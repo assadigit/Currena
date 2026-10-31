@@ -236,6 +236,27 @@ describe('runValidationSuite — the Part D tests', () => {
     expect(out.flags.get('copper-usd')).toBeDefined();
   });
 
+  it('S1-M1.6 #1: a PEGGED pair repeating at full precision is the peg working, not a frozen cache — never flagged', () => {
+    // The 2026-10-31 audit case: usdaed (the USD/AED peg, 3.6725 since the
+    // nineties) printed 3.6724998950 day after day to ten decimals — T-08
+    // (a)/(b)/(c) all read "duplicate/frozen" and the card sat in
+    // check-pending ("Can't tell") while the peg was simply doing its job.
+    const peg = dailySeries('2026-10-14', 30, () => 3.672499895);
+    const prevReading = {
+      id: 'usdaed',
+      value: 3.672499895,
+      asOf: '2026-10-13',
+      status: 'normal',
+      sourceName: 'Yahoo Finance',
+      updatedAt: '2026-10-13T04:20:00.000Z',
+    } as import('@currena/core').IndicatorReading;
+    const out = runValidationSuite(suiteInput({ usdaed: peg }, { previousReadings: [prevReading] }));
+    const t08 = out.results.find((r) => r.test === 'T-08')!;
+    expect(t08.flagged).not.toContain('usdaed');
+    expect(t08.failures.join(' ')).not.toContain('usdaed');
+    expect(out.flags.get('usdaed')).toBeUndefined();
+  });
+
   it('T-08 exempts the administrative rate series whose flat prints are normal (2026-10-15 venue evidence)', () => {
     // F6's outstanding-loan rate printed 6.21 for three straight months —
     // the series reprices only as the loan stock rolls. A repeated monthly

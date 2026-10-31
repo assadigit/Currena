@@ -438,6 +438,8 @@ export const insightsCopyFa: InsightsCopy = {
     // واژهٔ نمایشی «در انتظار بررسی» همه‌جا کنار رفت.
     checkPendingLine: 'فعلاً نمی‌توان گفت؛ {reason}',
     attentionLine: 'اکنون {value} — در ناحیه‌ای که قاعدهٔ آن پایش می‌کند: {rule}.',
+    // S1-M1.6 #4: سرعت ۳۰ روزه کنار ادعای سطحِ صدکی.
+    attentionLineSpeed: '({pct} در ۳۰ روز گذشته)',
     ruleVersionLine: 'نسخهٔ قاعده {v} (تغییر کرده در {date}).',
     nextReleaseToday: 'انتشار بعدی: امروز.',
     decidedEffectiveLine: 'تصمیم {decided} · اجرا {effective}',
@@ -777,6 +779,8 @@ export const insightsCopyFa: InsightsCopy = {
     breadthUp: 'شاخص‌های مثبت',
     breadthDown: 'شاخص‌های منفی',
     breadthFlat: 'بدون تغییر',
+    // S1-M1.6 #2: آستانهٔ «ثابت»، روایت‌شده (درخواست ممیزی).
+    flatBandNote: 'تغییر در محدودهٔ ۱ درصد، «ثابت» خوانده می‌شود.',
     coverageNote: '{count} شاخص از {total} شاخص دادهٔ این بازه را دارند.',
     belowHighLine: '{n} شاخص از {count} شاخص دست‌کم ۱۰ درصد پایین‌تر از سقف یک‌ساله خود قرار دارند',
     /** دو قهرمان بازه (02-ui-spec §3.4): بیشینه و کمینهٔ واقعی بازهٔ
@@ -815,7 +819,7 @@ export const insightsCopyFa: InsightsCopy = {
      * مکمل یاهوییِ ده‌سالهٔ کار شبانه است). */
     th5y: 'بازده پنج‌ساله',
     thFromHigh: 'فاصله از اوج یک‌ساله',
-    thTrend: 'روند',
+    thTrend: 'روند ۳ ماهه',
     // نسخهٔ ۳ (§7a، ۲۰۲۶-۱۰-۲۰، UI-27): سرستون ستون وضعیت جدول بازارها؛
     // ستون‌های جدول دقیقاً این‌ها هستند: بازار | امروز | سه‌ماهه | فاصله از
     // اوج یک‌ساله | وضعیت | آخرین قیمت. thTrend/thStatus بایگانی می‌مانند
@@ -1189,7 +1193,7 @@ export const insightsCopyFa: InsightsCopy = {
     thM1: 'یک ماه',
     thM3: 'سه ماه',
     thY1: 'یک سال',
-    thTrend: 'روند',
+    thTrend: 'روند ۳ ماهه',
     trendUp: 'صعودی',
     trendFlat: 'بدون تغییر',
     trendDown: 'نزولی',

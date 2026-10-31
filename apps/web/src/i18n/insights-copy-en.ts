@@ -4414,6 +4414,8 @@ export const insightsCopyEn = {
     // Fix spec A-02 (2026-10-14): the needs-attention line is GENERATED from
     // the reading's rule and value (the hand-written meanings are gone).
     attentionLine: 'Now {value} — in the zone its rule watches: {rule}.',
+    // S1-M1.6 #4: the 30-day speed beside a percentile-zone level claim.
+    attentionLineSpeed: '({pct} over the last 30 days)',
     // Fix spec A-07 (2026-10-14): the scoring-rule version rides the card.
     ruleVersionLine: 'Rule version {v} (changed {date}).',
     // Fix spec B-05 (2026-10-14): newer data is due today, not yet in.
@@ -4777,6 +4779,8 @@ export const insightsCopyEn = {
     breadthUp: 'Indices up',
     breadthDown: 'Indices down',
     breadthFlat: 'Flat',
+    // S1-M1.6 #2: the flat band, stated (the audit asked for the threshold).
+    flatBandNote: 'A move within ±1% reads as flat.',
     coverageNote: '{count} of {total} indices carry this period.',
     belowHighLine: '{n} of {count} indices are at least 10% below their 52-week high',
     /** The two featured movers (02-ui-spec §3.4): true extrema of the
@@ -4824,7 +4828,7 @@ export const insightsCopyEn = {
      * Yahoo-10y-anchored chg5y). */
     th5y: '5 years',
     thFromHigh: 'From 52-week high',
-    thTrend: 'Trend',
+    thTrend: '3m trend',
     // v3 UI_SPEC §7a (2026-10-20, UI-27): the state column's header — the
     // table's exact columns are Market | Today | 3 months | From 52-week
     // high | State | Last close. thTrend/thStatus stay archived (§1.7:
@@ -5244,7 +5248,7 @@ export const insightsCopyEn = {
     thM1: '1 month',
     thM3: '3 months',
     thY1: '1 year',
-    thTrend: 'Trend',
+    thTrend: '3m trend',
     trendUp: 'Up',
     trendFlat: 'Flat',
     trendDown: 'Down',

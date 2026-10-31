@@ -5,6 +5,7 @@
  */
 
 import type { IndicatorReading, WarningRule } from '@currena/core';
+import { formatNumber } from '@currena/core';
 import { interpolate } from '../../../i18n';
 import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatRuleText } from './labels';
@@ -189,7 +190,20 @@ export function attentionLineOf(
   const def = definitionFor(reading.id);
   const rule = formatRuleText(def.rule, reading.id, copy.rule, copy.units, numberLocale);
   const value = formatIndicatorValue(reading.id, reading.value, numberLocale, copy.units);
-  return interpolate(copy.ui.attentionLine, { rule, value });
+  let line = interpolate(copy.ui.attentionLine, { rule, value });
+  // S1-M1.6 #4 (2026-10-31 audit): a percentile-zone flag is a LEVEL claim —
+  // carry the 30-day speed beside it, so a high level that is fast
+  // unwinding never reads as fresh stress (the gold/silver case: top-decile
+  // wording beside a −7.8% month). Conditions only, no direction verdict —
+  // the speed phrase states the move, the reader reads the condition.
+  if (def.rule.kind === 'percentile' && reading.change30d !== undefined && Math.abs(reading.change30d) >= 1) {
+    const pct = `${formatNumber(reading.change30d, numberLocale, {
+      maximumFractionDigits: 1,
+      minimumFractionDigits: 0,
+    })}${numberLocale === 'fa-IR' ? '٪' : '%'}`;
+    line += ' ' + interpolate(copy.ui.attentionLineSpeed, { pct });
+  }
+  return line;
 }
 
 /** Band position words keyed by locale (the R28 tokens' rendered form). */

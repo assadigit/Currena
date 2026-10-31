@@ -24,6 +24,7 @@ import { IconImg, stateIconUrl } from '../../icons/currena';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { belowHighCount, marketBreadth } from './briefing';
+import { CORRECTION_PCT } from '@currena/insights/markets/definitions';
 import { periodWord, type MarketsView } from './shared';
 
 /* ------------------------------------------------------------------ *
@@ -46,9 +47,16 @@ export function marketsVerdictStep(snapshot: Pick<MarketsSnapshot, 'markets' | '
   return up > markets.length / 2 ? 1 : 2;
 }
 
-/** How many of the snapshot's markets sit in correction or a bear market. */
+/** How many of the snapshot's markets sit in correction or a bear market.
+ * S1-M1.6 #2 (2026-10-31 audit): the RAW ≥10%-below-high rule — the same
+ * number belowHighCount reads and the cards' distances show — so every
+ * sentence and the stat box share ONE computed value. The stored STATUS
+ * keeps its exit-buffer memory for the per-card tags (a −9% market that
+ * was ≤ −10% still reads "Correcting"), but no summary count may cite the
+ * buffered tag against the visible evidence (the audit saw "7 of 16 in
+ * correction" beside six ≥10% distances). */
 export function marketsInCorrectionCount(markets: readonly MarketEntry[]): number {
-  return markets.filter((m) => m.status === 'correction' || m.status === 'bear').length;
+  return markets.filter((m) => m.fromHigh <= CORRECTION_PCT).length;
 }
 
 const VERDICT_WORD: Record<MarketsVerdictStep, 'verdictBullish' | 'verdictMixed' | 'verdictCorrecting' | 'verdictBearish'> = {
@@ -197,6 +205,13 @@ export function MarketsVerdictBox({
             <span style={{ flexGrow: breadth.flat }} className="bg-[var(--color-text-tertiary)] opacity-40" />
           </div>
         ) : null}
+        {/* S1-M1.6 #2: state the flat threshold — the band that decides
+         * up/flat/down is a rule the reader can now check against the
+         * numbers (the audit asked for the sentence and the counts to
+         * agree, threshold stated). */}
+        <p className="m-0 mt-1.5 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-markets-flat-band-note>
+          {copy.markets.flatBandNote}
+        </p>
       </div>
       {/* §3.2's separate secondary context line: how many indices sit at
        * least 10% below their 52-week high — RAW fromHigh values, counted
@@ -233,9 +248,13 @@ export function marketsTakeaway(
   const { summary, markets } = snapshot;
   const stressed = summary.nAttention + summary.nUnusual;
   const count = num(markets.length);
+  // S1-M1.6 #2: the calm line's up-count is the BANDED today breadth — the
+  // same ±1% definition the breadth box beside it speaks (the old raw
+  // any-positive count said "8 rose" under a box reading "5 up · 3 flat").
+  const todayBreadth = marketBreadth(markets, 'today');
   let line: string;
   if (summary.signal === 'normal') {
-    line = interpolate(copy.markets.takeawayCalm, { up: num(summary.roseToday), count });
+    line = interpolate(copy.markets.takeawayCalm, { up: num(todayBreadth.up), count });
   } else if (summary.signal === 'attention') {
     line = interpolate(copy.markets.takeawaySome, {
       n: num(stressed),

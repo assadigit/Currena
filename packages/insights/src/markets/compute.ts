@@ -573,7 +573,13 @@ export function summarizeMarkets(markets: readonly MarketEntry[]): MarketsSummar
 
   return {
     count: markets.length,
-    roseToday: markets.filter((m) => m.chg1d > 0).length,
+    // S1-M1.6 #2 (2026-10-31 audit): the BANDED up-count — a rise beyond
+    // TREND_BAND_PCT (the same ±1% band the page's breadth box and trend
+    // words read; the web's MARKETS_FLAT_BAND_PCT mirrors it). The old raw
+    // any-positive count said "8 rose" under a breadth box reading
+    // "5 up · 3 flat"; the narrator and the takeaway now speak the same
+    // number the box shows.
+    roseToday: markets.filter((m) => m.chg1d > TREND_BAND_PCT).length,
     nAttention,
     nUnusual,
     signal,

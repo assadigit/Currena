@@ -971,3 +971,36 @@ describe('MAP §9.7 — the map fields change ZERO KV operations', () => {
     expect(store.ops).toEqual({ reads: 1, writes: 1 });
   });
 });
+
+// S1-M1.6 #2 (2026-10-31 audit): roseToday reads the ±1% band — the same
+// rule the page's breadth box and trend words speak, so no sentence can
+// disagree with the counts beside it.
+describe('summarizeMarkets — the banded roseToday (S1-M1.6 #2)', () => {
+  it('counts only rises beyond the band; a +0.3% day is flat, not "rose"', () => {
+    const m = (id: MarketEntry['id'], chg1d: number): MarketEntry => ({
+      id,
+      asOf: RUN_DATE,
+      close: 1000,
+      chg1d,
+      chg3m: 2,
+      high52w: 1100,
+      low52w: 900,
+      fromHigh: -9,
+      rangePos: 50,
+      trend: 'up',
+      status: 'normal',
+      source: 'eodhd',
+      stale: false,
+      weekly: [[300, 1000]],
+    });
+    const s = summarizeMarkets([
+      m('sp500', 1.4), // up
+      m('ndx', 0.3), // inside the band — flat, NOT rose
+      m('dax', -0.2), // flat
+      m('cac', -1.7), // down
+      m('ftse', 2.1), // up
+    ]);
+    expect(s.roseToday).toBe(2);
+    expect(s.count).toBe(5);
+  });
+});

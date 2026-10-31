@@ -221,7 +221,10 @@ describe('markets copy parity (en/fa)', () => {
 
 describe('marketsTakeaway — the verdict reason line', () => {
   it('calm line counts the live row total, not a hardcoded 14', () => {
-    const line = marketsTakeaway(snapshot(breadth(16, 9), { roseToday: 11 }), insightsCopyEn, 'en-US');
+    // S1-M1.6 #2: the up-count now derives from the rows' own banded
+    // chg1d (> +1% counts as up) — 11 of the 16 rows carry a >1% day.
+    const rows = breadth(16, 9).map((m, i) => ({ ...m, chg1d: i < 11 ? 1.2 : -0.4 }));
+    const line = marketsTakeaway(snapshot(rows, { roseToday: 11 }), insightsCopyEn, 'en-US');
     expect(line).toContain('11 of 16 markets rose today');
   });
 
@@ -239,5 +242,41 @@ describe('marketsTakeaway — the verdict reason line', () => {
     const line = marketsTakeaway(snapshot(breadth(16, 9), { roseToday: 11 }), insightsCopyFa, 'fa-IR');
     expect(line).toContain('۱۶');
     expect(line).not.toContain('14');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * Gap-closure S1-M1.6 #2 (2026-10-31 audit): the markets summary counts.
+ * One shared computed value for every sentence and the stat box; the
+ * up/down/flat vocabulary reads the ±1% band everywhere it is spoken.
+ * ------------------------------------------------------------------ */
+
+describe('S1-M1.6 #2 — the correction count and the up-count speak one rule', () => {
+  it('marketsInCorrectionCount reads the RAW ≥10% rule — a buffered status never pads the sentence', async () => {
+    const { marketsInCorrectionCount } = await import('./world-markets/MarketsVerdict');
+    const markets = [
+      entry({ id: 'sp500', fromHigh: -12.5, status: 'correction' }), // counts (raw ≥10%)
+      entry({ id: 'ndx', fromHigh: -22, status: 'bear' }), // counts (bear IS ≥10% below)
+      entry({ id: 'taiex', fromHigh: -9.2, status: 'correction' }), // buffered tag, raw −9.2% — NOT counted
+      entry({ id: 'dax', fromHigh: -4, status: 'normal' }),
+    ];
+    // The audit's case: the sentence said 7 while six cards showed ≥10%.
+    expect(marketsInCorrectionCount(markets)).toBe(2);
+    // And the below-high line (the same rule) agrees by construction.
+    const { belowHighCount } = await import('./world-markets/briefing');
+    expect(belowHighCount(markets)).toBe(2);
+  });
+
+  it('the takeaway up-count is the ±1% BANDED today breadth, never the raw any-positive count', () => {
+    const markets = [
+      entry({ id: 'sp500', chg1d: 1.4 }), // up (> +1%)
+      entry({ id: 'ndx', chg1d: 0.3 }), // flat (inside the band) — the old count said "rose"
+      entry({ id: 'dax', chg1d: -0.2 }), // flat
+      entry({ id: 'cac', chg1d: -1.5 }), // down
+    ];
+    const line = marketsTakeaway({ markets, summary: summary({ roseToday: 3, signal: 'normal' }) }, insightsCopyEn, 'en-US');
+    // The banded up count is 1 — the box beside the sentence says 1 up · 1 down · 2 flat.
+    expect(line).toContain('1');
+    expect(line).not.toMatch(/\b3\b.*rose/);
   });
 });

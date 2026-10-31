@@ -508,6 +508,13 @@ const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'rba-cash-rate',
   'au-home-loan',
   'au-deposit-rate',
+  // S1-M1.6 #1 (2026-10-31 audit): the PEGGED pair. USD/AED has sat on its
+  // 3.6725 peg for decades — a full-precision repeat day after day is the
+  // peg working, not the duplicate/frozen-cache bug class (T-08 (a)/(b)/(c)
+  // all misread it and the card sat in check-pending on 2026-10-30). A
+  // genuinely broken AED feed is still caught by the source report (the
+  // fetch itself failing), which is the honest signal for a peg.
+  'usdaed',
 ]);
 
 /**

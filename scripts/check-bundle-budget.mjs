@@ -758,7 +758,15 @@ const BUDGETS = [
   // blocked daily F2 file) riding this chunk. gz +0.19 kB over the old
   // ceiling. Entry chunk untouched at 294.45/88.48.
   // Justified in CHANGELOG §2026-10-31q.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1139_000, gz: 268_500, label: 'Insights lazy chunk' },
+  //
+  // 2026-10-31r gap-closure S1-M1.6 bump (measured 1139.36/268.36 →
+  // budget 1140/268.5): the audit fixes riding this chunk — the flat-band
+  // note on the markets breadth box (round-59), the attention line's
+  // 30-day speed phrase (round-59) and the "3m trend" column headers
+  // (round-59, the label now names its measure). gz stays inside 268.5.
+  // Entry chunk untouched at 294.45/88.49.
+  // Justified in CHANGELOG §2026-10-31r.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1140_000, gz: 268_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {
