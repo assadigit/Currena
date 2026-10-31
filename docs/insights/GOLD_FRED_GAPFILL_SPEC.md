@@ -311,8 +311,7 @@ below confirms it.
 - The 2026-10-31 04:10 UTC main rung (S3 code) stamped `goldSummary` on
   the wire; the 04:20/04:25/04:27/04:40 rungs completed after it.
 - `/api/insights` post-rung: `goldSummary` PRESENT; `breakeven-tilt`
-  present among the readings (value −0.24, asOf 2026-10-29 —
-  T5YIFR 2.23 − T5YIE 2.47); the trio's asOf moved WITH the decade group
+  present among the readings; the trio's asOf moved WITH the decade group
   (the D-4 split's effect); the ingest report's `realYieldFill: 0` row
   visible in `/admin`.
 - The panel check on currena.ir (EN + fa): the gold panels render under
@@ -320,12 +319,38 @@ below confirms it.
   («انتظارات در حال فروکش» — the live tilt is negative); zero page errors
   in both locales.
 
+**The S3-verify measurement (2026-10-31 ~04:35 UTC, after the rung — the
+numbers that stand).** The close-time row above carried the tilt at
+`asOf 2026-10-29 (T5YIFR 2.23 − T5YIE 2.47)` — the pre-rung values this
+file was written with; the rung itself landed a day later. Measured on
+the wire: `breakeven-tilt` value **−0.24 (unchanged)**, `asOf
+2026-10-30` — T5YIFR 2.22 − T5YIE 2.46, status `context`, source
+`FRED (T5YIFR − T5YIE, derived)`. The trio (`us10y` / `us30y` /
+`real-yield-10y`) all `asOf 2026-10-29` (the archive's 2026-10-28 + 1)
+while the decade group sits at `2026-10-30` (2026-10-29 + 1) — both
+advanced one day at the SAME rung: the D-4 split's first live
+observation, **day 1 of 3 of the `asOf`-watch**. Read-only KV
+(`insights:status` @ 04:20 UTC) confirms the run report row aloud
+(`realYieldFill: 0 … the stored history stays pure DFII10`) and the
+seven-group split all `ok=true [fetched]` (group 1 DGS10 + DGS30,
+group 2 DFII10 from 2003-01-02); the tilt's history key
+`insights:hist:breakeven-tilt` exists; T-01/T-02/T-03 green on the
+rung. Browser (EN + fa, zero page errors): both panels under the
+balance; the lane phrase EN `expectations fading` / fa «انتظارات در حال
+فروکش»; the tilt card renders in both locales (EN `The market's
+inflation tilt` −0.24 pts, fa «شیب انتظارات تورمی بازار» — context
+tier, behind the prices-heat lane's "Show all 10 hidden indicators"
+expander by the R7 design). Full record: the PR #5 verification comment
+(2026-10-31).
+
 ### Known gaps (honest)
 
 - The trio-split's freshness win is CAUSAL-INFERRED from the 10/10 lag
 evidence + the cosd/no-cosd path difference, not yet OBSERVED over
 multiple rungs — the worklog's next-steps row asks for a 3-day
-`asOf`-watch before calling it fully proven.
+`asOf`-watch before calling it fully proven. (Day 1 observed
+2026-10-31: the trio moved WITH the decade group at the same rung;
+days 2–3 remain.)
 - The cross-fill's degraded-day path is tested by fixture but has not
   fired live (all groups healthy at deploy time — by design it stays
   quiet on healthy days).
