@@ -5,6 +5,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31m] — gap-closure S1-M1.1: the session opens — baseline re-verified (10,296 tests green) + the Worker-egress probe table (13 hosts; NY Fed fine, ArcGIS slow, FiscalData blocked, RBA 403 re-confirmed)
+
+The gap-closure program's first session (docs/gap-closure/S1-foundation-and-trust.md).
+Ground truth before anything shipped: `pnpm install` + `pnpm gates` on a clean
+clone of `main` (`d4d62a1`) — **ALL 9 GATES GREEN, 10,296 tests in 1m49s**, the
+same counts the Gold Program S6 recorded. The probe then answered the program's
+biggest unknown — what can Worker egress actually reach:
+
+- **`docs/gap-closure/VERIFIED-SOURCES.md`** gained the "Worker egress"
+  section: a temporary Worker `currena-probe` (deployed 17:31 UTC, deleted
+  after — the URL 404s) fetched 15 URLs across 13 hosts ONCE each with the
+  declared honest UA `CurrenaDashboard/1.0` (F-09/T-25), single attempt, two
+  full runs + one targeted 30s re-run. Verdicts: **NY Fed GSCPI 200 in ~0.5s**
+  (the register's Akamai fear did not materialize — S4 can build it from the
+  Worker); **TIC tables 200 but slow (8–10s)** — S2's parser must keep the
+  honest single-attempt 12s policy with <4s margin; **ArcGIS 200 only past
+  12s** (first byte 12.5s at a 30s budget — S4 needs a longer `timeoutMs` or
+  the GHA venue); **FiscalData API hard-blocked from Workers (timeout ×3 at
+  12s/12s/30s** while a normal client gets 200 JSON in <1s — S3's
+  fiscal/auction work must use the GHA venue, exactly like RBA); **RBA 403
+  re-confirmed** (M1.5 proceeds on mirrors); ECB, FRED, ABS, Yahoo,
+  stats.govt.nz, Fed Board, policyuncertainty, matteoiacoviello all 200.
+- **`docs/gap-closure/PROGRESS.md`**: M1.1 ticked with the baseline evidence,
+  the credential-verification record, and the honest rotation note (the owner
+  re-pasted identical token values and instructed the session to use them;
+  rotation remains the top owner action item — nothing was printed, logged or
+  committed).
+
 ## [2026-10-31l] — Gold Program S6 wrap-up: the reminder spec (GOLD_RECHECK_SPEC.md) — the procedure home for every later re-check + re-backtest; the session fully closed (everything pushed, merged, deployed)
 
 The owner's wrap-up round. State verified end-to-end first: `main` =

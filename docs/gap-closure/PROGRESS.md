@@ -4,7 +4,7 @@ The single place to see how much of the gap-analysis is done. Agents update this
 file at the end of every milestone (tick the box, add evidence) and every session
 (session log). **37 milestones in 6 sessions.**
 
-> Last updated: 2026-10-31 (plan created, nothing implemented yet)
+> Last updated: 2026-10-31 (S1 in progress — M1.1 done)
 
 ## Summary
 
@@ -37,7 +37,11 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 ## Milestones
 
 ### S1 Foundation and trust (`S1-foundation-and-trust.md`)
-- [ ] M1.1 Environment, baseline and Worker-egress probe
+- [x] M1.1 Environment, baseline and Worker-egress probe
+  - Baseline (2026-10-31 16:53 UTC): `pnpm install` clean, `pnpm gates` **ALL 9 GREEN — 10,296 tests in 1m49s** (core 195 · scraper 67 · insights 973 · markets 13 · api 371 · web 8677; secret scan clean, 8 patterns · 688 files). Matches the S6 Gold Program record.
+  - Credentials: `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` verified present via `wrangler whoami` (account `5f123468027e4b2094167df1d2f2e852` — matches production); `git push origin main` verified via dry-run (credential helper reads `GITHUB_TOKEN` from the environment; no secret in any file — repo tree clean).
+  - Rotation: **not verified** — the owner re-pasted identical token values and explicitly instructed the session to use them (recorded 2026-11-01). The DEPLOY.md 2026-10-31k record shows the same `cfut_dGmEj…` prefix, i.e. these are the tokens the 2026-10-31 planning chat already exposed. Rotation stays the **top owner action item**; this session never prints or commits them.
+  - Egress probe: temporary Worker `currena-probe` (deployed + **deleted**; URL 404s), honest UA `CurrenaDashboard/1.0`, single attempt per host, 2 full runs + 1 targeted 30s re-run. **13 of 15 fetches 200** (incl. NY Fed GSCPI — the Akamai fear was unfounded); `ticdata` slow (8–10s, thin margin under the 12s policy); ArcGIS slow (>12s first byte, works at 30s); **FiscalData API blocked from Worker egress (timeout ×3)**; **RBA 403 re-confirmed**. Full table → `VERIFIED-SOURCES.md` "Worker egress".
 - [ ] M1.2 Diagnose and repair GitHub Actions
 - [ ] M1.3 Progress tooling
 - [ ] M1.4 Stale-voter honesty
