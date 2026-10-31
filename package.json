@@ -15,6 +15,8 @@
     "deploy": "pnpm --filter @currena/api run deploy",
     "copy:audit": "node scripts/audit-persian-copy.mjs",
     "copy:audit:update": "node scripts/update-persian-copy-manifest.mjs",
+    "gap:progress": "node scripts/gap-progress.mjs",
+    "gap:progress:test": "node --test scripts/gap-progress.test.mjs",
     "lint": "eslint .",
     "registry:generate": "tsx scripts/generate-indicators-registry.ts",
     "narrator:vocabulary": "pnpm --filter @currena/insights run narrator:vocabulary",

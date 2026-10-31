@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31o] — gap-closure S1-M1.3: progress tooling — `pnpm gap:progress` regenerates the PROGRESS.md Summary deterministically (6/6 tests, idempotent)
+
+- **`scripts/gap-progress.mjs`** (new, Node ESM, zero dependencies): parses
+  the `### S<n>` session sections of `docs/gap-closure/PROGRESS.md`, counts
+  the top-level `- [x]`/`- [ ]` milestone lines only (indented evidence
+  sub-bullets and the G1–G13 gap-coverage items are structurally excluded),
+  and rewrites the Summary table, the Total row and the last-updated line
+  between the new stable markers `<!-- gap-progress:begin/end -->`. Missing
+  markers or missing sections fail loudly instead of drifting. A `--check`
+  mode exits non-zero when the file is stale (CI-able later).
+- **`scripts/gap-progress.test.mjs`** (node:test — the root workspace has no
+  vitest package): 6 tests over `tests/fixtures/gap-progress-sample.md`
+  covering the counting rules, theme preservation from the existing table,
+  regeneration, idempotency (byte-identical second run) and both loud-failure
+  paths. `pnpm gap:progress` + `pnpm gap:progress:test` added to the root
+  package.json; eslint and all 9 gates green (10,296 tests).
+- First real run: the Summary now reads S1 2/7 (29%), total 2/37 (5%),
+  generated from the ticks — the hand-maintained numbers are retired.
+
 ## [2026-10-31n] — gap-closure S1-M1.2: GitHub Actions diagnosed AND repaired — the billing hold (owner-side, lifted 14:34 UTC) + the invalid shiller-fetch workflow (repo-side, fixed); first-ever green shiller run, dry-run ingest green, CI green
 
 Two verified causes behind the "Actions red since 2026-10-20" premise:
