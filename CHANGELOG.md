@@ -5,6 +5,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-10-31v] — gap-closure S2-M2.3: `GET /api/insights/tic` live — one KV read, ETag/304, the kill switch armed; the typed web client; the Treasury-verified calendar entry (round-60)
+
+The owner's top-priority feature now has its public read path: the
+`insights:tic:v1` written by rung3 serves at `/api/insights/tic`
+exactly like the markets/fx boards.
+
+- **The endpoint:** free + unauthenticated under the shared data-bucket
+  rate limit, **exactly one KV read per request** (pinned by test),
+  `Cache-Control: public, max-age=300, s-maxage=300` + a
+  content-addressed ETag (304 verified on production) + the Worker edge
+  cache + `X-Robots-Tag: noindex`. The calm 503s carry distinct machine
+  codes (`tic_not_ready` for an absent or POISONED key — the store's
+  zod defense degrades to "being prepared", never garbage;
+  `tic_unavailable` for a reader rejection). The per-source kill switch
+  rides the boards machinery: the registry generator now knows the
+  `tic` board (L0 public domain, 17 U.S.C. § 105 — no licence hide), so
+  a future generator run without the directive hides it exactly like
+  markets/fx.
+- **Staleness is honest by construction:** the endpoint serves the
+  snapshot VERBATIM (never hides data); the UI derives ">70 days old"
+  at render time from `dataMonth` via the shared pure `ticIsStale` — a
+  stale table can never present as current (route test pins the
+  contract).
+- **The typed client** (`apps/web/src/lib/tic.ts`): the markets.ts
+  twin — zod-validated with the core `TicSnapshot` contract, last-good
+  localStorage paint for offline/instant render, the null error
+  surface (any failure → null → "loading"/"being prepared").
+- **Calendar:** the `tic` kind (core enum + the NextUpStrip "TIC"
+  badge) and the entry `tic-2026-09` — **November 18, 2026** (Sep 2026
+  data), verified from the Treasury's own October press-notice PDF
+  ("The next release … is scheduled for November 18, 2026"). Later
+  dates ride each month's notice (`TIC-press-notice-<Mon>-<YYYY>.pdf`)
+  — never guessed. The fa title triaged as Persian-copy round-60
+  (terminology consistent with the «اوراق خزانه‌داری آمریکا» family).
+- **Bundle:** Insights lazy chunk 1140/268.5 → **1140/269** gz
+  (measured 1139.82/268.54 — the client + the zod contract ride the
+  lazy chunk; justified in `check-bundle-budget.mjs`).
+- **Tests:** +21 (8 api route incl. the stale-serves-verbatim and
+  poisoned-key paths; 13 web client). Gates ALL GREEN — **10,401**.
+- **Live:** api worker `c49f2983` (22:04 UTC) — `/api/insights/tic`
+  200 (45,326 B, dataMonth 2026-08, 21 holders), headers verified,
+  ETag→304 verified.
+
 ## [2026-10-31u] — gap-closure S2-M2.2: the TIC parser, data model and rung3 registration — `insights:tic:v1` written LIVE via the manual lever (data month 2026-08, 21 holders)
 
 The owner's top-priority feature's ingest layer, live in production. The

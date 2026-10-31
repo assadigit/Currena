@@ -12,12 +12,12 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 | Session | Theme | Milestones done | % |
 |---|---|---|---|
 | S1 | Foundation and trust | 7 / 7 | 100% |
-| S2 | Foreign holdings of US Treasuries (priority feature) | 2 / 6 | 33% |
+| S2 | Foreign holdings of US Treasuries (priority feature) | 3 / 6 | 50% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 0 / 6 | 0% |
 | S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **9 / 37** | **24%** |
+| **Total** | | **10 / 37** | **27%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -98,19 +98,28 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **Deploy + the manual trigger (the acceptance):** api worker deployed by the prior session — `db71eb3a` 21:17:32 UTC (12 s timeout), then after the first firing died it committed `ad64b94` (**TIC_TIMEOUT_MS = 30 s** — still ONE attempt, no retries, F-11; the ArcGIS/yield-curve slow-host prescription) and deployed `acf96674` 21:38:32; this session's `wrangler secret put` (REFRESH_SECRET rotation) rolled the version to **`ff6dea19`** (21:40:16, live at 100%). Manual lever `POST /internal/insights-ingest?phase=extra` (force mode): first attempt 21:31 UTC **timed out honestly** at the 12 s default (recorded `failed` — no retry inside the invocation), re-trigger 21:40:20 UTC (against `ff6dea19`) **succeeded**: `tic-slt ok — "written — data month 2026-08, 21 holders"`, budget **5/50** (status write + the declared 4). `insights:tic:v1` read back via the CF REST API and validates: dataMonth 2026-08, releasedAt 2026-10-16, total 9331.7 bn, official 3755.6 / private 5576.1, 21 holders × 24 months, Australia 79.912 bn (Table 3), Japan 1116.7→1103.9→1068.3 bn with net sales −37.0 bn (2026-08). `/api/health` ok, `/api/insights` 200. **KV writes for the rung: 2** (tic + status); daily steady-state 1–2.
   - **Final live state (the commit-revert discipline):** the temp verification gate #2 (21:52) was REVERTED BEFORE firing; the committed code (`ad64b94`) redeployed as **`1613fa5c`** at 21:45:53 UTC — the deployments API confirms it is the live version (superseding the secret-put `ff6dea19`, whose code carried the temp gate). The 12 s → 30 s timeout evidence (the first firing's honest death) is recorded in RUNGS.md + VERIFIED-SOURCES' egress rows.
   - **REFRESH_SECRET rotated** at 21:39 UTC (the documented unrecoverable-value pattern — DEPLOY.md 2026-10-21/10-28 precedents; the prior session's sandbox held the value): new value in `apps/api/.dev.vars` (gitignored) + `wrangler secret put`. Scheduled rungs never read it; only the manual levers do. Owner can re-rotate anytime.
-- [ ] M2.3 Public endpoint, store and calendar
+- [x] M2.3 Public endpoint, store and calendar
+  - **`GET /api/insights/tic`** (commit `1a18bc3`): the markets/fx twin — exactly **one KV read** (pinned by test), free + unauthenticated under the shared data-bucket rate limit, the hidden-boards per-source kill switch armed via the generator's `tic` directive (L0 public domain → serves public from day one; a generator run without the entry hides it, the markets/fx discipline), ETag + 304 + the Worker edge cache, `Cache-Control: public, max-age=300, s-maxage=300`, `X-Robots-Tag: noindex`, the calm 503s (`tic_not_ready` for an absent/poisoned key, `tic_unavailable` for a reader rejection). Staleness is derived at RENDER time from `dataMonth` (the shared pure `ticIsStale`) — the endpoint never hides data, the UI never shows a stale table as current (pinned by the route test).
+  - **Typed client** `apps/web/src/lib/tic.ts`: the markets.ts twin — zod-validated with the core `TicSnapshot` contract, last-good localStorage paint (`currena:insights:tic`), the null error surface (13 tests).
+  - **Calendar:** kind `tic` added to the core enum (+ the NextUpStrip TIC badge); entry `tic-2026-09` = **2026-11-18** (Sep 2026 data) — verified from the Treasury's own press-notice PDF ("The next release … is scheduled for November 18, 2026"); later dates ride each month's notice (the pattern `TIC-press-notice-<Mon>-<YYYY>.pdf`), never guessed — recorded in VERIFIED-SOURCES. fa title triaged **round-60** (terminology follows the «اوراق خزانه‌داری آمریکا» yield-card family; no em dash).
+  - **Tests:** +21 (8 api route: 200/ETag, 304, not-ready, poisoned-key, stale-serves-verbatim, one-KV-read, private-mode AC-05, tic_unavailable; 13 web client). Gates ALL GREEN — **10,401 tests**. Registry regenerated; INDICATORS_AND_DATA_SOURCES §3 row. Bundle: Insights lazy 1140/**269** (measured 1139.82/268.54; the client + zod contract; justified in check-bundle-budget.mjs).
+  - **Deploy + verify:** api worker **`c49f2983`** (22:04 UTC). Production: `/api/health` ok; `/api/insights/tic` **200, 45,326 B** — dataMonth 2026-08, 21 holders, total 9,331.7 bn, Japan 1,068.283 first; headers `public, max-age=300, s-maxage=300` + ETag + `X-Robots-Tag: noindex`; the matching `If-None-Match` answers **304**. Zero new KV reads per serve beyond the one; the calendar entry rides tomorrow's 04:10 ingest into the snapshot.
 - [ ] M2.4 UI: holders table, trend chart, weekly custody card
 - [ ] M2.5 Bilingual copy, glossary, narrator and licences
 - [ ] M2.6 Deploy verification, docs and session close
 
-> **S2 parallel-session note (2026-10-31 ~21:50 UTC):** TWO sessions worked
-> M2.2 concurrently (the builder session — code, deploys, temp-gate captures;
-> the verifier session — REFRESH_SECRET rotation, the manual-lever trigger,
-> the milestone record). The records are MERGED (commit `c996533`). The
-> builder session continues with M2.3→M2.6; any other S2 session must
-> `git pull --rebase` and re-read this file before starting a milestone and
-> must skip every already-ticked milestone. Every push below does
-> pull-rebase first (the §3.4 discipline).
+> **S2 parallel-session note (2026-10-31 ~21:50 UTC, UPDATED 22:05):** TWO
+> sessions worked M2.2 concurrently (the builder session — code, deploys,
+> temp-gate captures; the verifier session — REFRESH_SECRET rotation, the
+> manual-lever trigger, the milestone record). The records are MERGED
+> (commit `c996533`). **M2.3 was then completed by the VERIFIER session**
+> (commit `1a18bc3`, deployed + verified as `c49f2983` at 22:04 UTC — the
+> builder's 21:50 note declared intent to continue M2.3→M2.6 but no M2.3
+> work had landed; the verifier was already mid-milestone). **The verifier
+> session claims M2.4→M2.6 from 22:05 UTC.** Any other S2 session must
+> `git pull --rebase` and re-read this file before starting a milestone,
+> must skip every already-ticked milestone, and should record its claim
+> here before starting. Every push does pull-rebase first (§3.4).
 
 ### S3 US credit, liquidity, fiscal and growth nowcast (`S3-us-plumbing.md`)
 - [ ] M3.1 Series verification and licence scan
