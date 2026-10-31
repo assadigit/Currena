@@ -8,13 +8,18 @@
 # 04:20 lands inside the fresh post-midnight slice with ~750 writes of
 # headroom (see docs/insights/03-data-sources.md, Phase I3 record).
 #
-# RUNNER EXHAUSTION (since 2026-10-20): this account's free GitHub Actions
-# minutes exhausted — the job fails at runner allocation. The Worker's own
-# minute-cron (apps/api/src/insights-ingest-cron.ts) owns the ingest as the
-# PRIMARY venue since then (verified live through the 04:10/04:20/04:25+
-# 04:27/04:40 rungs). This workflow stays as belt-and-braces: if GHA
-# recovers, both venues write the same bytes (idempotent content). No paid
-# plan is needed for either path.
+# RUNNER EXHAUSTION (2026-10-20 → 2026-10-31): the account's Actions were
+# blocked by a billing/spending-limit hold — GitHub's own job annotation
+# read "The job was not started because recent account payments have failed
+# or your spending limit needs to be increased" (verified via the API,
+# gap-closure S1-M1.2, 2026-10-31; every run failed in ~2s with no runner
+# allocated). The hold lifted 2026-10-31 ~14:34 UTC (first green CI run
+# #363) and push/PR runs have been green since. The Worker's own minute-cron
+# (apps/api/src/insights-ingest-cron.ts) remains the PRIMARY venue — it has
+# owned the ingest through the whole outage (verified live through the
+# 04:10/04:20/04:25+04:27/04:40 rungs). This workflow stays as
+# belt-and-braces: if GHA stays healthy, both venues write the same bytes
+# (idempotent content). No paid plan is needed for either path.
 #
 # The job exits non-zero when any P1 indicator is unavailable (product
 # degraded). Failure signals (Phase I7 alerting): this red run (GitHub's
@@ -48,7 +53,8 @@ jobs:
     timeout-minutes: 15
     env:
       # Identifiers, not secrets (the namespace id also lives in
-      # apps/api/wrangler.jsonc; the repo is private).
+      # apps/api/wrangler.jsonc; the repo is public — identifiers only, never
+      # a token).
       CLOUDFLARE_ACCOUNT_ID: "5f123468027e4b2094167df1d2f2e852"
       INSIGHTS_KV_NAMESPACE_ID: "4627ac33a4b148ff9fc2189266b1890e" # RATES namespace
       INSIGHTS_RUN_MODE: ${{ github.event_name == 'schedule' && 'scheduled' || 'manual' }}

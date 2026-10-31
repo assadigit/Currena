@@ -24,11 +24,14 @@ concurrency:
   group: shiller-fetch
   cancel-in-progress: false
 
-timeout-minutes: 10
-
 jobs:
   fetch-and-convert:
     runs-on: ubuntu-latest
+    # 2026-10-31 (gap-closure S1-M1.2): timeout-minutes lives HERE, at job
+    # level — a top-level `timeout-minutes` is invalid workflow syntax and
+    # GitHub rejected the whole file (every push since 2026-10-19 produced a
+    # zero-job instant "failure" run; the workflow never executed once).
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
