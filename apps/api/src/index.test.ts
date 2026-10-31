@@ -530,6 +530,18 @@ describe('routes (injected service — no Workers, no live sites)', () => {
     expect(body.error.code).toBe('source_unavailable');
   });
 
+  it('POST /internal/insights-ingest?phase=<bogus> → 400 naming the valid phases (extra included)', async () => {
+    const res = await makeApp().request(
+      '/internal/insights-ingest?phase=whenever',
+      { method: 'POST', headers: { 'X-Refresh-Secret': 'test-secret' } },
+      env,
+    );
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('invalid_phase');
+    expect(body.error.message).toContain("'extra'");
+  });
+
   /* ----------------------- rate limiting (BACKLOG #18) ------------------ */
 
   it('POST /internal/refresh: 11 rapid attempts from one IP → 429 + Retry-After', async () => {

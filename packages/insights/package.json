@@ -14,6 +14,7 @@
     "./markets/definitions": "./src/markets/definitions.ts",
     "./fx": "./src/fx/index.ts",
     "./fx/definitions": "./src/fx/definitions.ts",
+    "./tic": "./src/tic/index.ts",
     "./prices": "./src/prices/index.ts",
     "./ingest": "./src/ingest/index.ts"
   },

@@ -1672,6 +1672,105 @@ export const FxSnapshotSchema = z
 export type FxSnapshot = z.infer<typeof FxSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * Foreign holdings of U.S. Treasuries — the Treasury TIC SLT tables
+ * (gap-closure S2, docs/gap-closure/S2-treasury-foreign-holders.md).
+ *
+ * The whole section is ONE KV key — `insights:tic:v1` — fetched from
+ * ticdata.treasury.gov by the rung3 extra-source of the currena-api
+ * minute cron (04:30 UTC, release-aware gate) and served read-only by
+ * GET /api/insights/tic. Composite dataset, NOT 100 indicator ids: the
+ * holders table, the trend chart and the chips all render from this one
+ * document.
+ *
+ *   dataMonth   — the SLT reference month (YYYY-MM, e.g. 2026-08)
+ *   releasedAt  — the file's HTTP Last-Modified at fetch time (display
+ *                 only: "data for <month>, released <date>")
+ *   holders[]   — the Table 5 top-20 plus Australia (Table 3); months
+ *                 are ASCENDING, latest last, ≤24 per series
+ *   netSalesBn  — Table 3 "Net U.S. Sales" converted from millions;
+ *                 POSITIVE = foreigners NET BOUGHT (the file's own sign
+ *                 line). `n.a.` months are ABSENT (never zero) — the
+ *                 series only exists from 2023-02 (the Treasury break)
+ *   valuationChangeBn — the price-effect column (long-term only)
+ *   isCustodyHub — Belgium, Luxembourg, Cayman Islands, Ireland, the
+ *                 UK, Switzerland, Bermuda: holdings recorded where
+ *                 HELD, not by owner (Treasury's own caveat)
+ * ------------------------------------------------------------------ */
+
+/** A month key as the TIC tables publish it (YYYY-MM). */
+export const TicYmSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'YYYY-MM');
+export type TicYm = z.infer<typeof TicYmSchema>;
+
+/** One month of one series (value in billions USD, 3 dp = $1M precision). */
+export const TicMonthlyValueSchema = z.object({
+  ym: TicYmSchema,
+  v: z.number().finite(),
+});
+export type TicMonthlyValue = z.infer<typeof TicMonthlyValueSchema>;
+
+/** One country row of the holders table. */
+export const TicHolderSchema = z.object({
+  /** Stable slug (e.g. 'japan', 'china-mainland') — UI i18n keys ride it. */
+  id: z.string().min(1).regex(/^[a-z0-9-]+$/),
+  /** The name exactly as Treasury publishes it (e.g. 'China, Mainland'). */
+  name: z.string().min(1),
+  /** Holdings in the latest month, billions USD. */
+  holdingsBn: z.number().finite().nonnegative(),
+  /** Holdings history, ascending, latest last, ≤24 months. */
+  months: z.array(TicMonthlyValueSchema).min(2).max(24),
+  /** Net U.S. sales (transactions), ascending; positive = foreigners bought. */
+  netSalesBn: z.array(TicMonthlyValueSchema).max(24).optional(),
+  /** Valuation change (price effect), ascending. */
+  valuationChangeBn: z.array(TicMonthlyValueSchema).max(24).optional(),
+  /** Treasury's custody-hub caveat applies to this row. */
+  isCustodyHub: z.boolean(),
+  /** Months whose holdings move exceeded the plausibility gate — FLAGGED,
+   *  never dropped (the honest data-quality note rides the row). */
+  flaggedMonths: z.array(TicYmSchema).optional(),
+});
+export type TicHolder = z.infer<typeof TicHolderSchema>;
+
+/** The value of `insights:tic:v1`, verbatim over the wire. */
+export const TicSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The SLT reference month of both tables. */
+    dataMonth: TicYmSchema,
+    /** The fetched files' HTTP Last-Modified (ISO 8601), when present. */
+    releasedAt: z.string().min(1).optional(),
+    /** When the rung wrote this snapshot (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** Grand total foreign holdings, billions USD (Table 5). */
+    totalBn: z.number().finite().positive(),
+    /** Foreign OFFICIAL holdings (Table 5 "Of Which: Foreign Official"). */
+    officialBn: z.number().finite().nonnegative().optional(),
+    /** totalBn − officialBn (the private remainder). */
+    privateBn: z.number().finite().nonnegative().optional(),
+    /** The Table 5 top-20 plus Australia (from Table 3). */
+    holders: z.array(TicHolderSchema).min(1),
+    /** The two verified URLs, for the About panel. */
+    sourceUrls: z.array(z.string().url()).min(1),
+  })
+  .refine((s) => new Set(s.holders.map((h) => h.id)).size === s.holders.length, {
+    message: 'tic holders must contain each id at most once',
+  })
+  .refine((s) => s.holders.every((h) => h.months.at(-1)?.ym === s.dataMonth), {
+    message: 'every holder’s latest holdings month must equal dataMonth',
+  })
+  .refine((s) => s.holders.every((h) => Math.abs(h.months.at(-1)!.v - h.holdingsBn) < 0.0005), {
+    message: 'holdingsBn must equal the latest month value',
+  })
+  .refine(
+    (s) =>
+      s.holders.every((h) => {
+        const yms = h.months.map((m) => m.ym);
+        return yms.every((ym, i) => i === 0 || ym > yms[i - 1]!);
+      }),
+    { message: 'holder months must be strictly ascending' },
+  );
+export type TicSnapshot = z.infer<typeof TicSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)
  *
  * The Prices board's four assets (Brent, gold, silver, Bitcoin) plus their

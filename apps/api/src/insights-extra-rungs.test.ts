@@ -15,6 +15,7 @@ import {
   extraRungsNeedHealing,
   firstOfMonthGate,
   runExtraRung,
+  ticReleaseAwareGate,
   weekdayGate,
 } from './insights-extra-rungs';
 import { insightsIngestRung, INGEST_CRON_HOUR } from './insights-ingest-cron';
@@ -75,16 +76,62 @@ describe('the rung gates (S1-M1.7)', () => {
   });
 });
 
-describe('runExtraRung — the empty registry is the live proof (S1 landing state)', () => {
+describe('the TIC release-aware gate (S2-M2.2)', () => {
+  it('runs daily from the 15th to the 25th, and weekly on Saturdays otherwise', () => {
+    // 2026-11-14 is a Saturday BEFORE the window; 2026-11-26 a Thursday after it.
+    expect(ticReleaseAwareGate(new Date('2026-11-14T04:30:00Z'))).toBe(true); // Saturday
+    expect(ticReleaseAwareGate(new Date('2026-11-26T04:30:00Z'))).toBe(false); // Thursday outside the window
+    for (let day = 15; day <= 25; day += 1) {
+      expect(ticReleaseAwareGate(new Date(`2026-11-${String(day).padStart(2, '0')}T04:30:00Z`))).toBe(true);
+    }
+    expect(ticReleaseAwareGate(new Date('2026-11-14T04:30:00Z'))).toBe(true);
+    expect(ticReleaseAwareGate(new Date('2026-11-27T04:30:00Z'))).toBe(false); // Friday outside the window
+    expect(ticReleaseAwareGate(new Date('2026-11-28T04:30:00Z'))).toBe(true); // Saturday again
+  });
+
+  it('the registry carries the verified TIC source on rung3 with the 4-subrequest budget', () => {
+    expect(EXTRA_SOURCES).toHaveLength(1);
+    const tic = EXTRA_SOURCES[0]!;
+    expect(tic.id).toBe('tic-slt');
+    expect(tic.rung).toBe(3);
+    expect(tic.gate).toBe(ticReleaseAwareGate);
+    expect(tic.budget).toBe(4); // 2 fetches + 1 idempotence read + 1 write
+  });
+});
+
+describe('runExtraRung — the empty rung is rung4 now (S2 registered tic-slt on rung3)', () => {
   it('an EMPTY rung still runs, writes its status record, and costs 1 subrequest', async () => {
-    expect(EXTRA_SOURCES).toHaveLength(0);
+    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(0);
     const kv = mockKv();
-    const status = await runExtraRung(ENV, 3, { kv, now: new Date(at(4, 30)) });
+    const status = await runExtraRung(ENV, 4, { kv, now: new Date(at(4, 35)) });
     expect(status.rows).toEqual([]);
     expect(status.budget).toEqual({ ceiling: EXTRA_RUNG_SUBREQUEST_CEILING, used: 1, refused: [] });
-    const raw = kv.store.get(extraRungStatusKey(3));
+    const raw = kv.store.get(extraRungStatusKey(4));
     expect(raw).toBeDefined();
-    expect(JSON.parse(raw!).rung).toBe(3);
+    expect(JSON.parse(raw!).rung).toBe(4);
+  });
+
+  it('FORCE mode (the manual /internal lever) runs a gated-out source anyway', async () => {
+    const kv = mockKv();
+    const calls: string[] = [];
+    const sources = [
+      source({
+        id: 'monthly',
+        gate: firstOfMonthGate,
+        run: async () => {
+          calls.push('monthly');
+          return { ok: true };
+        },
+      }),
+    ];
+    // Day 25, non-Saturday: gated out normally.
+    await runExtraRung(ENV, 3, { kv, sources, now: new Date(at(4, 30, 25, 10)) });
+    expect(calls).toEqual([]);
+    // Force: runs regardless of the day gate (no heal read — used = 2).
+    const status = await runExtraRung(ENV, 3, { kv, sources, now: new Date(at(4, 30, 25, 10)), force: true });
+    expect(calls).toEqual(['monthly']);
+    expect(status.rows).toEqual([{ id: 'monthly', ok: true }]);
+    expect(status.budget.used).toBe(2);
   });
 });
 
@@ -186,7 +233,7 @@ describe('the sweep heal arming (2 KV reads)', () => {
       JSON.stringify({
         generatedAt: '2026-10-31T04:30:00Z',
         rung: 3,
-        rows: [{ id: 'tic-table5', ok: false, kind: 'blocked', note: '403' }],
+        rows: [{ id: 'tic-slt', ok: false, kind: 'blocked', note: '403' }],
         budget: { ceiling: 50, used: 2, refused: [] },
       }),
     );
@@ -196,7 +243,7 @@ describe('the sweep heal arming (2 KV reads)', () => {
       JSON.stringify({
         generatedAt: '2026-10-31T04:30:00Z',
         rung: 3,
-        rows: [{ id: 'tic-table5', ok: true }],
+        rows: [{ id: 'tic-slt', ok: true }],
         budget: { ceiling: 50, used: 2, refused: [] },
       }),
     );

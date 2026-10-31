@@ -24,6 +24,7 @@
  */
 
 import type { Bindings } from './index';
+import { runTicIngest, KvTicStore } from '@currena/insights/tic';
 
 /** The UTC minute (inside INGEST_CRON_HOUR) that fires rung3. */
 export const EXTRA_RUNG3_MINUTE = 30;
@@ -32,6 +33,20 @@ export const EXTRA_RUNG4_MINUTE = 35;
 
 /** The free plan's per-invocation subrequest ceiling (the rung budget). */
 export const EXTRA_RUNG_SUBREQUEST_CEILING = 50;
+
+/**
+ * gap-closure S2-M2.2 — the TIC release-aware day gate: run DAILY from
+ * the 15th to the 25th of each month (the SLT publishes mid-month — Aug
+ * 2026 landed 2026-10-16; the daily window catches the new data month
+ * within a day, then the idempotent write makes the remaining days a
+ * cheap re-check), otherwise once a week on Saturdays (the CFTC gate's
+ * discipline). The 10:10/20:10 sweeps HEAL a failed fetch within hours
+ * with this gate BYPASSED.
+ */
+export function ticReleaseAwareGate(now: Date): boolean {
+  const day = now.getUTCDate();
+  return (day >= 15 && day <= 25) || now.getUTCDay() === 6;
+}
 
 /** The failure kinds that arm the sweep heal (mirrors sweepShouldFire). */
 const HEALABLE_KINDS: ReadonlySet<string> = new Set(['failed', 'blocked', 'format-changed']);
@@ -70,10 +85,22 @@ export interface ExtraSourceDef {
 }
 
 /**
- * The registry — EMPTY by design. S2 lands the Treasury TIC tables here;
- * nothing changes in the rung machinery when sources register.
+ * The registry — gap-closure S2-M2.2 lands the first source: the Treasury
+ * TIC SLT tables (the owner's top-priority feature). Budget 4 = the TWO
+ * file fetches (each 8–10 s under the honest 12 s single-attempt policy)
+ * + the idempotence read + the write. The two fetches share this rung
+ * with NOTHING else (the S2 session rule: they never share an invocation
+ * with anything heavy).
  */
-export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [];
+export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
+  {
+    id: 'tic-slt',
+    rung: 3,
+    gate: ticReleaseAwareGate,
+    budget: 4,
+    run: async (env: Bindings) => (await runTicIngest(new KvTicStore(env.RATES))).outcome,
+  },
+];
 
 /* ------------------------------------------------------------------ *
  * Day-gate helpers (the rung2 plan's first-of-month / Saturday rules).
@@ -122,6 +149,10 @@ export interface ExtraRungOptions {
   now?: Date;
   /** Heal mode (the sweep): run sources whose last row failed, ignoring the day gate. */
   heal?: boolean;
+  /** Force mode (the manual /internal lever): run EVERY registry source
+   * for the rung, day gates ignored — the owner-triggered equivalent of
+   * the sweep heal, for post-deploy verification of a new source. */
+  force?: boolean;
   /** KV override (tests); default env.RATES. */
   kv?: ExtraRungKv;
   /** Registry override (tests / future manual dispatch); default EXTRA_SOURCES. */
@@ -143,7 +174,7 @@ export async function runExtraRung(
   const now = opts.now ?? new Date();
   const kv = opts.kv ?? env.RATES;
   const registry = (opts.sources ?? EXTRA_SOURCES).filter((s) => s.rung === rung);
-  const due = registry.filter((s) => s.gate(now));
+  const due = opts.force === true ? registry : registry.filter((s) => s.gate(now));
   let healed: ExtraSourceDef[] = [];
   if (opts.heal) {
     const prev = await readStatus(kv, rung);

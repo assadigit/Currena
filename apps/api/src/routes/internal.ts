@@ -15,6 +15,7 @@ import { errorResponse, parseSourceParam } from '../http';
 import { clientIp, rateLimitTake, rateLimitRetryAfterSec, secretMatches } from '../security';
 import { RatesService, RatesServiceError } from '../rates-service';
 import { runScheduledInsightsIngest, runScheduledInsightsHistories } from '../insights-ingest-cron';
+import { runExtraRung } from '../insights-extra-rungs';
 import type { Bindings } from '../index';
 
 interface InternalRouteDeps {
@@ -111,12 +112,33 @@ export function createInternalRoutes(deps: InternalRouteDeps): Hono<{ Bindings: 
         { 'Cache-Control': 'no-store' },
       );
     }
+    // gap-closure S2-M2.2: the extra-rung manual lever — runs rung3 AND
+    // rung4 with the day gates BYPASSED (force mode). The TIC fetch (the
+    // first registered source) is the post-deploy verification path:
+    // curl -X POST '/internal/insights-ingest?phase=extra' with the
+    // refresh secret, then read the rung status record.
+    if (phase === 'extra') {
+      const [rung3, rung4] = await Promise.all([
+        runExtraRung(c.env, 3, { force: true }),
+        runExtraRung(c.env, 4, { force: true }),
+      ]);
+      return c.json(
+        {
+          ok: rung3.rows.every((r) => r.ok) && rung4.rows.every((r) => r.ok),
+          phase,
+          rung3,
+          rung4,
+        },
+        200,
+        { 'Cache-Control': 'no-store' },
+      );
+    }
     if (phase !== undefined) {
       return errorResponse(
         c,
         400,
         'invalid_phase',
-        `Invalid 'phase' parameter ${JSON.stringify(phase)} — must be 'daily', 'daily-a', 'daily-b' or 'periodic' (or omitted for the main run)`,
+        `Invalid 'phase' parameter ${JSON.stringify(phase)} — must be 'daily', 'daily-a', 'daily-b', 'periodic' or 'extra' (or omitted for the main run)`,
       );
     }
 
