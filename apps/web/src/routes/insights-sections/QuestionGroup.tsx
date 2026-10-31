@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import type { IndicatorGroupId, IndicatorId, InsightsSection, InsightsSnapshot } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { gaugesForSection } from '@currena/insights';
+import { gaugesForSection, GAUGES } from '@currena/insights';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { AlertCard } from '../../components/insights/AlertCard';
@@ -155,6 +155,19 @@ export function QuestionGroup({
     warnings: num(gauge?.warningCount ?? 0, numberLocale),
     voting: num(gauge?.votingCount ?? 0, numberLocale),
   });
+  // S1-M1.4 (2026-10-31): the calm out-of-date badge — when this gauge has
+  // members whose readings are past their staleness window, the header says
+  // so plainly ("n of m readings out of date"). The gauge itself is never
+  // hidden; the badge only explains why the count line shrinks.
+  const staleCount = gauge?.staleCount ?? 0;
+  const memberCount = GAUGES.find((g) => g.id === group)?.members.length ?? 0;
+  const staleBadge =
+    staleCount > 0 && memberCount > 0
+      ? interpolate(copy.ui.staleReadingsBadge, {
+          n: num(staleCount, numberLocale),
+          total: num(memberCount, numberLocale),
+        })
+      : null;
 
   // R5 ordering: needs-attention cards first (extremity-sorted), unusual
   // cards next, then the compact rows (normal, context, stale, delayed) in
@@ -224,6 +237,15 @@ export function QuestionGroup({
           </span>
           <span className={`font-bold ${stepToneClass(step)}`}>{stepWord}</span>
           <span className={`font-semibold ${attentionToneClass(gauge?.warningCount ?? 0)}`}>{countText}</span>
+          {staleBadge !== null ? (
+            <span
+              data-stale-badge
+              data-stale-count={staleCount}
+              className="rounded-full bg-currena-muted/15 px-2 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
+            >
+              {staleBadge}
+            </span>
+          ) : null}
           {/* L2 answer: no min-w-0 — the flex item keeps its min-content width
            * (the longest word) so the flex-wrap row moves it to its own line on
            * narrow phones instead of squeezing it below word width, which bled

@@ -742,7 +742,15 @@ const BUDGETS = [
   // chunk. +0.01 kB raw over the old ceiling (10 bytes); gz stays inside
   // 267.5 (measured 267.29). Entry chunk untouched at 294.45/88.48.
   // Justified in CHANGELOG §2026-10-31j.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1136_100, gz: 267_500, label: 'Insights lazy chunk' },
+  //
+  // 2026-10-31p gap-closure S1-M1.4 bump (measured 1137.37/267.78 →
+  // budget 1138/268): the stale-voter honesty badge — the audited fa
+  // badge copy (round-57, «{n} مورد از {total} قرائت قدیمی است») + the
+  // EN twin + the badge wiring on VerdictBlock and QuestionGroup + the
+  // gauge engine's staleCount arithmetic riding this chunk. gz +0.28 kB
+  // over the old ceiling. Entry chunk untouched at 294.45/88.48.
+  // Justified in CHANGELOG §2026-10-31p.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1138_000, gz: 268_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

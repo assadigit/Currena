@@ -1,6 +1,6 @@
 {
   "$schema": "the single indicator registry (fix spec A-01, 2026-10-14)",
-  "version": 2,
+  "version": 3,
   "graceDayDefaults": {
     "daily": 4,
     "weekly": 10,
@@ -60,7 +60,7 @@
         "direction": "below",
         "value": 0
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -138,7 +138,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -199,7 +199,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -272,7 +272,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -334,7 +334,7 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -397,7 +397,7 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -470,7 +470,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -529,7 +529,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -588,7 +588,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -647,7 +647,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited)",
@@ -708,7 +708,7 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited)",
@@ -770,7 +770,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -829,7 +829,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -889,7 +889,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -948,7 +948,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -1007,7 +1007,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -1066,7 +1066,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "UK Open Government Licence v3.0 (free reuse, attributed)",
@@ -1125,7 +1125,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -1186,7 +1186,7 @@
         "direction": "above",
         "value": 3
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -1245,7 +1245,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -1306,7 +1306,7 @@
         "direction": "above",
         "value": 2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -1367,7 +1367,7 @@
         "direction": "above",
         "value": 2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited)",
@@ -1426,7 +1426,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -1485,7 +1485,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -1547,7 +1547,7 @@
         "value": 2.4,
         "sustainedWeeks": 4
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -1610,7 +1610,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -1669,7 +1669,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "US government work — public domain (17 U.S.C. § 105)",
@@ -1750,7 +1750,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "US government work — public domain (17 U.S.C. § 105)",
@@ -1833,7 +1833,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "OECD reuse terms — free with suitable acknowledgment",
@@ -1892,7 +1892,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "OECD reuse terms — free with suitable acknowledgment",
@@ -1951,7 +1951,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "OECD reuse terms — free with suitable acknowledgment",
@@ -2010,7 +2010,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
@@ -2069,7 +2069,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "Free use with attribution (the workbook’s own licence line)",
@@ -2128,7 +2128,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -2187,7 +2187,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -2246,7 +2246,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -2306,7 +2306,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -2365,7 +2365,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -2424,7 +2424,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -2483,7 +2483,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -2542,7 +2542,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
@@ -2601,7 +2601,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "No reuse licence offered (unofficial endpoints)",
@@ -2660,7 +2660,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -2722,7 +2722,7 @@
         "value": 0,
         "sustainedWeeks": 4
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -2783,7 +2783,7 @@
         "direction": "above",
         "value": 0
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -2844,7 +2844,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -2903,7 +2903,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "Free API — attribution next to the data",
@@ -2962,7 +2962,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "Open academic data — attribution; no formal reuse terms",
@@ -3021,7 +3021,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "Open academic data — attribution; no formal reuse terms",
@@ -3083,7 +3083,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "Free API — commercial use permitted (their ToS)",
@@ -3156,7 +3156,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
@@ -3229,7 +3229,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -3292,7 +3292,7 @@
         "magnitude": 5,
         "windowWeeks": 4
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
@@ -3351,7 +3351,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
@@ -3412,7 +3412,7 @@
         "direction": "below",
         "value": 50
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
@@ -3473,7 +3473,7 @@
         "direction": "above",
         "value": 3
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
@@ -3532,7 +3532,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -3593,7 +3593,7 @@
         "direction": "below",
         "value": 0
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -3654,7 +3654,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -3715,7 +3715,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -3776,7 +3776,7 @@
         "direction": "above",
         "value": 0.5
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -3837,7 +3837,7 @@
         "direction": "above",
         "value": 0.5
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -3898,7 +3898,7 @@
         "tail": "low",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -3957,7 +3957,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -4016,7 +4016,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -4075,7 +4075,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -4134,7 +4134,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
@@ -4193,7 +4193,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -4254,7 +4254,7 @@
         "tail": "low",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -4313,7 +4313,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
@@ -4372,7 +4372,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -4431,7 +4431,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -4490,7 +4490,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -4554,7 +4554,7 @@
         "magnitude": 25,
         "windowWeeks": 13
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "No reuse licence offered (unofficial endpoints)",
@@ -4614,7 +4614,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "No reuse licence offered (unofficial endpoints)",
@@ -4674,7 +4674,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "No reuse licence offered (unofficial endpoints)",
@@ -4734,7 +4734,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -4794,7 +4794,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "No reuse licence offered (unofficial endpoints)",
@@ -4854,7 +4854,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "Free API — commercial use permitted (their ToS)",
@@ -4915,7 +4915,7 @@
         "direction": "above",
         "value": 3
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -4976,7 +4976,7 @@
         "direction": "above",
         "value": 3
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5037,7 +5037,7 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
@@ -5099,7 +5099,7 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
@@ -5161,7 +5161,7 @@
         "direction": "below",
         "value": 0
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -5220,7 +5220,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5279,7 +5279,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
@@ -5340,7 +5340,7 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
@@ -5399,7 +5399,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
@@ -5458,7 +5458,7 @@
       "rule": {
         "kind": "below-aux"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5519,7 +5519,7 @@
         "tail": "high",
         "cutoff": 0.1
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5579,7 +5579,7 @@
         "kind": "above-low",
         "rise": 0.5
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5639,7 +5639,7 @@
         "kind": "consecutive-decline",
         "periods": 3
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5700,7 +5700,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (RBA terms for statistical tables)",
@@ -5761,7 +5761,7 @@
         "tail": "high",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5820,7 +5820,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5879,7 +5879,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -5940,7 +5940,7 @@
         "tail": "low",
         "cutoff": 0.2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
@@ -6013,7 +6013,7 @@
           }
         ]
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "FRED license #copyright-public-domain (public domain)",
@@ -6076,7 +6076,7 @@
         "magnitude": 5,
         "windowWeeks": 4
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
@@ -6136,7 +6136,7 @@
         "kind": "consecutive-decline",
         "periods": 2
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0",
@@ -6195,7 +6195,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 1,
       "licence": {
         "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
@@ -6255,7 +6255,7 @@
       "rule": {
         "kind": "info"
       },
-      "ruleVersion": 2,
+      "ruleVersion": 3,
       "layer": 2,
       "licence": {
         "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",

@@ -4131,6 +4131,10 @@ export const insightsCopyEn = {
     // UI-06: the freshness chip (the stale count links to About).
     heroFreshness: 'Updated {time} UTC',
     heroStaleSuffix: '{n} stale',
+    // S1-M1.4 (2026-10-31): the calm out-of-date badge on the hero verdict
+    // cards and the gauge headers — plain wording, no alarmist colour; the
+    // card itself is never hidden.
+    staleReadingsBadge: '{n} of {total} readings out of date',
     // UI-08: the alert box (a stale or unavailable reading sits inside a
     // gauge whose members voted).
     heroAlertStaleLine: 'Some inputs are stale or missing — read the counts with care.',

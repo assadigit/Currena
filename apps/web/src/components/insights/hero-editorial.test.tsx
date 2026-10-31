@@ -569,3 +569,82 @@ describe('fidelity round §7 — the bottom information strip', () => {
     expect(document.querySelector('[data-continue-strip]')).toBeNull();
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * Gap-closure S1-M1.4 (2026-10-31) — the stale-voter honesty badge:
+ * a calm "n of m readings out of date" chip on the hero verdict card
+ * (and the gauge headers) whenever gauge members' readings sit past
+ * their staleness window. The card is never hidden; the verdict comes
+ * from the fresh voters only (the stale members dilute, never vote).
+ * ------------------------------------------------------------------ */
+
+describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
+  afterEach(cleanup);
+
+  /** The base fixture plus the RBA trio all stale (au-10y is flipped in
+   * place; rba-expectations and au-us-10y-gap are added as stale readings
+   * — the fixture never carried them). */
+  const withRbaStale: IndicatorReading[] = [
+    ...READINGS.map((r) => (r.id === 'au-10y' ? { ...r, status: 'stale' as const } : r)),
+    reading('rba-expectations', { status: 'stale', percentile10y: 0.6 }),
+    reading('au-us-10y-gap', { status: 'stale', percentile10y: 0.55 }),
+  ];
+
+  it('no stale members → no badge anywhere (the calm default)', () => {
+    renderHero(insightsCopyEn, 'en-US');
+    expect(document.querySelector('[data-stale-badge]')).toBeNull();
+  });
+
+  it('stale members → the Australia card carries the badge with n and total', () => {
+    render(
+      <HeroBlock
+        readings={withRbaStale}
+        copy={insightsCopyEn}
+        numberLocale="en-US"
+        onJumpSection={noop}
+        onFocusCard={noop}
+      />,
+    );
+    const cards = regionCards();
+    const auCard = within(cards[1]! as HTMLElement);
+    const badge = auCard.getByText('readings out of date', { exact: false });
+    // The AU gauges have 16 members total; the three RBA readings are stale.
+    expect(badge.textContent).toContain('3');
+    expect(badge.textContent).toContain('16');
+    // Global has no stale members in this fixture → its card carries none.
+    const globalCard = within(cards[0]! as HTMLElement);
+    expect(globalCard.queryByText('readings out of date', { exact: false })).toBeNull();
+  });
+
+  it('the badge counts only STALE members — unavailable readings never trigger it', () => {
+    const withUnavailable = READINGS.map((r) =>
+      r.id === 'au-10y' ? { ...r, status: 'unavailable' as const, value: null, asOf: null } : r,
+    );
+    render(
+      <HeroBlock
+        readings={withUnavailable}
+        copy={insightsCopyEn}
+        numberLocale="en-US"
+        onJumpSection={noop}
+        onFocusCard={noop}
+      />,
+    );
+    expect(document.querySelector('[data-stale-badge]')).toBeNull();
+  });
+
+  it('fa: the badge speaks Persian with fa-IR digits', () => {
+    render(
+      <HeroBlock
+        readings={withRbaStale}
+        copy={insightsCopyFa}
+        numberLocale="fa-IR"
+        onJumpSection={noop}
+        onFocusCard={noop}
+      />,
+    );
+    const cards = regionCards();
+    const auCard = within(cards[1]! as HTMLElement);
+    // «۳ مورد از ۱۶ قرائت قدیمی است» — the fa copy with Persian digits.
+    expect(auCard.getByText('قرائت قدیمی است', { exact: false }).textContent).toContain('۱۶');
+  });
+});

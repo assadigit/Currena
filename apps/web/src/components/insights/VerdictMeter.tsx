@@ -317,6 +317,19 @@ export function VerdictBlock({
   const voting = readings.filter(
     (r) => gaugeMemberIds.has(r.id) && (r.status === 'warning' || r.status === 'normal'),
   ).length;
+  // S1-M1.4 (2026-10-31): the calm out-of-date badge — stale gauge members
+  // across the section's gauges, counted from the same pure readings the
+  // verdict comes from. The card is never hidden; the badge only says why
+  // the count line shrank.
+  const staleTotal = gaugeRows.reduce((acc, g) => acc + g.staleCount, 0);
+  const memberTotal = sectionGauges.reduce((acc, g) => acc + g.members.length, 0);
+  const staleBadge =
+    staleTotal > 0
+      ? interpolate(copy.ui.staleReadingsBadge, {
+          n: num(staleTotal, numberLocale),
+          total: num(memberTotal, numberLocale),
+        })
+      : null;
 
   return (
     <article
@@ -397,6 +410,16 @@ export function VerdictBlock({
               voting: num(voting, numberLocale),
             })}
           </p>
+          {staleBadge !== null ? (
+            <span
+              data-stale-badge
+              data-stale-count={staleTotal}
+              title={copy.ui.heroAlertStaleLine}
+              className="rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
+            >
+              {staleBadge}
+            </span>
+          ) : null}
         </div>
       </div>
 

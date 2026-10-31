@@ -13,6 +13,9 @@
  * Step mapping (data spec §4 "Gauges"):
  *   share of scored, non-stale members in alert → step
  *   0 → 1 · up to ⅓ → 2 · up to ⅔ → 3 · above ⅔ → 4
+ *   (S1-M1.4, 2026-10-31: the share's base is fresh voters PLUS stale
+ *   members — a stale member never votes and never shrinks the base, so
+ *   a calm member going stale can never make the gauge read more severe.)
  * Verdict per region: see sectionVerdictStep (the E1 count rule).
  * Gauge members are the SCORED indicators of an area (fix B-14: oil is
  * scored and sits in prices-heat); context cards (info rules) never do.
@@ -166,6 +169,13 @@ export interface GaugeReading {
   votingCount: number;
   /** Voting members currently in their warning zone. */
   warningCount: number;
+  /** Members with a READING that is past its staleness window (S1-M1.4).
+   * They never vote — and they never shrink the share's denominator:
+   * a stale member dilutes (its silence can never make the gauge read
+   * MORE severe than the fresh evidence supports). Unavailable members
+   * (no reading at all) stay fully excluded — nothing exists to dilute
+   * with. */
+  staleCount: number;
 }
 
 const votable = (s: IndicatorReading['status']): boolean => s === 'warning' || s === 'normal';
@@ -178,20 +188,30 @@ export function gaugeReading(
   const byId = new Map(readings.map((r) => [r.id as string, r]));
   let votingCount = 0;
   let warningCount = 0;
+  let staleCount = 0;
   for (const id of gauge.members) {
     const r = byId.get(id);
-    if (!r || !votable(r.status)) continue;
+    if (!r) continue;
+    if (r.status === 'stale') {
+      // S1-M1.4: a stale member never votes, but it stays in the base so
+      // its going silent cannot INFLATE the warning share (the old code
+      // read 1 fresh warning + 1 stale member as 1/1 = 100% → step 4).
+      staleCount += 1;
+      continue;
+    }
+    if (!votable(r.status)) continue;
     votingCount += 1;
     if (r.status === 'warning') warningCount += 1;
   }
-  const share = votingCount === 0 ? 0 : warningCount / votingCount;
+  const base = votingCount + staleCount;
+  const share = base === 0 ? 0 : warningCount / base;
   let step: number;
-  if (votingCount === 0) step = 0; // nothing could vote — cannot read
+  if (votingCount === 0) step = 0; // nothing fresh could vote — cannot read
   else if (share === 0) step = 1;
   else if (share <= 1 / 3) step = 2;
   else if (share <= 2 / 3) step = 3;
   else step = 4;
-  return { gauge: gauge.id, section: gauge.section, step, votingCount, warningCount };
+  return { gauge: gauge.id, section: gauge.section, step, votingCount, warningCount, staleCount };
 }
 
 /** All gauge readings for one section, in GAUGES order (pure). */
@@ -270,14 +290,25 @@ export function summarizeSectionByGauges(
   let warningCount = 0;
   let votingCount = 0;
   let excludedCount = 0;
+  // S1-M1.4: the stale voters are NAMED, not just folded into the excluded
+  // count — the API consumer (and the hero badge) can say exactly which
+  // readings are out of date.
+  let staleCount = 0;
+  const staleVoters: IndicatorId[] = [];
   for (const id of memberIds) {
     const r = byId.get(id);
     if (!r) continue; // reading absent entirely (subset snapshot) — not counted
+    if (r.status === 'stale') {
+      staleCount += 1;
+      staleVoters.push(id as IndicatorId);
+      excludedCount += 1; // stale members are still excluded from voting
+      continue;
+    }
     if (votable(r.status)) {
       votingCount += 1;
       if (r.status === 'warning') warningCount += 1;
     } else {
-      excludedCount += 1; // stale / no-history / unavailable (context members are never gauge members)
+      excludedCount += 1; // unavailable / no-history / check-pending (context members are never gauge members)
     }
   }
   const step = sectionVerdictStep(section, readings);
@@ -287,6 +318,8 @@ export function summarizeSectionByGauges(
     warningCount,
     votingCount,
     excludedCount,
+    staleCount,
+    staleVoters,
   };
 }
 

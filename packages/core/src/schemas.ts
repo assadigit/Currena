@@ -927,6 +927,13 @@ export const SummaryLineSchema = z.object({
   warningCount: z.number().int().nonnegative(),
   votingCount: z.number().int().nonnegative(),
   excludedCount: z.number().int().nonnegative(),
+  /** S1-M1.4 (2026-10-31, additive + optional): how many gauge members'
+   * readings are past their staleness window. Optional so snapshots stored
+   * before the field existed still parse. */
+  staleCount: z.number().int().nonnegative().optional(),
+  /** S1-M1.4: the stale members' ids, in member order (subset of the
+   * excluded count above). */
+  staleVoters: z.array(IndicatorIdSchema).optional(),
 });
 export type SummaryLine = z.infer<typeof SummaryLineSchema>;
 

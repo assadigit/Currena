@@ -47,10 +47,15 @@ describe('gauge step mapping (data spec §4)', () => {
     expect(gaugeReading(g, []).step).toBe(0);
   });
 
-  it('excluded (stale) members do not vote but are not warnings', () => {
-    const g = GAUGES.find((gg) => gg.id === 'dollar-strength')!; // 2 members
+  it('excluded (stale) members do not vote — and their silence never inflates the share (S1-M1.4)', () => {
+    const g = GAUGES.find((gg) => gg.id === 'dollar-strength')!; // 3 members
     const r = gaugeReading(g, [...readingsFor('dollar-strength', 1, 0, 0), reading(g.members[1]!, 'stale')]);
-    expect(r).toMatchObject({ step: 4, votingCount: 1, warningCount: 1 });
+    // 1 fresh warning + 1 stale member: the share is 1/(1+1) = 0.5 → step 3.
+    // (Before S1-M1.4 the stale member left the denominator and 1/1 = 1.0
+    // read step 4 “alarmed” — a calmer-looking member going STALE made the
+    // gauge look WORSE. The stale member now dilutes instead: it never
+    // votes, and it never shrinks the base.)
+    expect(r).toMatchObject({ step: 3, votingCount: 1, warningCount: 1, staleCount: 1 });
   });
 
   it('context/price readings never vote (gold-usd on the prices board)', () => {
@@ -152,6 +157,91 @@ describe('labelForVerdictStep (the existing four label words, Block H1)', () => 
   });
 });
 
+describe('stale-voter honesty (gap-closure S1-M1.4)', () => {
+  it('a calm member going stale never makes the gauge more severe', () => {
+    const g = GAUGES.find((gg) => gg.id === 'market-stress')!; // 5 members
+    // 2 warnings + 3 normals: share 0.4 → step 3.
+    const fresh = gaugeReading(g, readingsFor('market-stress', 2, 3, 0));
+    expect(fresh.step).toBe(3);
+    // Two of the calm members go stale: fresh 2W of 2 votable, 2 stale →
+    // share 2/(2+2) = 0.5 → step 3 — NOT the old 2/2 = 1.0 → step 4.
+    const readings = readingsFor('market-stress', 2, 1, 2); // 2W + 1N fresh, 2 stale
+    const withStale = gaugeReading(g, readings);
+    expect(withStale).toMatchObject({ step: 3, votingCount: 3, warningCount: 2, staleCount: 2 });
+    expect(withStale.step).toBeLessThanOrEqual(fresh.step);
+  });
+
+  it('a WARNING member going stale only makes the gauge milder', () => {
+    const g = GAUGES.find((gg) => gg.id === 'dollar-strength')!; // 3 members
+    const fresh = gaugeReading(g, readingsFor('dollar-strength', 2, 1, 0)); // 0.67 → step 3
+    expect(fresh.step).toBe(3);
+    const withStale = gaugeReading(g, readingsFor('dollar-strength', 1, 1, 1)); // 1W+1N fresh, 1 stale → 1/3 → step 2
+    expect(withStale.step).toBe(2);
+    expect(withStale.staleCount).toBe(1);
+  });
+
+  it('an all-stale gauge stays unreadable (step 0) and reports its staleCount', () => {
+    const g = GAUGES.find((gg) => gg.id === 'au-inflation-rates')!;
+    const r = gaugeReading(g, readingsFor('au-inflation-rates', 0, 0, 5));
+    expect(r).toMatchObject({ step: 0, votingCount: 0, warningCount: 0, staleCount: 5 });
+  });
+
+  it('unavailable members still do not dilute — only a READING past its window does', () => {
+    const g = GAUGES.find((gg) => gg.id === 'dollar-strength')!; // 3 members
+    const r = gaugeReading(g, [
+      reading(g.members[0]!, 'warning'),
+      reading(g.members[1]!, 'unavailable'),
+      reading(g.members[2]!, 'stale'),
+    ]);
+    // 1 fresh warning + 1 stale dilutes (1/2 = 0.5 → step 3); the missing
+    // member contributes nothing at all — no reading exists to dilute with.
+    expect(r).toMatchObject({ step: 3, votingCount: 1, staleCount: 1 });
+  });
+
+  it('the summary reports staleCount and the stale voter ids (the RBA trio case)', () => {
+    const readings = [
+      reading('au-cpi', 'warning'),
+      reading('au-trimmed-mean', 'warning'),
+      reading('rba-expectations', 'stale'),
+      reading('au-10y', 'stale'),
+      reading('au-us-10y-gap', 'stale'),
+      // The other two AU gauges, fully fresh and calm:
+      ...readingsFor('au-households', 0, 7, 0),
+      ...readingsFor('au-trade-currency', 0, 4, 0),
+    ];
+    const s = summarizeByGauges(readings);
+    expect(s.australia).toMatchObject({
+      staleCount: 3,
+      staleVoters: ['rba-expectations', 'au-10y', 'au-us-10y-gap'],
+      excludedCount: 3, // stale members are still excluded from voting
+    });
+    // The inflation gauge itself: 2 fresh warnings + 3 stale → 2/5 = 0.4 →
+    // step 3 (the old fresh-only 2/2 = 1.0 → step 4 read worse than the
+    // data supports).
+    expect(gaugeReading(GAUGES.find((gg) => gg.id === 'au-inflation-rates')!, readings).step).toBe(3);
+  });
+
+  it('the section verdict never rises when members go stale (end-to-end guard)', () => {
+    const fresh = [
+      ...readingsFor('au-inflation-rates', 4, 1, 0), // 0.8 → step 4
+      ...readingsFor('au-households', 3, 4, 0), // 0.43 → step 3
+      ...readingsFor('au-trade-currency', 1, 3, 0), // 0.25 → step 2
+    ];
+    expect(sectionVerdictStep('australia', fresh)).toBe(3); // [4,3,2]
+    const withStale = [
+      // The RBA trio goes stale: 2 fresh warnings + 3 stale → 0.4 → step 3.
+      reading('au-cpi', 'warning'),
+      reading('au-trimmed-mean', 'warning'),
+      reading('rba-expectations', 'stale'),
+      reading('au-10y', 'stale'),
+      reading('au-us-10y-gap', 'stale'),
+      ...readingsFor('au-households', 3, 4, 0),
+      ...readingsFor('au-trade-currency', 1, 3, 0),
+    ];
+    expect(sectionVerdictStep('australia', withStale)).toBeLessThanOrEqual(3);
+  });
+});
+
 describe('summarizeByGauges (the summary wire shape)', () => {
   it('counts describe GAUGE members only; label comes from the verdict step', () => {
     const readings = [
@@ -172,6 +262,10 @@ describe('summarizeByGauges (the summary wire shape)', () => {
       warningCount: 1,
       votingCount: 12,
       excludedCount: 1,
+      // S1-M1.4 additive fields: the au-households stale member (the 6th
+      // member, au-home-values) is now named, not just counted.
+      staleCount: 1,
+      staleVoters: ['au-home-values'],
     });
     // Global has no votable readings here → honest null label.
     expect(s.global).toMatchObject({ label: null, votingCount: 0, warningCount: 0 });
