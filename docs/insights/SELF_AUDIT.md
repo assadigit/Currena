@@ -1,8 +1,8 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-10-27T18:28:25.541Z · rule version 2 · export: `docs/insights/exports/currena-insights-full-2026-10-27.md`
+Generated: 2026-11-01T13:20:04.799Z · rule version 4 · export: `docs/insights/exports/currena-insights-full-2026-11-01.md`
 
-Result: **ALL TESTS PASS** (25 of 25 pass)
+Result: **1 TEST(S) FAILED** (24 of 25 pass)
 
 ## Every test, pass or fail
 
@@ -23,26 +23,55 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 | T-13 | Source present: every card has a source name and a data date | pass | — |
 | T-14 | Regression fixtures: saved episodes produce the stored statuses | pass | — |
 | T-17 | Attribution present: attribution-required sources carry exact text | pass | — |
-| T-19 | No advice wording in generated text | pass | scope: the generated indicator sentences of both dictionaries |
+| T-19 | No advice wording in generated text | **FAIL** | en.nyfed-custody.cantTell: forbidden wording 'buy'; en.nyfed-custody.cantTell: forbidden wording 'sell'; en.term-premium-10y.tendedToMean: forbidden wording 'buy'; en.bank-reserves.whatItIs: forbidden wording 'hold'; en.repo-stress.lines.low: forbidden wording 'hold'; en.us-deficit-12m.whyItMatters: forbidden wording 'sell'; en.treasury-auction-10y-indirect.whyItMatters: forbidden wording 'buy'; en.treasury-auction-30y.whyItMatters: forbidden wording 'sell'; en.treasury-auction-30y-indirect.whyItMatters: forbidden wording 'buy'; en.treasury-auction-30y-indirect.cantTell: forbidden wording 'buy'; scope: the generated indicator sentences of both dictionaries |
 | E-10 | Money-supply scale: the export cell carries the DISPLAYED value (23.3 trillion) | pass | the display scale is applied at export (full-export.ts exportValue); registry-sync pins the unit token |
 | E-24 | The export price table carries the peak columns | pass | — |
 | E-18 | Trend labels reproducible from the stated 3-month rule | pass | the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests |
-| SUITE:packages/core | Unit suite — packages/core | pass | 191 tests |
+| SUITE:packages/core | Unit suite — packages/core | pass | 195 tests |
 | SUITE:packages/scraper | Unit suite — packages/scraper | pass | 67 tests |
-| SUITE:packages/insights | Unit suite — packages/insights | pass | 677 tests |
+| SUITE:packages/insights | Unit suite — packages/insights | pass | 1093 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
-| SUITE:apps/api | Unit suite — apps/api | pass | 344 tests |
-| SUITE:apps/web | Unit suite — apps/web | pass | 716 tests |
+| SUITE:apps/api | Unit suite — apps/api | pass | 393 tests |
+| SUITE:apps/web | Unit suite — apps/web | pass | 10046 tests |
 
 ## Stale or "can't tell" cards
 
-None — every card reads current or carries its own honest tag.
-
+| Indicator | Status | As of | Reason |
+| euro-hicp | stale | 2026-09-01 | stale |
+| food-index | stale | 2026-09-01 | stale |
+| wheat | stale | 2026-09-01 | stale |
+| maize | stale | 2026-09-01 | stale |
+| copper-gold | stale | 2026-09-01 | stale |
+| au-unemployment | stale | 2026-09-01 | stale |
+| iron-ore | stale | 2026-09-01 | stale |
 
 ## Unavailable cards
 
+- us-deficit-12m
+- us-deficit-monthly
+- treasury-auction-10y
+- treasury-auction-10y-indirect
+- treasury-auction-30y
+- treasury-auction-30y-indirect
+- median-cpi
+- sticky-cpi
+- oecd-cli-us
+- oecd-cli-cn
+- oecd-cli-de
 - shiller-cape
 - shiller-ecy
+- term-premium-10y
+- tga
+- reverse-repo
+- bank-reserves
+- repo-stress
+- net-liquidity
+- ebp
+- ofr-fsi
+- sloos-ci-tightening
+- empire-state
+- continuing-claims
+- gdpnow
 - au-10y
 - rba-expectations
 - au-us-10y-gap
@@ -54,13 +83,14 @@ None — every card reads current or carries its own honest tag.
 
 ## Source report
 
-- ✅ fred — bulk group 1 (3 series: DGS10, DGS30, DFII10)
-- ✅ fred — bulk group 2 (10 series, from 2016-07-31: T10Y2Y, T10Y3M, STLFSI4, T5YIFR, DGS2, T10YIE, VIXCLS, NFCI, SOFR, T5YIE)
-- ✅ fred — bulk group 3 (12 series, from 2016-07-31: M2SL, CPIAUCNS, CPILFENS, DFEDTARL, DFEDTARU, UNRATE, SAHMREALTIME, GACDFSA066MSFRBPHI, PAYEMS, A191RL1Q225SBEA, RSAFS, PERMIT)
-- ✅ fred — bulk group 4 (5 series, from 2016-07-31: A091RC1Q027SBEA, W006RC1Q027SBEA, DCOILBRENTEU, DCOILWTICO, DHHNGSP)
-- ✅ fred — bulk group 5 (4 series, from 2016-07-31: IRLTLT01DEM156N, IRLTLT01JPM156N, IRLTLT01GBM156N, IRSTCI01JPM156N)
-- ✅ fred — bulk group 6 (10 series, from 2016-07-31: ICSA, RECPROUSM156N, UMCSENT, MICH, PCEPILFE, MORTGAGE30US, WALCL, CFNAI, JTSJOL, AHETPI)
-- ✅ yahoo — BZ=F daily closes (Brent gap-fill)
+- ✅ fred — bulk group 1 (2 series: DGS10, DGS30)
+- ✅ fred — bulk group 2 (1 series, from 2003-01-02: DFII10)
+- ✅ fred — bulk group 3 (10 series, from 2016-08-05: T10Y2Y, T10Y3M, STLFSI4, T5YIFR, DGS2, T10YIE, VIXCLS, NFCI, SOFR, T5YIE)
+- ✅ fred — bulk group 4 (12 series, from 2016-08-05: M2SL, CPIAUCNS, CPILFENS, DFEDTARL, DFEDTARU, UNRATE, SAHMREALTIME, GACDFSA066MSFRBPHI, PAYEMS, A191RL1Q225SBEA, RSAFS, PERMIT)
+- ✅ fred — bulk group 5 (5 series, from 2016-08-05: A091RC1Q027SBEA, W006RC1Q027SBEA, DCOILBRENTEU, DCOILWTICO, DHHNGSP)
+- ✅ fred — bulk group 6 (4 series, from 2016-08-05: IRLTLT01DEM156N, IRLTLT01JPM156N, IRLTLT01GBM156N, IRSTCI01JPM156N)
+- ✅ fred — bulk group 7 (11 series, from 2016-08-05: ICSA, RECPROUSM156N, UMCSENT, MICH, PCEPILFE, MORTGAGE30US, WALCL, WSEFINTL1, CFNAI, JTSJOL, AHETPI)
+- ✅ yahoo — Brent front-month daily closes (the gap-fill, first active contract)
 - ✅ yahoo — GC=F daily quotes (10-year record history)
 - ✅ yahoo — SI=F daily quotes (10-year record history)
 - ✅ yahoo — BTC-USD daily quotes (10-year record history)
@@ -73,6 +103,7 @@ None — every card reads current or carries its own honest tag.
 - ✅ nbs — PMI release: Purchasing Managers' Index for September 2026 (2026-10-01)
 - ✅ nbs — CPI release: Consumer Price Index in September 2026 (2026-10-15)
 - ✅ frankfurter — USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY since 2016-01-04
+- ✅ yahoo — AED=X daily closes (USD/AED, the usdaed card)
 - ✅ world-bank — Pink Sheet monthly workbook
 - ✅ gold-api — XAU spot
 - ✅ gold-api — XAG spot
@@ -102,11 +133,11 @@ None — every card reads current or carries its own honest tag.
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 80555 vs Bitstamp close 80505 (2026-10-27) → 0.06%
-- ✅ mof — jgbcme.csv daily 10Y
+- ✅ cross-check — gold-api BTC 77892 vs Bitstamp close 77878 (2026-11-01) → 0.02%
+- ✅ mof — jgbcme.csv daily 10Y + jgbcme_all.csv history
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)
-- ✅ oecd — Composite leading indicators, amplitude-adjusted (USA, CHN, DEU)
+- ❌ oecd — Composite leading indicators, amplitude-adjusted (USA, CHN, DEU): HTTP 500 from sdmx.oecd.org — single attempt, no retry (F-11)
 - ✅ gpr — Geopolitical Risk Index (monthly export)
 - ✅ epu — US Economic Policy Uncertainty (Main News Index workbook)
 
