@@ -5,6 +5,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01f] — gap-closure S4-M4.1: the S4 verification pass (chokepoints, GSCPI, TPU, GPR daily, EIA SPR/production, Pink Sheet energy)
+
+M4.1's decision-per-candidate, all read from the providers' own responses
+(fixtures under `packages/insights/fixtures/s4/`; the register rows in
+`docs/gap-closure/VERIFIED-SOURCES.md` carry the full evidence):
+
+- **PortWatch (M4.3's source): VERIFIED with a rejection inside it.** The
+  Daily_Chokepoints_Data FeatureServer carries 28 chokepoints, daily transits
+  2019-01 → 2026-10-25, `n_total` + per-vessel-type counts, maxRecordCount
+  1000 with working pagination. **Hormuz is rejected for now: the provider's
+  own series collapses 2026-03** (Feb mean 78.3/day → Mar 3.2/day, tankers
+  59→1 — a source-side tracking gap; the other five spec chokepoints stay
+  continuous). Five chokepoints ship (Suez, Panama, Malacca, Taiwan,
+  Bab el-Mandeb). Query quirks recorded (`IN` required, intermittent 400s,
+  2–60 s responses → the 30 s single-attempt timeout). Licence: the IMF's
+  own statistical-data terms, quoted verbatim via a real-browser read
+  (attribution + integrity required).
+- **GSCPI: VERIFIED.** The register URL answers 200 (105,984 B) — a legacy
+  .xls misnamed .xlsx; Sheet2 `Date|GSCPI`, monthly 1998-01 → 2026-09
+  (latest 1.2840). The page carries the provider's own "publishing with
+  limited data" notice (2025-11-06). NY Fed terms quoted verbatim
+  (automated access + derivative works permitted, attribution required).
+- **TPU: the spec's assumed file is STALE (2019-07) — rejected.** The site's
+  own trade page links the monthly US TPU inside `Categorical_EPU_Data.xlsx`
+  (column M "9. Trade policy", 1985-01 → 2026-10, latest 1326.42; the
+  1985-01 value byte-identical to the stale file — the same series
+  continued). The daily TPU CSV is fresh but carries extreme 2026 spikes
+  (max 231,923 vs median 1,269) — left unwired.
+- **GPR: the monthly export already carries the country/threat/act columns**
+  (`GPRC_{TWN,CHN,RUS,UKR,ISR,SAU,AUS}` + `GPRT`/`GPRA`, all 501 points
+  1985-01 → 2026-09) — zero extra subrequests for M4.2. A DAILY file exists
+  (`data_gpr_daily_recent.xls`, 3.3 MB, `GPRD_MA7` latest 2026-10-26);
+  reading its header needs a biff SST cross-CONTINUE fix (the daily file's
+  SST spans 35 CONTINUE records) — lands in M4.2.
+- **EIA: SPR = `WCSSTUS1`** ("Ending Stocks of Crude Oil in SPR", weekly,
+  latest 282,583 k-bbl @ 2026-10-23); **production = `WCRFPUS2`** ("Field
+  Production of Crude Oil", weekly, latest 13,992 k-bbl/d) — both on the
+  LeafHandler page family the eia-crude-stocks adapter already parses.
+- **Pink Sheet energy: columns F/I/J verified** (Coal Australian $/mt,
+  Natural gas Europe $/mmbtu, LNG Japan $/mmbtu; 2026M09: 147.1 / 25.42 /
+  14.25) — same workbook, same sheet read, zero new fetches.
+
 ## [2026-11-01e] — gap-closure S3-M3.6: the S3 close — the T-19 advice-wording fix, the Australia-angle notes, and the daily self-check repaired (S3 complete: 6/6)
 
 S3's final milestone: the copy/docs/deploy close. Three pieces of real
