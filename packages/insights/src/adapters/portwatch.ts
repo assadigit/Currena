@@ -54,6 +54,24 @@ import { classifySourceError, insightsFetch } from './fetch-policy';
 import { epochDay, fromEpochDay, type SeriesPoint } from '../series';
 import type { FetchDeps } from './types';
 
+/**
+ * The provider's OWN intermittent slow-start error — an HTTP 200 body of
+ * `{error:{code:400, message:'Invalid URL'}}` that the host serves on a
+ * cold/rate-limited burst (live-observed 2026-11-01: 2 of 3 back-to-back
+ * probes, and the first live GHA run). The M4.1 VERIFIED-SOURCES record
+ * prescribes the treatment: "back off and retry — a slow-start/rate-limit
+ * class; single batched queries succeed". This is NOT a block (T-27): the
+ * same host serves the full data on the very next attempt — so the collect
+ * retries THIS class exactly once, after a pause, and every other failure
+ * (including OTHER error bodies) stays single-attempt (F-11).
+ */
+export class PortwatchTransientError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'PortwatchTransientError';
+  }
+}
+
 /** The M4.1-verified FeatureServer query endpoint (never an invented one). */
 export const PORTWATCH_QUERY_URL =
   'https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query';
@@ -172,6 +190,15 @@ export function parsePortwatchPage(text: string): PortwatchPage {
   // on its intermittent slow-start — the status line alone is not truth.
   if (body.error !== undefined) {
     const err = body.error as { code?: unknown; message?: unknown };
+    const code = typeof err.code === 'number' ? err.code : undefined;
+    const message = typeof err.message === 'string' ? err.message : '';
+    // The host's own slow-start class (M4.1's "back off and retry");
+    // anything else is a hard failure.
+    if (code === 400 && message.includes('Invalid URL')) {
+      throw new PortwatchTransientError(
+        `PortWatch query: the provider's transient slow-start (error body code 400 "Invalid URL") — backing off once, then one retry (the M4.1-recorded class)`,
+      );
+    }
     throw new Error(
       `PortWatch query: the provider returned an error body (code ${String(err.code)}: ${String(err.message)}) — single attempt, no retry (F-11)`,
     );
@@ -441,6 +468,9 @@ export interface PortwatchCollectDeps extends FetchDeps {
   now?: Date;
   /** Pause between pages (tests pass 0). Default PORTWATCH_PAGE_PAUSE_MS. */
   pagePauseMs?: number;
+  /** Pause before the one transient-class retry (tests pass 0). Default
+   *  PORTWATCH_RETRY_PAUSE_MS. */
+  retryPauseMs?: number;
 }
 
 function errMessage(err: unknown): string {
@@ -449,13 +479,42 @@ function errMessage(err: unknown): string {
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** The pause before the one transient-class retry (the M4.1 "back off"
+ *  prescription — long enough for the host's slow-start to clear; the
+ *  same scale as the page pause). */
+export const PORTWATCH_RETRY_PAUSE_MS = 10_000;
+
+/** The collect's per-page fetch with the ONE bounded retry for the
+ *  provider's transient slow-start class (PortwatchTransientError only —
+ *  every other failure is single-attempt, F-11). */
+async function fetchPage(
+  url: string,
+  deps: PortwatchCollectDeps,
+  pauseMs: number,
+  retryPauseMs: number,
+): Promise<PortwatchPage> {
+  const doFetch = (): Promise<PortwatchPage> =>
+    insightsFetch(url, {}, { fetchImpl: deps.fetchImpl, timeoutMs: deps.timeoutMs ?? PORTWATCH_TIMEOUT_MS })
+      .then((res) => res.text())
+      .then((text) => parsePortwatchPage(text));
+  try {
+    return await doFetch();
+  } catch (err) {
+    if (!(err instanceof PortwatchTransientError)) throw err;
+    if (retryPauseMs > 0) await sleep(retryPauseMs);
+    return await doFetch(); // the ONE retry — a second transient failure fails the page
+  }
+}
+
 /**
  * Fetch the provider rows for every chokepoint from `fromDate` onward,
  * paging until the server says the transfer is complete (single honest
- * attempt per page; a failing page fails the whole collection — the
- * sweeps heal within hours). MAX 3 pages by budget (the 400-day window is
- * ~1950 rows = 2 pages; the guard is a loud configuration error, never a
- * silent runaway).
+ * attempt per page EXCEPT the provider's own transient slow-start class,
+ * which gets exactly one backed-off retry — the M4.1 prescription; a
+ * failing page still fails the whole collection and the sweeps heal it
+ * within hours). MAX 3 pages by budget (the 400-day window is ~1950 rows
+ * = 2 pages; the guard is a loud configuration error, never a silent
+ * runaway).
  */
 export async function collectPortwatchRows(
   fromDate: string,
@@ -464,6 +523,7 @@ export async function collectPortwatchRows(
   const reports: InsightsSourceReport[] = [];
   const rows: PortwatchRow[] = [];
   const pause = deps.pagePauseMs ?? PORTWATCH_PAGE_PAUSE_MS;
+  const retryPause = deps.retryPauseMs ?? PORTWATCH_RETRY_PAUSE_MS;
   const MAX_PAGES = 3;
   let pages = 0;
   let offset = 0;
@@ -472,8 +532,7 @@ export async function collectPortwatchRows(
     if (pages > 0 && pause > 0) await sleep(pause);
     const url = portwatchQueryUrl(fromDate, offset);
     try {
-      const res = await insightsFetch(url, {}, { fetchImpl: deps.fetchImpl, timeoutMs: deps.timeoutMs ?? PORTWATCH_TIMEOUT_MS });
-      const page = parsePortwatchPage(await res.text());
+      const page = await fetchPage(url, deps, pause, retryPause);
       rows.push(...page.rows);
       more = page.more;
       pages += 1;

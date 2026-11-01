@@ -18,6 +18,7 @@ import type { InsightsSnapshot } from '@currena/core';
 import {
   buildChokepointCompare,
   CHOKEPOINT_DEFS,
+  PortwatchTransientError,
   collectPortwatchRows,
   derivePortwatchIndicatorSeries,
   ma7Series,
@@ -96,8 +97,14 @@ describe('parsePortwatchPage (fail closed on every shape drift)', () => {
     expect(page.more).toBe(true);
   });
 
-  it('fails closed on the host\'s HTTP-200-with-error body (the "Invalid URL" class)', () => {
-    expect(() => parsePortwatchPage(errorBody)).toThrow(/the provider returned an error body \(code 400/);
+  it('the host\'s HTTP-200-with-error body of the 400 "Invalid URL" class is the TRANSIENT error (the M4.1 back-off-and-retry prescription)', () => {
+    expect(() => parsePortwatchPage(errorBody)).toThrow(PortwatchTransientError);
+    expect(() => parsePortwatchPage(errorBody)).toThrow(/transient slow-start/);
+  });
+
+  it('any OTHER error body stays a hard single-attempt failure (F-11)', () => {
+    const body = JSON.stringify({ error: { code: 403, message: 'Forbidden' } });
+    expect(() => parsePortwatchPage(body)).toThrow(/error body \(code 403/);
   });
 
   it('fails closed on an unknown portid (a layer change)', () => {
@@ -340,13 +347,42 @@ describe('collectPortwatchRows (paged, single attempt per page)', () => {
     expect(urls[1]).toContain('resultOffset=1000');
   });
 
-  it('a failing page fails the whole collection (F-11: no retry) with the honest report row', async () => {
-    const fetchImpl = (async (): Promise<Response> => jsonRes(errorBody)) as typeof fetch;
-    const result = await collectPortwatchRows('2025-10-01', { fetchImpl, pagePauseMs: 0, now: FIXTURE_NOW });
+  it('a persistently transient page fails the whole collection after its ONE backed-off retry, with the honest report row', async () => {
+    let calls = 0;
+    const fetchImpl = (async (): Promise<Response> => {
+      calls += 1;
+      return jsonRes(errorBody);
+    }) as typeof fetch;
+    const result = await collectPortwatchRows('2025-10-01', { fetchImpl, pagePauseMs: 0, retryPauseMs: 0, now: FIXTURE_NOW });
     expect(result.rows).toEqual([]);
+    expect(calls).toBe(2); // the attempt + the one retry — never a loop
     expect(result.reports[0]!.ok).toBe(false);
     expect(result.reports[0]!.kind).toBe('failed');
-    expect(result.reports[0]!.detail).toContain('the provider returned an error body');
+    expect(result.reports[0]!.detail).toContain('transient slow-start');
+  });
+
+  it('a TRANSIENT first attempt recovers on the one retry (the live-observed host behaviour: 2 of 3 probes 400, the next serves)', async () => {
+    let calls = 0;
+    const fetchImpl = (async (): Promise<Response> => {
+      calls += 1;
+      return jsonRes(calls === 1 ? errorBody : sixtyDay);
+    }) as typeof fetch;
+    const result = await collectPortwatchRows('2026-09-15', { fetchImpl, pagePauseMs: 0, retryPauseMs: 0, now: FIXTURE_NOW });
+    expect(result.rows).toHaveLength(205);
+    expect(result.pages).toBe(1);
+    expect(result.reports[0]!.ok).toBe(true);
+  });
+
+  it('a NON-transient failure never retries (F-11 stands for everything else)', async () => {
+    let calls = 0;
+    const fetchImpl = (async (): Promise<Response> => {
+      calls += 1;
+      return new Response('gone', { status: 404 });
+    }) as typeof fetch;
+    const result = await collectPortwatchRows('2026-09-15', { fetchImpl, pagePauseMs: 0, retryPauseMs: 0, now: FIXTURE_NOW });
+    expect(result.rows).toEqual([]);
+    expect(calls).toBe(1);
+    expect(result.reports[0]!.detail).toContain('HTTP 404');
   });
 
   it('a window wider than the 3-page budget is refused loudly (never a silent runaway)', async () => {
@@ -483,6 +519,7 @@ describe('runInsightsPortwatchPhase (the 04:30 rung3 orchestration)', () => {
       now: new Date('2026-11-01T04:30:00Z'),
       fetchImpl,
       pagePauseMs: 0,
+      retryPauseMs: 0,
     });
 
     // The bootstrap: TWO paged fetches (the 400-day window), offset 0 + 1000.
@@ -535,6 +572,7 @@ describe('runInsightsPortwatchPhase (the 04:30 rung3 orchestration)', () => {
       now: new Date('2026-11-01T04:30:00Z'),
       fetchImpl,
       pagePauseMs: 0,
+      retryPauseMs: 0,
     });
 
     expect(result.patched).toBe(true);
@@ -545,7 +583,7 @@ describe('runInsightsPortwatchPhase (the 04:30 rung3 orchestration)', () => {
     expect(result.reports[0]!.detail).toContain('1 page(s)');
   });
 
-  it('a failing fetch fails the phase closed (F-11: no retry) — nothing patched, the honest row recorded', async () => {
+  it('a failing fetch fails the phase closed (after the one transient retry) — nothing patched, the honest row recorded', async () => {
     const fetchImpl = (async (): Promise<Response> => jsonRes(errorBody)) as typeof fetch;
     const store = buildStore();
     const kv = new MemoryKv();
@@ -557,6 +595,7 @@ describe('runInsightsPortwatchPhase (the 04:30 rung3 orchestration)', () => {
       now: new Date('2026-11-01T04:30:00Z'),
       fetchImpl,
       pagePauseMs: 0,
+      retryPauseMs: 0,
     });
 
     expect(result.patched).toBe(false);

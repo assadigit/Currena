@@ -1437,6 +1437,8 @@ export interface PortwatchPhaseOptions {
   fetchImpl?: typeof fetch;
   /** Page pause override (tests pass 0). */
   pagePauseMs?: number;
+  /** The transient-class retry pause override (tests pass 0). */
+  retryPauseMs?: number;
 }
 
 /** The days a daily fetch reaches back over the stored latest (revisions
@@ -1487,6 +1489,7 @@ export async function runInsightsPortwatchPhase(opts: PortwatchPhaseOptions): Pr
   const collected = await collectPortwatchRows(fromDate, {
     ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
     ...(opts.pagePauseMs !== undefined ? { pagePauseMs: opts.pagePauseMs } : {}),
+    ...(opts.retryPauseMs !== undefined ? { retryPauseMs: opts.retryPauseMs } : {}),
     now,
   });
   const reports = [...collected.reports];
