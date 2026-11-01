@@ -841,7 +841,18 @@ const BUDGETS = [
   // existing machinery only. Measured 1331.93/309.36; raw bumps
   // 1287 → 1332, gz 305 → 310.
   // Justified in CHANGELOG §2026-11-01g.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1332_000, gz: 310_000, label: 'Insights lazy chunk' },
+  // 2026-11-01h (gap-closure S4-M4.3): 1384/315 — the chokepoint
+  // family + the geo-fragmentation shadow lane: FIVE more bilingual ids
+  // (the IMF PortWatch transit cards) — the full bilingual indicator
+  // copy (2 dictionaries × 5 ids × 13 keys) + the layer-1 entries with
+  // TWO glossary terms (chokepoint, transit-estimate — fa round-68) +
+  // the new lane's gauge machinery (the shadow-gauge header treatment +
+  // the groups/groupShort/gaugeAnswers strings) + the 'transits' unit
+  // token + the narrator vocabulary growth (168 indicators + 40 terms ×
+  // 2 languages). The cards ride existing machinery only. Measured
+  // 1357.16/313.94; raw bumps 1332 → 1384, gz 310 → 315.
+  // Justified in CHANGELOG §2026-11-01h.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1384_000, gz: 315_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

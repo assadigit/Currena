@@ -5,6 +5,83 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01h] — gap-closure S4-M4.3: the chokepoint transits + the geo-fragmentation shadow lane (the 135th–139th indicators)
+
+Five context cards (G-5), all bilingual (fa round-68), riding a NEW rung3
+extra source — and the new lane whose header honestly says "not scored yet":
+
+- **The chokepoint transits (IMF PortWatch):** `chokepoint-suez`,
+  `chokepoint-panama`, `chokepoint-bab-el-mandeb`, `chokepoint-malacca`,
+  `chokepoint-taiwan` — the provider's daily n_total (an ESTIMATE from
+  ship-tracking data, ~7-day publication lag) read as the **7-day moving
+  average** (transits/day). The card's value is the MA7; the reading's new
+  `chokepointCompare` block carries the vs-prior-4-weeks (the mean over
+  [−34d, −7d], ≥14-of-28 days present) and the vs-year-ago (the MA7 within
+  ±7 days of 364 days back) comparisons — computed inside `computeReading`
+  for every portwatch-source reading, so both venues derive it
+  identically. **Hormuz stays rejected** (the M4.1 source-side collapse —
+  the provider's own chokepoint6 series reads 3–13/day since 2026-03).
+- **The query shape (verified live this session, from the provider's own
+  responses):** `portid IN (…)` is required (equality 400s), the DateOnly
+  field filters with `DATE 'YYYY-MM-DD'` literals, `resultOffset` paging
+  at 1000/page (a 400-day window × 5 chokepoints = 1950 rows = 2 pages).
+  The host answers **HTTP 200 WITH AN ERROR BODY** `{error:{code:400,
+  'Invalid URL'}}` on its intermittent slow-start — the parser fails
+  closed on the BODY, never the status line. Pages sit behind a 4 s
+  politeness pause (the host 400s rapid successive queries — a pause, not
+  a retry; F-11 stands; a failed page fails the job and the sweeps heal
+  it within hours). The fetch pins 30 s (the SLOW host: 12.5 s first
+  byte from Worker egress, the S1 probe — the TIC precedent).
+- **ONE combined raw-history key** `insights:portwatch:v1` (the spec's own
+  design): 400 days per chokepoint as compact [epochDay, n_total] pairs,
+  zod-validated on write AND on read; the per-id history keys carry the
+  derived MA7. The daily fetch only needs the days since the stored
+  latest − 7 (the provider's revisions ride every fetch); a missing or
+  >45-day-old stored key bootstraps the full window (≤3 pages, inside the
+  declared budget).
+- **The rung3 'portwatch' extra source** (04:30 UTC, daily gate, budget
+  18 — the daily live shape is 1 fetch + 5 reads + 10 writes = 16):
+  routed to RUNG3 by the session plan (rung4 carries 45/50 on all-gates
+  days; rung3 has its own 50 budget with only the TIC's 4 beside it →
+  23/50 on an all-gates day). The phase (`runInsightsPortwatchPhase`)
+  fetches → merges → derives → patches the snapshot + public projection +
+  stage + status and writes its OWN five history keys; the ids ride
+  CARRY_FORWARD_IDS and the 04:25/04:27/04:40 history phases exclude
+  them (the RUNG4_IDS discipline, applied to the rung3 slot). The Node
+  venue's inline collect (`collectPortwatch`, the full 400-day window)
+  feeds the same shared pure derivation — the venues cannot drift.
+- **The new lane:** the `geo-fragmentation` group — "Is the world getting
+  more fragmented?" — a SHADOW gauge until S6: every member is
+  context-only (G-5), the header reads the plain "not scored yet" words
+  (`gaugeNotScored` + `gaugeContextCount`, EN + fa) instead of a
+  meaningless "0 of 0", and the global summary counts are unchanged (a
+  step-0 gauge is excluded from the region verdict by design — pinned by
+  test). The M4.2 geopolitics eleven join this lane in M4.5.
+- **Tests:** the insights suite 1107 → 1136 (the portwatch parser/
+  compute/merge/collect/phase suites, provider-exact pins off the
+  committed fixtures: Suez MA7 41.3 @ 2026-10-25, vs4w −0.9, yoy −1.4;
+  Taiwan 190.0, vs4w −41.4, yoy +38.3; the error-body fail-closed, the
+  paging, the bootstrap vs daily-merge windows, the too-short bases). Pin
+  bumps: definitions 134 → **139** / P1 91 → 96 / info 86 → 91, the
+  schema id set (139 + the chokepoint five), the snapshot count 134 →
+  139, gauges 8 → 9 (37 global members incl. the shadow's five
+  context-only, 48 voters unchanged), the CARRY_FORWARD + history-exclusion
+  pins, the registry-sync (139), the LAYER1_INVENTORY list, the
+  units-discipline set (the chokepoints join the us-nfp count family),
+  the extra-rungs registry (5 sources, the rung3 ceiling check).
+- **Copy:** fa round-68 (136 strings: the five card families × both
+  layers, the lane's gauge strings, the 'transits' unit, the shadow-gauge
+  header words, the chokepoint + transit-estimate glossary terms);
+  terminology gains the world-trade section (گلوگاه، تردد، برآورد).
+  Registry + narrator vocabulary regenerated (168 ×2 + 40 ×2). Docs:
+  AGENTS.md §A (134 → **139**, the new Geopolitics and supply group),
+  INDICATORS_AND_DATA_SOURCES §1/§2, LICENCES.md + RISK_REGISTER +
+  SCRAPING_SPEC FS-12 (the portwatch row — the IMF's own statistical-data
+  terms, quoted), RUNGS.md rung3.
+- **Bundle:** Insights lazy 1332/310 → **1384/315** (measured
+  1357.16/313.94 — five bilingual card families + the lane machinery;
+  justified in `check-bundle-budget.mjs` §2026-11-01h + this entry).
+
 ## [2026-11-01g] — gap-closure S4-M4.2: the geopolitics family — the GPR threat/act/country columns, the daily 7-day average, and the TPU (the 124th–134th indicators)
 
 Eleven context cards (G-5), all bilingual (fa round-67), riding the

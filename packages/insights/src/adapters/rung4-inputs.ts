@@ -5,6 +5,7 @@
  * derived.ts (pure) and rung4.ts (fetching) can import it without cycles.
  */
 
+import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../series';
 
 /**
@@ -42,4 +43,14 @@ export interface Rung4SeriesInputs {
     btc30y?: SeriesPoint[];
     indirect30y?: SeriesPoint[];
   };
+  /**
+   * gap-closure S4-M4.3 (2026-11-01): the IMF PortWatch chokepoint MA7
+   * series, PRE-DERIVED by the Node venue's inline collect
+   * (adapters/portwatch.ts collectPortwatch — the full 400-day window,
+   * no subrequest ceiling there). The Worker's 04:30 rung3 phase derives
+   * the same series from its own stored-history merge (the shared pure
+   * derivation — the venues cannot drift); the 04:10 main rung passes
+   * nothing and the ids carry forward.
+   */
+  portwatch?: Partial<Record<IndicatorId, SeriesPoint[]>>;
 }

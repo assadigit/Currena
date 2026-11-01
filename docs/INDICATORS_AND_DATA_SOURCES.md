@@ -13,16 +13,18 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 123-indicator dashboard
+## 1. What indicators Currena has — the 139-indicator dashboard
 
-The Insights page renders **134 indicators** across **2 sections** (Global
-94, Australia 23 — see the
-breakdown below), grouped under **9 question gauges** (5 global + 3
-australia + the prices-board strip). Of those, **48 are scored voters**
-(contribute to a gauge's verdict) and **75 are context rows** (live value +
-10-year position bar, never vote).
+The Insights page renders **139 indicators** across **2 sections** (Global
+99, Australia 23 — see the
+breakdown below), grouped under **10 question gauges** (6 global + 3
+australia + the prices-board strip; the sixth global lane is the S4
+geo-fragmentation SHADOW gauge — context-only members, never votes until
+S6). Of those, **48 are scored voters** (contribute to a gauge's verdict)
+and **91 are context rows** (live value + 10-year position bar, never
+vote).
 
-The live snapshot is served at `GET /api/insights` — 123 `readings` plus
+The live snapshot is served at `GET /api/insights` — 139 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -30,7 +32,7 @@ current value, the data date (`asOf`), the 7-day and 30-day changes, the
 distance from the 10-year peak, the source name + URL, and the verdict
 status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 
-### The 9 question gauges (8 voting + the prices strip)
+### The 10 question gauges (8 voting + the prices strip + the S4 shadow)
 
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
@@ -40,6 +42,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `gpr-threats`, `gpr-acts`, `gpr-daily`, `gpr-taiwan`, `gpr-china`, `gpr-russia`, `gpr-ukraine`, `gpr-israel`, `gpr-saudi`, `gpr-australia` (S4-M4.2), `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4) | 5 |
 | **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
 | **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de`, `gdpnow`, `empire-state`, `continuing-claims` (S3-M3.4) | 10 |
+| **geo-fragmentation** (shadow, S4-M4.3) | global | context only (never votes until S6): `chokepoint-suez`, `chokepoint-panama`, `chokepoint-bab-el-mandeb`, `chokepoint-malacca`, `chokepoint-taiwan` — the IMF PortWatch transits; the M4.2 geopolitics family joins this lane in M4.5 | 0 |
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
 | **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** + context: `au-petrol-yoy` | 5 |
 | **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `rba-cash-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
@@ -49,7 +52,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (123 ids, alphabetical)
+### The complete indicator inventory (139 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -63,7 +66,8 @@ public-display-ok · scored voter? · short description.
 > Administration), `cftc` (CFTC Commitments of Traders), `oecd` (OECD
 > CLI SDMX), `gpr` (Caldara-Iacoviello GPR index), `epu` (Baker-Bloom-
 > Davis EPU), `alternative-me` (crypto Fear & Greed), `treasury` (U.S.
-> Treasury fallback), `shiller` (Shiller dataset), `derived` (Currena's
+> Treasury fallback), `shiller` (Shiller dataset), `portwatch` (IMF
+> PortWatch chokepoint transits, S4-M4.3), `derived` (Currena's
 > own arithmetic from the above).
 
 | id | provider | cadence | maxAge (d) | level | public | voter? | what it is |
@@ -133,6 +137,11 @@ public-display-ok · scored voter? · short description.
 | `gpr-saudi` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Saudi Arabia (GPRC_SAU) |
 | `gpr-australia` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Australia (GPRC_AUS) |
 | `tpu-us` | epu | monthly | 75 | L0 | yes | – | US Trade Policy Uncertainty (the Categorical EPU workbook's trade column) |
+| `chokepoint-bab-el-mandeb` | portwatch | daily | 14 | L1 | yes | – | Bab el-Mandeb transits, 7-day average (IMF PortWatch estimate) |
+| `chokepoint-malacca` | portwatch | daily | 14 | L1 | yes | – | Strait of Malacca transits, 7-day average (IMF PortWatch estimate) |
+| `chokepoint-panama` | portwatch | daily | 14 | L1 | yes | – | Panama Canal transits, 7-day average (IMF PortWatch estimate) |
+| `chokepoint-suez` | portwatch | daily | 14 | L1 | yes | – | Suez Canal transits, 7-day average (IMF PortWatch estimate) |
+| `chokepoint-taiwan` | portwatch | daily | 14 | L1 | yes | – | Taiwan Strait transits, 7-day average (IMF PortWatch estimate) |
 | `govt-interest-revenue` | derived | quarterly | 215 | L0 | yes | ✓ | US government interest payments / receipts (BEA via FRED) |
 | `housing-permits` | fred | monthly | 75 | L0 | yes | – | US building permits |
 | `initial-jobless-claims` | fred | weekly | 12 | L0 | yes | ✓ | New unemployment claims (US) |
@@ -201,10 +210,12 @@ public-display-ok · scored voter? · short description.
 | `yield-curve-10y2y` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 2Y yield |
 | `yield-curve-10y3m` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 3M yield (the Fed's recession lens) |
 
-**Counts:** 123 ids total. Voters: 48 (brent votes in prices-heat per the
+**Counts:** 139 ids total. Voters: 48 (brent votes in prices-heat per the
 B-14 fix; the count is 9+5+5+3+10 + 5+7+4 = 48, which includes the
 **A-7 cftc-gold-positioning** voter in market-stress and the **A-8
-oecd-cli-us** voter in growth-health). Context: 63 (+6 S3-M3.2, +2 S3-M3.3; the S2 custody card makes 63).
+oecd-cli-us** voter in growth-health). Context: 91 (+6 S3-M3.2, +2 S3-M3.3,
++6 S3-M3.4, +6 S3-M3.5, +11 S4-M4.2, +5 S4-M4.3 — the chokepoints; the
+geo-fragmentation shadow gauge's members are context-only by G-5).
 
 ---
 
@@ -260,6 +271,7 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 | **cftc** (Commodity Futures Trading Commission) | L0 | US government work — public domain | cftc-gold-positioning (Commitments of Traders, futures-only, deafut.txt) | **free forever**, keyless | no |
 | **oecd** (OECD SDMX) | L0 | OECD open data | oecd-cli-us, oecd-cli-cn, oecd-cli-de (Composite Leading Indicators, amplitude-adjusted) | **free forever**, keyless | no |
 | **gpr** (Caldara-Iacoviello GPR index, hosted by Federal Reserve Board) | L0 | Academic open data, attribution displayed | gpr-index (Geopolitical Risk Index, monthly .xls) + the threat/act/country columns from the SAME download + gpr-daily (the daily 7-day-average export, S4-M4.2) | **free forever**, keyless | no |
+| **portwatch** (IMF PortWatch, Daily_Chokepoints_Data) | L1 | The IMF's own statistical-data terms: redistribution with attribution (quoted verbatim in sources.ts; read 2026-11-01) | chokepoint-suez / -panama / -bab-el-mandeb / -malacca / -taiwan (daily transits n_total, read as the 7-day average; S4-M4.3) | **free forever**, keyless (the ArcGIS FeatureServer query; SLOW from Worker egress, 30 s timeout) | no |
 | **epu** (Baker-Bloom-Davis EPU) | L0 | Open academic data, licence quoted from inside the workbook | epu-us (US Economic Policy Uncertainty, monthly .xlsx) | **free forever**, keyless | no |
 | **alternative-me** | L0 | Free API — attribution next to the data | crypto-fng (Crypto Fear and Greed) | **free forever**, keyless | no |
 | **shiller** (Robert Shiller, Yale) | L2 (owner-accepted) | Open academic data, attribution expected | shiller-cape, shiller-ecy (CAPE, Excess CAPE Yield) | free, owner-accepted | no |

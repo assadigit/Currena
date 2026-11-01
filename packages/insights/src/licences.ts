@@ -468,8 +468,32 @@ const FISCALDATA: SourceLicence = {
   publicDisplayOk: 'yes',
   termsCheckedOn: '2026-11-01',
   termsEvidence:
-    'US federal government works carry no copyright (17 U.S.C. § 105) — the same class as TREASURY/TIC above (the Treasury is a US government department on a .gov domain). The FiscalData API is Treasury\u2019s own public data service; the auctions_query dataset is the published Treasury-auction record (verified live 2026-11-01: 200 JSON from a normal client in ~3.6 s / 803 KB). VENUE: api.fiscaldata.treasury.gov is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe) — the GHA/Node venue is the ONLY production fetcher; runtime is never the Worker.',
+    'US federal government works carry no copyright (17 U.S.C. § 105) — the same class as TREASURY/TIC above (the Treasury is a US government department on a .gov domain). The FiscalData API is Treasury\u2019s own public data service (api.fiscaldata.treasury.gov); the auctions_query dataset is the published Treasury-auction record (verified live 2026-11-01: 200 JSON from a normal client in ~3.6 s / 803 KB). VENUE: api.fiscaldata.treasury.gov is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe) — the GHA/Node venue is the ONLY production fetcher; runtime is never the Worker.',
   termsUrl: 'https://api.fiscaldata.treasury.gov/',
+};
+
+/**
+ * gap-closure S4-M4.3 (2026-11-01) — the IMF PortWatch chokepoint transits.
+ * The IMF's own statistical-data terms (read 2026-11-01 via a REAL-BROWSER
+ * read of imf.org/external/terms.htm — the link the dataset's own ArcGIS
+ * Hub licence field declares; the plain fetch is bot-filtered, the M4.1
+ * record) grant redistribution with attribution. Worker egress SERVED but
+ * SLOW (12.5 s first byte, the S1 probe): the fetch pins its own 30 s
+ * timeout — the TIC precedent; runtime is the Worker (rung3) + the Node
+ * venue's inline collect.
+ */
+const PORTWATCH: SourceLicence = {
+  provider: 'portwatch',
+  label: 'International Monetary Fund (PortWatch)',
+  licenceName: 'IMF Terms of Use — special terms for statistical data',
+  attributionText: 'Source: International Monetary Fund (PortWatch)',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-01',
+  termsEvidence:
+    'Quoted verbatim from the IMF\u2019s own terms page (read 2026-11-01 via a real-browser read — the link the dataset\u2019s own ArcGIS Hub licence field declares; the S4-M4.1 record): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source, e.g. \u2018Source: International Monetary Fund, Database Name, <<link to the dataset>>.\u2019 Users shall not infringe upon the integrity of the Data and shall refrain from any act of alteration of the Data that intentionally affects its nature or accuracy.” — affirmative redistribution permission with the attribution condition; L1 with quoted permission → public display with the attribution string above.',
+  termsUrl: 'https://www.imf.org/external/terms.htm',
 };
 
 /** The register. Unknown providers resolve to the fail-closed entry. */
@@ -492,6 +516,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   derived: DERIVED,
   treasury: TREASURY,
   fiscaldata: FISCALDATA,
+  portwatch: PORTWATCH,
   tic: TIC,
   eia: EIA,
   frb: FRB,

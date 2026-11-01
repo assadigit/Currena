@@ -89,6 +89,15 @@ import { providerFetchEnabled, SANITY_RANGES, withinSanityRange } from '../sourc
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS, type Rung2FetchPlan } from '../adapters/rung2';
 import { collectRung4Sources, deriveRung4IndicatorSeries, RUNG4_IDS } from '../adapters/rung4';
 import { fetchEbpCsv, fetchOfrFsiCsv } from '../adapters/credit';
+import {
+  collectPortwatchRows,
+  derivePortwatchIndicatorSeries,
+  mergePortwatchHistory,
+  parseStoredPortwatch,
+  PORTWATCH_IDS,
+  PORTWATCH_KV_KEY,
+  PORTWATCH_WINDOW_DAYS,
+} from '../adapters/portwatch';
 import { classifySourceError } from '../adapters/fetch-policy';
 import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
@@ -194,6 +203,14 @@ export interface IngestRunOptions {
     btc30y?: SeriesPoint[];
     indirect30y?: SeriesPoint[];
   };
+  /**
+   * gap-closure S4-M4.3 (2026-11-01): the IMF PortWatch chokepoint MA7
+   * series, pre-derived by the Node venue's inline collect
+   * (adapters/portwatch.ts collectPortwatch — the full 400-day window).
+   * The Worker's 04:10 main rung passes nothing — the ids carry forward
+   * (CARRY_FORWARD_IDS) until the 04:30 rung3 phase patches them.
+   */
+  portwatchSeries?: Partial<Record<IndicatorId, SeriesPoint[]>>;
   /**
    * The OECD mirror armed as the jgb-10y fallback (the Node venue passes
    * the FRED mirror it already collected; the 04:20 phase reads it from
@@ -425,7 +442,10 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     // gap-closure S3-M3.2: the inline rung-4 fetches (Node venue + selfcheck)
     // join the build; the Worker's 04:10 main rung passes nothing (the ids
     // carry forward until the 04:35 phase patches them).
-    ...(opts.rung4Series !== undefined || opts.creditSeries !== undefined || opts.auctionsSeries !== undefined
+    ...(opts.rung4Series !== undefined ||
+      opts.creditSeries !== undefined ||
+      opts.auctionsSeries !== undefined ||
+      opts.portwatchSeries !== undefined
       ? {
           rung4: {
             ...(opts.rung4Series !== undefined ? { fredS3: opts.rung4Series } : {}),
@@ -434,6 +454,9 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
             // gap-closure S3-M3.5: the Treasury auction families (Node
             // venue only — the Worker cannot reach the host).
             ...(opts.auctionsSeries !== undefined ? { auctions: opts.auctionsSeries } : {}),
+            // gap-closure S4-M4.3: the chokepoint MA7 series (the Node
+            // venue's inline collect; the rung3 phase derives its own).
+            ...(opts.portwatchSeries !== undefined ? { portwatch: opts.portwatchSeries } : {}),
           },
         }
       : {}),
@@ -756,9 +779,11 @@ function quantizedGap(us: SeriesPoint[], jp: SeriesPoint[]): SeriesPoint[] {
  * rung-2 pair (04:20, MOF/weekly/monthly) + the rung-4 family (04:35, the
  * S3 FRED groups). At the 04:10 MAIN build their series are absent by
  * design; their readings carry VERBATIM (see snapshot.ts carryForwardIds)
- * until their phases patch them minutes later.
+ * until their phases patch them minutes later. gap-closure S4-M4.3
+ * (2026-11-01): the PortWatch chokepoint ids join the same discipline for
+ * the 04:30 rung3 phase (the ids carry until the phase patches them).
  */
-export const CARRY_FORWARD_IDS: readonly string[] = [...RUNG2_IDS, ...RUNG4_IDS];
+export const CARRY_FORWARD_IDS: readonly string[] = [...RUNG2_IDS, ...RUNG4_IDS, ...PORTWATCH_IDS];
 
 /** Read a stored history as series, poison-tolerant (the collect pattern). */
 async function storedSeriesOf(store: InsightsStore, id: IndicatorId): Promise<SeriesPoint[] | undefined> {
@@ -1366,6 +1391,205 @@ export async function runInsightsCreditPhase(opts: CreditPhaseOptions): Promise<
 }
 
 /* ------------------------------------------------------------------ *
+ * The PortWatch phase (gap-closure S4-M4.3, 2026-11-01) — the 04:30 UTC
+ * rung3 phase that owns the chokepoint transits: the IMF PortWatch
+ * FeatureServer query (SLOW from Worker egress — the fetch pins its own
+ * 30 s timeout, the TIC precedent; the pages sit behind a politeness
+ * pause because the host 400s rapid successive queries), the ONE
+ * combined raw-history key (insights:portwatch:v1, 400 days per
+ * chokepoint, zod-validated both ways), and the per-id MA7 readings the
+ * snapshot carries. The credit phase's twin with TWO additions: the
+ * stored-history merge (the daily fetch only needs the days since the
+ * stored latest − 7; a missing/poisoned stored key bootstraps the FULL
+ * 400-day window, ≤3 pages) and the combined-key write.
+ *
+ * Subrequest budget (daily run): 1 fetch + 5 reads (combined key,
+ * snapshot, status, stage ×1) + 10 writes (combined key, snapshot,
+ * public, stage, status + 5 per-id histories) = 16; the bootstrap adds
+ * ≤2 fetch pages. The 'portwatch' ExtraSourceDef declares 18 (headroom).
+ * ------------------------------------------------------------------ */
+
+export interface PortwatchPhaseResult {
+  /** The re-derived MA7 series (the ids the phase refreshed this run). */
+  series: Record<string, SeriesPoint[]>;
+  /** Per-fetch report rows (appended to insights:status). */
+  reports: InsightsSourceReport[];
+  /** Whether the snapshot + public projection were patched and written. */
+  patched: boolean;
+  /** History writes for the phase's own ids. */
+  histories: { written: number; singlePoint: number };
+  /** The raw-day counts per chokepoint (the honest bootstrap record). */
+  rawDays: Record<string, number>;
+}
+
+export interface PortwatchPhaseOptions {
+  /** The KV or REST store (snapshot read + writes). */
+  store: InsightsStore;
+  /** The Worker venue's RATES binding (the combined key + histories + stage). */
+  kv: KVLike;
+  /** 'scheduled' (the Worker rung) or 'manual' (a dispatch). */
+  mode: 'scheduled' | 'manual';
+  /** Clock injection (tests). */
+  now?: Date;
+  /** The ids the PUBLIC projection hides. */
+  hiddenPublicIds?: ReadonlySet<string>;
+  /** Injectable fetch (tests replay fixtures — never live sites). */
+  fetchImpl?: typeof fetch;
+  /** Page pause override (tests pass 0). */
+  pagePauseMs?: number;
+}
+
+/** The days a daily fetch reaches back over the stored latest (revisions
+ *  of the recent week ride every fetch — the provider's own estimate
+ *  wording; the cards carry the data date). */
+const PORTWATCH_DAILY_OVERLAP_DAYS = 7;
+
+/** When is the stored history so old that a full bootstrap is cheaper
+ *  than the merge? (Also the poisoned/missing-key path.) */
+const PORTWATCH_BOOTSTRAP_IF_OLDER_THAN_DAYS = 45;
+
+export async function runInsightsPortwatchPhase(opts: PortwatchPhaseOptions): Promise<PortwatchPhaseResult> {
+  const now = opts.now ?? new Date();
+  const nowIso = now.toISOString();
+  const today = nowIso.slice(0, 10);
+  const todayMs = Date.parse(`${today}T00:00:00Z`);
+  console.log(`# Insights portwatch phase (S4-M4.3 chokepoints) — ${nowIso} [${opts.mode}]`);
+
+  // 1. The stored combined history decides the fetch window (bootstrap vs
+  //    the days-since-latest merge).
+  let stored: ReturnType<typeof parseStoredPortwatch> = undefined;
+  try {
+    stored = parseStoredPortwatch(await opts.kv.get(PORTWATCH_KV_KEY));
+  } catch (err) {
+    console.warn(`  ⚠ ${PORTWATCH_KV_KEY} read failed: ${errMessage(err)} (bootstrap path)`);
+  }
+  const todayDay = Math.round(todayMs / 86_400_000);
+  const latestStoredDay = (() => {
+    let latest = Number.NEGATIVE_INFINITY;
+    for (const c of stored?.chokepoints ?? []) {
+      for (const [day] of c.days) if (day > latest) latest = day;
+    }
+    return latest;
+  })();
+  const bootstrap =
+    stored === undefined ||
+    latestStoredDay === Number.NEGATIVE_INFINITY ||
+    latestStoredDay < todayDay - PORTWATCH_BOOTSTRAP_IF_OLDER_THAN_DAYS;
+  const fromDate = bootstrap
+    ? fromEpochDay(todayDay - (PORTWATCH_WINDOW_DAYS - 1))
+    : fromEpochDay(latestStoredDay - PORTWATCH_DAILY_OVERLAP_DAYS);
+  console.log(
+    `  stored: ${stored === undefined ? 'absent' : `${stored.chokepoints.length} chokepoints`} · ${bootstrap ? 'BOOTSTRAP' : 'daily merge'} from ${fromDate}`,
+  );
+
+  // 2. Fetch (single honest attempt per page; a failing page fails the
+  //    whole phase — the sweeps heal within hours, day gate bypassed).
+  const collected = await collectPortwatchRows(fromDate, {
+    ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+    ...(opts.pagePauseMs !== undefined ? { pagePauseMs: opts.pagePauseMs } : {}),
+    now,
+  });
+  const reports = [...collected.reports];
+  for (const row of reports) console.log(`  ${row.ok ? '✅' : '❌'} ${row.source} — ${row.detail}`);
+  const histories = { written: 0, singlePoint: 0 };
+  const rawDays: Record<string, number> = {};
+
+  if (collected.rows.length === 0) {
+    console.log('[portwatch] nothing to patch (no rows parsed)');
+    return { series: {}, reports, patched: false, histories, rawDays };
+  }
+
+  // 3. Merge into the 400-day window and write the combined key (the
+  //    spec's ONE-key history design; zod-validated shape on the way in).
+  const merged = mergePortwatchHistory(stored, collected.rows, now);
+  for (const c of merged.chokepoints) rawDays[c.portid] = c.days.length;
+  await opts.kv.put(PORTWATCH_KV_KEY, JSON.stringify(merged));
+  console.log(
+    `  ✍ ${PORTWATCH_KV_KEY} (${Object.entries(rawDays)
+      .map(([pid, n]) => `${pid} ${n}d`)
+      .join(' · ')})`,
+  );
+
+  // 4. Derive the per-id MA7 series (the shared pure derivation — the
+  //    Node venue's inline build runs the same function).
+  const series = derivePortwatchIndicatorSeries(merged) as Record<string, SeriesPoint[]>;
+  for (const [id, s] of Object.entries(series)) {
+    console.log(`  · ${id}: ${s.at(-1)!.value} @ ${s.at(-1)!.date} (${s.length} obs)`);
+  }
+
+  // 5. Recompute the readings (computeReading stamps the chokepointCompare
+  //    block for every portwatch-source reading — the same engine + guards
+  //    the other phases apply).
+  const storedSnapshot = await opts.store.getSnapshot();
+  if (storedSnapshot === undefined) {
+    console.warn('[portwatch] no stored snapshot to patch — the next main rung builds from scratch');
+    return { series, reports, patched: false, histories, rawDays };
+  }
+  const patchedReadings: IndicatorReading[] = [];
+  for (const [id, idSeries] of Object.entries(series) as [IndicatorId, SeriesPoint[]][]) {
+    const def = DEFINITIONS.find((d) => d.id === id)!;
+    const source: ReadingSource = READING_SOURCES[id] ?? { name: def.sourceRef };
+    // No SANITY_RANGES entry for the chokepoints (the M3.2 no-invented-
+    // bounds lesson: the parser's structural checks carry the load).
+    const reading = computeReading(def, idSeries, nowIso, source);
+    patchedReadings.push(reading);
+    console.log(
+      `  🔄 ${id}: ${reading.value ?? '—'} @ ${reading.asOf ?? '—'} [${reading.status}]${reading.chokepointCompare !== undefined ? ` vs4w ${reading.chokepointCompare.vsPrior4w >= 0 ? '+' : ''}${reading.chokepointCompare.vsPrior4w}${reading.chokepointCompare.vsYearAgo !== undefined ? ` · yoy ${reading.chokepointCompare.vsYearAgo >= 0 ? '+' : ''}${reading.chokepointCompare.vsYearAgo}` : ''}` : ''}`,
+    );
+  }
+
+  // 6. Patch + write the snapshot family (the credit phase's sequence).
+  const patched = patchInsightsSnapshot(storedSnapshot, patchedReadings, nowIso);
+  await opts.store.putSnapshot(patched);
+  console.log('  ✍ insights:snapshot (patched)');
+  const hiddenIds = opts.hiddenPublicIds ?? new Set<string>();
+  await opts.store.putPublicSnapshot(projectSnapshotToPublic(patched, hiddenIds));
+  console.log('  ✍ insights:snapshot-public (patched)');
+
+  // 7. Update the stage (the honest record of what this phase last served).
+  {
+    const base = (await readStage(opts.kv)) ?? { v: STAGE_VERSION, writtenAt: nowIso, series: {} };
+    for (const [id, idSeries] of Object.entries(series)) {
+      const trimmed = trimForStage(idSeries, todayMs);
+      if (trimmed.length > 0) base.series[id] = trimmed;
+    }
+    base.writtenAt = nowIso;
+    await putStage(opts.kv, base);
+    console.log(`  ✍ ${INSIGHTS_STAGE_KEY} (updated ${Object.keys(series).join(', ')})`);
+  }
+
+  // 8. Write the phase's OWN history keys (the daily halves' exclusion).
+  for (const [id, idSeries] of Object.entries(series) as [IndicatorId, SeriesPoint[]][]) {
+    const history = buildHistoryFile(id, idSeries);
+    if (!history) {
+      if (idSeries.length > 0) histories.singlePoint++;
+      continue;
+    }
+    try {
+      await opts.kv.put(`insights:hist:${id}`, JSON.stringify(history));
+      histories.written++;
+    } catch (err) {
+      console.warn(`  ⚠ insights:hist:${id} failed: ${errMessage(err)}`);
+    }
+  }
+  console.log(`  history: ${histories.written} written · ${histories.singlePoint} single-point (kept)`);
+
+  // 9. Append the phase's report rows to insights:status.
+  try {
+    const status = await opts.store.getStatus();
+    if (status !== undefined) {
+      const mergedRows = [...status.sources, ...reports];
+      await opts.store.putStatus({ ...status, sources: mergedRows, generatedAt: nowIso });
+      console.log(`  ✍ insights:status (+${reports.length} portwatch rows)`);
+    }
+  } catch (err) {
+    console.warn(`  ⚠ insights:status append failed: ${errMessage(err)}`);
+  }
+
+  return { series, reports, patched: true, histories, rawDays };
+}
+
+/* ------------------------------------------------------------------ *
  * The Node venue's inline history writes (read-compared, no staging).
  * ------------------------------------------------------------------ */
 
@@ -1455,11 +1679,14 @@ export interface HistoryPhaseOptions {
  * written by their own 04:35 phase (which runs AFTER the 04:25/04:27
  * daily halves; leaving them in would both duplicate the writes the next
  * morning and re-grow the daily halves past the exceededCpu ceiling the
- * 2026-10-26 split fixed). */
+ * 2026-10-26 split fixed). gap-closure S4-M4.3 (2026-11-01): the
+ * PORTWATCH_IDS are excluded for the same reason — the 04:30 rung3 phase
+ * owns their histories. */
 export function historyPhaseIds(phase: 'daily' | 'daily-a' | 'daily-b' | 'periodic'): IndicatorId[] {
-  const isRung4 = (id: IndicatorId): boolean => (RUNG4_IDS as readonly string[]).includes(id);
+  const isOwned = (id: IndicatorId): boolean =>
+    (RUNG4_IDS as readonly string[]).includes(id) || (PORTWATCH_IDS as readonly string[]).includes(id);
   const daily = DEFINITIONS.filter(
-    (d) => (d.cadence === 'daily' || d.cadence === 'weekly') && !isRung4(d.id),
+    (d) => (d.cadence === 'daily' || d.cadence === 'weekly') && !isOwned(d.id),
   ).map((d) => d.id);
   if (phase === 'daily-a') return daily.slice(0, Math.ceil(daily.length / 2));
   if (phase === 'daily-b') return daily.slice(Math.ceil(daily.length / 2));
@@ -1467,7 +1694,7 @@ export function historyPhaseIds(phase: 'daily' | 'daily-a' | 'daily-b' | 'period
   return DEFINITIONS.filter(
     (d) =>
       (d.cadence === 'monthly' || d.cadence === 'quarterly' || d.cadence === 'per-change' || d.cadence === 'manual') &&
-      !isRung4(d.id),
+      !isOwned(d.id),
   ).map((d) => d.id);
 }
 

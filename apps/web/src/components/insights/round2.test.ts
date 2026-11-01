@@ -803,13 +803,13 @@ describe('v3 Delayed tier (§4: ≥1 trading day behind the snapshot’s daily p
  * ------------------------------------------------------------------ */
 
 describe('R9 lane presentation (special containers, unchanged gauges)', () => {
-  it('GROUP_ORDER stays the FULL gauge order — the counting surface is unchanged by the merge', () => {
-    expect(GROUP_ORDER.global).toEqual(['borrowing-costs', 'prices-heat', 'market-stress', 'dollar-strength', 'growth-health']);
+  it('GROUP_ORDER stays the FULL gauge order — the counting surface is unchanged by the merge (gap-closure S4-M4.3: the geo-fragmentation shadow gauge joins global, last)', () => {
+    expect(GROUP_ORDER.global).toEqual(['borrowing-costs', 'prices-heat', 'market-stress', 'dollar-strength', 'growth-health', 'geo-fragmentation']);
     expect(GROUP_ORDER.australia).toEqual(['au-inflation-rates', 'au-households', 'au-trade-currency']);
   });
 
-  it('R9-04: the LANE drops the dollar-strength group — its cards render in the currencies section', () => {
-    expect(LANE_GROUP_ORDER.global).toEqual(['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health']);
+  it('R9-04: the LANE drops the dollar-strength group — its cards render in the currencies section (S4-M4.3: the geo-fragmentation lane renders last)', () => {
+    expect(LANE_GROUP_ORDER.global).toEqual(['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health', 'geo-fragmentation']);
     expect(LANE_GROUP_ORDER.global).not.toContain('dollar-strength');
     // The Australia lane keeps all three groups (R9-05 renders them as
     // sub-headed card groups INSIDE the one container — no group is lost).

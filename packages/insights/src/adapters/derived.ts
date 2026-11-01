@@ -510,6 +510,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('treasury-auction-10y-indirect', inputs.rung4?.auctions?.indirect10y);
   put('treasury-auction-30y', inputs.rung4?.auctions?.btc30y);
   put('treasury-auction-30y-indirect', inputs.rung4?.auctions?.indirect30y);
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint MA7 series — PRE-DERIVED
+  // by the Node venue's inline collect (adapters/portwatch.ts, the full
+  // 400-day window). The Worker's 04:10 main rung passes nothing (the ids
+  // carry forward until the 04:30 rung3 phase patches them).
+  for (const [id, s] of Object.entries(inputs.rung4?.portwatch ?? {}) as [IndicatorId, SeriesPoint[]][]) {
+    put(id, s);
+  }
   // Step-2 add-list §B5: the Cboe VIX close (daily, full history — the
   // stored history keeps the 10-year daily window the Step-3 verdicts
   // will compute their calm/nervous thresholds from).
@@ -1229,6 +1236,29 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'tpu-us': {
     name: 'Baker-Bloom-Davis, US Trade Policy Uncertainty',
     url: 'https://www.policyuncertainty.com/trade_uncertainty.html',
+  },
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint transit cards — the
+  // IMF PortWatch attribution the About panel and the details render (the
+  // register row's own licence line prescribes the source string).
+  'chokepoint-suez': {
+    name: 'International Monetary Fund, PortWatch (Suez Canal daily transits)',
+    url: 'https://portwatch.imf.org/',
+  },
+  'chokepoint-panama': {
+    name: 'International Monetary Fund, PortWatch (Panama Canal daily transits)',
+    url: 'https://portwatch.imf.org/',
+  },
+  'chokepoint-bab-el-mandeb': {
+    name: 'International Monetary Fund, PortWatch (Bab el-Mandeb Strait daily transits)',
+    url: 'https://portwatch.imf.org/',
+  },
+  'chokepoint-malacca': {
+    name: 'International Monetary Fund, PortWatch (Strait of Malacca daily transits)',
+    url: 'https://portwatch.imf.org/',
+  },
+  'chokepoint-taiwan': {
+    name: 'International Monetary Fund, PortWatch (Taiwan Strait daily transits)',
+    url: 'https://portwatch.imf.org/',
   },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
   platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },

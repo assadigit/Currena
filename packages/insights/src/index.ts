@@ -64,6 +64,7 @@ export {
   GAUGES,
   gaugeReading,
   gaugesForSection,
+  isShadowGauge,
   labelForVerdictStep,
   sectionVerdictStep,
   summarizeByGauges,

@@ -841,6 +841,14 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // gold-silver ratio family.
   'treasury-auction-10y',
   'treasury-auction-30y',
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint transits — a counted
+  // quantity per day, the us-nfp family (a count's changes are count
+  // differences, never percents).
+  'chokepoint-suez',
+  'chokepoint-panama',
+  'chokepoint-bab-el-mandeb',
+  'chokepoint-malacca',
+  'chokepoint-taiwan',
   // 2026-10-21 data-integrity round: the monthly nonfarm-payrolls change
   // speaks in thousands of jobs — a count, not a percent.
   'us-nfp',

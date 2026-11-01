@@ -338,6 +338,17 @@ const LAYER1 = {
       plain: 'How many dollars were bid for every dollar of bonds a Treasury auction sold. A lower reading says demand was thinner.',
       example: 'A bid-to-cover of 2.5 means buyers offered two and a half dollars for every dollar of bonds sold — around 2.5 has been typical.',
     },
+    // gap-closure S4-M4.3 (2026-11-01) — the chokepoint cards' terms (the
+    // M4.6 glossary list, landed with the cards that use them).
+    chokepoint: {
+      term: 'chokepoint',
+      plain: 'A narrow sea passage that a large share of world shipping passes through, such as a canal or a strait between two land masses.',
+      example: 'The Suez Canal, the Panama Canal and the Strait of Malacca are the best-known chokepoints.',
+    },
+    'transit-estimate': {
+      term: 'transit (estimate)',
+      plain: 'One ship passing through a passage, counted once. The count is an estimate from ship-tracking data, so it can be revised.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -970,6 +981,64 @@ const LAYER1 = {
         { with: 'gpr-index', text: 'Two lenses on world friction: trade words beside war words.', strength: 'usually' },
       ],
       glossaryTerms: [],
+    },
+    // gap-closure S4-M4.3 (2026-11-01): the chokepoint cards — measured
+    // ship traffic through the world's narrow sea gates. Measurements and
+    // tendencies only; the copy never names an event as a cause.
+    'chokepoint-suez': {
+      plainName: 'Suez Canal traffic',
+      oneLine: 'How many ships a day pass through the Suez Canal.',
+      ifRising: 'More of the Europe-Asia sea route is flowing through the canal.',
+      ifFalling: 'Fewer ships a day are using the Europe-Asia shortcut.',
+      connections: [
+        { with: 'chokepoint-bab-el-mandeb', text: 'The Red Sea gate on the canal\u2019s southern approach.', strength: 'reliable' },
+        { with: 'brent', text: 'The oil price often reads long freight routes into its moves.', strength: 'usually' },
+      ],
+      glossaryTerms: ['chokepoint', 'transit-estimate'],
+    },
+    'chokepoint-panama': {
+      plainName: 'Panama Canal traffic',
+      oneLine: 'How many ships a day pass through the Panama Canal.',
+      ifRising: 'More Atlantic-Pacific trade is moving through the canal.',
+      ifFalling: 'Fewer ships a day are crossing between the two oceans.',
+      connections: [
+        { with: 'chokepoint-suez', text: 'The two canal gates between the world\u2019s biggest trade blocs.', strength: 'usually' },
+        { with: 'brent', text: 'Longer freight routes tend to show up in oil\u2019s price moves.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['chokepoint', 'transit-estimate'],
+    },
+    'chokepoint-bab-el-mandeb': {
+      plainName: 'Bab el-Mandeb traffic',
+      oneLine: 'How many ships a day pass the gate into the Red Sea.',
+      ifRising: 'More Suez-bound traffic is taking the Red Sea route.',
+      ifFalling: 'Fewer ships a day are entering the Red Sea gate.',
+      connections: [
+        { with: 'chokepoint-suez', text: 'The canal the Red Sea gate feeds; the pair reads as one route.', strength: 'reliable' },
+        { with: 'gpr-saudi', text: 'The tension gauge of the region this gate sits in.', strength: 'usually' },
+      ],
+      glossaryTerms: ['chokepoint', 'transit-estimate'],
+    },
+    'chokepoint-malacca': {
+      plainName: 'Malacca Strait traffic',
+      oneLine: 'How many ships a day pass between the Indian Ocean and east Asia.',
+      ifRising: 'More of the Asia-bound trade is moving on the shortest sea lane.',
+      ifFalling: 'Fewer ships a day are using the main east-Asia artery.',
+      connections: [
+        { with: 'chokepoint-taiwan', text: 'The two busiest gates on the east-Asia approach.', strength: 'reliable' },
+        { with: 'china-pmi', text: 'Chinese factory runs tend to move with the raw-materials traffic.', strength: 'usually' },
+      ],
+      glossaryTerms: ['chokepoint', 'transit-estimate'],
+    },
+    'chokepoint-taiwan': {
+      plainName: 'Taiwan Strait traffic',
+      oneLine: 'How many ships a day pass through the Taiwan Strait.',
+      ifRising: 'More north-east Asian trade is moving through the strait.',
+      ifFalling: 'Fewer ships a day are crossing between mainland China and Taiwan.',
+      connections: [
+        { with: 'chokepoint-malacca', text: 'The two busiest gates on the east-Asia approach.', strength: 'reliable' },
+        { with: 'gpr-taiwan', text: 'The tension gauge of the same waters, read beside the traffic.', strength: 'usually' },
+      ],
+      glossaryTerms: ['chokepoint', 'transit-estimate'],
     },
     'copper-usd': {
       plainName: 'The world copper price',
@@ -4947,6 +5016,116 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'Uncertainty is not direction: a high reading says trade policy dominates the news, not which way it goes.',
     forYou: 'The trade leg of the policy-noise pair: read it beside the wider uncertainty gauge and the world-friction cards.',
   },
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint cards. The number is
+  // the provider's own 7-day average of estimated daily transits; the
+  // comparison lines quote the reading's own chokepointCompare block
+  // ({n} more/fewer transits a day) — measurements and tendencies only,
+  // never an event as a cause.
+  'chokepoint-suez': {
+    name: 'Suez Canal transits',
+    ticker: 'Suez',
+    oneLiner: 'How many ships a day are passing through the Suez Canal, as a 7-day average.',
+    lines: {
+      highRising: 'Suez traffic is well above its recent average and still rising.',
+      highEasing: 'Suez traffic remains above its recent average but is easing.',
+      typical: 'Suez traffic sits in its usual range for the past year.',
+      low: 'Unusually few ships a day are using the canal.',
+    },
+    unitNote: 'ships per day (7-day average, estimate)',
+    whatItIs:
+      'The IMF PortWatch estimate of daily transits through the Suez Canal, from ship-tracking data; the card reads the 7-day average and shows the change against the prior four weeks and the same weeks a year earlier.',
+    whyItMatters:
+      'The Suez Canal is the sea shortcut between Europe and Asia: about a tenth of world sea trade normally passes through it, so the count is a direct measure of how much of that route is being used.',
+    tendedToMean:
+      'The zones are measured against the strait\u2019s own trailing window, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The count is an estimate from ship-tracking data and is revised; a lower number says less traffic, never by itself why.',
+    forYou: 'The Europe-Asia freight gate: read it beside its Red Sea approach and the oil price.',
+  },
+  'chokepoint-panama': {
+    name: 'Panama Canal transits',
+    ticker: 'Panama',
+    oneLiner: 'How many ships a day are passing through the Panama Canal, as a 7-day average.',
+    lines: {
+      highRising: 'Panama traffic is well above its recent average and still rising.',
+      highEasing: 'Panama traffic remains above its recent average but is easing.',
+      typical: 'Panama traffic sits in its usual range for the past year.',
+      low: 'Unusually few ships a day are crossing the canal.',
+    },
+    unitNote: 'ships per day (7-day average, estimate)',
+    whatItIs:
+      'The IMF PortWatch estimate of daily transits through the Panama Canal, from ship-tracking data; the card reads the 7-day average and shows the change against the prior four weeks and the same weeks a year earlier.',
+    whyItMatters:
+      'The Panama Canal links the Atlantic and the Pacific: the count measures how much of that crossing is being used, and its water levels set an independent limit no other gate shares.',
+    tendedToMean:
+      'The zones are measured against the canal\u2019s own trailing window, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The count is an estimate from ship-tracking data and is revised; a lower number says less traffic, never by itself why.',
+    forYou: 'The Atlantic-Pacific gate: read it beside Suez — the two canals carry different trades.',
+  },
+  'chokepoint-bab-el-mandeb': {
+    name: 'Bab el-Mandeb transits',
+    ticker: 'Bab el-Mandeb',
+    oneLiner: 'How many ships a day are passing the strait into the Red Sea, as a 7-day average.',
+    lines: {
+      highRising: 'Bab el-Mandeb traffic is well above its recent average and still rising.',
+      highEasing: 'Bab el-Mandeb traffic remains above its recent average but is easing.',
+      typical: 'Bab el-Mandeb traffic sits in its usual range for the past year.',
+      low: 'Unusually few ships a day are entering the Red Sea gate.',
+    },
+    unitNote: 'ships per day (7-day average, estimate)',
+    whatItIs:
+      'The IMF PortWatch estimate of daily transits through the Bab el-Mandeb Strait, from ship-tracking data; the card reads the 7-day average and shows the change against the prior four weeks and the same weeks a year earlier.',
+    whyItMatters:
+      'Bab el-Mandeb is the gate into the Red Sea on the Suez approach: most Suez traffic between Europe and Asia also passes here, so the pair reads as one route.',
+    tendedToMean:
+      'The zones are measured against the strait\u2019s own trailing window, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The count is an estimate from ship-tracking data and is revised; a lower number says less traffic, never by itself why.',
+    forYou: 'The Red Sea gate: read it beside the Suez count — one route, two measurements.',
+  },
+  'chokepoint-malacca': {
+    name: 'Strait of Malacca transits',
+    ticker: 'Malacca',
+    oneLiner: 'How many ships a day are passing through the Strait of Malacca, as a 7-day average.',
+    lines: {
+      highRising: 'Malacca traffic is well above its recent average and still rising.',
+      highEasing: 'Malacca traffic remains above its recent average but is easing.',
+      typical: 'Malacca traffic sits in its usual range for the past year.',
+      low: 'Unusually few ships a day are using the strait.',
+    },
+    unitNote: 'ships per day (7-day average, estimate)',
+    whatItIs:
+      'The IMF PortWatch estimate of daily transits through the Strait of Malacca, from ship-tracking data; the card reads the 7-day average and shows the change against the prior four weeks and the same weeks a year earlier.',
+    whyItMatters:
+      'Malacca is the main artery between the Indian Ocean and east Asia — the shortest route for the region\u2019s raw materials and finished goods, including Australian coal and iron ore exports.',
+    tendedToMean:
+      'The zones are measured against the strait\u2019s own trailing window, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The count is an estimate from ship-tracking data and is revised; a lower number says less traffic, never by itself why.',
+    forYou: 'The east-Asia freight gate: read it beside the Taiwan Strait and China\u2019s factory gauge.',
+  },
+  'chokepoint-taiwan': {
+    name: 'Taiwan Strait transits',
+    ticker: 'Taiwan Strait',
+    oneLiner: 'How many ships a day are passing through the Taiwan Strait, as a 7-day average.',
+    lines: {
+      highRising: 'Taiwan Strait traffic is well above its recent average and still rising.',
+      highEasing: 'Taiwan Strait traffic remains above its recent average but is easing.',
+      typical: 'Taiwan Strait traffic sits in its usual range for the past year.',
+      low: 'Unusually few ships a day are crossing the strait.',
+    },
+    unitNote: 'ships per day (7-day average, estimate)',
+    whatItIs:
+      'The IMF PortWatch estimate of daily transits through the Taiwan Strait, from ship-tracking data; the card reads the 7-day average and shows the change against the prior four weeks and the same weeks a year earlier.',
+    whyItMatters:
+      'The Taiwan Strait is one of the busiest shipping lanes in the world; the traffic count is the measured flow beside the tension gauge of the same waters.',
+    tendedToMean:
+      'The zones are measured against the strait\u2019s own trailing window, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The count is an estimate from ship-tracking data and is revised; a lower number says less traffic, never by itself why.',
+    forYou: 'The north-east Asia freight gate: read it beside the Taiwan tension gauge.',
+  },
   'wti': {
     name: 'Oil price (WTI)',
     ticker: 'WTI',
@@ -5343,6 +5522,11 @@ export const insightsCopyEn = {
     // cards and the gauge headers — plain wording, no alarmist colour; the
     // card itself is never hidden.
     staleReadingsBadge: '{n} of {total} readings out of date',
+    // gap-closure S4-M4.3 (2026-11-01): the shadow-gauge header — a gauge
+    // whose members are all context-only (G-5) never claims a verdict; the
+    // plain words say so, and the count line reads the context readings.
+    gaugeNotScored: 'not scored yet',
+    gaugeContextCount: '{n} context readings',
     // UI-08: the alert box (a stale or unavailable reading sits inside a
     // gauge whose members voted).
     heroAlertStaleLine: 'Some inputs are stale or missing — read the counts with care.',
@@ -6962,6 +7146,9 @@ export const insightsCopyEn = {
     'au-inflation-rates': 'Are inflation and rates a problem?',
     'au-households': 'Are households under pressure?',
     'au-trade-currency': 'How is trade and the currency?',
+    // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane — a
+    // shadow gauge until S6 (the header reads "not scored yet").
+    'geo-fragmentation': 'Is the world getting more fragmented?',
   },
 
   /** R30: SHORT gauge names for the hero: the reason line once embedded
@@ -6977,6 +7164,7 @@ export const insightsCopyEn = {
     'au-inflation-rates': 'Inflation & rates',
     'au-households': 'Households',
     'au-trade-currency': 'Trade & currency',
+    'geo-fragmentation': 'Fragmentation',
   },
 
   /** The one-line answer under each gauge heading (L2). */
@@ -6990,6 +7178,8 @@ export const insightsCopyEn = {
     'au-inflation-rates': 'Australian inflation and the rates that respond to it.',
     'au-households': 'Mortgages, rents, wages and jobs: the household squeeze.',
     'au-trade-currency': 'Exports, imports and the Australian dollar.',
+    'geo-fragmentation':
+      'Measured world friction: tension news, policy fights and the sea gates trade passes through.',
   },
 
   status: {
@@ -7089,6 +7279,9 @@ export const insightsCopyEn = {
     vacancies: 'k vacancies',
     // 2026-10-26 gap-audit build, A-6: crude stocks in millions of barrels.
     barrels: 'm barrels',
+    // gap-closure S4-M4.3 (2026-11-01): the chokepoint transits — the
+    // 7-day average of the daily count ("45.3 transits a day").
+    transits: 'transits a day',
   },
 
   rule: {

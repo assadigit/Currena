@@ -145,14 +145,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 134 indicators (48 voting [V] + 86 context [C])
+### A. The 139 indicators (48 voting [V] + 91 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (105 indicators, 32 voting)
+#### GLOBAL (110 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -420,6 +420,31 @@ working KV-Edit token.*
 12-month — the YoY sibling of the spec's MoM id, the M3.1-recorded
 deviation), both context-only per G-5 and riding the rung4 'fred-s3' macro
 group beside the CPI family.)*
+
+**Geopolitics and supply** (the `geo-fragmentation` lane — "Is the world
+getting more fragmented?", a SHADOW gauge until S6: every member is
+context-only per G-5, the lane header reads "not scored yet", and the
+global summary counts are unchanged — a step-0 gauge is excluded from the
+region verdict by design):
+| | id | cadence | maxAge | rule | source |
+|---|---|---|---|---|---|
+| [C] | `chokepoint-suez` | daily | 14 | info | portwatch |
+| [C] | `chokepoint-panama` | daily | 14 | info | portwatch |
+| [C] | `chokepoint-bab-el-mandeb` | daily | 14 | info | portwatch |
+| [C] | `chokepoint-malacca` | daily | 14 | info | portwatch |
+| [C] | `chokepoint-taiwan` | daily | 14 | info | portwatch |
+
+*(gap-closure S4-M4.3, 2026-11-01: the chokepoint transit cards — the IMF
+PortWatch daily transits (n_total, an ESTIMATE from ship-tracking data,
+~7-day publication lag) read as the 7-day moving average. The value is
+the MA7 transits/day; the reading's `chokepointCompare` block carries the
+vs-prior-4-weeks and vs-year-ago comparisons. FIVE chokepoints — the
+spec's sixth, Hormuz, was REJECTED at the source in M4.1 (the provider's
+own series collapses 2026-03; VERIFIED-SOURCES documents it for a later
+re-check). One combined raw-history key `insights:portwatch:v1` (400
+days per chokepoint, zod both ways); the rung3 'portwatch' extra source
+(04:30, daily gate, budget 18) fetches + patches; the ids ride
+CARRY_FORWARD_IDS and the history phases exclude them.)*
 
 #### AUSTRALIA (23 indicators, 16 voting)
 

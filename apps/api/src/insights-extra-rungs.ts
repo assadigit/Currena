@@ -28,6 +28,7 @@ import { runTicIngest, KvTicStore } from '@currena/insights/tic';
 import {
   runInsightsRung4Phase,
   runInsightsCreditPhase,
+  runInsightsPortwatchPhase,
   KvInsightsStore,
   HIDDEN_PUBLIC_IDS,
 } from '@currena/insights/ingest';
@@ -134,6 +135,54 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
     gate: ticReleaseAwareGate,
     budget: 4,
     run: async (env: Bindings) => (await runTicIngest(new KvTicStore(env.RATES))).outcome,
+  },
+  {
+    // gap-closure S4-M4.3 (2026-11-01): the IMF PortWatch chokepoints — the
+    // daily transit estimates for the five shipping chokepoints. Rides
+    // RUNG3 (NOT rung4: that rung carries fred-s3 + the credit pair + the
+    // declared 45/50 on all-gates days; rung3 has its own 50-subrequest
+    // budget and only the TIC's 4 — the session plan's explicit routing).
+    // DAILY gate (the provider refreshes daily with a ~7-day lag; the
+    // 10:10/20:10 sweeps heal a failed day within hours, gate bypassed).
+    // Budget 18: the daily run is 1 fetch + 5 reads + 10 writes = 16; the
+    // BOOTSTRAP path (no stored combined history, or older than 45 days)
+    // adds ≤2 more pages of the same single-batched query — 18 covers it.
+    // The fetch pins its own 30 s timeout (services9.arcgis.com answered
+    // 12.5 s first byte from Worker egress in the S1 probe — the TIC
+    // precedent) with a politeness pause between pages (the host 400s
+    // rapid successive queries, live-observed 2026-11-01).
+    id: 'portwatch',
+    rung: 3,
+    gate: dailyGate(),
+    budget: 18,
+    run: async (env: Bindings, now: Date) => {
+      const result = await runInsightsPortwatchPhase({
+        store: new KvInsightsStore(env.RATES),
+        kv: env.RATES,
+        mode: 'scheduled',
+        hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+        now,
+      });
+      const failed = result.reports.filter((r) => !r.ok);
+      if (failed.length > 0) {
+        return {
+          ok: false as const,
+          kind: reportKind(failed[0]!.kind),
+          note: `PortWatch fetch failed: ${failed.map((r) => r.detail).join(' | ')}`,
+        };
+      }
+      return {
+        ok: true as const,
+        ...(result.patched
+          ? {
+              note:
+                `patched ${Object.keys(result.series).join(', ')} · raw days ${Object.entries(result.rawDays)
+                  .map(([pid, n]) => `${pid}:${n}`)
+                  .join(' ')} · histories ${result.histories.written} written`,
+            }
+          : { note: 'nothing to patch (no rows parsed or no snapshot)' }),
+      };
+    },
   },
   {
     id: 'fred-s3',

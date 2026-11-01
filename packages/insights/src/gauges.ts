@@ -22,6 +22,7 @@
  */
 
 import type { IndicatorGroupId, IndicatorId, IndicatorReading, InsightsSection, SummaryLine } from '@currena/core';
+import { DEFINITIONS } from './definitions';
 
 export interface GaugeDef {
   /** The lane group this gauge maps 1:1 onto (question groups). */
@@ -157,6 +158,25 @@ export const GAUGES: readonly GaugeDef[] = [
     // the voters — the short-rate carry leg beside audusd.
     members: ['audusd', 'rba-fed-gap', 'audjpy', 'terms-of-trade'],
   },
+  // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane — "Is
+  // the world getting more fragmented?". A SHADOW gauge (G-5): every
+  // member is context-only until S6 promotes them, so votingCount is
+  // always 0, the step stays 0 (excluded from sectionVerdictStep by
+  // design — the global summary counts are unchanged), and the lane
+  // header reads the "not scored yet" words (isShadowGauge + the UI copy).
+  // The members list exists so the counts + the stale badge read the
+  // lane's own membership.
+  {
+    id: 'geo-fragmentation',
+    section: 'global',
+    members: [
+      'chokepoint-suez',
+      'chokepoint-panama',
+      'chokepoint-bab-el-mandeb',
+      'chokepoint-malacca',
+      'chokepoint-taiwan',
+    ],
+  },
 ];
 
 export interface GaugeReading {
@@ -179,6 +199,17 @@ export interface GaugeReading {
 }
 
 const votable = (s: IndicatorReading['status']): boolean => s === 'warning' || s === 'normal';
+
+/** gap-closure S4-M4.3 (2026-11-01): is this gauge a SHADOW gauge — every
+ * member a context-only (info-rule) definition, pending S6's promotion
+ * decision (G-5)? Such a gauge never claims a verdict: its header reads
+ * "not scored yet" and the count line reads the context readings. Pure
+ * (derived from the definitions table). */
+export function isShadowGauge(gauge: GaugeDef): boolean {
+  const memberSet = new Set(gauge.members as readonly string[]);
+  const members = DEFINITIONS.filter((d) => memberSet.has(d.id));
+  return members.length > 0 && members.every((d) => d.rule.kind === 'info');
+}
 
 /** One gauge's reading from the snapshot readings (pure). */
 export function gaugeReading(

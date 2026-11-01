@@ -26,6 +26,7 @@ import {
   usDeficit12mSeries,
 } from './rung4';
 import { RUNG2_IDS } from './rung2';
+import { PORTWATCH_IDS } from './portwatch';
 import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsRung4Phase } from '../ingest/run';
 import type { InsightsStore } from '../store';
 import type { SeriesPoint } from '../series';
@@ -583,8 +584,20 @@ describe('historyPhaseIds excludes the rung4 ids (the phase owns its histories)'
     expect([...a, ...b]).toEqual(whole);
   });
 
-  it('CARRY_FORWARD_IDS covers exactly the rung-2 + rung-4 families (the main rung carries both)', () => {
-    expect(CARRY_FORWARD_IDS).toEqual([...RUNG2_IDS, ...RUNG4_IDS]);
+  // gap-closure S4-M4.3 (2026-11-01): the PortWatch chokepoints get the
+  // same exclusion — the 04:30 rung3 phase owns their histories (the
+  // stage it patches at 04:30 would otherwise feed the next morning's
+  // 04:25 halves a stale duplicate write).
+  it('no PORTWATCH id rides the daily or periodic phases (the rung3 phase owns them)', () => {
+    for (const phase of ['daily', 'daily-a', 'daily-b', 'periodic'] as const) {
+      for (const id of PORTWATCH_IDS) {
+        expect(historyPhaseIds(phase), `${id} must not ride phase '${phase}'`).not.toContain(id);
+      }
+    }
+  });
+
+  it('CARRY_FORWARD_IDS covers exactly the rung-2 + rung-4 + portwatch families (the main rung carries all three)', () => {
+    expect(CARRY_FORWARD_IDS).toEqual([...RUNG2_IDS, ...RUNG4_IDS, ...PORTWATCH_IDS]);
     expect(new Set(CARRY_FORWARD_IDS).size).toBe(CARRY_FORWARD_IDS.length);
   });
 });

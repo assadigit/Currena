@@ -40,7 +40,10 @@ export type UnitToken =
   | 'vacancies'
   // 2026-10-26 gap-audit build, A-6: crude stocks scaled to millions of
   // barrels ("416.7m barrels" EN — the raw unit is thousands of barrels).
-  | 'barrels';
+  | 'barrels'
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint transits — a counted
+  // quantity per day ("45.3 transits a day" EN, the 7-day average).
+  | 'transits';
 
 /** Locale-dependent unit labels (from the copy dictionaries). */
 export interface UnitLabels {
@@ -65,6 +68,7 @@ export interface UnitLabels {
   openings: string;
   vacancies: string;
   barrels: string;
+  transits: string;
 }
 
 interface DisplayConfig {
@@ -261,6 +265,14 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'gpr-saudi': { decimals: 2, unit: 'index' },
   'gpr-australia': { decimals: 2, unit: 'index' },
   'tpu-us': { decimals: 1, unit: 'index' },
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint cards — the 7-day
+  // average of the daily transit count, one decimal, the count word as
+  // the unit ("45.3 transits a day").
+  'chokepoint-suez': { decimals: 1, unit: 'transits' },
+  'chokepoint-panama': { decimals: 1, unit: 'transits' },
+  'chokepoint-bab-el-mandeb': { decimals: 1, unit: 'transits' },
+  'chokepoint-malacca': { decimals: 1, unit: 'transits' },
+  'chokepoint-taiwan': { decimals: 1, unit: 'transits' },
   'epu-us': { decimals: 1, unit: 'index' },
   'wti': { decimals: 2, unit: 'usd' },
   'natgas': { decimals: 2, unit: 'usd' },

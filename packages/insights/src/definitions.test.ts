@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { IndicatorDefinitionSchema, IndicatorIdSchema } from '@currena/core';
 
 import { DEFINITIONS } from './definitions';
-import { GAUGES } from './gauges';
+import { GAUGES, isShadowGauge } from './gauges';
 
 describe('DEFINITIONS (the v2 indicator table, I15)', () => {
   it('every row parses against the shared zod contract (loud, never garbage)', () => {
@@ -22,13 +22,13 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 91 P1 / 43 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, P1; the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — both P1 context cards; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — all P1 context cards; the 2026-11-01 gap-closure S4-M4.2 round adds the geopolitics eleven — the GPR threat/act/country family, the daily 7-day average and the TPU, all P1 context cards)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(91);
+  it('splits 96 P1 / 43 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, P1; the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — both P1 context cards; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — all P1 context cards; the 2026-11-01 gap-closure S4-M4.2 round adds the geopolitics eleven — the GPR threat/act/country family, the daily 7-day average and the TPU, all P1 context cards; the 2026-11-01 gap-closure S4-M4.3 round adds the chokepoint five — the IMF PortWatch transit cards, all P1 context cards)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(96);
     // Session 3 (G2): +breakeven-tilt (P2, the breakeven-10y sibling).
     expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(43);
   });
 
-  it('groups are the question groups (global 5 + prices-board, australia 3)', () => {
+  it('groups are the question groups (global 6 + prices-board, australia 3)', () => {
     const groups = new Set(DEFINITIONS.map((d) => d.group));
     expect([...groups].sort()).toEqual(
       [
@@ -41,6 +41,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
         'au-inflation-rates',
         'au-households',
         'au-trade-currency',
+        // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane —
+        // a shadow gauge until S6 (all context members).
+        'geo-fragmentation',
       ].sort(),
     );
     // Section/group coherence: a group belongs to exactly one section.
@@ -70,6 +73,11 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'btc-usd',
       'bund-10y',
       'cfnai',
+      'chokepoint-bab-el-mandeb',
+      'chokepoint-malacca',
+      'chokepoint-panama',
+      'chokepoint-suez',
+      'chokepoint-taiwan',
       'continuing-claims',
       'copper-usd',
       'crypto-fng',
@@ -147,18 +155,22 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     ]);
   });
 
-  it('GAUGE membership is the scored list (43 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health)', () => {
+  it('GAUGE membership is the scored list (48 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation SHADOW gauge carries context-only members — the deliberate G-5 exception, pinned here)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(48); // +yield-curve-10y3m (A-1, borrowing-costs) +rba-fed-gap (A-5, au-trade-currency) +us-japan-10y-gap (A-3, dollar-strength) +cftc-gold-positioning (A-7, market-stress) +oecd-cli-us (A-8, growth-health — the licensed-PMI replacement voter; the CN/DE companions stay context)
-    // Every gauge member is a scored (non-info) definition. B-14's one
-    // deliberate exception: brent lives in the prices-board lane group but
-    // counts in the prices-heat gauge (the card renders on the Prices
-    // strip; only the count membership moved).
+    expect(memberIds.size).toBe(53); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3 shadow gauge's five context-only chokepoint members (48 + 5 = 53; only the 48 vote)
+    // Every gauge member is a scored (non-info) definition. TWO deliberate
+    // exceptions: B-14's brent (the card renders on the Prices strip; only
+    // the count membership moved) and the S4-M4.3 SHADOW gauge's members
+    // (all context-only per G-5 — isShadowGauge pins that separately).
+    const shadowGauges = GAUGES.filter((g) => isShadowGauge(g)).map((g) => g.id);
+    expect(shadowGauges).toEqual(['geo-fragmentation']);
     for (const g of GAUGES) {
       for (const id of g.members) {
         const def = DEFINITIONS.find((d) => d.id === id)!;
-        expect(def.rule.kind, `${id} in gauge ${g.id} must be a voting rule`).not.toBe('info');
+        if (!shadowGauges.includes(g.id)) {
+          expect(def.rule.kind, `${id} in gauge ${g.id} must be a voting rule`).not.toBe('info');
+        }
         if (id !== 'brent') {
           expect(def.group, `${id} must live in its gauge's group`).toBe(g.id);
         }

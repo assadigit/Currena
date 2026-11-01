@@ -37,6 +37,15 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 (below) — `ui.bandPos*`. Threshold rules: بیشتر از / کمتر از {value}
 (`rule.thresholdAbove/Below`).
 
+## World trade and shipping (gap-closure S4, round 68)
+
+| English | Persian | Notes |
+| --- | --- | --- |
+| Chokepoint | گلوگاه | The narrow sea passage sense; `chokepoint-*` cards + the layer-1 glossary (round 68) |
+| Transit (of ships) | تردد | The count word; "transits a day" → «تردد در روز» (`units.transits`) |
+| Estimate (a data estimate) | برآورد | The honest PortWatch labelling; «برآورد» rides every chokepoint card |
+| Supply chain | زنجیرهٔ تأمین | ZWNJ; established by the S3 rounds |
+
 ## Exchange rates and conversion
 
 | English | Persian | Notes |

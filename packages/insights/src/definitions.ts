@@ -1038,6 +1038,93 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 75,
   },
   {
+    // gap-closure S4-M4.3 (2026-11-01): the chokepoint transit cards — the
+    // new geopolitics/supply lane's first members. The value is the 7-day
+    // moving average of the IMF PortWatch daily n_total (transits per
+    // day, an ESTIMATE from ship-tracking data, ~7-day publication lag).
+    // The reading's chokepointCompare block carries the prior-4-week and
+    // year-ago comparisons. Context-only per G-5; the lane is a shadow
+    // gauge ("not scored yet") until S6. FIVE chokepoints — Hormuz was
+    // rejected at the source (M4.1; the provider's own series collapses
+    // 2026-03 — VERIFIED-SOURCES documents it for a later re-check).
+    id: 'chokepoint-suez',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'Suez Canal transits',
+    source: 'portwatch',
+    sourceRef: 'IMF PortWatch daily transits, Suez Canal (n_total, 7-day average)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The provider's own ~7-day lag + a miss margin (the gpr-daily
+    // convention: lag + 6; here 7 + 7).
+    staleAfterDays: 14,
+  },
+  {
+    // gap-closure S4-M4.3: the Panama lane — the Atlantic-Pacific alternative
+    // to Suez; drought conditions move it independently of geopolitics
+    // (measurements only on the card — never a cause).
+    id: 'chokepoint-panama',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'Panama Canal transits',
+    source: 'portwatch',
+    sourceRef: 'IMF PortWatch daily transits, Panama Canal (n_total, 7-day average)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 14,
+  },
+  {
+    // gap-closure S4-M4.3: Bab el-Mandeb — the Red Sea gate on the Suez
+    // approach; the two read together (the lane's connection copy says so).
+    id: 'chokepoint-bab-el-mandeb',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'Bab el-Mandeb transits',
+    source: 'portwatch',
+    sourceRef: 'IMF PortWatch daily transits, Bab el-Mandeb Strait (n_total, 7-day average)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 14,
+  },
+  {
+    // gap-closure S4-M4.3: Malacca — the busiest of the five (roughly 210
+    // transits/day); the main artery between the Indian Ocean and east
+    // Asia (the Australian trade-route angle rides the layer-1 copy).
+    id: 'chokepoint-malacca',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'Strait of Malacca transits',
+    source: 'portwatch',
+    sourceRef: 'IMF PortWatch daily transits, Strait of Malacca (n_total, 7-day average)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 14,
+  },
+  {
+    // gap-closure S4-M4.3: the Taiwan Strait — the busiest by the count
+    // (roughly 230 transits/day); the east-Asia trade and tension lens
+    // beside the GPR Taiwan card (the lane's connection copy).
+    id: 'chokepoint-taiwan',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'Taiwan Strait transits',
+    source: 'portwatch',
+    sourceRef: 'IMF PortWatch daily transits, Taiwan Strait (n_total, 7-day average)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 14,
+  },
+  {
     // 2026-10-21 data-integrity round: the two EIA energy spots — context
     // cards in the prices lane (info rule; never prices-board tiles, the
     // board's four-tile layout is spec-fixed, and never scored votes —

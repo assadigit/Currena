@@ -134,6 +134,12 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   'treasury-auction-10y-indirect',
   'treasury-auction-30y',
   'treasury-auction-30y-indirect',
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint five → 139.
+  'chokepoint-suez',
+  'chokepoint-panama',
+  'chokepoint-bab-el-mandeb',
+  'chokepoint-malacca',
+  'chokepoint-taiwan',
   // ----- 16 markets (packages/insights/src/markets/definitions.ts) -----
   'n225', 'asx200', 'kospi', 'hsi', 'ssec', 'taiex', 'nifty50', 'stoxx50', 'dax',
   'cac', 'ftse', 'sp500', 'ndx', 'dow', 'tsx', 'ibov',

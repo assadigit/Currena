@@ -259,6 +259,26 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     notes:
       'Gap-closure S3-M3.5. REQUEST SHAPE (M3.1 + the 2026-11-01 re-probe, all from the provider\u2019s own responses): every FILTER on this endpoint is silently ignored (security_type / security_term / original_security_term / auction_date gte|eq) while page[size], sort AND fields= all work — ONE request page[size]=4000 sort=-auction_date fields=<the six documented fields> (~10.3 years of all auctions, 2016-07-18 \u2192 2026-10-22 measured, ~800 KB), then client-side family selection. original_security_term is the family classifier (reopenings read \u201c9-Year 10-Month\u201d with original \u201c10-Year\u201d); inflation_index_security=Yes marks TIPS (excluded). Results fields are null until the results record publishes (pending rows are skipped). The parser fails closed on envelope/field/date/numeric shape. Fixture: packages/insights/fixtures/s3/treasury-auctions-full-2026-11-01.json (the 4000-row response, verbatim).',
   },
+  portwatch: {
+    id: 'portwatch',
+    provider: 'portwatch',
+    label: 'International Monetary Fund (PortWatch, Daily_Chokepoints_Data)',
+    usedFor:
+      'chokepoint-suez / chokepoint-panama / chokepoint-bab-el-mandeb / chokepoint-malacca / chokepoint-taiwan — the daily transit estimates (n_total) read as the 7-day moving average — gap-closure S4-M4.3. Hormuz (chokepoint6) REJECTED at the source in M4.1 (the provider\u2019s own series collapses 2026-03); never rebuild without re-verifying the monthly means against VERIFIED-SOURCES.',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L1',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The IMF\u2019s own statistical-data terms, quoted verbatim (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the link the dataset\u2019s own ArcGIS Hub licence field declares; the plain fetch is bot-filtered, the M4.1 record): \u201cSpecial Terms for Statistical Data\u2026 Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source, e.g. \u2018Source: International Monetary Fund, Database Name, <<link to the dataset>>.\u2019 Users shall not infringe upon the integrity of the Data and shall refrain from any act of alteration of the Data that intentionally affects its nature or accuracy.\u201d — L1 with affirmative redistribution permission; public display with the attribution string.',
+    termsReadOn: '2026-11-01',
+    attribution: 'Source: International Monetary Fund (PortWatch)',
+    termsUrl: 'https://www.imf.org/external/terms.htm',
+    notes:
+      'Gap-closure S4-M4.3. QUERY SHAPE (verified live 2026-11-01 from the provider\u2019s own responses): portid IN (\u2026) is REQUIRED (equality 400s); the DateOnly field filters with DATE \u2018YYYY-MM-DD\u2019 literals; orderByFields=portid,date; maxRecordCount 1000 (a 400-day window \u00d7 5 chokepoints = 1950 rows = 2 pages, exceededTransferLimit:true on page 1). The host answers HTTP 200 WITH AN ERROR BODY {error:{code:400,\u2018Invalid URL\u2019}} on its intermittent slow-start — the parser fails closed on the body, not the status. Rapid successive queries trip the 400; the collect pauses 4 s between pages (a pause, not a retry — F-11 stands; a failed page fails the job and the sweeps heal it). Worker egress SLOW (12.5 s first byte, the S1 probe) — the fetch pins 30 s (the TIC precedent). The daily lag is ~7 days; staleAfterDays 14. ONE combined raw-history key insights:portwatch:v1 (400 days per chokepoint, zod both ways); the per-id histories carry the derived MA7. Fixtures: packages/insights/fixtures/s4/portwatch-query-{page1,page2,sixtyday,error}-2026-11-01.json.',
+  },
   'eia-spot': {
     id: 'eia-spot',
     provider: 'eia',
@@ -759,6 +779,14 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'treasury-auction-10y-indirect': ['fiscaldata:auctions_query'],
   'treasury-auction-30y': ['fiscaldata:auctions_query'],
   'treasury-auction-30y-indirect': ['fiscaldata:auctions_query'],
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint cards — the IMF
+  // PortWatch daily transits (register row 'portwatch', L1 with the IMF's
+  // own affirmative statistical-data terms).
+  'chokepoint-suez': ['portwatch:Daily_Chokepoints_Data'],
+  'chokepoint-panama': ['portwatch:Daily_Chokepoints_Data'],
+  'chokepoint-bab-el-mandeb': ['portwatch:Daily_Chokepoints_Data'],
+  'chokepoint-malacca': ['portwatch:Daily_Chokepoints_Data'],
+  'chokepoint-taiwan': ['portwatch:Daily_Chokepoints_Data'],
 };
 
 /* ------------------------------------------------------------------ */

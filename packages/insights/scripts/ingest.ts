@@ -40,6 +40,7 @@ import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/adapte
 import { collectRung4Sources } from '../src/adapters/rung4';
 import { collectCreditSources } from '../src/adapters/credit';
 import { collectTreasuryAuctions } from '../src/adapters/auctions';
+import { collectPortwatch } from '../src/adapters/portwatch';
 import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../src/series';
 
@@ -165,6 +166,20 @@ for (const row of credit.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row
 const auctions = await collectTreasuryAuctions();
 for (const row of auctions.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
 
+/* ------------------------------------------------------------------
+ * The inline PortWatch collection (gap-closure S4-M4.3, 2026-11-01) — the
+ * IMF PortWatch chokepoint transits. services9.arcgis.com serves GHA
+ * egress (the live probes 2026-11-01: single pages answer, rapid
+ * successive queries intermittently 400 — the collect pauses between
+ * pages); the Worker's 04:30 rung3 phase performs the same derivation from
+ * its own stored-history merge (shared pure functions — the venues cannot
+ * drift). No subrequest ceiling HERE: the full 400-day window fetch runs.
+ * ------------------------------------------------------------------ */
+
+const portwatch = await collectPortwatch();
+for (const row of portwatch.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
+const portwatchSeries = portwatch.series as Partial<Record<IndicatorId, SeriesPoint[]>>;
+
 const result = await runInsightsUpdate({
   // A dry-run without credentials takes the no-op store: runInsightsUpdate
   // skips every write when dryRun is set, and only the real store's READS
@@ -188,6 +203,10 @@ const result = await runInsightsUpdate({
   // families' ONLY venue — the Worker cannot reach the host; fail-soft:
   // a failed fetch omits the four series and the readings carry).
   auctionsSeries: auctions.series,
+  // gap-closure S4-M4.3: the inline PortWatch chokepoints (the MA7 series
+  // off the full 400-day window; the 04:30 rung3 phase re-derives from its
+  // own stored merge — fail-soft, the readings carry on a failed fetch).
+  portwatchSeries,
 });
 
 /* ------------------------------------------------------------------ *

@@ -460,6 +460,17 @@ export const IndicatorIdSchema = z.enum([
   'gpr-saudi',
   'gpr-australia',
   'tpu-us',
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint transit cards — IMF
+  // PortWatch's daily n_total per chokepoint, read as the 7-day moving
+  // average. FIVE chokepoints (the spec's sixth, Hormuz, was REJECTED at
+  // the source in M4.1: the provider's own chokepoint6 series collapses
+  // 2026-03 — a tracking gap, documented in VERIFIED-SOURCES for a later
+  // re-check; never rebuild it without re-verifying).
+  'chokepoint-suez',
+  'chokepoint-panama',
+  'chokepoint-bab-el-mandeb',
+  'chokepoint-malacca',
+  'chokepoint-taiwan',
   // 2026-10-26 gap-audit build (A-10): US Economic Policy Uncertainty —
   // Baker-Bloom-Davis's monthly headline index.
   'epu-us',
@@ -585,6 +596,12 @@ export const IndicatorGroupIdSchema = z.enum([
   'au-inflation-rates',
   'au-households',
   'au-trade-currency',
+  // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane — "Is
+  // the world getting more fragmented?". A SHADOW gauge until S6: its
+  // members are context-only (G-5), so the lane header reads "not scored
+  // yet" and the global summary counts stay untouched (a step-0 gauge is
+  // excluded from sectionVerdictStep by design).
+  'geo-fragmentation',
 ]);
 export type IndicatorGroupId = z.infer<typeof IndicatorGroupIdSchema>;
 
@@ -658,6 +675,12 @@ export const IndicatorSourceSchema = z.enum([
   // 17 U.S.C. § 105). Worker egress BLOCKED (timeout ×3 in the S1 probe):
   // the GHA/Node venue is the ONLY production fetcher.
   'fiscaldata',
+  // gap-closure S4-M4.3 (2026-11-01): the IMF PortWatch daily chokepoint
+  // transits (register row portwatch, L1 — the IMF's own statistical-data
+  // terms grant redistribution with attribution; quoted verbatim in
+  // sources.ts). Worker egress SLOW but served (the S1 probe: 12.5 s first
+  // byte — the fetch pins its own 30 s timeout, the TIC precedent).
+  'portwatch',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage
@@ -958,6 +981,24 @@ export const IndicatorReadingSchema = z
         decisionDate: z.iso.date(),
         /** The loan-rate change since that decision, in points. */
         points: z.number().finite(),
+      })
+      .optional(),
+    /**
+     * gap-closure S4-M4.3 (2026-11-01): the chokepoint cards' own
+     * comparison block — the 7-day-average transits against the prior
+     * 4-week average and against the same 7 days a year earlier (signed
+     * transit-count differences; the card shows "{n} fewer/more transits
+     * a day than …"). Computed by computeReading from the reading's own
+     * series for every portwatch-source reading (both venues derive it
+     * identically); absent when the stored base is too short for the
+     * comparison (the year-ago leg needs ~364 days of history).
+     */
+    chokepointCompare: z
+      .object({
+        /** MA7 now − mean(MA7 over the 28 days ending 7 days before the latest point). */
+        vsPrior4w: z.number().finite(),
+        /** MA7 now − MA7 at the closest point 364 days earlier (52 weeks — same weekday alignment); absent until the base covers it. */
+        vsYearAgo: z.number().finite().optional(),
       })
       .optional(),
     /**

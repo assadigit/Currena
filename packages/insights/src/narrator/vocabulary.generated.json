@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "e297122d58db1fa983b7b5847062019fbbcf3be1aebbfbd760d0f9b3fe3203ca",
-    "faSha256": "754d3f72b8e8321aa62734b3ca7975db7ca1f27a52af134b08ebbc51f8f00418",
-    "indicatorCount": 163,
-    "glossaryCount": 38
+    "enSha256": "9c73673e66974483b17cd145678e79cd9304faf02916dac742e44cf2616daef1",
+    "faSha256": "4523a5c1203b12fcbd4d4bc96f5e074ab71eff58e1ddaf5a4ae47e427d745050",
+    "indicatorCount": 168,
+    "glossaryCount": 40
   },
   "en": {
     "indicators": {
@@ -1159,6 +1159,116 @@
           }
         ],
         "glossaryTerms": []
+      },
+      "chokepoint-suez": {
+        "plainName": "Suez Canal traffic",
+        "oneLine": "How many ships a day pass through the Suez Canal.",
+        "ifRising": "More of the Europe-Asia sea route is flowing through the canal.",
+        "ifFalling": "Fewer ships a day are using the Europe-Asia shortcut.",
+        "connections": [
+          {
+            "with": "chokepoint-bab-el-mandeb",
+            "text": "The Red Sea gate on the canal’s southern approach.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "The oil price often reads long freight routes into its moves.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-panama": {
+        "plainName": "Panama Canal traffic",
+        "oneLine": "How many ships a day pass through the Panama Canal.",
+        "ifRising": "More Atlantic-Pacific trade is moving through the canal.",
+        "ifFalling": "Fewer ships a day are crossing between the two oceans.",
+        "connections": [
+          {
+            "with": "chokepoint-suez",
+            "text": "The two canal gates between the world’s biggest trade blocs.",
+            "strength": "usually"
+          },
+          {
+            "with": "brent",
+            "text": "Longer freight routes tend to show up in oil’s price moves.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-bab-el-mandeb": {
+        "plainName": "Bab el-Mandeb traffic",
+        "oneLine": "How many ships a day pass the gate into the Red Sea.",
+        "ifRising": "More Suez-bound traffic is taking the Red Sea route.",
+        "ifFalling": "Fewer ships a day are entering the Red Sea gate.",
+        "connections": [
+          {
+            "with": "chokepoint-suez",
+            "text": "The canal the Red Sea gate feeds; the pair reads as one route.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-saudi",
+            "text": "The tension gauge of the region this gate sits in.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-malacca": {
+        "plainName": "Malacca Strait traffic",
+        "oneLine": "How many ships a day pass between the Indian Ocean and east Asia.",
+        "ifRising": "More of the Asia-bound trade is moving on the shortest sea lane.",
+        "ifFalling": "Fewer ships a day are using the main east-Asia artery.",
+        "connections": [
+          {
+            "with": "chokepoint-taiwan",
+            "text": "The two busiest gates on the east-Asia approach.",
+            "strength": "reliable"
+          },
+          {
+            "with": "china-pmi",
+            "text": "Chinese factory runs tend to move with the raw-materials traffic.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-taiwan": {
+        "plainName": "Taiwan Strait traffic",
+        "oneLine": "How many ships a day pass through the Taiwan Strait.",
+        "ifRising": "More north-east Asian trade is moving through the strait.",
+        "ifFalling": "Fewer ships a day are crossing between mainland China and Taiwan.",
+        "connections": [
+          {
+            "with": "chokepoint-malacca",
+            "text": "The two busiest gates on the east-Asia approach.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-taiwan",
+            "text": "The tension gauge of the same waters, read beside the traffic.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
       },
       "copper-usd": {
         "plainName": "The world copper price",
@@ -3636,6 +3746,15 @@
         "term": "bid-to-cover",
         "plain": "How many dollars were bid for every dollar of bonds a Treasury auction sold. A lower reading says demand was thinner.",
         "example": "A bid-to-cover of 2.5 means buyers offered two and a half dollars for every dollar of bonds sold — around 2.5 has been typical."
+      },
+      "chokepoint": {
+        "term": "chokepoint",
+        "plain": "A narrow sea passage that a large share of world shipping passes through, such as a canal or a strait between two land masses.",
+        "example": "The Suez Canal, the Panama Canal and the Strait of Malacca are the best-known chokepoints."
+      },
+      "transit-estimate": {
+        "term": "transit (estimate)",
+        "plain": "One ship passing through a passage, counted once. The count is an estimate from ship-tracking data, so it can be revised."
       }
     },
     "ui": {
@@ -4826,6 +4945,116 @@
           }
         ],
         "glossaryTerms": []
+      },
+      "chokepoint-suez": {
+        "plainName": "تردد کانال سوئز",
+        "oneLine": "روزانه چند کشتی از کانال سوئز عبور می‌کند.",
+        "ifRising": "سهم بیشتری از مسیر دریایی اروپا و آسیا از کانال می‌گذرد.",
+        "ifFalling": "روزانه کشتی‌های کمتری از میان‌بر اروپا و آسیا استفاده می‌کنند.",
+        "connections": [
+          {
+            "with": "chokepoint-bab-el-mandeb",
+            "text": "دروازهٔ دریای سرخ در جنوبی‌ترین مسیر کانال.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "قیمت نفت مسیرهای دورحمل بار را اغلب در تغییراتش می‌خواند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-panama": {
+        "plainName": "تردد کانال پاناما",
+        "oneLine": "روزانه چند کشتی از کانال پاناما عبور می‌کند.",
+        "ifRising": "تجارت بیشتری بین اقیانوس آرام و اطلس از کانال می‌گذرد.",
+        "ifFalling": "روزانه کشتی‌های کمتری بین دو اقیانوس تردد می‌کنند.",
+        "connections": [
+          {
+            "with": "chokepoint-suez",
+            "text": "دو دروازهٔ کانالی میان بزرگ‌ترین بلوک‌های تجاری جهان.",
+            "strength": "usually"
+          },
+          {
+            "with": "brent",
+            "text": "مسیرهای دورحمل بار اغلب در تغییرات قیمت نفت دیده می‌شوند.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-bab-el-mandeb": {
+        "plainName": "تردد باب‌المندب",
+        "oneLine": "روزانه چند کشتی از دروازهٔ ورود به دریای سرخ می‌گذرد.",
+        "ifRising": "تردد بیشتری به‌سوی سوئز مسیر دریای سرخ را برمی‌گزیند.",
+        "ifFalling": "روزانه کشتی‌های کمتری وارد دروازهٔ دریای سرخ می‌شوند.",
+        "connections": [
+          {
+            "with": "chokepoint-suez",
+            "text": "کانالی که دروازهٔ دریای سرخ به آن می‌ریزد؛ این جفت یک مسیر را می‌خوانند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-saudi",
+            "text": "فشارسنج تنش منطقه‌ای که این دروازه در آن جای دارد.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-malacca": {
+        "plainName": "تردد تنگهٔ مالاکا",
+        "oneLine": "روزانه چند کشتی بین اقیانوس هند و شرق آسیا عبور می‌کند.",
+        "ifRising": "تجارت بیشترِ به‌سوی آسیا از کوتاه‌ترین مسیر دریایی می‌گذرد.",
+        "ifFalling": "روزانه کشتی‌های کمتری از سرخرگ اصلی شرق آسیا استفاده می‌کنند.",
+        "connections": [
+          {
+            "with": "chokepoint-taiwan",
+            "text": "دو پرترددترین دروازه در مسیر شرق آسیا.",
+            "strength": "reliable"
+          },
+          {
+            "with": "china-pmi",
+            "text": "دوره‌های کارخانه‌های چین اغلب با تردد مواد خام جابه‌جا می‌شود.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
+      },
+      "chokepoint-taiwan": {
+        "plainName": "تردد تنگهٔ تایوان",
+        "oneLine": "روزانه چند کشتی از تنگهٔ تایوان عبور می‌کند.",
+        "ifRising": "تجارت بیشتر شمال شرق آسیا از تنگه می‌گذرد.",
+        "ifFalling": "روزانه کشتی‌های کمتری بین چین و تایوان تردد می‌کنند.",
+        "connections": [
+          {
+            "with": "chokepoint-malacca",
+            "text": "دو پرترددترین دروازه در مسیر شرق آسیا.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-taiwan",
+            "text": "فشارسنج تنش همین آب‌ها، در کنار تردد کشتی‌ها.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "chokepoint",
+          "transit-estimate"
+        ]
       },
       "copper-usd": {
         "plainName": "قیمت جهانی مس",
@@ -7303,6 +7532,15 @@
         "term": "نسبت پوشش حراج",
         "plain": "چند دلار برای هر دلار اوراقی که حراج خزانه‌داری فروخت پیشنهاد شده است. قرائت پایین‌تر یعنی تقاضا کم‌تر بوده است.",
         "example": "نسبت پوشش ۲٫۵ یعنی خریداران برای هر دلار اوراق فروخته‌شده دو‌ونیم دلار پیشنهاد داده‌اند؛ حدود ۲٫۵ مقدار معمول بوده است."
+      },
+      "chokepoint": {
+        "term": "گلوگاه",
+        "plain": "گذرگاه دریایی باریکی که سهم بزرگی از کشتیرانی جهان باید از آن بگذرد، مانند کانال یا تنگه‌ای میان دو خشکی.",
+        "example": "کانال سوئز، کانال پاناما و تنگهٔ مالاکا شناخته‌شده‌ترین گلوگاه‌ها هستند."
+      },
+      "transit-estimate": {
+        "term": "تردد (برآورد)",
+        "plain": "عبور یک کشتی از یک گذرگاه، یک‌بار شمرده می‌شود. این شمارش برآوردی از داده‌های ردیابی کشتی‌هاست و ممکن است اصلاح شود."
       }
     },
     "ui": {

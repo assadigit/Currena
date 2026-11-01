@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import type { IndicatorGroupId, IndicatorId, InsightsSection, InsightsSnapshot } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { gaugesForSection, GAUGES } from '@currena/insights';
+import { gaugesForSection, GAUGES, isShadowGauge } from '@currena/insights';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { AlertCard } from '../../components/insights/AlertCard';
@@ -147,14 +147,31 @@ export function QuestionGroup({
 
   const question = copy.groups[group];
   const answer = copy.gaugeAnswers[group];
+  // gap-closure S4-M4.3 (2026-11-01): a SHADOW gauge (all members
+  // context-only, G-5) never claims a verdict — the step word reads the
+  // plain "not scored yet" words and the count line reads the context
+  // readings instead of a meaningless "0 of 0".
+  const shadow = GAUGES.find((g) => g.id === group) !== undefined && isShadowGauge(GAUGES.find((g) => g.id === group)!);
+  const contextCount = readings.filter((r) => r.status === 'context').length;
   // L2: the gauge reading (this group IS a gauge).
   const step = gauge?.step ?? 0;
-  const stepWord =
-    step === 0 ? copy.ui.gaugeNoReading : step === 1 ? copy.label.relaxed : step === 2 ? copy.label.cautious : step === 3 ? copy.label.stressed : copy.label.alarmed;
-  const countText = interpolate(copy.ui.inAlert, {
-    warnings: num(gauge?.warningCount ?? 0, numberLocale),
-    voting: num(gauge?.votingCount ?? 0, numberLocale),
-  });
+  const stepWord = shadow
+    ? copy.ui.gaugeNotScored
+    : step === 0
+      ? copy.ui.gaugeNoReading
+      : step === 1
+        ? copy.label.relaxed
+        : step === 2
+          ? copy.label.cautious
+          : step === 3
+            ? copy.label.stressed
+            : copy.label.alarmed;
+  const countText = shadow
+    ? interpolate(copy.ui.gaugeContextCount, { n: num(contextCount, numberLocale) })
+    : interpolate(copy.ui.inAlert, {
+        warnings: num(gauge?.warningCount ?? 0, numberLocale),
+        voting: num(gauge?.votingCount ?? 0, numberLocale),
+      });
   // S1-M1.4 (2026-10-31): the calm out-of-date badge — when this gauge has
   // members whose readings are past their staleness window, the header says
   // so plainly ("n of m readings out of date"). The gauge itself is never

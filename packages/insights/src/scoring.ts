@@ -21,6 +21,7 @@ import type {
   WarningRuleAtom,
 } from '@currena/core';
 import { IndicatorDefinitionSchema } from '@currena/core';
+import { buildChokepointCompare } from './adapters/portwatch';
 import {
   addDays,
   daysBetween,
@@ -525,6 +526,17 @@ export function computeReading(
     const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / (values.length - 1);
     const sd = Math.sqrt(variance);
     if (sd > 0) reading.sd10y = (current.value - mean) / sd;
+  }
+
+  // gap-closure S4-M4.3 (2026-11-01): the chokepoint cards' own comparison
+  // block — the 7-day-average transits against the prior 4-week average
+  // and the same 7 days a year earlier, derived from the reading's own
+  // MA7 series (both venues stamp it identically here, so the venues
+  // cannot drift). Absent when the base is too short — never a partial
+  // comparison presented as the full one.
+  if (parsed.source === 'portwatch') {
+    const compare = buildChokepointCompare(series);
+    if (compare !== undefined) reading.chokepointCompare = compare;
   }
 
   // Step-1 audit item C9: distance from the 10-year peak, in percent

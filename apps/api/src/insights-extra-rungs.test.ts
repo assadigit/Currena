@@ -89,8 +89,8 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ticReleaseAwareGate(new Date('2026-11-28T04:30:00Z'))).toBe(true); // Saturday again
   });
 
-  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, and the M3.3 credit pair (S3-M3.3 registered frb-ebp + ofr-fsi)', () => {
-    expect(EXTRA_SOURCES).toHaveLength(4); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3)
+  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, the M3.3 credit pair, and the S4 PortWatch chokepoints (S4-M4.3 registered portwatch)', () => {
+    expect(EXTRA_SOURCES).toHaveLength(5); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3) + portwatch (S4-M4.3)
     const tic = EXTRA_SOURCES.find((s) => s.id === 'tic-slt')!;
     expect(tic.rung).toBe(3);
     expect(tic.gate).toBe(ticReleaseAwareGate);
@@ -118,10 +118,25 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ofr.rung).toBe(4);
     expect(ofr.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
     expect(ofr.budget).toBe(10);
+    // gap-closure S4-M4.3 (2026-11-01): the IMF PortWatch chokepoints on
+    // RUNG3 (rung4 carries 45/50 on all-gates days — the session plan's
+    // explicit routing; rung3 has its own 50 budget with only the TIC's
+    // 4 beside it). DAILY gate (the provider refreshes daily, ~7-day lag;
+    // the sweeps heal a failed day within hours). Budget 18: the daily
+    // run is 1 fetch + 5 reads + 10 writes = 16; the bootstrap path adds
+    // ≤2 more pages.
+    const portwatch = EXTRA_SOURCES.find((s) => s.id === 'portwatch')!;
+    expect(portwatch.rung).toBe(3);
+    expect(portwatch.gate(new Date('2026-11-01T04:30:00Z'))).toBe(true); // daily
+    expect(portwatch.gate(new Date('2026-11-02T04:30:00Z'))).toBe(true); // every day
+    expect(portwatch.budget).toBe(18);
     // The whole rung4 registry stays inside the 50-subrequest ceiling even
     // on the day every gate fires (1 status + 24 + 10 + 10 = 45 ≤ 50).
     const total = EXTRA_SOURCES.filter((s) => s.rung === 4).reduce((sum, s) => sum + s.budget, 0) + 1;
     expect(total).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING);
+    // The rung3 registry too (1 status + tic 4 + portwatch 18 = 23 ≤ 50).
+    const total3 = EXTRA_SOURCES.filter((s) => s.rung === 3).reduce((sum, s) => sum + s.budget, 0) + 1;
+    expect(total3).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING);
   });
 });
 

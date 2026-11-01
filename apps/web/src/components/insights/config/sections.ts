@@ -21,7 +21,16 @@ export const SECTION_ORDER: readonly InsightsSection[] = ['global', 'australia']
 
 /** Group order within each section (the gauge/lane order, GAUGES-first). */
 export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGroupId[]>> = {
-  global: ['borrowing-costs', 'prices-heat', 'market-stress', 'dollar-strength', 'growth-health'],
+  global: [
+    'borrowing-costs',
+    'prices-heat',
+    'market-stress',
+    'dollar-strength',
+    'growth-health',
+    // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane — a
+    // shadow gauge until S6 (context-only members, "not scored yet").
+    'geo-fragmentation',
+  ],
   australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
 };
 
@@ -37,7 +46,7 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
  * step computation are unchanged.
  */
 export const LANE_GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGroupId[]>> = {
-  global: ['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health'],
+  global: ['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health', 'geo-fragmentation'],
   australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
 };
 
