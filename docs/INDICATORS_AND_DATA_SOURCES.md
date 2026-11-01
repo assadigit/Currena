@@ -13,16 +13,16 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 103-indicator dashboard
+## 1. What indicators Currena has — the 111-indicator dashboard
 
-The Insights page renders **103 indicators** across **2 sections** (Global
-80, Australia 23 — see the
+The Insights page renders **111 indicators** across **2 sections** (Global
+82, Australia 23 — see the
 breakdown below), grouped under **9 question gauges** (5 global + 3
 australia + the prices-board strip). Of those, **48 are scored voters**
-(contribute to a gauge's verdict) and **55 are context rows** (live value +
+(contribute to a gauge's verdict) and **63 are context rows** (live value +
 10-year position bar, never vote).
 
-The live snapshot is served at `GET /api/insights` — 103 `readings` plus
+The live snapshot is served at `GET /api/insights` — 111 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -35,8 +35,9 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
 | **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section) | 9 |
+
 | **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio` | 5 |
-| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index` | 5 |
+| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3) | 5 |
 | **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
 | **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de` | 10 |
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
@@ -48,7 +49,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (103 ids, alphabetical)
+### The complete indicator inventory (111 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -90,6 +91,7 @@ public-display-ok · scored voter? · short description.
 | `breakeven-tilt` | derived | daily | 5 | L2 | yes | – | Breakeven tilt (5y5y forward − 5y spot; the market's priced acceleration) |
 | `breakeven-5y5y` | fred | daily | 4 | L2 | yes | ✓ | Inflation expectations (5y5y forward) |
 | `brent` | fred | daily | 12 | L2 | yes | ✓ | Brent oil (EIA via FRED + Yahoo BZ=F gap-fill) |
+| `bank-reserves` | fred | weekly | 21 | L0 | yes | – | US bank reserve balances at the Fed (WRESBAL) |
 | `btc-usd` | gold-api | daily | 2 | L2 | yes | – | Bitcoin price |
 | `bund-10y` | fred | monthly | 75 | L2 | yes | – | German 10-year government bond yield (OECD mirror) |
 | `cfnai` | fred | monthly | 95 | L2 | yes | – | US economic activity scorecard (Chicago Fed) |
@@ -102,6 +104,7 @@ public-display-ok · scored voter? · short description.
 | `dollar-basket` | derived | daily | 4 | L1 | yes | ✓ | Currena dollar basket (DXY-style, ECB rates via Frankfurter) |
 | `ecb-dfr` | ecb | daily | 7 | L1 | yes | ✓ | ECB deposit facility rate |
 | `eia-crude-stocks` | eia | weekly | 12 | L0 | yes | – | US crude oil inventories (EIA LeafHandler, keyless) |
+| `ebp` | frb | monthly | 75 | L0 | yes | – | The Fed Board's own excess bond premium file (the credit-cycle gauge) |
 | `epu-us` | epu | monthly | 75 | L0 | yes | – | US policy uncertainty (EPU) |
 | `eur-usd` | frankfurter | daily | 4 | L1 | yes | – | EUR/USD |
 | `euro-aaa-10y` | ecb | daily | 7 | L1 | yes | – | Euro-area AAA 10-year yield |
@@ -128,10 +131,12 @@ public-display-ok · scored voter? · short description.
 | `michigan-sentiment` | fred | monthly | 75 | L2 | yes | ✓ | US consumer mood (Michigan survey) |
 | `mortgage-30y` | fred | weekly | 14 | L2 | yes | – | The US 30-year home-loan rate |
 | `natgas` | fred | daily | 12 | L0 | yes | – | US natural gas (Henry Hub) |
+| `net-liquidity` | derived | weekly | 21 | L0 | yes | – | Net liquidity: WALCL − TGA − RRP (the money actually available) |
 | `nfci` | fred | weekly | 14 | L2 | yes | ✓ | Chicago Fed National Financial Conditions Index |
 | `nyfed-custody` | fred | weekly | 21 | L0 | yes | – | Foreign official holdings at the New York Fed (WSEFINTL1; renders inside the TIC section) |
 | `oecd-cli-cn` | oecd | monthly | 75 | L0 | yes | – | OECD leading indicator (China) |
 | `oecd-cli-de` | oecd | monthly | 75 | L0 | yes | – | OECD leading indicator (Germany) |
+| `ofr-fsi` | ofr | daily | 7 | L0 | yes | – | The OFR Financial Stress Index aggregate (the Treasury's own daily composite) |
 | `oecd-cli-us` | oecd | monthly | 75 | L0 | yes | ✓ | OECD leading indicator (US) |
 | `philly-fed` | fred | monthly | 60 | L2 | yes | ✓ | Philadelphia Fed manufacturing index |
 | `platinum` | gold-api | daily | 2 | L1 | yes | – | Platinum price (ounce) |
@@ -141,6 +146,8 @@ public-display-ok · scored voter? · short description.
 | `real-yield-10y` | fred | daily | 4 | L0 | yes | ✓ | US 10-year real yield |
 | `recession-probability` | fred | monthly | 100 | L0 | yes | ✓ | US recession probability (Chauvet) |
 | `retail-sales` | fred | monthly | 75 | L0 | yes | – | US retail sales (monthly) |
+| `repo-stress` | derived | daily | 4 | L0 | yes | – | Repo funding pressure: SOFR − IORB |
+| `reverse-repo` | fred | daily | 4 | L1 | yes | – | The overnight reverse repo pile (RRPONTSYD, citation-required) |
 | `sahm-rule` | fred | monthly | 75 | L0 | yes | ✓ | US recession alarm (Sahm rule) |
 | `shiller-cape` | shiller | monthly | 45 | L2 | yes | – | US share prices vs long-run earnings (Shiller CAPE) |
 | `shiller-ecy` | shiller | monthly | 45 | L2 | yes | – | Excess CAPE Yield (Shiller) |
@@ -171,10 +178,10 @@ public-display-ok · scored voter? · short description.
 | `yield-curve-10y2y` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 2Y yield |
 | `yield-curve-10y3m` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 3M yield (the Fed's recession lens) |
 
-**Counts:** 102 ids total. Voters: 48 (brent votes in prices-heat per the
+**Counts:** 111 ids total. Voters: 48 (brent votes in prices-heat per the
 B-14 fix; the count is 9+5+5+3+10 + 5+7+4 = 48, which includes the
 **A-7 cftc-gold-positioning** voter in market-stress and the **A-8
-oecd-cli-us** voter in growth-health). Context: 54.
+oecd-cli-us** voter in growth-health). Context: 63 (+6 S3-M3.2, +2 S3-M3.3; the S2 custody card makes 63).
 
 ---
 
@@ -202,7 +209,11 @@ oecd-cli-us** voter in growth-health). Context: 54.
 | **First-of-month 04:20** | (within the rung-2 phase) | +3 fetches: OECD CLI + GPR + EPU + their history reads | ~+8 |
 | **10:10 / 20:10** | `sweep` | Gated re-runs of the full ingest ONLY when the last status shows fetch failures or is >10h old. Heals transient blips within hours; near-zero cost on healthy days. | ~1 KV read on healthy days |
 
-### The data sources (the 19 providers + their licence classes)
+### The data sources (the 21 providers + their licence classes)
+
+> The canonical ingest-rung map (times, budgets, KV writes) lives in
+> `docs/gap-closure/RUNGS.md` — updated with every rung change; the table
+> below is the per-provider licence view.
 
 Every source sits in `SOURCE_RISK_REGISTER` (`packages/insights/src/sources.ts`)
 with its licence level (L0 public / L1 probably fine / L2 owner-accepted /
@@ -229,6 +240,8 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 | **alternative-me** | L0 | Free API — attribution next to the data | crypto-fng (Crypto Fear and Greed) | **free forever**, keyless | no |
 | **shiller** (Robert Shiller, Yale) | L2 (owner-accepted) | Open academic data, attribution expected | shiller-cape, shiller-ecy (CAPE, Excess CAPE Yield) | free, owner-accepted | no |
 | **treasury** (U.S. Department of the Treasury) | L0 | US government work — public domain | FRED-fallback fills for DGS2/DGS10/DGS30/DFII10/T10Y2Y (fetched only when a FRED bulk group fails) | **free forever**, keyless | no |
+| **frb** (Federal Reserve Board — EBP file) | L0 | US government work — public domain (17 U.S.C. § 105) | ebp (the excess bond premium, rung4 source `frb-ebp`, Saturday re-check) | **free forever**, keyless | no |
+| **ofr** (U.S. Treasury Office of Financial Research — FSI file) | L0 | US government work — public domain (17 U.S.C. § 105) | ofr-fsi (the Financial Stress Index aggregate, rung4 source `ofr-fsi`, daily; DISCOVERED in S3-M3.1) | **free forever**, keyless | no |
 | **tic** (U.S. Treasury TIC — Treasury International Capital system) | L0 | US government work — public domain (17 U.S.C. § 105; Treasury's own custody caveat quoted in the register row) | The "Who holds US government debt" composite dataset: SLT Table 5 + Table 3 → `insights:tic:v1` (gap-closure S2; rung3, 30 s single-attempt timeout) | **free forever**, keyless | no |
 | **derived** (Currena's own arithmetic) | inherits | Own computation — inherits upstream legs' terms | fed-expectations, rba-expectations, au-us-10y-gap, us-japan-10y-gap, rba-fed-gap, dollar-basket, gold-silver, gold-oil-ratio, gold-btc, gold-aud, copper-gold, govt-interest-revenue, audusd, audjpy, us-nfp, us-cpi-yoy, us-cpi-core-yoy, us-pce-core-yoy, us-wages, breakeven-tilt | n/a (computed) | no |
 | **eodhd** (markets worker only — NOT in Insights) | L2 (owner-accepted) | Personal plan — owner only | The world stock markets board (16 indices, the currena-markets worker) | free personal plan, owner-accepted | yes (`EODHD_API_TOKEN` secret) |
@@ -261,7 +274,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
 | `GET` | `/api/rates?source=tgju\|frankfurter` | The fallback ladder — the converter's source rates | none | 60/min/IP |
 | `GET` | `/api/convert?from=USD&to=IRR&amount=100` | Server-side conversion math (via `@currena/core`) | none | 60/min/IP |
 | `GET` | `/api/status` | Per-source status + cache age (the `/admin` pill reads this) | none | none |
-| `GET` | `/api/insights` | The 102-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
+| `GET` | `/api/insights` | The 111-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
 | `GET` | `/api/insights/:id/history` | One card's history (downsampled to ≤2700 points) | public (the L2 sources are bounded to the visible chart window) | none |
 | `GET` | `/api/insights/markets` | The world stock markets board (16 indices, EODHD-first) | public (owner directive 2026-10-18b) | none |
 | `GET` | `/api/insights/fx` | The world currencies board (10 pairs + 7 patterns, ECB rates) | public (owner directive 2026-10-21c) | none |
