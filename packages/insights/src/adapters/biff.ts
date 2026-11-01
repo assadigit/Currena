@@ -250,54 +250,77 @@ function decodeRk(rk: number): number {
   return raw & 0x01 ? value / 100 : value;
 }
 
-/** Parse the SST record (+CONTINUEs, best-effort single-record strings). */
+/** Parse the SST record (+CONTINUEs).
+ *
+ * gap-closure S4-M4.2 (2026-11-01): strings may CROSS a CONTINUE
+ * boundary — per the BIFF8 spec, a CONTINUE that starts inside a
+ * string's character data re-emits the flags byte (the wide/narrow bit
+ * may differ for the remainder); rich-run and ext blocks never split.
+ * The GPR daily export is the live case: its SST carries 15,275 unique
+ * strings (every date string is a shared string) spanning 35 CONTINUE
+ * records, and the OLD parse stopped at the first crossing string —
+ * leaving the header labels (which sit AFTER the date strings)
+ * unresolved and skipped. Headers/blocks that would cross a boundary
+ * (never emitted by real writers) stop the parse loudly — the tail
+ * stays undefined and the adapter's assertions fail closed. */
 function parseSst(first: Uint8Array, continues: Uint8Array[]): Array<string | undefined> {
   const strings: Array<string | undefined> = [];
-  const view = new DataView(first.buffer, first.byteOffset, first.byteLength);
-  const unique = readU32(view, 4);
-  let pos = 8;
-  // Strings may continue into CONTINUE records; on a cross-record string we
-  // stop and leave the rest undefined (loudly observable via assertions).
   const chunks: Uint8Array[] = [first, ...continues];
   let chunkIdx = 0;
   let chunk = chunks[0]!;
-  const dv = () => new DataView(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+  const unique = new DataView(first.buffer, first.byteOffset, first.byteLength).getUint32(4, true);
+  let pos = 8;
   for (let s = 0; s < unique; s += 1) {
+    // Move to the next CONTINUE when a new string would START past the
+    // end of this one (no flags byte at a string boundary).
     if (pos + 3 > chunk.byteLength) {
-      // Move to the next CONTINUE (the flags byte repeats at its start).
       chunkIdx += 1;
       if (chunkIdx >= chunks.length) break; // truncated — leave the rest undefined
       chunk = chunks[chunkIdx]!;
       pos = 0;
       if (pos + 3 > chunk.byteLength) break;
     }
-    const cch = dv().getUint16(pos, true);
+    const dv = new DataView(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+    const cch = dv.getUint16(pos, true);
     const flags = chunk[pos + 2]!;
-    const wide = (flags & 0x01) !== 0;
+    let isWide = (flags & 0x01) !== 0;
     const rich = (flags & 0x08) !== 0;
     const ext = (flags & 0x04) !== 0;
     pos += 3;
     if (rich) {
       if (pos + 2 > chunk.byteLength) break;
-      pos += 2 + dv().getUint16(pos, true) * 4;
+      pos += 2 + dv.getUint16(pos, true) * 4;
+      if (pos > chunk.byteLength) break;
     }
     if (ext) {
       if (pos + 4 > chunk.byteLength) break;
-      pos += 4 + dv().getUint32(pos, true);
+      pos += 4 + dv.getUint32(pos, true);
+      if (pos > chunk.byteLength) break;
     }
-    const need = wide ? cch * 2 : cch;
-    if (pos + need > chunk.byteLength) break; // string crosses a CONTINUE — stop
+    // The character data may cross CONTINUE boundaries — each crossing
+    // re-emits the flags byte for the remainder.
     let str = '';
-    if (wide) {
-      for (let c = 0; c < cch; c += 1) {
-        str += String.fromCharCode(dv().getUint16(pos + c * 2, true));
+    let remaining = cch;
+    while (remaining > 0) {
+      const needBytes = isWide ? 2 : 1;
+      if (pos + needBytes > chunk.byteLength) {
+        chunkIdx += 1;
+        if (chunkIdx >= chunks.length || chunks[chunkIdx]!.byteLength < 1) {
+          remaining = -1; // ran out of chunks mid-string
+          break;
+        }
+        chunk = chunks[chunkIdx]!;
+        isWide = (chunk[0]! & 0x01) !== 0; // the repeated flags byte
+        pos = 1;
+        continue;
       }
-    } else {
-      for (let c = 0; c < cch; c += 1) {
-        str += String.fromCharCode(chunk[pos + c]!);
-      }
+      str += isWide
+        ? String.fromCharCode(new DataView(chunk.buffer, chunk.byteOffset, chunk.byteLength).getUint16(pos, true))
+        : String.fromCharCode(chunk[pos]!);
+      pos += needBytes;
+      remaining -= 1;
     }
-    pos += need;
+    if (remaining < 0) break; // truncated mid-string — the tail stays undefined
     strings.push(str);
   }
   return strings;

@@ -5,6 +5,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01g] — gap-closure S4-M4.2: the geopolitics family — the GPR threat/act/country columns, the daily 7-day average, and the TPU (the 124th–134th indicators)
+
+Eleven context cards (G-5), all bilingual (fa round-67), riding the
+existing rung2 machinery:
+
+- **The GPR export's own columns, zero new fetches:** the monthly
+  `data_gpr_export.xls` download that already feeds `gpr-index` now also
+  serves `gpr-threats` (GPRT), `gpr-acts` (GPRA) and the seven country
+  indices `gpr-{taiwan,china,russia,ukraine,israel,saudi,australia}`
+  (GPRC_*) — all 501 monthly points 1985-01 → 2026-09, verified from the
+  provider's own file. The parser (`parseGprExportAll`) asserts all ten
+  header names (a missing country column is a layout change), bands the
+  aggregate columns (0, 2000] and the country shares [0, 2000] (an
+  honest zero-mention month), and converts dates lazily so the pre-1985
+  historical-variant rows never reach `excelSerialToIso`.
+- **The timely signal:** `gpr-daily` — the provider's OWN GPRD_MA7
+  (7-day moving average) from `data_gpr_daily_recent.xls` (3.3 MB,
+  15,274 rows, ~6-day lag, staleAfterDays 12). A new daily fetch on
+  rung2 (`plan.gprDaily`). Reading its header at all required a **biff
+  SST cross-CONTINUE fix**: the file's SST carries 15,275 unique strings
+  (every date string is a shared string) spanning 35 CONTINUE records,
+  and the old parse stopped at the first string crossing a boundary —
+  per the BIFF8 spec each CONTINUE that starts mid-string re-emits the
+  flags byte (the wide/narrow bit may differ for the remainder). The fix
+  is pinned by the daily-file integration test (header resolves exactly
+  as xlrd reads it).
+- **The TPU of record:** `tpu-us` — the "9. Trade policy" column of
+  Baker-Bloom-Davis's `Categorical_EPU_Data.xlsx` (1985-01 → 2026-10,
+  latest 1326.42; the licence sentence in its A504 is the same as the
+  EPU file's). The spec's assumed `Trade_Uncertainty_Data.xlsx` is
+  STALE at 2019-07 (M4.1 rejected it); its 1985-01 value is
+  byte-identical — the same series continued. One more
+  policyuncertainty fetch on the rung2 monthly plan.
+- **The SD regime extends:** all eleven new ids read through z-scores
+  (`SD_BAND_IDS` grows from 2 to 13 — the M1.6 non-stationarity lesson:
+  news-based indices' levels drift by decade; percentiles mislead).
+- RUNG2_IDS grows by 11 (the carry-forward + the history phases pick
+  them up); the rung2 budget on an all-fetches day: 4 monthly fetches +
+  the daily GPR + MOF + Saturday pair ≈ 12 — well inside 50.
+- Docs: AGENTS.md §A (123 → 134 indicators, 48 voting + 86 context),
+  INDICATORS_AND_DATA_SOURCES §1/§2, LICENCES.md (the gpr/epu rows,
+  which had lived only in the machine twins, now documented + extended),
+  RISK_REGISTER log, SCRAPING_SPEC FS-11, VERIFIED-SOURCES (M4.1's
+  rows). fa copy round-67 (253 strings, manifest recorded). Registry +
+  narrator vocabulary regenerated (163 ids ×2). **Bundle: Insights lazy
+  1287/305 → 1332/310** (measured 1331.93/309.36 — eleven bilingual
+  card families' full copy + layer-1 entries + the vocabulary growth;
+  justified in `scripts/check-bundle-budget.mjs` §2026-11-01g).
+
 ## [2026-11-01f] — gap-closure S4-M4.1: the S4 verification pass (chokepoints, GSCPI, TPU, GPR daily, EIA SPR/production, Pink Sheet energy)
 
 M4.1's decision-per-candidate, all read from the providers' own responses

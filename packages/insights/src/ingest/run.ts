@@ -890,7 +890,28 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   // bootstrap). Each fetch carries its full history, so the stored merge
   // is belt-and-braces (fetched wins on collision); the stage base arms
   // the same bootstrap the weekly pair uses.
-  for (const id of ['oecd-cli-us', 'oecd-cli-cn', 'oecd-cli-de', 'gpr-index', 'epu-us'] as const) {
+  // gap-closure S4-M4.2 (2026-11-01): the geopolitics monthly family rides
+  // the same merge (the GPR export's threat/act/country columns + the TPU
+  // workbook — all first-of-month fetches carrying full histories, and
+  // gpr-daily, the daily MA7 fetch).
+  for (const id of [
+    'oecd-cli-us',
+    'oecd-cli-cn',
+    'oecd-cli-de',
+    'gpr-index',
+    'epu-us',
+    'gpr-threats',
+    'gpr-acts',
+    'gpr-taiwan',
+    'gpr-china',
+    'gpr-russia',
+    'gpr-ukraine',
+    'gpr-israel',
+    'gpr-saudi',
+    'gpr-australia',
+    'gpr-daily',
+    'tpu-us',
+  ] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;
     const stored =

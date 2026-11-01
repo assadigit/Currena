@@ -15,7 +15,7 @@ and the per-round specs that drove each wave (both removed in the
 
 ## 1. What indicators Currena has — the 123-indicator dashboard
 
-The Insights page renders **123 indicators** across **2 sections** (Global
+The Insights page renders **134 indicators** across **2 sections** (Global
 94, Australia 23 — see the
 breakdown below), grouped under **9 question gauges** (5 global + 3
 australia + the prices-board strip). Of those, **48 are scored voters**
@@ -37,7 +37,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section), `us-deficit-12m` (the us-deficit-monthly companion renders inside it), `treasury-auction-10y` + `treasury-auction-30y` (their *-indirect companions render inside them) (S3-M3.5) | 9 |
 
 | **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio`, `median-cpi`, `sticky-cpi` (S3-M3.4) | 5 |
-| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4) | 5 |
+| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `gpr-threats`, `gpr-acts`, `gpr-daily`, `gpr-taiwan`, `gpr-china`, `gpr-russia`, `gpr-ukraine`, `gpr-israel`, `gpr-saudi`, `gpr-australia` (S4-M4.2), `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4) | 5 |
 | **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
 | **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de`, `gdpnow`, `empire-state`, `continuing-claims` (S3-M3.4) | 10 |
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
@@ -122,6 +122,17 @@ public-display-ok · scored voter? · short description.
 | `gold-silver` | derived | daily | 2 | L1 | yes | ✓ | Gold / Silver ratio |
 | `gold-usd` | gold-api | daily | 2 | L2 | yes | – | Gold price (ounce) |
 | `gpr-index` | gpr | monthly | 75 | L0 | yes | – | Geopolitical Risk Index (Caldara-Iacoviello) |
+| `gpr-threats` | gpr | monthly | 75 | L0 | yes | – | GPR threats sub-index (GPRT, the same monthly export) |
+| `gpr-acts` | gpr | monthly | 75 | L0 | yes | – | GPR acts sub-index (GPRA, the same monthly export) |
+| `gpr-daily` | gpr | daily | 12 | L0 | yes | – | Daily GPR, the provider's own 7-day average (GPRD_MA7) |
+| `gpr-taiwan` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Taiwan (GPRC_TWN) |
+| `gpr-china` | gpr | monthly | 75 | L0 | yes | – | Country GPR: China (GPRC_CHN) |
+| `gpr-russia` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Russia (GPRC_RUS) |
+| `gpr-ukraine` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Ukraine (GPRC_UKR) |
+| `gpr-israel` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Israel (GPRC_ISR) |
+| `gpr-saudi` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Saudi Arabia (GPRC_SAU) |
+| `gpr-australia` | gpr | monthly | 75 | L0 | yes | – | Country GPR: Australia (GPRC_AUS) |
+| `tpu-us` | epu | monthly | 75 | L0 | yes | – | US Trade Policy Uncertainty (the Categorical EPU workbook's trade column) |
 | `govt-interest-revenue` | derived | quarterly | 215 | L0 | yes | ✓ | US government interest payments / receipts (BEA via FRED) |
 | `housing-permits` | fred | monthly | 75 | L0 | yes | – | US building permits |
 | `initial-jobless-claims` | fred | weekly | 12 | L0 | yes | ✓ | New unemployment claims (US) |
@@ -248,7 +259,7 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 | **eia** (U.S. Energy Information Administration) | L0 | US government work — public domain (17 U.S.C. § 105) | eia-crude-stocks (the keyless LeafHandler website route), Brent/WTI/Henry Hub fallback | **free forever**, keyless | no |
 | **cftc** (Commodity Futures Trading Commission) | L0 | US government work — public domain | cftc-gold-positioning (Commitments of Traders, futures-only, deafut.txt) | **free forever**, keyless | no |
 | **oecd** (OECD SDMX) | L0 | OECD open data | oecd-cli-us, oecd-cli-cn, oecd-cli-de (Composite Leading Indicators, amplitude-adjusted) | **free forever**, keyless | no |
-| **gpr** (Caldara-Iacoviello GPR index, hosted by Federal Reserve Board) | L0 | Academic open data, attribution displayed | gpr-index (Geopolitical Risk Index, monthly .xls) | **free forever**, keyless | no |
+| **gpr** (Caldara-Iacoviello GPR index, hosted by Federal Reserve Board) | L0 | Academic open data, attribution displayed | gpr-index (Geopolitical Risk Index, monthly .xls) + the threat/act/country columns from the SAME download + gpr-daily (the daily 7-day-average export, S4-M4.2) | **free forever**, keyless | no |
 | **epu** (Baker-Bloom-Davis EPU) | L0 | Open academic data, licence quoted from inside the workbook | epu-us (US Economic Policy Uncertainty, monthly .xlsx) | **free forever**, keyless | no |
 | **alternative-me** | L0 | Free API — attribution next to the data | crypto-fng (Crypto Fear and Greed) | **free forever**, keyless | no |
 | **shiller** (Robert Shiller, Yale) | L2 (owner-accepted) | Open academic data, attribution expected | shiller-cape, shiller-ecy (CAPE, Excess CAPE Yield) | free, owner-accepted | no |

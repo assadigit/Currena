@@ -25,6 +25,9 @@ const mofCurrentCsv = readFileSync(join(fixtures, 'mof-jgbcme-current.csv'), 'ut
 const cliCsv = readFileSync(join(fixtures, 'oecd-cli.csv'), 'utf8');
 const gprBuf = readFileSync(join(fixtures, 'gpr-export.xls')).buffer;
 const epuBuf = readFileSync(join(fixtures, 'epu-main-news-index.xlsx')).buffer;
+// gap-closure S4-M4.2: the geopolitics family's captures.
+const gprDailyBuf = readFileSync(join(fixtures, 's4', 'gpr-daily-2026-11-01.xls')).buffer;
+const tpuBuf = readFileSync(join(fixtures, 's4', 'tpu-categorical-epu-2026-11-01.xlsx')).buffer;
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -37,9 +40,9 @@ afterEach(() => {
 describe('rung2FetchPlanFor (the cadence gates + the bootstrap rule)', () => {
   const all = new Set<string>();
 
-  it('an ordinary Tuesday: MOF only (the weekly pair waits for Saturday, the monthly trio for the first)', () => {
+  it('an ordinary Tuesday: MOF + the GPR daily file only (the weekly pair waits for Saturday, the monthly trio for the first)', () => {
     const plan = rung2FetchPlanFor(new Date('2026-10-27T04:20:00Z'), all);
-    expect(plan).toEqual({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false });
+    expect(plan).toEqual({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: true });
   });
 
   it('Saturday arms the weekly pair; the first of the month arms the monthly trio', () => {
@@ -49,7 +52,7 @@ describe('rung2FetchPlanFor (the cadence gates + the bootstrap rule)', () => {
 
   it('a MISSING id bootstraps its feed regardless of the date (first deploy / disaster recovery)', () => {
     const plan = rung2FetchPlanFor(new Date('2026-10-27T04:20:00Z'), new Set(['eia-crude-stocks', 'epu-us']));
-    expect(plan).toEqual({ mof: true, eiaWeekly: true, cftcWeekly: false, monthly: true });
+    expect(plan).toEqual({ mof: true, eiaWeekly: true, cftcWeekly: false, monthly: true, gprDaily: true });
   });
 });
 
@@ -394,7 +397,7 @@ describe('collectRung2Sources (the shared collect)', () => {
     const before = register.SOURCE_RISK_REGISTER['mof-japan']!.enabled;
     register.SOURCE_RISK_REGISTER['mof-japan']!.enabled = false;
     try {
-      const out = await collectRung2Sources({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false });
+      const out = await collectRung2Sources({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: false });
       expect(called).toBe(false);
       expect(out.series['jgb-10y']).toBeUndefined();
       expect(out.reports.some((r) => r.source === 'mof' && r.kind === 'disabled')).toBe(true);
@@ -404,26 +407,59 @@ describe('collectRung2Sources (the shared collect)', () => {
     }
   });
 
-  it('A-8..A-10: the monthly plan fetches the trio — three CLI series + GPR + EPU from their captures', async () => {
+  it('A-8..A-10 (S4-M4.2: the full geopolitics family): the monthly plan fetches the trio + the TPU — three CLI series + the GPR column set + EPU + TPU from their captures', async () => {
     const original = globalThis.fetch;
     globalThis.fetch = (async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes('sdmx.oecd.org')) return new Response(cliCsv, { status: 200 });
-      if (url.includes('matteoiacoviello.com')) return new Response(gprBuf, { status: 200 });
+      if (url.includes('data_gpr_export.xls')) return new Response(gprBuf, { status: 200 });
+      if (url.includes('Categorical_EPU_Data')) return new Response(tpuBuf, { status: 200 });
       if (url.includes('policyuncertainty.com')) return new Response(epuBuf, { status: 200 });
       throw new Error(`unexpected fetch: ${url}`);
     }) as typeof fetch;
     try {
-      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true });
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true, gprDaily: false });
       expect(out.series['oecd-cli-us']!.at(-1)).toEqual({ date: '2026-09-01', value: 100.9993 });
       expect(out.series['oecd-cli-cn']!.at(-1)).toEqual({ date: '2026-09-01', value: 97.41035 });
       expect(out.series['oecd-cli-de']!.at(-1)).toEqual({ date: '2026-09-01', value: 101.0066 });
       expect(out.series['gpr-index']!.at(-1)!.value).toBeCloseTo(146.2099, 3);
+      // S4-M4.2: the SAME download also served the threat/act/country
+      // columns (zero extra subrequests — the one-request design).
+      expect(out.series['gpr-threats']!.at(-1)!.value).toBeCloseTo(173.0874, 3);
+      expect(out.series['gpr-acts']!.at(-1)!.value).toBeCloseTo(144.288, 3);
+      expect(out.series['gpr-taiwan']!.at(-1)!.value).toBeCloseTo(0.25924, 4);
+      expect(out.series['gpr-australia']!.at(-1)!.value).toBeCloseTo(0.12242, 4);
+      for (const id of ['gpr-threats', 'gpr-acts', 'gpr-taiwan', 'gpr-china', 'gpr-russia', 'gpr-ukraine', 'gpr-israel', 'gpr-saudi', 'gpr-australia']) {
+        expect(out.series[id as IndicatorId]!.length).toBe(501);
+      }
       expect(out.series['epu-us']!.at(-1)).toEqual({ date: '2026-09-01', value: 218.94095727491293 });
-      // One OECD fetch served all three countries (the one-request design).
+      // S4-M4.2: the TPU workbook — the Categorical EPU trade column.
+      expect(out.series['tpu-us']!.at(-1)).toEqual({ date: '2026-10-01', value: 1326.4193494653071 });
+      expect(out.series['tpu-us']!.length).toBe(502);
+      // One OECD fetch served all three countries; ONE GPR fetch served
+      // the whole family; the TPU is a second policyuncertainty fetch.
       expect(out.reports.filter((r) => r.source === 'oecd')).toHaveLength(1);
       expect(out.reports.filter((r) => r.source === 'gpr' && r.ok)).toHaveLength(1);
-      expect(out.reports.filter((r) => r.source === 'epu' && r.ok)).toHaveLength(1);
+      expect(out.reports.filter((r) => r.source === 'epu' && r.ok)).toHaveLength(2);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+
+  it('S4-M4.2: the daily plan fetches the GPR daily export — the provider\'s own GPRD_MA7 (15,274 rows through 2026-10-26)', async () => {
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('data_gpr_daily_recent.xls')) return new Response(gprDailyBuf, { status: 200 });
+      throw new Error(`unexpected fetch: ${url}`);
+    }) as typeof fetch;
+    try {
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: true });
+      const gprDaily = out.series['gpr-daily']!;
+      expect(gprDaily.length).toBe(15274);
+      expect(gprDaily[0]).toEqual({ date: '1985-01-01', value: 230.0394287109375 });
+      expect(gprDaily.at(-1)).toEqual({ date: '2026-10-26', value: 181.41552734375 });
+      expect(out.reports.filter((r) => r.source === 'gpr' && r.ok)).toHaveLength(1);
     } finally {
       globalThis.fetch = original;
     }
@@ -457,7 +493,9 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
       const url = String(input);
       if (url.includes('jgbcme')) return new Response(mofCurrentCsv, { status: 200 });
       if (url.includes('sdmx.oecd.org')) return new Response(cliCsv, { status: 200 });
+      if (url.includes('data_gpr_daily_recent.xls')) return new Response(gprDailyBuf, { status: 200 });
       if (url.includes('matteoiacoviello.com')) return new Response(gprBuf, { status: 200 });
+      if (url.includes('Categorical_EPU_Data')) return new Response(tpuBuf, { status: 200 });
       if (url.includes('policyuncertainty.com')) return new Response(epuBuf, { status: 200 });
       throw new Error(`unexpected fetch: ${url}`);
     }) as typeof fetch;
@@ -518,9 +556,32 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
       expect(epu.value).toBeCloseTo(218.941, 2);
       expect(epu.status).toBe('context');
       expect(epu.sd10y).toBeCloseTo(0.066, 2);
-      // The stage carries all five (the 04:40 periodic phase's input).
+      // S4-M4.2: the geopolitics family patches from the same fetches —
+      // the threat/act/country companions carry their SD-regime z-scores,
+      // the daily card reads the MA7 tail, and the TPU lands its October
+      // value (the freshest month the Categorical workbook carries).
+      const threats = byId.get('gpr-threats')!;
+      expect(threats.value).toBeCloseTo(173.0874, 3);
+      expect(threats.status).toBe('context');
+      expect(threats.sd10y).toBeDefined();
+      const taiwan = byId.get('gpr-taiwan')!;
+      expect(taiwan.value).toBeCloseTo(0.25924, 4);
+      expect(taiwan.status).toBe('context');
+      const gprDaily = byId.get('gpr-daily')!;
+      expect(gprDaily.value).toBeCloseTo(181.4155, 3);
+      expect(gprDaily.asOf).toBe('2026-10-26');
+      expect(gprDaily.status).toBe('context');
+      const tpu = byId.get('tpu-us')!;
+      expect(tpu.value).toBeCloseTo(1326.4193, 3);
+      expect(tpu.asOf).toBe('2026-10-01');
+      expect(tpu.status).toBe('context');
+      // The stage carries all five + the family (the 04:40 periodic phase's
+      // input; gpr-daily rides the daily halves).
       const stage = JSON.parse(kv.value!) as { series: Record<string, unknown> };
-      for (const id of ['oecd-cli-us', 'oecd-cli-cn', 'oecd-cli-de', 'gpr-index', 'epu-us']) {
+      for (const id of [
+        'oecd-cli-us', 'oecd-cli-cn', 'oecd-cli-de', 'gpr-index', 'epu-us',
+        'gpr-threats', 'gpr-taiwan', 'gpr-daily', 'tpu-us',
+      ]) {
         expect(stage.series[id]).toBeDefined();
       }
       // The periodic history phase then writes them (monthly cadence →
@@ -531,7 +592,7 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
         now: new Date('2026-11-01T04:40:00Z'),
       });
       expect(hist.written).toBeGreaterThan(0);
-      expect(store.snapshot!.readings).toHaveLength(123); // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card) + the S3-M3.2 liquidity/funding six + the S3-M3.3 credit pair + the S3-M3.4 growth-nowcast/survey six + the S3-M3.5 fiscal/Treasury-supply six
+      expect(store.snapshot!.readings).toHaveLength(134); // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card) + the S3-M3.2 liquidity/funding six + the S3-M3.3 credit pair + the S3-M3.4 growth-nowcast/survey six + the S3-M3.5 fiscal/Treasury-supply six + the S4-M4.2 geopolitics eleven
     } finally {
       globalThis.fetch = original;
     }

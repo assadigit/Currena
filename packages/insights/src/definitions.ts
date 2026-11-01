@@ -853,6 +853,152 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 75,
   },
   {
+    // gap-closure S4-M4.2 (2026-11-01): the GPR threats sub-index (GPRT) —
+    // the share of war-and-tension coverage that is THREATS rather than
+    // realised acts, from the SAME monthly export download (zero extra
+    // subrequests). Context-only per G-5; the SD regime reads it (the
+    // news-index non-stationarity lesson, M1.6).
+    id: 'gpr-threats',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — threats',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello GPR threats sub-index (GPRT, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S4-M4.2: the GPR acts sub-index (GPRA) — realised acts
+    // of war and tension, the companion of the threats card. Same
+    // download, same discipline.
+    id: 'gpr-acts',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — acts',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello GPR acts sub-index (GPRA, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S4-M4.2: the timely GPR signal — the provider's own
+    // GPRD_MA7 (the 7-day moving average of the daily GPR index). The
+    // daily export lags ~6 days, so the card reads best beside the
+    // monthly aggregate it tracks. Context-only per G-5.
+    id: 'gpr-daily',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk (7-day average)',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello daily GPR, 7-day moving average (GPRD_MA7)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 12, // the file's own ~6-day lag + margin (the EIA spots' convention)
+  },
+  {
+    // gap-closure S4-M4.2: the country GPR columns — war-and-tension news
+    // that mentions each place, from the SAME monthly export. Context-only;
+    // the SD regime reads them (country indices are news shares whose
+    // levels drift by decade — z-scores, not percentiles).
+    id: 'gpr-taiwan',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — Taiwan',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello country GPR: Taiwan (GPRC_TWN, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'gpr-china',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — China',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello country GPR: China (GPRC_CHN, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'gpr-russia',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — Russia',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello country GPR: Russia (GPRC_RUS, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'gpr-ukraine',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — Ukraine',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello country GPR: Ukraine (GPRC_UKR, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'gpr-israel',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — Israel',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello country GPR: Israel (GPRC_ISR, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'gpr-saudi',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — Saudi Arabia',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello country GPR: Saudi Arabia (GPRC_SAU, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    id: 'gpr-australia',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Geopolitical Risk — Australia',
+    source: 'gpr',
+    sourceRef: 'Caldara-Iacoviello country GPR: Australia (GPRC_AUS, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
     // 2026-10-26 gap-audit build, A-10 (INSIGHTS_DATA_SPEC.md): Baker-
     // Bloom-Davis US Economic Policy Uncertainty, monthly headline index.
     // CONTEXT per the spec's gauge table — the confidence leg beside
@@ -866,6 +1012,25 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'US policy uncertainty (EPU)',
     source: 'epu',
     sourceRef: 'Baker-Bloom-Davis US Economic Policy Uncertainty index (monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S4-M4.2 (2026-11-01): the US Trade Policy Uncertainty
+    // index — the Categorical EPU workbook's "9. Trade policy" column
+    // (the spec's assumed Trade_Uncertainty_Data.xlsx is stale at
+    // 2019-07; M4.1 verified this workbook as the source of record,
+    // 1985-01 → 2026-10). The epu-us pattern twin: same publisher, same
+    // licence class, same first-of-month gate. Context-only per G-5.
+    id: 'tpu-us',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US trade policy uncertainty',
+    source: 'epu',
+    sourceRef: 'Baker-Bloom-Davis US Trade Policy Uncertainty index (Categorical EPU workbook, monthly)',
     cadence: 'monthly',
     changeKind: 'points',
     phase: 'P1',

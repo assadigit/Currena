@@ -810,6 +810,20 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'oecd-cli-de',
   'gpr-index',
   'epu-us',
+  // gap-closure S4-M4.2 (2026-11-01): the geopolitics family — the GPR
+  // threat/act sub-indices, the daily 7-day average, the country indices
+  // and the TPU are all news-based indexes in index points.
+  'gpr-threats',
+  'gpr-acts',
+  'gpr-daily',
+  'gpr-taiwan',
+  'gpr-china',
+  'gpr-russia',
+  'gpr-ukraine',
+  'gpr-israel',
+  'gpr-saudi',
+  'gpr-australia',
+  'tpu-us',
   // M6 Wave 3 (2026-10-25): the Chicago Fed composite — a weighted
   // activity index in points (zero = trend growth), like china-pmi.
   'cfnai',

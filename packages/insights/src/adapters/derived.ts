@@ -1179,9 +1179,56 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'Caldara-Iacoviello Geopolitical Risk Index (Federal Reserve Board)',
     url: 'https://www.matteoiacoviello.com/gpr.htm',
   },
+  // gap-closure S4-M4.2 (2026-11-01): the geopolitics family — the
+  // threat/act/country columns ride the same GPR export; gpr-daily is the
+  // provider's own 7-day moving average of the daily index.
+  'gpr-threats': {
+    name: 'Caldara-Iacoviello GPR threats sub-index',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-acts': {
+    name: 'Caldara-Iacoviello GPR acts sub-index',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-daily': {
+    name: 'Caldara-Iacoviello daily GPR (7-day average)',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-taiwan': {
+    name: 'Caldara-Iacoviello country GPR: Taiwan',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-china': {
+    name: 'Caldara-Iacoviello country GPR: China',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-russia': {
+    name: 'Caldara-Iacoviello country GPR: Russia',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-ukraine': {
+    name: 'Caldara-Iacoviello country GPR: Ukraine',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-israel': {
+    name: 'Caldara-Iacoviello country GPR: Israel',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-saudi': {
+    name: 'Caldara-Iacoviello country GPR: Saudi Arabia',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
+  'gpr-australia': {
+    name: 'Caldara-Iacoviello country GPR: Australia',
+    url: 'https://www.matteoiacoviello.com/gpr.htm',
+  },
   'epu-us': {
     name: 'Baker-Bloom-Davis, US Economic Policy Uncertainty',
     url: 'https://www.policyuncertainty.com/us_monthly.html',
+  },
+  'tpu-us': {
+    name: 'Baker-Bloom-Davis, US Trade Policy Uncertainty',
+    url: 'https://www.policyuncertainty.com/trade_uncertainty.html',
   },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
   platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },

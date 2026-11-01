@@ -320,7 +320,8 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     id: 'gpr',
     provider: 'gpr',
     label: 'Caldara-Iacoviello Geopolitical Risk Index',
-    usedFor: 'gpr-index (the monthly GPR card)',
+    usedFor:
+      'gpr-index (the monthly GPR card) + the threat/act/country columns from the SAME monthly export + gpr-daily (the daily 7-day-average export, gap-closure S4-M4.2)',
     method: 'M2',
     runtime: 'worker',
     level: 'L0',
@@ -339,7 +340,8 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     id: 'epu',
     provider: 'epu',
     label: 'Baker-Bloom-Davis, US Economic Policy Uncertainty',
-    usedFor: 'epu-us (the monthly EPU card)',
+    usedFor:
+      'epu-us (the monthly EPU card) + tpu-us (the Categorical EPU workbook\'s trade-policy column, gap-closure S4-M4.2 — the same publisher, the same licence sentence in its A504)',
     method: 'M2',
     runtime: 'worker',
     level: 'L0',
@@ -689,7 +691,18 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'oecd-cli-cn': ['oecd'],
   'oecd-cli-de': ['oecd'],
   'gpr-index': ['gpr'],
+  'gpr-threats': ['gpr'],
+  'gpr-acts': ['gpr'],
+  'gpr-daily': ['gpr'],
+  'gpr-taiwan': ['gpr'],
+  'gpr-china': ['gpr'],
+  'gpr-russia': ['gpr'],
+  'gpr-ukraine': ['gpr'],
+  'gpr-israel': ['gpr'],
+  'gpr-saudi': ['gpr'],
+  'gpr-australia': ['gpr'],
   'epu-us': ['epu'],
+  'tpu-us': ['epu'],
   // 2026-10-26 gap-audit build, A-2: the MOF daily primary + the OECD
   // mirror fallback leg (the mirror fills during MOF outages, labelled).
   'jgb-10y': ['mof:jgbcme', 'fred:IRLTLT01JPM156N'],

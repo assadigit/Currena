@@ -1157,7 +1157,7 @@
       "publisherUrl": "https://fred.stlouisfed.org/series/WSEFINTL1",
       "methodUrl": "https://fred.stlouisfed.org/series/WSEFINTL1",
       "whatItIs": "Securities held in custody at the Federal Reserve Bank of New York for foreign official accounts (the H.4.1 memorandum item via FRED): Treasury securities kept at the Fed on behalf of foreign central banks and governments. Weekly, Wednesday level.",
-      "whatItIsnt": "The custody total has no country split: it cannot say which country is buying or selling (the monthly Treasury TIC table carries that, with its own six-to-seven-week lag), and some official holders keep securities somewhere other than the Fed.",
+      "whatItIsnt": "The custody total has no country split: it cannot say which countries are building or drawing down their positions (the monthly Treasury TIC table carries that, with its own six-to-seven-week lag), and some official holders keep securities somewhere other than the Fed.",
       "trackRecordNote": "The series climbed with foreign reserve growth for two decades and has stepped lower in the 2022-24 tightening round.",
       "definition": null,
       "failClosedConditions": "No value, data older than 21 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
@@ -1511,7 +1511,7 @@
       "publisherUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
       "methodUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
       "whatItIs": "The indirect bidders’ share of accepted bids at the latest 30-year-family Treasury auction (the Treasury FiscalData record): indirect-accepted dollars as a share of all accepted bids.",
-      "whatItIsnt": "The category hides its clients: a high share may be foreign official buying or an intermediary parking someone else’s bid.",
+      "whatItIsnt": "The category hides its clients: a high share may be a foreign official account, or an intermediary parking someone else’s bid.",
       "trackRecordNote": "The decade’s readings run from about 37 to 79 per cent; the latest sits near the top of that range.",
       "definition": null,
       "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
@@ -2555,6 +2555,596 @@
       }
     },
     {
+      "id": "gpr-threats",
+      "title": "Geopolitical Risk — threats",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello GPR threats sub-index",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello GPR threats sub-index (GPRT, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s threats sub-index (GPRT): the threat-related portion of the monthly Geopolitical Risk Index, from 1985 to today.",
+      "whatItIsnt": "A threats reading measures newspaper coverage, not events on the ground; it is not a forecast of acts.",
+      "trackRecordNote": "The zones are measured against the sub-index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-acts",
+      "title": "Geopolitical Risk — acts",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello GPR acts sub-index",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello GPR acts sub-index (GPRA, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s acts sub-index (GPRA): the realised-acts portion of the monthly Geopolitical Risk Index, from 1985 to today.",
+      "whatItIsnt": "An acts reading measures newspaper coverage, not a tally of events; quiet coverage is not the same as quiet facts.",
+      "trackRecordNote": "The zones are measured against the sub-index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-daily",
+      "title": "Geopolitical Risk (7-day average)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello daily GPR (7-day average)",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello daily GPR, 7-day moving average (GPRD_MA7)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s daily Geopolitical Risk Index, averaged over 7 days by the provider (GPRD_MA7); the file trails the calendar by about a week.",
+      "whatItIsnt": "The provider’s file trails the calendar by about a week, so the reading describes last week, not today.",
+      "trackRecordNote": "The zones are measured against the weekly average’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-taiwan",
+      "title": "Geopolitical Risk — Taiwan",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello country GPR: Taiwan",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello country GPR: Taiwan (GPRC_TWN, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s country index for Taiwan (GPRC_TWN): war-and-tension newspaper coverage that mentions Taiwan, monthly from 1985.",
+      "whatItIsnt": "Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.",
+      "trackRecordNote": "The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-china",
+      "title": "Geopolitical Risk — China",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello country GPR: China",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello country GPR: China (GPRC_CHN, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s country index for China (GPRC_CHN): war-and-tension newspaper coverage that mentions China, monthly from 1985.",
+      "whatItIsnt": "Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.",
+      "trackRecordNote": "The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-russia",
+      "title": "Geopolitical Risk — Russia",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello country GPR: Russia",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello country GPR: Russia (GPRC_RUS, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s country index for Russia (GPRC_RUS): war-and-tension newspaper coverage that mentions Russia, monthly from 1985.",
+      "whatItIsnt": "Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.",
+      "trackRecordNote": "The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-ukraine",
+      "title": "Geopolitical Risk — Ukraine",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello country GPR: Ukraine",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello country GPR: Ukraine (GPRC_UKR, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s country index for Ukraine (GPRC_UKR): war-and-tension newspaper coverage that mentions Ukraine, monthly from 1985.",
+      "whatItIsnt": "Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.",
+      "trackRecordNote": "The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-israel",
+      "title": "Geopolitical Risk — Israel",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello country GPR: Israel",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello country GPR: Israel (GPRC_ISR, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s country index for Israel (GPRC_ISR): war-and-tension newspaper coverage that mentions Israel, monthly from 1985.",
+      "whatItIsnt": "Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.",
+      "trackRecordNote": "The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-saudi",
+      "title": "Geopolitical Risk — Saudi Arabia",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello country GPR: Saudi Arabia",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello country GPR: Saudi Arabia (GPRC_SAU, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s country index for Saudi Arabia (GPRC_SAU): war-and-tension newspaper coverage that mentions Saudi Arabia, monthly from 1985.",
+      "whatItIsnt": "Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.",
+      "trackRecordNote": "The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
+      "id": "gpr-australia",
+      "title": "Geopolitical Risk — Australia",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "gpr",
+        "name": "Caldara-Iacoviello country GPR: Australia",
+        "url": "https://www.matteoiacoviello.com/gpr.htm",
+        "seriesIdOrTable": "Caldara-Iacoviello country GPR: Australia (GPRC_AUS, monthly)"
+      },
+      "publisher": "Caldara-Iacoviello Geopolitical Risk Index",
+      "publisherUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "methodUrl": "https://www.matteoiacoviello.com/gpr.htm",
+      "whatItIs": "Caldara and Iacoviello’s country index for Australia (GPRC_AUS): war-and-tension newspaper coverage that mentions Australia, monthly from 1985.",
+      "whatItIsnt": "Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.",
+      "trackRecordNote": "The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The author’s own page, quoted verbatim (read live 2026-10-26): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” Citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "legs": [
+          "gpr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Creative Commons BY 4.0 (the author’s own grant)",
+        "attributionText": "Source: Caldara and Iacoviello, Geopolitical Risk Index (matteoiacoviello.com)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The author’s own page, quoted verbatim (read live 2026-10-26, matteoiacoviello.com/gpr.htm): “License: All the material in this webpage, including interactive visualizations and code, are completely open access under the Creative Commons BY license. You have the permission to use, distribute, and reproduce these in any medium, provided the source and authors are credited.” The requested citation: Caldara, Dario and Matteo Iacoviello (2022), “Measuring Geopolitical Risk,” American Economic Review 112(4), pp. 1194-1225.",
+        "termsUrl": "https://www.matteoiacoviello.com/gpr.htm"
+      }
+    },
+    {
       "id": "epu-us",
       "title": "US policy uncertainty (EPU)",
       "area": {
@@ -2610,6 +3200,65 @@
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-26",
         "termsEvidence": "The licence is embedded in the data file itself (US_Policy_Uncertainty_Data.xlsx, Main News Index sheet, row 1523 — read from the committed fixture 2026-10-26): “Source: ‘Measuring Economic Policy Uncertainty’ by Scott Baker, Nicholas Bloom and Steven J. Davis at www.PolicyUncertainty.com. These data can be used freely with attribution to the authors, the paper, and the website.” · Legs (epu): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.policyuncertainty.com/us_monthly.html"
+      }
+    },
+    {
+      "id": "tpu-us",
+      "title": "US trade policy uncertainty",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "epu",
+        "name": "Baker-Bloom-Davis, US Trade Policy Uncertainty",
+        "url": "https://www.policyuncertainty.com/trade_uncertainty.html",
+        "seriesIdOrTable": "Baker-Bloom-Davis US Trade Policy Uncertainty index (Categorical EPU workbook, monthly)"
+      },
+      "publisher": "Baker-Bloom-Davis, US Economic Policy Uncertainty",
+      "publisherUrl": "https://www.policyuncertainty.com/trade_uncertainty.html",
+      "methodUrl": "https://www.policyuncertainty.com/trade_uncertainty.html",
+      "whatItIs": "Baker, Bloom and Davis’s US Trade Policy Uncertainty index: the trade-policy column of their categorical EPU measure, monthly from 1985.",
+      "whatItIsnt": "Uncertainty is not direction: a high reading says trade policy dominates the news, not which way it goes.",
+      "trackRecordNote": "The zones are measured against the index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The licence rides IN the workbook itself (Main News Index sheet, row 1523, read from the committed fixture 2026-10-26): “Source: ‘Measuring Economic Policy Uncertainty’ by Scott Baker, Nicholas Bloom and Steven J. Davis at www.PolicyUncertainty.com. These data can be used freely with attribution to the authors, the paper, and the website.”",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: Baker, Bloom and Davis, PolicyUncertainty.com",
+        "legs": [
+          "epu"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Free use with attribution (the workbook’s own licence line)",
+        "attributionText": "Source: Baker, Bloom and Davis, PolicyUncertainty.com",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The licence is embedded in the data file itself (US_Policy_Uncertainty_Data.xlsx, Main News Index sheet, row 1523 — read from the committed fixture 2026-10-26): “Source: ‘Measuring Economic Policy Uncertainty’ by Scott Baker, Nicholas Bloom and Steven J. Davis at www.PolicyUncertainty.com. These data can be used freely with attribution to the authors, the paper, and the website.”",
         "termsUrl": "https://www.policyuncertainty.com/us_monthly.html"
       }
     },
@@ -3585,7 +4234,7 @@
       "methodUrl": "https://fred.stlouisfed.org/series/THREEFYTP10",
       "whatItIs": "The Kim-Wright 10-year Treasury term premium (the Federal Reserve Board’s own model, via FRED): the part of the 10-year yield left over after subtracting the average short rate the market expects over the bond’s life.",
       "whatItIsnt": "It is a model estimate, not a market price you can see on a screen, and it says nothing about the next move in yields: a high premium can rise further and a low one can vanish.",
-      "trackRecordNote": "The premium spent the 2010s near or below zero (the era of trusted low inflation and heavy central-bank buying) and has been rebuilt since 2021, returning toward the positive territory that was normal before the financial crisis.",
+      "trackRecordNote": "The premium spent the 2010s near or below zero (the era of trusted low inflation and heavy central-bank bond purchases) and has been rebuilt since 2021, returning toward the positive territory that was normal before the financial crisis.",
       "definition": null,
       "failClosedConditions": "No value, data older than 14 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
@@ -3760,7 +4409,7 @@
       "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
       "publisherUrl": "https://fred.stlouisfed.org/series/WRESBAL",
       "methodUrl": "https://fred.stlouisfed.org/series/WRESBAL",
-      "whatItIs": "Reserve balances with Federal Reserve Banks (the H.4.1 weekly report via FRED): the total banks hold in their own accounts at the Fed, in millions of dollars at each Wednesday.",
+      "whatItIs": "Reserve balances with Federal Reserve Banks (the H.4.1 weekly report via FRED): the total banks keep in their own accounts at the Fed, in millions of dollars at each Wednesday.",
       "whatItIsnt": "There is no agreed number for scarce: the system’s need for reserves grows with the banking system itself, so the same level can be ample one year and tight the next.",
       "trackRecordNote": "Reserves quadrupled with the 2020 bond purchases and have fallen steadily as the balance sheet runs off; funding-market wobbles in 2019 showed how sensitive the system is when this buffer thins.",
       "definition": null,

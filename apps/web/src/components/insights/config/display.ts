@@ -246,6 +246,21 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'oecd-cli-cn': { decimals: 1, unit: 'index' },
   'oecd-cli-de': { decimals: 1, unit: 'index' },
   'gpr-index': { decimals: 1, unit: 'index' },
+  // gap-closure S4-M4.2: the geopolitics family — the threat/act/country
+  // sub-indices and the daily 7-day average render like their parent
+  // (index, one decimal); the country columns' small values keep two
+  // decimals so a 0.03→0.26 move stays readable.
+  'gpr-threats': { decimals: 1, unit: 'index' },
+  'gpr-acts': { decimals: 1, unit: 'index' },
+  'gpr-daily': { decimals: 1, unit: 'index' },
+  'gpr-taiwan': { decimals: 2, unit: 'index' },
+  'gpr-china': { decimals: 2, unit: 'index' },
+  'gpr-russia': { decimals: 2, unit: 'index' },
+  'gpr-ukraine': { decimals: 2, unit: 'index' },
+  'gpr-israel': { decimals: 2, unit: 'index' },
+  'gpr-saudi': { decimals: 2, unit: 'index' },
+  'gpr-australia': { decimals: 2, unit: 'index' },
+  'tpu-us': { decimals: 1, unit: 'index' },
   'epu-us': { decimals: 1, unit: 'index' },
   'wti': { decimals: 2, unit: 'usd' },
   'natgas': { decimals: 2, unit: 'usd' },

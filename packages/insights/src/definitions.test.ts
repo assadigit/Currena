@@ -22,8 +22,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     expect(ids).not.toContain('dollar-broad');
   });
 
-  it('splits 80 P1 / 43 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, P1; the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — both P1 context cards; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — all P1 context cards)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(80);
+  it('splits 91 P1 / 43 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, P1; the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — both P1 context cards; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — all P1 context cards; the 2026-11-01 gap-closure S4-M4.2 round adds the geopolitics eleven — the GPR threat/act/country family, the daily 7-day average and the TPU, all P1 context cards)', () => {
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(91);
     // Session 3 (G2): +breakeven-tilt (P2, the breakeven-10y sibling).
     expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(43);
   });
@@ -86,7 +86,17 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'gold-btc',
       'gold-oil-ratio',
       'gold-usd',
+      'gpr-acts',
+      'gpr-australia',
+      'gpr-china',
+      'gpr-daily',
       'gpr-index',
+      'gpr-israel',
+      'gpr-russia',
+      'gpr-saudi',
+      'gpr-taiwan',
+      'gpr-threats',
+      'gpr-ukraine',
       'housing-permits',
       'iron-ore',
       'jgb-10y',
@@ -116,6 +126,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       't5yie',
       'term-premium-10y',
       'tga',
+      'tpu-us',
       'treasury-auction-10y',
       'treasury-auction-10y-indirect',
       'treasury-auction-30y',

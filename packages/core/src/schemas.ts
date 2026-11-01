@@ -445,6 +445,21 @@ export const IndicatorIdSchema = z.enum([
   // 2026-10-26 gap-audit build (A-9): the Geopolitical Risk Index —
   // Iacoviello's monthly .xls via the repo's own biff reader.
   'gpr-index',
+  // gap-closure S4-M4.2 (2026-11-01): the geopolitics family — the GPR
+  // export's threat/act sub-indices + country columns (same download),
+  // the provider's own daily 7-day average, and the US Trade Policy
+  // Uncertainty (the Categorical EPU workbook's trade column).
+  'gpr-threats',
+  'gpr-acts',
+  'gpr-daily',
+  'gpr-taiwan',
+  'gpr-china',
+  'gpr-russia',
+  'gpr-ukraine',
+  'gpr-israel',
+  'gpr-saudi',
+  'gpr-australia',
+  'tpu-us',
   // 2026-10-26 gap-audit build (A-10): US Economic Policy Uncertainty —
   // Baker-Bloom-Davis's monthly headline index.
   'epu-us',

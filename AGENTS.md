@@ -145,14 +145,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 123 indicators (48 voting [V] + 75 context [C])
+### A. The 134 indicators (48 voting [V] + 86 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (94 indicators, 32 voting)
+#### GLOBAL (105 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -189,6 +189,15 @@ custody at the New York Fed for foreign official accounts, FRED
 with ZERO new fetches. Context-only; renders INSIDE the "Who holds US
 government debt" TIC section (HIDDEN_FROM_LANE_IDS — one reading, one
 surface), not in the borrowing-costs lane.)*
+
+*(gap-closure S4-M4.2, 2026-11-01: `tpu-us` — the US Trade Policy
+Uncertainty index, the "9. Trade policy" column of Baker-Bloom-Davis's
+Categorical EPU workbook (`policyuncertainty.com/media/
+Categorical_EPU_Data.xlsx`, the same licence sentence as the EPU file in
+its A504; the spec's assumed Trade_Uncertainty_Data.xlsx is STALE at
+2019-07 and was rejected in M4.1). Context-only per G-5, riding the rung2
+monthly plan as a second policyuncertainty fetch, read through the SD
+regime.)*
 
 *(gap-closure S3-M3.5, 2026-11-01: the fiscal and Treasury-supply family —
 the borrowing-costs lane's G4 leg. `us-deficit-12m` (derived: the rolling
@@ -238,6 +247,7 @@ currencies container per R9-04):
 | [C] | `oecd-cli-cn` | monthly | 75 | info | oecd |
 | [C] | `oecd-cli-de` | monthly | 75 | info | oecd |
 | [C] | `epu-us` | monthly | 75 | info | epu |
+| [C] | `tpu-us` | monthly | 75 | info | epu |
 | [C] | `copper-usd` | daily | 2 | info | gold-api |
 | [C] | `gdpnow` | quarterly | 150 | info | fred |
 | [C] | `empire-state` | monthly | 60 | info | fred |
@@ -256,6 +266,16 @@ currencies container per R9-04):
 | [C] | `shiller-cape` | monthly | 45 | info | shiller |
 | [C] | `shiller-ecy` | monthly | 45 | info | shiller |
 | [C] | `gpr-index` | monthly | 75 | info | gpr |
+| [C] | `gpr-threats` | monthly | 75 | info | gpr |
+| [C] | `gpr-acts` | monthly | 75 | info | gpr |
+| [C] | `gpr-daily` | daily | 12 | info | gpr |
+| [C] | `gpr-taiwan` | monthly | 75 | info | gpr |
+| [C] | `gpr-china` | monthly | 75 | info | gpr |
+| [C] | `gpr-russia` | monthly | 75 | info | gpr |
+| [C] | `gpr-ukraine` | monthly | 75 | info | gpr |
+| [C] | `gpr-israel` | monthly | 75 | info | gpr |
+| [C] | `gpr-saudi` | monthly | 75 | info | gpr |
+| [C] | `gpr-australia` | monthly | 75 | info | gpr |
 | [C] | `term-premium-10y` | daily | 14 | info | fred |
 | [C] | `tga` | weekly | 21 | info | fred |
 | [C] | `reverse-repo` | daily | 4 | info | fred |
@@ -265,6 +285,14 @@ currencies container per R9-04):
 | [C] | `ebp` | monthly | 75 | info | frb |
 | [C] | `ofr-fsi` | daily | 7 | info | ofr |
 | [C] | `sloos-ci-tightening` | quarterly | 215 | info | fred |
+
+*(gap-closure S4-M4.2, 2026-11-01: the geopolitics family — the GPR
+export's threat (GPRT) and act (GPRA) sub-indices, the seven country
+columns (GPRC_{TWN,CHN,RUS,UKR,ISR,SAU,AUS}) and the provider's own
+daily 7-day moving average (GPRD_MA7, the `data_gpr_daily_recent.xls`
+file, ~6-day lag) all ride the SAME rung2 monthly download + one daily
+fetch; the readings read through the SD regime (z-scores, the M1.6
+non-stationarity lesson). All context-only per G-5.)*
 
 *(gap-closure S3-M3.2, 2026-11-01: the US liquidity/funding family — six
 context cards in the market-stress lane, riding the rung4 'fred-s3' source:

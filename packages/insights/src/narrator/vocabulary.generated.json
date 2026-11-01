@@ -3,9 +3,9 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "66e4b7371ea1ae117480399a01f9503edddea4f9d294812f4afe74e7bfa8c8bd",
-    "faSha256": "c96964002debd5a7fa0c4c5a71c698b5d8b6d2b0dbad46e55fef170a18fc5558",
-    "indicatorCount": 152,
+    "enSha256": "e297122d58db1fa983b7b5847062019fbbcf3be1aebbfbd760d0f9b3fe3203ca",
+    "faSha256": "754d3f72b8e8321aa62734b3ca7975db7ca1f27a52af134b08ebbc51f8f00418",
+    "indicatorCount": 163,
     "glossaryCount": 38
   },
   "en": {
@@ -946,6 +946,215 @@
           {
             "with": "michigan-sentiment",
             "text": "The mood pair: policy noise beside household mood.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-threats": {
+        "plainName": "War-threat news gauge",
+        "oneLine": "How much war-and-tension news is threats and warnings.",
+        "ifRising": "Markets usually price more caution when threats dominate coverage.",
+        "ifFalling": "A smaller threats share usually reads as a calmer news mix.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this threat share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-acts",
+            "text": "The threats and acts pair splits the same coverage.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-acts": {
+        "plainName": "War-acts news gauge",
+        "oneLine": "How much war-and-tension news is realised acts.",
+        "ifRising": "Coverage is shifting from warnings to actual events.",
+        "ifFalling": "Fewer acts in the news mix usually reads as de-escalation.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this acts share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-threats",
+            "text": "The threats and acts pair splits the same coverage.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-daily": {
+        "plainName": "War-tension weekly gauge",
+        "oneLine": "The war-and-tension news gauge, refreshed weekly.",
+        "ifRising": "A fresher read on the tension the monthly card reports.",
+        "ifFalling": "A fresher read on the calm the monthly card reports.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The monthly average this weekly reading tracks.",
+            "strength": "reliable"
+          },
+          {
+            "with": "vix",
+            "text": "The fear gauge often moves with tension news.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-taiwan": {
+        "plainName": "Taiwan tension gauge",
+        "oneLine": "How much war-and-tension news mentions Taiwan.",
+        "ifRising": "A larger share of tension coverage is about Taiwan.",
+        "ifFalling": "A smaller share of tension coverage is about Taiwan.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this country share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-china",
+            "text": "The two east-Asia lenses of the same news stream.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-china": {
+        "plainName": "China tension gauge",
+        "oneLine": "How much war-and-tension news mentions China.",
+        "ifRising": "A larger share of tension coverage is about China.",
+        "ifFalling": "A smaller share of tension coverage is about China.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this country share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "china-pmi",
+            "text": "Tension news beside China’s factory gauge.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-russia": {
+        "plainName": "Russia tension gauge",
+        "oneLine": "How much war-and-tension news mentions Russia.",
+        "ifRising": "A larger share of tension coverage is about Russia.",
+        "ifFalling": "A smaller share of tension coverage is about Russia.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this country share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-ukraine",
+            "text": "The pair usually moves together in this news stream.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-ukraine": {
+        "plainName": "Ukraine tension gauge",
+        "oneLine": "How much war-and-tension news mentions Ukraine.",
+        "ifRising": "A larger share of tension coverage is about Ukraine.",
+        "ifFalling": "A smaller share of tension coverage is about Ukraine.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this country share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-russia",
+            "text": "The pair usually moves together in this news stream.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-israel": {
+        "plainName": "Israel tension gauge",
+        "oneLine": "How much war-and-tension news mentions Israel.",
+        "ifRising": "A larger share of tension coverage is about Israel.",
+        "ifFalling": "A smaller share of tension coverage is about Israel.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this country share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "Middle-East tension often travels with the oil price.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-saudi": {
+        "plainName": "Saudi tension gauge",
+        "oneLine": "How much war-and-tension news mentions Saudi Arabia.",
+        "ifRising": "A larger share of tension coverage is about Saudi Arabia.",
+        "ifFalling": "A smaller share of tension coverage is about Saudi Arabia.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this country share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "Gulf tension often travels with the oil price.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-australia": {
+        "plainName": "Australia tension gauge",
+        "oneLine": "How much war-and-tension news mentions Australia.",
+        "ifRising": "A larger share of tension coverage is about Australia.",
+        "ifFalling": "A smaller share of tension coverage is about Australia.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "The headline gauge this country share belongs to.",
+            "strength": "reliable"
+          },
+          {
+            "with": "audusd",
+            "text": "Australia’s currency often reads the world mood.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "tpu-us": {
+        "plainName": "Trade-fight noise gauge",
+        "oneLine": "How much US policy news is about trade fights.",
+        "ifRising": "Importers and exporters usually face harder planning.",
+        "ifFalling": "A quieter trade-policy backdrop usually eases supply plans.",
+        "connections": [
+          {
+            "with": "epu-us",
+            "text": "The trade column of the wider policy-noise gauge.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-index",
+            "text": "Two lenses on world friction: trade words beside war words.",
             "strength": "usually"
           }
         ],
@@ -4404,6 +4613,215 @@
           {
             "with": "michigan-sentiment",
             "text": "جفت خلق‌وخو: نویز سیاست در کنار حال و هوای خانوار.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-threats": {
+        "plainName": "سنجش تهدید در اخبار",
+        "oneLine": "چقدر از خبر جنگ و تنش، تهدید و هشدار است.",
+        "ifRising": "بازارها معمولاً با غلبهٔ تهدید بر پوشش خبری محتاط‌تر قیمت می‌دهند.",
+        "ifFalling": "سهم کمترِ تهدید معمولاً ترکیب خبری آرام‌تر خوانده می‌شود.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم تهدید به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-acts",
+            "text": "جفت تهدید و اقدام، همان پوشش را دو نیم می‌کند.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-acts": {
+        "plainName": "سنجش اقدام در اخبار",
+        "oneLine": "چقدر از خبر جنگ و تنش، اقدام واقعی است.",
+        "ifRising": "پوشش خبری از هشدار به رخدادهای واقعی جابه‌جا می‌شود.",
+        "ifFalling": "اقدام کمتر در ترکیب خبر، معمولاً فروکش خوانده می‌شود.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم اقدام به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-threats",
+            "text": "جفت تهدید و اقدام، همان پوشش را دو نیم می‌کند.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-daily": {
+        "plainName": "فشارسنج هفتگی جنگ و تنش",
+        "oneLine": "فشارسنج جنگ و تنش، با به‌روزرسانی هفتگی.",
+        "ifRising": "قرائتی تازه‌تر از تنشی که کارت ماهانه گزارش می‌کند.",
+        "ifFalling": "قرائتی تازه‌تر از آرامشی که کارت ماهانه گزارش می‌کند.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "میانگین ماهانه‌ای که این قرائت هفتگی دنبالش می‌رود.",
+            "strength": "reliable"
+          },
+          {
+            "with": "vix",
+            "text": "فشارسنج ترس اغلب با خبر تنش حرکت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-taiwan": {
+        "plainName": "تنش تایوان",
+        "oneLine": "چقدر از خبر جنگ و تنش به تایوان می‌پردازد.",
+        "ifRising": "سهم بزرگ‌تری از پوشش تنش دربارهٔ تایوان است.",
+        "ifFalling": "سهم کوچک‌تری از پوشش تنش دربارهٔ تایوان است.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم کشوری به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-china",
+            "text": "دو عدسی شرق آسیا روی همان جریان خبری.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-china": {
+        "plainName": "تنش چین",
+        "oneLine": "چقدر از خبر جنگ و تنش به چین می‌پردازد.",
+        "ifRising": "سهم بزرگ‌تری از پوشش تنش دربارهٔ چین است.",
+        "ifFalling": "سهم کوچک‌تری از پوشش تنش دربارهٔ چین است.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم کشوری به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "china-pmi",
+            "text": "خبر تنش در کنار فشارسنج کارخانه‌های چین.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-russia": {
+        "plainName": "تنش روسیه",
+        "oneLine": "چقدر از خبر جنگ و تنش به روسیه می‌پردازد.",
+        "ifRising": "سهم بزرگ‌تری از پوشش تنش دربارهٔ روسیه است.",
+        "ifFalling": "سهم کوچک‌تری از پوشش تنش دربارهٔ روسیه است.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم کشوری به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-ukraine",
+            "text": "این جفت اغلب در همین جریان خبری با هم حرکت می‌کنند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-ukraine": {
+        "plainName": "تنش اوکراین",
+        "oneLine": "چقدر از خبر جنگ و تنش به اوکراین می‌پردازد.",
+        "ifRising": "سهم بزرگ‌تری از پوشش تنش دربارهٔ اوکراین است.",
+        "ifFalling": "سهم کوچک‌تری از پوشش تنش دربارهٔ اوکراین است.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم کشوری به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-russia",
+            "text": "این جفت اغلب در همین جریان خبری با هم حرکت می‌کنند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-israel": {
+        "plainName": "تنش اسرائیل",
+        "oneLine": "چقدر از خبر جنگ و تنش به اسرائیل می‌پردازد.",
+        "ifRising": "سهم بزرگ‌تری از پوشش تنش دربارهٔ اسرائیل است.",
+        "ifFalling": "سهم کوچک‌تری از پوشش تنش دربارهٔ اسرائیل است.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم کشوری به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "تنش خاورمیانه اغلب همراه قیمت نفت حرکت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-saudi": {
+        "plainName": "تنش عربستان",
+        "oneLine": "چقدر از خبر جنگ و تنش به عربستان می‌پردازد.",
+        "ifRising": "سهم بزرگ‌تری از پوشش تنش دربارهٔ عربستان است.",
+        "ifFalling": "سهم کوچک‌تری از پوشش تنش دربارهٔ عربستان است.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم کشوری به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "تنش خلیج فارس اغلب همراه قیمت نفت حرکت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "gpr-australia": {
+        "plainName": "تنش استرالیا",
+        "oneLine": "چقدر از خبر جنگ و تنش به استرالیا می‌پردازد.",
+        "ifRising": "سهم بزرگ‌تری از پوشش تنش دربارهٔ استرالیا است.",
+        "ifFalling": "سهم کوچک‌تری از پوشش تنش دربارهٔ استرالیا است.",
+        "connections": [
+          {
+            "with": "gpr-index",
+            "text": "فشارسنج اصلی که این سهم کشوری به آن تعلق دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "audusd",
+            "text": "ارز استرالیا اغلب حال‌وهوای جهان را می‌خواند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "tpu-us": {
+        "plainName": "عدم قطعیت تجاری آمریکا",
+        "oneLine": "چقدر از خبر سیاست آمریکا دربارهٔ جنگ تجاری است.",
+        "ifRising": "واردکنندگان و صادرکنندگان معمولاً با برنامه‌ریزی سخت‌تری روبه‌رو می‌شوند.",
+        "ifFalling": "پس‌زمینهٔ آرام‌تر سیاست تجاری معمولاً برنامه‌ریزی زنجیرهٔ تأمین را آسان می‌کند.",
+        "connections": [
+          {
+            "with": "epu-us",
+            "text": "ستون تجاریِ شاخص گسترده‌تر نویز سیاستی.",
+            "strength": "reliable"
+          },
+          {
+            "with": "gpr-index",
+            "text": "دو عدسی بر اصطکاک جهانی: واژگان تجاری در کنار واژگان جنگ.",
             "strength": "usually"
           }
         ],

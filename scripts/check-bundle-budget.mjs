@@ -832,7 +832,16 @@ const BUDGETS = [
   // existing machinery only. Measured 1285.38/303.21; raw bumps
   // 1258 → 1287, gz 299 → 305.
   // Justified in CHANGELOG §2026-11-01d.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1287_000, gz: 305_000, label: 'Insights lazy chunk' },
+  // 2026-11-01g (gap-closure S4-M4.2): 1332/310 — the geopolitics
+  // family: ELEVEN more bilingual ids (the GPR threat/act sub-indices,
+  // the seven country indices, the daily 7-day average, and the TPU) —
+  // the full bilingual indicator copy (2 dictionaries × 11 ids × 13
+  // keys) + the layer-1 entries (fa round-67) + the narrator vocabulary
+  // growth (163 indicators + 38 terms × 2 languages). The cards ride
+  // existing machinery only. Measured 1331.93/309.36; raw bumps
+  // 1287 → 1332, gz 305 → 310.
+  // Justified in CHANGELOG §2026-11-01g.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1332_000, gz: 310_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

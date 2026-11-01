@@ -35,7 +35,7 @@ import { fetchMofJgb10y } from './mof';
 import { fetchEiaCrudeStocks } from './eia-stocks';
 import { fetchCftcGoldPositioning } from './cftc';
 import { fetchOecdCli } from './oecd';
-import { fetchEpuSeries, fetchGprSeries } from './monthly-indexes';
+import { fetchEpuSeries, fetchGprExportAll, fetchGprDailySeries, fetchTpuSeries } from './monthly-indexes';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -52,6 +52,23 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   'oecd-cli-de',
   'gpr-index', // A-9: Iacoviello's monthly GPR export, first-of-month
   'epu-us', // A-10: Baker-Bloom-Davis's monthly EPU workbook, first-of-month
+  // gap-closure S4-M4.2 (2026-11-01): the geopolitics family — the GPR
+  // export's threat/act/country columns ride the SAME monthly download
+  // (zero extra subrequests on the monthly fetch), the GPR daily export
+  // fetches daily (the 3.3 MB MA7 file), and the TPU workbook joins the
+  // monthly plan (one more policyuncertainty fetch on first-of-month
+  // days). All context-only per G-5.
+  'gpr-threats',
+  'gpr-acts',
+  'gpr-taiwan',
+  'gpr-china',
+  'gpr-russia',
+  'gpr-ukraine',
+  'gpr-israel',
+  'gpr-saudi',
+  'gpr-australia',
+  'gpr-daily',
+  'tpu-us',
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -62,8 +79,10 @@ export interface Rung2FetchPlan {
   eiaWeekly: boolean;
   /** The weekly CFTC COT file (Saturday + bootstrap). */
   cftcWeekly: boolean;
-  /** The monthly OECD CLI + GPR + EPU feeds (first-of-month + bootstrap). */
+  /** The monthly OECD CLI + GPR + EPU + TPU feeds (first-of-month + bootstrap). */
   monthly: boolean;
+  /** The GPR daily export (S4-M4.2: daily + bootstrap). */
+  gprDaily: boolean;
 }
 
 /** Saturday is fetch day for the weekly pair (data Tue, publish Fri 17:30 ET). */
@@ -88,12 +107,19 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     missing.has('oecd-cli-cn') ||
     missing.has('oecd-cli-de') ||
     missing.has('gpr-index') ||
-    missing.has('epu-us');
+    missing.has('epu-us') ||
+    // S4-M4.2: the geopolitics monthly family bootstraps the same way.
+    missing.has('gpr-threats') ||
+    missing.has('gpr-acts') ||
+    missing.has('tpu-us') ||
+    missing.has('gpr-taiwan') ||
+    missing.has('gpr-australia');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
     eiaWeekly: isSaturday(date) || missing.has('eia-crude-stocks'),
     cftcWeekly: isSaturday(date) || missing.has('cftc-gold-positioning'),
     monthly: isFirstOfMonth(date) || needMonthly,
+    gprDaily: true, // S4-M4.2: the daily GPR MA7 file, every day (a missing stage entry is the bootstrap itself)
   };
 }
 
@@ -194,10 +220,24 @@ export async function collectRung2Sources(
       series['oecd-cli-de'] = cli.deu;
     }
 
-    // A-9: Iacoviello's monthly GPR export (the legacy .xls via the
-    // repo's own biff reader). Full history per fetch.
-    const gpr = await fetchLogged('gpr', 'Geopolitical Risk Index (monthly export)', () => fetchGprSeries());
-    if (gpr !== undefined) series['gpr-index'] = gpr;
+    // A-9 (S4-M4.2: the FULL column set): Iacoviello's monthly GPR export
+    // (the legacy .xls via the repo's own biff reader) — ONE download
+    // feeding the gpr-index card AND its threat/act/country companions.
+    const gpr = await fetchLogged('gpr', 'Geopolitical Risk Index (monthly export, full column set)', () =>
+      fetchGprExportAll(),
+    );
+    if (gpr !== undefined) {
+      series['gpr-index'] = gpr.gpr;
+      series['gpr-threats'] = gpr.threats;
+      series['gpr-acts'] = gpr.acts;
+      series['gpr-taiwan'] = gpr.taiwan;
+      series['gpr-china'] = gpr.china;
+      series['gpr-russia'] = gpr.russia;
+      series['gpr-ukraine'] = gpr.ukraine;
+      series['gpr-israel'] = gpr.israel;
+      series['gpr-saudi'] = gpr.saudi;
+      series['gpr-australia'] = gpr.australia;
+    }
 
     // A-10: Baker-Bloom-Davis's monthly EPU workbook (OOXML, the Pink
     // Sheet reader path). Full history per fetch.
@@ -205,6 +245,25 @@ export async function collectRung2Sources(
       fetchEpuSeries(),
     );
     if (epu !== undefined) series['epu-us'] = epu;
+
+    // S4-M4.2: the US Trade Policy Uncertainty — the Categorical EPU
+    // workbook's "9. Trade policy" column (the old Trade_Uncertainty file
+    // is stale at 2019-07; M4.1 verified this workbook as the source of
+    // record). First-of-month + bootstrap, the epu-us pattern.
+    const tpu = await fetchLogged('epu', 'US Trade Policy Uncertainty (Categorical EPU workbook)', () =>
+      fetchTpuSeries(),
+    );
+    if (tpu !== undefined) series['tpu-us'] = tpu;
+  }
+
+  // S4-M4.2: the GPR daily export — the provider's own GPRD_MA7 7-day
+  // moving average (the timely signal; ~6-day file lag). Daily fetch; a
+  // missing stage entry IS the bootstrap (the fetch runs every day).
+  if (plan.gprDaily) {
+    const gprDaily = await fetchLogged('gpr', 'Geopolitical Risk Index (daily export, 7-day average)', () =>
+      fetchGprDailySeries(),
+    );
+    if (gprDaily !== undefined) series['gpr-daily'] = gprDaily;
   }
 
   return { series, reports };

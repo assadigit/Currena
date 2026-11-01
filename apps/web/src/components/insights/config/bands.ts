@@ -110,7 +110,24 @@ type ConsequenceState = keyof ConsequenceLines; // 'highRising' | 'highEasing' |
  * the percentile bar keeps rendering the decade position (an independent,
  * honest measure on its own terms).
  */
-export const SD_BAND_IDS: ReadonlySet<string> = new Set(['gpr-index', 'epu-us']);
+export const SD_BAND_IDS: ReadonlySet<string> = new Set([
+  'gpr-index',
+  'epu-us',
+  // gap-closure S4-M4.2 (2026-11-01): the geopolitics family + the TPU —
+  // all news-based indices whose LEVELS drift by decade (the M1.6
+  // non-stationarity lesson: z-scores, not percentiles, read them).
+  'gpr-threats',
+  'gpr-acts',
+  'gpr-daily',
+  'gpr-taiwan',
+  'gpr-china',
+  'gpr-russia',
+  'gpr-ukraine',
+  'gpr-israel',
+  'gpr-saudi',
+  'gpr-australia',
+  'tpu-us',
+]);
 
 /**
  * Pick the consequence-line state for one reading:

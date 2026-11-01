@@ -118,6 +118,18 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   // michigan-1y-expectations precedent).
   'us-deficit-12m',
   'us-deficit-monthly',
+  // gap-closure S4-M4.2 (2026-11-01): the geopolitics eleven → 134.
+  'gpr-threats',
+  'gpr-acts',
+  'gpr-daily',
+  'gpr-taiwan',
+  'gpr-china',
+  'gpr-russia',
+  'gpr-ukraine',
+  'gpr-israel',
+  'gpr-saudi',
+  'gpr-australia',
+  'tpu-us',
   'treasury-auction-10y',
   'treasury-auction-10y-indirect',
   'treasury-auction-30y',

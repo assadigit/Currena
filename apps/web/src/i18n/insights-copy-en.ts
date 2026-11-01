@@ -849,6 +849,128 @@ const LAYER1 = {
       ],
       glossaryTerms: [],
     },
+    'gpr-threats': {
+      // gap-closure S4-M4.2: the war-and-tension gauge's threats half.
+      plainName: 'War-threat news gauge',
+      oneLine: 'How much war-and-tension news is threats and warnings.',
+      ifRising: 'Markets usually price more caution when threats dominate coverage.',
+      ifFalling: 'A smaller threats share usually reads as a calmer news mix.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this threat share belongs to.', strength: 'reliable' },
+        { with: 'gpr-acts', text: 'The threats and acts pair splits the same coverage.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-acts': {
+      plainName: 'War-acts news gauge',
+      oneLine: 'How much war-and-tension news is realised acts.',
+      ifRising: 'Coverage is shifting from warnings to actual events.',
+      ifFalling: 'Fewer acts in the news mix usually reads as de-escalation.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this acts share belongs to.', strength: 'reliable' },
+        { with: 'gpr-threats', text: 'The threats and acts pair splits the same coverage.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-daily': {
+      plainName: 'War-tension weekly gauge',
+      oneLine: 'The war-and-tension news gauge, refreshed weekly.',
+      ifRising: 'A fresher read on the tension the monthly card reports.',
+      ifFalling: 'A fresher read on the calm the monthly card reports.',
+      connections: [
+        { with: 'gpr-index', text: 'The monthly average this weekly reading tracks.', strength: 'reliable' },
+        { with: 'vix', text: 'The fear gauge often moves with tension news.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-taiwan': {
+      plainName: 'Taiwan tension gauge',
+      oneLine: 'How much war-and-tension news mentions Taiwan.',
+      ifRising: 'A larger share of tension coverage is about Taiwan.',
+      ifFalling: 'A smaller share of tension coverage is about Taiwan.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this country share belongs to.', strength: 'reliable' },
+        { with: 'gpr-china', text: 'The two east-Asia lenses of the same news stream.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-china': {
+      plainName: 'China tension gauge',
+      oneLine: 'How much war-and-tension news mentions China.',
+      ifRising: 'A larger share of tension coverage is about China.',
+      ifFalling: 'A smaller share of tension coverage is about China.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this country share belongs to.', strength: 'reliable' },
+        { with: 'china-pmi', text: 'Tension news beside China’s factory gauge.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-russia': {
+      plainName: 'Russia tension gauge',
+      oneLine: 'How much war-and-tension news mentions Russia.',
+      ifRising: 'A larger share of tension coverage is about Russia.',
+      ifFalling: 'A smaller share of tension coverage is about Russia.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this country share belongs to.', strength: 'reliable' },
+        { with: 'gpr-ukraine', text: 'The pair usually moves together in this news stream.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-ukraine': {
+      plainName: 'Ukraine tension gauge',
+      oneLine: 'How much war-and-tension news mentions Ukraine.',
+      ifRising: 'A larger share of tension coverage is about Ukraine.',
+      ifFalling: 'A smaller share of tension coverage is about Ukraine.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this country share belongs to.', strength: 'reliable' },
+        { with: 'gpr-russia', text: 'The pair usually moves together in this news stream.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-israel': {
+      plainName: 'Israel tension gauge',
+      oneLine: 'How much war-and-tension news mentions Israel.',
+      ifRising: 'A larger share of tension coverage is about Israel.',
+      ifFalling: 'A smaller share of tension coverage is about Israel.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this country share belongs to.', strength: 'reliable' },
+        { with: 'brent', text: 'Middle-East tension often travels with the oil price.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-saudi': {
+      plainName: 'Saudi tension gauge',
+      oneLine: 'How much war-and-tension news mentions Saudi Arabia.',
+      ifRising: 'A larger share of tension coverage is about Saudi Arabia.',
+      ifFalling: 'A smaller share of tension coverage is about Saudi Arabia.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this country share belongs to.', strength: 'reliable' },
+        { with: 'brent', text: 'Gulf tension often travels with the oil price.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'gpr-australia': {
+      plainName: 'Australia tension gauge',
+      oneLine: 'How much war-and-tension news mentions Australia.',
+      ifRising: 'A larger share of tension coverage is about Australia.',
+      ifFalling: 'A smaller share of tension coverage is about Australia.',
+      connections: [
+        { with: 'gpr-index', text: 'The headline gauge this country share belongs to.', strength: 'reliable' },
+        { with: 'audusd', text: 'Australia’s currency often reads the world mood.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'tpu-us': {
+      plainName: 'Trade-fight noise gauge',
+      oneLine: 'How much US policy news is about trade fights.',
+      ifRising: 'Importers and exporters usually face harder planning.',
+      ifFalling: 'A quieter trade-policy backdrop usually eases supply plans.',
+      connections: [
+        { with: 'epu-us', text: 'The trade column of the wider policy-noise gauge.', strength: 'reliable' },
+        { with: 'gpr-index', text: 'Two lenses on world friction: trade words beside war words.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
     'copper-usd': {
       plainName: 'The world copper price',
       oneLine: 'The world price of the metal that wires homes and grids.',
@@ -4570,6 +4692,260 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'Uncertainty is not direction: a spike says decisions are being delayed, not which way the decisions go.',
     forYou: 'The confidence pair’s policy leg: read it beside Michigan sentiment for the mood under the growth numbers.',
+  },
+  'gpr-threats': {
+    // gap-closure S4-M4.2: the threats half of the war-and-tension gauge.
+    name: 'Geopolitical Risk — threats',
+    ticker: 'GPR threats',
+    oneLiner:
+      'The share of war-and-tension news that is threats and warnings rather than realised acts.',
+    lines: {
+      jumping:
+        'A historic-spike-class threats reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Threat-heavy coverage is well above its decade average and still rising.',
+      highEasing: 'Threat coverage remains elevated but is easing.',
+      typical: 'The threats share sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for threats in the news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s threats sub-index (GPRT): the threat-related portion of the monthly Geopolitical Risk Index, from 1985 to today.',
+    whyItMatters:
+      'How much of the war-and-tension news stream is warnings: the mix beside the acts card shows what the coverage is made of.',
+    tendedToMean:
+      'The zones are measured against the sub-index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'A threats reading measures newspaper coverage, not events on the ground; it is not a forecast of acts.',
+    forYou: 'The threats half of the war-and-tension gauge — read it beside the acts card and the headline index.',
+  },
+  'gpr-acts': {
+    name: 'Geopolitical Risk — acts',
+    ticker: 'GPR acts',
+    oneLiner:
+      'The share of war-and-tension news that is realised acts rather than threats and warnings.',
+    lines: {
+      jumping:
+        'A historic-spike-class acts reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Acts-heavy coverage is well above its decade average and still rising.',
+      highEasing: 'Acts coverage remains elevated but is easing.',
+      typical: 'The acts share sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for acts in the news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s acts sub-index (GPRA): the realised-acts portion of the monthly Geopolitical Risk Index, from 1985 to today.',
+    whyItMatters:
+      'How much of the war-and-tension news stream is realised acts: the mix beside the threats card shows what the coverage is made of.',
+    tendedToMean:
+      'The zones are measured against the sub-index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'An acts reading measures newspaper coverage, not a tally of events; quiet coverage is not the same as quiet facts.',
+    forYou: 'The acts half of the war-and-tension gauge — read it beside the threats card and the headline index.',
+  },
+  'gpr-daily': {
+    name: 'Geopolitical Risk (7-day average)',
+    ticker: 'GPR weekly',
+    oneLiner:
+      'The war-and-tension gauge averaged over the latest week of daily readings.',
+    lines: {
+      jumping:
+        'A historic-spike-class week (more than 2 standard deviations above the decade average of weekly readings).',
+      highRising: 'The weekly average is well above its decade average and still rising.',
+      highEasing: 'The weekly average remains elevated but is easing.',
+      typical: 'The weekly average sits in its usual range for the past decade.',
+      low: 'An unusually calm stretch of weeks.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s daily Geopolitical Risk Index, averaged over 7 days by the provider (GPRD_MA7); the file trails the calendar by about a week.',
+    whyItMatters:
+      'A fresher read on the same news stream the monthly card measures: the weekly average smooths single-day spikes.',
+    tendedToMean:
+      'The zones are measured against the weekly average’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The provider’s file trails the calendar by about a week, so the reading describes last week, not today.',
+    forYou: 'The timely half of the war-and-tension gauge — read it beside the monthly average it tracks.',
+  },
+  'gpr-taiwan': {
+    name: 'Geopolitical Risk — Taiwan',
+    ticker: 'GPR Taiwan',
+    oneLiner:
+      'How much war-and-tension news mentions Taiwan, as a share of that news stream.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Taiwan’s share of tension coverage is well above its decade average and still rising.',
+      highEasing: 'Taiwan’s coverage share remains elevated but is easing.',
+      typical: 'Taiwan’s share of tension coverage sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for Taiwan in the tension news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s country index for Taiwan (GPRC_TWN): war-and-tension newspaper coverage that mentions Taiwan, monthly from 1985.',
+    whyItMatters:
+      'Which places dominate the war-and-tension news stream: Taiwan’s share is the east-Asia lens beside China’s.',
+    tendedToMean:
+      'The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.',
+    forYou: 'The country lens on the war-and-tension gauge; a large share here also matters for Asia-bound trade routes.',
+  },
+  'gpr-china': {
+    name: 'Geopolitical Risk — China',
+    ticker: 'GPR China',
+    oneLiner:
+      'How much war-and-tension news mentions China, as a share of that news stream.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average).',
+      highRising: 'China’s share of tension coverage is well above its decade average and still rising.',
+      highEasing: 'China’s coverage share remains elevated but is easing.',
+      typical: 'China’s share of tension coverage sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for China in the tension news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s country index for China (GPRC_CHN): war-and-tension newspaper coverage that mentions China, monthly from 1985.',
+    whyItMatters:
+      'Which places dominate the war-and-tension news stream: China’s share sits beside the factory gauge in the China view.',
+    tendedToMean:
+      'The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.',
+    forYou: 'The China lens on the war-and-tension gauge, beside the China factory and CPI cards.',
+  },
+  'gpr-russia': {
+    name: 'Geopolitical Risk — Russia',
+    ticker: 'GPR Russia',
+    oneLiner:
+      'How much war-and-tension news mentions Russia, as a share of that news stream.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Russia’s share of tension coverage is well above its decade average and still rising.',
+      highEasing: 'Russia’s coverage share remains elevated but is easing.',
+      typical: 'Russia’s share of tension coverage sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for Russia in the tension news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s country index for Russia (GPRC_RUS): war-and-tension newspaper coverage that mentions Russia, monthly from 1985.',
+    whyItMatters:
+      'Which places dominate the war-and-tension news stream: Russia’s share is the energy-linked lens beside Ukraine’s.',
+    tendedToMean:
+      'The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.',
+    forYou: 'The Russia lens on the war-and-tension gauge — read it beside the Ukraine card.',
+  },
+  'gpr-ukraine': {
+    name: 'Geopolitical Risk — Ukraine',
+    ticker: 'GPR Ukraine',
+    oneLiner:
+      'How much war-and-tension news mentions Ukraine, as a share of that news stream.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Ukraine’s share of tension coverage is well above its decade average and still rising.',
+      highEasing: 'Ukraine’s coverage share remains elevated but is easing.',
+      typical: 'Ukraine’s share of tension coverage sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for Ukraine in the tension news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s country index for Ukraine (GPRC_UKR): war-and-tension newspaper coverage that mentions Ukraine, monthly from 1985.',
+    whyItMatters:
+      'Which places dominate the war-and-tension news stream: Ukraine’s share is the grain-and-energy-linked lens beside Russia’s.',
+    tendedToMean:
+      'The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.',
+    forYou: 'The Ukraine lens on the war-and-tension gauge — read it beside the Russia card.',
+  },
+  'gpr-israel': {
+    name: 'Geopolitical Risk — Israel',
+    ticker: 'GPR Israel',
+    oneLiner:
+      'How much war-and-tension news mentions Israel, as a share of that news stream.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Israel’s share of tension coverage is well above its decade average and still rising.',
+      highEasing: 'Israel’s coverage share remains elevated but is easing.',
+      typical: 'Israel’s share of tension coverage sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for Israel in the tension news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s country index for Israel (GPRC_ISR): war-and-tension newspaper coverage that mentions Israel, monthly from 1985.',
+    whyItMatters:
+      'Which places dominate the war-and-tension news stream: Israel’s share is the Middle-East lens beside Saudi Arabia’s.',
+    tendedToMean:
+      'The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.',
+    forYou: 'The Israel lens on the war-and-tension gauge — read it beside the Saudi card.',
+  },
+  'gpr-saudi': {
+    name: 'Geopolitical Risk — Saudi Arabia',
+    ticker: 'GPR Saudi',
+    oneLiner:
+      'How much war-and-tension news mentions Saudi Arabia, as a share of that news stream.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Saudi Arabia’s share of tension coverage is well above its decade average and still rising.',
+      highEasing: 'Saudi Arabia’s coverage share remains elevated but is easing.',
+      typical: 'Saudi Arabia’s share of tension coverage sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for Saudi Arabia in the tension news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s country index for Saudi Arabia (GPRC_SAU): war-and-tension newspaper coverage that mentions Saudi Arabia, monthly from 1985.',
+    whyItMatters:
+      'Which places dominate the war-and-tension news stream: Saudi Arabia’s share is the Gulf energy lens beside Israel’s.',
+    tendedToMean:
+      'The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.',
+    forYou: 'The Gulf lens on the war-and-tension gauge — read it beside the oil cards.',
+  },
+  'gpr-australia': {
+    name: 'Geopolitical Risk — Australia',
+    ticker: 'GPR Australia',
+    oneLiner:
+      'How much war-and-tension news mentions Australia, as a share of that news stream.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average).',
+      highRising: 'Australia’s share of tension coverage is well above its decade average and still rising.',
+      highEasing: 'Australia’s coverage share remains elevated but is easing.',
+      typical: 'Australia’s share of tension coverage sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for Australia in the tension news.',
+    },
+    whatItIs:
+      'Caldara and Iacoviello’s country index for Australia (GPRC_AUS): war-and-tension newspaper coverage that mentions Australia, monthly from 1985.',
+    whyItMatters:
+      'Which places dominate the war-and-tension news stream: Australia’s share is the home lens on the world tension gauge.',
+    tendedToMean:
+      'The zones are measured against the country index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Country coverage is not country risk: a quiet month can mean calm, or simply that attention moved elsewhere.',
+    forYou: 'The Australia lens on the war-and-tension gauge, beside the Australian currency cards.',
+  },
+  'tpu-us': {
+    name: 'US trade policy uncertainty',
+    ticker: 'Trade uncertainty',
+    oneLiner:
+      'How much US news is about trade-policy uncertainty: the tariff-and-trade-fight share of policy coverage.',
+    lines: {
+      jumping:
+        'A historic-spike-class reading (more than 2 standard deviations above its decade average — the measured tariff-war episodes).',
+      highRising: 'Trade-policy uncertainty is well above its decade average and still rising.',
+      highEasing: 'Trade-policy uncertainty remains elevated but is easing.',
+      typical: 'Trade-policy uncertainty sits in its usual range for the past decade.',
+      low: 'An unusually quiet stretch for trade-policy news.',
+    },
+    whatItIs:
+      'Baker, Bloom and Davis’s US Trade Policy Uncertainty index: the trade-policy column of their categorical EPU measure, monthly from 1985.',
+    whyItMatters:
+      'How much of US policy news is about trade: high readings have historically come with harder planning for importers and exporters.',
+    tendedToMean:
+      'The zones are measured against the index’s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'Uncertainty is not direction: a high reading says trade policy dominates the news, not which way it goes.',
+    forYou: 'The trade leg of the policy-noise pair: read it beside the wider uncertainty gauge and the world-friction cards.',
   },
   'wti': {
     name: 'Oil price (WTI)',
