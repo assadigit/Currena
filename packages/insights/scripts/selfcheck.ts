@@ -334,6 +334,19 @@ try {
   }
   for (const [, row] of seen) suiteRows.push(row);
   if (suiteRows.length === 0) {
+    // gap-closure S3-M3.6 (2026-11-01): the empty-parse case kept happening
+    // ONLY on the GHA runner (every run since the workflow was created;
+    // locally the same spawn parses all six packages). Print what the spawn
+    // actually captured so a red run is diagnosable from the log alone.
+    console.error(
+      `[selfcheck] SUITE-DIAGNOSTIC status=${run.status} error=${run.error?.message ?? 'none'} ` +
+        `stdoutBytes=${(run.stdout ?? '').length} stderrBytes=${(run.stderr ?? '').length}`,
+    );
+    const head = (s: string) => s.slice(0, 600).replace(/\n/g, ' ⏎ ');
+    const tail = (s: string) => (s.length > 600 ? s.slice(-600).replace(/\n/g, ' ⏎ ') : '');
+    console.error(`[selfcheck] SUITE-DIAGNOSTIC stdout.head: ${head(run.stdout ?? '')}`);
+    console.error(`[selfcheck] SUITE-DIAGNOSTIC stdout.tail: ${tail(run.stdout ?? '')}`);
+    console.error(`[selfcheck] SUITE-DIAGNOSTIC stderr.head: ${head(run.stderr ?? '')}`);
     suiteRows.push({ pkg: '(suites)', tests: 0, failed: 1, ok: false, note: 'no suite output parsed — the runner output shape changed' });
   }
 } catch (err) {
@@ -407,6 +420,12 @@ console.log(`[selfcheck] wrote ${AUDIT_PATH}`);
 
 if (failed.length > 0) {
   console.error(`\n[selfcheck] FAILING TESTS: ${failed.map((f) => f.id).join(', ')}`);
+  // gap-closure S3-M3.6 (2026-11-01): print each failing row's own failure
+  // lines — a red run's log should say WHAT failed, not only that something
+  // did (the T-02/T-19 details were invisible in the scheduled runs).
+  for (const f of failed) {
+    for (const failure of f.failures) console.error(`[selfcheck]   ${f.id}: ${failure}`);
+  }
   process.exit(1);
 }
 console.log('\n[selfcheck] all tests pass.');
