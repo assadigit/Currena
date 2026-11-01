@@ -1899,6 +1899,10 @@ const LAYER1 = {
         { with: 'us10y', text: 'The 10-year yield splits into the policy outlook plus this premium.', strength: 'reliable' },
         { with: 'real-yield-10y', text: 'Both are ways the long end prices risk and inflation.', strength: 'sometimes' },
       ],
+      // gap-closure S3-M3.6 (2026-11-01): the spec's RULES §7 Australia-first
+      // note — a tendency, never a forecast.
+      australiaAngle:
+        'A rising US term premium tends to lift long-term yields worldwide, and Australian long-term rates usually feel that pull.',
       glossaryTerms: ['term-premium', 'yield', 'inflation', 'treasury-securities'],
     },
     tga: {
@@ -1955,6 +1959,10 @@ const LAYER1 = {
         { with: 'tga', text: 'One of the two drains subtracted.', strength: 'reliable' },
         { with: 'reverse-repo', text: 'The other drain subtracted.', strength: 'reliable' },
       ],
+      // gap-closure S3-M3.6 (2026-11-01): the spec's RULES §7 Australia-first
+      // note — a tendency, never a forecast.
+      australiaAngle:
+        'When US net liquidity drains, dollar funding tightens globally, and Australian banks usually pay more for offshore US-dollar funding.',
       glossaryTerms: ['net-liquidity', 'liquidity'],
     },
     /* gap-closure S3-M3.3 (2026-11-01): the credit pair’s layer-1 rows. */
@@ -2802,7 +2810,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     tendedToMean:
       'The series climbed with foreign reserve growth for two decades and has stepped lower in the 2022-24 tightening round.',
     cantTell:
-      'The custody total has no country split: it cannot say which country is buying or selling (the monthly Treasury TIC table carries that, with its own six-to-seven-week lag), and some official holders keep securities somewhere other than the Fed.',
+      'The custody total has no country split: it cannot say which countries are building or drawing down their positions (the monthly Treasury TIC table carries that, with its own six-to-seven-week lag), and some official holders keep securities somewhere other than the Fed.',
     forYou:
       'Read it beside the country table in the Who holds US government debt section above: the weekly custody level is the same story told with a shorter delay and no country detail.',
   },
@@ -2828,7 +2836,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whyItMatters:
       'The 10-year yield is two stories in one number: what the market expects the Fed to do, and how much extra it demands for committing a decade. The second part, this premium, is what tends to move when investors worry about inflation, supply or holding risk.',
     tendedToMean:
-      'The premium spent the 2010s near or below zero (the era of trusted low inflation and heavy central-bank buying) and has been rebuilt since 2021, returning toward the positive territory that was normal before the financial crisis.',
+      'The premium spent the 2010s near or below zero (the era of trusted low inflation and heavy central-bank bond purchases) and has been rebuilt since 2021, returning toward the positive territory that was normal before the financial crisis.',
     cantTell:
       'It is a model estimate, not a market price you can see on a screen, and it says nothing about the next move in yields: a high premium can rise further and a low one can vanish.',
     forYou:
@@ -2899,7 +2907,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
         'Reserves are unusually low for the decade: the buffer thinned, the setting where funding pressure tends to appear.',
     },
     whatItIs:
-      'Reserve balances with Federal Reserve Banks (the H.4.1 weekly report via FRED): the total banks hold in their own accounts at the Fed, in millions of dollars at each Wednesday.',
+      'Reserve balances with Federal Reserve Banks (the H.4.1 weekly report via FRED): the total banks keep in their own accounts at the Fed, in millions of dollars at each Wednesday.',
     whyItMatters:
       'Reserves are the raw material of the funding market: banks lend them to each other overnight at SOFR. When reserves grow scarce, that rate tends to drift above what the Fed pays, the squeeze the repo-stress card measures.',
     tendedToMean:
@@ -2921,7 +2929,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
         'Funding pressure remains but is easing.',
       typical: 'The funding gap sits in its usual range: plumbing calm.',
       low:
-        'The gap is near zero or below: cash is easy, with banks content to hold reserves at the Fed.',
+        'The gap is near zero or below: cash is easy, with banks content to park reserves at the Fed.',
     },
     whatItIs:
       'The secured overnight financing rate (SOFR) minus the interest rate on reserve balances (IORB), both via FRED: how many percentage points more (or less) borrowers pay for overnight cash compared with what banks earn parking money at the Fed.',
@@ -3180,7 +3188,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The rolling twelve-month total of the US federal surplus or deficit (FRED MTSDS133FMS, the Treasury’s Monthly Treasury Statement): every month, the sum of the last twelve months’ balances, in millions of dollars. The latest month’s own figure rides inside this card.',
     whyItMatters:
-      'Every dollar of deficit is a dollar of bonds the Treasury must sell. The total supply, not any single month, is what the market prices — and what the interest-bill card down the lane compounds.',
+      'Every dollar of deficit is a dollar of bonds the Treasury must issue. The total supply, not any single month, is what the market prices — and what the interest-bill card down the lane compounds.',
     tendedToMean:
       'The pandemic year pushed the rolling total to about 4.1 trillion dollars at its 2021 peak; the decade’s smallest reading was about 0.5 trillion (2016). The latest sits between them, toward the larger half.',
     cantTell:
@@ -3247,7 +3255,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The indirect bidders’ share of accepted bids at the latest 10-year-family Treasury auction (the Treasury FiscalData record): the accepted dollar amount taken by indirect bidders — typically foreign and intermediary buyers — as a share of all accepted bids.',
     whyItMatters:
-      'Foreign and intermediary buying is the deep pocket behind Treasury demand. When it thins, the domestic base must absorb more of the supply.',
+      'Foreign and intermediary bidders are the deep pocket behind Treasury demand. When they thin, the domestic base must absorb more of the supply.',
     tendedToMean:
       'The decade’s readings run from single digits to about 83 per cent; the latest sits near the top of that range.',
     cantTell:
@@ -3270,7 +3278,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The bid-to-cover ratio of the latest 30-year-family Treasury auction (the Treasury FiscalData auctions_query record, ex TIPS): total bids accepted per dollar of bonds accepted. The as-of date is the auction day; the same auction’s indirect-bidder share rides inside the card.',
     whyItMatters:
-      'The 30-year bond is the longest regular supply the Treasury sells: it is where patience for duration runs out first, so its auctions are watched as the demand canary.',
+      'The 30-year bond is the longest regular supply the Treasury issues: it is where patience for duration runs out first, so its auctions are watched as the demand canary.',
     tendedToMean:
       'The decade’s readings run from about 2.06 to 2.74, with most between roughly 2.1 and 2.6; the latest sits near the top of that range.',
     cantTell:
@@ -3292,11 +3300,11 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The indirect bidders’ share of accepted bids at the latest 30-year-family Treasury auction (the Treasury FiscalData record): indirect-accepted dollars as a share of all accepted bids.',
     whyItMatters:
-      'The long bond leans hardest on deep-pocketed buying: when the indirect share thins there, someone domestic is holding more duration than they may want.',
+      'The long bond leans hardest on deep-pocketed bidders: when the indirect share thins there, someone domestic ends up with more duration than they may want.',
     tendedToMean:
       'The decade’s readings run from about 37 to 79 per cent; the latest sits near the top of that range.',
     cantTell:
-      'The category hides its clients: a high share may be foreign official buying or an intermediary parking someone else’s bid.',
+      'The category hides its clients: a high share may be a foreign official account, or an intermediary parking someone else’s bid.',
     forYou: 'Read it inside the 30-year auction card, beside the bid-to-cover.',
   },
   'retail-sales': {

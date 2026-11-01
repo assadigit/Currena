@@ -307,7 +307,18 @@ interface SuiteRow {
 }
 const suiteRows: SuiteRow[] = [];
 try {
-  const run = spawnSync('pnpm', ['-r', 'test'], {
+  // gap-closure S3-M3.6 (2026-11-01): the spawn is now the SAME shape
+  // scripts/gates.mjs uses for its 'full test suite' gate — `shell: true`
+  // with the command as one string — because that shape is PROVEN on the
+  // GHA runner (every CI push parses all six package footers through it),
+  // while the previous direct `spawnSync('pnpm', ['-r', 'test'])` produced
+  // zero parseable footers on the runner in EVERY selfcheck run since the
+  // workflow was created (13 of the 17 daily runs before 2026-11-01 were
+  // red with `SUITE:(suites)` "no suite output parsed"; it worked locally
+  // but never on the hosted runner). The regex is the gates one too,
+  // tolerant of any whitespace run (`\s+`) instead of the old `{2,}`.
+  const run = spawnSync('pnpm -r run test', {
+    shell: true,
     cwd: REPO,
     encoding: 'utf8',
     timeout: 10 * 60 * 1000,
@@ -315,9 +326,9 @@ try {
   });
   const text = run.stdout + '\n' + run.stderr;
   const seen = new Map<string, SuiteRow>();
-  for (const m of text.matchAll(/^(\S+) test: {2,}Tests {2}(\d+) passed(?: \((\d+)\))?(?:, (\d+) failed)?/gm)) {
+  for (const m of text.matchAll(/^(\S+) test:\s+Tests\s+(\d[\d,]*) passed(?: \((\d+)\))?(?:, (\d+) failed)?/gm)) {
     const pkg = m[1]!.replace(/ test:$/, '');
-    const tests = Number(m[2]);
+    const tests = Number(m[2]!.replace(/,/g, ''));
     const failed = m[4] !== undefined ? Number(m[4]) : 0;
     seen.set(pkg, { pkg, tests, failed, ok: failed === 0, note: failed === 0 ? `${tests} tests` : `${failed} failing` });
   }

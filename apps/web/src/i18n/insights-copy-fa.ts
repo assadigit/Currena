@@ -6717,6 +6717,9 @@ export const insightsCopyFa: InsightsCopy = {
           { with: 'us10y', text: 'بازدهی ۱۰ ساله دو بخش دارد: چشم‌انداز سیاست به‌علاوهٔ همین صرف.', strength: 'reliable' },
           { with: 'real-yield-10y', text: 'هر دو راهی هستند که انتهای بلند منحنی، ریسک و تورم را قیمت‌گذاری می‌کند.', strength: 'sometimes' },
         ],
+        // gap-closure S3-M3.6 (۲۰۲۶-۱۱-۰۱): یادداشت استرالیا محور (رولز §۷): یک گرایش، نه پیش‌بینی.
+        australiaAngle:
+          'صرف سررسید بالاتر در آمریکا معمولاً بازدهی بلندمدت را در سراسر جهان بالا می‌برد و نرخ‌های بلندمدت استرالیا نیز همین اثر را حس می‌کنند.',
         glossaryTerms: ['term-premium', 'yield', 'inflation', 'treasury-securities'],
       },
       tga: {
@@ -6773,6 +6776,9 @@ export const insightsCopyFa: InsightsCopy = {
           { with: 'tga', text: 'یکی از دو کسرِ روایت.', strength: 'reliable' },
           { with: 'reverse-repo', text: 'کسرِ دیگر.', strength: 'reliable' },
         ],
+        // gap-closure S3-M3.6 (۲۰۲۶-۱۱-۰۱): یادداشت استرالیا محور (رولز §۷): یک گرایش، نه پیش‌بینی.
+        australiaAngle:
+          'با تخلیهٔ نقدینگی خالص آمریکا، تأمین مالی دلاری در جهان تنگ می‌شود و بانک‌های استرالیایی معمولاً بهای بیشتری برای تأمین مالی دلاری می‌پردازند.',
         glossaryTerms: ['net-liquidity', 'liquidity'],
       },
       /* gap-closure S3-M3.3 (۲۰۲۶-۱۱-۰۱): ردیف‌های زوج اعتبار (راند ۶۳). */

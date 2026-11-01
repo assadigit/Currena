@@ -1,8 +1,8 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-11-01T13:20:04.799Z · rule version 4 · export: `docs/insights/exports/currena-insights-full-2026-11-01.md`
+Generated: 2026-11-01T13:40:49.824Z · rule version 4 · export: `docs/insights/exports/currena-insights-full-2026-11-01.md`
 
-Result: **1 TEST(S) FAILED** (24 of 25 pass)
+Result: **ALL TESTS PASS** (25 of 25 pass)
 
 ## Every test, pass or fail
 
@@ -23,7 +23,7 @@ Result: **1 TEST(S) FAILED** (24 of 25 pass)
 | T-13 | Source present: every card has a source name and a data date | pass | — |
 | T-14 | Regression fixtures: saved episodes produce the stored statuses | pass | — |
 | T-17 | Attribution present: attribution-required sources carry exact text | pass | — |
-| T-19 | No advice wording in generated text | **FAIL** | en.nyfed-custody.cantTell: forbidden wording 'buy'; en.nyfed-custody.cantTell: forbidden wording 'sell'; en.term-premium-10y.tendedToMean: forbidden wording 'buy'; en.bank-reserves.whatItIs: forbidden wording 'hold'; en.repo-stress.lines.low: forbidden wording 'hold'; en.us-deficit-12m.whyItMatters: forbidden wording 'sell'; en.treasury-auction-10y-indirect.whyItMatters: forbidden wording 'buy'; en.treasury-auction-30y.whyItMatters: forbidden wording 'sell'; en.treasury-auction-30y-indirect.whyItMatters: forbidden wording 'buy'; en.treasury-auction-30y-indirect.cantTell: forbidden wording 'buy'; scope: the generated indicator sentences of both dictionaries |
+| T-19 | No advice wording in generated text | pass | scope: the generated indicator sentences of both dictionaries |
 | E-10 | Money-supply scale: the export cell carries the DISPLAYED value (23.3 trillion) | pass | the display scale is applied at export (full-export.ts exportValue); registry-sync pins the unit token |
 | E-24 | The export price table carries the peak columns | pass | — |
 | E-18 | Trend labels reproducible from the stated 3-month rule | pass | the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests |
@@ -32,7 +32,7 @@ Result: **1 TEST(S) FAILED** (24 of 25 pass)
 | SUITE:packages/insights | Unit suite — packages/insights | pass | 1093 tests |
 | SUITE:apps/markets | Unit suite — apps/markets | pass | 13 tests |
 | SUITE:apps/api | Unit suite — apps/api | pass | 393 tests |
-| SUITE:apps/web | Unit suite — apps/web | pass | 10046 tests |
+| SUITE:apps/web | Unit suite — apps/web | pass | 10060 tests |
 
 ## Stale or "can't tell" cards
 
@@ -133,7 +133,7 @@ Result: **1 TEST(S) FAILED** (24 of 25 pass)
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 77892 vs Bitstamp close 77878 (2026-11-01) → 0.02%
+- ✅ cross-check — gold-api BTC 77893 vs Bitstamp close 77838 (2026-11-01) → 0.07%
 - ✅ mof — jgbcme.csv daily 10Y + jgbcme_all.csv history
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)

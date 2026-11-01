@@ -3,8 +3,8 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "8278d63b6cd69da0ae49abf8000f3d5b6106ff0da7e209d6987a99b4267de660",
-    "faSha256": "0bef40ae7f02e85a21c9ea3a0eed5d4a8ab1ff0690a3d7edc74f115250578c2f",
+    "enSha256": "66e4b7371ea1ae117480399a01f9503edddea4f9d294812f4afe74e7bfa8c8bd",
+    "faSha256": "c96964002debd5a7fa0c4c5a71c698b5d8b6d2b0dbad46e55fef170a18fc5558",
     "indicatorCount": 152,
     "glossaryCount": 38
   },
@@ -2892,6 +2892,7 @@
             "strength": "sometimes"
           }
         ],
+        "australiaAngle": "A rising US term premium tends to lift long-term yields worldwide, and Australian long-term rates usually feel that pull.",
         "glossaryTerms": [
           "term-premium",
           "yield",
@@ -3006,6 +3007,7 @@
             "strength": "reliable"
           }
         ],
+        "australiaAngle": "When US net liquidity drains, dollar funding tightens globally, and Australian banks usually pay more for offshore US-dollar funding.",
         "glossaryTerms": [
           "net-liquidity",
           "liquidity"
@@ -6348,6 +6350,7 @@
             "strength": "sometimes"
           }
         ],
+        "australiaAngle": "صرف سررسید بالاتر در آمریکا معمولاً بازدهی بلندمدت را در سراسر جهان بالا می‌برد و نرخ‌های بلندمدت استرالیا نیز همین اثر را حس می‌کنند.",
         "glossaryTerms": [
           "term-premium",
           "yield",
@@ -6462,6 +6465,7 @@
             "strength": "reliable"
           }
         ],
+        "australiaAngle": "با تخلیهٔ نقدینگی خالص آمریکا، تأمین مالی دلاری در جهان تنگ می‌شود و بانک‌های استرالیایی معمولاً بهای بیشتری برای تأمین مالی دلاری می‌پردازند.",
         "glossaryTerms": [
           "net-liquidity",
           "liquidity"
