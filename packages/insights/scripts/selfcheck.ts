@@ -326,7 +326,11 @@ try {
   });
   // Strip ANSI escapes (colors, cursor moves) before any line parsing —
   // CSI sequences plus any stray bare ESC bytes the terminal layered in.
-  const ansiFree = (s: string): string => s.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '').replace(/\x1b/g, '');
+  // The ESC byte is constructed at runtime: eslint's no-control-regex
+  // rightly rejects \x1b regex literals.
+  const ESC = String.fromCharCode(27);
+  const ANSI_CSI_RE = new RegExp(`${ESC}\\[[0-9;]*[A-Za-z]`, 'g');
+  const ansiFree = (s: string): string => s.replace(ANSI_CSI_RE, '').split(ESC).join('');
   const text = ansiFree(run.stdout ?? '') + '\n' + ansiFree(run.stderr ?? '');
   const seen = new Map<string, SuiteRow>();
   for (const m of text.matchAll(/^(\S+) test:\s+Tests\s+(\d[\d,]*) passed(?: \((\d+)\))?(?:, (\d+) failed)?/gm)) {

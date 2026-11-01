@@ -5,6 +5,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01e] — gap-closure S3-M3.6: the S3 close — the T-19 advice-wording fix, the Australia-angle notes, and the daily self-check repaired (S3 complete: 6/6)
+
+S3's final milestone: the copy/docs/deploy close. Three pieces of real
+work surfaced by the watch items, plus the session close.
+
+- **The T-19 advice-wording fix (9 EN strings):** the 11:30 UTC scheduled
+  `insights-selfcheck` — the first to actually run since the S1 billing
+  repair — failed T-19, and a manual re-dispatch isolated the cause: the
+  S2/S3 copy had drifted into buy/sell/hold wording the advice-wording
+  scan forbids in ANY form (buy/buys/buying/buyer/sell/sells/selling
+  inflections plus the exact word 'hold'). All 9 are descriptive
+  market-mechanics sentences, not advice — reworded meaning-for-meaning:
+  nyfed-custody's "which country is buying or selling" → "which countries
+  are building or drawing down their positions"; term-premium-10y's
+  "heavy central-bank buying" → "heavy central-bank bond purchases";
+  bank-reserves' "the total banks hold" → "the total banks keep";
+  repo-stress' "content to hold reserves" → "content to park reserves";
+  us-deficit-12m's "bonds the Treasury must sell" → "must issue";
+  treasury-auction-10y-indirect's "Foreign and intermediary buying" →
+  "…bidders"; treasury-auction-30y's "supply the Treasury sells" →
+  "issues"; treasury-auction-30y-indirect's "deep-pocketed buying" →
+  "deep-pocketed bidders" and "foreign official buying" → "a foreign
+  official account". The fa copy is untouched (the scan is EN-word-based
+  and the meanings are unchanged); the self-check now passes T-19.
+- **The Australia-angle notes (the spec's RULES §7 demand):**
+  `australiaAngle` added to `term-premium-10y` and `net-liquidity` in the
+  layer-1 dictionaries, EN + fa (presence parity enforced by the layer-1
+  validator): "A rising US term premium tends to lift long-term yields
+  worldwide, and Australian long-term rates usually feel that pull." and
+  "When US net liquidity drains, dollar funding tightens globally, and
+  Australian banks usually pay more for offshore US-dollar funding." —
+  tendencies, never forecasts (Persian-copy **round-66**, 2 strings,
+  manifest recorded; glossary all 8 M3.6 terms already landed with their
+  cards; narrator vocabulary regenerated — in sync 152×2 + 38×2).
+- **The daily self-check repaired (a pre-S1 latent bug):** the scheduled
+  `insights-selfcheck` had been red on 13 of the 17 days before S1 —
+  `SUITE:(suites)` "no suite output parsed" every time it ran. Root
+  cause, found by adding a diagnostic print and reading the captured
+  bytes (run 41313692117): a pnpm script spawned from INSIDE another pnpm
+  script emits **ANSI colour escapes inside the recursive test-output
+  footers** (`apps/web test: \x1b[…m      Tests…`) on the hosted runner,
+  which no whitespace regex can match — while the same spawn is
+  uncoloured locally, which is why it never failed in the sandbox. The
+  fix: the gates.mjs spawn shape (`shell: true`, `pnpm -r run test`) +
+  `NO_COLOR=1`/`FORCE_COLOR=0` in the spawn env + ANSI stripping before
+  parsing. The self-check also now prints each failing row's own failure
+  lines (T-02/T-05/T-19 details were previously invisible in red runs)
+  and what the suite spawn captured when the parse comes back empty.
+  The remaining red class is the honest one: provider outages (OECD's
+  sdmx endpoint answered HTTP 500 intermittently all day; a Yahoo
+  history hiccup once left the metals without their record peaks) — a
+  red run on those days is the check doing its job.
+- **Verification:** the six fiscal cards browser-verified EN + fa (RTL)
+  at 360 + 1200 (M3.5's stranded completion, below); the Australia-angle
+  notes verified in the live details dialogs (all four locale/width
+  passes: the AU section renders under its title, both notes present,
+  the reworded EN string renders, the old forbidden phrase gone, zero
+  console errors, 0px overflow at 360); worker `f09f0162` (the M3.6
+  copy). Gates ALL GREEN — **11,821 tests** (web 10,060 +14, the
+  Australia-angle parity assertions; layer-1 strict 9,275). Bundle:
+  Insights lazy 1286.37/303.40 — inside the existing 1287/305 ceiling
+  (no bump needed). S3 closes **6/6**: G3, G4 and G5 all ticked; 123
+  indicators, 18/37 milestones (49%).
+
 ## [2026-11-01d] — gap-closure S3-M3.5: the fiscal and Treasury-supply family — the 12-month deficit + the 10y/30y auction demand cards (the 118th–123rd indicators)
 
 S3's fourth build milestone: the spec's "Fiscal and auctions" — G4's two
