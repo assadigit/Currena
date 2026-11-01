@@ -301,6 +301,17 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 - [ ] M4.5 New gauge and relationship cards
 - [ ] M4.6 UI, copy, docs and deploy close
 
+> **S4 session claim (2026-11-01 ~17:30 UTC):** the S4 session started
+> (baseline: `pnpm gates` ALL GREEN — 11,821 tests, matching the S3 close
+> exactly; Insights lazy 1286.37/303.40 inside the 1287/305 ceiling; origin
+> `77da6e0`, tree clean). **This session claims M4.1→M4.6 from 17:30 UTC.**
+> Any parallel S4 session must `git pull --rebase` and re-read this file
+> before starting a milestone, skip every already-ticked milestone, and
+> record its claim here. Every push does pull-rebase first (§3.4); shared
+> wording resolves by additive union, first-landed copy wins; a prior
+> session's milestone found mid-loop (code pushed, verify/tick missing) is
+> completed under the ~55-minute lapse-protocol precedent, not redone.
+
 ### S5 Australia deep-dive (`S5-australia.md`)
 - [ ] M5.1 ABS verification and fixtures
 - [ ] M5.2 Australian macro indicators
