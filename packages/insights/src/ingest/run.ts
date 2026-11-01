@@ -1484,8 +1484,10 @@ export async function runInsightsPortwatchPhase(opts: PortwatchPhaseOptions): Pr
     `  stored: ${stored === undefined ? 'absent' : `${stored.chokepoints.length} chokepoints`} · ${bootstrap ? 'BOOTSTRAP' : 'daily merge'} from ${fromDate}`,
   );
 
-  // 2. Fetch (single honest attempt per page; a failing page fails the
-  //    whole phase — the sweeps heal within hours, day gate bypassed).
+  // 2. Fetch (single honest attempt per page, EXCEPT the provider's own
+  //    transient code-400 burst errors which get up to two backed-off
+  //    retries — the M4.1 prescription; a still-failing page fails the
+  //    whole phase and the sweeps heal within hours, day gate bypassed).
   const collected = await collectPortwatchRows(fromDate, {
     ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
     ...(opts.pagePauseMs !== undefined ? { pagePauseMs: opts.pagePauseMs } : {}),

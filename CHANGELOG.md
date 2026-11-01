@@ -81,14 +81,16 @@ extra source — and the new lane whose header honestly says "not scored yet":
 - **Bundle:** Insights lazy 1332/310 → **1384/315** (measured
   1357.16/313.94 — five bilingual card families + the lane machinery;
   justified in `check-bundle-budget.mjs` §2026-11-01h + this entry).
-- **Post-deploy fix (the first live GHA run's lesson):** the host's
-  transient 400-Invalid-URL slow-start killed the collect's single
-  attempt (F-11) — the M4.1 VERIFIED-SOURCES record prescribes
+- **Post-deploy fix (the live GHA runs' lesson):** the host's transient
+  code-400 burst errors killed the collect's single attempt (F-11) — TWO
+  message variants live-observed ("Invalid URL" and "Cannot perform
+  query. Invalid query parameters."), the SAME url failing then serving
+  (~38% of attempts). The M4.1 VERIFIED-SOURCES record prescribes
   "back off and retry" for exactly this class, so the collect now gives
-  the 400-Invalid-URL error body ONE backed-off retry (10 s pause; every
+  the code-400 error-body class up to TWO backed-off 10 s retries (every
   other failure stays single-attempt). NOT a circumvention: the same
-  host serves the full data on the next attempt (live-verified twice).
-  The same run also hit the account's daily KV write cap (1000/day, the
+  host serves the full data on the next attempt (live-verified). The
+  same runs also hit the account's daily KV write cap (1000/day, the
   exceptional S3+S4 session-day load — a pre-existing condition, not an
   M4.3 change; the cap resets 00:00 UTC and the rungs self-heal).
 

@@ -149,11 +149,14 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
     // adds ≤2 more pages of the same single-batched query — 18 covers it.
     // The fetch pins its own 30 s timeout (services9.arcgis.com answered
     // 12.5 s first byte from Worker egress in the S1 probe — the TIC
-    // precedent) with a politeness pause between pages AND one backed-off
-    // retry for the host's own transient 400-Invalid-URL slow-start class
-    // (the M4.1 back-off-and-retry prescription — NOT a block; every other
-    // failure stays single-attempt, F-11; live-observed 2026-11-01: the
-    // first GHA run died to it before the retry landed).
+    // precedent) with a politeness pause between pages AND up to two
+    // backed-off retries for the host's own transient code-400 burst
+    // errors (BOTH live-observed variants: 'Invalid URL' and 'Cannot
+    // perform query. Invalid query parameters.' — the same url fails then
+    // serves; the M4.1 back-off-and-retry prescription, NOT a block; every
+    // other failure stays single-attempt, F-11; live-observed 2026-11-01:
+    // ~38% of attempts, and both GHA runs died to it before the retries
+    // landed).
     id: 'portwatch',
     rung: 3,
     gate: dailyGate(),

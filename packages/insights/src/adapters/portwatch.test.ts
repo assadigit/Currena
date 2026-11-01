@@ -97,9 +97,11 @@ describe('parsePortwatchPage (fail closed on every shape drift)', () => {
     expect(page.more).toBe(true);
   });
 
-  it('the host\'s HTTP-200-with-error body of the 400 "Invalid URL" class is the TRANSIENT error (the M4.1 back-off-and-retry prescription)', () => {
+  it('the host\'s HTTP-200-with-error body of the code-400 class is the TRANSIENT error (the M4.1 back-off-and-retry prescription — both live-observed message variants)', () => {
     expect(() => parsePortwatchPage(errorBody)).toThrow(PortwatchTransientError);
-    expect(() => parsePortwatchPage(errorBody)).toThrow(/transient slow-start/);
+    expect(() => parsePortwatchPage(errorBody)).toThrow(/transient burst error/);
+    const variant2 = JSON.stringify({ error: { code: 400, message: 'Cannot perform query. Invalid query parameters.' } });
+    expect(() => parsePortwatchPage(variant2)).toThrow(PortwatchTransientError);
   });
 
   it('any OTHER error body stays a hard single-attempt failure (F-11)', () => {
@@ -347,7 +349,7 @@ describe('collectPortwatchRows (paged, single attempt per page)', () => {
     expect(urls[1]).toContain('resultOffset=1000');
   });
 
-  it('a persistently transient page fails the whole collection after its ONE backed-off retry, with the honest report row', async () => {
+  it('a persistently transient page fails the whole collection after its two backed-off retries, with the honest report row', async () => {
     let calls = 0;
     const fetchImpl = (async (): Promise<Response> => {
       calls += 1;
@@ -355,10 +357,24 @@ describe('collectPortwatchRows (paged, single attempt per page)', () => {
     }) as typeof fetch;
     const result = await collectPortwatchRows('2025-10-01', { fetchImpl, pagePauseMs: 0, retryPauseMs: 0, now: FIXTURE_NOW });
     expect(result.rows).toEqual([]);
-    expect(calls).toBe(2); // the attempt + the one retry — never a loop
+    expect(calls).toBe(3); // the attempt + the two bounded retries — never a loop
     expect(result.reports[0]!.ok).toBe(false);
     expect(result.reports[0]!.kind).toBe('failed');
-    expect(result.reports[0]!.detail).toContain('transient slow-start');
+    expect(result.reports[0]!.detail).toContain('transient burst error');
+  });
+
+  it('BOTH live-observed code-400 message variants are the transient class (Invalid URL and Cannot perform query)', async () => {
+    const variant2 = JSON.stringify({
+      error: { code: 400, message: 'Cannot perform query. Invalid query parameters.', details: [] },
+    });
+    let calls = 0;
+    const fetchImpl = (async (): Promise<Response> => {
+      calls += 1;
+      return jsonRes(calls === 1 ? variant2 : sixtyDay);
+    }) as typeof fetch;
+    const result = await collectPortwatchRows('2026-09-15', { fetchImpl, pagePauseMs: 0, retryPauseMs: 0, now: FIXTURE_NOW });
+    expect(result.rows).toHaveLength(205); // the variant-2 burst error retried, then served
+    expect(result.reports[0]!.ok).toBe(true);
   });
 
   it('a TRANSIENT first attempt recovers on the one retry (the live-observed host behaviour: 2 of 3 probes 400, the next serves)', async () => {
