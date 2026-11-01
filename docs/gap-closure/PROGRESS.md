@@ -232,6 +232,26 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > monitors only (an independent read-only verification of the live M3.3
 > readings is recorded below in the milestone's evidence, not in any
 > shared file).
+>
+> **Fourth session's record (2026-11-01 ~10:25 UTC):** the owner restarted
+> S3 a fourth time ("continue and finish up your work; pick up from where
+> you left off"). The lapse window closed long ago with no further S3
+> commit (last: `a5cacb8` 03:34 UTC, ~6.9 h quiet; the third session's
+> M3.3 tick `25e20fd` landed the stranded completion — nothing left
+> stranded). This session re-verified the live state before claiming:
+> baseline `pnpm gates` ALL GREEN 11,140 tests (10:21 UTC); the Worker
+> rungs fired today (04:10 main + 04:35 rung4 — fred-s3 patched all six
+> M3.2 histories, ofr-fsi patched, rung3 correctly idle outside the
+> 15th–25th window on a Sunday); the GHA venue's 04:20/04:50 SCHEDULED
+> runs silently SKIPPED today (the documented GitHub class — the watchdog
+> header's own history; the venue is belt-and-braces and the 03:01
+> dispatch was green, so no action beyond the session-log note); the RBA
+> trio reads honestly (au-us-10y-gap `stale` on the Sep/Oct leg mismatch
+> — the October F2.1 has not landed as of 10:15 UTC; expected within
+> days). **This session claims M3.4→M3.6 from 10:25 UTC.** If counter-work
+> for a milestone claimed here lands on main FIRST, this session stands
+> down from that milestone and moves to the next unticked one. Every push
+> does pull-rebase first (§3.4).
 
 ### S4 Geopolitics, supply chain and energy (`S4-geopolitics-supply-energy.md`)
 - [ ] M4.1 Verification and egress
