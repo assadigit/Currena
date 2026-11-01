@@ -28,4 +28,18 @@ export interface Rung4SeriesInputs {
    * the Node venue passes both so ONE build derives everything.
    */
   credit?: { ebp?: SeriesPoint[]; ofrFsi?: SeriesPoint[] };
+  /**
+   * gap-closure S3-M3.5 (2026-11-01): the Treasury FiscalData auction
+   * families, PRE-DERIVED by the Node venue's inline collect
+   * (adapters/auctions.ts) — direct series, no derivation here. The
+   * Worker's 04:10 main rung + 04:35 phase pass NOTHING (api.fiscaldata.
+   * treasury.gov is BLOCKED from Worker egress — the S1 probe ×3): the
+   * ids carry forward until the Node venue's inline build writes them.
+   */
+  auctions?: {
+    btc10y?: SeriesPoint[];
+    indirect10y?: SeriesPoint[];
+    btc30y?: SeriesPoint[];
+    indirect30y?: SeriesPoint[];
+  };
 }

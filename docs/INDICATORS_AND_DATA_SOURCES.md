@@ -13,16 +13,16 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 117-indicator dashboard
+## 1. What indicators Currena has — the 123-indicator dashboard
 
-The Insights page renders **117 indicators** across **2 sections** (Global
-88, Australia 23 — see the
+The Insights page renders **123 indicators** across **2 sections** (Global
+94, Australia 23 — see the
 breakdown below), grouped under **9 question gauges** (5 global + 3
 australia + the prices-board strip). Of those, **48 are scored voters**
-(contribute to a gauge's verdict) and **69 are context rows** (live value +
+(contribute to a gauge's verdict) and **75 are context rows** (live value +
 10-year position bar, never vote).
 
-The live snapshot is served at `GET /api/insights` — 117 `readings` plus
+The live snapshot is served at `GET /api/insights` — 123 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -34,7 +34,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
-| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section) | 9 |
+| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section), `us-deficit-12m` (the us-deficit-monthly companion renders inside it), `treasury-auction-10y` + `treasury-auction-30y` (their *-indirect companions render inside them) (S3-M3.5) | 9 |
 
 | **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio`, `median-cpi`, `sticky-cpi` (S3-M3.4) | 5 |
 | **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4) | 5 |
@@ -49,7 +49,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (117 ids, alphabetical)
+### The complete indicator inventory (123 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -161,10 +161,16 @@ public-display-ok · scored voter? · short description.
 | `sticky-cpi` | fred | monthly | 75 | L2 | yes | – | Atlanta Fed sticky-price CPI (12-month, inflation in rarely-changing prices) |
 | `stress-stlfsi` | fred | weekly | 14 | L2 | yes | ✓ | St. Louis Fed Financial Stress Index (R10-2: 10→14, absorbs one missed weekly release — matches NFCI) |
 | `t5yie` | fred | daily | 5 | L2 | yes | – | Expected US inflation, five years ahead |
+| `treasury-auction-10y` | fiscaldata | monthly | 45 | L0 | yes | – | The latest 10-Year-family auction's bid-to-cover @ the auction date (ex TIPS) |
+| `treasury-auction-10y-indirect` | fiscaldata | monthly | 45 | L0 | yes | – | The same auction's indirect-bidder share of accepted (renders INSIDE the 10y card) |
+| `treasury-auction-30y` | fiscaldata | monthly | 45 | L0 | yes | – | The latest 30-Year-family auction's bid-to-cover @ the auction date (ex TIPS) |
+| `treasury-auction-30y-indirect` | fiscaldata | monthly | 45 | L0 | yes | – | The same long-bond auction's indirect share of accepted (renders INSIDE the 30y card) |
 | `terms-of-trade` | abs | quarterly | 215 | L0 | yes | ✓ | Australia's terms of trade |
 | `us-2y` | fred | daily | 4 | L0 | yes | – | US 2-year Treasury yield |
 | `us-cpi-core-yoy` | derived | monthly | 75 | L0 | yes | – | US core inflation (yearly, NSA) |
 | `us-cpi-yoy` | derived | monthly | 75 | L0 | yes | ✓ | US inflation (yearly, NSA) |
+| `us-deficit-12m` | derived | monthly | 75 | L0 | yes | – | The rolling 12-month federal deficit (MTSDS133FMS sum; the monthly companion rides inside) |
+| `us-deficit-monthly` | fred | monthly | 75 | L0 | yes | – | The latest month's federal surplus/deficit figure (renders INSIDE the 12m card) |
 | `us-gdp-growth` | fred | quarterly | 215 | L0 | yes | – | US economic growth (real GDP) |
 | `us-japan-10y-gap` | derived | daily | 5 | L2 | yes | ✓ | US−Japan 10Y yield gap (carry-trade fuel) |
 | `us-nfp` | derived | monthly | 70 | L0 | yes | – | US jobs added each month |
@@ -184,7 +190,7 @@ public-display-ok · scored voter? · short description.
 | `yield-curve-10y2y` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 2Y yield |
 | `yield-curve-10y3m` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 3M yield (the Fed's recession lens) |
 
-**Counts:** 117 ids total. Voters: 48 (brent votes in prices-heat per the
+**Counts:** 123 ids total. Voters: 48 (brent votes in prices-heat per the
 B-14 fix; the count is 9+5+5+3+10 + 5+7+4 = 48, which includes the
 **A-7 cftc-gold-positioning** voter in market-stress and the **A-8
 oecd-cli-us** voter in growth-health). Context: 63 (+6 S3-M3.2, +2 S3-M3.3; the S2 custody card makes 63).
@@ -228,6 +234,7 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 | provider | level | licence class | used for | free? | key needed? |
 |---|---|---|---|---|---|
 | **fred** (St. Louis Fed) | L0 + L2 | per-series T-16 scan — `#copyright-public-domain` (33 series) or `#copyright-citation-required` (23 series, display-permitted with attribution) among the 57 registered series | US rates, CPI, jobs, money, yield curves, recession probability, VIX, the S3 liquidity/funding + growth-nowcast/survey families (rung4), etc. | **free forever**, keyless | no |
+| **fiscaldata** (U.S. Treasury FiscalData API) | L0 | US government work — public domain (17 U.S.C. § 105); read 2026-11-01 (gap-closure S3-M3.5) | The Treasury auction families (treasury-auction-10y/30y + their indirect companions, rung4 ids; **Node/GHA venue ONLY — the host is BLOCKED from Worker egress**) | **free forever**, keyless | no |
 | **mof** (Japan Ministry of Finance) | L0 | Japanese government statistical release — attribution displayed | jgb-10y daily (jgbcme.csv, 15 maturities) | **free forever**, keyless | no |
 | **ecb** (ECB Data Portal) | L1 | ECB website terms (free use, accurate + cited) | ecb-dfr, euro-aaa-10y, euro-hicp | **free forever**, keyless | no |
 | **boe** (Bank of England) | L2 (owner-accepted) | UK Open Government Licence v3.0 | boe-rate (Bank Rate decision table) | **free forever**, keyless | no |
@@ -280,7 +287,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
 | `GET` | `/api/rates?source=tgju\|frankfurter` | The fallback ladder — the converter's source rates | none | 60/min/IP |
 | `GET` | `/api/convert?from=USD&to=IRR&amount=100` | Server-side conversion math (via `@currena/core`) | none | 60/min/IP |
 | `GET` | `/api/status` | Per-source status + cache age (the `/admin` pill reads this) | none | none |
-| `GET` | `/api/insights` | The 117-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
+| `GET` | `/api/insights` | The 123-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
 | `GET` | `/api/insights/:id/history` | One card's history (downsampled to ≤2700 points) | public (the L2 sources are bounded to the visible chart window) | none |
 | `GET` | `/api/insights/markets` | The world stock markets board (16 indices, EODHD-first) | public (owner directive 2026-10-18b) | none |
 | `GET` | `/api/insights/fx` | The world currencies board (10 pairs + 7 patterns, ECB rates) | public (owner directive 2026-10-21c) | none |

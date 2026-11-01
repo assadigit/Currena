@@ -240,6 +240,25 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     notes:
       'Gap-closure S3-M3.3. Worker egress OK (the host 200 in ~1.2 s in the S1 probe); daily rows 2000-01-03 → 2026-10-28, 517,157 B. Rides rung4 as its own source (daily gate — the file updates on business days with a 1–2 day lag); the fetch trims to the decade window at parse. Fixture: packages/insights/fixtures/s3/ofr-fsi-2026-11-01.csv.',
   },
+  'treasury-fiscaldata': {
+    id: 'treasury-fiscaldata',
+    provider: 'fiscaldata',
+    label: 'U.S. Department of the Treasury (FiscalData API, auctions_query)',
+    usedFor: 'treasury-auction-10y / treasury-auction-10y-indirect / treasury-auction-30y / treasury-auction-30y-indirect — the 10y and 30y original-term auction families (bid-to-cover + the indirect share of accepted) — gap-closure S3-M3.5',
+    method: 'M2',
+    runtime: 'github-action',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain (the same class as the us-tic/us-treasury rows). The FiscalData API is Treasury\u2019s own public data service (api.fiscaldata.treasury.gov); the auctions_query dataset is Treasury\u2019s published auction record. VENUE CONSTRAINT: the host is BLOCKED from Cloudflare Worker egress (timeout \u00d73 at 12 s/12 s/30 s in the S1-M1.1 probe while a normal client gets 200 JSON in <1 s \u2014 re-confirmed 2026-11-01: 3.6 s / 803 KB measured) — the GHA/Node venue is the ONLY production fetcher (the RBA precedent), runtime is never the Worker.',
+    termsReadOn: '2026-11-01',
+    attribution: 'Source: U.S. Department of the Treasury, FiscalData',
+    termsUrl: 'https://api.fiscaldata.treasury.gov/',
+    notes:
+      'Gap-closure S3-M3.5. REQUEST SHAPE (M3.1 + the 2026-11-01 re-probe, all from the provider\u2019s own responses): every FILTER on this endpoint is silently ignored (security_type / security_term / original_security_term / auction_date gte|eq) while page[size], sort AND fields= all work — ONE request page[size]=4000 sort=-auction_date fields=<the six documented fields> (~10.3 years of all auctions, 2016-07-18 \u2192 2026-10-22 measured, ~800 KB), then client-side family selection. original_security_term is the family classifier (reopenings read \u201c9-Year 10-Month\u201d with original \u201c10-Year\u201d); inflation_index_security=Yes marks TIPS (excluded). Results fields are null until the results record publishes (pending rows are skipped). The parser fails closed on envelope/field/date/numeric shape. Fixture: packages/insights/fixtures/s3/treasury-auctions-full-2026-11-01.json (the 4000-row response, verbatim).',
+  },
   'eia-spot': {
     id: 'eia-spot',
     provider: 'eia',
@@ -717,6 +736,16 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'median-cpi': ['fred:MEDCPIM158SFRBCLE'],
   'sticky-cpi': ['fred:STICKCPIM158SFRBATL'],
   'sloos-ci-tightening': ['fred:DRTSCILM'],
+  // gap-closure S3-M3.5 (2026-11-01): the fiscal and Treasury-supply
+  // family's legs — the deficit pair (FRED MTSDS133FMS, T-16 scanned
+  // 2026-11-01: public domain) + the auction families (the Treasury
+  // FiscalData API, register row 'treasury-fiscaldata', L0).
+  'us-deficit-12m': ['fred:MTSDS133FMS'],
+  'us-deficit-monthly': ['fred:MTSDS133FMS'],
+  'treasury-auction-10y': ['fiscaldata:auctions_query'],
+  'treasury-auction-10y-indirect': ['fiscaldata:auctions_query'],
+  'treasury-auction-30y': ['fiscaldata:auctions_query'],
+  'treasury-auction-30y-indirect': ['fiscaldata:auctions_query'],
 };
 
 /* ------------------------------------------------------------------ */
@@ -806,6 +835,10 @@ export function rowIdForProvider(provider: string): string {
       return 'frb-ebp';
     case 'ofr':
       return 'ofr-fsi';
+    // gap-closure S3-M3.5 (2026-11-01): the Treasury FiscalData API (the
+    // auction families — distinct from the 'treasury' yield-curve row).
+    case 'fiscaldata':
+      return 'treasury-fiscaldata';
     default:
       return provider;
   }

@@ -181,6 +181,20 @@ export interface IngestRunOptions {
    */
   creditSeries?: { ebp?: SeriesPoint[]; ofrFsi?: SeriesPoint[] };
   /**
+   * gap-closure S3-M3.5 (2026-11-01): the Treasury FiscalData auction
+   * families (pre-derived by the Node venue's inline collect —
+   * adapters/auctions.ts). The Node venue passes them so ONE build
+   * derives everything; the Worker NEVER passes them (the host is
+   * BLOCKED from Worker egress) — the ids carry forward (RUNG4_IDS ⊆
+   * CARRY_FORWARD_IDS) until the Node venue's inline build writes them.
+   */
+  auctionsSeries?: {
+    btc10y?: SeriesPoint[];
+    indirect10y?: SeriesPoint[];
+    btc30y?: SeriesPoint[];
+    indirect30y?: SeriesPoint[];
+  };
+  /**
    * The OECD mirror armed as the jgb-10y fallback (the Node venue passes
    * the FRED mirror it already collected; the 04:20 phase reads it from
    * the stage helper the main rung writes).
@@ -411,12 +425,15 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     // gap-closure S3-M3.2: the inline rung-4 fetches (Node venue + selfcheck)
     // join the build; the Worker's 04:10 main rung passes nothing (the ids
     // carry forward until the 04:35 phase patches them).
-    ...(opts.rung4Series !== undefined || opts.creditSeries !== undefined
+    ...(opts.rung4Series !== undefined || opts.creditSeries !== undefined || opts.auctionsSeries !== undefined
       ? {
           rung4: {
             ...(opts.rung4Series !== undefined ? { fredS3: opts.rung4Series } : {}),
             // gap-closure S3-M3.3: the credit pair's inline files.
             ...(opts.creditSeries !== undefined ? { credit: opts.creditSeries } : {}),
+            // gap-closure S3-M3.5: the Treasury auction families (Node
+            // venue only — the Worker cannot reach the host).
+            ...(opts.auctionsSeries !== undefined ? { auctions: opts.auctionsSeries } : {}),
           },
         }
       : {}),

@@ -184,6 +184,19 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'median-cpi': { decimals: 1, unit: 'percent' },
   'sticky-cpi': { decimals: 1, unit: 'percent' },
   'sloos-ci-tightening': { decimals: 1, unit: 'index' },
+  // gap-closure S3-M3.5 (2026-11-01): the fiscal and Treasury-supply
+  // family — the deficit pair reads $ millions as trillions (the walcl
+  // convention: "US$2.0 trillion" for the 12-month total; the monthly
+  // companion as billions, "US$26.9bn", the reverse-repo convention);
+  // the auction bid-to-cover is a plain ratio (the gold-silver
+  // convention, 2dp) and the indirect share a percent (1dp, the
+  // cftc-gold-positioning convention).
+  'us-deficit-12m': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  'us-deficit-monthly': { decimals: 1, unit: 'usd-bn', scale: 1e-3 },
+  'treasury-auction-10y': { decimals: 2, unit: 'ratio' },
+  'treasury-auction-10y-indirect': { decimals: 1, unit: 'percent' },
+  'treasury-auction-30y': { decimals: 2, unit: 'ratio' },
+  'treasury-auction-30y-indirect': { decimals: 1, unit: 'percent' },
   'retail-sales': { decimals: 1, unit: 'usd-bn', scale: 0.001 },
   'housing-permits': { decimals: 2, unit: 'permits', scale: 0.001 },
   cfnai: { decimals: 2, unit: 'index' },

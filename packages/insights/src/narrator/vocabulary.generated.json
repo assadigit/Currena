@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "9ee1a92327bc832abfe4f82ad5fc431da6f9334ad0696669c7a1d84378aaf884",
-    "faSha256": "e7d5d76720b90d02884846c0dd32cd0b881bfd06b4f6cb0b320fc44c33915a2e",
-    "indicatorCount": 146,
-    "glossaryCount": 37
+    "enSha256": "8278d63b6cd69da0ae49abf8000f3d5b6106ff0da7e209d6987a99b4267de660",
+    "faSha256": "0bef40ae7f02e85a21c9ea3a0eed5d4a8ab1ff0690a3d7edc74f115250578c2f",
+    "indicatorCount": 152,
+    "glossaryCount": 38
   },
   "en": {
     "indicators": {
@@ -3176,6 +3176,97 @@
           }
         ],
         "glossaryTerms": []
+      },
+      "us-deficit-12m": {
+        "plainName": "The 12-month US deficit",
+        "oneLine": "How much the US government borrowed over the last twelve months.",
+        "ifRising": "The government is borrowing more, adding to the supply of bonds the market has to absorb.",
+        "ifFalling": "The government is borrowing less, and the flow of new bonds is coming down.",
+        "connections": [
+          {
+            "with": "govt-interest-revenue",
+            "text": "One is the borrowing flow; that one the interest bill it grows.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us10y",
+            "text": "More bonds to place is one of the pressures yields answer to.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "bond",
+          "yield"
+        ]
+      },
+      "us-deficit-monthly": {
+        "plainName": "The month’s deficit",
+        "oneLine": "What the US government borrowed or repaid in the latest month alone.",
+        "ifRising": "The month’s borrowing gap is widening.",
+        "ifFalling": "The month’s borrowing gap is narrowing.",
+        "connections": [],
+        "glossaryTerms": []
+      },
+      "treasury-auction-10y": {
+        "plainName": "10-year auction demand",
+        "oneLine": "How many dollars chased each dollar of 10-year bonds at the latest auction.",
+        "ifRising": "Buyers bid more for each dollar of 10-year bonds: stronger demand.",
+        "ifFalling": "Buyers bid less for each dollar of 10-year bonds: thinner demand.",
+        "connections": [
+          {
+            "with": "treasury-auction-30y",
+            "text": "The same question for the long bond.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us-deficit-12m",
+            "text": "The supply the auctions answer for.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "bid-to-cover",
+          "bond"
+        ]
+      },
+      "treasury-auction-10y-indirect": {
+        "plainName": "10-year foreign share",
+        "oneLine": "The share of the latest 10-year auction taken by indirect bidders.",
+        "ifRising": "Indirect bidders took a bigger share of the 10-year auction.",
+        "ifFalling": "Indirect bidders took a smaller share of the 10-year auction.",
+        "connections": [],
+        "glossaryTerms": []
+      },
+      "treasury-auction-30y": {
+        "plainName": "30-year auction demand",
+        "oneLine": "How many dollars chased each dollar of 30-year bonds at the latest auction.",
+        "ifRising": "Buyers bid more for each dollar of long bonds: stronger demand.",
+        "ifFalling": "Buyers bid less for each dollar of long bonds: thinner demand.",
+        "connections": [
+          {
+            "with": "treasury-auction-10y",
+            "text": "The same question for the 10-year note.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us30y",
+            "text": "The yield the auctions clear against.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "bid-to-cover",
+          "bond",
+          "yield"
+        ]
+      },
+      "treasury-auction-30y-indirect": {
+        "plainName": "30-year foreign share",
+        "oneLine": "The share of the latest 30-year auction taken by indirect bidders.",
+        "ifRising": "Indirect bidders took a bigger share of the 30-year auction.",
+        "ifFalling": "Indirect bidders took a smaller share of the 30-year auction.",
+        "connections": [],
+        "glossaryTerms": []
       }
     },
     "glossary": {
@@ -3329,6 +3420,11 @@
         "term": "nowcast",
         "plain": "An estimate of something happening right now, built from data that arrives before the official number. “Now” plus “forecast”: no waiting, less certainty.",
         "example": "The Atlanta Fed’s GDPNow estimates this quarter’s growth while the quarter is still running."
+      },
+      "bid-to-cover": {
+        "term": "bid-to-cover",
+        "plain": "How many dollars were bid for every dollar of bonds a Treasury auction sold. A lower reading says demand was thinner.",
+        "example": "A bid-to-cover of 2.5 means buyers offered two and a half dollars for every dollar of bonds sold — around 2.5 has been typical."
       }
     },
     "ui": {
@@ -6536,6 +6632,97 @@
           }
         ],
         "glossaryTerms": []
+      },
+      "us-deficit-12m": {
+        "plainName": "کسری ۱۲ماههٔ آمریکا",
+        "oneLine": "چقدر دولت آمریکا در دوازده ماه گذشته بیشتر خرج کرده تا درآمد.",
+        "ifRising": "دولت بیشتر استقراض می‌کند و عرضهٔ اوراقی که بازار باید جذب کند بیشتر می‌شود.",
+        "ifFalling": "دولت کمتر استقراض می‌کند و جریان اوراق تازه رو به کاهش است.",
+        "connections": [
+          {
+            "with": "govt-interest-revenue",
+            "text": "یکی جریان استقراض است؛ آن یکی صورت‌حساب بهره‌ای که بزرگش می‌کند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us10y",
+            "text": "اوراق بیشتر برای جای‌گذاری یکی از فشارهایی است که بازده‌ها بدان پاسخ می‌دهند.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "bond",
+          "yield"
+        ]
+      },
+      "us-deficit-monthly": {
+        "plainName": "کسری ماهانهٔ آمریکا",
+        "oneLine": "دولت آمریکا در آخرین ماه به‌تنهایی چقدر استقراض یا بازپرداخت داشته است.",
+        "ifRising": "شکاف استقراض ماه در حال باز شدن است.",
+        "ifFalling": "شکاف استقراض ماه در حال جمع شدن است.",
+        "connections": [],
+        "glossaryTerms": []
+      },
+      "treasury-auction-10y": {
+        "plainName": "تقاضای حراج ۱۰ساله",
+        "oneLine": "در آخرین حراج، چند دلار برای هر دلار اوراق ۱۰ساله پیشنهاد شده است.",
+        "ifRising": "خریداران برای هر دلار اوراق ۱۰ساله بیشتر پیشنهاد می‌دهند: تقاضای قوی‌تر.",
+        "ifFalling": "خریداران برای هر دلار اوراق ۱۰ساله کمتر پیشنهاد می‌دهند: تقاضای کم‌تر.",
+        "connections": [
+          {
+            "with": "treasury-auction-30y",
+            "text": "همان پرسش برای اوراق بلندمدت.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us-deficit-12m",
+            "text": "همان عرضه‌ای که حراج‌ها بدان پاسخ می‌دهند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "bid-to-cover",
+          "bond"
+        ]
+      },
+      "treasury-auction-10y-indirect": {
+        "plainName": "سهم خارجی حراج ۱۰ساله",
+        "oneLine": "سهم پیشنهادهای پذیرفته‌شدهٔ آخرین حراج ۱۰ساله که به خریداران غیرمستقیم رسیده است.",
+        "ifRising": "خریداران غیرمستقیم سهم بزرگ‌تری از حراج ۱۰ساله برده‌اند.",
+        "ifFalling": "خریداران غیرمستقیم سهم کوچک‌تری از حراج ۱۰ساله برده‌اند.",
+        "connections": [],
+        "glossaryTerms": []
+      },
+      "treasury-auction-30y": {
+        "plainName": "تقاضای حراج ۳۰ساله",
+        "oneLine": "در آخرین حراج، چند دلار برای هر دلار اوراق ۳۰ساله پیشنهاد شده است.",
+        "ifRising": "خریداران برای هر دلار اوراق بلندمدت بیشتر پیشنهاد می‌دهند: تقاضای قوی‌تر.",
+        "ifFalling": "خریداران برای هر دلار اوراق بلندمدت کمتر پیشنهاد می‌دهند: تقاضای کم‌تر.",
+        "connections": [
+          {
+            "with": "treasury-auction-10y",
+            "text": "همان پرسش برای اوراق ۱۰ساله.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us30y",
+            "text": "بازدهی‌ای که حراج‌ها در برابرش تسویه می‌شوند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "bid-to-cover",
+          "bond",
+          "yield"
+        ]
+      },
+      "treasury-auction-30y-indirect": {
+        "plainName": "سهم خارجی حراج ۳۰ساله",
+        "oneLine": "سهم پیشنهادهای پذیرفته‌شدهٔ آخرین حراج ۳۰ساله که به خریداران غیرمستقیم رسیده است.",
+        "ifRising": "خریداران غیرمستقیم سهم بزرگ‌تری از حراج اوراق بلندمدت برده‌اند.",
+        "ifFalling": "خریداران غیرمستقیم سهم کوچک‌تری از حراج اوراق بلندمدت برده‌اند.",
+        "connections": [],
+        "glossaryTerms": []
       }
     },
     "glossary": {
@@ -6689,6 +6876,11 @@
         "term": "برآورد اکنون",
         "plain": "برآورد چیزی که همین حالا در جریان است، بر پایهٔ داده‌هایی که پیش از عدد رسمی می‌رسند. «اکنون» به‌علاوهٔ «پیش‌بینی»: بدون انتظار، با قطعیت کمتر.",
         "example": "جی‌دی‌پی‌ناوِ فدرال رزرو آتلانتا رشد همین فصل را برآورد می‌کند، در حالی که فصل هنوز تمام نشده است."
+      },
+      "bid-to-cover": {
+        "term": "نسبت پوشش حراج",
+        "plain": "چند دلار برای هر دلار اوراقی که حراج خزانه‌داری فروخت پیشنهاد شده است. قرائت پایین‌تر یعنی تقاضا کم‌تر بوده است.",
+        "example": "نسبت پوشش ۲٫۵ یعنی خریداران برای هر دلار اوراق فروخته‌شده دو‌ونیم دلار پیشنهاد داده‌اند؛ حدود ۲٫۵ مقدار معمول بوده است."
       }
     },
     "ui": {

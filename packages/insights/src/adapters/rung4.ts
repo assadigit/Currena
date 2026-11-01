@@ -58,6 +58,20 @@ export const RUNG4_IDS: readonly IndicatorId[] = [
   'median-cpi', // FRED MEDCPIM158SFRBCLE (monthly, 12-month %)
   'sticky-cpi', // FRED STICKCPIM158SFRBATL (monthly, 12-month %)
   'sloos-ci-tightening', // FRED DRTSCILM (quarterly net %)
+  // gap-closure S3-M3.5 (2026-11-01): the fiscal and Treasury-supply
+  // family. The deficit pair derives from the macro group's own
+  // MTSDS133FMS (this module's FRED phase derives both Worker- and
+  // Node-side); the AUCTION four are fetched + pre-derived by the Node
+  // venue ONLY (adapters/auctions.ts — api.fiscaldata.treasury.gov is
+  // BLOCKED from Worker egress, the S1 probe ×3): the Worker's phase
+  // never derives them, the main rung carries them, and the Node venue's
+  // inline build writes their readings + histories.
+  'us-deficit-12m', // derived: rolling 12-month sum of MTSDS133FMS
+  'us-deficit-monthly', // companion: the latest monthly MTSDS133FMS figure
+  'treasury-auction-10y', // FiscalData: the latest 10y-family bid-to-cover (Node venue only)
+  'treasury-auction-10y-indirect', // companion: the 10y indirect share of accepted
+  'treasury-auction-30y', // FiscalData: the latest 30y-family bid-to-cover (Node venue only)
+  'treasury-auction-30y-indirect', // companion: the 30y indirect share of accepted
 ];
 
 /** The rung-4 collection's output: raw FRED series + honest report rows. */
@@ -159,6 +173,23 @@ export interface Rung4DeriveLegs {
 }
 
 /**
+ * The rolling 12-month federal surplus/deficit total (gap-closure
+ * S3-M3.5): at each month, the sum of the trailing 12 MTSDS133FMS
+ * observations ($ millions; negative = deficit). Pure; returns [] when
+ * fewer than 12 observations exist (fail closed — never a partial-year
+ * sum). 4dp quantized (the F4 discipline).
+ */
+export function usDeficit12mSeries(monthly: readonly SeriesPoint[]): SeriesPoint[] {
+  const out: SeriesPoint[] = [];
+  for (let i = 11; i < monthly.length; i++) {
+    let sum = 0;
+    for (let k = i - 11; k <= i; k++) sum += monthly[k]!.value;
+    out.push({ date: monthly[i]!.date, value: Math.round(sum * 1e4) / 1e4 });
+  }
+  return out;
+}
+
+/**
  * Derive the rung-4 indicator series from the fetched S3 map + the legs.
  * Pure; total (a missing input simply omits the affected indicator — the
  * runner renders those unavailable / carries the previous reading).
@@ -198,5 +229,17 @@ export function deriveRung4IndicatorSeries(
   put('median-cpi', s3[FRED_SERIES.medianCpi]);
   put('sticky-cpi', s3[FRED_SERIES.stickyCpi]);
   put('sloos-ci-tightening', s3[FRED_SERIES.sloosCiTightening]);
+
+  // gap-closure S3-M3.5 (2026-11-01): the fiscal pair — the rolling
+  // 12-month deficit total + its monthly companion (the MTSDS133FMS
+  // series itself), both off the same macro-group fetch (the Worker's
+  // 04:35 phase and the Node venue's inline build derive them equally;
+  // the AUCTION four arrive pre-derived from the Node venue only — see
+  // adapters/auctions.ts, never this module).
+  const mtsds = s3[FRED_SERIES.federalSurplusDeficit];
+  put('us-deficit-monthly', mtsds);
+  if (mtsds !== undefined) {
+    put('us-deficit-12m', usDeficit12mSeries(mtsds));
+  }
   return out;
 }

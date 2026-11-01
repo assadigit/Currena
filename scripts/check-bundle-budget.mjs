@@ -821,7 +821,18 @@ const BUDGETS = [
   // ride existing machinery only. Measured 1256.70/297.51; raw bumps
   // 1227 → 1258, gz 291 → 299.
   // Justified in CHANGELOG §2026-11-01c.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1258_000, gz: 299_000, label: 'Insights lazy chunk' },
+  // 2026-11-01d (gap-closure S3-M3.5): 1287/305 — the fiscal and
+  // Treasury-supply family: SIX more bilingual ids (us-deficit-12m + the
+  // us-deficit-monthly companion, treasury-auction-10y/30y + their
+  // indirect-share companions — the companion pattern renders inside the
+  // parents but carries full copy) — the full bilingual indicator copy
+  // (2 dictionaries × 6 ids × 13 keys) + the layer-1 entries + the ONE
+  // glossary term (bid-to-cover — round-65) + the narrator vocabulary
+  // growth (152 indicators + 38 terms × 2 languages). The cards ride
+  // existing machinery only. Measured 1285.38/303.21; raw bumps
+  // 1258 → 1287, gz 299 → 305.
+  // Justified in CHANGELOG §2026-11-01d.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1287_000, gz: 305_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

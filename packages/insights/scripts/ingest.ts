@@ -39,6 +39,7 @@ import { HIDDEN_PUBLIC_IDS } from '../src/ingest/data';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/adapters/rung2';
 import { collectRung4Sources } from '../src/adapters/rung4';
 import { collectCreditSources } from '../src/adapters/credit';
+import { collectTreasuryAuctions } from '../src/adapters/auctions';
 import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../src/series';
 
@@ -151,6 +152,19 @@ const rung4Series = rung4.fred;
 const credit = await collectCreditSources();
 for (const row of credit.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
 
+/* ------------------------------------------------------------------
+ * The inline Treasury-auction collection (gap-closure S3-M3.5,
+ * 2026-11-01) — the FiscalData auctions_query families.
+ * api.fiscaldata.treasury.gov is BLOCKED from Worker egress (timeout ×3
+ * in the S1-M1.1 probe while a normal client gets 200 in <1 s), so THIS
+ * venue is the families' ONLY production fetcher — the RBA precedent.
+ * The Worker's rungs never fetch this host; the ids ride RUNG4_IDS (the
+ * main rung carries them until this venue's build writes them).
+ * ------------------------------------------------------------------ */
+
+const auctions = await collectTreasuryAuctions();
+for (const row of auctions.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
+
 const result = await runInsightsUpdate({
   // A dry-run without credentials takes the no-op store: runInsightsUpdate
   // skips every write when dryRun is set, and only the real store's READS
@@ -170,6 +184,10 @@ const result = await runInsightsUpdate({
   // gap-closure S3-M3.3: the inline credit files (the 04:35 phases'
   // twin — the EBP + OFR FSI pair, fail-soft per file).
   creditSeries: credit.series,
+  // gap-closure S3-M3.5: the inline Treasury-auction families (the
+  // families' ONLY venue — the Worker cannot reach the host; fail-soft:
+  // a failed fetch omits the four series and the readings carry).
+  auctionsSeries: auctions.series,
 });
 
 /* ------------------------------------------------------------------ *

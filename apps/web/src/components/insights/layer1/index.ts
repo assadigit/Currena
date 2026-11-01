@@ -112,6 +112,16 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   'median-cpi',
   'sticky-cpi',
   'sloos-ci-tightening',
+  // gap-closure S3-M3.5 (2026-11-01): the fiscal and Treasury-supply
+  // family → 123 (us-deficit-monthly + the two auction indirect shares
+  // are companion-only ids — they still carry layer-1 copy, the
+  // michigan-1y-expectations precedent).
+  'us-deficit-12m',
+  'us-deficit-monthly',
+  'treasury-auction-10y',
+  'treasury-auction-10y-indirect',
+  'treasury-auction-30y',
+  'treasury-auction-30y-indirect',
   // ----- 16 markets (packages/insights/src/markets/definitions.ts) -----
   'n225', 'asx200', 'kospi', 'hsi', 'ssec', 'taiex', 'nifty50', 'stoxx50', 'dax',
   'cac', 'ftse', 'sp500', 'ndx', 'dow', 'tsx', 'ibov',

@@ -1198,6 +1198,360 @@
       }
     },
     {
+      "id": "us-deficit-12m",
+      "title": "US federal deficit (12-month total)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (MTSDS133FMS, derived: rolling 12-month sum)",
+        "url": "https://fred.stlouisfed.org/series/MTSDS133FMS",
+        "seriesIdOrTable": "FRED:MTSDS133FMS (federal surplus or deficit, monthly $M; derived: rolling 12-month sum)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/MTSDS133FMS",
+      "methodUrl": "https://fred.stlouisfed.org/series/MTSDS133FMS",
+      "whatItIs": "The rolling twelve-month total of the US federal surplus or deficit (FRED MTSDS133FMS, the Treasury’s Monthly Treasury Statement): every month, the sum of the last twelve months’ balances, in millions of dollars. The latest month’s own figure rides inside this card.",
+      "whatItIsnt": "A deficit number is not a verdict: it moves with recessions, emergencies and tax cycles, and says nothing by itself about who bears it.",
+      "trackRecordNote": "The pandemic year pushed the rolling total to about 4.1 trillion dollars at its 2021 peak; the decade’s smallest reading was about 0.5 trillion (2016). The latest sits between them, toward the larger half.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:MTSDS133FMS"
+        ]
+      },
+      "unit": "usd-tr",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.5 session; U.S. Treasury MTS source) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:MTSDS133FMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "us-deficit-monthly",
+      "title": "US federal deficit (monthly)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "U.S. Department of the Treasury via FRED (MTSDS133FMS)",
+        "url": "https://fred.stlouisfed.org/series/MTSDS133FMS",
+        "seriesIdOrTable": "FRED:MTSDS133FMS (federal surplus or deficit [-], monthly, $ millions)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/MTSDS133FMS",
+      "methodUrl": "https://fred.stlouisfed.org/series/MTSDS133FMS",
+      "whatItIs": "The latest month’s federal surplus or deficit (FRED MTSDS133FMS, from the Treasury’s Monthly Treasury Statement), in millions of dollars. Rendered inside the 12-month card as the month’s own figure.",
+      "whatItIsnt": "One month is a receipt-and-payment calendar artifact, never a trend.",
+      "trackRecordNote": "Single months swing hard with the calendar: tax-collection months have printed surpluses even in heavy-deficit years.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:MTSDS133FMS"
+        ]
+      },
+      "unit": "usd-bn",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.5 session; U.S. Treasury MTS source) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:MTSDS133FMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "treasury-auction-10y",
+      "title": "US 10-year Treasury auction demand",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fiscaldata",
+        "name": "U.S. Department of the Treasury via FiscalData (auctions_query, 10-Year family)",
+        "url": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+        "seriesIdOrTable": "Treasury FiscalData:auctions_query (10-Year family, ex TIPS, bid_to_cover_ratio, per auction)"
+      },
+      "publisher": "U.S. Department of the Treasury (FiscalData API, auctions_query)",
+      "publisherUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "methodUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "whatItIs": "The bid-to-cover ratio of the latest 10-year-family Treasury auction (the Treasury FiscalData auctions_query record, ex TIPS): total bids accepted per dollar of bonds accepted — the standard gauge of how hard buyers fought for the bonds. The as-of date is the auction day; the card carries the same auction’s indirect-bidder share inside it.",
+      "whatItIsnt": "Bid-to-cover is one auction’s snapshot, not a level: it swings with the size of the offer, the time of year and what else was on sale that week.",
+      "trackRecordNote": "The decade’s readings run from about 2.17 to 3.43, with most between roughly 2.2 and 2.8; the latest sits near the top of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain (the same class as the us-tic/us-treasury rows). The FiscalData API is Treasury’s own public data service (api.fiscaldata.treasury.gov); the auctions_query dataset is Treasury’s published auction record. VENUE CONSTRAINT: the host is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe while a normal client gets 200 JSON in <1 s — re-confirmed 2026-11-01: 3.6 s / 803 KB measured) — the GHA/Node venue is the ONLY production fetcher (the RBA precedent), runtime is never the Worker.",
+        "termsReadOn": "2026-11-01",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "legs": [
+          "fiscaldata:auctions_query"
+        ]
+      },
+      "unit": "ratio",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-01",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105) — the same class as TREASURY/TIC above (the Treasury is a US government department on a .gov domain). The FiscalData API is Treasury’s own public data service; the auctions_query dataset is the published Treasury-auction record (verified live 2026-11-01: 200 JSON from a normal client in ~3.6 s / 803 KB). VENUE: api.fiscaldata.treasury.gov is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe) — the GHA/Node venue is the ONLY production fetcher; runtime is never the Worker. · Legs (fiscaldata:auctions_query): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://api.fiscaldata.treasury.gov/"
+      }
+    },
+    {
+      "id": "treasury-auction-10y-indirect",
+      "title": "US 10-year auction indirect share",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fiscaldata",
+        "name": "U.S. Department of the Treasury via FiscalData (auctions_query, 10-Year family)",
+        "url": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+        "seriesIdOrTable": "Treasury FiscalData:auctions_query (10-Year family, indirect_bidder_accepted ÷ total_accepted, per auction)"
+      },
+      "publisher": "U.S. Department of the Treasury (FiscalData API, auctions_query)",
+      "publisherUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "methodUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "whatItIs": "The indirect bidders’ share of accepted bids at the latest 10-year-family Treasury auction (the Treasury FiscalData record): the accepted dollar amount taken by indirect bidders — typically foreign and intermediary buyers — as a share of all accepted bids.",
+      "whatItIsnt": "Indirect bidders are a category, not a country list: the label mixes foreign official buyers with intermediaries whose end clients are unknown.",
+      "trackRecordNote": "The decade’s readings run from single digits to about 83 per cent; the latest sits near the top of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain (the same class as the us-tic/us-treasury rows). The FiscalData API is Treasury’s own public data service (api.fiscaldata.treasury.gov); the auctions_query dataset is Treasury’s published auction record. VENUE CONSTRAINT: the host is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe while a normal client gets 200 JSON in <1 s — re-confirmed 2026-11-01: 3.6 s / 803 KB measured) — the GHA/Node venue is the ONLY production fetcher (the RBA precedent), runtime is never the Worker.",
+        "termsReadOn": "2026-11-01",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "legs": [
+          "fiscaldata:auctions_query"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-01",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105) — the same class as TREASURY/TIC above (the Treasury is a US government department on a .gov domain). The FiscalData API is Treasury’s own public data service; the auctions_query dataset is the published Treasury-auction record (verified live 2026-11-01: 200 JSON from a normal client in ~3.6 s / 803 KB). VENUE: api.fiscaldata.treasury.gov is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe) — the GHA/Node venue is the ONLY production fetcher; runtime is never the Worker. · Legs (fiscaldata:auctions_query): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://api.fiscaldata.treasury.gov/"
+      }
+    },
+    {
+      "id": "treasury-auction-30y",
+      "title": "US 30-year Treasury auction demand",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fiscaldata",
+        "name": "U.S. Department of the Treasury via FiscalData (auctions_query, 30-Year family)",
+        "url": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+        "seriesIdOrTable": "Treasury FiscalData:auctions_query (30-Year family, ex TIPS, bid_to_cover_ratio, per auction)"
+      },
+      "publisher": "U.S. Department of the Treasury (FiscalData API, auctions_query)",
+      "publisherUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "methodUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "whatItIs": "The bid-to-cover ratio of the latest 30-year-family Treasury auction (the Treasury FiscalData auctions_query record, ex TIPS): total bids accepted per dollar of bonds accepted. The as-of date is the auction day; the same auction’s indirect-bidder share rides inside the card.",
+      "whatItIsnt": "One auction is a snapshot: the ratio swings with offer size and season, and long-bond auctions are sparser than every other maturity.",
+      "trackRecordNote": "The decade’s readings run from about 2.06 to 2.74, with most between roughly 2.1 and 2.6; the latest sits near the top of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain (the same class as the us-tic/us-treasury rows). The FiscalData API is Treasury’s own public data service (api.fiscaldata.treasury.gov); the auctions_query dataset is Treasury’s published auction record. VENUE CONSTRAINT: the host is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe while a normal client gets 200 JSON in <1 s — re-confirmed 2026-11-01: 3.6 s / 803 KB measured) — the GHA/Node venue is the ONLY production fetcher (the RBA precedent), runtime is never the Worker.",
+        "termsReadOn": "2026-11-01",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "legs": [
+          "fiscaldata:auctions_query"
+        ]
+      },
+      "unit": "ratio",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-01",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105) — the same class as TREASURY/TIC above (the Treasury is a US government department on a .gov domain). The FiscalData API is Treasury’s own public data service; the auctions_query dataset is the published Treasury-auction record (verified live 2026-11-01: 200 JSON from a normal client in ~3.6 s / 803 KB). VENUE: api.fiscaldata.treasury.gov is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe) — the GHA/Node venue is the ONLY production fetcher; runtime is never the Worker. · Legs (fiscaldata:auctions_query): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://api.fiscaldata.treasury.gov/"
+      }
+    },
+    {
+      "id": "treasury-auction-30y-indirect",
+      "title": "US 30-year auction indirect share",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fiscaldata",
+        "name": "U.S. Department of the Treasury via FiscalData (auctions_query, 30-Year family)",
+        "url": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+        "seriesIdOrTable": "Treasury FiscalData:auctions_query (30-Year family, indirect_bidder_accepted ÷ total_accepted, per auction)"
+      },
+      "publisher": "U.S. Department of the Treasury (FiscalData API, auctions_query)",
+      "publisherUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "methodUrl": "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      "whatItIs": "The indirect bidders’ share of accepted bids at the latest 30-year-family Treasury auction (the Treasury FiscalData record): indirect-accepted dollars as a share of all accepted bids.",
+      "whatItIsnt": "The category hides its clients: a high share may be foreign official buying or an intermediary parking someone else’s bid.",
+      "trackRecordNote": "The decade’s readings run from about 37 to 79 per cent; the latest sits near the top of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "github-action",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain (the same class as the us-tic/us-treasury rows). The FiscalData API is Treasury’s own public data service (api.fiscaldata.treasury.gov); the auctions_query dataset is Treasury’s published auction record. VENUE CONSTRAINT: the host is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe while a normal client gets 200 JSON in <1 s — re-confirmed 2026-11-01: 3.6 s / 803 KB measured) — the GHA/Node venue is the ONLY production fetcher (the RBA precedent), runtime is never the Worker.",
+        "termsReadOn": "2026-11-01",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "legs": [
+          "fiscaldata:auctions_query"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Department of the Treasury, FiscalData",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-01",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105) — the same class as TREASURY/TIC above (the Treasury is a US government department on a .gov domain). The FiscalData API is Treasury’s own public data service; the auctions_query dataset is the published Treasury-auction record (verified live 2026-11-01: 200 JSON from a normal client in ~3.6 s / 803 KB). VENUE: api.fiscaldata.treasury.gov is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe) — the GHA/Node venue is the ONLY production fetcher; runtime is never the Worker. · Legs (fiscaldata:auctions_query): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://api.fiscaldata.treasury.gov/"
+      }
+    },
+    {
       "id": "us-cpi-yoy",
       "title": "US inflation (yearly)",
       "area": {

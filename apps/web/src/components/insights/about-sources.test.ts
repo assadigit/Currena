@@ -51,10 +51,10 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  it('fred: 50 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1; the 2026-10-31 gap-closure S2-M2.4 round adds WSEFINTL1, the weekly custody card; the 2026-11-01 gap-closure S3-M3.2 round adds the four direct liquidity cards — term-premium-10y, tga, reverse-repo, bank-reserves — riding rung4; the 2026-11-01 gap-closure S3-M3.4 round adds the six growth-nowcast/survey cards — gdpnow, empire-state, continuing-claims, median-cpi, sticky-cpi, sloos-ci-tightening)', () => {
+  it('fred: 51 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1; the 2026-10-31 gap-closure S2-M2.4 round adds WSEFINTL1, the weekly custody card; the 2026-11-01 gap-closure S3-M3.2 round adds the four direct liquidity cards — term-premium-10y, tga, reverse-repo, bank-reserves — riding rung4; the 2026-11-01 gap-closure S3-M3.4 round adds the six growth-nowcast/survey cards — gdpnow, empire-state, continuing-claims, median-cpi, sticky-cpi, sloos-ci-tightening; the 2026-11-01 gap-closure S3-M3.5 round registers MTSDS133FMS — the deficit card leg)', () => {
     const fred = rows.find((r) => r.provider === 'fred');
     expect(fred).toBeDefined();
-    expect(fred!.seriesCount).toBe(50); // A-2 moves jgb-10y to the mof row; S2-M2.4 adds WSEFINTL1; S3-M3.2 adds the four direct liquidity cards; S3-M3.4 adds the six growth-nowcast/survey cards
+    expect(fred!.seriesCount).toBe(51); // A-2 moves jgb-10y to the mof row; S2-M2.4 adds WSEFINTL1; S3-M3.2 adds the four direct liquidity cards; S3-M3.4 adds the six growth-nowcast/survey cards; S3-M3.5 registers MTSDS133FMS (the deficit leg)
     expect(fred!.levels).toEqual(['L0', 'L2']);
     expect(fred!.worstLevel).toBe('L2');
     // 3 distinct licence names across the 16 series (public-domain,
@@ -85,8 +85,8 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
 
   it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses (silver-btc retired 2026-10-23, OD-7)', () => {
     const derived = rows.find((r) => r.provider === 'derived');
-    expect(derived!.seriesCount).toBe(18); // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18
-    expect(derived!.enabledCount).toBe(18); // the Session-3 tilt card is enabled (both legs' T-16 records + the recorded acceptance); the S3 spreads ride the same acceptance
+    expect(derived!.seriesCount).toBe(19); // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18 + the S3-M3.5 deficit 12-month sum (us-deficit-12m) → 19
+    expect(derived!.enabledCount).toBe(19); // the Session-3 tilt card is enabled (both legs' T-16 records + the recorded acceptance); the S3 spreads + the deficit sum ride the same acceptance
     expect(aboutEnabledState(derived!)).toBe('on');
     // Own-computation series inherit the upstream terms — the blanket
     // sidecar string (audjpy's) is one of the row's licences (sources.ts

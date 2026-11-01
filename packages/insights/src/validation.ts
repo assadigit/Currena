@@ -781,6 +781,13 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'median-cpi',
   'sticky-cpi',
   'sloos-ci-tightening',
+  // gap-closure S3-M3.5 (2026-11-01): the auction indirect shares — shares
+  // of accepted takedown in points, the cftc-gold-positioning family. The
+  // bid-to-cover ratios stay 'points' via INDEX_POINT_IDS below (the
+  // gold-silver ratio convention); the deficit pair stays 'pct' (the $-level
+  // walcl convention).
+  'treasury-auction-10y-indirect',
+  'treasury-auction-30y-indirect',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */
@@ -815,6 +822,11 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // gap-closure S3-M3.3 (2026-11-01): the OFR FSI — a standardized index
   // in standard deviations (zero = average stress), the stlfsi family.
   'ofr-fsi',
+  // gap-closure S3-M3.5 (2026-11-01): the Treasury auction bid-to-cover
+  // ratios — plain ratios (bids accepted per dollar offered), the
+  // gold-silver ratio family.
+  'treasury-auction-10y',
+  'treasury-auction-30y',
   // 2026-10-21 data-integrity round: the monthly nonfarm-payrolls change
   // speaks in thousands of jobs — a count, not a percent.
   'us-nfp',

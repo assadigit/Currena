@@ -390,6 +390,125 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // age; 21 covers two.
     staleAfterDays: 21,
   },
+  {
+    // gap-closure S3-M3.5 (2026-11-01): the rolling 12-month federal
+    // deficit — how much the US government borrowed over the last year,
+    // the supply side of the Treasury market beside the yields family
+    // (G4's fiscal leg; the govt-interest-revenue voter is the interest
+    // side of the same ledger). DERIVED: rolling 12-month sum of FRED
+    // MTSDS133FMS (monthly $ millions; negative = deficit), pure, no
+    // joins. CONTEXT (info). The latest monthly figure rides INSIDE this
+    // card as the us-deficit-monthly companion. Rides rung4 (the macro
+    // group already fetches MTSDS133FMS since M3.2).
+    id: 'us-deficit-12m',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US federal deficit (12-month total)',
+    source: 'derived',
+    sourceRef: 'FRED:MTSDS133FMS (federal surplus or deficit, monthly $M; derived: rolling 12-month sum)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The Monthly Treasury Statement publishes the month ~4–7 weeks after
+    // it ends (verified live: the 2026-09 stamp is the freshest print on
+    // 2026-11-01) — obs M-01 ages ~75d between releases, the us-cpi-yoy
+    // monthly convention.
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S3-M3.5: COMPANION-ONLY — the latest MONTHLY federal
+    // surplus/deficit figure, rendered INSIDE the us-deficit-12m card
+    // (the michigan-1y-expectations pattern), never as its own row.
+    // CONTEXT (info): the month's own number beside the 12-month total.
+    id: 'us-deficit-monthly',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US federal deficit (monthly)',
+    source: 'fred',
+    sourceRef: 'FRED:MTSDS133FMS (federal surplus or deficit [-], monthly, $ millions)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75, // the parent's MTS publication rhythm
+  },
+  {
+    // gap-closure S3-M3.5: the latest 10-year-family Treasury auction —
+    // bid-to-cover (bids accepted per dollar offered: the demand gauge)
+    // at the AUCTION date. Treasury FiscalData auctions_query (the
+    // M3.1-verified request: one page[size]=4000 sorted -auction_date
+    // fetch, client-side family selection; filters are silently ignored,
+    // fields + sort + paging work). CONTEXT (info). The indirect-bidder
+    // share of accepted rides INSIDE this card as the companion.
+    // Worker egress BLOCKED — the GHA/Node venue fetches it; the id
+    // joins RUNG4_IDS (the main rung carries it; the Node inline build
+    // writes it). EVENT-BASED cadence: each 10y-family auction lands
+    // roughly monthly (monthly reopenings + quarterly new issues).
+    id: 'treasury-auction-10y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 10-year Treasury auction demand',
+    source: 'fiscaldata',
+    sourceRef: 'Treasury FiscalData:auctions_query (10-Year family, ex TIPS, bid_to_cover_ratio, per auction)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The event-based stale rule (the spec's explicit demand): a fresh
+    // 10y-family auction lands roughly monthly (reopenings monthly, new
+    // issues quarterly — the family never skips more than ~6 weeks); 45
+    // days covers one missed or delayed cycle, then honest stale.
+    staleAfterDays: 45,
+  },
+  {
+    // gap-closure S3-M3.5: COMPANION-ONLY — the same 10y auction's
+    // indirect-bidder share of accepted (indirect_bidder_accepted ÷
+    // total_accepted, % — the foreign/intermediary demand read), rendered
+    // INSIDE the treasury-auction-10y card.
+    id: 'treasury-auction-10y-indirect',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 10-year auction indirect share',
+    source: 'fiscaldata',
+    sourceRef: 'Treasury FiscalData:auctions_query (10-Year family, indirect_bidder_accepted ÷ total_accepted, per auction)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 45, // the parent auction's event rhythm
+  },
+  {
+    // gap-closure S3-M3.5: the latest 30-year-family Treasury auction —
+    // the long-bond demand gauge, the treasury-auction-10y twin.
+    id: 'treasury-auction-30y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 30-year Treasury auction demand',
+    source: 'fiscaldata',
+    sourceRef: 'Treasury FiscalData:auctions_query (30-Year family, ex TIPS, bid_to_cover_ratio, per auction)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 45, // the 10y twin's event-based rule (a fresh 30y-family auction lands roughly monthly)
+  },
+  {
+    // gap-closure S3-M3.5: COMPANION-ONLY — the same 30y auction's
+    // indirect-bidder share of accepted, rendered INSIDE the
+    // treasury-auction-30y card.
+    id: 'treasury-auction-30y-indirect',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 30-year auction indirect share',
+    source: 'fiscaldata',
+    sourceRef: 'Treasury FiscalData:auctions_query (30-Year family, indirect_bidder_accepted ÷ total_accepted, per auction)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 45, // the parent auction's event rhythm
+  },
   /* ---------------- Global — Are prices heating up? ---------------- */
   {
     id: 'us-cpi-yoy',

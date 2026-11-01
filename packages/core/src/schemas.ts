@@ -536,6 +536,20 @@ export const IndicatorIdSchema = z.enum([
   'median-cpi', // FRED MEDCPIM158SFRBCLE (Cleveland Fed median CPI, 12-month) — context
   'sticky-cpi', // FRED STICKCPIM158SFRBATL (Atlanta Fed sticky CPI, 12-month) — context
   'sloos-ci-tightening', // FRED DRTSCILM (SLOOS net % tightening C&I standards, quarterly) — context
+  // ---- gap-closure S3 (2026-11-01, M3.5): the fiscal and Treasury-supply
+  // family — context rows in the borrowing-costs lane (G-5: context-only
+  // until any S6 promotion decision). The deficit pair derives from FRED
+  // MTSDS133FMS (verified M3.1, public domain; rides rung4's macro group);
+  // the auction families ride the Treasury FiscalData API (verified M3.1
+  // from a normal client — Worker egress BLOCKED, the GHA/Node venue is
+  // their ONLY production fetcher; the ids join RUNG4_IDS for the carry +
+  // history-exclusion discipline).
+  'us-deficit-12m', // derived: rolling 12-month sum of MTSDS133FMS (monthly $M) — context
+  'us-deficit-monthly', // companion: the latest monthly MTSDS133FMS figure, rendered INSIDE the 12m card
+  'treasury-auction-10y', // FiscalData auctions_query: the latest 10y-family bid-to-cover @ auction date — context
+  'treasury-auction-10y-indirect', // companion: the 10y auction's indirect share of accepted, INSIDE the 10y card
+  'treasury-auction-30y', // FiscalData auctions_query: the latest 30y-family bid-to-cover @ auction date — context
+  'treasury-auction-30y-indirect', // companion: the 30y auction's indirect share of accepted, INSIDE the 30y card
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 
@@ -624,6 +638,11 @@ export const IndicatorSourceSchema = z.enum([
   // L0 public domain; the rung4 'frb-ebp'/'ofr-fsi' extra sources).
   'frb',
   'ofr',
+  // gap-closure S3-M3.5 (2026-11-01): the Treasury FiscalData API
+  // (auctions_query — register row treasury-fiscaldata, L0 public domain,
+  // 17 U.S.C. § 105). Worker egress BLOCKED (timeout ×3 in the S1 probe):
+  // the GHA/Node venue is the ONLY production fetcher.
+  'fiscaldata',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage

@@ -500,6 +500,16 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // forward — present on the Node venue's inline build).
   put('ebp', inputs.rung4?.credit?.ebp);
   put('ofr-fsi', inputs.rung4?.credit?.ofrFsi);
+  // gap-closure S3-M3.5 (2026-11-01): the Treasury auction families —
+  // PRE-DERIVED by the Node venue's inline collect (adapters/auctions.ts;
+  // api.fiscaldata.treasury.gov is BLOCKED from Worker egress — the Worker
+  // passes nothing and the ids carry forward until the Node venue writes
+  // them). The deficit pair derives inside deriveRung4IndicatorSeries (the
+  // MTSDS133FMS series rides the macro-group fetch).
+  put('treasury-auction-10y', inputs.rung4?.auctions?.btc10y);
+  put('treasury-auction-10y-indirect', inputs.rung4?.auctions?.indirect10y);
+  put('treasury-auction-30y', inputs.rung4?.auctions?.btc30y);
+  put('treasury-auction-30y-indirect', inputs.rung4?.auctions?.indirect30y);
   // Step-2 add-list §B5: the Cboe VIX close (daily, full history — the
   // stored history keeps the 10-year daily window the Step-3 verdicts
   // will compute their calm/nervous thresholds from).
@@ -1054,6 +1064,34 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'sloos-ci-tightening': {
     name: 'Federal Reserve via FRED (DRTSCILM, SLOOS)',
     url: 'https://fred.stlouisfed.org/series/DRTSCILM',
+  },
+  // gap-closure S3-M3.5 (2026-11-01) — the fiscal and Treasury-supply
+  // family's source lines: the deficit pair (FRED MTSDS133FMS, the rung4
+  // macro group) + the auction families (the Treasury FiscalData API,
+  // Node-venue-only).
+  'us-deficit-12m': {
+    name: 'FRED (MTSDS133FMS, derived: rolling 12-month sum)',
+    url: 'https://fred.stlouisfed.org/series/MTSDS133FMS',
+  },
+  'us-deficit-monthly': {
+    name: 'U.S. Department of the Treasury via FRED (MTSDS133FMS)',
+    url: 'https://fred.stlouisfed.org/series/MTSDS133FMS',
+  },
+  'treasury-auction-10y': {
+    name: 'U.S. Department of the Treasury via FiscalData (auctions_query, 10-Year family)',
+    url: 'https://www.treasurydirect.gov/auctions/announcements-data-results/',
+  },
+  'treasury-auction-10y-indirect': {
+    name: 'U.S. Department of the Treasury via FiscalData (auctions_query, 10-Year family)',
+    url: 'https://www.treasurydirect.gov/auctions/announcements-data-results/',
+  },
+  'treasury-auction-30y': {
+    name: 'U.S. Department of the Treasury via FiscalData (auctions_query, 30-Year family)',
+    url: 'https://www.treasurydirect.gov/auctions/announcements-data-results/',
+  },
+  'treasury-auction-30y-indirect': {
+    name: 'U.S. Department of the Treasury via FiscalData (auctions_query, 30-Year family)',
+    url: 'https://www.treasurydirect.gov/auctions/announcements-data-results/',
   },
   'housing-permits': {
     name: 'US Census Bureau via FRED (PERMIT)',

@@ -489,6 +489,14 @@
       "checkedOn": "2026-11-01",
       "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.4 session; Federal Reserve source)",
       "url": "https://fred.stlouisfed.org/series/DRTSCILM"
+    },
+    {
+      "seriesId": "MTSDS133FMS",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-01",
+      "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.5 session; U.S. Treasury MTS source)",
+      "url": "https://fred.stlouisfed.org/series/MTSDS133FMS"
     }
   ]
 }

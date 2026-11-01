@@ -128,6 +128,15 @@ export const COMPANION_ONLY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>
   // M4 Wave 1 (OD-8/D-42, 2026-10-24): the Michigan survey's 1y inflation
   // expectations ride inside the michigan-sentiment card.
   'michigan-1y-expectations',
+  // gap-closure S3-M3.5 (2026-11-01): the fiscal and Treasury-supply
+  // family's companions — the latest monthly deficit figure rides INSIDE
+  // the us-deficit-12m card ("show the monthly figure too", the spec's
+  // own wording), and each auction's indirect-bidder share rides INSIDE
+  // its family's demand card (one card per auction: bid-to-cover + the
+  // indirect share, with the auction date).
+  'us-deficit-monthly',
+  'treasury-auction-10y-indirect',
+  'treasury-auction-30y-indirect',
 ]);
 
 /**
@@ -145,6 +154,12 @@ export const COMPANIONS: Readonly<Partial<Record<IndicatorId, readonly Indicator
   // survey's 1y inflation-expectations companion (the review's §5.1 row:
   // "carries the 1y expectations leg (FRED MICH, verified 4.2%)").
   'michigan-sentiment': ['michigan-1y-expectations'],
+  // gap-closure S3-M3.5 (2026-11-01): the 12-month deficit card carries
+  // its latest monthly figure; each auction demand card carries its
+  // auction's indirect-bidder share.
+  'us-deficit-12m': ['us-deficit-monthly'],
+  'treasury-auction-10y': ['treasury-auction-10y-indirect'],
+  'treasury-auction-30y': ['treasury-auction-30y-indirect'],
 };
 
 /** The parent card a companion belongs to, or null when it rides nowhere. */

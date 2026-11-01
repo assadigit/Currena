@@ -5,6 +5,85 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01d] — gap-closure S3-M3.5: the fiscal and Treasury-supply family — the 12-month deficit + the 10y/30y auction demand cards (the 118th–123rd indicators)
+
+S3's fourth build milestone: the spec's "Fiscal and auctions" — G4's two
+legs: the supply side (the rolling 12-month federal deficit) and the
+market's answer (the Treasury auction demand gauges). All six ids are
+CONTEXT-ONLY per G-5, placed in the borrowing-costs lane beside the
+yields family (the govt-interest-revenue voter is the interest side of
+the same ledger).
+
+- **The six ids** (the 118th–123rd; 4 cards + 2 companion-only):
+  `us-deficit-12m` (DERIVED: the rolling 12-month sum of FRED MTSDS133FMS
+  — pure, fails closed below 12 observations; the spec's "show the
+  monthly figure too" rides as `us-deficit-monthly`, the latest month's
+  own figure rendered INSIDE the 12-month card, the michigan-1y
+  companion pattern) + `treasury-auction-10y` / `treasury-auction-30y`
+  (the Treasury FiscalData auctions_query demand gauges: bid-to-cover of
+  the latest family auction at the AUCTION date, ex TIPS; the spec's
+  singular "treasury-auctions" split into two family cards — one value
+  per card, the honest modeling) each carrying its `*-indirect`
+  companion INSIDE it (the same auction's indirect-bidder share of
+  accepted).
+- **The auctions venue constraint honored:** api.fiscaldata.treasury.gov
+  is BLOCKED from Worker egress (timeout ×3 in the S1-M1.1 probe;
+  re-confirmed 2026-11-01: a normal client gets 200 JSON in ~3.6 s /
+  803 KB). The Node/GHA venue is the families' ONLY production fetcher:
+  `collectTreasuryAuctions` in `packages/insights/src/adapters/auctions.ts`
+  runs inline in scripts/ingest.ts (ONE single-attempt fetch, a pinned
+  30 s timeout — the TIC slow-host precedent), the Worker NEVER fetches
+  the host, and the four auction ids ride RUNG4_IDS so the main rung
+  carries them and the history phases exclude them (the Node inline
+  build writes their readings + histories).
+- **REQUEST SHAPE (re-probed live 2026-11-01, from the provider's own
+  responses):** every FILTER on auctions_query is silently ignored
+  (re-confirmed) while `page[size]`, `sort` AND `fields=` all WORK
+  (fields verified this round — the M3.1 note only had sort + paging).
+  ONE request `page[size]=4000&sort=-auction_date&fields=<the six
+  documented fields>` (~10.3 years of ALL auctions, 2016-07-18 →
+  2026-10-22 measured; ~800 KB), then client-side family selection:
+  `original_security_term` is the classifier, `inflation_index_security`
+  = Yes excludes TIPS, pending results (the provider's own string
+  "null") are skipped. The parser fails closed on envelope/field/date/
+  numeric shape; the family selection + the indirect share are pure,
+  pinned against the fixture (latest 10y btc 2.77 @ 2026-10-07,
+  indirect 77.8014%; latest 30y btc 2.54 @ 2026-10-08, indirect
+  70.4453% — the provider's own numbers).
+- **Event-based stale rule (the spec's explicit demand):** cadence
+  `monthly` (a fresh family auction lands roughly monthly — monthly
+  reopenings + quarterly new issues) + `staleAfterDays` 45 (one missed
+  or delayed cycle, then honest stale), pinned by test. The deficit
+  pair rides the MTS publication rhythm (75, the us-cpi-yoy convention).
+- **Licence records:** the FiscalData API registered as a NEW provider
+  (`fiscaldata` — register row `treasury-fiscaldata`, L0 public domain
+  17 U.S.C. § 105, a distinct service from the `treasury` yield-curve
+  row): LICENCES.md + RISK_REGISTER.md + SCRAPING_SPEC FS-10 +
+  sources.ts (SOURCE_RISK_REGISTER + rowIdForProvider) + licences.ts
+  (SOURCE_LICENCES — the walk initially resolved the four ids to
+  "Unverified"/hidden until this row landed, caught by the regenerated
+  registry). MTSDS133FMS's T-16 record added (public domain, re-verified
+  live from the series page). No owner_accepts needed (all L0).
+- **Copy:** full bilingual indicator copy + layer-1 entries for all six
+  (Persian-copy round-65, manifest recorded 119 + 11 re-triaged
+  strings) + the `bid-to-cover` glossary term EN+fa (the M3.6 list —
+  glossary 37 → 38 ×2); the narrator vocabulary regenerated (152
+  indicators + 38 terms ×2). The layer-1 G3/G4/G6 validators caught
+  five first-draft slips (bond/yield jargon terms missing, 'must'/'sell'
+  banned words, a digit in glossary plain — all reworded). Every
+  historical number in the copy is from the providers' own data (the
+  deficit's ~$4.1tn pandemic peak and ~$0.5tn decade floor; the auction
+  decade ranges 2.17–3.43 / 2.06–2.74, the latest near the TOP of both).
+- **Numbers:** gates ALL GREEN — **11,807 tests** (insights 1093 · web
+  10046 (+300) · api 393 · core 195 · scraper 67 · markets 13; the
+  layer-1 strict validator 9,261 assertions). Insights lazy 1258/299 →
+  **1287/305** (measured 1285.49/303.22; justified in
+  check-bundle-budget.mjs). Registry 123 indicators (80 P1 / 43 P2; 75
+  info rules). KV writes/day ~+2 (the deficit pair's history keys ride
+  the existing phase; the auction families' four history keys are
+  read-compared inline writes that change only when a new auction
+  lands, ~monthly).
+
 ## [2026-11-01c] — gap-closure S3-M3.4: the growth-nowcast and survey family — GDPNow, Empire State, continuing claims, median CPI, sticky CPI, SLOOS (the 112th–117th indicators)
 
 S3's third build milestone: the spec's "Growth nowcast and surveys" — the

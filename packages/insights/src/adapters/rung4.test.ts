@@ -23,6 +23,7 @@ import {
   RRP_BN_TO_M,
   RUNG4_IDS,
   trimFutureDated,
+  usDeficit12mSeries,
 } from './rung4';
 import { RUNG2_IDS } from './rung2';
 import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsRung4Phase } from '../ingest/run';
@@ -211,6 +212,44 @@ describe('deriveRung4IndicatorSeries (the total derivation)', () => {
 
   it('is total on absent S3 fetches (nothing derived, nothing thrown)', () => {
     expect(deriveRung4IndicatorSeries(undefined, { sofr, walcl })).toEqual({});
+  });
+
+  it('gap-closure S3-M3.5: derives the fiscal pair from MTSDS133FMS (the rolling 12-month sum + the monthly companion)', () => {
+    const withMtsds: Partial<Record<string, SeriesPoint[]>> = {
+      ...s3,
+      MTSDS133FMS: [
+        { date: '2025-10-01', value: -100_000 },
+        { date: '2025-11-01', value: -200_000 },
+        { date: '2025-12-01', value: -100_000 },
+        { date: '2026-01-01', value: -100_000 },
+        { date: '2026-02-01', value: -100_000 },
+        { date: '2026-03-01', value: -100_000 },
+        { date: '2026-04-01', value: -100_000 },
+        { date: '2026-05-01', value: -100_000 },
+        { date: '2026-06-01', value: -100_000 },
+        { date: '2026-07-01', value: -100_000 },
+        { date: '2026-08-01', value: -100_000 },
+        { date: '2026-09-01', value: -26_900.35 },
+      ],
+    };
+    const out = deriveRung4IndicatorSeries(withMtsds, {});
+    // The monthly companion is the series itself.
+    expect(out['us-deficit-monthly']).toEqual(withMtsds.MTSDS133FMS);
+    // Exactly 12 months → exactly one 12-month sum: −1,226,900.35.
+    expect(out['us-deficit-12m']).toEqual([{ date: '2026-09-01', value: -1_226_900.35 }]);
+  });
+
+  it('gap-closure S3-M3.5: usDeficit12mSeries fails closed below 12 observations (never a partial-year sum)', () => {
+    const eleven: SeriesPoint[] = Array.from({ length: 11 }, (_, i) => ({
+      date: `2025-${String((i % 12) + 1).padStart(2, '0')}-01`,
+      value: -100,
+    }));
+    expect(usDeficit12mSeries(eleven)).toEqual([]);
+    // The derivation omits the 12m card when the sum cannot be built — the
+    // reading carries — while the monthly companion still lands.
+    const out = deriveRung4IndicatorSeries({ MTSDS133FMS: eleven }, {});
+    expect(out['us-deficit-12m']).toBeUndefined(); // the empty sum omits the card — the reading carries
+    expect(out['us-deficit-monthly']).toEqual(eleven);
   });
 });
 
@@ -479,9 +518,12 @@ describe('runInsightsRung4Phase (the 04:35 orchestration)', () => {
         expect(stage.series[id], `${id} must be staged`).toBeDefined();
       }
       // The phase's OWN history keys written (the 04:25 halves' exclusion).
-      // gap-closure S3-M3.4: the liquidity six + the macro six (the credit
-      // pair is written by its own phase, not this one).
-      expect(result.histories.written).toBe(12);
+      // gap-closure S3-M3.4: the liquidity six + the macro six; gap-closure
+      // S3-M3.5: + the deficit pair (the us-deficit-12m derivation + the
+      // monthly companion, both off the macro group's own MTSDS133FMS — the
+      // AUCTION four are Node-venue-only and never appear in this phase;
+      // the credit pair is written by its own phase, not this one).
+      expect(result.histories.written).toBe(14);
       for (const id of Object.keys(result.series)) {
         expect(kv.map.has(`insights:hist:${id}`), `${id} history key`).toBe(true);
       }

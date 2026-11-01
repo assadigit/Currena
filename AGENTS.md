@@ -122,7 +122,7 @@ Package manager is **pnpm** (Node ≥ 20).
 
 **This section is the canonical on-disk record of every indicator and every
 data point the Insights page shows.** It is sourced from
-`packages/insights/src/definitions.ts` (the 117 indicators), `packages/
+`packages/insights/src/definitions.ts` (the 123 indicators), `packages/
 insights/src/markets/definitions.ts` (the 16 market indices), and
 `packages/insights/src/fx/definitions.ts` (the 10 FX pairs + the dollar
 basket + the 7 FX patterns). `data/indicators.json` is the generated
@@ -145,14 +145,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 117 indicators (48 voting [V] + 69 context [C])
+### A. The 123 indicators (48 voting [V] + 75 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (88 indicators, 32 voting)
+#### GLOBAL (94 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -176,6 +176,12 @@ position bar, never votes). `maxAge` = staleAfterDays (days before the
 | [C] | `boe-rate` | per-change | — | info | boe |
 | [C] | `boj-rate` | monthly | 75 | info | fred |
 | [C] | `nyfed-custody` | weekly | 21 | info | fred |
+| [C] | `us-deficit-12m` | monthly | 75 | info | derived |
+| [C] | `us-deficit-monthly` | monthly | 75 | info | fred |
+| [C] | `treasury-auction-10y` | monthly | 45 | info | fiscaldata |
+| [C] | `treasury-auction-10y-indirect` | monthly | 45 | info | fiscaldata |
+| [C] | `treasury-auction-30y` | monthly | 45 | info | fiscaldata |
+| [C] | `treasury-auction-30y-indirect` | monthly | 45 | info | fiscaldata |
 
 *(gap-closure S2-M2.4, 2026-10-31: `nyfed-custody` — Treasuries held in
 custody at the New York Fed for foreign official accounts, FRED
@@ -183,6 +189,18 @@ custody at the New York Fed for foreign official accounts, FRED
 with ZERO new fetches. Context-only; renders INSIDE the "Who holds US
 government debt" TIC section (HIDDEN_FROM_LANE_IDS — one reading, one
 surface), not in the borrowing-costs lane.)*
+
+*(gap-closure S3-M3.5, 2026-11-01: the fiscal and Treasury-supply family —
+the borrowing-costs lane's G4 leg. `us-deficit-12m` (derived: the rolling
+12-month sum of FRED MTSDS133FMS; the `us-deficit-monthly` companion — the
+latest month's own figure — renders INSIDE the card, the michigan-1y
+pattern) + `treasury-auction-10y` / `treasury-auction-30y` (the Treasury
+FiscalData auctions_query demand gauges, bid-to-cover at the AUCTION date;
+their `*-indirect` companions — the indirect-bidder share of accepted —
+render INSIDE the auction cards). The auction families are Node-venue-only
+(api.fiscaldata.treasury.gov is BLOCKED from Worker egress — the ids ride
+RUNG4_IDS for the carry; scripts/ingest.ts collects them inline). All
+context-only per G-5.)*
 
 **Dollar strength** (`dollar-strength` gauge — rendered inside the World
 currencies container per R9-04):

@@ -331,6 +331,13 @@ const LAYER1 = {
       plain: 'An estimate of something happening right now, built from data that arrives before the official number. “Now” plus “forecast”: no waiting, less certainty.',
       example: 'The Atlanta Fed’s GDPNow estimates this quarter’s growth while the quarter is still running.',
     },
+    // gap-closure S3-M3.5 (2026-11-01) — the Treasury-supply family's term
+    // (the M3.6 glossary list, landed with the card that uses it).
+    'bid-to-cover': {
+      term: 'bid-to-cover',
+      plain: 'How many dollars were bid for every dollar of bonds a Treasury auction sold. A lower reading says demand was thinner.',
+      example: 'A bid-to-cover of 2.5 means buyers offered two and a half dollars for every dollar of bonds sold — around 2.5 has been typical.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -2043,6 +2050,66 @@ const LAYER1 = {
       ],
       glossaryTerms: [],
     },
+    /* gap-closure S3-M3.5 (2026-11-01): the fiscal and Treasury-supply
+     * family's layer-1 rows (four cards + two companion-only ids in the
+     * borrowing-costs lane). */
+    'us-deficit-12m': {
+      plainName: 'The 12-month US deficit',
+      oneLine: 'How much the US government borrowed over the last twelve months.',
+      ifRising: 'The government is borrowing more, adding to the supply of bonds the market has to absorb.',
+      ifFalling: 'The government is borrowing less, and the flow of new bonds is coming down.',
+      connections: [
+        { with: 'govt-interest-revenue', text: 'One is the borrowing flow; that one the interest bill it grows.', strength: 'reliable' },
+        { with: 'us10y', text: 'More bonds to place is one of the pressures yields answer to.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['bond', 'yield'],
+    },
+    'us-deficit-monthly': {
+      plainName: 'The month’s deficit',
+      oneLine: 'What the US government borrowed or repaid in the latest month alone.',
+      ifRising: 'The month’s borrowing gap is widening.',
+      ifFalling: 'The month’s borrowing gap is narrowing.',
+      connections: [],
+      glossaryTerms: [],
+    },
+    'treasury-auction-10y': {
+      plainName: '10-year auction demand',
+      oneLine: 'How many dollars chased each dollar of 10-year bonds at the latest auction.',
+      ifRising: 'Buyers bid more for each dollar of 10-year bonds: stronger demand.',
+      ifFalling: 'Buyers bid less for each dollar of 10-year bonds: thinner demand.',
+      connections: [
+        { with: 'treasury-auction-30y', text: 'The same question for the long bond.', strength: 'reliable' },
+        { with: 'us-deficit-12m', text: 'The supply the auctions answer for.', strength: 'usually' },
+      ],
+      glossaryTerms: ['bid-to-cover', 'bond'],
+    },
+    'treasury-auction-10y-indirect': {
+      plainName: '10-year foreign share',
+      oneLine: 'The share of the latest 10-year auction taken by indirect bidders.',
+      ifRising: 'Indirect bidders took a bigger share of the 10-year auction.',
+      ifFalling: 'Indirect bidders took a smaller share of the 10-year auction.',
+      connections: [],
+      glossaryTerms: [],
+    },
+    'treasury-auction-30y': {
+      plainName: '30-year auction demand',
+      oneLine: 'How many dollars chased each dollar of 30-year bonds at the latest auction.',
+      ifRising: 'Buyers bid more for each dollar of long bonds: stronger demand.',
+      ifFalling: 'Buyers bid less for each dollar of long bonds: thinner demand.',
+      connections: [
+        { with: 'treasury-auction-10y', text: 'The same question for the 10-year note.', strength: 'reliable' },
+        { with: 'us30y', text: 'The yield the auctions clear against.', strength: 'usually' },
+      ],
+      glossaryTerms: ['bid-to-cover', 'bond', 'yield'],
+    },
+    'treasury-auction-30y-indirect': {
+      plainName: '30-year foreign share',
+      oneLine: 'The share of the latest 30-year auction taken by indirect bidders.',
+      ifRising: 'Indirect bidders took a bigger share of the 30-year auction.',
+      ifFalling: 'Indirect bidders took a smaller share of the 30-year auction.',
+      connections: [],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
@@ -3091,6 +3158,146 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It is a quarterly survey of bankers, not a market price: it reports what lenders say, not what borrowers do, and one quarter is not a wave.',
     forYou:
       'Read it beside the excess bond premium: one is the price of lending to companies, this is the gate — together they cover how easy business borrowing is.',
+  },
+  /* gap-closure S3-M3.5 (2026-11-01): the fiscal and Treasury-supply
+   * family — the 12-month deficit + its monthly companion, and the two
+   * auction demand cards + their indirect-share companions. Every
+   * historical number below is extracted from the providers' own data
+   * (the M3.1 fixture captures). */
+  'us-deficit-12m': {
+    name: 'US federal deficit (12-month total)',
+    ticker: '12-month deficit',
+    oneLiner:
+      'How much more the US government spent than it raised over the last twelve months — the bond supply the market must absorb.',
+    lines: {
+      highRising:
+        'The 12-month deficit is large for its decade and growing: bond supply building faster than the economy behind it.',
+      highEasing: 'The 12-month deficit remains large but is narrowing.',
+      typical: 'The 12-month deficit sits in its usual range for the decade.',
+      low:
+        'The 12-month deficit is unusually small for its decade: the government borrowing much less than the recent norm.',
+    },
+    whatItIs:
+      'The rolling twelve-month total of the US federal surplus or deficit (FRED MTSDS133FMS, the Treasury’s Monthly Treasury Statement): every month, the sum of the last twelve months’ balances, in millions of dollars. The latest month’s own figure rides inside this card.',
+    whyItMatters:
+      'Every dollar of deficit is a dollar of bonds the Treasury must sell. The total supply, not any single month, is what the market prices — and what the interest-bill card down the lane compounds.',
+    tendedToMean:
+      'The pandemic year pushed the rolling total to about 4.1 trillion dollars at its 2021 peak; the decade’s smallest reading was about 0.5 trillion (2016). The latest sits between them, toward the larger half.',
+    cantTell:
+      'A deficit number is not a verdict: it moves with recessions, emergencies and tax cycles, and says nothing by itself about who bears it.',
+    forYou:
+      'Read it with the interest-bill card and the auction demand cards: this is the supply, that is the carrying cost, and the auctions are where the market answers.',
+  },
+  'us-deficit-monthly': {
+    name: 'US federal deficit (monthly)',
+    ticker: 'Monthly deficit',
+    oneLiner:
+      'What the US government borrowed or repaid in the latest month alone.',
+    lines: {
+      highRising: 'The month’s borrowing gap is wide and widening.',
+      highEasing: 'The month’s gap remains wide but is narrowing.',
+      typical: 'The month’s balance sits in its usual range for the decade.',
+      low: 'The month’s gap is unusually small, or the month ran a surplus.',
+    },
+    whatItIs:
+      'The latest month’s federal surplus or deficit (FRED MTSDS133FMS, from the Treasury’s Monthly Treasury Statement), in millions of dollars. Rendered inside the 12-month card as the month’s own figure.',
+    whyItMatters:
+      'The monthly figure is the noisy piece the 12-month total smooths: April’s tax receipts often print a surplus, other months bunch the outlays.',
+    tendedToMean:
+      'Single months swing hard with the calendar: tax-collection months have printed surpluses even in heavy-deficit years.',
+    cantTell:
+      'One month is a receipt-and-payment calendar artifact, never a trend.',
+    forYou: 'Read it as the month’s contribution to the 12-month total beside it.',
+  },
+  'treasury-auction-10y': {
+    name: 'US 10-year Treasury auction demand',
+    ticker: '10y bid-to-cover',
+    oneLiner:
+      'How many dollars were bid for every dollar of 10-year bonds sold at the latest auction, with the auction date.',
+    lines: {
+      highRising:
+        'Auction demand for the 10-year is strong for its decade and rising: buyers bidding more for each dollar offered.',
+      highEasing: 'Auction demand remains strong but is softening.',
+      typical: '10-year auction demand sits in its usual range for the decade.',
+      low:
+        'Auction demand is unusually thin for its decade: buyers bidding close to what was offered.',
+    },
+    whatItIs:
+      'The bid-to-cover ratio of the latest 10-year-family Treasury auction (the Treasury FiscalData auctions_query record, ex TIPS): total bids accepted per dollar of bonds accepted — the standard gauge of how hard buyers fought for the bonds. The as-of date is the auction day; the card carries the same auction’s indirect-bidder share inside it.',
+    whyItMatters:
+      'This is the market’s answer to the supply the deficit card measures: thin demand at auction is where borrowing trouble shows up first, long before it shows up in yields alone.',
+    tendedToMean:
+      'The decade’s readings run from about 2.17 to 3.43, with most between roughly 2.2 and 2.8; the latest sits near the top of that range.',
+    cantTell:
+      'Bid-to-cover is one auction’s snapshot, not a level: it swings with the size of the offer, the time of year and what else was on sale that week.',
+    forYou:
+      'Read it with the indirect share inside the card: strong overall demand can hide a foreign pullback, and weak cover with a high indirect share says domestic buyers stepped back instead.',
+  },
+  'treasury-auction-10y-indirect': {
+    name: 'US 10-year auction indirect share',
+    ticker: '10y indirect share',
+    oneLiner:
+      'The share of the latest 10-year auction’s accepted bids taken by indirect bidders — the foreign and intermediary demand.',
+    lines: {
+      highRising: 'Indirect bidders are taking a larger share of the 10-year auctions.',
+      highEasing: 'The indirect share remains high but is easing.',
+      typical: 'The indirect share sits in its usual range for the decade.',
+      low: 'Indirect bidders are taking an unusually small share: foreign demand for the 10-year is thin.',
+    },
+    whatItIs:
+      'The indirect bidders’ share of accepted bids at the latest 10-year-family Treasury auction (the Treasury FiscalData record): the accepted dollar amount taken by indirect bidders — typically foreign and intermediary buyers — as a share of all accepted bids.',
+    whyItMatters:
+      'Foreign and intermediary buying is the deep pocket behind Treasury demand. When it thins, the domestic base must absorb more of the supply.',
+    tendedToMean:
+      'The decade’s readings run from single digits to about 83 per cent; the latest sits near the top of that range.',
+    cantTell:
+      'Indirect bidders are a category, not a country list: the label mixes foreign official buyers with intermediaries whose end clients are unknown.',
+    forYou: 'Read it inside the 10-year auction card, beside the bid-to-cover it complements.',
+  },
+  'treasury-auction-30y': {
+    name: 'US 30-year Treasury auction demand',
+    ticker: '30y bid-to-cover',
+    oneLiner:
+      'How many dollars were bid for every dollar of 30-year bonds sold at the latest auction, with the auction date.',
+    lines: {
+      highRising:
+        'Auction demand for the long bond is strong for its decade and rising.',
+      highEasing: 'Long-bond demand remains strong but is softening.',
+      typical: 'Long-bond auction demand sits in its usual range for the decade.',
+      low:
+        'Long-bond demand is unusually thin for its decade: the hardest-to-place maturity meeting the least fight.',
+    },
+    whatItIs:
+      'The bid-to-cover ratio of the latest 30-year-family Treasury auction (the Treasury FiscalData auctions_query record, ex TIPS): total bids accepted per dollar of bonds accepted. The as-of date is the auction day; the same auction’s indirect-bidder share rides inside the card.',
+    whyItMatters:
+      'The 30-year bond is the longest regular supply the Treasury sells: it is where patience for duration runs out first, so its auctions are watched as the demand canary.',
+    tendedToMean:
+      'The decade’s readings run from about 2.06 to 2.74, with most between roughly 2.1 and 2.6; the latest sits near the top of that range.',
+    cantTell:
+      'One auction is a snapshot: the ratio swings with offer size and season, and long-bond auctions are sparser than every other maturity.',
+    forYou:
+      'Read it beside the 10-year auction card: when the long bond lags the note, the market is telling you where its patience ends.',
+  },
+  'treasury-auction-30y-indirect': {
+    name: 'US 30-year auction indirect share',
+    ticker: '30y indirect share',
+    oneLiner:
+      'The share of the latest 30-year auction’s accepted bids taken by indirect bidders.',
+    lines: {
+      highRising: 'Indirect bidders are taking a larger share of the long-bond auctions.',
+      highEasing: 'The long-bond indirect share remains high but is easing.',
+      typical: 'The long-bond indirect share sits in its usual range for the decade.',
+      low: 'Indirect bidders are taking an unusually small share of the long bond.',
+    },
+    whatItIs:
+      'The indirect bidders’ share of accepted bids at the latest 30-year-family Treasury auction (the Treasury FiscalData record): indirect-accepted dollars as a share of all accepted bids.',
+    whyItMatters:
+      'The long bond leans hardest on deep-pocketed buying: when the indirect share thins there, someone domestic is holding more duration than they may want.',
+    tendedToMean:
+      'The decade’s readings run from about 37 to 79 per cent; the latest sits near the top of that range.',
+    cantTell:
+      'The category hides its clients: a high share may be foreign official buying or an intermediary parking someone else’s bid.',
+    forYou: 'Read it inside the 30-year auction card, beside the bid-to-cover.',
   },
   'retail-sales': {
     name: 'US retail sales',

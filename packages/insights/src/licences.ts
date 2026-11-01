@@ -451,6 +451,27 @@ const EPU: SourceLicence = {
   termsUrl: 'https://www.policyuncertainty.com/us_monthly.html',
 };
 
+/**
+ * Gap-closure S3-M3.5 (2026-11-01) — the Treasury FiscalData API
+ * (auctions_query). Same public-domain class as TREASURY (US Treasury,
+ * 17 U.S.C. § 105), a DIFFERENT service: the machine-readable auction
+ * records. VENUE: the host is BLOCKED from Worker egress (the S1-M1.1
+ * probe ×3) — the GHA/Node venue is the ONLY production fetcher.
+ */
+const FISCALDATA: SourceLicence = {
+  provider: 'fiscaldata',
+  label: 'U.S. Department of the Treasury (FiscalData API, auctions_query)',
+  licenceName: 'US government work — public domain (17 U.S.C. § 105)',
+  attributionText: 'Source: U.S. Department of the Treasury, FiscalData',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-01',
+  termsEvidence:
+    'US federal government works carry no copyright (17 U.S.C. § 105) — the same class as TREASURY/TIC above (the Treasury is a US government department on a .gov domain). The FiscalData API is Treasury\u2019s own public data service; the auctions_query dataset is the published Treasury-auction record (verified live 2026-11-01: 200 JSON from a normal client in ~3.6 s / 803 KB). VENUE: api.fiscaldata.treasury.gov is BLOCKED from Cloudflare Worker egress (timeout ×3 at 12 s/12 s/30 s in the S1-M1.1 probe) — the GHA/Node venue is the ONLY production fetcher; runtime is never the Worker.',
+  termsUrl: 'https://api.fiscaldata.treasury.gov/',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -470,6 +491,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   shiller: SHILLER,
   derived: DERIVED,
   treasury: TREASURY,
+  fiscaldata: FISCALDATA,
   tic: TIC,
   eia: EIA,
   frb: FRB,
