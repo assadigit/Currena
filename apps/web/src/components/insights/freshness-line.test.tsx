@@ -73,18 +73,17 @@ describe('P1 freshness line — the pure gate', () => {
 });
 
 describe('P1 freshness line — the rendered line (EN + FA)', () => {
-  // Deterministic clock (the briefing.test.tsx pattern): the rendered
-  // component reads the VISITOR's clock (new Date() inside
-  // FreshnessAsOfLine), so the "nothing extra for a fresh reading"
-  // invariant is only true while the fixture's asOf (2026-10-27) is
-  // young. Pin NOW so the suite stays green as real time marches on
-  // (it broke at the 2026-11-01 UTC midnight crossing).
+  // CardMetaRow reads the real clock internally — pin it to the suite's
+  // NOW so the "fresh reading renders nothing" assertions never flake at
+  // a real-world date boundary (found live: the vix fixture (asOf
+  // 2026-10-27, maxAge 4) went stale at 2026-11-01 00:00 UTC and flipped
+  // this suite red at midnight — the pure gate above always passed NOW).
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.setSystemTime(new Date(NOW));
   });
   afterEach(() => {
     vi.useRealTimers();
-    cleanup();
   });
 
   it('renders the muted line with the data marker when it fires', () => {
@@ -95,6 +94,7 @@ describe('P1 freshness line — the rendered line (EN + FA)', () => {
     expect(line?.textContent).toContain('Data as of');
     // the meta row itself is untouched beside it
     expect(container.querySelector('[data-meta-row]')).not.toBeNull();
+    cleanup();
   });
 
   it('renders the Persian line, RTL-safe wording, when it fires', () => {
@@ -107,6 +107,7 @@ describe('P1 freshness line — the rendered line (EN + FA)', () => {
     // digits at render (the template string itself carries none).
     expect(line?.textContent).toMatch(/[\u06F0-\u06F9]/);
     expect(line?.textContent).not.toContain('{date}');
+    cleanup();
   });
 
   it('renders nothing extra for a fresh reading (byte-for-byte the old meta row)', () => {
@@ -115,5 +116,6 @@ describe('P1 freshness line — the rendered line (EN + FA)', () => {
     );
     expect(container.querySelector('[data-freshness-asof]')).toBeNull();
     expect(container.querySelectorAll('p')).toHaveLength(1);
+    cleanup();
   });
 });
