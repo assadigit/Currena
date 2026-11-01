@@ -319,6 +319,46 @@ const EIA: SourceLicence = {
 };
 
 /**
+ * gap-closure S3-M3.3 (2026-11-01) — the Federal Reserve Board's own EBP
+ * file (federalreserve.gov, NOT on FRED). Same public-domain class as the
+ * TIC tables: a US federal government work (the site carries the "An
+ * official website of the United States Government" banner).
+ */
+const FRB: SourceLicence = {
+  provider: 'frb',
+  label: 'Federal Reserve Board (FEDS Notes EBP file)',
+  licenceName: 'US government work — public domain (17 U.S.C. § 105)',
+  attributionText: 'Source: Board of Governors of the Federal Reserve System',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-01',
+  termsEvidence:
+    'US federal government works carry no copyright (17 U.S.C. § 105) — the EBP file (federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv) is the Board\u2019s own published research data (the FEDS Notes excess-bond-premium model). Worker egress FAST (267/260 ms, the S1-M1.1 probe — read again in M3.1); the CSV carries no copyright notice. Columns mapped from the provider\u2019s own response 2026-11-01: date,gz_spread,ebp,est_prob.',
+  termsUrl: 'https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv',
+};
+
+/**
+ * gap-closure S3-M3.3 (2026-11-01) — the OFR Financial Stress Index file
+ * (financialresearch.gov, DISCOVERED in M3.1 from the FSI page's own
+ * fsi-indicator.js). The OFR is a bureau of the U.S. Treasury — the same
+ * public-domain class.
+ */
+const OFR: SourceLicence = {
+  provider: 'ofr',
+  label: 'U.S. Treasury Office of Financial Research (OFR FSI file)',
+  licenceName: 'US government work — public domain (17 U.S.C. § 105)',
+  attributionText: 'Source: Office of Financial Research, U.S. Department of the Treasury',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-01',
+  termsEvidence:
+    'US federal government works carry no copyright (17 U.S.C. § 105) — the OFR is a Treasury bureau on a .gov site (the site\u2019s policies page carries the Treasury Open Government Initiative statement). The file (financial-stress-index/data/fsi.csv, 517,157 B) was read from the provider\u2019s own response 2026-11-01: 10 documented columns, daily 2000-01-03 → 2026-10-28; the card reads the aggregate column only.',
+  termsUrl: 'https://www.financialresearch.gov/financial-stress-index/',
+};
+
+/**
  * 2026-10-26 gap-audit build, A-2: the Japan Ministry of Finance — the MOF
  * notice page (read live 2026-10-26, in Japanese, with the honest UA) puts
  * the site's content under Japan's Public Data Use License when no rights
@@ -432,6 +472,8 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   treasury: TREASURY,
   tic: TIC,
   eia: EIA,
+  frb: FRB,
+  ofr: OFR,
   mof: MOF,
   cftc: CFTC,
   oecd: OECD,

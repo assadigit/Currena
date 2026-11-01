@@ -765,6 +765,10 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // 'pct' — the walcl convention.
   'term-premium-10y',
   'repo-stress',
+  // gap-closure S3-M3.3 (2026-11-01): the excess bond premium — a
+  // spread in percentage points, the repo-stress family (a premium
+  // built from corporate yields minus expected default losses).
+  'ebp',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */
@@ -796,6 +800,9 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'crypto-fng', // Step 3 L1-18: the publisher's own 0-100 index speaks in index points
   'stress-stlfsi',
   'nfci',
+  // gap-closure S3-M3.3 (2026-11-01): the OFR FSI — a standardized index
+  // in standard deviations (zero = average stress), the stlfsi family.
+  'ofr-fsi',
   // 2026-10-21 data-integrity round: the monthly nonfarm-payrolls change
   // speaks in thousands of jobs — a count, not a percent.
   'us-nfp',

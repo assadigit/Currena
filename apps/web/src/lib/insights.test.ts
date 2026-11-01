@@ -584,7 +584,7 @@ describe('copy dictionaries', () => {
     // the 2026-10-31 Session-3 round adds breakeven-tilt (the G2 interplay
     // card) → 102; the 2026-10-31 gap-closure S2-M2.4 round adds
     // nyfed-custody (the weekly custody card) → 103.
-    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(109); // +6: gap-closure S3-M3.2 (2026-11-01) — the liquidity/funding family
+    expect(Object.keys(insightsCopyFa.indicators)).toHaveLength(111); // +6: gap-closure S3-M3.2 (2026-11-01) — the liquidity/funding family · +2: gap-closure S3-M3.3 (2026-11-01) — the credit pair
   });
 
   // Fix spec T-07 (2026-10-15): the CI-side corpus scan — the ingest's

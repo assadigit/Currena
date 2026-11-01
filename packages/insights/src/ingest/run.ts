@@ -88,6 +88,8 @@ import {
 import { providerFetchEnabled, SANITY_RANGES, withinSanityRange } from '../sources';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS, type Rung2FetchPlan } from '../adapters/rung2';
 import { collectRung4Sources, deriveRung4IndicatorSeries, RUNG4_IDS } from '../adapters/rung4';
+import { fetchEbpCsv, fetchOfrFsiCsv } from '../adapters/credit';
+import { classifySourceError } from '../adapters/fetch-policy';
 import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
 import type { KVLike } from './kv-store';
@@ -169,6 +171,15 @@ export interface IngestRunOptions {
    * forward (CARRY_FORWARD_IDS) until the 04:35 phase patches them.
    */
   rung4Series?: Partial<Record<string, SeriesPoint[]>>;
+  /**
+   * gap-closure S3-M3.3 (2026-11-01): the credit pair's inline files (the
+   * Fed Board EBP CSV + the OFR FSI aggregate CSV, pre-parsed + decade-
+   * trimmed). The Node venue + selfcheck pass them so ONE build derives
+   * everything; the Worker's 04:10 main rung passes nothing — the credit
+   * ids carry forward (CARRY_FORWARD_IDS) until the 04:35 phases patch
+   * them.
+   */
+  creditSeries?: { ebp?: SeriesPoint[]; ofrFsi?: SeriesPoint[] };
   /**
    * The OECD mirror armed as the jgb-10y fallback (the Node venue passes
    * the FRED mirror it already collected; the 04:20 phase reads it from
@@ -400,7 +411,15 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     // gap-closure S3-M3.2: the inline rung-4 fetches (Node venue + selfcheck)
     // join the build; the Worker's 04:10 main rung passes nothing (the ids
     // carry forward until the 04:35 phase patches them).
-    ...(opts.rung4Series !== undefined ? { rung4: { fredS3: opts.rung4Series } } : {}),
+    ...(opts.rung4Series !== undefined || opts.creditSeries !== undefined
+      ? {
+          rung4: {
+            ...(opts.rung4Series !== undefined ? { fredS3: opts.rung4Series } : {}),
+            // gap-closure S3-M3.3: the credit pair's inline files.
+            ...(opts.creditSeries !== undefined ? { credit: opts.creditSeries } : {}),
+          },
+        }
+      : {}),
     chinaPmi,
     chinaCpi,
     nbsStored,
@@ -1126,6 +1145,186 @@ export async function runInsightsRung4Phase(opts: Rung4PhaseOptions): Promise<Ru
   }
 
   return { series, reports: collected.reports, patched: true, histories };
+}
+
+/* ------------------------------------------------------------------ *
+ * The credit phase (gap-closure S3-M3.3, 2026-11-01) — the 04:35 UTC
+ * phase that owns the credit-stress pair: the Fed Board's Excess Bond
+ * Premium monthly file and the OFR Financial Stress Index daily file.
+ * The two hosts are NOT FRED (they ride the rung4 slot as their own
+ * extra sources, 'frb-ebp' + 'ofr-fsi', so their failure domains stay
+ * isolated from the S3 FRED groups and from each other). This phase is
+ * the rung-4 phase's twin with ONE simplification: no staged legs (both
+ * cards are direct — no derivation, no join).
+ *
+ * Subrequest budget per source invocation: 1 fetch + 1 snapshot read +
+ * 1 status read + 4 patch writes (snapshot, public, stage, status) + 1
+ * own history write = 8 — the ExtraSourceDef declares 10 (headroom).
+ * ------------------------------------------------------------------ */
+
+export interface CreditPhaseResult {
+  /** The fetched series (the ids the phase refreshed this run). */
+  series: Record<string, SeriesPoint[]>;
+  /** Per-file report rows (appended to insights:status). */
+  reports: InsightsSourceReport[];
+  /** Whether the snapshot + public projection were patched and written. */
+  patched: boolean;
+  /** History writes for the phase's own ids. */
+  histories: { written: number; singlePoint: number };
+}
+
+export interface CreditPhaseOptions {
+  /** The files this invocation owns ('ebp' = the frb-ebp source; 'ofr' = the ofr-fsi source). */
+  files: readonly ('ebp' | 'ofr')[];
+  /** The KV or REST store (snapshot read + writes). */
+  store: InsightsStore;
+  /** The Worker venue's RATES binding (stage read/update + history writes). */
+  kv: KVLike;
+  /** 'scheduled' (the Worker rung) or 'manual' (a dispatch). */
+  mode: 'scheduled' | 'manual';
+  /** Clock injection (tests). */
+  now?: Date;
+  /** The ids the PUBLIC projection hides. */
+  hiddenPublicIds?: ReadonlySet<string>;
+}
+
+/**
+ * THE credit phase. Fetches its files (fail-soft per file — one failing
+ * file never sinks the other), recomputes their readings (computeReading
+ * + the definitional sanity gates, the same engine the rung-2/rung-4
+ * phases apply), PATCHES the snapshot + public projection, updates the
+ * stage, appends honest report rows, and writes its OWN history keys
+ * (the 04:25/04:27 daily halves and the 04:40 periodic rung exclude them
+ * — RUNG4_IDS owns the exclusion list).
+ */
+export async function runInsightsCreditPhase(opts: CreditPhaseOptions): Promise<CreditPhaseResult> {
+  const now = opts.now ?? new Date();
+  const nowIso = now.toISOString();
+  const today = nowIso.slice(0, 10);
+  const todayMs = Date.parse(`${today}T00:00:00Z`);
+  console.log(`# Insights credit phase (S3-M3.3 EBP + OFR FSI) — ${nowIso} [${opts.mode}] files=${opts.files.join(',')}`);
+
+  // 1. Fetch the files this invocation owns (fail-soft per file).
+  const series: Record<string, SeriesPoint[]> = {};
+  const reports: InsightsSourceReport[] = [];
+  const fetchOne = async (file: 'ebp' | 'ofr'): Promise<void> => {
+    try {
+      if (file === 'ebp') {
+        series.ebp = await fetchEbpCsv({ now });
+        reports.push({ source: 'frb-ebp', ok: true, detail: `EBP file: ${series.ebp.length} obs (decade window)`, kind: 'fetched' });
+      } else {
+        series['ofr-fsi'] = await fetchOfrFsiCsv({ now });
+        reports.push({
+          source: 'ofr-fsi',
+          ok: true,
+          detail: `OFR FSI file: ${series['ofr-fsi'].length} obs (decade window)`,
+          kind: 'fetched',
+        });
+      }
+    } catch (err) {
+      reports.push({
+        source: file === 'ebp' ? 'frb-ebp' : 'ofr-fsi',
+        ok: false,
+        detail: errMessage(err),
+        kind: classifySourceError(err),
+      });
+    }
+  };
+  for (const file of opts.files) await fetchOne(file);
+  for (const row of reports) console.log(`  ${row.ok ? '✅' : '❌'} ${row.source} — ${row.detail}`);
+  const histories = { written: 0, singlePoint: 0 };
+
+  if (Object.keys(series).length === 0) {
+    console.log('[credit] nothing to patch (no file parsed)');
+    return { series, reports, patched: false, histories };
+  }
+
+  // 2. Recompute the affected readings (the same engine + guards the
+  // other phases apply).
+  const storedSnapshot = await opts.store.getSnapshot();
+  if (storedSnapshot === undefined) {
+    console.warn('[credit] no stored snapshot to patch — the next main rung builds from scratch');
+    return { series, reports, patched: false, histories };
+  }
+  const patchedReadings: IndicatorReading[] = [];
+  for (const [id, idSeries] of Object.entries(series) as [IndicatorId, SeriesPoint[]][]) {
+    const def = DEFINITIONS.find((d) => d.id === id)!;
+    const source: ReadingSource = READING_SOURCES[id] ?? { name: def.sourceRef };
+    let reading = computeReading(def, idSeries, nowIso, source);
+    // The definitional sanity range (T-28/F-14) — no band is registered
+    // for either series (the M3.2 no-invented-bounds lesson: a spread and
+    // a standardized index can honestly sit anywhere near zero).
+    const sanityBand = SANITY_RANGES[id as string];
+    if (sanityBand !== undefined && reading.value !== null && !withinSanityRange(id as string, reading.value)) {
+      const bandText = sanityBand.minExclusive
+        ? 'must be greater than zero'
+        : `must sit in ${sanityBand.min ?? '-∞'} to ${sanityBand.max ?? '∞'}`;
+      reading = {
+        ...reading,
+        value: null,
+        asOf: null,
+        status: 'unavailable',
+        flag: { test: 'T-28', reason: `value outside its allowed range (${bandText}) — rejected, can't tell right now` },
+      };
+    }
+    patchedReadings.push(reading);
+    console.log(
+      `  🔄 ${id}: ${reading.value ?? '—'} @ ${reading.asOf ?? '—'} [${reading.status}]${reading.percentile10y !== undefined ? ` pct10y=${(reading.percentile10y * 100).toFixed(0)}%` : ''}`,
+    );
+  }
+
+  // 3. Patch + write the snapshot family (the same sequence the rung-4
+  // phase performs — only the live keys are touched).
+  const patched = patchInsightsSnapshot(storedSnapshot, patchedReadings, nowIso);
+  await opts.store.putSnapshot(patched);
+  console.log('  ✍ insights:snapshot (patched)');
+  const hiddenIds = opts.hiddenPublicIds ?? new Set<string>();
+  await opts.store.putPublicSnapshot(projectSnapshotToPublic(patched, hiddenIds));
+  console.log('  ✍ insights:snapshot-public (patched)');
+
+  // 4. Update the stage (the honest record of what this phase last
+  // served; the 04:40 periodic rung reads it 5 minutes later).
+  {
+    const base = (await readStage(opts.kv)) ?? { v: STAGE_VERSION, writtenAt: nowIso, series: {} };
+    for (const [id, idSeries] of Object.entries(series)) {
+      const trimmed = trimForStage(idSeries, todayMs);
+      if (trimmed.length > 0) base.series[id] = trimmed;
+    }
+    base.writtenAt = nowIso;
+    await putStage(opts.kv, base);
+    console.log(`  ✍ ${INSIGHTS_STAGE_KEY} (updated ${Object.keys(series).join(', ')})`);
+  }
+
+  // 5. Write the phase's OWN history keys (idempotent, unconditional —
+  // the daily halves' exclusion).
+  for (const [id, idSeries] of Object.entries(series) as [IndicatorId, SeriesPoint[]][]) {
+    const history = buildHistoryFile(id, idSeries);
+    if (!history) {
+      if (idSeries.length > 0) histories.singlePoint++;
+      continue;
+    }
+    try {
+      await opts.kv.put(`insights:hist:${id}`, JSON.stringify(history));
+      histories.written++;
+    } catch (err) {
+      console.warn(`  ⚠ insights:hist:${id} failed: ${errMessage(err)}`);
+    }
+  }
+  console.log(`  history: ${histories.written} written · ${histories.singlePoint} single-point (kept)`);
+
+  // 6. Append the phase's report rows to insights:status.
+  try {
+    const status = await opts.store.getStatus();
+    if (status !== undefined) {
+      const merged = [...status.sources, ...reports];
+      await opts.store.putStatus({ ...status, sources: merged, generatedAt: nowIso });
+      console.log(`  ✍ insights:status (+${reports.length} credit rows)`);
+    }
+  } catch (err) {
+    console.warn(`  ⚠ insights:status append failed: ${errMessage(err)}`);
+  }
+
+  return { series, reports, patched: true, histories };
 }
 
 /* ------------------------------------------------------------------ *

@@ -731,6 +731,32 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "ebp",
+      "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 75,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "ofr-fsi",
+      "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 7,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "gold-silver",
       "licenceName": "Free API — commercial use permitted (their ToS)",
       "publicDisplayOk": "yes",

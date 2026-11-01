@@ -119,6 +119,11 @@ export const JARGON: JargonSpec = [
   // yield/bond pattern: still flagged, always glossed) instead of the old
   // blanket replace-it rule.
   { en: 'liquidity', fa: 'نقدینگی', termId: 'liquidity' },
+  // gap-closure S3-M3.3 (2026-11-01): the credit pair's cards use the
+  // words on their faces — each carries its own glossary term (the
+  // liquidity pattern).
+  { en: 'excess bond premium', fa: 'صرف اضافی اوراق', termId: 'excess-bond-premium' },
+  { en: 'financial stress index', fa: 'شاخص تنش مالی', termId: 'financial-stress-index' },
   { en: 'recession', fa: 'رکود', termId: 'recession' },
   { en: 'inflation', fa: 'تورم', termId: 'inflation' },
   { en: 'mortgage', fa: 'وام مسکن', termId: 'mortgage' },

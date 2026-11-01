@@ -1137,6 +1137,60 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 21,
   },
   {
+    // gap-closure S3-M3.3 (2026-11-01): the excess bond premium — the
+    // piece of corporate bond spreads left over after the expected
+    // default risk is subtracted: how much extra investors demand to
+    // lend to risky companies beyond compensation for likely losses
+    // (the credit-cycle gauge the market-stress gauge's story was
+    // missing; the ICE BofA spreads are licence-rejected, this is the
+    // licence-clean substitute). CONTEXT (info). The Fed Board's own
+    // EBP file (federalreserve.gov FEDS Notes, ebp_csv.csv, the ebp
+    // column) — L0 public domain (17 U.S.C. § 105, the us-tic class).
+    // Rides rung4 (its own 'frb-ebp' source — different host + rhythm
+    // than the FRED groups; monthly file, Saturday re-check).
+    id: 'ebp',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Excess bond premium (EBP)',
+    source: 'frb',
+    sourceRef: 'Federal Reserve Board:EBP (FEDS Notes excess bond premium file, ebp column, monthly, percentage points)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The file's own rhythm (M3.1, read live 2026-11-01): monthly rows,
+    // latest observation 2026-09-01 — the Fed Board uploads the model
+    // with a 1–2 month lag. 75 days = the us-cpi-yoy monthly convention:
+    // one full publication cycle plus grace, then honest stale.
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S3-M3.3: the OFR Financial Stress Index — the Treasury's
+    // own daily composite of credit, funding, volatility, safe-asset and
+    // equity-valuation stress (10 documented columns; the card reads the
+    // AGGREGATE, the layer-1 copy explains the components in words).
+    // CONTEXT (info) — the stress-stlfsi/nfci family. L0 public domain
+    // (17 U.S.C. § 105 — the OFR is a Treasury bureau; the file was
+    // DISCOVERED in M3.1: financial-stress-index/data/fsi.csv). Rides
+    // rung4 (its own 'ofr-fsi' source, daily gate).
+    id: 'ofr-fsi',
+    section: 'global',
+    group: 'market-stress',
+    name: 'OFR Financial Stress Index',
+    source: 'ofr',
+    sourceRef: 'Office of Financial Research:OFR-FSI (OFR FSI file, aggregate column, daily, index sd)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The file's own rhythm (M3.1, read live 2026-11-01 on a Sunday):
+    // daily rows, latest observation 2026-10-28 — business-day
+    // publication with a 1–2 day lag. 7 days = the ecb-dfr daily
+    // convention: covers a long weekend plus missed publication days,
+    // then honest stale.
+    staleAfterDays: 7,
+  },
+  {
     id: 'gold-silver',
     section: 'global',
     group: 'market-stress',

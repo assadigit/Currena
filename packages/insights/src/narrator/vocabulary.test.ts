@@ -111,8 +111,8 @@ describe('P3 getNarratorVocabulary — both languages, one shape', () => {
     expect(en.entries['vix']!.plainName).not.toMatch(/[\u0600-\u06FF]/);
   });
 
-  it('the full catalogue answers identically in both languages (138 ids)', () => {
-    expect(VOCABULARY_IDS).toHaveLength(138); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six
+  it('the full catalogue answers identically in both languages (140 ids)', () => {
+    expect(VOCABULARY_IDS).toHaveLength(140); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair
     const en = getNarratorVocabulary(VOCABULARY_IDS, 'en');
     const fa = getNarratorVocabulary(VOCABULARY_IDS, 'fa');
     expect(en.ids).toEqual(fa.ids);
@@ -137,19 +137,19 @@ describe('P3 — the generated snapshot integrity', () => {
     fa: { indicators: Record<string, unknown>; glossary: Record<string, unknown> };
   };
 
-  it('counts match the Layer-1 record (138 indicators, 34 glossary terms)', () => {
-    expect(payload.source.indicatorCount).toBe(138); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six
-    expect(payload.source.glossaryCount).toBe(34); // gap-closure S2-M2.5: +the 5 foreign-holders terms · S3-M3.2: +liquidity, term premium, TGA, reverse repo, bank reserves, net liquidity
-    expect(Object.keys(payload.en.indicators)).toHaveLength(138);
-    expect(Object.keys(payload.fa.indicators)).toHaveLength(138);
-    expect(Object.keys(payload.en.glossary)).toHaveLength(34);
-    expect(Object.keys(payload.fa.glossary)).toHaveLength(34);
+  it('counts match the Layer-1 record (140 indicators, 36 glossary terms)', () => {
+    expect(payload.source.indicatorCount).toBe(140); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair
+    expect(payload.source.glossaryCount).toBe(36); // gap-closure S2-M2.5: +the 5 foreign-holders terms · S3-M3.2: +liquidity, term premium, TGA, reverse repo, bank reserves, net liquidity · S3-M3.3: +excess bond premium, financial stress index
+    expect(Object.keys(payload.en.indicators)).toHaveLength(140);
+    expect(Object.keys(payload.fa.indicators)).toHaveLength(140);
+    expect(Object.keys(payload.en.glossary)).toHaveLength(36);
+    expect(Object.keys(payload.fa.glossary)).toHaveLength(36);
   });
 
   it("records its source provenance (the dictionaries' sha256)", () => {
     expect(payload.source.enSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(payload.source.faSha256).toMatch(/^[0-9a-f]{64}$/);
-    expect(VOCABULARY_SOURCE.indicatorCount).toBe(138);
+    expect(VOCABULARY_SOURCE.indicatorCount).toBe(140); // S3-M3.3: +the credit pair
   });
 });
 

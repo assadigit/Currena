@@ -13,6 +13,7 @@ export {
   runInsightsHistoryPhase,
   runInsightsRung2Phase,
   runInsightsRung4Phase,
+  runInsightsCreditPhase,
   writeAllHistoriesInline,
   historyPhaseIds,
   SEED_IDS,
@@ -31,6 +32,8 @@ export type {
   Rung2PhaseResult,
   Rung4PhaseOptions,
   Rung4PhaseResult,
+  CreditPhaseOptions,
+  CreditPhaseResult,
 } from './run';
 
 export { KvInsightsStore } from './kv-store';

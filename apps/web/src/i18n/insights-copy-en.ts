@@ -314,6 +314,16 @@ const LAYER1 = {
       term: 'net liquidity',
       plain: 'The money actually available to markets: the Fed’s balance sheet minus the Treasury’s account and the overnight cash parked back at the Fed.',
     },
+    /* gap-closure S3-M3.3 (2026-11-01): the credit pair's terms (M3.6's
+     * list, landed with the cards that use them — the M3.2 pattern). */
+    'excess-bond-premium': {
+      term: 'excess bond premium',
+      plain: 'The part of what investors demand for lending to risky companies that is NOT compensation for expected losses — the pure extra charge for risk appetite itself.',
+    },
+    'financial-stress-index': {
+      term: 'financial stress index',
+      plain: 'A daily score of how strained money markets are. The OFR’s own combines credit, funding, volatility, safe-asset and equity-valuation pressure into one number around zero (zero = its long-run average).',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -1933,6 +1943,29 @@ const LAYER1 = {
       ],
       glossaryTerms: ['net-liquidity', 'liquidity'],
     },
+    /* gap-closure S3-M3.3 (2026-11-01): the credit pair’s layer-1 rows. */
+    'ebp': {
+      plainName: 'Excess bond premium',
+      oneLine: 'How much extra investors demand to lend to risky companies, beyond covering the losses they expect.',
+      ifRising: 'Lenders are charging more for risk appetite itself, not just for expected defaults.',
+      ifFalling: 'Credit is priced closer to expected losses alone: the pure risk-appetite charge is coming down.',
+      connections: [
+        { with: 'ofr-fsi', text: 'A rising premium feeds the same strain the stress index folds together.', strength: 'sometimes' },
+        { with: 'term-premium-10y', text: 'One is the extra charge for lending long to the government; this one for lending to companies.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['excess-bond-premium', 'bond'],
+    },
+    'ofr-fsi': {
+      plainName: 'OFR Financial Stress Index',
+      oneLine: 'The Treasury’s own daily score of how strained money markets are (zero = its long-run average).',
+      ifRising: 'Strains in credit, funding or volatility are building together.',
+      ifFalling: 'The system is calmer than its long-run average.',
+      connections: [
+        { with: 'stress-stlfsi', text: 'The St Louis twin: same question, different builder.', strength: 'usually' },
+        { with: 'repo-stress', text: 'Funding pressure is one of the channels this index folds in.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['financial-stress-index', 'liquidity', 'volatility'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
@@ -2781,6 +2814,58 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It is an accounting identity, not a forecast: the same liquidity level can accompany rising or falling markets depending on the demand for money at the time.',
     forYou:
       'Read it beside the Fed balance sheet card: when the headline shrinks but the Treasury account or the reverse repo pile shrinks faster, net liquidity can rise even in tightening times.',
+  },
+  /* gap-closure S3-M3.3 (2026-11-01): the credit pair. The history lines
+   * quote the provider's own file (the M3.1 fixture read 2026-11-01):
+   * EBP peaked 3.41 in Oct 2008; its decade range runs −0.95 (Feb 2021)
+   * to +1.19 (Mar 2020), latest −0.39 in the lower part. OFR FSI peaked
+   * 29.32 on 2008-10-10; decade range −4.36 (Feb 2021) to +10.27 (Mar
+   * 2020), latest −1.83 mid-range. */
+  'ebp': {
+    name: 'Excess bond premium (EBP)',
+    ticker: 'EBP',
+    oneLiner:
+      'How much extra investors demand to lend to risky companies beyond the losses they expect: the price of risk appetite itself.',
+    lines: {
+      highRising:
+        'The premium is high for its decade and rising: lenders demanding ever more beyond expected losses, the setting where credit tightens first.',
+      highEasing: 'The premium remains high for the decade but is easing.',
+      typical: 'The premium sits in its usual range for the decade.',
+      low:
+        'The premium is unusually low: lending to risky companies is priced close to expected losses alone.',
+    },
+    whatItIs:
+      'The Federal Reserve Board’s own model (its FEDS Notes file, monthly, percentage points): the part of corporate bond spreads left over after subtracting the compensation investors require for expected default losses.',
+    whyItMatters:
+      'A bond spread mixes two things: expected losses, and the extra charge for risk. Cycles of appetite and fear move the second part, and this is the gauge built to isolate it.',
+    tendedToMean:
+      'It peaked at 3.4 in October 2008. Its decade range has run from about −0.95 (February 2021) to +1.19 (March 2020), and the latest reading sits in the lower part of that range.',
+    cantTell:
+      'It is a model estimate published with a one-to-two month lag, and it says nothing about any individual company: a high premium can persist for years, and a low one carries no promise about the next turn.',
+    forYou:
+      'Read it beside the stress index cards: when the whole family rises together, the strain is broad; when this one alone rises, lenders are charging more for risk appetite while funding still works.',
+  },
+  'ofr-fsi': {
+    name: 'OFR Financial Stress Index',
+    ticker: 'OFR FSI',
+    oneLiner:
+      'The Treasury’s own daily composite of credit, funding, volatility, safe-asset and equity-valuation stress: one number around zero, where zero is its long-run average.',
+    lines: {
+      highRising: 'Stress is above the index’s average and building.',
+      highEasing: 'Stress is above average but easing.',
+      typical: 'Stress sits in its usual range for the decade.',
+      low: 'Financial conditions are calmer than the index’s long-run average.',
+    },
+    whatItIs:
+      'The Office of Financial Research’s own daily file: ten documented columns, of which this card reads the aggregate; the five components (credit, equity valuation, safe assets, funding, volatility) and three regions stay in the file’s documentation.',
+    whyItMatters:
+      'It is the Treasury’s own lens on the system-wide question: are money markets strained together, or is the pressure isolated to one corner?',
+    tendedToMean:
+      'It printed its all-time high of 29.3 on 10 October 2008. Its decade range has run from −4.36 (February 2021) to +10.27 (March 2020), and the latest reading sits around the middle of that range.',
+    cantTell:
+      'It is a coincident reading of strain, not a forecast: a calm index has sat beside every bubble, and it moves the day conditions move, not before.',
+    forYou:
+      'Read it beside the St Louis Fed’s own stress index: two builders, one question. When they disagree, the disagreement itself is the detail worth a look.',
   },
   'retail-sales': {
     name: 'US retail sales',

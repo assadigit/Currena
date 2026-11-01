@@ -493,6 +493,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
       put(id, s);
     }
   }
+  // gap-closure S3-M3.3 (2026-11-01): the credit pair — the Fed Board EBP
+  // monthly file + the OFR FSI daily aggregate. DIRECT series (no
+  // derivation): the rung-4 credit inputs arrive pre-parsed + decade-
+  // trimmed (absent on the Worker's 04:10 main rung — the ids carry
+  // forward — present on the Node venue's inline build).
+  put('ebp', inputs.rung4?.credit?.ebp);
+  put('ofr-fsi', inputs.rung4?.credit?.ofrFsi);
   // Step-2 add-list §B5: the Cboe VIX close (daily, full history — the
   // stored history keeps the 10-year daily window the Step-3 verdicts
   // will compute their calm/nervous thresholds from).
@@ -1009,6 +1016,17 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'net-liquidity': {
     name: 'FRED (WALCL − WTREGEN − RRPONTSYD, derived)',
     url: 'https://fred.stlouisfed.org/series/WALCL',
+  },
+  // gap-closure S3-M3.3 (2026-11-01) — the credit pair's source lines (the
+  // rung4 'frb-ebp'/'ofr-fsi' collections; the provider's own site, not a
+  // FRED mirror — these two files are not on FRED).
+  ebp: {
+    name: 'Federal Reserve Board via FEDS Notes (EBP file, ebp column)',
+    url: 'https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv',
+  },
+  'ofr-fsi': {
+    name: 'U.S. Office of Financial Research via financialresearch.gov (OFR FSI, aggregate column)',
+    url: 'https://www.financialresearch.gov/financial-stress-index/data/fsi.csv',
   },
   'housing-permits': {
     name: 'US Census Bureau via FRED (PERMIT)',

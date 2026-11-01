@@ -517,6 +517,13 @@ export const IndicatorIdSchema = z.enum([
   'bank-reserves', // FRED WRESBAL (bank reserve balances, weekly Wednesday $M) — context
   'repo-stress', // derived: SOFR − IORB (the funding-pressure spread, daily pts) — context
   'net-liquidity', // derived: WALCL − TGA − RRP (weekly Wednesday $M) — context
+  // ---- gap-closure S3 (2026-11-01, M3.3): the credit-stress pair —
+  // context rows in the market-stress lane (G-5: context-only until any
+  // S6 promotion decision). Both files verified from the provider's own
+  // responses 2026-11-01 (M3.1); the fetches ride rung4 (EXTRA_SOURCES
+  // 'frb-ebp' + 'ofr-fsi' — their own sources, not the FRED groups).
+  'ebp', // the Fed Board's own EBP file, ebp column (monthly, pts) — context
+  'ofr-fsi', // the OFR FSI file, aggregate column (daily, index sd) — context
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 
@@ -600,6 +607,11 @@ export const IndicatorSourceSchema = z.enum([
   // Brent gap-fill, the metals 10-year histories and the live-prices
   // refresh already use (sources.ts register row: L2, ownerAccepts).
   'yahoo',
+  // gap-closure S3-M3.3 (2026-11-01): the credit pair — the Fed Board's
+  // own EBP file + the OFR's FSI file (register rows frb-ebp / ofr-fsi,
+  // L0 public domain; the rung4 'frb-ebp'/'ofr-fsi' extra sources).
+  'frb',
+  'ofr',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage

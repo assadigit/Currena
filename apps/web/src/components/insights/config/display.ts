@@ -165,6 +165,12 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'bank-reserves': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
   'repo-stress': { decimals: 2, unit: 'percent' },
   'net-liquidity': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  // gap-closure S3-M3.3 (2026-11-01): the credit pair — the EBP premium
+  // reads as percent 2dp (a spread in percentage points, the repo-stress
+  // convention); the OFR FSI is a standardized index in sds (the stlfsi
+  // convention — no % sign, it is not a rate).
+  ebp: { decimals: 2, unit: 'percent' },
+  'ofr-fsi': { decimals: 2, unit: 'index' },
   'retail-sales': { decimals: 1, unit: 'usd-bn', scale: 0.001 },
   'housing-permits': { decimals: 2, unit: 'permits', scale: 0.001 },
   cfnai: { decimals: 2, unit: 'index' },

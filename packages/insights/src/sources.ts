@@ -197,6 +197,49 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     notes:
       'Gap-closure S2-M2.1. Worker-egress verified 2026-10-31 (S1-M1.1 probe): both files 200, 8–10 s each — the rung3 fetch keeps the 12 s single-attempt policy (F-11), no retries; the 10:10/20:10 sweeps heal a failed fetch within hours. Composite dataset (not 100 indicators): one KV key insights:tic:v1. The dead mfh.txt / slt3d.txt (frozen 2023-01) are NEVER used.',
   },
+  // gap-closure S3-M3.3 (2026-11-01): the credit-stress pair — the Fed
+  // Board's own EBP file + the OFR's FSI file. Both L0 US-government-works
+  // class (17 U.S.C. § 105); neither exists on FRED, so they ride the rung4
+  // 04:35 slot as their OWN extra sources (hosts egress-verified S1-M1.1:
+  // ~270 ms / ~1.2 s — fast, the 12 s default is ample).
+  'frb-ebp': {
+    id: 'frb-ebp',
+    provider: 'frb',
+    label: 'Federal Reserve Board (FEDS Notes EBP file)',
+    usedFor: 'ebp — the excess bond premium card (the credit-cycle gauge; the licence-rejected ICE BofA spreads\u2019 substitute)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The EBP file (ebp_csv.csv) is the Federal Reserve Board\u2019s own published research data; the site carries the "An official website of the United States Government" banner. The CSV itself carries no copyright notice. Columns mapped in M3.1 from the provider\u2019s own response: date,gz_spread,ebp,est_prob — the card reads the ebp column only.',
+    termsReadOn: '2026-11-01',
+    attribution: 'Source: Board of Governors of the Federal Reserve System',
+    termsUrl: 'https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv',
+    notes:
+      'Gap-closure S3-M3.3. Worker egress FAST (267/260 ms in the S1-M1.1 probe); monthly rows 1973-01 → 2026-09, 44,606 B. Rides rung4 as its own source (Saturday re-check — the CFTC gate\u2019s discipline); the fetch trims to the decade window at parse. Fixture: packages/insights/fixtures/s3/ebp-2026-11-01.csv.',
+  },
+  'ofr-fsi': {
+    id: 'ofr-fsi',
+    provider: 'ofr',
+    label: 'U.S. Treasury Office of Financial Research (OFR FSI file)',
+    usedFor: 'ofr-fsi — the OFR Financial Stress Index card (the aggregate; the 9 component columns are documented but not carded)',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L0',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The OFR is a bureau of the U.S. Treasury (a .gov site; the site\u2019s policies page carries the Treasury Open Government Initiative statement). The file was DISCOVERED in M3.1 from the FSI page\u2019s own fsi-indicator.js (the old index.csv 404 is dead). 10 documented columns; the card reads the AGGREGATE column only.',
+    termsReadOn: '2026-11-01',
+    attribution: 'Source: Office of Financial Research, U.S. Department of the Treasury',
+    termsUrl: 'https://www.financialresearch.gov/financial-stress-index/',
+    notes:
+      'Gap-closure S3-M3.3. Worker egress OK (the host 200 in ~1.2 s in the S1 probe); daily rows 2000-01-03 → 2026-10-28, 517,157 B. Rides rung4 as its own source (daily gate — the file updates on business days with a 1–2 day lag); the fetch trims to the decade window at parse. Fixture: packages/insights/fixtures/s3/ofr-fsi-2026-11-01.csv.',
+  },
   'eia-spot': {
     id: 'eia-spot',
     provider: 'eia',
@@ -747,6 +790,11 @@ export function rowIdForProvider(provider: string): string {
       return 'us-tic';
     case 'eia':
       return 'eia-spot';
+    // gap-closure S3-M3.3 (2026-11-01): the credit-stress pair.
+    case 'frb':
+      return 'frb-ebp';
+    case 'ofr':
+      return 'ofr-fsi';
     default:
       return provider;
   }

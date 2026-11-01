@@ -38,6 +38,7 @@ import { runInsightsUpdate, writeAllHistoriesInline } from '../src/ingest/run';
 import { HIDDEN_PUBLIC_IDS } from '../src/ingest/data';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/adapters/rung2';
 import { collectRung4Sources } from '../src/adapters/rung4';
+import { collectCreditSources } from '../src/adapters/credit';
 import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../src/series';
 
@@ -139,6 +140,17 @@ const rung4 = await collectRung4Sources();
 for (const row of rung4.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
 const rung4Series = rung4.fred;
 
+/* ------------------------------------------------------------------
+ * The inline credit collection (gap-closure S3-M3.3, 2026-11-01) — the
+ * Fed Board EBP file + the OFR FSI file. Both hosts serve GHA egress
+ * fine (the S1-M1.1 probe: ~270 ms / ~1.2 s); the Worker's 04:35 phases
+ * perform the same collect per file (shared code), so the venues cannot
+ * drift apart.
+ * ------------------------------------------------------------------ */
+
+const credit = await collectCreditSources();
+for (const row of credit.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
+
 const result = await runInsightsUpdate({
   // A dry-run without credentials takes the no-op store: runInsightsUpdate
   // skips every write when dryRun is set, and only the real store's READS
@@ -155,6 +167,9 @@ const result = await runInsightsUpdate({
   // gap-closure S3-M3.2: the inline rung-4 series (the 04:35 phase's
   // twin — the S3 FRED groups; one build derives everything on Node).
   rung4Series,
+  // gap-closure S3-M3.3: the inline credit files (the 04:35 phases'
+  // twin — the EBP + OFR FSI pair, fail-soft per file).
+  creditSeries: credit.series,
 });
 
 /* ------------------------------------------------------------------ *

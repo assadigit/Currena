@@ -450,14 +450,17 @@ describe('runInsightsRung4Phase (the 04:35 orchestration)', () => {
       expect(reading('net-liquidity')!.value).not.toBeNull();
       // The derived cards' percentiles exist (the decade basis parsed).
       expect(reading('tga')!.percentile10y).toBeDefined();
-      // The stage updated with the six series (the sweep bootstrap record).
+      // The stage updated with THIS phase's series (the sweep bootstrap
+      // record). gap-closure S3-M3.3: scoped to the phase's refreshed ids —
+      // the credit pair (ebp/ofr-fsi) joined RUNG4_IDS but is written by its
+      // OWN phase (adapters/credit.ts), not this one.
       const stage = JSON.parse(kv.map.get('insights:ingest-stage:v1')!) as { series: Record<string, unknown> };
-      for (const id of RUNG4_IDS) {
+      for (const id of Object.keys(result.series)) {
         expect(stage.series[id], `${id} must be staged`).toBeDefined();
       }
       // The phase's OWN history keys written (the 04:25 halves' exclusion).
-      expect(result.histories.written).toBe(RUNG4_IDS.length);
-      for (const id of RUNG4_IDS) {
+      expect(result.histories.written).toBe(6); // the liquidity family only — the M3.3 credit pair has its own phase
+      for (const id of Object.keys(result.series)) {
         expect(kv.map.has(`insights:hist:${id}`), `${id} history key`).toBe(true);
       }
       // Honest report rows appended to the status.

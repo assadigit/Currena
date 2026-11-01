@@ -89,8 +89,8 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ticReleaseAwareGate(new Date('2026-11-28T04:30:00Z'))).toBe(true); // Saturday again
   });
 
-  it('the registry carries the verified TIC source on rung3 with the 4-subrequest budget', () => {
-    expect(EXTRA_SOURCES).toHaveLength(2); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2)
+  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, and the M3.3 credit pair (S3-M3.3 registered frb-ebp + ofr-fsi)', () => {
+    expect(EXTRA_SOURCES).toHaveLength(4); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3)
     const tic = EXTRA_SOURCES.find((s) => s.id === 'tic-slt')!;
     expect(tic.rung).toBe(3);
     expect(tic.gate).toBe(ticReleaseAwareGate);
@@ -103,12 +103,31 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(fredS3.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
     expect(fredS3.gate(new Date('2026-11-02T04:35:00Z'))).toBe(true); // every day
     expect(fredS3.budget).toBe(16);
+    // gap-closure S3-M3.3 (2026-11-01): the credit-stress pair on rung4 —
+    // the EBP file is MONTHLY (the Saturday re-check, the CFTC gate's
+    // discipline; the sweeps heal failures within hours, gate bypassed)
+    // while the OFR FSI file is DAILY. Budgets 10 each: 1 fetch + 1
+    // snapshot read + 1 status read + 4 patch writes + 1 history write,
+    // with headroom (see RUNGS.md).
+    const ebp = EXTRA_SOURCES.find((s) => s.id === 'frb-ebp')!;
+    expect(ebp.rung).toBe(4);
+    expect(ebp.gate(new Date('2026-11-01T04:35:00Z'))).toBe(false); // Sunday
+    expect(ebp.gate(new Date('2026-11-07T04:35:00Z'))).toBe(true); // Saturday
+    expect(ebp.budget).toBe(10);
+    const ofr = EXTRA_SOURCES.find((s) => s.id === 'ofr-fsi')!;
+    expect(ofr.rung).toBe(4);
+    expect(ofr.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
+    expect(ofr.budget).toBe(10);
+    // The whole rung4 registry stays inside the 50-subrequest ceiling even
+    // on the day every gate fires (1 status + 16 + 10 + 10 = 37 ≤ 50).
+    const total = EXTRA_SOURCES.filter((s) => s.rung === 4).reduce((sum, s) => sum + s.budget, 0) + 1;
+    expect(total).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING);
   });
 });
 
 describe('runExtraRung — rung4 now carries the S3 FRED source (S3-M3.2 registered fred-s3)', () => {
   it('a rung whose registry list is EMPTY still runs, writes its status record, and costs 1 subrequest (the S1-M1.7 proof, via the override)', async () => {
-    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(1); // fred-s3
+    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(3); // fred-s3 + frb-ebp + ofr-fsi (S3-M3.3)
     const kv = mockKv();
     const status = await runExtraRung(ENV, 4, { kv, now: new Date(at(4, 35)), sources: [] });
     expect(status.rows).toEqual([]);

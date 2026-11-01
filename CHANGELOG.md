@@ -5,6 +5,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01b] — gap-closure S3-M3.3: the credit-stress pair — EBP and the OFR FSI, two new rung4 sources (the 110th–111th indicators)
+
+S3's second build milestone: the spec's "Credit stress sources" — the
+licence-clean substitutes the gap analysis demanded after the ICE BofA
+rejection (the market-stress gauge's credit leg). Both cards are
+CONTEXT-ONLY per G-5.
+
+- **The two indicators** (all context, P1 info rules — the 110th–111th):
+  `ebp` (the Fed Board's own Excess Bond Premium file, the `ebp` column of
+  `ebp_csv.csv` — the piece of corporate bond spreads left over after the
+  expected-default compensation is subtracted) and `ofr-fsi` (the OFR
+  Financial Stress Index, the AGGREGATE column of the file DISCOVERED in
+  M3.1 — `financial-stress-index/data/fsi.csv`; the 9 component/region
+  columns are documented but stay uncarded, the layer-1 copy explains them
+  in words). Placed in the `market-stress` lane beside their stress-index
+  siblings.
+- **Ingest capacity:** the fetches ride the rung4 04:35 slot as TWO new
+  extra sources — `frb-ebp` (Saturday re-check for the monthly file, the
+  CFTC gate's discipline) + `ofr-fsi` (daily gate), each with its OWN phase
+  (`runInsightsCreditPhase`) so a failing host never touches the other, the
+  S3 FRED groups, or the TIC tables. The rung4 registry total on the day
+  every gate fires: 1 + 16 + 10 + 10 = 37/50. The Node venue (GHA 04:20)
+  collects the same files inline (`collectCreditSources`) — the venues
+  cannot drift. The two hosts answered ~270 ms/~1.2 s in the S1 egress
+  probe; the 12 s single-attempt policy stands.
+- **Honesty machinery:** the parsers fail closed (exact header text, exact
+  column count 4/10, strict ISO dates, strictly ascending rows, finite
+  numerics, empty/header-only rejected); NO magnitude bands — both series
+  are spreads/indexes that can honestly sit anywhere near zero (the M3.2
+  no-invented-bounds lesson); the fetch trims to the SAME fredDecadeFrom
+  window the FRED groups ride (121 monthly / 2,616 daily obs at the
+  fixture-pinned lengths). `staleAfterDays` 75 (EBP, the us-cpi-yoy monthly
+  convention — the file uploads with a 1–2 month lag) and 7 (OFR FSI, the
+  ecb-dfr daily convention — business-day publication with a 1–2 day
+  lag). The ids joined RUNG4_IDS: the main rung carries them forward, the
+  daily halves + the periodic rung exclude them, the phases write their OWN
+  history keys.
+- **Licence records:** both providers are L0 public domain (17 U.S.C. §
+  105 — the Fed Board and the OFR, a Treasury bureau); register rows
+  `frb-ebp`/`ofr-fsi` + providers `frb`/`ofr` + the FS-09 method card +
+  LICENCES.md/RISK_REGISTER.md rows. No owner_accepts needed (L0).
+- **The layer-1 copy:** two glossary terms (excess bond premium, financial
+  stress index) + the full bilingual card copy (EN + fa, Persian-copy
+  round-63). The history lines quote the providers' own files (EBP peaked
+  3.41 in Oct 2008, decade range −0.95..+1.19; OFR FSI peaked 29.32 on
+  2008-10-10, decade range −4.36..+10.27); the G2/G3/G5 validators caught
+  and fixed three first-draft slips (the St. abbreviation's period
+  splitting a sentence, the 'easing' null-termId jargon, the fa plainName's
+  stray Latin).
+- **Numbers:** tests 10,978 → **11,140 green** (+162: the credit suite +22 in insights — the parser fail-closed cases, the exact-URL/decade-trim fetchers, the phase orchestration + isolation, the registry arithmetic — and the web layer-1 validator's per-field growth +140 for the two new ids and two new glossary terms; plus the 109→111 pin updates). Insights lazy 1214/288 → **1227/291** (measured
+  1225.55/290.23; justified here and in check-bundle-budget.mjs). KV
+  writes/day ~+9 (two more history keys + the patch writes on their gate
+  days); rung4 subrequests ~31/50 on a Saturday, ~21/50 otherwise. The
+  glossary count grows 34 → 36 ×2 languages; the narrator vocabulary 140
+  indicators + 36 terms ×2.
+
 ## [2026-11-01a] — gap-closure S3-M3.2: the US liquidity and funding family — six context cards riding the new rung4 'fred-s3' source (the 104th–109th indicators)
 
 S3's first build milestone: the spec's "Liquidity and term premium from

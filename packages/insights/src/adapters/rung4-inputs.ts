@@ -21,4 +21,11 @@ export interface Rung4SeriesInputs {
    * carries administratively announced rows past today).
    */
   fredS3?: Partial<Record<string, SeriesPoint[]>>;
+  /**
+   * gap-closure S3-M3.3 (2026-11-01): the credit pair's files (the Fed
+   * Board EBP CSV + the OFR FSI aggregate CSV, decade-trimmed) — direct
+   * series, no derivation. The Worker's 04:35 phases patch them per file;
+   * the Node venue passes both so ONE build derives everything.
+   */
+  credit?: { ebp?: SeriesPoint[]; ofrFsi?: SeriesPoint[] };
 }

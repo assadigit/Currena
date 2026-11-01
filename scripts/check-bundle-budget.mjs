@@ -802,7 +802,16 @@ const BUDGETS = [
   // cards ride existing machinery only (CompactRow/display/labels). Measured
   // 1213.69/287.07.
   // Justified in CHANGELOG §2026-11-01a.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1214_000, gz: 288_000, label: 'Insights lazy chunk' },
+  // 2026-11-01b (gap-closure S3-M3.3): 1227/291 — the credit-stress pair
+  // (ebp + ofr-fsi): TWO new bilingual context cards in the market-stress
+  // lane on TOP of the M3.2 family — the full bilingual indicator copy
+  // (2 dictionaries × 2 cards × 13 keys) + the layer-1 entries + the TWO
+  // glossary terms (excess bond premium, financial stress index — round-63)
+  // + the narrator vocabulary growth (140 indicators + 36 terms × 2
+  // languages). The cards ride existing machinery only. Measured
+  // 1225.55/290.23; raw bumps 1214 → 1227, gz 288 → 291.
+  // Justified in CHANGELOG §2026-11-01b.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1227_000, gz: 291_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

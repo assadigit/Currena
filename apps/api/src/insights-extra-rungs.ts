@@ -25,7 +25,12 @@
 
 import type { Bindings } from './index';
 import { runTicIngest, KvTicStore } from '@currena/insights/tic';
-import { runInsightsRung4Phase, KvInsightsStore, HIDDEN_PUBLIC_IDS } from '@currena/insights/ingest';
+import {
+  runInsightsRung4Phase,
+  runInsightsCreditPhase,
+  KvInsightsStore,
+  HIDDEN_PUBLIC_IDS,
+} from '@currena/insights/ingest';
 
 /** The UTC minute (inside INGEST_CRON_HOUR) that fires rung3. */
 export const EXTRA_RUNG3_MINUTE = 30;
@@ -51,6 +56,12 @@ export function ticReleaseAwareGate(now: Date): boolean {
 
 /** The failure kinds that arm the sweep heal (mirrors sweepShouldFire). */
 const HEALABLE_KINDS: ReadonlySet<string> = new Set(['failed', 'blocked', 'format-changed']);
+
+/** Narrow a report row's optional kind onto the outcome's kind (never
+ * undefined — the honest default is 'failed'). */
+function reportKind(kind: 'fetched' | 'blocked' | 'format-changed' | 'failed' | 'disabled' | 'cross-check' | undefined): 'failed' | 'blocked' | 'format-changed' {
+  return kind === 'blocked' || kind === 'format-changed' ? kind : 'failed';
+}
 
 /** One source's run result — recorded verbatim in the rung's status. */
 export type ExtraSourceOutcome =
@@ -101,6 +112,17 @@ export interface ExtraSourceDef {
  * history writes = 15; declared budget 16 (rounding headroom). Day gate:
  * daily — the groups carry daily series (term premium, RRP, IORB), and
  * the 10:10/20:10 sweeps heal a failed day within hours (gate bypassed).
+ *
+ * gap-closure S3-M3.3 (2026-11-01) registers the THIRD and FOURTH: the
+ * credit-stress pair, in TWO sources so their failure domains stay
+ * isolated (different hosts than FRED, and different rhythms from each
+ * other). 'frb-ebp' — the Fed Board's monthly EBP file, re-checked
+ * Saturdays (the CFTC gate's discipline; a monthly file needs no daily
+ * fetch, and the sweeps heal failures within hours, gate bypassed).
+ * 'ofr-fsi' — the OFR's daily FSI file, daily gate. Each budget 10:
+ * 1 fetch + 1 snapshot read + 1 status read + 4 patch writes + 1 history
+ * write = 8, declared with headroom. The rung4 registry total on the day
+ * every gate fires: 1 status + 16 + 10 + 10 = 37 ≤ 50.
  */
 export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
   {
@@ -139,6 +161,61 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
         ...(result.patched
           ? { note: `patched ${Object.keys(result.series).join(', ')} · histories ${result.histories.written} written` }
           : { note: 'nothing to patch (no group parsed)' }),
+      };
+    },
+  },
+  {
+    // gap-closure S3-M3.3: the Fed Board EBP file (monthly, Saturday
+    // re-check — the CFTC gate's discipline; the sweeps heal failures).
+    id: 'frb-ebp',
+    rung: 4,
+    gate: weekdayGate(6),
+    budget: 10,
+    run: async (env: Bindings, now: Date) => {
+      const result = await runInsightsCreditPhase({
+        files: ['ebp'],
+        store: new KvInsightsStore(env.RATES),
+        kv: env.RATES,
+        mode: 'scheduled',
+        hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+        now,
+      });
+      const failed = result.reports.filter((r) => !r.ok);
+      if (failed.length > 0) {
+        return { ok: false, kind: reportKind(failed[0]!.kind), note: `EBP file failed: ${failed.map((r) => r.detail).join(' | ')}` };
+      }
+      return {
+        ok: true,
+        ...(result.patched
+          ? { note: `ebp patched · history written` }
+          : { note: 'nothing to patch (no file parsed or no snapshot yet)' }),
+      };
+    },
+  },
+  {
+    // gap-closure S3-M3.3: the OFR FSI aggregate file (daily).
+    id: 'ofr-fsi',
+    rung: 4,
+    gate: dailyGate(),
+    budget: 10,
+    run: async (env: Bindings, now: Date) => {
+      const result = await runInsightsCreditPhase({
+        files: ['ofr'],
+        store: new KvInsightsStore(env.RATES),
+        kv: env.RATES,
+        mode: 'scheduled',
+        hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+        now,
+      });
+      const failed = result.reports.filter((r) => !r.ok);
+      if (failed.length > 0) {
+        return { ok: false, kind: reportKind(failed[0]!.kind), note: `OFR FSI file failed: ${failed.map((r) => r.detail).join(' | ')}` };
+      }
+      return {
+        ok: true,
+        ...(result.patched
+          ? { note: `ofr-fsi patched · history written` }
+          : { note: 'nothing to patch (no file parsed or no snapshot yet)' }),
       };
     },
   },

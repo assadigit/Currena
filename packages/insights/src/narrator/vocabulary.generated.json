@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "5f4108d400ad62d5d3edea38fdf733001e8a7be55cd611fa5578242b89d285b3",
-    "faSha256": "bc2b3f23ce17849806987f90406592ee4c559bb07424f485fee27a406efe9d72",
-    "indicatorCount": 138,
-    "glossaryCount": 34
+    "enSha256": "2f252173bc8ac06d36424a273ac72a1db799481d0aec7357ea846998641c6cb6",
+    "faSha256": "ea965615da0ef40c301aa06a6e116e48c4800e99c49e79bf39fa726a43d6a5b2",
+    "indicatorCount": 140,
+    "glossaryCount": 36
   },
   "en": {
     "indicators": {
@@ -3010,6 +3010,51 @@
           "net-liquidity",
           "liquidity"
         ]
+      },
+      "ebp": {
+        "plainName": "Excess bond premium",
+        "oneLine": "How much extra investors demand to lend to risky companies, beyond covering the losses they expect.",
+        "ifRising": "Lenders are charging more for risk appetite itself, not just for expected defaults.",
+        "ifFalling": "Credit is priced closer to expected losses alone: the pure risk-appetite charge is coming down.",
+        "connections": [
+          {
+            "with": "ofr-fsi",
+            "text": "A rising premium feeds the same strain the stress index folds together.",
+            "strength": "sometimes"
+          },
+          {
+            "with": "term-premium-10y",
+            "text": "One is the extra charge for lending long to the government; this one for lending to companies.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "excess-bond-premium",
+          "bond"
+        ]
+      },
+      "ofr-fsi": {
+        "plainName": "OFR Financial Stress Index",
+        "oneLine": "The Treasury’s own daily score of how strained money markets are (zero = its long-run average).",
+        "ifRising": "Strains in credit, funding or volatility are building together.",
+        "ifFalling": "The system is calmer than its long-run average.",
+        "connections": [
+          {
+            "with": "stress-stlfsi",
+            "text": "The St Louis twin: same question, different builder.",
+            "strength": "usually"
+          },
+          {
+            "with": "repo-stress",
+            "text": "Funding pressure is one of the channels this index folds in.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "financial-stress-index",
+          "liquidity",
+          "volatility"
+        ]
       }
     },
     "glossary": {
@@ -3150,6 +3195,14 @@
       "net-liquidity": {
         "term": "net liquidity",
         "plain": "The money actually available to markets: the Fed’s balance sheet minus the Treasury’s account and the overnight cash parked back at the Fed."
+      },
+      "excess-bond-premium": {
+        "term": "excess bond premium",
+        "plain": "The part of what investors demand for lending to risky companies that is NOT compensation for expected losses — the pure extra charge for risk appetite itself."
+      },
+      "financial-stress-index": {
+        "term": "financial stress index",
+        "plain": "A daily score of how strained money markets are. The OFR’s own combines credit, funding, volatility, safe-asset and equity-valuation pressure into one number around zero (zero = its long-run average)."
       }
     },
     "ui": {
@@ -6191,6 +6244,51 @@
           "net-liquidity",
           "liquidity"
         ]
+      },
+      "ebp": {
+        "plainName": "صرف اضافی اوراق",
+        "oneLine": "سرمایه‌گذار چقدر بیشتر از جبران ضررهای موردانتظار می‌خواهد تا به شرکت‌های پرریسک وام بدهد.",
+        "ifRising": "وام‌دهندگان برای خودِ اشتهای ریسک بیشتر می‌خواهند، نه فقط برای ضررهای موردانتظار.",
+        "ifFalling": "اعتبار نزدیک به جبران ضررهای موردانتظار قیمت می‌خورد: بهای اشتهای ریسک در حال فروکش است.",
+        "connections": [
+          {
+            "with": "ofr-fsi",
+            "text": "صرفِ در حال رشد همان فشاری است که شاخص تنش با هم جمع می‌کند.",
+            "strength": "sometimes"
+          },
+          {
+            "with": "term-premium-10y",
+            "text": "یکی بهای وام بلندمدت به دولت است و دیگری بهای وام به شرکت‌ها.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "excess-bond-premium",
+          "bond"
+        ]
+      },
+      "ofr-fsi": {
+        "plainName": "شاخص تنش مالی",
+        "oneLine": "امتیاز روزانهٔ خودِ خزانه‌داری آمریکا از فشار بازارهای پول (صفر یعنی میانگین بلندمدت).",
+        "ifRising": "فشار اعتبار، تأمین مالی یا نوسان با هم دارد زیاد می‌شود.",
+        "ifFalling": "سیستم آرام‌تر از میانگین بلندمدتش است.",
+        "connections": [
+          {
+            "with": "stress-stlfsi",
+            "text": "همزاد سنت‌لوئیس: یک پرسش، دو سازنده.",
+            "strength": "usually"
+          },
+          {
+            "with": "repo-stress",
+            "text": "فشار تأمین مالی یکی از مجاری‌ای است که این شاخص جمع می‌کند.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "financial-stress-index",
+          "liquidity",
+          "volatility"
+        ]
       }
     },
     "glossary": {
@@ -6331,6 +6429,14 @@
       "net-liquidity": {
         "term": "نقدینگی خالص",
         "plain": "پولی که واقعاً در دسترس بازارهاست: ترازنامهٔ فدرال رزرو منهای حساب خزانه‌داری و پول شبانه‌ای که به فدرال بازگردانده شده است."
+      },
+      "excess-bond-premium": {
+        "term": "صرف اضافی اوراق",
+        "plain": "بخشی از آنچه سرمایه‌گذار برای وام‌دادن به شرکت‌های پرریسک می‌خواهد که جبران ضررهای موردانتظار نیست: بهای خودِ اشتهای ریسک."
+      },
+      "financial-stress-index": {
+        "term": "شاخص تنش مالی",
+        "plain": "امتیاز روزانه از میزان فشار روی بازارهای پول. شاخص دفتر پژوهش‌های مالی فشار اعتبار، تأمین مالی، نوسان، دارایی امن و ارزش‌گذاری سهام را در یک عدد حول صفر جمع می‌کند (صفر یعنی میانگین بلندمدت)."
       }
     },
     "ui": {

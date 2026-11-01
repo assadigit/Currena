@@ -33,8 +33,12 @@ import type { FetchDeps } from './types';
 
 /**
  * The ids this rung owns (grows with each S3 milestone). The main rung's
- * build carries these forward; the 04:35 phase + the Node venue's inline
- * build derive them fresh. M3.4/M3.5 append their ids here.
+ * build carries these forward; the 04:35 phases + the Node venue's inline
+ * build derive them fresh. M3.4/M3.5 append their ids here. gap-closure
+ * S3-M3.3 (2026-11-01): the credit pair joins the FAMILY (the rung's
+ * carry/history-exclusion discipline) but is FETCHED + patched by its OWN
+ * phase (runInsightsCreditPhase — adapters/credit.ts), not this module's
+ * FRED phase: different hosts, different cadence gates.
  */
 export const RUNG4_IDS: readonly IndicatorId[] = [
   'term-premium-10y',
@@ -43,6 +47,8 @@ export const RUNG4_IDS: readonly IndicatorId[] = [
   'bank-reserves',
   'repo-stress', // derived: SOFR − IORB
   'net-liquidity', // derived: WALCL − TGA − RRP
+  'ebp', // gap-closure S3-M3.3: the Fed Board EBP file (its own phase)
+  'ofr-fsi', // gap-closure S3-M3.3: the OFR FSI aggregate file (its own phase)
 ];
 
 /** The rung-4 collection's output: raw FRED series + honest report rows. */

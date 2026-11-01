@@ -3451,6 +3451,124 @@
       }
     },
     {
+      "id": "ebp",
+      "title": "Excess bond premium (EBP)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "frb",
+        "name": "Federal Reserve Board via FEDS Notes (EBP file, ebp column)",
+        "url": "https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv",
+        "seriesIdOrTable": "Federal Reserve Board:EBP (FEDS Notes excess bond premium file, ebp column, monthly, percentage points)"
+      },
+      "publisher": "Federal Reserve Board (FEDS Notes EBP file)",
+      "publisherUrl": "https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv",
+      "methodUrl": "https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv",
+      "whatItIs": "The Federal Reserve Board’s own model (its FEDS Notes file, monthly, percentage points): the part of corporate bond spreads left over after subtracting the compensation investors require for expected default losses.",
+      "whatItIsnt": "It is a model estimate published with a one-to-two month lag, and it says nothing about any individual company: a high premium can persist for years, and a low one carries no promise about the next turn.",
+      "trackRecordNote": "It peaked at 3.4 in October 2008. Its decade range has run from about −0.95 (February 2021) to +1.19 (March 2020), and the latest reading sits in the lower part of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The EBP file (ebp_csv.csv) is the Federal Reserve Board’s own published research data; the site carries the \"An official website of the United States Government\" banner. The CSV itself carries no copyright notice. Columns mapped in M3.1 from the provider’s own response: date,gz_spread,ebp,est_prob — the card reads the ebp column only.",
+        "termsReadOn": "2026-11-01",
+        "attributionText": "Source: Board of Governors of the Federal Reserve System",
+        "legs": [
+          "frb"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: Board of Governors of the Federal Reserve System",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-01",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105) — the EBP file (federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv) is the Board’s own published research data (the FEDS Notes excess-bond-premium model). Worker egress FAST (267/260 ms, the S1-M1.1 probe — read again in M3.1); the CSV carries no copyright notice. Columns mapped from the provider’s own response 2026-11-01: date,gz_spread,ebp,est_prob.",
+        "termsUrl": "https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv"
+      }
+    },
+    {
+      "id": "ofr-fsi",
+      "title": "OFR Financial Stress Index",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "ofr",
+        "name": "U.S. Office of Financial Research via financialresearch.gov (OFR FSI, aggregate column)",
+        "url": "https://www.financialresearch.gov/financial-stress-index/data/fsi.csv",
+        "seriesIdOrTable": "Office of Financial Research:OFR-FSI (OFR FSI file, aggregate column, daily, index sd)"
+      },
+      "publisher": "U.S. Treasury Office of Financial Research (OFR FSI file)",
+      "publisherUrl": "https://www.financialresearch.gov/financial-stress-index/data/fsi.csv",
+      "methodUrl": "https://www.financialresearch.gov/financial-stress-index/data/fsi.csv",
+      "whatItIs": "The Office of Financial Research’s own daily file: ten documented columns, of which this card reads the aggregate; the five components (credit, equity valuation, safe assets, funding, volatility) and three regions stay in the file’s documentation.",
+      "whatItIsnt": "It is a coincident reading of strain, not a forecast: a calm index has sat beside every bubble, and it moves the day conditions move, not before.",
+      "trackRecordNote": "It printed its all-time high of 29.3 on 10 October 2008. Its decade range has run from −4.36 (February 2021) to +10.27 (March 2020), and the latest reading sits around the middle of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 7 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The OFR is a bureau of the U.S. Treasury (a .gov site; the site’s policies page carries the Treasury Open Government Initiative statement). The file was DISCOVERED in M3.1 from the FSI page’s own fsi-indicator.js (the old index.csv 404 is dead). 10 documented columns; the card reads the AGGREGATE column only.",
+        "termsReadOn": "2026-11-01",
+        "attributionText": "Source: Office of Financial Research, U.S. Department of the Treasury",
+        "legs": [
+          "ofr"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 7,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: Office of Financial Research, U.S. Department of the Treasury",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-01",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105) — the OFR is a Treasury bureau on a .gov site (the site’s policies page carries the Treasury Open Government Initiative statement). The file (financial-stress-index/data/fsi.csv, 517,157 B) was read from the provider’s own response 2026-11-01: 10 documented columns, daily 2000-01-03 → 2026-10-28; the card reads the aggregate column only.",
+        "termsUrl": "https://www.financialresearch.gov/financial-stress-index/"
+      }
+    },
+    {
       "id": "gold-silver",
       "title": "Gold / Silver",
       "area": {
