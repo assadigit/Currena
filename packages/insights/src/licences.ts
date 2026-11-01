@@ -496,6 +496,28 @@ const PORTWATCH: SourceLicence = {
   termsUrl: 'https://www.imf.org/external/terms.htm',
 };
 
+/**
+ * gap-closure S4-M4.4 (2026-11-01) — the NY Fed GSCPI. The provider's own
+ * Terms of Use grant an affirmative non-exclusive reuse licence (access via
+ * automated process, download, copy, distribute, derivative works) with an
+ * attribution condition — L1 with quoted permission. Worker egress FAST
+ * (the S1 probe ~0.5 s); runtime is the Worker (rung-2 monthly plan) + the
+ * Node venue's inline collect.
+ */
+const NYFED: SourceLicence = {
+  provider: 'nyfed',
+  label: 'Federal Reserve Bank of New York (GSCPI)',
+  licenceName: 'New York Fed Terms of Use — non-exclusive reuse licence',
+  attributionText: 'Source: Federal Reserve Bank of New York',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-01',
+  termsEvidence:
+    'Quoted verbatim from newyorkfed.org/privacy/termsofuse (read 2026-11-01, the S4-M4.1 record): “The New York Fed grants you a non-exclusive license, subject to the Terms, to use, copy, and distribute Content for your personal or business purposes. You may: Access the Content, manually or through an automated process or device… Download, store, and use Content in any format or media, Copy and distribute the Content in any format or media, and Modify and create derivative works from the Content.” — with the attribution condition (“you must include any copyright notice and other source identifiers”). L1 with quoted permission → public display with the attribution string above.',
+  termsUrl: 'https://www.newyorkfed.org/privacy/termsofuse',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -517,6 +539,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   treasury: TREASURY,
   fiscaldata: FISCALDATA,
   portwatch: PORTWATCH,
+  nyfed: NYFED,
   tic: TIC,
   eia: EIA,
   frb: FRB,

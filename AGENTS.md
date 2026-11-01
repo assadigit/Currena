@@ -145,7 +145,7 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 139 indicators (48 voting [V] + 91 context [C])
+### A. The 145 indicators (48 voting [V] + 97 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
@@ -433,6 +433,12 @@ region verdict by design):
 | [C] | `chokepoint-bab-el-mandeb` | daily | 14 | info | portwatch |
 | [C] | `chokepoint-malacca` | daily | 14 | info | portwatch |
 | [C] | `chokepoint-taiwan` | daily | 14 | info | portwatch |
+| [C] | `gscpi` | monthly | 75 | info | nyfed |
+| [C] | `us-spr` | weekly | 12 | info | eia |
+| [C] | `us-crude-production` | weekly | 12 | info | eia |
+| [C] | `coal-aus` | monthly | 60 | info | world-bank |
+| [C] | `lng-japan` | monthly | 60 | info | world-bank |
+| [C] | `gas-europe` | monthly | 60 | info | world-bank |
 
 *(gap-closure S4-M4.3, 2026-11-01: the chokepoint transit cards — the IMF
 PortWatch daily transits (n_total, an ESTIMATE from ship-tracking data,

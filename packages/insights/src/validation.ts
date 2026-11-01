@@ -849,6 +849,9 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'chokepoint-bab-el-mandeb',
   'chokepoint-malacca',
   'chokepoint-taiwan',
+  // gap-closure S4-M4.4 (2026-11-01): the GSCPI — a standardised index in
+  // deviation units (zero = the global average), the ofr-fsi family.
+  'gscpi',
   // 2026-10-21 data-integrity round: the monthly nonfarm-payrolls change
   // speaks in thousands of jobs — a count, not a percent.
   'us-nfp',

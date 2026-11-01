@@ -3558,6 +3558,360 @@
       }
     },
     {
+      "id": "gscpi",
+      "title": "Global supply chain pressure",
+      "area": {
+        "section": "global",
+        "group": "geo-fragmentation",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "nyfed",
+        "name": "Federal Reserve Bank of New York (Global Supply Chain Pressure Index)",
+        "url": "https://www.newyorkfed.org/research/policy/gscpi",
+        "seriesIdOrTable": "NY Fed Global Supply Chain Pressure Index (monthly)"
+      },
+      "publisher": "Federal Reserve Bank of New York (GSCPI)",
+      "publisherUrl": "https://www.newyorkfed.org/research/policy/gscpi",
+      "methodUrl": "https://www.newyorkfed.org/research/policy/gscpi",
+      "whatItIs": "The New York Fed’s Global Supply Chain Pressure Index, monthly — transport costs and manufacturing survey answers combined into one standardised number. The publisher’s own notice says the index is currently published with limited data; the card shows the months the file carries.",
+      "whatItIsnt": "A single month’s print is noisy; the index says how stretched chains are, never which event stretched them.",
+      "trackRecordNote": "The zones are read as z-scores against the index’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The New York Fed’s own Terms of Use, quoted verbatim (read 2026-11-01, the S4-M4.1 record): “The New York Fed grants you a non-exclusive license, subject to the Terms, to use, copy, and distribute Content for your personal or business purposes. You may: Access the Content, manually or through an automated process or device… Download, store, and use Content in any format or media, Copy and distribute the Content in any format or media, and Modify and create derivative works from the Content.” — an affirmative reuse licence with the attribution condition (“you must include any copyright notice and other source identifiers”). L1 with quoted permission → public display with the attribution string.",
+        "termsReadOn": "2026-11-01",
+        "attributionText": "Source: Federal Reserve Bank of New York",
+        "legs": [
+          "nyfed"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "New York Fed Terms of Use — non-exclusive reuse licence",
+        "attributionText": "Source: Federal Reserve Bank of New York",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-01",
+        "termsEvidence": "Quoted verbatim from newyorkfed.org/privacy/termsofuse (read 2026-11-01, the S4-M4.1 record): “The New York Fed grants you a non-exclusive license, subject to the Terms, to use, copy, and distribute Content for your personal or business purposes. You may: Access the Content, manually or through an automated process or device… Download, store, and use Content in any format or media, Copy and distribute the Content in any format or media, and Modify and create derivative works from the Content.” — with the attribution condition (“you must include any copyright notice and other source identifiers”). L1 with quoted permission → public display with the attribution string above. · Legs (nyfed): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.newyorkfed.org/privacy/termsofuse"
+      }
+    },
+    {
+      "id": "us-spr",
+      "title": "US strategic petroleum reserve",
+      "area": {
+        "section": "global",
+        "group": "geo-fragmentation",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "eia",
+        "name": "U.S. Energy Information Administration (ending stocks of crude oil in the SPR, WCSSTUS1)",
+        "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W",
+        "seriesIdOrTable": "EIA WCSSTUS1 (ending stocks of crude oil in the SPR, weekly, thousand barrels)"
+      },
+      "publisher": "U.S. Energy Information Administration (daily spot .xls workbooks)",
+      "publisherUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W",
+      "methodUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W",
+      "whatItIs": "The EIA’s weekly count of crude oil held in the US Strategic Petroleum Reserve — the government-owned stock, separate from the commercial inventories card.",
+      "whatItIsnt": "The level says how big the cushion is, never why it changed.",
+      "trackRecordNote": "The zones are measured against the reserve’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The RWTCd/RBRTEd/RNGWHHDd workbooks are the PRIMARY source of FRED’s EIA spot series; cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly.",
+        "termsReadOn": "2026-10-22",
+        "attributionText": "Source: U.S. Energy Information Administration",
+        "legs": [
+          "eia"
+        ]
+      },
+      "unit": "barrels",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Energy Information Administration",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-22",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105); EIA’s daily spot .xls workbooks (WTI RWTCd, Brent RBRTEd, Henry Hub RNGWHHDd) are the PRIMARY source of FRED’s DCOILWTICO/DCOILBRENTEU/DHHNGSP. Cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly. FALLBACK-ONLY: FRED stays the primary. · Legs (eia): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.eia.gov/about/copyrights-and-terms-of-service.php"
+      }
+    },
+    {
+      "id": "us-crude-production",
+      "title": "US crude oil production",
+      "area": {
+        "section": "global",
+        "group": "geo-fragmentation",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "eia",
+        "name": "U.S. Energy Information Administration (field production of crude oil, WCRFPUS2)",
+        "url": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRFPUS2&f=W",
+        "seriesIdOrTable": "EIA WCRFPUS2 (field production of crude oil, weekly, thousand barrels per day)"
+      },
+      "publisher": "U.S. Energy Information Administration (daily spot .xls workbooks)",
+      "publisherUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRFPUS2&f=W",
+      "methodUrl": "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRFPUS2&f=W",
+      "whatItIs": "The EIA’s weekly estimate of US field production of crude oil — the supply side of the oil balance, in barrels per day (a rate, unlike the reserve’s level).",
+      "whatItIsnt": "The rate says how much is being pumped, never why the rig count or wells changed.",
+      "trackRecordNote": "The zones are measured against production’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The RWTCd/RBRTEd/RNGWHHDd workbooks are the PRIMARY source of FRED’s EIA spot series; cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly.",
+        "termsReadOn": "2026-10-22",
+        "attributionText": "Source: U.S. Energy Information Administration",
+        "legs": [
+          "eia"
+        ]
+      },
+      "unit": "barrels-per-day",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Energy Information Administration",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-22",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105); EIA’s daily spot .xls workbooks (WTI RWTCd, Brent RBRTEd, Henry Hub RNGWHHDd) are the PRIMARY source of FRED’s DCOILWTICO/DCOILBRENTEU/DHHNGSP. Cross-validated 2026-10-22: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20 exactly. FALLBACK-ONLY: FRED stays the primary. · Legs (eia): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.eia.gov/about/copyrights-and-terms-of-service.php"
+      }
+    },
+    {
+      "id": "coal-aus",
+      "title": "Australian coal price",
+      "area": {
+        "section": "australia",
+        "group": "au-trade-currency",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "world-bank",
+        "name": "The World Bank Pink Sheet — Australian coal",
+        "url": "https://www.worldbank.org/en/research/commodity-markets",
+        "seriesIdOrTable": "World Bank Pink Sheet (Coal, Australian; $/metric ton)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "The World Bank’s monthly price for Australian coal — the Newcastle benchmark the seaborne trade prices against.",
+      "whatItIsnt": "The price says what a tonne fetches, never by itself why the demand or supply shifted.",
+      "trackRecordNote": "The zones are measured against the price’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
+      }
+    },
+    {
+      "id": "lng-japan",
+      "title": "LNG price (Japan)",
+      "area": {
+        "section": "australia",
+        "group": "au-trade-currency",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "world-bank",
+        "name": "The World Bank Pink Sheet — LNG, Japan",
+        "url": "https://www.worldbank.org/en/research/commodity-markets",
+        "seriesIdOrTable": "World Bank Pink Sheet (Liquefied natural gas, Japan; $/mmbtu)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "The World Bank’s monthly price for liquefied natural gas delivered to Japan — the Asia-Pacific benchmark for shipped gas.",
+      "whatItIsnt": "The price says what shipped gas fetches, never by itself why demand or supply shifted.",
+      "trackRecordNote": "The zones are measured against the price’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
+      }
+    },
+    {
+      "id": "gas-europe",
+      "title": "European natural gas price",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "world-bank",
+        "name": "The World Bank Pink Sheet — European natural gas",
+        "url": "https://www.worldbank.org/en/research/commodity-markets",
+        "seriesIdOrTable": "World Bank Pink Sheet (Natural gas, Europe; $/mmbtu)"
+      },
+      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisherUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "methodUrl": "https://www.worldbank.org/en/research/commodity-markets",
+      "whatItIs": "The World Bank’s monthly price for European natural gas — the continent’s benchmark, the Atlantic twin of the Japan LNG price.",
+      "whatItIsnt": "The price says what gas fetches in Europe, never by itself why demand or supply shifted.",
+      "trackRecordNote": "The zones are measured against the price’s own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: World Bank",
+        "legs": [
+          "world-bank"
+        ]
+      },
+      "unit": "usd",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
+      }
+    },
+    {
       "id": "wti",
       "title": "WTI crude oil",
       "area": {

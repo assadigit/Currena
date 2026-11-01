@@ -22,11 +22,13 @@ import {
   GPR_URL,
   GPR_DAILY_URL,
   TPU_URL,
+  GSCPI_URL,
   parseEpuWorkbook,
   parseGprWorkbook,
   parseGprExportAll,
   parseGprDailyWorkbook,
   parseTpuWorkbook,
+  parseGscpiWorkbook,
 } from './monthly-indexes';
 import { FormatChangedError } from './fetch-policy';
 import { readXlsWorkbook } from './biff';
@@ -39,6 +41,9 @@ const epuBuf = readFileSync(join(fixtures, 'epu-main-news-index.xlsx')).buffer;
 // gap-closure S4-M4.2: the geopolitics family's captures.
 const gprDailyBuf = readFileSync(join(fixtures, 's4', 'gpr-daily-2026-11-01.xls')).buffer;
 const tpuBuf = readFileSync(join(fixtures, 's4', 'tpu-categorical-epu-2026-11-01.xlsx')).buffer;
+// gap-closure S4-M4.4: the NY Fed GSCPI capture (the .xlsx-named LEGACY
+// .xls, 105,984 B, recorded 2026-11-01).
+const gscpiBuf = readFileSync(join(fixtures, 's4', 'gscpi-2026-11-01.xls')).buffer;
 
 describe('parseOecdCliCsv (A-8: the filtered SDMX export, one fetch → three countries)', () => {
   it('parses the recorded capture: the jumbled export order sorts into three ascending decade series', () => {
@@ -246,6 +251,53 @@ describe('parseTpuWorkbook (S4-M4.2: the Categorical EPU workbook’s trade colu
 
   it('the URL is the publisher’s own categorical workbook (never the stale 2019 file)', () => {
     expect(TPU_URL).toBe('https://policyuncertainty.com/media/Categorical_EPU_Data.xlsx');
+  });
+});
+
+// gap-closure S4-M4.4 (2026-11-01): the NY Fed GSCPI — the legacy .xls the
+// .xlsx name hides, found structurally (the Date/GSCPI header row inside
+// the second sheet, the boilerplate spill skipped). Provider-exact pins off
+// the M4.1 capture: 345 monthly points 1998-01 → 2026-09, latest 1.2840.
+describe('parseGscpiWorkbook (S4-M4.4: the supply-chain pressure index)', () => {
+  it('parses the recorded capture: 345 monthly points, 1998-01 → 2026-09, latest 1.2840', () => {
+    const series = parseGscpiWorkbook(gscpiBuf as ArrayBuffer);
+    expect(series.length).toBe(345);
+    expect(series[0]).toEqual({ date: '1998-01-01', value: -0.7886641614361506 });
+    // The provider stamps month-END dates ('30-Sep-2026'); the repo's
+    // monthly convention is month-start.
+    expect(series.at(-1)).toEqual({ date: '2026-09-01', value: 1.284014886203148 });
+  });
+
+  it('the boilerplate sheets and spill rows never become data points', () => {
+    // Sheet 1 is the NY Fed boilerplate; the data sheet's own rows 1–3
+    // carry the spill ('YORK FED ECONOMIC RESEARCH', the URL) — only the
+    // DD-MMM-YYYY/number pairs count.
+    const series = parseGscpiWorkbook(gscpiBuf as ArrayBuffer);
+    expect(series.every((p) => /^\d{4}-\d{2}-01$/.test(p.date))).toBe(true);
+    expect(series.every((p) => Number.isFinite(p.value))).toBe(true);
+  });
+
+  it('the pandemic spike class stays in-band (the 2021 record)', () => {
+    const series = parseGscpiWorkbook(gscpiBuf as ArrayBuffer);
+    const peak = Math.max(...series.map((p) => p.value));
+    expect(peak).toBeCloseTo(4.429494960171241, 10); // the 2021-12 record
+    const trough = Math.min(...series.map((p) => p.value));
+    expect(trough).toBeCloseTo(-1.5630214337077464, 10); // the 2023-05 easing
+  });
+
+  it('a renamed header fails closed (the structural sheet finder)', () => {
+    // Corrupt the header cells via the biff reader: swap the GSCPI header
+    // row for junk by feeding the GPR export — no Date/GSCPI header row
+    // anywhere → the loud FormatChangedError.
+    expect(() => parseGscpiWorkbook(gprBuf as ArrayBuffer)).toThrow(
+      /no sheet carries a Date\/GSCPI header row/,
+    );
+  });
+
+  it('the URL is the provider’s own download path (the register row’s URL)', () => {
+    expect(GSCPI_URL).toBe(
+      'https://www.newyorkfed.org/medialibrary/research/interactives/gscpi/downloads/gscpi_data.xlsx',
+    );
   });
 });
 

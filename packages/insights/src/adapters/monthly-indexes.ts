@@ -53,6 +53,17 @@ export const GPR_URL = 'https://www.matteoiacoviello.com/gpr_files/data_gpr_expo
 export const GPR_DAILY_URL = 'https://www.matteoiacoviello.com/gpr_files/data_gpr_daily_recent.xls';
 export const TPU_URL = 'https://policyuncertainty.com/media/Categorical_EPU_Data.xlsx';
 
+/* gap-closure S4-M4.4 (2026-11-01): the NY Fed GSCPI — the Global Supply
+ * Chain Pressure Index. The file is named .xlsx but is a LEGACY .xls
+ * (OLE2/BIFF — 105,984 B, verified live in M4.1): the repo's biff reader
+ * parses it. TWO sheets — Sheet1 is the NY Fed boilerplate (terms of use);
+ * the DATA sheet is found structurally by its 'Date' + 'GSCPI' header row
+ * (the boilerplate rows spill into the data sheet's top too — 'YORK FED
+ * ECONOMIC RESEARCH', the URL — so the parse takes only the
+ * DD-MMM-YYYY/number pairs below the header, never by row index). */
+export const GSCPI_URL =
+  'https://www.newyorkfed.org/medialibrary/research/interactives/gscpi/downloads/gscpi_data.xlsx';
+
 export const MONTHLY_FILE_TIMEOUT_MS = 45_000;
 
 /** The plausible EPU band (a news-based index; the observed range ~0–800). */
@@ -438,4 +449,94 @@ export async function parseTpuWorkbook(buf: ArrayBuffer): Promise<SeriesPoint[]>
 export async function fetchTpuSeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
   const res = await insightsFetch(TPU_URL, {}, { ...deps, timeoutMs: deps.timeoutMs ?? MONTHLY_FILE_TIMEOUT_MS });
   return parseTpuWorkbook(await res.arrayBuffer());
+}
+
+/* ------------------------------------------------------------------ *
+ * gap-closure S4-M4.4 (2026-11-01): the NY Fed GSCPI — the supply-chain
+ * pressure measure of the geo-fragmentation lane.
+ * ------------------------------------------------------------------ */
+
+/** The plausible GSCPI band (the observed history spans ≈ −1.6…+4.6 —
+ * standard-deviation units around the global average). */
+const GSCPI_MIN = -5;
+const GSCPI_MAX = 10;
+
+/** The data sheet's date cell: the provider's own 'DD-MMM-YYYY' end-of-month
+ * string ('31-Jan-1998' … '30-Sep-2026' — verified from the fixture). */
+const GSCPI_DATE_CELL = /^(\d{1,2})-([A-Z][a-z]{2})-(\d{4})$/;
+
+const GSCPI_MONTHS: Readonly<Record<string, number>> = {
+  Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+  Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12,
+};
+
+/**
+ * Parse the GSCPI workbook (pure — fixture-testable): the data sheet is
+ * found structurally (the row whose cells read 'Date' + 'GSCPI' — the
+ * workbook's first sheet is the NY Fed boilerplate, and the data sheet's
+ * own top rows carry boilerplate spill); every row pairing a DD-MMM-YYYY
+ * string with a number becomes one month-start point (the provider stamps
+ * month-END dates; the repo's monthly convention is month-start). The
+ * publisher's own disruption notice (2025-11-06, "limited data") means
+ * the series may pause — a gap never back-fills, the parse just takes the
+ * rows the file carries.
+ */
+export function parseGscpiWorkbook(buf: ArrayBuffer): SeriesPoint[] {
+  const wb = readXlsWorkbook(buf);
+  // The data sheet + header row, found structurally (the row whose cells
+  // read 'Date' + 'GSCPI'); the position is remembered as indices because
+  // the biff rows are Map objects (reference compare would work, indices
+  // read clearer and survive a reader that rebuilt the rows).
+  let headerSheet = -1;
+  let headerRowIdx = -1;
+  outer: for (let s = 0; s < wb.sheets.length; s += 1) {
+    const rows = wb.sheets[s]!.rows;
+    for (let r = 0; r < rows.length; r += 1) {
+      const row = rows[r]!;
+      if (row.get(0) === 'Date' && row.get(1) === 'GSCPI') {
+        headerSheet = s;
+        headerRowIdx = r;
+        break outer;
+      }
+    }
+  }
+  if (headerSheet < 0 || headerRowIdx < 0) {
+    throw new FormatChangedError('GSCPI workbook: no sheet carries a Date/GSCPI header row (layout change?)');
+  }
+  const out: SeriesPoint[] = [];
+  const rows = wb.sheets[headerSheet]!.rows;
+  for (let r = headerRowIdx + 1; r < rows.length; r += 1) {
+    const row = rows[r]!;
+    const dateCell = row.get(0);
+    const value = row.get(1);
+    if (typeof dateCell !== 'string' || typeof value !== 'number') continue; // boilerplate spill/annotation rows
+    const m = GSCPI_DATE_CELL.exec(dateCell.trim());
+    if (!m) {
+      throw new FormatChangedError(`GSCPI workbook: the Date cell ${JSON.stringify(dateCell)} is not DD-MMM-YYYY (layout change?)`);
+    }
+    const month = GSCPI_MONTHS[m[2]!];
+    if (month === undefined) {
+      throw new FormatChangedError(`GSCPI workbook: unknown month "${m[2]}" in ${JSON.stringify(dateCell)} (layout change?)`);
+    }
+    if (value < GSCPI_MIN || value > GSCPI_MAX) {
+      throw new FormatChangedError(`GSCPI workbook: value ${value} at ${dateCell} is outside ${GSCPI_MIN}–${GSCPI_MAX} (layout change?)`);
+    }
+    out.push({ date: `${m[3]}-${String(month).padStart(2, '0')}-01`, value });
+  }
+  if (out.length < 100) {
+    throw new FormatChangedError(`GSCPI workbook: only ${out.length} monthly rows parsed (expected decades)`);
+  }
+  try {
+    assertAscending(out);
+  } catch (err) {
+    throw new FormatChangedError(`GSCPI workbook: rows are not date-ascending (${err instanceof Error ? err.message : err})`);
+  }
+  return out;
+}
+
+/** Fetch + parse the GSCPI workbook (S4-M4.4 — the monthly plan's fifth
+ * file; Worker egress verified FAST in the S1 probe, ~0.5 s). */
+export async function fetchGscpiSeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const res = await insightsFetch(GSCPI_URL, {}, { ...deps, timeoutMs: deps.timeoutMs ?? MONTHLY_FILE_TIMEOUT_MS });
+  return parseGscpiWorkbook(await res.arrayBuffer());
 }

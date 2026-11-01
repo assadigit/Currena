@@ -140,6 +140,13 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   'chokepoint-bab-el-mandeb',
   'chokepoint-malacca',
   'chokepoint-taiwan',
+  // gap-closure S4-M4.4 (2026-11-01): the supply-chain/energy six → 145.
+  'gscpi',
+  'us-spr',
+  'us-crude-production',
+  'coal-aus',
+  'lng-japan',
+  'gas-europe',
   // ----- 16 markets (packages/insights/src/markets/definitions.ts) -----
   'n225', 'asx200', 'kospi', 'hsi', 'ssec', 'taiex', 'nifty50', 'stoxx50', 'dax',
   'cac', 'ftse', 'sp500', 'ndx', 'dow', 'tsx', 'ibov',

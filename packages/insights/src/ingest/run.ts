@@ -798,8 +798,10 @@ async function storedSeriesOf(store: InsightsStore, id: IndicatorId): Promise<Se
 /**
  * THE rung-2 phase. Subrequest budget at 04:20: 1 stage read + 1 snapshot
  * read + 1 status read + the stored-history reads (one per refreshed id) +
- * the planned fetches (1 daily / 3 Saturday / 4 first-of-month max) + 4
- * writes (snapshot, public, stage, status) — comfortably inside 50.
+ * the planned fetches (S4-M4.4: 2 daily [mof + gpr-daily] / 5 Saturday
+ * [mof + the three EIA pages + cftc] / 7 first-of-month max [mof×2 + oecd
+ * + gpr + epu + tpu + gscpi, + gpr-daily]) + 4 writes (snapshot, public,
+ * stage, status) — an all-gates day lands ≈ 39/50, inside the ceiling.
  */
 export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Rung2PhaseResult> {
   const now = opts.now ?? new Date();
@@ -901,7 +903,7 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   // history (buildHistoryFile's floor), and without the stage base the
   // second week's fetch would replace rather than join the first (the
   // accumulation deadlock the A-7 commit shipped with).
-  for (const id of ['eia-crude-stocks', 'cftc-gold-positioning'] as const) {
+  for (const id of ['eia-crude-stocks', 'cftc-gold-positioning', 'us-spr', 'us-crude-production'] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;
     const stored =
@@ -936,6 +938,9 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     'gpr-australia',
     'gpr-daily',
     'tpu-us',
+    // gap-closure S4-M4.4 (2026-11-01): the GSCPI joins the monthly
+    // merge list (full history per fetch, fetched wins on collision).
+    'gscpi',
   ] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;

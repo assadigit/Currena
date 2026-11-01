@@ -32,10 +32,16 @@ import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
 import type { SeriesPoint } from '../series';
 import { fetchMofJgb10y } from './mof';
-import { fetchEiaCrudeStocks } from './eia-stocks';
+import { fetchEiaCrudeStocks, fetchEiaSprLevel, fetchEiaCrudeProduction } from './eia-stocks';
 import { fetchCftcGoldPositioning } from './cftc';
 import { fetchOecdCli } from './oecd';
-import { fetchEpuSeries, fetchGprExportAll, fetchGprDailySeries, fetchTpuSeries } from './monthly-indexes';
+import {
+  fetchEpuSeries,
+  fetchGprExportAll,
+  fetchGprDailySeries,
+  fetchTpuSeries,
+  fetchGscpiSeries,
+} from './monthly-indexes';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -69,6 +75,16 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   'gpr-australia',
   'gpr-daily',
   'tpu-us',
+  // gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy family
+  // — the NY Fed GSCPI joins the monthly plan (one more first-of-month
+  // fetch), and the EIA SPR level + US field production join the eiaWeekly
+  // Saturday gate (two more LeafHandler pages, the crude-stocks pattern).
+  // The Pink Sheet energy trio (coal-aus/lng-japan/gas-europe) rides the
+  // MAIN rung's existing world-bank fetch — NOT a rung-2 id (zero new
+  // subrequests anywhere).
+  'gscpi',
+  'us-spr',
+  'us-crude-production',
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -113,10 +129,17 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     missing.has('gpr-acts') ||
     missing.has('tpu-us') ||
     missing.has('gpr-taiwan') ||
-    missing.has('gpr-australia');
+    missing.has('gpr-australia') ||
+    // S4-M4.4: the GSCPI bootstraps the same way.
+    missing.has('gscpi');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
-    eiaWeekly: isSaturday(date) || missing.has('eia-crude-stocks'),
+    eiaWeekly:
+      isSaturday(date) ||
+      missing.has('eia-crude-stocks') ||
+      // S4-M4.4: the SPR + production pages bootstrap with the stocks page.
+      missing.has('us-spr') ||
+      missing.has('us-crude-production'),
     cftcWeekly: isSaturday(date) || missing.has('cftc-gold-positioning'),
     monthly: isFirstOfMonth(date) || needMonthly,
     gprDaily: true, // S4-M4.2: the daily GPR MA7 file, every day (a missing stage entry is the bootstrap itself)
@@ -189,11 +212,25 @@ export async function collectRung2Sources(
   }
 
   // A-6: the EIA keyless weekly stocks page (Saturday + bootstrap).
+  // S4-M4.4 (2026-11-01): the family grows to THREE pages — the total
+  // crude-stocks page, the SPR level and the US field production (the
+  // series ids walked from the provider's own indexes in M4.1, never
+  // guessed; the same LeafHandler page family, the same parse).
   if (plan.eiaWeekly) {
     const stocks = await fetchLogged('eia', 'crude oil ending stocks WCRSTUS1 (weekly, keyless website route)', () =>
       fetchEiaCrudeStocks(),
     );
     if (stocks !== undefined) series['eia-crude-stocks'] = stocks;
+
+    const spr = await fetchLogged('eia', 'crude oil in the SPR WCSSTUS1 (weekly, keyless website route)', () =>
+      fetchEiaSprLevel(),
+    );
+    if (spr !== undefined) series['us-spr'] = spr;
+
+    const production = await fetchLogged('eia', 'US field production of crude oil WCRFPUS2 (weekly, keyless website route)', () =>
+      fetchEiaCrudeProduction(),
+    );
+    if (production !== undefined) series['us-crude-production'] = production;
   }
 
   // A-7: the CFTC's weekly futures-only COT file (Saturday + bootstrap).
@@ -254,6 +291,17 @@ export async function collectRung2Sources(
       fetchTpuSeries(),
     );
     if (tpu !== undefined) series['tpu-us'] = tpu;
+
+    // gap-closure S4-M4.4 (2026-11-01): the NY Fed GSCPI — the Global
+    // Supply Chain Pressure Index (the .xlsx-named LEGACY .xls, the biff
+    // reader's path; Worker egress verified FAST in the S1 probe). The
+    // provider's own 2025-11-06 notice says the index publishes with
+    // limited data — the parse takes the rows the file carries, never
+    // back-fills a paused month.
+    const gscpi = await fetchLogged('nyfed', 'Global Supply Chain Pressure Index (GSCPI, monthly workbook)', () =>
+      fetchGscpiSeries(),
+    );
+    if (gscpi !== undefined) series['gscpi'] = gscpi;
   }
 
   // S4-M4.2: the GPR daily export — the provider's own GPRD_MA7 7-day

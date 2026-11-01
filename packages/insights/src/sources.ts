@@ -279,11 +279,30 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     notes:
       'Gap-closure S4-M4.3. QUERY SHAPE (verified live 2026-11-01 from the provider\u2019s own responses): portid IN (\u2026) is REQUIRED (equality 400s); the DateOnly field filters with DATE \u2018YYYY-MM-DD\u2019 literals; orderByFields=portid,date; maxRecordCount 1000 (a 400-day window \u00d7 5 chokepoints = 1950 rows = 2 pages, exceededTransferLimit:true on page 1). The host answers HTTP 200 WITH AN ERROR BODY {error:{code:400,\u2018Invalid URL\u2019}} on its intermittent slow-start — the parser fails closed on the body, not the status. Rapid successive queries AND cold starts trip the 400 (TWO live-observed message variants: \u2018Invalid URL\u2019 and \u2018Cannot perform query. Invalid query parameters.\u2019 — the same url fails then serves, ~38% of attempts; both GHA runs died to it before the retries landed); the collect pauses 4 s between pages and gives the code-400 error-body class up to TWO backed-off 10 s retries (the M4.1 back-off-and-retry prescription — NOT a block; every other failure stays single-attempt, F-11; a still-failing page fails the job and the sweeps heal it). Worker egress SLOW (12.5 s first byte, the S1 probe) — the fetch pins 30 s (the TIC precedent). The daily lag is ~7 days; staleAfterDays 14. ONE combined raw-history key insights:portwatch:v1 (400 days per chokepoint, zod both ways); the per-id histories carry the derived MA7. Fixtures: packages/insights/fixtures/s4/portwatch-query-{page1,page2,sixtyday,error}-2026-11-01.json.',
   },
+  nyfed: {
+    id: 'nyfed',
+    provider: 'nyfed',
+    label: 'Federal Reserve Bank of New York (GSCPI)',
+    usedFor: 'gscpi — the Global Supply Chain Pressure Index (monthly) — gap-closure S4-M4.4',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L1',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The New York Fed\u2019s own Terms of Use, quoted verbatim (read 2026-11-01, the S4-M4.1 record): \u201cThe New York Fed grants you a non-exclusive license, subject to the Terms, to use, copy, and distribute Content for your personal or business purposes. You may: Access the Content, manually or through an automated process or device\u2026 Download, store, and use Content in any format or media, Copy and distribute the Content in any format or media, and Modify and create derivative works from the Content.\u201d — an affirmative reuse licence with the attribution condition (\u201cyou must include any copyright notice and other source identifiers\u201d). L1 with quoted permission → public display with the attribution string.',
+    termsReadOn: '2026-11-01',
+    attribution: 'Source: Federal Reserve Bank of New York',
+    termsUrl: 'https://www.newyorkfed.org/privacy/termsofuse',
+    notes:
+      'Gap-closure S4-M4.4. FILE SHAPE (verified live 2026-11-01, M4.1): the download is named gscpi_data.xlsx but is a LEGACY .xls (OLE2/BIFF, 105,984 B) — the repo\u2019s biff reader parses it. TWO sheets: the boilerplate + the data sheet (header Date|GSCPI; DD-MMM-YYYY month-END date strings; 345 monthly rows 1998-01 \u2192 2026-09, latest 1.2840). Worker egress FAST (the S1 probe: ~0.5 s — the Akamai bot-manager fear did not materialise, unlike RBA); runs on the rung-2 monthly plan (first-of-month + bootstrap) + the Node venue\u2019s inline collect. The provider\u2019s own disruption notice (2025-11-06, on the GSCPI page): the index publishes with limited data until further notice — the parse takes the rows the file carries. Fixture: packages/insights/fixtures/s4/gscpi-2026-11-01.xls.',
+  },
   'eia-spot': {
     id: 'eia-spot',
     provider: 'eia',
     label: 'U.S. Energy Information Administration (daily spot .xls workbooks)',
-    usedFor: 'FRED-fallback fills for DCOILWTICO/DCOILBRENTEU/DHHNGSP (WTI, Brent, Henry Hub) — 2026-10-22 reliability round',
+    usedFor: 'FRED-fallback fills for DCOILWTICO/DCOILBRENTEU/DHHNGSP (WTI, Brent, Henry Hub) — 2026-10-22 reliability round; gap-closure S4-M4.4 (2026-11-01) adds the row’s THIRD and FOURTH uses — the weekly SPR level (WCSSTUS1) and the US field production (WCRFPUS2) pages, the eia-crude-stocks pattern twins (the Saturday rung-2 gate)',
     method: 'M2',
     runtime: 'worker',
     level: 'L0',
@@ -787,6 +806,17 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'chokepoint-bab-el-mandeb': ['portwatch:Daily_Chokepoints_Data'],
   'chokepoint-malacca': ['portwatch:Daily_Chokepoints_Data'],
   'chokepoint-taiwan': ['portwatch:Daily_Chokepoints_Data'],
+  // gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy family —
+  // the GSCPI (register row 'nyfed', L1 with the NY Fed's own quoted
+  // reuse terms), the EIA weekly pair (the eia-spot row's pattern twins)
+  // and the Pink Sheet energy trio (the world-bank row's columns F/I/J,
+  // zero new fetches).
+  gscpi: ['nyfed'],
+  'us-spr': ['eia'],
+  'us-crude-production': ['eia'],
+  'coal-aus': ['world-bank'],
+  'lng-japan': ['world-bank'],
+  'gas-europe': ['world-bank'],
 };
 
 /* ------------------------------------------------------------------ */
@@ -1040,6 +1070,17 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   'oecd-cli-de': { min: 50, max: 150 },
   'gpr-index': { minExclusive: true, max: 2_000 },
   'epu-us': { minExclusive: true, max: 2_000 },
+  // gap-closure S4-M4.4 (2026-11-01): the GSCPI is a standardised index
+  // in deviation units (the observed history ≈ −1.6…+4.6; ±5/10 is the
+  // impossibility ceiling); the SPR level and the production rate are
+  // positive with physical ceilings (the parser bands' twins); the three
+  // energy prices are positive like every other Pink Sheet price.
+  gscpi: { min: -5, max: 10 },
+  'us-spr': { minExclusive: true, max: 1_000_000 },
+  'us-crude-production': { minExclusive: true, max: 20_000 },
+  'coal-aus': { minExclusive: true },
+  'lng-japan': { minExclusive: true },
+  'gas-europe': { minExclusive: true },
   'silver-usd': { minExclusive: true },
   'btc-usd': { minExclusive: true },
   'copper-usd': { minExclusive: true },

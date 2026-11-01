@@ -1125,6 +1125,110 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 14,
   },
   {
+    // gap-closure S4-M4.4 (2026-11-01): the NY Fed's Global Supply Chain
+    // Pressure Index — the lane's supply-pressure measure (transport costs
+    // + manufacturing surveys in one standardised index; zero = the global
+    // average, positive = pressure above it). Monthly, ~4-week lag; the
+    // provider's own 2025-11-06 notice says the index publishes with
+    // limited data — the card says so. The SD regime reads it (its level
+    // drifts by era — the M1.6 z-score lesson). Context-only per G-5.
+    id: 'gscpi',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'Global supply chain pressure',
+    source: 'nyfed',
+    sourceRef: 'NY Fed Global Supply Chain Pressure Index (monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75, // the monthly family's convention (gpr/epu/tpu)
+  },
+  {
+    // gap-closure S4-M4.4: the US Strategic Petroleum Reserve level — the
+    // government-owned crude cushion, a LEVEL in thousand barrels (the
+    // total-stocks card's SPR component, its own series). Weekly EIA
+    // cadence (data Friday, publish Wednesday). Context-only per G-5.
+    id: 'us-spr',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'US strategic petroleum reserve',
+    source: 'eia',
+    sourceRef: 'EIA WCSSTUS1 (ending stocks of crude oil in the SPR, weekly, thousand barrels)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 12, // the eia-crude-stocks convention
+  },
+  {
+    // gap-closure S4-M4.4: the US field production of crude oil — the
+    // supply side's other leg, a RATE in thousand barrels per day (the
+    // unit differs from the SPR's LEVEL — both cards state their own
+    // unit, the M4.1 note). Weekly EIA cadence. Context-only per G-5.
+    id: 'us-crude-production',
+    section: 'global',
+    group: 'geo-fragmentation',
+    name: 'US crude oil production',
+    source: 'eia',
+    sourceRef: 'EIA WCRFPUS2 (field production of crude oil, weekly, thousand barrels per day)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 12,
+  },
+  {
+    // gap-closure S4-M4.4: Australian coal — the Newcastle benchmark,
+    // Australia's largest energy export (RULES §7: the Australian angle
+    // first). The SAME Pink Sheet workbook the metals ride (column F,
+    // $/mt — zero new subrequests). Context-only per G-5.
+    id: 'coal-aus',
+    section: 'australia',
+    group: 'au-trade-currency',
+    name: 'Australian coal price',
+    source: 'world-bank',
+    sourceRef: 'World Bank Pink Sheet (Coal, Australian; $/metric ton)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 60, // B-09: the Pink Sheet convention
+  },
+  {
+    // gap-closure S4-M4.4: LNG Japan — the Asia-Pacific LNG benchmark the
+    // region's spot cargoes (including Australia's, one of the world's
+    // largest LNG exporters) price against (column J, $/mmbtu — the same
+    // workbook). Context-only per G-5.
+    id: 'lng-japan',
+    section: 'australia',
+    group: 'au-trade-currency',
+    name: 'LNG price (Japan)',
+    source: 'world-bank',
+    sourceRef: 'World Bank Pink Sheet (Liquefied natural gas, Japan; $/mmbtu)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 60,
+  },
+  {
+    // gap-closure S4-M4.4: European natural gas — the Dutch TTF-class
+    // benchmark (column I, $/mmbtu), the prices lane's third fossil-fuel
+    // column beside WTI and Henry Hub. Context-only per G-5.
+    id: 'gas-europe',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'European natural gas price',
+    source: 'world-bank',
+    sourceRef: 'World Bank Pink Sheet (Natural gas, Europe; $/mmbtu)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 60,
+  },
+  {
     // 2026-10-21 data-integrity round: the two EIA energy spots — context
     // cards in the prices lane (info rule; never prices-board tiles, the
     // board's four-tile layout is spec-fixed, and never scored votes —

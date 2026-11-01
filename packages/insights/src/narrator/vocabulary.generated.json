@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "9c73673e66974483b17cd145678e79cd9304faf02916dac742e44cf2616daef1",
-    "faSha256": "4523a5c1203b12fcbd4d4bc96f5e074ab71eff58e1ddaf5a4ae47e427d745050",
-    "indicatorCount": 168,
-    "glossaryCount": 40
+    "enSha256": "b3c23b753e318cf82c806a76b73d86bd38d56e20ff0a8c1ec053bbc13980a698",
+    "faSha256": "5f14685eb019a1968a877178d2828b97959edda9275a41d3ee0ad9bcc7f213e1",
+    "indicatorCount": 174,
+    "glossaryCount": 45
   },
   "en": {
     "indicators": {
@@ -1158,7 +1158,9 @@
             "strength": "usually"
           }
         ],
-        "glossaryTerms": []
+        "glossaryTerms": [
+          "trade-policy-uncertainty"
+        ]
       },
       "chokepoint-suez": {
         "plainName": "Suez Canal traffic",
@@ -1268,6 +1270,128 @@
         "glossaryTerms": [
           "chokepoint",
           "transit-estimate"
+        ]
+      },
+      "gscpi": {
+        "plainName": "Supply chain pressure gauge",
+        "oneLine": "How stretched the world’s delivery chains are.",
+        "ifRising": "Moving goods tends to take longer and cost more.",
+        "ifFalling": "Goods tend to flow more freely and freight tends to cost less.",
+        "connections": [
+          {
+            "with": "us-cpi-yoy",
+            "text": "Delivery-chain pressure tends to reach goods prices with a lag.",
+            "strength": "usually"
+          },
+          {
+            "with": "chokepoint-suez",
+            "text": "The traffic gates the pressure index reads beside.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "supply-chain-pressure"
+        ]
+      },
+      "us-spr": {
+        "plainName": "America’s emergency oil store",
+        "oneLine": "How much crude oil the US government holds in its strategic reserve.",
+        "ifRising": "The emergency store is being refilled.",
+        "ifFalling": "The emergency store is being drawn down.",
+        "connections": [
+          {
+            "with": "eia-crude-stocks",
+            "text": "The commercial stocks that sit beside the government store.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "The oil price the cushion stands behind.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "strategic-reserve"
+        ]
+      },
+      "us-crude-production": {
+        "plainName": "US oil pumping",
+        "oneLine": "How much crude oil US fields pump each day.",
+        "ifRising": "American oil supply is growing.",
+        "ifFalling": "American oil supply is falling back.",
+        "connections": [
+          {
+            "with": "brent",
+            "text": "The price that tends to move with supply swings.",
+            "strength": "usually"
+          },
+          {
+            "with": "eia-crude-stocks",
+            "text": "Supply and storage read as one balance.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "coal-aus": {
+        "plainName": "Australian coal price",
+        "oneLine": "The world price of Australia’s largest energy export.",
+        "ifRising": "Australia’s coal export income tends to rise.",
+        "ifFalling": "Australia’s coal export income tends to ease.",
+        "connections": [
+          {
+            "with": "terms-of-trade",
+            "text": "Coal is one of the big legs of Australia’s export price basket.",
+            "strength": "reliable"
+          },
+          {
+            "with": "audusd",
+            "text": "Resource export prices and the dollar tend to move together.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "lng-japan": {
+        "plainName": "Asia’s LNG price",
+        "oneLine": "The price Asian buyers pay for shipped gas.",
+        "ifRising": "Australia’s LNG export income tends to rise.",
+        "ifFalling": "Asia’s gas import bill tends to ease.",
+        "connections": [
+          {
+            "with": "coal-aus",
+            "text": "The two big energy-export prices of the region.",
+            "strength": "usually"
+          },
+          {
+            "with": "audusd",
+            "text": "Resource export prices and the dollar tend to move together.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "lng"
+        ]
+      },
+      "gas-europe": {
+        "plainName": "Europe’s gas price",
+        "oneLine": "The price of natural gas in Europe.",
+        "ifRising": "European industry tends to face costlier energy.",
+        "ifFalling": "European energy costs tend to ease.",
+        "connections": [
+          {
+            "with": "brent",
+            "text": "The two fossil-fuel prices of the world’s industrial core.",
+            "strength": "usually"
+          },
+          {
+            "with": "lng-japan",
+            "text": "The Atlantic and Pacific reference prices of one world market.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "lng"
         ]
       },
       "copper-usd": {
@@ -1484,7 +1608,9 @@
             "strength": "usually"
           }
         ],
-        "glossaryTerms": []
+        "glossaryTerms": [
+          "geopolitical-risk-index"
+        ]
       },
       "brent": {
         "plainName": "The world oil price",
@@ -3755,6 +3881,31 @@
       "transit-estimate": {
         "term": "transit (estimate)",
         "plain": "One ship passing through a passage, counted once. The count is an estimate from ship-tracking data, so it can be revised."
+      },
+      "supply-chain-pressure": {
+        "term": "supply chain pressure",
+        "plain": "How stretched the world’s delivery chains are — a measure of how long and how costly it is to move goods, not of any single event.",
+        "example": "When pressure is high, shipping a container tends to cost more and take longer."
+      },
+      "strategic-reserve": {
+        "term": "strategic reserve",
+        "plain": "A stock of crude oil owned by a government and held for emergencies, separate from the inventories companies keep for normal business.",
+        "example": "The US Strategic Petroleum Reserve is the largest of these government oil stocks."
+      },
+      "lng": {
+        "term": "LNG",
+        "plain": "Liquefied natural gas — natural gas cooled into a liquid so it can be shipped by tanker, the form in which gas crosses oceans.",
+        "example": "Most of the gas Japan and Korea use arrives as LNG; Australia is one of the world’s largest LNG exporters."
+      },
+      "geopolitical-risk-index": {
+        "term": "geopolitical risk index",
+        "plain": "A measure of how much war and international tension fills the news, built by counting newspaper coverage — not a count of events themselves.",
+        "example": "A reading of 200 means war-and-tension coverage was about twice as common as in the average month."
+      },
+      "trade-policy-uncertainty": {
+        "term": "trade policy uncertainty",
+        "plain": "A measure of how much newspaper coverage is about trade policy — tariffs, deals and disputes — rather than what the policy actually is.",
+        "example": "A high reading says trade dominates the news, not which way it goes."
       }
     },
     "ui": {
@@ -4944,7 +5095,9 @@
             "strength": "usually"
           }
         ],
-        "glossaryTerms": []
+        "glossaryTerms": [
+          "trade-policy-uncertainty"
+        ]
       },
       "chokepoint-suez": {
         "plainName": "تردد کانال سوئز",
@@ -5054,6 +5207,128 @@
         "glossaryTerms": [
           "chokepoint",
           "transit-estimate"
+        ]
+      },
+      "gscpi": {
+        "plainName": "فشارسنج زنجیرهٔ تأمین",
+        "oneLine": "زنجیره‌های حمل کالای جهان چقدر کشیده شده‌اند.",
+        "ifRising": "جابه‌جایی کالا معمولاً طولانی‌تر و پرهزینه‌تر می‌شود.",
+        "ifFalling": "کالاها معمولاً روان‌تر جریان می‌یابند و هزینهٔ باربری کم می‌شود.",
+        "connections": [
+          {
+            "with": "us-cpi-yoy",
+            "text": "فشار زنجیرهٔ حمل معمولاً با تأخیر به قیمت کالاها می‌رسد.",
+            "strength": "usually"
+          },
+          {
+            "with": "chokepoint-suez",
+            "text": "دروازه‌های ترددی که فشارسنج در کنارشان خوانده می‌شود.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "supply-chain-pressure"
+        ]
+      },
+      "us-spr": {
+        "plainName": "انبار اضطراری نفت آمریکا",
+        "oneLine": "دولت آمریکا چه مقدار نفت خام در ذخیرهٔ راهبردی خود نگه می‌دارد.",
+        "ifRising": "انبار اضطراری در حال پرشدن دوباره است.",
+        "ifFalling": "انبار اضطراری در حال تخلیه است.",
+        "connections": [
+          {
+            "with": "eia-crude-stocks",
+            "text": "موجودی تجاری که در کنار انبار دولتی می‌نشیند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "brent",
+            "text": "قیمت نفت که این بالشتک پشت آن است.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "strategic-reserve"
+        ]
+      },
+      "us-crude-production": {
+        "plainName": "پمپاژ نفت آمریکا",
+        "oneLine": "میدان‌های نفتی آمریکا روزانه چه مقدار نفت خام پمپ می‌کنند.",
+        "ifRising": "عرضهٔ نفتی آمریکا در حال رشد است.",
+        "ifFalling": "عرضهٔ نفتی آمریکا در حال کاهش است.",
+        "connections": [
+          {
+            "with": "brent",
+            "text": "قیمتی که معمولاً همراه عرضه جابه‌جا می‌شود.",
+            "strength": "usually"
+          },
+          {
+            "with": "eia-crude-stocks",
+            "text": "عرضه و انبارش، یک ترازنامه را می‌سازند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "coal-aus": {
+        "plainName": "قیمت زغال‌سنگ استرالیا",
+        "oneLine": "قیمت جهانی بزرگ‌ترین صادرات انرژی استرالیا.",
+        "ifRising": "درآمد صادرات زغال‌سنگ استرالیا معمولاً بالا می‌رود.",
+        "ifFalling": "درآمد صادرات زغال‌سنگ استرالیا معمولاً کم می‌شود.",
+        "connections": [
+          {
+            "with": "terms-of-trade",
+            "text": "زغال‌سنگ یکی از پایه‌های بزرگ سبد قیمت صادرات استرالیاست.",
+            "strength": "reliable"
+          },
+          {
+            "with": "audusd",
+            "text": "قیمت صادرات منابع و دلار معمولاً با هم حرکت می‌کنند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "lng-japan": {
+        "plainName": "قیمت ال‌ان‌جی آسیا",
+        "oneLine": "قیمتی که خریداران آسیایی برای گاز دریایی می‌پردازند.",
+        "ifRising": "درآمد صادرات ال‌ان‌جی استرالیا معمولاً بالا می‌رود.",
+        "ifFalling": "قبض وارد گاز آسیا معمولاً سبک‌تر می‌شود.",
+        "connections": [
+          {
+            "with": "coal-aus",
+            "text": "دو قیمت بزرگ صادرات انرژی منطقه.",
+            "strength": "usually"
+          },
+          {
+            "with": "audusd",
+            "text": "قیمت صادرات منابع و دلار معمولاً با هم حرکت می‌کنند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "lng"
+        ]
+      },
+      "gas-europe": {
+        "plainName": "قیمت گاز اروپا",
+        "oneLine": "قیمت گاز طبیعی در اروپا.",
+        "ifRising": "صنعت اروپا معمولاً با انرژی گران‌تر روبه‌رو می‌شود.",
+        "ifFalling": "هزینهٔ انرژی اروپا معمولاً سبک‌تر می‌شود.",
+        "connections": [
+          {
+            "with": "brent",
+            "text": "دو قیمت سوخت فسیلی در قلب صنعتی جهان.",
+            "strength": "usually"
+          },
+          {
+            "with": "lng-japan",
+            "text": "معیارهای گازی اقیانوس اطلس و آرام در یک بازار جهانی.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "lng"
         ]
       },
       "copper-usd": {
@@ -5270,7 +5545,9 @@
             "strength": "usually"
           }
         ],
-        "glossaryTerms": []
+        "glossaryTerms": [
+          "geopolitical-risk-index"
+        ]
       },
       "brent": {
         "plainName": "قیمت جهانی نفت",
@@ -7541,6 +7818,31 @@
       "transit-estimate": {
         "term": "تردد (برآورد)",
         "plain": "عبور یک کشتی از یک گذرگاه، یک‌بار شمرده می‌شود. این شمارش برآوردی از داده‌های ردیابی کشتی‌هاست و ممکن است اصلاح شود."
+      },
+      "supply-chain-pressure": {
+        "term": "فشار زنجیرهٔ تأمین",
+        "plain": "میزان کشیده‌شدن زنجیره‌های حمل جهان؛ سنجه‌ای از اینکه جابه‌جایی کال‌ها چقدر طولانی و پرهزینه است، نه گزارش یک رویداد خاص.",
+        "example": "وقتی فشار بالاست، ارسال یک کانتینر معمولاً گران‌تر و طولانی‌تر می‌شود."
+      },
+      "strategic-reserve": {
+        "term": "ذخیرهٔ راهبردی",
+        "plain": "انباری از نفت خام در اختیار دولت که برای شرایط اضطراری نگه داشته می‌شود، جدا از موجودی‌ای که شرکت‌ها برای کار عادی نگه می‌دارند.",
+        "example": "ذخیرهٔ راهبردی نفت ایالات متحده بزرگ‌ترین این انبارهای دولتی نفت است."
+      },
+      "lng": {
+        "term": "ال‌ان‌جی (گاز مایع)",
+        "plain": "گاز طبیعی مایع‌شده؛ گازی که با سرما به مایع بدل می‌شود تا با کشتی جابه‌جا شود؛ شکلی که گاز با آن از اقیانوس‌ها می‌گذرد.",
+        "example": "ژاپن و کره بیشتر گاز خود را به‌صورت ال‌ان‌جی می‌خرند؛ استرالیا یکی از بزرگ‌ترین صادرکنندگان ال‌ان‌جی جهان است."
+      },
+      "geopolitical-risk-index": {
+        "term": "شاخص ریسک ژئوپلیتیک",
+        "plain": "سنجه‌ای از اینکه خبرها چقدر پر از جنگ و تنش بین‌المللی است، با شمارش پوشش روزنامه‌ها، نه شمارش خودِ رویدادها.",
+        "example": "عدد ۲۰۰ یعنی پوشش جنگ و تنش حدوداً دو برابر ماه متوسط بوده است."
+      },
+      "trade-policy-uncertainty": {
+        "term": "عدم قطعیت سیاست تجاری",
+        "plain": "سنجه‌ای از اینکه چه سهمی از پوشش روزنامه‌ها دربارهٔ سیاست تجاری است (تعرفه‌ها، توافق‌ها و اختلاف‌ها)، نه اینکه سیاست دقیقاً چه می‌گوید.",
+        "example": "عدد بالا یعنی تجارت بر خبرها مسلط است، نه اینکه جهتش معلوم است."
       }
     },
     "ui": {

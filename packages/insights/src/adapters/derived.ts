@@ -655,6 +655,10 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('brent', fred.DCOILBRENTEU !== undefined ? fillBrentGap(fred.DCOILBRENTEU, inputs.brentYahoo) : undefined);
   if (out.brent === undefined && inputs.brentYahoo !== undefined) put('brent', inputs.brentYahoo);
   if (out.brent === undefined && wb) put('brent', wb.brent);
+  // gap-closure S4-M4.4 (2026-11-01): the European natural-gas benchmark —
+  // the prices lane's third fossil-fuel column beside WTI and Henry Hub
+  // (the same Pink Sheet workbook, $/mmbtu).
+  put('gas-europe', wb?.gasEurope);
 
   // Gold (fix B-01): the Yahoo 10-year daily closes are the value history;
   // today's gold-api spot stamps the live point; the WB monthly and any
@@ -799,6 +803,12 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   }
   put('terms-of-trade', abs?.termsOfTrade);
   put('iron-ore', wb?.ironOre);
+  // gap-closure S4-M4.4 (2026-11-01): Australia's energy-export benchmarks
+  // from the SAME Pink Sheet workbook (RULES §7 — the Australian angle
+  // first: coal is Australia's largest energy export, and the Japan LNG
+  // price is the Asia-Pacific benchmark its LNG exports price against).
+  put('coal-aus', wb?.coalAus);
+  put('lng-japan', wb?.lngJapan);
   if (inputs.xauSpot && fx.AUD && fx.AUD.length > 0) {
     const lastAud = fx.AUD[fx.AUD.length - 1]!;
     put('gold-aud', singlePoint(today, inputs.xauSpot.price * lastAud.value));
@@ -1259,6 +1269,33 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'chokepoint-taiwan': {
     name: 'International Monetary Fund, PortWatch (Taiwan Strait daily transits)',
     url: 'https://portwatch.imf.org/',
+  },
+  // gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy family's
+  // reading sources (the GSCPI + the EIA weekly pair + the Pink Sheet
+  // energy trio).
+  gscpi: {
+    name: 'Federal Reserve Bank of New York (Global Supply Chain Pressure Index)',
+    url: 'https://www.newyorkfed.org/research/policy/gscpi',
+  },
+  'us-spr': {
+    name: 'U.S. Energy Information Administration (ending stocks of crude oil in the SPR, WCSSTUS1)',
+    url: 'https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W',
+  },
+  'us-crude-production': {
+    name: 'U.S. Energy Information Administration (field production of crude oil, WCRFPUS2)',
+    url: 'https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRFPUS2&f=W',
+  },
+  'coal-aus': {
+    name: 'The World Bank Pink Sheet — Australian coal',
+    url: 'https://www.worldbank.org/en/research/commodity-markets',
+  },
+  'gas-europe': {
+    name: 'The World Bank Pink Sheet — European natural gas',
+    url: 'https://www.worldbank.org/en/research/commodity-markets',
+  },
+  'lng-japan': {
+    name: 'The World Bank Pink Sheet — LNG, Japan',
+    url: 'https://www.worldbank.org/en/research/commodity-markets',
   },
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
   platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },

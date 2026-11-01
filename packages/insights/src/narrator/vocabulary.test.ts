@@ -111,8 +111,8 @@ describe('P3 getNarratorVocabulary — both languages, one shape', () => {
     expect(en.entries['vix']!.plainName).not.toMatch(/[\u0600-\u06FF]/);
   });
 
-  it('the full catalogue answers identically in both languages (168 ids)', () => {
-    expect(VOCABULARY_IDS).toHaveLength(168); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair · gap-closure S3-M3.4 (2026-11-01): +the growth-nowcast/survey six · gap-closure S3-M3.5 (2026-11-01): +the fiscal/Treasury-supply six · gap-closure S4-M4.2 (2026-11-01): +the geopolitics eleven · gap-closure S4-M4.3 (2026-11-01): +the chokepoint five
+  it('the full catalogue answers identically in both languages (174 ids)', () => {
+    expect(VOCABULARY_IDS).toHaveLength(174); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair · gap-closure S3-M3.4 (2026-11-01): +the growth-nowcast/survey six · gap-closure S3-M3.5 (2026-11-01): +the fiscal/Treasury-supply six · gap-closure S4-M4.2 (2026-11-01): +the geopolitics eleven · gap-closure S4-M4.3 (2026-11-01): +the chokepoint five · gap-closure S4-M4.4 (2026-11-01): +the supply-chain/energy six
     const en = getNarratorVocabulary(VOCABULARY_IDS, 'en');
     const fa = getNarratorVocabulary(VOCABULARY_IDS, 'fa');
     expect(en.ids).toEqual(fa.ids);
@@ -137,19 +137,19 @@ describe('P3 — the generated snapshot integrity', () => {
     fa: { indicators: Record<string, unknown>; glossary: Record<string, unknown> };
   };
 
-  it('counts match the Layer-1 record (168 indicators, 40 glossary terms)', () => {
-    expect(payload.source.indicatorCount).toBe(168); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair · gap-closure S3-M3.4 (2026-11-01): +the growth-nowcast/survey six · gap-closure S3-M3.5 (2026-11-01): +the fiscal/Treasury-supply six · gap-closure S4-M4.2 (2026-11-01): +the geopolitics eleven · gap-closure S4-M4.3 (2026-11-01): +the chokepoint five
-    expect(payload.source.glossaryCount).toBe(40); // gap-closure S2-M2.5: +the 5 foreign-holders terms · S3-M3.2: +liquidity, term premium, TGA, reverse repo, bank reserves, net liquidity · S3-M3.3: +excess bond premium, financial stress index · S3-M3.4: +nowcast · S3-M3.5: +bid-to-cover · S4-M4.3: +chokepoint, transit-estimate
-    expect(Object.keys(payload.en.indicators)).toHaveLength(168);
-    expect(Object.keys(payload.fa.indicators)).toHaveLength(168);
-    expect(Object.keys(payload.en.glossary)).toHaveLength(40);
-    expect(Object.keys(payload.fa.glossary)).toHaveLength(40);
+  it('counts match the Layer-1 record (174 indicators, 45 glossary terms)', () => {
+    expect(payload.source.indicatorCount).toBe(174); // gap-closure S2-M2.4 completion (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair · gap-closure S3-M3.4 (2026-11-01): +the growth-nowcast/survey six · gap-closure S3-M3.5 (2026-11-01): +the fiscal/Treasury-supply six · gap-closure S4-M4.2 (2026-11-01): +the geopolitics eleven · gap-closure S4-M4.3 (2026-11-01): +the chokepoint five · gap-closure S4-M4.4 (2026-11-01): +the supply-chain/energy six
+    expect(payload.source.glossaryCount).toBe(45); // gap-closure S2-M2.5: +the 5 foreign-holders terms · S3-M3.2: +liquidity, term premium, TGA, reverse repo, bank reserves, net liquidity · S3-M3.3: +excess bond premium, financial stress index · S3-M3.4: +nowcast · S3-M3.5: +bid-to-cover · S4-M4.3: +chokepoint, transit-estimate · S4-M4.4: +supply-chain-pressure, strategic-reserve, lng, geopolitical-risk-index, trade-policy-uncertainty
+    expect(Object.keys(payload.en.indicators)).toHaveLength(174);
+    expect(Object.keys(payload.fa.indicators)).toHaveLength(174);
+    expect(Object.keys(payload.en.glossary)).toHaveLength(45);
+    expect(Object.keys(payload.fa.glossary)).toHaveLength(45);
   });
 
   it("records its source provenance (the dictionaries' sha256)", () => {
     expect(payload.source.enSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(payload.source.faSha256).toMatch(/^[0-9a-f]{64}$/);
-    expect(VOCABULARY_SOURCE.indicatorCount).toBe(168); // S3-M3.3: +the credit pair · S3-M3.4: +the growth-nowcast/survey six · S3-M3.5: +the fiscal/Treasury-supply six · S4-M4.2: +the geopolitics eleven · S4-M4.3: +the chokepoint five
+    expect(VOCABULARY_SOURCE.indicatorCount).toBe(174); // S3-M3.3: +the credit pair · S3-M3.4: +the growth-nowcast/survey six · S3-M3.5: +the fiscal/Treasury-supply six · S4-M4.2: +the geopolitics eleven · S4-M4.3: +the chokepoint five · S4-M4.4: +the supply-chain/energy six
   });
 });
 

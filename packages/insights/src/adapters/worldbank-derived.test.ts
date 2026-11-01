@@ -50,6 +50,21 @@ describe('worldbank XLSX parse (real recorded workbook)', () => {
     expect(wb.gold[0]!.date).toMatch(/^19\d{2}-\d{2}-01$/);
   });
 
+  // gap-closure S4-M4.4 (2026-11-01): the energy trio from the SAME
+  // Monthly Prices sheet (columns F/I/J — provider-exact pins off the
+  // committed workbook, the M4.1 verification values).
+  it('reads the energy columns (coal Australian, gas Europe, LNG Japan)', async () => {
+    const cells = await readXlsxSheet(bytes, 'Monthly Prices');
+    const wb = parseWorldBankMonthlySheet(cells);
+    expect(wb.coalAus.at(-1)).toEqual({ date: '2026-09-01', value: 147.1 });
+    expect(wb.gasEurope.at(-1)).toEqual({ date: '2026-09-01', value: 25.42 });
+    expect(wb.lngJapan.at(-1)).toEqual({ date: '2026-09-01', value: 14.25 });
+    // Decades of history each (the coal column starts 1990s, gas/LNG later).
+    expect(wb.coalAus.length).toBeGreaterThan(300);
+    expect(wb.gasEurope.length).toBeGreaterThan(300);
+    expect(wb.lngJapan.length).toBeGreaterThan(300);
+  });
+
   it('throws on an unknown sheet name', async () => {
     await expect(readXlsxSheet(bytes, 'Not A Sheet')).rejects.toThrow(/no sheet named/);
   });
@@ -60,6 +75,14 @@ describe('worldbank XLSX parse (real recorded workbook)', () => {
       c.row === 6 && c.value === '($/troy oz)' ? { ...c, value: '($/kg)' } : c,
     );
     expect(() => parseWorldBankMonthlySheet(saboteur)).toThrow(/unit is "\(\$\/kg\)"/);
+  });
+
+  it('S4-M4.4: throws when an energy column loses its identity (the $/mmbtu check)', async () => {
+    const cells = await readXlsxSheet(bytes, 'Monthly Prices');
+    const saboteur = cells.map((c) =>
+      c.row === 6 && c.value === '($/mmbtu)' ? { ...c, value: '($/GJ)' } : c,
+    );
+    expect(() => parseWorldBankMonthlySheet(saboteur)).toThrow(/unit is "\(\$\/GJ\)"/);
   });
 });
 
@@ -119,6 +142,11 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
       // (the wheat/maize assertions live in the workbook-fixture test below).
       wheat: [],
       maize: [],
+      // gap-closure S4-M4.4 (2026-11-01): the energy columns — empty here
+      // (the workbook-fixture test above carries the provider-exact pins).
+      coalAus: [],
+      gasEurope: [],
+      lngJapan: [],
     },
     xauSpot: { symbol: 'XAU', price: 4162.6, updatedAt: '2026-10-06T15:03:10Z' },
     xagSpot: { symbol: 'XAG', price: 61.28, updatedAt: '2026-10-06T15:03:10Z' },
@@ -213,6 +241,29 @@ describe('buildIndicatorSeries (assembly mirrors the backtest SERIES map)', () =
     // every ABS P2 series passes through
     expect(out['au-home-values']).toEqual(inputs.abs.resDwellMeanPrice);
     expect(out['terms-of-trade']).toEqual(inputs.abs.termsOfTrade);
+  });
+
+  // gap-closure S4-M4.4 (2026-11-01): the energy trio rides the same wb
+  // contract — the Pink Sheet columns pass straight through (coal/LNG in
+  // the Australia trade lane, gas in the prices lane).
+  it('S4-M4.4: passes the Pink Sheet energy columns through when present', () => {
+    const withEnergy = {
+      ...inputs,
+      wb: {
+        ...inputs.wb,
+        coalAus: pts([['2026-08-01', 145.2], ['2026-09-01', 147.1]]),
+        gasEurope: pts([['2026-09-01', 25.42]]),
+        lngJapan: pts([['2026-09-01', 14.25]]),
+      },
+    };
+    const out = buildIndicatorSeries(withEnergy);
+    expect(out['coal-aus']).toEqual(withEnergy.wb.coalAus);
+    expect(out['gas-europe']).toEqual(withEnergy.wb.gasEurope);
+    expect(out['lng-japan']).toEqual(withEnergy.wb.lngJapan);
+    // and omit cleanly when absent (fail closed, never a stale price)
+    expect(buildIndicatorSeries(inputs)['coal-aus']).toBeUndefined();
+    expect(buildIndicatorSeries(inputs)['gas-europe']).toBeUndefined();
+    expect(buildIndicatorSeries(inputs)['lng-japan']).toBeUndefined();
   });
 
   it('falls back to the World Bank monthly brent when FRED is down, and omits what it cannot build', () => {

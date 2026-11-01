@@ -13,9 +13,9 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 139-indicator dashboard
+## 1. What indicators Currena has — the 145-indicator dashboard
 
-The Insights page renders **139 indicators** across **2 sections** (Global
+The Insights page renders **145 indicators** across **2 sections** (Global
 99, Australia 23 — see the
 breakdown below), grouped under **10 question gauges** (6 global + 3
 australia + the prices-board strip; the sixth global lane is the S4
@@ -24,7 +24,7 @@ S6). Of those, **48 are scored voters** (contribute to a gauge's verdict)
 and **91 are context rows** (live value + 10-year position bar, never
 vote).
 
-The live snapshot is served at `GET /api/insights` — 139 `readings` plus
+The live snapshot is served at `GET /api/insights` — 145 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -42,7 +42,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `gpr-threats`, `gpr-acts`, `gpr-daily`, `gpr-taiwan`, `gpr-china`, `gpr-russia`, `gpr-ukraine`, `gpr-israel`, `gpr-saudi`, `gpr-australia` (S4-M4.2), `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4) | 5 |
 | **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
 | **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de`, `gdpnow`, `empire-state`, `continuing-claims` (S3-M3.4) | 10 |
-| **geo-fragmentation** (shadow, S4-M4.3) | global | context only (never votes until S6): `chokepoint-suez`, `chokepoint-panama`, `chokepoint-bab-el-mandeb`, `chokepoint-malacca`, `chokepoint-taiwan` — the IMF PortWatch transits; the M4.2 geopolitics family joins this lane in M4.5 | 0 |
+| **geo-fragmentation** (shadow, S4-M4.3/M4.4) | global | context only (never votes until S6): `chokepoint-suez`, `chokepoint-panama`, `chokepoint-bab-el-mandeb`, `chokepoint-malacca`, `chokepoint-taiwan` — the IMF PortWatch transits — plus `gscpi`, `us-spr`, `us-crude-production` (S4-M4.4: the supply-pressure and US-oil-supply members) | 0 |
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
 | **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** + context: `au-petrol-yoy` | 5 |
 | **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `rba-cash-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
@@ -52,7 +52,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (139 ids, alphabetical)
+### The complete indicator inventory (145 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -67,7 +67,8 @@ public-display-ok · scored voter? · short description.
 > CLI SDMX), `gpr` (Caldara-Iacoviello GPR index), `epu` (Baker-Bloom-
 > Davis EPU), `alternative-me` (crypto Fear & Greed), `treasury` (U.S.
 > Treasury fallback), `shiller` (Shiller dataset), `portwatch` (IMF
-> PortWatch chokepoint transits, S4-M4.3), `derived` (Currena's
+> PortWatch chokepoint transits, S4-M4.3), `nyfed` (the NY Fed GSCPI,
+> S4-M4.4), `derived` (Currena's
 > own arithmetic from the above).
 
 | id | provider | cadence | maxAge (d) | level | public | voter? | what it is |
@@ -100,6 +101,7 @@ public-display-ok · scored voter? · short description.
 | `bund-10y` | fred | monthly | 75 | L2 | yes | – | German 10-year government bond yield (OECD mirror) |
 | `cfnai` | fred | monthly | 95 | L2 | yes | – | US economic activity scorecard (Chicago Fed) |
 | `cftc-gold-positioning` | cftc | weekly | 12 | L0 | yes | ✓ | Trader positioning in gold (COT, net non-commercial share of OI) |
+| `coal-aus` | world-bank | monthly | 60 | L1 | yes | – | Australian coal price (Pink Sheet, $/mt — the Newcastle benchmark) |
 | `china-cpi` | nbs | monthly | 45 | L1 | yes | ✓ | China inflation (yearly) |
 | `china-pmi` | nbs | monthly | 45 | L1 | yes | ✓ | China manufacturing PMI |
 | `continuing-claims` | fred | weekly | 28 | L0 | yes | – | Americans receiving unemployment benefits (CCSA, the persistence read beside new claims) |
@@ -125,6 +127,8 @@ public-display-ok · scored voter? · short description.
 | `gold-oil-ratio` | derived | daily | 3 | L2 | yes | – | Gold measured in oil (barrels per ounce) |
 | `gold-silver` | derived | daily | 2 | L1 | yes | ✓ | Gold / Silver ratio |
 | `gold-usd` | gold-api | daily | 2 | L2 | yes | – | Gold price (ounce) |
+| `gas-europe` | world-bank | monthly | 60 | L1 | yes | – | European natural gas price (Pink Sheet, $/mmbtu) |
+| `gscpi` | nyfed | monthly | 75 | L1 | yes | – | Global Supply Chain Pressure Index (NY Fed; the z-score regime reads it) |
 | `gpr-index` | gpr | monthly | 75 | L0 | yes | – | Geopolitical Risk Index (Caldara-Iacoviello) |
 | `gpr-threats` | gpr | monthly | 75 | L0 | yes | – | GPR threats sub-index (GPRT, the same monthly export) |
 | `gpr-acts` | gpr | monthly | 75 | L0 | yes | – | GPR acts sub-index (GPRA, the same monthly export) |
@@ -148,6 +152,7 @@ public-display-ok · scored voter? · short description.
 | `iron-ore` | world-bank | monthly | 60 | L1 | yes | – | Iron ore price (Pink Sheet) |
 | `jgb-10y` | mof | daily | 4 | L2 | yes | – | Japan 10-year government bond yield (MOF jgbcme; OECD mirror fallback) |
 | `job-openings` | fred | monthly | 110 | L0 | yes | – | US job openings (JOLTS) |
+| `lng-japan` | world-bank | monthly | 60 | L1 | yes | – | LNG price, Japan (Pink Sheet, $/mmbtu — the Asia-Pacific benchmark) |
 | `m2-us` | fred | monthly | 90 | L0 | yes | – | US M2 money supply |
 | `maize` | world-bank | monthly | 60 | L1 | yes | – | Maize price (Pink Sheet) |
 | `michigan-1y-expectations` | fred | monthly | 75 | L2 | yes | – | US expected inflation next year (Michigan) |
@@ -189,6 +194,7 @@ public-display-ok · scored voter? · short description.
 | `us-2y` | fred | daily | 4 | L0 | yes | – | US 2-year Treasury yield |
 | `us-cpi-core-yoy` | derived | monthly | 75 | L0 | yes | – | US core inflation (yearly, NSA) |
 | `us-cpi-yoy` | derived | monthly | 75 | L0 | yes | ✓ | US inflation (yearly, NSA) |
+| `us-crude-production` | eia | weekly | 12 | L0 | yes | – | US field production of crude oil (EIA WCRFPUS2, thousand barrels per day) |
 | `us-deficit-12m` | derived | monthly | 75 | L0 | yes | – | The rolling 12-month federal deficit (MTSDS133FMS sum; the monthly companion rides inside) |
 | `us-deficit-monthly` | fred | monthly | 75 | L0 | yes | – | The latest month's federal surplus/deficit figure (renders INSIDE the 12m card) |
 | `us-gdp-growth` | fred | quarterly | 215 | L0 | yes | – | US economic growth (real GDP) |
@@ -196,6 +202,7 @@ public-display-ok · scored voter? · short description.
 | `us-nfp` | derived | monthly | 70 | L0 | yes | – | US jobs added each month |
 | `us-pce-core-yoy` | derived | monthly | 95 | L0 | yes | ✓ | US core inflation by the Fed's gauge (PCE) |
 | `us-unemployment` | fred | monthly | 75 | L0 | yes | ✓ | US unemployment rate (BLS) |
+| `us-spr` | eia | weekly | 12 | L0 | yes | – | US Strategic Petroleum Reserve level (EIA WCSSTUS1, thousand barrels) |
 | `us-wages` | derived | monthly | 75 | L0 | yes | – | US wage growth (yearly) |
 | `us10y` | fred | daily | 4 | L0 | yes | ✓ | US 10-year Treasury yield |
 | `us30y` | fred | daily | 4 | L0 | yes | ✓ | US 30-year Treasury yield |
@@ -210,7 +217,7 @@ public-display-ok · scored voter? · short description.
 | `yield-curve-10y2y` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 2Y yield |
 | `yield-curve-10y3m` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 3M yield (the Fed's recession lens) |
 
-**Counts:** 139 ids total. Voters: 48 (brent votes in prices-heat per the
+**Counts:** 145 ids total. Voters: 48 (brent votes in prices-heat per the
 B-14 fix; the count is 9+5+5+3+10 + 5+7+4 = 48, which includes the
 **A-7 cftc-gold-positioning** voter in market-stress and the **A-8
 oecd-cli-us** voter in growth-health). Context: 91 (+6 S3-M3.2, +2 S3-M3.3,

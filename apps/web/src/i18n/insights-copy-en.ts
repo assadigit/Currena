@@ -349,6 +349,34 @@ const LAYER1 = {
       term: 'transit (estimate)',
       plain: 'One ship passing through a passage, counted once. The count is an estimate from ship-tracking data, so it can be revised.',
     },
+    // gap-closure S4-M4.4 (2026-11-01) — the supply-chain and energy
+    // cards' terms (the M4.6 glossary list, landed with the cards that
+    // use them; the GPR/TPU terms below land with their cards' refresh).
+    'supply-chain-pressure': {
+      term: 'supply chain pressure',
+      plain: 'How stretched the world\u2019s delivery chains are \u2014 a measure of how long and how costly it is to move goods, not of any single event.',
+      example: 'When pressure is high, shipping a container tends to cost more and take longer.',
+    },
+    'strategic-reserve': {
+      term: 'strategic reserve',
+      plain: 'A stock of crude oil owned by a government and held for emergencies, separate from the inventories companies keep for normal business.',
+      example: 'The US Strategic Petroleum Reserve is the largest of these government oil stocks.',
+    },
+    lng: {
+      term: 'LNG',
+      plain: 'Liquefied natural gas \u2014 natural gas cooled into a liquid so it can be shipped by tanker, the form in which gas crosses oceans.',
+      example: 'Most of the gas Japan and Korea use arrives as LNG; Australia is one of the world\u2019s largest LNG exporters.',
+    },
+    'geopolitical-risk-index': {
+      term: 'geopolitical risk index',
+      plain: 'A measure of how much war and international tension fills the news, built by counting newspaper coverage \u2014 not a count of events themselves.',
+      example: 'A reading of 200 means war-and-tension coverage was about twice as common as in the average month.',
+    },
+    'trade-policy-uncertainty': {
+      term: 'trade policy uncertainty',
+      plain: 'A measure of how much newspaper coverage is about trade policy \u2014 tariffs, deals and disputes \u2014 rather than what the policy actually is.',
+      example: 'A high reading says trade dominates the news, not which way it goes.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -980,7 +1008,7 @@ const LAYER1 = {
         { with: 'epu-us', text: 'The trade column of the wider policy-noise gauge.', strength: 'reliable' },
         { with: 'gpr-index', text: 'Two lenses on world friction: trade words beside war words.', strength: 'usually' },
       ],
-      glossaryTerms: [],
+      glossaryTerms: ['trade-policy-uncertainty'],
     },
     // gap-closure S4-M4.3 (2026-11-01): the chokepoint cards — measured
     // ship traffic through the world's narrow sea gates. Measurements and
@@ -1039,6 +1067,75 @@ const LAYER1 = {
         { with: 'gpr-taiwan', text: 'The tension gauge of the same waters, read beside the traffic.', strength: 'usually' },
       ],
       glossaryTerms: ['chokepoint', 'transit-estimate'],
+    },
+    // gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy cards
+    // — measured pressure, stocks and prices. The Australian angle leads
+    // the coal and LNG cards (RULES §7); measurements and tendencies only.
+    gscpi: {
+      plainName: 'Supply chain pressure gauge',
+      oneLine: 'How stretched the world\u2019s delivery chains are.',
+      ifRising: 'Moving goods tends to take longer and cost more.',
+      ifFalling: 'Goods tend to flow more freely and freight tends to cost less.',
+      connections: [
+        { with: 'us-cpi-yoy', text: 'Delivery-chain pressure tends to reach goods prices with a lag.', strength: 'usually' },
+        { with: 'chokepoint-suez', text: 'The traffic gates the pressure index reads beside.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['supply-chain-pressure'],
+    },
+    'us-spr': {
+      plainName: 'America\u2019s emergency oil store',
+      oneLine: 'How much crude oil the US government holds in its strategic reserve.',
+      ifRising: 'The emergency store is being refilled.',
+      ifFalling: 'The emergency store is being drawn down.',
+      connections: [
+        { with: 'eia-crude-stocks', text: 'The commercial stocks that sit beside the government store.', strength: 'reliable' },
+        { with: 'brent', text: 'The oil price the cushion stands behind.', strength: 'usually' },
+      ],
+      glossaryTerms: ['strategic-reserve'],
+    },
+    'us-crude-production': {
+      plainName: 'US oil pumping',
+      oneLine: 'How much crude oil US fields pump each day.',
+      ifRising: 'American oil supply is growing.',
+      ifFalling: 'American oil supply is falling back.',
+      connections: [
+        { with: 'brent', text: 'The price that tends to move with supply swings.', strength: 'usually' },
+        { with: 'eia-crude-stocks', text: 'Supply and storage read as one balance.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'coal-aus': {
+      plainName: 'Australian coal price',
+      oneLine: 'The world price of Australia\u2019s largest energy export.',
+      ifRising: 'Australia\u2019s coal export income tends to rise.',
+      ifFalling: 'Australia\u2019s coal export income tends to ease.',
+      connections: [
+        { with: 'terms-of-trade', text: 'Coal is one of the big legs of Australia\u2019s export price basket.', strength: 'reliable' },
+        { with: 'audusd', text: 'Resource export prices and the dollar tend to move together.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'lng-japan': {
+      plainName: 'Asia\u2019s LNG price',
+      oneLine: 'The price Asian buyers pay for shipped gas.',
+      ifRising: 'Australia\u2019s LNG export income tends to rise.',
+      ifFalling: 'Asia\u2019s gas import bill tends to ease.',
+      connections: [
+        { with: 'coal-aus', text: 'The two big energy-export prices of the region.', strength: 'usually' },
+        { with: 'audusd', text: 'Resource export prices and the dollar tend to move together.', strength: 'usually' },
+      ],
+      glossaryTerms: ['lng'],
+    },
+    'gas-europe': {
+      plainName: 'Europe\u2019s gas price',
+      oneLine: 'The price of natural gas in Europe.',
+      ifRising: 'European industry tends to face costlier energy.',
+      ifFalling: 'European energy costs tend to ease.',
+      connections: [
+        { with: 'brent', text: 'The two fossil-fuel prices of the world\u2019s industrial core.', strength: 'usually' },
+        { with: 'lng-japan', text: 'The Atlantic and Pacific reference prices of one world market.', strength: 'usually' },
+      ],
+      glossaryTerms: ['lng'],
     },
     'copper-usd': {
       plainName: 'The world copper price',
@@ -1161,7 +1258,7 @@ const LAYER1 = {
         { with: 'brent', text: 'Oil often jumps on war and supply scares.', strength: 'usually' },
         { with: 'gold-usd', text: 'Gold often rises on worry.', strength: 'usually' },
       ],
-      glossaryTerms: [],
+      glossaryTerms: ['geopolitical-risk-index'],
     },
 
     /* ----- Batch 9 — prices-board (5) ----- */
@@ -5126,6 +5223,136 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'The count is an estimate from ship-tracking data and is revised; a lower number says less traffic, never by itself why.',
     forYou: 'The north-east Asia freight gate: read it beside the Taiwan tension gauge.',
   },
+  // gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy cards.
+  // The units are stated on every card ($/mt vs $/mmbtu vs million barrels
+  // vs million barrels a day — the M4.1 note); measurements and tendencies
+  // only, never an event as a cause.
+  gscpi: {
+    name: 'Global supply chain pressure',
+    ticker: 'Supply pressure',
+    oneLiner: 'How stretched the world\u2019s delivery chains are, as a single index.',
+    lines: {
+      highRising: 'Supply chain pressure is well above its recent average and still rising.',
+      highEasing: 'Pressure remains above its recent average but is easing.',
+      typical: 'Supply chain pressure sits near its typical range of the past decade.',
+      low: 'Delivery chains are running freer than usual.',
+    },
+    unitNote: 'standard deviations from the global average (zero = average)',
+    whatItIs:
+      'The New York Fed\u2019s Global Supply Chain Pressure Index, monthly — transport costs and manufacturing survey answers combined into one standardised number. The publisher\u2019s own notice says the index is currently published with limited data; the card shows the months the file carries.',
+    whyItMatters:
+      'When the index is high, moving goods tends to take longer and cost more — pressure that tends to show up in goods prices with a lag.',
+    tendedToMean:
+      'The zones are read as z-scores against the index\u2019s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'A single month\u2019s print is noisy; the index says how stretched chains are, never which event stretched them.',
+    forYou: 'The delivery-chain lens on prices: read it beside the inflation cards and the chokepoint traffic.',
+  },
+  'us-spr': {
+    name: 'US strategic petroleum reserve',
+    ticker: 'SPR',
+    oneLiner: 'How much crude oil the US government holds in its strategic reserve, in millions of barrels.',
+    lines: {
+      highRising: 'The reserve is above its recent average and still being refilled.',
+      highEasing: 'The reserve remains above its recent average, with the refill easing.',
+      typical: 'The reserve sits in its usual range for the past decade.',
+      low: 'The reserve is unusually low for the past decade.',
+    },
+    unitNote: 'millions of barrels (weekly level)',
+    whatItIs:
+      'The EIA\u2019s weekly count of crude oil held in the US Strategic Petroleum Reserve — the government-owned stock, separate from the commercial inventories card.',
+    whyItMatters:
+      'The reserve is the country\u2019s measured cushion of crude: a lower level says the cushion is thinner, nothing more.',
+    tendedToMean:
+      'The zones are measured against the reserve\u2019s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The level says how big the cushion is, never why it changed.',
+    forYou: 'The supply cushion beside the oil price: read it with commercial inventories.',
+  },
+  'us-crude-production': {
+    name: 'US crude oil production',
+    ticker: 'US output',
+    oneLiner: 'How much crude oil US fields pump each day, in millions of barrels.',
+    lines: {
+      highRising: 'US production is above its recent average and still rising.',
+      highEasing: 'Production remains above its recent average but is easing.',
+      typical: 'US production sits in its usual range for the past decade.',
+      low: 'US production is unusually low for the past decade.',
+    },
+    unitNote: 'millions of barrels per day (weekly)',
+    whatItIs:
+      'The EIA\u2019s weekly estimate of US field production of crude oil — the supply side of the oil balance, in barrels per day (a rate, unlike the reserve\u2019s level).',
+    whyItMatters:
+      'Production is the domestic supply leg of the oil balance: more output tends to lean against price pressure, less tends to lean with it.',
+    tendedToMean:
+      'The zones are measured against production\u2019s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The rate says how much is being pumped, never why the rig count or wells changed.',
+    forYou: 'The supply leg beside the oil price and inventories.',
+  },
+  'coal-aus': {
+    name: 'Australian coal price',
+    ticker: 'Coal',
+    oneLiner: 'The world price of Australian coal, in US dollars per metric ton.',
+    lines: {
+      highRising: 'Coal is well above its recent average and still rising.',
+      highEasing: 'Coal remains above its recent average but is easing.',
+      typical: 'Coal sits in its usual range for the past decade.',
+      low: 'Coal is unusually cheap for the past decade.',
+    },
+    unitNote: 'US dollars per metric ton',
+    whatItIs:
+      'The World Bank\u2019s monthly price for Australian coal — the Newcastle benchmark the seaborne trade prices against.',
+    whyItMatters:
+      'Coal is one of Australia\u2019s largest energy exports: its world price feeds directly into Australia\u2019s export income and terms of trade.',
+    tendedToMean:
+      'The zones are measured against the price\u2019s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The price says what a tonne fetches, never by itself why the demand or supply shifted.',
+    forYou: 'An Australian export price: read it beside iron ore and the terms-of-trade gauge.',
+  },
+  'lng-japan': {
+    name: 'LNG price (Japan)',
+    ticker: 'LNG',
+    oneLiner: 'The price of liquefied natural gas delivered to Japan, in US dollars per MMBtu.',
+    lines: {
+      highRising: 'LNG is well above its recent average and still rising.',
+      highEasing: 'LNG remains above its recent average but is easing.',
+      typical: 'LNG sits in its usual range for the past decade.',
+      low: 'LNG is unusually cheap for the past decade.',
+    },
+    unitNote: 'US dollars per MMBtu',
+    whatItIs:
+      'The World Bank\u2019s monthly price for liquefied natural gas delivered to Japan — the Asia-Pacific benchmark for shipped gas.',
+    whyItMatters:
+      'Australia is one of the world\u2019s largest LNG exporters, and Asia\u2019s benchmark price is what the region\u2019s cargoes — including Australian ones — tend to price against.',
+    tendedToMean:
+      'The zones are measured against the price\u2019s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The price says what shipped gas fetches, never by itself why demand or supply shifted.',
+    forYou: 'Australia\u2019s other big energy export: read it beside coal and the terms-of-trade gauge.',
+  },
+  'gas-europe': {
+    name: 'European natural gas price',
+    ticker: 'Europe gas',
+    oneLiner: 'The price of natural gas in Europe, in US dollars per MMBtu.',
+    lines: {
+      highRising: 'European gas is well above its recent average and still rising.',
+      highEasing: 'European gas remains above its recent average but is easing.',
+      typical: 'European gas sits in its usual range for the past decade.',
+      low: 'European gas is unusually cheap for the past decade.',
+    },
+    unitNote: 'US dollars per MMBtu',
+    whatItIs:
+      'The World Bank\u2019s monthly price for European natural gas — the continent\u2019s benchmark, the Atlantic twin of the Japan LNG price.',
+    whyItMatters:
+      'Gas is a big input for European industry and electricity: its price tends to move European energy costs, and to travel to other regions through the shipped-gas market.',
+    tendedToMean:
+      'The zones are measured against the price\u2019s own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'The price says what gas fetches in Europe, never by itself why demand or supply shifted.',
+    forYou: 'The world\u2019s other gas benchmark: read it beside the LNG price and the oil price.',
+  },
   'wti': {
     name: 'Oil price (WTI)',
     ticker: 'WTI',
@@ -7279,6 +7506,9 @@ export const insightsCopyEn = {
     vacancies: 'k vacancies',
     // 2026-10-26 gap-audit build, A-6: crude stocks in millions of barrels.
     barrels: 'm barrels',
+    // gap-closure S4-M4.4 (2026-11-01): the US field production — a RATE
+    // in millions of barrels per day ("13.99m barrels a day").
+    'barrels-per-day': 'm barrels a day',
     // gap-closure S4-M4.3 (2026-11-01): the chokepoint transits — the
     // 7-day average of the daily count ("45.3 transits a day").
     transits: 'transits a day',

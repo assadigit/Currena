@@ -127,6 +127,11 @@ export const SD_BAND_IDS: ReadonlySet<string> = new Set([
   'gpr-saudi',
   'gpr-australia',
   'tpu-us',
+  // gap-closure S4-M4.4 (2026-11-01): the GSCPI — a standardised index
+  // whose LEVEL drifts by era (the pre-pandemic ~−0.5…+1 band vs the
+  // pandemic's +4.6 record): the z-score reads it, not the percentile
+  // (the M1.6 non-stationarity lesson).
+  'gscpi',
 ]);
 
 /**

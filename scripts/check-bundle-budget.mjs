@@ -852,7 +852,19 @@ const BUDGETS = [
   // 2 languages). The cards ride existing machinery only. Measured
   // 1357.16/313.94; raw bumps 1332 → 1384, gz 310 → 315.
   // Justified in CHANGELOG §2026-11-01h.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1384_000, gz: 315_000, label: 'Insights lazy chunk' },
+  // 2026-11-01i (gap-closure S4-M4.4): 1390/321 — the supply-chain and
+  // energy family: SIX more bilingual ids (the NY Fed GSCPI, the EIA SPR
+  // level + US field production, the Pink Sheet coal/LNG/gas trio) —
+  // the full bilingual indicator copy (2 dictionaries × 6 ids × 13
+  // keys) + the layer-1 entries with FIVE glossary terms
+  // (supply-chain-pressure, strategic-reserve, lng,
+  // geopolitical-risk-index, trade-policy-uncertainty — fa round-69,
+  // the M4.6 list landed with its cards) + the 'barrels-per-day' unit
+  // token + the narrator vocabulary growth (174 indicators + 45 terms ×
+  // 2 languages). The cards ride existing machinery only. Measured
+  // 1384.91/319.55; raw bumps 1384 → 1390, gz 315 → 321.
+  // Justified in CHANGELOG §2026-11-01i.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1390_000, gz: 321_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

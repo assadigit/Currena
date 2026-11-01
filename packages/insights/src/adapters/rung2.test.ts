@@ -28,6 +28,13 @@ const epuBuf = readFileSync(join(fixtures, 'epu-main-news-index.xlsx')).buffer;
 // gap-closure S4-M4.2: the geopolitics family's captures.
 const gprDailyBuf = readFileSync(join(fixtures, 's4', 'gpr-daily-2026-11-01.xls')).buffer;
 const tpuBuf = readFileSync(join(fixtures, 's4', 'tpu-categorical-epu-2026-11-01.xlsx')).buffer;
+// gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy family's
+// captures — the GSCPI workbook + the two EIA weekly pages (plus the main
+// crude-stocks fixture the weekly family test reuses).
+const gscpiBuf = readFileSync(join(fixtures, 's4', 'gscpi-2026-11-01.xls')).buffer;
+const stocksHtml = readFileSync(join(fixtures, 'eia-crude-stocks.html'), 'utf8');
+const sprHtml = readFileSync(join(fixtures, 's4', 'eia-spr-2026-11-01.html'), 'utf8');
+const productionHtml = readFileSync(join(fixtures, 's4', 'eia-crude-production-2026-11-01.html'), 'utf8');
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -53,6 +60,14 @@ describe('rung2FetchPlanFor (the cadence gates + the bootstrap rule)', () => {
   it('a MISSING id bootstraps its feed regardless of the date (first deploy / disaster recovery)', () => {
     const plan = rung2FetchPlanFor(new Date('2026-10-27T04:20:00Z'), new Set(['eia-crude-stocks', 'epu-us']));
     expect(plan).toEqual({ mof: true, eiaWeekly: true, cftcWeekly: false, monthly: true, gprDaily: true });
+  });
+
+  // gap-closure S4-M4.4 (2026-11-01): the new family's bootstrap legs.
+  it('S4-M4.4: a missing SPR/production id bootstraps the EIA weekly gate; a missing GSCPI bootstraps the monthly plan', () => {
+    const weekday = new Date('2026-11-03T04:20:00Z'); // a Tuesday
+    expect(rung2FetchPlanFor(weekday, new Set(['us-spr']))).toMatchObject({ eiaWeekly: true, monthly: false });
+    expect(rung2FetchPlanFor(weekday, new Set(['us-crude-production']))).toMatchObject({ eiaWeekly: true });
+    expect(rung2FetchPlanFor(weekday, new Set(['gscpi']))).toMatchObject({ monthly: true, eiaWeekly: false });
   });
 });
 
@@ -464,6 +479,57 @@ describe('collectRung2Sources (the shared collect)', () => {
       globalThis.fetch = original;
     }
   });
+
+  // gap-closure S4-M4.4 (2026-11-01): the EIA weekly family — THREE pages on
+  // the Saturday gate (stocks + SPR + production), provider-exact pins off
+  // the M4.1 captures.
+  it('S4-M4.4: the eiaWeekly plan fetches all three EIA pages — stocks + the SPR level + field production', async () => {
+    const original = globalThis.fetch;
+    const urls: string[] = [];
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      urls.push(url);
+      if (url.includes('WCRSTUS1')) return new Response(stocksHtml, { status: 200 });
+      if (url.includes('WCSSTUS1')) return new Response(sprHtml, { status: 200 });
+      if (url.includes('WCRFPUS2')) return new Response(productionHtml, { status: 200 });
+      throw new Error(`unexpected fetch: ${url}`);
+    }) as typeof fetch;
+    try {
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: true, cftcWeekly: false, monthly: false, gprDaily: false });
+      expect(out.series['eia-crude-stocks']!.at(-1)).toEqual({ date: '2026-10-16', value: 695200 });
+      expect(out.series['us-spr']!.at(-1)).toEqual({ date: '2026-10-23', value: 282583 });
+      expect(out.series['us-spr']!.length).toBeGreaterThan(2000);
+      expect(out.series['us-crude-production']!.at(-1)).toEqual({ date: '2026-10-23', value: 13992 });
+      // THREE distinct EIA fetches, one report row each.
+      expect(urls).toHaveLength(3);
+      expect(out.reports.filter((r) => r.source === 'eia' && r.ok)).toHaveLength(3);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+
+  // gap-closure S4-M4.4: the GSCPI joins the monthly plan — the nyfed
+  // provider's first fetch (one more first-of-month subrequest).
+  it('S4-M4.4: the monthly plan also fetches the GSCPI workbook (345 rows through 2026-09)', async () => {
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('sdmx.oecd.org')) return new Response(cliCsv, { status: 200 });
+      if (url.includes('data_gpr_export.xls')) return new Response(gprBuf, { status: 200 });
+      if (url.includes('Categorical_EPU_Data')) return new Response(tpuBuf, { status: 200 });
+      if (url.includes('policyuncertainty.com')) return new Response(epuBuf, { status: 200 });
+      if (url.includes('newyorkfed.org')) return new Response(gscpiBuf, { status: 200 });
+      throw new Error(`unexpected fetch: ${url}`);
+    }) as typeof fetch;
+    try {
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true, gprDaily: false });
+      expect(out.series['gscpi']!.length).toBe(345);
+      expect(out.series['gscpi']!.at(-1)).toEqual({ date: '2026-09-01', value: 1.284014886203148 });
+      expect(out.reports.filter((r) => r.source === 'nyfed' && r.ok)).toHaveLength(1);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
 });
 
 /* ------------------------------------------------------------------ *
@@ -497,6 +563,7 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
       if (url.includes('matteoiacoviello.com')) return new Response(gprBuf, { status: 200 });
       if (url.includes('Categorical_EPU_Data')) return new Response(tpuBuf, { status: 200 });
       if (url.includes('policyuncertainty.com')) return new Response(epuBuf, { status: 200 });
+      if (url.includes('newyorkfed.org')) return new Response(gscpiBuf, { status: 200 });
       throw new Error(`unexpected fetch: ${url}`);
     }) as typeof fetch;
     try {
@@ -575,12 +642,20 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
       expect(tpu.value).toBeCloseTo(1326.4193, 3);
       expect(tpu.asOf).toBe('2026-10-01');
       expect(tpu.status).toBe('context');
+      // S4-M4.4: the GSCPI joins the monthly patch — the supply-pressure
+      // member of the geo-fragmentation lane (345 monthly rows on the
+      // capture; the reading carries its SD-regime z-score).
+      const gscpi = byId.get('gscpi')!;
+      expect(gscpi.value).toBeCloseTo(1.284014886203148, 6);
+      expect(gscpi.asOf).toBe('2026-09-01');
+      expect(gscpi.status).toBe('context');
+      expect(gscpi.sd10y).toBeDefined();
       // The stage carries all five + the family (the 04:40 periodic phase's
       // input; gpr-daily rides the daily halves).
       const stage = JSON.parse(kv.value!) as { series: Record<string, unknown> };
       for (const id of [
         'oecd-cli-us', 'oecd-cli-cn', 'oecd-cli-de', 'gpr-index', 'epu-us',
-        'gpr-threats', 'gpr-taiwan', 'gpr-daily', 'tpu-us',
+        'gpr-threats', 'gpr-taiwan', 'gpr-daily', 'tpu-us', 'gscpi',
       ]) {
         expect(stage.series[id]).toBeDefined();
       }
@@ -592,7 +667,7 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
         now: new Date('2026-11-01T04:40:00Z'),
       });
       expect(hist.written).toBeGreaterThan(0);
-      expect(store.snapshot!.readings).toHaveLength(139); // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card) + the S3-M3.2 liquidity/funding six + the S3-M3.3 credit pair + the S3-M3.4 growth-nowcast/survey six + the S3-M3.5 fiscal/Treasury-supply six + the S4-M4.2 geopolitics eleven + the S4-M4.3 chokepoint five
+      expect(store.snapshot!.readings).toHaveLength(145); // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card) + the S3-M3.2 liquidity/funding six + the S3-M3.3 credit pair + the S3-M3.4 growth-nowcast/survey six + the S3-M3.5 fiscal/Treasury-supply six + the S4-M4.2 geopolitics eleven + the S4-M4.3 chokepoint five + the S4-M4.4 supply-chain/energy six
     } finally {
       globalThis.fetch = original;
     }

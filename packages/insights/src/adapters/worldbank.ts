@@ -40,6 +40,15 @@ const WB_COLUMNS = {
   // wheat 278.6 $/mt · maize 239.6 $/mt @ 2026M09) — zero new requests.
   wheat: { header: 'Wheat, US SRW', unit: '($/mt)' },
   maize: { header: 'Maize', unit: '($/mt)' },
+  // gap-closure S4-M4.4 (2026-11-01): the energy trio — coal (Australian,
+  // column F), natural gas Europe (column I) and LNG Japan (column J),
+  // verified from the live workbook's header + units rows in M4.1 (latest
+  // fixture values 2026M09: coal 147.1 $/mt · gas 25.42 $/mmbtu · LNG
+  // 14.25 $/mmbtu). The SAME Monthly Prices sheet the metals ride — zero
+  // new requests, the same header+unit identity check.
+  coalAus: { header: 'Coal, Australian', unit: '($/mt)' },
+  gasEurope: { header: 'Natural gas, Europe', unit: '($/mmbtu)' },
+  lngJapan: { header: 'Liquefied natural gas, Japan', unit: '($/mmbtu)' },
 } as const;
 
 export interface WorldBankMonthly {
@@ -52,6 +61,11 @@ export interface WorldBankMonthly {
   /** M5: the grain columns (Monthly Prices sheet, $/mt — same parse as the metals). */
   wheat: SeriesPoint[];
   maize: SeriesPoint[];
+  /** S4-M4.4: the energy columns (Monthly Prices sheet — coal $/mt,
+   * gas + LNG $/mmbtu; the same parse, zero new requests). */
+  coalAus: SeriesPoint[];
+  gasEurope: SeriesPoint[];
+  lngJapan: SeriesPoint[];
   /**
    * M5: the Food index (Monthly Indices sheet, 2010=100). Optional at the
    * type level because parseWorldBankMonthlySheet (the pure prices-sheet
@@ -168,6 +182,7 @@ export function parseWorldBankMonthlySheet(cells: { col: string; row: number; va
 
   const targets: Record<keyof typeof WB_COLUMNS, SeriesPoint[]> = {
     gold: [], silver: [], copper: [], ironOre: [], brent: [], platinum: [], wheat: [], maize: [],
+    coalAus: [], gasEurope: [], lngJapan: [],
   };
   const colOf = new Map<string, keyof typeof WB_COLUMNS>();
   for (const [key, spec] of Object.entries(WB_COLUMNS) as [keyof typeof WB_COLUMNS, (typeof WB_COLUMNS)[keyof typeof WB_COLUMNS]][]) {

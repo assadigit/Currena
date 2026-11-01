@@ -471,6 +471,17 @@ export const IndicatorIdSchema = z.enum([
   'chokepoint-bab-el-mandeb',
   'chokepoint-malacca',
   'chokepoint-taiwan',
+  // gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy family —
+  // the NY Fed GSCPI (monthly), the EIA SPR level + US field production
+  // (weekly, the keyless LeafHandler route), and the Pink Sheet energy
+  // columns (coal Australian / LNG Japan / natural gas Europe — the SAME
+  // workbook the metals ride, zero new fetches). All context-only (G-5).
+  'gscpi',
+  'us-spr',
+  'us-crude-production',
+  'coal-aus',
+  'lng-japan',
+  'gas-europe',
   // 2026-10-26 gap-audit build (A-10): US Economic Policy Uncertainty —
   // Baker-Bloom-Davis's monthly headline index.
   'epu-us',
@@ -681,6 +692,11 @@ export const IndicatorSourceSchema = z.enum([
   // sources.ts). Worker egress SLOW but served (the S1 probe: 12.5 s first
   // byte — the fetch pins its own 30 s timeout, the TIC precedent).
   'portwatch',
+  // gap-closure S4-M4.4 (2026-11-01): the NY Fed GSCPI (register row nyfed,
+  // L1 — the New York Fed's own Terms of Use grant an affirmative reuse
+  // licence with attribution; quoted verbatim in sources.ts). Worker egress
+  // FAST (the S1 probe: ~0.5 s).
+  'nyfed',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage

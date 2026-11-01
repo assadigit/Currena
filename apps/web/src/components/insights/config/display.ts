@@ -41,6 +41,11 @@ export type UnitToken =
   // 2026-10-26 gap-audit build, A-6: crude stocks scaled to millions of
   // barrels ("416.7m barrels" EN — the raw unit is thousands of barrels).
   | 'barrels'
+  // gap-closure S4-M4.4 (2026-11-01): the US field production — a RATE in
+  // thousands of barrels per day, scaled to millions ("13.99m barrels a
+  // day" EN; the SPR's LEVEL keeps the plain 'barrels' unit — the unit
+  // difference the M4.1 note demands the cards state).
+  | 'barrels-per-day'
   // gap-closure S4-M4.3 (2026-11-01): the chokepoint transits — a counted
   // quantity per day ("45.3 transits a day" EN, the 7-day average).
   | 'transits';
@@ -68,6 +73,7 @@ export interface UnitLabels {
   openings: string;
   vacancies: string;
   barrels: string;
+  'barrels-per-day': string;
   transits: string;
 }
 
@@ -273,6 +279,18 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'chokepoint-bab-el-mandeb': { decimals: 1, unit: 'transits' },
   'chokepoint-malacca': { decimals: 1, unit: 'transits' },
   'chokepoint-taiwan': { decimals: 1, unit: 'transits' },
+  // gap-closure S4-M4.4 (2026-11-01): the supply-chain and energy family.
+  // The GSCPI is a standardised index in deviation units (two decimals,
+  // the ofr-fsi convention); the SPR level and the production rate carry
+  // their own distinct unit tokens (a LEVEL vs a RATE — the M4.1 note);
+  // the three energy prices are USD with the unitNote stating $/mt vs
+  // $/mmbtu (the spec's consistent-units rule).
+  gscpi: { decimals: 2, unit: 'index' },
+  'us-spr': { decimals: 1, unit: 'barrels', scale: 1e-3 },
+  'us-crude-production': { decimals: 2, unit: 'barrels-per-day', scale: 1e-3 },
+  'coal-aus': { decimals: 1, unit: 'usd' },
+  'lng-japan': { decimals: 2, unit: 'usd' },
+  'gas-europe': { decimals: 2, unit: 'usd' },
   'epu-us': { decimals: 1, unit: 'index' },
   'wti': { decimals: 2, unit: 'usd' },
   'natgas': { decimals: 2, unit: 'usd' },

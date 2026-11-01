@@ -30,6 +30,18 @@ import type { FetchDeps } from './types';
 export const EIA_CRUDE_STOCKS_URL =
   'https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRSTUSUS1'.replace('WCRSTUSUS1', 'WCRSTUS1&f=W');
 
+/* gap-closure S4-M4.4 (2026-11-01): the same LeafHandler page family grows
+ * two more weekly series (both series ids walked from the provider's own
+ * PET_STOC_WSTK_DCU_NUS_W / PET_CRD_WRPD_DCU_NUS_W indexes in M4.1 — never
+ * guessed): the SPR level and the US field production. The SPR page's unit
+ * line reads "Thousand Barrels" (a LEVEL, like the stocks page); the
+ * production page's reads "Thousand Barrels per Day" (a RATE — the cards'
+ * labels must state both units, the M4.1 note). */
+export const EIA_SPR_URL =
+  'https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCSSTUS1&f=W';
+export const EIA_CRUDE_PRODUCTION_URL =
+  'https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRFPUS2&f=W';
+
 /** The 245 KB page — an RBA-table-style fetch window. */
 export const EIA_STOCKS_TIMEOUT_MS = 45_000;
 
@@ -48,6 +60,43 @@ const MONTHS: Readonly<Record<string, number>> = {
 const STOCKS_MIN = 50_000;
 const STOCKS_MAX = 5_000_000;
 
+/** The per-series identity + plausibility spec of one LeafHandler weekly
+ * page (S4-M4.4): the series id string the page must carry, the unit line
+ * needle, and the plausible value band (thousand barrels / thousand barrels
+ * per day — the SPR level's band differs from the production rate's). */
+export interface EiaWeeklySeriesSpec {
+  seriesId: string;
+  unitNeedle: string;
+  min: number;
+  max: number;
+}
+
+/** The crude-stocks page's spec (the historical band observed 1982–2026). */
+export const EIA_CRUDE_STOCKS_SPEC: EiaWeeklySeriesSpec = {
+  seriesId: 'WCRSTUS1',
+  unitNeedle: 'Thousand Barrels',
+  min: STOCKS_MIN,
+  max: STOCKS_MAX,
+};
+
+/** The SPR page's spec: the observed history spans ~347k–727k thousand
+ * barrels (the 2020s drawdown low to the 2020 peak). */
+export const EIA_SPR_SPEC: EiaWeeklySeriesSpec = {
+  seriesId: 'WCSSTUS1',
+  unitNeedle: 'Thousand Barrels',
+  min: 100_000,
+  max: 1_000_000,
+};
+
+/** The field-production page's spec: a RATE in thousand barrels per day;
+ * the observed history spans ~5k–13.5k (the 1982 low to the 2026 high). */
+export const EIA_CRUDE_PRODUCTION_SPEC: EiaWeeklySeriesSpec = {
+  seriesId: 'WCRFPUS2',
+  unitNeedle: 'Thousand Barrels per Day',
+  min: 1_000,
+  max: 20_000,
+};
+
 /** Strip HTML tags/entities and collapse whitespace (the page's &nbsp; padding). */
 function cellText(cellHtml: string): string {
   return cellHtml
@@ -61,17 +110,18 @@ function cellText(cellHtml: string): string {
 }
 
 /**
- * Parse the stocks page's HTML into the weekly series (pure — fixture
- * testable). Asserts the page's identity markers (the series id + the
- * unit line) before trusting a single number; the weekly table is found
- * structurally (the Year-Month + Week 1..5 header), never by index.
+ * Parse ONE LeafHandler weekly series page into its weekly series (pure —
+ * fixture-testable; S4-M4.4 generalised from the crude-stocks parse).
+ * Asserts the page's identity markers (the series id + the unit needle)
+ * before trusting a single number; the weekly table is found structurally
+ * (the Year-Month + Week 1..5 header), never by index.
  */
-export function parseEiaCrudeStocksHtml(html: string): SeriesPoint[] {
-  if (!html.includes('WCRSTUS1')) {
-    throw new FormatChangedError('EIA stocks page: the WCRSTUS1 series id does not appear (wrong page or layout change?)');
+export function parseEiaWeeklySeriesHtml(html: string, spec: EiaWeeklySeriesSpec): SeriesPoint[] {
+  if (!html.includes(spec.seriesId)) {
+    throw new FormatChangedError(`EIA ${spec.seriesId} page: the series id does not appear (wrong page or layout change?)`);
   }
-  if (!html.includes('Thousand Barrels')) {
-    throw new FormatChangedError('EIA stocks page: the "Thousand Barrels" unit line is absent (layout change?)');
+  if (!html.includes(spec.unitNeedle)) {
+    throw new FormatChangedError(`EIA ${spec.seriesId} page: the "${spec.unitNeedle}" unit line is absent (layout change?)`);
   }
   const tables = html.match(/<table[^>]*>[\s\S]*?<\/table>/g) ?? [];
   let dataRows: string[][] | undefined;
@@ -90,7 +140,7 @@ export function parseEiaCrudeStocksHtml(html: string): SeriesPoint[] {
     }
   }
   if (dataRows === undefined) {
-    throw new FormatChangedError('EIA stocks page: no Year-Month/Week table found (layout change?)');
+    throw new FormatChangedError(`EIA ${spec.seriesId} page: no Year-Month/Week table found (layout change?)`);
   }
   const out: SeriesPoint[] = [];
   for (const row of dataRows) {
@@ -108,9 +158,9 @@ export function parseEiaCrudeStocksHtml(html: string): SeriesPoint[] {
       const dd = Number(dateCell[2]);
       if (!/^-?\d+(\.\d+)?$/.test(valueCell)) continue; // '-', '--', NA, empty
       const value = Number(valueCell);
-      if (!Number.isFinite(value) || value < STOCKS_MIN || value > STOCKS_MAX) {
+      if (!Number.isFinite(value) || value < spec.min || value > spec.max) {
         throw new FormatChangedError(
-          `EIA stocks page: value ${JSON.stringify(row[i + 1])} at ${row[i]} is outside the plausible weekly band (layout change?)`,
+          `EIA ${spec.seriesId} page: value ${JSON.stringify(row[i + 1])} at ${row[i]} is outside the plausible weekly band (layout change?)`,
         );
       }
       // A December row's last week can end in January (and a month-end
@@ -122,18 +172,42 @@ export function parseEiaCrudeStocksHtml(html: string): SeriesPoint[] {
     }
   }
   if (out.length < 100) {
-    throw new FormatChangedError(`EIA stocks page: only ${out.length} weekly points parsed (expected decades of history)`);
+    throw new FormatChangedError(`EIA ${spec.seriesId} page: only ${out.length} weekly points parsed (expected decades of history)`);
   }
   try {
     assertAscending(out);
   } catch (err) {
-    throw new FormatChangedError(`EIA stocks page: points are not date-ascending (${err instanceof Error ? err.message : err})`);
+    throw new FormatChangedError(`EIA ${spec.seriesId} page: points are not date-ascending (${err instanceof Error ? err.message : err})`);
   }
   return out;
+}
+
+/**
+ * Parse the stocks page's HTML into the weekly series (pure — fixture
+ * testable). Asserts the page's identity markers (the series id + the
+ * unit line) before trusting a single number; the weekly table is found
+ * structurally (the Year-Month + Week 1..5 header), never by index.
+ */
+export function parseEiaCrudeStocksHtml(html: string): SeriesPoint[] {
+  return parseEiaWeeklySeriesHtml(html, EIA_CRUDE_STOCKS_SPEC);
 }
 
 /** Fetch + parse the weekly crude-stocks page. */
 export async function fetchEiaCrudeStocks(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
   const res = await insightsFetch(EIA_CRUDE_STOCKS_URL, {}, { ...deps, timeoutMs: deps.timeoutMs ?? EIA_STOCKS_TIMEOUT_MS });
   return parseEiaCrudeStocksHtml(await res.text());
+}
+
+/** Fetch + parse the weekly SPR level page (S4-M4.4 — a LEVEL in thousand
+ * barrels; WCSSTUS1, "Ending Stocks of Crude Oil in SPR"). */
+export async function fetchEiaSprLevel(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const res = await insightsFetch(EIA_SPR_URL, {}, { ...deps, timeoutMs: deps.timeoutMs ?? EIA_STOCKS_TIMEOUT_MS });
+  return parseEiaWeeklySeriesHtml(await res.text(), EIA_SPR_SPEC);
+}
+
+/** Fetch + parse the weekly US field-production page (S4-M4.4 — a RATE in
+ * thousand barrels per day; WCRFPUS2, "Field Production of Crude Oil"). */
+export async function fetchEiaCrudeProduction(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const res = await insightsFetch(EIA_CRUDE_PRODUCTION_URL, {}, { ...deps, timeoutMs: deps.timeoutMs ?? EIA_STOCKS_TIMEOUT_MS });
+  return parseEiaWeeklySeriesHtml(await res.text(), EIA_CRUDE_PRODUCTION_SPEC);
 }

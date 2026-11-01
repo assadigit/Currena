@@ -5,6 +5,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01i] — gap-closure S4-M4.4: the supply-chain and energy family (the 140th–145th indicators)
+
+Six context cards (G-5), all bilingual (fa round-69), riding existing
+machinery only — three new fetches and one free ride:
+
+- **The NY Fed GSCPI** (`gscpi`): the Global Supply Chain Pressure Index,
+  monthly on the rung2 first-of-month plan. The download is named `.xlsx`
+  but is a LEGACY .xls (OLE2/BIFF, 105,984 B — the biff reader's path);
+  the data sheet is found STRUCTURALLY (the 'Date' + 'GSCPI' header row —
+  sheet 1 is the NY Fed boilerplate, and the data sheet's own rows 1–3
+  carry boilerplate spill); the provider's month-END date strings read as
+  month-start (the repo convention). 345 monthly points 1998-01 →
+  2026-09, latest 1.2840 (provider-exact, pinned off the M4.1 capture).
+  The publisher's own 2025-11-06 disruption notice ("limited data") is
+  carried on the card's whatItIs. The z-score regime reads it (the M1.6
+  non-stationarity lesson — its level drifts by era; SD_BAND_IDS 13 → 14).
+- **The EIA weekly pair** (`us-spr`, `us-crude-production`): the
+  Strategic Petroleum Reserve LEVEL (WCSSTUS1, thousand barrels) and the
+  US field-production RATE (WCRFPUS2, thousand barrels per day) — the
+  series ids walked from the provider's own PET indexes in M4.1, never
+  guessed. The A-6 crude-stocks parse is generalised into
+  `parseEiaWeeklySeriesHtml` (a per-series spec: series id + unit-line
+  needle + plausibility band — the production's "Thousand Barrels per
+  Day" needle and its [1k, 20k] band differ from the SPR's [100k, 1M]
+  level band); the Saturday rung2 gate grows to THREE LeafHandler pages.
+  Provider-exact pins: SPR 282,583 thousand bbl @ 2026-10-23; production
+  13,992 thousand bbl/d @ 2026-10-23.
+- **The Pink Sheet energy trio** (`coal-aus`, `lng-japan`, `gas-europe`):
+  the Australian coal (column F, $/mt), European natural gas (column I,
+  $/mmbtu) and Japan LNG (column J, $/mmbtu) columns from the SAME
+  Monthly Prices workbook the metals ride — **zero new subrequests
+  anywhere** (the WB_COLUMNS header+unit identity check extends to them).
+  Provider-exact pins @ 2026M09: coal 147.1 · gas 25.42 · LNG 14.25.
+  Coal and LNG sit in the Australia trade lane beside iron ore (RULES §7
+  — the Australian angle leads their copy); gas sits in the prices lane
+  beside WTI and Henry Hub.
+- **The glossary list of M4.6 landed with its cards**: five new bilingual
+  terms — supply chain pressure, strategic reserve, LNG, geopolitical
+  risk index, trade policy uncertainty (the last two attach to the
+  existing gpr-index/tpu-us cards). Units are stated on every card
+  ($/mt vs $/mmbtu vs million barrels vs million barrels a day — the
+  M4.1 note); a new 'barrels-per-day' unit token renders the production
+  rate.
+- **Budget:** the rung2 all-gates day grows to ≈39/50 subrequests (12
+  fetches + the stored-history reads + the 4 patch writes); the main rung
+  is UNTOUCHED (the WB trio rides the existing world-bank fetch). The
+  Insights lazy bundle 1384/315 → **1390/321** (measured 1384.91/319.55;
+  six bilingual card families + the glossary + the unit token — justified
+  in check-bundle-budget.mjs §2026-11-01i). Registry 139 → **145
+  indicators** (48 voting + 97 context); narrator vocabulary 168 → 174 ×2
+  + 40 → 45 terms ×2; fa round-69 (160 strings, manifest clean).
+
 ## [2026-11-01h] — gap-closure S4-M4.3: the chokepoint transits + the geo-fragmentation shadow lane (the 135th–139th indicators)
 
 Five context cards (G-5), all bilingual (fa round-68), riding a NEW rung3
