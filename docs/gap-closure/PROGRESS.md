@@ -14,10 +14,10 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 | S1 | Foundation and trust | 7 / 7 | 100% |
 | S2 | Foreign holdings of US Treasuries (priority feature) | 6 / 6 | 100% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 6 / 6 | 100% |
-| S4 | Geopolitics, supply chain and energy | 0 / 6 | 0% |
+| S4 | Geopolitics, supply chain and energy | 2 / 6 | 33% |
 | S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **19 / 37** | **51%** |
+| **Total** | | **21 / 37** | **57%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -294,8 +294,17 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > session log.
 
 ### S4 Geopolitics, supply chain and energy (`S4-geopolitics-supply-energy.md`)
-- [ ] M4.1 Verification and egress
-- [ ] M4.2 GPR country series and trade policy uncertainty
+- [x] M4.1 Verification and egress
+- [x] M4.2 GPR country series and trade policy uncertainty
+  - **The GPR export's own columns (zero new fetches for the monthly family):** `parseGprExportAll` reads GPRT/GPRA + `GPRC_{TWN,CHN,RUS,UKR,ISR,SAU,AUS}` from the SAME `data_gpr_export.xls` download — all ten series 501 monthly points 1985-01 → 2026-09, verified against the provider's own file (fixture re-read 2026-11-01). The parser asserts all ten header names (fail closed on a missing country column), bands the aggregates (0, 2000] and the country shares [0, 2000] (an honest zero-mention month), and converts dates LAZILY so the pre-1985 historical-variant rows (serials outside the supported range) never throw — the bug my first draft hit (`excelSerialToIso(1)`), caught by the existing rung2 phase test before any commit.
+  - **The biff SST cross-CONTINUE fix (the daily file's unlock):** the GPR daily export's SST carries 15,275 unique strings (every date string is a shared string) spanning 35 CONTINUE records; the old `parseSst` stopped at the first string crossing a boundary, leaving only col-0 'DAY' resolved. Per the BIFF8 spec each CONTINUE that starts mid-string re-emits the flags byte (the wide/narrow bit may differ for the remainder) — the rewritten parse handles the crossing, and the daily-file integration test pins the header exactly as xlrd reads it (`DAY | N10D | GPRD | GPRD_ACT | GPRD_THREAT | date | GPRD_MA30 | GPRD_MA7 | event | var_name | var_label`).
+  - **`gpr-daily`:** the provider's OWN GPRD_MA7 (7-day moving average) — 15,274 daily rows 1985-01-01 → 2026-10-26 (~6-day lag; staleAfterDays 12). A NEW daily fetch on rung2 (`plan.gprDaily`; a missing stage entry IS the bootstrap).
+  - **`tpu-us`:** the "9. Trade policy" column of `Categorical_EPU_Data.xlsx` (1985-01 → 2026-10, latest 1326.42) — the TPU of record per M4.1 (the spec's assumed file is stale at 2019-07). The 1985-01 value byte-identical to the stale file's first point — the same series continued. One more policyuncertainty fetch on the monthly plan.
+  - **The SD regime extends:** `SD_BAND_IDS` 2 → 13 (all eleven new ids read through z-scores — the M1.6 non-stationarity lesson). Live z-scores: saudi +2.17 (the historic-spike zone), gpr-daily +1.32, threats +0.68, russia +0.00 (typical).
+  - **Tests:** the insights suite 1093 → 1107 (the parser suites + the collect/phase tests extended to assert the family: threat 173.0874, taiwan 0.25924, gpr-daily 181.4155 @ 2026-10-26, tpu 1326.4193 @ 2026-10-01 — all provider-exact). Full gates ALL GREEN — **12,451 tests** (core 195 · scraper 67 · insights 1107 · markets 13 · api 393 · web 10,676; layer1 strict 9,891). Pin bumps: definitions 123→134 / P1 80→91 / info 75→86, the schema id set, the snapshot count, the vocabulary 152→163, the corpus 123→134, the LAYER1_INVENTORY list.
+  - **Deploy + verify:** worker **`558507ce-33e5-43e7-b5e5-592fe7a2ea96`** (19:03 UTC); markets unchanged. The GHA dispatch (run 41339888407, green 19:05) bootstrapped the series — `/api/insights` serves **134 readings** with all 11 new ids provider-exact (threats 173.0874 @ 2026-09, gpr-daily 181.4155 @ 2026-10-26, tpu 1326.4193 @ 2026-10-01, the seven countries 0.12–1.61). Browser-verified fresh contexts EN + fa (RTL) at 1200 + 360: all eleven cards render in both languages (fa values in Persian digits with the U+066C separator «۱٬۳۲۶٫۴» — the ASCII-comma grep false-negative class), the SD-zone lines render («عدم قطعیت سیاست تجاری در محدودهٔ معمول دههٔ گذشته است»), **0px horizontal overflow at 360**, zero console errors. Evidence `evidence/S4-M4.2/` (4 screenshots; the DOM+value checks carry the verification — this sandbox is not vision-capable). Verification trap re-learned: the disclosures need a beat before the body greps (the R7 rows appear after the animation).
+  - **Budget:** rung2 on an all-fetches day ≈ 6 fetches (mof + oecd + gpr + epu + tpu + gpr-daily) + ~4 reads + 4 writes + the stored-history reads ≈ 30/50 — the rung stays comfortable. KV writes/day: ~66 on first-of-month days (the daily halves gain the gpr-daily write; the periodic phase gains ten read-compared writes, one-time on the first run). **Bundle: Insights lazy 1287/305 → 1332/310** (measured 1331.85/309.35 — eleven bilingual card families; justified in `check-bundle-budget.mjs` §2026-11-01g + CHANGELOG).
+  - **Copy:** fa round-67 (253 strings + 8 re-records after the G3 jargon fix — «سنجه» is the jargon word mapped to EN "benchmark" with no glossary term; the country plainNames became «تنش X» and the tpu connection «شاخص»); manifest clean. Registry + narrator vocabulary regenerated (163 ×2 + 38 ×2). Docs: AGENTS.md §A (123 → **134**, 48 voting + 86 context), INDICATORS_AND_DATA_SOURCES §1/§2, the LICENCES.md gpr/epu rows (documented for the first time — they had lived only in the machine twins), RISK_REGISTER log, SCRAPING_SPEC FS-11. Commit `247648a`.
 - [ ] M4.3 Chokepoint transits
 - [ ] M4.4 Supply chain and energy
 - [ ] M4.5 New gauge and relationship cards
