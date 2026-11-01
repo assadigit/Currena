@@ -166,6 +166,14 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 - [ ] M3.5 Fiscal and auctions
 - [ ] M3.6 UI, copy, docs and deploy close
 
+> **S3 session claim (2026-11-01 00:15 UTC):** the S3 session started
+> (baseline: `pnpm gates` ALL GREEN 10,526 tests — after pinning the
+> visitor clock in `freshness-line.test.tsx`, which broke at the
+> 2026-11-01 UTC midnight crossing; commit `3c4ed8a`). The session
+> claims M3.1→M3.6. Any other S3 session must `git pull --rebase` and
+> re-read this file before starting a milestone, skip every
+> already-ticked milestone, and record its claim here.
+
 ### S4 Geopolitics, supply chain and energy (`S4-geopolitics-supply-energy.md`)
 - [ ] M4.1 Verification and egress
 - [ ] M4.2 GPR country series and trade policy uncertainty
