@@ -1024,9 +1024,15 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P1',
     rule: { kind: 'info' },
-    // Daily, business-day publication (the Fed Board's curve model);
-    // 4 = the daily family's window (the vix precedent).
-    staleAfterDays: 4,
+    // LIVE-VERIFIED publication rhythm (2026-11-01, the first production
+    // reading): the observations are business-daily but the Fed Board
+    // uploads the Kim-Wright model with a ~1-WEEK LAG (the provider's own
+    // file on 2026-11-01 ends at 2026-10-23 — 9 days of obs age at fresh
+    // publication; the M3.1 fixture's tail shows the same rhythm). The
+    // daily-family 4-day window false- alarmed as stale on day one. 14
+    // days = the walcl two-missed-prints convention applied to a
+    // weekly-lag publisher: two missed weekly uploads, then honest stale.
+    staleAfterDays: 14,
   },
   {
     // gap-closure S3-M3.2: the Treasury General Account — the US

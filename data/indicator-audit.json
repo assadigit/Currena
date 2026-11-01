@@ -661,7 +661,7 @@
       "ownerAccepts": null,
       "enabled": true,
       "method": "M1",
-      "maxAgeDays": 4,
+      "maxAgeDays": 14,
       "ruleVersion": 4,
       "rule": "{\"kind\":\"info\"}"
     },

@@ -3115,7 +3115,7 @@
       "whatItIsnt": "It is a model estimate, not a market price you can see on a screen, and it says nothing about the next move in yields: a high premium can rise further and a low one can vanish.",
       "trackRecordNote": "The premium spent the 2010s near or below zero (the era of trusted low inflation and heavy central-bank buying) and has been rebuilt since 2021, returning toward the positive territory that was normal before the financial crisis.",
       "definition": null,
-      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "failClosedConditions": "No value, data older than 14 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L0",
         "ownerAccepts": null,
@@ -3132,7 +3132,7 @@
       "unit": "percent",
       "changeUnit": "percentage points",
       "cadence": "daily",
-      "maxAgeDays": 4,
+      "maxAgeDays": 14,
       "maxAgeBasis": "per-series override",
       "scored": false,
       "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
