@@ -19,8 +19,9 @@ that everything about gold is shown by one balance.
 | `02-ENGINE-AND-DECISION-TABLE.md` | The pure engine API, the 21-voter table, the one-rule-per-indicator decision table, the lane vote rule, the pre-registered calibration protocol |
 | `03-UX-AND-COPY.md` | Visual anatomy, states, interaction, accessibility, RTL, the EN copy and FA drafts, copy keys kept and retired |
 | `04-MIGRATION-AND-ACCEPTANCE.md` | File-by-file change list, wire compatibility, rollout, tests, gates, acceptance criteria, risks |
+| `05-VISUAL-DESIGN-SPEC.md` | The visual redesign of the balance: layout, brass beam, lane weights, verdict block, tokens, type, motion, states, responsive rules, visual acceptance criteria. Supersedes 03 §1 where it says the geometry is untouched |
 
-Reading order: 01, 02, 03, 04.
+Reading order: 01, 02, 03, 04, 05.
 
 ## Decision log
 
@@ -35,6 +36,7 @@ Reading order: 01, 02, 03, 04.
 | D-GB-7 | The meaning is "conditions today, not a forecast". The model-vs-reality chip UI is retired. The measured note and the backtest link stay, visible. | `docs/insights/BACKTEST-GOLD.md`: no edge, and the association ran the other way over 2021 to 2026. |
 | D-GB-8 | The beam angle formula is unchanged (`|net| / (for + against) x 10`, clamped to 3 to 10 degrees). | Preserves the owner's 2026-10-21c decision. Thin evidence is shown by the counts line, not by a new cap. Easy to revisit (OI-6). |
 | D-GB-9 | `goldTailwindScore`, `goldSummary`, `gold-score.ts` and the backtest harness lineage stay frozen and keep running. The new engine is additive. | The re-check and backtest procedures (`GOLD_RECHECK_SPEC.md`) read `goldSummary`, and an armed check runs on 2026-11-02. |
+| D-GB-11 | The balance gets a visual redesign (owner request, 2026-10-31): spacious, brass beam balance, lane weights with a segmented rim, the verdict as the hero. Spec in 05. Behaviour and beam formula unchanged. | The current drawing is small and low contrast, and the answer (the verdict) is its weakest element |
 | D-GB-10 | Delivery is a branch and a pull request. Nothing is committed to `main` directly. A preview parameter gates the visible change until the owner flips it. | The change is visible to every visitor (the Outlook word can change). |
 
 ## Open items for the owner
