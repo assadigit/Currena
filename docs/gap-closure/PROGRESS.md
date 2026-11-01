@@ -202,6 +202,29 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > lands on main FIRST, this session stands down from that milestone and
 > moves to the next unticked one. Every push does pull-rebase first
 > (§3.4).
+>
+> **Third session's record (2026-11-01 ~03:06 UTC):** the owner restarted
+> S3 a third time ("this is the 6th time I am running this session… small
+> steps, commit and push so nothing gets lost") at ~03:00 UTC. This third
+> session found the continuation session ALIVE and mid-M3.3-loop: the
+> credit-pair code `7af2c83` pushed 03:00:28 UTC (37 files — EBP + OFR
+> FSI complete with copy round-63/licences/registry/tests 11,140), CI
+> green on the push, worker `0fafc9e4` deployed 03:00:51, the GHA
+> dispatch 41267477191 green at 03:01:19, and a secret-triggered redeploy
+> `4496e229` (live at 100%) at 03:01:35. **This session stands down from
+> M3.3 entirely** (first-landed wins) and records a **lapse protocol**:
+> it touches no S3 file unless no further S3 commit lands on main by
+> **04:00 UTC** (a ~55-minute window from the continuation session's last
+> landing — enough for its full browser-verify + tick loop; the M3.2
+> verify took ~25 min). If the lapse fires, this session takes the next
+> unticked milestone in order (M3.3's stranded verify/tick completion
+> first, then M3.4→M3.6), pull-rebasing before every push. If the
+> continuation session is alive: keep landing, every push pull-rebases
+> first and will see this record; shared wording resolves by additive
+> union, first-landed copy wins. Until the window closes this session
+> monitors only (an independent read-only verification of the live M3.3
+> readings is recorded below in the milestone's evidence, not in any
+> shared file).
 
 ### S4 Geopolitics, supply chain and energy (`S4-geopolitics-supply-energy.md`)
 - [ ] M4.1 Verification and egress
