@@ -1,8 +1,8 @@
 # SELF_AUDIT.md — the automatic self-check
 
-Generated: 2026-11-01T13:40:49.824Z · rule version 4 · export: `docs/insights/exports/currena-insights-full-2026-11-01.md`
+Generated: 2026-11-01T14:02:51.364Z · rule version 4 · export: `docs/insights/exports/currena-insights-full-2026-11-01.md`
 
-Result: **ALL TESTS PASS** (25 of 25 pass)
+Result: **1 TEST(S) FAILED** (24 of 25 pass)
 
 ## Every test, pass or fail
 
@@ -12,7 +12,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 | T-02 | Derived values recomputed from displayed inputs | pass | — |
 | T-03 | Dates: trading days, nothing in the future, data on or before release | pass | — |
 | T-04 | Freshness: every card within its maximum age or tagged stale | pass | — |
-| T-05 | Known records: stored peaks at least the confirmed record values | pass | — |
+| T-05 | Known records: stored peaks at least the confirmed record values | **FAIL** | btc-usd: no stored peak — the record-history backfill is missing; gold-usd: no stored peak — the record-history backfill is missing; silver-usd: no stored peak — the record-history backfill is missing |
 | T-06 | Text matches status: no easing text on a rising value | pass | — |
 | T-07 | Forbidden words: no forecast wording in generated sentences | pass | — |
 | T-08 | Suspicious values: no duplicate prints, no exactly-zero monthly changes | pass | — |
@@ -38,6 +38,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 
 | Indicator | Status | As of | Reason |
 | euro-hicp | stale | 2026-09-01 | stale |
+| gold-oil-ratio | stale | 2026-09-01 | stale |
 | food-index | stale | 2026-09-01 | stale |
 | wheat | stale | 2026-09-01 | stale |
 | maize | stale | 2026-09-01 | stale |
@@ -58,6 +59,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - oecd-cli-us
 - oecd-cli-cn
 - oecd-cli-de
+- usdaed
 - shiller-cape
 - shiller-ecy
 - term-premium-10y
@@ -90,10 +92,10 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ✅ fred — bulk group 5 (5 series, from 2016-08-05: A091RC1Q027SBEA, W006RC1Q027SBEA, DCOILBRENTEU, DCOILWTICO, DHHNGSP)
 - ✅ fred — bulk group 6 (4 series, from 2016-08-05: IRLTLT01DEM156N, IRLTLT01JPM156N, IRLTLT01GBM156N, IRSTCI01JPM156N)
 - ✅ fred — bulk group 7 (11 series, from 2016-08-05: ICSA, RECPROUSM156N, UMCSENT, MICH, PCEPILFE, MORTGAGE30US, WALCL, WSEFINTL1, CFNAI, JTSJOL, AHETPI)
-- ✅ yahoo — Brent front-month daily closes (the gap-fill, first active contract)
-- ✅ yahoo — GC=F daily quotes (10-year record history)
-- ✅ yahoo — SI=F daily quotes (10-year record history)
-- ✅ yahoo — BTC-USD daily quotes (10-year record history)
+- ❌ yahoo — Brent front-month daily closes (the gap-fill, first active contract): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (rate-limited, HTTP 429) — waiting for the next scheduled refresh)
+- ❌ yahoo — GC=F daily quotes (10-year record history): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (rate-limited, HTTP 429) — waiting for the next scheduled refresh)
+- ❌ yahoo — SI=F daily quotes (10-year record history): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (rate-limited, HTTP 429) — waiting for the next scheduled refresh)
+- ❌ yahoo — BTC-USD daily quotes (10-year record history): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (rate-limited, HTTP 429) — waiting for the next scheduled refresh)
 - ✅ ecb — FM/D.U2.EUR.4F.KR.DFR.LEV
 - ✅ ecb — YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (decade window)
 - ✅ ecb — HICP/M.U2.N.000000.4D0.ANR (decade window)
@@ -103,7 +105,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ✅ nbs — PMI release: Purchasing Managers' Index for September 2026 (2026-10-01)
 - ✅ nbs — CPI release: Consumer Price Index in September 2026 (2026-10-15)
 - ✅ frankfurter — USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY since 2016-01-04
-- ✅ yahoo — AED=X daily closes (USD/AED, the usdaed card)
+- ❌ yahoo — AED=X daily closes (USD/AED, the usdaed card): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (rate-limited, HTTP 429) — waiting for the next scheduled refresh)
 - ✅ world-bank — Pink Sheet monthly workbook
 - ✅ gold-api — XAU spot
 - ✅ gold-api — XAG spot
@@ -133,7 +135,7 @@ Result: **ALL TESTS PASS** (25 of 25 pass)
 - ❌ rba — F2.1 FCMYGBAG10 10-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ❌ rba — F2.1 FCMYGBAG3 3-year bond yield (monthly): blocked by the site — no retry, waiting for the next scheduled refresh (blocked by the site (HTTP 403) — waiting for the next scheduled refresh)
 - ✅ alternative-me — Crypto Fear and Greed (daily history)
-- ✅ cross-check — gold-api BTC 77893 vs Bitstamp close 77838 (2026-11-01) → 0.07%
+- ✅ cross-check — gold-api BTC 77858 vs Bitstamp close 77813 (2026-11-01) → 0.06%
 - ✅ mof — jgbcme.csv daily 10Y + jgbcme_all.csv history
 - ✅ eia — crude oil ending stocks WCRSTUS1 (weekly, keyless website route)
 - ✅ cftc — Commitments of Traders, futures-only (gold row)

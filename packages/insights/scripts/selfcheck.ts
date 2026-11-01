@@ -307,24 +307,27 @@ interface SuiteRow {
 }
 const suiteRows: SuiteRow[] = [];
 try {
-  // gap-closure S3-M3.6 (2026-11-01): the spawn is now the SAME shape
-  // scripts/gates.mjs uses for its 'full test suite' gate — `shell: true`
-  // with the command as one string — because that shape is PROVEN on the
-  // GHA runner (every CI push parses all six package footers through it),
-  // while the previous direct `spawnSync('pnpm', ['-r', 'test'])` produced
-  // zero parseable footers on the runner in EVERY selfcheck run since the
-  // workflow was created (13 of the 17 daily runs before 2026-11-01 were
-  // red with `SUITE:(suites)` "no suite output parsed"; it worked locally
-  // but never on the hosted runner). The regex is the gates one too,
-  // tolerant of any whitespace run (`\s+`) instead of the old `{2,}`.
+  // gap-closure S3-M3.6 (2026-11-01): TWO runner-only fixes, found via the
+  // SUITE-DIAGNOSTIC print (run 41313692117): (a) the suites spawn now uses
+  // the gates.mjs shape (`shell: true`, command as one string) — the old
+  // direct spawn produced nothing on the GHA runner; (b) a pnpm script
+  // spawned from INSIDE another pnpm script emits ANSI color codes in its
+  // recursive output (`apps/web test: \x1b[…m      Tests…`), which no
+  // whitespace regex can match — so the env forces no-color AND the text is
+  // stripped of escapes before parsing. Locally the same spawn is uncolored,
+  // which is why this never failed in the sandbox.
   const run = spawnSync('pnpm -r run test', {
     shell: true,
     cwd: REPO,
     encoding: 'utf8',
     timeout: 10 * 60 * 1000,
     maxBuffer: 64 * 1024 * 1024,
+    env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' },
   });
-  const text = run.stdout + '\n' + run.stderr;
+  // Strip ANSI escapes (colors, cursor moves) before any line parsing —
+  // CSI sequences plus any stray bare ESC bytes the terminal layered in.
+  const ansiFree = (s: string): string => s.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '').replace(/\x1b/g, '');
+  const text = ansiFree(run.stdout ?? '') + '\n' + ansiFree(run.stderr ?? '');
   const seen = new Map<string, SuiteRow>();
   for (const m of text.matchAll(/^(\S+) test:\s+Tests\s+(\d[\d,]*) passed(?: \((\d+)\))?(?:, (\d+) failed)?/gm)) {
     const pkg = m[1]!.replace(/ test:$/, '');
