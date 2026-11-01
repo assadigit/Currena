@@ -49,6 +49,15 @@ export const RUNG4_IDS: readonly IndicatorId[] = [
   'net-liquidity', // derived: WALCL − TGA − RRP
   'ebp', // gap-closure S3-M3.3: the Fed Board EBP file (its own phase)
   'ofr-fsi', // gap-closure S3-M3.3: the OFR FSI aggregate file (its own phase)
+  // gap-closure S3-M3.4 (2026-11-01): the growth-nowcast/survey family —
+  // direct cards off the SAME 'fred-s3' macro group fetch (the series
+  // were fetched from day one; their cards land with M3.4).
+  'gdpnow', // FRED GDPNOW (quarterly stamps, % SAAR)
+  'empire-state', // FRED GACDISA066MSFRBNY (monthly diffusion)
+  'continuing-claims', // FRED CCSA (weekly Saturday)
+  'median-cpi', // FRED MEDCPIM158SFRBCLE (monthly, 12-month %)
+  'sticky-cpi', // FRED STICKCPIM158SFRBATL (monthly, 12-month %)
+  'sloos-ci-tightening', // FRED DRTSCILM (quarterly net %)
 ];
 
 /** The rung-4 collection's output: raw FRED series + honest report rows. */
@@ -179,5 +188,15 @@ export function deriveRung4IndicatorSeries(
   if (legs.walcl !== undefined && tga !== undefined && rrp !== undefined) {
     put('net-liquidity', netLiquiditySeries(legs.walcl, tga, rrp));
   }
+
+  // gap-closure S3-M3.4 (2026-11-01): the growth-nowcast/survey family —
+  // six DIRECT series off the same macro-group fetch (no legs, no joins;
+  // a missing series simply omits its card and the reading carries).
+  put('gdpnow', s3[FRED_SERIES.gdpNow]);
+  put('empire-state', s3[FRED_SERIES.empireState]);
+  put('continuing-claims', s3[FRED_SERIES.continuingClaims]);
+  put('median-cpi', s3[FRED_SERIES.medianCpi]);
+  put('sticky-cpi', s3[FRED_SERIES.stickyCpi]);
+  put('sloos-ci-tightening', s3[FRED_SERIES.sloosCiTightening]);
   return out;
 }

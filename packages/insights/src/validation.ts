@@ -769,6 +769,18 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // spread in percentage points, the repo-stress family (a premium
   // built from corporate yields minus expected default losses).
   'ebp',
+  // gap-closure S3-M3.4 (2026-11-01): the growth-nowcast/survey family's
+  // rate/index series — GDPNow (a growth rate, the us-gdp-growth family),
+  // Empire State (a diffusion index, the philly-fed family), the median
+  // and sticky CPI yearly rates (the us-cpi-yoy family), and the SLOOS
+  // net share (a share of banks in points, the cftc-gold-positioning
+  // family). continuing-claims stays 'pct' — the initial-jobless-claims
+  // convention.
+  'gdpnow',
+  'empire-state',
+  'median-cpi',
+  'sticky-cpi',
+  'sloos-ci-tightening',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */

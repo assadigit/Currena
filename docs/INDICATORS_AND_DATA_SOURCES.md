@@ -13,16 +13,16 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 111-indicator dashboard
+## 1. What indicators Currena has — the 117-indicator dashboard
 
-The Insights page renders **111 indicators** across **2 sections** (Global
-82, Australia 23 — see the
+The Insights page renders **117 indicators** across **2 sections** (Global
+88, Australia 23 — see the
 breakdown below), grouped under **9 question gauges** (5 global + 3
 australia + the prices-board strip). Of those, **48 are scored voters**
-(contribute to a gauge's verdict) and **63 are context rows** (live value +
+(contribute to a gauge's verdict) and **69 are context rows** (live value +
 10-year position bar, never vote).
 
-The live snapshot is served at `GET /api/insights` — 111 `readings` plus
+The live snapshot is served at `GET /api/insights` — 117 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -36,10 +36,10 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 |---|---|---|---|
 | **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section) | 9 |
 
-| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio` | 5 |
-| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3) | 5 |
+| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio`, `median-cpi`, `sticky-cpi` (S3-M3.4) | 5 |
+| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4) | 5 |
 | **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
-| **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de` | 10 |
+| **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de`, `gdpnow`, `empire-state`, `continuing-claims` (S3-M3.4) | 10 |
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
 | **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** + context: `au-petrol-yoy` | 5 |
 | **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `rba-cash-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
@@ -49,7 +49,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (111 ids, alphabetical)
+### The complete indicator inventory (117 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -98,12 +98,14 @@ public-display-ok · scored voter? · short description.
 | `cftc-gold-positioning` | cftc | weekly | 12 | L0 | yes | ✓ | Trader positioning in gold (COT, net non-commercial share of OI) |
 | `china-cpi` | nbs | monthly | 45 | L1 | yes | ✓ | China inflation (yearly) |
 | `china-pmi` | nbs | monthly | 45 | L1 | yes | ✓ | China manufacturing PMI |
+| `continuing-claims` | fred | weekly | 28 | L0 | yes | – | Americans receiving unemployment benefits (CCSA, the persistence read beside new claims) |
 | `copper-gold` | derived | monthly | 60 | L1 | yes | ✓ | Copper / Gold ratio |
 | `copper-usd` | gold-api | daily | 2 | L1 | yes | – | Copper price |
 | `crypto-fng` | alternative-me | daily | 4 | L0 | yes | – | Crypto Fear and Greed Index |
 | `dollar-basket` | derived | daily | 4 | L1 | yes | ✓ | Currena dollar basket (DXY-style, ECB rates via Frankfurter) |
 | `ecb-dfr` | ecb | daily | 7 | L1 | yes | ✓ | ECB deposit facility rate |
 | `eia-crude-stocks` | eia | weekly | 12 | L0 | yes | – | US crude oil inventories (EIA LeafHandler, keyless) |
+| `empire-state` | fred | monthly | 60 | L2 | yes | – | Empire State manufacturing survey (the NY Fed factory diffusion, the philly-fed twin) |
 | `ebp` | frb | monthly | 75 | L0 | yes | – | The Fed Board's own excess bond premium file (the credit-cycle gauge) |
 | `epu-us` | epu | monthly | 75 | L0 | yes | – | US policy uncertainty (EPU) |
 | `eur-usd` | frankfurter | daily | 4 | L1 | yes | – | EUR/USD |
@@ -112,6 +114,7 @@ public-display-ok · scored voter? · short description.
 | `fed-expectations` | derived | daily | 4 | L0 | yes | ✓ | What markets expect from the Fed (2y gap) |
 | `fed-target` | fred | daily | 5 | L0 | yes | ✓ | Federal funds target rate |
 | `food-index` | world-bank | monthly | 60 | L1 | yes | – | World food prices (Pink Sheet) |
+| `gdpnow` | fred | quarterly | 150 | L2 | yes | – | Atlanta Fed GDPNow: the running nowcast of the CURRENT quarter's real GDP growth (quarter-start stamps) |
 | `gilt-10y` | fred | monthly | 75 | L2 | yes | – | UK 10-year government bond yield (OECD mirror) |
 | `gold-aud` | derived | daily | 4 | L1 | yes | – | Gold price in AUD |
 | `gold-btc` | derived | daily | 4 | L0 | yes | – | Bitcoin priced in gold (BTC per ounce) |
@@ -128,6 +131,7 @@ public-display-ok · scored voter? · short description.
 | `m2-us` | fred | monthly | 90 | L0 | yes | – | US M2 money supply |
 | `maize` | world-bank | monthly | 60 | L1 | yes | – | Maize price (Pink Sheet) |
 | `michigan-1y-expectations` | fred | monthly | 75 | L2 | yes | – | US expected inflation next year (Michigan) |
+| `median-cpi` | fred | monthly | 75 | L2 | yes | – | Cleveland Fed median CPI (12-month, the quiet-inflation middle read) |
 | `michigan-sentiment` | fred | monthly | 75 | L2 | yes | ✓ | US consumer mood (Michigan survey) |
 | `mortgage-30y` | fred | weekly | 14 | L2 | yes | – | The US 30-year home-loan rate |
 | `natgas` | fred | daily | 12 | L0 | yes | – | US natural gas (Henry Hub) |
@@ -150,9 +154,11 @@ public-display-ok · scored voter? · short description.
 | `reverse-repo` | fred | daily | 4 | L1 | yes | – | The overnight reverse repo pile (RRPONTSYD, citation-required) |
 | `sahm-rule` | fred | monthly | 75 | L0 | yes | ✓ | US recession alarm (Sahm rule) |
 | `shiller-cape` | shiller | monthly | 45 | L2 | yes | – | US share prices vs long-run earnings (Shiller CAPE) |
+| `sloos-ci-tightening` | fred | quarterly | 215 | L0 | yes | – | SLOOS: net share of US banks tightening business lending standards (DRTSCILM) |
 | `shiller-ecy` | shiller | monthly | 45 | L2 | yes | – | Excess CAPE Yield (Shiller) |
 | `silver-usd` | gold-api | daily | 2 | L2 | yes | – | Silver price (ounce) |
 | `sofr` | fred | daily | 4 | L2 | yes | – | The overnight funding rate (SOFR) |
+| `sticky-cpi` | fred | monthly | 75 | L2 | yes | – | Atlanta Fed sticky-price CPI (12-month, inflation in rarely-changing prices) |
 | `stress-stlfsi` | fred | weekly | 14 | L2 | yes | ✓ | St. Louis Fed Financial Stress Index (R10-2: 10→14, absorbs one missed weekly release — matches NFCI) |
 | `t5yie` | fred | daily | 5 | L2 | yes | – | Expected US inflation, five years ahead |
 | `terms-of-trade` | abs | quarterly | 215 | L0 | yes | ✓ | Australia's terms of trade |
@@ -178,7 +184,7 @@ public-display-ok · scored voter? · short description.
 | `yield-curve-10y2y` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 2Y yield |
 | `yield-curve-10y3m` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 3M yield (the Fed's recession lens) |
 
-**Counts:** 111 ids total. Voters: 48 (brent votes in prices-heat per the
+**Counts:** 117 ids total. Voters: 48 (brent votes in prices-heat per the
 B-14 fix; the count is 9+5+5+3+10 + 5+7+4 = 48, which includes the
 **A-7 cftc-gold-positioning** voter in market-stress and the **A-8
 oecd-cli-us** voter in growth-health). Context: 63 (+6 S3-M3.2, +2 S3-M3.3; the S2 custody card makes 63).
@@ -221,7 +227,7 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 
 | provider | level | licence class | used for | free? | key needed? |
 |---|---|---|---|---|---|
-| **fred** (St. Louis Fed) | L0 + L2 | per-series T-16 scan — `#copyright-public-domain` (40 series) or `#copyright-citation-required` (8 series, display-permitted with attribution) | US rates, CPI, jobs, money, yield curves, recession probability, VIX, etc. | **free forever**, keyless | no |
+| **fred** (St. Louis Fed) | L0 + L2 | per-series T-16 scan — `#copyright-public-domain` (33 series) or `#copyright-citation-required` (23 series, display-permitted with attribution) among the 57 registered series | US rates, CPI, jobs, money, yield curves, recession probability, VIX, the S3 liquidity/funding + growth-nowcast/survey families (rung4), etc. | **free forever**, keyless | no |
 | **mof** (Japan Ministry of Finance) | L0 | Japanese government statistical release — attribution displayed | jgb-10y daily (jgbcme.csv, 15 maturities) | **free forever**, keyless | no |
 | **ecb** (ECB Data Portal) | L1 | ECB website terms (free use, accurate + cited) | ecb-dfr, euro-aaa-10y, euro-hicp | **free forever**, keyless | no |
 | **boe** (Bank of England) | L2 (owner-accepted) | UK Open Government Licence v3.0 | boe-rate (Bank Rate decision table) | **free forever**, keyless | no |
@@ -274,7 +280,7 @@ Insights page's serve path performs **exactly ONE KV read per request**
 | `GET` | `/api/rates?source=tgju\|frankfurter` | The fallback ladder — the converter's source rates | none | 60/min/IP |
 | `GET` | `/api/convert?from=USD&to=IRR&amount=100` | Server-side conversion math (via `@currena/core`) | none | 60/min/IP |
 | `GET` | `/api/status` | Per-source status + cache age (the `/admin` pill reads this) | none | none |
-| `GET` | `/api/insights` | The 111-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
+| `GET` | `/api/insights` | The 117-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
 | `GET` | `/api/insights/:id/history` | One card's history (downsampled to ≤2700 points) | public (the L2 sources are bounded to the visible chart window) | none |
 | `GET` | `/api/insights/markets` | The world stock markets board (16 indices, EODHD-first) | public (owner directive 2026-10-18b) | none |
 | `GET` | `/api/insights/fx` | The world currencies board (10 pairs + 7 patterns, ECB rates) | public (owner directive 2026-10-21c) | none |

@@ -154,8 +154,8 @@ describe('buildInsightsSnapshot', () => {
     // eia-crude-stocks (A-6), cftc-gold-positioning (A-7) → 95; the
     // monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10)
     // → 100.
-    expect(snap.readings).toHaveLength(111); // 2026-10-29 owner round: +usdaed · Session 3 (G2, 2026-10-31): +breakeven-tilt · gap-closure S2-M2.4 (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair
-    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(111); // +6: gap-closure S3-M3.2 (2026-11-01) · +2: gap-closure S3-M3.3 (2026-11-01)
+    expect(snap.readings).toHaveLength(117); // 2026-10-29 owner round: +usdaed · Session 3 (G2, 2026-10-31): +breakeven-tilt · gap-closure S2-M2.4 (2026-10-31): +nyfed-custody · gap-closure S3-M3.2 (2026-11-01): +the liquidity/funding six · gap-closure S3-M3.3 (2026-11-01): +the credit pair · gap-closure S3-M3.4 (2026-11-01): +the growth-nowcast/survey six
+    expect(new Set(snap.readings.map((r) => r.id)).size).toBe(117); // +6: gap-closure S3-M3.2 (2026-11-01) · +2: gap-closure S3-M3.3 (2026-11-01) · +6: gap-closure S3-M3.4 (2026-11-01)
     expect(snap.readings.find((r) => r.id === 'us10y')!.status).not.toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.status).toBe('unavailable');
     expect(snap.readings.find((r) => r.id === 'china-pmi')!.value).toBeNull();

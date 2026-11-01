@@ -100,9 +100,11 @@ describe('fred adapter', () => {
     // gap-closure S2-M2.4 round adds WSEFINTL1 (the weekly custody card) → 45;
     // the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity family's
     // five (THREEFYTP10, WTREGEN, RRPONTSYD, WRESBAL, IORB — the repo-stress
-    // leg) → 50. CCSA and the macro six ride FRED_S3_GROUPS (rung4), not the
-    // FRED_SERIES register (their cards land with M3.4/M3.5).
-    expect(Object.values(FRED_SERIES)).toHaveLength(50);
+    // leg) → 50; the 2026-11-01 gap-closure S3-M3.4 round registers the
+    // growth-nowcast/survey family + the M3.5 deficit leg (GDPNOW,
+    // GACDISA066MSFRBNY, CCSA, MEDCPIM158SFRBCLE, STICKCPIM158SFRBATL,
+    // MTSDS133FMS, DRTSCILM — all riding FRED_S3_GROUPS on rung4) → 57.
+    expect(Object.values(FRED_SERIES)).toHaveLength(57);
   });
 
   it('rides WSEFINTL1 in the mixed-frequency bulk group beside WALCL (S2-M2.4: zero new subrequests)', () => {

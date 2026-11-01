@@ -524,6 +524,18 @@ export const IndicatorIdSchema = z.enum([
   // 'frb-ebp' + 'ofr-fsi' — their own sources, not the FRED groups).
   'ebp', // the Fed Board's own EBP file, ebp column (monthly, pts) — context
   'ofr-fsi', // the OFR FSI file, aggregate column (daily, index sd) — context
+  // ---- gap-closure S3 (2026-11-01, M3.4): the growth-nowcast and survey
+  // family — context rows in the growth-health / market-stress / prices-heat
+  // lanes (G-5: context-only until any S6 promotion decision). All six
+  // series verified from the provider's own fredgraph.csv + series pages
+  // 2026-11-01 (M3.1); the fetches already ride rung4's 'fred-s3' macro
+  // group — their cards land here (RUNG4_IDS + the shared derivation).
+  'gdpnow', // FRED GDPNOW (Atlanta Fed nowcast, quarterly stamps, % SAAR) — context
+  'empire-state', // FRED GACDISA066MSFRBNY (NY Fed Empire State diffusion, monthly) — context
+  'continuing-claims', // FRED CCSA (continued claims, weekly Saturday) — context
+  'median-cpi', // FRED MEDCPIM158SFRBCLE (Cleveland Fed median CPI, 12-month) — context
+  'sticky-cpi', // FRED STICKCPIM158SFRBATL (Atlanta Fed sticky CPI, 12-month) — context
+  'sloos-ci-tightening', // FRED DRTSCILM (SLOOS net % tightening C&I standards, quarterly) — context
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 

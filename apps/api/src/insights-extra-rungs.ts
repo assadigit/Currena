@@ -108,10 +108,11 @@ export interface ExtraSourceDef {
  * liquidity/funding/macro groups — the 'fred-s3' rung4 source (the 04:35
  * slot the S1-M1.7 scaffolding reserved). TWO fredgraph ZIP fetches + the
  * stage read (the sofr/walcl legs) + the snapshot read + the status read
- * + the patch writes (snapshot, public, stage, status) + the 6 OWN
- * history writes = 15; declared budget 16 (rounding headroom). Day gate:
- * daily — the groups carry daily series (term premium, RRP, IORB), and
- * the 10:10/20:10 sweeps heal a failed day within hours (gate bypassed).
+ * + the patch writes (snapshot, public, stage, status) + the 12 OWN
+ * history writes (the M3.2 liquidity six + the M3.4 macro six) = 21 live;
+ * declared budget 22 (rounding headroom). Day gate: daily — the groups
+ * carry daily series (term premium, RRP, IORB), and the 10:10/20:10
+ * sweeps heal a failed day within hours (gate bypassed).
  *
  * gap-closure S3-M3.3 (2026-11-01) registers the THIRD and FOURTH: the
  * credit-stress pair, in TWO sources so their failure domains stay
@@ -122,7 +123,7 @@ export interface ExtraSourceDef {
  * 'ofr-fsi' — the OFR's daily FSI file, daily gate. Each budget 10:
  * 1 fetch + 1 snapshot read + 1 status read + 4 patch writes + 1 history
  * write = 8, declared with headroom. The rung4 registry total on the day
- * every gate fires: 1 status + 16 + 10 + 10 = 37 ≤ 50.
+ * every gate fires: 1 status + 22 + 10 + 10 = 43 ≤ 50.
  */
 export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
   {
@@ -136,7 +137,7 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
     id: 'fred-s3',
     rung: 4,
     gate: dailyGate(),
-    budget: 16,
+    budget: 22,
     run: async (env: Bindings, now: Date) => {
       const result = await runInsightsRung4Phase({
         store: new KvInsightsStore(env.RATES),

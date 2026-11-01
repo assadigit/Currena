@@ -1379,6 +1379,124 @@
       }
     },
     {
+      "id": "median-cpi",
+      "title": "US median inflation (Cleveland Fed)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve Bank of Cleveland via FRED (MEDCPIM158SFRBCLE, 12-month)",
+        "url": "https://fred.stlouisfed.org/series/MEDCPIM158SFRBCLE",
+        "seriesIdOrTable": "FRED:MEDCPIM158SFRBCLE (Median Consumer Price Index, 12-month % change, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/MEDCPIM158SFRBCLE",
+      "methodUrl": "https://fred.stlouisfed.org/series/MEDCPIM158SFRBCLE",
+      "whatItIs": "The Cleveland Fed’s median CPI (via FRED MEDCPIM158SFRBCLE): the median price change across the consumption basket over 12 months — the wildest moves on both sides are ignored by construction.",
+      "whatItIsnt": "It is a different construction from the headline index: the two can disagree for months about the same economy, and neither is wrong.",
+      "trackRecordNote": "Its decade range runs from about 1.1 (2020) to 7.8 (June 2022), and the latest reading sits in the lower half of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:MEDCPIM158SFRBCLE"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:MEDCPIM158SFRBCLE): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "sticky-cpi",
+      "title": "US sticky-price inflation (Atlanta Fed)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve Bank of Atlanta via FRED (STICKCPIM158SFRBATL, 12-month)",
+        "url": "https://fred.stlouisfed.org/series/STICKCPIM158SFRBATL",
+        "seriesIdOrTable": "FRED:STICKCPIM158SFRBATL (Sticky Price Consumer Price Index, 12-month % change, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/STICKCPIM158SFRBATL",
+      "methodUrl": "https://fred.stlouisfed.org/series/STICKCPIM158SFRBATL",
+      "whatItIs": "The Atlanta Fed’s sticky-price CPI (via FRED STICKCPIM158SFRBATL): 12-month inflation in the basket of items whose prices change infrequently — rents, services and the like.",
+      "whatItIsnt": "The sticky basket leans toward services: it can stay elevated after goods prices cool, and it moves slowly by construction.",
+      "trackRecordNote": "Its decade range runs from about −1.8 (April 2020) to 8.3 (June 2022); the latest reading sits above the middle of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:STICKCPIM158SFRBATL"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:STICKCPIM158SFRBATL): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "euro-hicp",
       "title": "Euro-area inflation (yearly)",
       "area": {
@@ -3569,6 +3687,65 @@
       }
     },
     {
+      "id": "sloos-ci-tightening",
+      "title": "Banks tightening business lending (SLOOS)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve via FRED (DRTSCILM, SLOOS)",
+        "url": "https://fred.stlouisfed.org/series/DRTSCILM",
+        "seriesIdOrTable": "FRED:DRTSCILM (Net Percentage of Domestic Banks Tightening C&I Standards, SLOOS, quarterly)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DRTSCILM",
+      "methodUrl": "https://fred.stlouisfed.org/series/DRTSCILM",
+      "whatItIs": "The Senior Loan Officer Opinion Survey (via FRED DRTSCILM): the net percentage of US banks reporting tighter standards for business loans — the share tightening minus the share easing, covering large and middle-market firms.",
+      "whatItIsnt": "It is a quarterly survey of bankers, not a market price: it reports what lenders say, not what borrowers do, and one quarter is not a wave.",
+      "trackRecordNote": "Tightening peaked at about 71 in July 2020 and swung to net easing of −32 in 2021; the latest reading sits around zero — standards basically unchanged.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DRTSCILM"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 215,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.4 session; Federal Reserve source) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DRTSCILM): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "gold-silver",
       "title": "Gold / Silver",
       "area": {
@@ -4141,6 +4318,65 @@
       }
     },
     {
+      "id": "empire-state",
+      "title": "Empire State manufacturing survey",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve Bank of New York via FRED (GACDISA066MSFRBNY)",
+        "url": "https://fred.stlouisfed.org/series/GACDISA066MSFRBNY",
+        "seriesIdOrTable": "FRED:GACDISA066MSFRBNY (Current General Business Conditions: Diffusion Index for New York, SA, monthly)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/GACDISA066MSFRBNY",
+      "methodUrl": "https://fred.stlouisfed.org/series/GACDISA066MSFRBNY",
+      "whatItIs": "The New York Fed’s Empire State manufacturing survey (via FRED GACDISA066MSFRBNY): the general business conditions index — the share of firms reporting improvement minus the share reporting deterioration, seasonally adjusted.",
+      "whatItIsnt": "It asks one region’s factories about conditions, not the country: a single month’s swing is noise, and the survey reports sentiment, not output.",
+      "trackRecordNote": "The decade’s range runs from −80 (April 2020) to about +36; readings above +20 have been rare outside strong stretches, and the latest sits in that upper part.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:GACDISA066MSFRBNY"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:GACDISA066MSFRBNY): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "initial-jobless-claims",
       "title": "New unemployment claims (US)",
       "area": {
@@ -4198,6 +4434,65 @@
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; US Department of Labor source, no copyright notice) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "continuing-claims",
+      "title": "Americans on unemployment benefits",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "US Department of Labor via FRED (CCSA)",
+        "url": "https://fred.stlouisfed.org/series/CCSA",
+        "seriesIdOrTable": "FRED:CCSA (Continued Claims, Insured Unemployment, weekly Saturday, persons)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/CCSA",
+      "methodUrl": "https://fred.stlouisfed.org/series/CCSA",
+      "whatItIs": "Continued claims (via FRED CCSA, from the Department of Labor’s weekly report): how many people were receiving unemployment insurance in the week, published about a week and a half after the week it covers.",
+      "whatItIsnt": "Benefit rolls count only people who qualify and claim: the level shifts with rules and the size of the workforce, and one quiet week is not a trend.",
+      "trackRecordNote": "The pandemic spring of 2020 pushed the rolls past 23 million; since 2022 they have mostly run between about 1.3 and 2.0 million, and the latest sits in the lower part of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 28 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:CCSA"
+        ]
+      },
+      "unit": "claims",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 28,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.4 session; DOL source) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:CCSA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -4916,6 +5211,65 @@
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "gdpnow",
+      "title": "US growth nowcast (GDPNow)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Atlanta Fed via FRED (GDPNOW, real GDP nowcast)",
+        "url": "https://fred.stlouisfed.org/series/GDPNOW",
+        "seriesIdOrTable": "FRED:GDPNOW (Atlanta Fed GDPNow, real GDP growth, QoQ annualized, quarterly stamps)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/GDPNOW",
+      "methodUrl": "https://fred.stlouisfed.org/series/GDPNOW",
+      "whatItIs": "The Atlanta Fed’s GDPNow model (via FRED GDPNOW): a running estimate of real GDP growth for the CURRENT quarter, annualised, revised in place as monthly data lands. The as-of date is the quarter’s first day: the stamp tells you which quarter the number refers to.",
+      "whatItIsnt": "It is a model estimate that revises several times a month, not a promise: the official print can land far from the last nowcast, and it says nothing about the quarter after.",
+      "trackRecordNote": "The pandemic quarters swing the decade’s range from about −32 (April 2020) to +37 (July 2020); outside those two, the last five quarters have run between about 1.2 and 4.2.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 150 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:GDPNOW"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 150,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:GDPNOW): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },

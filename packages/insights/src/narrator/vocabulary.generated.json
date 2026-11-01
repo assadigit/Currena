@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "2f252173bc8ac06d36424a273ac72a1db799481d0aec7357ea846998641c6cb6",
-    "faSha256": "ea965615da0ef40c301aa06a6e116e48c4800e99c49e79bf39fa726a43d6a5b2",
-    "indicatorCount": 140,
-    "glossaryCount": 36
+    "enSha256": "9ee1a92327bc832abfe4f82ad5fc431da6f9334ad0696669c7a1d84378aaf884",
+    "faSha256": "e7d5d76720b90d02884846c0dd32cd0b881bfd06b4f6cb0b320fc44c33915a2e",
+    "indicatorCount": 146,
+    "glossaryCount": 37
   },
   "en": {
     "indicators": {
@@ -3055,6 +3055,127 @@
           "liquidity",
           "volatility"
         ]
+      },
+      "gdpnow": {
+        "plainName": "US growth nowcast",
+        "oneLine": "The Atlanta Fed’s running estimate of this quarter’s US growth.",
+        "ifRising": "This quarter is tracking stronger as the data lands.",
+        "ifFalling": "This quarter is tracking weaker as the data lands.",
+        "connections": [
+          {
+            "with": "us-gdp-growth",
+            "text": "The official print for the quarter before; this nowcast runs the current one.",
+            "strength": "reliable"
+          },
+          {
+            "with": "retail-sales",
+            "text": "Consumer spending is the biggest input the model aggregates.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "nowcast"
+        ]
+      },
+      "empire-state": {
+        "plainName": "New York factory survey",
+        "oneLine": "A monthly survey of New York manufacturers: above zero means growth.",
+        "ifRising": "More New York manufacturers are reporting growth than decline.",
+        "ifFalling": "More New York manufacturers are reporting decline than growth.",
+        "connections": [
+          {
+            "with": "philly-fed",
+            "text": "The same question asked of Philadelphia factories.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us-gdp-growth",
+            "text": "Factory surveys often turn before the headline growth number.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "continuing-claims": {
+        "plainName": "Americans on benefits",
+        "oneLine": "The number of people already receiving unemployment benefits each week.",
+        "ifRising": "Fewer people are ending up off the rolls: job-finding is slowing.",
+        "ifFalling": "People are leaving the rolls faster: job-finding is picking up.",
+        "connections": [
+          {
+            "with": "initial-jobless-claims",
+            "text": "One counts new filings; this counts everyone still claiming.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us-unemployment",
+            "text": "The monthly rate the weekly rolls feed into.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "median-cpi": {
+        "plainName": "US median inflation",
+        "oneLine": "US inflation measured by the middle price change, ignoring the wildest moves.",
+        "ifRising": "The steady middle of price changes is moving up.",
+        "ifFalling": "The steady middle of price changes is coming down.",
+        "connections": [
+          {
+            "with": "us-cpi-yoy",
+            "text": "The headline measure this middle read sits beside.",
+            "strength": "reliable"
+          },
+          {
+            "with": "sticky-cpi",
+            "text": "Both strip noise from the monthly print, each a different way.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation",
+          "trimmed-mean"
+        ]
+      },
+      "sticky-cpi": {
+        "plainName": "US sticky-price inflation",
+        "oneLine": "US inflation in the goods and services that rarely change price.",
+        "ifRising": "Even rarely-changing prices are rising faster: underlying pressure is building.",
+        "ifFalling": "Even rarely-changing prices are cooling: underlying pressure is coming down.",
+        "connections": [
+          {
+            "with": "median-cpi",
+            "text": "The other quiet-inflation read, built the opposite way.",
+            "strength": "usually"
+          },
+          {
+            "with": "us-cpi-yoy",
+            "text": "The headline print the sticky basket reads beside.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation"
+        ]
+      },
+      "sloos-ci-tightening": {
+        "plainName": "Bank lending standards",
+        "oneLine": "The net share of US banks making business loans harder to get.",
+        "ifRising": "More banks are making business loans harder to obtain.",
+        "ifFalling": "Fewer banks are making business loans hard to obtain.",
+        "connections": [
+          {
+            "with": "ebp",
+            "text": "One is the price of lending to companies; this is the gate.",
+            "strength": "sometimes"
+          },
+          {
+            "with": "us-gdp-growth",
+            "text": "A rising share here has usually lined up with weaker growth.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
       }
     },
     "glossary": {
@@ -3203,6 +3324,11 @@
       "financial-stress-index": {
         "term": "financial stress index",
         "plain": "A daily score of how strained money markets are. The OFR’s own combines credit, funding, volatility, safe-asset and equity-valuation pressure into one number around zero (zero = its long-run average)."
+      },
+      "nowcast": {
+        "term": "nowcast",
+        "plain": "An estimate of something happening right now, built from data that arrives before the official number. “Now” plus “forecast”: no waiting, less certainty.",
+        "example": "The Atlanta Fed’s GDPNow estimates this quarter’s growth while the quarter is still running."
       }
     },
     "ui": {
@@ -6289,6 +6415,127 @@
           "liquidity",
           "volatility"
         ]
+      },
+      "gdpnow": {
+        "plainName": "برآورد رشد آمریکا",
+        "oneLine": "برآورد اکنونِ فدرال رزرو آتلانتا از رشد همین فصل آمریکا.",
+        "ifRising": "این فصل با رسیدن داده‌ها قوی‌تر از آب درمی‌آید.",
+        "ifFalling": "این فصل با رسیدن داده‌ها ضعیف‌تر از آب درمی‌آید.",
+        "connections": [
+          {
+            "with": "us-gdp-growth",
+            "text": "عدد رسمی فصلِ پیش است؛ این برآورد اکنون، فصلِ در جریان را می‌راند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "retail-sales",
+            "text": "مصرف بزرگ‌ترین ورودی‌ای است که مدل جمع می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "nowcast"
+        ]
+      },
+      "empire-state": {
+        "plainName": "نظرسنجی کارخانه‌های نیویورک",
+        "oneLine": "نظرسنجی ماهانه از تولیدکنندگان نیویورک: بالای صفر یعنی رشد.",
+        "ifRising": "تولیدکنندگان بیشتری در نیویورک رشد را گزارش می‌کنند تا افت را.",
+        "ifFalling": "تولیدکنندگان بیشتری در نیویورک افت را گزارش می‌کنند تا رشد را.",
+        "connections": [
+          {
+            "with": "philly-fed",
+            "text": "همان پرسش، این بار از کارخانه‌های فیلادلفیا.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us-gdp-growth",
+            "text": "نظرسنجی‌های کارخانه‌ای اغلب پیش از عدد اصلی رشد می‌چرخند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "continuing-claims": {
+        "plainName": "دریافت‌کنندگان بیمهٔ بیکاری",
+        "oneLine": "شماری از مردم که هر هفته در حال دریافت بیمهٔ بیکاری‌اند.",
+        "ifRising": "خروج از فهرست کمتر شده: پیدا کردن شغل کندتر می‌شود.",
+        "ifFalling": "دریافت‌کنندگان سریع‌تر از فهرست بیرون می‌روند: پیدا کردن شغل جا می‌افتد.",
+        "connections": [
+          {
+            "with": "initial-jobless-claims",
+            "text": "یکی درخواست‌های تازه را می‌شمارد؛ این همهٔ باقی‌مانده‌ها را.",
+            "strength": "reliable"
+          },
+          {
+            "with": "us-unemployment",
+            "text": "نرخ ماهانه‌ای که این فهرست هفتگی به آن می‌رسد.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "median-cpi": {
+        "plainName": "تورم میانهٔ آمریکا",
+        "oneLine": "تورم آمریکا بر پایهٔ تغییر قیمت میانه، با چشم‌پوشی از پرش‌های تند.",
+        "ifRising": "میانهٔ آرام تغییرات قیمت‌ها دارد بالا می‌رود.",
+        "ifFalling": "میانهٔ آرام تغییرات قیمت‌ها دارد فروکش می‌کند.",
+        "connections": [
+          {
+            "with": "us-cpi-yoy",
+            "text": "عدد اصلی که این قرائت میانه کنارش می‌نشیند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "sticky-cpi",
+            "text": "هر دو نویزِ چاپ ماهانه را می‌گیرند، هرکدام به راهی دیگر.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation",
+          "trimmed-mean"
+        ]
+      },
+      "sticky-cpi": {
+        "plainName": "تورم قیمت‌های چسبندهٔ آمریکا",
+        "oneLine": "تورم آمریکا در کالاها و خدماتی که به‌ندرت قیمت‌شان عوض می‌شود.",
+        "ifRising": "حتی قیمت‌های به‌ندرت‌تغییر کرده هم تندتر بالا می‌روند: فشار زیرین دارد زیاد می‌شود.",
+        "ifFalling": "حتی قیمت‌های به‌ندرت‌تغییر کرده هم آرام می‌گیرند: فشار زیرین دارد فروکش می‌کند.",
+        "connections": [
+          {
+            "with": "median-cpi",
+            "text": "قرائت دیگرِ تورمِ آرام، با ساختاری برعکس.",
+            "strength": "usually"
+          },
+          {
+            "with": "us-cpi-yoy",
+            "text": "چاپ اصلی که سبد چسبنده کنارش خوانده می‌شود.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation"
+        ]
+      },
+      "sloos-ci-tightening": {
+        "plainName": "معیارهای وام بانک‌ها",
+        "oneLine": "سهم خالص بانک‌های آمریکایی که وام کسب‌وکار را سخت‌تر می‌کنند.",
+        "ifRising": "بانک‌های بیشتری معیارها را سخت می‌کنند: گرفتن اعتبار کسب‌وکار دشوارتر می‌شود.",
+        "ifFalling": "بانک‌های کمتری معیارها را سخت می‌کنند: گرفتن اعتبار کسب‌وکار آسان‌تر می‌شود.",
+        "connections": [
+          {
+            "with": "ebp",
+            "text": "یکی بهای وام‌دادن به شرکت‌هاست؛ این دروازه است.",
+            "strength": "sometimes"
+          },
+          {
+            "with": "us-gdp-growth",
+            "text": "دوره‌های سخت‌گیری معمولاً با رشد ضعیف‌تر همراه بوده است.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": []
       }
     },
     "glossary": {
@@ -6437,6 +6684,11 @@
       "financial-stress-index": {
         "term": "شاخص تنش مالی",
         "plain": "امتیاز روزانه از میزان فشار روی بازارهای پول. شاخص دفتر پژوهش‌های مالی فشار اعتبار، تأمین مالی، نوسان، دارایی امن و ارزش‌گذاری سهام را در یک عدد حول صفر جمع می‌کند (صفر یعنی میانگین بلندمدت)."
+      },
+      "nowcast": {
+        "term": "برآورد اکنون",
+        "plain": "برآورد چیزی که همین حالا در جریان است، بر پایهٔ داده‌هایی که پیش از عدد رسمی می‌رسند. «اکنون» به‌علاوهٔ «پیش‌بینی»: بدون انتظار، با قطعیت کمتر.",
+        "example": "جی‌دی‌پی‌ناوِ فدرال رزرو آتلانتا رشد همین فصل را برآورد می‌کند، در حالی که فصل هنوز تمام نشده است."
       }
     },
     "ui": {

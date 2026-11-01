@@ -441,6 +441,54 @@
       "checkedOn": "2026-11-01",
       "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve interest on reserve balances; series page read live 2026-11-01, the gap-closure S3-M3.2 scan; the series carries administratively announced future-dated rows — trimmed to today at collect)",
       "url": "https://fred.stlouisfed.org/series/IORB"
+    },
+    {
+      "seriesId": "GDPNOW",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-01",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
+      "url": "https://fred.stlouisfed.org/series/GDPNOW"
+    },
+    {
+      "seriesId": "GACDISA066MSFRBNY",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-01",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
+      "url": "https://fred.stlouisfed.org/series/GACDISA066MSFRBNY"
+    },
+    {
+      "seriesId": "CCSA",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-01",
+      "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.4 session; DOL source)",
+      "url": "https://fred.stlouisfed.org/series/CCSA"
+    },
+    {
+      "seriesId": "MEDCPIM158SFRBCLE",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-01",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
+      "url": "https://fred.stlouisfed.org/series/MEDCPIM158SFRBCLE"
+    },
+    {
+      "seriesId": "STICKCPIM158SFRBATL",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-01",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
+      "url": "https://fred.stlouisfed.org/series/STICKCPIM158SFRBATL"
+    },
+    {
+      "seriesId": "DRTSCILM",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-01",
+      "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.4 session; Federal Reserve source)",
+      "url": "https://fred.stlouisfed.org/series/DRTSCILM"
     }
   ]
 }

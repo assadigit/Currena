@@ -448,6 +448,52 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 95,
   },
   {
+    // gap-closure S3-M3.4 (2026-11-01): the Cleveland Fed's median CPI —
+    // the trimmed-middle inflation read the Fed's own researchers track,
+    // beside the headline and core CPI cards. CONTEXT (info). FRED
+    // MEDCPIM158SFRBCLE, monthly 12-month % change, citation-required
+    // (T-16, verified live from the series page 2026-11-01 — displayed
+    // with the FRED attribution). Rides rung4.
+    id: 'median-cpi',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US median inflation (Cleveland Fed)',
+    source: 'fred',
+    sourceRef: 'FRED:MEDCPIM158SFRBCLE (Median Consumer Price Index, 12-month % change, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The Cleveland Fed's CPI suite publishes ~mid-month following the
+    // BLS print (the us-cpi-yoy calendar): obs M-01 ages ~75d between
+    // releases — the monthly convention keeps the cadence honest.
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S3-M3.4 (2026-11-01): the Atlanta Fed's sticky-price CPI
+    // — inflation in the basket whose prices rarely change (the
+    // expectations-sensitive read). CONTEXT (info): reads beside the
+    // median-CPI and headline-CPI yearly family. FRED STICKCPIM158SFRBATL
+    // — the 12-MONTH sibling of the spec's MoM id (STICKCPIM157SFRBATL,
+    // verified too), chosen so the card reads beside yearly cards; the
+    // deviation is recorded in PROGRESS + VERIFIED-SOURCES (M3.1).
+    // Citation-required (T-16, verified live 2026-11-01). Rides rung4.
+    id: 'sticky-cpi',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US sticky-price inflation (Atlanta Fed)',
+    source: 'fred',
+    sourceRef: 'FRED:STICKCPIM158SFRBATL (Sticky Price Consumer Price Index, 12-month % change, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The Atlanta Fed's sticky-CPI suite publishes ~mid-month following
+    // the BLS print: obs M-01 ages ~75d between releases — the monthly
+    // convention (the us-cpi-yoy precedent).
+    staleAfterDays: 75,
+  },
+  {
     // M6 Wave 3 (OD-8/D-42, 2026-10-25): the euro area's inflation — the
     // P0/P1 review's "thinnest major economy" fix (the euro area had only
     // a policy rate). SCORED against the ECB's own 2% symmetric target
@@ -1191,6 +1237,32 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 7,
   },
   {
+    // gap-closure S3-M3.4 (2026-11-01): the Senior Loan Officer Survey —
+    // the net share of US banks TIGHTENING lending standards for
+    // businesses, the credit-conditions read the market-stress gauge's
+    // story was missing beside EBP. CONTEXT (info): a quarterly survey,
+    // zero = standards basically unchanged. FRED DRTSCILM (SLOOS, large
+    // + middle-market firms), quarterly net %, public domain (T-16,
+    // verified live from the series page 2026-11-01). Rides rung4.
+    id: 'sloos-ci-tightening',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Banks tightening business lending (SLOOS)',
+    source: 'fred',
+    sourceRef: 'FRED:DRTSCILM (Net Percentage of Domestic Banks Tightening C&I Standards, SLOOS, quarterly)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The SLOOS cadence (verified from the FRED series' own tail
+    // 2026-11-01): quarterly first-month stamps (Jan/Apr/Jul/Oct), each
+    // survey publishing in the first week of the survey quarter's THIRD
+    // month (the July stamp lands ~Sep 3; the October stamp ~Dec 3) — the
+    // newest stamp serves up to ~157d. 215 = the us-gdp-growth quarterly
+    // convention with margin.
+    staleAfterDays: 215,
+  },
+  {
     id: 'gold-silver',
     section: 'global',
     group: 'market-stress',
@@ -1384,6 +1456,30 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 60,
   },
   {
+    // gap-closure S3-M3.4 (2026-11-01): the Empire State manufacturing
+    // survey — the New York Fed's free monthly manufacturing diffusion
+    // index (the headline "current general business conditions" reading).
+    // CONTEXT (info): the philly-fed twin beside it in the lane; below zero
+    // reads as contraction exactly like its sibling. FRED
+    // GACDISA066MSFRBNY, monthly diffusion index, citation-required (T-16,
+    // verified live from the series page 2026-11-01 — displayed with the
+    // FRED attribution per the licence walk). Rides rung4.
+    id: 'empire-state',
+    section: 'global',
+    group: 'growth-health',
+    name: 'Empire State manufacturing survey',
+    source: 'fred',
+    sourceRef: 'FRED:GACDISA066MSFRBNY (Current General Business Conditions: Diffusion Index for New York, SA, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The philly-fed convention: the survey publishes mid-month for the
+    // same month (obs M-01 ages ~46d between releases) — 60 keeps the
+    // cadence honest.
+    staleAfterDays: 60,
+  },
+  {
     // M4 Wave 1 (OD-8/D-42, 2026-10-24): the weekly early-warning layer —
     // the highest-frequency labor read on the page (Thursday print, weeks
     // before the monthly data, months before Sahm). SCORED on its 10-year
@@ -1405,6 +1501,31 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // week is 10+ days of obs age; 12 keeps a single missed print from
     // reading stale the same day the next one lands.
     staleAfterDays: 12,
+  },
+  {
+    // gap-closure S3-M3.4 (2026-11-01): continuing claims — the number of
+    // people ALREADY receiving unemployment insurance, the stock beside
+    // initial-jobless-claims' flow. CONTEXT (info): the sibling voter
+    // carries the weekly labour signal; this adds the persistence read.
+    // FRED CCSA, weekly Saturday, public domain (T-16, verified live from
+    // the series page 2026-11-01). Rides rung4.
+    id: 'continuing-claims',
+    section: 'global',
+    group: 'growth-health',
+    name: 'Americans on unemployment benefits',
+    source: 'fred',
+    sourceRef: 'FRED:CCSA (Continued Claims, Insured Unemployment, weekly Saturday, persons)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The DOL print carries a built-in ~12-day lag (the Thursday release
+    // covers the initial week ending the prior Saturday AND the continuing
+    // week ending one week earlier — verified live: the freshest print
+    // 2026-11-01 carries the 2026-10-17 Saturday stamp). Fresh reads 12–19d
+    // of obs age, so 28 = the initial-jobless-claims convention (one missed
+    // print plus grace) adjusted for the one-week-longer publication lag.
+    staleAfterDays: 28,
   },
   {
     // Step-2 add-list §B3: US unemployment (FRED UNRATE, monthly, verified
@@ -1620,6 +1741,34 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // govt-interest-revenue's 215d (verified live: obs 2026-04-01 is the
     // freshest print that exists through late October).
     staleAfterDays: 215,
+  },
+  {
+    // gap-closure S3-M3.4 (2026-11-01): the Atlanta Fed's GDPNow — the
+    // real-time nowcast of the CURRENT quarter's real GDP growth (annualised
+    // rate), updated several times a month as data lands. CONTEXT (info):
+    // never a vote; the us-gdp-growth card carries the official print beside
+    // it. FRED GDPNOW, % SAAR, quarterly first-day stamps (the stamp IS the
+    // quarter it refers to — verified against the Atlanta Fed's own page
+    // 2026-11-01: "3.2% Fourth-Quarter GDPNow Estimate for 2026:Q4, updated
+    // October 29, 2026"; FRED revises the quarter's row in place as nowcasts
+    // update). Rides rung4 (the 'fred-s3' macro group).
+    id: 'gdpnow',
+    section: 'global',
+    group: 'growth-health',
+    name: 'US growth nowcast (GDPNow)',
+    source: 'fred',
+    sourceRef: 'FRED:GDPNOW (Atlanta Fed GDPNow, real GDP growth, QoQ annualized, quarterly stamps)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The stamp only advances quarterly (quarter first-day) while the VALUE
+    // revises in place several times a month; the next quarter's initial
+    // nowcast lands within days of the advance GDP release (~30d after
+    // quarter end) — the newest stamp ages up to ~120d between quarters
+    // (the Atlanta page's own cadence, verified 2026-11-01). 150 = one full
+    // quarter-boundary cycle plus grace, then honest stale.
+    staleAfterDays: 150,
   },
   {
     id: 'us-nfp',

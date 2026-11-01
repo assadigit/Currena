@@ -5,6 +5,77 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01c] — gap-closure S3-M3.4: the growth-nowcast and survey family — GDPNow, Empire State, continuing claims, median CPI, sticky CPI, SLOOS (the 112th–117th indicators)
+
+S3's third build milestone: the spec's "Growth nowcast and surveys" — the
+real-time growth read the gap analysis flagged (GDPNow) plus the survey,
+labour-persistence and quiet-inflation context around it. All six cards
+are CONTEXT-ONLY per G-5; no growth voter changed (the spec's rule).
+
+- **The six indicators** (all context, P1 info rules — the 112th–117th):
+  `gdpnow` (Atlanta Fed GDPNow, FRED GDPNOW — the running estimate of the
+  CURRENT quarter's real GDP growth, quarterly first-day stamps: the stamp
+  IS the quarter it refers to, VERIFIED against the Atlanta Fed's own page
+  2026-11-01: "3.2% Fourth-Quarter GDPNow Estimate for 2026:Q4, updated
+  October 29, 2026" == FRED 3.2217 @ 2026-10-01), `empire-state` (the New
+  York Fed's Empire State manufacturing survey, FRED GACDISA066MSFRBNY —
+  the philly-fed twin), `continuing-claims` (FRED CCSA — the stock of
+  people receiving benefits beside initial-jobless-claims' flow),
+  `median-cpi` (Cleveland Fed median CPI, 12-month, FRED
+  MEDCPIM158SFRBCLE), `sticky-cpi` (Atlanta Fed sticky-price CPI,
+  12-month, FRED STICKCPIM158SFRBATL — the YoY sibling of the spec's MoM
+  id, the M3.1-recorded deviation) and `sloos-ci-tightening` (the Senior
+  Loan Officer Survey's net share of banks tightening business lending,
+  FRED DRTSCILM — the credit-conditions read beside EBP). Placed:
+  growth-health (gdpnow, empire-state, continuing-claims), prices-heat
+  (median-cpi, sticky-cpi, beside the CPI family) and market-stress
+  (sloos-ci-tightening, beside ebp — the spec's own credit framing).
+- **Zero new fetches:** the series already rode the rung4 'fred-s3' macro
+  group from M3.2 day one (GDPNOW, GACDISA066MSFRBNY, CCSA rode the
+  liquidity group, MEDCPIM158SFRBCLE, STICKCPIM158SFRBATL, DRTSCILM —
+  fetched daily since 2026-11-01, the cards land here). The six ids join
+  RUNG4_IDS (the main rung carries them; the 04:25/04:27 daily halves and
+  the 04:40 periodic rung exclude them; the 04:35 phase writes their
+  history keys — the rung's history writes grow 6 → 12; KV writes/day
+  ~+6) and `deriveRung4IndicatorSeries` derives them directly (no legs, no
+  joins — a missing series omits its card and the reading carries).
+- **T-16 + licence walk:** six new records in `data/fred-copyright.json`,
+  re-verified live 2026-11-01 from each series page's own schema.org
+  license field — GDPNOW, GACDISA066MSFRBNY, MEDCPIM158SFRBCLE and
+  STICKCPIM158SFRBATL citation-required (displayed with the FRED
+  attribution per the licence walk), CCSA and DRTSCILM public domain;
+  UPSTREAM_LEGS + READING_SOURCES rows for all six. No sanity bands —
+  every family precedent (us-gdp-growth, philly-fed,
+  initial-jobless-claims, us-cpi-yoy) carries none.
+- **`staleAfterDays` discipline** (each verified from the provider's own
+  rhythm): gdpnow 150 (the stamp only advances quarterly; the next
+  quarter's initial nowcast lands within days of the advance GDP release —
+  the newest stamp ages up to ~120d), empire-state 60 (the philly-fed
+  convention: publishes mid-month for the same month), continuing-claims
+  28 (the DOL print carries a built-in ~12-day lag — the freshest print
+  2026-11-01 carries the 2026-10-17 Saturday stamp; 28 = one missed print
+  plus grace), median-cpi + sticky-cpi 75 (the us-cpi-yoy monthly
+  convention) and sloos-ci-tightening 215 (quarterly first-month stamps
+  publishing in the survey quarter's third month — the July stamp serves
+  until the October survey publishes ~Dec 3, the us-gdp-growth
+  convention).
+- **Copy:** full bilingual indicator copy + layer-1 entries for all six
+  (round-64, Persian-copy manifest recorded) + the `nowcast` glossary term
+  (the M3.6 list, landed with the card that uses it — glossary 36 → 37
+  ×2); the narrator vocabulary regenerated (146 indicators + 37 terms ×2).
+  Every historical number in the copy is extracted from the provider's own
+  fixture data (GDPNow's decade range −32.08/+36.97 pandemic quarters and
+  the 1.2–4.2 of the last five quarters; Empire State's −80/+35.8 decade;
+  CCSA's 23m pandemic spike and the 1.34–1.96m range since 2022; median
+  1.14/7.84; sticky −1.76/8.31; SLOOS's +71.2 (2020-07) / −32.4 (2021-07)
+  and the current ~0).
+- **Numbers:** gates ALL GREEN — 11,495 tests (insights 1081 · web 9746
+  (+354) · api 393 · core 195 · scraper 67 · markets 13; the layer-1
+  strict validator 8,961 assertions). Insights lazy 1227/291 → **1258/299**
+  (measured 1256.69/297.49; the largest single-milestone copy batch of S3 —
+  justified in check-bundle-budget.mjs). Registry 117 indicators (74 P1 /
+  43 P2; 69 info rules).
+
 ## [2026-11-01b] — gap-closure S3-M3.3: the credit-stress pair — EBP and the OFR FSI, two new rung4 sources (the 110th–111th indicators)
 
 S3's second build milestone: the spec's "Credit stress sources" — the

@@ -96,13 +96,13 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(tic.gate).toBe(ticReleaseAwareGate);
     expect(tic.budget).toBe(4); // 2 fetches + 1 idempotence read + 1 write
     // gap-closure S3-M3.2 (2026-11-01): the S3 FRED groups on rung4 — daily
-    // gate (the groups carry daily series), budget 16 (2 fetches + 3 reads +
+    // gate (the groups carry daily series), budget 22 (2 fetches + 3 reads +
     // 10 writes + headroom; see RUNGS.md).
     const fredS3 = EXTRA_SOURCES.find((s) => s.id === 'fred-s3')!;
     expect(fredS3.rung).toBe(4);
     expect(fredS3.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
     expect(fredS3.gate(new Date('2026-11-02T04:35:00Z'))).toBe(true); // every day
-    expect(fredS3.budget).toBe(16);
+    expect(fredS3.budget).toBe(22); // gap-closure S3-M3.4: +6 macro history writes (12 total)
     // gap-closure S3-M3.3 (2026-11-01): the credit-stress pair on rung4 —
     // the EBP file is MONTHLY (the Saturday re-check, the CFTC gate's
     // discipline; the sweeps heal failures within hours, gate bypassed)
@@ -119,7 +119,7 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ofr.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
     expect(ofr.budget).toBe(10);
     // The whole rung4 registry stays inside the 50-subrequest ceiling even
-    // on the day every gate fires (1 status + 16 + 10 + 10 = 37 ≤ 50).
+    // on the day every gate fires (1 status + 22 + 10 + 10 = 43 ≤ 50).
     const total = EXTRA_SOURCES.filter((s) => s.rung === 4).reduce((sum, s) => sum + s.budget, 0) + 1;
     expect(total).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING);
   });

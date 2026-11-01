@@ -811,7 +811,17 @@ const BUDGETS = [
   // languages). The cards ride existing machinery only. Measured
   // 1225.55/290.23; raw bumps 1214 → 1227, gz 288 → 291.
   // Justified in CHANGELOG §2026-11-01b.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1227_000, gz: 291_000, label: 'Insights lazy chunk' },
+  // 2026-11-01c (gap-closure S3-M3.4): 1258/299 — the growth-nowcast and
+  // survey family: SIX new bilingual context cards (gdpnow, empire-state,
+  // continuing-claims, median-cpi, sticky-cpi, sloos-ci-tightening — the
+  // largest single-milestone copy batch of S3) — the full bilingual
+  // indicator copy (2 dictionaries × 6 cards × 13 keys) + the layer-1
+  // entries + the ONE glossary term (nowcast — round-64) + the narrator
+  // vocabulary growth (146 indicators + 37 terms × 2 languages). The cards
+  // ride existing machinery only. Measured 1256.70/297.51; raw bumps
+  // 1227 → 1258, gz 291 → 299.
+  // Justified in CHANGELOG §2026-11-01c.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1258_000, gz: 299_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

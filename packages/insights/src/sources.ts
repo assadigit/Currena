@@ -706,6 +706,17 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'bank-reserves': ['fred:WRESBAL'],
   'repo-stress': ['fred:SOFR', 'fred:IORB'],
   'net-liquidity': ['fred:WALCL', 'fred:WTREGEN', 'fred:RRPONTSYD'],
+  // gap-closure S3-M3.4 (2026-11-01): the growth-nowcast/survey family's
+  // legs (T-16 scanned 2026-11-01, verified live from the series pages:
+  // GDPNOW / GACDISA066MSFRBNY / MEDCPIM158SFRBCLE / STICKCPIM158SFRBATL
+  // citation-required — the recorded acceptance; CCSA / DRTSCILM public
+  // domain).
+  gdpnow: ['fred:GDPNOW'],
+  'empire-state': ['fred:GACDISA066MSFRBNY'],
+  'continuing-claims': ['fred:CCSA'],
+  'median-cpi': ['fred:MEDCPIM158SFRBCLE'],
+  'sticky-cpi': ['fred:STICKCPIM158SFRBATL'],
+  'sloos-ci-tightening': ['fred:DRTSCILM'],
 };
 
 /* ------------------------------------------------------------------ */

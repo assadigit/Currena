@@ -1028,6 +1028,33 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'U.S. Office of Financial Research via financialresearch.gov (OFR FSI, aggregate column)',
     url: 'https://www.financialresearch.gov/financial-stress-index/data/fsi.csv',
   },
+  // gap-closure S3-M3.4 (2026-11-01) — the growth-nowcast/survey family's
+  // source lines (the rung4 'fred-s3' macro group + the liquidity group's
+  // CCSA member).
+  gdpnow: {
+    name: 'Atlanta Fed via FRED (GDPNOW, real GDP nowcast)',
+    url: 'https://fred.stlouisfed.org/series/GDPNOW',
+  },
+  'empire-state': {
+    name: 'Federal Reserve Bank of New York via FRED (GACDISA066MSFRBNY)',
+    url: 'https://fred.stlouisfed.org/series/GACDISA066MSFRBNY',
+  },
+  'continuing-claims': {
+    name: 'US Department of Labor via FRED (CCSA)',
+    url: 'https://fred.stlouisfed.org/series/CCSA',
+  },
+  'median-cpi': {
+    name: 'Federal Reserve Bank of Cleveland via FRED (MEDCPIM158SFRBCLE, 12-month)',
+    url: 'https://fred.stlouisfed.org/series/MEDCPIM158SFRBCLE',
+  },
+  'sticky-cpi': {
+    name: 'Federal Reserve Bank of Atlanta via FRED (STICKCPIM158SFRBATL, 12-month)',
+    url: 'https://fred.stlouisfed.org/series/STICKCPIM158SFRBATL',
+  },
+  'sloos-ci-tightening': {
+    name: 'Federal Reserve via FRED (DRTSCILM, SLOOS)',
+    url: 'https://fred.stlouisfed.org/series/DRTSCILM',
+  },
   'housing-permits': {
     name: 'US Census Bureau via FRED (PERMIT)',
     url: 'https://fred.stlouisfed.org/series/PERMIT',

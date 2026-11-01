@@ -104,6 +104,14 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   // gap-closure S3-M3.3 (2026-11-01): the credit pair → 111.
   'ebp',
   'ofr-fsi',
+  // gap-closure S3-M3.4 (2026-11-01): the growth-nowcast and survey
+  // family → 117.
+  'gdpnow',
+  'empire-state',
+  'continuing-claims',
+  'median-cpi',
+  'sticky-cpi',
+  'sloos-ci-tightening',
   // ----- 16 markets (packages/insights/src/markets/definitions.ts) -----
   'n225', 'asx200', 'kospi', 'hsi', 'ssec', 'taiex', 'nifty50', 'stoxx50', 'dax',
   'cac', 'ftse', 'sp500', 'ndx', 'dow', 'tsx', 'ibov',

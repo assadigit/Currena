@@ -218,6 +218,18 @@ export const FRED_SERIES = {
   reverseRepo: 'RRPONTSYD', // reverse-repo: overnight reverse repo, daily $bn (citation-required)
   bankReserves: 'WRESBAL', // bank-reserves: reserve balances with Fed banks, weekly Wednesday $m (public domain)
   iorb: 'IORB', // repo-stress leg: interest on reserve balances, daily 7-day % (public domain; CARRIES FUTURE-DATED announced rows — trimmed to today at parse)
+  // ---- gap-closure S3-M3.4 (2026-11-01; each verified from the provider's
+  // own fredgraph.csv + series page 2026-11-01, T-16 classes in
+  // data/fred-copyright.json). These ride the rung4 'fred-s3' macro /
+  // liquidity groups (FRED_S3_GROUPS below), NOT the main rung's
+  // FRED_BULK_GROUPS ----
+  gdpNow: 'GDPNOW', // gdpnow: Atlanta Fed nowcast, quarterly stamps % SAAR (citation-required)
+  empireState: 'GACDISA066MSFRBNY', // empire-state: NY Fed Empire State manufacturing diffusion, monthly (citation-required)
+  continuingClaims: 'CCSA', // continuing-claims: continued claims (insured unemployment), weekly Saturday (public domain)
+  medianCpi: 'MEDCPIM158SFRBCLE', // median-cpi: Cleveland Fed median CPI, 12-month % (citation-required)
+  stickyCpi: 'STICKCPIM158SFRBATL', // sticky-cpi: Atlanta Fed sticky-price CPI, 12-month % (citation-required)
+  federalSurplusDeficit: 'MTSDS133FMS', // the M3.5 deficit card's leg: federal surplus/deficit, monthly $m (public domain)
+  sloosCiTightening: 'DRTSCILM', // sloos-ci-tightening: SLOOS net % tightening C&I standards, quarterly (public domain)
   // NOTE (M3/D-44, 2026-10-24): the ICE BofA credit-spread series
   // (BAMLH0A0HYM2 / BAMLC0A0CM) are deliberately ABSENT: the T-16 scan
   // found FRED's "copyright-pre-approval" tag on them — the publisher's
@@ -413,23 +425,23 @@ export const FRED_S3_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.reverseRepo,
       FRED_SERIES.bankReserves,
       FRED_SERIES.iorb,
-      'CCSA', // continuing claims — the M3.4 card; rides the same request
+      FRED_SERIES.continuingClaims, // the M3.4 card; rides the same request
     ],
     window: 'decade',
   },
-  // The S3 macro family (M3.4/M3.5 cards): GDPNow (quarterly), Empire
-  // State (monthly), median + sticky CPI (monthly), the federal
-  // surplus/deficit (monthly), SLOOS C&I tightening (quarterly) — probed
-  // live 2026-11-01: quarterly.csv (GDPNOW, DRTSCILM) + monthly.csv (the
-  // other four).
+  // The S3 macro family (the M3.4 cards + the M3.5 deficit leg): GDPNow
+  // (quarterly), Empire State (monthly), median + sticky CPI (monthly), the
+  // federal surplus/deficit (monthly), SLOOS C&I tightening (quarterly) —
+  // probed live 2026-11-01: quarterly.csv (GDPNOW, DRTSCILM) + monthly.csv
+  // (the other four).
   {
     seriesIds: [
-      'GDPNOW',
-      'GACDISA066MSFRBNY',
-      'MEDCPIM158SFRBCLE',
-      'STICKCPIM158SFRBATL',
-      'MTSDS133FMS',
-      'DRTSCILM',
+      FRED_SERIES.gdpNow,
+      FRED_SERIES.empireState,
+      FRED_SERIES.medianCpi,
+      FRED_SERIES.stickyCpi,
+      FRED_SERIES.federalSurplusDeficit,
+      FRED_SERIES.sloosCiTightening,
     ],
     window: 'decade',
   },

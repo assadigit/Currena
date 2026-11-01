@@ -122,7 +122,7 @@ Package manager is **pnpm** (Node ≥ 20).
 
 **This section is the canonical on-disk record of every indicator and every
 data point the Insights page shows.** It is sourced from
-`packages/insights/src/definitions.ts` (the 111 indicators), `packages/
+`packages/insights/src/definitions.ts` (the 117 indicators), `packages/
 insights/src/markets/definitions.ts` (the 16 market indices), and
 `packages/insights/src/fx/definitions.ts` (the 10 FX pairs + the dollar
 basket + the 7 FX patterns). `data/indicators.json` is the generated
@@ -145,14 +145,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 111 indicators (48 voting [V] + 63 context [C])
+### A. The 117 indicators (48 voting [V] + 69 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (82 indicators, 32 voting)
+#### GLOBAL (88 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -221,6 +221,9 @@ currencies container per R9-04):
 | [C] | `oecd-cli-de` | monthly | 75 | info | oecd |
 | [C] | `epu-us` | monthly | 75 | info | epu |
 | [C] | `copper-usd` | daily | 2 | info | gold-api |
+| [C] | `gdpnow` | quarterly | 150 | info | fred |
+| [C] | `empire-state` | monthly | 60 | info | fred |
+| [C] | `continuing-claims` | weekly | 28 | info | fred |
 
 **Market stress** (`market-stress` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -243,6 +246,7 @@ currencies container per R9-04):
 | [C] | `net-liquidity` | weekly | 21 | info | derived |
 | [C] | `ebp` | monthly | 75 | info | frb |
 | [C] | `ofr-fsi` | daily | 7 | info | ofr |
+| [C] | `sloos-ci-tightening` | quarterly | 215 | info | fred |
 
 *(gap-closure S3-M3.2, 2026-11-01: the US liquidity/funding family — six
 context cards in the market-stress lane, riding the rung4 'fred-s3' source:
@@ -253,7 +257,9 @@ gap-closure S3-M3.3, 2026-11-01: the credit-stress pair — `ebp` (the Fed
 Board's own EBP file via federalreserve.gov, rung4 source 'frb-ebp') and
 `ofr-fsi` (the OFR FSI aggregate, rung4 source 'ofr-fsi'; the aggregate
 column only — the 9 documented component/region columns stay uncarded).
-All context-only per G-5.)*
+gap-closure S3-M3.4, 2026-11-01: the credit-conditions leg —
+`sloos-ci-tightening` (FRED DRTSCILM, the SLOOS net share of banks
+tightening business lending). All context-only per G-5.)*
 
 **Prices board** (the `prices-board` strip — rendered as tiles above the
 markets table):
@@ -359,6 +365,15 @@ working KV-Edit token.*
 | [C] | `food-index` | monthly | 60 | info | world-bank |
 | [C] | `wheat` | monthly | 60 | info | world-bank |
 | [C] | `maize` | monthly | 60 | info | world-bank |
+| [C] | `median-cpi` | monthly | 75 | info | fred |
+| [C] | `sticky-cpi` | monthly | 75 | info | fred |
+
+*(gap-closure S3-M3.4, 2026-11-01: the quiet-inflation pair — `median-cpi`
+(FRED MEDCPIM158SFRBCLE, the Cleveland Fed median CPI, 12-month) and
+`sticky-cpi` (FRED STICKCPIM158SFRBATL, the Atlanta Fed sticky-price CPI,
+12-month — the YoY sibling of the spec's MoM id, the M3.1-recorded
+deviation), both context-only per G-5 and riding the rung4 'fred-s3' macro
+group beside the CPI family.)*
 
 #### AUSTRALIA (23 indicators, 16 voting)
 

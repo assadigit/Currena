@@ -324,6 +324,13 @@ const LAYER1 = {
       term: 'financial stress index',
       plain: 'A daily score of how strained money markets are. The OFR’s own combines credit, funding, volatility, safe-asset and equity-valuation pressure into one number around zero (zero = its long-run average).',
     },
+    // gap-closure S3-M3.4 (2026-11-01) — the growth-nowcast family's term
+    // (the M3.6 glossary list, landed with the card that uses it).
+    nowcast: {
+      term: 'nowcast',
+      plain: 'An estimate of something happening right now, built from data that arrives before the official number. “Now” plus “forecast”: no waiting, less certainty.',
+      example: 'The Atlanta Fed’s GDPNow estimates this quarter’s growth while the quarter is still running.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -1966,6 +1973,76 @@ const LAYER1 = {
       ],
       glossaryTerms: ['financial-stress-index', 'liquidity', 'volatility'],
     },
+    /* gap-closure S3-M3.4 (2026-11-01): the growth-nowcast and survey
+     * family’s layer-1 rows (six context cards: gdpnow, empire-state,
+     * continuing-claims in growth-health; median-cpi + sticky-cpi in
+     * prices-heat; sloos-ci-tightening in market-stress). */
+    gdpnow: {
+      plainName: 'US growth nowcast',
+      oneLine: 'The Atlanta Fed’s running estimate of this quarter’s US growth.',
+      ifRising: 'This quarter is tracking stronger as the data lands.',
+      ifFalling: 'This quarter is tracking weaker as the data lands.',
+      connections: [
+        { with: 'us-gdp-growth', text: 'The official print for the quarter before; this nowcast runs the current one.', strength: 'reliable' },
+        { with: 'retail-sales', text: 'Consumer spending is the biggest input the model aggregates.', strength: 'usually' },
+      ],
+      glossaryTerms: ['nowcast'],
+    },
+    'empire-state': {
+      plainName: 'New York factory survey',
+      oneLine: 'A monthly survey of New York manufacturers: above zero means growth.',
+      ifRising: 'More New York manufacturers are reporting growth than decline.',
+      ifFalling: 'More New York manufacturers are reporting decline than growth.',
+      connections: [
+        { with: 'philly-fed', text: 'The same question asked of Philadelphia factories.', strength: 'reliable' },
+        { with: 'us-gdp-growth', text: 'Factory surveys often turn before the headline growth number.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'continuing-claims': {
+      plainName: 'Americans on benefits',
+      oneLine: 'The number of people already receiving unemployment benefits each week.',
+      ifRising: 'Fewer people are ending up off the rolls: job-finding is slowing.',
+      ifFalling: 'People are leaving the rolls faster: job-finding is picking up.',
+      connections: [
+        { with: 'initial-jobless-claims', text: 'One counts new filings; this counts everyone still claiming.', strength: 'reliable' },
+        { with: 'us-unemployment', text: 'The monthly rate the weekly rolls feed into.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
+    'median-cpi': {
+      plainName: 'US median inflation',
+      oneLine: 'US inflation measured by the middle price change, ignoring the wildest moves.',
+      ifRising: 'The steady middle of price changes is moving up.',
+      ifFalling: 'The steady middle of price changes is coming down.',
+      connections: [
+        { with: 'us-cpi-yoy', text: 'The headline measure this middle read sits beside.', strength: 'reliable' },
+        { with: 'sticky-cpi', text: 'Both strip noise from the monthly print, each a different way.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'trimmed-mean'],
+    },
+    'sticky-cpi': {
+      plainName: 'US sticky-price inflation',
+      oneLine: 'US inflation in the goods and services that rarely change price.',
+      ifRising: 'Even rarely-changing prices are rising faster: underlying pressure is building.',
+      ifFalling: 'Even rarely-changing prices are cooling: underlying pressure is coming down.',
+      connections: [
+        { with: 'median-cpi', text: 'The other quiet-inflation read, built the opposite way.', strength: 'usually' },
+        { with: 'us-cpi-yoy', text: 'The headline print the sticky basket reads beside.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['inflation'],
+    },
+    'sloos-ci-tightening': {
+      plainName: 'Bank lending standards',
+      oneLine: 'The net share of US banks making business loans harder to get.',
+      ifRising: 'More banks are making business loans harder to obtain.',
+      ifFalling: 'Fewer banks are making business loans hard to obtain.',
+      connections: [
+        { with: 'ebp', text: 'One is the price of lending to companies; this is the gate.', strength: 'sometimes' },
+        { with: 'us-gdp-growth', text: 'A rising share here has usually lined up with weaker growth.', strength: 'usually' },
+      ],
+      glossaryTerms: [],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
@@ -2866,6 +2943,154 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It is a coincident reading of strain, not a forecast: a calm index has sat beside every bubble, and it moves the day conditions move, not before.',
     forYou:
       'Read it beside the St Louis Fed’s own stress index: two builders, one question. When they disagree, the disagreement itself is the detail worth a look.',
+  },
+  /* gap-closure S3-M3.4 (2026-11-01): the growth-nowcast and survey family —
+   * six context cards (GDPNow, Empire State, continuing claims, median CPI,
+   * sticky CPI, SLOOS lending standards). Every historical number below is
+   * extracted from the provider’s own data (the M3.1 fixture captures). */
+  gdpnow: {
+    name: 'US growth nowcast (GDPNow)',
+    ticker: 'GDPNow',
+    oneLiner:
+      'The Atlanta Fed’s running estimate of this quarter’s US growth, updated several times a month as data lands.',
+    lines: {
+      highRising:
+        'The nowcast is strong for its decade and rising: the quarter is tracking above the usual pace.',
+      highEasing: 'The nowcast remains strong for its decade but is coming down.',
+      typical: 'The nowcast sits in the usual range of the past decade’s quarters.',
+      low:
+        'The nowcast is unusually weak: the quarter is tracking toward contraction.',
+    },
+    whatItIs:
+      'The Atlanta Fed’s GDPNow model (via FRED GDPNOW): a running estimate of real GDP growth for the CURRENT quarter, annualised, revised in place as monthly data lands. The as-of date is the quarter’s first day: the stamp tells you which quarter the number refers to.',
+    whyItMatters:
+      'Official GDP lands about a month after a quarter ends; this estimate updates while the quarter is still running. It is the freshest read on US growth that exists.',
+    tendedToMean:
+      'The pandemic quarters swing the decade’s range from about −32 (April 2020) to +37 (July 2020); outside those two, the last five quarters have run between about 1.2 and 4.2.',
+    cantTell:
+      'It is a model estimate that revises several times a month, not a promise: the official print can land far from the last nowcast, and it says nothing about the quarter after.',
+    forYou:
+      'Read it beside the official GDP card: this one moves while the quarter is still open, the official one lands later.',
+  },
+  'empire-state': {
+    name: 'Empire State manufacturing survey',
+    ticker: 'Empire State',
+    oneLiner:
+      'A monthly survey of New York State manufacturers: the share growing minus the share shrinking, where above zero means growth.',
+    lines: {
+      highRising:
+        'More New York manufacturers are growing than shrinking, and the balance is improving.',
+      highEasing: 'The factory balance remains positive but is softening.',
+      typical: 'The factory balance sits in its usual range for the decade.',
+      low:
+        'More New York manufacturers are shrinking than growing: the balance is negative.',
+    },
+    whatItIs:
+      'The New York Fed’s Empire State manufacturing survey (via FRED GACDISA066MSFRBNY): the general business conditions index — the share of firms reporting improvement minus the share reporting deterioration, seasonally adjusted.',
+    whyItMatters:
+      'One of the first reads on the US economy each month, published around the middle of the month it covers: factory surveys have often turned before the headline numbers.',
+    tendedToMean:
+      'The decade’s range runs from −80 (April 2020) to about +36; readings above +20 have been rare outside strong stretches, and the latest sits in that upper part.',
+    cantTell:
+      'It asks one region’s factories about conditions, not the country: a single month’s swing is noise, and the survey reports sentiment, not output.',
+    forYou:
+      'Read it beside the Philadelphia Fed’s survey: two regions, the same question — when they agree, the factory signal is broad.',
+  },
+  'continuing-claims': {
+    name: 'Americans on unemployment benefits',
+    ticker: 'Continuing claims',
+    oneLiner:
+      'The number of people receiving unemployment benefits in a given week: the stock of joblessness beside the weekly flow of new claims.',
+    lines: {
+      highRising:
+        'The number of people on benefits is high for its decade and rising: joblessness is both arriving and sticking.',
+      highEasing: 'The benefit rolls remain elevated but are coming down.',
+      typical: 'The number of people on benefits sits in its usual range for the decade.',
+      low:
+        'The benefit rolls are near the decade’s floor: people are finding next jobs quickly.',
+    },
+    whatItIs:
+      'Continued claims (via FRED CCSA, from the Department of Labor’s weekly report): how many people were receiving unemployment insurance in the week, published about a week and a half after the week it covers.',
+    whyItMatters:
+      'New claims tell you who just lost a job; this tells you who has not found the next one. A rising stock with steady flows is the job-finding story on its own.',
+    tendedToMean:
+      'The pandemic spring of 2020 pushed the rolls past 23 million; since 2022 they have mostly run between about 1.3 and 2.0 million, and the latest sits in the lower part of that range.',
+    cantTell:
+      'Benefit rolls count only people who qualify and claim: the level shifts with rules and the size of the workforce, and one quiet week is not a trend.',
+    forYou:
+      'Read it with the new-claims card: rising flows land here a week later, and a rising stock without rising flows is the job-finding story.',
+  },
+  'median-cpi': {
+    name: 'US median inflation (Cleveland Fed)',
+    ticker: 'Median CPI',
+    oneLiner:
+      'US inflation measured by the middle price change in the basket: the steady signal under the monthly noise.',
+    lines: {
+      highRising:
+        'The middle of price changes is high for its decade and rising: underlying inflation is firm.',
+      highEasing: 'Median inflation remains elevated but is easing.',
+      typical: 'Median inflation sits in its usual range for the decade.',
+      low:
+        'Median inflation is unusually low for the decade: underlying price pressure is quiet.',
+    },
+    whatItIs:
+      'The Cleveland Fed’s median CPI (via FRED MEDCPIM158SFRBCLE): the median price change across the consumption basket over 12 months — the wildest moves on both sides are ignored by construction.',
+    whyItMatters:
+      'Food and energy make headline inflation jump around; the median ignores the wild moves entirely, which is why the Fed’s own researchers track it as a cleaner signal of the underlying trend.',
+    tendedToMean:
+      'Its decade range runs from about 1.1 (2020) to 7.8 (June 2022), and the latest reading sits in the lower half of that range.',
+    cantTell:
+      'It is a different construction from the headline index: the two can disagree for months about the same economy, and neither is wrong.',
+    forYou:
+      'Read it beside headline and core inflation: when the median sits below the headline, the moves are concentrated in a few noisy categories.',
+  },
+  'sticky-cpi': {
+    name: 'US sticky-price inflation (Atlanta Fed)',
+    ticker: 'Sticky CPI',
+    oneLiner:
+      'US inflation in the goods and services that rarely change price: a read on where underlying pressure sits.',
+    lines: {
+      highRising:
+        'Sticky-price inflation is high for its decade and rising: even slow-moving prices are firming.',
+      highEasing: 'Sticky-price inflation remains elevated but is easing.',
+      typical: 'Sticky-price inflation sits in its usual range for the decade.',
+      low:
+        'Sticky-price inflation is unusually low: even slow-moving prices are quiet.',
+    },
+    whatItIs:
+      'The Atlanta Fed’s sticky-price CPI (via FRED STICKCPIM158SFRBATL): 12-month inflation in the basket of items whose prices change infrequently — rents, services and the like.',
+    whyItMatters:
+      'Prices that rarely move do not spike with a supply shock; they respond to underlying demand and expectations. Sticky inflation that stays high says the pressure is broad, not just in food and fuel.',
+    tendedToMean:
+      'Its decade range runs from about −1.8 (April 2020) to 8.3 (June 2022); the latest reading sits above the middle of that range.',
+    cantTell:
+      'The sticky basket leans toward services: it can stay elevated after goods prices cool, and it moves slowly by construction.',
+    forYou:
+      'Read it beside the median-CPI card: both quiet the monthly noise, one by ignoring the extremes, the other by watching slow prices.',
+  },
+  'sloos-ci-tightening': {
+    name: 'Banks tightening business lending (SLOOS)',
+    ticker: 'Bank lending',
+    oneLiner:
+      'The net share of US banks making business loans harder to get, from the Fed’s quarterly survey of loan officers.',
+    lines: {
+      highRising:
+        'A high share of banks is tightening standards, and the share is rising: business credit is clearly tightening.',
+      highEasing: 'Banks are still tightening, but the share is shrinking.',
+      typical: 'The tightening share sits in its usual range for the decade.',
+      low:
+        'Banks are basically unchanged or easing: business credit is easy to obtain.',
+    },
+    whatItIs:
+      'The Senior Loan Officer Opinion Survey (via FRED DRTSCILM): the net percentage of US banks reporting tighter standards for business loans — the share tightening minus the share easing, covering large and middle-market firms.',
+    whyItMatters:
+      'The price of credit has its own cards; this one is the gate. When banks tighten standards, borrowing gets harder at the same interest rate, and tightening spells have historically lined up with weaker credit and growth.',
+    tendedToMean:
+      'Tightening peaked at about 71 in July 2020 and swung to net easing of −32 in 2021; the latest reading sits around zero — standards basically unchanged.',
+    cantTell:
+      'It is a quarterly survey of bankers, not a market price: it reports what lenders say, not what borrowers do, and one quarter is not a wave.',
+    forYou:
+      'Read it beside the excess bond premium: one is the price of lending to companies, this is the gate — together they cover how easy business borrowing is.',
   },
   'retail-sales': {
     name: 'US retail sales',

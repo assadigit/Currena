@@ -166,6 +166,13 @@ describe('deriveRung4IndicatorSeries (the total derivation)', () => {
     ],
     WRESBAL: [{ date: '2026-10-28', value: 2_893_770 }],
     IORB: [{ date: '2026-10-31', value: 3.9 }],
+    // gap-closure S3-M3.4: the macro six (direct — no legs, no joins).
+    GDPNOW: [{ date: '2026-10-01', value: 3.2217 }],
+    GACDISA066MSFRBNY: [{ date: '2026-10-01', value: 25.5 }],
+    CCSA: [{ date: '2026-10-17', value: 1_701_000 }],
+    MEDCPIM158SFRBCLE: [{ date: '2026-09-01', value: 2.8081575376 }],
+    STICKCPIM158SFRBATL: [{ date: '2026-09-01', value: 3.401271558 }],
+    DRTSCILM: [{ date: '2026-07-01', value: 0 }],
   };
   const sofr: SeriesPoint[] = [{ date: '2026-10-31', value: 3.95 }];
   const walcl: SeriesPoint[] = [{ date: '2026-10-28', value: 6_850_000 }];
@@ -182,11 +189,24 @@ describe('deriveRung4IndicatorSeries (the total derivation)', () => {
     expect(out['net-liquidity']).toEqual([{ date: '2026-10-28', value: 5_845_898 }]);
   });
 
+  it('gap-closure S3-M3.4: derives the six growth/survey/inflation ids directly (no legs needed)', () => {
+    const out = deriveRung4IndicatorSeries(s3, {});
+    expect(out.gdpnow).toEqual(s3.GDPNOW);
+    expect(out['empire-state']).toEqual(s3.GACDISA066MSFRBNY);
+    expect(out['continuing-claims']).toEqual(s3.CCSA);
+    expect(out['median-cpi']).toEqual(s3.MEDCPIM158SFRBCLE);
+    expect(out['sticky-cpi']).toEqual(s3.STICKCPIM158SFRBATL);
+    expect(out['sloos-ci-tightening']).toEqual(s3.DRTSCILM);
+  });
+
   it('omits a derived id whose leg is missing (fail closed — the reading carries)', () => {
     const noLegs = deriveRung4IndicatorSeries(s3, {});
     expect(noLegs['repo-stress']).toBeUndefined();
     expect(noLegs['net-liquidity']).toBeUndefined();
     expect(noLegs['term-premium-10y']).toBeDefined();
+    // The M3.4 six are direct: no legs to miss.
+    expect(noLegs.gdpnow).toBeDefined();
+    expect(noLegs['sloos-ci-tightening']).toBeDefined();
   });
 
   it('is total on absent S3 fetches (nothing derived, nothing thrown)', () => {
@@ -459,7 +479,9 @@ describe('runInsightsRung4Phase (the 04:35 orchestration)', () => {
         expect(stage.series[id], `${id} must be staged`).toBeDefined();
       }
       // The phase's OWN history keys written (the 04:25 halves' exclusion).
-      expect(result.histories.written).toBe(6); // the liquidity family only — the M3.3 credit pair has its own phase
+      // gap-closure S3-M3.4: the liquidity six + the macro six (the credit
+      // pair is written by its own phase, not this one).
+      expect(result.histories.written).toBe(12);
       for (const id of Object.keys(result.series)) {
         expect(kv.map.has(`insights:hist:${id}`), `${id} history key`).toBe(true);
       }

@@ -171,6 +171,19 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // convention — no % sign, it is not a rate).
   ebp: { decimals: 2, unit: 'percent' },
   'ofr-fsi': { decimals: 2, unit: 'index' },
+  // gap-closure S3-M3.4 (2026-11-01): the growth-nowcast/survey family —
+  // GDPNow reads like us-gdp-growth (percent 1dp, % SAAR); Empire State and
+  // SLOOS are net-percent survey shares (percent, the philly-fed points
+  // convention reads a diffusion index as plain points — these two are
+  // shares of banks, so percent); continuing claims counts people (the
+  // initial-jobless-claims 'claims' convention); median + sticky CPI read
+  // like us-cpi-yoy (percent 1dp).
+  gdpnow: { decimals: 1, unit: 'percent' },
+  'empire-state': { decimals: 1, unit: 'index' },
+  'continuing-claims': { decimals: 0, unit: 'claims' },
+  'median-cpi': { decimals: 1, unit: 'percent' },
+  'sticky-cpi': { decimals: 1, unit: 'percent' },
+  'sloos-ci-tightening': { decimals: 1, unit: 'index' },
   'retail-sales': { decimals: 1, unit: 'usd-bn', scale: 0.001 },
   'housing-permits': { decimals: 2, unit: 'permits', scale: 0.001 },
   cfnai: { decimals: 2, unit: 'index' },

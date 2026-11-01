@@ -49,6 +49,11 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
     // the audit sidecar today (M6 Wave 3: +cfnai, +mortgage-30y, +t5yie — the
     // citation-required FRED additions; the BoE fix keeps boe-rate here but
     // under the OGL-attribution licence).
+    // gap-closure S3-M3.4 (2026-11-01): +empire-state, +gdpnow, +median-cpi,
+    // +sticky-cpi — the citation-required FRED additions of the
+    // growth-nowcast/survey family (display-permitted with attribution);
+    // continuing-claims (CCSA) and sloos-ci-tightening (DRTSCILM) are L0
+    // public domain and never bounded.
     expect([...PUBLIC_BOUNDED_HISTORY_IDS].sort()).toEqual([
       'boe-rate',
       'boj-rate',
@@ -62,10 +67,13 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'btc-usd',
       'bund-10y',
       'cfnai',
+      'empire-state',
+      'gdpnow',
       'gilt-10y',
       'gold-oil-ratio',
     'gold-usd',
       'jgb-10y',
+      'median-cpi',
       'michigan-1y-expectations',
       'michigan-sentiment',
       'mortgage-30y',
@@ -85,6 +93,7 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'shiller-ecy',
       'silver-usd',
       'sofr',
+      'sticky-cpi',
       'stress-stlfsi',
       't5yie',
       // A-3: the US−Japan gap (DGS10 public-domain + MOF PDL1.0 + the OECD
