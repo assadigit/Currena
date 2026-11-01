@@ -262,6 +262,25 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > for a milestone claimed here lands on main FIRST, this session stands
 > down from that milestone and moves to the next unticked one. Every push
 > does pull-rebase first (§3.4).
+>
+> **Fifth session's record (2026-11-01 ~12:55 UTC):** the owner restarted
+> S3 a fifth time ("continue and finish up your work; pick up from where
+> you left off"). This session found the fourth session's M3.5 loop
+> mid-flight but evidently cut short: the fiscal family code `5a158d3`
+> pushed 12:20:34 UTC, worker `91d3ca54` deployed 12:21:03, the GHA
+> dispatch 41306087625 green at 12:21:18, the production snapshot
+> regenerated 12:21:50 — all six fiscal ids LIVE — but no M3.5 verify/tick
+> landed (PROGRESS 4/6, G4 open, no evidence/S3-M3.5/). Following the
+> third session's lapse-protocol precedent, this session records a
+> **~55-minute window from 12:21:50 (closes ~13:17 UTC)**: read-only
+> verification prep until then; if the fourth session lands its own M3.5
+> close first, this session stands down from M3.5. After the window
+> closes with no further S3 commit, **this session claims M3.5's stranded
+> verify/tick completion, then M3.6** — pull-rebasing before every push.
+> Also noted: the 11:30 UTC scheduled `insights-selfcheck` FAILED on two
+> transient upstream fetches (OECD sdmx HTTP 500 + the EPU workbook) —
+> the T-19 provider class, not a code regression; re-checked below in the
+> session log.
 
 ### S4 Geopolitics, supply chain and energy (`S4-geopolitics-supply-energy.md`)
 - [ ] M4.1 Verification and egress
