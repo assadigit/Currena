@@ -791,7 +791,18 @@ const BUDGETS = [
   // + this card's copy + wiring). The spec-mandated card; the walcl-twin
   // rides existing machinery only.
   // Justified in CHANGELOG §2026-10-31y.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1179_000, gz: 278_000, label: 'Insights lazy chunk' },
+  // 2026-11-01a (gap-closure S3-M3.2): 1214/288 — the US liquidity/funding
+  // family: SIX new bilingual context cards in the market-stress lane
+  // (term-premium-10y, tga, reverse-repo, bank-reserves + the derived
+  // repo-stress and net-liquidity) — the full bilingual indicator copy
+  // (2 dictionaries × 6 cards × 13 keys) + the layer-1 entries + the SIX
+  // glossary terms (liquidity, term premium, TGA, reverse repo, bank
+  // reserves, net liquidity — round-62) riding both dictionaries + the
+  // narrator vocabulary (138 indicators + 34 terms × 2 languages). The
+  // cards ride existing machinery only (CompactRow/display/labels). Measured
+  // 1213.69/287.07.
+  // Justified in CHANGELOG §2026-11-01a.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1214_000, gz: 288_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

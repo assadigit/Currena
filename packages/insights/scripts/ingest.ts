@@ -37,6 +37,7 @@ import { RestInsightsStore } from '../src/store';
 import { runInsightsUpdate, writeAllHistoriesInline } from '../src/ingest/run';
 import { HIDDEN_PUBLIC_IDS } from '../src/ingest/data';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/adapters/rung2';
+import { collectRung4Sources } from '../src/adapters/rung4';
 import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../src/series';
 
@@ -126,6 +127,18 @@ const rung2 = await collectRung2Sources(rung2Plan);
 for (const row of rung2.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
 const rung2Series = rung2.series as Partial<Record<IndicatorId, SeriesPoint[]>>;
 
+/* ------------------------------------------------------------------ *
+ * The inline rung-4 collection (gap-closure S3-M3.2, 2026-11-01) — the
+ * S3 FRED liquidity/funding/macro groups. fred.stlouisfed.org serves
+ * GHA egress fine (the main rung's groups already ride this venue); the
+ * Worker's 04:35 phase performs the same collect (shared code), so the
+ * venues cannot drift apart. IORB arrives future-trimmed.
+ * ------------------------------------------------------------------ */
+
+const rung4 = await collectRung4Sources();
+for (const row of rung4.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
+const rung4Series = rung4.fred;
+
 const result = await runInsightsUpdate({
   // A dry-run without credentials takes the no-op store: runInsightsUpdate
   // skips every write when dryRun is set, and only the real store's READS
@@ -139,6 +152,9 @@ const result = await runInsightsUpdate({
   // The inline rung-2 series (the 04:20 phase's twin; the mirror arms
   // itself inside when the MOF fetch failed).
   rung2Series,
+  // gap-closure S3-M3.2: the inline rung-4 series (the 04:35 phase's
+  // twin — the S3 FRED groups; one build derives everything on Node).
+  rung4Series,
 });
 
 /* ------------------------------------------------------------------ *

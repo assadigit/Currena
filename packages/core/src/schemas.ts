@@ -505,6 +505,18 @@ export const IndicatorIdSchema = z.enum([
   // series page's own license tag) — context, borrowing-costs; renders
   // inside the "Who holds US government debt" section (HIDDEN_FROM_LANE).
   'nyfed-custody',
+  // ---- gap-closure S3 (2026-11-01, M3.2): the US liquidity and funding
+  // family — context rows in the market-stress lane (G-5: context-only
+  // until any S6 promotion decision). All series verified from the
+  // provider's own fredgraph.csv + series pages 2026-11-01 (M3.1); the
+  // fetches ride rung4 (EXTRA_SOURCES 'fred-s3'), never the 04:10 main
+  // rung (see docs/gap-closure/RUNGS.md).
+  'term-premium-10y', // FRED THREEFYTP10 (Kim-Wright 10y term premium, daily %) — context
+  'tga', // FRED WTREGEN (Treasury General Account, weekly Wednesday $M) — context
+  'reverse-repo', // FRED RRPONTSYD (overnight reverse repo, daily $B, citation-required) — context
+  'bank-reserves', // FRED WRESBAL (bank reserve balances, weekly Wednesday $M) — context
+  'repo-stress', // derived: SOFR − IORB (the funding-pressure spread, daily pts) — context
+  'net-liquidity', // derived: WALCL − TGA − RRP (weekly Wednesday $M) — context
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 

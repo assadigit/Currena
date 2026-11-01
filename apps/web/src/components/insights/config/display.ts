@@ -154,6 +154,17 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // gap-closure S2-M2.4: the custody card — the walcl convention ($ millions
   // → "US$2.84 trillion", 2dp).
   'nyfed-custody': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  // gap-closure S3-M3.2 (2026-11-01): the liquidity/funding family — the
+  // $-million balance levels read as trillions (the walcl convention); the
+  // RRP level is already $ billions (2dp reads the facility's small prints
+  // honestly); the two rate SPREADS read as percent, 2dp (the sofr/yield
+  // family convention).
+  'term-premium-10y': { decimals: 2, unit: 'percent' },
+  tga: { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  'reverse-repo': { decimals: 2, unit: 'usd-bn' },
+  'bank-reserves': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  'repo-stress': { decimals: 2, unit: 'percent' },
+  'net-liquidity': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
   'retail-sales': { decimals: 1, unit: 'usd-bn', scale: 0.001 },
   'housing-permits': { decimals: 2, unit: 'permits', scale: 0.001 },
   cfnai: { decimals: 2, unit: 'index' },

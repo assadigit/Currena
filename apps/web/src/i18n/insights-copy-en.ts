@@ -287,6 +287,33 @@ const LAYER1 = {
       term: 'custody hub',
       plain: 'A country whose reported holdings include much that belongs to investors elsewhere, because the securities are simply held there. Belgium, Luxembourg, the Cayman Islands, Ireland, the UK, Switzerland and Bermuda are the big ones.',
     },
+    /* gap-closure S3 (2026-11-01): the liquidity/funding family's terms
+     * (M3.6's list, landed with the cards that use them). Plain words,
+     * the Fed's own concepts. */
+    'liquidity': {
+      term: 'liquidity',
+      plain: 'How easily money can be had in a market: cash ready to use, rather than tied up in assets.',
+    },
+    'term-premium': {
+      term: 'term premium',
+      plain: 'The extra yield investors demand for lending long-term instead of rolling short-term loans, on top of the path of short rates.',
+    },
+    'treasury-general-account': {
+      term: 'Treasury General Account',
+      plain: 'The US government’s own bank account at the Federal Reserve, from which it pays its bills.',
+    },
+    'reverse-repo': {
+      term: 'reverse repo',
+      plain: 'An overnight deposit at the Federal Reserve: money funds and others park cash there at a set rate instead of lending it in private markets.',
+    },
+    'bank-reserves': {
+      term: 'bank reserves',
+      plain: 'The deposits banks keep at the central bank. They are the raw material of the overnight lending market between banks.',
+    },
+    'net-liquidity': {
+      term: 'net liquidity',
+      plain: 'The money actually available to markets: the Fed’s balance sheet minus the Treasury’s account and the overnight cash parked back at the Fed.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -1837,6 +1864,75 @@ const LAYER1 = {
       connections: [],
       glossaryTerms: ['treasury-securities', 'foreign-official-holdings', 'central-bank'],
     },
+    // gap-closure S3-M3.2 — the US liquidity and funding family (six
+    // context cards in the market-stress lane).
+    'term-premium-10y': {
+      plainName: 'US 10-year term premium',
+      oneLine: 'The extra yield investors demand for lending to the US for ten years.',
+      ifRising: 'Investors are demanding more to commit money long-term.',
+      ifFalling: 'Long-term lending is being priced closer to the path of short rates.',
+      connections: [
+        { with: 'us10y', text: 'The 10-year yield splits into the policy outlook plus this premium.', strength: 'reliable' },
+        { with: 'real-yield-10y', text: 'Both are ways the long end prices risk and inflation.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['term-premium', 'yield', 'inflation', 'treasury-securities'],
+    },
+    tga: {
+      plainName: 'US Treasury General Account',
+      oneLine: 'The US government’s own bank balance at the Federal Reserve.',
+      ifRising: 'Bond sales and taxes are pulling cash into the government’s till.',
+      ifFalling: 'Government spending is pushing cash back into the system.',
+      connections: [
+        { with: 'net-liquidity', text: 'The account is subtracted there: that cash is not in the system.', strength: 'reliable' },
+        { with: 'walcl', text: 'The Fed’s balance sheet funds it on the other side of the ledger.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['treasury-general-account', 'bond'],
+    },
+    'reverse-repo': {
+      plainName: 'Fed overnight reverse repo',
+      oneLine: 'Cash parked at the Federal Reserve overnight instead of reaching private markets.',
+      ifRising: 'More money is choosing the Fed’s floor over lending anywhere else.',
+      ifFalling: 'That cash is moving back into markets and bills.',
+      connections: [
+        { with: 'net-liquidity', text: 'The pile is subtracted there: parked cash is not available cash.', strength: 'reliable' },
+        { with: 'bank-reserves', text: 'The two sides of the system’s spare cash.', strength: 'usually' },
+      ],
+      glossaryTerms: ['reverse-repo'],
+    },
+    'bank-reserves': {
+      plainName: 'US bank reserves',
+      oneLine: 'The deposits banks keep at the Federal Reserve: the system’s liquidity buffer.',
+      ifRising: 'The buffer behind the banking system is filling.',
+      ifFalling: 'The buffer is thinning, the setting where funding pressure tends to appear.',
+      connections: [
+        { with: 'repo-stress', text: 'Pressure there with falling reserves is the classic squeeze pattern.', strength: 'reliable' },
+        { with: 'walcl', text: 'Reserves are a liability the balance sheet creates.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['bank-reserves', 'central-bank', 'liquidity'],
+    },
+    'repo-stress': {
+      plainName: 'Repo funding pressure',
+      oneLine: 'How much more overnight money costs than what the Fed pays banks: the plumbing’s stress gauge.',
+      ifRising: 'Borrowers are paying up for overnight cash.',
+      ifFalling: 'Cash is easy, trading at or below the Fed’s own rate.',
+      connections: [
+        { with: 'sofr', text: 'The card’s own upper leg.', strength: 'reliable' },
+        { with: 'bank-reserves', text: 'A thinning reserve buffer is what usually drives the gap up.', strength: 'reliable' },
+      ],
+      glossaryTerms: [],
+    },
+    'net-liquidity': {
+      plainName: 'US net liquidity',
+      oneLine: 'The money actually available to markets after subtracting the Treasury account and reverse repos.',
+      ifRising: 'The pool supporting trading and lending is growing.',
+      ifFalling: 'The pool is being drained.',
+      connections: [
+        { with: 'walcl', text: 'The headline the net measure starts from.', strength: 'reliable' },
+        { with: 'tga', text: 'One of the two drains subtracted.', strength: 'reliable' },
+        { with: 'reverse-repo', text: 'The other drain subtracted.', strength: 'reliable' },
+      ],
+      glossaryTerms: ['net-liquidity', 'liquidity'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
@@ -2532,6 +2628,159 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'The custody total has no country split: it cannot say which country is buying or selling (the monthly Treasury TIC table carries that, with its own six-to-seven-week lag), and some official holders keep securities somewhere other than the Fed.',
     forYou:
       'Read it beside the country table in the Who holds US government debt section above: the weekly custody level is the same story told with a shorter delay and no country detail.',
+  },
+  // gap-closure S3-M3.2 (2026-11-01): the US liquidity and funding family —
+  // six context cards in the market-stress lane (FRED THREEFYTP10, WTREGEN,
+  // RRPONTSYD, WRESBAL + the derived SOFR−IORB and WALCL−TGA−RRP).
+  'term-premium-10y': {
+    name: 'US 10-year term premium',
+    ticker: 'Term premium',
+    oneLiner:
+      'The extra yield investors demand for holding 10-year US bonds instead of rolling short-term ones: the price of lending long.',
+    lines: {
+      highRising:
+        'The term premium is high for its decade and rising: investors demanding ever more to lend long, a setting that pressures bonds and risky assets together.',
+      highEasing:
+        'The term premium remains high for the decade but is easing.',
+      typical: 'The term premium sits in its usual range for the decade.',
+      low:
+        'The term premium is unusually low: long-term lending is priced close to the path of short rates.',
+    },
+    whatItIs:
+      'The Kim-Wright 10-year Treasury term premium (the Federal Reserve Board’s own model, via FRED): the part of the 10-year yield left over after subtracting the average short rate the market expects over the bond’s life.',
+    whyItMatters:
+      'The 10-year yield is two stories in one number: what the market expects the Fed to do, and how much extra it demands for committing a decade. The second part, this premium, is what tends to move when investors worry about inflation, supply or holding risk.',
+    tendedToMean:
+      'The premium spent the 2010s near or below zero (the era of trusted low inflation and heavy central-bank buying) and has been rebuilt since 2021, returning toward the positive territory that was normal before the financial crisis.',
+    cantTell:
+      'It is a model estimate, not a market price you can see on a screen, and it says nothing about the next move in yields: a high premium can rise further and a low one can vanish.',
+    forYou:
+      'Read it beside the 10-year yield card: when the yield rises while this premium stays quiet, the move is mostly about expected policy; when the premium itself rises, the market is charging more for the long end itself.',
+  },
+  tga: {
+    name: 'US Treasury General Account',
+    ticker: 'TGA',
+    oneLiner:
+      'The US government’s checking account at the Federal Reserve: the balance its spending draws down and its taxes and bond sales rebuild.',
+    lines: {
+      highRising:
+        'The Treasury account is high for its decade and rebuilding: bond sales pulling cash out of the system and into the government’s till.',
+      highEasing:
+        'The Treasury account remains elevated but is being drawn down.',
+      typical: 'The Treasury account sits in its usual range for the decade.',
+      low:
+        'The Treasury account is unusually low: the government spending down its balance, which adds cash back to the system.',
+    },
+    whatItIs:
+      'The Treasury General Account at the Federal Reserve (the H.4.1 weekly report via FRED): the US government’s own balance at the central bank, held in millions of dollars at each Wednesday.',
+    whyItMatters:
+      'Every dollar the Treasury holds at the Fed is a dollar outside the banking system. A rebuilding account drains reserves; a drawdown pushes cash back out. Big swings in this balance can move market liquidity as much as a central-bank decision.',
+    tendedToMean:
+      'The balance hovered near tens of billions for years, then swung violently around the 2023 debt-ceiling standoff, and has since been held far larger, in the hundreds of billions.',
+    cantTell:
+      'The level alone says nothing about direction of policy: a big balance can sit idle while a small one is about to be rebuilt with a bond-sale wave.',
+    forYou:
+      'Read it with the reserves card and the net-liquidity card: the three together show how much money the system actually holds.',
+  },
+  'reverse-repo': {
+    name: 'Fed overnight reverse repo (RRP)',
+    ticker: 'RRP',
+    oneLiner:
+      'Cash parked overnight at the Federal Reserve by money funds and others: the pool choosing the Fed over private markets.',
+    lines: {
+      highRising:
+        'The reverse repo pile is high for its decade and growing: money choosing the Fed’s floor over lending anywhere else.',
+      highEasing:
+        'The reverse repo pile remains large but is shrinking.',
+      typical: 'The reverse repo balance sits in its usual range for the decade.',
+      low:
+        'The reverse repo pile is near empty: the facility barely used, as was normal before 2021.',
+    },
+    whatItIs:
+      'The overnight reverse repurchase agreement facility (the Federal Reserve Bank of New York’s daily report via FRED): how many billions the Fed borrowed back overnight from money-market funds and other eligible users.',
+    whyItMatters:
+      'This is the plumbing floor: cash in the facility earns a set rate and reaches no private borrower. A large pile means the system has more cash than it wants to deploy; a shrinking pile means that cash is moving back into markets and bills.',
+    tendedToMean:
+      'The facility was a backwater for years, then exploded past two trillion dollars in 2022-23 as rates rose and funds had nowhere better to park, and has been draining since.',
+    cantTell:
+      'The balance is a symptom, not a signal: the pile shrinks as bills supply rises or reserves thin, and a low balance is not by itself good or bad.',
+    forYou:
+      'Read it beside the net-liquidity card: the reverse repo pile is subtracted there because that cash is at the Fed, not in the system.',
+  },
+  'bank-reserves': {
+    name: 'US bank reserves at the Fed',
+    ticker: 'Reserves',
+    oneLiner:
+      'The deposits banks keep at the Federal Reserve: the banking system’s own liquidity buffer.',
+    lines: {
+      highRising:
+        'Bank reserves are high for their decade and rising: abundant liquidity behind the system.',
+      highEasing:
+        'Reserves remain elevated but are being absorbed.',
+      typical: 'Bank reserves sit in their usual range for the decade.',
+      low:
+        'Reserves are unusually low for the decade: the buffer thinned, the setting where funding pressure tends to appear.',
+    },
+    whatItIs:
+      'Reserve balances with Federal Reserve Banks (the H.4.1 weekly report via FRED): the total banks hold in their own accounts at the Fed, in millions of dollars at each Wednesday.',
+    whyItMatters:
+      'Reserves are the raw material of the funding market: banks lend them to each other overnight at SOFR. When reserves grow scarce, that rate tends to drift above what the Fed pays, the squeeze the repo-stress card measures.',
+    tendedToMean:
+      'Reserves quadrupled with the 2020 bond purchases and have fallen steadily as the balance sheet runs off; funding-market wobbles in 2019 showed how sensitive the system is when this buffer thins.',
+    cantTell:
+      'There is no agreed number for scarce: the system’s need for reserves grows with the banking system itself, so the same level can be ample one year and tight the next.',
+    forYou:
+      'Read it beside the repo-stress card: rising pressure there with falling reserves here is the classic sign the buffer is getting thin.',
+  },
+  'repo-stress': {
+    name: 'Repo funding pressure (SOFR minus IORB)',
+    ticker: 'SOFR−IORB',
+    oneLiner:
+      'The gap between what overnight money actually costs and what the Fed pays banks: the plumbing’s own stress gauge.',
+    lines: {
+      highRising:
+        'Overnight money is trading well above what the Fed pays banks: real pressure in the funding plumbing.',
+      highEasing:
+        'Funding pressure remains but is easing.',
+      typical: 'The funding gap sits in its usual range: plumbing calm.',
+      low:
+        'The gap is near zero or below: cash is easy, with banks content to hold reserves at the Fed.',
+    },
+    whatItIs:
+      'The secured overnight financing rate (SOFR) minus the interest rate on reserve balances (IORB), both via FRED: how many percentage points more (or less) borrowers pay for overnight cash compared with what banks earn parking money at the Fed.',
+    whyItMatters:
+      'This is the cleanest single read on funding stress: when overnight money costs more than the Fed’s own rate, cash is being scrambled for; when it trades below, liquidity is ample.',
+    tendedToMean:
+      'The gap sat near zero through most of the decade, spiked in the September 2019 repo squeeze, was pinned by the 2020-22 cash flood, and has returned to a small positive spread as the balance sheet runs off.',
+    cantTell:
+      'It measures one night’s funding, not the health of any bank or the economy, and end-of-quarter spikes fade as routinely as they appear.',
+    forYou:
+      'Read it beside the reserves and stress-index cards: a widening gap with falling reserves is the pattern that historically preceded policy responses.',
+  },
+  'net-liquidity': {
+    name: 'US net liquidity',
+    ticker: 'Net liquidity',
+    oneLiner:
+      'The Fed’s balance sheet minus the Treasury’s account and the reverse repo pile: the money actually available to markets.',
+    lines: {
+      highRising:
+        'Net liquidity is high for its decade and rising: the setting that tends to support risk assets.',
+      highEasing:
+        'Net liquidity remains elevated but is being drained.',
+      typical: 'Net liquidity sits in its usual range for the decade.',
+      low:
+        'Net liquidity is unusually low for the decade: the system operating with a thinner cushion of money.',
+    },
+    whatItIs:
+      'A derived measure: total Fed assets minus the Treasury General Account minus the overnight reverse repo balance (all three legs via FRED). Stated in millions of dollars at each Wednesday.',
+    whyItMatters:
+      'The balance sheet’s headline size overstates the money available to markets: the Treasury’s own balance and the cash parked in reverse repos are both at the Fed, not in the system. Subtracting them gives the pool that actually supports trading and lending.',
+    tendedToMean:
+      'The measure became a market watchword in the 2020s: it surged with the bond purchases, and each trillion of run-off has shown up here first, often months before prices responded.',
+    cantTell:
+      'It is an accounting identity, not a forecast: the same liquidity level can accompany rising or falling markets depending on the demand for money at the time.',
+    forYou:
+      'Read it beside the Fed balance sheet card: when the headline shrinks but the Treasury account or the reverse repo pile shrinks faster, net liquidity can rise even in tightening times.',
   },
   'retail-sales': {
     name: 'US retail sales',

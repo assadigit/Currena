@@ -64,6 +64,16 @@ const SERIES = [
   'A191RL1Q225SBEA',
   'A091RC1Q027SBEA',
   'W006RC1Q027SBEA',
+  // gap-closure S3-M3.2 (2026-11-01): the rung4 liquidity/funding family
+  // (the records verified live 2026-11-01; IORB rides the repo-stress leg,
+  // CCSA and the macro six join the scan list when their M3.4/M3.5 cards
+  // land). WSEFINTL1 (S2-M2.4) is below.
+  'THREEFYTP10',
+  'WTREGEN',
+  'RRPONTSYD',
+  'WRESBAL',
+  'IORB',
+  'WSEFINTL1',
 ] as const;
 
 interface Record {

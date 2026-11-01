@@ -90,20 +90,27 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
   });
 
   it('the registry carries the verified TIC source on rung3 with the 4-subrequest budget', () => {
-    expect(EXTRA_SOURCES).toHaveLength(1);
-    const tic = EXTRA_SOURCES[0]!;
-    expect(tic.id).toBe('tic-slt');
+    expect(EXTRA_SOURCES).toHaveLength(2); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2)
+    const tic = EXTRA_SOURCES.find((s) => s.id === 'tic-slt')!;
     expect(tic.rung).toBe(3);
     expect(tic.gate).toBe(ticReleaseAwareGate);
     expect(tic.budget).toBe(4); // 2 fetches + 1 idempotence read + 1 write
+    // gap-closure S3-M3.2 (2026-11-01): the S3 FRED groups on rung4 — daily
+    // gate (the groups carry daily series), budget 16 (2 fetches + 3 reads +
+    // 10 writes + headroom; see RUNGS.md).
+    const fredS3 = EXTRA_SOURCES.find((s) => s.id === 'fred-s3')!;
+    expect(fredS3.rung).toBe(4);
+    expect(fredS3.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
+    expect(fredS3.gate(new Date('2026-11-02T04:35:00Z'))).toBe(true); // every day
+    expect(fredS3.budget).toBe(16);
   });
 });
 
-describe('runExtraRung — the empty rung is rung4 now (S2 registered tic-slt on rung3)', () => {
-  it('an EMPTY rung still runs, writes its status record, and costs 1 subrequest', async () => {
-    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(0);
+describe('runExtraRung — rung4 now carries the S3 FRED source (S3-M3.2 registered fred-s3)', () => {
+  it('a rung whose registry list is EMPTY still runs, writes its status record, and costs 1 subrequest (the S1-M1.7 proof, via the override)', async () => {
+    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(1); // fred-s3
     const kv = mockKv();
-    const status = await runExtraRung(ENV, 4, { kv, now: new Date(at(4, 35)) });
+    const status = await runExtraRung(ENV, 4, { kv, now: new Date(at(4, 35)), sources: [] });
     expect(status.rows).toEqual([]);
     expect(status.budget).toEqual({ ceiling: EXTRA_RUNG_SUBREQUEST_CEILING, used: 1, refused: [] });
     const raw = kv.store.get(extraRungStatusKey(4));

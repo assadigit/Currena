@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "352a3540f64728444cbc00b58a1415b9c56d07b45420d8e58a0779bfba5d24d6",
-    "faSha256": "e30c1a047d57de2798a46982789628a682f96962a95557714fad3ed5cff8e6f5",
-    "indicatorCount": 132,
-    "glossaryCount": 28
+    "enSha256": "5f4108d400ad62d5d3edea38fdf733001e8a7be55cd611fa5578242b89d285b3",
+    "faSha256": "bc2b3f23ce17849806987f90406592ee4c559bb07424f485fee27a406efe9d72",
+    "indicatorCount": 138,
+    "glossaryCount": 34
   },
   "en": {
     "indicators": {
@@ -2874,6 +2874,142 @@
           "foreign-official-holdings",
           "central-bank"
         ]
+      },
+      "term-premium-10y": {
+        "plainName": "US 10-year term premium",
+        "oneLine": "The extra yield investors demand for lending to the US for ten years.",
+        "ifRising": "Investors are demanding more to commit money long-term.",
+        "ifFalling": "Long-term lending is being priced closer to the path of short rates.",
+        "connections": [
+          {
+            "with": "us10y",
+            "text": "The 10-year yield splits into the policy outlook plus this premium.",
+            "strength": "reliable"
+          },
+          {
+            "with": "real-yield-10y",
+            "text": "Both are ways the long end prices risk and inflation.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "term-premium",
+          "yield",
+          "inflation",
+          "treasury-securities"
+        ]
+      },
+      "tga": {
+        "plainName": "US Treasury General Account",
+        "oneLine": "The US government’s own bank balance at the Federal Reserve.",
+        "ifRising": "Bond sales and taxes are pulling cash into the government’s till.",
+        "ifFalling": "Government spending is pushing cash back into the system.",
+        "connections": [
+          {
+            "with": "net-liquidity",
+            "text": "The account is subtracted there: that cash is not in the system.",
+            "strength": "reliable"
+          },
+          {
+            "with": "walcl",
+            "text": "The Fed’s balance sheet funds it on the other side of the ledger.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "treasury-general-account",
+          "bond"
+        ]
+      },
+      "reverse-repo": {
+        "plainName": "Fed overnight reverse repo",
+        "oneLine": "Cash parked at the Federal Reserve overnight instead of reaching private markets.",
+        "ifRising": "More money is choosing the Fed’s floor over lending anywhere else.",
+        "ifFalling": "That cash is moving back into markets and bills.",
+        "connections": [
+          {
+            "with": "net-liquidity",
+            "text": "The pile is subtracted there: parked cash is not available cash.",
+            "strength": "reliable"
+          },
+          {
+            "with": "bank-reserves",
+            "text": "The two sides of the system’s spare cash.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "reverse-repo"
+        ]
+      },
+      "bank-reserves": {
+        "plainName": "US bank reserves",
+        "oneLine": "The deposits banks keep at the Federal Reserve: the system’s liquidity buffer.",
+        "ifRising": "The buffer behind the banking system is filling.",
+        "ifFalling": "The buffer is thinning, the setting where funding pressure tends to appear.",
+        "connections": [
+          {
+            "with": "repo-stress",
+            "text": "Pressure there with falling reserves is the classic squeeze pattern.",
+            "strength": "reliable"
+          },
+          {
+            "with": "walcl",
+            "text": "Reserves are a liability the balance sheet creates.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "bank-reserves",
+          "central-bank",
+          "liquidity"
+        ]
+      },
+      "repo-stress": {
+        "plainName": "Repo funding pressure",
+        "oneLine": "How much more overnight money costs than what the Fed pays banks: the plumbing’s stress gauge.",
+        "ifRising": "Borrowers are paying up for overnight cash.",
+        "ifFalling": "Cash is easy, trading at or below the Fed’s own rate.",
+        "connections": [
+          {
+            "with": "sofr",
+            "text": "The card’s own upper leg.",
+            "strength": "reliable"
+          },
+          {
+            "with": "bank-reserves",
+            "text": "A thinning reserve buffer is what usually drives the gap up.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "net-liquidity": {
+        "plainName": "US net liquidity",
+        "oneLine": "The money actually available to markets after subtracting the Treasury account and reverse repos.",
+        "ifRising": "The pool supporting trading and lending is growing.",
+        "ifFalling": "The pool is being drained.",
+        "connections": [
+          {
+            "with": "walcl",
+            "text": "The headline the net measure starts from.",
+            "strength": "reliable"
+          },
+          {
+            "with": "tga",
+            "text": "One of the two drains subtracted.",
+            "strength": "reliable"
+          },
+          {
+            "with": "reverse-repo",
+            "text": "The other drain subtracted.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "net-liquidity",
+          "liquidity"
+        ]
       }
     },
     "glossary": {
@@ -2990,6 +3126,30 @@
       "custody-hub": {
         "term": "custody hub",
         "plain": "A country whose reported holdings include much that belongs to investors elsewhere, because the securities are simply held there. Belgium, Luxembourg, the Cayman Islands, Ireland, the UK, Switzerland and Bermuda are the big ones."
+      },
+      "liquidity": {
+        "term": "liquidity",
+        "plain": "How easily money can be had in a market: cash ready to use, rather than tied up in assets."
+      },
+      "term-premium": {
+        "term": "term premium",
+        "plain": "The extra yield investors demand for lending long-term instead of rolling short-term loans, on top of the path of short rates."
+      },
+      "treasury-general-account": {
+        "term": "Treasury General Account",
+        "plain": "The US government’s own bank account at the Federal Reserve, from which it pays its bills."
+      },
+      "reverse-repo": {
+        "term": "reverse repo",
+        "plain": "An overnight deposit at the Federal Reserve: money funds and others park cash there at a set rate instead of lending it in private markets."
+      },
+      "bank-reserves": {
+        "term": "bank reserves",
+        "plain": "The deposits banks keep at the central bank. They are the raw material of the overnight lending market between banks."
+      },
+      "net-liquidity": {
+        "term": "net liquidity",
+        "plain": "The money actually available to markets: the Fed’s balance sheet minus the Treasury’s account and the overnight cash parked back at the Fed."
       }
     },
     "ui": {
@@ -5895,6 +6055,142 @@
           "foreign-official-holdings",
           "central-bank"
         ]
+      },
+      "term-premium-10y": {
+        "plainName": "صرف سررسید ۱۰ سالهٔ آمریکا",
+        "oneLine": "بازدهی اضافی که سرمایه‌گذاران برای وام‌دادن ده‌ساله به آمریکا می‌خواهند.",
+        "ifRising": "سرمایه‌گذاران برای بلندکردن مدتِ پولشان مبلغ بیشتری می‌خواهند.",
+        "ifFalling": "قیمت وام بلندمدت به مسیر نرخ‌های کوتاه نزدیک می‌شود.",
+        "connections": [
+          {
+            "with": "us10y",
+            "text": "بازدهی ۱۰ ساله دو بخش دارد: چشم‌انداز سیاست به‌علاوهٔ همین صرف.",
+            "strength": "reliable"
+          },
+          {
+            "with": "real-yield-10y",
+            "text": "هر دو راهی هستند که انتهای بلند منحنی، ریسک و تورم را قیمت‌گذاری می‌کند.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "term-premium",
+          "yield",
+          "inflation",
+          "treasury-securities"
+        ]
+      },
+      "tga": {
+        "plainName": "حساب عمومی خزانه‌داری آمریکا",
+        "oneLine": "حساب بانکی خودِ دولت آمریکا نزد فدرال رزرو.",
+        "ifRising": "فروش اوراق و مالیات‌ها پول را به خزانهٔ دولت می‌کشد.",
+        "ifFalling": "هزینه‌کردِ دولت پول را به سیستم برمی‌گرداند.",
+        "connections": [
+          {
+            "with": "net-liquidity",
+            "text": "آن‌جا از این حساب کم می‌شود: پول خزانه در سیستم نیست.",
+            "strength": "reliable"
+          },
+          {
+            "with": "walcl",
+            "text": "ترازنامهٔ فدرال رزرو از سوی دیگر دفتر آن را تأمین می‌کند.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "treasury-general-account",
+          "bond"
+        ]
+      },
+      "reverse-repo": {
+        "plainName": "ریورس ریپوی شبانهٔ فدرال رزرو",
+        "oneLine": "پولی که یک‌شبه نزد فدرال رزرو پارک می‌شود به جای رسیدن به بازارهای خصوصی.",
+        "ifRising": "پول بیشتری کفِ فدرال رزرو را به قرض‌دادن جای دیگر ترجیح می‌دهد.",
+        "ifFalling": "آن پول به بازارها و اسناد خزانه برمی‌گردد.",
+        "connections": [
+          {
+            "with": "net-liquidity",
+            "text": "آن‌جا از این انبار کم می‌شود: پولِ پارک‌شده پولِ در دسترس نیست.",
+            "strength": "reliable"
+          },
+          {
+            "with": "bank-reserves",
+            "text": "دو روی پولِ اضافی سیستم.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "reverse-repo"
+        ]
+      },
+      "bank-reserves": {
+        "plainName": "ذخایر بانکی آمریکا",
+        "oneLine": "سپرده‌هایی که بانک‌ها نزد فدرال رزرو نگه می‌دارند: ذخیرهٔ نقدینگی سیستم.",
+        "ifRising": "ذخیرهٔ پشتیبان نظام بانکی پر می‌شود.",
+        "ifFalling": "ذخیره دارد نازک می‌شود؛ همان وضعیتی که فشار تأمین مالی معمولاً پیدا می‌شود.",
+        "connections": [
+          {
+            "with": "repo-stress",
+            "text": "فشار آن‌جا با پایین‌آمدن ذخایر، الگوی کلاسیک تنگ‌شدن است.",
+            "strength": "reliable"
+          },
+          {
+            "with": "walcl",
+            "text": "ذخایر بدهی‌ای هستند که ترازنامه می‌سازد.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "bank-reserves",
+          "central-bank",
+          "liquidity"
+        ]
+      },
+      "repo-stress": {
+        "plainName": "فشار تأمین مالی ریپو",
+        "oneLine": "چقدر پول شبانه از آنچه فدرال رزرو به بانک‌ها می‌دهد گران‌تر است: فشارسنج خود لوله‌کشی بازار.",
+        "ifRising": "قرض‌گیرندگان برای پول یک‌شبه بهای بیشتری می‌پردازند.",
+        "ifFalling": "پول راحت است، با نرخِ خودِ فدرال یا پایین‌تر معامله می‌شود.",
+        "connections": [
+          {
+            "with": "sofr",
+            "text": "پایهٔ بالایی خودِ این کارت.",
+            "strength": "reliable"
+          },
+          {
+            "with": "bank-reserves",
+            "text": "نازک‌شدن ذخیرهٔ بانکی همان چیزی است که معمولاً این فاصله را باز می‌کند.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": []
+      },
+      "net-liquidity": {
+        "plainName": "نقدینگی خالص آمریکا",
+        "oneLine": "پولی که واقعاً در دسترس بازارهاست: ترازنامهٔ فدرال رزرو منهای حساب خزانه‌داری و انبار ریورس ریپو.",
+        "ifRising": "استخری که معامله و وام را پشتیبانی می‌کند بزرگ‌تر می‌شود.",
+        "ifFalling": "این استخر دارد تخلیه می‌شود.",
+        "connections": [
+          {
+            "with": "walcl",
+            "text": "عدد اصلی‌ای که سنجش خالص از آن آغاز می‌شود.",
+            "strength": "reliable"
+          },
+          {
+            "with": "tga",
+            "text": "یکی از دو کسرِ روایت.",
+            "strength": "reliable"
+          },
+          {
+            "with": "reverse-repo",
+            "text": "کسرِ دیگر.",
+            "strength": "reliable"
+          }
+        ],
+        "glossaryTerms": [
+          "net-liquidity",
+          "liquidity"
+        ]
       }
     },
     "glossary": {
@@ -6011,6 +6307,30 @@
       "custody-hub": {
         "term": "مرکز امانت‌داری",
         "plain": "کشوری که رقم نگهداری‌اش بخش زیادی دارایی سرمایه‌گذاران کشورهای دیگر را هم شامل می‌شود، چون اوراق صرفاً آنجا نگهداری می‌شوند. بلژیک، لوکزامبورگ، جزایر کیمن، ایرلند، بریتانیا، سوئیس و برمودا بزرگ‌ترین‌ها هستند."
+      },
+      "liquidity": {
+        "term": "نقدینگی",
+        "plain": "چقدر راحت می‌شود در یک بازار پول پیدا کرد: پول نقدِ آمادهٔ استفاده، نه قفل‌شده در دارایی‌ها."
+      },
+      "term-premium": {
+        "term": "صرف سررسید",
+        "plain": "بازدهی اضافی که سرمایه‌گذار برای وام‌دادن بلندمدت به جای تمدید پیوستهٔ وام‌های کوتاه‌مدت می‌خواهد، روی مسیر نرخ‌های کوتاه."
+      },
+      "treasury-general-account": {
+        "term": "حساب عمومی خزانه‌داری",
+        "plain": "حساب بانکی خودِ دولت آمریکا نزد فدرال رزرو که قبض‌هایش را از آن پرداخت می‌کند."
+      },
+      "reverse-repo": {
+        "term": "ریورس ریپو",
+        "plain": "سپردهٔ یک‌شبه نزد فدرال رزرو: صندوق‌های پولی و دیگران پولشان را با نرخ مشخص آنجا می‌گذارند به جای اینکه در بازار خصوصی قرض بدهند."
+      },
+      "bank-reserves": {
+        "term": "ذخایر بانکی",
+        "plain": "سپرده‌هایی که بانک‌ها نزد بانک مرکزی نگه می‌دارند. مادهٔ خام بازار وام شبانهٔ بین بانکی هستند."
+      },
+      "net-liquidity": {
+        "term": "نقدینگی خالص",
+        "plain": "پولی که واقعاً در دسترس بازارهاست: ترازنامهٔ فدرال رزرو منهای حساب خزانه‌داری و پول شبانه‌ای که به فدرال بازگردانده شده است."
       }
     },
     "ui": {

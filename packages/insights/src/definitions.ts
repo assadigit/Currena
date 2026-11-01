@@ -1007,6 +1007,130 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 45,
   },
   {
+    // gap-closure S3-M3.2 (2026-11-01): the 10-year term premium (Kim-
+    // Wright) — the extra yield investors demand for holding long US
+    // bonds instead of rolling short ones. CONTEXT (info): never a vote;
+    // the plumbing level the reader watches beside the stress gauges (the
+    // spec's "how much extra investors demand to lend long"). FRED
+    // THREEFYTP10, daily percent, public domain (T-16, M3.1). Rides rung4
+    // (the 'fred-s3' extra source), carried forward at the 04:10 main rung.
+    id: 'term-premium-10y',
+    section: 'global',
+    group: 'market-stress',
+    name: 'US 10-year term premium',
+    source: 'fred',
+    sourceRef: 'FRED:THREEFYTP10 (10-Year Treasury Term Premium, Kim-Wright, daily, %)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // Daily, business-day publication (the Fed Board's curve model);
+    // 4 = the daily family's window (the vix precedent).
+    staleAfterDays: 4,
+  },
+  {
+    // gap-closure S3-M3.2: the Treasury General Account — the US
+    // government's checking balance at the Fed. Drawdowns add liquidity to
+    // the system; rebuilds drain it. CONTEXT (info). FRED WTREGEN, weekly
+    // Wednesday $ millions, public domain (T-16, M3.1). Rides rung4.
+    id: 'tga',
+    section: 'global',
+    group: 'market-stress',
+    name: 'US Treasury General Account',
+    source: 'fred',
+    sourceRef: 'FRED:WTREGEN (Liabilities and Capital: Other Factors Draining Reserve Balances: Treasury, General Account: Wednesday Level, weekly, $ millions)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // H.4.1-family Wednesday level published Thursdays — the walcl
+    // precedent: one missed print reads ~10d of obs age; 21 covers two.
+    staleAfterDays: 21,
+  },
+  {
+    // gap-closure S3-M3.2: the overnight reverse repo facility — cash
+    // parked AT the Fed (the floor of the plumbing: money that earns the
+    // ON RRP rate instead of reaching private markets). CONTEXT (info).
+    // FRED RRPONTSYD, daily $ billions, citation-required (T-16, M3.1 —
+    // displayed with the FRED attribution per the licence walk). Rides
+    // rung4.
+    id: 'reverse-repo',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Fed overnight reverse repo (RRP)',
+    source: 'fred',
+    sourceRef: 'FRED:RRPONTSYD (Overnight Reverse Repurchase Agreements: Treasury Securities Sold by the Federal Reserve in the Temporary Open Market Operations, daily, $ billions)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // NY Fed publication is every business day; 4 covers weekends and a
+    // holiday bridge (the daily family's window).
+    staleAfterDays: 4,
+  },
+  {
+    // gap-closure S3-M3.2: reserve balances — the deposits banks hold at
+    // the Fed, the banking system's own liquidity buffer. CONTEXT (info).
+    // FRED WRESBAL, weekly Wednesday $ millions, public domain (T-16,
+    // M3.1). Rides rung4.
+    id: 'bank-reserves',
+    section: 'global',
+    group: 'market-stress',
+    name: 'US bank reserves at the Fed',
+    source: 'fred',
+    sourceRef: 'FRED:WRESBAL (Reserve Balances with Federal Reserve Banks: Wednesday Level, weekly, $ millions)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The walcl/tga H.4.1-family window: 21 days covers two missed prints.
+    staleAfterDays: 21,
+  },
+  {
+    // gap-closure S3-M3.2: the funding-pressure spread — SOFR minus the
+    // interest rate on reserve balances. When overnight money trades ABOVE
+    // what the Fed pays banks, the plumbing is squeezed; at or below, it is
+    // calm. DERIVED (the breakeven-tilt discipline: inner join on common
+    // dates, 4dp quantized, both legs must exist or the card reads
+    // can't-tell). CONTEXT (info). Legs: FRED SOFR (the main rung's daily
+    // group, staged for the 04:35 phase) + FRED IORB (rung4; the series
+    // carries administratively ANNOUNCED future-dated rows — trimmed to
+    // today before the join). Rides rung4.
+    id: 'repo-stress',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Repo funding pressure (SOFR minus IORB)',
+    source: 'derived',
+    sourceRef: 'FRED:SOFR − FRED:IORB (derived, daily, percentage points)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 4,
+  },
+  {
+    // gap-closure S3-M3.2: net liquidity — the Fed's balance sheet minus
+    // the Treasury's General Account minus the reverse repo pile: the
+    // money actually available to the private system. DERIVED (inner join
+    // on the shared Wednesday dates; RRP converted $B → $M before the
+    // subtraction; 4dp quantized). CONTEXT (info). Legs: FRED WALCL (the
+    // main rung's mixed-frequency group, staged) + FRED WTREGEN +
+    // RRPONTSYD (rung4). Rides rung4.
+    id: 'net-liquidity',
+    section: 'global',
+    group: 'market-stress',
+    name: 'US net liquidity',
+    source: 'derived',
+    sourceRef: 'FRED:WALCL − FRED:WTREGEN − FRED:RRPONTSYD (derived, weekly Wednesday, $ millions)',
+    cadence: 'weekly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The walcl-family H.4.1 window: the Wednesday level publishes
+    // Thursday; 21 days covers two missed prints.
+    staleAfterDays: 21,
+  },
+  {
     id: 'gold-silver',
     section: 'global',
     group: 'market-stress',

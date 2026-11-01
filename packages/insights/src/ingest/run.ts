@@ -87,6 +87,7 @@ import {
 } from './data';
 import { providerFetchEnabled, SANITY_RANGES, withinSanityRange } from '../sources';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS, type Rung2FetchPlan } from '../adapters/rung2';
+import { collectRung4Sources, deriveRung4IndicatorSeries, RUNG4_IDS } from '../adapters/rung4';
 import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
 import type { KVLike } from './kv-store';
@@ -159,6 +160,15 @@ export interface IngestRunOptions {
    * forward (carryForwardIds) until the 04:20 phase patches them.
    */
   rung2Series?: Partial<Record<IndicatorId, SeriesPoint[]>>;
+  /**
+   * gap-closure S3-M3.2 (2026-11-01): the fourth-rung series (the S3
+   * liquidity/funding/macro FRED groups, keyed by FRED series id — the
+   * raw collectRung4Outputs.fred map, IORB already future-trimmed). The
+   * Node venue + selfcheck pass it so ONE build derives everything; the
+   * Worker's 04:10 main rung passes nothing — its rung-4 ids carry
+   * forward (CARRY_FORWARD_IDS) until the 04:35 phase patches them.
+   */
+  rung4Series?: Partial<Record<string, SeriesPoint[]>>;
   /**
    * The OECD mirror armed as the jgb-10y fallback (the Node venue passes
    * the FRED mirror it already collected; the 04:20 phase reads it from
@@ -387,6 +397,10 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   const series = buildIndicatorSeries({
     ...inputs,
     ...(rung2Inputs !== undefined ? { rung2: rung2Inputs } : {}),
+    // gap-closure S3-M3.2: the inline rung-4 fetches (Node venue + selfcheck)
+    // join the build; the Worker's 04:10 main rung passes nothing (the ids
+    // carry forward until the 04:35 phase patches them).
+    ...(opts.rung4Series !== undefined ? { rung4: { fredS3: opts.rung4Series } } : {}),
     chinaPmi,
     chinaCpi,
     nbsStored,
@@ -465,7 +479,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       : {}),
     now: nowIso,
     baseReadingCache,
-    carryForwardIds: new Set(RUNG2_IDS as readonly string[]),
+    carryForwardIds: new Set(CARRY_FORWARD_IDS),
   });
   const tDraft = performance.now();
 
@@ -500,7 +514,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
       : {}),
     now: nowIso,
     baseReadingCache,
-    carryForwardIds: new Set(RUNG2_IDS as readonly string[]),
+    carryForwardIds: new Set(CARRY_FORWARD_IDS),
   });
   const tFinal = performance.now();
   // 2026-10-23 CPU round: the phase budget, one line per run — the number
@@ -700,6 +714,15 @@ function quantizedGap(us: SeriesPoint[], jp: SeriesPoint[]): SeriesPoint[] {
   const f = 10_000;
   return gap.map((p) => ({ date: p.date, value: Math.round(p.value * f) / f }));
 }
+
+/**
+ * gap-closure S3-M3.2: the ids whose fetches live OFF the main rung — the
+ * rung-2 pair (04:20, MOF/weekly/monthly) + the rung-4 family (04:35, the
+ * S3 FRED groups). At the 04:10 MAIN build their series are absent by
+ * design; their readings carry VERBATIM (see snapshot.ts carryForwardIds)
+ * until their phases patch them minutes later.
+ */
+export const CARRY_FORWARD_IDS: readonly string[] = [...RUNG2_IDS, ...RUNG4_IDS];
 
 /** Read a stored history as series, poison-tolerant (the collect pattern). */
 async function storedSeriesOf(store: InsightsStore, id: IndicatorId): Promise<SeriesPoint[] | undefined> {
@@ -935,6 +958,177 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
 }
 
 /* ------------------------------------------------------------------ *
+ * The rung-4 phase (gap-closure S3-M3.2, 2026-11-01) — the 04:35 UTC
+ * rung that owns the S3 liquidity/funding FRED family. Fetches the two
+ * FRED_S3_GROUPS ZIP requests (fail-soft per group), derives the six
+ * indicator series against the STAGED legs (sofr/walcl — the 04:10 main
+ * rung's own collect, read back from the stage exactly like the rung-2
+ * phase reads us10y), recomputes their readings, PATCHES the snapshot +
+ * public projection, updates the stage, appends honest report rows, and
+ * writes its OWN history keys (the 04:25/04:27 daily halves exclude
+ * RUNG4_IDS — they run 10 minutes BEFORE this phase).
+ *
+ * Subrequest budget at 04:35: 2 fetches + 1 stage read + 1 snapshot read
+ * + 1 status read + 6 history writes + 4 patch writes (snapshot, public,
+ * stage, status) = 15 — well inside the rung's own 50 ceiling (the
+ * 'fred-s3' ExtraSourceDef declares 16).
+ * ------------------------------------------------------------------ */
+
+export interface Rung4PhaseResult {
+  /** The re-derived series (the ids the phase refreshed this run). */
+  series: Record<string, SeriesPoint[]>;
+  /** Per-group report rows (appended to insights:status). */
+  reports: InsightsSourceReport[];
+  /** Whether the snapshot + public projection were patched and written. */
+  patched: boolean;
+  /** History writes for the phase's own ids (the 04:25 halves' exclusion). */
+  histories: { written: number; unchanged: number; singlePoint: number };
+}
+
+export interface Rung4PhaseOptions {
+  /** The KV or REST store (snapshot read + writes). */
+  store: InsightsStore;
+  /** The Worker venue's RATES binding (stage read/update + history writes). */
+  kv: KVLike;
+  /** 'scheduled' (the Worker rung) or 'manual' (a dispatch). */
+  mode: 'scheduled' | 'manual';
+  /** Clock injection (tests). */
+  now?: Date;
+  /** The ids the PUBLIC projection hides. */
+  hiddenPublicIds?: ReadonlySet<string>;
+}
+
+/**
+ * THE rung-4 phase. The legs read from the stage (the main rung wrote it
+ * 25 minutes earlier): sofr (the daily rates group) and walcl (the
+ * mixed-frequency group). A missing leg fails closed — the affected
+ * derived reading carries its previous value; the direct cards still
+ * refresh. History writes are idempotent and unconditional (the daily
+ * phase's discipline).
+ */
+export async function runInsightsRung4Phase(opts: Rung4PhaseOptions): Promise<Rung4PhaseResult> {
+  const now = opts.now ?? new Date();
+  const nowIso = now.toISOString();
+  const today = nowIso.slice(0, 10);
+  const todayMs = Date.parse(`${today}T00:00:00Z`);
+  console.log(`# Insights rung-4 phase (S3 liquidity/funding) — ${nowIso} [${opts.mode}]`);
+
+  // 1. The staged legs (the main rung's own collect, 25 minutes old at most).
+  const stage = await readStage(opts.kv);
+  const legOf = (id: string): SeriesPoint[] | undefined =>
+    stage?.series[id]?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+  const sofrLeg = legOf('sofr');
+  const walclLeg = legOf('walcl');
+  console.log(
+    `[rung4] staged legs — sofr ${sofrLeg?.at(-1)?.date ?? 'MISSING'} · walcl ${walclLeg?.at(-1)?.date ?? 'MISSING'}` +
+      (stage === undefined ? ' (no stage — the Node/manual venue)' : ''),
+  );
+
+  // 2. Fetch the two S3 groups (fail-soft per group; honest report rows).
+  const collected = await collectRung4Sources({ now });
+  for (const row of collected.reports) console.log(`  ${row.ok ? '✅' : '❌'} ${row.source} — ${row.detail}`);
+
+  // 3. Derive the indicator series (the shared pure derivation).
+  const series = deriveRung4IndicatorSeries(collected.fred, { sofr: sofrLeg, walcl: walclLeg });
+  for (const [id, s] of Object.entries(series)) {
+    console.log(`  · ${id}: ${s.at(-1)!.value} @ ${s.at(-1)!.date} (${s.length} obs)`);
+  }
+  const histories = { written: 0, unchanged: 0, singlePoint: 0 };
+
+  if (Object.keys(series).length === 0) {
+    console.log('[rung4] nothing to patch (no group parsed and no leg filled)');
+    return { series, reports: collected.reports, patched: false, histories };
+  }
+
+  // 4. Recompute the affected readings (computeReading + the sanity gates —
+  // the same engine + guards the rung-2 phase applies).
+  const storedSnapshot = await opts.store.getSnapshot();
+  if (storedSnapshot === undefined) {
+    console.warn('[rung4] no stored snapshot to patch — the next main rung builds from scratch');
+    return { series, reports: collected.reports, patched: false, histories };
+  }
+  const patchedReadings: IndicatorReading[] = [];
+  for (const [id, idSeries] of Object.entries(series) as [IndicatorId, SeriesPoint[]][]) {
+    const def = DEFINITIONS.find((d) => d.id === id)!;
+    const source: ReadingSource = READING_SOURCES[id] ?? { name: def.sourceRef };
+    let reading = computeReading(def, idSeries, nowIso, source);
+    // The definitional sanity range (T-28/F-14) — the same gate the main
+    // build applies after the deterministic base.
+    const sanityBand = SANITY_RANGES[id as string];
+    if (sanityBand !== undefined && reading.value !== null && !withinSanityRange(id as string, reading.value)) {
+      const bandText = sanityBand.minExclusive
+        ? 'must be greater than zero'
+        : `must sit in ${sanityBand.min ?? '-∞'} to ${sanityBand.max ?? '∞'}`;
+      reading = {
+        ...reading,
+        value: null,
+        asOf: null,
+        status: 'unavailable',
+        flag: { test: 'T-28', reason: `value outside its allowed range (${bandText}) — rejected, can't tell right now` },
+      };
+    }
+    patchedReadings.push(reading);
+    console.log(
+      `  🔄 ${id}: ${reading.value ?? '—'} @ ${reading.asOf ?? '—'} [${reading.status}]${reading.percentile10y !== undefined ? ` pct10y=${(reading.percentile10y * 100).toFixed(0)}%` : ''}`,
+    );
+  }
+
+  // 5. Patch + write the snapshot family (the main rung wrote the day's
+  // archive 25 minutes ago — the patch touches only the live keys).
+  const patched = patchInsightsSnapshot(storedSnapshot, patchedReadings, nowIso);
+  await opts.store.putSnapshot(patched);
+  console.log('  ✍ insights:snapshot (patched)');
+  const hiddenIds = opts.hiddenPublicIds ?? new Set<string>();
+  await opts.store.putPublicSnapshot(projectSnapshotToPublic(patched, hiddenIds));
+  console.log('  ✍ insights:snapshot-public (patched)');
+
+  // 6. Update the stage (the sweep bootstrap + the honest record of what
+  // this rung last served — the same merge the rung-2 phase performs).
+  {
+    const base = (await readStage(opts.kv)) ?? { v: STAGE_VERSION, writtenAt: nowIso, series: {} };
+    for (const [id, idSeries] of Object.entries(series)) {
+      const trimmed = trimForStage(idSeries, todayMs);
+      if (trimmed.length > 0) base.series[id] = trimmed;
+    }
+    base.writtenAt = nowIso;
+    await putStage(opts.kv, base);
+    console.log(`  ✍ ${INSIGHTS_STAGE_KEY} (updated ${Object.keys(series).join(', ')})`);
+  }
+
+  // 7. Write the phase's OWN history keys (the 04:25/04:27 halves exclude
+  // RUNG4_IDS — this phase is their writer; unconditional idempotent writes).
+  for (const [id, idSeries] of Object.entries(series) as [IndicatorId, SeriesPoint[]][]) {
+    const history = buildHistoryFile(id, idSeries);
+    if (!history) {
+      if (idSeries.length > 0) histories.singlePoint++;
+      continue;
+    }
+    try {
+      await opts.kv.put(`insights:hist:${id}`, JSON.stringify(history));
+      histories.written++;
+    } catch (err) {
+      console.warn(`  ⚠ insights:hist:${id} failed: ${errMessage(err)}`);
+    }
+  }
+  console.log(`  history: ${histories.written} written · ${histories.singlePoint} single-point (kept)`);
+
+  // 8. Append the rung's report rows to insights:status (the /admin panel
+  // + the sweep gate see the honest fetch outcomes).
+  try {
+    const status = await opts.store.getStatus();
+    if (status !== undefined) {
+      const merged = [...status.sources, ...collected.reports];
+      await opts.store.putStatus({ ...status, sources: merged, generatedAt: nowIso });
+      console.log(`  ✍ insights:status (+${collected.reports.length} rung-4 rows)`);
+    }
+  } catch (err) {
+    console.warn(`  ⚠ insights:status append failed: ${errMessage(err)}`);
+  }
+
+  return { series, reports: collected.reports, patched: true, histories };
+}
+
+/* ------------------------------------------------------------------ *
  * The Node venue's inline history writes (read-compared, no staging).
  * ------------------------------------------------------------------ */
 
@@ -1019,14 +1213,24 @@ export interface HistoryPhaseOptions {
   now?: Date;
 }
 
-/** The ids a phase covers — derived FROM the definitions (self-maintaining). */
+/** The ids a phase covers — derived FROM the definitions (self-maintaining).
+ * gap-closure S3-M3.2: the RUNG4_IDS are EXCLUDED — their histories are
+ * written by their own 04:35 phase (which runs AFTER the 04:25/04:27
+ * daily halves; leaving them in would both duplicate the writes the next
+ * morning and re-grow the daily halves past the exceededCpu ceiling the
+ * 2026-10-26 split fixed). */
 export function historyPhaseIds(phase: 'daily' | 'daily-a' | 'daily-b' | 'periodic'): IndicatorId[] {
-  const daily = DEFINITIONS.filter((d) => d.cadence === 'daily' || d.cadence === 'weekly').map((d) => d.id);
+  const isRung4 = (id: IndicatorId): boolean => (RUNG4_IDS as readonly string[]).includes(id);
+  const daily = DEFINITIONS.filter(
+    (d) => (d.cadence === 'daily' || d.cadence === 'weekly') && !isRung4(d.id),
+  ).map((d) => d.id);
   if (phase === 'daily-a') return daily.slice(0, Math.ceil(daily.length / 2));
   if (phase === 'daily-b') return daily.slice(Math.ceil(daily.length / 2));
   if (phase === 'daily') return daily;
   return DEFINITIONS.filter(
-    (d) => d.cadence === 'monthly' || d.cadence === 'quarterly' || d.cadence === 'per-change' || d.cadence === 'manual',
+    (d) =>
+      (d.cadence === 'monthly' || d.cadence === 'quarterly' || d.cadence === 'per-change' || d.cadence === 'manual') &&
+      !isRung4(d.id),
   ).map((d) => d.id);
 }
 

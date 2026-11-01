@@ -37,6 +37,8 @@ import { boeBankRateDailySeries } from './boe';
 import { BASKET_CURRENCIES, computeBasketValue } from '../basket';
 import { PERCENTILE_WINDOW_DAYS } from '../scoring';
 import type { Rung2SeriesInputs } from './rung2-inputs';
+import type { Rung4SeriesInputs } from './rung4-inputs';
+import { deriveRung4IndicatorSeries } from './rung4';
 import type { SpotPrice } from './types';
 import type { WorldBankMonthly } from './worldbank';
 import type { YahooQuote } from './yahoo';
@@ -71,6 +73,15 @@ export interface SeriesInputs {
    * everything. See adapters/rung2.ts.
    */
   rung2?: Rung2SeriesInputs;
+  /**
+   * gap-closure S3-M3.2 (2026-11-01): the fourth-rung feeds (the 04:35
+   * phase — the US liquidity/funding FRED groups) whose subrequest cost
+   * must not ride the 04:10 main rung. The MAIN rung passes undefined (the
+   * rung-4 ids' readings carry forward until the phase patches them); the
+   * Node venue + selfcheck pass the fetched map so one build derives
+   * everything. See adapters/rung4.ts.
+   */
+  rung4?: Rung4SeriesInputs;
   /** Frankfurter USD→currency series (USD quote side, USD base). */
   fx: {
     JPY?: SeriesPoint[];
@@ -466,6 +477,22 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // M6 Wave 3 (2026-10-25): the liquidity level beside the plumbing gauges.
   put('walcl', fred.WALCL);
   put('nfci', fred.NFCI);
+  // gap-closure S3-M3.2 (2026-11-01): the US liquidity/funding family —
+  // the four direct FRED cards + the two derived spreads (SOFR−IORB and
+  // WALCL−TGA−RRP; the pure functions live in adapters/rung4.ts and are
+  // shared with the 04:35 phase). The LEGS come from this build's own
+  // FRED collect (SOFR/WALCL ride the main rung's groups); the S3 map
+  // comes from the rung-4 inputs (absent on the Worker's 04:10 main rung
+  // — the ids carry forward — present on the Node venue's inline build).
+  {
+    const rung4Series = deriveRung4IndicatorSeries(inputs.rung4?.fredS3, {
+      sofr: fred.SOFR,
+      walcl: fred.WALCL,
+    });
+    for (const [id, s] of Object.entries(rung4Series) as [IndicatorId, SeriesPoint[]][]) {
+      put(id, s);
+    }
+  }
   // Step-2 add-list §B5: the Cboe VIX close (daily, full history — the
   // stored history keeps the 10-year daily window the Step-3 verdicts
   // will compute their calm/nervous thresholds from).
@@ -959,6 +986,29 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'retail-sales': {
     name: 'US Census Bureau via FRED (RSAFS)',
     url: 'https://fred.stlouisfed.org/series/RSAFS',
+  },
+  // gap-closure S3-M3.2 (2026-11-01) — the liquidity/funding family's
+  // source lines (the rung4 'fred-s3' collection).
+  'term-premium-10y': {
+    name: 'Federal Reserve Board (Kim-Wright) via FRED (THREEFYTP10)',
+    url: 'https://fred.stlouisfed.org/series/THREEFYTP10',
+  },
+  tga: { name: 'Federal Reserve via FRED (WTREGEN, H.4.1 table)', url: 'https://fred.stlouisfed.org/series/WTREGEN' },
+  'reverse-repo': {
+    name: 'Federal Reserve Bank of New York via FRED (RRPONTSYD)',
+    url: 'https://fred.stlouisfed.org/series/RRPONTSYD',
+  },
+  'bank-reserves': {
+    name: 'Federal Reserve via FRED (WRESBAL, H.4.1 table)',
+    url: 'https://fred.stlouisfed.org/series/WRESBAL',
+  },
+  'repo-stress': {
+    name: 'FRED (SOFR − IORB, derived)',
+    url: 'https://fred.stlouisfed.org/series/SOFR',
+  },
+  'net-liquidity': {
+    name: 'FRED (WALCL − WTREGEN − RRPONTSYD, derived)',
+    url: 'https://fred.stlouisfed.org/series/WALCL',
   },
   'housing-permits': {
     name: 'US Census Bureau via FRED (PERMIT)',

@@ -531,7 +531,7 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
         now: new Date('2026-11-01T04:40:00Z'),
       });
       expect(hist.written).toBeGreaterThan(0);
-      expect(store.snapshot!.readings).toHaveLength(103); // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card)
+      expect(store.snapshot!.readings).toHaveLength(109); // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card) + the S3-M3.2 liquidity/funding six
     } finally {
       globalThis.fetch = original;
     }

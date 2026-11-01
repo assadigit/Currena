@@ -97,8 +97,12 @@ describe('fred adapter', () => {
     // CFNAI, JTSJOL, T5YIE and AHETPI → 44, and the Wave-4 BoE fix
     // RETIRES IRSTCI01GBM156N (boe-rate moved to the BoE's own page) → 43;
     // the 2026-10-26 gap-audit build adds T10Y3M (A-1) → 44; the 2026-10-31
-    // gap-closure S2-M2.4 round adds WSEFINTL1 (the weekly custody card) → 45.
-    expect(Object.values(FRED_SERIES)).toHaveLength(45);
+    // gap-closure S2-M2.4 round adds WSEFINTL1 (the weekly custody card) → 45;
+    // the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity family's
+    // five (THREEFYTP10, WTREGEN, RRPONTSYD, WRESBAL, IORB — the repo-stress
+    // leg) → 50. CCSA and the macro six ride FRED_S3_GROUPS (rung4), not the
+    // FRED_SERIES register (their cards land with M3.4/M3.5).
+    expect(Object.values(FRED_SERIES)).toHaveLength(50);
   });
 
   it('rides WSEFINTL1 in the mixed-frequency bulk group beside WALCL (S2-M2.4: zero new subrequests)', () => {

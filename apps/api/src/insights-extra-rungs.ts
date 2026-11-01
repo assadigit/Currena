@@ -25,6 +25,7 @@
 
 import type { Bindings } from './index';
 import { runTicIngest, KvTicStore } from '@currena/insights/tic';
+import { runInsightsRung4Phase, KvInsightsStore, HIDDEN_PUBLIC_IDS } from '@currena/insights/ingest';
 
 /** The UTC minute (inside INGEST_CRON_HOUR) that fires rung3. */
 export const EXTRA_RUNG3_MINUTE = 30;
@@ -91,6 +92,15 @@ export interface ExtraSourceDef {
  * + the idempotence read + the write. The two fetches share this rung
  * with NOTHING else (the S2 session rule: they never share an invocation
  * with anything heavy).
+ *
+ * gap-closure S3-M3.2 (2026-11-01) registers the second: the S3 FRED
+ * liquidity/funding/macro groups — the 'fred-s3' rung4 source (the 04:35
+ * slot the S1-M1.7 scaffolding reserved). TWO fredgraph ZIP fetches + the
+ * stage read (the sofr/walcl legs) + the snapshot read + the status read
+ * + the patch writes (snapshot, public, stage, status) + the 6 OWN
+ * history writes = 15; declared budget 16 (rounding headroom). Day gate:
+ * daily — the groups carry daily series (term premium, RRP, IORB), and
+ * the 10:10/20:10 sweeps heal a failed day within hours (gate bypassed).
  */
 export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
   {
@@ -99,6 +109,38 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
     gate: ticReleaseAwareGate,
     budget: 4,
     run: async (env: Bindings) => (await runTicIngest(new KvTicStore(env.RATES))).outcome,
+  },
+  {
+    id: 'fred-s3',
+    rung: 4,
+    gate: dailyGate(),
+    budget: 16,
+    run: async (env: Bindings, now: Date) => {
+      const result = await runInsightsRung4Phase({
+        store: new KvInsightsStore(env.RATES),
+        kv: env.RATES,
+        mode: 'scheduled',
+        hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+        now,
+      });
+      const failed = result.reports.filter((r) => !r.ok);
+      if (failed.length === result.reports.length && failed.length > 0) {
+        // EVERY group failed (the FRED-edge blip class): a failed row so the
+        // sweeps heal it within hours. A partial failure still patched what
+        // it could — ok, with the honest note.
+        return {
+          ok: false,
+          kind: 'failed' as const,
+          note: `both S3 groups failed: ${failed.map((r) => r.detail).join(' | ')}`,
+        };
+      }
+      return {
+        ok: true,
+        ...(result.patched
+          ? { note: `patched ${Object.keys(result.series).join(', ')} · histories ${result.histories.written} written` }
+          : { note: 'nothing to patch (no group parsed)' }),
+      };
+    },
   },
 ];
 

@@ -3094,6 +3094,363 @@
       }
     },
     {
+      "id": "term-premium-10y",
+      "title": "US 10-year term premium",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve Board (Kim-Wright) via FRED (THREEFYTP10)",
+        "url": "https://fred.stlouisfed.org/series/THREEFYTP10",
+        "seriesIdOrTable": "FRED:THREEFYTP10 (10-Year Treasury Term Premium, Kim-Wright, daily, %)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/THREEFYTP10",
+      "methodUrl": "https://fred.stlouisfed.org/series/THREEFYTP10",
+      "whatItIs": "The Kim-Wright 10-year Treasury term premium (the Federal Reserve Board’s own model, via FRED): the part of the 10-year yield left over after subtracting the average short rate the market expects over the bond’s life.",
+      "whatItIsnt": "It is a model estimate, not a market price you can see on a screen, and it says nothing about the next move in yields: a high premium can rise further and a low one can vanish.",
+      "trackRecordNote": "The premium spent the 2010s near or below zero (the era of trusted low inflation and heavy central-bank buying) and has been rebuilt since 2021, returning toward the positive territory that was normal before the financial crisis.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:THREEFYTP10"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve Board Kim-Wright term premium; series page read live 2026-11-01, the gap-closure S3-M3.2 scan — the class the M3.1 verification recorded) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:THREEFYTP10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "tga",
+      "title": "US Treasury General Account",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve via FRED (WTREGEN, H.4.1 table)",
+        "url": "https://fred.stlouisfed.org/series/WTREGEN",
+        "seriesIdOrTable": "FRED:WTREGEN (Liabilities and Capital: Other Factors Draining Reserve Balances: Treasury, General Account: Wednesday Level, weekly, $ millions)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/WTREGEN",
+      "methodUrl": "https://fred.stlouisfed.org/series/WTREGEN",
+      "whatItIs": "The Treasury General Account at the Federal Reserve (the H.4.1 weekly report via FRED): the US government’s own balance at the central bank, held in millions of dollars at each Wednesday.",
+      "whatItIsnt": "The level alone says nothing about direction of policy: a big balance can sit idle while a small one is about to be rebuilt with a bond-sale wave.",
+      "trackRecordNote": "The balance hovered near tens of billions for years, then swung violently around the 2023 debt-ceiling standoff, and has since been held far larger, in the hundreds of billions.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 21 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:WTREGEN"
+        ]
+      },
+      "unit": "usd-tr",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 21,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve H.4.1 Treasury General Account, Wednesday level; series page read live 2026-11-01, the gap-closure S3-M3.2 scan) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WTREGEN): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "reverse-repo",
+      "title": "Fed overnight reverse repo (RRP)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve Bank of New York via FRED (RRPONTSYD)",
+        "url": "https://fred.stlouisfed.org/series/RRPONTSYD",
+        "seriesIdOrTable": "FRED:RRPONTSYD (Overnight Reverse Repurchase Agreements: Treasury Securities Sold by the Federal Reserve in the Temporary Open Market Operations, daily, $ billions)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/RRPONTSYD",
+      "methodUrl": "https://fred.stlouisfed.org/series/RRPONTSYD",
+      "whatItIs": "The overnight reverse repurchase agreement facility (the Federal Reserve Bank of New York’s daily report via FRED): how many billions the Fed borrowed back overnight from money-market funds and other eligible users.",
+      "whatItIsnt": "The balance is a symptom, not a signal: the pile shrinks as bills supply rises or reserves thin, and a low balance is not by itself good or bad.",
+      "trackRecordNote": "The facility was a backwater for years, then exploded past two trillion dollars in 2022-23 as rates rose and funds had nowhere better to park, and has been draining since.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:RRPONTSYD"
+        ]
+      },
+      "unit": "usd-bn",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Federal Reserve Bank of New York overnight reverse repo; series page read live 2026-11-01, the gap-closure S3-M3.2 scan — displayed with the FRED attribution per the licence walk, the recorded acceptance the citation-required family rides) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:RRPONTSYD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "bank-reserves",
+      "title": "US bank reserves at the Fed",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "Federal Reserve via FRED (WRESBAL, H.4.1 table)",
+        "url": "https://fred.stlouisfed.org/series/WRESBAL",
+        "seriesIdOrTable": "FRED:WRESBAL (Reserve Balances with Federal Reserve Banks: Wednesday Level, weekly, $ millions)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/WRESBAL",
+      "methodUrl": "https://fred.stlouisfed.org/series/WRESBAL",
+      "whatItIs": "Reserve balances with Federal Reserve Banks (the H.4.1 weekly report via FRED): the total banks hold in their own accounts at the Fed, in millions of dollars at each Wednesday.",
+      "whatItIsnt": "There is no agreed number for scarce: the system’s need for reserves grows with the banking system itself, so the same level can be ample one year and tight the next.",
+      "trackRecordNote": "Reserves quadrupled with the 2020 bond purchases and have fallen steadily as the balance sheet runs off; funding-market wobbles in 2019 showed how sensitive the system is when this buffer thins.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 21 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:WRESBAL"
+        ]
+      },
+      "unit": "usd-tr",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 21,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve H.4.1 reserve balances, Wednesday level; series page read live 2026-11-01, the gap-closure S3-M3.2 scan) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WRESBAL): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "repo-stress",
+      "title": "Repo funding pressure (SOFR minus IORB)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (SOFR − IORB, derived)",
+        "url": "https://fred.stlouisfed.org/series/SOFR",
+        "seriesIdOrTable": "FRED:SOFR − FRED:IORB (derived, daily, percentage points)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/SOFR",
+      "methodUrl": "https://fred.stlouisfed.org/series/SOFR",
+      "whatItIs": "The secured overnight financing rate (SOFR) minus the interest rate on reserve balances (IORB), both via FRED: how many percentage points more (or less) borrowers pay for overnight cash compared with what banks earn parking money at the Fed.",
+      "whatItIsnt": "It measures one night’s funding, not the health of any bank or the economy, and end-of-quarter spikes fade as routinely as they appear.",
+      "trackRecordNote": "The gap sat near zero through most of the decade, spiked in the September 2019 repo squeeze, was pinned by the 2020-22 cash flood, and has returned to a small positive spread as the balance sheet runs off.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15). · Worst of legs (fred:SOFR, fred:IORB): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:SOFR",
+          "fred:IORB"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve interest on reserve balances; series page read live 2026-11-01, the gap-closure S3-M3.2 scan; the series carries administratively announced future-dated rows — trimmed to today at collect) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:SOFR, fred:IORB): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "net-liquidity",
+      "title": "US net liquidity",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (WALCL − WTREGEN − RRPONTSYD, derived)",
+        "url": "https://fred.stlouisfed.org/series/WALCL",
+        "seriesIdOrTable": "FRED:WALCL − FRED:WTREGEN − FRED:RRPONTSYD (derived, weekly Wednesday, $ millions)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/WALCL",
+      "methodUrl": "https://fred.stlouisfed.org/series/WALCL",
+      "whatItIs": "A derived measure: total Fed assets minus the Treasury General Account minus the overnight reverse repo balance (all three legs via FRED). Stated in millions of dollars at each Wednesday.",
+      "whatItIsnt": "It is an accounting identity, not a forecast: the same liquidity level can accompany rising or falling markets depending on the demand for money at the time.",
+      "trackRecordNote": "The measure became a market watchword in the 2020s: it surged with the bond purchases, and each trillion of run-off has shown up here first, often months before prices responded.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 21 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15). · Worst of legs (fred:WALCL, fred:WTREGEN, fred:RRPONTSYD): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:WALCL",
+          "fred:WTREGEN",
+          "fred:RRPONTSYD"
+        ]
+      },
+      "unit": "usd-tr",
+      "changeUnit": "percent",
+      "cadence": "weekly",
+      "maxAgeDays": 21,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Federal Reserve Bank of New York overnight reverse repo; series page read live 2026-11-01, the gap-closure S3-M3.2 scan — displayed with the FRED attribution per the licence walk, the recorded acceptance the citation-required family rides) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WALCL, fred:WTREGEN, fred:RRPONTSYD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "gold-silver",
       "title": "Gold / Silver",
       "area": {

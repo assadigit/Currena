@@ -209,6 +209,15 @@ export const FRED_SERIES = {
   jobOpenings: 'JTSJOL', // job-openings: JOLTS total nonfarm, monthly k (public domain)
   t5yie: 'T5YIE', // t5yie: 5-year breakeven inflation, daily (citation-required)
   averageHourlyEarnings: 'AHETPI', // us-wages: avg hourly earnings → 12-month % change (public domain)
+  // ---- gap-closure S3-M3.2 (2026-11-01; each verified from the provider's
+  // own fredgraph.csv + series page 2026-11-01, T-16 classes in
+  // data/fred-copyright.json). These ride the rung4 'fred-s3' groups
+  // (FRED_S3_GROUPS below), NOT the main rung's FRED_BULK_GROUPS ----
+  termPremium10y: 'THREEFYTP10', // term-premium-10y: Kim-Wright 10y term premium, daily % (public domain)
+  tga: 'WTREGEN', // tga: Treasury General Account, weekly Wednesday $m (public domain)
+  reverseRepo: 'RRPONTSYD', // reverse-repo: overnight reverse repo, daily $bn (citation-required)
+  bankReserves: 'WRESBAL', // bank-reserves: reserve balances with Fed banks, weekly Wednesday $m (public domain)
+  iorb: 'IORB', // repo-stress leg: interest on reserve balances, daily 7-day % (public domain; CARRIES FUTURE-DATED announced rows — trimmed to today at parse)
   // NOTE (M3/D-44, 2026-10-24): the ICE BofA credit-spread series
   // (BAMLH0A0HYM2 / BAMLC0A0CM) are deliberately ABSENT: the T-16 scan
   // found FRED's "copyright-pre-approval" tag on them — the publisher's
@@ -378,3 +387,53 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
 
 /** Every series the bulk groups must cover (the collect layer asserts this). */
 export const FRED_BULK_ALL_IDS: readonly string[] = FRED_BULK_GROUPS.flatMap((g) => g.seriesIds);
+
+/**
+ * gap-closure S3 (2026-11-01): the rung4 'fred-s3' bulk groups — the S3
+ * US-plumbing series that must NEVER ride the 04:10 main rung (~47/50
+ * subrequests; the free-tier budget table). Two requests of ≤ 6 ids each
+ * (the fredgraph ZIP truncates past ~12 ids — the M6 probe), fetched by
+ * collectRung4Sources (adapters/rung4.ts) on the 04:35 extra rung and by
+ * the Node venue's inline collection. Same discipline as FRED_BULK_GROUPS:
+ * every id must come back somewhere in the answer or the fetch fails
+ * loudly; the decade window matches the percentile basis. The liquidity
+ * group also carries CCSA (continuing claims — verified in M3.1; its card
+ * lands with M3.4, the fetch shape is stable from day one).
+ */
+export const FRED_S3_GROUPS: readonly FredBulkGroup[] = [
+  // The liquidity/funding family: term premium (daily), TGA + reserves
+  // (weekly Wednesday), reverse repo (daily), IORB (daily 7-day) — the
+  // ZIP members probed live 2026-11-01: daily.csv (THREEFYTP10, RRPONTSYD),
+  // weekly,_ending_wednesday.csv (WTREGEN, WRESBAL), daily,_7-day.csv
+  // (IORB), weekly,_ending_saturday.csv (CCSA).
+  {
+    seriesIds: [
+      FRED_SERIES.termPremium10y,
+      FRED_SERIES.tga,
+      FRED_SERIES.reverseRepo,
+      FRED_SERIES.bankReserves,
+      FRED_SERIES.iorb,
+      'CCSA', // continuing claims — the M3.4 card; rides the same request
+    ],
+    window: 'decade',
+  },
+  // The S3 macro family (M3.4/M3.5 cards): GDPNow (quarterly), Empire
+  // State (monthly), median + sticky CPI (monthly), the federal
+  // surplus/deficit (monthly), SLOOS C&I tightening (quarterly) — probed
+  // live 2026-11-01: quarterly.csv (GDPNOW, DRTSCILM) + monthly.csv (the
+  // other four).
+  {
+    seriesIds: [
+      'GDPNOW',
+      'GACDISA066MSFRBNY',
+      'MEDCPIM158SFRBCLE',
+      'STICKCPIM158SFRBATL',
+      'MTSDS133FMS',
+      'DRTSCILM',
+    ],
+    window: 'decade',
+  },
+];
+
+/** Every series the S3 groups cover (rung4's own registry). */
+export const FRED_S3_ALL_IDS: readonly string[] = FRED_S3_GROUPS.flatMap((g) => g.seriesIds);

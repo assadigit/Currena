@@ -5,6 +5,71 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01a] — gap-closure S3-M3.2: the US liquidity and funding family — six context cards riding the new rung4 'fred-s3' source (the 104th–109th indicators)
+
+S3's first build milestone: the spec's "Liquidity and term premium from
+FRED" — the plumbing the market-stress gauge's story was missing (the spec's
+own motivation: "The market-stress gauge has no credit, funding or liquidity
+voter"; these cards are CONTEXT-ONLY per G-5, the promotion decision is S6's).
+
+- **The six indicators** (all context, all P1, the 104th–109th):
+  `term-premium-10y` (FRED THREEFYTP10, the Kim-Wright premium, daily %),
+  `tga` (WTREGEN, the Treasury General Account, weekly Wednesday $M),
+  `reverse-repo` (RRPONTSYD, the overnight reverse repo pile, daily $B,
+  citation-required — displayed with the FRED attribution), `bank-reserves`
+  (WRESBAL, weekly Wednesday $M), and the two DERIVED spreads:
+  `repo-stress` (SOFR − IORB, the funding-pressure gauge; inner join on
+  common dates, 4dp quantized, the breakeven-tilt discipline) and
+  `net-liquidity` (WALCL − TGA − RRP×1000, the money actually available to
+  markets; RRP converted $B → $M inside the derivation). Placed in the
+  `market-stress` lane (the spec's option 1 — read after gauges.ts, whose
+  1:1 group↔gauge mapping makes a context-only "Liquidity and funding"
+  group render a permanently-cannot-read gauge; recorded as the choice).
+- **Ingest capacity (the rung4 registration — RUNGS.md updated):** the
+  fetches NEVER touch the 04:10 main rung (~47/50). The new 'fred-s3'
+  extra source rides the 04:35 rung4 slot the S1-M1.7 scaffolding reserved:
+  TWO fredgraph ZIP requests (the two truncation-safe 6-id groups verified
+  in M3.1) + 3 reads (stage legs, snapshot, status) + 10 writes (6 OWN
+  history keys — the 04:25/04:27 daily halves now EXCLUDE the rung4 ids,
+  both to keep the CPU-split arithmetic and to keep history ownership clean
+  — plus snapshot/public/stage/status patches). Declared budget 16; live
+  verified via the manual lever. Day gate: daily (the groups carry daily
+  series); the 10:10/20:10 sweeps heal failures within hours.
+- **The carry-forward:** the main rung's build now carries RUNG2 ∪ RUNG4
+  (`CARRY_FORWARD_IDS` in ingest/run.ts) — at 04:10 the six readings carry
+  verbatim from the previous snapshot (their series are absent by design)
+  and the 04:35 phase patches them; the Node venue (GHA 04:20 +
+  `scripts/ingest.ts`) runs the SAME collection inline (rung4Series), so
+  the venues cannot drift (the rung-2 discipline).
+- **Honesty machinery:** IORB's administratively announced FUTURE-dated
+  rows are trimmed to today at the collect boundary (the M3.1 finding —
+  pinned by its own test); the phase fails closed per group (one failing
+  ZIP never sinks the other) and per leg (a missing staged SOFR/WALCL leg
+  omits the derived card, never a partial number); T-16 records added for
+  all five new FRED series (live-verified licence tags 2026-11-01: four
+  public-domain + RRPONTSYD citation-required; the WSEFINTL1 record
+  untouched); sanity bands only where construction justifies them (the
+  three non-negative balance levels — no invented bounds for the spreads).
+- **The layer-1 jargon canon:** `liquidity` moves from "must be replaced"
+  to a proper glossary term (the yield/bond pattern — still flagged, always
+  glossed; wordlists.ts is the shared Layer-1/narrator canon). Six glossary
+  terms land (liquidity, term premium, Treasury General Account, reverse
+  repo, bank reserves, net liquidity — M3.6's list, arrived with the cards
+  that use them), EN + fa (Persian-copy round-62, manifest recorded).
+- **Numbers:** tests 10,526 → 10,546 green (+20: the rung4 suite — the
+  fixture-ZIP collection, the pure derivations, the phase orchestration,
+  the carry-forward, the history-phase exclusion, the registry pins);
+  Insights lazy 1179/278 → **1214/288** (measured 1213.69/287.07 — six
+  bilingual cards + six glossary terms × 2 dictionaries + the narrator
+  vocabulary growth; justified here and in check-bundle-budget.mjs).
+  KV writes/day: ~+10 (the phase's 6 histories + 4 patch writes at 04:35;
+  page-serve reads unchanged). Subrequests at 04:35: ~15/50.
+- **Docs:** RUNGS.md (the rung4 row — no longer empty, the 'fred-s3'
+  recipe), VERIFIED-SOURCES (the cosd note: the fredgraph ZIP path IGNORES
+  cosd — every member serves full history; probed live 2026-11-01),
+  fred-copyright.json (+5 records, 55 total), the scan script's lockstep
+  list.
+
 ## [2026-10-31y] — gap-closure S2-M2.4 completion: the weekly custody card (FRED WSEFINTL1) — the 103rd indicator, context-only, closing the Who-holds-US-government-debt section
 
 The S2 spec's M2.4 item 6 — "**Weekly custody card** (FRED `WSEFINTL1` once

@@ -114,7 +114,11 @@ export const JARGON: JargonSpec = [
   { en: 'equities', fa: 'سهام', termId: null },
   { en: 'bond', fa: 'اوراق قرضه', termId: 'bond' },
   { en: 'bonds', fa: 'اوراق قرضه', termId: 'bond' },
-  { en: 'liquidity', fa: 'نقدینگی', termId: null },
+  // gap-closure S3-M3.2 (2026-11-01): the liquidity family's cards use the
+  // word on their faces — it now carries its own glossary term (the
+  // yield/bond pattern: still flagged, always glossed) instead of the old
+  // blanket replace-it rule.
+  { en: 'liquidity', fa: 'نقدینگی', termId: 'liquidity' },
   { en: 'recession', fa: 'رکود', termId: 'recession' },
   { en: 'inflation', fa: 'تورم', termId: 'inflation' },
   { en: 'mortgage', fa: 'وام مسکن', termId: 'mortgage' },

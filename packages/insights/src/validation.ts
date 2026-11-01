@@ -758,6 +758,13 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // tilt — a breakeven-rate gap in percentage points (T5YIFR − T5YIE),
   // the t5yie/us-japan-10y-gap family.
   'breakeven-tilt',
+  // gap-closure S3-M3.2 (2026-11-01): the liquidity family's rate series —
+  // the term premium (a rate level) and the repo spread (a rate gap) both
+  // speak in percentage points, the sofr/yield-gap family. The four dollar
+  // BALANCE levels (tga, reverse-repo, bank-reserves, net-liquidity) stay
+  // 'pct' — the walcl convention.
+  'term-premium-10y',
+  'repo-stress',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */

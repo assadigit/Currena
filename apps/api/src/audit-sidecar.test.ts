@@ -69,8 +69,18 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'michigan-1y-expectations',
       'michigan-sentiment',
       'mortgage-30y',
+      // gap-closure S3-M3.2 (2026-11-01): the net-liquidity spread — its
+      // worst leg is RRPONTSYD (citation-required, display-permitted with
+      // attribution); the term-premium/tga/bank-reserves cards are L0
+      // public-domain and never bounded.
+      'net-liquidity',
       'nfci',
       'philly-fed',
+      // gap-closure S3-M3.2: the funding spreads — repo-stress's worst leg
+      // is SOFR (already in this licence class), reverse-repo is RRPONTSYD
+      // itself (citation-required, display-permitted with attribution).
+      'repo-stress',
+      'reverse-repo',
       'shiller-cape',
       'shiller-ecy',
       'silver-usd',

@@ -652,6 +652,17 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // group (T-16 scanned: citation-required, the recorded acceptance the
   // breakeven family already rides). Derived subtraction, worst-leg walk.
   'breakeven-tilt': ['fred:T5YIFR', 'fred:T5YIE'],
+  // gap-closure S3-M3.2 (2026-11-01): the liquidity/funding family's legs
+  // — the four direct cards (T-16 scanned 2026-11-01: THREEFYTP10 /
+  // WTREGEN / WRESBAL public domain; RRPONTSYD citation-required, the
+  // recorded acceptance) + the two derived spreads (SOFR and WALCL are
+  // the main rung's own series; IORB rides rung4's group).
+  'term-premium-10y': ['fred:THREEFYTP10'],
+  tga: ['fred:WTREGEN'],
+  'reverse-repo': ['fred:RRPONTSYD'],
+  'bank-reserves': ['fred:WRESBAL'],
+  'repo-stress': ['fred:SOFR', 'fred:IORB'],
+  'net-liquidity': ['fred:WALCL', 'fred:WTREGEN', 'fred:RRPONTSYD'],
 };
 
 /* ------------------------------------------------------------------ */
@@ -911,6 +922,16 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   // parse error (a wrong symbol, a percentage misread) without ever false-
   // alarming on a real revaluation, which would itself be historic news.
   usdaed: { min: 3.0, max: 4.5 },
+  // gap-closure S3-M3.2 (2026-11-01): the liquidity BALANCE levels —
+  // non-negative by construction (a balance held: the Treasury's account,
+  // the RRP facility's usage, banks' reserve deposits). A negative value
+  // is a parse error, never a real reading. The term-premium / repo-stress
+  // / net-liquidity SPREADS carry no band: they are differences that can
+  // honestly sit anywhere near zero, and inventing bounds would violate
+  // the no-invented-thresholds rule.
+  tga: { minExclusive: true },
+  'reverse-repo': { minExclusive: true },
+  'bank-reserves': { minExclusive: true },
 };
 
 /** F-14: is the value inside its definitional band? (true when no band is registered) */
