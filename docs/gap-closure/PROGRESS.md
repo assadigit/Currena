@@ -186,6 +186,22 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > claims M3.1→M3.6. Any other S3 session must `git pull --rebase` and
 > re-read this file before starting a milestone, skip every
 > already-ticked milestone, and record its claim here.
+>
+> **Continuation session's record (2026-11-01 02:20 UTC):** the owner
+> restarted the S3 session ("the last session was lost; pick up from
+> where you left off") at ~02:13 UTC. This continuation session found
+> M3.1 + M3.2 already landed on main (the M3.2 close-out `6593a70` was
+> authored 02:14:34 UTC — right at the restart boundary; the prior
+> session's process evidently survived long enough to finish its
+> verification push). Acknowledged and NOT re-done. **This continuation
+> session claims M3.3→M3.6 from 02:20 UTC.** If the prior session is
+> still alive: it must pull-rebase before its next commit, will see this
+> record, and stands down from any milestone claimed here (the S2
+> builder/verifier precedent — additive union on shared wording, the
+> first-landed copy wins). If counter-work for a milestone claimed here
+> lands on main FIRST, this session stands down from that milestone and
+> moves to the next unticked one. Every push does pull-rebase first
+> (§3.4).
 
 ### S4 Geopolitics, supply chain and energy (`S4-geopolitics-supply-energy.md`)
 - [ ] M4.1 Verification and egress
