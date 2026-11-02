@@ -52,6 +52,10 @@ import {
   NBS_PRESS_INDEX_URL,
   parseNbsPressIndex,
 } from './nbs';
+// gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+// family's fetchers — the IMF COFER adapter + the S&P 500 breadth pair.
+import { fetchCoferUsdShare } from './cofer';
+import { fetchSp500BreadthRatio } from './sp500-breadth';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -112,6 +116,14 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   // coincide with the first-of-month gates). All context-only per G-5.
   'china-property-investment',
   'china-steel-output',
+  // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+  // family's two fetched members — the IMF COFER USD share (quarterly,
+  // the Saturday re-check of a quarterly file + bootstrap: idempotent, the
+  // eiaWeekly/cftcWeekly discipline) + the S&P 500 breadth ratio (daily,
+  // two sequential Yahoo calls — the live-prices refresh's own shape).
+  // All context-only per G-5.
+  'usd-reserve-share',
+  'sp500-breadth-ratio',
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -133,6 +145,13 @@ export interface Rung2FetchPlan {
    * 21st-25th UTC window (the releases publish ~the 19th-20th of M+1)
    * + bootstrap. */
   nbsMonthly: boolean;
+  /** gap-closure S6-M6.3: the IMF COFER USD reserve share — quarterly
+   * data, re-checked every Saturday + bootstrap (idempotent fetch of a
+   * ~127 kB dataset; the publication cadence is ~1 quarter). */
+  coferQuarterly: boolean;
+  /** gap-closure S6-M6.3: the S&P 500 breadth ratio (RSP + SPY) — daily
+   * + bootstrap (a missing stage entry IS the bootstrap itself). */
+  breadthDaily: boolean;
 }
 
 /** Saturday is fetch day for the weekly pair (data Tue, publish Fri 17:30 ET). */
@@ -187,6 +206,9 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
   const needNzMonthly = missing.has('nz-short-rate') || missing.has('nz-10y');
   // gap-closure S6-M6.2: the NBS China pair bootstraps the same way.
   const needNbsMonthly = missing.has('china-property-investment') || missing.has('china-steel-output');
+  // gap-closure S6-M6.3: the COFER share + the breadth ratio bootstrap
+  // the same way (a fresh deploy on any day must not wait for Saturday).
+  const needCoferQuarterly = missing.has('usd-reserve-share');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
     eiaWeekly:
@@ -205,6 +227,13 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     // (the releases publish ~the 19th-20th; the window keeps the data
     // fresh AND the release link on index page 1).
     nbsMonthly: isNbsReleaseWindow(date) || needNbsMonthly,
+    // S6-M6.3: the COFER share rides the Saturday gate (a quarterly file
+    // needs no daily fetch — the eiaWeekly/cftcWeekly discipline; the
+    // sweeps heal a missed Saturday within hours anyway).
+    coferQuarterly: isSaturday(date) || needCoferQuarterly,
+    // S6-M6.3: the breadth ratio fetches every day (a missing stage entry
+    // IS the bootstrap itself — the mof/gpr-daily pattern).
+    breadthDaily: true,
   };
 }
 
@@ -435,6 +464,29 @@ export async function collectRung2Sources(
       fetchGprDailySeries(),
     );
     if (gprDaily !== undefined) series['gpr-daily'] = gprDaily;
+  }
+
+  // gap-closure S6-M6.3 (2026-11-02): the IMF COFER USD reserve share —
+  // one SDMX 3.0 request for the full dataset (Saturday + bootstrap; the
+  // parse takes the world USD-share quarterly series and fails closed on
+  // any shape drift). Cross-checked against the provider's own data brief
+  // (2026-Q2 = 56.70 %, exactly).
+  if (plan.coferQuarterly) {
+    const cofer = await fetchLogged('imf', 'COFER — USD share of world allocated FX reserves (quarterly)', () =>
+      fetchCoferUsdShare(),
+    );
+    if (cofer !== undefined) series['usd-reserve-share'] = cofer;
+  }
+
+  // gap-closure S6-M6.3 (2026-11-02): the S&P 500 breadth ratio — two
+  // sequential Yahoo chart requests (RSP + SPY, 10y), inner-joined on
+  // common dates and divided (4dp). Daily; a missing stage entry IS the
+  // bootstrap.
+  if (plan.breadthDaily) {
+    const breadth = await fetchLogged('yahoo', 'S&P 500 breadth ratio (RSP ÷ SPY, daily closes)', () =>
+      fetchSp500BreadthRatio(),
+    );
+    if (breadth !== undefined) series['sp500-breadth-ratio'] = breadth.ratio;
   }
 
   return { series, reports };

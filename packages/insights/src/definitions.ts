@@ -3109,4 +3109,83 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'info' },
     staleAfterDays: 75,
   },
+  /* -------- Global — Is the world's money concentrating? (S6-M6.3 shadow
+   * lane; every member context-only per G-5 until the S6-M6.4 promotion
+   * decision) -------- */
+  {
+    // gap-closure S6-M6.3 (2026-11-02): the USD share of world allocated
+    // foreign exchange reserves — the IMF COFER quarterly series
+    // (G001.AFXRA.CI_USD.SHRO_PT.Q), the de-dollarization lane's reserve
+    // measure. Quarterly with ~1-quarter publication lag (the 2026-Q2
+    // point published 2026-09-30 — the provider's own data brief; the
+    // parsed value 56.70 % matches it exactly). Cross-linked in copy to
+    // the Treasury-holders section (the S2 story is the reserve-
+    // diversification evidence). Context-only per G-5; rides rung2's
+    // Saturday gate (the weekly re-check of a quarterly file — idempotent,
+    // the eiaWeekly/cftcWeekly discipline) + bootstrap.
+    id: 'usd-reserve-share',
+    section: 'global',
+    group: 'dedollar-concentration',
+    name: 'USD share of world FX reserves',
+    source: 'imf',
+    sourceRef: 'IMF COFER (USD share of world allocated foreign exchange reserves, percent, quarterly)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // Quarterly ~1-quarter-lagged series: asOf (the quarter END) sits
+    // ~91 days behind publication, and the NEXT publication lands ~91
+    // days after that. 200 days = two consecutive missed releases before
+    // the card honestly reads stale (one slipped release never trips it:
+    // asOf 2026-06-30 + 200d = 2027-01-16, the 2026-Q3 release ~end of
+    // December refreshes it first).
+    staleAfterDays: 200,
+  },
+  {
+    // gap-closure S6-M6.3 (2026-11-02): the S&P 500 market-concentration
+    // PROXY — the equal-weight/cap-weight ratio (RSP ÷ SPY, Yahoo daily
+    // closes, inner-join on common dates). A falling ratio = the largest
+    // companies pulling away from the average member; a rising ratio =
+    // broader participation. LABELLED a proxy in the layer-1 copy (the
+    // spec's own limitation: a stand-in for the share of the largest
+    // companies, not their exact weight). Context-only per G-5; rides
+    // rung2's daily gate (+2 subrequests — the live-prices refresh's own
+    // two-call shape, sequential).
+    id: 'sp500-breadth-ratio',
+    section: 'global',
+    group: 'dedollar-concentration',
+    name: 'S&P 500 equal-weight vs cap-weight (ratio)',
+    source: 'yahoo',
+    sourceRef: 'Yahoo Finance RSP ÷ SPY daily closes (equal-weight vs cap-weight S&P 500 ETFs)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 4,
+  },
+  {
+    // gap-closure S6-M6.3 (2026-11-02): the Italy−Germany 10-year
+    // government bond yield spread (the BTP−Bund spread) — the euro
+    // area's own sovereign-stress gauge, the euro leg beside the bund/
+    // gilt mirrors in the borrowing lane. Derived from the two FRED OECD
+    // monthly mirrors (IRLTLT01ITM156N − IRLTLT01DEM156N, inner join on
+    // common months — the legs' revision cycles differ, so the latest
+    // common month is the honest latest point, the audnzd discipline).
+    // Monthly average, LAGGED (labelled in copy); citation-required on
+    // both legs (the T-16 records). Context-only per G-5; rides the MAIN
+    // rung's existing OECD-yields bulk group as its 5th id — zero new
+    // subrequests (the WSEFINTL1 precedent).
+    id: 'btp-bund-spread',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'Italy–Germany 10-year spread',
+    source: 'derived',
+    sourceRef: 'FRED IRLTLT01ITM156N − IRLTLT01DEM156N (OECD monthly mirrors, percentage points)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // The bund/gilt monthly-mirror convention (the legs' own cadence).
+    staleAfterDays: 75,
+  },
 ] as const;

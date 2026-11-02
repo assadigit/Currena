@@ -426,6 +426,18 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // Private-only cards: every IRLTLT01*/IRSTCI01* series carries FRED's
   // "copyright-citation-required" tag (T-16 scanned 2026-10-21).
   put('bund-10y', fred.IRLTLT01DEM156N);
+  // gap-closure S6-M6.3 (2026-11-02): the Italy−Germany 10-year spread —
+  // the euro area's own sovereign-stress gauge (the BTP−Bund spread),
+  // derived from the two OECD monthly mirrors in the SAME bulk group
+  // (inner join on common months — the legs' revision cycles differ, so
+  // the latest common month is the honest latest point, the audnzd
+  // discipline; 4dp quantized, F4). Fail closed on either leg missing.
+  put(
+    'btp-bund-spread',
+    fred.IRLTLT01ITM156N !== undefined && fred.IRLTLT01DEM156N !== undefined
+      ? quantized(combineSeries(fred.IRLTLT01ITM156N, fred.IRLTLT01DEM156N, (ita, deu) => ita - deu), 4)
+      : undefined,
+  );
   // A-2 (2026-10-26 gap-audit build): jgb-10y upgrades to the MOF's own
   // DAILY file — the OECD mirror (IRLTLT01JPM156N) retires to the labelled
   // fallback it always was (rung2.jgbMirror; the main rung passes nothing
@@ -1366,6 +1378,20 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   natgas: { name: 'FRED (EIA Henry Hub spot)', url: 'https://fred.stlouisfed.org/series/DHHNGSP' },
   platinum: { name: 'gold-api.com (XPT spot; history: World Bank Pink Sheet)', url: 'https://www.gold-api.com' },
   'bund-10y': { name: 'OECD via FRED (IRLTLT01DEM156N)', url: 'https://fred.stlouisfed.org/series/IRLTLT01DEM156N' },
+  'btp-bund-spread': {
+    name: 'OECD via FRED (IRLTLT01ITM156N − IRLTLT01DEM156N)',
+    url: 'https://fred.stlouisfed.org/series/IRLTLT01ITM156N',
+  },
+  // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+  // family's two source lines.
+  'usd-reserve-share': {
+    name: 'International Monetary Fund, COFER',
+    url: 'https://data.imf.org/en/datasets/IMF.STA:COFER',
+  },
+  'sp500-breadth-ratio': {
+    name: 'Yahoo Finance (RSP, SPY daily closes)',
+    url: 'https://finance.yahoo.com/quote/RSP',
+  },
   // A-2 (2026-10-26 gap-audit build): the MOF's own daily file is the
   // primary; the mirror attribution appears only when the fallback fills
   // (the readingSourceOverrides mechanism, the 04:20 phase).

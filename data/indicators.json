@@ -9574,6 +9574,184 @@
         "termsEvidence": "FRED series page (read live 2026-11-02, gap-closure S6-M6.1): title 'Interest Rates: Long-Term Government Bond Yields: 10-Year: Main (Including Benchmark) for New Zealand', source Organization for Economic Co-operation and Development, monthly Percent NSA, latest Sep 2026 (updated Oct 15, 2026), copyright class 'Copyrighted: Citation Required' — the IRLTLT01DEM156N bund-10y sibling (checked 2026-11-02) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:IRLTLT01NZM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
+    },
+    {
+      "id": "usd-reserve-share",
+      "title": "USD share of world FX reserves",
+      "area": {
+        "section": "global",
+        "group": "dedollar-concentration",
+        "gauge": "dedollar-concentration",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "imf",
+        "name": "International Monetary Fund, COFER",
+        "url": "https://data.imf.org/en/datasets/IMF.STA:COFER",
+        "seriesIdOrTable": "IMF COFER (USD share of world allocated foreign exchange reserves, percent, quarterly)"
+      },
+      "publisher": "International Monetary Fund (COFER)",
+      "publisherUrl": "https://data.imf.org/en/datasets/IMF.STA:COFER",
+      "methodUrl": "https://data.imf.org/en/datasets/IMF.STA:COFER",
+      "whatItIs": "The IMF’s COFER survey: the US-dollar share of world allocated foreign exchange reserves, quarterly, published about a quarter behind. Since late 2025 the IMF reports shares of total reserves, the unallocated residual having been eliminated by imputation.",
+      "whatItIsnt": "A quarterly survey of about 147 reporting authorities, published about a quarter behind; exchange-rate moves shift the measured share between quarters.",
+      "trackRecordNote": "From 71% in 1999 to about 57% now, the decline has been steady rather than sudden; the IMF’s own data briefs note the “other currencies” slice has more than doubled since 2021.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 200 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The IMF’s own Special Terms for Statistical Data, quoted verbatim (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the gap-closure S4-M4.3 PortWatch record, the same terms page; the plain fetch is bot-filtered and the link currently 301-redirects to a 404 marker, but the terms were read and recorded then): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — L1 with affirmative redistribution permission (the PortWatch precedent, the same IMF statistical-data terms). The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.”",
+        "termsReadOn": "2026-11-02",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "legs": [
+          "imf"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 200,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "IMF Terms of Use — special terms for statistical data",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-02",
+        "termsEvidence": "The IMF’s own Special Terms for Statistical Data, quoted verbatim in the gap-closure S4-M4.3 record (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the same terms page PortWatch’s own licence field declares; the plain fetch is bot-filtered and the URL now 301-redirects to a 404 marker, so the S4 read is the terms record of reference): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — affirmative redistribution permission with the attribution condition. The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.” L1 with quoted permission → public display with the attribution string above.",
+        "termsUrl": "https://www.imf.org/external/terms.htm"
+      }
+    },
+    {
+      "id": "sp500-breadth-ratio",
+      "title": "S&P 500 equal-weight vs cap-weight (ratio)",
+      "area": {
+        "section": "global",
+        "group": "dedollar-concentration",
+        "gauge": "dedollar-concentration",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "yahoo",
+        "name": "Yahoo Finance (RSP, SPY daily closes)",
+        "url": "https://finance.yahoo.com/quote/RSP",
+        "seriesIdOrTable": "Yahoo Finance RSP ÷ SPY daily closes (equal-weight vs cap-weight S&P 500 ETFs)"
+      },
+      "publisher": "Yahoo Finance (unofficial endpoints)",
+      "publisherUrl": "https://finance.yahoo.com/quote/RSP",
+      "methodUrl": "https://finance.yahoo.com/quote/RSP",
+      "whatItIs": "The Invesco equal-weight S&P 500 ETF price divided by the SPDR cap-weight ETF price (RSP ÷ SPY), daily closes. A PROXY: it reads the equal-weight index relative to the cap-weight one — a stand-in for the share of the market’s largest companies, not their exact weight; ETF tracking differences sit inside the level.",
+      "whatItIsnt": "A proxy measured through two ETFs, not the index weights themselves; the level mixes tracking differences with the concentration signal — read its direction, not its precise level.",
+      "trackRecordNote": "The ratio’s zones are read against its own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M3",
+        "runtime": "worker",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Data: Yahoo Finance",
+        "legs": [
+          "yahoo"
+        ]
+      },
+      "unit": "ratio",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "No reuse licence offered (unofficial endpoints)",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · OWNER DIRECTIVE (2026-10-19e): Spec-directed card (gap-closure S6-M6.3, the owner-approved plan: \"equal-weight vs cap-weight S&P 500 ratio from Yahoo (RSP and SPY; L2, already owner-accepted for Yahoo). Add sp500-breadth-ratio.\"); both legs are the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill, the metals histories and usdaed ride). The spec's directive lifts its worst-leg display bar.",
+        "termsUrl": "https://finance.yahoo.com/"
+      }
+    },
+    {
+      "id": "btp-bund-spread",
+      "title": "Italy–Germany 10-year spread",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "OECD via FRED (IRLTLT01ITM156N − IRLTLT01DEM156N)",
+        "url": "https://fred.stlouisfed.org/series/IRLTLT01ITM156N",
+        "seriesIdOrTable": "FRED IRLTLT01ITM156N − IRLTLT01DEM156N (OECD monthly mirrors, percentage points)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01ITM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01ITM156N",
+      "whatItIs": "Italy’s 10-year government bond yield minus Germany’s (the BTP–Bund spread), monthly averages from the OECD’s mirrors on FRED — published about a month behind, on the months both legs carry.",
+      "whatItIsnt": "A monthly average, lagged; the daily spikes between prints are not visible here.",
+      "trackRecordNote": "The spread’s zones are read against its own trailing decade, recomputed on every write — never fixed numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15). · Worst of legs (fred:IRLTLT01ITM156N, fred:IRLTLT01DEM156N): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:IRLTLT01ITM156N",
+          "fred:IRLTLT01DEM156N"
+        ]
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:IRLTLT01ITM156N, fred:IRLTLT01DEM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     }
   ]
 }

@@ -455,6 +455,11 @@ export const IndicatorIdSchema = z.enum([
   // nbs-indprod-release.html, both headline-cross-checked).
   'china-property-investment', // NBS real-estate development investment, YTD year-on-year % — context, au-trade-currency
   'china-steel-output', // NBS crude steel output, monthly, 10,000 tons — context, au-trade-currency
+  // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+  // family — all context-only per G-5 until the S6-M6.4 promotion decision.
+  'usd-reserve-share', // IMF COFER USD share of world allocated FX reserves, quarterly — context, dedollar-concentration
+  'sp500-breadth-ratio', // RSP/SPY equal-vs-cap-weight S&P 500 ratio (Yahoo), daily — context, dedollar-concentration
+  'btp-bund-spread', // Italy−Germany 10y yield spread (FRED OECD monthly mirrors), monthly — context, borrowing-costs
   // Global — Prices lane companions (context rows rendered in lanes)
   // 2026-10-26 gap-audit build (A-4): gold measured in oil — the classic
   // long-run relative-value ratio, derived gold-usd ÷ brent.
@@ -651,6 +656,12 @@ export const IndicatorGroupIdSchema = z.enum([
   // are excluded from sectionVerdictStep by design).
   'au-activity',
   'au-external',
+  // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+  // lane — "Is the world's money concentrating?". A SHADOW gauge until S6
+  // (G-5, the geo-fragmentation precedent): every member context-only, the
+  // lane header reads "not scored yet", the global summary counts stay
+  // untouched (a step-0 gauge is excluded from sectionVerdictStep by design).
+  'dedollar-concentration',
 ]);
 export type IndicatorGroupId = z.infer<typeof IndicatorGroupIdSchema>;
 
@@ -735,6 +746,12 @@ export const IndicatorSourceSchema = z.enum([
   // licence with attribution; quoted verbatim in sources.ts). Worker egress
   // FAST (the S1 probe: ~0.5 s).
   'nyfed',
+  // gap-closure S6-M6.3 (2026-11-02): the IMF COFER dataset — the SDMX 3.0
+  // API at api.imf.org (register row imf-cofer, L1 — the IMF's own
+  // Special Terms for Statistical Data grant redistribution with
+  // attribution, the PortWatch precedent; quoted verbatim in sources.ts).
+  // Worker egress FAST (the S6-M6.3 probe: ~1.2–1.5 s, 200 byte-identical).
+  'imf',
   // 2026-10-21 data-integrity round: EODHD crypto (eth-usd) — RETIRED with
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage

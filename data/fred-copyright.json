@@ -1,6 +1,6 @@
 {
   "_comment": "T-16 FRED copyright scan. Three classes (FRED legal, read 2026-10-21): public-domain -> public; citation-required (copyrightNotice=true) -> display-permitted WITH \"Source: publisher via FRED\" attribution; pre-approval (license contains 'pre-approval') -> private-only, no fetch, no display until the publisher's permission is recorded (D-44, 2026-10-24). Re-run the scan when a series is added.",
-  "scannedOn": "2026-11-01",
+  "scannedOn": "2026-11-02",
   "records": [
     {
       "seriesId": "T10Y2Y",
@@ -505,6 +505,14 @@
       "checkedOn": "2026-11-02",
       "evidence": "FRED series page (read live 2026-11-02, gap-closure S6-M6.1): title 'Interest Rates: Long-Term Government Bond Yields: 10-Year: Main (Including Benchmark) for New Zealand', source Organization for Economic Co-operation and Development, monthly Percent NSA, latest Sep 2026 (updated Oct 15, 2026), copyright class 'Copyrighted: Citation Required' — the IRLTLT01DEM156N bund-10y sibling",
       "url": "https://fred.stlouisfed.org/series/IRLTLT01NZM156N"
+    },
+    {
+      "seriesId": "IRLTLT01ITM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-02",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (the provider page read live 2026-11-02, the same class as its bund/gilt/NZ siblings)",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01ITM156N"
     }
   ]
 }

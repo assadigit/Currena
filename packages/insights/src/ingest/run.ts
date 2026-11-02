@@ -832,7 +832,7 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   const missing = new Set<string>(RUNG2_IDS.filter((id) => (stage ? stage.series[id] === undefined : true)));
   const plan = opts.plan ?? rung2FetchPlanFor(now, missing);
   console.log(
-    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly}` +
+    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly} coferQuarterly=${plan.coferQuarterly} breadthDaily=${plan.breadthDaily}` +
       (stage === undefined ? ' (no stage — the Node/manual venue)' : ` (bootstrap-missing: ${[...missing].join(', ') || 'none'})`),
   );
 
@@ -966,6 +966,12 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     // series month by month (the china-cpi union discipline).
     'china-property-investment',
     'china-steel-output',
+    // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+    // family's fetched members — the COFER share (full history per fetch,
+    // fetched wins on collision) + the breadth ratio (the 10-year window
+    // arrives with every fetch, fetched wins on collision).
+    'usd-reserve-share',
+    'sp500-breadth-ratio',
   ] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;

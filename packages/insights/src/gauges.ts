@@ -215,6 +215,19 @@ export const GAUGES: readonly GaugeDef[] = [
     section: 'australia',
     members: ['au-trade-balance', 'audnzd', 'nz-short-rate', 'nz-10y'],
   },
+  // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+  // lane — "Is the world's money concentrating?". A SHADOW gauge (G-5, the
+  // geo-fragmentation precedent): every member context-only until S6-M6.4's
+  // promotion decision, so votingCount stays 0, the step stays 0 (excluded
+  // from sectionVerdictStep by design — the global summary counts are
+  // unchanged), and the lane header reads the "not scored yet" words. The
+  // members list exists so the counts + the stale badge read the lane's
+  // own membership.
+  {
+    id: 'dedollar-concentration',
+    section: 'global',
+    members: ['usd-reserve-share', 'sp500-breadth-ratio'],
+  },
 ];
 
 export interface GaugeReading {

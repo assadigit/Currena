@@ -30,6 +30,10 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
     // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane — a
     // shadow gauge until S6 (context-only members, "not scored yet").
     'geo-fragmentation',
+    // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+    // lane — a shadow gauge until S6 (context-only members, "not scored
+    // yet" — the COFER reserve share + the S&P 500 breadth proxy).
+    'dedollar-concentration',
   ],
   australia: [
     'au-inflation-rates',
@@ -55,7 +59,7 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
  * step computation are unchanged.
  */
 export const LANE_GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGroupId[]>> = {
-  global: ['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health', 'geo-fragmentation'],
+  global: ['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health', 'geo-fragmentation', 'dedollar-concentration'],
   australia: ['au-inflation-rates', 'au-households', 'au-trade-currency', 'au-activity', 'au-external'],
 };
 

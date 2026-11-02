@@ -518,6 +518,31 @@ const NYFED: SourceLicence = {
   termsUrl: 'https://www.newyorkfed.org/privacy/termsofuse',
 };
 
+/**
+ * gap-closure S6-M6.3 (2026-11-02) — the IMF COFER dataset. The same
+ * IMF statistical-data terms as PortWatch (the S4-M4.3 real-browser read
+ * of the terms page, quoted verbatim there) govern COFER — it is “Data
+ * obtained from IMF Sites” — and the provider's own API page (read
+ * 2026-11-02) affirms SDMX API import: “You can use the APIs to import
+ * data from datasets available on http://data.imf.org into your data
+ * systems or applications.” L1 with quoted permission. Worker egress
+ * FAST (the S6-M6.3 probe: ~1.2–1.5 s, 200 byte-identical); runtime is
+ * the Worker (rung-2 Saturday gate) + the Node venue's inline collect.
+ */
+const IMF_COFER: SourceLicence = {
+  provider: 'imf',
+  label: 'International Monetary Fund (COFER)',
+  licenceName: 'IMF Terms of Use — special terms for statistical data',
+  attributionText: 'Source: International Monetary Fund, COFER',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-02',
+  termsEvidence:
+    'The IMF’s own Special Terms for Statistical Data, quoted verbatim in the gap-closure S4-M4.3 record (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the same terms page PortWatch’s own licence field declares; the plain fetch is bot-filtered and the URL now 301-redirects to a 404 marker, so the S4 read is the terms record of reference): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — affirmative redistribution permission with the attribution condition. The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.” L1 with quoted permission → public display with the attribution string above.',
+  termsUrl: 'https://www.imf.org/external/terms.htm',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -540,6 +565,7 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fiscaldata: FISCALDATA,
   portwatch: PORTWATCH,
   nyfed: NYFED,
+  imf: IMF_COFER,
   tic: TIC,
   eia: EIA,
   frb: FRB,

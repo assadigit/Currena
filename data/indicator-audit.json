@@ -2055,6 +2055,45 @@
       "maxAgeDays": 75,
       "ruleVersion": 4,
       "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "usd-reserve-share",
+      "licenceName": "IMF Terms of Use — special terms for statistical data",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L1",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 200,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "sp500-breadth-ratio",
+      "licenceName": "No reuse licence offered (unofficial endpoints)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M3",
+      "maxAgeDays": 4,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "btp-bund-spread",
+      "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": true,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 75,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
     }
   ]
 }

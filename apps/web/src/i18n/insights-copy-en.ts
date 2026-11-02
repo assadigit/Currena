@@ -421,6 +421,23 @@ const LAYER1 = {
       plain: 'The first solid steel a mill makes, before it is rolled into sheets, beams or wire. Counting it raw measures how much steel-making, and so iron-ore buying, a country is doing.',
       example: 'A monthly output of 7359 (10,000 tons) means China\u2019s mills made about 73.6 million tonnes of crude steel that month.',
     },
+    // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+    // family's + the euro-spread card's glossary terms.
+    'reserve-share': {
+      term: 'reserve share',
+      plain: 'The share of the world\u2019s official foreign exchange reserves held in one currency. Central banks and monetary authorities report their reserve stocks to the IMF; adding them up shows which currencies the world\u2019s safety cushions lean on.',
+      example: 'A US dollar reserve share of 56.7% means about 56.7 cents of every allocated reserve dollar was held in US-dollar assets.',
+    },
+    'equal-weight-index': {
+      term: 'equal-weight index',
+      plain: 'A stock index that counts every member company the same, however big it is. Next to the usual index, where bigger companies count for more, the pair shows how much the giants are doing the moving.',
+      example: 'If the 500 companies move together, the equal-weight and cap-weight versions rise and fall as one; when only the giants move, they split apart.',
+    },
+    'sovereign-spread': {
+      term: 'sovereign spread',
+      plain: 'The gap between what two governments pay to borrow for the same term. A wider gap means lenders see more difference in risk between the two countries.',
+      example: 'A spread of 0.25 points means lending to Italy for ten years pays 0.25 percentage points more than lending to Germany.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -1886,6 +1903,45 @@ const LAYER1 = {
       ],
       australiaAngle: 'The demand gauge under Australia’s biggest export: how much steel-making, and so iron-ore buying, China is doing.',
       glossaryTerms: ['crude-steel', 'commodity'],
+    },
+    // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+    // family (context-only, the new shadow lane) + the euro sovereign-stress
+    // spread in the borrowing lane.
+    'usd-reserve-share': {
+      plainName: 'The dollar’s slice of world reserves',
+      oneLine: 'The share of the world’s official foreign exchange reserves held in US dollars, quarterly.',
+      ifRising: 'A rising share usually reads central banks leaning further on the dollar for their safety cushions.',
+      ifFalling: 'A falling share usually reads the slow drift of reserves toward other currencies.',
+      connections: [
+        { with: 'nyfed-custody', text: 'The Treasury-holders section below shows the other half of this story: the dollar debt those reserves help finance.', strength: 'usually' },
+        { with: 'dollar-basket', text: 'The reserve share moves over years; the basket moves over days.', strength: 'usually' },
+      ],
+      australiaAngle: 'The dollar’s global role is the backdrop every AUD pair trades against; this reads its slow, decades-long arc.',
+      glossaryTerms: ['reserve-share', 'central-bank', 'safe-haven'],
+    },
+    'sp500-breadth-ratio': {
+      plainName: 'America’s biggest market, weighed two ways',
+      oneLine: 'Whether the US share market’s moving is broad or carried by its giants.',
+      ifRising: 'The average company is usually catching up with the giants: broader participation.',
+      ifFalling: 'The giants are usually pulling away from the average member: the market’s moving is concentrating.',
+      connections: [
+        { with: 'shiller-cape', text: 'The same market, read for price against a decade of earnings.', strength: 'usually' },
+        { with: 'vix', text: 'Narrow markets and jumpy ones are different readings; the pair tells them apart.', strength: 'usually' },
+      ],
+      australiaAngle: 'The US market is the biggest single weight in the world share indexes Australian savings tend to ride.',
+      glossaryTerms: ['equal-weight-index', 'stock-index'],
+    },
+    'btp-bund-spread': {
+      plainName: 'Italy–Germany borrowing gap',
+      oneLine: 'How much more Italy pays than Germany to borrow for ten years.',
+      ifRising: 'Lenders are usually asking more of a premium for Italy over Germany.',
+      ifFalling: 'The premium Italy pays over Germany is usually narrowing.',
+      connections: [
+        { with: 'bund-10y', text: 'The German leg of this gap has its own card beside it.', strength: 'reliable' },
+        { with: 'ecb-dfr', text: 'The ECB’s policy rate sits at the short end of the euro rates this gap compares.', strength: 'usually' },
+      ],
+      australiaAngle: 'Euro-area stress tends to steer world risk appetite, which the Australian dollar usually feels.',
+      glossaryTerms: ['sovereign-spread', 'central-bank', 'policy-rate'],
     },
 
     /* ----- Batch 16 — world stock markets: Asia-Pacific (7) ----- */
@@ -5160,6 +5216,77 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'Beside the Australian 10-year, it shows how much more or less long-term money pays across the Tasman.',
   },
+  // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+  // family + the euro sovereign-stress spread (all context-only per G-5).
+  'usd-reserve-share': {
+    name: 'USD share of world FX reserves',
+    ticker: 'Reserve share',
+    oneLiner:
+      'The share of the world\u2019s official foreign exchange reserves held in US dollars, published quarterly by the IMF.',
+    lines: {
+      highRising: 'The dollar\u2019s share sits high in its decade range and is edging up.',
+      highEasing: 'The share sits high in its decade range but is easing down.',
+      typical: 'The share sits in its usual range of the past decade.',
+      low: 'The share sits unusually low for the past decade — the de-dollarization drift, read directly.',
+    },
+    unitNote: 'percent of world allocated foreign exchange reserves (quarterly)',
+    whatItIs:
+      'The IMF\u2019s COFER survey: the US-dollar share of world allocated foreign exchange reserves, quarterly, published about a quarter behind. Since late 2025 the IMF reports shares of total reserves, the unallocated residual having been eliminated by imputation.',
+    whyItMatters:
+      'The dollar\u2019s reserve role is the backbone of its global reach; a slowly falling share reads the de-dollarization drift — a decades-slow tendency, never a verdict.',
+    tendedToMean:
+      'From 71% in 1999 to about 57% now, the decline has been steady rather than sudden; the IMF\u2019s own data briefs note the \u201cother currencies\u201d slice has more than doubled since 2021.',
+    cantTell:
+      'A quarterly survey of about 147 reporting authorities, published about a quarter behind; exchange-rate moves shift the measured share between quarters.',
+    forYou:
+      'Read it beside the Who holds US government debt section below: the currencies reserve stocks lean on and the Treasury debt they finance are two halves of the same dollar-exposure story.',
+  },
+  'sp500-breadth-ratio': {
+    name: 'S&P 500 equal-weight vs cap-weight (ratio)',
+    ticker: 'Breadth ratio',
+    oneLiner:
+      'Whether the US share market\u2019s moving is broad or carried by its giants, read through one ratio.',
+    lines: {
+      highRising: 'The average member is catching up with the giants — broader participation.',
+      highEasing: 'The ratio remains above its decade norm but is easing back toward it.',
+      typical: 'The ratio sits in its usual range of the past decade.',
+      low: 'The giants are pulling away from the average member — the concentration this ratio reads directly.',
+    },
+    unitNote: 'ratio of the equal-weight to the cap-weight ETF price (daily)',
+    whatItIs:
+      'The Invesco equal-weight S&P 500 ETF price divided by the SPDR cap-weight ETF price (RSP \u00f7 SPY), daily closes. A PROXY: it reads the equal-weight index relative to the cap-weight one — a stand-in for the share of the market\u2019s largest companies, not their exact weight; ETF tracking differences sit inside the level.',
+    whyItMatters:
+      'When the biggest names do most of the index\u2019s moving, the market\u2019s fortunes narrow to a handful of companies — a tilt that narrows what \u201cthe market\u201d means.',
+    tendedToMean:
+      'The ratio\u2019s zones are read against its own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'A proxy measured through two ETFs, not the index weights themselves; the level mixes tracking differences with the concentration signal — read its direction, not its precise level.',
+    forYou:
+      'Read it beside the Shiller valuation cards: the same market, weighed two ways.',
+  },
+  'btp-bund-spread': {
+    name: 'Italy–Germany 10-year spread',
+    ticker: 'BTP–Bund',
+    oneLiner:
+      'How much more Italy pays than Germany to borrow for ten years — the euro area\u2019s own stress gauge.',
+    lines: {
+      highRising: 'Italy\u2019s long-term borrowing costs are pulling away from Germany\u2019s — the euro-area premium is widening.',
+      highEasing: 'The premium remains above its decade norm but is easing.',
+      typical: 'The spread sits in its usual range of the past decade.',
+      low: 'The premium Italy pays over Germany is unusually small for the decade.',
+    },
+    unitNote: 'percentage points (monthly average)',
+    whatItIs:
+      'Italy\u2019s 10-year government bond yield minus Germany\u2019s (the BTP–Bund spread), monthly averages from the OECD\u2019s mirrors on FRED — published about a month behind, on the months both legs carry.',
+    whyItMatters:
+      'The gap prices the extra premium of lending to Italy versus Germany; wide gaps have tended to come with euro-area stress episodes.',
+    tendedToMean:
+      'The spread\u2019s zones are read against its own trailing decade, recomputed on every write — never fixed numbers.',
+    cantTell:
+      'A monthly average, lagged; the daily spikes between prints are not visible here.',
+    forYou:
+      'Beside the Bund card (the German leg) and the euro inflation cards — the euro block\u2019s stress read.',
+  },
   // 2026-10-21 data-integrity round — the coverage additions (WTI,
   // natural gas, platinum, ETH, Bund/JGB/Gilt, BoJ/BoE rates, NZD/USD,
   // US GDP growth and nonfarm payrolls): recovered verbatim from the
@@ -8078,6 +8205,9 @@ export const insightsCopyEn = {
     // gap-closure S6-M6.1 (2026-11-02): the lane now carries the New
     // Zealand link family too.
     'au-external': 'How are Australia\u2019s trade and partner links?',
+    // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+    // lane — a shadow gauge until S6 (the header reads "not scored yet").
+    'dedollar-concentration': 'Is the world\u2019s money concentrating?',
   },
 
   /** R30: SHORT gauge names for the hero: the reason line once embedded
@@ -8097,6 +8227,9 @@ export const insightsCopyEn = {
     // gap-closure S5-M5.2 (2026-11-02).
     'au-activity': 'Activity',
     'au-external': 'Trade & partners',
+    // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+    // lane's short name.
+    'dedollar-concentration': 'Concentration',
   },
 
   /** The one-line answer under each gauge heading (L2). */
@@ -8116,6 +8249,10 @@ export const insightsCopyEn = {
       'The Australian economy\u2019s pace: output, spending, construction, population and the labour market.',
     'au-external':
       'Australia\u2019s goods trade, its commodity links and the New Zealand connection.',
+    // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+    // lane's one-line answer.
+    'dedollar-concentration':
+      'The dollar\u2019s slice of world reserves and how top-heavy America\u2019s share market is.',
   },
 
   status: {

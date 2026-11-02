@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "9ce488f88abde0b29464f196e99ccaa141083c8b57169bc39482dad77b9a7224",
-    "faSha256": "c8f2e7d1038dd2fb8f04865cc95f13a278895495aff69ce35d04ff387259fe48",
-    "indicatorCount": 187,
-    "glossaryCount": 53
+    "enSha256": "034d2b7d4937f05eba6da2ac50aff27b632244db72dd065777618c0f93f25dab",
+    "faSha256": "f406843b62c41cdfdbd899008b202843290b2fdeb8738a0a51153f1dba61755b",
+    "indicatorCount": 190,
+    "glossaryCount": 56
   },
   "en": {
     "indicators": {
@@ -2704,6 +2704,77 @@
           "commodity"
         ]
       },
+      "usd-reserve-share": {
+        "plainName": "The dollar’s slice of world reserves",
+        "oneLine": "The share of the world’s official foreign exchange reserves held in US dollars, quarterly.",
+        "ifRising": "A rising share usually reads central banks leaning further on the dollar for their safety cushions.",
+        "ifFalling": "A falling share usually reads the slow drift of reserves toward other currencies.",
+        "connections": [
+          {
+            "with": "nyfed-custody",
+            "text": "The Treasury-holders section below shows the other half of this story: the dollar debt those reserves help finance.",
+            "strength": "usually"
+          },
+          {
+            "with": "dollar-basket",
+            "text": "The reserve share moves over years; the basket moves over days.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "The dollar’s global role is the backdrop every AUD pair trades against; this reads its slow, decades-long arc.",
+        "glossaryTerms": [
+          "reserve-share",
+          "central-bank",
+          "safe-haven"
+        ]
+      },
+      "sp500-breadth-ratio": {
+        "plainName": "America’s biggest market, weighed two ways",
+        "oneLine": "Whether the US share market’s moving is broad or carried by its giants.",
+        "ifRising": "The average company is usually catching up with the giants: broader participation.",
+        "ifFalling": "The giants are usually pulling away from the average member: the market’s moving is concentrating.",
+        "connections": [
+          {
+            "with": "shiller-cape",
+            "text": "The same market, read for price against a decade of earnings.",
+            "strength": "usually"
+          },
+          {
+            "with": "vix",
+            "text": "Narrow markets and jumpy ones are different readings; the pair tells them apart.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "The US market is the biggest single weight in the world share indexes Australian savings tend to ride.",
+        "glossaryTerms": [
+          "equal-weight-index",
+          "stock-index"
+        ]
+      },
+      "btp-bund-spread": {
+        "plainName": "Italy–Germany borrowing gap",
+        "oneLine": "How much more Italy pays than Germany to borrow for ten years.",
+        "ifRising": "Lenders are usually asking more of a premium for Italy over Germany.",
+        "ifFalling": "The premium Italy pays over Germany is usually narrowing.",
+        "connections": [
+          {
+            "with": "bund-10y",
+            "text": "The German leg of this gap has its own card beside it.",
+            "strength": "reliable"
+          },
+          {
+            "with": "ecb-dfr",
+            "text": "The ECB’s policy rate sits at the short end of the euro rates this gap compares.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "Euro-area stress tends to steer world risk appetite, which the Australian dollar usually feels.",
+        "glossaryTerms": [
+          "sovereign-spread",
+          "central-bank",
+          "policy-rate"
+        ]
+      },
       "n225": {
         "plainName": "Japan’s biggest companies",
         "oneLine": "One number for how Japan’s largest companies are doing.",
@@ -4230,6 +4301,21 @@
         "term": "crude steel output",
         "plain": "The first solid steel a mill makes, before it is rolled into sheets, beams or wire. Counting it raw measures how much steel-making, and so iron-ore buying, a country is doing.",
         "example": "A monthly output of 7359 (10,000 tons) means China’s mills made about 73.6 million tonnes of crude steel that month."
+      },
+      "reserve-share": {
+        "term": "reserve share",
+        "plain": "The share of the world’s official foreign exchange reserves held in one currency. Central banks and monetary authorities report their reserve stocks to the IMF; adding them up shows which currencies the world’s safety cushions lean on.",
+        "example": "A US dollar reserve share of 56.7% means about 56.7 cents of every allocated reserve dollar was held in US-dollar assets."
+      },
+      "equal-weight-index": {
+        "term": "equal-weight index",
+        "plain": "A stock index that counts every member company the same, however big it is. Next to the usual index, where bigger companies count for more, the pair shows how much the giants are doing the moving.",
+        "example": "If the 500 companies move together, the equal-weight and cap-weight versions rise and fall as one; when only the giants move, they split apart."
+      },
+      "sovereign-spread": {
+        "term": "sovereign spread",
+        "plain": "The gap between what two governments pay to borrow for the same term. A wider gap means lenders see more difference in risk between the two countries.",
+        "example": "A spread of 0.25 points means lending to Italy for ten years pays 0.25 percentage points more than lending to Germany."
       }
     },
     "ui": {
@@ -8259,6 +8345,77 @@
           "bond",
           "yield"
         ]
+      },
+      "usd-reserve-share": {
+        "plainName": "سهم دلار از ذخایر جهان",
+        "oneLine": "سهم دلار آمریکا از کل ذخایر ارزی رسمی جهان، سه‌ماهه.",
+        "ifRising": "رشد سهم معمولاً یعنی بانک‌های مرکزی ذخایر امنیتی خود را بیشتر بر دلار تکیه کرده‌اند.",
+        "ifFalling": "کاهش سهم معمولاً یعنی ذخایر آرام‌آرام به سوی ارزهای دیگر می‌روند.",
+        "connections": [
+          {
+            "with": "nyfed-custody",
+            "text": "بخش «برگه‌داران بدهی دولت آمریکا» در پایین صفحه، نیمهٔ دیگر همین ماجرا را نشان می‌دهد: بدهی دلاری‌ای که این ذخایر به آن تکیه دارند.",
+            "strength": "usually"
+          },
+          {
+            "with": "dollar-basket",
+            "text": "سهم ذخایر در بازهٔ سال‌ها حرکت می‌کند؛ سبد دلار در بازهٔ روزها.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "نقش جهانی دلار، پس‌زمینه‌ای است که همهٔ جفت‌ارزهای دلار استرالیا در برابرش معامله می‌شوند؛ این کارت آرک آرام چنددهه‌ای آن را می‌خواند.",
+        "glossaryTerms": [
+          "reserve-share",
+          "central-bank",
+          "safe-haven"
+        ]
+      },
+      "sp500-breadth-ratio": {
+        "plainName": "بازار بزرگ آمریکا، با دو ترازو",
+        "oneLine": "حرکت بازار بزرگ آمریکا فراگیر است یا بر دوش غول‌هایش.",
+        "ifRising": "شرکت‌های معمولی معمولاً در حال رسیدن به غول‌ها هستند: مشارکت فراگیرتر.",
+        "ifFalling": "غول‌ها معمولاً از شرکت‌های معمولی جلو می‌زنند: حرکت بازار در حال متمرکز شدن است.",
+        "connections": [
+          {
+            "with": "shiller-cape",
+            "text": "همان بازار، این بار از زاویهٔ قیمت در برابر یک دهه سود.",
+            "strength": "usually"
+          },
+          {
+            "with": "vix",
+            "text": "بازار باریک و بازار پرجوش‌وجوش دو خواندن متفاوت‌اند؛ این جفت آنها را از هم جدا می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "بازار آمریکا بزرگ‌ترین وزن تک‌رشتهٔ شاخص‌های جهانی است؛ این کارت می‌خواند خودِ آن بازار چقدر به سوی چند شرکت بزرگ متمایل شده است.",
+        "glossaryTerms": [
+          "equal-weight-index",
+          "stock-index"
+        ]
+      },
+      "btp-bund-spread": {
+        "plainName": "فاصلهٔ استقراض ایتالیا و آلمان",
+        "oneLine": "ایتالیا برای وام ده‌ساله چقدر بیشتر از آلمان می‌پردازد.",
+        "ifRising": "وام‌دهندگان معمولاً مابه‌التفاوت بیشتری برای ایتالیا در برابر آلمان می‌خواهند.",
+        "ifFalling": "مابه‌التفاوتی که ایتالیا در برابر آلمان می‌پردازد معمولاً در حال باریک‌شدن است.",
+        "connections": [
+          {
+            "with": "bund-10y",
+            "text": "پای آلمانی همین فاصله، کارت خودش را کنار این کارت دارد.",
+            "strength": "reliable"
+          },
+          {
+            "with": "ecb-dfr",
+            "text": "نرخ سیاستی بانک مرکزی اروپا در انتهای کوتاه نرخ‌های اروپایی می‌نشیند که این فاصله مقایسه‌شان می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "تنش منطقهٔ یورو معمولاً اشتها به ریسک جهان را هدایت می‌کند و دلار استرالیا آن را معمولاً حس می‌کند.",
+        "glossaryTerms": [
+          "sovereign-spread",
+          "central-bank",
+          "policy-rate"
+        ]
       }
     },
     "glossary": {
@@ -8491,6 +8648,21 @@
         "term": "تولید فولاد خام",
         "plain": "اولین فولاد جامدی که کارخانه پیش از نورد شدن به ورق، تیرآهن یا مفتول تولید می‌کند. شمارش خام نشان می‌دهد یک کشور چقدر فولادسازی، و در نتیجه چقدر خرید سنگ‌آهن، انجام می‌دهد.",
         "example": "تولید ماهانهٔ ۷۳۵۹ (ده‌هزار تن) یعنی کارخانه‌های چین در آن ماه حدود ۷۳٫۶ میلیون تن فولاد خام ساخته‌اند."
+      },
+      "reserve-share": {
+        "term": "سهم ذخایر",
+        "plain": "سهم ارز مشخصی از کل ذخایر ارزی رسمی جهان. بانک‌های مرکزی و مراجع پولی موجودی ذخایر خود را به صندوق بین‌المللی پول گزارش می‌کنند؛ جمع این گزارش‌ها نشان می‌دهد ذخایر امنیتی جهان به کدام ارزها تکیه کرده‌اند.",
+        "example": "سهم دلار آمریکا ۵۶٫۷٪ یعنی حدود ۵۶٫۷ سنت از هر دلارِ ذخایر اعلام‌شده در دارایی‌های دلاری نگه داشته شده است."
+      },
+      "equal-weight-index": {
+        "term": "شاخص هم‌وزن",
+        "plain": "شاخص سهامی که به هر شرکت عضو، هر قدر هم بزرگ، وزن یکسانی می‌دهد. در کنار شاخص معمول که به شرکت‌های بزرگ‌تر وزن بیشتر می‌دهد، این جفت نشان می‌دهد چقدر حرکت بازار دست شرکت‌های غول‌آساست.",
+        "example": "اگر ۵۰۰ شرکت با هم حرکت کنند، نسخهٔ هم‌وزن و نسخهٔ وزن‌مبنای بازار یکسان بالا و پایین می‌شوند؛ وقتی فقط غول‌ها حرکت کنند، از هم جدا می‌افتند."
+      },
+      "sovereign-spread": {
+        "term": "فاصلهٔ حاکمیتی",
+        "plain": "اختلاف آنچه دو دولت برای مدت مشابه می‌پردازند تا وام بگیرند. پهن‌تر شدن این فاصله یعنی وام‌دهندگان ریسک دو کشور را متفاوت‌تر می‌بینند.",
+        "example": "فاصلهٔ ۰٫۲۵ واحد یعنی وام دادن ده‌ساله به ایتالیا ۰٫۲۵ واحد درصد بیشتر از وام دادن به آلمان می‌پردازد."
       }
     },
     "ui": {

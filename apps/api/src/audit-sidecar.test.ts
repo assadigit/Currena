@@ -65,6 +65,10 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'breakeven-tilt',
       'brent',
       'btc-usd',
+      // gap-closure S6-M6.3 (2026-11-02): the Italy−Germany spread — its
+      // two legs are the FRED OECD citation-required mirrors (the
+      // bund/gilt class), display-permitted with attribution.
+      'btp-bund-spread',
       'bund-10y',
       'cfnai',
       'empire-state',
@@ -97,6 +101,10 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'shiller-ecy',
       'silver-usd',
       'sofr',
+      // gap-closure S6-M6.3 (2026-11-02): the S&P 500 breadth ratio — the
+      // Yahoo L2 legs ride the spec-directed display bar (the usdaed
+      // class), so its public history serves the visible window only.
+      'sp500-breadth-ratio',
       'sticky-cpi',
       'stress-stlfsi',
       't5yie',

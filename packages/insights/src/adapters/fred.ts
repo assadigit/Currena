@@ -179,6 +179,12 @@ export const FRED_SERIES = {
   bund10y: 'IRLTLT01DEM156N', // bund-10y: German 10Y govt yield, monthly OECD (citation-required)
   jgb10y: 'IRLTLT01JPM156N', // jgb-10y: Japan 10Y govt yield, monthly OECD
   gilt10y: 'IRLTLT01GBM156N', // gilt-10y: UK 10Y govt yield, monthly OECD
+  // gap-closure S6-M6.3 (2026-11-02): the Italy 10y OECD monthly mirror —
+  // the btp-bund-spread's euro leg (verified live 2026-11-02: fresh
+  // 2026-08 = 3.986, 427 rows since 1991-03; citation-required, T-16
+  // record added). Joins the OECD-yields bulk group as its 5th id — zero
+  // new subrequests (the WSEFINTL1 precedent).
+  italy10y: 'IRLTLT01ITM156N', // btp-bund-spread: Italy 10Y govt yield, monthly OECD (citation-required)
   bojCallRate: 'IRSTCI01JPM156N', // boj-rate: Japan overnight call rate avg, monthly OECD (≈ policy)
   // boe-rate left this mirror 2026-10-25 (M6 Wave-4 probe fix): the BoE's
   // own Bank Rate history page serves the current rate at every decision —
@@ -368,6 +374,10 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.jgb10y,
       FRED_SERIES.gilt10y,
       FRED_SERIES.bojCallRate,
+      // gap-closure S6-M6.3 (2026-11-02): the Italy mirror joins its
+      // bund/gilt siblings (5/12 ids — the ZIP truncates past ~12; the
+      // btp-bund-spread derives from this group's bund + italy legs).
+      FRED_SERIES.italy10y,
     ],
     window: 'decade',
   },

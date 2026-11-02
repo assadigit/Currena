@@ -203,6 +203,20 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
   // own site — the same display-bar lift the four prices tiles carry.
   usdaed:
     'Owner-requested card (2026-10-29: "add dollar against UAE currency"); the ECB publishes no AED reference rate, so the single leg is Yahoo USD/AED daily closes — the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill and metals history legs ride). The owner directive lifts its worst-leg display bar.',
+  // gap-closure S6-M6.3 (2026-11-02): the S&P 500 breadth-ratio card — the
+  // session spec's own direction (docs/gap-closure/S6-links-promotion-
+  // polish.md M6.3 item 2, the owner-approved plan): "equal-weight vs
+  // cap-weight S&P 500 ratio from Yahoo (RSP and SPY; L2, already
+  // owner-accepted for Yahoo). Add sp500-breadth-ratio." Both legs are the
+  // same unofficial-but-accepted provider the Brent gap-fill, the metals
+  // histories and usdaed already ride (register row yahoo: L2,
+  // ownerAccepts, 2026-10-16) — the spec's sentence is the recorded
+  // directive lifting this card's worst-leg display bar, the usdaed
+  // pattern. The card is LABELLED a proxy in its layer-1 copy (the spec's
+  // own limitation note). NOT a terms re-verification: the quarterly
+  // licence review re-confirms this decision.
+  'sp500-breadth-ratio':
+    'Spec-directed card (gap-closure S6-M6.3, the owner-approved plan: "equal-weight vs cap-weight S&P 500 ratio from Yahoo (RSP and SPY; L2, already owner-accepted for Yahoo). Add sp500-breadth-ratio."); both legs are the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill, the metals histories and usdaed ride). The spec\'s directive lifts its worst-leg display bar.',
 };
 
 /**

@@ -122,7 +122,7 @@ Package manager is **pnpm** (Node ≥ 20).
 
 **This section is the canonical on-disk record of every indicator and every
 data point the Insights page shows.** It is sourced from
-`packages/insights/src/definitions.ts` (the 123 indicators), `packages/
+`packages/insights/src/definitions.ts` (the 161 indicators), `packages/
 insights/src/markets/definitions.ts` (the 16 market indices), and
 `packages/insights/src/fx/definitions.ts` (the 10 FX pairs + the dollar
 basket + the 7 FX patterns). `data/indicators.json` is the generated
@@ -145,14 +145,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 158 indicators (48 voting [V] + 110 context [C])
+### A. The 161 indicators (48 voting [V] + 113 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (122 indicators, 32 voting)
+#### GLOBAL (125 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -182,6 +182,7 @@ position bar, never votes). `maxAge` = staleAfterDays (days before the
 | [C] | `treasury-auction-10y-indirect` | monthly | 45 | info | fiscaldata |
 | [C] | `treasury-auction-30y` | monthly | 45 | info | fiscaldata |
 | [C] | `treasury-auction-30y-indirect` | monthly | 45 | info | fiscaldata |
+| [C] | `btp-bund-spread` | monthly | 75 | info | derived |
 
 *(gap-closure S2-M2.4, 2026-10-31: `nyfed-custody` — Treasuries held in
 custody at the New York Fed for foreign official accounts, FRED
@@ -451,6 +452,37 @@ re-check). One combined raw-history key `insights:portwatch:v1` (400
 days per chokepoint, zod both ways); the rung3 'portwatch' extra source
 (04:30, daily gate, budget 18) fetches + patches; the ids ride
 CARRY_FORWARD_IDS and the history phases exclude them.)*
+
+**De-dollarization and concentration** (the `dedollar-concentration`
+lane — "Is the world's money concentrating?", a SHADOW gauge until S6:
+every member is context-only per G-5, the lane header reads "not scored
+yet", and the global summary counts stay untouched — a step-0 gauge is
+excluded from sectionVerdictStep by design; gap-closure S6-M6.3,
+2026-11-02):
+| | id | cadence | maxAge | rule | source |
+|---|---|---|---|---|---|
+| [C] | `usd-reserve-share` | quarterly | 200 | info | imf |
+| [C] | `sp500-breadth-ratio` | daily | 4 | info | yahoo |
+
+*(gap-closure S6-M6.3, 2026-11-02: the de-dollarization/concentration
+family — `usd-reserve-share` is the IMF COFER quarterly USD share of
+world allocated FX reserves (the SDMX 3.0 API at api.imf.org, keyless,
+Worker-egress verified via the temp-probe pattern: 200 byte-identical
+~1.5 s; the parsed latest 56.70 % @ 2026-Q2 matches the IMF's own
+September-30 data brief EXACTLY; rides rung2's Saturday gate + bootstrap,
+fixtures `packages/insights/fixtures/s6/cofer-sdmx-2026-11-02.json`).
+`sp500-breadth-ratio` is the equal-weight/cap-weight S&P 500 PROXY (Yahoo
+RSP ÷ SPY daily closes, inner-join on common dates, 4dp — the audnzd
+discipline; 2,512 points × 10y per leg verified; rides rung2's daily
+gate, +2 sequential subrequests). The card is labelled a proxy in its
+layer-1 copy; its public display rides the spec-directed override (the
+owner-approved S6 plan's own sentence, the usdaed pattern). The
+`btp-bund-spread` (the borrowing-costs lane above) completes the
+milestone: the Italy−Germany 10-year spread derived from the two FRED
+OECD monthly mirrors — the italy series IRLTLT01ITM156N joined the
+main rung's OECD-yields bulk group as its 5th id (zero new
+subrequests, the WSEFINTL1 precedent; T-16 citation-required record
+added).)*
 
 #### AUSTRALIA (36 indicators, 16 voting)
 

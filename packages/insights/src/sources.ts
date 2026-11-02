@@ -298,6 +298,28 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     notes:
       'Gap-closure S4-M4.4. FILE SHAPE (verified live 2026-11-01, M4.1): the download is named gscpi_data.xlsx but is a LEGACY .xls (OLE2/BIFF, 105,984 B) — the repo\u2019s biff reader parses it. TWO sheets: the boilerplate + the data sheet (header Date|GSCPI; DD-MMM-YYYY month-END date strings; 345 monthly rows 1998-01 \u2192 2026-09, latest 1.2840). Worker egress FAST (the S1 probe: ~0.5 s — the Akamai bot-manager fear did not materialise, unlike RBA); runs on the rung-2 monthly plan (first-of-month + bootstrap) + the Node venue\u2019s inline collect. The provider\u2019s own disruption notice (2025-11-06, on the GSCPI page): the index publishes with limited data until further notice — the parse takes the rows the file carries. Fixture: packages/insights/fixtures/s4/gscpi-2026-11-01.xls.',
   },
+  // gap-closure S6-M6.3 (2026-11-02): the IMF COFER dataset — the SDMX 3.0
+  // API at api.imf.org, the de-dollarization lane's reserve measure.
+  imf: {
+    id: 'imf',
+    provider: 'imf',
+    label: 'International Monetary Fund (COFER)',
+    usedFor:
+      'usd-reserve-share — the USD share of world allocated foreign exchange reserves (quarterly) — gap-closure S6-M6.3',
+    method: 'M2',
+    runtime: 'worker',
+    level: 'L1',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The IMF\u2019s own Special Terms for Statistical Data, quoted verbatim (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the gap-closure S4-M4.3 PortWatch record, the same terms page; the plain fetch is bot-filtered and the link currently 301-redirects to a 404 marker, but the terms were read and recorded then): \u201cSpecial Terms for Statistical Data\u2026 Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source\u2026 Users shall not infringe upon the integrity of the Data\u2026\u201d — L1 with affirmative redistribution permission (the PortWatch precedent, the same IMF statistical-data terms). The provider\u2019s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: \u201cOur data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.\u201d',
+    termsReadOn: '2026-11-02',
+    attribution: 'Source: International Monetary Fund, COFER',
+    termsUrl: 'https://www.imf.org/external/terms.htm',
+    notes:
+      'Gap-closure S6-M6.3. QUERY SHAPE (verified live 2026-11-02 from the provider\u2019s own responses, work sandbox AND Cloudflare Worker egress via a temporary probe worker — 200, byte-identical, ~1.2–1.5 s): GET https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/COFER/7.0.1/* with Accept: application/json serves the FULL dataset keyless (140 series, 126,820 B, SDMX-JSON 2.0). The old dataservices.imf.org SDMX 2.1 host is DEAD (DNS); the DataMapper API carries no COFER; portal.api.imf.org gates only its interactive docs. The card\u2019s series: G001.AFXRA.CI_USD.SHRO_PT.Q (world, allocated, USD, share-percent, quarterly), 110 points 1999-Q1 \u2192 2026-Q2, latest 56.704761505127 @ 2026-Q2 — EXACTLY the IMF\u2019s own September-30 data brief (56.70 % vs 57.18 % in Q1; total $13.22 tn both). Quarterly publication ~1 quarter lag (2025Q3 \u2192 2025-12-19, 2025Q4 \u2192 2026-03-27, 2026Q1 \u2192 2026-07-01, 2026Q2 \u2192 2026-09-30 — the dataset page\u2019s lastUpdatedDate metadata field is stale/misleading, the data briefs are the freshness record). Rides rung2\u2019s Saturday gate + bootstrap; the parse fails closed on dimension-set, series-membership or period-format drift. Fixture: packages/insights/fixtures/s6/cofer-sdmx-2026-11-02.json.',
+  },
   'eia-spot': {
     id: 'eia-spot',
     provider: 'eia',
@@ -766,6 +788,11 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // the recorded acceptance the bund/gilt siblings ride).
   'nz-short-rate': ['oecd'],
   'nz-10y': ['fred:IRLTLT01NZM156N'],
+  // gap-closure S6-M6.3 (2026-11-02): the Italy−Germany 10-year spread —
+  // the two FRED OECD monthly mirrors (both T-16 citation-required records;
+  // the italy record added 2026-11-02, the same recorded acceptance the
+  // bund sibling rides).
+  'btp-bund-spread': ['fred:IRLTLT01ITM156N', 'fred:IRLTLT01DEM156N'],
   // 2026-10-29 owner round (the usdaed card): the Gulf petro-currency
   // member's single leg — Yahoo's USD/AED daily closes. The register row
   // (yahoo: L2, ownerAccepts — the same acceptance the Brent gap-fill and

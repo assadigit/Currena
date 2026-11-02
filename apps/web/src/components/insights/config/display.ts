@@ -372,6 +372,13 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   audnzd: { decimals: 4, unit: 'nzd' },
   'nz-short-rate': { decimals: 2, unit: 'percent' },
   'nz-10y': { decimals: 2, unit: 'percent' },
+  // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
+  // family + the euro sovereign-stress spread. The reserve share reads to
+  // 2dp percent (56.70 %); the breadth ratio to 4dp like the audnzd cross
+  // (0.2925); the BTP–Bund spread to 2dp points like the yield-gap family.
+  'usd-reserve-share': { decimals: 2, unit: 'percent' },
+  'sp500-breadth-ratio': { decimals: 4, unit: 'ratio' },
+  'btp-bund-spread': { decimals: 2, unit: 'points' },
 };
 
 /** The Fed target corridor's half-width (the FOMC has used 25bp since 2008). */

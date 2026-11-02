@@ -5,6 +5,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02j] — gap-closure S6-M6.3: the de-dollarization/concentration family (the COFER reserve share + the S&P 500 breadth proxy + the BTP–Bund spread — three context cards, a new shadow lane)
+
+The last gap family of the program. Three cards, all context-only per
+G-5, none touching a voter (the global summary counts unchanged):
+
+- **`usd-reserve-share`** — the USD share of world allocated foreign
+  exchange reserves, the IMF's own COFER quarterly survey, THE
+  de-dollarization measure. The machine-readable path was the discovery:
+  the old dataservices.imf.org SDMX 2.1 host is dead (DNS), the
+  DataMapper API carries no COFER, and the new iData developer portal
+  gates its docs — but the SDMX 3.0 data endpoints themselves are open
+  and keyless (`api.imf.org/external/sdmx/3.0/data/dataflow/
+  IMF.STA:COFER/7.0.1/*` with `Accept: application/json`, 126,820 B,
+  140 series). Worker egress verified via a temporary probe worker
+  (deployed + deleted, the S1-M1.1 pattern): 200, byte-identical,
+  ~1.5 s. The parse resolves the card's series by dimension-value ids
+  (never index tuples) and fails closed on the dimension set, the series
+  membership, the period format, the (0,100) band and a truncation
+  floor. The parsed latest — **56.70 % @ 2026-Q2, from 57.18 % in
+  Q1 — matches the IMF's own September-30 data brief EXACTLY** (and the
+  parsed world total, $13.22 tn, matches the same brief). Rides rung2's
+  Saturday gate + bootstrap (a quarterly file needs no daily fetch);
+  staleAfterDays 200 (two consecutive missed releases before the honest
+  stale tag). The layer-1 copy cross-links the Treasury-holders section
+  (the spec's "the main reserve-diversification evidence").
+- **`sp500-breadth-ratio`** — the S&P 500 market-concentration PROXY:
+  the equal-weight ETF ÷ the cap-weight ETF (Yahoo RSP ÷ SPY, daily
+  closes, inner-join on common dates, 4dp). Both legs verified from the
+  provider's own responses: 2,512 points each over exactly ten years,
+  zero gaps >15 days (the continuity check the spec demanded). LABELLED
+  a proxy in the layer-1 copy (the spec's own limitation note: a
+  stand-in for the share of the largest companies, not their exact
+  weight). Rides rung2's daily gate (+2 sequential Yahoo calls — the
+  live-prices refresh's own shape); the public display bar rides the
+  spec-directed override (the owner-approved S6 plan's own sentence —
+  "L2, already owner-accepted for Yahoo" — recorded in the generator,
+  the usdaed pattern).
+- **`btp-bund-spread`** — the Italy−Germany 10-year government bond
+  spread (the BTP–Bund spread), the euro area's own sovereign-stress
+  gauge, derived from the two FRED OECD monthly mirrors
+  (IRLTLT01ITM156N − IRLTLT01DEM156N). The italy series joins the main
+  rung's OECD-yields bulk group as its 5th id — ZERO new subrequests
+  (the WSEFINTL1 precedent); the T-16 citation-required record added
+  (the tag read from the series page itself). The legs' revision cycles
+  differ (italy fresh to 2026-08, germany 2026-09), so the honest latest
+  point is the latest COMMON month (the audnzd inner-join discipline).
+
+The two family cards live in a NEW shadow lane —
+**`dedollar-concentration`** ("Is the world's money concentrating?"),
+the geo-fragmentation precedent: context-only members, the "not scored
+yet" header, votingCount 0, the step excluded from sectionVerdictStep
+(the global verdict + summary counts untouched by design); the
+btp-bund-spread joins the borrowing-costs lane beside its bund/gilt
+siblings. Three glossary terms (reserve-share, equal-weight-index,
+sovereign-spread), the lane's question/short/answer headers, fa copy
+**round-75** (92 strings — indicators + layer1 + glossary + the lane
+headers). Registry 158 → **161 indicators** (48 voting + 113 context).
+Bundle: Insights lazy 1510/347 → **1530/354** (measured 1522.88/351.96 —
+three cards' full EN+fa copy + the lane machinery + the registry's
+161-id audit chunk; justified above). Gates: 14,257 → **14,519 tests
+green**. Fixtures: `packages/insights/fixtures/s6/` (the provider's own
+responses). The rung2-run manual lever gained `--cofer --breadth` (the
+post-deploy landing levers).
+
 ## [2026-11-02i] — gap-closure S6-M6.2 completion: the rung-2 manual lever + the deploy (the China family live on production; the reading landing rides the daily-cap reset)
 
 The stranded M6.2 close (the builder session was lost after the code push

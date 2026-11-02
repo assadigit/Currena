@@ -104,7 +104,10 @@ describe('fred adapter', () => {
     // growth-nowcast/survey family + the M3.5 deficit leg (GDPNOW,
     // GACDISA066MSFRBNY, CCSA, MEDCPIM158SFRBCLE, STICKCPIM158SFRBATL,
     // MTSDS133FMS, DRTSCILM — all riding FRED_S3_GROUPS on rung4) → 57.
-    expect(Object.values(FRED_SERIES)).toHaveLength(58);
+    // The 2026-11-02 gap-closure S6-M6.1 round adds IRLTLT01NZM156N (the
+    // NZ 10y OECD mirror) → 58; the S6-M6.3 round adds IRLTLT01ITM156N
+    // (the Italy 10y OECD mirror, the btp-bund-spread leg) → 59.
+    expect(Object.values(FRED_SERIES)).toHaveLength(59);
   });
 
   it('rides WSEFINTL1 in the mixed-frequency bulk group beside WALCL (S2-M2.4: zero new subrequests)', () => {

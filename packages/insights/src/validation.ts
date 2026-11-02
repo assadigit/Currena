@@ -881,6 +881,12 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // growth — a year-on-year growth RATE whose changes are percentage
   // points (the china-cpi family).
   'china-property-investment',
+  // gap-closure S6-M6.3 (2026-11-02): the USD reserve share — a share in
+  // percent whose changes are percentage points (56.70 → 56.52 is −0.18
+  // pts); and the Italy−Germany 10-year spread — a yield gap in percentage
+  // points (the us-japan-10y-gap family).
+  'usd-reserve-share',
+  'btp-bund-spread',
 ]);
 
 function t10Units(): ValidationTestResult {

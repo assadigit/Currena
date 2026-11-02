@@ -896,7 +896,13 @@ const BUDGETS = [
   // the two glossary terms + the 'tonnes' unit label) + the NEW
   // china-demand-iron-ore relationship card (the connections copy EN+fa).
   // Measured 1502.19/346.42.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1510_000, gz: 347_000, label: 'Insights lazy chunk' },
+  // gap-closure S6-M6.3 (2026-11-02, CHANGELOG §2026-11-02j): 1510→1530 /
+  // 347→354 — the de-dollarization/concentration family (THREE context
+  // cards' full EN+fa copy: INDICATORS + layer1 + the dedollar-concentration
+  // lane's question/short/answer headers + the three glossary terms) + the
+  // registry's 158→161 ids (the indicator-audit chunk rides the same lazy
+  // boundary). Measured 1522.90/352.00.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1530_000, gz: 354_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

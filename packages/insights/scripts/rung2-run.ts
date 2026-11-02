@@ -20,6 +20,9 @@
  *   --eia         the weekly EIA pages (Saturday gate family)
  *   --cftc        the weekly CFTC COT file
  *   --gpr-daily   the GPR daily export
+ *   --cofer       the IMF COFER USD reserve share (gap-closure S6-M6.3;
+ *                 the post-cap/landing lever for the quarterly card)
+ *   --breadth     the S&P 500 breadth ratio pair (RSP + SPY)
  *   --bootstrap   ignore the flags: derive the plan from the stored
  *                 histories exactly like the Node inline build does
  *                 (first-of-month/Saturday/window gates + missing-history
@@ -81,17 +84,19 @@ async function main(): Promise<void> {
       gprDaily: flag('gpr-daily'),
       nzMonthly: flag('nz'),
       nbsMonthly: flag('nbs'),
+      coferQuarterly: flag('cofer'),
+      breadthDaily: flag('breadth'),
     };
     const armed = Object.values(plan).some(Boolean);
     if (!armed) {
       console.error(
-        '[rung2-run] FATAL: no plan gate armed — pass at least one of --nbs --nz --monthly --mof --eia --cftc --gpr-daily (or --bootstrap).',
+        '[rung2-run] FATAL: no plan gate armed — pass at least one of --nbs --nz --monthly --mof --eia --cftc --gpr-daily --cofer --breadth (or --bootstrap).',
       );
       process.exit(1);
     }
   }
   console.log(
-    `[rung2-run] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} gprDaily=${plan.gprDaily} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly}`,
+    `[rung2-run] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} gprDaily=${plan.gprDaily} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly} coferQuarterly=${plan.coferQuarterly} breadthDaily=${plan.breadthDaily}`,
   );
 
   const result = await runInsightsRung2Phase({

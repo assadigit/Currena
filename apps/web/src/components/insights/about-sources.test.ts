@@ -85,8 +85,8 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
 
   it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses (silver-btc retired 2026-10-23, OD-7)', () => {
     const derived = rows.find((r) => r.provider === 'derived');
-    expect(derived!.seriesCount).toBe(20); // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18 + the S3-M3.5 deficit 12-month sum (us-deficit-12m) → 19 + the S6-M6.1 AUD/NZD cross (audnzd) → 20
-    expect(derived!.enabledCount).toBe(20); // the Session-3 tilt card is enabled (both legs' T-16 records + the recorded acceptance); the S3 spreads + the deficit sum + the S6 audnzd cross ride the same acceptance
+    expect(derived!.seriesCount).toBe(21); // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18 + the S3-M3.5 deficit 12-month sum (us-deficit-12m) → 19 + the S6-M6.1 AUD/NZD cross (audnzd) → 20 + the S6-M6.3 Italy−Germany spread (btp-bund-spread) → 21
+    expect(derived!.enabledCount).toBe(21); // the Session-3 tilt card is enabled (both legs' T-16 records + the recorded acceptance); the S3 spreads + the deficit sum + the S6 audnzd cross + the S6-M6.3 BTP−Bund spread (both legs' T-16 records) ride the same acceptance
     expect(aboutEnabledState(derived!)).toBe('on');
     // Own-computation series inherit the upstream terms — the blanket
     // sidecar string (audjpy's) is one of the row's licences (sources.ts
