@@ -312,6 +312,8 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **The live-run saga (three dispatches):** `ceb7312` (run 41351167468) failed on the then-single-attempt 400; `ab9298f` (run 41352681679) failed the same class; `2c83b0f` (run 41354592446) FETCHED CLEAN (1965 rows over 2 pages, all five readings derived: suez 41.3 · panama 28.7 · bab-el-mandeb 28.9 · malacca 228 · taiwan 190 @ 2026-10-25) but the snapshot write hit the account's free-tier **KV daily write cap** (1,000/day, exhausted 2026-11-01 by the session's many dispatches + the hourly crons) and the run was cancelled mid-retry at 22:12 UTC. The re-dispatch after the 00:00 UTC reset (run 41364548704, green 00:02) landed everything.
   - **Deploy + verify:** workers `3656f3ec` (21:15) → `e684b229` (21:34) → **`5e84d5aa`** (21:56) → **`84434851`** (23:51, the M4.4 deploy — the chokepoint cards verified against it). `/api/insights` serves the five ids provider-exact. Browser-verified fresh context EN + fa (RTL) at 1200 + 360: all five cards render in both languages (fa values in Persian digits «۴۱٫۳»), the "not scored yet" header + context-count line render, the transits unit renders, **0px horizontal overflow at 360 in both locales**, zero console errors. Evidence `evidence/S4-M4.3/` (4 screenshots; the DOM+value checks carry the verification — this sandbox is not vision-capable).
   - **Budget:** the rung3 'portwatch' extra source (04:30, daily gate, declared budget 18; the daily run = 1 fetch + 5 reads + 10 writes = 16). KV writes/day: +10 (the combined key + the five per-id histories, read-compared after the first day). Gates at `ceb7312`: ALL GREEN **12,792 tests** (insights 1107 → 1136). Bundle 1332/310 → 1384/315 (measured 1357.16/313.94, justified §2026-11-01h). fa round-68 (136 strings, manifest clean).
+  - **Worker-venue verification (the 2026-11-02 continuation session, additive):** the manual extra lever (`POST /internal/insights-ingest?phase=extra`, REFRESH_SECRET rotated first per the lost-sandbox pattern) fired 00:18:42 UTC — rung3 GREEN on the WORKER venue (the GHA dispatch path above was already proven): the portwatch phase ran its own BOOTSTRAP (392 raw days × 5), wrote the combined `insights:portwatch:v1` (read back zod-valid) + the 5 MA7 histories, and the rung budget landed EXACTLY as declared — **rung3 used 23/50** (1 status + tic-slt 4 + portwatch 18), rung4 in the same run 45/50 (fred-s3 + frb-ebp + ofr-fsi all green). The first natural 04:30 firing follows the same shape.
+
 - [x] M4.4 Supply chain and energy
   - **Six ids (the 140th–145th):** `gscpi` (the NY Fed GSCPI, monthly on rung2's first-of-month plan — the .xlsx-named LEGACY .xls parsed by the repo's biff reader, the data sheet found STRUCTURALLY by its Date/GSCPI header, month-END date strings read as month-start; **345** points 1998-01 → 2026-09, latest 1.2840 — the M4.1 record's "344" was a miscount, corrected in VERIFIED-SOURCES), `us-spr` + `us-crude-production` (the EIA weekly pair: the A-6 crude-stocks parse generalised into `parseEiaWeeklySeriesHtml` — per-series specs; the SPR LEVEL WCSSTUS1 [100k, 1M] thousand-bbl band vs the production RATE WCRFPUS2 [1k, 20k] thousand-bbl/d band, the "Thousand Barrels per Day" unit needle; the Saturday rung2 gate grows to THREE LeafHandler pages), and `coal-aus`/`lng-japan`/`gas-europe` (the Pink Sheet energy trio: columns F/I/J — coal $/mt, gas + LNG $/mmbtu — from the SAME Monthly Prices workbook the metals ride, **zero new subrequests**).
   - **Provider-exact pins (all off the M4.1 captures):** GSCPI 1.284014886203148 @ 2026-09-01 · SPR 282,583 thousand bbl @ 2026-10-23 · production 13,992 thousand bbl/d @ 2026-10-23 · coal 147.1 · gas 25.42 · LNG 14.25 @ 2026M09. The nyfed provider register row (L1 — the NY Fed's own Terms of Use quoted verbatim: the affirmative non-exclusive reuse licence with attribution) + the licence twin + UPSTREAM_LEGS + SANITY_RANGES + the FS-13 method card. SD_BAND_IDS 13 → 14 (gscpi — the era-drifting level reads through z-scores).
@@ -331,6 +333,19 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > wording resolves by additive union, first-landed copy wins; a prior
 > session's milestone found mid-loop (code pushed, verify/tick missing) is
 > completed under the ~55-minute lapse-protocol precedent, not redone.
+
+> **S4 continuation claim (2026-11-02 ~00:10 UTC):** a fresh sandbox
+> picking up after the previous session's box was lost post-push
+> (~23:51 UTC 2026-11-01). This session re-cloned, re-ran the baseline
+> gates clean (13,238 tests — exactly the M4.4 commit's count), and
+> completed the M4.3/M4.4 verification INDEPENDENTLY while the original
+> session's own tick landed on origin mid-rebase (27d3fa3 — the union
+> above keeps its richer tick and adds this session's Worker-venue
+> extra-rung verification: the lever fired green 00:18:42 UTC, rung3
+> 23/50 exactly as declared, the combined key written + read back
+> zod-valid). **This session claims M4.5 + M4.6 from 00:30 UTC.**
+> REFRESH_SECRET was rotated once more (the lost-box pattern; the value
+> lives only in `apps/api/.dev.vars` + the Worker secret).
 
 ### S5 Australia deep-dive (`S5-australia.md`)
 - [ ] M5.1 ABS verification and fixtures
