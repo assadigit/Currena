@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02a] — gap-closure S4-M4.5 close: the union additions + the production verification
+
+The M4.5 loop completion (the session that landed `99b20f6` was cut
+short post-push; this close follows the lapse protocol):
+
+- **The registry's shadow-membership honesty fix** (from the parallel-session
+  union, `0f50796`): the generator now stamps the shadow gauge's members
+  "shadow-gauge lane member — counted in the lane, never votes until S6
+  promotes it (G-5)" instead of the misleading "scored member of the area
+  counts" (a pre-existing gap since the M4.3 chokepoints joined GAUGES);
+  `data/indicators.json` regenerated (8 entries). The
+  INDICATORS_AND_DATA_SOURCES gauge table also gains the M4.4 energy trio's
+  lane rows (gas-europe beside WTI/Henry Hub; coal + LNG beside iron ore).
+- **Deploy + verification:** worker **`bc686ec7`** (01:26 UTC; markets
+  unchanged — zero `apps/markets` changes since 2026-10-21). Gates re-run
+  green on the merged tree (13,245 tests). `/api/insights` 145 readings,
+  zero unavailable; the Pink Sheet trio honestly `stale` in the October
+  window (the documented ~Nov 1–3 publish). Browser-verified fresh contexts
+  EN + fa (RTL) at 1200 + 360: all three relationship cards render in both
+  languages (collapsed chips with honest state words — "Trigger not
+  present" for the calm-Suez and calm-GSCPI reads, "Not enough fresh data"
+  for the LNG-stale energy chain — plus the full cards: legs with units
+  «۴۱٫۳ تردد در روز», the "Usual tendency" sentences, the E-19
+  weaker-reverse line in both languages); the gauge header renders "not
+  scored yet" + "8 context readings" / «هنوز نمره داده نمی‌شود» + «۸ قرائت
+  اطلاعاتی»; **0px horizontal overflow at 360 in both locales**; zero
+  console errors. Evidence `evidence/S4-M4.5/` (4 screenshots).
+- **Verification trap re-learned (the documented class, fa):** the
+  Together "see all {n} connections" button greps need the Persian digit
+  class `[۰-۹]` («نمایش هر ۹ ارتباط» — `\d` never matches), and a loose
+  `نمایش همه` regex matches the lane expanders instead (the trap-(g)
+  sibling).
+
 ## [2026-11-01j] — gap-closure S4-M4.5: the relationship trio (the shadow gauge's full membership)
 
 Three bilingual (fa round-70) relationship cards in the "Together" section
