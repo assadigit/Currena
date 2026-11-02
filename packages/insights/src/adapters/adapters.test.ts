@@ -104,7 +104,7 @@ describe('fred adapter', () => {
     // growth-nowcast/survey family + the M3.5 deficit leg (GDPNOW,
     // GACDISA066MSFRBNY, CCSA, MEDCPIM158SFRBCLE, STICKCPIM158SFRBATL,
     // MTSDS133FMS, DRTSCILM — all riding FRED_S3_GROUPS on rung4) → 57.
-    expect(Object.values(FRED_SERIES)).toHaveLength(57);
+    expect(Object.values(FRED_SERIES)).toHaveLength(58);
   });
 
   it('rides WSEFINTL1 in the mixed-frequency bulk group beside WALCL (S2-M2.4: zero new subrequests)', () => {
@@ -148,7 +148,7 @@ describe('frankfurter adapter', () => {
   it('builds the open-ended timeseries URL', () => {
     expect(frankfurterTimeseriesUrl('2016-01-04')).toBe(
       // M5 Wave 2 (2026-10-24): TRY joins as the ninth leg (the usdtry card).
-      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY',
+      'https://api.frankfurter.dev/v1/2016-01-04..?from=USD&to=JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY,NZD',
     );
     // Narrow currency lists still build their own URL.
     expect(frankfurterTimeseriesUrl('2016-01-04', ['JPY'])).toBe(

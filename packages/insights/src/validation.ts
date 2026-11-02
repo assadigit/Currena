@@ -872,6 +872,11 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // of people).
   'au-building-approvals',
   'au-nom',
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand rate mirrors — a
+  // short-term money-market rate and a 10-year yield, both percentage-point
+  // series (the bund-10y family).
+  'nz-short-rate',
+  'nz-10y',
 ]);
 
 function t10Units(): ValidationTestResult {

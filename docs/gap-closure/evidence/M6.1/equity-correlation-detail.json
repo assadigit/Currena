@@ -1,0 +1,23 @@
+{
+ "weekly": {
+  "n": 244,
+  "r": 0.7340601278270007
+ },
+ "daily_lag_minus2": {
+  "n": 2224,
+  "r": 0.04583925823798344
+ },
+ "daily_lag_minus1": {
+  "n": 2225,
+  "r": 0.1780639391237838
+ },
+ "daily_same_day": {
+  "n": 2226,
+  "r": 0.31238866801614273
+ },
+ "daily_lag_plus1": {
+  "n": 2225,
+  "r": 0.08840287345837061
+ },
+ "note": "lag -1 = NZ previous close vs ASX today (NZ closes ~2h before ASX); +1 = NZ next close vs ASX today"
+}

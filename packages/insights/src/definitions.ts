@@ -2996,4 +2996,62 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // Published ~35 days after month end (Sep 2026 lands 2026-11-05).
     staleAfterDays: 75,
   },
+  {
+    // gap-closure S6-M6.1 (2026-11-02): the AUD/NZD cross — the measured
+    // AU-NZ link (the evidence: AUD/USD and NZD/USD daily changes correlate
+    // 0.86 over 2016-2026, rolling-1y min 0.62). Derived from the SAME
+    // Frankfurter request as audusd/audjpy (NZD rejoined the currency list —
+    // zero new fetches). Context-only per G-5; renders in the au-external
+    // shadow lane.
+    id: 'audnzd',
+    section: 'australia',
+    group: 'au-external',
+    name: 'AUD/NZD',
+    source: 'derived',
+    sourceRef: 'Frankfurter USD→NZD ÷ USD→AUD',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+  },
+  {
+    // gap-closure S6-M6.1 (2026-11-02): New Zealand's short-term money-market
+    // interest rate, the OECD FINMARK mirror (IR3TIB, monthly average — the
+    // RBNZ's own site is 403 from the work venue, the RBA/Akamai class, and
+    // the FRED OCR-family mirror is stale at 2024-12 AND is the call-money
+    // rate, so the OECD series — fresh through 2026-09 — is the honest
+    // source, honestly NAMED: it is the short-term rate, not the Official
+    // Cash Rate itself). Monthly average, ~1-month lag. Context-only per
+    // G-5; rides rung2's monthly gate (one more sdmx.oecd.org request).
+    id: 'nz-short-rate',
+    section: 'australia',
+    group: 'au-external',
+    name: 'New Zealand short-term interest rate (monthly average)',
+    source: 'oecd',
+    sourceRef: 'OECD FINMARK IR3TIB NZL (short-term interest rate, percent p.a., monthly average)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S6-M6.1 (2026-11-02): the NZ 10-year government bond yield
+    // — the FRED OECD monthly mirror (IRLTLT01NZM156N, citation-required,
+    // fresh 2026-09; the bund-10y/gilt-10y sibling). The AU−NZ 10y spread
+    // is one of the three measured links (levels correlation 0.93 since
+    // 1970). Monthly average, lagged. Context-only per G-5; rides rung2's
+    // monthly gate (one fredgraph.csv request).
+    id: 'nz-10y',
+    section: 'australia',
+    group: 'au-external',
+    name: 'New Zealand 10-year government bond yield',
+    source: 'fred',
+    sourceRef: 'FRED:IRLTLT01NZM156N (OECD monthly mirror, percent, monthly average)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
 ] as const;

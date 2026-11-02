@@ -16,8 +16,8 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 | S3 | US credit, liquidity, fiscal and growth nowcast | 6 / 6 | 100% |
 | S4 | Geopolitics, supply chain and energy | 6 / 6 | 100% |
 | S5 | Australia deep-dive and Australian markets | 6 / 6 | 100% |
-| S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **31 / 37** | **84%** |
+| S6 | New Zealand link, China and world links, promotion and polish | 1 / 6 | 17% |
+| **Total** | | **32 / 37** | **86%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -414,7 +414,10 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > GREEN **13,873 tests** (13:11 UTC run; Insights lazy 1467.34/338.18 vs the
 > 1470/340 ceiling). api worker `d86242ac` + markets worker `699daa4d` live.
 
-- [ ] M6.1 New Zealand link (evidence first)
+- [x] M6.1 New Zealand link (evidence first)
+  - **The measured evidence + the INCLUDE decision** (evidence/M6.1/: raw-series.json, measurements.json, equity-correlation-detail.json, NZ-LINK-EVIDENCE.md): weekly ASX 200/NZX 50 returns correlation **0.73** (n=244; the daily 0.31 is close-stagger attenuation — the lag structure measured), AUD/USD vs NZD/USD daily **0.86** (rolling-1y min 0.62 — high AND stable), AU−NZ 10y yield levels **0.93** (1970→2026; latest spread +0.34pp), plus two structural links quoted verbatim from the official pages (RBNZ "84% of bank lending" by the four Australian-owned banks; MFAT "$32.76 billion in 2024" two-way trade). G-6 cleared.
+  - **Four context-only additions** (the 154th–156th ids + the board rider): `audnzd` (the Frankfurter legs — NZD rejoined the one request, zero new fetches), `nz-short-rate` (the OECD FINMARK IR3TIB monthly average — the honest mirror: rbnz.govt.nz 403s the work venue; the FRED OCR-family mirror is stale at 2024-12 AND is the call-money rate, so the card is named the short-term rate, never the OCR), `nz-10y` (the FRED OECD mirror IRLTLT01NZM156N, T-16 record added), and the **NZX 50 rider** on the Australian markets board (Yahoo `^NZ50` verified from the provider's own response; its own `newzealand` group, NZD-denominated; the currency note updated; the leading/lagging summary keeps the AU groups). The two NZ mirrors ride rung2's first-of-month gate (+2 fetches; all-gates ≈41/50). New `markets-au-run` Node runner (the markets-run Path-B twin).
+  - fa copy **round-73** (86 strings + 4 re-reviews, all audited clean); the lane header now reads "trade and partner links" (EN + fa); the terminology doc gained the NZ section. Registry 153 → **156** (48 voting + 108 context). Bundle 1470/340 → **1490/343** (measured 1484.65/341.88, justified §2026-11-02g). Gates **14,072 tests green**.
 - [ ] M6.2 China property and steel
 - [ ] M6.3 De-dollarization and concentration
 - [ ] M6.4 Shadow review and promotion proposal

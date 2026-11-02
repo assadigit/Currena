@@ -756,6 +756,16 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // Their honest legs are the Frankfurter quote series they invert/cross.
   audusd: ['frankfurter'],
   audjpy: ['frankfurter'],
+  // gap-closure S6-M6.1 (2026-11-02): the AUD/NZD cross — the same two
+  // Frankfurter legs as its audusd/audjpy siblings (one request, three
+  // cards).
+  audnzd: ['frankfurter'],
+  // gap-closure S6-M6.1: the two NZ monthly mirrors — the OECD FINMARK
+  // short rate (the oecd-cli register row's provider) + the FRED OECD
+  // 10-year yield mirror (T-16 record added 2026-11-02: citation-required,
+  // the recorded acceptance the bund/gilt siblings ride).
+  'nz-short-rate': ['oecd'],
+  'nz-10y': ['fred:IRLTLT01NZM156N'],
   // 2026-10-29 owner round (the usdaed card): the Gulf petro-currency
   // member's single leg — Yahoo's USD/AED daily closes. The register row
   // (yahoo: L2, ownerAccepts — the same acceptance the Brent gap-fill and

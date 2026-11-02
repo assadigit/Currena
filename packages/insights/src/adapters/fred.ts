@@ -230,6 +230,11 @@ export const FRED_SERIES = {
   stickyCpi: 'STICKCPIM158SFRBATL', // sticky-cpi: Atlanta Fed sticky-price CPI, 12-month % (citation-required)
   federalSurplusDeficit: 'MTSDS133FMS', // the M3.5 deficit card's leg: federal surplus/deficit, monthly $m (public domain)
   sloosCiTightening: 'DRTSCILM', // sloos-ci-tightening: SLOOS net % tightening C&I standards, quarterly (public domain)
+  // gap-closure S6-M6.1 (2026-11-02): the NZ 10y OECD monthly mirror —
+  // fetched on rung2's monthly plan (fetchFredSeries, one fredgraph.csv
+  // request), NEVER a main-rung bulk group (the main rung is full). The
+  // bund-10y/gilt-10y sibling; citation-required (T-16 record added).
+  nz10y: 'IRLTLT01NZM156N', // nz-10y: New Zealand 10Y govt yield, monthly OECD mirror (citation-required)
   // NOTE (M3/D-44, 2026-10-24): the ICE BofA credit-spread series
   // (BAMLH0A0HYM2 / BAMLC0A0CM) are deliberately ABSENT: the T-16 scan
   // found FRED's "copyright-pre-approval" tag on them — the publisher's

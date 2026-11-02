@@ -814,8 +814,9 @@ async function storedSeriesOf(store: InsightsStore, id: IndicatorId): Promise<Se
  * read + 1 status read + the stored-history reads (one per refreshed id) +
  * the planned fetches (S4-M4.4: 2 daily [mof + gpr-daily] / 5 Saturday
  * [mof + the three EIA pages + cftc] / 7 first-of-month max [mof×2 + oecd
- * + gpr + epu + tpu + gscpi, + gpr-daily]) + 4 writes (snapshot, public,
- * stage, status) — an all-gates day lands ≈ 39/50, inside the ceiling.
+ * + gpr + epu + tpu + gscpi, + gpr-daily] — S6-M6.1 adds the NZ pair on
+ * first-of-month days, +2) + 4 writes (snapshot, public, stage, status)
+ * — an all-gates day lands ≈ 41/50, inside the ceiling.
  */
 export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Rung2PhaseResult> {
   const now = opts.now ?? new Date();
@@ -831,7 +832,7 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   const missing = new Set<string>(RUNG2_IDS.filter((id) => (stage ? stage.series[id] === undefined : true)));
   const plan = opts.plan ?? rung2FetchPlanFor(now, missing);
   console.log(
-    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly}` +
+    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} nzMonthly=${plan.nzMonthly}` +
       (stage === undefined ? ' (no stage — the Node/manual venue)' : ` (bootstrap-missing: ${[...missing].join(', ') || 'none'})`),
   );
 
@@ -955,6 +956,10 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     // gap-closure S4-M4.4 (2026-11-01): the GSCPI joins the monthly
     // merge list (full history per fetch, fetched wins on collision).
     'gscpi',
+    // gap-closure S6-M6.1 (2026-11-02): the NZ monthly mirrors join the
+    // same merge (full history per fetch, fetched wins on collision).
+    'nz-short-rate',
+    'nz-10y',
   ] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;

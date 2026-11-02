@@ -17,7 +17,9 @@ export const FRANKFURTER_BASE = 'https://api.frankfurter.dev/v1';
  * original three PLUS the dollar-basket six (I15, data spec §3 — one
  * Frankfurter timeseries request covers every business day's full quote
  * set, so eight currencies ride one fetch). NZD left 2026-10-23 (OD-7:
- * the nzd-usd card retired).
+ * the nzd-usd card retired) and REJOINS 2026-11-02 (gap-closure S6-M6.1:
+ * the audnzd cross — the measured AU-NZ link card; one more field on the
+ * SAME request, zero new fetches).
  */
 export const FRANKFURTER_INSIGHTS_CURRENCIES = [
   'JPY',
@@ -32,6 +34,11 @@ export const FRANKFURTER_INSIGHTS_CURRENCIES = [
   // card, the EM-pressure first member (the review: both passes probed it
   // live, 49.63 vs 49.628 the same day). One request covers all legs.
   'TRY',
+  // gap-closure S6-M6.1 (2026-11-02): NZD rejoins as the tenth leg — the
+  // audnzd card (NZD per AUD, derived from the two USD legs). Verified
+  // live 2026-11-02: the ECB publishes the NZD reference rate and the
+  // timeseries serves 2559 business days 2016-11-02 → 2026-11-02.
+  'NZD',
 ] as const;
 
 /** URL of the USD-base timeseries for `currencies` from `start` (ISO date). */

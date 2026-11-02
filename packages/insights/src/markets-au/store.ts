@@ -114,3 +114,102 @@ export class KvAuMarketsStore implements AuMarketsReader, AuMarketsWriter {
     return 'written';
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * Cloudflare REST adapter (gap-closure S6-M6.1, 2026-11-02) — the
+ * markets-run.ts "Path B" twin for the AU board: the manual runner
+ * (packages/insights/scripts/markets-au-run.ts) writes the AU key through
+ * the KV REST API, so a post-deploy verification or a fresh index can
+ * land WITHOUT waiting for the 07:00 UTC cron tick (the M5.4 board's
+ * original bootstrap had to wait a day). Mirrors RestMarketsStore's
+ * request/retry shape verbatim (the proven class).
+ * ------------------------------------------------------------------ */
+
+export const AU_CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4';
+
+export interface RestAuMarketsOptions {
+  /** Cloudflare API token (KV write permission on the RATES namespace). */
+  apiToken: string;
+  accountId: string;
+  /** The RATES namespace id (apps/api/wrangler.jsonc kv_namespaces[0].id). */
+  namespaceId: string;
+  /** Injected for tests — defaults to global fetch. */
+  fetchImpl?: typeof fetch;
+  /** REST base override (tests). */
+  baseUrl?: string;
+  /** Daily-cap (429/10048) retry ladder in ms; [] disables (tests). */
+  retryDelaysMs?: readonly number[];
+}
+
+export class RestAuMarketsStore implements AuMarketsReader, AuMarketsWriter {
+  private readonly fetchImpl: typeof fetch;
+  private readonly baseUrl: string;
+  private readonly retryDelaysMs: readonly number[];
+  readonly ops = { reads: 0, writes: 0, retriedWrites: 0 };
+
+  constructor(private readonly opts: RestAuMarketsOptions) {
+    this.fetchImpl = opts.fetchImpl ?? ((input, init) => fetch(input, init));
+    this.baseUrl = opts.baseUrl ?? AU_CLOUDFLARE_API_BASE;
+    this.retryDelaysMs = opts.retryDelaysMs ?? [60_000, 120_000];
+  }
+
+  private url(): string {
+    return (
+      `${this.baseUrl}/accounts/${this.opts.accountId}` +
+      `/storage/kv/namespaces/${this.opts.namespaceId}/values/${encodeURIComponent(MARKETS_AU_KV_KEY)}`
+    );
+  }
+
+  private async request(init: RequestInit): Promise<Response> {
+    return this.fetchImpl(this.url(), {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${this.opts.apiToken}`,
+        ...(init.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        ...(init.headers ?? {}),
+      },
+    });
+  }
+
+  /** Daily-cap detection: HTTP 429 with CF error 10048 (verified 2026-10-06). */
+  private isDailyCap(status: number, body: string): boolean {
+    return status === 429 && body.includes('10048');
+  }
+
+  private async sleep(ms: number): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async getAuMarkets(): Promise<AuMarketsSnapshot | undefined> {
+    this.ops.reads++;
+    const res = await this.request({ method: 'GET' });
+    if (res.status === 404) return undefined;
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`[markets-au-store] GET ${MARKETS_AU_KV_KEY} → HTTP ${res.status}: ${body.slice(0, 200)}`);
+    }
+    return parseStoredAuMarkets(await res.text());
+  }
+
+  async putAuMarketsIfChanged(
+    next: AuMarketsSnapshot,
+    prev: AuMarketsSnapshot | undefined,
+  ): Promise<'written' | 'unchanged'> {
+    if (auMarketsContentEqual(prev, next)) return 'unchanged';
+    const payload = JSON.stringify(next);
+    for (let attempt = 0; ; attempt++) {
+      const res = await this.request({ method: 'PUT', body: payload });
+      if (res.ok) {
+        this.ops.writes++;
+        return 'written';
+      }
+      const body = await res.text().catch(() => '');
+      if (this.isDailyCap(res.status, body) && attempt < this.retryDelaysMs.length) {
+        this.ops.retriedWrites++;
+        await this.sleep(this.retryDelaysMs[attempt]!);
+        continue;
+      }
+      throw new Error(`[markets-au-store] PUT ${MARKETS_AU_KV_KEY} → HTTP ${res.status}: ${body.slice(0, 200)}`);
+    }
+  }
+}

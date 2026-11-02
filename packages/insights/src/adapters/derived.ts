@@ -102,6 +102,10 @@ export interface SeriesInputs {
      *  own subrequest and handed in here alongside the Frankfurter set. */
     TRY?: SeriesPoint[];
     AED?: SeriesPoint[];
+    /** gap-closure S6-M6.1 (2026-11-02): NZD rejoins the Frankfurter set
+     *  (the audnzd cross — the measured AU-NZ link card). The ECB serves
+     *  the NZD reference rate; the leg rides the one timeseries request. */
+    NZD?: SeriesPoint[];
   };
   /** World Bank Pink Sheet monthly series. */
   wb?: WorldBankMonthly;
@@ -573,8 +577,9 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // reference rate). Context info card in the dollar lane beside usdtry.
   put('usdaed', fx.AED);
   // nzd-usd retired 2026-10-23 (OD-7, D-42): an indicator card for an
-  // audience that doesn't exist — no replacement, the Frankfurter request
-  // drops the NZD leg again.
+  // audience that doesn't exist — no replacement. The NZD LEG returned
+  // 2026-11-02 (gap-closure S6-M6.1): not as its own card, but as the
+  // audnzd cross above (the measured AU-NZ link).
 
   // 2026-10-26 gap-audit build, wave 3: the fetched rung-2 additions —
   // the weekly pair (A-6/A-7) and the monthly trio (A-8..A-10) ride the
@@ -808,6 +813,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   if (fx.AUD) put('audusd', invert(fx.AUD));
   if (fx.JPY && fx.AUD) {
     put('audjpy', combineSeries(fx.JPY, fx.AUD, (jpy, aud) => jpy / aud));
+  }
+  // gap-closure S6-M6.1 (2026-11-02): the AUD/NZD cross — the measured
+  // AU-NZ link card (NZD per AUD = the NZD-per-USD ÷ AUD-per-USD legs,
+  // the audjpy pattern). Context-only per G-5; rides the au-external
+  // shadow lane.
+  if (fx.NZD && fx.AUD) {
+    put('audnzd', combineSeries(fx.NZD, fx.AUD, (nzd, aud) => nzd / aud));
   }
   put('terms-of-trade', abs?.termsOfTrade);
   put('iron-ore', wb?.ironOre);
@@ -1234,6 +1246,18 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'OECD (Composite leading indicator, amplitude-adjusted)',
     url: 'https://www.oecd.org/en/data/datasets/composite-leading-indicators-cli.htm',
   },
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family's source
+  // lines. The NZ short rate is the OECD FINMARK mirror (the RBNZ's own
+  // site is venue-blocked — the RBA/Akamai class); the NZ 10y is the FRED
+  // OECD mirror (citation-required, the bund/gilt sibling).
+  'nz-short-rate': {
+    name: 'OECD (Financial market dataset — short-term interest rates, monthly average)',
+    url: 'https://www.oecd.org/en/data/datasets/main-economic-indicators.htm',
+  },
+  'nz-10y': {
+    name: 'OECD via FRED (IRLTLT01NZM156N, monthly average)',
+    url: 'https://fred.stlouisfed.org/series/IRLTLT01NZM156N',
+  },
   'gpr-index': {
     name: 'Caldara-Iacoviello Geopolitical Risk Index (Federal Reserve Board)',
     url: 'https://www.matteoiacoviello.com/gpr.htm',
@@ -1418,6 +1442,8 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'au-rent-yoy': { name: 'ABS (CPI Rents)', url: 'https://data.api.abs.gov.au/rest/data/CPI/1.115522.10.50.M' },
   audusd: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   audjpy: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
+  // gap-closure S6-M6.1: the AUD/NZD cross rides the same Frankfurter legs.
+  audnzd: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   'au-us-10y-gap': { name: 'RBA F2 − FRED (DGS10)', url: 'https://www.rba.gov.au/statistics/tables/' },
   // 2026-10-26 gap-audit build, A-5.
   'rba-fed-gap': {

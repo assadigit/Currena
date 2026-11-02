@@ -83,6 +83,10 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       // public-domain and never bounded.
       'net-liquidity',
       'nfci',
+      // gap-closure S6-M6.1 (2026-11-02): the NZ 10-year mirror — FRED
+      // citation-required (the bund/gilt class), display-permitted with
+      // attribution.
+      'nz-10y',
       'philly-fed',
       // gap-closure S3-M3.2: the funding spreads — repo-stress's worst leg
       // is SOFR (already in this licence class), reverse-repo is RRPONTSYD

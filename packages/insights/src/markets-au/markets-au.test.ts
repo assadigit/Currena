@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { AuMarketId, AuMarketEntry } from '@currena/core';
+import type { AuMarketId, AuMarketEntry, AuMarketsSnapshot } from '@currena/core';
 import { AuMarketsSnapshotSchema } from '@currena/core';
 import { AU_MARKET_IDS, auMarketDefinition } from './definitions';
 import {
@@ -26,6 +26,7 @@ import { runAuMarketsJob } from './job';
 import type { AuMarketJobFetchers } from './job';
 import type { AuMarketSeries } from './providers';
 import { AuProviderError } from './providers';
+import { RestAuMarketsStore } from './store';
 
 /** A synthetic ascending 260-trading-day series ending on lastCloseDate. */
 function auSeries(id: AuMarketId, lastCloseDate: string, days = 260): AuMarketSeries {
@@ -47,8 +48,8 @@ function auSeries(id: AuMarketId, lastCloseDate: string, days = 260): AuMarketSe
 }
 
 describe('markets-au definitions', () => {
-  it('AU_MARKET_IDS has all 18 probe-verified ids', () => {
-    expect(AU_MARKET_IDS).toHaveLength(18);
+  it('AU_MARKET_IDS has all 18 probe-verified ASX ids + the S6-M6.1 NZX 50 rider', () => {
+    expect(AU_MARKET_IDS).toHaveLength(19);
     expect(AU_MARKET_IDS).toContain('aord');
     expect(AU_MARKET_IDS).toContain('axvi');
     expect(AU_MARKET_IDS).toContain('cba');
@@ -60,7 +61,7 @@ describe('markets-au definitions', () => {
     for (const id of AU_MARKET_IDS) {
       const def = auMarketDefinition(id);
       expect(def.yahooSymbol.length).toBeGreaterThan(0);
-      expect(def.group).toMatch(/^(broad|sectors|banks|volatility)$/);
+      expect(def.group).toMatch(/^(broad|sectors|banks|volatility|newzealand)$/);
     }
   });
 });
@@ -128,8 +129,8 @@ describe('markets-au compute', () => {
       generatedAt: '2026-10-12T07:31:00Z',
     });
     expect(snap).toBeDefined();
-    expect(snap!.markets).toHaveLength(18);
-    expect(snap!.summary.count).toBe(18);
+    expect(snap!.markets).toHaveLength(19);
+    expect(snap!.summary.count).toBe(19);
     expect(snap!.summary.roseToday).toBeGreaterThanOrEqual(0);
     // The snapshot passes the zod schema (all invariants).
     expect(() => AuMarketsSnapshotSchema.parse(snap)).not.toThrow();
@@ -147,7 +148,7 @@ describe('markets-au compute', () => {
       generatedAt: '2026-10-12T07:31:00Z',
     });
     const summary = summarizeAuMarkets(snap!.markets);
-    expect(summary.count).toBe(18);
+    expect(summary.count).toBe(19);
     expect(summary.nAttention).toBeGreaterThanOrEqual(0);
     expect(summary.nUnusual).toBeGreaterThanOrEqual(0);
     expect(['normal', 'attention', 'unusual']).toContain(summary.signal);
@@ -198,19 +199,19 @@ describe('markets-au job', () => {
       },
     };
     const job = await runAuMarketsJob({ fetchers, politenessMs: 0 }, { kind: 'main' }, prev, '2026-10-12', '2026-10-12T07:01:00Z');
-    // The axvi row failed; the other 17 succeeded.
-    expect(job.reports.filter((r) => r.usedSource === 'yahoo')).toHaveLength(17);
+    // The axvi row failed; the other 18 succeeded (the S6-M6.1 NZX rider included).
+    expect(job.reports.filter((r) => r.usedSource === 'yahoo')).toHaveLength(18);
     expect(job.reports.find((r) => r.id === 'axvi')!.usedSource).toBe('none');
-    expect(job.providerCalls.yahoo).toBe(18); // every market was attempted
+    expect(job.providerCalls.yahoo).toBe(19); // every market was attempted
   });
 
-  it('Yahoo-only: the budget is 18 calls + KV ops (≤ 50)', async () => {
+  it('Yahoo-only: the budget is 19 calls + KV ops (≤ 50)', async () => {
     const fetchers: AuMarketJobFetchers = {
       fetchYahoo: async (id) => auSeries(id, '2026-10-12'),
     };
     const job = await runAuMarketsJob({ fetchers, politenessMs: 0 }, { kind: 'main' }, undefined, '2026-10-12', '2026-10-12T07:01:00Z');
-    expect(job.providerCalls.yahoo).toBe(18);
-    // 18 fetches + 1 read + 1 write = 20 subrequests — under the 50 cap.
+    expect(job.providerCalls.yahoo).toBe(19);
+    // 19 fetches + 1 read + 1 write = 21 subrequests — under the 50 cap.
   });
 });
 
@@ -220,5 +221,93 @@ describe('markets-au compute reuses world helpers', () => {
     expect(typeof statusOf).toBe('function');
     expect(typeof trendOf).toBe('function');
     expect(typeof weeklySeries).toBe('function');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * gap-closure S6-M6.1 (2026-11-02): the REST store twin (the manual
+ * runner's Path B — the RestMarketsStore pattern).
+ * ------------------------------------------------------------------ */
+describe('RestAuMarketsStore (S6-M6.1: the manual runner\'s Path B store)', () => {
+  const snapshot: AuMarketsSnapshot = {
+    v: 1,
+    generatedAt: '2026-11-02T07:00:00Z',
+    markets: [
+      {
+        id: 'aord',
+        asOf: '2026-11-02',
+        close: 8978.2,
+        chg1d: 0.4,
+        chg3m: 2.1,
+        high52w: 9100,
+        low52w: 8000,
+        fromHigh: -1.3,
+        rangePos: 90,
+        trend: 'up',
+        status: 'normal',
+        source: 'yahoo',
+        stale: false,
+        weekly: [[0, 8978.2]],
+      },
+      {
+        id: 'nz50',
+        asOf: '2026-11-02',
+        close: 13698.63,
+        chg1d: 0.13,
+        chg3m: 1.4,
+        high52w: 14000,
+        low52w: 12000,
+        fromHigh: -2.2,
+        rangePos: 80,
+        trend: 'up',
+        status: 'normal',
+        source: 'yahoo',
+        stale: false,
+        weekly: [[0, 13698.63]],
+      },
+    ],
+    summary: { count: 2, roseToday: 1, nAttention: 0, nUnusual: 0, signal: 'normal', worstGroup: null },
+  };
+
+  it('GET 404 → undefined (no stored key); PUT writes on the changed path', async () => {
+    const calls: Array<{ method: string; body?: string }> = [];
+    const store = new RestAuMarketsStore({
+      apiToken: 'test-token',
+      accountId: 'acct',
+      namespaceId: 'ns',
+      retryDelaysMs: [],
+      fetchImpl: (async (input: RequestInfo | URL, init?: RequestInit) => {
+        calls.push({ method: init?.method ?? 'GET', body: typeof init?.body === 'string' ? init.body : undefined });
+        if ((init?.method ?? 'GET') === 'GET') return new Response('not found', { status: 404 });
+        return new Response('{"success":true}', { status: 200 });
+      }) as typeof fetch,
+    });
+    expect(await store.getAuMarkets()).toBeUndefined();
+    const out = await store.putAuMarketsIfChanged(snapshot, undefined);
+    expect(out).toBe('written');
+    expect(store.ops.reads).toBe(1);
+    expect(store.ops.writes).toBe(1);
+    expect(calls[1]!.body).toContain('"nz50"');
+  });
+
+  it('write-only-if-changed: identical content skips the PUT (zero KV cost)', async () => {
+    let puts = 0;
+    const store = new RestAuMarketsStore({
+      apiToken: 'test-token',
+      accountId: 'acct',
+      namespaceId: 'ns',
+      retryDelaysMs: [],
+      fetchImpl: (async (_input: RequestInfo | URL, init?: RequestInit) => {
+        if ((init?.method ?? 'GET') === 'PUT') {
+          puts++;
+          return new Response('{"success":true}', { status: 200 });
+        }
+        return new Response(JSON.stringify(snapshot), { status: 200 });
+      }) as typeof fetch,
+    });
+    const prev = await store.getAuMarkets();
+    const out = await store.putAuMarketsIfChanged(snapshot, prev);
+    expect(out).toBe('unchanged');
+    expect(puts).toBe(0);
   });
 });

@@ -13,7 +13,7 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 153-indicator dashboard
+## 1. What indicators Currena has — the 156-indicator dashboard
 
 The Insights page renders **145 indicators** across **2 sections** (Global
 99, Australia 23 — see the
@@ -48,13 +48,13 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `rba-cash-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
 | **au-trade-currency** | australia | **audusd**, **audjpy**, **terms-of-trade**, **rba-fed-gap** + context: `iron-ore`, `coal-aus`, `lng-japan` (S4-M4.4: the energy export pair beside iron ore), `gold-aud` | 4 |
 | **au-activity** (shadow, S5-M5.2) | australia | context only (never votes until S6): `au-gdp-growth` (the chain-volume GDP annual rate), `au-household-spending` (the CEASED Retail Trade flow's HSI successor), `au-building-approvals` (the dwelling-unit count, original terms), `au-population-growth` (the ERP annual rate, with the `au-nom` net-migration companion rendered inside its card), `au-participation`, `au-underemployment` (the LF_UNDER series the LF flow does not carry) | 0 |
-| **au-external** (shadow, S5-M5.2) | australia | context only (never votes until S6): `au-trade-balance` (the ABS's own "Balance on goods", SA $m). The spec's wider membership (terms of trade, iron ore, coal, LNG, AUD/CNY) needs the S6 owner decision — moving the existing ids would reweight their current lanes (G-3) | 0 |
+| **au-external** (shadow, S5-M5.2 + S6-M6.1) | australia | context only (never votes until S6): `au-trade-balance` (the ABS's own "Balance on goods", SA $m) + the New Zealand link family `audnzd` (AUD/NZD from the Frankfurter legs) / `nz-short-rate` (OECD FINMARK monthly average) / `nz-10y` (FRED OECD mirror) — included on the measured evidence (evidence/M6.1/). The spec's wider membership (terms of trade, iron ore, coal, LNG, AUD/CNY) needs the S6 owner decision — moving the existing ids would reweight their current lanes (G-3) | 0 |
 
 **Voter total:** 9+5+5+3+10 + 5+7+4 = **48** (the market-stress fifth is
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (153 ids, alphabetical)
+### The complete indicator inventory (156 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -88,6 +88,9 @@ public-display-ok · scored voter? · short description.
 | `au-saving-ratio` | abs | quarterly | 250 | L0 | yes | – | Australian household saving rate |
 | `au-underemployment` | abs | monthly | 60 | L0 | yes | – | Underemployment rate, proportion of labour force (S5-M5.2, rung3 abs-au-macro; the LF_UNDER flow) |
 | `au-trade-balance` | abs | monthly | 75 | L0 | yes | – | Goods trade balance, seasonally adjusted $m (S5-M5.2, rung3 abs-au-macro; the ITGS "Balance on goods" series) |
+| `audnzd` | derived | daily | 4 | L1 | yes | – | AUD/NZD — NZD per AUD from the two Frankfurter USD legs (S6-M6.1; the measured AU-NZ link) |
+| `nz-short-rate` | oecd | monthly | 75 | L1 | yes | – | New Zealand short-term interest rate, OECD FINMARK monthly average (S6-M6.1; rung2 monthly gate — the honest mirror, the RBNZ site is venue-blocked) |
+| `nz-10y` | fred | monthly | 75 | L2 | yes | – | New Zealand 10-year government bond yield, FRED OECD mirror IRLTLT01NZM156N (S6-M6.1; rung2 monthly gate; citation-required) |
 | `au-participation` | abs | monthly | 60 | L0 | yes | – | Participation rate, persons, SA (S5-M5.2, rung3 abs-au-macro; the LF M12 sibling of au-unemployment) |
 | `au-population-growth` | abs | quarterly | 270 | L0 | yes | – | ERP annual growth rate (S5-M5.2, rung3 abs-au-macro; the ~170d publication rhythm) |
 | `au-nom` | abs | quarterly | 270 | L0 | yes | – | Net overseas migration, quarterly thousands — COMPANION-ONLY inside the population card (S5-M5.2) |

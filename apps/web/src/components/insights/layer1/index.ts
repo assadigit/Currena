@@ -91,6 +91,8 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   // gap-closure S5-M5.2 (2026-11-02): the Australian macro family -> 146-153.
   'au-gdp-growth', 'au-household-spending', 'au-building-approvals', 'au-population-growth',
   'au-nom', 'au-participation', 'au-underemployment', 'au-trade-balance',
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family.
+  'audnzd', 'nz-short-rate', 'nz-10y',
   'audusd', 'rba-fed-gap', 'audjpy', 'terms-of-trade', 'iron-ore', 'gold-aud',
   // Session 3 (GOLD_FRED_GAPFILL_SPEC G2, 2026-10-31): the breakeven
   // interplay context card → 102.

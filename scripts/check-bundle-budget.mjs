@@ -885,7 +885,12 @@ const BUDGETS = [
   // marketsAu EN/fa copy block (18 entries × 4 strings + the summary
   // templates + the table headers). Measured 1466.69/338.01; raw bumps
   // 1440 → 1470, gz 333 → 340. Justified in CHANGELOG §2026-11-02f.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1470_000, gz: 340_000, label: 'Insights lazy chunk' },
+  // gap-closure S6-M6.1 (2026-11-02, CHANGELOG §2026-11-02g): 1470→1490 /
+  // 340→343 — the New Zealand link family (three context cards' full EN+fa
+  // copy: INDICATORS + layer1 + the au-external lane copy) + the markets-au
+  // NZX 50 rider (the newzealand group + entries + the currency note).
+  // Measured 1484.51/341.88.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1490_000, gz: 343_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

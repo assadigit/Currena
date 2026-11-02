@@ -9279,6 +9279,183 @@
         "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
         "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
       }
+    },
+    {
+      "id": "audnzd",
+      "title": "AUD/NZD",
+      "area": {
+        "section": "australia",
+        "group": "au-external",
+        "gauge": "au-external",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "Frankfurter (ECB)",
+        "url": "https://frankfurter.dev",
+        "seriesIdOrTable": "Frankfurter USD→NZD ÷ USD→AUD"
+      },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The AUD/NZD exchange rate: how many New Zealand dollars one Australian dollar buys, derived from ECB reference rates via Frankfurter (the two legs of one request).",
+      "whatItIsnt": "Both currencies lean on the same commodity and China-demand forces, so the cross can stay quiet for long stretches.",
+      "trackRecordNote": "The cross has traded between roughly 1.01 and 1.25 New Zealand dollars over the past decade; the current level sits near the top of that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
+      },
+      "unit": "nzd",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "cadence default (daily)",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+      }
+    },
+    {
+      "id": "nz-short-rate",
+      "title": "New Zealand short-term interest rate (monthly average)",
+      "area": {
+        "section": "australia",
+        "group": "au-external",
+        "gauge": "au-external",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "oecd",
+        "name": "OECD (Financial market dataset — short-term interest rates, monthly average)",
+        "url": "https://www.oecd.org/en/data/datasets/main-economic-indicators.htm",
+        "seriesIdOrTable": "OECD FINMARK IR3TIB NZL (short-term interest rate, percent p.a., monthly average)"
+      },
+      "publisher": "OECD (Composite Leading Indicators via SDMX)",
+      "publisherUrl": "https://www.oecd.org/en/data/datasets/main-economic-indicators.htm",
+      "methodUrl": "https://www.oecd.org/en/data/datasets/main-economic-indicators.htm",
+      "whatItIs": "New Zealand’s short-term interest rate (the OECD’s monthly average of the money-market rate, percent per annum, published about a month behind) — the licence-clean mirror of the Reserve Bank of New Zealand’s policy setting.",
+      "whatItIsnt": "A monthly average smooths the moves inside the month, and the OECD publishes it about a month behind.",
+      "trackRecordNote": "The rate follows New Zealand’s policy cycle: it fell to 0.26% through 2020-21, climbed to 5.71% by early 2024, and has eased since — the same shape as Australia’s cycle.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (no verbatim quote from a plain fetch); the publication-page line is the OECD’s own material. Commercial-use requests go to rights@oecd.org — this site is an attribution-with-quote display, the FRED citation-required class.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "legs": [
+          "oecd"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "OECD reuse terms — free with suitable acknowledgment",
+        "attributionText": "Source: OECD (Composite leading indicators)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "The OECD’s standard reuse terms, quoted verbatim from the OECD’s own publication copyright pages (read 2026-10-26): “You can copy, download or print OECD content for your own use, and you can include excerpts from OECD publications, databases and multimedia products in your own documents, presentations, blogs, websites and teaching materials, provided that suitable acknowledgment of OECD as source and copyright owner is given.” The oecd.org terms-and-conditions page itself is JS-rendered (a plain fetch returns the app shell — no verbatim quote from there); the publication-page line is the OECD’s own material, and this site’s use (own cards, attribution, source link) sits inside it. Commercial-use and translation requests are directed to rights@oecd.org by the same terms. · Legs (oecd): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.oecd.org/en/about/legal/terms-conditions.html"
+      }
+    },
+    {
+      "id": "nz-10y",
+      "title": "New Zealand 10-year government bond yield",
+      "area": {
+        "section": "australia",
+        "group": "au-external",
+        "gauge": "au-external",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "OECD via FRED (IRLTLT01NZM156N, monthly average)",
+        "url": "https://fred.stlouisfed.org/series/IRLTLT01NZM156N",
+        "seriesIdOrTable": "FRED:IRLTLT01NZM156N (OECD monthly mirror, percent, monthly average)"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/IRLTLT01NZM156N",
+      "methodUrl": "https://fred.stlouisfed.org/series/IRLTLT01NZM156N",
+      "whatItIs": "The yield on New Zealand’s 10-year government bond (the OECD’s monthly mirror via FRED, percent, published about a month behind).",
+      "whatItIsnt": "A monthly average, published about a month behind; the daily moves in between are not visible here.",
+      "trackRecordNote": "Over the past decade the yield has ranged from 0.54% to 5.47%; like Australia’s 10-year, it climbed steeply through 2022-23.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": true,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED license tag #copyright-citation-required per the T-16 scan (2026-10-16): \"Copyrighted: Citation Required\" — the series page names the upstream copyright holder (e.g. © Cboe for VIXCLS). Public display restricted by the upstream copyright; shown privately under the owner’s recorded acceptance, never in public mode (T-15).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:IRLTLT01NZM156N"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED series page (read live 2026-11-02, gap-closure S6-M6.1): title 'Interest Rates: Long-Term Government Bond Yields: 10-Year: Main (Including Benchmark) for New Zealand', source Organization for Economic Co-operation and Development, monthly Percent NSA, latest Sep 2026 (updated Oct 15, 2026), copyright class 'Copyrighted: Citation Required' — the IRLTLT01DEM156N bund-10y sibling (checked 2026-11-02) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:IRLTLT01NZM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
     }
   ]
 }

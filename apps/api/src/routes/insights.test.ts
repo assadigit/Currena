@@ -611,9 +611,9 @@ describe('GET /api/insights/markets-au', () => {
     expect(res.headers.get('cache-control')).toBe('private, no-store');
   });
 
-  it('the 18-market AU snapshot stays well under the route budget', async () => {
+  it('the 19-market AU snapshot (the S6-M6.1 NZX rider included) stays well under the route budget', async () => {
     const snap = await realisticAuSnapshot();
-    expect(snap.markets.length).toBe(18);
+    expect(snap.markets.length).toBe(19);
     expect(snap.markets.every((m) => m.weekly.length === 52)).toBe(true);
     const bytes = JSON.stringify(snap).length;
     expect(bytes).toBeLessThan(16 * 1024);

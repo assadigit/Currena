@@ -48,6 +48,22 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 | Raw materials | مواد خام | The Australia-angle trade word (round 71; the Malacca/Taiwan `whyItMatters` — «صادرات مواد خام استرالیا») |
 | The biggest buyers | بزرگ‌ترین خریداران | ZWNJ in بزرگ‌ترین; the superlative form chosen over a share claim (round 71 — tendencies only, never a number) |
 
+## New Zealand (gap-closure S6, round 73)
+
+| English | Persian | Notes |
+| --- | --- | --- |
+| New Zealand | نیوزیلند | `marketsAu.groups.newzealand` + every NZ card |
+| S&P/NZX 50 | شاخص ۵۰ شرکت بزرگ نیوزیلند | `marketsAu.entries.nz50.name`; the Latin tag `S&P/NZX 50` stays |
+| NZX (the exchange) | بورس نیوزیلند | `marketsAu.entries.nz50.what` |
+| AUD/NZD | دلار استرالیا در برابر دلار نیوزیلند | the audusd pattern (`indicators.audnzd.name`) |
+| New Zealand dollar | دلار نیوزیلند | `units.nzd` |
+| The cross-Tasman pair | جفت‌ارز تاسمان | the audnzd layer-1 plainName (Tasman = تاسمان) |
+| Short-term interest rate | نرخ بهرهٔ کوتاه‌مدت | `indicators.nz-short-rate` — never «نرخ رسمی بهره» (that is the RBA policy-rate word) |
+| Money-market rate | نرخ بازار پول | the nz-short-rate whatItIs |
+| 10-year government bond yield | بازده اوراق قرضه ۱۰سالهٔ دولت نیوزیلند | the au-10y pattern (`indicators.nz-10y.name`) |
+| Reserve Bank of New Zealand | بانک مرکزی نیوزیلند | the «بانک مرکزی» glossary term |
+| OECD (the organisation) | سازمان همکاری و توسعه اقتصادی | one convention everywhere (no hamza on توسعه) |
+
 ## Exchange rates and conversion
 
 | English | Persian | Notes |

@@ -31,6 +31,8 @@ export type UnitToken =
   | 'try'
   // 2026-10-29 owner round: the UAE dirham (the usdaed pair).
   | 'aed'
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand dollar (the audnzd pair).
+  | 'nzd'
   // M6 Wave 3 (2026-10-25): the leading-edge batch — Australian billions
   // ("A$97.6bn" EN), US permits and job openings scaled to millions
   // ("1.40m permits a year"), AU vacancies in thousands ("325k").
@@ -75,6 +77,8 @@ export interface UnitLabels {
   try: string;
   // 2026-10-29 owner round (the usdaed card): the UAE dirham unit.
   aed: string;
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand dollar unit.
+  nzd: string;
   'aud-bn': string;
   permits: string;
   openings: string;
@@ -99,7 +103,7 @@ interface DisplayConfig {
 }
 
 /** Units rendered as a prefix in English (suffix everywhere in Farsi). */
-const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'usd-tr', 'eur', 'jpy', 'cny', 'try']);
+const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'usd-tr', 'eur', 'jpy', 'cny', 'try', 'nzd']);
 
 export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'yield-curve-10y2y': { decimals: 2, unit: 'points' },
@@ -351,6 +355,11 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'au-participation': { decimals: 1, unit: 'percent' },
   'au-underemployment': { decimals: 1, unit: 'percent' },
   'au-trade-balance': { decimals: 0, unit: 'aud-m' },
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family — the
+  // audnzd cross (4dp like audusd), the two NZ rate mirrors (2dp percent).
+  audnzd: { decimals: 4, unit: 'nzd' },
+  'nz-short-rate': { decimals: 2, unit: 'percent' },
+  'nz-10y': { decimals: 2, unit: 'percent' },
 };
 
 /** The Fed target corridor's half-width (the FOMC has used 25bp since 2008). */

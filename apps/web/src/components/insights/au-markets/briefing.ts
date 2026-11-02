@@ -28,7 +28,14 @@ export interface AuGroupBreadth {
   worst: number | null;
 }
 
-/** The per-group breadth under the given view lens. */
+/** The per-group breadth under the given view lens.
+ *
+ * The group list is the FOUR Australian groups by design: the one-line
+ * summary describes the Australian market (its copy says so), and the
+ * S6-M6.1 `newzealand` rider group — a single NZD row — deliberately stays
+ * OUT of the leading/lagging extrema (a one-row group would also break the
+ * plural grammar of the summary sentences). The NZX row renders in its own
+ * labelled group below; its own numbers carry its story. */
 export function auGroupBreadth(
   markets: readonly AuMarketEntry[],
   view: AuMarketsView,

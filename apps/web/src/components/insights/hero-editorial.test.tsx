@@ -608,9 +608,9 @@ describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
     const cards = regionCards();
     const auCard = within(cards[1]! as HTMLElement);
     const badge = auCard.getByText('readings out of date', { exact: false });
-    // The AU gauges have 23 members total (16 voters + the 7 S5-M5.2 shadow members); the three RBA readings are stale.
+    // The AU gauges have 26 members total (16 voters + the 7 S5-M5.2 shadow members + the 3 S6-M6.1 NZ-link members); the three RBA readings are stale.
     expect(badge.textContent).toContain('3');
-    expect(badge.textContent).toContain('23');
+    expect(badge.textContent).toContain('26');
     // Global has no stale members in this fixture → its card carries none.
     const globalCard = within(cards[0]! as HTMLElement);
     expect(globalCard.queryByText('readings out of date', { exact: false })).toBeNull();
@@ -645,6 +645,6 @@ describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
     const cards = regionCards();
     const auCard = within(cards[1]! as HTMLElement);
     // «۳ مورد از ۲۳ قرائت قدیمی است» — the fa copy with Persian digits.
-    expect(auCard.getByText('قرائت قدیمی است', { exact: false }).textContent).toContain('۲۳');
+    expect(auCard.getByText('قرائت قدیمی است', { exact: false }).textContent).toContain('۲۶');
   });
 });

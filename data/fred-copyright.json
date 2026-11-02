@@ -497,6 +497,14 @@
       "checkedOn": "2026-11-01",
       "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.5 session; U.S. Treasury MTS source)",
       "url": "https://fred.stlouisfed.org/series/MTSDS133FMS"
+    },
+    {
+      "seriesId": "IRLTLT01NZM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-02",
+      "evidence": "FRED series page (read live 2026-11-02, gap-closure S6-M6.1): title 'Interest Rates: Long-Term Government Bond Yields: 10-Year: Main (Including Benchmark) for New Zealand', source Organization for Economic Co-operation and Development, monthly Percent NSA, latest Sep 2026 (updated Oct 15, 2026), copyright class 'Copyrighted: Citation Required' — the IRLTLT01DEM156N bund-10y sibling",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01NZM156N"
     }
   ]
 }

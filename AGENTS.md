@@ -145,7 +145,7 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 153 indicators (48 voting [V] + 105 context [C])
+### A. The 156 indicators (48 voting [V] + 108 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
@@ -452,7 +452,7 @@ days per chokepoint, zod both ways); the rung3 'portwatch' extra source
 (04:30, daily gate, budget 18) fetches + patches; the ids ride
 CARRY_FORWARD_IDS and the history phases exclude them.)*
 
-#### AUSTRALIA (31 indicators, 16 voting)
+#### AUSTRALIA (34 indicators, 16 voting)
 
 **Inflation and rates** (`au-inflation-rates` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -512,11 +512,14 @@ underemployment). `au-nom` is COMPANION-ONLY — it renders inside the
 population card (COMPANIONS['au-population-growth']), never its own lane
 row. Fixtures: `packages/insights/fixtures/s5/`.)*
 
-**External** (the `au-external` lane — "How is Australia's trade and China
-link?", a SHADOW gauge until S6, same discipline):
+**External** (the `au-external` lane — "How are Australia's trade and
+partner links?", a SHADOW gauge until S6, same discipline):
 | | id | cadence | maxAge | rule | source |
 |---|---|---|---|---|---|
 | [C] | `au-trade-balance` | monthly | 75 | info | abs |
+| [C] | `audnzd` | daily | 4 | info | derived |
+| [C] | `nz-short-rate` | monthly | 75 | info | oecd |
+| [C] | `nz-10y` | monthly | 75 | info | fred |
 
 *(gap-closure S5-M5.2, 2026-11-02: the ABS's own "Balance on goods" series
 (ITGS DATA_ITEM 170, seasonally adjusted, $m — served by the provider,
@@ -524,6 +527,30 @@ never computed). The spec's wider lane membership — terms of trade, iron
 ore, coal, LNG, AUD/CNY — needs the S6 owner decision: moving the existing
 ids would reweight their current lanes (G-3), so the S6 promotion proposal
 carries it.)*
+
+*(gap-closure S6-M6.1, 2026-11-02: the New Zealand link family — the
+measured evidence in docs/gap-closure/evidence/M6.1/ (weekly ASX/NZX
+returns correlation 0.73; AUD/USD vs NZD/USD daily correlation 0.86,
+rolling-1y never below 0.62; AU vs NZ 10y yield-levels correlation 0.93
+since 1970; the RBNZ's own 84%-of-bank-lending figure; MFAT's $32.76bn
+two-way trade) cleared G-6. `audnzd` derives from the Frankfurter legs
+(NZD rejoined the one timeseries request — zero new fetches);
+`nz-short-rate` is the OECD FINMARK monthly average (the honest mirror:
+rbnz.govt.nz is venue-blocked, the FRED OCR-family mirror is stale at
+2024-12 AND is the call-money rate — the card is named for what it is);
+`nz-10y` is the FRED OECD monthly mirror (IRLTLT01NZM156N,
+citation-required, the bund/gilt sibling). The two mirrors ride rung2's
+first-of-month gate (+2 fetches on that day). All context-only per G-5;
+the lane header copy reads the wider "trade and partner links" story.)*
+
+**The Australian markets board** (S5-M5.4 + S6-M6.1): the 18 probe-verified
+ASX indices + the S&P/NZX 50 rider (Yahoo `^NZ50`, NZD, its own
+`newzealand` group, last) on the separate `AuMarketId` union — one KV key
+`insights:markets-au:v1`, written by the markets worker's 4th cron
+(`0 7 * * 1-5`), served at `GET /api/insights/markets-au`. The ASX 200
+anchor stays on the world board. The manual runner
+`pnpm --filter @currena/insights markets-au-run` (S6-M6.1) writes the key
+through the KV REST API for post-deploy landings.
 
 ### B. The markets board (16 world stock indices)
 

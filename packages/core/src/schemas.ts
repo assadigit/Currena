@@ -439,6 +439,15 @@ export const IndicatorIdSchema = z.enum([
   'au-participation', // ABS LF M12.3.1599.20.AUS.M (participation rate, SA) — context, au-activity
   'au-underemployment', // ABS LF_UNDER M23.3.1599.20.AUS.M (underemployment rate, SA) — context, au-activity
   'au-trade-balance', // ABS ITGS M1.170.20.AUS.M (balance on goods, SA, $m) — context, au-external
+  // ---- gap-closure S6-M6.1 (2026-11-02): the New Zealand link family —
+  // context rows in the au-external shadow lane (G-5). Included on the
+  // measured evidence (docs/gap-closure/evidence/M6.1/): the weekly ASX/NZX
+  // returns correlation 0.73, the AUD/NZD daily correlation 0.86, the 10y
+  // yield-levels correlation 0.93, the RBNZ's own 84%-of-bank-lending
+  // figure and MFAT's $32.76bn two-way trade.
+  'audnzd', // Frankfurter (ECB): NZD per AUD, derived from the two USD legs — context, au-external
+  'nz-short-rate', // OECD FINMARK IR3TIB NZL (short-term interest rate, monthly average) — context, au-external
+  'nz-10y', // FRED IRLTLT01NZM156N (NZ 10-year government bond yield, OECD monthly mirror) — context, au-external
   // Global — Prices lane companions (context rows rendered in lanes)
   // 2026-10-26 gap-audit build (A-4): gold measured in oil — the classic
   // long-run relative-value ratio, derived gold-usd ÷ brent.
@@ -1621,6 +1630,14 @@ export type MarketsSnapshot = z.infer<typeof MarketsSnapshotSchema>;
  * ASX 200 itself stays on the world board (id `asx200`) and is shown
  * here as the anchor WITHOUT a second fetch (G-3 — never touch the 16).
  *
+ * gap-closure S6-M6.1 (2026-11-02): the New Zealand link — the S&P/NZX 50
+ * joins the board in its OWN `newzealand` group (G-6: NZ included only on
+ * the measured evidence in docs/gap-closure/evidence/M6.1/ — the weekly
+ * ASX/NZX returns correlation 0.73, the AUD/NZD daily correlation 0.86, the
+ * 10y-yield-levels correlation 0.93, the RBNZ's own 84%-of-bank-lending
+ * figure and MFAT's $32.76bn two-way trade). The NZX row is NZD-denominated
+ * (its own market's currency); the board's currency note says so.
+ *
  * The row shape mirrors MarketEntry exactly (the same 52-week-high
  * distance, the same chg1d/1w/1m/3m/1y/5y lenses, the same weekly delta
  * encoding) so the AU board reuses the world board's tile/table
@@ -1636,6 +1653,11 @@ export type MarketsSnapshot = z.infer<typeof MarketsSnapshotSchema>;
  * Information Technology); `axso` is the ASX Small Ordinaries; `axvi` is
  * the ASX 200 VIX; `cba`/`nab`/`anz`/`wbc` are the four major banks. The
  * ASX 200 (`asx200`) is NOT here — it stays on the world board.
+ *
+ * gap-closure S6-M6.1 (2026-11-02): `nz50` is the S&P/NZX 50 INDEX GROSS
+ * (Yahoo `^NZ50`, NZD, the NZSE — verified from the provider's own response,
+ * docs/gap-closure/evidence/M6.1/), the New Zealand link the S6 evidence
+ * approved. Its group is `newzealand`, never an ASX group.
  */
 export const AuMarketIdSchema = z.enum([
   'aord',
@@ -1656,11 +1678,15 @@ export const AuMarketIdSchema = z.enum([
   'nab',
   'anz',
   'wbc',
+  // gap-closure S6-M6.1: the New Zealand link (own group, NZD currency).
+  'nz50',
 ]);
 export type AuMarketId = z.infer<typeof AuMarketIdSchema>;
 
-/** The AU board's own group order: broad → sectors → banks → volatility. */
-export const AuMarketGroupIdSchema = z.enum(['broad', 'sectors', 'banks', 'volatility']);
+/** The AU board's own group order: broad → sectors → banks → volatility
+ * → the New Zealand link (S6-M6.1: the cross-Tasman rider rides LAST so the
+ * Australian groups stay contiguous). */
+export const AuMarketGroupIdSchema = z.enum(['broad', 'sectors', 'banks', 'volatility', 'newzealand']);
 export type AuMarketGroupId = z.infer<typeof AuMarketGroupIdSchema>;
 
 /** The AU board is Yahoo-only (the M5.1 probe decision; EODHD quota spent). */

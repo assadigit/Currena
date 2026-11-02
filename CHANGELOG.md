@@ -5,6 +5,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02g] — gap-closure S6-M6.1: the New Zealand link (the measured inclusion — the NZX 50 rider + audnzd + the two NZ rate mirrors)
+
+G-6 cleared on measured evidence (docs/gap-closure/evidence/M6.1/): the
+weekly ASX 200/NZX 50 returns correlation 0.73, the AUD/USD vs NZD/USD
+daily correlation 0.86 (rolling-1y never below 0.62), the AU−NZ 10-year
+yield-levels correlation 0.93 (1970→2026), and two structural links quoted
+verbatim from official sources (the RBNZ's own 84% of bank lending; MFAT's
+$32.76bn two-way trade 2024). Four context-only additions, all in the
+au-external shadow lane (G-5):
+
+- **NZX 50 on the Australian markets board** — Yahoo `^NZ50` (S&P/NZX 50
+  INDEX GROSS, NZD — verified from the provider's own response), its own
+  `newzealand` group riding LAST so the ASX groups stay contiguous. The
+  board's currency note now states the mixed currencies honestly; the
+  one-line leading/lagging summary keeps describing the Australian groups
+  only (a one-row group would also break the summary's plural grammar).
+  19 fetches + 1 read + 1 write = 21 subrequests on the markets worker's
+  07:00 UTC cron. New `markets-au-run` Node runner (the markets-run
+  Path-B twin) writes the key via the KV REST API so a fresh index can
+  land without waiting for the cron tick.
+- **`audnzd`** — AUD/NZD derived from the two Frankfurter USD legs (NZD
+  rejoined the one timeseries request; zero new fetches), the audjpy
+  pattern.
+- **`nz-short-rate`** — the OECD FINMARK monthly average (IR3TIB, NZL,
+  fresh through 2026-09). The honest mirror: rbnz.govt.nz 403s the work
+  venue (the RBA/Akamai class) and the FRED OCR-family mirror is stale at
+  2024-12 AND is FRED's own call-money rate — so the card is named for
+  exactly what the data is, never the Official Cash Rate.
+- **`nz-10y`** — the FRED OECD monthly mirror (IRLTLT01NZM156N,
+  citation-required; the T-16 record added; the bund/gilt sibling).
+
+Ingest: the two NZ mirrors ride rung2's first-of-month gate (+2 fetches on
+that day, the all-gates arithmetic ≈41/50). The lane header copy reads the
+wider "trade and partner links" story (EN + fa). Persian copy round-73
+(86 strings + 4 re-reviews). Registry 153 → **156 indicators** (48 voting +
+108 context). Bundle: Insights lazy 1470/340 → **1490/343** (measured
+1484.65/341.88 — three cards' full EN+fa copy + the markets-au rider).
+Gates: 13,873 → **14,072 tests green**.
+
 ## [2026-11-02f] — gap-closure S5-M5.4/M5.5/M5.6: the Australian markets board + the money-panel housing drivers + the ABS release calendar (S5 complete 6/6)
 
 The S5 close: the Australian markets board, the money-panel's two new

@@ -3,9 +3,9 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "3251abf54e7562d004735ddc7875a8b9e5796e1f151d91d17ca73f458e06d2cc",
-    "faSha256": "7167998f1985a861152600bb634d0763391cbae12dc747ea8debe06f7ba301da",
-    "indicatorCount": 182,
+    "enSha256": "296926abda0065c04d0a89b5940701bc7bba3c114dd65d6c64727c6654c71aab",
+    "faSha256": "ef828f68ba1ab24d1d1a7f8d7818bfe9d47f61e7d54ce11c924b5ed2b65e65a0",
+    "indicatorCount": 185,
     "glossaryCount": 51
   },
   "en": {
@@ -3882,6 +3882,75 @@
         "glossaryTerms": [
           "trade-balance",
           "commodity"
+        ]
+      },
+      "audnzd": {
+        "plainName": "The Tasman pair",
+        "oneLine": "How many New Zealand dollars one Australian dollar buys.",
+        "ifRising": "Australian money goes further in New Zealand.",
+        "ifFalling": "New Zealand money goes further in Australia.",
+        "connections": [
+          {
+            "with": "audusd",
+            "text": "The two dollars usually rise and fall together against the world.",
+            "strength": "reliable"
+          },
+          {
+            "with": "nz-10y",
+            "text": "The gap between the two countries’ long-term yields usually steers this cross.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "Australia and New Zealand share banks, trade and tourists; the cross reads the small differences between two closely linked economies.",
+        "glossaryTerms": [
+          "policy-rate",
+          "yield"
+        ]
+      },
+      "nz-short-rate": {
+        "plainName": "New Zealand borrowing costs",
+        "oneLine": "How expensive short-term borrowing is in New Zealand.",
+        "ifRising": "Borrowing in New Zealand is getting costlier; saving there pays more.",
+        "ifFalling": "Borrowing in New Zealand is getting cheaper; saving there pays less.",
+        "connections": [
+          {
+            "with": "rba-cash-rate",
+            "text": "The two central banks’ cycles have usually moved in the same direction.",
+            "strength": "usually"
+          },
+          {
+            "with": "audnzd",
+            "text": "Which side pays more usually steers the cross-Tasman exchange rate.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "The four large Australian-owned banks write most of New Zealand’s bank lending, so its rate cycle reaches Australian bank owners.",
+        "glossaryTerms": [
+          "interest-rate",
+          "central-bank"
+        ]
+      },
+      "nz-10y": {
+        "plainName": "New Zealand long-term rates",
+        "oneLine": "What ten-year lending to New Zealand’s government pays.",
+        "ifRising": "Long-term money costs more in New Zealand.",
+        "ifFalling": "Long-term money costs less in New Zealand.",
+        "connections": [
+          {
+            "with": "au-10y",
+            "text": "The two 10-year yields move closely together; world rates set both.",
+            "strength": "reliable"
+          },
+          {
+            "with": "audnzd",
+            "text": "The yield gap between the two countries usually steers the cross.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "New Zealand’s long-term yield tracks Australia’s closely; the gap between them reads the local differences.",
+        "glossaryTerms": [
+          "bond",
+          "yield"
         ]
       }
     },
@@ -8018,6 +8087,75 @@
         "glossaryTerms": [
           "trade-balance",
           "commodity"
+        ]
+      },
+      "audnzd": {
+        "plainName": "جفت‌ارز تاسمان",
+        "oneLine": "هر دلار استرالیا چند دلار نیوزیلند ارزش دارد.",
+        "ifRising": "پول استرالیایی در نیوزیلند بیشتر پیش می‌رود.",
+        "ifFalling": "پول نیوزیلندی در استرالیا بیشتر پیش می‌رود.",
+        "connections": [
+          {
+            "with": "audusd",
+            "text": "این دو دلار معمولاً در برابر جهان با هم بالا و پایین می‌شوند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "nz-10y",
+            "text": "فاصلهٔ بازدهی بلندمدت دو کشور معمولاً ارزش هر دلار در برابر دیگری را هدایت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "استرالیا و نیوزیلند بانک‌ها، تجارت و گردشگران را با هم به اشتراک دارند؛ این جفت‌ارز تفاوت‌های کوچک میان دو اقتصاد به‌هم‌پیوسته را نشان می‌دهد.",
+        "glossaryTerms": [
+          "policy-rate",
+          "yield"
+        ]
+      },
+      "nz-short-rate": {
+        "plainName": "هزینهٔ استقراض در نیوزیلند",
+        "oneLine": "استقراض کوتاه‌مدت در نیوزیلند چقدر گران است.",
+        "ifRising": "استقراض در نیوزیلند گران‌تر می‌شود؛ پس‌انداز آنجا بیشتر می‌پردازد.",
+        "ifFalling": "استقراض در نیوزیلند ارزان‌تر می‌شود؛ پس‌انداز آنجا کمتر می‌پردازد.",
+        "connections": [
+          {
+            "with": "rba-cash-rate",
+            "text": "چرخهٔ دو بانک مرکزی معمولاً هم‌جهت حرکت کرده است.",
+            "strength": "usually"
+          },
+          {
+            "with": "audnzd",
+            "text": "هر سوی تاسمان که بیشتر بپردازد معمولاً نرخ تبدیل میان دو دلار را هدایت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "به گفتهٔ خود بانک مرکزی نیوزیلند، چهار بانک بزرگ استرالیایی بیشترِ وام‌دهی بانکی آن کشور را می‌نویسند، پس چرخهٔ نرخش به مالکان بانک‌های استرالیایی می‌رسد.",
+        "glossaryTerms": [
+          "interest-rate",
+          "central-bank"
+        ]
+      },
+      "nz-10y": {
+        "plainName": "نرخ بلندمدت نیوزیلند",
+        "oneLine": "وام دادن ده‌ساله به دولت نیوزیلند چه بازدهی می‌پردازد.",
+        "ifRising": "پول بلندمدت در نیوزیلند گران‌تر تمام می‌شود.",
+        "ifFalling": "پول بلندمدت در نیوزیلند ارزان‌تر تمام می‌شود.",
+        "connections": [
+          {
+            "with": "au-10y",
+            "text": "دو بازدهی ۱۰ساله معمولاً با هم حرکت می‌کنند؛ نرخ‌های جهانی هر دو را تعیین می‌کنند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "audnzd",
+            "text": "فاصلهٔ بازدهی دو کشور معمولاً ارزش هر دلار در برابر دیگری را هدایت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "بازدهی بلندمدت نیوزیلند مسیر بازدهی استرالیا را دقیق دنبال می‌کند؛ فاصلهٔ آنها تفاوت‌های محلی را نشان می‌دهد.",
+        "glossaryTerms": [
+          "bond",
+          "yield"
         ]
       }
     },

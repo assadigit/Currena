@@ -206,8 +206,14 @@ export const GAUGES: readonly GaugeDef[] = [
   },
   {
     id: 'au-external',
+    // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family joins
+    // the lane (audnzd + nz-short-rate + nz-10y, all context-only — G-5);
+    // the lane header copy reads the wider story (trade + the New Zealand
+    // connection). The spec's wider AU membership (terms of trade, iron
+    // ore, coal, LNG, AUD/CNY) still needs the S6 owner decision — moving
+    // the existing ids would reweight their current lanes (G-3).
     section: 'australia',
-    members: ['au-trade-balance'],
+    members: ['au-trade-balance', 'audnzd', 'nz-short-rate', 'nz-10y'],
   },
 ];
 

@@ -75,6 +75,25 @@ const ASX_CLOSE_UTC_MINUTE = 6 * 60 + 30; // 06:30 UTC
 const ASX_HOLIDAYS = ['01-01', '04-25', '12-25', '12-26'] as const;
 
 /* ------------------------------------------------------------------ *
+ * The NZX regular session (S6-M6.1 — the ONE non-ASX row on the board).
+ * The NZX main board trades 10:00–16:45 NZ time with a closing auction
+ * to 17:00; the index finalises at the 17:00 close. NZST (UTC+12) in the
+ * southern winter, NZDT (UTC+13) Oct–Apr — DST-true through the
+ * Pacific/Auckland zone below. The constant closeUtcMinute takes the
+ * WINTER close (17:00 NZST = 05:00 UTC) + the 30-min settlement margin =
+ * 05:30 UTC — conservative in both seasons (the NZDT close is 04:00 UTC),
+ * and the 07:00 UTC run always sits past it. Fixed-date holiday subset
+ * (the ASX convention — variable-date holidays are not expressible in
+ * the MM-DD format; the open/closed display leans on Yahoo's own
+ * marketState first).
+ * ------------------------------------------------------------------ */
+const NZX_TIMEZONE = 'Pacific/Auckland';
+const NZX_OPEN_LOCAL_MINUTE = 600; // 10:00 local
+const NZX_CLOSE_LOCAL_MINUTE = 1020; // 17:00 local (after the closing auction)
+const NZX_CLOSE_UTC_MINUTE = 5 * 60 + 30; // 05:30 UTC (NZST close + margin)
+const NZX_HOLIDAYS = ['01-01', '02-06', '04-25', '12-25', '12-26'] as const;
+
+/* ------------------------------------------------------------------ *
  * The AU market definition
  * ------------------------------------------------------------------ */
 
@@ -103,10 +122,11 @@ export interface AuMarketDefinition {
 }
 
 /**
- * The 18 probe-verified Australian indices, in board render order:
- * broad first (the All Ordinaries + the Small Ordinaries), then the
- * eleven ASX 200 GICS sector indices, then the four major banks, then
- * the ASX 200 VIX. The ASX 200 anchor itself comes from the world board
+ * The 18 probe-verified Australian indices + the NZX 50 link, in board
+ * render order: broad first (the All Ordinaries + the Small Ordinaries),
+ * then the eleven ASX 200 GICS sector indices, then the four major banks,
+ * then the ASX 200 VIX, and LAST the S6-M6.1 New Zealand rider (its own
+ * group). The ASX 200 anchor itself comes from the world board
  * (id `asx200`) — it is NOT in this array (G-3).
  */
 export const AU_MARKETS: readonly AuMarketDefinition[] = [
@@ -188,6 +208,17 @@ export const AU_MARKETS: readonly AuMarketDefinition[] = [
     closeUtcMinute: ASX_CLOSE_UTC_MINUTE, timezone: ASX_TIMEZONE,
     openLocalMinute: ASX_OPEN_LOCAL_MINUTE, closeLocalMinute: ASX_CLOSE_LOCAL_MINUTE,
     holidays: ASX_HOLIDAYS },
+  // --- the New Zealand link (gap-closure S6-M6.1) ---
+  // The S&P/NZX 50 INDEX GROSS, NZD, the NZSE — Yahoo ^NZ50 verified from
+  // the provider's own response (the 2026-11-02 probe + the 10y evidence
+  // fetch: 2502 daily points, NZD, fresh through the probe day). Included
+  // on the S6 measured evidence (weekly returns correlation 0.73 vs the
+  // ASX 200 — the full record: docs/gap-closure/evidence/M6.1/). Its own
+  // session + currency — never an ASX row.
+  { id: 'nz50', group: 'newzealand', yahooSymbol: '^NZ50', latin: 'S&P/NZX 50',
+    closeUtcMinute: NZX_CLOSE_UTC_MINUTE, timezone: NZX_TIMEZONE,
+    openLocalMinute: NZX_OPEN_LOCAL_MINUTE, closeLocalMinute: NZX_CLOSE_LOCAL_MINUTE,
+    holidays: NZX_HOLIDAYS },
 ];
 
 const AU_BY_ID = new Map(AU_MARKETS.map((m) => [m.id as string, m]));
@@ -199,8 +230,9 @@ export function auMarketDefinition(id: AuMarketId): AuMarketDefinition {
   return def;
 }
 
-/** Group render order: broad → sectors → banks → volatility (the spec). */
-export const AU_MARKET_GROUP_ORDER: readonly AuMarketGroupId[] = ['broad', 'sectors', 'banks', 'volatility'];
+/** Group render order: broad → sectors → banks → volatility → the New
+ * Zealand link (the S6-M6.1 rider; the ASX groups stay contiguous). */
+export const AU_MARKET_GROUP_ORDER: readonly AuMarketGroupId[] = ['broad', 'sectors', 'banks', 'volatility', 'newzealand'];
 
 /** All AU market ids in board render order. */
 export const AU_MARKET_IDS: readonly AuMarketId[] = AU_MARKETS.map((m) => m.id);

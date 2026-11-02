@@ -2533,6 +2533,44 @@ const LAYER1 = {
       australiaAngle: 'Australia\u2019s external engine: commodity prices set the surplus, and the surplus feeds national income.',
       glossaryTerms: ['trade-balance', 'commodity'],
     },
+    // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family
+    // (context-only, the au-external shadow lane).
+    audnzd: {
+      plainName: 'The Tasman pair',
+      oneLine: 'How many New Zealand dollars one Australian dollar buys.',
+      ifRising: 'Australian money goes further in New Zealand.',
+      ifFalling: 'New Zealand money goes further in Australia.',
+      connections: [
+        { with: 'audusd', text: 'The two dollars usually rise and fall together against the world.', strength: 'reliable' },
+        { with: 'nz-10y', text: 'The gap between the two countries\u2019 long-term yields usually steers this cross.', strength: 'usually' },
+      ],
+      australiaAngle: 'Australia and New Zealand share banks, trade and tourists; the cross reads the small differences between two closely linked economies.',
+      glossaryTerms: ['policy-rate', 'yield'],
+    },
+    'nz-short-rate': {
+      plainName: 'New Zealand borrowing costs',
+      oneLine: 'How expensive short-term borrowing is in New Zealand.',
+      ifRising: 'Borrowing in New Zealand is getting costlier; saving there pays more.',
+      ifFalling: 'Borrowing in New Zealand is getting cheaper; saving there pays less.',
+      connections: [
+        { with: 'rba-cash-rate', text: 'The two central banks\u2019 cycles have usually moved in the same direction.', strength: 'usually' },
+        { with: 'audnzd', text: 'Which side pays more usually steers the cross-Tasman exchange rate.', strength: 'usually' },
+      ],
+      australiaAngle: 'The four large Australian-owned banks write most of New Zealand\u2019s bank lending, so its rate cycle reaches Australian bank owners.',
+      glossaryTerms: ['interest-rate', 'central-bank'],
+    },
+    'nz-10y': {
+      plainName: 'New Zealand long-term rates',
+      oneLine: 'What ten-year lending to New Zealand\u2019s government pays.',
+      ifRising: 'Long-term money costs more in New Zealand.',
+      ifFalling: 'Long-term money costs less in New Zealand.',
+      connections: [
+        { with: 'au-10y', text: 'The two 10-year yields move closely together; world rates set both.', strength: 'reliable' },
+        { with: 'audnzd', text: 'The yield gap between the two countries usually steers the cross.', strength: 'usually' },
+      ],
+      australiaAngle: 'New Zealand\u2019s long-term yield tracks Australia\u2019s closely; the gap between them reads the local differences.',
+      glossaryTerms: ['bond', 'yield'],
+    },
   } satisfies Record<string, Layer1Entry>,
 };
 
@@ -4968,6 +5006,75 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'The external lane\u2019s headline: read it beside iron ore, coal and LNG prices for the causes the balance records.',
   },
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family —
+  // context cards in the au-external shadow lane, on the measured evidence
+  // in docs/gap-closure/evidence/M6.1/.
+  audnzd: {
+    name: 'Australian dollar vs New Zealand dollar',
+    ticker: 'AUD/NZD',
+    oneLiner:
+      'How many New Zealand dollars one Australian dollar buys: the cross-Tasman pair.',
+    lines: {
+      highRising: 'The Australian dollar is unusually strong against the New Zealand dollar and strengthening.',
+      highEasing: 'The Australian dollar stays strong against the New Zealand dollar but is easing back.',
+      typical: 'The cross sits in its usual range for the decade.',
+      low: 'The Australian dollar is unusually weak against the New Zealand dollar.',
+    },
+    whatItIs:
+      'The AUD/NZD exchange rate: how many New Zealand dollars one Australian dollar buys, derived from ECB reference rates via Frankfurter (the two legs of one request).',
+    whyItMatters:
+      'The two dollars usually move together against the world \u2014 their daily moves correlate 0.86 over the past decade \u2014 so this cross reads the small differences between the two economies rather than global swings.',
+    tendedToMean:
+      'The cross has traded between roughly 1.01 and 1.25 New Zealand dollars over the past decade; the current level sits near the top of that range.',
+    cantTell:
+      'Both currencies lean on the same commodity and China-demand forces, so the cross can stay quiet for long stretches.',
+    forYou:
+      'The closest thing to a home-rate check for anyone who earns on one side of the Tasman and spends on the other.',
+  },
+  'nz-short-rate': {
+    name: 'New Zealand short-term interest rate',
+    ticker: 'NZ short rate',
+    oneLiner:
+      'New Zealand\u2019s overnight money-market rate as a monthly average: the read on the neighbour\u2019s borrowing costs.',
+    lines: {
+      highRising: 'Short-term borrowing in New Zealand is costlier and rising: a tight setting by the decade\u2019s standards.',
+      highEasing: 'Short-term borrowing in New Zealand stays costly but the monthly average is easing.',
+      typical: 'The rate sits in its usual range for the decade.',
+      low: 'Short-term borrowing in New Zealand is unusually cheap.',
+    },
+    whatItIs:
+      'New Zealand\u2019s short-term interest rate (the OECD\u2019s monthly average of the money-market rate, percent per annum, published about a month behind) \u2014 the licence-clean mirror of the Reserve Bank of New Zealand\u2019s policy setting.',
+    whyItMatters:
+      'New Zealand\u2019s banking is dominated by the four large Australian-owned banks \u2014 84% of bank lending, the Reserve Bank of New Zealand\u2019s own figure \u2014 so Australian lenders and households feel New Zealand\u2019s rate cycle through the same institutions.',
+    tendedToMean:
+      'The rate follows New Zealand\u2019s policy cycle: it fell to 0.26% through 2020-21, climbed to 5.71% by early 2024, and has eased since \u2014 the same shape as Australia\u2019s cycle.',
+    cantTell:
+      'A monthly average smooths the moves inside the month, and the OECD publishes it about a month behind.',
+    forYou:
+      'Read it beside the RBA cash rate: the gap shows which side of the Tasman short-term money pays more.',
+  },
+  'nz-10y': {
+    name: 'New Zealand 10-year government bond yield',
+    ticker: 'NZ 10Y',
+    oneLiner:
+      'What lending to New Zealand\u2019s government for ten years pays, as a monthly average.',
+    lines: {
+      highRising: 'Long-term borrowing costs in New Zealand are high and rising.',
+      highEasing: 'Long-term borrowing costs in New Zealand stay high but are easing.',
+      typical: 'The yield sits in its usual range for the decade.',
+      low: 'Long-term borrowing costs in New Zealand are unusually low.',
+    },
+    whatItIs:
+      'The yield on New Zealand\u2019s 10-year government bond (the OECD\u2019s monthly mirror via FRED, percent, published about a month behind).',
+    whyItMatters:
+      'The Australian and New Zealand 10-year yields move closely together \u2014 their levels correlate 0.93 across the past half-century \u2014 so the spread reads the small local differences while world rates set both.',
+    tendedToMean:
+      'Over the past decade the yield has ranged from 0.54% to 5.47%; like Australia\u2019s 10-year, it climbed steeply through 2022-23.',
+    cantTell:
+      'A monthly average, published about a month behind; the daily moves in between are not visible here.',
+    forYou:
+      'Beside the Australian 10-year, it shows how much more or less long-term money pays across the Tasman.',
+  },
   // 2026-10-21 data-integrity round — the coverage additions (WTI,
   // natural gas, platinum, ETH, Bund/JGB/Gilt, BoJ/BoE rates, NZD/USD,
   // US GDP growth and nonfarm payrolls): recovered verbatim from the
@@ -7069,6 +7176,8 @@ export const insightsCopyEn = {
       sectors: 'ASX 200 sectors',
       banks: 'The big four banks',
       volatility: 'Volatility',
+      // gap-closure S6-M6.1: the New Zealand link (its own group, last).
+      newzealand: 'New Zealand',
     },
     /** The ASX 200 anchor label (the world board carries the row; this is a
      *  read-only label that links out to the world board, never a second
@@ -7097,8 +7206,10 @@ export const insightsCopyEn = {
     tileTagBelow: '{x}% below 52-week high',
     delayedTag: 'Delayed',
     oldData: 'Old data · {date}',
-    /** Returns are in AUD (all 18 symbols trade on the ASX). */
-    localCurrencyNote: 'All returns are in Australian dollars.',
+    /** Returns are in local market currencies (AUD for the ASX rows; the
+     * NZX 50 rider is NZD — S6-M6.1). */
+    localCurrencyNote:
+      'The Australian rows are in Australian dollars; the New Zealand row is in New Zealand dollars.',
     /** The empty / being-prepared line. */
     empty: 'Australian market data is being prepared. Check back after the next daily update.',
     /** Per-index context content. */
@@ -7221,6 +7332,13 @@ export const insightsCopyEn = {
         what: 'One of the big four banks and a major mortgage lender.',
         why: 'It tracks the home-loan cycle and Australian household credit.',
         you: 'Its results track mortgage demand and the housing cycle.',
+      },
+      nz50: {
+        name: 'S&P/NZX 50',
+        latin: 'S&P/NZX 50',
+        what: 'New Zealand\u2019s main stock index: the 50 largest companies on the NZX.',
+        why: 'The New Zealand market usually moves with Australia\u2019s (the two indices\u2019 weekly returns correlate 0.73 over the past decade), and the four big Australian banks dominate New Zealand\u2019s lending.',
+        you: 'The cross-Tasman read: New Zealand\u2019s economy is tightly linked to Australia\u2019s through banks, trade and tourism.',
       },
       axvi: {
         name: 'ASX 200 VIX',
@@ -7872,7 +7990,9 @@ export const insightsCopyEn = {
     'geo-fragmentation': 'Is the world getting more fragmented?',
     // gap-closure S5-M5.2 (2026-11-02): the two Australian shadow lanes.
     'au-activity': 'Is the economy growing?',
-    'au-external': 'How is Australia\u2019s trade and China link?',
+    // gap-closure S6-M6.1 (2026-11-02): the lane now carries the New
+    // Zealand link family too.
+    'au-external': 'How are Australia\u2019s trade and partner links?',
   },
 
   /** R30: SHORT gauge names for the hero: the reason line once embedded
@@ -7891,7 +8011,7 @@ export const insightsCopyEn = {
     'geo-fragmentation': 'Fragmentation',
     // gap-closure S5-M5.2 (2026-11-02).
     'au-activity': 'Activity',
-    'au-external': 'Trade & China',
+    'au-external': 'Trade & partners',
   },
 
   /** The one-line answer under each gauge heading (L2). */
@@ -7910,7 +8030,7 @@ export const insightsCopyEn = {
     'au-activity':
       'The Australian economy\u2019s pace: output, spending, construction, population and the labour market.',
     'au-external':
-      'Australia\u2019s goods trade and the commodity links that drive it.',
+      'Australia\u2019s goods trade, its commodity links and the New Zealand connection.',
   },
 
   status: {
@@ -8000,6 +8120,9 @@ export const insightsCopyEn = {
     try: '₺',
     // 2026-10-29 owner round (the usdaed card): the UAE dirham (EN prefix).
     aed: 'AED',
+    // gap-closure S6-M6.1 (2026-11-02): the New Zealand dollar (EN prefix,
+    // the audnzd cross).
+    nzd: 'NZ$',
     // M6 Wave 3 (2026-10-25): the leading-edge batch — the AU
     // billions ("A$97.6bn" EN, suffix in fa), permits and
     // openings scaled to millions ("1.40m permits a year"),

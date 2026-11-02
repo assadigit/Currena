@@ -34,7 +34,8 @@ import type { SeriesPoint } from '../series';
 import { fetchMofJgb10y } from './mof';
 import { fetchEiaCrudeStocks, fetchEiaSprLevel, fetchEiaCrudeProduction } from './eia-stocks';
 import { fetchCftcGoldPositioning } from './cftc';
-import { fetchOecdCli } from './oecd';
+import { fetchOecdCli, fetchOecdNzShortRate } from './oecd';
+import { fetchFredSeries, FRED_SERIES } from './fred';
 import {
   fetchEpuSeries,
   fetchGprExportAll,
@@ -85,6 +86,14 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   'gscpi',
   'us-spr',
   'us-crude-production',
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family's two
+  // monthly mirrors — the OECD FINMARK NZ short rate + the FRED NZ 10y
+  // OECD mirror. First-of-month + bootstrap (the monthly trio's
+  // discipline); TWO more fetches on the monthly plan (~+2 subrequests on
+  // an all-gates day's ~39 — the ceiling arithmetic stays safe). All
+  // context-only per G-5.
+  'nz-short-rate',
+  'nz-10y',
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -99,6 +108,9 @@ export interface Rung2FetchPlan {
   monthly: boolean;
   /** The GPR daily export (S4-M4.2: daily + bootstrap). */
   gprDaily: boolean;
+  /** gap-closure S6-M6.1: the NZ monthly mirrors (OECD short rate + FRED
+   * NZ 10y) — first-of-month + bootstrap, the monthly trio's gate. */
+  nzMonthly: boolean;
 }
 
 /** Saturday is fetch day for the weekly pair (data Tue, publish Fri 17:30 ET). */
@@ -132,6 +144,9 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     missing.has('gpr-australia') ||
     // S4-M4.4: the GSCPI bootstraps the same way.
     missing.has('gscpi');
+  // gap-closure S6-M6.1: the NZ monthly mirrors bootstrap the same way
+  // (a fresh deploy on any day of the month must not wait for the 1st).
+  const needNzMonthly = missing.has('nz-short-rate') || missing.has('nz-10y');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
     eiaWeekly:
@@ -143,6 +158,9 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     cftcWeekly: isSaturday(date) || missing.has('cftc-gold-positioning'),
     monthly: isFirstOfMonth(date) || needMonthly,
     gprDaily: true, // S4-M4.2: the daily GPR MA7 file, every day (a missing stage entry is the bootstrap itself)
+    // S6-M6.1: the NZ pair rides the same first-of-month gate (never a
+    // daily fetch — both mirrors are monthly).
+    nzMonthly: isFirstOfMonth(date) || needNzMonthly,
   };
 }
 
@@ -302,6 +320,22 @@ export async function collectRung2Sources(
       fetchGscpiSeries(),
     );
     if (gscpi !== undefined) series['gscpi'] = gscpi;
+  }
+
+  // gap-closure S6-M6.1 (2026-11-02): the New Zealand monthly mirrors —
+  // the OECD FINMARK NZ short rate (one sdmx.oecd.org request, the
+  // oecd-cli venue) + the FRED NZ 10y OECD mirror (one fredgraph.csv
+  // request). First-of-month + bootstrap; fail-soft per source.
+  if (plan.nzMonthly) {
+    const nzShortRate = await fetchLogged('oecd', 'New Zealand short-term interest rate (OECD FINMARK, monthly average)', () =>
+      fetchOecdNzShortRate(),
+    );
+    if (nzShortRate !== undefined) series['nz-short-rate'] = nzShortRate;
+
+    const nz10y = await fetchLogged('fred', 'New Zealand 10-year government bond yield (FRED IRLTLT01NZM156N, OECD monthly mirror)', () =>
+      fetchFredSeries(FRED_SERIES.nz10y),
+    );
+    if (nz10y !== undefined) series['nz-10y'] = nz10y;
   }
 
   // S4-M4.2: the GPR daily export — the provider's own GPRD_MA7 7-day
