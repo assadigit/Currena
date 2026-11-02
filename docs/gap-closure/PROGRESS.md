@@ -15,9 +15,9 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 | S2 | Foreign holdings of US Treasuries (priority feature) | 6 / 6 | 100% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 6 / 6 | 100% |
 | S4 | Geopolitics, supply chain and energy | 6 / 6 | 100% |
-| S5 | Australia deep-dive and Australian markets | 2 / 6 | 33% |
+| S5 | Australia deep-dive and Australian markets | 3 / 6 | 50% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **27 / 37** | **73%** |
+| **Total** | | **28 / 37** | **76%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -390,7 +390,9 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **Rung3 `abs-au-macro`** (daily gate, budget 22 = 8 fetches + 1 read + 4 patch writes + 8 history writes = 21; the rung3 all-gates day 45/50; the ids ride CARRY_FORWARD_IDS; never touches main). The Node venue collects the same series inline.
   - **Deploy + verify (the lapse-protocol close):** worker **`823266af`** (03:35 UTC 2026-11-02; markets unchanged). The 04:30 UTC rung fired GREEN — rung3 used 41/50 (portwatch 18 + abs-au-macro 22 + 1 status; tic correctly idle outside 15–25). `/api/insights` serves **153 readings**, all eight provider-exact against the same-day fixtures (GDP 2.1376% @ 2026-Q2 · balance 495 @ 2026-08 · spending 6.6 @ 2026-08 · approvals 18,264 @ 2026-09 · population 1.4269% + NOM 101 @ 2026-Q1 · participation 66.7632% + underemployment 6.3258% @ 2026-09). The stale tags are honest release-calendar gaps (LF Oct lands 11-19, HSI Sep 11-04, ITGS Sep 11-05, population Jun-quarter 12-17). Browser-verified fresh contexts EN + fa (RTL) at 1200 + 360: both lane headers + "not scored yet" + the context counts render, all eight cards render (fa Persian digits «۶۶٫۸٪» «۱۸٬۲۶۴»), the NOM companion rides the population card, **0px horizontal overflow at 360 in both locales**, zero console errors. Evidence `evidence/m5.2/` (5 screenshots).
   - **Tests + budget:** gates ALL GREEN **13,854 tests** (insights 1163 → 1176; web grows with the card-render suite). Registry 145 → **153** (48 voting + 105 context — the voters untouched). Bundle 1396/322 → **1440/333** (measured 1436.12/331.30, justified §2026-11-02d). fa round-72 (manifest clean). KV writes/day ~76 → ~88 (+12, read-compared after the first day).
-- [ ] M5.3 Australian gauges
+- [x] M5.3 Australian gauges
+  - **The audit-and-close round (no new code needed — the substance landed with M5.2 + S4-M4.5):** the `au-activity` gauge carries all six spec members as context cards (GDP, the household-spending successor of the CEASED retail flow, approvals, population, participation, underemployment); the `au-external` gauge carries the goods balance, with the spec's wider membership (terms of trade, iron ore, coal, LNG, AUD/CNY) **deferred to the S6 owner decision on G-3 grounds** (terms-of-trade is a VOTER of au-trade-currency; moving the ids would reweight lanes that already render — the S6 promotion proposal carries the move). The relationship cards the spec asked for exist: `iron-terms-aud` (pre-program) + `energy-terms-aud` (LNG [trigger] + coal → terms of trade → AUD — landed S4-M4.5, verified present, not rebuilt).
+  - **The shadow discipline verified on production:** both lane headers read "not scored yet" / «هنوز نمره داده نمی‌شود» + the context-count lines (browser EN/fa 1200/360, the M5.2 round); `isShadowGauge` pure over the definitions; the gauge pin tests hold (11 gauges in lane order — 6 global + 5 australia, both new ones last + flagged shadow). **The Australia summary counts are unchanged by construction** — the 16 voters and the 'stressed' verdict are exactly the pre-S5 set (votingCount 14 = 16 minus the 2 pre-existing stale voters; the shadow members are context-only and a step-0 gauge is excluded from `sectionVerdictStep`). CHANGELOG §2026-11-02e.
 - [ ] M5.4 Australian markets board
 - [ ] M5.5 "What it means for my money" and calendar
 - [ ] M5.6 UI, copy, docs and deploy close

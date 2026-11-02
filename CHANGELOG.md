@@ -5,6 +5,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02e] — gap-closure S5-M5.3: the Australian gauges close (the audit-and-close round — the substance landed with M5.2 + S4-M4.5)
+
+M5.3's list, audited item by item against what M5.2 and the S4 sessions
+already shipped (this round adds no new code — it records the completion
+and the one deliberate deferral):
+
+- **The `au-activity` gauge** ("Is the economy growing?"): all six spec
+  members live as context cards — GDP, the retail-trade successor
+  (household spending, the CEASED flow's replacement per M5.1), building
+  approvals, population growth, participation, underemployment.
+- **The `au-external` gauge** ("How is Australia's trade and China
+  link?"): live with the goods trade balance. The spec's wider membership
+  (terms of trade, iron ore, coal, LNG, AUD/CNY) is **deferred to the
+  S6 owner decision on G-3 grounds** — terms-of-trade is a VOTER of
+  au-trade-currency and the others are rows of existing lanes; moving
+  them would reweight lanes that already render. The S6 promotion
+  proposal carries the move as its own decision.
+- **The relationship cards the spec asked for already exist:**
+  `iron-terms-aud` (the iron-ore export chain) predates the program, and
+  `energy-terms-aud` (LNG [trigger] + coal → terms of trade → AUD, the
+  dollar basket as context never a gate) landed with S4-M4.5 — the
+  coal/LNG relationship M5.3 asked to "add" was verified present, not
+  rebuilt.
+- **The shadow discipline holds on production:** both lane headers read
+  "not scored yet" / «هنوز نمره داده نمی‌شود» with the context-count
+  lines; `isShadowGauge` is pure over the definitions; the gauge pin
+  tests (`gauges.test.ts`: 11 gauges in lane order — 6 global + 5
+  australia, the two new ones last; both flagged shadow) hold the
+  membership. **The Australia summary counts are unchanged by
+  construction**: the 16 voters and the 'stressed' verdict are exactly
+  the pre-S5 set (the shadow members are context-only and a step-0
+  gauge is excluded from `sectionVerdictStep`).
+- Browser-verified in the M5.2 round (fresh contexts EN + fa at 1200 +
+  360, both lanes + labels + cards rendering, zero console errors).
+
 ## [2026-11-02d] — gap-closure S5-M5.2: the Australian macro family — eight ABS context cards + the two shadow lanes (the 146th–153rd indicators)
 
 The S5 data milestone (commit `11ff4ea`, deployed as worker version
