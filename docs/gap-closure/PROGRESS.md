@@ -362,6 +362,14 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > milestones, 145 indicators.** The S5 prompt is rewritten in PROMPTS.md.
 
 ### S5 Australia deep-dive (`S5-australia.md`)
+
+> **S5 session claim (2026-11-02 ~02:15 UTC):** the S5 session started
+> from the S4 close state (origin/main == `c74f105`, tree clean; api
+> `916836af` live; markets `0266f168` unchanged; 13,245-test baseline;
+> 145 indicators). **This session claims M5.1→M5.6 from 02:15 UTC.**
+> Any other S5 session must re-read this file and skip already-ticked
+> milestones.
+
 - [ ] M5.1 ABS verification and fixtures
 - [ ] M5.2 Australian macro indicators
 - [ ] M5.3 Australian gauges
