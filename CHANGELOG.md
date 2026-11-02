@@ -5,6 +5,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02i] — gap-closure S6-M6.2 completion: the rung-2 manual lever + the deploy (the China family live on production; the reading landing rides the daily-cap reset)
+
+The stranded M6.2 close (the builder session was lost after the code push
+and the history backfill, before the deploy/verify/tick — completed under
+the lapse protocol):
+
+- **Deploy:** web build + api worker **`ecd3ff63`** (no `apps/markets`
+  change — the markets worker stays at `58c4eebd`). The two cards, the
+  lane copy and the `china-demand-iron-ore` connection card render live.
+- **NEW: the rung-2 manual lever** — `pnpm --filter @currena/insights
+  rung2-run --nbs` (`scripts/rung2-run.ts`): runs the PRODUCTION
+  `runInsightsRung2Phase` through `RestInsightsStore` with an explicit
+  fetch plan (flags `--nbs --nz --monthly --mof --eia --cftc
+  --gpr-daily`, or `--bootstrap` for the store-history rule). The
+  `plan` override existed in `Rung2PhaseOptions` for exactly this; the
+  lever is the markets-au-run "Path B" pattern applied to the insights
+  snapshot family (the post-deploy landing path when the next 04:20 UTC
+  firing is hours away). ~3 KV writes per firing (snapshot + public +
+  status).
+- **The reading landing, honestly blocked then scheduled:** the lever's
+  first firing (17:33 UTC) fetched the NBS index page + both dedicated
+  releases and computed the readings provider-exact
+  (china-property-investment **−20.6** @ 2026-09-30;
+  china-steel-output **7,359** (10k tons) @ 2026-09-30) — but every KV
+  write answered 429/10048: **the account-wide free-tier daily KV write
+  cap was exhausted** (the second dispatch-heavy-day occurrence —
+  M6.1's multiple GHA ingests + the backfills + today's rungs). The cap
+  resets 00:00 UTC; the landing is owned by (a) the scheduled 00:07 UTC
+  lever re-run and (b) tomorrow's 04:20 UTC rung-2 bootstrap (the stage
+  carries no China entries, so the bootstrap arms by design). Until
+  then the two cards show the honest "Can't tell right now" face —
+  never a fabricated number.
+- **Verified on production** (fresh browser contexts, EN + fa RTL at
+  1200 + 360): both cards render in the trade lane (the L2 names — the
+  plainNames live in the details panel), the connection card renders
+  its pending face, 0px horizontal overflow at 360 in both locales,
+  zero console errors; `/api/insights` serves 156 readings incl. both
+  ids. Evidence: `docs/gap-closure/evidence/M6.2/screenshots/` (4
+  files) + the lever log quoted in PROGRESS.md.
+- RUNGS.md documents the lever; the GHA dispatch of 17:20 (run
+  41490112798) is recorded as FAILED-exit-1-after-writes (the honest
+  P1 FATAL for nz-short-rate — sdmx.oecd.org's known 500 class) with
+  the snapshot writes intact.
+
 ## [2026-11-02h] — gap-closure S6-M6.2: the China property/steel family (the demand side of the iron-ore story — two context cards + the china-demand-iron-ore relationship)
 
 The NBS's own dedicated English monthly releases, both fail-closed with
