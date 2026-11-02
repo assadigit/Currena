@@ -106,6 +106,13 @@ const EVENT_TARGETS: Readonly<Record<string, IndicatorId | undefined>> = {
   // Step-2 add-list §D: the two new jobs kinds link to their cards
   // (abs-cpi keeps no us-cpi target — the CPI events target the CPI cards).
   'abs-jobs': 'au-unemployment',
+  // gap-closure S5-M5.5: the new ABS release kinds link to their M5.2 cards
+  // (the calendar's next-up strip opens the matching indicator's detail).
+  'abs-hsi': 'au-household-spending',
+  'abs-trade': 'au-trade-balance',
+  'abs-approvals': 'au-building-approvals',
+  'abs-gdp': 'au-gdp-growth',
+  'abs-population': 'au-population-growth',
   fed: 'fed-target',
   // Fix spec C-07 (2026-10-14): the ECB decision links to the euro policy
   // rate card.

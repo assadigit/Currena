@@ -48,6 +48,22 @@
     "tz": "Australia/Sydney"
   },
   {
+    "id": "abs-hsi-2026-10",
+    "date": "2026-11-04",
+    "titleEn": "ABS Household Spending Indicator: October 2026",
+    "titleFa": "شاخص هزینهٔ خانوار استرالیا: اکتبر ۲۰۲۶",
+    "kind": "abs-hsi",
+    "tz": "Australia/Sydney"
+  },
+  {
+    "id": "abs-trade-2026-09",
+    "date": "2026-11-05",
+    "titleEn": "ABS international trade in goods and services: September 2026",
+    "titleFa": "تجارت بین‌المللی کالا و خدمات استرالیا: سپتامبر ۲۰۲۶",
+    "kind": "abs-trade",
+    "tz": "Australia/Sydney"
+  },
+  {
     "id": "us-jobs-2026-10",
     "date": "2026-11-06",
     "titleEn": "US jobs report (Employment Situation): October 2026",
@@ -85,6 +101,22 @@
     "titleEn": "ABS monthly CPI: October 2026",
     "titleFa": "شاخص ماهانهٔ قیمت مصرف‌کنندهٔ استرالیا، اکتبر ۲۰۲۶",
     "kind": "abs-cpi",
+    "tz": "Australia/Sydney"
+  },
+  {
+    "id": "abs-approvals-2026-10",
+    "date": "2026-12-01",
+    "titleEn": "ABS building approvals: October 2026",
+    "titleFa": "مجوزهای ساخت‌وساز استرالیا: اکتبر ۲۰۲۶",
+    "kind": "abs-approvals",
+    "tz": "Australia/Sydney"
+  },
+  {
+    "id": "abs-gdp-2026-q3",
+    "date": "2026-12-02",
+    "titleEn": "ABS GDP: September quarter 2026",
+    "titleFa": "تولید ناخالص داخلی استرالیا: سه‌ماههٔ سوم ۲۰۲۶",
+    "kind": "abs-gdp",
     "tz": "Australia/Sydney"
   },
   {
@@ -133,6 +165,14 @@
     "titleEn": "ABS jobs report (Labour Force): November 2026",
     "titleFa": "گزارش وضعیت بازار کار استرالیا: نوامبر ۲۰۲۶",
     "kind": "abs-jobs",
+    "tz": "Australia/Sydney"
+  },
+  {
+    "id": "abs-population-2026-q3",
+    "date": "2026-12-17",
+    "titleEn": "ABS population: September quarter 2026",
+    "titleFa": "جمعیت استرالیا: سه‌ماههٔ سوم ۲۰۲۶",
+    "kind": "abs-population",
     "tz": "Australia/Sydney"
   },
   {

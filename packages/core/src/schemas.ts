@@ -1123,7 +1123,7 @@ export const CalendarEventSchema = z.object({
   // gap-closure S2-M2.3: 'tic' — the monthly Treasury TIC release (the
   // foreign-holders table's own publication day, verified from the
   // provider's press notice).
-  kind: z.enum(['rba', 'abs-cpi', 'abs-jobs', 'fed', 'us-cpi', 'us-jobs', 'ecb', 'tic', 'other']),
+  kind: z.enum(['rba', 'abs-cpi', 'abs-jobs', 'fed', 'us-cpi', 'us-jobs', 'ecb', 'tic', 'abs-hsi', 'abs-trade', 'abs-approvals', 'abs-gdp', 'abs-population', 'other']),
   /**
    * Fix spec C-07 (2026-10-14): the event's OWN time zone as an IANA name
    * (e.g. 'Australia/Sydney'). "Days away" is computed IN this zone so a

@@ -21,7 +21,15 @@ type MoneyAreaState = 'attention' | 'unusual' | 'calm';
 
 export const MONEY_AREAS: Readonly<Record<MoneyAreaId, readonly IndicatorId[]>> = {
   petrol: ['brent', 'au-petrol-yoy', 'audusd'],
-  homeLoan: ['rba-cash-rate', 'au-home-loan', 'au-rent-yoy', 'au-household-debt-arrears'],
+  // gap-closure S5-M5.5: the homeLoan area now carries the M5.2 housing-supply
+  // and population-growth indicators as context drivers. Building approvals
+  // lead the housing-supply pipeline (more approvals → more homes → the
+  // supply side of rents); population growth drives the demand side. Both
+  // are shadow/context (G-5) so they never drive the area's state (which
+  // the warning/normal indicators — the mortgage rate, rent yoy, arrears —
+  // own); they join the area's readings so the panel considers them when
+  // the area enters attention or unusual.
+  homeLoan: ['rba-cash-rate', 'au-home-loan', 'au-rent-yoy', 'au-household-debt-arrears', 'au-building-approvals', 'au-population-growth'],
   // Step-2 add-list §B7: the savings row leads with the REAL deposit rate
   // (RBA F4.1 new household term deposits); the cash rate and CPI stay as
   // its state drivers beside it.

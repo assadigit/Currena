@@ -31,6 +31,13 @@ const KIND_CLASS: Record<CalendarEvent['kind'], string> = {
   // table's own publication day — the section it feeds is the owner's
   // top-priority feature).
   tic: 'bg-currena-blue/15 text-[var(--color-status-context)]',
+  // gap-closure S5-M5.5: the new ABS release kinds wear the ABS tint
+  // (the same green as the CPI and jobs kinds — all ABS releases).
+  'abs-hsi': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
+  'abs-trade': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
+  'abs-approvals': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
+  'abs-gdp': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
+  'abs-population': 'bg-currena-success/15 text-[var(--color-text-secondary)]',
   other: 'bg-currena-muted/15 text-[var(--color-text-secondary)]',
 };
 
@@ -43,6 +50,12 @@ const KIND_BADGE: Record<CalendarEvent['kind'], string> = {
   'us-cpi': 'CPI',
   'us-jobs': 'JOBS',
   tic: 'TIC',
+  // gap-closure S5-M5.5: the new ABS release badges.
+  'abs-hsi': 'HSI',
+  'abs-trade': 'TRADE',
+  'abs-approvals': 'APPROVALS',
+  'abs-gdp': 'GDP',
+  'abs-population': 'POP',
   other: '',
 };
 
