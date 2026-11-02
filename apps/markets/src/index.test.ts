@@ -19,7 +19,7 @@ import type { MarketId, MarketsSnapshot } from '@currena/core';
 import { ProviderError } from '@currena/insights/markets';
 import type { MarketJobFetchers, MarketSeries, KVLike } from '@currena/insights/markets';
 import { runScheduledMarkets } from './index';
-import { MAIN_CRON, RETRY_CRON, ASIA_CRON } from './crons';
+import { MAIN_CRON, RETRY_CRON, ASIA_CRON, AU_CRON } from './crons';
 
 // The node surface this TEST file uses, resolved at RUNTIME through a
 // non-literal specifier (vitest runs on Node) so the app's worker program
@@ -232,10 +232,11 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     const config = JSON.parse(uncommented) as { triggers?: { crons?: string[] } };
     const crons = config.triggers?.crons;
     expect(crons).toBeDefined();
-    expect(crons).toHaveLength(3);
+    expect(crons).toHaveLength(4);
     expect(MAIN_CRON).toBe(crons![0]);
     expect(RETRY_CRON).toBe(crons![1]);
     expect(ASIA_CRON).toBe(crons![2]);
+    expect(AU_CRON).toBe(crons![3]);
     // The literal spellings stay pinned too — a wrong expression in BOTH
     // places would otherwise pass silently.
     expect(MAIN_CRON).toBe('30 23 * * 1-5');
@@ -243,6 +244,9 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     // F1 (2026-10-21 session-finality round): the Asia rung re-fetches the
     // held intraday rows after the Asian sessions close.
     expect(ASIA_CRON).toBe('50 8 * * 2-6');
+    // gap-closure S5-M5.4: the Australian markets rung — 07:00 UTC Mon–Fri,
+    // after the ASX 06:00 UTC close + the 30-min F1 margin.
+    expect(AU_CRON).toBe('0 7 * * 1-5');
   });
 });
 

@@ -54,7 +54,10 @@ import type { RunMarketsUpdateResult } from '@currena/insights/markets';
 import { KvMarketsStore } from '@currena/insights/markets';
 import { defaultFxFetchers, formatFxRunReport, runFxUpdate } from '@currena/insights/fx';
 import { KvFxStore } from '@currena/insights/fx';
-import { MAIN_CRON, RETRY_CRON, ASIA_CRON } from './crons';
+import { auDefaultFetcher, formatAuRunReport, runAuMarketsUpdate } from '@currena/insights/markets-au';
+import type { AuMarketJobFetchers, RunAuMarketsUpdateResult } from '@currena/insights/markets-au';
+import { KvAuMarketsStore } from '@currena/insights/markets-au';
+import { MAIN_CRON, RETRY_CRON, ASIA_CRON, AU_CRON } from './crons';
 
 /**
  * The Worker's bindings. RATES is typed as the structural KV surface the
@@ -110,6 +113,26 @@ export async function runScheduledFx(env: MarketsEnv, deps: { now?: Date } = {})
   console.log(formatFxRunReport(result));
 }
 
+/**
+ * gap-closure S5-M5.4: one scheduled Australian-markets run. Yahoo-only
+ * (no EODHD, no fx twin) — the AU job runs ALONE in its invocation. `deps`
+ * lets the budget test drive the exact production path with a fake KV and
+ * fake Yahoo provider. Fault-isolated: a failure logs and never rethrows.
+ */
+export async function runScheduledAuMarkets(
+  env: MarketsEnv,
+  deps: { fetchers?: AuMarketJobFetchers; now?: Date; politenessMs?: number } = {},
+): Promise<RunAuMarketsUpdateResult> {
+  const store = new KvAuMarketsStore(env.RATES);
+  const fetchers = deps.fetchers ?? auDefaultFetcher();
+  const result = await runAuMarketsUpdate(
+    { store, fetchers, ...(deps.now !== undefined ? { now: deps.now } : {}), ...(deps.politenessMs !== undefined ? { politenessMs: deps.politenessMs } : {}) },
+    'main',
+  );
+  console.log(formatAuRunReport(result));
+  return result;
+}
+
 export default {
   async scheduled(
     event: ScheduledController,
@@ -123,6 +146,18 @@ export default {
     // misconfigured trigger). The Asia rung (F1) is retry-SHAPED: it runs
     // the same retry orchestration (only failed/old markets), only its
     // trigger time differs — after the Asian closes.
+    if (event.cron === AU_CRON) {
+      // gap-closure S5-M5.4: the AU markets rung runs ALONE (no fx twin) —
+      // its own 50-subrequest budget, its own failure domain.
+      const auWork = runScheduledAuMarkets(env).then(
+        () => undefined,
+        (err: unknown) => {
+          console.error(`[markets-au] run failed: ${err instanceof Error ? err.message : String(err)}`);
+        },
+      );
+      ctx.waitUntil(auWork);
+      return;
+    }
     const kind: 'main' | 'retry' | undefined =
       event.cron === MAIN_CRON
         ? 'main'
@@ -132,7 +167,7 @@ export default {
     if (kind === undefined) {
       console.error(
         `[markets] unknown cron expression ${JSON.stringify(event.cron)} — skipping ` +
-          `(expected ${JSON.stringify(MAIN_CRON)}, ${JSON.stringify(RETRY_CRON)} or ${JSON.stringify(ASIA_CRON)})`,
+          `(expected ${JSON.stringify(MAIN_CRON)}, ${JSON.stringify(RETRY_CRON)}, ${JSON.stringify(ASIA_CRON)} or ${JSON.stringify(AU_CRON)})`,
       );
       return;
     }

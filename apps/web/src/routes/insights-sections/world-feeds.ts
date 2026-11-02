@@ -18,11 +18,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
+import { fetchAuMarketsSnapshot, readCachedAuMarkets } from '../../lib/markets-au';
 import { fetchFxSnapshot, readCachedFx } from '../../lib/fx';
 import { fetchNarrativeDoc, readCachedNarrative } from '../../lib/narrative';
 import type { NarrativeDoc } from '../../lib/narrative';
 import { fetchTicSnapshot, readCachedTic } from '../../lib/tic';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
+import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
 import type { TicLoadState } from '../../components/insights/TicSection';
 import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../../components/insights/VerdictMeter';
@@ -241,6 +243,41 @@ export function useTicSection(enabled = true): TicLoadState {
     return () => controller.abort();
   }, [enabled]);
   return ticState;
+}
+
+/**
+ * useAuMarketsSection — the Australian markets board feed (gap-closure
+ * S5-M5.4): the markets/fx discipline for the 18 probe-verified ASX
+ * indices. Own last-good cache (readCachedAuMarkets), never an error
+ * surface (loading + the calm "being prepared" line are the designed
+ * fallbacks), and a failed refresh keeps the last good copy on screen
+ * flagged fromCache (the M17 pattern).
+ */
+export function useAuMarketsSection(enabled = true): AuMarketsLoadState {
+  const [auMarketsState, setAuMarketsState] = useState<AuMarketsLoadState>(() => {
+    if (!enabled) return { kind: 'empty' };
+    try {
+      const cached = readCachedAuMarkets();
+      return cached ? { kind: 'ready', snapshot: cached } : { kind: 'loading' };
+    } catch {
+      return { kind: 'loading' };
+    }
+  });
+  useEffect(() => {
+    if (!enabled) return;
+    const controller = new AbortController();
+    void fetchAuMarketsSnapshot(controller.signal).then((snapshot) => {
+      if (controller.signal.aborted) return;
+      setAuMarketsState((prev) => {
+        if (snapshot !== null) return { kind: 'ready', snapshot };
+        const cached = prev.kind === 'ready' ? prev.snapshot : null;
+        if (cached !== null) return { kind: 'ready', snapshot: cached, fromCache: true };
+        return { kind: 'empty' };
+      });
+    });
+    return () => controller.abort();
+  }, [enabled]);
+  return auMarketsState;
 }
 
 /**

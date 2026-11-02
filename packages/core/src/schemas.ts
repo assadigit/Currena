@@ -1609,6 +1609,139 @@ export const MarketsSnapshotSchema = z
 export type MarketsSnapshot = z.infer<typeof MarketsSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * Australian markets board (gap-closure S5-M5.4).
+ *
+ * A SEPARATE one-key snapshot (`insights:markets-au:v1`) for the
+ * probe-verified Australian indices — the All Ordinaries, the eleven
+ * ASX 200 sector indices, the ASX Small Ordinaries, the ASX 200 VIX and
+ * the four major banks' share prices. Yahoo-only (the M5.1 symbol
+ * probe — docs/gap-closure/evidence/m5.1/yahoo-symbol-probe-2026-11-02.json
+ * — every candidate returned 22/22 fresh AUD-denominated ASX points;
+ * EODHD's free-plan quota is already spent by the world board). The
+ * ASX 200 itself stays on the world board (id `asx200`) and is shown
+ * here as the anchor WITHOUT a second fetch (G-3 — never touch the 16).
+ *
+ * The row shape mirrors MarketEntry exactly (the same 52-week-high
+ * distance, the same chg1d/1w/1m/3m/1y/5y lenses, the same weekly delta
+ * encoding) so the AU board reuses the world board's tile/table
+ * components verbatim. The id union and the group id are AU-ONLY so the
+ * two boards can never collide and the world map/counts are untouched.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The 18 probe-verified Australian index ids (M5.1). `aord` is the All
+ * Ordinaries; `axfj`/`axmj`/… are the eleven ASX 200 GICS sector indices
+ * (Financials, Materials, Energy, A-REIT, Health Care, Industrials,
+ * Communication, Consumer Discretionary, Consumer Staples, Utilities,
+ * Information Technology); `axso` is the ASX Small Ordinaries; `axvi` is
+ * the ASX 200 VIX; `cba`/`nab`/`anz`/`wbc` are the four major banks. The
+ * ASX 200 (`asx200`) is NOT here — it stays on the world board.
+ */
+export const AuMarketIdSchema = z.enum([
+  'aord',
+  'axfj',
+  'axmj',
+  'axej', // the Energy sector (^AXEJ lowercased)
+  'axpj',
+  'axhj',
+  'axij',
+  'axnj',
+  'axdj',
+  'axsj',
+  'axuj',
+  'axtj',
+  'axso',
+  'axvi',
+  'cba',
+  'nab',
+  'anz',
+  'wbc',
+]);
+export type AuMarketId = z.infer<typeof AuMarketIdSchema>;
+
+/** The AU board's own group order: broad → sectors → banks → volatility. */
+export const AuMarketGroupIdSchema = z.enum(['broad', 'sectors', 'banks', 'volatility']);
+export type AuMarketGroupId = z.infer<typeof AuMarketGroupIdSchema>;
+
+/** The AU board is Yahoo-only (the M5.1 probe decision; EODHD quota spent). */
+export const AuMarketSourceSchema = z.enum(['yahoo']);
+export type AuMarketSource = z.infer<typeof AuMarketSourceSchema>;
+
+/** One Australian index's row — the world MarketEntry shape, AU-typed. */
+export const AuMarketEntrySchema = z.object({
+  id: AuMarketIdSchema,
+  asOf: z.iso.date(),
+  close: z.number().finite().positive(),
+  chg1d: z.number().finite(),
+  chg1w: z.number().finite().optional(),
+  chg1m: z.number().finite().optional(),
+  chg3m: z.number().finite(),
+  chg1y: z.number().finite().optional(),
+  chg5y: z.number().finite().optional(),
+  high52w: z.number().finite().positive(),
+  low52w: z.number().finite().positive(),
+  fromHigh: z.number().finite().max(0),
+  rangePos: z.number().min(0).max(100),
+  trend: MarketTrendSchema,
+  status: MarketStatusSchema,
+  source: AuMarketSourceSchema,
+  stale: z.boolean(),
+  open: z.boolean().optional(),
+  quoteTime: z.iso.datetime().optional(),
+  weekly: z
+    .array(z.tuple([z.number().int().nonnegative(), z.number().finite().positive()]))
+    .min(1)
+    .max(52)
+    .refine((w) => w.every((p, i) => i === 0 || p[0] > 0), {
+      message: 'weekly day deltas must be positive after the first entry',
+    }),
+});
+export type AuMarketEntry = z.infer<typeof AuMarketEntrySchema>;
+
+/**
+ * The AU board's rollup — the world MarketsSummary shape with the AU
+ * group-id type. The `signal` field is descriptive (it does NOT feed the
+ * hero verdict — the AU board is context-only per G-5); the UI renders it
+ * as a small status chip and the one-line "leading or lagging" summary
+ * reads `roseToday` + `worstGroup` + the per-group chg1d extrema.
+ */
+export const AuMarketsSummarySchema = z.object({
+  count: z.number().int().positive(),
+  roseToday: z.number().int().nonnegative(),
+  nAttention: z.number().int().nonnegative(),
+  nUnusual: z.number().int().nonnegative(),
+  signal: z.enum(['normal', 'attention', 'unusual']),
+  worstGroup: AuMarketGroupIdSchema.nullable(),
+});
+export type AuMarketsSummary = z.infer<typeof AuMarketsSummarySchema>;
+
+/** The value of `insights:markets-au:v1`, verbatim over the wire. */
+export const AuMarketsSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    generatedAt: z.iso.datetime(),
+    markets: z.array(AuMarketEntrySchema),
+    summary: AuMarketsSummarySchema,
+  })
+  .refine((s) => new Set(s.markets.map((m) => m.id)).size === s.markets.length, {
+    message: 'au-markets must contain each market id at most once',
+  })
+  .refine((s) => s.summary.count === s.markets.length, {
+    message: 'au summary.count must equal the number of market rows',
+  })
+  .refine((s) => s.summary.nAttention + s.summary.nUnusual <= s.markets.length, {
+    message: 'au summary attention+unusual counts cannot exceed the row count',
+  })
+  .refine((s) => s.summary.roseToday <= s.markets.length, {
+    message: 'au summary.roseToday cannot exceed the row count',
+  })
+  .refine(
+    (s) => s.markets.every((m) => m.low52w <= m.close && m.close <= m.high52w && m.high52w > 0),
+    { message: 'each au close must sit inside its own 52-week range' },
+  );
+export type AuMarketsSnapshot = z.infer<typeof AuMarketsSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
  * World currencies (insights-world-currencies-spec.md)
  *
  * The whole section is ONE KV key — `insights:fx:v1` — written by the fx

@@ -28,7 +28,7 @@
 import { Hono } from 'hono';
 import type { MarketsReader } from '@currena/insights/markets';
 import type { InsightsReader } from '@currena/insights/store';
-import { KvInsightsReader, KvMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
+import { KvInsightsReader, KvMarketsReader, KvAuMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
 import { KvTicStore } from '@currena/insights/tic';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
@@ -155,6 +155,8 @@ export interface AppDeps {
   makeExportReader?: (env: Bindings) => InsightsReader;
   /** Override the world-markets store (route tests inject the in-memory fake). */
   makeMarketsReader?: (env: Bindings) => MarketsReader;
+  /** gap-closure S5-M5.4: override the AU-markets store (route tests inject the in-memory fake). */
+  makeAuMarketsReader?: (env: Bindings) => import('@currena/insights/markets-au').AuMarketsReader;
   /** Override the world-currencies store (route tests inject the in-memory fake). */
   makeFxReader?: (env: Bindings) => import('@currena/insights/fx').FxReader;
   /** Override the TIC store (route tests inject the in-memory fake). */
@@ -233,6 +235,15 @@ export function createApp(deps: AppDeps = {}) {
     return marketsReader;
   };
 
+  // gap-closure S5-M5.4: the Australian markets board's serve path — the
+  // markets twin. The section's ONE key (`insights:markets-au:v1`) behind the
+  // same 5-minute KV edge cache (KvAuMarketsReader — same lazy-singleton).
+  let auMarketsReader: import('@currena/insights/markets-au').AuMarketsReader | undefined;
+  const getAuMarketsReader = (env: Bindings): import('@currena/insights/markets-au').AuMarketsReader => {
+    auMarketsReader ??= deps.makeAuMarketsReader ? deps.makeAuMarketsReader(env) : new KvAuMarketsReader(env.RATES);
+    return auMarketsReader;
+  };
+
   // World currencies serve path: the section's ONE key behind the same
   // 5-minute KV edge cache (KvFxReader — same lazy-singleton pattern).
   let fxReader: import('@currena/insights/fx').FxReader | undefined;
@@ -297,6 +308,7 @@ export function createApp(deps: AppDeps = {}) {
       getReader: getInsightsReader,
       getExportReader,
       getMarketsReader,
+      getAuMarketsReader,
       getFxReader,
       getTicReader,
       getPricesReader,

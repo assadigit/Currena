@@ -485,6 +485,150 @@ describe('GET /api/insights/markets', () => {
 });
 
 /* ------------------------------------------------------------------ *
+ * Australian markets board route (gap-closure S5-M5.4) — the /markets
+ * twin, served read-only behind the same cache discipline.
+ * ------------------------------------------------------------------ */
+
+import { InMemoryAuMarketsStore } from '@currena/insights/markets-au';
+import { buildAuMarketsSnapshot, runAuMarketsJob } from '@currena/insights/markets-au';
+import type { AuMarketsSnapshot } from '@currena/core';
+import { AU_MARKET_IDS } from '@currena/insights/markets-au';
+
+/** A REAL-shaped AU snapshot: the full 18-market pipeline over synthetic
+ *  Yahoo series (the M5.1 probe decision — Yahoo-only). */
+async function realisticAuSnapshot(): Promise<AuMarketsSnapshot> {
+  const job = await runAuMarketsJob(
+    {
+      fetchers: {
+        fetchYahoo: async (id) => {
+          const points: { date: string; value: number }[] = [];
+          let t = new Date('2026-10-09T00:00:00Z').getTime();
+          let made = 0;
+          while (made < 260) {
+            const date = new Date(t).toISOString().slice(0, 10);
+            const dow = new Date(t).getUTCDay();
+            if (dow !== 0 && dow !== 6) {
+              // Each AU index gets a distinct base level so the rows differ.
+              const base = 1000 + AU_MARKET_IDS.indexOf(id) * 137;
+              points.push({ date, value: base + made * 3 + (made % 7) });
+              made++;
+            }
+            t -= 86_400_000;
+          }
+          points.reverse();
+          return { id, source: 'yahoo' as const, points };
+        },
+      },
+      // No politeness pause in tests.
+      politenessMs: 0,
+    },
+    { kind: 'main' },
+    undefined,
+    '2026-10-12',
+    '2026-10-12T07:01:00Z',
+  );
+  const snap = buildAuMarketsSnapshot({
+    resolutions: job.resolutions,
+    prev: undefined,
+    runDate: '2026-10-12',
+    generatedAt: '2026-10-12T07:31:00Z',
+  });
+  if (snap === undefined) throw new Error('AU fixture snapshot failed to build');
+  return snap;
+}
+
+describe('GET /api/insights/markets-au', () => {
+  let store: InMemoryAuMarketsStore;
+
+  beforeEach(() => {
+    store = new InMemoryAuMarketsStore();
+  });
+
+  function makeApp() {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeAuMarketsReader: () => store,
+      // A-8: pin the serve-time staleness clock to the fixture world's
+      // "today" (asOf 2026-10-09 + a few days = fresh) so assertions stay
+      // deterministic regardless of the wall clock.
+      now: () => new Date('2026-10-13T12:00:00Z'),
+    });
+  }
+
+  it('serves the stored AU snapshot with ETag + the AC-05 private cache stamp', async () => {
+    const snap = await realisticAuSnapshot();
+    await store.putAuMarketsIfChanged(snap, undefined);
+    const res = await authed(makeApp()).request('/api/insights/markets-au', undefined, authedEnv);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('etag')).toBe('"insights-markets-au:2026-10-12T07:31:00Z"');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
+    expect(await res.json()).toEqual(snap);
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const snap = await realisticAuSnapshot();
+    await store.putAuMarketsIfChanged(snap, undefined);
+    const res = await authed(makeApp()).request(
+      '/api/insights/markets-au',
+      { headers: { 'if-none-match': '"insights-markets-au:2026-10-12T07:31:00Z"' } },
+      authedEnv,
+    );
+    expect(res.status).toBe(304);
+  });
+
+  it('A-8: an aged stale:false row serves stale:true (serve-time re-evaluation)', async () => {
+    const snap = await realisticAuSnapshot();
+    expect(snap.markets.every((m) => !m.stale)).toBe(true);
+    await store.putAuMarketsIfChanged(snap, undefined);
+
+    const freshRes = await authed(makeApp()).request('/api/insights/markets-au', undefined, authedEnv);
+    expect(freshRes.status).toBe(200);
+    expect(await freshRes.text()).toBe(JSON.stringify(snap));
+
+    // Aged serve (now = 2026-10-16: asOf + 7 days = STALE_DAYS + 2): every
+    // row flips to stale:true; everything else stays byte-identical.
+    const agedApp = authed(createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeAuMarketsReader: () => store,
+      now: () => new Date('2026-10-16T12:00:00Z'),
+    }));
+    const agedRes = await agedApp.request('/api/insights/markets-au', undefined, authedEnv);
+    expect(agedRes.status).toBe(200);
+    const body = (await agedRes.json()) as typeof snap;
+    expect(body.markets.every((m) => m.stale)).toBe(true);
+    expect(body).toEqual({
+      ...snap,
+      markets: snap.markets.map((m) => ({ ...m, stale: true })),
+    });
+    expect(agedRes.headers.get('etag')).toBe('"insights-markets-au:2026-10-12T07:31:00Z"');
+  });
+
+  it('answers 503 markets_au_not_ready (calm, no-store) when KV is empty', async () => {
+    const res = await authed(makeApp()).request('/api/insights/markets-au', undefined, authedEnv);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('markets_au_not_ready');
+    expect(res.headers.get('cache-control')).toBe('private, no-store');
+  });
+
+  it('the 18-market AU snapshot stays well under the route budget', async () => {
+    const snap = await realisticAuSnapshot();
+    expect(snap.markets.length).toBe(18);
+    expect(snap.markets.every((m) => m.weekly.length === 52)).toBe(true);
+    const bytes = JSON.stringify(snap).length;
+    expect(bytes).toBeLessThan(16 * 1024);
+  });
+
+  it('one KV read per request (the store counts its own ops)', async () => {
+    const snap = await realisticAuSnapshot();
+    await store.putAuMarketsIfChanged(snap, undefined);
+    const readsBefore = store.ops.reads;
+    await authed(makeApp()).request('/api/insights/markets-au', undefined, authedEnv);
+    expect(store.ops.reads - readsBefore).toBe(1);
+  });
+});
+
+/* ------------------------------------------------------------------ *
  * World currencies route (insights-world-currencies-spec.md §5 rules
  * 3–4 / §9 build step 6)
  * ------------------------------------------------------------------ */

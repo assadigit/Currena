@@ -879,7 +879,13 @@ const BUDGETS = [
   // Measured 1436.12/331.30; raw bumps 1396 → 1440, gz 322 → 333.
   // Justified in CHANGELOG §2026-11-02d (the heading the lost-box session
   // projected as "2026-11-02a" — two S4 entries took a/b first).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1440_000, gz: 333_000, label: 'Insights lazy chunk' },
+  // 2026-11-02f (gap-closure S5-M5.4): 1470/340 — the Australian markets
+  // board: the AustralianMarkets component + the au-markets/{shared,briefing}
+  // helpers + the markets-au client lib + the useAuMarketsSection hook + the
+  // marketsAu EN/fa copy block (18 entries × 4 strings + the summary
+  // templates + the table headers). Measured 1466.69/338.01; raw bumps
+  // 1440 → 1470, gz 333 → 340. Justified in CHANGELOG §2026-11-02f.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1470_000, gz: 340_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

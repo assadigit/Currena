@@ -7044,6 +7044,195 @@ export const insightsCopyEn = {
   },
 
   /* ------------------------------------------------------------------ *
+   * gap-closure S5-M5.4 — the Australian markets board. A SEPARATE block
+   * (`marketsAu`, not `markets.entries`) so the AU ids never collide with
+   * the 16 world MarketId. The ASX 200 anchor itself comes from the world
+   * board (id `asx200`) and is shown here as a label, not a second row
+   * (G-3). Yahoo-only (the M5.1 probe decision; EODHD quota spent by the
+   * world board). Wording: measurements and trends only, no news causes
+   * (RULES.md §5).
+   * ------------------------------------------------------------------ */
+  marketsAu: {
+    title: 'The Australian market up close',
+    sectionLabel: 'Australian stock indices',
+    subtitle: 'The All Ordinaries, the ASX 200 sectors, the big banks and the ASX 200 VIX to the last close',
+    lastCloseBadge: 'Latest data · end of trading day',
+    asOf: 'as of {date}',
+    /** The ASX all-closed banner (the world board's twin — the ASX trades
+     *  Mon–Fri 10:00–16:00 AEST, no DST on the market's own clock). */
+    closedTitle: 'The ASX is closed right now.',
+    closedBody:
+      'The Australian Securities Exchange is outside its trading session (weekend or public holiday) — the numbers below are the last completed session’s closes.',
+    /** Group labels. */
+    groups: {
+      broad: 'Broad indices',
+      sectors: 'ASX 200 sectors',
+      banks: 'The big four banks',
+      volatility: 'Volatility',
+    },
+    /** The ASX 200 anchor label (the world board carries the row; this is a
+     *  read-only label that links out to the world board, never a second
+     *  fetch — G-3). */
+    asx200Anchor: 'ASX 200 (on the world markets board)',
+    asx200AnchorHint: 'The ASX 200 itself sits with the world indices above; this section adds the All Ordinaries, the sectors, the banks and the VIX.',
+    /** The one-line "leading or lagging" summary — generated from the
+     *  per-group chg1d extrema, never a forecast. {leader}/{laggard} are
+     *  group labels; {leaderVal}/{laggardVal} are the best/worst chg1d. */
+    summaryLeading: 'Today the {leader} are leading the Australian market, up as much as {val}.',
+    summaryLagging: 'The {laggard} are lagging, down as much as {val}.',
+    summaryMixed: 'The Australian market is mixed today: the {leader} are up as much as {val}, while the {laggard} are down as much as {val2}.',
+    summaryCalm: 'The Australian market is steady today, with most sectors close to flat.',
+    summaryNoReading: 'Australian market data is being prepared. Check back after the next daily update.',
+    /** The per-row table columns (mirrors the world board's columns, minus
+     *  the 3-month/5-year lenses the AU table omits to stay compact). */
+    thIndex: 'Index',
+    thToday: 'Today',
+    thWeek: '1 week',
+    thMonth: '1 month',
+    thYear: '1 year',
+    thFromHigh: 'From 52-week high',
+    thClose: 'Last close',
+    /** The 52-week-distance tag. */
+    atHighTag: 'At its 52-week high',
+    tileTagBelow: '{x}% below 52-week high',
+    delayedTag: 'Delayed',
+    oldData: 'Old data · {date}',
+    /** Returns are in AUD (all 18 symbols trade on the ASX). */
+    localCurrencyNote: 'All returns are in Australian dollars.',
+    /** The empty / being-prepared line. */
+    empty: 'Australian market data is being prepared. Check back after the next daily update.',
+    /** Per-index context content. */
+    entries: {
+      aord: {
+        name: 'All Ordinaries',
+        latin: 'All Ordinaries',
+        what: 'The 500 largest companies on the ASX — a wider measure of the Australian market than the ASX 200.',
+        why: 'It captures the mid-caps and smaller miners the ASX 200 leaves out, so it reads as a broader pulse of the local market.',
+        you: 'A wider read on the Australian market than your super fund’s main ASX 200 holding.',
+      },
+      axso: {
+        name: 'ASX Small Ordinaries',
+        latin: 'ASX Small Ordinaries',
+        what: 'The next 200 companies below the ASX 200 by size — the small-cap index.',
+        why: 'Small caps often move ahead of the wider market on the way into or out of a slowdown.',
+        you: 'A signal of risk appetite among local investors, distinct from the big miners and banks.',
+      },
+      axfj: {
+        name: 'ASX 200 Financials',
+        latin: 'ASX 200 Financials',
+        what: 'The financial companies inside the ASX 200: the big banks, insurers and fund managers.',
+        why: 'The biggest weight in the Australian market; it tracks bank margins, credit growth and the home-loan cycle.',
+        you: 'Most Australian super funds hold a large slice of these companies, so the sector affects retirement savings.',
+      },
+      axmj: {
+        name: 'ASX 200 Materials',
+        latin: 'ASX 200 Materials',
+        what: 'The mining and materials companies inside the ASX 200: BHP, Rio Tinto, Fortescue and the lithium miners.',
+        why: 'The sector that ties the Australian market to iron ore, lithium and China’s demand.',
+        you: 'Iron ore prices flow straight into this sector and into the Australian dollar.',
+      },
+      axej: {
+        name: 'ASX 200 Energy',
+        latin: 'ASX 200 Energy',
+        what: 'The oil, gas and energy companies inside the ASX 200: Woodside, Santos and the energy utilities.',
+        why: 'It tracks oil and gas prices, which set wholesale energy costs in Australia.',
+        you: 'Energy moves feed into power bills and petrol prices.',
+      },
+      axpj: {
+        name: 'ASX 200 A-REIT',
+        latin: 'ASX 200 A-REIT',
+        what: 'The Australian Real Estate Investment Trusts inside the ASX 200 — the listed property trusts.',
+        why: 'It tracks office, retail and industrial property, and the cost of borrowing to hold them.',
+        you: 'A-REITs are a common income holding in Australian super funds and direct portfolios.',
+      },
+      axhj: {
+        name: 'ASX 200 Health Care',
+        latin: 'ASX 200 Health Care',
+        what: 'The healthcare companies inside the ASX 200: CSL, Cochlear, ResMed and the private hospitals.',
+        why: 'A defensive sector that holds up when the wider market falls, and rides global healthcare demand.',
+        you: 'A steadier corner of the Australian market for long-term savings.',
+      },
+      axij: {
+        name: 'ASX 200 Industrials',
+        latin: 'ASX 200 Industrials',
+        what: 'The industrial companies inside the ASX 200: transport, engineering, defence and services.',
+        why: 'It tracks construction activity, government infrastructure spend and freight.',
+        you: 'Infrastructure work moves this sector and the jobs tied to it.',
+      },
+      axnj: {
+        name: 'ASX 200 Communication',
+        latin: 'ASX 200 Communication',
+        what: 'The telecom and media companies inside the ASX 200: Telstra, the broadcasters and the platforms.',
+        why: 'A defensive, dividend-paying sector that tracks household and business telecom spend.',
+        you: 'The sector behind the phone and internet bills you pay.',
+      },
+      axdj: {
+        name: 'ASX 200 Consumer Discretionary',
+        latin: 'ASX 200 Consumer Discretionary',
+        what: 'The discretionary retailers and services inside the ASX 200: Wesfarmers, the car dealers and travel firms.',
+        why: 'It tracks household willingness to spend on non-essentials.',
+        you: 'A read on how confident Australian households feel about their budgets.',
+      },
+      axsj: {
+        name: 'ASX 200 Consumer Staples',
+        latin: 'ASX 200 Consumer Staples',
+        what: 'The supermarkets and staple retailers inside the ASX 200: Woolworths, Coles and the food sellers.',
+        why: 'A defensive sector that holds up when household budgets tighten.',
+        you: 'The sector behind the grocery prices you pay each week.',
+      },
+      axuj: {
+        name: 'ASX 200 Utilities',
+        latin: 'ASX 200 Utilities',
+        what: 'The electricity, gas and water utilities inside the ASX 200.',
+        why: 'A defensive, regulated sector that tracks wholesale power and water prices.',
+        you: 'Wholesale utility prices feed into household bills.',
+      },
+      axtj: {
+        name: 'ASX 200 Information Technology',
+        latin: 'ASX 200 IT',
+        what: 'The technology companies inside the ASX 200: the small but growing local tech sector.',
+        why: 'The smallest ASX 200 sector by weight; it tracks global tech sentiment more than the local economy.',
+        you: 'A read on investor appetite for growth stocks in Australia.',
+      },
+      cba: {
+        name: 'Commonwealth Bank',
+        latin: 'CBA',
+        what: 'Australia’s largest bank by market value, and the largest mortgage lender.',
+        why: 'A bellwether for the home-loan cycle and Australian household credit.',
+        you: 'Its results track mortgage demand and the housing cycle.',
+      },
+      nab: {
+        name: 'National Australia Bank',
+        latin: 'NAB',
+        what: 'One of the big four banks, with a large business-lending book.',
+        why: 'It tracks business credit and the small-to-medium enterprise cycle.',
+        you: 'A read on business borrowing and investment.',
+      },
+      anz: {
+        name: 'ANZ Group',
+        latin: 'ANZ',
+        what: 'One of the big four banks, with a large share of lending in Australia and New Zealand.',
+        why: 'It tracks household and business credit across both markets.',
+        you: 'A read on trans-Tasman lending conditions.',
+      },
+      wbc: {
+        name: 'Westpac',
+        latin: 'WBC',
+        what: 'One of the big four banks and a major mortgage lender.',
+        why: 'It tracks the home-loan cycle and Australian household credit.',
+        you: 'Its results track mortgage demand and the housing cycle.',
+      },
+      axvi: {
+        name: 'ASX 200 VIX',
+        latin: 'ASX 200 VIX',
+        what: 'A measure of expected volatility in the ASX 200 over the next 30 days, derived from option prices.',
+        why: 'A rise signals that option markets expect bigger swings; a fall signals calm.',
+        you: 'A read on how volatile the local market may be in the month ahead.',
+      },
+    },
+  },
+
+  /* ------------------------------------------------------------------ *
    * R10-3 (2026-10-28) — the global companies table behind a feature
    * flag. OFF by default; the UI renders the empty-state panel below
    * the markets tiles. The fa mirror sits in insights-copy-fa.ts;

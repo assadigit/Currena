@@ -12,6 +12,8 @@
     "./narrator": "./src/narrator/index.ts",
     "./markets": "./src/markets/index.ts",
     "./markets/definitions": "./src/markets/definitions.ts",
+    "./markets-au": "./src/markets-au/index.ts",
+    "./markets-au/definitions": "./src/markets-au/definitions.ts",
     "./fx": "./src/fx/index.ts",
     "./fx/definitions": "./src/fx/definitions.ts",
     "./tic": "./src/tic/index.ts",

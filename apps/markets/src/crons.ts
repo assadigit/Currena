@@ -21,3 +21,20 @@ export const RETRY_CRON = '30 1 * * 2-6';
  * data, Yahoo-first when many do, exactly like the 01:30 twin.
  */
 export const ASIA_CRON = '50 8 * * 2-6';
+
+/**
+ * gap-closure S5-M5.4 (2026-11-02): the Australian markets board rung —
+ * 07:00 UTC Mon–Fri. The ASX regular session closes 16:00 AEST = 06:00 UTC
+ * (the market's own clock, no DST), and the F1 closeUtcMinute is 06:30 UTC
+ * (the +30 min settlement margin); 07:00 UTC gives Yahoo one hour to index
+ * the day's close before the run asks for it. Yahoo-only (the M5.1 probe
+ * decision; EODHD's free quota is spent by the world board) — 18 fetches +
+ * 1 read + 1 write = 20 subrequests, its OWN 50-subrequest budget (the
+ * S5-M5.4 venue decision: rung3/rung4 are full at 45/50 after M5.2, and
+ * piggybacking on the main/retry crons breaks their subrequest budget, so
+ * the 4th cron on this Worker — the account's free 5-cron limit's last
+ * slot — is the only budget-safe venue; the S5 spec explicitly allows the
+ * markets worker). The AU job runs ALONE in its invocation (no fx twin):
+ * it has nothing to do with the currencies section.
+ */
+export const AU_CRON = '0 7 * * 1-5';

@@ -58,6 +58,7 @@ import { PricesBoard } from '../components/insights/PricesBoard';
 import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
 import { WorldMarkets } from '../components/insights/WorldMarkets';
+import { AustralianMarkets } from '../components/insights/AustralianMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
 import { WorldCurrencies } from '../components/insights/WorldCurrencies';
 import { TicSection, TicCustodyCard } from '../components/insights/TicSection';
@@ -82,6 +83,7 @@ import {
 } from './insights-sections/InsightsStatusBlocks';
 import { SectionLane } from './insights-sections/SectionLane';
 import {
+  useAuMarketsSection,
   useNarrative,
   useNarrativePreview,
   useTicSection,
@@ -204,6 +206,11 @@ export function Insights() {
   const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
   const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
   const ticState = useTicSection(ticFeedEnabled);
+  // gap-closure S5-M5.4: the Australian markets board rides the same
+  // marketsFeedEnabled gate (the world board is public on the owner's own
+  // EODHD key; the AU board is Yahoo-only, no licence concern, so it serves
+  // public mode exactly like private mode).
+  const auMarketsState = useAuMarketsSection(marketsFeedEnabled);
   const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
 
   // Layer-2 narrator (M5, spec §11): the narrative document feed + the
@@ -685,12 +692,28 @@ export function Insights() {
               </>
             }
             australiaSlot={
-              <MoneyPanel
-                readings={state.snapshot.readings}
-                copy={copy}
-                numberLocale={numberLocale}
-                onFocusCard={focusCard}
-              />
+              <>
+                {/* gap-closure S5-M5.4: the Australian markets board sits at
+                 * the TOP of the Australia section's closing slot (above the
+                 * money panel), so the AU indices read as the section's
+                 * markets content before the household-costs panel. The
+                 * board carries its own loading/empty states — it never
+                 * breaks the page. */}
+                {marketsFeedEnabled ? (
+                  <AustralianMarkets
+                    state={auMarketsState}
+                    copy={copy}
+                    locale={locale}
+                    numberLocale={numberLocale}
+                  />
+                ) : null}
+                <MoneyPanel
+                  readings={state.snapshot.readings}
+                  copy={copy}
+                  numberLocale={numberLocale}
+                  onFocusCard={focusCard}
+                />
+              </>
             }
           />
 

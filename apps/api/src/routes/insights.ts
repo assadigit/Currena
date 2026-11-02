@@ -40,6 +40,7 @@
 
 import { IndicatorIdSchema } from '@currena/core';
 import type {
+  AuMarketsSnapshot,
   FxSnapshot,
   IndicatorHistory,
   IndicatorId,
@@ -53,6 +54,8 @@ import type { Context } from 'hono';
 import type { InsightsReader } from '@currena/insights/store';
 import { reStaleMarketsSnapshot } from '@currena/insights/markets';
 import type { MarketsReader } from '@currena/insights/markets';
+import { reStaleAuMarketsSnapshot } from '@currena/insights/markets-au';
+import type { AuMarketsReader } from '@currena/insights/markets-au';
 import { reStaleFxSnapshot } from '@currena/insights/fx';
 import type { FxReader } from '@currena/insights/fx';
 import type { TicReader } from '@currena/insights/tic';
@@ -117,6 +120,8 @@ interface InsightsRouteDeps {
   getExportReader: (env: Bindings) => InsightsReader;
   /** Markets store construction (route tests inject the in-memory fake). */
   getMarketsReader: (env: Bindings) => MarketsReader;
+  /** gap-closure S5-M5.4: the Australian markets board's reader. */
+  getAuMarketsReader: (env: Bindings) => AuMarketsReader;
   /** Fx store construction (route tests inject the in-memory fake). */
   getFxReader: (env: Bindings) => FxReader;
   /** TIC store construction (route tests inject the in-memory fake). */
@@ -426,6 +431,65 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     if (typeof caches !== 'undefined') {
       // Best-effort warm of the Worker's edge cache; the response is
       // already on its way to the client.
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // gap-closure S5-M5.4: the Australian markets board — the ONE-key
+  // snapshot (`insights:markets-au:v1`), served read-only behind the SAME
+  // cache discipline as /markets (edge cache + ETag + the calm 503 "being
+  // prepared" answer). Registered BEFORE /:id/history so the literal path
+  // wins. Yahoo-only (no EODHD, no licence concern); the public visibility
+  // rides HIDDEN_BOARDS like the world markets board (the generated
+  // overrides file does NOT declare 'markets-au' hidden → public mode
+  // serves it exactly like private mode).
+  app.get('/markets-au', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('markets-au')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: AuMarketsSnapshot | undefined;
+    try {
+      snapshot = await deps.getAuMarketsReader(c.env).getAuMarkets();
+    } catch (err) {
+      console.warn('[insights] markets-au read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'markets_au_unavailable',
+        'Australian markets are temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      return errorResponse(
+        c,
+        503,
+        'markets_au_not_ready',
+        'No Australian-markets snapshot stored yet — the scheduled job has not completed.',
+      );
+    }
+    // A-8 (D-21): re-evaluate per-row staleness at SERVE time — the stored
+    // flag freezes at write time, so a multi-day cron failure would
+    // otherwise keep `stale:false` while asOf ages. Fresh snapshots come
+    // back untouched (byte-identical).
+    snapshot = reStaleAuMarketsSnapshot(snapshot, now().toISOString().slice(0, 10));
+    const etag = `"insights-markets-au:${snapshot.generatedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=300', ETag: etag });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+    });
+    if (typeof caches !== 'undefined') {
       try {
         await caches.default.put(c.req.raw, response.clone());
       } catch {

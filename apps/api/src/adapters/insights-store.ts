@@ -27,6 +27,7 @@ import type {
   MarketsSnapshot,
   LivePricesSnapshot,
   FxSnapshot,
+  AuMarketsSnapshot,
 } from '@currena/core';
 import {
   INSIGHTS_SNAPSHOT_KEY,
@@ -41,6 +42,8 @@ import {
 import type { InsightsServeMode } from '../public-mode';
 import { MARKETS_KV_KEY, parseStoredMarkets } from '@currena/insights/markets';
 import type { MarketsReader } from '@currena/insights/markets';
+import { MARKETS_AU_KV_KEY, parseStoredAuMarkets } from '@currena/insights/markets-au';
+import type { AuMarketsReader } from '@currena/insights/markets-au';
 import { FX_KV_KEY, parseStoredFx } from '@currena/insights/fx';
 import type { FxReader } from '@currena/insights/fx';
 import { PRICES_KV_KEY, parseStoredLivePrices } from '@currena/insights/prices';
@@ -112,6 +115,21 @@ export class KvMarketsReader implements MarketsReader {
 
   async getMarkets(): Promise<MarketsSnapshot | undefined> {
     return parseStoredMarkets(await this.kv.get(MARKETS_KV_KEY, { cacheTtl: 300 }));
+  }
+}
+
+/**
+ * gap-closure S5-M5.4: the Australian markets board's serve path — the
+ * markets twin. ONE KV read for the section's ONE key, with the spec's
+ * 5-minute KV edge cache. The value is written by the currena-markets
+ * Worker's 4th cron (the AU rung) — read-only here, and a page request can
+ * never reach a provider.
+ */
+export class KvAuMarketsReader implements AuMarketsReader {
+  constructor(private readonly kv: KVNamespace) {}
+
+  async getAuMarkets(): Promise<AuMarketsSnapshot | undefined> {
+    return parseStoredAuMarkets(await this.kv.get(MARKETS_AU_KV_KEY, { cacheTtl: 300 }));
   }
 }
 
