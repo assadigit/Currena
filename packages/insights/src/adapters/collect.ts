@@ -431,7 +431,7 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // Frankfurter (USD→JPY/AUD/CNY + the six basket currencies + TRY, 10y
   // window; NZD left the request 2026-10-23 — the nzd-usd card retired,
   // OD-7; TRY joined 2026-10-24 — the usdtry card, M5 Wave 2).
-  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY since ${fxStart}`, () =>
+  const fx = await fetchLogged('frankfurter', `USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY,NZD since ${fxStart}`, () =>
     fetchFrankfurterSeries(fxStart),
   );
 
@@ -586,6 +586,10 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
         SEK: fx?.SEK,
         CHF: fx?.CHF,
         TRY: fx?.TRY,
+        // gap-closure S6-M6.1 (2026-11-02): the NZD leg rejoins — the audnzd
+        // cross's second Frankfurter leg (the ECB publishes the NZD
+        // reference rate; one more field on the same request).
+        NZD: fx?.NZD,
         // The Yahoo-sourced leg (2026-10-29): the dirham the ECB never
         // published. Absent on a failed fetch — an honest unavailable card.
         AED: aedQuote?.points,

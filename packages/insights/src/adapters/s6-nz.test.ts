@@ -102,3 +102,21 @@ describe('audnzd derivation (S6-M6.1: NZD per AUD from the two Frankfurter USD l
     expect(out2.audnzd).toBeUndefined();
   });
 });
+
+describe('the collect wiring (S6-M6.1: the NZD leg must REACH the derivation)', () => {
+  // The live bug this pins: 2026-11-02's first GHA run fetched the NZD leg
+  // (the currency list carried it) but collect.ts's hardcoded fx input block
+  // DROPPED it — audnzd served unavailable while every other Frankfurter
+  // card was fine. The derivation test above proves derived.ts; this pin
+  // proves the wire between them.
+  it('collect.ts hands every FRANKFURTER_INSIGHTS_CURRENCIES leg into the fx input', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { FRANKFURTER_INSIGHTS_CURRENCIES } = await import('./frankfurter');
+    const source = readFileSync(new URL('./collect.ts', import.meta.url), 'utf8');
+    const fxBlock = /fx: \{[^}]*\},/s.exec(source)?.[0] ?? '';
+    expect(fxBlock.length).toBeGreaterThan(0);
+    for (const ccy of FRANKFURTER_INSIGHTS_CURRENCIES) {
+      expect(fxBlock, `collect.ts fx block must map ${ccy}`).toContain(`${ccy}: fx?.${ccy}`);
+    }
+  });
+});
