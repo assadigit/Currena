@@ -424,6 +424,23 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > 19-row board live). api `c81f65c8` + markets `58c4eebd` live. The G10 tick
 > landed with this claim (completing the prior session's record).
 
+> **S6 third continuation claim (2026-11-02, ~17:20 UTC):** the M6.2 builder
+> session was lost after pushing the code (`309adba`, 17:01 UTC — the full
+> family: parsers, fixtures, rung2 window gate, the connection card, round-74
+> copy, registry 158) and running the `nbs-backfill --write` (both
+> `insights:hist:china-*` keys verified present via the KV REST API — 14 + 14
+> provider-exact points, Sep 2026 endpoints) but BEFORE the deploy, the
+> production verification and the tick. The owner's restart message confirms
+> the box was lost mid-loop. This continuation session re-cloned, re-ran the
+> baseline gates clean (**14,257 tests** — exactly the M6.2 commit's count;
+> Insights lazy 1502.19/346.42 vs the 1510/347 ceiling) and completes M6.2's
+> stranded deploy + verification + tick under the ~55-minute-lapse precedent.
+> Production at claim time: `/api/health` 200, `/api/insights` serves the
+> M6.1 state (156 readings, the two China ids absent — the worker predates
+> the code), api `c81f65c8` + markets `58c4eebd` live, status clean
+> (generatedAt 17:03 UTC — the lost session's last ingest; zero failed
+> sources). **This session then claims M6.3→M6.6 from ~17:45 UTC.**
+
 - [x] M6.1 New Zealand link (evidence first)
   - **The measured evidence + the INCLUDE decision** (evidence/M6.1/: raw-series.json, measurements.json, equity-correlation-detail.json, NZ-LINK-EVIDENCE.md): weekly ASX 200/NZX 50 returns correlation **0.73** (n=244; the daily 0.31 is close-stagger attenuation — the lag structure measured), AUD/USD vs NZD/USD daily **0.86** (rolling-1y min 0.62 — high AND stable), AU−NZ 10y yield levels **0.93** (1970→2026; latest spread +0.34pp), plus two structural links quoted verbatim from the official pages (RBNZ "84% of bank lending" by the four Australian-owned banks; MFAT "$32.76 billion in 2024" two-way trade). G-6 cleared.
   - **Four context-only additions** (the 154th–156th ids + the board rider): `audnzd` (the Frankfurter legs — NZD rejoined the one request, zero new fetches), `nz-short-rate` (the OECD FINMARK IR3TIB monthly average — the honest mirror: rbnz.govt.nz 403s the work venue; the FRED OCR-family mirror is stale at 2024-12 AND is the call-money rate, so the card is named the short-term rate, never the OCR), `nz-10y` (the FRED OECD mirror IRLTLT01NZM156N, T-16 record added), and the **NZX 50 rider** on the Australian markets board (Yahoo `^NZ50` verified from the provider's own response; its own `newzealand` group, NZD-denominated; the currency note updated; the leading/lagging summary keeps the AU groups). The two NZ mirrors ride rung2's first-of-month gate (+2 fetches; all-gates ≈41/50). New `markets-au-run` Node runner (the markets-run Path-B twin).
