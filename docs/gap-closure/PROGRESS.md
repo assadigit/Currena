@@ -462,6 +462,21 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > `unavailable` — the OECD 500 class and the write-cap landing), api
 > `ecd3ff63` + markets `58c4eebd` live.
 
+> **S6 fifth continuation claim (2026-11-02, ~22:57 UTC):** the fourth
+> continuation session was lost ~26 minutes into its claim (its last push
+> `e900eb6` at 22:07:48 UTC IS the claim commit — zero M6.3 code landed;
+> the tree at `e900eb6` carries no M6.3 files). THIS session re-cloned,
+> re-ran the baseline gates clean (**14,257 tests** — exactly the M6.2
+> commit's count; Insights lazy 1502.19/346.42 vs the 1510/347 ceiling;
+> 22:55 UTC run), smoke-checked production (`/api/health` 200;
+> `/api/insights` 200 @ 158 readings, generatedAt 17:20:46 — audnzd
+> 1.2456 landed; nz-short-rate + both China ids honestly `unavailable`,
+> the inherited states), and claims **M6.3→M6.6 from ~22:57 UTC**,
+> INHERITING the fourth session's China KV-landing ownership (the
+> `rung2-run --nbs` manual firing after the 00:00 UTC KV write-cap reset,
+> recorded under M6.2; the 04:20 UTC rung-2 bootstrap fallback stays armed
+> either way).
+
 - [x] M6.1 New Zealand link (evidence first)
   - **The measured evidence + the INCLUDE decision** (evidence/M6.1/: raw-series.json, measurements.json, equity-correlation-detail.json, NZ-LINK-EVIDENCE.md): weekly ASX 200/NZX 50 returns correlation **0.73** (n=244; the daily 0.31 is close-stagger attenuation — the lag structure measured), AUD/USD vs NZD/USD daily **0.86** (rolling-1y min 0.62 — high AND stable), AU−NZ 10y yield levels **0.93** (1970→2026; latest spread +0.34pp), plus two structural links quoted verbatim from the official pages (RBNZ "84% of bank lending" by the four Australian-owned banks; MFAT "$32.76 billion in 2024" two-way trade). G-6 cleared.
   - **Four context-only additions** (the 154th–156th ids + the board rider): `audnzd` (the Frankfurter legs — NZD rejoined the one request, zero new fetches), `nz-short-rate` (the OECD FINMARK IR3TIB monthly average — the honest mirror: rbnz.govt.nz 403s the work venue; the FRED OCR-family mirror is stale at 2024-12 AND is the call-money rate, so the card is named the short-term rate, never the OCR), `nz-10y` (the FRED OECD mirror IRLTLT01NZM156N, T-16 record added), and the **NZX 50 rider** on the Australian markets board (Yahoo `^NZ50` verified from the provider's own response; its own `newzealand` group, NZD-denominated; the currency note updated; the leading/lagging summary keeps the AU groups). The two NZ mirrors ride rung2's first-of-month gate (+2 fetches; all-gates ≈41/50). New `markets-au-run` Node runner (the markets-run Path-B twin).
