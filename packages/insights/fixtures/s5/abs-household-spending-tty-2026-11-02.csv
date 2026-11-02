@@ -1,0 +1,171 @@
+DATAFLOW,MEASURE,CATEGORY,PRICE_ADJUSTMENT,TSEST,STATE,FREQ,TIME_PERIOD,OBS_VALUE,UNIT_MEASURE,UNIT_MULT,OBS_STATUS,OBS_COMMENT
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2012-07,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2012-08,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2012-09,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2012-10,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2012-11,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2012-12,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-01,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-02,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-03,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-04,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-05,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-06,,PCT,0,u,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-07,4.4,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-08,2.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-09,3.4,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-10,2.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-11,3.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2013-12,4.5,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-01,4.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-02,3,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-03,4.1,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-04,4.8,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-05,3.3,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-06,4.3,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-07,4.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-08,2.1,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-09,4.4,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-10,5.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-11,3.1,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2014-12,3.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-01,1.9,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-02,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-03,3.5,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-04,3.3,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-05,2.8,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-06,5.1,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-07,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-08,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-09,3.9,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-10,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-11,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2015-12,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-01,3.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-02,5.8,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-03,3,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-04,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-05,4,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-06,3.9,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-07,1.3,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-08,3.8,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-09,3.4,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-10,1.4,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-11,3.9,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2016-12,4.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-01,4.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-02,0.5,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-03,4.1,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-04,2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-05,3.9,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-06,3.1,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-07,2.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-08,2.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-09,2.9,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-10,3.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-11,5.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2017-12,3.2,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-01,3.8,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-02,5.1,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-03,4.4,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-04,4.8,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-05,5.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-06,5.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-07,5.7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-08,7,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-09,4.8,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-10,6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-11,5.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2018-12,3.6,PCT,0,,Estimates up to and including December 2018 are derived using a different methodology - see the Methodology page for more information.
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-01,3.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-02,1.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-03,3.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-04,1.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-05,1.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-06,-1.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-07,1.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-08,1.2,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-09,-0.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-10,-0.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-11,-1.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2019-12,-4.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-01,-0.2,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-02,0.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-03,-6.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-04,-23.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-05,-11.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-06,-4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-07,-0.2,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-08,-7.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-09,-5.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-10,-3.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-11,-0.2,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2020-12,0.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-01,-2.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-02,-3.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-03,5.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-04,32.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-05,12.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-06,3.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-07,-3.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-08,-0.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-09,2.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-10,5.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-11,9.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2021-12,8.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-01,9.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-02,15.2,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-03,14.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-04,16.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-05,17.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-06,21.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-07,26.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-08,31.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-09,30.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-10,23.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-11,16.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2022-12,15.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-01,19.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-02,14.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-03,12.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-04,9.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-05,9.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-06,8.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-07,5.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-08,6.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-09,5.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-10,3.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-11,5.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2023-12,2,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-01,4.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-02,7.9,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-03,2.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-04,3.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-05,3.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-06,1.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-07,3.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-08,2.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-09,0.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-10,3.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-11,3.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2024-12,4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-01,3.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-02,-0.4,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-03,3.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-04,3.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-05,4.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-06,5.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-07,5.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-08,3.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-09,5.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-10,5.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-11,5.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2025-12,5.2,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-01,4.6,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-02,4.7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-03,6.8,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-04,5.1,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-05,4.3,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-06,7,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-07,7.5,PCT,0,,
+ABS:HSI_M(1.6.0),9,TOT,CUR,10,AUS,M,2026-08,6.6,PCT,0,,

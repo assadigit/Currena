@@ -1,0 +1,207 @@
+{
+ "probedAt": "2026-11-02T02:40:00Z",
+ "range": "1mo",
+ "interval": "1d",
+ "venue": "sandbox curl with the declared honest UA (CurrenaDashboard/1.0); host already verified for Worker egress in production use",
+ "note": "The M5.1 symbol probe: every candidate kept only if complete (>=20 of ~22 trading days), fresh (last date within the probe week), plausible (level vs the ASX 200 anchor), AUD, ASX-listed.",
+ "symbols": [
+  {
+   "symbol": "%5EAORD",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 8978.2002,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXDJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 3698.2,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXEJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 11108.2998,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXFJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 9777.2998,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXHJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 34386.3984,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXIJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 1597.2,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXMJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 21950.5,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXNJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 8243.7002,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXPJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 1567.9,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXSJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 13083.0,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXSO",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 3129.8999,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXTJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 1588.4,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXUJ",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 10745.4004,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "%5EAXVI",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 11.418,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "ANZ.AX",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 40.71,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "CBA.AX",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 165.6,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "NAB.AX",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 41.17,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  },
+  {
+   "symbol": "WBC.AX",
+   "found": true,
+   "points": 22,
+   "firstDate": "2026-10-02",
+   "lastDate": "2026-11-02",
+   "lastValue": 36.7,
+   "currency": "AUD",
+   "exchange": "ASX",
+   "fullExchangeName": "ASX"
+  }
+ ]
+}
