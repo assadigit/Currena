@@ -5,6 +5,157 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02d] — gap-closure S5-M5.2: the Australian macro family — eight ABS context cards + the two shadow lanes (the 146th–153rd indicators)
+
+The S5 data milestone (commit `11ff4ea`, deployed as worker version
+`823266af` 03:35 UTC 2026-11-02; this entry + the PROGRESS tick land with
+the lapse-protocol close — the building session's box was lost after the
+push, before its verification round):
+
+- **Eight context-only ids (G-5), the 146th–153rd:** `au-gdp-growth`
+  (the YoY % COMPUTED off the ANA_AGG chain-volume levels — the
+  provider's own M2 QoQ series is the pinned cross-check, 0.4 vs the
+  computed 0.42), `au-household-spending` (the HSI_M through-the-year % —
+  the CEASED Retail Trade flow's own successor, catalogue 5682.0),
+  `au-building-approvals` (BA_GCCSA dwellings, ORIGINAL terms — no SA
+  variant exists in the SDMX API for the national total),
+  `au-population-growth` (ERP level → computed YoY) with **`au-nom` as a
+  COMPANION-ONLY reading inside it** (the net-overseas-migration quarter,
+  the spec's "secondary value" — `COMPANION_ONLY_IDS` +
+  `COMPANIONS['au-population-growth']`), `au-participation` (LF M12 — the
+  same flow/key family as the live au-unemployment) and
+  `au-underemployment` (LF_UNDER M23 — the LF flow carries NO
+  underemployment measures; the mirror flow is the only SDMX home) in the
+  new **`au-activity` shadow lane** ("Is the economy growing?"); and
+  `au-trade-balance` (the ITGS "Balance on goods" DATA_ITEM 170, SA,
+  SERVED by the provider — never computed) alone in the new
+  **`au-external` shadow lane** ("How is Australia's trade and China
+  link?"). The spec's wider au-external membership (terms of trade, iron
+  ore, coal, LNG, AUD/CNY) is deferred to the S6 owner decision — moving
+  the existing ids would reweight their current lanes (G-3).
+- **Both lanes are SHADOW gauges** (the geo-fragmentation precedent):
+  every member context-only, the headers read "not scored yet" /
+  «هنوز نمره داده نمی‌شود», `isShadowGauge` is pure over the definitions,
+  and the Australia verdict + voting counts are untouched by design
+  (a step-0 gauge is excluded from `sectionVerdictStep`).
+- **The rung3 `abs-au-macro` extra source** (daily gate, declared budget
+  22 = 8 fetches + 1 snapshot read + 4 patch writes + 8 history writes =
+  21 with headroom): the eight fetches ride the SAME keyless
+  data.api.abs.gov.au host the monthly CPI has used from Worker egress
+  since 2026-10-06. The rung3 registry total on an all-gates day:
+  1 status + tic 4 + portwatch 18 + abs-au-macro 22 = 45 ≤ 50. The ids
+  ride `CARRY_FORWARD_IDS`; the history phases exclude them (ABS_AU_IDS).
+  The Node venue (GHA ingest) collects the same series inline — the
+  venues cannot drift. **Never touches the 04:10 main rung.**
+- **Honest staleness on day one** (the release-calendar gaps, not fetch
+  failures): participation/underemployment read Sep-2026 (the October
+  Labour Force lands 2026-11-19; the 60-day windows crossed Oct 31 —
+  the SAME honest window the live au-unemployment reads through),
+  spending Aug-2026 (September HSI lands 2026-11-04), the goods balance
+  Aug-2026 (September ITGS lands 2026-11-05), population/NOM 2026-Q1
+  (the June-quarter print lands 2026-12-17). GDP (2026-Q2, Dec 2 next)
+  and approvals (Sep-2026, freshest print — released 2026-11-02 itself)
+  read fresh.
+- **Tests:** 13,245 → **13,854 green** (core 195 · scraper 67 · insights
+  1176 · markets 13 · api 393 · web 12,010). The parser suite pins all
+  eight families provider-exact against the same-day fixtures; the phase
+  test pins the rung's patch/history arithmetic; the gauge-membership +
+  shadow-label pins ride `gauges.test.ts`.
+- **Bundle:** Insights lazy 1396/322 → **1440/333** (measured
+  1436.12/331.30 — eight bilingual card families with full Layer-1 +
+  details-panel copy + six glossary terms + the two lane rows; justified
+  in `scripts/check-bundle-budget.mjs` §2026-11-02d + this entry).
+- **Copy:** fa round-72 (the full family — plainNames, whyItMatters,
+  the lane questions + gauge answers, the six glossary terms; manifest
+  clean; the terminology doc gains the round-72 rows). Registry
+  regenerated: **153 indicators** (48 voting + 105 context). Narrator
+  vocabulary regenerated (in sync).
+- **Docs:** AGENTS.md §A (the AUSTRALIA section's two new lane tables +
+  the counts), INDICATORS_AND_DATA_SOURCES §1/§2, SCRAPING_SPEC FS-14
+  (the abs-au-macro method card), RUNGS.md (the rung3 budget line).
+- **Production verification (the lapse-protocol round, this session):**
+  the 04:30 UTC rung fired GREEN (rung3 used 41/50: portwatch 18 +
+  abs-au-macro 22 + 1 status; the tic gate correctly idle outside
+  15–25), all eight series patched; `/api/insights` serves **153
+  readings** with every new id provider-exact against the same-day
+  fixtures (GDP 2.1376% @ 2026-Q2 · balance 495 $m @ 2026-08 · spending
+  6.6% @ 2026-08 · approvals 18,264 @ 2026-09 · population 1.4269% +
+  NOM 101k @ 2026-Q1 · participation 66.7632% + underemployment 6.3258%
+  @ 2026-09). Browser-verified fresh contexts EN + fa (RTL) at 1200 +
+  360: both lane headers + "not scored yet" + the context-count lines
+  render in both languages, all eight cards render (fa values in Persian
+  digits «۶۶٫۸٪», «۱۸٬۲۶۴»), the population card carries its NOM
+  companion, 0px horizontal overflow at 360 in both locales, zero
+  console errors. Evidence `docs/gap-closure/evidence/m5.2/` (5
+  screenshots). KV writes/day: ~76 → ~88 (+12: the 8 history writes +
+  the 4 patch writes, read-compared after the first day).
+
+## [2026-11-02c] — gap-closure S5-M5.1: the ABS verification pass + the Yahoo symbol probe
+
+M5.1's decision-per-candidate, all read from the providers' own responses
+(commit `2283d18`; fixtures under `packages/insights/fixtures/s5/` — 11
+files; the register rows in `docs/gap-closure/VERIFIED-SOURCES.md` carry
+the full evidence):
+
+- **The spec's Retail Trade candidate is DEAD at the source:** the RT
+  dataflow carries the provider's own "CEASED - This dataset has been
+  discontinued" description and every RT series ends 2025-06 (flow
+  annotation `NonProductionDataflow=true`; the evidence fixture
+  `abs-rt-flow-ceased-2026-11-02.json`). The verified successor is the
+  **Monthly Household Spending Indicator** (HSI_M, catalogue 5682.0,
+  bank-transactions data): MEASURE 9 "through the year percentage change"
+  × CATEGORY TOT × PRICE_ADJUSTMENT CUR × TSEST 10 × STATE AUS × M (the
+  CVM and SA variants return NoRecordsFound — probed, not assumed).
+- **Six more ABS series verified with exact keys** (all off the same
+  keyless SDMX host already in production use): GDP chain-volume levels
+  `ANA_AGG/M1.GPM.20.AUS.Q` (269 obs 1959-Q3 → 2026-Q2 = 699,461 AUD m;
+  the YoY is COMPUTED — the QoQ cross-check against the provider's own
+  M2 series matches at 0.4); the goods balance `ITGS/M1.170.20.AUS.M`
+  (DATA_ITEM 170 "Balance on goods", served DIRECTLY — the codelist walk
+  found it; 2026-08 = +495 AUD m SA); dwelling approvals
+  `BA_GCCSA/1.1.9.1.100.10.AUS.M` (ORIGINAL terms only — TSEST 20
+  returns NoRecordsFound for the national total; the Sep-2026 print
+  18,264 released 2026-11-02 itself, the freshest of the family); the
+  ERP + NOM pair `ERP_COMP_Q/10.AUS.Q` + `/9.AUS.Q` (2026-Q1 =
+  27,921.2 thousand persons + 101.0 thousand NOM; the June-quarter print
+  lands 2026-12-17); participation `LF/M12.3.1599.20.AUS.M` (the same
+  flow/key family as the live au-unemployment; 2026-09 = 66.7632%);
+  underemployment `LF_UNDER/M23.3.1599.20.AUS.M` (the LF flow itself
+  carries NO underemployment measures — M21/M22/M23 all probed
+  NoRecordsFound there; the LF_UNDER mirror flow is the only SDMX home;
+  2026-09 = 6.3258%).
+- **SDMX quirks learned live:** the `BOP` dataflow is an EMPTY shell
+  (NoRecordsFound at every period) and `BOP_GOODS` is intermittent at
+  flow level (a CloudFront-cached 404 "NoRecordsFound" after a first
+  successful answer) — the series-key route is the reliable one. The
+  codelist-walk recipe (dataflow → datastructure → codelist) resolved
+  every dimension value; the LF_UNDER flow has its own PARM_ITEM
+  dimension distinct from CL_LF_MEASURE.
+- **The Yahoo symbol probe (the M5.4 board's candidates): ALL 18 PASS**
+  — `^AORD` 8978.20 · `^AXSO` 3129.90 · `^AXVI` 11.42 · the eleven
+  sector indices (`^AXFJ` 9777.30 · `^AXMJ` 21950.50 · `^AXEJ` 11108.30
+  · `^AXPJ` 1567.90 · `^AXHJ` 34386.40 · `^AXIJ` 1597.20 · `^AXNJ`
+  8243.70 · `^AXDJ` 3698.20 · `^AXSJ` 13083.00 · `^AXUJ` 10745.40 ·
+  `^AXTJ` 1588.40) · the four banks (`CBA.AX` 165.60 · `WBC.AX` 36.70 ·
+  `NAB.AX` 41.17 · `ANZ.AX` 40.71) — every one 22/22 trading points
+  2026-10-02 → 2026-11-02, currency AUD, exchange ASX, levels plausible
+  vs the ASX 200 anchor (the probe table:
+  `evidence/m5.1/yahoo-symbol-probe-2026-11-02.json`). **Probe lesson:**
+  the chart endpoint 429s on rapid back-to-back calls with a bare UA —
+  the repo's declared honest UA + ~8 s spacing answers 200 reliably; a
+  modest politeness pause rides the M5.4 rung anyway. **EODHD: NOT
+  used** — the free plan's ~20 calls/day are already spent by the
+  markets worker; the quota arithmetic favours Yahoo 19:0 (the Yahoo
+  path is L2 owner-accepted).
+- **The release calendar read via the real browser** (the future-releases
+  tab is JS-rendered; all 11:30am AEDT = 00:30 UTC) — the M5.5 calendar
+  inputs: HSI Sep-ref Wed 2026-11-04 + Oct-ref Mon 2026-11-30 · ITGS
+  Sep-ref Thu 2026-11-05 + Oct-ref Thu 2026-12-03 · Building Approvals
+  Oct-ref Tue 2026-12-01 · National Accounts (GDP) Sep-quarter Wed
+  2026-12-02 · Labour Force Oct-ref Thu 2026-11-19 + Nov-ref Thu
+  2026-12-17 · population June-quarter Thu 2026-12-17 · CPI Oct-ref Wed
+  2026-11-25 (already calendared).
+
 ## [2026-11-02b] — gap-closure S4-M4.6: UI, copy, docs and deploy close
 
 The S4 finale — the audit-and-close round (most of the list had landed

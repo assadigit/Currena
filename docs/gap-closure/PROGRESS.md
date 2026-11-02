@@ -15,9 +15,9 @@ file at the end of every milestone (tick the box, add evidence) and every sessio
 | S2 | Foreign holdings of US Treasuries (priority feature) | 6 / 6 | 100% |
 | S3 | US credit, liquidity, fiscal and growth nowcast | 6 / 6 | 100% |
 | S4 | Geopolitics, supply chain and energy | 6 / 6 | 100% |
-| S5 | Australia deep-dive and Australian markets | 0 / 6 | 0% |
+| S5 | Australia deep-dive and Australian markets | 2 / 6 | 33% |
 | S6 | New Zealand link, China and world links, promotion and polish | 0 / 6 | 0% |
-| **Total** | | **25 / 37** | **68%** |
+| **Total** | | **27 / 37** | **73%** |
 <!-- gap-progress:end -->
 
 Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in production):
@@ -369,9 +369,27 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > 145 indicators). **This session claims M5.1→M5.6 from 02:15 UTC.**
 > Any other S5 session must re-read this file and skip already-ticked
 > milestones.
+>
+> **S5 continuation claim (2026-11-02 ~07:10 UTC):** the building
+> session's box was lost after pushing M5.2 (`11ff4ea`, deployed as
+> `823266af` 03:35 UTC) but before its verification/PROGRESS round.
+> This continuation session re-cloned, re-ran the baseline gates clean
+> (13,854 tests — exactly the M5.2 commit's count), verified M5.2's
+> production state independently (the 04:30 rung green, all eight ids
+> provider-exact vs the same-day fixtures, browser EN/fa 1200/360), and
+> completed the M5.1+M5.2 ticks + CHANGELOG entries under the
+> ~55-minute-lapse precedent. **This session claims M5.3→M5.6 from
+> 07:10 UTC.**
 
-- [ ] M5.1 ABS verification and fixtures
-- [ ] M5.2 Australian macro indicators
+- [x] M5.1 ABS verification and fixtures
+  - **Every candidate verified or rejected with evidence** (commit `2283d18`; the register rows in VERIFIED-SOURCES "S5-M5.1 additions" + the log line 2026-11-02): six ABS series verified with exact SDMX keys (GDP chain-volume ANA_AGG/M1.GPM.20.AUS.Q with the M2 QoQ cross-check · goods balance ITGS/M1.170.20.AUS.M served as DATA_ITEM 170 · dwelling approvals BA_GCCSA original-terms-only · ERP + NOM pair ERP_COMP_Q/10 & /9 · participation LF/M12 · underemployment LF_UNDER/M23), **the Retail Trade candidate REJECTED at the source** (the RT flow's own "CEASED" annotation, data ends 2025-06 — the Monthly Household Spending Indicator HSI_M is the verified successor), 11 fixtures under `packages/insights/fixtures/s5/`, the SDMX quirks recorded (BOP empty shell, BOP_GOODS intermittent at flow level, the codelist-walk recipe, LF_UNDER's own PARM_ITEM dimension).
+  - **The Yahoo symbol probe: ALL 18 AU candidates pass** (22/22 trading points 2026-10-02 → 2026-11-02, AUD/ASX, plausible levels; the probe table `evidence/m5.1/yahoo-symbol-probe-2026-11-02.json`). Probe lesson: the chart endpoint 429s on rapid back-to-back calls with a bare UA — the declared honest UA + ~8 s spacing answers 200. **EODHD NOT used** (quota arithmetic: the markets worker already spends the ~20 free calls; Yahoo 19:0, L2 owner-accepted).
+  - **The release calendar read via the real browser** (the M5.5 inputs; all 11:30am AEDT): HSI 2026-11-04/11-30 · ITGS 2026-11-05/12-03 · BA 2026-12-01 · GDP 2026-12-02 · LF 2026-11-19/12-17 · population 2026-12-17.
+- [x] M5.2 Australian macro indicators
+  - **Eight context-only ids, the 146th–153rd** (commit `11ff4ea`): the au-activity lane's six (au-gdp-growth [computed YoY off the levels], au-household-spending [the HSI successor], au-building-approvals, au-population-growth [+ the au-nom COMPANION-ONLY reading inside it], au-participation, au-underemployment) + au-trade-balance alone in au-external (the spec's wider external membership — terms of trade, iron ore, coal, LNG, AUD/CNY — deferred to the S6 owner decision per G-3: moving existing ids would reweight their lanes). All G-5 context-only; both lanes SHADOW gauges (the geo-fragmentation precedent — "not scored yet" headers, the Australia verdict + voting counts untouched by design).
+  - **Rung3 `abs-au-macro`** (daily gate, budget 22 = 8 fetches + 1 read + 4 patch writes + 8 history writes = 21; the rung3 all-gates day 45/50; the ids ride CARRY_FORWARD_IDS; never touches main). The Node venue collects the same series inline.
+  - **Deploy + verify (the lapse-protocol close):** worker **`823266af`** (03:35 UTC 2026-11-02; markets unchanged). The 04:30 UTC rung fired GREEN — rung3 used 41/50 (portwatch 18 + abs-au-macro 22 + 1 status; tic correctly idle outside 15–25). `/api/insights` serves **153 readings**, all eight provider-exact against the same-day fixtures (GDP 2.1376% @ 2026-Q2 · balance 495 @ 2026-08 · spending 6.6 @ 2026-08 · approvals 18,264 @ 2026-09 · population 1.4269% + NOM 101 @ 2026-Q1 · participation 66.7632% + underemployment 6.3258% @ 2026-09). The stale tags are honest release-calendar gaps (LF Oct lands 11-19, HSI Sep 11-04, ITGS Sep 11-05, population Jun-quarter 12-17). Browser-verified fresh contexts EN + fa (RTL) at 1200 + 360: both lane headers + "not scored yet" + the context counts render, all eight cards render (fa Persian digits «۶۶٫۸٪» «۱۸٬۲۶۴»), the NOM companion rides the population card, **0px horizontal overflow at 360 in both locales**, zero console errors. Evidence `evidence/m5.2/` (5 screenshots).
+  - **Tests + budget:** gates ALL GREEN **13,854 tests** (insights 1163 → 1176; web grows with the card-render suite). Registry 145 → **153** (48 voting + 105 context — the voters untouched). Bundle 1396/322 → **1440/333** (measured 1436.12/331.30, justified §2026-11-02d). fa round-72 (manifest clean). KV writes/day ~76 → ~88 (+12, read-compared after the first day).
 - [ ] M5.3 Australian gauges
 - [ ] M5.4 Australian markets board
 - [ ] M5.5 "What it means for my money" and calendar

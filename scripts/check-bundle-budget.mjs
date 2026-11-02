@@ -877,7 +877,8 @@ const BUDGETS = [
   // details-panel copy + six glossary terms, plus the two shadow-lane
   // machinery extensions (the au-activity/au-external gauge rows).
   // Measured 1436.12/331.30; raw bumps 1396 → 1440, gz 322 → 333.
-  // Justified in CHANGELOG §2026-11-02a.
+  // Justified in CHANGELOG §2026-11-02d (the heading the lost-box session
+  // projected as "2026-11-02a" — two S4 entries took a/b first).
   { pattern: /^Insights-[\w-]+\.js$/, raw: 1440_000, gz: 333_000, label: 'Insights lazy chunk' },
 ];
 
