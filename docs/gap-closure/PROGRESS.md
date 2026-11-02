@@ -380,6 +380,13 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > completed the M5.1+M5.2 ticks + CHANGELOG entries under the
 > ~55-minute-lapse precedent. **This session claims M5.3→M5.6 from
 > 07:10 UTC.**
+>
+> **S5 second continuation claim (2026-11-02 ~10:25 UTC):** the M5.3
+> close session's box was lost after pushing `e34c213` (07:29 UTC,
+> the audit-and-close round — no deploy was needed for it). This
+> session re-cloned, re-ran the baseline gates clean (13,854 tests —
+> exactly the M5.3 close's count; origin/main == `e34c213`, tree
+> clean). **This session claims M5.4→M5.6 from 10:25 UTC.**
 
 - [x] M5.1 ABS verification and fixtures
   - **Every candidate verified or rejected with evidence** (commit `2283d18`; the register rows in VERIFIED-SOURCES "S5-M5.1 additions" + the log line 2026-11-02): six ABS series verified with exact SDMX keys (GDP chain-volume ANA_AGG/M1.GPM.20.AUS.Q with the M2 QoQ cross-check · goods balance ITGS/M1.170.20.AUS.M served as DATA_ITEM 170 · dwelling approvals BA_GCCSA original-terms-only · ERP + NOM pair ERP_COMP_Q/10 & /9 · participation LF/M12 · underemployment LF_UNDER/M23), **the Retail Trade candidate REJECTED at the source** (the RT flow's own "CEASED" annotation, data ends 2025-06 — the Monthly Household Spending Indicator HSI_M is the verified successor), 11 fixtures under `packages/insights/fixtures/s5/`, the SDMX quirks recorded (BOP empty shell, BOP_GOODS intermittent at flow level, the codelist-walk recipe, LF_UNDER's own PARM_ITEM dimension).
