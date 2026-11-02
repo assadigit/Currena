@@ -5216,7 +5216,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The IMF PortWatch estimate of daily transits through the Taiwan Strait, from ship-tracking data; the card reads the 7-day average and shows the change against the prior four weeks and the same weeks a year earlier.',
     whyItMatters:
-      'The Taiwan Strait is one of the busiest shipping lanes in the world; the traffic count is the measured flow beside the tension gauge of the same waters.',
+      'The Taiwan Strait is one of the busiest shipping lanes in the world — the waters beside the north-east Asian factories, the biggest buyers of Australia\u2019s raw-material exports; the traffic count is the measured flow beside the tension gauge of the same waters.',
     tendedToMean:
       'The zones are measured against the strait\u2019s own trailing window, recomputed on every write — never fixed numbers.',
     cantTell:

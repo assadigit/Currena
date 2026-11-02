@@ -5,6 +5,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02b] — gap-closure S4-M4.6: UI, copy, docs and deploy close
+
+The S4 finale — the audit-and-close round (most of the list had landed
+with its milestones; this closes the gaps the audit found):
+
+- **The Taiwan card gains the Australian trade-route angle (RULES §7):**
+  `whyItMatters` now reads "…the waters beside the north-east Asian
+  factories, the biggest buyers of Australia's raw-material exports…"
+  (EN + fa, tendency-only, the Malacca precedent's twin — Malacca's angle
+  had landed with M4.3; Taiwan's had been the one gap). fa round-71
+  (1 string, manifest clean; the terminology doc gains the round-71 rows:
+  «مواد خام», «بزرگ‌ترین خریداران» — the superlative chosen over any share
+  claim).
+- **The EIA licence row lands in LICENCES.md** — the register evidence had
+  lived only in the machine twin (`eia-spot`, L0 17 U.S.C. § 105, read
+  2026-10-22) since the spot-workbook round; the row documents all four of
+  the provider's uses (spots + crude stocks + the M4.4 SPR/production
+  pair) — the M4.2 documentation precedent applied to the last gap.
+- **The RISK_REGISTER M4.4 log line** (nyfed new + eia/world-bank
+  extended) — recorded in this round; every other S4 milestone had one.
+- **Already-current, verified by the audit:** the 7 glossary terms
+  (chokepoint, transit-estimate, supply-chain-pressure,
+  strategic-reserve, geopolitical-risk-index, trade-policy-uncertainty,
+  lng), AGENTS.md §A (145 ids: 48 voting + 97 context),
+  INDICATORS_AND_DATA_SOURCES (145 everywhere + the M4.5 lane rows),
+  SCRAPING_SPEC FS-11/12/13, the registry regeneration
+  (`registry:generate`, 0f50796).
+- **Deploy + verify:** worker **`916836af`** (01:42 UTC). Gates ALL GREEN
+  **13,245 tests**; Insights lazy 1392.94/321.04 inside the 1396/322
+  ceiling (the one-sentence copy delta needs no bump). Browser-verified
+  fresh contexts EN + fa (RTL) at 1200 + 360: the Taiwan AU-angle renders
+  in the details panel in both languages («بزرگ‌ترین خریداران صادرات مواد
+  خام استرالیا»), the shadow gauge + trio still render, **0px overflow at
+  360 both locales**, zero console errors. Evidence `evidence/S4-M4.6/`
+  (3 screenshots).
+
 ## [2026-11-02a] — gap-closure S4-M4.5 close: the union additions + the production verification
 
 The M4.5 loop completion (the session that landed `99b20f6` was cut

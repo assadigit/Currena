@@ -45,6 +45,8 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 | Transit (of ships) | تردد | The count word; "transits a day" → «تردد در روز» (`units.transits`) |
 | Estimate (a data estimate) | برآورد | The honest PortWatch labelling; «برآورد» rides every chokepoint card |
 | Supply chain | زنجیرهٔ تأمین | ZWNJ; established by the S3 rounds |
+| Raw materials | مواد خام | The Australia-angle trade word (round 71; the Malacca/Taiwan `whyItMatters` — «صادرات مواد خام استرالیا») |
+| The biggest buyers | بزرگ‌ترین خریداران | ZWNJ in بزرگ‌ترین; the superlative form chosen over a share claim (round 71 — tendencies only, never a number) |
 
 ## Exchange rates and conversion
 
