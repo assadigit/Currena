@@ -7736,6 +7736,62 @@ export const insightsCopyEn = {
           unknown: 'One link in this chain has no fresh data right now.',
         },
       },
+      // gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy
+      // relationship trio — general tendencies only, never forecasts; the
+      // card never names an event as a cause (the spec's wording rule).
+      'oil-geopolitics-chokepoints': {
+        name: 'Oil, war-and-tension coverage and sea-gate traffic',
+        legs: {
+          'chokepoint-suez': 'Suez Canal traffic',
+          brent: 'the oil price',
+          'gpr-index': 'war-and-tension coverage',
+        },
+        relation:
+          'When measured traffic through the main Europe–Asia sea gate falls, ships take longer routes and the oil price and war-and-tension coverage often rise together. The reverse reads weaker: recovering traffic does not by itself mean cheaper oil. The card never says why traffic moved — only what the counts and prices did.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c}: the rerouting pattern is showing.',
+          partly: 'Right now {a}, {b}, {c}: only part of the rerouting pattern is showing.',
+          inactive: 'Right now {a}, {b}, {c}: sea-gate traffic is steady and the pattern is quiet.',
+          disagree: 'Right now {a}, {b}, {c}: the links point against each other.',
+          unknown: 'One link in this chain has no fresh data right now.',
+        },
+      },
+      'energy-terms-aud': {
+        name: 'Energy export prices, the terms of trade and the Australian dollar',
+        legs: {
+          'lng-japan': 'the Asia LNG price',
+          'coal-aus': 'the Australian coal price',
+          'terms-of-trade': 'the terms of trade',
+          audusd: 'the Australian dollar',
+          'dollar-basket': 'the US dollar',
+        },
+        relation:
+          'Coal and LNG are two of Australia\u2019s largest energy exports, so firm energy-export prices tend to lift the terms of trade and, over time, the Australian dollar. The US dollar rides along as context: a falling Australian dollar is often mostly a rising US dollar.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c}: the energy export chain is in place.',
+          partly: 'Right now {a}, {b}, {c}: only part of the energy export chain is showing.',
+          inactive: 'Right now {a}, {b}, {c}: the energy export chain is quiet.',
+          disagree: 'Right now {a}, {b}, {c}: the links point against each other.',
+          unknown: 'One link in this chain has no fresh data right now.',
+        },
+      },
+      'supply-pressure-inflation': {
+        name: 'Supply-chain pressure and inflation',
+        legs: {
+          gscpi: 'supply-chain pressure',
+          'us-cpi-yoy': 'US consumer inflation',
+          'breakeven-5y5y': 'the market\u2019s inflation expectation',
+        },
+        relation:
+          'When the world\u2019s delivery chains are stretched, goods tend to cost more to move, and consumer prices tend to feel the pressure with a lag of months. The market\u2019s inflation expectation rides along as context: it can move on its own, and it never gates the read.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c}: the pressure-to-prices chain is engaged.',
+          partly: 'Right now {a}, {b}, {c}: only part of the pressure-to-prices chain is showing.',
+          inactive: 'Right now {a}, {b}, {c}: delivery chains are calm and the chain is quiet.',
+          disagree: 'Right now {a}, {b}, {c}: the links point against each other.',
+          unknown: 'One link in this chain has no fresh data right now.',
+        },
+      },
     },
   },
 

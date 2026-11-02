@@ -164,7 +164,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
   it('GAUGE membership is the scored list (48 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation SHADOW gauge carries context-only members — the deliberate G-5 exception, pinned here)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(53); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3 shadow gauge's five context-only chokepoint members (48 + 5 = 53; only the 48 vote)
+    expect(memberIds.size).toBe(56); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3/M4.5 shadow gauge's EIGHT context-only members (the five chokepoints + gscpi/us-spr/us-crude-production; 48 + 8 = 56; only the 48 vote)
     // Every gauge member is a scored (non-info) definition. TWO deliberate
     // exceptions: B-14's brent (the card renders on the Prices strip; only
     // the count membership moved) and the S4-M4.3 SHADOW gauge's members

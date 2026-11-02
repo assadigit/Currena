@@ -166,6 +166,9 @@ export const GAUGES: readonly GaugeDef[] = [
   // header reads the "not scored yet" words (isShadowGauge + the UI copy).
   // The members list exists so the counts + the stale badge read the
   // lane's own membership.
+  // gap-closure S4-M4.5 (2026-11-01): the lane's supply members join —
+  // the GSCPI + the EIA SPR/production pair (all context-only, the same
+  // G-5 shadow; the members list mirrors the group's definitions).
   {
     id: 'geo-fragmentation',
     section: 'global',
@@ -175,6 +178,9 @@ export const GAUGES: readonly GaugeDef[] = [
       'chokepoint-bab-el-mandeb',
       'chokepoint-malacca',
       'chokepoint-taiwan',
+      'gscpi',
+      'us-spr',
+      'us-crude-production',
     ],
   },
 ];

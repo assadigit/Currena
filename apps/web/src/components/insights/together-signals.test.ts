@@ -393,7 +393,7 @@ describe('the I17 wiring', () => {
       ),
     );
     const evaluated = evaluateConnections(readings);
-    expect(evaluated).toHaveLength(6);
+    expect(evaluated).toHaveLength(9); // 6 v1 + the S4-M4.5 trio (2026-11-01)
     // every leg present, every state a valid vocabulary word
     for (const c of evaluated) {
       expect(['active', 'partly', 'pending', 'inactive', 'disagree', 'unknown']).toContain(c.state);

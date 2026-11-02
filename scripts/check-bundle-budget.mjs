@@ -864,7 +864,13 @@ const BUDGETS = [
   // 2 languages). The cards ride existing machinery only. Measured
   // 1384.91/319.55; raw bumps 1384 → 1390, gz 315 → 321.
   // Justified in CHANGELOG §2026-11-01i.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1390_000, gz: 321_000, label: 'Insights lazy chunk' },
+  // 2026-11-01j (gap-closure S4-M4.5): 1396/322 — the relationship trio:
+  // three more bilingual connection cards (oil/geopolitics/chokepoints,
+  // energy/terms-of-trade/AUD, supply-pressure/inflation) — the together
+  // copy (2 dictionaries × 3 cards × ~16 strings) + the connections
+  // registry. Measured 1392.67/320.98; raw bumps 1390 → 1396, gz 321 → 322.
+  // Justified in CHANGELOG §2026-11-01j.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1396_000, gz: 322_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

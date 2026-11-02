@@ -46,14 +46,19 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-/** The six v1 connections (spec Block T1 note) — order = card order. */
+/** The v1 connections (spec Block T1 note) + the S4-M4.5 trio — order = card order. */
 export type ConnectionId =
   | 'real-yields-gold'
   | 'dollar-gold-oil'
   | 'oil-expectations-costs'
   | 'copper-china-growth'
   | 'iron-terms-aud'
-  | 'rba-loan-debt';
+  | 'rba-loan-debt'
+  // gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy trio —
+  // general tendencies only, never forecasts (the spec's wording rule).
+  | 'oil-geopolitics-chokepoints'
+  | 'energy-terms-aud'
+  | 'supply-pressure-inflation';
 
 export type ConnectionState = 'active' | 'partly' | 'inactive' | 'disagree' | 'pending' | 'unknown';
 
@@ -246,6 +251,51 @@ export const CONNECTIONS: readonly ConnectionDef[] = [
       { id: 'rba-cash-rate', role: 'required', windows: [{ days: 30, minMove: 0.1 }], trigger: true },
       { id: 'au-home-loan', role: 'required', windows: [{ days: 30, minMove: 0.05 }] },
       { id: 'au-household-debt-arrears', role: 'context', windows: [{ days: 30, minMove: 0.5 }], caveat: 'debt-level' },
+    ],
+  },
+  // gap-closure S4-M4.5 (2026-11-01) — the geopolitics/supply/energy trio.
+  // (7) oil, geopolitical risk and the chokepoint transits: when the
+  // measured traffic through the Europe-Asia sea gate falls, oil and
+  // war-and-tension coverage often rise — the INVERSE structure (the
+  // first leg moves against the rest). The trigger (E-19) is the transit
+  // count itself: with traffic steady the rerouting tendency is not in
+  // play. Tendency words only — the card never names an event as a cause.
+  {
+    id: 'oil-geopolitics-chokepoints',
+    polarity: 'inverse',
+    legs: [
+      { id: 'chokepoint-suez', role: 'required', windows: [{ days: 30, minMove: 2 }], trigger: true },
+      { id: 'brent', role: 'required', windows: [{ days: 30, minMove: 5 }] },
+      { id: 'gpr-index', role: 'required', windows: [{ days: 30, minMove: 20 }] },
+    ],
+  },
+  // (8) LNG/coal prices, Australia's terms of trade and the Australian
+  // dollar — the iron-terms-aud pattern twin for the energy exports: firm
+  // energy-export prices tend to lift the terms of trade and, over time,
+  // the currency. The trigger is the LNG price (the region's benchmark).
+  {
+    id: 'energy-terms-aud',
+    polarity: 'same',
+    legs: [
+      { id: 'lng-japan', role: 'required', windows: [{ days: 30, minMove: 8 }], trigger: true },
+      { id: 'coal-aus', role: 'required', windows: [{ days: 30, minMove: 10 }] },
+      { id: 'terms-of-trade', role: 'required', windows: [{ days: 30, minMove: 1 }] },
+      { id: 'audusd', role: 'required', windows: [{ days: 30, minMove: 2 }] },
+      { id: 'dollar-basket', role: 'context', windows: [{ days: 30, minMove: 1 }] },
+    ],
+  },
+  // (9) supply-chain pressure and inflation: when delivery chains are
+  // stretched, goods prices tend to feel it with a lag. The CPI leg is
+  // the measured pass-through; the breakeven rides as context (the
+  // market's own inflation expectation, never a gate). The trigger is
+  // the pressure index — a calm GSCPI means the tendency is not in play.
+  {
+    id: 'supply-pressure-inflation',
+    polarity: 'same',
+    legs: [
+      { id: 'gscpi', role: 'required', windows: [{ days: 30, minMove: 0.3 }], trigger: true },
+      { id: 'us-cpi-yoy', role: 'required', windows: [{ days: 30, minMove: 0.15 }] },
+      { id: 'breakeven-5y5y', role: 'context', windows: [{ days: 30, minMove: 0.1 }] },
     ],
   },
 ] as const;

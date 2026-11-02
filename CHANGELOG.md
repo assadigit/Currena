@@ -5,6 +5,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-01j] — gap-closure S4-M4.5: the relationship trio (the shadow gauge's full membership)
+
+Three bilingual (fa round-70) relationship cards in the "Together" section
++ the geo-fragmentation gauge's complete member list:
+
+- **oil-geopolitics-chokepoints:** the INVERSE structure — when the
+  measured Suez traffic falls, oil and war-and-tension coverage often rise
+  (the trigger is the transit count itself: steady traffic = the tendency
+  is not in play, the E-19 discipline). The relation copy states the
+  weaker reverse explicitly.
+- **energy-terms-aud:** the iron-terms-aud pattern twin — LNG + coal
+  prices → the terms of trade → the Australian dollar (the dollar basket
+  rides as context, never a gate). The LNG price is the trigger.
+- **supply-pressure-inflation:** the GSCPI → US CPI chain with the
+  market's inflation expectation as context (never a gate); a calm GSCPI
+  = inactive, honestly.
+- **The shadow gauge's full membership:** gscpi + us-spr +
+  us-crude-production join the five chokepoints in the geo-fragmentation
+  members list (all context-only; the counts + the stale badge read the
+  lane's own membership; the global summary counts stay untouched).
+- Gates ALL GREEN 13,249 tests (insights 1156 → 1167, +11; web pins:
+  the together smoke 6 → 9, the registry gauge column regenerated).
+  Insights lazy bundle 1390/321 → 1396/322 (measured 1392.67/320.98,
+  justified §2026-11-01j). fa round-70 (32 strings, manifest clean).
+
 ## [2026-11-01i] — gap-closure S4-M4.4: the supply-chain and energy family (the 140th–145th indicators)
 
 Six context cards (G-5), all bilingual (fa round-69), riding existing

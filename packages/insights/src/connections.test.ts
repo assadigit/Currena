@@ -331,7 +331,7 @@ describe('evaluateConnection (v2 rules)', () => {
     expect(r.state).toBe('unknown');
   });
 
-  it('live-like snapshot (2026-10-14) pins the shipped states for all six connections', () => {
+  it('live-like snapshot (2026-10-14) pins the shipped states for the six v1 connections + the S4-M4.5 trio', () => {
     const live = [
       reading('real-yield-10y', { value: 2.91, change30d: 0.48, percentile10y: 0.998 }),
       reading('gold-usd', { value: 4125.9, status: 'context', change30d: -5.19, change90d: 9, percentile10y: 0.925 }),
@@ -372,7 +372,116 @@ describe('evaluateConnection (v2 rules)', () => {
       'iron-terms-aud': 'inactive',
       // The Sep 30 hike is newer than the August loan data.
       'rba-loan-debt': 'pending',
+      // S4-M4.5: the trio's legs are absent from this v1-era fixture —
+      // every card reads unknown (a required leg has no reading).
+      'oil-geopolitics-chokepoints': 'unknown',
+      'energy-terms-aud': 'unknown',
+      'supply-pressure-inflation': 'unknown',
     });
+  });
+});
+
+// gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy trio's
+// evaluation — the INVERSE rerouting chain, the energy-export twin and the
+// pressure-to-prices chain, each with the trigger discipline (E-19).
+describe('evaluateConnection (S4-M4.5: the geopolitics/supply/energy trio)', () => {
+  it('oil-geopolitics-chokepoints: transits falling while oil + tension rise = the INVERSE structure WORKING (active)', () => {
+    const r = evaluateConnection(
+      def('oil-geopolitics-chokepoints'),
+      [
+        reading('chokepoint-suez', { change30d: -4.1 }),
+        reading('brent', { change30d: 8.4 }),
+        reading('gpr-index', { change30d: 34.7 }),
+      ],
+    );
+    expect(r.state).toBe('active');
+    expect(r.summary?.triggerPresent).toBe(true);
+    expect(r.summary?.matchCount).toBe(3);
+  });
+
+  it('oil-geopolitics-chokepoints: steady traffic = inactive regardless of the other legs (the E-19 trigger discipline)', () => {
+    const r = evaluateConnection(
+      def('oil-geopolitics-chokepoints'),
+      [
+        reading('chokepoint-suez', { change30d: 0.8 }),
+        reading('brent', { change30d: 8.4 }),
+        reading('gpr-index', { change30d: 34.7 }),
+      ],
+    );
+    expect(r.state).toBe('inactive');
+    expect(r.summary?.triggerPresent).toBe(false);
+  });
+
+  it('oil-geopolitics-chokepoints: transits AND oil rising together reads disagree (against the inverse structure)', () => {
+    const r = evaluateConnection(
+      def('oil-geopolitics-chokepoints'),
+      [
+        reading('chokepoint-suez', { change30d: 3.9 }),
+        reading('brent', { change30d: 8.4 }),
+        reading('gpr-index', { change30d: -2 }),
+      ],
+    );
+    // suez +, brent + (against the expectation for leg 1+), gpr − (steady-ish
+    // under the 20 minimum → not counted). The moved signs disagree.
+    expect(r.state).toBe('disagree');
+  });
+
+  it('energy-terms-aud: firm LNG + coal + terms of trade + AUD = the export chain active (the iron-terms-aud twin)', () => {
+    const r = evaluateConnection(
+      def('energy-terms-aud'),
+      [
+        reading('lng-japan', { change30d: 11.2 }),
+        reading('coal-aus', { change30d: 18.4 }),
+        reading('terms-of-trade', { change30d: 2.1 }),
+        reading('audusd', { change30d: 2.6 }),
+        reading('dollar-basket', { change30d: 0.4 }),
+      ],
+    );
+    expect(r.state).toBe('active');
+    expect(r.summary?.matchCount).toBe(4);
+    expect(r.summary?.movedCount).toBe(4);
+  });
+
+  it('energy-terms-aud: a stale terms-of-trade leg blocks the read (unknown, chips keep values)', () => {
+    const r = evaluateConnection(
+      def('energy-terms-aud'),
+      [
+        reading('lng-japan', { change30d: 11.2 }),
+        reading('coal-aus', { change30d: 18.4 }),
+        reading('terms-of-trade', { status: 'stale', change30d: undefined }),
+        reading('audusd', { change30d: 2.6 }),
+      ],
+    );
+    expect(r.state).toBe('unknown');
+  });
+
+  it('supply-pressure-inflation: pressure + CPI both rising = active; the breakeven context never gates', () => {
+    const r = evaluateConnection(
+      def('supply-pressure-inflation'),
+      [
+        reading('gscpi', { change30d: 0.42 }),
+        reading('us-cpi-yoy', { change30d: 0.22 }),
+        reading('breakeven-5y5y', { change30d: 0.02 }),
+      ],
+    );
+    expect(r.state).toBe('active');
+    expect(r.summary?.matchCount).toBe(2);
+    // The context leg's marker reads can-tell (it never moved) — the card
+    // still reads active on its two required legs.
+    const breakeven = r.legs.find((l) => l.id === 'breakeven-5y5y')!;
+    expect(breakeven.marker).toBe('can-tell');
+  });
+
+  it('supply-pressure-inflation: a calm GSCPI = inactive (the tendency is not in play)', () => {
+    const r = evaluateConnection(
+      def('supply-pressure-inflation'),
+      [
+        reading('gscpi', { change30d: 0.05 }),
+        reading('us-cpi-yoy', { change30d: 0.22 }),
+      ],
+    );
+    expect(r.state).toBe('inactive');
+    expect(r.summary?.triggerPresent).toBe(false);
   });
 });
 
@@ -382,6 +491,8 @@ describe('CONNECTIONS table integrity', () => {
       'real-yield-10y', 'gold-usd', 'brent', 'dollar-basket', 'breakeven-5y5y', 'us10y',
       'copper-gold', 'china-pmi', 'm2-us', 'iron-ore', 'terms-of-trade', 'audusd',
       'rba-cash-rate', 'au-home-loan', 'au-household-debt-arrears', 'silver-usd',
+      // gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy trio's legs.
+      'chokepoint-suez', 'gpr-index', 'lng-japan', 'coal-aus', 'gscpi', 'us-cpi-yoy',
     ]);
     for (const c of CONNECTIONS) {
       expect(c.legs.length).toBeGreaterThanOrEqual(2);
@@ -396,7 +507,7 @@ describe('CONNECTIONS table integrity', () => {
     }
   });
 
-  it('has the six spec connections in order', () => {
+  it('has the six spec connections in order, then the S4-M4.5 trio', () => {
     expect(CONNECTIONS.map((c) => c.id)).toEqual([
       'real-yields-gold',
       'dollar-gold-oil',
@@ -404,6 +515,11 @@ describe('CONNECTIONS table integrity', () => {
       'copper-china-growth',
       'iron-terms-aud',
       'rba-loan-debt',
+      // gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy
+      // relationship trio — general tendencies only, never forecasts.
+      'oil-geopolitics-chokepoints',
+      'energy-terms-aud',
+      'supply-pressure-inflation',
     ]);
   });
 

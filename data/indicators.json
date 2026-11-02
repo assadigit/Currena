@@ -3563,8 +3563,8 @@
       "area": {
         "section": "global",
         "group": "geo-fragmentation",
-        "gauge": null,
-        "gaugeMembership": "context only — never counts"
+        "gauge": "geo-fragmentation",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
       },
       "source": {
         "provider": "nyfed",
@@ -3622,8 +3622,8 @@
       "area": {
         "section": "global",
         "group": "geo-fragmentation",
-        "gauge": null,
-        "gaugeMembership": "context only — never counts"
+        "gauge": "geo-fragmentation",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
       },
       "source": {
         "provider": "eia",
@@ -3681,8 +3681,8 @@
       "area": {
         "section": "global",
         "group": "geo-fragmentation",
-        "gauge": null,
-        "gaugeMembership": "context only — never counts"
+        "gauge": "geo-fragmentation",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
       },
       "source": {
         "provider": "eia",
