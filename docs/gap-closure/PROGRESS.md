@@ -408,6 +408,12 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
   - **Deploy:** api worker `1e25e37d` (the /markets-au route), markets worker `699daa4d` (the 4th cron), web (the AU board + the calendar). `/api/insights/markets-au` live (503 "being prepared" until the 07:00 UTC cron fires — the honest designed state). **Persian copy round 67:** 121 `marketsAu` strings + 2 `au-markets/shared` hardcoded strings + 5 calendar `titleFa` entries — all audited clean (`pnpm copy:audit` ✓ clean). **Narrator vocabulary** regenerated (182 indicators × 2 languages). **Docs:** AGENTS.md §A (the markets-au board row), this PROGRESS.md (S5 complete 6/6, G8/G9 ticked), VERIFIED-SOURCES.md (the AU board's venue + provider decisions), PROMPTS.md (the S6 prompt). CHANGELOG §2026-11-02f.
 
 ### S6 New Zealand, China and world links, promotion and polish (`S6-links-promotion-polish.md`)
+
+> **S6 session claim (2026-11-02, ~13:15 UTC):** this session claims M6.1→M6.6
+> from 13:15 UTC. Baseline: origin/main == `b5c76c7`, tree clean, gates ALL
+> GREEN **13,873 tests** (13:11 UTC run; Insights lazy 1467.34/338.18 vs the
+> 1470/340 ceiling). api worker `d86242ac` + markets worker `699daa4d` live.
+
 - [ ] M6.1 New Zealand link (evidence first)
 - [ ] M6.2 China property and steel
 - [ ] M6.3 De-dollarization and concentration
