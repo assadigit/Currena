@@ -31,7 +31,7 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 - [x] G7 Supply chain, chokepoints and energy (S4) — CLOSED 2026-11-01 (S4-M4.3/M4.4): five chokepoint transit cards (Hormuz rejected at the source, documented for a later re-check), the GSCPI, the SPR level + US production pair, and the Pink Sheet coal/LNG/gas trio — 11 ids live provider-exact, EN/fa verified at 1200/360, zero new subrequests for the Pink Sheet trio.
 - [x] G8 Australian macro activity and external gauges (S5)
 - [x] G9 Australian indices board (S5)
-- [ ] G10 New Zealand link (S6)
+- [x] G10 New Zealand link (S6) — CLOSED 2026-11-02 (S6-M6.1): the measured inclusion live end-to-end (the NZX 50 rider on the AU board + audnzd + the two NZ rate mirrors, all context-only per G-5); G-6 cleared on the measured evidence in evidence/M6.1/ (weekly ASX/NZX returns correlation 0.73; AUD/USD vs NZD/USD 0.86 with rolling-1y min 0.62; AU−NZ 10y yield levels 0.93; the RBNZ 84%-of-bank-lending + MFAT $32.76bn trade quotes). Production-verified: api `c81f65c8` + markets `58c4eebd`, 19-row board + 156 readings, EN/fa 360+1200, zero console errors. nz-short-rate honestly `unavailable` at the close (sdmx.oecd.org 500 ×3, the known intermittent class) — the rung2 monthly gate owns its landing.
 - [ ] G11 China property and steel (S6)
 - [ ] G12 De-dollarization and concentration (S6)
 - [ ] G13 Promotion of proven indicators to voters (S6)
@@ -413,6 +413,16 @@ Gap coverage (from the 2026-10-31 gap analysis; tick when the gap is closed in p
 > from 13:15 UTC. Baseline: origin/main == `b5c76c7`, tree clean, gates ALL
 > GREEN **13,873 tests** (13:11 UTC run; Insights lazy 1467.34/338.18 vs the
 > 1470/340 ceiling). api worker `d86242ac` + markets worker `699daa4d` live.
+
+> **S6 second continuation claim (2026-11-02, ~16:35 UTC):** the M6.1 builder
+> session was lost after its M6.1 tick landed (nothing mid-loop — `3439887`
+> carried the tick; the session log row stays open). This continuation session
+> claims M6.2→M6.6 from 16:35 UTC. Baseline re-established: origin/main ==
+> `3439887`, tree clean, gates ALL GREEN **14,073 tests** (16:31 UTC run;
+> Insights lazy 1484.65/341.88 vs the 1490/343 ceiling). Production smoke:
+> `/api/health` 200, `/api/insights` 200, `/api/insights/markets-au` 200 (the
+> 19-row board live). api `c81f65c8` + markets `58c4eebd` live. The G10 tick
+> landed with this claim (completing the prior session's record).
 
 - [x] M6.1 New Zealand link (evidence first)
   - **The measured evidence + the INCLUDE decision** (evidence/M6.1/: raw-series.json, measurements.json, equity-correlation-detail.json, NZ-LINK-EVIDENCE.md): weekly ASX 200/NZX 50 returns correlation **0.73** (n=244; the daily 0.31 is close-stagger attenuation — the lag structure measured), AUD/USD vs NZD/USD daily **0.86** (rolling-1y min 0.62 — high AND stable), AU−NZ 10y yield levels **0.93** (1970→2026; latest spread +0.34pp), plus two structural links quoted verbatim from the official pages (RBNZ "84% of bank lending" by the four Australian-owned banks; MFAT "$32.76 billion in 2024" two-way trade). G-6 cleared.
