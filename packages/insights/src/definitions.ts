@@ -2823,4 +2823,177 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P1',
     rule: { kind: 'info' },
   },
+  /* -------- Australia — Is the economy growing? (S5-M5.2 shadow lane;
+   * every member context-only per G-5 until the S6 promotion decision) -------- */
+  {
+    // gap-closure S5-M5.2 (2026-11-02): real GDP growth — the YoY % of the
+    // ABS chain-volume GDP level (ANA_AGG/M1.GPM.20.AUS.Q; the YoY is
+    // COMPUTED from the levels exactly like au-cpi, and the fixture pair
+    // cross-checks the QoQ against the provider's own M2 series). The
+    // ABS's own headline convention is the quarterly change; the card's
+    // Layer-1 copy states the annual-rate basis. National Accounts
+    // publish ~9 weeks after quarter end (Sep quarter 2026 lands
+    // 2026-12-02, the provider's own calendar).
+    id: 'au-gdp-growth',
+    section: 'australia',
+    group: 'au-activity',
+    name: 'Australian economic growth (real GDP)',
+    source: 'abs',
+    sourceRef: 'ABS ANA_AGG M1.GPM.20.AUS.Q (chain-volume GDP level, annual change derived)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The us-gdp-growth quarterly convention with margin (release ~63d
+    // after quarter end + the quarter's own span).
+    staleAfterDays: 215,
+  },
+  {
+    // gap-closure S5-M5.2 (2026-11-02): household spending, the CEASED
+    // Retail Trade flow's successor. The spec's candidate (ABS Retail
+    // Trade) is discontinued at the source — the RT dataflow's own
+    // description reads "CEASED - This dataset has been discontinued"
+    // and all RT data ends 2025-06 (M5.1's verified finding; the
+    // evidence fixture abs-rt-flow-ceased-2026-11-02.json). The Monthly
+    // Household Spending Indicator (catalogue 5682.0, bank-transactions
+    // data) is the ABS's own replacement: through-the-year % change,
+    // total category, current prices, original terms. Pre-Dec-2018
+    // values carry the provider's own methodology-break flag (the
+    // 'u' OBS_STATUS); the series reads honestly from 2013-07.
+    id: 'au-household-spending',
+    section: 'australia',
+    group: 'au-activity',
+    name: 'Australian household spending (annual change)',
+    source: 'abs',
+    sourceRef: 'ABS HSI_M 9.TOT.CUR.10.AUS.M (Monthly Household Spending Indicator, through-the-year %)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // Published ~35 days after month end (Sep 2026 landed 2026-11-04);
+    // worst-case staleness ~65d between releases.
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S5-M5.2 (2026-11-02): dwelling approvals — the number
+    // of new residential dwelling units approved each month (the housing
+    // supply pipeline's leading edge). ORIGINAL terms: the SDMX API
+    // serves no seasonally-adjusted national total (verified M5.1 — the
+    // TSEST=20 key returns NoRecordsFound), so the card states the
+    // original basis in its Layer-1 copy; the through-the-year
+    // comparison absorbs the seasonality.
+    id: 'au-building-approvals',
+    section: 'australia',
+    group: 'au-activity',
+    name: 'Australian dwelling approvals',
+    source: 'abs',
+    sourceRef: 'ABS BA_GCCSA 1.1.9.1.100.10.AUS.M (dwelling units approved, new residential, original)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // Published ~32 days after month end (Sep 2026 released 2026-11-02;
+    // Oct lands 2026-12-01 — the provider's own calendar).
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S5-M5.2 (2026-11-02): population growth — the YoY % of
+    // the Estimated Resident Population level. The companion au-nom card
+    // (net overseas migration, the quarterly flow) renders INSIDE this
+    // card — the us-deficit-12m/monthly companion pattern. The
+    // population release runs ~170 days after quarter end (June quarter
+    // 2026 lands 2026-12-17, the provider's own calendar) — the
+    // staleAfterDays absorbs the provider's own rhythm.
+    id: 'au-population-growth',
+    section: 'australia',
+    group: 'au-activity',
+    name: 'Australian population growth',
+    source: 'abs',
+    sourceRef: 'ABS ERP_COMP_Q 10.AUS.Q (estimated resident population, annual change derived)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // ~170d publication lag + the quarter's own span + margin.
+    staleAfterDays: 270,
+  },
+  {
+    // gap-closure S5-M5.2 (2026-11-02): net overseas migration — the
+    // quarterly flow in thousands, COMPANION-ONLY (renders inside the
+    // au-population-growth card, never its own lane row — the
+    // us-deficit-monthly pattern). The provider's own series
+    // (ERP_COMP_Q measure 9), never computed.
+    id: 'au-nom',
+    section: 'australia',
+    group: 'au-activity',
+    name: 'Net overseas migration',
+    source: 'abs',
+    sourceRef: 'ABS ERP_COMP_Q 9.AUS.Q (net overseas migration, quarterly level)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 270, // the population release's own rhythm
+  },
+  {
+    // gap-closure S5-M5.2 (2026-11-02): the participation rate — the
+    // share of the working-age population in the labour force (employed
+    // or looking). The SAME LF flow/key family as the live
+    // au-unemployment card (the M12/M13 siblings), published together
+    // (~3 weeks after month end).
+    id: 'au-participation',
+    section: 'australia',
+    group: 'au-activity',
+    name: 'Australian participation rate',
+    source: 'abs',
+    sourceRef: 'ABS LF M12.3.1599.20.AUS.M (participation rate, persons, seasonally adjusted)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // The au-unemployment convention (same release, same rhythm).
+    staleAfterDays: 60,
+  },
+  {
+    // gap-closure S5-M5.2 (2026-11-02): the underemployment rate —
+    // people with a job who want more hours, as a share of the labour
+    // force (the ABS's own headline definition, LF_UNDER measure M23).
+    // The labour market's hidden slack beside the unemployment rate. The
+    // LF flow itself carries no underemployment measures (probed M5.1) —
+    // the LF_UNDER mirror flow is the only SDMX home.
+    id: 'au-underemployment',
+    section: 'australia',
+    group: 'au-activity',
+    name: 'Australian underemployment rate',
+    source: 'abs',
+    sourceRef: 'ABS LF_UNDER M23.3.1599.20.AUS.M (underemployment rate, proportion of labour force, SA)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    staleAfterDays: 60, // the au-unemployment convention (same release)
+  },
+  /* -------- Australia — How is Australia's trade and China link?
+   * (S5-M5.2 shadow lane; context-only per G-5 until S6) -------- */
+  {
+    // gap-closure S5-M5.2 (2026-11-02): the goods trade balance — the
+    // ABS's own "Balance on goods" series (ITGS DATA_ITEM 170 — the
+    // balance is SERVED by the provider, never computed), seasonally
+    // adjusted, $ millions. The external lane's first member; the S6
+    // promotion proposal carries the spec's wider membership (terms of
+    // trade, iron ore, coal, LNG, AUD/CNY — the existing ids stay in
+    // their lanes until the owner approves the moves).
+    id: 'au-trade-balance',
+    section: 'australia',
+    group: 'au-external',
+    name: 'Australian goods trade balance',
+    source: 'abs',
+    sourceRef: 'ABS ITGS M1.170.20.AUS.M (balance on goods, seasonally adjusted, $m)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P1',
+    rule: { kind: 'info' },
+    // Published ~35 days after month end (Sep 2026 lands 2026-11-05).
+    staleAfterDays: 75,
+  },
 ] as const;

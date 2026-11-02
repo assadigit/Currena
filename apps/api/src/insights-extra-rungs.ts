@@ -29,6 +29,7 @@ import {
   runInsightsRung4Phase,
   runInsightsCreditPhase,
   runInsightsPortwatchPhase,
+  runInsightsAbsAuPhase,
   KvInsightsStore,
   HIDDEN_PUBLIC_IDS,
 } from '@currena/insights/ingest';
@@ -274,6 +275,55 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
         ...(result.patched
           ? { note: `ofr-fsi patched · history written` }
           : { note: 'nothing to patch (no file parsed or no snapshot yet)' }),
+      };
+    },
+  },
+  {
+    // gap-closure S5-M5.2 (2026-11-02): the Australian macro family — the
+    // eight ABS series (GDP chain volume, goods balance, household
+    // spending, dwelling approvals, ERP + NOM, participation,
+    // underemployment) riding RUNG3 beside the TIC + PortWatch sources
+    // (data.api.abs.gov.au is a DIFFERENT failure domain, already in
+    // production use from the Worker — the S1-M1.1 probe; the monthly CPI
+    // has run from the Worker since 2026-10-06). DAILY gate: the series
+    // are monthly/quarterly cadence but the ABS revises and the cheap
+    // re-check keeps the readings fresh; the 10:10/20:10 sweeps heal a
+    // failed day within hours (gate bypassed). Budget 22: 8 fetches + 1
+    // snapshot read + 4 patch writes (snapshot, public, stage, status) +
+    // 8 history writes = 21, declared with headroom. The rung3 registry
+    // total on an all-gates day: 1 status + 4 (tic) + 18 (portwatch) +
+    // 22 = 45 ≤ 50. The ids ride CARRY_FORWARD_IDS; the history phases
+    // exclude them (ABS_AU_IDS).
+    id: 'abs-au-macro',
+    rung: 3,
+    gate: dailyGate(),
+    budget: 22,
+    run: async (env: Bindings, now: Date) => {
+      const result = await runInsightsAbsAuPhase({
+        store: new KvInsightsStore(env.RATES),
+        kv: env.RATES,
+        mode: 'scheduled',
+        hiddenPublicIds: HIDDEN_PUBLIC_IDS,
+        now,
+      });
+      const failed = result.reports.filter((r) => !r.ok);
+      if (failed.length === result.reports.length && failed.length > 0) {
+        // EVERY series failed (an ABS-edge blip class): a failed row so the
+        // sweeps heal it within hours. A partial failure still patched what
+        // it could — ok, with the honest note.
+        return {
+          ok: false,
+          kind: reportKind(failed[0]!.kind),
+          note: `ABS AU macro failed: ${failed.map((r) => r.detail).join(' | ')}`,
+        };
+      }
+      return {
+        ok: true,
+        ...(result.patched
+          ? {
+              note: `patched ${Object.keys(result.series).join(', ')} · histories ${result.histories.written} written`,
+            }
+          : { note: 'nothing to patch (no series parsed or no snapshot)' }),
       };
     },
   },

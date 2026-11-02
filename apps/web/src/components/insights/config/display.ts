@@ -48,7 +48,14 @@ export type UnitToken =
   | 'barrels-per-day'
   // gap-closure S4-M4.3 (2026-11-01): the chokepoint transits — a counted
   // quantity per day ("45.3 transits a day" EN, the 7-day average).
-  | 'transits';
+  | 'transits'
+  // gap-closure S5-M5.2 (2026-11-02): the Australian macro family —
+  // dwelling approvals ("18,264 dwellings approved" EN), the net
+  // overseas migration flow in thousands ("101k people" EN), and the
+  // goods balance in $ millions ("A$495m" EN — the aud-bn pattern).
+  | 'dwellings'
+  | 'persons-k'
+  | 'aud-m';
 
 /** Locale-dependent unit labels (from the copy dictionaries). */
 export interface UnitLabels {
@@ -75,6 +82,9 @@ export interface UnitLabels {
   barrels: string;
   'barrels-per-day': string;
   transits: string;
+  dwellings: string;
+  'persons-k': string;
+  'aud-m': string;
 }
 
 interface DisplayConfig {
@@ -328,6 +338,19 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'terms-of-trade': { decimals: 1, unit: 'index' },
   'iron-ore': { decimals: 1, unit: 'usd' },
   'gold-aud': { decimals: 0, unit: 'aud' },
+  // gap-closure S5-M5.2 (2026-11-02): the Australian macro family — the
+  // activity lane's six + the external lane's balance + the NOM companion.
+  // All units verified from the providers' own UNIT_MEASURE fields (M5.1):
+  // the two growth rates are PCT, the balance AUD millions, the approvals
+  // dwelling units, the NOM thousands of persons.
+  'au-gdp-growth': { decimals: 1, unit: 'percent' },
+  'au-household-spending': { decimals: 1, unit: 'percent' },
+  'au-building-approvals': { decimals: 0, unit: 'dwellings' },
+  'au-population-growth': { decimals: 1, unit: 'percent' },
+  'au-nom': { decimals: 0, unit: 'persons-k' },
+  'au-participation': { decimals: 1, unit: 'percent' },
+  'au-underemployment': { decimals: 1, unit: 'percent' },
+  'au-trade-balance': { decimals: 0, unit: 'aud-m' },
 };
 
 /** The Fed target corridor's half-width (the FOMC has used 25bp since 2008). */
@@ -396,9 +419,9 @@ export function indicatorValueParts(
   // currency and suffixes the magnitude word ("US$745.0bn" / "A$97.6bn",
   // the usd-tr pattern minus the space); fa keeps its suffix word
   // ("۹۷٫۶ میلیارد دلار استرالیا").
-  if (cfg.unit === 'usd-bn' || cfg.unit === 'aud-bn') {
+  if (cfg.unit === 'usd-bn' || cfg.unit === 'aud-bn' || cfg.unit === 'aud-m') {
     if (numberLocale === 'en-US') {
-      const prefix = cfg.unit === 'aud-bn' ? units.aud : units.usd;
+      const prefix = cfg.unit === 'usd-bn' ? units.usd : units.aud;
       return { value: `${prefix}${num}${unit}`, unit: null };
     }
     return { value: num, unit };

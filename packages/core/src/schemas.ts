@@ -425,6 +425,20 @@ export const IndicatorIdSchema = z.enum([
   'au-housing-finance', // ABS LEND_HOUSING quarterly — SCORED, au-households
   'au-saving-ratio', // ABS ANA_AGG M7.HSR.20.AUS.Q (quarterly) — context, au-households
   'au-job-vacancies', // ABS JV/M1.7.TOT.20.AUS.Q (quarterly) — context, au-households
+  // ---- gap-closure S5 (2026-11-02, M5.2): the Australian activity and
+  // external families — context rows in the two new shadow lanes (G-5:
+  // context-only until any S6 promotion decision). Every series key
+  // verified from the ABS SDMX structure endpoints + live responses
+  // 2026-11-02 (M5.1 — see VERIFIED-SOURCES.md); the fetches ride rung3
+  // (EXTRA_SOURCES 'abs-au-macro'), never the 04:10 main rung.
+  'au-gdp-growth', // ABS ANA_AGG M1.GPM.20.AUS.Q (chain-volume GDP level, YoY computed) — context, au-activity
+  'au-household-spending', // ABS HSI_M 9.TOT.CUR.10.AUS.M (the CEASED RT flow's successor) — context, au-activity
+  'au-building-approvals', // ABS BA_GCCSA 1.1.9.1.100.10.AUS.M (dwelling units, original terms) — context, au-activity
+  'au-population-growth', // ABS ERP_COMP_Q 10.AUS.Q (ERP level, YoY computed) — context, au-activity
+  'au-nom', // ABS ERP_COMP_Q 9.AUS.Q (net overseas migration, quarterly level) — context, COMPANION-ONLY (rides inside the population card)
+  'au-participation', // ABS LF M12.3.1599.20.AUS.M (participation rate, SA) — context, au-activity
+  'au-underemployment', // ABS LF_UNDER M23.3.1599.20.AUS.M (underemployment rate, SA) — context, au-activity
+  'au-trade-balance', // ABS ITGS M1.170.20.AUS.M (balance on goods, SA, $m) — context, au-external
   // Global — Prices lane companions (context rows rendered in lanes)
   // 2026-10-26 gap-audit build (A-4): gold measured in oil — the classic
   // long-run relative-value ratio, derived gold-usd ÷ brent.
@@ -613,6 +627,14 @@ export const IndicatorGroupIdSchema = z.enum([
   // yet" and the global summary counts stay untouched (a step-0 gauge is
   // excluded from sectionVerdictStep by design).
   'geo-fragmentation',
+  // gap-closure S5-M5.2/M5.3 (2026-11-02): the two Australian shadow
+  // lanes — "Is the economy growing?" (the activity family) and "How is
+  // Australia's trade and China link?" (the external family). SHADOW
+  // gauges until S6 (G-5): every member context-only, the lane headers
+  // read "not scored yet", the Australia verdict untouched (step-0 gauges
+  // are excluded from sectionVerdictStep by design).
+  'au-activity',
+  'au-external',
 ]);
 export type IndicatorGroupId = z.infer<typeof IndicatorGroupIdSchema>;
 

@@ -107,6 +107,14 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 | Unemployment | بیکاری | `us-unemployment` |
 | Jobs report | گزارش وضعیت بازار کار | calendar titles |
 | Inflation expectations | انتظارات تورمی | |
+| GDP / real GDP | تولید ناخالص داخلی / تولید واقعی | the `au-gdp-growth` card + glossary (round 72) |
+| Household spending | هزینه‌کرد خانوار | `au-household-spending` (the HSI successor to the discontinued Retail Trade series) |
+| Dwelling approval | مجوز ساخت مسکن | `au-building-approvals` + glossary; the supply pipeline's leading edge |
+| Population growth | رشد جمعیت | `au-population-growth` |
+| Net overseas migration | مهاجرت خالص خارجی | `au-nom` + glossary (round 72); NOTE: the EN layer-1 plainName reads "Net overseas movement" because the copy validator's jargon scan matches substrings — "migration" contains "ratio" (round 72's live finding) |
+| Participation rate | نرخ مشارکت | `au-participation` + glossary |
+| Underemployment | کم‌کاری | `au-underemployment` + glossary; NOT «بیکاری پنهان» (the hidden-slack phrase rides the card copy instead) |
+| Trade balance (goods) | تراز تجاری کالا | `au-trade-balance` + glossary |
 
 ## Household budget, shared expenses, settlement
 

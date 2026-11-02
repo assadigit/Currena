@@ -13,7 +13,7 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 145-indicator dashboard
+## 1. What indicators Currena has — the 153-indicator dashboard
 
 The Insights page renders **145 indicators** across **2 sections** (Global
 99, Australia 23 — see the
@@ -32,7 +32,7 @@ current value, the data date (`asOf`), the 7-day and 30-day changes, the
 distance from the 10-year peak, the source name + URL, and the verdict
 status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 
-### The 10 question gauges (8 voting + the prices strip + the S4 shadow)
+### The 12 question gauges (8 voting + the prices strip + the S4/S5 shadows)
 
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
@@ -47,12 +47,14 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** + context: `au-petrol-yoy` | 5 |
 | **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `rba-cash-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
 | **au-trade-currency** | australia | **audusd**, **audjpy**, **terms-of-trade**, **rba-fed-gap** + context: `iron-ore`, `coal-aus`, `lng-japan` (S4-M4.4: the energy export pair beside iron ore), `gold-aud` | 4 |
+| **au-activity** (shadow, S5-M5.2) | australia | context only (never votes until S6): `au-gdp-growth` (the chain-volume GDP annual rate), `au-household-spending` (the CEASED Retail Trade flow's HSI successor), `au-building-approvals` (the dwelling-unit count, original terms), `au-population-growth` (the ERP annual rate, with the `au-nom` net-migration companion rendered inside its card), `au-participation`, `au-underemployment` (the LF_UNDER series the LF flow does not carry) | 0 |
+| **au-external** (shadow, S5-M5.2) | australia | context only (never votes until S6): `au-trade-balance` (the ABS's own "Balance on goods", SA $m). The spec's wider membership (terms of trade, iron ore, coal, LNG, AUD/CNY) needs the S6 owner decision — moving the existing ids would reweight their current lanes (G-3) | 0 |
 
 **Voter total:** 9+5+5+3+10 + 5+7+4 = **48** (the market-stress fifth is
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (145 ids, alphabetical)
+### The complete indicator inventory (153 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -84,6 +86,14 @@ public-display-ok · scored voter? · short description.
 | `au-petrol-yoy` | abs | monthly | 95 | L0 | yes | – | Petrol prices vs a year ago |
 | `au-rent-yoy` | abs | monthly | 95 | L0 | yes | ✓ | Rent inflation (yearly) |
 | `au-saving-ratio` | abs | quarterly | 250 | L0 | yes | – | Australian household saving rate |
+| `au-underemployment` | abs | monthly | 60 | L0 | yes | – | Underemployment rate, proportion of labour force (S5-M5.2, rung3 abs-au-macro; the LF_UNDER flow) |
+| `au-trade-balance` | abs | monthly | 75 | L0 | yes | – | Goods trade balance, seasonally adjusted $m (S5-M5.2, rung3 abs-au-macro; the ITGS "Balance on goods" series) |
+| `au-participation` | abs | monthly | 60 | L0 | yes | – | Participation rate, persons, SA (S5-M5.2, rung3 abs-au-macro; the LF M12 sibling of au-unemployment) |
+| `au-population-growth` | abs | quarterly | 270 | L0 | yes | – | ERP annual growth rate (S5-M5.2, rung3 abs-au-macro; the ~170d publication rhythm) |
+| `au-nom` | abs | quarterly | 270 | L0 | yes | – | Net overseas migration, quarterly thousands — COMPANION-ONLY inside the population card (S5-M5.2) |
+| `au-household-spending` | abs | monthly | 75 | L0 | yes | – | Monthly Household Spending Indicator, through-the-year % (S5-M5.2 — the CEASED RT flow's successor) |
+| `au-gdp-growth` | abs | quarterly | 215 | L0 | yes | – | Real GDP annual growth, chain-volume levels derived (S5-M5.2, rung3 abs-au-macro) |
+| `au-building-approvals` | abs | monthly | 75 | L0 | yes | – | Dwelling units approved, new residential, original terms (S5-M5.2, rung3 abs-au-macro) |
 | `au-trimmed-mean` | abs | monthly | 95 | L0 | yes | ✓ | Australian trimmed-mean inflation |
 | `au-unemployment` | abs | monthly | 60 | L0 | yes | ✓ | Australian unemployment rate |
 | `au-us-10y-gap` | derived | daily | 40 | L0 | yes | ✓ | Australia vs US 10-year yield gap |
@@ -269,7 +279,7 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 | **boe** (Bank of England) | L2 (owner-accepted) | UK Open Government Licence v3.0 | boe-rate (Bank Rate decision table) | **free forever**, keyless | no |
 | **nbs** (China NBS English press releases) | L1 | NBS ToS — attributed quotation + data download granted | china-pmi, china-cpi | **free forever**, keyless | no |
 | **rba** (Reserve Bank of Australia) | L0 | CC BY 4.0 (most material) | cash rate, bond yields, loan/deposit rates, household ratios | **free forever**, keyless | no |
-| **abs** (Australian Bureau of Statistics) | L0 | CC BY 4.0 | au-cpi, jobs, wages, rents, home values, terms of trade | **free forever**, keyless | no |
+| **abs** (Australian Bureau of Statistics) | L0 | CC BY 4.0 | au-cpi, jobs, wages, rents, home values, terms of trade + the S5-M5.2 macro family (GDP, household spending, approvals, population + NOM, participation, underemployment, goods balance — the rung3 `abs-au-macro` source) | **free forever**, keyless | no |
 | **frankfurter** (ECB rates via Frankfurter project) | L1 | ECB website terms (MIT code) | usdjpy, audusd, eur-usd, usdcny, usdtry + the dollar basket | **free forever**, keyless | no |
 | **world-bank** (Pink Sheet) | L1 | CC BY 4.0 (World Bank Dataset Terms) | food-index, wheat, maize, iron-ore, copper-gold (history) | **free forever**, keyless | no |
 | **gold-api** (gold-api.com) | L0 | "Commercial use of the API is always permitted" (their §9) | gold-usd, silver-usd, copper-usd, btc-usd, platinum (live spots) | **free forever**, keyless | no |

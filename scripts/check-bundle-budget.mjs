@@ -870,7 +870,15 @@ const BUDGETS = [
   // copy (2 dictionaries × 3 cards × ~16 strings) + the connections
   // registry. Measured 1392.67/320.98; raw bumps 1390 → 1396, gz 321 → 322.
   // Justified in CHANGELOG §2026-11-01j.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1396_000, gz: 322_000, label: 'Insights lazy chunk' },
+  // 2026-11-02a (gap-closure S5-M5.2): 1440/333 — the Australian macro
+  // family: EIGHT bilingual indicator cards (the activity lane's six + the
+  // external balance + the au-nom companion that renders inside the
+  // population card), each with the full Layer-1 plain-words entry + the
+  // details-panel copy + six glossary terms, plus the two shadow-lane
+  // machinery extensions (the au-activity/au-external gauge rows).
+  // Measured 1436.12/331.30; raw bumps 1396 → 1440, gz 322 → 333.
+  // Justified in CHANGELOG §2026-11-02a.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1440_000, gz: 333_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

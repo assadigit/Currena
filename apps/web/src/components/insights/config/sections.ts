@@ -31,7 +31,16 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
     // shadow gauge until S6 (context-only members, "not scored yet").
     'geo-fragmentation',
   ],
-  australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
+  australia: [
+    'au-inflation-rates',
+    'au-households',
+    'au-trade-currency',
+    // gap-closure S5-M5.2 (2026-11-02): the two Australian shadow lanes —
+    // "Is the economy growing?" and "How is Australia's trade and China
+    // link?" (context-only members until S6, "not scored yet" headers).
+    'au-activity',
+    'au-external',
+  ],
 };
 
 /**
@@ -47,7 +56,7 @@ export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGro
  */
 export const LANE_GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGroupId[]>> = {
   global: ['borrowing-costs', 'prices-heat', 'market-stress', 'growth-health', 'geo-fragmentation'],
-  australia: ['au-inflation-rates', 'au-households', 'au-trade-currency'],
+  australia: ['au-inflation-rates', 'au-households', 'au-trade-currency', 'au-activity', 'au-external'],
 };
 
 /**
@@ -146,6 +155,9 @@ export const COMPANION_ONLY_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>
   'us-deficit-monthly',
   'treasury-auction-10y-indirect',
   'treasury-auction-30y-indirect',
+  // gap-closure S5-M5.2 (2026-11-02): the population growth card carries
+  // its migration flow companion — the net overseas migration quarter.
+  'au-nom',
 ]);
 
 /**
@@ -169,6 +181,9 @@ export const COMPANIONS: Readonly<Partial<Record<IndicatorId, readonly Indicator
   'us-deficit-12m': ['us-deficit-monthly'],
   'treasury-auction-10y': ['treasury-auction-10y-indirect'],
   'treasury-auction-30y': ['treasury-auction-30y-indirect'],
+  // gap-closure S5-M5.2 (2026-11-02): the population growth card carries
+  // the net overseas migration quarter (the spec's "secondary value").
+  'au-population-growth': ['au-nom'],
 };
 
 /** The parent card a companion belongs to, or null when it rides nowhere. */

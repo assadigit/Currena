@@ -89,8 +89,8 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ticReleaseAwareGate(new Date('2026-11-28T04:30:00Z'))).toBe(true); // Saturday again
   });
 
-  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, the M3.3 credit pair, and the S4 PortWatch chokepoints (S4-M4.3 registered portwatch)', () => {
-    expect(EXTRA_SOURCES).toHaveLength(5); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3) + portwatch (S4-M4.3)
+  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, the M3.3 credit pair, the S4 PortWatch chokepoints, and the S5 Australian macro family (S4-M4.3 registered portwatch; S5-M5.2 registered abs-au-macro)', () => {
+    expect(EXTRA_SOURCES).toHaveLength(6); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3) + portwatch (S4-M4.3) + abs-au-macro (S5-M5.2)
     const tic = EXTRA_SOURCES.find((s) => s.id === 'tic-slt')!;
     expect(tic.rung).toBe(3);
     expect(tic.gate).toBe(ticReleaseAwareGate);
@@ -137,6 +137,20 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     // The rung3 registry too (1 status + tic 4 + portwatch 18 = 23 ≤ 50).
     const total3 = EXTRA_SOURCES.filter((s) => s.rung === 3).reduce((sum, s) => sum + s.budget, 0) + 1;
     expect(total3).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING);
+    // gap-closure S5-M5.2 (2026-11-02): the Australian macro family on
+    // rung3 — daily gate (the ABS revises; the cheap re-check keeps the
+    // readings fresh; the sweeps heal a failed day within hours), budget
+    // 22 (8 fetches + 1 snapshot read + 4 patch writes + 8 history writes
+    // = 21, declared with headroom — see RUNGS.md).
+    const absAu = EXTRA_SOURCES.find((s) => s.id === 'abs-au-macro')!;
+    expect(absAu.rung).toBe(3);
+    expect(absAu.gate(new Date('2026-11-02T04:30:00Z'))).toBe(true); // daily
+    expect(absAu.gate(new Date('2026-11-03T04:30:00Z'))).toBe(true); // every day
+    expect(absAu.budget).toBe(22);
+    // The rung3 registry total on an all-gates day: 1 status + 4 + 18 + 22 = 45 <= 50.
+    expect(
+      EXTRA_SOURCES.filter((s) => s.rung === 3).reduce((sum, s) => sum + s.budget, 0) + 1,
+    ).toBeLessThanOrEqual(50);
   });
 });
 

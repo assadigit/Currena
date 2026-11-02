@@ -41,6 +41,7 @@ import { collectRung4Sources } from '../src/adapters/rung4';
 import { collectCreditSources } from '../src/adapters/credit';
 import { collectTreasuryAuctions } from '../src/adapters/auctions';
 import { collectPortwatch } from '../src/adapters/portwatch';
+import { collectAbsAuMacro } from '../src/adapters/abs-au';
 import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../src/series';
 
@@ -180,6 +181,18 @@ const portwatch = await collectPortwatch();
 for (const row of portwatch.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
 const portwatchSeries = portwatch.series as Partial<Record<IndicatorId, SeriesPoint[]>>;
 
+/* ------------------------------------------------------------------
+ * The inline ABS AU-macro collection (gap-closure S5-M5.2, 2026-11-02) —
+ * the eight Australian macro series. data.api.abs.gov.au serves GHA
+ * egress fine (the main rung's ABS groups already ride this venue); the
+ * Worker's rung3 'abs-au-macro' phase performs the same collect (shared
+ * code), so the venues cannot drift.
+ * ------------------------------------------------------------------ */
+
+const absAu = await collectAbsAuMacro();
+for (const row of absAu.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);
+const absAuSeries = absAu.series as Partial<Record<IndicatorId, SeriesPoint[]>>;
+
 const result = await runInsightsUpdate({
   // A dry-run without credentials takes the no-op store: runInsightsUpdate
   // skips every write when dryRun is set, and only the real store's READS
@@ -207,6 +220,9 @@ const result = await runInsightsUpdate({
   // off the full 400-day window; the 04:30 rung3 phase re-derives from its
   // own stored merge — fail-soft, the readings carry on a failed fetch).
   portwatchSeries,
+  // gap-closure S5-M5.2: the inline ABS AU-macro series (the rung3
+  // 'abs-au-macro' phase's twin — fail-soft, the readings carry).
+  absAuSeries,
 });
 
 /* ------------------------------------------------------------------ *

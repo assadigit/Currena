@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "a4c935532104c24e1a4dc886f2f1a3e6768ae4cf36a49208901abd86c474f167",
-    "faSha256": "fbc1f5b65515e26a0cb53b56d434f86d562a583e73c2c941171975eaa91be285",
-    "indicatorCount": 174,
-    "glossaryCount": 45
+    "enSha256": "42a0a6accb7447cfa16f435bdb32ca1a46e2334405a06286d243f9fa27a02721",
+    "faSha256": "35e5c219664cba5bb4d1bffa63814907d409faa27b7b9e5cc1721b08680b7e87",
+    "indicatorCount": 182,
+    "glossaryCount": 51
   },
   "en": {
     "indicators": {
@@ -3714,6 +3714,175 @@
         "ifFalling": "Indirect bidders took a smaller share of the 30-year auction.",
         "connections": [],
         "glossaryTerms": []
+      },
+      "au-gdp-growth": {
+        "plainName": "Australia’s economic growth",
+        "oneLine": "How much Australia’s economy grew over the past year, after inflation.",
+        "ifRising": "Growth is usually stronger: more jobs and firmer pay tend to follow.",
+        "ifFalling": "Growth is usually weaker: hiring often slows first.",
+        "connections": [
+          {
+            "with": "au-household-spending",
+            "text": "Spending is the largest piece of the growth total.",
+            "strength": "reliable"
+          },
+          {
+            "with": "au-trade-balance",
+            "text": "Net exports add to or subtract from the growth total.",
+            "strength": "reliable"
+          }
+        ],
+        "australiaAngle": "Australia’s growth rides commodities and population: resource income and new arrivals both lift the total.",
+        "glossaryTerms": [
+          "gdp",
+          "inflation"
+        ]
+      },
+      "au-household-spending": {
+        "plainName": "Household spending",
+        "oneLine": "How much more or less Australian households spent over the past year.",
+        "ifRising": "Demand is usually strengthening: businesses and jobs often follow.",
+        "ifFalling": "Households are usually holding back: retailers feel it first.",
+        "connections": [
+          {
+            "with": "au-gdp-growth",
+            "text": "Spending is the largest piece of the growth total.",
+            "strength": "reliable"
+          },
+          {
+            "with": "au-saving-ratio",
+            "text": "Spending and saving usually move as mirror images.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "The successor to the discontinued Retail Trade series: the ABS now reads spending from bank transactions.",
+        "glossaryTerms": []
+      },
+      "au-building-approvals": {
+        "plainName": "Home building approvals",
+        "oneLine": "How many new homes were approved for construction this month.",
+        "ifRising": "More homes are entering the pipeline: future supply is building.",
+        "ifFalling": "Fewer homes are entering the pipeline: future supply thins.",
+        "connections": [
+          {
+            "with": "au-rent-yoy",
+            "text": "Thin approvals and fast population growth usually mean rising rents.",
+            "strength": "usually"
+          },
+          {
+            "with": "au-population-growth",
+            "text": "Population sets the demand the approvals answer.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "Approvals lead Australian construction by many months: today’s thin pipeline is tomorrow’s tight rental market.",
+        "glossaryTerms": [
+          "building-approvals"
+        ]
+      },
+      "au-population-growth": {
+        "plainName": "Population growth",
+        "oneLine": "How fast Australia’s population grew over the past year.",
+        "ifRising": "Demand for homes, schools and services is usually rising faster.",
+        "ifFalling": "Demand for homes and services usually softens.",
+        "connections": [
+          {
+            "with": "au-building-approvals",
+            "text": "Population sets the demand the approvals answer.",
+            "strength": "usually"
+          },
+          {
+            "with": "au-household-spending",
+            "text": "More people usually means more total spending.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "Population growth is the demand side of Australia’s housing equation; the official count arrives with a long lag.",
+        "glossaryTerms": [
+          "net-overseas-migration"
+        ]
+      },
+      "au-nom": {
+        "plainName": "Net overseas movement",
+        "oneLine": "How many more people moved to Australia than left, in the latest quarter.",
+        "ifRising": "Population pressure on housing and services is usually building.",
+        "ifFalling": "That pressure usually softens.",
+        "connections": [],
+        "glossaryTerms": [
+          "net-overseas-migration"
+        ]
+      },
+      "au-participation": {
+        "plainName": "Workforce participation",
+        "oneLine": "The share of working-age Australians who have a job or are looking for one.",
+        "ifRising": "More people are usually joining the workforce: confidence in finding work rises.",
+        "ifFalling": "People are usually stepping back from the job search.",
+        "connections": [
+          {
+            "with": "au-unemployment",
+            "text": "More seekers can raise unemployment even while hiring holds.",
+            "strength": "usually"
+          },
+          {
+            "with": "au-underemployment",
+            "text": "Together the three rates describe the labour market.",
+            "strength": "reliable"
+          }
+        ],
+        "australiaAngle": "Australian participation sits near record highs after years of gains: more of the population is in the workforce than ever.",
+        "glossaryTerms": [
+          "participation-rate"
+        ]
+      },
+      "au-underemployment": {
+        "plainName": "Underemployment",
+        "oneLine": "People who have a job but want more hours, as a share of the labour force.",
+        "ifRising": "Hidden slack is usually building: workers want more hours than exist.",
+        "ifFalling": "Work is usually getting fuller for those who want it.",
+        "connections": [
+          {
+            "with": "au-unemployment",
+            "text": "The two rates together measure real labour slack.",
+            "strength": "reliable"
+          },
+          {
+            "with": "au-wage-growth",
+            "text": "Thinner slack usually comes with firmer wage growth.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "The quiet half of Australia’s labour market: it moved before unemployment in past slowdowns.",
+        "glossaryTerms": [
+          "underemployment"
+        ]
+      },
+      "au-trade-balance": {
+        "plainName": "The goods trade balance",
+        "oneLine": "Whether Australia earned more from selling goods abroad than it spent on goods from abroad.",
+        "ifRising": "Export income is usually outpacing import spending.",
+        "ifFalling": "Import spending is usually catching up with export income.",
+        "connections": [
+          {
+            "with": "iron-ore",
+            "text": "Iron ore is the largest single export earner.",
+            "strength": "usually"
+          },
+          {
+            "with": "coal-aus",
+            "text": "Coal prices shape the export side of the balance.",
+            "strength": "usually"
+          },
+          {
+            "with": "audusd",
+            "text": "A wide surplus usually supports the Australian dollar.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "Australia’s external engine: commodity prices set the surplus, and the surplus feeds national income.",
+        "glossaryTerms": [
+          "trade-balance",
+          "commodity"
+        ]
       }
     },
     "glossary": {
@@ -3906,6 +4075,36 @@
         "term": "trade policy uncertainty",
         "plain": "A measure of how much newspaper coverage is about trade policy — tariffs, deals and disputes — rather than what the policy actually is.",
         "example": "A high reading says trade dominates the news, not which way it goes."
+      },
+      "gdp": {
+        "term": "GDP",
+        "plain": "Gross domestic product: everything a country produces in a period, added up. Real GDP removes the effect of price changes.",
+        "example": "When real GDP grows 2%, the country made about 2% more than the same period a year earlier."
+      },
+      "underemployment": {
+        "term": "underemployment",
+        "plain": "Having a job but not enough hours — working part-time while wanting and being available for more.",
+        "example": "An underemployment rate of 6% means about 6 in 100 labour-force members want more hours than they get."
+      },
+      "participation-rate": {
+        "term": "participation rate",
+        "plain": "The share of working-age people who either have a job or are actively looking for one.",
+        "example": "A participation rate of 66% means about two of every three working-age people are in the labour force."
+      },
+      "net-overseas-migration": {
+        "term": "net overseas migration",
+        "plain": "How many more people moved to Australia than left it over a period — arrivals minus departures, the migration part of population growth.",
+        "example": "Net overseas migration of 100k in a quarter means arrivals outnumbered departures by 100,000 people."
+      },
+      "building-approvals": {
+        "term": "building approvals",
+        "plain": "Official permission to build a new home, granted by a local council before construction can start.",
+        "example": "Around 15,000–20,000 new dwellings are approved in Australia in a typical month."
+      },
+      "trade-balance": {
+        "term": "trade balance",
+        "plain": "The gap between what a country earns from selling goods abroad and what it spends on goods from abroad. A surplus means it earned more.",
+        "example": "A goods surplus of A$495m means exports beat imports by 495 million Australian dollars that month."
       }
     },
     "ui": {
@@ -7651,6 +7850,175 @@
         "ifFalling": "خریداران غیرمستقیم سهم کوچک‌تری از حراج اوراق بلندمدت برده‌اند.",
         "connections": [],
         "glossaryTerms": []
+      },
+      "au-gdp-growth": {
+        "plainName": "رشد اقتصادی استرالیا",
+        "oneLine": "اقتصاد استرالیا در یک سال گذشته چقدر پس از احتساب تورم رشد کرده است.",
+        "ifRising": "رشد معمولاً قوی‌تر است: شغل بیشتر و دستمزد محکم‌تر معمولاً دنبالش می‌آیند.",
+        "ifFalling": "رشد معمولاً ضعیف‌تر است: استخدام اغلب اول کند می‌شود.",
+        "connections": [
+          {
+            "with": "au-household-spending",
+            "text": "مصرف بزرگ‌ترین قطعهٔ کلِ رشد است.",
+            "strength": "reliable"
+          },
+          {
+            "with": "au-trade-balance",
+            "text": "صادرات و واردات خالص از کلِ رشد کم یا به آن اضافه می‌کند.",
+            "strength": "reliable"
+          }
+        ],
+        "australiaAngle": "رشد استرالیا سوار بر کالاها و جمعیت است: درآمد منابع و تازه‌واردان هر دو کل را بالا می‌برند.",
+        "glossaryTerms": [
+          "gdp",
+          "inflation"
+        ]
+      },
+      "au-household-spending": {
+        "plainName": "هزینه‌کرد خانوارها",
+        "oneLine": "خانوارهای استرالیایی در یک سال گذشته چقدر بیشتر یا کمتر خرج کرده‌اند.",
+        "ifRising": "تقاضا معمولاً قوی‌تر می‌شود: کسب‌وکارها و شغل‌ها اغلب دنبالش می‌آیند.",
+        "ifFalling": "خانوارها معمولاً دست نگه می‌دارند: خرده‌فروشی اول احساسش می‌کند.",
+        "connections": [
+          {
+            "with": "au-gdp-growth",
+            "text": "مصرف بزرگ‌ترین قطعهٔ کلِ رشد است.",
+            "strength": "reliable"
+          },
+          {
+            "with": "au-saving-ratio",
+            "text": "مصرف و پس‌انداز معمولاً دو روی یک سکه‌اند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "جانشین سریِ متوقف‌شدهٔ خرده‌فروشی: ادارهٔ آمار استرالیا هزینه‌کرد را حالا از تراکنش‌های بانکی می‌خواند.",
+        "glossaryTerms": []
+      },
+      "au-building-approvals": {
+        "plainName": "مجوزهای ساخت مسکن",
+        "oneLine": "در این ماه چند خانهٔ جدید برای ساخت تأیید شده است.",
+        "ifRising": "خانه‌های بیشتری وارد چرخهٔ ساخت می‌شوند: عرضهٔ آینده در حال شکل‌گیری است.",
+        "ifFalling": "خانه‌های کمتری وارد چرخهٔ ساخت می‌شوند: عرضهٔ آینده نازک می‌شود.",
+        "connections": [
+          {
+            "with": "au-rent-yoy",
+            "text": "مجوز کم و رشد جمعیت سریع معمولاً یعنی اجاره‌بهای رو به رشد.",
+            "strength": "usually"
+          },
+          {
+            "with": "au-population-growth",
+            "text": "جمعیت تقاضایی را تعیین می‌کند که مجوزها باید جوابش را بدهند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "مجوزها ماه‌ها جلوتر از ساخت‌وساز استرالیا می‌روند: چرخهٔ کم‌عرضهٔ امروز، بازار اجارهٔ تنگ فرداست.",
+        "glossaryTerms": [
+          "building-approvals"
+        ]
+      },
+      "au-population-growth": {
+        "plainName": "رشد جمعیت",
+        "oneLine": "جمعیت استرالیا در یک سال گذشته با چه سرعتی رشد کرده است.",
+        "ifRising": "تقاضا برای خانه، مدرسه و خدمات معمولاً تندتر بالا می‌رود.",
+        "ifFalling": "تقاضا برای خانه و خدمات معمولاً آرام می‌گیرد.",
+        "connections": [
+          {
+            "with": "au-building-approvals",
+            "text": "جمعیت تقاضایی را تعیین می‌کند که مجوزها باید جوابش را بدهند.",
+            "strength": "usually"
+          },
+          {
+            "with": "au-household-spending",
+            "text": "آدم بیشتر معمولاً یعنی مجموع هزینه‌کرد بیشتر.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "رشد جمعیت سمت تقاضای معادلهٔ مسکن استرالیاست؛ شمار رسمی با تأخیر طولانی می‌رسد.",
+        "glossaryTerms": [
+          "net-overseas-migration"
+        ]
+      },
+      "au-nom": {
+        "plainName": "مهاجرت خالص خارجی",
+        "oneLine": "در آخرین فصل چند نفر بیشتر به استرالیا آمده‌اند تا آنچه رفته‌اند.",
+        "ifRising": "فشار جمعیتی بر خانه و خدمات معمولاً در حال ساخت‌شدن است.",
+        "ifFalling": "همان فشار معمولاً در حال آرام‌شدن است.",
+        "connections": [],
+        "glossaryTerms": [
+          "net-overseas-migration"
+        ]
+      },
+      "au-participation": {
+        "plainName": "مشارکت در بازار کار",
+        "oneLine": "سهم استرالیایی‌های در سن کار که یا شغل دارند یا در جست‌وجوی کارند.",
+        "ifRising": "افراد بیشتری معمولاً به بازار کار می‌پیوندند: اعتماد به پیدا کردن کار بالا می‌رود.",
+        "ifFalling": "افراد معمولاً از جست‌وجوی کار فاصله می‌گیرند.",
+        "connections": [
+          {
+            "with": "au-unemployment",
+            "text": "جویندهٔ بیشتر می‌تواند بیکاری را بالا ببرد حتی وقتی استخدام سر جایش است.",
+            "strength": "usually"
+          },
+          {
+            "with": "au-underemployment",
+            "text": "این سه نرخ با هم بازار کار را توصیف می‌کنند.",
+            "strength": "reliable"
+          }
+        ],
+        "australiaAngle": "مشارکت استرالیا پس از سال‌ها رشد نزدیک رکوردهای تاریخی است: سهم بیشتری از جمعیت تا امروز در بازار کار حضور دارد.",
+        "glossaryTerms": [
+          "participation-rate"
+        ]
+      },
+      "au-underemployment": {
+        "plainName": "کم‌کاری",
+        "oneLine": "کسانی که شغل دارند اما ساعت بیشتری می‌خواهند، به‌عنوان سهمی از بازار کار.",
+        "ifRising": "شل‌گی پنهان معمولاً در حال جمع‌شدن است: کارگران ساعت بیشتری می‌خواهند تا آنچه هست.",
+        "ifFalling": "کار برای خواهندگانِ ساعت بیشتر معمولاً پُرتر می‌شود.",
+        "connections": [
+          {
+            "with": "au-unemployment",
+            "text": "این دو نرخ با هم شل‌گی واقعی بازار کار را می‌سنجند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "au-wage-growth",
+            "text": "شل‌گی کمتر معمولاً با رشد دستمزد محکم‌تر همراه است.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "نیمهٔ خاموش بازار کار استرالیا: در افت‌های گذشته پیش از بیکاری حرکت کرد.",
+        "glossaryTerms": [
+          "underemployment"
+        ]
+      },
+      "au-trade-balance": {
+        "plainName": "تراز تجاری کالا",
+        "oneLine": "استرالیا از صادرات کالا بیشتر درآمده یا برای واردات بیشتر خرج کرده است.",
+        "ifRising": "درآمد صادراتی معمولاً از خرج وارداتی جلو می‌زند.",
+        "ifFalling": "خرج وارداتی معمولاً به درآمد صادراتی می‌رسد یا از آن جلو می‌زند.",
+        "connections": [
+          {
+            "with": "iron-ore",
+            "text": "سنگ‌آهن بزرگ‌ترین قلم درآمد صادراتی است.",
+            "strength": "usually"
+          },
+          {
+            "with": "coal-aus",
+            "text": "قیمت زغال سمت صادراتی تراز را شکل می‌دهد.",
+            "strength": "usually"
+          },
+          {
+            "with": "audusd",
+            "text": "مازاد پهن معمولاً دلار استرالیا را نگه می‌دارد.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "موتور بیرونی استرالیا: قیمت کالاها مازاد را تعیین می‌کند و مازاد به درآمد ملی می‌ریزد.",
+        "glossaryTerms": [
+          "trade-balance",
+          "commodity"
+        ]
       }
     },
     "glossary": {
@@ -7843,6 +8211,36 @@
         "term": "عدم قطعیت سیاست تجاری",
         "plain": "سنجه‌ای از اینکه چه سهمی از پوشش روزنامه‌ها دربارهٔ سیاست تجاری است (تعرفه‌ها، توافق‌ها و اختلاف‌ها)، نه اینکه سیاست دقیقاً چه می‌گوید.",
         "example": "عدد بالا یعنی تجارت بر خبرها مسلط است، نه اینکه جهتش معلوم است."
+      },
+      "gdp": {
+        "term": "تولید ناخالص داخلی",
+        "plain": "مجموع هر آنچه یک کشور در یک بازه تولید می‌کند. نسخهٔ واقعی اثر تغییر قیمت‌ها را حذف می‌کند تا فقط رشد کمّی دیده شود.",
+        "example": "رشد ۲ درصدی تولید ناخالص داخلی واقعی یعنی کشور حدود ۲ درصد بیشتر از همان بازهٔ سال قبل تولید کرده است."
+      },
+      "underemployment": {
+        "term": "کم‌کاری",
+        "plain": "شغل داشتن اما با ساعت‌های کمتر از نیاز؛ کار کردن پاره‌وقت در حالی که فرد ساعت بیشتری می‌خواهد و در دسترس است.",
+        "example": "نرخ کم‌کاری ۶ درصد یعنی از هر صد نفر در بازار کار، حدود شش نفر ساعت کمتری از آنچه می‌خواهند کار می‌کنند."
+      },
+      "participation-rate": {
+        "term": "نرخ مشارکت",
+        "plain": "سهم مردم در سن کار که یا شغل دارند یا فعالانه در جست‌وجوی کارند.",
+        "example": "نرخ مشارکت ۶۶ درصد یعنی حدود دو سوم مردم در سن کار در بازار کار حضور دارند."
+      },
+      "net-overseas-migration": {
+        "term": "مهاجرت خالص خارجی",
+        "plain": "چند نفر بیشتر به استرالیا آمده‌اند تا آنچه رفته‌اند؛ ورودی منهای خروجی، یعنی بخش مهاجرتیِ رشد جمعیت.",
+        "example": "مهاجرت خالص خارجی ۱۰۰ هزار نفری در یک فصل یعنی ورودی‌ها ۱۰۰ هزار نفر از خروجی‌ها بیشتر بوده‌اند."
+      },
+      "building-approvals": {
+        "term": "مجوز ساخت مسکن",
+        "plain": "اجازهٔ رسمی ساخت خانهٔ جدید که شورای محلی پیش از شروع ساختمان صادر می‌کند.",
+        "example": "در یک ماه معمولی، حدود ۱۵ تا ۲۰ هزار واحد مسکونی جدید در استرالیا مجوز می‌گیرد."
+      },
+      "trade-balance": {
+        "term": "تراز تجاری",
+        "plain": "فاصلهٔ آنچه یک کشور از فروش کالا در خارج به دست می‌آورد با آنچه برای کالای خارجی خرج می‌کند. مازاد یعنی بیشتر به دست آورده است.",
+        "example": "مازاد کالایی ۴۹۵ میلیون دلار استرالیا یعنی صادرات آن ماه ۴۹۵ میلیون دلار از واردات جلو زده است."
       }
     },
     "ui": {

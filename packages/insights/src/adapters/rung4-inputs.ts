@@ -53,4 +53,14 @@ export interface Rung4SeriesInputs {
    * nothing and the ids carry forward.
    */
   portwatch?: Partial<Record<IndicatorId, SeriesPoint[]>>;
+  /**
+   * gap-closure S5-M5.2 (2026-11-02): the Australian macro family's
+   * DERIVED series (adapters/abs-au.ts collectAbsAuMacro — the eight ABS
+   * fetches, GDP/population YoY computed from the levels). The Node
+   * venue + selfcheck pass them so ONE build derives everything; the
+   * Worker's 04:10 main rung passes nothing — the ids carry forward
+   * (CARRY_FORWARD_IDS) until the rung3 'abs-au-macro' phase patches
+   * them.
+   */
+  absAu?: Partial<Record<IndicatorId, SeriesPoint[]>>;
 }

@@ -788,6 +788,17 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // walcl convention).
   'treasury-auction-10y-indirect',
   'treasury-auction-30y-indirect',
+  // gap-closure S5-M5.2 (2026-11-02): the Australian macro family's rate
+  // series — the GDP/spending/population growth rates (the us-gdp-growth
+  // family) and the participation/underemployment rates (the
+  // au-unemployment family). The goods balance stays 'pct' (the $-level
+  // walcl/deficit convention); the approval and migration COUNTS ride
+  // INDEX_POINT_IDS below (the us-nfp/chokepoint count convention).
+  'au-gdp-growth',
+  'au-household-spending',
+  'au-population-growth',
+  'au-participation',
+  'au-underemployment',
 ]);
 
 /** Index/ratio series that speak in points but are not interest rates. */
@@ -855,6 +866,12 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // 2026-10-21 data-integrity round: the monthly nonfarm-payrolls change
   // speaks in thousands of jobs — a count, not a percent.
   'us-nfp',
+  // gap-closure S5-M5.2 (2026-11-02): the Australian macro family's counted
+  // quantities — the monthly dwelling approvals (a count of units, the
+  // us-nfp family) and the quarterly net overseas migration flow (a count
+  // of people).
+  'au-building-approvals',
+  'au-nom',
 ]);
 
 function t10Units(): ValidationTestResult {

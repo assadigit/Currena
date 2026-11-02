@@ -8807,6 +8807,478 @@
         "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (gold-api:XAU, frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
+    },
+    {
+      "id": "au-gdp-growth",
+      "title": "Australian economic growth (real GDP)",
+      "area": {
+        "section": "australia",
+        "group": "au-activity",
+        "gauge": "au-activity",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (ANA_AGG, chain-volume GDP)",
+        "url": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M1.GPM.20.AUS.Q",
+        "seriesIdOrTable": "ABS ANA_AGG M1.GPM.20.AUS.Q (chain-volume GDP level, annual change derived)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M1.GPM.20.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/ANA_AGG/M1.GPM.20.AUS.Q",
+      "whatItIs": "The annual change in Australia’s inflation-adjusted gross domestic product (the ABS national accounts, quarterly, chain-volume levels; the annual rate is derived, and the quarterly change is cross-checked against the ABS’s own published figures).",
+      "whatItIsnt": "A national total hides the mix: population growth can keep GDP rising while output per person stalls.",
+      "trackRecordNote": "Australia famously avoided recession for three decades until 2020; its growth has since run near 1–2% a year, with commodity swings and population growth shaping the pace.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 215 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 215,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-household-spending",
+      "title": "Australian household spending (annual change)",
+      "area": {
+        "section": "australia",
+        "group": "au-activity",
+        "gauge": "au-activity",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (Monthly Household Spending Indicator)",
+        "url": "https://data.api.abs.gov.au/rest/data/HSI_M/9.TOT.CUR.10.AUS.M",
+        "seriesIdOrTable": "ABS HSI_M 9.TOT.CUR.10.AUS.M (Monthly Household Spending Indicator, through-the-year %)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/HSI_M/9.TOT.CUR.10.AUS.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/HSI_M/9.TOT.CUR.10.AUS.M",
+      "whatItIs": "The through-the-year change in the ABS Monthly Household Spending Indicator (bank-transactions data, current prices): the successor to the discontinued Retail Trade series.",
+      "whatItIsnt": "Bank-transactions data is an estimate the ABS refines, and it covers spending by Australian households, not every dollar of domestic demand.",
+      "trackRecordNote": "Spending swung wildly through the pandemic restrictions and their reopening, then settled back toward its usual pace.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-building-approvals",
+      "title": "Australian dwelling approvals",
+      "area": {
+        "section": "australia",
+        "group": "au-activity",
+        "gauge": "au-activity",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (BA_GCCSA, dwelling approvals)",
+        "url": "https://data.api.abs.gov.au/rest/data/BA_GCCSA/1.1.9.1.100.10.AUS.M",
+        "seriesIdOrTable": "ABS BA_GCCSA 1.1.9.1.100.10.AUS.M (dwelling units approved, new residential, original)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/BA_GCCSA/1.1.9.1.100.10.AUS.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/BA_GCCSA/1.1.9.1.100.10.AUS.M",
+      "whatItIs": "The number of new residential dwelling units approved in the month (the ABS Building Approvals survey, original terms — not seasonally adjusted; monthly figures move with the calendar).",
+      "whatItIsnt": "Not every approved dwelling is built, and original-terms months swing with seasonal patterns and approval processing rhythms.",
+      "trackRecordNote": "Approvals peaked with the 2021 construction boom and have run well below it since, while the population kept growing — the gap sits behind the tight rental market.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "dwellings",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-population-growth",
+      "title": "Australian population growth",
+      "area": {
+        "section": "australia",
+        "group": "au-activity",
+        "gauge": "au-activity",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (ERP_COMP_Q, estimated resident population)",
+        "url": "https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/10.AUS.Q",
+        "seriesIdOrTable": "ABS ERP_COMP_Q 10.AUS.Q (estimated resident population, annual change derived)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/10.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/10.AUS.Q",
+      "whatItIs": "The annual change in the ABS estimated resident population (quarterly levels; the annual rate is derived). The card also shows net overseas migration — arrivals minus departures — for the latest quarter.",
+      "whatItIsnt": "The ABS publishes this series with a long lag (the June-quarter figure arrives in December); the reading is the freshest official count, not this week’s news.",
+      "trackRecordNote": "Growth ran near record highs in 2023 as migration rebounded after the border closures, and has been easing since.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 270 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 270,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-nom",
+      "title": "Net overseas migration",
+      "area": {
+        "section": "australia",
+        "group": "au-activity",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (ERP_COMP_Q, net overseas migration)",
+        "url": "https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/9.AUS.Q",
+        "seriesIdOrTable": "ABS ERP_COMP_Q 9.AUS.Q (net overseas migration, quarterly level)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/9.AUS.Q",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/9.AUS.Q",
+      "whatItIs": "The net overseas migration flow for the quarter, in thousands of people (the ABS population release). Rendered inside the population growth card as its migration component.",
+      "whatItIsnt": "A gross flow nets out big movements in both directions; it says nothing about who arrived or left.",
+      "trackRecordNote": "The flow collapsed to near zero during the 2020–22 border closures, then rebounded sharply — the largest swings in the series’ history.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 270 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "persons-k",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 270,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-participation",
+      "title": "Australian participation rate",
+      "area": {
+        "section": "australia",
+        "group": "au-activity",
+        "gauge": "au-activity",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (Labour Force)",
+        "url": "https://data.api.abs.gov.au/rest/data/LF/M12.3.1599.20.AUS.M",
+        "seriesIdOrTable": "ABS LF M12.3.1599.20.AUS.M (participation rate, persons, seasonally adjusted)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/LF/M12.3.1599.20.AUS.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/LF/M12.3.1599.20.AUS.M",
+      "whatItIs": "The labour force (employed plus unemployed) as a share of the working-age population (the ABS Labour Force survey, persons, seasonally adjusted).",
+      "whatItIsnt": "A rate says nothing about hours or pay: high participation can sit beside rising underemployment.",
+      "trackRecordNote": "Australian participation has climbed for years to record highs, driven by more women and older Australians staying in work.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-underemployment",
+      "title": "Australian underemployment rate",
+      "area": {
+        "section": "australia",
+        "group": "au-activity",
+        "gauge": "au-activity",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (Labour Force, underemployment)",
+        "url": "https://data.api.abs.gov.au/rest/data/LF_UNDER/M23.3.1599.20.AUS.M",
+        "seriesIdOrTable": "ABS LF_UNDER M23.3.1599.20.AUS.M (underemployment rate, proportion of labour force, SA)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/LF_UNDER/M23.3.1599.20.AUS.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/LF_UNDER/M23.3.1599.20.AUS.M",
+      "whatItIs": "Underemployed workers — employed people willing and available for more hours — as a proportion of the labour force (the ABS Labour Force survey, persons, seasonally adjusted).",
+      "whatItIsnt": "Wanting more hours is not the same as needing them: students and carers often prefer shorter hours.",
+      "trackRecordNote": "It fell through the 2020s labour shortage and remains low by its decade’s standards — the quiet half of the tight labour market.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 60 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 60,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
+    },
+    {
+      "id": "au-trade-balance",
+      "title": "Australian goods trade balance",
+      "area": {
+        "section": "australia",
+        "group": "au-external",
+        "gauge": "au-external",
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
+      },
+      "source": {
+        "provider": "abs",
+        "name": "Australian Bureau of Statistics (ITGS, balance on goods)",
+        "url": "https://data.api.abs.gov.au/rest/data/ITGS/M1.170.20.AUS.M",
+        "seriesIdOrTable": "ABS ITGS M1.170.20.AUS.M (balance on goods, seasonally adjusted, $m)"
+      },
+      "publisher": "Australian Bureau of Statistics",
+      "publisherUrl": "https://data.api.abs.gov.au/rest/data/ITGS/M1.170.20.AUS.M",
+      "methodUrl": "https://data.api.abs.gov.au/rest/data/ITGS/M1.170.20.AUS.M",
+      "whatItIs": "Goods exports minus goods imports for the month, in millions of Australian dollars (the ABS International Trade in Goods release, balance on goods, seasonally adjusted).",
+      "whatItIsnt": "A monthly balance is volatile, and the goods balance excludes services such as travel and education — two of Australia’s larger export industries.",
+      "trackRecordNote": "Australia has run goods surpluses for most of the past decade as iron ore and energy exports grew; the balance swings with commodity prices.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "ABS copyright page (read 2026-10-16): CC BY 4.0 — the page carries a Creative Commons menu item; the JS-rendered page could not be quoted verbatim in a plain fetch, so the exact clause is recorded as \"not quoted\" until re-read in a browser. Attribution is displayed regardless (LR-04).",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "legs": [
+          "abs"
+        ]
+      },
+      "unit": "aud-m",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY 4.0",
+        "attributionText": "Source: Australian Bureau of Statistics",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "Step 3 spec §2.3 (owner research): CC BY 4.0, attribution kept; abs.gov.au copyright page carries a Creative Commons menu item (JS-heavy page, verbatim quote not captured — recorded, re-check at the quarterly licence review).",
+        "termsUrl": "https://www.abs.gov.au/about/copyright-and-disclaimer"
+      }
     }
   ]
 }

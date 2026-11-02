@@ -26,6 +26,7 @@ import {
   usDeficit12mSeries,
 } from './rung4';
 import { RUNG2_IDS } from './rung2';
+import { ABS_AU_IDS } from './abs-au';
 import { PORTWATCH_IDS } from './portwatch';
 import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsRung4Phase } from '../ingest/run';
 import type { InsightsStore } from '../store';
@@ -596,8 +597,8 @@ describe('historyPhaseIds excludes the rung4 ids (the phase owns its histories)'
     }
   });
 
-  it('CARRY_FORWARD_IDS covers exactly the rung-2 + rung-4 + portwatch families (the main rung carries all three)', () => {
-    expect(CARRY_FORWARD_IDS).toEqual([...RUNG2_IDS, ...RUNG4_IDS, ...PORTWATCH_IDS]);
+  it('CARRY_FORWARD_IDS covers exactly the rung-2 + rung-4 + portwatch + abs-au families (the main rung carries them all)', () => {
+    expect(CARRY_FORWARD_IDS).toEqual([...RUNG2_IDS, ...RUNG4_IDS, ...PORTWATCH_IDS, ...ABS_AU_IDS]);
     expect(new Set(CARRY_FORWARD_IDS).size).toBe(CARRY_FORWARD_IDS.length);
   });
 });

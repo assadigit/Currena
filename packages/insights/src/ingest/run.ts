@@ -98,6 +98,7 @@ import {
   PORTWATCH_KV_KEY,
   PORTWATCH_WINDOW_DAYS,
 } from '../adapters/portwatch';
+import { collectAbsAuMacro, ABS_AU_IDS } from '../adapters/abs-au';
 import { classifySourceError } from '../adapters/fetch-policy';
 import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
@@ -211,6 +212,15 @@ export interface IngestRunOptions {
    * (CARRY_FORWARD_IDS) until the 04:30 rung3 phase patches them.
    */
   portwatchSeries?: Partial<Record<IndicatorId, SeriesPoint[]>>;
+  /**
+   * gap-closure S5-M5.2 (2026-11-02): the Australian macro family's
+   * derived series, pre-collected by the Node venue's inline collect
+   * (adapters/abs-au.ts collectAbsAuMacro — the eight ABS fetches).
+   * The Worker's 04:10 main rung passes nothing — the ids carry forward
+   * (CARRY_FORWARD_IDS) until the rung3 'abs-au-macro' phase patches
+   * them.
+   */
+  absAuSeries?: Partial<Record<IndicatorId, SeriesPoint[]>>;
   /**
    * The OECD mirror armed as the jgb-10y fallback (the Node venue passes
    * the FRED mirror it already collected; the 04:20 phase reads it from
@@ -445,7 +455,8 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     ...(opts.rung4Series !== undefined ||
       opts.creditSeries !== undefined ||
       opts.auctionsSeries !== undefined ||
-      opts.portwatchSeries !== undefined
+      opts.portwatchSeries !== undefined ||
+      opts.absAuSeries !== undefined
       ? {
           rung4: {
             ...(opts.rung4Series !== undefined ? { fredS3: opts.rung4Series } : {}),
@@ -457,6 +468,9 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
             // gap-closure S4-M4.3: the chokepoint MA7 series (the Node
             // venue's inline collect; the rung3 phase derives its own).
             ...(opts.portwatchSeries !== undefined ? { portwatch: opts.portwatchSeries } : {}),
+            // gap-closure S5-M5.2: the Australian macro family (the Node
+            // venue's inline collect; the rung3 phase derives its own).
+            ...(opts.absAuSeries !== undefined ? { absAu: opts.absAuSeries } : {}),
           },
         }
       : {}),
@@ -783,7 +797,7 @@ function quantizedGap(us: SeriesPoint[], jp: SeriesPoint[]): SeriesPoint[] {
  * (2026-11-01): the PortWatch chokepoint ids join the same discipline for
  * the 04:30 rung3 phase (the ids carry until the phase patches them).
  */
-export const CARRY_FORWARD_IDS: readonly string[] = [...RUNG2_IDS, ...RUNG4_IDS, ...PORTWATCH_IDS];
+export const CARRY_FORWARD_IDS: readonly string[] = [...RUNG2_IDS, ...RUNG4_IDS, ...PORTWATCH_IDS, ...ABS_AU_IDS];
 
 /** Read a stored history as series, poison-tolerant (the collect pattern). */
 async function storedSeriesOf(store: InsightsStore, id: IndicatorId): Promise<SeriesPoint[] | undefined> {
@@ -1600,6 +1614,139 @@ export async function runInsightsPortwatchPhase(opts: PortwatchPhaseOptions): Pr
 }
 
 /* ------------------------------------------------------------------ *
+ * gap-closure S5-M5.2 (2026-11-02): the Australian macro rung3 phase —
+ * the portwatch/credit phase pattern for the eight ABS series. Fetches
+ * via collectAbsAuMacro (fail-soft per series), computes the readings,
+ * patches the snapshot family, updates the stage, writes its OWN history
+ * keys (the daily/periodic history phases exclude ABS_AU_IDS), appends
+ * the report rows. Subrequest budget on rung3: 8 fetches + 1 snapshot
+ * read + 4 patch writes + 8 history writes = 21; declared 22 with the
+ * status write's headroom (the registry's refusal arithmetic).
+ * ------------------------------------------------------------------ */
+
+export interface AbsAuPhaseOptions {
+  /** The KV or REST store (snapshot read + writes). */
+  store: InsightsStore;
+  /** The Worker venue's RATES binding (histories + stage). */
+  kv: KVLike;
+  /** 'scheduled' (the Worker rung) or 'manual' (a dispatch). */
+  mode: 'scheduled' | 'manual';
+  /** Clock injection (tests). */
+  now?: Date;
+  /** The ids the PUBLIC projection hides. */
+  hiddenPublicIds?: ReadonlySet<string>;
+  /** Injectable fetch (tests replay fixtures — never live sites). */
+  fetchImpl?: typeof fetch;
+}
+
+export interface AbsAuPhaseResult {
+  /** The derived series (the ids the phase refreshed this run). */
+  series: Record<string, SeriesPoint[]>;
+  /** Per-source report rows (appended to insights:status). */
+  reports: InsightsSourceReport[];
+  /** Whether the snapshot + public projection were patched and written. */
+  patched: boolean;
+  /** The phase's own history-key writes. */
+  histories: { written: number; singlePoint: number };
+}
+
+export async function runInsightsAbsAuPhase(opts: AbsAuPhaseOptions): Promise<AbsAuPhaseResult> {
+  const now = opts.now ?? new Date();
+  const nowIso = now.toISOString();
+  console.log(`# Insights abs-au phase (S5-M5.2 Australian macro) — ${nowIso} [${opts.mode}]`);
+
+  // 1. Collect (fail-soft per series; one honest attempt each, F-11). The
+  //    eight fetches run back-to-back exactly like the 04:10 main rung's
+  //    own ~11 ABS series (data.api.abs.gov.au serves that shape in
+  //    production — no pause needed, none taken).
+  const collected = await collectAbsAuMacro({
+    ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+  });
+  const reports = [...collected.reports];
+  for (const row of reports) console.log(`  ${row.ok ? '✅' : '❌'} ${row.source} — ${row.detail}`);
+  const histories = { written: 0, singlePoint: 0 };
+
+  const seriesEntries = Object.entries(collected.series) as [IndicatorId, SeriesPoint[]][];
+  if (seriesEntries.length === 0) {
+    console.log('[abs-au] nothing to patch (no series parsed)');
+    return { series: {}, reports, patched: false, histories };
+  }
+  const series: Record<string, SeriesPoint[]> = Object.fromEntries(seriesEntries);
+  for (const [id, s] of seriesEntries) {
+    console.log(`  · ${id}: ${s.at(-1)!.value} @ ${s.at(-1)!.date} (${s.length} obs)`);
+  }
+
+  // 2. Recompute the readings (the same engine + guards the other phases apply).
+  const storedSnapshot = await opts.store.getSnapshot();
+  if (storedSnapshot === undefined) {
+    console.warn('[abs-au] no stored snapshot to patch — the next main rung builds from scratch');
+    return { series, reports, patched: false, histories };
+  }
+  const patchedReadings: IndicatorReading[] = [];
+  for (const [id, idSeries] of seriesEntries) {
+    const def = DEFINITIONS.find((d) => d.id === id)!;
+    const source: ReadingSource = READING_SOURCES[id] ?? { name: def.sourceRef };
+    // No SANITY_RANGES entries (the M3.2 no-invented-bounds lesson: the
+    // parser's structural checks carry the load — every unit verified M5.1).
+    const reading = computeReading(def, idSeries, nowIso, source);
+    patchedReadings.push(reading);
+    console.log(`  🔄 ${id}: ${reading.value ?? '—'} @ ${reading.asOf ?? '—'} [${reading.status}]`);
+  }
+
+  // 3. Patch + write the snapshot family (the credit phase's sequence).
+  const patched = patchInsightsSnapshot(storedSnapshot, patchedReadings, nowIso);
+  await opts.store.putSnapshot(patched);
+  console.log('  ✍ insights:snapshot (patched)');
+  const hiddenIds = opts.hiddenPublicIds ?? new Set<string>();
+  await opts.store.putPublicSnapshot(projectSnapshotToPublic(patched, hiddenIds));
+  console.log('  ✍ insights:snapshot-public (patched)');
+
+  // 4. Update the stage (the honest record of what this phase last served).
+  {
+    const todayMs = Date.parse(`${nowIso.slice(0, 10)}T00:00:00Z`);
+    const base = (await readStage(opts.kv)) ?? { v: STAGE_VERSION, writtenAt: nowIso, series: {} };
+    for (const [id, idSeries] of seriesEntries) {
+      const trimmed = trimForStage(idSeries, todayMs);
+      if (trimmed.length > 0) base.series[id] = trimmed;
+    }
+    base.writtenAt = nowIso;
+    await putStage(opts.kv, base);
+    console.log(`  ✍ ${INSIGHTS_STAGE_KEY} (updated ${seriesEntries.map(([id]) => id).join(', ')})`);
+  }
+
+  // 5. Write the phase's OWN history keys (the daily/periodic halves'
+  //    exclusion — ABS_AU_IDS rides historyPhaseIds' isOwned list).
+  for (const [id, idSeries] of seriesEntries) {
+    const history = buildHistoryFile(id, idSeries);
+    if (!history) {
+      if (idSeries.length > 0) histories.singlePoint++;
+      continue;
+    }
+    try {
+      await opts.kv.put(`insights:hist:${id}`, JSON.stringify(history));
+      histories.written++;
+    } catch (err) {
+      console.warn(`  ⚠ insights:hist:${id} failed: ${errMessage(err)}`);
+    }
+  }
+  console.log(`  history: ${histories.written} written · ${histories.singlePoint} single-point (kept)`);
+
+  // 6. Append the phase's report rows to insights:status.
+  try {
+    const status = await opts.store.getStatus();
+    if (status !== undefined) {
+      const mergedRows = [...status.sources, ...reports];
+      await opts.store.putStatus({ ...status, sources: mergedRows, generatedAt: nowIso });
+      console.log(`  ✍ insights:status (+${reports.length} abs-au rows)`);
+    }
+  } catch (err) {
+    console.warn(`  ⚠ insights:status append failed: ${errMessage(err)}`);
+  }
+
+  return { series, reports, patched: true, histories };
+}
+
+/* ------------------------------------------------------------------ *
  * The Node venue's inline history writes (read-compared, no staging).
  * ------------------------------------------------------------------ */
 
@@ -1694,7 +1841,9 @@ export interface HistoryPhaseOptions {
  * owns their histories. */
 export function historyPhaseIds(phase: 'daily' | 'daily-a' | 'daily-b' | 'periodic'): IndicatorId[] {
   const isOwned = (id: IndicatorId): boolean =>
-    (RUNG4_IDS as readonly string[]).includes(id) || (PORTWATCH_IDS as readonly string[]).includes(id);
+    (RUNG4_IDS as readonly string[]).includes(id) ||
+    (PORTWATCH_IDS as readonly string[]).includes(id) ||
+    (ABS_AU_IDS as readonly string[]).includes(id);
   const daily = DEFINITIONS.filter(
     (d) => (d.cadence === 'daily' || d.cadence === 'weekly') && !isOwned(d.id),
   ).map((d) => d.id);

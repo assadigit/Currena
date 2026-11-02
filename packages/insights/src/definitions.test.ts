@@ -23,7 +23,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
   });
 
   it('splits 96 P1 / 43 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, P1; the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — both P1 context cards; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — all P1 context cards; the 2026-11-01 gap-closure S4-M4.2 round adds the geopolitics eleven — the GPR threat/act/country family, the daily 7-day average and the TPU, all P1 context cards; the 2026-11-01 gap-closure S4-M4.3 round adds the chokepoint five — the IMF PortWatch transit cards, all P1 context cards; the 2026-11-01 gap-closure S4-M4.4 round adds the supply-chain/energy six — the GSCPI + the EIA SPR/production pair as P1 context cards, the Pink Sheet energy trio as P2 context cards)', () => {
-    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(99);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(107);
     // Session 3 (G2): +breakeven-tilt (P2, the breakeven-10y sibling).
     expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(46);
   });
@@ -44,6 +44,9 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
         // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane —
         // a shadow gauge until S6 (all context members).
         'geo-fragmentation',
+        // gap-closure S5-M5.2 (2026-11-02): the two Australian shadow lanes.
+        'au-activity',
+        'au-external',
       ].sort(),
     );
     // Section/group coherence: a group belongs to exactly one section.
@@ -58,13 +61,21 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: the ninety-seven info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair; 2026-10-26 gap-audit: +gold-oil-ratio, +eia-crude-stocks (A-4/A-6), +oecd-cli-cn, +oecd-cli-de, +gpr-index, +epu-us (the A-8 companions and the A-9/A-10 context pair — the CLI US leg is the trio’s voter); 2026-10-29 owner round: +usdaed — the UAE dirham context card; 2026-10-31 Session-3 round: +breakeven-tilt — the G2 interplay context card, D-5 keeps it out of the voter table; 2026-10-31 gap-closure S2-M2.4 round: +nyfed-custody — the weekly custody card, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.2 round: the liquidity/funding six; 2026-11-01 gap-closure S3-M3.3 round: +ebp and +ofr-fsi — the credit pair, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.4 round: the growth-nowcast/survey six, context-only by spec (G-5); the S4-M4.2/M4.3/M4.4 rounds: the geopolitics eleven + the chokepoint five + the supply-chain/energy six, context-only by spec (G-5))', () => {
+  it('info-only cards never vote: the hundred-and-five info rules (2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair; 2026-10-26 gap-audit: +gold-oil-ratio, +eia-crude-stocks (A-4/A-6), +oecd-cli-cn, +oecd-cli-de, +gpr-index, +epu-us (the A-8 companions and the A-9/A-10 context pair — the CLI US leg is the trio’s voter); 2026-10-29 owner round: +usdaed — the UAE dirham context card; 2026-10-31 Session-3 round: +breakeven-tilt — the G2 interplay context card, D-5 keeps it out of the voter table; 2026-10-31 gap-closure S2-M2.4 round: +nyfed-custody — the weekly custody card, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.2 round: the liquidity/funding six; 2026-11-01 gap-closure S3-M3.3 round: +ebp and +ofr-fsi — the credit pair, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.4 round: the growth-nowcast/survey six, context-only by spec (G-5); the S4-M4.2/M4.3/M4.4 rounds: the geopolitics eleven + the chokepoint five + the supply-chain/energy six, context-only by spec (G-5))', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
+      'au-building-approvals',
       'au-deposit-rate',
+      'au-gdp-growth',
+      'au-household-spending',
       'au-job-vacancies',
+      'au-nom',
+      'au-participation',
       'au-petrol-yoy',
+      'au-population-growth',
       'au-saving-ratio',
+      'au-trade-balance',
+      'au-underemployment',
       'bank-reserves',
       'boe-rate',
       'boj-rate',
@@ -164,13 +175,13 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
   it('GAUGE membership is the scored list (48 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation SHADOW gauge carries context-only members — the deliberate G-5 exception, pinned here)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(56); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3/M4.5 shadow gauge's EIGHT context-only members (the five chokepoints + gscpi/us-spr/us-crude-production; 48 + 8 = 56; only the 48 vote)
+    expect(memberIds.size).toBe(63); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3/M4.5 shadow gauge's EIGHT context-only members (the five chokepoints + gscpi/us-spr/us-crude-production; 48 + 8 = 56; only the 48 vote) PLUS the S5-M5.2 shadow lanes' SEVEN context-only members (the six activity cards + au-trade-balance; 56 + 7 = 63; still only the 48 vote)
     // Every gauge member is a scored (non-info) definition. TWO deliberate
     // exceptions: B-14's brent (the card renders on the Prices strip; only
     // the count membership moved) and the S4-M4.3 SHADOW gauge's members
     // (all context-only per G-5 — isShadowGauge pins that separately).
     const shadowGauges = GAUGES.filter((g) => isShadowGauge(g)).map((g) => g.id);
-    expect(shadowGauges).toEqual(['geo-fragmentation']);
+    expect(shadowGauges).toEqual(['geo-fragmentation', 'au-activity', 'au-external']);
     for (const g of GAUGES) {
       for (const id of g.members) {
         const def = DEFINITIONS.find((d) => d.id === id)!;

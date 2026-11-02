@@ -413,7 +413,7 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     // one bullet per gauge, worst first (the fixture: inflation step 4
     // with 3 flagged, households step 3 with 2, trade step 0)
     const rows = Array.from(panel!.querySelectorAll('[data-ei-area-step]')) as HTMLElement[];
-    expect(rows.map((r) => r.getAttribute('data-ei-area-step'))).toEqual(['4', '3', '0']);
+    expect(rows.map((r) => r.getAttribute('data-ei-area-step'))).toEqual(['4', '3', '0', '0', '0']); // + the two S5-M5.2 shadow lanes (step 0, context-only)
     const raised = rows.filter((r) => r.tagName === 'BUTTON');
     expect(raised).toHaveLength(2);
     expect(raised[0]!.getAttribute('data-ei-area-signal')).toBe('raised');
@@ -436,7 +436,7 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(onFocusCard).toHaveBeenCalledWith('au-cpi', expect.anything());
     // the unreadable area sits in the quiet ink, never a button
     const quiet = rows.filter((r) => r.tagName === 'SPAN');
-    expect(quiet).toHaveLength(1);
+    expect(quiet).toHaveLength(3); // the unreadable trade lane + the two S5-M5.2 shadow lanes (all step 0, quiet ink)
     expect(quiet[0]!.getAttribute('data-ei-area-signal')).toBe('no-reading');
     expect(quiet[0]!.textContent).toContain(insightsCopyEn.groupShort['au-trade-currency']);
     expect(quiet[0]!.textContent).toContain(insightsCopyEn.ui.gaugeNoReading);
@@ -497,7 +497,7 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(auPanel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
       insightsCopyEn.ui.australiaSignalsTitle,
     );
-    expect(auPanel!.querySelectorAll('[data-ei-area-step]')).toHaveLength(3);
+    expect(auPanel!.querySelectorAll('[data-ei-area-step]')).toHaveLength(5); // + the two S5-M5.2 shadow lanes
   });
 
   it('fa: the Australia signals box speaks Persian (heading, state words, fa digits, named indicators)', () => {
@@ -608,9 +608,9 @@ describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
     const cards = regionCards();
     const auCard = within(cards[1]! as HTMLElement);
     const badge = auCard.getByText('readings out of date', { exact: false });
-    // The AU gauges have 16 members total; the three RBA readings are stale.
+    // The AU gauges have 23 members total (16 voters + the 7 S5-M5.2 shadow members); the three RBA readings are stale.
     expect(badge.textContent).toContain('3');
-    expect(badge.textContent).toContain('16');
+    expect(badge.textContent).toContain('23');
     // Global has no stale members in this fixture → its card carries none.
     const globalCard = within(cards[0]! as HTMLElement);
     expect(globalCard.queryByText('readings out of date', { exact: false })).toBeNull();
@@ -644,7 +644,7 @@ describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
     );
     const cards = regionCards();
     const auCard = within(cards[1]! as HTMLElement);
-    // «۳ مورد از ۱۶ قرائت قدیمی است» — the fa copy with Persian digits.
-    expect(auCard.getByText('قرائت قدیمی است', { exact: false }).textContent).toContain('۱۶');
+    // «۳ مورد از ۲۳ قرائت قدیمی است» — the fa copy with Persian digits.
+    expect(auCard.getByText('قرائت قدیمی است', { exact: false }).textContent).toContain('۲۳');
   });
 });

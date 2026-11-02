@@ -377,6 +377,38 @@ const LAYER1 = {
       plain: 'A measure of how much newspaper coverage is about trade policy \u2014 tariffs, deals and disputes \u2014 rather than what the policy actually is.',
       example: 'A high reading says trade dominates the news, not which way it goes.',
     },
+    // gap-closure S5-M5.2 (2026-11-02) — the Australian macro family's
+    // terms (the M5.6 glossary list, landed with the cards that use them).
+    gdp: {
+      term: 'GDP',
+      plain: 'Gross domestic product: everything a country produces in a period, added up. Real GDP removes the effect of price changes.',
+      example: 'When real GDP grows 2%, the country made about 2% more than the same period a year earlier.',
+    },
+    underemployment: {
+      term: 'underemployment',
+      plain: 'Having a job but not enough hours \u2014 working part-time while wanting and being available for more.',
+      example: 'An underemployment rate of 6% means about 6 in 100 labour-force members want more hours than they get.',
+    },
+    'participation-rate': {
+      term: 'participation rate',
+      plain: 'The share of working-age people who either have a job or are actively looking for one.',
+      example: 'A participation rate of 66% means about two of every three working-age people are in the labour force.',
+    },
+    'net-overseas-migration': {
+      term: 'net overseas migration',
+      plain: 'How many more people moved to Australia than left it over a period \u2014 arrivals minus departures, the migration part of population growth.',
+      example: 'Net overseas migration of 100k in a quarter means arrivals outnumbered departures by 100,000 people.',
+    },
+    'building-approvals': {
+      term: 'building approvals',
+      plain: 'Official permission to build a new home, granted by a local council before construction can start.',
+      example: 'Around 15,000\u201320,000 new dwellings are approved in Australia in a typical month.',
+    },
+    'trade-balance': {
+      term: 'trade balance',
+      plain: 'The gap between what a country earns from selling goods abroad and what it spends on goods from abroad. A surplus means it earned more.',
+      example: 'A goods surplus of A$495m means exports beat imports by 495 million Australian dollars that month.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -2405,6 +2437,101 @@ const LAYER1 = {
       ifFalling: 'Indirect bidders took a smaller share of the 30-year auction.',
       connections: [],
       glossaryTerms: [],
+    },
+    // gap-closure S5-M5.2 (2026-11-02): the Australian macro family — the
+    // activity lane's six + the external lane's balance + the NOM companion.
+    'au-gdp-growth': {
+      plainName: 'Australia\u2019s economic growth',
+      oneLine: 'How much Australia\u2019s economy grew over the past year, after inflation.',
+      ifRising: 'Growth is usually stronger: more jobs and firmer pay tend to follow.',
+      ifFalling: 'Growth is usually weaker: hiring often slows first.',
+      connections: [
+        { with: 'au-household-spending', text: 'Spending is the largest piece of the growth total.', strength: 'reliable' },
+        { with: 'au-trade-balance', text: 'Net exports add to or subtract from the growth total.', strength: 'reliable' },
+      ],
+      australiaAngle: 'Australia\u2019s growth rides commodities and population: resource income and new arrivals both lift the total.',
+      glossaryTerms: ['gdp', 'inflation'],
+    },
+    'au-household-spending': {
+      plainName: 'Household spending',
+      oneLine: 'How much more or less Australian households spent over the past year.',
+      ifRising: 'Demand is usually strengthening: businesses and jobs often follow.',
+      ifFalling: 'Households are usually holding back: retailers feel it first.',
+      connections: [
+        { with: 'au-gdp-growth', text: 'Spending is the largest piece of the growth total.', strength: 'reliable' },
+        { with: 'au-saving-ratio', text: 'Spending and saving usually move as mirror images.', strength: 'usually' },
+      ],
+      australiaAngle: 'The successor to the discontinued Retail Trade series: the ABS now reads spending from bank transactions.',
+      glossaryTerms: [],
+    },
+    'au-building-approvals': {
+      plainName: 'Home building approvals',
+      oneLine: 'How many new homes were approved for construction this month.',
+      ifRising: 'More homes are entering the pipeline: future supply is building.',
+      ifFalling: 'Fewer homes are entering the pipeline: future supply thins.',
+      connections: [
+        { with: 'au-rent-yoy', text: 'Thin approvals and fast population growth usually mean rising rents.', strength: 'usually' },
+        { with: 'au-population-growth', text: 'Population sets the demand the approvals answer.', strength: 'usually' },
+      ],
+      australiaAngle: 'Approvals lead Australian construction by many months: today\u2019s thin pipeline is tomorrow\u2019s tight rental market.',
+      glossaryTerms: ['building-approvals'],
+    },
+    'au-population-growth': {
+      plainName: 'Population growth',
+      oneLine: 'How fast Australia\u2019s population grew over the past year.',
+      ifRising: 'Demand for homes, schools and services is usually rising faster.',
+      ifFalling: 'Demand for homes and services usually softens.',
+      connections: [
+        { with: 'au-building-approvals', text: 'Population sets the demand the approvals answer.', strength: 'usually' },
+        { with: 'au-household-spending', text: 'More people usually means more total spending.', strength: 'usually' },
+      ],
+      australiaAngle: 'Population growth is the demand side of Australia\u2019s housing equation; the official count arrives with a long lag.',
+      glossaryTerms: ['net-overseas-migration'],
+    },
+    'au-nom': {
+      plainName: 'Net overseas movement',
+      oneLine: 'How many more people moved to Australia than left, in the latest quarter.',
+      ifRising: 'Population pressure on housing and services is usually building.',
+      ifFalling: 'That pressure usually softens.',
+      connections: [],
+      glossaryTerms: ['net-overseas-migration'],
+    },
+    'au-participation': {
+      plainName: 'Workforce participation',
+      oneLine: 'The share of working-age Australians who have a job or are looking for one.',
+      ifRising: 'More people are usually joining the workforce: confidence in finding work rises.',
+      ifFalling: 'People are usually stepping back from the job search.',
+      connections: [
+        { with: 'au-unemployment', text: 'More seekers can raise unemployment even while hiring holds.', strength: 'usually' },
+        { with: 'au-underemployment', text: 'Together the three rates describe the labour market.', strength: 'reliable' },
+      ],
+      australiaAngle: 'Australian participation sits near record highs after years of gains: more of the population is in the workforce than ever.',
+      glossaryTerms: ['participation-rate'],
+    },
+    'au-underemployment': {
+      plainName: 'Underemployment',
+      oneLine: 'People who have a job but want more hours, as a share of the labour force.',
+      ifRising: 'Hidden slack is usually building: workers want more hours than exist.',
+      ifFalling: 'Work is usually getting fuller for those who want it.',
+      connections: [
+        { with: 'au-unemployment', text: 'The two rates together measure real labour slack.', strength: 'reliable' },
+        { with: 'au-wage-growth', text: 'Thinner slack usually comes with firmer wage growth.', strength: 'usually' },
+      ],
+      australiaAngle: 'The quiet half of Australia\u2019s labour market: it moved before unemployment in past slowdowns.',
+      glossaryTerms: ['underemployment'],
+    },
+    'au-trade-balance': {
+      plainName: 'The goods trade balance',
+      oneLine: 'Whether Australia earned more from selling goods abroad than it spent on goods from abroad.',
+      ifRising: 'Export income is usually outpacing import spending.',
+      ifFalling: 'Import spending is usually catching up with export income.',
+      connections: [
+        { with: 'iron-ore', text: 'Iron ore is the largest single export earner.', strength: 'usually' },
+        { with: 'coal-aus', text: 'Coal prices shape the export side of the balance.', strength: 'usually' },
+        { with: 'audusd', text: 'A wide surplus usually supports the Australian dollar.', strength: 'usually' },
+      ],
+      australiaAngle: 'Australia\u2019s external engine: commodity prices set the surplus, and the surplus feeds national income.',
+      glossaryTerms: ['trade-balance', 'commodity'],
     },
   } satisfies Record<string, Layer1Entry>,
 };
@@ -4662,6 +4789,184 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'It is mostly the US-dollar gold price plus the AUD/USD rate: either can move it.',
     forYou:
       'The gold price Australians actually face when pricing coins, jewellery or metal funds.',
+  },
+  // gap-closure S5-M5.2 (2026-11-02): the Australian macro family — the
+  // activity lane's six cards, the external lane's balance, and the NOM
+  // companion that renders inside the population card.
+  'au-gdp-growth': {
+    name: 'Australian economic growth (real GDP)',
+    ticker: 'AU GDP',
+    oneLiner:
+      'How much Australia\u2019s economy grew over the past year, after inflation: the broadest activity gauge.',
+    lines: {
+      highRising: 'The Australian economy is growing faster than usual and accelerating.',
+      highEasing: 'Growth is strong for its decade but settling back.',
+      typical: 'Australian growth sits in its usual range for the decade.',
+      low: 'Growth is unusually weak: the economy is barely expanding.',
+    },
+    whatItIs:
+      'The annual change in Australia\u2019s inflation-adjusted gross domestic product (the ABS national accounts, quarterly, chain-volume levels; the annual rate is derived, and the quarterly change is cross-checked against the ABS\u2019s own published figures).',
+    whyItMatters:
+      'GDP sums everything the economy produces. Faster growth usually comes with more jobs and stronger pay; weak growth usually shows up in hiring first.',
+    tendedToMean:
+      'Australia famously avoided recession for three decades until 2020; its growth has since run near 1\u20132% a year, with commodity swings and population growth shaping the pace.',
+    cantTell:
+      'A national total hides the mix: population growth can keep GDP rising while output per person stalls.',
+    forYou:
+      'The activity lane\u2019s foundation: read it beside the spending, approvals and jobs cards for the fuller picture.',
+  },
+  'au-household-spending': {
+    name: 'Australian household spending (annual change)',
+    ticker: 'AU spending',
+    oneLiner:
+      'How much more or less Australian households spent over the past year.',
+    lines: {
+      highRising: 'Household spending is rising faster than usual: demand is strong.',
+      highEasing: 'Spending growth is high for its decade but cooling.',
+      typical: 'Spending growth sits in its usual range for the decade.',
+      low: 'Spending is unusually weak: households are holding back.',
+    },
+    whatItIs:
+      'The through-the-year change in the ABS Monthly Household Spending Indicator (bank-transactions data, current prices): the successor to the discontinued Retail Trade series.',
+    whyItMatters:
+      'Household spending is the largest share of the Australian economy; its pace usually leads jobs and steers the RBA\u2019s thinking on rates.',
+    tendedToMean:
+      'Spending swung wildly through the pandemic restrictions and their reopening, then settled back toward its usual pace.',
+    cantTell:
+      'Bank-transactions data is an estimate the ABS refines, and it covers spending by Australian households, not every dollar of domestic demand.',
+    forYou:
+      'The consumption pulse: compare it with the population card \u2014 spending per person is the sterner test.',
+  },
+  'au-building-approvals': {
+    name: 'Australian dwelling approvals',
+    ticker: 'AU approvals',
+    oneLiner:
+      'How many new homes were approved for construction this month: the housing supply pipeline\u2019s leading edge.',
+    lines: {
+      highRising: 'More homes than usual are being approved: the construction pipeline is filling.',
+      highEasing: 'Approvals remain high for their decade but are easing.',
+      typical: 'Dwelling approvals sit in their usual range for the decade.',
+      low: 'Approvals are unusually thin: fewer homes entering the pipeline.',
+    },
+    whatItIs:
+      'The number of new residential dwelling units approved in the month (the ABS Building Approvals survey, original terms \u2014 not seasonally adjusted; monthly figures move with the calendar).',
+    whyItMatters:
+      'An approval is the first hard step to a new home. Sustained low approvals usually mean less construction, tighter rental markets and more pressure on rents in the years ahead.',
+    tendedToMean:
+      'Approvals peaked with the 2021 construction boom and have run well below it since, while the population kept growing \u2014 the gap sits behind the tight rental market.',
+    cantTell:
+      'Not every approved dwelling is built, and original-terms months swing with seasonal patterns and approval processing rhythms.',
+    forYou:
+      'The future supply gauge for renters and homeowners: read it beside the rent and population cards.',
+  },
+  'au-population-growth': {
+    name: 'Australian population growth',
+    ticker: 'AU population',
+    oneLiner:
+      'How fast Australia\u2019s population grew over the past year.',
+    lines: {
+      highRising: 'The population is growing unusually fast: demand for homes and services is rising quickly.',
+      highEasing: 'Population growth is high for its decade but slowing.',
+      typical: 'Population growth sits in its usual range for the decade.',
+      low: 'Population growth is unusually weak.',
+    },
+    whatItIs:
+      'The annual change in the ABS estimated resident population (quarterly levels; the annual rate is derived). The card also shows net overseas migration \u2014 arrivals minus departures \u2014 for the latest quarter.',
+    whyItMatters:
+      'Population growth sets how many homes, schools and jobs the country needs. Fast growth with slow construction usually tightens the rental market.',
+    tendedToMean:
+      'Growth ran near record highs in 2023 as migration rebounded after the border closures, and has been easing since.',
+    cantTell:
+      'The ABS publishes this series with a long lag (the June-quarter figure arrives in December); the reading is the freshest official count, not this week\u2019s news.',
+    forYou:
+      'The demand side of the housing equation: read it beside approvals and rents.',
+  },
+  'au-nom': {
+    name: 'Net overseas migration',
+    ticker: 'Net migration',
+    oneLiner:
+      'How many more people moved to Australia than left, in the latest quarter.',
+    lines: {
+      highRising: 'Net migration is rising: population pressure on housing and services is building.',
+      highEasing: 'Net migration remains high but is easing.',
+      typical: 'Net migration sits in its usual range for the decade.',
+      low: 'Net migration is unusually low.',
+    },
+    whatItIs:
+      'The net overseas migration flow for the quarter, in thousands of people (the ABS population release). Rendered inside the population growth card as its migration component.',
+    whyItMatters:
+      'Migration is the swing factor in Australian population growth: it fills workplaces and adds housing demand at the same time.',
+    tendedToMean:
+      'The flow collapsed to near zero during the 2020\u201322 border closures, then rebounded sharply \u2014 the largest swings in the series\u2019 history.',
+    cantTell:
+      'A gross flow nets out big movements in both directions; it says nothing about who arrived or left.',
+    forYou: 'The migration piece of the population story, shown beside the annual growth rate.',
+  },
+  'au-participation': {
+    name: 'Australian participation rate',
+    ticker: 'AU participation',
+    oneLiner:
+      'The share of working-age Australians who have a job or are looking for one.',
+    lines: {
+      highRising: 'More people are joining the labour force: confidence in finding work is usually rising.',
+      highEasing: 'Participation is high for its decade but drifting down.',
+      typical: 'The participation rate sits in its usual range for the decade.',
+      low: 'Participation is unusually low: people are dropping out of the job search.',
+    },
+    whatItIs:
+      'The labour force (employed plus unemployed) as a share of the working-age population (the ABS Labour Force survey, persons, seasonally adjusted).',
+    whyItMatters:
+      'Participation sets how many workers the economy has. It can also shift the unemployment rate without any job being created or lost \u2014 more seekers can raise unemployment even while hiring holds.',
+    tendedToMean:
+      'Australian participation has climbed for years to record highs, driven by more women and older Australians staying in work.',
+    cantTell:
+      'A rate says nothing about hours or pay: high participation can sit beside rising underemployment.',
+    forYou:
+      'Read it beside the unemployment and underemployment cards \u2014 the three together describe the labour market.',
+  },
+  'au-underemployment': {
+    name: 'Australian underemployment rate',
+    ticker: 'AU underemployment',
+    oneLiner:
+      'People who have a job but want more hours, as a share of the labour force.',
+    lines: {
+      highRising: 'More workers want more hours than they are getting: hidden slack is building.',
+      highEasing: 'Underemployment is high for its decade but easing.',
+      typical: 'The underemployment rate sits in its usual range for the decade.',
+      low: 'Underemployment is unusually low: people who want more hours are usually finding them.',
+    },
+    whatItIs:
+      'Underemployed workers \u2014 employed people willing and available for more hours \u2014 as a proportion of the labour force (the ABS Labour Force survey, persons, seasonally adjusted).',
+    whyItMatters:
+      'Unemployment counts people without work; underemployment counts work that falls short. Together they measure the labour market\u2019s real slack, and underemployment usually moves first.',
+    tendedToMean:
+      'It fell through the 2020s labour shortage and remains low by its decade\u2019s standards \u2014 the quiet half of the tight labour market.',
+    cantTell:
+      'Wanting more hours is not the same as needing them: students and carers often prefer shorter hours.',
+    forYou:
+      'The job market\u2019s hidden gauge: it fills the gap the unemployment rate leaves.',
+  },
+  'au-trade-balance': {
+    name: 'Australian goods trade balance',
+    ticker: 'AU trade balance',
+    oneLiner:
+      'Whether Australia earned more or less from selling goods abroad than it spent on goods from abroad, in the latest month.',
+    lines: {
+      highRising: 'The goods surplus is unusually wide and widening.',
+      highEasing: 'The surplus is wide for its decade but narrowing.',
+      typical: 'The goods balance sits in its usual range for the decade.',
+      low: 'The goods balance is unusually weak, or in deficit.',
+    },
+    whatItIs:
+      'Goods exports minus goods imports for the month, in millions of Australian dollars (the ABS International Trade in Goods release, balance on goods, seasonally adjusted).',
+    whyItMatters:
+      'Commodity exports are Australia\u2019s external engine: a wide surplus usually comes with strong resource income and supports the Australian dollar; a narrowing balance usually reflects softer export prices.',
+    tendedToMean:
+      'Australia has run goods surpluses for most of the past decade as iron ore and energy exports grew; the balance swings with commodity prices.',
+    cantTell:
+      'A monthly balance is volatile, and the goods balance excludes services such as travel and education \u2014 two of Australia\u2019s larger export industries.',
+    forYou:
+      'The external lane\u2019s headline: read it beside iron ore, coal and LNG prices for the causes the balance records.',
   },
   // 2026-10-21 data-integrity round — the coverage additions (WTI,
   // natural gas, platinum, ETH, Bund/JGB/Gilt, BoJ/BoE rates, NZD/USD,
@@ -7376,6 +7681,9 @@ export const insightsCopyEn = {
     // gap-closure S4-M4.3 (2026-11-01): the geopolitics/supply lane — a
     // shadow gauge until S6 (the header reads "not scored yet").
     'geo-fragmentation': 'Is the world getting more fragmented?',
+    // gap-closure S5-M5.2 (2026-11-02): the two Australian shadow lanes.
+    'au-activity': 'Is the economy growing?',
+    'au-external': 'How is Australia\u2019s trade and China link?',
   },
 
   /** R30: SHORT gauge names for the hero: the reason line once embedded
@@ -7392,6 +7700,9 @@ export const insightsCopyEn = {
     'au-households': 'Households',
     'au-trade-currency': 'Trade & currency',
     'geo-fragmentation': 'Fragmentation',
+    // gap-closure S5-M5.2 (2026-11-02).
+    'au-activity': 'Activity',
+    'au-external': 'Trade & China',
   },
 
   /** The one-line answer under each gauge heading (L2). */
@@ -7407,6 +7718,10 @@ export const insightsCopyEn = {
     'au-trade-currency': 'Exports, imports and the Australian dollar.',
     'geo-fragmentation':
       'Measured world friction: tension news, policy fights and the sea gates trade passes through.',
+    'au-activity':
+      'The Australian economy\u2019s pace: output, spending, construction, population and the labour market.',
+    'au-external':
+      'Australia\u2019s goods trade and the commodity links that drive it.',
   },
 
   status: {
@@ -7512,6 +7827,13 @@ export const insightsCopyEn = {
     // gap-closure S4-M4.3 (2026-11-01): the chokepoint transits — the
     // 7-day average of the daily count ("45.3 transits a day").
     transits: 'transits a day',
+    // gap-closure S5-M5.2 (2026-11-02): the Australian macro family —
+    // dwelling approvals ("18,264 dwellings approved"), the migration
+    // flow in thousands ("101k people"), the goods balance in $ millions
+    // ("A$495m" — the aud-bn pattern's million sibling).
+    dwellings: 'dwellings approved',
+    'persons-k': 'k people',
+    'aud-m': 'm',
   },
 
   rule: {

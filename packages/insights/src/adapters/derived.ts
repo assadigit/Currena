@@ -517,6 +517,14 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   for (const [id, s] of Object.entries(inputs.rung4?.portwatch ?? {}) as [IndicatorId, SeriesPoint[]][]) {
     put(id, s);
   }
+  // gap-closure S5-M5.2 (2026-11-02): the Australian macro family —
+  // PRE-DERIVED by the Node venue's inline collect (adapters/abs-au.ts —
+  // the eight ABS fetches with GDP/population YoY computed from the
+  // levels). The Worker's 04:10 main rung passes nothing (the ids carry
+  // forward until the rung3 'abs-au-macro' phase patches them).
+  for (const [id, s] of Object.entries(inputs.rung4?.absAu ?? {}) as [IndicatorId, SeriesPoint[]][]) {
+    put(id, s);
+  }
   // Step-2 add-list §B5: the Cboe VIX close (daily, full history — the
   // stored history keeps the 10-year daily window the Step-3 verdicts
   // will compute their calm/nervous thresholds from).
@@ -1133,6 +1141,40 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'au-job-vacancies': {
     name: 'Australian Bureau of Statistics (JV, job vacancies)',
     url: 'https://data.api.abs.gov.au/rest/data/JV/M1.7.TOT.20.AUS.Q',
+  },
+  // gap-closure S5-M5.2 (2026-11-02): the Australian macro family's source
+  // lines (the rung3 'abs-au-macro' collection; every key verified M5.1).
+  'au-gdp-growth': {
+    name: 'Australian Bureau of Statistics (ANA_AGG, chain-volume GDP)',
+    url: 'https://data.api.abs.gov.au/rest/data/ANA_AGG/M1.GPM.20.AUS.Q',
+  },
+  'au-household-spending': {
+    name: 'Australian Bureau of Statistics (Monthly Household Spending Indicator)',
+    url: 'https://data.api.abs.gov.au/rest/data/HSI_M/9.TOT.CUR.10.AUS.M',
+  },
+  'au-building-approvals': {
+    name: 'Australian Bureau of Statistics (BA_GCCSA, dwelling approvals)',
+    url: 'https://data.api.abs.gov.au/rest/data/BA_GCCSA/1.1.9.1.100.10.AUS.M',
+  },
+  'au-population-growth': {
+    name: 'Australian Bureau of Statistics (ERP_COMP_Q, estimated resident population)',
+    url: 'https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/10.AUS.Q',
+  },
+  'au-nom': {
+    name: 'Australian Bureau of Statistics (ERP_COMP_Q, net overseas migration)',
+    url: 'https://data.api.abs.gov.au/rest/data/ERP_COMP_Q/9.AUS.Q',
+  },
+  'au-participation': {
+    name: 'Australian Bureau of Statistics (Labour Force)',
+    url: 'https://data.api.abs.gov.au/rest/data/LF/M12.3.1599.20.AUS.M',
+  },
+  'au-underemployment': {
+    name: 'Australian Bureau of Statistics (Labour Force, underemployment)',
+    url: 'https://data.api.abs.gov.au/rest/data/LF_UNDER/M23.3.1599.20.AUS.M',
+  },
+  'au-trade-balance': {
+    name: 'Australian Bureau of Statistics (ITGS, balance on goods)',
+    url: 'https://data.api.abs.gov.au/rest/data/ITGS/M1.170.20.AUS.M',
   },
   'breakeven-5y5y': {
     name: 'Federal Reserve Bank of St. Louis via FRED (T5YIFR)',

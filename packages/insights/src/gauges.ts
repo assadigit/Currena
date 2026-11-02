@@ -183,6 +183,32 @@ export const GAUGES: readonly GaugeDef[] = [
       'us-crude-production',
     ],
   },
+  // gap-closure S5-M5.2 (2026-11-02): the two Australian shadow lanes —
+  // "Is the economy growing?" and "How is Australia's trade and China
+  // link?". SHADOW gauges (G-5, the geo-fragmentation precedent): every
+  // member context-only until S6 promotes them, so votingCount stays 0,
+  // the step stays 0 (excluded from sectionVerdictStep by design — the
+  // Australia verdict is unchanged), and the lane headers read the "not
+  // scored yet" words. The spec's wider au-external membership (terms of
+  // trade, iron ore, coal, LNG, AUD/CNY) needs the S6 owner decision —
+  // moving the existing ids would reweight their current lanes (G-3).
+  {
+    id: 'au-activity',
+    section: 'australia',
+    members: [
+      'au-gdp-growth',
+      'au-household-spending',
+      'au-building-approvals',
+      'au-population-growth',
+      'au-participation',
+      'au-underemployment',
+    ],
+  },
+  {
+    id: 'au-external',
+    section: 'australia',
+    members: ['au-trade-balance'],
+  },
 ];
 
 export interface GaugeReading {

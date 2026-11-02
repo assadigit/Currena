@@ -145,7 +145,7 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 145 indicators (48 voting [V] + 97 context [C])
+### A. The 153 indicators (48 voting [V] + 105 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
@@ -452,7 +452,7 @@ days per chokepoint, zod both ways); the rung3 'portwatch' extra source
 (04:30, daily gate, budget 18) fetches + patches; the ids ride
 CARRY_FORWARD_IDS and the history phases exclude them.)*
 
-#### AUSTRALIA (23 indicators, 16 voting)
+#### AUSTRALIA (31 indicators, 16 voting)
 
 **Inflation and rates** (`au-inflation-rates` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -488,6 +488,42 @@ CARRY_FORWARD_IDS and the history phases exclude them.)*
 | [V] | `rba-fed-gap` | per-change | — | any-of | derived |
 | [C] | `gold-aud` | daily | 4 | info | derived |
 | [C] | `iron-ore` | monthly | 60 | info | world-bank |
+
+**Activity** (the `au-activity` lane — "Is the economy growing?", a SHADOW
+gauge until S6: every member context-only per G-5, the lane header reads
+"not scored yet", the Australia verdict untouched):
+| | id | cadence | maxAge | rule | source |
+|---|---|---|---|---|---|
+| [C] | `au-gdp-growth` | quarterly | 215 | info | abs |
+| [C] | `au-household-spending` | monthly | 75 | info | abs |
+| [C] | `au-building-approvals` | monthly | 75 | info | abs |
+| [C] | `au-population-growth` | quarterly | 270 | info | abs |
+| [C] | `au-nom` | quarterly | 270 | info | abs |
+| [C] | `au-participation` | monthly | 60 | info | abs |
+| [C] | `au-underemployment` | monthly | 60 | info | abs |
+
+*(gap-closure S5-M5.2, 2026-11-02: the Australian macro family — eight
+context cards riding the rung3 `abs-au-macro` extra source (8 ABS fetches,
+budget 22; the ANA_AGG GDP chain-volume levels with the YoY derived, the
+HSI_M household-spending indicator that REPLACED the CEASED Retail Trade
+flow, the BA_GCCSA dwelling approvals in original terms, the ERP_COMP_Q
+population + NOM pair, the LF M12 participation and LF_UNDER M23
+underemployment). `au-nom` is COMPANION-ONLY — it renders inside the
+population card (COMPANIONS['au-population-growth']), never its own lane
+row. Fixtures: `packages/insights/fixtures/s5/`.)*
+
+**External** (the `au-external` lane — "How is Australia's trade and China
+link?", a SHADOW gauge until S6, same discipline):
+| | id | cadence | maxAge | rule | source |
+|---|---|---|---|---|---|
+| [C] | `au-trade-balance` | monthly | 75 | info | abs |
+
+*(gap-closure S5-M5.2, 2026-11-02: the ABS's own "Balance on goods" series
+(ITGS DATA_ITEM 170, seasonally adjusted, $m — served by the provider,
+never computed). The spec's wider lane membership — terms of trade, iron
+ore, coal, LNG, AUD/CNY — needs the S6 owner decision: moving the existing
+ids would reweight their current lanes (G-3), so the S6 promotion proposal
+carries it.)*
 
 ### B. The markets board (16 world stock indices)
 
