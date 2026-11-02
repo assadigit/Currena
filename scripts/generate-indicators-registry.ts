@@ -18,7 +18,7 @@ import { DEFINITIONS } from '../packages/insights/src/definitions';
 // @ts-expect-error — same.
 import { READING_SOURCES } from '../packages/insights/src/adapters/derived';
 // @ts-expect-error — same.
-import { GAUGES } from '../packages/insights/src/gauges';
+import { GAUGES, isShadowGauge } from '../packages/insights/src/gauges';
 // @ts-expect-error — same.
 import { RULE_VERSION } from '../packages/insights/src/ruleVersion';
 // @ts-expect-error — same.
@@ -38,6 +38,9 @@ const auditPath = join(here, '..', 'data', 'indicator-audit.json');
 
 const gaugeOf = new Map<string, string>();
 for (const g of GAUGES) for (const id of g.members) gaugeOf.set(id, g.id);
+/** gap-closure S4-M4.5: the shadow gauges (all members context-only, G-5) —
+ * their members read as lane members, never as scored voters. */
+const SHADOW_GAUGE_IDS = new Set(GAUGES.filter(isShadowGauge).map((g) => g.id));
 
 /* ---------------- Step 3 §8: licence block + layer ---------------- */
 
@@ -259,7 +262,12 @@ const indicators = DEFINITIONS.map((def) => {
       group: def.group,
       gauge: gaugeOf.get(def.id) ?? null,
       gaugeMembership: gaugeOf.has(def.id)
-        ? 'scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)'
+        ? SHADOW_GAUGE_IDS.has(gaugeOf.get(def.id)!)
+          // gap-closure S4-M4.5 (2026-11-02): the geo-fragmentation shadow
+          // gauge's members are context-only lane members (G-5) — the gauge
+          // counts + stale badge read the lane, but they never vote.
+          ? 'shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)'
+          : 'scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)'
         : scored
           ? 'scored but outside the area counts (not expected — the sync test fails the run)'
           : 'context only — never counts',

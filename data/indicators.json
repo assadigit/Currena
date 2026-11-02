@@ -3269,7 +3269,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "portwatch",
@@ -3328,7 +3328,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "portwatch",
@@ -3387,7 +3387,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "portwatch",
@@ -3446,7 +3446,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "portwatch",
@@ -3505,7 +3505,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "portwatch",
@@ -3564,7 +3564,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "nyfed",
@@ -3623,7 +3623,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "eia",
@@ -3682,7 +3682,7 @@
         "section": "global",
         "group": "geo-fragmentation",
         "gauge": "geo-fragmentation",
-        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+        "gaugeMembership": "shadow-gauge lane member — counted in the lane, never votes until S6 promotes it (G-5)"
       },
       "source": {
         "provider": "eia",
