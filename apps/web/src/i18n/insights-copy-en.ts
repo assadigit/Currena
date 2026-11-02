@@ -409,6 +409,18 @@ const LAYER1 = {
       plain: 'The gap between what a country earns from selling goods abroad and what it spends on goods from abroad. A surplus means it earned more.',
       example: 'A goods surplus of A$495m means exports beat imports by 495 million Australian dollars that month.',
     },
+    // gap-closure S6-M6.2 (2026-11-02): the China property/steel pair's
+    // glossary terms.
+    'property-investment': {
+      term: 'property development investment',
+      plain: 'Money spent in China on building homes, offices and other property, counted while the construction happens. The yearly figure compares the year so far with the same stretch a year earlier.',
+      example: 'A reading of −20.6% for January to September means China spent 20.6% less on property development than in the same nine months a year earlier.',
+    },
+    'crude-steel': {
+      term: 'crude steel output',
+      plain: 'The first solid steel a mill makes, before it is rolled into sheets, beams or wire. Counting it raw measures how much steel-making, and so iron-ore buying, a country is doing.',
+      example: 'A monthly output of 7359 (10,000 tons) means China\u2019s mills made about 73.6 million tonnes of crude steel that month.',
+    },
   } satisfies Record<string, Layer1GlossaryEntry>,
 
   indicators: {
@@ -1771,7 +1783,7 @@ const LAYER1 = {
       glossaryTerms: [],
     },
 
-    /* ----- Batch 15 — au-trade-currency (6) ----- */
+    /* ----- Batch 15 — au-trade-currency (8) ----- */
     audusd: {
       plainName: 'The Australian dollar rate',
       oneLine: 'How many US dollars one Australian dollar buys.',
@@ -1847,6 +1859,33 @@ const LAYER1 = {
       ],
       australiaAngle: 'Iron ore funds Australian miners, budgets and the broader export-price story, and China’s building cycle dominates its demand.',
       glossaryTerms: [],
+    },
+    // gap-closure S6-M6.2 (2026-11-02): the China property/steel family
+    // (context-only, the au-trade-currency lane — the demand side of the
+    // iron-ore story, from the NBS's own English monthly releases).
+    'china-property-investment': {
+      plainName: 'China’s property building',
+      oneLine: 'How much China is spending on building property, compared with the same stretch of last year.',
+      ifRising: 'Chinese building is usually picking up, which tends to feed demand for steel and the materials in it.',
+      ifFalling: 'Chinese building is usually shrinking, which tends to drag on steel and the materials that feed it.',
+      connections: [
+        { with: 'iron-ore', text: 'Property building is a main end-use of the steel iron ore becomes.', strength: 'usually' },
+        { with: 'china-steel-output', text: 'Fewer building projects tend to mean less steel-making.', strength: 'usually' },
+      ],
+      australiaAngle: 'Australia’s biggest export answers to China’s building cycle: when Chinese property investment falls, the demand under iron ore usually thins.',
+      glossaryTerms: ['property-investment', 'commodity'],
+    },
+    'china-steel-output': {
+      plainName: 'China’s steel output',
+      oneLine: 'How much crude steel China’s mills made last month.',
+      ifRising: 'Mills are usually running harder, which tends to lift demand for iron ore.',
+      ifFalling: 'Mills are usually running slower, which tends to thin demand for iron ore.',
+      connections: [
+        { with: 'iron-ore', text: 'China’s steel mills are the main buyer of the iron ore Australia ships.', strength: 'reliable' },
+        { with: 'china-pmi', text: 'Steel output tends to move with broader Chinese factory activity.', strength: 'usually' },
+      ],
+      australiaAngle: 'The demand gauge under Australia’s biggest export: how much steel-making, and so iron-ore buying, China is doing.',
+      glossaryTerms: ['crude-steel', 'commodity'],
     },
 
     /* ----- Batch 16 — world stock markets: Asia-Pacific (7) ----- */
@@ -4035,6 +4074,52 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'A national average over a vast economy: it says nothing about any one province, and food and energy swings can mask the underlying trend for months.',
     forYou:
       'The China pair’s second card: read it with the factory PMI to judge whether Chinese demand is heating, cooling or stalling.',
+  },
+  // gap-closure S6-M6.2 (2026-11-02): the China property/steel family —
+  // the demand side of the iron-ore story (context-only).
+  'china-property-investment': {
+    name: 'China property investment (year-to-date, yearly)',
+    ticker: 'China property',
+    oneLiner:
+      'How much China is spending on building property this year versus last: the building-cycle gauge under the world’s biggest commodity demand.',
+    lines: {
+      highRising: 'Chinese property building is growing again and quickening: firm demand for steel and the materials in it.',
+      highEasing: 'Chinese property building is still growing, but more slowly.',
+      typical: 'Chinese property investment sits in its usual range for recent years.',
+      low: 'Chinese property building is falling steeply by the standards of the past two decades.',
+    },
+    whatItIs:
+      'The year-to-date year-on-year change in China’s real-estate development investment, published by the national statistics bureau in its own English monthly release and read verbatim from its summary table (the figures are cumulative: January to the stated month, compared with the same stretch a year earlier).',
+    whyItMatters:
+      'Property building is the single biggest end-use of Chinese steel, and Chinese steel-making is the main buyer of the iron ore Australia ships: when Chinese property investment falls, the demand under Australia’s biggest export usually thins.',
+    tendedToMean:
+      'Across the fifteen months through September 2026, the year-to-date reading has sat between −11.1% and −20.6%: it deepened through 2025 to −17.2% for the full year, briefly narrowed in early 2026, and then worsened again to the deepest reading of the stretch.',
+    cantTell:
+      'A cumulative year-to-date figure, not a single month: it smooths month-to-month swings, and it says nothing about any one city. January is not published on its own (the first release of each year covers January and February together).',
+    forYou:
+      'Read it beside China’s steel output: together they show whether the building-and-making demand under iron ore is thickening or thinning.',
+  },
+  'china-steel-output': {
+    name: 'China crude steel output (monthly)',
+    ticker: 'China steel',
+    oneLiner:
+      'How much crude steel China’s mills made last month: the demand gauge under the iron-ore price.',
+    lines: {
+      highRising: 'Chinese mills are running harder: demand for iron ore tends to firm.',
+      highEasing: 'Chinese steel output stays high but is easing.',
+      typical: 'Chinese steel output sits in its usual range for recent years.',
+      low: 'Chinese mills are running well below recent norms: thin demand for the raw materials, iron ore first.',
+    },
+    whatItIs:
+      'China’s monthly crude steel output in the statistics bureau’s own unit (10,000 tons), from the Output of Major Industrial Products table in its English monthly industrial-production release, read verbatim and cross-checked against the release’s own headline sentence.',
+    whyItMatters:
+      'China is the world’s largest steel maker, and its mills are the main buyer of the seaborne iron ore Australia ships: the output level is the most direct reading of how much iron-ore buying China is doing.',
+    tendedToMean:
+      'Across the sixteen months through September 2026, monthly output has run between about 68 and 87 million tonnes — drifting lower through late 2025, lifting in spring 2026, and easing again in the second half of the year.',
+    cantTell:
+      'A monthly level in tonnes, not a value: it says nothing about steel prices or mills’ profits. The spring-festival months publish no dedicated release of their own (January and February ride the combined national-economy release), so the series steps from December straight to March each year.',
+    forYou:
+      'Read it beside the iron-ore price: when output shifts, the price of Australia’s biggest export tends to feel it.',
   },
   'm2-us': {
     name: 'The amount of money in the US economy',
@@ -8133,6 +8218,10 @@ export const insightsCopyEn = {
     vacancies: 'k vacancies',
     // 2026-10-26 gap-audit build, A-6: crude stocks in millions of barrels.
     barrels: 'm barrels',
+    // gap-closure S6-M6.2 (2026-11-02): China's crude-steel output in
+    // millions of tonnes ("73.6m tonnes" — the NBS's own 10,000-ton unit,
+    // scaled).
+    tonnes: 'm tonnes',
     // gap-closure S4-M4.4 (2026-11-01): the US field production — a RATE
     // in millions of barrels per day ("13.99m barrels a day").
     'barrels-per-day': 'm barrels a day',
@@ -8349,6 +8438,25 @@ export const insightsCopyEn = {
           active: 'Right now {a}, {b}, {c}: the export chain is in place.',
           partly: 'Right now {a}, {b}, {c}: only part of the export chain is showing.',
           inactive: 'Right now {a}, {b}, {c}: the export chain is quiet.',
+          disagree: 'Right now {a}, {b}, {c}: the links point against each other.',
+          unknown: 'One link in this chain has no fresh data right now.',
+        },
+      },
+      // gap-closure S6-M6.2 (2026-11-02): the China demand/iron-ore card —
+      // the demand side of the iron-ore story, tendency words only.
+      'china-demand-iron-ore': {
+        name: 'China’s steel making and iron ore',
+        legs: {
+          'iron-ore': 'the iron-ore price',
+          'china-steel-output': 'China’s steel output',
+          'china-property-investment': 'China’s property building',
+        },
+        relation:
+          'China’s steel mills are the main buyer of the iron ore Australia ships, so when the mills run harder or slower the iron-ore price tends to feel it. Property building rides along as context: it is the biggest end-use of that steel, and it moves slowly.',
+        rightNow: {
+          active: 'Right now {a}, {b}, {c}: the demand chain is showing.',
+          partly: 'Right now {a}, {b}, {c}: only part of the demand chain is showing.',
+          inactive: 'Right now {a}, {b}, {c}: the demand chain is quiet.',
           disagree: 'Right now {a}, {b}, {c}: the links point against each other.',
           unknown: 'One link in this chain has no fresh data right now.',
         },

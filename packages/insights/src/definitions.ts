@@ -2812,6 +2812,61 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 60,
   },
   {
+    // gap-closure S6-M6.2 (2026-11-02): China's real-estate development
+    // investment, the year-to-date Y/Y the NBS itself publishes (the
+    // dedicated "Investment in Real Estate Development from January to
+    // <Month> <Year>" English release — Table 1's row, headline-
+    // cross-checked; the adapters/nbs.ts S6-M6.2 parse). The property
+    // downcycle is the main domestic drag on China's steel demand — the
+    // iron-ore relationship's supporting reading (the iron-terms-aud
+    // card's context leg, never a gate). Context-only per G-5; rides
+    // rung2's 21st-25th window gate (one index page + one release page).
+    id: 'china-property-investment',
+    section: 'australia',
+    group: 'au-trade-currency',
+    name: 'China property investment (year-to-date, yearly)',
+    source: 'nbs',
+    sourceRef:
+      'NBS English press release (Investment in Real Estate Development, Table 1 YTD year-on-year)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // The release publishes ~the 19th-20th of M+1 (verified: Jan-Sep out
+    // 2026-10-20) and the rung fetches on the 21st-25th window → the
+    // observation (month-end dated) is ~21-52 days old between refreshes;
+    // January is reporting-exempt (Jan-Feb combined) which the same
+    // window covers. 75 = the NZ monthly-mirror convention.
+    staleAfterDays: 75,
+  },
+  {
+    // gap-closure S6-M6.2 (2026-11-02): China's crude steel output — the
+    // month's level in the provider's own unit (10,000 tons), from the
+    // "Industrial Production Operation in <Month> <Year>" English
+    // release's Output of Major Industrial Products table (the
+    // rolled-steel prose cross-check pins the column alignment; the
+    // adapters/nbs.ts S6-M6.2 parse). The steel-output level is the
+    // demand side of the iron-ore price — the iron-terms-aud card's
+    // context leg, never a gate. Context-only per G-5; rides rung2's
+    // 21st-25th window gate (the same index page + one release page).
+    id: 'china-steel-output',
+    section: 'australia',
+    group: 'au-trade-currency',
+    name: 'China crude steel output (monthly)',
+    source: 'nbs',
+    sourceRef:
+      'NBS English press release (Industrial Production Operation, crude steel output, 10,000 tons)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // Same release cadence as china-property-investment (published
+    // ~the 19th-20th, fetched on the 21st-25th window; Jan-Feb combined
+    // in March — a combined release does not match the single-month
+    // title and the card honestly holds its previous point).
+    staleAfterDays: 75,
+  },
+  {
     id: 'gold-aud',
     section: 'australia',
     group: 'au-trade-currency',

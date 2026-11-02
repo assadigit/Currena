@@ -1392,6 +1392,16 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'National Bureau of Statistics of China (Consumer Price Index)',
     url: 'https://www.stats.gov.cn/english/PressRelease/',
   },
+  // gap-closure S6-M6.2 (2026-11-02): the China property/steel pair's
+  // reading sources (the same press-release index the china family rides).
+  'china-property-investment': {
+    name: 'National Bureau of Statistics of China (Investment in Real Estate Development)',
+    url: 'https://www.stats.gov.cn/english/PressRelease/',
+  },
+  'china-steel-output': {
+    name: 'National Bureau of Statistics of China (Industrial Production Operation, crude steel)',
+    url: 'https://www.stats.gov.cn/english/PressRelease/',
+  },
   'm2-us': { name: 'FRED (M2SL)', url: 'https://fred.stlouisfed.org/series/M2SL' },
   'us-unemployment': { name: 'FRED (UNRATE), US BLS', url: 'https://fred.stlouisfed.org/series/UNRATE' },
   'sahm-rule': {

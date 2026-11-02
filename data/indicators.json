@@ -8749,6 +8749,124 @@
       }
     },
     {
+      "id": "china-property-investment",
+      "title": "China property investment (year-to-date, yearly)",
+      "area": {
+        "section": "australia",
+        "group": "au-trade-currency",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "nbs",
+        "name": "National Bureau of Statistics of China (Investment in Real Estate Development)",
+        "url": "https://www.stats.gov.cn/english/PressRelease/",
+        "seriesIdOrTable": "NBS English press release (Investment in Real Estate Development, Table 1 YTD year-on-year)"
+      },
+      "publisher": "China NBS (English press releases)",
+      "publisherUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "methodUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "whatItIs": "The year-to-date year-on-year change in China’s real-estate development investment, published by the national statistics bureau in its own English monthly release and read verbatim from its summary table (the figures are cumulative: January to the stated month, compared with the same stretch a year earlier).",
+      "whatItIsnt": "A cumulative year-to-date figure, not a single month: it smooths month-to-month swings, and it says nothing about any one city. January is not published on its own (the first release of each year covers January and February together).",
+      "trackRecordNote": "Across the fifteen months through September 2026, the year-to-date reading has sat between −11.1% and −20.6%: it deepened through 2025 to −17.2% for the full year, briefly narrowed in early 2026, and then worsened again to the deepest reading of the stretch.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"When reprinting or quoting the contents of this website, be sure to indicate the words “Reprinted from (or quoted from) the website of the National Bureau of Statistics”\" + Section III Use of data item 1: \"You are allowed to download and use the statistical data on this website.\" — the publisher’s own affirmative permissions for attributed quotation and data download. Conditions kept: reasonable good-faith quoting for news/free-public-information purposes, no distortion of the original intention (values shown verbatim), attribution displayed on the cards. M7 (2026-10-26) flips the row from the M5 manual-entry regime to the automated fetch the ToS grants.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "legs": [
+          "nbs"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"Welcome to reprint or quote the contents of this website\" with the attribution line (\"Reprinted from (or quoted from) the website of the National Bureau of Statistics\"), and — Section III Use of data item 1 — \"You are allowed to download and use the statistical data on this website.\" The M7 automation (adapters/nbs.ts) reads the English press releases, shows the values verbatim with attribution, and keeps the good-faith/no-distortion condition; the M1 display permission (2026-10-23, no reuse prohibition found) is superseded by these affirmative quotes. data.stats.gov.cn easy-query is WAF-blocked (403, probed 2026-10-26) — the press releases are the only machine-readable path.",
+        "termsUrl": "https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html"
+      }
+    },
+    {
+      "id": "china-steel-output",
+      "title": "China crude steel output (monthly)",
+      "area": {
+        "section": "australia",
+        "group": "au-trade-currency",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "nbs",
+        "name": "National Bureau of Statistics of China (Industrial Production Operation, crude steel)",
+        "url": "https://www.stats.gov.cn/english/PressRelease/",
+        "seriesIdOrTable": "NBS English press release (Industrial Production Operation, crude steel output, 10,000 tons)"
+      },
+      "publisher": "China NBS (English press releases)",
+      "publisherUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "methodUrl": "https://www.stats.gov.cn/english/PressRelease/",
+      "whatItIs": "China’s monthly crude steel output in the statistics bureau’s own unit (10,000 tons), from the Output of Major Industrial Products table in its English monthly industrial-production release, read verbatim and cross-checked against the release’s own headline sentence.",
+      "whatItIsnt": "A monthly level in tonnes, not a value: it says nothing about steel prices or mills’ profits. The spring-festival months publish no dedicated release of their own (January and February ride the combined national-economy release), so the series steps from December straight to March each year.",
+      "trackRecordNote": "Across the sixteen months through September 2026, monthly output has run between about 68 and 87 million tonnes — drifting lower through late 2025, lifting in spring 2026, and easing again in the second half of the year.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"When reprinting or quoting the contents of this website, be sure to indicate the words “Reprinted from (or quoted from) the website of the National Bureau of Statistics”\" + Section III Use of data item 1: \"You are allowed to download and use the statistical data on this website.\" — the publisher’s own affirmative permissions for attributed quotation and data download. Conditions kept: reasonable good-faith quoting for news/free-public-information purposes, no distortion of the original intention (values shown verbatim), attribution displayed on the cards. M7 (2026-10-26) flips the row from the M5 manual-entry regime to the automated fetch the ToS grants.",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "legs": [
+          "nbs"
+        ]
+      },
+      "unit": "tonnes",
+      "changeUnit": "percent",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
+        "attributionText": "Source: National Bureau of Statistics of China",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "NBS Terms of Service (read 2026-10-26, stats.gov.cn/english/nbs/200701/t20070104_59236.html): \"Welcome to reprint or quote the contents of this website\" with the attribution line (\"Reprinted from (or quoted from) the website of the National Bureau of Statistics\"), and — Section III Use of data item 1 — \"You are allowed to download and use the statistical data on this website.\" The M7 automation (adapters/nbs.ts) reads the English press releases, shows the values verbatim with attribution, and keeps the good-faith/no-distortion condition; the M1 display permission (2026-10-23, no reuse prohibition found) is superseded by these affirmative quotes. data.stats.gov.cn easy-query is WAF-blocked (403, probed 2026-10-26) — the press releases are the only machine-readable path.",
+        "termsUrl": "https://www.stats.gov.cn/english/nbs/200701/t20070104_59236.html"
+      }
+    },
+    {
       "id": "gold-aud",
       "title": "Gold price in AUD",
       "area": {

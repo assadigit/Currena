@@ -1875,6 +1875,32 @@
       "rule": "{\"kind\":\"info\"}"
     },
     {
+      "id": "china-property-investment",
+      "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L1",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 75,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "china-steel-output",
+      "licenceName": "NBS Terms of Service — attributed quotation + data download granted",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L1",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 75,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "gold-aud",
       "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
       "publicDisplayOk": "yes",

@@ -31,6 +31,7 @@
     "markets-data-check": "tsx scripts/markets-data-check.ts",
     "markets-run": "tsx scripts/markets-run.ts",
     "markets-au-run": "tsx scripts/markets-au-run.ts",
+    "nbs-backfill": "tsx scripts/nbs-backfill.ts",
     "markets-backfill-chg5y": "tsx scripts/markets-backfill-chg5y.ts",
     "markets-backfill": "tsx scripts/markets-backfill.ts",
     "fx-run": "tsx scripts/fx-run.ts",

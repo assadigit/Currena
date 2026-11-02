@@ -13,7 +13,7 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 156-indicator dashboard
+## 1. What indicators Currena has — the 158-indicator dashboard
 
 The Insights page renders **145 indicators** across **2 sections** (Global
 99, Australia 23 — see the
@@ -46,7 +46,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | prices-board (not a gauge) | global | `brent`, `gold-usd`, `silver-usd`, `copper-usd`, `btc-usd`, `gold-btc`, `platinum` (some also count in their own gauge above) | 0 |
 | **au-inflation-rates** | australia | **au-cpi**, **au-trimmed-mean**, **rba-expectations**, **au-10y**, **au-us-10y-gap** + context: `au-petrol-yoy` | 5 |
 | **au-households** | australia | **au-home-loan**, **au-wage-growth**, **au-rent-yoy**, **au-household-debt-arrears**, **au-unemployment**, **au-home-values**, **au-housing-finance** + context: `au-deposit-rate`, `rba-cash-rate`, `au-saving-ratio`, `au-job-vacancies` | 7 |
-| **au-trade-currency** | australia | **audusd**, **audjpy**, **terms-of-trade**, **rba-fed-gap** + context: `iron-ore`, `coal-aus`, `lng-japan` (S4-M4.4: the energy export pair beside iron ore), `gold-aud` | 4 |
+| **au-trade-currency** | australia | **audusd**, **audjpy**, **terms-of-trade**, **rba-fed-gap** + context: `iron-ore`, `coal-aus`, `lng-japan` (S4-M4.4: the energy export pair beside iron ore), `gold-aud`, `china-property-investment` + `china-steel-output` (S6-M6.2: the China property/steel pair from the NBS's own English monthly releases — the demand side of the iron-ore story; rung2's 21st-25th window) | 4 |
 | **au-activity** (shadow, S5-M5.2) | australia | context only (never votes until S6): `au-gdp-growth` (the chain-volume GDP annual rate), `au-household-spending` (the CEASED Retail Trade flow's HSI successor), `au-building-approvals` (the dwelling-unit count, original terms), `au-population-growth` (the ERP annual rate, with the `au-nom` net-migration companion rendered inside its card), `au-participation`, `au-underemployment` (the LF_UNDER series the LF flow does not carry) | 0 |
 | **au-external** (shadow, S5-M5.2 + S6-M6.1) | australia | context only (never votes until S6): `au-trade-balance` (the ABS's own "Balance on goods", SA $m) + the New Zealand link family `audnzd` (AUD/NZD from the Frankfurter legs) / `nz-short-rate` (OECD FINMARK monthly average) / `nz-10y` (FRED OECD mirror) — included on the measured evidence (evidence/M6.1/). The spec's wider membership (terms of trade, iron ore, coal, LNG, AUD/CNY) needs the S6 owner decision — moving the existing ids would reweight their current lanes (G-3) | 0 |
 
@@ -54,7 +54,7 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (156 ids, alphabetical)
+### The complete indicator inventory (158 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -116,6 +116,8 @@ public-display-ok · scored voter? · short description.
 | `cftc-gold-positioning` | cftc | weekly | 12 | L0 | yes | ✓ | Trader positioning in gold (COT, net non-commercial share of OI) |
 | `coal-aus` | world-bank | monthly | 60 | L1 | yes | – | Australian coal price (Pink Sheet, $/mt — the Newcastle benchmark) |
 | `china-cpi` | nbs | monthly | 45 | L1 | yes | ✓ | China inflation (yearly) |
+| `china-property-investment` | nbs | monthly | 75 | L2 | yes | – | China real-estate development investment, YTD year-on-year % (S6-M6.2; the dedicated NBS English release, headline-cross-checked; rung2 21st-25th window) |
+| `china-steel-output` | nbs | monthly | 75 | L2 | yes | – | China crude steel output, monthly, 10,000 tons (S6-M6.2; the industrial-production release's products table, rolled-steel-cross-checked; rung2 21st-25th window) |
 | `china-pmi` | nbs | monthly | 45 | L1 | yes | ✓ | China manufacturing PMI |
 | `continuing-claims` | fred | weekly | 28 | L0 | yes | – | Americans receiving unemployment benefits (CCSA, the persistence read beside new claims) |
 | `copper-gold` | derived | monthly | 60 | L1 | yes | ✓ | Copper / Gold ratio |
@@ -280,7 +282,7 @@ L3 never used), the verbatim terms-lines quote, and the date read.
 | **mof** (Japan Ministry of Finance) | L0 | Japanese government statistical release — attribution displayed | jgb-10y daily (jgbcme.csv, 15 maturities) | **free forever**, keyless | no |
 | **ecb** (ECB Data Portal) | L1 | ECB website terms (free use, accurate + cited) | ecb-dfr, euro-aaa-10y, euro-hicp | **free forever**, keyless | no |
 | **boe** (Bank of England) | L2 (owner-accepted) | UK Open Government Licence v3.0 | boe-rate (Bank Rate decision table) | **free forever**, keyless | no |
-| **nbs** (China NBS English press releases) | L1 | NBS ToS — attributed quotation + data download granted | china-pmi, china-cpi | **free forever**, keyless | no |
+| **nbs** (China NBS English press releases) | L1 | NBS ToS — attributed quotation + data download granted | china-pmi, china-cpi, china-property-investment, china-steel-output | **free forever**, keyless | no |
 | **rba** (Reserve Bank of Australia) | L0 | CC BY 4.0 (most material) | cash rate, bond yields, loan/deposit rates, household ratios | **free forever**, keyless | no |
 | **abs** (Australian Bureau of Statistics) | L0 | CC BY 4.0 | au-cpi, jobs, wages, rents, home values, terms of trade + the S5-M5.2 macro family (GDP, household spending, approvals, population + NOM, participation, underemployment, goods balance — the rung3 `abs-au-macro` source) | **free forever**, keyless | no |
 | **frankfurter** (ECB rates via Frankfurter project) | L1 | ECB website terms (MIT code) | usdjpy, audusd, eur-usd, usdcny, usdtry + the dollar basket | **free forever**, keyless | no |
@@ -480,6 +482,7 @@ so a future owner can revisit if a source revives.
 | **Daily German Bund** (the OECD mirror's daily upgrade) | The ECB Data Portal carries no national benchmark yields (only the euro-area AAA curve, which the page already uses daily); the Bundesbank API is dead; Eurostat not disseminated. The bund-10y card stays on the OECD monthly mirror with its honest "monthly average, lagged" label. |
 | **Silver/Bitcoin ratio** | Fails the classic-indicator criteria (silver-btc was retired 2026-10-23 as the weaker twin of gold-btc). |
 | **Silver/Bitcoin stays unbuilt; Gold/Bitcoin stays context-only** | Per the spec's standing rule: gold-btc is context-only, never voting. |
+| **china-home-prices** (the NBS 70-cities new-home price index, S6-M6.2 2026-11-02) | The NBS English 70-cities release carries per-city tables ONLY (Table I/II by city pairs, Table III/IV by size class) — no aggregate row, no tier summary, no prose. A 70-city average would be OUR calculation, not the provider's published number. Rejected per G-4 (never invent a number); evidence at docs/gap-closure/evidence/M6.2/. |
 
 ### Known operational gaps — status after the 2026-10-28 R10 round
 

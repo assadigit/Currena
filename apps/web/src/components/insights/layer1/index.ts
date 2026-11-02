@@ -93,6 +93,8 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   'au-nom', 'au-participation', 'au-underemployment', 'au-trade-balance',
   // gap-closure S6-M6.1 (2026-11-02): the New Zealand link family.
   'audnzd', 'nz-short-rate', 'nz-10y',
+  // gap-closure S6-M6.2 (2026-11-02): the China property/steel family.
+  'china-property-investment', 'china-steel-output',
   'audusd', 'rba-fed-gap', 'audjpy', 'terms-of-trade', 'iron-ore', 'gold-aud',
   // Session 3 (GOLD_FRED_GAPFILL_SPEC G2, 2026-10-31): the breakeven
   // interplay context card → 102.

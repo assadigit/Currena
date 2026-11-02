@@ -877,6 +877,10 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // series (the bund-10y family).
   'nz-short-rate',
   'nz-10y',
+  // gap-closure S6-M6.2 (2026-11-02): China's real-estate investment
+  // growth — a year-on-year growth RATE whose changes are percentage
+  // points (the china-cpi family).
+  'china-property-investment',
 ]);
 
 function t10Units(): ValidationTestResult {

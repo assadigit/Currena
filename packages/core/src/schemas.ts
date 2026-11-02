@@ -448,6 +448,13 @@ export const IndicatorIdSchema = z.enum([
   'audnzd', // Frankfurter (ECB): NZD per AUD, derived from the two USD legs — context, au-external
   'nz-short-rate', // OECD FINMARK IR3TIB NZL (short-term interest rate, monthly average) — context, au-external
   'nz-10y', // FRED IRLTLT01NZM156N (NZ 10-year government bond yield, OECD monthly mirror) — context, au-external
+  // ---- gap-closure S6-M6.2 (2026-11-02): the China property/steel family
+  // — context rows in the au-trade-currency lane beside iron-ore (G-5),
+  // the demand side of the iron-ore story. From the NBS's own dedicated
+  // English monthly releases (fixtures nbs-realestate-release.html /
+  // nbs-indprod-release.html, both headline-cross-checked).
+  'china-property-investment', // NBS real-estate development investment, YTD year-on-year % — context, au-trade-currency
+  'china-steel-output', // NBS crude steel output, monthly, 10,000 tons — context, au-trade-currency
   // Global — Prices lane companions (context rows rendered in lanes)
   // 2026-10-26 gap-audit build (A-4): gold measured in oil — the classic
   // long-run relative-value ratio, derived gold-usd ÷ brent.

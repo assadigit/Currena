@@ -46,13 +46,14 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-/** The v1 connections (spec Block T1 note) + the S4-M4.5 trio — order = card order. */
+/** The v1 connections (spec Block T1 note) + the S4-M4.5 trio + the S6-M6.2 China-demand card — order = card order. */
 export type ConnectionId =
   | 'real-yields-gold'
   | 'dollar-gold-oil'
   | 'oil-expectations-costs'
   | 'copper-china-growth'
   | 'iron-terms-aud'
+  | 'china-demand-iron-ore'
   | 'rba-loan-debt'
   // gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy trio —
   // general tendencies only, never forecasts (the spec's wording rule).
@@ -236,6 +237,30 @@ export const CONNECTIONS: readonly ConnectionDef[] = [
       { id: 'terms-of-trade', role: 'required', windows: [{ days: 30, minMove: 1 }] },
       { id: 'audusd', role: 'required', windows: [{ days: 30, minMove: 2 }] },
       { id: 'dollar-basket', role: 'context', windows: [{ days: 30, minMove: 1 }] },
+    ],
+  },
+  // gap-closure S6-M6.2 (2026-11-02): China's building and steel demand
+  // and iron ore — the DEMAND side of the iron-ore story as its own card
+  // (the one-context-leg-per-card rule stands, so the China pair joins a
+  // dedicated relationship instead of appending legs to iron-terms-aud).
+  // China's steel mills are the main buyer of seaborne iron ore, and the
+  // property downcycle is the upstream driver of steel demand — so when
+  // steel output shifts, the iron-ore price tends to feel it. The
+  // property-investment reading rides as the card's one CONTEXT leg (the
+  // dollar-basket discipline: displayed, never gating). Trigger (E-19):
+  // iron ore. Tendency words only — the card never names a policy or
+  // event as a cause.
+  {
+    id: 'china-demand-iron-ore',
+    polarity: 'same',
+    legs: [
+      { id: 'iron-ore', role: 'required', windows: [{ days: 30, minMove: 5 }], trigger: true },
+      // a 300 (3 Mt) month-on-month shift in crude-steel output is a
+      // real move (the series moves ~300-1000 between months, seasonal)
+      { id: 'china-steel-output', role: 'required', windows: [{ days: 30, minMove: 300 }] },
+      // a 0.5pp month-on-month shift in the cumulative property growth
+      // rate is a real move (the series moves 0.2-1.5pp between releases)
+      { id: 'china-property-investment', role: 'context', windows: [{ days: 30, minMove: 0.5 }] },
     ],
   },
   // (6) the RBA cash rate and the home-loan rate and household debt — the

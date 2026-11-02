@@ -125,7 +125,7 @@ if (store !== undefined) {
 }
 const rung2Plan = rung2FetchPlanFor(new Date(), rung2Missing);
 console.log(
-  `[ingest] rung-2 inline plan - mof=${rung2Plan.mof} eiaWeekly=${rung2Plan.eiaWeekly} cftcWeekly=${rung2Plan.cftcWeekly} monthly=${rung2Plan.monthly} nzMonthly=${rung2Plan.nzMonthly}`,
+  `[ingest] rung-2 inline plan - mof=${rung2Plan.mof} eiaWeekly=${rung2Plan.eiaWeekly} cftcWeekly=${rung2Plan.cftcWeekly} monthly=${rung2Plan.monthly} nzMonthly=${rung2Plan.nzMonthly} nbsMonthly=${rung2Plan.nbsMonthly}`,
 );
 const rung2 = await collectRung2Sources(rung2Plan);
 for (const row of rung2.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.source} - ${row.detail}`);

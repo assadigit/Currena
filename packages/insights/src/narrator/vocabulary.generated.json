@@ -3,10 +3,10 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "296926abda0065c04d0a89b5940701bc7bba3c114dd65d6c64727c6654c71aab",
-    "faSha256": "ef828f68ba1ab24d1d1a7f8d7818bfe9d47f61e7d54ce11c924b5ed2b65e65a0",
-    "indicatorCount": 185,
-    "glossaryCount": 51
+    "enSha256": "9ce488f88abde0b29464f196e99ccaa141083c8b57169bc39482dad77b9a7224",
+    "faSha256": "c8f2e7d1038dd2fb8f04865cc95f13a278895495aff69ce35d04ff387259fe48",
+    "indicatorCount": 187,
+    "glossaryCount": 53
   },
   "en": {
     "indicators": {
@@ -2658,6 +2658,52 @@
         "australiaAngle": "Iron ore funds Australian miners, budgets and the broader export-price story, and China’s building cycle dominates its demand.",
         "glossaryTerms": []
       },
+      "china-property-investment": {
+        "plainName": "China’s property building",
+        "oneLine": "How much China is spending on building property, compared with the same stretch of last year.",
+        "ifRising": "Chinese building is usually picking up, which tends to feed demand for steel and the materials in it.",
+        "ifFalling": "Chinese building is usually shrinking, which tends to drag on steel and the materials that feed it.",
+        "connections": [
+          {
+            "with": "iron-ore",
+            "text": "Property building is a main end-use of the steel iron ore becomes.",
+            "strength": "usually"
+          },
+          {
+            "with": "china-steel-output",
+            "text": "Fewer building projects tend to mean less steel-making.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "Australia’s biggest export answers to China’s building cycle: when Chinese property investment falls, the demand under iron ore usually thins.",
+        "glossaryTerms": [
+          "property-investment",
+          "commodity"
+        ]
+      },
+      "china-steel-output": {
+        "plainName": "China’s steel output",
+        "oneLine": "How much crude steel China’s mills made last month.",
+        "ifRising": "Mills are usually running harder, which tends to lift demand for iron ore.",
+        "ifFalling": "Mills are usually running slower, which tends to thin demand for iron ore.",
+        "connections": [
+          {
+            "with": "iron-ore",
+            "text": "China’s steel mills are the main buyer of the iron ore Australia ships.",
+            "strength": "reliable"
+          },
+          {
+            "with": "china-pmi",
+            "text": "Steel output tends to move with broader Chinese factory activity.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "The demand gauge under Australia’s biggest export: how much steel-making, and so iron-ore buying, China is doing.",
+        "glossaryTerms": [
+          "crude-steel",
+          "commodity"
+        ]
+      },
       "n225": {
         "plainName": "Japan’s biggest companies",
         "oneLine": "One number for how Japan’s largest companies are doing.",
@@ -4174,6 +4220,16 @@
         "term": "trade balance",
         "plain": "The gap between what a country earns from selling goods abroad and what it spends on goods from abroad. A surplus means it earned more.",
         "example": "A goods surplus of A$495m means exports beat imports by 495 million Australian dollars that month."
+      },
+      "property-investment": {
+        "term": "property development investment",
+        "plain": "Money spent in China on building homes, offices and other property, counted while the construction happens. The yearly figure compares the year so far with the same stretch a year earlier.",
+        "example": "A reading of −20.6% for January to September means China spent 20.6% less on property development than in the same nine months a year earlier."
+      },
+      "crude-steel": {
+        "term": "crude steel output",
+        "plain": "The first solid steel a mill makes, before it is rolled into sheets, beams or wire. Counting it raw measures how much steel-making, and so iron-ore buying, a country is doing.",
+        "example": "A monthly output of 7359 (10,000 tons) means China’s mills made about 73.6 million tonnes of crude steel that month."
       }
     },
     "ui": {
@@ -6863,6 +6919,52 @@
         "australiaAngle": "سنگ‌آهن معدنکاران، بودجه و داستان قیمت صادرات استرالیا را تأمین می‌کند و چرخهٔ ساختمان چین بر تقاضایش حاکم است.",
         "glossaryTerms": []
       },
+      "china-property-investment": {
+        "plainName": "ساخت‌وساز مسکن چین",
+        "oneLine": "چین در سنجش با مدت مشابه سال گذشته چقدر برای ساخت‌وساز املاک خرج می‌کند.",
+        "ifRising": "ساخت‌وساز چین معمولاً جان می‌گیرد و این روند معمولاً تقاضای فولاد و مواد ساخت آن را تغذیه می‌کند.",
+        "ifFalling": "ساخت‌وساز چین معمولاً کوچک‌تر می‌شود و این روند معمولاً فولاد و مواد تغذیه‌کنندهٔ آن را پایین می‌کشد.",
+        "connections": [
+          {
+            "with": "iron-ore",
+            "text": "ساخت‌وساز املاک یکی از مصرف‌های اصلی فولادی است که از سنگ‌آهن به دست می‌آید.",
+            "strength": "usually"
+          },
+          {
+            "with": "china-steel-output",
+            "text": "پروژه‌های ساختمانی کمتر معمولاً به معنای فولادسازی کمتر است.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "بزرگ‌ترین صادرات استرالیا به چرخهٔ ساختمان چین پاسخ می‌دهد: وقتی سرمایه‌گذاری املاک چین افت می‌کند، تقاضای زیر سنگ‌آهن معمولاً نازک می‌شود.",
+        "glossaryTerms": [
+          "property-investment",
+          "commodity"
+        ]
+      },
+      "china-steel-output": {
+        "plainName": "تولید فولاد چین",
+        "oneLine": "کارخانه‌های فولاد چین ماه گذشته چقدر فولاد خام تولید کرده‌اند.",
+        "ifRising": "کارخانه‌ها معمولاً تندتر کار می‌کنند و این روند معمولاً تقاضای سنگ‌آهن را بالا می‌برد.",
+        "ifFalling": "کارخانه‌ها معمولاً کندتر کار می‌کنند و این روند معمولاً تقاضای سنگ‌آهن را کم می‌کند.",
+        "connections": [
+          {
+            "with": "iron-ore",
+            "text": "فولادسازهای چین بزرگ‌ترین خریدار سنگ‌آهنی هستند که استرالیا صادر می‌کند.",
+            "strength": "reliable"
+          },
+          {
+            "with": "china-pmi",
+            "text": "تولید فولاد معمولاً هم‌راه با فعالیت کلی کارخانه‌های چین حرکت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "australiaAngle": "نشانهٔ تقاضا زیر بزرگ‌ترین صادرات استرالیا: چین چقدر فولادسازی، و در نتیجه چقدر خرید سنگ‌آهن، انجام می‌دهد.",
+        "glossaryTerms": [
+          "crude-steel",
+          "commodity"
+        ]
+      },
       "n225": {
         "plainName": "شرکت‌های بزرگ ژاپن",
         "oneLine": "یک عدد برای وضعیت بزرگ‌ترین شرکت‌های ژاپن.",
@@ -8379,6 +8481,16 @@
         "term": "تراز تجاری",
         "plain": "فاصلهٔ آنچه یک کشور از فروش کالا در خارج به دست می‌آورد با آنچه برای کالای خارجی خرج می‌کند. مازاد یعنی بیشتر به دست آورده است.",
         "example": "مازاد کالایی ۴۹۵ میلیون دلار استرالیا یعنی صادرات آن ماه ۴۹۵ میلیون دلار از واردات جلو زده است."
+      },
+      "property-investment": {
+        "term": "سرمایه‌گذاری توسعهٔ املاک",
+        "plain": "پولی که در چین برای ساخت خانه، دفتر و سایر املاک خرج می‌شود و هم‌زمان با انجام ساخت‌وساز شمرده می‌شود. رقم سالانه، از ابتدای سال تا ماه جاری را با مدت مشابه سال قبل مقایسه می‌کند.",
+        "example": "رقم منفی ۲۰٫۶ درصد برای ژانویه تا سپتامبر یعنی چین در این نه ماه ۲۰٫۶ درصد کمتر از مدت مشابه سال قبل برای توسعهٔ املاک خرج کرده است."
+      },
+      "crude-steel": {
+        "term": "تولید فولاد خام",
+        "plain": "اولین فولاد جامدی که کارخانه پیش از نورد شدن به ورق، تیرآهن یا مفتول تولید می‌کند. شمارش خام نشان می‌دهد یک کشور چقدر فولادسازی، و در نتیجه چقدر خرید سنگ‌آهن، انجام می‌دهد.",
+        "example": "تولید ماهانهٔ ۷۳۵۹ (ده‌هزار تن) یعنی کارخانه‌های چین در آن ماه حدود ۷۳٫۶ میلیون تن فولاد خام ساخته‌اند."
       }
     },
     "ui": {

@@ -5,6 +5,53 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02h] — gap-closure S6-M6.2: the China property/steel family (the demand side of the iron-ore story — two context cards + the china-demand-iron-ore relationship)
+
+The NBS's own dedicated English monthly releases, both fail-closed with
+in-release cross-checks (each parser verifies its table row against the
+release's own headline sentence — a column shift can never pass silently):
+
+- **`china-property-investment`** — real-estate development investment,
+  the year-to-date year-on-year % from the dedicated release's Table 1
+  (`Investment in real estate development (100 million yuan)`), verified
+  against the headline's level (billion yuan × 10) and growth. Latest:
+  −20.6% for January–September 2026 (published 2026-10-20).
+- **`china-steel-output`** — crude steel monthly output in the provider's
+  own unit (10,000 tons), from the industrial-production release's
+  Output of Major Industrial Products table, verified against the
+  rolled-steel prose (million tons × 100 + the YoY). Latest: 7,359
+  (≈73.6m tonnes) for September 2026.
+
+**Five provider-side layout variants were verified and fixture-pinned**
+(the 2026 `from January to <Month> (in) <Year>` title vs the 2025
+`for January-<Month> <Year>` vs the annual `for <Year>`; the Jan-Feb
+combined release's missing `Table 1` prefix; the 2025 lowercase
+`Crude steel` row labels; the 2025 spelled-out `percent` prose) — six
+real-page fixtures, 31 parser tests. **`china-home-prices` REJECTED
+(G-4):** the 70-cities release is per-city tables only — no aggregate,
+no tier summary, no prose; a 70-city mean would be our own calculation,
+not the NBS's published number (evidence/M6.2/).
+
+Both cards are context-only per G-5, in the au-trade-currency lane
+beside iron-ore, and support a NEW "Together" relationship card —
+**`china-demand-iron-ore`** (iron ore required + trigger, steel output
+required, property investment the one context leg; the ≤1-context-leg
+integrity rule stands, so the pair joins a dedicated card rather than
+appending legs to iron-terms-aud). Tendency language only.
+
+Ingest: rung2's new **21st–25th UTC release window** (+ bootstrap) — the
+dedicated releases publish ~the 19th–20th of M+1, so the window keeps the
+newest release on index page 1 AND never coincides with the first-of-month
+gates (+3 subrequests on window days). The histories were backfilled from
+the provider's own releases via the new `nbs-backfill` Node runner (KV
+REST writes): 14 + 14 provider-exact points, Jul/Jun 2025 → Sep 2026.
+fa copy round-74 (64 strings + 1 re-review). The steel unit renders as
+"m tonnes" (the new `tonnes` unit token, scale 1e-2 from the NBS's own
+10,000-ton unit). Registry 156 → **158 indicators** (48 voting + 110
+context). Bundle: Insights lazy 1490/343 → **1510/347** (measured
+1502.19/346.42 — two cards' full EN+fa copy + the new relationship card).
+Gates: 14,073 → **14,257 tests green**.
+
 ## [2026-11-02g] — gap-closure S6-M6.1: the New Zealand link (the measured inclusion — the NZX 50 rider + audnzd + the two NZ rate mirrors)
 
 G-6 cleared on measured evidence (docs/gap-closure/evidence/M6.1/): the

@@ -123,6 +123,27 @@ export function parseNbsPressIndex(html: string, baseUrl: string): NbsReleaseLin
 
 const PMI_TITLE_RE = /^Purchasing Managers' Index for ([A-Z][a-z]+) (\d{4})$/;
 const CPI_TITLE_RE = /^Consumer Price Index in ([A-Z][a-z]+) (\d{4})$/;
+// gap-closure S6-M6.2 (2026-11-02): the China property/steel family's two
+// dedicated releases — FIXED title patterns (verified live 2026-11-02,
+// published 2026-10-20: "Investment in Real Estate Development from
+// January to September 2026" + "Industrial Production Operation in
+// September 2026"). The comprehensive "National Economy ..." release is
+// deliberately NOT matched: its title is a prose headline that changes
+// every month ("...was Generally Stable with New Achievement Made in..."),
+// not a machine-readable pattern — the dedicated per-topic releases are.
+// NOTE: the index's title attribute and the release page's own <title>
+// differ by one word — the index reads "...from January to September 2026"
+// while the release page reads "...from January to September in 2026"
+// (both verified from the provider's own bytes 2026-11-02) — so the
+// optional "in" accepts both observed forms, anchored everywhere else.
+// The 2025 releases used "for January-<Month> <Year>" (verified:
+// "...for January-November 2025", published 2025-12-16) and the annual
+// reads "for <Year>" (verified: "...for 2025", published 2026-01-20) —
+// all three forms accepted; the observation is the month-end of the
+// LAST month named (December for the annual).
+const REAL_ESTATE_TITLE_RE =
+  /^Investment in Real Estate Development (?:from January to ([A-Z][a-z]+) (?:in )?|for January-([A-Z][a-z]+) |for )(\d{4})$/;
+const INDUSTRIAL_PRODUCTION_TITLE_RE = /^Industrial Production Operation in ([A-Z][a-z]+) (\d{4})$/;
 
 /** The newest PMI release link on the scanned index pages (page order = newest first). */
 export function latestPmiRelease(links: readonly NbsReleaseLink[]): NbsReleaseLink | undefined {
@@ -132,6 +153,20 @@ export function latestPmiRelease(links: readonly NbsReleaseLink[]): NbsReleaseLi
 /** The newest CPI release link on the scanned index pages (page order = newest first). */
 export function latestCpiRelease(links: readonly NbsReleaseLink[]): NbsReleaseLink | undefined {
   return links.find((l) => CPI_TITLE_RE.test(l.title));
+}
+
+/** The newest real-estate-investment release link (S6-M6.2; the dedicated
+ *  release — the fixed-pattern "Investment in Real Estate Development from
+ *  January to <Month> in <Year>" title, verified live 2026-11-02). */
+export function latestRealEstateRelease(links: readonly NbsReleaseLink[]): NbsReleaseLink | undefined {
+  return links.find((l) => REAL_ESTATE_TITLE_RE.test(l.title));
+}
+
+/** The newest industrial-production release link (S6-M6.2; the fixed-pattern
+ *  "Industrial Production Operation in <Month> <Year>" title, verified live
+ *  2026-11-02 — carries the Output of Major Industrial Products table). */
+export function latestIndustrialProductionRelease(links: readonly NbsReleaseLink[]): NbsReleaseLink | undefined {
+  return links.find((l) => INDUSTRIAL_PRODUCTION_TITLE_RE.test(l.title));
 }
 
 /** Last calendar day of (year, month) as YYYY-MM-DD (UTC — a date, never a timestamp). */
@@ -300,6 +335,216 @@ export async function fetchNbsIndexPage(page: 1 | 2, deps: FetchDeps = {}): Prom
   return res.text();
 }
 
+/**
+ * Parse the real-estate-investment release into ONE observation: the
+ * year-to-date year-on-year growth of investment in real estate
+ * development (the spec's "year-to-date, annual %" reading), read from
+ * Table 1's "Investment in real estate development (100 million yuan)"
+ * row — the SECOND numeric cell is the Y/Y column — and cross-checked
+ * against the headline sentence ("the investment in real estate
+ * development was X,XXX.X billion yuan, a year-on-year decrease/increase
+ * of N%"): the level (billion yuan × 10 = the table's 100-million-yuan
+ * cell) AND the signed growth must agree, else FormatChangedError (a
+ * column shift can never pass silently).
+ *
+ * Verified live 2026-11-02 (the Jan-Sep 2026 release, published
+ * 2026-10-20): Table 1 row 53364 / -20.6; headline "5,336.4 billion
+ * yuan, a year-on-year decrease of 20.6%" → -20.6 @ 2026-09-30. The
+ * observation is dated to the MONTH-END of the title's "January to
+ * <Month>" (the china-pmi/cpi convention). January is reporting-exempt
+ * (the release's own Annotation 3) — the first release of each year
+ * covers Jan-Feb and reads "from January to February", which the title
+ * pattern matches with month = February.
+ */
+export function parseNbsRealEstateRelease(html: string): SeriesPoint[] {
+  const lines = cellText(html).split('\n');
+  // the observation date comes from the page title (three verified forms:
+  // the 2026 "from January to <Month> (in) <Year>", the 2025
+  // "for January-<Month> <Year>", and the annual "for <Year>")
+  const titleIdx = lines.findIndex((l) => REAL_ESTATE_TITLE_RE.test(l));
+  if (titleIdx < 0) {
+    throw new FormatChangedError(
+      'NBS real-estate release: the "Investment in Real Estate Development" title was not found',
+    );
+  }
+  const tm = REAL_ESTATE_TITLE_RE.exec(lines[titleIdx]!)!;
+  // the annual form (no month named) reads as December
+  const monthName = tm[1] ?? tm[2] ?? 'December';
+  const month = MONTHS[monthName];
+  const year = Number(tm[3]!);
+  if (month === undefined || !Number.isFinite(year)) {
+    throw new FormatChangedError(`NBS real-estate release: unparsable month/year "${monthName} ${tm[3]}"`);
+  }
+  const date = monthEnd(year, month);
+  // Table 1 — the summary table (shape-validated: the column headers must
+  // sit between the table title and the row, so a renamed column fails).
+  // NOTE: the table title carries THREE verified variants — the 2026
+  // monthly "Table 1 Real Estate Development and Sales from January to
+  // <Month> <Year>", the combined Jan-Feb form WITHOUT the "Table 1"
+  // prefix, the 2025 "Real Estate Development and Sales for
+  // January-<Month> <Year>" and the annual "... for <Year>" (all
+  // verified from the provider's own pages 2026-11-02) — "from" and
+  // "for" both accepted, the prefix optional.
+  const tableIdx = lines.findIndex(
+    (l) => /^(?:Table 1\s+)?Real Estate Development and Sales (?:from|for)/.test(l),
+  );
+  if (tableIdx < 0) {
+    throw new FormatChangedError('NBS real-estate release: the Table 1 header was not found (layout changed?)');
+  }
+  const rowIdx = lines.findIndex((l, k) => k > tableIdx && l === 'Investment in real estate development (100 million yuan)');
+  if (rowIdx < 0) {
+    throw new FormatChangedError('NBS real-estate release: the investment row was not found');
+  }
+  const headerSlice = lines.slice(tableIdx, rowIdx).join('\n');
+  if (!/Absolute Value/.test(headerSlice) || !/Growth Rate Y\/Y/.test(headerSlice)) {
+    throw new FormatChangedError(
+      'NBS real-estate release: the Table 1 column headers (Absolute Value / Growth Rate Y/Y) were not found (layout changed?)',
+    );
+  }
+  // the row cells: [absolute (100 million yuan), Y/Y %]
+  const cells: number[] = [];
+  let j = rowIdx + 1;
+  while (cells.length < 2 && j < lines.length && isNumber(lines[j]!)) {
+    cells.push(Number(lines[j]!));
+    j++;
+  }
+  if (cells.length < 2) {
+    throw new FormatChangedError('NBS real-estate release: the investment row carried no Y/Y cell');
+  }
+  const absolute = cells[0]!;
+  const value = cells[1]!;
+  if (!Number.isFinite(value) || value < -60 || value > 60) {
+    throw new FormatChangedError(`NBS real-estate release: out-of-range YTD Y/Y value ${value} for ${date}`);
+  }
+  // the headline cross-check (the paragraph before the table — applied
+  // when present, like the CPI parser; a DISAGREEMENT always throws)
+  const headlineIdx = lines.findIndex(
+    (l, k) =>
+      k < tableIdx &&
+      /investment in real estate development was [\d,.]+ billion yuan, a year-on-year (decrease|increase) of \d+(\.\d+)?%/.test(l),
+  );
+  if (headlineIdx >= 0) {
+    const headline = lines[headlineIdx]!;
+    const m = /investment in real estate development was ([\d,.]+) billion yuan, a year-on-year (decrease|increase) of (\d+(?:\.\d+)?)%/.exec(
+      headline,
+    );
+    if (m !== null) {
+      const levelBillion = Number(m[1]!.replace(/,/g, ''));
+      const growth = m[2] === 'decrease' ? -Number(m[3]!) : Number(m[3]!);
+      // 1 billion yuan = 10 × 100 million yuan (the table's own unit)
+      if (Math.abs(levelBillion * 10 - absolute) > 1) {
+        throw new FormatChangedError(
+          `NBS real-estate release: the headline level ${m[1]} billion yuan disagrees with the table's ${absolute} (100 million yuan) for ${date}`,
+        );
+      }
+      if (Math.abs(growth - value) > 0.05) {
+        throw new FormatChangedError(
+          `NBS real-estate release: the headline ${growth}% disagrees with the table Y/Y ${value}% for ${date}`,
+        );
+      }
+    }
+  }
+  return [{ date, value }];
+}
+
+/**
+ * Parse the industrial-production release into ONE observation: the
+ * month's crude steel output in the provider's own unit (10,000 tons),
+ * read from the "Output of Major Industrial Products of Enterprises
+ * Above the Designated Size" table's "Crude Steel (10,000 tons)" row —
+ * the FIRST numeric cell is the month's absolute output (the row's four
+ * cells are [month, month Y/Y %, Jan-current YTD, YTD Y/Y %], verified
+ * against the provider's own layout 2026-11-02) — and cross-checked
+ * against the headline sentence's rolled-steel figure ("the output of
+ * rolled steel was 118.17 million tons, down by 3.8% year on year"):
+ * the Rolled Steel row's first cell must equal the prose level × 100
+ * (million tons → 10,000 tons; 118.17 × 100 = 11817) and its second cell
+ * must equal the prose Y/Y — a column shift can never pass silently. Some
+ * neighbour rows carry the provider's own masked cells (an ellipsis),
+ * which the row scan simply stops at.
+ *
+ * Verified live 2026-11-02 (the Sep-2026 release, published 2026-10-20):
+ * Crude Steel row 7359 / 0.1 / 72477 / -2.9; rolled-steel prose
+ * 118.17 million tons / -3.8% against the Rolled Steel row 11817 / -3.8
+ * → 7359 @ 2026-09-30. The observation is dated to the release month's
+ * end. NOTE: the Jan/Feb releases combine the two months (verified
+ * wording to be captured when one is next seen — until then a combined
+ * release simply does not match the single-month title pattern and the
+ * card honestly holds its previous point).
+ */
+export function parseNbsIndustrialProductionRelease(html: string): SeriesPoint[] {
+  const lines = cellText(html).split('\n');
+  // the observation date comes from the page title
+  const titleIdx = lines.findIndex((l) => INDUSTRIAL_PRODUCTION_TITLE_RE.test(l));
+  if (titleIdx < 0) {
+    throw new FormatChangedError('NBS industrial-production release: the "Industrial Production Operation in <Month> <Year>" title was not found');
+  }
+  const tm = INDUSTRIAL_PRODUCTION_TITLE_RE.exec(lines[titleIdx]!)!;
+  const month = MONTHS[tm[1]!];
+  const year = Number(tm[2]!);
+  if (month === undefined || !Number.isFinite(year)) {
+    throw new FormatChangedError(`NBS industrial-production release: unparsable month/year "${tm[1]} ${tm[2]}"`);
+  }
+  const date = monthEnd(year, month);
+  // the products table (shape anchor). NOTE: the header's wording changed
+  // between 2025 and 2026 — the 2025 releases read "Output of Major
+  // Industrial Products Above the Designated Size" while the 2026 ones
+  // insert "of Enterprises" (both verified from the provider's own pages
+  // 2026-11-02: t20251022_1961661 vs t20261020_1965665) — both accepted.
+  const tableIdx = lines.findIndex((l) =>
+    /^Output of Major Industrial Products (?:of Enterprises )?Above the Designated Size$/.test(l),
+  );
+  if (tableIdx < 0) {
+    throw new FormatChangedError('NBS industrial-production release: the products table was not found (layout changed?)');
+  }
+  // The row labels' CASE changed between 2025 releases — August 2025
+  // reads "Crude steel (10,000 tons)" where September 2025 onward reads
+  // "Crude Steel (10,000 tons)" (both verified from the provider's own
+  // pages 2026-11-02) — both accepted, the unit anchor stays exact.
+  const readRow = (label: RegExp): { cells: number[]; idx: number } | undefined => {
+    const idx = lines.findIndex((l, k) => k > tableIdx && label.test(l));
+    if (idx < 0) return undefined;
+    const cells: number[] = [];
+    let j = idx + 1;
+    while (cells.length < 4 && j < lines.length && isNumber(lines[j]!)) {
+      cells.push(Number(lines[j]!));
+      j++;
+    }
+    return { cells, idx };
+  };
+  const steelRow = readRow(/^Crude [Ss]teel \(10,000 tons\)$/);
+  if (steelRow === undefined || steelRow.cells.length < 2) {
+    throw new FormatChangedError('NBS industrial-production release: the Crude Steel row was not found');
+  }
+  const value = steelRow.cells[0]!;
+  if (!Number.isFinite(value) || value <= 0 || value > 20000) {
+    throw new FormatChangedError(`NBS industrial-production release: out-of-range crude-steel output ${value} for ${date}`);
+  }
+  // the rolled-steel prose cross-check (applied when the sentence is
+  // present, like the CPI headline check; a DISAGREEMENT always throws).
+  // The 2025 releases spell "up by 5.1 percent" where the 2026 ones write
+  // "down by 3.8%" — both forms accepted (verified live 2026-11-02).
+  const headlineIdx = lines.findIndex(
+    (l) => /output of rolled steel was \d[\d,.]* million tons, (down|up) by \d+(\.\d+)?( percent|%)/.test(l),
+  );
+  if (headlineIdx >= 0) {
+    const m = /output of rolled steel was (\d[\d,.]*) million tons, (down|up) by (\d+(?:\.\d+)?)(?: percent|%)/.exec(
+      lines[headlineIdx]!,
+    );
+    const rolledRow = m !== null ? readRow(/^Rolled [Ss]teel \(10,000 tons\)$/) : undefined;
+    if (m !== null && rolledRow !== undefined && rolledRow.cells.length >= 2) {
+      const proseLevel = Number(m[1]!.replace(/,/g, '')) * 100; // million tons → 10,000 tons (× 100)
+      const proseYoy = m[2] === 'down' ? -Number(m[3]!) : Number(m[3]!);
+      if (Math.abs(proseLevel - rolledRow.cells[0]!) > 1 || Math.abs(proseYoy - rolledRow.cells[1]!) > 0.05) {
+        throw new FormatChangedError(
+          `NBS industrial-production release: the rolled-steel cross-check failed for ${date} — the prose says ${m[1]} million tons / ${proseYoy}%, the table says ${rolledRow.cells[0]} / ${rolledRow.cells[1]} (a column shift?)`,
+        );
+      }
+    }
+  }
+  return [{ date, value }];
+}
+
 /** Fetch + parse a PMI release page (Table 1's 13-month history). */
 export async function fetchNbsPmiRelease(url: string, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
   const res = await insightsFetch(url, {}, { timeoutMs: deps.timeoutMs ?? 45_000, ...deps });
@@ -310,4 +555,18 @@ export async function fetchNbsPmiRelease(url: string, deps: FetchDeps = {}): Pro
 export async function fetchNbsCpiRelease(url: string, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
   const res = await insightsFetch(url, {}, { timeoutMs: deps.timeoutMs ?? 45_000, ...deps });
   return parseNbsCpiRelease(await res.text());
+}
+
+/** Fetch + parse a real-estate-investment release page (S6-M6.2: the
+ *  year-to-date Y/Y observation). */
+export async function fetchNbsRealEstateRelease(url: string, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const res = await insightsFetch(url, {}, { timeoutMs: deps.timeoutMs ?? 45_000, ...deps });
+  return parseNbsRealEstateRelease(await res.text());
+}
+
+/** Fetch + parse an industrial-production release page (S6-M6.2: the
+ *  month's crude-steel output observation). */
+export async function fetchNbsIndustrialProductionRelease(url: string, deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const res = await insightsFetch(url, {}, { timeoutMs: deps.timeoutMs ?? 45_000, ...deps });
+  return parseNbsIndustrialProductionRelease(await res.text());
 }

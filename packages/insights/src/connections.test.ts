@@ -370,6 +370,9 @@ describe('evaluateConnection (v2 rules)', () => {
       // Iron ore (the E-19 trigger) is steady; only the AUD moves (down,
       // past 2%) — without the trigger the export chain is not in play.
       'iron-terms-aud': 'inactive',
+      // S6-M6.2: the China-demand card's legs are absent from this v1-era
+      // fixture — the card reads unknown (a required leg has no reading).
+      'china-demand-iron-ore': 'unknown',
       // The Sep 30 hike is newer than the August loan data.
       'rba-loan-debt': 'pending',
       // S4-M4.5: the trio's legs are absent from this v1-era fixture —
@@ -493,6 +496,8 @@ describe('CONNECTIONS table integrity', () => {
       'rba-cash-rate', 'au-home-loan', 'au-household-debt-arrears', 'silver-usd',
       // gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy trio's legs.
       'chokepoint-suez', 'gpr-index', 'lng-japan', 'coal-aus', 'gscpi', 'us-cpi-yoy',
+      // gap-closure S6-M6.2 (2026-11-02): the China-demand card's legs.
+      'china-steel-output', 'china-property-investment',
     ]);
     for (const c of CONNECTIONS) {
       expect(c.legs.length).toBeGreaterThanOrEqual(2);
@@ -514,6 +519,9 @@ describe('CONNECTIONS table integrity', () => {
       'oil-expectations-costs',
       'copper-china-growth',
       'iron-terms-aud',
+      // gap-closure S6-M6.2 (2026-11-02): the China demand/iron-ore card —
+      // beside the iron-ore export chain it complements.
+      'china-demand-iron-ore',
       'rba-loan-debt',
       // gap-closure S4-M4.5 (2026-11-01): the geopolitics/supply/energy
       // relationship trio — general tendencies only, never forecasts.

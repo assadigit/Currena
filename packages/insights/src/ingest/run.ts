@@ -832,7 +832,7 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   const missing = new Set<string>(RUNG2_IDS.filter((id) => (stage ? stage.series[id] === undefined : true)));
   const plan = opts.plan ?? rung2FetchPlanFor(now, missing);
   console.log(
-    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} nzMonthly=${plan.nzMonthly}` +
+    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly}` +
       (stage === undefined ? ' (no stage — the Node/manual venue)' : ` (bootstrap-missing: ${[...missing].join(', ') || 'none'})`),
   );
 
@@ -960,6 +960,12 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     // same merge (full history per fetch, fetched wins on collision).
     'nz-short-rate',
     'nz-10y',
+    // gap-closure S6-M6.2 (2026-11-02): the NBS China pair joins the same
+    // merge — each release carries only its own month, so the STORED
+    // accumulation (this phase's own written-back history) grows the
+    // series month by month (the china-cpi union discipline).
+    'china-property-investment',
+    'china-steel-output',
   ] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;

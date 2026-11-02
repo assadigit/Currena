@@ -890,7 +890,13 @@ const BUDGETS = [
   // copy: INDICATORS + layer1 + the au-external lane copy) + the markets-au
   // NZX 50 rider (the newzealand group + entries + the currency note).
   // Measured 1484.51/341.88.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1490_000, gz: 343_000, label: 'Insights lazy chunk' },
+  // gap-closure S6-M6.2 (2026-11-02, CHANGELOG §2026-11-02h): 1490→1510 /
+  // 343→347 — the China property/steel family (two context cards' full
+  // EN+fa copy: INDICATORS + layer1 + the au-trade-currency lane entries +
+  // the two glossary terms + the 'tonnes' unit label) + the NEW
+  // china-demand-iron-ore relationship card (the connections copy EN+fa).
+  // Measured 1502.19/346.42.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1510_000, gz: 347_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

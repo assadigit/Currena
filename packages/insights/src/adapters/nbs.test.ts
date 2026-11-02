@@ -6,6 +6,14 @@
  * the expectations are the NBS's own, cross-checked against the committed
  * china-pmi seed for all 10 overlapping observations), plus synthetic
  * pages for the failure modes (the boe.test.ts conventions).
+ *
+ * gap-closure S6-M6.2 (2026-11-02): the China property/steel family — the
+ * index scan's two new link finders + the real-estate YTD parse + the
+ * crude-steel output parse, against TRIMMED CAPTURES OF THE REAL PAGES
+ * (read 2026-11-02: the live index page 1, the Jan-Sep 2026 real-estate
+ * release and the Sep-2026 industrial production release — every expected
+ * value is the NBS's own, cross-checked table-vs-headline inside the
+ * parser itself).
  */
 
 import { readFileSync } from 'node:fs';
@@ -14,10 +22,14 @@ import { describe, expect, it } from 'vitest';
 import {
   NBS_PRESS_INDEX_URL,
   latestCpiRelease,
+  latestIndustrialProductionRelease,
   latestPmiRelease,
+  latestRealEstateRelease,
   parseNbsCpiRelease,
+  parseNbsIndustrialProductionRelease,
   parseNbsPmiRelease,
   parseNbsPressIndex,
+  parseNbsRealEstateRelease,
 } from './nbs';
 
 const FIXTURES = join(__dirname, '..', '..', 'fixtures');
@@ -176,5 +188,188 @@ describe('nbs adapter — the CPI YoY parse (the real Sep-2026 release)', () => 
   it('fails loudly when the title/table row is missing (layout changed)', () => {
     const broken = fixture('nbs-cpi-release.html').replace(/Consumer Price Indexes in September 2026/, 'Prices 2026');
     expect(() => parseNbsCpiRelease(broken)).toThrowError(/summary table header was not found/);
+  });
+});
+
+describe('nbs adapter — the S6-M6.2 link finders (the live 2026-11-02 index)', () => {
+  it('finds the Jan-Sep 2026 real-estate release (published 2026-10-20)', () => {
+    const links = parseNbsPressIndex(fixture('nbs-press-index-3.html'), NBS_PRESS_INDEX_URL);
+    const re = latestRealEstateRelease(links);
+    expect(re).toBeDefined();
+    expect(re!.title).toBe('Investment in Real Estate Development from January to September 2026');
+    expect(re!.url).toBe('https://www.stats.gov.cn/english/PressRelease/202610/t20261020_1965663.html');
+    expect(re!.published).toBe('2026-10-20');
+  });
+
+  it('finds the Sep-2026 industrial production release (published 2026-10-20)', () => {
+    const links = parseNbsPressIndex(fixture('nbs-press-index-3.html'), NBS_PRESS_INDEX_URL);
+    const ip = latestIndustrialProductionRelease(links);
+    expect(ip).toBeDefined();
+    expect(ip!.title).toBe('Industrial Production Operation in September 2026');
+    expect(ip!.url).toBe('https://www.stats.gov.cn/english/PressRelease/202610/t20261020_1965665.html');
+    expect(ip!.published).toBe('2026-10-20');
+  });
+
+  it('rejects the headline-style National Economy release (its title varies)', () => {
+    // the comprehensive release is NOT the machine-readable path: its title
+    // is a prose headline ("...was Generally Stable with..."), not a fixed
+    // pattern — the dedicated per-topic releases are
+    const links = parseNbsPressIndex(fixture('nbs-press-index-3.html'), NBS_PRESS_INDEX_URL);
+    expect(
+      links.some((l) => /National Economy/.test(l.title) && latestRealEstateRelease([l]) !== undefined),
+    ).toBe(false);
+  });
+});
+
+describe('nbs adapter — the real-estate YTD parse (the real Jan-Sep 2026 release)', () => {
+  it('parses the YTD YoY (-20.6% @ 2026-09-30) with the headline cross-check agreeing', () => {
+    const out = parseNbsRealEstateRelease(fixture('nbs-realestate-release.html'));
+    expect(out).toEqual([{ date: '2026-09-30', value: -20.6 }]);
+  });
+
+  it('parses a growth month (synthetic, the wording verified against the real page)', () => {
+    const html = `<!DOCTYPE html><html><body>
+      <p>Investment in Real Estate Development from January to June in 2025</p>
+      <p>From January to June, the investment in real estate development was 5,000.0 billion yuan, a year-on-year increase of 1.2%.</p>
+      <p>Table 1 Real Estate Development and Sales from January to June 2025</p>
+      <p>Indicator</p>
+      <p>Absolute Value</p>
+      <p>Growth Rate Y/Y (%)</p>
+      <p>Investment in real estate development (100 million yuan)</p><p>50000</p><p>1.2</p>
+      <p>Of which: Residential buildings</p><p>38000</p><p>0.5</p>
+    </body></html>`;
+    expect(parseNbsRealEstateRelease(html)).toEqual([{ date: '2025-06-30', value: 1.2 }]);
+  });
+
+  it('parses the combined January-February release (the real 2026 pair — no Table 1 prefix, −11.1 @ 2026-02-28)', () => {
+    const out = parseNbsRealEstateRelease(fixture('nbs-realestate-release-janfeb.html'));
+    expect(out).toEqual([{ date: '2026-02-28', value: -11.1 }]);
+  });
+
+  it('parses the 2025 title form (for January-November 2025: −15.9 @ 2025-11-30)', () => {
+    const out = parseNbsRealEstateRelease(fixture('nbs-realestate-release-nov2025.html'));
+    expect(out).toEqual([{ date: '2025-11-30', value: -15.9 }]);
+  });
+
+  it('parses the ANNUAL form (for 2025: −17.2 @ 2025-12-31)', () => {
+    const out = parseNbsRealEstateRelease(fixture('nbs-realestate-release-annual2025.html'));
+    expect(out).toEqual([{ date: '2025-12-31', value: -17.2 }]);
+  });
+
+  it('fails loudly when the headline and the table disagree (a column shift)', () => {
+    const html = `<!DOCTYPE html><html><body>
+      <p>Investment in Real Estate Development from January to September in 2026</p>
+      <p>From January to September, the investment in real estate development was 5,336.4 billion yuan, a year-on-year decrease of 20.6%.</p>
+      <p>Table 1 Real Estate Development and Sales from January to September 2026</p>
+      <p>Indicator</p>
+      <p>Absolute Value</p>
+      <p>Growth Rate Y/Y (%)</p>
+      <p>Investment in real estate development (100 million yuan)</p><p>53364</p><p>-12.9</p>
+      <p>Of which: Residential buildings</p><p>41125</p><p>-20.5</p>
+    </body></html>`;
+    expect(() => parseNbsRealEstateRelease(html)).toThrowError(/disagrees with the table/);
+  });
+
+  it('fails loudly when the headline level and the table level disagree (unit shift)', () => {
+    const html = `<!DOCTYPE html><html><body>
+      <p>Investment in Real Estate Development from January to September in 2026</p>
+      <p>From January to September, the investment in real estate development was 6,000.0 billion yuan, a year-on-year decrease of 20.6%.</p>
+      <p>Table 1 Real Estate Development and Sales from January to September 2026</p>
+      <p>Indicator</p>
+      <p>Absolute Value</p>
+      <p>Growth Rate Y/Y (%)</p>
+      <p>Investment in real estate development (100 million yuan)</p><p>53364</p><p>-20.6</p>
+      <p>Of which: Residential buildings</p><p>41125</p><p>-20.5</p>
+    </body></html>`;
+    expect(() => parseNbsRealEstateRelease(html)).toThrowError(/headline level/);
+  });
+
+  it('fails loudly when the Table 1 header is missing (F-16)', () => {
+    const broken = fixture('nbs-realestate-release.html').replace(/Table 1 Real Estate Development and Sales/, 'Table A Property');
+    expect(() => parseNbsRealEstateRelease(broken)).toThrowError(/Table 1 header was not found/);
+  });
+
+  it('fails loudly when the investment row is missing (F-16)', () => {
+    const broken = fixture('nbs-realestate-release.html').replace(
+      /Investment in real estate development \(100 million yuan\)/,
+      'Property development spending (100 million yuan)',
+    );
+    expect(() => parseNbsRealEstateRelease(broken)).toThrowError(/investment row was not found/);
+  });
+
+  it('fails loudly on an out-of-range YTD value', () => {
+    const html = `<!DOCTYPE html><html><body>
+      <p>Investment in Real Estate Development from January to September in 2026</p>
+      <p>Table 1 Real Estate Development and Sales from January to September 2026</p>
+      <p>Indicator</p>
+      <p>Absolute Value</p>
+      <p>Growth Rate Y/Y (%)</p>
+      <p>Investment in real estate development (100 million yuan)</p><p>53364</p><p>-220.6</p>
+      <p>Of which: Residential buildings</p><p>41125</p><p>-220.5</p>
+    </body></html>`;
+    expect(() => parseNbsRealEstateRelease(html)).toThrowError(/out-of-range/);
+  });
+});
+
+describe('nbs adapter — the crude-steel output parse (the real Sep-2026 release)', () => {
+  it('parses the monthly output (7359 x 10k tons @ 2026-09-30) with the rolled-steel prose cross-check agreeing', () => {
+    const out = parseNbsIndustrialProductionRelease(fixture('nbs-indprod-release.html'));
+    expect(out).toEqual([{ date: '2026-09-30', value: 7359 }]);
+  });
+
+  it('parses a synthetic month with masked neighbour cells (the ellipsis rows)', () => {
+    const html = `<!DOCTYPE html><html><body>
+      <p>Industrial Production Operation in August 2026</p>
+      <p>In terms of products, in August, the output of rolled steel was 100.00 million tons, down by 1.0% year on year.</p>
+      <p>Output of Major Industrial Products of Enterprises Above the Designated Size</p>
+      <p>Crude Steel (10,000 tons)</p><p>8000</p><p>0.5</p><p>64000</p><p>-1.0</p>
+      <p>Rolled Steel (10,000 tons)</p><p>10000</p><p>-1.0</p><p>80000</p><p>-2.0</p>
+      <p>Cement (10,000 tons)</p><p>…</p><p>…</p><p>…</p><p>…</p>
+    </body></html>`;
+    expect(parseNbsIndustrialProductionRelease(html)).toEqual([{ date: '2026-08-31', value: 8000 }]);
+  });
+
+  it('parses the real Sep-2025 release (the older header + spelled-out percent prose: 7349 @ 2025-09-30)', () => {
+    const out = parseNbsIndustrialProductionRelease(fixture('nbs-indprod-release-2025.html'));
+    expect(out).toEqual([{ date: '2025-09-30', value: 7349 }]);
+  });
+
+  it('parses the real Aug-2025 release (the LOWERCASE row labels: Crude steel 7737 @ 2025-08-31)', () => {
+    const out = parseNbsIndustrialProductionRelease(fixture('nbs-indprod-release-aug2025.html'));
+    expect(out).toEqual([{ date: '2025-08-31', value: 7737 }]);
+  });
+
+  it('fails loudly when the rolled-steel prose cross-check disagrees (a column shift)', () => {
+    const html = `<!DOCTYPE html><html><body>
+      <p>Industrial Production Operation in September 2026</p>
+      <p>In terms of products, in September, the output of rolled steel was 118.17 million tons, down by 3.8% year on year.</p>
+      <p>Output of Major Industrial Products of Enterprises Above the Designated Size</p>
+      <p>Crude Steel (10,000 tons)</p><p>7359</p><p>0.1</p><p>72477</p><p>-2.9</p>
+      <p>Rolled Steel (10,000 tons)</p><p>1181</p><p>-3.8</p><p>10671</p><p>-2.0</p>
+    </body></html>`;
+    expect(() => parseNbsIndustrialProductionRelease(html)).toThrowError(/rolled-steel cross-check/);
+  });
+
+  it('fails loudly when the products-table header is missing (F-16)', () => {
+    const broken = fixture('nbs-indprod-release.html').replace(
+      /Output of Major Industrial Products of Enterprises Above the Designated Size/,
+      'Outputs of Products',
+    );
+    expect(() => parseNbsIndustrialProductionRelease(broken)).toThrowError(/products table was not found/);
+  });
+
+  it('fails loudly when the Crude Steel row is missing (F-16)', () => {
+    const broken = fixture('nbs-indprod-release.html').replace(/Crude Steel \(10,000 tons\)/, 'Steel, Crude (10k tonnes)');
+    expect(() => parseNbsIndustrialProductionRelease(broken)).toThrowError(/Crude Steel row was not found/);
+  });
+
+  it('fails loudly on an out-of-range output value', () => {
+    const html = `<!DOCTYPE html><html><body>
+      <p>Industrial Production Operation in September 2026</p>
+      <p>Output of Major Industrial Products of Enterprises Above the Designated Size</p>
+      <p>Crude Steel (10,000 tons)</p><p>735900</p><p>0.1</p><p>72477</p><p>-2.9</p>
+      <p>Rolled Steel (10,000 tons)</p><p>11817</p><p>-3.8</p><p>106710</p><p>-2.0</p>
+    </body></html>`;
+    expect(() => parseNbsIndustrialProductionRelease(html)).toThrowError(/out-of-range/);
   });
 });

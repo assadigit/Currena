@@ -43,6 +43,15 @@ import {
   fetchTpuSeries,
   fetchGscpiSeries,
 } from './monthly-indexes';
+import {
+  fetchNbsIndexPage,
+  fetchNbsIndustrialProductionRelease,
+  fetchNbsRealEstateRelease,
+  latestIndustrialProductionRelease,
+  latestRealEstateRelease,
+  NBS_PRESS_INDEX_URL,
+  parseNbsPressIndex,
+} from './nbs';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -94,6 +103,15 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   // context-only per G-5.
   'nz-short-rate',
   'nz-10y',
+  // gap-closure S6-M6.2 (2026-11-02): the China property/steel family —
+  // the NBS dedicated releases' YTD property-investment Y/Y + crude-steel
+  // monthly output. The releases publish ~the 19th-20th of M+1, so the
+  // gate is the 21st-25th UTC window (the freshest data, the release
+  // always on index page 1) + bootstrap; the two release fetches share
+  // ONE index-page fetch (~+3 subrequests on window days — which never
+  // coincide with the first-of-month gates). All context-only per G-5.
+  'china-property-investment',
+  'china-steel-output',
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -111,6 +129,10 @@ export interface Rung2FetchPlan {
   /** gap-closure S6-M6.1: the NZ monthly mirrors (OECD short rate + FRED
    * NZ 10y) — first-of-month + bootstrap, the monthly trio's gate. */
   nzMonthly: boolean;
+  /** gap-closure S6-M6.2: the NBS China property/steel releases — the
+   * 21st-25th UTC window (the releases publish ~the 19th-20th of M+1)
+   * + bootstrap. */
+  nbsMonthly: boolean;
 }
 
 /** Saturday is fetch day for the weekly pair (data Tue, publish Fri 17:30 ET). */
@@ -121,6 +143,22 @@ function isSaturday(date: Date): boolean {
 /** The first-of-month rung refreshes the monthly feeds. */
 function isFirstOfMonth(date: Date): boolean {
   return date.getUTCDate() === 1;
+}
+
+/**
+ * gap-closure S6-M6.2: the NBS release window — the dedicated
+ * real-estate and industrial-production releases publish ~the 19th-20th
+ * of M+1 (verified: the Jan-Sep 2026 pair out 2026-10-20), so the rung
+ * re-checks on the 21st-25th of every month (idempotent fetches; a
+ * slipped release is caught by a later day in the window, and a release
+ * that slips past the whole window self-heals at the NEXT window — the
+ * link finder always takes the newest release). The window never
+ * coincides with the first-of-month gates, so the subrequest peaks stay
+ * separate.
+ */
+function isNbsReleaseWindow(date: Date): boolean {
+  const day = date.getUTCDate();
+  return day >= 21 && day <= 25;
 }
 
 /**
@@ -147,6 +185,8 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
   // gap-closure S6-M6.1: the NZ monthly mirrors bootstrap the same way
   // (a fresh deploy on any day of the month must not wait for the 1st).
   const needNzMonthly = missing.has('nz-short-rate') || missing.has('nz-10y');
+  // gap-closure S6-M6.2: the NBS China pair bootstraps the same way.
+  const needNbsMonthly = missing.has('china-property-investment') || missing.has('china-steel-output');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
     eiaWeekly:
@@ -161,6 +201,10 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     // S6-M6.1: the NZ pair rides the same first-of-month gate (never a
     // daily fetch — both mirrors are monthly).
     nzMonthly: isFirstOfMonth(date) || needNzMonthly,
+    // S6-M6.2: the NBS China pair rides the 21st-25th release window
+    // (the releases publish ~the 19th-20th; the window keeps the data
+    // fresh AND the release link on index page 1).
+    nbsMonthly: isNbsReleaseWindow(date) || needNbsMonthly,
   };
 }
 
@@ -336,6 +380,51 @@ export async function collectRung2Sources(
       fetchFredSeries(FRED_SERIES.nz10y),
     );
     if (nz10y !== undefined) series['nz-10y'] = nz10y;
+  }
+
+  // gap-closure S6-M6.2 (2026-11-02): the NBS China property/steel pair —
+  // ONE index-page scan + the two dedicated releases (each parser
+  // cross-checks its release's own headline against its own table, so a
+  // column shift can never pass). The releases publish ~the 19th-20th of
+  // M+1; the 21st-25th window keeps the newest release on page 1. On a
+  // window day the newest release may be last month's (a slipped publish)
+  // — the idempotent merge simply re-writes the same point. If a link is
+  // missing on page 1 the honest report row says so (never page-walking
+  // past page 1: the window guarantees freshness).
+  if (plan.nbsMonthly) {
+    const index1 = await fetchLogged('nbs', 'press-release index page 1 (property/steel scan)', () =>
+      fetchNbsIndexPage(1),
+    );
+    const links = index1 !== undefined ? parseNbsPressIndex(index1, NBS_PRESS_INDEX_URL) : [];
+
+    const realestate = latestRealEstateRelease(links);
+    if (realestate !== undefined) {
+      const property = await fetchLogged(
+        'nbs',
+        `real-estate release: ${realestate.title} (${realestate.published})`,
+        () => fetchNbsRealEstateRelease(realestate.url),
+      );
+      if (property !== undefined) series['china-property-investment'] = property;
+    } else {
+      report('nbs', false, 'real-estate release link not found on index page 1 (layout changed?)', 'format-changed');
+    }
+
+    const indprod = latestIndustrialProductionRelease(links);
+    if (indprod !== undefined) {
+      const steel = await fetchLogged(
+        'nbs',
+        `industrial-production release: ${indprod.title} (${indprod.published})`,
+        () => fetchNbsIndustrialProductionRelease(indprod.url),
+      );
+      if (steel !== undefined) series['china-steel-output'] = steel;
+    } else {
+      report(
+        'nbs',
+        false,
+        'industrial-production release link not found on index page 1 (layout changed?)',
+        'format-changed',
+      );
+    }
   }
 
   // S4-M4.2: the GPR daily export — the provider's own GPRD_MA7 7-day

@@ -154,6 +154,9 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 | Copper | مس | |
 | Oil (crude) | نفت | |
 | Iron ore | سنگ‌آهن | |
+| Property development investment (China, YTD) | سرمایه‌گذاری توسعهٔ املاک (چین، از ابتدای سال) | `china-property-investment` + glossary؛ رقم تجمعی ژانویه تا ماه اعلام‌شده در سنجش با مدت مشابه سال قبل |
+| Crude steel output | تولید فولاد خام | `china-steel-output` + glossary؛ واحد ده‌هزار تنی ادارهٔ آمار چین، روی کارت به میلیون تن مقیاس می‌شود |
+| Steel mill / steelmaker | فولادساز / کارخانهٔ فولاد | the `china-demand-iron-ore` card |
 | Precious metals | فلزات گران‌بها | |
 | Indicator | شاخص | insights page «شاخص‌های اقتصادی» |
 | Indicator card one-liner | توضیح یک‌خطی | fields: `whatItIs`, `whyItMatters`, `tendedToMean`, `cantTell`, `forYou` |

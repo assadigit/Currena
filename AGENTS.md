@@ -145,14 +145,14 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-### A. The 156 indicators (48 voting [V] + 108 context [C])
+### A. The 158 indicators (48 voting [V] + 110 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-#### GLOBAL (110 indicators, 32 voting)
+#### GLOBAL (122 indicators, 32 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -452,7 +452,7 @@ days per chokepoint, zod both ways); the rung3 'portwatch' extra source
 (04:30, daily gate, budget 18) fetches + patches; the ids ride
 CARRY_FORWARD_IDS and the history phases exclude them.)*
 
-#### AUSTRALIA (34 indicators, 16 voting)
+#### AUSTRALIA (36 indicators, 16 voting)
 
 **Inflation and rates** (`au-inflation-rates` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -488,6 +488,8 @@ CARRY_FORWARD_IDS and the history phases exclude them.)*
 | [V] | `rba-fed-gap` | per-change | — | any-of | derived |
 | [C] | `gold-aud` | daily | 4 | info | derived |
 | [C] | `iron-ore` | monthly | 60 | info | world-bank |
+| [C] | `china-property-investment` | monthly | 75 | info | nbs |
+| [C] | `china-steel-output` | monthly | 75 | info | nbs |
 
 **Activity** (the `au-activity` lane — "Is the economy growing?", a SHADOW
 gauge until S6: every member context-only per G-5, the lane header reads

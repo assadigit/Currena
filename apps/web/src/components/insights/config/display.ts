@@ -43,6 +43,10 @@ export type UnitToken =
   // 2026-10-26 gap-audit build, A-6: crude stocks scaled to millions of
   // barrels ("416.7m barrels" EN — the raw unit is thousands of barrels).
   | 'barrels'
+  // gap-closure S6-M6.2 (2026-11-02): China's crude-steel output scaled to
+  // millions of tonnes ("73.6m tonnes" EN — the raw unit is 10,000 tons,
+  // the NBS's own).
+  | 'tonnes'
   // gap-closure S4-M4.4 (2026-11-01): the US field production — a RATE in
   // thousands of barrels per day, scaled to millions ("13.99m barrels a
   // day" EN; the SPR's LEVEL keeps the plain 'barrels' unit — the unit
@@ -84,6 +88,9 @@ export interface UnitLabels {
   openings: string;
   vacancies: string;
   barrels: string;
+  // gap-closure S6-M6.2 (2026-11-02): China's crude-steel output in
+  // millions of tonnes (the NBS's own 10,000-ton unit, scaled).
+  tonnes: string;
   'barrels-per-day': string;
   transits: string;
   dwellings: string;
@@ -302,6 +309,11 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   gscpi: { decimals: 2, unit: 'index' },
   'us-spr': { decimals: 1, unit: 'barrels', scale: 1e-3 },
   'us-crude-production': { decimals: 2, unit: 'barrels-per-day', scale: 1e-3 },
+  // gap-closure S6-M6.2 (2026-11-02): the China property/steel pair — the
+  // YTD Y/Y in percent (1 decimal), the steel output scaled from the
+  // NBS's own 10,000-ton unit to millions of tonnes (7359 → 73.6m tonnes).
+  'china-property-investment': { decimals: 1, unit: 'percent' },
+  'china-steel-output': { decimals: 1, unit: 'tonnes', scale: 1e-2 },
   'coal-aus': { decimals: 1, unit: 'usd' },
   'lng-japan': { decimals: 2, unit: 'usd' },
   'gas-europe': { decimals: 2, unit: 'usd' },
