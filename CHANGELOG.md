@@ -5,6 +5,84 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-02f] — gap-closure S5-M5.4/M5.5/M5.6: the Australian markets board + the money-panel housing drivers + the ABS release calendar (S5 complete 6/6)
+
+The S5 close: the Australian markets board, the money-panel's two new
+housing drivers, the ABS release calendar, and the docs/deploy close.
+
+### M5.4 — the Australian markets board (the 18 probe-verified ASX indices)
+
+A SEPARATE one-key snapshot (`insights:markets-au:v1`) for the 18
+probe-verified Australian indices — the All Ordinaries, the eleven ASX 200
+GICS sector indices, the ASX Small Ordinaries, the ASX 200 VIX, and the
+four major banks' share prices. The ASX 200 itself stays on the world
+board (G-3); it is shown here as the anchor label, never a second fetch.
+
+- **Venue:** the markets worker's 4th cron (`0 7 * * 1-5`, 07:00 UTC
+  Mon–Fri, 30 min after the ASX 06:00 UTC close + the 30-min F1 margin).
+  The account's free 5-cron limit is now full (the api minute-cron + the
+  markets worker's four). rung3/rung4 were full at 45/50 after M5.2, so
+  piggybacking on an api rung was budget-unsafe; the S5 spec explicitly
+  allows the markets worker venue.
+- **Provider:** Yahoo-only (the M5.1 probe decision; EODHD's ~20 free
+  calls/day are spent by the world board). A 300 ms politeness pause
+  between calls (the probe lesson) keeps 18 calls under the 30 s
+  scheduled-handler wall-clock. 18 fetches + 1 read + 1 write = 20
+  subrequests (under the 50 cap).
+- **New core schemas:** `AuMarketIdSchema` (18 ids), `AuMarketGroupIdSchema`
+  (`broad|sectors|banks|volatility`), `AuMarketSourceSchema` (`yahoo`),
+  `AuMarketEntrySchema` (mirrors `MarketEntry`), `AuMarketsSummarySchema`,
+  `AuMarketsSnapshotSchema` — all AU-only, the world `MarketId` union is
+  untouched (G-3).
+- **New module:** `packages/insights/src/markets-au/` (definitions,
+  providers, compute, store, job, run, index) — reuses the world board's
+  pure helpers (`trendOf`, `yearAgoAnchor`, `fiveYearAgoAnchor`,
+  `weeklySeries`, `statusOf`) and thresholds; clones the Yahoo parser
+  AU-typed. New `./markets-au` subpath export.
+- **New route:** `GET /api/insights/markets-au` (the markets twin — same
+  cache discipline: edge cache + ETag + the calm 503 "being prepared"
+  answer + A-8 serve-time staleness re-evaluation). `KvAuMarketsReader`
+  with 5-min KV edge cache. Public mode serves it (no licence concern —
+  Yahoo-only, L2 owner-accepted).
+- **New UI:** `AustralianMarkets` component + `au-markets/{shared,briefing}`
+  helpers + `lib/markets-au` client + `useAuMarketsSection` hook. Mounted
+  inside the Australia region's `australiaSlot` (above the MoneyPanel).
+  The one-line "leading or lagging" summary is generated from the
+  per-group chg1d extrema (measurements only, no news causes, RULES.md §5).
+- **Tests:** 13 new markets-au unit tests (definitions, compute R2/R3/R5/F1,
+  buildAuMarketsSnapshot, summarize, reStale, content hash, fault
+  isolation, budget) + 6 new /markets-au route tests. Bundle budget
+  1440/333 → 1470/340 (measured 1467.34/338.18).
+
+### M5.5 — the money-panel housing drivers + the ABS release calendar
+
+- **Money panel:** the `homeLoan` area now carries `au-building-approvals`
+  (the housing-supply pipeline) and `au-population-growth` (the demand
+  side) as context drivers. Both are shadow (G-5) so they never drive the
+  area's state (the mortgage rate, rent yoy, arrears own that); they join
+  the area's readings so the panel considers them when the area enters
+  attention or unusual.
+- **ABS release calendar:** 5 new calendar entries (verified from the ABS
+  release calendar via M5.1's real-browser read) — HSI 2026-11-04, ITGS
+  2026-11-05, building approvals 2026-12-01, GDP 2026-12-02, population
+  2026-12-17. 5 new `CalendarEventSchema` kinds (`abs-hsi`, `abs-trade`,
+  `abs-approvals`, `abs-gdp`, `abs-population`) + their `NextUpStrip`
+  tint/badge entries + their `EVENT_TARGETS` → indicator mappings. The
+  calendar's next-up strip now opens the matching indicator's detail on
+  click.
+
+### M5.6 — docs and deploy close
+
+- **Deploy:** api worker `1e25e37d` (the /markets-au route), markets worker
+  `699daa4d` (the 4th cron), web (the AU board + the calendar). The
+  /api/insights/markets-au route is live (503 "being prepared" until the
+  07:00 UTC cron fires — the honest designed state).
+- **Persian copy:** round 67 — 121 `marketsAu` strings + 2 `au-markets/shared`
+  hardcoded strings + 5 calendar `titleFa` entries, all audited clean.
+- **Docs:** AGENTS.md §A (the markets-au board row), PROGRESS.md (S5
+  complete 6/6, G8/G9 ticked, session log), VERIFIED-SOURCES.md (the AU
+  board's venue + provider decisions), PROMPTS.md (the S6 prompt).
+
 ## [2026-11-02e] — gap-closure S5-M5.3: the Australian gauges close (the audit-and-close round — the substance landed with M5.2 + S4-M4.5)
 
 M5.3's list, audited item by item against what M5.2 and the S4 sessions
