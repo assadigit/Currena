@@ -77,6 +77,18 @@ export default defineConfig({
       testMatch: /gb-s3-screenshots\.plw\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // gold-balance GB-S4 (P2b — the visual redesign, 05 §12 V-1..V-10):
+      // the six scenarios × EN/fa × 360/1280 × light/dark over the
+      // ?balance=lanes preview, the squint/overflow/rim/keyboard/reduced-
+      // motion/contrast checks, and the default view beside it. The
+      // scenarios ride an in-memory /api/insights interception (the GB-S3
+      // overlay pattern without touching the fixture file); the evidence
+      // lands in docs/specs/gold-balance-consolidation/evidence/gb-s4/.
+      name: 'gb-s4',
+      testMatch: /gb-s4-visual\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
   webServer: [
     {

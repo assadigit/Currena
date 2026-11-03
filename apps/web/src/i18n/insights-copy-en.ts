@@ -8847,6 +8847,39 @@ export const insightsCopyEn = {
         stress: 'Stress in financial markets, from money markets to volatility.',
         inflation: 'Inflation and inflation expectations in the US and Europe.',
       },
+      // Gold balance consolidation P2b (GB-S4, 2026-11-03 —
+      // 05-VISUAL-DESIGN-SPEC §4.1/§4.4/§4.5/§4.6 + §11's key list): the
+      // visual redesign's own strings, rendered ONLY behind
+      // ?balance=lanes (the eyebrow over the title, the verdict block's
+      // eyebrow + lane-counts line, the "Not leaning" tray, the ledger
+      // rows' state words). The verdict word itself, the pan captions,
+      // the empty-pan sentences and the measured note REUSE the keys
+      // above (no churn). FA triaged through round-77
+      // (docs/localization/persian-copy-round-77-gold-balance-visual.md).
+      // The eyebrow over the whole instrument (05 §4.1 item 1).
+      eyebrow: 'Gold · today’s conditions',
+      // The verdict block's eyebrow (05 §4.4).
+      verdictEyebrow: 'Today’s lean',
+      // The counts line under the verdict word (05 §4.4): the for and
+      // against parts ALWAYS render (zeros included — the strip shows
+      // the shape, the counts state it); the unread part only when > 0.
+      verdictCountFor: '{n} for',
+      verdictCountAgainst: '{n} against',
+      verdictCountNotLeaning: '{n} not leaning',
+      verdictCountUnread: '{n} unread',
+      // The "Not leaning" tray (05 §4.5): title, the one-line note, the
+      // empty state. Neutral AND unread lane weights sit in this one
+      // well (the unread ones wear the dotted rim).
+      trayTitle: 'Not leaning',
+      trayNote: 'Weighed, but no clear lean',
+      trayEmpty: 'Every driver is on a pan.',
+      // The ledger rows' state words (05 §4.6), in words — colour never
+      // rides alone. The split state names the contest.
+      laneStateFor: 'Leans for gold',
+      laneStateAgainst: 'Leans against gold',
+      laneStateNeutral: 'Not leaning',
+      laneStateUnread: 'Couldn’t be read',
+      laneStateSplit: 'Split: {supports} for, {pressures} against',
     },
     // 2026-10-21c owner round: the balanceSilver copy variants are RETIRED
     // with silver's balance (the merged card renders gold's balance only).

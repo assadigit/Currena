@@ -242,14 +242,14 @@ export function MergedSignalsCard({
 
   /* 01 §6: the context line — gold's own 30-day move, shown for context,
    * never counted in the balance or the Outlook (it replaces the
-   * model-vs-reality chip under the flag). Hidden when missing. */
+   * model-vs-reality chip under the flag). Hidden when missing. GB-S4:
+   * the visual lane view renders it as the VERDICT BLOCK's recessed pill
+   * (05 §4.4 — never green or red); the node is only ever built for the
+   * lane view, so restyling it here cannot touch the default view. */
   const goldChange30d = byId.get('gold-usd')?.change30d;
   const contextLine =
     balanceLanes && goldChange30d !== undefined && Number.isFinite(goldChange30d) ? (
-      <p
-        data-balance-context-line
-        className="mx-auto m-0 w-full max-w-[440px] text-center text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-secondary)]"
-      >
+      <p data-balance-context-line className="bal-context">
         {interpolate(s.balance.contextLine, {
           change: formatChange(goldChange30d, 'pct', numberLocale, copy.units),
         })}
@@ -257,18 +257,17 @@ export function MergedSignalsCard({
     ) : null;
 
   /* 01 §8.2: the measured note + the backtest link, moved here from the
-   * wind panel — visible without a tap, no edge claimed. */
+   * wind panel — visible without a tap, no edge claimed. GB-S4: the
+   * visual lane view renders it as the balance's FOOTNOTE (05 §4.1
+   * item 8); the node is only ever built for the lane view. */
   const measuredNote = balanceLanes ? (
-    <p
-      data-balance-measured-note
-      className="mx-auto m-0 w-full max-w-[640px] text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]"
-    >
+    <p data-balance-measured-note className="bal-foot">
       {s.balance.measuredNote}{' '}
       <a
         href={GOLD_BALANCE_BACKTEST_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="insights-focusable text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+        className="insights-focusable"
       >
         {gs.measuredNoteLink}
       </a>
@@ -409,11 +408,11 @@ export function MergedSignalsCard({
        * banner.
        *
        * GB-S3 (?balance=lanes): the LANE drivers replace the condition
-       * chips — the pans hold lane chips (max 4), the split lane sits in
-       * the neutral tray with its badge, the reworded subtitle, the
-       * context line and the measured note join the block. The legacy
-       * path passes none of the new props and renders byte-for-byte as
-       * before. */}
+       * chips. GB-S4 (P2b, 05-VISUAL-DESIGN-SPEC.md): the lane view now
+       * renders the VISUAL REDESIGN (the brass stage, the lane weights,
+       * the verdict hero, the tray, the inline ledger) via the `visual`
+       * prop — the legacy path passes none of the new props and renders
+       * byte-for-byte as before (the snapshot pin). */}
       <BalanceScale
         drivers={laneDrivers ?? balanceDrivers}
         copy={copy}
@@ -422,6 +421,7 @@ export function MergedSignalsCard({
         subtitle={laneDrivers !== null ? s.balance.subtitleLanes : undefined}
         contextLine={contextLine}
         measuredNote={measuredNote}
+        visual={balanceLanes === true}
       />
       {/* 2026-10-21c owner round: <BalanceScale metal="silver" …> is RETIRED
        * here (the owner: "I dont need balance scale of Silver, remove that

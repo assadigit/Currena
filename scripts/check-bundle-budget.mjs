@@ -912,7 +912,20 @@ const BUDGETS = [
   // two gold panels still ride the chunk (they render in the DEFAULT view
   // until the owner-gated P5/GB-S6 flip retires them — THAT session
   // re-baselines downward). Measured 1533.15/354.25.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1540_000, gz: 355_500, label: 'Insights lazy chunk' },
+  // gold-balance GB-S4 P2b (2026-11-03, CHANGELOG §2026-11-03j): 1540→1560 /
+  // 355.5→360 — the VISUAL REDESIGN of the lane view (05-VISUAL-DESIGN-SPEC,
+  // behind the same ?balance=lanes flag): the new signals/BalanceWeight.tsx
+  // (the segmented-rim weight + the engraved lane icons) + BalanceScale's
+  // visual branch (the brass stage drawing, the verdict hero block, the
+  // tray, the inline ledger — the pure metrics/frame functions and the
+  // per-frame SVG derivation) + the --bal-* token + scoped-CSS block in
+  // index.css + 14 more copy keys × 2 locales (round-77). All inline
+  // SVG + CSS, no new dependency, no image asset (05 §11). The legacy
+  // branch's markup is untouched (the default view stays byte-stable —
+  // the snapshot pin). The GB-S3 note still stands: the two gold panels
+  // ride the chunk until the P5/GB-S6 flip re-baselines downward.
+  // Measured 1550.47/358.81.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1560_000, gz: 360_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {
