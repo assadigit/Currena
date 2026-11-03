@@ -69,6 +69,7 @@ export function Signals({
   copy,
   numberLocale,
   expandToken,
+  balanceLanes,
 }: {
   readings: readonly IndicatorReading[];
   /** Gold Program S2.1: the served snapshot's compact gold summary —
@@ -79,6 +80,9 @@ export function Signals({
   numberLocale: 'en-US' | 'fa-IR';
   /** Bumped by the route when a pill/hash/hero link targets this section. */
   expandToken: number;
+  /** GB-S3 (04 §3 P2): the ?balance=lanes preview flag, read once on the
+   * route — the merged card's consolidated lane balance. */
+  balanceLanes?: boolean | undefined;
 }) {
   const gold = useMemo(() => evaluateSignal('gold', readings), [readings]);
   const silver = useMemo(() => evaluateSignal('silver', readings), [readings]);
@@ -164,6 +168,7 @@ export function Signals({
             goldSummary={goldSummary}
             copy={copy}
             numberLocale={numberLocale}
+            balanceLanes={balanceLanes}
           />
         ) : (
           /* Collapsed: one line per metal (spec R7b). */

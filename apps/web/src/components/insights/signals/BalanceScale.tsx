@@ -117,6 +117,15 @@
  * Reusable by contract (spec §2.6): the component takes a list of
  * drivers and knows nothing about gold beyond the copy strings; the
  * merged card applies it to the gold driver list only.
+ *
+ * Gold balance consolidation P2 (GB-S3, 2026-11-03 —
+ * docs/specs/gold-balance-consolidation/03-UX-AND-COPY.md): ADDITIVE
+ * optional fields on BalanceDriver (members/split/tally/note) + three
+ * optional slots (subtitle/contextLine/measuredNote) carry the LANE view
+ * behind the ?balance=lanes preview flag. The drawing, the animation,
+ * the beam formula and every LEGACY branch are untouched — drivers
+ * without the new fields render byte-for-byte as before (pinned by the
+ * legacy-markup snapshot test, gold-balance-lanes.test.tsx).
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -133,6 +142,26 @@ import { VerdictIcon, verdictTone } from './verdict';
  * no effect) and `unread` (could not be read) are DIFFERENT states. */
 export type BalanceDriverState = 'for' | 'against' | 'neutral' | 'unread';
 
+/** Gold balance consolidation P2 (GB-S3, 03 §3): one member row of a
+ * driver's detail-panel list — a lane's voter. The component stays
+ * reusable by contract: it renders these lines and knows nothing about
+ * gold beyond the copy strings (the caller builds them). */
+export interface BalanceMember {
+  /** Stable identity (the voter's indicator id — also the deep link). */
+  key: string;
+  /** The voter's short name. */
+  label: string;
+  /** The voter's impact: firing members group under Supports/Pressures;
+   * `steady` = readable, not firing; `unread` = could not be read. */
+  impact: 'supports' | 'pressures' | 'steady' | 'unread';
+  /** The evidence phrase when firing ("falling", "high in its decade"),
+   * else null. The caller composes any per-member suffix (e.g. the B-12
+   * card-status word beside the lean phrase). */
+  evidenceText: string | null;
+  /** The current value, display-formatted, or null when unread. */
+  valueText: string | null;
+}
+
 export interface BalanceDriver {
   /** Stable identity (the condition key) — drives the detail panel. */
   key: string;
@@ -144,6 +173,21 @@ export interface BalanceDriver {
   /** The current value(s), display-formatted, or null when unread. */
   valueText: string | null;
   state: BalanceDriverState;
+  /** GB-S3 (03 §3): the driver's member list for the detail panel —
+   * grouped Supports/Pressures, steady collapsed by name, unread listed.
+   * Absent on the legacy condition chips (their panel stays one line). */
+  members?: ReadonlyArray<BalanceMember>;
+  /** GB-S3 (03 §2): a contested neutral (supports === pressures > 0) —
+   * renders the badge beside the label and appends the badge word to the
+   * chip's accessible name. */
+  split?: boolean;
+  /** GB-S3 (03 §2): the chip's second line, built by the caller from
+   * copy ("4 of 8 drivers firing" / "No driver firing" / "2 for, 2
+   * against"). Absent on the legacy chips. */
+  tally?: string;
+  /** GB-S3 (03 §3 item 5): the driver's context line under the intro
+   * sentence (the inflation lane's tilt phrase). Absent when null. */
+  note?: string;
 }
 
 /** The card's condition state → the balance's four states (§4). The
@@ -531,6 +575,9 @@ export function BalanceScale({
   copy,
   numberLocale,
   banner,
+  subtitle,
+  contextLine,
+  measuredNote,
 }: {
   drivers: readonly BalanceDriver[];
   copy: InsightsCopy;
@@ -538,6 +585,16 @@ export function BalanceScale({
   /** The card's existing verdict banner sentence (spec §5.2 — kept
    * unchanged, rendered inside the aggregate assessment box). */
   banner?: ReactNode;
+  /** GB-S3: the lane view's reworded subtitle — absent → the dictionary's
+   * own `subtitle` (the legacy view renders byte-for-byte today's page). */
+  subtitle?: string;
+  /** GB-S3 (01 §6): the non-voting context line under the verdict box
+   * (gold's own 30-day move, never counted). Absent → nothing renders. */
+  contextLine?: ReactNode;
+  /** GB-S3 (01 §8.2): the measured note + the backtest link, visible
+   * without a tap. Absent → nothing renders (the legacy view carries it
+   * on the wind panel instead). */
+  measuredNote?: ReactNode;
 }): React.JSX.Element | null {
   // 2026-10-21c owner round: silver's balance (and with it the `metal`
   // prop + the balanceSilver copy variants) is RETIRED — the merged card
@@ -741,6 +798,104 @@ export function BalanceScale({
   const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
   const openDriver = drivers.find((d) => d.key === openKey) ?? null;
 
+  /** GB-S3 (03 §5): the lane chip's accessible name — "{lane}: {side}.
+   * {tally}." (laneChipAria); a split lane appends the badge word before
+   * its counts so the badge's meaning is never colour-only. The side
+   * word reuses the card's own condition-state vocabulary
+   * (conditionStateShort) — no new words, both locales already carry it. */
+  const laneChipAriaOf = (d: BalanceDriver): string => {
+    const sideKey =
+      d.state === 'for' ? 'supportive' : d.state === 'against' ? 'against' : d.state === 'neutral' ? 'neutral' : 'unknown';
+    const side = copy.signals.conditionStateShort[sideKey];
+    const tally = d.split === true && d.tally !== undefined ? `${b.splitBadge}, ${d.tally}` : d.tally;
+    return tally !== undefined ? interpolate(b.laneChipAria, { lane: d.label, side, tally }) : `${d.label}: ${side}.`;
+  };
+
+  /** GB-S3 (03 §3): the detail panel's member list — firing members
+   * grouped "Supports gold" / "Pressures gold" (each row: name, evidence
+   * phrase, value, and the deep link to the indicator card), the steady
+   * voters collapsed by name, the unread voters listed when any. A group
+   * with no members never renders. */
+  const memberList = (members: ReadonlyArray<BalanceMember>): React.JSX.Element => {
+    const n = (v: number): string => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
+    const firing = (impact: 'supports' | 'pressures'): React.JSX.Element | null => {
+      const rows = members.filter((m) => m.impact === impact);
+      if (rows.length === 0) return null;
+      return (
+        <div key={impact} data-balance-member-group={impact}>
+          <span className="block font-bold text-[var(--color-text-primary)]">
+            {impact === 'supports' ? b.memberSupports : b.memberPressures}
+          </span>
+          <ul className="m-0 mt-1 flex list-none flex-col gap-1 p-0">
+            {rows.map((m) => (
+              <li
+                key={m.key}
+                data-balance-member={m.key}
+                data-balance-member-impact={m.impact}
+                className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5"
+              >
+                <span className="font-semibold text-[var(--color-text-primary)]">{m.label}</span>
+                {m.evidenceText !== null ? (
+                  <span className="text-[var(--color-text-secondary)]">· {m.evidenceText}</span>
+                ) : null}
+                {m.valueText !== null ? (
+                  <bdi
+                    dir="ltr"
+                    className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]"
+                  >
+                    {m.valueText}
+                  </bdi>
+                ) : null}
+                <a
+                  href={`/insights?card=${m.key}`}
+                  className="insights-focusable text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+                >
+                  {b.memberOpenIndicator}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    };
+    const steady = members.filter((m) => m.impact === 'steady');
+    const unread = members.filter((m) => m.impact === 'unread');
+    return (
+      <>
+        {firing('supports')}
+        {firing('pressures')}
+        {steady.length > 0 ? (
+          <details data-balance-member-group="steady">
+            <summary className="insights-focusable cursor-pointer font-bold text-[var(--color-text-primary)]">
+              {interpolate(b.membersSteadyTitle, { n: n(steady.length) })}
+            </summary>
+            <ul className="m-0 mt-1 flex list-none flex-col gap-1 p-0">
+              {steady.map((m) => (
+                <li key={m.key} data-balance-member={m.key} data-balance-member-impact="steady">
+                  {m.label}
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : null}
+        {unread.length > 0 ? (
+          <div data-balance-member-group="unread">
+            <span className="block font-bold text-[var(--color-text-secondary)]">
+              {interpolate(b.membersUnreadTitle, { n: n(unread.length) })}
+            </span>
+            <ul className="m-0 mt-1 flex list-none flex-col gap-1 p-0">
+              {unread.map((m) => (
+                <li key={m.key} data-balance-member={m.key} data-balance-member-impact="unread">
+                  {m.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </>
+    );
+  };
+
   /** One compact factor chip RESTING ON THE PAN (v6's load, kept;
    * v8/R9-03: EVERY chip renders — there is no capacity anymore): icon
    * + full short name (never truncated) + the value where space permits
@@ -759,6 +914,7 @@ export function BalanceScale({
       type="button"
       aria-expanded={openKey === d.key}
       aria-controls={`${metal}-balance-detail`}
+      aria-label={d.members !== undefined ? laneChipAriaOf(d) : undefined}
       onClick={() => toggle(d.key)}
       data-balance-tile={d.key}
       className="insights-focusable flex min-h-[40px] w-full cursor-pointer flex-wrap items-center gap-x-1.5 gap-y-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-start shadow-[0_1px_2px_rgb(15_23_42/0.14)] ring-1 ring-[var(--color-border)] sm:min-h-[32px]"
@@ -774,6 +930,18 @@ export function BalanceScale({
         >
           {d.valueText}
         </bdi>
+      ) : null}
+      {/* GB-S3 (03 §2): the lane chip's second line — the tally wraps to
+       * its own row (the button already flex-wraps; w-full claims the
+       * line). Legacy condition chips carry no tally and render exactly
+       * as before. */}
+      {d.tally !== undefined ? (
+        <span
+          data-balance-tally
+          className="w-full ps-[20px] text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)]"
+        >
+          {d.tally}
+        </span>
       ) : null}
     </button>
   );
@@ -898,7 +1066,9 @@ export function BalanceScale({
           data-balance-subtitle
           className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]"
         >
-          {b.subtitle}
+          {/* GB-S3: the lane view passes its reworded subtitle; the legacy
+           * view keeps the dictionary's own (byte-identical default). */}
+          {subtitle ?? b.subtitle}
         </p>
       </div>
 
@@ -1094,6 +1264,14 @@ export function BalanceScale({
         {banner}
       </div>
 
+      {/* GB-S3 (01 §6 + 01 §8.2): the non-voting context line (gold's own
+       * 30-day move, never counted in the balance or the Outlook) and the
+       * measured note + backtest link, both caller-built and visible
+       * without a tap. Absent on the legacy view — nothing renders and
+       * the default markup stays byte-for-byte today's. */}
+      {contextLine}
+      {measuredNote}
+
       {/* The shared detail panel (v2 §5.5.6 — every width): one open
        * panel at a time, tap again to close. It always exists in the DOM
        * (so every aria-controls is valid) and stays hidden until a tile,
@@ -1108,6 +1286,24 @@ export function BalanceScale({
           <>
             <span className="font-bold text-[var(--color-text-primary)]">{openDriver.label}: </span>
             {openDriver.detail}
+            {/* GB-S3 (03 §3 item 5): the driver's context line under the
+             * intro sentence — the inflation lane's tilt phrase. */}
+            {openDriver.note !== undefined ? (
+              <p
+                data-balance-lane-note
+                className="m-0 mt-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
+              >
+                {openDriver.note}
+              </p>
+            ) : null}
+            {/* GB-S3 (03 §3): the member list — firing members grouped by
+             * impact, steady collapsed, unread listed. The legacy chips
+             * carry no members and render exactly as before. */}
+            {openDriver.members !== undefined && openDriver.members.length > 0 ? (
+              <div className="mt-2 flex flex-col gap-2" data-balance-members>
+                {memberList(openDriver.members)}
+              </div>
+            ) : null}
           </>
         ) : null}
       </div>
@@ -1127,12 +1323,34 @@ export function BalanceScale({
                 type="button"
                 aria-expanded={openKey === d.key}
                 aria-controls={`${metal}-balance-detail`}
+                aria-label={d.members !== undefined ? laneChipAriaOf(d) : undefined}
                 onClick={() => toggle(d.key)}
                 data-balance-chip={d.key}
-                className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-[length:var(--type-label)] font-semibold text-[var(--color-status-stale)] ring-1 ring-[var(--color-border)]"
+                /* GB-S3 (03 §2): a lane chip with a tally wraps to two
+                 * lines — the class is computed so the LEGACY chips keep
+                 * the exact class string they render today. */
+                className={`insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-[length:var(--type-label)] font-semibold text-[var(--color-status-stale)] ring-1 ring-[var(--color-border)]${d.tally !== undefined ? ' flex-wrap' : ''}`}
               >
                 <ConditionIcon state="neutral" />
                 {d.label}
+                {d.split === true ? (
+                  /* OI-2's default: the contested-neutral badge — a neutral
+                   * lane that is split, not empty (03 §2). */
+                  <span
+                    data-balance-split-badge
+                    className="rounded-full bg-[var(--color-surface)] px-1.5 py-0.5 text-[11px] font-bold leading-none text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
+                  >
+                    {b.splitBadge}
+                  </span>
+                ) : null}
+                {d.tally !== undefined ? (
+                  <span
+                    data-balance-tally
+                    className="w-full ps-[22px] text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-tertiary)]"
+                  >
+                    {d.tally}
+                  </span>
+                ) : null}
               </button>
             ))}
           </span>
@@ -1150,12 +1368,21 @@ export function BalanceScale({
                 type="button"
                 aria-expanded={openKey === d.key}
                 aria-controls={`${metal}-balance-detail`}
+                aria-label={d.members !== undefined ? laneChipAriaOf(d) : undefined}
                 onClick={() => toggle(d.key)}
                 data-balance-chip={d.key}
-                className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-[var(--color-border)] px-3 py-2 text-[length:var(--type-label)] font-semibold text-[var(--color-status-stale)]"
+                className={`insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-[var(--color-border)] px-3 py-2 text-[length:var(--type-label)] font-semibold text-[var(--color-status-stale)]${d.tally !== undefined ? ' flex-wrap' : ''}`}
               >
                 <ConditionIcon state="unknown" />
                 {d.label}
+                {d.tally !== undefined ? (
+                  <span
+                    data-balance-tally
+                    className="w-full ps-[22px] text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-tertiary)]"
+                  >
+                    {d.tally}
+                  </span>
+                ) : null}
               </button>
             ))}
           </span>

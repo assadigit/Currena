@@ -66,6 +66,17 @@ export default defineConfig({
       testMatch: /world-map\.plw\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // gold-balance GB-S3 (docs/specs/gold-balance-consolidation/): the
+      // ?balance=lanes preview + the default view, EN/fa × 360/1280, on the
+      // fixture snapshot overlaid with the recorded 2026-10-31 corpus
+      // archive (the spec's level case + the split lane). The screenshots
+      // land in docs/specs/gold-balance-consolidation/evidence/gb-s3/ for
+      // the phase's PR description.
+      name: 'gb-s3',
+      testMatch: /gb-s3-screenshots\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
   webServer: [
     {

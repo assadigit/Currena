@@ -8796,6 +8796,57 @@ export const insightsCopyEn = {
       listEmptyFor: 'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
       listEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',
       listEmptyNone: 'Nothing could be read yet, so neither side has been weighed.',
+      // Gold balance consolidation P2 (GB-S3, 2026-11-03, behind the
+      // ?balance=lanes preview flag — 03-UX-AND-COPY §6): the lane-view
+      // copy. The reworded subtitle lands as a SIBLING key (subtitleLanes)
+      // because the shared `subtitle` above still renders the default view,
+      // which must stay byte-for-byte today's page until the owner-gated
+      // flip (P5/GB-S6 swaps the two). The lane/voter/evidence/tilt word
+      // dictionaries under signals.goldScore are REUSED as they are (their
+      // copy-audit fingerprints do not churn); the measured note's link
+      // word is goldScore.measuredNoteLink. FA triaged through round-76
+      // (docs/localization/persian-copy-round-76-gold-balance.md).
+      subtitleLanes:
+        'Gold’s four main drivers are each read against their usual range and weighed equally. The beam shows today’s lean. It is not a forecast.',
+      // The lane chip's second line (03 §2): "{firing} of {readable}
+      // drivers firing"; "No driver firing" when 0 fire but the lane is
+      // readable; a split lane shows the contest instead.
+      laneTally: '{firing} of {readable} drivers firing',
+      laneTallyNone: 'No driver firing',
+      laneSplit: '{supports} for, {pressures} against',
+      // OI-2's default label for a contested neutral lane (2v2): the single
+      // most important disclosure — a neutral lane that is split, not empty.
+      splitBadge: 'Split',
+      // The chip's accessible name: "{lane}: {side}. {tally}." — split
+      // lanes append the splitBadge word + the laneSplit counts.
+      laneChipAria: '{lane}: {side}. {tally}.',
+      // The detail panel's member groups (03 §3): firing members grouped by
+      // impact, steady voters collapsed by name, unread voters listed.
+      memberSupports: 'Supports gold',
+      memberPressures: 'Pressures gold',
+      membersSteadyTitle: 'Not firing ({n})',
+      membersUnreadTitle: 'Could not be read ({n})',
+      // 03 §3 item 6: the per-member deep link to the indicator card.
+      memberOpenIndicator: 'Open indicator',
+      // 01 §6: gold's own 30-day move as CONTEXT — never counted in the
+      // balance or the Outlook (replaces the model-vs-reality chip).
+      contextLine: 'Gold over the last 30 days: {change}. Shown for context, not counted in the balance.',
+      // 01 §8.2 + 03 §6.2: the measured note, visible without a tap. The
+      // wording is the lane model's own measured record — verified against
+      // BACKTEST-GOLD-LANES.md's realised-move tables (sign-agreements
+      // 51.9/46.6/41.1% at 5/20/60td; against-readings preceded larger
+      // rises at 20td/60td), which is where the link points. No wind
+      // vocabulary anywhere (01 §8.3).
+      measuredNote:
+        'Measured against gold’s actual moves over 2016 to 2026: the lean of these drivers showed no positive association with the next 5 to 60 days. If anything, readings against gold came before larger rises. It describes conditions, not direction.',
+      // One sentence per lane (03 §3 item 1, 03 §6.2): what the lane
+      // measures, 12 words or fewer, descriptive only.
+      laneIntro: {
+        'borrowing-costs': 'The cost of borrowing dollars: yields, curves and rate expectations.',
+        dollar: 'The US dollar against major currencies and the yen.',
+        stress: 'Stress in financial markets, from money markets to volatility.',
+        inflation: 'Inflation and inflation expectations in the US and Europe.',
+      },
     },
     // 2026-10-21c owner round: the balanceSilver copy variants are RETIRED
     // with silver's balance (the merged card renders gold's balance only).

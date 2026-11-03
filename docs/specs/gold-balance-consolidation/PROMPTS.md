@@ -156,18 +156,25 @@ At the end: PROGRESS.md ticks + session log (commits + PR number + merge SHA); C
 ## GB-S4 — P2b: the visual redesign behind the flag
 
 ```
-You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1..S3 are done — read docs/specs/gold-balance-consolidation/PROGRESS.md first.
+You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1..S3 are DONE — read docs/specs/gold-balance-consolidation/PROGRESS.md first (the authoritative record; the GB-S3 session log has the exact component state).
 
-Read, in order: AGENTS.md, the spec README, 05-VISUAL-DESIGN-SPEC.md (your session spec — ALL of it: layout, the stage, lane weights with segmented rims, the verdict block, the tray, the ledger, tokens, type, motion, states, responsive, dark/RTL/a11y, V-1..V-10, the open design questions DQ-1..4), 03-UX-AND-COPY.md (the copy + interaction contract), 04 §4.3, and reference/balance-reference.html — the owner's approved visual + mechanical prototype (open it in a browser with ?sc=today|against|for|split|stack|none|loading, &theme=dark, &dir=rtl, &frame=360|390|768, &guides=1, &open=borrow — it is the look target; implement it in React inside BalanceScale.tsx + the new signals/BalanceWeight.tsx, no new dependencies, inline SVG + CSS only).
+Read, in order: AGENTS.md (the Gold Program + gold-balance paragraphs), the spec README, 05-VISUAL-DESIGN-SPEC.md (your session spec — ALL of it: layout, the stage, lane weights with segmented rims, the verdict block, the tray, the ledger, tokens, type, motion, states, responsive, dark/RTL/a11y, V-1..V-10, the open design questions DQ-1..4), 03-UX-AND-COPY.md (the copy + interaction contract), 04 §4.3, and reference/balance-reference.html — the owner's approved visual + mechanical prototype (open it in a browser with ?sc=today|against|for|split|stack|none|loading, &theme=dark, &dir=rtl, &frame=360|390|768, &guides=1, &open=borrow — it is the look target; implement it in React inside BalanceScale.tsx + the new signals/BalanceWeight.tsx, no new dependencies, inline SVG + CSS only).
 
 Your job: the visual redesign of the balance, STILL behind ?balance=lanes (the default view stays exactly as today — pin it again with the legacy snapshot test):
+
 1. The stage: brass beam (tapered, the gradient tokens), pivot + dial with 11 ticks, column + base, hangers redrawn per frame, pans as shallow bowls with side tint + brass rim, pan captions. The single animated angle drives everything; pans translate only; the beam formula unchanged (3-10 degrees, level at net 0); 650ms ease-out; prefers-reduced-motion jumps.
 2. BalanceWeight.tsx: the lane weight — round brass (stone for neutral/unread), the engraved lane icon, the SEGMENTED RIM (one arc segment per driver: green supports, red pressures, hairline steady, dotted unread, sorted supports->pressures->steady->unread), the split badge, the label, 44px hit area, hover/active/focus states.
 3. The verdict block (the hero: the verdict word at 30-44px, the lane strip, the counts line, the context pill), the "Not leaning" tray, and the four-row ledger (inline expansion, one row open at a time, the B-12 status word in the inflation row).
 4. The --bal-* tokens (05 §5) scoped to the balance, light + dark; WCAG AA contrast on the verdict word, captions and tallies in BOTH themes (record the ratios).
 5. Tests + evidence: V-1..V-10 (the six scenarios x EN/fa x desktop/mobile x light/dark screenshots for the PR; the squint test; 360/390/768/1280/1920 no-overflow; the rim matches the ledger counts; keyboard; reduced motion). Reuse the reference prototype's scenario fixtures to build the test states.
 
-The exact current state: PROGRESS.md (authoritative — GB-S3 recorded the component state, the fa round, the bundle numbers). This session may add fa strings (the tray/verdict/eyebrow keys from 05 §11) — triage them same-session (next round per PROGRESS.md). Bundle: the redesign adds SVG + CSS — measure, re-baseline with justification if needed (04 §1 lists check-bundle-budget.mjs).
+The exact current state (verify against PROGRESS.md + the repo before you start):
+- The lane view SHIPS behind ?balance=lanes (GB-S3, PR #16): useBalanceLanesPreview() in MergedCard.tsx (read once at mount, threaded Insights -> Signals -> MergedSignalsCard); MergedCard builds the lane drivers from goldBalance(readings) — key/label/intro from copy (goldScore.laneNames, balance.laneIntro), the side/split/tally/members from the engine, the inflation note from tiltWords[breakevenTiltLean(...)], the B-12 status word via copy.status[chipWordKeyOf(status)] on the breakeven-5y5y row, the context line (hidden when change30d is missing), the measured note + the BACKTEST-GOLD-LANES.md link. BalanceScale renders it today as TWO-LINE CHIPS on the pans/trays (data-balance-tile/data-balance-chip + data-balance-tally + data-balance-split-badge) + the shared detail panel's member list (data-balance-member-group supports|pressures|steady|unread, data-balance-lane-note) + the three slots (subtitle = balance.subtitleLanes, contextLine, measuredNote props). Your redesign REPLACES the chip-on-pan presentation with the 05 weights/verdict/ledger anatomy — the member list's CONTENT contract (AC-2: every voter reachable) and every 03 §5 a11y rule stay.
+- The copy: everything you need is under signals.balance (round-76) + the reused goldScore dictionaries (laneNames/voterNames/evidenceWords/tiltWords/measuredNoteLink). YOUR session may add the tray/verdict/eyebrow keys from 05 §11 — triage them same-session; YOUR fa round is round-77 (GB-S3 used round-76).
+- Tests: gold-balance-lanes.test.tsx (19) pins the current lane view + the LEGACY SNAPSHOT (apps/web/src/components/insights/signals/__snapshots__/) — your redesign REWRITES the flag-view assertions to the new anatomy and KEEPS the legacy snapshot untouched (the default view still renders byte-for-byte; the snapshot is the pin). balance.test.tsx (46) pins the drawing's mechanics — keep the pure-geometry tests green. Test baseline: 14,582 (web 12,623).
+- Screenshots: the gb-s3 Playwright project (apps/web/visual/gb-s3-screenshots.plw.ts + the config entry) is the harness pattern — build the V-1..V-10 set the same way (the fixture overlay script pattern: the 2026-10-31 corpus archive onto visual/fixtures/snapshot.json, restored after; sticky bars neutralized for element captures; evidence/ under docs/specs/gold-balance-consolidation/).
+- Bundle: the redesign adds SVG + CSS — measure from 1533.15/354.25 (ceiling 1540/355.5, chunk Insights-ptsctHOq.js); re-baseline with justification if needed (scripts/check-bundle-budget.mjs, 04 §1).
+- CHANGELOG: the last heading is [2026-11-03i] (count 191, verified) — yours is the next per the sequence; CHECK THE FILE and verify the heading count before and after.
 
 Discipline: as before — FULL `pnpm gates` before every push; branch gold-balance/p2b-visual; commit + push per milestone; draft PR with the screenshot set; merge yourself when V-1..V-10 hold; CI green; deploy; browser-verify the flag view AND the default view (fresh contexts, EN + fa, 360 + 1280, zero console errors); after three honest failures, record blocked and move on. DQ-1..4 defaults stand unless the owner said otherwise in chat.
 
@@ -325,3 +332,36 @@ At the end: PROGRESS.md (the program's final close — every OI resolved or expl
   AND after. Gates: 14,563 (baseline + 15); bundle byte-identical
   (1522.88/351.96, chunk names unchanged — the app does not import the
   engine yet); no deploy.
+- **GB-S3 (2026-11-03, P2):** the UI session. **Prove byte-identity, never
+  assume it:** a temporary harness rendered the flag-off card on the
+  2026-10-31 fixture against BOTH main's components (git stash the six
+  changed files) and the new ones — `cmp` byte-identical — and only then
+  was the vitest snapshot written; the snapshot alone pins nothing about
+  "unchanged vs main" (it would happily pin a changed render). **The
+  spec's "changed subtitle" collides with the byte-stable default** —
+  resolved by the SIBLING key `subtitleLanes` (the shared key still
+  renders the default view; P5/GB-S6 merges them); the same reasoning
+  kept every legacy JSX branch verbatim (the lane branches are separate,
+  gated on the new optional fields — computed class strings, not
+  mutated ones). **jsdom serves http module URLs** — `new URL(rel,
+  import.meta.url)` + readFileSync fails in a jsdom test ("The URL must
+  be of scheme file"); resolve fixtures from `process.cwd()` instead
+  (vitest runs from the package root). **The narrator vocabulary
+  regenerates on the copy file's HASH** — any copy-file edit (even a
+  comment) after `pnpm narrator:vocabulary` needs another regeneration
+  or gate 5 stays red. **Playwright element screenshots of tall cards
+  stitch scrolled passes** — the sticky header rides every pass and a
+  VLM (or eye) reads broken overlap; neutralize the sticky bars for the
+  capture (`position: static !important`) and scroll the subject to the
+  viewport top with breathing room (`scrollIntoView({block:'start'})` +
+  `scrollBy(0,-170)`), then VERIFY the shots with a vision model before
+  shipping them into a PR. **The sandbox kills background processes
+  between shell calls** — the playwright config's second webServer
+  (wrangler, no token) is satisfied with a dummy :8799 health server
+  started IN THE SAME call (reuseExistingServer skips wrangler). The
+  spec's three BalanceDriver fields became four (`note` — the 03 §3
+  item 5 tilt phrase needed a lane-level carrier) and 03 §3 item 6
+  needed its own link-word key (`memberOpenIndicator`) — both additive,
+  both recorded in the PR for the owner. Gates: 14,582 (baseline + 19);
+  Insights lazy 1533.15/354.25, ceiling 1540/355.5 (justified); DEPLOY
+  this phase (the SPA rides the api worker and the chunk changed).

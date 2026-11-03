@@ -16,10 +16,11 @@ actually executed. The gap-closure program that ran in parallel is CLOSED
 | C | docs/insights/BACKTEST-GOLD-LANES.md (the calibration report) + the decision section appended to GOLD_BACKTEST_SPEC.md | ✅ DONE (GB-S1, 2026-11-03) — every cell with n; lineage-only tables labelled "not used for selection"; no forecasting edge claimed |
 | D | The decision: MIN2 if C1+C2, else MIN1 if C1+C2, else STOP | ✅ DONE (GB-S1, 2026-11-03) — **GOLD_LANE_MIN_FIRING = 2** (D-GB-3's default; both criteria hold over all windows; no fallback needed, no STOP) |
 | E | P1: the pure engine `gold-balance.ts` + unit tests + index export (04 §3) | ✅ DONE (GB-S2, 2026-11-03) — the engine exactly 02 §2–§3 over the frozen imports (D-GB-9 additive); 15 tests (04 §4.1's 13 + the harness-equivalence pin); the 2026-10-31 fixture reproduces 01 §7 (level · 4 neutral · split 2v2 · dollar 1 · inflation 1) with the no-drift pin −2/headwind/6; gates 9/9 GREEN 14,563 (insights 1,270 → 1,285); bundle byte-identical 1522.88/351.96 |
+| F | P2: BalanceScale members/split/context + MergedCard wiring behind `?balance=lanes` (04 §3) | ✅ DONE (GB-S3, 2026-11-03) — PR #16 (branch gold-balance/p2-ui; code commit `71dede7`); the lane drivers from `goldBalance(readings)` through the SAME BalanceScale (members/split/tally/note + the subtitle/contextLine/measuredNote slots; geometry/animation/beam untouched); the default view byte-identical (main-vs-new render diff PROVEN, then pinned by the legacy vitest snapshot); 19 tests of 04 §4.3 items 1-7/9/11-13 on the recorded 2026-10-31 fixture; fa round-76 same-session (17 strings, copy:audit clean); screenshots EN/fa × 360/1280 + 2 detail-open (evidence/gb-s3/); gates 9/9 GREEN 14,582; Insights lazy 1533.15/354.25 — ceiling bumped to 1540/355.5 WITH justification |
 
-Next: GB-S3 (P2a — the consolidated balance behind `?balance=lanes`), then
-GB-S4 (P2b the visual redesign), GB-S5 (P3+P4), GB-S6 (P5 — **the
-owner-gated flip**), GB-S7 (OI-3, its own owner round).
+Next: GB-S4 (P2b — the visual redesign behind the same flag), then
+GB-S5 (P3+P4), GB-S6 (P5 — **the owner-gated flip**), GB-S7 (OI-3,
+its own owner round).
 
 ## Session log
 
@@ -186,6 +187,97 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
   stress reads neutral, not "against" — one line to reverse) stays
   flagged in the PR description and the CHANGELOG.
 
+### GB-S3 (2026-11-03 ~15:5x–17:xx UTC) — P2: the consolidated balance behind the flag
+
+- **Branch:** `gold-balance/p2-ui` — **PR #16**
+  `gold balance(P2): the consolidated balance behind ?balance=lanes`
+  (draft opened with the screenshots; self-merge when the exit gate
+  held — the owner's incremental-merge instruction). Start state pinned:
+  main at `801cc02` (the GB-S2 merge, PR #15).
+- **Commits** (this branch, in order):
+  1. `web(gold-balance P2): the consolidated balance behind
+     ?balance=lanes — …` (`71dede7` — BalanceScale + MergedCard +
+     Signals/Insights threading + both dictionaries + the 19-test
+     suite + the snapshot + the gb-s3 Playwright project/screenshots +
+     the round-76 doc/manifest + the narrator hashes + the budget bump)
+  2. `docs(gold-balance P2): the records — …` (PROGRESS.md, CHANGELOG
+     2026-11-03i, the GB-S4 prompt rewrite + the lessons log, AGENTS.md's
+     gold-balance paragraph)
+- **The flag:** `?balance=lanes` read ONCE at mount by
+  `useBalanceLanesPreview()` (MergedCard.tsx — the ?narrative=preview
+  pattern), threaded Insights → Signals → MergedSignalsCard; no
+  persistence; without it every visitor sees today's page.
+- **BalanceScale (additive only — geometry/animation/beam UNTOUCHED):**
+  `BalanceDriver` gains optional `members`/`split`/`tally` + `note` (the
+  4th field is THIS session's one extension beyond 03 §3's list — the
+  inflation tilt phrase (03 §3 item 5) needed a lane-level context-line
+  carrier; recorded in the PR); the pan tiles gain the tally second
+  line + the laneChipAria; the tray chips gain the Split badge + tally
+  (the class string computed so LEGACY chips render the exact old
+  classes); the detail panel gains the note line + the member list
+  (Supports/Pressures grouped with evidence · value · the
+  `/insights?card=<id>` deep link, steady collapsed in a `<details>`,
+  unread listed); three optional slots — `subtitle`, `contextLine`,
+  `measuredNote` — render only when passed.
+- **MergedCard (flag on):** the lane drivers from `goldBalance(readings)`
+  (the P1 engine, first app import — AC-3: one engine, no drift), the
+  B-12 status word on the breakeven-5y5y member line
+  (`copy.status[chipWordKeyOf(status)]`), the context line (hidden when
+  change30d is missing), the measured note + the link aimed at
+  BACKTEST-GOLD-LANES.md (the lane model's own measured record — the
+  note's sentence verified against its realised-move tables);
+  the C12 banner + the footing strip kept in BOTH views; the two gold
+  panels retired from the PREVIEW only (never the default).
+- **The default view is PINNED byte-for-byte:** a temporary harness
+  rendered the flag-off card on the 2026-10-31 fixture against BOTH
+  main's components (git stash) and the new ones — `cmp` reported
+  byte-identical — and `gold-balance-lanes.test.tsx` item 13 pins it
+  with a vitest snapshot (the repo's first; the determinism guard
+  renders twice and asserts equality first).
+- **The copy:** the reworded subtitle lands as the SIBLING key
+  `subtitleLanes` (the shared `subtitle` still renders the default view
+  — merging them is P5/GB-S6's); 16 more keys (laneTally, laneTallyNone,
+  laneSplit, splitBadge, laneChipAria, memberSupports, memberPressures,
+  membersSteadyTitle, membersUnreadTitle, memberOpenIndicator (the
+  03 §3 item 6 link word — the second small extension), contextLine,
+  measuredNote, laneIntro.*). fa triaged SAME-SESSION — **round-76**
+  (`docs/localization/persian-copy-round-76-gold-balance.md`, 17
+  strings processed; one polish beyond the drafts: the unread title
+  moved to the «قابل ارزیابی» family); no em dashes (pinned by test);
+  copy:audit clean.
+- **Tests (19, `gold-balance-lanes.test.tsx`):** 04 §4.3 items 1-7, 9,
+  11-13 — the chip placement per side (a synthetic one-sided case: 1
+  for · 2 against · 1 neutral), the split badge + "2 for, 2 against" +
+  the composed aria, the member list (the 2026-10-31 fixture's 8-member
+  borrowing-costs lane; the tilt phrase «expectations fading» verified
+  against `breakevenTiltLean` on the fixture; B-12 both statuses), the
+  unread group shown/hidden, the context line shown/hidden, the
+  measured note + link, the EN+fa wind-word DOM scan (also «باد»), the
+  RTL mirror (same data-tilt + same drops; the for hanger > cx), the
+  dictionary coverage (placeholders + the honesty sentences + the
+  em-dash ban), the keyboard open/close + focus, the legacy snapshot,
+  and the hook (pushState /insights?balance=lanes → true;
+  ?narrative=preview does NOT leak into it).
+- **Screenshots (evidence/gb-s3/, VLM-verified):** EN/fa × 360/1280 of
+  the flag view (level + split lane — the 2026-10-31 overlay on the
+  visual fixture) + the default view + two detail-open shots; captured
+  via the new `gb-s3` Playwright project (the sticky bars neutralized
+  for the element captures — a screenshot-only tweak, documented in the
+  spec file).
+- **Exit gate (04 §3 P2):** component tests green (19/19) · full
+  `pnpm gates` ALL 9 GREEN — **14,582** tests (web 12,604 → 12,623;
+  baseline 14,563, no regression) · lint 0/0 · copy:audit clean ·
+  layer1 strict 11,819/11,819 · narrator checks green (vocabulary
+  hashes refreshed — a copy-file edit after the regeneration means
+  regenerate AGAIN) · Insights lazy **1533.15/354.25** (baseline
+  1522.88/351.96; the engine + lane copy join the chunk) — ceiling
+  bumped 1530/354 → **1540/355.5** WITH the justification in
+  `scripts/check-bundle-budget.mjs` + CHANGELOG (the two panels still
+  ride the chunk until P5 re-baselines downward).
+- **Deploy:** the built worker CHANGES this phase (the SPA joins the
+  api worker) — deployed + verified per docs/DEPLOY.md after the merge
+  (the flag view AND the default view, EN + fa, fresh contexts).
+
 ## Owner must decide
 
 1. **Confirm the calibration decision** (or reverse it): the pre-registered
@@ -203,9 +295,12 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
    Reversing later means a dedicated gated session (the 02 §6 protocol
    again), never a silent edit.
 2. **OI-1 remains open:** the Outlook sentences still state a forecast the
-   backtest does not support — the rewording (03 §6) needs an FA copy round
-   (round-76 is next) and rides GB-S5 (P4).
-3. **OI-2 remains open:** the "mixed" lane badge label ("Split" proposed).
+   backtest does not support — the rewording (03 §6) rides GB-S5 (P4);
+   the fa round for it is round-77.
+3. **OI-2 is now visible in the preview:** the split badge ships as
+   "Split" / «دوپاره» (the default) behind `?balance=lanes` — the owner's
+   live read of it (plus the calm-stress semantic, 02 §4.1) belongs to
+   the P5 decision.
 4. No other open item moved this session (OI-3's precondition — the re-check
    record — is now satisfied; OI-4/OI-5/OI-6 unchanged).
 
