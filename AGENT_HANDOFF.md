@@ -69,6 +69,26 @@
    ledger closed by default; the prototype's own lane icons — the
    ConditionIcon set names states, not lanes).
 
+
+## A-ter. The third variant's re-verification stamp (GB-S4c, 2026-11-04)
+
+A THIRD concurrent GB-S4 session (never pushed; its implementation is
+discarded per the union precedent) re-verified the final delivered
+state end-to-end WITHOUT changing anything (the full record:
+`docs/specs/gold-balance-consolidation/PROGRESS.md`'s GB-S4c block):
+gates ALL 9 GREEN 14,598 re-run on main; CI green on both merges and
+the post-record pushes; currena-api confirmed at 100% on deployment
+`9844fd4f`/version `6549c5bc` with the deployed Insights chunk
+measuring exactly the recorded 1,550,458 bytes; a fresh-context
+production pass over both views EN+fa at 1280+360 with ZERO console
+errors and the wind scan clean; the landed harness re-run 67/67. The
+third hand independently measured the same prototype stack clip
+(188px) and the same dark-tint caption verdict as the second variant.
+Two environment notes ride in the GB-S4c block for future sessions:
+the PRE-EXISTING RTL-360 389px document scrollWidth (the app's
+off-canvas side menu — identical on both views, not a balance
+regression) and the union probes' invocation-CWD sensitivity.
+
 ## B. What is deliberately left open (the owner's decisions — not tasks)
 
 - **V-11: the owner's live read of the redesigned preview** before the

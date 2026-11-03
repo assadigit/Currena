@@ -479,6 +479,64 @@ LANDED as PR #18 (`gold-balance/p2b-union`, merged as `8a99e03`).
   first blurred in the second variant's shot AND in the owner's
   approved reference (the verdict word is the dominant TEXT).
 
+### GB-S4c (2026-11-04 ~0x:xx UTC) — the third variant's arrival + the independent re-verification stamp
+
+A THIRD GB-S4 session also ran concurrently (started from `f6f1fdd`,
+~2.5h behind the first). It built the redesign independently
+(BalanceWeight with the segmented rim, the dispatcher, its own round-77
+triage, its own harness) and found the delivery closed at its first
+push — PR #17 + the PR #18 union already merged, deployed and recorded.
+Its implementation was never pushed (the push was rejected against the
+first variant's branch) and is discarded whole, per the union
+precedent. The session then became the final independent
+re-verification (the f6f1fdd pattern — no state changed), re-running
+everything AFTER the union's own close-out record (`00b4ccb`):
+
+- **Gates re-run on main: ALL 9 GREEN — 14,598 tests** (web 12,639);
+  Insights lazy 1550.46/358.81 as recorded. **CI green** on `bc566e9d`,
+  `3c54dbe`, `8a99e03` AND the post-record main pushes (`00b4ccb`'s
+  lint failure was fixed by `839ce89` — verified in the run history).
+- **Deployment re-verified via the Cloudflare API:** currena-api at
+  100% on deployment `9844fd4f` / version `6549c5bc`; `/api/health` ok;
+  the deployed `Insights-CT99o-Ue.js` = **1,550,458 bytes raw — the
+  recorded 1550.46 kB exactly**; the deployed stylesheet carries the
+  union's `.dark [data-balance-visual] [data-bal-seg=…]` rim override.
+- **A live production browser pass, fresh contexts, zero console
+  errors:** the flag view EN (1280 + 360 — Balanced, "0 for · 0 against
+  · 4 not leaning", 4 tray weights, no overflow) + fa (1280 + 360 RTL
+  + a dark pass — «متعادل», «۰ موافق · ۰ مخالف · ۴ بدون گرایش») and
+  the default view EN + fa (the panels, the legacy chips, the legacy
+  subtitle); the wind scan clean on the flag view in both locales.
+- **The landed harness re-run: 67/67 green** (gb-s4-visual's 61 + the
+  union's 6 probes) with the documented apps/web invocation.
+- **The third hand's independent confirmations** (two hands reaching
+  the same numbers is worth more than one): the prototype's own fixed
+  pan heights clip the 360px four-weight stack — this session measured
+  the SAME `agOverflow: 188` the second variant recorded; the dark
+  captions on the 9% tint fail 4.5:1 with the site's dark chip inks —
+  4.10:1/4.23:1 by this hand's 9% blend vs the second variant's
+  4.28/4.35, the same verdict. Both landed fixes are necessary.
+- **Two environment notes for future sessions** (recorded so the
+  failure modes are recognisable):
+  1. The RTL page at 360px carries a document `scrollWidth` of 389px
+     from the app's own off-canvas side menu — measured IDENTICALLY on
+     the default view and the flag view (nothing inside the gold card
+     overflows any edge). A PRE-EXISTING app-chrome quirk, NOT a
+     balance regression; the probes' baseline-comparison pattern is
+     the right guard against mistaking it for one.
+  2. `gb-s4-union-probe.plw.ts` reads `visual/fixtures/snapshot.json`
+     relative to the process CWD: it PASSES with the documented
+     `--config=visual/playwright.config.ts` invocation from apps/web
+     and FAILS when Playwright is run from `apps/web/visual` itself
+     (where the config file lives — a natural but undocumented entry
+     point). The guards hold; a one-line `import.meta.url` resolution
+     would harden the entry point (deferred to GB-S5's harness touch).
+  3. The deployed site ships ONE main stylesheet — index-*.css carries
+     the `--bal-*` tokens and every visual rule (Vite merges the app's
+     CSS here), so the union record's "code-split into the lazy CSS
+     chunk" describes the intent, not the shipped artifact; the JS
+     budget is unaffected either way.
+
 ## Owner must decide
 
 1. **Confirm the calibration decision** (or reverse it): the pre-registered
