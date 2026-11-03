@@ -2,8 +2,12 @@
  * prod-verify.mjs — the GB-S4 union/delivery production verification:
  * the flag view AND the default view, EN + fa, 360 + 1280, fresh
  * contexts, collecting console errors (the delivery discipline's
- * final gate). Run: node scripts/prod-verify.mjs (from repo root).
+ * final gate). Run: node visual/prod-verify.mjs (from apps/web).
+ *
+ * The page.evaluate callbacks run IN THE BROWSER — window/document are
+ * Playwright-injected page globals, declared for the Node linter here.
  */
+/* global window, document, console */
 import { chromium } from '@playwright/test';
 
 const BASE = 'https://currena.ir';
