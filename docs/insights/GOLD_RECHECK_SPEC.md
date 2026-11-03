@@ -28,6 +28,27 @@ Companion files, in read order: `AGENTS.md` (the rules) → this file →
 
 ## 1. The state of record (updated every re-run — this is what "now" was)
 
+- **2026-11-03 ~05:00 UTC — the missed armed check, run manually (GB-S1, the
+  gold-balance consolidation's first session).** The 2026-11-02 one-shot
+  never fired (no `[2026-11-02a]` entry; the fixture stood at recordedAt
+  2026-10-31T15:17:40Z), so §3 steps 1–7 ran by hand. The corpus-of-record:
+  19 archive days, 2026-10-15 → 11-03 (10-20 absent), recordedAt
+  2026-11-03T04:43:54Z — **grown AND re-venued**: the two FX voters
+  (`dollar-basket`, `usdjpy`) left the stage blob (the gap-closure ingest
+  rounds) and are now sourced read-only from their `insights:hist:<id>`
+  keys (the dump records the venue); the rolling ~10-year history window
+  trimmed the head and dropped the 2026-10-31 Saturday seed point, so the
+  windows count moved 2,514 → **2,512**. The promoted-table re-run: sign-
+  agreements 51.6 / 47.3 / 44.3%, tilt 46.7% (in band), mature base
+  46.8 / 42.2 / 32.7% — the 5td sits a hair BELOW the 2-SE band edge (S6
+  had it just inside), so the mechanical wording returns to the S4 form;
+  no edge claim either way, the round-55 note stays operative. The watch
+  (days 2–4): **LOCKSTEP — validated-by-watch** (offset exactly 1 gold
+  trading day at every rung). The no-drift contract holds on all four
+  stamped days (all −2/headwind, the tilt silent). No escalation rule
+  fired. The P0 lane calibration rode the same corpus
+  (`docs/insights/BACKTEST-GOLD-LANES.md`; MIN2 chosen). Full record:
+  `GOLD_BACKTEST_SPEC.md` §5's 2026-11-03 sections.
 - **2026-10-31 ~16:07 UTC — the S6 close (this file's birth).**
   Production: currena-api version `21ca25ab` at 100% — the 21-voter
   table (breakeven-tilt, inflation lane, level-leg only) computes in
@@ -83,7 +104,12 @@ is no such thing as "too late" — §1 just gets a new line.
   check the output: the archive-day count should be ≈ the days since
   2026-10-15 (10-20 absent) — e.g. a 2026-11-02 run expects ~18.
   An unexplained missing day is a finding: record it, do not paper
-  over it.
+  over it. *(Venue note, 2026-11-03: `dollar-basket` and `usdjpy` no
+  longer ride the stage blob — the dump sources them read-only from
+  their own `insights:hist:<id>` keys and records the venue in the
+  corpus; the KV histories are rolling ~10-year windows, so the head
+  trims over time and the window count can move DOWN between runs —
+  compare values on common days, never silently reconcile.)*
 - **Step 4 — the backtest run (offline; reads only the fixture):**
   `corepack pnpm --filter @currena/insights gold-backtest`
   — the PROMOTED 21-voter table is the primary; the S4-frozen
@@ -134,6 +160,7 @@ For each new archive day: extract the five readings' `asOf` + status.
 |---|---|---|---|---|---|
 | S4 (frozen 20-voter) | 16 days, recorded 10-31 12:34Z | 2,514 | 51.7 / 46.9 / 43.9% | — | the pre-promotion baseline |
 | S6 (promoted 21-voter) | 16 days, recorded 10-31 15:17Z | 2,514 | 52.1 / 47.6 / 43.9% | 1,174 (46.7%) | label flips 256 (10.2%); mature-base 46.9/42.3/32.6%, spreads +0.02/−0.22/−1.94 — the 5td sits just INSIDE the 2-SE band → "no measurable edge" either way (the S4 "runs the other way" wording softens); 20td/60td still depart below 50% |
+| 2026-11-03 re-check (promoted 21, run manually) | 19 days, recorded 11-03 04:43Z | 2,512 | 51.6 / 47.3 / 44.3% | 1,173 (46.7%) | mature 46.8/42.2/32.7%, spreads −0.01/−0.30/−1.98% — the 5td flips to just OUTSIDE the 2-SE band and its spread to −0.01%: the mechanical wording returns to the S4 form ("runs the OTHER way"), borderline stated; watch days 2–4 LOCKSTEP → validated-by-watch; no-drift holds on all 4 stamped days; windows −2 vs S6 (the rolling head trim + the dropped 10-31 Saturday seed); label flips 263 (10.5%); the FX voters re-venued to insights:hist:*; no escalation |
 
 **The standing honest note** (round-55, on the panel in EN + fa): the
 table's lean showed no positive association with gold's next 5–60
