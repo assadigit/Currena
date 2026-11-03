@@ -1439,6 +1439,15 @@ html:not(:lang(fa)) .type-kicker {
  * elsewhere are untouched. */
 .dark [data-balance-visual] .bal-pan-for .bal-pan-cap { --bal-cap-ink: #4bc27d; }
 .dark [data-balance-visual] .bal-pan-against .bal-pan-cap { --bal-cap-ink: #f07078; }
+/* GB-S4 union polish (the parallel variant's VLM pass + tint measurement,
+   applied to the merged build): the segments are decorative (the counts
+   live in words) but must stay LEGIBLE — the site's pinned Green 50
+   reads faint against #1A222E at a 3-4.2px stroke, so the dark theme's
+   rim segments take the reference prototype's own darker-theme side
+   hues (its --side-for / --side-against), matching the dark caption
+   ink family above (light mode keeps the site's status hues verbatim). */
+.dark [data-balance-visual] [data-bal-seg='supports'] { stroke: #4bc27d; }
+.dark [data-balance-visual] [data-bal-seg='pressures'] { stroke: #f07078; }
 .bal-pan-empty {
   margin: auto;
   padding: 0 8px;
