@@ -46,7 +46,7 @@ where to look; nothing here needs the agent.
   - `usd-reserve-share` (IMF COFER): quarterly, ~one quarter behind —
     expect the new quarter's reading within ~4-5 weeks of the quarter
     end (the Saturday gate re-checks weekly; a stale card beyond the
-    270-day window means the parser or the dataset changed — check
+    200-day window means the parser or the dataset changed — check
     VERIFIED-SOURCES's COFER row before anything else).
   - The NBS China pair (property investment + crude steel): the
     dedicated releases publish ~the 19th-20th of each month; the rung

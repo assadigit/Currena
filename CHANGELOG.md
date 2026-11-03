@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03c] — gap-closure S6: the parallel-session union (the second M6.3 variant's records join the first-landed, deployed `d6f60b6`; nothing user-facing changes — the builds are byte-identical)
+
+Two sessions built M6.3 independently (the S5 parallel reality, again).
+The first-landed variant (`d6f60b6` — the dedollar-concentration gauge
+design, the SDMX 3.0 endpoint) is pushed and deployed; per the S5
+precedent its design wins. This union layers the second variant's
+chain on top as records + evidence only: the M6.4 promotion proposal
+(`docs/gap-closure/PROMOTION-PROPOSAL.md` + `evidence/M6.4/`), the
+M6.5 quality-pass evidence, the M6.6 docs close (the stale
+123-indicator line → 161, the `/api/insights/markets-au` endpoint row,
+CASE-STUDY.md, MAINTENANCE.md's S6 cadence checks), the twice-verified
+provider answers (`evidence/M6.3/`), and the persian-terminology
+section (rewritten against the shipping strings). The second variant's
+render design (the dollar-lane foot + the DOLLAR_STRENGTH_IDS fix)
+does not ship — recorded as history in PROGRESS.md's M6.5 union note.
+**The union's web build reproduces the deployed `Insights-5V_N7nyu.js`
+byte-identically; gates ALL 9 GREEN at 14,519 tests.**
+
 ## [2026-11-03b] — gap-closure S6-M6.5: the final quality pass (the render check caught the missing COFER lane row; both locales verified at 360/768/1200; the free-tier audit final)
 
 - **The fix:** `usd-reserve-share` was missing from `DOLLAR_STRENGTH_IDS`
@@ -68,7 +86,6 @@ the providers' own data + the raw results).
 - **PROMOTION-PROPOSAL.md committed; execution plan §7 armed; owner
   approval PENDING.**
 
-## [2026-11-02j] — gap-closure S6-M6.3: the de-dollarization and concentration family (the IMF COFER reserve share + the S&P 500 equal-weight/cap-weight proxy + the Italy–Germany spread; G12)
 ## [2026-11-02j] — gap-closure S6-M6.3: the de-dollarization/concentration family (the COFER reserve share + the S&P 500 breadth proxy + the BTP–Bund spread — three context cards, a new shadow lane)
 
 The last gap family of the program. Three cards, all context-only per
