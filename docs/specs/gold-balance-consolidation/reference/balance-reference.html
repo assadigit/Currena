@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gold balance: visual and mechanical reference</title>
+<!--
+  VISUAL + MECHANICAL REFERENCE (not production code).
+  Implement in React in apps/web/src/components/insights/signals/BalanceScale.tsx.
+  Spec: docs/specs/gold-balance-consolidation/05-VISUAL-DESIGN-SPEC.md
+  Everything is vanilla JS + inline SVG + CSS. No dependency, no image asset.
+  Query params for quick views: ?sc=today|against|for|split|stack|none|loading
+                                &theme=dark &dir=rtl &frame=360|390|768 &guides=1 &open=borrow
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Vazirmatn:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ---------- Tokens. Names belong to the assay office: brass, ivory, stone. ---------- */
+  :root {
+    --page: #eef2f7;
+    --ivory: #fffdf8;
+    --paper: #ffffff;
+    --ink: #2c3e50;
+    --ink-2: #47525d;
+    --ink-3: #66727f;
+    --hairline: rgba(44, 62, 80, 0.14);
+    --hairline-soft: rgba(44, 62, 80, 0.07);
+    --bal-brass-hi: #fbe3a0;
+    --bal-brass-mid: #eab544;
+    --bal-brass-lo: #b27a1d;
+    --bal-brass-ink: #5b3d08;
+    --bal-brass-text: #8a5a0a;
+    --bal-stone-hi: #eef2f6;
+    --bal-stone-lo: #c7d0da;
+    --bal-recess: #f3f5f8;
+    --bal-glow: rgba(243, 177, 63, 0.16);
+    --side-for: #1b8a4a;
+    --side-against: #cf2530;
+    --shadow-card: 0 0 0 1px rgba(44,62,80,.06), 0 1px 2px -1px rgba(44,62,80,.08), 0 18px 48px -18px rgba(168,126,28,.28);
+    --font: Poppins, ui-sans-serif, system-ui, sans-serif;
+  }
+  .dark {
+    --page: #0c1118;
+    --ivory: #19212c;
+    --paper: #1a222e;
+    --ink: #e8edf4;
+    --ink-2: #b5c0cf;
+    --ink-3: #8f9db0;
+    --hairline: rgba(255, 255, 255, 0.12);
+    --hairline-soft: rgba(255, 255, 255, 0.06);
+    --bal-brass-hi: #f3d488;
+    --bal-brass-mid: #d9a43e;
+    --bal-brass-lo: #8f5f14;
+    --bal-brass-ink: #2a1c04;
+    --bal-brass-text: #e8bd63;
+    --bal-stone-hi: #46546a;
+    --bal-stone-lo: #2b3646;
+    --bal-recess: #141b25;
+    --bal-glow: rgba(243, 177, 63, 0.10);
+    --side-for: #4bc27d;
+    --side-against: #f07078;
+    --shadow-card: 0 0 0 1px rgba(255,255,255,.08), 0 24px 60px -20px rgba(0,0,0,.7);
+  }
+  [dir="rtl"] { --font: Vazirmatn, Poppins, ui-sans-serif, system-ui, sans-serif; }
+
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--font); line-height: 1.5; }
+  button { font: inherit; color: inherit; }
+
+  /* ---------- Reference chrome (NOT part of the component) ---------- */
+  .ref-bar { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 12px; background: color-mix(in srgb, var(--page) 90%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--hairline-soft); font-size: 12px; }
+  .ref-bar .grp { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-inline-end: 10px; margin-inline-end: 4px; border-inline-end: 1px solid var(--hairline); }
+  .ref-bar .grp:last-child { border: 0; }
+  .ref-bar .lbl { color: var(--ink-3); font-weight: 500; }
+  .ref-bar button { padding: 6px 11px; min-height: 32px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--paper); cursor: pointer; font-weight: 500; font-size: 12px; }
+  .ref-bar button[aria-pressed="true"] { background: var(--bal-brass-mid); border-color: var(--bal-brass-lo); color: #2a1c04; }
+  .ref-wrap { padding: 12px 8px 40px; }
+  .frame { margin: 0 auto; width: 100%; max-width: 1120px; transition: width .25s ease; }
+  .frame[data-frame="360"] { width: 360px; } .frame[data-frame="390"] { width: 390px; } .frame[data-frame="768"] { width: 768px; max-width: 100%; }
+  .readout { margin: 14px auto 0; max-width: 1120px; padding: 12px 14px; border-radius: 12px; background: var(--paper); box-shadow: 0 0 0 1px var(--hairline); font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace; color: var(--ink-2); display: none; white-space: pre-wrap; }
+  body[data-guides="1"] .readout { display: block; }
+  .notes { max-width: 1120px; margin: 28px auto 0; padding: 0 6px; font-size: 13px; color: var(--ink-2); }
+  .notes h2 { font-size: 15px; margin: 0 0 8px; color: var(--ink); }
+  .notes table { width: 100%; border-collapse: collapse; font-size: 12.5px; background: var(--paper); border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px var(--hairline); }
+  .notes th, .notes td { text-align: start; padding: 7px 10px; border-bottom: 1px solid var(--hairline-soft); vertical-align: top; }
+  .notes th { font-weight: 600; color: var(--ink); background: var(--bal-recess); }
+  .notes code { font-size: 12px; }
+  .notes .scroll { overflow-x: auto; }
+
+  /* ---------- THE COMPONENT ---------- */
+  .gb {
+    position: relative; isolation: isolate; overflow: clip;
+    border-radius: 28px; padding: 44px 36px 36px;
+    background: radial-gradient(120% 60% at 50% -10%, var(--bal-glow), transparent 60%), linear-gradient(180deg, var(--ivory), var(--paper) 55%);
+    box-shadow: var(--shadow-card);
+  }
+  .gb[data-size="m"] { padding: 32px 24px 28px; border-radius: 26px; }
+  .gb[data-size="s"] { padding: 22px 12px 22px; border-radius: 24px; }
+
+  .gb-head { max-width: 640px; margin: 0 auto; text-align: center; }
+  .gb-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--bal-brass-text); margin: 0 0 8px; }
+  [dir="rtl"] .gb-eyebrow, [dir="rtl"] .verdict-eyebrow { letter-spacing: 0; text-transform: none; }
+  .gb-title { margin: 0; font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  [data-size="m"] .gb-title { font-size: 24px; } [data-size="s"] .gb-title { font-size: 20px; }
+  .gb-sub { margin: 10px auto 0; font-size: 14px; color: var(--ink-2); text-wrap: pretty; max-width: 52ch; }
+  [data-size="s"] .gb-sub { font-size: 13px; }
+
+  /* Stage: the drawing layer (svg) sits behind the pans (absolute DOM). Height is computed in JS from the worst case. */
+  .stage { position: relative; width: 100%; max-width: 720px; margin: 20px auto 0; }
+  [data-size="s"] .stage { margin-top: 10px; }
+  .stage svg.mech { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .pan {
+    position: absolute; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 12px 6px 24px; border-radius: 14px 14px 34px 34px / 14px 14px 26px 26px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 9%, transparent), color-mix(in srgb, var(--tint) 3%, transparent));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 20%, transparent);
+    will-change: transform;
+  }
+  .pan::after { content: ""; position: absolute; inset-inline: 5%; bottom: 0; height: 8px; border-radius: 999px;
+    background: linear-gradient(180deg, var(--bal-brass-hi), var(--bal-brass-mid) 45%, var(--bal-brass-lo)); box-shadow: 0 5px 8px -3px rgba(91,61,8,.4); }
+  .pan-for { --tint: var(--side-for); } .pan-against { --tint: var(--side-against); }
+  .pan-cap { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--tint); text-align: center; line-height: 1.25; min-height: 30px; }
+  [data-size="s"] .pan-cap { font-size: 11px; gap: 4px; }
+  .pan-cap svg { width: 14px; height: 14px; flex: none; }
+  .pan-empty { margin: auto; padding: 0 8px; font-size: 12px; color: var(--ink-3); text-align: center; text-wrap: balance; }
+  [data-size="s"] .pan-empty { font-size: 11px; }
+  .weights { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 6px; width: 100%; }
+  .stage .weights { gap: 10px 8px; }
+
+  .weight { display: flex; flex-direction: column; align-items: center; gap: 6px; width: var(--w, 78px); background: none; border: 0; padding: 2px 0 0; cursor: pointer; border-radius: 14px; transition: transform 140ms cubic-bezier(.23,1,.32,1); }
+  .weight:hover { transform: translateY(-1px); } .weight:active { transform: scale(.97); }
+  .weight:focus-visible, .row-btn:focus-visible { outline: 2px solid var(--bal-brass-mid); outline-offset: 3px; }
+  .weight-label { font-size: 12px; font-weight: 500; line-height: 1.2; text-align: center; color: var(--ink); text-wrap: balance; overflow-wrap: anywhere; }
+  [data-size="s"] .weight-label { font-size: 11px; }
+  .disc { position: relative; width: var(--d, 58px); height: var(--d, 58px); flex: none; }
+  .disc svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .disc .face { filter: drop-shadow(0 4px 5px rgba(91,61,8,.30)); }
+  .dark .disc .face { filter: none; }
+  .badge-split { position: absolute; inset-block-start: -7px; inset-inline-end: -12px; font-size: 10px; font-weight: 600; line-height: 1; padding: 3px 7px; border-radius: 999px; background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--hairline), 0 2px 4px rgba(0,0,0,.12); white-space: nowrap; }
+
+  /* Verdict block: the focal point */
+  .verdict { margin: 22px auto 0; text-align: center; }
+  [data-size="s"] .verdict { margin-top: 14px; }
+  .verdict-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+  .verdict-word { margin: 4px 0 0; font-size: 44px; line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+  [data-size="m"] .verdict-word { font-size: 38px; } [data-size="s"] .verdict-word { font-size: 30px; }
+  .verdict-word[data-side="for"] { color: var(--side-for); } .verdict-word[data-side="against"] { color: var(--side-against); }
+  .lanes-bar { display: inline-grid; grid-auto-flow: column; gap: 6px; margin-top: 14px; }
+  .lanes-bar i { width: 44px; height: 6px; border-radius: 999px; background: var(--hairline); }
+  [data-size="s"] .lanes-bar i { width: 30px; }
+  .lanes-bar i[data-side="for"] { background: var(--side-for); } .lanes-bar i[data-side="against"] { background: var(--side-against); }
+  .lanes-bar i[data-side="neutral"] { background: var(--bal-stone-lo); } .dark .lanes-bar i[data-side="neutral"] { background: #5a6a82; }
+  .verdict-counts { margin: 10px 0 0; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .verdict-note { margin: 6px auto 0; max-width: 46ch; font-size: 12.5px; color: var(--ink-3); text-wrap: balance; }
+  .context { display: inline-block; max-width: 100%; margin-top: 14px; padding: 7px 14px; border-radius: 18px; background: var(--bal-recess); font-size: 12.5px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--hairline-soft); text-wrap: balance; }
+  .context b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* Tray */
+  .tray { margin: 28px auto 0; max-width: 760px; padding: 14px 18px 18px; border-radius: 20px; background: var(--bal-recess); box-shadow: inset 0 1px 3px rgba(0,0,0,.06), inset 0 0 0 1px var(--hairline-soft); }
+  [data-size="s"] .tray { margin-top: 20px; padding: 12px 10px 14px; border-radius: 18px; }
+  .tray-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; align-items: baseline; margin-bottom: 12px; }
+  .tray-title { font-size: 12px; font-weight: 600; color: var(--ink-2); } .tray-note { font-size: 12px; color: var(--ink-3); }
+  .tray .weights { gap: 12px 18px; } [data-size="s"] .tray .weights { gap: 12px 8px; }
+  .tray .weight { --w: 92px; --d: 46px; } [data-size="s"] .tray .weight { --w: 72px; --d: 42px; }
+  .tray-empty { font-size: 13px; color: var(--ink-3); text-align: center; margin: 4px 0; }
+
+  /* Ledger */
+  .ledger { list-style: none; margin: 28px auto 0; padding: 0; max-width: 760px; display: grid; gap: 2px; }
+  [data-size="s"] .ledger { margin-top: 20px; }
+  .row { border-radius: 18px; }
+  .row[data-open="true"] { background: var(--bal-recess); box-shadow: inset 0 0 0 1px var(--hairline-soft); }
+  .row-btn { width: 100%; display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 14px; padding: 12px 14px; background: none; border: 0; cursor: pointer; text-align: start; border-radius: 18px; min-height: 64px; }
+  .row-btn:hover { background: color-mix(in srgb, var(--bal-recess) 70%, transparent); }
+  .row .disc { --d: 40px; }
+  .row-name { font-size: 15px; font-weight: 600; line-height: 1.25; display: block; }
+  .row-state { font-size: 13px; color: var(--ink-2); display: block; }
+  .row-state[data-side="for"] { color: var(--side-for); } .row-state[data-side="against"] { color: var(--side-against); }
+  .row-tally { font-size: 12.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  [data-size="s"] .row-btn { grid-template-columns: auto 1fr auto; gap: 10px; padding: 10px; }
+  [data-size="s"] .row-tally { grid-column: 2; grid-row: 2; white-space: normal; margin-top: -6px; }
+  [data-size="s"] .row-btn .chev { grid-column: 3; grid-row: 1; }
+  .chev { width: 18px; height: 18px; color: var(--ink-3); transition: transform .2s cubic-bezier(.23,1,.32,1); }
+  .row[data-open="true"] .chev { transform: rotate(180deg); }
+  .members { padding: 2px 18px 16px; display: grid; gap: 7px; } [data-size="s"] .members { padding: 2px 12px 14px; }
+  .members[hidden] { display: none; }
+  .m { display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: baseline; font-size: 13px; }
+  [data-size="s"] .m { grid-template-columns: 10px 1fr; } [data-size="s"] .m .m-ev { grid-column: 2; margin-top: -4px; }
+  .m i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .m[data-i="S"] i { background: var(--side-for); } .m[data-i="P"] i { background: var(--side-against); }
+  .m[data-i="U"] i { box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+  .m-ev { color: var(--ink-3); font-size: 12.5px; }
+  .steady { margin-top: 4px; font-size: 12.5px; color: var(--ink-3); text-wrap: pretty; }
+  .foot { max-width: 640px; margin: 28px auto 0; text-align: center; font-size: 12.5px; color: var(--ink-3); text-wrap: pretty; }
+  .foot a { color: var(--ink-2); text-decoration-color: var(--bal-brass-mid); text-underline-offset: 3px; }
+
+  /* Skeleton (loading state): static, no motion */
+  .sk { background: var(--hairline-soft); border-radius: 999px; }
+  @media (prefers-reduced-motion: reduce) { .chev, .weight, .frame { transition: none; } }
+</style>
+</head>
+<body data-guides="0">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="faceBrass" cx="35%" cy="28%" r="85%"><stop offset="0%" stop-color="var(--bal-brass-hi)"/><stop offset="55%" stop-color="var(--bal-brass-mid)"/><stop offset="100%" stop-color="var(--bal-brass-lo)"/></radialGradient>
+    <radialGradient id="faceStone" cx="35%" cy="28%" r="85%"><stop offset="0%" stop-color="var(--bal-stone-hi)"/><stop offset="100%" stop-color="var(--bal-stone-lo)"/></radialGradient>
+    <linearGradient id="beamBrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--bal-brass-hi)"/><stop offset="50%" stop-color="var(--bal-brass-mid)"/><stop offset="100%" stop-color="var(--bal-brass-lo)"/></linearGradient>
+  </defs>
+</svg>
+
+<div class="ref-bar" id="bar"></div>
+<div class="ref-wrap">
+  <div class="frame" id="frame" data-frame="fluid"><section class="gb" id="gb" aria-label="Gold balance"></section></div>
+  <div class="readout" id="readout" aria-live="off"></div>
+
+  <div class="notes">
+    <h2>Mechanics (what the implementation must reproduce)</h2>
+    <div class="scroll"><table>
+      <tr><th>Rule</th><th>Value</th></tr>
+      <tr><td>One animated value</td><td><code>theta</code> (degrees, positive = the "for" pan is heavier). Beam rotation, joints, pan translation, hangers and needle all derive from it in the same frame.</td></tr>
+      <tr><td>Beam angle (unchanged formula)</td><td><code>|for - against| / (for + against) x 10</code>, clamped to [3, 10], level when net = 0 or fewer than 3 lanes are readable, level when all unread. Heavier pan goes down.</td></tr>
+      <tr><td>Physical angle</td><td></td>The "for" pan is the inline-start pan: left in LTR, right in RTL. <code>phys = rtl ? theta : -theta</code>; positive phys = right end down.</td></tr>
+      <tr><td>Pans</td><td>Never rotated or scaled. Only <code>translateY(dy)</code>, <code>dy = (L/2) * sin(phys)</code> (opposite sign on the other end), so they hang plumb.</td></tr>
+      <tr><td>Hangers</td><td>Two lines per end, redrawn each frame from the joint (beam end after rotation) to the pan top corners at 42% of the pan width either side of its centre.</td></tr>
+      <tr><td>Needle</td><td>Pivots at the hub, angle <code>clamp(phys x 3, -32, 32)</code> over a dial of 11 ticks spanning +/-35 degrees (a 3x magnified readout so a 3 degree lean is legible). Hidden when nothing could be read.</td></tr>
+      <tr><td>Geometry</td><td><code>pw</code> = pan width (s: 46% of stage; m/l: min(280, 38%)). <code>L = stageWidth - pw</code> (pan centres sit on the beam ends, pan edges touch the stage edges). <code>swing = (L/2) sin 10 deg</code>. <code>hanger = swing + 22</code>. <code>panH</code>: s 236, m/l 268 (the "stack" scenario proves four weights fit). <code>H = pivotY + hanger + panH + swing + 40</code>. Height never depends on the data.</td></tr>
+      <tr><td>Motion</td><td>650 ms, ease-out quartic, only on load and data change. <code>prefers-reduced-motion</code>: jump to the final angle.</td></tr>
+      <tr><td>Breakpoints</td><td>By the card's own width (ResizeObserver / container query), not the viewport: s &lt; 560, m 560 to 759, l &gt;= 760.</td></tr>
+      <tr><td>Weight rim</td><td>One arc segment per driver of the lane, sorted supports, pressures, steady, unread. Green / red / grey / dotted grey. Decorative; counts live in the aria-label and the ledger.</td></tr>
+      <tr><td>Lane vote</td><td>Spec 02: at least 2 drivers firing, strict majority; a tie is neutral with the "Split" badge; no readable driver = unread.</td></tr>
+    </table></div>
+    <h2 style="margin-top:20px">Tokens added (scoped to the balance)</h2>
+    <div class="scroll"><table>
+      <tr><th>Token</th><th>Light</th><th>Dark</th></tr>
+      <tr><td><code>--bal-brass-hi / mid / lo / ink / text</code></td><td>#fbe3a0 / #eab544 / #b27a1d / #5b3d08 / #8a5a0a</td><td>#f3d488 / #d9a43e / #8f5f14 / #2a1c04 / #e8bd63</td></tr>
+      <tr><td><code>--bal-stone-hi / lo</code></td><td>#eef2f6 / #c7d0da</td><td>#46546a / #2b3646</td></tr>
+      <tr><td><code>--bal-recess</code>, <code>--bal-glow</code></td><td>#f3f5f8, rgba(243,177,63,.16)</td><td>#141b25, rgba(243,177,63,.10)</td></tr>
+      <tr><td>Side colours</td><td>for #1b8a4a, against #cf2530 (map to the site's status tokens; these are contrast-checked on the tinted pan)</td><td>for #4bc27d, against #f07078</td></tr>
+    </table></div>
+  </div>
+</div>
+
+<script>
+/* ===================== Copy (EN + FA). Production: i18n dictionaries. FA is a draft. ===================== */
+const I18N = {
+  en: {
+    eyebrow: "Gold · today's conditions",
+    title: "The aggregate of factors affecting the price of gold",
+    sub: "Gold's four main drivers are each read against their usual range and weighed equally. The beam shows today's lean. It is not a forecast.",
+    capFor: "Supporting gold", capAgainst: "Pressuring gold", empty: "Nothing on this side",
+    emptyNone: "Nothing could be read yet, so neither side has been weighed.",
+    verdictEyebrow: "Today's lean",
+    v: { for: "Leaning for gold", balanced: "Balanced", against: "Leaning against gold", none: "Can't read the conditions" },
+    counts: (f,a,n,u)=>`${f} for · ${a} against · ${n} not leaning` + (u?` · ${u} unread`:''),
+    notEnough: "Fewer than three drivers could be read, so the beam stays level.",
+    context: (c)=>`Gold, last 30 days <b>${c}</b> · context only, not counted`,
+    trayTitle: "Not leaning", trayNote: "Weighed, but no clear lean", trayEmpty: "Every driver is on a pan.",
+    split: "Split",
+    lane: { borrow: "Borrowing costs", dollar: "The dollar", stress: "Market stress", inflation: "Inflation" },
+    state: { for: "Leans for gold", against: "Leans against gold", neutral: "Not leaning", split: (s,p)=>`Split: ${s} for, ${p} against`, unread: "Couldn't be read" },
+    tally: (f,r)=> f? `${f} of ${r} firing` : (r? 'None firing':'No data'),
+    S: "Supports", P: "Pressures", U: "Unread", steady: (n,names)=>`Not firing (${n}): ${names}`,
+    foot: `This describes today's conditions. It is not a forecast. Over 2016 to 2026 the same drivers showed no positive link to gold's next moves. <a href="#">Read the full backtest</a>`,
+    ev: { falling:"falling", rising:"rising", high:"high in its decade", low:"low in its decade" },
+    aria: (lane, st, tally)=>`${lane}: ${st}. ${tally}.`,
+    stageAria: (v,deg)=>`Balance for gold. ${v}. Beam tilt ${deg} degrees.`,
+    voters: { borrow:["Real yields","US 10-year yield","US 30-year yield","Fed policy rate","Fed expectations","ECB deposit rate","Yield curve 10y-2y","Yield curve 10y-3m"], dollar:["Dollar index","USD/JPY","US-Japan 10y gap"], stress:["Financial stress (STLFSI)","Financial conditions (NFCI)","VIX","Gold-silver ratio","Futures positioning"], inflation:["US CPI","US core PCE","Euro HICP","5y5y breakeven","Inflation tilt"] }
+  },
+  fa: {
+    eyebrow: "طلا · شرایط امروز",
+    title: "برآیند عوامل مؤثر بر قیمت طلا",
+    sub: "چهار عامل اصلی مؤثر بر طلا هرکدام در برابر محدودهٔ معمولشان خوانده و با وزن برابر سنجیده می‌شوند. ترازو گرایش امروز را نشان می‌دهد و پیش‌بینی نیست.",
+    capFor: "به نفع قیمت طلا", capAgainst: "علیه قیمت طلا", empty: "چیزی در این کفه نیست",
+    emptyNone: "هنوز چیزی قابل خواندن نیست، پس هیچ‌یک از دو کفه سنجیده نشده است.",
+    verdictEyebrow: "گرایش امروز",
+    v: { for: "به نفع طلا", balanced: "متعادل", against: "علیه طلا", none: "شرایط قابل ارزیابی نیست" },
+    counts: (f,a,n,u)=>`${f} موافق · ${a} مخالف · ${n} بدون گرایش` + (u?` · ${u} ناخوانده`:''),
+    notEnough: "کمتر از سه عامل قابل خواندن بود، پس ترازو در حالت تعادل می‌ماند.",
+    context: (c)=>`طلا در ۳۰ روز گذشته <b>${c}</b> · فقط برای زمینه، حساب نمی‌شود`,
+    trayTitle: "بدون گرایش", trayNote: "سنجیده شد، اما گرایش روشنی نیست", trayEmpty: "همهٔ عوامل روی کفه‌ها هستند.",
+    split: "دوپاره",
+    lane: { borrow: "هزینهٔ استقراض", dollar: "دلار", stress: "تنش بازار", inflation: "تورم" },
+    state: { for: "به نفع طلا", against: "علیه طلا", neutral: "بدون گرایش", split: (s,p)=>`دوپاره: ${s} موافق، ${p} مخالف`, unread: "قابل‌خواندن نبود" },
+    tally: (f,r)=> f? `${f} از ${r} فعال` : (r? 'هیچ‌کدام فعال نیست':'بدون داده'),
+    S: "به نفع", P: "علیه", U: "ناخوانده", steady: (n,names)=>`غیرفعال (${n}): ${names}`,
+    foot: `این ترازو شرایط امروز را توصیف می‌کند و پیش‌بینی نیست. در سال‌های ۲۰۱۶ تا ۲۰۲۶ همین عوامل رابطهٔ مثبتی با حرکت بعدی طلا نشان ندادند. <a href="#">گزارش کامل بک‌تست</a>`,
+    ev: { falling:"در حال کاهش", rising:"در حال افزایش", high:"بالا در بازهٔ ده‌ساله", low:"پایین در بازهٔ ده‌ساله" },
+    aria: (lane, st, tally)=>`${lane}: ${st}. ${tally}.`,
+    stageAria: (v,deg)=>`ترازوی طلا. ${v}. شیب بازو ${deg} درجه.`,
+    voters: { borrow:["بازده واقعی","بازده ۱۰ساله آمریکا","بازده ۳۰ساله آمریکا","نرخ سیاستی فدرال","انتظارات از فدرال","نرخ سپردهٔ ECB","شیب ۱۰ و ۲ ساله","شیب ۱۰ ساله و ۳ ماهه"], dollar:["شاخص دلار","دلار/ین","شکاف ۱۰ساله آمریکا و ژاپن"], stress:["تنش مالی","شرایط مالی","وی‌آی‌ایکس","نسبت طلا به نقره","موقعیت قراردادها"], inflation:["شاخص قیمت مصرف‌کننده","هستهٔ PCE","تورم یورو","تورم ۵ساله پس از ۵ سال","شیب تورم"] }
+  }
+};
+
+/* Lucide-style icons. Production: reuse the existing ConditionIcon set first (DQ-4). */
+const ICONS = {
+  borrow: '<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  dollar: '<line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  stress: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
+  inflation: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'
+};
+const LANE_KEYS = ['borrow','dollar','stress','inflation'];
+
+/* Scenarios. Per lane: driver index -> [impact, evidence]. S supports, P pressures, U unread; absent = steady. */
+const SCENARIOS = {
+  today:   { label: "Today (31 Oct)", change: "−4.2%",
+    borrow:{0:['S','falling'],1:['S','falling'],2:['P','high'],4:['P','high']}, dollar:{1:['P','high']}, stress:{4:['U']}, inflation:{3:['P','falling']} },
+  against: { label: "Against", change: "−6.8%",
+    borrow:{0:['P','high'],1:['P','high'],2:['P','high'],3:['P','high'],4:['P','high']}, dollar:{0:['P','rising'],1:['P','high']}, stress:{}, inflation:{0:['S','rising'],1:['S','rising'],3:['P','falling']} },
+  for:     { label: "For", change: "+5.1%",
+    borrow:{0:['S','falling'],1:['S','falling'],2:['S','falling'],4:['S','falling']}, dollar:{0:['S','falling'],1:['S','falling']}, stress:{0:['S','rising'],2:['S','high']}, inflation:{} },
+  split:   { label: "For + split", change: "+0.8%",
+    borrow:{0:['S','falling'],1:['S','falling'],2:['P','high'],3:['P','high']}, dollar:{0:['S','falling'],1:['S','falling']}, stress:{0:['P','low'],1:['P','low']}, inflation:{3:['S','rising'],0:['S','rising']} },
+  stack:   { label: "All 4 on one pan", change: "−9.0%",
+    borrow:{0:['P','high'],1:['P','high'],2:['P','high']}, dollar:{0:['P','high'],1:['P','high']}, stress:{0:['P','low'],1:['P','low']}, inflation:{0:['P','falling'],1:['P','falling']} },
+  none:    { label: "Can't read", change: null, borrow:'U', dollar:'U', stress:'U', inflation:'U' },
+  loading: { label: "Loading", loading: true }
+};
+
+/* ===================== Engine (spec 02 §3). Production: goldBalance() in packages/insights. ===================== */
+const MIN_FIRING = 2;
+function engine(sc, T) {
+  const lanes = LANE_KEYS.map((k) => {
+    const members = T.voters[k].map((name, i) => {
+      const spec = sc[k] === 'U' ? ['U'] : ((sc[k] || {})[i] || ['T']);
+      return { name, impact: spec[0], ev: spec[1] || null };
+    });
+    const s = members.filter(m=>m.impact==='S').length, p = members.filter(m=>m.impact==='P').length;
+    const u = members.filter(m=>m.impact==='U').length;
+    const readable = members.length - u, firing = s + p;
+    let side, split = false;
+    if (readable === 0) side = 'unread';
+    else if (firing < MIN_FIRING) side = 'neutral';
+    else if (s > p) side = 'for'; else if (p > s) side = 'against';
+    else { side = 'neutral'; split = true; }
+    return { k, members, s, p, u, readable, firing, side, split };
+  });
+  const c = (x)=>lanes.filter(l=>l.side===x).length;
+  const f=c('for'), a=c('against'), n=c('neutral'), u=c('unread');
+  const net=f-a, readable=f+a+n;
+  let angle = 0;                                    // + : the "for" pan is heavier
+  if (readable >= 3 && net !== 0) angle = Math.min(10, Math.max(3, Math.abs(net)/(f+a)*10)) * Math.sign(net);
+  return { lanes, f, a, n, u, net, readable, angle };
+}
+
+/* ===================== The weight: a brass (or stone) disc with a segmented rim ===================== */
+function disc(lane, stone) {
+  const n = lane.members.length, R = 27, cx = 30, cy = 30, gap = n > 5 ? 6 : 8;
+  const order = [...lane.members].sort((x,y)=>'SPTU'.indexOf(x.impact)-'SPTU'.indexOf(y.impact));
+  const seg = 360/n; let arcs = '';
+  order.forEach((m, i) => {
+    const a0 = (-90 + i*seg + gap/2) * Math.PI/180, a1 = (-90 + (i+1)*seg - gap/2) * Math.PI/180;
+    const f = (v)=>v.toFixed(2);
+    const col = m.impact==='S'?'var(--side-for)':m.impact==='P'?'var(--side-against)':'var(--hairline)';
+    const w = (m.impact==='S'||m.impact==='P') ? 4.2 : 3;
+    arcs += `<path d="M${f(cx+R*Math.cos(a0))} ${f(cy+R*Math.sin(a0))} A${R} ${R} 0 0 1 ${f(cx+R*Math.cos(a1))} ${f(cy+R*Math.sin(a1))}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" ${m.impact==='U'?'stroke-dasharray="1.4 3.2"':''}/>`;
+  });
+  const face = stone ? 'url(#faceStone)' : 'url(#faceBrass)', ico = stone ? 'var(--ink-2)' : 'var(--bal-brass-ink)';
+  return `<svg viewBox="0 0 60 60" aria-hidden="true"><g>${arcs}</g>
+    <g class="face"><circle cx="30" cy="30" r="20" fill="${face}"/><circle cx="30" cy="30" r="19.4" fill="none" stroke="rgba(255,255,255,.55)" stroke-width=".8"/><circle cx="30" cy="30" r="15.6" fill="none" stroke="rgba(0,0,0,.14)" stroke-width=".7"/></g>
+    <g transform="translate(20 20) scale(.8333)" fill="none" stroke="${ico}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[lane.k]}</g></svg>`;
+}
+
+/* ===================== State + rendering ===================== */
+const state = { sc: 'today', theme: 'light', dir: 'ltr', open: null, frame: 'fluid', guides: false };
+let theta = 0, targetTheta = 0, anim = null, curVerdictNone = false, curSize = 'l';
+const T_ = () => I18N[state.dir === 'rtl' ? 'fa' : 'en'];
+const rtl = () => state.dir === 'rtl';
+const FD = '۰۱۲۳۴۵۶۷۸۹';
+const num = (n) => rtl() ? String(n).replace(/\d/g, d => FD[d]) : String(n);
+const numStr = (s) => rtl() ? s.replace(/\d/g, d => FD[d]).replace('.', '٫').replace('%', '٪') : s;
+
+function weightBtn(l, stone) {
+  const T = T_(), st = l.split ? T.state.split(num(l.s), num(l.p)) : T.state[l.side==='for'?'for':l.side==='against'?'against':l.side==='unread'?'unread':'neutral'];
+  return `<button type="button" class="weight" data-lane="${l.k}" aria-label="${T.aria(T.lane[l.k], st, T.tally(num(l.firing), num(l.readable)))}">
+    <span class="disc">${disc(l, stone)}${l.split?`<span class="badge-split">${T.split}</span>`:''}</span><span class="weight-label">${T.lane[l.k]}</span></button>`;
+}
+const skWeight = () => `<div class="weight" style="cursor:default"><span class="disc"><span class="sk" style="display:block;width:100%;height:100%"></span></span><span class="sk" style="height:10px;width:80%"></span></div>`;
+
+function render() {
+  const T = T_(), sc = SCENARIOS[state.sc], loading = !!sc.loading;
+  document.documentElement.dir = state.dir; document.documentElement.lang = rtl() ? 'fa' : 'en';
+  document.documentElement.classList.toggle('dark', state.theme === 'dark');
+  document.body.dataset.guides = state.guides ? '1' : '0';
+  document.getElementById('frame').dataset.frame = state.frame;
+  const E = loading ? { lanes: [], f:0,a:0,n:0,u:4,net:0,readable:0,angle:0 } : engine(sc, T);
+  const forL = E.lanes.filter(l=>l.side==='for'), agL = E.lanes.filter(l=>l.side==='against');
+  const neu = E.lanes.filter(l=>l.side==='neutral'), unr = E.lanes.filter(l=>l.side==='unread');
+  const none = !loading && E.readable === 0;
+  const verdict = none ? 'none' : E.net>0 ? 'for' : E.net<0 ? 'against' : 'balanced';
+  const up = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>';
+  const down = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 8v9H8"/></svg>';
+  const bothEmpty = none ? T.emptyNone : null;
+  const panBody = (list, w) => loading ? `<div class="weights">${skWeight()}${skWeight()}</div>` : list.length ? `<div class="weights">${list.map(l=>weightBtn(l,false)).join('')}</div>` : `<div class="pan-empty">${bothEmpty || T.empty}</div>`;
+
+  const ledger = loading ? '' : E.lanes.map(l => {
+    const sideKey = l.split ? 'split' : l.side;
+    const stateText = l.split ? T.state.split(num(l.s), num(l.p)) : T.state[sideKey];
+    const firingM = l.members.filter(m=>m.impact==='S'||m.impact==='P'), unread = l.members.filter(m=>m.impact==='U');
+    const steady = l.members.filter(m=>m.impact==='T').map(m=>m.name), open = state.open === l.k;
+    return `<li class="row" data-open="${open}">
+      <button type="button" class="row-btn" data-row="${l.k}" aria-expanded="${open}">
+        <span class="disc">${disc(l, l.side==='neutral'||l.side==='unread')}</span>
+        <span><span class="row-name">${T.lane[l.k]}</span><span class="row-state" data-side="${l.side}">${stateText}</span></span>
+        <span class="row-tally">${T.tally(num(l.firing), num(l.readable))}</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="members" ${open?'':'hidden'}>
+        ${firingM.map(m=>`<div class="m" data-i="${m.impact}"><i></i><span>${m.name}</span><span class="m-ev">${T[m.impact]} · ${T.ev[m.ev]}</span></div>`).join('')}
+        ${unread.map(m=>`<div class="m" data-i="U"><i></i><span>${m.name}</span><span class="m-ev">${T.U}</span></div>`).join('')}
+        ${steady.length?`<div class="steady">${T.steady(num(steady.length), steady.join(rtl()?'، ':', '))}</div>`:''}
+      </div></li>`;
+  }).join('');
+
+  const verdictHtml = loading
+    ? `<div class="verdict"><div class="sk" style="height:10px;width:90px;margin:0 auto"></div><div class="sk" style="height:34px;width:min(260px,70%);margin:12px auto 0"></div><div class="sk" style="height:6px;width:200px;margin:18px auto 0"></div></div>`
+    : `<div class="verdict">
+        <div class="verdict-eyebrow">${T.verdictEyebrow}</div>
+        <h4 class="verdict-word" data-side="${verdict==='for'?'for':verdict==='against'?'against':''}">${T.v[verdict]}</h4>
+        <div class="lanes-bar" aria-hidden="true">${E.lanes.map(l=>`<i data-side="${l.side}"></i>`).join('')}</div>
+        <p class="verdict-counts">${T.counts(num(E.f), num(E.a), num(E.n), E.u?num(E.u):0)}</p>
+        ${(!none && E.readable < 3) ? `<p class="verdict-note">${T.notEnough}</p>` : ''}
+        ${sc.change ? `<div class="context">${numStr(T.context(sc.change))}</div>` : ''}
+      </div>`;
+
+  document.getElementById('gb').innerHTML = `
+    <header class="gb-head"><p class="gb-eyebrow">${T.eyebrow}</p><h3 class="gb-title">${T.title}</h3><p class="gb-sub">${T.sub}</p></header>
+    <div class="stage" id="stage" role="img" aria-label="${loading ? '' : T.stageAria(T.v[verdict], num(Math.abs(E.angle).toFixed(1)))}">
+      <svg class="mech" id="mech" aria-hidden="true"></svg>
+      <div class="pan pan-for" id="panFor"><div class="pan-cap">${up}<span>${T.capFor}</span></div>${panBody(forL)}</div>
+      <div class="pan pan-against" id="panAg"><div class="pan-cap">${down}<span>${T.capAgainst}</span></div>${panBody(agL)}</div>
+    </div>
+    ${verdictHtml}
+    ${loading ? '' : `<div class="tray"><div class="tray-head"><span class="tray-title">${T.trayTitle}</span><span class="tray-note">${T.trayNote}</span></div>
+      ${neu.length||unr.length?`<div class="weights">${neu.map(l=>weightBtn(l,true)).join('')}${unr.map(l=>weightBtn(l,true)).join('')}</div>`:`<p class="tray-empty">${T.trayEmpty}</p>`}</div>
+    <ul class="ledger">${ledger}</ul>`}
+    <p class="foot">${T.foot}</p>`;
+
+  document.querySelectorAll('[data-row]').forEach(b => b.onclick = () => { state.open = state.open === b.dataset.row ? null : b.dataset.row; render(); const r=document.querySelector(`[data-row="${b.dataset.row}"]`); if (state.open) r.focus({preventScroll:true}); });
+  document.querySelectorAll('[data-lane]').forEach(b => b.onclick = () => { state.open = b.dataset.lane; render(); const r=document.querySelector(`[data-row="${b.dataset.lane}"]`); r.scrollIntoView({block:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); r.focus({preventScroll:true}); });
+  curVerdictNone = none || loading;
+  targetTheta = E.angle; sizeAndLayout(true);
+}
+
+/* ===================== Mechanics ===================== */
+function sizeOfWidth(w) { return w < 560 ? 's' : w < 760 ? 'm' : 'l'; }
+function sizeAndLayout(animate) {
+  const gb = document.getElementById('gb'), size = sizeOfWidth(gb.clientWidth);
+  curSize = size; gb.dataset.size = size;
+  layoutStage(animate);
+}
+function layoutStage(animate) {
+  const stage = document.getElementById('stage'); if (!stage) return;
+  const W = stage.clientWidth, s = curSize === 's';
+  const pw = s ? Math.round(W*0.46) : Math.round(Math.min(280, W*0.38));
+  const L = W - pw;
+  const swing = (L/2) * Math.sin(10*Math.PI/180);
+  const hanger = Math.round(swing + 22);
+  const pivotY = s ? 56 : 72, panH = s ? 236 : 268;
+  const H = Math.round(pivotY + hanger + panH + swing + 40);
+  const wW = s ? Math.max(50, Math.min(70, Math.floor((pw - 12 - 6)/2))) : 78;
+  stage.style.height = H + 'px'; stage.style.setProperty('--w', wW + 'px'); stage.style.setProperty('--d', Math.min(58, wW - 8) + 'px');
+  const geo = { W, L, pw, pivotY, hanger, panH, swing, H, s };
+  stage._geo = geo;
+  if (animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    cancelAnimationFrame(anim); const from = theta, to = targetTheta, t0 = performance.now(), D = 650;
+    const step = (now) => { const p = Math.min(1,(now-t0)/D), e = 1-Math.pow(1-p,4); theta = from+(to-from)*e; draw(geo); if (p<1) anim = requestAnimationFrame(step); };
+    anim = requestAnimationFrame(step);
+  } else { theta = targetTheta; draw(geo); }
+}
+
+function draw(g) {
+  const { W, L, pw, pivotY, hanger, panH, swing, H, s } = g, R = rtl();
+  const cx = W/2, th = theta;                          // th > 0: "for" pan heavier
+  const phys = R ? th : -th, rad = phys*Math.PI/180;   // phys > 0: right end down
+  const dyR = (L/2)*Math.sin(rad), dyL = -dyR;
+  const xR = cx + (L/2)*Math.cos(rad), xL = cx - (L/2)*Math.cos(rad);
+  const leftX = cx - L/2, rightX = cx + L/2, forIsLeft = !R;
+  const restTop = pivotY + hanger;                     // pan top when level
+  const panFor = document.getElementById('panFor'), panAg = document.getElementById('panAg');
+  const place = (el, centerX, dy) => { el.style.width = pw+'px'; el.style.height = panH+'px'; el.style.left = (centerX - pw/2)+'px'; el.style.top = (restTop + dy)+'px'; };
+  place(forIsLeft?panFor:panAg, leftX, dyL); place(forIsLeft?panAg:panFor, rightX, dyR);
+
+  const Rd = s ? 30 : 42, hubR = s ? 10 : 12, bh = s ? .8 : 1;
+  let ticks = '';
+  for (let i=-5;i<=5;i++){ const a=(i*7)*Math.PI/180, r1=Rd, r2=Rd-(i===0?9:5);
+    ticks += `<line x1="${cx+r1*Math.sin(a)}" y1="${pivotY-r1*Math.cos(a)}" x2="${cx+r2*Math.sin(a)}" y2="${pivotY-r2*Math.cos(a)}" stroke="var(--ink-3)" stroke-width="${i===0?1.6:1}" stroke-linecap="round" opacity="${i===0?.9:.55}"/>`; }
+  const needleA = Math.max(-32, Math.min(32, phys*3)) * Math.PI/180;
+  const hang = (jx, jy, panCx, topY) => { const a = panCx - pw*0.42, b = panCx + pw*0.42;
+    return `<line x1="${jx}" y1="${jy}" x2="${a}" y2="${topY}" stroke="var(--bal-brass-lo)" stroke-width="1.25" opacity=".75"/><line x1="${jx}" y1="${jy}" x2="${b}" y2="${topY}" stroke="var(--bal-brass-lo)" stroke-width="1.25" opacity=".75"/>`; };
+  const colTop = pivotY + 10, colBot = H - 26;
+  const forCol = 'var(--side-for)', agCol = 'var(--side-against)';
+  const leftEnd = forIsLeft ? forCol : agCol, rightEnd = forIsLeft ? agCol : forCol;
+  const beam = `M ${-L/2} ${-3.2*bh} L -20 ${-7.5*bh} Q 0 ${-10*bh} 20 ${-7.5*bh} L ${L/2} ${-3.2*bh} L ${L/2} ${3.2*bh} L 20 ${7.5*bh} Q 0 ${10*bh} -20 ${7.5*bh} L ${-L/2} ${3.2*bh} Z`;
+  let guides = '';
+  if (state.guides) {
+    guides = `<g fill="none" stroke="#e11d8f" stroke-width="1" stroke-dasharray="4 3" opacity=".9">
+      <rect x="0" y="0" width="${W}" height="${H}"/>
+      <rect x="${leftX-pw/2}" y="${restTop-swing}" width="${pw}" height="${panH+2*swing}"/><rect x="${rightX-pw/2}" y="${restTop-swing}" width="${pw}" height="${panH+2*swing}"/>
+      <line x1="0" y1="${pivotY}" x2="${W}" y2="${pivotY}"/><line x1="${cx}" y1="0" x2="${cx}" y2="${H}"/>
+      <rect x="${leftX-pw/2}" y="${restTop}" width="${pw}" height="${panH}" stroke="#2563eb"/><rect x="${rightX-pw/2}" y="${restTop}" width="${pw}" height="${panH}" stroke="#2563eb"/></g>
+      <text x="6" y="12" font-size="10" fill="#e11d8f">envelope = rest +/- swing (${swing.toFixed(1)}px) · blue = level rest position</text>`;
+  }
+  document.getElementById('mech').setAttribute('viewBox', `0 0 ${W} ${H}`);
+  document.getElementById('mech').innerHTML = `
+    <ellipse cx="${cx}" cy="${colBot+10}" rx="${s?50:68}" ry="7" fill="rgba(91,61,8,.18)"/>
+    <path d="M ${cx-5} ${colTop} L ${cx+5} ${colTop} L ${cx+9} ${colBot} L ${cx-9} ${colBot} Z" fill="url(#beamBrass)" opacity=".95"/>
+    <rect x="${cx-(s?44:58)}" y="${colBot}" width="${s?88:116}" height="12" rx="6" fill="url(#beamBrass)"/>
+    ${ticks}
+    <path d="M ${cx+Rd*Math.sin(-35*Math.PI/180)} ${pivotY-Rd*Math.cos(35*Math.PI/180)} A ${Rd} ${Rd} 0 0 1 ${cx+Rd*Math.sin(35*Math.PI/180)} ${pivotY-Rd*Math.cos(35*Math.PI/180)}" fill="none" stroke="var(--hairline)" stroke-width="1"/>
+    ${hang(xL, pivotY+dyL, leftX, restTop+dyL)}${hang(xR, pivotY+dyR, rightX, restTop+dyR)}
+    <g transform="rotate(${phys} ${cx} ${pivotY})">
+      <g transform="translate(${cx} ${pivotY})"><path d="${beam}" fill="url(#beamBrass)" stroke="var(--bal-brass-lo)" stroke-width=".6"/><path d="M ${-L/2+6} ${-1.6*bh} L ${L/2-6} ${-1.6*bh}" stroke="rgba(255,255,255,.55)" stroke-width="1" stroke-linecap="round"/></g>
+      <circle cx="${cx-L/2}" cy="${pivotY}" r="7" fill="var(--paper)" stroke="${leftEnd}" stroke-width="3"/>
+      <circle cx="${cx+L/2}" cy="${pivotY}" r="7" fill="var(--paper)" stroke="${rightEnd}" stroke-width="3"/>
+    </g>
+    ${curVerdictNone ? '' : `<line x1="${cx}" y1="${pivotY}" x2="${cx+(Rd-3)*Math.sin(needleA)}" y2="${pivotY-(Rd-3)*Math.cos(needleA)}" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>`}
+    <circle cx="${cx}" cy="${pivotY}" r="${hubR}" fill="url(#faceBrass)" stroke="var(--bal-brass-lo)" stroke-width="1"/>
+    <circle cx="${cx}" cy="${pivotY}" r="${s?3.6:4.4}" fill="var(--ink)"/><circle cx="${cx-1.2}" cy="${pivotY-1.4}" r="1.2" fill="rgba(255,255,255,.7)"/>${guides}`;
+
+  if (state.guides) {
+    const ro = document.getElementById('readout');
+    const pf = (R ? panAg : panFor), pa = (R ? panFor : panAg);
+    ro.textContent = `size=${curSize}  stageW=${W}  H=${H}  pw=${pw}  L=${L}  pivotY=${pivotY}  hanger=${hanger}  panH=${panH}  swing=${swing.toFixed(1)}\n`+
+      `theta(for-heavy)=${th.toFixed(2)}deg  phys=${phys.toFixed(2)}deg  dyLeft=${dyL.toFixed(1)}  dyRight=${dyR.toFixed(1)}\n`+
+      `pan overflow check (scrollHeight<=clientHeight): for=${panFor.scrollHeight<=panFor.clientHeight+1}  against=${panAg.scrollHeight<=panAg.clientHeight+1}`;
+  }
+  window.__lastDraw = { size: curSize, W, H, pw, L, swing, theta: th, forOverflow: panFor.scrollHeight - panFor.clientHeight, agOverflow: panAg.scrollHeight - panAg.clientHeight,
+    scrollW: document.documentElement.scrollWidth, innerW: window.innerWidth };
+}
+
+/* ===================== Reference chrome ===================== */
+function bar() {
+  const el = document.getElementById('bar');
+  const grp = (label, items) => `<div class="grp"><span class="lbl">${label}</span>${items}</div>`;
+  const b = (attrs, pressed, text) => `<button type="button" ${attrs} aria-pressed="${pressed}">${text}</button>`;
+  el.innerHTML =
+    grp('Scenario', Object.entries(SCENARIOS).map(([k,v])=>b(`data-sc="${k}"`, state.sc===k, v.label)).join('')) +
+    grp('Frame', ['fluid','768','390','360'].map(f=>b(`data-fr="${f}"`, state.frame===f, f==='fluid'?'Fluid':f+' px')).join('')) +
+    grp('View', b('data-act="theme"', state.theme==='dark', 'Dark') + b('data-act="dir"', rtl(), 'RTL · فارسی') + b('data-act="guides"', state.guides, 'Guides + readout'));
+  el.querySelectorAll('[data-sc]').forEach(x=>x.onclick=()=>{state.sc=x.dataset.sc; bar(); render();});
+  el.querySelectorAll('[data-fr]').forEach(x=>x.onclick=()=>{state.frame=x.dataset.fr; bar(); render();});
+  el.querySelector('[data-act="theme"]').onclick=()=>{state.theme=state.theme==='dark'?'light':'dark'; bar(); render();};
+  el.querySelector('[data-act="dir"]').onclick=()=>{state.dir=rtl()?'ltr':'rtl'; bar(); render();};
+  el.querySelector('[data-act="guides"]').onclick=()=>{state.guides=!state.guides; bar(); render();};
+}
+const q = new URLSearchParams(location.search);
+if (SCENARIOS[q.get('sc')]) state.sc = q.get('sc'); if (q.get('theme')==='dark') state.theme='dark'; if (q.get('dir')==='rtl') state.dir='rtl';
+if (q.get('frame')) state.frame = q.get('frame'); if (q.get('guides')==='1') state.guides = true; if (q.get('open')) state.open = q.get('open');
+if (q.get('static')==='1') { /* screenshot mode: skip animation */ matchMedia = ((orig)=> (s)=> s.includes('reduced-motion') ? {matches:true} : orig(s))(matchMedia.bind(window)); }
+bar(); render();
+new ResizeObserver(() => { if (document.getElementById('gb').dataset.size !== sizeOfWidth(document.getElementById('gb').clientWidth)) sizeAndLayout(false); else layoutStage(false); }).observe(document.getElementById('frame'));
+</script>
+</body>
+</html>

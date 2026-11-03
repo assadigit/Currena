@@ -392,6 +392,22 @@ byte-verified), C5 validated (corpus content-identical to S4,
 recordedAt refreshed), and the repo Actions secret rotated to the
 working KV-Edit token.*
 
+*Gold balance consolidation (2026-11-03, SPECIFIED — NOT YET
+IMPLEMENTED — docs/specs/gold-balance-consolidation/): the owner's
+next Gold Program round folds the two gold metaphors into ONE
+balance. The wind panel (`GoldTailwindPanel`) and the model-vs-
+reality panel are SPECIFIED for retirement behind the `?balance=lanes`
+preview flag; the pure lane engine (`gold-balance.ts`, 21 voters ->
+4 lane votes, `GOLD_LANE_MIN_FIRING` per the P0 calibration) is
+additive — `gold-score.ts`, `goldSummary` and the backtest harness
+stay frozen and running (D-GB-9). The spec set (README + 01-05 +
+the visual reference prototype) is the owner-approved source of
+truth; the session-by-session delivery plan (GB-S1..GB-S7, branch +
+PR per phase, the owner's incremental-merge instruction) is
+`docs/specs/gold-balance-consolidation/PROMPTS.md`. Until GB-S6
+flips the default, everything user-visible about gold stays exactly
+as it is today.*
+
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |
 |---|---|---|---|---|---|

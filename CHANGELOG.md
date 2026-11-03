@@ -5,6 +5,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03e] — gold balance consolidation: the spec set lands (the owner's zip extracted to docs/specs/gold-balance-consolidation/ + the GB-S1..S7 session plan; one balance for gold — SPECIFIED, not yet implemented)
+
+The handoff session between programs. The gap-closure S6 stream is closed
+(delivered 2026-11-03d); the owner uploaded the approved consolidation spec
+set as a zip at the repo root, and this session gives it its permanent home:
+
+- **The spec set** (owner-approved 2026-10-31, re-checked against the code
+  before being written down) now lives at
+  `docs/specs/gold-balance-consolidation/` — `README.md` (the decision log
+  D-GB-1…11, the open items OI-1…6), `01-SPEC.md` (one balance for gold:
+  21 voters → 4 lane votes → the beam, footing demoted to a context line,
+  the Outlook derived from the same reading), `02` (the pure engine + the
+  21-voter decision table + the pre-registered P0 calibration), `03` (the
+  UX + EN/FA copy), `04` (the migration, the AC-1…12 acceptance table), `05`
+  (the brass-beam visual redesign, V-1…V-10) and `reference/
+  balance-reference.html` (the vanilla-JS visual + mechanical prototype with
+  its `?sc=` scenario params). The root zip is removed from the worktree —
+  it stays in git history at `8cefd8f`.
+- **The session plan** (`PROMPTS.md` in the same folder): GB-S1 (P0 — the
+  missed 2026-11-02 armed recheck, run manually per GOLD_RECHECK_SPEC §3,
+  then the lane calibration and `BACKTEST-GOLD-LANES.md`) → GB-S2 (P1 — the
+  `gold-balance.ts` pure engine) → GB-S3 (P2a — the consolidated balance
+  behind `?balance=lanes`) → GB-S4 (P2b — the visual redesign behind the
+  flag) → GB-S5 (P3+P4 — the Outlook derivation + the copy close) → GB-S6
+  (P5 — **the owner-gated flip** and the panel retirement) → GB-S7 (OI-3 —
+  the deferred `goldSummary`/wind-key cleanup, its own owner round). Every
+  session: branch + PR + self-merge (the owner's incremental-merge
+  instruction) + deploy when the build changes + CI verified green — the
+  user-visible change stays behind the preview flag until the owner's
+  recorded "go".
+- **AGENTS.md** gains the Gold-Program pointer paragraph (SPECIFIED — NOT
+  YET IMPLEMENTED; `gold-score.ts` and `goldSummary` stay frozen, D-GB-9).
+- **The finding that shapes GB-S1:** the armed 2026-11-02 04:30 UTC recheck
+  NEVER FIRED — no `[2026-11-02a]` entry exists and the corpus fixture's
+  `recordedAt` is still 2026-10-31T15:17:40Z. GB-S1 runs it manually before
+  the calibration (it also satisfies OI-3's precondition).
+
+No code changes in this entry — docs and the delivery plan only. No deploy
+(the built worker is unchanged).
+
 ## [2026-11-03d] — gap-closure S6: the delivery close (the union chain pushed `d6f60b6..550d76f`, CI #472 green; the api hygiene-deploy `115eb1e5` — byte-identical build; the five readings landed provider-exact, snapshot 158 → 161; the cards browser-verified EN + fa)
 
 The eighth session — the credentialed close the handoff prescribed. Gates
