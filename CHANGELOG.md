@@ -5,6 +5,86 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03i] — gold-balance P2: the consolidated balance behind ?balance=lanes (the four lanes drive the SAME BalanceScale through goldBalance(); the split badge + lane tallies + the member detail panel + the context line + the measured note; the DEFAULT view byte-identical, pinned by snapshot; fa round-76; gates 9/9 GREEN 14,582; Insights chunk 1533.15/354.25 — ceiling 1540/355.5 justified)
+
+GB-S3, the gold balance consolidation's UI session (rollout P2 per
+`04-MIGRATION-AND-ACCEPTANCE.md` §3: `BalanceScale` members/split/context
++ `MergedCard` wiring behind the preview flag — exit gate "component
+tests green, screenshots EN/FA 360/1280"). Branch `gold-balance/p2-ui`,
+PR #16, code commit `71dede7`. One balance for gold is now PREVIEWABLE
+at `currena.ir/insights?balance=lanes` after the deploy; without the
+parameter every visitor sees today's page — **proven byte-identical**
+(a main-vs-new render diff on the recorded 2026-10-31 fixture, `cmp`
+clean) and then **pinned** by the repo's first vitest snapshot
+(`gold-balance-lanes.test.tsx`: the legacy markup, with a
+render-twice determinism guard).
+
+- **BalanceScale (additive only; geometry, animation and the beam
+  formula untouched):** `BalanceDriver` gains the optional
+  `members`/`split`/`tally` fields of 03 §3 plus one recorded extension,
+  `note` (the lane-level context line the inflation tilt phrase needs,
+  03 §3 item 5); the pan tiles gain the tally second line; the tray
+  chips gain the **Split** badge (OI-2's default: "Split" /
+  «دوپاره») + the tally, with the class string computed so legacy chips
+  render their exact old classes; the detail panel gains the member
+  list (firing members grouped **Supports gold / Pressures gold** with
+  evidence · value · an "Open indicator" deep link per row, the steady
+  voters collapsed by name, the unread listed) — 03 §3 item 6's link
+  word rides the new `memberOpenIndicator` key; three optional slots
+  (`subtitle`, `contextLine`, `measuredNote`) render only when passed.
+- **MergedCard (flag on):** lane drivers built from `goldBalance` (the
+  P1 engine's first app import — the balance and its counts can never
+  disagree with the engine, AC-3); the B-12 card-status word beside the
+  breakeven-5y5y lean phrase (`chipWordKeyOf` — "elevated" can never
+  appear); the context line (gold's own 30-day move, hidden when
+  missing); the measured note + link aimed at the LANE model's measured
+  record (`BACKTEST-GOLD-LANES.md` — the sentence verified against its
+  realised-move tables); the C12 banner + the footing strip kept in
+  both views; the wind + model-vs-reality panels render only in the
+  default view. The flag: `useBalanceLanesPreview()` read once at mount
+  (the `?narrative=preview` pattern, no persistence), threaded
+  Insights → Signals → MergedSignalsCard.
+- **The copy (03 §6):** the reworded subtitle lands as the SIBLING key
+  `subtitleLanes` — the shared `subtitle` still renders the default
+  view, so the merge is P5/GB-S6's — plus 16 more keys
+  (`laneTally`, `laneTallyNone`, `laneSplit`, `splitBadge`,
+  `laneChipAria`, `memberSupports`, `memberPressures`,
+  `membersSteadyTitle`, `membersUnreadTitle`, `memberOpenIndicator`,
+  `contextLine`, `measuredNote`, `laneIntro.*`). EN + fa; **fa
+  round-76** triaged same-session (17 strings processed,
+  `docs/localization/persian-copy-round-76-gold-balance.md`; one polish
+  beyond the drafts: the unread-group title moved to the «قابل ارزیابی»
+  family); no em dashes in fa (pinned by test); `pnpm copy:audit`
+  clean.
+- **Tests:** 19 new (`gold-balance-lanes.test.tsx`) — 04 §4.3 items
+  1-7, 9, 11-13 — on the recorded 2026-10-31 fixture (level · 4 neutral
+  · borrowing-costs split 2v2 · dollar 1 firing · stress
+  readable-5/firing-0 · inflation 1 firing) and a synthetic one-sided
+  case: chip placement per side, the split badge + "2 for, 2 against" +
+  the composed aria, the member list + the tilt phrase + B-12 (both
+  card statuses), the unread group shown/hidden, the context line
+  shown/hidden, the measured note + link, the EN+fa wind-word DOM scan
+  ("tailwind"/"headwind"/"wind" AND «باد»), the RTL mirror with the
+  direction-free beam sign, the dictionary coverage (placeholders +
+  the honesty sentences + the em-dash ban), the keyboard open/close +
+  focus return, the legacy snapshot, and the flag hook itself.
+- **Screenshots (VLM-verified, `docs/specs/gold-balance-consolidation/
+  evidence/gb-s3/`):** EN/fa × 360/1280 of the flag view (the level
+  case + the split lane) and the default view, plus two detail-open
+  shots (EN 360, fa 1280 RTL) — captured via the new `gb-s3` Playwright
+  project (`visual/gb-s3-screenshots.plw.ts` + the config entry).
+- **Gates ALL 9 GREEN — 14,582 tests** (web 12,604 → 12,623; baseline
+  14,563) · typecheck 6/6 · lint 0/0 · copy:audit clean · narrator
+  checks green (the vocabulary hashes refreshed; NOTE: any copy-file
+  edit after a regeneration needs another regeneration) · layer1 strict
+  11,819/11,819. **Bundle:** the Insights lazy chunk 1522.88/351.96 →
+  **1533.15/354.25** (the engine + the lane copy join it behind the
+  flag) — the ceiling bumped 1530/354 → **1540/355.5 WITH the
+  justification** in `scripts/check-bundle-budget.mjs` (the two gold
+  panels still ride the chunk until the P5/GB-S6 flip retires them and
+  re-baselines downward). The entry chunk is untouched
+  (294.45/88.48 vs 296/89.5).
+
 ## [2026-11-03h] — gold-balance P1: the pure engine lands (gold-balance.ts — 21 frozen voters → 4 lane votes → one balance, GOLD_LANE_MIN_FIRING = 2; the 13 engine tests + the harness-equivalence pin; the 2026-10-31 fixture reproduces 01 §7; no UI change, bundle byte-identical)
 
 GB-S2, the gold balance consolidation's engine session (rollout P1 per

@@ -392,8 +392,8 @@ byte-verified), C5 validated (corpus content-identical to S4,
 recordedAt refreshed), and the repo Actions secret rotated to the
 working KV-Edit token.*
 
-*Gold balance consolidation (2026-11-03, P0 CALIBRATED + P1 ENGINE LANDED —
-the rest SPECIFIED, NOT YET IMPLEMENTED — docs/specs/gold-balance-consolidation/):
+*Gold balance consolidation (2026-11-03, P0 CALIBRATED + P1 ENGINE +
+P2 PREVIEW LANDED — the rest SPECIFIED, docs/specs/gold-balance-consolidation/):
 the owner's
 next Gold Program round folds the two gold metaphors into ONE
 balance. The wind panel (`GoldTailwindPanel`) and the model-vs-
@@ -421,9 +421,23 @@ exported from the package index, pinned to the harness's
 `laneBalanceOverVoters` by equivalence tests (15; the 2026-10-31 fixture
 reproduces 01 §7) — nothing user-visible changes yet and the built
 bundle is byte-identical (the web app imports the engine from P2 on,
-behind the flag). Until GB-S6
+behind the flag). P2 landed 2026-11-03 (GB-S3, PR #16): the consolidated
+lane balance is PREVIEWABLE at `currena.ir/insights?balance=lanes` —
+`useBalanceLanesPreview()` (MergedCard.tsx, the ?narrative=preview
+pattern, no persistence) threads the flag to the merged card, whose
+lane drivers come from `goldBalance` through the SAME BalanceScale
+(members/split/tally/note + the subtitle/contextLine/measuredNote
+slots — additive only; the split badge «دوپاره», the lane tallies, the
+member detail panel, the context line, the measured note →
+BACKTEST-GOLD-LANES.md); the two gold panels render only in the DEFAULT
+view, which is PROVEN byte-identical (a main-vs-new render diff) and
+pinned by the legacy-markup vitest snapshot; fa round-76 (17 strings)
+triaged same-session; 19 component tests of 04 §4.3 (gates 9/9 GREEN
+14,582); the Insights lazy chunk moved to 1533.15/354.25 with the
+ceiling re-based to 1540/355.5 (justified in
+scripts/check-bundle-budget.mjs). Until GB-S6
 flips the default, everything user-visible about gold stays exactly
-as it is today.*
+as it is today — the preview is opt-in by URL only.*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |

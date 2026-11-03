@@ -1,77 +1,85 @@
-# AGENT_HANDOFF — Currena gap-closure S6 (FINAL — program complete AND delivered)
+# AGENT_HANDOFF — Currena: the gold balance consolidation program (GB-S3 delivered, deploy pending)
 
-> The six-session gap-closure program is COMPLETE (37/37 milestones,
-> 2026-11-03) and **DELIVERED** — the eighth session (2026-11-03
-> 02:49–03:30 UTC, credentialed) executed the one remaining task this
-> handoff used to carry: the push of the union chain, the hygiene deploy,
-> the five readings' landings, and the production-browser verification
-> (EN + fa). Read `docs/gap-closure/PROGRESS.md` (the authoritative log —
-> the eighth claim note has the full delivery record) and
-> `docs/gap-closure/CASE-STUDY.md` (the program summary).
+> The ACTIVE program is the owner's **gold balance consolidation**
+> (`docs/specs/gold-balance-consolidation/`, session plan GB-S1..GB-S7 in
+> its `PROMPTS.md`; PROGRESS.md is the authoritative log). The gap-closure
+> program is CLOSED (2026-11-03d; its record: `docs/gap-closure/`).
 > Never record credentials here.
 
-## A. The delivery state (verified 2026-11-03 ~03:30 UTC)
+## A. Original objective
 
-1. **origin/main = `550d76f`** — the union chain pushed
-   (`d6f60b6..550d76f`, 6 commits; remote verified via the GitHub API;
-   **CI run #472 on `550d76f`: SUCCESS** — the pushed tree is green
-   independently on GitHub).
-2. **Production**: currena-api **`115eb1e5`** @ 100% (deployment
-   `4ccce05b`, 03:14:34 UTC — the hygiene deploy from the union head; the
-   build proven byte-identical to the already-live parallel-variant
-   deploy: entry `index-DrhFnckY.js` + `Insights-5V_N7nyu.js` unchanged
-   pre AND post). currena-markets `58c4eebd` @ 100% — code-unchanged
-   since M6.1, correctly NOT redeployed (the repo convention).
-   Smoke: `/api/health` · `/` · `/api/insights` · `/api/insights/markets-au`
-   all 200.
-3. **The readings**: `/api/insights` serves **161 readings** — the five
-   pending ids all landed provider-exact (the `insights-ingest` dispatch
-   on the pushed code + the `rung2-run --nbs` lever):
-   `usd-reserve-share` 56.704761505127 @ 2026-06-30 ·
-   `sp500-breadth-ratio` 0.2925 @ 2026-11-02 · `btp-bund-spread` 0.8003
-   @ 2026-08-01 · `china-property-investment` −20.6 @ 2026-09-30 ·
-   `china-steel-output` 7,359×10kt @ 2026-09-30. The dispatch run's
-   exit-1 is the DESIGNED P1 signal (nz-short-rate's known
-   sdmx.oecd.org 500 class — the 04:20 retries own it).
-4. **The render**: browser-verified on production EN + fa — the
-   `dedollar-concentration` gauge (both cards), the Italy–Germany card in
-   borrowing, both China cards in the trade lane; Persian digits, RTL,
-   0px overflow @360, zero console errors
-   (`evidence/M6.3/screenshots-prod/`, 8 screenshots).
+GB-S3: **P2a — the consolidated gold balance behind the preview flag
+`?balance=lanes`** (the authoritative task text: the GB-S3 prompt in
+`docs/specs/gold-balance-consolidation/PROMPTS.md`). DONE — see C.
 
-## B. What is deliberately left open (the owner's decisions — not tasks)
+## B. Requirements and decisions (binding, unchanged)
 
-- **The promotion decision (G-5):** `docs/gap-closure/PROMOTION-PROPOSAL.md`
-  + `evidence/M6.4/` — cfnai + ebp proposed; the voters stay 48 until the
-  owner approves. §7 of the proposal is the ready execution plan.
-- **The two rebalancing questions** (proposal §6) + the Westpac-MI/NAB
-  `owner_accepts` flags.
-- **The credential rotation — the TOP owner action item**: every token
-  pasted into the planning/session chats (now an EIGHTH round) must be
-  rotated; after rotating the Cloudflare token, update the repo secret
-  `CLOUDFLARE_API_TOKEN` and re-run one `insights-ingest` dispatch to
-  confirm green.
-- The paid-plan ideas + the re-check horizons (sloos ~2028, ofr-fsi as
-  episodes accrue, the young families at the 120-obs floor) — recorded in
-  MAINTENANCE.md's S6 follow-ups.
+- D-GB-9: the frozen files are never edited (gold-score.ts, goldSummary,
+  GoldSummarySchema, snapshot.ts, apps/api/**, the harness tables).
+- The default view is byte-stable until the owner-gated P5/GB-S6 flip
+  (proven + pinned by the legacy vitest snapshot).
+- `GOLD_LANE_MIN_FIRING = 2` — never re-litigate. No edge claimed, ever.
+- Full `pnpm gates` before every push; self-merge when the exit gate
+  holds; deploy only when the built worker changes (it DID this phase).
 
-## C. The standing constraints (unchanged, for any future session)
+## C. Completed work (GB-S3, all verified this session)
 
-G-3 (never remove/hide), G-5 (nothing scores without the owner's
-approval), provider-exact numbers only, fail-closed parsers, credentials
-only from the environment and never printed, the full `pnpm gates`
-before every push, the CHANGELOG heading-count discipline, the fa
-copy-audit flow (next round: 76), the parallel-session protocol
-(pull --rebase before committing).
+- **Branch `gold-balance/p2-ui`, PR #16 (draft), code commit `71dede7`
+  pushed.** The lane view: BalanceScale's optional
+  members/split/tally/note + subtitle/contextLine/measuredNote slots
+  (additive; geometry/animation/beam untouched); MergedCard's lane
+  drivers from `goldBalance(readings)`; the split badge; the member
+  detail panel; the context line; the measured note →
+  BACKTEST-GOLD-LANES.md; the flag threaded Insights → Signals → card.
+- The default view PROVEN byte-identical (main-vs-new render diff on the
+  2026-10-31 fixture) and pinned (the repo's first vitest snapshot).
+- 19 tests (04 §4.3 items 1-7, 9, 11-13); fa round-76 (17 strings,
+  copy:audit clean); 10 VLM-verified screenshots in
+  `docs/specs/gold-balance-consolidation/evidence/gb-s3/`.
+- Gates ALL 9 GREEN 14,582; Insights chunk 1533.15/354.25, ceiling
+  re-based 1540/355.5 (justified in scripts/check-bundle-budget.mjs).
+- Records: PROGRESS.md (F tick + session log), CHANGELOG
+  [2026-11-03i] (count 191 verified), AGENTS.md paragraph, the GB-S4
+  prompt rewrite, the GB-S3 lesson.
 
-## D. Git + deployment state (as of the eighth session, 2026-11-03 ~03:30 UTC)
+## D. Remaining work (in order)
 
-- origin/main = `550d76f` (local `main` == origin; tree clean after the
-  delivery-record commit). The full S6 chain: `f126010` → … → `d6f60b6`
-  (the parallel M6.3 — the union's code base) → `c2a91fe` · `e66a6b9` ·
-  `b84660f` · `e1ae37b` · `af17e38` · `550d76f` — all pushed, all 17 on
-  origin/main.
-- Production: currena-api `115eb1e5` (from the union head) ·
-  currena-markets `58c4eebd` (unchanged since M6.1, active @ 100%).
-- The scheduled 04:10/04:20/04:50 UTC GHA + Worker runs continue the
-  cadence on the pushed code (idempotent content — the same bytes).
+1. **Commit the records** (`docs(gold-balance P2): …`) + push the branch.
+2. **Merge PR #16** (the exit gate holds: component tests green,
+   copy:audit clean, screenshots attached, default view byte-stable).
+3. **Deploy per docs/DEPLOY.md** (deploy-lock check, `pnpm deploy`,
+   version verification, smoke test) — the built worker changed.
+4. **Browser-verify on production**: the flag view AND the default view,
+   EN + fa, 360 + 1280, FRESH browser contexts (the PWA service worker
+   serves the previous chunk to returning visitors), zero console errors.
+5. Mark PR #16 ready + merge; verify CI green on main; update this
+   handoff + PROGRESS with the merge SHA + deploy version.
+6. Print the GB-S4 prompt (PROMPTS.md has it rewritten) + a 5-line
+   summary as the session's closing report.
+
+## E. Problems and considerations
+
+- The playwright config's second webServer (wrangler dev) fails without
+  CLOUDFLARE_API_TOKEN — satisfy its :8799 health check with a dummy
+  server started in the SAME shell call (reuseExistingServer skips it).
+- The visual fixture overlay (the 2026-10-31 gold data on
+  apps/web/visual/fixtures/snapshot.json) is a ONE-OFF: restore the file
+  with git checkout after the screenshot run (it is tracked).
+- MultiEdit is atomic per call but CAN apply earlier edits before
+  failing a later one — re-verify with grep after any failed MultiEdit.
+- The session-supplied Cloudflare/GitHub credentials live ONLY in the
+  shell env / remote URL; never in files, commits, logs or this handoff.
+
+## F. Git and deployment state
+
+- origin/main = `801cc02` (the GB-S2 merge, PR #15). Branch
+  `gold-balance/p2-ui` pushed at `71dede7` + the records commit (this
+  push). PR #16 draft open. Production: currena-api `115eb1e5`,
+  currena-markets `58c4eebd` — BOTH about to be superseded by the P2
+  deploy (currena-api only; markets is code-unchanged and stays).
+- GitHub auth: the owner's token sits in the remote URL (never printed).
+
+## G. Next action
+
+D.1 — commit the records and push; then merge PR #16, deploy, verify
+production, and close the session with the GB-S4 prompt printed.
