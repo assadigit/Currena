@@ -28,6 +28,29 @@ Companion files, in read order: `AGENTS.md` (the rules) → this file →
 
 ## 1. The state of record (updated every re-run — this is what "now" was)
 
+- **2026-11-03 ~05:20–06:00 UTC — the same re-check, run a second time
+  by the concurrent GB-S1 variant (the parallel-session union; CHANGELOG
+  [2026-11-03g]).** Same live anchors, same KV verdicts, one ADDITIONAL
+  finding that matters for the procedure: **the 04:35 UTC rung's
+  Frankfurter outage was TRANSIENT** — the provider was verified back
+  up ~05:30 UTC, and the 11-03 03:15 UTC rung (the S6 delivery's
+  dispatch) had been FX-healthy (fresh `dollar-basket`/`usdjpy`
+  readings in that day's archive) — which is exactly why the fresh
+  stage lacked the two series while the archives carried fresh FX. The
+  other path through the same blocker is now twice-verified as the
+  pre-registered fallback: when the fresh dump would fail the harness's
+  loud missing-voter-series check, **the fixture stands on the
+  corpus-of-record and the blocker is recorded — never hand-patched to
+  completeness**; this variant's corpus-of-record re-run then reproduced
+  every S6 number exactly (2,514 windows, sign-agreements 52.1 / 47.6 /
+  43.9%, tilt 1,174 = 46.7%; `BACKTEST-GOLD.md` byte-identical), the
+  watch days 2–4 read lockstep from the fresh archive reads (11-01/
+  11-02 holding over the weekend; 11-03 trio 10-29 → 10-30, decade
+  group 10-30 → 11-02, both +1 trading day) — validated-by-watch,
+  and the 11-01/02/03 `goldSummary` stamps (−2/headwind) === the
+  promoted-table re-derivation, re-derived read-only from the archived
+  readings (no drift; the tilt silent on all three). §5 carries the
+  run's row.
 - **2026-11-03 ~05:00 UTC — the missed armed check, run manually (GB-S1, the
   gold-balance consolidation's first session).** The 2026-11-02 one-shot
   never fired (no `[2026-11-02a]` entry; the fixture stood at recordedAt
@@ -162,6 +185,7 @@ For each new archive day: extract the five readings' `asOf` + status.
 | S6 (promoted 21-voter) | 16 days, recorded 10-31 15:17Z | 2,514 | 52.1 / 47.6 / 43.9% | 1,174 (46.7%) | label flips 256 (10.2%); mature-base 46.9/42.3/32.6%, spreads +0.02/−0.22/−1.94 — the 5td sits just INSIDE the 2-SE band → "no measurable edge" either way (the S4 "runs the other way" wording softens); 20td/60td still depart below 50% |
 | 2026-11-03 re-check (promoted 21, run manually) | 19 days, recorded 11-03 04:43Z | 2,512 | 51.6 / 47.3 / 44.3% | 1,173 (46.7%) | mature 46.8/42.2/32.7%, spreads −0.01/−0.30/−1.98% — the 5td flips to just OUTSIDE the 2-SE band and its spread to −0.01%: the mechanical wording returns to the S4 form ("runs the OTHER way"), borderline stated; watch days 2–4 LOCKSTEP → validated-by-watch; no-drift holds on all 4 stamped days; windows −2 vs S6 (the rolling head trim + the dropped 10-31 Saturday seed); label flips 263 (10.5%); the FX voters re-venued to insights:hist:*; no escalation |
 
+| 2026-11-03 (the concurrent variant, promoted 21, corpus-of-record) | 16 days — the fixture stood on the corpus-of-record (the 04:35 UTC rung's Frankfurter outage left the fresh stage without the two FX voter series; recorded, never hand-patched) | 2,514 | 52.1 / 47.6 / 43.9% — identical to S6 by construction (same corpus + same code; `BACKTEST-GOLD.md` byte-identical) | 1,174 (46.7%) | the second, independent path through the same blocker; the watch days 2–4 validated-by-watch (from the fresh archive reads the dump performed); the 11-01/02/03 stamps (−2/headwind) === the promoted re-derivation (no drift); the P0 calibration over this corpus chose the same MIN2 (C1 24.7%/49.6%, C2 9 = net-sign 9 — the decision's robustness check, GOLD_BACKTEST_SPEC §5) |
 **The standing honest note** (round-55, on the panel in EN + fa): the
 table's lean showed no positive association with gold's next 5–60
 days — it reads conditions, not direction. No re-run may soften this
