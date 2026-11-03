@@ -5,6 +5,67 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-04a] — gold-balance P2b UNION: the parallel-session union + the delivery completion (the second GB-S4 variant's end-to-end verification of the merged redesign; the dark rim hues; the 6 standing union-probe guards; currena-api 6549c5bc @ 100% with the 8/8 production matrix, zero console errors)
+
+GB-S4b, the parallel-session union (the GB-S1b precedent applied to the
+visual phase). A second GB-S4 session built the visual redesign
+independently and completely — its own dispatcher, BalanceWeight,
+`--bal-*` stylesheet, round-77 triage, 28-test jsdom rewrite and
+81-test evidence suite — and found the first variant already merged
+(PR #17). The first-landed variant stands whole; the second's
+verification landed as **PR #18** (merged `8a99e03`, branch
+`gold-balance/p2b-union`), and the full second variant is preserved
+unmerged on `gold-balance/p2b-visual-parallel` for the owner.
+
+- **The independent verification (all green on the merged build):**
+  full `pnpm gates` ALL 9 GREEN 14,598 re-run on merged main; the
+  merged 61-test gb-s4 suite re-run green; the legacy snapshot
+  byte-identical through the merge; the frozen files untouched
+  (`gold-balance.ts`, `gold-score.ts`, the snapshot pin — zero diff).
+- **The union's landed contributions:**
+  - **The dark rim polish** (`index.css`): an independent VLM pass on
+    the merged evidence flagged the dark segmented rims as faint (the
+    pinned Green 50 at a 3–4.2px stroke on #1A222E); the segments take
+    the reference prototype's own darker-theme side hues (#4bc27d
+    supports / #f07078 pressures) — the same decision the merged
+    variant had already made for the dark CAPTION inks, extended to the
+    rims. Light mode untouched; the counts stay in words (the rims are
+    decorative, 05 §10).
+  - **`gb-s4-union-probe.plw.ts`** (6 tests, green against the merged
+    build AS-IS) — the STANDING guards for the two acceptance areas
+    the merged suite cannot see: the FOUR-weights-on-one-pan worst case
+    at 360/390 EN+fa (the merged scenarios peak at three on a pan; the
+    merged pan heights 256/280 hold two rows of two with zero clip)
+    and the pan-caption AA measured ON the 9% side TINT (the merged
+    contrast check's background-climb lands on the card because the
+    pans' tint is a background-image gradient; the probe blends the
+    live tokens at the CSS's own alpha and holds >=4.5:1 in both
+    themes). The config gains its project entry; the visual README
+    records it.
+  - **`visual/prod-verify.mjs`** — the delivery-verification harness
+    (the flag view AND the default view, EN + fa, 360 + 1280, fresh
+    contexts, console-error collection), reusable for GB-S5/S6.
+- **The delivery completion:** CI green on the union branch → PR #18
+  merged → the deploy-lock check passed (production at the expected
+  `d0eab36c` @ 100%) → **currena-api `6549c5bc` @ 100%**
+  (deployment `9844fd4f`, 2026-11-03T21:41:30Z — the merged build +
+  the union polish). The production matrix: **8/8 pass, ZERO console
+  errors** — the flag view (4 weights, Balanced/«متعادل», the
+  Split/«دوپاره» badge, the tray + the ledger row-open interaction,
+  the inflation tilt phrase + the B-12 "falling · Normal" row, no
+  overflow, RTL) and the default view (the two panels + the wind
+  panel + the legacy chips + the legacy subtitle — untouched). The
+  full record in docs/DEPLOY.md's [2026-11-04a] session note +
+  PROGRESS.md's GB-S4b section.
+- **The parallel variant's independently-measured findings, recorded
+  for the owner:** the reference prototype's own 236px mobile pan
+  overflowed its stack scenario by 188px (measured in its guides
+  readout before either implementation — both variants tuned it away);
+  the site's dark status inks read 4.28:1/4.35:1 on the 9% pan tint;
+  the squint calibration — the brass signature reads first blurred in
+  the second variant's shot AND in the owner's approved reference (the
+  verdict word is the dominant TEXT, exactly the approved hierarchy).
+
 ## [2026-11-03j] — gold-balance P2b: the visual redesign of the balance behind ?balance=lanes (the brass stage + dial + bowl pans, the lane WEIGHTS with segmented rims, the verdict word as the hero at 30-44px, the Not-leaning tray, the four-row inline ledger; --bal-* tokens light+dark with measured AA ratios; the DEFAULT view still byte-identical; fa round-77; gates 9/9 GREEN 14,598; Insights chunk 1550.46/358.81 — ceiling 1560/360 justified)
 
 GB-S4, the gold balance consolidation's visual session (rollout P2b per

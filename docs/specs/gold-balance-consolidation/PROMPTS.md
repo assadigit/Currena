@@ -415,3 +415,35 @@ the unread state (only the NEEDLE hides, per the reference); verify
 (baseline + 16); Insights lazy 1550.46/358.81, ceiling 1560/360
 (justified); DEPLOY this phase (the SPA rides the api worker and the
 chunk changed).
+- **GB-S4b (2026-11-04, the parallel-session union):** two sessions ran
+  GB-S4 concurrently from the same start state; the first variant
+  landed (PR #17) while the second was still building. **The union
+  protocol worked exactly as designed** — fetch BEFORE you push (the
+  non-fast-forward rejection is the cheap outcome; the expensive one is
+  discovering the merge after writing your records), the first-landed
+  variant stands whole, the second records its verification (the
+  GB-S1b precedent), and the verification itself can CONTRIBUTE: the
+  union probes (the four-weights stack, the tint-surface AA — the two
+  gaps in the merged suite's coverage) + the dark rim polish landed as
+  PR #18 with the merged build passing everything AS-IS. **A
+  verification pass is only worth its uncovered surface**: the merged
+  suite proved three-weights-on-a-pan; only the reference's own stack
+  scenario found the four case, and only a blend-at-the-CSS's-alpha
+  probe sees the tinted pans (a background-image gradient is invisible
+  to a background-color climb — both variants had measured the CAPTIONS
+  on the tint, only the union pinned it). **The VLM pass earns its keep
+  twice**: the first session's pass caught the placeholder-copy trap;
+  the second's found the faint dark rims on the merged evidence (and
+  pixel-scanned the PNG before acting on its other two findings, which
+  were false positives). **prod-verify.mjs is now the delivery close-out
+  harness** — the 8/8 matrix (flag + default, EN + fa, 360 + 1280,
+  fresh contexts, zero console errors) with console-error collection is
+  one reproducible command; agent-browser is fine for spot checks but
+  exhausts its daemon on a full matrix. **The parallel variant is
+  preserved, not wasted**: its independent findings (the prototype's
+  own 188px stack overflow, the dark tint contrast, the squint
+  calibration against the approved reference) are recorded in the
+  union section, and the branch stays for the owner's inspection.
+  Gates: 14,598 (unchanged through the union); the union deploy
+  currena-api `6549c5bc` @ 100% (the polish rides the entry CSS, not
+  the JS chunk).

@@ -17,7 +17,7 @@ actually executed. The gap-closure program that ran in parallel is CLOSED
 | D | The decision: MIN2 if C1+C2, else MIN1 if C1+C2, else STOP | ✅ DONE (GB-S1, 2026-11-03) — **GOLD_LANE_MIN_FIRING = 2** (D-GB-3's default; both criteria hold over all windows; no fallback needed, no STOP) |
 | E | P1: the pure engine `gold-balance.ts` + unit tests + index export (04 §3) | ✅ DONE (GB-S2, 2026-11-03) — the engine exactly 02 §2–§3 over the frozen imports (D-GB-9 additive); 15 tests (04 §4.1's 13 + the harness-equivalence pin); the 2026-10-31 fixture reproduces 01 §7 (level · 4 neutral · split 2v2 · dollar 1 · inflation 1) with the no-drift pin −2/headwind/6; gates 9/9 GREEN 14,563 (insights 1,270 → 1,285); bundle byte-identical 1522.88/351.96 |
 | F | P2: BalanceScale members/split/context + MergedCard wiring behind `?balance=lanes` (04 §3) | ✅ DONE (GB-S3, 2026-11-03) — PR #16 (branch gold-balance/p2-ui; code commit `71dede7`); the lane drivers from `goldBalance(readings)` through the SAME BalanceScale (members/split/tally/note + the subtitle/contextLine/measuredNote slots; geometry/animation/beam untouched); the default view byte-identical (main-vs-new render diff PROVEN, then pinned by the legacy vitest snapshot); 19 tests of 04 §4.3 items 1-7/9/11-13 on the recorded 2026-10-31 fixture; fa round-76 same-session (17 strings, copy:audit clean); screenshots EN/fa × 360/1280 + 2 detail-open (evidence/gb-s3/); gates 9/9 GREEN 14,582; Insights lazy 1533.15/354.25 — ceiling bumped to 1540/355.5 WITH justification |
-| G | P2b: the visual redesign of the balance behind the same flag (05) | ✅ DONE (GB-S4, 2026-11-03) — branch gold-balance/p2b-visual; the owner's 05-VISUAL-DESIGN-SPEC implemented from the approved reference prototype: the brass stage (beam + 11-tick dial + column + bowl pans), the lane WEIGHTS with segmented rims (the NEW BalanceWeight.tsx), the verdict word as the hero, the Not-leaning tray, the four-row inline LEDGER (the same member content contract); --bal-* tokens light+dark with the measured AA ratios (the full table in evidence/gb-s4/README.md); the default view still byte-identical (the snapshot pin untouched, the 46 pure-geometry tests green); 14 new copy keys EN+fa through round-77; the lane tests rewritten 19 → 35 + the gb-s4 Playwright V-1..V-10 suite (61 tests, 6 engine-verified scenarios, 70 screenshots); gates 9/9 GREEN 14,598 (web 12,623 → 12,639); Insights lazy 1550.46/358.81 — ceiling 1560/360 justified |
+| G | P2b: the visual redesign of the balance behind the same flag (05) | ✅ DONE (GB-S4 2026-11-03 + the GB-S4b parallel-session union 2026-11-04) — branch gold-balance/p2b-visual (PR #17, merged `bc566e9d`); the owner's 05-VISUAL-DESIGN-SPEC implemented from the approved reference prototype: the brass stage (beam + 11-tick dial + column + bowl pans), the lane WEIGHTS with segmented rims (the NEW BalanceWeight.tsx), the verdict word as the hero, the Not-leaning tray, the four-row inline LEDGER (the same member content contract); --bal-* tokens light+dark with the measured AA ratios (the full table in evidence/gb-s4/README.md); the default view still byte-identical (the snapshot pin untouched, the 46 pure-geometry tests green); 14 new copy keys EN+fa through round-77; the lane tests rewritten 19 → 35 + the gb-s4 Playwright V-1..V-10 suite (61 tests, 6 engine-verified scenarios, 70 screenshots); gates 9/9 GREEN 14,598 (web 12,623 → 12,639); Insights lazy 1550.46/358.81 — ceiling 1560/360 justified; the UNION (PR #18, merged `8a99e03`): the second session's verification + the dark rim hues + the 6 standing union-probe guards, deployed as currena-api `6549c5bc` @ 100% + the 8/8 production matrix (see GB-S4b below) |
 
 Next: GB-S5 (P3+P4 — the Outlook derivation + the copy close), then
 GB-S6 (P5 — **the owner-gated flip**), GB-S7 (OI-3,
@@ -417,6 +417,67 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
   subtitle — no visual-redesign element anywhere). The owner previews
   the redesign at currena.ir/insights?balance=lanes (V-11: the owner's
   live read before the P5/GB-S6 flip).
+
+### GB-S4b (2026-11-04) — the parallel-session union + the delivery completion
+
+A SECOND GB-S4 session (branch `gold-balance/p2b-visual`, pushed as
+`gold-balance/p2b-visual-parallel` for the record) built the visual
+redesign independently and COMPLETELY — its own dispatcher
+(`visual="lanes"`), its own BalanceWeight + segmented rim, its own
+`--bal-*` stylesheet (code-split into the lazy CSS chunk), its own
+round-77 triage (19 keys + the «، » separator), its own 28-test jsdom
+rewrite, its own 81-test gb-s4 evidence suite (the tint-surface
+contrast asserted in-suite; the squint calibrated against the reference
+prototype; the stack case pinned; VLM-verified shots) — and found the
+first variant ALREADY MERGED (PR #17, `bc566e9d`) when it pushed. The
+GB-S1b union precedent applies: **the first-landed variant stands
+whole; the second records its verification** — and the verification
+LANDED as PR #18 (`gold-balance/p2b-union`, merged as `8a99e03`).
+
+- **The independent verification (all green, on the merged build):**
+  full `pnpm gates` ALL 9 GREEN 14,598 re-run on merged main; the
+  merged 61-test gb-s4 suite re-run green; the legacy snapshot
+  byte-identical through the merge; the frozen files untouched.
+- **The union's contributions (PR #18):** (1) the dark-theme RIM
+  SEGMENTS take the reference prototype's own darker-theme side hues
+  (#4bc27d/#f07078) — an independent VLM pass on the merged evidence
+  flagged the pinned Green 50 as faint at a 3–4.2px stroke on #1A222E,
+  the same conclusion the merged variant had already reached for the
+  dark CAPTION inks (the second variant had shipped the identical fix
+  independently); light mode untouched. (2) `gb-s4-union-probe.plw.ts`
+  (6 tests, green against the merged build AS-IS) — the STANDING guards
+  for the two acceptance areas the merged suite cannot see: the
+  FOUR-weights-on-one-pan worst case at 360/390 EN+fa (the merged
+  scenarios peak at three on a pan; the merged pan heights 256/280 hold
+  two rows of four with zero clip) and the pan-caption AA measured ON
+  the 9% side TINT (the merged contrast check's background-climb lands
+  on the card because the pans' tint is a background-image gradient;
+  the probe blends the live tokens at the CSS's own alpha — >=4.5:1 in
+  both themes). The visual README records both files +
+  `prod-verify.mjs`.
+- **The delivery completion:** CI green on the union branch → PR #18
+  merged as `8a99e03` → the deploy-lock check passed (the active
+  version was the parallel session's `d0eab36c` @ 100% — expected, no
+  third session) → `wrangler deploy` shipped **currena-api `6549c5bc`
+  @ 100%** (deployment `9844fd4f`, 2026-11-03T21:41:30Z — the merged
+  build + the union polish; the note in docs/DEPLOY.md's
+  [2026-11-03j]→[2026-11-04a] records). The production matrix
+  (visual/prod-verify.mjs — the flag view AND the default view, EN +
+  fa, 360 + 1280, fresh contexts): **8/8 pass, ZERO console errors**
+  — the flag view (4 weights, «متعادل»/Balanced, the «دوپاره»/Split
+  badge, the tray + the ledger with the row-open interaction, the
+  inflation tilt phrase + the B-12 "falling · Normal" row, no
+  overflow, RTL mirrored) and the default view (the two panels + the
+  wind panel + the legacy chips + the legacy subtitle — no
+  visual-redesign element anywhere).
+- **The parallel variant's independently-measured findings** (recorded
+  for the owner, in its round-77 doc + the preserved branch): the
+  reference prototype's OWN 236px mobile pan overflowed its stack
+  scenario by 188px (measured in its guides readout before either
+  implementation); the site's dark status inks read 4.28:1/4.35:1 on
+  the 9% pan tint; the squint calibration — the brass signature reads
+  first blurred in the second variant's shot AND in the owner's
+  approved reference (the verdict word is the dominant TEXT).
 
 ## Owner must decide
 

@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold balance consolidation program (GB-S4 DELIVERED)
+# AGENT_HANDOFF — Currena: the gold balance consolidation program (GB-S4 + the parallel-session union DELIVERED)
 
 > The ACTIVE program is the owner's **gold balance consolidation**
 > (`docs/specs/gold-balance-consolidation/`, session plan GB-S1..GB-S7 in
@@ -6,7 +6,37 @@
 > program is CLOSED (2026-11-03d; its record: `docs/gap-closure/`).
 > Never record credentials here.
 
-## A. The delivered state
+## A. The delivered state (verified 2026-11-04, the union session)
+
+1. **GB-S4 (P2b) + the GB-S4b union are COMPLETE and LIVE**: PR #17
+   merged `bc566e9d` (the first variant), PR #18 merged `8a99e03`
+   (the union: the dark rim hues + the 6 standing union-probe guards +
+   the prod-verify harness); **currena-api `6549c5bc` @ 100%**
+   (deployment `9844fd4f`, 2026-11-03T21:41:30Z; the parallel session's
+   earlier `d0eab36c` deploy of PR #17 stands superseded). The
+   REDESIGNED balance is previewable at
+   **https://currena.ir/insights?balance=lanes**; the DEFAULT view
+   renders byte-for-byte today's page (the snapshot pin held through
+   both merges).
+2. **The production matrix (the union session's close-out): 8/8 pass,
+   ZERO console errors** — the flag view AND the default view, EN + fa,
+   360 + 1280, fresh contexts (visual/prod-verify.mjs; the full facts in
+   DEPLOY.md's [2026-11-04a] note + PROGRESS.md's GB-S4b section).
+3. **The parallel-session record**: a second GB-S4 variant was built
+   independently, verified the first-landed variant end-to-end (gates
+   9/9 GREEN 14,598 re-run; the 61-test suite green; the snapshot
+   byte-identical; the frozen files untouched) and is preserved unmerged
+   on `gold-balance/p2b-visual-parallel` for the owner (its findings —
+   the prototype's own 236px stack overflow measured pre-implementation,
+   the 4.28:1/4.35:1 dark tint contrast, the squint calibration against
+   the approved reference — recorded in PROGRESS.md's GB-S4b section).
+4. Gates on merged main at the union: **ALL 9 GREEN — 14,598 tests**
+   (web 12,639); copy:audit clean (fa round-77); Insights lazy
+   1550.46/358.81 (ceiling 1560/360, justified); CHANGELOG through
+   [2026-11-04a] (the heading count verified 192 → 193).
+
+## A0. What the visual ships (the merged anatomy, for the next session)
+
 
 1. **GB-S4 (P2b — the visual redesign) is COMPLETE** on branch
    `gold-balance/p2b-visual`: the lane view behind

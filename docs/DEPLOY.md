@@ -132,6 +132,41 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-04a the gold-balance P2b UNION deploy (worker 6549c5bc at 100% — the parallel-session union: the dark rim hues + the standing probes; the merged visual unchanged in behaviour)
+
+The GB-S4 parallel-session union (PR #18, merge `8a99e03`, branch
+`gold-balance/p2b-union`): a second GB-S4 session had built the visual
+redesign independently, found the first variant already merged (PR #17)
+and — per the GB-S1b union precedent — verified it end-to-end and landed
+its findings (PROGRESS.md's GB-S4b section; the full second variant
+preserved unmerged on `gold-balance/p2b-visual-parallel`).
+
+- **Gates before the deploy:** ALL 9 GREEN locally on merged main + the
+  union changes — 14,598 tests (web 12,639) · typecheck 6 · lint 0/0 ·
+  copy:audit clean (round-77 stands) · narrator in sync · layer1 strict
+  11,819/11,819 · entry 294.45/88.48 · Insights lazy 1550.46/358.81
+  (ceiling 1560/360; the rim polish rides the entry CSS, not the JS).
+  CI green on the union branch before the merge.
+- **Deploy-lock check:** the versions API showed production at
+  `d0eab36c` @ 100% (the parallel session's 21:13 deploy of PR #17) —
+  the expected active version, no third session. Clear.
+- **DEPLOY:** `pnpm --filter @currena/api exec wrangler deploy` →
+  **currena-api `6549c5bc` @ 100%** (deployment `9844fd4f`,
+  2026-11-03T21:41:30Z; the merged build + the union polish — the
+  dark-theme rim segments take the reference prototype's darker-theme
+  side hues; the gb-s4-union-probe Playwright project + the
+  prod-verify delivery harness join the repo).
+- **Post-deploy smoke:** `/api/health` ok (kv ok). The production
+  matrix (`node visual/prod-verify.mjs` from apps/web — the flag view
+  AND the default view, EN + fa, 360 + 1280, fresh contexts):
+  **8/8 pass, ZERO console errors** — the flag view (4 lane weights,
+  Balanced/«متعادل», the Split/«دوپاره» badge, the tray + the ledger
+  with the row-open interaction and the inflation tilt phrase + the
+  B-12 "falling · Normal" row, no overflow, RTL mirrored) and the
+  default view (the two panels, the wind panel, the legacy chips, the
+  legacy subtitle — nothing from the visual anywhere). The deployed
+  bundle is the measured one (the budget script's numbers held).
+
 ## Session record — 2026-11-03j the gold-balance P2b visual deploy (worker d0eab36c at 100% — the REDESIGNED balance behind ?balance=lanes; the DEFAULT view still byte-stable)
 
 GB-S4 (PR #17, merge `bc566e9d`): the visual redesign joins the lane
