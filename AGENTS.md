@@ -435,6 +435,21 @@ pinned by the legacy-markup vitest snapshot; fa round-76 (17 strings)
 triaged same-session; 19 component tests of 04 §4.3 (gates 9/9 GREEN
 14,582); the Insights lazy chunk moved to 1533.15/354.25 with the
 ceiling re-based to 1540/355.5 (justified in
+scripts/check-bundle-budget.mjs). P2b landed 2026-11-04 (GB-S4, PR
+#17): the flag view now renders the 05 VISUAL REDESIGN —
+`BalanceScale` is a dispatcher (`visual="lanes"` → the brass-beam
+stage with the 11-tick dial, the lane WEIGHTS with segmented rims in
+`signals/BalanceWeight.tsx`, the verdict hero block, the "Not
+leaning" tray, the four-row LEDGER whose inline expansion carries
+the member content contract; the `--bal-*` tokens + all styles in
+`signals/balance-visual.css`, scoped to `[data-balance-visual]`),
+650ms quartic, the beam formula untouched; the DEFAULT view is still
+byte-for-byte (the snapshot pin held through the refactor); fa
+round-77 (19 strings); the lanes suite rewritten to 28 tests + the
+gb-s4 Playwright evidence suite (81 tests, six scenarios × EN/fa ×
+360/1280 × light/dark, evidence/gb-s4/); gates 9/9 GREEN 14,591;
+the Insights lazy chunk moved to 1553.13/359.32 with the ceiling
+re-based to 1565/360 (justified in
 scripts/check-bundle-budget.mjs). Until GB-S6
 flips the default, everything user-visible about gold stays exactly
 as it is today — the preview is opt-in by URL only.*

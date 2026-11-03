@@ -17,10 +17,11 @@ actually executed. The gap-closure program that ran in parallel is CLOSED
 | D | The decision: MIN2 if C1+C2, else MIN1 if C1+C2, else STOP | ✅ DONE (GB-S1, 2026-11-03) — **GOLD_LANE_MIN_FIRING = 2** (D-GB-3's default; both criteria hold over all windows; no fallback needed, no STOP) |
 | E | P1: the pure engine `gold-balance.ts` + unit tests + index export (04 §3) | ✅ DONE (GB-S2, 2026-11-03) — the engine exactly 02 §2–§3 over the frozen imports (D-GB-9 additive); 15 tests (04 §4.1's 13 + the harness-equivalence pin); the 2026-10-31 fixture reproduces 01 §7 (level · 4 neutral · split 2v2 · dollar 1 · inflation 1) with the no-drift pin −2/headwind/6; gates 9/9 GREEN 14,563 (insights 1,270 → 1,285); bundle byte-identical 1522.88/351.96 |
 | F | P2: BalanceScale members/split/context + MergedCard wiring behind `?balance=lanes` (04 §3) | ✅ DONE (GB-S3, 2026-11-03) — PR #16 (branch gold-balance/p2-ui; code commit `71dede7`); the lane drivers from `goldBalance(readings)` through the SAME BalanceScale (members/split/tally/note + the subtitle/contextLine/measuredNote slots; geometry/animation/beam untouched); the default view byte-identical (main-vs-new render diff PROVEN, then pinned by the legacy vitest snapshot); 19 tests of 04 §4.3 items 1-7/9/11-13 on the recorded 2026-10-31 fixture; fa round-76 same-session (17 strings, copy:audit clean); screenshots EN/fa × 360/1280 + 2 detail-open (evidence/gb-s3/); gates 9/9 GREEN 14,582; Insights lazy 1533.15/354.25 — ceiling bumped to 1540/355.5 WITH justification |
+| G | P2b: the visual redesign of the balance behind the same flag (05) | ✅ DONE (GB-S4, 2026-11-04) — PR #17 (branch gold-balance/p2b-visual); BalanceScale becomes a dispatcher: `visual="lanes"` mounts the 05 anatomy (the brass-beam stage with the 11-tick dial, the lane WEIGHTS with segmented rims — the new signals/BalanceWeight.tsx — the verdict hero block, the "Not leaning" tray, the four-row ledger with the inline member expansion; 650ms quartic; pure geometry/frame/ticks helpers), the LEGACY path renders byte-for-byte (the snapshot untouched); the rim/ledger counts pinned both sides of the DOM; the --bal-* tokens (05 §5) in the new balance-visual.css (dark caption/rim inks lightened for AA on the tinted pans — measured); 19+9 copy keys EN+fa round-77 same-session; 28 lane tests (jsdom) + the gb-s4 Playwright suite (81 tests: V-1..V-10, six scenarios × EN/fa × 360/1280 × light/dark, evidence/gb-s4/); gates 9/9 GREEN 14,591; Insights lazy 1553.13/359.32 — ceiling bumped to 1565/360 WITH justification |
 
-Next: GB-S4 (P2b — the visual redesign behind the same flag), then
-GB-S5 (P3+P4), GB-S6 (P5 — **the owner-gated flip**), GB-S7 (OI-3,
-its own owner round).
+Next: GB-S5 (P3+P4 — the Outlook derivation + the copy close), then
+GB-S6 (P5 — **the owner-gated flip**), GB-S7 (OI-3, its own owner
+round).
 
 ## Session log
 
@@ -286,6 +287,131 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
   detail-panel interaction with the tilt phrase + the B-12 row) and the
   default view EN + fa (the panels, the legacy chips, the legacy
   subtitle). The owner previews at currena.ir/insights?balance=lanes.
+
+### GB-S4 (2026-11-04) — P2b: the visual redesign behind the flag
+
+- **Branch:** `gold-balance/p2b-visual` — **PR #17**
+  `gold balance(P2b): the visual redesign behind ?balance=lanes`
+  (draft opened with the 48-shot evidence set; self-merged when
+  V-1..V-10 held — the owner's incremental-merge instruction). Start
+  state pinned: main at `f6f1fdd` (the GB-S3 merge + the delivery
+  records).
+- **The visual (05, the owner's approved reference prototype as the
+  look target):** BalanceScale is now a dispatcher — `visual="lanes"`
+  (passed by MergedCard only under the flag) mounts the LANES VISUAL:
+  the eyebrow/title/subtitle head; the STAGE (a tapered brass beam on
+  the gradient tokens, the pivot hub + the ±35° dial with 11 ticks
+  over a 3×-magnified needle, the tapered column + rounded base, the
+  per-frame hangers, the pans as shallow bowls with the side tint +
+  the brass rim + the icon captions, the level reference retiring with
+  the old drawing); the VERDICT block (the hero word at 30–44px fluid
+  in the side ink, the four-bar lane strip, the counts line, the
+  not-enough note, the context PILL); the "Not leaning" TRAY (a
+  recessed well holding the neutral + unread stone weights, the split
+  badge, the one-line note, the empty state); the four-row LEDGER
+  (weight disc + name + state word + tally + chevron, inline
+  expansion, ONE row open at a time — the detail panel's member
+  CONTENT contract rides inside: firing rows as dot + name +
+  "Supports/Pressures · evidence · value" + the deep link, the steady
+  voters as one muted sentence, the unread rows with a hollow dot, the
+  lane intro + the inflation tilt phrase + the B-12 card-status word,
+  AC-2 intact); the footnote (the measured note slot). The mechanics
+  unchanged: the beam formula 3–10° untouched (pinned by the same
+  pure-law battery), ONE animated value, pans translate only,
+  hangers redrawn per frame, the RTL flip on the visual sign only,
+  **650ms ease-out quartic** (05 §7; the legacy path keeps its own
+  500ms cubic), prefers-reduced-motion jumps. The 05 §8 loading
+  skeleton (level drawing + grey discs, no motion) is implemented as
+  the lanes visual's zero-drivers state and unit-pinned — the app
+  page-gates loading before the card mounts, so the live loading
+  evidence is the page's own role="status" shell.
+- **BalanceWeight.tsx (new):** the lane weight — a round brass disc
+  (stone for neutral/unread), the engraved lane glyph (DQ-4 resolved:
+  the existing sets are STATE-keyed/photographic and carry no per-lane
+  identity at 1.9px, so the four glyphs draw exactly as the approved
+  prototype does), and THE SEGMENTED RIM — one arc segment per driver
+  sorted supports→pressures→steady→unread (green/red/hairline/dotted),
+  4.2/3px strokes, `balanceRimSegments` pure + tested; the split badge
+  on the disc's inline-end corner; the 44px hit area; hover lift /
+  active press / brass focus ring. All inline SVG + CSS, no new
+  dependency.
+- **The tokens (05 §5):** `signals/balance-visual.css` owns the
+  `--bal-*` family (brass hi/mid/lo/ink/text, stone hi/lo, recess,
+  glow) light + dark, every rule scoped under `[data-balance-visual]`
+  (only the flag view mounts it; the CSS code-splits into the lazy
+  Insights-*.css chunk). **V-7's dark pass:** the site's dark status
+  inks hold 4.8:1 on the CARD but slip to 4.28:1/4.35:1 on the 9% pan
+  TINT — exactly the lightening 05 §5 anticipated — so the dark
+  caption/verdict inks and the dark rim strokes take the reference
+  prototype's own brighter dark side hues (#4bc27d/#f07078; the VLM
+  pass's one recommendation applied within the approved look target).
+  Measured (evidence/gb-s4/contrast-ratios.txt): light verdict 10.98:1
+  · caption-on-tint 7.01:1 (for) / 5.62:1 (against) · tally 7.03:1;
+  dark verdict 13.60:1 · caption-on-tint 6.36:1 / 5.07:1 · tally
+  7.10:1 — AA everywhere, both themes.
+- **The default view:** STILL byte-for-byte — the legacy path is the
+  untouched `BalanceScaleMechanical`, the lane-view assertions were
+  rewritten to the new anatomy (weights/verdict/ledger + the rim↔ledger
+  count pins) and the LEGACY SNAPSHOT still passes unchanged
+  (`__snapshots__/gold-balance-lanes.test.tsx.snap` — the pin holds
+  through the refactor; balance.test.tsx's 46 mechanical tests all
+  green).
+- **The copy:** 19 new keys under `signals.balance` (eyebrow,
+  verdictEyebrow, panCapFor/Against, laneCount{For,Against,Neutral,
+  Unread}, trayTitleLanes/trayNote/trayEmpty,
+  laneState{For,Against,Neutral,Unread,Split},
+  memberWord{Supports,Pressures,Unread}, laneSteadySentence) EN + fa,
+  triaged same-session through **round-77**
+  (docs/localization/persian-copy-round-77-gold-balance-visual.md; the
+  manifest +21 processed incl. the «، » list-separator technical
+  entry; no em dashes; copy:audit clean).
+- **Tests:** `gold-balance-lanes.test.tsx` rewritten 19 → **28** (the
+  flag-view assertions on the new anatomy + the V-1/4/5/8/9 jsdom
+  pins: weight placement, the split badge + aria, the ledger
+  expansion incl. steady-sentence/B-12/tilt-phrase/AC-2, the rim
+  sorting + rim↔engine counts, the pure geometry (size classes, the
+  reserved stage, 11 ticks, plumb drops, the 3× needle clamp), the
+  formula battery over nets −3..+3, the sparse rule, reduced-motion
+  first paint, the skeleton, RTL mirror + Persian digits + state
+  words, dictionary coverage ×2, keyboard open/close + focus, the
+  legacy default + the snapshot, the hook). Web 12,623 → **12,632**;
+  gates ALL 9 GREEN **14,591**.
+- **Evidence (gb-s4 Playwright project, `gb-s4-visual.plw.ts`, 81
+  tests, all green):** the six scenarios (today/for/against/split/
+  none/loading) × EN/fa × 360/1280 × light/dark — **48 screenshots**
+  into evidence/gb-s4/ (page.route() per scenario over the 2026-10-31
+  corpus overlay; the scenario reads verified against the engine
+  before the run: for = dollar's basket falling past its 1.0-point
+  threshold + usdjpy at the decade BOTTOM — usdjpy has NO move
+  threshold, only its level ever fires; inflation pressures via LOW
+  CPI/PCE — the table reads running-hot as the hedge's SUPPORT) +
+  the squint shot + the 4-in-one-pan stack at 360 (the reference's own
+  236px pan draft overflowed its stack scenario by 188px — measured
+  before implementation; the shipped panH 268 + the two-per-row width
+  formula hold it) + the reduced-motion shot + contrast-ratios.txt.
+  V-1 measured (the verdict word the largest text) + V-2 (fill 0.93
+  mobile / 0.71 desktop at the measured card) + V-3 (360/390/768/
+  1280/1920 × EN/fa, no scroll, no pan overflow) + V-4 (rim ↔ ledger,
+  DOM vs DOM, 4 scenarios) + V-5 (angle/needle/verdict + the heavy
+  pan lower, the none needle hidden) + V-6 (the wind-word scan) +
+  V-7 (AA on the CARD and on the 9% TINTS, both themes) + V-8
+  (keyboard: weight → row opens + focus moves; Enter/Space toggle)
+  + V-9 (reduced motion: the first paint at the target, zero
+  transitions) + **VLM-verified** (the desktop/fa-dark/mobile shots
+  clean; the squint calibration: the brass signature reads first
+  blurred in OUR shot AND in the owner's approved reference — the
+  verdict word is the dominant TEXT and the focal point of the
+  reading half, exactly the approved hierarchy).
+- **Bundle:** Insights lazy **1553.13/359.32** (from 1533.15/354.25;
+  +19.98 raw / +5.07 gz — the visual + BalanceWeight + 19 copy keys ×
+  2 locales; the ~7.5kB balance-visual.css rides the lazy Insights
+  CSS chunk, outside this JS budget) — ceiling re-based 1540/355.5 →
+  **1565/360** WITH the justification in
+  scripts/check-bundle-budget.mjs (the legacy drawing + the two gold
+  panels still ride the chunk until the P5/GB-S6 flip re-baselines
+  downward).
+- **CHANGELOG:** `[2026-11-04a]` — the heading count verified 191 →
+  192.
 
 ## Owner must decide
 

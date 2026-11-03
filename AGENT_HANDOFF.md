@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold balance consolidation program (GB-S3 DELIVERED)
+# AGENT_HANDOFF — Currena: the gold balance consolidation program (GB-S4 branch READY TO MERGE)
 
 > The ACTIVE program is the owner's **gold balance consolidation**
 > (`docs/specs/gold-balance-consolidation/`, session plan GB-S1..GB-S7 in
@@ -6,7 +6,7 @@
 > program is CLOSED (2026-11-03d; its record: `docs/gap-closure/`).
 > Never record credentials here.
 
-## A. The delivered state (verified 2026-11-03 ~17:10 UTC)
+## A. The delivered state (GB-S4 built + verified locally 2026-11-04; the merge/deploy steps below)
 
 1. **GB-S3 (P2) is COMPLETE and LIVE**: PR #16 merged as `0bba57a`
    (code `71dede7` + records `0e68597`); CI green on main; **currena-api
@@ -44,7 +44,7 @@
 
 - The owner's live read of the preview (the Split badge OI-2, the
   calm-stress semantic 02 §4.1) before the P5/GB-S6 flip.
-- OI-1 (the Outlook sentences) — GB-S5 (P3+P4), fa round-77.
+- OI-1 (the Outlook sentences) — GB-S5 (P3+P4), fa round-78 (round-77 was GB-S4's).
 - The credential rotation (the session-supplied tokens were pasted in
   chat — rotate per the standing owner action item).
 
@@ -52,24 +52,36 @@
 
 D-GB-9 (the frozen files), no edge claimed ever, full `pnpm gates`
 before every push, the byte-stable default until the owner-gated flip,
-fa copy-audit flow (next: round-77), the parallel-session protocol
+fa copy-audit flow (next: round-78), the parallel-session protocol
 (pull --rebase before committing).
 
 ## D. Git + deployment state
 
-- origin/main = `0bba57a` (local main == origin). The branch
-  `gold-balance/p2-ui` is merged (PR #16, closed merged). Production:
-  **currena-api `1bfc88c5` @ 100%** · currena-markets `58c4eebd`
-  (code-unchanged, correctly not redeployed). The scheduled GHA runs
-  continue on the pushed code.
-- The next session is **GB-S4 (P2b — the visual redesign behind the
-  same flag)**: the rewritten prompt is in PROMPTS.md (the exact
+- origin/main = `f6f1fdd` at the session's start; the work sits on the
+  branch `gold-balance/p2b-visual` (PR #17, draft with the 48-shot
+  evidence set): code commit (BalanceScale dispatcher + BalanceWeight +
+  balance-visual.css + MergedCard flag wiring + the copy ×2 + round-77 +
+  the rewritten 28-test suite + the gb-s4 Playwright project + the
+  budget re-base) + the records commit (PROGRESS/CHANGELOG/AGENTS/
+  PROMPTS). Gates at push: ALL 9 GREEN — 14,591 tests (web 12,632);
+  copy:audit clean (fa round-77, 19 keys + the «، » separator);
+  Insights lazy 1553.13/359.32 (ceiling 1565/360, justified); the
+  gb-s4 suite 81/81 green (V-1..V-10, evidence/gb-s4/).
+- Remaining for THIS session (the owner's incremental-merge
+  instruction): merge PR #17 when CI is green → deploy-lock check →
+  `wrangler deploy` → production browser-verify the flag view AND the
+  default view (fresh contexts, EN + fa, 360 + 1280, zero console
+  errors) → the delivery-record commit (PROGRESS's merge SHA + deploy +
+  verification lines, DEPLOY.md's session note, this handoff finalized).
+- The next session is **GB-S5 (P3 + P4 — the Outlook derivation + the
+  copy close)**: the rewritten prompt is in PROMPTS.md (the exact
   component state, the fa round, the bundle numbers, the harness
   patterns).
 
 ## E. Next action (a new session)
 
-Read PROMPTS.md's GB-S4 prompt (rewritten with the exact shipped
-state) + PROGRESS.md's GB-S3 session log; branch
-`gold-balance/p2b-visual`; the session spec is
-05-VISUAL-DESIGN-SPEC.md + reference/balance-reference.html.
+Read PROMPTS.md's GB-S5 prompt (rewritten with the exact shipped
+state) + PROGRESS.md's GB-S4 session log; branch
+`gold-balance/p3-outlook`; the session spec is 01-SPEC.md §5.2 +
+03-UX-AND-COPY.md §6 + 04 §4.2. The preview for the owner's eyes:
+https://currena.ir/insights?balance=lanes (now the 05 visual).

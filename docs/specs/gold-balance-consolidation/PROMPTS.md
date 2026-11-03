@@ -186,20 +186,26 @@ At the end: PROGRESS.md; CHANGELOG; rewrite the GB-S5 prompt (the Outlook + copy
 ## GB-S5 — P3 + P4: the Outlook derivation + the copy close
 
 ```
-You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1..S4 are done — read docs/specs/gold-balance-consolidation/PROGRESS.md first.
+You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1..S4 are done — read docs/specs/gold-balance-consolidation/PROGRESS.md first (the GB-S4 session log has the exact component state the visual left behind).
 
-Read, in order: AGENTS.md, the spec README (OI-1 especially), 01-SPEC.md §5.2 (the Outlook derivation — your primary contract), 03-UX-AND-COPY.md §6 (the copy close), 04 §4.2 (the outlook table tests), PROGRESS.md.
+Read, in order: AGENTS.md (the Gold Program + gold-balance paragraphs), the spec README (OI-1 especially), 01-SPEC.md §5.2 (the Outlook derivation — your primary contract), 03-UX-AND-COPY.md §6 (the copy close), 04 §4.2 (the outlook table tests), 05 §4.4 (the verdict block your Outlook must not contradict), PROGRESS.md.
 
 Your job:
 1. P3: the gold Outlook card derives from goldBalance() behind the same ?balance=lanes flag (verdict.tsx): all-4-unread -> null; L>=3 strong-bullish / A>=3 strong-bearish (GOLD_LANE_STRONG = 3); range evidence unchanged (|30d change| < 2% AND typical 10y position AND |L-A| <= 1 -> range-bound — price describes consolidation only); L==A -> mixed if L>0 else neutral; else bullish/bearish. Footing no longer counts anywhere (AC-7). Silver's Outlook path UNTOUCHED (OI-4 is a recorded follow-up, not yours).
 2. The outlook table test (04 §4.2): every branch of 01 §5.2 over (L, A, unread, speed, band), plus the footing-decoupling pin (gold change30d of -9% and +9% give the same state unless the range evidence differs), plus the silver tests unchanged and green.
 3. OI-1 (owner decision — ask ONCE, early, with the 03 §6.3 table in front of me): reword the seven gold outlook sentences to the conditions wording, or keep the owner's originals? If I do not answer or decline: ship the engine change with the EXISTING sentences and note in the report that the wording still reads as a forecast (03 §6.3's rule). FA drafts for any reworded sentence go through the review round.
-4. P4 (the copy close): every new key from GB-S3/GB-S4 triaged and processed in the manifest (copy:audit clean is already the per-session gate — this session CONFIRMS the full set, updates docs/localization/persian-terminology.md with any new terms (Split / دوپاره, lane names, tally wording), and records OI-5 as satisfied-pending-final-owner-read).
-5. The consistency pins: the balance, its verdict word and the Outlook state come from the SAME goldBalance() result (AC-3) — a test pins that they cannot disagree; no bespoke stress or expectations rule remains in the gold path (AC-4).
+4. P4 (the copy close): every new key from GB-S3/GB-S4 triaged and processed in the manifest (copy:audit clean is already the per-session gate — this session CONFIRMS the full set, updates docs/localization/persian-terminology.md with any new terms (Split / دوپاره, lane names, tally wording, the round-77 tray/verdict/state vocabulary), and records OI-5 as satisfied-pending-final-owner-read).
+5. The consistency pins: the balance, its verdict word and the Outlook state come from the SAME goldBalance() result (AC-3) — a test pins that they cannot disagree (the flag view's data-balance-verdict attribute + the balance's net vs the VerdictStrip's gold state); no bespoke stress or expectations rule remains in the gold path (AC-4).
 
-The exact current state: PROGRESS.md (authoritative). fa round: the next per PROGRESS.md. Bundle: measure; re-baseline with justification if needed.
+The exact current state (verify against PROGRESS.md + the repo before you start):
+- The visual is LIVE behind ?balance=lanes (GB-S4, PR #17): BalanceScale is a DISPATCHER — visual="lanes" (passed by MergedCard only under the flag) renders the lanes visual (the brass-beam stage, BalanceWeight.tsx's segmented rims, the verdict hero block with data-balance-verdict={verdict}, the "Not leaning" tray, the four-row LEDGER whose inline expansion carries the member content contract: data-balance-member/-impact/-group + the lane intro + the inflation tilt note + the B-12 word + the deep links); the DEFAULT view is BalanceScaleMechanical, byte-for-byte, pinned by the legacy snapshot (__snapshots__/gold-balance-lanes.test.tsx.snap) — DO NOT touch the legacy path or its 46 balance.test.tsx tests. The ledger rows' aria words come from the round-77 laneState* keys; the counts line from laneCount*; the tray from trayTitleLanes/trayNote/trayEmpty.
+- Your Outlook work touches verdict.tsx (the gold state's derivation) + MergedCard/VerdictStrip wiring under the flag; the balance visual itself should not need edits (if the Outlook state and the verdict block must speak the same vocabulary, prefer copy over markup).
+- Tests: gold-balance-lanes.test.tsx (28) pins the visual; balance.test.tsx (46) pins the legacy mechanics; test baseline 14,591 (web 12,632). fa round: YOURS is round-78 (GB-S4 used round-77).
+- Bundle: measure from 1553.13/359.32 (ceiling 1565/360, chunk Insights-*.js); re-baseline with justification if needed (scripts/check-bundle-budget.mjs).
+- CHANGELOG: the last heading is [2026-11-04a] (count 192, verified) — yours is the next per the sequence; CHECK THE FILE and verify the heading count before and after.
+- The gb-s4 Playwright project (apps/web/visual/gb-s4-visual.plw.ts, 81 tests) is the harness pattern for any new browser evidence; the dummy :8799 health-server trick + the sticky-bar neutralization + the VLM verification of shots stand (the GB-S3/GB-S4 lessons).
 
-Discipline: as before — FULL `pnpm gates`; branch gold-balance/p3-outlook; commit + push per milestone; draft PR; merge yourself when the exit gate holds (outlook tests green, copy:audit clean, terminology updated); CI green; deploy; browser-verify EN + fa 360+1280 fresh contexts (the outlook strip beside the balance, zero console errors). After three honest failures, record blocked and move on.
+Discipline: as before — FULL `pnpm gates`; branch gold-balance/p3-outlook; commit + push per milestone; draft PR; merge yourself when the exit gate holds (outlook tests green, copy:audit clean, terminology updated); CI green; deploy; browser-verify EN + fa 360+1280 fresh contexts (the outlook strip beside the balance visual, zero console errors). After three honest failures, record blocked and move on.
 
 At the end: PROGRESS.md; CHANGELOG; rewrite the GB-S6 prompt (the owner-gated flip — the P5 checklist: default on, delete GoldTailwindPanel.tsx + ModelVsRealityPanel.tsx + their test parts with surviving assertions moved, the bundle re-baseline, the docs set: GOLD_SCORE_SPEC notes, INDICATORS_AND_DATA_SOURCES, AGENTS.md, DEPLOY.md, the AC-1..AC-12 + V-1..V-10 final acceptance table); commit, push, merge, deploy, verify; print the GB-S6 prompt with a 5-line summary. Tell me clearly: the preview is ready for my review at https://currena.ir/insights?balance=lanes — GB-S6 does NOT proceed without my explicit "go".
 ```
@@ -365,3 +371,51 @@ At the end: PROGRESS.md (the program's final close — every OI resolved or expl
   both recorded in the PR for the owner. Gates: 14,582 (baseline + 19);
   Insights lazy 1533.15/354.25, ceiling 1540/355.5 (justified); DEPLOY
   this phase (the SPA rides the api worker and the chunk changed).
+- **GB-S4 (2026-11-04, P2b):** the visual session. **Measure the
+  reference prototype BEFORE implementing its numbers** — the "approved"
+  draft had never been rendered and its own guides readout
+  (`window.__lastDraw`) showed its 236px mobile pan overflowing the
+  four-weights stack by 188px (a column-gap/wW mismatch wrapped one
+  weight per row); the shipped pan height + the two-per-row width
+  formula were tuned from the measurement, and the stack scenario is
+  now a pinned V-3 test. **The sign convention trap:** the codebase's
+  physical angle is AGAINST-heavy POSITIVE (for-heavy → −10°) — the
+  reference prototype's is the opposite; the V-5 expectations were
+  written from the reference and failed until re-derived from
+  `signedTiltDeg`. **Engine-verify scenario fixtures before the browser
+  run:** `evalLeg` fires the MOVE leg only for ids with a
+  `SIGNAL_LEG_MOVE` threshold (usdjpy has none — only its decade level
+  ever fires) and the inflation table reads running-HOT as the hedge's
+  SUPPORT (an "against" inflation vote needs LOW CPI/PCE); a 30-line
+  tsx probe over `goldBalance` caught all three before the Playwright
+  pass. **Contrast on TINTED surfaces ≠ contrast on the card:** the
+  site's dark status inks hold 4.8:1 on #1A222E but slip to 4.28:1 on
+  the 9% side tint over it — the V-7 test must blend the live token
+  over the live card at the CSS's own alpha, and 05 §5 had already
+  anticipated the fix (the reference's brighter dark side hues
+  #4bc27d/#f07078). **The squint test needs a calibration:** a blurred
+  VLM read puts the brass signature first in OUR shot — and FIRST IN
+  THE OWNER'S APPROVED REFERENCE TOO (verified side by side); the
+  verdict word is the dominant TEXT (V-1's measured clause) — record
+  the hierarchy honestly instead of chasing a criterion the approved
+  design itself does not have. **page.route() beats the file-overlay
+  restore:** per-scenario rewrites of /api/insights over the 2026-10-31
+  corpus give six scenarios with no fixture mutation and no restore
+  step (the gb-s3 overlay script pattern, retired). **A `Loading`
+  scenario is a page-level truth:** the app page-gates loading before
+  the card mounts, so the balance's 05 §8 skeleton is unit-pinned as
+  the zero-drivers state and the live loading evidence is the page's
+  own role="status" shell — state it, don't fake it. **The VLM pass
+  earns its keep:** its one real finding (faint dark rims) became the
+  dark segment-hue fix; its other two findings were false positives
+  (the card header's own dark ink misread as a "stray blue line" —
+  verified by pixel-scanning the PNG before acting). **Keep the
+  legacy snapshot green through a dispatcher refactor:** renaming the
+  whole legacy function body to BalanceScaleMechanical and branching
+  before its hooks (two components, one prop) left the 46 mechanical
+  tests + the snapshot untouched while the new visual mounts only
+  under `visual="lanes"`. Gates: 14,591 (baseline + 9);
+  Insights lazy 1553.13/359.32, ceiling 1565/360 (justified; the
+  ~7.5kB balance-visual.css rides the lazy Insights CSS chunk,
+  outside the JS budget); DEPLOY this phase (the SPA rides the api
+  worker and the chunk changed).
