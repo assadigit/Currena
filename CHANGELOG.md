@@ -5,6 +5,95 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03j] — gold-balance P2b: the visual redesign of the balance behind ?balance=lanes (the brass stage + dial + bowl pans, the lane WEIGHTS with segmented rims, the verdict word as the hero at 30-44px, the Not-leaning tray, the four-row inline ledger; --bal-* tokens light+dark with measured AA ratios; the DEFAULT view still byte-identical; fa round-77; gates 9/9 GREEN 14,598; Insights chunk 1550.46/358.81 — ceiling 1560/360 justified)
+
+GB-S4, the gold balance consolidation's visual session (rollout P2b per
+04 §3, the owner's 05-VISUAL-DESIGN-SPEC implemented from the approved
+reference prototype `reference/balance-reference.html`; branch
+`gold-balance/p2b-visual`). The lane view behind `?balance=lanes` now
+renders the owner's requested look — sophisticated, spacious, the
+answer first:
+
+- **The stage** (signals/BalanceScale.tsx, the new `visual` branch):
+  a tapered brass beam (the gradient tokens + a highlight line), the
+  brass hub over an 11-tick ±35° dial with a 3× magnified needle, the
+  tapered column + rounded base + contact shadow, hangers redrawn per
+  frame from the rotated beam-end joints to the pans' top corners, and
+  the pans as shallow bowls (side tint, hairline ring, the brass rim
+  along the bottom) with the captions inside. The MECHANICS are
+  unchanged: ONE animated angle still drives everything, the pans
+  translate only, the beam formula is the owner's (3–10°, level at net
+  0 / sparse / nothing readable); the visual branch tweens 650 ms
+  ease-out quartic on load and data change, and prefers-reduced-motion
+  jumps. The pans' heights are 05 §4.2's targets tuned for the measured
+  worst case (s 236→256, m/l 268→280 — the spec's header allows
+  tuning; the measurements are recorded in the code comment).
+- **The lane weight** (NEW signals/BalanceWeight.tsx): a round brass
+  disc — stone for neutral and unread — with the lane icon engraved
+  and the SEGMENTED RIM (one arc per driver, sorted supports →
+  pressures → steady → unread; green supports, red pressures, hairline
+  steady, dotted unread), the Split badge, the label, a 44 px hit area
+  and hover/active/focus states. Pure props only (05 §11).
+- **The verdict block is the hero**: the verdict word at 30–44 px
+  (green for, red against, primary ink otherwise), the four-segment
+  lane strip, the counts line that always states for/against/
+  not-leaning (unread appended when > 0), and the context pill
+  (01 §6, never green or red). Sparse keeps UI-40's honesty: the
+  not-enough sentence IS the verdict word.
+- **The tray and the ledger**: one recessed "Not leaning" well holds
+  the neutral AND unread weights (the unread ones wear the dotted
+  rim); the four-row LEDGER replaces the shared panel INLINE — one row
+  open at a time, a weight press scrolls the row to the centre and
+  focuses it, and the member list keeps the GB-S3 content contract
+  (every voter reachable, evidence + value + the deep link, steady
+  collapsed to one muted sentence, the B-12 status word, the inflation
+  tilt phrase).
+- **Tokens + contrast (05 §5)**: the `--bal-*` tokens scoped to
+  `[data-balance-visual]`, light + dark. WCAG AA measured from the
+  rendered styles in BOTH themes (the full table in
+  evidence/gb-s4/README.md): the hero 5.00/4.77 (light/dark, ≥3:1
+  large text; the green word 3.35/4.78), every caption/tally surface
+  ≥4.5 (5.56–13.60). The dark captions needed 05 §5's anticipated
+  lightening (the site's dark chip inks read 4.28/4.35 on the 9%-
+  tinted pans): the balance's dark captions and state words wear the
+  prototype's own dark side hues (#4bc27d/#f07078, measured 7.10/5.56).
+- **The DEFAULT view stays byte-for-byte** (the legacy-markup snapshot
+  untouched; balance.test.tsx's 46 pure-geometry tests green — the
+  legacy branch renders verbatim, the `visual` prop gates the redesign).
+- **Copy**: 14 new keys EN + fa (the eyebrow, the verdict eyebrow +
+  four counts parts, the tray title/note/empty line, the ledger state
+  words + the split state) triaged same-session through round-77
+  (`docs/localization/persian-copy-round-77-gold-balance-visual.md`;
+  manifest +15 processed incl. the fa list-joiner precedent; no em
+  dashes). The verdict word, captions, empty-pan sentences and measured
+  note REUSE the existing keys — no churn.
+- **Tests**: gold-balance-lanes.test.tsx rewritten to the new anatomy
+  (19 → 35 tests) + the gb-s4 Playwright project (61 tests): the six
+  engine-verified scenarios (balanced = the recorded 2026-10-31
+  archive; for 3-0-1; against 1-2-1; split 1-1-2; all-unread; loading
+  = the route's honest skeleton — the balance never half-renders, the
+  deviation recorded) × EN/fa × 360/1280 × light/dark, the squint test
+  (programmatic + blur(8px) capture), the 360–1920 overflow sweep, the
+  rim-vs-ledger parity, the formula pins, the wind-word scan, the
+  computed contrast, the keyboard walk and the reduced-motion equality.
+  70 screenshots in evidence/gb-s4/. The scenarios ride an in-memory
+  /api/insights interception that clears unspecified eval fields — the
+  fixture's own change30d values otherwise LEAK into the scenario's
+  voters (caught and fixed; recorded in the file).
+- **Gates**: ALL 9 GREEN — 14,598 tests (web 12,623 → 12,639; baseline
+  14,582, no regression) · typecheck 6/6 · lint 0/0 · copy:audit clean
+  (round-77) · narrator vocabulary refreshed · layer1 strict
+  11,819/11,819 · Insights lazy 1533.15/354.25 → **1550.46/358.81**
+  measured — ceiling bumped 1540/355.5 → **1560/360** WITH this
+  justification in scripts/check-bundle-budget.mjs (the redesign's SVG
+  + CSS + copy join the chunk behind the flag; no new dependency, no
+  image asset; the two gold panels still ride the chunk until the
+  P5/GB-S6 flip re-baselines downward).
+- DQ-1..4 defaults held: brass (DQ-1), the segmented rim (DQ-2), the
+  ledger closed by default (DQ-3), and the lane icons are the approved
+  prototype's own lucide-style set (DQ-4's "reuse first" resolves to
+  them — the existing ConditionIcon glyphs name STATES, not lanes).
+
 ## [2026-11-03i] — gold-balance P2: the consolidated balance behind ?balance=lanes (the four lanes drive the SAME BalanceScale through goldBalance(); the split badge + lane tallies + the member detail panel + the context line + the measured note; the DEFAULT view byte-identical, pinned by snapshot; fa round-76; gates 9/9 GREEN 14,582; Insights chunk 1533.15/354.25 — ceiling 1540/355.5 justified)
 
 GB-S3, the gold balance consolidation's UI session (rollout P2 per

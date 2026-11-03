@@ -1166,6 +1166,27 @@ body {
   --type-number: 1.45rem;
   --type-label: 0.875rem;
   --type-caption: 0.78rem;
+  /* Gold balance consolidation P2b (GB-S4, 2026-11-03 —
+   * docs/specs/gold-balance-consolidation/05-VISUAL-DESIGN-SPEC.md §5,
+   * the owner-approved reference prototype reference/balance-reference.html):
+   * the assay-office tokens, SCOPED to the balance visual
+   * ([data-balance-visual] — the legacy balance never reads them). The
+   * brass family derives from --color-accent-gold; -text is the
+   * prototype's own readable brass ink for the eyebrow (4.9:1 on white).
+   * Contrast, measured (see the gb-s4 evidence): the pan captions use
+   * the site's chip text-ink pair (--color-chip-ink-normal #0E6027
+   * 7.0:1 / --color-chip-ink-attention #B91C1C 5.9:1 on the 9%-tinted
+   * pan — the 05 §5 required 4.5:1 for the 12px captions); the verdict
+   * word rides the status pair at hero size (large-text AA, 3:1). */
+  --bal-brass-hi: #fbe3a0;
+  --bal-brass-mid: #eab544;
+  --bal-brass-lo: #b27a1d;
+  --bal-brass-ink: #5b3d08;
+  --bal-brass-text: #8a5a0a;
+  --bal-stone-hi: #eef2f6;
+  --bal-stone-lo: #c7d0da;
+  --bal-recess: #f3f5f8;
+  --bal-glow: rgba(243, 177, 63, 0.16);
 }
 
 .dark {
@@ -1203,6 +1224,19 @@ body {
    * #1A222E card the deep navy would be invisible, so the light ink
    * speaks (13.1:1 on #1A222E). Kept through the v3 merge for --ei-* consumers. */
   --ei-navy: #E8EDF4;
+  /* GB-S4 (05 §5): the assay-office tokens, dark theme — brass lowered in
+   * lightness, stone inverted, recess darkened, glow weaker. Dark captions
+   * keep the site's dark chip inks (#24a148 / #fa4d56, 4.4:1+ on the
+   * tinted #1A222E pan — measured in the gb-s4 evidence). */
+  --bal-brass-hi: #f3d488;
+  --bal-brass-mid: #d9a43e;
+  --bal-brass-lo: #8f5f14;
+  --bal-brass-ink: #2a1c04;
+  --bal-brass-text: #e8bd63;
+  --bal-stone-hi: #46546a;
+  --bal-stone-lo: #2b3646;
+  --bal-recess: #141b25;
+  --bal-glow: rgba(243, 177, 63, 0.10);
 }
 
 /* Type-role utilities (G3) — the four sizes the page is allowed to speak in. */
@@ -1252,6 +1286,533 @@ html:not(:lang(fa)) .type-kicker {
 }
 .text-secondary-ink {
   color: var(--color-text-secondary);
+}
+
+/* =================================================================== *
+ * Gold balance — the visual redesign (GB-S4 / P2b, 2026-11-03).
+ *
+ * docs/specs/gold-balance-consolidation/05-VISUAL-DESIGN-SPEC.md §4–§10,
+ * implemented from the owner-approved prototype
+ * (docs/specs/gold-balance-consolidation/reference/balance-reference.html):
+ * the assay-office balance — brass beam + dial, bowl pans hung from the
+ * beam ends, lane WEIGHTS with segmented rims, the verdict as the hero,
+ * the recessed "Not leaning" tray and the inline ledger. Everything is
+ * scoped to [data-balance-visual] (the lane view behind ?balance=lanes);
+ * the legacy balance (and the byte-stable default view) never matches.
+ * Logical properties only (RTL mirrors with the document); the stage
+ * geometry itself is computed in BalanceScale.tsx and set inline — this
+ * block carries the look, not the mechanics. No element here animates on
+ * its own: the ONE animated value (the beam angle) drives the stage per
+ * frame; only the weight hover/press (140ms transform) and the chevron
+ * (200ms) move, and prefers-reduced-motion silences them.
+ * =================================================================== */
+[data-balance-visual] {
+  position: relative;
+  isolation: isolate;
+}
+/* The warm radial glow at the top of the card (05 §4.1) — one quiet
+ * atmosphere layer behind the heading, never a box. */
+.bal-glow {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 280px;
+  background: radial-gradient(120% 60% at 50% -10%, var(--bal-glow), transparent 60%);
+  pointer-events: none;
+}
+/* 4.1 the head: eyebrow → title → subtitle, centred, ≤640px. */
+.bal-head {
+  position: relative;
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
+}
+.bal-eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bal-brass-text);
+}
+/* Persian never letter-spaces or uppercases (the .type-kicker rule). */
+:lang(fa) .bal-eyebrow,
+:lang(fa) .bal-verdict-eyebrow {
+  letter-spacing: 0;
+  text-transform: none;
+}
+.bal-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  color: var(--color-text-primary);
+}
+[data-balance-visual][data-size="m"] .bal-title { font-size: 24px; }
+[data-balance-visual][data-size="s"] .bal-title { font-size: 20px; }
+.bal-sub {
+  margin: 10px auto 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  max-width: 52ch;
+}
+[data-balance-visual][data-size="s"] .bal-sub { font-size: 13px; }
+
+/* 4.2 the stage: the svg mechanical layer sits behind the pans (absolute
+ * DOM). Its height/width are set inline by the component from the
+ * measured width + the worst case (never from the data). */
+.bal-stage {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto 0;
+}
+[data-balance-visual][data-size="s"] .bal-stage { margin-top: 10px; }
+.bal-stage svg.bal-mech {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+/* The pans: shallow bowls — side tint, hairline ring, a brass rim along
+ * the bottom (05 §4.2). Position/size/translation are inline. */
+.bal-pan {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 6px 24px;
+  border-radius: 14px 14px 34px 34px / 14px 14px 26px 26px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bal-tint) 9%, transparent),
+    color-mix(in srgb, var(--bal-tint) 3%, transparent)
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bal-tint) 20%, transparent);
+  will-change: transform;
+}
+.bal-pan::after {
+  content: "";
+  position: absolute;
+  inset-inline: 5%;
+  inset-block-end: 0;
+  block-size: 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--bal-brass-hi), var(--bal-brass-mid) 45%, var(--bal-brass-lo));
+  box-shadow: 0 5px 8px -3px rgba(91, 61, 8, 0.4);
+}
+.bal-pan-for { --bal-tint: var(--color-status-normal); }
+.bal-pan-against { --bal-tint: var(--color-status-alert); }
+/* The pan caption: icon + the side label inside the top of the pan, in
+ * the side's readable text ink (the chip-ink pair — the pinned status
+ * hues are for meters/icons; text needs 4.5:1, 05 §5). */
+.bal-pan-cap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 30px;
+  padding-inline: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--bal-cap-ink);
+}
+[data-balance-visual][data-size="s"] .bal-pan-cap { font-size: 11px; gap: 4px; }
+.bal-pan-cap svg { width: 14px; height: 14px; flex: none; }
+.bal-pan-for .bal-pan-cap { --bal-cap-ink: var(--color-chip-ink-normal); }
+.bal-pan-against .bal-pan-cap { --bal-cap-ink: var(--color-chip-ink-attention); }
+/* 05 §5's anticipated fix: on the 9%-tinted pans the dark chip inks land
+ * at 4.28:1 / 4.35:1 (measured) — a hair under the 4.5:1 the 12px
+ * captions need — so the balance's dark captions wear the reference
+ * prototype's own dark side hues instead (#4bc27d 6.36:1 / #f07078
+ * 5.07:1 on the tinted pans; the ratios recorded in the gb-s4
+ * evidence). Scoped to [data-balance-visual]; the app's chip inks
+ * elsewhere are untouched. */
+.dark [data-balance-visual] .bal-pan-for .bal-pan-cap { --bal-cap-ink: #4bc27d; }
+.dark [data-balance-visual] .bal-pan-against .bal-pan-cap { --bal-cap-ink: #f07078; }
+.bal-pan-empty {
+  margin: auto;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  text-wrap: balance;
+}
+[data-balance-visual][data-size="s"] .bal-pan-empty { font-size: 11px; }
+/* The weights wrap and centre inside a pan (10px rows, 8px columns). */
+.bal-weights {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 8px;
+  width: 100%;
+}
+
+/* 4.3 the lane weight (signals/BalanceWeight.tsx renders the markup). */
+.bal-weight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+  font: inherit;
+  color: inherit;
+}
+.bal-weight:hover { transform: translateY(-1px); }
+.bal-weight:active { transform: scale(0.97); }
+.bal-weight:focus-visible,
+.bal-row-btn:focus-visible {
+  outline: 2px solid var(--bal-brass-mid);
+  outline-offset: 3px;
+}
+.bal-weight-label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-text-primary);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+[data-balance-visual][data-size="s"] .bal-weight-label { font-size: 11px; }
+.bal-disc {
+  position: relative;
+  flex: none;
+}
+.bal-disc svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.bal-disc .bal-disc-face { filter: drop-shadow(0 4px 5px rgba(91, 61, 8, 0.3)); }
+.dark .bal-disc .bal-disc-face { filter: none; }
+.bal-badge-split {
+  position: absolute;
+  inset-block-start: -7px;
+  inset-inline-end: -12px;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 0 0 1px var(--color-border), 0 2px 4px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+}
+
+/* 4.4 the verdict block — the hero. */
+.bal-verdict {
+  position: relative;
+  margin: 22px auto 0;
+  text-align: center;
+}
+[data-balance-visual][data-size="s"] .bal-verdict { margin-top: 14px; }
+.bal-verdict-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+.bal-verdict-word {
+  margin: 4px 0 0;
+  font-size: 44px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--color-text-primary);
+}
+[data-balance-visual][data-size="m"] .bal-verdict-word { font-size: 38px; }
+[data-balance-visual][data-size="s"] .bal-verdict-word { font-size: 30px; }
+.bal-verdict-word[data-side="for"] { color: var(--color-status-normal); }
+.bal-verdict-word[data-side="against"] { color: var(--color-status-alert); }
+.bal-lanes-bar {
+  display: inline-grid;
+  grid-auto-flow: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+.bal-lanes-bar i {
+  width: 44px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+[data-balance-visual][data-size="s"] .bal-lanes-bar i { width: 30px; }
+.bal-lanes-bar i[data-side="for"] { background: var(--color-status-normal); }
+.bal-lanes-bar i[data-side="against"] { background: var(--color-status-alert); }
+.bal-lanes-bar i[data-side="neutral"] { background: var(--bal-stone-lo); }
+.dark .bal-lanes-bar i[data-side="neutral"] { background: #5a6a82; }
+.bal-verdict-counts {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.bal-verdict-note {
+  margin: 6px auto 0;
+  max-width: 46ch;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+  text-wrap: balance;
+}
+/* The context pill (01 §6): recessed, never green or red. */
+.bal-context {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 14px;
+  padding: 7px 14px;
+  border-radius: 18px;
+  background: var(--bal-recess);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-border) 50%, transparent);
+  text-wrap: balance;
+}
+
+/* 4.5 the tray: a recessed well for the not-leaning lanes. */
+.bal-tray {
+  position: relative;
+  margin: 28px auto 0;
+  max-width: 760px;
+  padding: 14px 18px 18px;
+  border-radius: 20px;
+  background: var(--bal-recess);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 0 0 1px color-mix(in srgb, var(--color-border) 50%, transparent);
+}
+[data-balance-visual][data-size="s"] .bal-tray {
+  margin-top: 20px;
+  padding: 12px 10px 14px;
+  border-radius: 18px;
+}
+.bal-tray-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  align-items: baseline;
+  margin-block-end: 12px;
+}
+.bal-tray-title { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); }
+.bal-tray-note { font-size: 12px; color: var(--color-text-tertiary); }
+.bal-tray .bal-weights { gap: 12px 18px; }
+[data-balance-visual][data-size="s"] .bal-tray .bal-weights { gap: 12px 8px; }
+.bal-tray-empty {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+/* 4.6 the ledger: four expandable rows, one per lane. */
+.bal-ledger {
+  position: relative;
+  list-style: none;
+  margin: 28px auto 0;
+  padding: 0;
+  max-width: 760px;
+  display: grid;
+  gap: 2px;
+}
+[data-balance-visual][data-size="s"] .bal-ledger { margin-top: 20px; }
+.bal-row { border-radius: 18px; }
+.bal-row[data-open="true"] {
+  background: var(--bal-recess);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-border) 50%, transparent);
+}
+.bal-row-btn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  min-block-size: 64px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: start;
+  border-radius: 18px;
+  font: inherit;
+  color: inherit;
+}
+.bal-row-btn:hover { background: color-mix(in srgb, var(--bal-recess) 70%, transparent); }
+.bal-row-name {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+}
+.bal-row-state {
+  display: block;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+.bal-row-state[data-side="for"] { color: var(--color-chip-ink-normal); }
+.bal-row-state[data-side="against"] { color: var(--color-chip-ink-attention); }
+/* The same 05 §5 dark fix for the ledger's state words (the same
+ * 12.5-13px size class on the recessed row surface). */
+.dark [data-balance-visual] .bal-row-state[data-side="for"] { color: #4bc27d; }
+.dark [data-balance-visual] .bal-row-state[data-side="against"] { color: #f07078; }
+.bal-row-tally {
+  font-size: 12.5px;
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bal-chev {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-tertiary);
+  transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bal-row[data-open="true"] .bal-chev { transform: rotate(180deg); }
+/* <560px: the tally moves under the state text, the chevron stays on the
+ * inline end (05 §9). */
+[data-balance-visual][data-size="s"] .bal-row-btn {
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  padding: 10px;
+}
+[data-balance-visual][data-size="s"] .bal-row-tally {
+  grid-column: 2;
+  grid-row: 2;
+  white-space: normal;
+  margin-block-start: -6px;
+}
+[data-balance-visual][data-size="s"] .bal-row-btn .bal-chev {
+  grid-column: 3;
+  grid-row: 1;
+}
+/* The open row's inline expansion: the intro sentence, the lane note and
+ * the member list (the same content contract as the shared panel). */
+.bal-members {
+  padding: 2px 18px 16px;
+  display: grid;
+  gap: 7px;
+}
+[data-balance-visual][data-size="s"] .bal-members { padding: 2px 12px 14px; }
+.bal-members[hidden] { display: none; }
+.bal-members-intro {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+.bal-members-note {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+/* The member groups inside an open row (the shared panel's content
+ * contract, 03 §3, in the ledger look): dot, name, evidence on the end
+ * side; steady collapses to one muted sentence; unread listed hollow. */
+.bal-m-group {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+.bal-m-list {
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+.bal-m {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 4px 10px;
+  align-items: baseline;
+  font-size: 13px;
+  line-height: 1.5;
+}
+[data-balance-visual][data-size="s"] .bal-m { grid-template-columns: 10px 1fr; }
+[data-balance-visual][data-size="s"] .bal-m .bal-m-ev { grid-column: 2; margin-block-start: -4px; }
+.bal-m-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  justify-self: center;
+}
+.bal-m-dot[data-i="supports"] { background: var(--color-status-normal); }
+.bal-m-dot[data-i="pressures"] { background: var(--color-status-alert); }
+.bal-m-dot[data-i="unread"] { box-shadow: inset 0 0 0 1.5px var(--color-text-tertiary); }
+.bal-m-name { font-weight: 600; color: var(--color-text-primary); }
+.bal-m-ev {
+  color: var(--color-text-tertiary);
+  font-size: 12.5px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  justify-content: flex-end;
+  text-align: end;
+}
+[data-balance-visual][data-size="s"] .bal-m-ev { justify-content: flex-start; text-align: start; }
+.bal-m-val { font-variant-numeric: tabular-nums; font-weight: 600; }
+.bal-m-link {
+  color: var(--color-status-context);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-accent-brand) 40%, transparent);
+  text-underline-offset: 2px;
+}
+.bal-steady {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--color-text-tertiary);
+  text-wrap: pretty;
+}
+
+/* 4.1 item 8 — the footnote (the measured note + the backtest link). */
+.bal-foot {
+  position: relative;
+  max-width: 640px;
+  margin: 28px auto 0;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--color-text-tertiary);
+  text-wrap: pretty;
+}
+.bal-foot a {
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  text-decoration-color: var(--bal-brass-mid);
+  text-underline-offset: 3px;
+}
+.dark .bal-foot a { color: var(--color-text-tertiary); }
+
+/* 05 §7 motion: only the weight hover/press and the chevron move on
+ * their own; reduced motion silences them (the beam's own rAF tween
+ * already jumps under the media query inside BalanceScale.tsx). */
+@media (prefers-reduced-motion: reduce) {
+  .bal-weight, .bal-chev { transition: none; }
+  .bal-weight:hover { transform: none; }
 }
 
 /* Sticky section nav (P1): pins below the app header, blurs like it. */

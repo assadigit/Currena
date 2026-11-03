@@ -186,9 +186,9 @@ At the end: PROGRESS.md; CHANGELOG; rewrite the GB-S5 prompt (the Outlook + copy
 ## GB-S5 — P3 + P4: the Outlook derivation + the copy close
 
 ```
-You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1..S4 are done — read docs/specs/gold-balance-consolidation/PROGRESS.md first.
+You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1..S4 are done — read docs/specs/gold-balance-consolidation/PROGRESS.md first (the authoritative record; the GB-S4 session log has the exact component state).
 
-Read, in order: AGENTS.md, the spec README (OI-1 especially), 01-SPEC.md §5.2 (the Outlook derivation — your primary contract), 03-UX-AND-COPY.md §6 (the copy close), 04 §4.2 (the outlook table tests), PROGRESS.md.
+Read, in order: AGENTS.md (the Gold Program + gold-balance paragraphs), the spec README (OI-1 especially), 01-SPEC.md §5.2 (the Outlook derivation — your primary contract), 03-UX-AND-COPY.md §6 (the copy close), 04-MIGRATION-AND-ACCEPTANCE.md §4.2 (the outlook table tests), PROGRESS.md.
 
 Your job:
 1. P3: the gold Outlook card derives from goldBalance() behind the same ?balance=lanes flag (verdict.tsx): all-4-unread -> null; L>=3 strong-bullish / A>=3 strong-bearish (GOLD_LANE_STRONG = 3); range evidence unchanged (|30d change| < 2% AND typical 10y position AND |L-A| <= 1 -> range-bound — price describes consolidation only); L==A -> mixed if L>0 else neutral; else bullish/bearish. Footing no longer counts anywhere (AC-7). Silver's Outlook path UNTOUCHED (OI-4 is a recorded follow-up, not yours).
@@ -197,11 +197,18 @@ Your job:
 4. P4 (the copy close): every new key from GB-S3/GB-S4 triaged and processed in the manifest (copy:audit clean is already the per-session gate — this session CONFIRMS the full set, updates docs/localization/persian-terminology.md with any new terms (Split / دوپاره, lane names, tally wording), and records OI-5 as satisfied-pending-final-owner-read).
 5. The consistency pins: the balance, its verdict word and the Outlook state come from the SAME goldBalance() result (AC-3) — a test pins that they cannot disagree; no bespoke stress or expectations rule remains in the gold path (AC-4).
 
-The exact current state: PROGRESS.md (authoritative). fa round: the next per PROGRESS.md. Bundle: measure; re-baseline with justification if needed.
+The exact current state (verify against PROGRESS.md + the repo before you start):
+- The lane view SHIPS the VISUAL REDESIGN behind ?balance=lanes (GB-S4, branch gold-balance/p2b-visual): BalanceScale renders the 05 anatomy through the `visual` prop (the brass stage + 11-tick dial + bowl pans, the lane WEIGHTS from signals/BalanceWeight.tsx with the segmented rims, the verdict hero block, the Not-leaning tray, the four-row inline LEDGER with the member content contract); MergedCard passes visual={balanceLanes === true} and builds the lane drivers from goldBalance(readings) exactly as GB-S3 left them (key/label/intro, side/split/tally/members, the inflation note, the B-12 word, the context pill, the measured-note footnote). The Outlook strip (VerdictStrip) still reads the OLD derivation — YOUR session swaps the gold leg to goldBalance behind the flag; the default view stays byte-for-byte (the legacy snapshot is the pin, balance.test.tsx 46 + gold-balance-lanes.test.tsx 35 green).
+- The copy: everything under signals.balance (round-76 + round-77) + the reused goldScore dictionaries. YOUR session may add the outlook-state keys ONLY if OI-1 is approved (03 §6.3's seven reworded sentences); fa round-78 (round-77 was GB-S4's visual copy; the last manifest round is round-77).
+- Tests: the lane suite is gold-balance-lanes.test.tsx (35) + balance.test.tsx (46) + verdict/outlook tests wherever the VerdictStrip's derivation lives today (find them; extend per 04 §4.2). Test baseline: 14,598 (web 12,639).
+- The outlook derivation contract (01 §5.2) in engine terms: unread === 4 -> null; L >= GOLD_LANE_STRONG(3) -> strong-bullish; A >= 3 -> strong-bearish; range evidence (|gold change30d| < 2% AND gold percentile10y typical (0.2..0.8) AND |L-A| <= 1) -> range-bound; L === A -> (L > 0 ? mixed : neutral); else L > A ? bullish : bearish. The Outlook strip's silver leg + its tests stay untouched.
+- Bundle: measure from 1550.46/358.81 (ceiling 1560/360, chunk Insights-PIEDSGJA.js at GB-S4; expect a re-hash); re-baseline with justification if needed (scripts/check-bundle-budget.mjs).
+- CHANGELOG: the last heading is [2026-11-03j] (count 192, verified) — yours is the next per the sequence; CHECK THE FILE and verify the heading count before and after.
+- The gb-s4 Playwright project (apps/web/visual/gb-s4-visual.plw.ts + the config entry) is the harness pattern for any new screenshots (the in-memory /api/insights interception with the eval-field clearing — remember the change30d-leak lesson — plus the missing-id append).
 
-Discipline: as before — FULL `pnpm gates`; branch gold-balance/p3-outlook; commit + push per milestone; draft PR; merge yourself when the exit gate holds (outlook tests green, copy:audit clean, terminology updated); CI green; deploy; browser-verify EN + fa 360+1280 fresh contexts (the outlook strip beside the balance, zero console errors). After three honest failures, record blocked and move on.
+Discipline: as before — FULL `pnpm gates` before every push; branch gold-balance/p3-outlook; commit + push per milestone; draft PR; merge yourself when the exit gate holds (outlook tests green, copy:audit clean, terminology updated); CI green; deploy; browser-verify EN + fa 360+1280 fresh contexts (the outlook strip beside the redesigned balance, zero console errors). After three honest failures, record blocked and move on.
 
-At the end: PROGRESS.md; CHANGELOG; rewrite the GB-S6 prompt (the owner-gated flip — the P5 checklist: default on, delete GoldTailwindPanel.tsx + ModelVsRealityPanel.tsx + their test parts with surviving assertions moved, the bundle re-baseline, the docs set: GOLD_SCORE_SPEC notes, INDICATORS_AND_DATA_SOURCES, AGENTS.md, DEPLOY.md, the AC-1..AC-12 + V-1..V-10 final acceptance table); commit, push, merge, deploy, verify; print the GB-S6 prompt with a 5-line summary. Tell me clearly: the preview is ready for my review at https://currena.ir/insights?balance=lanes — GB-S6 does NOT proceed without my explicit "go".
+At the end: PROGRESS.md; CHANGELOG; rewrite the GB-S6 prompt (the owner-gated flip — the P5 checklist: default on, delete GoldTailwindPanel.tsx + ModelVsRealityPanel.tsx + their test parts with surviving assertions moved, the bundle re-baseline, the docs set: GOLD_SCORE_SPEC notes, INDICATORS_AND_DATA_SOURCES, AGENTS.md, DEPLOY.md, the AC-1..AC-12 + V-1..V-10 final acceptance table); commit, push, merge, deploy, verify; print the GB-S6 prompt with a 5-line summary. Tell me clearly: with P3+P4 landed, the preview is complete for my review at https://currena.ir/insights?balance=lanes — GB-S6 does NOT proceed without my explicit "go".
 ```
 
 ---
@@ -365,3 +372,46 @@ At the end: PROGRESS.md (the program's final close — every OI resolved or expl
   both recorded in the PR for the owner. Gates: 14,582 (baseline + 19);
   Insights lazy 1533.15/354.25, ceiling 1540/355.5 (justified); DEPLOY
   this phase (the SPA rides the api worker and the chunk changed).
+
+### Lessons learned (GB-S4 — the visual session)
+
+**A route interception that merges scenario fields leaks the fixture's
+own eval inputs** — `{...fixtureReading, ...scenarioOverride}` keeps
+the fixture's `change30d` when the scenario means to speak through the
+LEVEL leg only, and evalLeg prefers direction over level, so the
+fixture's −0.28 move silently flipped real-yield-10y/us10y to supports
+and the "against" scenario tipped the wrong way. Intercepted scenarios
+must set ALL eval-relevant fields explicitly (value, asOf, status,
+percentile10y, change30d — unspecified means CLEARED), and APPEND the
+ids the fixture lacks (breakeven-tilt) or the engine quietly runs a
+20-voter table. **The probe script that mutates a fixture file must
+restore it in a `finally` that wraps EVERYTHING after the write** —
+the first probe crashed at chromium.launch() (outside its try) and left
+the fixture minified with the overlay inside; the suite then ran green
+against the wrong base. `git checkout --` the fixture and re-run, and
+verify with `git status` before committing. **A fixed pan height is a
+promise the labels can break** — 05's 236/268 targets clip at s-390
+when EN labels wrap to two lines (scrollHeight 244) and sit at EXACTLY
+268 at m/l (zero slack); measure the real worst case per size/locale
+before shipping the constant, and let the spec's "every number is a
+target to be tuned" header justify the tuned values with the
+measurements recorded beside them. **Hooks after an early return pass
+jsdom and fail lint** — the pendingRowFocus effect sat below
+`if (drivers.length === 0) return null` and every test stayed green
+(drivers are never empty in tests); only `react-hooks/rules-of-hooks`
+caught it. Keep new hooks with the other hooks, above every guard. **A
+crashing probe's `&` backgrounds the whole `cd && cmd` chain** — the
+shell stayed in the old cwd and the config resolve failed; `cd X; cmd &`
+(semicolon + separate background) is the correct shape. **The
+reference prototype's copy is placeholder, not contract** — the VLM's
+biggest "deviations" (short pan captions, "Nothing on this side", the
+bolded context value) were the PROTOTYPE's own stand-in strings; the
+program's frozen copy (R9-08's full evidence sentences, the GB-S3
+captions, round-76's pill) wins over the look-alike. Compare against
+the CONTRACTS, not the pixels, before "fixing" copy. **The dial's
+centre tick reads as a needle to a vision model** — the dial stays in
+the unread state (only the NEEDLE hides, per the reference); verify
+"no needle" with the data attribute, not the VLM. Gates: 14,598
+(baseline + 16); Insights lazy 1550.46/358.81, ceiling 1560/360
+(justified); DEPLOY this phase (the SPA rides the api worker and the
+chunk changed).
