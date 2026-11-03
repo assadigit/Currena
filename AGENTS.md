@@ -392,8 +392,9 @@ byte-verified), C5 validated (corpus content-identical to S4,
 recordedAt refreshed), and the repo Actions secret rotated to the
 working KV-Edit token.*
 
-*Gold balance consolidation (2026-11-03, SPECIFIED — NOT YET
-IMPLEMENTED — docs/specs/gold-balance-consolidation/): the owner's
+*Gold balance consolidation (2026-11-03, P0 CALIBRATED — the rest
+SPECIFIED, NOT YET IMPLEMENTED — docs/specs/gold-balance-consolidation/):
+the owner's
 next Gold Program round folds the two gold metaphors into ONE
 balance. The wind panel (`GoldTailwindPanel`) and the model-vs-
 reality panel are SPECIFIED for retirement behind the `?balance=lanes`
@@ -404,7 +405,15 @@ stay frozen and running (D-GB-9). The spec set (README + 01-05 +
 the visual reference prototype) is the owner-approved source of
 truth; the session-by-session delivery plan (GB-S1..GB-S7, branch +
 PR per phase, the owner's incremental-merge instruction) is
-`docs/specs/gold-balance-consolidation/PROMPTS.md`. Until GB-S6
+`docs/specs/gold-balance-consolidation/PROMPTS.md`. P0 landed 2026-11-03
+(GB-S1): the missed 2026-11-02 armed re-check ran manually per
+GOLD_RECHECK_SPEC §3 (the watch days 2–4 lockstep — validated-by-watch; no
+escalation), and the pre-registered lane calibration chose
+`GOLD_LANE_MIN_FIRING = 2` (C1+C2 PASS over all windows — the measured
+tables in `docs/insights/BACKTEST-GOLD-LANES.md`, recorded in
+GOLD_BACKTEST_SPEC §5; `HARNESS_GOLD_LANES_MIN2`/`_MIN1` sit beside the
+frozen harness tables, their outputs pinned byte-identical by test).
+Until GB-S6
 flips the default, everything user-visible about gold stays exactly
 as it is today.*
 

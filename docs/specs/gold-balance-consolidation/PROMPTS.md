@@ -90,25 +90,31 @@ At the end: append your session record to docs/insights/GOLD_RECHECK_SPEC.md §5
 ## GB-S2 — P1: the pure engine
 
 ```
-You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1 (P0) is done: read its record first.
+You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1 (P0) is DONE: read docs/specs/gold-balance-consolidation/PROGRESS.md first (the authoritative record), then the calibration report docs/insights/BACKTEST-GOLD-LANES.md — the GOLD_LANE_MIN_FIRING decision is recorded there and in GOLD_BACKTEST_SPEC.md §5. Use it; do not re-litigate it.
 
-Read, in order, before touching anything: AGENTS.md (the Gold Program paragraph), docs/specs/gold-balance-consolidation/README.md, 01-SPEC.md, 02-ENGINE-AND-DECISION-TABLE.md (your session spec — ALL of it: types, algorithm, the voter table, the copy constraint B-12), 04-MIGRATION-AND-ACCEPTANCE.md (§1 file list, §4.1 the 13 engine tests), docs/specs/gold-balance-consolidation/PROGRESS.md, and the calibration report docs/insights/BACKTEST-GOLD-LANES.md (the GOLD_LANE_MIN_FIRING decision is recorded there — use it, do not re-litigate it).
+Read, in order, before touching anything: AGENTS.md (the Gold Program + gold-balance paragraphs), docs/specs/gold-balance-consolidation/README.md, 01-SPEC.md, 02-ENGINE-AND-DECISION-TABLE.md (your session spec — ALL of it: the types, the algorithm, the voter table, the copy constraint B-12), 04-MIGRATION-AND-ACCEPTANCE.md (§1 file list, §3 rollout P1, §4.1 the 13 engine tests), PROGRESS.md (the GB-S1 record), docs/insights/BACKTEST-GOLD-LANES.md.
 
-Your job: P1 of the rollout (04 §3). Create packages/insights/src/gold-balance.ts (the pure engine, exactly 02 §2-§3: the types, goldBalance(readings), GOLD_LANE_MIN_FIRING from the P0 decision, GOLD_LANE_STRONG = 3) and packages/insights/src/gold-balance.test.ts (all 13 tests of 04 §4.1, including the 2026-10-31 fixture reproducing 01 §7 — level, 4 neutral, borrowing costs split 2v2, dollar 1 firing, inflation 1 firing — and the no-drift pin: goldTailwindScore on the same fixture gives netScore -2 / headwind / 6 of 21 firing). Export the engine from packages/insights/src/index.ts. Import GOLD_LANES, GoldLane, GOLD_LANE_VOTERS and evalLeg; NEVER edit them (D-GB-9). Platform-free, zero fetches, zero KV, zero wire fields.
+Your job: P1 of the rollout (04 §3). Create packages/insights/src/gold-balance.ts (the pure engine, exactly 02 §2-§3: GoldBalanceSide, GoldBalanceMember (impact supports/pressures/steady/unread + evidence rising/falling/high/low/null), GoldBalanceLane (side, split, readable, firing, supports, pressures, members in table order), GoldBalanceReading (lanes exactly 4 in GOLD_LANES order, counts, net, readable), goldBalance(readings), GOLD_LANE_MIN_FIRING = 2 (the P0 decision — D-GB-3's default, C1+C2 PASS over all windows), GOLD_LANE_STRONG = 3) and packages/insights/src/gold-balance.test.ts (all 13 tests of 04 §4.1). Export the engine from packages/insights/src/index.ts. Import GOLD_LANES, GoldLane, GOLD_LANE_VOTERS from gold-score.ts and evalLeg from connections.ts; NEVER edit them, goldSummary, GoldSummarySchema, snapshot.ts, apps/api/** or the harness (D-GB-9 + 04 §1 must-not-change list). Platform-free, zero fetches, zero KV, zero wire fields, zero fa strings this session.
 
-Properties to pin (02 §3): deterministic and order-independent; never throws on missing readings; an all-stale lane is unread; adding a stale voter never changes a lane's side; unread and neutral are never merged; breakeven-tilt fires on level only; polarity pins (falling real-yield-10y supports; high us30y pressures; rising vix supports; high cftc-gold-positioning pressures); table integrity (the engine's lanes equal GOLD_LANE_VOTERS: 21 voters, 8/3/5/5).
+The algorithm is ALREADY MEASURED in the harness: laneBalanceOverVoters(readings, GOLD_LANE_VOTERS, 2) in packages/insights/src/gold-backtest-core.ts implements 02 §3 exactly (readable rule: missing/stale/check-pending/unavailable -> unread member; evalLeg lean 0 -> steady; else supports/pressures via polarity; lane side: readable===0 -> unread, firing < min -> neutral, strict majority, tie -> split neutral; counts/net/readable over the 4 lanes; beam |net|/(for+against)*10 clamped [3,10], 0 when level). Pin the equivalence: goldBalance(readings) must agree with laneBalanceOverVoters(readings, GOLD_LANE_VOTERS, 2) on every lane side/split/count over your test batteries (the harness is frozen lineage; the production engine is the richer shape with members — both derive from the same imports, so they cannot drift silently).
 
-The exact current state (from GB-S1's close — verify against PROGRESS.md before you start; it has the authoritative numbers):
-- Test baseline: whatever GB-S1's gates recorded (14,519 + the harness additions). Do not regress.
-- The 2026-10-31 fixture readings: derive them from the corpus fixture or the archived snapshot exactly as the no-drift test needs — if the exact reading set behind 01 §7 is not reconstructable, pin the closest honest fixture and say so in the test comment.
-- No fa strings this session (pure engine + tests). Bundle: the Insights lazy chunk does NOT change (nothing imports goldBalance from the web app yet) — verify the budget check still measures 1522.90/352.00 against the 1530/354 ceiling and record it.
-- Commit style: `insights(gold-balance P1): ...`.
+The 2026-10-31 fixture (04 §4.1 tests 12+13) is DIRECTLY CONSTRUCTABLE — GB-S1 verified it against the real archive: read packages/insights/fixtures/gold-backtest-corpus.json's archives["2026-10-31"] (readings with id/value/asOf/status/percentile10y/change30d) and build IndicatorReadings from them (sourceName "archive 2026-10-31", updatedAt the archive's generatedAt). Measured on that fixture: the lane balance reads LEVEL, 4 neutral — borrowing-costs SPLIT 2v2 (readable 8, firing 4), dollar 1 firing (pressures), stress readable 5 / firing 0 (neutral, NOT unread), inflation 1 firing — and goldTailwindScore on the same readings gives netScore -2 / headwind / 6 of 21 firing (the no-drift pin). Reproduce exactly these numbers.
 
-Discipline: tests first; FULL `pnpm gates` green before every push; branch gold-balance/p1-engine; commit + push the branch per milestone; draft PR early; merge yourself when the exit gate holds (engine tests green, typecheck 6/6 clean, the frozen engine's tests still green, index export compiles); verify CI on main; no deploy (the web app does not import the engine yet — confirm the build is unchanged). After three honest failures on an item, record it blocked and move on. Never edit the frozen files (04 §1 must-not-change list).
+Watch out for the vix trap (GB-S1's lesson): evalLeg has NO 30-day move threshold for vix (SIGNAL_LEG_MOVE has no vix entry) — its firing path is the LEVEL leg. In the polarity tests, construct the vix firing via percentile10y HIGH (lean +1), not change30d, or the voter will silently stay steady. Same for every voter without a SIGNAL_LEG_MOVE entry.
 
-At the end: PROGRESS.md ticks + session log; CHANGELOG entry (the next heading per the sequence — check the file); rewrite the GB-S3 prompt in PROMPTS.md with the exact state (engine API as shipped, test count, the next fa round — GB-S3 adds fa strings, so its round is probably round-76 — the bundle numbers, the flag design ?balance=lanes); commit, push, merge, and print the GB-S3 prompt in a code block with a 5-line summary.
+The exact current state (verify against PROGRESS.md + the repo before you start):
+- main is at the GB-S1 merge (PR #12, gold-balance/p0-calibration — PROGRESS.md's session log has the branch + commits; pin main's SHA in your records at start). Test baseline: 14,548 (14,519 + GB-S1's 29 lane-calibration tests — insights 1,270). Do not regress.
+- The corpus: 19 archive days (2026-10-15 -> 11-03, 10-20 absent), recordedAt 2026-11-03T04:43:54Z. The 2026-11-03 re-check ran (GOLD_RECHECK_SPEC §1/§5); the next re-check appends to §5 per its procedure.
+- The P0 numbers (BACKTEST-GOLD-LANES.md): MIN2 all-windows level 25.0% / full-tip 49.7% / flips 8 vs net-sign 9 (C1+C2 PASS — the DECISION); MIN1 26.1% / 22.6% / 8 vs 9 (also PASS); mature base MIN2 full-tip 66.5% (C1 FAIL there — recorded as context, the criteria are pre-registered on ALL windows).
+- Bundle: the Insights lazy chunk is UNCHANGED by P0 (1522.88/351.96 against the 1530/354 ceiling) — P1 adds a module the web app does not import yet, so it should stay byte-identical; measure in the gates and record.
+- No fa strings this session (pure engine + tests). round-76 is the next fa round when strings land (GB-S3).
+- CHANGELOG: the last heading is [2026-11-03f] (GB-S1's entry; the count moved 187 -> 188, verified). Yours is [2026-11-04a] if the date rolled, else [2026-11-03g] — CHECK THE FILE and verify the heading count before and after.
+- Commit style: `insights(gold-balance P1): ...` for code, `docs(gold-balance P1): ...` for records (04 §8).
+
+Discipline: tests first; FULL `pnpm gates` green before every push (secret-scan + typecheck 6/6 + lint + copy:audit + narrator checks + layer1 strict + the full suite — 9 gates, ~14.5k tests); branch gold-balance/p1-engine; commit + push the branch per milestone; draft PR early (`gold-balance(P1): the pure engine`); merge yourself when the exit gate holds (engine tests green, typecheck 6/6 clean, the frozen engine's tests still green — gold-score 35 + gold-backtest-core 29 + gold-lane-calibration 29, index export compiles); verify CI green on main; no deploy (the web app does not import the engine yet — confirm the built chunk names are unchanged, index-DrhFnckY.js + Insights-5V_N7nyu.js as of GB-S1). After three honest failed attempts on an item, record it blocked and move on. Never invent a number — every cell comes from a run you executed. Never edit the frozen files.
+
+At the end: PROGRESS.md ticks + session log (commits + PR number + merge SHA); CHANGELOG entry (the next heading per the sequence — check the file); rewrite the GB-S3 prompt in PROMPTS.md with the exact state (engine API as shipped, test count, the next fa round — GB-S3 adds fa strings, so its round is round-76 — the bundle numbers, the flag design ?balance=lanes, the fixture recipe from this session); append the GB-S2 lesson to the Lessons learned log; commit, push, merge, and print the GB-S3 prompt in a code block with a 5-line summary.
 ```
-
 ---
 
 ## GB-S3 — P2a: the consolidated balance behind the flag
@@ -228,3 +234,30 @@ At the end: PROGRESS.md (the program's final close — every OI resolved or expl
   fired — GB-S1 runs it manually. fa rounds end at round-75. Insights lazy
   ceiling 1530/354 (measured 1522.90/352.00). Test baseline 14,519. api worker
   115eb1e5, markets 58c4eebd.
+- **GB-S1 (2026-11-03, P0):** the §3 manual re-check procedure held up
+  end-to-end (a REAL KV read is the gate — `limit=5` is rejected by the KV
+  API, use ≥10). **The corpus venue moves:** the FX voters
+  (`dollar-basket`, `usdjpy`) left the stage blob in the gap-closure ingest
+  rounds — the dump now falls back read-only to their `insights:hist:<id>`
+  keys and records the venue in `corpus.venues`; treat the corpus as a set of
+  recorded venues, not one key. **The KV histories are ROLLING ~10-year
+  windows:** the head trims between runs and seed points can drop, so window
+  counts can move DOWN (2,514 → 2,512 here) — always diff values on common
+  days and record, never reconcile silently. **Generated-report prose rots:**
+  the S6-era runner carried hardcoded "days 2–3 not yet observable" text that
+  became false on the grown corpus — the watch verdict (and anything
+  time-dependent) is now DERIVED per run; keep it that way in future
+  writers. **The frozen-tables check that satisfies D-GB-9:** re-run the
+  pre-change code over the same corpus and diff (31 lines here, all prose,
+  zero numeric) — then pin it permanently
+  (`gold-lane-calibration.test.ts`'s JSON pins). **The vix trap:** evalLeg
+  has no 30-day move threshold for vix (level-leg only) — construct test
+  firings via percentile extremes. **The 2026-10-31 archive reproduces 01 §7
+  exactly** (level · 4 neutral · borrowing split 2v2 · dollar 1 firing ·
+  inflation 1 firing; goldTailwindScore −2/headwind/6 firing) — the P1
+  fixture is `corpus.archives["2026-10-31"]`, verified. Beam-angle parity:
+  with 4 lanes the only reachable angles are 0, 10/3, 5, 10 — the 6–10° band
+  is exactly the full-tip band. CHANGELOG heading-count discipline held
+  (187 → 188). Gates: 14,548 (baseline + 29); budget unchanged
+  (1522.88/351.96); built worker unchanged (chunk names identical) — no
+  deploy for scripts+tests+docs sessions.

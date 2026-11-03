@@ -104,6 +104,14 @@ console.log(`# Gold backtest corpus dump — ${new Date().toISOString()}`);
 console.log(`venue: RATES KV (read-only REST), ${CORPUS_SERIES_IDS.length} series ids + archives\n`);
 
 // (1) The stage blob — the exact series feeding the scoring math (G1a-audited).
+//
+// 2026-11-03 note (the venue moved, read-only either way): since the
+// gap-closure S5/S6 ingest rounds, the FX-derived voters (`dollar-basket`,
+// `usdjpy`) no longer ride the stage blob — their full-depth daily histories
+// live under their own `insights:hist:<id>` keys (the insightsHistoryKey
+// pattern). The dump sources them from there when the stage lacks them, so
+// the corpus keeps carrying every voter the harness re-runs. The venue each
+// series came from is recorded in `venues` below (never silently).
 const stageRaw = await kvGetValue('insights:ingest-stage:v1');
 const stage = JSON.parse(stageRaw) as {
   v: number;
@@ -117,9 +125,24 @@ console.log(`stage: v${stage.v}, writtenAt ${stage.writtenAt}, ${Object.keys(sta
 
 const series: Record<string, Array<[number, number]>> = {};
 const seriesMissing: string[] = [];
+/** Ids the stage no longer carries, sourced read-only from insights:hist:<id>. */
+const histFallbackIds: string[] = [];
 for (const id of CORPUS_SERIES_IDS) {
   const pts = stage.series[id];
   if (pts === undefined || !Array.isArray(pts) || pts.length === 0) {
+    // The FX voters' histories live outside the stage now — read their own
+    // insights:hist:<id> key (a GET, like every other read here).
+    if (id === 'dollar-basket' || id === 'usdjpy') {
+      const histRaw = await kvGetValue(`insights:hist:${id}`);
+      const hist = JSON.parse(histRaw) as { id: string; points: Array<[number, number]> };
+      if (hist.id !== id || !Array.isArray(hist.points) || hist.points.length === 0) {
+        seriesMissing.push(id);
+        continue;
+      }
+      series[id] = hist.points;
+      histFallbackIds.push(id);
+      continue;
+    }
     seriesMissing.push(id);
     continue;
   }
@@ -130,7 +153,16 @@ for (const id of CORPUS_SERIES_IDS) {
   }
   series[id] = pts;
 }
+for (const id of histFallbackIds) {
+  const pts = series[id]!;
+  for (let i = 1; i < pts.length; i++) {
+    if (pts[i]![0] <= pts[i - 1]![0]) throw new Error(`insights:hist:${id}: epoch days not ascending at index ${i}`);
+    if (!Number.isFinite(pts[i]![1])) throw new Error(`insights:hist:${id}: non-finite value at index ${i}`);
+  }
+  console.log(`  ${id.padEnd(24)} n=${String(pts.length).padStart(5)}  epochDay ${pts[0]![0]} → ${pts[pts.length - 1]![0]}  (venue: insights:hist:${id})`);
+}
 for (const id of Object.keys(series)) {
+  if (histFallbackIds.includes(id)) continue; // already printed with its venue above
   const pts = series[id]!;
   console.log(
     `  ${id.padEnd(24)} n=${String(pts.length).padStart(5)}  epochDay ${pts[0]![0]} → ${pts[pts.length - 1]![0]}`,
@@ -220,6 +252,10 @@ const corpus = {
     stage: { key: 'insights:ingest-stage:v1', writtenAt: stage.writtenAt, seriesCount: Object.keys(stage.series).length },
     goldHist: { key: 'insights:hist:gold-usd', points: goldHist.points.length },
     archives: { keyPrefix: 'insights:archive:v1:', days: archiveDays.length },
+    /** Series the stage no longer carries (the FX voters), read read-only from their own history keys. */
+    ...(histFallbackIds.length > 0
+      ? { histFallback: { keyPrefix: 'insights:hist:', ids: [...histFallbackIds] } }
+      : {}),
   },
   /** The voters + tilt + gold + cross-fill legs, from the stage blob ([epochDay, value]). */
   series,

@@ -420,6 +420,99 @@ prescribed; all four gates plus the fresh run, measured:
   clean · copy:audit clean (round-56, manifest 4,852) · secret scan
   clean.
 
+### The 2026-11-03 re-check re-run (GOLD_RECHECK_SPEC §3 — the missed 2026-11-02 armed check, run manually)
+
+The armed one-shot never fired (no `[2026-11-02a]` CHANGELOG entry; the
+corpus fixture stood at recordedAt 2026-10-31T15:17:40Z). The gold-balance
+consolidation program's first session (GB-S1, 2026-11-03 ~04:35–05:00 UTC)
+ran §3 steps 1–7 manually, all measured:
+
+- **Step 1 anchors:** `/api/health` `ok:true`; `/api/insights` (161
+  readings) carries `goldSummary` netScore −1 / headwind / 5 firing
+  (borrowing-costs mixed 2/2 · dollar unreadable · stress unreadable ·
+  inflation cool 0/1 — the 04:35 rung, stamped by the promoted engine) and
+  `breakeven-tilt` −0.20 @ 2026-11-02 (percentile10y 0.234 — mid-range,
+  silent).
+- **Step 2 — the real KV read passed** (the archive-keys list answered
+  HTTP 200 with 19 keys; `/user/tokens/verify` was never used).
+- **Step 3 — the corpus refresh:** 19 full archive days (2026-10-15 →
+  2026-11-03; 10-20 absent, the known outage). **Two venue findings,
+  recorded:** (a) `dollar-basket` + `usdjpy` no longer ride the stage blob
+  (the gap-closure S5/S6 ingest rounds moved them) — the dump now sources
+  them read-only from their own `insights:hist:<id>` keys (a small additive
+  fix in `gold-corpus-dump.ts`; the venue recorded in the corpus); (b) the
+  KV histories are rolling ~10-year windows — the head trimmed
+  (2016-11-02…11-04 left) and the 2026-10-31 Saturday seed point dropped,
+  so **windows moved 2,514 → 2,512** (2016-11-07 → 2026-11-03), and
+  `us-japan-10y-gap`'s monthly jgb backfill left the stored stage window
+  (97 → 21 points — the dollar lane ran 2-voter). Values on common days
+  are identical everywhere (0 changed); nothing was reconciled silently.
+- **Step 4 — the run (the promoted 21-voter primary):** sign-agreements
+  **51.6 / 47.3 / 44.3%** at 5/20/60td (S6: 52.1 / 47.6 / 43.9 — deltas
+  −0.5 / −0.3 / +0.4pp, within drift); the tilt fired 1,173 of 2,512
+  (**46.7%**, inside the ~40–50% band); label-bucket flips 263 (10.5%);
+  label distribution tailwind ×918 · strong-tailwind ×232 · balanced ×232
+  · headwind ×740 · strong-headwind ×390. Mature base: **46.8 / 42.2 /
+  32.7%**, spreads **−0.01 / −0.30 / −1.98%**.
+- **The 5td nuance reversed from S6, stated:** 46.8% now sits a hair BELOW
+  the ±3.2% 2-SE band edge (S6 measured 46.9% just inside) and the 5td
+  spread flipped +0.02 → −0.01% — the mechanical conclusion returns to the
+  S4 wording ("the association runs the OTHER way") with the borderline
+  stated, not hidden. No edge claim is made in either direction; the
+  round-55 measured-reality note stays the operative description.
+- **The asOf-watch (§4, days 2–4):** LOCKSTEP at every post-S6 rung — the
+  trio-vs-decade-group offset held at exactly 1 gold trading day
+  throughout (both groups held over the 11-01 weekend and at the 11-02
+  Monday rung, then both advanced exactly +1 trading day at the 11-03
+  rung: trio 2026-10-29 → 2026-10-30, decade group 2026-10-30 →
+  2026-11-02, us10y 4.98 → 4.94). **The watch closes as
+  validated-by-watch** — the honest wording, still not "proven".
+- **The no-drift contract holds on every stamped day:** the 10-31 stamp
+  (pre-promotion engine, the S6 deploy boundary) matches the S4-frozen
+  re-derivation; the 11-01/11-02/11-03 stamps match the promoted
+  re-derivation — all four days read −2/headwind (the tilt silent those
+  days), so both tables agree on all of them.
+- **No escalation rule fired** (§6): no sign-agreement crossed 50% upward
+  with a sign-consistent positive spread; the tilt stayed in band; the
+  archives are complete beyond the known 10-20 outage; the stamped stamps
+  agree with the re-derivations. `BACKTEST-GOLD.md` regenerated from the
+  run and committed; the runner's stale S6-era prose (the "days 2–3 not
+  yet observable" verdict line among it) was corrected to per-run derived
+  text — the frozen tables' NUMBERS were verified byte-identical against
+  the pre-change code over the same corpus (the session's regression
+  check; now pinned permanently by `gold-lane-calibration.test.ts`).
+
+### The P0 lane calibration (the gold-balance consolidation, 02 §6 — the GOLD_LANE_MIN_FIRING decision, 2026-11-03)
+
+The consolidation program's pre-registered calibration ran over the SAME
+refreshed corpus (2,512 windows; the frozen 21-voter table, the shared
+evaluator, the frozen clock) with the lane engine as NEW tables beside the
+frozen ones — `HARNESS_GOLD_LANES_MIN2` / `HARNESS_GOLD_LANES_MIN1` in
+`gold-backtest-core.ts` + the runner's lane section (additive only; the
+frozen tables and their outputs pinned byte-identical by test). The
+criteria were fixed in advance: C1 (level ≤ 70% of all windows AND
+fully-tipped ≤ 60%), C2 (median verdict flips per 60 trading days not
+higher than the 21-voter net-sign figure). Measured, every cell with n
+(the full report is **`docs/insights/BACKTEST-GOLD-LANES.md`**):
+
+| Rule | Scope | n | level | full-tip | C1 | flips/60td vs net-sign | C2 |
+|---|---|---|---|---|---|---|---|
+| MIN2 | all windows | 2,512 | 25.0% | 49.7% | PASS | 8 vs 9 | PASS |
+| MIN2 | mature base | 1,287 | 19.3% | 66.5% | FAIL | 8 vs 8 | PASS |
+| MIN1 | all windows | 2,512 | 26.1% | 22.6% | PASS | 8 vs 9 | PASS |
+| MIN1 | mature base | 1,287 | 27.0% | 30.7% | PASS | 6 vs 8 | PASS |
+
+**DECISION: MIN2 — `GOLD_LANE_MIN_FIRING = 2` (D-GB-3's default).** Both
+criteria hold over all windows, so the pre-registered rule selects the
+default; no fallback needed. The mature base's C1 disagreement (MIN2's
+full-tip share 66.5% > 60% there) is recorded in the report, not hidden —
+the criteria were fixed on ALL windows in advance, and the mature-base
+row is context. No lane is unread in most windows under either rule (the
+measured per-lane shares are in the report); the lineage-only confusion
+tables are labelled "not used for selection". **No forecasting edge is
+claimed** — for either rule, for the consolidated balance, or for the
+frozen tables; the standing no-edge record above is unchanged.
+
 ### The standard block (S4)
 
 - `corepack pnpm -r test` — green (the insights package gains

@@ -5,6 +5,69 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03f] — gold-balance P0: the missed re-check runs manually (the watch closes validated-by-watch) + the lane calibration chooses GOLD_LANE_MIN_FIRING = 2 (BACKTEST-GOLD-LANES.md; the frozen tables byte-identical)
+
+GB-S1, the gold balance consolidation's first session. Two deliverables,
+both pre-registered: the missed 2026-11-02 armed re-check (run manually per
+`GOLD_RECHECK_SPEC.md` §3 steps 1–7) and the P0 lane calibration
+(`02-ENGINE-AND-DECISION-TABLE.md` §6). Every number below is from a run
+this session executed; nothing was invented.
+
+- **The re-check (§3 steps 1–7):** the live anchors recorded (`/api/health`
+  ok; `goldSummary` −1/headwind/5 firing, `breakeven-tilt` −0.20 @
+  2026-11-02, p10y 0.234); a REAL KV read passed (19 archive keys listed —
+  never `/user/tokens/verify`); the corpus refreshed to **19 archive days**
+  (2026-10-15 → 11-03; 10-20 absent) and the backtest re-ran:
+  **2,512 windows** (2016-11-07 → 2026-11-03), sign-agreements
+  **51.6 / 47.3 / 44.3%** at 5/20/60td (S6: 52.1 / 47.6 / 43.9), the tilt
+  fired 1,173 (46.7%, in band), mature base 46.8 / 42.2 / 32.7% with
+  spreads −0.01 / −0.30 / −1.98%. **The asOf-watch days 2–4: LOCKSTEP —
+  validated-by-watch** (the trio-vs-decade-group offset held at exactly 1
+  gold trading day at every post-S6 rung; both groups held over the weekend
+  and at the Monday rung, then both advanced +1 trading day together). The
+  no-drift contract holds on all four stamped days (all −2/headwind, the
+  tilt silent). No escalation rule fired. The 5td nuance reversed from S6
+  (now a hair BELOW the 2-SE band edge, spread −0.01%) — the mechanical
+  wording returns to the S4 form, the borderline stated; **no edge claim in
+  either direction**, the round-55 measured-reality note stays operative.
+- **Two corpus venue findings, recorded honestly:** (1) `dollar-basket` +
+  `usdjpy` left the stage blob (the gap-closure ingest rounds) — the dump
+  (`gold-corpus-dump.ts`, a small additive read-only fix) now sources them
+  from their own `insights:hist:<id>` keys and records the venue in the
+  corpus; (2) the KV histories are rolling ~10-year windows — the head
+  trimmed and the 2026-10-31 Saturday seed point dropped, so windows moved
+  2,514 → 2,512, and `us-japan-10y-gap`'s monthly backfill left the stored
+  stage window (97 → 21 points; the dollar lane ran 2-voter). Values on
+  common days identical everywhere; `BACKTEST-GOLD.md` regenerated from the
+  run with the runner's stale S6-era prose corrected to per-run derived
+  text (the frozen tables' NUMBERS verified byte-identical against the
+  pre-change code over the same corpus).
+- **The lane calibration (02 §6):** `HARNESS_GOLD_LANES_MIN2` / `_MIN1`
+  added beside the frozen `HARNESS_GOLD_VOTERS_21`/`_20` in
+  `gold-backtest-core.ts` + the runner (additive only — D-GB-9; the frozen
+  tables' outputs pinned byte-identical by the new
+  `gold-lane-calibration.test.ts`, 29 tests). Measured over the same 2,512
+  windows (all windows / mature base): MIN2 level 25.0% · full-tip 49.7% ·
+  C1 PASS · flips 8 vs the net-sign's 9 · C2 PASS (mature: C1 FAIL —
+  full-tip 66.5% — stated, context); MIN1 level 26.1% · full-tip 22.6% ·
+  C1 PASS · flips 8 vs 9 · C2 PASS (mature: PASS/PASS). **DECISION:
+  `GOLD_LANE_MIN_FIRING = 2`** (D-GB-3's default — both criteria hold over
+  all windows, no fallback needed). The report is
+  `docs/insights/BACKTEST-GOLD-LANES.md` (every cell with n; the
+  lineage-only confusion tables labelled "not used for selection";
+  **no forecasting edge is claimed** for either rule or the consolidated
+  balance).
+- **The records:** `GOLD_RECHECK_SPEC.md` §1's new state-of-record line +
+  §5's baseline row + the §3 venue note; `GOLD_BACKTEST_SPEC.md` §5's two
+  2026-11-03 sections (the re-check + the calibration decision);
+  `AGENTS.md`'s gold-balance paragraph now reads P0 CALIBRATED;
+  `docs/specs/gold-balance-consolidation/PROGRESS.md` created (the
+  milestone table + the owner-must-decide list); the GB-S2 prompt rewritten
+  in `PROMPTS.md` with the exact state.
+- **No deploy** (scripts, tests and docs only — the app code never imports
+  the harness; the built worker is unchanged, chunk names verified in the
+  gates' build step).
+
 ## [2026-11-03e] — gold balance consolidation: the spec set lands (the owner's zip extracted to docs/specs/gold-balance-consolidation/ + the GB-S1..S7 session plan; one balance for gold — SPECIFIED, not yet implemented)
 
 The handoff session between programs. The gap-closure S6 stream is closed

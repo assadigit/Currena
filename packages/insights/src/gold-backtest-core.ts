@@ -259,3 +259,263 @@ export function signAgreement(netScore: number, retPct: number, bandPct: number)
   if (Math.abs(retPct) <= bandPct) return undefined; // flat — not a testable window
   return netScore > 0 ? retPct > 0 : retPct < 0;
 }
+
+/* ------------------------------------------------------------------ *
+ * The lane tables — the gold-balance consolidation P0 calibration
+ * (docs/specs/gold-balance-consolidation/02-ENGINE-AND-DECISION-TABLE.md §6)
+ * ------------------------------------------------------------------ */
+
+/**
+ * One lane-rule configuration for the P0 calibration: the SAME frozen
+ * 21-voter production table, paired with a lane-vote crowd minimum
+ * (`GOLD_LANE_MIN_FIRING` per D-GB-3; the pre-registered fallback is 1).
+ * These sit BESIDE the frozen voter tables (`HARNESS_GOLD_VOTERS_21` /
+ * `_20`) and change nothing about them: the voters, their lanes and their
+ * polarities come from `gold-score.ts`'s `GOLD_LANE_VOTERS` — the single
+ * source of truth (D-GB-9). The consolidated balance's production engine
+ * (`gold-balance.ts`, rollout phase P1) will import the same source; this
+ * harness-local copy exists so the calibration can run BEFORE any UI work,
+ * exactly as 02 §6 pre-registered.
+ */
+export interface HarnessGoldLanes {
+  /** The voter table the lanes group — always GOLD_LANE_VOTERS here. */
+  readonly voters: readonly GoldLaneVoter[];
+  /** The crowd minimum: how many firing voters a lane needs before it may vote. */
+  readonly minFiring: number;
+}
+
+/** D-GB-3's default rule: a lane votes only when at least 2 of its voters fire. */
+export const HARNESS_GOLD_LANES_MIN2: HarnessGoldLanes = { voters: GOLD_LANE_VOTERS, minFiring: 2 };
+
+/** The pre-registered calibration fallback (02 §6): one firing voter can tip a lane. */
+export const HARNESS_GOLD_LANES_MIN1: HarnessGoldLanes = { voters: GOLD_LANE_VOTERS, minFiring: 1 };
+
+/** A lane's side in the consolidated balance (02 §2's GoldBalanceSide). */
+export type GoldLaneSide = 'for' | 'against' | 'neutral' | 'unread';
+
+/** One lane's vote under a min-firing rule. */
+export interface HarnessLaneVote {
+  lane: GoldLane;
+  side: GoldLaneSide;
+  /** true when side is 'neutral' because supports === pressures > 0 (02 §3). */
+  split: boolean;
+  /** Voters readable (not missing/stale/check-pending/unavailable). */
+  readable: number;
+  /** supports + pressures. */
+  firing: number;
+  supports: number;
+  pressures: number;
+}
+
+/** The balance's verdict state (01 §5.1): 'none' = all four lanes unread. */
+export type HarnessBalanceState = 'tipped-for' | 'tipped-against' | 'level' | 'none';
+
+/** The consolidated balance over the four lanes, as the harness computes it. */
+export interface HarnessLaneBalance {
+  /** The four lane votes, GOLD_LANES order. */
+  lanes: HarnessLaneVote[];
+  counts: { for: number; against: number; neutral: number; unread: number };
+  /** lanesFor − lanesAgainst. */
+  net: number;
+  /** for + against + neutral lane counts (01 §5.1's readable). */
+  readable: number;
+  state: HarnessBalanceState;
+  /**
+   * The beam angle in degrees (D-GB-8, unchanged formula):
+   * |net| / (for + against) × 10, clamped to [3, 10]; 0 when level.
+   */
+  beamAngle: number;
+  /** |net| === for + against — the one-sided, full 10-degree tip. */
+  fullyTipped: boolean;
+}
+
+/**
+ * The consolidated lane balance over an arbitrary voter table + crowd
+ * minimum — the harness-local lane engine (02 §3's algorithm, the same
+ * one the P1 `gold-balance.ts` engine will implement from the same
+ * imports). Pure, offline, order-independent; never throws on missing
+ * readings. `unread` (nothing readable) and `neutral` (readable, nothing
+ * firing or split) are never merged — problem P5's fix.
+ */
+export function laneBalanceOverVoters(
+  readings: readonly IndicatorReading[],
+  voters: readonly GoldLaneVoter[],
+  minFiring: number,
+): HarnessLaneBalance {
+  const byId = new Map(readings.map((r) => [r.id as string, r]));
+
+  const lanes: HarnessLaneVote[] = GOLD_LANES.map((lane) => {
+    let readableCount = 0;
+    let supports = 0;
+    let pressures = 0;
+    for (const def of voters) {
+      if (def.lane !== lane) continue;
+      const r = byId.get(def.id);
+      if (!readable(r)) continue;
+      readableCount++;
+      const leg = evalLeg(def.id, r);
+      if (leg.lean === 0) continue; // steady AND typical — honestly not firing
+      if (leg.lean * def.polarity === 1) supports++;
+      else pressures++;
+    }
+    const firing = supports + pressures;
+    let side: GoldLaneSide;
+    let split = false;
+    if (readableCount === 0) side = 'unread';
+    else if (firing < minFiring) side = 'neutral';
+    else if (supports > pressures) side = 'for';
+    else if (pressures > supports) side = 'against';
+    else {
+      side = 'neutral';
+      split = true;
+    }
+    return { lane, side, split, readable: readableCount, firing, supports, pressures };
+  });
+
+  const counts = {
+    for: lanes.filter((l) => l.side === 'for').length,
+    against: lanes.filter((l) => l.side === 'against').length,
+    neutral: lanes.filter((l) => l.side === 'neutral').length,
+    unread: lanes.filter((l) => l.side === 'unread').length,
+  };
+  const net = counts.for - counts.against;
+  const tipped = counts.for + counts.against;
+  const beamAngle = net === 0 || tipped === 0 ? 0 : Math.min(10, Math.max(3, (Math.abs(net) / tipped) * 10));
+  const state: HarnessBalanceState =
+    counts.unread === 4 ? 'none' : net > 0 ? 'tipped-for' : net < 0 ? 'tipped-against' : 'level';
+
+  return {
+    lanes,
+    counts,
+    net,
+    readable: counts.for + counts.against + counts.neutral,
+    state,
+    beamAngle,
+    fullyTipped: net !== 0 && Math.abs(net) === tipped,
+  };
+}
+
+/* ------------------------------------------------------------------ *
+ * The calibration statistics (02 §6 — C1 and C2, pre-registered)
+ * ------------------------------------------------------------------ */
+
+/** C1's level ceiling: the balance is level in at most 70% of all windows. */
+export const LANE_CALIB_LEVEL_MAX_SHARE = 0.7;
+/** C1's full-tip ceiling: fully tipped (10°, one-sided) in at most 60% of all windows. */
+export const LANE_CALIB_FULLTIP_MAX_SHARE = 0.6;
+/** C2's stability window: flips per 60 trading days. */
+export const LANE_CALIB_FLIP_WINDOW = 60;
+
+/**
+ * The median number of day-to-day side changes inside every window of
+ * `LANE_CALIB_FLIP_WINDOW` consecutive entries (C2's "verdict flips per 60
+ * trading days"). Sliding windows, step 1; the median across all of them.
+ * Null when the sequence is shorter than the window (n stated, never guessed).
+ */
+export function medianFlipsPer60(sides: readonly string[]): number | null {
+  const w = LANE_CALIB_FLIP_WINDOW;
+  if (sides.length < w) return null;
+  const counts: number[] = [];
+  for (let i = 0; i + w <= sides.length; i++) {
+    let c = 0;
+    for (let j = i + 1; j < i + w; j++) {
+      if (sides[j] !== sides[j - 1]) c++;
+    }
+    counts.push(c);
+  }
+  counts.sort((a, b) => a - b);
+  const mid = counts.length >> 1;
+  return counts.length % 2 === 1 ? counts[mid]! : (counts[mid - 1]! + counts[mid]!) / 2;
+}
+
+/** The per-rule calibration figures (02 §6 items 1–3 + the C1/C2 verdicts). */
+export interface LaneCalibrationStats {
+  n: number;
+  tippedFor: number;
+  tippedAgainst: number;
+  /** net === 0 (level beam) — INCLUDES the all-unread 'none' windows, which noneCount states separately. */
+  level: number;
+  /** all four lanes unread (the verdictNone state). */
+  none: number;
+  /** Beam-angle bands: 0 (level) · (0, 6] · (6, 10]. */
+  beam: { level: number; mid: number; full: number };
+  /** |net| === for+against — the one-sided full tip (the 10° band). */
+  fullyTipped: number;
+  /** Per lane: windows in which the lane's side is 'unread'. */
+  laneUnread: Record<GoldLane, number>;
+  /** Per lane: windows in which the lane is a SPLIT neutral (supports === pressures > 0). */
+  laneSplit: Record<GoldLane, number>;
+  /** C2's lane figure: median verdict (state) flips per 60 trading days. */
+  flipsMedianPer60: number | null;
+  /** C2's comparison figure: the same statistic on the 21-voter net sign. */
+  netSignFlipsMedianPer60: number | null;
+  /** C1 (not degenerate): level share <= 70% AND fully-tipped share <= 60%. */
+  c1: boolean;
+  /** C2 (smoother): lane flips median <= the 21-voter net-sign figure. */
+  c2: boolean;
+}
+
+/**
+ * The pre-registered calibration statistics over one window set. `balances`
+ * and `netScores` must be aligned (one entry per window, chronological
+ * order); the caller slices for the mature base. Pure; every field derives
+ * from the inputs alone (no thresholds, no tuning).
+ */
+export function laneCalibrationStats(
+  balances: readonly HarnessLaneBalance[],
+  netScores: readonly number[],
+): LaneCalibrationStats {
+  const n = balances.length;
+  let tippedFor = 0;
+  let tippedAgainst = 0;
+  let level = 0;
+  let none = 0;
+  let beamLevel = 0;
+  let beamMid = 0;
+  let beamFull = 0;
+  let fullyTipped = 0;
+  const laneUnread: Record<GoldLane, number> = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 };
+  const laneSplit: Record<GoldLane, number> = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 };
+
+  for (const b of balances) {
+    if (b.state === 'tipped-for') tippedFor++;
+    else if (b.state === 'tipped-against') tippedAgainst++;
+    else if (b.state === 'none') {
+      none++;
+      level++;
+    } else level++;
+    if (b.beamAngle === 0) beamLevel++;
+    else if (b.beamAngle <= 6) beamMid++;
+    else beamFull++;
+    if (b.fullyTipped) fullyTipped++;
+    for (const l of b.lanes) {
+      if (l.side === 'unread') laneUnread[l.lane]++;
+      if (l.split) laneSplit[l.lane]++;
+    }
+  }
+
+  const flipsMedianPer60 = medianFlipsPer60(balances.map((b) => b.state as string));
+  const netSignFlipsMedianPer60 = medianFlipsPer60(netScores.map((s) => (s > 0 ? '+' : s < 0 ? '-' : '0')));
+
+  const levelShare = n > 0 ? level / n : 1;
+  const fullTipShare = n > 0 ? fullyTipped / n : 1;
+  const c1 = n > 0 && levelShare <= LANE_CALIB_LEVEL_MAX_SHARE && fullTipShare <= LANE_CALIB_FULLTIP_MAX_SHARE;
+  const c2 =
+    flipsMedianPer60 !== null && netSignFlipsMedianPer60 !== null && flipsMedianPer60 <= netSignFlipsMedianPer60;
+
+  return {
+    n,
+    tippedFor,
+    tippedAgainst,
+    level,
+    none,
+    beam: { level: beamLevel, mid: beamMid, full: beamFull },
+    fullyTipped,
+    laneUnread,
+    laneSplit,
+    flipsMedianPer60,
+    netSignFlipsMedianPer60,
+    c1,
+    c2,
+  };
+}
