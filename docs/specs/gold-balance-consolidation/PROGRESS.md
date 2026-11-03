@@ -274,9 +274,18 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
   bumped 1530/354 → **1540/355.5** WITH the justification in
   `scripts/check-bundle-budget.mjs` + CHANGELOG (the two panels still
   ride the chunk until P5 re-baselines downward).
-- **Deploy:** the built worker CHANGES this phase (the SPA joins the
-  api worker) — deployed + verified per docs/DEPLOY.md after the merge
-  (the flag view AND the default view, EN + fa, fresh contexts).
+- **Merge + deploy:** PR #16 merged as `0bba57a` (CI green on main
+  before the deploy); the deploy-lock check passed (the active version
+  was the expected `115eb1e5` @ 100%) and `wrangler deploy` shipped
+  **currena-api `1bfc88c5` @ 100%** (2026-11-03T17:00:46Z; the full
+  record in docs/DEPLOY.md's [2026-11-03i] session note). Browser-
+  verified on production, fresh contexts, zero console errors, no
+  overflow at 360 + 1280: the flag view EN + fa (today's live data
+  reads LEVEL · 4 neutral with borrowing-costs split 2v2 — the badge,
+  the tallies, the context line −5.11%, the measured note, the chip →
+  detail-panel interaction with the tilt phrase + the B-12 row) and the
+  default view EN + fa (the panels, the legacy chips, the legacy
+  subtitle). The owner previews at currena.ir/insights?balance=lanes.
 
 ## Owner must decide
 

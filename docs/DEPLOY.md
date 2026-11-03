@@ -132,6 +132,40 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-03i the gold-balance P2 preview deploy (worker 1bfc88c5 at 100% — the consolidated lane balance behind ?balance=lanes; the DEFAULT view byte-stable)
+
+GB-S3 (PR #16, merge `0bba57a`): the first gold-balance deploy that
+changes the built worker — the SPA imports the P1 engine
+(`goldBalance`) and the lane-view UI + copy join the Insights lazy
+chunk (1522.88/351.96 → 1533.15/354.25; the ceiling re-based to
+1540/355.5 with the justification in scripts/check-bundle-budget.mjs).
+The deploy-lock check ran first (the D-43 lesson): the active version
+was the expected `115eb1e5` @ 100% — no parallel deploy. Gates ALL 9
+GREEN 14,582 on the branch head (CI `gates` check green) before the
+merge; main CI green on `0bba57a` before the deploy. `pnpm --filter
+@currena/web build` + `wrangler deploy` → **currena-api `1bfc88c5`
+@ 100%** (deployment `aad8fbce`, 2026-11-03T17:00:46Z). currena-markets
+untouched (code-unchanged — the repo convention).
+
+Smoke: `/api/health` ok (kv ok) · `/` 200 · `/api/insights` 200.
+
+Browser-verified on production (fresh contexts, zero console/page
+errors, no horizontal overflow at 360 + 1280): the FLAG view
+(`currena.ir/insights?balance=lanes`) EN + fa — today's live data reads
+LEVEL · 4 neutral with borrowing-costs SPLIT 2v2 (the same shape as the
+recorded 2026-10-31 fixture), the «Split»/«دوپاره» badge + the
+"2 for, 2 against" / «۲ موافق، ۲ مخالف» line, the context line
+(−5.11% / −۵٫۱۱٪), the measured note + the BACKTEST-GOLD-LANES.md
+link, the chip → detail-panel interaction (8 members, the supports/
+pressures groups, the steady expander, the inflation tilt phrase
+"expectations fading", the B-12 "falling · Normal" breakeven row, the
+`/insights?card=<id>` deep links), Persian digits + RTL; and the
+DEFAULT view EN + fa — the two gold panels under the balance, the
+legacy condition chips, the legacy subtitle, none of the lane elements.
+The owner previews at `https://currena.ir/insights?balance=lanes` until
+the P5/GB-S6 flip (returning visitors may need one reload — the PWA
+service worker serves the previous chunk to already-open installs).
+
 ## Session record — 2026-11-03d the gap-closure S6 delivery close (worker 115eb1e5 at 100% — the union head's hygiene deploy; the build byte-identical; the five readings landed; 161 on production)
 
 The eighth S6 session — the credentialed close the handoff prescribed
