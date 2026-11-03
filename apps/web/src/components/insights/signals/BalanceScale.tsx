@@ -128,7 +128,7 @@
  * legacy-markup snapshot test, gold-balance-lanes.test.tsx).
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { formatNumber } from '@currena/core';
 import type { SignalConditionState } from '@currena/insights';
@@ -137,6 +137,12 @@ import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg } from '../../icons/currena';
 import { ConditionIcon } from './icons';
 import { VerdictIcon, verdictTone } from './verdict';
+// GB-S4 (05 §11): the lane weight + the balance's own tokens/component
+// styles. The CSS file rides the Insights lazy chunk with this module;
+// its rules are all scoped under [data-balance-visual], which only the
+// lanes visual mounts — the default view's markup is untouched.
+import { BalanceWeight, BalanceWeightDisc, BalanceWeightSkeleton } from './BalanceWeight';
+import './balance-visual.css';
 
 /** One balance driver — the spec's four states (§4). `neutral` (read,
  * no effect) and `unread` (could not be read) are DIFFERENT states. */
@@ -570,15 +576,178 @@ export function balanceGaugeGeometry(cx: number, cy: number, rtl: boolean): Bala
   };
 }
 
-export function BalanceScale({
-  drivers,
-  copy,
-  numberLocale,
-  banner,
-  subtitle,
-  contextLine,
-  measuredNote,
-}: {
+/* ------------------------------------------------------------------ *
+ * GB-S4 (05 §4.2 + the reference prototype's mechanics table): the
+ * LANES visual's stage geometry — pure, derived from the measured
+ * stage width and the size class. The beam ANGLE still comes from
+ * the unchanged balanceTilt formula above (05: "the beam formula is
+ * unchanged"); only the drawing is new.
+ *
+ * Size classes follow the CARD's own width (the reference's rule, a
+ * container-query pattern): s < 560, m 560–759, l >= 760.
+ * ------------------------------------------------------------------ */
+
+/** The lanes visual's stage max width (05 §9: the stage centres inside
+ * the wider card; 720 keeps the instrument >= 60% of the ~1100px card
+ * at desktop — the reference prototype's measured value, which wins
+ * over 05 §9's 640 draft for V-2's own criterion). */
+export const BALANCE_VISUAL_STAGE_MAX_W = 720;
+
+/** The tilt animation for the lanes visual (05 §7): 650 ms ease-out
+ * quartic on load and on data change, then still. The LEGACY drawing
+ * keeps its own 500 ms cubic (its path is untouched). */
+export const BALANCE_VISUAL_TILT_MS = 650;
+
+/** The pans' fixed height (the reference's 268, holding the worst
+ * case: the caption + FOUR weights in two rows + the rim zone). The
+ * stage's height is reserved from the same constant, so no data state
+ * can ever resize or clip the drawing (05 §4.2). */
+export const BALANCE_VISUAL_PAN_H_PX = 268;
+
+/** The lanes visual's size class (the reference's sizeOfWidth). */
+export type BalanceVisualSize = 's' | 'm' | 'l';
+
+export function balanceVisualSizeOfWidth(width: number): BalanceVisualSize {
+  return width < 560 ? 's' : width < 760 ? 'm' : 'l';
+}
+
+export interface BalanceVisualGeometry {
+  stageWidth: number;
+  size: BalanceVisualSize;
+  /** The pan width: 46% of the stage on mobile, else min(280, 38%). */
+  pw: number;
+  /** The beam's pin-to-pin length = stageWidth − pw (the pan centres
+   * sit on the beam ends; the pan edges touch the stage edges). */
+  L: number;
+  cx: number;
+  /** The pivot's y: 56 mobile, 72 otherwise. */
+  pivotY: number;
+  /** (L/2)·sin(10°) — the reserved vertical swing envelope. */
+  swing: number;
+  /** The hangers' rest length: swing + 22. */
+  hanger: number;
+  /** The pans' rest top = pivotY + hanger. */
+  restTop: number;
+  panH: number;
+  /** The stage's reserved height (never depends on the data). */
+  H: number;
+  /** A pan weight's label column width. */
+  weightW: number;
+  /** A pan weight's disc diameter (58 desktop, 52 mobile — 05 §4.3). */
+  discD: number;
+  /** The dial's radius: 30 mobile, 42 otherwise. */
+  dialR: number;
+}
+
+/** The lanes visual's stage metrics (pure; the reference's geometry
+ * table, with the pan height tuned so the four-weights stack fits at
+ * 360px — the reference's own 236 draft overflowed its stack
+ * scenario, measured before implementation). */
+export function balanceVisualGeometry(stageWidth: number, size: BalanceVisualSize): BalanceVisualGeometry {
+  const s = size === 's';
+  const W = Math.max(220, Math.round(stageWidth));
+  const pw = s ? Math.round(W * 0.46) : Math.round(Math.min(280, W * 0.38));
+  const L = W - pw;
+  const pivotY = s ? 56 : 72;
+  const swing = (L / 2) * Math.sin(radOf(BALANCE_MAX_ANGLE_DEG));
+  const hanger = Math.round(swing + 22);
+  const panH = BALANCE_VISUAL_PAN_H_PX;
+  const H = Math.ceil(pivotY + hanger + panH + swing + 40);
+  // Two weights + their column gap must fit a pan's inner width so the
+  // worst case wraps to two rows of two, never one-per-row (the
+  // reference's own readout caught the 1-per-row overflow at 360).
+  const weightW = s ? Math.max(50, Math.min(70, Math.floor((pw - 20) / 2))) : 78;
+  return {
+    stageWidth: W,
+    size,
+    pw,
+    L,
+    cx: W / 2,
+    pivotY,
+    swing,
+    hanger,
+    restTop: pivotY + hanger,
+    panH,
+    H,
+    weightW,
+    discD: s ? Math.min(52, weightW - 6) : 58,
+    dialR: s ? 30 : 42,
+  };
+}
+
+export interface BalanceVisualFrame {
+  /** The VISUAL rotation in degrees: positive dips the RIGHT beam end
+   * (SVG rotate is clockwise). rtl flips the sign so the heavy side's
+   * end always dips — the same direction-free physical angle drives
+   * the drops (the legacy rule, kept). */
+  visDeg: number;
+  forIsLeft: boolean;
+  /** The two beam-end joints at the current angle. */
+  jointLeft: BalancePoint;
+  jointRight: BalancePoint;
+  /** Each pan's plumb translation — ONLY vertical, exactly its joint's
+   * displacement (05 §7: "pans translate only"). */
+  forDrop: number;
+  againstDrop: number;
+  /** The needle's dial angle: clamp(vis × 3, ±32) over the ±35°, 11-tick
+   * dial (the reference's 3× magnified readout — a 3° lean is legible). */
+  needleDeg: number;
+}
+
+/** The lanes visual's per-frame derivation (pure): from the ONE
+ * animated physical angle θ (the legacy convention: against-heavy
+ * positive, 0 = level) and the direction, every mechanical coordinate
+ * the frame draws. Unit-tested without a DOM. */
+export function balanceVisualFrame(
+  geo: Pick<BalanceVisualGeometry, 'L' | 'cx' | 'pivotY'>,
+  signedPhysicalDeg: number,
+  rtl: boolean,
+): BalanceVisualFrame {
+  const vis = rtl ? -signedPhysicalDeg : signedPhysicalDeg;
+  const rad = radOf(vis);
+  const half = geo.L / 2;
+  const jointLeft: BalancePoint = { x: geo.cx - half * Math.cos(rad), y: geo.pivotY - half * Math.sin(rad) };
+  const jointRight: BalancePoint = { x: geo.cx + half * Math.cos(rad), y: geo.pivotY + half * Math.sin(rad) };
+  // Right end's vertical displacement; the pans hang plumb (translate
+  // only), each by exactly its joint's displacement.
+  const rightDrop = half * Math.sin(rad);
+  const leftDrop = -rightDrop;
+  const forIsLeft = !rtl;
+  return {
+    visDeg: vis,
+    forIsLeft,
+    jointLeft,
+    jointRight,
+    forDrop: forIsLeft ? leftDrop : rightDrop,
+    againstDrop: forIsLeft ? rightDrop : leftDrop,
+    needleDeg: Math.max(-32, Math.min(32, vis * 3)),
+  };
+}
+
+export interface BalanceVisualTick {
+  /** True for the centre tick (drawn longer, 05 §4.2). */
+  center: boolean;
+  from: BalancePoint;
+  to: BalancePoint;
+}
+
+/** The dial's 11 ticks over ±35°, one every 7° (05 §4.2). Pure. */
+export function balanceVisualTicks(cx: number, cy: number, r: number): BalanceVisualTick[] {
+  const ticks: BalanceVisualTick[] = [];
+  for (let i = -5; i <= 5; i++) {
+    const a = radOf(i * 7);
+    const inner = i === 0 ? 9 : 5;
+    ticks.push({
+      center: i === 0,
+      from: { x: cx + r * Math.sin(a), y: cy - r * Math.cos(a) },
+      to: { x: cx + (r - inner) * Math.sin(a), y: cy - (r - inner) * Math.cos(a) },
+    });
+  }
+  return ticks;
+}
+
+
+export interface BalanceScaleProps {
   drivers: readonly BalanceDriver[];
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
@@ -595,7 +764,690 @@ export function BalanceScale({
    * without a tap. Absent → nothing renders (the legacy view carries it
    * on the wind panel instead). */
   measuredNote?: ReactNode;
-}): React.JSX.Element | null {
+  /** GB-S4 (05): 'lanes' renders the P2b VISUAL redesign — the brass
+   * beam stage, the lane weights with segmented rims, the verdict
+   * block, the "Not leaning" tray and the ledger. Absent → the LEGACY
+   * mechanical drawing renders byte-for-byte today's page (the two
+   * paths share the model: balanceCounts, balanceTilt, the angle
+   * constants, the RTL sign logic and the reduced-motion rule). */
+  visual?: 'lanes';
+}
+
+/**
+ * BalanceScale — the public component: one prop-dispatched instrument.
+ * `visual === 'lanes'` mounts the P2b visual (GB-S4, behind the
+ * ?balance=lanes preview flag only); every other call renders the
+ * legacy mechanical drawing UNTOUCHED (the default view's byte-for-byte
+ * markup is pinned by the legacy snapshot test).
+ */
+export function BalanceScale(props: BalanceScaleProps): React.JSX.Element | null {
+  if (props.visual === 'lanes') {
+    return <BalanceLanesVisual {...props} />;
+  }
+  return <BalanceScaleMechanical {...props} />;
+}
+
+/** interpolate with ReactNode params — the copy templates stay
+ * string-shaped for the audit; this renders the steady sentence's name
+ * spans without stringifying them. */
+function interpolateNodes(template: string, params: Record<string, ReactNode>): React.JSX.Element {
+  const out: ReactNode[] = [];
+  let last = 0;
+  for (const m of template.matchAll(/\{(\w+)\}/g)) {
+    const at = m.index ?? 0;
+    if (at > last) out.push(template.slice(last, at));
+    out.push(m[1] !== undefined && m[1] in params ? params[m[1]] : m[0]);
+    last = at + m[0].length;
+  }
+  if (last < template.length) out.push(template.slice(last));
+  return <>{out}</>;
+}
+
+/* ------------------------------------------------------------------ *
+ * GB-S4 — the LANES VISUAL (05-VISUAL-DESIGN-SPEC + the owner's
+ * approved reference prototype). Mounted ONLY behind
+ * ?balance=lanes (MergedCard passes visual="lanes"); renders the
+ * 05 §4.1 anatomy: eyebrow → title → subtitle → the STAGE (a brass
+ * beam balance whose pans carry LANE WEIGHTS) → the VERDICT block
+ * (the hero) → the "Not leaning" tray → the four-row LEDGER → the
+ * footnote. The model is the SAME as the legacy drawing's:
+ * balanceCounts, balanceVerdictOf, balanceTilt (the unchanged
+ * |net|/(for+against) × 10° clamped to [3°, 10°] formula), the
+ * direction-free physical angle, the one animated value, and the
+ * prefers-reduced-motion jump (05 §7: 650 ms ease-out quartic).
+ *
+ * A11y (05 §10): the stage is a labelled group; the MECHANICAL SVG is
+ * one role="img" carrying the existing gaugeAria text; every weight
+ * and ledger row is a real button with a visible focus ring,
+ * aria-expanded and its own accessible name; the rim segments and
+ * the lane strip are decorative (aria-hidden) — the counts live in
+ * words (the aria labels + the ledger), never colour alone.
+ * ------------------------------------------------------------------ */
+function BalanceLanesVisual({
+  drivers,
+  copy,
+  numberLocale,
+  banner,
+  subtitle,
+  contextLine,
+  measuredNote,
+}: Omit<BalanceScaleProps, 'visual'>): React.JSX.Element {
+  const b = copy.signals.balance;
+  const rtl = numberLocale === 'fa-IR';
+  const metal = 'gold' as const;
+  const n = (v: number): string => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
+
+  /* The model reads (the legacy path's own pure helpers). */
+  const counts = balanceCounts(drivers);
+  const verdict = balanceVerdictOf(counts);
+  const tilt = balanceTilt(counts, BALANCE_LH_PX);
+  const sparse = counts.readable < 3;
+  const targetDeg = sparse ? 0 : signedTiltDeg(tilt);
+
+  /* THE ONE ANIMATED VALUE (05 §7): 650 ms ease-out quartic, landing
+   * immediately under prefers-reduced-motion. The FIRST paint carries
+   * the verdict angle (progressive, like the legacy path). */
+  const [theta, setTheta] = useState(targetDeg);
+  const thetaRef = useRef(targetDeg);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const from = thetaRef.current;
+    if (from === targetDeg) return undefined;
+    const land = (v: number): void => {
+      thetaRef.current = v;
+      setTheta(v);
+    };
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || typeof requestAnimationFrame !== 'function') {
+      land(targetDeg);
+      return undefined;
+    }
+    const start = performance.now();
+    const tick = (now: number): void => {
+      const progress = Math.min(1, (now - start) / BALANCE_VISUAL_TILT_MS);
+      const eased = 1 - (1 - progress) ** 4; // ease-out quartic
+      land(from + (targetDeg - from) * eased);
+      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
+      else land(targetDeg);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [targetDeg]);
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  /* The CARD's own measured width drives the size class; the stage's
+   * width is min(720, card width) (05 §9 + the reference). jsdom has
+   * no layout, so the pre-measurement default is the l geometry —
+   * deterministic in tests, swapped pre-paint in browsers. */
+  const [rootW, setRootW] = useState(0);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  useLayoutEffect(() => {
+    const el = rootRef.current;
+    if (el === null) return undefined;
+    const apply = (w: number): void => {
+      if (w > 0 && Math.abs(w - rootW) > 0.5) setRootW(w);
+    };
+    apply(el.getBoundingClientRect().width);
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver((entries) => {
+      apply(entries[0]?.contentRect.width ?? 0);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const size = balanceVisualSizeOfWidth(rootW > 0 ? rootW : BALANCE_VISUAL_STAGE_MAX_W);
+  const stageW = rootW > 0 ? Math.min(BALANCE_VISUAL_STAGE_MAX_W, rootW) : BALANCE_VISUAL_STAGE_MAX_W;
+  const geo = balanceVisualGeometry(stageW, size);
+  const frame = balanceVisualFrame(geo, theta, rtl);
+  const s = size === 's';
+  const bh = s ? 0.8 : 1;
+
+  /* The ledger: one row open at a time (05 §4.6); opening from a weight
+   * scrolls the row to the centre and focuses it (03 §5: focus moves
+   * into the opened detail and the buttons stay keyboard-reachable). */
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const openRowBtnRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    if (openKey === null) return;
+    const btn = openRowBtnRef.current;
+    if (btn === null) return;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof btn.scrollIntoView === 'function') {
+      btn.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+    }
+    btn.focus({ preventScroll: true });
+  }, [openKey]);
+
+  /* The side loads (the lane weights on the pans — max 4 by
+   * construction) and the tray's stones. */
+  const forBlocks = drivers.filter((d) => d.state === 'for');
+  const againstBlocks = drivers.filter((d) => d.state === 'against');
+  const trayStones = drivers.filter((d) => d.state === 'neutral' || d.state === 'unread');
+  const none = counts.readable === 0;
+
+  /* The verdict word (the legacy rule kept: sparse is not a reading). */
+  const verdictWord = !sparse
+    ? verdict === 'for'
+      ? b.verdictFor
+      : verdict === 'against'
+        ? b.verdictAgainst
+        : verdict === 'balanced'
+          ? b.verdictBalanced
+          : b.verdictNone
+    : counts.readable === 0
+      ? b.verdictNone
+      : copy.signals.notEnoughReadable;
+
+  /* The lane's state words (05 §4.6: state in words — "Leans for gold"
+   * … — colour never rides alone). */
+  const laneStateTextOf = (d: BalanceDriver): string => {
+    if (d.split === true && d.members !== undefined) {
+      const supports = d.members.filter((m) => m.impact === 'supports').length;
+      const pressures = d.members.filter((m) => m.impact === 'pressures').length;
+      return interpolate(b.laneStateSplit, { supports: n(supports), pressures: n(pressures) });
+    }
+    return d.state === 'for'
+      ? b.laneStateFor
+      : d.state === 'against'
+        ? b.laneStateAgainst
+        : d.state === 'neutral'
+          ? b.laneStateNeutral
+          : b.laneStateUnread;
+  };
+  /** The weight's accessible name (03 §5's "{lane}: {side}. {tally}."):
+   * a split lane appends the badge word before its counts so the
+   * badge's meaning never rides on colour alone. */
+  const laneAriaOf = (d: BalanceDriver): string => {
+    const side = d.split === true ? b.laneStateNeutral : laneStateTextOf(d);
+    const tally = d.split === true && d.tally !== undefined ? `${b.splitBadge}, ${d.tally}` : d.tally;
+    return tally !== undefined ? interpolate(b.laneChipAria, { lane: d.label, side, tally }) : `${d.label}: ${side}.`;
+  };
+  const impactsOf = (d: BalanceDriver): ReadonlyArray<BalanceMember['impact']> =>
+    d.members !== undefined ? d.members.map((m) => m.impact) : [];
+
+  /** The open row's member list — the detail-panel CONTENT contract
+   * (AC-2: every voter reachable), inline (05 §4.6): firing rows as
+   * dot + name + "Supports/Pressures, evidence" on the end side, the
+   * steady voters as ONE muted sentence, unread rows with a hollow
+   * dot. The lane's intro sentence and the inflation tilt phrase
+   * (03 §3 items 1+5) ride above the rows. */
+  const ledgerMembersOf = (d: BalanceDriver): React.JSX.Element | null => {
+    if (d.members === undefined || d.members.length === 0) return null;
+    const firingGroup = (impact: 'supports' | 'pressures'): React.JSX.Element | null => {
+      const rows = d.members!.filter((m) => m.impact === impact);
+      if (rows.length === 0) return null;
+      return (
+        <div key={impact} data-balance-member-group={impact}>
+          {rows.map((m) => (
+            <div
+              key={m.key}
+              className="m"
+              data-impact={m.impact}
+              data-balance-member={m.key}
+              data-balance-member-impact={m.impact}
+            >
+              <i aria-hidden="true" />
+              <span>{m.label}</span>
+              <span className="m-ev">
+                {impact === 'supports' ? b.memberWordSupports : b.memberWordPressures}
+                {m.evidenceText !== null ? ` · ${m.evidenceText}` : ''}
+                {m.valueText !== null ? (
+                  <>
+                    {' · '}
+                    <bdi dir="ltr">{m.valueText}</bdi>
+                  </>
+                ) : null}
+                {' '}
+                <a href={`/insights?card=${m.key}`} className="insights-focusable">
+                  {b.memberOpenIndicator}
+                </a>
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    };
+    const unread = d.members.filter((m) => m.impact === 'unread');
+    const steady = d.members.filter((m) => m.impact === 'steady');
+    return (
+      <>
+        <p className="lane-intro" data-balance-lane-intro={d.key}>
+          {d.detail}
+        </p>
+        {d.note !== undefined ? (
+          <p className="lane-note" data-balance-lane-note>
+            {d.note}
+          </p>
+        ) : null}
+        {firingGroup('supports')}
+        {firingGroup('pressures')}
+        {steady.length > 0 ? (
+          <div className="steady" data-balance-member-group="steady">
+            {interpolateNodes(b.laneSteadySentence, {
+              n: n(steady.length),
+              names: steady.map((m, i) => (
+                <span key={m.key}>
+                  {i > 0 ? (rtl ? '، ' : ', ') : ''}
+                  <span data-balance-member={m.key} data-balance-member-impact="steady">
+                    {m.label}
+                  </span>
+                </span>
+              )),
+            })}
+          </div>
+        ) : null}
+        {unread.length > 0 ? (
+          <div data-balance-member-group="unread">
+            {unread.map((m) => (
+              <div
+                key={m.key}
+                className="m"
+                data-impact="unread"
+                data-balance-member={m.key}
+                data-balance-member-impact="unread"
+              >
+                <i aria-hidden="true" />
+                <span>{m.label}</span>
+                <span className="m-ev">{b.memberWordUnread}</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </>
+    );
+  };
+
+  /* The counts line (05 §4.4): for/against/not-leaning always, unread
+   * when any — tabular numbers via the locale formatter. */
+  const countParts = [
+    interpolate(b.laneCountFor, { n: n(counts.for) }),
+    interpolate(b.laneCountAgainst, { n: n(counts.against) }),
+    interpolate(b.laneCountNeutral, { n: n(counts.neutral) }),
+  ];
+  if (counts.unread > 0) countParts.push(interpolate(b.laneCountUnread, { n: n(counts.unread) }));
+
+  /* The stage's accessible labels: the drawing is one role="img" with
+   * the existing gaugeAria text (05 §10); the stage group carries the
+   * summary aria (the legacy pattern, kept for the none case). */
+  const summaryParts = countLineParts(counts, copy, numberLocale);
+  const stageAria = interpolate(b.aria, { summary: summaryParts.join(' · '), verdict: verdictWord });
+  const gaugeAriaText = interpolate(b.gaugeAria, {
+    n: formatNumber(tilt.angleDeg, numberLocale, { maximumFractionDigits: 0 }),
+    verdict: verdictWord,
+  });
+
+  const loading = drivers.length === 0;
+  const emptyLineOf = (side: 'for' | 'against'): string =>
+    none ? b.listEmptyNone : side === 'for' ? b.listEmptyFor : b.listEmptyAgainst;
+
+  /* One side's pan (05 §4.2): a shallow bowl with the side's tint, the
+   * caption inside its top, the brass rim along its bottom, the lane
+   * weights (or the evidence sentence when empty). It moves by
+   * translateY ONLY — the plumb rule (05 §7). */
+  const panOf = (side: 'for' | 'against', blocks: readonly BalanceDriver[]): React.JSX.Element => {
+    const drop = side === 'for' ? frame.forDrop : frame.againstDrop;
+    const centreX = frame.forIsLeft === (side === 'for') ? geo.cx - geo.L / 2 : geo.cx + geo.L / 2;
+    return (
+      <div
+        key={side}
+        data-balance-assembly={side}
+        data-balance-pan={side}
+        className={`pan ${side === 'for' ? 'pan-for' : 'pan-against'}`}
+        style={{
+          left: r2(centreX - geo.pw / 2),
+          top: r2(geo.restTop),
+          width: geo.pw,
+          height: geo.panH,
+          transform: `translate(0px, ${r2(drop)}px)`,
+        }}
+      >
+        <div className="pan-cap">
+          <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={14} className="shrink-0" />
+          <span>{side === 'for' ? b.panCapFor : b.panCapAgainst}</span>
+        </div>
+        {loading ? (
+          <div className="weights">
+            <BalanceWeightSkeleton />
+            <BalanceWeightSkeleton />
+          </div>
+        ) : blocks.length > 0 ? (
+          <div className="weights">
+            {blocks.map((d) => (
+              <BalanceWeight
+                key={d.key}
+                laneKey={d.key}
+                impacts={impactsOf(d)}
+                state={d.state}
+                label={d.label}
+                ariaLabel={laneAriaOf(d)}
+                splitBadge={d.split === true ? b.splitBadge : null}
+                ariaExpanded={openKey === d.key}
+                onOpen={() => setOpenKey(d.key)}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="pan-empty" data-balance-empty={side}>
+            {emptyLineOf(side)}
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  /* The hanger lines (redrawn every frame from the joint to the pan's
+   * two top corners at ±42% of its width — 05 §4.2). */
+  const hangersOf = (side: 'for' | 'against'): React.JSX.Element[] => {
+    const joint = side === 'for' ? (frame.forIsLeft ? frame.jointLeft : frame.jointRight) : frame.forIsLeft ? frame.jointRight : frame.jointLeft;
+    const drop = side === 'for' ? frame.forDrop : frame.againstDrop;
+    const centreX = frame.forIsLeft === (side === 'for') ? geo.cx - geo.L / 2 : geo.cx + geo.L / 2;
+    return (['start', 'end'] as const).map((name) => (
+      <line
+        key={`${side}-${name}`}
+        aria-hidden="true"
+        data-balance-hanger={`${side}-${name}`}
+        x1={r2(joint.x)}
+        y1={r2(joint.y)}
+        x2={r2(centreX + (name === 'start' ? -1 : 1) * geo.pw * 0.42)}
+        y2={r2(geo.restTop + drop)}
+        strokeWidth={1.25}
+        strokeLinecap="round"
+        className="stroke-[var(--bal-brass-lo)] opacity-75"
+      />
+    ));
+  };
+
+  /* The beam's tapered outline (05 §4.2: ~20px at the centre tapering
+   * to 6px at the ends; the reference's path, in the beam group's
+   * local coordinates). */
+  const half = geo.L / 2;
+  const beamPath = `M ${r2(-half)} ${r2(-3.2 * bh)} L -20 ${r2(-7.5 * bh)} Q 0 ${r2(-10 * bh)} 20 ${r2(-7.5 * bh)} L ${r2(half)} ${r2(-3.2 * bh)} L ${r2(half)} ${r2(3.2 * bh)} L 20 ${r2(7.5 * bh)} Q 0 ${r2(10 * bh)} -20 ${r2(7.5 * bh)} L ${r2(-half)} ${r2(3.2 * bh)} Z`;
+  const forEndX = frame.forIsLeft ? geo.cx - half : geo.cx + half;
+  const againstEndX = frame.forIsLeft ? geo.cx + half : geo.cx - half;
+  const colTop = geo.pivotY + 10;
+  const colBot = geo.H - 26;
+  const needleRad = radOf(frame.needleDeg);
+
+  return (
+    <div
+      ref={rootRef}
+      className="flex flex-col"
+      data-balance={metal}
+      data-balance-visual=""
+      data-balance-size={size}
+      data-balance-tilt-target={String(targetDeg)}
+      style={{
+        ['--w' as string]: `${geo.weightW}px`,
+        ['--d' as string]: `${geo.discD}px`,
+      } as React.CSSProperties}
+    >
+      {/* The gradients' ONE defs block (the reference's pattern):
+       * document-scoped url(#) references from every disc + the beam. */}
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: 'absolute' }}>
+        <defs>
+          <radialGradient id="gb-faceBrass" cx="35%" cy="28%" r="85%">
+            <stop offset="0%" stopColor="var(--bal-brass-hi)" />
+            <stop offset="55%" stopColor="var(--bal-brass-mid)" />
+            <stop offset="100%" stopColor="var(--bal-brass-lo)" />
+          </radialGradient>
+          <radialGradient id="gb-faceStone" cx="35%" cy="28%" r="85%">
+            <stop offset="0%" stopColor="var(--bal-stone-hi)" />
+            <stop offset="100%" stopColor="var(--bal-stone-lo)" />
+          </radialGradient>
+          <linearGradient id="gb-beamBrass" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--bal-brass-hi)" />
+            <stop offset="50%" stopColor="var(--bal-brass-mid)" />
+            <stop offset="100%" stopColor="var(--bal-brass-lo)" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* 4.1 the head: eyebrow → title → subtitle */}
+      <header className="gb-head" data-balance-heading>
+        <p className="gb-eyebrow" data-balance-eyebrow>
+          {b.eyebrow}
+        </p>
+        <h4 className="gb-title" data-balance-title>
+          {b.heading}
+        </h4>
+        <p className="gb-sub" data-balance-subtitle>
+          {subtitle ?? b.subtitle}
+        </p>
+      </header>
+
+      {/* 4.2 the stage: the drawing layer behind the pans. The stage
+       * height is RESERVED from the worst case (never data-sized). */}
+      <div
+        className="stage"
+        data-balance-stage
+        role="group"
+        aria-label={stageAria}
+        style={{ height: `${geo.H}px` }}
+      >
+        <svg
+          className="mech"
+          data-balance-mech
+          viewBox={`0 0 ${geo.stageWidth} ${geo.H}`}
+          role="img"
+          aria-label={gaugeAriaText}
+        >
+          {/* The base's soft contact shadow. */}
+          <ellipse
+            cx={geo.cx}
+            cy={colBot + 10}
+            rx={s ? 50 : 68}
+            ry={7}
+            fill="rgba(91,61,8,.18)"
+            className="dark:opacity-70"
+          />
+          {/* The tapered brass column + the rounded foot. */}
+          <path
+            d={`M ${r2(geo.cx - 5)} ${colTop} L ${r2(geo.cx + 5)} ${colTop} L ${r2(geo.cx + 9)} ${colBot} L ${r2(geo.cx - 9)} ${colBot} Z`}
+            fill="url(#gb-beamBrass)"
+            opacity={0.95}
+          />
+          <rect x={geo.cx - (s ? 44 : 58)} y={colBot} width={s ? 88 : 116} height={12} rx={6} fill="url(#gb-beamBrass)" />
+          {/* The dial: 11 ticks over ±35°, the centre tick longer. */}
+          {balanceVisualTicks(geo.cx, geo.pivotY, geo.dialR).map((t, i) => (
+            <line
+              key={i}
+              data-balance-dial-tick={t.center ? 'center' : 'tick'}
+              x1={r2(t.from.x)}
+              y1={r2(t.from.y)}
+              x2={r2(t.to.x)}
+              y2={r2(t.to.y)}
+              strokeWidth={t.center ? 1.6 : 1}
+              strokeLinecap="round"
+              opacity={t.center ? 0.9 : 0.55}
+              className="stroke-[var(--color-text-tertiary)]"
+            />
+          ))}
+          <path
+            d={`M ${r2(geo.cx + geo.dialR * Math.sin(radOf(-35)))} ${r2(geo.pivotY - geo.dialR * Math.cos(radOf(35)))} A ${geo.dialR} ${geo.dialR} 0 0 1 ${r2(geo.cx + geo.dialR * Math.sin(radOf(35)))} ${r2(geo.pivotY - geo.dialR * Math.cos(radOf(35)))}`}
+            fill="none"
+            strokeWidth={1}
+            className="stroke-[var(--color-border)]"
+          />
+          {/* The hangers (redrawn per frame). */}
+          {hangersOf('for')}
+          {hangersOf('against')}
+          {/* THE BEAM GROUP — the one rotated element (rotate about the
+           * pivot); the pans only translate. */}
+          <g data-balance-beam data-tilt={String(targetDeg)} transform={`rotate(${r2(frame.visDeg)} ${r2(geo.cx)} ${r2(geo.pivotY)})`}>
+            <g transform={`translate(${r2(geo.cx)} ${r2(geo.pivotY)})`}>
+              <path data-balance-beam-bar d={beamPath} fill="url(#gb-beamBrass)" stroke="var(--bal-brass-lo)" strokeWidth={0.6} />
+              <path
+                d={`M ${r2(-half + 6)} ${r2(-1.6 * bh)} L ${r2(half - 6)} ${r2(-1.6 * bh)}`}
+                stroke="rgba(255,255,255,.55)"
+                strokeWidth={1}
+                strokeLinecap="round"
+                fill="none"
+              />
+            </g>
+            {/* The beam-end rings: white with a 3px side stroke (05 §4.2). */}
+            <circle cx={r2(forEndX)} cy={geo.pivotY} r={7} fill="var(--color-surface)" strokeWidth={3} className="stroke-[var(--color-status-normal)]" data-balance-bead="for" />
+            <circle cx={r2(againstEndX)} cy={geo.pivotY} r={7} fill="var(--color-surface)" strokeWidth={3} className="stroke-[var(--color-status-alert)]" data-balance-bead="against" />
+          </g>
+          {/* The needle: the 3× magnified readout over the dial, hidden
+           * when nothing could be read (05 §8). */}
+          {!none && !loading ? (
+            <line
+              data-balance-needle
+              x1={r2(geo.cx)}
+              y1={r2(geo.pivotY)}
+              x2={r2(geo.cx + (geo.dialR - 3) * Math.sin(needleRad))}
+              y2={r2(geo.pivotY - (geo.dialR - 3) * Math.cos(needleRad))}
+              strokeWidth={2}
+              strokeLinecap="round"
+              className="stroke-[var(--color-text-primary)]"
+            />
+          ) : null}
+          {/* The hub: brass with a dark centre + the highlight dot. */}
+          <circle data-balance-pivot cx={r2(geo.cx)} cy={r2(geo.pivotY)} r={s ? 10 : 12} fill="url(#gb-faceBrass)" stroke="var(--bal-brass-lo)" strokeWidth={1} />
+          <circle cx={r2(geo.cx)} cy={r2(geo.pivotY)} r={s ? 3.6 : 4.4} className="fill-[var(--color-text-primary)]" />
+          <circle cx={r2(geo.cx - 1.2)} cy={r2(geo.pivotY - 1.4)} r={1.2} fill="rgba(255,255,255,.7)" />
+        </svg>
+        {panOf('for', loading ? [] : forBlocks)}
+        {panOf('against', loading ? [] : againstBlocks)}
+      </div>
+
+      {/* 4.4 the verdict block — the hero: the verdict word is the
+       * largest text in the balance (V-1). */}
+      <div className="verdict" data-balance-verdict={verdict} data-balance-verdict-sparse={sparse ? 'true' : undefined}>
+        {loading ? (
+          <>
+            <span className="sk" style={{ height: 10, width: 90, margin: '0 auto' }} />
+            <span className="sk" style={{ height: 34, width: 'min(260px,70%)', margin: '12px auto 0' }} />
+            <span className="sk" style={{ height: 6, width: 200, margin: '18px auto 0' }} />
+          </>
+        ) : (
+          <>
+            <div className="verdict-eyebrow" data-balance-verdict-eyebrow>
+              {b.verdictEyebrow}
+            </div>
+            <h4
+              className="verdict-word"
+              data-balance-verdict-word
+              data-side={verdict === 'for' ? 'for' : verdict === 'against' ? 'against' : undefined}
+            >
+              {verdictWord}
+            </h4>
+            {/* The lane strip: four bars, one per lane (decorative —
+             * the counts line carries the text). */}
+            <div className="lanes-bar" data-balance-lane-strip aria-hidden="true">
+              {drivers.map((d) => (
+                <i key={d.key} data-side={d.state} />
+              ))}
+            </div>
+            <p className="verdict-counts" data-balance-count>
+              {countParts.join(' · ')}
+            </p>
+            {!none && sparse ? <p className="verdict-note" data-balance-not-enough>{copy.signals.notEnoughReadable}</p> : null}
+            {contextLine}
+          </>
+        )}
+      </div>
+      {banner}
+
+      {/* 4.5 the tray: "Not leaning" — neutral and unread stones in a
+       * recessed well (the split badge on a contested neutral). */}
+      {!loading ? (
+        <div className="tray" data-balance-tray="not-leaning">
+          <div className="tray-head">
+            <span className="tray-title" data-balance-tray-title>
+              {b.trayTitleLanes}
+            </span>
+            <span className="tray-note">{b.trayNote}</span>
+          </div>
+          {trayStones.length > 0 ? (
+            <div className="weights">
+              {trayStones.map((d) => (
+                <BalanceWeight
+                  key={d.key}
+                  laneKey={d.key}
+                  impacts={impactsOf(d)}
+                  state={d.state}
+                  label={d.label}
+                  ariaLabel={laneAriaOf(d)}
+                  splitBadge={d.split === true ? b.splitBadge : null}
+                  ariaExpanded={openKey === d.key}
+                  onOpen={() => setOpenKey(d.key)}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="tray-empty" data-balance-tray-empty>
+              {b.trayEmpty}
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      {/* 4.6 the ledger: one row per lane, inline expansion, one open
+       * at a time (the detail-panel CONTENT contract rides here). */}
+      {!loading ? (
+        <ul className="ledger" data-balance-ledger>
+          {drivers.map((d) => {
+            const open = openKey === d.key;
+            return (
+              <li key={d.key} className="row" data-balance-row={d.key} data-open={open ? 'true' : 'false'}>
+                <button
+                  ref={open ? openRowBtnRef : undefined}
+                  type="button"
+                  className="row-btn insights-focusable"
+                  aria-expanded={open}
+                  aria-controls={`gold-balance-members-${d.key}`}
+                  onClick={() => setOpenKey((prev) => (prev === d.key ? null : d.key))}
+                  data-balance-row-btn={d.key}
+                >
+                  <BalanceWeightDisc
+                    laneKey={d.key}
+                    impacts={impactsOf(d)}
+                    state={d.state}
+                    splitBadge={d.split === true ? b.splitBadge : null}
+                  />
+                  <span>
+                    <span className="row-name">{d.label}</span>
+                    <span className="row-state" data-side={d.state}>
+                      {laneStateTextOf(d)}
+                    </span>
+                  </span>
+                  {d.tally !== undefined ? <span className="row-tally" data-balance-tally>{d.tally}</span> : <span aria-hidden="true" />}
+                  <svg className="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                <div className="members" id={`gold-balance-members-${d.key}`} hidden={!open} data-balance-row-members={d.key}>
+                  {open ? ledgerMembersOf(d) : null}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+
+      {/* 4.1 item 8: the footnote — the measured note + the backtest
+       * link (01 §8.2), visible without a tap. */}
+      {measuredNote}
+    </div>
+  );
+}
+
+
+function BalanceScaleMechanical({
+  drivers,
+  copy,
+  numberLocale,
+  banner,
+  subtitle,
+  contextLine,
+  measuredNote,
+}: Omit<BalanceScaleProps, 'visual'>): React.JSX.Element | null {
   // 2026-10-21c owner round: silver's balance (and with it the `metal`
   // prop + the balanceSilver copy variants) is RETIRED — the merged card
   // renders GOLD's balance only; the drawing, counts and honesty rules

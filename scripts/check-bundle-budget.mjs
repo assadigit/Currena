@@ -912,7 +912,21 @@ const BUDGETS = [
   // two gold panels still ride the chunk (they render in the DEFAULT view
   // until the owner-gated P5/GB-S6 flip retires them — THAT session
   // re-baselines downward). Measured 1533.15/354.25.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1540_000, gz: 355_500, label: 'Insights lazy chunk' },
+  // gold-balance GB-S4 P2b (2026-11-04, CHANGELOG §2026-11-04a): 1540→1565 /
+  // 355.5→360 — the VISUAL redesign of the balance joins the chunk behind
+  // the same preview flag: the lanes visual (the brass-beam stage, the
+  // pure visual geometry/frame/ticks helpers) + the BalanceWeight
+  // component (the segmented rim + the engraved lane glyphs) + the
+  // verdict hero block, the "Not leaning" tray and the four-row ledger
+  // (the detail-panel member content rides inline now) + 19 more copy
+  // keys × 2 locales. The component CSS (balance-visual.css, ~7.5 kB)
+  // code-splits into the lazy Insights-*.css chunk and does NOT count
+  // toward this JS budget — the lazy route loads it with the JS. The
+  // legacy drawing + the two gold panels still ride the chunk until the
+  // owner-gated P5/GB-S6 flip retires them — THAT session re-baselines
+  // downward (the legacy path + the panels leave the chunk). Measured
+  // 1553.13/359.32.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1565_000, gz: 360_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

@@ -1,0 +1,666 @@
+/**
+ * signals/balance-visual.css — the gold balance's P2b VISUAL redesign
+ * (GB-S4, 2026-11-04 — docs/specs/gold-balance-consolidation/
+ * 05-VISUAL-DESIGN-SPEC.md §5 + the owner's approved reference prototype,
+ * reference/balance-reference.html).
+ *
+ * This file owns the balance's OWN tokens (05 §5): the --bal-* family is
+ * defined ONCE here (the spec's alternative to a Tailwind token block),
+ * light on :root and its harmonized dark siblings on .dark — scoped by
+ * USE to the [data-balance-visual] block, which only renders behind the
+ * ?balance=lanes preview flag (the default view never mounts it and its
+ * byte-for-byte markup is pinned by the legacy snapshot test).
+ *
+ * No dependency, no image asset: inline SVG + CSS only (05 §11). The
+ * class names mirror the reference prototype's (.gb-*, .stage, .pan,
+ * .disc, .verdict, .tray, .ledger …) but every rule is scoped under
+ * [data-balance-visual] so nothing can leak into the rest of the app.
+ */
+
+/* ------------------------------------------------------------------ *
+ * 05 §5 tokens — the assay-office family: brass, stone, recess.
+ * Side colours stay the SITE's status tokens (05 §5); the readable
+ * TEXT inks for the verdict word / pan captions / row states are the
+ * site's chip-ink siblings (both themes hold ≥ 4.5:1 — V-7 evidence).
+ * ------------------------------------------------------------------ */
+:root {
+  --bal-brass-hi: #fbe3a0;
+  --bal-brass-mid: #eab544;
+  --bal-brass-lo: #b27a1d;
+  --bal-brass-ink: #5b3d08;
+  --bal-brass-text: #8a5a0a;
+  --bal-stone-hi: #eef2f6;
+  --bal-stone-lo: #c7d0da;
+  --bal-recess: #f3f5f8;
+  --bal-glow: rgba(243, 177, 63, 0.16);
+  /* The site's own readable side inks (light): the pinned status hues
+   * stay on segments/meters; words take the darker chip-ink siblings. */
+  --bal-for-ink: var(--color-chip-ink-normal);
+  --bal-against-ink: var(--color-chip-ink-attention);
+}
+
+.dark {
+  --bal-brass-hi: #f3d488;
+  --bal-brass-mid: #d9a43e;
+  --bal-brass-lo: #8f5f14;
+  --bal-brass-ink: #2a1c04;
+  --bal-brass-text: #e8bd63;
+  --bal-stone-hi: #46546a;
+  --bal-stone-lo: #2b3646;
+  --bal-recess: #141b25;
+  --bal-glow: rgba(243, 177, 63, 0.1);
+  /* 05 §5 anticipated this: the site's dark status inks hold 4.8:1 on the
+   * CARD but slip below AA on the PAN TINT (measured 4.28:1/4.35:1 on
+   * the 9% side tint over #1A222E) — the dark captions take the
+   * reference prototype's own brighter dark side words instead
+   * (measured: for 6.36:1 · against 5.07:1 on the tint, 7.1:1/5.56:1 on
+   * the card — V-7 evidence). Light mode keeps the site's chip-ink
+   * siblings (7.01:1/5.62:1 on the tint). */
+  --bal-for-ink: #4bc27d;
+  --bal-against-ink: #f07078;
+}
+
+[data-balance-visual] {
+  position: relative;
+  isolation: isolate;
+  font-variant-numeric: tabular-nums;
+  /* 05 §4.1: a very light warm radial glow at the card's top — one
+   * surface, no nested card. */
+  background: radial-gradient(120% 60% at 50% -10%, var(--bal-glow), transparent 60%);
+  border-radius: 24px;
+  padding-block-end: 4px;
+}
+@media (min-width: 720px) {
+  [data-balance-visual] {
+    border-radius: 28px;
+  }
+}
+
+/* ---- 4.1 the head: eyebrow → title → subtitle ---- */
+[data-balance-visual] .gb-head {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+[data-balance-visual] .gb-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bal-brass-text);
+  margin: 0 0 8px;
+}
+[dir='rtl'] [data-balance-visual] .gb-eyebrow,
+[dir='rtl'] [data-balance-visual] .verdict-eyebrow {
+  letter-spacing: 0;
+  text-transform: none;
+}
+[data-balance-visual] .gb-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  color: var(--color-text-primary);
+}
+[data-balance-visual] .gb-sub {
+  margin: 10px auto 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+  max-width: 52ch;
+}
+
+/* ---- 4.2 the stage: the SVG drawing layer sits behind the pans
+   (absolute DOM). Height is computed by the component from the worst
+   case (pivot + hanger + the tallest pan + swing + base) — it never
+   depends on the data. ---- */
+[data-balance-visual] .stage {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto 0;
+}
+[data-balance-visual][data-balance-size='s'] .stage {
+  margin-top: 10px;
+}
+[data-balance-visual] .stage svg.mech {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  display: block;
+}
+
+/* The pans: shallow bowls — side tint, hairline ring, a brass rim
+   along the bottom (::after). They only ever translate (plumb). */
+[data-balance-visual] .pan {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 6px 24px;
+  border-radius: 14px 14px 34px 34px / 14px 14px 26px 26px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tint) 9%, transparent),
+    color-mix(in srgb, var(--tint) 3%, transparent)
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 20%, transparent);
+  will-change: transform;
+}
+[data-balance-visual] .pan::after {
+  content: '';
+  position: absolute;
+  inset-inline: 5%;
+  bottom: 0;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--bal-brass-hi), var(--bal-brass-mid) 45%, var(--bal-brass-lo));
+  box-shadow: 0 5px 8px -3px rgba(91, 61, 8, 0.4);
+}
+.dark [data-balance-visual] .pan::after {
+  box-shadow: none;
+}
+[data-balance-visual] .pan-for {
+  --tint: var(--color-status-normal);
+}
+[data-balance-visual] .pan-against {
+  --tint: var(--color-status-alert);
+}
+[data-balance-visual] .pan-cap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  min-height: 30px;
+  text-align: center;
+  text-wrap: balance;
+}
+[data-balance-visual][data-balance-size='s'] .pan-cap {
+  font-size: 11px;
+  gap: 4px;
+}
+[data-balance-visual] .pan-cap svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+[data-balance-visual] .pan-for .pan-cap {
+  color: var(--bal-for-ink);
+}
+[data-balance-visual] .pan-against .pan-cap {
+  color: var(--bal-against-ink);
+}
+[data-balance-visual] .pan-empty {
+  margin: auto;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  text-wrap: balance;
+}
+[data-balance-visual][data-balance-size='s'] .pan-empty {
+  font-size: 11px;
+}
+[data-balance-visual] .weights {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 6px;
+  width: 100%;
+}
+
+/* ---- 4.3 the lane weights ---- */
+[data-balance-visual] .weight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: var(--w, 78px);
+  min-height: 44px; /* the touch-target floor (05 §10) */
+  padding: 2px 0 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  font: inherit;
+  color: inherit;
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+[data-balance-visual] .weight:hover {
+  transform: translateY(-1px);
+}
+[data-balance-visual] .weight:active {
+  transform: scale(0.97);
+}
+[data-balance-visual] .weight:focus-visible,
+[data-balance-visual] .row-btn:focus-visible {
+  outline: 2px solid var(--bal-brass-mid);
+  outline-offset: 3px;
+}
+[data-balance-visual] .weight-label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-text-primary);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+[data-balance-visual][data-balance-size='s'] .weight-label {
+  font-size: 11px;
+}
+[data-balance-visual] .disc {
+  position: relative;
+  width: var(--d, 58px);
+  height: var(--d, 58px);
+  flex: none;
+}
+[data-balance-visual] .disc svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+[data-balance-visual] .disc .face {
+  filter: drop-shadow(0 4px 5px rgba(91, 61, 8, 0.3));
+}
+.dark [data-balance-visual] .disc .face {
+  filter: none; /* dark mode drops depth shadows for rings (05 §3) */
+}
+[data-balance-visual] .badge-split {
+  position: absolute;
+  inset-block-start: -7px;
+  inset-inline-end: -12px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 0 0 1px var(--color-border), 0 2px 4px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+}
+.dark [data-balance-visual] .badge-split {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* The rim's segments are decorative (the counts live in words), but they
+   must stay LEGIBLE on the dark card — the site's pinned Green 50 reads
+   faint against #1A222E at a 3-4px stroke, so the dark theme takes the
+   reference prototype's own brighter dark side hues (its --side-for /
+   --side-against), matching the caption ink family (the VLM pass's one
+   recommendation, applied within the approved look target). */
+.dark [data-balance-visual] [data-balance-seg='supports'] {
+  stroke: #4bc27d;
+}
+.dark [data-balance-visual] [data-balance-seg='pressures'] {
+  stroke: #f07078;
+}
+
+/* ---- 4.4 the verdict block: the focal point ---- */
+[data-balance-visual] .verdict {
+  margin: 22px auto 0;
+  text-align: center;
+}
+[data-balance-visual][data-balance-size='s'] .verdict {
+  margin-top: 14px;
+}
+[data-balance-visual] .verdict-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+[data-balance-visual] .verdict-word {
+  margin: 4px 0 0;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: var(--color-text-primary); /* balanced + can't-read: primary ink */
+}
+@media (min-width: 560px) {
+  [data-balance-visual] .verdict-word {
+    font-size: 38px;
+  }
+}
+@media (min-width: 760px) {
+  [data-balance-visual] .verdict-word {
+    font-size: 44px;
+  }
+}
+[data-balance-visual] .verdict-word[data-side='for'] {
+  color: var(--bal-for-ink);
+}
+[data-balance-visual] .verdict-word[data-side='against'] {
+  color: var(--bal-against-ink);
+}
+[data-balance-visual] .lanes-bar {
+  display: inline-grid;
+  grid-auto-flow: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+[data-balance-visual] .lanes-bar i {
+  width: 44px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border);
+}
+[data-balance-visual][data-balance-size='s'] .lanes-bar i {
+  width: 30px;
+}
+[data-balance-visual] .lanes-bar i[data-side='for'] {
+  background: var(--color-status-normal);
+}
+[data-balance-visual] .lanes-bar i[data-side='against'] {
+  background: var(--color-status-alert);
+}
+[data-balance-visual] .lanes-bar i[data-side='neutral'] {
+  background: var(--bal-stone-lo);
+}
+.dark [data-balance-visual] .lanes-bar i[data-side='neutral'] {
+  background: #5a6a82;
+}
+[data-balance-visual] .verdict-counts {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+[data-balance-visual] .verdict-note {
+  margin: 6px auto 0;
+  max-width: 46ch;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+  text-wrap: balance;
+}
+/* The context pill (01 §6): recessed, never green or red. */
+[data-balance-visual] [data-balance-context-line] {
+  display: inline-block;
+  max-width: 100%;
+  margin: 14px auto 0;
+  padding: 7px 14px;
+  border-radius: 18px;
+  background: var(--bal-recess);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  text-wrap: balance;
+}
+
+/* The C12 banner keeps its warning role under the visual (03 §1). */
+[data-balance-visual] [data-gold-yields-warning] {
+  margin: 14px auto 0;
+  max-width: 760px;
+}
+
+/* ---- 4.5 the tray: "Not leaning" — a recessed well ---- */
+[data-balance-visual] .tray {
+  margin: 28px auto 0;
+  max-width: 760px;
+  padding: 14px 18px 18px;
+  border-radius: 20px;
+  background: var(--bal-recess);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 0 0 1px var(--color-border);
+}
+[data-balance-visual][data-balance-size='s'] .tray {
+  margin-top: 20px;
+  padding: 12px 10px 14px;
+  border-radius: 18px;
+}
+[data-balance-visual] .tray-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+[data-balance-visual] .tray-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+[data-balance-visual] .tray-note {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+[data-balance-visual] .tray .weights {
+  gap: 12px 18px;
+}
+[data-balance-visual][data-balance-size='s'] .tray .weights {
+  gap: 12px 8px;
+}
+[data-balance-visual] .tray .weight {
+  --w: 92px;
+  --d: 46px;
+}
+[data-balance-visual][data-balance-size='s'] .tray .weight {
+  --w: 72px;
+  --d: 42px;
+}
+[data-balance-visual] .tray-empty {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin: 4px 0;
+}
+
+/* ---- 4.6 the ledger: four expandable rows ---- */
+[data-balance-visual] .ledger {
+  list-style: none;
+  margin: 28px auto 0;
+  padding: 0;
+  max-width: 760px;
+  display: grid;
+  gap: 2px;
+}
+[data-balance-visual][data-balance-size='s'] .ledger {
+  margin-top: 20px;
+}
+[data-balance-visual] .row {
+  border-radius: 18px;
+}
+[data-balance-visual] .row[data-open='true'] {
+  background: var(--bal-recess);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+[data-balance-visual] .row-btn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: start;
+  border-radius: 18px;
+  min-height: 64px;
+  font: inherit;
+  color: inherit;
+}
+[data-balance-visual] .row-btn:hover {
+  background: color-mix(in srgb, var(--bal-recess) 70%, transparent);
+}
+[data-balance-visual] .row .disc {
+  --d: 40px;
+}
+[data-balance-visual] .row-name {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  display: block;
+  color: var(--color-text-primary);
+}
+[data-balance-visual] .row-state {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  display: block;
+}
+[data-balance-visual] .row-state[data-side='for'] {
+  color: var(--bal-for-ink);
+}
+[data-balance-visual] .row-state[data-side='against'] {
+  color: var(--bal-against-ink);
+}
+[data-balance-visual] .row-tally {
+  font-size: 12.5px;
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+[data-balance-visual][data-balance-size='s'] .row-btn {
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  padding: 10px;
+}
+[data-balance-visual][data-balance-size='s'] .row-tally {
+  grid-column: 2;
+  grid-row: 2;
+  white-space: normal;
+  margin-top: -6px;
+}
+[data-balance-visual][data-balance-size='s'] .row-btn .chev {
+  grid-column: 3;
+  grid-row: 1;
+}
+[data-balance-visual] .chev {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-tertiary);
+  transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+[data-balance-visual] .row[data-open='true'] .chev {
+  transform: rotate(180deg);
+}
+
+/* The open row's intro sentence (03 §3 item 1) and the inflation lane's
+   tilt phrase (03 §3 item 5) — carried above the member rows. */
+[data-balance-visual] .lane-intro,
+[data-balance-visual] .lane-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
+}
+[data-balance-visual] .lane-note {
+  color: var(--color-text-tertiary);
+}
+
+/* The open row's member list — the detail-panel CONTENT contract
+   (AC-2: every voter reachable), rendered inline (05 §4.6). */
+[data-balance-visual] .members {
+  padding: 2px 18px 16px;
+  display: grid;
+  gap: 7px;
+}
+[data-balance-visual][data-balance-size='s'] .members {
+  padding: 2px 12px 14px;
+}
+[data-balance-visual] .members p,
+[data-balance-visual] .members span,
+[data-balance-visual] .members div,
+[data-balance-visual] .members summary,
+[data-balance-visual] .members li {
+  text-align: start;
+}
+[data-balance-visual] .m {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 10px;
+  align-items: baseline;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+[data-balance-visual][data-balance-size='s'] .m {
+  grid-template-columns: 10px 1fr;
+}
+[data-balance-visual][data-balance-size='s'] .m .m-ev {
+  grid-column: 2;
+  margin-top: -4px;
+}
+[data-balance-visual] .m i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+[data-balance-visual] .m[data-impact='supports'] i {
+  background: var(--color-status-normal);
+}
+[data-balance-visual] .m[data-impact='pressures'] i {
+  background: var(--color-status-alert);
+}
+[data-balance-visual] .m[data-impact='unread'] i {
+  box-shadow: inset 0 0 0 1.5px var(--color-text-tertiary);
+}
+[data-balance-visual] .m-ev {
+  color: var(--color-text-tertiary);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+[data-balance-visual] .members summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+[data-balance-visual] .steady-sentence,
+[data-balance-visual] .members .steady {
+  font-size: 12.5px;
+  color: var(--color-text-tertiary);
+  text-wrap: pretty;
+}
+[data-balance-visual] .members a {
+  color: var(--color-status-context);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* The footnote (05 §4.1 item 8): not a forecast + the backtest link —
+   the measured-note slot (01 §8.2), restyled for the visual. */
+[data-balance-visual] [data-balance-measured-note] {
+  max-width: 640px;
+  margin: 28px auto 0;
+  text-align: center;
+  line-height: 1.6;
+  color: var(--color-text-tertiary);
+}
+[data-balance-visual] [data-balance-measured-note] a {
+  color: var(--color-text-secondary);
+  text-decoration-color: var(--bal-brass-mid);
+  text-underline-offset: 3px;
+}
+
+/* ---- 05 §8 loading: skeleton, static, no motion ---- */
+[data-balance-visual] .sk {
+  background: var(--color-border);
+  border-radius: 999px;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-balance-visual] .chev,
+  [data-balance-visual] .weight {
+    transition: none;
+  }
+}

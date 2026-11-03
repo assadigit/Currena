@@ -364,7 +364,15 @@ export function MergedSignalsCard({
   return (
     <article
       data-signal-card="merged"
-      className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]"
+      className={`flex flex-col gap-3 ring-1 ring-[var(--color-border)] ${
+        balanceLanes
+          ? // GB-S4 (05 §4.1): under the flag the gold card breathes — the
+            // one outer container gets the spec's radius + clamp padding.
+            // The mobile floor stays thin so the instrument itself holds
+            // V-2's >= 92% fill of the card width.
+            'rounded-[24px] bg-[var(--color-surface)] p-[clamp(10px,3vw,28px)] min-[720px]:rounded-[28px] min-[720px]:p-[clamp(18px,4vw,44px)]'
+          : 'rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4'
+      }`}
     >
       <header className="flex flex-wrap items-center gap-2">
         <h3 className="type-question m-0 text-[var(--color-text-primary)]">
@@ -414,6 +422,22 @@ export function MergedSignalsCard({
        * context line and the measured note join the block. The legacy
        * path passes none of the new props and renders byte-for-byte as
        * before. */}
+      {/* UI-45 (2026-10-19 v3 merge; 2026-10-21c owner round): GOLD's
+       * balance — the owner's v7 BalanceScale machinery (heading + side
+       * captions over the pan columns → the balance with factor tiles
+       * resting on real pans hung from the beam → the aggregate
+       * assessment box with the verdict word + count line + the v3
+       * readable-count line). Silver's own balance is RETIRED (the
+       * owner's directive): silver keeps its analysis card above and its
+       * footing row below. Gold's assessment also carries the C12
+       * banner.
+       *
+       * GB-S3 (?balance=lanes): the LANE drivers replace the condition
+       * chips. GB-S4: the flag view mounts the P2b VISUAL (05) —
+       * BalanceScale visual="lanes" renders the brass-beam stage, the
+       * lane weights with segmented rims, the verdict hero block, the
+       * "Not leaning" tray and the four-row ledger; the DEFAULT view
+       * keeps the legacy path byte-for-byte (the snapshot pin). */}
       <BalanceScale
         drivers={laneDrivers ?? balanceDrivers}
         copy={copy}
@@ -422,6 +446,7 @@ export function MergedSignalsCard({
         subtitle={laneDrivers !== null ? s.balance.subtitleLanes : undefined}
         contextLine={contextLine}
         measuredNote={measuredNote}
+        visual={balanceLanes ? 'lanes' : undefined}
       />
       {/* 2026-10-21c owner round: <BalanceScale metal="silver" …> is RETIRED
        * here (the owner: "I dont need balance scale of Silver, remove that

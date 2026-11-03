@@ -2487,6 +2487,32 @@ export const insightsCopyFa: InsightsCopy = {
         stress: 'تنش در بازارهای مالی، از بازار پول تا نوسان‌ها.',
         inflation: 'تورم و انتظارات تورمی در آمریکا و اروپا.',
       },
+      // برنامهٔ ادغام ترازوی طلا، P2b (GB-S4، ۲۰۲۶-۱۱-۰۴ — بازطراحی
+      // بصری، سند ۱۱ِ ۰۵-VISUAL-DESIGN-SPEC + نمونهٔ مرجع تأییدشدهٔ مالک؛ فقط
+      // پشت ?balance=lanes): واژگان خودِ نمای بصری — سرتیتر بالای عنوان،
+      // بلوک حکم، سرتیتر کفه‌ها، سینی «بدون گرایش»، واژه‌های وضعیت لاین‌ها
+      // در دفتر و جملهٔ غیرفعال‌ها. دور بازبینی فارسی: round-77
+      // (docs/localization/persian-copy-round-77-gold-balance-visual.md).
+      eyebrow: 'طلا، شرایط امروز',
+      verdictEyebrow: 'گرایش امروز',
+      panCapFor: 'به نفع قیمت طلا',
+      panCapAgainst: 'علیه قیمت طلا',
+      laneCountFor: '{n} موافق',
+      laneCountAgainst: '{n} مخالف',
+      laneCountNeutral: '{n} بدون گرایش',
+      laneCountUnread: '{n} ناخوانده',
+      trayTitleLanes: 'بدون گرایش',
+      trayNote: 'سنجیده شد، اما گرایش روشنی نیست',
+      trayEmpty: 'همهٔ عوامل روی کفه‌ها هستند.',
+      laneStateFor: 'به نفع طلاست',
+      laneStateAgainst: 'علیه طلاست',
+      laneStateNeutral: 'بدون گرایش',
+      laneStateUnread: 'قابل ارزیابی نبود',
+      laneStateSplit: 'دوپاره: {supports} موافق، {pressures} مخالف',
+      memberWordSupports: 'به نفع',
+      memberWordPressures: 'علیه',
+      memberWordUnread: 'ناخوانده',
+      laneSteadySentence: 'غیرفعال ({n}): {names}',
     },
     // دوراند ۲۰۲۶-۱۰-۲۱c (مالک): واژه‌های ترازوی نقره با خودِ آن بازنشسته
     // شدند — کارت ادغامی فقط ترازوی طلا را می‌کشد؛ نقره کارت تحلیل و

@@ -1,0 +1,2 @@
+light: verdict 10.98:1 · caption-for-on-tint 7.01:1 · caption-against-on-tint 5.62:1 · tally 7.03:1 · counts 7.98:1 · tray-title 7.98:1 (card rgb(255, 255, 255))
+dark: verdict 13.60:1 · caption-for-on-tint 6.36:1 · caption-against-on-tint 5.07:1 · tally 7.10:1 · counts 7.70:1 · tray-title 7.70:1 (card rgb(26, 34, 46))

@@ -8847,6 +8847,42 @@ export const insightsCopyEn = {
         stress: 'Stress in financial markets, from money markets to volatility.',
         inflation: 'Inflation and inflation expectations in the US and Europe.',
       },
+      // Gold balance consolidation P2b (GB-S4, 2026-11-04 — the visual
+      // redesign, 05-VISUAL-DESIGN-SPEC §11 + the owner's approved
+      // reference prototype; rendered ONLY behind ?balance=lanes): the
+      // visual's own strings — the eyebrow, the verdict hero block, the
+      // pan captions, the "Not leaning" tray, the ledger's lane-state
+      // words and the steady sentence. FA triaged same-session through
+      // round-77 (docs/localization/persian-copy-round-77-gold-balance-visual.md).
+      // 05 §4.1: the eyebrow above the title (no letter-spacing in FA).
+      eyebrow: 'Gold, today’s conditions',
+      // 05 §4.4: the verdict block's eyebrow.
+      verdictEyebrow: 'Today’s lean',
+      // 05 §4.2: the pan captions (icon + side label inside the pan).
+      panCapFor: 'Supporting gold',
+      panCapAgainst: 'Pressuring gold',
+      // 05 §4.4: the counts line — for/against/not leaning always,
+      // unread only when any lane could not be read.
+      laneCountFor: '{n} for',
+      laneCountAgainst: '{n} against',
+      laneCountNeutral: '{n} not leaning',
+      laneCountUnread: '{n} unread',
+      // 05 §4.5: the tray's title + one-line note + the empty state.
+      trayTitleLanes: 'Not leaning',
+      trayNote: 'Weighed, but no clear lean',
+      trayEmpty: 'Every driver is on a pan.',
+      // 05 §4.6: the ledger row's state text — always words, so colour
+      // never carries the state alone. A split lane names its contest.
+      laneStateFor: 'Leans for gold',
+      laneStateAgainst: 'Leans against gold',
+      laneStateNeutral: 'Not leaning',
+      laneStateUnread: 'Couldn’t be read',
+      laneStateSplit: 'Split: {supports} for, {pressures} against',
+      // The ledger's per-member impact word + the steady sentence.
+      memberWordSupports: 'Supports',
+      memberWordPressures: 'Pressures',
+      memberWordUnread: 'Unread',
+      laneSteadySentence: 'Not firing ({n}): {names}',
     },
     // 2026-10-21c owner round: the balanceSilver copy variants are RETIRED
     // with silver's balance (the merged card renders gold's balance only).

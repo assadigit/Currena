@@ -77,6 +77,18 @@ export default defineConfig({
       testMatch: /gb-s3-screenshots\.plw\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // gold-balance GB-S4 (docs/specs/gold-balance-consolidation/): the
+      // P2b VISUAL redesign's acceptance + evidence suite (05 §12's
+      // V-1..V-10) — six scenarios × EN/fa × 360/1280 × light/dark
+      // screenshots plus the squint/fill/overflow/rim/contrast/keyboard/
+      // reduced-motion checks, on the same 2026-10-31 corpus overlay
+      // (page.route per scenario). The evidence lands in
+      // docs/specs/gold-balance-consolidation/evidence/gb-s4/.
+      name: 'gb-s4',
+      testMatch: /gb-s4-visual\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
   webServer: [
     {
