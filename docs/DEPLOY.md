@@ -132,6 +132,44 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-03j the gold-balance P2b visual deploy (worker d0eab36c at 100% — the REDESIGNED balance behind ?balance=lanes; the DEFAULT view still byte-stable)
+
+GB-S4 (PR #17, merge `bc566e9d`): the visual redesign joins the lane
+view behind the same flag — the brass stage, the lane weights with
+segmented rims (the NEW BalanceWeight.tsx), the verdict hero block,
+the tray and the inline ledger, plus the `--bal-*` tokens/CSS and 14
+more copy keys × 2 locales (round-77). The Insights lazy chunk moves
+1533.15/354.25 → 1550.46/358.81; the ceiling re-based to 1560/360 with
+the justification in scripts/check-bundle-budget.mjs (SVG + CSS only —
+no new dependency, no image asset). The deploy-lock check ran first
+(the D-43 lesson): the active version was the expected `1bfc88c5`
+@ 100% — no parallel deploy. Gates ALL 9 GREEN 14,598 on the branch
+head (CI `gates` check green) before the merge; main CI green on
+`bc566e9d` before the deploy. `pnpm --filter @currena/web build` +
+`wrangler deploy` → **currena-api `d0eab36c` @ 100%** (deployment
+`0fc7870c`, 2026-11-03T21:13:17Z). currena-markets untouched
+(code-unchanged — the repo convention).
+
+Smoke: `/api/health` 200 · `/` 200 · `/api/insights` 200.
+
+Browser-verified on production (fresh contexts, zero console/page
+errors, no horizontal overflow at 360 + 1280, both views): the FLAG
+view (`currena.ir/insights?balance=lanes`) EN + fa — today's live data
+reads **Balanced / «متعادل» · "0 for · 0 against · 4 not leaning" /
+«۰ موافق · ۰ مخالف · ۴ بدون گرایش»** with the borrowing-costs split
+lane in the tray wearing the Split badge: the brass instrument (beam,
+11-tick dial, column, base, hangers, the tinted bowl pans with the
+captions inside), the hero verdict word with the lane strip + counts +
+the context pill, the Not-leaning tray, the four-row ledger (the
+weight press opens + scrolls + focuses the row; the member lists carry
+the evidence, the values, the deep links, the B-12 word and the tilt
+phrase), the measured-note footnote → BACKTEST-GOLD-LANES.md; a VLM
+pass confirmed the look in both themes and the RTL mirror. The DEFAULT
+view EN + fa keeps the two gold panels, the legacy chips and the
+legacy subtitle — no visual-redesign element anywhere (the
+legacy-markup snapshot pin). The owner previews the redesign at the
+flag URL (V-11: the owner's live read before the P5/GB-S6 flip).
+
 ## Session record — 2026-11-03i the gold-balance P2 preview deploy (worker 1bfc88c5 at 100% — the consolidated lane balance behind ?balance=lanes; the DEFAULT view byte-stable)
 
 GB-S3 (PR #16, merge `0bba57a`): the first gold-balance deploy that

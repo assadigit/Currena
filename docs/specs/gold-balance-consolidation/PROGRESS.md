@@ -399,6 +399,24 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
   P5/GB-S6 flip re-baselines downward).
 - **DQ-1..4 defaults held** (brass; the segmented rim; the ledger
   closed by default; the prototype's lane icons) — recorded in the PR.
+- **Merge + deploy:** PR #17 merged as `bc566e9d` (CI green on the
+  branch and on main before the deploy); the deploy-lock check passed
+  (the active version was the expected `1bfc88c5` @ 100%) and
+  `wrangler deploy` shipped **currena-api `d0eab36c` @ 100%**
+  (deployment `0fc7870c`, 2026-11-03T21:13:17Z; the full record in
+  docs/DEPLOY.md's [2026-11-03j] session note). Browser-verified on
+  production, FRESH contexts, zero console errors, no overflow at
+  360 + 1280, both views: the redesigned flag view EN + fa (today's
+  live data reads **Balanced / «متعادل» · "0 for · 0 against · 4 not
+  leaning"** with the borrowing-costs split lane in the tray wearing
+  the Split badge — the hero word, the lane strip, the counts, the
+  tray, the ledger, the weight-press → row-open interaction with focus
+  landing on the row button; the VLM pass confirmed the brass
+  instrument, the hero and the RTL mirror in both themes) and the
+  default view EN + fa (the two panels, the legacy chips, the legacy
+  subtitle — no visual-redesign element anywhere). The owner previews
+  the redesign at currena.ir/insights?balance=lanes (V-11: the owner's
+  live read before the P5/GB-S6 flip).
 
 ## Owner must decide
 

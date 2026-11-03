@@ -57,9 +57,14 @@ fa copy-audit flow (next: round-78), the parallel-session protocol
 
 ## D. Git + deployment state
 
-- Branch `gold-balance/p2b-visual` (this session); main was at
-  `f6f1fdd` at the session's start. Production before this session's
-  deploy: currena-api `1bfc88c5` @ 100% (the GB-S3 deploy).
+- **PR #17 merged as `bc566e9d`** (code + records; CI green on the
+  branch and on main). **Deployed: currena-api `d0eab36c` @ 100%**
+  (deployment `0fc7870c`, 2026-11-03T21:13:17Z — the deploy-lock check
+  passed first; the record in docs/DEPLOY.md's [2026-11-03j] note).
+  Browser-verified on production: the flag view AND the default view,
+  EN + fa, 360 + 1280, fresh contexts, zero console errors; today's
+  live data reads Balanced · "0 for · 0 against · 4 not leaning" with
+  the split lane in the tray.
 - The next session is **GB-S5 (P3 + P4 — the Outlook derivation +
   the copy close)**: the rewritten prompt is in PROMPTS.md (the exact
   component state, the fa round, the bundle numbers, the harness
