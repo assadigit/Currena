@@ -93,6 +93,7 @@ import {
 } from './insights-sections/world-feeds';
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
 import { NarrativeBlock } from '../components/insights/NarrativeBlock';
+import { useBalanceLanesPreview } from '../components/insights/signals/MergedCard';
 import { InTheNews } from '../components/insights/InTheNews';
 
 /**
@@ -229,6 +230,13 @@ export function Insights() {
   const narrativeDoc = useNarrative();
   const narrativePreview = useNarrativePreview();
   const narrativeVisible = narrativeDoc !== null && (narrativeDoc.visible || narrativePreview);
+  /* Gold balance consolidation P2 (GB-S3, 04 §3): the ?balance=lanes
+   * preview flag — read ONCE at mount, never persisted (the
+   * ?narrative=preview pattern). Without it every visitor sees today's
+   * page byte-for-byte; with it the gold card renders the consolidated
+   * lane balance. The owner previews via currena.ir/insights?balance=lanes
+   * until the P5/GB-S6 flip. */
+  const balanceLanesPreview = useBalanceLanesPreview();
 
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
@@ -650,6 +658,7 @@ export function Insights() {
                 copy={copy}
                 numberLocale={numberLocale}
                 expandToken={signalsToken}
+                balanceLanes={balanceLanesPreview}
               />
             </section>
           ) : null}

@@ -902,7 +902,17 @@ const BUDGETS = [
   // lane's question/short/answer headers + the three glossary terms) + the
   // registry's 158→161 ids (the indicator-audit chunk rides the same lazy
   // boundary). Measured 1522.90/352.00.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1530_000, gz: 354_000, label: 'Insights lazy chunk' },
+  // gold-balance GB-S3 P2 (2026-11-03, CHANGELOG §2026-11-03i): 1530→1540 /
+  // 354→355.5 — the consolidated gold balance joins the chunk behind the
+  // ?balance=lanes preview flag: the P1 lane engine (goldBalance, exported
+  // from @currena/insights — its frozen imports were already in the chunk,
+  // so only the engine's own code rides along) + the lane-view UI
+  // (BalanceScale's member list/chips/slots + MergedCard's lane drivers,
+  // context line and measured note) + 17 new copy keys × 2 locales. The
+  // two gold panels still ride the chunk (they render in the DEFAULT view
+  // until the owner-gated P5/GB-S6 flip retires them — THAT session
+  // re-baselines downward). Measured 1533.15/354.25.
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1540_000, gz: 355_500, label: 'Insights lazy chunk' },
 ];
 
 function main() {
