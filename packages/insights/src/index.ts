@@ -25,6 +25,10 @@
  *                      voters for gold (GOLD_SCORE_SPEC.md): the tailwind
  *                      score, the four lanes, model-vs-reality, the compact
  *                      snapshot writer + the EN copy blocks.
+ *   - gold-balance.ts — the consolidated balance engine (specs/gold-
+ *                      balance-consolidation/ 02 §2–§3): 21 frozen voters
+ *                      → 4 lane votes → one balance; additive, the frozen
+ *                      engine untouched (D-GB-9).
  */
 
 export {
@@ -153,6 +157,26 @@ export type {
   ModelVsRealityChip,
   ModelVsRealityReading,
 } from './gold-score';
+
+// The gold balance consolidation (docs/specs/gold-balance-consolidation/):
+// the P1 pure engine — 21 frozen voters → 4 lane votes → one balance
+// (02-ENGINE-AND-DECISION-TABLE.md §2–§3). Additive beside the frozen
+// Gold Program engine above (D-GB-9): same voter table, same shared
+// evaluator, one rule per indicator; the equivalence with the P0
+// calibration harness measurement is pinned by gold-balance.test.ts.
+// The web app does not import this yet (rollout P2+ gates the UI behind
+// ?balance=lanes); zero fetches, zero KV, zero wire fields.
+export {
+  GOLD_LANE_MIN_FIRING,
+  GOLD_LANE_STRONG,
+  goldBalance,
+} from './gold-balance';
+export type {
+  GoldBalanceLane,
+  GoldBalanceMember,
+  GoldBalanceReading,
+  GoldBalanceSide,
+} from './gold-balance';
 
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the

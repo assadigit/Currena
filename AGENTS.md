@@ -392,8 +392,8 @@ byte-verified), C5 validated (corpus content-identical to S4,
 recordedAt refreshed), and the repo Actions secret rotated to the
 working KV-Edit token.*
 
-*Gold balance consolidation (2026-11-03, P0 CALIBRATED — the rest
-SPECIFIED, NOT YET IMPLEMENTED — docs/specs/gold-balance-consolidation/):
+*Gold balance consolidation (2026-11-03, P0 CALIBRATED + P1 ENGINE LANDED —
+the rest SPECIFIED, NOT YET IMPLEMENTED — docs/specs/gold-balance-consolidation/):
 the owner's
 next Gold Program round folds the two gold metaphors into ONE
 balance. The wind panel (`GoldTailwindPanel`) and the model-vs-
@@ -413,7 +413,15 @@ escalation), and the pre-registered lane calibration chose
 tables in `docs/insights/BACKTEST-GOLD-LANES.md`, recorded in
 GOLD_BACKTEST_SPEC §5; `HARNESS_GOLD_LANES_MIN2`/`_MIN1` sit beside the
 frozen harness tables, their outputs pinned byte-identical by test).
-Until GB-S6
+P1 landed 2026-11-03 (GB-S2, PR #15): the pure engine
+`packages/insights/src/gold-balance.ts` ships exactly 02 §2–§3 —
+`goldBalance(readings)` (4 lanes, counts/net/readable, every voter as a
+member with supports/pressures/steady/unread + the evaluator's evidence)
+exported from the package index, pinned to the harness's
+`laneBalanceOverVoters` by equivalence tests (15; the 2026-10-31 fixture
+reproduces 01 §7) — nothing user-visible changes yet and the built
+bundle is byte-identical (the web app imports the engine from P2 on,
+behind the flag). Until GB-S6
 flips the default, everything user-visible about gold stays exactly
 as it is today.*
 
