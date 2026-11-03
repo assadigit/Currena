@@ -108,7 +108,7 @@ The exact current state (verify against PROGRESS.md + the repo before you start)
 - The P0 numbers (BACKTEST-GOLD-LANES.md): MIN2 all-windows level 25.0% / full-tip 49.7% / flips 8 vs net-sign 9 (C1+C2 PASS — the DECISION); MIN1 26.1% / 22.6% / 8 vs 9 (also PASS); mature base MIN2 full-tip 66.5% (C1 FAIL there — recorded as context, the criteria are pre-registered on ALL windows).
 - Bundle: the Insights lazy chunk is UNCHANGED by P0 (1522.88/351.96 against the 1530/354 ceiling) — P1 adds a module the web app does not import yet, so it should stay byte-identical; measure in the gates and record.
 - No fa strings this session (pure engine + tests). round-76 is the next fa round when strings land (GB-S3).
-- CHANGELOG: the last heading is [2026-11-03f] (GB-S1's entry; the count moved 187 -> 188, verified). Yours is [2026-11-04a] if the date rolled, else [2026-11-03g] — CHECK THE FILE and verify the heading count before and after.
+- CHANGELOG: the last heading is [2026-11-03g] (the GB-S1 parallel-session union record — GB-S1 ran twice concurrently; first-landed PR #12 stands, the second variant's measurement is the decision's robustness check, CHANGELOG 2026-11-03f + 2026-11-03g; the count moved 187 -> 188 -> 189, verified at each step). Yours is [2026-11-04a] if the date rolled, else [2026-11-03h] — CHECK THE FILE and verify the heading count before and after.
 - Commit style: `insights(gold-balance P1): ...` for code, `docs(gold-balance P1): ...` for records (04 §8).
 
 Discipline: tests first; FULL `pnpm gates` green before every push (secret-scan + typecheck 6/6 + lint + copy:audit + narrator checks + layer1 strict + the full suite — 9 gates, ~14.5k tests); branch gold-balance/p1-engine; commit + push the branch per milestone; draft PR early (`gold-balance(P1): the pure engine`); merge yourself when the exit gate holds (engine tests green, typecheck 6/6 clean, the frozen engine's tests still green — gold-score 35 + gold-backtest-core 29 + gold-lane-calibration 29, index export compiles); verify CI green on main; no deploy (the web app does not import the engine yet — confirm the built chunk names are unchanged, index-DrhFnckY.js + Insights-5V_N7nyu.js as of GB-S1). After three honest failed attempts on an item, record it blocked and move on. Never invent a number — every cell comes from a run you executed. Never edit the frozen files.
@@ -234,6 +234,31 @@ At the end: PROGRESS.md (the program's final close — every OI resolved or expl
   fired — GB-S1 runs it manually. fa rounds end at round-75. Insights lazy
   ceiling 1530/354 (measured 1522.90/352.00). Test baseline 14,519. api worker
   115eb1e5, markets 58c4eebd.
+- **GB-S1b (2026-11-03, the second variant — the union):** two GB-S1
+  sessions can run concurrently and will collide on the SAME branch name
+  (the push is rejected non-fast-forward, the PR API answers "No commits
+  between main and <branch>"). **Fetch and inspect origin BEFORE
+  planning your own branch** — if a parallel variant already landed,
+  follow the S5/S6 union precedent: first-landed stands whole (zero code
+  diff), the second variant's records layer on top, and the second's
+  measurement becomes the decision's robustness check (here: the same
+  MIN2 over a different corpus — record that fact; it is worth more
+  than the discarded implementation). **Diff audits catch silent
+  collateral:** a global text substitution (or any broad edit) on a file
+  with pre-existing content can alter lines you never meant to touch —
+  audit the removed-lines set (`git diff | rg '^-[^-]'`) before every
+  commit; on this file an apostrophe sweep nearly rewrote the frozen
+  report's existing prose (caught by the audit, reconstructed from HEAD
+  + intended additions only). **Heading-clobber during anchored
+  inserts:** inserting a section ABOVE an existing heading by replacing
+  the heading text consumes the heading (hit twice in one session) —
+  always re-count the headings/sections before AND after, and prefer
+  inserting BEFORE the anchor's following content or appending below.
+  Single-quoted TS strings need U+2019 for possessives (’), never the
+  ASCII apostrophe. The corpus-of-record fallback path is now
+  twice-verified: a blocked refresh (missing voter series in the stage)
+  is honestly recorded and the fixture stands — never hand-patch a
+  fixture to completeness.
 - **GB-S1 (2026-11-03, P0):** the §3 manual re-check procedure held up
   end-to-end (a REAL KV read is the gate — `limit=5` is rejected by the KV
   API, use ≥10). **The corpus venue moves:** the FX voters
