@@ -17,9 +17,10 @@ actually executed. The gap-closure program that ran in parallel is CLOSED
 | D | The decision: MIN2 if C1+C2, else MIN1 if C1+C2, else STOP | ✅ DONE (GB-S1, 2026-11-03) — **GOLD_LANE_MIN_FIRING = 2** (D-GB-3's default; both criteria hold over all windows; no fallback needed, no STOP) |
 | E | P1: the pure engine `gold-balance.ts` + unit tests + index export (04 §3) | ✅ DONE (GB-S2, 2026-11-03) — the engine exactly 02 §2–§3 over the frozen imports (D-GB-9 additive); 15 tests (04 §4.1's 13 + the harness-equivalence pin); the 2026-10-31 fixture reproduces 01 §7 (level · 4 neutral · split 2v2 · dollar 1 · inflation 1) with the no-drift pin −2/headwind/6; gates 9/9 GREEN 14,563 (insights 1,270 → 1,285); bundle byte-identical 1522.88/351.96 |
 | F | P2: BalanceScale members/split/context + MergedCard wiring behind `?balance=lanes` (04 §3) | ✅ DONE (GB-S3, 2026-11-03) — PR #16 (branch gold-balance/p2-ui; code commit `71dede7`); the lane drivers from `goldBalance(readings)` through the SAME BalanceScale (members/split/tally/note + the subtitle/contextLine/measuredNote slots; geometry/animation/beam untouched); the default view byte-identical (main-vs-new render diff PROVEN, then pinned by the legacy vitest snapshot); 19 tests of 04 §4.3 items 1-7/9/11-13 on the recorded 2026-10-31 fixture; fa round-76 same-session (17 strings, copy:audit clean); screenshots EN/fa × 360/1280 + 2 detail-open (evidence/gb-s3/); gates 9/9 GREEN 14,582; Insights lazy 1533.15/354.25 — ceiling bumped to 1540/355.5 WITH justification |
+| G | P2b: the visual redesign of the balance behind the same flag (05) | ✅ DONE (GB-S4, 2026-11-03) — branch gold-balance/p2b-visual; the owner's 05-VISUAL-DESIGN-SPEC implemented from the approved reference prototype: the brass stage (beam + 11-tick dial + column + bowl pans), the lane WEIGHTS with segmented rims (the NEW BalanceWeight.tsx), the verdict word as the hero, the Not-leaning tray, the four-row inline LEDGER (the same member content contract); --bal-* tokens light+dark with the measured AA ratios (the full table in evidence/gb-s4/README.md); the default view still byte-identical (the snapshot pin untouched, the 46 pure-geometry tests green); 14 new copy keys EN+fa through round-77; the lane tests rewritten 19 → 35 + the gb-s4 Playwright V-1..V-10 suite (61 tests, 6 engine-verified scenarios, 70 screenshots); gates 9/9 GREEN 14,598 (web 12,623 → 12,639); Insights lazy 1550.46/358.81 — ceiling 1560/360 justified |
 
-Next: GB-S4 (P2b — the visual redesign behind the same flag), then
-GB-S5 (P3+P4), GB-S6 (P5 — **the owner-gated flip**), GB-S7 (OI-3,
+Next: GB-S5 (P3+P4 — the Outlook derivation + the copy close), then
+GB-S6 (P5 — **the owner-gated flip**), GB-S7 (OI-3,
 its own owner round).
 
 ## Session log
@@ -287,6 +288,118 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
   default view EN + fa (the panels, the legacy chips, the legacy
   subtitle). The owner previews at currena.ir/insights?balance=lanes.
 
+### GB-S4 (2026-11-03 ~19:4x–2x:xx UTC) — P2b: the visual redesign behind the flag
+
+- **Branch:** `gold-balance/p2b-visual` — the PR
+  `gold balance(P2b): the visual redesign behind ?balance=lanes`
+  (draft opened with the screenshot set; self-merged when the V-1..V-10
+  exit gate held). Start state pinned: main at `f6f1fdd` (the GB-S3
+  re-verification record).
+- **Commits** (this branch, in order):
+  1. `web(gold-balance P2b): the visual redesign of the balance behind
+     ?balance=lanes — …` (BalanceWeight.tsx + the BalanceScale `visual`
+     branch + MergedCard wiring + the tokens/CSS + the copy EN/fa +
+     round-77 + the rewritten tests + the gb-s4 Playwright suite +
+     the evidence + the budget bump + the narrator hashes)
+  2. `docs(gold-balance P2b): the records — …` (PROGRESS.md, CHANGELOG
+     2026-11-03j, the GB-S5 prompt rewrite, AGENTS.md's gold-balance
+     paragraph)
+- **The stage** (05 §4.2, from the owner-approved prototype): the
+  tapered brass beam with its highlight line, the brass hub over the
+  11-tick ±35° dial with the 3× magnified needle (hidden when nothing
+  could be read), the tapered column + rounded base + contact shadow,
+  hangers redrawn every frame from the rotated joints to the pans' top
+  corners, and the pans as tinted shallow bowls with the brass rim and
+  the captions inside. ONE animated angle still drives everything; the
+  pans translate only; the beam formula is the owner's; 650 ms ease-out
+  quartic on load + data change; prefers-reduced-motion jumps. The
+  pans' heights are 05's targets TUNED for the measured worst case
+  (s 236→256, m/l 268→280 — the spec's own header allows tuning; the
+  244/268 scrollHeight measurements that motivated it are recorded in
+  the `balanceVisualMetrics` comment). The size steps read the balance
+  root's measured width (s/m/l), the stage caps at 720.
+- **The weight** (NEW signals/BalanceWeight.tsx, 05 §4.3 + §11): the
+  round brass disc (stone for neutral/unread), the lane icon engraved
+  (DQ-4 resolved to the prototype's own lucide-style set — the
+  existing ConditionIcon glyphs name STATES, not lanes), the SEGMENTED
+  RIM (one arc per driver, sorted supports → pressures → steady →
+  unread; green/red/hairline/dotted; 4.2px firing / 3px otherwise),
+  the Split badge, the label, the 44px hit area, hover/active/focus.
+  Pure props; `balanceRimSegments` exported for the rim-count tests.
+- **The verdict block (the hero), the tray, the ledger (05 §4.4–4.6):**
+  the verdict word at 30–44px with the lane strip and the always-stated
+  counts line (for/against/not-leaning, unread appended when > 0) + the
+  context pill inside the block; ONE recessed "Not leaning" tray holds
+  the neutral AND unread weights; the four-row LEDGER replaces the
+  shared detail panel INLINE — one row open at a time, a weight press
+  opens + scrolls + focuses the row, and the member list keeps the
+  GB-S3 content contract (AC-2: all 21 voters reachable; evidence +
+  value + deep links; steady as one muted sentence; B-12; the tilt
+  phrase). Sparse keeps UI-40's honesty: the not-enough sentence IS
+  the verdict word.
+- **Tokens + contrast (05 §5, V-7):** the `--bal-*` tokens scoped to
+  `[data-balance-visual]`, light + dark, in index.css. The AA ratios
+  MEASURED from the rendered styles in both themes (the full table in
+  evidence/gb-s4/README.md): the hero word 5.00/4.77 (red) and
+  3.35/4.78 (green — large-text AA ≥3:1); every caption/tally surface
+  ≥4.5 (5.56–13.60). The dark captions needed 05 §5's anticipated
+  lightening — the site's dark chip inks read 4.28/4.35 on the 9%-
+  tinted pans, so the balance's dark captions and ledger state words
+  wear the prototype's own dark side hues (#4bc27d/#f07078 → 7.10/5.56).
+- **The default view stays byte-for-byte:** the legacy branch renders
+  verbatim (the `visual` prop gates the redesign); the legacy-markup
+  vitest snapshot is untouched and green; balance.test.tsx's 46
+  pure-geometry tests stay green untouched.
+- **The copy:** 14 new keys EN + fa (eyebrow, verdictEyebrow, the four
+  verdictCount parts, trayTitle/trayNote/trayEmpty, the four
+  laneState words + laneStateSplit), triaged SAME-SESSION through
+  **round-77** (`docs/localization/persian-copy-round-77-gold-balance-
+  visual.md`; the manifest +15 processed, including the fa
+  list-joiner «،» under the ConnectionCard precedent); no em dashes.
+  The verdict word, captions, empty-pan sentences and measured note
+  REUSE the existing keys (no churn).
+- **Tests:** gold-balance-lanes.test.tsx REWRITTEN to the new anatomy
+  (19 → **35**: placement per side incl. the FOR/stack cases, the split
+  disclosure (badge + aria + ledger state), the ledger member lists,
+  B-12, the context pill inside the verdict block, the rim (pure +
+  rendered-vs-ledger V-4 pin), the pure visual geometry (size steps,
+  metrics, the weight-fit invariant, the frame drops/needle/RTL), the
+  verdict block + the all-unread/sparse states, RTL mirror +
+  direction-free drops + Persian digits, keyboard open/close + focus
+  landing, the legacy snapshot, the `visual` prop boundary, the flag
+  hook). Every synthetic fixture was verified against `goldBalance`
+  BEFORE pinning (for 3-0-1 · against 1-2-1 · split 1-1-2 · all-unread
+  0-0-0-4 · sparse readable 1).
+- **The gb-s4 Playwright project + the V-1..V-10 evidence (61 tests,
+  all green; 70 screenshots + the README in evidence/gb-s4/):** the
+  six scenarios (balanced = the recorded 2026-10-31 archive; the five
+  synthetic; loading = the route's honest skeleton — the merged card
+  only mounts with data, so the balance never half-renders; the
+  deviation is recorded) × EN/fa × 360/1280 × light/dark; the squint
+  test (the computed-size maximum + the blur(8px) capture); V-2's fill
+  ratios; the 360/390/768/1280/1920 overflow sweep with the pan-clip
+  checks; the rim-vs-ledger parity per scenario; the formula pins; the
+  wind scan; the computed contrast in both themes; the keyboard walk;
+  the reduced-motion layout equality; the default view beside it. The
+  scenarios ride an in-memory `/api/insights` interception that CLEARS
+  unspecified eval fields — the fixture's own change30d values
+  otherwise LEAK into the scenario's voters (the leak flipped
+  real-yield-10y/us10y to supports through the fixture's −0.28 moves;
+  caught by V-5, fixed, recorded in the file) — and APPENDS the voter
+  ids the fixture lacks (breakeven-tilt).
+- **Exit gate (the prompt's V-1..V-10):** all hold — see the README's
+  per-criterion evidence lines. **Gates: ALL 9 GREEN — 14,598 tests**
+  (web 12,623 → 12,639; baseline 14,582, no regression) · typecheck
+  6/6 · lint 0/0 · copy:audit clean (round-77) · narrator vocabulary
+  refreshed · layer1 strict 11,819/11,819 · Insights lazy
+  **1550.46/358.81** measured — ceiling bumped 1540/355.5 →
+  **1560/360** WITH the justification in
+  scripts/check-bundle-budget.mjs (SVG + CSS + copy behind the flag;
+  no new dependency; the two panels still ride the chunk until the
+  P5/GB-S6 flip re-baselines downward).
+- **DQ-1..4 defaults held** (brass; the segmented rim; the ledger
+  closed by default; the prototype's lane icons) — recorded in the PR.
+
 ## Owner must decide
 
 1. **Confirm the calibration decision** (or reverse it): the pre-registered
@@ -305,11 +418,13 @@ discovered the same 04:35 UTC Frankfurter stage-blob finding within
    again), never a silent edit.
 2. **OI-1 remains open:** the Outlook sentences still state a forecast the
    backtest does not support — the rewording (03 §6) rides GB-S5 (P4);
-   the fa round for it is round-77.
-3. **OI-2 is now visible in the preview:** the split badge ships as
-   "Split" / «دوپاره» (the default) behind `?balance=lanes` — the owner's
-   live read of it (plus the calm-stress semantic, 02 §4.1) belongs to
-   the P5 decision.
+   the fa round for it is round-78 (round-77 was GB-S4's visual copy).
+3. **OI-2 is now visible in the redesigned preview:** the split badge
+   ships as "Split" / «دوپاره» behind `?balance=lanes` — now rendered
+   as the weight's badge + the ledger's "Split: 2 for, 2 against"
+   state word. The owner's live read of the REDESIGN (V-11: the look
+   itself, plus the split badge OI-2 and the calm-stress semantic
+   02 §4.1) belongs to the P5 decision.
 4. No other open item moved this session (OI-3's precondition — the re-check
    record — is now satisfied; OI-4/OI-5/OI-6 unchanged).
 

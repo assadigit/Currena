@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold balance consolidation program (GB-S3 DELIVERED)
+# AGENT_HANDOFF — Currena: the gold balance consolidation program (GB-S4 DELIVERED)
 
 > The ACTIVE program is the owner's **gold balance consolidation**
 > (`docs/specs/gold-balance-consolidation/`, session plan GB-S1..GB-S7 in
@@ -6,45 +6,45 @@
 > program is CLOSED (2026-11-03d; its record: `docs/gap-closure/`).
 > Never record credentials here.
 
-## A. The delivered state (verified 2026-11-03 ~17:10 UTC)
+## A. The delivered state
 
-1. **GB-S3 (P2) is COMPLETE and LIVE**: PR #16 merged as `0bba57a`
-   (code `71dede7` + records `0e68597`); CI green on main; **currena-api
-   `1bfc88c5` @ 100%** (deploy-lock checked first; the record in
-   docs/DEPLOY.md's [2026-11-03i] session note). The consolidated lane
-   balance is previewable at **https://currena.ir/insights?balance=lanes**
-   — the DEFAULT view renders byte-for-byte today's page (proven by a
-   main-vs-new render diff, pinned by the legacy vitest snapshot).
-2. Browser-verified on production, fresh contexts, zero console errors,
-   both 360 + 1280, EN + fa: the flag view (today's data: LEVEL · 4
-   neutral · borrowing-costs split 2v2 — the badge, the tallies, the
-   context line, the measured note, the detail-panel interaction with
-   the tilt phrase + the B-12 row) and the default view (the wind +
-   model-vs-reality panels, the legacy chips, the legacy subtitle).
-3. **Independently RE-VERIFIED 2026-11-04 by a fresh recovery session**
-   (no repo state changed by it): CI `gates` green on both `0bba57a`
-   and main HEAD; the Cloudflare API confirms currena-api serves
-   `1bfc88c5` @ 100% (deployment `aad8fbce`, 2026-11-03T17:00:46Z);
-   the deployed index chunk references `Insights-ptsctHOq.js` (1,533,148
-   bytes raw — the measured 1533.15 kB); a live production browser pass
-   re-confirmed the flag view EN + fa (the 4 lane chips, «دوپاره» +
-   "2 for, 2 against", the context line −5.24%, the measured note →
-   BACKTEST-GOLD-LANES.md, the detail panel's member groups + the
-   "expectations fading" tilt phrase + the B-12 "Normal" row, RTL, no
-   wind words in the gold card, no 360 overflow, zero console errors)
-   and the default view's legacy rendering; locally re-run: the 19
-   component tests, the 15 engine tests, copy:audit clean, and the
-   bundle budget check all green ("All bundle budgets held").
-4. Gates at merge: **ALL 9 GREEN — 14,582 tests** (web 12,623 ·
-   insights 1,285); copy:audit clean (fa **round-76**, 17 strings);
-   Insights lazy chunk 1533.15/354.25 (ceiling 1540/355.5, justified);
-   CHANGELOG [2026-11-03i] (heading count 191 verified).
+1. **GB-S4 (P2b — the visual redesign) is COMPLETE** on branch
+   `gold-balance/p2b-visual`: the lane view behind
+   **https://currena.ir/insights?balance=lanes** now renders the owner's
+   05-VISUAL-DESIGN-SPEC, implemented from the approved reference
+   prototype — the brass stage (tapered beam, the 11-tick ±35° dial
+   with the 3× needle, the column + base, the bowl pans with side tint
+   + brass rim + captions inside), the lane WEIGHTS with segmented
+   rims (NEW signals/BalanceWeight.tsx), the verdict word as the
+   30-44px hero with the lane strip + the always-stated counts line +
+   the context pill, the recessed "Not leaning" tray (neutral AND
+   unread weights), and the four-row inline LEDGER (one row open at a
+   time; the same member content contract — AC-2 held). The mechanics
+   are unchanged: ONE animated angle, pans translate only, the beam
+   formula untouched, 650ms ease-out quartic, reduced-motion jumps.
+2. **The DEFAULT view is still byte-for-byte today's page** — the
+   legacy-markup vitest snapshot is untouched and green;
+   balance.test.tsx's 46 pure-geometry tests are untouched and green.
+3. **V-1..V-10 all hold**, each with its evidence line in
+   `docs/specs/gold-balance-consolidation/evidence/gb-s4/README.md`
+   (the measured AA contrast table for BOTH themes; 70 screenshots;
+   the loading-state deviation honestly recorded — the merged card only
+   mounts with data, so the route's skeleton is the real loading look).
+4. Gates at delivery: **ALL 9 GREEN — 14,598 tests** (web 12,623 →
+   12,639); copy:audit clean (fa **round-77**, 14 keys + the
+   list-joiner precedent); Insights lazy 1550.46/358.81 (ceiling
+   1560/360, justified in scripts/check-bundle-budget.mjs); CHANGELOG
+   [2026-11-03j] (heading count 192 verified).
+5. DQ-1..4 defaults held and recorded (brass; the segmented rim; the
+   ledger closed by default; the prototype's own lane icons — the
+   ConditionIcon set names states, not lanes).
 
 ## B. What is deliberately left open (the owner's decisions — not tasks)
 
-- The owner's live read of the preview (the Split badge OI-2, the
-  calm-stress semantic 02 §4.1) before the P5/GB-S6 flip.
-- OI-1 (the Outlook sentences) — GB-S5 (P3+P4), fa round-77.
+- **V-11: the owner's live read of the redesigned preview** before the
+  P5/GB-S6 flip (plus the standing items: the Split badge OI-2, the
+  calm-stress semantic 02 §4.1, the calibration confirmation).
+- OI-1 (the Outlook sentences) — GB-S5 (P3+P4), fa round-78.
 - The credential rotation (the session-supplied tokens were pasted in
   chat — rotate per the standing owner action item).
 
@@ -52,24 +52,25 @@
 
 D-GB-9 (the frozen files), no edge claimed ever, full `pnpm gates`
 before every push, the byte-stable default until the owner-gated flip,
-fa copy-audit flow (next: round-77), the parallel-session protocol
+fa copy-audit flow (next: round-78), the parallel-session protocol
 (pull --rebase before committing).
 
 ## D. Git + deployment state
 
-- origin/main = `0bba57a` (local main == origin). The branch
-  `gold-balance/p2-ui` is merged (PR #16, closed merged). Production:
-  **currena-api `1bfc88c5` @ 100%** · currena-markets `58c4eebd`
-  (code-unchanged, correctly not redeployed). The scheduled GHA runs
-  continue on the pushed code.
-- The next session is **GB-S4 (P2b — the visual redesign behind the
-  same flag)**: the rewritten prompt is in PROMPTS.md (the exact
+- Branch `gold-balance/p2b-visual` (this session); main was at
+  `f6f1fdd` at the session's start. Production before this session's
+  deploy: currena-api `1bfc88c5` @ 100% (the GB-S3 deploy).
+- The next session is **GB-S5 (P3 + P4 — the Outlook derivation +
+  the copy close)**: the rewritten prompt is in PROMPTS.md (the exact
   component state, the fa round, the bundle numbers, the harness
-  patterns).
+  patterns, the outlook derivation contract in engine terms).
 
 ## E. Next action (a new session)
 
-Read PROMPTS.md's GB-S4 prompt (rewritten with the exact shipped
-state) + PROGRESS.md's GB-S3 session log; branch
-`gold-balance/p2b-visual`; the session spec is
-05-VISUAL-DESIGN-SPEC.md + reference/balance-reference.html.
+Read PROMPTS.md's GB-S5 prompt + PROGRESS.md's GB-S4 session log;
+branch `gold-balance/p3-outlook`; the primary contract is 01 §5.2 +
+04 §4.2. Remember the GB-S4 lessons (PROMPTS.md's lessons log): the
+interception must clear unspecified eval fields, the fixture file must
+be restored by a finally that wraps everything, hooks stay above every
+early return, and the prototype's copy is placeholder — the frozen
+contracts win.
