@@ -5,6 +5,80 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03h] — gold-balance P1: the pure engine lands (gold-balance.ts — 21 frozen voters → 4 lane votes → one balance, GOLD_LANE_MIN_FIRING = 2; the 13 engine tests + the harness-equivalence pin; the 2026-10-31 fixture reproduces 01 §7; no UI change, bundle byte-identical)
+
+GB-S2, the gold balance consolidation's engine session (rollout P1 per
+`04-MIGRATION-AND-ACCEPTANCE.md` §3: `gold-balance.ts` + unit tests + the
+index export — exit gate "engine tests green, typecheck clean"). Every
+number below is from a run this session executed; nothing was invented.
+
+- **The engine (`packages/insights/src/gold-balance.ts`):** `goldBalance(readings)`
+  implements `02-ENGINE-AND-DECISION-TABLE.md` §2–§3 exactly — the member
+  shape (impact supports/pressures/steady/unread + the evaluator's own
+  evidence rising/falling/high/low/null), the lane vote (readable 0 →
+  unread; firing < `GOLD_LANE_MIN_FIRING` → neutral; strict majority of
+  the FIRING voters; supports === pressures → split neutral — `unread`
+  and `neutral` never merged, problem P5's fix), and counts/net/readable
+  over the 4 lanes. It imports ONLY the frozen sources (`GOLD_LANES` +
+  `GOLD_LANE_VOTERS` from `gold-score.ts`, `evalLeg` from
+  `connections.ts` — one rule per indicator, D-GB-4); the voter-readable
+  rule mirrors gold-score.ts's own private `readable` (stale /
+  check-pending / unavailable never fire). Platform-free: zero fetches,
+  zero KV, zero wire fields, zero fa strings. **Nothing frozen was
+  edited (D-GB-9):** `gold-score.ts`, `goldSummary`, `GoldSummarySchema`,
+  `snapshot.ts`, `apps/api/**` and the harness are untouched.
+- **The thresholds:** `GOLD_LANE_MIN_FIRING = 2` (the P0 calibration
+  decision — D-GB-3's default, C1+C2 PASS over all windows, measured
+  twice independently over two corpora; `HARNESS_GOLD_LANES_MIN2.minFiring`
+  is pinned equal to it by test) and `GOLD_LANE_STRONG = 3` (01 §5.2's
+  Outlook strong bar, for P3).
+- **The tests (`gold-balance.test.ts`, 15):** all 13 engine tests of
+  04 §4.1 — the crowd minimum, the split tie, the stale-voter
+  immutability, `net`/`counts`/`readable` over mixed combinations, the
+  polarity pins, `breakeven-tilt` level-only, table integrity (21 voters,
+  8/3/5/5), the 2026-10-31 fixture, the no-drift pin — PLUS the
+  frozen-lineage equivalence pin: `goldBalance(readings)` ===
+  `laneBalanceOverVoters(readings, GOLD_LANE_VOTERS, 2)` on every lane
+  side/split/readable/firing/supports/pressures and the counts/net/readable,
+  over 12 batteries (every synthetic shape + the fixture). **The vix trap
+  is pinned as a test of its own** (GB-S1's lesson): every voter without a
+  `SIGNAL_LEG_MOVE` entry (vix, us30y, fed-expectations, stress-stlfsi,
+  us-cpi-yoy, …) fires through the LEVEL leg alone — a 30-day move,
+  however large, silently reads steady; the four threshold-carrying voters
+  (real-yield-10y, us10y, dollar-basket, breakeven-5y5y) fire from the move.
+- **The 2026-10-31 fixture (tests 12+13), measured:** directly constructed
+  from `fixtures/gold-backtest-corpus.json`'s `archives["2026-10-31"]`
+  (readings with id/value/asOf/status/percentile10y/change30d; sourceName
+  `archive 2026-10-31`, updatedAt the archive's generatedAt — GB-S1's
+  verified recipe). The lane balance reads **LEVEL, 4 neutral**:
+  borrowing-costs **SPLIT 2v2** (readable 8, firing 4), dollar **1 firing**
+  (pressures), stress **readable 5 / firing 0** (neutral, NOT unread),
+  inflation **1 firing** (pressures) — 01 §7's worked example reproduced
+  exactly. The no-drift pin on the same readings: `goldTailwindScore` =
+  **netScore −2 / headwind / 6 of 21 firing** (2 tailwind / 4 headwind;
+  real-yield-10y falling, us10y falling, us30y high, fed-expectations
+  high, usdjpy high, breakeven-5y5y falling) — the frozen engine is
+  untouched.
+- **Gates (measured this session):** ALL 9 GREEN — 2m 7s; secret scan
+  clean (8 patterns · 795 files) · typecheck 6/6 · lint 0/0 · copy:audit
+  clean · narrator vocabulary in sync (190×2 + 56×2) · narrator eval 50
+  checks · layer1 strict 11819/11819 · **full suite 14,563** (core 195 ·
+  scraper 67 · **insights 1,285** = 1,270 + 15 new · markets 13 · api 399
+  · web 12,604; baseline 14,548 — no regression) · build + budget: entry
+  294.45/88.48 · **Insights lazy 1522.88/351.96 — unchanged from GB-S1**
+  (the web app does not import the engine yet; built chunk names verified
+  unchanged: `index-DrhFnckY.js` + `Insights-5V_N7nyu.js`). The frozen
+  engines' tests all green: gold-score 35 · gold-backtest-core 29 ·
+  gold-lane-calibration 29.
+- **No deploy** (code + tests + docs only; the built worker is unchanged).
+  The records: `PROGRESS.md` (the P1 tick + the GB-S2 session log), the
+  GB-S3 prompt rewritten in `PROMPTS.md` with the exact shipped state
+  (engine API, test count, fa round-76, bundle figures, the `?balance=lanes`
+  flag design, the fixture recipe), the GB-S2 lesson appended to the
+  lessons log, `AGENTS.md`'s gold-balance paragraph notes P1 landed. The
+  one semantic note carried forward for the owner (02 §4.1): calm stress
+  reads neutral, not "against" — one line to reverse.
+
 ## [2026-11-03g] — gold balance GB-S1 (the parallel-session union): a second GB-S1 variant ran concurrently, hit the same FX finding, took the OTHER pre-registered path (the corpus-of-record fallback), and INDEPENDENTLY measured the calibration — the same decision (MIN2) over a different corpus; the first-landed variant stands whole (PR #12, already merged); main verified end-to-end (CI green, both reports regenerate byte-identically, gates ALL 9 GREEN 14,548)
 
 The repo's second parallel-session union of the day (the gap-closure

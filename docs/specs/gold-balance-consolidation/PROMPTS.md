@@ -120,22 +120,35 @@ At the end: PROGRESS.md ticks + session log (commits + PR number + merge SHA); C
 ## GB-S3 — P2a: the consolidated balance behind the flag
 
 ```
-You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1 (P0 calibration) and GB-S2 (P1 engine) are done — read docs/specs/gold-balance-consolidation/PROGRESS.md first, then the prompts it points to.
+You are continuing the Currena gold balance consolidation program in the repo assadigit/Currena, on main. GB-S1 (P0 calibration) and GB-S2 (P1 engine) are DONE — read docs/specs/gold-balance-consolidation/PROGRESS.md first (the authoritative record), then the calibration report docs/insights/BACKTEST-GOLD-LANES.md. The GOLD_LANE_MIN_FIRING = 2 decision is recorded and SHIPPED as a constant; do not re-litigate it.
 
-Read, in order: AGENTS.md, the spec set README + 01 + 02 + 03-UX-AND-COPY.md (your primary session spec: anatomy, the lane chip, the detail panel, states, a11y/RTL, copy) + 04 (§1, §3 P2, §4.3 component tests) + PROGRESS.md. 05-VISUAL-DESIGN-SPEC.md is GB-S4's session — this session keeps the EXISTING BalanceScale visuals and only adds the data structure (03 §1 as written; 05 supersedes it NEXT session).
+Read, in order: AGENTS.md (the Gold Program + gold-balance paragraphs), the spec set README + 01-SPEC.md + 02-ENGINE-AND-DECISION-TABLE.md (§1, §2 the SHIPPED API, §4 the decision table incl. B-12) + 03-UX-AND-COPY.md (your primary session spec: anatomy, the lane chip, the detail panel, states, a11y/RTL, copy) + 04-MIGRATION-AND-ACCEPTANCE.md (§1 file list, §3 P2, §4.3 component tests) + PROGRESS.md (the GB-S2 record). 05-VISUAL-DESIGN-SPEC.md is GB-S4's session — this session keeps the EXISTING BalanceScale visuals and only adds the data structure (03 §1 as written; 05 supersedes it NEXT session).
 
-Your job: P2 of the rollout (04 §3), entirely behind the preview flag `?balance=lanes` (the ?narrative=preview pattern: a query parameter read on the Insights route, no persistence — without it, every visitor sees today's page byte-for-byte):
-1. BalanceScale.tsx: the optional BalanceDriver fields members/split/tally (03 §3), the detail-panel member list (grouped Supports gold / Pressures gold, steady collapsed, unread listed, the inflation lane's tilt phrase, the breakeven-5y5y card-status word per B-12), the context-line slot (01 §6: gold's 30-day move, "Shown for context. It is not counted in the balance.", hidden when missing) and the measured-note slot (reuse signals.goldScore.measuredNote* copy + the backtest link). Geometry, animation and the beam formula UNTOUCHED.
+The engine as shipped (GB-S2, PR #15, packages/insights/src/gold-balance.ts — import from '@currena/insights'):
+- goldBalance(readings: readonly IndicatorReading[]): GoldBalanceReading — { lanes: GoldBalanceLane[] (exactly 4, GOLD_LANES order), counts: {for, against, neutral, unread}, net: for-against, readable: for+against+neutral }.
+- GoldBalanceLane: { lane: GoldLane, side: 'for'|'against'|'neutral'|'unread', split: boolean (neutral because supports===pressures>0), readable, firing, supports, pressures, members: GoldBalanceMember[] } — members cover EVERY voter of the lane in table order (unread ones included), 21 total (8/3/5/5).
+- GoldBalanceMember: { id: IndicatorId, impact: 'supports'|'pressures'|'steady'|'unread', evidence: 'rising'|'falling'|'high'|'low'|null } — evidence only when firing.
+- GOLD_LANE_MIN_FIRING = 2, GOLD_LANE_STRONG = 3 (both exported; pinned equal to HARNESS_GOLD_LANES_MIN2.minFiring by test).
+- The 2026-10-31 fixture recipe (verified twice, GB-S1 + GB-S2): read packages/insights/fixtures/gold-backtest-corpus.json's archives["2026-10-31"] .readings (id/value/asOf/status/percentile10y/change30d) and build IndicatorReadings with sourceName "archive 2026-10-31", updatedAt the archive's generatedAt (2026-10-31T04:10:19.365Z) — goldBalance on it reads LEVEL · 4 neutral · borrowing-costs split 2v2 (readable 8, firing 4) · dollar 1 firing · stress readable 5 / firing 0 · inflation 1 firing; goldTailwindScore on the same readings: netScore −2 / headwind / 6 of 21 firing. Use it for component test states.
+
+Your job: P2 of the rollout (04 §3), entirely behind the preview flag `?balance=lanes` (the ?narrative=preview pattern: a query parameter read on the Insights route, NO persistence — without it every visitor sees today's page byte-for-byte, pinned by a legacy-markup snapshot test):
+1. BalanceScale.tsx: the optional BalanceDriver fields members/split/tally (03 §3), the detail-panel member list (grouped Supports gold / Pressures gold, steady collapsed, unread listed, the inflation lane's tilt phrase, the breaveven-5y5y card-status word per B-12), the context-line slot (01 §6: gold's 30-day move, "Shown for context. It is not counted in the balance.", hidden when missing) and the measured-note slot (reuse signals.goldScore.measuredNote* copy + the backtest link). Geometry, animation and the beam formula UNTOUCHED.
 2. MergedCard.tsx: build the lane drivers from goldBalance(readings) when the flag is on; the pans hold lane chips (max 4); split lanes sit in the neutral tray with the "Split" badge (OI-2 default) and the "2 for, 2 against" second line; keep the C12 banner and the footing strip; the legacy default rendering must be UNCHANGED (pin it with a snapshot test of the legacy markup).
-3. The copy (03 §6): the reworded signals.balance.subtitle, the new keys (laneTally, laneTallyNone, laneSplit, splitBadge, laneChipAria, memberSupports, memberPressures, membersSteadyTitle, membersUnreadTitle, contextLine, measuredNote under balance, laneIntro.*). EN + FA drafts; triage them in the persian-copy manifest the same session (the next round per PROGRESS.md — no em dashes in fa; terminology per docs/localization/persian-terminology.md; OI-5's full review happens before the flip, but copy:audit must be clean NOW because gates include it).
+3. The copy (03 §6): the reworded signals.balance.subtitle, the new keys (laneTally, laneTallyNone, laneSplit, splitBadge, laneChipAria, memberSupports, memberPressures, membersSteadyTitle, membersUnreadTitle, contextLine, measuredNote under balance, laneIntro.*). EN + FA drafts; triage them in the persian-copy manifest the SAME session — YOUR fa round is round-76 (GB-S2 added zero fa strings; the last is round-75) — no em dashes in fa; terminology per docs/localization/persian-terminology.md; OI-5's full review happens before the flip, but copy:audit must be clean NOW because gates include it.
 4. Tests: 04 §4.3 items 1-7, 9, 11-13 (the DOM scan: no "tailwind"/"headwind"/"wind" in the gold card under the flag, EN + fa; dictionary coverage both locales; keyboard open/close + focus return; the legacy snapshot without the flag). Screenshots EN/FA 360+1280 of the flag view (the level case, a split lane) + the default view, for the PR description.
-5. Bundle: the engine module + the new copy join the Insights lazy chunk. Measure; if the ceiling must move, bump scripts/check-bundle-budget.mjs WITH a CHANGELOG justification (never silently). The current ceiling is in the file (1530/354 kB as of GB-S1; check for GB-S2's note).
+5. Bundle: the engine module + the new copy join the Insights lazy chunk. Measure; if the ceiling must move, bump scripts/check-bundle-budget.mjs WITH a CHANGELOG justification (never silently). The ceiling is 1530/354 kB; the measured base you start from is 1522.88/351.96 (GB-S2, chunk names index-DrhFnckY.js + Insights-5V_N7nyu.js — unchanged since GB-S1 because the app did not import the engine yet; YOUR session changes the chunk, expect a re-hash).
 
-The exact current state: PROGRESS.md (authoritative — GB-S2 recorded the engine API, test count, the next fa round, the bundle numbers). Production: currena-api serves the SPA; after your merge + deploy the owner previews via https://currena.ir/insights?balance=lanes. Deploy per docs/DEPLOY.md (deploy-lock check, `pnpm deploy`, version verification, smoke test, then browser-verify the flag view AND the default view in EN + fa at 360 + 1280 in a FRESH browser context — the PWA service worker serves the previous chunk to returning visitors).
+The exact current state (verify against PROGRESS.md + the repo before you start):
+- main is at the GB-S2 merge (PR #15, gold-balance/p1-engine — PROGRESS.md's GB-S2 session log has the branch + commits; pin main's SHA in your records at start). Test baseline: 14,563 (14,548 + GB-S2's 15 engine tests — insights 1,285). Do not regress.
+- The corpus: 19 archive days (2026-10-15 -> 11-03, 10-20 absent), recordedAt 2026-11-03T04:43:54Z. The 2026-11-03 re-check ran (GOLD_RECHECK_SPEC §1/§5); the next re-check appends to §5 per its procedure.
+- CHANGELOG: the last heading is [2026-11-03h] (GB-S2's P1 record; the count moved 189 -> 190, verified). Yours is [2026-11-04a] if the date rolled, else [2026-11-03i] — CHECK THE FILE and verify the heading count before and after.
+- Commit style: `web(gold-balance P2): ...` for code, `docs(gold-balance P2): ...` for records (04 §8).
 
-Discipline: tests first; FULL `pnpm gates` before every push; branch gold-balance/p2-ui; commit + push per milestone; draft PR with the screenshots; merge yourself when the exit gate holds (component tests green, copy:audit clean, screenshots attached, default view byte-stable); CI green on main; deploy + verify. After three honest failures, record blocked and move on. Never edit the frozen files; never remove a visible element from the DEFAULT view (the panels retire only in GB-S6).
+Production: currena-api serves the SPA; after your merge + deploy the owner previews via https://currena.ir/insights?balance=lanes. Deploy per docs/DEPLOY.md (deploy-lock check, `pnpm deploy`, version verification, smoke test, then browser-verify the flag view AND the default view in EN + fa at 360 + 1280 in a FRESH browser context — the PWA service worker serves the previous chunk to returning visitors).
 
-At the end: PROGRESS.md; CHANGELOG; rewrite the GB-S4 prompt (the visual session — point it at 05 + reference/balance-reference.html and the ?sc= scenario params, list the exact component state you left, the fa round used, the bundle numbers); commit, push, merge, deploy, verify; print the GB-S4 prompt with a 5-line summary.
+Discipline: tests first; FULL `pnpm gates` before every push (secret-scan + typecheck 6/6 + lint + copy:audit + narrator checks + layer1 strict + the full suite — 9 gates, ~14.5k tests); branch gold-balance/p2-ui; commit + push per milestone; draft PR with the screenshots; merge yourself when the exit gate holds (component tests green, copy:audit clean, screenshots attached, default view byte-stable); CI green on main; deploy + verify. After three honest failures, record blocked and move on. Never invent a number. Never edit the frozen files (gold-score.ts, goldSummary, GoldSummarySchema, snapshot.ts, apps/api/**, the harness); never remove a visible element from the DEFAULT view (the panels retire only in GB-S6). Remember the MultiEdit heading-clobber lesson: when inserting above a heading, re-include the heading, and re-count headings before AND after.
+
+At the end: PROGRESS.md ticks + session log (commits + PR number + merge SHA); CHANGELOG entry (the next heading per the sequence — check the file); rewrite the GB-S4 prompt (the visual session — point it at 05 + reference/balance-reference.html and the ?sc= scenario params, list the exact component state you left, the fa round used, the bundle numbers); append the GB-S3 lesson to the Lessons learned log; commit, push, merge, deploy, verify; print the GB-S4 prompt in a code block with a 5-line summary.
 ```
 
 ---
@@ -286,3 +299,29 @@ At the end: PROGRESS.md (the program's final close — every OI resolved or expl
   (187 → 188). Gates: 14,548 (baseline + 29); budget unchanged
   (1522.88/351.96); built worker unchanged (chunk names identical) — no
   deploy for scripts+tests+docs sessions.
+- **GB-S2 (2026-11-03, P1):** the engine session. **Measure the fixture
+  with the harness BEFORE writing the tests** — a 5-line tsx script over
+  `corpus.archives["2026-10-31"]` printed every lane's side/split/counts
+  and the frozen engine's −2/headwind/6 first; the tests then pin numbers
+  already observed, never guessed. **The vix trap generalises into a
+  threshold-units trap:** SIGNAL_LEG_MOVE is per-leg in the indicator's
+  OWN units — a "rates-family" −0.3/−0.5 move fires real-yield-10y (0.1)
+  and us10y (0.15) but NOT dollar-basket (1.0-point bar); a battery that
+  "moves every threshold voter" the same way fails on dollar-basket —
+  build qualifying moves per voter. **A lane is unread when readable === 0,
+  and MISSING voters are unread too:** a "one unavailable + rest absent"
+  battery reads unread, not neutral — to construct a readable lane you
+  must supply a readable voter (the first draft of test 5 got this wrong
+  and was caught by the run, not by review). **Members covering every
+  voter makes staleness inert by full-object equality:** because
+  `GoldBalanceLane.members` lists every table voter (unread ones
+  included), adding a stale or missing voter leaves the ENTIRE reading
+  object unchanged — the immutability pin is a one-line `toEqual`. **The
+  heading-clobber struck AGAIN (third time on record):** anchoring a
+  CHANGELOG insert on the previous heading's text consumed it — the
+  `^-[^-]` removed-lines audit caught it ([2026-11-03g] restored, count
+  verified 189 → 190); the anchored-insert edit MUST re-include the anchor
+  heading verbatim, every time, and the heading count is checked before
+  AND after. Gates: 14,563 (baseline + 15); bundle byte-identical
+  (1522.88/351.96, chunk names unchanged — the app does not import the
+  engine yet); no deploy.
