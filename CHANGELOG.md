@@ -5,6 +5,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03b] — gap-closure S6-M6.5: the final quality pass (the render check caught the missing COFER lane row; both locales verified at 360/768/1200; the free-tier audit final)
+
+- **The fix:** `usd-reserve-share` was missing from `DOLLAR_STRENGTH_IDS`
+  (sections.ts) — the reading would have landed in the snapshot but the
+  card would never have rendered in the dollar lane. Caught live on the
+  local verification stack (the web dev server + a pass-through mock
+  serving the live production snapshot with the three M6.3 readings
+  injected at provider-exact values); the card joins at the lane's foot;
+  the R9-04 pin test updated; gates green (14,508).
+- **The verification (evidence/M6.5/, 22 screenshots):** all three M6.3
+  cards render provider-exact in EN and fa (RTL, Persian digits, the
+  Jalali-dated details dialog); 0px horizontal overflow at 360 in both
+  locales; keyboard focus + the [role=dialog] details panel + Escape
+  all tested; zero console errors; the R7 hidden-rows disclosures
+  expanded before every check (the known trap); VLM-verified visually.
+- **The final audits:** crons 5/5 FULL (api ×1 minute-cron + markets ×4
+  — new cadences must gate inside the minute-cron, which the COFER
+  Saturday gate does); KV writes ~89/day typical vs the 1,000 cap;
+  subrequests worst-case — main ~47/50 (FULL) · rung2 ~8–44 · history
+  ~26 ×2 · rung3 ~45/50 · rung4 ~45/50; the page-load request shape
+  unchanged (one snapshot + the datasets + the lazy per-card
+  histories). Production status (read-only): zero failed sources, all
+  14 validation tests green.
+- The production deploy + the production-browser pass are deferred to a
+  credentialed session (this session has none — recorded in
+  PROGRESS.md's sixth claim note).
+
 ## [2026-11-03a] — gap-closure S6-M6.4: the shadow review and promotion PROPOSAL (nothing promoted — G-5; cfnai + ebp proposed, the owner decides)
 
 The M6.4 evaluation: 15 registered candidate–outcome pairs measured with
