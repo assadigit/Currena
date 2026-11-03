@@ -132,6 +132,46 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-03d the gap-closure S6 delivery close (worker 115eb1e5 at 100% — the union head's hygiene deploy; the build byte-identical; the five readings landed; 161 on production)
+
+The eighth S6 session — the credentialed close the handoff prescribed
+(the owner supplied credentials and directed "deploy all"). Gates re-run
+on the union tree first, in foreground stages (a first background attempt
+was killed by a sandbox OOM from a leftover browser process): ALL 9 GREEN
+— secret scan 8·783 · typecheck 6 · lint 0/0 · copy:audit · narrator
+vocabulary 190×2+56×2 · eval 50 · layer1 strict 11,819 · full suite
+**14,519** · budget entry 294.45/88.48 + Insights lazy 1522.88/351.96.
+
+- **Push**: the union chain `d6f60b6..550d76f` (6 commits — docs/records/
+  evidence only, zero code diff vs the deployed `d6f60b6`); remote
+  verified via the GitHub API; **CI run #472 on `550d76f`: SUCCESS**.
+- **Deploy-lock check**: `currena-api` latest deployment `de52b141`
+  (version `c8fb04d9`, the parallel session's 23:35 UTC deploy of
+  `d6f60b6`'s build); markets `229fcc34` (version `58c4eebd`, M6.1) —
+  both active @ 100%; `apps/markets` code-unchanged since M6.1 → markets
+  NOT redeployed (the repo convention).
+- **The byte-identical proof, pre-deploy**: the union-head build (fresh
+  from the gates' build step) reproduces production's exact chunk names —
+  `index-DrhFnckY.js` + `Insights-5V_N7nyu.js` — confirming the deployed
+  parallel-variant build IS the union's build before any deploy.
+- **DEPLOY**: `pnpm --filter @currena/api exec wrangler deploy` →
+  currena-api **`115eb1e5-cc79-4008-99ce-add3e3bcff1e` @ 100%**
+  (deployment `4ccce05b`, 03:14:34 UTC) — the hygiene deploy that aligns
+  the deployed provenance with main's HEAD; the post-deploy smoke: `/api/
+  health` 200 · `/` 200 (entry chunk still `index-DrhFnckY.js`) ·
+  `/api/insights` 200 · `/api/insights/markets-au` 200 (19 rows).
+- **The readings**: the `insights-ingest` workflow_dispatch on the pushed
+  code (run 75) armed the rung-2 bootstrap as designed (COFER + breadth
+  fetched, the spread derived, the snapshot written — 40 writes/181
+  reads; its exit-1 is the designed P1 signal for nz-short-rate's known
+  OECD 500, which retries at 04:20); `rung2-run --nbs` landed the China
+  pair. `/api/insights` serves **161 readings** — every one of the five
+  new ids exactly its twice-verified value.
+- **Browser verification EN + fa**: the dedollar-concentration gauge +
+  the Italy–Germany borrowing card + both China trade-lane cards, fresh
+  contexts, the R7 disclosures expanded, Persian digits/RTL in fa, 0px
+  overflow @360, zero console errors (evidence/M6.3/screenshots-prod/).
+
 ## Session record — 2026-10-31k the Gold Program S6 deploy — the 21-voter table rides production (worker 21ca25ab at 100%; the Insights chunk byte-identical; goldSummary −2/headwind as predicted)
 
 The owner's fifth credential round ("continue your work" with a fresh

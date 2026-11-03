@@ -5,6 +5,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03d] — gap-closure S6: the delivery close (the union chain pushed `d6f60b6..550d76f`, CI #472 green; the api hygiene-deploy `115eb1e5` — byte-identical build; the five readings landed provider-exact, snapshot 158 → 161; the cards browser-verified EN + fa)
+
+The eighth session — the credentialed close the handoff prescribed. Gates
+re-run on the union tree first (ALL 9 GREEN: secret scan 8·783 · typecheck 6 ·
+lint 0/0 · copy:audit · narrator 190×2+56×2 + eval 50 · layer1 strict
+11,819 · full suite **14,519** · budgets held — entry 294.45/88.48, Insights
+lazy 1522.88/351.96). Then the delivery chain, end to end:
+
+- **Push**: the six-commit union chain (`d6f60b6..550d76f` — the M6.3 union
+  record, the M6.4 proposal, the M6.5 pass, the M6.6 docs close, the
+  verification record, the pre-landing evidence) pushed to origin/main;
+  remote verified via the GitHub API; **CI run #472 on `550d76f`: SUCCESS**.
+- **Deploy**: currena-api **`115eb1e5`** @ 100% (deployment `4ccce05b`) —
+  the hygiene deploy from the union head, proven byte-identical to the
+  already-live build pre AND post (`index-DrhFnckY.js` +
+  `Insights-5V_N7nyu.js` unchanged); smoke: health/insights/markets-au all
+  200 (19 board rows). currena-markets left as the repo convention dictates
+  (`apps/markets` code-unchanged since M6.1's `58c4eebd` — deployments list
+  confirms it active @ 100%).
+- **Readings**: the `insights-ingest` dispatch on the pushed code armed the
+  rung-2 bootstrap exactly as designed (COFER + breadth fetched, the spread
+  derived, the snapshot written — its exit-1 is the designed P1 signal for
+  nz-short-rate's known OECD 500 class, which retries at 04:20); the
+  `rung2-run --nbs` lever landed the China pair. `/api/insights` now serves
+  **161 readings**, each of the five exactly its twice-verified value:
+  usd-reserve-share 56.704761505127 @ 2026-06-30 · sp500-breadth-ratio
+  0.2925 @ 2026-11-02 · btp-bund-spread 0.8003 @ 2026-08-01 ·
+  china-property-investment −20.6 @ 2026-09-30 · china-steel-output
+  7,359×10kt @ 2026-09-30.
+- **Verify**: production-browser EN + fa (fresh contexts, the R7 disclosures
+  expanded) — the `dedollar-concentration` gauge (56.7% · 0.2925), the
+  Italy–Germany card in borrowing (0.80 pts), both China cards in the trade
+  lane (−20.6% · 73.6m tonnes; fa Persian digits + RTL), 0px overflow @360
+  both locales, zero console errors (evidence/M6.3/screenshots-prod/, 8
+  shots).
+
+No code changes in this entry — records, evidence and docs only. The
+program's remaining opens are the owner's alone: the promotion decision
+(G-5), the `owner_accepts` flags, and the credential rotation (an eighth
+paste round this session — still the top owner action item).
+
 ## [2026-11-03c] — gap-closure S6: the parallel-session union (the second M6.3 variant's records join the first-landed, deployed `d6f60b6`; nothing user-facing changes — the builds are byte-identical)
 
 Two sessions built M6.3 independently (the S5 parallel reality, again).

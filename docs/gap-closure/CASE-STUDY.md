@@ -169,10 +169,13 @@ session-by-session log with every commit, deploy and honest failure is
 
 ## What is honestly unfinished
 
-- **The push/deploy of the S6-M6.3 code and the three readings'
-  landings** — the closing session lost its credentials mid-program;
-  the commits are ready and the bootstrap paths are armed (recorded in
-  PROGRESS.md's sixth claim note).
+- ~~**The push/deploy of the S6-M6.3 code and the three readings'
+  landings**~~ **DELIVERED 2026-11-03 (the eighth session):** the union
+  chain pushed (`d6f60b6`'s successor `550d76f`, CI green), the api
+  hygiene-deployed (`115eb1e5`, byte-identical build), the five readings
+  landed provider-exact (snapshot 158 → 161) and the cards
+  browser-verified on production EN + fa — the delivery chain closed
+  end-to-end (PROGRESS.md's eighth claim note).
 - **The owner's pending decisions:** the promotion list (cfnai + ebp),
   the two rebalancing questions, the Westpac-MI/NAB survey acceptance
   flags, and the credential rotation (the top open action item — every
