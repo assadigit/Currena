@@ -1,132 +1,76 @@
-# AGENT_HANDOFF — Currena gap-closure S6 (continuation)
+# AGENT_HANDOFF — Currena gap-closure S6 (FINAL — program complete)
 
-> Working state record for the S6 session chain. Read together with
-> `docs/gap-closure/PROGRESS.md` (the authoritative milestone log) and
-> `docs/gap-closure/S6-links-promotion-polish.md` (the spec).
+> The six-session gap-closure program is COMPLETE (37/37 milestones,
+> 2026-11-03). This handoff is the recovery record for the ONE remaining
+> execution: the push + deploy of the S6 closing commits, which the
+> closing session could not perform (no credentials). Read together with
+> `docs/gap-closure/PROGRESS.md` (the authoritative log — the S6 sixth
+> claim note + the owner action items) and
+> `docs/gap-closure/CASE-STUDY.md` (the program summary).
 > Never record credentials here.
 
-## A. Original objective
+## A. The one remaining task (for a credentialed session)
 
-Execute S6 (M6.1→M6.6) of the gap-closure program on `main` of
-`assadigit/Currena`: NZ link (evidence first), China property/steel,
-de-dollarization/concentration, shadow review + promotion **proposal**
-(stop for owner approval — G-5), final quality pass, final docs/case
-study/credential hygiene. Measurement-only language; never remove or hide
-any existing indicator (G-3); fail-closed parsers; provider-exact numbers
-only; credentials only from the environment, never printed.
+1. `cd /home/z/currena && git push origin main` — the local `main`
+   carries `3b5b879` (M6.3) · `4b6e8c2` (M6.4) · `c06b42a` (M6.5) + the
+   M6.6 close, all gates-green (14,508 tests). Last pushed: `879639d`.
+2. Deploy: `pnpm deploy` (the api worker — the M6.3 definitions/licences/
+   validation ride it) + the web app (`pnpm --filter @currena/web build`
+   + the worker sites deploy, per DEPLOY.md). The markets worker is
+   UNCHANGED by S6-M6.3+ (no redeploy needed).
+3. The readings land via the armed paths (either is sufficient):
+   - the **04:20 UTC rung-2 bootstrap** (GHA scheduled, repo-secret
+     auth): the stage carries no `usd-reserve-share` /
+     `sp500-breadth-ratio` entries → it arms, fetches, patches, writes;
+     the **04:10 main rung** derives `btp-bund-spread` once the Italy
+     leg rides the OECD bulk group. NOTE: the same 04:20 bootstrap also
+     owns the **M6.2 China readings' landing** (china-property-investment
+     + china-steel-output, still honestly `unavailable` on production).
+   - or expedite: `pnpm --filter @currena/insights rung2-run --cofer
+     --breadth` (+ `--nbs` if the China landing is still pending) and
+     the main phase (or `--bootstrap`) for the spread.
+4. Browser-verify on production: the three M6.3 cards in their lanes
+   (the dollar lane's foot / market-stress / borrowing) in EN + fa —
+   the M6.5 local stack already verified the exact render (evidence/
+   M6.5/), so this is the production confirmation pass.
+5. Record the verified lines under M6.3/M6.2 in PROGRESS.md and clear
+   the owner action item.
 
-## B. Requirements and decisions
+## B. What the S6 close produced (all local, gates-green)
 
-- All S1–S5 standing rules apply (`docs/gap-closure/00-OPERATING-RULES.md`).
-- G-5: new scoring memberships only after M6.4 owner approval — everything
-  new lands context-only.
-- CHANGELOG discipline: same-day continuation → `## [2026-11-02h]` style
-  next letter (check the file's latest heading first); count headings
-  before/after.
-- fa copy: next round is **round-75** (73 = M6.1, 74 = M6.2); audit flow
-  `pnpm copy:audit` → review → `pnpm copy:audit:update --ids ... --status
-  processed --round 75 --reference ...`; no em dashes in fa.
-- Parallel-session protocol: `git pull --rebase origin main` before every
-  commit; re-read PROGRESS.md; additive-union conflict resolution.
-- Gold Program files are off-limits (gold-score.ts, gold-backtest-*,
-  docs/insights/*GOLD*).
-- Push/deploy/KV-write/GHA-dispatch require GitHub + Cloudflare tokens.
+- **M6.3** (`3b5b879`): usd-reserve-share (IMF COFER) + sp500-breadth-
+  ratio (Yahoo RSP/SPY) + btp-bund-spread (FRED mirrors, zero new
+  fetches) — registry 161, fa round-75, every provider answer verified
+  twice, CHANGELOG §2026-11-02j.
+- **M6.4** (`4b6e8c2`): the promotion PROPOSAL — `docs/gap-closure/
+  PROMOTION-PROPOSAL.md` + the reproducible harness/evidence in
+  `evidence/M6.4/`. cfnai + ebp proposed; NOTHING promoted (G-5); the
+  owner's approval is the open decision.
+- **M6.5** (`c06b42a`): the final quality pass — caught + fixed the
+  missing DOLLAR_STRENGTH_IDS row; 22 screenshots (EN/fa × 360/768/1200,
+  0px overflow); a11y verified; the free-tier audit final
+  (crons 5/5 full, ~89 KV writes/day).
+- **M6.6** (the final commit): AGENTS.md §A/§B + INDICATORS_AND_DATA_
+  SOURCES.md + MAINTENANCE.md refreshed; CASE-STUDY.md written;
+  PROGRESS.md final (37/37, 100%); the owner action items updated.
 
-## C. Completed work (as of this handoff)
+## C. The standing constraints (unchanged)
 
-- **M6.1 DONE** (commits `4b638dd`…`3439887`): NZ link measured + included;
-  audnzd/nz-10y/nz-short-rate + NZX 50 board rider; deployed api
-  `c81f65c8` + markets `58c4eebd`; browser-verified EN/fa; ticked in
-  PROGRESS.md.
-- **M6.2 DONE** (commits `309adba` + `9a595a2`): China property/steel
-  parsers + fixture pinning + rung2 21st–25th window + connection card;
-  deployed api `ecd3ff63`; the readings' KV landing was blocked by the
-  account-wide KV write cap (resets 00:00 UTC) — see E below.
-- **M6.3 IN PROGRESS — uncommitted working tree** (inherited from the lost
-  fifth session; ~1,214 insertions across 42 files): all three indicators
-  defined (`usd-reserve-share` COFER quarterly Saturday gate,
-  `sp500-breadth-ratio` Yahoo RSP/SPY daily, `btp-bund-spread` FRED OECD
-  mirror derived), adapters `cofer.ts` + `breadth.ts` + tests + fixtures,
-  rung2 plan flags `--cofer`/`--breadth`, sources/licences/T-16/registry/
-  display/layer1/i18n EN+fa diffs present, VERIFIED-SOURCES rows DONE,
-  bundle budget bumped. Completeness/gates NOT yet verified by this session.
+G-3 (never remove/hide), G-5 (nothing scores without the owner's
+approval), provider-exact numbers only, fail-closed parsers,
+credentials only from the environment and never printed, the full
+`pnpm gates` before every push, the CHANGELOG heading-count discipline,
+the fa copy-audit flow (next round: 76), the parallel-session protocol
+(pull --rebase before committing).
 
-## D. Current state
+## D. Git state
 
-- HEAD `879639d` (the fifth continuation claim, pushed 22:57 UTC
-  2026-11-02). Branch `main`, up to date with origin at last check.
-- Working tree: the M6.3 changes above, uncommitted.
-- Production: api `ecd3ff63` + markets `58c4eebd` live;
-  `/api/insights` 158 readings @ generatedAt 2026-11-02T17:20:46Z;
-  china-property-investment/china-steel-output/nz-short-rate honestly
-  `unavailable` (landings pending — see E).
-- Baseline gates at the fifth session's claim: **14,257 tests green**;
-  Insights lazy 1502.19/346.42 vs the (working-tree-bumped) 1510/347
-  ceiling.
-
-## E. Remaining work (in order)
-
-1. **M6.2 landing note**: the manual 00:07 UTC `rung2-run --nbs` lever
-   could not fire from the sixth session (no Cloudflare token). The
-   designed fallback — the **04:20 UTC rung-2 bootstrap** (GHA scheduled,
-   repo-secret auth, stage carries no China entries → arms by design) —
-   owns the landing. Record under M6.2 in PROGRESS.md; verify after 04:20
-   UTC if the session is alive.
-2. **M6.3 completion**: verify working-tree completeness, live-verify the
-   three parsers from the sandbox, run `pnpm gates`, fa copy audit
-   (round-75), CHANGELOG `2026-11-02h` (or next letter — check the file),
-   commit `gap(S6-M6.3)`.
-3. **M6.4**: read `docs/insights/BACKTEST.md` + `BACKTEST-GOLD.md`;
-   evaluate shadow candidates with enough history (frozen thresholds, no
-   lookahead, sample sizes, base rates); write
-   `docs/gap-closure/PROMOTION-PROPOSAL.md`; commit; **stop for owner
-   approval — execute no promotions** (record as an open owner action
-   item).
-4. **M6.5**: copy audit clean; a11y sweep of new components; screenshots
-   360/768/1200 EN+fa (local build is acceptable, honestly labelled, if
-   production deploy is blocked); bundle budget; free-tier audit;
-   data-health review (public GHA API + `/api/insights/status`); fix +
-   record.
-5. **M6.6**: refresh AGENTS.md §A/§B, INDICATORS_AND_DATA_SOURCES.md,
-   MAINTENANCE.md, CHANGELOG; write `docs/gap-closure/CASE-STUDY.md`;
-   final PROGRESS.md (every box ticked or honestly blocked; gap coverage;
-   overall %); credential hygiene (owner rotation confirmation — top open
-   action item); next-steps note; FINAL summary. No next-session prompt.
-
-## F. Problems and considerations
-
-- **THIS SESSION (sixth) HAS NO CREDENTIALS.** The continuation message's
-  credential section arrived empty; the environment carries no
-  GH_TOKEN/CLOUDFLARE_API_TOKEN/ACCOUNT_ID (checked by presence only;
-  values never printed). Consequences: **git push, wrangler deploy, KV
-  REST writes, GHA dispatches are all blocked.** All work proceeds
-  locally and is committed; the push/deploy/landing recipe is documented.
-  Do NOT treat missing credentials as a reason to stop local work.
-- The KV daily write cap was exhausted 2026-11-02 (second occurrence);
-  resets 00:00 UTC. Budget dispatches carefully on any credentialed
-  future session.
-- OECD sdmx intermittent HTTP-500 class from GHA (nz-short-rate's
-  honest-red face) — retries on the next rung2 phase by design.
-- Verification traps (a)–(l) from the S6 brief still apply — fresh browser
-  contexts, Persian-digit regexes, expand hidden rows before grepping,
-  REST (not CLI) for KV reads, no buy/sell/hold wording from the first
-  draft.
-
-## G. Git and deployment status
-
-- Local `main` == `879639d` + the uncommitted M6.3 tree (this session will
-  commit M6.3/M6.4/M6.5/M6.6 work locally as it completes).
-- **Push blocked** (no GitHub token). Last pushed: `879639d` (22:57 UTC
-  2026-11-02). CI on it: green at last check (the fifth session's gates
-  run).
-- Deploys: api `ecd3ff63` (M6.2 close) + markets `58c4eebd` (M6.1) are
-  the live versions; nothing since. M6.3's worker/web deploy is pending
-  credentials.
-
-## H. Next action
-
-Verify the M6.3 working tree is complete (step E.2): read the remaining
-diffs (i18n fa round, display.ts, layer1, fred-copyright, licences,
-sources, registry, RUNGS), run the full `pnpm gates`, then live-verify the
-three parsers from the sandbox, run the fa copy audit, write the CHANGELOG
-entry, and commit `gap(S6-M6.3)` locally. Then M6.4 (the proposal + stop).
+- Local `main` = the M6.6 close commit on top of `c06b42a` (all
+  gates-green). **Not pushed** (no GitHub token in the closing
+  sessions' environments).
+- Production: api `ecd3ff63` + markets `58c4eebd` (the M6.1/M6.2
+  state); production serves 158 readings; the three M6.3 ids land
+  after the push + rungs.
+- The backup of the M6.3 working tree (pre-commit) lives at
+  `/home/z/my-project/currena-backup/` (now redundant — everything is
+  committed).

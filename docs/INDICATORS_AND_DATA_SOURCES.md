@@ -337,9 +337,10 @@ Insights page's serve path performs **exactly ONE KV read per request**
 | `GET` | `/api/rates?source=tgju\|frankfurter` | The fallback ladder — the converter's source rates | none | 60/min/IP |
 | `GET` | `/api/convert?from=USD&to=IRR&amount=100` | Server-side conversion math (via `@currena/core`) | none | 60/min/IP |
 | `GET` | `/api/status` | Per-source status + cache age (the `/admin` pill reads this) | none | none |
-| `GET` | `/api/insights` | The 123-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
+| `GET` | `/api/insights` | The 161-indicator Insights snapshot (the canonical call) | **public by owner decree** (2026-10-19) — see below | none |
 | `GET` | `/api/insights/:id/history` | One card's history (downsampled to ≤2700 points) | public (the L2 sources are bounded to the visible chart window) | none |
 | `GET` | `/api/insights/markets` | The world stock markets board (16 indices, EODHD-first) | public (owner directive 2026-10-18b) | none |
+| `GET` | `/api/insights/markets-au` | The Australian markets board (18 ASX indices + the S&P/NZX 50 rider, Yahoo-only — gap-closure S5-M5.4/S6-M6.1; 503 "being prepared" until the markets worker's 07:00 UTC cron first fires) | public (the Yahoo L2 owner-accepted class) | none |
 | `GET` | `/api/insights/fx` | The world currencies board (10 pairs + 7 patterns, ECB rates) | public (owner directive 2026-10-21c) | none |
 | `GET` | `/api/insights/tic` | Foreign holders of US Treasuries — the top-20 + Australia, holdings/net-transactions/valuation series, 24 months (gap-closure S2) | public (L0 US-government data; generator directive 2026-10-31) | none |
 | `GET` | `/api/insights/status` | The Insights ingest status (last fetch row results, generatedAt) | public | none |

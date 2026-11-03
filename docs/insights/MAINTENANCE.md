@@ -31,6 +31,32 @@ where to look; nothing here needs the agent.
   (the register records what to re-quote). Re-run the FRED copyright scan
   (`pnpm --filter @currena/insights exec tsx scripts/fred-copyright-scan.ts`)
   and commit any changed records.
+- **The S6 shadow-promotion follow-ups (gap-closure 2026-11-03):**
+  1. `docs/gap-closure/PROMOTION-PROPOSAL.md` — the owner's approval is
+     the PENDING decision (cfnai + ebp proposed; §6 carries the two
+     rebalancing questions). Until approved, the voters stay 48 and the
+     proposal's §7 plan stays armed.
+  2. The re-check candidates (from the proposal's honest negatives):
+     `sloos-ci-tightening` re-checks when its quarterly base crosses
+     ~2028 (n=22 at the 2026 evaluation); `ofr-fsi` re-checks as stress
+     episodes accrue (10 warning windows at evaluation); the young
+     families (NZ, China, the M6.3 trio) re-check as their stored
+     histories cross the 120-observation percentile floor.
+- **The S6 cadence checks (new quarterly rhythms):**
+  - `usd-reserve-share` (IMF COFER): quarterly, ~one quarter behind —
+    expect the new quarter's reading within ~4-5 weeks of the quarter
+    end (the Saturday gate re-checks weekly; a stale card beyond the
+    270-day window means the parser or the dataset changed — check
+    VERIFIED-SOURCES's COFER row before anything else).
+  - The NBS China pair (property investment + crude steel): the
+    dedicated releases publish ~the 19th-20th of each month; the rung
+    fetches daily through the 21st-25th. A missing month = the release
+    title form changed (the five layout variants are fixture-pinned;
+    a new variant fails loudly).
+  - The NZ mirrors + the Italy 10y leg (OECD monthly, via FRED): a
+    one-month lag is normal; a two-month lag means the OECD mirror
+    stalled (the bund/gilt siblings on the same bulk group are the
+    control — if THEY advanced, the mirror id itself needs a look).
 - **RE-CONFIRM the two owner directives recorded in code:**
   1. The 2026-10-19e prices directive — the four tiles (brent, gold-usd,
      silver-usd, btc-usd) are public BY OWNER DECISION

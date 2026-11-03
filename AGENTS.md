@@ -591,6 +591,10 @@ through the KV REST API for post-deploy landings.
 Sourced from `packages/insights/src/markets/definitions.ts` (`MARKETS`).
 Each index renders as a tile + a row in the markets table. Provider:
 EODHD (owner's personal plan) primary, Yahoo Finance fallback.
+*(The AUSTRALIAN twin board — the 18 ASX indices + the S&P/NZX 50
+rider on the separate `AuMarketId` union, Yahoo-only, the markets
+worker's 4th cron — is documented in §A's S5-M5.4/S6-M6.1 note; the
+ASX 200 anchor stays here on the world board.)*
 
 | id | group | exchange | EODHD code | Yahoo symbol |
 |---|---|---|---|---|
