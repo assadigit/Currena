@@ -21,7 +21,21 @@
    context line, the measured note, the detail-panel interaction with
    the tilt phrase + the B-12 row) and the default view (the wind +
    model-vs-reality panels, the legacy chips, the legacy subtitle).
-3. Gates at merge: **ALL 9 GREEN — 14,582 tests** (web 12,623 ·
+3. **Independently RE-VERIFIED 2026-11-04 by a fresh recovery session**
+   (no repo state changed by it): CI `gates` green on both `0bba57a`
+   and main HEAD; the Cloudflare API confirms currena-api serves
+   `1bfc88c5` @ 100% (deployment `aad8fbce`, 2026-11-03T17:00:46Z);
+   the deployed index chunk references `Insights-ptsctHOq.js` (1,533,148
+   bytes raw — the measured 1533.15 kB); a live production browser pass
+   re-confirmed the flag view EN + fa (the 4 lane chips, «دوپاره» +
+   "2 for, 2 against", the context line −5.24%, the measured note →
+   BACKTEST-GOLD-LANES.md, the detail panel's member groups + the
+   "expectations fading" tilt phrase + the B-12 "Normal" row, RTL, no
+   wind words in the gold card, no 360 overflow, zero console errors)
+   and the default view's legacy rendering; locally re-run: the 19
+   component tests, the 15 engine tests, copy:audit clean, and the
+   bundle budget check all green ("All bundle budgets held").
+4. Gates at merge: **ALL 9 GREEN — 14,582 tests** (web 12,623 ·
    insights 1,285); copy:audit clean (fa **round-76**, 17 strings);
    Insights lazy chunk 1533.15/354.25 (ceiling 1540/355.5, justified);
    CHANGELOG [2026-11-03i] (heading count 191 verified).
