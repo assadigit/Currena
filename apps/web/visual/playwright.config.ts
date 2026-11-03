@@ -89,6 +89,18 @@ export default defineConfig({
       testMatch: /gb-s4-visual\.plw\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // gold-balance GB-S4 union probes (the parallel-session union's
+      // standing guards, added by the second variant's verification pass):
+      // the FOUR-weights-on-one-pan worst case at 360/390 EN+fa (05
+      // §4.3/§9 — the merged suite proves three on a pan) and the caption
+      // AA on the 9% pan TINT (05 §5 — the merged suite's background
+      // climb measures against the card; the pans' tint is a gradient
+      // background-image it cannot see).
+      name: 'gb-s4',
+      testMatch: /gb-s4-union-probe\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
   webServer: [
     {
