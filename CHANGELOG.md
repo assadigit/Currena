@@ -5,6 +5,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03a] — gap-closure S6-M6.4: the shadow review and promotion PROPOSAL (nothing promoted — G-5; cfnai + ebp proposed, the owner decides)
+
+The M6.4 evaluation: 15 registered candidate–outcome pairs measured with
+the repo's own discipline (the trailing-10y top-decile rule — exactly the
+production percentile rule — with the provider's own thresholds where one
+exists; no lookahead; every cell's n; the post-2000 sensitivity splits
+reported beside; the gold program's "no edge" verdict as the bar).
+Evidence: `docs/gap-closure/evidence/M6.4/` (the reproducible harness +
+the providers' own data + the raw results).
+
+- **PROPOSED for promotion (the owner approves; nothing flips yet):**
+  `cfnai` → growth-health (`threshold below −0.7`, the Chicago Fed's own
+  marker; lift 3.30 full / 3.78 post-2000; P(unemployment rise | warn)
+  68.5% vs 20.8% base; n=583) and `ebp` → market-stress (`percentile
+  high 0.1`; lift 1.80 / 2.27; P(drawdown | warn) 30.4% vs 16.9%; n=521).
+  Both read normal at today's data — promoting both changes no verdict
+  today (Global 8/30 → 8/32, same label step).
+- **Evidence-qualified but NOT proposed:** `ofr-fsi` (lift 3.18 on only
+  10 warning windows, all episodes STLFSI/NFCI/VIX already fire) and
+  `continuing-claims` (lift 2.61; the labour-voter overlap the spec
+  reserves for the owner).
+- **The measured keep-contexts (11), including the honest negatives:**
+  gscpi 1.44, nyfed-custody 1.47 (WARN today — no promotion on sub-2×
+  lift), au-underemployment 1.38 (fires 29.8% of the time), au-
+  participation 1.30, gpr-index 1.06 (the null), walcl 0.80,
+  shiller-cape 0.84 (no 12-month edge; WARN today — the would-be false
+  alarm), median-cpi 0.74, chokepoint-suez 0.35 (transit collapses
+  coincide with calm oil), sloos 2.93 on n=22 (re-check ~2028),
+  usd-reserve-share (42 quarters — not evaluable under any honest base).
+- The rebalancing questions (the gold-specific market-stress voters; the
+  growth-health labour overlap) recorded in the proposal §6 as the
+  owner's separate explicit decisions. Nothing removed or hidden (G-3);
+  the voters stay 48 until approval (G-5).
+- **PROMOTION-PROPOSAL.md committed; execution plan §7 armed; owner
+  approval PENDING.**
+
+## [2026-11-02j] — gap-closure S6-M6.3: the de-dollarization and concentration family (the IMF COFER reserve share + the S&P 500 equal-weight/cap-weight proxy + the Italy–Germany spread; G12)
 ## [2026-11-02j] — gap-closure S6-M6.3: the de-dollarization/concentration family (the COFER reserve share + the S&P 500 breadth proxy + the BTP–Bund spread — three context cards, a new shadow lane)
 
 The last gap family of the program. Three cards, all context-only per
