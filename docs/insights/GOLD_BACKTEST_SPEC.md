@@ -513,6 +513,40 @@ tables are labelled "not used for selection". **No forecasting edge is
 claimed** — for either rule, for the consolidated balance, or for the
 frozen tables; the standing no-edge record above is unchanged.
 
+### The 2026-11-03 calibration robustness check (the parallel-session union)
+
+A second GB-S1 variant ran concurrently with the one that landed
+(PR #12), hit the same Frankfurter stage-blob finding, and resolved it
+the OTHER pre-registered way: the fixture stayed on the
+**corpus-of-record** (16 days, recorded 2026-10-31T15:17:40Z —
+02 §6's venue is "the same windows as the S4 report") instead of
+re-venuing the FX pair. It then measured the calibration independently
+(a separate implementation, `lanesOverVoters`, since discarded for the
+first-landed `laneBalanceOverVoters` per the S5/S6 union precedent):
+
+- 2,514 windows; **MIN2** — C1: level 622/2,514 = **24.7%**
+  (≤ 70%), fully tipped 1,247/2,514 = **49.6%** (≤ 60%); C2:
+  median verdict flips **9**/60td = the 21-voter net-sign **9** (not
+  higher). **MIN1** — level 652/2,514 = 25.9%, fully tipped
+  554/2,514 = 22.0%; median 8 vs 9. The same mature-base nuance (MIN2
+  fully tipped 65.9% there — context only, the same shape the
+  landed report carries at 66.5%).
+- **The same decision by the same pre-registered rule: MIN2.**
+
+The robustness fact worth the record: **two independent implementations
+over two different corpora (the corpus-of-record and the fresh
+hist-venued 19-day dump) reached the same criteria verdicts and the
+same rule choice.** The decision is not an artifact of either corpus
+venue or either hand. The 2026-10-31 worked example reproduced 01 §7
+exactly under both rules on the real archive readings (MIN2 level with
+borrowing costs a 2v2 split; MIN1 the full 10° against gold on two
+single-voter lanes), and the corpus-of-record re-check reproduced every
+S6 number byte-identically with the watch days 2–4 in lockstep
+(the full record: CHANGELOG [2026-11-03g]).
+
+The standing honesty rule is unchanged: **no forecasting edge is
+claimed** — for either rule, at any horizon, over any population.
+
 ### The standard block (S4)
 
 - `corepack pnpm -r test` — green (the insights package gains

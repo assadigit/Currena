@@ -5,6 +5,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-03g] — gold balance GB-S1 (the parallel-session union): a second GB-S1 variant ran concurrently, hit the same FX finding, took the OTHER pre-registered path (the corpus-of-record fallback), and INDEPENDENTLY measured the calibration — the same decision (MIN2) over a different corpus; the first-landed variant stands whole (PR #12, already merged); main verified end-to-end (CI green, both reports regenerate byte-identically, gates ALL 9 GREEN 14,548)
+
+The repo's second parallel-session union of the day (the gap-closure
+S6 set the precedent). Two GB-S1 sessions ran concurrently from
+10f3e65, both discovered the same stage-blob finding, and both ran the
+02 §6 calibration to the same pre-registered conclusion.
+
+- **The shared finding:** the 2026-11-03 04:35 UTC rung's Frankfurter
+  collect failed (the whole FX family stale on the live snapshot; the
+  fresh stage lacks `dollar-basket`/`usdjpy`) — recorded independently
+  by both sessions within ~50 minutes of each other.
+- **The two resolutions:** the first-landed variant (PR #12, merged as
+  98168b4) re-venued the two FX series read-only from
+  `insights:hist:*` in the dump script and ran the calibration over
+  the fresh 19-day corpus (2,512 windows; MIN2 C1 level 25.0% /
+  full-tip 49.7%, C2 flips 8 vs the net-sign 9). The second variant
+  (this record) kept the fixture on the **corpus-of-record** (16 days,
+  recorded 2026-10-31T15:17:40Z — the pre-registered calibration venue
+  is "the same windows as the S4 report") and measured: 2,514 windows;
+  MIN2 C1 level 622/2,514 = **24.7%** / fully tipped 1,247/2,514 =
+  **49.6%**, C2 median **9** = the 21-voter net-sign **9**; MIN1
+  652/2,514 = 25.9% / 554/2,514 = 22.0%, median 8 vs 9; the same
+  mature-base nuance (MIN2 full-tip 65.9% there — context only). The
+  2026-10-31 worked example reproduced 01 §7 exactly under both rules
+  (MIN2 level + four neutral with borrowing costs a 2v2 split; MIN1
+  the full 10° against gold on two single-voter lanes; the frozen
+  wind engine -2/headwind/6 on the same readings).
+- **The robustness fact this union records: two independent
+  implementations (lanesOverVoters in the second; laneBalanceOverVoters
+  in the first) over two different corpora (the corpus-of-record and
+  the fresh hist-venued dump) reached the SAME decision by the same
+  pre-registered criteria.** The first-landed variant stands whole per
+  the S5/S6 union precedent (zero code diff); the second variant's
+  measurement is recorded as the decision's robustness check in
+  `GOLD_BACKTEST_SPEC.md` §5 and PROGRESS.md.
+- **The re-check over the corpus-of-record (the second variant's §3
+  run, recorded in the session notes):** every S6 number reproduced
+  exactly (`BACKTEST-GOLD.md` byte-identical); the watch days 2–3
+  (11-01/11-02 holding over the weekend) + day 4 (11-03: trio
+  10-29 → 10-30, decade group 10-30 → 11-02, both +1 trading
+  day) — validated-by-watch, the offset never widened past 1; the
+  11-01/02/03 `goldSummary` stamps (-2/headwind) === the promoted-table
+  re-derivation re-derived read-only from the archived readings (no
+  drift; the tilt silent on all three).
+- **Main verified end-to-end post-merge (this session, re-run and
+  measured):** CI green on the merge commit (the gates check:
+  success); `BACKTEST-GOLD.md` AND `BACKTEST-GOLD-LANES.md` regenerate
+  **byte-identically** from the committed corpus; the full
+  `pnpm gates` ALL 9 GREEN — 14,548 tests, Insights lazy
+  1522.88/351.96 against the 1530/354 ceiling (the built worker
+  unchanged; nothing in `apps/` imports the harness).
+- One heading-collision note for the record: both sessions had planned
+  `[2026-11-03f]`; the first-landed took it, this union takes
+  `[2026-11-03g]`, and the count moved 187 → 188 → 189
+  (verified at each step).
+
 ## [2026-11-03f] — gold-balance P0: the missed re-check runs manually (the watch closes validated-by-watch) + the lane calibration chooses GOLD_LANE_MIN_FIRING = 2 (BACKTEST-GOLD-LANES.md; the frozen tables byte-identical)
 
 GB-S1, the gold balance consolidation's first session. Two deliverables,

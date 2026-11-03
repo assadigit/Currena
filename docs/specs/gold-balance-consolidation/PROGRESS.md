@@ -80,10 +80,50 @@ round).
   (scripts + tests + docs only; the app code never imports the harness —
   the built worker is unchanged).
 
+### GB-S1b (2026-11-03 ~05:20–06:00 UTC) — the second variant: the parallel-session union (P0 verified twice)
+
+A second GB-S1 session ran concurrently from 10f3e65 (both variants
+discovered the same 04:35 UTC Frankfurter stage-blob finding within
+~50 minutes of each other). This variant's path and its record:
+
+- **The other pre-registered resolution:** the fixture stayed on the
+  **corpus-of-record** (16 days, recorded 2026-10-31T15:17:40Z —
+  02 §6's calibration venue is "the same windows as the S4
+  report"); the fresh dump's blocker was recorded and the fixture
+  reverted. The §3 re-check over it reproduced every S6 number
+  exactly (`BACKTEST-GOLD.md` byte-identical); the watch days 2–4
+  read lockstep from the fresh archive reads the dump performed
+  (11-01/11-02 holding over the weekend; 11-03 both +1 trading day)
+  — validated-by-watch; the 11-01/02/03 `goldSummary` stamps
+  (−2/headwind) === the promoted-table re-derivation, re-derived
+  read-only from the archived readings (no drift; the tilt silent on
+  all three).
+- **The independent calibration measurement** (a separate
+  implementation `lanesOverVoters`, discarded per the first-landed
+  union precedent — zero code diff vs PR #12): 2,514 windows;
+  MIN2 C1 level **24.7%** / full-tip **49.6%**, C2 median **9** = the
+  net-sign **9**; MIN1 25.9% / 22.0%, median 8 vs 9; the same
+  mature-base nuance (MIN2 full-tip 65.9% there). The 2026-10-31
+  worked example reproduced 01 §7 under both rules.
+- **The union result: the first-landed variant stands whole (PR #12,
+  merged as 98168b4); this variant's measurement is recorded as the
+  decision's robustness check** (GOLD_BACKTEST_SPEC §5 + CHANGELOG
+  [2026-11-03g]): two independent implementations over two different
+  corpora reached the same criteria verdicts and the same decision,
+  **MIN2** — the choice is not an artifact of either corpus venue
+  or either hand.
+- **Main verified end-to-end post-merge (re-run and measured):** CI
+  green on 98168b4; both reports regenerate byte-identically from the
+  committed corpus; the full gates ALL 9 GREEN — 14,548 tests,
+  Insights lazy 1522.88/351.96 (the built worker unchanged).
+
 ## Owner must decide
 
 1. **Confirm the calibration decision** (or reverse it): the pre-registered
-   rule selected **MIN2** (`GOLD_LANE_MIN_FIRING = 2`, D-GB-3's default).
+   rule selected **MIN2** (`GOLD_LANE_MIN_FIRING = 2`, D-GB-3's default) —
+   and the parallel-session union measured it TWICE, independently, over two
+   different corpora (the corpus-of-record 16-day run and the fresh 19-day
+   run): the same criteria verdicts, the same decision, from two hands.
    The measured tables are in `docs/insights/BACKTEST-GOLD-LANES.md`; the
    one number worth your eyes is the mature-base row: from 2021-09-23 the
    MIN2 balance reads fully tipped (10°, one-sided) in **66.5%** of windows
