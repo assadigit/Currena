@@ -64,6 +64,23 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 | Reserve Bank of New Zealand | بانک مرکزی نیوزیلند | the «بانک مرکزی» glossary term |
 | OECD (the organisation) | سازمان همکاری و توسعه اقتصادی | one convention everywhere (no hamza on توسعه) |
 
+## De-dollarization and concentration (gap-closure S6)
+
+| English | Persian | Notes |
+| --- | --- | --- |
+| US dollar share of world FX reserves | سهم دلار از ذخایر ارزی جهان | `indicators.usd-reserve-share.name`; «سهم دلار از ذخایر جهان» in layer 1 |
+| Reserve share | سهم ذخایر | the ticker (`indicators.usd-reserve-share.ticker`) |
+| Reserve diversification | تنوع‌بخشی ذخایر | the slow structural story — the measured phrasing only, never a prediction |
+| Equal-weight index | شاخص هم‌وزن | the glossary term; every company counts once |
+| Cap-weighted | وزن‌مبنا | `indicators.sp500-breadth-ratio.name` («S&P 500 هم‌وزن در برابر وزن‌مبنا (نسبت)») |
+| Breadth ratio | نسبت گستردگی | the ticker (`indicators.sp500-breadth-ratio.ticker`) |
+| Two scales / two yardsticks | دو ترازو | the layer-1 plainName («بازار بزرگ آمریکا، با دو ترازو») |
+| Market concentration | تمرکز بازار | the why-it-matters language; the card is honestly a proxy for the giants' share |
+| Proxy measure | سنجهٔ جایگزین | the honest label on sp500-breadth-ratio (the level is arbitrary; the movement is the signal) |
+| Italy–Germany 10-year spread | فاصلهٔ ۱۰سالهٔ ایتالیا و آلمان | `indicators.btp-bund-spread.name`; «فاصلهٔ استقراض ایتالیا و آلمان» in layer 1 |
+| BTP / Bund | BTP / بوند | the Italian and German government-bond tickers; the Latin BTP stays (the ticker `BTP–Bund`) |
+| Sovereign spread | فاصلهٔ حاکمیتی | the glossary term — what two governments pay to borrow for the same term |
+
 ## Exchange rates and conversion
 
 | English | Persian | Notes |
