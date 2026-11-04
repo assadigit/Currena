@@ -68,6 +68,20 @@ which starts by resolving the lock.**
 
 ## GA-S2-COMPLETION — the wiring evidence pack (A2's deferred half; the live kickoff)
 
+RUN (2026-11-05) — **FALLBACK AGAIN (the lock still unresolved)**: the owner
+was not reachable in-session (the second consecutive session) and left no
+decision in the repo, so the session executed only this prompt's explicit
+fallback — the lock-nothing re-verification: the drift record
+`evidence/wire-scan-2026-11-05.txt` committed (the denominators, the GB-S7
+retirement and all 21 voters verified holding; the day's deltas — the healed
+dollar lane, `ecb-dfr` gone stale, `usdcny` the only `check-pending` — noted
+in PROGRESS's session block). The voters table (03 §1.1) and the wiring
+trace + the context traces + the history depths (03 §2) remain DEFERRED —
+wiring work against the unlocked denominator (D-GA-1). **The prompt below is
+re-issued with the exact state — the next session starts by resolving the
+lock (OI-GA-1), whose question is printed in the GA-S2-completion session's
+final message.**
+
 ```
 You are working in the Currena repo at the repo root. This is the
 GA-S2-completion session of the gold meter audit program — the owner's
@@ -101,10 +115,30 @@ present; the day's states recorded as facts). What did NOT ship: the
 voters table (03 §1.1), the wiring trace + the context traces + the
 history depths (03 §2) — deferred because the trace needs the LOCKED
 denominator. 02-REFERENCE-TAXONOMY.md is untouched (v1, unlocked).
-Repo state: main holds the GA-S2 partial merge (PR "gold meter audit
-(GA-S2): the inventory + wiring evidence pack" — the partial scope is
-recorded in the PR body and PROGRESS row B); git pull --rebase before
-starting.
+GA-S2-COMPLETION RAN (2026-11-05, PROGRESS.md row B still PARTIAL): the
+owner was NOT reachable in-session AGAIN (the second consecutive session)
+and left no decision in the repo (no commits after the GA-S2 merge,
+PR #28 zero comments, no new issues; 02 still v1/unlocked), so the session
+took this prompt's explicit fallback — the lock-nothing re-verification
+ONLY: ga-s2-wire-scan.sh re-run against the fresh wire (the 20:10-UTC-sweep
+snapshot, generatedAt 2026-11-04T20:10:18.690Z) with the dated drift record
+committed as evidence/wire-scan-2026-11-05.txt. The holds: 161 readings =
+161 DEFINITIONS ids; goldSummary absent — the GB-S7 retirement verified
+holding, the second consecutive scan; all 21 voters present; the doc-table
+159-row drift and the GAUGES 12/68/48 + 4-shadow cross-checks unchanged;
+every static scan column identical across the two runs — no code moved.
+The day's notable deltas (facts, in PROGRESS's session block): the dollar
+lane healed (dollar-basket + usdjpy stale → normal, both evalLeg inputs
+present); ecb-dfr flipped normal → stale (asOf unchanged, both inputs now
+absent — the WHY is the post-lock wiring trace's job); usdcny the only
+check-pending; 21/161 rows drifted, 140 identical. What did NOT ship
+(again): the voters table (03 §1.1), the wiring trace + the context traces
++ the history depths (03 §2) — still deferred, still blocked on the lock.
+02-REFERENCE-TAXONOMY.md is untouched (v1, unlocked).
+Repo state: main holds the GA-S2-completion fallback merge (PR "gold meter
+audit (GA-S2 completion): the wiring evidence pack" #29 — the fallback
+scope is recorded in the PR body and PROGRESS row B); git pull --rebase
+before starting.
 
 RESOLVE THE LOCK FIRST (OI-GA-1)
 BEFORE any wiring work: ask the owner to LOCK or AMEND the 82-row v1
@@ -116,12 +150,15 @@ PROGRESS.md's session block, and re-state the arithmetic in any downstream
 file that quotes it. If the owner locks: write the lock line into 02's
 status header ("LOCKED by the owner, <date>" — after that, additions are
 owner-recorded amendments only) and PROCEED with the work items below.
-If the owner is not reachable in-session AGAIN: do only the lock-nothing
-re-verification — re-run ga-s2-wire-scan.sh against the fresh wire, commit
-dated output under evidence/ (the day-to-day drift record), note any
-deltas in PROGRESS.md's session block — and end the session with the lock
-question printed. Do NOT start the voters table, the wiring trace or the
-history depths: they are wiring work against the denominator.
+If the owner is not reachable in-session AGAIN (this fallback has now
+fired twice — GA-S2 on 2026-11-04, GA-S2-completion on 2026-11-05): do
+only the lock-nothing re-verification — re-run ga-s2-wire-scan.sh against
+the fresh wire, commit dated output under evidence/ as
+wire-scan-<date>.txt (the day-to-day drift record — the series
+2026-11-04, 2026-11-05, … continues), note any deltas in PROGRESS.md's
+session block — and end the session with the lock question printed. Do
+NOT start the voters table, the wiring trace or the history depths: they
+are wiring work against the denominator.
 
 WHAT THIS SESSION IS
 The completion of A2 (01 §2; 03 §1.1 + §2): the voters table, the wiring
@@ -134,13 +171,14 @@ WORK ITEMS (in order)
    02-REFERENCE-TAXONOMY.md (the LOCKED denominator — after the lock is
    resolved), 03-METHOD-AND-EVIDENCE.md (§1.1 + §2 are this session's
    procedures), 04-REPORT-AND-FILL-DESIGN.md, PROGRESS.md (the GA-S1 +
-   GA-S2 blocks — the verified source record and the delivered
-   source-side inventory), PROMPTS.md; then docs/INDICATORS_AND_DATA-
+   GA-S2 + GA-S2-completion blocks — the verified source record, the
+   delivered source-side inventory and the drift record), PROMPTS.md; then docs/INDICATORS_AND_DATA-
    SOURCES.md, the audited object's record (docs/specs/gold-balance-
    consolidation/02-ENGINE-AND-DECISION-TABLE.md §4 — the 21-voter table),
    docs/insights/GOLD_SCORE_SPEC.md, evidence/inventory.md + evidence/
-   wire-scan-2026-11-04.txt (the delivered half — build on it, do not
-   redo it), and the code itself: packages/insights/src/gold-score.ts
+   wire-scan-2026-11-04.txt + evidence/wire-scan-2026-11-05.txt (the
+   delivered half + the drift records — build on them, do not redo them),
+   and the code itself: packages/insights/src/gold-score.ts
    (GOLD_LANE_VOTERS), connections.ts (evalLeg + SIGNAL_LEG_MOVE —
    note: only 4 of the 21 voter ids carry a 30-day move threshold),
    gold-balance.ts. Then git pull --rebase.

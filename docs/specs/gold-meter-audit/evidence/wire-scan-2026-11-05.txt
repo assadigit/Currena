@@ -1,0 +1,222 @@
+# fetched live: HTTP 200 (81002 bytes)
+========================================================================
+1. THE WIRE  (GET /api/insights)
+========================================================================
+generatedAt      : 2026-11-04T20:10:18.690Z
+readings         : 161 (161 unique ids)
+goldSummary      : ABSENT (the GB-S7 retirement holds)
+displayMode      : public  ruleVersion: 4
+status counts    : {'check-pending': 1, 'context': 104, 'normal': 29, 'stale': 13, 'warning': 14}
+summary.global   : stressed  {'warningCount': 9, 'votingCount': 30, 'excludedCount': 12, 'staleCount': 2, 'staleVoters': ['ecb-dfr', 'govt-interest-revenue']}
+summary.australia: stressed  {'warningCount': 5, 'votingCount': 13, 'excludedCount': 13, 'staleCount': 8, 'staleVoters': ['au-us-10y-gap', 'au-unemployment', 'terms-of-trade', 'au-gdp-growth', 'au-population-growth', 'au-participation', 'au-underemployment', 'au-trade-balance']}
+
+========================================================================
+2. THE VOTER FIELDS  (the 21 gold-lane seats x today's wire)
+========================================================================
+id                       @line lane            pol  asOf        status    ch30d pct10y
+real-yield-10y             158 borrowing-costs  -1  2026-11-02  warning       y     y
+us10y                      159 borrowing-costs  -1  2026-11-02  warning       y     y
+us30y                      160 borrowing-costs  -1  2026-11-02  warning       y     y
+fed-target                 161 borrowing-costs  -1  2026-11-04  normal        y     y
+fed-expectations           162 borrowing-costs  -1  2026-11-02  normal        y     y
+ecb-dfr                    163 borrowing-costs  -1  2026-11-04  stale         -     -
+yield-curve-10y2y          164 borrowing-costs  -1  2026-11-03  normal        y     y
+yield-curve-10y3m          165 borrowing-costs  -1  2026-11-03  normal        y     y
+dollar-basket              168 dollar           -1  2026-11-04  normal        y     y
+usdjpy                     169 dollar           -1  2026-11-04  normal        y     y
+us-japan-10y-gap           170 dollar           -1  2026-10-30  normal        -     y
+stress-stlfsi              173 stress            1  2026-10-30  normal        y     y
+nfci                       174 stress            1  2026-10-30  normal        y     y
+vix                        175 stress            1  2026-11-03  normal        y     y
+gold-silver                176 stress            1  2026-11-04  normal        y     y
+cftc-gold-positioning      177 stress           -1  2026-10-27  warning       -     -
+us-cpi-yoy                 179 inflation         1  2026-09-01  warning       y     y
+us-pce-core-yoy            180 inflation         1  2026-09-01  warning       y     y
+euro-hicp                  181 inflation         1  2026-10-01  warning       y     y
+breakeven-5y5y             182 inflation         1  2026-11-03  normal        y     y
+breakeven-tilt             183 inflation         1  2026-11-03  context       y     y
+
+========================================================================
+3. THE THREE DENOMINATORS
+========================================================================
+wire readings          : 161 ids
+DEFINITIONS entries    : 161 ids
+doc table header claim : 161 ids
+doc table actual rows  : 159 ids
+doc Counts: line claim : 145 ids (stale if != 159)
+wire - doc table       : ['term-premium-10y', 'tga']
+doc table - wire       : []
+DEFINITIONS - wire     : []
+wire - DEFINITIONS     : []
+DEFINITIONS - doc      : ['term-premium-10y', 'tga']
+doc - DEFINITIONS      : []
+DEFINITIONS rule kinds : 48 scored-gauge rules + 113 info (context) = 161
+GAUGES                  : 12 gauges, 68 listed members, 48 scored voters in the 8 non-shadow gauges (borrowing-costs:9, prices-heat:5, market-stress:5, dollar-strength:3, growth-health:10, au-inflation-rates:5, au-households:7, au-trade-currency:4, geo-fragmentation:8, au-activity:6, au-external:4, dedollar-concentration:2)
+shadow gauges (G-5)     : au-activity, au-external, dedollar-concentration, geo-fragmentation (20 context-only members, never vote until S6)
+doc-voter flag vs GAUGES: AGREE on all 159 doc rows
+
+========================================================================
+4. THE TABLE  (one row per DEFINITIONS id, alphabetical)
+========================================================================
+id | group | source | sourceRef | cadence | staleAfterDays | docMaxAge | docLevel | gaugeVoter(gauges.ts) | wireAsOf | wireStatus | goldLaneVoter
+au-10y | au-inflation-rates | rba | RBA F2 FCMYGBAG10D (daily) / F2.1 FCMYGBAG10 (monthly fallback) | daily | 40 | 40 | L0 | VOTER:au-inflation-rates | 2026-09-30 | warning | -
+au-building-approvals | au-activity | abs | ABS BA_GCCSA 1.1.9.1.100.10.AUS.M (dwelling units approved, new residential, original) | monthly | 75 | 75 | L0 | SHADOW:au-activity | 2026-09-01 | context | -
+au-cpi | au-inflation-rates | abs | ABS monthly CPI All groups index (annual change derived) | monthly | 95 | 95 | L0 | VOTER:au-inflation-rates | 2026-09-01 | warning | -
+au-deposit-rate | au-households | rba | RBA F4.1 PDRNTH (paid rate, new household term deposits) | monthly | 70 | 70 | L0 | - | 2026-08-31 | context | -
+au-gdp-growth | au-activity | abs | ABS ANA_AGG M1.GPM.20.AUS.Q (chain-volume GDP level, annual change derived) | quarterly | 215 | 215 | L0 | SHADOW:au-activity | 2026-04-01 | stale | -
+au-home-loan | au-households | rba | RBA F6 FLRHOOTA (owner-occupier outstanding, all institutions) | monthly | 70 | 70 | L0 | VOTER:au-households | 2026-08-31 | warning | -
+au-home-values | au-households | abs | ABS RES_DWELL_ST residential dwelling price index | quarterly | 225 | 225 | L0 | VOTER:au-households | 2026-04-01 | normal | -
+au-household-debt-arrears | au-households | rba | RBA E2 'Household debt to income' (ABS-calculated ratios republished by the RBA) | quarterly | 190 | 190 | L0 | VOTER:au-households | 2026-06-30 | normal | -
+au-household-spending | au-activity | abs | ABS HSI_M 9.TOT.CUR.10.AUS.M (Monthly Household Spending Indicator, through-the-year %) | monthly | 75 | 75 | L0 | SHADOW:au-activity | 2026-09-01 | context | -
+au-housing-finance | au-households | abs | ABS LEND_HOUSING/FIN_VAL.NEWCOMMITS.DV8368.TOTDWELL.TOT.TOT.20.AUS.Q (new housing loan com | quarterly | 230 | 230 | L0 | VOTER:au-households | 2026-04-01 | normal | -
+au-job-vacancies | au-households | abs | ABS JV/M1.7.TOT.20.AUS.Q (job vacancies, all sectors, seasonally adjusted, thousands) | quarterly | 240 | 240 | L0 | - | 2026-07-01 | context | -
+au-nom | au-activity | abs | ABS ERP_COMP_Q 9.AUS.Q (net overseas migration, quarterly level) | quarterly | 270 | 270 | L0 | - | 2026-01-01 | stale | -
+au-participation | au-activity | abs | ABS LF M12.3.1599.20.AUS.M (participation rate, persons, seasonally adjusted) | monthly | 60 | 60 | L0 | SHADOW:au-activity | 2026-09-01 | stale | -
+au-petrol-yoy | au-inflation-rates | abs | ABS CPI Automotive fuel index (12-month % change) | monthly | 95 | 95 | L0 | - | 2026-09-01 | context | -
+au-population-growth | au-activity | abs | ABS ERP_COMP_Q 10.AUS.Q (estimated resident population, annual change derived) | quarterly | 270 | 270 | L0 | SHADOW:au-activity | 2026-01-01 | stale | -
+au-rent-yoy | au-households | abs | ABS CPI Rents index, monthly (12-month % change) | monthly | 95 | 95 | L0 | VOTER:au-households | 2026-09-01 | normal | -
+au-saving-ratio | au-households | abs | ABS ANA_AGG/M7.HSR.20.AUS.Q (household saving ratio, seasonally adjusted, % of disposable  | quarterly | 250 | 250 | L0 | - | 2026-04-01 | context | -
+au-trade-balance | au-external | abs | ABS ITGS M1.170.20.AUS.M (balance on goods, seasonally adjusted, $m) | monthly | 75 | 75 | L0 | SHADOW:au-external | 2026-08-01 | stale | -
+au-trimmed-mean | au-inflation-rates | abs | ABS monthly CPI Trimmed Mean index (annual change derived) | monthly | 95 | 95 | L0 | VOTER:au-inflation-rates | 2026-09-01 | warning | -
+au-underemployment | au-activity | abs | ABS LF_UNDER M23.3.1599.20.AUS.M (underemployment rate, proportion of labour force, SA) | monthly | 60 | 60 | L0 | SHADOW:au-activity | 2026-09-01 | stale | -
+au-unemployment | au-households | abs | ABS Labour Force M13 (persons, SA, Australia) | monthly | 60 | 60 | L0 | VOTER:au-households | 2026-09-01 | stale | -
+au-us-10y-gap | au-inflation-rates | derived | RBA F2 10y − FRED:DGS10 | daily | 40 | 40 | L0 | VOTER:au-inflation-rates | 2026-09-30 | stale | -
+au-wage-growth | au-households | abs | ABS WPI total hourly rates excluding bonuses (12-month % change) | quarterly | 230 | 230 | L0 | VOTER:au-households | 2026-04-01 | warning | -
+audjpy | au-trade-currency | derived | Frankfurter USD→JPY ÷ USD→AUD | daily | - | 4 | L1 | VOTER:au-trade-currency | 2026-11-04 | normal | -
+audnzd | au-external | derived | Frankfurter USD→NZD ÷ USD→AUD | daily | - | 4 | L1 | SHADOW:au-external | 2026-11-04 | context | -
+audusd | au-trade-currency | derived | 1 ÷ Frankfurter USD→AUD | daily | - | 4 | L1 | VOTER:au-trade-currency | 2026-11-04 | normal | -
+bank-reserves | market-stress | fred | FRED:WRESBAL (Reserve Balances with Federal Reserve Banks: Wednesday Level, weekly, $ mill | weekly | 21 | 21 | L0 | - | 2026-10-28 | context | -
+boe-rate | borrowing-costs | boe | Bank of England official Bank Rate history (decision table) | per-change | - | – | L2 | - | 2026-11-04 | context | -
+boj-rate | borrowing-costs | fred | FRED:IRSTCI01JPM156N (overnight call rate, monthly) | monthly | 75 | 75 | L2 | - | 2026-09-01 | context | -
+breakeven-10y | prices-heat | fred | FRED:T10YIE (10-year breakeven inflation rate) | daily | - | 4 | L2 | - | 2026-11-03 | context | -
+breakeven-5y5y | prices-heat | fred | FRED:T5YIFR | daily | - | 4 | L2 | VOTER:prices-heat | 2026-11-03 | normal | VOTER
+breakeven-tilt | prices-heat | derived | FRED:T5YIFR − FRED:T5YIE (both collected; points) | daily | 5 | 5 | L2 | - | 2026-11-03 | context | VOTER
+brent | prices-board | fred | FRED:DCOILBRENTEU + Yahoo Finance BZ=F (gap-fill + live refresh) | daily | 12 | 12 | L2 | VOTER:prices-heat | 2026-11-03 | normal | -
+btc-usd | prices-board | gold-api | gold-api.com BTC spot (history: accumulated daily snapshots) | daily | 2 | 2 | L2 | - | 2026-11-04 | context | -
+btp-bund-spread | borrowing-costs | derived | FRED IRLTLT01ITM156N − IRLTLT01DEM156N (OECD monthly mirrors, percentage points) | monthly | 75 | 75 | L2 | - | 2026-08-01 | stale | -
+bund-10y | borrowing-costs | fred | FRED:IRLTLT01DEM156N (long-term government bond yield, monthly) | monthly | 75 | 75 | L2 | - | 2026-09-01 | context | -
+cfnai | growth-health | fred | FRED:CFNAI (Chicago Fed National Activity Index, monthly) | monthly | 95 | 95 | L2 | - | 2026-09-01 | context | -
+cftc-gold-positioning | market-stress | cftc | CFTC Commitments of Traders (futures-only, GOLD - COMMODITY EXCHANGE INC.) | weekly | 12 | 12 | L0 | VOTER:market-stress | 2026-10-27 | warning | VOTER
+china-cpi | growth-health | nbs | NBS English press release (Consumer Price Index, YoY; seed data/manual/china-cpi.json) | monthly | - | 45 | L1 | VOTER:growth-health | 2026-09-30 | normal | -
+china-pmi | growth-health | nbs | NBS English press release (Purchasing Managers Index, Table 1; seed data/manual/china-pmi. | monthly | - | 45 | L1 | VOTER:growth-health | 2026-10-31 | warning | -
+china-property-investment | au-trade-currency | nbs | NBS English press release (Investment in Real Estate Development, Table 1 YTD year-on-year | monthly | 75 | 75 | L2 | - | 2026-09-30 | context | -
+china-steel-output | au-trade-currency | nbs | NBS English press release (Industrial Production Operation, crude steel output, 10,000 ton | monthly | 75 | 75 | L2 | - | 2026-09-30 | context | -
+chokepoint-bab-el-mandeb | geo-fragmentation | portwatch | IMF PortWatch daily transits, Bab el-Mandeb Strait (n_total, 7-day average) | daily | 14 | 14 | L1 | SHADOW:geo-fragmentation | 2026-10-25 | context | -
+chokepoint-malacca | geo-fragmentation | portwatch | IMF PortWatch daily transits, Strait of Malacca (n_total, 7-day average) | daily | 14 | 14 | L1 | SHADOW:geo-fragmentation | 2026-10-25 | context | -
+chokepoint-panama | geo-fragmentation | portwatch | IMF PortWatch daily transits, Panama Canal (n_total, 7-day average) | daily | 14 | 14 | L1 | SHADOW:geo-fragmentation | 2026-10-25 | context | -
+chokepoint-suez | geo-fragmentation | portwatch | IMF PortWatch daily transits, Suez Canal (n_total, 7-day average) | daily | 14 | 14 | L1 | SHADOW:geo-fragmentation | 2026-10-25 | context | -
+chokepoint-taiwan | geo-fragmentation | portwatch | IMF PortWatch daily transits, Taiwan Strait (n_total, 7-day average) | daily | 14 | 14 | L1 | SHADOW:geo-fragmentation | 2026-10-25 | context | -
+coal-aus | au-trade-currency | world-bank | World Bank Pink Sheet (Coal, Australian; $/metric ton) | monthly | 60 | 60 | L1 | - | 2026-10-01 | context | -
+continuing-claims | growth-health | fred | FRED:CCSA (Continued Claims, Insured Unemployment, weekly Saturday, persons) | weekly | 28 | 28 | L0 | - | 2026-10-17 | context | -
+copper-gold | growth-health | derived | World Bank copper ÷ gold | monthly | 60 | 60 | L1 | VOTER:growth-health | 2026-10-01 | normal | -
+copper-usd | growth-health | gold-api | gold-api.com HG spot × 2204.62262 (history: World Bank Pink Sheet copper, monthly) | daily | 2 | 2 | L1 | - | 2026-11-04 | context | -
+crypto-fng | market-stress | alternative-me | alternative.me /fng/ API (daily, 0-100) | daily | 4 | 4 | L0 | - | 2026-11-04 | context | -
+dollar-basket | dollar-strength | derived | Frankfurter six-currency basket (DXY weights, 50.14348112 base) | daily | 4 | 4 | L1 | VOTER:dollar-strength | 2026-11-04 | normal | VOTER
+ebp | market-stress | frb | Federal Reserve Board:EBP (FEDS Notes excess bond premium file, ebp column, monthly, perce | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+ecb-dfr | borrowing-costs | ecb | ECB Data Portal FM/D.U2.EUR.4F.KR.DFR.LEV | daily | 7 | 7 | L1 | VOTER:borrowing-costs | 2026-11-04 | stale | VOTER
+eia-crude-stocks | prices-heat | eia | EIA WCRSTUS1 (U.S. ending stocks of crude oil, weekly, thousand barrels) | weekly | 12 | 12 | L0 | - | 2026-10-23 | context | -
+empire-state | growth-health | fred | FRED:GACDISA066MSFRBNY (Current General Business Conditions: Diffusion Index for New York, | monthly | 60 | 60 | L2 | - | 2026-10-01 | context | -
+epu-us | growth-health | epu | Baker-Bloom-Davis US Economic Policy Uncertainty index (monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+eur-usd | dollar-strength | frankfurter | Frankfurter USD→EUR | daily | 4 | 4 | L1 | - | 2026-11-04 | context | -
+euro-aaa-10y | borrowing-costs | ecb | ECB Data Portal YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (AAA yield curve, 10-year spot rate) | daily | 7 | 7 | L1 | - | 2026-11-03 | context | -
+euro-hicp | prices-heat | ecb | ECB Data Portal HICP/M.U2.N.000000.4D0.ANR (euro-area HICP all-items, annual rate of chang | monthly | 60 | 60 | L1 | VOTER:prices-heat | 2026-10-01 | warning | VOTER
+fed-expectations | borrowing-costs | derived | FRED:DGS2 − FRED:DFEDTARL/DFEDTARU midpoint (2-year yield minus the policy-rate midpoint) | daily | 4 | 4 | L0 | VOTER:borrowing-costs | 2026-11-02 | normal | VOTER
+fed-target | borrowing-costs | fred | FRED:DFEDTARL (lower bound) + DFEDTARU (upper bound) | daily | 5 | 5 | L0 | VOTER:borrowing-costs | 2026-11-04 | normal | VOTER
+food-index | prices-heat | world-bank | World Bank Pink Sheet (Monthly Indices, Food; 2010=100) | monthly | 60 | 60 | L1 | - | 2026-10-01 | context | -
+gas-europe | prices-heat | world-bank | World Bank Pink Sheet (Natural gas, Europe; $/mmbtu) | monthly | 60 | 60 | L1 | - | 2026-10-01 | context | -
+gdpnow | growth-health | fred | FRED:GDPNOW (Atlanta Fed GDPNow, real GDP growth, QoQ annualized, quarterly stamps) | quarterly | 150 | 150 | L2 | - | 2026-10-01 | context | -
+gilt-10y | borrowing-costs | fred | FRED:IRLTLT01GBM156N (long-term government bond yield, monthly) | monthly | 75 | 75 | L2 | - | 2026-09-01 | context | -
+gold-aud | au-trade-currency | derived | gold-api.com XAU × Frankfurter USD→AUD | daily | - | 4 | L1 | - | 2026-11-04 | context | -
+gold-btc | prices-board | derived | gold-api.com XAU ÷ BTC (bitcoin per troy ounce) | daily | - | 4 | L0 | - | 2026-11-04 | context | -
+gold-oil-ratio | prices-heat | derived | gold-usd ÷ brent (both collected; barrels of Brent per troy ounce of gold) | daily | 3 | 3 | L2 | - | 2026-11-03 | context | -
+gold-silver | market-stress | derived | gold-api.com XAU ÷ XAG (history: World Bank gold ÷ silver) | daily | 2 | 2 | L1 | VOTER:market-stress | 2026-11-04 | normal | VOTER
+gold-usd | prices-board | gold-api | gold-api.com XAU spot (history: World Bank Pink Sheet gold, monthly + daily accumulation) | daily | 2 | 2 | L2 | - | 2026-11-04 | context | -
+govt-interest-revenue | borrowing-costs | derived | FRED:A091RC1Q027SBEA ÷ FRED:W006RC1Q027SBEA | quarterly | 215 | 215 | L0 | VOTER:borrowing-costs | 2026-04-01 | stale | -
+gpr-acts | market-stress | gpr | Caldara-Iacoviello GPR acts sub-index (GPRA, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-australia | market-stress | gpr | Caldara-Iacoviello country GPR: Australia (GPRC_AUS, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-china | market-stress | gpr | Caldara-Iacoviello country GPR: China (GPRC_CHN, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-daily | market-stress | gpr | Caldara-Iacoviello daily GPR, 7-day moving average (GPRD_MA7) | daily | 12 | 12 | L0 | - | 2026-11-02 | context | -
+gpr-index | market-stress | gpr | Caldara-Iacoviello Geopolitical Risk Index (monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-israel | market-stress | gpr | Caldara-Iacoviello country GPR: Israel (GPRC_ISR, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-russia | market-stress | gpr | Caldara-Iacoviello country GPR: Russia (GPRC_RUS, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-saudi | market-stress | gpr | Caldara-Iacoviello country GPR: Saudi Arabia (GPRC_SAU, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-taiwan | market-stress | gpr | Caldara-Iacoviello country GPR: Taiwan (GPRC_TWN, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-threats | market-stress | gpr | Caldara-Iacoviello GPR threats sub-index (GPRT, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gpr-ukraine | market-stress | gpr | Caldara-Iacoviello country GPR: Ukraine (GPRC_UKR, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+gscpi | geo-fragmentation | nyfed | NY Fed Global Supply Chain Pressure Index (monthly) | monthly | 75 | 75 | L1 | SHADOW:geo-fragmentation | 2026-09-01 | context | -
+housing-permits | growth-health | fred | FRED:PERMIT (New Private Housing Units Authorized by Building Permits, monthly, thousands, | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+initial-jobless-claims | growth-health | fred | FRED:ICSA (initial claims, weekly) | weekly | 12 | 12 | L0 | VOTER:growth-health | 2026-10-24 | normal | -
+iron-ore | au-trade-currency | world-bank | World Bank Pink Sheet iron ore, cfr spot (FRED mirror PIORECRUSDM lags ~2 months) | monthly | 60 | 60 | L1 | - | 2026-10-01 | context | -
+jgb-10y | borrowing-costs | mof | Japan Ministry of Finance jgbcme.csv (10Y column, daily) | daily | 4 | 4 | L2 | - | 2026-09-01 | stale | -
+job-openings | growth-health | fred | FRED:JTSJOL (Job Openings: Total Nonfarm, monthly, thousands) | monthly | 110 | 110 | L0 | - | 2026-09-01 | context | -
+lng-japan | au-trade-currency | world-bank | World Bank Pink Sheet (Liquefied natural gas, Japan; $/mmbtu) | monthly | 60 | 60 | L1 | - | 2026-10-01 | context | -
+m2-us | growth-health | fred | FRED:M2SL | monthly | 90 | 90 | L0 | - | 2026-09-01 | context | -
+maize | prices-heat | world-bank | World Bank Pink Sheet (Maize; $/metric ton) | monthly | 60 | 60 | L1 | - | 2026-10-01 | context | -
+median-cpi | prices-heat | fred | FRED:MEDCPIM158SFRBCLE (Median Consumer Price Index, 12-month % change, monthly) | monthly | 75 | 75 | L2 | - | 2026-09-01 | context | -
+michigan-1y-expectations | growth-health | fred | FRED:MICH (median expected price change, next 12 months) | monthly | 75 | 75 | L2 | - | 2026-09-01 | context | -
+michigan-sentiment | growth-health | fred | FRED:UMCSENT (University of Michigan consumer sentiment) | monthly | 75 | 75 | L2 | VOTER:growth-health | 2026-09-01 | warning | -
+mortgage-30y | borrowing-costs | fred | FRED:MORTGAGE30US (30-Year Fixed Rate Mortgage Average, weekly) | weekly | 14 | 14 | L2 | - | 2026-10-29 | context | -
+natgas | prices-heat | fred | FRED:DHHNGSP (EIA Henry Hub spot) | daily | 12 | 12 | L0 | - | 2026-11-03 | context | -
+net-liquidity | market-stress | derived | FRED:WALCL − FRED:WTREGEN − FRED:RRPONTSYD (derived, weekly Wednesday, $ millions) | weekly | 21 | 21 | L0 | - | 2026-10-28 | context | -
+nfci | market-stress | fred | FRED:NFCI | weekly | 14 | 14 | L2 | VOTER:market-stress | 2026-10-30 | normal | VOTER
+nyfed-custody | borrowing-costs | fred | FRED:WSEFINTL1 (Treasuries held in custody for foreign official accounts, Wednesday level, | weekly | 21 | 21 | L0 | - | 2026-10-28 | context | -
+nz-10y | au-external | fred | FRED:IRLTLT01NZM156N (OECD monthly mirror, percent, monthly average) | monthly | 75 | 75 | L2 | SHADOW:au-external | 2026-09-01 | context | -
+nz-short-rate | au-external | oecd | OECD FINMARK IR3TIB NZL (short-term interest rate, percent p.a., monthly average) | monthly | 75 | 75 | L1 | SHADOW:au-external | 2026-09-01 | context | -
+oecd-cli-cn | growth-health | oecd | OECD Composite leading indicator (amplitude-adjusted), China | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+oecd-cli-de | growth-health | oecd | OECD Composite leading indicator (amplitude-adjusted), Germany | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+oecd-cli-us | growth-health | oecd | OECD Composite leading indicator (amplitude-adjusted), United States | monthly | 75 | 75 | L0 | VOTER:growth-health | 2026-09-01 | normal | -
+ofr-fsi | market-stress | ofr | Office of Financial Research:OFR-FSI (OFR FSI file, aggregate column, daily, index sd) | daily | 7 | 7 | L0 | - | 2026-10-30 | context | -
+philly-fed | growth-health | fred | FRED:GACDFSA066MSFRBPHI (Philadelphia Fed manufacturing index, SA) | monthly | 60 | 60 | L2 | VOTER:growth-health | 2026-10-01 | normal | -
+platinum | prices-heat | gold-api | gold-api.com XPT spot (history: World Bank Pink Sheet platinum, monthly + daily accumulati | daily | 2 | 2 | L1 | - | 2026-11-04 | context | -
+rba-cash-rate | au-households | rba | RBA statistical table F1 (Cash Rate Target, daily) | per-change | - | – | L0 | - | 2026-11-03 | context | -
+rba-expectations | au-inflation-rates | derived | RBA F2 FCMYGBAG3D (3-year bond) − RBA F1 cash rate target | daily | 40 | 40 | L0 | VOTER:au-inflation-rates | 2026-09-30 | normal | -
+rba-fed-gap | au-trade-currency | derived | RBA Cash Rate Target (F1/decision table) − FRED:DFEDTARL/DFEDTARU midpoint | per-change | - | – | L0 | VOTER:au-trade-currency | 2026-11-03 | normal | -
+real-yield-10y | borrowing-costs | fred | FRED:DFII10 | daily | - | 4 | L0 | VOTER:borrowing-costs | 2026-11-02 | warning | VOTER
+recession-probability | growth-health | fred | FRED:RECPROUSM156N (smoothed US recession probability) | monthly | 100 | 100 | L0 | VOTER:growth-health | 2026-09-01 | normal | -
+repo-stress | market-stress | derived | FRED:SOFR − FRED:IORB (derived, daily, percentage points) | daily | 4 | 4 | L0 | - | 2026-11-02 | context | -
+retail-sales | growth-health | fred | FRED:RSAFS (Advance Retail Sales: Retail Trade, monthly, $ millions) | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+reverse-repo | market-stress | fred | FRED:RRPONTSYD (Overnight Reverse Repurchase Agreements: Treasury Securities Sold by the F | daily | 4 | 4 | L1 | - | 2026-11-03 | context | -
+sahm-rule | growth-health | fred | FRED:SAHMREALTIME (real-time vintage) | monthly | 75 | 75 | L0 | VOTER:growth-health | 2026-09-01 | normal | -
+shiller-cape | market-stress | shiller | Robert Shiller ie_data.xls (monthly, CAPE column) | monthly | 45 | 45 | L2 | - | 2026-10-01 | context | -
+shiller-ecy | market-stress | shiller | Robert Shiller ie_data.xls (monthly, Excess CAPE Yield column) | monthly | 45 | 45 | L2 | - | 2026-10-01 | context | -
+silver-usd | prices-board | gold-api | gold-api.com XAG spot (history: World Bank Pink Sheet silver, monthly + daily accumulation | daily | 2 | 2 | L2 | - | 2026-11-04 | context | -
+sloos-ci-tightening | market-stress | fred | FRED:DRTSCILM (Net Percentage of Domestic Banks Tightening C&I Standards, SLOOS, quarterly | quarterly | 215 | 215 | L0 | - | 2026-10-01 | context | -
+sofr | borrowing-costs | fred | FRED:SOFR (Secured Overnight Financing Rate) | daily | - | 4 | L2 | - | 2026-11-03 | context | -
+sp500-breadth-ratio | dedollar-concentration | yahoo | Yahoo Finance RSP ÷ SPY daily closes (equal-weight vs cap-weight S&P 500 ETFs) | daily | 4 | 4 | L2 | SHADOW:dedollar-concentration | 2026-11-03 | context | -
+sticky-cpi | prices-heat | fred | FRED:STICKCPIM158SFRBATL (Sticky Price Consumer Price Index, 12-month % change, monthly) | monthly | 75 | 75 | L2 | - | 2026-09-01 | context | -
+stress-stlfsi | market-stress | fred | FRED:STLFSI4 | weekly | 14 | 14 | L2 | VOTER:market-stress | 2026-10-30 | normal | VOTER
+t5yie | prices-heat | fred | FRED:T5YIE (5-Year Breakeven Inflation Rate, daily) | daily | 5 | 5 | L2 | - | 2026-11-03 | context | -
+term-premium-10y | market-stress | fred | FRED:THREEFYTP10 (10-Year Treasury Term Premium, Kim-Wright, daily, %) | daily | 14 | ? | ? | - | 2026-10-30 | context | -
+terms-of-trade | au-trade-currency | abs | ABS national accounts (ANA_AGG export ÷ import price index) | quarterly | 215 | 215 | L0 | VOTER:au-trade-currency | 2026-04-01 | stale | -
+tga | market-stress | fred | FRED:WTREGEN (Liabilities and Capital: Other Factors Draining Reserve Balances: Treasury,  | weekly | 21 | ? | ? | - | 2026-10-28 | context | -
+tpu-us | growth-health | epu | Baker-Bloom-Davis US Trade Policy Uncertainty index (Categorical EPU workbook, monthly) | monthly | 75 | 75 | L0 | - | 2026-10-01 | context | -
+treasury-auction-10y | borrowing-costs | fiscaldata | Treasury FiscalData:auctions_query (10-Year family, ex TIPS, bid_to_cover_ratio, per aucti | monthly | 45 | 45 | L0 | - | 2026-10-07 | context | -
+treasury-auction-10y-indirect | borrowing-costs | fiscaldata | Treasury FiscalData:auctions_query (10-Year family, indirect_bidder_accepted ÷ total_accep | monthly | 45 | 45 | L0 | - | 2026-10-07 | context | -
+treasury-auction-30y | borrowing-costs | fiscaldata | Treasury FiscalData:auctions_query (30-Year family, ex TIPS, bid_to_cover_ratio, per aucti | monthly | 45 | 45 | L0 | - | 2026-10-08 | context | -
+treasury-auction-30y-indirect | borrowing-costs | fiscaldata | Treasury FiscalData:auctions_query (30-Year family, indirect_bidder_accepted ÷ total_accep | monthly | 45 | 45 | L0 | - | 2026-10-08 | context | -
+us-2y | borrowing-costs | fred | FRED:DGS2 | daily | - | 4 | L0 | - | 2026-11-02 | context | -
+us-cpi-core-yoy | prices-heat | fred | FRED:CPILFENS (12-month % change, not seasonally adjusted) | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+us-cpi-yoy | prices-heat | fred | FRED:CPIAUCNS (12-month % change, not seasonally adjusted — the BLS headline basis) | monthly | 75 | 75 | L0 | VOTER:prices-heat | 2026-09-01 | warning | VOTER
+us-crude-production | geo-fragmentation | eia | EIA WCRFPUS2 (field production of crude oil, weekly, thousand barrels per day) | weekly | 12 | 12 | L0 | SHADOW:geo-fragmentation | 2026-10-23 | context | -
+us-deficit-12m | borrowing-costs | derived | FRED:MTSDS133FMS (federal surplus or deficit, monthly $M; derived: rolling 12-month sum) | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+us-deficit-monthly | borrowing-costs | fred | FRED:MTSDS133FMS (federal surplus or deficit [-], monthly, $ millions) | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+us-gdp-growth | growth-health | fred | FRED:A191RL1Q225SBEA (real GDP growth, QoQ annualized) | quarterly | 215 | 215 | L0 | - | 2026-07-01 | context | -
+us-japan-10y-gap | dollar-strength | derived | FRED:DGS10 − MOF jgbcme 10Y (daily) | daily | 5 | 5 | L2 | VOTER:dollar-strength | 2026-10-30 | normal | VOTER
+us-nfp | growth-health | derived | FRED:PAYEMS (monthly change, thousands) | monthly | 70 | 70 | L0 | - | 2026-09-01 | context | -
+us-pce-core-yoy | prices-heat | fred | FRED:PCEPILFE (12-month % change, core PCE price index) | monthly | 95 | 95 | L0 | VOTER:prices-heat | 2026-09-01 | warning | VOTER
+us-spr | geo-fragmentation | eia | EIA WCSSTUS1 (ending stocks of crude oil in the SPR, weekly, thousand barrels) | weekly | 12 | 12 | L0 | SHADOW:geo-fragmentation | 2026-10-23 | context | -
+us-unemployment | growth-health | fred | FRED:UNRATE (US Bureau of Labor Statistics) | monthly | 75 | 75 | L0 | VOTER:growth-health | 2026-09-01 | normal | -
+us-wages | prices-heat | fred | FRED:AHETPI (average hourly earnings, all employees → 12-month % change) | monthly | 75 | 75 | L0 | - | 2026-09-01 | context | -
+us10y | borrowing-costs | fred | FRED:DGS10 | daily | - | 4 | L0 | VOTER:borrowing-costs | 2026-11-02 | warning | VOTER
+us30y | borrowing-costs | fred | FRED:DGS30 | daily | 4 | 4 | L0 | VOTER:borrowing-costs | 2026-11-02 | warning | VOTER
+usd-reserve-share | dedollar-concentration | imf | IMF COFER (USD share of world allocated foreign exchange reserves, percent, quarterly) | quarterly | 200 | 200 | L1 | SHADOW:dedollar-concentration | 2026-06-30 | context | -
+usdaed | dollar-strength | yahoo | Yahoo Finance USD/AED daily closes (AED=X) | daily | - | 4 | L2 | - | 2026-11-04 | context | -
+usdcny | growth-health | frankfurter | Frankfurter USD→CNY | daily | - | 4 | L1 | - | 2026-11-03 | check-pending | -
+usdjpy | dollar-strength | frankfurter | Frankfurter USD→JPY | daily | - | 4 | L1 | VOTER:dollar-strength | 2026-11-04 | normal | VOTER
+usdtry | dollar-strength | frankfurter | Frankfurter USD→TRY (ECB reference rates) | daily | - | 4 | L1 | - | 2026-11-04 | context | -
+vix | market-stress | fred | FRED:VIXCLS (Cboe Volatility Index, close) | daily | 4 | 4 | L2 | VOTER:market-stress | 2026-11-03 | normal | VOTER
+walcl | market-stress | fred | FRED:WALCL (Total Assets of the Federal Reserve, weekly, $ millions) | weekly | 21 | 21 | L0 | - | 2026-10-28 | context | -
+wheat | prices-heat | world-bank | World Bank Pink Sheet (Wheat, US SRW; $/metric ton) | monthly | 60 | 60 | L1 | - | 2026-10-01 | context | -
+wti | prices-heat | fred | FRED:DCOILWTICO (EIA WTI spot) | daily | 12 | 12 | L0 | - | 2026-11-03 | context | -
+yield-curve-10y2y | borrowing-costs | fred | FRED:T10Y2Y | daily | - | 4 | L2 | VOTER:borrowing-costs | 2026-11-03 | normal | VOTER
+yield-curve-10y3m | borrowing-costs | fred | FRED:T10Y3M | daily | - | 4 | L2 | VOTER:borrowing-costs | 2026-11-03 | normal | VOTER
