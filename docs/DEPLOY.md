@@ -134,8 +134,8 @@ green before every deploy is the runbook rule, CI or not.
 
 ## Session record — 2026-11-04e the gold-balance OI-3/GB-S7 wire-cleanup deploy (the goldSummary field OFF the wire + the wind copy keys retired; the page rendering identically)
 
-GB-S7 (branch `gold-balance/oi3-cleanup`, **PR #<PENDING> merged
-<SHA-PENDING>**). The hard gate (this round's own): the GB-S1 recheck
+GB-S7 (branch `gold-balance/oi3-cleanup`, **PR #24 merged
+`b4acef0`**). The hard gate (this round's own): the GB-S1 recheck
 record verified present (GOLD_RECHECK_SPEC §1) + the owner's explicit
 in-session approval — **"Approve both" (2026-11-04)**, asked before any
 edit with the §3 recheck dependency disclosed in the question (the
@@ -164,23 +164,35 @@ procedure + spec update in the same change, which this branch carries).
   the balance renders byte-identically, it never read a retired key);
   the bundle check green — **Insights lazy 1520.84/352.54, DOWN from
   1526.97/354.18** (the retired copy left the chunk; ceiling 1535/355).
-- **The deploy procedure (this session executes it):**
+- **The deploy procedure, executed verbatim:**
   1. Deploy-lock check FIRST: **CLEAR — production at the flip's
      `0e7d7cb8` @ 100%** (deployment `7c6a0315`, the versions API
-     checked at session start; no later deploy superseded it).
-  2. **PR #<PENDING> merged** (`<SHA-PENDING>`; CI `gates` green on
-     the branch and on main, run <RUN-PENDING>).
+     checked at session start AND re-checked right before the deploy;
+     no later deploy superseded it).
+  2. **PR #24 merged** (`b4acef0`; CI `gates` green on the branch,
+     run 41852152993, and on main, run 41852443205).
   3. `pnpm --filter @currena/web build` + `pnpm --filter @currena/api
-     exec wrangler deploy` → **currena-api `<VERSION-PENDING>` @ 100%**
-     (deployment `<DEPLOYMENT-PENDING>`, <TIME-PENDING>).
-  4. Post-deploy smoke: `/api/health` ok · `/` 200 · `/api/insights`
-     200 **WITHOUT goldSummary** (this round's wire contract; the
-     readings + breaveven-tilt present — the recheck's new anchors).
+     exec wrangler deploy` → **currena-api `0bad33fa` @ 100%**
+     (deployment `d536f823`, 2026-11-04T14:58:25Z).
+  4. Post-deploy smoke: `/api/health` ok (kv ok, 14:58:49Z) · `/` 200 ·
+     `/api/insights` 200 **WITHOUT goldSummary** — the serving path's
+     schema parse strips the field even from the still-stored 12:18Z
+     snapshot (the designed backward compatibility); readings 161 +
+     `breakeven-tilt` present (asOf 2026-11-03 — the recheck's new
+     anchors). The next ingest rung writes the field out of the stored
+     snapshot itself.
   5. The production matrix (`node visual/prod-verify.mjs` from
-     apps/web): **<MATRIX-PENDING>** — the balance must render
-     identically (the flipped view never read goldSummary).
+     apps/web): **8/8 PASS, ZERO console errors** — the-default-page +
+     the-inert-parameter legs (4/4 EN/fa × 360/1280 cells): the lane
+     balance everywhere (4 weights + 4 ledger rows,
+     Balanced/«متعادل», the Split/«دوپاره» badge), the panels absent,
+     the lane-derived outlook neutral with the hedged sentence, the
+     measured note + the BACKTEST-GOLD-LANES.md link, the header lane
+     prose — and the WIND SCAN CLEAN in both locales (the retired
+     words never render). The balance renders identically to the
+     flip's verified state, as it must: it never read a retired key.
   6. The executed facts recorded back here + in PROGRESS.md's GB-S7
-     log (the record commit on main, the flip's two-phase pattern).
+     log (this record commit on main, the flip's two-phase pattern).
 - **What the next recheck (GOLD_RECHECK_SPEC §3) sees after this
   deploy:** the live payload carries the readings (not the summary —
   Step 1's new anchor); new archive days after the retirement rung
