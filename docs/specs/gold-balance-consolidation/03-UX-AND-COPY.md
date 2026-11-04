@@ -189,14 +189,16 @@ If the owner declines OI-1, the existing sentences stay and the engine
 change still ships; the report must then note that the sentence wording
 still reads as a forecast.
 
-### 6.4 Retired (removal deferred to OI-3, separate PR)
+### 6.4 Retired (removed at OI-3/GB-S7, 2026-11-04 — the owner's recorded approval)
 
 Under `signals.goldScore`: `title`, `subtitle`, `labels`, `noReadWord`,
 `netFiringLine`, `netFiringNone`, `laneCountsLabel`, `laneCountsLine`,
 `subGaugeWords`, `impactWords`, `votersTitle`, `votersNone`, `footnote`,
 `measuredNote` (replaced by `balance.measuredNote`). All of
-`signals.goldModelVsReality`. They stay in the dictionaries, unused, until
-OI-3 clears, so the manifest and the frozen engine's tests are not disturbed.
+`signals.goldModelVsReality`. They stayed in the dictionaries, unused,
+until OI-3 cleared — then retired with their manifest entries (the
+dictionary-coverage guard trimmed to the five surviving blocks), and
+`copy:audit` ended clean on the retired shape.
 
 ## 7. Visual QA checklist (for the PR)
 

@@ -40,6 +40,18 @@
 `apps/api/**`, `docs/insights/GOLD_RECHECK_SPEC.md` procedures. The recheck
 and the armed 2026-11-02 check read `goldSummary` and must keep working.
 
+> **OI-3/GB-S7 note (2026-11-04, the owner's recorded approval):** the
+> freeze above served P0–P5 — exactly so the consolidation never
+> disturbed the recheck lineage mid-program. OI-3 was its own gated
+> session BECAUSE it is the one round allowed to touch this list:
+> the `goldSummary` wire field retired (the `InsightsSnapshotSchema`
+> field + the three ingest stamp sites), and the recheck procedure +
+> spec were updated in the SAME change (the corpus dump reads the
+> historical stamps from the raw archive JSON; §3 Steps 1/5 re-worded).
+> `gold-score.ts`, `goldTailwindScore` and the harness tables stayed
+> frozen throughout (D-GB-9); `GoldSummarySchema` stays exported as
+> the engine's own output contract.
+
 ## 2. Wire and data compatibility
 
 - No schema change, no new KV key, no new network call, no snapshot size change.

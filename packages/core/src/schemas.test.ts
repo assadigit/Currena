@@ -539,13 +539,15 @@ describe('Insights: InsightsSnapshotSchema', () => {
     expect(parsed).not.toHaveProperty('injected');
   });
 
-  it('Gold Program S2: goldSummary is OPTIONAL — a snapshot without it stays valid', () => {
+  it('OI-3/GB-S7 (2026-11-04, the owner\'s recorded approval): the goldSummary field is RETIRED — a stored snapshot still carrying the historical stamp parses clean and zod strips it', () => {
     expect(InsightsSnapshotSchema.safeParse(snap).success).toBe(true);
-    expect(InsightsSnapshotSchema.parse(snap).goldSummary).toBeUndefined();
+    const withStamp = InsightsSnapshotSchema.safeParse({ ...snap, goldSummary: { any: 'shape' } });
+    expect(withStamp.success).toBe(true);
+    if (withStamp.success) expect('goldSummary' in withStamp.data).toBe(false);
   });
 });
 
-describe('Insights: GoldSummarySchema (the Gold Program wire shape)', () => {
+describe('Insights: GoldSummarySchema (the frozen engine\'s output contract — off the wire since OI-3/GB-S7)', () => {
   const reading = (id: string) => ({
     id,
     value: 1,
@@ -594,11 +596,14 @@ describe('Insights: GoldSummarySchema (the Gold Program wire shape)', () => {
     },
   };
 
-  it('accepts a coherent summary and stamps onto the snapshot beside the section summaries', () => {
+  it('accepts a coherent summary (the engine output contract; the field no longer rides the snapshot — OI-3)', () => {
     expect(GoldSummarySchema.safeParse(gold).success).toBe(true);
+    // A stored snapshot carrying the stamp parses beside it — zod strips
+    // the retired key, never rejects it (the archives 2026-10-31 → the
+    // retirement rung depend on this).
     const withGold = InsightsSnapshotSchema.safeParse({ ...snap, goldSummary: gold });
     expect(withGold.success).toBe(true);
-    if (withGold.success) expect(withGold.data.goldSummary?.label).toBe('tailwind');
+    if (withGold.success) expect('goldSummary' in withGold.data).toBe(false);
   });
 
   it('rejects a three-lane subGauge set, an unknown lane word and a fractional net score', () => {

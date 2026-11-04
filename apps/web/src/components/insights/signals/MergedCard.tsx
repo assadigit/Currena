@@ -65,12 +65,13 @@ const GOLD_BALANCE_BACKTEST_URL =
  * GB-S6 (P5, 2026-11-04 — the owner's recorded "go"): the consolidated
  * lane balance is THE gold card for every visitor. The ?balance=lanes
  * preview flag, the balanceLanes threading and the two gold panels
- * (GoldTailwindPanel + ModelVsRealityPanel) RETIRED with this flip;
- * `goldSummary` no longer reaches the card (the snapshot field still
- * arrives on the wire and stays validated — the UI simply does not
- * read it, AC-9; its retirement is OI-3/GB-S7). The two panels' own
- * tests went with them (the surviving assertions moved to
- * gold-balance-lanes.test.tsx).
+ * (GoldTailwindPanel + ModelVsRealityPanel) RETIRED with this flip.
+ * OI-3/GB-S7 (2026-11-04, the owner's recorded approval): the
+ * `goldSummary` wire field retired too — the snapshot no longer carries
+ * it at all (the UI never read it since the flip — AC-9 held; the
+ * recheck lineage reads the historical stamps from the raw archive
+ * JSON, per GOLD_RECHECK_SPEC §3). The two panels' own tests went with
+ * them (the surviving assertions moved to gold-balance-lanes.test.tsx).
  */
 
 export function MergedSignalsCard({
