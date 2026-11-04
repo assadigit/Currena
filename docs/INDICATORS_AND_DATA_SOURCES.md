@@ -355,6 +355,19 @@ Insights page's serve path performs **exactly ONE KV read per request**
 
 ### The `/api/insights` shape
 
+> **One balance (GB-S6/P5, 2026-11-04 — STAGED on the
+> `gold-balance/p5-flip` branch, awaiting the owner's recorded "go"):
+> everything about gold on the Insights page is ONE balance — the
+> consolidated lane balance (`gold-balance.ts`, 21 voters → 4 lane
+> votes → one beam), the owner-approved visual redesign carrying it,
+> and the gold Outlook derived from the same result. The two
+> wind/`model-vs-reality` UI panels are RETIRED at the staged flip; the `goldSummary`
+> field below STILL ARRIVES on the wire and stays validated (the
+> recheck/backtest lineage reads it — D-GB-9) — the UI simply does not
+> read it. Its retirement from the wire is OI-3/GB-S7's own owner
+> round. The record:
+> `docs/specs/gold-balance-consolidation/PROGRESS.md`.
+
 ```jsonc
 {
   "generatedAt": "2026-10-26T04:20:17.883Z",
@@ -365,9 +378,11 @@ Insights page's serve path performs **exactly ONE KV read per request**
   // Gold Program (optional field — absent on snapshots written before it):
   // the gold-directional re-cut of the voters (GOLD_SCORE_SPEC.md — 21
   // voters since the D-5 promotion: breakeven-tilt votes for gold while
-  // staying a context card for its own gauge). Compact numbers only; the
-  // SPA re-derives the firing-driver list client-side through the same
-  // pure engine.
+  // staying a context card for its own gauge). Compact numbers only.
+  // STILL STAMPED + STILL VALIDATED, but UNREAD BY THE UI since the
+  // GB-S6 flip (see the "one balance" note above): the page's gold card
+  // is the consolidated lane balance; this summary feeds nothing on the
+  // screen. Kept on the wire for the recheck/backtest lineage (D-GB-9).
   "goldSummary": {
     "netScore": -1,                        // tailwind voters − headwind voters
     "label": "headwind",                   // strong-tailwind | tailwind | balanced | headwind | strong-headwind | null

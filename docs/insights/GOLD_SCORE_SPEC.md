@@ -1,5 +1,20 @@
 # GOLD_SCORE_SPEC — the gold-directional scoring engine (the Gold Program)
 
+> **GB-S6/P5 note (2026-11-04, STAGED — the flip awaits the owner's
+> recorded "go" per the hard gate):** the two UI panels below
+> (`GoldTailwindPanel` + `ModelVsRealityPanel`) are RETIRED
+> from the UI — the gold balance consolidation program
+> (`docs/specs/gold-balance-consolidation/`, now IMPLEMENTED) folded the
+> two gold metaphors into ONE balance: the consolidated lane balance
+> (the pure engine `gold-balance.ts`, 21 voters → 4 lane votes) is THE
+> gold card for every visitor. THE ENGINE STAYS: `gold-score.ts`,
+> `goldTailwindScore`, `goldSummary` (the optional snapshot field — still
+> stamped by the ingest and still validated; the UI simply does not read
+> it) and the frozen harness tables keep running unchanged (D-GB-9) —
+> the recheck and backtest lineage reads them. The wind copy keys stay
+> in the dictionaries until OI-3/GB-S7's own owner round. The full
+> record: `docs/specs/gold-balance-consolidation/PROGRESS.md`.
+
 **Status:** S1 (engine) + S2 (API + UI integration) + S2.1 (bilingual +
 placement round) shipped. FA copy shipped in S2.1 (round-53). **Session 6
 (2026-10-31, the D-5 promotion): the voter table is 21 — `breakeven-tilt`
@@ -8,9 +23,11 @@ GOLD_BACKTEST_SPEC's decision log; the panel's round-55 measured-reality
 note stays the operative description).
 **Modules:** `packages/insights/src/gold-score.ts` (pure engine — copy
 moved to the web dictionaries in S2.1) ·
-`packages/core/src/schemas.ts` (`GoldSummarySchema`, the optional snapshot field) ·
-`apps/web/src/components/insights/signals/GoldTailwindPanel.tsx` + `ModelVsRealityPanel.tsx`
-(mounted INSIDE the merged gold card, under the balance — the owner's S2.1 directive).
+`packages/core/src/schemas.ts` (`GoldSummarySchema`, the optional snapshot field —
+still stamped by the ingest, still validated; unread by the UI since GB-S6).
+**The UI panels** (`GoldTailwindPanel.tsx` + `ModelVsRealityPanel.tsx`) —
+**RETIRED from the UI at the GB-S6 flip (staged on
+`gold-balance/p5-flip`, 2026-11-04)**; see the note above.
 **Discipline:** pure, additive, zero new fetches, zero new KV ops. Descriptive,
 hedged, never advice (the signals-card contract — words and counts, no green/red).
 
@@ -188,7 +205,15 @@ through untouched (§2.4 for the one-tick skew).
 The `/api/insights` shape example gains the `goldSummary` block (optional
 field, shown with a comment saying so).
 
-### 4.4 The UI — `apps/web/src/components/insights/signals/` (S2.1)
+### 4.4 The UI — `apps/web/src/components/insights/signals/` (S2.1; the panels RETIRED at GB-S6 — staged)
+
+> **GB-S6/P5 (2026-11-04, staged on `gold-balance/p5-flip`):** the two panels below are RETIRED from the
+> UI — deleted with their test parts (the surviving assertions moved to
+> `gold-balance-lanes.test.tsx`). The ENGINE and `goldSummary` stay
+> (D-GB-9); the UI simply does not read the summary. The consolidated
+> lane balance (`gold-balance.ts` + BalanceScale's visual redesign) is
+> THE gold card. This section is kept as the historical record of what
+> the panels were.
 
 - **`GoldTailwindPanel.tsx`** — the net score, the 5-step label, the
   tailwind/headwind/mixed lane counts, the four sub-gauge readings, the
@@ -199,10 +224,10 @@ field, shown with a comment saying so).
   (`modelVsRealityExplainerKey` + `copy.signals.goldModelVsReality`), the
   reality value with its basis phrase (٪ in fa, % in EN).
 - **Placement (the owner's 2026-10-31 directive, superseding S2's
-  prices-strip mount):** both panels render INSIDE the merged gold
-  card (`signals/MergedCard.tsx`), DIRECTLY UNDER the balance visual
-  («برآیند عوامل مؤثر بر قیمت طلا») and before the price-footing strip —
-  two columns beside the balance's max-width column, stacked on mobile.
+  prices-strip mount; itself superseded by the GB-S6 retirement):**
+  both panels rendered INSIDE the merged gold card
+  (`signals/MergedCard.tsx`), DIRECTLY UNDER the balance visual
+  («برآیند عوامل مؤثر بر قیمت طلا») and before the price-footing strip.
   The prices strip is the four price tiles again.
 - **BILINGUAL since S2.1** (the owner's "must be bilingual"): the copy
   lives in the web i18n dictionaries — `signals.goldScore` /

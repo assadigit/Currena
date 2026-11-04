@@ -1,9 +1,22 @@
 # Gold balance consolidation: spec set
 
-**Status:** SPECIFIED, NOT IMPLEMENTED (2026-10-31). The owner approved the
-full recommendation set in chat on 2026-10-31 and asked that each
-recommendation be re-checked against the code before it is written down.
-This set is the result of that re-check (see "What the re-check changed").
+**Status:** IMPLEMENTED through P4 (2026-11-04) — P0–P4 landed through
+GB-S1..GB-S5 (PR #12, #15, #16, #17 + the #18 union, #20 + the #21
+record merge); the preview is complete at
+`currena.ir/insights?balance=lanes`. P5 (the owner-gated flip) is
+STAGED on the `gold-balance/p5-flip` branch, AWAITING the owner's
+recorded "go" (the hard gate — 04 §3 P5 + AC-12 + V-11: the owner
+reviews the live preview first; the Outlook word changing for every
+visitor is exactly why the gate exists, D-GB-10). On the recorded
+"go": the merge ships the flip (the consolidated balance becomes THE
+gold card for every visitor) and this line becomes IMPLEMENTED with
+the flip PR number. The engine + `goldSummary` + the harness stay
+frozen and running (D-GB-9); OI-3 (the wire field + the wind copy
+keys) is GB-S7's own owner round. The owner approved the full
+recommendation set in chat on 2026-10-31 and asked that each
+recommendation be re-checked against the code before it is written
+down. This set is the result of that re-check (see "What the re-check
+changed").
 
 **Owner intent (UX):** two metaphors for one question (the Balance and the
 Wind meter) are unnecessary cognitive load for the owner and for users.

@@ -132,6 +132,47 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-04c the gold-balance P5 flip STAGED (NOT deployed — the owner gate holds; production stays on a803f526)
+
+GB-S6 (branch `gold-balance/p5-flip`, draft PR). The flip work is fully
+staged but **NOT merged and NOT deployed** — the hard gate (04 §3 P5 +
+AC-12 + V-11) requires the owner's recorded "go" after the live preview
+review; until then production keeps serving GB-S5's build. This note
+records the staged state + the deploy procedure that runs AT flip time.
+
+- **Staged on the branch:** the `?balance=lanes` gate code + the
+  `visual` prop + BalanceScale's whole legacy branch + the two gold
+  panels retired; the gold Outlook derivation, the collapsed takeaway
+  and the summary prose (the collapsed-corner decision, `metalLeanLanes`
+  round-78) unconditional — outlookOf stays for silver only; a fresh
+  flipped-view snapshot the byte-stability pin; the bundle re-based
+  downward 1560/360 → **1535/355** (measured **1526.97/354.18**, the
+  chunk re-hashed `Insights-TjkEDaYV.js`); the harness converted
+  (gb-s4-visual's default-view tests + prod-verify's matrix — both
+  legs read the flipped view, the retired parameter proven inert).
+- **Gates on the branch:** ALL 9 GREEN — **14,578 tests** (web 12,619),
+  typecheck 6/6, lint 0/0, copy:audit clean (round-78), narrator in
+  sync, layer1 strict, secret scan clean, the bundle check green at
+  the re-based ceiling; the gb-s4 standing guards **67/67 (gb-s4-visual 61 + the union probes 6)** on the
+  branch build.
+- **AT FLIP TIME (on the recorded "go"), the procedure:**
+  1. Deploy-lock check FIRST: the versions API must show production at
+     **`a803f526` @ 100% (deployment `754dccb6`)** — the expected
+     active version (GB-S5's); anything else means a parallel session.
+  2. Merge the PR (CI green on the branch and on main).
+  3. `pnpm --filter @currena/web build` +
+     `pnpm --filter @currena/api exec wrangler deploy` → record the new
+     worker version + deployment id here.
+  4. Post-deploy smoke: `/api/health` · `/` 200 · `/api/insights` 200.
+  5. The production matrix (`node visual/prod-verify.mjs` from
+     apps/web): the-default-page + the-inert-parameter legs, EN + fa,
+     360 + 1280, fresh contexts — ZERO console errors, the lane balance
+     for every visitor, the panels absent, AC-8's honesty elements, the
+     wind scan clean in both locales, the header's lane prose beside
+     the balance.
+  6. Record the live read + the AC-12 line in PROGRESS.md and flip the
+     docs' staged wording to LIVE in the same commit.
+
 ## Session record — 2026-11-04b the gold-balance P3+P4 deploy (worker a803f526 at 100% — the Outlook DERIVED from the balance behind ?balance=lanes; the DEFAULT view still byte-stable)
 
 GB-S5 (PR #20, merge `1d1211c`, branch `gold-balance/p3-outlook`): the
