@@ -1,0 +1,87 @@
+========================================================================
+GA-S2 HISTORY DEPTHS — corpus: 2026-11-03T04:43:54.969Z
+  venues: stage 147 series @ 2026-11-03T04:35:17.936Z | goldHist 2512 pts | archives 19 days | histFallback ids: ['dollar-basket', 'usdjpy']
+========================================================================
+
+1. THE STAGED SERIES DEPTH (the corpus's staged series per voter)
+------------------------------------------------------------------------
+id                            n       first        last  base10y  lvl>=30  mv30d
+real-yield-10y             2524  2016-09-26  2026-10-30     2497      YES      y
+us10y                      2524  2016-09-26  2026-10-30     2497      YES      y
+us30y                      2524  2016-09-26  2026-10-30     2497      YES      y
+fed-target                 3690  2016-09-26  2026-11-02     3649      YES      y
+fed-expectations           2524  2016-09-26  2026-10-30     2497      YES      y
+ecb-dfr                    3691  2016-09-26  2026-11-03     3649      YES      y
+yield-curve-10y2y          2525  2016-09-26  2026-11-02     2495      YES      y
+yield-curve-10y3m          2525  2016-09-26  2026-11-02     2495      YES      y
+dollar-basket              2557  2016-11-04  2026-11-02     2555      YES      y
+usdjpy                     2557  2016-11-04  2026-11-02     2555      YES      y
+us-japan-10y-gap             21  2026-10-01  2026-10-30       20       NO      -
+stress-stlfsi               526  2016-09-30  2026-10-23      521      YES      y
+nfci                        526  2016-09-30  2026-10-23      521      YES      y
+vix                        2572  2016-09-26  2026-10-30     2544      YES      y
+gold-silver                 122  2016-10-01  2026-11-03      119      YES      -
+cftc-gold-positioning         1  2026-10-27  2026-10-27        0       NO      -
+us-cpi-yoy                  119  2016-10-01  2026-09-01      118      YES      y
+us-pce-core-yoy             120  2016-10-01  2026-09-01      119      YES      y
+euro-hicp                   120  2016-10-01  2026-09-01      119      YES      y
+breakeven-5y5y             2525  2016-09-26  2026-11-02     2495      YES      y
+breakeven-tilt             2525  2016-09-26  2026-11-02     2495      YES      y
+(gold-usd: companion series, 2515 pts, first 2016-11-02, last 2026-11-03)
+(breakeven-10y: companion series, 2525 pts, first 2016-09-26, last 2026-11-02)
+(t5yie: companion series, 2525 pts, first 2016-09-26, last 2026-11-02)
+(goldHist: gold-usd history key, 2512 pts, first 2016-11-07, last 2026-11-03)
+
+2. THE ARCHIVE-DAY TRUTH (the raw archive readings — what evalLeg
+   could actually reach on each recorded day)
+------------------------------------------------------------------------
+recorded days: 19 (2026-10-15 .. 2026-11-03)
+id                        present  ch30d  pct10y  both  either  last-day asOf/status
+real-yield-10y              19/19     18      18    18      18  2026-10-30 / warning
+us10y                       19/19     18      18    18      18  2026-10-30 / warning
+us30y                       19/19     18      18    18      18  2026-10-30 / warning
+fed-target                  19/19     18      18    18      18  2026-11-02 / normal
+fed-expectations            19/19     17      17    17      17  2026-10-30 / normal
+ecb-dfr                     19/19     19      19    19      19  2026-11-03 / normal
+yield-curve-10y2y           19/19     18      18    18      18  2026-11-02 / normal
+yield-curve-10y3m            9/19      9       9     9       9  2026-11-02 / normal
+dollar-basket               19/19     19      19    19      19  2026-11-02 / normal
+usdjpy                      19/19     19      19    19      19  2026-11-02 / normal
+us-japan-10y-gap             9/19      1       6     1       6  2026-10-30 / normal
+stress-stlfsi               19/19     18      18    18      18  2026-10-23 / normal
+nfci                        19/19     18      18    18      18  2026-10-23 / normal
+vix                         19/19     18      18    18      18  2026-10-30 / normal
+gold-silver                 19/19      0      15     0      15  2026-11-03 / normal
+cftc-gold-positioning        9/19      0       0     0       0  2026-10-27 / warning
+us-cpi-yoy                  19/19     18      18    18      18  2026-09-01 / warning
+us-pce-core-yoy             10/19     10      10    10      10  2026-09-01 / warning
+euro-hicp                   10/19     10      10    10      10  2026-09-01 / stale
+breakeven-5y5y              19/19     18      18    18      18  2026-11-02 / normal
+breakeven-tilt               4/19      4       4     4       4  2026-11-02 / context
+
+3. THE H2 VERDICT (03 §4 H2: the decade-extreme percentile wants
+   >= ~250 points behind it; the suspects get their numbers here)
+------------------------------------------------------------------------
+real-yield-10y           base  2497 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+us10y                    base  2497 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+us30y                    base  2497 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+fed-target               base  3649 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+fed-expectations         base  2497 [PASS  ] legs: move+level archive: ch 17/19 d, pct 17/19 d
+ecb-dfr                  base  3649 [PASS  ] legs: move+level archive: ch 19/19 d, pct 19/19 d
+yield-curve-10y2y        base  2495 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+yield-curve-10y3m        base  2495 [PASS  ] legs: move+level archive: ch 9/9 d, pct 9/9 d
+dollar-basket            base  2555 [PASS  ] legs: move+level archive: ch 19/19 d, pct 19/19 d
+usdjpy                   base  2555 [PASS  ] legs: move+level archive: ch 19/19 d, pct 19/19 d
+us-japan-10y-gap         base    20 [NO-LEG] legs: NONE       archive: ch 1/9 d, pct 6/9 d
+stress-stlfsi            base   521 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+nfci                     base   521 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+vix                      base  2544 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+gold-silver              base   119 [THIN  ] legs: level-only archive: ch 0/19 d, pct 15/19 d
+cftc-gold-positioning    base     0 [NO-LEG] legs: NONE       archive: ch 0/9 d, pct 0/9 d
+us-cpi-yoy               base   118 [THIN  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+us-pce-core-yoy          base   119 [THIN  ] legs: move+level archive: ch 10/10 d, pct 10/10 d
+euro-hicp                base   119 [THIN  ] legs: move+level archive: ch 10/10 d, pct 10/10 d
+breakeven-5y5y           base  2495 [PASS  ] legs: move+level archive: ch 18/19 d, pct 18/19 d
+breakeven-tilt           base  2495 [PASS  ] legs: move+level archive: ch 4/4 d, pct 4/4 d
+
+Read-only: corpus fixture + source parses only. No worker, no KV, no wire.

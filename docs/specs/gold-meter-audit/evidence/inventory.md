@@ -1,14 +1,18 @@
-# GA-S2 evidence — the inventory (the source-side half)
+# GA-S2 evidence — the inventory (source-side) + the voters table (the completion half)
 
-**Status: PARTIAL (2026-11-04) — delivered under the GA-S2 prompt's lock
-fallback.** The owner was not reachable in-session, so **OI-GA-1 (the
-taxonomy lock) is still OPEN** and this file carries only the inventory's
-**source-side work (03 §1.2–§1.4): the readings table, the derived-series
-recipes, the rungs** — everything that locks nothing. The wiring-dependent
-halves are **DEFERRED to the post-lock completion session** (see the last
-section): the voters table (03 §1.1), the wiring trace + the context
-traces + the history depths (03 §2). `02-REFERENCE-TAXONOMY.md` is
-untouched by this session (v1, delivered, **awaiting the owner's lock**).
+**Status: COMPLETE — the voters table (03 §1.1) appended 2026-11-05 by the
+GA-S2-completion session, after OI-GA-1 was resolved** (the owner's
+delegated lock — 02 is **v1.1 = 85 rows, LOCKED 2026-11-05**; the lock
+record with the full research basis is at 02's foot). The source-side half
+was delivered 2026-11-04 under the GA-S2 prompt's lock fallback: **the
+readings table, the derived-series recipes, the rungs** (§1–§4 below,
+unchanged). This session's additions: **§5 — the voters table** (the 21
+seats transcribed verbatim with line numbers and the `evalLeg` rule that
+applies per seat) and, in the sibling file `evidence/wiring.md`, **the
+wiring trace + the context traces + the history depths** (03 §2). Every
+mechanical fact below is transcribed from the code, the canonical rung map,
+or the live wire of the day named in the section, and every number names the
+script or command that produced it (01 §4.3):
 
 Nothing in this file classifies anything (D-GA-6 — the six classes are
 GA-S3's, against the locked taxonomy) and nothing maps wiring against the
@@ -427,29 +431,75 @@ gold-relevant can be "discovered later by accident" — and so the
 
 ---
 
-## 5. Deferred to the post-lock completion session (blocked on OI-GA-1)
+## 5. The voters table (03 §1.1) — the 21 seats, transcribed verbatim
 
-Per the GA-S2 prompt's fallback (the owner not reachable in-session), the
-following halves of A2 are **not done** — the wiring trace needs the
-locked denominator (D-GA-1):
+The seats are `GOLD_LANE_VOTERS`, `gold-score.ts:155-184` (the table
+literal; the promotion comments above it are the D-5 record). Every seat
+line below is the code's own line — **verified against the file this
+session, not against the scan alone** (the scan's §2 line numbers agree on
+all 21). The `evalLeg` columns state which leg each seat can actually
+express:
 
-1. **The voters table (03 §1.1)** — the 21 seats transcribed verbatim with
-   line numbers, lane, polarity, and the `evalLeg` rule that applies per
-   voter (which `SIGNAL_LEG_MOVE` threshold exists — connections.ts:575-585
-   defines one for only 4 of the 21 ids — and the percentile basis). The
-   scan already prints each voter's `gold-score.ts` line number
-   (evidence/wire-scan-2026-11-04.txt §2); the transcription itself is
-   wiring work.
-2. **The wiring trace (03 §2)** — `evidence/wiring.md`: all 21 voters
-   source → reading → seat with path:line citations (TRACE-BROKEN as a
-   finding), plus the abbreviated context traces ending in "never votes".
-3. **The history depths (03 §2)** — the per-voter point counts `evalLeg`
-   can reach in the stored corpus (the known suspects:
-   `cftc-gold-positioning`, `gold-silver`, `us-japan-10y-gap`), read-only
-   from `packages/insights/fixtures/gold-backtest-corpus.json` (the
-   recorded corpus of 2026-11-03T04:43:54Z) + the KV-dump fixtures, via a
-   read-only script in the `gold-corpus-dump` precedent's footsteps.
+- **Move leg** — `SIGNAL_LEG_MOVE` (`connections.ts:575-585`) defines a
+  30-day-move threshold for **only 4 of the 21 ids**:
+  `real-yield-10y` 0.1 pts · `us10y` 0.15 pts · `dollar-basket` 1.0 pts ·
+  `breakeven-5y5y` 0.1 pts (the other five entries in the map — gold-usd,
+  silver-usd, brent, copper-gold, china-pmi — are not gold-lane seats).
+  **The other 17 seats are LEVEL-LEG ONLY**: without a threshold,
+  `direction` stays `null` whatever `change30d` does (`connections.ts:596-606`),
+  so the lean can only come from the decade-extreme level
+  (`connections.ts:608-613`).
+- **Level leg** — `percentile10y` in `levelOf` bands < 0.2 / > 0.8
+  (`connections.ts:588-592`), computed by `computeReading` over the trailing
+  **3650-day** window of the series' **level** (`PERCENTILE_WINDOW_DAYS`,
+  `scoring.ts:63`; `percentileBase` slices the window and excludes the
+  current point, `scoring.ts:115-120`), gated on **≥ 30 observations**
+  (`MIN_PERCENTILE_OBS`, `scoring.ts:72`) — **no voter definition sets
+  `percentileBasis: 'yoy'`** (the only three 'yoy' definitions in the file
+  are `m2-us`, `au-home-values` and `au-housing-finance`,
+  `definitions.ts:1907/2636/2679` — none a gold-lane seat), so all 21
+  percentile legs read the level.
+- **change30d semantics** — daily/weekly cadences get the rolling 30-day
+  window change; **monthly cadences get the change since the previous
+  release** (`cadenceUsesPreviousRelease`, `scoring.ts:425-427`; the branch
+  at `scoring.ts:492-497`). The three monthly seats (`us-cpi-yoy`,
+  `us-pce-core-yoy`, `euro-hicp`) therefore express "the latest print vs
+  the one before", never a 30-day slide — they are also level-leg-only
+  (no move threshold), so this only affects the card's displayed change
+  field, not the lean.
+- **The seat's impact** — lean × polarity → supports/pressures
+  (`gold-balance.ts:174`); the lane needs **≥ 2 firing** to vote
+  (`GOLD_LANE_MIN_FIRING = 2`, `gold-balance.ts:113`).
 
-**The owner's lock question (OI-GA-1):** LOCK or AMEND the 82-row v1
-taxonomy (`02-REFERENCE-TAXONOMY.md`). Until then the audit cannot count
-coverage (D-GA-1) and GA-S3 cannot run.
+| # | seat — verbatim (`gold-score.ts`) | reading · source · ref (`definitions.ts`) | cadence → change30d | stale (d) | move leg (threshold) | level leg (percentile basis) | wire 2026-11-05 (asOf · status · ch30d/pct10y) |
+|---|---|---|---|---|---|---|---|
+| 1 | `{ lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 }` — :158 ("THE textbook driver") | `real-yield-10y` · fred · `FRED:DFII10` (:78) | daily → 30d window | 4 (default) | **0.1 pts** (`connections.ts:576`) | level percentile over trailing 3650d of DFII10; the ingest fetches DFII10 whole-history since 2003-01-02 (its own 'since' group, `fred.ts:301-305`) | 11-02 · warning · y/y |
+| 2 | `{ lane: 'borrowing-costs', id: 'us10y', polarity: -1 }` — :159 | `us10y` · fred · `FRED:DGS10` (:90) | daily → 30d window | 4 (default) | **0.15 pts** (`connections.ts:582`) | level percentile over trailing 3650d; DGS10 rides the FULL-history group (`fred.ts:293-296`) | 11-02 · warning · y/y |
+| 3 | `{ lane: 'borrowing-costs', id: 'us30y', polarity: -1 }` — :160 | `us30y` · fred · `FRED:DGS30` (:147) | daily → 30d window | 4 (override) | none — level only | level percentile over trailing 3650d; DGS30 rides the FULL-history group (`fred.ts:293-296`) | 11-02 · warning · y/y |
+| 4 | `{ lane: 'borrowing-costs', id: 'fed-target', polarity: -1 }` — :161 ("high policy rate = tight") | `fed-target` · fred · `DFEDTARL (lower bound) + DFEDTARU (upper bound)` (:108) | daily (steps on decisions) → 30d window | 5 (override) | none — level only | level percentile over trailing 3650d of the corridor's lower bound (DFEDTARL direct, `DFEDTARU` attached as `rangeHigh`, derived.ts:372-375); rides the monthly- US-macro decade group (`fred.ts:333-348`) | 11-04 · normal · y/y |
+| 5 | `{ lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 }` — :162 ("2y above policy = higher-for-longer priced") | `fed-expectations` · derived · `DGS2 − (DFEDTARL+DFEDTARU)/2` (:127) | daily → 30d window | 4 (override) | none — level only | level percentile over the derived series (the derivation's own history: the DGS2 decade-window series joined to the DFEDTAR pair, `derived.ts:415-418`) | 11-02 · normal · y/y |
+| 6 | `{ lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 }` — :163 | `ecb-dfr` · ecb · `ECB Data Portal FM/D.U2.EUR.4F.KR.DFR.LEV` (:225) | daily (steps on decisions) → 30d window | 7 (override) | none — level only | level percentile over trailing 3650d of the full-history DFR series (`ecb.ts:17-20, 45-48`) — **when the fetch fails the hold drops BOTH derived fields** (the H3 rule, `snapshot.ts:451-465`) | 11-04 · stale · **−/−** (the held read) |
+| 7 | `{ lane: 'borrowing-costs', id: 'yield-curve-10y2y', polarity: -1 }` — :164 ("steep = reflation; inverted = stress/easing ahead") | `yield-curve-10y2y` · fred · `FRED:T10Y2Y` (:41) | daily → 30d window | 4 (default) | none — level only | level percentile over trailing 3650d; T10Y2Y rides the daily rates/stress decade group (`fred.ts:315-329`) | 11-03 · normal · y/y |
+| 8 | `{ lane: 'borrowing-costs', id: 'yield-curve-10y3m', polarity: -1 }` — :165 | `yield-curve-10y3m` · fred · `FRED:T10Y3M` (:53) | daily → 30d window | 4 (default) | none — level only | level percentile over trailing 3650d; same decade group as 10y2y (`fred.ts:315-329`) | 11-03 · normal · y/y |
+| 9 | `{ lane: 'dollar', id: 'dollar-basket', polarity: -1 }` — :168 | `dollar-basket` · derived · Frankfurter six-currency basket (DXY weights, 50.14348112 base) (:1754) | daily → 30d window | 4 (override) | **1.0 pts** (`connections.ts:580`) | level percentile over trailing 3650d of the basket series (Frankfurter ×6 legs, `basket.ts:18-49` · `derived.ts:321-355`) | 11-04 · normal · y/y (healed from 11-04's stale) |
+| 10 | `{ lane: 'dollar', id: 'usdjpy', polarity: -1 }` — :169 ("USD strength against the funding currency") | `usdjpy` · frankfurter · `Frankfurter USD→JPY` (:1817) | daily → 30d window (**pct** — the only pct-changeKind seat) | 4 (default) | none — level only | level percentile over trailing 3650d of the Frankfurter USD→JPY series (`frankfurter.ts:13-66`, 8 currencies one fetch) | 11-04 · normal · y/y (healed) |
+| 11 | `{ lane: 'dollar', id: 'us-japan-10y-gap', polarity: -1 }` — :170 ("a wide gap is carry fuel — a dollar-positive") | `us-japan-10y-gap` · derived · `DGS10 − MOF jgbcme 10Y` (:1787) | daily → 30d window | 5 (override) | none — level only | level percentile over the inner-join series (DGS10 × MOF 10y on common dates, `derived.ts:575-580`) — the join's own history is the percentile base (thin-history suspect; the number in wiring.md §3) | 10-30 · normal · **−/y** (percentile-only again) |
+| 12 | `{ lane: 'stress', id: 'stress-stlfsi', polarity: 1 }` — :173 | `stress-stlfsi` · fred · `FRED:STLFSI4` (:1410) | weekly → 30d window | 14 (override) | none — level only | level percentile over trailing 3650d; rides the daily rates/stress decade group (`fred.ts:315-329`) | 10-30 · normal · y/y (the weekly roll) |
+| 13 | `{ lane: 'stress', id: 'nfci', polarity: 1 }` — :174 | `nfci` · fred · `FRED:NFCI` (:1433) | weekly → 30d window | 14 (override) | none — level only | level percentile over trailing 3650d; same decade group (`fred.ts:315-329`) | 10-30 · normal · y/y |
+| 14 | `{ lane: 'stress', id: 'vix', polarity: 1 }` — :175 | `vix` · fred · `FRED:VIXCLS` (:1447) | daily → 30d window | 4 (override) | none — level only | level percentile over trailing 3650d; same decade group (`fred.ts:315-329`) | 11-03 · normal · y/y |
+| 15 | `{ lane: 'stress', id: 'gold-silver', polarity: 1 }` — :176 ("a high ratio IS the monetary-stress read") | `gold-silver` · derived · `gold-api XAU ÷ XAG (history: WB gold ÷ silver)` (:1740) | daily → 30d window | 2 (override) | none — level only | level percentile over the union series (WB monthly decade ∪ stored seedHistory ∪ live XAU/XAG point, `derived.ts:548-564`) — the union's own depth is the base (thin-history suspect; the number in wiring.md §3) | 11-04 · normal · y/y |
+| 16 | `{ lane: 'stress', id: 'cftc-gold-positioning', polarity: -1 }` — :177 ("crowded longs are fragile … contrarian") | `cftc-gold-positioning` · cftc · `COT futures-only, GOLD - COMMODITY EXCHANGE INC.` (:735) | weekly (Saturday gate) → 30d window | 12 (override) | none — level only | level percentile over the accumulated weekly series — **one point per fetch** (`cftc.ts:35-44 · 104-117`): the stored history grows one point per Saturday, so the base is as deep as the accumulated fetches (the known never-fires suspect; the number in wiring.md §3) | 10-27 · warning · **−/−** (neither input on the wire) |
+| 17 | `{ lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 }` — :179 | `us-cpi-yoy` · fred · `CPIAUCNS (12-month % change, NSA)` (:513) | monthly → **previous-release change** | 75 (override) | none — level only | level percentile over trailing 3650d of the YoY series (the derived YoY of the CPIAUCNS index, `derived.ts:451`); rides the monthly-US-macro decade group (`fred.ts:333-348`) | 09-01 · warning · y/y |
+| 18 | `{ lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 }` — :180 | `us-pce-core-yoy` · fred · `PCEPILFE (12-month % change, core PCE)` (:548) | monthly → **previous-release change** | 95 (override) | none — level only | level percentile over trailing 3650d of the YoY series (`derived.ts:455`); PCEPILFE rides the mixed early-warning group (`fred.ts:393-405`) | 09-01 · warning · y/y |
+| 19 | `{ lane: 'inflation', id: 'euro-hicp', polarity: 1 }` — :181 | `euro-hicp` · ecb · `ECB Data Portal HICP/M.U2.N.000000.4D0.ANR` (:615) | monthly → **previous-release change** | 60 (override) | none — level only | level percentile over trailing 3650d of the annual-rate series (decade-window request, `ecb.ts:43-68`) | 10-01 · warning · y/y |
+| 20 | `{ lane: 'inflation', id: 'breakeven-5y5y', polarity: 1 }` — :182 ("rising inflation expectations") | `breakeven-5y5y` · fred · `FRED:T5YIFR` (:673) | daily → 30d window | 4 (default) | **0.1 pts** (`connections.ts:581`) | level percentile over trailing 3650d; rides the daily rates/stress decade group (`fred.ts:315-329`) | 11-03 · normal · y/y |
+| 21 | `{ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 }` — :183 ("the D-5 promotion … level-leg only") | `breakeven-tilt` · derived · `T5YIFR − T5YIE` (:1279) | daily → 30d window | 5 (override) | none — level only (the promotion's own recorded variant) | level percentile over the common-date join of T5YIFR × T5YIE (`derived.ts:478-483`); its DEFINITIONS rule is `info` — wire status `context`, and `readable()` admits it (`gold-balance.ts:127-129`) | 11-03 · context · y/y |
+
+**The table's arithmetic:** 21 seats = 8 borrowing-costs (:158-165) + 3
+dollar (:168-170) + 5 stress (:173-177) + 5 inflation (:179-183); 4 seats
+carry a move threshold (1 · 2 · 9 · 20); 17 are level-leg only; 3 seats
+read monthly series (previous-release change semantics); 1 seat is
+pct-changeKind (usdjpy); 1 seat holds a `context`-status reading
+(breakeven-tilt). Wire column transcribed from `ga-s2-wire-scan.sh` §2's
+committed run `evidence/wire-scan-2026-11-05.txt` — the seat line numbers
+re-verified against `gold-score.ts` itself this session (all 21 agree).

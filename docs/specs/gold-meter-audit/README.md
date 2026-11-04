@@ -31,7 +31,7 @@ follow-up, out of scope here too).
 |---|---|
 | `README.md` | This index, the decision log, open items, out of scope |
 | `01-AUDIT-SPEC.md` | The master spec: the problem, the audit's contract, the honesty rules, the completeness guarantee, the classification rubric |
-| `02-REFERENCE-TAXONOMY.md` | **The specialist's checklist**: the canonical classic indicator set for gold direction — 9 families, every row with its classic claim, sign, free source, cadence and treatment. The audit's fixed denominator, locked at GA-S1 |
+| `02-REFERENCE-TAXONOMY.md` | **The specialist's checklist**: the canonical classic indicator set for gold direction — 9 families, every row with its classic claim, sign, free source, cadence and treatment. The audit's fixed denominator: **v1.1 = 85 rows, LOCKED by the owner 2026-11-05** (delegated to the pre-lock research pass — the record at the file's foot) |
 | `03-METHOD-AND-EVIDENCE.md` | How each audit session works: the inventory, the wiring trace, the coverage matrix, the half-implementation checks, evidence and citation rules |
 | `04-REPORT-AND-FILL-DESIGN.md` | The report format, the severity ranking, and the design of the follow-up gap-fill program (phases, gates, owner decisions) |
 | `PROMPTS.md` | The session plan GA-S1..GA-S4 with the full next-session prompt (rewritten at the end of every session — the owner's standing instruction) |
@@ -58,7 +58,7 @@ Reading order: 01, 02, 03, 04, then PROMPTS.md.
 
 | ID | Question | When it must be answered |
 |---|---|---|
-| OI-GA-1 | **The taxonomy lock.** GA-S1 delivers 02 as a draft (v1) for the owner's read; the owner amends or locks it. Unlocked, the audit cannot count coverage (D-GA-1). | At GA-S1's end (or in chat before GA-S2 runs) |
+| OI-GA-1 | **The taxonomy lock.** GA-S1 delivers 02 as a draft (v1) for the owner's read; the owner amends or locks it. Unlocked, the audit cannot count coverage (D-GA-1). | **RESOLVED 2026-11-05**: the owner delegated the research-and-lock to the audit ("I trust your research and judgement. if you think its enough, it's enough and locked by me"); the pre-lock research pass added 3 rows (S13 · F16 · X7 — the owner's recorded amendment) and **02 is v1.1 = 85 rows, LOCKED** | At GA-S1's end (or in chat before GA-S2 runs) — resolved in chat before the GA-S2-completion wiring work |
 | OI-GA-2 | **A fifth lane?** The classic set wants a flows/positioning family (CFTC, ETF flows, central-bank buying, Asian premiums) that today has exactly one voter (`cftc-gold-positioning`) hidden inside market stress, where it can never tip the lane alone. Fold into the 4 lanes, or add a "flows & demand" lane? | GA-S4 proposes; the fill program executes only on the owner's recorded decision |
 | OI-GA-3 | **The S6-M6.4 promotion, revisited.** The repo already holds a `dedollar-concentration` shadow lane (`usd-reserve-share` from IMF COFER + `sp500-breadth-ratio`) that "never votes until the S6-M6.4 promotion decision." Is that decision part of the fill program? | GA-S4's proposal |
 | OI-GA-4 | **WGC quarterly data** (central-bank purchases, ETF holdings/flows, mine supply): free but quarterly with a lag. Voters, or context-only with promotion criteria? The classic answer is context-first (they set the structural regime, not the month's direction) — but the owner calls it. | GA-S4's proposal |

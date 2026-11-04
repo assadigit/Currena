@@ -12,13 +12,113 @@ PROGRESS.md`); this program changes nothing it shipped (D-GA-3).
 
 | ID | Milestone (spec ref) | State |
 |---|---|---|
-| A | The reference taxonomy verified + v1 delivered for the owner's lock; the blind-spot sweep; the presence pre-scan (01 §2 A1; 02) | ✅ COMPLETE — GA-S1 (2026-11-04): 02 is v1 (82 rows: v0 72 + 10 sweep adds − 0 strikes), every row verified live, the sweep + pre-scan recorded, PR merged; **awaiting the owner's lock (OI-GA-1)** |
-| B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | 🔶 **PARTIAL — GA-S2 (2026-11-04): the source-side half delivered** — `evidence/inventory.md`: the full 161-row readings table with the mirror-sweep column (**voter 21 · context 63 · not-gold 77 = 161**), the 25 derived-series recipes + the adapter metrics, the rung map; the runnable record `packages/insights/scripts/ga-s2-wire-scan.sh` + its committed run `evidence/wire-scan-2026-11-04.txt`. **The voters table (03 §1.1), the wiring trace + the context traces + the history depths (03 §2) are DEFERRED** — the owner was not reachable in-session, OI-GA-1 (the taxonomy lock) is still OPEN, and the GA-S2 prompt's fallback bound the session to 03 §1.2–§1.4 (the trace needs the locked denominator, D-GA-1). The completion session (its prompt is in PROMPTS.md) resumes A2 after the lock. **Re-verified 2026-11-05** (the completion attempt's fallback — the owner again unreachable: the drift record `evidence/wire-scan-2026-11-05.txt` committed, the denominators + the GB-S7 retirement + all 21 voters verified holding; OI-GA-1 still OPEN; the row stays PARTIAL) |
+| A | The reference taxonomy verified + v1 delivered for the owner's lock; the blind-spot sweep; the presence pre-scan (01 §2 A1; 02) | ✅ COMPLETE — GA-S1 (2026-11-04): 02 is v1 (82 rows: v0 72 + 10 sweep adds − 0 strikes), every row verified live, the sweep + pre-scan recorded, PR merged. **LOCKED 2026-11-05 (OI-GA-1 RESOLVED): the owner delegated the research-and-lock to the audit's pre-lock research pass — coverage cross-checked against the canonical driver frameworks (Chicago Fed Letter 464 · WGC demand-side), every named free source re-verified live (52 FRED ids + 11 providers), 3 rows added (S13 · F16 · X7) → v1.1 = 85 rows, LOCKED. The record: 02's lock record at the file's foot** |
+| B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | ✅ **COMPLETE — GA-S2 (2026-11-04, source-side) + GA-S2-completion (2026-11-05, the lock + the deferred halves)**: `evidence/inventory.md` (the 161-row readings table with the mirror-sweep column **voter 21 · context 63 · not-gold 77 = 161**, the 25 derived-series recipes, the rung map, **+ §5 the voters table — the 21 seats verbatim with the evalLeg rule per seat**); `evidence/wiring.md` (**the 21 full wiring traces — no TRACE-BROKEN hops — + the 63 context traces with their never-votes notes + the five recorded findings**); `evidence/history-depths-2026-11-05.txt` (the runnable record `packages/insights/scripts/ga-s2-history-depths.sh`: 15 healthy bases 2,495–3,649 pts; cftc-gold-positioning **1 pt / base 0 / 0-of-9 days**; us-japan-10y-gap **21 pts / base 20 / pct 6-of-9 days**; gold-silver **122 pts / base 119 / ch30d 0-of-19 days**); the scan record `ga-s2-wire-scan.sh` + its runs 2026-11-04/-05. Delivered AFTER the lock was resolved in-session (the owner's delegated research-and-lock — see row A) |
 | C | The coverage matrix classified + the half-implementation defect list; the header arithmetic (01 §2 A3, §5; 03 §3–§4) | ⏳ PENDING — GA-S3 |
 | D | The audit report `docs/insights/GOLD-METER-AUDIT-REPORT.md` (01 §2 A4; 04 §1–§2) | ⏳ PENDING — GA-S4 |
 | E | The fill-program design + its GF-S1.. prompts; the owner's decision list stated (04 §3–§5) | ⏳ PENDING — GA-S4 |
 
 ## Session log
+
+### GA-S2-completion, attempt 3 (2026-11-05) — THE LOCK RESOLVED + A2 COMPLETED
+
+- **The lock first (OI-GA-1) — RESOLVED this session.** The owner reached
+  back in chat and **delegated the research-and-lock**: *"I am not gold or
+  finance expert, I just advice you to audit and investigate and research
+  wheter those 82 items are enough for our indicator or not, do we have
+  reliable data streams for them, and questions like this for
+  feasbility/accuracy and reliability. If you find new items, add them. if
+  not , you can lock and continue. it depends on your research, I trust
+  your research and judgement. if you think its enough, it's enough and
+  locked by me."* The research pass performed before the lock (every check
+  run this session; the full record with the verbatim instruction is 02's
+  lock record at the file's foot):
+  1. **Coverage cross-check** against the canonical driver frameworks —
+     the Chicago Fed's four-driver model (*"What Drives Gold Prices?"*,
+     Chicago Fed Letter 464, 2021: real 10y rate · long-run inflation
+     expectations · **pessimistic expectations** · world income) and the
+     WGC demand-side framework (jewellery · technology · central banks ·
+     bar & coin · ETFs · OTC). Three classic objects found absent from v1
+     and **ADDED as the owner's pre-lock amendment (v1 → v1.1)**: **S13**
+     US household pessimism (Michigan — the Chicago Fed's named pessimism
+     driver; `UMCSENT` re-verified live on FRED: 887 pts, 1952-12 →
+     2026-09; the object is already ingested as `michigan-sentiment`, a
+     growth-health voter outside the gold lanes — promotion-class) ·
+     **F16** Swiss gold net exports by destination (the
+     London↔Switzerland↔Asia physical-flow read behind the F6/F7 premium
+     rows; the BAZG SwissImpex tables verified live, free/keyless, monthly
+     by country 2012→) · **X7** gold/platinum ratio (the second
+     precious-bloc internal ratio; gold-api **XPT verified live beside
+     XAU**; both legs already in the repo's price-row family). The rest of
+     the candidates recorded as considered-not-added with reasons (China
+     real rates — no verifiable free source from this venue, ChinaBond
+     HTTP 000; world income growth; MOVE; AISC; HUI — the sweep's open
+     call now resolved NOT added; India import tonnage — carried inside
+     F16 + WGC commentary). **v1.1 = 85 rows, LOCKED by the owner's
+     delegated instruction, 2026-11-05** (row-count arithmetic verified by
+     script: R14+D9+I11+S13+F16+X7+G7+H4+M4 = 85).
+  2. **Data-stream reliability re-verification** — `ga-s1-fred-verify.sh`
+     re-run (49 ids) + `DPCREDIT`/`MPCREDIT`/`H41RESPPALDKNWW` by curl:
+     **the identical live/dead pattern GA-S1 recorded** (every live leg
+     still live; every dead id still dead — DFII2 404, the BAML pair
+     still a rolling ~3y window now starting 2023-11-07). Provider
+     spot-checks: Frankfurter (JPY 178.30 · CHF 0.9188 · CNY 7.5177 ·
+     INR 106.6318 @ 2026-11-04) · gold-api (XAU **and XPT**) · MOF jgbcme
+     (10Y 2.817 @ 2026-11-02) · CFTC deafut.txt (439,640 B — byte-identical
+     to GA-S1) · WGC GDT + ETF pages · GPR (2,718,208 B) · OFR FSI
+     (517,372 B) · EBP (44,606 B) · IMF COFER (126,820 B) · BAZG — all
+     HTTP 200 live.
+  3. Downstream arithmetic restated: README's file table + OI-GA-1 row ·
+     row A above — all quote v1.1 = 85 rows, locked.
+- **The voters table (03 §1.1) — `inventory.md` §5:** the 21 seats of
+  `GOLD_LANE_VOTERS` (`gold-score.ts:155-184`) transcribed **verbatim with
+  line numbers, verified against the file** (the scan's §2 agrees on all
+  21), each with the definitions.ts source/ref/cadence/staleness line and
+  **the evalLeg rule that applies**: 4 of 21 seats carry a
+  `SIGNAL_LEG_MOVE` threshold (real-yield-10y 0.1 pts · us10y 0.15 ·
+  dollar-basket 1.0 · breakeven-5y5y 0.1 — connections.ts:575-585); **17
+  are level-leg only**; the level leg = percentile10y bands <0.2/>0.8 over
+  the trailing-3650d of the LEVEL (scoring.ts:63/115-120, ≥30-obs gate
+  scoring.ts:72 — no voter sets `percentileBasis: 'yoy'`); the monthly
+  seats express previous-release change; usdjpy is the only pct-changeKind
+  seat; breakeven-tilt the only context-status seat.
+- **The wiring trace (03 §2) — `evidence/wiring.md`:** the full chain for
+  each of the 21 voters (source endpoint → adapter file:fn → rung →
+  reading + staleness → evalLeg inputs → seat → the visitor's member line
+  at `MergedCard.tsx:113/220-224`), **no TRACE-BROKEN hops**, plus the 63
+  context traces (D-GA-4) ending in "never votes", plus the history
+  depths restated. **Five recorded findings** (facts for GA-S3's
+  H-questions): (1) `cftc-gold-positioning` — the never-fires seat now
+  numbered; (2) `us-japan-10y-gap` — the intermittent percentile (the
+  reading-time join at ingest/run.ts:886-899); (3) `gold-silver` — the
+  thin union base; (4) **`ecb-dfr` — the 2026-11-05 drift record's open
+  question answered**: the failed-fetch hold carries value+asOf with
+  status `stale` and drops both derived fields (snapshot.ts:451-465, the
+  H3 hold rule); (5) the structural 17-of-21 level-only finding.
+- **The history depths (03 §2) — the runnable record
+  `packages/insights/scripts/ga-s2-history-depths.sh`** (read-only,
+  keyless, fetchless — the corpus fixture + source parses only) + its
+  committed run `evidence/history-depths-2026-11-05.txt` (corpus
+  recordedAt 2026-11-03T04:43:54Z). **Every number from that run:** 15
+  voters PASS with bases 2,495–3,649 pts and 17–19/19-day input
+  availability; the monthly three 118–119 pts (a decade at cadence); the
+  suspects — `cftc-gold-positioning` **1 staged point, base 0, 0/9
+  archive days with either input**; `us-japan-10y-gap` **21 staged
+  points, base 20, pct10y 6/9 · change30d 1/9 recorded days**;
+  `gold-silver` **122 staged points, base 119, change30d 0/19 recorded
+  days** (both fields present on the 2026-11-04/05 wires — the union's
+  live tail aged past 30 days).
+- **Milestone row B flipped to COMPLETE.** A2 is whole: the inventory
+  (readings + recipes + rungs + voters table) + the wiring evidence pack
+  (traces + context traces + history depths). GA-S3 can classify.
+- **Nothing classified, nothing wired into the meter, nothing deployed**
+  (D-GA-3/D-GA-6/D-GA-2): docs + one read-only script + its committed
+  output only; no code, worker, schema, adapter or copy file touched.
+- **Not blocked on the owner anymore.** The next session is **GA-S3** (the
+  coverage matrix + the half-implementation audit, 03 §3–§4) — its prompt
+  is in PROMPTS.md and printed in this session's final message. The
+  owner's decision list that REMAINS open: OI-GA-2..OI-GA-6 (GA-S4's
+  proposal territory).
 
 ### GA-S2-completion (2026-11-05) — the lock still open: the re-verification drift record only
 
@@ -311,8 +411,11 @@ PROGRESS.md`); this program changes nothing it shipped (D-GA-3).
 
 ## Owner must decide
 
-1. **OI-GA-1 — the taxonomy lock** (after GA-S1 delivers v1): amend or lock.
-   The audit cannot count coverage against an unlocked denominator.
+1. **OI-GA-1 — the taxonomy lock: RESOLVED 2026-11-05** (the owner
+   delegated the research-and-lock to the audit in chat; the pre-lock
+   research pass added S13 · F16 · X7 and locked **v1.1 = 85 rows** — the
+   record in 02's lock record). Further additions are owner-recorded
+   amendments with dates only (D-GA-1).
 2. OI-GA-2..OI-GA-6 — as scheduled in the README's table (GA-S4's decision
    list, unless the owner calls them earlier in chat).
 
