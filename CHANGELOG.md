@@ -5,6 +5,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-04b] — gold-balance P3+P4 (GB-S5): the gold Outlook DERIVED from the consolidated balance behind ?balance=lanes + the copy close (goldOutlookOf per 01 §5.2 — footing counted nowhere, AC-7; the strip, the collapsed takeaway and the balance from ONE goldBalance() result, AC-3; the owner's existing seven sentences ship — OI-1 asked, unanswered; the terminology recorded, OI-5 satisfied-pending-final-owner-read; gates 9/9 GREEN 14,618; Insights chunk 1550.94/358.99 — ceiling 1560/360 holds)
+
+GB-S5 (branch `gold-balance/p3-outlook`). The last preview-phase piece:
+the gold Outlook card no longer counts gold's own 30-day move as
+evidence — the old 5th "footing" condition was circular (a falling
+price was read as bearish evidence for a falling price, and the page
+could say Outlook "Bearish" beside Balance "Balanced" — 01 §1 P3,
+D-GB-5/D-GB-6). Behind the same `?balance=lanes` flag:
+
+- **The derivation** (`goldOutlookOf` in `signals/verdict.tsx`, 01 §5.2
+  exactly): all-4-unread → null; `L >= GOLD_LANE_STRONG (3)` →
+  strong-bullish / `A >= 3` → strong-bearish; the range evidence
+  UNCHANGED from `outlookOf` (|change30d| < 2% AND the typical 10-year
+  band AND |L−A| ≤ 1 → range-bound — price describes consolidation
+  only, never direction); `L == A` → mixed if L > 0 else neutral; else
+  bullish/bearish. `outlookOf` itself is untouched and keeps serving
+  silver (OI-4, a recorded follow-up) and the DEFAULT gold view (the
+  legacy snapshot pin, byte-for-byte).
+- **The wiring (AC-3):** `MergedCard` feeds the strip's gold leg from
+  the SAME `goldBalance()` result that drives the lane drivers and the
+  verdict word — the strip, the balance and (this session's one small
+  recorded extension, the GB-S3 `note`-field precedent) the COLLAPSED
+  section takeaway's gold chip cannot disagree anymore. Flag off →
+  `undefined` → the legacy derivation renders byte-for-byte.
+- **The tests (04 §4.2):** `outlook.test.ts` 15 → 26 — the table test
+  over (L, A, unread, speed, band) for every branch, the boundary pins
+  and the FOOTING-DECOUPLING pin (−9% and +9% give the same state;
+  ±1.5% quiet+typical is the only price effect); the silver contract
+  untouched and green. `gold-balance-lanes.test.tsx` 35 → 44 — the
+  strip-wiring pin over a 13-variant engine-verified battery, the
+  never-opposing verdict/outlook matrix, the ±9% DOM decoupling with
+  the balance byte-identical, the all-unread null (verdictNone, where
+  the old path said Bearish from footing), the existing-sentences pin,
+  the doctored-conditions pin (AC-4: no bespoke stress/expectations
+  rule can reach the Outlook) and the collapsed-takeaway pair.
+- **The copy close (P4):** the GB-S3/GB-S4 key set CONFIRMED in the
+  manifest (round-76 17 + round-77 15, copy:audit clean); NO new keys —
+  OI-1 was asked once, early, with the 03 §6.3 table in front of the
+  owner and no answer had arrived at ship time, so the seven EXISTING
+  sentences ship and the honest note stands: they still read as a
+  forecast, which the backtest does not support (03 §6.3's rule); fa
+  round-78 NOT created. `persian-terminology.md` gains the gold-balance
+  lane section (Split / «دوپاره», the lane states, the tally wording,
+  the counts + context lines); OI-5 recorded satisfied-pending-final-
+  owner-read.
+- **Harness:** the GB-S4c CWD-sensitivity note closed
+  (`gb-s4-union-probe.plw.ts` resolves its fixture from
+  `import.meta.url`); `prod-verify.mjs` now probes the Outlook strip's
+  gold state + sentence in the production matrix; the gb-s4 evidence
+  set regenerated on the P3 build (the scenarios' strips show the
+  lane-derived states).
+- **Measured:** full `pnpm gates` ALL 9 GREEN — **14,618 tests** (web
+  12,639 → 12,659; baseline 14,598, no regression) · typecheck 6/6 ·
+  lint 0/0 · copy:audit clean · narrator in sync + 50 eval checks ·
+  layer1 strict 11,819/11,819 · Insights lazy **1550.94/358.99**
+  (baseline 1550.46/358.81; +0.48/+0.18 kB — the derivation + the
+  wiring) — the 1560/360 ceiling holds, no re-baseline; the chunk
+  re-hashed to `Insights-Ck9A6XE3.js`. The gb-s4 standing guards
+  re-run on the P3 build: 67/67 green.
+
+With P3+P4 landed the preview is COMPLETE for the owner's review at
+`currena.ir/insights?balance=lanes` — GB-S6 (the owner-gated default
+flip) does not proceed without the explicit "go".
+
 ## [2026-11-04a] — gold-balance P2b UNION: the parallel-session union + the delivery completion (the second GB-S4 variant's end-to-end verification of the merged redesign; the dark rim hues; the 6 standing union-probe guards; currena-api 6549c5bc @ 100% with the 8/8 production matrix, zero console errors)
 
 GB-S4b, the parallel-session union (the GB-S1b precedent applied to the

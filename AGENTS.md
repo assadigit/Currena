@@ -443,7 +443,20 @@ AA ratios (evidence/gb-s4/); the default view stays byte-identical
 lane tests rewritten 19 -> 35 + the gb-s4 Playwright V-1..V-10 suite
 (61 tests, six engine-verified scenarios, 70 screenshots); gates 9/9
 GREEN 14,598; Insights lazy 1550.46/358.81, ceiling 1560/360
-(justified). Until GB-S6
+(justified). P3+P4 landed 2026-11-04 (GB-S5, branch
+gold-balance/p3-outlook): the gold OUTLOOK is derived from the same
+engine behind the flag — `goldOutlookOf` (verdict.tsx, 01 §5.2: 4
+unread -> null; L/A >= 3 strong; the unchanged range evidence; mixed/
+neutral; else bullish/bearish — footing counted nowhere, AC-7) feeds
+the strip's gold leg + the collapsed takeaway from the ONE
+goldBalance() result (AC-3), silver + the default view untouched
+(OI-4); the 04 §4.2 table + consistency tests (outlook 26, lanes 44);
+gates 9/9 GREEN 14,618; Insights lazy 1550.94/358.99 (ceiling holds);
+the copy close: rounds 76-77 confirmed in the manifest, the lane
+terminology recorded (persian-terminology.md), OI-5 satisfied-pending-
+final-owner-read, NO new keys (OI-1 asked, unanswered -> the owner's
+existing seven sentences ship, still reading as a forecast per 03
+§6.3). Until GB-S6
 flips the default, everything user-visible about gold stays exactly
 as it is today — the preview is opt-in by URL only.*
 

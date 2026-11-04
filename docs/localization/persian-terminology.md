@@ -180,6 +180,27 @@ Band position words: در محدودهٔ (inside), بالاتر از (above), پ
 | Percent sign | ٪ (Persian) | glyph, not the word |
 | Gold price in A$ | قیمت طلا به دلار استرالیا | `gold-aud` |
 
+## Gold balance lanes (gold-balance consolidation, rounds 76–77)
+
+The consolidated lane balance behind `?balance=lanes`
+(`signals.balance.*`; the lane/voter/evidence words under
+`signals.goldScore` are round-53's, reused as they are):
+
+| English | Persian | Notes |
+| --- | --- | --- |
+| Split (a contested neutral lane) | دوپاره | `signals.balance.splitBadge` (OI-2's default) — the single most important disclosure: a neutral lane that is contested, not empty |
+| Split: {supports} for, {pressures} against | دوپاره: {supports} موافق، {pressures} مخالف | `signals.balance.laneStateSplit`; the contest line itself is `laneSplit` «{supports} موافق، {pressures} مخالف» |
+| {firing} of {readable} drivers firing | {firing} مورد از {readable} عامل فعال است | `signals.balance.laneTally` — the lane chip's second line |
+| No driver firing | هیچ عاملی فعال نیست | `signals.balance.laneTallyNone` — a readable lane with zero firing voters |
+| For gold / Against gold / Not leaning / Unread (lane states) | به نفع طلا / علیه طلا / بدون گرایش / قابل ارزیابی نبود | `signals.balance.laneState*` (round-77); the tray's own title is «بدون گرایش» |
+| Not leaning (the tray) | بدون گرایش | `signals.balance.trayTitle`; trayNote: «سنجیده شد، اما گرایش روشنی نیست» |
+| Supports gold / Pressures gold (members) | به نفع قیمت طلا / علیه قیمت طلا | `signals.balance.memberSupports` / `memberPressures` (the engine's supports/pressures vocabulary) |
+| Not firing ({n}) | غیرفعال ({n}) | `signals.balance.membersSteadyTitle` — the steady voters' collapsed group |
+| Could not be read ({n}) | قابل ارزیابی نبود ({n}) | `signals.balance.membersUnreadTitle` — the «قابل ارزیابی» family (round-76's polish) |
+| {n} for / {n} not leaning / {n} unread (counts) | {n} موافق / {n} بدون گرایش / {n} ناخوانده | `signals.balance.verdictCount*` (round-77); against mirrors «{n} مخالف» |
+| Gold over the last 30 days: … not counted in the balance | طلا در ۳۰ روز گذشته: … برای زمینه نشان داده می‌شود و در ترازو حساب نمی‌شود | `signals.balance.contextLine` — the non-voting footing line (01 §6) |
+| Borrowing costs / Dollar / Market stress / Inflation (the four lanes) | هزینهٔ استقراض / دلار / تنش بازار / تورم | `signals.goldScore.laneNames.*` (round-53, reused — the lane model keeps the wind panel's lane vocabulary) |
+
 ## Time, freshness, and time-ago
 
 | English | Persian | Notes |

@@ -16,8 +16,18 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { LEAN_STRONG, type SignalConditionKey, type SignalConditionState, type SignalReading } from '@currena/insights';
-import { RANGE_SPEED_PCT, outlookOf } from './signals/verdict';
+import {
+  GOLD_LANE_STRONG,
+  GOLD_LANES,
+  LEAN_STRONG,
+  type GoldBalanceLane,
+  type GoldBalanceReading,
+  type GoldBalanceSide,
+  type SignalConditionKey,
+  type SignalConditionState,
+  type SignalReading,
+} from '@currena/insights';
+import { RANGE_SPEED_PCT, goldOutlookOf, outlookOf } from './signals/verdict';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 
@@ -218,3 +228,181 @@ describe('outlook copy — the owner\'s verbatim sentences, both locales', () =>
 function sorted(xs: readonly string[]): string[] {
   return [...xs].sort();
 }
+
+/* ------------------------------------------------------------------ *
+ * goldOutlookOf — the consolidated gold Outlook (GB-S5, P3: 01 §5.2,
+ * behind ?balance=lanes). The table test 04 §4.2 mandates: every
+ * branch over (L, A, unread, speed, band), plus the footing-decoupling
+ * pin (AC-7). outlookOf above KEEPS serving silver and the DEFAULT
+ * gold view untouched (its tests stay green as the silver contract);
+ * OI-4 — silver's own footing circularity — is a recorded follow-up.
+ * ------------------------------------------------------------------ */
+
+type Band = 'low' | 'typical' | 'high';
+const pos = (band: Band) => ({ band, percentile: band === 'low' ? 0.1 : band === 'high' ? 0.95 : 0.5 });
+const QUIET = 1.2; // |30-day change| well under the 2% bar
+const MOVING = 6.4; // well above it
+
+/** A minimal but VALID GoldBalanceReading: `L` lanes for, `A` against,
+ * `U` unread, the rest neutral — the counts roll up exactly as
+ * goldBalance() does (the engine's own rollup is pinned by its tests;
+ * this builder lets the table test walk every (L, A, unread) branch
+ * without 21-voter fixtures). goldOutlookOf reads only the rollup. */
+const laneBalance = (L: number, A: number, U: number): GoldBalanceReading => {
+  const neutral = 4 - L - A - U;
+  const sides: GoldBalanceSide[] = [
+    ...Array<GoldBalanceSide>(L).fill('for'),
+    ...Array<GoldBalanceSide>(A).fill('against'),
+    ...Array<GoldBalanceSide>(neutral).fill('neutral'),
+    ...Array<GoldBalanceSide>(U).fill('unread'),
+  ];
+  const lanes: GoldBalanceLane[] = GOLD_LANES.map((lane, i) => ({
+    lane,
+    side: sides[i]!,
+    split: false,
+    readable: sides[i] === 'unread' ? 0 : 1,
+    firing: 0,
+    supports: 0,
+    pressures: 0,
+    members: [],
+  }));
+  return {
+    lanes,
+    counts: { for: L, against: A, neutral, unread: U },
+    net: L - A,
+    readable: L + A + neutral,
+  };
+};
+
+const outlookAt = (
+  L: number,
+  A: number,
+  U: number,
+  speed: number | null,
+  band: Band | null,
+): ReturnType<typeof goldOutlookOf> => goldOutlookOf(laneBalance(L, A, U), speed, band === null ? null : pos(band));
+
+describe('goldOutlookOf — the consolidated gold Outlook (01 §5.2, GB-S5 P3)', () => {
+  it('the strong bar sits at GOLD_LANE_STRONG = 3 of 4 lanes (mirroring the old 4-of-5 bar)', () => {
+    expect(GOLD_LANE_STRONG).toBe(3);
+    // 2 of 4 is a majority, not a strong one
+    expect(outlookAt(2, 0, 0, MOVING, 'typical')).toBe('bullish');
+    expect(outlookAt(0, 2, 0, MOVING, 'typical')).toBe('bearish');
+  });
+
+  it('all four lanes unread → null (verdictNone — nothing could be read)', () => {
+    expect(outlookAt(0, 0, 4, null, null)).toBeNull();
+    // rule 1 precedes everything, even complete range evidence
+    expect(outlookAt(0, 0, 4, QUIET, 'typical')).toBeNull();
+  });
+
+  it('L >= 3 → strong-bullish; A >= 3 → strong-bearish (L=3, L=4 both pin)', () => {
+    expect(outlookAt(3, 0, 0, MOVING, 'typical')).toBe('strong-bullish');
+    expect(outlookAt(3, 1, 0, MOVING, 'typical')).toBe('strong-bullish');
+    expect(outlookAt(4, 0, 0, MOVING, 'typical')).toBe('strong-bullish');
+    // the strong states outrank the range rule even on a quiet, typical month
+    expect(outlookAt(3, 0, 0, QUIET, 'typical')).toBe('strong-bullish');
+    expect(outlookAt(4, 0, 0, QUIET, 'typical')).toBe('strong-bullish');
+    expect(outlookAt(0, 3, 0, MOVING, 'typical')).toBe('strong-bearish');
+    expect(outlookAt(1, 3, 0, MOVING, 'typical')).toBe('strong-bearish');
+    expect(outlookAt(0, 4, 0, MOVING, 'typical')).toBe('strong-bearish');
+    expect(outlookAt(0, 3, 0, QUIET, 'typical')).toBe('strong-bearish');
+  });
+
+  it('range-bound: quiet price mid-range plus |L - A| <= 1 beats a thin driver edge', () => {
+    // all neutral, quiet and typical
+    expect(outlookAt(0, 0, 0, QUIET, 'typical')).toBe('range-bound');
+    // a 2v1 / 1v2 / 1v1 edge is "no clear breakout direction" while the price consolidates
+    expect(outlookAt(2, 1, 0, QUIET, 'typical')).toBe('range-bound');
+    expect(outlookAt(1, 2, 0, QUIET, 'typical')).toBe('range-bound');
+    expect(outlookAt(1, 1, 0, QUIET, 'typical')).toBe('range-bound');
+    // a single voting lane (1v0) with the rest quiet
+    expect(outlookAt(1, 0, 0, QUIET, 'typical')).toBe('range-bound');
+    // the negative quiet month is as quiet as the positive one
+    expect(outlookAt(2, 1, 0, -QUIET, 'typical')).toBe('range-bound');
+    // the rules' order: range evidence precedes the L==A/else ladder, so a
+    // thin readable read (1 for, 3 unread) on a quiet month still reads
+    // consolidation (01 §5.2 rule 3 before rules 4-5)
+    expect(outlookAt(1, 0, 3, QUIET, 'typical')).toBe('range-bound');
+  });
+
+  it('NOT range-bound when the price is moving (no range evidence, whatever the lanes)', () => {
+    expect(outlookAt(0, 0, 0, MOVING, 'typical')).toBe('neutral');
+    expect(outlookAt(0, 0, 0, -3.1, 'typical')).toBe('neutral');
+    // the thin edge keeps its direction when the price moves
+    expect(outlookAt(2, 1, 0, MOVING, 'typical')).toBe('bullish');
+    expect(outlookAt(1, 2, 0, -3.1, 'typical')).toBe('bearish');
+    expect(outlookAt(1, 1, 0, MOVING, 'typical')).toBe('mixed');
+  });
+
+  it('NOT range-bound away from the typical band, without a position, or without a speed', () => {
+    // the edge of the decade range is a breakout setup
+    expect(outlookAt(2, 1, 0, QUIET, 'high')).toBe('bullish');
+    expect(outlookAt(1, 2, 0, QUIET, 'low')).toBe('bearish');
+    expect(outlookAt(0, 0, 0, QUIET, 'high')).toBe('neutral');
+    expect(outlookAt(0, 0, 0, QUIET, 'low')).toBe('neutral');
+    // honest absence: no position / no speed → no range evidence
+    expect(outlookAt(2, 1, 0, QUIET, null)).toBe('bullish');
+    expect(outlookAt(0, 0, 0, null, 'typical')).toBe('neutral');
+  });
+
+  it(`the speed bar is |30-day change| < ${RANGE_SPEED_PCT}% (boundary excluded, either sign)`, () => {
+    expect(RANGE_SPEED_PCT).toBe(2);
+    expect(outlookAt(0, 0, 0, RANGE_SPEED_PCT, 'typical')).toBe('neutral');
+    expect(outlookAt(0, 0, 0, -RANGE_SPEED_PCT, 'typical')).toBe('neutral');
+    expect(outlookAt(0, 0, 0, 1.99, 'typical')).toBe('range-bound');
+    expect(outlookAt(0, 0, 0, -1.99, 'typical')).toBe('range-bound');
+  });
+
+  it('a clear driver edge (|L - A| >= 2) keeps its direction regardless of a quiet month', () => {
+    expect(outlookAt(2, 0, 0, QUIET, 'typical')).toBe('bullish');
+    expect(outlookAt(0, 2, 0, QUIET, 'typical')).toBe('bearish');
+    expect(outlookAt(3, 1, 0, QUIET, 'typical')).toBe('strong-bullish');
+  });
+
+  it('L == A → mixed when L > 0, else neutral', () => {
+    expect(outlookAt(1, 1, 0, MOVING, 'typical')).toBe('mixed');
+    expect(outlookAt(2, 2, 0, MOVING, 'typical')).toBe('mixed');
+    // no speed at all → honest mixed, no range claim
+    expect(outlookAt(1, 1, 0, null, null)).toBe('mixed');
+    // equal to zero → neutral
+    expect(outlookAt(0, 0, 0, MOVING, 'typical')).toBe('neutral');
+    expect(outlookAt(0, 0, 2, MOVING, 'typical')).toBe('neutral');
+    // neutral conditions plus unreadable lanes still read as Neutral
+    expect(outlookAt(0, 0, 1, MOVING, 'typical')).toBe('neutral');
+  });
+
+  it('otherwise: bullish if L > A, bearish if A > L (unread lanes do not vote)', () => {
+    expect(outlookAt(1, 0, 0, MOVING, 'typical')).toBe('bullish');
+    expect(outlookAt(2, 1, 0, MOVING, 'typical')).toBe('bullish');
+    expect(outlookAt(0, 1, 0, MOVING, 'typical')).toBe('bearish');
+    expect(outlookAt(0, 1, 3, MOVING, 'typical')).toBe('bearish'); // the sparse shape: 1 against, 3 unread
+  });
+
+  it('the footing-decoupling pin (AC-7, 04 §4.2): gold change30d of -9% and +9% give the SAME state unless the range evidence differs', () => {
+    // The old gold path counted the move itself as a 5th condition
+    // (falling = bearish evidence). The lane derivation reads price ONLY
+    // as range evidence — the sign of a large move can never flip a state.
+    for (const [L, A, U, expected] of [
+      [2, 1, 0, 'bullish'],
+      [1, 2, 0, 'bearish'],
+      [0, 0, 0, 'neutral'],
+      [1, 1, 0, 'mixed'],
+      [0, 1, 3, 'bearish'],
+      [3, 0, 0, 'strong-bullish'],
+      [0, 3, 0, 'strong-bearish'],
+    ] as const) {
+      expect(outlookAt(L, A, U, -9, 'typical'), `L${L} A${A} U${U} at -9%`).toBe(expected);
+      expect(outlookAt(L, A, U, 9, 'typical'), `L${L} A${A} U${U} at +9%`).toBe(expected);
+    }
+    // The ONLY way price changes the state is the range evidence: the same
+    // lanes at ±1.5% (quiet, typical) read range-bound where ±9% does not.
+    expect(outlookAt(0, 0, 0, -9, 'typical')).toBe('neutral');
+    expect(outlookAt(0, 0, 0, 9, 'typical')).toBe('neutral');
+    expect(outlookAt(0, 0, 0, -1.5, 'typical')).toBe('range-bound');
+    expect(outlookAt(0, 0, 0, 1.5, 'typical')).toBe('range-bound');
+    // And a move big enough to leave the range bar is the same in both directions
+    expect(outlookAt(2, 1, 0, -1.5, 'typical')).toBe('range-bound');
+    expect(outlookAt(2, 1, 0, 1.5, 'typical')).toBe('range-bound');
+  });
+});

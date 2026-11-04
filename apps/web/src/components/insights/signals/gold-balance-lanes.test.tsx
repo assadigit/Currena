@@ -38,6 +38,12 @@
  * (05 §4.4), the tray's empty state (05 §4.5), the all-unread and
  * sparse states (05 §8, UI-40 held through the redesign).
  *
+ * GB-S5 (P3) adds: the gold Outlook DERIVED from the balance (01 §5.2
+ * — the strip's gold leg reads goldOutlookOf(goldBalance(readings))
+ * behind the flag; the never-opposing matrix + the footing-decoupling
+ * DOM pin (AC-7) + the doctored-conditions pin (AC-4); the collapsed
+ * gold takeaway rides the same engine under the flag (AC-3)).
+ *
  * Fixtures: the RECORDED 2026-10-31 corpus archive (the recipe verified
  * twice — GB-S1 + GB-S2: sourceName "archive 2026-10-31", updatedAt the
  * archive's generatedAt) reproduces 01 §7 exactly — LEVEL · 4 neutral ·
@@ -59,6 +65,8 @@ import { evaluateSignal } from '@currena/insights';
 import { MergedSignalsCard, useBalanceLanesPreview } from './MergedCard';
 import { BalanceScale, balanceVisualFrame, balanceVisualMetrics, balanceVisualSizeOf } from './BalanceScale';
 import { balanceRimSegments } from './BalanceWeight';
+import { goldOutlookOf, outlookOf } from './verdict';
+import { Signals } from '../Signals';
 import { formatChange } from '../config';
 import { insightsCopyEn } from '../../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
@@ -1027,6 +1035,229 @@ describe('the visual prop boundary (GB-S4)', () => {
     // The neutral lane driver renders as the legacy TRAY CHIP (the tiles are
     // for pan drivers) — the legacy markup, not the redesign.
     expect(document.querySelector('[data-balance-chip="borrowing-costs"]')).not.toBeNull();
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * GB-S5 (P3) — the gold Outlook DERIVED from the balance (01 §5.2):
+ * the strip's gold leg, the AC-3 consistency pins and the AC-7
+ * footing decoupling, all behind ?balance=lanes.
+ * ------------------------------------------------------------------ */
+describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
+  /** Gold's price row overridden — the voters (and so the whole lane
+   * balance) are untouched; only the OUTLOOK's range evidence changes. */
+  const withGold = (base: readonly IndicatorReading[], change30d: number, percentile = 0.6): IndicatorReading[] =>
+    base.map((r) => (r.id === 'gold-usd' ? { ...r, change30d, percentile10y: percentile } : r));
+  /** A lane's firing voters neutralized to quiet rows (side -> neutral). */
+  const quieten = (base: readonly IndicatorReading[], ids: IndicatorId[]): IndicatorReading[] =>
+    base.map((r) => (ids.includes(r.id) ? quiet(r.id) : r));
+
+  /** The battery: every (balance verdict × outlook family) cell, each
+   * variant's counts verified against the real engine before pinning
+   * (the probe numbers are in the GB-S5 session log). */
+  const BATTERY: Array<[name: string, readings: () => IndicatorReading[], expected: string]> = [
+    ['the recorded fixture (L0 A0, price moving)', () => fixtureReadings(), 'neutral'],
+    ['DIRECTIONAL (1 for · 2 against, price moving)', () => DIRECTIONAL, 'bearish'],
+    ['FOR (3 for)', () => FOR, 'strong-bullish'],
+    ['STACK (4 against)', () => STACK, 'strong-bearish'],
+    ['SPARSE (1 against · 3 unread, price moving)', () => SPARSE, 'bearish'],
+    ['fixture · gold -9%', () => withGold(fixtureReadings(), -9), 'neutral'],
+    ['fixture · gold +9%', () => withGold(fixtureReadings(), 9), 'neutral'],
+    ['fixture · gold quiet + typical band', () => withGold(fixtureReadings(), 0.8, 0.5), 'range-bound'],
+    ['DIRECTIONAL · gold quiet + typical band', () => withGold(DIRECTIONAL, 0.8), 'range-bound'],
+    ['FOR minus stress (L2 A0)', () => quieten(FOR, ['stress-stlfsi', 'nfci']), 'bullish'],
+    ['FOR minus stress minus dollar (L1 A0)', () => quieten(FOR, ['stress-stlfsi', 'nfci', 'dollar-basket', 'usdjpy']), 'bullish'],
+    ['FOR minus stress minus dollar · gold quiet', () => withGold(quieten(FOR, ['stress-stlfsi', 'nfci', 'dollar-basket', 'usdjpy']), 0.8), 'range-bound'],
+    ['DIRECTIONAL minus dollar (L1 A1)', () => quieten(DIRECTIONAL, ['dollar-basket', 'usdjpy']), 'mixed'],
+  ];
+
+  it('the strip\'s gold chip reads exactly goldOutlookOf(goldBalance(readings)) — the SAME engine result as the balance (AC-3)', () => {
+    for (const [name, make, expected] of BATTERY) {
+      cleanup();
+      const readings = make();
+      const { gold } = renderCard(readings);
+      const balance = goldBalance(readings);
+      const direction = document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction');
+      // The engine-derived state, recomputed here from the same readings
+      // the card rendered on — the strip and the derivation cannot drift.
+      expect(direction, `${name}: DOM vs goldOutlookOf`).toBe(goldOutlookOf(balance, gold.speed, gold.position));
+      // The engine-verified expectation from the session's probe.
+      expect(direction, `${name}: DOM direction`).toBe(expected);
+    }
+  });
+
+  it('the Outlook never OPPOSES the beam: every battery verdict/outlook pair agrees (AC-3, D-GB-6)', () => {
+    const CALM = new Set(['neutral', 'range-bound', 'mixed']);
+    const BULL = new Set(['bullish', 'strong-bullish']);
+    const BEAR = new Set(['bearish', 'strong-bearish']);
+    for (const [name, make] of BATTERY) {
+      cleanup();
+      renderCard(make());
+      const balanceVerdict = document.querySelector('[data-balance-verdict]')?.getAttribute('data-balance-verdict');
+      const outlook = document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction');
+      expect(balanceVerdict, `${name}: verdict attr`).toBeTruthy();
+      if (balanceVerdict === 'for') {
+        // net > 0: the outlook may understate (range-bound on a quiet
+        // month) but never flip or fence-sit
+        expect(BULL.has(outlook ?? '') || outlook === 'range-bound', `${name}: for vs ${outlook}`).toBe(true);
+      } else if (balanceVerdict === 'against') {
+        expect(BEAR.has(outlook ?? '') || outlook === 'range-bound', `${name}: against vs ${outlook}`).toBe(true);
+      } else if (balanceVerdict === 'balanced') {
+        // net === 0: never directional — the old page said Bearish here
+        expect(CALM.has(outlook ?? ''), `${name}: balanced vs ${outlook}`).toBe(true);
+      } else {
+        // readable === 0: nothing could be read — the gold chip carries none
+        expect(outlook, `${name}: none`).toBe('none');
+      }
+    }
+  });
+
+  it('silver\'s leg is UNTOUCHED: the silver chip still reads outlookOf(silver) under the flag (OI-4)', () => {
+    for (const [name, make] of BATTERY.slice(0, 5)) {
+      cleanup();
+      const { silver } = renderCard(make());
+      expect(document.querySelector('[data-verdict-metal="silver"]')?.getAttribute('data-verdict-direction'), name).toBe(
+        outlookOf(silver),
+      );
+    }
+  });
+
+  it('the footing decoupling in the DOM (AC-7): gold change30d of -9% and +9% leave BOTH the balance and the Outlook unchanged', () => {
+    const snapshotOf = (): { verdict: string | null | undefined; count: string | null | undefined; tilt: string | null | undefined; direction: string | null | undefined } => ({
+      verdict: document.querySelector('[data-balance-verdict-word]')?.textContent,
+      count: document.querySelector('[data-balance-count]')?.textContent,
+      tilt: document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt'),
+      direction: document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction'),
+    });
+    renderCard(withGold(fixtureReadings(), -9));
+    const down = snapshotOf();
+    cleanup();
+    renderCard(withGold(fixtureReadings(), 9));
+    const up = snapshotOf();
+    // The old gold path counted the move (a falling month dragged the
+    // verdict toward bearish). The lane path: the sign of a large move
+    // changes NOTHING — price is context, counted nowhere.
+    expect(up).toEqual(down);
+    expect(down).toEqual({
+      verdict: 'Balanced',
+      count: '0 for · 0 against · 4 not leaning',
+      tilt: '0',
+      direction: 'neutral',
+    });
+    // The ONLY price effect: quiet + typical band reads range-bound —
+    // consolidation described, never direction — while the balance stays
+    // byte-identical.
+    cleanup();
+    renderCard(withGold(fixtureReadings(), 0.8, 0.5));
+    const quiet = snapshotOf();
+    expect(quiet.direction).toBe('range-bound');
+    expect(quiet.verdict).toBe('Balanced');
+    expect(quiet.count).toBe(down.count);
+    expect(quiet.tilt).toBe(down.tilt);
+    // …and a quiet month at the decade high is NOT range evidence.
+    cleanup();
+    renderCard(withGold(fixtureReadings(), 0.8, 0.95));
+    expect(snapshotOf().direction).toBe('neutral');
+  });
+
+  it('all four lanes unread: the gold chip carries the honest none (verdictNone); with both metals unread the whole strip hides', () => {
+    renderCard(ALL_UNREAD);
+    // Both metals read nothing → the strip's own both-null rule hides it.
+    expect(document.querySelector('[data-signal-verdict]')).toBeNull();
+    // Silver readable → the strip renders and the GOLD chip states it
+    // could not be read (the OLD path said Bearish here, from footing).
+    cleanup();
+    renderCard([...ALL_UNREAD, reading('silver-usd', { value: 55, percentile10y: 0.5, change30d: 3 })]);
+    const goldChip = document.querySelector('[data-verdict-metal="gold"]') as HTMLElement;
+    expect(goldChip.getAttribute('data-verdict-direction')).toBe('none');
+    expect(goldChip.textContent).toContain(copy.signals.verdictNone);
+  });
+
+  it('the owner\'s EXISTING outlook sentences ship (OI-1 unanswered — the states change, the wording does not)', () => {
+    renderCard(fixtureReadings());
+    expect(document.querySelector('[data-verdict-metal="gold"]')?.textContent).toContain(
+      copy.signals.verdictStates.neutral.gold,
+    );
+    cleanup();
+    renderCard(withGold(fixtureReadings(), 0.8, 0.5));
+    expect(document.querySelector('[data-verdict-metal="gold"]')?.textContent).toContain(
+      copy.signals.verdictStates['range-bound'].gold,
+    );
+    cleanup();
+    renderCard(FOR);
+    expect(document.querySelector('[data-verdict-metal="gold"]')?.textContent).toContain(
+      copy.signals.verdictStates['strong-bullish'].gold,
+    );
+  });
+
+  it('behind the flag the strip reads the ENGINE, not the gold conditions (AC-4: no bespoke stress/expectations rule can reach the Outlook)', () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
+    const readings = fixtureReadings();
+    const gold = evaluateSignal('gold', readings);
+    const silver = evaluateSignal('silver', readings);
+    // A doctored gold reading: EVERY legacy condition reads against (the
+    // bespoke stress/expectations/footing states at their most bearish —
+    // the old path would say strong-bearish from this). The lane view
+    // derives from goldBalance(readings) + speed/position only, so neither
+    // the strip nor the balance can see the doctored conditions.
+    const doctored: SignalReading = {
+      ...gold,
+      conditions: gold.conditions.map((c) => ({ ...c, state: 'against' as const })),
+      metCount: gold.conditions.length,
+      lean: 'mostly-unsupportive',
+    };
+    render(
+      <MergedSignalsCard
+        gold={doctored}
+        silver={silver}
+        readings={readings}
+        copy={copy}
+        numberLocale="en-US"
+        balanceLanes
+      />,
+    );
+    expect(document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction')).toBe(
+      goldOutlookOf(goldBalance(readings), gold.speed, gold.position),
+    );
+    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toContain('Balanced');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * GB-S5 (P3) — the COLLAPSED gold takeaway also derives from the
+ * balance under the flag (AC-3: the Outlook state cannot disagree with
+ * the balance in any presentation of the card).
+ * ------------------------------------------------------------------ */
+describe('the collapsed gold takeaway under the flag (GB-S5, AC-3)', () => {
+  const renderSignals = (balanceLanes: boolean) => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
+    render(
+      <Signals
+        readings={DIRECTIONAL}
+        copy={copy}
+        numberLocale="en-US"
+        expandToken={0}
+        balanceLanes={balanceLanes}
+      />,
+    );
+    // Collapse the section (session-only toggle) so the summary lines render.
+    fireEvent.click(document.querySelector('button[aria-controls="insights-signals-body"]') as HTMLButtonElement);
+    const verdictOf = (metal: string): string | null | undefined =>
+      document.querySelector(`li[data-signal-metal="${metal}"] [data-collapsed-verdict]`)?.getAttribute('data-collapsed-verdict');
+    return { verdictOf };
+  };
+
+  it('the collapsed gold line reads the LANE state (bearish: 1 for · 2 against), not the old mixed (which footing dragged up)', () => {
+    const { verdictOf } = renderSignals(true);
+    expect(verdictOf('gold')).toBe('bearish');
+    // Silver's collapsed takeaway keeps its own legacy derivation (OI-4).
+    expect(verdictOf('silver')).toBe(outlookOf(evaluateSignal('silver', DIRECTIONAL)));
+  });
+
+  it('without the flag the collapsed line keeps the legacy derivation byte-for-byte (the default view pin)', () => {
+    const { verdictOf } = renderSignals(false);
+    expect(verdictOf('gold')).toBe(outlookOf(evaluateSignal('gold', DIRECTIONAL)));
+    expect(verdictOf('silver')).toBe(outlookOf(evaluateSignal('silver', DIRECTIONAL)));
   });
 });
 

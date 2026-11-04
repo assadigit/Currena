@@ -13,7 +13,7 @@
 
 import type { CSSProperties } from 'react';
 import type { SignalReading } from '@currena/insights';
-import { LEAN_STRONG } from '@currena/insights';
+import { GOLD_LANE_STRONG, LEAN_STRONG, type GoldBalanceReading } from '@currena/insights';
 import { Coins } from 'lucide-react';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
@@ -78,6 +78,56 @@ export function outlookOf(reading: SignalReading): OutlookState | null {
   if (rangeEvidence && Math.abs(supportive - against) <= 1) return 'range-bound';
   if (supportive === against) return supportive > 0 ? 'mixed' : 'neutral';
   return supportive > against ? 'bullish' : 'bearish';
+}
+
+/* ------------------------------------------------------------------ *
+ * Gold balance consolidation P3 (GB-S5, 01-SPEC §5.2 — the gold
+ * Outlook card DERIVED from the consolidated balance, behind the same
+ * ?balance=lanes preview flag): the gold state is computed from the
+ * SAME goldBalance() result that drives the lane balance, so the card
+ * and the balance can never contradict each other (D-GB-6, AC-3 —
+ * today the Outlook's 5th "footing" condition is gold's own 30-day
+ * move, the circularity that read Bearish beside a Balanced balance).
+ *
+ * The contract (01 §5.2), in engine terms — L = lanes for, A = lanes
+ * against, over the four lanes:
+ *   1. all four lanes unread → null (the existing "nothing could be
+ *      read", verdictNone);
+ *   2. L ≥ GOLD_LANE_STRONG (3) → strong-bullish; A ≥ 3 →
+ *      strong-bearish (3 of 4 mirrors the old "4 of 5" bar);
+ *   3. range evidence — UNCHANGED from outlookOf: |30-day change| <
+ *      RANGE_SPEED_PCT (2%) AND the 10-year position in the typical
+ *      band AND |L − A| ≤ 1 → range-bound. Price enters ONLY here,
+ *      describing consolidation — never direction (AC-7: footing
+ *      counts nowhere else in this function);
+ *   4. L == A → mixed if L > 0, else neutral;
+ *   5. otherwise bullish if L > A, else bearish.
+ *
+ * `speed`/`position` are the gold SignalReading's own fields — the
+ * exact range evidence outlookOf reads today (rule 3 verbatim), so the
+ * consolidation read stays honest without re-deriving price inputs.
+ * Silver keeps outlookOf untouched (OI-4 is a recorded follow-up, not
+ * this change); so does the DEFAULT gold view until the owner-gated
+ * P5/GB-S6 flip.
+ * ------------------------------------------------------------------ */
+export function goldOutlookOf(
+  balance: GoldBalanceReading,
+  speed: number | null,
+  position: SignalReading['position'],
+): OutlookState | null {
+  const L = balance.counts.for;
+  const A = balance.counts.against;
+  if (balance.counts.unread === 4) return null; // nothing could be read
+  if (L >= GOLD_LANE_STRONG) return 'strong-bullish';
+  if (A >= GOLD_LANE_STRONG) return 'strong-bearish';
+  const rangeEvidence =
+    speed !== null &&
+    Math.abs(speed) < RANGE_SPEED_PCT &&
+    position !== null &&
+    position.band === 'typical';
+  if (rangeEvidence && Math.abs(L - A) <= 1) return 'range-bound';
+  if (L === A) return L > 0 ? 'mixed' : 'neutral';
+  return L > A ? 'bullish' : 'bearish';
 }
 
 export function VerdictIcon({
@@ -244,12 +294,21 @@ export function MetalTrendChart({
 export function VerdictStrip({
   gold,
   silver,
+  goldOutlook,
   prices,
   copy,
   numberLocale,
 }: {
   gold: SignalReading;
   silver: SignalReading;
+  /** GB-S5 (P3, 01 §5.2 + AC-3): the gold Outlook derived from the
+   * SAME goldBalance() result that drives the lane balance — passed by
+   * the merged card ONLY under ?balance=lanes. `undefined` (flag off,
+   * the default view) keeps the legacy outlookOf(gold) derivation
+   * byte-for-byte; a passed `null` IS a verdict (all four lanes
+   * unread → verdictNone), distinct from "not provided". Silver's leg
+   * always reads outlookOf (OI-4). */
+  goldOutlook?: OutlookState | null | undefined;
   /** Each metal's current price, display-formatted (2026-10-20 owner
    * sketch): the header carries it in a LIGHTER ink — the price already
    * leads the prices board above; here the TREND is the emphasis. */
@@ -259,7 +318,7 @@ export function VerdictStrip({
 }) {
   const s = copy.signals;
   const rows = [
-    { reading: gold, verdict: outlookOf(gold), price: prices.gold },
+    { reading: gold, verdict: goldOutlook !== undefined ? goldOutlook : outlookOf(gold), price: prices.gold },
     { reading: silver, verdict: outlookOf(silver), price: prices.silver },
   ];
   if (rows.every((r) => r.verdict === null)) return null;

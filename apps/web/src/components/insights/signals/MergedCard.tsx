@@ -42,7 +42,7 @@ import { BalanceScale, driverStateOf, type BalanceDriver } from './BalanceScale'
 import { GoldTailwindPanel } from './GoldTailwindPanel';
 import { ModelVsRealityPanel } from './ModelVsRealityPanel';
 import { ConditionIcon, LeanIcon, stateToneClass } from './icons';
-import { MetalIcon, VerdictStrip } from './verdict';
+import { MetalIcon, VerdictStrip, goldOutlookOf } from './verdict';
 
 /**
  * Gold balance consolidation P2 (GB-S3): the lane model's own measured
@@ -170,6 +170,15 @@ export function MergedSignalsCard({
    * ---------------------------------------------------------------- */
   const gs = s.goldScore;
   const balance = useMemo(() => (balanceLanes ? goldBalance(readings) : null), [balanceLanes, readings]);
+  /* GB-S5 (P3, 01 §5.2 + AC-3): the gold Outlook derived from the SAME
+   * goldBalance() result that drives the lane drivers and the verdict
+   * word above — the strip can no longer contradict the balance
+   * (D-GB-6). The range evidence is UNCHANGED: the gold reading's own
+   * speed/position, the exact inputs outlookOf reads today. Flag off →
+   * undefined → the strip keeps the legacy derivation byte-for-byte
+   * (the default view's pin). */
+  const goldOutlook =
+    balance !== null ? goldOutlookOf(balance, gold.speed, gold.position) : undefined;
   /* Session 3 (G2) reuse: the inflation lane's context phrase — the
    * breakeven tilt reading's own lean (pure selection in the insights
    * package; the card never chooses copy). Absent/stale → no phrase. */
@@ -388,10 +397,14 @@ export function MergedSignalsCard({
        * metal, derived from the conditions below. Answer first.
        * 2026-10-20 (owner sketch): the chips redraw as analysis cards —
        * header (artwork box · name + verdict · lighter price) over a BIG
-       * trend chart, one anatomy for mobile and desktop. */}
+       * trend chart, one anatomy for mobile and desktop.
+       * GB-S5 (P3, 01 §5.2): under ?balance=lanes the GOLD leg derives
+       * from the consolidated balance (goldOutlookOf — AC-3); silver
+       * keeps its own conditions (OI-4). */}
       <VerdictStrip
         gold={gold}
         silver={silver}
+        goldOutlook={goldOutlook}
         prices={{ gold: priceTextOf('gold-usd'), silver: priceTextOf('silver-usd') }}
         copy={copy}
         numberLocale={numberLocale}
