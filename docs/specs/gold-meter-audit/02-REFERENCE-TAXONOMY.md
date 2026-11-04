@@ -1,16 +1,28 @@
 # 02. The reference taxonomy — the classic gold-direction checklist
 
-**Status: v1 (GA-S1, 2026-11-04) — delivered for the owner's lock (OI-GA-1).**
-Every row was verified this session against the live source — the exact
+**Status: v1.1 — LOCKED by the owner, 2026-11-05 (OI-GA-1 RESOLVED).**
+The lock was delegated by the owner's instruction of 2026-11-05 (verbatim
+in the lock record at the file's foot): research whether the items are
+enough and the data streams reliable; add what is found; if enough, locked.
+The pre-lock research pass (the GA-S2-completion session, 2026-11-05)
+cross-checked the coverage against the canonical driver frameworks (the
+Chicago Fed's "What Drives Gold Prices?" driver set — Letter 464, 2021; the
+WGC demand-side framework) and re-verified the named free sources live
+(`ga-s1-fred-verify.sh` re-run + the provider spot-checks — the full record
+at the file's foot): it added 3 rows (S13 · F16 · X7, marked
+**★ v1.1-add**, each carrying a classic use plus a live-verified free
+source) and recorded the remaining candidates as considered-not-added with
+reasons. **v1.1 = 85 rows is now the locked denominator (D-GA-1): additions
+from here are owner-recorded amendments with dates only — never silent.**
+Every v1 row was verified against the live source at GA-S1 (2026-11-04) —
+the exact
 FRED series id, the provider URL, the licence class, the served history
 (script: `packages/insights/scripts/ga-s1-fred-verify.sh`; the full source
 list with URLs in `PROGRESS.md`'s GA-S1 block). Rows amended by that
 verification are recorded at the file's foot; rows added by the blind-spot
 sweep (01 §5.3) are marked **★ v1-add** and listed in the sweep record;
 nothing was struck (each family was walked for the pruning question too —
-the honest answer is recorded below). This is the audit's fixed denominator
-(D-GA-1): after the owner locks it, additions are owner-recorded amendments
-with dates, never silent. Nothing in the row tables describes the current
+the honest answer is recorded below). Nothing in the row tables describes the current
 meter — by design; where a row brushes the repo it is because the repo
 already ingests that series (sourcing context only). The pre-scan at the
 file's foot is labelled, bounded, and is **not part of the checklist**.
@@ -112,6 +124,7 @@ it bids. The family measures which regime is running.
 | S10 | Repo-market stress (SOFR−IORB etc.) | **+**: plumbing stress marks the funding-fear regime | FRED `SOFR` (L2-cite, live →2026-11-03) − `IORB` (L0, live →2026-11-04) — both verified; the repo's `repo-stress` derivation | daily | level; context |
 | S11 | EU sovereign stress (BTP–Bund) | **+**: the regional haven magnet that competes for the same bid | ECB/FRED OECD mirrors (free; the repo's `btp-bund-spread` context card is live) | daily | context-leaning |
 | S12 ★ v1-add | EM sovereign stress (EMBI-class spread) | **+** in EM-stress episodes (with the family's conditional-haven rule): EM dollar-debt spread widening is the EM stress regime — dollar strength, capital flight, and the physical-demand channel (pairs with D8/D9) | JPMorgan EMBI Global — **MISSING-PAID** (verified: no FRED series this session; no clean free mirror found). Free proxy: the S5 composites + the EM dollar indexes (D9) and EM FX (D8) | — | level vs range; context |
+| S13 ★ v1.1-add | US household pessimism (Michigan sentiment / the "mostly bad times" read) | **+**: the household fear channel — the Chicago Fed's canonical driver set ("What Drives Gold Prices?", Chicago Fed Letter 464, 2021: real 10y rate · long-run inflation expectations · **pessimistic expectations** — a measured ~5% real-gold-price rise per 10pp innovation in the bad-times fraction) treats household pessimism as a standalone gold bid beside the market-price fear legs (S1–S5) | FRED `UMCSENT` (L2-cite © U. Michigan via FRED; **re-verified live 2026-11-05**: monthly, 887 pts, 1952-12 → 2026-09). The exact object (the 5y "mostly bad times" fraction) is a UoM SIE-portal table (free download, no API — the same honest class as I4); `UMCSENT` is the free feed object | monthly / ~2w | level + change; context-leaning (the S-family's household leg) |
 
 ## F. Flows, positioning & demand — the COT school
 
@@ -136,6 +149,7 @@ the middle**; this family is the least represented in the current meter.
 | F13 ★ v1-add | Official-sector monthly purchases (PBoC/SAFE, CBR) | **+** structural: the monthly-resolution twin of F4 — the PBoC's reported reserve sequence (the 2022–2026 streak) and the CBR's reported gold reserves are the desk's higher-frequency official-demand reads; reported pauses/resumes move the structural-bid narrative | PBoC/SAFE official monthly gold-reserve tables (free/keyless official sites) + CBR reserves page (free); WGC's monthly commentary consolidates (free) | monthly / ~2–4w | level + changed-flag; context (OI-GA-4 family) |
 | F14 ★ v1-add | COMEX–LBMA EFP basis | event/extreme: the exchange-for-physical spread between New York futures and London spot is the dual-market dislocation tell (2020's squeeze — the classic episode); an EFP blowout marks deliverable-scarcity stress | **MISSING-PAID-class** — verified this session: the clean EFP needs both a live futures leg (CME: 403 to automation) and the London price (bot-challenged); no free clean series. Free proxy: F8's warehouse drains + F6's premium direction | — | context; event marker |
 | F15 ★ v1-add | SGE monthly withdrawals (the China physical proxy) | **+** for physical demand: SGE gold withdrawals are the classic China physical-demand proxy (the 2013–2016 usage debate; the WGC's China accounting references them) — the quantity-expression of the Eastern bid whose price-expression is F6 | SGE monthly statistics (en.sge.com.cn — free, UA-sensitive, site verified live this session); WGC China commentary (free) | monthly | level vs 5y band; context |
+| F16 ★ v1.1-add | Swiss gold net exports by destination (the London↔Switzerland↔Asia flow) | **+**: the classic physical-arbitrage flow read — Switzerland is the world's largest refining hub, so its monthly customs tables are the flow evidence behind the F6/F7 premium rows (surging CH→CN/CH→IN exports = the Eastern physical bid clearing; reversals toward the UK = ETF liquidation feeding back through London); the release the trade press headlines monthly | Swiss customs (BAZG) SwissImpex monthly tables — gold by partner country, 2012→ (free/keyless; **verified live 2026-11-05**: the BAZG gold-and-silver trade page serves the dashboard and the monthly results; the tariff-heading note is on the page) | monthly / ~2–3w | level vs own range by destination; context-leaning |
 
 ## X. Cross-asset relative value
 
@@ -151,6 +165,7 @@ full for the matrix.
 | X4 | Gold/Bitcoin | context: the store-of-value competition, post-2017 | gold-api × Bitstamp (both free; the repo derives `gold-btc`) | daily / 0 | context |
 | X5 | Gold vs equities (GLD/SPY) | context: the long-horizon rotation gauge | Yahoo (free; L2 owner-accepted per the repo's register) | daily / 0 | context |
 | X6 | Gold real price percentile | cross-listed I10 | derived | monthly | context |
+| X7 ★ v1.1-add | Gold/platinum ratio | regime gauge (context-leaning): gold's monetary premium vs platinum's industrial cycle — the second precious-bloc internal ratio beside X1 (a stretched ratio = the monetary-bid regime; a collapsing one = industrial-risk-on); the desk charts it beside gold/silver and it is the ratio the bullion trade itself headlines as the overlooked precious-metals gauge | gold-api (L0; **verified live 2026-11-05: XPT served beside XAU**) — both legs already sit in the repo's price-row family (the `platinum` price row + `gold-usd`) | daily / 0 | level vs own range; context |
 
 ## G. Fiscal & sovereign — the debasement trade
 
@@ -197,7 +212,11 @@ can say the family was examined, not forgotten.
 **v1 = 82 rows** (v0's 72 + **10 sweep additions** − 0 strikes):
 R14 + D9 + I11 + S12 + F15 + X6 + G7 + H4 + M4 = 82 physical rows
 (cross-listed placeholders I5/I6/X6 resolve to their primary rows at
-classification). The additions, all appended **before** the v1 stamp
+classification). **v1.1 = 85 rows** (v1 + **3 pre-lock research additions**
+− 0 strikes): +S13 +F16 +X7 — added by the owner-delegated research pass
+of 2026-11-05, *before* the lock (the amendment record and the lock record
+are at the file's foot). The v1
+additions, all appended **before** the v1 stamp
 (D-GA-1) and each carried by a classic desk use plus a verified source:
 
 | Add | Row | Why it clears the classic bar |
@@ -212,6 +231,16 @@ classification). The additions, all appended **before** the v1 stamp
 | 8 | F13 Official-sector monthly purchases (PBoC/SAFE, CBR) | The 2022–2026 official-buying regime's monthly-resolution read; free official sources |
 | 9 | F14 COMEX–LBMA EFP basis | The dual-market dislocation tell (2020's squeeze); honest MISSING-PAID-class with free proxies |
 | 10 | F15 SGE monthly withdrawals | The classic China physical-demand proxy; SGE site verified live (UA-sensitive) |
+
+**The v1.1 additions (2026-11-05, the pre-lock research pass — the owner's
+delegated instruction, quoted verbatim in the lock record at the file's
+foot):**
+
+| Add | Row | Why it clears the classic bar |
+|---|---|---|
+| 11 | S13 US household pessimism (Michigan) | A named driver of the Chicago Fed's canonical driver model (Letter 464, 2021) — the household fear channel the S-family otherwise expresses only through market prices; `UMCSENT` re-verified live on FRED this session (887 pts, 1952-12 → 2026-09) |
+| 12 | F16 Swiss gold net exports by destination | The physical-flow evidence behind the F6/F7 premium rows — the monthly Swiss customs release the desks and the trade press headline; the BAZG SwissImpex tables verified live, free/keyless, monthly by country 2012→ |
+| 13 | X7 Gold/platinum ratio | The second precious-bloc internal ratio (the monetary-premium vs industrial-cycle gauge beside X1); gold-api XPT verified live beside XAU; both legs already ingested in the repo's price-row family |
 
 **Pruning pass (the honest answer):** every family was walked again with the
 question "is any v0 row honestly desk-lore, not literature?" — **no row
@@ -231,6 +260,33 @@ LBMA clearing volumes — free monthly stats exist but the claim
 (liquidity/activity) is second-order for a conditions meter. AUD/JPY risk
 cross — redundant with the S-family's risk gauges for gold's purposes.
 Silver-specific crosses — out of scope (the closed program's OI-4).
+
+**Checked and deliberately NOT added by the 2026-11-05 research pass**
+(each with its reason, so the delegated lock decision is auditable):
+
+- **China real rates (10y CGB − CPI)** — the modern EM household channel is
+  documented, but no free/keyless source could be verified this session
+  (ChinaBond unreachable from the audit venue — HTTP 000; no FRED mirror;
+  no repo ingest grounds it). A row whose source cannot be verified fails
+  this checklist's own bar (every row carries a live-verified source);
+  recorded as a candidate owner amendment should a reliable free route be
+  verified from a browser venue.
+- **World / EM income growth** — the Chicago Fed model's largest elasticity,
+  but an annual-scale model variable rather than a desk gauge; the
+  demand-side rows (F3/F4/F6/H3) carry the channel at the meter's scale.
+- **MOVE / rate-volatility index** — paid (ICE), no clean free proxy (a
+  realized-vol derivation would be a construct, not the classic object);
+  the R-family's move/level legs already express the policy-regime
+  conditions.
+- **All-in sustaining cost (AISC)** — the industry cost-curve floor is
+  Metals-Focus-paid and a valuation-floor narrative rather than a conditions
+  direction; I10 carries the valuation anchor.
+- **HUI/gold-miners ratio — the sweep's open call, now resolved:** NOT
+  added (thin formal literature, L2-Yahoo-sourced, and its equity-side
+  leverage is already expressed by X5 + S6).
+- **India monthly import tonnage** — the quantity-twin of F7's price read,
+  carried inside F16's flow record and WGC's monthly commentary rather than
+  as its own row.
 
 ---
 
@@ -338,6 +394,14 @@ cross-listed). Read with the bound above: this says the *table* holds
 voters/context/absence for these objects; it says nothing about lane
 seating, rule fit, history depth, or sign — the audit's actual work.
 
+**v1.1 addendum (2026-11-05, the pre-lock research additions — presence
+checked against the same doc table, same bounds):** S13 **ABSENT** (no
+`UMCSENT` row — the repo ingests the same survey's `MICH` leg only) ·
+F16 **ABSENT** (no Swiss-flow row) · X7 **ABSENT** (the `platinum` price
+row exists but no ratio reading). **Tally restated over the 82 primary rows
+of v1.1 (85 − 3 cross-listed): PRESENT-VOTER 15 · PRESENT-CONTEXT 23 ·
+ABSENT 44 · UNKNOWN 0.**
+
 ---
 
 ## Changelog (v0 → v1, GA-S1, 2026-11-04)
@@ -402,3 +466,73 @@ curl checks logged in PROGRESS.md's GA-S1 block):
   blind-spot sweep's additions (see the sweep record above).
 - **Pre-scan section** — appended, labelled and bounded (not part of the
   checklist; GA-S2/GA-S3 decide).
+
+---
+
+## The lock record (OI-GA-1) — RESOLVED 2026-11-05
+
+**The owner's instruction (2026-11-05, verbatim, in chat):** *"I am not gold
+or finance expert, I just advice you to audit and investigate and research
+wheter those 82 items are enough for our indicator or not, do we have
+reliable data streams for them, and questions like this for feasbility
+/accuracy and reliability. If you find new items, add them. if not , you can
+lock and continue. it depends on your research, I trust your research and
+judgement. if you think its enough, it's enough and locked by me."*
+
+**The research pass performed before the lock** (the GA-S2-completion
+session, 2026-11-05 — every check below was run this session):
+
+1. **Coverage cross-check.** The 82 v1 rows were walked family-by-family
+   against the canonical driver frameworks: the Chicago Fed's *"What Drives
+   Gold Prices?"* (Chicago Fed Letter 464, 2021 — the four-driver model over
+   1971–2019: real 10y rate · long-run inflation expectations · pessimistic
+   expectations · world income) and the World Gold Council's demand-side
+   framework (jewellery · technology · central banks · bar & coin · ETFs ·
+   OTC — the families F/H carry). Findings: **three classic objects absent
+   from v1** — the household-pessimism driver (added as **S13**), the Swiss
+   physical-flow read (added as **F16**), the gold/platinum regime ratio
+   (added as **X7**); every other driver in both frameworks maps to existing
+   rows (world income → considered-not-added, reason recorded above).
+2. **Data-stream reliability re-verification (52 FRED ids + 11 provider
+   endpoints, all read live).** `ga-s1-fred-verify.sh` re-run (49 ids) plus
+   `DPCREDIT`/`MPCREDIT`/`H41RESPPALDKNWW` (curl): **the identical
+   live/dead pattern GA-S1 recorded on 2026-11-04** — every live leg still
+   live (DFII10/DFII5/DFII7 6,218 pts → 2026-11-02; DFEDTARU/L and
+   IORB/RRPONTSYD/RRPONTSYAWARD → 2026-11-04; DGS2/DGS10/DGS30/DFF →
+   2026-11-02; T5YIFR/T5YIE/T10YIE/VIXCLS → 2026-11-03; T10Y2Y → 2026-11-03;
+   NFCI/STLFSI4/DTWEXBGS/DTWEXEMEGS → 2026-10-30; CPI/PCE/MICH/UMCSENT/M2SL/
+   median/sticky → 2026-09; GFDEGDQ188S → 2026-04-01; WALCL/WSEFINTL1/
+   WRESBAL/WTREGEN → 2026-10-28; SOFR → 2026-11-03; DPCREDIT 6,214 pts →
+   2026-11-03; MPCREDIT → 2026-10-01) and every dead/wrong id still dead
+   (DFII2 404; MEDCPIM158SFRBCML 404; STICKCPIM158SFRBCLE 404; STLFSI2 ends
+   2022-01-07; DISCBORR ends 2020-08-01; DTWEXB ends 2019-12-31; WBTFL/WLCR
+   404; H41RESPPALDKNWW ends 2026-05-06 — the BTFP maturity the S9 row
+   records; the BAML pair's rolling window now starts 2023-11-07 — still
+   ~3y, still insufficient for decade-extreme treatments, still the
+   licence-pre-approval class S2/S3 record). Provider spot-checks (curl,
+   UA `CurrenaDashboard/1.0`): Frankfurter live (JPY 178.30 · CHF 0.9188 ·
+   CNY 7.5177 · INR 106.6318 @ 2026-11-04) · gold-api live (**XAU and
+   XPT** both served) · MOF `jgbcme.csv` live (10Y 2.817 @ 2026-11-02) ·
+   CFTC `deafut.txt` live (439,640 B — the byte-count GA-S1 recorded) · WGC
+   GDT + ETF pages live · GPR export live (2,718,208 B — byte-identical) ·
+   OFR `fsi.csv` live (517,372 B — byte-identical) · Fed Board `ebp_csv.csv`
+   live (44,606 B — byte-identical) · IMF COFER SDMX live (126,820 B —
+   byte-identical) · **BAZG Swiss customs live** (the SwissImpex gold-trade
+   page — F16's source). Unreachable from this audit venue, recorded
+   honestly: ChinaBond (HTTP 000 — the China-real-rate candidate's recorded
+   reason for not being added).
+3. **The decision, under the owner's delegation.** The research found the
+   checklist three rows short of the classic condition set (added before the
+   lock — the amendment above) and **no further gap that clears the classic
+   bar with a verifiable free source** (the rest recorded as
+   considered-not-added with reasons). **v1.1 = 85 rows is therefore LOCKED
+   by the owner's delegated instruction, 2026-11-05.** From here (D-GA-1):
+   additions are owner-recorded amendments with dates only — never silent.
+
+**Amendment v1 → v1.1 (2026-11-05, pre-lock):** +S13 · +F16 · +X7 · −0
+strikes. Downstream arithmetic restated by this session: `README.md`'s file
+table + OI-GA-1 open-item row · `PROGRESS.md` row A's lock annotation · the
+GA-S3 prompt in `PROMPTS.md` — all now quote 85 rows (v1.1, locked). The
+GA-S1 historical records (PROGRESS's GA-S1 block, PROMPTS's GA-S1 note, the
+v1 row-count line above) intentionally still quote v1 = 82 — they are dated
+session records, not live state.
