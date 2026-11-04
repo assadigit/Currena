@@ -392,15 +392,17 @@ byte-verified), C5 validated (corpus content-identical to S4,
 recordedAt refreshed), and the repo Actions secret rotated to the
 working KV-Edit token.*
 
-*Gold balance consolidation (2026-11-03, P0 CALIBRATED + P1 ENGINE +
-P2 PREVIEW + P2b VISUAL + P3+P4 LANDED — the P5 flip STAGED on the
-`gold-balance/p5-flip` branch, awaiting the owner's recorded "go" per
-the hard gate; on the recorded "go" the consolidated lane balance
-becomes THE gold card for every visitor — docs/specs/gold-balance-consolidation/):
+*Gold balance consolidation (2026-11-03 → 2026-11-04, P0 CALIBRATED +
+P1 ENGINE + P2 PREVIEW + P2b VISUAL + P3+P4 LANDED + **P5 FLIPPED,
+SHIPPED AND LIVE — the program COMPLETE except GB-S7/OI-3** —
+docs/specs/gold-balance-consolidation/):
 the owner's next Gold Program round folded the two gold
-metaphors into ONE balance. The wind panel (`GoldTailwindPanel`) and the
-model-vs-reality panel are RETIRED from the UI at the staged flip
-(deleted with their test parts); the pure lane engine (`gold-balance.ts`, 21 voters →
+metaphors into ONE balance — **live for every visitor since the P5
+flip (PR #22, merge `4f192c9`; worker `0e7d7cb8` @ 100%, the 8/8
+production matrix with ZERO console errors; the `?balance=lanes`
+parameter inert)**. The wind panel (`GoldTailwindPanel`) and the
+model-vs-reality panel are RETIRED from the UI (deleted with their
+test parts); the pure lane engine (`gold-balance.ts`, 21 voters →
 4 lane votes, `GOLD_LANE_MIN_FIRING` per the P0 calibration) stays —
 `gold-score.ts`, `goldSummary` and the backtest harness stay frozen and
 running (D-GB-9): the snapshot field still arrives on the wire and stays
@@ -471,11 +473,21 @@ collapsed-corner decision: the gold prose joined the lane model —
 are unconditional; outlookOf stays for silver ONLY; a fresh vitest
 snapshot of the flipped view is the byte-stability pin; the chunk
 re-baselined downward 1560/360 -> 1535/355 (measured 1526.97/354.18,
-Insights-TjkEDaYV.js); OI-1 was never answered, so the owner's
-existing seven outlook sentences still ship — the forecast-wording
-note stands per 03 §6.3 until the owner rewords them (a normal copy
-change post-flip). The program record + every AC/V walked with
-evidence: `docs/specs/gold-balance-consolidation/PROGRESS.md`.*
+Insights-TjkEDaYV.js). **The gate was then satisfied (2026-11-04):
+the owner's recorded "go" ("GO, I love the result so far.", after the
+live preview review) + the OI-1 decision (keep the forecast wording,
+with hedging language — the shipped sentences already carry it, both
+locales, so they ship unchanged; the 03 §6.3 consequence stands); the
+flip shipped per DEPLOY.md's [2026-11-04c] procedure verbatim —
+deploy-lock check clear (`a803f526` @ 100%), PR #22 merged
+(`4f192c9`, CI green on branch + main), deployed as currena-api
+`0e7d7cb8` @ 100% (deployment `7c6a0315`), smoke green, the
+production matrix 8/8 with ZERO console errors, the deployed chunk
+byte-verified 1,526,974 bytes.** The program record + every AC/V
+walked with evidence:
+`docs/specs/gold-balance-consolidation/PROGRESS.md`; what remains is
+GB-S7 — OI-3, its own owner round (the `goldSummary` wire field +
+the wind copy keys; the rewritten prompt is in PROMPTS.md).*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |

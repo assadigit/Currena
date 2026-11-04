@@ -27,8 +27,9 @@ gate is green — the owner authorized incremental merges — then deploy if the
 built worker changes (`pnpm deploy`; the SPA rides the api worker at
 currena.ir; the markets worker is NOT touched by this program — zero new
 fetches, KV keys or wire fields). Verify CI green on main after every merge.
-The user-visible change is gated by the `?balance=lanes` preview parameter
-(the `?narrative=preview` pattern) until the owner flips the default in GB-S6.
+The user-visible change shipped with GB-S6: **the consolidated balance is
+THE gold card for every visitor since 2026-11-04** (PR #22, worker
+`0e7d7cb8`; the `?balance=lanes` parameter is inert).
 
 **Program map.**
 
@@ -263,13 +264,14 @@ With my recorded approval:
 The exact current state (verify against PROGRESS.md + the repo before you start):
 - The flipped view (the only view): BalanceScale renders the visual redesign unconditionally; MergedCard builds the lane drivers from goldBalance(readings) and passes goldOutlook={goldOutlookOf(balance, gold.speed, gold.position)}; the collapsed takeaway AND the summary prose (the collapsed line + the card header, metalLeanLanes) ride the same engine; silver + its prose keep the legacy model (OI-4); outlookOf serves silver only.
 - Tests: outlook.test.ts 26 + gold-balance-lanes.test.tsx 53 (incl. the flipped-view snapshot pin + the moved gold-panels coverage) + balance.test.tsx 22 (the pure law + the rule-home pins). Test baseline: 14,578 (web 12,619).
-- Bundle: measure from 1526.97/354.18 (ceiling 1535/355, chunk Insights-TjkEDaYV.js; a keys-only change should barely move it — a wire-field removal does not touch the web chunk at all).
-- CHANGELOG: the last heading is [2026-11-04c] (count 195, verified) — yours is the next per the sequence; CHECK THE FILE and verify the heading count before and after.
-- The harness: gb-s4-visual.plw.ts (61, the converted default-view tests ride the inert parameter) + gb-s4-union-probe.plw.ts (6) + prod-verify.mjs (the-default-page + the-inert-parameter legs). The invocation: npx playwright test --config=visual/playwright.config.ts --project=gb-s4 from apps/web.
+- Bundle: measure from 1526.97/354.18 (ceiling 1535/355; the deployed chunk hashed Insights-B4EBvpCM.js — chunk names re-hash per build environment, so measure the CURRENT build, never assume the name — a keys-only change should barely move the size; a wire-field removal does not touch the web chunk at all).
+- CHANGELOG: the last heading is [2026-11-04d] (count 196, verified) — yours is the next per the sequence; CHECK THE FILE and verify the heading count before and after.
+- The harness: gb-s4-visual.plw.ts (61, the converted default-view tests ride the inert parameter) + gb-s4-union-probe.plw.ts (6) + prod-verify.mjs (the-default-page + the-inert-parameter legs). The invocation: npx playwright test --config=visual/playwright.config.ts --project=gb-s4 from apps/web (needs CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in the env for the wrangler webServer; on a fresh machine: corepack prepare pnpm@10.34.5 --activate + npx playwright install chromium).
 - The standing constraints hold (D-GB-9: gold-score.ts, GoldSummarySchema (until this session's own decision), snapshot.ts's OTHER fields, apps/api/** (until this session's own decision), the harness tables are never edited without the recorded approval above; no forecasting edge claimed anywhere).
-- OI-1 may still be open (the seven outlook sentences still reading as a forecast): if the owner has reworded them by now, the new sentences ship; otherwise the forecast-wording note stands (03 §6.3's rule).
+- OI-1 is RESOLVED (2026-11-04, with the P5 go): "Keep the forecast wording, but with hedging language" — the shipped sentences already carry the hedging (EN "Signs point to a potential…" / fa «نشانه‌ها حاکی از احتمال…») and ship UNCHANGED in both locales; the 03 §6.3 consequence stands (no advantage claimed; the measured note + backtest link visible). Do not reword them unless the owner explicitly revives 03 §6's proposed table in a future session.
+- Production: the active worker is the flip's `0e7d7cb8` @ 100% (deployment `7c6a0315`; the flip's record PR was docs-only, no re-deploy); the production matrix harness (prod-verify.mjs) last ran 8/8 with ZERO console errors on 2026-11-04.
 
-Discipline: as before — FULL pnpm gates before every push; branch gold-balance/oi3-cleanup; commit + push per milestone; draft PR; merge yourself when the exit gate holds (the recorded approval + gates green); CI green; deploy (deploy-lock check first — the active version is the flip's); production browser-verify EN + fa 360+1280 fresh contexts (zero console errors). After three honest failures, record blocked and move on.
+Discipline: as before — FULL pnpm gates before every push; branch gold-balance/oi3-cleanup; commit + push per milestone; draft PR; merge yourself when the exit gate holds (the recorded approval + gates green); CI green; deploy (deploy-lock check first — the active version is the flip's `0e7d7cb8` @ 100%, unless a later deploy superseded it: check the versions API and reconcile with DEPLOY.md's newest session note if it differs); production browser-verify EN + fa 360+1280 fresh contexts (zero console errors). After three honest failures, record blocked and move on.
 
 At the end: PROGRESS.md (the program's final close — every OI resolved or explicitly kept); CHANGELOG; rewrite this file's status block (the program is COMPLETE — record it in the README's Status line too); commit, push, merge, deploy, verify; print a final 5-line summary. There is no next session unless I open a new agenda (silver's OI-4 footing circularity is the recorded candidate — docs/specs/ is its natural home if I ask for it).
 ```
@@ -470,3 +472,37 @@ chunk changed).
   Gates: 14,598 (unchanged through the union); the union deploy
   currena-api `6549c5bc` @ 100% (the polish rides the entry CSS, not
   the JS chunk).
+- **GB-S6 + GB-S6b (2026-11-04, the owner-gated flip — staged, then
+  shipped on the "go"):** the hard gate worked exactly as designed —
+  the staging session built EVERYTHING (code + docs + re-baselined
+  bundle + converted harness), verified it (gates 9/9 GREEN 14,578 +
+  the guards 67/67), and stopped with the branch unmerged and
+  production untouched; the continuation session then re-verified the
+  staged branch in a FRESH clone before executing the go (the
+  recovery-protocol pattern: verify what exists, never re-build it).
+  **The staged-then-flipped delivery splits into two merges**: PR #22
+  (the flip: code + the drafted docs) then the record PR (the go + the
+  deploy + the matrix + the program close) — the GB-S5 #20/#21
+  precedent, and it keeps the owner's "go" recording in the docs that
+  the merge itself could not contain. **Draft-PR mechanics:** the REST
+  PATCH `{"draft": false}` does NOT flip a draft PR — use the GraphQL
+  `markPullRequestReadyForReview` mutation (the node id from the
+  pullRequest query). **A scheduled workflow's check-run attaches to
+  the default-branch head**: the daily insights-ingest failure showed
+  on the merge commit (event=schedule, a frankfurter FX outage —
+  pre-existing, unrelated) — read the run's `event` field before
+  treating a red check as a merge regression; the push-triggered `ci`
+  run is the operative one. **The deployed chunk re-hashes per build
+  environment** (staged `Insights-TjkEDaYV.js` vs deployed
+  `Insights-B4EBvpCM.js`, byte-length identical) — record the SIZE as
+  the invariant (1,526,974 bytes, fetched from production and
+  byte-compared against the verified local build) and never pin a
+  cross-environment chunk NAME. **The OI-1 middle path**: "keep the
+  forecast wording, but with hedging language" — check what is already
+  shipped before scheduling copy work (both locales already carried
+  the hedge: "Signs point to a potential…" / «نشانه‌ها حاکی از
+  احتمال…»; the resolution was a RECORD, not a change). Gates through
+  the flip: 14,578 (web 12,619); the flip deploy currena-api
+  `0e7d7cb8` @ 100% (deployment `7c6a0315`); the production matrix
+  8/8 with ZERO console errors, the inert parameter byte-identical in
+  all 4 cells.

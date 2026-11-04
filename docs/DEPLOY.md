@@ -132,46 +132,72 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
-## Session record — 2026-11-04c the gold-balance P5 flip STAGED (NOT deployed — the owner gate holds; production stays on a803f526)
+## Session record — 2026-11-04c the gold-balance P5 flip DEPLOYED (worker 0e7d7cb8 at 100% — the consolidated lane balance for EVERY visitor; the ?balance=lanes parameter inert)
 
-GB-S6 (branch `gold-balance/p5-flip`, draft PR). The flip work is fully
-staged but **NOT merged and NOT deployed** — the hard gate (04 §3 P5 +
-AC-12 + V-11) requires the owner's recorded "go" after the live preview
-review; until then production keeps serving GB-S5's build. This note
-records the staged state + the deploy procedure that runs AT flip time.
+GB-S6 + the GB-S6b continuation (branch `gold-balance/p5-flip`, **PR #22
+merged `4f192c9`**). The hard gate (04 §3 P5 + AC-12 + V-11) was
+satisfied: the owner reviewed the live preview (EN + fa, desktop +
+mobile, light + dark) and recorded the explicit "go" in chat on
+2026-11-04 — **"GO, I love the result so far."** — with the OI-1
+decision: keep the forecast wording, with hedging language (the shipped
+sentences already carry it — EN "Signs point to a potential…" / fa
+«نشانه‌ها حاکی از احتمال…»; no copy change). The staged state (recorded
+below) shipped unchanged.
 
-- **Staged on the branch:** the `?balance=lanes` gate code + the
+- **Staged (and now LIVE) on the branch:** the `?balance=lanes` gate code + the
   `visual` prop + BalanceScale's whole legacy branch + the two gold
   panels retired; the gold Outlook derivation, the collapsed takeaway
   and the summary prose (the collapsed-corner decision, `metalLeanLanes`
   round-78) unconditional — outlookOf stays for silver only; a fresh
   flipped-view snapshot the byte-stability pin; the bundle re-based
-  downward 1560/360 → **1535/355** (measured **1526.97/354.18**, the
-  chunk re-hashed `Insights-TjkEDaYV.js`); the harness converted
+  downward 1560/360 → **1535/355** (measured **1526.97/354.18**; the
+  deployed chunk hashes `Insights-B4EBvpCM.js` in this build
+  environment); the harness converted
   (gb-s4-visual's default-view tests + prod-verify's matrix — both
   legs read the flipped view, the retired parameter proven inert).
 - **Gates on the branch:** ALL 9 GREEN — **14,578 tests** (web 12,619),
   typecheck 6/6, lint 0/0, copy:audit clean (round-78), narrator in
   sync, layer1 strict, secret scan clean, the bundle check green at
   the re-based ceiling; the gb-s4 standing guards **67/67 (gb-s4-visual 61 + the union probes 6)** on the
-  branch build.
-- **AT FLIP TIME (on the recorded "go"), the procedure:**
-  1. Deploy-lock check FIRST: the versions API must show production at
-     **`a803f526` @ 100% (deployment `754dccb6`)** — the expected
-     active version (GB-S5's); anything else means a parallel session.
-  2. Merge the PR (CI green on the branch and on main).
-  3. `pnpm --filter @currena/web build` +
-     `pnpm --filter @currena/api exec wrangler deploy` → record the new
-     worker version + deployment id here.
-  4. Post-deploy smoke: `/api/health` · `/` 200 · `/api/insights` 200.
+  branch build (re-verified in a fresh clone by GB-S6b, with CI's
+  `gates` green on `83adbdb` + `cc1ba2c` and on the merged main,
+  run 41827725767).
+- **The AT-FLIP-TIME procedure, executed verbatim:**
+  1. Deploy-lock check FIRST: **CLEAR** — the versions API showed
+     production at `a803f526` @ 100% (deployment `754dccb6`, GB-S5's);
+     no parallel session.
+  2. **PR #22 merged** (`4f192c9`, marked ready via the GraphQL
+     mutation, merged with a merge commit; CI `gates` green on the
+     branch and on main).
+  3. `pnpm --filter @currena/web build` + `pnpm --filter @currena/api
+     exec wrangler deploy` → **currena-api `0e7d7cb8` @ 100%**
+     (deployment `7c6a0315`, 2026-11-04T12:21:01Z).
+  4. Post-deploy smoke: `/api/health` ok (kv ok) · `/` 200 ·
+     `/api/insights` 200 (fresh at 12:18Z — the Worker's own minute-cron
+     ingest healthy; `goldSummary` still on the wire, AC-9).
   5. The production matrix (`node visual/prod-verify.mjs` from
-     apps/web): the-default-page + the-inert-parameter legs, EN + fa,
-     360 + 1280, fresh contexts — ZERO console errors, the lane balance
-     for every visitor, the panels absent, AC-8's honesty elements, the
-     wind scan clean in both locales, the header's lane prose beside
-     the balance.
-  6. Record the live read + the AC-12 line in PROGRESS.md and flip the
-     docs' staged wording to LIVE in the same commit.
+     apps/web): **8/8 PASS, ZERO console errors** — the-default-page +
+     the-inert-parameter legs (byte-identical in all 4 EN/fa ×
+     360/1280 cells), the lane balance for every visitor (4 weights + 4
+     ledger rows, Balanced/«متعادل», the Split/«دوپاره» badge, the
+     lane-derived outlook neutral with the hedged sentence), the panels
+     absent, AC-8's honesty elements visible, the wind scan clean in
+     both locales, the header's lane prose beside the balance. The
+     deployed chunk `Insights-B4EBvpCM.js` fetched from currena.ir and
+     measured **1,526,974 bytes — byte-identical to the verified local
+     build**.
+  6. The live read + the AC-12 line recorded in PROGRESS.md (its GB-S6
+     log + the acceptance walk) and the docs' staged wording flipped to
+     LIVE in this commit.
+- **A pre-existing, UNRELATED failure noted (not the flip's):** the
+  scheduled `insights-ingest` GHA run on the merge commit (run
+  41827914050, event=schedule — the belt-and-braces venue) failed on
+  P1 FX fetches (frankfurter: dollar-basket, usdjpy, audusd, audjpy,
+  gold-aud, audnzd — last good values held, flagged stale; the designed
+  "product degraded" exit). The Worker's own minute-cron (the PRIMARY
+  venue) was healthy — the live snapshot at 12:18Z is fresh — and the
+  flip diff touches web UI + docs only. For the owner's data-source
+  watch, not a balance regression.
 
 ## Session record — 2026-11-04b the gold-balance P3+P4 deploy (worker a803f526 at 100% — the Outlook DERIVED from the balance behind ?balance=lanes; the DEFAULT view still byte-stable)
 
