@@ -13,12 +13,86 @@ PROGRESS.md`); this program changes nothing it shipped (D-GA-3).
 | ID | Milestone (spec ref) | State |
 |---|---|---|
 | A | The reference taxonomy verified + v1 delivered for the owner's lock; the blind-spot sweep; the presence pre-scan (01 §2 A1; 02) | ✅ COMPLETE — GA-S1 (2026-11-04): 02 is v1 (82 rows: v0 72 + 10 sweep adds − 0 strikes), every row verified live, the sweep + pre-scan recorded, PR merged; **awaiting the owner's lock (OI-GA-1)** |
-| B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | 🔶 **PARTIAL — GA-S2 (2026-11-04): the source-side half delivered** — `evidence/inventory.md`: the full 161-row readings table with the mirror-sweep column (**voter 21 · context 63 · not-gold 77 = 161**), the 25 derived-series recipes + the adapter metrics, the rung map; the runnable record `packages/insights/scripts/ga-s2-wire-scan.sh` + its committed run `evidence/wire-scan-2026-11-04.txt`. **The voters table (03 §1.1), the wiring trace + the context traces + the history depths (03 §2) are DEFERRED** — the owner was not reachable in-session, OI-GA-1 (the taxonomy lock) is still OPEN, and the GA-S2 prompt's fallback bound the session to 03 §1.2–§1.4 (the trace needs the locked denominator, D-GA-1). The completion session (its prompt is in PROMPTS.md) resumes A2 after the lock |
+| B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | 🔶 **PARTIAL — GA-S2 (2026-11-04): the source-side half delivered** — `evidence/inventory.md`: the full 161-row readings table with the mirror-sweep column (**voter 21 · context 63 · not-gold 77 = 161**), the 25 derived-series recipes + the adapter metrics, the rung map; the runnable record `packages/insights/scripts/ga-s2-wire-scan.sh` + its committed run `evidence/wire-scan-2026-11-04.txt`. **The voters table (03 §1.1), the wiring trace + the context traces + the history depths (03 §2) are DEFERRED** — the owner was not reachable in-session, OI-GA-1 (the taxonomy lock) is still OPEN, and the GA-S2 prompt's fallback bound the session to 03 §1.2–§1.4 (the trace needs the locked denominator, D-GA-1). The completion session (its prompt is in PROMPTS.md) resumes A2 after the lock. **Re-verified 2026-11-05** (the completion attempt's fallback — the owner again unreachable: the drift record `evidence/wire-scan-2026-11-05.txt` committed, the denominators + the GB-S7 retirement + all 21 voters verified holding; OI-GA-1 still OPEN; the row stays PARTIAL) |
 | C | The coverage matrix classified + the half-implementation defect list; the header arithmetic (01 §2 A3, §5; 03 §3–§4) | ⏳ PENDING — GA-S3 |
 | D | The audit report `docs/insights/GOLD-METER-AUDIT-REPORT.md` (01 §2 A4; 04 §1–§2) | ⏳ PENDING — GA-S4 |
 | E | The fill-program design + its GF-S1.. prompts; the owner's decision list stated (04 §3–§5) | ⏳ PENDING — GA-S4 |
 
 ## Session log
+
+### GA-S2-completion (2026-11-05) — the lock still open: the re-verification drift record only
+
+- **The lock first (OI-GA-1):** the owner was **not reachable in-session — the
+  second consecutive session** — and no owner decision exists in the repo
+  either (checked before any work: no commits after the GA-S2 merge a87ba24;
+  PR #28 carries 0 comments; no issues opened; `02-REFERENCE-TAXONOMY.md`'s
+  status header still reads "v1 … delivered for the owner's lock" — no lock
+  line, no amendment block at the file's foot). The session therefore took
+  the GA-S2-completion prompt's explicit fallback — **the lock-nothing
+  re-verification only** — and did NOT start the voters table (03 §1.1), the
+  wiring trace, the context traces or the history depths (03 §2): all wiring
+  work against the unlocked denominator (D-GA-1). **The lock question is
+  printed at the head of this session's final message and opens the next
+  prompt.**
+- **The drift record (the day-to-day re-verification):**
+  `packages/insights/scripts/ga-s2-wire-scan.sh` re-run against the live wire
+  — the script untouched since GA-S2 (read-only, keyless; D-GA-3 respected:
+  nothing it parses moved). Run 2026-11-05 00:22 +0330
+  (2026-11-04T20:52Z UTC) against the 20:10-UTC-sweep snapshot (generatedAt
+  `2026-11-04T20:10:18.690Z`, 81,002 bytes; the 2026-11-04 baseline was the
+  12:18Z snapshot, 79,247 bytes). Full output committed as
+  `evidence/wire-scan-2026-11-05.txt`. **Every number below is from that
+  run** (01 §4.3); deltas are vs `evidence/wire-scan-2026-11-04.txt`,
+  computed by differencing the two committed outputs' §4 tables (reproducible
+  from the two files alone: 21 rows drifted, 140 identical, 0 static-column
+  differences).
+- **The holds (the continuity anchors, unchanged between the two runs):** the
+  wire serves **161 readings (161 unique ids)** and `DEFINITIONS` holds **161
+  ids** — still exactly equal (48 scored-gauge rules + 113 info) ·
+  `goldSummary` **ABSENT** — the OI-3/GB-S7 retirement verified holding on
+  the live wire, the **second consecutive scan** · **all 21 gold-lane voters
+  present** · the doc's inventory table still **159 rows** (term-premium-10y
+  + tga still missing from it; its header still claims 161, its `**Counts:**`
+  line still 145 — the recorded doc drift, unchanged) · GAUGES still **12
+  gauges / 68 listed members / 48 scored voters in the 8 non-shadow gauges +
+  4 shadow gauges with 20 context-only members** · the doc's per-row voter
+  flags still **AGREE with gauges.ts on all 159 rows** · every static §4
+  column (group · source · sourceRef · cadence · staleAfterDays · gauge
+  membership · gold-lane-voter flag) **identical on all 161 rows** across the
+  two runs — no code moved.
+- **The deltas (day-to-day drift, facts not defects):** status tally
+  `context 100 → 104 · normal 26 → 29 · stale 20 → 13 · warning 15 → 14 ·
+  check-pending 0 → 1`. Gold-lane: **the dollar lane healed** —
+  `dollar-basket` + `usdjpy` stale → normal, both now carrying `change30d`
+  AND `percentile10y` (the 2026-11-04 record's 2/3-unread dollar lane reads
+  3/3 on the fresh wire) · **`ecb-dfr` flipped normal → stale** with asOf
+  unchanged (2026-11-04) and BOTH evalLeg input fields now absent — it
+  enters the snapshot's global `staleVoters` beside the persistent
+  `govt-interest-revenue` (the 2026-11-04 staleVoters were
+  govt-interest-revenue · dollar-basket · usdjpy); **why the ECB seat aged
+  out between the 12:18Z and 20:10Z snapshots is a wiring question this
+  session does not answer — the post-lock wiring trace (03 §2) owns it** ·
+  `fed-target` asOf 2026-11-03 → 2026-11-04 · `stress-stlfsi` + `nfci` asOf
+  2026-10-23 → 2026-10-30 (the weekly roll) · `vix` 2026-11-02 → 2026-11-03.
+  The known suspects' day-states HOLD unchanged: `cftc-gold-positioning`
+  `warning` (asOf 2026-10-27) with **neither** evalLeg input on the wire ·
+  `us-japan-10y-gap` percentile-only · `gold-silver` normal with both fields
+  · `breakeven-tilt` still a `context`-status seat. Non-gold-lane drift,
+  recorded for completeness: the Frankfurter family healed broadly
+  (audjpy/audnzd/audusd/eur-usd/usdtry stale → normal/context at asOf
+  2026-11-04; **`usdcny` → `check-pending`, the only one** — the
+  validation-suite flag status, `packages/core/src/schemas.ts:875`);
+  `brent` warning → normal; the RBA daily-10y monthly fallback visible
+  (`au-10y` · `rba-expectations` · `au-us-10y-gap` asOf back to 2026-09-30,
+  `au-us-10y-gap` normal → stale); `gold-oil-ratio` stale → context.
+- **Nothing classified, nothing wired, nothing deployed** (D-GA-3/D-GA-6/
+  D-GA-2). No code, worker, schema, adapter or copy file touched; the scan
+  script itself untouched; one committed scan output + docs only.
+- **Blocked on the owner:** **OI-GA-1 — the taxonomy lock** (second
+  consecutive session). LOCK or AMEND the 82-row v1 taxonomy; the completion
+  work items (the voters table 03 §1.1 + the wiring trace + the context
+  traces + the history depths 03 §2) start by resolving it. The re-issued
+  GA-S2-completion prompt is in PROMPTS.md.
 
 ### GA-S2 (2026-11-04) — the source-side inventory delivered under the lock fallback
 
