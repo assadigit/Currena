@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold meter audit program (SPECIFIED — GA-S1 next)
+# AGENT_HANDOFF — Currena: the gold meter audit program (GA-S1 DELIVERED — GA-S2 next, the lock question open)
 
 > The owner's **gold meter audit** program (`docs/specs/gold-meter-audit/`,
 > session plan GA-S1..GA-S4 in its `PROMPTS.md`) was **specified
@@ -21,13 +21,14 @@ owner-gated **gap-fill program** (design + prompts, GA-S4):
 
 | Session | Milestone | Branch |
 |---|---|---|
-| GA-S1 | The taxonomy verified + v1 for the owner's lock; the blind-spot sweep; the presence pre-scan | `ga/s1-taxonomy` |
-| GA-S2 | The inventory + wiring evidence pack; the mirror sweep | `ga/s2-inventory` |
+| GA-S1 | The taxonomy verified + v1 for the owner's lock; the blind-spot sweep; the presence pre-scan | `ga/s1-taxonomy` — **DONE (2026-11-04): 02 is v1, 82 rows, verified live; OI-GA-1 (the lock) OPEN** |
+| GA-S2 | The inventory + wiring evidence pack; the mirror sweep | `ga/s2-inventory` — **next; starts by resolving the lock** |
 | GA-S3 | The coverage matrix classified + the half-implementation defects | `ga/s3-matrix` |
 | GA-S4 | The report + the fill-program design + its prompts | `ga/s4-report` |
 
-The next session's prompt is PROMPTS.md's live kickoff (GA-S1 — the
-taxonomy). Paste it into a fresh session at the repo root.
+The next session's prompt is PROMPTS.md's live kickoff (GA-S2 — the
+inventory + wiring; it opens by resolving the owner's taxonomy lock,
+OI-GA-1). Paste it into a fresh session at the repo root.
 
 ## B. The standing rules (read before any session)
 
@@ -54,7 +55,16 @@ taxonomy). Paste it into a fresh session at the repo root.
    PROMPTS.md, committed, pushed, and printed in the final message — never
    end a session without one.
 
-## C. The state of the world (as the spec session left it, 2026-11-04)
+## C. The state of the world (as GA-S1 left it, 2026-11-04)
+
+- **GA-S1 delivered:** `02-REFERENCE-TAXONOMY.md` is **v1 — 82 rows**
+  (v0 72 + 10 sweep adds − 0 strikes; R14+D9+I11+S12+F15+X6+G7+H4+M4),
+  every row verified against live sources this session (the runnable
+  record `packages/insights/scripts/ga-s1-fred-verify.sh`; the full
+  URL/HTTP log in the audit PROGRESS.md's GA-S1 block), the pre-scan
+  appended (15 voter · 23 context · 41 absent · 0 unknown — directional
+  only). **OI-GA-1 (the owner's lock or amend) is OPEN — GA-S2 must
+  resolve it before any wiring trace (D-GA-1).**
 
 - Production: currena-api serving the consolidated lane balance for every
   visitor; `goldSummary` retired from the wire (GB-S7, PR #24/#25; worker

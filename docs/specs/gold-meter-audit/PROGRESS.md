@@ -12,13 +12,126 @@ PROGRESS.md`); this program changes nothing it shipped (D-GA-3).
 
 | ID | Milestone (spec ref) | State |
 |---|---|---|
-| A | The reference taxonomy verified + v1 delivered for the owner's lock; the blind-spot sweep; the presence pre-scan (01 §2 A1; 02) | ⏳ PENDING — GA-S1 |
+| A | The reference taxonomy verified + v1 delivered for the owner's lock; the blind-spot sweep; the presence pre-scan (01 §2 A1; 02) | ✅ COMPLETE — GA-S1 (2026-11-04): 02 is v1 (82 rows: v0 72 + 10 sweep adds − 0 strikes), every row verified live, the sweep + pre-scan recorded, PR merged; **awaiting the owner's lock (OI-GA-1)** |
 | B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | ⏳ PENDING — GA-S2 |
 | C | The coverage matrix classified + the half-implementation defect list; the header arithmetic (01 §2 A3, §5; 03 §3–§4) | ⏳ PENDING — GA-S3 |
 | D | The audit report `docs/insights/GOLD-METER-AUDIT-REPORT.md` (01 §2 A4; 04 §1–§2) | ⏳ PENDING — GA-S4 |
 | E | The fill-program design + its GF-S1.. prompts; the owner's decision list stated (04 §3–§5) | ⏳ PENDING — GA-S4 |
 
 ## Session log
+
+### GA-S1 (2026-11-04) — the taxonomy verified, swept, delivered as v1
+
+- **Delivery:** `02-REFERENCE-TAXONOMY.md` is **v1 — delivered for the owner's
+  lock (OI-GA-1)**. Every v0 row verified against the live source this
+  session; the blind-spot sweep (01 §5.3) ran with the 13-question walk;
+  10 rows added before the v1 stamp, 0 struck; the presence pre-scan
+  (labelled, bounded) appended at the file's foot; a per-row changelog at
+  the file's foot. The runnable verification record:
+  `packages/insights/scripts/ga-s1-fred-verify.sh` (read-only, keyless —
+  FRED's public `fredgraph.csv` route, the same route the ingest reads).
+- **Row arithmetic:** v0 72 rows → **+10 adds** (R13 TIPS liquidity/
+  breakeven–swap basis · R14 JGB 10y/YCC regime · D7 USD/CHF · D8 EM
+  devaluation episodes · D9 EME trade-weighted dollar · I11 global
+  liquidity/CB balance-sheet aggregate · S12 EM sovereign stress (EMBI-class)
+  · F13 official-sector monthly purchases · F14 COMEX–LBMA EFP basis ·
+  F15 SGE monthly withdrawals) → **−0 strikes** (the pruning walk found no
+  v0 row that fails the classic bar — recorded, with the close calls and
+  the considered-not-added list, in 02's sweep record) → **v1 = 82 rows**
+  (R14 + D9 + I11 + S12 + F15 + X6 + G7 + H4 + M4; cross-listed
+  placeholders I5/I6/X6 resolve to primaries at classification).
+- **Rows amended by verification** (the one-line reasons are in 02's
+  changelog): R3 (`DFII2` does not exist — 404; proxy-only), R4 (live
+  tenors), R9 (the repo's `term-premium-10y` is FRED `THREEFYTP10`
+  Kim-Wright, not ACM — code-verified; both free objects named), R10 (ECB
+  venue-block note), I4 (FRED has no 5–10y Michigan series — SIE portal is
+  the source), I8 (id fixed: `MEDCPIM158SFRBCLE`, not `…SFRBCML`), S2/S3
+  (ICE BofA pair: pre-approval licence tag + a rolling ~3-year served
+  window, first obs 2023-11-06 — honest D-GA-5 re-class with the S5-proxy
+  named), S9 (pinned to FRED `DPCREDIT`, weekly, live; BTFP series ended
+  2026-05-06, `DISCBORR` dead 2020-08), F1 (legacy file carries
+  *non-commercial*, not managed money — wording corrected), F3 (WGC
+  monthly XLSX is the clean free object; SPDR export is JS-driven), F4/F5/
+  H1–H4 (WGC GDT URL amended to the live `/goldhub/research/` page), F6
+  (SGE UA-sensitive; LBMA leg bot-challenged — free-first derivation
+  named), F8 (CME automation-hostile), F11 (US Mint venue-blocked).
+- **Pre-scan tally** (02's foot; presence against
+  `docs/INDICATORS_AND_DATA_SOURCES.md` ONLY): PRESENT-VOTER 15 ·
+  PRESENT-CONTEXT 23 · ABSENT 41 · UNKNOWN 0, over 79 primary rows —
+  directional only; GA-S2/GA-S3 decide.
+- **Sources checked this session, each opened and read** (curl, UA
+  `CurrenaDashboard/1.0` or a browser UA where noted; the FRED batch ran
+  via `ga-s1-fred-verify.sh`):
+  - FRED series pages + `fredgraph.csv` (keyless):
+    `https://fred.stlouisfed.org/series/{DFII10,DFII5,DFII7,DFII20,DFII30,
+    DFEDTARU,DFEDTARL,DFF,DGS2,DGS10,DGS30,T10Y2Y,T5YIFR,T5YIE,T10YIE,
+    CPIAUCSL,CPILFESL,PCEPILFE,MICH,UMCSENT,M2SL,MEDCPIM158SFRBCLE,
+    STICKCPIM158SFRBATL,VIXCLS,BAMLH0A0HYM2,BAMLC0A0CM,NFCI,STLFSI4,
+    DTWEXBGS,DTWEXAFEGS,DTWEXEMEGS,GFDEGDQ188S,WSEFINTL1,MTSDS133FMS,
+    WALCL,WRESBAL,SOFR,IORB,RRPONTSYD,WTREGEN,DPCREDIT,MPCREDIT,
+    H41RESPPALDKNWW,DISCBORR}` — the live ones dated to their last
+    observation (DFII10 → 2026-11-02; DFEDTARU/L → 2026-11-04; T5YIFR/
+    T5YIE/T10YIE/VIXCLS → 2026-11-03; NFCI/STLFSI4/DTWEXBGS/DTWEXEMEGS →
+    2026-10-30; CPI/PCE/MICH/M2SL/median/sticky → 2026-09; GFDEGDQ188S →
+    2026-04-01; WSEFINTL1/WALCL → 2026-10-28; DPCREDIT → 2026-11-02);
+    the dead/wrong ones recorded (DFII2 404; MEDCPIM158SFRBCML 404;
+    STICKCPIM158SFRBCLE 404; STLFSI2 ends 2022-01-07; DISCBORR ends
+    2020-08-01; H41RESPPALDKNWW ends 2026-05-06; BAML pair: first obs
+    2023-11-06 — the rolling ~3y window). FRED search pages used for the
+    absences: Michigan expectations (only MICH/UMCSENT), discount window
+    (`DPCREDIT`/`MPCREDIT`/`RIFSRPF02NA`), BTFP (`H41RESPPALDKNWW`),
+    TIPS tenor enumeration (DFII5/7/10/20/30), negative-yielding (none).
+    FRED copyright-tag pass over 22 named series (public-domain vs
+    citation-required vs pre-approval) — recorded per-row in 02.
+  - Providers: `https://api.frankfurter.app/latest` (200; CHF 0.81548,
+    JPY 158.25, TRY 50.022 @ 2026-11-04) · `https://api.gold-api.com/price/XAU`
+    (200) · `https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp`
+    (200) · `https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv`
+    (200) · `https://www.boj.or.jp/en/index.htm` (200) ·
+    `https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv`
+    (200, 44,606 B) · `https://www.financialresearch.gov/financial-stress-index/data/fsi.csv`
+    (200, 517,372 B) · `https://www.cftc.gov/dea/newcot/deafut.txt` (200,
+    439,640 B; `deacot.txt`/`dfut.txt` 404 — not cited) ·
+    `https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt`
+    (200) · `https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query?size=1`
+    (200) · `https://www.newyorkfed.org/medialibrary/media/research/data_indicators/ACMTermPremium.xls`
+    (200, 10,168,832 B) · `https://www.newyorkfed.org/research/policy/rstar`
+    (200; the `Holston_Laubach_Williams_current_estimates.xlsx` link present)
+    · `https://www.matteoiacoviello.com/gpr_files/data_gpr_export.xls` (200,
+    2,718,208 B) + `data_gpr_daily_recent.xls` (200, 3,276,288 B) ·
+    `https://www.gold.org/goldhub/research/gold-demand-trends` (200; the
+    `/goldhub/data/` variant 404s) · `https://www.gold.org/goldhub/data/gold-etfs-holdings-and-flows`
+    (200; serves `Flows_2026-10-02_1401.xlsx`) · `https://www.spdrgoldshares.com/`
+    (200; export JS-driven) · `https://en.sge.com.cn/` (403 default UA, 200
+    browser UA) · `https://www.lbma.org.uk/prices-and-data/precious-metal-prices`
+    (200 but Cloudflare-style interstitial to automation) ·
+    `https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting`
+    (200) · `https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/COFER/7.0.1/*`
+    (Accept: application/json → 200, 126,820 B — matches the repo's own
+    recorded payload) · `https://data.sca.isr.umich.edu/` (200 — the UoM
+    SIE portal).
+  - **Venue blocks recorded, never circumvented** (the RULES 4.3 lineage):
+    ECB Data Portal + `data-api.ecb.europa.eu` (WAF block page; availability
+    grounded by the repo's own live `ecb-dfr`/`euro-hicp` voters + the
+    licence register) · `policyuncertainty.com` workbooks (403 both hosts,
+    both UAs; grounded by the repo's live `epu-us`/`tpu-us` first-of-month
+    ingest) · `usmint.gov` (403) · `www.usgs.gov` gold statistics (405) ·
+    `cmegroup.com` (403).
+  - Code grounding (read-only, per the owner's re-check instruction):
+    `packages/insights/src/sources.ts`, `adapters/{fred,derived,cftc,
+    mof,boe,goldapi,monthly-indexes,rung4}.ts`, `licences.ts` — the exact
+    series ids the repo ingests (`fed-target`=DFEDTARL/U,
+    `term-premium-10y`=THREEFYTP10, `stress-stlfsi`=STLFSI4,
+    `michigan-1y-expectations`=MICH, `m2-us`=M2SL, `median-cpi`=
+    MEDCPIM158SFRBCLE, `sticky-cpi`=STICKCPIM158SFRBATL, `repo-stress`=
+    SOFR−IORB, `us-deficit-12m`=MTSDS133FMS, COFER=`G001.AFXRA.CI_USD.SHRO_PT.Q`,
+    CFTC=`dea/newcot/deafut.txt`, GPR/EPU URLs).
+- **Nothing classified, nothing wired, nothing deployed** (D-GA-3/D-GA-6:
+  the pre-scan's marks are not classes; GA-S3 classifies). No code, worker,
+  schema, adapter or copy file touched; one read-only script added.
+- **Blocked on the owner:** **OI-GA-1 — the taxonomy lock.** Amend or lock
+  82-row v1; until then GA-S2 must not map wiring against an unlocked
+  denominator (its prompt starts by resolving the lock).
 
 ### Spec session (2026-11-04) — the program specified
 
