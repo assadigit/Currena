@@ -132,6 +132,60 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-04b the gold-balance P3+P4 deploy (worker a803f526 at 100% — the Outlook DERIVED from the balance behind ?balance=lanes; the DEFAULT view still byte-stable)
+
+GB-S5 (PR #20, merge `1d1211c`, branch `gold-balance/p3-outlook`): the
+last preview-phase deploy — the gold Outlook strip's gold leg (and the
+collapsed section takeaway's gold chip) now derive from the SAME
+`goldBalance()` result that drives the redesigned balance (`goldOutlookOf`
+per 01 §5.2; footing counted nowhere, AC-7; silver + the default view
+untouched — OI-4 + the legacy snapshot). Plus the copy close (P4: the
+terminology section, the manifest confirmation, NO new keys — OI-1 asked,
+unanswered → the owner's existing sentences ship) and the harness touches
+(the union-probe CWD fix, the prod-verify outlook probe, the regenerated
+gb-s4 evidence).
+
+- **Gates before the merge:** ALL 9 GREEN on the branch — **14,618
+  tests** (web 12,639 → 12,659, +20: the 04 §4.2 table + the wiring
+  pins) · typecheck 6 · lint 0/0 · copy:audit clean (no new keys) ·
+  narrator in sync + 50 eval checks · layer1 strict 11,819/11,819 ·
+  secret scan clean · entry 294.45/88.49 · Insights lazy
+  **1550.94/358.99** (baseline 1550.46/358.81; the 1560/360 ceiling
+  holds, no re-baseline; chunk re-hashed `Insights-Ck9A6XE3.js`). CI
+  green on the branch AND on main (`1d1211c`, run 41754039288). The
+  gb-s4 standing guards re-run on the P3 build: 67/67.
+- **Deploy-lock check:** the versions API showed production at
+  `6549c5bc` @ 100% (deployment `9844fd4f` — the GB-S4b union deploy)
+  — the expected active version, no parallel session. Clear.
+- **DEPLOY:** `pnpm --filter @currena/web build` +
+  `pnpm --filter @currena/api exec wrangler deploy` → **currena-api
+  `a803f526` @ 100%** (deployment `754dccb6`, 2026-11-04T01:28:07Z;
+  the merged build with the derived Outlook).
+- **Post-deploy smoke:** `/api/health` ok (kv ok) · `/` 200 ·
+  `/api/insights` 200. The production matrix (`node visual/prod-verify.mjs`
+  from apps/web — now also probing the Outlook strip's gold state):
+  **8/8 pass, ZERO console errors** — the flag view (4 lane weights,
+  Balanced/«متعادل», the Split badge, and the outlook probe reading
+  **neutral / «چشم‌اندازی خنثی»** in every flag cell) and the default
+  view (the two panels, the wind panel, the legacy chips — and the
+  outlook probe reading the legacy **bearish** in every default cell,
+  the pinned old derivation). No overflow anywhere (360 + 1280, both
+  locales).
+- **Live reading on the day (the D-GB-6 fix visible):** the four lanes
+  all quiet — **Balanced · "0 for · 0 against · 4 not leaning"** with
+  gold's 30-day move at **−5.19%** — and the strip's gold chip reads
+  **"Signs point to a neutral outlook for gold prices."** where the
+  default view (the old footing-counting path) says "…a potential
+  decline…": the falling month now shows ONLY as the context pill
+  ("Shown for context, not counted in the balance"). The collapsed
+  section (live check): the gold takeaway reads "Outlook: Neutral"
+  (lane-derived) beside silver's own "Outlook: Mixed". A VLM pass on
+  the strip close-up confirmed the clean render (evidence/gb-s5/ — 5
+  shots + the README with the sticky-row environment note, the
+  GB-S4c pattern: the app's sticky section tabs sit over
+  scrolled-under content IDENTICALLY on both views — pre-existing
+  chrome, not a balance regression).
+
 ## Session record — 2026-11-04a the gold-balance P2b UNION deploy (worker 6549c5bc at 100% — the parallel-session union: the dark rim hues + the standing probes; the merged visual unchanged in behaviour)
 
 The GB-S4 parallel-session union (PR #18, merge `8a99e03`, branch
