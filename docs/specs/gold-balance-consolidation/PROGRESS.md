@@ -21,12 +21,17 @@ actually executed. The gap-closure program that ran in parallel is CLOSED
 | H | P3: the gold Outlook card derived from the unified balance behind the flag (01 §5.2, 04 §3) | ✅ DONE (GB-S5, 2026-11-04) — branch gold-balance/p3-outlook; `goldOutlookOf` in verdict.tsx (unread===4 → null; L≥GOLD_LANE_STRONG(3) strong-bullish / A≥3 strong-bearish; the range evidence UNCHANGED — |change30d|<2% ∧ typical band ∧ |L−A|≤1 → range-bound; L==A → mixed/neutral; else bullish/bearish; footing counted NOWHERE, AC-7) fed by the SAME goldBalance() result as the lane drivers + the verdict word (AC-3 — strip, collapsed takeaway and balance cannot disagree); silver's leg + the default view untouched (OI-4, the legacy snapshot); the 04 §4.2 table test (outlook 15 → 26) + the wiring/consistency pins (lanes 35 → 44); gates 9/9 GREEN 14,618; the gb-s4 standing guards re-run 67/67 |
 | I | P4: the copy close — every new key triaged, the terminology, OI-5 (04 §3) | ✅ DONE (GB-S5, 2026-11-04) — the full GB-S3/GB-S4 set CONFIRMED in the manifest (round-76 17 + round-77 15 entries, copy:audit clean); NO new keys this session (OI-1 unanswered → the owner's existing seven sentences ship, the forecast-wording note recorded); fa round-78 NOT created; persian-terminology.md gains the gold-balance lane section (Split / «دوپاره», the lane states, the tally wording, the counts + context lines); OI-5 recorded satisfied-pending-final-owner-read |
 | J | P5: the owner-gated flip — default on, delete the panels, bundle re-baseline, docs (04 §3 P5, §1) | ✅ LANDED (GB-S6 + GB-S6b, 2026-11-04) — the hard gate satisfied: the owner reviewed the live preview and recorded the explicit "GO, I love the result so far." in chat on 2026-11-04 (with the OI-1 decision: keep the forecast wording — the shipped sentences already carry the hedging language, EN "Signs point to a potential…" / fa «نشانه‌ها حاکی از احتمال…»; no copy change). **PR #22 merged `4f192c9`** (the staged branch: the gate code retired, BalanceScale visual-only, the two panels deleted, goldOutlookOf the only gold path, the collapsed-corner prose on the lane model, the bundle re-baselined downward 1535/355 measured 1526.97/354.18); CI `gates` green on the branch AND on main (run 41827725767); **DEPLOYED currena-api `0e7d7cb8` @ 100%** (deployment `7c6a0315`, 2026-11-04T12:21:01Z; the deploy-lock check cleared first — production was at GB-S5's `a803f526` @ 100%); post-deploy smoke green (health ok/kv ok · `/` 200 · `/api/insights` 200 fresh, goldSummary still on the wire, AC-9); **the production matrix 8/8 PASS, ZERO console errors** (both legs — the-default-page + the-inert-parameter — byte-identical 4/4 cells, EN + fa, 360 + 1280, fresh contexts; the lane balance everywhere, the panels absent, AC-8's honesty elements visible, the wind scan clean in both locales, the header lane prose beside the balance); the deployed chunk `Insights-B4EBvpCM.js` fetched from production and measured **1,526,974 bytes — byte-identical to the verified local build** |
+| K | OI-3/GB-S7: the wire cleanup — goldSummary off the wire + the 03 §6.4 wind copy keys retired (the owner-gated round 01 §9 excluded from P0–P5) | ✅ DONE (GB-S7, 2026-11-04) — the hard gate satisfied: the GB-S1 recheck record verified present (GOLD_RECHECK_SPEC §1) + the owner's explicit in-session approval recorded ("Approve both", the structured gate question with the §3 dependency disclosed); the 14 goldScore wind keys + ALL of goldModelVsReality retired from both dictionaries with their 46 manifest entries (copy:audit CLEAN); the 5 survivors verified against MergedCard (the only reader) and pinned by the trimmed guard; the goldSummary field retired from InsightsSnapshotSchema + the 3 ingest stamp sites — GoldSummarySchema STAYS as the frozen engine's own output contract (gold-score.ts untouched, D-GB-9); the recheck lineage preserved in the same change (gold-corpus-dump reads the historical stamps from the raw archive JSON pre-parse; GOLD_RECHECK_SPEC §3 Steps 1/5 re-anchored); gates 9/9 GREEN 14,574 (the honest −4: the retired stamping/guard tests replaced by tighter retirement pins); the gb-s4 standing guards 67/67 re-run on the retired shape; Insights lazy 1520.84/352.54 — DOWN from 1526.97/354.18 |
 
-**PROGRAM COMPLETE (2026-11-04):** every milestone A–J delivered; the
-consolidated lane balance is THE gold card for every visitor on
-currena.ir (worker `0e7d7cb8`). What remains is GB-S7 — OI-3, its own
-owner round (the `goldSummary` wire field + the wind copy keys
-retirement; the rewritten prompt is in PROMPTS.md).
+**PROGRAM COMPLETE (2026-11-04, closed at GB-S7):** every milestone
+A–K delivered; the consolidated lane balance is THE gold card for every
+visitor on currena.ir, and the wire now carries exactly what the page
+reads — the wind vocabulary and the `goldSummary` field retired with the
+owner's recorded approval. Every OI is resolved or explicitly kept
+(OI-1 resolved with the P5 go; OI-2/OI-5 shipped; OI-3 executed here;
+OI-4/OI-6 kept as the recorded silver/coverage posture). The recheck
+lineage (GOLD_RECHECK_SPEC §3) runs on the readings + the raw-archive
+historical stamps.
 
 ## Session log
 
@@ -802,6 +807,78 @@ the owner's review surface).
   fresh) and the flip diff touches web UI + docs only. Flagged for the
   owner; not a balance regression.
 
+### GB-S7 (2026-11-04 ~14:1x–1x:xx UTC) — OI-3: the wire cleanup, behind its own hard gate
+
+- **Branch:** `gold-balance/oi3-cleanup` — the PR
+  `gold balance(OI-3/GB-S7): the wire cleanup — goldSummary off the wire + the wind copy keys retired`.
+- **The hard gate (both legs verified before any edit):**
+  1. The GB-S1 recheck record exists — GOLD_RECHECK_SPEC §1's two
+     2026-11-03 state-of-record lines + PROGRESS.md's own precondition
+     note; production at the flip's `0e7d7cb8` @ 100% (deployments API
+     checked, no supersession); the live API carrying goldSummary
+     (netScore −1 / headwind / 5 firing — the last wire reading, recorded
+     here as the retirement's "before" anchor).
+  2. The owner's explicit in-session approval — asked BEFORE any edit,
+     with the §3 finding disclosed in the question itself (the recheck
+     procedure READS goldSummary: Step 1's live anchor + Step 5's
+     stamped-vs-rederived no-drift contract → the removal requires the
+     procedure+spec update in the same change). **Answer: "Approve both"
+     (2026-11-04, recorded in the session).**
+- **The wind copy keys (03 §6.4, both locales):** the 14 goldScore keys
+  (title, subtitle, labels, noReadWord, netFiringLine, netFiringNone,
+  laneCountsLabel, laneCountsLine, subGaugeWords, impactWords,
+  votersTitle, votersNone, footnote, measuredNote) + ALL of
+  goldModelVsReality retired from insights-copy-en.ts + insights-copy-fa.ts;
+  their 46 manifest entries deleted in the same commit (the one manual
+  manifest edit the workflow prescribes); **copy:audit ends CLEAN** on
+  the retired shape. The five survivors — laneNames / voterNames /
+  tiltWords / evidenceWords / measuredNoteLink — verified against
+  MergedCard (the ONLY reader; BalanceScale/verdict/Signals read none)
+  before deleting. The moved dictionary-coverage guard trimmed with the
+  keys (the lanes suite 53 → 51) and now also PINS the retirement
+  (labels/subGaugeWords/impactWords/measuredNote/goldModelVsReality
+  asserted absent, both locales).
+- **The wire field:** `goldSummary` retired from
+  InsightsSnapshotSchema + the three ingest stamp sites (the 04:10
+  build, the 04:20 patch, the public projection). **GoldSummarySchema
+  STAYS exported** — the frozen gold-score.test.ts round-trips it and
+  gold-score.ts types its return against it (the engine's own output
+  contract; D-GB-9 held: gold-score.ts, goldTailwindScore and the
+  harness tables untouched, byte-for-byte). Stored snapshots that
+  still carry the field parse clean — zod strips the unknown key
+  (pinned by the two new snapshot tests + the two updated schema
+  tests; the retired stamping tests replaced by the retirement pins).
+- **The recheck lineage (updated in the SAME change, as the approval
+  required):** gold-corpus-dump reads the historical stamps from the
+  RAW archive JSON pre-parse (post-removal the zod parse strips the
+  field, which would have silently blinded the no-drift contract);
+  GOLD_RECHECK_SPEC §3 Step 1 re-anchored on the readings +
+  breakeven-tilt + health, Step 3's stamp note added, Step 5 re-worded
+  to the STAMPED ERA (2026-10-31 → the retirement rung), §6 rule 4
+  scoped to stamped days. The retirement rung = the first ingest rung
+  after this deploy; every later archive day honestly reports
+  present:false.
+- **Gates:** ALL 9 GREEN — tests **14,574** (core 195 · scraper 67 ·
+  insights 1,283 · markets 13 · api 399 · web 12,617; the honest −4
+  from the 14,578 baseline: two guard tests + two stamping tests
+  retired into the tighter pins); copy:audit clean; narrator
+  vocabulary regenerated (the dictionary hashes moved — the retired
+  words were not narrator vocabulary, the counts stayed 190+56);
+  **Insights lazy 1520.84 / 352.54 — DOWN from 1526.97/354.18**
+  (the retired copy left the chunk; ceiling 1535/355 holds with more
+  headroom).
+- **The standing guards:** the gb-s4 suite re-run on the retired
+  shape — **67/67 PASS** (gb-s4-visual 61 + the union probes 6, the
+  flipped-view snapshot pin included: the balance renders
+  byte-identically, as it must — it never read a retired key).
+- **Deploy + production verification:** the api worker redeployed
+  (the snapshot shape changed on /api/insights) — the deploy-lock
+  check cleared against the flip's `0e7d7cb8` @ 100% first; smoke:
+  health ok + `/api/insights` 200 WITHOUT goldSummary (the wire
+  contract of this round) + the page rendering the lane balance
+  identically, EN + fa, 360 + 1280, fresh contexts, ZERO console
+  errors. The executed facts are in DEPLOY.md's session note.
+
 ## The final acceptance walk (04 §6 AC-1..AC-12 + 05 §12 V-1..V-10)
 
 Walked at the staging (the local gates + the jsdom/Playwright suites)
@@ -818,7 +895,7 @@ Every AC is green.
 | AC-6 | unread ≠ neutral in engine, UI and copy | The state words (round-77) + the counts-parts pins; the tray holds both, the words differ («قابل ارزیابی نیست» vs «بدون گرایش») |
 | AC-7 | Gold's 30-day move is context, counted nowhere | The ±9% DOM decoupling pin + the footing-decoupling pin in outlook.test.ts (26); the context pill never green/red |
 | AC-8 | The honesty rules visible on the card, EN + FA | The subtitle + measured-note + backtest-link pins (the lanes suite) + prod-verify's AC-8 probes; the link aims at BACKTEST-GOLD-LANES.md |
-| AC-9 | goldTailwindScore, goldSummary + the frozen harness tables unchanged, tests pass | D-GB-9 held: gold-score.ts/schemas/snapshot.ts/apps/api untouched; the engine tests green; the wire field still arrives + validates (the UI simply does not read it) |
+| AC-9 | goldTailwindScore, goldSummary + the frozen harness tables unchanged, tests pass | Held through P0–P5 (D-GB-9: gold-score.ts/schemas/snapshot.ts/apps/api untouched; the engine tests green) and CLOSED at OI-3/GB-S7 with the owner's recorded approval: the wire field retired (the frozen engine + GoldSummarySchema as its output contract stay; the engine tests still green, gold-score.ts untouched) |
 | AC-10 | The calibration report exists, states n, pre-registered criteria, no edge | BACKTEST-GOLD-LANES.md (GB-S1, unchanged) |
 | AC-11 | The 2026-10-31 fixture reproduces 01 §7 | The engine fixture test (GB-S2) + the fixture pins in the lanes suite (Balanced · 0-0-4) |
 | AC-12 | All gates pass + the owner's approval recorded BEFORE the flip | ✅ SATISFIED — the owner's explicit "go" recorded in chat on 2026-11-04 ("GO, I love the result so far."), AFTER the live preview review and BEFORE the merge; the gates 9/9 GREEN 14,578 on the branch + CI green on branch and main; the merge `4f192c9` and the deploy `0e7d7cb8` @ 100% followed |
@@ -848,15 +925,24 @@ Every AC is green.
    header lane prose read in all 8 cells).
 5. **OI-5 — the final owner read DONE** (the "go" above covers it:
    every fa string reviewed + fingerprinted, rounds 76–78).
-6. OI-3 (goldSummary + the wind copy keys retirement) is GB-S7's own
-   owner round — the ONLY remaining item; its preconditions hold (the
-   recheck record from GB-S1 exists). OI-4/OI-6 unchanged.
+6. OI-3 (goldSummary + the wind copy keys retirement) — **RESOLVED
+   (2026-11-04, GB-S7):** the owner's explicit in-session approval
+   recorded ("Approve both", after the verified preconditions + the
+   disclosed §3 recheck dependency); both retirements executed with the
+   recheck procedure + spec updated in the same change; the program
+   closed at this round. OI-4/OI-6 unchanged (kept as recorded).
 
 ## Standing constraints (every session)
 
 - D-GB-9: `gold-score.ts`, `goldSummary`, `GoldSummarySchema`,
   `snapshot.ts`, `apps/api/**` and the frozen harness tables are NEVER
-  edited by this program; the new work is additive.
+  edited by this program; the new work is additive. *(Held through
+  P0–P6; the ONE sanctioned exception — `goldSummary`'s wire field +
+  the snapshot stamp sites, with `gold-score.ts` itself untouched —
+  was OI-3/GB-S7's own owner-gated round, executed 2026-11-04 with
+  the recorded approval; `GoldSummarySchema` stays exported as the
+  engine's output contract. The constraint's original form is the
+  P0–P5 rule; see 04 §1's note.)*
 - No forecasting edge is claimed anywhere, ever — the standing no-edge
   record (GOLD_BACKTEST_SPEC §5, the round-55 note) is the operative
   description until a stated-in-advance rule says otherwise.

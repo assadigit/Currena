@@ -393,8 +393,9 @@ recordedAt refreshed), and the repo Actions secret rotated to the
 working KV-Edit token.*
 
 *Gold balance consolidation (2026-11-03 → 2026-11-04, P0 CALIBRATED +
-P1 ENGINE + P2 PREVIEW + P2b VISUAL + P3+P4 LANDED + **P5 FLIPPED,
-SHIPPED AND LIVE — the program COMPLETE except GB-S7/OI-3** —
+P1 ENGINE + P2 PREVIEW + P2b VISUAL + P3+P4 LANDED + P5 FLIPPED,
+SHIPPED AND LIVE + **OI-3/GB-S7 EXECUTED — THE PROGRAM COMPLETE
+AND CLOSED** —
 docs/specs/gold-balance-consolidation/):
 the owner's next Gold Program round folded the two gold
 metaphors into ONE balance — **live for every visitor since the P5
@@ -403,11 +404,16 @@ production matrix with ZERO console errors; the `?balance=lanes`
 parameter inert)**. The wind panel (`GoldTailwindPanel`) and the
 model-vs-reality panel are RETIRED from the UI (deleted with their
 test parts); the pure lane engine (`gold-balance.ts`, 21 voters →
-4 lane votes, `GOLD_LANE_MIN_FIRING` per the P0 calibration) stays —
-`gold-score.ts`, `goldSummary` and the backtest harness stay frozen and
-running (D-GB-9): the snapshot field still arrives on the wire and stays
-validated; the UI simply does not read it (its retirement is OI-3/GB-S7,
-its own owner round). The spec set (README + 01-05 + the visual reference
+4 lane votes, `GOLD_LANE_MIN_FIRING` per the P0 calibration) stays.
+**OI-3/GB-S7 (2026-11-04, the owner's recorded in-session approval
+"Approve both") closed the wire:** the `goldSummary` snapshot field
+RETIRED (the flipped UI never read it) and the 03 §6.4 wind copy
+keys retired from both dictionaries (copy:audit clean); `gold-score.ts`,
+`goldTailwindScore` and the harness tables stayed frozen throughout
+(D-GB-9 — `GoldSummarySchema` remains exported as the engine's own
+output contract), and the recheck lineage runs on the readings + the
+raw-archive historical stamps (GOLD_RECHECK_SPEC §3, updated in the
+same change). The spec set (README + 01-05 + the visual reference
 prototype) is the owner-approved source of truth; the session-by-session
 delivery plan (GB-S1..GB-S7) is
 `docs/specs/gold-balance-consolidation/PROMPTS.md`. P0 landed 2026-11-03

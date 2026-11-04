@@ -107,9 +107,14 @@ month later is a materially better test than a re-run tomorrow; there
 is no such thing as "too late" — §1 just gets a new line.
 
 - **Step 1 — the live check (no credentials; always first):**
-  `curl -s https://currena.ir/api/insights` must carry `goldSummary`
-  (expect `netScore` −5…+5, `label`, `firingVoters`, the lane
-  breakdown) and the `breakeven-tilt` reading (asOf, percentile10y).
+  `curl -s https://currena.ir/api/insights` must answer with its
+  `readings` array carrying the gold voters and the `gold-usd` price
+  reading, and the `breakeven-tilt` reading (asOf, percentile10y).
+  *(OI-3/GB-S7, 2026-11-04, the owner's recorded approval: the
+  payload NO LONGER carries `goldSummary` — the wire field retired
+  with the flipped UI that never read it. The numbers the field
+  used to state are re-derived OFFLINE from the readings by the same
+  pure engine — that is what Steps 3–5 do.)*
   `curl -s https://currena.ir/api/health` must answer `ok:true`.
   Record both verbatim — they are the re-run's "today" anchors.
 - **Step 2 — credentials (read-only KV; the critical gate):** the
@@ -133,6 +138,12 @@ is no such thing as "too late" — §1 just gets a new line.
   corpus; the KV histories are rolling ~10-year windows, so the head
   trims over time and the window count can move DOWN between runs —
   compare values on common days, never silently reconcile.)*
+  *(Stamp note, 2026-11-04 / OI-3: the dump reads the historical
+  `goldSummary` stamps from the RAW archive JSON, pre-parse — the
+  field left the snapshot schema with the GB-S7 cleanup, so the
+  zod-parsed snapshot no longer exposes it. Archive days written
+  after the retirement rung simply report `present:false`; that is
+  the honest record, not a gap.)*
 - **Step 4 — the backtest run (offline; reads only the fixture):**
   `corepack pnpm --filter @currena/insights gold-backtest`
   — the PROMOTED 21-voter table is the primary; the S4-frozen
@@ -142,11 +153,16 @@ is no such thing as "too late" — §1 just gets a new line.
 - **Step 5 — compare against §5's baselines:** the honest frame is
   deltas, never softening. Expected drift: windows grow (~2 per new
   gold trading day), sign-agreements wander within a few points, the
-  tilt's fire-rate stays in the ~40–50% band. Say which engine
-  stamped the new archives' `goldSummary` — every rung after
-  2026-10-31 16:07 UTC is the PROMOTED engine (`21ca25ab`+); before
-  is the S4-frozen one (the stamped-vs-rederived no-drift contract
-  is itself a check: GOLD_BACKTEST_SPEC §5 Session 6).
+  tilt's fire-rate stays in the ~40–50% band. The stamped-vs-rederived
+  `goldSummary` no-drift contract covers the STAMPED ERA ONLY — the
+  rungs from 2026-10-31 through the last rung before the OI-3/GB-S7
+  retirement deploy (2026-11-04); every stamp from a rung after
+  2026-10-31 16:07 UTC is the PROMOTED engine's (`21ca25ab`+), the
+  10-31 one is the S4-frozen engine's (the deploy boundary).
+  Archive days written after the retirement rung carry NO stamp —
+  their scores exist only as the harness's own re-derivation from
+  the archived readings (the same check, one leg: the stamps were
+  the second, independent leg).
 - **Step 6 — the watch (§4) if any new archive days carry it:** pull
   the trio + decade-group asOf rows for the new days; a verdict is
   only claimable from the archive values (the live API serves the
@@ -204,8 +220,9 @@ numbers, before any change, if a re-run shows:
    percentile distribution shifting materially (the promotion's
    premise was B4's 46.7%);
 4. **Archive days going missing** beyond the known 10-20 outage, or
-   the stamped-vs-rederived `goldSummary` disagreeing (the no-drift
-   contract);
+   the stamped-vs-rederived `goldSummary` disagreeing on a STAMPED
+   day (the no-drift contract — stamped era 2026-10-31 → the OI-3
+   retirement rung, per §3 Step 5);
 5. **KV usage approaching the free-tier ceiling** (D-8: ~18.8
    MB/year against 1 GB; retention is an owner decision, never
    silent).

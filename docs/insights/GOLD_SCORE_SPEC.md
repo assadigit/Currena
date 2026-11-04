@@ -1,19 +1,22 @@
 # GOLD_SCORE_SPEC — the gold-directional scoring engine (the Gold Program)
 
-> **GB-S6/P5 note (2026-11-04, STAGED — the flip awaits the owner's
-> recorded "go" per the hard gate):** the two UI panels below
-> (`GoldTailwindPanel` + `ModelVsRealityPanel`) are RETIRED
+> **GB-S6/P5 note (2026-11-04, SHIPPED — the owner's recorded "go"),
+> amended at OI-3/GB-S7 (2026-11-04, the owner's recorded approval):**
+> the two UI panels below (`GoldTailwindPanel` +
+> `ModelVsRealityPanel`) are RETIRED
 > from the UI — the gold balance consolidation program
-> (`docs/specs/gold-balance-consolidation/`, now IMPLEMENTED) folded the
+> (`docs/specs/gold-balance-consolidation/`, IMPLEMENTED and LIVE) folded the
 > two gold metaphors into ONE balance: the consolidated lane balance
 > (the pure engine `gold-balance.ts`, 21 voters → 4 lane votes) is THE
 > gold card for every visitor. THE ENGINE STAYS: `gold-score.ts`,
-> `goldTailwindScore`, `goldSummary` (the optional snapshot field — still
-> stamped by the ingest and still validated; the UI simply does not read
-> it) and the frozen harness tables keep running unchanged (D-GB-9) —
-> the recheck and backtest lineage reads them. The wind copy keys stay
-> in the dictionaries until OI-3/GB-S7's own owner round. The full
-> record: `docs/specs/gold-balance-consolidation/PROGRESS.md`.
+> `goldTailwindScore`, `goldSummaryOf` and the frozen harness tables keep
+> running unchanged (D-GB-9). **The `goldSummary` WIRE FIELD is RETIRED
+> (OI-3/GB-S7): the snapshot no longer stamps or validates it — the
+> flipped UI never read it, and the recheck lineage reads the historical
+> stamps from the raw archive JSON (GOLD_RECHECK_SPEC.md §3; the
+> engine's own output contract lives on as `GoldSummarySchema`).** The
+> wind copy keys retired with the same round. The full record:
+> `docs/specs/gold-balance-consolidation/PROGRESS.md`.
 
 **Status:** S1 (engine) + S2 (API + UI integration) + S2.1 (bilingual +
 placement round) shipped. FA copy shipped in S2.1 (round-53). **Session 6
@@ -23,11 +26,13 @@ GOLD_BACKTEST_SPEC's decision log; the panel's round-55 measured-reality
 note stays the operative description).
 **Modules:** `packages/insights/src/gold-score.ts` (pure engine — copy
 moved to the web dictionaries in S2.1) ·
-`packages/core/src/schemas.ts` (`GoldSummarySchema`, the optional snapshot field —
-still stamped by the ingest, still validated; unread by the UI since GB-S6).
+`packages/core/src/schemas.ts` (`GoldSummarySchema` — the engine's own
+output contract since OI-3/GB-S7, 2026-11-04; the optional snapshot
+FIELD retired with the wire, the schema itself stays because the frozen
+gold-score.test.ts round-trips it).
 **The UI panels** (`GoldTailwindPanel.tsx` + `ModelVsRealityPanel.tsx`) —
-**RETIRED from the UI at the GB-S6 flip (staged on
-`gold-balance/p5-flip`, 2026-11-04)**; see the note above.
+**RETIRED from the UI at the GB-S6 flip (2026-11-04)**; see the note
+above.
 **Discipline:** pure, additive, zero new fetches, zero new KV ops. Descriptive,
 hedged, never advice (the signals-card contract — words and counts, no green/red).
 
@@ -158,6 +163,13 @@ gauges.ts contract: one function, ingest and SPA, no drift).
 
 ### 4.1 The schema — `packages/core/src/schemas.ts`
 
+> **OI-3/GB-S7 (2026-11-04, the owner's recorded approval):** the
+> `goldSummary` field below RETIRED from `InsightsSnapshotSchema` —
+> this section is the S2 historical record. `GoldSummarySchema` itself
+> stays exported (the engine's output contract; the frozen engine tests
+> round-trip it). Stored snapshots that still carry the field parse
+> clean — zod strips the unknown key.
+
 Additive and OPTIONAL (zero breaking change — every stored snapshot and
 archive stays valid; old readers ignore it):
 
@@ -174,6 +186,9 @@ core and is exported from `@currena/core` alongside its leaf schemas
 `GoldTailwindLabelSchema`, `ModelVsRealityChipSchema`).
 
 ### 4.2 The ingest — where `summarizeByGauges(readings)` is called
+
+> **OI-3/GB-S7 (2026-11-04):** all THREE stamp sites below retired —
+> this section is the S2 historical record.
 
 The summary lines are written in **`packages/insights/src/adapters/snapshot.ts`**
 (not `ingest/run.ts` — the runner only orchestrates; the pure builders write
@@ -201,6 +216,9 @@ rides along automatically (no route change). The live-prices overlay
 through untouched (§2.4 for the one-tick skew).
 
 ### 4.3 The API docs — `docs/INDICATORS_AND_DATA_SOURCES.md` §3
+
+> **OI-3/GB-S7 (2026-11-04):** the `goldSummary` block below left the
+> documented shape with the wire field.
 
 The `/api/insights` shape example gains the `goldSummary` block (optional
 field, shown with a comment saying so).

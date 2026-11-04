@@ -355,17 +355,18 @@ Insights page's serve path performs **exactly ONE KV read per request**
 
 ### The `/api/insights` shape
 
-> **One balance (GB-S6/P5, 2026-11-04 — STAGED on the
-> `gold-balance/p5-flip` branch, awaiting the owner's recorded "go"):
-> everything about gold on the Insights page is ONE balance — the
-> consolidated lane balance (`gold-balance.ts`, 21 voters → 4 lane
-> votes → one beam), the owner-approved visual redesign carrying it,
-> and the gold Outlook derived from the same result. The two
-> wind/`model-vs-reality` UI panels are RETIRED at the staged flip; the `goldSummary`
-> field below STILL ARRIVES on the wire and stays validated (the
-> recheck/backtest lineage reads it — D-GB-9) — the UI simply does not
-> read it. Its retirement from the wire is OI-3/GB-S7's own owner
-> round. The record:
+> **One balance (GB-S6/P5, 2026-11-04 — SHIPPED with the owner's
+> recorded "go"; the wire cleanup landed at OI-3/GB-S7 the same
+> day, the owner's recorded approval): everything about gold on
+> the Insights page is ONE balance — the consolidated lane balance
+> (`gold-balance.ts`, 21 voters → 4 lane votes → one beam), the
+> owner-approved visual redesign carrying it, and the gold Outlook
+> derived from the same result. The two wind/`model-vs-reality` UI
+> panels are RETIRED, and the `goldSummary` field below LEFT THE
+> WIRE at OI-3/GB-S7 — the payload no longer stamps or carries it
+> (the flipped UI never read it; the recheck lineage reads the
+> HISTORICAL stamps from the raw archive JSON — GOLD_RECHECK_SPEC
+> §3). The record:
 > `docs/specs/gold-balance-consolidation/PROGRESS.md`.
 
 ```jsonc
@@ -375,33 +376,14 @@ Insights page's serve path performs **exactly ONE KV read per request**
     "global":     { "section": "global",     "label": "stressed", "warningCount": 9, "votingCount": 32, "excludedCount": 0 },
     "australia":  { "section": "australia",  "label": "stressed", "warningCount": 7, "votingCount": 16, "excludedCount": 0 }
   },
-  // Gold Program (optional field — absent on snapshots written before it):
-  // the gold-directional re-cut of the voters (GOLD_SCORE_SPEC.md — 21
-  // voters since the D-5 promotion: breakeven-tilt votes for gold while
-  // staying a context card for its own gauge). Compact numbers only.
-  // STILL STAMPED + STILL VALIDATED, but UNREAD BY THE UI since the
-  // GB-S6 flip (see the "one balance" note above): the page's gold card
-  // is the consolidated lane balance; this summary feeds nothing on the
-  // screen. Kept on the wire for the recheck/backtest lineage (D-GB-9).
-  "goldSummary": {
-    "netScore": -1,                        // tailwind voters − headwind voters
-    "label": "headwind",                   // strong-tailwind | tailwind | balanced | headwind | strong-headwind | null
-    "firingVoters": 3, "tailwindVoters": 1, "headwindVoters": 2,
-    "laneCounts": { "tailwind": 1, "headwind": 2, "mixed": 0 },   // of the four lanes
-    "subGauges": [                         // exactly four, in lane order
-      { "lane": "borrowing-costs", "reading": "tight", "tailwindVoters": 0, "headwindVoters": 2 },
-      { "lane": "dollar",          "reading": "strong", "tailwindVoters": 0, "headwindVoters": 0 },
-      { "lane": "stress",          "reading": "mixed",  "tailwindVoters": 1, "headwindVoters": 0 },
-      { "lane": "inflation",       "reading": "hot",    "tailwindVoters": 0, "headwindVoters": 0 }
-    ],
-    "modelVsReality": {                    // the score vs gold's actual 30-day move
-      "chip": "diverging-up",              // aligned-tailwind | aligned-headwind | diverging-up | diverging-down | neutral | no-read
-      "modelDirection": "headwind",
-      "realityDirection": "rising",
-      "realityBasis": "change30d",         // or ma200GapPct (the fallback) / null
-      "realityValue": 5.2                  // the signed percent the reality read
-    }
-  },
+  // OI-3/GB-S7 (2026-11-04, the owner's recorded approval): the
+  // `goldSummary` block that used to sit here — the Gold Program's
+  // compact gold-directional re-cut (GOLD_SCORE_SPEC.md) — RETIRED
+  // from the wire: the flipped UI's gold card is the consolidated
+  // lane balance derived client-side from `readings`, and the
+  // recheck/backtest lineage re-derives the same numbers offline
+  // (the historical archive stamps stay readable from the raw KV
+  // JSON, pre-parse).
   "readings": [
     {
       "id": "yield-curve-10y3m",

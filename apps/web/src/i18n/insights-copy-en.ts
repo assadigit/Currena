@@ -8973,41 +8973,18 @@ export const insightsCopyEn = {
     // the two gold panels' copy, moved from the @currena/insights package
     // into the dictionaries so both locales render through the same
     // reviewed-copy path (the fa mirror below, triaged through the
-    // Persian-copy audit). The panels render INSIDE the merged gold
-    // card, under the balance visual.
+    // Persian-copy audit). OI-3/GB-S7 (2026-11-04, the owner's recorded
+    // approval): the panels' OWN copy retired with the panels — only the
+    // five blocks the lane view READS survive (03 §6.4's list): the lane,
+    // voter, evidence and tilt word dictionaries + the measured note's
+    // link word. Keeping their key paths means their copy-audit
+    // fingerprints did not churn.
     goldScore: {
-      title: 'Gold tailwind score',
-      subtitle: 'The macro drivers, re-cut for gold direction',
-      /** null label (nothing firing) — never a made-up word. */
-      noReadWord: 'Cannot read yet',
-      labels: {
-        'strong-tailwind': 'Strong tailwind',
-        tailwind: 'Tailwind',
-        balanced: 'Balanced',
-        headwind: 'Headwind',
-        'strong-headwind': 'Strong headwind',
-      },
-      netFiringLine: 'Net score — {firing} of {total} drivers firing',
-      netFiringNone: 'Net score — no driver is firing right now',
-      laneCountsLabel: 'Lanes',
-      laneCountsLine: '{tailwind} tailwind · {headwind} headwind · {mixed} mixed',
       laneNames: {
         'borrowing-costs': 'Borrowing costs',
         dollar: 'Dollar',
         stress: 'Market stress',
         inflation: 'Inflation',
-      },
-      subGaugeWords: {
-        tight: 'tight',
-        relief: 'relief',
-        strong: 'strong',
-        stress: 'under stress',
-        elevated: 'elevated',
-        calm: 'calm',
-        hot: 'running hot',
-        cool: 'cooling',
-        mixed: 'mixed',
-        unreadable: 'no read',
       },
       // Session 3 (G2): the inflation lane's context phrase, fed by the
       // breakeven-tilt reading (breakevenTiltLean — pure, the panel never
@@ -9017,8 +8994,6 @@ export const insightsCopyEn = {
         fading: 'expectations fading',
         steady: 'expectations steady',
       },
-      votersTitle: 'Firing drivers',
-      votersNone: 'None firing',
       voterNames: {
         'real-yield-10y': 'Real yields',
         us10y: 'US 10-year yield',
@@ -9051,50 +9026,12 @@ export const insightsCopyEn = {
         high: 'high in its decade',
         low: 'low in its decade',
       },
-      impactWords: {
-        tailwind: 'tailwind',
-        headwind: 'headwind',
-      },
-      footnote: 'A descriptive score of the classic driver relationships — conditions, not advice.',
-      // Gold Program S5 (C4a, 2026-10-31): the measured-reality note — the
-      // S4 backtest's verdict, stated on the panel itself. The table reads
-      // conditions; over 2016–2026 its lean showed no positive association
-      // with gold's next 5–60 days (BACKTEST-GOLD.md). The link word beside
-      // it points at the full public report (GoldTailwindPanel's
-      // GOLD_BACKTEST_URL).
-      measuredNote:
-        'Measured against gold’s actual moves over 2016–2026: the table’s lean showed no positive association with the next 5–60 days — if anything, headwind readings came before larger rises. It reads conditions, not direction.',
+      // OI-3/GB-S7 (2026-11-04): the panels' title/subtitle/labels/
+      // noReadWord/netFiring*/laneCounts*/subGaugeWords/impactWords/
+      // votersTitle/votersNone/footnote/measuredNote — and ALL of
+      // signals.goldModelVsReality — retired with the panels (03 §6.4;
+      // balance.measuredNote is the lane view's own note).
       measuredNoteLink: 'Read the full backtest',
-    },
-    goldModelVsReality: {
-      title: 'Model vs reality',
-      subtitle: 'Does the macro score agree with what gold actually did?',
-      chips: {
-        'aligned-tailwind': 'Aligned — tailwind',
-        'aligned-headwind': 'Aligned — headwind',
-        'diverging-up': 'Diverging — gold rising anyway',
-        'diverging-down': 'Diverging — gold falling anyway',
-        neutral: 'No gap to read',
-        'no-read': 'Not enough data',
-      },
-      explainers: {
-        'aligned-tailwind':
-          'The macro drivers lean supportive and gold has moved {value} {basis} — the move has company.',
-        'aligned-headwind':
-          'The macro drivers lean against gold and the price has moved {value} {basis} — the weakness has company.',
-        'diverging-up':
-          'The macro drivers lean against gold, yet the price has moved {value} {basis} — the market is fighting the model.',
-        'diverging-down':
-          'The macro drivers lean supportive, yet the price has moved {value} {basis} — the market is not following the drivers.',
-        'model-neutral': 'The macro drivers show no clear lean for gold right now.',
-        'reality-flat': 'Gold has held roughly flat ({value} {basis}) — no model-vs-market gap to read.',
-        'no-read': 'Not enough fresh data to compare the model with the market.',
-      },
-      basisPhrases: {
-        change30d: 'over the past 30 days',
-        ma200GapPct: 'vs its 200-day average',
-      },
-      footnote: 'The model reads the drivers; reality reads the price. Both can be wrong.',
     },
   },
 

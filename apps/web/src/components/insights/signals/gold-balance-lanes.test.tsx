@@ -1305,58 +1305,43 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
 /* ------------------------------------------------------------------ *
  * Moved from gold-panels.test.tsx (retired with the panels at the
  * GB-S6 flip — 04 §1: the surviving assertions move to the new tests):
- * the dictionary coverage of the engine vocabulary (the copy keys stay
- * until OI-3/GB-S7) + the PricesBoard no-panels pin + the card order.
+ * the dictionary coverage of the engine vocabulary + the PricesBoard
+ * no-panels pin + the card order. OI-3/GB-S7 (2026-11-04, the owner's
+ * recorded approval): trimmed WITH the keys — only the five blocks the
+ * lane view reads (laneNames / voterNames / tiltWords / evidenceWords /
+ * measuredNoteLink) stay under test; the panels' own vocabulary
+ * (labels, subGaugeWords, impactWords, netFiring*, laneCounts*,
+ * votersTitle/votersNone, measuredNote, all of goldModelVsReality)
+ * retired with them (03 §6.4).
  * ------------------------------------------------------------------ */
 
-describe('gold copy — both dictionaries cover the whole engine vocabulary (moved from gold-panels)', () => {
-  const SUB_GAUGE_WORDS = [
-    'tight', 'relief', 'strong', 'stress', 'elevated', 'calm', 'hot', 'cool', 'mixed', 'unreadable',
-  ] as const;
-  const LABELS = ['strong-tailwind', 'tailwind', 'balanced', 'headwind', 'strong-headwind'] as const;
-  const CHIPS = ['aligned-tailwind', 'aligned-headwind', 'diverging-up', 'diverging-down', 'neutral', 'no-read'] as const;
-  const EXPLAINERS = [
-    'aligned-tailwind', 'aligned-headwind', 'diverging-up', 'diverging-down', 'model-neutral', 'reality-flat', 'no-read',
-  ] as const;
-
+describe('gold copy — both dictionaries cover the whole engine vocabulary (moved from gold-panels, trimmed at OI-3)', () => {
   for (const [name, c] of [['en', copy], ['fa', copyFa]] as const) {
-    it(`${name}: every label/lane/word/voter/evidence/impact key is non-empty`, () => {
+    it(`${name}: every lane/voter/evidence/tilt key the lane view reads is non-empty`, () => {
       const g = c.signals.goldScore;
-      for (const l of LABELS) expect(g.labels[l], `${name} ${l}`).toBeTruthy();
-      expect(g.noReadWord).toBeTruthy();
       for (const lane of GOLD_LANES) expect(g.laneNames[lane], `${name} ${lane}`).toBeTruthy();
-      for (const w of SUB_GAUGE_WORDS) expect(g.subGaugeWords[w], `${name} ${w}`).toBeTruthy();
       for (const e of ['rising', 'falling', 'high', 'low'] as const) {
         expect(g.evidenceWords[e], `${name} ${e}`).toBeTruthy();
       }
-      expect(g.impactWords.tailwind).toBeTruthy();
-      expect(g.impactWords.headwind).toBeTruthy();
       // Session 3 (G2): the inflation lane's tilt phrase keys — both locales.
       for (const t of ['building', 'fading', 'steady'] as const) {
         expect(g.tiltWords[t], `${name} tilt ${t}`).toBeTruthy();
       }
-      // Session 5 (C4a): the measured-reality note + its link word — both locales.
-      expect(g.measuredNote, `${name} measuredNote`).toBeTruthy();
+      // Session 5 (C4a): the measured note's link word — both locales (the
+      // note itself is balance.measuredNote since the flip).
       expect(g.measuredNoteLink, `${name} measuredNoteLink`).toBeTruthy();
       // the voter names cover EXACTLY the 21-voter table (Session 6: the
       // D-5 promotion added breakeven-tilt to both dictionaries)
       const tableIds = GOLD_LANE_VOTERS.map((v) => v.id as string);
       expect(Object.keys(g.voterNames).sort()).toEqual([...new Set(tableIds)].sort());
       for (const id of tableIds) expect(g.voterNames[id as keyof typeof g.voterNames], `${name} ${id}`).toBeTruthy();
-      expect(g.netFiringLine).toContain('{firing}');
-      expect(g.netFiringLine).toContain('{total}');
-      expect(g.laneCountsLine).toContain('{tailwind}');
-    });
-
-    it(`${name}: every chip + explainer + basis key is non-empty`, () => {
-      const m = c.signals.goldModelVsReality;
-      for (const chip of CHIPS) expect(m.chips[chip], `${name} ${chip}`).toBeTruthy();
-      for (const k of EXPLAINERS) expect(m.explainers[k], `${name} ${k}`).toBeTruthy();
-      expect(m.basisPhrases.change30d).toBeTruthy();
-      expect(m.basisPhrases.ma200GapPct).toBeTruthy();
-      // the two value-bearing explainers keep their placeholders intact
-      expect(m.explainers['aligned-tailwind']).toContain('{value}');
-      expect(m.explainers['aligned-tailwind']).toContain('{basis}');
+      // OI-3/GB-S7: the retired panels' vocabulary is GONE from the
+      // dictionaries (03 §6.4) — the wind words never render again.
+      expect('labels' in g, `${name} labels retired`).toBe(false);
+      expect('subGaugeWords' in g, `${name} subGaugeWords retired`).toBe(false);
+      expect('impactWords' in g, `${name} impactWords retired`).toBe(false);
+      expect('measuredNote' in g, `${name} measuredNote retired`).toBe(false);
+      expect('goldModelVsReality' in c.signals, `${name} goldModelVsReality retired`).toBe(false);
     });
 
     it(`${name}: the summary-prose key carries its placeholders (metalLeanLanes, round-78)`, () => {

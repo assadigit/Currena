@@ -150,4 +150,7 @@ still shows the fall. This is intended.
 ## 9. Non-goals
 
 Forecasting. Weighting lanes or voters. New indicators. Changing silver.
-Replacing the beam geometry. Removing `goldSummary`.
+Replacing the beam geometry. Removing `goldSummary` *(a P0–P5 non-goal —
+it became OI-3/GB-S7's own owner-gated round, executed 2026-11-04 with
+the owner's recorded approval: the wire field retired, the recheck
+procedure updated in the same change; see 04 §1's note).*

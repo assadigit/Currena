@@ -637,10 +637,10 @@ export function Insights() {
 
           {/* S1–S3 + R26: "What the signals say" — the merged card, collapsed
            * default. GB-S6 (P5): the consolidated lane balance is THE
-           * gold card for every visitor — the ?balance=lanes flag and
-           * the goldSummary threading retired with the flip (the
-           * snapshot field still arrives on the wire and stays
-           * validated; the UI simply does not read it — AC-9). */}
+           * gold card for every visitor. OI-3/GB-S7 (2026-11-04, the
+           * owner's recorded approval): the goldSummary wire field
+           * retired with the cleanup — the snapshot no longer carries it
+           * at all (the UI never read it since the flip — AC-9 held). */}
           {SIGNALS_ENABLED ? (
             <section id="insights-signals-wrap" className="scroll-mt-24">
               <Signals

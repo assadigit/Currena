@@ -1229,10 +1229,14 @@ export const ModelVsRealityChipSchema = z.enum([
 export type ModelVsRealityChip = z.infer<typeof ModelVsRealityChipSchema>;
 
 /**
- * The compact gold summary stamped by the ingest (goldSummaryOf in
- * @currena/insights) — the numbers only; the firing voter LIST never
- * rides the snapshot (the SPA re-derives it through the same pure
- * engine, the gauges.ts contract).
+ * The compact gold summary computed by the frozen engine (goldSummaryOf
+ * in @currena/insights) — the ENGINE'S OWN OUTPUT CONTRACT since OI-3
+ * (2026-11-04, the owner's recorded approval): the field left the
+ * snapshot wire at the GB-S7 cleanup, but gold-score.test.ts (frozen,
+ * D-GB-9) round-trips this schema and gold-score.ts types its return
+ * against it, so the contract stays. The numbers only; the firing voter
+ * LIST never rode the snapshot (the SPA re-derived it through the same
+ * pure engine, the gauges.ts contract).
  */
 export const GoldSummarySchema = z.object({
   /** tailwind voters − headwind voters (signed). */
@@ -1290,16 +1294,14 @@ export const InsightsSnapshotSchema = z
      * are unaffected.
      */
     displayMode: z.literal('public').optional(),
-    /**
-     * Gold Program S2 (docs/insights/GOLD_SCORE_SPEC.md §4.1): the
-     * compact gold directional summary (tailwind score + model-vs-
-     * reality), stamped by the ingest beside the section summaries and
-     * recomputed by the public projection over its surviving readings.
-     * OPTIONAL → zero breaking change: snapshots written before the
-     * field (and every stored archive) stay valid, and the SPA derives
-     * the reading client-side when it is absent.
-     */
-    goldSummary: GoldSummarySchema.optional(),
+    // OI-3/GB-S7 (2026-11-04, the owner's recorded approval): the
+    // `goldSummary` field — the Gold Program S2 wire stamp — RETIRED from
+    // the snapshot. The flipped UI never read it (AC-9 held through GB-S6);
+    // the recheck lineage reads the HISTORICAL stamps from the raw archive
+    // JSON (gold-corpus-dump reads them pre-parse, so the stamped-era
+    // no-drift contract stays checkable); the frozen engine's own output
+    // contract lives on as GoldSummarySchema above. Stored snapshots that
+    // still carry the field parse fine — zod strips the unknown key.
   })
   .refine(
     (snap) => new Set(snap.readings.map((r) => r.id)).size === snap.readings.length,

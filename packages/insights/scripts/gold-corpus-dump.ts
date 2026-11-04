@@ -16,7 +16,11 @@
  *    series, per the spec);
  *  - every `insights:archive:v1:*` day's readings for the same ids (the
  *    live out-of-sample slice), zod-validated with the production snapshot
- *    schema, plus the goldSummary presence flag.
+ *    schema, plus the goldSummary presence flag (read from the RAW archive
+ *    JSON pre-parse: the field left the snapshot schema at OI-3/GB-S7 —
+ *    2026-11-04, the owner's recorded approval — so zod would strip it;
+ *    reading it raw keeps the stamped-era no-drift contract checkable on
+ *    the days that still carry the stamp).
  *
  * MANUAL script (like backtest.ts / live-run.ts): never part of the test
  * suite. Credentials come from the environment ONLY
@@ -199,7 +203,15 @@ const archives: Record<string, ArchiveExtract> = {};
 const archiveIds = new Set(CORPUS_SERIES_IDS);
 for (const day of archiveDays) {
   const raw = await kvGetValue(`insights:archive:v1:${day}`);
-  const parsed = InsightsSnapshotSchema.safeParse(JSON.parse(raw));
+  // OI-3/GB-S7 (2026-11-04): goldSummary reads from the RAW JSON, BEFORE
+  // the schema parse — the field retired from InsightsSnapshotSchema, so
+  // zod now strips it and snap.goldSummary is always undefined. The
+  // historical stamps (2026-10-31 → the retirement rung) are the
+  // no-drift contract's data; the dump must keep seeing them. Days after
+  // the retirement rung simply carry present:false — recorded honestly,
+  // never papered over.
+  const rawSnapshot = JSON.parse(raw) as { goldSummary?: { netScore: number; label: string | null } };
+  const parsed = InsightsSnapshotSchema.safeParse(rawSnapshot);
   if (!parsed.success) {
     throw new Error(`Archive ${day} failed the production snapshot schema — aborting (never record garbage).`);
   }
@@ -217,9 +229,12 @@ for (const day of archiveDays) {
   archives[day] = {
     generatedAt: snap.generatedAt,
     goldSummary: {
-      present: snap.goldSummary !== undefined,
-      ...(snap.goldSummary !== undefined
-        ? { netScore: snap.goldSummary.netScore, label: snap.goldSummary.label ?? undefined }
+      present: rawSnapshot.goldSummary !== undefined,
+      ...(rawSnapshot.goldSummary !== undefined
+        ? {
+            netScore: rawSnapshot.goldSummary.netScore,
+            label: rawSnapshot.goldSummary.label ?? undefined,
+          }
         : {}),
     },
     readings,

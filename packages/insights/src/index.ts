@@ -125,12 +125,13 @@ export type {
 } from './signals';
 
 // The Gold Program (docs/insights/GOLD_SCORE_SPEC.md): the directional
-// re-cut of the gauge voters for gold — S1's pure engine, S2's compact
-// snapshot writer. The SPA re-derives the full reading (voters included)
-// through the SAME functions; only goldSummaryOf's compact output rides
-// the KV write. The PANEL COPY lives in the web i18n dictionaries since
-// the S2.1 bilingual round (see gold-score.ts's header note) — this
-// package exports pure logic only.
+// re-cut of the gauge voters for gold — S1's pure engine, frozen (D-GB-9).
+// OI-3/GB-S7 (2026-11-04, the owner's recorded approval): goldSummaryOf's
+// compact output no longer rides the snapshot wire — the exports stay as
+// the engine's own contract (gold-score.test.ts round-trips them; the
+// backtest harness re-derives through the same functions). The PANEL COPY
+// lives in the web i18n dictionaries since the S2.1 bilingual round (see
+// gold-score.ts's header note) — this package exports pure logic only.
 export {
   GOLD_LANE_VOTERS,
   GOLD_LANES,

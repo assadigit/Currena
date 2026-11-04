@@ -132,6 +132,61 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-04e the gold-balance OI-3/GB-S7 wire-cleanup deploy (the goldSummary field OFF the wire + the wind copy keys retired; the page rendering identically)
+
+GB-S7 (branch `gold-balance/oi3-cleanup`, **PR #<PENDING> merged
+<SHA-PENDING>**). The hard gate (this round's own): the GB-S1 recheck
+record verified present (GOLD_RECHECK_SPEC §1) + the owner's explicit
+in-session approval — **"Approve both" (2026-11-04)**, asked before any
+edit with the §3 recheck dependency disclosed in the question (the
+recheck procedure READS goldSummary → the removal requires the
+procedure + spec update in the same change, which this branch carries).
+
+- **On the branch:** the 03 §6.4 wind copy keys retired from both
+  dictionaries (14 goldScore keys + all of `goldModelVsReality`) with
+  their 46 manifest entries — copy:audit CLEAN; the five survivors
+  (laneNames/voterNames/tiltWords/evidenceWords/measuredNoteLink)
+  verified against MergedCard, the only reader. The `goldSummary` wire
+  field retired from `InsightsSnapshotSchema` + the three ingest stamp
+  sites — `GoldSummarySchema` stays exported as the frozen engine's own
+  output contract (gold-score.ts untouched, D-GB-9). The recheck
+  lineage preserved in the same change: gold-corpus-dump reads the
+  historical stamps from the RAW archive JSON pre-parse;
+  GOLD_RECHECK_SPEC §3 Steps 1/5 re-anchored (the stamped era =
+  2026-10-31 → the retirement rung = the first ingest rung after THIS
+  deploy).
+- **Gates on the branch:** ALL 9 GREEN — **14,574 tests** (web 12,617;
+  the honest −4 from the 14,578 baseline: the retired stamping/guard
+  tests replaced by tighter retirement pins), typecheck 6/6, lint 0/0,
+  copy:audit clean, narrator vocabulary regenerated + in sync, layer1
+  strict, secret scan clean; the gb-s4 standing guards **67/67**
+  re-run on the retired shape (the flipped-view snapshot pin included —
+  the balance renders byte-identically, it never read a retired key);
+  the bundle check green — **Insights lazy 1520.84/352.54, DOWN from
+  1526.97/354.18** (the retired copy left the chunk; ceiling 1535/355).
+- **The deploy procedure (this session executes it):**
+  1. Deploy-lock check FIRST: **CLEAR — production at the flip's
+     `0e7d7cb8` @ 100%** (deployment `7c6a0315`, the versions API
+     checked at session start; no later deploy superseded it).
+  2. **PR #<PENDING> merged** (`<SHA-PENDING>`; CI `gates` green on
+     the branch and on main, run <RUN-PENDING>).
+  3. `pnpm --filter @currena/web build` + `pnpm --filter @currena/api
+     exec wrangler deploy` → **currena-api `<VERSION-PENDING>` @ 100%**
+     (deployment `<DEPLOYMENT-PENDING>`, <TIME-PENDING>).
+  4. Post-deploy smoke: `/api/health` ok · `/` 200 · `/api/insights`
+     200 **WITHOUT goldSummary** (this round's wire contract; the
+     readings + breaveven-tilt present — the recheck's new anchors).
+  5. The production matrix (`node visual/prod-verify.mjs` from
+     apps/web): **<MATRIX-PENDING>** — the balance must render
+     identically (the flipped view never read goldSummary).
+  6. The executed facts recorded back here + in PROGRESS.md's GB-S7
+     log (the record commit on main, the flip's two-phase pattern).
+- **What the next recheck (GOLD_RECHECK_SPEC §3) sees after this
+  deploy:** the live payload carries the readings (not the summary —
+  Step 1's new anchor); new archive days after the retirement rung
+  report `goldSummary: present:false` in the corpus dump (the honest
+  record); the no-drift table covers the stamped era only.
+
 ## Session record — 2026-11-04c the gold-balance P5 flip DEPLOYED (worker 0e7d7cb8 at 100% — the consolidated lane balance for EVERY visitor; the ?balance=lanes parameter inert)
 
 GB-S6 + the GB-S6b continuation (branch `gold-balance/p5-flip`, **PR #22
