@@ -1,6 +1,7 @@
 # Gold balance consolidation: spec set
 
-**Status:** IMPLEMENTED through P5 (2026-11-04) — **COMPLETE and LIVE**.
+**Status:** IMPLEMENTED through P5 + OI-3/GB-S7 (2026-11-04) —
+**COMPLETE, LIVE and CLOSED**.
 P0–P4 landed through GB-S1..GB-S5 (PR #12, #15, #16, #17 + the #18
 union, #20 + the #21 record merge); **P5 (the owner-gated flip)
 shipped as PR #22 (merge `4f192c9`) + the record merge** — the hard
@@ -9,9 +10,14 @@ gate (04 §3 P5 + AC-12 + V-11) was satisfied by the owner's recorded
 preview review) and the consolidated balance became **THE gold card
 for every visitor** (worker `0e7d7cb8` @ 100%; the 8/8 production
 matrix with ZERO console errors; the `?balance=lanes` parameter now
-inert). The engine + `goldSummary` + the harness stay frozen and
-running (D-GB-9); OI-3 (the wire field + the wind copy keys) is
-GB-S7's own owner round — the only remaining item. The owner approved
+inert). **OI-3 (the wire cleanup) executed at GB-S7 the same day with
+the owner's recorded in-session approval ("Approve both"): the
+`goldSummary` wire field and the 03 §6.4 wind copy keys retired; the
+frozen engine + `GoldSummarySchema` (its output contract) stay; the
+recheck lineage preserved (GOLD_RECHECK_SPEC §3 — the readings + the
+raw-archive historical stamps). Every OI is resolved or explicitly
+kept (OI-1 with the P5 go; OI-2/OI-5 shipped; OI-3 at GB-S7; OI-4/OI-6
+kept as recorded). The owner approved
 the full recommendation set in chat on 2026-10-31 and asked that each
 recommendation be re-checked against the code before it is written
 down. This set is the result of that re-check (see "What the re-check
