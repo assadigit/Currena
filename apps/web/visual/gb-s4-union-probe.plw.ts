@@ -12,6 +12,15 @@
  */
 
 import { test, expect, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+/** The fixture resolves from THIS file's own directory (the GB-S4c
+ * environment note: a CWD-relative read passed from apps/web — the
+ * documented invocation — but failed from apps/web/visual, where the
+ * config file lives). */
+const SNAPSHOT_PATH = resolve(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'snapshot.json');
 
 const OVER = (side: string) => `pan ${side} clipped`;
 
@@ -22,7 +31,7 @@ const OVER = (side: string) => `pan ${side} clipped`;
  * running-HOT as the hedge's support — so the LOW side pressures). */
 async function serveStack(page: Page): Promise<void> {
   await page.route('**/api/insights', async (route) => {
-    const snap = (await import('node:fs')).readFileSync('visual/fixtures/snapshot.json', 'utf8');
+    const snap = readFileSync(SNAPSHOT_PATH, 'utf8');
     const parsed = JSON.parse(snap) as { generatedAt: string; readings: Array<Record<string, unknown>> };
     const byId = new Map(parsed.readings.map((r) => [r.id as string, r]));
     const set = (id: string, patch: Record<string, unknown>): void => {

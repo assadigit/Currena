@@ -1,5 +1,7 @@
 /**
- * prod-verify.mjs — the GB-S4 union/delivery production verification:
+ * prod-verify.mjs — the GB-S4 union/delivery production verification
+ * (reused for GB-S5: the flag view now also probes the Outlook strip's
+ * gold state — the lane-derived outlook beside the redesigned balance):
  * the flag view AND the default view, EN + fa, 360 + 1280, fresh
  * contexts, collecting console errors (the delivery discipline's
  * final gate). Run: node visual/prod-verify.mjs (from apps/web).
@@ -35,6 +37,12 @@ async function pass(browser, { flag, locale, width }) {
     panels: document.querySelector('[data-gold-panels]') !== null,
     windPanel: document.querySelector('#insights-gold-tailwind') !== null,
     legacyChips: document.querySelectorAll('[data-balance-tile]').length,
+    // GB-S5 (P3): the Outlook strip's gold chip — its state + sentence
+    // (the lane-derived outlook beside the balance; the default view's
+    // gold chip keeps the legacy derivation).
+    goldOutlook: document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction') ?? null,
+    goldOutlookSentence:
+      document.querySelector('[data-verdict-metal="gold"]')?.textContent?.replace(/[\s\n]+/g, ' ').trim().slice(0, 90) ?? null,
     overflow: document.documentElement.scrollWidth - window.innerWidth,
     dir: document.documentElement.dir,
   }));
