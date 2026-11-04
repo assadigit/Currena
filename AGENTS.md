@@ -393,18 +393,21 @@ recordedAt refreshed), and the repo Actions secret rotated to the
 working KV-Edit token.*
 
 *Gold balance consolidation (2026-11-03, P0 CALIBRATED + P1 ENGINE +
-P2 PREVIEW + P2b VISUAL LANDED — the rest SPECIFIED, docs/specs/gold-balance-consolidation/):
-the owner's
-next Gold Program round folds the two gold metaphors into ONE
-balance. The wind panel (`GoldTailwindPanel`) and the model-vs-
-reality panel are SPECIFIED for retirement behind the `?balance=lanes`
-preview flag; the pure lane engine (`gold-balance.ts`, 21 voters ->
-4 lane votes, `GOLD_LANE_MIN_FIRING` per the P0 calibration) is
-additive — `gold-score.ts`, `goldSummary` and the backtest harness
-stay frozen and running (D-GB-9). The spec set (README + 01-05 +
-the visual reference prototype) is the owner-approved source of
-truth; the session-by-session delivery plan (GB-S1..GB-S7, branch +
-PR per phase, the owner's incremental-merge instruction) is
+P2 PREVIEW + P2b VISUAL + P3+P4 LANDED — the P5 flip STAGED on the
+`gold-balance/p5-flip` branch, awaiting the owner's recorded "go" per
+the hard gate; on the recorded "go" the consolidated lane balance
+becomes THE gold card for every visitor — docs/specs/gold-balance-consolidation/):
+the owner's next Gold Program round folded the two gold
+metaphors into ONE balance. The wind panel (`GoldTailwindPanel`) and the
+model-vs-reality panel are RETIRED from the UI at the staged flip
+(deleted with their test parts); the pure lane engine (`gold-balance.ts`, 21 voters →
+4 lane votes, `GOLD_LANE_MIN_FIRING` per the P0 calibration) stays —
+`gold-score.ts`, `goldSummary` and the backtest harness stay frozen and
+running (D-GB-9): the snapshot field still arrives on the wire and stays
+validated; the UI simply does not read it (its retirement is OI-3/GB-S7,
+its own owner round). The spec set (README + 01-05 + the visual reference
+prototype) is the owner-approved source of truth; the session-by-session
+delivery plan (GB-S1..GB-S7) is
 `docs/specs/gold-balance-consolidation/PROMPTS.md`. P0 landed 2026-11-03
 (GB-S1): the missed 2026-11-02 armed re-check ran manually per
 GOLD_RECHECK_SPEC §3 (the watch days 2–4 lockstep — validated-by-watch; no
@@ -456,9 +459,23 @@ the copy close: rounds 76-77 confirmed in the manifest, the lane
 terminology recorded (persian-terminology.md), OI-5 satisfied-pending-
 final-owner-read, NO new keys (OI-1 asked, unanswered -> the owner's
 existing seven sentences ship, still reading as a forecast per 03
-§6.3). Until GB-S6
-flips the default, everything user-visible about gold stays exactly
-as it is today — the preview is opt-in by URL only.*
+§6.3). GB-S6/P5 then STAGED the flip (2026-11-04, on the
+`gold-balance/p5-flip` branch — the hard gate holds until the owner's
+recorded "go"; on the recorded "go" the merge ships it): the
+`?balance=lanes`
+flag, the `visual` prop, BalanceScale's whole legacy branch and the
+two gold panels RETIRED; the gold Outlook derivation
+(`goldOutlookOf`), the collapsed takeaway AND the summary prose (the
+collapsed-corner decision: the gold prose joined the lane model —
+`metalLeanLanes`, fa round-78; silver keeps the legacy sentence, OI-4)
+are unconditional; outlookOf stays for silver ONLY; a fresh vitest
+snapshot of the flipped view is the byte-stability pin; the chunk
+re-baselined downward 1560/360 -> 1535/355 (measured 1526.97/354.18,
+Insights-TjkEDaYV.js); OI-1 was never answered, so the owner's
+existing seven outlook sentences still ship — the forecast-wording
+note stands per 03 §6.3 until the owner rewords them (a normal copy
+change post-flip). The program record + every AC/V walked with
+evidence: `docs/specs/gold-balance-consolidation/PROGRESS.md`.*
 
 **Prices heat** (`prices-heat` gauge):
 | | id | cadence | maxAge | rule | source |

@@ -82,12 +82,12 @@ export function outlookOf(reading: SignalReading): OutlookState | null {
 
 /* ------------------------------------------------------------------ *
  * Gold balance consolidation P3 (GB-S5, 01-SPEC §5.2 — the gold
- * Outlook card DERIVED from the consolidated balance, behind the same
- * ?balance=lanes preview flag): the gold state is computed from the
- * SAME goldBalance() result that drives the lane balance, so the card
- * and the balance can never contradict each other (D-GB-6, AC-3 —
- * today the Outlook's 5th "footing" condition is gold's own 30-day
- * move, the circularity that read Bearish beside a Balanced balance).
+ * Outlook card DERIVED from the consolidated balance): the gold state
+ * is computed from the SAME goldBalance() result that drives the lane
+ * balance, so the card and the balance can never contradict each
+ * other (D-GB-6, AC-3 — today the Outlook's 5th "footing" condition is
+ * gold's own 30-day move, the circularity that read Bearish beside a
+ * Balanced balance).
  *
  * The contract (01 §5.2), in engine terms — L = lanes for, A = lanes
  * against, over the four lanes:
@@ -106,9 +106,9 @@ export function outlookOf(reading: SignalReading): OutlookState | null {
  * `speed`/`position` are the gold SignalReading's own fields — the
  * exact range evidence outlookOf reads today (rule 3 verbatim), so the
  * consolidation read stays honest without re-deriving price inputs.
- * Silver keeps outlookOf untouched (OI-4 is a recorded follow-up, not
- * this change); so does the DEFAULT gold view until the owner-gated
- * P5/GB-S6 flip.
+ * Since the GB-S6 flip this is THE gold derivation (the flag-off
+ * legacy path retired with the flag); outlookOf stays for silver ONLY
+ * (OI-4 is a recorded follow-up, not this change).
  * ------------------------------------------------------------------ */
 export function goldOutlookOf(
   balance: GoldBalanceReading,
@@ -301,14 +301,13 @@ export function VerdictStrip({
 }: {
   gold: SignalReading;
   silver: SignalReading;
-  /** GB-S5 (P3, 01 §5.2 + AC-3): the gold Outlook derived from the
-   * SAME goldBalance() result that drives the lane balance — passed by
-   * the merged card ONLY under ?balance=lanes. `undefined` (flag off,
-   * the default view) keeps the legacy outlookOf(gold) derivation
-   * byte-for-byte; a passed `null` IS a verdict (all four lanes
-   * unread → verdictNone), distinct from "not provided". Silver's leg
-   * always reads outlookOf (OI-4). */
-  goldOutlook?: OutlookState | null | undefined;
+  /** GB-S5 (P3, 01 §5.2 + AC-3): the gold Outlook derived from the SAME
+   * goldBalance() result that drives the lane balance. Since the GB-S6
+   * flip this is THE gold derivation (the flag-off outlookOf(gold)
+   * legacy path retired with the flag); a passed `null` IS a verdict
+   * (all four lanes unread → verdictNone). Silver's leg always reads
+   * outlookOf (OI-4). */
+  goldOutlook: OutlookState | null;
   /** Each metal's current price, display-formatted (2026-10-20 owner
    * sketch): the header carries it in a LIGHTER ink — the price already
    * leads the prices board above; here the TREND is the emphasis. */
@@ -318,7 +317,7 @@ export function VerdictStrip({
 }) {
   const s = copy.signals;
   const rows = [
-    { reading: gold, verdict: goldOutlook !== undefined ? goldOutlook : outlookOf(gold), price: prices.gold },
+    { reading: gold, verdict: goldOutlook, price: prices.gold },
     { reading: silver, verdict: outlookOf(silver), price: prices.silver },
   ];
   if (rows.every((r) => r.verdict === null)) return null;

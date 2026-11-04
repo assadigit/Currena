@@ -20,11 +20,13 @@ actually executed. The gap-closure program that ran in parallel is CLOSED
 | G | P2b: the visual redesign of the balance behind the same flag (05) | ✅ DONE (GB-S4 2026-11-03 + the GB-S4b parallel-session union 2026-11-04) — branch gold-balance/p2b-visual (PR #17, merged `bc566e9d`); the owner's 05-VISUAL-DESIGN-SPEC implemented from the approved reference prototype: the brass stage (beam + 11-tick dial + column + bowl pans), the lane WEIGHTS with segmented rims (the NEW BalanceWeight.tsx), the verdict word as the hero, the Not-leaning tray, the four-row inline LEDGER (the same member content contract); --bal-* tokens light+dark with the measured AA ratios (the full table in evidence/gb-s4/README.md); the default view still byte-identical (the snapshot pin untouched, the 46 pure-geometry tests green); 14 new copy keys EN+fa through round-77; the lane tests rewritten 19 → 35 + the gb-s4 Playwright V-1..V-10 suite (61 tests, 6 engine-verified scenarios, 70 screenshots); gates 9/9 GREEN 14,598 (web 12,623 → 12,639); Insights lazy 1550.46/358.81 — ceiling 1560/360 justified; the UNION (PR #18, merged `8a99e03`): the second session's verification + the dark rim hues + the 6 standing union-probe guards, deployed as currena-api `6549c5bc` @ 100% + the 8/8 production matrix (see GB-S4b below) |
 | H | P3: the gold Outlook card derived from the unified balance behind the flag (01 §5.2, 04 §3) | ✅ DONE (GB-S5, 2026-11-04) — branch gold-balance/p3-outlook; `goldOutlookOf` in verdict.tsx (unread===4 → null; L≥GOLD_LANE_STRONG(3) strong-bullish / A≥3 strong-bearish; the range evidence UNCHANGED — |change30d|<2% ∧ typical band ∧ |L−A|≤1 → range-bound; L==A → mixed/neutral; else bullish/bearish; footing counted NOWHERE, AC-7) fed by the SAME goldBalance() result as the lane drivers + the verdict word (AC-3 — strip, collapsed takeaway and balance cannot disagree); silver's leg + the default view untouched (OI-4, the legacy snapshot); the 04 §4.2 table test (outlook 15 → 26) + the wiring/consistency pins (lanes 35 → 44); gates 9/9 GREEN 14,618; the gb-s4 standing guards re-run 67/67 |
 | I | P4: the copy close — every new key triaged, the terminology, OI-5 (04 §3) | ✅ DONE (GB-S5, 2026-11-04) — the full GB-S3/GB-S4 set CONFIRMED in the manifest (round-76 17 + round-77 15 entries, copy:audit clean); NO new keys this session (OI-1 unanswered → the owner's existing seven sentences ship, the forecast-wording note recorded); fa round-78 NOT created; persian-terminology.md gains the gold-balance lane section (Split / «دوپاره», the lane states, the tally wording, the counts + context lines); OI-5 recorded satisfied-pending-final-owner-read |
+| J | P5: the owner-gated flip — default on, delete the panels, bundle re-baseline, docs (04 §3 P5, §1) | 🔶 STAGED (GB-S6, 2026-11-04) — the FULL flip work is staged on the branch `gold-balance/p5-flip` (draft PR) behind the hard gate: the gate code retired (useBalanceLanesPreview + balanceLanes threading + the `visual` prop + BalanceScale's whole legacy branch + the legacy snapshot), the two panels + their test parts deleted (the surviving assertions moved), the goldOutlook derivation + the collapsed takeaway + THE CORNER DECISION (the gold summary prose joins the lane model at BOTH sites — the collapsed line AND the merged card's header; `metalLeanLanes` EN+fa round-78; silver untouched, OI-4) unconditional, a fresh vitest snapshot of the flipped view the byte-stability pin, the bundle re-baselined DOWNWARD 1560/360 → 1535/355 (measured 1526.97/354.18, Insights-TjkEDaYV.js), the docs set drafted (GOLD_SCORE_SPEC + INDICATORS + AGENTS + the README Status + DEPLOY), harness conversions (gb-s4-visual's default-view tests + prod-verify's matrix — both legs now read the flipped view + the inert-param proof); local gates ALL 9 GREEN 14,578 (web 12,619) + the gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) — **NOT MERGED, NOT DEPLOYED: the owner's recorded "go" is the remaining gate (AC-12 + V-11 + 04 §3 P5)** |
 
-Next: GB-S6 (P5 — **the owner-gated flip**), GB-S7 (OI-3,
-its own owner round). With P3+P4 landed, the preview is COMPLETE for
-the owner's review at `currena.ir/insights?balance=lanes` — GB-S6 does
-NOT proceed without the owner's explicit "go".
+Next: the owner's P5 decision on the staged branch (the recorded
+"go" merges + deploys + completes the walk below), then GB-S7 (OI-3,
+its own owner round). The preview remains live for the review at
+`currena.ir/insights?balance=lanes` — the production site is UNTOUCHED
+until the recorded "go".
 
 ## Session log
 
@@ -675,53 +677,153 @@ everything AFTER the union's own close-out record (`00b4ccb`):
   app's section tabs sit over scrolled-under content identically on
   both views; pre-existing chrome, the GB-S4c pattern).
 
+### GB-S6 (2026-11-04 ~02:1x–0x:xx UTC) — P5 STAGED: the flip behind the hard gate
+
+- **Branch:** `gold-balance/p5-flip` — the draft PR
+  `gold balance(P5): the owner-gated flip — STAGED, awaiting the recorded "go"`
+  (draft opened with the work; **NOT merged, NOT deployed** — the hard
+gate holds: AC-12 + V-11 + 04 §3 P5 require the owner's explicit "go"
+recorded in THIS file first; the production site still serves GB-S5's
+a803f526, and the preview at currena.ir/insights?balance=lanes remains
+the owner's review surface).
+- **The flip (staged):** the `?balance=lanes` gate code RETIRED —
+  `useBalanceLanesPreview` + the `balanceLanes` threading through
+  Insights/Signals/MergedCard + the `visual` prop: BalanceScale's
+  visual branch is now the ONLY branch (the whole legacy branch — the
+  pan tiles, the shared detail panel, the trays, the legacy stage
+  geometry + gauge + pan-sizing helpers, the 500ms cubic tween —
+  deleted; the pure law helpers the redesign shares stay verbatim;
+  the tween's t0 now rides the first rAF tick's own timestamp, which
+  also cleared a react-hooks/purity false positive at 0 warnings).
+  `GoldTailwindPanel.tsx` + `ModelVsRealityPanel.tsx` + their parts of
+  `gold-panels.test.tsx` DELETED (the surviving assertions moved: the
+  dictionary-coverage pair + the PricesBoard pin + the card-order test
+  adapted to strip → balance → footing with no panels between).
+  `goldSummary` still arrives on the wire and stays validated — the UI
+  simply does not read it (AC-9; its retirement is OI-3/GB-S7).
+  `VerdictStrip`'s `goldOutlook` prop is now REQUIRED (the flag-off
+  `outlookOf(gold)` path retired); `outlookOf` stays for silver ONLY
+  (OI-4). The collapsed takeaway override is unconditional.
+- **THE CORNER DECISION (recorded):** the collapsed section's gold
+  PROSE **joins the lane model** — and the same sentence family at its
+  second site, the merged card's header line (`metalLeanLine`). The
+  legacy sentence counted FOOTING among 5 conditions (the circularity
+  D-GB-5 removed) and, post-flip, would have been the only
+  footing-counted prose left on the page — twice (open + collapsed),
+  directly contradicting the card's own counts line on the same card.
+  ONE new sibling key `metalLeanLanes` ('{metal}: {lean}, {counts}' /
+  '{metal}: {lean}؛ {counts}') + one rule home
+  (`balanceVerdictWordOf` + `balanceVerdictCountsParts`, exported from
+  BalanceScale — the same words the card renders); gold's header lean
+  icon rides the balance verdict; silver keeps the legacy per-condition
+  sentence everywhere (its own model is unchanged, OI-4). fa triaged
+  round-78 (1 string, copy:audit clean; the ModelVsRealityPanel
+  manifest entry deleted per the workflow's expected manual edit).
+- **Tests:** balance.test.tsx REWRITTEN 46 → 22 (the pure law kept
+  verbatim — §4, §6 minus the pan-sizing test, §5.1/§13 + the new
+  rule-home describe; §A/§B + the rendered-legacy + integration
+  describes retired with the legacy branch) · outlook.test.ts 26
+  UNCHANGED (outlookOf's contract tests stay as the silver leg; the
+  framing comments updated) · gold-balance-lanes.test.tsx 44 → 53
+  (the flag-hook + flag-off pins retired; +AC-1, +the fresh
+  flipped-view snapshot pin (determinism guard first), +the
+  unconditional-visual pin, +5 collapsed-prose/header pins incl. fa,
+  +3 moved dictionary-coverage incl. metalLeanLanes, +the order test,
+  +the PricesBoard pin) — 101/101 across the three files.
+- **Harness:** gb-s4-visual.plw.ts's default-view tests CONVERTED (both
+  legs now read the flipped view + the byte-identical inert-param
+  proof; 66 tests) + prod-verify.mjs CONVERTED (the matrix's two legs
+  are now the-default-page + the-inert-parameter, both asserting the
+  lane balance, the panels absent, AC-8's honesty elements, the
+  wind-word scan and the header's lane prose; the outlook probe
+  unchanged). The union probes ride their `?balance=lanes` navigation
+  (inert post-flip) unchanged.
+- **Bundle re-baseline (the promised downward move):** measured on the
+  branch build — Insights lazy **1526.97/354.18** (from GB-S5's
+  1550.94/358.99; −23.97 kB raw / −4.81 kB gz), the chunk re-hashed
+  `Insights-Ck9A6XE3.js` → `Insights-TjkEDaYV.js`; the ceiling
+  re-based 1560/360 → **1535/355** with the justification in
+  scripts/check-bundle-budget.mjs. The entry chunk 294.45/88.48
+  (budgets 296/89.5 hold).
+- **Docs (drafted on the branch):** GOLD_SCORE_SPEC.md (the top note +
+  §4.4: panels retired from the UI, engine + goldSummary stay) ·
+  docs/INDICATORS_AND_DATA_SOURCES.md (the one-balance note on the
+  /api/insights shape) · AGENTS.md (the gold-balance paragraph: the
+  flag language retired, the P5 state staged) · the spec README's
+  Status line (P0–P4 IMPLEMENTED; P5 staged pending the recorded
+  "go") · docs/DEPLOY.md (the session note with the deploy fields
+  PENDING until the flip lands) · this PROGRESS.md + CHANGELOG
+  [2026-11-04c] · PROMPTS.md (the GB-S7 rewrite).
+- **Local gates (the branch):** the full `pnpm gates` ALL 9 GREEN —
+  **14,578** tests (web 12,619; baseline 14,618 − the retired
+  panels/legacy tests + the new pins) · typecheck 6/6 · lint 0/0
+  (0 warnings — the rAF-clock change cleared the purity false
+  positive) · copy:audit clean (round-78) · narrator vocabulary in
+  sync · layer1 strict · secret scan clean · the bundle check green
+  at the re-based ceiling. The gb-s4 standing guards re-run on the
+  branch build: **67/67 (gb-s4-visual 61 + the union probes 6)** (gb-s4-visual 61 + the union probes 6,
+  via visual/playwright.config.ts from apps/web).
+- **NOT done (the gate):** merge, deploy, the production matrix, the
+  final AC-12 line. The owner's review of the live preview (EN + fa,
+  desktop + mobile, light + dark) is REQUESTED; on the recorded "go"
+  this session's merge ships the branch, the deploy follows
+  (deploy-lock check first — the active version is expected to be
+  GB-S5's a803f526), the production matrix runs (EN + fa, 360 + 1280,
+  fresh contexts, zero console errors), and the AC/V walk below
+  completes.
+
+## The final acceptance walk (04 §6 AC-1..AC-12 + 05 §12 V-1..V-10)
+
+Staged evidence from the branch (the local gates + the jsdom/Playwright
+suites); the production columns complete at flip time.
+
+| ID | Criterion | Staged evidence |
+|---|---|---|
+| AC-1 | One gold instrument; no wind/model-vs-reality panel remains | The AC-1 pin (gold-balance-lanes.test.tsx): no `data-gold-panels`, no `#insights-gold-tailwind`, no `#insights-gold-model-vs-reality`, no `data-gold-label` anywhere; the flipped-view snapshot carries the balance only; the gb-s4/prod-verify probes assert the same in the browser |
+| AC-2 | Every one of the 21 voters reachable from a lane chip | The ledger member-list pins (the fixture's 8-member borrowing-costs row + steady/unread groups + the deep links); balance.test.tsx's export-surface pin keeps the table intact (21, D-GB-9) |
+| AC-3 | Balance + verdict word + gold Outlook from the same goldBalance() result | The strip-wiring === pins (unchanged from GB-S5); the collapsed takeaway AND the summary prose now ride the same result at both sites (the corner decision); the never-opposing matrix re-pinned |
+| AC-4 | evalLeg only; no bespoke stress/expectations rule in the gold path | The doctored-conditions pin (re-run in the flipped default); the engine's imports unchanged (D-GB-9) |
+| AC-5 | Fewer than GOLD_LANE_MIN_FIRING firing voters never moves the beam | The engine tests (15, GB-S2) + the crowd-minimum pins in the lanes suite (unchanged) |
+| AC-6 | unread ≠ neutral in engine, UI and copy | The state words (round-77) + the counts-parts pins; the tray holds both, the words differ («قابل ارزیابی نیست» vs «بدون گرایش») |
+| AC-7 | Gold's 30-day move is context, counted nowhere | The ±9% DOM decoupling pin + the footing-decoupling pin in outlook.test.ts (26); the context pill never green/red |
+| AC-8 | The honesty rules visible on the card, EN + FA | The subtitle + measured-note + backtest-link pins (the lanes suite) + prod-verify's AC-8 probes; the link aims at BACKTEST-GOLD-LANES.md |
+| AC-9 | goldTailwindScore, goldSummary + the frozen harness tables unchanged, tests pass | D-GB-9 held: gold-score.ts/schemas/snapshot.ts/apps/api untouched; the engine tests green; the wire field still arrives + validates (the UI simply does not read it) |
+| AC-10 | The calibration report exists, states n, pre-registered criteria, no edge | BACKTEST-GOLD-LANES.md (GB-S1, unchanged) |
+| AC-11 | The 2026-10-31 fixture reproduces 01 §7 | The engine fixture test (GB-S2) + the fixture pins in the lanes suite (Balanced · 0-0-4) |
+| AC-12 | All gates pass + the owner's approval recorded BEFORE the flip | 🔶 PENDING — the hard gate: the owner's review of the live preview (EN+fa, desktop+mobile, light+dark) + the recorded "go" in this file. The staged branch does not merge without it |
+| V-1..V-10 | The visual criteria (05 §12) | The gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) on the branch build (V-1..V-10 were walked at GB-S4 with the same visual branch — the flip makes it unconditional; the default-view tests now assert the same view for every visitor); V-11 = the owner's live read — the same PENDING as AC-12 |
+
 ## Owner must decide
 
-1. **Confirm the calibration decision** (or reverse it): the pre-registered
-   rule selected **MIN2** (`GOLD_LANE_MIN_FIRING = 2`, D-GB-3's default) —
-   and the parallel-session union measured it TWICE, independently, over two
-   different corpora (the corpus-of-record 16-day run and the fresh 19-day
-   run): the same criteria verdicts, the same decision, from two hands.
-   The measured tables are in `docs/insights/BACKTEST-GOLD-LANES.md`; the
-   one number worth your eyes is the mature-base row: from 2021-09-23 the
-   MIN2 balance reads fully tipped (10°, one-sided) in **66.5%** of windows
-   (over ALL windows: 49.7%, inside the ≤60% criterion). That is the
-   honest shape of 2021–2026's macro (the same era the frozen table reads
-   headwind-heavy) — if you want a calmer recent beam, MIN1's mature
-   full-tip is 30.7% (and MIN1 also passed C1+C2); one constant decides.
-   Reversing later means a dedicated gated session (the 02 §6 protocol
-   again), never a silent edit.
-2. **OI-1 was asked (2026-11-04, GB-S5) and is STILL OPEN:** with the
-   03 §6.3 table in front of you — reword the seven gold outlook
-   sentences to the conditions wording
-   ("Conditions lean in favour of gold prices." and siblings), or keep
-   your originals? No answer had arrived at GB-S5's ship time, so the
-   EXISTING sentences ship and the honest note stands: they still read
-   as a forecast ("Signs point to a potential …") which the backtest
-   does not support — 03 §6.3's recorded consequence. An approval any
-   time before the GB-S6 flip lands the rewording + its fa round-78 as
-   a small copy-only session; after the flip it is a normal copy
-   change.
-3. **OI-2 is now visible in the redesigned preview:** the split badge
-   ships as "Split" / «دوپاره» behind `?balance=lanes` — now rendered
-   as the weight's badge + the ledger's "Split: 2 for, 2 against"
-   state word. The owner's live read of the REDESIGN (V-11: the look
-   itself, plus the split badge OI-2 and the calm-stress semantic
-   02 §4.1) belongs to the P5 decision.
-4. **The preview is now COMPLETE (P0–P4 all landed):** the Outlook
-   strip's gold state derives from the same balance you see
-   (GB-S5/P3), so the full `currena.ir/insights?balance=lanes` preview
-   — the redesigned balance, the lane-derived Outlook beside it, the
-   collapsed takeaway agreeing, all copy EN+fa — is ready for your
-   review. GB-S6 (the default flip) does NOT proceed without your
-   explicit "go".
-5. **OI-5 is satisfied-pending-final-owner-read** (GB-S5): every fa
-   string behind the flag is reviewed + fingerprinted (rounds 76–77,
-   copy:audit clean) and the terminology is recorded in
-   persian-terminology.md; your final read of the fa preview belongs to
-   the P5 decision.
-6. No other open item moved this session (OI-3's precondition — the re-check
-   record — is satisfied; OI-4/OI-6 unchanged).
+1. **THE P5 DECISION (the hard gate — AC-12 + V-11 + 04 §3 P5):** review
+   the live preview at `currena.ir/insights?balance=lanes` — EN + fa,
+   desktop + mobile, light + dark — and record your explicit "go" (or
+   your changes). The FULL flip work is staged on
+   `gold-balance/p5-flip` (the draft PR); on the recorded "go" it
+   merges, deploys and completes the AC/V walk above. The production
+   site is untouched until then — the Outlook word changing for every
+   visitor is exactly why this gate exists (D-GB-10).
+2. **OI-1 was asked twice (GB-S5, and again at the GB-S6 staging) and
+   remains OPEN:** the seven gold outlook sentences still read as a
+   forecast ("Signs point to a potential …"), which the backtest does
+   not support — 03 §6.3's recorded consequence stands. Since the flip,
+   rewording them is a normal copy change (03 §6.3's table has the
+   proposed conditions wording + the fa drafts; a small copy-only
+   session whenever you say yes).
+3. **OI-2 shipped** (the Split badge / «دوپاره», GB-S4) and is visible
+   in the preview (the tray weight's badge + the ledger's split state
+   word) — now part of the P5 review above.
+4. **The collapsed-corner DECISION was made and recorded at the
+   staging (GB-S6):** the gold summary prose (the collapsed line AND
+   the card header) joined the lane model (`metalLeanLanes`, fa
+   round-78); silver keeps the legacy sentence (OI-4). It is part of
+   the staged branch — veto it in the P5 review if you disagree and it
+   reverts with the branch.
+5. **OI-5's final owner read** rides the P5 review above (every fa
+   string behind the flag is reviewed + fingerprinted, rounds 76–78).
+6. OI-3 (goldSummary + the wind copy keys retirement) is NOT this
+   session's — GB-S7, its own owner round; its preconditions hold (the
+   recheck record from GB-S1 exists). OI-4/OI-6 unchanged.
 
 ## Standing constraints (every session)
 

@@ -81,7 +81,10 @@ sees the full 21-voter table in every scenario).
   settle (`reduced-motion-against-en-1280.png`). ✅
 - **V-10 (the screenshots):** 5 data scenarios × EN/fa × 360/1280 ×
   light/dark (40 captures) + the loading skeleton × EN/fa × 360/1280 (4)
-  + the default view × EN/fa × 360/1280 (4) + the two detail-open
+  + the default view × EN/fa × 360/1280 (4 — REGENERATED at the GB-S6
+  staging: since the flip the default view IS the lane balance, and
+  the retired `?balance=lanes` parameter is proven inert in the same
+  test) + the two detail-open
   interaction shots + the squint/blur and reduced-motion captures — 70
   files in this directory. ✅
 

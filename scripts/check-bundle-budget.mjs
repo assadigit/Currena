@@ -925,7 +925,25 @@ const BUDGETS = [
   // the snapshot pin). The GB-S3 note still stands: the two gold panels
   // ride the chunk until the P5/GB-S6 flip re-baselines downward.
   // Measured 1550.47/358.81.
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1560_000, gz: 360_000, label: 'Insights lazy chunk' },
+  // gold-balance GB-S6 P5 — THE FLIP (2026-11-04, the owner's recorded
+  // "go", CHANGELOG §2026-11-05a): 1560→1535 / 360→355 — the downward
+  // re-baseline the GB-S3/GB-S4 notes promised. The flip RETIRES the
+  // two gold panels (GoldTailwindPanel + ModelVsRealityPanel, with
+  // their test parts and the goldSummary threading) AND BalanceScale's
+  // whole legacy branch (the pan tiles, the shared detail panel, the
+  // trays, the legacy stage geometry, the gauge, the pan-sizing
+  // helpers, the 500ms cubic tween) together with the ?balance=lanes
+  // flag and the `visual` prop — the visual redesign (GB-S4) is THE
+  // balance for every visitor. The engine + the lane copy stay (the
+  // lane view's own code is unchanged); the net is the shrink the
+  // panels + the legacy branch were costing. One new copy key
+  // (metalLeanLanes × 2 locales, round-78) + the summary-prose rule
+  // helpers ride along. The measured figures: the chunk re-hashed
+  // Insights-Ck9A6XE3.js → Insights-TjkEDaYV.js at 1526.97/354.18
+  // (from 1550.94/358.99 — the GB-S5 log's figures): −23.97 kB raw /
+  // −4.81 kB gz. The ceiling re-bases to 1535/355 (≈8 kB raw /
+  // ≈0.8 kB gz headroom, the program's tight multiple-of-5 convention).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1535_000, gz: 355_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

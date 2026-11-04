@@ -5,6 +5,76 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-04c] — gold-balance P5 (GB-S6): THE FLIP STAGED on gold-balance/p5-flip — the consolidated balance for every visitor, behind the owner gate (the ?balance=lanes code + the `visual` prop + BalanceScale's whole legacy branch + the two gold panels RETIRED; the gold Outlook + the collapsed takeaway AND the summary prose (the collapsed-corner decision: metalLeanLanes, fa round-78) unconditional, outlookOf stays for silver only; a fresh flipped-view snapshot the byte-stability pin; the bundle re-baselined DOWNWARD 1560/360 → 1535/355 — measured 1526.97/354.18, Insights-TjkEDaYV.js; gates 9/9 GREEN 14,578; the gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) — NOT merged, NOT deployed: the owner's recorded "go" is the remaining gate, AC-12 + V-11)
+
+GB-S6 (branch `gold-balance/p5-flip`, draft PR — the hard gate of
+04 §3 P5 holds: the owner reviews the live preview first; nothing
+merges and nothing deploys until the recorded "go"). The staged flip:
+
+- **The gate code retired.** `useBalanceLanesPreview` + the
+  `balanceLanes` threading (Insights → Signals → MergedCard) + the
+  `visual` prop are gone: BalanceScale's visual redesign (GB-S4) is
+  the ONLY branch — the whole legacy branch deleted (the pan tiles,
+  the shared detail panel, the trays, the legacy stage geometry +
+  gauge + pan-sizing helpers, the 500ms cubic tween; the pure law
+  helpers the redesign shares stay verbatim, and the tween's t0 now
+  rides the first rAF tick's own timestamp — which also cleared a
+  react-hooks/purity false positive, lint 0/0 at 0 warnings).
+- **The two gold panels retired** (`GoldTailwindPanel.tsx` +
+  `ModelVsRealityPanel.tsx` deleted with their test parts — the
+  surviving assertions moved to gold-balance-lanes.test.tsx: the
+  dictionary-coverage pair, the PricesBoard pin, the card-order test
+  now strip → balance → footing). `goldSummary` still arrives on the
+  wire and stays validated (the recheck/backtest lineage, D-GB-9) —
+  the UI simply does not read it; its retirement is OI-3/GB-S7.
+- **The gold Outlook + the collapsed takeaway are unconditional**
+  (`VerdictStrip`'s `goldOutlook` prop now required — the flag-off
+  `outlookOf(gold)` path retired); `outlookOf` stays for silver ONLY
+  (OI-4).
+- **The collapsed-corner DECISION (recorded):** the gold summary
+  PROSE joins the lane model at BOTH its sites — the collapsed
+  section's line and the merged card's header line. The legacy
+  sentence counted FOOTING among 5 conditions (the circularity
+  D-GB-5 removed) and post-flip would have been the only
+  footing-counted prose left, twice on one page, contradicting the
+  card's own counts line. ONE new sibling key `metalLeanLanes`
+  (EN '{metal}: {lean}, {counts}' / fa '{metal}: {lean}؛ {counts}',
+  round-78) + one rule home (`balanceVerdictWordOf` +
+  `balanceVerdictCountsParts` — the same words the card renders);
+  gold's header lean icon rides the balance verdict; silver keeps
+  the legacy sentence everywhere (OI-4).
+- **Tests:** balance.test.tsx 46 → 22 (pure law kept verbatim; the
+  rendered-legacy/§A/§B/integration describes retired with the
+  branch) · outlook.test.ts 26 unchanged (outlookOf's contract now
+  the silver leg) · gold-balance-lanes.test.tsx 44 → 53 (AC-1, the
+  fresh flipped-view snapshot pin — determinism guard first, the
+  unconditional-visual pin, 5 collapsed-prose/header pins incl. fa,
+  the moved coverage/order/PricesBoard pins) — 101/101.
+- **The bundle re-baseline, the promised downward move:** Insights
+  lazy 1526.97/354.18 (from 1550.94/358.99: −23.97 kB raw / −4.81 kB
+  gz), the chunk re-hashed to `Insights-TjkEDaYV.js`; the ceiling
+  re-based to 1535/355 with the justification in
+  scripts/check-bundle-budget.mjs. Entry chunk 294.45/88.48 (holds).
+- **Harness:** gb-s4-visual's default-view tests converted (both legs
+  read the flipped view + the byte-identical inert-parameter proof)
+  + prod-verify.mjs converted (the-default-page + the-inert-parameter
+  legs, both asserting the lane balance, the panels absent, AC-8's
+  honesty elements, the wind scan, the header's lane prose); the
+  union probes ride their inert navigation unchanged.
+- **Docs:** GOLD_SCORE_SPEC (the top note + §4.4), INDICATORS (the
+  one-balance note), AGENTS.md (the flag language retired, P5
+  staged), the spec README Status (P0–P4 IMPLEMENTED; P5 staged),
+  DEPLOY.md (the session note, deploy fields PENDING), PROGRESS.md
+  (the J milestone + the GB-S6 log + the AC/V acceptance walk), the
+  GB-S7 prompt rewrite.
+- **Gates (the branch):** ALL 9 GREEN — 14,578 tests (web 12,619),
+  typecheck 6/6, lint 0/0, copy:audit clean (round-78), narrator in
+  sync, layer1 strict, secret scan clean, the bundle check green at
+  the re-based ceiling; the gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) on the branch
+  build. OI-1 was asked again and remains unanswered — the owner's
+  existing seven outlook sentences still ship (the forecast-wording
+  note stands per 03 §6.3; post-flip it is a normal copy change).
+
 ## [2026-11-04b] — gold-balance P3+P4 (GB-S5): the gold Outlook DERIVED from the consolidated balance behind ?balance=lanes + the copy close (goldOutlookOf per 01 §5.2 — footing counted nowhere, AC-7; the strip, the collapsed takeaway and the balance from ONE goldBalance() result, AC-3; the owner's existing seven sentences ship — OI-1 asked, unanswered; the terminology recorded, OI-5 satisfied-pending-final-owner-read; gates 9/9 GREEN 14,618; Insights chunk 1550.94/358.99 — ceiling 1560/360 holds)
 
 GB-S5 (branch `gold-balance/p3-outlook`). The last preview-phase piece:

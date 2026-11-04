@@ -2338,6 +2338,11 @@ export const insightsCopyFa: InsightsCopy = {
     mergedSubtitle: 'طلا و نقره بسیاری از عوامل اثرگذار مشترکی دارند؛ به همین دلیل، شرایط مشترک فقط یک بار نمایش داده می‌شوند.',
     conditionsMet: '{met} مورد از {total} شرط برقرار است',
     metalLean: '{metal}: {lean}؛ {met} مورد از {total} شرط برقرار است.',
+    // GB-S6 (تصمیم گوشهٔ متن جمع‌شده): جملهٔ خلاصهٔ طلا — واژهٔ حکم ترازو +
+    // سطر شمار دسته‌ها، همان واژه‌هایی که خود کارت نشان می‌دهد (نقره
+    // «metalLean» خود را نگه می‌دارد؛ OI-4). دورهٔ بازبینی: round-78
+    // (docs/localization/persian-copy-round-78-gold-balance-flip.md).
+    metalLeanLanes: '{metal}: {lean}؛ {counts}',
     lean: {
       'mostly-supportive': 'عمدتاً حمایتی',
       mixed: 'ترکیبی',

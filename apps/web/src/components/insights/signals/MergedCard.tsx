@@ -30,7 +30,7 @@
  */
 
 import { useMemo } from 'react';
-import type { GoldSummary, IndicatorId, IndicatorReading } from '@currena/core';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import type { SignalConditionReading, SignalReading } from '@currena/insights';
 import { breakevenTiltLean, goldBalance, type GoldBalanceLane, type GoldBalanceMember } from '@currena/insights';
@@ -38,9 +38,13 @@ import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { formatChange, formatIndicatorValue, mergeSignals } from '../config';
 import { chipWordKeyOf } from '../StatusChip';
-import { BalanceScale, driverStateOf, type BalanceDriver } from './BalanceScale';
-import { GoldTailwindPanel } from './GoldTailwindPanel';
-import { ModelVsRealityPanel } from './ModelVsRealityPanel';
+import {
+  BalanceScale,
+  balanceVerdictCountsParts,
+  balanceVerdictWordOf,
+  type BalanceCounts,
+  type BalanceDriver,
+} from './BalanceScale';
 import { ConditionIcon, LeanIcon, stateToneClass } from './icons';
 import { MetalIcon, VerdictStrip, goldOutlookOf } from './verdict';
 
@@ -58,47 +62,29 @@ const GOLD_BALANCE_BACKTEST_URL =
   'https://github.com/assadigit/Currena/blob/main/docs/insights/BACKTEST-GOLD-LANES.md';
 
 /**
- * GB-S3 (04 §3 P2): reads `?balance=lanes` from window.location.search
- * once at mount — the ?narrative=preview pattern (a query parameter read
- * on the Insights route, NO persistence; without it every visitor sees
- * today's page byte-for-byte, pinned by the legacy-markup snapshot
- * test). The route calls this and threads the boolean down through
- * Signals to this card.
+ * GB-S6 (P5, 2026-11-04 — the owner's recorded "go"): the consolidated
+ * lane balance is THE gold card for every visitor. The ?balance=lanes
+ * preview flag, the balanceLanes threading and the two gold panels
+ * (GoldTailwindPanel + ModelVsRealityPanel) RETIRED with this flip;
+ * `goldSummary` no longer reaches the card (the snapshot field still
+ * arrives on the wire and stays validated — the UI simply does not
+ * read it, AC-9; its retirement is OI-3/GB-S7). The two panels' own
+ * tests went with them (the surviving assertions moved to
+ * gold-balance-lanes.test.tsx).
  */
-export function useBalanceLanesPreview(): boolean {
-  return useMemo(() => {
-    try {
-      return new URLSearchParams(window.location.search).get('balance') === 'lanes';
-    } catch {
-      return false;
-    }
-  }, []);
-}
 
 export function MergedSignalsCard({
   gold,
   silver,
   readings,
-  goldSummary,
   copy,
   numberLocale,
-  balanceLanes,
 }: {
   gold: SignalReading;
   silver: SignalReading;
   readings: readonly IndicatorReading[];
-  /** Gold Program S2.1: the served snapshot's compact gold summary
-   * (absent on pre-S2 snapshots — the panels then derive it client-side
-   * through the same pure engine). */
-  goldSummary?: GoldSummary | undefined;
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
-  /** GB-S3 (04 §3 P2): the ?balance=lanes preview flag — true renders the
-   * consolidated LANE balance (the engine's four lanes as the drivers,
-   * the context line, the measured note) and RETIRES the two gold panels
-   * from the preview; absent/undefined renders today's card
-   * byte-for-byte. */
-  balanceLanes?: boolean | undefined;
 }) {
   const s = copy.signals;
   const merged = mergeSignals(gold, silver);
@@ -115,78 +101,71 @@ export function MergedSignalsCard({
       : null;
   };
 
-  const metalLeanLine = (reading: SignalReading): string => {
-    const leanWord = reading.lean !== null ? s.lean[reading.lean] : s.notEnoughData;
-    return interpolate(s.metalLean, {
-      metal: s.metals[reading.metal],
-      lean: leanWord,
-      met: formatNumber(reading.metCount, numberLocale, { maximumFractionDigits: 0 }),
-      total: formatNumber(reading.conditions.length, numberLocale, { maximumFractionDigits: 0 }),
-    });
-  };
-
   /* ---------------------------------------------------------------- *
-   * The gold card's balance visual (owner spec
-   * docs/insights/gold-balance-card-spec.md): the grouped driver list
-   * becomes a beam balance. The driver list is READ from the signal
-   * data (gold's conditions minus its own footing — footing is the
-   * price strip below the trays, never a driver, §9); the length is
-   * whatever the evaluator produces, never hard-coded. The explanation
-   * sentences, the values and the banner below are the card's existing
-   * copy, unchanged.
-   * ---------------------------------------------------------------- */
-  const balanceValueText = (inputs: readonly IndicatorId[]): string | null => {
-    const parts: string[] = [];
-    for (const id of inputs) {
-      const r = byId.get(id);
-      if (r === undefined || r.value === null) continue;
-      parts.push(formatIndicatorValue(id, r.value, numberLocale, copy.units));
-    }
-    return parts.length > 0 ? parts.join(' · ') : null;
-  };
-  const driversOf = (signal: SignalReading): BalanceDriver[] =>
-    signal.conditions
-      .filter((c) => c.key !== 'footing')
-      .map((c) => ({
-        key: c.key,
-        label: s.conditions[c.key].name,
-        detail: s.conditions[c.key].how,
-        valueText: balanceValueText(c.inputs),
-        state: driverStateOf(c.state),
-      }));
-  const balanceDrivers: BalanceDriver[] = driversOf(gold);
-  /* 2026-10-21c owner round: silver's balance is RETIRED entirely — only
-   * gold's balance renders below. silverDrivers is gone with it. */
-
-  /* ---------------------------------------------------------------- *
-   * Gold balance consolidation P2 (GB-S3, behind ?balance=lanes —
-   * docs/specs/gold-balance-consolidation/03-UX-AND-COPY.md): the
-   * consolidated balance. The four LANES drive the SAME BalanceScale
-   * through the P1 engine (goldBalance, PR #15) — one chip per lane, its
-   * members one tap away in the shared detail panel. The DEFAULT view
-   * (flag off) keeps the legacy condition chips and the two gold panels
-   * below, byte-for-byte as today (the panels retire from the DEFAULT
-   * view only at P5/GB-S6 — never this session).
+   * Gold balance consolidation P2 (GB-S3, 2026-11-03; LIVE for every
+   * visitor since the GB-S6 flip — 03-UX-AND-COPY.md): the consolidated
+   * balance. The four LANES drive the BalanceScale through the P1
+   * engine (goldBalance, PR #15) — one chip per lane, its members one
+   * tap away in the ledger row.
    * ---------------------------------------------------------------- */
   const gs = s.goldScore;
-  const balance = useMemo(() => (balanceLanes ? goldBalance(readings) : null), [balanceLanes, readings]);
+  const balance = useMemo(() => goldBalance(readings), [readings]);
   /* GB-S5 (P3, 01 §5.2 + AC-3): the gold Outlook derived from the SAME
    * goldBalance() result that drives the lane drivers and the verdict
    * word above — the strip can no longer contradict the balance
    * (D-GB-6). The range evidence is UNCHANGED: the gold reading's own
-   * speed/position, the exact inputs outlookOf reads today. Flag off →
-   * undefined → the strip keeps the legacy derivation byte-for-byte
-   * (the default view's pin). */
-  const goldOutlook =
-    balance !== null ? goldOutlookOf(balance, gold.speed, gold.position) : undefined;
+   * speed/position, the exact inputs outlookOf reads today. Since the
+   * GB-S6 flip this is THE derivation (the flag-off legacy path
+   * retired); outlookOf stays for silver ONLY (OI-4). */
+  const goldOutlook = goldOutlookOf(balance, gold.speed, gold.position);
   /* Session 3 (G2) reuse: the inflation lane's context phrase — the
    * breakeven tilt reading's own lean (pure selection in the insights
    * package; the card never chooses copy). Absent/stale → no phrase. */
   const tiltLean = useMemo(
-    () => (balanceLanes ? breakevenTiltLean(readings.find((r) => r.id === 'breakeven-tilt')) : null),
-    [balanceLanes, readings],
+    () => breakevenTiltLean(readings.find((r) => r.id === 'breakeven-tilt')),
+    [readings],
   );
   const laneCount = (v: number): string => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
+
+  /** The gold prose helper (GB-S6, the collapsed-corner decision): the
+   * balance counts as a BalanceCounts shape for the shared rule helpers
+   * — the verdict word + the counts parts the card itself renders, so
+   * the summary prose can never drift from the card (one engine). */
+  const laneCounts: BalanceCounts = {
+    ...balance.counts,
+    total: balance.lanes.length,
+    net: balance.net,
+    readable: balance.readable,
+  };
+
+  /** The metal's summary prose for the card header. Silver keeps the
+   * legacy per-condition sentence (its own model is unchanged, OI-4);
+   * gold's line joins the lane model with the flip — the legacy
+   * sentence counted FOOTING among 5 conditions, the circularity
+   * D-GB-5 removed, and would have contradicted the card's own counts
+   * line on the same card. */
+  const metalLeanLine = (reading: SignalReading): string => {
+    if (reading.metal !== 'gold') {
+      const leanWord = reading.lean !== null ? s.lean[reading.lean] : s.notEnoughData;
+      return interpolate(s.metalLean, {
+        metal: s.metals[reading.metal],
+        lean: leanWord,
+        met: formatNumber(reading.metCount, numberLocale, { maximumFractionDigits: 0 }),
+        total: formatNumber(reading.conditions.length, numberLocale, { maximumFractionDigits: 0 }),
+      });
+    }
+    return interpolate(s.metalLeanLanes, {
+      metal: s.metals.gold,
+      lean: balanceVerdictWordOf(laneCounts, copy),
+      counts: balanceVerdictCountsParts(laneCounts, copy, numberLocale).join(' · '),
+    });
+  };
+
+  /** Gold's header lean icon rides the balance verdict (net for → up,
+   * against → down, level/unreadable → flat) so the icon can never
+   * contradict the prose beside it; silver keeps its own lean. */
+  const goldHeaderLean: 'mostly-supportive' | 'mostly-unsupportive' | 'mixed' =
+    balance.net > 0 ? 'mostly-supportive' : balance.net < 0 ? 'mostly-unsupportive' : 'mixed';
 
   /** The chip's second line (03 §2): the split contest, the honest "No
    * driver firing" (only when the lane is readable — an absent read is
@@ -228,36 +207,32 @@ export function MergedSignalsCard({
 
   /** The four lane drivers (03 §2–§3): key/label/intro from the copy, the
    * side from the engine, every voter of the lane in table order. */
-  const laneDrivers: BalanceDriver[] | null =
-    balance === null
-      ? null
-      : balance.lanes.map((lane) => ({
-          key: lane.lane,
-          label: gs.laneNames[lane.lane],
-          detail: s.balance.laneIntro[lane.lane],
-          note: lane.lane === 'inflation' && tiltLean !== null ? gs.tiltWords[tiltLean] : undefined,
-          valueText: null,
-          state: lane.side,
-          split: lane.split,
-          tally: laneTallyOf(lane),
-          members: lane.members.map((m) => ({
-            key: m.id as string,
-            label: gs.voterNames[m.id as keyof typeof gs.voterNames],
-            impact: m.impact,
-            evidenceText: memberEvidenceOf(m),
-            valueText: memberValueOf(m),
-          })),
-        }));
+  const laneDrivers: BalanceDriver[] = balance.lanes.map((lane) => ({
+    key: lane.lane,
+    label: gs.laneNames[lane.lane],
+    detail: s.balance.laneIntro[lane.lane],
+    note: lane.lane === 'inflation' && tiltLean !== null ? gs.tiltWords[tiltLean] : undefined,
+    valueText: null,
+    state: lane.side,
+    split: lane.split,
+    tally: laneTallyOf(lane),
+    members: lane.members.map((m) => ({
+      key: m.id as string,
+      label: gs.voterNames[m.id as keyof typeof gs.voterNames],
+      impact: m.impact,
+      evidenceText: memberEvidenceOf(m),
+      valueText: memberValueOf(m),
+    })),
+  }));
 
   /* 01 §6: the context line — gold's own 30-day move, shown for context,
-   * never counted in the balance or the Outlook (it replaces the
-   * model-vs-reality chip under the flag). Hidden when missing. GB-S4:
-   * the visual lane view renders it as the VERDICT BLOCK's recessed pill
-   * (05 §4.4 — never green or red); the node is only ever built for the
-   * lane view, so restyling it here cannot touch the default view. */
+   * never counted in the balance or the Outlook (it replaced the
+   * model-vs-reality chip at the consolidation). Hidden when missing.
+   * GB-S4: the verdict block's recessed pill (05 §4.4 — never green or
+   * red). */
   const goldChange30d = byId.get('gold-usd')?.change30d;
   const contextLine =
-    balanceLanes && goldChange30d !== undefined && Number.isFinite(goldChange30d) ? (
+    goldChange30d !== undefined && Number.isFinite(goldChange30d) ? (
       <p data-balance-context-line className="bal-context">
         {interpolate(s.balance.contextLine, {
           change: formatChange(goldChange30d, 'pct', numberLocale, copy.units),
@@ -265,11 +240,9 @@ export function MergedSignalsCard({
       </p>
     ) : null;
 
-  /* 01 §8.2: the measured note + the backtest link, moved here from the
-   * wind panel — visible without a tap, no edge claimed. GB-S4: the
-   * visual lane view renders it as the balance's FOOTNOTE (05 §4.1
-   * item 8); the node is only ever built for the lane view. */
-  const measuredNote = balanceLanes ? (
+  /* 01 §8.2: the measured note + the backtest link — visible without a
+   * tap, no edge claimed. GB-S4: the balance's FOOTNOTE (05 §4.1 item 8). */
+  const measuredNote = (
     <p data-balance-measured-note className="bal-foot">
       {s.balance.measuredNote}{' '}
       <a
@@ -281,7 +254,7 @@ export function MergedSignalsCard({
         {gs.measuredNoteLink}
       </a>
     </p>
-  ) : null;
+  );
 
   const positionWordOf = (percentile: number | null): string | null => {
     if (percentile === null) return null;
@@ -386,7 +359,14 @@ export function MergedSignalsCard({
               data-signal-metal={reading.metal}
             >
               <MetalIcon metal={reading.metal} size={18} desktopSize={22} />
-              {reading.lean !== null ? <LeanIcon lean={reading.lean} /> : null}
+              {/* GB-S6: gold's header icon rides the balance verdict (the
+               * prose joined the lane model — the collapsed-corner
+               * decision); silver keeps its own lean. */}
+              {reading.metal === 'gold' ? (
+                <LeanIcon lean={goldHeaderLean} />
+              ) : reading.lean !== null ? (
+                <LeanIcon lean={reading.lean} />
+              ) : null}
               {metalLeanLine(reading)}
             </span>
           ))}
@@ -398,9 +378,10 @@ export function MergedSignalsCard({
        * 2026-10-20 (owner sketch): the chips redraw as analysis cards —
        * header (artwork box · name + verdict · lighter price) over a BIG
        * trend chart, one anatomy for mobile and desktop.
-       * GB-S5 (P3, 01 §5.2): under ?balance=lanes the GOLD leg derives
-       * from the consolidated balance (goldOutlookOf — AC-3); silver
-       * keeps its own conditions (OI-4). */}
+       * GB-S5 (P3, 01 §5.2): the GOLD leg derives from the consolidated
+       * balance (goldOutlookOf — AC-3) — since the GB-S6 flip THE
+       * derivation for every visitor; silver keeps its own conditions
+       * (OI-4). */}
       <VerdictStrip
         gold={gold}
         silver={silver}
@@ -411,64 +392,28 @@ export function MergedSignalsCard({
       />
 
       {/* UI-45 (2026-10-19 v3 merge; 2026-10-21c owner round): GOLD's
-       * balance — the owner's v7 BalanceScale machinery (heading + side
-       * captions over the pan columns → the balance with factor tiles
-       * resting on real pans hung from the beam → the aggregate
-       * assessment box with the verdict word + count line + the v3
-       * readable-count line). Silver's own balance is RETIRED (the
-       * owner's directive): silver keeps its analysis card above and its
-       * footing row below. Gold's assessment also carries the C12
-       * banner.
+       * balance. Silver's own balance is RETIRED (the owner's directive):
+       * silver keeps its analysis card above and its footing row below.
+       * Gold's assessment also carries the C12 banner.
        *
-       * GB-S3 (?balance=lanes): the LANE drivers replace the condition
-       * chips. GB-S4 (P2b, 05-VISUAL-DESIGN-SPEC.md): the lane view now
-       * renders the VISUAL REDESIGN (the brass stage, the lane weights,
-       * the verdict hero, the tray, the inline ledger) via the `visual`
-       * prop — the legacy path passes none of the new props and renders
-       * byte-for-byte as before (the snapshot pin). */}
+       * GB-S3 (the consolidation): the LANE drivers. GB-S4 (P2b,
+       * 05-VISUAL-DESIGN-SPEC.md): the VISUAL REDESIGN (the brass stage,
+       * the lane weights, the verdict hero, the tray, the inline ledger)
+       * — since the GB-S6 flip THE balance for every visitor (the
+       * `visual` prop and the legacy branch retired with the flag). */}
       <BalanceScale
-        drivers={laneDrivers ?? balanceDrivers}
+        drivers={laneDrivers}
         copy={copy}
         numberLocale={numberLocale}
         banner={c12Banner}
-        subtitle={laneDrivers !== null ? s.balance.subtitleLanes : undefined}
+        subtitle={s.balance.subtitleLanes}
         contextLine={contextLine}
         measuredNote={measuredNote}
-        visual={balanceLanes === true}
       />
       {/* 2026-10-21c owner round: <BalanceScale metal="silver" …> is RETIRED
        * here (the owner: "I dont need balance scale of Silver, remove that
        * section entirely"). Silver keeps its analysis card (VerdictStrip,
        * above) and its footing row (below); only gold carries a balance. */}
-
-      {/* Gold Program S2.1 (owner round 2026-10-31 — "it's placed on the
-       * wrong section … it must place here"): the two gold panels mount
-       * DIRECTLY UNDER the balance visual («برآیند عوامل مؤثر بر قیمت
-       * طلا»), inside this card — the 21-voter tailwind score (the D-5 promotion, Session 6) + the
-       * model-vs-reality comparison, the finer cut of the same question
-       * the balance answers with its four broad conditions. Two columns
-       * beside the balance's max-width column, stacked on mobile.
-       *
-       * GB-S3 (?balance=lanes): the consolidated balance RETIRES both
-       * panels from the PREVIEW (03 §1 — nothing about gold outside the
-       * balance); the DEFAULT view keeps them byte-for-byte until the
-       * owner-gated flip (P5/GB-S6). */}
-      {balanceLanes ? null : (
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2" data-gold-panels>
-          <GoldTailwindPanel
-            goldSummary={goldSummary}
-            readings={readings}
-            copy={copy}
-            numberLocale={numberLocale}
-          />
-          <ModelVsRealityPanel
-            goldSummary={goldSummary}
-            readings={readings}
-            copy={copy}
-            numberLocale={numberLocale}
-          />
-        </div>
-      )}
 
       {/* Price footing strip (owner spec §9): the SAME content that used
        * to sit beside the driver groups, now below the trays, separated

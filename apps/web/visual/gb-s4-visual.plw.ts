@@ -1,7 +1,8 @@
 /**
  * gb-s4-visual.plw.ts — the gold balance consolidation P2b (GB-S4) visual
  * acceptance suite: V-1..V-10 of 05-VISUAL-DESIGN-SPEC.md §12 over the
- * ?balance=lanes preview, on the fixture server (never a live site).
+ * lane view (the GB-S6 flip made it THE default; the parameter is inert),
+ * on the fixture server (never a live site).
  *
  * The six V-10 scenarios are driven by intercepting /api/insights and
  * rewriting the fixture snapshot's readings per scenario (the GB-S3
@@ -662,11 +663,13 @@ test('the ledger row open — EN 360 + FA 1280 dark (the PR interaction shots)',
 });
 
 /* ------------------------------------------------------------------ *
- * The default view beside the preview (today's page, unchanged)
+ * The default view — since the GB-S6 flip THE lane balance for every
+ * visitor (the ?balance=lanes parameter is INERT: with or without it,
+ * the same flipped view renders; the panels are gone everywhere).
  * ------------------------------------------------------------------ */
 for (const [locale, word] of [['en', 'EN'], ['fa', 'FA']] as const) {
   for (const width of WIDTHS) {
-    test(`the default view — ${word} ${width}px (today's page, byte-for-byte)`, async ({ page }) => {
+    test(`the default view — ${word} ${width}px (the flipped page: the lane balance, the parameter inert)`, async ({ page }) => {
       await page.setViewportSize({ width, height: HEIGHTS[width as 360 | 1280] });
       await page.addInitScript(
         ([l]) => {
@@ -683,10 +686,18 @@ for (const [locale, word] of [['en', 'EN'], ['fa', 'FA']] as const) {
       const card = page.locator('[data-signal-card="merged"]');
       await card.scrollIntoViewIfNeeded();
       await card.screenshot({ path: path.join(SHOT_DIR, `default-${locale}-${width}.png`) });
-      // The legacy view keeps the two panels and no visual-redesign elements.
-      await expect(page.locator('[data-gold-panels]')).toBeVisible();
-      await expect(page.locator('[data-balance-visual]')).toHaveCount(0);
-      await expect(page.locator('[data-balance-context-line]')).toHaveCount(0);
+      // The flipped view: the lane balance renders, the panels are gone,
+      // and the inert ?balance=lanes parameter changes nothing.
+      await expect(page.locator('[data-balance-visual]')).toBeVisible();
+      await expect(page.locator('[data-balance-context-line]')).toBeVisible();
+      await expect(page.locator('[data-gold-panels]')).toHaveCount(0);
+      await expect(page.locator('#insights-gold-tailwind')).toHaveCount(0);
+      const withoutParam = await page.evaluate(() => document.querySelector('[data-signal-card="merged"]')!.innerHTML);
+      await page.goto('/insights?balance=lanes');
+      await page.waitForSelector('[data-signal-card="merged"]', { state: 'visible' });
+      await page.waitForTimeout(900);
+      const withParam = await page.evaluate(() => document.querySelector('[data-signal-card="merged"]')!.innerHTML);
+      expect(withParam).toBe(withoutParam);
     });
   }
 }
