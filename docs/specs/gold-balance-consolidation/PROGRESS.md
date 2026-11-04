@@ -655,9 +655,25 @@ everything AFTER the union's own close-out record (`00b4ccb`):
   `Insights-Ck9A6XE3.js`. The gb-s4 standing guards re-run on the P3
   build: **67/67 green** (gb-s4-visual 61 + the union probes 6, the
   hardened invocation).
-- **Merge + deploy:** recorded in the delivery note below (the
-  3c54dbe pattern — the record commit completes this block with the
-  merge SHA, the deploy and the production verification).
+- **Merge + deploy:** PR #20 merged as `1d1211c` (CI green on the
+  branch AND on main — the `gates` check, run 41754039288); the
+  deploy-lock check passed (the active version was the expected
+  `6549c5bc` @ 100% on deployment `9844fd4f` — no parallel session) and
+  `wrangler deploy` shipped **currena-api `a803f526` @ 100%**
+  (deployment `754dccb6`, 2026-11-04T01:28:07Z; the full record in
+  docs/DEPLOY.md's [2026-11-04b] session note). Production verified:
+  the 8/8 prod-verify matrix (both views × EN + fa × 360 + 1280, fresh
+  contexts) with **ZERO console errors**, the outlook probe reading
+  **neutral** in every flag cell and the legacy **bearish** in every
+  default cell; the live D-GB-6 read — **Balanced · "0 for · 0 against
+  · 4 not leaning" with gold −5.19% over 30 days → the gold chip
+  "Signs point to a neutral outlook for gold prices."** (the falling
+  month shows only as the context pill) — plus the collapsed-section
+  check ("Outlook: Neutral", lane-derived, beside silver's own "Outlook:
+  Mixed") and a VLM pass on the strip close-up (evidence/gb-s5/: 5
+  shots + the README, incl. the sticky-row environment note — the
+  app's section tabs sit over scrolled-under content identically on
+  both views; pre-existing chrome, the GB-S4c pattern).
 
 ## Owner must decide
 
