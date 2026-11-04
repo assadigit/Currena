@@ -1,19 +1,18 @@
 # Gold balance consolidation: spec set
 
-**Status:** IMPLEMENTED through P4 (2026-11-04) — P0–P4 landed through
-GB-S1..GB-S5 (PR #12, #15, #16, #17 + the #18 union, #20 + the #21
-record merge); the preview is complete at
-`currena.ir/insights?balance=lanes`. P5 (the owner-gated flip) is
-STAGED on the `gold-balance/p5-flip` branch, AWAITING the owner's
-recorded "go" (the hard gate — 04 §3 P5 + AC-12 + V-11: the owner
-reviews the live preview first; the Outlook word changing for every
-visitor is exactly why the gate exists, D-GB-10). On the recorded
-"go": the merge ships the flip (the consolidated balance becomes THE
-gold card for every visitor) and this line becomes IMPLEMENTED with
-the flip PR number. The engine + `goldSummary` + the harness stay
-frozen and running (D-GB-9); OI-3 (the wire field + the wind copy
-keys) is GB-S7's own owner round. The owner approved the full
-recommendation set in chat on 2026-10-31 and asked that each
+**Status:** IMPLEMENTED through P5 (2026-11-04) — **COMPLETE and LIVE**.
+P0–P4 landed through GB-S1..GB-S5 (PR #12, #15, #16, #17 + the #18
+union, #20 + the #21 record merge); **P5 (the owner-gated flip)
+shipped as PR #22 (merge `4f192c9`) + the record merge** — the hard
+gate (04 §3 P5 + AC-12 + V-11) was satisfied by the owner's recorded
+"go" on 2026-11-04 ("GO, I love the result so far.", after the live
+preview review) and the consolidated balance became **THE gold card
+for every visitor** (worker `0e7d7cb8` @ 100%; the 8/8 production
+matrix with ZERO console errors; the `?balance=lanes` parameter now
+inert). The engine + `goldSummary` + the harness stay frozen and
+running (D-GB-9); OI-3 (the wire field + the wind copy keys) is
+GB-S7's own owner round — the only remaining item. The owner approved
+the full recommendation set in chat on 2026-10-31 and asked that each
 recommendation be re-checked against the code before it is written
 down. This set is the result of that re-check (see "What the re-check
 changed").
@@ -56,12 +55,12 @@ Reading order: 01, 02, 03, 04, 05.
 
 | ID | Question | Proposed default |
 |---|---|---|
-| OI-1 | The Outlook sentences ("Signs point to a potential decline in gold prices" and the six siblings) were written by the owner. They state a forecast, which the backtest does not support. Reword? | Keep the seven states and their order. Reword the bullish and bearish sentences to describe conditions. Proposed text in 03 §6. Needs an FA copy round. |
-| OI-2 | The label of the "mixed" lane badge. | "Split" (EN). FA draft in 03 §6. |
-| OI-3 | When may `goldSummary` and the wind copy keys be removed? | Not before the 2026-11-02 armed check has run and `GOLD_RECHECK_SPEC.md` is updated. A separate PR. |
+| OI-1 | The Outlook sentences ("Signs point to a potential decline in gold prices" and the six siblings) were written by the owner. They state a forecast, which the backtest does not support. Reword? | **RESOLVED (2026-11-04, with the P5 go): keep the forecast wording, with hedging language — the shipped sentences already carry it (EN "Signs point to a potential…" / fa «نشانه‌ها حاکی از احتمال…»), so they ship unchanged in both locales.** 03 §6.3's consequence stands (no advantage claimed; the measured note + backtest link visible). The proposed conditions wording in 03 §6 stays on file as an option. |
+| OI-2 | The label of the "mixed" lane badge. | **SHIPPED (GB-S4, live since the flip): "Split" / «دوپاره».** |
+| OI-3 | When may `goldSummary` and the wind copy keys be removed? | Not before the 2026-11-02 armed check has run and `GOLD_RECHECK_SPEC.md` is updated. A separate PR. **(Preconditions hold; GB-S7's own owner round — the only remaining item.)** |
 | OI-4 | The silver Outlook has the same circularity (6 conditions, one of them silver's own 30-day footing). | Out of scope here. Recorded as a follow-up. |
-| OI-5 | Persian copy review round for all new strings. | Required before the preview flag is flipped (the `copy:audit` gate). |
-| OI-6 | Soften the one-sided beam tip (for example a 6 degree cap when fewer than 3 lanes vote)? | No. Keep the owner's current rule. Revisit after seeing the preview. |
+| OI-5 | Persian copy review round for all new strings. | **DONE — rounds 76–78 fingerprinted; the final owner read rode the P5 "go" (2026-11-04).** |
+| OI-6 | Soften the one-sided beam tip (for example a 6 degree cap when fewer than 3 lanes vote)? | No. Keep the owner's current rule. Revisit after seeing the preview. **(The owner saw the preview and shipped it as-is.)** |
 
 ## What the re-check changed (versus the chat recommendations)
 

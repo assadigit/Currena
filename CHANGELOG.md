@@ -5,6 +5,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-04d] — gold-balance P5 (GB-S6 + GB-S6b): THE FLIP SHIPPED — the hard gate satisfied by the owner's recorded "go" (2026-11-04: "GO, I love the result so far.", after the live preview review EN+fa/desktop+mobile/light+dark) and the consolidated lane balance is THE gold card for EVERY visitor (PR #22 merged `4f192c9`, CI green on branch + main; DEPLOYED currena-api `0e7d7cb8` @ 100%, deployment `7c6a0315` — the deploy-lock check cleared first against GB-S5's `a803f526` @ 100%; post-deploy smoke green; the production matrix 8/8 PASS with ZERO console errors — both legs (the default page + the inert ?balance=lanes parameter, byte-identical in all 4 EN/fa × 360/1280 cells) render the lane balance: 4 weights + 4 ledger rows, Balanced/«متعادل», the Split/«دوپاره» badge, the lane-derived outlook neutral with the hedged sentence, AC-8's honesty elements visible, the wind scan clean in both locales; the deployed chunk Insights-B4EBvpCM.js fetched from currena.ir and measured 1,526,974 bytes, byte-identical to the verified local build) + OI-1 RESOLVED with the go (keep the forecast wording, with hedging language — the shipped sentences already carry it, EN "Signs point to a potential…" / fa «نشانه‌ها حاکی از احتمال…», so they ship unchanged; the 03 §6.3 consequence stands) + the program COMPLETE except GB-S7/OI-3 (the goldSummary wire field + the wind copy keys — its own owner round, the prompt rewritten in PROMPTS.md)
+
+The owner's "go" + "COMMIT PUSH MERGE ON THE MAIN BRAIN DEPLOY." —
+executed per DEPLOY.md's [2026-11-04c] AT-FLIP-TIME procedure verbatim
+by the GB-S6b continuation session (which had first re-verified the
+staged branch in a fresh clone: gates 9/9 GREEN 14,578 re-run + the
+gb-s4 standing guards 67/67 + CI green on the branch heads). This
+heading's records: PROGRESS.md's GB-S6 log completed (the gate
+satisfied + the deploy + the matrix + the AC-12/V-11 lines + the
+program close), the final acceptance walk every-AC-green, the
+Owner-must-decide set resolved (P5 DECIDED, OI-1 RESOLVED, OI-5's
+final read done, OI-2/the collapsed corner LIVE, OI-3 the only
+remaining item), DEPLOY.md's [2026-11-04c] note flipped to the
+DEPLOYED facts, the spec README's Status → IMPLEMENTED through P5
+(COMPLETE and LIVE) with the open items resolved, AGENTS.md's
+gold-balance paragraph → P5 FLIPPED/SHIPPED/LIVE, the GB-S7 prompt
+finalized with the exact shipped state (test baseline 14,578/web
+12,619, bundle 1526.97/354.18 ceiling 1535/355, CHANGELOG count 196,
+the OI-1 resolution, the record-PR merge), and AGENT_HANDOFF.md
+finalized (the program delivered; the next session is GB-S7). One
+pre-existing, UNRELATED failure noted honestly: the scheduled
+insights-ingest GHA run on the merge commit (event=schedule, the
+belt-and-braces venue) failed on P1 FX fetches (frankfurter — last
+good values held, flagged stale; the designed "product degraded"
+exit); the Worker's own minute-cron (the PRIMARY venue) was healthy
+and the flip diff touches web UI + docs only.
+
 ## [2026-11-04c] — gold-balance P5 (GB-S6): THE FLIP STAGED on gold-balance/p5-flip — the consolidated balance for every visitor, behind the owner gate (the ?balance=lanes code + the `visual` prop + BalanceScale's whole legacy branch + the two gold panels RETIRED; the gold Outlook + the collapsed takeaway AND the summary prose (the collapsed-corner decision: metalLeanLanes, fa round-78) unconditional, outlookOf stays for silver only; a fresh flipped-view snapshot the byte-stability pin; the bundle re-baselined DOWNWARD 1560/360 → 1535/355 — measured 1526.97/354.18, Insights-TjkEDaYV.js; gates 9/9 GREEN 14,578; the gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) — NOT merged, NOT deployed: the owner's recorded "go" is the remaining gate, AC-12 + V-11)
 
 GB-S6 (branch `gold-balance/p5-flip`, draft PR — the hard gate of

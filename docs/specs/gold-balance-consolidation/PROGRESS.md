@@ -20,13 +20,13 @@ actually executed. The gap-closure program that ran in parallel is CLOSED
 | G | P2b: the visual redesign of the balance behind the same flag (05) | ✅ DONE (GB-S4 2026-11-03 + the GB-S4b parallel-session union 2026-11-04) — branch gold-balance/p2b-visual (PR #17, merged `bc566e9d`); the owner's 05-VISUAL-DESIGN-SPEC implemented from the approved reference prototype: the brass stage (beam + 11-tick dial + column + bowl pans), the lane WEIGHTS with segmented rims (the NEW BalanceWeight.tsx), the verdict word as the hero, the Not-leaning tray, the four-row inline LEDGER (the same member content contract); --bal-* tokens light+dark with the measured AA ratios (the full table in evidence/gb-s4/README.md); the default view still byte-identical (the snapshot pin untouched, the 46 pure-geometry tests green); 14 new copy keys EN+fa through round-77; the lane tests rewritten 19 → 35 + the gb-s4 Playwright V-1..V-10 suite (61 tests, 6 engine-verified scenarios, 70 screenshots); gates 9/9 GREEN 14,598 (web 12,623 → 12,639); Insights lazy 1550.46/358.81 — ceiling 1560/360 justified; the UNION (PR #18, merged `8a99e03`): the second session's verification + the dark rim hues + the 6 standing union-probe guards, deployed as currena-api `6549c5bc` @ 100% + the 8/8 production matrix (see GB-S4b below) |
 | H | P3: the gold Outlook card derived from the unified balance behind the flag (01 §5.2, 04 §3) | ✅ DONE (GB-S5, 2026-11-04) — branch gold-balance/p3-outlook; `goldOutlookOf` in verdict.tsx (unread===4 → null; L≥GOLD_LANE_STRONG(3) strong-bullish / A≥3 strong-bearish; the range evidence UNCHANGED — |change30d|<2% ∧ typical band ∧ |L−A|≤1 → range-bound; L==A → mixed/neutral; else bullish/bearish; footing counted NOWHERE, AC-7) fed by the SAME goldBalance() result as the lane drivers + the verdict word (AC-3 — strip, collapsed takeaway and balance cannot disagree); silver's leg + the default view untouched (OI-4, the legacy snapshot); the 04 §4.2 table test (outlook 15 → 26) + the wiring/consistency pins (lanes 35 → 44); gates 9/9 GREEN 14,618; the gb-s4 standing guards re-run 67/67 |
 | I | P4: the copy close — every new key triaged, the terminology, OI-5 (04 §3) | ✅ DONE (GB-S5, 2026-11-04) — the full GB-S3/GB-S4 set CONFIRMED in the manifest (round-76 17 + round-77 15 entries, copy:audit clean); NO new keys this session (OI-1 unanswered → the owner's existing seven sentences ship, the forecast-wording note recorded); fa round-78 NOT created; persian-terminology.md gains the gold-balance lane section (Split / «دوپاره», the lane states, the tally wording, the counts + context lines); OI-5 recorded satisfied-pending-final-owner-read |
-| J | P5: the owner-gated flip — default on, delete the panels, bundle re-baseline, docs (04 §3 P5, §1) | 🔶 STAGED (GB-S6, 2026-11-04) — the FULL flip work is staged on the branch `gold-balance/p5-flip` (draft PR) behind the hard gate: the gate code retired (useBalanceLanesPreview + balanceLanes threading + the `visual` prop + BalanceScale's whole legacy branch + the legacy snapshot), the two panels + their test parts deleted (the surviving assertions moved), the goldOutlook derivation + the collapsed takeaway + THE CORNER DECISION (the gold summary prose joins the lane model at BOTH sites — the collapsed line AND the merged card's header; `metalLeanLanes` EN+fa round-78; silver untouched, OI-4) unconditional, a fresh vitest snapshot of the flipped view the byte-stability pin, the bundle re-baselined DOWNWARD 1560/360 → 1535/355 (measured 1526.97/354.18, Insights-TjkEDaYV.js), the docs set drafted (GOLD_SCORE_SPEC + INDICATORS + AGENTS + the README Status + DEPLOY), harness conversions (gb-s4-visual's default-view tests + prod-verify's matrix — both legs now read the flipped view + the inert-param proof); local gates ALL 9 GREEN 14,578 (web 12,619) + the gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) — **NOT MERGED, NOT DEPLOYED: the owner's recorded "go" is the remaining gate (AC-12 + V-11 + 04 §3 P5)** |
+| J | P5: the owner-gated flip — default on, delete the panels, bundle re-baseline, docs (04 §3 P5, §1) | ✅ LANDED (GB-S6 + GB-S6b, 2026-11-04) — the hard gate satisfied: the owner reviewed the live preview and recorded the explicit "GO, I love the result so far." in chat on 2026-11-04 (with the OI-1 decision: keep the forecast wording — the shipped sentences already carry the hedging language, EN "Signs point to a potential…" / fa «نشانه‌ها حاکی از احتمال…»; no copy change). **PR #22 merged `4f192c9`** (the staged branch: the gate code retired, BalanceScale visual-only, the two panels deleted, goldOutlookOf the only gold path, the collapsed-corner prose on the lane model, the bundle re-baselined downward 1535/355 measured 1526.97/354.18); CI `gates` green on the branch AND on main (run 41827725767); **DEPLOYED currena-api `0e7d7cb8` @ 100%** (deployment `7c6a0315`, 2026-11-04T12:21:01Z; the deploy-lock check cleared first — production was at GB-S5's `a803f526` @ 100%); post-deploy smoke green (health ok/kv ok · `/` 200 · `/api/insights` 200 fresh, goldSummary still on the wire, AC-9); **the production matrix 8/8 PASS, ZERO console errors** (both legs — the-default-page + the-inert-parameter — byte-identical 4/4 cells, EN + fa, 360 + 1280, fresh contexts; the lane balance everywhere, the panels absent, AC-8's honesty elements visible, the wind scan clean in both locales, the header lane prose beside the balance); the deployed chunk `Insights-B4EBvpCM.js` fetched from production and measured **1,526,974 bytes — byte-identical to the verified local build** |
 
-Next: the owner's P5 decision on the staged branch (the recorded
-"go" merges + deploys + completes the walk below), then GB-S7 (OI-3,
-its own owner round). The preview remains live for the review at
-`currena.ir/insights?balance=lanes` — the production site is UNTOUCHED
-until the recorded "go".
+**PROGRAM COMPLETE (2026-11-04):** every milestone A–J delivered; the
+consolidated lane balance is THE gold card for every visitor on
+currena.ir (worker `0e7d7cb8`). What remains is GB-S7 — OI-3, its own
+owner round (the `goldSummary` wire field + the wind copy keys
+retirement; the rewritten prompt is in PROMPTS.md).
 
 ## Session log
 
@@ -763,21 +763,52 @@ the owner's review surface).
   at the re-based ceiling. The gb-s4 standing guards re-run on the
   branch build: **67/67 (gb-s4-visual 61 + the union probes 6)** (gb-s4-visual 61 + the union probes 6,
   via visual/playwright.config.ts from apps/web).
-- **NOT done (the gate):** merge, deploy, the production matrix, the
-  final AC-12 line. The owner's review of the live preview (EN + fa,
-  desktop + mobile, light + dark) is REQUESTED; on the recorded "go"
-  this session's merge ships the branch, the deploy follows
-  (deploy-lock check first — the active version is expected to be
-  GB-S5's a803f526), the production matrix runs (EN + fa, 360 + 1280,
-  fresh contexts, zero console errors), and the AC/V walk below
-  completes.
+- **THE GATE — satisfied, and the flip shipped (2026-11-04, the GB-S6b
+  continuation session):** the owner's recorded "go" ("GO, I love the
+  result so far." — chat, 2026-11-04, with "COMMIT PUSH MERGE ON THE
+  MAIN BRAIN DEPLOY") + the OI-1 decision ("Keep the forecast wording,
+  but with hedging language" — the shipped sentences already carry the
+  hedging, both locales, so they ship unchanged). The execution, per
+  DEPLOY.md's [2026-11-04c] AT-FLIP-TIME procedure verbatim:
+  deploy-lock check CLEAR (production at `a803f526` @ 100% / deployment
+  `754dccb6` — GB-S5's, no parallel session) → **PR #22 merged
+  `4f192c9`** (marked ready + merged with a merge commit; CI `gates`
+  green on the branch — runs 41766830519 on `83adbdb` and 126554141955
+  on `cc1ba2c` — and on main, run 41827725767) → build + deploy (**currena-api
+  `0e7d7cb8` @ 100%, deployment `7c6a0315`, 2026-11-04T12:21:01Z**; the
+  built Insights lazy 1526.97/354.18 exactly at the re-based ceiling) →
+  smoke green (health ok/kv ok · `/` 200 · `/api/insights` 200, fresh
+  at 12:18Z — the Worker's own minute-cron ingest healthy) → **the
+  production matrix 8/8 PASS, ZERO console errors** (prod-verify.mjs:
+  both legs — the default page and the inert `?balance=lanes`
+  parameter, proven byte-identical in all 4 EN/fa × 360/1280 cells —
+  render the lane balance: 4 weights + 4 ledger rows, Balanced /
+  «متعادل», the Split/«دوپاره» badge, the lane-derived outlook reading
+  **neutral** in every cell with the hedged sentence, the context line
+  + measured note + backtest link visible without a tap, the header
+  lane prose "Gold: Balanced, 0 for · 0 against · 4 not leaning" /
+  «طلا: متعادل؛ ۰ موافق · ۰ مخالف · ۴ بدون گرایش», the wind scan
+  clean in both locales, zero overflow, ZERO console errors) → the
+  deployed chunk `Insights-B4EBvpCM.js` fetched from currena.ir and
+  measured **1,526,974 bytes, byte-identical to the verified local
+  build**.
+- **A pre-existing, UNRELATED failure noted honestly (not this
+  program's):** the scheduled `insights-ingest` GHA run on the merge
+  commit (run 41827914050, event=schedule — the belt-and-braces venue)
+  failed on P1 FX fetches (frankfurter: dollar-basket, usdjpy, audusd,
+  audjpy, gold-aud, audnzd — last good values held, flagged stale; the
+  designed "product degraded" exit). The Worker's own minute-cron —
+  the PRIMARY venue — was healthy (the live snapshot at 12:18Z is
+  fresh) and the flip diff touches web UI + docs only. Flagged for the
+  owner; not a balance regression.
 
 ## The final acceptance walk (04 §6 AC-1..AC-12 + 05 §12 V-1..V-10)
 
-Staged evidence from the branch (the local gates + the jsdom/Playwright
-suites); the production columns complete at flip time.
+Walked at the staging (the local gates + the jsdom/Playwright suites)
+and COMPLETED at the flip (the production columns below; 2026-11-04).
+Every AC is green.
 
-| ID | Criterion | Staged evidence |
+| ID | Criterion | Evidence (staged + production) |
 |---|---|---|
 | AC-1 | One gold instrument; no wind/model-vs-reality panel remains | The AC-1 pin (gold-balance-lanes.test.tsx): no `data-gold-panels`, no `#insights-gold-tailwind`, no `#insights-gold-model-vs-reality`, no `data-gold-label` anywhere; the flipped-view snapshot carries the balance only; the gb-s4/prod-verify probes assert the same in the browser |
 | AC-2 | Every one of the 21 voters reachable from a lane chip | The ledger member-list pins (the fixture's 8-member borrowing-costs row + steady/unread groups + the deep links); balance.test.tsx's export-surface pin keeps the table intact (21, D-GB-9) |
@@ -790,39 +821,35 @@ suites); the production columns complete at flip time.
 | AC-9 | goldTailwindScore, goldSummary + the frozen harness tables unchanged, tests pass | D-GB-9 held: gold-score.ts/schemas/snapshot.ts/apps/api untouched; the engine tests green; the wire field still arrives + validates (the UI simply does not read it) |
 | AC-10 | The calibration report exists, states n, pre-registered criteria, no edge | BACKTEST-GOLD-LANES.md (GB-S1, unchanged) |
 | AC-11 | The 2026-10-31 fixture reproduces 01 §7 | The engine fixture test (GB-S2) + the fixture pins in the lanes suite (Balanced · 0-0-4) |
-| AC-12 | All gates pass + the owner's approval recorded BEFORE the flip | 🔶 PENDING — the hard gate: the owner's review of the live preview (EN+fa, desktop+mobile, light+dark) + the recorded "go" in this file. The staged branch does not merge without it |
-| V-1..V-10 | The visual criteria (05 §12) | The gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) on the branch build (V-1..V-10 were walked at GB-S4 with the same visual branch — the flip makes it unconditional; the default-view tests now assert the same view for every visitor); V-11 = the owner's live read — the same PENDING as AC-12 |
+| AC-12 | All gates pass + the owner's approval recorded BEFORE the flip | ✅ SATISFIED — the owner's explicit "go" recorded in chat on 2026-11-04 ("GO, I love the result so far."), AFTER the live preview review and BEFORE the merge; the gates 9/9 GREEN 14,578 on the branch + CI green on branch and main; the merge `4f192c9` and the deploy `0e7d7cb8` @ 100% followed |
+| V-1..V-10 | The visual criteria (05 §12) | ✅ The gb-s4 standing guards 67/67 (gb-s4-visual 61 + the union probes 6) — walked at GB-S4, unconditional since the flip, re-verified on the merged build in a fresh environment (GB-S6b); the production matrix confirms the same view for every visitor; **V-11 = the owner's live read — SATISFIED: "GO, I love the result so far." (2026-11-04)** |
 
 ## Owner must decide
 
-1. **THE P5 DECISION (the hard gate — AC-12 + V-11 + 04 §3 P5):** review
-   the live preview at `currena.ir/insights?balance=lanes` — EN + fa,
-   desktop + mobile, light + dark — and record your explicit "go" (or
-   your changes). The FULL flip work is staged on
-   `gold-balance/p5-flip` (the draft PR); on the recorded "go" it
-   merges, deploys and completes the AC/V walk above. The production
-   site is untouched until then — the Outlook word changing for every
-   visitor is exactly why this gate exists (D-GB-10).
-2. **OI-1 was asked twice (GB-S5, and again at the GB-S6 staging) and
-   remains OPEN:** the seven gold outlook sentences still read as a
-   forecast ("Signs point to a potential …"), which the backtest does
-   not support — 03 §6.3's recorded consequence stands. Since the flip,
-   rewording them is a normal copy change (03 §6.3's table has the
-   proposed conditions wording + the fa drafts; a small copy-only
-   session whenever you say yes).
-3. **OI-2 shipped** (the Split badge / «دوپاره», GB-S4) and is visible
-   in the preview (the tray weight's badge + the ledger's split state
-   word) — now part of the P5 review above.
-4. **The collapsed-corner DECISION was made and recorded at the
-   staging (GB-S6):** the gold summary prose (the collapsed line AND
-   the card header) joined the lane model (`metalLeanLanes`, fa
-   round-78); silver keeps the legacy sentence (OI-4). It is part of
-   the staged branch — veto it in the P5 review if you disagree and it
-   reverts with the branch.
-5. **OI-5's final owner read** rides the P5 review above (every fa
-   string behind the flag is reviewed + fingerprinted, rounds 76–78).
-6. OI-3 (goldSummary + the wind copy keys retirement) is NOT this
-   session's — GB-S7, its own owner round; its preconditions hold (the
+1. **THE P5 DECISION — DECIDED (2026-11-04):** the owner reviewed the
+   live preview and recorded the explicit "go": **"GO, I love the
+   result so far."** — followed by "COMMIT PUSH MERGE ON THE MAIN
+   BRAIN DEPLOY." The flip shipped the same hour (PR #22 `4f192c9`,
+   worker `0e7d7cb8` @ 100%, the 8/8 production matrix above).
+2. **OI-1 — RESOLVED (2026-11-04, with the go):** "Keep the forecast
+   wording, but with hedging language." The shipped sentences already
+   carry the hedging — EN "Signs point to a potential rise/decline…",
+   fa «نشانه‌ها حاکی از احتمال…» — so they ship UNCHANGED in both
+   locales; the 03 §6.3 consequence stands (no advantage claimed
+   anywhere; the measured note + the backtest link stay visible on the
+   card). No rewording session is needed; 03 §6.3's proposed table
+   stays on file as an option the owner can revive anytime.
+3. **OI-2 shipped** (the Split badge / «دوپاره», GB-S4) and rode the
+   owner's P5 review — live for every visitor since the flip.
+4. **The collapsed-corner decision rode the P5 review and is LIVE:**
+   the gold summary prose (the collapsed line AND the card header) on
+   the lane model (`metalLeanLanes`, fa round-78); silver keeps the
+   legacy sentence (OI-4). Confirmed in the production matrix (the
+   header lane prose read in all 8 cells).
+5. **OI-5 — the final owner read DONE** (the "go" above covers it:
+   every fa string reviewed + fingerprinted, rounds 76–78).
+6. OI-3 (goldSummary + the wind copy keys retirement) is GB-S7's own
+   owner round — the ONLY remaining item; its preconditions hold (the
    recheck record from GB-S1 exists). OI-4/OI-6 unchanged.
 
 ## Standing constraints (every session)
