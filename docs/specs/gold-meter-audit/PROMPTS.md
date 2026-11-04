@@ -68,25 +68,38 @@ which starts by resolving the lock.**
 
 ## GA-S2-COMPLETION — the wiring evidence pack (A2's deferred half; the live kickoff)
 
-RUN (2026-11-05) — **FALLBACK AGAIN (the lock still unresolved)**: the owner
-was not reachable in-session (the second consecutive session) and left no
-decision in the repo, so the session executed only this prompt's explicit
-fallback — the lock-nothing re-verification: the drift record
-`evidence/wire-scan-2026-11-05.txt` committed (the denominators, the GB-S7
-retirement and all 21 voters verified holding; the day's deltas — the healed
-dollar lane, `ecb-dfr` gone stale, `usdcny` the only `check-pending` — noted
-in PROGRESS's session block). The voters table (03 §1.1) and the wiring
-trace + the context traces + the history depths (03 §2) remain DEFERRED —
-wiring work against the unlocked denominator (D-GA-1). **The prompt below is
-re-issued with the exact state — the next session starts by resolving the
-lock (OI-GA-1), whose question is printed in the GA-S2-completion session's
-final message.**
+RUN (2026-11-05, attempt 3) — **COMPLETE: THE LOCK RESOLVED + A2 DELIVERED.**
+The owner reached back in chat and **delegated the research-and-lock**
+("I trust your research and judgement. if you think its enough, it's enough
+and locked by me."). The session's pre-lock research pass cross-checked the
+coverage against the canonical driver frameworks (Chicago Fed Letter 464's
+four-driver set · the WGC demand-side framework), re-verified every named
+free source live (52 FRED ids + 11 providers — the identical live/dead
+pattern GA-S1 recorded), **added 3 rows** (S13 US household pessimism /
+Michigan `UMCSENT` — the Chicago Fed's named pessimism driver, already
+ingested as `michigan-sentiment` (promotion-class) · F16 Swiss gold net
+exports by destination — BAZG SwissImpex verified live · X7 gold/platinum
+ratio — gold-api XPT verified live), recorded the rest as
+considered-not-added with reasons, and **LOCKED 02 as v1.1 = 85 rows**
+(the lock record at 02's foot). Then A2 completed against the locked
+denominator: `inventory.md` §5 (the 21-seat voters table, verbatim, with
+the evalLeg rule per seat), `evidence/wiring.md` (the 21 full traces — no
+TRACE-BROKEN hops — + the 63 context traces + five recorded findings,
+including the ANSWER to the 2026-11-05 drift record's ecb-dfr question:
+the failed-fetch hold drops both derived fields, snapshot.ts:451-465), and
+`evidence/history-depths-2026-11-05.txt` (the runnable
+`ga-s2-history-depths.sh`: cftc **1 pt / base 0 / 0-of-9 days**;
+us-japan-10y-gap **21 pts / base 20 / pct 6-of-9 days**; gold-silver
+**122 pts / base 119 / ch30d 0-of-19 days**). PROGRESS row B → COMPLETE.
+
+---
+
+## GA-S3 — the coverage matrix + the half-implementation audit (the live kickoff)
 
 ```
-You are working in the Currena repo at the repo root. This is the
-GA-S2-completion session of the gold meter audit program — the owner's
-continuation of the gold program. Read this whole prompt before doing
-anything.
+You are working in the Currena repo at the repo root. This is the GA-S3
+session of the gold meter audit program — the owner's continuation of the
+gold program. Read this whole prompt before doing anything.
 
 CONTEXT — WHERE WE STAND
 The gold balance consolidation program is COMPLETE and LIVE (closed
@@ -97,150 +110,145 @@ with 20 years specialization in gold exchange, create an audit program to
 make sure that our gold meter has all the required indicators which
 classically show the direction of gold price. Make sure nothing is missed
 or half-implemented." The spec set is docs/specs/gold-meter-audit/.
-GA-S1 DELIVERED (2026-11-04, PROGRESS.md row A): the 82-row taxonomy v1,
-verified live, swept, pre-scanned — delivered for the owner's lock.
-GA-S2 ran (2026-11-04, PROGRESS.md row B PARTIAL): the owner was NOT
-reachable in-session, so the session took the prompt's explicit fallback —
-the inventory's SOURCE-SIDE work only (03 §1.2–§1.4) and a hard stop
-before the voter wiring trace. What shipped: evidence/inventory.md (the
-full 161-row readings table — every id with source · series ref, cadence,
-staleness window, layer, licence, gauge role, the mirror-sweep mark and
-the day's wire state; the mirror-sweep tally voter 21 · context 63 ·
-not-gold 77 = 161; the 25 derived-series recipes with exact formulas and
-path:line cites; the rung map per docs/gap-closure/RUNGS.md) and the
-runnable record packages/insights/scripts/ga-s2-wire-scan.sh with its
-committed run evidence/wire-scan-2026-11-04.txt (the wire: 161 readings,
-goldSummary absent — the GB-S7 retirement verified holding; all 21 voters
-present; the day's states recorded as facts). What did NOT ship: the
-voters table (03 §1.1), the wiring trace + the context traces + the
-history depths (03 §2) — deferred because the trace needs the LOCKED
-denominator. 02-REFERENCE-TAXONOMY.md is untouched (v1, unlocked).
-GA-S2-COMPLETION RAN (2026-11-05, PROGRESS.md row B still PARTIAL): the
-owner was NOT reachable in-session AGAIN (the second consecutive session)
-and left no decision in the repo (no commits after the GA-S2 merge,
-PR #28 zero comments, no new issues; 02 still v1/unlocked), so the session
-took this prompt's explicit fallback — the lock-nothing re-verification
-ONLY: ga-s2-wire-scan.sh re-run against the fresh wire (the 20:10-UTC-sweep
-snapshot, generatedAt 2026-11-04T20:10:18.690Z) with the dated drift record
-committed as evidence/wire-scan-2026-11-05.txt. The holds: 161 readings =
-161 DEFINITIONS ids; goldSummary absent — the GB-S7 retirement verified
-holding, the second consecutive scan; all 21 voters present; the doc-table
-159-row drift and the GAUGES 12/68/48 + 4-shadow cross-checks unchanged;
-every static scan column identical across the two runs — no code moved.
-The day's notable deltas (facts, in PROGRESS's session block): the dollar
-lane healed (dollar-basket + usdjpy stale → normal, both evalLeg inputs
-present); ecb-dfr flipped normal → stale (asOf unchanged, both inputs now
-absent — the WHY is the post-lock wiring trace's job); usdcny the only
-check-pending; 21/161 rows drifted, 140 identical. What did NOT ship
-(again): the voters table (03 §1.1), the wiring trace + the context traces
-+ the history depths (03 §2) — still deferred, still blocked on the lock.
-02-REFERENCE-TAXONOMY.md is untouched (v1, unlocked).
-Repo state: main holds the GA-S2-completion fallback merge (PR "gold meter
-audit (GA-S2 completion): the wiring evidence pack" #29 — the fallback
-scope is recorded in the PR body and PROGRESS row B); git pull --rebase
-before starting.
-
-RESOLVE THE LOCK FIRST (OI-GA-1)
-BEFORE any wiring work: ask the owner to LOCK or AMEND the 82-row v1
-taxonomy. D-GA-1 is absolute: the taxonomy is the fixed denominator — do
-not map any wiring against an unlocked checklist. If the owner amends:
-record the amendment in 02 as an owner-recorded decision with its date (a
-dated amendment block at the file's foot; the row count restated), in
-PROGRESS.md's session block, and re-state the arithmetic in any downstream
-file that quotes it. If the owner locks: write the lock line into 02's
-status header ("LOCKED by the owner, <date>" — after that, additions are
-owner-recorded amendments only) and PROCEED with the work items below.
-If the owner is not reachable in-session AGAIN (this fallback has now
-fired twice — GA-S2 on 2026-11-04, GA-S2-completion on 2026-11-05): do
-only the lock-nothing re-verification — re-run ga-s2-wire-scan.sh against
-the fresh wire, commit dated output under evidence/ as
-wire-scan-<date>.txt (the day-to-day drift record — the series
-2026-11-04, 2026-11-05, … continues), note any deltas in PROGRESS.md's
-session block — and end the session with the lock question printed. Do
-NOT start the voters table, the wiring trace or the history depths: they
-are wiring work against the denominator.
+THE DENOMINATOR IS LOCKED: GA-S1 (2026-11-04) delivered the 82-row taxonomy
+v1; on 2026-11-05 the owner delegated the research-and-lock to the audit
+("I trust your research and judgement. if you think its enough, it's enough
+and locked by me."), the GA-S2-completion session's pre-lock research pass
+cross-checked the coverage against the canonical driver frameworks
+(Chicago Fed Letter 464 · WGC demand-side), re-verified every named free
+source live, added 3 rows (S13 · F16 · X7 — the owner's recorded pre-lock
+amendment) and LOCKED 02-REFERENCE-TAXONOMY.md as **v1.1 = 85 rows**
+(the lock record with the verbatim owner instruction is at 02's foot).
+From here additions are owner-recorded amendments with dates only (D-GA-1).
+A2 IS COMPLETE (GA-S2 2026-11-04 source-side + GA-S2-completion 2026-11-05
+the deferred halves — PROGRESS rows A and B both ✅):
+  - evidence/inventory.md — the 161-row readings table (the mirror sweep:
+    voter 21 · context 63 · not-gold 77 = 161), the 25 derived-series
+    recipes, the rung map (RUNGS.md canonical), AND §5 the voters table:
+    the 21 seats of GOLD_LANE_VOTERS (gold-score.ts:155-184) verbatim with
+    line numbers and THE EVALLEG RULE PER SEAT — 4 of 21 carry a
+    SIGNAL_LEG_MOVE threshold (real-yield-10y 0.1 pts · us10y 0.15 ·
+    dollar-basket 1.0 · breakeven-5y5y 0.1, connections.ts:575-585), 17 are
+    LEVEL-LEG ONLY; the level leg = percentile10y bands <0.2/>0.8 over the
+    trailing-3650d of the LEVEL series (scoring.ts:63/115-120, ≥30-obs gate
+    scoring.ts:72); the monthly seats express previous-release change
+    (scoring.ts:425-427); usdjpy is the only pct seat; breakeven-tilt the
+    only context-status seat (readable() admits it, gold-balance.ts:127-129).
+  - evidence/wiring.md — the full chain for EACH of the 21 voters (source
+    endpoint → adapter file:fn → rung → reading + staleness → evalLeg
+    inputs → seat → the visitor's member line, MergedCard.tsx:113/220-224),
+    NO TRACE-BROKEN hops, + the 63 context traces (D-GA-4) ending in
+    "never votes", + five recorded findings: (1) cftc-gold-positioning the
+    never-fires seat; (2) us-japan-10y-gap the intermittent percentile
+    (ingest/run.ts:886-899); (3) gold-silver the thin union base;
+    (4) ecb-dfr — the failed-fetch hold drops both derived fields
+    (snapshot.ts:451-465 — the 2026-11-05 drift question answered);
+    (5) the structural 17-of-21 level-only finding.
+  - evidence/history-depths-2026-11-05.txt — the committed run of the
+    read-only keyless fetchless packages/insights/scripts/
+    ga-s2-history-depths.sh (the corpus fixture + source parses only):
+    15 voters PASS (bases 2,495–3,649 pts), the monthly three 118–119 pts,
+    the suspects numbered — cftc 1 pt / base 0 / 0-of-9 archive days;
+    us-japan-10y-gap 21 pts / base 20 / pct 6-of-9 · ch30d 1-of-9 days;
+    gold-silver 122 pts / base 119 / ch30d 0-of-19 days (both fields
+    present on the 2026-11-04/05 wires — the live tail aged past 30 days).
+  - The scan family: ga-s2-wire-scan.sh + wire-scan-2026-11-04/-05.txt
+    (the day-to-day drift record; re-run it fresh this session if useful —
+    read-only, keyless).
+Repo state: main holds the GA-S2-completion merge (PR "gold meter audit
+(GA-S2 completion): the wiring evidence pack" — the lock + A2 complete);
+git pull --rebase before starting.
 
 WHAT THIS SESSION IS
-The completion of A2 (01 §2; 03 §1.1 + §2): the voters table, the wiring
-trace, the context traces and the history depths — the wiring evidence
-pack the partial GA-S2 deferred. This session still classifies NOTHING
-(GA-S3's job) and edits no meter code (D-GA-3).
+GA-S3 (01 §2 A3; 03 §3–§4): **the coverage matrix classified + the
+half-implementation defect list** — the audit's first verdict-bearing
+session. Every one of the 85 taxonomy rows gets exactly one class from the
+fixed rubric (01 §6: COVERED · PARTIAL · MISSING-FREE · MISSING-PAID ·
+CONTEXT-ONLY-BY-DESIGN · NOT-APPLICABLE), every one of the 21 voters maps
+to exactly one row (or is flagged UNCLASSICATED — a defect by definition),
+and the H1–H7 half-implementation checks run per voter. The output:
+evidence/coverage-matrix.md + evidence/half-implementation.md, with the
+header arithmetic stated (01 §5: rows classified = 85; voters mapped = 21).
+This session still edits NO meter code (D-GA-3) and deploys nothing.
 
 WORK ITEMS (in order)
-1. READ FIRST: docs/specs/gold-meter-audit/README.md, 01-AUDIT-SPEC.md,
-   02-REFERENCE-TAXONOMY.md (the LOCKED denominator — after the lock is
-   resolved), 03-METHOD-AND-EVIDENCE.md (§1.1 + §2 are this session's
-   procedures), 04-REPORT-AND-FILL-DESIGN.md, PROGRESS.md (the GA-S1 +
-   GA-S2 + GA-S2-completion blocks — the verified source record, the
-   delivered source-side inventory and the drift record), PROMPTS.md; then docs/INDICATORS_AND_DATA-
-   SOURCES.md, the audited object's record (docs/specs/gold-balance-
-   consolidation/02-ENGINE-AND-DECISION-TABLE.md §4 — the 21-voter table),
-   docs/insights/GOLD_SCORE_SPEC.md, evidence/inventory.md + evidence/
-   wire-scan-2026-11-04.txt + evidence/wire-scan-2026-11-05.txt (the
-   delivered half + the drift records — build on them, do not redo them),
-   and the code itself: packages/insights/src/gold-score.ts
-   (GOLD_LANE_VOTERS), connections.ts (evalLeg + SIGNAL_LEG_MOVE —
-   note: only 4 of the 21 voter ids carry a 30-day move threshold),
-   gold-balance.ts. Then git pull --rebase.
-2. THE VOTERS TABLE (03 §1.1): append to evidence/inventory.md — the 21
-   seats of GOLD_LANE_VOTERS transcribed VERBATIM with line numbers
-   (id, lane, polarity, the evalLeg rule that applies: which leg — move
-   vs level — the voter can actually express, given SIGNAL_LEG_MOVE's
-   coverage, and the percentile basis). The scan's §2 already prints each
-   voter's gold-score.ts line number — verify against the code, never
-   against the scan alone.
-3. THE WIRING TRACE (03 §2): for EACH of the 21 voters, one row in
-   evidence/wiring.md — source endpoint → adapter (file, fn) → rung →
-   reading id → staleness window → evalLeg inputs (which history, which
-   percentile basis) → seat (lane, polarity) → what the visitor sees.
-   Cite path:line for every hop; a hop that cannot be shown is
-   TRACE-BROKEN — itself a finding. Abbreviated traces for every
-   context-marked gold-relevant series (the 63 of the mirror sweep),
-   ending in the card it renders on and the explicit note "never votes".
-   The rung column comes from inventory.md §3 (RUNGS.md is canonical).
-4. THE HISTORY DEPTHS (03 §2, the numbers GA-S3 needs): read the stored
-   corpus — packages/insights/fixtures/gold-backtest-corpus.json (the
-   gold-corpus-dump record, recordedAt 2026-11-03T04:43:54Z: the staged
-   series for the 21 voters + gold-usd + the tilt/cross-fill legs + the
-   daily goldHist + the archive days) and the KV-dump fixtures — READ-ONLY;
-   do NOT run the production worker or write KV. Write a read-only script
-   under packages/insights/scripts/ (the ga-s1-fred-verify.sh /
-   ga-s2-wire-scan.sh / gold-corpus-dump precedents) that counts, per
-   voter, the points evalLeg can reach today — the quantified basis for
-   the known suspects (cftc-gold-positioning, gold-silver,
-   us-japan-10y-gap) and every other voter. Commit the script's output
-   under evidence/ and cite it for every number.
-5. RECORD: PROGRESS.md — the session block (what you did, the trace
-   outcome incl. any TRACE-BROKEN rows, the history-depth numbers with
-   the script that printed each, the lock resolution) and flip milestone
-   row B to COMPLETE. CHANGELOG.md — a dated entry in the house style.
-   Rewrite the GA-S3 prompt in PROMPTS.md from the template with the
-   exact state.
+1. READ FIRST: docs/specs/gold-meter-audit/README.md (the decision log —
+   D-GA-1..10), 01-AUDIT-SPEC.md (§5 the completeness guarantee, §6 the
+   rubric — the classes' necessary-and-sufficient conditions),
+   02-REFERENCE-TAXONOMY.md (the LOCKED v1.1 denominator — 85 rows; the
+   lock record at the foot), 03-METHOD-AND-EVIDENCE.md (§3 the matrix
+   columns, §4 the H1–H7 checks — this session's procedures),
+   04-REPORT-AND-FILL-DESIGN.md (the severity components your "fill
+   program?" column seeds), PROGRESS.md (all session blocks), PROMPTS.md;
+   then the evidence pack (inventory.md + wiring.md +
+   history-depths-2026-11-05.txt + the wire scans), and the code itself:
+   gold-score.ts, connections.ts (evalLeg + SIGNAL_LEG_MOVE), gold-balance.ts,
+   definitions.ts, gauges.ts. Then git pull --rebase.
+2. THE COVERAGE MATRIX (03 §3): evidence/coverage-matrix.md — one row per
+   taxonomy row (all 85, including the three v1.1 additions S13/F16/X7 —
+   S13's object is ALREADY INGESTED as michigan-sentiment, a growth-health
+   voter: a promotion-class row the matrix must resolve), columns: taxonomy
+   id + name · current footprint (the reading(s)/voter(s) by id, or none —
+   wiring.md is the citation source) · Class (one of six, per §6's
+   necessary-and-sufficient conditions — no COVERED without a wiring
+   citation and a fire-history that shows the voter can actually fire in
+   the current corpus era; no NOT-APPLICABLE where the honest class is
+   CONTEXT-ONLY-BY-DESIGN without a recorded decision) · Reason (one line,
+   citing wiring.md's row or the absence) · fill program? (yes/no + the
+   severity components, 04 §3). Cross-listed rows resolve to their
+   primaries (I5→R7, I6→R8, X6→I10) — state that in the header.
+3. THE VOTER MAPPING: every one of the 21 voters maps to exactly one
+   taxonomy row (or UNCLASSICATED — a defect; the owner decides which).
+   Known live questions to resolve honestly: the yield-curve seats
+   (yield-curve-10y2y/10y3m vs R4 — the polarity the frozen spec itself
+   calls ambiguous); cftc-gold-positioning (F1 — the never-fires number is
+   the PARTIAL evidence); us10y/us30y (R1's belt-and-braces or their own
+   rows?); copper-gold (X3 — a growth-health seat holding a gold-family
+   claim); michigan-sentiment's mirror-sweep mark (not-gold — now
+   revisitable against S13, though the card itself is not a gold-lane
+   voter and S13's class is the matrix's to assign).
+4. THE HALF-IMPLEMENTATION AUDIT (03 §4): evidence/half-implementation.md —
+   the H1–H7 checks per voter, any yes = a defect row with evidence and
+   the proposed fill-program treatment (repair / promote / re-seat /
+   accept-with-note). The wiring pack already quantified the H2 evidence
+   (history-depths) and the H1 evidence (cadence vs the 4-threshold
+   move-rule coverage); H5's expected findings (CFTC solo in stress, the
+   dollar lane's thin third seat) now have exact counts to cite.
+5. RECORD: PROGRESS.md — the session block + milestone row C → COMPLETE;
+   CHANGELOG.md — a dated entry in the house style; rewrite the GA-S4
+   prompt in PROMPTS.md from the template with the exact state.
 
 CONSTRAINTS (standing, every session of this program)
 - D-GA-3: read-only against the code. No edits to gold-score.ts,
   gold-balance.ts, GOLD_LANE_VOTERS, harness tables, schemas, adapters,
   copy dictionaries. Docs + read-only scripts only. Deploy NOTHING.
-- D-GA-2: no forecasting claim anywhere; coverage/honesty language only.
-- D-GA-5/D-GA-6: free-first sourcing; NO classification this session —
-  the rubric is GA-S3's; the wiring trace records facts, not classes.
-- Every number from a run or a citation (the 01 §4.3 rule): the history
-  depths, the trace's hops, the mirror-sweep counts — each with the
-  script, file or query that produced it.
-- Branch ga/s2-wiring; PR "gold meter audit (GA-S2 completion): the
-  wiring evidence pack"; push after each milestone; merge yourself when
-  the exit gate holds; CI green on main verified. Docs/scripts-only: no
-  deploy.
+- D-GA-2: no forecasting claim anywhere; coverage/honesty language only —
+  the severity ranking is classic-literature importance × data
+  availability × wiring cost, never a backtest of proposed voters.
+- D-GA-1/D-GA-6: the denominator is LOCKED (v1.1 = 85 rows); if the owner
+  amends in-session, record it in 02 as an owner-recorded decision with
+  its date and restate the arithmetic downstream. One class per row, no
+  silent waves.
+- Every number from a run or a citation (01 §4.3): the counts, the
+  fire-ability verdicts, the defect rows — each with the script, file or
+  query that produced it (wiring.md + history-depths-2026-11-05.txt are
+  the citation base; re-run ga-s2-history-depths.sh / ga-s2-wire-scan.sh
+  read-only if you need today's numbers).
+- Branch ga/s3-matrix; PR "gold meter audit (GA-S3): the coverage matrix
+  + the half-implementation defects"; push after each milestone; merge
+  yourself when the exit gate holds; CI green on main verified.
+  Docs/scripts-only: no deploy.
 
 EXIT GATE
-evidence/inventory.md complete (the voters table verbatim with line
-numbers appended to the delivered source-side half; the readings table,
-recipes and rungs already shipped); evidence/wiring.md complete (all 21
-voters traced with no unexplained hops; the context traces with their
-never-votes notes); the history-depth numbers stated per voter with their
-scripts; PROGRESS row B COMPLETE; the GA-S3 prompt written, committed,
+evidence/coverage-matrix.md complete: 85 rows classified (one class each,
+the cross-lists resolved to primaries), every reason citing wiring.md or a
+recorded absence, the fill-program column filled; the header arithmetic
+stated (rows classified = 85, voters mapped = 21); evidence/
+half-implementation.md complete: the H1–H7 defect rows with evidence and
+treatments; PROGRESS row C COMPLETE; the GA-S4 prompt written, committed,
 pushed, merged; the prompt printed in your final message with a 5-line
-summary (what shipped, what is blocked, what the owner must do).
+summary (what shipped, the defect counts, what the owner must decide —
+OI-GA-2..6 are GA-S4's proposal territory).
 
 AT THE END (the standing close-out, every session)
 1. PROGRESS.md session block + milestone row; 2. CHANGELOG entry; 3. the
@@ -251,12 +259,6 @@ session — never end without one.)
 ```
 
 ---
-
-## GA-S3 — the coverage matrix + the half-implementation audit (to be rewritten by the GA-S2-completion session)
-
-Will follow 03 §3–§4: every taxonomy row classified (the six classes), every
-voter mapped or flagged UNCLASSICATED, the H1–H7 defect list, the header
-arithmetic. Branch `ga/s3-matrix`.
 
 ## GA-S4 — the report + the fill program (to be rewritten by GA-S3)
 Will follow 04: `docs/insights/GOLD-METER-AUDIT-REPORT.md`, the severity
