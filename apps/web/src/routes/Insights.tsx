@@ -93,7 +93,6 @@ import {
 } from './insights-sections/world-feeds';
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
 import { NarrativeBlock } from '../components/insights/NarrativeBlock';
-import { useBalanceLanesPreview } from '../components/insights/signals/MergedCard';
 import { InTheNews } from '../components/insights/InTheNews';
 
 /**
@@ -230,14 +229,6 @@ export function Insights() {
   const narrativeDoc = useNarrative();
   const narrativePreview = useNarrativePreview();
   const narrativeVisible = narrativeDoc !== null && (narrativeDoc.visible || narrativePreview);
-  /* Gold balance consolidation P2 (GB-S3, 04 §3): the ?balance=lanes
-   * preview flag — read ONCE at mount, never persisted (the
-   * ?narrative=preview pattern). Without it every visitor sees today's
-   * page byte-for-byte; with it the gold card renders the consolidated
-   * lane balance. The owner previews via currena.ir/insights?balance=lanes
-   * until the P5/GB-S6 flip. */
-  const balanceLanesPreview = useBalanceLanesPreview();
-
   const togglePin = useCallback((id: IndicatorId, next: boolean): void => {
     setPinned((prev) => {
       const s = new Set(prev);
@@ -645,20 +636,18 @@ export function Insights() {
           />
 
           {/* S1–S3 + R26: "What the signals say" — the merged card, collapsed
-           * default. */}
+           * default. GB-S6 (P5): the consolidated lane balance is THE
+           * gold card for every visitor — the ?balance=lanes flag and
+           * the goldSummary threading retired with the flip (the
+           * snapshot field still arrives on the wire and stays
+           * validated; the UI simply does not read it — AC-9). */}
           {SIGNALS_ENABLED ? (
             <section id="insights-signals-wrap" className="scroll-mt-24">
-              {/* Gold Program S2.1: the snapshot's compact goldSummary
-               * rides down to the signals card so the two gold panels
-               * under the balance render the ingest's stamp (they derive
-               * it client-side when absent). */}
               <Signals
                 readings={state.snapshot.readings}
-                goldSummary={state.snapshot.goldSummary}
                 copy={copy}
                 numberLocale={numberLocale}
                 expandToken={signalsToken}
-                balanceLanes={balanceLanesPreview}
               />
             </section>
           ) : null}

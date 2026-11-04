@@ -6,9 +6,11 @@
  *
  * Covered here:
  *   - `outlookOf`'s mapping of the condition tally onto the owner's seven
- *     states, including the owner's distinctions: Neutral (no directional
- *     bias) ≠ Range-Bound (an affirmative range read that needs the
- *     quiet-price evidence) ≠ Mixed Signals (the indicators disagree).
+ *     states (SILVER's leg since the GB-S6 flip — the flag-off gold
+ *     legacy path retired with the flip), including the owner's
+ *     distinctions: Neutral (no directional bias) ≠ Range-Bound (an
+ *     affirmative range read that needs the quiet-price evidence) ≠
+ *     Mixed Signals (the indicators disagree).
  *   - the shared "strong" bar: the Strong states sit at the card lean's
  *     own LEAN_STRONG threshold (4 conditions on one side).
  *   - copy parity + the owner's verbatim sentences (gold, EN + fa) —
@@ -230,12 +232,13 @@ function sorted(xs: readonly string[]): string[] {
 }
 
 /* ------------------------------------------------------------------ *
- * goldOutlookOf — the consolidated gold Outlook (GB-S5, P3: 01 §5.2,
- * behind ?balance=lanes). The table test 04 §4.2 mandates: every
- * branch over (L, A, unread, speed, band), plus the footing-decoupling
- * pin (AC-7). outlookOf above KEEPS serving silver and the DEFAULT
- * gold view untouched (its tests stay green as the silver contract);
- * OI-4 — silver's own footing circularity — is a recorded follow-up.
+ * goldOutlookOf — the consolidated gold Outlook (GB-S5, P3: 01 §5.2;
+ * since the GB-S6 flip THE gold derivation for every visitor). The
+ * table test 04 §4.2 mandates: every branch over (L, A, unread, speed,
+ * band), plus the footing-decoupling pin (AC-7). outlookOf above now
+ * serves SILVER ONLY (the flag-off gold legacy path retired with the
+ * flip); OI-4 — silver's own footing circularity — is a recorded
+ * follow-up.
  * ------------------------------------------------------------------ */
 
 type Band = 'low' | 'typical' | 'high';

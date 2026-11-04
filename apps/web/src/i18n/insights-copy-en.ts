@@ -8690,6 +8690,15 @@ export const insightsCopyEn = {
     mergedSubtitle: 'The two precious metals share most of their drivers: shared conditions are listed once.',
     conditionsMet: '{met} of {total} conditions met',
     metalLean: '{metal}: {lean}, {met} of {total} conditions met',
+    // GB-S6 (the collapsed-corner decision): gold's summary prose — the
+    // balance verdict word + the lane counts line, the same words the
+    // card renders (silver keeps `metalLean`; its own model is unchanged,
+    // OI-4). The shape mirrors the legacy sibling's (a colon, the lean,
+    // a comma); the counts parts join with ' · ' exactly as the verdict
+    // block renders them. Persian digits through the locale formatter.
+    // FA triaged through round-78
+    // (docs/localization/persian-copy-round-78-gold-balance-flip.md).
+    metalLeanLanes: '{metal}: {lean}, {counts}',
     lean: {
       'mostly-supportive': 'mostly supportive',
       mixed: 'mixed',

@@ -34,13 +34,18 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { GoldSummary, IndicatorReading } from '@currena/core';
+import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { evaluateSignal, goldBalance, type SignalReading } from '@currena/insights';
 import { Activity, ChevronDown } from 'lucide-react';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { SIGNALS_ENABLED } from './config';
+import {
+  balanceVerdictCountsParts,
+  balanceVerdictWordOf,
+  type BalanceCounts,
+} from './signals/BalanceScale';
 import { MergedSignalsCard } from './signals/MergedCard';
 import { VerdictIcon, goldOutlookOf, outlookOf, verdictTone, type OutlookState } from './signals/verdict';
 
@@ -48,10 +53,10 @@ import { VerdictIcon, goldOutlookOf, outlookOf, verdictTone, type OutlookState }
  * icon + word + ink (round 26: the icon joined the line); unreadable
  * metals stay silent. 2026-10-21 (owner): the word is the seven-state
  * outlook's short NAME (the full sentences live in the strip chips).
- * GB-S5 (P3, AC-3): an optional lane-derived override — under
- * ?balance=lanes the gold takeaway derives from the SAME goldBalance()
- * result as the card (undefined → the legacy outlookOf(reading),
- * byte-for-byte today's default view). */
+ * GB-S5 (P3, AC-3): the lane-derived override — the gold takeaway
+ * derives from the SAME goldBalance() result as the card.
+ * GB-S6 (the flip): the override is unconditional (the flag-off legacy
+ * path retired with the flag). */
 function CollapsedVerdict({
   reading,
   copy,
@@ -77,36 +82,26 @@ function CollapsedVerdict({
 
 export function Signals({
   readings,
-  goldSummary,
   copy,
   numberLocale,
   expandToken,
-  balanceLanes,
 }: {
   readings: readonly IndicatorReading[];
-  /** Gold Program S2.1: the served snapshot's compact gold summary —
-   * passed down to the merged card's two gold panels (derived
-   * client-side when absent). */
-  goldSummary?: GoldSummary | undefined;
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
   /** Bumped by the route when a pill/hash/hero link targets this section. */
   expandToken: number;
-  /** GB-S3 (04 §3 P2): the ?balance=lanes preview flag, read once on the
-   * route — the merged card's consolidated lane balance. */
-  balanceLanes?: boolean | undefined;
 }) {
   const gold = useMemo(() => evaluateSignal('gold', readings), [readings]);
   const silver = useMemo(() => evaluateSignal('silver', readings), [readings]);
-  /* GB-S5 (P3, AC-3): under ?balance=lanes the collapsed gold takeaway
-   * ALSO derives from the lane balance — the same pure engine the merged
-   * card runs (one engine, no drift), so the collapsed line can never
-   * contradict the balance beside it (D-GB-6). Without the flag it stays
-   * undefined and the collapsed line keeps today's derivation
-   * byte-for-byte. */
+  /* GB-S5 (P3, AC-3): the collapsed gold takeaway ALSO derives from the
+   * lane balance — the same pure engine the merged card runs (one
+   * engine, no drift), so the collapsed line can never contradict the
+   * balance beside it (D-GB-6). GB-S6 (the flip): unconditional. */
+  const goldBalanceReading = useMemo(() => goldBalance(readings), [readings]);
   const goldLaneOutlook = useMemo(
-    () => (balanceLanes ? goldOutlookOf(goldBalance(readings), gold.speed, gold.position) : undefined),
-    [balanceLanes, readings, gold],
+    () => goldOutlookOf(goldBalanceReading, gold.speed, gold.position),
+    [goldBalanceReading, gold],
   );
   /* Round 27 (owner): open by default — the detail is the content.
    * No persistence: collapsing is a per-session choice (spec R7b's
@@ -122,10 +117,42 @@ export function Signals({
   if (!SIGNALS_ENABLED) return null;
 
   // Collapsed summary (R7b, now session-only): one line per metal —
-  // "Gold: mixed, 2 of 5 conditions met — price in the top 7% of the
-  // last 10 years".
+  // silver keeps the legacy per-condition sentence (its own model is
+  // unchanged, OI-4). GB-S6 (the collapsed-corner decision): gold's
+  // PROSE joins the lane model — the legacy sentence counted FOOTING
+  // among 5 conditions (the circularity D-GB-5 removed) and would have
+  // contradicted the card's own counts line on the same page; the
+  // verdict word + the counts parts are the SAME words the card renders
+  // (one engine, no drift).
+  const goldLaneCounts: BalanceCounts = {
+    ...goldBalanceReading.counts,
+    total: goldBalanceReading.lanes.length,
+    net: goldBalanceReading.net,
+    readable: goldBalanceReading.readable,
+  };
   const collapsedLine = (reading: SignalReading): string => {
     const s = copy.signals;
+    if (reading.metal === 'gold') {
+      const base = interpolate(s.metalLeanLanes, {
+        metal: s.metals.gold,
+        lean: balanceVerdictWordOf(goldLaneCounts, copy),
+        counts: balanceVerdictCountsParts(goldLaneCounts, copy, numberLocale).join(' · '),
+      });
+      const position = reading.position;
+      if (position === null) return base;
+      const p = formatNumber(
+        Math.round((position.band === 'high' ? 1 - position.percentile : position.percentile) * 100),
+        numberLocale,
+        { maximumFractionDigits: 0 },
+      );
+      const band =
+        position.band === 'high'
+          ? interpolate(s.bandTop, { p })
+          : position.band === 'low'
+            ? interpolate(s.bandBottom, { p })
+            : s.bandMid;
+      return `${base}; ${interpolate(s.collapsedFooting, { band })}`;
+    }
     const leanWord = reading.lean !== null ? s.lean[reading.lean] : s.notEnoughData;
     const base = interpolate(s.metalLean, {
       metal: s.metals[reading.metal],
@@ -187,10 +214,8 @@ export function Signals({
             gold={gold}
             silver={silver}
             readings={readings}
-            goldSummary={goldSummary}
             copy={copy}
             numberLocale={numberLocale}
-            balanceLanes={balanceLanes}
           />
         ) : (
           /* Collapsed: one line per metal (spec R7b). */
@@ -205,7 +230,7 @@ export function Signals({
                 {/* Round 24 (roast #4): the collapsed line now ends with
                  * its takeaway — the round-23 estimation, in the ink.
                  * GB-S5 (P3): gold's takeaway rides the lane-derived
-                 * override under the flag (AC-3). */}
+                 * state (AC-3); GB-S6 (the flip): unconditional. */}
                 <CollapsedVerdict
                   reading={reading}
                   copy={copy}

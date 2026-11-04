@@ -2,12 +2,14 @@
  * @vitest-environment jsdom
  *
  * signals/gold-balance-lanes.test.tsx — the gold balance consolidation's
- * component tests: the consolidated LANE balance behind the
- * ?balance=lanes preview flag, REWRITTEN for the GB-S4 visual redesign
- * (P2b, docs/specs/gold-balance-consolidation/05-VISUAL-DESIGN-SPEC.md —
- * the lane WEIGHTS on brass pans, the verdict block as the hero, the
+ * component tests: the consolidated LANE balance — THE gold card for
+ * every visitor since the GB-S6 flip (the ?balance=lanes preview flag,
+ * the `visual` prop, the legacy branch and the two gold panels RETIRED
+ * with it; the GB-S4 visual redesign is the one balance — the lane
+ * WEIGHTS on brass pans, the verdict block as the hero, the
  * "Not leaning" tray and the four-row inline LEDGER; 04 §4.3 items
- * 1-7, 9, 11-13 re-pinned to the new anatomy):
+ * 1-7, 9, 11 re-pinned to the new anatomy + the flipped view's fresh
+ * byte-stability snapshot):
  *
  *   1. lane weights land in the right pan or tray for each side
  *   2. a split lane shows the "Split" badge, the aria contest and the
@@ -60,13 +62,14 @@ import { resolve } from 'node:path';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { GOLD_LANES, goldBalance, type SignalReading } from '@currena/insights';
+import { GOLD_LANES, GOLD_LANE_VOTERS, goldBalance, type SignalReading } from '@currena/insights';
 import { evaluateSignal } from '@currena/insights';
-import { MergedSignalsCard, useBalanceLanesPreview } from './MergedCard';
+import { MergedSignalsCard } from './MergedCard';
 import { BalanceScale, balanceVisualFrame, balanceVisualMetrics, balanceVisualSizeOf } from './BalanceScale';
 import { balanceRimSegments } from './BalanceWeight';
 import { goldOutlookOf, outlookOf } from './verdict';
 import { Signals } from '../Signals';
+import { PricesBoard } from '../PricesBoard';
 import { formatChange } from '../config';
 import { insightsCopyEn } from '../../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
@@ -307,12 +310,13 @@ beforeAll(() => {
 });
 
 /** Renders the merged card on `readings` with honest signals (the same
- * evaluateSignal the page runs) — `balanceLanes` on by default (this
- * file's subject). A stray fetch must fail loudly — the card makes NO
- * network request of its own (the charts' history fetches reject). */
+ * evaluateSignal the page runs) — the consolidated lane balance IS the
+ * card since the GB-S6 flip (the flag retired). A stray fetch must fail
+ * loudly — the card makes NO network request of its own (the charts'
+ * history fetches reject). */
 function renderCard(
   readings: readonly IndicatorReading[],
-  opts: { balanceLanes?: boolean; locale?: 'en-US' | 'fa-IR'; c?: typeof copy } = {},
+  opts: { locale?: 'en-US' | 'fa-IR'; c?: typeof copy } = {},
 ): { gold: SignalReading; silver: SignalReading } {
   vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
   const gold = evaluateSignal('gold', readings);
@@ -324,7 +328,6 @@ function renderCard(
       readings={readings}
       copy={opts.c ?? copy}
       numberLocale={opts.locale ?? 'en-US'}
-      balanceLanes={opts.balanceLanes ?? true}
     />,
   );
   return { gold, silver };
@@ -401,11 +404,13 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     expect(Number(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt'))).toBe(10);
   });
 
-  it('the two gold panels are RETIRED from the preview (nothing about gold outside the balance)', () => {
+  it('AC-1: exactly ONE gold instrument — the balance; no wind or model-vs-reality panel remains anywhere', () => {
     renderCard(fixtureReadings());
     expect(document.querySelector('[data-gold-panels]')).toBeNull();
     expect(document.querySelector('#insights-gold-tailwind')).toBeNull();
-    // The C12 banner mechanism and the footing strip stay (the prompt keeps them).
+    expect(document.querySelector('#insights-gold-model-vs-reality')).toBeNull();
+    expect(document.querySelector('[data-gold-label]')).toBeNull();
+    // The C12 banner mechanism and the footing strip stay (the spec keeps them).
     expect(document.querySelectorAll('[data-footing-metal]').length).toBe(2);
   });
 });
@@ -939,31 +944,13 @@ describe('keyboard (04 §4.3 item 12, 05 §4.3/§4.6)', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * §4.3 item 13 — the legacy default rendering, byte-for-byte
+ * GB-S6 — the flipped view's byte-stability pin: a FRESH snapshot of
+ * the flipped view replaces the flag-era legacy-markup snapshot (which
+ * retired with the legacy branch). Any change to the DEFAULT view —
+ * now the visual lane balance — updates this snapshot CONSCIOUSLY.
  * ------------------------------------------------------------------ */
-describe('the legacy default rendering (04 §4.3 item 13)', () => {
-  it('without the flag: the two gold panels stay, the balance keeps the legacy condition chips, no lane view renders', () => {
-    renderCard(fixtureReadings(), { balanceLanes: false });
-    // The two panels stay under the balance (they retire from the DEFAULT view only at P5/GB-S6).
-    expect(document.querySelector('[data-gold-panels]')).not.toBeNull();
-    expect(document.querySelector('#insights-gold-tailwind')).not.toBeNull();
-    // The legacy condition chips (not lanes) drive the balance.
-    expect(document.querySelector('[data-balance-tile="real-yield"]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-weight="borrowing-costs"]')).toBeNull();
-    expect(document.querySelector('[data-balance-row="borrowing-costs"]')).toBeNull();
-    // None of the lane-view elements render.
-    expect(document.querySelector('[data-balance-context-line]')).toBeNull();
-    expect(document.querySelector('[data-balance-measured-note]')).toBeNull();
-    expect(document.querySelector('[data-balance-split-badge]')).toBeNull();
-    expect(document.querySelector('[data-balance-tally]')).toBeNull();
-    expect(document.querySelector('[data-balance-visual]')).toBeNull();
-    // The legacy subtitle, not the reworded one.
-    expect(document.querySelector('[data-balance-subtitle]')?.textContent).toBe(
-      'Each factor is read against its usual range and weighed equally; the beam shows the combined lean of today’s readings.',
-    );
-  });
-
-  it('the legacy markup is pinned byte-for-byte (the snapshot — any change to the default view must be conscious)', () => {
+describe('the flipped view byte-stability pin (GB-S6)', () => {
+  it('the flipped view is pinned byte-for-byte (the snapshot — any change to the default view must be conscious)', () => {
     // Determinism guard: two independent renders must produce identical markup
     // before the snapshot is allowed to speak.
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
@@ -994,19 +981,26 @@ describe('the legacy default rendering (04 §4.3 item 13)', () => {
     expect(html2).toBe(html1);
     expect(first.container).toBeTruthy();
     expect(second.container).toBeTruthy();
-    // The pin itself: without ?balance=lanes the card renders today's markup,
-    // byte-for-byte (04 §3 P2: "without the parameter visitors see today's
-    // page until P5"). A future session that changes the DEFAULT view
-    // updates this snapshot CONSCIOUSLY (with the spec's blessing recorded).
+    // The pin itself: the flipped view (the visual lane balance) is THE
+    // default — every visitor's markup, byte-for-byte.
     expect(html2).toMatchSnapshot();
+    // And the retired elements stay retired inside the pinned markup.
+    expect(document.querySelector('[data-gold-panels]')).toBeNull();
+    expect(document.querySelector('[data-balance-tile]')).toBeNull();
+    expect(document.querySelector('[data-balance-visual]')).not.toBeNull();
+    // The reworded lane subtitle, not the legacy one.
+    expect(document.querySelector('[data-balance-subtitle]')?.textContent).toBe(
+      copy.signals.balance.subtitleLanes,
+    );
   });
 });
 
 /* ------------------------------------------------------------------ *
- * The BalanceScale `visual` prop — the branch boundary itself
+ * GB-S6 — the visual design is THE balance (the `visual` prop and the
+ * legacy branch retired with the flag).
  * ------------------------------------------------------------------ */
-describe('the visual prop boundary (GB-S4)', () => {
-  it('BalanceScale with visual renders the redesign root; without it the legacy markup (never both)', () => {
+describe('the unconditional visual (GB-S6)', () => {
+  it('BalanceScale renders the redesign root with no prop — there is no other branch', () => {
     const drivers = [
       {
         key: 'borrowing-costs',
@@ -1024,17 +1018,12 @@ describe('the visual prop boundary (GB-S4)', () => {
         ],
       },
     ];
-    const { unmount } = render(
-      <BalanceScale drivers={drivers} copy={copy} numberLocale="en-US" visual />,
-    );
+    render(<BalanceScale drivers={drivers} copy={copy} numberLocale="en-US" />);
     expect(document.querySelector('[data-balance-visual]')).not.toBeNull();
     expect(document.querySelector('[data-balance-visual]')?.getAttribute('data-size')).toBe('l');
-    unmount();
-    render(<BalanceScale drivers={drivers} copy={copy} numberLocale="en-US" />);
-    expect(document.querySelector('[data-balance-visual]')).toBeNull();
-    // The neutral lane driver renders as the legacy TRAY CHIP (the tiles are
-    // for pan drivers) — the legacy markup, not the redesign.
-    expect(document.querySelector('[data-balance-chip="borrowing-costs"]')).not.toBeNull();
+    // The legacy condition-chip markup retired with the branch.
+    expect(document.querySelector('[data-balance-chip]')).toBeNull();
+    expect(document.querySelector('[data-balance-tile]')).toBeNull();
   });
 });
 
@@ -1213,7 +1202,6 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
         readings={readings}
         copy={copy}
         numberLocale="en-US"
-        balanceLanes
       />,
     );
     expect(document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction')).toBe(
@@ -1224,65 +1212,211 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * GB-S5 (P3) — the COLLAPSED gold takeaway also derives from the
- * balance under the flag (AC-3: the Outlook state cannot disagree with
- * the balance in any presentation of the card).
+ * GB-S5 (P3, GB-S6 flip) — the COLLAPSED gold takeaway AND PROSE derive
+ * from the balance (AC-3: the Outlook state cannot disagree with the
+ * balance in any presentation of the card). The collapsed-corner
+ * DECISION at the flip: the gold PROSE joined the lane model — the
+ * legacy sentence ("Gold: mixed, 2 of 5 conditions met") counted
+ * FOOTING among 5 conditions (the circularity D-GB-5 removed) and
+ * would have contradicted the card's own counts line on the same
+ * page; silver's prose keeps the legacy per-condition sentence (its
+ * own model is unchanged, OI-4). The same sentence rides the merged
+ * card's header (MergedCard metalLeanLine) — one key (metalLeanLanes),
+ * one rule home (balanceVerdictWordOf + balanceVerdictCountsParts).
  * ------------------------------------------------------------------ */
-describe('the collapsed gold takeaway under the flag (GB-S5, AC-3)', () => {
-  const renderSignals = (balanceLanes: boolean) => {
+describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
+  const renderSignals = (readings: readonly IndicatorReading[] = DIRECTIONAL, c: typeof copy = copy, locale: 'en-US' | 'fa-IR' = 'en-US') => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
     render(
       <Signals
-        readings={DIRECTIONAL}
-        copy={copy}
-        numberLocale="en-US"
+        readings={readings}
+        copy={c}
+        numberLocale={locale}
         expandToken={0}
-        balanceLanes={balanceLanes}
       />,
     );
     // Collapse the section (session-only toggle) so the summary lines render.
     fireEvent.click(document.querySelector('button[aria-controls="insights-signals-body"]') as HTMLButtonElement);
+    const lineOf = (metal: string): string | null =>
+      document.querySelector(`li[data-signal-metal="${metal}"]`)?.textContent ?? null;
     const verdictOf = (metal: string): string | null | undefined =>
       document.querySelector(`li[data-signal-metal="${metal}"] [data-collapsed-verdict]`)?.getAttribute('data-collapsed-verdict');
-    return { verdictOf };
+    return { lineOf, verdictOf };
   };
 
   it('the collapsed gold line reads the LANE state (bearish: 1 for · 2 against), not the old mixed (which footing dragged up)', () => {
-    const { verdictOf } = renderSignals(true);
+    const { verdictOf } = renderSignals();
     expect(verdictOf('gold')).toBe('bearish');
     // Silver's collapsed takeaway keeps its own legacy derivation (OI-4).
     expect(verdictOf('silver')).toBe(outlookOf(evaluateSignal('silver', DIRECTIONAL)));
   });
 
-  it('without the flag the collapsed line keeps the legacy derivation byte-for-byte (the default view pin)', () => {
-    const { verdictOf } = renderSignals(false);
-    expect(verdictOf('gold')).toBe(outlookOf(evaluateSignal('gold', DIRECTIONAL)));
-    expect(verdictOf('silver')).toBe(outlookOf(evaluateSignal('silver', DIRECTIONAL)));
+  it('THE CORNER DECISION: the collapsed gold PROSE speaks the lane model — the verdict word + the counts line, the same words the card renders', () => {
+    // DIRECTIONAL: 1 for · 2 against · 1 neutral — the engine-verified battery.
+    const b = goldBalance(DIRECTIONAL);
+    expect(b.counts).toEqual({ for: 1, against: 2, neutral: 1, unread: 0 });
+    const { lineOf } = renderSignals();
+    const goldLine = lineOf('gold') ?? '';
+    // The verdict word + the counts parts, exactly as the card renders them.
+    expect(goldLine).toContain('Leaning against gold');
+    expect(goldLine).toContain('1 for · 2 against · 1 not leaning');
+    // The legacy 5-condition count is GONE from the gold prose (the
+    // circularity D-GB-5 removed; the counts line is the lane counts).
+    expect(goldLine).not.toContain('of 5 conditions met');
+    // The footing band sentence still rides the line (context only).
+    expect(goldLine).toContain('price in the');
+    // Silver's prose keeps the legacy per-condition sentence (OI-4).
+    const silverLine = lineOf('silver') ?? '';
+    expect(silverLine).toContain('of 6 conditions met');
+  });
+
+  it('the collapsed gold PROSE on the balanced fixture: "Balanced, 0 for · 0 against · 4 not leaning"', () => {
+    const { lineOf } = renderSignals(fixtureReadings());
+    const goldLine = lineOf('gold') ?? '';
+    expect(goldLine).toContain('Balanced');
+    expect(goldLine).toContain('0 for · 0 against · 4 not leaning');
+    // The outlook chip still rides the line's end (AC-3: same engine).
+    expect(goldLine).toContain('Outlook: Neutral');
+  });
+
+  it('the card header speaks the same lane prose for gold; silver keeps the legacy sentence (one key, two models by metal)', () => {
+    renderCard(fixtureReadings());
+    const goldHeader = document.querySelector('[data-signal-card="merged"] [data-signal-metal="gold"]')?.textContent ?? '';
+    const silverHeader = document.querySelector('[data-signal-card="merged"] [data-signal-metal="silver"]')?.textContent ?? '';
+    expect(goldHeader).toContain('Balanced');
+    expect(goldHeader).toContain('0 for · 0 against · 4 not leaning');
+    expect(goldHeader).not.toContain('of 5 conditions met');
+    expect(silverHeader).toContain('of 6 conditions met');
+  });
+
+  it('fa: the collapsed gold prose renders the Persian verdict word + Persian counts with Persian digits', () => {
+    const { lineOf } = renderSignals(fixtureReadings(), copyFa, 'fa-IR');
+    const goldLine = lineOf('gold') ?? '';
+    expect(goldLine).toContain('متعادل');
+    expect(goldLine).toContain('۰ موافق · ۰ مخالف · ۴ بدون گرایش');
+    // The legacy Persian count clause is gone from the gold line.
+    expect(goldLine).not.toContain('از ۵ شرط');
+    // Silver keeps its own Persian sentence.
+    const silverLine = lineOf('silver') ?? '';
+    expect(silverLine).toContain('از ۶ شرط');
   });
 });
 
 /* ------------------------------------------------------------------ *
- * The flag itself — the ?narrative=preview pattern
+ * Moved from gold-panels.test.tsx (retired with the panels at the
+ * GB-S6 flip — 04 §1: the surviving assertions move to the new tests):
+ * the dictionary coverage of the engine vocabulary (the copy keys stay
+ * until OI-3/GB-S7) + the PricesBoard no-panels pin + the card order.
  * ------------------------------------------------------------------ */
-describe('useBalanceLanesPreview — the ?balance=lanes query flag', () => {
-  it('reads the parameter once from the canonical path URL; absent → false (no persistence)', () => {
-    const probe = (): boolean => {
-      let value = false;
-      function Probe(): React.JSX.Element {
-        value = useBalanceLanesPreview();
-        return <p>probe</p>;
+
+describe('gold copy — both dictionaries cover the whole engine vocabulary (moved from gold-panels)', () => {
+  const SUB_GAUGE_WORDS = [
+    'tight', 'relief', 'strong', 'stress', 'elevated', 'calm', 'hot', 'cool', 'mixed', 'unreadable',
+  ] as const;
+  const LABELS = ['strong-tailwind', 'tailwind', 'balanced', 'headwind', 'strong-headwind'] as const;
+  const CHIPS = ['aligned-tailwind', 'aligned-headwind', 'diverging-up', 'diverging-down', 'neutral', 'no-read'] as const;
+  const EXPLAINERS = [
+    'aligned-tailwind', 'aligned-headwind', 'diverging-up', 'diverging-down', 'model-neutral', 'reality-flat', 'no-read',
+  ] as const;
+
+  for (const [name, c] of [['en', copy], ['fa', copyFa]] as const) {
+    it(`${name}: every label/lane/word/voter/evidence/impact key is non-empty`, () => {
+      const g = c.signals.goldScore;
+      for (const l of LABELS) expect(g.labels[l], `${name} ${l}`).toBeTruthy();
+      expect(g.noReadWord).toBeTruthy();
+      for (const lane of GOLD_LANES) expect(g.laneNames[lane], `${name} ${lane}`).toBeTruthy();
+      for (const w of SUB_GAUGE_WORDS) expect(g.subGaugeWords[w], `${name} ${w}`).toBeTruthy();
+      for (const e of ['rising', 'falling', 'high', 'low'] as const) {
+        expect(g.evidenceWords[e], `${name} ${e}`).toBeTruthy();
       }
-      render(<Probe />);
-      cleanup();
-      return value;
-    };
-    window.history.pushState({}, '', '/insights?balance=lanes');
-    expect(probe()).toBe(true);
-    window.history.pushState({}, '', '/insights');
-    expect(probe()).toBe(false);
-    // The narrative flag's parameter does NOT leak into the balance flag.
-    window.history.pushState({}, '', '/insights?narrative=preview');
-    expect(probe()).toBe(false);
-    window.history.pushState({}, '', '/insights');
+      expect(g.impactWords.tailwind).toBeTruthy();
+      expect(g.impactWords.headwind).toBeTruthy();
+      // Session 3 (G2): the inflation lane's tilt phrase keys — both locales.
+      for (const t of ['building', 'fading', 'steady'] as const) {
+        expect(g.tiltWords[t], `${name} tilt ${t}`).toBeTruthy();
+      }
+      // Session 5 (C4a): the measured-reality note + its link word — both locales.
+      expect(g.measuredNote, `${name} measuredNote`).toBeTruthy();
+      expect(g.measuredNoteLink, `${name} measuredNoteLink`).toBeTruthy();
+      // the voter names cover EXACTLY the 21-voter table (Session 6: the
+      // D-5 promotion added breakeven-tilt to both dictionaries)
+      const tableIds = GOLD_LANE_VOTERS.map((v) => v.id as string);
+      expect(Object.keys(g.voterNames).sort()).toEqual([...new Set(tableIds)].sort());
+      for (const id of tableIds) expect(g.voterNames[id as keyof typeof g.voterNames], `${name} ${id}`).toBeTruthy();
+      expect(g.netFiringLine).toContain('{firing}');
+      expect(g.netFiringLine).toContain('{total}');
+      expect(g.laneCountsLine).toContain('{tailwind}');
+    });
+
+    it(`${name}: every chip + explainer + basis key is non-empty`, () => {
+      const m = c.signals.goldModelVsReality;
+      for (const chip of CHIPS) expect(m.chips[chip], `${name} ${chip}`).toBeTruthy();
+      for (const k of EXPLAINERS) expect(m.explainers[k], `${name} ${k}`).toBeTruthy();
+      expect(m.basisPhrases.change30d).toBeTruthy();
+      expect(m.basisPhrases.ma200GapPct).toBeTruthy();
+      // the two value-bearing explainers keep their placeholders intact
+      expect(m.explainers['aligned-tailwind']).toContain('{value}');
+      expect(m.explainers['aligned-tailwind']).toContain('{basis}');
+    });
+
+    it(`${name}: the summary-prose key carries its placeholders (metalLeanLanes, round-78)`, () => {
+      expect(c.signals.metalLeanLanes).toContain('{metal}');
+      expect(c.signals.metalLeanLanes).toContain('{lean}');
+      expect(c.signals.metalLeanLanes).toContain('{counts}');
+      if (name === 'fa') {
+        expect(c.signals.metalLeanLanes).not.toContain('—');
+      }
+    });
+  }
+});
+
+describe('MergedSignalsCard order — the balance then the footing strip (moved from gold-panels, post-flip)', () => {
+  it('the card renders the outlook strip, then the balance, then the footing strip — no panels between (order pinned)', () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
+    const readings = fixtureReadings();
+    const gold = evaluateSignal('gold', readings);
+    const silver = evaluateSignal('silver', readings);
+    const { container } = render(
+      <MergedSignalsCard gold={gold} silver={silver} readings={readings} copy={copy} numberLocale="en-US" />,
+    );
+    const card = container.querySelector<HTMLElement>('[data-signal-card="merged"]')!;
+    const strip = card.querySelector<HTMLElement>('[data-signal-verdict]')!;
+    const balance = card.querySelector<HTMLElement>('[data-balance="gold"]')!;
+    const footing = card.querySelector<HTMLElement>('[data-footing-metal="gold"]')!;
+    expect(strip).toBeTruthy();
+    expect(balance).toBeTruthy();
+    expect(footing).toBeTruthy();
+    // The owner's order: strip → balance → footing (the panels that sat
+    // between balance and footing retired with the flip).
+    expect(strip.compareDocumentPosition(balance) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(balance.compareDocumentPosition(footing) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(card.querySelector('[data-gold-panels]')).toBeNull();
+  });
+});
+
+describe('PricesBoard — the strip is the four price tiles again (moved from gold-panels)', () => {
+  it('the board renders NO gold panels, with or without price rows', () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve({ ok: true, status: 200, json: async () => null } as unknown as Response)),
+    );
+    const { container } = render(
+      <PricesBoard
+        readings={[reading('gold-usd', { value: 4166, change30d: 5.2 })]}
+        copy={copy}
+        locale="en"
+        numberLocale="en-US"
+        onFocusCard={vi.fn()}
+      />,
+    );
+    const board = container.querySelector<HTMLElement>('#insights-prices')!;
+    expect(board.querySelector('#insights-card-gold-usd')).toBeTruthy();
+    expect(board.querySelector('#insights-gold-tailwind')).toBeNull();
+    expect(board.querySelector('#insights-gold-model-vs-reality')).toBeNull();
+    // and with no price rows at all, still nothing
+    const empty = render(
+      <PricesBoard readings={[]} copy={copy} locale="en" numberLocale="en-US" onFocusCard={vi.fn()} />,
+    );
+    expect(empty.container.querySelector('#insights-gold-tailwind')).toBeNull();
   });
 });
