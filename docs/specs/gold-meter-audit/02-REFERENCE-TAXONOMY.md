@@ -238,7 +238,7 @@ foot):**
 
 | Add | Row | Why it clears the classic bar |
 |---|---|---|
-| 11 | S13 US household pessimism (Michigan) | A named driver of the Chicago Fed's canonical driver model (Letter 464, 2021) — the household fear channel the S-family otherwise expresses only through market prices; `UMCSENT` re-verified live on FRED this session (887 pts, 1952-12 → 2026-09) |
+| 11 | S13 US household pessimism (Michigan) | A named driver of the Chicago Fed's canonical driver model (Letter 464, 2021) — the household fear channel the S-family otherwise expresses only through market prices; `UMCSENT` re-verified live on FRED this session (887 pts, 1952-12 → 2026-09) — and the object is already ingested as `michigan-sentiment` (a growth-health voter outside the gold lanes): a promotion-class row, not a new-source row |
 | 12 | F16 Swiss gold net exports by destination | The physical-flow evidence behind the F6/F7 premium rows — the monthly Swiss customs release the desks and the trade press headline; the BAZG SwissImpex tables verified live, free/keyless, monthly by country 2012→ |
 | 13 | X7 Gold/platinum ratio | The second precious-bloc internal ratio (the monetary-premium vs industrial-cycle gauge beside X1); gold-api XPT verified live beside XAU; both legs already ingested in the repo's price-row family |
 
@@ -395,12 +395,15 @@ voters/context/absence for these objects; it says nothing about lane
 seating, rule fit, history depth, or sign — the audit's actual work.
 
 **v1.1 addendum (2026-11-05, the pre-lock research additions — presence
-checked against the same doc table, same bounds):** S13 **ABSENT** (no
-`UMCSENT` row — the repo ingests the same survey's `MICH` leg only) ·
-F16 **ABSENT** (no Swiss-flow row) · X7 **ABSENT** (the `platinum` price
-row exists but no ratio reading). **Tally restated over the 82 primary rows
-of v1.1 (85 − 3 cross-listed): PRESENT-VOTER 15 · PRESENT-CONTEXT 23 ·
-ABSENT 44 · UNKNOWN 0.**
+checked against the same doc table + the live readings set, same bounds):**
+S13 **PRESENT-VOTER** (`michigan-sentiment` — FRED UMCSENT, a scored
+growth-health voter OUTSIDE the gold lanes; the mirror sweep's `not-gold —
+consumer-mood` mark is a wiring fact GA-S3 now revisits against S13: the
+Chicago Fed's pessimism driver is already ingested, promotion-class rather
+than new-source-class) · F16 **ABSENT** (no Swiss-flow row) · X7 **ABSENT**
+(the `platinum` price row exists but no ratio reading). **Tally restated
+over the 82 primary rows of v1.1 (85 − 3 cross-listed): PRESENT-VOTER 16 ·
+PRESENT-CONTEXT 23 · ABSENT 43 · UNKNOWN 0.**
 
 ---
 
