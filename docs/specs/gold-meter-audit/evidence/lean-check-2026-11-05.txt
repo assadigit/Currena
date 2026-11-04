@@ -1,0 +1,32 @@
+# fetched live: HTTP 200 (81002 bytes)
+generatedAt      : 2026-11-04T20:10:18.690Z
+seat                       lean    impact   pct10y     ch30d  evidence
+----------------------------------------------------------------------
+real-yield-10y               -1  supports 0.987575 -0.299999  falling
+us10y                        -1  supports 0.983967 -0.370000  falling
+us30y                        +1 pressures 0.984368 -0.349999  high
+fed-target                   +0    steady 0.676164         0  —
+fed-expectations             +1 pressures 0.826052     -0.24  high
+ecb-dfr                       —    unread                   
+yield-curve-10y2y            +0    steady 0.477964 -0.109999  —
+yield-curve-10y3m            +0    steady 0.588141 -0.350000  —
+dollar-basket                +0    steady 0.682440 -0.986194  —
+usdjpy                       +1 pressures 0.946030 0.0126398  high
+us-japan-10y-gap             +0    steady 0.302083      None  —
+stress-stlfsi                +0    steady 0.428846    0.2835  —
+nfci                         +0    steady 0.634615 0.0509999  —
+vix                          +0    steady 0.725127 5.5199999  —
+gold-silver                  +0    steady 0.330578 5.4909859  —
+cftc-gold-positioning        +0    steady     None      None  —
+us-cpi-yoy                   +0    steady 0.758620 0.3411368  —
+us-pce-core-yoy              +0    steady 0.692307 0.0867171  —
+euro-hicp                    +0    steady 0.796610 0.2000000  —
+breakeven-5y5y               -1 pressures 0.542868 -0.140000  falling
+breakeven-tilt               +0    steady 0.243189     -0.16  —
+
+lane borrowing-costs  readable 7 · firing 4 (supports 2 / pressures 2) -> side: neutral (split)
+lane dollar           readable 3 · firing 1 (supports 0 / pressures 1) -> side: neutral (<2 firing: 1)
+lane stress           readable 5 · firing 0 (supports 0 / pressures 0) -> side: neutral (<2 firing: 0)
+lane inflation        readable 5 · firing 1 (supports 0 / pressures 1) -> side: neutral (<2 firing: 1)
+
+Read-only: GET + the client-side rule replicated. No worker, no KV, no writes.

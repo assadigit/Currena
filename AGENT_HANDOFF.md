@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold meter audit program (A2 COMPLETE, the taxonomy LOCKED — the GA-S3 session next)
+# AGENT_HANDOFF — Currena: the gold meter audit program (A3 COMPLETE — the GA-S4 session next)
 
 > The owner's **gold meter audit** program (`docs/specs/gold-meter-audit/`,
 > session plan GA-S1..GA-S4 in its `PROMPTS.md`) was **specified
@@ -24,12 +24,12 @@ owner-gated **gap-fill program** (design + prompts, GA-S4):
 | GA-S1 | The taxonomy verified + v1 for the owner's lock; the blind-spot sweep; the presence pre-scan | `ga/s1-taxonomy` — **DONE (2026-11-04): 02 is v1, 82 rows, verified live; OI-GA-1 (the lock) OPEN** |
 | GA-S2 | The inventory + wiring evidence pack; the mirror sweep | `ga/s2-inventory` — **RUN PARTIAL (2026-11-04): the source-side inventory delivered (03 §1.2–§1.4 — `evidence/inventory.md`, 161-row readings table + mirror sweep voter 21 · context 63 · not-gold 77, the recipes, the rungs; the runnable record `ga-s2-wire-scan.sh`); the voters table + the wiring trace + the history depths DEFERRED — the owner was not reachable in-session (the prompt's fallback)** |
 | GA-S2-completion | A2's deferred half: the voters table, the wiring trace, the context traces, the history depths | `ga/s2-wiring` — **DONE (2026-11-05): THE LOCK RESOLVED + A2 COMPLETE — the owner delegated the research-and-lock in chat; the pre-lock research pass added S13 · F16 · X7 and LOCKED 02 as v1.1 = 85 rows; then the voters table (inventory.md §5), `evidence/wiring.md` (21 full traces, no TRACE-BROKEN, + 63 context traces + five findings) and `evidence/history-depths-2026-11-05.txt` (`ga-s2-history-depths.sh`: cftc 1 pt / base 0 / 0-of-9 days; us-japan-10y-gap 21 pts / base 20 / pct 6-of-9; gold-silver 122 pts / base 119 / ch30d 0-of-19) delivered** |
-| GA-S3 | The coverage matrix classified + the half-implementation defects | `ga/s3-matrix` — **NEXT: the live kickoff prompt is PROMPTS.md's GA-S3** |
-| GA-S4 | The report + the fill-program design + its prompts | `ga/s4-report` |
+| GA-S3 | The coverage matrix classified + the half-implementation defects | `ga/s3-matrix` — **DONE (2026-11-05): A3 COMPLETE — all 85 rows classified (COVERED 8 · PARTIAL 7 · MISSING-FREE 36 · MISSING-PAID 10 · CONTEXT-ONLY-BY-DESIGN 18 · NOT-APPLICABLE 3 + the 3 cross-lists to primaries); 21 voters mapped (20 rows + 1 UNCLASSICATED: `euro-hicp` — finding N-1, the owner decides amend-vs-re-seat); 18 half-implementation defect rows (D-1 the structural 17-of-21 level-only finding + 17 per-voter across 10 voters; H6 1 = **D-18 the fake-steady finding: cftc reads `steady`, not `unread`**); the fill backlog seeded (yes 47, the 27-band: R4 · R6 · R8 · R9 · R10 · D4 · S4 · S7 · S13 · F1 · F2 · G1); the new runnable `ga-s3-lean-check.sh` + `evidence/lean-check-2026-11-05.txt` (6 seats fire on the fresh wire; all four lanes `neutral` today)** |
+| GA-S4 | The report + the fill-program design + its prompts | `ga/s4-report` — **NEXT: the live kickoff prompt is PROMPTS.md's GA-S4** |
 
-The next session's prompt is PROMPTS.md's **GA-S3** kickoff (the coverage
-matrix + the half-implementation audit over the LOCKED 85-row denominator).
-Paste it into a fresh session at the repo root.
+The next session's prompt is PROMPTS.md's **GA-S4** kickoff (the report +
+the fill-program design + its prompts — the audit program's closing
+deliverable). Paste it into a fresh session at the repo root.
 
 ## B. The standing rules (read before any session)
 
@@ -56,7 +56,7 @@ Paste it into a fresh session at the repo root.
    PROMPTS.md, committed, pushed, and printed in the final message — never
    end a session without one.
 
-## C. The state of the world (as the GA-S2-completion run left it, 2026-11-05)
+## C. The state of the world (as the GA-S3 run left it, 2026-11-05)
 
 - **THE TAXONOMY IS LOCKED — OI-GA-1 RESOLVED (2026-11-05).** The owner
   reached back in chat and delegated the research-and-lock ("I trust your
@@ -88,6 +88,29 @@ Paste it into a fresh session at the repo root.
   / base 0 / 0-of-9 days; us-japan-10y-gap 21 pts / base 20 / pct 6-of-9;
   gold-silver 122 pts / base 119 / ch30d 0-of-19). The scan family:
   `ga-s2-wire-scan.sh` + wire-scan-2026-11-04/-05.txt.
+- **A3 IS COMPLETE (row C ✅): the audit's first verdict-bearing session.**
+  `evidence/coverage-matrix.md` — all **85 rows classified, one class
+  each** (COVERED 8 · PARTIAL 7 · MISSING-FREE 36 · MISSING-PAID 10 ·
+  CONTEXT-ONLY-BY-DESIGN 18 · NOT-APPLICABLE 3, + the 3 cross-lists
+  resolved to primaries; the header arithmetic stated: rows classified =
+  85, voters mapped = 21), the fill column seeding the backlog (yes 47;
+  the 27-band: R4 · R6 · R8 · R9 · R10 · D4 · S4 · S7 · S13 · F1 · F2 ·
+  G1). The voter mapping: 20 seats to exactly one row each — **us10y/
+  us30y → R1 belt-and-braces** (H4 accept-with-note), **breakeven-tilt →
+  R7's change accent** (02 R13's "free proxy" note corrected: no swap
+  leg — R13 classes MISSING-PAID), cftc → F1 PARTIAL, the yield-curve
+  pair → R4 PARTIAL — + **1 UNCLASSICATED: `euro-hicp` (finding N-1 —
+  the locked checklist holds no euro-area realised-inflation row; the
+  owner decides amend-vs-re-seat)**. `evidence/half-implementation.md`
+  — the H1–H7 checks per voter, **18 defect rows** (D-1 the structural
+  17-of-21 level-only finding + 17 per-voter rows across 10 voters;
+  H6 1 = **D-18 the fake-steady finding: cftc reads `steady`, not
+  `unread`** — its warning status passes readable() with neither input;
+  H7 verified coherent); treatments proposed (repair 6 · repair-if-filled
+  2 · re-seat 2 · owner-decisions 3 · accept-with-note 5). The new
+  runnable `ga-s3-lean-check.sh` + `evidence/lean-check-2026-11-05.txt`:
+  **6 seats fire on the fresh wire** (2 move-leg + 4 level-leg), 14
+  honestly steady, ecb-dfr unread, **all four lanes `neutral` today**.
 - Production: currena-api serving the consolidated lane balance for every
   visitor; `goldSummary` retired from the wire (GB-S7, PR #24/#25; worker
   versions and deployment IDs in the GB program's PROGRESS.md §GB-S7 and
