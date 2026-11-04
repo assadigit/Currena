@@ -13,12 +13,83 @@ PROGRESS.md`); this program changes nothing it shipped (D-GA-3).
 | ID | Milestone (spec ref) | State |
 |---|---|---|
 | A | The reference taxonomy verified + v1 delivered for the owner's lock; the blind-spot sweep; the presence pre-scan (01 §2 A1; 02) | ✅ COMPLETE — GA-S1 (2026-11-04): 02 is v1 (82 rows: v0 72 + 10 sweep adds − 0 strikes), every row verified live, the sweep + pre-scan recorded, PR merged; **awaiting the owner's lock (OI-GA-1)** |
-| B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | ⏳ PENDING — GA-S2 |
+| B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | 🔶 **PARTIAL — GA-S2 (2026-11-04): the source-side half delivered** — `evidence/inventory.md`: the full 161-row readings table with the mirror-sweep column (**voter 21 · context 63 · not-gold 77 = 161**), the 25 derived-series recipes + the adapter metrics, the rung map; the runnable record `packages/insights/scripts/ga-s2-wire-scan.sh` + its committed run `evidence/wire-scan-2026-11-04.txt`. **The voters table (03 §1.1), the wiring trace + the context traces + the history depths (03 §2) are DEFERRED** — the owner was not reachable in-session, OI-GA-1 (the taxonomy lock) is still OPEN, and the GA-S2 prompt's fallback bound the session to 03 §1.2–§1.4 (the trace needs the locked denominator, D-GA-1). The completion session (its prompt is in PROMPTS.md) resumes A2 after the lock |
 | C | The coverage matrix classified + the half-implementation defect list; the header arithmetic (01 §2 A3, §5; 03 §3–§4) | ⏳ PENDING — GA-S3 |
 | D | The audit report `docs/insights/GOLD-METER-AUDIT-REPORT.md` (01 §2 A4; 04 §1–§2) | ⏳ PENDING — GA-S4 |
 | E | The fill-program design + its GF-S1.. prompts; the owner's decision list stated (04 §3–§5) | ⏳ PENDING — GA-S4 |
 
 ## Session log
+
+### GA-S2 (2026-11-04) — the source-side inventory delivered under the lock fallback
+
+- **The lock first (OI-GA-1):** the owner was **not reachable in-session**, so
+  the session took the GA-S2 prompt's explicit fallback path — the
+  inventory's **source-side work only (03 §1.2–§1.4)**, which locks nothing,
+  and a hard stop before the voter wiring trace (03 §2). `02-REFERENCE-
+  TAXONOMY.md` is **untouched** (v1, delivered, still awaiting the owner's
+  lock — no lock line, no amendment). **The lock question is printed at the
+  head of this session's final message and opens the next prompt.**
+- **Delivery:** `evidence/inventory.md` — the readings table (161 rows,
+  every id with source · ref, cadence, staleness window, layer, licence,
+  gauge role, the mirror-sweep mark and today's wire state), the
+  derived-series recipes (the 25 `derived`-provider rows with exact
+  formulas + code cites, plus the CFTC positioning metric, the S&P breadth
+  ratio and the price-row composition family), and the rung map (04:10
+  main / 04:20 rung-2 / 04:25+04:27 daily-history halves / 04:30 rung-3 /
+  04:35 rung-4 / 04:40 periodic, the Saturday + first-of-month + 21st–25th
+  gates, the hourly :13/:50 and quarter-hour slots, the 10:10/20:10
+  sweeps — per `docs/gap-closure/RUNGS.md`, the canonical map).
+- **The runnable record:** `packages/insights/scripts/ga-s2-wire-scan.sh`
+  (read-only, keyless — GET /api/insights + read-only parses of
+  definitions.ts, gold-score.ts, gauges.ts and the doc's inventory table;
+  the `ga-s1-fred-verify.sh` precedent). Its full output is committed as
+  `evidence/wire-scan-2026-11-04.txt`. **Every number below is from that
+  run** (01 §4.3).
+- **The denominators, cross-checked:** the live wire serves **161 readings**
+  (161 unique ids; generatedAt 2026-11-04T12:18:13.290Z; `goldSummary`
+  ABSENT — the OI-3/GB-S7 retirement verified holding on the live wire) ·
+  DEFINITIONS holds **161 ids** (48 scored-gauge rules + 113 info rules) ·
+  GAUGES holds **12 gauges, 48 scored voters in the 8 non-shadow gauges**
+  (borrowing-costs 9 · prices-heat 5 · market-stress 5 · dollar-strength 3
+  · growth-health 10 · au-inflation-rates 5 · au-households 7 ·
+  au-trade-currency 4) **+ 4 shadow gauges (G-5) with 20 context-only
+  members** · the doc's inventory table has **159 rows** (missing
+  `term-premium-10y` + `tga`, both live rung-4 ids since S3-M3.2) while
+  its own header claims 161 and its `**Counts:**` line claims 145 — the
+  doc drift is recorded as inventory facts; the doc's per-row voter flags
+  **agree with gauges.ts on all 159 rows**.
+- **The mirror sweep (01 §5.4, D-GA-4):** every one of the 161 ids marked
+  **voter / context / not-gold with a one-word reason** (the method and
+  criteria are stated in inventory.md §4; the marks are today's wiring
+  facts, not classes — D-GA-6, and nothing maps against the unlocked
+  taxonomy — D-GA-1). **Tally: voter 21 · context 63 · not-gold 77 = 161**
+  (counted by `grep -c` of the three mark strings over the delimited
+  readings-table region of inventory.md — the commands are stated in the
+  file).
+- **Today's wire facts recorded (not defects — the day's states):** all 21
+  gold-lane voters present; `dollar-basket` + `usdjpy` read `stale` with
+  no `change30d`/`percentile10y` (the dollar lane runs 2/3 unread today —
+  the whole Frankfurter family reads stale on 2026-11-04);
+  `cftc-gold-positioning` reads `warning` (46.99 % @ 2026-10-27) but
+  carries neither `change30d` nor `percentile10y` — neither `evalLeg` leg
+  has an input on today's wire; `us-japan-10y-gap` is percentile-only
+  today; `breakeven-tilt` carries wire status `context` (a prices-heat
+  context card holding a gold-lane seat — `readable()` admits it).
+- **Doc-drift facts found and recorded (inventory.md):** the doc's
+  inventory table is 2 rows short of the wire (term-premium-10y, tga) and
+  its counts line is 14 stale; the doc's provider-key list names only 20
+  of the 25 `derived`-provider ids; the doc's rung table's "Saturday 04:25
+  +2 fetches" line is superseded by RUNGS.md (the CFTC + EIA fetches ride
+  the 04:20 rung-2 Saturday gate — rung2.ts:68-69).
+- **Nothing classified, nothing wired, nothing deployed** (D-GA-3/D-GA-6:
+  the mirror-sweep marks are wiring facts with reasons, not classes; GA-S3
+  classifies against the locked taxonomy). No code, worker, schema,
+  adapter or copy file touched; one read-only script + its committed
+  output + docs only.
+- **Blocked on the owner:** **OI-GA-1 — the taxonomy lock.** LOCK or AMEND
+  the 82-row v1 taxonomy; the completion session (voters table + wiring
+  trace + history depths — 03 §1.1 + §2) starts by resolving it. The
+  GA-S2-completion prompt is in PROMPTS.md.
 
 ### GA-S1 (2026-11-04) — the taxonomy verified, swept, delivered as v1
 
