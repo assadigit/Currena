@@ -1,0 +1,62 @@
+
+> @currena/insights@0.1.0 gf-p0-calibration /home/z/currena/packages/insights
+> tsx scripts/gf-p0-calibration.ts
+
+# GF-P0 calibration — 2026-11-05T02:10:14.098Z
+windows: 2512 (2016-11-07 → 2026-11-03); mature base ≥ 2021-09-23: 1287
+corpus: recorded 2026-11-03T04:43:54.969Z; candidates: recorded 2026-11-05T01:41:58.523Z (stage 2026-11-04T04:35:18.079Z); cftc backfill: 565 weeks 2016-01-05 → 2026-10-27 (11 files, 0 failures)
+D-6 gap derivation: 2375 points 2016-09-26 → 2026-10-30
+
+## The D-1 derivation (the anchors' band)
+  anchor real-yield-10y     t=0.1   n=2512 firing=1417 share=56.4%
+  anchor us10y              t=0.15  n=2512 firing=1166 share=46.4%
+  anchor dollar-basket      t=1     n=2494 firing=1449 share=58.1%
+  anchor breakeven-5y5y     t=0.1   n=2512 firing=885 share=35.2%
+  median anchor share: 51.4%
+  derived fed-expectations     n=2512 value=0.13 share=50.7%
+  derived usdjpy               n=2494 value=1.38 share=51.4%
+  derived fed-target           n=2512 value=0.25 share=7.0%
+  derived term-premium-10y     n=2512 value=0.07 share=49.2%
+  derived t5yie                n=2512 value=0.1 share=50.7%
+
+## FROZEN (MIN2) — n=2512 (mature 1287)
+  all:    for 885 · level 628 · against 999 · fullTip 1248 · flips 8 vs net 9 · C1 PASS · C2 PASS
+  mature: for 277 · level 249 · against 761 · fullTip 856 · flips 8 vs net 8 · C1 FAIL · C2 PASS
+
+## POST-P1 (MIN2) — n=2512 (mature 1287)
+  all:    for 941 · level 555 · against 1016 · fullTip 1147 · flips 8 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 293 · level 256 · against 738 · fullTip 779 · flips 6 vs net 7 · C1 FAIL · C2 PASS
+
+## POST-P1-DEMOTE (MIN2) — n=2512 (mature 1287)
+  all:    for 925 · level 518 · against 1069 · fullTip 1208 · flips 8 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 298 · level 247 · against 742 · fullTip 807 · flips 6 vs net 7 · C1 FAIL · C2 PASS
+
+## POST-P2-4LANE (MIN2) — n=2512 (mature 1287)
+  all:    for 1188 · level 635 · against 689 · fullTip 522 · flips 9 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 599 · level 376 · against 312 · fullTip 268 · flips 7 vs net 4 · C1 PASS · C2 FAIL
+
+## POST-P2-5LANE (MIN2) — n=2512 (mature 1287)
+  all:    for 1193 · level 607 · against 712 · fullTip 402 · flips 10 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 552 · level 365 · against 370 · fullTip 191 · flips 8 vs net 4 · C1 PASS · C2 FAIL
+
+## FROZEN (MIN1) — n=2512 (mature 1287)
+  all:    for 902 · level 656 · against 954 · fullTip 567 · flips 8 vs net 9 · C1 PASS · C2 PASS
+  mature: for 254 · level 348 · against 685 · fullTip 395 · flips 6 vs net 8 · C1 PASS · C2 PASS
+
+## POST-P1 (MIN1) — n=2512 (mature 1287)
+  all:    for 894 · level 661 · against 957 · fullTip 550 · flips 9 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 241 · level 380 · against 666 · fullTip 353 · flips 8 vs net 7 · C1 PASS · C2 FAIL
+
+## POST-P1-DEMOTE (MIN1) — n=2512 (mature 1287)
+  all:    for 840 · level 670 · against 1002 · fullTip 570 · flips 9 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 217 · level 386 · against 684 · fullTip 353 · flips 6.5 vs net 7 · C1 PASS · C2 PASS
+
+## POST-P2-4LANE (MIN1) — n=2512 (mature 1287)
+  all:    for 1154 · level 716 · against 642 · fullTip 376 · flips 9 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 587 · level 389 · against 311 · fullTip 200 · flips 8 vs net 4 · C1 PASS · C2 FAIL
+
+## POST-P2-5LANE (MIN1) — n=2512 (mature 1287)
+  all:    for 1139 · level 653 · against 720 · fullTip 270 · flips 10 vs net 7 · C1 PASS · C2 FAIL
+  mature: for 534 · level 365 · against 388 · fullTip 130 · flips 9 vs net 4 · C1 PASS · C2 FAIL
+
+✍ /home/z/currena/docs/specs/gold-meter-gapfill/evidence/gf-p0-calibration-2026-11-05.md (315 lines)

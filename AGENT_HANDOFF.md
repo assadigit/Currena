@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold meter audit program (CLOSED) → the gold meter gap-fill program (GF-S1 next)
+# AGENT_HANDOFF — Currena: the gold meter gap-fill program (P0 delivered, GF-S2 next)
 
 > The owner's **gold meter audit** program (`docs/specs/gold-meter-audit/`)
 > is **CLOSED — COMPLETE 2026-11-05 at GA-S4**: A1–A4 whole (the taxonomy
@@ -16,16 +16,16 @@
 
 ## A. What comes next
 
-The **GF-S1 session** — the gap-fill program's first: the P0
-recalibration pre-registration (the fill design's GF-P0 phase, the
-audit report §6.1). Its kickoff prompt is at the foot of
-`docs/specs/gold-meter-audit/PROMPTS.md` (the D-GA-9 convention handed
-over) — paste it into a fresh session at the repo root.
+The **GF-S2 session** — the decision-list re-issue + the P1 repairs on
+the owner's recorded go (the program home:
+`docs/specs/gold-meter-gapfill/`). Its kickoff prompt is at the foot of
+`docs/specs/gold-meter-gapfill/PROMPTS.md` (the D-GA-9 convention) —
+paste it into a fresh session at the repo root.
 
 | Program | Milestone | Branch |
 |---|---|---|
 | gold meter audit — **CLOSED (2026-11-05)** | GA-S1 (the taxonomy, LOCKED v1.1 = 85) · GA-S2 + completion (the inventory + wiring pack) · GA-S3 (the matrix + the defects) · GA-S4 (the report + the fill design) | `ga/s1-taxonomy` · `ga/s2-inventory` · `ga/s2-wiring` · `ga/s3-matrix` · `ga/s4-report` — all merged |
-| gold meter gap-fill — **GF-S1 NEXT** | P0 the recalibration pre-registration (the proposed voter set in new read-only harness tables beside the frozen ones; the lane rule re-derived per the GB-S1 C1/C2 protocol; the OI-GA-2 lane count; the D-1 threshold calibration) → P1 repairs → P2 promotions → P3 new free sources → P4 context additions → P5 acceptance + flip | `gf/p0-recalibration` |
+| gold meter gap-fill — **P0 DELIVERED (GF-S1, 2026-11-05), the owner's go awaited; GF-S2 NEXT** | P0 delivered: the program home + the proposed voter set in new read-only harness tables (pinned by test) + the calibration with its runnable record — **the FROZEN baseline reproduced cell-for-cell; the proposed sets FAIL the pre-registered C2 on the all-windows scope (the STOP branch — the numbers are with the owner); OI-GA-2 measured (the flows lane votes 30.2% of windows post-backfill); the D-1 thresholds derived (five values + the 22-seat walk)** → the owner's answers gate P1 (repairs) → P2 promotions → P3 new free sources → P4 context additions → P5 acceptance + flip | `gf/p0-recalibration` (merged) → `gf/p1-repairs` next |
 
 ## B. The standing rules (read before any session)
 
@@ -104,8 +104,13 @@ over) — paste it into a fresh session at the repo root.
 
 Commit and push the branch anyway (nothing is lost if the session dies);
 the next session `git pull --rebase`s and re-reads the authoritative
-record — the audit program's `docs/specs/gold-meter-audit/PROGRESS.md`
-(CLOSED) and, once created, the fill program's
-`docs/specs/gold-meter-gapfill/PROGRESS.md`. If PROMPTS.md's latest
-prompt disagrees with PROGRESS.md, PROGRESS.md wins and the prompt gets
-rewritten.
+records — the audit program's `docs/specs/gold-meter-audit/PROGRESS.md`
+(CLOSED) and the fill program's `docs/specs/gold-meter-gapfill/
+PROGRESS.md` (authoritative for the fill). If PROMPTS.md's latest prompt
+disagrees with PROGRESS.md, PROGRESS.md wins and the prompt gets
+rewritten. The GF-P0 calibration's runnable record:
+`packages/insights/scripts/gf-p0-record-candidates.ts` +
+`gf-p0-calibration.ts` over the committed fixtures (`packages/insights/
+fixtures/gf-p0-*.json`) — re-running reproduces the committed report
+byte-for-byte (the credentials live in the environment only, never in
+the repo).
