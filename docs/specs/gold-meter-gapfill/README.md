@@ -57,13 +57,23 @@ them, it does not restate them.
 
 ## The owner's decision list (the audit report §5, restated — it gates this program)
 
-**Status at GF-S1 open: recorded-open on every item** (no decisions recorded
-in chat or the repo before this session — the GA lock-fallback precedent
-applies: GF-S1 delivers the calibration scenarios + re-issues the list).
+**Status at GF-S2 close: recorded-open on every item.** Re-issued by GF-S1
+(the calibration scenarios + the printed list) and **again by GF-S2**
+(2026-11-05 — no answers recorded in chat or the repo between the closes;
+the GA lock-fallback precedent applies: the deliverable halves only, the
+P1 repairs stay gated). **The GF-S2 re-issue ADDS the lane-rule question as
+the list's first item (A below)** — the question the GF-P0 calibration
+itself opened (the C2 STOP branch, the report §4); it is the one item the
+audit's §5 could not carry, the audit having closed before the calibration
+ran. The calibration's measured additions per item live in the report §8
+(the GF-S1 re-issue's own table); the list the owner answers is **A–K** as
+printed in the GF-S2 session's final message — one recorded answer per
+item, and the answers gate P1 (and the P2 composition questions they name).
 
-| # | The decision | The audit's recommendation |
+| # | The decision | The recommendation (the audit's; the GF-P0 calibration's where marked ⚙) |
 |---|---|---|
-| OI-GA-2 | A fifth lane — flows & demand? | **Add** (the F-family's 16 rows hold one dead, solo seat — D-14); GF-P0 measures the 4-lane vs 5-lane scenarios |
+| **A** (GF-S2's add) | **The lane rule for the proposed sets** — the calibration's C2 STOP branch: the pre-registered criteria (GB 02 §6, unchanged) reject every proposed set on the all-windows scope under BOTH crowd rules (each set's own net sign smooths to 7 flips/60td — 4 mature — while the lane verdict holds 8–10). The owner's options, each owner-gated: **(a)** keep the criteria and the MIN2 rule as the default for the proposed sets on judgment; **(b)** amend the criteria (an owner-recorded amendment with its date — e.g. re-basing C2's comparison on the FROZEN production net sign, or a flips ceiling) and re-run the calibration before any new seat counts; **(c)** hold the promotions | ⚙ the GF-P0 report §4's measured reading (not the audit's — the question opened at the calibration): the C2 failure is the price of the coverage — richer lanes vote more, and the absolute smoothness stays comparable (9–10 vs the frozen 8 flips/60td); **nothing ships on (a) without the recorded choice** |
+| OI-GA-2 | A fifth lane — flows & demand? | **Add** (the F-family's 16 rows hold one dead, solo seat — D-14); ⚙ both compositions measured (the flows lane votes 759/2512 windows = 30.2% post-backfill, MIN2); the GOLD_LANE_STRONG re-statement (3-of-4 → 3-of-5 or 4-of-5) rides the decision |
 | OI-GA-3 | The S6-M6.4 shadow promotion (D5 `usd-reserve-share` + S6 `sp500-breadth-ratio`) | Fold into GF-P2 as two owner-gated promotions (ranks 13, 17); D5 promote-leaning, S6 with the calibration evidence in hand |
 | OI-GA-4 | WGC quarterly (F3 · F4 · F5 · F13 · F15 · F16 · H1–H4) | **Context-first**, with recorded promotion criteria revisit-able once the cards exist |
 | OI-GA-5 | EODHD per-item policy (F9 · F10 · S2 · S3 · G7) | **No use proposed** — the free proxies carry these channels |
