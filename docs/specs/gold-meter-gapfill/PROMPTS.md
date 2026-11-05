@@ -952,7 +952,7 @@ next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
 green; 5. final message = the printed next prompt + the 5-line summary.
 ```
 
-## GF-S7 — the decision-list re-issue again, with the P1 pivot on the owner's recorded answers (the live kickoff)
+## GF-S7 — the decision-list re-issue again, with the P1 pivot on the owner's recorded answers (RUN 2026-11-05 — **THE OWNER'S ANSWERS A–K ARRIVED AND WERE RECORDED + GF-P1 EXECUTED**: the answer sheet in the README's decision table (with the standing delegation); the repairs delivered on H/I/J + the data plane (the CFTC backfill · the gap persistence · the gold-silver deepening — the history keys written to production KV); the recalibration re-run (the committed report byte-for-byte + the gf-p1-verify evidence: production ≡ POST-P1-DEMOTE in ALL 2512 windows); the tests restated (insights 1310 · web 12617); superseded by the GF-S8 prompt below)
 
 ```
 You are working in the Currena repo at the repo root. This is the GF-S7
@@ -1134,6 +1134,150 @@ if the P1 go is recorded: the repairs executed (D-2 · D-3 · D-7/D-8 per
 the choice · D-6 · D-4 + D-18 · D-5), the recalibration re-run, tests +
 gates green, PR merged; else: the deliverable halves + the re-issue. The
 GF-S8 prompt written, committed, pushed and printed (D-GA-9).
+
+AT THE END (the standing close-out, every session)
+1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the
+next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
+green; 5. final message = the printed next prompt + the 5-line summary.
+```
+
+## GF-S8 — the P2 promotions on the owner's recorded answers (the live kickoff)
+
+```
+You are working in the Currena repo at the repo root. This is the GF-S8
+session of the gold meter gap-fill program (the owner-gated successor to
+the CLOSED gold meter audit program; the program home:
+docs/specs/gold-meter-gapfill/ — README + 01-FILL-SPEC + PROGRESS +
+PROMPTS; the audit's verdict: docs/insights/GOLD-METER-AUDIT-REPORT.md).
+Read this whole prompt before doing anything.
+
+CONTEXT — WHERE WE STAND
+GF-S7 (2026-11-05) recorded the owner's answers to EVERY item of the
+decision list (A–K, in-chat, with the standing delegation: "Generally, I
+trust your decisions. go full autonomously." — the answer sheet: the
+README's decision table) and EXECUTED GF-P1 on the recorded go: the
+D-7/D-8 context demotion (the 21-voter table became 19: 6/3/5/5), the
+five derived thresholds in the production SIGNAL_LEG_MOVE (J), the D-18
+input-presence rule (I), and the data plane (the CFTC archive parse
+production-owned + the one-off gf-p1-backfill — the three history keys
+written to production KV; the rung-2 gap persistence repair; the
+gold-silver base deepening over Yahoo GC=F÷SI=F). The D-GF-6
+recalibration re-ran: the committed calibration report reproduces
+byte-for-byte AND the new gf-p1-verify evidence pins the production
+engine ≡ the measured POST-P1-DEMOTE scenario in ALL 2512 windows (MIN2
+all: C1 PASS · C2 FAIL 8 vs 7 — the owner's recorded A resolves the STOP
+branch on judgment: keep the criteria + MIN2). The lineage is preserved
+verbatim (HARNESS_GOLD_VOTERS_21 + GF_VOTERS_FROZEN_21) and pinned.
+THE RECORDED ANSWERS THAT GATE THIS SESSION (the README's decision
+table is the authority): B — ADD the flows lane + GOLD_LANE_STRONG =
+4-of-5 (80% — preserves the 75% strictness); C — PROMOTE D5
+(usd-reserve-share) + S6 (sp500-breadth-ratio); G — N-1 AMEND (the
+euro-hicp taxonomy amendment, owner-recorded with its date — the
+denominator becomes 86 and the arithmetic restates downstream); K —
+PROMOTE the twelve zero-new-fetch seats: R9 (term-premium-10y) · S4
+(ebp) · G1 (us-deficit-12m) · R8 (t5yie) · S13 (michigan-sentiment —
+polarity note: pessimism reads gold-positive) · S7 the DAILY object
+(gpr-daily; the monthly gpr-index alternative fires 1114) · S8 (epu-us;
+the tpu-us alternative fires 1259 — a one-seat swap recorded as the
+alternative) · I3 (michigan-1y-expectations) · F2 (the gross CFTC legs —
+rides F1's backfill; the one-seat-or-two question and the gross-short
+complement are the design questions) · I7 (m2-us) · G4 (nyfed-custody).
+D7: CONTEXT CARD first (the seat question stays recorded-open). I10 ·
+X7 · I11: CONTEXT ADDS (GF-P4). D (OI-GA-4): WGC quarterly
+context-first. E (OI-GA-5): EODHD — NO USE, zero calls any phase.
+
+WHAT THIS SESSION IS
+GF-P2 — THE PROMOTIONS (01-FILL-SPEC §1, ranks 6–18 + the COBD pair):
+the twelve promote seats + the flows lane (B) + the GOLD_LANE_STRONG
+re-statement + the N-1 amendment (G). The composition the calibration
+measured as POST-P2-5LANE: 32 seats (borrowing-costs 6 · dollar 5 ·
+stress 10 · inflation 9 · flows 2) — GF_VOTERS_5LANE in
+gf-p0-proposed.ts is the measured table (every seat line cites its §4
+row); F2's seat there is the SCENARIO PROXY (the harness-local
+gf-f2-gross-long-share id) — the P2 design names the real object (the
+gross-long share parse from the same deafut.txt, or the proxy promoted
+as-is with the id renamed — the design decision to record in-session).
+The R9/t5yie thresholds already live in SIGNAL_LEG_MOVE (executed at
+P1); the promotions ACTIVATE them. Session shape: (1) read-first +
+git pull --rebase; (2) the F2 design decision recorded in-session (the
+owner's delegation covers it — record the choice + its reason in
+PROGRESS); (3) execute: the voter-table promotions into GOLD_LANE_VOTERS
++ GOLD_LANES gains 'flows' (the fifth lane — the engine, the beam
+formula is lane-count-agnostic) + GOLD_LANE_STRONG = 4 (of 5) + the N-1
+taxonomy amendment (docs/specs/gold-meter-audit/ 02's amendment record +
+the denominator 86 restatement wherever the report arithmetic cites it)
++ the S8/S7 object seats per the recorded answers (epu-us + gpr-daily)
++ the D7 context card (I10/X7/I11 are P4 — NOT this session); (4) the
+D-GF-6 recalibration re-runs BEFORE the new seat counts anywhere: the
+calibration script re-verified byte-for-byte + the gf-p1-verify extended
+(or a gf-p2-verify twin) pinning production ≡ POST-P2-5LANE
+window-for-window over the corpus + the fixtures; (5) the tests + the
+honesty suite restated (the same discipline as GF-S7: every delta traced
+to a recorded answer); (6) the UI copy: the fifth lane's member lines
+render from the engine (the laneNames/voterNames dictionaries need the
+'flows' lane name + the new voters' names — EN+fa, the copy:audit gate);
+GOLD_LANE_STRONG 4-of-5 changes the Outlook's strong bar (the
+goldOutlookOf STRONG constant is 3-of-4 today — it becomes 4 with 5
+lanes; the Outlook copy states the same words).
+
+WORK ITEMS (in order)
+1. READ FIRST: docs/specs/gold-meter-gapfill/ (README — the answer
+   sheet; 01-FILL-SPEC §1 P2; PROGRESS — the GF-S7 block;
+   evidence/gf-p1-verify-2026-11-05.md) + the audit report §4 (the
+   promotion rows) + the calibration report §5–§7 (the per-seat firing
+   tables + the POST-P2 compositions) + gf-p0-proposed.ts
+   (GF_VOTERS_5LANE) + the engines. Then git pull --rebase.
+2. THE F2 DESIGN DECISION (recorded in-session under the standing
+   delegation): the real object for the gross-long share — the
+   production parse of the same deafut.txt row's NonComm Long ÷ OI (the
+   recorder's fixture records both gross legs) — or the proxy promoted
+   as-is. Record the choice + reason in PROGRESS; cite the §4 row.
+3. EXECUTE THE PROMOTIONS: every seat change per the per-seat approval
+   rule (the audit §4 row = the justification, the README's recorded
+   answer = the go). The F1 re-seat to flows (D-14's repair — cftc
+   leaves stress for the new lane). The N-1 amendment with its date.
+4. THE RECALIBRATION (D-GF-6 — BEFORE the new seat counts ship): the
+   committed calibration report re-run (byte-for-byte) + the production
+   ≡ POST-P2-5LANE pin window-for-window + the C1/C2 verdicts restated
+   (the committed numbers: MIN2 all — level 24.2% · full-tip 16.0% · C1
+   PASS · C2 FAIL 10 vs 7 — the owner's recorded A already resolves the
+   shape on judgment; state it, never narrate it away).
+5. THE TESTS + COPY: the engine pins restated (the GF-S7 discipline);
+   the dictionaries gain the flows lane + the new voters (EN+fa); the
+   Outlook strong bar 4-of-5; copy:audit clean.
+6. GATES + CLOSE-OUT: pnpm gates green; the PR; self-merge when the
+   exit gate holds; CI green on main verified; PROGRESS block +
+   milestone row (P2 DELIVERED); CHANGELOG [2026-11-05l]; the GF-S9
+   prompt written (P3 — the new free sources: R2 DFII5 (unlocks
+   D-11/D-12's derived real curve — the D-7/D-8 sign question re-opens
+   with the correct object) · D2 DTWEXBGS · D9 DTWEXEMEGS · F6 the
+   Shanghai premium · F3/F4/F13 per OI-GA-4's context-first answer · F7
+   · S9 DPCREDIT · I4 · I9); AGENT_HANDOFF restated; the final message =
+   the printed GF-S9 prompt + the 5-line summary.
+
+CONSTRAINTS (standing, every session of this program — README D-GF-1..9)
+- THE PER-SEAT APPROVAL RULE: every gold-score.ts / GOLD_LANE_VOTERS
+  edit requires the owner's RECORDED approval per seat change — the
+  audit report's §4 row is the justification attached to each; the
+  README's decision table IS the recorded go for every promotion this
+  session names.
+- The beam formula, the honesty rules and the no-edge record are
+  inherited UNCHANGED; no forecasting claim anywhere — copy says
+  "conditions"; every number from a run or a citation; free-first
+  (EODHD: zero calls — the owner's recorded E); the taxonomy's N-1
+  amendment is owner-recorded with its date (D-GF-7).
+- P0 wraps every voter-set change (D-GF-6): the recalibration re-runs
+  BEFORE the new seat counts anywhere.
+- Branch gf/p2-promotions; PR early; pnpm gates green before every
+  push; self-merge when the exit gate holds; CI green on main verified;
+  deploy only when the built worker changes (D-GF-9).
+
+EXIT GATE
+The promotions executed (the twelve seats + the flows lane + STRONG
+4-of-5 + the N-1 amendment); the recalibration re-run (byte-for-byte +
+the production ≡ POST-P2-5LANE pin); tests + copy:audit + gates green;
+PR merged; CI green on main. The GF-S9 prompt written, committed,
+pushed and printed (D-GA-9).
 
 AT THE END (the standing close-out, every session)
 1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the

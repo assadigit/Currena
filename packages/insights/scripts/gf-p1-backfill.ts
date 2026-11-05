@@ -23,12 +23,17 @@
  *     with this accumulation (the GF-P1 run.ts repair) instead of
  *     resetting to the stage window.
  *  3. **gold-silver (D-5/X1)** — the base deepening: the free daily
- *     ratio history from Yahoo (XAU=X ÷ XAG=X, the repo's own adapter —
- *     the audit's named source, L2 owner-accepted), merged into the
- *     stored history as the DEEPENING layer (stored production values
- *     win on collision — the backfill fills the decade BEFORE the live
- *     seeds began, it never re-venues the tail; the live tail and the
- *     move leg keep ageing through the normal 04:10 build).
+ *     ratio history from Yahoo (GC=F ÷ SI=F — the front-month futures
+ *     pair, the repo's OWN existing Yahoo metal symbols (gold-usd's
+ *     yahoo:GC=F fallback, silver-usd's yahoo:SI=F), L2 owner-accepted;
+ *     the spot-style symbols XAU=X/XAG=X return HTTP 404 on Yahoo's
+ *     chart endpoint — probed 2026-11-05 — so the futures pair carries
+ *     the ratio, both legs same-day so the term structure cancels in the
+ *     division), merged into the stored history as the DEEPENING layer
+ *     (stored production values win on collision — the backfill fills
+ *     the decade BEFORE the live seeds began, it never re-venues the
+ *     tail; the live tail and the move leg keep ageing through the
+ *     normal 04:10 build).
  *
  * Collision policies, stated: (1) and (2) merge with the FRESH FETCH
  * winning (mergeSeries(stored, fetched) — the same discipline the ingest
@@ -216,9 +221,9 @@ await runOne(
  * ------------------------------------------------------------------ */
 
 console.log('\n## 3. gold-silver — the daily ratio history (D-5/X1)');
-const xau = await fetchYahooQuote('XAU=X', '10y');
-const xag = await fetchYahooQuote('XAG=X', '10y');
-console.log(`  parents: XAU=X ${xau.points.length} pts · XAG=X ${xag.points.length} pts (Yahoo, the repo's own adapter)`);
+const xau = await fetchYahooQuote('GC=F', '10y');
+const xag = await fetchYahooQuote('SI=F', '10y');
+console.log(`  parents: GC=F ${xau.points.length} pts · SI=F ${xag.points.length} pts (Yahoo, the repo's own adapter — the spot symbols XAU=X/XAG=X 404 on the chart endpoint, probed 2026-11-05)`);
 if (xau.points.length < 500 || xag.points.length < 500) {
   throw new Error('[gf-p1-backfill] FATAL: a Yahoo ratio leg came back implausibly short — aborting (never a partial backfill).');
 }
@@ -231,7 +236,7 @@ await runOne(
   'gold-silver',
   ratio,
   (stored, fetched) => mergeSeries(fetched, stored), // the STORED production values win — the Yahoo layer only deepens the base
-  `D-5/X1: Yahoo XAU=X ÷ XAG=X, ${ratio.length} daily points (the audit's named source, L2 owner-accepted)`,
+  `D-5/X1: Yahoo GC=F ÷ SI=F, ${ratio.length} daily points (the futures pair — the repo's own L2-accepted Yahoo metal symbols; both legs same-day so the term structure cancels)`,
 );
 
 /* ------------------------------------------------------------------ *
