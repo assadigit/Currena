@@ -328,7 +328,7 @@ import {
 describe('Insights: IndicatorIdSchema (contract shape is deliberate)', () => {
   it('pins the exact indicator set — 156 ids (the 2026-11-01 gap-closure S4-M4.4 round adds the supply-chain/energy six — gscpi/us-spr/us-crude-production riding rung2 + coal-aus/lng-japan/gas-europe riding the Pink Sheet columns, context-only; the 2026-11-01 gap-closure S4-M4.3 round adds the chokepoint five — chokepoint-suez/panama/bab-el-mandeb/malacca/taiwan, the IMF PortWatch transits riding rung3, context-only; the 2026-10-25 M6 Wave-3 round adds the leading-edge batch: mortgage-30y, walcl, retail-sales, housing-permits, cfnai, job-openings, t5yie, us-wages, euro-hicp, au-housing-finance, au-saving-ratio, au-job-vacancies; the 2026-10-26 M7 round adds china-cpi on the NBS press-release automation — both OECD mirrors died upstream 2025-04; the 2026-10-29 owner round adds usdaed — the UAE dirham card; the 2026-10-31 Session-3 round adds breakeven-tilt — the G2 interplay card; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, FRED WSEFINTL1; the 2026-11-01 gap-closure S3-M3.2 round adds the US liquidity/funding six — term-premium-10y, tga, reverse-repo, bank-reserves, repo-stress, net-liquidity — riding rung4, context-only; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — ebp + ofr-fsi — riding rung4 as their own sources, context-only; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — gdpnow, empire-state, continuing-claims, median-cpi, sticky-cpi, sloos-ci-tightening — riding rung4\'s fred-s3 macro group, context-only; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — us-deficit-12m + the us-deficit-monthly companion (FRED MTSDS133FMS, derived) + the treasury-auction-10y/30y demand cards with their indirect-share companions (FiscalData auctions_query, Node-venue-only), context-only; the 2026-11-01 gap-closure S4-M4.2 round adds the geopolitics eleven — the GPR threat/act sub-indices + the seven country indices + the daily 7-day average + the TPU — riding rung2, context-only), blocked/licensed items absent', () => {
     const ids = IndicatorIdSchema.options;
-    expect(ids).toHaveLength(161); // gap-closure S6-M6.3 (2026-11-02) adds the de-dollarization/concentration family — usd-reserve-share (IMF COFER, rung2 Saturday) + sp500-breadth-ratio (Yahoo RSP÷SPY, rung2 daily) — plus btp-bund-spread (the FRED OECD mirrors' derived spread), all context-only // gap-closure S6-M6.2 (2026-11-02) adds the China property/steel pair — china-property-investment + china-steel-output (the NBS dedicated English releases, rung2's 21st-25th window, context-only) // gap-closure S5-M5.2 (2026-11-02) adds the Australian macro eight — au-gdp-growth, au-household-spending, au-building-approvals, au-population-growth + the au-nom companion, au-participation, au-underemployment (the au-activity shadow lane) and au-trade-balance (the au-external shadow lane), all context-only, riding rung3's abs-au-macro source // the 2026-11-01 gap-closure S4-M4.4 round adds the supply-chain/energy six (the GSCPI + the EIA SPR/production pair on rung2, the Pink Sheet energy trio, context-only); the 2026-11-01 gap-closure S4-M4.3 round adds the chokepoint five (IMF PortWatch transits, context-only); the 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1), rba-fed-gap (A-5), us-japan-10y-gap (A-3), gold-oil-ratio (A-4), eia-crude-stocks (A-6), cftc-gold-positioning (A-7) + the monthly trio: oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10); the 2026-10-29 owner round adds usdaed (Yahoo USD/AED daily closes); the 2026-10-31 Session-3 round adds breakeven-tilt (T5YIFR − T5YIE, derived, context-only — D-5); the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody (FRED WSEFINTL1, context-only); the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six (THREEFYTP10, WTREGEN, RRPONTSYD, WRESBAL + the derived SOFR−IORB and WALCL−TGA−RRP, context-only); the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair (the Fed Board's EBP file + the OFR's FSI file, context-only); the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six (GDPNOW, GACDISA066MSFRBNY, CCSA, MEDCPIM158SFRBCLE, STICKCPIM158SFRBATL, DRTSCILM, context-only); the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six (MTSDS133FMS ×2 — the 12m derived sum + the monthly companion — and the four FiscalData auction ids, context-only)
+    expect(ids).toHaveLength(163); // GF-P2 (2026-11-05, the owner's recorded answers K + the per-row D7 answer) adds cftc-gold-gross-long (F2's real object — the same deafut.txt gold row's gross-long share, the Saturday rung) + usdchf (the haven cross — the already-fetched Frankfurter CHF leg, context-only) — 161 + 2 = 163 // gap-closure S6-M6.3 (2026-11-02) adds the de-dollarization/concentration family — usd-reserve-share (IMF COFER, rung2 Saturday) + sp500-breadth-ratio (Yahoo RSP÷SPY, rung2 daily) — plus btp-bund-spread (the FRED OECD mirrors' derived spread), all context-only // gap-closure S6-M6.2 (2026-11-02) adds the China property/steel pair — china-property-investment + china-steel-output (the NBS dedicated English releases, rung2's 21st-25th window, context-only) // gap-closure S5-M5.2 (2026-11-02) adds the Australian macro eight — au-gdp-growth, au-household-spending, au-building-approvals, au-population-growth + the au-nom companion, au-participation, au-underemployment (the au-activity shadow lane) and au-trade-balance (the au-external shadow lane), all context-only, riding rung3's abs-au-macro source // the 2026-11-01 gap-closure S4-M4.4 round adds the supply-chain/energy six (the GSCPI + the EIA SPR/production pair on rung2, the Pink Sheet energy trio, context-only); the 2026-11-01 gap-closure S4-M4.3 round adds the chokepoint five (IMF PortWatch transits, context-only); the 2026-10-26 gap-audit build adds yield-curve-10y3m (A-1), rba-fed-gap (A-5), us-japan-10y-gap (A-3), gold-oil-ratio (A-4), eia-crude-stocks (A-6), cftc-gold-positioning (A-7) + the monthly trio: oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10); the 2026-10-29 owner round adds usdaed (Yahoo USD/AED daily closes); the 2026-10-31 Session-3 round adds breakeven-tilt (T5YIFR − T5YIE, derived, context-only — D-5); the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody (FRED WSEFINTL1, context-only); the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six (THREEFYTP10, WTREGEN, RRPONTSYD, WRESBAL + the derived SOFR−IORB and WALCL−TGA−RRP, context-only); the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair (the Fed Board's EBP file + the OFR's FSI file, context-only); the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six (GDPNOW, GACDISA066MSFRBNY, CCSA, MEDCPIM158SFRBCLE, STICKCPIM158SFRBATL, DRTSCILM, context-only); the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six (MTSDS133FMS ×2 — the 12m derived sum + the monthly companion — and the four FiscalData auction ids, context-only)
     // Step-2 add-list §B5: VIX is IN (FRED VIXCLS, licence noted); the rest
     // of the v1 blocked list stays blocked.
     for (const blocked of ['spx-gold', 'breadth', 'cape']) {
@@ -567,7 +567,12 @@ describe('Insights: GoldSummarySchema (the frozen engine\'s output contract — 
     calendar: [],
   };
 
-  const sub = (lane: 'borrowing-costs' | 'dollar' | 'stress' | 'inflation', reading: string) => ({
+  // GF-P2 (the owner's recorded answer B): the helper's union carries the
+  // five lanes — the schema's own GoldLane set (schemas.ts GoldLaneSchema).
+  const sub = (
+    lane: 'borrowing-costs' | 'dollar' | 'stress' | 'inflation' | 'flows',
+    reading: string,
+  ) => ({
     lane,
     reading,
     tailwindVoters: 1,
@@ -580,12 +585,15 @@ describe('Insights: GoldSummarySchema (the frozen engine\'s output contract — 
     firingVoters: 3,
     tailwindVoters: 2,
     headwindVoters: 1,
-    laneCounts: { tailwind: 1, headwind: 1, mixed: 1 },
+    laneCounts: { tailwind: 1, headwind: 1, mixed: 2 },
+    // GF-P2 (2026-11-05, the owner's recorded answer B): five lanes — the
+    // flows seat joins the battery ('elevated', the harness's own word).
     subGauges: [
       sub('borrowing-costs', 'relief'),
       sub('dollar', 'strong'),
       sub('stress', 'mixed'),
       sub('inflation', 'unreadable'),
+      sub('flows', 'elevated'),
     ],
     modelVsReality: {
       chip: 'diverging-down' as const,
@@ -606,10 +614,10 @@ describe('Insights: GoldSummarySchema (the frozen engine\'s output contract — 
     if (withGold.success) expect('goldSummary' in withGold.data).toBe(false);
   });
 
-  it('rejects a three-lane subGauge set, an unknown lane word and a fractional net score', () => {
-    expect(GoldSummarySchema.safeParse({ ...gold, subGauges: gold.subGauges.slice(0, 3) }).success).toBe(false);
+  it('rejects a FOUR-lane subGauge set (GF-P2: five is the contract), an unknown lane word and a fractional net score', () => {
+    expect(GoldSummarySchema.safeParse({ ...gold, subGauges: gold.subGauges.slice(0, 4) }).success).toBe(false);
     expect(
-      GoldSummarySchema.safeParse({ ...gold, subGauges: [...gold.subGauges.slice(0, 3), sub('inflation', 'windy')] })
+      GoldSummarySchema.safeParse({ ...gold, subGauges: [...gold.subGauges.slice(0, 4), sub('inflation', 'windy')] })
         .success,
     ).toBe(false);
     expect(GoldSummarySchema.safeParse({ ...gold, netScore: 1.5 }).success).toBe(false);

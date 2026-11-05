@@ -934,7 +934,11 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   // history (buildHistoryFile's floor), and without the stage base the
   // second week's fetch would replace rather than join the first (the
   // accumulation deadlock the A-7 commit shipped with).
-  for (const id of ['eia-crude-stocks', 'cftc-gold-positioning', 'us-spr', 'us-crude-production'] as const) {
+  // GF-P2 (2026-11-05, the owner's recorded answer K — §4 row 12 / F2):
+  // the gross-long share joins the same accumulation loop — the SAME
+  // Saturday file's second series (the gf-p2-backfill seeded its deep
+  // base; this merge keeps it current exactly as the net seat's).
+  for (const id of ['eia-crude-stocks', 'cftc-gold-positioning', 'cftc-gold-gross-long', 'us-spr', 'us-crude-production'] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;
     const stored =

@@ -484,6 +484,19 @@
       "rule": "{\"kind\":\"any-of\",\"of\":[{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":45},{\"kind\":\"threshold\",\"direction\":\"below\",\"value\":0},{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.02},{\"kind\":\"percentile\",\"tail\":\"low\",\"cutoff\":0.02}]}"
     },
     {
+      "id": "cftc-gold-gross-long",
+      "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M2",
+      "maxAgeDays": 12,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"any-of\",\"of\":[{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":62},{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.02},{\"kind\":\"percentile\",\"tail\":\"low\",\"cutoff\":0.02}]}"
+    },
+    {
       "id": "oecd-cli-us",
       "licenceName": "OECD reuse terms — free with suitable acknowledgment",
       "publicDisplayOk": "yes",
@@ -1161,11 +1174,11 @@
     },
     {
       "id": "gold-silver",
-      "licenceName": "Free API — commercial use permitted (their ToS)",
+      "licenceName": "No reuse licence offered (unofficial endpoints)",
       "publicDisplayOk": "yes",
       "privateOk": true,
-      "level": "L1",
-      "ownerAccepts": null,
+      "level": "L2",
+      "ownerAccepts": true,
       "enabled": true,
       "method": "M1",
       "maxAgeDays": 2,
@@ -1213,6 +1226,19 @@
     },
     {
       "id": "eur-usd",
+      "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L1",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 4,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "usdchf",
       "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
       "publicDisplayOk": "yes",
       "privateOk": true,

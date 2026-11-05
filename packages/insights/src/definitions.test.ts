@@ -25,7 +25,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
   it('splits 96 P1 / 43 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, P1; the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — both P1 context cards; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — all P1 context cards; the 2026-11-01 gap-closure S4-M4.2 round adds the geopolitics eleven — the GPR threat/act/country family, the daily 7-day average and the TPU, all P1 context cards; the 2026-11-01 gap-closure S4-M4.3 round adds the chokepoint five — the IMF PortWatch transit cards, all P1 context cards; the 2026-11-01 gap-closure S4-M4.4 round adds the supply-chain/energy six — the GSCPI + the EIA SPR/production pair as P1 context cards, the Pink Sheet energy trio as P2 context cards)', () => {
     expect(DEFINITIONS.filter((d) => d.phase === 'P1')).toHaveLength(110);
     // Session 3 (G2): +breakeven-tilt (P2, the breakeven-10y sibling).
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(51); // gap-closure S6-M6.3 (2026-11-02): +the de-dollarization/concentration family + the btp-bund-spread (three P2 context cards — the rung2 Saturday/daily gates + the OECD-yields group)
+    // GF-P2 (2026-11-05, the owner's recorded answers K + the per-row D7
+    // answer): +cftc-gold-gross-long (F2's real object) + usdchf (the haven
+    // cross context card) — two P2 cards.
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(53);
   });
 
   it('groups are the question groups (global 7 + prices-board, australia 3)', () => {
@@ -175,6 +178,8 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'us-wages',
       'usd-reserve-share',
       'usdaed',
+      // GF-P2 (D7, §4 row 23 — 2026-11-05): the haven cross, a context card.
+      'usdchf',
       'usdcny',
       'usdtry',
       'walcl',
@@ -186,7 +191,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
   it('GAUGE membership is the scored list (48 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation SHADOW gauge carries context-only members — the deliberate G-5 exception, pinned here)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(68); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3/M4.5 shadow gauge's EIGHT context-only members (the five chokepoints + gscpi/us-spr/us-crude-production; 48 + 8 = 56; only the 48 vote) PLUS the S5-M5.2 shadow lanes' SEVEN context-only members (the six activity cards + au-trade-balance; 56 + 7 = 63; still only the 48 vote) PLUS the S6-M6.1 NZ link's THREE context-only members (audnzd + nz-short-rate + nz-10y in the au-external shadow lane; 63 + 3 = 66; still only the 48 vote) PLUS the S6-M6.3 de-dollarization lane's TWO context-only members (usd-reserve-share + sp500-breadth-ratio; 66 + 2 = 68; still only the 48 vote)
+    expect(memberIds.size).toBe(69); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3/M4.5 shadow gauge's EIGHT context-only members (the five chokepoints + gscpi/us-spr/us-crude-production; 48 + 8 = 56; only the 48 vote) PLUS the S5-M5.2 shadow lanes' SEVEN context-only members (the six activity cards + au-trade-balance; 56 + 7 = 63; still only the 48 vote) PLUS the S6-M6.1 NZ link's THREE context-only members (audnzd + nz-short-rate + nz-10y in the au-external shadow lane; 63 + 3 = 66; still only the 48 vote) PLUS the S6-M6.3 de-dollarization lane's TWO context-only members (usd-reserve-share + sp500-breadth-ratio; 66 + 2 = 68; still only the 48 vote) PLUS GF-P2's cftc-gold-gross-long (F2's real object — the market-stress gauge's scored twin beside the net seat, 2026-11-05; 68 + 1 = 69)
     // Every gauge member is a scored (non-info) definition. TWO deliberate
     // exceptions: B-14's brent (the card renders on the Prices strip; only
     // the count membership moved) and the S4-M4.3 SHADOW gauge's members

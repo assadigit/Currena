@@ -1141,7 +1141,7 @@ next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
 green; 5. final message = the printed next prompt + the 5-line summary.
 ```
 
-## GF-S8 — the P2 promotions on the owner's recorded answers (the live kickoff)
+## GF-S8 — the P2 promotions on the owner's recorded answers (RUN 2026-11-05 — **GF-P2 EXECUTED**: the twelve seats + the COBD pair + the flows lane + GOLD_LANE_STRONG 4-of-5 + the N-1 v1.2 amendment (the denominator 86) + the D7 usdchf context card + the F2 REAL OBJECT (the in-session design decision under the standing delegation, recorded in PROGRESS's GF-S8 block); the D-GF-6 recalibration (the committed report byte-for-byte + the NEW gf-p2-verify evidence: production ≡ POST-P2-5LANE in ALL 2512 windows, the F2 id mapping recorded); the tests restated (insights 1311 · web 12617 — the full suite 14,602); copy round-79 triaged, copy:audit clean; superseded by the GF-S9 prompt below)
 
 ```
 You are working in the Currena repo at the repo root. This is the GF-S8
@@ -1278,6 +1278,155 @@ The promotions executed (the twelve seats + the flows lane + STRONG
 the production ≡ POST-P2-5LANE pin); tests + copy:audit + gates green;
 PR merged; CI green on main. The GF-S9 prompt written, committed,
 pushed and printed (D-GA-9).
+
+AT THE END (the standing close-out, every session)
+1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the
+next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
+green; 5. final message = the printed next prompt + the 5-line summary.
+```
+
+## GF-S9 — the P3 new free sources (the live kickoff)
+
+```
+You are working in the Currena repo at the repo root. This is the GF-S9
+session of the gold meter gap-fill program (the owner-gated successor to
+the CLOSED gold meter audit program; the program home:
+docs/specs/gold-meter-gapfill/ — README + 01-FILL-SPEC + PROGRESS +
+PROMPTS; the audit's verdict: docs/insights/GOLD-METER-AUDIT-REPORT.md).
+Read this whole prompt before doing anything.
+
+CONTEXT — WHERE WE STAND
+GF-S8 (2026-11-05) EXECUTED GF-P2 on the owner's recorded answers
+B/C/G/K (the README's decision table is the authority): the 32-seat
+five-lane voter table (borrowing-costs 6 · dollar 5 · stress 10 ·
+inflation 9 · flows 2 — the measured POST-P2-5LANE composition; the F2
+seat is the REAL OBJECT cftc-gold-gross-long, the in-session design
+decision under the standing delegation, its reason recorded in
+PROGRESS's GF-S8 block), GOLD_LANE_STRONG = 4-of-5 (the Outlook's strong
+bar moved with the lane count), the N-1 taxonomy amendment (v1.1 →
+v1.2: the N-A1 euro-area realised-inflation row recorded with its date,
+the denominator 86 restated downstream), the D7 usdchf CONTEXT CARD
+(the seat question stays recorded-open), and the F2 data plane (the
+production parse of both gross legs from the same deafut.txt Saturday
+fetch + the one-off gf-p2-backfill: 522 points WRITTEN to production
+KV, read-back verified). The D-GF-6 recalibration re-ran BEFORE the new
+seat counts anywhere: the committed calibration report re-verified
+byte-for-byte AND the new gf-p2-verify evidence pins the production
+engine ≡ the measured POST-P2-5LANE scenario (the F2 id mapping
+recorded: cftc-gold-gross-long ↔ gf-f2-gross-long-share) in ALL 2512
+windows — MIN2 all: level 24.2% · full-tip 16.0% · C1 PASS · C2 FAIL
+10 vs 7 (the owner's recorded A resolves the shape on judgment: keep
+the criteria + MIN2; the failure is the recorded price of the coverage
+— state it, never narrate it away). The registry drift the re-run
+surfaced (the GF-P1 D-5 gold-silver Yahoo legs) was resolved by the
+gold-oil-ratio A-4 precedent (the owner-display override; the card
+stays public; the M-2 public-history bound follows automatically).
+The standing delegation from GF-S7 remains on record: "Generally, I
+trust your decisions. go full autonomously."
+
+WHAT THIS SESSION IS
+GF-P3 — THE NEW FREE SOURCES (01-FILL-SPEC §1, ranks 19–22, 24–28,
+32–33): R2 DFII5 (the 5y real yield — the belly where policy bites
+first; UNLOCKS D-11/D-12's derived real curve, which RE-OPENS the
+D-7/D-8 sign question with the correct object — the yield-curve seats
+are context cards since P1, the question recorded-open) · D2 DTWEXBGS
+(the trade-weighted dollar — "the honest inverse") · D9 DTWEXEMEGS
+(the EME dollar — the marginal buyer's leg) · F6 the Shanghai premium
+derivation (SGE Au9999 × gold-api XAU × Frankfurter USD/CNY — "the
+classic scarcity tell") · F3/F4/F13 the WGC/official flows (per
+OI-GA-4's recorded CONTEXT-FIRST answer — context cards with recorded
+promotion criteria (annualised-level extreme bands) revisit-able once
+the cards exist; NEVER voters this session) · F7 the India parity ·
+S9 DPCREDIT (the bank-facility usage — the modern bank-run tell) · I4
+the UoM SIE portal (the 5–10y household anchor) · I9 the
+nowcast-surprise derivation. Each lands with its licence row (L0/L1
+rules), its rung, its staleness window — the free-first discipline
+inherited (EODHD: zero calls — the owner's recorded E).
+
+SESSION SHAPE
+(1) read-first + git pull --rebase (the program home + the GF-S8
+block + the gf-p2-verify evidence + the audit report §4 rows 19–28,
+32–33 + the licences register + the adapters/rung patterns the
+backlog's sources ride); (2) wire the sources phase by phase — every
+NEW VOTER seat (R2's real-yield-5y? D2/D9's dollar seats? F6's flows
+seat? S9's stress seat? I4's inflation seat?) is OWNER-GATED per the
+per-seat approval rule: the §4 row is the justification, but P3's
+compositions were NEVER measured by the calibration — a new seat
+requires the D-GF-6 recalibration FIRST (extend the harness scenario
+family with the P3 composition, re-run the calibration over the
+fixtures, THEN seat; the no-silent-change rule D-GF-1); the CONTEXT
+cards (F3/F4/F13 per the recorded D) need no recalibration but DO
+need the EN+fa copy (round 80+ per OI-GA-6's standing rule); (3) the
+D-11/D-12 derived real curve (DGS10-style nominal × the DFII family →
+the real curve object): its derivation follows R2's fill; the sign
+question it re-opens is a DECISION LIST item — measure both variants
+in the harness, print the question for the owner, never seat a sign
+silently; (4) the tests + the honesty suite restated (the GF-S8
+discipline: every delta traced to a recorded answer or a measured
+scenario); (5) the gates + the close-out.
+
+WORK ITEMS (in order)
+1. READ FIRST: the program home (README — the answer sheet + the
+   GF-S8 execution notes; 01-FILL-SPEC §1 P3; PROGRESS — the GF-S8
+   block; PROMPTS — this prompt) + evidence/gf-p2-verify-2026-11-05.md
+   + the audit report §4 rows 19–22, 24–28, 32–33 + the calibration
+   report (the scenario family's shape — the P3 extension follows it)
+   + the licences register (LICENCES.md / licences.ts) + the existing
+   adapter patterns (fred.ts · goldapi.ts · yahoo.ts · frankfurter.ts
+   · monthly-indexes.ts · the rung2/rung3/rung4 gates). Then git pull
+   --rebase.
+2. THE HARNESS FIRST (D-GF-6): extend gf-p0-proposed.ts with the P3
+   scenario family (the P3 compositions over the corpus + fixtures —
+   the new sources' histories recorded the gf-p0-record-candidates
+   way where they are not already on the wire), re-run the
+   calibration, commit the measured record BEFORE any production seat
+   changes. The F2 real-object precedent is the pattern: the scenario
+   seat and the production seat agree by construction.
+3. WIRE THE SOURCES: each with its definition + adapter + rung +
+   staleAfterDays + registry row + EN+fa card copy (round 80+,
+   copy:audit clean) + the licence register row. The context-first
+   family (F3/F4/F13) lands as CARDS with the recorded promotion
+   criteria in their definitions' comments. R2's derived real curve
+   (D-11/D-12) rides the DFII family; the sign question prints as a
+   decision-list item with both variants measured.
+4. THE SEATS (owner-gated, per the per-seat approval rule): seat ONLY
+   what a measured P3 scenario covers; the recalibration re-runs
+   BEFORE any new seat counts (the gf-p2-verify pattern extends — a
+   gf-p3-verify twin pinning production ≡ the measured P3 scenario
+   window-for-window).
+5. THE TESTS + COPY: the engine pins restated; the dictionaries gain
+   the new voters/cards (EN+fa); copy:audit clean.
+6. GATES + CLOSE-OUT: pnpm gates green; the PR; self-merge when the
+   exit gate holds; CI green on main verified; PROGRESS block +
+   milestone row (P3 DELIVERED); CHANGELOG [2026-11-05m]; the GF-S10
+   prompt written (P4 — the context additions with EN+fa copy round
+   80+: I10 · X7 · I11 + the WGC family F5/F8/F11/F15/F16 · G3 · X5 ·
+   R11 · F12 · H1–H4); AGENT_HANDOFF restated; the final message =
+   the printed GF-S10 prompt + the 5-line summary.
+
+CONSTRAINTS (standing, every session of this program — README D-GF-1..9)
+- THE PER-SEAT APPROVAL RULE: every gold-score.ts / GOLD_LANE_VOTERS
+  edit requires the owner's RECORDED approval per seat change — the
+  audit report's §4 row is the justification attached to each. P3's
+  seats ride the standing delegation ONLY through a MEASURED scenario
+  (the harness-first discipline): no measured scenario, no seat.
+- The beam formula, the honesty rules and the no-edge record are
+  inherited UNCHANGED; no forecasting claim anywhere — copy says
+  "conditions"; every number from a run or a citation; free-first
+  (EODHD: zero calls — the owner's recorded E).
+- P0 wraps every voter-set change (D-GF-6): the recalibration re-runs
+  BEFORE the new seat counts anywhere.
+- Branch gf/p3-new-sources; PR early; pnpm gates green before every
+  push; self-merge when the exit gate holds; CI green on main
+  verified; deploy only when the built worker changes (D-GF-9).
+
+EXIT GATE
+The new sources wired (the voter seats owner-gated through measured
+scenarios; the context cards with their recorded promotion criteria);
+the recalibration re-run (the extended scenario family committed + the
+production ≡ scenario pin); tests + copy:audit + gates green; PR
+merged; CI green on main. The GF-S10 prompt written, committed, pushed
+and printed (D-GA-9).
 
 AT THE END (the standing close-out, every session)
 1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the

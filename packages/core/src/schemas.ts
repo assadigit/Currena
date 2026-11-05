@@ -448,6 +448,11 @@ export const IndicatorIdSchema = z.enum([
   'audnzd', // Frankfurter (ECB): NZD per AUD, derived from the two USD legs — context, au-external
   'nz-short-rate', // OECD FINMARK IR3TIB NZL (short-term interest rate, monthly average) — context, au-external
   'nz-10y', // FRED IRLTLT01NZM156N (NZ 10-year government bond yield, OECD monthly mirror) — context, au-external
+  // GF-P2 (2026-11-05, the owner's recorded per-row answer — the audit
+  // report §4 row 23 / D7): USD/CHF, the haven pair's other leg — a CONTEXT
+  // card (rule: info, never votes; the seat question stays recorded-open).
+  // The CHF leg already rides the one Frankfurter request (zero new fetches).
+  'usdchf', // Frankfurter (ECB): CHF per USD — context, dollar-strength
   // ---- gap-closure S6-M6.2 (2026-11-02): the China property/steel family
   // — context rows in the au-trade-currency lane beside iron-ore (G-5),
   // the demand side of the iron-ore story. From the NBS's own dedicated
@@ -470,6 +475,12 @@ export const IndicatorIdSchema = z.enum([
   // 2026-10-26 gap-audit build (A-7): trader positioning in gold (COT) —
   // the CFTC's weekly futures-only file, Saturday rung.
   'cftc-gold-positioning',
+  // GF-P2 (2026-11-05, the owner's recorded answer K — the audit report §4
+  // row 12 / F2, the in-session design decision under the standing
+  // delegation): the GROSS noncommercial long share of open interest — the
+  // same deafut.txt gold row the net-share card parses (zero new fetches);
+  // the flows lane's second seat.
+  'cftc-gold-gross-long',
   // 2026-10-26 gap-audit build (A-8): the OECD's amplitude-adjusted
   // Composite Leading Indicators — one fetch, three rows (USA, CHN, and
   // DEU — the euro-area substitute; EA19 does not exist in the dataflow,
@@ -1174,15 +1185,20 @@ export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
  * only the COMPACT numbers ride the KV write (~0.5 KB).
  * ------------------------------------------------------------------ */
 
-/** The four driver lanes the gold score re-cuts the gauge voters into. */
-export const GoldLaneSchema = z.enum(['borrowing-costs', 'dollar', 'stress', 'inflation']);
+/** The five driver lanes the gold score re-cuts the gauge voters into
+ * (the fifth — `flows` — added at GF-P2, 2026-11-05: the owner's recorded
+ * answer B, OI-GA-2's ADD scenario; the promotion is owner-gated per the
+ * per-seat approval rule, every seat citing its audit-report §4 row). */
+export const GoldLaneSchema = z.enum(['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows']);
 export type GoldLane = z.infer<typeof GoldLaneSchema>;
 
 /**
  * A lane's word. The four directional pairs are lane-specific
  * (borrowing-costs tight/relief, dollar strong/stress, market-stress
- * elevated/calm, inflation hot/cool); 'mixed' = the lane's firing
- * voters disagree; 'unreadable' = nothing in the lane could fire.
+ * elevated/calm, inflation hot/cool); the GF-P2 `flows` lane shares the
+ * stress pair's words (demand elevated/calm — the harness's own recorded
+ * mapping); 'mixed' = the lane's firing voters disagree; 'unreadable' =
+ * nothing in the lane could fire.
  */
 export const GoldSubGaugeWordSchema = z.enum([
   'tight',
@@ -1245,14 +1261,15 @@ export const GoldSummarySchema = z.object({
   firingVoters: z.number().int().nonnegative(),
   tailwindVoters: z.number().int().nonnegative(),
   headwindVoters: z.number().int().nonnegative(),
-  /** How many of the four LANES read tailwind / headwind / mixed. */
+  /** How many of the five LANES read tailwind / headwind / mixed. */
   laneCounts: z.object({
     tailwind: z.number().int().nonnegative(),
     headwind: z.number().int().nonnegative(),
     mixed: z.number().int().nonnegative(),
   }),
-  /** The four lane readings, in lane order — exactly four. */
-  subGauges: z.array(GoldSubGaugeSummarySchema).length(4),
+  /** The five lane readings, in lane order — exactly five (GF-P2, the
+   * owner's recorded answer B: the flows lane). */
+  subGauges: z.array(GoldSubGaugeSummarySchema).length(5),
   modelVsReality: z.object({
     chip: ModelVsRealityChipSchema,
     modelDirection: z.enum(['tailwind', 'headwind', 'neutral']).nullable(),

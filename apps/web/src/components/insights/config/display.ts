@@ -33,6 +33,8 @@ export type UnitToken =
   | 'aed'
   // gap-closure S6-M6.1 (2026-11-02): the New Zealand dollar (the audnzd pair).
   | 'nzd'
+  // GF-P2 (D7, §4 row 23 — 2026-11-05): the Swiss franc (the usdchf haven cross).
+  | 'chf'
   // M6 Wave 3 (2026-10-25): the leading-edge batch — Australian billions
   // ("A$97.6bn" EN), US permits and job openings scaled to millions
   // ("1.40m permits a year"), AU vacancies in thousands ("325k").
@@ -83,6 +85,8 @@ export interface UnitLabels {
   aed: string;
   // gap-closure S6-M6.1 (2026-11-02): the New Zealand dollar unit.
   nzd: string;
+  // GF-P2 (D7, §4 row 23 — 2026-11-05): the Swiss franc unit (the usdchf card).
+  chf: string;
   'aud-bn': string;
   permits: string;
   openings: string;
@@ -110,7 +114,7 @@ interface DisplayConfig {
 }
 
 /** Units rendered as a prefix in English (suffix everywhere in Farsi). */
-const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'usd-tr', 'eur', 'jpy', 'cny', 'try', 'nzd']);
+const PREFIXED_UNITS: ReadonlySet<UnitToken> = new Set(['usd', 'aud', 'usd-bn', 'usd-tr', 'eur', 'jpy', 'cny', 'try', 'nzd', 'chf']);
 
 export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'yield-curve-10y2y': { decimals: 2, unit: 'points' },
@@ -172,6 +176,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // 2026-10-29 owner round ("add dollar against UAE currency"): the
   // pegged pair — 2dp reads the dirham's tight band honestly (3.67).
   usdaed: { decimals: 2, unit: 'aed' },
+  // GF-P2 (D7, §4 row 23 — 2026-11-05): the haven cross — the franc's tight
+  // range reads honestly at 4dp like the euro leg (0.9188).
+  usdchf: { decimals: 4, unit: 'chf' },
   // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch: the
   // mortgage/liquidity/spending family. WALCL is $ millions → 'usd-tr'
   // ×1e-6 ("US$6.8 trillion"); retail sales $ millions → 'usd-bn' ×1e-3
@@ -271,6 +278,9 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'eia-crude-stocks': { decimals: 1, unit: 'barrels', scale: 1e-3 },
   // A-7: the net non-commercial share of open interest, in percent.
   'cftc-gold-positioning': { decimals: 1, unit: 'percent' },
+  // GF-P2 (F2, §4 row 12 — 2026-11-05): the gross-long share — the net
+  // seat's convention (percent, 1dp).
+  'cftc-gold-gross-long': { decimals: 1, unit: 'percent' },
   // 2026-10-26 gap-audit build, A-8..A-10: the monthly trio — the CLI is
   // an index normalised around 100; GPR and EPU are news-based indexes.
   'oecd-cli-us': { decimals: 1, unit: 'index' },

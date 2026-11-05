@@ -75,6 +75,14 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'gdpnow',
       'gilt-10y',
       'gold-oil-ratio',
+      // GF-P2 (2026-11-05): the registry re-run surfaced the GF-P1 drift —
+      // the D-5 base deepening added the Yahoo GC=F ÷ SI=F history legs, so
+      // the ratio's audit level is now L2 (the worst leg) while the
+      // standing owner directives keep it public (the gold-oil-ratio A-4
+      // precedent: the derived ratio inherits its parents' lifted display
+      // bars). The M-2 rule follows automatically: its public history
+      // serves the visible window only, exactly like its parents'.
+      'gold-silver',
     'gold-usd',
       'jgb-10y',
       'median-cpi',

@@ -763,6 +763,43 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 12,
   },
   {
+    // GF-P2 (2026-11-05, the owner's recorded answer K — the audit report
+    // §4 row 12 / F2: "the gross CFTC legs — richer than net"; the
+    // in-session F2 design decision under the standing delegation, the
+    // reason recorded in docs/specs/gold-meter-gapfill/PROGRESS.md's GF-S8
+    // block): the GROSS noncommercial LONG share of open interest —
+    // NonComm Long ÷ OI × 100, parsed from the SAME deafut.txt gold row
+    // the net-share card reads (zero new subrequests; the parse carries
+    // the same arithmetic-identity assertions). The flows lane's second
+    // seat, polarity −1 (crowded gross-longs fragile — the contrarian
+    // read, exactly the net seat's). The threshold band is the archive's
+    // own top decile (62% of OI, measured over the committed 565-week
+    // backfill fixture: p90 = 62.07 — a derived number, D-GF-5, never a
+    // desk-placed one); the percentile tails at 2% mirror the net seat's
+    // level-vs-decade read (the seat is percentile-led, the D-1 walk's
+    // F1 class). The history was seeded once by the GF-P2 backfill
+    // (scripts/gf-p2-backfill.ts — the same CFTC archive the F1 backfill
+    // read); the weekly rung keeps appending.
+    id: 'cftc-gold-gross-long',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Gold long positioning (COT)',
+    source: 'cftc',
+    sourceRef: 'CFTC Commitments of Traders (futures-only, GOLD - COMMODITY EXCHANGE INC.)',
+    cadence: 'weekly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: {
+      kind: 'any-of',
+      of: [
+        { kind: 'threshold', direction: 'above', value: 62 },
+        { kind: 'percentile', tail: 'high', cutoff: 0.02 },
+        { kind: 'percentile', tail: 'low', cutoff: 0.02 },
+      ],
+    },
+    staleAfterDays: 12,
+  },
+  {
     // 2026-10-26 gap-audit build, A-8 (INSIGHTS_DATA_SPEC.md): the OECD's
     // amplitude-adjusted Composite Leading Indicator, US leg — the
     // licensed-PMI replacement the spec names ("the growth lane gains its
@@ -1833,6 +1870,30 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     name: 'EUR/USD',
     source: 'frankfurter',
     sourceRef: 'Frankfurter USD→EUR',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 4,
+  },
+  {
+    // GF-P2 (2026-11-05, the owner's recorded per-row answer — the audit
+    // report §4 row 23 / D7, "no USD/CHF — the haven pair's other leg;
+    // zero new fetches (CHF already in the basket fetch)"; the owner's
+    // recorded K: "D7: CONTEXT CARD first — its row is context-leaning; a
+    // seat defensible, the seat question stays recorded-open"). The
+    // haven cross as a CONTEXT CARD (rule: info — never votes); the
+    // Swiss franc leg already rides the one Frankfurter request
+    // (USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY,NZD — collect.ts), so the
+    // card adds ZERO new subrequests. The seat question re-opens only
+    // on the owner's recorded go (02 D7's own "−-with-nuance" treatment:
+    // a falling USD/CHF marks the European haven-demand regime).
+    id: 'usdchf',
+    section: 'global',
+    group: 'dollar-strength',
+    name: 'USD/CHF',
+    source: 'frankfurter',
+    sourceRef: 'Frankfurter USD→CHF',
     cadence: 'daily',
     changeKind: 'pct',
     phase: 'P2',

@@ -2,15 +2,19 @@
 
 **Status: delivered 2026-11-05 by the GA-S4 session** — the gold meter
 audit program's closing deliverable (A4, 01 §2; the report shape 04 §1).
-The audited object: the consolidated lane balance live for every visitor
-on currena.ir — the frozen 21-voter table `GOLD_LANE_VOTERS`
-(`gold-score.ts:155-184`, 4 lanes: borrowing costs 8 · dollar 3 · market
-stress 5 · inflation 5), the evaluator `evalLeg`
+**The denominator was amended v1.1 → v1.2 on 2026-11-05 by the owner's
+RECORDED answer G (the GF-S7 answer sheet — the N-1 amendment, executed
+at GF-P2 by the GF-S8 session): 02-REFERENCE-TAXONOMY = 86 rows** (the
+v1.2 amendment adds N-A1, the euro-area realised-inflation row the
+checklist itself missed; the live-state arithmetic below restates to 86
+— the dated session records in the audit's own PROGRESS/PROMPTS keep
+their recorded 85). The audited object: the consolidated lane balance live
+for every visitor on currena.ir — the frozen 21-voter table
+`GOLD_LANE_VOTERS` (`gold-score.ts:155-184`, 4 lanes: borrowing costs 8 ·
+dollar 3 · market stress 5 · inflation 5), the evaluator `evalLeg`
 (`connections.ts:595-614`), the consolidation (`gold-balance.ts`,
 `GOLD_LANE_MIN_FIRING = 2`), the derived Outlook and the context pill.
-The denominator: **02-REFERENCE-TAXONOMY v1.1 = 85 rows, LOCKED
-2026-11-05** (the owner's delegated instruction; the lock record at 02's
-foot). The evidence base (every number below cites one of these):
+The evidence base (every number below cites one of these):
 `evidence/coverage-matrix.md` (the classification) ·
 `evidence/half-implementation.md` (the defects) · `evidence/wiring.md`
 (the 21 traces + the 63 context traces) · `evidence/inventory.md` (the
@@ -27,24 +31,26 @@ the owner-gated gap-fill program (§6 below).
 
 | Guarantee | Count | Basis |
 |---|---|---|
-| **rows classified** | **85 = the taxonomy** | 82 rows carry exactly one class + the 3 cross-lists resolved to their primaries (I5→R7 · I6→R8 · X6→I10 — they carry the primary's class, no class of their own) — coverage-matrix.md §2 |
-| **voters mapped** | **21 = the voter table** | 20 of the 21 seats map to exactly one row each; **1 is `UNCLASSICATED` — a defect by definition** (`euro-hicp`, finding N-1: the locked checklist holds no euro-area realised-inflation row) — coverage-matrix.md §1 |
+| **rows classified** | **86 = the taxonomy (v1.2)** | 82 v1 rows carry exactly one class + the 3 cross-lists resolved to their primaries (I5→R7 · I6→R8 · X6→I10 — they carry the primary's class, no class of their own) + the v1.2 amendment's N-A1 (euro-area realised inflation, COVERED — the owner's recorded answer G, 2026-11-05: the row the checklist itself missed, `euro-hicp` maps to it) — coverage-matrix.md §2 + 02's v1.1→v1.2 amendment record |
+| **voters mapped** | **21 = the voter table, ALL CLASSIFIED** | the 20 seats that always mapped to exactly one row each + `euro-hicp` — UNCLASSICATED at the audit (finding N-1) — RESOLVED by the v1.2 amendment (the owner's recorded G: the row is recorded, the voter maps to it; striking a healthy voter reduces coverage with no classic-literature basis) — coverage-matrix.md §1 + 02's amendment record |
 | **defects found** | **18** | D-1 the structural finding (17 of 21 seats level-leg only) + 17 per-voter defect rows across 10 voters (11 voters carry none) — half-implementation.md §2 |
-| class tally | **COVERED 8 · PARTIAL 7 · MISSING-FREE 36 · MISSING-PAID 10 · CONTEXT-ONLY-BY-DESIGN 18 · NOT-APPLICABLE 3** | 8+7+36+10+18+3 = 82 own classes + 3 cross-lists = 85 |
+| class tally | **COVERED 9 · PARTIAL 7 · MISSING-FREE 36 · MISSING-PAID 10 · CONTEXT-ONLY-BY-DESIGN 18 · NOT-APPLICABLE 3** | 9+7+36+10+18+3 = 83 own classes + 3 cross-lists = 86 |
 | fill-program backlog | **47 rows** | 7 PARTIAL + 36 MISSING-FREE + 4 promote-worthy CONTEXT-ONLY-BY-DESIGN (D5 · I7 · S6 · G4) — ranked in §4 below |
 
 **The headline — how much of the classic condition set the meter sees
-today:**
+today (restated to the v1.2 denominator, 2026-11-05):**
 
-> **The meter fully covers 8 of the 85 classic rows as healthy voting
-> claims — 8/85 (≈ 9.4%).** Another 7 rows (8.2%) carry a voting seat
+> **The meter fully covers 9 of the 86 classic rows as healthy voting
+> claims — 9/86 (≈ 10.5%).** Another 7 rows (8.1%) carry a voting seat
 > that is half-implemented in a recorded way (the PARTIAL seven), so
-> **15/85 (≈ 17.6%) of the classic set has any voting expression at
+> **16/86 (≈ 18.6%) of the classic set has any voting expression at
 > all**; the remaining 67 rows are context-only by design (18), missing
 > with a free source in reach (36), missing behind paid sources (10), or
 > not applicable to a conditions meter (3) — plus the 3 cross-lists
 > riding their primaries' classes. The one row the checklist itself
-> missed is the 21st voter's (N-1).
+> missed — the 21st voter's (N-1) — was recorded by the owner's v1.2
+> amendment (2026-11-05); the pre-amendment fractions were 8/85 (≈ 9.4%)
+> and 15/85 (≈ 17.6%).
 
 Read plainly, that fraction is not a criticism of the meter's mechanics —
 it is the shape of the answer to the owner's question. **The meter's four
@@ -91,18 +97,21 @@ with its citation.
 |---|---|---|---|---|---|---|---|---|
 | R · Real rates & policy | 14 | 3 (R1 · R5 · R7) | 4 (R4 · R6 · R8 · R10) | 3 (R2 · R9 · R11) | 2 (R3 · R13) | 1 (R14) | 1 (R12) | 7 |
 | D · The dollar | 9 | 1 (D1) | 1 (D4) | 3 (D2 · D7 · D9) | — | 4 (D3 · D5 · D6 · D8) | — | 5 (incl. D5 ★) |
-| I · Inflation & purchasing power | 11 | 2 (I1 · I2) | — | 5 (I3 · I4 · I9 · I10 · I11) | — | 2 (I7 · I8) | — | 6 (incl. I7 ★) |
+| I · Inflation & purchasing power | 12 | 3 (I1 · I2 · N-A1) | — | 5 (I3 · I4 · I9 · I10 · I11) | — | 2 (I7 · I8) | — | 6 (incl. I7 ★) |
 | S · Stress, risk & haven demand | 13 | 2 (S1 · S5) | — | 5 (S4 · S7 · S8 · S9 · S13) | 3 (S2 · S3 · S12) | 3 (S6 · S10 · S11) | — | 6 (incl. S6 ★) |
 | F · Flows, positioning & demand | 16 | — | 1 (F1) | 12 (F2–F8 · F11–F13 · F15 · F16) | 3 (F9 · F10 · F14) | — | — | 13 |
 | X · Cross-asset relative value | 7 | — | 1 (X1) | 2 (X5 · X7) | — | 3 (X2 · X3 · X4) | — | 3 |
 | G · Fiscal & sovereign | 7 | — | — | 2 (G1 · G3) | 1 (G7) | 4 (G2 · G4 · G5 · G6) | — | 3 (incl. G4 ★) |
 | H · Supply | 4 | — | — | 4 (H1–H4) | — | — | — | 4 |
 | M · Meta (non-voting) | 4 | — | — | — | 1 (M2) | 1 (M1) | 2 (M3 · M4) | 0 |
-| **Total** | **85** | **8** | **7** | **36** | **10** | **18** | **3** | **47** |
+| **Total** | **86** | **9** | **7** | **36** | **10** | **18** | **3** | **47** |
 
-### 2.2 The COVERED core — 8 rows (the meter's honest heart)
+### 2.2 The COVERED core — 9 rows (the meter's honest heart)
 
-Each with a wiring citation AND a fire-history (the COVERED bar, 01 §6):
+Each with a wiring citation AND a fire-history (the COVERED bar, 01 §6).
+The ninth — N-A1 — joined at the v1.2 amendment (2026-11-05, the owner's
+recorded answer G): the `euro-hicp` voter was always healthy and
+wiring-complete; the row it maps to is the amendment's own record.
 
 - **R1 · US 10y real yield** — `real-yield-10y` votes with BOTH legs
   (move 0.1 pts + level; base 2,497; 18/19 recorded days) and FIRES on
@@ -128,6 +137,11 @@ Each with a wiring citation AND a fire-history (the COVERED bar, 01 §6):
 - **S5 · Financial-stress composites** — `stress-stlfsi` + `nfci` vote
   (bases 521 = a decade of weeklies, 18/19 days); `ofr-fsi` rides as
   context — belt-and-braces.
+- **N-A1 · Euro-area realised inflation (HICP)** — the v1.2 amendment's
+  own row (2026-11-05, the owner's recorded answer G): `euro-hicp` votes
+  (base 119 = a decade of monthlies, 18/19 recorded days, fires mid-band
+  on the lean check) — the wiring was always complete; the row the
+  checklist missed is now recorded (02's v1.1→v1.2 amendment record).
 
 ### 2.3 Every non-COVERED row (the 74 own-class rows + the 3 cross-lists, in full)
 
@@ -389,10 +403,10 @@ in hand) · 18 ×10 (D5 · I7 · S8 · I3 · S6 · G4 · R2 · D2 · D9 · F6) �
 (R11 · F12 · H1–H4). **Every one of the 27-band is a promotion, a rule
 repair, or a sign decision — zero new daily sources in the top band.**
 The cheapest 12 wins on the board (ranks 1–12) would move the COVERED
-share from 8/85 to at most 20/85 — eleven of them with zero new
-fetches, the twelfth (F1) with a free backfill from the historical
-archive of the site the repo already ingests. That is the arithmetic
-the owner's promotion decisions (§5) actually buy.
+share from 9/86 (8/85 pre-amendment) to at most 21/86 — eleven of them
+with zero new fetches, the twelfth (F1) with a free backfill from the
+historical archive of the site the repo already ingests. That is the
+arithmetic the owner's promotion decisions (§5) actually buy.
 
 ---
 
@@ -409,7 +423,7 @@ every item opens (or closes) a gate in the fill program. Status:
 | **OI-GA-4** | **WGC quarterly: voters or context-first?** (F3 · F4 · F5 · F13 · F15 · F16 · H1–H4) | All are free but quarterly/monthly with lag; the rows' own treatments are context or "context-voter debate"; a quarterly series under a daily meter fires rarely and coarsely (the monthly three's cadence semantics are the in-repo precedent) | **Context-first** (the classic answer — they set the structural regime, not the month's direction), with recorded promotion criteria (e.g. annualised-level extreme bands) revisit-able after the cards exist. The owner calls; GF-P3/P4 wire whichever reading is chosen |
 | **OI-GA-5** | **EODHD per-item policy** (F9 · F10 · S2 · S3 · G7) | Each is MISSING-PAID with the free proxies named (S5 carries S2/S3; F8+F6 carry F9/F10's proxies; G6's copy note carries G7). Free-first is D-GA-5; the repo's register fail-closes the ICE BofA class (OD-5) | **No EODHD use proposed by the audit** — the free proxies already carry these channels; any per-item EODHD use needs the owner's recorded approval and its own licence row. Flagged, not seeded |
 | **OI-GA-6** | **The copy rounds for any new context line** | Any new card/context line gets fresh EN + fa copy (round 79+ in the persian-copy manifest); GF-P4's gate already carries `copy:audit` clean | **Accepted as standing** — no decision needed beyond the round numbering when GF-P4 runs |
-| **N-1 (new)** | **`euro-hicp` UNCLASSICATED: amend the taxonomy or re-seat the voter?** | The locked checklist holds NO euro-area realised-inflation row (the I-family is US-centric; R10 is foreign policy rates; I11 the global liquidity aggregate — verified by walking all 85). The voter is wiring-complete and healthy (base 119, monthly semantics, fires mid-band); its claim — euro-area realised inflation as a hedge-demand channel — is classic desk practice (the 2022–24 European retail gold demand episode) | **Amend** (the audit's recommendation): record a euro-area realised-inflation row in 02 as an owner-recorded amendment with its date (D-GA-1) — the denominator becomes 86 and the arithmetic restates downstream (rows classified = 86; the COVERED share 8/86). The alternative — re-seat/remove — would strike a healthy, wiring-complete voter and reduce coverage; the audit finds no classic-literature basis for calling euro realised inflation non-classic |
+| **N-1 (new)** | **`euro-hicp` UNCLASSICATED: amend the taxonomy or re-seat the voter?** | The locked checklist holds NO euro-area realised-inflation row (the I-family is US-centric; R10 is foreign policy rates; I11 the global liquidity aggregate — verified by walking all 85). The voter is wiring-complete and healthy (base 119, monthly semantics, fires mid-band); its claim — euro-area realised inflation as a hedge-demand channel — is classic desk practice (the 2022–24 European retail gold demand episode) | **AMEND** (the audit's recommendation): record a euro-area realised-inflation row in 02 as an owner-recorded amendment with its date (D-GA-1) — the denominator becomes 86 and the arithmetic restates downstream (rows classified = 86; the COVERED share 8/86). The alternative — re-seat/remove — would strike a healthy, wiring-complete voter and reduce coverage; the audit finds no classic-literature basis for calling euro realised inflation non-classic. **RESOLVED at GF-P2 (2026-11-05, the owner's recorded answer G — the GF-S7 answer sheet): the v1.2 amendment EXECUTED** — the N-A1 row recorded (02's amendment record), `euro-hicp` maps to it, the denominator 86 restated in this report's header arithmetic and headline |
 | **The D-7/D-8 sign decision** | **The yield-curve polarity** (four recorded options) | The fixed −1 on a regime-dependent claim ("a steepening-from-inversion marks an easing cycle, historically gold's BEST regime; not a standalone direction bet" — 02 R4); the frozen spec itself recorded the polarity as ambiguous; the meter votes the row TWICE | **(b) the context demotion** — per R4's own locked treatment ("context / secondary"): at most one seat, or none, with the curve moving to a context card. Minimal-change fallback: **(d) accept-with-note**. Option (a) (the regime-conditional event rule) and option (c) (the polarity flip) are recorded but not recommended — (a) is an event-detector the evaluator has no vocabulary for, (c) accepts the reflation reading as headwind against the row's own text. The real-curve derivation (riding R2, GF-P3) re-opens the question with the correct object in hand |
 | **The D-18 readable-rule question** | **Should `readable()` require evalLeg-input presence?** (an inputless-but-fresh seat reading `unread`, not `steady`) | D-18: cftc reads `steady` with NEITHER input — its fresh warning-status value passes `readable()` (gold-balance.ts:127-129) while the evaluator had nothing to evaluate; the word renders "readable, honestly not firing" — false confidence for ~30 weeks | **Adopt the input-presence rule** in the fill program (a harness-visible rule nuance, owner-gated, proposed — never silent): a seat with neither evalLeg input reads `unread`. The D-4 backfill fixes the only current instance regardless; the rule prevents the class, not just the instance |
 | **The D-1 threshold question** | **Which of the 17 level-only seats deserve move thresholds?** | connections.ts:575-585 defines thresholds for 4 ids only; 17 seats' only fire path is the decade-extreme percentile; the lean check proves level-only seats DO fire at the bands (3 fired today) — the question is which classic treatments are change-led | **Derive, don't assume**: the GF-P0 calibration walks the 17 seats against their 02 treatments and proposes thresholds only where the treatment is change-led. The audit names two on the evidence (already repair items): fed-expectations (D-2) and usdjpy (D-3); the monthly three are cadence-exempt (previous-release semantics); the rest accept-with-note pending the calibration |

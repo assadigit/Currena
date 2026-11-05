@@ -36,6 +36,7 @@ import {
 import { HARNESS_GOLD_VOTERS_21 } from './gold-backtest-core';
 import {
   GF_F2_PROXY_ID,
+  GF_LANES_4,
   GF_LANES_5,
   GF_MOVE_FROZEN_BASE,
   GF_MOVE_P1_PROPOSED,
@@ -119,11 +120,28 @@ describe('the equivalence pins — the copies cannot drift from the engines', ()
     }
   });
 
-  it('GF-P1 (the owner\'s recorded decision H): the production table IS the POST-P1-DEMOTE composition — the measured scenario and the shipped meter are the same object', () => {
-    expect(GF_VOTERS_P1_DEMOTE).toEqual(GOLD_LANE_VOTERS);
+  it('GF-P2 (the owner\'s recorded answers B/C/K): the production table IS the POST-P2-5LANE composition — modulo the F2 seat\'s RECORDED id mapping, the measured scenario and the shipped meter are the same object', () => {
+    // The in-session F2 design decision under the standing delegation (the
+    // reason recorded in PROGRESS's GF-S8 block; §4 row 12): the production
+    // seat is the REAL OBJECT cftc-gold-gross-long (the production parse of
+    // the same deafut.txt gold row's NonComm Long ÷ OI); the scenario seat is
+    // the harness proxy gf-f2-gross-long-share. Every OTHER seat matches
+    // cell-for-cell — lane, id, polarity.
+    expect(GF_VOTERS_P1_DEMOTE).toHaveLength(19); // the P1-era composition, preserved as the gf-p1-verify basis
     expect(GF_VOTERS_FROZEN_21).toHaveLength(21);
-    expect(GF_VOTERS_P1_DEMOTE).toHaveLength(19);
     expect(HARNESS_GOLD_VOTERS_21).toEqual(GF_VOTERS_FROZEN_21); // the two lineage snapshots are one
+    expect(GOLD_LANE_VOTERS).toHaveLength(32);
+    expect(GF_VOTERS_5LANE).toHaveLength(32);
+    const scenarioMapped = GF_VOTERS_5LANE.map((v) =>
+      v.id === GF_F2_PROXY_ID ? { ...v, id: 'cftc-gold-gross-long' as const } : v,
+    );
+    expect(scenarioMapped).toEqual(GOLD_LANE_VOTERS);
+    // the mapping is EXACTLY one seat — the proxy id appears once, the real
+    // id once, and nothing else differs.
+    expect(GF_VOTERS_5LANE.filter((v) => v.id === GF_F2_PROXY_ID)).toHaveLength(1);
+    expect(GOLD_LANE_VOTERS.filter((v) => v.id === 'cftc-gold-gross-long')).toEqual([
+      { lane: 'flows', id: 'cftc-gold-gross-long', polarity: -1 },
+    ]);
   });
 
   it('the LINEAGE division, stated: the harness engine reads the PRODUCTION evaluator, so the frozen-map lineage reproduction is the calibration\'s own drift gate', () => {
@@ -138,12 +156,14 @@ describe('the equivalence pins — the copies cannot drift from the engines', ()
     // battery — the frozen map is not the production map, and the battery's
     // RISING/FALLING seats prove the difference is real (J's thresholds).
     const readings = battery();
-    const frozenCopy = gfLaneBalance(readings, GF_VOTERS_FROZEN_21, GOLD_LANES, 2, GF_MOVE_FROZEN_BASE, false);
-    const productionCopy = gfLaneBalance(readings, GF_VOTERS_P1_DEMOTE, GOLD_LANES, 2, gfMoveMapWith(GF_MOVE_P1_PROPOSED), true);
+    // GF-P2 (B — EXECUTED): the frozen lineage scenarios keep the frozen
+    // FOUR-lane basis (GF_LANES_4 — GOLD_LANES is the production five now).
+    const frozenCopy = gfLaneBalance(readings, GF_VOTERS_FROZEN_21, GF_LANES_4, 2, GF_MOVE_FROZEN_BASE, false);
+    const productionCopy = gfLaneBalance(readings, GOLD_LANE_VOTERS, GOLD_LANES, 2, gfMoveMapWith(GF_MOVE_P1_PROPOSED), true);
     expect(frozenCopy).not.toEqual(productionCopy);
   });
 
-  it('gfLaneBalance on the PRODUCTION configuration === laneBalanceOverVoters(…, inputPresence = true) (the 19-seat table, the executed five, the D-18 rule — MIN2 and MIN1)', () => {
+  it('gfLaneBalance on the PRODUCTION configuration === laneBalanceOverVoters(…, inputPresence = true) (GF-P2\'s 32-seat table, the executed five, the D-18 rule — MIN2 and MIN1)', () => {
     const readings = battery();
     for (const minFiring of [2, 1]) {
       const productionEngine = laneBalanceOverVoters(readings, GOLD_LANE_VOTERS, minFiring, true);
@@ -189,8 +209,9 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
     for (const v of GF_VOTERS_P2_4LANE) counts[v.lane] = (counts[v.lane] ?? 0) + 1;
     expect(counts).toEqual({ 'borrowing-costs': 6, dollar: 5, stress: 11, inflation: 9 });
     expect(GF_VOTERS_P2_4LANE).toHaveLength(31);
-    // The demoted pair is absent; every other frozen seat survives.
-    for (const v of GOLD_LANE_VOTERS) {
+    // The demoted pair is absent; every other P1-era seat survives (the
+    // GF-P1 19 — cftc still seated in stress in this 4-lane variant).
+    for (const v of GF_VOTERS_P1_DEMOTE) {
       if (v.id === 'yield-curve-10y2y' || v.id === 'yield-curve-10y3m') {
         expect(GF_VOTERS_P2_4LANE.find((x) => x.id === v.id)).toBeUndefined();
       } else {
@@ -204,7 +225,12 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
     for (const v of GF_VOTERS_5LANE) counts[v.lane] = (counts[v.lane] ?? 0) + 1;
     expect(counts).toEqual({ 'borrowing-costs': 6, dollar: 5, stress: 10, inflation: 9, flows: 2 });
     expect(GF_VOTERS_5LANE).toHaveLength(32);
-    expect(GF_LANES_5).toEqual([...GOLD_LANES, 'flows']);
+    // GF-P2 (the owner's recorded answer B — EXECUTED): the proposed five IS
+    // the production lane list now (GOLD_LANES gained flows); GF_LANES_4 is
+    // the frozen four-lane snapshot the FROZEN/POST-P1 scenarios keep.
+    expect(GF_LANES_5).toEqual([...GOLD_LANES]);
+    expect([...GF_LANES_5]).toEqual(['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows']);
+    expect([...GF_LANES_4]).toEqual(['borrowing-costs', 'dollar', 'stress', 'inflation']);
     const flows = GF_VOTERS_5LANE.filter((v) => v.lane === 'flows');
     expect(flows.map((v) => v.id).sort()).toEqual(['cftc-gold-positioning', GF_F2_PROXY_ID].sort());
   });
@@ -235,11 +261,18 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
       expect(s.inputPresence).toBe(!s.name.startsWith('FROZEN'));
       if (s.name.startsWith('FROZEN')) {
         expect(s.voters).toBe(GF_VOTERS_FROZEN_21);
-        expect(s.lanes).toBe(GOLD_LANES);
+        // GF-P2 (B — EXECUTED): the FROZEN scenarios keep the frozen FOUR-lane
+        // basis (GF_LANES_4, the pre-P2 snapshot) — production GOLD_LANES is
+        // the five now.
+        expect(s.lanes).toBe(GF_LANES_4);
         expect(s.moveMap).toBe(GF_MOVE_FROZEN_BASE);
       }
+      if (s.name.startsWith('POST-P1') && !s.name.startsWith('POST-P1-DEMOTE')) {
+        expect(s.lanes).toBe(GF_LANES_4);
+      }
       if (s.name.startsWith('POST-P1-DEMOTE')) {
-        expect(s.voters).toBe(GF_VOTERS_P1_DEMOTE); // ≡ production GOLD_LANE_VOTERS (pinned above)
+        expect(s.voters).toBe(GF_VOTERS_P1_DEMOTE); // the P1-era production composition (the gf-p1-verify record's basis)
+        expect(s.lanes).toBe(GF_LANES_4);
       }
     }
   });

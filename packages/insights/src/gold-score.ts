@@ -5,11 +5,13 @@
  * AGAINST it? The engine re-cuts the EXISTING gauge voters — the same
  * readings the page already holds — into a single directional score:
  *
- *   - 4 LANES (sub-gauges): borrowing costs (tight/relief), the dollar
- *     (strong/under stress), market stress (elevated/calm) and inflation
- *     (running hot/cooling). Each lane's reading comes from its firing
- *     voters, never from a new fetch; the inflation lane carries five
- *     voters since the D-5 promotion (Session 6 — breakeven-tilt);
+ *   - 5 LANES (sub-gauges): borrowing costs (tight/relief), the dollar
+ *     (strong/under stress), market stress (elevated/calm), inflation
+ *     (running hot/cooling) and — since GF-P2, the owner's recorded
+ *     answer B (OI-GA-2 ADD, 2026-11-05) — flows & demand (crowded /
+ *     capitulating positioning). Each lane's reading comes from its
+ *     firing voters, never from a new fetch; the inflation lane carries
+ *     five voters since the D-5 promotion (Session 6 — breakeven-tilt);
  *   - FIRING VOTERS: a voter fires when the shared signals evaluator
  *     (connections.ts evalLeg — direction over 30 days with a per-leg
  *     minimum move, else the 10-year position) leans ±1, and its lean is
@@ -47,8 +49,9 @@ import { evalLeg } from './connections';
  * The vocabulary
  * ------------------------------------------------------------------ */
 
-/** The four driver lanes, in display order. */
-export const GOLD_LANES = ['borrowing-costs', 'dollar', 'stress', 'inflation'] as const;
+/** The five driver lanes, in display order (the fifth — `flows` — added at
+ * GF-P2, 2026-11-05: the owner's recorded answer B, OI-GA-2's ADD scenario). */
+export const GOLD_LANES = ['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows'] as const;
 export type GoldLane = (typeof GOLD_LANES)[number];
 
 /** What a firing voter does to gold. */
@@ -70,7 +73,9 @@ export interface GoldVoter {
 }
 
 /**
- * A lane's word — the four directional pairs plus the honest shared pair.
+ * A lane's word — the four directional pairs plus the honest shared pair
+ * (the flows lane shares the stress pair's words — demand elevated / calm —
+ * the harness's own recorded mapping).
  * 'unreadable' = no voter in the lane could fire (never a guess).
  */
 export type GoldSubGaugeWord =
@@ -105,9 +110,9 @@ export interface GoldTailwindReading {
   firingVoters: number;
   tailwindVoters: number;
   headwindVoters: number;
-  /** How many of the four LANES read tailwind / headwind / mixed. */
+  /** How many of the five LANES read tailwind / headwind / mixed. */
   laneCounts: { tailwind: number; headwind: number; mixed: number };
-  /** The four lane readings, in GOLD_LANES order. */
+  /** The five lane readings, in GOLD_LANES order. */
   subGauges: readonly GoldSubGaugeReading[];
   /** The firing voters, in lane order then table order. */
   voters: readonly GoldVoter[];
@@ -139,7 +144,8 @@ export interface GoldLaneVoter {
 }
 
 /**
- * The 19 voters (6 borrowing costs · 3 dollar · 5 stress · 5 inflation).
+ * The 32 voters (6 borrowing costs · 5 dollar · 10 stress · 9 inflation ·
+ * 2 flows).
  *
  * Session 6 (2026-10-31, the D-5 promotion — the owner's "we can have 21"
  * on S4's B4 evidence): `breakeven-tilt` joined the inflation lane as the
@@ -166,36 +172,73 @@ export interface GoldLaneVoter {
  * `GF_VOTERS_FROZEN_21` (gf-p0-proposed.ts) — the FROZEN/POST-P1
  * calibration scenarios and the BACKTEST-GOLD-LANES.md lineage keep
  * their measured basis.
+ *
+ * GF-P2 (2026-11-05, the owner's recorded answers B/C/K — the GF-S7
+ * answer sheet, docs/specs/gold-meter-gapfill/README.md; every seat line
+ * below cites its audit-report §4 row per the per-seat approval rule
+ * D-GF-1): the twelve zero-new-fetch promotions + the COBD pair + the
+ * fifth `flows` lane. The composition IS the calibration's measured
+ * POST-P2-5LANE table (32 seats: 6/5/10/9/2 — evidence/
+ * gf-p0-calibration-2026-11-05.md §7; the harness twin
+ * `GF_VOTERS_5LANE`, pinned equivalent modulo the F2 seat's recorded
+ * id mapping — the F2 design decision, PROGRESS's GF-S8 block). The
+ * pre-P2 19-seat table stays preserved as `GF_VOTERS_P1_DEMOTE`.
  */
 export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
-  // ——— Borrowing costs: TIGHT is the classic gold headwind (real rates
+  // ——— Borrowing costs (6): TIGHT is the classic gold headwind (real rates
   // ——— are gold's opportunity cost); RELIEF (falling/low rates) the tailwind.
   // ——— GF-P1 (the owner's recorded H, 2026-11-05): the two yield-curve
-  // ——— seats demoted to context cards (D-7/D-8, R4) — 8 → 6 here.
-  { lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 }, // THE textbook driver
-  { lane: 'borrowing-costs', id: 'us10y', polarity: -1 },
-  { lane: 'borrowing-costs', id: 'us30y', polarity: -1 },
-  { lane: 'borrowing-costs', id: 'fed-target', polarity: -1 }, // high policy rate = tight
-  { lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 }, // 2y above policy = higher-for-longer priced
-  { lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 },
-  // ——— The dollar: STRONG is the headwind (gold is priced in USD); a
-  // ——— dollar under STRESS (falling/low) is the tailwind.
-  { lane: 'dollar', id: 'dollar-basket', polarity: -1 },
-  { lane: 'dollar', id: 'usdjpy', polarity: -1 }, // USD strength against the funding currency
-  { lane: 'dollar', id: 'us-japan-10y-gap', polarity: -1 }, // a wide gap is carry fuel — a dollar-positive
-  // ——— Market stress: ELEVATED usually supports gold (the safe-haven
-  // ——— bid); CALM removes it.
-  { lane: 'stress', id: 'stress-stlfsi', polarity: 1 },
-  { lane: 'stress', id: 'nfci', polarity: 1 },
-  { lane: 'stress', id: 'vix', polarity: 1 },
-  { lane: 'stress', id: 'gold-silver', polarity: 1 }, // a high ratio IS the monetary-stress read
-  { lane: 'stress', id: 'cftc-gold-positioning', polarity: -1 }, // crowded longs are fragile (the squeeze-then-slump zone — contrarian)
-  // ——— Inflation: RUNNING HOT usually supports the hedge demand.
-  { lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 },
-  { lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 },
-  { lane: 'inflation', id: 'euro-hicp', polarity: 1 },
-  { lane: 'inflation', id: 'breakeven-5y5y', polarity: 1 }, // rising inflation expectations
-  { lane: 'inflation', id: 'breakeven-tilt', polarity: 1 }, // the D-5 promotion (Session 6): the priced ACCELERATION of inflation — building = tailwind; level-leg only (no move threshold), exactly the B4-measured variant
+  // ——— seats demoted to context cards (D-7/D-8, R4) — 8 → 6 (unchanged at P2).
+  { lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 }, // R1 COVERED — THE textbook driver
+  { lane: 'borrowing-costs', id: 'us10y', polarity: -1 }, // R1's belt-and-braces (D-9 accept-with-note)
+  { lane: 'borrowing-costs', id: 'us30y', polarity: -1 }, // R1's belt-and-braces (D-10)
+  { lane: 'borrowing-costs', id: 'fed-target', polarity: -1 }, // R5 COVERED — high policy rate = tight
+  { lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 }, // R6 PARTIAL → repaired at P1 (D-2 threshold)
+  { lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 }, // R10's ECB leg
+  // ——— The dollar (5): STRONG is the headwind (gold is priced in USD); a
+  // ——— dollar under STRESS (falling/low) is the tailwind. GF-P2 adds the
+  // ——— COBD pair (the owner's recorded C + K: D5 and G4, OI-GA-3's
+  // ——— territory — §4 rows 13 and 18).
+  { lane: 'dollar', id: 'dollar-basket', polarity: -1 }, // D1 COVERED
+  { lane: 'dollar', id: 'usdjpy', polarity: -1 }, // D4 PARTIAL → repaired at P1 (D-3 threshold) — the funding currency
+  { lane: 'dollar', id: 'us-japan-10y-gap', polarity: -1 }, // R10 PARTIAL → repaired at P1 (D-6 persistence) — carry fuel, dollar-positive
+  { lane: 'dollar', id: 'usd-reserve-share', polarity: -1 }, // GF-P2 (C): D5 ★ COBD → promote (§4 rank 13 — a rising USD reserve share = headwind, the dedollarisation inverse; the classic long-run channel)
+  { lane: 'dollar', id: 'nyfed-custody', polarity: -1 }, // GF-P2 (K): G4 ★ COBD → promote (§4 rank 18 — rising foreign custody = dollar-asset demand = headwind, the D5 pairing)
+  // ——— Market stress (10): ELEVATED usually supports gold (the safe-haven
+  // ——— bid); CALM removes it. GF-P2: the six zero-new-fetch stress
+  // ——— promotions (the owner's recorded K; §4 rows 6/7/10/11/15) + S6
+  // ——— (C, §4 rank 17); cftc LEAVES for the new flows lane (B, D-14).
+  { lane: 'stress', id: 'stress-stlfsi', polarity: 1 }, // S5 COVERED
+  { lane: 'stress', id: 'nfci', polarity: 1 }, // S5 COVERED
+  { lane: 'stress', id: 'vix', polarity: 1 }, // S1 COVERED
+  { lane: 'stress', id: 'gold-silver', polarity: 1 }, // X1 PARTIAL → base deepened at P1 (D-5) — a high ratio IS the monetary-stress read
+  { lane: 'stress', id: 'term-premium-10y', polarity: 1 }, // GF-P2 (K): R9 MISSING-FREE → promote (§4 rank 6 — rises with fiscal/inflation-risk fear, gold-positive; the 0.07-pt move threshold executed at P1 now ACTIVATES)
+  { lane: 'stress', id: 'ebp', polarity: 1 }, // GF-P2 (K): S4 MISSING-FREE → promote (§4 rank 7 — the literature's PREFERRED risk-appetite signal)
+  { lane: 'stress', id: 'michigan-sentiment', polarity: -1 }, // GF-P2 (K): S13 MISSING-FREE → promote (§4 rank 10 — pessimism is gold-POSITIVE: low sentiment = the tailwind side, the polarity note recorded)
+  { lane: 'stress', id: 'gpr-daily', polarity: 1 }, // GF-P2 (K): S7 → promote the DAILY object (§4 rank 11 — the event-risk channel; the owner's object choice: the monthly gpr-index alternative fires 1114 vs the daily's 1316)
+  { lane: 'stress', id: 'epu-us', polarity: 1 }, // GF-P2 (K): S8 MISSING-FREE → promote (§4 rank 15 — regime uncertainty raises the hedging premium; the tpu-us alternative fires 1259 — a one-seat swap recorded as the alternative)
+  { lane: 'stress', id: 'sp500-breadth-ratio', polarity: -1 }, // GF-P2 (C): S6 ★ COBD → promote (§4 rank 17 — falling breadth = risk-off = the tailwind side; one-directional and measured)
+  // ——— Inflation (9): RUNNING HOT usually supports the hedge demand.
+  // ——— GF-P2: the four promotions (the owner's recorded K; §4 rows 8/9/16 + I7).
+  { lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 }, // I1 COVERED
+  { lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 }, // I2 COVERED
+  { lane: 'inflation', id: 'euro-hicp', polarity: 1 }, // N-1 — AMENDED (the owner's recorded G, 2026-11-05): the v1.2 taxonomy amendment records the euro-area realised-inflation row; the seat stays, the denominator becomes 86
+  { lane: 'inflation', id: 'breakeven-5y5y', polarity: 1 }, // R7 COVERED — rising inflation expectations
+  { lane: 'inflation', id: 'breakeven-tilt', polarity: 1 }, // the D-5 promotion's own recorded level-only variant (unchanged)
+  { lane: 'inflation', id: 't5yie', polarity: 1 }, // GF-P2 (K): R8 PARTIAL → promote (§4 rank 9 — the SPOT level's own claim; the 0.10-pt move threshold executed at P1 now ACTIVATES)
+  { lane: 'inflation', id: 'michigan-1y-expectations', polarity: 1 }, // GF-P2 (K): I3 MISSING-FREE → promote (§4 rank 16 — households price inflation in before the market does)
+  { lane: 'inflation', id: 'm2-us', polarity: 1 }, // GF-P2 (K): I7 ★ COBD → promote (§4 rank 14 — the debasement channel, YoY percentile basis)
+  { lane: 'inflation', id: 'us-deficit-12m', polarity: 1 }, // GF-P2 (K): G1 MISSING-FREE → promote (§4 rank 8 — fiscal dominance, the debasement channel's fiscal leg)
+  // ——— Flows & demand (2 — the owner's recorded B, OI-GA-2's ADD scenario,
+  // ——— §4 rows 5 and 12 + D-14's repair): the crowded-positioning family
+  // ——— gets its own lane. CFTC re-seated from market stress (F1, the
+  // ——— D-4-backfilled net-share seat) + F2's REAL OBJECT — the gross
+  // ——— noncommercial long share of open interest (the in-session design
+  // ——— decision under the standing delegation: the production parse of
+  // ——— the same deafut.txt gold row, NOT the harness proxy promoted
+  // ——— as-is — the recorded reason in PROGRESS's GF-S8 block).
+  { lane: 'flows', id: 'cftc-gold-positioning', polarity: -1 }, // F1 PARTIAL → backfilled at P1 (D-4) — crowded longs are fragile (the squeeze-then-slump zone — contrarian); re-seated to flows at GF-P2 (B, D-14)
+  { lane: 'flows', id: 'cftc-gold-gross-long', polarity: -1 }, // GF-P2 (K): F2 MISSING-FREE → promote the REAL OBJECT (§4 rank 12 — the gross legs richer than net; rides F1's backfill — the same deafut.txt row's NonComm Long ÷ OI)
 ];
 
 /* ------------------------------------------------------------------ *
@@ -237,12 +280,21 @@ const LANE_TAILWIND_WORD: Record<GoldLane, GoldSubGaugeWord> = {
   dollar: 'stress',
   stress: 'elevated',
   inflation: 'hot',
+  // The flows lane's tailwind word (GF-P2, the owner's recorded B): the
+  // harness's own mapping (gf-p0-proposed.ts gfScoreOverVoters) — demand
+  // ELEVATED reads the lane's for-side, the same vocabulary family as the
+  // stress lane's safe-haven bid.
+  flows: 'elevated',
 };
 const LANE_HEADWIND_WORD: Record<GoldLane, GoldSubGaugeWord> = {
   'borrowing-costs': 'tight',
   dollar: 'strong',
   stress: 'calm',
   inflation: 'cool',
+  // The flows lane's headwind word: positioning CALM — the harness's own
+  // mapping (gfScoreOverVoters), kept identical so the frozen-engine twin
+  // cannot drift from the measured scenario.
+  flows: 'calm',
 };
 
 /**

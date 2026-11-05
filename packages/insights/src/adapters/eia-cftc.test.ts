@@ -125,6 +125,21 @@ describe('parseCftcGoldPositioning (A-7: the weekly COT file)', () => {
     expect(row.netSharePct).toBeCloseTo(49.68324, 4);
   });
 
+  // GF-P2 (2026-11-05, the owner's recorded answer K — §4 row 12 / F2): the
+  // GROSS legs parse from the SAME row — the real object behind the flows
+  // lane's second seat. The recorded capture's own fields: NonComm Long
+  // 237,142 · NonComm Short 37,277 · OI 402,279.
+  it('parses the gross legs too (GF-P2 F2): long 58.95% · short 9.27% of OI — the shares reconcile with the net', () => {
+    const row = parseCftcGoldPositioning(deafut);
+    // 237,142 / 402,279 = 58.95% — the F2 seat's own object.
+    expect(row.grossLongSharePct).toBeCloseTo(58.949634, 4);
+    // 37,277 / 402,279 = 9.27% — the recorded complement (never seated).
+    expect(row.grossShortSharePct).toBeCloseTo(9.266454, 4);
+    // the file's own arithmetic: long − short = net (the shares reconcile).
+    expect(row.grossLongSharePct - row.grossShortSharePct).toBeCloseTo(row.netSharePct, 3);
+    expect(row.grossLongSharePct + row.grossShortSharePct).toBeLessThanOrEqual(100);
+  });
+
   it('never matches the MICRO GOLD sibling row (the exact-name discipline)', () => {
     // Remove the true gold row; the parser must FAIL, not fall back to
     // MICRO GOLD (a silent sibling match would misread the metric).

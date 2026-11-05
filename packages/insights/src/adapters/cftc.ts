@@ -33,12 +33,21 @@ export const CFTC_TIMEOUT_MS = 45_000;
 /** The exact gold row name (the MICRO GOLD sibling must never match). */
 export const CFTC_GOLD_MARKET = 'GOLD - COMMODITY EXCHANGE INC.';
 
-/** One week's gold positioning: the net-noncommercial share of open interest (percent). */
+/** One week's gold positioning: the net-noncommercial share of open
+ * interest (percent) + the gross legs (GF-P2, the owner's recorded
+ * answer K / §4 row 12 — F2's REAL OBJECT rides the same row). */
 export interface CftcGoldPositioning {
   /** The report's Tuesday (ISO). */
   date: string;
   /** (NonComm Long − NonComm Short) ÷ Open Interest × 100 — [-100, 100] by construction. */
   netSharePct: number;
+  /** NonComm Long ÷ Open Interest × 100 — the F2 seat's object
+   * (cftc-gold-gross-long; [0, 100] by construction). Recorded for the
+   * gross-short complement too (the fixture records both legs; only the
+   * long share seats — the measured 32-seat composition). */
+  grossLongSharePct: number;
+  /** NonComm Short ÷ Open Interest × 100 — the F2 design's recorded complement (never seated). */
+  grossShortSharePct: number;
   /** The raw open interest (contracts) — the report row's own field. */
   openInterest: number;
 }
@@ -118,7 +127,20 @@ export function parseCftcGoldPositioning(text: string): CftcGoldPositioning {
         `CFTC deafut: the net share ${netSharePct.toFixed(2)}% falls outside [-100, 100] (wrong fields?)`,
       );
     }
-    return { date, netSharePct: Math.round(netSharePct * 1e4) / 1e4, openInterest: oi };
+    const grossLongSharePct = (long / oi) * 100;
+    const grossShortSharePct = (short / oi) * 100;
+    if (grossLongSharePct < 0 || grossLongSharePct > 100 || grossShortSharePct < 0 || grossShortSharePct > 100) {
+      throw new FormatChangedError(
+        `CFTC deafut: the gross shares ${grossLongSharePct.toFixed(2)}%/${grossShortSharePct.toFixed(2)}% fall outside [0, 100] (wrong fields?)`,
+      );
+    }
+    return {
+      date,
+      netSharePct: Math.round(netSharePct * 1e4) / 1e4,
+      grossLongSharePct: Math.round(grossLongSharePct * 1e4) / 1e4,
+      grossShortSharePct: Math.round(grossShortSharePct * 1e4) / 1e4,
+      openInterest: oi,
+    };
   }
   throw new FormatChangedError(`CFTC deafut: no "${CFTC_GOLD_MARKET}" row in the file (retired or renamed?)`);
 }
@@ -209,7 +231,20 @@ export function parseCftcGoldArchiveAnnual(text: string): CftcGoldPositioning[] 
         `CFTC annual: the net share ${netSharePct.toFixed(2)}% @ ${date} falls outside [-100, 100] (wrong fields?)`,
       );
     }
-    out.push({ date, netSharePct: Math.round(netSharePct * 1e4) / 1e4, openInterest: oi });
+    const grossLongSharePct = (long / oi) * 100;
+    const grossShortSharePct = (short / oi) * 100;
+    if (grossLongSharePct < 0 || grossLongSharePct > 100 || grossShortSharePct < 0 || grossShortSharePct > 100) {
+      throw new FormatChangedError(
+        `CFTC annual: the gross shares ${grossLongSharePct.toFixed(2)}%/${grossShortSharePct.toFixed(2)}% @ ${date} fall outside [0, 100] (wrong fields?)`,
+      );
+    }
+    out.push({
+      date,
+      netSharePct: Math.round(netSharePct * 1e4) / 1e4,
+      grossLongSharePct: Math.round(grossLongSharePct * 1e4) / 1e4,
+      grossShortSharePct: Math.round(grossShortSharePct * 1e4) / 1e4,
+      openInterest: oi,
+    });
   }
   return out;
 }

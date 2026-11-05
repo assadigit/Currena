@@ -217,6 +217,20 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
   // licence review re-confirms this decision.
   'sp500-breadth-ratio':
     'Spec-directed card (gap-closure S6-M6.3, the owner-approved plan: "equal-weight vs cap-weight S&P 500 ratio from Yahoo (RSP and SPY; L2, already owner-accepted for Yahoo). Add sp500-breadth-ratio."); both legs are the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill, the metals histories and usdaed ride). The spec\'s directive lifts its worst-leg display bar.',
+  // GF-P2 (2026-11-05): the gold-silver ratio's registry re-run surfaced the
+  // GF-P1 drift — the D-5 base deepening added the Yahoo GC=F ÷ SI=F history
+  // leg to sources.ts (the recorded decision X1/D-5: "the futures pair is
+  // the repo's OWN existing Yahoo metal pair, L2 owner-accepted, both legs
+  // same-day so the term structure cancels in the division") without the
+  // registry being regenerated that session. The ratio's legs are EXACTLY
+  // the gold-usd and silver-usd tiles' own metals history legs (GC=F and
+  // SI=F) — the two legs the standing 2026-10-19e directives already lifted
+  // — so the gold-oil-ratio precedent (A-4: the derived ratio inherits its
+  // parents' directives) governs it identically. The override keeps the
+  // card public exactly as it stands on currena.ir today; the licence facts
+  // stay verbatim (worst-leg L2 disclosed in the register row).
+  'gold-silver':
+    'The ratio\'s history legs are exactly the gold-usd and silver-usd tiles\' own Yahoo metals legs (GC=F and SI=F — the GF-P1 D-5 recorded base deepening, the repo\'s own L2 owner-accepted pair, both legs same-day so the term structure cancels); the standing owner directives (2026-10-19e) already lifted those legs\' display bars, and the derived ratio inherits them — the gold-oil-ratio (A-4) precedent. The directive lifts its worst-leg display bar.',
 };
 
 /**
