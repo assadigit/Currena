@@ -59398,26 +59398,6 @@
       "reference": "persian-copy-round-53-gold-panels.md"
     },
     {
-      "id": "signals.goldScore.voterNames.yield-curve-10y2y",
-      "source": "apps/web/src/i18n/insights-copy-fa.ts",
-      "status": "processed",
-      "kind": "copy",
-      "text": "فاصلهٔ ۱۰ و ۲ ساله",
-      "sha256": "2c51e75fd1d6715c781b44234ec9c86a2afceab86f3960f7ab05341b02cd09bc",
-      "round": "round-53",
-      "reference": "persian-copy-round-53-gold-panels.md"
-    },
-    {
-      "id": "signals.goldScore.voterNames.yield-curve-10y3m",
-      "source": "apps/web/src/i18n/insights-copy-fa.ts",
-      "status": "processed",
-      "kind": "copy",
-      "text": "فاصلهٔ ۱۰ ساله و ۳ ماهه",
-      "sha256": "a5e5d0b90b268c2f516da63a5100c4fdd83fc990058caa248442e2ab80314b3f",
-      "round": "round-53",
-      "reference": "persian-copy-round-53-gold-panels.md"
-    },
-    {
       "id": "signals.lean.mixed",
       "source": "apps/web/src/i18n/insights-copy-fa.ts",
       "status": "processed",
