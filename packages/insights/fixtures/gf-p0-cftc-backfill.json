@@ -1,0 +1,4031 @@
+{
+  "v": 1,
+  "recordedAt": "2026-11-05T01:41:58.523Z",
+  "source": "CFTC legacy futures-only COT historical archive (dea/history/deacot<year>.zip, annual.txt — the long format; the gold rows verified identical in layout to the current deafut.txt)",
+  "files": [
+    {
+      "year": 2016,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2016.zip",
+      "weeks": 52,
+      "bytes": 1710723
+    },
+    {
+      "year": 2017,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2017.zip",
+      "weeks": 52,
+      "bytes": 1711091
+    },
+    {
+      "year": 2018,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2018.zip",
+      "weeks": 53,
+      "bytes": 1900546
+    },
+    {
+      "year": 2019,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2019.zip",
+      "weeks": 52,
+      "bytes": 1904592
+    },
+    {
+      "year": 2020,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2020.zip",
+      "weeks": 52,
+      "bytes": 1838852
+    },
+    {
+      "year": 2021,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2021.zip",
+      "weeks": 52,
+      "bytes": 1882568
+    },
+    {
+      "year": 2022,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2022.zip",
+      "weeks": 52,
+      "bytes": 1983765
+    },
+    {
+      "year": 2023,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2023.zip",
+      "weeks": 52,
+      "bytes": 2116244
+    },
+    {
+      "year": 2024,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2024.zip",
+      "weeks": 53,
+      "bytes": 2302771
+    },
+    {
+      "year": 2025,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2025.zip",
+      "weeks": 52,
+      "bytes": 2392119
+    },
+    {
+      "year": 2026,
+      "url": "https://www.cftc.gov/files/dea/history/deacot2026.zip",
+      "weeks": 43,
+      "bytes": 2130840
+    }
+  ],
+  "failures": [],
+  "weeks": [
+    {
+      "date": "2016-01-05",
+      "netSharePct": 6.4203,
+      "grossLongSharePct": 37.113,
+      "grossShortSharePct": 30.6927,
+      "openInterest": 413688
+    },
+    {
+      "date": "2016-01-12",
+      "netSharePct": 11.248,
+      "grossLongSharePct": 39.9067,
+      "grossShortSharePct": 28.6587,
+      "openInterest": 397565
+    },
+    {
+      "date": "2016-01-19",
+      "netSharePct": 10.6874,
+      "grossLongSharePct": 38.7247,
+      "grossShortSharePct": 28.0372,
+      "openInterest": 408835
+    },
+    {
+      "date": "2016-01-26",
+      "netSharePct": 15.3211,
+      "grossLongSharePct": 44.238,
+      "grossShortSharePct": 28.9168,
+      "openInterest": 385350
+    },
+    {
+      "date": "2016-02-02",
+      "netSharePct": 19.2049,
+      "grossLongSharePct": 46.6706,
+      "grossShortSharePct": 27.4657,
+      "openInterest": 379185
+    },
+    {
+      "date": "2016-02-09",
+      "netSharePct": 23.9582,
+      "grossLongSharePct": 49.1085,
+      "grossShortSharePct": 25.1504,
+      "openInterest": 410833
+    },
+    {
+      "date": "2016-02-16",
+      "netSharePct": 27.3623,
+      "grossLongSharePct": 48.7515,
+      "grossShortSharePct": 21.3892,
+      "openInterest": 428912
+    },
+    {
+      "date": "2016-02-23",
+      "netSharePct": 32.5581,
+      "grossLongSharePct": 51.0636,
+      "grossShortSharePct": 18.5055,
+      "openInterest": 445290
+    },
+    {
+      "date": "2016-03-01",
+      "netSharePct": 33.8278,
+      "grossLongSharePct": 49.5358,
+      "grossShortSharePct": 15.708,
+      "openInterest": 450555
+    },
+    {
+      "date": "2016-03-08",
+      "netSharePct": 35.0243,
+      "grossLongSharePct": 50.6692,
+      "grossShortSharePct": 15.6448,
+      "openInterest": 499110
+    },
+    {
+      "date": "2016-03-15",
+      "netSharePct": 34.3778,
+      "grossLongSharePct": 50.2263,
+      "grossShortSharePct": 15.8486,
+      "openInterest": 493086
+    },
+    {
+      "date": "2016-03-22",
+      "netSharePct": 35.0251,
+      "grossLongSharePct": 50.6574,
+      "grossShortSharePct": 15.6323,
+      "openInterest": 510579
+    },
+    {
+      "date": "2016-03-29",
+      "netSharePct": 39.505,
+      "grossLongSharePct": 54.548,
+      "grossShortSharePct": 15.0431,
+      "openInterest": 480461
+    },
+    {
+      "date": "2016-04-05",
+      "netSharePct": 40.1608,
+      "grossLongSharePct": 55.639,
+      "grossShortSharePct": 15.4782,
+      "openInterest": 474094
+    },
+    {
+      "date": "2016-04-12",
+      "netSharePct": 42.378,
+      "grossLongSharePct": 56.7548,
+      "grossShortSharePct": 14.3767,
+      "openInterest": 504523
+    },
+    {
+      "date": "2016-04-19",
+      "netSharePct": 43.0804,
+      "grossLongSharePct": 57.8432,
+      "grossShortSharePct": 14.7628,
+      "openInterest": 503331
+    },
+    {
+      "date": "2016-04-26",
+      "netSharePct": 44.3591,
+      "grossLongSharePct": 57.8795,
+      "grossShortSharePct": 13.5204,
+      "openInterest": 497884
+    },
+    {
+      "date": "2016-05-03",
+      "netSharePct": 48.0135,
+      "grossLongSharePct": 59.8253,
+      "grossShortSharePct": 11.8118,
+      "openInterest": 565774
+    },
+    {
+      "date": "2016-05-10",
+      "netSharePct": 45.6896,
+      "grossLongSharePct": 58.1691,
+      "grossShortSharePct": 12.4795,
+      "openInterest": 579777
+    },
+    {
+      "date": "2016-05-17",
+      "netSharePct": 44.7485,
+      "grossLongSharePct": 57.2612,
+      "grossShortSharePct": 12.5127,
+      "openInterest": 595077
+    },
+    {
+      "date": "2016-05-24",
+      "netSharePct": 38.0567,
+      "grossLongSharePct": 53.6443,
+      "grossShortSharePct": 15.5876,
+      "openInterest": 542958
+    },
+    {
+      "date": "2016-05-31",
+      "netSharePct": 39.88,
+      "grossLongSharePct": 55.5487,
+      "grossShortSharePct": 15.6688,
+      "openInterest": 494321
+    },
+    {
+      "date": "2016-06-07",
+      "netSharePct": 46.0619,
+      "grossLongSharePct": 59.5749,
+      "grossShortSharePct": 13.513,
+      "openInterest": 496330
+    },
+    {
+      "date": "2016-06-14",
+      "netSharePct": 51.3172,
+      "grossLongSharePct": 63.7302,
+      "grossShortSharePct": 12.413,
+      "openInterest": 545357
+    },
+    {
+      "date": "2016-06-21",
+      "netSharePct": 51.2196,
+      "grossLongSharePct": 62.7847,
+      "grossShortSharePct": 11.565,
+      "openInterest": 571517
+    },
+    {
+      "date": "2016-06-28",
+      "netSharePct": 49.1893,
+      "grossLongSharePct": 60.7906,
+      "grossShortSharePct": 11.6013,
+      "openInterest": 613792
+    },
+    {
+      "date": "2016-07-05",
+      "netSharePct": 48.3885,
+      "grossLongSharePct": 59.6642,
+      "grossShortSharePct": 11.2757,
+      "openInterest": 652971
+    },
+    {
+      "date": "2016-07-12",
+      "netSharePct": 46.9911,
+      "grossLongSharePct": 59.7265,
+      "grossShortSharePct": 12.7355,
+      "openInterest": 633020
+    },
+    {
+      "date": "2016-07-19",
+      "netSharePct": 46.3337,
+      "grossLongSharePct": 59.4538,
+      "grossShortSharePct": 13.1201,
+      "openInterest": 617069
+    },
+    {
+      "date": "2016-07-26",
+      "netSharePct": 48.4024,
+      "grossLongSharePct": 60.283,
+      "grossShortSharePct": 11.8806,
+      "openInterest": 576325
+    },
+    {
+      "date": "2016-08-02",
+      "netSharePct": 50.5286,
+      "grossLongSharePct": 62.8296,
+      "grossShortSharePct": 12.301,
+      "openInterest": 582211
+    },
+    {
+      "date": "2016-08-09",
+      "netSharePct": 49.7823,
+      "grossLongSharePct": 61.952,
+      "grossShortSharePct": 12.1696,
+      "openInterest": 575399
+    },
+    {
+      "date": "2016-08-16",
+      "netSharePct": 49.5813,
+      "grossLongSharePct": 61.4039,
+      "grossShortSharePct": 11.8226,
+      "openInterest": 572496
+    },
+    {
+      "date": "2016-08-23",
+      "netSharePct": 51.4176,
+      "grossLongSharePct": 62.7927,
+      "grossShortSharePct": 11.3751,
+      "openInterest": 572973
+    },
+    {
+      "date": "2016-08-30",
+      "netSharePct": 49.4882,
+      "grossLongSharePct": 60.9934,
+      "grossShortSharePct": 11.5052,
+      "openInterest": 558398
+    },
+    {
+      "date": "2016-09-06",
+      "netSharePct": 52.1217,
+      "grossLongSharePct": 62.7057,
+      "grossShortSharePct": 10.584,
+      "openInterest": 590656
+    },
+    {
+      "date": "2016-09-13",
+      "netSharePct": 49.6369,
+      "grossLongSharePct": 61.1782,
+      "grossShortSharePct": 11.5414,
+      "openInterest": 575002
+    },
+    {
+      "date": "2016-09-20",
+      "netSharePct": 45.8452,
+      "grossLongSharePct": 58.3986,
+      "grossShortSharePct": 12.5534,
+      "openInterest": 558791
+    },
+    {
+      "date": "2016-09-27",
+      "netSharePct": 50.0555,
+      "grossLongSharePct": 61.5562,
+      "grossShortSharePct": 11.5008,
+      "openInterest": 583161
+    },
+    {
+      "date": "2016-10-04",
+      "netSharePct": 45.0619,
+      "grossLongSharePct": 59.4937,
+      "grossShortSharePct": 14.4318,
+      "openInterest": 544824
+    },
+    {
+      "date": "2016-10-11",
+      "netSharePct": 39.0182,
+      "grossLongSharePct": 56.64,
+      "grossShortSharePct": 17.6218,
+      "openInterest": 500328
+    },
+    {
+      "date": "2016-10-18",
+      "netSharePct": 36.136,
+      "grossLongSharePct": 55.1934,
+      "grossShortSharePct": 19.0574,
+      "openInterest": 497061
+    },
+    {
+      "date": "2016-10-25",
+      "netSharePct": 38.8048,
+      "grossLongSharePct": 56.2188,
+      "grossShortSharePct": 17.4139,
+      "openInterest": 507617
+    },
+    {
+      "date": "2016-11-01",
+      "netSharePct": 41.2519,
+      "grossLongSharePct": 55.2837,
+      "grossShortSharePct": 14.0319,
+      "openInterest": 521506
+    },
+    {
+      "date": "2016-11-08",
+      "netSharePct": 41.1277,
+      "grossLongSharePct": 54.8766,
+      "grossShortSharePct": 13.7489,
+      "openInterest": 528203
+    },
+    {
+      "date": "2016-11-15",
+      "netSharePct": 37.0714,
+      "grossLongSharePct": 51.2794,
+      "grossShortSharePct": 14.208,
+      "openInterest": 479237
+    },
+    {
+      "date": "2016-11-22",
+      "netSharePct": 36.2392,
+      "grossLongSharePct": 52.4107,
+      "grossShortSharePct": 16.1716,
+      "openInterest": 461062
+    },
+    {
+      "date": "2016-11-29",
+      "netSharePct": 37.3637,
+      "grossLongSharePct": 56.6313,
+      "grossShortSharePct": 19.2676,
+      "openInterest": 405661
+    },
+    {
+      "date": "2016-12-06",
+      "netSharePct": 34.6561,
+      "grossLongSharePct": 57.8554,
+      "grossShortSharePct": 23.1993,
+      "openInterest": 393524
+    },
+    {
+      "date": "2016-12-13",
+      "netSharePct": 32.5693,
+      "grossLongSharePct": 57.8678,
+      "grossShortSharePct": 25.2986,
+      "openInterest": 397034
+    },
+    {
+      "date": "2016-12-20",
+      "netSharePct": 28.8049,
+      "grossLongSharePct": 54.9507,
+      "grossShortSharePct": 26.1458,
+      "openInterest": 398661
+    },
+    {
+      "date": "2016-12-27",
+      "netSharePct": 24.4931,
+      "grossLongSharePct": 51.4399,
+      "grossShortSharePct": 26.9468,
+      "openInterest": 401513
+    },
+    {
+      "date": "2017-01-03",
+      "netSharePct": 22.7351,
+      "grossLongSharePct": 49.1802,
+      "grossShortSharePct": 26.4451,
+      "openInterest": 424673
+    },
+    {
+      "date": "2017-01-10",
+      "netSharePct": 24.6581,
+      "grossLongSharePct": 48.1981,
+      "grossShortSharePct": 23.54,
+      "openInterest": 444001
+    },
+    {
+      "date": "2017-01-17",
+      "netSharePct": 22.8751,
+      "grossLongSharePct": 46.6182,
+      "grossShortSharePct": 23.7432,
+      "openInterest": 467937
+    },
+    {
+      "date": "2017-01-24",
+      "netSharePct": 22.6809,
+      "grossLongSharePct": 43.5044,
+      "grossShortSharePct": 20.8235,
+      "openInterest": 482374
+    },
+    {
+      "date": "2017-01-31",
+      "netSharePct": 29.9059,
+      "grossLongSharePct": 53.3124,
+      "grossShortSharePct": 23.4064,
+      "openInterest": 398433
+    },
+    {
+      "date": "2017-02-07",
+      "netSharePct": 28.1918,
+      "grossLongSharePct": 52.0784,
+      "grossShortSharePct": 23.8866,
+      "openInterest": 415543
+    },
+    {
+      "date": "2017-02-14",
+      "netSharePct": 26.4381,
+      "grossLongSharePct": 51.131,
+      "grossShortSharePct": 24.6929,
+      "openInterest": 415128
+    },
+    {
+      "date": "2017-02-21",
+      "netSharePct": 28.9729,
+      "grossLongSharePct": 51.4254,
+      "grossShortSharePct": 22.4525,
+      "openInterest": 427168
+    },
+    {
+      "date": "2017-02-28",
+      "netSharePct": 36.7193,
+      "grossLongSharePct": 55.4819,
+      "grossShortSharePct": 18.7625,
+      "openInterest": 446081
+    },
+    {
+      "date": "2017-03-07",
+      "netSharePct": 30.7746,
+      "grossLongSharePct": 52.9393,
+      "grossShortSharePct": 22.1648,
+      "openInterest": 434401
+    },
+    {
+      "date": "2017-03-14",
+      "netSharePct": 24.8816,
+      "grossLongSharePct": 49.35,
+      "grossShortSharePct": 24.4684,
+      "openInterest": 426170
+    },
+    {
+      "date": "2017-03-21",
+      "netSharePct": 26.0141,
+      "grossLongSharePct": 49.1673,
+      "grossShortSharePct": 23.1532,
+      "openInterest": 446880
+    },
+    {
+      "date": "2017-03-28",
+      "netSharePct": 30.6663,
+      "grossLongSharePct": 50.6965,
+      "grossShortSharePct": 20.0301,
+      "openInterest": 449418
+    },
+    {
+      "date": "2017-04-04",
+      "netSharePct": 36.3331,
+      "grossLongSharePct": 55.8804,
+      "grossShortSharePct": 19.5473,
+      "openInterest": 427808
+    },
+    {
+      "date": "2017-04-11",
+      "netSharePct": 37.8545,
+      "grossLongSharePct": 55.4674,
+      "grossShortSharePct": 17.6129,
+      "openInterest": 456131
+    },
+    {
+      "date": "2017-04-18",
+      "netSharePct": 41.4532,
+      "grossLongSharePct": 59.1431,
+      "grossShortSharePct": 17.6899,
+      "openInterest": 472263
+    },
+    {
+      "date": "2017-04-25",
+      "netSharePct": 42.1604,
+      "grossLongSharePct": 60.3943,
+      "grossShortSharePct": 18.234,
+      "openInterest": 475985
+    },
+    {
+      "date": "2017-05-02",
+      "netSharePct": 41.0548,
+      "grossLongSharePct": 59.7595,
+      "grossShortSharePct": 18.7047,
+      "openInterest": 461905
+    },
+    {
+      "date": "2017-05-09",
+      "netSharePct": 34.6408,
+      "grossLongSharePct": 54.5259,
+      "grossShortSharePct": 19.8851,
+      "openInterest": 433033
+    },
+    {
+      "date": "2017-05-16",
+      "netSharePct": 29.1305,
+      "grossLongSharePct": 50.9244,
+      "grossShortSharePct": 21.7939,
+      "openInterest": 435021
+    },
+    {
+      "date": "2017-05-23",
+      "netSharePct": 34.5388,
+      "grossLongSharePct": 52.2626,
+      "grossShortSharePct": 17.7237,
+      "openInterest": 462572
+    },
+    {
+      "date": "2017-05-30",
+      "netSharePct": 38.4782,
+      "grossLongSharePct": 57.6959,
+      "grossShortSharePct": 19.2177,
+      "openInterest": 434246
+    },
+    {
+      "date": "2017-06-06",
+      "netSharePct": 41.3862,
+      "grossLongSharePct": 63.2012,
+      "grossShortSharePct": 21.815,
+      "openInterest": 494041
+    },
+    {
+      "date": "2017-06-13",
+      "netSharePct": 40.3864,
+      "grossLongSharePct": 63.0772,
+      "grossShortSharePct": 22.6908,
+      "openInterest": 471134
+    },
+    {
+      "date": "2017-06-20",
+      "netSharePct": 33.7957,
+      "grossLongSharePct": 56.6615,
+      "grossShortSharePct": 22.8658,
+      "openInterest": 445841
+    },
+    {
+      "date": "2017-06-27",
+      "netSharePct": 29.0574,
+      "grossLongSharePct": 52.2099,
+      "grossShortSharePct": 23.1525,
+      "openInterest": 453144
+    },
+    {
+      "date": "2017-07-03",
+      "netSharePct": 20.5159,
+      "grossLongSharePct": 48.4866,
+      "grossShortSharePct": 27.9706,
+      "openInterest": 457201
+    },
+    {
+      "date": "2017-07-11",
+      "netSharePct": 12.6685,
+      "grossLongSharePct": 45.7539,
+      "grossShortSharePct": 33.0854,
+      "openInterest": 475669
+    },
+    {
+      "date": "2017-07-18",
+      "netSharePct": 12.42,
+      "grossLongSharePct": 44.8637,
+      "grossShortSharePct": 32.4438,
+      "openInterest": 484204
+    },
+    {
+      "date": "2017-07-25",
+      "netSharePct": 19.5829,
+      "grossLongSharePct": 47.4959,
+      "grossShortSharePct": 27.913,
+      "openInterest": 463827
+    },
+    {
+      "date": "2017-08-01",
+      "netSharePct": 28.8989,
+      "grossLongSharePct": 53.4346,
+      "grossShortSharePct": 24.5357,
+      "openInterest": 448709
+    },
+    {
+      "date": "2017-08-08",
+      "netSharePct": 33.1687,
+      "grossLongSharePct": 54.9058,
+      "grossShortSharePct": 21.737,
+      "openInterest": 448727
+    },
+    {
+      "date": "2017-08-15",
+      "netSharePct": 39.2814,
+      "grossLongSharePct": 58.1121,
+      "grossShortSharePct": 18.8307,
+      "openInterest": 477921
+    },
+    {
+      "date": "2017-08-22",
+      "netSharePct": 41.6507,
+      "grossLongSharePct": 59.0898,
+      "grossShortSharePct": 17.4391,
+      "openInterest": 500443
+    },
+    {
+      "date": "2017-08-29",
+      "netSharePct": 42.8758,
+      "grossLongSharePct": 59.1757,
+      "grossShortSharePct": 16.2999,
+      "openInterest": 538875
+    },
+    {
+      "date": "2017-09-05",
+      "netSharePct": 43.2764,
+      "grossLongSharePct": 59.2913,
+      "grossShortSharePct": 16.0149,
+      "openInterest": 566817
+    },
+    {
+      "date": "2017-09-12",
+      "netSharePct": 43.8783,
+      "grossLongSharePct": 60.5388,
+      "grossShortSharePct": 16.6605,
+      "openInterest": 580606
+    },
+    {
+      "date": "2017-09-19",
+      "netSharePct": 41.4121,
+      "grossLongSharePct": 57.9983,
+      "grossShortSharePct": 16.5862,
+      "openInterest": 570096
+    },
+    {
+      "date": "2017-09-26",
+      "netSharePct": 38.679,
+      "grossLongSharePct": 55.1737,
+      "grossShortSharePct": 16.4947,
+      "openInterest": 549637
+    },
+    {
+      "date": "2017-10-03",
+      "netSharePct": 38.8201,
+      "grossLongSharePct": 54.7098,
+      "grossShortSharePct": 15.8897,
+      "openInterest": 525127
+    },
+    {
+      "date": "2017-10-10",
+      "netSharePct": 38.4827,
+      "grossLongSharePct": 53.697,
+      "grossShortSharePct": 15.2143,
+      "openInterest": 520005
+    },
+    {
+      "date": "2017-10-17",
+      "netSharePct": 37.9584,
+      "grossLongSharePct": 53.8232,
+      "grossShortSharePct": 15.8648,
+      "openInterest": 528800
+    },
+    {
+      "date": "2017-10-24",
+      "netSharePct": 36.3384,
+      "grossLongSharePct": 52.3134,
+      "grossShortSharePct": 15.975,
+      "openInterest": 526674
+    },
+    {
+      "date": "2017-10-31",
+      "netSharePct": 36.3016,
+      "grossLongSharePct": 50.5172,
+      "grossShortSharePct": 14.2155,
+      "openInterest": 531918
+    },
+    {
+      "date": "2017-11-07",
+      "netSharePct": 36.4706,
+      "grossLongSharePct": 50.7729,
+      "grossShortSharePct": 14.3023,
+      "openInterest": 536843
+    },
+    {
+      "date": "2017-11-14",
+      "netSharePct": 36.5974,
+      "grossLongSharePct": 50.9322,
+      "grossShortSharePct": 14.3348,
+      "openInterest": 533054
+    },
+    {
+      "date": "2017-11-21",
+      "netSharePct": 37.9651,
+      "grossLongSharePct": 51.3408,
+      "grossShortSharePct": 13.3757,
+      "openInterest": 531612
+    },
+    {
+      "date": "2017-11-28",
+      "netSharePct": 44.544,
+      "grossLongSharePct": 57.0421,
+      "grossShortSharePct": 12.4982,
+      "openInterest": 503810
+    },
+    {
+      "date": "2017-12-05",
+      "netSharePct": 36.6605,
+      "grossLongSharePct": 53.138,
+      "grossShortSharePct": 16.4775,
+      "openInterest": 472795
+    },
+    {
+      "date": "2017-12-12",
+      "netSharePct": 23.9731,
+      "grossLongSharePct": 45.2091,
+      "grossShortSharePct": 21.236,
+      "openInterest": 446618
+    },
+    {
+      "date": "2017-12-19",
+      "netSharePct": 25.0874,
+      "grossLongSharePct": 43.5351,
+      "grossShortSharePct": 18.4477,
+      "openInterest": 453595
+    },
+    {
+      "date": "2017-12-26",
+      "netSharePct": 29.7825,
+      "grossLongSharePct": 44.3819,
+      "grossShortSharePct": 14.5994,
+      "openInterest": 456470
+    },
+    {
+      "date": "2018-01-02",
+      "netSharePct": 32.6059,
+      "grossLongSharePct": 48.2151,
+      "grossShortSharePct": 15.6092,
+      "openInterest": 500731
+    },
+    {
+      "date": "2018-01-09",
+      "netSharePct": 36.5985,
+      "grossLongSharePct": 52.0584,
+      "grossShortSharePct": 15.4599,
+      "openInterest": 555455
+    },
+    {
+      "date": "2018-01-16",
+      "netSharePct": 36.3557,
+      "grossLongSharePct": 51.8368,
+      "grossShortSharePct": 15.4812,
+      "openInterest": 582333
+    },
+    {
+      "date": "2018-01-23",
+      "netSharePct": 36.8606,
+      "grossLongSharePct": 52.507,
+      "grossShortSharePct": 15.6464,
+      "openInterest": 582421
+    },
+    {
+      "date": "2018-01-30",
+      "netSharePct": 37.0553,
+      "grossLongSharePct": 53.3363,
+      "grossShortSharePct": 16.281,
+      "openInterest": 559332
+    },
+    {
+      "date": "2018-02-06",
+      "netSharePct": 35.6565,
+      "grossLongSharePct": 51.1521,
+      "grossShortSharePct": 15.4956,
+      "openInterest": 535321
+    },
+    {
+      "date": "2018-02-13",
+      "netSharePct": 34.3151,
+      "grossLongSharePct": 49.2159,
+      "grossShortSharePct": 14.9008,
+      "openInterest": 511745
+    },
+    {
+      "date": "2018-02-20",
+      "netSharePct": 36.1489,
+      "grossLongSharePct": 48.6989,
+      "grossShortSharePct": 12.5499,
+      "openInterest": 528154
+    },
+    {
+      "date": "2018-02-27",
+      "netSharePct": 33.5394,
+      "grossLongSharePct": 47.2884,
+      "grossShortSharePct": 13.749,
+      "openInterest": 532860
+    },
+    {
+      "date": "2018-03-06",
+      "netSharePct": 36.1785,
+      "grossLongSharePct": 48.3344,
+      "grossShortSharePct": 12.1559,
+      "openInterest": 508100
+    },
+    {
+      "date": "2018-03-13",
+      "netSharePct": 31.8831,
+      "grossLongSharePct": 44.5042,
+      "grossShortSharePct": 12.6211,
+      "openInterest": 526762
+    },
+    {
+      "date": "2018-03-20",
+      "netSharePct": 27.2651,
+      "grossLongSharePct": 41.0417,
+      "grossShortSharePct": 13.7766,
+      "openInterest": 545499
+    },
+    {
+      "date": "2018-03-27",
+      "netSharePct": 38.3911,
+      "grossLongSharePct": 48.9026,
+      "grossShortSharePct": 10.5114,
+      "openInterest": 529690
+    },
+    {
+      "date": "2018-04-03",
+      "netSharePct": 33.7812,
+      "grossLongSharePct": 47.5882,
+      "grossShortSharePct": 13.807,
+      "openInterest": 493141
+    },
+    {
+      "date": "2018-04-10",
+      "netSharePct": 31.1,
+      "grossLongSharePct": 46.9301,
+      "grossShortSharePct": 15.83,
+      "openInterest": 499588
+    },
+    {
+      "date": "2018-04-17",
+      "netSharePct": 31.96,
+      "grossLongSharePct": 46.5062,
+      "grossShortSharePct": 14.5462,
+      "openInterest": 510229
+    },
+    {
+      "date": "2018-04-24",
+      "netSharePct": 26.9833,
+      "grossLongSharePct": 44.5892,
+      "grossShortSharePct": 17.6059,
+      "openInterest": 506410
+    },
+    {
+      "date": "2018-05-01",
+      "netSharePct": 21.0296,
+      "grossLongSharePct": 41.2751,
+      "grossShortSharePct": 20.2456,
+      "openInterest": 507756
+    },
+    {
+      "date": "2018-05-08",
+      "netSharePct": 21.8642,
+      "grossLongSharePct": 40.4047,
+      "grossShortSharePct": 18.5406,
+      "openInterest": 491398
+    },
+    {
+      "date": "2018-05-15",
+      "netSharePct": 17.7789,
+      "grossLongSharePct": 38.747,
+      "grossShortSharePct": 20.968,
+      "openInterest": 519958
+    },
+    {
+      "date": "2018-05-22",
+      "netSharePct": 18.085,
+      "grossLongSharePct": 37.7135,
+      "grossShortSharePct": 19.6285,
+      "openInterest": 502942
+    },
+    {
+      "date": "2018-05-29",
+      "netSharePct": 24.528,
+      "grossLongSharePct": 41.2568,
+      "grossShortSharePct": 16.7288,
+      "openInterest": 469382
+    },
+    {
+      "date": "2018-06-05",
+      "netSharePct": 24.7239,
+      "grossLongSharePct": 41.1239,
+      "grossShortSharePct": 16.4,
+      "openInterest": 450641
+    },
+    {
+      "date": "2018-06-12",
+      "netSharePct": 26.7977,
+      "grossLongSharePct": 42.9584,
+      "grossShortSharePct": 16.1606,
+      "openInterest": 448695
+    },
+    {
+      "date": "2018-06-19",
+      "netSharePct": 20.607,
+      "grossLongSharePct": 43.326,
+      "grossShortSharePct": 22.7189,
+      "openInterest": 468345
+    },
+    {
+      "date": "2018-06-26",
+      "netSharePct": 16.3629,
+      "grossLongSharePct": 41.6409,
+      "grossShortSharePct": 25.278,
+      "openInterest": 468573
+    },
+    {
+      "date": "2018-07-03",
+      "netSharePct": 15.8504,
+      "grossLongSharePct": 42.5938,
+      "grossShortSharePct": 26.7433,
+      "openInterest": 494164
+    },
+    {
+      "date": "2018-07-10",
+      "netSharePct": 16.1706,
+      "grossLongSharePct": 42.5562,
+      "grossShortSharePct": 26.3856,
+      "openInterest": 503593
+    },
+    {
+      "date": "2018-07-17",
+      "netSharePct": 10.949,
+      "grossLongSharePct": 41.347,
+      "grossShortSharePct": 30.398,
+      "openInterest": 528278
+    },
+    {
+      "date": "2018-07-24",
+      "netSharePct": 9.7856,
+      "grossLongSharePct": 44.4243,
+      "grossShortSharePct": 34.6388,
+      "openInterest": 496620
+    },
+    {
+      "date": "2018-07-31",
+      "netSharePct": 7.8066,
+      "grossLongSharePct": 46.2284,
+      "grossShortSharePct": 38.4218,
+      "openInterest": 452655
+    },
+    {
+      "date": "2018-08-07",
+      "netSharePct": 2.7614,
+      "grossLongSharePct": 45.3327,
+      "grossShortSharePct": 42.5713,
+      "openInterest": 459474
+    },
+    {
+      "date": "2018-08-14",
+      "netSharePct": -0.7736,
+      "grossLongSharePct": 44.4224,
+      "grossShortSharePct": 45.196,
+      "openInterest": 476739
+    },
+    {
+      "date": "2018-08-21",
+      "netSharePct": -1.8006,
+      "grossLongSharePct": 44.1362,
+      "grossShortSharePct": 45.9368,
+      "openInterest": 483730
+    },
+    {
+      "date": "2018-08-28",
+      "netSharePct": -0.6391,
+      "grossLongSharePct": 43.2667,
+      "grossShortSharePct": 43.9058,
+      "openInterest": 479283
+    },
+    {
+      "date": "2018-09-04",
+      "netSharePct": -2.8528,
+      "grossLongSharePct": 42.2224,
+      "grossShortSharePct": 45.0752,
+      "openInterest": 473118
+    },
+    {
+      "date": "2018-09-11",
+      "netSharePct": -1.6168,
+      "grossLongSharePct": 42.2552,
+      "grossShortSharePct": 43.872,
+      "openInterest": 469450
+    },
+    {
+      "date": "2018-09-18",
+      "netSharePct": -2.31,
+      "grossLongSharePct": 42.135,
+      "grossShortSharePct": 44.445,
+      "openInterest": 469436
+    },
+    {
+      "date": "2018-09-25",
+      "netSharePct": -3.8342,
+      "grossLongSharePct": 41.9181,
+      "grossShortSharePct": 45.7523,
+      "openInterest": 460279
+    },
+    {
+      "date": "2018-10-02",
+      "netSharePct": -4.7462,
+      "grossLongSharePct": 41.866,
+      "grossShortSharePct": 46.6123,
+      "openInterest": 459776
+    },
+    {
+      "date": "2018-10-09",
+      "netSharePct": -8.2052,
+      "grossLongSharePct": 38.634,
+      "grossShortSharePct": 46.8392,
+      "openInterest": 465253
+    },
+    {
+      "date": "2018-10-16",
+      "netSharePct": 3.7239,
+      "grossLongSharePct": 39.8804,
+      "grossShortSharePct": 36.1565,
+      "openInterest": 474418
+    },
+    {
+      "date": "2018-10-23",
+      "netSharePct": 6.1503,
+      "grossLongSharePct": 40.3024,
+      "grossShortSharePct": 34.1522,
+      "openInterest": 477832
+    },
+    {
+      "date": "2018-10-30",
+      "netSharePct": 2.778,
+      "grossLongSharePct": 35.5316,
+      "grossShortSharePct": 32.7535,
+      "openInterest": 474941
+    },
+    {
+      "date": "2018-11-06",
+      "netSharePct": 3.8443,
+      "grossLongSharePct": 34.176,
+      "grossShortSharePct": 30.3317,
+      "openInterest": 494911
+    },
+    {
+      "date": "2018-11-13",
+      "netSharePct": -1.7139,
+      "grossLongSharePct": 31.2159,
+      "grossShortSharePct": 32.9298,
+      "openInterest": 539520
+    },
+    {
+      "date": "2018-11-20",
+      "netSharePct": 1.6914,
+      "grossLongSharePct": 31.4686,
+      "grossShortSharePct": 29.7772,
+      "openInterest": 525940
+    },
+    {
+      "date": "2018-11-27",
+      "netSharePct": 0.4225,
+      "grossLongSharePct": 35.4062,
+      "grossShortSharePct": 34.9837,
+      "openInterest": 442801
+    },
+    {
+      "date": "2018-12-04",
+      "netSharePct": 12.2527,
+      "grossLongSharePct": 43.2635,
+      "grossShortSharePct": 31.0108,
+      "openInterest": 399919
+    },
+    {
+      "date": "2018-12-11",
+      "netSharePct": 15.0401,
+      "grossLongSharePct": 42.1628,
+      "grossShortSharePct": 27.1227,
+      "openInterest": 402250
+    },
+    {
+      "date": "2018-12-18",
+      "netSharePct": 18.4152,
+      "grossLongSharePct": 44.1635,
+      "grossShortSharePct": 25.7483,
+      "openInterest": 412485
+    },
+    {
+      "date": "2018-12-24",
+      "netSharePct": 25.0685,
+      "grossLongSharePct": 47.122,
+      "grossShortSharePct": 22.0535,
+      "openInterest": 442727
+    },
+    {
+      "date": "2018-12-31",
+      "netSharePct": 27.422,
+      "grossLongSharePct": 46.5573,
+      "grossShortSharePct": 19.1353,
+      "openInterest": 451360
+    },
+    {
+      "date": "2019-01-08",
+      "netSharePct": 21.7946,
+      "grossLongSharePct": 43.837,
+      "grossShortSharePct": 22.0424,
+      "openInterest": 455232
+    },
+    {
+      "date": "2019-01-15",
+      "netSharePct": 17.5263,
+      "grossLongSharePct": 40.2301,
+      "grossShortSharePct": 22.7037,
+      "openInterest": 501605
+    },
+    {
+      "date": "2019-01-22",
+      "netSharePct": 14.5088,
+      "grossLongSharePct": 36.3207,
+      "grossShortSharePct": 21.8119,
+      "openInterest": 513509
+    },
+    {
+      "date": "2019-01-29",
+      "netSharePct": 20.603,
+      "grossLongSharePct": 43.9227,
+      "grossShortSharePct": 23.3197,
+      "openInterest": 483390
+    },
+    {
+      "date": "2019-02-05",
+      "netSharePct": 22.7406,
+      "grossLongSharePct": 45.4833,
+      "grossShortSharePct": 22.7427,
+      "openInterest": 479736
+    },
+    {
+      "date": "2019-02-12",
+      "netSharePct": 22.0285,
+      "grossLongSharePct": 44.9859,
+      "grossShortSharePct": 22.9573,
+      "openInterest": 476083
+    },
+    {
+      "date": "2019-02-19",
+      "netSharePct": 28.8616,
+      "grossLongSharePct": 50.3501,
+      "grossShortSharePct": 21.4884,
+      "openInterest": 504639
+    },
+    {
+      "date": "2019-02-26",
+      "netSharePct": 27.0705,
+      "grossLongSharePct": 47.2472,
+      "grossShortSharePct": 20.1766,
+      "openInterest": 501268
+    },
+    {
+      "date": "2019-03-05",
+      "netSharePct": 18.6751,
+      "grossLongSharePct": 42.9924,
+      "grossShortSharePct": 24.3173,
+      "openInterest": 471311
+    },
+    {
+      "date": "2019-03-12",
+      "netSharePct": 14.8707,
+      "grossLongSharePct": 38.7242,
+      "grossShortSharePct": 23.8536,
+      "openInterest": 530030
+    },
+    {
+      "date": "2019-03-19",
+      "netSharePct": 17.1922,
+      "grossLongSharePct": 39.7393,
+      "grossShortSharePct": 22.5471,
+      "openInterest": 514163
+    },
+    {
+      "date": "2019-03-26",
+      "netSharePct": 23.5369,
+      "grossLongSharePct": 42.1718,
+      "grossShortSharePct": 18.6349,
+      "openInterest": 509575
+    },
+    {
+      "date": "2019-04-02",
+      "netSharePct": 21.4817,
+      "grossLongSharePct": 44.0248,
+      "grossShortSharePct": 22.5431,
+      "openInterest": 440170
+    },
+    {
+      "date": "2019-04-09",
+      "netSharePct": 23.543,
+      "grossLongSharePct": 44.5787,
+      "grossShortSharePct": 21.0357,
+      "openInterest": 447539
+    },
+    {
+      "date": "2019-04-16",
+      "netSharePct": 12.7725,
+      "grossLongSharePct": 41.5844,
+      "grossShortSharePct": 28.812,
+      "openInterest": 440581
+    },
+    {
+      "date": "2019-04-23",
+      "netSharePct": 8.4979,
+      "grossLongSharePct": 40.1527,
+      "grossShortSharePct": 31.6547,
+      "openInterest": 440048
+    },
+    {
+      "date": "2019-04-30",
+      "netSharePct": 15.3994,
+      "grossLongSharePct": 41.2257,
+      "grossShortSharePct": 25.8263,
+      "openInterest": 430011
+    },
+    {
+      "date": "2019-05-07",
+      "netSharePct": 16.7565,
+      "grossLongSharePct": 41.2855,
+      "grossShortSharePct": 24.529,
+      "openInterest": 450039
+    },
+    {
+      "date": "2019-05-14",
+      "netSharePct": 24.0419,
+      "grossLongSharePct": 43.6995,
+      "grossShortSharePct": 19.6575,
+      "openInterest": 517995
+    },
+    {
+      "date": "2019-05-21",
+      "netSharePct": 17.4592,
+      "grossLongSharePct": 40.0336,
+      "grossShortSharePct": 22.5744,
+      "openInterest": 508643
+    },
+    {
+      "date": "2019-05-28",
+      "netSharePct": 17.1617,
+      "grossLongSharePct": 38.4979,
+      "grossShortSharePct": 21.3363,
+      "openInterest": 505126
+    },
+    {
+      "date": "2019-06-04",
+      "netSharePct": 32.423,
+      "grossLongSharePct": 49.9438,
+      "grossShortSharePct": 17.5208,
+      "openInterest": 481495
+    },
+    {
+      "date": "2019-06-11",
+      "netSharePct": 37.0952,
+      "grossLongSharePct": 50.3589,
+      "grossShortSharePct": 13.2637,
+      "openInterest": 496663
+    },
+    {
+      "date": "2019-06-18",
+      "netSharePct": 38.8716,
+      "grossLongSharePct": 52.2478,
+      "grossShortSharePct": 13.3762,
+      "openInterest": 525636
+    },
+    {
+      "date": "2019-06-25",
+      "netSharePct": 40.9543,
+      "grossLongSharePct": 51.611,
+      "grossShortSharePct": 10.6568,
+      "openInterest": 577605
+    },
+    {
+      "date": "2019-07-02",
+      "netSharePct": 42.734,
+      "grossLongSharePct": 51.6053,
+      "grossShortSharePct": 8.8714,
+      "openInterest": 605949
+    },
+    {
+      "date": "2019-07-09",
+      "netSharePct": 40.8635,
+      "grossLongSharePct": 51.1046,
+      "grossShortSharePct": 10.2411,
+      "openInterest": 598977
+    },
+    {
+      "date": "2019-07-16",
+      "netSharePct": 40.7877,
+      "grossLongSharePct": 51.4263,
+      "grossShortSharePct": 10.6386,
+      "openInterest": 601900
+    },
+    {
+      "date": "2019-07-23",
+      "netSharePct": 40.7305,
+      "grossLongSharePct": 50.5595,
+      "grossShortSharePct": 9.829,
+      "openInterest": 616859
+    },
+    {
+      "date": "2019-07-30",
+      "netSharePct": 45.1605,
+      "grossLongSharePct": 55.4261,
+      "grossShortSharePct": 10.2656,
+      "openInterest": 563298
+    },
+    {
+      "date": "2019-08-06",
+      "netSharePct": 48.7318,
+      "grossLongSharePct": 58.3955,
+      "grossShortSharePct": 9.6637,
+      "openInterest": 600317
+    },
+    {
+      "date": "2019-08-13",
+      "netSharePct": 48.8398,
+      "grossLongSharePct": 58.2904,
+      "grossShortSharePct": 9.4506,
+      "openInterest": 593962
+    },
+    {
+      "date": "2019-08-20",
+      "netSharePct": 50.4354,
+      "grossLongSharePct": 59.2283,
+      "grossShortSharePct": 8.7929,
+      "openInterest": 594807
+    },
+    {
+      "date": "2019-08-27",
+      "netSharePct": 46.6592,
+      "grossLongSharePct": 56.9976,
+      "grossShortSharePct": 10.3384,
+      "openInterest": 636183
+    },
+    {
+      "date": "2019-09-03",
+      "netSharePct": 47.3781,
+      "grossLongSharePct": 57.5992,
+      "grossShortSharePct": 10.221,
+      "openInterest": 634358
+    },
+    {
+      "date": "2019-09-10",
+      "netSharePct": 43.8753,
+      "grossLongSharePct": 54.3493,
+      "grossShortSharePct": 10.474,
+      "openInterest": 614753
+    },
+    {
+      "date": "2019-09-17",
+      "netSharePct": 44.7866,
+      "grossLongSharePct": 54.123,
+      "grossShortSharePct": 9.3364,
+      "openInterest": 630990
+    },
+    {
+      "date": "2019-09-24",
+      "netSharePct": 47.4159,
+      "grossLongSharePct": 56.2101,
+      "grossShortSharePct": 8.7942,
+      "openInterest": 658944
+    },
+    {
+      "date": "2019-10-01",
+      "netSharePct": 44.4701,
+      "grossLongSharePct": 53.3655,
+      "grossShortSharePct": 8.8954,
+      "openInterest": 604885
+    },
+    {
+      "date": "2019-10-08",
+      "netSharePct": 44.6649,
+      "grossLongSharePct": 54.1988,
+      "grossShortSharePct": 9.5339,
+      "openInterest": 616957
+    },
+    {
+      "date": "2019-10-15",
+      "netSharePct": 41.6583,
+      "grossLongSharePct": 52.581,
+      "grossShortSharePct": 10.9227,
+      "openInterest": 607387
+    },
+    {
+      "date": "2019-10-22",
+      "netSharePct": 41.4261,
+      "grossLongSharePct": 51.6231,
+      "grossShortSharePct": 10.197,
+      "openInterest": 625528
+    },
+    {
+      "date": "2019-10-29",
+      "netSharePct": 42.9743,
+      "grossLongSharePct": 52.1295,
+      "grossShortSharePct": 9.1551,
+      "openInterest": 643442
+    },
+    {
+      "date": "2019-11-05",
+      "netSharePct": 40.5441,
+      "grossLongSharePct": 49.9276,
+      "grossShortSharePct": 9.3835,
+      "openInterest": 690181
+    },
+    {
+      "date": "2019-11-12",
+      "netSharePct": 37.6965,
+      "grossLongSharePct": 45.6183,
+      "grossShortSharePct": 7.9218,
+      "openInterest": 708463
+    },
+    {
+      "date": "2019-11-19",
+      "netSharePct": 39.7462,
+      "grossLongSharePct": 46.8981,
+      "grossShortSharePct": 7.1519,
+      "openInterest": 719211
+    },
+    {
+      "date": "2019-11-26",
+      "netSharePct": 40.5867,
+      "grossLongSharePct": 48.6033,
+      "grossShortSharePct": 8.0165,
+      "openInterest": 669268
+    },
+    {
+      "date": "2019-12-03",
+      "netSharePct": 41.4691,
+      "grossLongSharePct": 49.4318,
+      "grossShortSharePct": 7.9627,
+      "openInterest": 701016
+    },
+    {
+      "date": "2019-12-10",
+      "netSharePct": 39.2636,
+      "grossLongSharePct": 47.7054,
+      "grossShortSharePct": 8.4418,
+      "openInterest": 690003
+    },
+    {
+      "date": "2019-12-17",
+      "netSharePct": 39.9275,
+      "grossLongSharePct": 48.0473,
+      "grossShortSharePct": 8.1198,
+      "openInterest": 716987
+    },
+    {
+      "date": "2019-12-24",
+      "netSharePct": 40.8223,
+      "grossLongSharePct": 48.6566,
+      "grossShortSharePct": 7.8343,
+      "openInterest": 748737
+    },
+    {
+      "date": "2019-12-31",
+      "netSharePct": 41.7119,
+      "grossLongSharePct": 48.5419,
+      "grossShortSharePct": 6.83,
+      "openInterest": 786166
+    },
+    {
+      "date": "2020-01-07",
+      "netSharePct": 41.0114,
+      "grossLongSharePct": 48.7977,
+      "grossShortSharePct": 7.7863,
+      "openInterest": 785857
+    },
+    {
+      "date": "2020-01-14",
+      "netSharePct": 40.0605,
+      "grossLongSharePct": 47.2854,
+      "grossShortSharePct": 7.2249,
+      "openInterest": 796883
+    },
+    {
+      "date": "2020-01-21",
+      "netSharePct": 40.0206,
+      "grossLongSharePct": 47.2133,
+      "grossShortSharePct": 7.1927,
+      "openInterest": 793829
+    },
+    {
+      "date": "2020-01-28",
+      "netSharePct": 46.1319,
+      "grossLongSharePct": 52.6038,
+      "grossShortSharePct": 6.4719,
+      "openInterest": 715539
+    },
+    {
+      "date": "2020-02-04",
+      "netSharePct": 45.8018,
+      "grossLongSharePct": 54.3728,
+      "grossShortSharePct": 8.5709,
+      "openInterest": 654572
+    },
+    {
+      "date": "2020-02-11",
+      "netSharePct": 46.8029,
+      "grossLongSharePct": 54.1827,
+      "grossShortSharePct": 7.3798,
+      "openInterest": 658024
+    },
+    {
+      "date": "2020-02-18",
+      "netSharePct": 49.4395,
+      "grossLongSharePct": 57.0864,
+      "grossShortSharePct": 7.647,
+      "openInterest": 715317
+    },
+    {
+      "date": "2020-02-25",
+      "netSharePct": 45.8258,
+      "grossLongSharePct": 53.1218,
+      "grossShortSharePct": 7.2961,
+      "openInterest": 732917
+    },
+    {
+      "date": "2020-03-03",
+      "netSharePct": 46.2052,
+      "grossLongSharePct": 52.9163,
+      "grossShortSharePct": 6.7111,
+      "openInterest": 691985
+    },
+    {
+      "date": "2020-03-10",
+      "netSharePct": 47.2842,
+      "grossLongSharePct": 53.087,
+      "grossShortSharePct": 5.8028,
+      "openInterest": 633470
+    },
+    {
+      "date": "2020-03-17",
+      "netSharePct": 49.1207,
+      "grossLongSharePct": 55.3043,
+      "grossShortSharePct": 6.1836,
+      "openInterest": 573925
+    },
+    {
+      "date": "2020-03-24",
+      "netSharePct": 52.6856,
+      "grossLongSharePct": 58.0867,
+      "grossShortSharePct": 5.4011,
+      "openInterest": 547334
+    },
+    {
+      "date": "2020-03-31",
+      "netSharePct": 52.2239,
+      "grossLongSharePct": 58.0103,
+      "grossShortSharePct": 5.7863,
+      "openInterest": 495652
+    },
+    {
+      "date": "2020-04-07",
+      "netSharePct": 51.8575,
+      "grossLongSharePct": 58.3023,
+      "grossShortSharePct": 6.4447,
+      "openInterest": 480050
+    },
+    {
+      "date": "2020-04-14",
+      "netSharePct": 51.5345,
+      "grossLongSharePct": 58.4974,
+      "grossShortSharePct": 6.9629,
+      "openInterest": 489965
+    },
+    {
+      "date": "2020-04-21",
+      "netSharePct": 50.6067,
+      "grossLongSharePct": 57.2358,
+      "grossShortSharePct": 6.6291,
+      "openInterest": 493158
+    },
+    {
+      "date": "2020-04-28",
+      "netSharePct": 52.4602,
+      "grossLongSharePct": 57.3828,
+      "grossShortSharePct": 4.9226,
+      "openInterest": 500816
+    },
+    {
+      "date": "2020-05-05",
+      "netSharePct": 50.9855,
+      "grossLongSharePct": 56.1996,
+      "grossShortSharePct": 5.2141,
+      "openInterest": 490343
+    },
+    {
+      "date": "2020-05-12",
+      "netSharePct": 48.8844,
+      "grossLongSharePct": 55.9189,
+      "grossShortSharePct": 7.0345,
+      "openInterest": 496739
+    },
+    {
+      "date": "2020-05-19",
+      "netSharePct": 47.6686,
+      "grossLongSharePct": 55.9241,
+      "grossShortSharePct": 8.2555,
+      "openInterest": 528205
+    },
+    {
+      "date": "2020-05-26",
+      "netSharePct": 45.8078,
+      "grossLongSharePct": 55.4799,
+      "grossShortSharePct": 9.672,
+      "openInterest": 519374
+    },
+    {
+      "date": "2020-06-02",
+      "netSharePct": 46.0402,
+      "grossLongSharePct": 57.2147,
+      "grossShortSharePct": 11.1745,
+      "openInterest": 475745
+    },
+    {
+      "date": "2020-06-09",
+      "netSharePct": 43.8575,
+      "grossLongSharePct": 55.4958,
+      "grossShortSharePct": 11.6383,
+      "openInterest": 475661
+    },
+    {
+      "date": "2020-06-16",
+      "netSharePct": 45.8262,
+      "grossLongSharePct": 56.6618,
+      "grossShortSharePct": 10.8356,
+      "openInterest": 489563
+    },
+    {
+      "date": "2020-06-23",
+      "netSharePct": 47.3513,
+      "grossLongSharePct": 57.97,
+      "grossShortSharePct": 10.6187,
+      "openInterest": 532101
+    },
+    {
+      "date": "2020-06-30",
+      "netSharePct": 47.4816,
+      "grossLongSharePct": 58.5694,
+      "grossShortSharePct": 11.0878,
+      "openInterest": 561628
+    },
+    {
+      "date": "2020-07-07",
+      "netSharePct": 46.6776,
+      "grossLongSharePct": 58.8415,
+      "grossShortSharePct": 12.1639,
+      "openInterest": 572776
+    },
+    {
+      "date": "2020-07-14",
+      "netSharePct": 45.2326,
+      "grossLongSharePct": 56.9147,
+      "grossShortSharePct": 11.6822,
+      "openInterest": 580175
+    },
+    {
+      "date": "2020-07-21",
+      "netSharePct": 44.175,
+      "grossLongSharePct": 55.4163,
+      "grossShortSharePct": 11.2414,
+      "openInterest": 603138
+    },
+    {
+      "date": "2020-07-28",
+      "netSharePct": 39.5572,
+      "grossLongSharePct": 52.2173,
+      "grossShortSharePct": 12.6601,
+      "openInterest": 598629
+    },
+    {
+      "date": "2020-08-04",
+      "netSharePct": 42.4938,
+      "grossLongSharePct": 57.2848,
+      "grossShortSharePct": 14.7909,
+      "openInterest": 561837
+    },
+    {
+      "date": "2020-08-11",
+      "netSharePct": 40.4907,
+      "grossLongSharePct": 55.4567,
+      "grossShortSharePct": 14.9661,
+      "openInterest": 553345
+    },
+    {
+      "date": "2020-08-18",
+      "netSharePct": 41.0871,
+      "grossLongSharePct": 55.5815,
+      "grossShortSharePct": 14.4944,
+      "openInterest": 544010
+    },
+    {
+      "date": "2020-08-25",
+      "netSharePct": 40.2413,
+      "grossLongSharePct": 54.9006,
+      "grossShortSharePct": 14.6593,
+      "openInterest": 549282
+    },
+    {
+      "date": "2020-09-01",
+      "netSharePct": 42.1388,
+      "grossLongSharePct": 55.8911,
+      "grossShortSharePct": 13.7523,
+      "openInterest": 547704
+    },
+    {
+      "date": "2020-09-08",
+      "netSharePct": 42.42,
+      "grossLongSharePct": 56.1789,
+      "grossShortSharePct": 13.7589,
+      "openInterest": 557457
+    },
+    {
+      "date": "2020-09-15",
+      "netSharePct": 41.6249,
+      "grossLongSharePct": 56.0542,
+      "grossShortSharePct": 14.4293,
+      "openInterest": 578925
+    },
+    {
+      "date": "2020-09-22",
+      "netSharePct": 38.0394,
+      "grossLongSharePct": 53.6599,
+      "grossShortSharePct": 15.6205,
+      "openInterest": 575877
+    },
+    {
+      "date": "2020-09-29",
+      "netSharePct": 43.3252,
+      "grossLongSharePct": 56.207,
+      "grossShortSharePct": 12.8818,
+      "openInterest": 562396
+    },
+    {
+      "date": "2020-10-06",
+      "netSharePct": 44.7457,
+      "grossLongSharePct": 57.766,
+      "grossShortSharePct": 13.0203,
+      "openInterest": 555555
+    },
+    {
+      "date": "2020-10-13",
+      "netSharePct": 43.5055,
+      "grossLongSharePct": 59.1084,
+      "grossShortSharePct": 15.6029,
+      "openInterest": 553197
+    },
+    {
+      "date": "2020-10-20",
+      "netSharePct": 44.3352,
+      "grossLongSharePct": 60.4281,
+      "grossShortSharePct": 16.0929,
+      "openInterest": 562993
+    },
+    {
+      "date": "2020-10-27",
+      "netSharePct": 44.3277,
+      "grossLongSharePct": 58.1321,
+      "grossShortSharePct": 13.8044,
+      "openInterest": 560900
+    },
+    {
+      "date": "2020-11-03",
+      "netSharePct": 44.5889,
+      "grossLongSharePct": 59.07,
+      "grossShortSharePct": 14.4811,
+      "openInterest": 544774
+    },
+    {
+      "date": "2020-11-10",
+      "netSharePct": 43.7915,
+      "grossLongSharePct": 58.1819,
+      "grossShortSharePct": 14.3904,
+      "openInterest": 547449
+    },
+    {
+      "date": "2020-11-17",
+      "netSharePct": 45.0682,
+      "grossLongSharePct": 59.1352,
+      "grossShortSharePct": 14.067,
+      "openInterest": 557533
+    },
+    {
+      "date": "2020-11-24",
+      "netSharePct": 43.9263,
+      "grossLongSharePct": 57.6897,
+      "grossShortSharePct": 13.7635,
+      "openInterest": 555253
+    },
+    {
+      "date": "2020-12-01",
+      "netSharePct": 48.3817,
+      "grossLongSharePct": 60.2823,
+      "grossShortSharePct": 11.9006,
+      "openInterest": 538042
+    },
+    {
+      "date": "2020-12-08",
+      "netSharePct": 48.9918,
+      "grossLongSharePct": 61.5575,
+      "grossShortSharePct": 12.5657,
+      "openInterest": 549520
+    },
+    {
+      "date": "2020-12-15",
+      "netSharePct": 49.3461,
+      "grossLongSharePct": 61.8879,
+      "grossShortSharePct": 12.5418,
+      "openInterest": 550366
+    },
+    {
+      "date": "2020-12-21",
+      "netSharePct": 49.6097,
+      "grossLongSharePct": 62.3911,
+      "grossShortSharePct": 12.7814,
+      "openInterest": 560769
+    },
+    {
+      "date": "2020-12-29",
+      "netSharePct": 48.3223,
+      "grossLongSharePct": 61.4312,
+      "grossShortSharePct": 13.1089,
+      "openInterest": 556414
+    },
+    {
+      "date": "2021-01-05",
+      "netSharePct": 49.0989,
+      "grossLongSharePct": 61.514,
+      "grossShortSharePct": 12.4151,
+      "openInterest": 568888
+    },
+    {
+      "date": "2021-01-12",
+      "netSharePct": 44.3223,
+      "grossLongSharePct": 56.3808,
+      "grossShortSharePct": 12.0586,
+      "openInterest": 555538
+    },
+    {
+      "date": "2021-01-19",
+      "netSharePct": 45.5615,
+      "grossLongSharePct": 56.8058,
+      "grossShortSharePct": 11.2443,
+      "openInterest": 541330
+    },
+    {
+      "date": "2021-01-26",
+      "netSharePct": 48.1778,
+      "grossLongSharePct": 58.6508,
+      "grossShortSharePct": 10.473,
+      "openInterest": 534574
+    },
+    {
+      "date": "2021-02-02",
+      "netSharePct": 49.4463,
+      "grossLongSharePct": 60.451,
+      "grossShortSharePct": 11.0048,
+      "openInterest": 520011
+    },
+    {
+      "date": "2021-02-09",
+      "netSharePct": 49.6125,
+      "grossLongSharePct": 61.0422,
+      "grossShortSharePct": 11.4297,
+      "openInterest": 506741
+    },
+    {
+      "date": "2021-02-16",
+      "netSharePct": 46.712,
+      "grossLongSharePct": 60.3526,
+      "grossShortSharePct": 13.6405,
+      "openInterest": 503016
+    },
+    {
+      "date": "2021-02-23",
+      "netSharePct": 44.8393,
+      "grossLongSharePct": 59.0452,
+      "grossShortSharePct": 14.2059,
+      "openInterest": 481125
+    },
+    {
+      "date": "2021-03-02",
+      "netSharePct": 40.607,
+      "grossLongSharePct": 56.8583,
+      "grossShortSharePct": 16.2513,
+      "openInterest": 467008
+    },
+    {
+      "date": "2021-03-09",
+      "netSharePct": 36.9643,
+      "grossLongSharePct": 53.7781,
+      "grossShortSharePct": 16.8139,
+      "openInterest": 473871
+    },
+    {
+      "date": "2021-03-16",
+      "netSharePct": 37.8192,
+      "grossLongSharePct": 53.7785,
+      "grossShortSharePct": 15.9593,
+      "openInterest": 476467
+    },
+    {
+      "date": "2021-03-23",
+      "netSharePct": 35.8563,
+      "grossLongSharePct": 54.1292,
+      "grossShortSharePct": 18.2729,
+      "openInterest": 485457
+    },
+    {
+      "date": "2021-03-30",
+      "netSharePct": 35.8486,
+      "grossLongSharePct": 56.3752,
+      "grossShortSharePct": 20.5266,
+      "openInterest": 467321
+    },
+    {
+      "date": "2021-04-06",
+      "netSharePct": 40.8995,
+      "grossLongSharePct": 59.5017,
+      "grossShortSharePct": 18.6022,
+      "openInterest": 463353
+    },
+    {
+      "date": "2021-04-13",
+      "netSharePct": 39.2579,
+      "grossLongSharePct": 58.4966,
+      "grossShortSharePct": 19.2387,
+      "openInterest": 460733
+    },
+    {
+      "date": "2021-04-20",
+      "netSharePct": 38.4743,
+      "grossLongSharePct": 58.5039,
+      "grossShortSharePct": 20.0296,
+      "openInterest": 471738
+    },
+    {
+      "date": "2021-04-27",
+      "netSharePct": 36.0484,
+      "grossLongSharePct": 57.1972,
+      "grossShortSharePct": 21.1487,
+      "openInterest": 473305
+    },
+    {
+      "date": "2021-05-04",
+      "netSharePct": 36.3015,
+      "grossLongSharePct": 57.4464,
+      "grossShortSharePct": 21.1449,
+      "openInterest": 470341
+    },
+    {
+      "date": "2021-05-11",
+      "netSharePct": 38.5518,
+      "grossLongSharePct": 56.5801,
+      "grossShortSharePct": 18.0283,
+      "openInterest": 498693
+    },
+    {
+      "date": "2021-05-18",
+      "netSharePct": 38.2178,
+      "grossLongSharePct": 55.7766,
+      "grossShortSharePct": 17.5588,
+      "openInterest": 520410
+    },
+    {
+      "date": "2021-05-25",
+      "netSharePct": 42.0731,
+      "grossLongSharePct": 56.5046,
+      "grossShortSharePct": 14.4314,
+      "openInterest": 510164
+    },
+    {
+      "date": "2021-06-01",
+      "netSharePct": 43.6839,
+      "grossLongSharePct": 59.0407,
+      "grossShortSharePct": 15.3568,
+      "openInterest": 489198
+    },
+    {
+      "date": "2021-06-08",
+      "netSharePct": 42.5706,
+      "grossLongSharePct": 58.7123,
+      "grossShortSharePct": 16.1417,
+      "openInterest": 491858
+    },
+    {
+      "date": "2021-06-15",
+      "netSharePct": 39.9969,
+      "grossLongSharePct": 57.0572,
+      "grossShortSharePct": 17.0603,
+      "openInterest": 480127
+    },
+    {
+      "date": "2021-06-22",
+      "netSharePct": 36.6159,
+      "grossLongSharePct": 55.7679,
+      "grossShortSharePct": 19.1521,
+      "openInterest": 453940
+    },
+    {
+      "date": "2021-06-29",
+      "netSharePct": 35.783,
+      "grossLongSharePct": 56.0716,
+      "grossShortSharePct": 20.2885,
+      "openInterest": 453360
+    },
+    {
+      "date": "2021-07-06",
+      "netSharePct": 39.2479,
+      "grossLongSharePct": 58.0804,
+      "grossShortSharePct": 18.8325,
+      "openInterest": 465811
+    },
+    {
+      "date": "2021-07-13",
+      "netSharePct": 38.4907,
+      "grossLongSharePct": 55.5757,
+      "grossShortSharePct": 17.085,
+      "openInterest": 495798
+    },
+    {
+      "date": "2021-07-20",
+      "netSharePct": 39.9519,
+      "grossLongSharePct": 56.5343,
+      "grossShortSharePct": 16.5824,
+      "openInterest": 490520
+    },
+    {
+      "date": "2021-07-27",
+      "netSharePct": 39.8627,
+      "grossLongSharePct": 54.7171,
+      "grossShortSharePct": 14.8544,
+      "openInterest": 500187
+    },
+    {
+      "date": "2021-08-03",
+      "netSharePct": 40.4262,
+      "grossLongSharePct": 56.2413,
+      "grossShortSharePct": 15.8151,
+      "openInterest": 485663
+    },
+    {
+      "date": "2021-08-10",
+      "netSharePct": 35.2881,
+      "grossLongSharePct": 58.0975,
+      "grossShortSharePct": 22.8095,
+      "openInterest": 477232
+    },
+    {
+      "date": "2021-08-17",
+      "netSharePct": 39.4537,
+      "grossLongSharePct": 58.5882,
+      "grossShortSharePct": 19.1345,
+      "openInterest": 485485
+    },
+    {
+      "date": "2021-08-24",
+      "netSharePct": 41.7354,
+      "grossLongSharePct": 59.2556,
+      "grossShortSharePct": 17.5203,
+      "openInterest": 504735
+    },
+    {
+      "date": "2021-08-31",
+      "netSharePct": 42.7025,
+      "grossLongSharePct": 61.3283,
+      "grossShortSharePct": 18.6258,
+      "openInterest": 507113
+    },
+    {
+      "date": "2021-09-07",
+      "netSharePct": 40.6571,
+      "grossLongSharePct": 60.3855,
+      "grossShortSharePct": 19.7284,
+      "openInterest": 506772
+    },
+    {
+      "date": "2021-09-14",
+      "netSharePct": 41.0304,
+      "grossLongSharePct": 60.6269,
+      "grossShortSharePct": 19.5965,
+      "openInterest": 506356
+    },
+    {
+      "date": "2021-09-21",
+      "netSharePct": 38.0804,
+      "grossLongSharePct": 60.2052,
+      "grossShortSharePct": 22.1247,
+      "openInterest": 492765
+    },
+    {
+      "date": "2021-09-28",
+      "netSharePct": 34.3071,
+      "grossLongSharePct": 59.8572,
+      "grossShortSharePct": 25.5502,
+      "openInterest": 490858
+    },
+    {
+      "date": "2021-10-05",
+      "netSharePct": 37.74,
+      "grossLongSharePct": 61.1711,
+      "grossShortSharePct": 23.4311,
+      "openInterest": 483789
+    },
+    {
+      "date": "2021-10-12",
+      "netSharePct": 38.3043,
+      "grossLongSharePct": 61.6255,
+      "grossShortSharePct": 23.3213,
+      "openInterest": 484382
+    },
+    {
+      "date": "2021-10-19",
+      "netSharePct": 39.7859,
+      "grossLongSharePct": 61.7074,
+      "grossShortSharePct": 21.9215,
+      "openInterest": 485974
+    },
+    {
+      "date": "2021-10-26",
+      "netSharePct": 42.0876,
+      "grossLongSharePct": 61.5241,
+      "grossShortSharePct": 19.4365,
+      "openInterest": 509794
+    },
+    {
+      "date": "2021-11-02",
+      "netSharePct": 42.3803,
+      "grossLongSharePct": 61.2847,
+      "grossShortSharePct": 18.9044,
+      "openInterest": 507616
+    },
+    {
+      "date": "2021-11-09",
+      "netSharePct": 43.8126,
+      "grossLongSharePct": 59.7366,
+      "grossShortSharePct": 15.924,
+      "openInterest": 571025
+    },
+    {
+      "date": "2021-11-16",
+      "netSharePct": 42.4053,
+      "grossLongSharePct": 58.8511,
+      "grossShortSharePct": 16.4458,
+      "openInterest": 612612
+    },
+    {
+      "date": "2021-11-23",
+      "netSharePct": 41.8723,
+      "grossLongSharePct": 58.3058,
+      "grossShortSharePct": 16.4334,
+      "openInterest": 559823
+    },
+    {
+      "date": "2021-11-30",
+      "netSharePct": 42.4654,
+      "grossLongSharePct": 58.3327,
+      "grossShortSharePct": 15.8673,
+      "openInterest": 531868
+    },
+    {
+      "date": "2021-12-07",
+      "netSharePct": 43.4973,
+      "grossLongSharePct": 60.187,
+      "grossShortSharePct": 16.6897,
+      "openInterest": 499307
+    },
+    {
+      "date": "2021-12-14",
+      "netSharePct": 40.1821,
+      "grossLongSharePct": 59.1893,
+      "grossShortSharePct": 19.0072,
+      "openInterest": 503709
+    },
+    {
+      "date": "2021-12-21",
+      "netSharePct": 41.0927,
+      "grossLongSharePct": 59.2254,
+      "grossShortSharePct": 18.1327,
+      "openInterest": 500846
+    },
+    {
+      "date": "2021-12-28",
+      "netSharePct": 41.8846,
+      "grossLongSharePct": 59.7115,
+      "grossShortSharePct": 17.8269,
+      "openInterest": 508912
+    },
+    {
+      "date": "2022-01-04",
+      "netSharePct": 42.0425,
+      "grossLongSharePct": 58.996,
+      "grossShortSharePct": 16.9535,
+      "openInterest": 502717
+    },
+    {
+      "date": "2022-01-11",
+      "netSharePct": 36.5473,
+      "grossLongSharePct": 53.0821,
+      "grossShortSharePct": 16.5347,
+      "openInterest": 546516
+    },
+    {
+      "date": "2022-01-18",
+      "netSharePct": 36.0174,
+      "grossLongSharePct": 53.8809,
+      "grossShortSharePct": 17.8636,
+      "openInterest": 539204
+    },
+    {
+      "date": "2022-01-25",
+      "netSharePct": 38.4827,
+      "grossLongSharePct": 54.7854,
+      "grossShortSharePct": 16.3027,
+      "openInterest": 572078
+    },
+    {
+      "date": "2022-02-01",
+      "netSharePct": 33.4042,
+      "grossLongSharePct": 53.5566,
+      "grossShortSharePct": 20.1525,
+      "openInterest": 515331
+    },
+    {
+      "date": "2022-02-08",
+      "netSharePct": 36.4061,
+      "grossLongSharePct": 54.5117,
+      "grossShortSharePct": 18.1056,
+      "openInterest": 512842
+    },
+    {
+      "date": "2022-02-15",
+      "netSharePct": 38.2377,
+      "grossLongSharePct": 56.0766,
+      "grossShortSharePct": 17.8389,
+      "openInterest": 558645
+    },
+    {
+      "date": "2022-02-22",
+      "netSharePct": 39.7633,
+      "grossLongSharePct": 57.2531,
+      "grossShortSharePct": 17.4898,
+      "openInterest": 611488
+    },
+    {
+      "date": "2022-03-01",
+      "netSharePct": 41.8489,
+      "grossLongSharePct": 57.5336,
+      "grossShortSharePct": 15.6847,
+      "openInterest": 615600
+    },
+    {
+      "date": "2022-03-08",
+      "netSharePct": 42.9737,
+      "grossLongSharePct": 57.1052,
+      "grossShortSharePct": 14.1315,
+      "openInterest": 638502
+    },
+    {
+      "date": "2022-03-15",
+      "netSharePct": 42.3876,
+      "grossLongSharePct": 56.1412,
+      "grossShortSharePct": 13.7536,
+      "openInterest": 617605
+    },
+    {
+      "date": "2022-03-22",
+      "netSharePct": 40.9841,
+      "grossLongSharePct": 54.3068,
+      "grossShortSharePct": 13.3227,
+      "openInterest": 605191
+    },
+    {
+      "date": "2022-03-29",
+      "netSharePct": 44.8367,
+      "grossLongSharePct": 57.027,
+      "grossShortSharePct": 12.1903,
+      "openInterest": 574521
+    },
+    {
+      "date": "2022-04-05",
+      "netSharePct": 43.7945,
+      "grossLongSharePct": 57.8901,
+      "grossShortSharePct": 14.0956,
+      "openInterest": 560666
+    },
+    {
+      "date": "2022-04-12",
+      "netSharePct": 44.0218,
+      "grossLongSharePct": 58.5424,
+      "grossShortSharePct": 14.5207,
+      "openInterest": 577639
+    },
+    {
+      "date": "2022-04-19",
+      "netSharePct": 41.6822,
+      "grossLongSharePct": 57.5007,
+      "grossShortSharePct": 15.8184,
+      "openInterest": 575202
+    },
+    {
+      "date": "2022-04-26",
+      "netSharePct": 39.0875,
+      "grossLongSharePct": 55.6686,
+      "grossShortSharePct": 16.5811,
+      "openInterest": 557785
+    },
+    {
+      "date": "2022-05-03",
+      "netSharePct": 35.5377,
+      "grossLongSharePct": 52.3586,
+      "grossShortSharePct": 16.8209,
+      "openInterest": 560441
+    },
+    {
+      "date": "2022-05-10",
+      "netSharePct": 33.829,
+      "grossLongSharePct": 50.5641,
+      "grossShortSharePct": 16.7351,
+      "openInterest": 571447
+    },
+    {
+      "date": "2022-05-17",
+      "netSharePct": 31.5534,
+      "grossLongSharePct": 50.9236,
+      "grossShortSharePct": 19.3702,
+      "openInterest": 555756
+    },
+    {
+      "date": "2022-05-24",
+      "netSharePct": 34.6753,
+      "grossLongSharePct": 53.2358,
+      "grossShortSharePct": 18.5605,
+      "openInterest": 530098
+    },
+    {
+      "date": "2022-05-31",
+      "netSharePct": 33.5958,
+      "grossLongSharePct": 52.4523,
+      "grossShortSharePct": 18.8565,
+      "openInterest": 513722
+    },
+    {
+      "date": "2022-06-07",
+      "netSharePct": 35.47,
+      "grossLongSharePct": 54.7135,
+      "grossShortSharePct": 19.2435,
+      "openInterest": 494130
+    },
+    {
+      "date": "2022-06-14",
+      "netSharePct": 31.0777,
+      "grossLongSharePct": 53.5919,
+      "grossShortSharePct": 22.5142,
+      "openInterest": 497456
+    },
+    {
+      "date": "2022-06-21",
+      "netSharePct": 32.6394,
+      "grossLongSharePct": 53.5942,
+      "grossShortSharePct": 20.9548,
+      "openInterest": 500276
+    },
+    {
+      "date": "2022-06-28",
+      "netSharePct": 31.7287,
+      "grossLongSharePct": 54.0663,
+      "grossShortSharePct": 22.3376,
+      "openInterest": 497005
+    },
+    {
+      "date": "2022-07-05",
+      "netSharePct": 29.2367,
+      "grossLongSharePct": 53.7536,
+      "grossShortSharePct": 24.517,
+      "openInterest": 498210
+    },
+    {
+      "date": "2022-07-12",
+      "netSharePct": 21.7737,
+      "grossLongSharePct": 46.2911,
+      "grossShortSharePct": 24.5174,
+      "openInterest": 542493
+    },
+    {
+      "date": "2022-07-19",
+      "netSharePct": 18.094,
+      "grossLongSharePct": 45.9242,
+      "grossShortSharePct": 27.8302,
+      "openInterest": 524786
+    },
+    {
+      "date": "2022-07-26",
+      "netSharePct": 19.0127,
+      "grossLongSharePct": 49.57,
+      "grossShortSharePct": 30.5572,
+      "openInterest": 487515
+    },
+    {
+      "date": "2022-08-02",
+      "netSharePct": 27.048,
+      "grossLongSharePct": 52.6767,
+      "grossShortSharePct": 25.6287,
+      "openInterest": 459649
+    },
+    {
+      "date": "2022-08-09",
+      "netSharePct": 31.4969,
+      "grossLongSharePct": 53.5578,
+      "grossShortSharePct": 22.0609,
+      "openInterest": 453540
+    },
+    {
+      "date": "2022-08-16",
+      "netSharePct": 31.0961,
+      "grossLongSharePct": 52.4707,
+      "grossShortSharePct": 21.3746,
+      "openInterest": 453960
+    },
+    {
+      "date": "2022-08-23",
+      "netSharePct": 27.4918,
+      "grossLongSharePct": 51.8669,
+      "grossShortSharePct": 24.3751,
+      "openInterest": 457762
+    },
+    {
+      "date": "2022-08-30",
+      "netSharePct": 25.6409,
+      "grossLongSharePct": 51.2482,
+      "grossShortSharePct": 25.6074,
+      "openInterest": 459165
+    },
+    {
+      "date": "2022-09-06",
+      "netSharePct": 22.2913,
+      "grossLongSharePct": 49.6937,
+      "grossShortSharePct": 27.4024,
+      "openInterest": 465908
+    },
+    {
+      "date": "2022-09-13",
+      "netSharePct": 20.9941,
+      "grossLongSharePct": 48.7265,
+      "grossShortSharePct": 27.7324,
+      "openInterest": 463674
+    },
+    {
+      "date": "2022-09-20",
+      "netSharePct": 14.0014,
+      "grossLongSharePct": 45.7093,
+      "grossShortSharePct": 31.7078,
+      "openInterest": 469395
+    },
+    {
+      "date": "2022-09-27",
+      "netSharePct": 11.3948,
+      "grossLongSharePct": 45.3231,
+      "grossShortSharePct": 33.9283,
+      "openInterest": 457061
+    },
+    {
+      "date": "2022-10-04",
+      "netSharePct": 20.2224,
+      "grossLongSharePct": 49.4123,
+      "grossShortSharePct": 29.1899,
+      "openInterest": 437065
+    },
+    {
+      "date": "2022-10-11",
+      "netSharePct": 21.8871,
+      "grossLongSharePct": 49.2729,
+      "grossShortSharePct": 27.3858,
+      "openInterest": 431395
+    },
+    {
+      "date": "2022-10-18",
+      "netSharePct": 17.7032,
+      "grossLongSharePct": 48.5138,
+      "grossShortSharePct": 30.8106,
+      "openInterest": 434701
+    },
+    {
+      "date": "2022-10-25",
+      "netSharePct": 14.9169,
+      "grossLongSharePct": 46.6709,
+      "grossShortSharePct": 31.754,
+      "openInterest": 456072
+    },
+    {
+      "date": "2022-11-01",
+      "netSharePct": 13.8297,
+      "grossLongSharePct": 46.2983,
+      "grossShortSharePct": 32.4686,
+      "openInterest": 467276
+    },
+    {
+      "date": "2022-11-08",
+      "netSharePct": 16.8563,
+      "grossLongSharePct": 45.6803,
+      "grossShortSharePct": 28.824,
+      "openInterest": 488471
+    },
+    {
+      "date": "2022-11-15",
+      "netSharePct": 25.5001,
+      "grossLongSharePct": 45.8997,
+      "grossShortSharePct": 20.3996,
+      "openInterest": 495171
+    },
+    {
+      "date": "2022-11-22",
+      "netSharePct": 25.8292,
+      "grossLongSharePct": 47.6672,
+      "grossShortSharePct": 21.838,
+      "openInterest": 449542
+    },
+    {
+      "date": "2022-11-29",
+      "netSharePct": 25.3661,
+      "grossLongSharePct": 48.2315,
+      "grossShortSharePct": 22.8653,
+      "openInterest": 433661
+    },
+    {
+      "date": "2022-12-06",
+      "netSharePct": 27.2743,
+      "grossLongSharePct": 50.1,
+      "grossShortSharePct": 22.8256,
+      "openInterest": 422100
+    },
+    {
+      "date": "2022-12-13",
+      "netSharePct": 28.75,
+      "grossLongSharePct": 51.3475,
+      "grossShortSharePct": 22.5975,
+      "openInterest": 437040
+    },
+    {
+      "date": "2022-12-20",
+      "netSharePct": 29.5081,
+      "grossLongSharePct": 51.7885,
+      "grossShortSharePct": 22.2804,
+      "openInterest": 436653
+    },
+    {
+      "date": "2022-12-27",
+      "netSharePct": 31.1063,
+      "grossLongSharePct": 52.16,
+      "grossShortSharePct": 21.0538,
+      "openInterest": 440040
+    },
+    {
+      "date": "2023-01-03",
+      "netSharePct": 31.5239,
+      "grossLongSharePct": 51.3584,
+      "grossShortSharePct": 19.8345,
+      "openInterest": 449393
+    },
+    {
+      "date": "2023-01-10",
+      "netSharePct": 31.2625,
+      "grossLongSharePct": 50.5828,
+      "grossShortSharePct": 19.3203,
+      "openInterest": 481519
+    },
+    {
+      "date": "2023-01-17",
+      "netSharePct": 31.1579,
+      "grossLongSharePct": 50.1962,
+      "grossShortSharePct": 19.0383,
+      "openInterest": 491818
+    },
+    {
+      "date": "2023-01-24",
+      "netSharePct": 31.5392,
+      "grossLongSharePct": 50.6696,
+      "grossShortSharePct": 19.1304,
+      "openInterest": 499927
+    },
+    {
+      "date": "2023-01-31",
+      "netSharePct": 33.9836,
+      "grossLongSharePct": 54.3669,
+      "grossShortSharePct": 20.3833,
+      "openInterest": 471642
+    },
+    {
+      "date": "2023-02-07",
+      "netSharePct": 29.2924,
+      "grossLongSharePct": 50.7778,
+      "grossShortSharePct": 21.4854,
+      "openInterest": 439755
+    },
+    {
+      "date": "2023-02-14",
+      "netSharePct": 24.7653,
+      "grossLongSharePct": 49.3701,
+      "grossShortSharePct": 24.6048,
+      "openInterest": 426116
+    },
+    {
+      "date": "2023-02-21",
+      "netSharePct": 25.3405,
+      "grossLongSharePct": 49.7305,
+      "grossShortSharePct": 24.39,
+      "openInterest": 422648
+    },
+    {
+      "date": "2023-02-28",
+      "netSharePct": 25.4382,
+      "grossLongSharePct": 48.8226,
+      "grossShortSharePct": 23.3845,
+      "openInterest": 426890
+    },
+    {
+      "date": "2023-03-07",
+      "netSharePct": 21.4786,
+      "grossLongSharePct": 47.0199,
+      "grossShortSharePct": 25.5413,
+      "openInterest": 458474
+    },
+    {
+      "date": "2023-03-14",
+      "netSharePct": 30.5689,
+      "grossLongSharePct": 50.2812,
+      "grossShortSharePct": 19.7123,
+      "openInterest": 459064
+    },
+    {
+      "date": "2023-03-21",
+      "netSharePct": 33.7548,
+      "grossLongSharePct": 50.6287,
+      "grossShortSharePct": 16.8739,
+      "openInterest": 469874
+    },
+    {
+      "date": "2023-03-28",
+      "netSharePct": 37.9494,
+      "grossLongSharePct": 51.218,
+      "grossShortSharePct": 13.2686,
+      "openInterest": 478611
+    },
+    {
+      "date": "2023-04-04",
+      "netSharePct": 40.9608,
+      "grossLongSharePct": 55.8473,
+      "grossShortSharePct": 14.8865,
+      "openInterest": 476592
+    },
+    {
+      "date": "2023-04-11",
+      "netSharePct": 40.4445,
+      "grossLongSharePct": 54.5915,
+      "grossShortSharePct": 14.147,
+      "openInterest": 476567
+    },
+    {
+      "date": "2023-04-18",
+      "netSharePct": 39.3761,
+      "grossLongSharePct": 53.9261,
+      "grossShortSharePct": 14.55,
+      "openInterest": 482254
+    },
+    {
+      "date": "2023-04-25",
+      "netSharePct": 39.1506,
+      "grossLongSharePct": 53.5041,
+      "grossShortSharePct": 14.3535,
+      "openInterest": 473209
+    },
+    {
+      "date": "2023-05-02",
+      "netSharePct": 39.6042,
+      "grossLongSharePct": 53.1411,
+      "grossShortSharePct": 13.5369,
+      "openInterest": 493804
+    },
+    {
+      "date": "2023-05-09",
+      "netSharePct": 37.7327,
+      "grossLongSharePct": 51.3482,
+      "grossShortSharePct": 13.6155,
+      "openInterest": 518951
+    },
+    {
+      "date": "2023-05-16",
+      "netSharePct": 34.4582,
+      "grossLongSharePct": 48.9142,
+      "grossShortSharePct": 14.456,
+      "openInterest": 521832
+    },
+    {
+      "date": "2023-05-23",
+      "netSharePct": 33.5501,
+      "grossLongSharePct": 49.2922,
+      "grossShortSharePct": 15.742,
+      "openInterest": 479080
+    },
+    {
+      "date": "2023-05-30",
+      "netSharePct": 37.6664,
+      "grossLongSharePct": 52.7916,
+      "grossShortSharePct": 15.1252,
+      "openInterest": 449515
+    },
+    {
+      "date": "2023-06-06",
+      "netSharePct": 40.2568,
+      "grossLongSharePct": 54.4273,
+      "grossShortSharePct": 14.1705,
+      "openInterest": 436301
+    },
+    {
+      "date": "2023-06-13",
+      "netSharePct": 37.0085,
+      "grossLongSharePct": 52.5105,
+      "grossShortSharePct": 15.502,
+      "openInterest": 432898
+    },
+    {
+      "date": "2023-06-20",
+      "netSharePct": 37.2058,
+      "grossLongSharePct": 52.349,
+      "grossShortSharePct": 15.1432,
+      "openInterest": 438037
+    },
+    {
+      "date": "2023-06-27",
+      "netSharePct": 35.1757,
+      "grossLongSharePct": 51.1463,
+      "grossShortSharePct": 15.9706,
+      "openInterest": 431861
+    },
+    {
+      "date": "2023-07-03",
+      "netSharePct": 36.4005,
+      "grossLongSharePct": 52.4661,
+      "grossShortSharePct": 16.0656,
+      "openInterest": 448063
+    },
+    {
+      "date": "2023-07-11",
+      "netSharePct": 34.3055,
+      "grossLongSharePct": 49.785,
+      "grossShortSharePct": 15.4794,
+      "openInterest": 483170
+    },
+    {
+      "date": "2023-07-18",
+      "netSharePct": 40.105,
+      "grossLongSharePct": 54.706,
+      "grossShortSharePct": 14.601,
+      "openInterest": 482104
+    },
+    {
+      "date": "2023-07-25",
+      "netSharePct": 36.4653,
+      "grossLongSharePct": 52.1297,
+      "grossShortSharePct": 15.6644,
+      "openInterest": 476176
+    },
+    {
+      "date": "2023-08-01",
+      "netSharePct": 37.5354,
+      "grossLongSharePct": 54.391,
+      "grossShortSharePct": 16.8557,
+      "openInterest": 439383
+    },
+    {
+      "date": "2023-08-08",
+      "netSharePct": 33.4265,
+      "grossLongSharePct": 53.4988,
+      "grossShortSharePct": 20.0723,
+      "openInterest": 427759
+    },
+    {
+      "date": "2023-08-15",
+      "netSharePct": 27.9366,
+      "grossLongSharePct": 53.7528,
+      "grossShortSharePct": 25.8162,
+      "openInterest": 433611
+    },
+    {
+      "date": "2023-08-22",
+      "netSharePct": 23.6952,
+      "grossLongSharePct": 52.608,
+      "grossShortSharePct": 28.9128,
+      "openInterest": 430239
+    },
+    {
+      "date": "2023-08-29",
+      "netSharePct": 27.8388,
+      "grossLongSharePct": 53.3087,
+      "grossShortSharePct": 25.4698,
+      "openInterest": 442806
+    },
+    {
+      "date": "2023-09-05",
+      "netSharePct": 31.46,
+      "grossLongSharePct": 53.7536,
+      "grossShortSharePct": 22.2936,
+      "openInterest": 438672
+    },
+    {
+      "date": "2023-09-12",
+      "netSharePct": 28.073,
+      "grossLongSharePct": 53.4208,
+      "grossShortSharePct": 25.3478,
+      "openInterest": 441221
+    },
+    {
+      "date": "2023-09-19",
+      "netSharePct": 30.8536,
+      "grossLongSharePct": 54.2634,
+      "grossShortSharePct": 23.4098,
+      "openInterest": 438078
+    },
+    {
+      "date": "2023-09-26",
+      "netSharePct": 26.5862,
+      "grossLongSharePct": 54.0747,
+      "grossShortSharePct": 27.4884,
+      "openInterest": 435620
+    },
+    {
+      "date": "2023-10-03",
+      "netSharePct": 21.155,
+      "grossLongSharePct": 52.9667,
+      "grossShortSharePct": 31.8116,
+      "openInterest": 431226
+    },
+    {
+      "date": "2023-10-10",
+      "netSharePct": 16.365,
+      "grossLongSharePct": 50.4771,
+      "grossShortSharePct": 34.1121,
+      "openInterest": 436499
+    },
+    {
+      "date": "2023-10-17",
+      "netSharePct": 25.6467,
+      "grossLongSharePct": 52.6438,
+      "grossShortSharePct": 26.9971,
+      "openInterest": 439581
+    },
+    {
+      "date": "2023-10-24",
+      "netSharePct": 32.2314,
+      "grossLongSharePct": 54.2572,
+      "grossShortSharePct": 22.0257,
+      "openInterest": 463476
+    },
+    {
+      "date": "2023-10-31",
+      "netSharePct": 34.3468,
+      "grossLongSharePct": 54.8652,
+      "grossShortSharePct": 20.5184,
+      "openInterest": 475808
+    },
+    {
+      "date": "2023-11-07",
+      "netSharePct": 34.3175,
+      "grossLongSharePct": 54.0218,
+      "grossShortSharePct": 19.7043,
+      "openInterest": 484347
+    },
+    {
+      "date": "2023-11-14",
+      "netSharePct": 31.9287,
+      "grossLongSharePct": 52.2676,
+      "grossShortSharePct": 20.3389,
+      "openInterest": 486634
+    },
+    {
+      "date": "2023-11-21",
+      "netSharePct": 33.7717,
+      "grossLongSharePct": 53.046,
+      "grossShortSharePct": 19.2743,
+      "openInterest": 508429
+    },
+    {
+      "date": "2023-11-28",
+      "netSharePct": 39.569,
+      "grossLongSharePct": 57.3204,
+      "grossShortSharePct": 17.7513,
+      "openInterest": 505658
+    },
+    {
+      "date": "2023-12-05",
+      "netSharePct": 41.7553,
+      "grossLongSharePct": 59.253,
+      "grossShortSharePct": 17.4977,
+      "openInterest": 487469
+    },
+    {
+      "date": "2023-12-12",
+      "netSharePct": 40.0548,
+      "grossLongSharePct": 58.2067,
+      "grossShortSharePct": 18.1519,
+      "openInterest": 469939
+    },
+    {
+      "date": "2023-12-19",
+      "netSharePct": 41.8408,
+      "grossLongSharePct": 58.3895,
+      "grossShortSharePct": 16.5487,
+      "openInterest": 481203
+    },
+    {
+      "date": "2023-12-26",
+      "netSharePct": 42.2756,
+      "grossLongSharePct": 58.99,
+      "grossShortSharePct": 16.7144,
+      "openInterest": 491343
+    },
+    {
+      "date": "2024-01-02",
+      "netSharePct": 41.4996,
+      "grossLongSharePct": 58.0989,
+      "grossShortSharePct": 16.5993,
+      "openInterest": 500364
+    },
+    {
+      "date": "2024-01-09",
+      "netSharePct": 38.5045,
+      "grossLongSharePct": 55.4589,
+      "grossShortSharePct": 16.9544,
+      "openInterest": 489849
+    },
+    {
+      "date": "2024-01-16",
+      "netSharePct": 36.7628,
+      "grossLongSharePct": 53.6157,
+      "grossShortSharePct": 16.8529,
+      "openInterest": 489334
+    },
+    {
+      "date": "2024-01-23",
+      "netSharePct": 36.3778,
+      "grossLongSharePct": 51.7524,
+      "grossShortSharePct": 15.3746,
+      "openInterest": 465872
+    },
+    {
+      "date": "2024-01-30",
+      "netSharePct": 34.3438,
+      "grossLongSharePct": 50.943,
+      "grossShortSharePct": 16.5992,
+      "openInterest": 430328
+    },
+    {
+      "date": "2024-02-06",
+      "netSharePct": 38.5898,
+      "grossLongSharePct": 54.5482,
+      "grossShortSharePct": 15.9584,
+      "openInterest": 419121
+    },
+    {
+      "date": "2024-02-13",
+      "netSharePct": 31.1702,
+      "grossLongSharePct": 51.687,
+      "grossShortSharePct": 20.5168,
+      "openInterest": 420812
+    },
+    {
+      "date": "2024-02-20",
+      "netSharePct": 34.4571,
+      "grossLongSharePct": 51.8431,
+      "grossShortSharePct": 17.386,
+      "openInterest": 407063
+    },
+    {
+      "date": "2024-02-27",
+      "netSharePct": 34.445,
+      "grossLongSharePct": 52.274,
+      "grossShortSharePct": 17.829,
+      "openInterest": 411195
+    },
+    {
+      "date": "2024-03-05",
+      "netSharePct": 40.5612,
+      "grossLongSharePct": 56.0091,
+      "grossShortSharePct": 15.4479,
+      "openInterest": 471616
+    },
+    {
+      "date": "2024-03-12",
+      "netSharePct": 39.0658,
+      "grossLongSharePct": 54.8509,
+      "grossShortSharePct": 15.7851,
+      "openInterest": 516057
+    },
+    {
+      "date": "2024-03-19",
+      "netSharePct": 37.6793,
+      "grossLongSharePct": 52.0949,
+      "grossShortSharePct": 14.4156,
+      "openInterest": 535047
+    },
+    {
+      "date": "2024-03-26",
+      "netSharePct": 39.5706,
+      "grossLongSharePct": 52.7452,
+      "grossShortSharePct": 13.1746,
+      "openInterest": 503642
+    },
+    {
+      "date": "2024-04-02",
+      "netSharePct": 41.4463,
+      "grossLongSharePct": 56.2747,
+      "grossShortSharePct": 14.8285,
+      "openInterest": 500045
+    },
+    {
+      "date": "2024-04-09",
+      "netSharePct": 40.066,
+      "grossLongSharePct": 55.3823,
+      "grossShortSharePct": 15.3163,
+      "openInterest": 505214
+    },
+    {
+      "date": "2024-04-16",
+      "netSharePct": 39.0421,
+      "grossLongSharePct": 53.9019,
+      "grossShortSharePct": 14.8598,
+      "openInterest": 517193
+    },
+    {
+      "date": "2024-04-23",
+      "netSharePct": 39.301,
+      "grossLongSharePct": 54.1473,
+      "grossShortSharePct": 14.8463,
+      "openInterest": 516249
+    },
+    {
+      "date": "2024-04-30",
+      "netSharePct": 39.2869,
+      "grossLongSharePct": 53.6466,
+      "grossShortSharePct": 14.3596,
+      "openInterest": 519791
+    },
+    {
+      "date": "2024-05-07",
+      "netSharePct": 37.6659,
+      "grossLongSharePct": 51.3639,
+      "grossShortSharePct": 13.698,
+      "openInterest": 529835
+    },
+    {
+      "date": "2024-05-14",
+      "netSharePct": 39.1042,
+      "grossLongSharePct": 53.0913,
+      "grossShortSharePct": 13.9871,
+      "openInterest": 522952
+    },
+    {
+      "date": "2024-05-21",
+      "netSharePct": 43.3113,
+      "grossLongSharePct": 56.6781,
+      "grossShortSharePct": 13.3668,
+      "openInterest": 530591
+    },
+    {
+      "date": "2024-05-28",
+      "netSharePct": 48.7372,
+      "grossLongSharePct": 59.0687,
+      "grossShortSharePct": 10.3315,
+      "openInterest": 485430
+    },
+    {
+      "date": "2024-06-04",
+      "netSharePct": 53.0298,
+      "grossLongSharePct": 63.5919,
+      "grossShortSharePct": 10.5621,
+      "openInterest": 447488
+    },
+    {
+      "date": "2024-06-11",
+      "netSharePct": 53.5475,
+      "grossLongSharePct": 63.3546,
+      "grossShortSharePct": 9.8071,
+      "openInterest": 436857
+    },
+    {
+      "date": "2024-06-18",
+      "netSharePct": 54.7061,
+      "grossLongSharePct": 64.6225,
+      "grossShortSharePct": 9.9164,
+      "openInterest": 444345
+    },
+    {
+      "date": "2024-06-25",
+      "netSharePct": 54.4526,
+      "grossLongSharePct": 63.0012,
+      "grossShortSharePct": 8.5486,
+      "openInterest": 452190
+    },
+    {
+      "date": "2024-07-02",
+      "netSharePct": 53.1179,
+      "grossLongSharePct": 61.6007,
+      "grossShortSharePct": 8.4828,
+      "openInterest": 454730
+    },
+    {
+      "date": "2024-07-09",
+      "netSharePct": 49.344,
+      "grossLongSharePct": 58.6924,
+      "grossShortSharePct": 9.3484,
+      "openInterest": 516324
+    },
+    {
+      "date": "2024-07-16",
+      "netSharePct": 49.1538,
+      "grossLongSharePct": 60.3294,
+      "grossShortSharePct": 11.1756,
+      "openInterest": 579862
+    },
+    {
+      "date": "2024-07-23",
+      "netSharePct": 47.7147,
+      "grossLongSharePct": 59.6883,
+      "grossShortSharePct": 11.9737,
+      "openInterest": 572306
+    },
+    {
+      "date": "2024-07-30",
+      "netSharePct": 48.2666,
+      "grossLongSharePct": 61.334,
+      "grossShortSharePct": 13.0674,
+      "openInterest": 510914
+    },
+    {
+      "date": "2024-08-06",
+      "netSharePct": 49.6726,
+      "grossLongSharePct": 62.0248,
+      "grossShortSharePct": 12.3522,
+      "openInterest": 480645
+    },
+    {
+      "date": "2024-08-13",
+      "netSharePct": 52.8323,
+      "grossLongSharePct": 64.9906,
+      "grossShortSharePct": 12.1582,
+      "openInterest": 505872
+    },
+    {
+      "date": "2024-08-20",
+      "netSharePct": 54.6577,
+      "grossLongSharePct": 66.7242,
+      "grossShortSharePct": 12.0664,
+      "openInterest": 532867
+    },
+    {
+      "date": "2024-08-27",
+      "netSharePct": 56.4331,
+      "grossLongSharePct": 65.8024,
+      "grossShortSharePct": 9.3693,
+      "openInterest": 521759
+    },
+    {
+      "date": "2024-09-03",
+      "netSharePct": 56.2586,
+      "grossLongSharePct": 66.3536,
+      "grossShortSharePct": 10.095,
+      "openInterest": 511136
+    },
+    {
+      "date": "2024-09-10",
+      "netSharePct": 55.2298,
+      "grossLongSharePct": 66.4722,
+      "grossShortSharePct": 11.2424,
+      "openInterest": 511501
+    },
+    {
+      "date": "2024-09-17",
+      "netSharePct": 57.6731,
+      "grossLongSharePct": 68.7715,
+      "grossShortSharePct": 11.0984,
+      "openInterest": 537627
+    },
+    {
+      "date": "2024-09-24",
+      "netSharePct": 55.8568,
+      "grossLongSharePct": 68.6405,
+      "grossShortSharePct": 12.7837,
+      "openInterest": 564640
+    },
+    {
+      "date": "2024-10-01",
+      "netSharePct": 56.2609,
+      "grossLongSharePct": 69.414,
+      "grossShortSharePct": 13.1531,
+      "openInterest": 533107
+    },
+    {
+      "date": "2024-10-08",
+      "netSharePct": 53.4637,
+      "grossLongSharePct": 67.0537,
+      "grossShortSharePct": 13.59,
+      "openInterest": 520316
+    },
+    {
+      "date": "2024-10-15",
+      "netSharePct": 52.9226,
+      "grossLongSharePct": 66.0519,
+      "grossShortSharePct": 13.1293,
+      "openInterest": 541232
+    },
+    {
+      "date": "2024-10-22",
+      "netSharePct": 51.6251,
+      "grossLongSharePct": 64.8029,
+      "grossShortSharePct": 13.1778,
+      "openInterest": 573760
+    },
+    {
+      "date": "2024-10-29",
+      "netSharePct": 48.0877,
+      "grossLongSharePct": 63.2711,
+      "grossShortSharePct": 15.1834,
+      "openInterest": 579468
+    },
+    {
+      "date": "2024-11-05",
+      "netSharePct": 45.7551,
+      "grossLongSharePct": 60.3576,
+      "grossShortSharePct": 14.6025,
+      "openInterest": 558034
+    },
+    {
+      "date": "2024-11-12",
+      "netSharePct": 44.1156,
+      "grossLongSharePct": 58.9993,
+      "grossShortSharePct": 14.8837,
+      "openInterest": 535981
+    },
+    {
+      "date": "2024-11-19",
+      "netSharePct": 46.5983,
+      "grossLongSharePct": 61.5077,
+      "grossShortSharePct": 14.9094,
+      "openInterest": 502952
+    },
+    {
+      "date": "2024-11-26",
+      "netSharePct": 52.9637,
+      "grossLongSharePct": 64.1901,
+      "grossShortSharePct": 11.2265,
+      "openInterest": 472660
+    },
+    {
+      "date": "2024-12-03",
+      "netSharePct": 56.215,
+      "grossLongSharePct": 66.5767,
+      "grossShortSharePct": 10.3617,
+      "openInterest": 462040
+    },
+    {
+      "date": "2024-12-10",
+      "netSharePct": 57.0163,
+      "grossLongSharePct": 67.1014,
+      "grossShortSharePct": 10.0851,
+      "openInterest": 483346
+    },
+    {
+      "date": "2024-12-17",
+      "netSharePct": 56.1632,
+      "grossLongSharePct": 64.9372,
+      "grossShortSharePct": 8.774,
+      "openInterest": 466571
+    },
+    {
+      "date": "2024-12-24",
+      "netSharePct": 54.4663,
+      "grossLongSharePct": 63.6574,
+      "grossShortSharePct": 9.1911,
+      "openInterest": 454646
+    },
+    {
+      "date": "2024-12-31",
+      "netSharePct": 53.9223,
+      "grossLongSharePct": 61.6914,
+      "grossShortSharePct": 7.7691,
+      "openInterest": 458584
+    },
+    {
+      "date": "2025-01-07",
+      "netSharePct": 53.4356,
+      "grossLongSharePct": 61.1519,
+      "grossShortSharePct": 7.7163,
+      "openInterest": 477043
+    },
+    {
+      "date": "2025-01-14",
+      "netSharePct": 53.0637,
+      "grossLongSharePct": 59.3709,
+      "grossShortSharePct": 6.3071,
+      "openInterest": 526467
+    },
+    {
+      "date": "2025-01-21",
+      "netSharePct": 52.641,
+      "grossLongSharePct": 59.0299,
+      "grossShortSharePct": 6.3888,
+      "openInterest": 571387
+    },
+    {
+      "date": "2025-01-28",
+      "netSharePct": 51.8453,
+      "grossLongSharePct": 58.5919,
+      "grossShortSharePct": 6.7466,
+      "openInterest": 577505
+    },
+    {
+      "date": "2025-02-04",
+      "netSharePct": 55.8129,
+      "grossLongSharePct": 65.7744,
+      "grossShortSharePct": 9.9616,
+      "openInterest": 542004
+    },
+    {
+      "date": "2025-02-11",
+      "netSharePct": 53.8101,
+      "grossLongSharePct": 65.0187,
+      "grossShortSharePct": 11.2086,
+      "openInterest": 528719
+    },
+    {
+      "date": "2025-02-18",
+      "netSharePct": 51.4376,
+      "grossLongSharePct": 63.9525,
+      "grossShortSharePct": 12.5149,
+      "openInterest": 522330
+    },
+    {
+      "date": "2025-02-25",
+      "netSharePct": 51.0808,
+      "grossLongSharePct": 61.8823,
+      "grossShortSharePct": 10.8015,
+      "openInterest": 512179
+    },
+    {
+      "date": "2025-03-04",
+      "netSharePct": 49.7192,
+      "grossLongSharePct": 61.956,
+      "grossShortSharePct": 12.2368,
+      "openInterest": 489270
+    },
+    {
+      "date": "2025-03-11",
+      "netSharePct": 46.1786,
+      "grossLongSharePct": 57.928,
+      "grossShortSharePct": 11.7494,
+      "openInterest": 511276
+    },
+    {
+      "date": "2025-03-18",
+      "netSharePct": 48.3412,
+      "grossLongSharePct": 60.2838,
+      "grossShortSharePct": 11.9427,
+      "openInterest": 533566
+    },
+    {
+      "date": "2025-03-25",
+      "netSharePct": 48.8377,
+      "grossLongSharePct": 61.8931,
+      "grossShortSharePct": 13.0554,
+      "openInterest": 511482
+    },
+    {
+      "date": "2025-04-01",
+      "netSharePct": 47.8067,
+      "grossLongSharePct": 65.7521,
+      "grossShortSharePct": 17.9454,
+      "openInterest": 498746
+    },
+    {
+      "date": "2025-04-08",
+      "netSharePct": 45.0571,
+      "grossLongSharePct": 60.5729,
+      "grossShortSharePct": 15.5158,
+      "openInterest": 445468
+    },
+    {
+      "date": "2025-04-15",
+      "netSharePct": 44.2833,
+      "grossLongSharePct": 59.5029,
+      "grossShortSharePct": 15.2196,
+      "openInterest": 456628
+    },
+    {
+      "date": "2025-04-22",
+      "netSharePct": 37.6873,
+      "grossLongSharePct": 55.6346,
+      "grossShortSharePct": 17.9473,
+      "openInterest": 465351
+    },
+    {
+      "date": "2025-04-29",
+      "netSharePct": 36.1429,
+      "grossLongSharePct": 53.1963,
+      "grossShortSharePct": 17.0534,
+      "openInterest": 451868
+    },
+    {
+      "date": "2025-05-06",
+      "netSharePct": 35.9178,
+      "grossLongSharePct": 52.484,
+      "grossShortSharePct": 16.5662,
+      "openInterest": 452414
+    },
+    {
+      "date": "2025-05-13",
+      "netSharePct": 36.5684,
+      "grossLongSharePct": 54.0309,
+      "grossShortSharePct": 17.4625,
+      "openInterest": 440842
+    },
+    {
+      "date": "2025-05-20",
+      "netSharePct": 36.6029,
+      "grossLongSharePct": 53.1388,
+      "grossShortSharePct": 16.5359,
+      "openInterest": 448000
+    },
+    {
+      "date": "2025-05-27",
+      "netSharePct": 39.81,
+      "grossLongSharePct": 53.501,
+      "grossShortSharePct": 13.6909,
+      "openInterest": 437538
+    },
+    {
+      "date": "2025-06-03",
+      "netSharePct": 45.1759,
+      "grossLongSharePct": 59.3791,
+      "grossShortSharePct": 14.2032,
+      "openInterest": 415941
+    },
+    {
+      "date": "2025-06-10",
+      "netSharePct": 44.9441,
+      "grossLongSharePct": 58.9714,
+      "grossShortSharePct": 14.0273,
+      "openInterest": 417143
+    },
+    {
+      "date": "2025-06-17",
+      "netSharePct": 45.4763,
+      "grossLongSharePct": 59.0611,
+      "grossShortSharePct": 13.5848,
+      "openInterest": 441214
+    },
+    {
+      "date": "2025-06-24",
+      "netSharePct": 44.8328,
+      "grossLongSharePct": 58.874,
+      "grossShortSharePct": 14.0411,
+      "openInterest": 434958
+    },
+    {
+      "date": "2025-07-01",
+      "netSharePct": 46.1498,
+      "grossLongSharePct": 59.0938,
+      "grossShortSharePct": 12.944,
+      "openInterest": 437662
+    },
+    {
+      "date": "2025-07-08",
+      "netSharePct": 45.8018,
+      "grossLongSharePct": 59.0519,
+      "grossShortSharePct": 13.2501,
+      "openInterest": 443144
+    },
+    {
+      "date": "2025-07-15",
+      "netSharePct": 47.514,
+      "grossLongSharePct": 60.2471,
+      "grossShortSharePct": 12.7331,
+      "openInterest": 448531
+    },
+    {
+      "date": "2025-07-22",
+      "netSharePct": 51.7013,
+      "grossLongSharePct": 63.7381,
+      "grossShortSharePct": 12.0368,
+      "openInterest": 489423
+    },
+    {
+      "date": "2025-07-29",
+      "netSharePct": 50.2171,
+      "grossLongSharePct": 63.1635,
+      "grossShortSharePct": 12.9464,
+      "openInterest": 445259
+    },
+    {
+      "date": "2025-08-05",
+      "netSharePct": 52.7191,
+      "grossLongSharePct": 64.983,
+      "grossShortSharePct": 12.2638,
+      "openInterest": 449647
+    },
+    {
+      "date": "2025-08-12",
+      "netSharePct": 51.4365,
+      "grossLongSharePct": 64.5778,
+      "grossShortSharePct": 13.1413,
+      "openInterest": 446152
+    },
+    {
+      "date": "2025-08-19",
+      "netSharePct": 48.4767,
+      "grossLongSharePct": 62.7711,
+      "grossShortSharePct": 14.2944,
+      "openInterest": 438541
+    },
+    {
+      "date": "2025-08-26",
+      "netSharePct": 48.2943,
+      "grossLongSharePct": 62.1433,
+      "grossShortSharePct": 13.8489,
+      "openInterest": 443760
+    },
+    {
+      "date": "2025-09-02",
+      "netSharePct": 50.6241,
+      "grossLongSharePct": 64.0679,
+      "grossShortSharePct": 13.4439,
+      "openInterest": 492908
+    },
+    {
+      "date": "2025-09-09",
+      "netSharePct": 51.3593,
+      "grossLongSharePct": 63.7479,
+      "grossShortSharePct": 12.3885,
+      "openInterest": 509625
+    },
+    {
+      "date": "2025-09-16",
+      "netSharePct": 51.6077,
+      "grossLongSharePct": 63.302,
+      "grossShortSharePct": 11.6942,
+      "openInterest": 516221
+    },
+    {
+      "date": "2025-09-23",
+      "netSharePct": 50.4453,
+      "grossLongSharePct": 62.9378,
+      "grossShortSharePct": 12.4925,
+      "openInterest": 528789
+    },
+    {
+      "date": "2025-09-30",
+      "netSharePct": 51.2221,
+      "grossLongSharePct": 64.5682,
+      "grossShortSharePct": 13.3461,
+      "openInterest": 493748
+    },
+    {
+      "date": "2025-10-07",
+      "netSharePct": 47.7709,
+      "grossLongSharePct": 61.9488,
+      "grossShortSharePct": 14.1779,
+      "openInterest": 485559
+    },
+    {
+      "date": "2025-10-14",
+      "netSharePct": 41.9763,
+      "grossLongSharePct": 57.31,
+      "grossShortSharePct": 15.3336,
+      "openInterest": 485788
+    },
+    {
+      "date": "2025-10-21",
+      "netSharePct": 37.3838,
+      "grossLongSharePct": 53.7341,
+      "grossShortSharePct": 16.3502,
+      "openInterest": 472421
+    },
+    {
+      "date": "2025-10-28",
+      "netSharePct": 44.7723,
+      "grossLongSharePct": 58.2575,
+      "grossShortSharePct": 13.4852,
+      "openInterest": 457122
+    },
+    {
+      "date": "2025-11-04",
+      "netSharePct": 44.9173,
+      "grossLongSharePct": 56.9655,
+      "grossShortSharePct": 12.0482,
+      "openInterest": 450399
+    },
+    {
+      "date": "2025-11-10",
+      "netSharePct": 45.0153,
+      "grossLongSharePct": 57.8082,
+      "grossShortSharePct": 12.7929,
+      "openInterest": 459997
+    },
+    {
+      "date": "2025-11-18",
+      "netSharePct": 44.5678,
+      "grossLongSharePct": 57.115,
+      "grossShortSharePct": 12.5472,
+      "openInterest": 471953
+    },
+    {
+      "date": "2025-11-25",
+      "netSharePct": 47.2549,
+      "grossLongSharePct": 58.4983,
+      "grossShortSharePct": 11.2434,
+      "openInterest": 432946
+    },
+    {
+      "date": "2025-12-02",
+      "netSharePct": 51.9869,
+      "grossLongSharePct": 62.4462,
+      "grossShortSharePct": 10.4593,
+      "openInterest": 418490
+    },
+    {
+      "date": "2025-12-09",
+      "netSharePct": 51.7573,
+      "grossLongSharePct": 62.0676,
+      "grossShortSharePct": 10.3103,
+      "openInterest": 432569
+    },
+    {
+      "date": "2025-12-16",
+      "netSharePct": 49.6671,
+      "grossLongSharePct": 59.6315,
+      "grossShortSharePct": 9.9645,
+      "openInterest": 471093
+    },
+    {
+      "date": "2025-12-23",
+      "netSharePct": 48.9125,
+      "grossLongSharePct": 58.9635,
+      "grossShortSharePct": 10.0509,
+      "openInterest": 492103
+    },
+    {
+      "date": "2025-12-30",
+      "netSharePct": 47.9745,
+      "grossLongSharePct": 57.1927,
+      "grossShortSharePct": 9.2181,
+      "openInterest": 481866
+    },
+    {
+      "date": "2026-01-06",
+      "netSharePct": 46.6348,
+      "grossLongSharePct": 56.2233,
+      "grossShortSharePct": 9.5885,
+      "openInterest": 488116
+    },
+    {
+      "date": "2026-01-13",
+      "netSharePct": 47.6321,
+      "grossLongSharePct": 56.1532,
+      "grossShortSharePct": 8.5211,
+      "openInterest": 527455
+    },
+    {
+      "date": "2026-01-20",
+      "netSharePct": 46.3576,
+      "grossLongSharePct": 56.017,
+      "grossShortSharePct": 9.6594,
+      "openInterest": 528004
+    },
+    {
+      "date": "2026-01-27",
+      "netSharePct": 42.0494,
+      "grossLongSharePct": 51.6109,
+      "grossShortSharePct": 9.5614,
+      "openInterest": 488463
+    },
+    {
+      "date": "2026-02-03",
+      "netSharePct": 40.4214,
+      "grossLongSharePct": 52.3581,
+      "grossShortSharePct": 11.9367,
+      "openInterest": 409694
+    },
+    {
+      "date": "2026-02-10",
+      "netSharePct": 39.5686,
+      "grossLongSharePct": 52.6243,
+      "grossShortSharePct": 13.0557,
+      "openInterest": 404391
+    },
+    {
+      "date": "2026-02-17",
+      "netSharePct": 39.2836,
+      "grossLongSharePct": 52.4302,
+      "grossShortSharePct": 13.1466,
+      "openInterest": 407078
+    },
+    {
+      "date": "2026-02-24",
+      "netSharePct": 37.8829,
+      "grossLongSharePct": 50.3708,
+      "grossShortSharePct": 12.4879,
+      "openInterest": 420182
+    },
+    {
+      "date": "2026-03-03",
+      "netSharePct": 39.0799,
+      "grossLongSharePct": 52.1615,
+      "grossShortSharePct": 13.0816,
+      "openInterest": 409789
+    },
+    {
+      "date": "2026-03-10",
+      "netSharePct": 39.4081,
+      "grossLongSharePct": 52.0454,
+      "grossShortSharePct": 12.6373,
+      "openInterest": 413956
+    },
+    {
+      "date": "2026-03-17",
+      "netSharePct": 38.8609,
+      "grossLongSharePct": 52.4957,
+      "grossShortSharePct": 13.6348,
+      "openInterest": 411388
+    },
+    {
+      "date": "2026-03-24",
+      "netSharePct": 41.6728,
+      "grossLongSharePct": 54.6787,
+      "grossShortSharePct": 13.0059,
+      "openInterest": 403925
+    },
+    {
+      "date": "2026-03-31",
+      "netSharePct": 45.1571,
+      "grossLongSharePct": 57.4424,
+      "grossShortSharePct": 12.2853,
+      "openInterest": 361409
+    },
+    {
+      "date": "2026-04-07",
+      "netSharePct": 44.0448,
+      "grossLongSharePct": 57.8702,
+      "grossShortSharePct": 13.8254,
+      "openInterest": 354877
+    },
+    {
+      "date": "2026-04-14",
+      "netSharePct": 44.8627,
+      "grossLongSharePct": 57.9697,
+      "grossShortSharePct": 13.1069,
+      "openInterest": 362274
+    },
+    {
+      "date": "2026-04-21",
+      "netSharePct": 44.8297,
+      "grossLongSharePct": 58.1926,
+      "grossShortSharePct": 13.3629,
+      "openInterest": 365842
+    },
+    {
+      "date": "2026-04-28",
+      "netSharePct": 43.1822,
+      "grossLongSharePct": 57.3209,
+      "grossShortSharePct": 14.1388,
+      "openInterest": 369530
+    },
+    {
+      "date": "2026-05-05",
+      "netSharePct": 44.384,
+      "grossLongSharePct": 57.5688,
+      "grossShortSharePct": 13.1848,
+      "openInterest": 367932
+    },
+    {
+      "date": "2026-05-12",
+      "netSharePct": 45.584,
+      "grossLongSharePct": 58.3786,
+      "grossShortSharePct": 12.7946,
+      "openInterest": 376496
+    },
+    {
+      "date": "2026-05-19",
+      "netSharePct": 42.1362,
+      "grossLongSharePct": 55.6299,
+      "grossShortSharePct": 13.4937,
+      "openInterest": 379325
+    },
+    {
+      "date": "2026-05-26",
+      "netSharePct": 43.6393,
+      "grossLongSharePct": 56.778,
+      "grossShortSharePct": 13.1387,
+      "openInterest": 353489
+    },
+    {
+      "date": "2026-06-02",
+      "netSharePct": 53.9853,
+      "grossLongSharePct": 63.2095,
+      "grossShortSharePct": 9.2243,
+      "openInterest": 326052
+    },
+    {
+      "date": "2026-06-09",
+      "netSharePct": 52.249,
+      "grossLongSharePct": 62.5123,
+      "grossShortSharePct": 10.2633,
+      "openInterest": 332709
+    },
+    {
+      "date": "2026-06-16",
+      "netSharePct": 53.1105,
+      "grossLongSharePct": 62.2188,
+      "grossShortSharePct": 9.1082,
+      "openInterest": 339330
+    },
+    {
+      "date": "2026-06-23",
+      "netSharePct": 51.4923,
+      "grossLongSharePct": 61.6264,
+      "grossShortSharePct": 10.1341,
+      "openInterest": 352167
+    },
+    {
+      "date": "2026-06-30",
+      "netSharePct": 52.5027,
+      "grossLongSharePct": 62.1363,
+      "grossShortSharePct": 9.6336,
+      "openInterest": 369541
+    },
+    {
+      "date": "2026-07-07",
+      "netSharePct": 52.2481,
+      "grossLongSharePct": 62.8639,
+      "grossShortSharePct": 10.6158,
+      "openInterest": 371776
+    },
+    {
+      "date": "2026-07-14",
+      "netSharePct": 48.6545,
+      "grossLongSharePct": 59.2433,
+      "grossShortSharePct": 10.5888,
+      "openInterest": 383689
+    },
+    {
+      "date": "2026-07-21",
+      "netSharePct": 47.9722,
+      "grossLongSharePct": 58.6343,
+      "grossShortSharePct": 10.6621,
+      "openInterest": 383368
+    },
+    {
+      "date": "2026-07-28",
+      "netSharePct": 47.3397,
+      "grossLongSharePct": 57.1036,
+      "grossShortSharePct": 9.7638,
+      "openInterest": 384603
+    },
+    {
+      "date": "2026-08-04",
+      "netSharePct": 53.1916,
+      "grossLongSharePct": 61.0987,
+      "grossShortSharePct": 7.9071,
+      "openInterest": 371551
+    },
+    {
+      "date": "2026-08-11",
+      "netSharePct": 54.4429,
+      "grossLongSharePct": 62.6856,
+      "grossShortSharePct": 8.2426,
+      "openInterest": 400309
+    },
+    {
+      "date": "2026-08-18",
+      "netSharePct": 54.6913,
+      "grossLongSharePct": 63.2359,
+      "grossShortSharePct": 8.5445,
+      "openInterest": 406260
+    },
+    {
+      "date": "2026-08-25",
+      "netSharePct": 56.8595,
+      "grossLongSharePct": 64.7633,
+      "grossShortSharePct": 7.9038,
+      "openInterest": 427957
+    },
+    {
+      "date": "2026-09-01",
+      "netSharePct": 54.9437,
+      "grossLongSharePct": 62.7378,
+      "grossShortSharePct": 7.7942,
+      "openInterest": 415196
+    },
+    {
+      "date": "2026-09-08",
+      "netSharePct": 56.4068,
+      "grossLongSharePct": 63.4703,
+      "grossShortSharePct": 7.0635,
+      "openInterest": 411227
+    },
+    {
+      "date": "2026-09-15",
+      "netSharePct": 56.1938,
+      "grossLongSharePct": 62.9567,
+      "grossShortSharePct": 6.7629,
+      "openInterest": 409899
+    },
+    {
+      "date": "2026-09-22",
+      "netSharePct": 54.7125,
+      "grossLongSharePct": 61.5266,
+      "grossShortSharePct": 6.8142,
+      "openInterest": 412800
+    },
+    {
+      "date": "2026-09-29",
+      "netSharePct": 53.7898,
+      "grossLongSharePct": 61.4423,
+      "grossShortSharePct": 7.6525,
+      "openInterest": 406456
+    },
+    {
+      "date": "2026-10-06",
+      "netSharePct": 53.1003,
+      "grossLongSharePct": 61.9534,
+      "grossShortSharePct": 8.8531,
+      "openInterest": 396109
+    },
+    {
+      "date": "2026-10-13",
+      "netSharePct": 52.449,
+      "grossLongSharePct": 61.8905,
+      "grossShortSharePct": 9.4415,
+      "openInterest": 396345
+    },
+    {
+      "date": "2026-10-20",
+      "netSharePct": 49.6832,
+      "grossLongSharePct": 58.9496,
+      "grossShortSharePct": 9.2665,
+      "openInterest": 402279
+    },
+    {
+      "date": "2026-10-27",
+      "netSharePct": 46.9875,
+      "grossLongSharePct": 56.3806,
+      "grossShortSharePct": 9.3932,
+      "openInterest": 396810
+    }
+  ]
+}
