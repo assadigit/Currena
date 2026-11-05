@@ -15,10 +15,99 @@ PROGRESS.md`); this program changes nothing it shipped (D-GA-3).
 | A | The reference taxonomy verified + v1 delivered for the owner's lock; the blind-spot sweep; the presence pre-scan (01 §2 A1; 02) | ✅ COMPLETE — GA-S1 (2026-11-04): 02 is v1 (82 rows: v0 72 + 10 sweep adds − 0 strikes), every row verified live, the sweep + pre-scan recorded, PR merged. **LOCKED 2026-11-05 (OI-GA-1 RESOLVED): the owner delegated the research-and-lock to the audit's pre-lock research pass — coverage cross-checked against the canonical driver frameworks (Chicago Fed Letter 464 · WGC demand-side), every named free source re-verified live (52 FRED ids + 11 providers), 3 rows added (S13 · F16 · X7) → v1.1 = 85 rows, LOCKED. The record: 02's lock record at the file's foot** |
 | B | The inventory + wiring evidence pack; the mirror sweep (01 §2 A2; 03 §1–§2) | ✅ **COMPLETE — GA-S2 (2026-11-04, source-side) + GA-S2-completion (2026-11-05, the lock + the deferred halves)**: `evidence/inventory.md` (the 161-row readings table with the mirror-sweep column **voter 21 · context 63 · not-gold 77 = 161**, the 25 derived-series recipes, the rung map, **+ §5 the voters table — the 21 seats verbatim with the evalLeg rule per seat**); `evidence/wiring.md` (**the 21 full wiring traces — no TRACE-BROKEN hops — + the 63 context traces with their never-votes notes + the five recorded findings**); `evidence/history-depths-2026-11-05.txt` (the runnable record `packages/insights/scripts/ga-s2-history-depths.sh`: 15 healthy bases 2,495–3,649 pts; cftc-gold-positioning **1 pt / base 0 / 0-of-9 days**; us-japan-10y-gap **21 pts / base 20 / pct 6-of-9 days**; gold-silver **122 pts / base 119 / ch30d 0-of-19 days**); the scan record `ga-s2-wire-scan.sh` + its runs 2026-11-04/-05. Delivered AFTER the lock was resolved in-session (the owner's delegated research-and-lock — see row A) |
 | C | The coverage matrix classified + the half-implementation defect list; the header arithmetic (01 §2 A3, §5; 03 §3–§4) | ✅ **COMPLETE — GA-S3 (2026-11-05)**: `evidence/coverage-matrix.md` — **all 85 rows classified, one class each** (COVERED 8 · PARTIAL 7 · MISSING-FREE 36 · MISSING-PAID 10 · CONTEXT-ONLY-BY-DESIGN 18 · NOT-APPLICABLE 3, + the 3 cross-lists resolved to primaries I5→R7 · I6→R8 · X6→I10; header arithmetic stated: rows classified = 85, voters mapped = 21), every reason citing wiring.md or a recorded absence, the fill column seeding the backlog (yes 47 = 7 PARTIAL + 36 MISSING-FREE + 4 promote-worthy COBD, the severity components per 04 §2 — the 27-band: R4 · R6 · R8 · R9 · R10 · D4 · S4 · S7 · S13 · F1 · F2 · G1); the 21-voter mapping (20 rows + **1 UNCLASSICATED: `euro-hicp` — finding N-1, the owner decides amend-vs-re-seat**); `evidence/half-implementation.md` — the H1–H7 checks per voter, **18 defect rows** (D-1 the structural 17-of-21 level-only finding + 17 per-voter rows across 10 voters; H1 3 · H2 3 · H3 2 · H4 5 · H5 4 · H6 1 · H7 0-verified), incl. **D-18 the fake-steady finding** (cftc reads `steady`, not `unread` — the lean check's discovery) + the new read-only `ga-s3-lean-check.sh` with its committed run `evidence/lean-check-2026-11-05.txt` (6 seats fire today; all four lanes `neutral`) |
-| D | The audit report `docs/insights/GOLD-METER-AUDIT-REPORT.md` (01 §2 A4; 04 §1–§2) | ⏳ PENDING — GA-S4 |
-| E | The fill-program design + its GF-S1.. prompts; the owner's decision list stated (04 §3–§5) | ⏳ PENDING — GA-S4 |
+| D | The audit report `docs/insights/GOLD-METER-AUDIT-REPORT.md` (01 §2 A4; 04 §1–§2) | ✅ **COMPLETE — GA-S4 (2026-11-05)**: the report delivered per 04 §1's shape — the header arithmetic up front (rows classified = 85 · voters mapped = 21 · defects = 18 · the class tally · the headline: **the meter fully covers 8/85 (≈ 9.4%) of the classic rows as healthy voting claims; 15/85 (≈ 17.6%) with any voting expression**), the condensed coverage matrix (the per-family summaries + the COVERED core + every non-COVERED row in full — the 74 own-class rows + the 3 cross-lists), the 18 half-implementation defects with severity and treatment, **the RANKED 47-row backlog** (severity = W×A×C per 04 §2, the tie-break cascade recorded, each row with its named free source + its GF phase; F6's band-tally slip restated honestly at 18 per its own fill cell), the owner's decision list (OI-GA-2..6 + N-1 + the D-7/D-8 sign decision + the D-18 readable-rule question + the D-1 threshold question + the per-row go/no-go for the 12 zero-new-fetch class, each with the audit's recommendation), and the honesty footer (no forecasting claim — D-GA-2) |
+| E | The fill-program design + its GF-S1.. prompts; the owner's decision list stated (04 §3–§5) | ✅ **COMPLETE — GA-S4 (2026-11-05)**: the fill program concretized — **GF-P0..P5 loaded with the ranked backlog** (P0 the recalibration wrapping every voter-set change + the D-1 threshold calibration + the OI-GA-2 lane count; P1 repairs = ranks 1–5 + 29 — the six repair defects D-2 · D-3 · D-4(+D-18) · D-5 · D-6 + the D-7/D-8 sign execution + the repair-if-filled D-11/D-12 riding R2; P2 promotions = the zero-new-fetch voting class R9 · S4 · G1 · R8 · S13 · S7 · F2 · S8 · I3 · D7 + the 4 promote-worthy COBD D5 · I7 · S6 · G4; P3 new free sources = R2 · D2 · D9 · F6 · F3 · F4 · F13 · F7 · S9 · I4 · I9; P4 context additions = I10 · X7 · I11 + the X/G/H/F context winners, 16 rows; P5 acceptance + flip), the standing constraints restated (04 §4 — the per-seat owner approval for every gold-score.ts edit, the gates, the copy rounds, the no-forecasting rule), the end state stated (04 §5). **The GF-S1 kickoff prompt written in PROMPTS.md** (the fill program's home `docs/specs/gold-meter-gapfill/` is created by ITS first session) — printed in the GA-S4 final message (D-GA-9). **THE PROGRAM CLOSES: A1–A4 whole** |
 
 ## Session log
+
+### GA-S4 (2026-11-05) — the report + the fill-program design (A4 delivered; THE PROGRAM CLOSES)
+
+- **Read-first done**: the full spec set + the whole evidence pack
+  (coverage-matrix · half-implementation · lean-check · inventory ·
+  wiring · history-depths · the wire scans) re-read before writing;
+  `git pull --rebase` clean (main held the GA-S3 merge, PR #31). The
+  key code citations restated in the report were re-checked against the
+  files this session (connections.ts:575-585 the 4 gold-lane thresholds
+  · gold-balance.ts:127-129 the readable() rule · gold-score.ts:155-184
+  the 21-seat table — the owner's re-check-before-writing instruction),
+  and the lean check re-run fresh against the live wire this session
+  (`ga-s3-lean-check.sh`, read-only + keyless): **identical to the
+  committed `lean-check-2026-11-05.txt` on every seat and every lane**
+  (the same 2026-11-04T20:10:18.690Z snapshot served — the report's
+  "today" numbers verified on a fresh fetch).
+- **THE REPORT — `docs/insights/GOLD-METER-AUDIT-REPORT.md` (04 §1).**
+  The header arithmetic up front (rows classified = 85 = 82 own classes
+  + 3 cross-lists · voters mapped = 21 = 20 + 1 UNCLASSICATED · defects
+  = 18 · the class tally · the backlog 47) and the headline stated as
+  fractions: **COVERED 8/85 (≈ 9.4%) · any voting expression 15/85
+  (≈ 17.6%)** — plain about what the meter sees (the four headline
+  channels covered at the primary-object level: R1 · R5 · R7 · D1 · I1
+  · I2 · S1 · S5) and what it does not (the flows/positioning family's
+  only seat is dead and solo; S4 EBP · G1 deficit · R9 term premium are
+  healthy context cards that never vote; 63 of 161 ingested readings
+  are gold-relevant context). The condensed matrix: the per-family
+  summaries + the COVERED core + **every non-COVERED row in full** (the
+  74 own-class rows + the 3 cross-lists, each restated with its
+  citation). The 18 defects with severity and proposed treatment
+  (D-1 structural · D-18 the fake-steady finding prominent). **The
+  RANKED backlog** — the 47 rows sorted by severity (W×A×C per 04 §2)
+  with the tie-break cascade recorded (severity desc → higher C →
+  repair-before-expand → zero-new-fetch → higher W), each row with its
+  named free source and its GF phase; **one arithmetic restatement
+  disclosed**: the matrix §3's band-tally line placed F6 in the 12-band
+  but F6's own fill cell states 3·3·2 = 18 — the ranking follows the
+  per-row cells (F6 at 18; the class and fill untouched, no
+  re-classification). The bands restated: 27×12 · 18×10 · 12×6 · 9×3 ·
+  8×9 · 6×1 · 4×6. The owner's decision list stated with the audit's
+  recommendation per item. The honesty footer (no forecasting claim
+  anywhere — D-GA-2; every number from the committed evidence).
+- **THE FILL-PROGRAM DESIGN (04 §3–§5), concretized in the report §6.**
+  GF-P0 (the recalibration pre-registration — the proposed voter set in
+  new harness tables beside the frozen ones, the lane rule re-derived
+  per the GB-S1 C1/C2 protocol, the OI-GA-2 lane count, the D-1
+  threshold calibration) wraps every voter-set change; **GF-P1
+  repairs** loaded (R6/D-2 · D4/D-3 · R4/D-7-D-8 sign · R10/D-6 ·
+  F1/D-4+D-18 · X1/D-5 + the repair-if-filled D-11/D-12 riding R2);
+  **GF-P2 promotions** loaded (R9 · S4 · G1 · R8 · S13 · S7 · F2 · S8
+  · I3 · D7 + the COBD-4 D5 · I7 · S6 · G4 — every seat change
+  owner-gated with its matrix row as the justification); **GF-P3 new
+  free sources** loaded (R2 · D2 · D9 · F6 · F3 · F4 · F13 · F7 · S9 ·
+  I4 · I9 — each with its licence row + rung + staleness window);
+  **GF-P4 context additions** loaded (I10 · X7 · I11 + F5 · F8 · F11 ·
+  F15 · F16 · G3 · X5 · R11 · F12 · H1–H4, EN+fa copy round 79+);
+  **GF-P5 acceptance + flip**. The standing constraints restated (04
+  §4) and the end state stated (04 §5: every family covered or
+  recorded-accepted, no half-implemented seat, nothing claimed about
+  the future — *nothing missed, nothing half-implemented*).
+- **The owner's decision list stated** (the report §5 + this file's
+  Owner-must-decide below): OI-GA-2 (the fifth lane — the audit
+  recommends ADDING a flows & demand lane) · OI-GA-3 (the shadow pair —
+  fold into GF-P2, promote D5, decide S6 with the calibration) ·
+  OI-GA-4 (WGC quarterly — context-first recommended) · OI-GA-5 (no
+  EODHD use proposed; free proxies carry the channels) · OI-GA-6 (the
+  copy rounds — standing) · **N-1** (euro-hicp — AMEND recommended: an
+  owner-recorded row, the denominator becomes 86) · the **D-7/D-8 sign
+  decision** (the context demotion recommended, per R4's own locked
+  treatment; accept-with-note the fallback) · the **D-18
+  readable-rule question** (the input-presence rule recommended) · the
+  **D-1 threshold question** (derive, don't assume — the GF-P0
+  calibration; two seats named on the evidence: D-2 · D-3) · the
+  **per-row go/no-go for the 12 zero-new-fetch class** (per-row
+  recommendations stated: PROMOTE ×8 · CONTEXT ADD ×3 · D7
+  seat-or-context). GA-S4 PROPOSES — nothing executes here.
+- **Milestone rows D AND E flipped to COMPLETE. THE PROGRAM CLOSES:**
+  A1 (the taxonomy, locked v1.1 = 85) · A2 (the inventory + wiring
+  pack) · A3 (the matrix + the defects) · A4 (this report + the fill
+  design) — all whole. The successor: **the gold meter gap-fill
+  program** (`docs/specs/gold-meter-gapfill/`, created by GF-S1) — its
+  kickoff prompt is written in PROMPTS.md and printed in this session's
+  final message (D-GA-9's convention handed to the fill program).
+- **Nothing re-classified, nothing wired, nothing deployed**
+  (D-GA-3/D-GA-6/D-GA-2): one new doc (the report) + the records
+  (PROGRESS · CHANGELOG · PROMPTS · AGENT_HANDOFF) only; no code,
+  worker, schema, adapter or copy file touched; no forecasting claim
+  anywhere (the severity ranking is classic-literature importance ×
+  availability × wiring cost only).
 
 ### GA-S3 (2026-11-05) — the coverage matrix classified + the half-implementation defects (A3 delivered)
 
@@ -547,8 +636,44 @@ PROGRESS.md`); this program changes nothing it shipped (D-GA-3).
    research pass added S13 · F16 · X7 and locked **v1.1 = 85 rows** — the
    record in 02's lock record). Further additions are owner-recorded
    amendments with dates only (D-GA-1).
-2. OI-GA-2..OI-GA-6 — as scheduled in the README's table (GA-S4's decision
-   list, unless the owner calls them earlier in chat).
+2. **The fill program's decision list (stated with the audit's
+   recommendations in the report §5 — GA-S4 proposes, the owner
+   decides; nothing executes without the recorded go):**
+   - **OI-GA-2 — a fifth lane (flows & demand)?** — the audit
+     recommends ADDING it (D-14's evidence: the F-family's only seat
+     anywhere is dead and solo; 13 of its 16 rows sit in the backlog).
+   - **OI-GA-3 — the S6-M6.4 shadow promotion** (D5 `usd-reserve-share`
+     + S6 `sp500-breadth-ratio`) — fold into GF-P2; promote D5, decide
+     S6 with the calibration evidence.
+   - **OI-GA-4 — WGC quarterly: voter or context-first?** (F3 · F4 ·
+     F5 · F13 · F15 · F16 · H1–H4) — context-first recommended, with
+     recorded promotion criteria.
+   - **OI-GA-5 — EODHD per-item policy** (F9 · F10 · S2 · S3 · G7) — no
+     EODHD use proposed by the audit; any per-item use needs the
+     owner's recorded approval.
+   - **OI-GA-6 — the copy rounds** for any new context line (round 79+)
+     — standing, accepted.
+   - **N-1 — `euro-hicp` UNCLASSICATED: amend or re-seat?** — AMEND
+     recommended (an owner-recorded euro-area realised-inflation row
+     with its date; the denominator becomes 86 and the arithmetic
+     restates); the alternative strikes a healthy wiring-complete
+     voter.
+   - **The D-7/D-8 yield-curve sign decision** (four options recorded)
+     — the context demotion recommended (per R4's own locked
+     treatment); accept-with-note the fallback; the real-curve
+     derivation (riding R2, GF-P3) re-opens the question with the
+     correct object.
+   - **The D-18 readable-rule question** — the input-presence rule
+     recommended (an inputless-but-fresh seat reads `unread`, not
+     `steady`); owner-gated, never silent.
+   - **The D-1 threshold question** — derive, don't assume: the GF-P0
+     calibration walks the 17 level-only seats against their 02
+     treatments (two already named on the evidence: D-2 · D-3; the
+     monthly three cadence-exempt).
+   - **The per-row promotion go/no-go — the 12 zero-new-fetch class**
+     (R9 · I3 · I10 · S4 · S7 · S8 · S13 · G1 · X7 · F2 · D7 · I11) —
+     per-row recommendations stated in the report §5 (PROMOTE ×8 ·
+     CONTEXT ADD ×3 · D7 seat-or-context, the owner calls).
 
 ## Standing constraints (every session)
 
