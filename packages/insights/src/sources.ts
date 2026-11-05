@@ -721,7 +721,12 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'gold-usd': ['gold-api:XAU', 'yahoo:GC=F'],
   'silver-usd': ['gold-api:XAG', 'yahoo:SI=F'],
   'btc-usd': ['gold-api:BTC', 'yahoo:BTC-USD'],
-  'gold-silver': ['world-bank', 'gold-api'],
+  // GF-P1 (2026-11-05, the owner's recorded go — D-5/X1): the daily ratio
+  // HISTORY leg (Yahoo XAU=X ÷ XAG=X, the audit's named free source,
+  // L2 owner-accepted) deepened the base once via scripts/gf-p1-backfill.ts;
+  // the stored production values keep winning on collision (the live tail
+  // stays gold-api/World-Bank-venued — the Yahoo layer only deepens).
+  'gold-silver': ['world-bank', 'gold-api', 'yahoo:XAU=X/XAG=X (history leg, GF-P1 D-5)'],
   'copper-gold': ['world-bank'],
   'copper-usd': ['gold-api:HG', 'world-bank'],
   'gold-aud': ['gold-api:XAU', 'frankfurter'],

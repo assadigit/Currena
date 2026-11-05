@@ -57,48 +57,38 @@ them, it does not restate them.
 
 ## The owner's decision list (the audit report §5, restated — it gates this program)
 
-**Status at GF-S6 close: recorded-open on every item.** Re-issued by GF-S1
-(the calibration scenarios + the printed list), **again by GF-S2**
-(2026-11-05 — the lane-rule question added as the list's first item),
-**again by GF-S3** (2026-11-05 — still no answers recorded in chat or the
-repo between the closes), **again by GF-S4** (2026-11-05 — the same
-check repeated: the repo holds no commits after the GF-S3 merge, and the
-session's chat carried no answers), **again by GF-S5** (2026-11-05 —
-the same check repeated a fifth time: `git log` over origin/main since
-the GF-S4 merge (91d7fc1) holds no commits after the merge itself and no
-branch newer than the merge; the decision log and PROGRESS's GF-S4 block
-carry no answers; the session's chat carried none → the GA lock-fallback
-precedent applies a fifth time: the deliverable halves only, the P1
-repairs stay gated), and **again by GF-S6** (2026-11-05 — the same check
-repeated a sixth time: `git log` over origin/main since the GF-S5 merge
-(74de329) holds no commits after the merge itself and no branch newer
-than the merge; the decision log and PROGRESS's GF-S5 block carry no
-answers; the session's chat carried none → the GA lock-fallback
-precedent applies a sixth time: the deliverable halves only, the P1
-repairs stay gated).
-**The GF-S2 re-issue ADDS the lane-rule question as the list's first item
-(A below)** — the question the GF-P0 calibration itself opened (the C2
-STOP branch, the report §4); it is the one item the audit's §5 could not
-carry, the audit having closed before the calibration ran. The
-calibration's measured additions per item live in the report §8 (the
-GF-S1 re-issue's own table); the list the owner answers is **A–K** as
-printed in the GF-S6 session's final message — one recorded answer per
-item, and the answers gate P1 (and the P2 composition questions they
-name).
+**Status at GF-S7: ANSWERED — every item answered by the owner in the
+GF-S7 session's chat (2026-11-05), recorded in the answer column below,
+with the standing delegation recorded beside them: "Generally, I trust
+your decisions. go full autonomously."** The list had been re-issued six
+times before the answers arrived (GF-S1 through GF-S6, all 2026-11-05 —
+the GA lock-fallback precedent each time: no answers recorded in the
+repo or the chat between the closes; the sixth check verified `git log`
+over origin/main since the GF-S5 merge (74de329) held no commits after
+the merge itself and no branch newer than the merge). The GF-S2 re-issue
+had added the lane-rule question as the list's first item (A below) —
+the question the GF-P0 calibration itself opened (the C2 STOP branch,
+the report §4); it is the one item the audit's §5 could not carry, the
+audit having closed before the calibration ran. The calibration's
+measured additions per item live in the report §8 (the GF-S1 re-issue's
+own table); the list the owner answered was **A–K** as printed in the
+GF-S6 session's final message — one recorded answer per item. The
+answers gate P1 (**executed at GF-S7**) and the P2 composition questions
+they name (GF-S8+).
 
-| # | The decision | The recommendation (the audit's; the GF-P0 calibration's where marked ⚙) |
-|---|---|---|
-| **A** (GF-S2's add) | **The lane rule for the proposed sets** — the calibration's C2 STOP branch: the pre-registered criteria (GB 02 §6, unchanged) reject every proposed set on the all-windows scope under BOTH crowd rules (each set's own net sign smooths to 7 flips/60td — 4 mature — while the lane verdict holds 8–10). The owner's options, each owner-gated: **(a)** keep the criteria and the MIN2 rule as the default for the proposed sets on judgment; **(b)** amend the criteria (an owner-recorded amendment with its date — e.g. re-basing C2's comparison on the FROZEN production net sign, or a flips ceiling) and re-run the calibration before any new seat counts; **(c)** hold the promotions | ⚙ the GF-P0 report §4's measured reading (not the audit's — the question opened at the calibration): the C2 failure is the price of the coverage — richer lanes vote more, and the absolute smoothness stays comparable (9–10 vs the frozen 8 flips/60td); **nothing ships on (a) without the recorded choice** |
-| OI-GA-2 | A fifth lane — flows & demand? | **Add** (the F-family's 16 rows hold one dead, solo seat — D-14); ⚙ both compositions measured (the flows lane votes 759/2512 windows = 30.2% post-backfill, MIN2); the GOLD_LANE_STRONG re-statement (3-of-4 → 3-of-5 or 4-of-5) rides the decision |
-| OI-GA-3 | The S6-M6.4 shadow promotion (D5 `usd-reserve-share` + S6 `sp500-breadth-ratio`) | Fold into GF-P2 as two owner-gated promotions (ranks 13, 17); D5 promote-leaning, S6 with the calibration evidence in hand |
-| OI-GA-4 | WGC quarterly (F3 · F4 · F5 · F13 · F15 · F16 · H1–H4) | **Context-first**, with recorded promotion criteria revisit-able once the cards exist |
-| OI-GA-5 | EODHD per-item policy (F9 · F10 · S2 · S3 · G7) | **No use proposed** — the free proxies carry these channels |
-| OI-GA-6 | Copy rounds for any new context line | Standing (round 79+ when GF-P4 runs) |
-| N-1 | `euro-hicp` UNCLASSICATED: amend the taxonomy or re-seat? | **Amend** (an owner-recorded amendment with its date — the denominator becomes 86) |
-| The D-7/D-8 sign decision | The yield-curve polarity (four recorded options) | **(b) context demotion** per R4's own locked treatment; (d) accept-with-note the minimal-change fallback |
-| The D-18 readable-rule question | Should `readable()` require evalLeg-input presence? | **Adopt the input-presence rule** (a harness-visible rule nuance, owner-gated) |
-| The D-1 threshold question | Which of the 17 level-only seats deserve move thresholds? | **Derive, don't assume**: the GF-P0 calibration walks the 17 seats against their 02 treatments + the corpus distributions; D-2/D-3 (fed-expectations, usdjpy) are already P1 repairs |
-| The per-row go/no-go | The 12 zero-new-fetch class: R9 · I3 · I10 · S4 · S7 · S8 · S13 · G1 · X7 · F2 · D7 · I11 | Per row: PROMOTE ×8 (R9 · I3 · S4 · S7 · S8 · S13 · G1 · F2) · CONTEXT ADD ×3 (I10 · X7 · I11) · D7 seat-or-context |
+| # | The decision | The recommendation (the audit's; the GF-P0 calibration's where marked ⚙) | **The owner's recorded answer (GF-S7, 2026-11-05)** |
+|---|---|---|---|
+| **A** (GF-S2's add) | **The lane rule for the proposed sets** — the calibration's C2 STOP branch: the pre-registered criteria (GB 02 §6, unchanged) reject every proposed set on the all-windows scope under BOTH crowd rules (each set's own net sign smooths to 7 flips/60td — 4 mature — while the lane verdict holds 8–10). The owner's options, each owner-gated: **(a)** keep the criteria and the MIN2 rule as the default for the proposed sets on judgment; **(b)** amend the criteria (an owner-recorded amendment with its date — e.g. re-basing C2's comparison on the FROZEN production net sign, or a flips ceiling) and re-run the calibration before any new seat counts; **(c)** hold the promotions | ⚙ the GF-P0 report §4's measured reading (not the audit's — the question opened at the calibration): the C2 failure is the price of the coverage — richer lanes vote more, and the absolute smoothness stays comparable (9–10 vs the frozen 8 flips/60td); **nothing ships on (a) without the recorded choice** | **(a) KEEP the criteria + MIN2** — the owner's answer records the agent's judgment as the decision: C2's substance ("no flip-flopping verdict") is not violated (8–10 vs the frozen 8 is comparable); the failure is an artifact of comparing the verdict against each set's own improved net sign; MIN2 is the conservative crowd rule; (b) is not a clean fix either (re-basing on the FROZEN net sign (9) would pass POST-P1 (8) and POST-P2-4LANE (9) but the 5-lane set still fails marginally (10 > 9), so a flips ceiling would need bolting on too); (c) would freeze the coverage gap the audit measured (8/85 rows fully covered). **The P1 go rides this answer — the GO is RECORDED** |
+| OI-GA-2 | A fifth lane — flows & demand? | **Add** (the F-family's 16 rows hold one dead, solo seat — D-14); ⚙ both compositions measured (the flows lane votes 759/2512 windows = 30.2% post-backfill, MIN2); the GOLD_LANE_STRONG re-statement (3-of-4 → 3-of-5 or 4-of-5) rides the decision | **ADD the flows lane** — a 16-row classic family structurally muted is exactly the "missed" the charter asked to prevent; both compositions are measured. **GOLD_LANE_STRONG = 4-of-5** (today's bar 3-of-4 = 75%; 4-of-5 = 80% preserves that strictness; 3-of-5 = 60% would quietly loosen it). Executes with the P2 promotions (GF-P2) |
+| OI-GA-3 | The S6-M6.4 shadow promotion (D5 `usd-reserve-share` + S6 `sp500-breadth-ratio`) | Fold into GF-P2 as two owner-gated promotions (ranks 13, 17); D5 promote-leaning, S6 with the calibration evidence in hand | **PROMOTE D5, PROMOTE S6** — both fold into GF-P2: D5 is the classic long-run channel; S6's drawdown-depth claim is one-directional and measured (the stress lane grows 5 → 11 in the post-P2 composition) |
+| OI-GA-4 | WGC quarterly (F3 · F4 · F5 · F13 · F15 · F16 · H1–H4) | **Context-first**, with recorded promotion criteria revisit-able once the cards exist | **CONTEXT-FIRST** — quarterly/monthly lagged series set the structural regime, not the month's direction; recorded promotion criteria (annualised-level extreme bands) revisit-able once the cards exist |
+| OI-GA-5 | EODHD per-item policy (F9 · F10 · S2 · S3 · G7) | **No use proposed** — the free proxies carry these channels | **NO USE** — the free proxies carry every channel (S5 carries S2/S3, F8+F6 carry F9/F10, G6's copy carries G7); the licence register fail-closes the paid class. Zero EODHD calls in any phase — the key stays unused |
+| OI-GA-6 | Copy rounds for any new context line | Standing (round 79+ when GF-P4 runs) | **STANDING** (no decision needed) — every new context line gets fresh EN+fa copy when GF-P4 runs |
+| N-1 | `euro-hicp` UNCLASSICATED: amend the taxonomy or re-seat? | **Amend** (an owner-recorded amendment with its date — the denominator becomes 86) | **AMEND** — an owner-recorded amendment with its date (2026-11-05); the denominator becomes 86 and the arithmetic restates downstream. Striking a healthy voter reduces coverage with no classic-literature basis. The amendment executes with the P2 work |
+| The D-7/D-8 sign decision | The yield-curve polarity (four recorded options) | **(b) context demotion** per R4's own locked treatment; (d) accept-with-note the minimal-change fallback | **(b) CONTEXT DEMOTION** — both seats leave the voter set, the curve becomes a context card, and the real-curve derivation (DFII5, GF-P3) re-opens the question with the correct object. **EXECUTED at GF-P1** (the voter table 21 → 19) |
+| The D-18 readable-rule question | Should `readable()` require evalLeg-input presence? | **Adopt the input-presence rule** (a harness-visible rule nuance, owner-gated) | **ADOPT the input-presence rule** — neither input → `unread`, never `steady`. The repair fixes the instance; the rule prevents the class. **EXECUTED at GF-P1** |
+| The D-1 threshold question | Which of the 17 level-only seats deserve move thresholds? | **Derive, don't assume**: the GF-P0 calibration walks the 17 seats against their 02 treatments + the corpus distributions; D-2/D-3 (fed-expectations, usdjpy) are already P1 repairs | **ADOPT the five derived values** — fed-expectations 0.13 pts · usdjpy 1.38 pct · fed-target 0.25 pts (the FOMC step grid) · term-premium-10y 0.07 pts · t5yie 0.10 pts. **The five entered the production `SIGNAL_LEG_MOVE` at GF-P1** (the term-premium-10y and t5yie thresholds activate with their P2 promotions) |
+| The per-row go/no-go | The 12 zero-new-fetch class: R9 · I3 · I10 · S4 · S7 · S8 · S13 · G1 · X7 · F2 · D7 · I11 | Per row: PROMOTE ×8 (R9 · I3 · S4 · S7 · S8 · S13 · G1 · F2) · CONTEXT ADD ×3 (I10 · X7 · I11) · D7 seat-or-context | **PROMOTE ×12**: R9 · S4 (the literature's preferred risk-appetite signal) · G1 (the fiscal-dominance channel) · S13 (polarity note: pessimism reads gold-positive) · S7 the DAILY object (the monthly gpr-index alternative fires 1114) · S8 (the tpu-us alternative fires 1259 — a one-seat swap recorded as the alternative) · I3 · F2 (rides F1's backfill) · R8 (rides J's threshold) · I7 (the debasement channel) · G4 (the foreign-financing retreat). **D7: CONTEXT CARD first** (its row is context-leaning; a seat defensible — the seat question stays recorded-open). **I10 · X7 · I11: CONTEXT ADD** (GF-P4; I10 the Jastram anchor; I11 promotion revisit-able once the card exists — the ECB/BoJ legs absent). The promotions execute at GF-P2 |
 
 ## Out of scope
 

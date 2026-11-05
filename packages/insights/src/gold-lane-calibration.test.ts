@@ -3,9 +3,12 @@
  * (docs/specs/gold-balance-consolidation/02-ENGINE-AND-DECISION-TABLE.md §6
  * + 04-MIGRATION-AND-ACCEPTANCE.md §4.4).
  *
- *   - the LANE TABLES: HARNESS_GOLD_LANES_MIN2 / _MIN1 pair the SAME frozen
- *     21-voter production table with their crowd minimum (2 / 1) — additive
- *     beside HARNESS_GOLD_VOTERS_21 / _20, which stay untouched (D-GB-9);
+ *   - the LANE TABLES: HARNESS_GOLD_LANES_MIN2 / _MIN1 pair the FROZEN
+ *     21-seat lineage snapshot (HARNESS_GOLD_VOTERS_21 — the production
+ *     table until GF-P1, 2026-11-05, demoted it to 19) with their crowd
+ *     minimum (2 / 1) — additive beside HARNESS_GOLD_VOTERS_21 / _20,
+ *     which stay verbatim (D-GB-9's lineage discipline, restated at
+ *     GF-P1);
  *   - the LANE ENGINE (laneBalanceOverVoters): 02 §3's lane-vote rules —
  *     the crowd minimum, strict majority, the split tie, unread vs neutral
  *     (problem P5), the stale-voter immutability, the polarity pins, the
@@ -13,9 +16,12 @@
  *   - the CALIBRATION STATISTICS (medianFlipsPer60, laneCalibrationStats):
  *     the flip counting and the pre-registered C1 / C2 verdicts, including
  *     their exact boundaries (70% / 60%, "not higher than");
- *   - the FROZEN-TABLES REGRESSION PIN: scoreOverVoters over a fixed
- *     synthetic battery must stay BYTE-IDENTICAL — the P0 additions cannot
- *     change what the frozen tables produce (04 §4.4).
+ *   - the FROZEN-TABLES REGRESSION PIN: gfScoreOverVoters (the
+ *     threshold-map-parameterized copy) over a fixed synthetic battery
+ *     must stay BYTE-IDENTICAL under the FROZEN map — the lineage JSONs
+ *     (the GB-S1/pre-GF-P1 era) cannot change — while the PRODUCTION
+ *     engines (GF-P1's 19-seat table + the executed five thresholds) get
+ *     their own equivalence pin (04 §4.4's discipline, restated at GF-P1).
  *
  * Synthetic data only — no fixtures, no live sites (AGENTS.md rule 7).
  */
@@ -40,6 +46,7 @@ import {
   type GoldLaneSide,
   type HarnessLaneBalance,
 } from './gold-backtest-core';
+import { GF_MOVE_FROZEN_BASE, GF_MOVE_P1_PROPOSED, gfMoveMapWith, gfScoreOverVoters } from './gf-p0-proposed';
 
 const NOW = '2026-11-03T04:10:00.000Z';
 const DAY = '2026-11-02';
@@ -67,21 +74,29 @@ const STEADY: Partial<IndicatorReading> = { percentile10y: 0.5, change30d: 0.02 
  * ------------------------------------------------------------------ */
 
 describe('the lane tables — MIN2 / MIN1 beside the frozen voter tables', () => {
-  it('MIN2 is the frozen 21-voter production table with the D-GB-3 crowd minimum of 2', () => {
-    expect(HARNESS_GOLD_LANES_MIN2.voters).toBe(GOLD_LANE_VOTERS);
-    expect(HARNESS_GOLD_LANES_MIN2.voters).toEqual(HARNESS_GOLD_VOTERS_21);
+  it('MIN2 is the frozen 21-seat lineage snapshot with the D-GB-3 crowd minimum of 2', () => {
+    // GF-P1 (2026-11-05, the owner's recorded decision H) demoted
+    // production to 19 seats; the lineage configuration keeps measuring
+    // the frozen 21 the GB-S1 calibration and BACKTEST-GOLD-LANES.md
+    // recorded (the post-P1 production set's recalibration is the GF
+    // program's own evidence: gf-p1-verify).
+    expect(HARNESS_GOLD_LANES_MIN2.voters).toBe(HARNESS_GOLD_VOTERS_21);
     expect(HARNESS_GOLD_LANES_MIN2.minFiring).toBe(2);
   });
   it('MIN1 is the SAME table with the pre-registered fallback minimum of 1', () => {
-    expect(HARNESS_GOLD_LANES_MIN1.voters).toBe(GOLD_LANE_VOTERS);
+    expect(HARNESS_GOLD_LANES_MIN1.voters).toBe(HARNESS_GOLD_VOTERS_21);
     expect(HARNESS_GOLD_LANES_MIN1.minFiring).toBe(1);
   });
-  it('the lane tables add no voters, lanes or polarities of their own (21 voters, 8/3/5/5)', () => {
-    const counts = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 } as Record<string, number>;
-    for (const v of GOLD_LANE_VOTERS) counts[v.lane] = (counts[v.lane] ?? 0) + 1;
-    expect(counts).toEqual({ 'borrowing-costs': 8, dollar: 3, stress: 5, inflation: 5 });
+  it('the lineage snapshots keep their recorded shapes (21 · 8/3/5/5 · 20); production is GF-P1\'s 19 · 6/3/5/5', () => {
+    const counts21: Record<string, number> = {};
+    for (const v of HARNESS_GOLD_VOTERS_21) counts21[v.lane] = (counts21[v.lane] ?? 0) + 1;
+    expect(counts21).toEqual({ 'borrowing-costs': 8, dollar: 3, stress: 5, inflation: 5 });
     expect(HARNESS_GOLD_VOTERS_21).toHaveLength(21);
     expect(HARNESS_GOLD_VOTERS_20).toHaveLength(20);
+    const countsProd: Record<string, number> = {};
+    for (const v of GOLD_LANE_VOTERS) countsProd[v.lane] = (countsProd[v.lane] ?? 0) + 1;
+    expect(GOLD_LANE_VOTERS).toHaveLength(19);
+    expect(countsProd).toEqual({ 'borrowing-costs': 6, dollar: 3, stress: 5, inflation: 5 });
   });
 });
 
@@ -417,15 +432,19 @@ describe('laneCalibrationStats — the pre-registered C1 / C2', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * The frozen-tables regression pin (04 §4.4) — the P0 additions cannot
- * change what the frozen tables produce. The pinned JSON was produced by
- * a REAL run of scoreOverVoters over the fixed battery below (never
- * hand-written); any change to the voter tables, the shared evaluator's
- * semantics or the score arithmetic breaks this test byte-for-byte.
+ * The frozen-tables regression pin (04 §4.4, restated at GF-P1) — the
+ * LINEAGE JSONs cannot change. The pinned JSONs were produced by REAL
+ * runs (never hand-written) over the fixed battery below, under the
+ * FROZEN map (the pre-GF-P1 evaluator): the 21-seat lineage snapshot
+ * and the S4-FROZEN 20 reproduce them byte-for-byte through
+ * gfScoreOverVoters (the threshold-map-parameterized copy). The
+ * PRODUCTION engines (GF-P1's 19-seat table + the executed five
+ * thresholds) get their own equivalence pin below — the copy and the
+ * engine cannot drift on the production configuration either.
  * ------------------------------------------------------------------ */
 
-describe('the frozen tables stay byte-identical (the P0 regression pin)', () => {
-  const battery: readonly IndicatorReading[] = GOLD_LANE_VOTERS.map((v, i) =>
+describe('the frozen tables stay byte-identical (the lineage regression pin)', () => {
+  const battery: readonly IndicatorReading[] = HARNESS_GOLD_VOTERS_21.map((v, i) =>
     reading(
       v.id as IndicatorId,
       i % 4 === 0 ? { ...HIGH, ...FALLING } : i % 4 === 1 ? { ...LOW, ...RISING } : i % 4 === 2 ? HIGH : STEADY,
@@ -433,17 +452,24 @@ describe('the frozen tables stay byte-identical (the P0 regression pin)', () => 
   );
   const battery20 = battery.filter((r) => (r.id as string) !== 'breakeven-tilt');
 
-  it('the PROMOTED 21-voter table over the fixed battery is byte-identical', () => {
-    expect(JSON.stringify(scoreOverVoters(battery, GOLD_LANE_VOTERS))).toBe(
+  it('the 21-seat lineage snapshot over the fixed battery, under the FROZEN map, is byte-identical', () => {
+    expect(JSON.stringify(gfScoreOverVoters(battery, HARNESS_GOLD_VOTERS_21, GF_MOVE_FROZEN_BASE))).toBe(
       '{"netScore":0,"label":"balanced","firingVoters":16,"tailwindVoters":8,"headwindVoters":8,"laneCounts":{"tailwind":0,"headwind":0,"mixed":4},"subGauges":[{"lane":"borrowing-costs","reading":"mixed","tailwindVoters":2,"headwindVoters":4},{"lane":"dollar","reading":"mixed","tailwindVoters":1,"headwindVoters":2},{"lane":"stress","reading":"mixed","tailwindVoters":2,"headwindVoters":1},{"lane":"inflation","reading":"mixed","tailwindVoters":3,"headwindVoters":1}],"voters":[{"id":"real-yield-10y","lane":"borrowing-costs","impact":"tailwind","evidence":"falling"},{"id":"us10y","lane":"borrowing-costs","impact":"headwind","evidence":"rising"},{"id":"us30y","lane":"borrowing-costs","impact":"headwind","evidence":"high"},{"id":"fed-expectations","lane":"borrowing-costs","impact":"headwind","evidence":"high"},{"id":"ecb-dfr","lane":"borrowing-costs","impact":"tailwind","evidence":"low"},{"id":"yield-curve-10y2y","lane":"borrowing-costs","impact":"headwind","evidence":"high"},{"id":"dollar-basket","lane":"dollar","impact":"headwind","evidence":"high"},{"id":"usdjpy","lane":"dollar","impact":"tailwind","evidence":"low"},{"id":"us-japan-10y-gap","lane":"dollar","impact":"headwind","evidence":"high"},{"id":"nfci","lane":"stress","impact":"tailwind","evidence":"high"},{"id":"vix","lane":"stress","impact":"headwind","evidence":"low"},{"id":"gold-silver","lane":"stress","impact":"tailwind","evidence":"high"},{"id":"us-cpi-yoy","lane":"inflation","impact":"tailwind","evidence":"high"},{"id":"us-pce-core-yoy","lane":"inflation","impact":"headwind","evidence":"low"},{"id":"euro-hicp","lane":"inflation","impact":"tailwind","evidence":"high"},{"id":"breakeven-tilt","lane":"inflation","impact":"tailwind","evidence":"high"}]}',
     );
   });
-  it('the S4-FROZEN 20-voter table over the same battery minus the tilt is byte-identical', () => {
-    expect(JSON.stringify(scoreOverVoters(battery20, HARNESS_GOLD_VOTERS_20))).toBe(
+  it('the S4-FROZEN 20-voter table over the same battery minus the tilt, under the FROZEN map, is byte-identical', () => {
+    expect(JSON.stringify(gfScoreOverVoters(battery20, HARNESS_GOLD_VOTERS_20, GF_MOVE_FROZEN_BASE))).toBe(
       '{"netScore":-1,"label":"headwind","firingVoters":15,"tailwindVoters":7,"headwindVoters":8,"laneCounts":{"tailwind":0,"headwind":0,"mixed":4},"subGauges":[{"lane":"borrowing-costs","reading":"mixed","tailwindVoters":2,"headwindVoters":4},{"lane":"dollar","reading":"mixed","tailwindVoters":1,"headwindVoters":2},{"lane":"stress","reading":"mixed","tailwindVoters":2,"headwindVoters":1},{"lane":"inflation","reading":"mixed","tailwindVoters":2,"headwindVoters":1}],"voters":[{"id":"real-yield-10y","lane":"borrowing-costs","impact":"tailwind","evidence":"falling"},{"id":"us10y","lane":"borrowing-costs","impact":"headwind","evidence":"rising"},{"id":"us30y","lane":"borrowing-costs","impact":"headwind","evidence":"high"},{"id":"fed-expectations","lane":"borrowing-costs","impact":"headwind","evidence":"high"},{"id":"ecb-dfr","lane":"borrowing-costs","impact":"tailwind","evidence":"low"},{"id":"yield-curve-10y2y","lane":"borrowing-costs","impact":"headwind","evidence":"high"},{"id":"dollar-basket","lane":"dollar","impact":"headwind","evidence":"high"},{"id":"usdjpy","lane":"dollar","impact":"tailwind","evidence":"low"},{"id":"us-japan-10y-gap","lane":"dollar","impact":"headwind","evidence":"high"},{"id":"nfci","lane":"stress","impact":"tailwind","evidence":"high"},{"id":"vix","lane":"stress","impact":"headwind","evidence":"low"},{"id":"gold-silver","lane":"stress","impact":"tailwind","evidence":"high"},{"id":"us-cpi-yoy","lane":"inflation","impact":"tailwind","evidence":"high"},{"id":"us-pce-core-yoy","lane":"inflation","impact":"headwind","evidence":"low"},{"id":"euro-hicp","lane":"inflation","impact":"tailwind","evidence":"high"}]}',
     );
   });
-  it('the harness copy still equals the production engine on the same battery (the standing pin)', () => {
+  it('the harness copy on the PRODUCTION configuration (GF-P1: the 19-seat table + the executed five thresholds) equals the production engine — the standing pin', () => {
+    // The copy ≡ the engine on the shipped configuration: gfScoreOverVoters
+    // with gfMoveMapWith(GF_MOVE_P1_PROPOSED) must deep-equal the
+    // production scoreOverVoters (which reads the production
+    // SIGNAL_LEG_MOVE) over the production table.
+    expect(gfScoreOverVoters(battery, GOLD_LANE_VOTERS, gfMoveMapWith(GF_MOVE_P1_PROPOSED))).toEqual(
+      scoreOverVoters(battery, GOLD_LANE_VOTERS),
+    );
     expect(scoreOverVoters(battery, GOLD_LANE_VOTERS)).toEqual(goldTailwindScore(battery));
   });
 });

@@ -2632,8 +2632,10 @@ export const insightsCopyFa: InsightsCopy = {
         'fed-target': 'نرخ سیاستی فدرال رزرو',
         'fed-expectations': 'انتظارات بازار از فدرال رزرو',
         'ecb-dfr': 'نرخ سپردهٔ بانک مرکزی اروپا',
-        'yield-curve-10y2y': 'فاصلهٔ ۱۰ و ۲ ساله',
-        'yield-curve-10y3m': 'فاصلهٔ ۱۰ ساله و ۳ ماهه',
+        // GF-P1 (2026-11-05, the owner's recorded decision H — the D-7/D-8
+        // context demotion): yield-curve-10y2y and yield-curve-10y3m left the
+        // voter table (context cards only) — their voterNames entries retired
+        // with the seats (the lane view never renders them again).
         'dollar-basket': 'شاخص دلار',
         usdjpy: 'دلار در برابر ین ژاپن',
         'us-japan-10y-gap': 'شکاف ۱۰ساله آمریکا و ژاپن',

@@ -10,8 +10,10 @@
  *
  * The engine is ADDITIVE (D-GB-9): it imports the FROZEN sources and
  * edits nothing —
- *   - `GOLD_LANES`, `GoldLane` and the 21-voter table `GOLD_LANE_VOTERS`
- *     (the lane memberships and polarities) from `gold-score.ts`;
+ *   - `GOLD_LANES`, `GoldLane` and the voter table `GOLD_LANE_VOTERS`
+ *     (the lane memberships and polarities — 19 seats since GF-P1: the
+ *     D-7/D-8 yield-curve context demotion, the owner's recorded
+ *     decision H, 2026-11-05) from `gold-score.ts`;
  *   - `evalLeg`, the ONE shared evaluator, from `connections.ts`
  *     (D-GB-4: one rule per indicator; the Balance's bespoke stress and
  *     expectations rules are retired).
@@ -25,7 +27,13 @@
  * (stale / check-pending / unavailable never fire; the rule is not
  * exported there and D-GB-9 forbids editing it — gold-backtest-core.ts
  * carries the same copy, and the equivalence pin holds all three to one
- * semantics).
+ * semantics). GF-P1 (2026-11-05, the owner's recorded decision I — the
+ * D-18 readable-rule question): the INPUT-PRESENCE rule — a readable
+ * seat with NEITHER evalLeg input (no finite change30d where a move
+ * threshold exists, no percentile10y) counts as UNREAD, never
+ * 'steady' — the fake-steady class (audit finding D-18) manufactured
+ * false confidence for ~30 weeks; the rule prevents the class, the
+ * D-4 backfill fixed the instance.
  *
  * Platform-free (AGENTS.md rule 2): pure over the readings the page
  * already holds; zero fetches, zero KV, zero wire fields, zero clock.
@@ -56,8 +64,13 @@ export interface GoldBalanceMember {
   /**
    * Gold-direction of this voter. 'steady' = readable, not firing.
    * 'unread' = missing / stale / check-pending / unavailable (never a
-   * guess); 'supports' / 'pressures' = the lean mapped through the
-   * table's polarity.
+   * guess) — and, since GF-P1 (the D-18 input-presence rule, the owner's
+   * recorded decision I, 2026-11-05), also a readable seat with NEITHER
+   * evalLeg input (no finite change30d where a threshold exists, no
+   * percentile10y): the evaluator had nothing to evaluate, so the member
+   * never reads 'steady' on it (the fake-steady class, audit D-18);
+   * 'supports' / 'pressures' = the lean mapped through the table's
+   * polarity.
    */
   impact: 'supports' | 'pressures' | 'steady' | 'unread';
   /**
@@ -134,8 +147,14 @@ function readable(r: IndicatorReading | undefined): r is IndicatorReading {
  *
  *   1. not readable (missing, stale, check-pending, unavailable) → an
  *      'unread' member;
- *   2. `evalLeg` lean 0 → 'steady' (readable, honestly not firing);
- *   3. else 'supports' / 'pressures' by lean × polarity, with the
+ *   2. GF-P1's D-18 INPUT-PRESENCE rule (the owner's recorded decision
+ *      I, 2026-11-05): a readable seat whose evaluator carries NEITHER
+ *      input (evalLeg returns no direction — no threshold or no finite
+ *      change30d — and no level — no percentile10y) → an 'unread'
+ *      member: the evaluator had nothing to evaluate, never a steady
+ *      word on an inputless seat (the fake-steady finding, audit D-18);
+ *   3. `evalLeg` lean 0 → 'steady' (readable, honestly not firing);
+ *   4. else 'supports' / 'pressures' by lean × polarity, with the
  *      evaluator's own evidence word.
  *
  * The lane then votes: 'unread' when nothing could be read; 'neutral'
@@ -164,8 +183,19 @@ export function goldBalance(readings: readonly IndicatorReading[]): GoldBalanceR
         members.push({ id: def.id, impact: 'unread', evidence: null });
         continue;
       }
-      readableCount++;
       const leg = evalLeg(def.id, r);
+      // GF-P1's D-18 input-presence rule (the owner's recorded decision
+      // I, 2026-11-05): neither evalLeg input exists — no direction (no
+      // threshold for the seat, or no finite change30d) and no level (no
+      // percentile10y) — so the evaluator had NOTHING to evaluate. The
+      // member reads 'unread', never 'steady' (the fake-steady class,
+      // audit D-18). The check rides the evaluator's own outputs, so the
+      // rule and evalLeg cannot drift.
+      if (leg.direction === null && leg.level === null) {
+        members.push({ id: def.id, impact: 'unread', evidence: null });
+        continue;
+      }
+      readableCount++;
       if (leg.lean === 0) {
         // steady AND typical — honestly not firing
         members.push({ id: def.id, impact: 'steady', evidence: null });

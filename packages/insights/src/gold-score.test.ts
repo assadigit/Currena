@@ -105,25 +105,27 @@ describe('voter firing (the shared evalLeg lean × the polarity table)', () => {
 
   it('the polarity table spot-checks: each lane maps its lean the documented way', () => {
     // dollar high (strong) → headwind; stress indexes high → tailwind; the
-    // crowded-long COT decade-high → headwind (contrarian); an inverted
-    // curve (low) → tailwind; hot CPI → tailwind. (Duplicate ids in the
-    // input array keep the LAST occurrence — the Map constructor's own
-    // rule; the snapshot itself never carries duplicates, the schema
-    // refuses them.)
+    // crowded-long COT decade-high → headwind (contrarian); hot CPI →
+    // tailwind. (Duplicate ids in the input array keep the LAST
+    // occurrence — the Map constructor's own rule; the snapshot itself
+    // never carries duplicates, the schema refuses them.) GF-P1 (the
+    // owner's recorded decision H, 2026-11-05): the yield-curve seats are
+    // DEMOTED — a curve reading never reaches the voters at all, pinned
+    // right below.
     const t = goldTailwindScore([
       reading('dollar-basket', LOW),
       reading('dollar-basket', HIGH), // the later row wins the Map
       reading('stress-stlfsi', HIGH),
       reading('cftc-gold-positioning', HIGH),
-      reading('yield-curve-10y3m', LOW),
+      reading('yield-curve-10y3m', LOW), // demoted (D-7/D-8): present in the input, absent from the voters
       reading('us-cpi-yoy', HIGH),
     ]);
     const byId = new Map(t.voters.map((v) => [v.id as string, v]));
     expect(byId.get('dollar-basket')!.impact).toBe('headwind');
     expect(byId.get('stress-stlfsi')!.impact).toBe('tailwind');
     expect(byId.get('cftc-gold-positioning')!.impact).toBe('headwind');
-    expect(byId.get('yield-curve-10y3m')!.impact).toBe('tailwind');
     expect(byId.get('us-cpi-yoy')!.impact).toBe('tailwind');
+    expect(t.voters.some((v) => v.id === 'yield-curve-10y3m')).toBe(false); // GF-P1 H: never a voter
     expect(t.voters.filter((v) => v.id === 'dollar-basket')).toHaveLength(1);
   });
 });
@@ -358,12 +360,15 @@ describe('the compact wire shape + the EN copy blocks', () => {
     expect(GOLD_LANES).toHaveLength(4);
   });
 
-  it('the 20→21 pin (the D-5 promotion, Session 6): 21 voters, lane counts 8/3/5/5, the tilt exactly once, no duplicates', () => {
-    // The promoted table's exact shape — the pin a future edit cannot
-    // drift past silently. Pre-promotion this asserted ≥ 20 loosely plus
-    // the 20-voter pin in breakeven-tilt.test.ts; the promotion session
-    // tightens it to the promoted shape (the owner's "we can have 21").
-    expect(GOLD_LANE_VOTERS).toHaveLength(21);
+  it('the GF-P1 table pin: 19 voters, lane counts 6/3/5/5, the tilt exactly once, no duplicates, the curve seats demoted', () => {
+    // The production table's exact shape — the pin a future edit cannot
+    // drift past silently. Session 6 promoted 20 → 21 (the D-5 tilt); GF-P1
+    // (2026-11-05, the owner's recorded decision H — the D-7/D-8 context
+    // demotion) removed the two yield-curve seats: 21 → 19, borrowing
+    // costs 8 → 6. The pre-demotion 21-seat shape is pinned VERBATIM in
+    // gold-backtest-core.test.ts (HARNESS_GOLD_VOTERS_21) and
+    // gf-p0-proposed.test.ts (GF_VOTERS_FROZEN_21).
+    expect(GOLD_LANE_VOTERS).toHaveLength(19);
     const byLane = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 } as Record<string, number>;
     const ids = new Set<string>();
     for (const v of GOLD_LANE_VOTERS) {
@@ -371,11 +376,13 @@ describe('the compact wire shape + the EN copy blocks', () => {
       expect(ids.has(v.id as string), `duplicate voter ${v.id}`).toBe(false);
       ids.add(v.id as string);
     }
-    expect(byLane).toEqual({ 'borrowing-costs': 8, dollar: 3, stress: 5, inflation: 5 });
+    expect(byLane).toEqual({ 'borrowing-costs': 6, dollar: 3, stress: 5, inflation: 5 });
+    expect(ids.has('yield-curve-10y2y')).toBe(false); // demoted to context (D-7)
+    expect(ids.has('yield-curve-10y3m')).toBe(false); // demoted to context (D-8)
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
     expect(tilt).toHaveLength(1);
     expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
-    expect(tilt[0]!.lane === 'inflation' && GOLD_LANE_VOTERS.indexOf(tilt[0]!) === 20).toBe(true); // the last seat — the B4-measured shape
+    expect(tilt[0]!.lane === 'inflation' && GOLD_LANE_VOTERS.indexOf(tilt[0]!) === 18).toBe(true); // the last seat — the B4-measured shape
   });
 
   it('the promoted 21st voter fires like every level-only voter: decade-HIGH tilt → tailwind, LOW → headwind, steady-mid → silent', () => {

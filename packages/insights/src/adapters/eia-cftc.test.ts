@@ -19,7 +19,7 @@ import {
   parseEiaCrudeStocksHtml,
   parseEiaWeeklySeriesHtml,
 } from './eia-stocks';
-import { CFTC_DEAFUT_URL, CFTC_GOLD_MARKET, parseCftcGoldPositioning } from './cftc';
+import { CFTC_DEAFUT_URL, CFTC_GOLD_MARKET, cftcArchiveUrl, parseCftcGoldArchiveAnnual, parseCftcGoldPositioning } from './cftc';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtures = join(here, '..', '..', 'fixtures');
@@ -158,5 +158,54 @@ describe('parseCftcGoldPositioning (A-7: the weekly COT file)', () => {
 
   it('the URL is the agency’s own weekly file', () => {
     expect(CFTC_DEAFUT_URL).toBe('https://www.cftc.gov/dea/newcot/deafut.txt');
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * GF-P1 (2026-11-05, the owner's recorded go — the D-4/F1 repair): the
+ * CFTC legacy futures-only HISTORICAL archive parse (the annual.txt long
+ * format, dea/history/deacot<year>.zip). The gold rows carry EXACTLY the
+ * weekly deafut.txt's column layout (verified 2026-11-05 against the
+ * 2026 archive file), so these tests build the annual body from the
+ * recorded deafut capture's own gold row — no live site (AGENTS.md 7).
+ * ------------------------------------------------------------------ */
+
+describe('parseCftcGoldArchiveAnnual (GF-P1 D-4/F1: the historical archive)', () => {
+  /** The recorded deafut capture's gold row line (the shared column layout). */
+  const goldRow = deafut.split('\n').find((l) => l.startsWith(`"${CFTC_GOLD_MARKET}"`))!;
+
+  /** An annual.txt-shaped body: the header row, a noise market, then gold rows. */
+  const annualBody = (rows: string[]): string =>
+    ['"Market and Exchange Names",...', '"SOME OTHER MARKET - EXAMPLE EXCHANGE",1,2,3,4,5,6,7,8,9,10,11,12,13,14', ...rows].join('\n');
+
+  it('parses the gold rows of the long format (the header + noise markets skipped), matching the weekly parse on the shared row', () => {
+    expect(goldRow).toBeTruthy();
+    const weeks = parseCftcGoldArchiveAnnual(annualBody([goldRow]));
+    expect(weeks).toHaveLength(1);
+    expect(weeks[0]).toEqual(parseCftcGoldPositioning(deafut)); // the same row, the same arithmetic
+  });
+
+  it('multi-week: two gold rows parse to two weeks', () => {
+    // A sibling week's row: the same positions, the report dates moved.
+    const cells = goldRow.split(',');
+    cells[1] = '260121'; // the YYMMDD field
+    cells[2] = '2026-01-21'; // the ISO date field
+    const secondRow = cells.join(',');
+    const weeks = parseCftcGoldArchiveAnnual(annualBody([secondRow, goldRow]));
+    expect(weeks).toHaveLength(2);
+    expect(weeks.map((w) => w.date)).toEqual(['2026-01-21', '2026-10-20']); // the caller sorts; the parse preserves order
+  });
+
+  it('asserts the arithmetic identity per row (a column shift fails loudly, never a silent skip)', () => {
+    const cells = goldRow.split(',');
+    cells[9] = '  99999'; // the NonComm Short position — the reportable-positions identity now fails
+    expect(() => parseCftcGoldArchiveAnnual(annualBody([cells.join(',')]))).toThrow(
+      /fails the reportable-positions identity/,
+    );
+  });
+
+  it('the archive URL is the same site\'s historical route, one zip per report year', () => {
+    expect(cftcArchiveUrl(2026)).toBe('https://www.cftc.gov/files/dea/history/deacot2026.zip');
+    expect(cftcArchiveUrl(2016)).toBe('https://www.cftc.gov/files/dea/history/deacot2016.zip');
   });
 });

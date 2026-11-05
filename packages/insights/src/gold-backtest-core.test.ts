@@ -124,24 +124,38 @@ describe('scoreOverVoters — the parameterized copy equals the production engin
  * The harness tables after the promotion (Session 6 — D-5)
  * ------------------------------------------------------------------ */
 
-describe('the harness tables — post-promotion (Session 6)', () => {
-  it('the EQUALITY PIN: HARNESS_GOLD_VOTERS_21 IS the production table (the harness cannot drift from the engine)', () => {
-    expect(HARNESS_GOLD_VOTERS_21).toEqual(GOLD_LANE_VOTERS);
+describe('the harness tables — the lineage snapshots (Session 6 → GF-P1)', () => {
+  it('the SNAPSHOT PIN: HARNESS_GOLD_VOTERS_21 is the VERBATIM pre-GF-P1 production table — 21 seats, the curve pair present', () => {
+    // GF-P1 (2026-11-05, the owner's recorded decision H — the D-7/D-8
+    // context demotion) separated the harness snapshot from production:
+    // the lineage tables (the GB-S1 calibration, BACKTEST-GOLD-LANES.md,
+    // the FROZEN/POST-P1 calibration scenarios) measured THIS 21-seat
+    // table, so it stays VERBATIM while production moved to 19.
     expect(HARNESS_GOLD_VOTERS_21).toHaveLength(21);
+    expect(HARNESS_GOLD_VOTERS_21.some((v) => v.id === 'yield-curve-10y2y')).toBe(true);
+    expect(HARNESS_GOLD_VOTERS_21.some((v) => v.id === 'yield-curve-10y3m')).toBe(true);
+    expect(HARNESS_GOLD_VOTERS_21.at(-1)).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
   });
 
-  it('production is the promoted table: 21 voters, the tilt in the inflation lane, polarity +1, the last seat', () => {
-    expect(GOLD_LANE_VOTERS).toHaveLength(21);
+  it('production is the GF-P1 table: 19 voters (6/3/5/5), the tilt in the inflation lane, polarity +1, the last seat', () => {
+    expect(GOLD_LANE_VOTERS).toHaveLength(19);
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
     expect(tilt).toHaveLength(1);
     expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
     expect(GOLD_LANE_VOTERS[GOLD_LANE_VOTERS.length - 1]!.id).toBe('breakeven-tilt'); // the B4-measured shape
   });
 
-  it('the S4 frozen 20-voter table is the production table minus EXACTLY the tilt — the promotion is the only change', () => {
+  it('the DEMOTION PIN: production is the 21-seat snapshot minus EXACTLY the two yield-curve seats (GF-P1 H — the D-7/D-8 demotion is the only change)', () => {
+    expect(GOLD_LANE_VOTERS).toHaveLength(19);
+    expect(
+      HARNESS_GOLD_VOTERS_21.filter((v) => v.id !== 'yield-curve-10y2y' && v.id !== 'yield-curve-10y3m'),
+    ).toEqual(GOLD_LANE_VOTERS);
+  });
+
+  it('the S4 frozen 20-voter table is the 21-seat snapshot minus EXACTLY the tilt — the promotion is the only change between them', () => {
     expect(HARNESS_GOLD_VOTERS_20).toHaveLength(20);
     expect(HARNESS_GOLD_VOTERS_20.some((v) => v.id === 'breakeven-tilt')).toBe(false);
-    expect(GOLD_LANE_VOTERS.filter((v) => v.id !== 'breakeven-tilt')).toEqual(HARNESS_GOLD_VOTERS_20);
+    expect(HARNESS_GOLD_VOTERS_21.filter((v) => v.id !== 'breakeven-tilt')).toEqual(HARNESS_GOLD_VOTERS_20);
   });
 
   it('the tilt voter behaves like every other level-only voter: high → tailwind, low → headwind, steady-mid → silent (production semantics)', () => {

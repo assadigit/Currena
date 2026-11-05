@@ -9001,8 +9001,10 @@ export const insightsCopyEn = {
         'fed-target': 'Fed funds target',
         'fed-expectations': 'Fed expectations',
         'ecb-dfr': 'ECB deposit rate',
-        'yield-curve-10y2y': '10y−2y curve',
-        'yield-curve-10y3m': '10y−3m curve',
+        // GF-P1 (2026-11-05, the owner's recorded decision H — the D-7/D-8
+        // context demotion): yield-curve-10y2y and yield-curve-10y3m left the
+        // voter table (context cards only) — their voterNames entries retired
+        // with the seats (the lane view never renders them again).
         'dollar-basket': 'Dollar basket',
         usdjpy: 'USD/JPY',
         'us-japan-10y-gap': 'US−Japan 10y gap',

@@ -56,7 +56,7 @@ import { fileURLToPath } from 'node:url';
 import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@currena/core';
 
 import { DEFINITIONS, computeReading } from '../src/index';
-import { GOLD_LANE_VOTERS } from '../src/gold-score';
+import { GF_VOTERS_FROZEN_21 } from '../src/gf-p0-proposed';
 import { realYieldScoringSeries } from '../src/real-yield-fill';
 import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/series';
 import { seriesUpTo } from '../src/gold-backtest-core';
@@ -162,7 +162,7 @@ const isMature = (day: string): boolean => day >= MATURE_FROM;
  *  - the POST-P1 swapped seats: cftc-gold-positioning (the backfill), us-japan-10y-gap (the derived gap);
  *  - the promotion candidates (the candidates fixture; t5yie rides the corpus's own series);
  *  - the F2 proxy (the synthetic definition). */
-const VOTER_IDS = GOLD_LANE_VOTERS.map((v) => v.id as string);
+const VOTER_IDS = GF_VOTERS_FROZEN_21.map((v) => v.id as string);
 const CANDIDATE_READ_IDS: readonly string[] = [
   'term-premium-10y',
   'ebp',
@@ -725,14 +725,14 @@ emit('|---|---|---|---|');
 {
   const lanesOf = (voters: readonly GfVoter[], lanes: readonly string[]): string[] =>
     lanes.map((lane) => `${lane}: ${voters.filter((v) => v.lane === lane).length}`);
-  const frozen = lanesOf(GOLD_LANE_VOTERS, ['borrowing-costs', 'dollar', 'stress', 'inflation']);
+  const frozen = lanesOf(GF_VOTERS_FROZEN_21, ['borrowing-costs', 'dollar', 'stress', 'inflation']);
   const p24 = lanesOf(GF_VOTERS_P2_4LANE, ['borrowing-costs', 'dollar', 'stress', 'inflation']);
   const p25 = lanesOf(GF_VOTERS_5LANE, ['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows']);
   const rows = ['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows'];
   for (let i = 0; i < rows.length; i++) {
     emit(`| ${rows[i]} | ${i < 4 ? frozen[i] : '—'} | ${i < 4 ? p24[i] : '—'} | ${p25[i]} |`);
   }
-  emit(`| **total** | **${GOLD_LANE_VOTERS.length}** | **${GF_VOTERS_P2_4LANE.length}** | **${GF_VOTERS_5LANE.length}** |`);
+  emit(`| **total** | **${GF_VOTERS_FROZEN_21.length}** | **${GF_VOTERS_P2_4LANE.length}** | **${GF_VOTERS_5LANE.length}** |`);
 }
 emit();
 emit('The seat-by-seat composition (polarities, justifications) is `gf-p0-proposed.ts`\'s own commented tables — every seat line cites its §4 row. The P1 repairs and the P2 promotions land phase by phase (01-FILL-SPEC §1); **P0 wraps around every voter-set change** (D-GF-6): the recalibration re-runs before any new seat counts.');

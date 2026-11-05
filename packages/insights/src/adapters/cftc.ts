@@ -23,6 +23,7 @@
  */
 
 import { insightsFetch, FormatChangedError } from './fetch-policy';
+import { readZipTextEntries } from './zip';
 import type { FetchDeps } from './types';
 
 export const CFTC_DEAFUT_URL = 'https://www.cftc.gov/dea/newcot/deafut.txt';
@@ -126,4 +127,109 @@ export function parseCftcGoldPositioning(text: string): CftcGoldPositioning {
 export async function fetchCftcGoldPositioning(deps: FetchDeps = {}): Promise<CftcGoldPositioning> {
   const res = await insightsFetch(CFTC_DEAFUT_URL, {}, { ...deps, timeoutMs: deps.timeoutMs ?? CFTC_TIMEOUT_MS });
   return parseCftcGoldPositioning(await res.text());
+}
+
+/* ------------------------------------------------------------------ *
+ * GF-P1 (2026-11-05, the owner's recorded go — the D-4/F1 repair, the
+ * audit report §4 row 5): the CFTC legacy futures-only HISTORICAL
+ * archive — the same site's annual long-format files
+ * (dea/history/deacot<year>.zip, annual.txt), whose gold rows carry
+ * EXACTLY the current deafut.txt's column layout (verified 2026-11-05:
+ * the 2026 file's gold row @ 2026-10-27 is identical to the then-current
+ * deafut.txt's). The parse mirrors parseCftcGoldPositioning's own
+ * assertions row-for-row (the arithmetic identity, finite fields,
+ * OI > 0, the share band) — the GF-P0 recorder
+ * (scripts/gf-p0-record-candidates.ts) validated 565 gold weeks
+ * 2016-01-05 → 2026-10-27 with 0 failures before this parse moved into
+ * production; the calibration measured the backfilled seat's firing
+ * statistics over it (evidence/gf-p0-calibration-2026-11-05.md §5–§6).
+ * Licence: the same public-domain federal work as the weekly file.
+ * ------------------------------------------------------------------ */
+
+/** One annual archive file: dea/history/deacot<year>.zip. */
+export const cftcArchiveUrl = (year: number): string => `https://www.cftc.gov/files/dea/history/deacot${year}.zip`;
+
+/** The archive fetch timeout (the zips are a few MB — slower than the weekly file). */
+export const CFTC_ARCHIVE_TIMEOUT_MS = 90_000;
+
+/** One archive year's outcome (the honest per-file report row). */
+export interface CftcArchiveYear {
+  year: number;
+  url: string;
+  weeks: CftcGoldPositioning[];
+  bytes: number;
+}
+
+/**
+ * Parse one annual.txt body (the LONG format: a header row, then the
+ * quoted market name + the SAME field layout the current deafut.txt
+ * carries after the name). Pure — fixture-testable; throws loudly on a
+ * layout change (never silently skips a row).
+ */
+export function parseCftcGoldArchiveAnnual(text: string): CftcGoldPositioning[] {
+  const out: CftcGoldPositioning[] = [];
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (trimmed === '') continue;
+    if (trimmed.startsWith('"Market and Exchange Names"')) continue; // the header row
+    const nameMatch = /^"([^"]*)"/.exec(trimmed);
+    if (nameMatch === null || nameMatch[1] !== CFTC_GOLD_MARKET) continue;
+    const rest = trimmed.slice(nameMatch[0].length);
+    const fields = rest.split(',');
+    // The quoted-name prefix leaves a leading empty field — drop it so the
+    // map starts at the YYMMDD date (the production parse's own rule).
+    if (fields[0] !== undefined && fields[0]!.trim() === '') fields.shift();
+    if (fields.length < 14) {
+      throw new FormatChangedError(`CFTC annual: the gold row carries ${fields.length} fields (expected ≥14 — layout change?)`);
+    }
+    const date = isoOf(fields);
+    const oi = Number(fields[COL.openInterest]!.trim());
+    const long = Number(fields[COL.nonCommLong]!.trim());
+    const short = Number(fields[COL.nonCommShort]!.trim());
+    const spread = Number(fields[COL.nonCommSpread]!.trim());
+    const commLong = Number(fields[COL.commLong]!.trim());
+    const commShort = Number(fields[COL.commShort]!.trim());
+    const totLong = Number(fields[COL.totRepLong]!.trim());
+    const totShort = Number(fields[COL.totRepShort]!.trim());
+    const numbers = [oi, long, short, spread, commLong, commShort, totLong, totShort];
+    if (date === undefined || numbers.some((n) => !Number.isFinite(n))) {
+      throw new FormatChangedError(`CFTC annual: the gold row @ ${date ?? '?'} carries a non-numeric field (layout change?)`);
+    }
+    // The file's own arithmetic identity (the production parse's strongest
+    // assertion — proves the column map on every row).
+    if (long + spread + commLong !== totLong || short + spread + commShort !== totShort) {
+      throw new FormatChangedError(
+        `CFTC annual: the gold row @ ${date} fails the reportable-positions identity (layout change?)`,
+      );
+    }
+    if (oi <= 0) throw new FormatChangedError(`CFTC annual: the gold row @ ${date} — open interest ${oi} (layout change?)`);
+    const netSharePct = ((long - short) / oi) * 100;
+    if (netSharePct < -100 || netSharePct > 100) {
+      throw new FormatChangedError(
+        `CFTC annual: the net share ${netSharePct.toFixed(2)}% @ ${date} falls outside [-100, 100] (wrong fields?)`,
+      );
+    }
+    out.push({ date, netSharePct: Math.round(netSharePct * 1e4) / 1e4, openInterest: oi });
+  }
+  return out;
+}
+
+/**
+ * Fetch + parse one archive year's zip → its gold weeks (fails loudly per
+ * year; the caller discloses failures, never silently skips).
+ */
+export async function fetchCftcGoldArchiveYear(year: number, deps: FetchDeps = {}): Promise<CftcArchiveYear> {
+  const url = cftcArchiveUrl(year);
+  const res = await insightsFetch(url, {}, { ...deps, timeoutMs: deps.timeoutMs ?? CFTC_ARCHIVE_TIMEOUT_MS });
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  const entries = await readZipTextEntries(bytes);
+  const annual = entries.get('annual.txt');
+  if (annual === undefined) {
+    throw new FormatChangedError(`CFTC archive ${year}: the zip carries no annual.txt (entries: ${[...entries.keys()].join(', ')})`);
+  }
+  const weeks = parseCftcGoldArchiveAnnual(annual);
+  if (weeks.length === 0) {
+    throw new FormatChangedError(`CFTC archive ${year}: no parsable gold rows (retired or renamed?)`);
+  }
+  return { year, url, weeks, bytes: bytes.byteLength };
 }
