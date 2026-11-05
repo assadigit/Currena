@@ -57,20 +57,23 @@ them, it does not restate them.
 
 ## The owner's decision list (the audit report §5, restated — it gates this program)
 
-**Status at GF-S3 close: recorded-open on every item.** Re-issued by GF-S1
+**Status at GF-S4 close: recorded-open on every item.** Re-issued by GF-S1
 (the calibration scenarios + the printed list), **again by GF-S2**
-(2026-11-05 — the lane-rule question added as the list's first item), and
+(2026-11-05 — the lane-rule question added as the list's first item),
 **again by GF-S3** (2026-11-05 — still no answers recorded in chat or the
-repo between the closes; the GA lock-fallback precedent applies again:
-the deliverable halves only, the P1 repairs stay gated). **The GF-S2
-re-issue ADDS the lane-rule question as the list's first item (A below)**
-— the question the GF-P0 calibration itself opened (the C2 STOP branch,
-the report §4); it is the one item the audit's §5 could not carry, the
-audit having closed before the calibration ran. The calibration's measured
-additions per item live in the report §8 (the GF-S1 re-issue's own
-table); the list the owner answers is **A–K** as printed in the GF-S3
-session's final message — one recorded answer per item, and the answers
-gate P1 (and the P2 composition questions they name).
+repo between the closes), and **again by GF-S4** (2026-11-05 — the same
+check repeated: the repo holds no commits after the GF-S3 merge, and the
+session's chat carried no answers; the GA lock-fallback precedent applies
+a fourth time: the deliverable halves only, the P1 repairs stay gated).
+**The GF-S2 re-issue ADDS the lane-rule question as the list's first item
+(A below)** — the question the GF-P0 calibration itself opened (the C2
+STOP branch, the report §4); it is the one item the audit's §5 could not
+carry, the audit having closed before the calibration ran. The
+calibration's measured additions per item live in the report §8 (the
+GF-S1 re-issue's own table); the list the owner answers is **A–K** as
+printed in the GF-S4 session's final message — one recorded answer per
+item, and the answers gate P1 (and the P2 composition questions they
+name).
 
 | # | The decision | The recommendation (the audit's; the GF-P0 calibration's where marked ⚙) |
 |---|---|---|
