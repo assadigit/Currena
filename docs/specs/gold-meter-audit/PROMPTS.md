@@ -1,4 +1,4 @@
-# Session kickoff prompts — the gold meter audit program
+# Session kickoff prompts — the gold meter audit program (CLOSED) → the gold meter gap-fill program
 
 The owner's continuation of the gold program (2026-11-04): after the gold
 balance consolidation closed (GB-S7), **audit that the meter holds the full
@@ -8,6 +8,15 @@ is this folder: `README.md` (decisions D-GA-1..10, open items OI-GA-1..6) →
 `01-AUDIT-SPEC.md` → `02-REFERENCE-TAXONOMY.md` (the checklist — the audit's
 fixed denominator) → `03-METHOD-AND-EVIDENCE.md` → `04-REPORT-AND-FILL-DESIGN.md`
 → `PROGRESS.md` (the authoritative log).
+
+**PROGRAM STATUS: CLOSED 2026-11-05 at GA-S4** — A1–A4 whole (the taxonomy
+locked v1.1 = 85 rows · the inventory + wiring pack · the coverage matrix
++ the 18 defects · the report + the fill design). The audit's verdict:
+`docs/insights/GOLD-METER-AUDIT-REPORT.md`. **The successor — the gold
+meter gap-fill program (`docs/specs/gold-meter-gapfill/`, created by its
+first session) — receives the D-GA-9 convention: its GF-S1 kickoff prompt
+is at the foot of this file** (the live kickoff; paste it into a fresh
+session at the repo root).
 
 **How to use this file.** Paste the next session's prompt into a fresh agent
 session at the repo root. Before starting: `git pull --rebase`; make sure
@@ -32,7 +41,7 @@ deploy nothing — and every session of this program is docs/scripts-only
 | GA-S2 | The inventory + wiring evidence pack; the mirror sweep | `ga/s2-inventory` | no |
 | GA-S2-completion | The voters table + the wiring trace + the history depths (A2's deferred half, after the lock) | `ga/s2-wiring` | no |
 | GA-S3 | The coverage matrix classified; the half-implementation defects | `ga/s3-matrix` | no |
-| GA-S4 | The audit report + the fill-program design + its prompts | `ga/s4-report` | no |
+| GA-S4 | The audit report + the fill-program design + its prompts | `ga/s4-report` — **DONE (2026-11-05): the program CLOSED; the GF-S1 prompt at the foot of this file is the live kickoff** | no |
 
 A session that finishes early pulls the next milestone forward (the GB-S1
 precedent). PROGRESS.md is the authoritative state.
@@ -128,230 +137,166 @@ below.**
 
 ---
 
-## GA-S4 — the report + the fill program (the live kickoff)
+## GA-S4 — the report + the fill program
+
+RUN (2026-11-05) — **COMPLETE: A4 DELIVERED — THE AUDIT PROGRAM CLOSES.**
+`docs/insights/GOLD-METER-AUDIT-REPORT.md` delivered per 04 §1: the
+header arithmetic up front (**rows classified = 85 · voters mapped = 21
+· defects = 18**; the headline as fractions — **COVERED 8/85 ≈ 9.4% ·
+any voting expression 15/85 ≈ 17.6%**), the condensed coverage matrix
+(per-family summaries + the COVERED core + every non-COVERED row in
+full — the 74 own-class rows + the 3 cross-lists), the 18 defects with
+severity and treatment, **the RANKED 47-row backlog** (the tie-break
+cascade recorded; F6's band-tally slip disclosed and restated at 18 per
+its own fill cell; the bands 27×12 · 18×10 · 12×6 · 9×3 · 8×9 · 6×1 ·
+4×6), the owner's decision list with the audit's recommendation per
+item (OI-GA-2 add-the-lane · OI-GA-3 fold-into-GF-P2 · OI-GA-4
+context-first · OI-GA-5 no-EODHD-use-proposed · OI-GA-6 standing · N-1
+AMEND · D-7/D-8 context-demotion · D-18 input-presence-rule · D-1
+derive-don't-assume · the 12 promotion go/no-gos: PROMOTE ×8 · CONTEXT
+ADD ×3 · D7 seat-or-context), the fill-program design concretized
+(**GF-P0..P5 loaded with the ranked backlog**, the standing
+constraints, the end state), and the honesty footer. The lean check
+re-run fresh → identical on every seat. PROGRESS rows D AND E →
+COMPLETE — **A1–A4 whole; the program is CLOSED**. CHANGELOG
+[2026-11-05d]. AGENT_HANDOFF restated for the successor. **The
+successor program — the gold meter gap-fill program (`docs/specs/
+gold-meter-gapfill/`, created by ITS first session) — receives the
+D-GA-9 convention: its GF-S1 kickoff prompt is below and printed in the
+GA-S4 final message.**
+
+---
+
+## GF-S1 — the gap-fill program's first session: the P0 recalibration pre-registration (the live kickoff)
 
 ```
-You are working in the Currena repo at the repo root. This is the GA-S4
-session of the gold meter audit program — the owner's continuation of the
-gold program, and the audit program's LAST session (01 §8). Read this
-whole prompt before doing anything.
+You are working in the Currena repo at the repo root. This is the GF-S1
+session of the gold meter gap-fill program — the owner-gated successor
+to the CLOSED gold meter audit program (GA-S1..GA-S4, CLOSED 2026-11-05;
+its record: docs/specs/gold-meter-audit/PROGRESS.md; the audit's
+verdict: docs/insights/GOLD-METER-AUDIT-REPORT.md — READ THE REPORT
+FIRST, especially §4 the ranked backlog, §5 the owner's decision list
+and §6 the fill design). Read this whole prompt before doing anything.
 
 CONTEXT — WHERE WE STAND
-The gold balance consolidation program is COMPLETE and LIVE (closed
-2026-11-04 at GB-S7 — the consolidated lane balance is THE gold card for
-every visitor on currena.ir; its record: docs/specs/gold-balance-
-consolidation/PROGRESS.md). The owner then instructed: "As a financial
-investor with 20 years specialization in gold exchange, create an audit
-program to make sure that our gold meter has all the required indicators
-which classically show the direction of gold price. Make sure nothing is
-missed or half-implemented." The spec set is docs/specs/gold-meter-audit/.
-THE DENOMINATOR IS LOCKED: 02-REFERENCE-TAXONOMY.md is v1.1 = 85 rows,
-LOCKED 2026-11-05 by the owner's delegated instruction (the lock record
-with the verbatim instruction at 02's foot; from here additions are
-owner-recorded amendments with dates only, D-GA-1).
-A1+A2 ARE COMPLETE (GA-S1 + GA-S2 + GA-S2-completion — PROGRESS rows A
-and B ✅): the taxonomy, the 161-row readings table with the mirror sweep
-(voter 21 · context 63 · not-gold 77), the 25 derived-series recipes, the
-rung map, the 21-seat voters table with the evalLeg rule per seat
-(4 move-threshold seats · 17 level-only), the 21 full wiring traces (no
-TRACE-BROKEN hops) + the 63 context traces, the history depths
-(evidence/history-depths-2026-11-05.txt), and the wire-scan family
-(ga-s2-wire-scan.sh + the 2026-11-04/-05 runs).
-A3 IS COMPLETE (GA-S3, 2026-11-05 — PROGRESS row C ✅), the audit's
-first verdict-bearing session:
-  - evidence/coverage-matrix.md — ALL 85 rows classified, one class each
-    (COVERED 8 · PARTIAL 7 · MISSING-FREE 36 · MISSING-PAID 10 ·
-    CONTEXT-ONLY-BY-DESIGN 18 · NOT-APPLICABLE 3, + the 3 cross-lists
-    resolved to primaries I5→R7 · I6→R8 · X6→I10; the header arithmetic
-    stated: rows classified = 85, voters mapped = 21), every reason
-    citing wiring.md or a recorded absence, the fill column seeding the
-    backlog (yes 47 = 7 PARTIAL + 36 MISSING-FREE + 4 promote-worthy COBD,
-    the severity components per 04 §2; the 27-band: R4 · R6 · R8 · R9 ·
-    R10 · D4 · S4 · S7 · S13 · F1 · F2 · G1 — 12 rows, every one a
-    core-channel claim with the data in hand).
-  - THE VOTER MAPPING, 21 seats: 20 to exactly one row each (R1 ×3 —
-    real-yield-10y the exact object + us10y/us30y as belt-and-braces
-    nominal proxies, H4 accept-with-note; R4 ×2; R5; R6; R7 ×2 —
-    breakeven-tilt mapped to R7's change accent, 02 R13's own "free
-    proxy" note corrected honestly: the repo's tilt T5YIFR−T5YIE has no
-    swap leg, so R13 classes MISSING-PAID on its own footing; R10 ×2;
-    D1; D4; S1; S5 ×2; X1; F1; I1; I2) + **1 UNCLASSICATED — finding
-    N-1: euro-hicp** (the locked checklist holds no euro-area
-    realised-inflation row; the owner decides amend-vs-re-seat).
-    michigan-sentiment's mirror-sweep mark was revisited and recorded
-    against S13 (S13 = MISSING-FREE promotion-class — the exact UMCSENT
-    object already ingested as a growth-health voter; the re-seat needs
-    the owner's polarity decision: the growth rule reads bottom-quintile
-    sentiment as growth-NEGATIVE, S13's claim reads pessimism as
-    gold-POSITIVE).
-  - evidence/half-implementation.md — the H1–H7 checks per voter, 18
-    defect rows: D-1 THE STRUCTURAL FINDING (17 of 21 seats level-leg
-    only — connections.ts:575-585 defines move thresholds for just 4 ids,
-    so a readable-but-typical seat reads steady by construction) + 17
-    per-voter rows across 10 voters (11 carry none): H1 3 (D-2
-    fed-expectations — R6's change-led claim with no move leg; D-3
-    usdjpy — D4's "change emphasis", the pct changeKind unconsumed) ·
-    H2 3 (D-4 cftc 1 pt / base 0 / 0-of-9 days; D-5 gold-silver
-    122 pts / base 119 / ch30d 0-of-19 recorded days; D-6
-    us-japan-10y-gap 21 pts / base 20 / pct 6-of-9 days) · H3 2 (D-7/D-8
-    the yield-curve pair: the fixed −1 polarity on R4's
-    regime-dependent claim — the frozen spec's own "ambiguous" record;
-    the re-seat options stated for the owner) · H4 5 (D-9/D-10 us10y/
-    us30y nominal-vs-real belt-and-braces; D-11/D-12 the nominal curve
-    vs the real curve, riding R2's DFII5 fill; D-13 the 10y market gap
-    vs R10's policy-gap object) · H5 4 (D-14 cftc — the F-family's only
-    seat anywhere, OI-GA-2's exact evidence; D-15 gold-silver the only
-    X in stress; D-16 us-japan-10y-gap the dollar lane's thin third
-    seat; D-17 euro-hicp the solo euro leg, riding N-1) · H6 1 (**D-18
-    the fake-steady finding, the lean check's discovery: cftc reads
-    `steady`, NOT `unread`** — its fresh warning-status value passes
-    readable() at gold-balance.ts:127-129 while neither evalLeg input
-    exists) · H7 0 (verified coherent — the member line speaks only the
-    evaluator's own evidence words, the B-12 pin holds). The ecb-dfr
-    hold verified honest (adapters/snapshot.ts:451-465). Treatments
-    proposed: repair 6 (D-2 · D-3 · D-4 · D-5 · D-6 · D-18) ·
-    repair-if-filled 2 (D-11/D-12 riding R2) · re-seat 2 (D-7/D-8, one
-    sign decision) · owner-decisions 3 (D-14 = OI-GA-2 · D-16's lane
-    half · D-17 = N-1) · accept-with-note 5 (D-9 · D-10 · D-13 · D-15 +
-    the structural D-1 acceptance pending the threshold question).
-  - The lean check: packages/insights/scripts/ga-s3-lean-check.sh (the
-    new read-only keyless script, the ga-s2-wire-scan.sh precedent) +
-    its committed run evidence/lean-check-2026-11-05.txt — 6 seats fire
-    on the fresh wire (real-yield-10y + us10y move-leg supports; us30y +
-    fed-expectations + usdjpy level-leg pressures at decade highs
-    0.984/0.826/0.946; breakeven-5y5y move-leg pressures), 14 readable
-    seats honestly steady, ecb-dfr unread (the hold), ALL FOUR LANES
-    `neutral` today (borrowing-costs a 2/2 split — the min-2 rule
-    holding). Re-run it fresh this session if useful (read-only,
-    keyless).
-  - The pre-classification re-verification runs: ga-s2-history-depths.sh
-    re-run → identical; ga-s2-wire-scan.sh re-run → byte-identical to
-    the committed 11-05 run.
-Repo state: main holds the GA-S3 merge (PR "gold meter audit (GA-S3):
-the coverage matrix + the half-implementation defects"); git pull
---rebase before starting.
+The gold meter audit program is CLOSED and DELIVERED (2026-11-05):
+against the LOCKED taxonomy (02 v1.1 = 85 rows) it classified all 85
+rows (COVERED 8 · PARTIAL 7 · MISSING-FREE 36 · MISSING-PAID 10 ·
+CONTEXT-ONLY-BY-DESIGN 18 · NOT-APPLICABLE 3 + the 3 cross-lists),
+mapped all 21 voters (20 rows + 1 UNCLASSICATED — euro-hicp, finding
+N-1), found 18 half-implementation defects (D-1 the structural
+17-of-21 level-only finding … D-18 the fake-steady finding), ranked the
+47-row backlog, and stated the owner's decision list with the audit's
+recommendations. The predecessor gold balance consolidation is COMPLETE
+and LIVE (GB-S7, 2026-11-04): the consolidated lane balance is THE gold
+card for every visitor on currena.ir.
+THE METER IS FROZEN — the audit changed nothing (D-GA-3). Every change
+is THIS program's, owner-gated: the per-seat approval lineage (D-GB-9
+as amended at GB-S7) — every gold-score.ts / GOLD_LANE_VOTERS edit
+requires the owner's RECORDED approval per seat change, with the audit
+report's §4 row as the justification attached to each approval.
+THE OWNER'S DECISION LIST (the report §5) GATES THE VOTER SET:
+OI-GA-2 (a fifth flows & demand lane? — the audit recommends ADDING) ·
+OI-GA-3 (the S6-M6.4 shadow pair D5/S6 — fold into GF-P2) · OI-GA-4
+(WGC quarterly — context-first recommended) · OI-GA-5 (EODHD — no use
+proposed) · OI-GA-6 (copy rounds 79+) · N-1 (euro-hicp: AMEND the
+taxonomy — an owner-recorded amendment with its date, D-GA-1 — or
+re-seat; AMEND recommended, the denominator becomes 86) · the D-7/D-8
+yield-curve sign decision (context demotion recommended) · the D-18
+readable-rule question (input-presence rule recommended) · the D-1
+threshold question (derive, don't assume) · the per-row go/no-go for
+the 12 zero-new-fetch class (R9 · I3 · I10 · S4 · S7 · S8 · S13 · G1 ·
+X7 · F2 · D7 · I11 — PROMOTE ×8 · CONTEXT ADD ×3 · D7 seat-or-context).
+NOTHING EXECUTES WITHOUT THE OWNER'S RECORDED GO. If decisions are
+recorded (in chat or the repo), assemble the proposed voter set from
+them; if not, run the calibration over the CURRENT frozen set + the
+audit's ranked candidates as clearly-labelled SCENARIO tables, and
+print the decision list for the owner (the GA lock-fallback precedent).
 
 WHAT THIS SESSION IS
-GA-S4 (01 §2 A4; 04 §1–§5): **the audit report + the fill-program design
-with its session prompts** — the program's closing deliverable. Two
-artifacts and the record: (1) docs/insights/GOLD-METER-AUDIT-REPORT.md
-per 04 §1's shape — the header arithmetic up front (rows classified = 85
-· voters mapped = 21 · defects found = 18 · the headline: how much of
-the classic condition set the meter sees today, the COVERED+healthy
-share stated as a fraction with the row count), the condensed coverage
-matrix (per-family summaries + every non-COVERED row in full), the
-half-implementation defects with severity, the gap backlog RANKED (every
-PARTIAL + MISSING-FREE + promote-worthy COBD row, sorted by the 04 §2
-severity with ties broken toward cheaper wiring, each with its named
-free source and the fill phase it lands in), the owner's decision list
-stated (below), and the honesty footer (no forecasting claim, 01 §4.1 —
-the fill program adds coverage of the classic condition set, nothing
-more); (2) the fill-program design per 04 §3–§4 made concrete: the
-GF-P0..P5 phases loaded with the ranked backlog (which rows land in
-which phase), the standing constraints restated, the end state (04 §5),
-and the GF-S1 kickoff prompt WRITTEN IN PROMPTS.md from this program's
-template convention (the fill program's home docs/specs/gold-meter-
-gapfill/ is created by ITS first session, not this one) — PRINTED in
-your final message per D-GA-9. GA-S4 still edits NO meter code (D-GA-3)
-and deploys nothing — the fill program executes only on the owner's
-recorded go, phase by phase.
+GF-S1 (the fill design's GF-P0 phase, the report §6.1): THE
+RECALIBRATION PRE-REGISTRATION — (1) create the fill program's home
+docs/specs/gold-meter-gapfill/ (README with the decision log +
+01-FILL-SPEC + PROGRESS + PROMPTS — the audit program's structure as
+the template, the audit's 04 §3–§5 as the founding spec); (2) the
+proposed voter set (post-fill) added to the read-only harness as NEW
+TABLES BESIDE THE FROZEN ONES — no product code; (3) the lane rule
+(min-firing) re-derived per the GB-S1 protocol (the C1/C2 criteria
+over the corpus); (4) the lane-count question (OI-GA-2) answered with
+the calibration evidence (4-lane vs 5-lane scenarios, the F-family's
+D-14 evidence in hand); (5) the D-1 threshold calibration proposal
+(which of the 17 level-only seats deserve move thresholds — derive
+from the corpus distributions + the 02 treatments; D-2/D-3's two
+repairs are already P1 items).
 
 WORK ITEMS (in order)
-1. READ FIRST: docs/specs/gold-meter-audit/README.md (the decision log
-   D-GA-1..10 + the open items OI-GA-1..6), 01-AUDIT-SPEC.md (§7 what
-   the audit is not), 02-REFERENCE-TAXONOMY.md (the LOCKED v1.1 = 85
-   rows), 03-METHOD-AND-EVIDENCE.md, 04-REPORT-AND-FILL-DESIGN.md (§1
-   the report shape, §2 the severity components, §3 the GF phases, §4
-   the standing constraints, §5 the end state — THIS session's spec),
-   PROGRESS.md (all session blocks), PROMPTS.md; then the whole A3
-   evidence pack (evidence/coverage-matrix.md + half-implementation.md +
-   lean-check-2026-11-05.txt + the GA-S2 pack: inventory.md + wiring.md
-   + history-depths-2026-11-05.txt + the wire scans). Then git pull
-   --rebase.
-2. THE REPORT: docs/insights/GOLD-METER-AUDIT-REPORT.md per 04 §1 —
-   every number restated from the evidence files with their citations
-   (the arithmetic 85/21/18; the COVERED share 8/85; the class tally;
-   the backlog 47 with the severity sort; the defects with treatments).
-   The report is the OWNER-READABLE verdict: plain about what the meter
-   sees and what it does not, honest about every promote-worthy and
-   repairable gap, no hedging that hides a defect, no forecasting claim
-   anywhere (D-GA-2).
-3. THE FILL-PROGRAM DESIGN: concretize 04 §3 — map the ranked backlog
-   to the phases (GF-P1 repairs: the 6 repair defects + the 2
-   repair-if-filled; GF-P2 promotions: the 12 zero-new-fetch class +
-   the promote-worthy COBD questions; GF-P3 new free sources: the
-   MISSING-FREE fills that need a fetch; GF-P4 context additions: the
-   X/G/H context winners; GF-P0 wrapping every voter-set change with
-   the recalibration; GF-P5 acceptance+flip), restate the standing
-   constraints (04 §4 — the per-seat owner approval for every
-   gold-score.ts edit, the recalibration before any new voter counts,
-   the gates, the copy rounds), and state the end state (04 §5).
-4. THE OWNER'S DECISION LIST, stated in the report (04 §1.5) and in
-   PROGRESS's Owner-must-decide: OI-GA-2 (a fifth lane? — with D-14's
-   evidence: the F-family's only seat anywhere is dead and solo) ·
-   OI-GA-3 (the S6-M6.4 promotion — D5/S6, the dedollar shadow pair) ·
-   OI-GA-4 (WGC quarterly: voter vs context-first for F3/F4/F5/F13/
-   F15/F16/H1–H4) · OI-GA-5 (EODHD per-item policy: F9/F10/S2/S3/G7) ·
-   OI-GA-6 (the copy rounds for any new context line) · **NEW N-1**
-   (euro-hicp UNCLASSICATED: amend the taxonomy — an owner-recorded
-   amendment with its date, D-GA-1 — or re-seat/remove the voter) ·
-   **the D-7/D-8 yield-curve sign decision** (the four recorded options)
-   · **the D-18 readable-rule question** (accept-with-note or the
-   input-presence rule) · **the D-1 threshold question** (which of the
-   17 level-only seats deserve move thresholds — the calibration
-   proposal) · the per-row promotion go/no-go for the 12 zero-new-fetch
-   class (R9 · I3 · I10 · S4 · S7 · S8 · S13 · G1 · X7 · F2 · D7 ·
-   I11). Each with the audit's recommendation and the recorded-open
-   status — GA-S4 PROPOSES, the owner decides; nothing executes here.
-5. RECORD: PROGRESS.md — the session block + milestone rows D AND E →
-   COMPLETE (the program closes: A1–A4 whole); CHANGELOG.md — a dated
-   entry in the house style; PROMPTS.md — the GF-S1 kickoff prompt
-   written from the template with the exact state (the fill program's
-   first session, its branch gf/p0-recalibration per the 04 §3 P0
-   phase, its exit gate = the calibration report + the owner's recorded
-   go on the proposed voter set), and the GA-S4 prompt superseded by
-   its completion record.
+1. READ FIRST: docs/insights/GOLD-METER-AUDIT-REPORT.md (the whole
+   verdict) + the audit's evidence pack (docs/specs/gold-meter-audit/
+   evidence/ — coverage-matrix.md + half-implementation.md + the
+   committed runs) + the gold-balance consolidation's GB-S1 calibration
+   record (docs/specs/gold-balance-consolidation/ — the C1/C2 protocol
+   and the min-2 derivation) + gold-score.ts / gold-balance.ts / the
+   harness (read-only). Then git pull --rebase.
+2. THE PROGRAM HOME: docs/specs/gold-meter-gapfill/ — README.md (the
+   decision log D-GF-*: the inherited constraints — the per-seat
+   approval rule, the beam formula unchanged, the no-forecasting rule,
+   free-first, every number from a run, the D-GA-9 prompt convention)
+   + 01-FILL-SPEC.md (the phases GF-P0..P5 loaded with the ranked
+   backlog from the report §4/§6, the gates, the standing constraints,
+   the end state) + PROGRESS.md (the milestone table: rows for P0..P5)
+   + PROMPTS.md (this prompt as the first record).
+3. THE CALIBRATION (GF-P0 proper): the proposed voter set as new
+   read-only harness tables beside the frozen ones (a
+   GF-proposed-voters table + the calibration scripts, the GB-S1
+   precedent — no product code, no deploy); the min-firing rule
+   re-derived per the C1/C2 criteria over the corpus; the lane-count
+   scenarios for OI-GA-2; the D-1 threshold proposal (per-seat,
+   derived, with the 02-treatment justification per seat).
+4. THE CALIBRATION REPORT: committed under the fill program's evidence
+   folder with its runnable record (the script + the committed output —
+   the GA evidence-pack convention); the proposed voter set stated for
+   the owner's go, with every scenario table labelled.
+5. RECORD: the fill program's PROGRESS session block + milestone row;
+   CHANGELOG (house style); the GF-S2 prompt (the next phase per the
+   owner's decisions — P1 repairs if the go is recorded, else the
+   decision-list re-issue).
 
 CONSTRAINTS (standing, every session of this program)
-- D-GA-3: read-only against the code. No edits to gold-score.ts,
-  gold-balance.ts, GOLD_LANE_VOTERS, harness tables, schemas, adapters,
-  copy dictionaries. Docs + read-only scripts only. Deploy NOTHING.
-- D-GA-2: no forecasting claim anywhere; coverage/honesty language only
-  — the severity ranking is classic-literature importance × data
-  availability × wiring cost, never a backtest of proposed voters
-  (01 §4.1; the standing no-edge record stays operative).
-- D-GA-1/D-GA-6: the denominator is LOCKED (v1.1 = 85 rows); if the
-  owner amends in-session (e.g. the N-1 euro-inflation row), record it
-  in 02 as an owner-recorded decision with its date and restate the
-  arithmetic downstream. One class per row already fixed — the report
-  may not re-classify anything the matrix classed.
-- Every number from a run or a citation (01 §4.3): restate only what the
-  evidence files and the committed runs carry (the citation base:
-  coverage-matrix.md + half-implementation.md + wiring.md + the four
-  committed runs; re-run the read-only scripts if you need today's
-  numbers).
-- Branch ga/s4-report; PR "gold meter audit (GA-S4): the report + the
-  fill-program design"; push after each milestone; merge yourself when
-  the exit gate holds; CI green on main verified. Docs-only: no deploy.
+- THE PER-SEAT APPROVAL RULE: every gold-score.ts / GOLD_LANE_VOTERS
+  edit requires the owner's RECORDED approval per seat change — the
+  audit report's §4 row is the justification attached to each. GF-P0
+  adds NO product code at all (the proposed set lives in new read-only
+  tables beside the frozen ones).
+- The beam formula, the honesty rules and the no-edge record are
+  inherited UNCHANGED (D-GB-8 lineage); the min-2 lane rule is
+  RE-DERIVED, not assumed (this session's whole point).
+- No forecasting claim anywhere (D-GA-2 lineage): the calibration
+  measures firing statistics and lane behaviour, never predictive
+  power; copy says "conditions".
+- Free-first (D-GA-5 lineage): every new source the backlog names is
+  free/keyless/licence-clean; EODHD only with the owner's recorded
+  per-item approval (none proposed).
+- Every number from a run or a citation; recommendations re-checked
+  against code before they are written down.
+- Branch gf/p0-recalibration; PR "gold meter gapfill (GF-S1): the P0
+  recalibration pre-registration"; push after each milestone; merge
+  yourself when the exit gate holds; CI green on main verified. P0
+  deploys nothing.
 
 EXIT GATE
-docs/insights/GOLD-METER-AUDIT-REPORT.md merged: the header arithmetic
-stated (rows classified = 85 · voters mapped = 21 · defects = 18 · the
-COVERED share as a fraction), the condensed matrix + every non-COVERED
-row, the defects with severities, the RANKED backlog with phases, the
-owner's decision list stated (OI-GA-2..6 + N-1 + the sign/readable-rule/
-threshold questions + the per-row promotions), the honesty footer; the
-fill-program design concretized (GF-P0..P5 loaded, the standing
-constraints, the end state); PROGRESS rows D AND E COMPLETE (the
-program closes); the GF-S1 kickoff prompt written, committed, pushed,
-merged, printed in your final message with a 5-line summary (what
-shipped, the verdict's headline numbers, the owner's decision list).
+docs/specs/gold-meter-gapfill/ exists (README + 01-FILL-SPEC + PROGRESS
++ PROMPTS); the calibration report committed with its runnable record;
+the proposed voter set stated in new read-only tables beside the frozen
+ones (no product code); the lane-rule re-derivation + the OI-GA-2
+lane-count scenarios + the D-1 threshold proposal delivered; the
+owner's decision list printed; the GF-S2 prompt written, committed,
+pushed and printed (D-GA-9). The owner's recorded go on the proposed
+voter set closes P0 — if the owner is not reachable in-session, the GA
+lock-fallback precedent applies (deliver everything deliverable, print
+the decision list, re-issue).
 
 AT THE END (the standing close-out, every session)
-1. PROGRESS.md session block + milestone rows; 2. CHANGELOG entry; 3.
-the next prompt (the GF-S1 kickoff) rewritten in PROMPTS.md; 4. commit,
-push, PR, merge when green; 5. final message = the printed next prompt
-+ the 5-line summary. (D-GA-9: the owner asked for a next-session prompt
-at the end of EVERY session — never end without one; the GA program's
-last session hands the convention to the fill program's first.)
+1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the
+next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
+green; 5. final message = the printed next prompt + the 5-line summary.
 ```
