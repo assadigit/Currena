@@ -3286,6 +3286,31 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'Anyone who earns dirhams but spends in another currency effectively rides the dollar; the peg makes this the quietest number on the page.',
   },
+  // ---- GF-P2 (2026-11-05, the owner's recorded per-row answer — the audit
+  // report §4 row 23 / D7: the haven pair's other leg, a CONTEXT card —
+  // the seat question stays recorded-open) ----
+  usdchf: {
+    name: 'Dollar vs Swiss franc',
+    ticker: 'USD/CHF',
+    oneLiner:
+      'How many Swiss francs one US dollar buys: the haven pair’s other leg beside the yen.',
+    lines: {
+      highRising: 'The dollar is gaining on the franc: haven demand is not running through Europe’s safe currency.',
+      highEasing: 'The dollar remains firm against the franc but is easing back.',
+      typical: 'The dollar–franc rate sits in its usual range for the decade.',
+      low: 'The franc is gaining on the dollar: the European haven-demand setting the desk watches beside a bid yen.',
+    },
+    whatItIs:
+      'The USD→CHF reference rate (ECB rates via Frankfurter, daily): how many Swiss francs one US dollar buys in the foreign-exchange market.',
+    whyItMatters:
+      'The franc is the fellow haven: a falling USD/CHF (a strengthening franc) usually marks the European haven-demand regime that accompanies gold’s flight bids — the desk watches CHF and JPY together as the funding/haven pair.',
+    tendedToMean:
+      'A context card: it reads its own decade range and votes in no gauge; the franc’s big regime shifts (the 2011 and 2015 floor episodes) sit inside that range.',
+    cantTell:
+      'A quiet franc can mean firm Swiss policy or a calm world: the pair alone does not say which side moved.',
+    forYou:
+      'Read it beside USD/JPY and the gold cards: the franc and the yen are the two ends of the haven trade, and gold usually trades with the same bid.',
+  },
   // ---- M6 Wave 3 (2026-10-25): the leading-edge batch (recovered from the deployed bundle) ----
   'mortgage-30y': {
     name: 'The US 30-year home-loan rate',
@@ -5362,6 +5387,32 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
       'Positioning says how crowded the boat is, not which way the wind blows: crowded books can stay crowded for months.',
     forYou:
       'The gold market’s crowd gauge: read it beside VIX — stress plus crowding is the combination that unwinds hardest.',
+  },
+  // ---- GF-P2 (2026-11-05, the owner's recorded answer K — the audit report
+  // §4 row 12 / F2: the gross CFTC legs, the flows lane's second seat; the
+  // in-session design decision under the standing delegation — the REAL
+  // OBJECT, the same deafut.txt row the net card reads) ----
+  'cftc-gold-gross-long': {
+    name: 'Gold long positioning (COT)',
+    ticker: 'Gold COT long',
+    oneLiner:
+      'How much of gold futures’ open interest big speculators hold on the long side alone — the buy side, before shorts are netted off.',
+    lines: {
+      highRising: 'Speculators’ long side is more crowded than usual and still growing: the squeeze-then-slump zone.',
+      highEasing: 'The long side remains crowded but is being trimmed.',
+      typical: 'The long side sits in its usual range of the past decade.',
+      low: 'Speculators hold an unusually small share on the long side: positioning has thinned out.',
+    },
+    whatItIs:
+      'The gross non-commercial LONG position in gold futures (big speculators’ longs, before their shorts are netted off) as a share of all open interest, from the CFTC’s weekly Commitments of Traders report (Tuesday data, published Fridays) — the same gold row the net-positioning card reads.',
+    whyItMatters:
+      'The gross long share reads how crowded the BUY side alone is — a richer read than the net figure when speculators run both sides at once, the classic crowded-book shape.',
+    tendedToMean:
+      'The crowded-long zone sits at the top of the share’s own trailing decade — the card reads percentiles and its derived band (about 62% of open interest, the recorded archive’s own top decile), never fixed desk numbers.',
+    cantTell:
+      'Positioning says how crowded the boat is, not which way the wind blows: crowded books can stay crowded for months.',
+    forYou:
+      'The net-positioning card’s gross twin: read the two together — the net share nets this card’s longs against speculators’ shorts, and the gap between them is the short side’s size.',
   },
   'oecd-cli-us': {
     // 2026-10-26 gap-audit build, A-8 (INSIGHTS_DATA_SPEC.md): the OECD's
@@ -8345,6 +8396,9 @@ export const insightsCopyEn = {
     // gap-closure S6-M6.1 (2026-11-02): the New Zealand dollar (EN prefix,
     // the audnzd cross).
     nzd: 'NZ$',
+    // GF-P2 (D7, §4 row 23 — 2026-11-05): the Swiss franc (EN prefix, the
+    // usdchf haven cross).
+    chf: 'CHF',
     // M6 Wave 3 (2026-10-25): the leading-edge batch — the AU
     // billions ("A$97.6bn" EN, suffix in fa), permits and
     // openings scaled to millions ("1.40m permits a year"),
@@ -8816,7 +8870,7 @@ export const insightsCopyEn = {
       // word is goldScore.measuredNoteLink. FA triaged through round-76
       // (docs/localization/persian-copy-round-76-gold-balance.md).
       subtitleLanes:
-        'Gold’s four main drivers are each read against their usual range and weighed equally. The beam shows today’s lean. It is not a forecast.',
+        'Gold’s five main drivers are each read against their usual range and weighed equally. The beam shows today’s lean. It is not a forecast.',
       // The lane chip's second line (03 §2): "{firing} of {readable}
       // drivers firing"; "No driver firing" when 0 fire but the lane is
       // readable; a split lane shows the contest instead.
@@ -8855,6 +8909,11 @@ export const insightsCopyEn = {
         dollar: 'The US dollar against major currencies and the yen.',
         stress: 'Stress in financial markets, from money markets to volatility.',
         inflation: 'Inflation and inflation expectations in the US and Europe.',
+        // GF-P2 (the owner's recorded answer B, OI-GA-2's ADD scenario —
+        // 2026-11-05): the fifth lane's intro, 12 words or fewer,
+        // descriptive only. The lane holds the CFTC positioning pair today;
+        // the WGC/official flows join as their phases land (P3+/P4).
+        flows: 'Speculative positioning and flows into gold.',
       },
       // Gold balance consolidation P2b (GB-S4, 2026-11-03 —
       // 05-VISUAL-DESIGN-SPEC §4.1/§4.4/§4.5/§4.6 + §11's key list): the
@@ -8985,6 +9044,10 @@ export const insightsCopyEn = {
         dollar: 'Dollar',
         stress: 'Market stress',
         inflation: 'Inflation',
+        // GF-P2 (the owner's recorded answer B — 2026-11-05): the fifth
+        // lane's name (OI-GA-2's ADD scenario, D-14's repair — the F-family
+        // gets its own lane).
+        flows: 'Flows & demand',
       },
       // Session 3 (G2): the inflation lane's context phrase, fed by the
       // breakeven-tilt reading (breakevenTiltLean — pure, the panel never
@@ -9021,6 +9084,22 @@ export const insightsCopyEn = {
         // of the context card's own plainName ("The inflation tilt, near
         // vs far"). Same series, same name family, one seat in the lane.
         'breakeven-tilt': 'Inflation tilt',
+        // GF-P2 (2026-11-05, the owner's recorded answers B/C/K — the GF-S7
+        // answer sheet): the thirteen new voters' names — compact forms of
+        // their indicator cards' own names, same family as every entry above.
+        'usd-reserve-share': 'USD reserve share',
+        'nyfed-custody': 'Foreign custody at the NY Fed',
+        'term-premium-10y': '10-year term premium',
+        ebp: 'Excess bond premium',
+        'michigan-sentiment': 'US consumer mood',
+        'gpr-daily': 'Geopolitical risk (7-day)',
+        'epu-us': 'US policy uncertainty',
+        'sp500-breadth-ratio': 'S&P 500 breadth',
+        t5yie: '5-year breakeven',
+        'michigan-1y-expectations': '1-year inflation expectations',
+        'm2-us': 'US money supply',
+        'us-deficit-12m': 'US 12-month deficit',
+        'cftc-gold-gross-long': 'Gold long positioning (COT)',
       },
       evidenceWords: {
         rising: 'rising',

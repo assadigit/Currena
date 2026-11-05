@@ -67,6 +67,7 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   'us-japan-10y-gap', // A-3: derived at 04:20 from the staged us10y + MOF
   'eia-crude-stocks', // A-6: the EIA keyless weekly stocks page, Saturday
   'cftc-gold-positioning', // A-7: the CFTC weekly COT file, Saturday
+  'cftc-gold-gross-long', // GF-P2 (F2, §4 row 12): the gross-long share — the SAME Saturday file, zero extra subrequests
   'oecd-cli-us', // A-8: the OECD CLI trio — one filtered fetch, first-of-month
   'oecd-cli-cn',
   'oecd-cli-de',
@@ -326,12 +327,16 @@ export async function collectRung2Sources(
 
   // A-7: the CFTC's weekly futures-only COT file (Saturday + bootstrap).
   // One point per file — the series accumulates in the stored history.
+  // GF-P2 (2026-11-05, the owner's recorded answer K — §4 row 12 / F2): the
+  // SAME fetch now feeds the gross-long share seat beside the net share —
+  // the parse returns both, zero extra subrequests.
   if (plan.cftcWeekly) {
     const gold = await fetchLogged('cftc', 'Commitments of Traders, futures-only (gold row)', () =>
       fetchCftcGoldPositioning(),
     );
     if (gold !== undefined) {
       series['cftc-gold-positioning'] = [{ date: gold.date, value: gold.netSharePct }];
+      series['cftc-gold-gross-long'] = [{ date: gold.date, value: gold.grossLongSharePct }];
     }
   }
 

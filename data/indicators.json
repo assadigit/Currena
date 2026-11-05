@@ -2295,6 +2295,82 @@
       }
     },
     {
+      "id": "cftc-gold-gross-long",
+      "title": "Gold long positioning (COT)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": "market-stress",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "cftc",
+        "name": "U.S. Commodity Futures Trading Commission (Commitments of Traders, gold)",
+        "url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+        "seriesIdOrTable": "CFTC Commitments of Traders (futures-only, GOLD - COMMODITY EXCHANGE INC.)"
+      },
+      "publisher": "U.S. Commodity Futures Trading Commission (Commitments of Traders)",
+      "publisherUrl": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+      "methodUrl": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm",
+      "whatItIs": "The gross non-commercial LONG position in gold futures (big speculators’ longs, before their shorts are netted off) as a share of all open interest, from the CFTC’s weekly Commitments of Traders report (Tuesday data, published Fridays) — the same gold row the net-positioning card reads.",
+      "whatItIsnt": "Positioning says how crowded the boat is, not which way the wind blows: crowded books can stay crowded for months.",
+      "trackRecordNote": "The crowded-long zone sits at the top of the share’s own trailing decade — the card reads percentiles and its derived band (about 62% of open interest, the recorded archive’s own top decile), never fixed desk numbers.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 12 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The weekly futures-only COT file (dea/newcot/deafut.txt) is the agency’s own published data; verified live 200 with the honest UA 2026-10-26 (the gold row 2026-10-20: open interest 402,279, net non-commercial share 49.68%).",
+        "termsReadOn": "2026-10-26",
+        "attributionText": "Source: U.S. Commodity Futures Trading Commission",
+        "legs": [
+          "cftc"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "weekly",
+      "maxAgeDays": 12,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "any-of",
+        "of": [
+          {
+            "kind": "threshold",
+            "direction": "above",
+            "value": 62
+          },
+          {
+            "kind": "percentile",
+            "tail": "high",
+            "cutoff": 0.02
+          },
+          {
+            "kind": "percentile",
+            "tail": "low",
+            "cutoff": 0.02
+          }
+        ]
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "US government work — public domain (17 U.S.C. § 105)",
+        "attributionText": "Source: U.S. Commodity Futures Trading Commission",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-26",
+        "termsEvidence": "US federal government works carry no copyright (17 U.S.C. § 105). The weekly futures-only Commitments of Traders file (dea/newcot/deafut.txt, verified live 200 with the honest UA 2026-10-26) is the agency’s own published data.",
+        "termsUrl": "https://www.cftc.gov/About/TheCFTC/index.htm"
+      }
+    },
+    {
       "id": "oecd-cli-us",
       "title": "OECD leading indicator (US)",
       "area": {
@@ -5412,7 +5488,7 @@
         "url": "https://www.gold-api.com",
         "seriesIdOrTable": "gold-api.com XAU ÷ XAG (history: World Bank gold ÷ silver)"
       },
-      "publisher": "World Bank (Commodity Markets \"Pink Sheet\")",
+      "publisher": "Yahoo Finance (unofficial endpoints)",
       "publisherUrl": "https://www.gold-api.com",
       "methodUrl": "https://www.gold-api.com",
       "whatItIs": "The gold price divided by the silver price, live from a metals feed, on a decade of World Bank monthly history.",
@@ -5421,17 +5497,18 @@
       "definition": "The gold price divided by the silver price, same date and the same price basis.",
       "failClosedConditions": "No value, data older than 2 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
-        "level": "L1",
-        "ownerAccepts": null,
+        "level": "L2",
+        "ownerAccepts": true,
         "enabled": true,
         "method": "M1",
         "runtime": "github-action",
-        "termsLines": "World Bank Open Data terms are commonly CC BY 4.0, but the terms page is JS-rendered and could not be quoted verbatim on 2026-10-16 — level L1 (need checking), fail closed in public mode until the clause is quoted. Attribution shown regardless. · Worst of legs (world-bank, gold-api): the L1 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsLines": "Yahoo offers no reuse licence for these unofficial quote endpoints (read 2026-10-16) — the terms are silent on automated reuse, which makes the source L2 under the owner’s recorded acceptance. Unofficial endpoints can break or be blocked at any time: every Yahoo leg fails closed (a block is a block — SCRAPING_SPEC F-09, no identity change). · Worst of legs (world-bank, gold-api, yahoo:GC=F/SI=F (history leg, GF-P1 D-5)): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
         "termsReadOn": "2026-10-16",
-        "attributionText": "Source: World Bank",
+        "attributionText": "Data: Yahoo Finance",
         "legs": [
           "world-bank",
-          "gold-api"
+          "gold-api",
+          "yahoo:GC=F/SI=F (history leg, GF-P1 D-5)"
         ]
       },
       "unit": "ratio",
@@ -5449,14 +5526,14 @@
       "ruleVersion": 4,
       "layer": 2,
       "licence": {
-        "licenceName": "Free API — commercial use permitted (their ToS)",
+        "licenceName": "No reuse licence offered (unofficial endpoints)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "gold-api.com/terms read 2026-10-16: \"Commercial use of the API is always permitted, including use in web applications…\" (§9); no attribution clause found; service \"as is\", no accuracy warranty (§5–6); terms may change without notice (§11) — re-check at the quarterly review. (Closes defect E-02’s \"terms unconfirmed\".) · Legs (world-bank, gold-api): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://gold-api.com/terms"
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (world-bank, gold-api, yahoo:GC=F/SI=F (history leg, GF-P1 D-5)): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The ratio's history legs are exactly the gold-usd and silver-usd tiles' own Yahoo metals legs (GC=F and SI=F — the GF-P1 D-5 recorded base deepening, the repo's own L2 owner-accepted pair, both legs same-day so the term structure cancels); the standing owner directives (2026-10-19e) already lifted those legs' display bars, and the derived ratio inherits them — the gold-oil-ratio (A-4) precedent. The directive lifts its worst-leg display bar.",
+        "termsUrl": "https://finance.yahoo.com/"
       }
     },
     {
@@ -5705,6 +5782,65 @@
         ]
       },
       "unit": "eur",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+      }
+    },
+    {
+      "id": "usdchf",
+      "title": "USD/CHF",
+      "area": {
+        "section": "global",
+        "group": "dollar-strength",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "frankfurter",
+        "name": "Frankfurter (ECB)",
+        "url": "https://frankfurter.dev",
+        "seriesIdOrTable": "Frankfurter USD→CHF"
+      },
+      "publisher": "ECB reference rates via the Frankfurter project",
+      "publisherUrl": "https://frankfurter.dev",
+      "methodUrl": "https://frankfurter.dev",
+      "whatItIs": "The USD→CHF reference rate (ECB rates via Frankfurter, daily): how many Swiss francs one US dollar buys in the foreign-exchange market.",
+      "whatItIsnt": "A quiet franc can mean firm Swiss policy or a calm world: the pair alone does not say which side moved.",
+      "trackRecordNote": "A context card: it reads its own decade range and votes in no gauge; the franc’s big regime shifts (the 2011 and 2015 floor episodes) sit inside that range.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "frankfurter.dev/license links the ECB disclaimer for the data (read 2026-10-16); the ECB’s reuse terms page is JS-rendered and could not be quoted verbatim in a plain fetch — level L1 (probably fine, terms need the quarterly re-check), fail closed in public mode until then. Frankfurter’s code is MIT.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "legs": [
+          "frankfurter"
+        ]
+      },
+      "unit": "chf",
       "changeUnit": "percent",
       "cadence": "daily",
       "maxAgeDays": 4,

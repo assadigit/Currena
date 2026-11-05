@@ -41,6 +41,7 @@ import {
   signAgreement,
 } from './gold-backtest-core';
 import type { SeriesPoint } from './series';
+import { GF_VOTERS_P1_DEMOTE } from './gf-p0-proposed';
 
 const NOW = '2026-10-30T04:10:00.000Z';
 const DAY = '2026-10-29';
@@ -124,32 +125,53 @@ describe('scoreOverVoters — the parameterized copy equals the production engin
  * The harness tables after the promotion (Session 6 — D-5)
  * ------------------------------------------------------------------ */
 
-describe('the harness tables — the lineage snapshots (Session 6 → GF-P1)', () => {
+describe('the harness tables — the lineage snapshots (Session 6 → GF-P1 → GF-P2)', () => {
   it('the SNAPSHOT PIN: HARNESS_GOLD_VOTERS_21 is the VERBATIM pre-GF-P1 production table — 21 seats, the curve pair present', () => {
     // GF-P1 (2026-11-05, the owner's recorded decision H — the D-7/D-8
     // context demotion) separated the harness snapshot from production:
     // the lineage tables (the GB-S1 calibration, BACKTEST-GOLD-LANES.md,
     // the FROZEN/POST-P1 calibration scenarios) measured THIS 21-seat
-    // table, so it stays VERBATIM while production moved to 19.
+    // table, so it stays VERBATIM while production moved to 19, then to
+    // GF-P2's 32.
     expect(HARNESS_GOLD_VOTERS_21).toHaveLength(21);
     expect(HARNESS_GOLD_VOTERS_21.some((v) => v.id === 'yield-curve-10y2y')).toBe(true);
     expect(HARNESS_GOLD_VOTERS_21.some((v) => v.id === 'yield-curve-10y3m')).toBe(true);
     expect(HARNESS_GOLD_VOTERS_21.at(-1)).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
   });
 
-  it('production is the GF-P1 table: 19 voters (6/3/5/5), the tilt in the inflation lane, polarity +1, the last seat', () => {
-    expect(GOLD_LANE_VOTERS).toHaveLength(19);
+  it('production is the GF-P2 table: 32 voters (6/5/10/9/2), the tilt in the inflation lane, polarity +1', () => {
+    // GF-P2 (the owner's recorded answers B/C/K, 2026-11-05): the measured
+    // POST-P2-5LANE composition. The tilt seat keeps its recorded shape.
+    expect(GOLD_LANE_VOTERS).toHaveLength(32);
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
     expect(tilt).toHaveLength(1);
     expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
-    expect(GOLD_LANE_VOTERS[GOLD_LANE_VOTERS.length - 1]!.id).toBe('breakeven-tilt'); // the B4-measured shape
   });
 
-  it('the DEMOTION PIN: production is the 21-seat snapshot minus EXACTLY the two yield-curve seats (GF-P1 H — the D-7/D-8 demotion is the only change)', () => {
-    expect(GOLD_LANE_VOTERS).toHaveLength(19);
-    expect(
-      HARNESS_GOLD_VOTERS_21.filter((v) => v.id !== 'yield-curve-10y2y' && v.id !== 'yield-curve-10y3m'),
-    ).toEqual(GOLD_LANE_VOTERS);
+  it('the PROMOTION DELTA PIN: production is the 19-seat P1-era table PLUS EXACTLY the GF-P2 promotions (the owner\'s recorded B/C/K — the flows re-seat, the COBD pair and the twelve seats)', () => {
+    // The P1-era composition (the frozen 21 minus the two curve seats) plus
+    // the P2 additions = production. The cftc seat MOVED from stress to
+    // flows (D-14's repair) and the F2 real object joined it there.
+    expect(GF_VOTERS_P1_DEMOTE).toHaveLength(19);
+    // Set<string>: the P1_DEMOTE ids are the wider GfCandidateId union (the
+    // harness-local candidate ids included) — the membership check is the
+    // test's own object, not a type-level identity claim.
+    const productionIds = new Set<string>(GOLD_LANE_VOTERS.map((v) => v.id));
+    for (const v of GF_VOTERS_P1_DEMOTE) expect(productionIds.has(v.id), `${v.id} kept`).toBe(true);
+    // The GF-P1 19 seats' lanes all survive into the 32 — except cftc's
+    // re-seat (stress → flows, the owner's recorded B).
+    const kept = GOLD_LANE_VOTERS.filter((v) => v.lane !== 'flows' && v.id !== 'cftc-gold-positioning');
+    expect(kept).toHaveLength(30); // 19 − cftc-reseat + the 12 non-flows promotions
+    for (const v of GF_VOTERS_P1_DEMOTE) {
+      if (v.id === 'cftc-gold-positioning') continue;
+      const match = kept.find((x) => x.id === v.id);
+      expect(match, `${v.id} same lane`).toEqual(v);
+    }
+    // the flows lane: F1 re-seated + F2's real object, both polarity −1.
+    expect(GOLD_LANE_VOTERS.filter((v) => v.lane === 'flows')).toEqual([
+      { lane: 'flows', id: 'cftc-gold-positioning', polarity: -1 },
+      { lane: 'flows', id: 'cftc-gold-gross-long', polarity: -1 },
+    ]);
   });
 
   it('the S4 frozen 20-voter table is the 21-seat snapshot minus EXACTLY the tilt — the promotion is the only change between them', () => {

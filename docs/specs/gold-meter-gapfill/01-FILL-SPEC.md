@@ -61,9 +61,12 @@ record is authoritative).
    output.
 5. Free-first (D-GF-4): every new source is free/keyless/licence-clean;
    EODHD only with the owner's recorded per-item approval (none proposed).
-6. The taxonomy stays LOCKED at 02 v1.1 = 85 rows (D-GF-7); N-1's answer, if
+6. The taxonomy stays LOCKED (D-GF-7); N-1's answer, if
    AMEND, is an owner-recorded amendment with its date — the denominator
-   becomes 86 and the report's arithmetic restates downstream.
+   becomes 86 and the report's arithmetic restates downstream. **EXECUTED
+   at GF-P2 (2026-11-05, the owner's recorded answer G): the v1.1 → v1.2
+   amendment** — the N-A1 euro-area realised-inflation row recorded; the
+   denominator is 86.
 
 ## 4. The end state (the audit's 04 §5)
 

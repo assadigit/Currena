@@ -108,17 +108,18 @@ describe('breakevenTiltLean — the pure phrase selection', () => {
 });
 
 describe('D-5 — the promotion pinned (Session 6)', () => {
-  it('breakeven-tilt IS the last gold voter: exactly one entry, inflation lane, polarity +1 (the 21st seat until GF-P1 demoted the curve pair — 19 now)', () => {
+  it('breakeven-tilt keeps its one gold seat: exactly one entry, inflation lane, polarity +1 (the 21st seat until GF-P1 demoted the curve pair; GF-P2 seated twelve more — 32 now)', () => {
     // Session 6 promoted the table 20 → 21 with the tilt as the last seat;
     // GF-P1 (2026-11-05, the owner's recorded decision H) demoted the two
-    // yield-curve seats (21 → 19) — the tilt KEEPS its last-seat shape, now
-    // at index 18. The pre-demotion 21-seat table is pinned VERBATIM as
-    // HARNESS_GOLD_VOTERS_21 (gold-backtest-core.test.ts).
-    expect(GOLD_LANE_VOTERS).toHaveLength(19);
+    // yield-curve seats (21 → 19); GF-P2 (the owner's recorded answers
+    // B/C/K) seated the twelve promotions + the COBD pair + the flows pair
+    // (19 → 32). The tilt KEEPS its recorded shape — one seat, inflation,
+    // polarity +1 — through every change. The pre-demotion 21-seat table is
+    // pinned VERBATIM as HARNESS_GOLD_VOTERS_21 (gold-backtest-core.test.ts).
+    expect(GOLD_LANE_VOTERS).toHaveLength(32);
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
     expect(tilt).toHaveLength(1);
     expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
-    expect(GOLD_LANE_VOTERS[GOLD_LANE_VOTERS.length - 1]!.id).toBe('breakeven-tilt'); // the B4-measured shape: the tilt at the end
   });
 
   it('the phrase selector stays the level-deadband read it always was (context phrase, not the voter lean)', () => {

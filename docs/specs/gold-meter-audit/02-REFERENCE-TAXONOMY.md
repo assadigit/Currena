@@ -1,5 +1,22 @@
 # 02. The reference taxonomy — the classic gold-direction checklist
 
+**Status: v1.2 — amended by the owner's RECORDED answer G, 2026-11-05
+(GF-S7 → executed at GF-P2 by the GF-S8 session; N-1 RESOLVED).**
+v1.1 was LOCKED by the owner, 2026-11-05 (OI-GA-1 RESOLVED; the lock
+record at the file's foot). The lock's own rule (D-GA-1): additions from
+here are owner-recorded amendments with dates only — never silent. The
+**v1.1 → v1.2 amendment** adds ONE row — **N-A1, the euro-area realised
+inflation (HICP)** — on the owner's recorded answer G (the GF-S7 answer
+sheet: "AMEND — an owner-recorded amendment with its date (2026-11-05);
+the denominator becomes 86 and the arithmetic restates downstream.
+Striking a healthy voter reduces coverage with no classic-literature
+basis"). The amendment resolves finding N-1: the locked checklist held no
+euro-area realised-inflation row while a healthy, wiring-complete voter
+(`euro-hicp`) sat UNCLASSICATED — the amendment records the row the
+checklist itself missed; the voter maps to it and the denominator becomes
+**86** (the downstream arithmetic restated where it cites it — the audit
+report's header arithmetic and the gapfill program's live-state docs).
+
 **Status: v1.1 — LOCKED by the owner, 2026-11-05 (OI-GA-1 RESOLVED).**
 The lock was delegated by the owner's instruction of 2026-11-05 (verbatim
 in the lock record at the file's foot): research whether the items are
@@ -103,6 +120,7 @@ gold's marginal buyer actually pays in.
 | I9 | Inflation surprises vs expectations | **+**: upside surprises reprice the hedge case fast | Cleveland Fed nowcasts (page verified live this session) vs realised prints — free, model-updated near-daily | daily-ish | event/short-window; context-leaning |
 | I10 | Real gold price vs its long-run range | context: the valuation anchor — how expensive gold is in purchasing-power terms (Jastram's golden-constant lineage) | derived (gold ÷ CPI; Shiller-method) | monthly | context-only |
 | I11 ★ v1-add | Global liquidity / major-CB balance-sheet aggregate | **+** (slow, regime-scale): the sum/growth of the major central banks' balance sheets (Fed+ECB+BoJ) is the liquidity regime the debasement trade prices — the monetary anchor the gold literature's drivers frameworks carry at global scale | free legs, no single canonical file: FRED `WALCL` (L0; verified live: weekly through 2026-10-28) + ECB Data Portal + BoJ (both free; the ECB portal is venue-blocked to this audit's sandbox — repo's live legs ground it) | weekly-ish | YoY growth; context-leaning |
+| N-A1 ★ v1.2-add | Euro-area realised inflation (HICP) | **+**: the euro bloc's realised-inflation channel of the hedge case — the same channel I1/I2 carry for the US, at the euro area's own scale (the 2022–24 European retail gold demand episode the desk literature records) | ECB Data Portal HICP annual rate (the repo's own `euro-hicp` card reads exactly this — the post-Feb-2026 dataset, monthly; re-verified at the audit's GA-S1 inventory walk) | monthly / ~2w | level + change |
 
 ## S. Stress, risk & haven demand
 
@@ -539,3 +557,16 @@ GA-S3 prompt in `PROMPTS.md` — all now quote 85 rows (v1.1, locked). The
 GA-S1 historical records (PROGRESS's GA-S1 block, PROMPTS's GA-S1 note, the
 v1 row-count line above) intentionally still quote v1 = 82 — they are dated
 session records, not live state.
+
+**Amendment v1.1 → v1.2 (2026-11-05, the owner's RECORDED answer G — the
+GF-S7 answer sheet, executed at GF-P2 by the GF-S8 session):** +N-A1
+(euro-area realised inflation, HICP) · −0 strikes — resolving finding N-1
+(the one UNCLASSICATED voter: `euro-hicp`, healthy and wiring-complete,
+now maps to the row the checklist itself missed). Downstream arithmetic
+restated by the GF-S8 session: `GOLD-METER-AUDIT-REPORT.md`'s header table
++ headline (rows classified 86 · voters mapped 21/21 · COVERED 9 of 86 —
+the euro-area row joins the COVERED core) · the gapfill program's README
+decision-log D-GF-7 annotation + 01-FILL-SPEC §3 constraint 6 + the live
+handoff state. The GF-S1..GF-S7 historical records (PROGRESS blocks,
+PROMPTS, the committed calibration report's N-1 row) intentionally still
+quote v1.1 = 85 — they are dated session records, not live state.

@@ -90,10 +90,13 @@ describe('goldBalance — the lane vote rules (02 §3)', () => {
     expect(dollar.supports).toBe(0);
     expect(dollar.pressures).toBe(1);
     expect(b.net).toBe(0);
-    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 1, unread: 3 });
+    // GF-P2 (the owner's recorded answers B/C/K): five lanes — the three
+    // untouched lanes plus the new flows lane read unread when their voters'
+    // readings are absent (never a guess).
+    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 1, unread: 4 });
     expect(b.readable).toBe(1);
     // the member shape: the firing voter carries its evidence; the other
-    // two dollar voters are missing → unread, evidence null.
+    // four dollar voters are missing → unread, evidence null.
     expect(member(b, 'dollar', 'usdjpy')).toEqual({ id: 'usdjpy', impact: 'pressures', evidence: 'high' });
     expect(member(b, 'dollar', 'dollar-basket')).toEqual({ id: 'dollar-basket', impact: 'unread', evidence: null });
   });
@@ -107,7 +110,8 @@ describe('goldBalance — the lane vote rules (02 §3)', () => {
     expect(inflation.supports).toBe(2);
     expect(inflation.pressures).toBe(0);
     expect(inflation.firing).toBe(2);
-    expect(support.counts).toEqual({ for: 1, against: 0, neutral: 0, unread: 3 });
+    // GF-P2 (B/C/K): the other four lanes' voters absent → unread.
+    expect(support.counts).toEqual({ for: 1, against: 0, neutral: 0, unread: 4 });
     expect(support.net).toBe(1);
 
     const pressure = goldBalance([reading('us10y', HIGH), reading('us30y', HIGH)]);
@@ -115,7 +119,7 @@ describe('goldBalance — the lane vote rules (02 §3)', () => {
     expect(borrowing.side).toBe('against');
     expect(borrowing.split).toBe(false);
     expect(borrowing.pressures).toBe(2);
-    expect(pressure.counts).toEqual({ for: 0, against: 1, neutral: 0, unread: 3 });
+    expect(pressure.counts).toEqual({ for: 0, against: 1, neutral: 0, unread: 4 }); // GF-P2 (B/C/K): five lanes — four absent
     expect(pressure.net).toBe(-1);
   });
 
@@ -134,7 +138,7 @@ describe('goldBalance — the lane vote rules (02 §3)', () => {
     expect(borrowing.pressures).toBe(2);
     expect(borrowing.firing).toBe(4);
     expect(borrowing.readable).toBe(4);
-    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 1, unread: 3 });
+    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 1, unread: 4 });
     expect(b.net).toBe(0);
   });
 
@@ -168,7 +172,7 @@ describe('goldBalance — the lane vote rules (02 §3)', () => {
         expect(m.evidence).toBeNull();
       }
     }
-    expect(staleAll.counts).toEqual({ for: 0, against: 0, neutral: 0, unread: 4 });
+    expect(staleAll.counts).toEqual({ for: 0, against: 0, neutral: 0, unread: 5 });
     expect(staleAll.net).toBe(0);
     expect(staleAll.readable).toBe(0);
 
@@ -201,9 +205,9 @@ describe('goldBalance — the lane vote rules (02 §3)', () => {
       expect(l.firing).toBe(0);
       for (const m of l.members) expect(m.impact).toBe('steady');
     }
-    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 4, unread: 0 });
+    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 5, unread: 0 });
     expect(b.net).toBe(0);
-    expect(b.readable).toBe(4);
+    expect(b.readable).toBe(5);
   });
 
   // 04 §4.1 test 7 — staleness is inert, never a vote.
@@ -236,19 +240,19 @@ describe('goldBalance — the totals (02 §3 step 4)', () => {
       reading('usdjpy', HIGH), reading('dollar-basket', LOW), // dollar SPLIT (1 v 1)
       ...steadyFor('stress'),
     ]);
-    expect(mixed.counts).toEqual({ for: 1, against: 1, neutral: 2, unread: 0 });
+    expect(mixed.counts).toEqual({ for: 1, against: 1, neutral: 2, unread: 1 });
     expect(mixed.net).toBe(0);
     expect(mixed.readable).toBe(4);
     expect(lane(mixed, 'dollar').split).toBe(true);
 
-    // 1 FOR · 1 AGAINST · 1 SPLIT · 1 UNREAD — readable counts neutral, not absent.
+    // 1 FOR · 1 AGAINST · 1 SPLIT · 2 UNREAD — readable counts neutral, not absent.
     const withUnread = goldBalance([
       reading('us-cpi-yoy', HIGH), reading('us-pce-core-yoy', HIGH), // inflation FOR
       reading('us10y', HIGH), reading('us30y', HIGH), // borrowing-costs AGAINST
       reading('usdjpy', HIGH), reading('dollar-basket', LOW), // dollar SPLIT
-      // stress lane entirely absent → unread
+      // stress AND flows lanes entirely absent → unread
     ]);
-    expect(withUnread.counts).toEqual({ for: 1, against: 1, neutral: 1, unread: 1 });
+    expect(withUnread.counts).toEqual({ for: 1, against: 1, neutral: 1, unread: 2 });
     expect(withUnread.net).toBe(0);
     expect(withUnread.readable).toBe(3);
 
@@ -259,7 +263,7 @@ describe('goldBalance — the totals (02 §3 step 4)', () => {
       reading('usdjpy', LOW), reading('dollar-basket', LOW), // dollar FOR
       reading('us10y', HIGH), reading('us30y', HIGH), // borrowing-costs AGAINST
     ]);
-    expect(threeFor.counts).toEqual({ for: 3, against: 1, neutral: 0, unread: 0 });
+    expect(threeFor.counts).toEqual({ for: 3, against: 1, neutral: 0, unread: 1 });
     expect(threeFor.net).toBe(2);
     expect(threeFor.readable).toBe(4);
   });
@@ -267,12 +271,16 @@ describe('goldBalance — the totals (02 §3 step 4)', () => {
 
 describe('goldBalance — the member vocabulary (02 §2)', () => {
   // 04 §4.1 test 9 — the polarity pins, with the GB-S1 vix trap stated.
-  it('9. polarity: falling real-yield-10y supports; high us30y pressures; a firing vix supports; high cftc-gold-positioning pressures', () => {
+  // GF-P2 (the owner's recorded answer B, D-14's repair): cftc-gold-positioning
+  // re-seated from stress to the flows lane; the F2 gross-long seat joins it
+  // (the in-session design decision — polarity −1, the contrarian read).
+  it('9. polarity: falling real-yield-10y supports; high us30y pressures; a firing vix supports; high cftc-gold-positioning AND cftc-gold-gross-long pressure (the flows pair)', () => {
     const b = goldBalance([
       reading('real-yield-10y', FALLING),
       reading('us30y', HIGH),
       reading('vix', HIGH),
       reading('cftc-gold-positioning', HIGH),
+      reading('cftc-gold-gross-long', HIGH),
     ]);
     expect(member(b, 'borrowing-costs', 'real-yield-10y')).toEqual({
       id: 'real-yield-10y',
@@ -281,15 +289,27 @@ describe('goldBalance — the member vocabulary (02 §2)', () => {
     });
     expect(member(b, 'borrowing-costs', 'us30y')).toEqual({ id: 'us30y', impact: 'pressures', evidence: 'high' });
     expect(member(b, 'stress', 'vix')).toEqual({ id: 'vix', impact: 'supports', evidence: 'high' });
-    expect(member(b, 'stress', 'cftc-gold-positioning')).toEqual({
+    // GF-P2 (B, D-14): the F1 seat's new home — the flows lane.
+    expect(member(b, 'flows', 'cftc-gold-positioning')).toEqual({
       id: 'cftc-gold-positioning',
+      impact: 'pressures',
+      evidence: 'high',
+    });
+    // GF-P2 (K, §4 row 12 — F2's REAL OBJECT): the gross-long share's own
+    // polarity pin — crowded gross-longs pressure, exactly the net seat's
+    // contrarian read.
+    expect(member(b, 'flows', 'cftc-gold-gross-long')).toEqual({
+      id: 'cftc-gold-gross-long',
       impact: 'pressures',
       evidence: 'high',
     });
     expect(lane(b, 'borrowing-costs').supports).toBe(1);
     expect(lane(b, 'borrowing-costs').pressures).toBe(1);
     expect(lane(b, 'stress').supports).toBe(1);
-    expect(lane(b, 'stress').pressures).toBe(1);
+    expect(lane(b, 'stress').pressures).toBe(0); // cftc left for flows (B, D-14)
+    expect(lane(b, 'flows').supports).toBe(0);
+    expect(lane(b, 'flows').pressures).toBe(2); // both flows seats fire — the lane votes AGAINST
+    expect(lane(b, 'flows').side).toBe('against');
 
     // THE VIX TRAP (GB-S1's lesson, pinned): vix has NO SIGNAL_LEG_MOVE
     // entry in the shared evaluator, so a 30-day move — however large —
@@ -357,27 +377,32 @@ describe('goldBalance — the member vocabulary (02 §2)', () => {
   });
 
   // 04 §4.1 test 11 — the engine's membership IS the frozen table's.
-  it("11. table integrity: the engine's lane membership equals GOLD_LANE_VOTERS (GF-P1's 19 voters, 6/3/5/5)", () => {
+  it("11. table integrity: the engine's lane membership equals GOLD_LANE_VOTERS (GF-P2's 32 voters, 6/5/10/9/2)", () => {
     expect(GOLD_LANE_MIN_FIRING).toBe(2); // the P0 calibration decision (MIN2)
-    expect(GOLD_LANE_STRONG).toBe(3); // 01 §5.2's strong bar
+    expect(GOLD_LANE_STRONG).toBe(4); // GF-P2 (the owner's recorded answer B): 4 of 5 lanes = 80%, preserving the old 3-of-4 = 75% strictness
     expect(HARNESS_GOLD_LANES_MIN2.minFiring).toBe(GOLD_LANE_MIN_FIRING); // the decision the harness measured
 
     const b = goldBalance(GOLD_LANE_VOTERS.map((v) => reading(v.id as IndicatorId, STEADY)));
-    expect(b.lanes).toHaveLength(4);
+    expect(b.lanes).toHaveLength(5);
     expect(b.lanes.map((l) => l.lane)).toEqual([...GOLD_LANES]);
     const memberIds = b.lanes.flatMap((l) => l.members.map((m) => m.id));
     expect(memberIds).toEqual(GOLD_LANE_VOTERS.map((v) => v.id)); // table order, every voter
-    expect(memberIds).toHaveLength(19);
+    expect(memberIds).toHaveLength(32);
     const perLane: Record<string, number> = {};
     for (const id of memberIds) {
       const v = GOLD_LANE_VOTERS.find((x) => x.id === id)!;
       perLane[v.lane] = (perLane[v.lane] ?? 0) + 1;
     }
-    expect(perLane).toEqual({ 'borrowing-costs': 6, dollar: 3, stress: 5, inflation: 5 });
+    // GF-P2 (the owner's recorded answers B/C/K): the measured POST-P2-5LANE
+    // composition (evidence/gf-p0-calibration-2026-11-05.md §7).
+    expect(perLane).toEqual({ 'borrowing-costs': 6, dollar: 5, stress: 10, inflation: 9, flows: 2 });
     // GF-P1 (the owner's recorded decision H, 2026-11-05 — the D-7/D-8
     // context demotion): the two yield-curve seats are NEVER members.
     expect(memberIds).not.toContain('yield-curve-10y2y');
     expect(memberIds).not.toContain('yield-curve-10y3m');
+    // GF-P2 (K): the D7 seat question stays recorded-open — usdchf is a
+    // CONTEXT CARD, never a member.
+    expect(memberIds).not.toContain('usdchf');
   });
 });
 
@@ -394,10 +419,11 @@ describe('goldBalance — the D-18 input-presence rule', () => {
   const INPUTLESS: Partial<IndicatorReading> = { value: 46.99, change30d: undefined, percentile10y: undefined };
 
   it('a readable-but-inputless seat reads unread, never steady — the lane may read unread on it', () => {
+    // GF-P2 (B, D-14): the cftc seat now lives in the flows lane.
     const b = goldBalance([reading('cftc-gold-positioning', INPUTLESS)]);
-    expect(member(b, 'stress', 'cftc-gold-positioning')).toEqual({ id: 'cftc-gold-positioning', impact: 'unread', evidence: null });
-    expect(lane(b, 'stress').readable).toBe(0);
-    expect(lane(b, 'stress').side).toBe('unread');
+    expect(member(b, 'flows', 'cftc-gold-positioning')).toEqual({ id: 'cftc-gold-positioning', impact: 'unread', evidence: null });
+    expect(lane(b, 'flows').readable).toBe(0);
+    expect(lane(b, 'flows').side).toBe('unread');
   });
 
   it('a LEVEL input alone keeps the seat readable (the staged gold-silver shape: percentile without change30d)', () => {
@@ -420,10 +446,17 @@ describe('goldBalance — the D-18 input-presence rule', () => {
   });
 
   it('an inputless seat beside a healthy co-seat drops only its own readable count — the lane still reads', () => {
-    const b = goldBalance([reading('cftc-gold-positioning', INPUTLESS), reading('vix', HIGH)]);
-    expect(lane(b, 'stress').readable).toBe(1); // vix only
-    expect(lane(b, 'stress').side).toBe('neutral'); // 1 firing < MIN 2
-    expect(lane(b, 'stress').members.map((m) => `${m.id}:${m.impact}`)).toEqual(['stress-stlfsi:unread', 'nfci:unread', 'vix:supports', 'gold-silver:unread', 'cftc-gold-positioning:unread']);
+    // GF-P2 (B/K): the two flows seats — the inputless net seat beside the
+    // healthy gross-long seat (F2's real object, D-18 measured on both).
+    const b = goldBalance([reading('cftc-gold-positioning', INPUTLESS), reading('cftc-gold-gross-long', HIGH)]);
+    expect(lane(b, 'flows').readable).toBe(1); // the gross-long seat only
+    expect(lane(b, 'flows').side).toBe('neutral'); // 1 firing < MIN 2
+    expect(lane(b, 'flows').members.map((m) => `${m.id}:${m.impact}`)).toEqual(['cftc-gold-positioning:unread', 'cftc-gold-gross-long:pressures']);
+    // the same rule in the stress lane: vix healthy, stlfsi/nfci absent —
+    // the lane reads on vix alone (the pre-P2 shape preserved).
+    const stress = goldBalance([reading('vix', HIGH)]);
+    expect(lane(stress, 'stress').readable).toBe(1);
+    expect(lane(stress, 'stress').side).toBe('neutral');
   });
 });
 
@@ -465,17 +498,19 @@ function fixtureReadings(): IndicatorReading[] {
 
 describe('goldBalance — the 2026-10-31 fixture (01 §7, 04 §4.1 tests 12+13)', () => {
   // 04 §4.1 test 12 — the worked example, measured on the real archive.
-  // GF-P1 (2026-11-05, the owner's recorded answers H/I/J) restates the
-  // example: the demotion (H) leaves borrowing-costs 6 members; the
-  // fed-expectations threshold (J) flips its fixture seat from the level
-  // leg (high → pressures) to the MOVE leg (−0.28 < −0.13 → falling →
-  // supports) so the lane reads FOR 3v1; the D-18 rule (I) renders the
-  // inputless cftc member unread (stress readable 5 → 4). Every delta
-  // from the pre-GF-P1 pin traces to a recorded decision.
-  it('12. the fixture reads FOR 1 · neutral 3: borrowing-costs for 3v1, dollar 1 firing, stress readable-4 (the D-18 unread cftc), inflation 1 firing', () => {
+  // GF-P1 (2026-11-05, the owner's recorded answers H/I/J) restated the
+  // example once; GF-P2 (the owner's recorded answers B/C/K) restates it
+  // again, every delta traced: the promotions seat twelve voters whose
+  // readings the 2026-10-31 archive does not carry → unread members (never
+  // a guess); t5yie — a context card the archive DOES carry — joins the
+  // inflation lane (R8's promotion) and FIRES on the P1-derived 0.10-pt
+  // threshold (J: the threshold ACTIVATES with the seat), flipping the
+  // lane to a 1v1 split; the flows lane reads unread (the D-18 inputless
+  // cftc member + the gross-long seat absent from the archive).
+  it('12. the fixture reads FOR 1 · neutral 3 · unread 1 (the flows lane): borrowing-costs for 3v1, dollar 1 firing, stress readable-4, inflation a 1v1 SPLIT (t5yie fires), flows unread', () => {
     const b = goldBalance(fixtureReadings());
     expect(b.net).toBe(1);
-    expect(b.counts).toEqual({ for: 1, against: 0, neutral: 3, unread: 0 });
+    expect(b.counts).toEqual({ for: 1, against: 0, neutral: 3, unread: 1 });
     expect(b.readable).toBe(4);
 
     const borrowing = lane(b, 'borrowing-costs');
@@ -498,33 +533,52 @@ describe('goldBalance — the 2026-10-31 fixture (01 §7, 04 §4.1 tests 12+13)'
     expect(dollar.split).toBe(false);
     expect(dollar.firing).toBe(1);
     expect(dollar.pressures).toBe(1);
-    expect(dollar.readable).toBe(3);
+    expect(dollar.readable).toBe(3); // GF-P2 (C/K): D5 + G4 seat — their readings are absent from the archive → unread members
     expect(member(b, 'dollar', 'usdjpy')).toEqual({ id: 'usdjpy', impact: 'pressures', evidence: 'high' });
 
     const stress = lane(b, 'stress');
     expect(stress.side).toBe('neutral'); // readable, nothing firing — NOT unread (P5)
-    expect(stress.readable).toBe(4); // GF-P1's D-18 rule (I): the inputless cftc member reads UNREAD — 5 → 4
+    expect(stress.readable).toBe(4); // GF-P1's D-18 rule (I): the inputless cftc member reads UNREAD — 5 → 4; GF-P2 (B, D-14): cftc LEFT for flows; the six new stress voters' readings are absent from the archive → unread members
     expect(stress.firing).toBe(0);
     expect(stress.split).toBe(false);
-    expect(member(b, 'stress', 'cftc-gold-positioning')).toEqual({ id: 'cftc-gold-positioning', impact: 'unread', evidence: null });
 
     const inflation = lane(b, 'inflation');
-    expect(inflation.side).toBe('neutral'); // 1 firing < MIN 2
-    expect(inflation.firing).toBe(1);
+    // GF-P2 (K, §4 row 9 — R8's promotion): t5yie joins and FIRES on the
+    // move leg (change30d 0.10 beyond J's 0.10-pt threshold — the P1
+    // threshold ACTIVATES with the seat) → 1v1: the split tie under MIN2.
+    expect(inflation.side).toBe('neutral');
+    expect(inflation.split).toBe(true); // breakeven-5y5y pressures vs t5yie supports — the mixed chip
+    expect(inflation.readable).toBe(6); // I3/I7/G1's readings are absent from the archive → unread members
+    expect(inflation.firing).toBe(2);
+    expect(inflation.supports).toBe(1);
     expect(inflation.pressures).toBe(1);
-    expect(inflation.readable).toBe(5);
     expect(member(b, 'inflation', 'breakeven-5y5y')).toEqual({ id: 'breakeven-5y5y', impact: 'pressures', evidence: 'falling' });
+    expect(member(b, 'inflation', 't5yie')).toEqual({ id: 't5yie', impact: 'supports', evidence: 'rising' });
+
+    // GF-P2 (B, D-14 + K): the flows lane — the inputless net seat (the
+    // D-18 rule, inherited from P1) beside the gross-long seat whose
+    // reading the archive does not carry → the lane honestly unread.
+    const flows = lane(b, 'flows');
+    expect(flows.side).toBe('unread');
+    expect(flows.readable).toBe(0);
+    expect(flows.firing).toBe(0);
+    expect(member(b, 'flows', 'cftc-gold-positioning')).toEqual({ id: 'cftc-gold-positioning', impact: 'unread', evidence: null });
+    expect(member(b, 'flows', 'cftc-gold-gross-long')).toEqual({ id: 'cftc-gold-gross-long', impact: 'unread', evidence: null });
   });
 
   // 04 §4.1 test 13 — the no-drift pin: the frozen engine's shape follows
-  // the recorded GF-P1 decisions exactly (the demoted pair was steady in
-  // the fixture, so the net delta is the fed-expectations flip alone).
-  it('13. no-drift: goldTailwindScore on the same fixture is netScore 0 / balanced / 6 of 19 firing', () => {
+  // the recorded decisions exactly. GF-P2's restatement: the t5yie
+  // promotion (K) + its P1 threshold (J) flip the fixture's seventh firing
+  // voter — netScore 0/balanced (GF-P1) → netScore 1/tailwind; the other
+  // twelve promoted seats' readings are absent from the 2026-10-31 archive
+  // → they never fire here (the gf-p2-verify corpus pin measures them over
+  // the GF-P0 fixtures instead — ALL 2512 windows).
+  it('13. no-drift: goldTailwindScore on the same fixture is netScore 1 / tailwind / 7 of 32 firing (the t5yie flip traced to R8×J)', () => {
     const t = goldTailwindScore(fixtureReadings());
-    expect(t.netScore).toBe(0);
-    expect(t.label).toBe('balanced');
-    expect(t.firingVoters).toBe(6);
-    expect(t.tailwindVoters).toBe(3);
+    expect(t.netScore).toBe(1);
+    expect(t.label).toBe('tailwind');
+    expect(t.firingVoters).toBe(7);
+    expect(t.tailwindVoters).toBe(4);
     expect(t.headwindVoters).toBe(3);
     expect(t.voters.map((v) => `${v.id}:${v.impact}:${v.evidence}`)).toEqual([
       'real-yield-10y:tailwind:falling',
@@ -533,6 +587,7 @@ describe('goldBalance — the 2026-10-31 fixture (01 §7, 04 §4.1 tests 12+13)'
       'fed-expectations:tailwind:falling', // GF-P1 J: was headwind:high
       'usdjpy:headwind:high',
       'breakeven-5y5y:headwind:falling',
+      't5yie:tailwind:rising', // GF-P2 K (R8's promotion) × J (the 0.10-pt threshold ACTIVATES): the seventh firing voter
     ]);
   });
 });
@@ -646,7 +701,7 @@ describe('goldBalance === laneBalanceOverVoters(GOLD_LANE_VOTERS, 2) — the fro
     expect(goldBalance(shuffled)).toEqual(goldBalance(readings));
     expect(() => goldBalance([])).not.toThrow();
     const empty = goldBalance([]);
-    expect(empty.counts).toEqual({ for: 0, against: 0, neutral: 0, unread: 4 });
+    expect(empty.counts).toEqual({ for: 0, against: 0, neutral: 0, unread: 5 });
     expect(empty.net).toBe(0);
     expect(empty.readable).toBe(0);
     expect(empty.lanes.map((l) => l.lane)).toEqual([...GOLD_LANES]);

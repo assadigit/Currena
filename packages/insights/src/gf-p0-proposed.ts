@@ -4,32 +4,42 @@
  * (docs/specs/gold-meter-gapfill/01-FILL-SPEC.md — GF-P0; the audit report
  * §6.1's P0 row; the GB-S1 precedent: gold-balance-consolidation 02 §6).
  *
- * THE GF-P0 STANCE, UPDATED AT GF-P1 (2026-11-05, the owner's recorded
- * answers A/H/I/J — the GF-S7 answer sheet): this module began as pure
- * proposals beside the frozen engines ("no product code", D-GF-1); with
- * the owner's recorded go, GF-P1 EXECUTED its P1 halves into production
- * — the five derived thresholds (now the production `SIGNAL_LEG_MOVE`
- * additions, still mirrored here as `GF_MOVE_P1_PROPOSED` so the
- * committed calibration report keeps reproducing byte-for-byte), the
- * D-7/D-8 context demotion (production `GOLD_LANE_VOTERS` is now the
- * 19-seat table, pinned equal to `GF_VOTERS_P1_DEMOTE` by test) and the
- * D-18 input-presence rule (now the production `goldBalance` member
- * rule). The P2 tables below remain PROPOSALS until the owner's recorded
- * per-seat gos execute them (GF-P2); the scenario family stays the
- * calibration's measured record — the FROZEN/POST-P1 scenarios measure
- * the frozen 21-seat snapshot (`GF_VOTERS_FROZEN_21`), never production.
+ * THE GF-P0 STANCE, UPDATED AT GF-P2 (2026-11-05, the owner's recorded
+ * answers A/B/C/G/H/I/J/K — the GF-S7 answer sheet; the GF-S8 execution):
+ * this module began as pure proposals beside the frozen engines ("no
+ * product code", D-GF-1); the owner's recorded gos executed its halves
+ * into production phase by phase —
+ *   - GF-P1: the five derived thresholds (now the production
+ *     `SIGNAL_LEG_MOVE` additions, still mirrored here as
+ *     `GF_MOVE_P1_PROPOSED` so the committed calibration report keeps
+ *     reproducing byte-for-byte), the D-7/D-8 context demotion and the
+ *     D-18 input-presence rule (now the production `goldBalance` member
+ *     rule);
+ *   - GF-P2 (the owner's recorded answers B/C/K + the in-session F2
+ *     design decision under the standing delegation): the promotions
+ *     EXECUTED — production `GOLD_LANES` is the five-lane list and
+ *     `GOLD_LANE_VOTERS` the 32-seat table, ≡ the measured
+ *     POST-P2-5LANE composition below modulo the F2 seat's recorded id
+ *     mapping (the scenario proxy `gf-f2-gross-long-share` ↔ the real
+ *     production object `cftc-gold-gross-long`; the window-for-window
+ *     pin: scripts/gf-p2-verify.ts).
+ * The scenario family stays the calibration's measured record — the
+ * FROZEN/POST-P1 scenarios measure the frozen 21-seat snapshot
+ * (`GF_VOTERS_FROZEN_21`) on the frozen four lanes (`GF_LANES_4`), never
+ * production; the P1-era composition snapshot (`GF_VOTERS_P1_DEMOTE`)
+ * is the gf-p1-verify record's own basis.
  *
  * What lives here:
- *  - `GF_LANES_5` — the proposed fifth lane (`flows`, OI-GA-2's ADD
- *    scenario — the owner's RECORDED answer B: ADD) beside the frozen
- *    `GOLD_LANES` (4);
+ *  - `GF_LANES_4` / `GF_LANES_5` — the frozen four (the pre-GF-P2 lane
+ *    list, VERBATIM) and the five (since GF-P2 the production
+ *    `GOLD_LANES` itself — the owner's RECORDED answer B: ADD, EXECUTED);
  *  - `GF_VOTERS_FROZEN_21` / `GF_VOTERS_P1_DEMOTE` — the lineage
- *    snapshots: the pre-GF-P1 21-seat production table VERBATIM, and
- *    the post-demotion 19-seat composition (equal to production,
- *    pinned by test);
- *  - `GF_VOTERS_P2_4LANE` / `GF_VOTERS_P2_5LANE` — the proposed post-P2
+ *    snapshots: the pre-GF-P1 21-seat production table VERBATIM, and the
+ *    post-demotion 19-seat P1-era composition (the gf-p1-verify basis);
+ *  - `GF_VOTERS_P2_4LANE` / `GF_VOTERS_P2_5LANE` — the measured post-P2
  *    voter tables (the audit's recommended composition — every seat
- *    change cites the report's §4 row in its comment);
+ *    change cites the report's §4 row in its comment; the 5LANE table
+ *    IS the production composition modulo the F2 seat's id mapping);
  *  - `GF_MOVE_P1_PROPOSED` — the five D-1-derived thresholds, EXECUTED
  *    into the production `SIGNAL_LEG_MOVE` at GF-P1 (the owner's
  *    recorded decision J); kept here as the scenario-harness constant
@@ -45,10 +55,10 @@
  *      `gfCalibrationStats`  ≡ `gold-backtest-core.ts laneCalibrationStats`
  *                             (lane list parameterized).
  *    Each equivalence is PINNED BY TEST (gf-p0-proposed.test.ts) on the
- *    PRODUCTION configuration (post-GF-P1: the production threshold map
- *    = the frozen four + the executed five) and on the frozen
- *    configuration for the lineage scenarios — the copies cannot drift
- *    from the engines (the scoreOverVoters discipline).
+ *    PRODUCTION configuration (post-GF-P2: the five-lane list + the 32-seat
+ *    table + the production threshold map = the frozen four + the executed
+ *    five) and on the frozen configuration for the lineage scenarios — the
+ *    copies cannot drift from the engines (the scoreOverVoters discipline).
  *
  * HONESTY RULES (inherited, D-GF-2/D-GF-3): the engines here measure
  * firing statistics and lane behaviour ONLY — never predictive power; no
@@ -82,17 +92,29 @@ import {
  * The proposed fifth lane — `flows` (OI-GA-2's ADD scenario, the audit
  * report §5's recommendation: "Add a flows & demand lane" — D-14's
  * evidence: the F-family's 16 rows hold exactly one voter anywhere,
- * seated in market stress where it can never tip the lane alone). A
- * proposal only: the lane ships on the owner's recorded go; until then
- * production speaks `GOLD_LANES` (the frozen four).
+ * seated in market stress where it can never tip the lane alone). The
+ * owner's RECORDED answer B (GF-S7, 2026-11-05): **ADD** — EXECUTED at
+ * GF-P2: production `GOLD_LANES` is the five-lane list since this change,
+ * and this constant names the fifth lane for the harness tables.
  */
 export const GF_FLOWS_LANE = 'flows' as const;
 
-/** The frozen four (an alias for readability — never a second source). */
-export const GF_LANES_4: readonly GoldLane[] = GOLD_LANES;
+/**
+ * The FROZEN four — the pre-GF-P2 production lane list, VERBATIM. Until
+ * GF-P2 this was an alias of `GOLD_LANES`; the promotions (the owner's
+ * recorded answer B) added `flows` to production, so the FROZEN /
+ * POST-P1 / POST-P1-DEMOTE scenarios keep their four-lane basis through
+ * this literal snapshot (the same discipline as the lineage voter
+ * tables — a historical basis, never the live config).
+ */
+export const GF_LANES_4: readonly GoldLane[] = ['borrowing-costs', 'dollar', 'stress', 'inflation'];
 
-/** The proposed five: the frozen four + `flows`. */
-export const GF_LANES_5: readonly string[] = [...GOLD_LANES, GF_FLOWS_LANE];
+/**
+ * The five — since GF-P2 the PRODUCTION lane list itself (`GOLD_LANES`, the
+ * owner's recorded answer B EXECUTED; the POST-P2-5LANE scenario's lane
+ * basis, and the shipped meter's own lanes).
+ */
+export const GF_LANES_5: readonly string[] = GOLD_LANES;
 
 /**
  * The FROZEN 21-seat production table, VERBATIM — the pre-GF-P1
@@ -280,13 +302,19 @@ export const GF_VOTERS_P2_4LANE: readonly GfVoter[] = [
  * The proposed post-P2 voter set — the 5-LANE variant (OI-GA-2's ADD
  * recommendation): the same composition with `cftc-gold-positioning`
  * RE-SEATED from market stress to the new `flows` lane (D-14's repair)
- * + the F2 proxy seat. The F2 seat here is the SCENARIO'S PROXY for F2's
- * P2-designable object (rank 12: "the gross CFTC legs — richer than
- * net"): the gross noncommercial LONG share of open interest, polarity
- * −1 (crowded longs fragile — the same contrarian read as F1's net
- * seat). The one-seat-or-two question and the gross-SHORT complement
- * are the P2 design questions the owner's go decides; the fixture
- * records both gross legs.
+ * + the F2 proxy seat. The owner's RECORDED answers B/K (GF-S7,
+ * 2026-11-05) executed this composition at GF-P2 as the production
+ * `GOLD_LANE_VOTERS` (32 seats: 6/5/10/9/2) — **modulo the F2 seat's
+ * recorded id mapping**: the seat here is the SCENARIO'S PROXY
+ * (`gf-f2-gross-long-share`, a harness-local id); the production seat is
+ * the REAL OBJECT `cftc-gold-gross-long` (the in-session F2 design
+ * decision under the standing delegation — the production parse of the
+ * same deafut.txt gold row's NonComm Long ÷ OI; the recorded reason:
+ * PROGRESS's GF-S8 block). The proxy computes the identical 4dp value
+ * from the identical row, so the measured scenario and the shipped
+ * meter are the same object — pinned window-for-window by the
+ * gf-p2-verify script. The gross-short complement stays RECORDED in the
+ * fixture (never seated — one seat, the measured 32-seat composition).
  */
 export const GF_F2_PROXY_ID = 'gf-f2-gross-long-share' as const;
 
@@ -712,11 +740,16 @@ export interface GfScenario {
  *    sign decision's keep-variant, measured beside the demote-variant).
  *  - **POST-P1-DEMOTE** — POST-P1 with the D-7/D-8 context demotion
  *    (the owner's RECORDED choice (b), GF-S7 2026-11-05 — this scenario
- *    IS the production composition since GF-P1; `GF_VOTERS_P1_DEMOTE`
- *    equals the production `GOLD_LANE_VOTERS`, pinned by test).
+ *    WAS the production composition from GF-P1 to GF-P2; the P2
+ *    promotions superseded it — the composition is preserved as the
+ *    measured P1 basis, pinned to the P1-era production by the committed
+ *    gf-p1-verify record).
  *  - **POST-P2-4LANE** — the promotions on the frozen four lanes.
  *  - **POST-P2-5LANE** — the promotions with the flows lane (OI-GA-2's
- *    ADD recommendation, the owner's RECORDED answer B).
+ *    ADD recommendation, the owner's RECORDED answer B — EXECUTED at
+ *    GF-P2 as the production composition, modulo the F2 seat's recorded
+ *    id mapping: the scenario seat `gf-f2-gross-long-share` ↔ the
+ *    production seat `cftc-gold-gross-long`, the F2 design decision).
  *
  * Each scenario runs under BOTH crowd rules (MIN2 = D-GB-3's default —
  * re-affirmed by the owner's recorded answer A, GF-S7 2026-11-05: keep

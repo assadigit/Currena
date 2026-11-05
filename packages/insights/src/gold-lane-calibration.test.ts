@@ -87,16 +87,19 @@ describe('the lane tables — MIN2 / MIN1 beside the frozen voter tables', () =>
     expect(HARNESS_GOLD_LANES_MIN1.voters).toBe(HARNESS_GOLD_VOTERS_21);
     expect(HARNESS_GOLD_LANES_MIN1.minFiring).toBe(1);
   });
-  it('the lineage snapshots keep their recorded shapes (21 · 8/3/5/5 · 20); production is GF-P1\'s 19 · 6/3/5/5', () => {
+  it('the lineage snapshots keep their recorded shapes (21 · 8/3/5/5 · 20); production is GF-P2\'s 32 · 6/5/10/9/2 (the measured POST-P2-5LANE composition)', () => {
     const counts21: Record<string, number> = {};
     for (const v of HARNESS_GOLD_VOTERS_21) counts21[v.lane] = (counts21[v.lane] ?? 0) + 1;
     expect(counts21).toEqual({ 'borrowing-costs': 8, dollar: 3, stress: 5, inflation: 5 });
     expect(HARNESS_GOLD_VOTERS_21).toHaveLength(21);
     expect(HARNESS_GOLD_VOTERS_20).toHaveLength(20);
+    // GF-P2 (the owner's recorded answers B/C/K, 2026-11-05): the production
+    // table is the measured POST-P2-5LANE composition — 32 seats over five
+    // lanes (evidence/gf-p0-calibration-2026-11-05.md §7).
     const countsProd: Record<string, number> = {};
     for (const v of GOLD_LANE_VOTERS) countsProd[v.lane] = (countsProd[v.lane] ?? 0) + 1;
-    expect(GOLD_LANE_VOTERS).toHaveLength(19);
-    expect(countsProd).toEqual({ 'borrowing-costs': 6, dollar: 3, stress: 5, inflation: 5 });
+    expect(GOLD_LANE_VOTERS).toHaveLength(32);
+    expect(countsProd).toEqual({ 'borrowing-costs': 6, dollar: 5, stress: 10, inflation: 9, flows: 2 });
   });
 });
 
@@ -149,7 +152,7 @@ describe('laneBalanceOverVoters — the lane-vote rules', () => {
     expect(b.state).toBe('tipped-for');
   });
 
-  it('a lane of all-stale voters is unread; all four unread reads "none" (never a guess)', () => {
+  it('a lane of all-stale voters is unread; all five lanes unread reads "none" (never a guess)', () => {
     const b = laneBalanceOverVoters(
       GOLD_LANE_VOTERS.map((v) => reading(v.id as IndicatorId, { status: 'stale' })),
       GOLD_LANE_VOTERS,
@@ -157,7 +160,8 @@ describe('laneBalanceOverVoters — the lane-vote rules', () => {
     );
     for (const l of b.lanes) expect(l.side).toBe('unread');
     expect(b.state).toBe('none');
-    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 0, unread: 4 });
+    // GF-P2 (B/C/K): five lanes.
+    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 0, unread: 5 });
     expect(b.net).toBe(0);
     expect(b.readable).toBe(0);
   });
@@ -174,8 +178,9 @@ describe('laneBalanceOverVoters — the lane-vote rules', () => {
       expect(l.readable).toBeGreaterThan(0);
     }
     expect(b.state).toBe('level');
-    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 4, unread: 0 });
-    expect(b.readable).toBe(4);
+    // GF-P2 (B/C/K): five lanes, all readable-steady → five neutrals.
+    expect(b.counts).toEqual({ for: 0, against: 0, neutral: 5, unread: 0 });
+    expect(b.readable).toBe(5);
   });
 
   it('adding a stale (or missing) voter to a lane never changes its side', () => {
@@ -186,12 +191,14 @@ describe('laneBalanceOverVoters — the lane-vote rules', () => {
     expect(laneBalanceOverVoters(withStale, GOLD_LANE_VOTERS, 1)).toEqual(laneBalanceOverVoters(base, GOLD_LANE_VOTERS, 1));
   });
 
-  it('polarity pins (02 §4): falling real-yield-10y SUPPORTS; high us30y PRESSURES; a high (firing) vix SUPPORTS; high cftc-gold-positioning PRESSURES', () => {
+  it('polarity pins (02 §4): falling real-yield-10y SUPPORTS; high us30y PRESSURES; a high (firing) vix SUPPORTS; high cftc-gold-positioning + cftc-gold-gross-long PRESSURE (the flows pair)', () => {
     // vix carries no 30-day move threshold in the shared evaluator
     // (SIGNAL_LEG_MOVE has no vix entry — its rule is percentile/level), so
     // its firing path here is the LEVEL leg: percentile10y high → lean +1.
+    // GF-P2 (B, D-14 + K): the cftc pair fires in the FLOWS lane now — the
+    // stress lane holds vix alone.
     const b = laneBalanceOverVoters(
-      [reading('real-yield-10y', FALLING), reading('us30y', HIGH), reading('vix', HIGH), reading('cftc-gold-positioning', HIGH)],
+      [reading('real-yield-10y', FALLING), reading('us30y', HIGH), reading('vix', HIGH), reading('cftc-gold-positioning', HIGH), reading('cftc-gold-gross-long', HIGH)],
       GOLD_LANE_VOTERS,
       1,
     );
@@ -200,10 +207,14 @@ describe('laneBalanceOverVoters — the lane-vote rules', () => {
     expect(borrowing.pressures).toBe(1); // high 30y pressures
     const stress = b.lanes.find((l) => l.lane === 'stress')!;
     expect(stress.supports).toBe(1); // elevated fear supports
-    expect(stress.pressures).toBe(1); // crowded longs pressure
+    expect(stress.pressures).toBe(0); // cftc left for flows (B, D-14)
+    const flows = b.lanes.find((l) => l.lane === 'flows')!;
+    expect(flows.supports).toBe(0);
+    expect(flows.pressures).toBe(2); // the crowded pair pressures (F2's real object included)
     expect(borrowing.side).toBe('neutral'); // 1 v 1 — the split tie under MIN1's majority
     expect(borrowing.split).toBe(true);
-    expect(stress.side).toBe('neutral');
+    expect(stress.side).toBe('for');
+    expect(flows.side).toBe('against');
   });
 
   it('breakeven-tilt fires on the LEVEL leg only (the D-5 promotion shape): high → supports, mid → steady', () => {
@@ -234,13 +245,14 @@ describe('laneBalanceOverVoters — the beam angle (D-GB-8, unchanged formula)',
   const steadyFor = (...lanes: string[]): IndicatorReading[] =>
     GOLD_LANE_VOTERS.filter((v) => lanes.includes(v.lane)).map((v) => reading(v.id as IndicatorId, STEADY));
 
-  it('one lane for, three neutral: net 1, d 1 → 10° — fully tipped', () => {
+  it('one lane for, the rest neutral or unread: net 1, d 1 → 10° — fully tipped', () => {
     const one = laneBalanceOverVoters(
       [reading('us-cpi-yoy', HIGH), reading('us-pce-core-yoy', HIGH), ...steadyFor('borrowing-costs', 'dollar', 'stress')],
       GOLD_LANE_VOTERS,
       2,
     );
-    expect(one.counts).toEqual({ for: 1, against: 0, neutral: 3, unread: 0 });
+    // GF-P2 (B/C/K): the flows lane's voters are absent here → unread.
+    expect(one.counts).toEqual({ for: 1, against: 0, neutral: 3, unread: 1 });
     expect(one.net).toBe(1);
     expect(one.beamAngle).toBeCloseTo(10, 10);
     expect(one.fullyTipped).toBe(true);
@@ -256,15 +268,15 @@ describe('laneBalanceOverVoters — the beam angle (D-GB-8, unchanged formula)',
       GOLD_LANE_VOTERS,
       2,
     );
-    expect(b.counts).toEqual({ for: 1, against: 1, neutral: 2, unread: 0 });
+    expect(b.counts).toEqual({ for: 1, against: 1, neutral: 2, unread: 1 }); // GF-P2 (B/C/K): the flows lane's voters absent → unread
     expect(b.net).toBe(0);
     expect(b.state).toBe('level');
     expect(b.beamAngle).toBe(0);
     expect(b.fullyTipped).toBe(false);
   });
-  it('the parity fact the calibration band structure rides on: with 4 lanes the only reachable angles are 0, 10/3, 5 and 10 degrees', () => {
-    // net and d share parity, so |net|/d ∈ {1, 1/2, 1/3} × 10 plus the level 0.
-    // 2 lanes for + 1 against + 1 neutral: net 1, d 3 → 10/3° — not fully tipped.
+  it('the parity fact the calibration band structure rides on: with 5 lanes the reachable angles include 0, 10/4, 10/3, 5 and 10 degrees', () => {
+    // net and d share parity, so |net|/d ∈ {1, 1/2, 1/3, 1/4} × 10 plus the level 0.
+    // 2 lanes for + 1 against + 1 neutral + 1 unread: net 1, d 3 → 10/3° — not fully tipped.
     const threeToOne = laneBalanceOverVoters(
       [
         reading('us-cpi-yoy', HIGH), reading('us-pce-core-yoy', HIGH), reading('euro-hicp', HIGH), // inflation FOR
@@ -275,7 +287,7 @@ describe('laneBalanceOverVoters — the beam angle (D-GB-8, unchanged formula)',
       GOLD_LANE_VOTERS,
       2,
     );
-    expect(threeToOne.counts).toEqual({ for: 2, against: 1, neutral: 1, unread: 0 });
+    expect(threeToOne.counts).toEqual({ for: 2, against: 1, neutral: 1, unread: 1 });
     expect(threeToOne.net).toBe(1);
     expect(threeToOne.beamAngle).toBeCloseTo(10 / 3, 10);
     expect(threeToOne.fullyTipped).toBe(false);
@@ -290,7 +302,7 @@ describe('laneBalanceOverVoters — the beam angle (D-GB-8, unchanged formula)',
       GOLD_LANE_VOTERS,
       2,
     );
-    expect(twoTwo.counts).toEqual({ for: 2, against: 2, neutral: 0, unread: 0 });
+    expect(twoTwo.counts).toEqual({ for: 2, against: 2, neutral: 0, unread: 1 });
     expect(twoTwo.net).toBe(0);
     expect(twoTwo.beamAngle).toBe(0);
   });
@@ -369,7 +381,9 @@ describe('laneCalibrationStats — the pre-registered C1 / C2', () => {
     expect(s.tippedAgainst).toBe(1);
     expect(s.beam).toEqual({ level: 2, mid: 0, full: 2 });
     expect(s.fullyTipped).toBe(2);
-    expect(s.laneUnread).toEqual({ 'borrowing-costs': 1, dollar: 1, stress: 1, inflation: 1 });
+    // GF-P2 (B/C/K): the flows key exists and stays 0 over four-lane
+    // synthetic balances (the real five-lane stats carry it measured).
+    expect(s.laneUnread).toEqual({ 'borrowing-costs': 1, dollar: 1, stress: 1, inflation: 1, flows: 0 });
   });
   it('C1 holds at the exact boundaries (level ≤ 70%, full-tip ≤ 60%) and fails beyond them', () => {
     // 10 windows: 7 level (70%), 3 full tips (30%) — exactly at the ceiling → PASS

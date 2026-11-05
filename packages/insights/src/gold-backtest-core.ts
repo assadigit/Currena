@@ -122,12 +122,18 @@ const LANE_TAILWIND_WORD: Record<GoldLane, GoldSubGaugeWord> = {
   dollar: 'stress',
   stress: 'elevated',
   inflation: 'hot',
+  // GF-P2 (the owner's recorded answer B): the flows lane — the harness
+  // twin of gold-score.ts's own mapping (the gf-p0-proposed gfScoreOverVoters
+  // precedent; the frozen 21-seat lineage tables carry no flows seat, so
+  // the entry changes no lineage number).
+  flows: 'elevated',
 };
 const LANE_HEADWIND_WORD: Record<GoldLane, GoldSubGaugeWord> = {
   'borrowing-costs': 'tight',
   dollar: 'strong',
   stress: 'calm',
   inflation: 'cool',
+  flows: 'calm',
 };
 
 /**
@@ -340,12 +346,12 @@ export interface HarnessLaneVote {
   pressures: number;
 }
 
-/** The balance's verdict state (01 §5.1): 'none' = all four lanes unread. */
+/** The balance's verdict state (01 §5.1): 'none' = all lanes unread. */
 export type HarnessBalanceState = 'tipped-for' | 'tipped-against' | 'level' | 'none';
 
-/** The consolidated balance over the four lanes, as the harness computes it. */
+/** The consolidated balance over the lane list, as the harness computes it. */
 export interface HarnessLaneBalance {
-  /** The four lane votes, GOLD_LANES order. */
+  /** The lane votes, GOLD_LANES order (five since GF-P2). */
   lanes: HarnessLaneVote[];
   counts: { for: number; against: number; neutral: number; unread: number };
   /** lanesFor − lanesAgainst. */
@@ -427,8 +433,13 @@ export function laneBalanceOverVoters(
   const net = counts.for - counts.against;
   const tipped = counts.for + counts.against;
   const beamAngle = net === 0 || tipped === 0 ? 0 : Math.min(10, Math.max(3, (Math.abs(net) / tipped) * 10));
+  // Lane-count-agnostic since GF-P2 (the five-lane set): 'none' reads every
+  // lane unread, whatever the lane count — the semantics the four-lane
+  // hardcoded check expressed (the frozen 21-seat lineage tables carry no
+  // flows seat, so over THEM the fifth lane reads unread and 'none' still
+  // means all-readable-lanes-unread exactly as before).
   const state: HarnessBalanceState =
-    counts.unread === 4 ? 'none' : net > 0 ? 'tipped-for' : net < 0 ? 'tipped-against' : 'level';
+    counts.unread === GOLD_LANES.length ? 'none' : net > 0 ? 'tipped-for' : net < 0 ? 'tipped-against' : 'level';
 
   return {
     lanes,
@@ -481,7 +492,7 @@ export interface LaneCalibrationStats {
   tippedAgainst: number;
   /** net === 0 (level beam) — INCLUDES the all-unread 'none' windows, which noneCount states separately. */
   level: number;
-  /** all four lanes unread (the verdictNone state). */
+  /** all lanes unread (the verdictNone state). */
   none: number;
   /** Beam-angle bands: 0 (level) · (0, 6] · (6, 10]. */
   beam: { level: number; mid: number; full: number };
@@ -520,8 +531,8 @@ export function laneCalibrationStats(
   let beamMid = 0;
   let beamFull = 0;
   let fullyTipped = 0;
-  const laneUnread: Record<GoldLane, number> = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 };
-  const laneSplit: Record<GoldLane, number> = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 };
+  const laneUnread: Record<GoldLane, number> = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0, flows: 0 };
+  const laneSplit: Record<GoldLane, number> = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0, flows: 0 };
 
   for (const b of balances) {
     if (b.state === 'tipped-for') tippedFor++;

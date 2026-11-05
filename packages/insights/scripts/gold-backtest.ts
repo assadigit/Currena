@@ -44,7 +44,7 @@ import { fileURLToPath } from 'node:url';
 import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@currena/core';
 
 import { DEFINITIONS, computeReading } from '../src/index';
-import { GOLD_LANE_VOTERS } from '../src/gold-score';
+import { GOLD_LANE_VOTERS, type GoldLaneVoter } from '../src/gold-score';
 import { realYieldScoringSeries } from '../src/real-yield-fill';
 import { fromEpochDay, type SeriesPoint } from '../src/series';
 import {
@@ -157,7 +157,7 @@ const gridDates = GOLD.map((p) => p.date);
 const goldIndexOf = new Map<string, number>(gridDates.map((d, i) => [d, i]));
 
 /** One voter's state at one window, via the shared evaluator over one reading. */
-function voterStateOf(reading: IndicatorReading, def: { lane: 'borrowing-costs' | 'dollar' | 'stress' | 'inflation'; id: IndicatorId; polarity: 1 | -1 }): VoterState {
+function voterStateOf(reading: IndicatorReading, def: GoldLaneVoter): VoterState {
   if (!isReadable(reading.status)) return { readable: false, impact: null, evidence: null };
   const leg = scoreOverVoters([reading], [def]).voters[0];
   return leg === undefined

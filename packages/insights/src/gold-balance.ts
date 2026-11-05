@@ -3,7 +3,7 @@
  * (docs/specs/gold-balance-consolidation/02-ENGINE-AND-DECISION-TABLE.md
  * §2–§3; rollout phase P1 per 04 §3).
  *
- * ONE question, ONE instrument (01 §2): which of the four macro
+ * ONE question, ONE instrument (01 §2): which of the five macro
  * conditions lean FOR gold's price today, which lean AGAINST it, and
  * which do not lean. Conditions today — never a forecast (01 §8; the
  * backtest's measured no-edge record, BACKTEST-GOLD.md, stands).
@@ -11,9 +11,10 @@
  * The engine is ADDITIVE (D-GB-9): it imports the FROZEN sources and
  * edits nothing —
  *   - `GOLD_LANES`, `GoldLane` and the voter table `GOLD_LANE_VOTERS`
- *     (the lane memberships and polarities — 19 seats since GF-P1: the
- *     D-7/D-8 yield-curve context demotion, the owner's recorded
- *     decision H, 2026-11-05) from `gold-score.ts`;
+ *     (the lane memberships and polarities — 32 seats since GF-P2: the
+ *     owner's recorded answers B/C/K, 2026-11-05, the five-lane
+ *     POST-P2-5LANE composition the calibration measured) from
+ *     `gold-score.ts`;
  *   - `evalLeg`, the ONE shared evaluator, from `connections.ts`
  *     (D-GB-4: one rule per indicator; the Balance's bespoke stress and
  *     expectations rules are retired).
@@ -98,9 +99,10 @@ export interface GoldBalanceLane {
   members: GoldBalanceMember[];
 }
 
-/** The consolidated balance over the four lanes. */
+/** The consolidated balance over the five lanes. */
 export interface GoldBalanceReading {
-  /** Exactly 4, in GOLD_LANES order. */
+  /** Exactly 5, in GOLD_LANES order (GF-P2: the flows lane, the owner's
+   * recorded answer B). */
   lanes: GoldBalanceLane[];
   counts: { for: number; against: number; neutral: number; unread: number };
   /** lanesFor − lanesAgainst (01 §5.1's net). */
@@ -125,8 +127,14 @@ export interface GoldBalanceReading {
  */
 export const GOLD_LANE_MIN_FIRING = 2;
 
-/** The Outlook card's strong bar (01 §5.2): L or A ≥ 3 of 4 lanes. */
-export const GOLD_LANE_STRONG = 3;
+/**
+ * The Outlook card's strong bar (01 §5.2): L or A ≥ GOLD_LANE_STRONG of the
+ * GOLD_LANES lanes. GF-P2 (2026-11-05, the owner's recorded answer B): with
+ * five lanes the bar sits at **4 of 5** — today's 3-of-4 was 75%; 4-of-5 is
+ * 80%, preserving that strictness (3-of-5 = 60% would quietly have loosened
+ * it — the owner's recorded reason). Restated beside the gf-p2-verify pin.
+ */
+export const GOLD_LANE_STRONG = 4;
 
 /* ------------------------------------------------------------------ *
  * The engine (02 §3)
@@ -166,7 +174,7 @@ function readable(r: IndicatorReading | undefined): r is IndicatorReading {
  *
  * Deterministic and order-independent for readings; never throws on
  * missing or empty input (every lane then reads 'unread'). The counts,
- * net and readable roll up over the four lane sides (01 §5.1).
+ * net and readable roll up over the five lane sides (01 §5.1).
  */
 export function goldBalance(readings: readonly IndicatorReading[]): GoldBalanceReading {
   const byId = new Map(readings.map((r) => [r.id as string, r]));

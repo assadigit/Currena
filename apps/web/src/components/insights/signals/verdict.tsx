@@ -13,7 +13,7 @@
 
 import type { CSSProperties } from 'react';
 import type { SignalReading } from '@currena/insights';
-import { GOLD_LANE_STRONG, LEAN_STRONG, type GoldBalanceReading } from '@currena/insights';
+import { GOLD_LANES, GOLD_LANE_STRONG, LEAN_STRONG, type GoldBalanceReading } from '@currena/insights';
 import { Coins } from 'lucide-react';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
@@ -90,11 +90,13 @@ export function outlookOf(reading: SignalReading): OutlookState | null {
  * Balanced balance).
  *
  * The contract (01 §5.2), in engine terms — L = lanes for, A = lanes
- * against, over the four lanes:
- *   1. all four lanes unread → null (the existing "nothing could be
+ * against, over the five lanes (GF-P2, the owner's recorded answer B:
+ * the flows lane, 2026-11-05):
+ *   1. all five lanes unread → null (the existing "nothing could be
  *      read", verdictNone);
- *   2. L ≥ GOLD_LANE_STRONG (3) → strong-bullish; A ≥ 3 →
- *      strong-bearish (3 of 4 mirrors the old "4 of 5" bar);
+ *   2. L ≥ GOLD_LANE_STRONG (4) → strong-bullish; A ≥ 4 →
+ *      strong-bearish (4 of 5 = 80% — preserves the old 3-of-4 = 75%
+ *      strictness; the owner's recorded reason);
  *   3. range evidence — UNCHANGED from outlookOf: |30-day change| <
  *      RANGE_SPEED_PCT (2%) AND the 10-year position in the typical
  *      band AND |L − A| ≤ 1 → range-bound. Price enters ONLY here,
@@ -117,7 +119,9 @@ export function goldOutlookOf(
 ): OutlookState | null {
   const L = balance.counts.for;
   const A = balance.counts.against;
-  if (balance.counts.unread === 4) return null; // nothing could be read
+  // GF-P2 (the owner's recorded answer B): the five-lane set — the null
+  // check reads the lane count, never a hardcoded four.
+  if (balance.counts.unread === GOLD_LANES.length) return null; // nothing could be read
   if (L >= GOLD_LANE_STRONG) return 'strong-bullish';
   if (A >= GOLD_LANE_STRONG) return 'strong-bearish';
   const rangeEvidence =

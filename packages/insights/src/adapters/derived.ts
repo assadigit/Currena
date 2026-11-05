@@ -579,6 +579,11 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
     );
   }
   put('eur-usd', fx.EUR);
+  // GF-P2 (2026-11-05, the owner's recorded per-row answer — the audit
+  // report §4 row 23 / D7): the haven pair's other leg as a CONTEXT card.
+  // The CHF leg already rides the one Frankfurter request (collect.ts's
+  // USD→JPY,AUD,CNY,EUR,GBP,CAD,SEK,CHF,TRY,NZD) — zero new fetches.
+  put('usdchf', fx.CHF);
   // M5 Wave 2 (2026-10-24): the EM-pressure first member — the dollar
   // against the Turkish lira (context; the fx-module EM block may follow
   // in a later round once TRY proves the slot).
@@ -1234,6 +1239,8 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://fred.stlouisfed.org/series/DGS10',
   },
   'eur-usd': { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
+  // GF-P2 (D7, §4 row 23): the haven cross's own source line.
+  usdchf: { name: 'Frankfurter (ECB)', url: 'https://frankfurter.dev' },
   // 2026-10-21 data-integrity round — the coverage additions' attributions.
   wti: { name: 'FRED (EIA WTI spot)', url: 'https://fred.stlouisfed.org/series/DCOILWTICO' },
   // 2026-10-26 gap-audit build, A-6/A-7.
@@ -1242,6 +1249,11 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=WCRSTUS1&f=W',
   },
   'cftc-gold-positioning': {
+    name: 'U.S. Commodity Futures Trading Commission (Commitments of Traders, gold)',
+    url: 'https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm',
+  },
+  // GF-P2 (F2, §4 row 12): the gross-long share's own line — the same file.
+  'cftc-gold-gross-long': {
     name: 'U.S. Commodity Futures Trading Commission (Commitments of Traders, gold)',
     url: 'https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm',
   },

@@ -65,7 +65,9 @@ describe('voter firing (the shared evalLeg lean × the polarity table)', () => {
     expect(t.voters).toEqual([]);
     expect(t.firingVoters).toBe(0);
     expect(t.netScore).toBe(0);
-    expect(t.subGauges.map((g) => g.reading)).toEqual(['unreadable', 'unreadable', 'unreadable', 'unreadable']);
+    // GF-P2 (the owner's recorded answer B): five lanes read unreadable on
+    // empty input — never a guess.
+    expect(t.subGauges.map((g) => g.reading)).toEqual(['unreadable', 'unreadable', 'unreadable', 'unreadable', 'unreadable']);
     const m = modelVsReality([]);
     expect(m.chip).toBe('no-read');
     expect(m.modelDirection).toBeNull();
@@ -349,7 +351,8 @@ describe('the compact wire shape + the EN copy blocks', () => {
     expect(compact.laneCounts).toEqual(full.laneCounts);
     expect(compact.subGauges).toEqual(full.subGauges);
     expect(compact.modelVsReality).toEqual(modelVsReality(READINGS));
-    expect(compact.subGauges).toHaveLength(4);
+    // GF-P2 (the owner's recorded answer B): five lanes.
+    expect(compact.subGauges).toHaveLength(5);
   });
 
   it('the label copy covers all five steps, non-empty', () => {
@@ -357,32 +360,38 @@ describe('the compact wire shape + the EN copy blocks', () => {
     // asserted there (gold-panels.test.tsx). This package keeps only the
     // pure engine, so the remaining assertions here are the compact
     // writer's shape above and the pure key-mapping below.
-    expect(GOLD_LANES).toHaveLength(4);
+    // GF-P2 (the owner's recorded answer B — OI-GA-2's ADD scenario): the
+    // five-lane list.
+    expect(GOLD_LANES).toHaveLength(5);
+    expect([...GOLD_LANES]).toEqual(['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows']);
   });
 
-  it('the GF-P1 table pin: 19 voters, lane counts 6/3/5/5, the tilt exactly once, no duplicates, the curve seats demoted', () => {
+  it('the GF-P2 table pin: 32 voters, lane counts 6/5/10/9/2 (the measured POST-P2-5LANE composition), the tilt exactly once, no duplicates, the curve seats demoted', () => {
     // The production table's exact shape — the pin a future edit cannot
     // drift past silently. Session 6 promoted 20 → 21 (the D-5 tilt); GF-P1
     // (2026-11-05, the owner's recorded decision H — the D-7/D-8 context
-    // demotion) removed the two yield-curve seats: 21 → 19, borrowing
-    // costs 8 → 6. The pre-demotion 21-seat shape is pinned VERBATIM in
+    // demotion) removed the two yield-curve seats: 21 → 19; GF-P2 (the
+    // owner's recorded answers B/C/K) seated the twelve promotions + the
+    // COBD pair + the flows pair: 19 → 32 — the calibration's measured
+    // POST-P2-5LANE composition (evidence/gf-p0-calibration-2026-11-05.md
+    // §7). The pre-demotion 21-seat shape is pinned VERBATIM in
     // gold-backtest-core.test.ts (HARNESS_GOLD_VOTERS_21) and
-    // gf-p0-proposed.test.ts (GF_VOTERS_FROZEN_21).
-    expect(GOLD_LANE_VOTERS).toHaveLength(19);
-    const byLane = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0 } as Record<string, number>;
+    // gf-p0-proposed.test.ts (GF_VOTERS_FROZEN_21); the P1-era 19-seat
+    // composition is preserved as GF_VOTERS_P1_DEMOTE.
+    expect(GOLD_LANE_VOTERS).toHaveLength(32);
+    const byLane = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0, flows: 0 } as Record<string, number>;
     const ids = new Set<string>();
     for (const v of GOLD_LANE_VOTERS) {
       byLane[v.lane] = (byLane[v.lane] ?? 0) + 1;
       expect(ids.has(v.id as string), `duplicate voter ${v.id}`).toBe(false);
       ids.add(v.id as string);
     }
-    expect(byLane).toEqual({ 'borrowing-costs': 6, dollar: 3, stress: 5, inflation: 5 });
+    expect(byLane).toEqual({ 'borrowing-costs': 6, dollar: 5, stress: 10, inflation: 9, flows: 2 });
     expect(ids.has('yield-curve-10y2y')).toBe(false); // demoted to context (D-7)
     expect(ids.has('yield-curve-10y3m')).toBe(false); // demoted to context (D-8)
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
     expect(tilt).toHaveLength(1);
     expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
-    expect(tilt[0]!.lane === 'inflation' && GOLD_LANE_VOTERS.indexOf(tilt[0]!) === 18).toBe(true); // the last seat — the B4-measured shape
   });
 
   it('the promoted 21st voter fires like every level-only voter: decade-HIGH tilt → tailwind, LOW → headwind, steady-mid → silent', () => {

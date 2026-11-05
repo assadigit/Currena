@@ -131,9 +131,10 @@ function reading(id: IndicatorId, extra: Partial<IndicatorReading> = {}): Indica
   };
 }
 
-/** Every one of the 19 voters (the lane ids in table order — GF-P1,
- * 2026-11-05, the owner's recorded decision H: the two yield-curve seats
- * demoted to context), for the synthetic fixtures' shared quiet rows. */
+/** Every one of the 32 voters (the lane ids in table order — GF-P2,
+ * 2026-11-05, the owner's recorded answers B/C/K: the twelve promotions +
+ * the COBD pair + the flows pair; the two yield-curve seats stay demoted),
+ * for the synthetic fixtures' shared quiet rows. */
 const ALL_VOTERS: IndicatorId[] = [
   'real-yield-10y',
   'us10y',
@@ -144,16 +145,29 @@ const ALL_VOTERS: IndicatorId[] = [
   'dollar-basket',
   'usdjpy',
   'us-japan-10y-gap',
+  'usd-reserve-share',
+  'nyfed-custody',
   'stress-stlfsi',
   'nfci',
   'vix',
   'gold-silver',
-  'cftc-gold-positioning',
+  'term-premium-10y',
+  'ebp',
+  'michigan-sentiment',
+  'gpr-daily',
+  'epu-us',
+  'sp500-breadth-ratio',
   'us-cpi-yoy',
   'us-pce-core-yoy',
   'euro-hicp',
   'breakeven-5y5y',
   'breakeven-tilt',
+  't5yie',
+  'michigan-1y-expectations',
+  'm2-us',
+  'us-deficit-12m',
+  'cftc-gold-positioning',
+  'cftc-gold-gross-long',
 ];
 
 /** A quiet (steady, typical) row for a voter. */
@@ -162,9 +176,11 @@ const quiet = (id: IndicatorId): IndicatorReading => reading(id, { value: 1, per
 /**
  * The one-sided case: borrowing costs (2 decade-high yields) and the
  * dollar (2 decade-high) read AGAINST, market stress (2 decade-high
- * indexes) reads FOR, inflation reads steady — 1 for · 2 against ·
- * 1 neutral (engine-verified), so both pans carry lane weights and the
- * beam tips against at |−1|/3 × 10° ≈ 3.33°.
+ * indexes) reads FOR, inflation and the flows lane read steady — 1 for ·
+ * 2 against · 2 neutral (engine-verified), so both pans carry lane weights
+ * and the beam tips against at |−1|/3 × 10° ≈ 3.33°.
+ * GF-P2 (the owner's recorded answers B/C/K): the thirteen promoted seats
+ * join as quiet rows — the five-lane shape.
  */
 const DIRECTIONAL: IndicatorReading[] = [
   // borrowing costs: two firing pressures (decade-high levels)
@@ -179,26 +195,40 @@ const DIRECTIONAL: IndicatorReading[] = [
   reading('dollar-basket', { value: 108, percentile10y: 0.95 }),
   reading('usdjpy', { value: 155, percentile10y: 0.95 }),
   quiet('us-japan-10y-gap'),
+  quiet('usd-reserve-share'),
+  quiet('nyfed-custody'),
   // stress: two firing supports
   reading('stress-stlfsi', { value: 0.8, percentile10y: 0.95 }),
   reading('nfci', { value: 0.4, percentile10y: 0.95 }),
   quiet('vix'),
   quiet('gold-silver'),
-  quiet('cftc-gold-positioning'),
+  quiet('term-premium-10y'),
+  quiet('ebp'),
+  quiet('michigan-sentiment'),
+  quiet('gpr-daily'),
+  quiet('epu-us'),
+  quiet('sp500-breadth-ratio'),
   // inflation: readable, steady
   quiet('us-cpi-yoy'),
   quiet('us-pce-core-yoy'),
   quiet('euro-hicp'),
   quiet('breakeven-5y5y'),
   reading('breakeven-tilt', { value: 0.1, percentile10y: 0.5, change30d: 0.1 }),
+  quiet('t5yie'),
+  quiet('michigan-1y-expectations'),
+  quiet('m2-us'),
+  quiet('us-deficit-12m'),
+  // flows: readable, steady (GF-P2's new lane — the CFTC pair)
+  quiet('cftc-gold-positioning'),
+  quiet('cftc-gold-gross-long'),
   // gold itself: context only
   reading('gold-usd', { value: 4166, percentile10y: 0.6, change30d: 5.2 }),
 ];
 
 /**
- * The leaning-FOR case (engine-verified: 3 for · 0 against · 1 neutral,
+ * The leaning-FOR case (engine-verified: 3 for · 0 against · 2 neutral,
  * net +3 → the full 10° tip): falling yields + a falling dollar + high
- * stress all read for gold, inflation steady.
+ * stress all read for gold, inflation and flows steady.
  */
 const FOR: IndicatorReading[] = [
   reading('real-yield-10y', { value: 1.8, percentile10y: 0.5, change30d: -0.25 }),
@@ -211,23 +241,38 @@ const FOR: IndicatorReading[] = [
   reading('dollar-basket', { value: 98, percentile10y: 0.5, change30d: -1.6 }),
   reading('usdjpy', { value: 130, percentile10y: 0.08 }),
   quiet('us-japan-10y-gap'),
+  quiet('usd-reserve-share'),
+  quiet('nyfed-custody'),
   reading('stress-stlfsi', { value: 0.8, percentile10y: 0.95 }),
   reading('nfci', { value: 0.4, percentile10y: 0.95 }),
   quiet('vix'),
   quiet('gold-silver'),
-  quiet('cftc-gold-positioning'),
+  quiet('term-premium-10y'),
+  quiet('ebp'),
+  quiet('michigan-sentiment'),
+  quiet('gpr-daily'),
+  quiet('epu-us'),
+  quiet('sp500-breadth-ratio'),
   quiet('us-cpi-yoy'),
   quiet('us-pce-core-yoy'),
   quiet('euro-hicp'),
   quiet('breakeven-5y5y'),
   reading('breakeven-tilt', { value: 0.1, percentile10y: 0.5, change30d: 0.05 }),
+  quiet('t5yie'),
+  quiet('michigan-1y-expectations'),
+  quiet('m2-us'),
+  quiet('us-deficit-12m'),
+  quiet('cftc-gold-positioning'),
+  quiet('cftc-gold-gross-long'),
   reading('gold-usd', { value: 4200, percentile10y: 0.6, change30d: 5.1 }),
 ];
 
 /**
- * The stack case (engine-verified: 0 for · 4 against, net −4 → the full
- * 10° tip against): ALL FOUR lanes read against — the against pan holds
- * four weights (two rows) and the tray carries its empty line.
+ * The stack case (engine-verified: 0 for · 5 against, net −5 → the full
+ * 10° tip against): ALL FIVE lanes read against — GF-P2's restatement: the
+ * new seats fire on the against side of their polarities (the flows
+ * pair's crowded highs pressure) — the against pan holds five weights
+ * (two rows) and the tray carries its empty line.
  */
 const STACK: IndicatorReading[] = [
   reading('real-yield-10y', { value: 2.9, percentile10y: 0.95 }),
@@ -240,30 +285,43 @@ const STACK: IndicatorReading[] = [
   reading('dollar-basket', { value: 108, percentile10y: 0.95 }),
   reading('usdjpy', { value: 155, percentile10y: 0.95 }),
   quiet('us-japan-10y-gap'),
+  reading('usd-reserve-share', { value: 58, percentile10y: 0.95 }), // GF-P2 (C): D5 — a rising USD share pressures
+  reading('nyfed-custody', { value: 3.4e6, percentile10y: 0.95 }), // GF-P2 (K): G4 — rising custody pressures
   reading('stress-stlfsi', { value: -0.4, percentile10y: 0.05 }),
   reading('nfci', { value: -0.3, percentile10y: 0.05 }),
   quiet('vix'),
   quiet('gold-silver'),
-  quiet('cftc-gold-positioning'),
+  reading('term-premium-10y', { value: -1.2, percentile10y: 0.05 }), // GF-P2 (K): R9 — a low term premium pressures (polarity +1)
+  reading('ebp', { value: -0.3, percentile10y: 0.05 }), // GF-P2 (K): S4 — easy credit pressures
+  reading('michigan-sentiment', { value: 72, percentile10y: 0.95 }), // GF-P2 (K): S13 — optimism pressures (polarity −1)
+  reading('gpr-daily', { value: 0.2, percentile10y: 0.05 }), // GF-P2 (K): S7 — a calm world pressures
+  reading('epu-us', { value: 60, percentile10y: 0.05 }), // GF-P2 (K): S8 — low uncertainty pressures
+  reading('sp500-breadth-ratio', { value: 0.4, percentile10y: 0.95 }), // GF-P2 (C): S6 — narrow breadth pressures (polarity −1)
   reading('us-cpi-yoy', { value: 1.2, percentile10y: 0.05 }),
   reading('us-pce-core-yoy', { value: 1.3, percentile10y: 0.05 }),
   quiet('euro-hicp'),
   quiet('breakeven-5y5y'),
   reading('breakeven-tilt', { value: 0.1, percentile10y: 0.5, change30d: 0.05 }),
+  reading('t5yie', { value: 2.1, percentile10y: 0.05 }), // GF-P2 (K): R8 — cooling expectations pressure
+  reading('michigan-1y-expectations', { value: 2.4, percentile10y: 0.05 }), // GF-P2 (K): I3
+  reading('m2-us', { value: 21e12, percentile10y: 0.05 }), // GF-P2 (K): I7 — a shrinking money stock pressures
+  reading('us-deficit-12m', { value: 1.1e12, percentile10y: 0.05 }), // GF-P2 (K): G1 — a narrowing deficit pressures
+  reading('cftc-gold-positioning', { value: 60, percentile10y: 0.95 }), // GF-P2 (B): F1 — crowded net longs pressure
+  reading('cftc-gold-gross-long', { value: 66, percentile10y: 0.95 }), // GF-P2 (K): F2 — crowded gross longs pressure
   reading('gold-usd', { value: 4100, percentile10y: 0.6, change30d: -9.0 }),
 ];
 
-/** The all-unread case (engine-verified: 4 unread, readable 0): every
+/** The all-unread case (engine-verified: 5 unread, readable 0): every
  * voter stale — the level beam, the "Can't read" hero, no needle, both
- * pans carrying the shared nothing-read sentence, four dotted rims in
- * the tray. */
+ * pans carrying the shared nothing-read sentence, five dotted rims in
+ * the tray (GF-P2's five-lane set). */
 const ALL_UNREAD: IndicatorReading[] = [
   ...ALL_VOTERS.map((id) => reading(id, { status: 'stale', value: null })),
   reading('gold-usd', { value: 4166, percentile10y: 0.6, change30d: -4.2 }),
 ];
 
 /** The sparse case (engine-verified: 1 readable lane, net −1): only
- * borrowing costs reads (against); the other three lanes unread — UI-40:
+ * borrowing costs reads (against); the other four lanes unread — UI-40:
  * level beam + the not-enough verdict word, no needle. */
 const SPARSE: IndicatorReading[] = [
   reading('real-yield-10y', { value: 2.9, percentile10y: 0.95 }),
@@ -342,19 +400,21 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     renderCard(DIRECTIONAL);
     const b = goldBalance(DIRECTIONAL);
     // The UI mirrors the engine exactly (AC-3: one engine, no drift).
-    expect(b.counts).toEqual({ for: 1, against: 2, neutral: 1, unread: 0 });
+    // GF-P2 (B/C/K): five lanes — inflation AND the flows pair sit in the tray.
+    expect(b.counts).toEqual({ for: 1, against: 2, neutral: 2, unread: 0 });
     const forAssembly = document.querySelector('[data-balance-assembly="for"]') as HTMLElement;
     const againstAssembly = document.querySelector('[data-balance-assembly="against"]') as HTMLElement;
     // stress (for) on the supporting pan; borrowing-costs + dollar (against) on the pressuring pan.
     expect(forAssembly.querySelector('[data-balance-weight="stress"]')).not.toBeNull();
     expect(againstAssembly.querySelector('[data-balance-weight="borrowing-costs"]')).not.toBeNull();
     expect(againstAssembly.querySelector('[data-balance-weight="dollar"]')).not.toBeNull();
-    // inflation (neutral, below the crowd minimum) in the tray — never on a pan.
+    // inflation + flows (neutral, below the crowd minimum) in the tray — never on a pan.
     const tray = document.querySelector('[data-balance-tray="not-leaning"]') as HTMLElement;
     expect(tray.querySelector('[data-balance-weight="inflation"]')).not.toBeNull();
-    // Exactly one weight per lane (4 total — pans + tray; the ledger rows
+    expect(tray.querySelector('[data-balance-weight="flows"]')).not.toBeNull();
+    // Exactly one weight per lane (5 total — pans + tray; the ledger rows
     // carry plain discs, not weight buttons).
-    expect(document.querySelectorAll('[data-balance-weight]').length).toBe(4);
+    expect(document.querySelectorAll('[data-balance-weight]').length).toBe(5);
     // The beam tips against (net −1 → |−1|/3 × 10° ≈ 3.33°, the unchanged formula).
     const tilt = Number(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt'));
     expect(tilt).toBeCloseTo(3.33, 1);
@@ -362,17 +422,19 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     expect(document.querySelector('[data-balance-verdict-word]')?.getAttribute('data-side')).toBe('against');
   });
 
-  it('the 2026-10-31 fixture: borrowing-costs FOR — one pan weight, the tipped beam, the "Leaning for gold" hero, the full counts line, 3 tray weights', () => {
+  it('the 2026-10-31 fixture: borrowing-costs FOR — one pan weight, the tipped beam, the "Leaning for gold" hero, the full counts line (4 not leaning · 1 unread), 4 tray weights', () => {
     // GF-P1 (2026-11-05, the owner's recorded answers H/I/J) restated the
-    // recorded fixture: the demotion (H) left borrowing-costs 6 members; the
-    // fed-expectations threshold (J) flipped its seat to the MOVE leg
-    // (falling → supports) so the lane reads FOR 3v1; the D-18 rule (I)
-    // rendered the inputless cftc member unread (stress readable 4).
-    // Engine-verified: for 1 · against 0 · neutral 3, net +1 over 1 tipped
-    // → the full 10° tip for.
+    // recorded fixture once; GF-P2 (the owner's recorded answers B/C/K)
+    // restates it again: the twelve promoted seats' readings are absent from
+    // the 2026-10-31 archive (unread members, never a guess); t5yie fires on
+    // J's P1 threshold (R8's promotion) flipping inflation to a 1v1 split;
+    // the flows lane reads unread (the D-18 inputless cftc member + the
+    // absent gross-long seat).
+    // Engine-verified: for 1 · against 0 · neutral 3 · unread 1, net +1 over
+    // 1 tipped → the full 10° tip for.
     renderCard(fixtureReadings());
     const b = goldBalance(fixtureReadings());
-    expect(b.counts).toEqual({ for: 1, against: 0, neutral: 3, unread: 0 });
+    expect(b.counts).toEqual({ for: 1, against: 0, neutral: 3, unread: 1 });
     expect(
       document.querySelector('[data-balance-assembly="for"] [data-balance-weight="borrowing-costs"]'),
     ).not.toBeNull();
@@ -380,16 +442,19 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     expect(Number(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt'))).toBe(-10);
     expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toBe('Leaning for gold');
     // The counts line states the whole shape (05 §4.4): for/against
-    // always, not-leaning always, unread only when > 0.
-    expect(document.querySelector('[data-balance-count]')?.textContent).toBe('1 for · 0 against · 3 not leaning');
+    // always, not-leaning always, unread only when > 0 — the flows lane's
+    // unread part renders (GF-P2).
+    expect(document.querySelector('[data-balance-count]')?.textContent).toBe('1 for · 0 against · 3 not leaning · 1 unread');
     const tray = document.querySelector('[data-balance-tray="not-leaning"]') as HTMLElement;
-    expect(tray.querySelectorAll('[data-balance-weight]').length).toBe(3);
-    // The lane strip: four segments, one for + three neutral (decorative, aria-hidden).
+    expect(tray.querySelectorAll('[data-balance-weight]').length).toBe(4);
+    // The lane strip: five segments, one for + three neutral + one unread
+    // (decorative, aria-hidden — the flows rim dotted).
     const strip = document.querySelector('[data-balance-lane-strip]') as HTMLElement;
     expect(strip.getAttribute('aria-hidden')).toBe('true');
-    expect(strip.querySelectorAll('i').length).toBe(4);
+    expect(strip.querySelectorAll('i').length).toBe(5);
     expect(strip.querySelectorAll('i[data-side="neutral"]').length).toBe(3);
     expect(strip.querySelectorAll('i[data-side="for"]').length).toBe(1);
+    expect(strip.querySelectorAll('i[data-side="unread"]').length).toBe(1);
   });
 
   it('the FOR case: three weights on the supporting pan, the full 10° tip for (the signed angle is for-heavy NEGATIVE), the tray still holds the quiet lane', () => {
@@ -401,10 +466,12 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toBe('Leaning for gold');
   });
 
-  it('the stack case: all four weights on ONE pan (two rows) and the tray shows its empty line (05 §4.5)', () => {
+  it('the stack case: all five weights on ONE pan (two rows) and the tray shows its empty line (05 §4.5)', () => {
+    // GF-P2 (B/C/K): the new seats fire on the against side — ALL FIVE
+    // lanes read against (engine-verified: 0 for · 5 against).
     renderCard(STACK);
     const againstAssembly = document.querySelector('[data-balance-assembly="against"]') as HTMLElement;
-    expect(againstAssembly.querySelectorAll('[data-balance-weight]').length).toBe(4);
+    expect(againstAssembly.querySelectorAll('[data-balance-weight]').length).toBe(5);
     expect(document.querySelector('[data-balance-assembly="for"] [data-balance-weight]')).toBeNull();
     const tray = document.querySelector('[data-balance-tray="not-leaning"]') as HTMLElement;
     expect(tray.querySelector('[data-balance-weight]')).toBeNull();
@@ -542,16 +609,29 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
       document.getElementById('gold-balance-row-borrowing-costs')?.querySelector('[data-balance-member-group="unread"]'),
     ).toBeNull();
     // …but GF-P1's D-18 input-presence rule (the owner's recorded decision
-    // I, 2026-11-05) now renders the STRESS row's unread group naturally:
-    // the fixture's cftc member is readable-but-inputless (the 1-point
-    // staged truth) — unread, never a steady word (audit D-18).
+    // I, 2026-11-05) renders the FLOWS row's unread group naturally, and
+    // GF-P2 (B/C/K) restates the shape twice: the six promoted stress
+    // voters' readings are absent from the 2026-10-31 archive → the stress
+    // row's unread group lists them; the cftc member (readable-but-inputless,
+    // the 1-point staged truth) now lives in the FLOWS row beside the
+    // gross-long seat whose reading the archive does not carry — unread,
+    // never a steady word (audit D-18).
     openRow('stress');
     const stressUnread = document.getElementById('gold-balance-row-stress')?.querySelector(
       '[data-balance-member-group="unread"]',
     ) as HTMLElement;
     expect(stressUnread).not.toBeNull();
-    expect(stressUnread.textContent).toContain('Could not be read (1)');
-    expect(stressUnread.textContent).toContain('Gold positioning');
+    expect(stressUnread.textContent).toContain('Could not be read (6)');
+    expect(stressUnread.textContent).toContain('10-year term premium');
+    expect(stressUnread.textContent).toContain('Excess bond premium');
+    openRow('flows');
+    const flowsUnread = document.getElementById('gold-balance-row-flows')?.querySelector(
+      '[data-balance-member-group="unread"]',
+    ) as HTMLElement;
+    expect(flowsUnread).not.toBeNull();
+    expect(flowsUnread.textContent).toContain('Could not be read (2)');
+    expect(flowsUnread.textContent).toContain('Gold positioning');
+    expect(flowsUnread.textContent).toContain('Gold long positioning');
   });
 });
 
@@ -783,14 +863,15 @@ describe('the verdict block and the states (GB-S4, 05 §4.4 + §8)', () => {
     expect(verdict.querySelector('.bal-verdict-eyebrow')?.textContent).toBe('Today’s lean');
   });
 
-  it('the counts line appends the unread part only when > 0 (all-unread: "0 for · 0 against · 0 not leaning · 4 unread")', () => {
+  it('the counts line appends the unread part only when > 0 (all-unread: "0 for · 0 against · 0 not leaning · 5 unread")', () => {
+    // GF-P2 (B/C/K): five lanes — the all-unread case carries five dotted rims.
     renderCard(ALL_UNREAD);
     expect(document.querySelector('[data-balance-count]')?.textContent).toBe(
-      '0 for · 0 against · 0 not leaning · 4 unread',
+      '0 for · 0 against · 0 not leaning · 5 unread',
     );
   });
 
-  it('all four lanes unread: level beam, the "Can\'t read" hero in primary ink, no needle, both pans carry the shared nothing-read sentence, four dotted rims in the tray', () => {
+  it('all five lanes unread: level beam, the "Can\'t read" hero in primary ink, no needle, both pans carry the shared nothing-read sentence, five dotted rims in the tray', () => {
     renderCard(ALL_UNREAD);
     expect(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt')).toBe('0');
     const word = document.querySelector('[data-balance-verdict-word]') as HTMLElement;
@@ -803,7 +884,7 @@ describe('the verdict block and the states (GB-S4, 05 §4.4 + §8)', () => {
       );
     }
     const trayWeights = document.querySelectorAll('[data-balance-tray] [data-balance-weight]');
-    expect(trayWeights.length).toBe(4);
+    expect(trayWeights.length).toBe(5);
     for (const w of trayWeights) {
       const segs = w.querySelectorAll('[data-bal-seg]');
       expect(segs.length).toBeGreaterThan(0);
@@ -865,9 +946,10 @@ describe('RTL (04 §4.3 item 9)', () => {
     const forLeft = Number((document.querySelector('[data-balance-assembly="for"]') as HTMLElement).style.left.replace('px', ''));
     expect(forLeft).toBeGreaterThan(360);
     // Persian digits render in the ledger tally (the locale formatter) — the
-    // dollar lane reads against on this fixture: 2 of its 3 voters firing.
+    // dollar lane reads against on this fixture: 2 of its 5 voters firing
+    // (GF-P2 C/K: D5 + G4 seat — the quiet rows read steady).
     expect(document.querySelector('[data-balance-row="dollar"] [data-balance-tally]')?.textContent).toBe(
-      '۲ مورد از ۳ عامل فعال است',
+      '۲ مورد از ۵ عامل فعال است',
     );
   });
 });
@@ -1087,9 +1169,11 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     // bullish (was neutral on the pre-P1 level balance).
     ['the recorded fixture (L1 A0, price moving)', () => fixtureReadings(), 'bullish'],
     ['DIRECTIONAL (1 for · 2 against, price moving)', () => DIRECTIONAL, 'bearish'],
-    ['FOR (3 for)', () => FOR, 'strong-bullish'],
-    ['STACK (4 against)', () => STACK, 'strong-bearish'],
-    ['SPARSE (1 against · 3 unread, price moving)', () => SPARSE, 'bearish'],
+    // GF-P2 (the owner's recorded answer B): the strong bar is 4-of-5 — 3
+    // for is a majority, not strong (the old 3-of-4 bar moved).
+    ['FOR (3 for — the 4-of-5 bar keeps it bullish)', () => FOR, 'bullish'],
+    ['STACK (5 against)', () => STACK, 'strong-bearish'],
+    ['SPARSE (1 against · 4 unread, price moving)', () => SPARSE, 'bearish'],
     ['fixture · gold -9%', () => withGold(fixtureReadings(), -9), 'bullish'],
     ['fixture · gold +9%', () => withGold(fixtureReadings(), 9), 'bullish'],
     ['fixture · gold quiet + typical band', () => withGold(fixtureReadings(), 0.8, 0.5), 'range-bound'],
@@ -1171,7 +1255,8 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     expect(up).toEqual(down);
     expect(down).toEqual({
       verdict: 'Leaning for gold',
-      count: '1 for · 0 against · 3 not leaning',
+      // GF-P2 (B/C/K): the counts line states the unread flows lane.
+      count: '1 for · 0 against · 3 not leaning · 1 unread',
       tilt: '-10',
       direction: 'bullish',
     });
@@ -1218,8 +1303,10 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     );
     cleanup();
     renderCard(FOR);
+    // GF-P2 (the owner's recorded answer B): 3 of 5 is a majority, not the
+    // strong bar — the bullish sentence (was strong-bullish under 3-of-4).
     expect(document.querySelector('[data-verdict-metal="gold"]')?.textContent).toContain(
-      copy.signals.verdictStates['strong-bullish'].gold,
+      copy.signals.verdictStates.bullish.gold,
     );
   });
 
@@ -1296,14 +1383,15 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
   });
 
   it('THE CORNER DECISION: the collapsed gold PROSE speaks the lane model — the verdict word + the counts line, the same words the card renders', () => {
-    // DIRECTIONAL: 1 for · 2 against · 1 neutral — the engine-verified battery.
+    // DIRECTIONAL: 1 for · 2 against · 2 neutral (GF-P2's five-lane battery —
+    // inflation AND the flows pair quiet) — the engine-verified battery.
     const b = goldBalance(DIRECTIONAL);
-    expect(b.counts).toEqual({ for: 1, against: 2, neutral: 1, unread: 0 });
+    expect(b.counts).toEqual({ for: 1, against: 2, neutral: 2, unread: 0 });
     const { lineOf } = renderSignals();
     const goldLine = lineOf('gold') ?? '';
     // The verdict word + the counts parts, exactly as the card renders them.
     expect(goldLine).toContain('Leaning against gold');
-    expect(goldLine).toContain('1 for · 2 against · 1 not leaning');
+    expect(goldLine).toContain('1 for · 2 against · 2 not leaning');
     // The legacy 5-condition count is GONE from the gold prose (the
     // circularity D-GB-5 removed; the counts line is the lane counts).
     expect(goldLine).not.toContain('of 5 conditions met');
@@ -1314,7 +1402,7 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
     expect(silverLine).toContain('of 6 conditions met');
   });
 
-  it('the collapsed gold PROSE on the recorded fixture: "Leaning for gold, 1 for · 0 against · 3 not leaning" (GF-P1\'s recorded flip)', () => {
+  it('the collapsed gold PROSE on the recorded fixture: "Leaning for gold, 1 for · 0 against · 3 not leaning · 1 unread" (GF-P2 restates GF-P1\'s recorded flip)', () => {
     const { lineOf } = renderSignals(fixtureReadings());
     const goldLine = lineOf('gold') ?? '';
     expect(goldLine).toContain('Leaning for gold');
@@ -1340,7 +1428,7 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
     // GF-P1: the fixture reads FOR now — the Persian for-word
     // ('تمایل به نفع طلا') + the 1-for counts.
     expect(goldLine).toContain('تمایل به نفع طلا');
-    expect(goldLine).toContain('۱ موافق · ۰ مخالف · ۳ بدون گرایش');
+    expect(goldLine).toContain('۱ موافق · ۰ مخالف · ۳ بدون گرایش · ۱ ناخوانده');
     // The legacy Persian count clause is gone from the gold line.
     expect(goldLine).not.toContain('از ۵ شرط');
     // Silver keeps its own Persian sentence.

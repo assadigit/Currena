@@ -250,9 +250,11 @@ const MOVING = 6.4; // well above it
  * `U` unread, the rest neutral — the counts roll up exactly as
  * goldBalance() does (the engine's own rollup is pinned by its tests;
  * this builder lets the table test walk every (L, A, unread) branch
- * without 21-voter fixtures). goldOutlookOf reads only the rollup. */
+ * without 32-voter fixtures). goldOutlookOf reads only the rollup. */
 const laneBalance = (L: number, A: number, U: number): GoldBalanceReading => {
-  const neutral = 4 - L - A - U;
+  // GF-P2 (the owner's recorded answer B): five lanes — the neutral count
+  // derives from the lane list, never a hardcoded four.
+  const neutral = GOLD_LANES.length - L - A - U;
   const sides: GoldBalanceSide[] = [
     ...Array<GoldBalanceSide>(L).fill('for'),
     ...Array<GoldBalanceSide>(A).fill('against'),
@@ -286,30 +288,39 @@ const outlookAt = (
 ): ReturnType<typeof goldOutlookOf> => goldOutlookOf(laneBalance(L, A, U), speed, band === null ? null : pos(band));
 
 describe('goldOutlookOf — the consolidated gold Outlook (01 §5.2, GB-S5 P3)', () => {
-  it('the strong bar sits at GOLD_LANE_STRONG = 3 of 4 lanes (mirroring the old 4-of-5 bar)', () => {
-    expect(GOLD_LANE_STRONG).toBe(3);
-    // 2 of 4 is a majority, not a strong one
+  // GF-P2 (2026-11-05, the owner's recorded answer B): the five-lane set —
+  // the strong bar moved 3-of-4 (75%) → 4-of-5 (80%, preserving the
+  // strictness; 3-of-5 = 60% would have loosened it — the owner's recorded
+  // reason).
+  it('the strong bar sits at GOLD_LANE_STRONG = 4 of 5 lanes (80% — preserving the old 3-of-4 = 75% strictness)', () => {
+    expect(GOLD_LANE_STRONG).toBe(4);
+    expect(GOLD_LANES).toHaveLength(5);
+    // 3 of 5 is a majority (60%), not a strong one
+    expect(outlookAt(3, 0, 0, MOVING, 'typical')).toBe('bullish');
+    expect(outlookAt(0, 3, 0, MOVING, 'typical')).toBe('bearish');
+    // 2 of 5 is a plurality, not even a majority
     expect(outlookAt(2, 0, 0, MOVING, 'typical')).toBe('bullish');
-    expect(outlookAt(0, 2, 0, MOVING, 'typical')).toBe('bearish');
   });
 
-  it('all four lanes unread → null (verdictNone — nothing could be read)', () => {
-    expect(outlookAt(0, 0, 4, null, null)).toBeNull();
+  it('all five lanes unread → null (verdictNone — nothing could be read)', () => {
+    expect(outlookAt(0, 0, 5, null, null)).toBeNull();
+    // four unread + one readable is NOT nothing — the readable lane speaks
+    expect(outlookAt(0, 0, 4, null, null)).toBe('neutral');
     // rule 1 precedes everything, even complete range evidence
-    expect(outlookAt(0, 0, 4, QUIET, 'typical')).toBeNull();
+    expect(outlookAt(0, 0, 5, QUIET, 'typical')).toBeNull();
   });
 
-  it('L >= 3 → strong-bullish; A >= 3 → strong-bearish (L=3, L=4 both pin)', () => {
-    expect(outlookAt(3, 0, 0, MOVING, 'typical')).toBe('strong-bullish');
-    expect(outlookAt(3, 1, 0, MOVING, 'typical')).toBe('strong-bullish');
+  it('L >= 4 → strong-bullish; A >= 4 → strong-bearish (L=4 both pins, 4-of-5)', () => {
     expect(outlookAt(4, 0, 0, MOVING, 'typical')).toBe('strong-bullish');
+    expect(outlookAt(4, 1, 0, MOVING, 'typical')).toBe('strong-bullish');
     // the strong states outrank the range rule even on a quiet, typical month
-    expect(outlookAt(3, 0, 0, QUIET, 'typical')).toBe('strong-bullish');
     expect(outlookAt(4, 0, 0, QUIET, 'typical')).toBe('strong-bullish');
-    expect(outlookAt(0, 3, 0, MOVING, 'typical')).toBe('strong-bearish');
-    expect(outlookAt(1, 3, 0, MOVING, 'typical')).toBe('strong-bearish');
     expect(outlookAt(0, 4, 0, MOVING, 'typical')).toBe('strong-bearish');
-    expect(outlookAt(0, 3, 0, QUIET, 'typical')).toBe('strong-bearish');
+    expect(outlookAt(1, 4, 0, MOVING, 'typical')).toBe('strong-bearish');
+    expect(outlookAt(0, 4, 0, QUIET, 'typical')).toBe('strong-bearish');
+    // GF-P2: 3 no longer clears the bar (3-of-5 = 60%) — the loosening the
+    // owner's recorded 4-of-5 answer prevents
+    expect(outlookAt(3, 0, 0, MOVING, 'typical')).toBe('bullish');
   });
 
   it('range-bound: quiet price mid-range plus |L - A| <= 1 beats a thin driver edge', () => {
@@ -360,7 +371,8 @@ describe('goldOutlookOf — the consolidated gold Outlook (01 §5.2, GB-S5 P3)',
   it('a clear driver edge (|L - A| >= 2) keeps its direction regardless of a quiet month', () => {
     expect(outlookAt(2, 0, 0, QUIET, 'typical')).toBe('bullish');
     expect(outlookAt(0, 2, 0, QUIET, 'typical')).toBe('bearish');
-    expect(outlookAt(3, 1, 0, QUIET, 'typical')).toBe('strong-bullish');
+    // GF-P2 (B): the strong bar is 4 — a 3v1 edge is bullish, not strong
+    expect(outlookAt(3, 1, 0, QUIET, 'typical')).toBe('bullish');
   });
 
   it('L == A → mixed when L > 0, else neutral', () => {
@@ -386,14 +398,15 @@ describe('goldOutlookOf — the consolidated gold Outlook (01 §5.2, GB-S5 P3)',
     // The old gold path counted the move itself as a 5th condition
     // (falling = bearish evidence). The lane derivation reads price ONLY
     // as range evidence — the sign of a large move can never flip a state.
+    // GF-P2 (B): the strong rows moved to the 4-of-5 bar.
     for (const [L, A, U, expected] of [
       [2, 1, 0, 'bullish'],
       [1, 2, 0, 'bearish'],
       [0, 0, 0, 'neutral'],
       [1, 1, 0, 'mixed'],
       [0, 1, 3, 'bearish'],
-      [3, 0, 0, 'strong-bullish'],
-      [0, 3, 0, 'strong-bearish'],
+      [4, 0, 0, 'strong-bullish'],
+      [0, 4, 0, 'strong-bearish'],
     ] as const) {
       expect(outlookAt(L, A, U, -9, 'typical'), `L${L} A${A} U${U} at -9%`).toBe(expected);
       expect(outlookAt(L, A, U, 9, 'typical'), `L${L} A${A} U${U} at +9%`).toBe(expected);

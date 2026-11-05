@@ -77,10 +77,14 @@ export const GAUGES: readonly GaugeDef[] = [
   // 10-year position; the calm/nervous word thresholds arrive with Step 3).
   // 2026-10-26 gap-audit build, A-7: gold COT positioning joins the
   // voters — the crowded-book gauge beside VIX and the stress pair.
+  // GF-P2 (2026-11-05, the owner's recorded answer K — the audit report §4
+  // row 12 / F2): the GROSS-long twin joins beside the net seat (the same
+  // deafut.txt row; the gold meter's flows lane carries both, the question
+  // gauge scores both — the crowded-book read at its richest).
   {
     id: 'market-stress',
     section: 'global',
-    members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver', 'cftc-gold-positioning'],
+    members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver', 'cftc-gold-positioning', 'cftc-gold-gross-long'],
   },
   // 2026-10-26 gap-audit build, A-3: the US−Japan 10y gap joins the
   // voters — the carry trade's fuel line beside USD/JPY.
