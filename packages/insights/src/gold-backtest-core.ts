@@ -16,10 +16,10 @@
  *    the truncation is the belt-and-braces guarantee, and the test
  *    asserts the two agree.)
  *  - scoreOverVoters() is a COPY of goldTailwindScore's arithmetic with
- *    the voter table parameterized. Production's GOLD_LANE_VOTERS stays
- *    untouched (D-5 discipline); the equivalence is PINNED BY TEST
- *    (scoreOverVoters(r, GOLD_LANE_VOTERS) === goldTailwindScore(r) on
- *    synthetic batteries), so the harness cannot drift from the engine.
+ *    the voter table parameterized. The equivalence with the production
+ *    table is PINNED BY TEST (scoreOverVoters(r, GOLD_LANE_VOTERS) ===
+ *    goldTailwindScore(r) on synthetic batteries), so the harness cannot
+ *    drift from the engine.
  *
  * Tested in gold-backtest-core.test.ts (window joins, the no-lookahead
  * percentile, the flat band, the pin). Platform-free (AGENTS.md rule 2).
@@ -28,7 +28,6 @@
 import type { IndicatorReading } from '@currena/core';
 import type { GoldLane, GoldLaneVoter, GoldSubGaugeWord, GoldTailwindLabel, GoldTailwindReading, GoldVoter } from './gold-score';
 import {
-  GOLD_LANE_VOTERS,
   GOLD_LANES,
   GOLD_STRONG_MIN_FIRING,
   GOLD_STRONG_SHARE,
@@ -42,16 +41,42 @@ import type { SeriesPoint } from './series';
  * ------------------------------------------------------------------ */
 
 /**
- * The PROMOTED production table (D-5, Session 6): the harness's 21-voter
- * table IS the production `GOLD_LANE_VOTERS` since the promotion landed —
- * `breakeven-tilt` (T5YIFR − T5YIE) as the 5th member of the inflation
- * lane, polarity +1, level-leg only (the shared evaluator carries no
- * 30-day move threshold for it — exactly the variant S4's B4 measured).
- * The EQUALITY is pinned by test (gold-backtest-core.test.ts): this alias
- * exists so the harness's own references stay named, and can never drift
- * from the engine.
+ * The S6-promoted 21-voter table — the production `GOLD_LANE_VOTERS`
+ * from Session 6 (the D-5 breakeven-tilt promotion) until GF-P1 (2026-11-05),
+ * kept VERBATIM for lineage: the GB-S1 calibration, BACKTEST-GOLD-LANES.md
+ * and the FROZEN/POST-P1 calibration scenarios measured THIS table, and the
+ * GF-P0 report must keep reproducing over it. Do not edit: it is a
+ * historical snapshot, not a living config.
+ *
+ * GF-P1 (2026-11-05, the owner's recorded decision H — the D-7/D-8 context
+ * demotion): production became the 19-seat table (GOLD_LANE_VOTERS in
+ * gold-score.ts = this snapshot minus the two yield-curve seats); the pin
+ * asserts the demotion is the ONLY difference. `_20` stays as the
+ * pre-promotion S4 snapshot beneath this one.
  */
-export const HARNESS_GOLD_VOTERS_21: readonly GoldLaneVoter[] = GOLD_LANE_VOTERS;
+export const HARNESS_GOLD_VOTERS_21: readonly GoldLaneVoter[] = [
+  { lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'us10y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'us30y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'fed-target', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'yield-curve-10y2y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'yield-curve-10y3m', polarity: -1 },
+  { lane: 'dollar', id: 'dollar-basket', polarity: -1 },
+  { lane: 'dollar', id: 'usdjpy', polarity: -1 },
+  { lane: 'dollar', id: 'us-japan-10y-gap', polarity: -1 },
+  { lane: 'stress', id: 'stress-stlfsi', polarity: 1 },
+  { lane: 'stress', id: 'nfci', polarity: 1 },
+  { lane: 'stress', id: 'vix', polarity: 1 },
+  { lane: 'stress', id: 'gold-silver', polarity: 1 },
+  { lane: 'stress', id: 'cftc-gold-positioning', polarity: -1 },
+  { lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 },
+  { lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 },
+  { lane: 'inflation', id: 'euro-hicp', polarity: 1 },
+  { lane: 'inflation', id: 'breakeven-5y5y', polarity: 1 },
+  { lane: 'inflation', id: 'breakeven-tilt', polarity: 1 },
+];
 
 /**
  * The S4 FROZEN 20-voter table — the pre-promotion production table, kept
@@ -266,29 +291,37 @@ export function signAgreement(netScore: number, retPct: number, bandPct: number)
  * ------------------------------------------------------------------ */
 
 /**
- * One lane-rule configuration for the P0 calibration: the SAME frozen
- * 21-voter production table, paired with a lane-vote crowd minimum
- * (`GOLD_LANE_MIN_FIRING` per D-GB-3; the pre-registered fallback is 1).
- * These sit BESIDE the frozen voter tables (`HARNESS_GOLD_VOTERS_21` /
- * `_20`) and change nothing about them: the voters, their lanes and their
- * polarities come from `gold-score.ts`'s `GOLD_LANE_VOTERS` — the single
- * source of truth (D-GB-9). The consolidated balance's production engine
- * (`gold-balance.ts`, rollout phase P1) will import the same source; this
- * harness-local copy exists so the calibration can run BEFORE any UI work,
- * exactly as 02 §6 pre-registered.
+ * One lane-rule configuration for the P0 calibration: a voter table
+ * paired with a lane-vote crowd minimum (`GOLD_LANE_MIN_FIRING` per
+ * D-GB-3; the pre-registered fallback is 1). The lineage configurations
+ * (HARNESS_GOLD_LANES_MIN2 / _MIN1 below) pair the FROZEN 21-seat
+ * snapshot — the table the GB-S1 calibration and BACKTEST-GOLD-LANES.md
+ * measured — with their crowd minimums. The CURRENT production seats are
+ * `gold-score.ts`'s `GOLD_LANE_VOTERS` (since GF-P1 a 19-seat table,
+ * D-GB-9's single source of truth); the post-P1 recalibration of that
+ * set is the GF program's own evidence (gf-p1-verify,
+ * docs/specs/gold-meter-gapfill/).
  */
 export interface HarnessGoldLanes {
-  /** The voter table the lanes group — always GOLD_LANE_VOTERS here. */
+  /** The voter table the lanes group (the lineage configs use the frozen 21-seat snapshot). */
   readonly voters: readonly GoldLaneVoter[];
   /** The crowd minimum: how many firing voters a lane needs before it may vote. */
   readonly minFiring: number;
 }
 
-/** D-GB-3's default rule: a lane votes only when at least 2 of its voters fire. */
-export const HARNESS_GOLD_LANES_MIN2: HarnessGoldLanes = { voters: GOLD_LANE_VOTERS, minFiring: 2 };
+/** D-GB-3's default rule: a lane votes only when at least 2 of its voters fire.
+ *
+ * The GB-S1 lineage configuration (02 §6's calibration measured THIS pairing
+ * over the frozen 21): the voters stay the FROZEN 21-seat snapshot
+ * (HARNESS_GOLD_VOTERS_21) after GF-P1 demoted the production table to 19 —
+ * the lineage numbers (BACKTEST-GOLD-LANES.md) keep their measured basis,
+ * and the current production set's recalibration is the GF program's own
+ * evidence (gf-p0-calibration + gf-p1-verify, docs/specs/gold-meter-gapfill/).
+ */
+export const HARNESS_GOLD_LANES_MIN2: HarnessGoldLanes = { voters: HARNESS_GOLD_VOTERS_21, minFiring: 2 };
 
 /** The pre-registered calibration fallback (02 §6): one firing voter can tip a lane. */
-export const HARNESS_GOLD_LANES_MIN1: HarnessGoldLanes = { voters: GOLD_LANE_VOTERS, minFiring: 1 };
+export const HARNESS_GOLD_LANES_MIN1: HarnessGoldLanes = { voters: HARNESS_GOLD_VOTERS_21, minFiring: 1 };
 
 /** A lane's side in the consolidated balance (02 §2's GoldBalanceSide). */
 export type GoldLaneSide = 'for' | 'against' | 'neutral' | 'unread';
@@ -336,11 +369,21 @@ export interface HarnessLaneBalance {
  * imports). Pure, offline, order-independent; never throws on missing
  * readings. `unread` (nothing readable) and `neutral` (readable, nothing
  * firing or split) are never merged — problem P5's fix.
+ *
+ * `inputPresence` (GF-P1, the owner's recorded decision I, 2026-11-05 —
+ * the D-18 readable-rule question): when true, a readable seat with
+ * NEITHER evalLeg input (no direction — no threshold or no finite
+ * change30d — and no level — no percentile10y) counts as UNREAD, the
+ * same rule the production `goldBalance` engine applies unconditionally
+ * (the fake-steady class, audit D-18). Default FALSE = the frozen
+ * lineage semantics (the GB-S1 numbers and every committed backtest
+ * re-run keep their measured basis).
  */
 export function laneBalanceOverVoters(
   readings: readonly IndicatorReading[],
   voters: readonly GoldLaneVoter[],
   minFiring: number,
+  inputPresence = false,
 ): HarnessLaneBalance {
   const byId = new Map(readings.map((r) => [r.id as string, r]));
 
@@ -352,8 +395,11 @@ export function laneBalanceOverVoters(
       if (def.lane !== lane) continue;
       const r = byId.get(def.id);
       if (!readable(r)) continue;
-      readableCount++;
       const leg = evalLeg(def.id, r);
+      // The D-18 input-presence rule (see the doc comment): inputless →
+      // unread, never a steady word.
+      if (inputPresence && leg.direction === null && leg.level === null) continue;
+      readableCount++;
       if (leg.lean === 0) continue; // steady AND typical — honestly not firing
       if (leg.lean * def.polarity === 1) supports++;
       else pressures++;

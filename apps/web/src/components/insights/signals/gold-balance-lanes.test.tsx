@@ -131,8 +131,9 @@ function reading(id: IndicatorId, extra: Partial<IndicatorReading> = {}): Indica
   };
 }
 
-/** Every one of the 21 voters (the lane ids in table order), for the
- * synthetic fixtures' shared quiet rows. */
+/** Every one of the 19 voters (the lane ids in table order — GF-P1,
+ * 2026-11-05, the owner's recorded decision H: the two yield-curve seats
+ * demoted to context), for the synthetic fixtures' shared quiet rows. */
 const ALL_VOTERS: IndicatorId[] = [
   'real-yield-10y',
   'us10y',
@@ -140,8 +141,6 @@ const ALL_VOTERS: IndicatorId[] = [
   'fed-target',
   'fed-expectations',
   'ecb-dfr',
-  'yield-curve-10y2y',
-  'yield-curve-10y3m',
   'dollar-basket',
   'usdjpy',
   'us-japan-10y-gap',
@@ -175,8 +174,7 @@ const DIRECTIONAL: IndicatorReading[] = [
   quiet('fed-target'),
   quiet('fed-expectations'),
   quiet('ecb-dfr'),
-  quiet('yield-curve-10y2y'),
-  quiet('yield-curve-10y3m'),
+  // GF-P1 (the owner's recorded H): the yield-curve seats demoted — no rows.
   // dollar: two firing pressures
   reading('dollar-basket', { value: 108, percentile10y: 0.95 }),
   reading('usdjpy', { value: 155, percentile10y: 0.95 }),
@@ -209,8 +207,7 @@ const FOR: IndicatorReading[] = [
   quiet('fed-target'),
   quiet('fed-expectations'),
   quiet('ecb-dfr'),
-  quiet('yield-curve-10y2y'),
-  quiet('yield-curve-10y3m'),
+  // GF-P1 (the owner's recorded H): the yield-curve seats demoted — no rows.
   reading('dollar-basket', { value: 98, percentile10y: 0.5, change30d: -1.6 }),
   reading('usdjpy', { value: 130, percentile10y: 0.08 }),
   quiet('us-japan-10y-gap'),
@@ -239,8 +236,7 @@ const STACK: IndicatorReading[] = [
   quiet('fed-target'),
   quiet('fed-expectations'),
   quiet('ecb-dfr'),
-  quiet('yield-curve-10y2y'),
-  quiet('yield-curve-10y3m'),
+  // GF-P1 (the owner's recorded H): the yield-curve seats demoted — no rows.
   reading('dollar-basket', { value: 108, percentile10y: 0.95 }),
   reading('usdjpy', { value: 155, percentile10y: 0.95 }),
   quiet('us-japan-10y-gap'),
@@ -276,8 +272,7 @@ const SPARSE: IndicatorReading[] = [
   quiet('fed-target'),
   quiet('fed-expectations'),
   quiet('ecb-dfr'),
-  quiet('yield-curve-10y2y'),
-  quiet('yield-curve-10y3m'),
+  // GF-P1 (the owner's recorded H): the yield-curve seats demoted — no rows.
   ...ALL_VOTERS.slice(8).map((id) => reading(id, { status: 'stale', value: null })),
   reading('gold-usd', { value: 4166, percentile10y: 0.6, change30d: -4.2 }),
 ];
@@ -367,21 +362,34 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     expect(document.querySelector('[data-balance-verdict-word]')?.getAttribute('data-side')).toBe('against');
   });
 
-  it('the 2026-10-31 fixture: all four lanes neutral — no pan weights, the level beam, the "Balanced" hero, the full counts line, 4 tray weights', () => {
+  it('the 2026-10-31 fixture: borrowing-costs FOR — one pan weight, the tipped beam, the "Leaning for gold" hero, the full counts line, 3 tray weights', () => {
+    // GF-P1 (2026-11-05, the owner's recorded answers H/I/J) restated the
+    // recorded fixture: the demotion (H) left borrowing-costs 6 members; the
+    // fed-expectations threshold (J) flipped its seat to the MOVE leg
+    // (falling → supports) so the lane reads FOR 3v1; the D-18 rule (I)
+    // rendered the inputless cftc member unread (stress readable 4).
+    // Engine-verified: for 1 · against 0 · neutral 3, net +1 over 1 tipped
+    // → the full 10° tip for.
     renderCard(fixtureReadings());
-    expect(document.querySelectorAll('[data-balance-assembly] [data-balance-weight]').length).toBe(0);
-    expect(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt')).toBe('0');
-    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toContain('Balanced');
+    const b = goldBalance(fixtureReadings());
+    expect(b.counts).toEqual({ for: 1, against: 0, neutral: 3, unread: 0 });
+    expect(
+      document.querySelector('[data-balance-assembly="for"] [data-balance-weight="borrowing-costs"]'),
+    ).not.toBeNull();
+    expect(document.querySelectorAll('[data-balance-assembly="against"] [data-balance-weight]').length).toBe(0);
+    expect(Number(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt'))).toBe(-10);
+    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toBe('Leaning for gold');
     // The counts line states the whole shape (05 §4.4): for/against
     // always, not-leaning always, unread only when > 0.
-    expect(document.querySelector('[data-balance-count]')?.textContent).toBe('0 for · 0 against · 4 not leaning');
+    expect(document.querySelector('[data-balance-count]')?.textContent).toBe('1 for · 0 against · 3 not leaning');
     const tray = document.querySelector('[data-balance-tray="not-leaning"]') as HTMLElement;
-    expect(tray.querySelectorAll('[data-balance-weight]').length).toBe(4);
-    // The lane strip: four segments, all neutral (decorative, aria-hidden).
+    expect(tray.querySelectorAll('[data-balance-weight]').length).toBe(3);
+    // The lane strip: four segments, one for + three neutral (decorative, aria-hidden).
     const strip = document.querySelector('[data-balance-lane-strip]') as HTMLElement;
     expect(strip.getAttribute('aria-hidden')).toBe('true');
     expect(strip.querySelectorAll('i').length).toBe(4);
-    expect(strip.querySelectorAll('i[data-side="neutral"]').length).toBe(4);
+    expect(strip.querySelectorAll('i[data-side="neutral"]').length).toBe(3);
+    expect(strip.querySelectorAll('i[data-side="for"]').length).toBe(1);
   });
 
   it('the FOR case: three weights on the supporting pan, the full 10° tip for (the signed angle is for-heavy NEGATIVE), the tray still holds the quiet lane', () => {
@@ -420,7 +428,17 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
  * ------------------------------------------------------------------ */
 describe('the split lane (04 §4.3 item 2)', () => {
   it('shows the "Split" badge on the tray weight, the contest in the accessible name, and the ledger state word names it', () => {
-    renderCard(fixtureReadings());
+    // GF-P1: the recorded fixture no longer splits (borrowing-costs reads
+    // FOR 3v1 — the fed-expectations threshold flip), so the split shape is
+    // built by cloning the fixture and turning us10y RISING (change30d
+    // +0.3 > the 0.15pt threshold → pressures): supports {real-yield-10y
+    // falling, fed-expectations falling} v pressures {us10y rising, us30y
+    // high} — 2 v 2, engine-verified.
+    const split = fixtureReadings().map((r) =>
+      r.id === 'us10y' ? { ...r, change30d: 0.3, percentile10y: 0.5 } : r,
+    );
+    expect(goldBalance(split).lanes.find((l) => l.lane === 'borrowing-costs')!.split).toBe(true);
+    renderCard(split);
     const weight = document.querySelector('[data-balance-weight="borrowing-costs"]') as HTMLElement;
     expect(weight).not.toBeNull();
     expect(weight.querySelector('[data-balance-split-badge]')?.textContent).toBe('Split');
@@ -456,14 +474,18 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
     expect(row.getAttribute('data-open')).toBe('true');
     // The lane's intro sentence (laneIntro) opens the expansion.
     expect(members.textContent).toContain('The cost of borrowing dollars');
-    // Grouped: the two falling yields under Supports gold, the two highs under Pressures gold.
+    // Grouped (GF-P1: the fed-expectations threshold (J) moved its fixture
+    // seat into Supports — three falling readings): real-yield-10y,
+    // us10y AND fed-expectations under Supports gold; us30y alone under
+    // Pressures gold (engine-verified: 3 supports · 1 pressure).
     const supports = members.querySelector('[data-balance-member-group="supports"]') as HTMLElement;
-    expect(supports.querySelectorAll('[data-balance-member]').length).toBe(2);
+    expect(supports.querySelectorAll('[data-balance-member]').length).toBe(3);
     expect(supports.textContent).toContain('Real yields');
     expect(supports.textContent).toContain('falling');
     expect(supports.textContent).toContain('US 10-year yield');
+    expect(supports.textContent).toContain('Fed expectations');
     const pressures = members.querySelector('[data-balance-member-group="pressures"]') as HTMLElement;
-    expect(pressures.querySelectorAll('[data-balance-member]').length).toBe(2);
+    expect(pressures.querySelectorAll('[data-balance-member]').length).toBe(1);
     expect(pressures.textContent).toContain('US 30-year yield');
     expect(pressures.textContent).toContain('high in its decade');
     // Every firing row carries the value text and the deep link to its indicator card.
@@ -473,11 +495,12 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
     // The steady voters: collapsed to ONE muted sentence naming them (05 §4.6).
     const steady = members.querySelector('[data-balance-member-group="steady"]') as HTMLElement;
     expect(steady).not.toBeNull();
-    expect(steady.querySelectorAll('[data-balance-member-impact="steady"]').length).toBe(4);
-    expect(steady.textContent).toContain('Not firing (4)');
+    expect(steady.querySelectorAll('[data-balance-member-impact="steady"]').length).toBe(2);
+    expect(steady.textContent).toContain('Not firing (2)');
     expect(steady.textContent).toContain('Fed funds target');
-    // The 21 voters are all reachable (AC-2): 8 members in this lane.
-    expect(members.querySelectorAll('[data-balance-member]').length).toBe(8);
+    // The 19 voters are all reachable (AC-2): 6 members in this lane (GF-P1
+    // H: the two yield-curve seats demoted — 8 → 6).
+    expect(members.querySelectorAll('[data-balance-member]').length).toBe(6);
     // A closed row's expansion is hidden.
     expect(document.getElementById('gold-balance-row-dollar')?.hidden).toBe(true);
   });
@@ -499,9 +522,10 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
   });
 
   it('an unread member group renders only when a voter could not be read', () => {
-    // Clone the fixture with two borrowing-costs voters turned stale.
+    // Clone the fixture with two borrowing-costs voters turned stale
+    // (GF-P1 H: both are actual members — the demoted curve seats are not).
     const readings = fixtureReadings().map((r) =>
-      r.id === 'ecb-dfr' || r.id === 'yield-curve-10y2y' ? { ...r, status: 'stale' as const, value: null } : r,
+      r.id === 'ecb-dfr' || r.id === 'fed-target' ? { ...r, status: 'stale' as const, value: null } : r,
     );
     renderCard(readings);
     openRow('borrowing-costs');
@@ -510,13 +534,24 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
     expect(unread).not.toBeNull();
     expect(unread.textContent).toContain('Could not be read (2)');
     expect(unread.querySelectorAll('[data-balance-member-impact="unread"]').length).toBe(2);
-    // The clean fixture has no unread group.
+    // The clean fixture has no unread group in the borrowing row…
     cleanup();
     renderCard(fixtureReadings());
     openRow('borrowing-costs');
     expect(
       document.getElementById('gold-balance-row-borrowing-costs')?.querySelector('[data-balance-member-group="unread"]'),
     ).toBeNull();
+    // …but GF-P1's D-18 input-presence rule (the owner's recorded decision
+    // I, 2026-11-05) now renders the STRESS row's unread group naturally:
+    // the fixture's cftc member is readable-but-inputless (the 1-point
+    // staged truth) — unread, never a steady word (audit D-18).
+    openRow('stress');
+    const stressUnread = document.getElementById('gold-balance-row-stress')?.querySelector(
+      '[data-balance-member-group="unread"]',
+    ) as HTMLElement;
+    expect(stressUnread).not.toBeNull();
+    expect(stressUnread.textContent).toContain('Could not be read (1)');
+    expect(stressUnread.textContent).toContain('Gold positioning');
   });
 });
 
@@ -712,18 +747,20 @@ describe('the segmented rim (GB-S4, 05 §4.3 + V-4)', () => {
 
   it('the rendered rim matches the ledger counts on the recorded fixture (V-4)', () => {
     renderCard(fixtureReadings());
-    // borrowing-costs: 2 supports, 2 pressures, 4 steady — 8 members (engine-verified).
+    // borrowing-costs (GF-P1): 3 supports, 1 pressure, 2 steady — 6 members
+    // (engine-verified; the demotion H removed the two curve seats and the
+    // threshold J flipped fed-expectations into the supports).
     const weight = document.querySelector('[data-balance-weight="borrowing-costs"]') as HTMLElement;
-    expect(weight.querySelectorAll('[data-bal-seg]').length).toBe(8);
-    expect(weight.querySelectorAll('[data-bal-seg="supports"]').length).toBe(2);
-    expect(weight.querySelectorAll('[data-bal-seg="pressures"]').length).toBe(2);
-    expect(weight.querySelectorAll('[data-bal-seg="steady"]').length).toBe(4);
+    expect(weight.querySelectorAll('[data-bal-seg]').length).toBe(6);
+    expect(weight.querySelectorAll('[data-bal-seg="supports"]').length).toBe(3);
+    expect(weight.querySelectorAll('[data-bal-seg="pressures"]').length).toBe(1);
+    expect(weight.querySelectorAll('[data-bal-seg="steady"]').length).toBe(2);
     // The ledger row's open list agrees — the rim is a picture of the same counts.
     openRow('borrowing-costs');
     const members = document.getElementById('gold-balance-row-borrowing-costs') as HTMLElement;
-    expect(members.querySelectorAll('[data-balance-member-impact="supports"]').length).toBe(2);
-    expect(members.querySelectorAll('[data-balance-member-impact="pressures"]').length).toBe(2);
-    expect(members.querySelectorAll('[data-balance-member-impact="steady"]').length).toBe(4);
+    expect(members.querySelectorAll('[data-balance-member-impact="supports"]').length).toBe(3);
+    expect(members.querySelectorAll('[data-balance-member-impact="pressures"]').length).toBe(1);
+    expect(members.querySelectorAll('[data-balance-member-impact="steady"]').length).toBe(2);
   });
 
   it('brass faces on the pans, stone faces in the tray (neutral and unread weigh stone)', () => {
@@ -1045,13 +1082,16 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
    * variant's counts verified against the real engine before pinning
    * (the probe numbers are in the GB-S5 session log). */
   const BATTERY: Array<[name: string, readings: () => IndicatorReading[], expected: string]> = [
-    ['the recorded fixture (L0 A0, price moving)', () => fixtureReadings(), 'neutral'],
+    // GF-P1 (2026-11-05): the recorded fixture's balance is FOR 1 now (the
+    // fed-expectations flip, decision J) — L1 A0 with the price moving →
+    // bullish (was neutral on the pre-P1 level balance).
+    ['the recorded fixture (L1 A0, price moving)', () => fixtureReadings(), 'bullish'],
     ['DIRECTIONAL (1 for · 2 against, price moving)', () => DIRECTIONAL, 'bearish'],
     ['FOR (3 for)', () => FOR, 'strong-bullish'],
     ['STACK (4 against)', () => STACK, 'strong-bearish'],
     ['SPARSE (1 against · 3 unread, price moving)', () => SPARSE, 'bearish'],
-    ['fixture · gold -9%', () => withGold(fixtureReadings(), -9), 'neutral'],
-    ['fixture · gold +9%', () => withGold(fixtureReadings(), 9), 'neutral'],
+    ['fixture · gold -9%', () => withGold(fixtureReadings(), -9), 'bullish'],
+    ['fixture · gold +9%', () => withGold(fixtureReadings(), 9), 'bullish'],
     ['fixture · gold quiet + typical band', () => withGold(fixtureReadings(), 0.8, 0.5), 'range-bound'],
     ['DIRECTIONAL · gold quiet + typical band', () => withGold(DIRECTIONAL, 0.8), 'range-bound'],
     ['FOR minus stress (L2 A0)', () => quieten(FOR, ['stress-stlfsi', 'nfci']), 'bullish'],
@@ -1125,13 +1165,15 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     const up = snapshotOf();
     // The old gold path counted the move (a falling month dragged the
     // verdict toward bearish). The lane path: the sign of a large move
-    // changes NOTHING — price is context, counted nowhere.
+    // changes NOTHING — price is context, counted nowhere. (GF-P1: the
+    // fixture's balance itself now reads FOR — the recorded decisions
+    // changed the balance, never the decoupling.)
     expect(up).toEqual(down);
     expect(down).toEqual({
-      verdict: 'Balanced',
-      count: '0 for · 0 against · 4 not leaning',
-      tilt: '0',
-      direction: 'neutral',
+      verdict: 'Leaning for gold',
+      count: '1 for · 0 against · 3 not leaning',
+      tilt: '-10',
+      direction: 'bullish',
     });
     // The ONLY price effect: quiet + typical band reads range-bound —
     // consolidation described, never direction — while the balance stays
@@ -1140,13 +1182,13 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     renderCard(withGold(fixtureReadings(), 0.8, 0.5));
     const quiet = snapshotOf();
     expect(quiet.direction).toBe('range-bound');
-    expect(quiet.verdict).toBe('Balanced');
+    expect(quiet.verdict).toBe('Leaning for gold');
     expect(quiet.count).toBe(down.count);
     expect(quiet.tilt).toBe(down.tilt);
     // …and a quiet month at the decade high is NOT range evidence.
     cleanup();
     renderCard(withGold(fixtureReadings(), 0.8, 0.95));
-    expect(snapshotOf().direction).toBe('neutral');
+    expect(snapshotOf().direction).toBe('bullish');
   });
 
   it('all four lanes unread: the gold chip carries the honest none (verdictNone); with both metals unread the whole strip hides', () => {
@@ -1163,9 +1205,11 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
   });
 
   it('the owner\'s EXISTING outlook sentences ship (OI-1 unanswered — the states change, the wording does not)', () => {
+    // GF-P1: the recorded fixture reads FOR 1 now → the bullish sentence
+    // (was the neutral one on the pre-P1 level balance).
     renderCard(fixtureReadings());
     expect(document.querySelector('[data-verdict-metal="gold"]')?.textContent).toContain(
-      copy.signals.verdictStates.neutral.gold,
+      copy.signals.verdictStates.bullish.gold,
     );
     cleanup();
     renderCard(withGold(fixtureReadings(), 0.8, 0.5));
@@ -1207,7 +1251,7 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     expect(document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction')).toBe(
       goldOutlookOf(goldBalance(readings), gold.speed, gold.position),
     );
-    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toContain('Balanced');
+    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toContain('Leaning for gold'); // GF-P1: the fixture's balance reads FOR
   });
 });
 
@@ -1270,21 +1314,22 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
     expect(silverLine).toContain('of 6 conditions met');
   });
 
-  it('the collapsed gold PROSE on the balanced fixture: "Balanced, 0 for · 0 against · 4 not leaning"', () => {
+  it('the collapsed gold PROSE on the recorded fixture: "Leaning for gold, 1 for · 0 against · 3 not leaning" (GF-P1\'s recorded flip)', () => {
     const { lineOf } = renderSignals(fixtureReadings());
     const goldLine = lineOf('gold') ?? '';
-    expect(goldLine).toContain('Balanced');
-    expect(goldLine).toContain('0 for · 0 against · 4 not leaning');
-    // The outlook chip still rides the line's end (AC-3: same engine).
-    expect(goldLine).toContain('Outlook: Neutral');
+    expect(goldLine).toContain('Leaning for gold');
+    expect(goldLine).toContain('1 for · 0 against · 3 not leaning');
+    // The outlook chip still rides the line's end (AC-3: same engine) —
+    // the fixture reads bullish now (L1 A0, price moving).
+    expect(goldLine).toContain('Outlook: Bullish');
   });
 
   it('the card header speaks the same lane prose for gold; silver keeps the legacy sentence (one key, two models by metal)', () => {
     renderCard(fixtureReadings());
     const goldHeader = document.querySelector('[data-signal-card="merged"] [data-signal-metal="gold"]')?.textContent ?? '';
     const silverHeader = document.querySelector('[data-signal-card="merged"] [data-signal-metal="silver"]')?.textContent ?? '';
-    expect(goldHeader).toContain('Balanced');
-    expect(goldHeader).toContain('0 for · 0 against · 4 not leaning');
+    expect(goldHeader).toContain('Leaning for gold');
+    expect(goldHeader).toContain('1 for · 0 against · 3 not leaning');
     expect(goldHeader).not.toContain('of 5 conditions met');
     expect(silverHeader).toContain('of 6 conditions met');
   });
@@ -1292,8 +1337,10 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
   it('fa: the collapsed gold prose renders the Persian verdict word + Persian counts with Persian digits', () => {
     const { lineOf } = renderSignals(fixtureReadings(), copyFa, 'fa-IR');
     const goldLine = lineOf('gold') ?? '';
-    expect(goldLine).toContain('متعادل');
-    expect(goldLine).toContain('۰ موافق · ۰ مخالف · ۴ بدون گرایش');
+    // GF-P1: the fixture reads FOR now — the Persian for-word
+    // ('تمایل به نفع طلا') + the 1-for counts.
+    expect(goldLine).toContain('تمایل به نفع طلا');
+    expect(goldLine).toContain('۱ موافق · ۰ مخالف · ۳ بدون گرایش');
     // The legacy Persian count clause is gone from the gold line.
     expect(goldLine).not.toContain('از ۵ شرط');
     // Silver keeps its own Persian sentence.

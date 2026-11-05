@@ -139,7 +139,7 @@ export interface GoldLaneVoter {
 }
 
 /**
- * The 21 voters (8 borrowing costs · 3 dollar · 5 stress · 5 inflation).
+ * The 19 voters (6 borrowing costs · 3 dollar · 5 stress · 5 inflation).
  *
  * Session 6 (2026-10-31, the D-5 promotion — the owner's "we can have 21"
  * on S4's B4 evidence): `breakeven-tilt` joined the inflation lane as the
@@ -151,18 +151,33 @@ export interface GoldLaneVoter {
  * supports (the B4 delta: sign-agreements moved +0.4/+0.7/+0.0pp — no
  * material difference); the panel's measured-reality note (S5, C4a) stays
  * the operative description.
+ *
+ * GF-P1 (2026-11-05, the owner's recorded decision H — the D-7/D-8 sign
+ * question, option (b) context demotion; the audit report §4 row 3 / R4
+ * the justification attached per the per-seat approval rule D-GF-1):
+ * `yield-curve-10y2y` and `yield-curve-10y3m` LEAVE the voter set — the
+ * fixed −1 polarity sat on a regime-dependent claim (02 R4's own locked
+ * treatment: "context / secondary"), so both seats demote to context
+ * (the indicators keep their own cards on the page; they simply never
+ * vote). The sign question RE-OPENS with the correct object — the REAL
+ * curve — when R2's DFII5 lands (GF-P3, D-11/D-12's derived curve). The
+ * pre-demotion 21-seat table is preserved VERBATIM as the harness lineage
+ * snapshots `HARNESS_GOLD_VOTERS_21` (gold-backtest-core.ts) and
+ * `GF_VOTERS_FROZEN_21` (gf-p0-proposed.ts) — the FROZEN/POST-P1
+ * calibration scenarios and the BACKTEST-GOLD-LANES.md lineage keep
+ * their measured basis.
  */
 export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
   // ——— Borrowing costs: TIGHT is the classic gold headwind (real rates
   // ——— are gold's opportunity cost); RELIEF (falling/low rates) the tailwind.
+  // ——— GF-P1 (the owner's recorded H, 2026-11-05): the two yield-curve
+  // ——— seats demoted to context cards (D-7/D-8, R4) — 8 → 6 here.
   { lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 }, // THE textbook driver
   { lane: 'borrowing-costs', id: 'us10y', polarity: -1 },
   { lane: 'borrowing-costs', id: 'us30y', polarity: -1 },
   { lane: 'borrowing-costs', id: 'fed-target', polarity: -1 }, // high policy rate = tight
   { lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 }, // 2y above policy = higher-for-longer priced
   { lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 },
-  { lane: 'borrowing-costs', id: 'yield-curve-10y2y', polarity: -1 }, // steep = reflation; inverted = stress/easing ahead
-  { lane: 'borrowing-costs', id: 'yield-curve-10y3m', polarity: -1 },
   // ——— The dollar: STRONG is the headwind (gold is priced in USD); a
   // ——— dollar under STRESS (falling/low) is the tailwind.
   { lane: 'dollar', id: 'dollar-basket', polarity: -1 },

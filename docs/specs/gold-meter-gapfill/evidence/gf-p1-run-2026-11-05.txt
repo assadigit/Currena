@@ -1,0 +1,11 @@
+# GF-P1 verify run record — 2026-11-05T11:37:00.857Z
+
+windows: 2512 (2016-11-07 → 2026-11-03)
+production voters: 19
+production ≡ POST-P1-DEMOTE: ALL 2512 windows equal (0 mismatches)
+MIN2 all: level 518/2512 (20.6%) · full-tip 1208 (48.1%) · C1 PASS · flips 8 vs 7 · C2 FAIL
+MIN2 mature: level 247/1287 · full-tip 807 · C1 FAIL · flips 6 vs 7 · C2 PASS
+MIN1 all: level 670/2512 · full-tip 570 · C1 PASS · flips 9 vs 7 · C2 FAIL
+MIN1 mature: level 386/1287 · full-tip 353 · C1 PASS · flips 6.5 vs 7 · C2 PASS
+committed POST-P1-DEMOTE rows: reproduced (the drift gate held)
+

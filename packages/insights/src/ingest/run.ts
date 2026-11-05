@@ -883,13 +883,29 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     // series this phase just resolved. Inner join on common dates, 4dp
     // quantized (F4), fail closed on either parent missing (never a
     // stale gap — the au-us-10y-gap discipline).
+    //
+    // GF-P1 (2026-11-05, the owner's recorded go — the D-6/R10 repair,
+    // the audit report §4 row 4): the derived gap now PERSISTS — merged
+    // with the stored accumulation (the derived tail wins on collision,
+    // the mergeSeries(stored, fetched) discipline), so the percentile and
+    // change bases DEEPEN rung over rung instead of resetting to the
+    // stage window's shallow tail (the intermittent-percentile defect,
+    // audit D-6: base 20 < 30, pct10y readable only 6/9 recorded days).
+    // The deep base was seeded once by the GF-P1 backfill
+    // (scripts/gf-p1-backfill.ts — the FRED DGS10 × MOF all-file
+    // derivation, the exact series the calibration simulated); this merge
+    // keeps it current.
     const stagedUs10y = stage?.series['us10y']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
     const jgbSeries = series['jgb-10y'];
     if (stagedUs10y !== undefined && jgbSeries !== undefined) {
       const gap = quantizedGap(stagedUs10y, jgbSeries);
       if (gap.length > 0) {
-        series['us-japan-10y-gap'] = gap;
-        console.log(`  · us-japan-10y-gap: ${gap.at(-1)!.value} @ ${gap.at(-1)!.date}`);
+        const storedGap = await storedSeriesOf(opts.store, 'us-japan-10y-gap');
+        series['us-japan-10y-gap'] = storedGap !== undefined ? mergeSeries(storedGap, gap) : gap;
+        console.log(
+          `  · us-japan-10y-gap: ${series['us-japan-10y-gap']!.at(-1)!.value} @ ${series['us-japan-10y-gap']!.at(-1)!.date}` +
+            ` (${series['us-japan-10y-gap']!.length} persisted points)`,
+        );
       } else {
         // No common dates (a desynchronised stage) — fail closed, never a
         // stale gap: the reading carries, the next rung re-derives.

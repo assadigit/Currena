@@ -4,23 +4,37 @@
  * (docs/specs/gold-meter-gapfill/01-FILL-SPEC.md — GF-P0; the audit report
  * §6.1's P0 row; the GB-S1 precedent: gold-balance-consolidation 02 §6).
  *
- * NEW TABLES BESIDE THE FROZEN ONES — **no product code** (D-GF-1):
- * this module ADDS the fill program's proposed voter set to the read-only
- * harness; it imports the frozen sources (`gold-score.ts`,
- * `gold-backtest-core.ts`, `connections.ts`) and edits NOTHING. The
- * proposed set executes in production only on the owner's recorded go,
- * per seat change, with the audit report's §4 row as the justification.
+ * THE GF-P0 STANCE, UPDATED AT GF-P1 (2026-11-05, the owner's recorded
+ * answers A/H/I/J — the GF-S7 answer sheet): this module began as pure
+ * proposals beside the frozen engines ("no product code", D-GF-1); with
+ * the owner's recorded go, GF-P1 EXECUTED its P1 halves into production
+ * — the five derived thresholds (now the production `SIGNAL_LEG_MOVE`
+ * additions, still mirrored here as `GF_MOVE_P1_PROPOSED` so the
+ * committed calibration report keeps reproducing byte-for-byte), the
+ * D-7/D-8 context demotion (production `GOLD_LANE_VOTERS` is now the
+ * 19-seat table, pinned equal to `GF_VOTERS_P1_DEMOTE` by test) and the
+ * D-18 input-presence rule (now the production `goldBalance` member
+ * rule). The P2 tables below remain PROPOSALS until the owner's recorded
+ * per-seat gos execute them (GF-P2); the scenario family stays the
+ * calibration's measured record — the FROZEN/POST-P1 scenarios measure
+ * the frozen 21-seat snapshot (`GF_VOTERS_FROZEN_21`), never production.
  *
  * What lives here:
  *  - `GF_LANES_5` — the proposed fifth lane (`flows`, OI-GA-2's ADD
- *    scenario) beside the frozen `GOLD_LANES` (4);
+ *    scenario — the owner's RECORDED answer B: ADD) beside the frozen
+ *    `GOLD_LANES` (4);
+ *  - `GF_VOTERS_FROZEN_21` / `GF_VOTERS_P1_DEMOTE` — the lineage
+ *    snapshots: the pre-GF-P1 21-seat production table VERBATIM, and
+ *    the post-demotion 19-seat composition (equal to production,
+ *    pinned by test);
  *  - `GF_VOTERS_P2_4LANE` / `GF_VOTERS_P2_5LANE` — the proposed post-P2
  *    voter tables (the audit's recommended composition — every seat
  *    change cites the report's §4 row in its comment);
- *  - `GF_MOVE_P1_PROPOSED` — the proposed `SIGNAL_LEG_MOVE` additions
- *    (D-2/D-3's repairs + the D-1 calibration's derived thresholds),
- *    beside the frozen map — a PROPOSAL, not a product edit;
- *  - the PARAMETERIZED scenario engines — faithful copies of the frozen
+ *  - `GF_MOVE_P1_PROPOSED` — the five D-1-derived thresholds, EXECUTED
+ *    into the production `SIGNAL_LEG_MOVE` at GF-P1 (the owner's
+ *    recorded decision J); kept here as the scenario-harness constant
+ *    the committed calibration report is written against;
+ *  - the PARAMETERIZED scenario engines — faithful copies of the
  *    evaluators with the lane list / voter table / threshold map /
  *    crowd minimum / D-18 input-presence rule as parameters:
  *      `gfEvalLeg`           ≡ `connections.ts evalLeg` (threshold map parameterized),
@@ -31,8 +45,10 @@
  *      `gfCalibrationStats`  ≡ `gold-backtest-core.ts laneCalibrationStats`
  *                             (lane list parameterized).
  *    Each equivalence is PINNED BY TEST (gf-p0-proposed.test.ts) on the
- *    frozen configuration — the copies cannot drift from the engines
- *    (the scoreOverVoters discipline).
+ *    PRODUCTION configuration (post-GF-P1: the production threshold map
+ *    = the frozen four + the executed five) and on the frozen
+ *    configuration for the lineage scenarios — the copies cannot drift
+ *    from the engines (the scoreOverVoters discipline).
  *
  * HONESTY RULES (inherited, D-GF-2/D-GF-3): the engines here measure
  * firing statistics and lane behaviour ONLY — never predictive power; no
@@ -49,7 +65,7 @@
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
 import type { LegDirection, LegLevel } from './connections';
-import { GOLD_LANE_VOTERS, GOLD_LANES } from './gold-score';
+import { GOLD_LANES } from './gold-score';
 import type { GoldLane, GoldLaneVoter } from './gold-score';
 import type { GoldLaneSide, HarnessLaneBalance } from './gold-backtest-core';
 import {
@@ -77,6 +93,52 @@ export const GF_LANES_4: readonly GoldLane[] = GOLD_LANES;
 
 /** The proposed five: the frozen four + `flows`. */
 export const GF_LANES_5: readonly string[] = [...GOLD_LANES, GF_FLOWS_LANE];
+
+/**
+ * The FROZEN 21-seat production table, VERBATIM — the pre-GF-P1
+ * `GOLD_LANE_VOTERS` (Session 6's D-5 breakeven-tilt promotion through
+ * GF-S6). Since GF-P1 (2026-11-05, the owner's recorded decision H — the
+ * D-7/D-8 context demotion) production is the 19-seat table
+ * (GOLD_LANE_VOTERS = this snapshot minus the two yield-curve seats,
+ * pinned by test), and the FROZEN / POST-P1 (keep-variant) scenarios
+ * measure THIS snapshot so the committed calibration report keeps
+ * reproducing byte-for-byte (the drift gate). A historical snapshot, not
+ * a living config — do not edit.
+ */
+export const GF_VOTERS_FROZEN_21: readonly GoldLaneVoter[] = [
+  { lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'us10y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'us30y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'fed-target', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'yield-curve-10y2y', polarity: -1 },
+  { lane: 'borrowing-costs', id: 'yield-curve-10y3m', polarity: -1 },
+  { lane: 'dollar', id: 'dollar-basket', polarity: -1 },
+  { lane: 'dollar', id: 'usdjpy', polarity: -1 },
+  { lane: 'dollar', id: 'us-japan-10y-gap', polarity: -1 },
+  { lane: 'stress', id: 'stress-stlfsi', polarity: 1 },
+  { lane: 'stress', id: 'nfci', polarity: 1 },
+  { lane: 'stress', id: 'vix', polarity: 1 },
+  { lane: 'stress', id: 'gold-silver', polarity: 1 },
+  { lane: 'stress', id: 'cftc-gold-positioning', polarity: -1 },
+  { lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 },
+  { lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 },
+  { lane: 'inflation', id: 'euro-hicp', polarity: 1 },
+  { lane: 'inflation', id: 'breakeven-5y5y', polarity: 1 },
+  { lane: 'inflation', id: 'breakeven-tilt', polarity: 1 },
+];
+
+/**
+ * The POST-P1-DEMOTE composition — the production table since GF-P1
+ * (the frozen 21 minus the two yield-curve seats, the owner's recorded
+ * decision H). Equal to production `GOLD_LANE_VOTERS` — PINNED BY TEST
+ * (gf-p0-proposed.test.ts): the measured scenario and the shipped meter
+ * are the same object.
+ */
+export const GF_VOTERS_P1_DEMOTE: readonly GfVoter[] = GF_VOTERS_FROZEN_21.filter(
+  (v) => v.id !== 'yield-curve-10y2y' && v.id !== 'yield-curve-10y3m',
+);
 
 /** A voter of a PROPOSED table — the lane may be the proposed fifth. */
 export interface GfVoter {
@@ -137,11 +199,15 @@ export const GF_MOVE_FROZEN_BASE: Readonly<Partial<Record<IndicatorId, number>>>
  * §4).
  */
 export const GF_MOVE_P1_PROPOSED: Readonly<Partial<Record<IndicatorId, number>>> = {
-  // The values below are the calibration's derived proposals (derived by the
-  // GF-S1 run over the recorded corpus, 2026-11-05 — the derivation rule, the
+  // The values below are the calibration's derived thresholds — derived by the
+  // GF-S1 run over the recorded corpus, 2026-11-05 (the derivation rule, the
   // anchors' measured band and each value's measured firing share: the report
-  // §3; the per-seat firing effect: §4/§6). They override nothing until the
-  // owner's recorded go executes GF-P1.
+  // §3; the per-seat firing effect: §4/§6). EXECUTED into the production
+  // `SIGNAL_LEG_MOVE` at GF-P1 (2026-11-05, the owner's recorded decision J —
+  // the GF-S7 answer sheet): the production map now carries these five beside
+  // the frozen four (pinned by test, gf-p0-proposed.test.ts). The constant
+  // stays as the scenario-harness input the committed calibration report is
+  // written against.
   'fed-expectations': 0.13, // points (D-2) — derived §3 (share 50.7%, n=2512); measured §6
   usdjpy: 1.38, // pct (D-3) — derived §3 (share 51.4%, n=2494); measured §6
   'fed-target': 0.25, // points (R5 step-direction) — derived §3 (share 7.0%, n=2512 — the one-FOMC-step grid); measured §6
@@ -337,7 +403,7 @@ function seatReadable(
 /**
  * `gold-backtest-core.ts laneBalanceOverVoters` with the lane list, the
  * threshold map and the D-18 rule parameterized. On the frozen
- * configuration (GOLD_LANES, GOLD_LANE_VOTERS, GF_MOVE_FROZEN_BASE,
+ * configuration (GOLD_LANES, GF_VOTERS_FROZEN_21, GF_MOVE_FROZEN_BASE,
  * inputPresence = false, any minFiring) the output is IDENTICAL to the
  * frozen engine's — PINNED BY TEST.
  */
@@ -425,6 +491,102 @@ export function gfNetScore(
     net += leg.lean * def.polarity;
   }
   return net;
+}
+
+/* ------------------------------------------------------------------ *
+ * gfScoreOverVoters — the full score arithmetic with thresholds
+ * parameterized (the frozen-lineage regression pin's engine)
+ * ------------------------------------------------------------------ */
+
+/**
+ * `gold-backtest-core.ts scoreOverVoters`'s FULL output shape (the
+ * GoldTailwindReading: the label, the lane counts, the sub-gauges, the
+ * fired voters) with the threshold map parameterized — so the
+ * frozen-lineage regression pin (gold-lane-calibration.test.ts) can keep
+ * asserting the PRE-GF-P1 byte-identical JSONs over the frozen 21-seat
+ * snapshot under the FROZEN map, while the production engines carry the
+ * GF-P1 map. On the production map this equals `scoreOverVoters` —
+ * PINNED BY TEST (gf-p0-proposed.test.ts). Pure; no product path ever
+ * calls this.
+ */
+export function gfScoreOverVoters(
+  readings: readonly IndicatorReading[],
+  voters: readonly GfVoter[],
+  moveMap: Readonly<Partial<Record<GfCandidateId, number>>> = GF_MOVE_FROZEN_BASE,
+): {
+  netScore: number;
+  label: 'strong-tailwind' | 'tailwind' | 'balanced' | 'headwind' | 'strong-headwind' | null;
+  firingVoters: number;
+  tailwindVoters: number;
+  headwindVoters: number;
+  laneCounts: { tailwind: number; headwind: number; mixed: number };
+  subGauges: Array<{ lane: string; reading: string; tailwindVoters: number; headwindVoters: number }>;
+  voters: Array<{ id: GfCandidateId; lane: string; impact: 'tailwind' | 'headwind'; evidence: 'rising' | 'falling' | 'high' | 'low' }>;
+} {
+  const LANE_TAILWIND_WORD: Record<string, string> = {
+    'borrowing-costs': 'relief',
+    dollar: 'stress',
+    stress: 'elevated',
+    inflation: 'hot',
+    flows: 'elevated',
+  };
+  const LANE_HEADWIND_WORD: Record<string, string> = {
+    'borrowing-costs': 'tight',
+    dollar: 'strong',
+    stress: 'calm',
+    inflation: 'cool',
+    flows: 'calm',
+  };
+  const lanesOf = [...new Set(voters.map((v) => v.lane))];
+
+  const byId = new Map(readings.map((r) => [r.id as string, r]));
+  const fired: Array<{ id: GfCandidateId; lane: string; impact: 'tailwind' | 'headwind'; evidence: 'rising' | 'falling' | 'high' | 'low' }> = [];
+  for (const def of voters) {
+    const r = byId.get(def.id);
+    if (!readable(r)) continue;
+    const leg = gfEvalLeg(def.id, r, moveMap);
+    if (leg.lean === 0) continue; // steady AND typical — honestly not firing
+    const impact = leg.lean * def.polarity === 1 ? ('tailwind' as const) : ('headwind' as const);
+    const evidence =
+      leg.direction === 'rising' ? ('rising' as const)
+      : leg.direction === 'falling' ? ('falling' as const)
+      : leg.level === 'high' ? ('high' as const)
+      : ('low' as const);
+    fired.push({ id: def.id, lane: def.lane, impact, evidence });
+  }
+
+  const tailwindVoters = fired.filter((v) => v.impact === 'tailwind').length;
+  const headwindVoters = fired.filter((v) => v.impact === 'headwind').length;
+  const firingVoters = tailwindVoters + headwindVoters;
+  const netScore = tailwindVoters - headwindVoters;
+  const STRONG_MIN = 3;
+  const STRONG_SHARE = 0.5;
+  let label: 'strong-tailwind' | 'tailwind' | 'balanced' | 'headwind' | 'strong-headwind' | null;
+  if (firingVoters === 0) label = null;
+  else if (netScore > 0 && firingVoters >= STRONG_MIN && netScore / firingVoters >= STRONG_SHARE) label = 'strong-tailwind';
+  else if (netScore > 0) label = 'tailwind';
+  else if (netScore === 0) label = 'balanced';
+  else if (netScore < 0 && firingVoters >= STRONG_MIN && -netScore / firingVoters >= STRONG_SHARE) label = 'strong-headwind';
+  else label = 'headwind';
+
+  const subGauges = lanesOf.map((lane) => {
+    const laneVoters = fired.filter((v) => v.lane === lane);
+    const t = laneVoters.filter((v) => v.impact === 'tailwind').length;
+    const h = laneVoters.filter((v) => v.impact === 'headwind').length;
+    let reading: string;
+    if (t === 0 && h === 0) reading = 'unreadable';
+    else if (t > 0 && h > 0) reading = 'mixed';
+    else if (t > 0) reading = LANE_TAILWIND_WORD[lane]!;
+    else reading = LANE_HEADWIND_WORD[lane]!;
+    return { lane, reading, tailwindVoters: t, headwindVoters: h };
+  });
+  const laneCounts = {
+    tailwind: subGauges.filter((g) => g.reading === LANE_TAILWIND_WORD[g.lane]).length,
+    headwind: subGauges.filter((g) => g.reading === LANE_HEADWIND_WORD[g.lane]).length,
+    mixed: subGauges.filter((g) => g.reading === 'mixed').length,
+  };
+
+  return { netScore, label, firingVoters, tailwindVoters, headwindVoters, laneCounts, subGauges, voters: fired };
 }
 
 /* ------------------------------------------------------------------ *
@@ -540,28 +702,32 @@ export interface GfScenario {
  * The GF-P0 scenario family, stated once (the calibration script runs
  * exactly these; the report labels every table with its scenario name):
  *
- *  - **FROZEN** — the current production state (21 voters, 4 lanes, the
- *    frozen thresholds): the GB-S1 baseline re-derivation. MUST
- *    reproduce BACKTEST-GOLD-LANES.md's committed numbers (the script
- *    asserts them — a drift means the harness drifted, not the meter).
+ *  - **FROZEN** — the pre-GF-P1 production state (the frozen 21-seat
+ *    snapshot `GF_VOTERS_FROZEN_21`, 4 lanes, the frozen thresholds): the
+ *    GB-S1 baseline re-derivation. MUST reproduce BACKTEST-GOLD-LANES.md's
+ *    committed numbers (the script asserts them — a drift means the
+ *    harness drifted, not the meter).
  *  - **POST-P1** — the repairs' state: the D-2/D-3 + D-1 thresholds +
  *    the F1 backfill + the D-18 rule; the yield-curve seats KEPT (the
- *    sign decision pending — measured both ways).
+ *    sign decision's keep-variant, measured beside the demote-variant).
  *  - **POST-P1-DEMOTE** — POST-P1 with the D-7/D-8 context demotion
- *    (the audit's recommended variant, R4 rank 3).
+ *    (the owner's RECORDED choice (b), GF-S7 2026-11-05 — this scenario
+ *    IS the production composition since GF-P1; `GF_VOTERS_P1_DEMOTE`
+ *    equals the production `GOLD_LANE_VOTERS`, pinned by test).
  *  - **POST-P2-4LANE** — the promotions on the frozen four lanes.
  *  - **POST-P2-5LANE** — the promotions with the flows lane (OI-GA-2's
- *    ADD recommendation).
+ *    ADD recommendation, the owner's RECORDED answer B).
  *
- * Each scenario runs under BOTH crowd rules (MIN2 = D-GB-3's default,
- * MIN1 = the pre-registered fallback) and both window scopes (all
- * windows / the mature base ≥ 2021-09-23) — the GB-S1 protocol,
- * unchanged.
+ * Each scenario runs under BOTH crowd rules (MIN2 = D-GB-3's default —
+ * re-affirmed by the owner's recorded answer A, GF-S7 2026-11-05: keep
+ * the criteria + MIN2 on judgment — and MIN1 = the pre-registered
+ * fallback) and both window scopes (all windows / the mature base ≥
+ * 2021-09-23) — the GB-S1 protocol, unchanged.
  */
 export function gfScenarios(): GfScenario[] {
-  const frozenVoters: readonly GfVoter[] = GOLD_LANE_VOTERS;
-  const p1Voters = frozenVoters; // P1 repairs no seat: thresholds + the backfill only
-  const p1DemoteVoters = frozenVoters.filter((v) => v.id !== 'yield-curve-10y2y' && v.id !== 'yield-curve-10y3m');
+  const frozenVoters: readonly GfVoter[] = GF_VOTERS_FROZEN_21;
+  const p1Voters = frozenVoters; // P1 repairs no seat: thresholds + the backfill only (the keep-variant)
+  const p1DemoteVoters = GF_VOTERS_P1_DEMOTE;
   const scenarios: GfScenario[] = [];
   const push = (
     name: string,

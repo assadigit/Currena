@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold meter gap-fill program (P0 delivered + re-issued ×6, GF-S7 next)
+# AGENT_HANDOFF — Currena: the gold meter gap-fill program (P0 ANSWERED + P1 DELIVERED at GF-S7, GF-S8 = the P2 promotions next)
 
 > The owner's **gold meter audit** program (`docs/specs/gold-meter-audit/`)
 > is **CLOSED — COMPLETE 2026-11-05 at GA-S4**: A1–A4 whole (the taxonomy
@@ -9,25 +9,26 @@
 > of what the meter sees and what it does not. The successor — the
 > **gold meter gap-fill program** (owner-gated; its home
 > `docs/specs/gold-meter-gapfill/`) — executes the fills phase by phase
-> on the owner's recorded go. The predecessor gold balance consolidation
-> is COMPLETE, LIVE and CLOSED (2026-11-04, GB-S7): the consolidated lane
-> balance is THE gold card for every visitor on currena.ir. Never record
-> credentials here.
+> on the owner's recorded go. **The owner's answers A–K are RECORDED
+> (GF-S7, 2026-11-05 — the answer sheet: the README's decision table,
+> with the standing delegation "Generally, I trust your decisions. go
+> full autonomously.")**; GF-P1 is DELIVERED. The predecessor gold balance
+> consolidation is COMPLETE, LIVE and CLOSED (2026-11-04, GB-S7): the
+> consolidated lane balance is THE gold card for every visitor on
+> currena.ir. Never record credentials here.
 
 ## A. What comes next
 
-The **GF-S7 session** — the decision-list re-issue again, with the P1
-pivot on the owner's recorded answers (the program home:
-`docs/specs/gold-meter-gapfill/`). Its kickoff prompt is at the foot of
-`docs/specs/gold-meter-gapfill/PROMPTS.md` (the D-GA-9 convention) —
-paste it into a fresh session at the repo root. **The owner's answers
-(A–K) gate everything**; if they arrive before GF-S7 starts, the session
-pivots to the P1 repairs per its work item 4.
+The **GF-S8 session** — the P2 promotions on the owner's recorded
+answers (B/C/G/K: the twelve promote seats + the flows lane +
+GOLD_LANE_STRONG 4-of-5 + the N-1 amendment). Its kickoff prompt is at
+the foot of `docs/specs/gold-meter-gapfill/PROMPTS.md` (the D-GA-9
+convention) — paste it into a fresh session at the repo root.
 
 | Program | Milestone | Branch |
 |---|---|---|
 | gold meter audit — **CLOSED (2026-11-05)** | GA-S1 (the taxonomy, LOCKED v1.1 = 85) · GA-S2 + completion (the inventory + wiring pack) · GA-S3 (the matrix + the defects) · GA-S4 (the report + the fill design) | `ga/s1-taxonomy` · `ga/s2-inventory` · `ga/s2-wiring` · `ga/s3-matrix` · `ga/s4-report` — all merged |
-| gold meter gap-fill — **P0 DELIVERED (GF-S1) + the decision list RE-ISSUED (GF-S2 + GF-S3 + GF-S4 + GF-S5 + GF-S6, 2026-11-05); the owner's answers gate P1; GF-S7 NEXT** | GF-S1 delivered P0: the program home + the proposed voter set in new read-only harness tables (pinned by test ×14) + the calibration with its runnable record — **the FROZEN baseline reproduced cell-for-cell; every proposed set FAILS the pre-registered C2 on the all-windows scope (the STOP branch — the numbers are with the owner); OI-GA-2 measured (the flows lane votes 30.2% of windows post-backfill); the D-1 thresholds derived (five values + the 22-seat walk)**. GF-S2 (the lock-fallback: no answers recorded) re-issued the list A–K, **added the lane-rule question as item A of the living list (the README's decision table)**, re-verified the environment (the calibration reproduced byte-for-byte; the tests 14/14). GF-S3, GF-S4, GF-S5 and GF-S6 (the lock-fallback repeated: still no answers recorded — repo and chat both verified each time) checked for the answers FIRST, re-verified the environment again (byte-for-byte; 14/14) and re-issued the list a third, fourth, fifth and sixth time → the owner's answers gate P1 (repairs) → P2 promotions → P3 new free sources → P4 context additions → P5 acceptance + flip | `gf/p0-recalibration` (merged) · `gf/s2-reissue` (merged) · `gf/s3-reissue` (merged) · `gf/s4-reissue` (merged) · `gf/s5-reissue` (merged) · `gf/s6-reissue` (merged) → `gf/p1-repairs` next (or `gf/s7-reissue` if the answers are still absent) |
+| gold meter gap-fill — **P0 ANSWERED + P1 DELIVERED (GF-S7, 2026-11-05); GF-S8 = the P2 promotions NEXT** | GF-S1 delivered P0 (the calibration + the harness tables). GF-S2..GF-S6 re-issued the decision list A–K (the lock-fallback ×5). **GF-S7 recorded the owner's answers A–K + executed GF-P1**: the D-7/D-8 context demotion (21 → 19 voters: 6/3/5/5) · the five derived thresholds in the production SIGNAL_LEG_MOVE · the D-18 input-presence rule · the data plane (the CFTC archive parse production-owned + the one-off gf-p1-backfill — the three `insights:hist:*` keys written to production KV; the rung-2 gap persistence repair; the gold-silver base deepening over Yahoo GC=F÷SI=F) · the D-GF-6 recalibration (the committed report byte-for-byte + the gf-p1-verify evidence: production ≡ POST-P1-DEMOTE in ALL 2512 windows) · the tests restated (insights 1310 · web 12617). → GF-S8: the P2 promotions (the twelve seats + the flows lane + STRONG 4-of-5 + the N-1 amendment) → P3 the new free sources (R2 DFII5 re-opens the D-7/D-8 sign question with the real curve) → P4 the context additions (I10 · X7 · I11 + the WGC family, copy round 79+) → P5 acceptance + flip | `gf/p0-recalibration` (merged) · `gf/s2-reissue`…`gf/s6-reissue` (merged) · `gf/p1-repairs` (merged at GF-S7) → `gf/p2-promotions` next |
 
 ## B. The standing rules (read before any session)
 
@@ -57,7 +58,7 @@ pivots to the P1 repairs per its work item 4.
    PROMPTS.md, committed, pushed, and printed in the final message —
    never end a session without one.
 
-## C. The state of the world (as the GF-S6 close leaves it, 2026-11-05)
+## C. The state of the world (as the GF-S7 close leaves it, 2026-11-05)
 
 - **THE AUDIT'S VERDICT** (`docs/insights/GOLD-METER-AUDIT-REPORT.md`):
   rows classified = 85 · voters mapped = 21 (20 + 1 UNCLASSICATED —
@@ -68,53 +69,68 @@ pivots to the P1 repairs per its work item 4.
   **the meter fully covers 8/85 (≈ 9.4%) of the classic rows as healthy
   voting claims; 15/85 (≈ 17.6%) with any voting expression**. The
   RANKED 47-row backlog (severity W×A×C) maps every gap to its GF phase
-  with its named free source.
-- **THE GF-P0 CALIBRATION IS DELIVERED AND REPRODUCIBLE**
-  (`docs/specs/gold-meter-gapfill/evidence/gf-p0-calibration-2026-11-05.md`
-  + the run record + the fixtures; the harness tables in
-  `packages/insights/src/gf-p0-proposed.ts`, pinned by test ×14 —
-  re-verified at GF-S2, GF-S3, GF-S4, GF-S5 and GF-S6: the committed
-  report reproduces byte-for-byte):
+  with its named free source. **GF-P1 repaired D-2/D-3/D-4/D-5/D-6/
+  D-7/D-8/D-18** — the defects remaining for the fill program: D-9/D-10
+  accept-with-note (stand) · D-11/D-12 repair-if-filled (ride R2 at
+  P3) · D-13/D-15/D-16 accept-with-note · D-14 (the flows lane —
+  rides the P2 re-seat) · D-17 (the N-1 amendment — rides the P2 work).
+- **THE OWNER'S ANSWERS A–K ARE RECORDED** (GF-S7, 2026-11-05 — the
+  answer sheet: the README's decision table, with the standing
+  delegation "Generally, I trust your decisions. go full autonomously.").
+  The P1 halves EXECUTED at GF-S7; the P2 halves (B the flows lane +
+  STRONG 4-of-5 · C D5+S6 · G the N-1 amendment · K the twelve
+  promotions) gate GF-S8; the P4 context adds (I10 · X7 · I11 + the WGC
+  family, D's context-first) gate GF-P4.
+- **THE GF-P1 RECALIBRATION IS DELIVERED AND REPRODUCIBLE** (the D-GF-6
+  re-derivation): the committed calibration report
+  (`evidence/gf-p0-calibration-2026-11-05.md`) reproduces byte-for-byte
+  post-P1, and the NEW `evidence/gf-p1-verify-2026-11-05.md` + its run
+  record pin **the production engine ≡ the measured POST-P1-DEMOTE
+  scenario in ALL 2512 windows** (the composition equality + the
+  threshold-map equality pinned by test). The verdict restated under
+  the owner's recorded A: MIN2 all-windows C1 PASS · C2 FAIL (8 vs 7)
+  — keep the criteria + MIN2 on judgment, the recorded price of the
+  coverage.
+- **THE DATA-PLANE BACKFILLS ARE WRITTEN** (production KV, the owner's
+  environment-only credentials): `insights:hist:cftc-gold-positioning`
+  (522 points — the 565-week CFTC archive) · `insights:hist:
+  us-japan-10y-gap` (2350 points — DGS10 × MOF, persisted; rung-2 now
+  merges its derive with the accumulation) · `insights:hist:gold-silver`
+  (2555 points — the Yahoo GC=F÷SI=F deepening, stored values winning
+  on collision). The readings heal on their own cadences (cftc at the
+  next Saturday rung — the D-18 rule renders it honestly `unread`
+  until then).
+- **THE GF-P0 CALIBRATION EVIDENCE STANDS**
+  (`evidence/gf-p0-calibration-2026-11-05.md` + the run record + the
+  fixtures; the harness tables in `packages/insights/src/gf-p0-proposed.ts`):
   the FROZEN baseline reproduced BACKTEST-GOLD-LANES.md cell-for-cell;
-  **every proposed set FAILS the pre-registered C2 on the all-windows
-  scope under both crowd rules → the GB 02 §6 STOP branch: the
-  min-firing rule for the proposed sets is NOT selectable on this
-  corpus — the numbers are with the owner (decision item A)**; OI-GA-2
-  measured (the flows lane votes 759/2512 = 30.2% post-backfill, MIN2);
-  the D-1 thresholds derived (fed-expectations 0.13 · usdjpy 1.38 ·
-  fed-target 0.25 — the FOMC step grid · term-premium-10y 0.07 ·
-  t5yie 0.10; the 22-seat accept-with-note walk).
-- **THE OWNER'S DECISION LIST (A–K) gates the fill program** — the
-  living list is the README's decision table (`docs/specs/gold-meter-gapfill/README.md`):
-  **A** the lane rule for the proposed sets (the C2 STOP branch —
-  keep-criteria+MIN2 / amend-and-rerun / hold; the P1 go rides it) ·
-  OI-GA-2 the fifth flows & demand lane (ADD recommended) · OI-GA-3 the
-  D5/S6 shadow pair (fold into GF-P2) · OI-GA-4 WGC quarterly
-  (context-first) · OI-GA-5 EODHD (no use proposed) · OI-GA-6 copy
-  rounds 79+ (standing) · N-1 euro-hicp (AMEND recommended, the
-  denominator becomes 86) · the D-7/D-8 yield-curve sign decision
-  (context demotion recommended) · the D-18 readable-rule question
-  (input-presence rule recommended) · the D-1 threshold question (the
-  five derived values) · the 12 zero-new-fetch promotion go/no-gos
-  (PROMOTE ×8 · CONTEXT ADD ×3 · D7 seat-or-context). **Nothing
-  executes without the recorded go; every item stands recorded-open
-  (re-issued at GF-S1, GF-S2, GF-S3, GF-S4, GF-S5 and GF-S6).**
+  every proposed set FAILS the pre-registered C2 on the all-windows
+  scope under both crowd rules (the STOP branch — resolved by the
+  owner's recorded A); OI-GA-2 measured (the flows lane votes
+  759/2512 = 30.2% post-backfill, MIN2); the D-1 thresholds derived
+  (the five values — EXECUTED into production at GF-P1); the per-seat
+  firing tables (§6) — the go/no-go evidence for every P2 promotion.
 - **The taxonomy is LOCKED** (02 v1.1 = 85 rows, LOCKED 2026-11-05 by
   the owner's delegated instruction — the lock record at 02's foot).
-  Additions are owner-recorded amendments with dates only (D-GA-1).
+  Additions are owner-recorded amendments with dates only (D-GA-1); the
+  N-1 AMEND (the owner's recorded G) executes with the P2 work — the
+  denominator becomes 86.
 - Production: currena-api serving the consolidated lane balance for
-  every visitor; `goldSummary` retired from the wire (GB-S7). The
-  audited object: the 21-voter table (borrowing costs 8 · dollar 3 ·
-  market stress 5 · inflation 5), `evalLeg` (30-day move beyond the
-  per-leg minimum — only 4 of 21 seats carry one), the min-2 lane rule,
-  the derived Outlook, the context pill — all frozen until the fill
-  program's owner-gated changes land.
-- The known weak seats, quantified (history-depths-2026-11-05.txt):
-  `cftc-gold-positioning` (1 staged point — never fires today; reads
-  `steady` not `unread` — D-18), `us-japan-10y-gap` (percentile
-  intermittent — 6/9 recorded days), `gold-silver` (base 119 — thin),
-  the yield-curve polarity (fixed −1 on a regime-dependent claim — the
-  owner's sign decision).
+  every visitor; `goldSummary` retired from the wire (GB-S7). **The
+  audited object AS OF GF-P1**: the 19-voter table (borrowing costs 6 ·
+  dollar 3 · market stress 5 · inflation 5 — the two yield-curve seats
+  demoted to context per the owner's recorded H), `evalLeg` (the
+  30-day move beyond the per-leg minimum — 7 of 19 seats carry one now,
+  the P1 five included), the min-2 lane rule (MIN2 — the owner's
+  recorded A), the D-18 input-presence rule, the derived Outlook, the
+  context pill.
+- The GF-P1-repaired seats: `cftc-gold-positioning` (the 565-week base
+  written — fires from the next Saturday rung; the D-18 rule renders it
+  honestly `unread` until then), `us-japan-10y-gap` (the persisted
+  2350-point history + the rung-2 merge — the intermittent percentile
+  repaired), `gold-silver` (the base deepened to 2555 points),
+  `fed-expectations`/`usdjpy`/`fed-target` (the derived thresholds —
+  the move legs live).
 
 ## D. If a session is interrupted
 
@@ -128,5 +144,7 @@ rewritten. The GF-P0 calibration's runnable record:
 `packages/insights/scripts/gf-p0-record-candidates.ts` +
 `gf-p0-calibration.ts` over the committed fixtures (`packages/insights/
 fixtures/gf-p0-*.json`) — re-running reproduces the committed report
-byte-for-byte (re-verified at GF-S2, GF-S3, GF-S4, GF-S5 and GF-S6;
-the credentials live in the environment only, never in the repo).
+byte-for-byte (re-verified at GF-S2..GF-S6 and again POST-P1 at GF-S7;
+the GF-P1 verify record: `scripts/gf-p1-verify.ts` + the backfill
+`scripts/gf-p1-backfill.ts`; the credentials live in the environment
+only, never in the repo).

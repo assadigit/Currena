@@ -571,8 +571,32 @@ export interface SignalLegEval {
   lean: 1 | 0 | -1;
 }
 
-/** Per-leg 30-day thresholds in each definition's changeKind units (signals vocabulary). */
-const SIGNAL_LEG_MOVE: Partial<Record<IndicatorId, number>> = {
+/**
+ * Per-leg 30-day thresholds in each definition's changeKind units (signals
+ * vocabulary).
+ *
+ * GF-P1 (2026-11-05, the owner's recorded go — decision J of the GF-S7
+ * answer sheet, docs/specs/gold-meter-gapfill/README.md): the five
+ * D-1-derived values below EXECUTED into the production map — every value
+ * derived by the GF-P0 calibration over the recorded corpus (the
+ * derivation rule, the anchors' measured band and each value's firing
+ * share: evidence/gf-p0-calibration-2026-11-05.md §3), each justified by
+ * its 02 v1.1 treatment (change-led or level+change, daily cadence):
+ *   - fed-expectations 0.13 pts — D-2/R6 (rank 1): "change + level vs
+ *     decade range"; measured share 50.7% (n=2512);
+ *   - usdjpy 1.38 pct — D-3/D4 (rank 2): "change emphasis"; measured
+ *     share 51.4% (n=2494) — the only pct-changeKind seat;
+ *   - fed-target 0.25 pts — R5's "level + step direction": the derivation
+ *     landed exactly on the FOMC step grid (one 0.25pt step over 30 days);
+ *     measured share 7.0% (n=2512);
+ *   - term-premium-10y 0.07 pts — R9 (rank 6, the P2 promotion's own
+ *     threshold, measured share 49.2%): activates when the seat promotes;
+ *   - t5yie 0.1 pts — R8 (rank 9, the P2 promotion's own threshold,
+ *     measured share 50.7%): activates when the seat promotes.
+ * Every other level-only seat is accept-with-note (the per-seat walk with
+ * the numbers: the calibration §3).
+ */
+export const SIGNAL_LEG_MOVE: Partial<Record<IndicatorId, number>> = {
   'real-yield-10y': 0.1, // points
   'gold-usd': 3, // pct
   'silver-usd': 3, // pct
@@ -582,6 +606,13 @@ const SIGNAL_LEG_MOVE: Partial<Record<IndicatorId, number>> = {
   us10y: 0.15, // points
   'copper-gold': 0.08, // points
   'china-pmi': 0.25, // points
+  // ——— GF-P1 (2026-11-05, the owner's recorded decision J): the five
+  // ——— D-1-derived values — evidence/gf-p0-calibration-2026-11-05.md §3.
+  'fed-expectations': 0.13, // points (D-2/R6, rank 1 — the change-led claim)
+  usdjpy: 1.38, // pct (D-3/D4, rank 2 — the carry-unwind move story)
+  'fed-target': 0.25, // points (R5 — the FOMC step grid: one step over 30 days)
+  'term-premium-10y': 0.07, // points (R9's promotion threshold — activates at GF-P2)
+  t5yie: 0.1, // points (R8's promotion threshold — activates at GF-P2)
 };
 
 /** The F3 position bands (one vocabulary with the page's position words). */

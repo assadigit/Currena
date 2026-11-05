@@ -48,6 +48,8 @@
     "gold-backtest": "tsx scripts/gold-backtest.ts",
     "gf-p0-record-candidates": "tsx scripts/gf-p0-record-candidates.ts",
     "gf-p0-calibration": "tsx scripts/gf-p0-calibration.ts",
+    "gf-p1-backfill": "tsx scripts/gf-p1-backfill.ts",
+    "gf-p1-verify": "tsx scripts/gf-p1-verify.ts",
     "rung2-run": "tsx scripts/rung2-run.ts"
   },
   "dependencies": {
