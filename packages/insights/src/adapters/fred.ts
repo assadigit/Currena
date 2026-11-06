@@ -142,6 +142,11 @@ export const FRED_SERIES = {
   yieldCurve10y3m: 'T10Y3M',
   stressStlfsi: 'STLFSI4',
   realYield10y: 'DFII10',
+  // GF-P3 (2026-11-06, audit §4 rank 19 — R2): the 5y real yield — the belly
+  // where policy bites first. Same cosd as DFII10 (2003-01-02); rides the
+  // same 'since' bulk group (zero extra subrequests). Unlocks D-11/D-12's
+  // derived real curve.
+  realYield5y: 'DFII5',
   us10y: 'DGS10',
   breakeven5y5y: 'T5YIFR',
   govtInterest: 'A091RC1Q027SBEA',
@@ -160,8 +165,16 @@ export const FRED_SERIES = {
   fedTargetLower: 'DFEDTARL', // fed-target: the lower bound of the target range
   fedTargetUpper: 'DFEDTARU', // …and its upper bound (rangeHigh on the reading)
   nfci: 'NFCI', // Chicago Fed National Financial Conditions, weekly
-  // dollar-broad (DTWEXBGS) retired: the series now lags ~5 days upstream
-  // and the Currena dollar basket replaces it (data spec §3, basket.ts).
+  // GF-P3 (2026-11-06, audit §4 ranks 20–21, 28 — D2/D9/S9): the trade-
+  // weighted dollar pair + the bank-facility rate. DTWEXBGS RETURNED for
+  // GF-P3 (the audit's D2 fill — "the honest inverse"); the ~5-day upstream
+  // lag is accommodated by staleAfterDays:10 on the dollar-broad/dollar-eme
+  // definitions (the card reads fresh within the publication lag, the asOf
+  // date honest). DTWEXEMEGS is the EME twin (same lag, same accommodation).
+  // DPCREDIT is the 30d commercial paper rate (the modern bank-run tell).
+  dollarBroad: 'DTWEXBGS',
+  dollarEme: 'DTWEXEMEGS',
+  bankStress: 'DPCREDIT',
   // Step-2 add-list §B3/§B4/§B5 (all verified current 2026-10-13):
   usUnemployment: 'UNRATE', // us-unemployment: the US unemployment rate, monthly BLS
   sahmRealtime: 'SAHMREALTIME', // sahm-rule: the real-time Sahm recession indicator, monthly
@@ -299,7 +312,9 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
   // the fresher answer path. The cross-fill + the Treasury real-curve
   // fallback (collect.ts) cover this group's own failure days.
   {
-    seriesIds: [FRED_SERIES.realYield10y],
+    // GF-P3: DFII5 joins its 10y twin (same cosd 2003-01-02, same family —
+    // zero extra subrequests; the belly beside the long end).
+    seriesIds: [FRED_SERIES.realYield10y, FRED_SERIES.realYield5y],
     window: 'since',
     since: FRED_DFII10_COSD,
   },
@@ -324,6 +339,10 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.nfci,
       FRED_SERIES.sofr,
       FRED_SERIES.t5yie,
+      // GF-P3: the trade-weighted dollar pair joins this daily decade group
+      // (10 → 12 ids — at the ZIP-truncation cap; both series daily, 2006+).
+      FRED_SERIES.dollarBroad,
+      FRED_SERIES.dollarEme,
     ],
     window: 'decade',
   },
@@ -407,6 +426,10 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.cfnai,
       FRED_SERIES.jobOpenings,
       FRED_SERIES.averageHourlyEarnings,
+      // GF-P3: the 30d commercial paper rate joins this weekly/monthly group
+      // (11 → 12 ids — at the cap; DPCREDIT is weekly, rides the
+      // weekly,_as_of_wednesday ZIP member beside WALCL/custody).
+      FRED_SERIES.bankStress,
     ],
     window: 'decade',
   },

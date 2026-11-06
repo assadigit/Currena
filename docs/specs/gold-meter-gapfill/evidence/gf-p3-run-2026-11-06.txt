@@ -1,0 +1,11 @@
+# GF-P3 verify run record — 2026-11-06T01:14:24.396Z
+
+windows: 2512 (2016-11-07 → 2026-11-03)
+production voters: 36 (36 seats, 5 lanes)
+production ≡ POST-P3-5LANE (the F2 id mapping recorded): ALL 2512 windows equal (0 mismatches)
+MIN2 all: level 680/2512 (27.1%) · full-tip 299 (11.9%) · C1 PASS · flips 10 vs 8 · C2 FAIL
+MIN2 mature: level 328/1287 · full-tip 116 · C1 PASS · flips 10 vs 8 · C2 FAIL
+MIN1 all: level 591/2512 · full-tip 224 · C1 PASS · flips 10 vs 8 · C2 FAIL
+MIN1 mature: level 311/1287 · full-tip 85 · C1 PASS · flips 10 vs 8 · C2 FAIL
+committed POST-P3-5LANE rows: reproduced (the drift gate held)
+

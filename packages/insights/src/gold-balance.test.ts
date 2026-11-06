@@ -377,7 +377,7 @@ describe('goldBalance — the member vocabulary (02 §2)', () => {
   });
 
   // 04 §4.1 test 11 — the engine's membership IS the frozen table's.
-  it("11. table integrity: the engine's lane membership equals GOLD_LANE_VOTERS (GF-P2's 32 voters, 6/5/10/9/2)", () => {
+  it("11. table integrity: the engine's lane membership equals GOLD_LANE_VOTERS (GF-P3's 36 voters, 7/7/11/9/2)", () => {
     expect(GOLD_LANE_MIN_FIRING).toBe(2); // the P0 calibration decision (MIN2)
     expect(GOLD_LANE_STRONG).toBe(4); // GF-P2 (the owner's recorded answer B): 4 of 5 lanes = 80%, preserving the old 3-of-4 = 75% strictness
     expect(HARNESS_GOLD_LANES_MIN2.minFiring).toBe(GOLD_LANE_MIN_FIRING); // the decision the harness measured
@@ -387,15 +387,17 @@ describe('goldBalance — the member vocabulary (02 §2)', () => {
     expect(b.lanes.map((l) => l.lane)).toEqual([...GOLD_LANES]);
     const memberIds = b.lanes.flatMap((l) => l.members.map((m) => m.id));
     expect(memberIds).toEqual(GOLD_LANE_VOTERS.map((v) => v.id)); // table order, every voter
-    expect(memberIds).toHaveLength(32);
+    expect(memberIds).toHaveLength(36);
     const perLane: Record<string, number> = {};
     for (const id of memberIds) {
       const v = GOLD_LANE_VOTERS.find((x) => x.id === id)!;
       perLane[v.lane] = (perLane[v.lane] ?? 0) + 1;
     }
-    // GF-P2 (the owner's recorded answers B/C/K): the measured POST-P2-5LANE
-    // composition (evidence/gf-p0-calibration-2026-11-05.md §7).
-    expect(perLane).toEqual({ 'borrowing-costs': 6, dollar: 5, stress: 10, inflation: 9, flows: 2 });
+    // GF-P3 (the standing delegation, 2026-11-06): the measured POST-P3-5LANE
+    // composition (evidence/gf-p0-calibration-2026-11-05.md §7's new
+    // POST-P3-5LANE rows). The P2-era 32-seat composition (6/5/10/9/2) is
+    // preserved as GF_VOTERS_5LANE.
+    expect(perLane).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 9, flows: 2 });
     // GF-P1 (the owner's recorded decision H, 2026-11-05 — the D-7/D-8
     // context demotion): the two yield-curve seats are NEVER members.
     expect(memberIds).not.toContain('yield-curve-10y2y');
@@ -403,6 +405,11 @@ describe('goldBalance — the member vocabulary (02 §2)', () => {
     // GF-P2 (K): the D7 seat question stays recorded-open — usdchf is a
     // CONTEXT CARD, never a member.
     expect(memberIds).not.toContain('usdchf');
+    // GF-P3 (OI-GA-4's recorded context-first answer): the WGC/official-
+    // flows family are CONTEXT CARDS, never members.
+    expect(memberIds).not.toContain('wgc-etf-holdings');
+    expect(memberIds).not.toContain('wgc-cb-demand');
+    expect(memberIds).not.toContain('official-gold-demand');
   });
 });
 
@@ -573,7 +580,7 @@ describe('goldBalance — the 2026-10-31 fixture (01 §7, 04 §4.1 tests 12+13)'
   // twelve promoted seats' readings are absent from the 2026-10-31 archive
   // → they never fire here (the gf-p2-verify corpus pin measures them over
   // the GF-P0 fixtures instead — ALL 2512 windows).
-  it('13. no-drift: goldTailwindScore on the same fixture is netScore 1 / tailwind / 7 of 32 firing (the t5yie flip traced to R8×J)', () => {
+  it('13. no-drift: goldTailwindScore on the same fixture is netScore 1 / tailwind / 7 of 36 firing (the t5yie flip traced to R8×J; GF-P3: the 4 new voters absent from the 2026-10-31 archive → still 7 firing)', () => {
     const t = goldTailwindScore(fixtureReadings());
     expect(t.netScore).toBe(1);
     expect(t.label).toBe('tailwind');

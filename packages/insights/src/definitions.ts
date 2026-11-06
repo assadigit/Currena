@@ -88,6 +88,32 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
   },
   {
+    // GF-P3 (2026-11-06, the new free sources — audit report §4 rank 19,
+    // R2 MISSING-FREE → promote): FRED DFII5 — the 5-year Treasury
+    // Inflation-Indexed Security Yield (the real yield's belly, where
+    // policy bites first). The real-yield-10y's twin (same family, same
+    // units, the same polarity −1 — rising real yields = the opportunity
+    // cost of holding gold rises = headwind). UNLOCKS D-11/D-12's derived
+    // real curve (the 10y−5y slope — the object that re-opens the D-7/D-8
+    // sign question with the correct curve; the sign is a DECISION LIST
+    // item, never seated silently). The threshold (0.10 pts, the
+    // real-yield-10y's own family) enters the production SIGNAL_LEG_MOVE
+    // on the owner-gated seating (the measured POST-P3-5LANE scenario
+    // covers it; the F2 precedent). Keyless FRED fredgraph.csv (L0/L1,
+    // public domain — the FRED licence register row).
+    id: 'real-yield-5y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US 5-year real yield',
+    source: 'fred',
+    sourceRef: 'FRED:DFII5',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
+    staleAfterDays: 4,
+  },
+  {
     id: 'us10y',
     section: 'global',
     group: 'borrowing-costs',
@@ -1482,6 +1508,30 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 14,
   },
   {
+    // GF-P3 (2026-11-06, the new free sources — audit report §4 rank 28,
+    // S9 MISSING-FREE → promote): FRED DPCREDIT — the commercial paper
+    // rate (the 30-day nonfinancial commercial paper rate, the bank-
+    // facility usage proxy). "The modern bank-run tell, absent from the
+    // data plane" — a spike in short-term funding rates is the classic
+    // stress signal (the 2008/2020 pattern). Polarity +1 (rising =
+    // stress = gold-positive, the stress lane's own sign). The threshold
+    // (0.10 pts, the rate-move family) enters the production
+    // SIGNAL_LEG_MOVE on the owner-gated seating (the measured
+    // POST-P3-5LANE scenario; the F2 precedent). Keyless FRED
+    // fredgraph.csv (L0/L1, public domain).
+    id: 'bank-stress',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Commercial paper rate (30d)',
+    source: 'fred',
+    sourceRef: 'FRED:DPCREDIT',
+    cadence: 'weekly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+    staleAfterDays: 14,
+  },
+  {
     // Step-2 add-list §B5: the market fear gauge (Cboe VIX via FRED VIXCLS,
     // daily, licence noted on the card/About — Cboe data redistributed
     // through FRED with attribution). Scored through the engine's standard
@@ -1822,6 +1872,54 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 4,
   },
   {
+    // GF-P3 (2026-11-06, the new free sources — audit report §4 rank 20,
+    // D2 MISSING-FREE → promote): FRED DTWEXBGS — the Federal Reserve's
+    // Broad Trade-Weighted Dollar Index (the 26-currency basket, the
+    // "honest inverse" — a rising broad dollar is the classic gold
+    // headwind, the dollar-basket's own family). Polarity −1 (rising =
+    // headwind). The threshold (1.0 pct, the dollar-basket's own family)
+    // enters the production SIGNAL_LEG_MOVE on the owner-gated seating
+    // (the measured POST-P3-5LANE scenario; the F2 precedent). Keyless
+    // FRED fredgraph.csv (L0/L1, public domain).
+    id: 'dollar-broad',
+    section: 'global',
+    group: 'dollar-strength',
+    name: 'Broad trade-weighted dollar',
+    source: 'fred',
+    sourceRef: 'FRED:DTWEXBGS',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+    // DTWEXBGS lags ~5 days upstream (FRED publishes with a delay); the 10-day
+    // window keeps the card fresh within the publication lag (the asOf date
+    // honest — the card shows the latest available point with its true date).
+    staleAfterDays: 10,
+  },
+  {
+    // GF-P3 (2026-11-06, the new free sources — audit report §4 rank 21,
+    // D9 MISSING-FREE → promote): FRED DTWEXEMEGS — the FRB's Emerging
+    // Markets Economies Trade-Weighted Dollar Index (the EME dollar —
+    // "the marginal buyer's leg"; a rising EME dollar tightens the
+    // marginal gold buyer's funding, the dollar-basket's EME complement).
+    // Polarity −1 (rising = headwind). The threshold (1.0 pct, the
+    // dollar-basket's own family) enters the production SIGNAL_LEG_MOVE
+    // on the owner-gated seating. Keyless FRED fredgraph.csv (L0/L1).
+    id: 'dollar-eme',
+    section: 'global',
+    group: 'dollar-strength',
+    name: 'EME trade-weighted dollar',
+    source: 'fred',
+    sourceRef: 'FRED:DTWEXEMEGS',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
+    // DTWEXEMEGS lags ~5 days upstream (same publication cadence as DTWEXBGS);
+    // the 10-day window keeps the card fresh within the lag.
+    staleAfterDays: 10,
+  },
+  {
     // 2026-10-26 gap-audit build, A-3 (INSIGHTS_DATA_SPEC.md): the
     // US−Japan 10-year yield gap — DGS10 − the MOF's daily 10Y. The
     // carry trade's fuel line: unwinds historically accelerate as the gap
@@ -1899,6 +1997,85 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P2',
     rule: { kind: 'info' },
     staleAfterDays: 4,
+  },
+  {
+    // GF-P3 (2026-11-06, the WGC/official-flows family — audit report
+    // §4 rank 24 / F3, OI-GA-4's recorded context-first answer): the
+    // Western investor bid — how many tonnes the world's gold-backed
+    // ETFs hold. A CONTEXT CARD (rule: info — never votes; the tonnes
+    // say nothing about price direction, they read the structural bid
+    // only). The promotion criteria (annualised-level extreme bands —
+    // the 2022-2024 drawdown vs the decade norm) ride the card's own
+    // percentile history once the card exists; the seat question re-
+    // opens only on the owner's recorded go, revisit-able then. WGC's
+    // monthly ETF holdings table (XLSX, free for research/reference
+    // with attribution — L1; the data adapter lands with the card).
+    // The group is 'market-stress' (the cftc-gold-gross-long precedent
+    // — the gold-flows family rides the question-gauge's stress lane;
+    // the gold meter's flows LANE is a separate re-cut of the same
+    // members). NOT a gauge member (rule: info — context cards never
+    // join a scored gauge, the usdchf/eur-usd precedent).
+    id: 'wgc-etf-holdings',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Gold ETF holdings',
+    source: 'wgc',
+    sourceRef: 'WGC monthly ETF holdings table (tonnes)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 45,
+  },
+  {
+    // GF-P3 (2026-11-06, the WGC/official-flows family — audit report
+    // §4 rank 25 / F4, OI-GA-4's recorded context-first answer): the
+    // 2022-2026 regime driver — how many tonnes central banks bought
+    // (quarterly). A CONTEXT CARD (rule: info — never votes; the
+    // tonnes read the structural regime, never a price direction). The
+    // promotion criteria (annualised-level extreme bands) ride the
+    // card's own percentile history once the card exists; the seat
+    // question stays recorded-open, revisit-able then. WGC's Gold
+    // Demand Trends quarterly tonnage table (XLSX, free for
+    // research/reference with attribution — L1; the data adapter lands
+    // with the card). Same group discipline as F3 above
+    // ('market-stress', NOT a gauge member).
+    id: 'wgc-cb-demand',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Central bank gold demand',
+    source: 'wgc',
+    sourceRef: 'WGC Gold Demand Trends quarterly (tonnes)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 100,
+  },
+  {
+    // GF-P3 (2026-11-06, the WGC/official-flows family — audit report
+    // §4 rank 26 / F13, OI-GA-4's recorded context-first answer): F4's
+    // monthly twin — the official-sector gold purchases from PBoC/SAFE
+    // monthly reserves + CBR (tonnes). A CONTEXT CARD (rule: info —
+    // never votes; the tonnes read the official-sector bid, never a
+    // price direction). The promotion criteria (annualised-level
+    // extreme bands) ride the card's own percentile history once the
+    // card exists; the seat question stays recorded-open, revisit-able
+    // then. PBoC's monthly official-reserve / gold-purchase tables
+    // (free official site — L1; the data adapter lands with the card).
+    // Same group discipline as F3/F4 above ('market-stress', NOT a
+    // gauge member).
+    id: 'official-gold-demand',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Official-sector gold demand',
+    source: 'pboc',
+    sourceRef: 'PBoC/SAFE monthly reserves table + CBR (tonnes)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 45,
   },
   /* ---------------- Global — Is growth healthy? ---------------- */
   {

@@ -13,13 +13,17 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('covers every indicator id exactly once (41, retired ids absent)', () => {
+  it('covers every indicator id exactly once (GF-P3: 170 ids — the 4 FRED-sourced P3 voters + the 3 WGC/official-flows P3 context cards)', () => {
     const ids = DEFINITIONS.map((d) => d.id);
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids).toHaveLength(IndicatorIdSchema.options.length);
     expect([...ids].sort()).toEqual([...IndicatorIdSchema.options].sort());
-    // The retired slug must NOT come back (replaced by the Currena basket).
-    expect(ids).not.toContain('dollar-broad');
+    // GF-P3 (2026-11-06, the standing delegation — §4 rank 20 / D2): the
+    // `dollar-broad` slug is NO LONGER RETIRED — it was retired at I15
+    // (replaced by the Currena basket) and re-added at GF-P3 as a separate
+    // voter beside the basket (FRED DTWEXBGS, the trade-weighted dollar;
+    // the basket stays). The retired-slug assertion is dropped — the id
+    // is now a sanctioned member of the enum.
   });
 
   it('splits 96 P1 / 43 P2 (the 2026-10-25 M6 Wave-3 round adds twelve P1 cards — the leading-edge batch; the 2026-10-26 M7 round adds china-cpi as a P1 card on the NBS press-release automation; the 2026-10-26 gap-audit build adds yield-curve-10y3m, rba-fed-gap, us-japan-10y-gap, cftc-gold-positioning (voters, A-1/A-5/A-3/A-7), gold-oil-ratio, eia-crude-stocks (context, A-4/A-6) and the monthly trio oecd-cli-us/cn/de, gpr-index, epu-us (A-8/A-9/A-10) as P1 cards; the 2026-10-29 owner round adds usdaed — the UAE dirham context card, P2; the 2026-10-31 gap-closure S2-M2.4 round adds nyfed-custody — the weekly custody card, P1; the 2026-11-01 gap-closure S3-M3.2 round adds the liquidity/funding six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.3 round adds the credit pair — both P1 context cards; the 2026-11-01 gap-closure S3-M3.4 round adds the growth-nowcast/survey six — all P1 context cards; the 2026-11-01 gap-closure S3-M3.5 round adds the fiscal and Treasury-supply six — all P1 context cards; the 2026-11-01 gap-closure S4-M4.2 round adds the geopolitics eleven — the GPR threat/act/country family, the daily 7-day average and the TPU, all P1 context cards; the 2026-11-01 gap-closure S4-M4.3 round adds the chokepoint five — the IMF PortWatch transit cards, all P1 context cards; the 2026-11-01 gap-closure S4-M4.4 round adds the supply-chain/energy six — the GSCPI + the EIA SPR/production pair as P1 context cards, the Pink Sheet energy trio as P2 context cards)', () => {
@@ -146,6 +150,12 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'nz-short-rate',
       'oecd-cli-cn',
       'oecd-cli-de',
+      // GF-P3 (2026-11-06, OI-GA-4's recorded context-first answer): the
+      // WGC/official-flows family — three context cards, never vote. The
+      // ids sort lexicographically: 'official-gold-demand' falls between
+      // 'oecd-cli-de' and 'ofr-fsi'; 'wgc-cb-demand' and 'wgc-etf-holdings'
+      // fall between 'walcl' and 'wheat'.
+      'official-gold-demand',
       'ofr-fsi',
       'platinum',
       'rba-cash-rate',
@@ -183,15 +193,17 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'usdcny',
       'usdtry',
       'walcl',
+      'wgc-cb-demand',
+      'wgc-etf-holdings',
       'wheat',
       'wti',
     ]);
   });
 
-  it('GAUGE membership is the scored list (48 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation SHADOW gauge carries context-only members — the deliberate G-5 exception, pinned here)', () => {
+  it('GAUGE membership is the scored list (53 voters; fix B-14: +brent counts in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims, +recession-probability, +michigan-sentiment in growth-health, +us-pce-core-yoy in prices-heat; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation SHADOW gauge carries context-only members — the deliberate G-5 exception, pinned here; GF-P2 (2026-11-05): +cftc-gold-gross-long in market-stress — 49 voters; GF-P3 (2026-11-06, the standing delegation): +real-yield-5y in borrowing-costs, +dollar-broad +dollar-eme in dollar-strength, +bank-stress in market-stress — 53 voters)', () => {
     const gaugedGroups = new Set(GAUGES.map((g) => g.id));
     const memberIds = new Set(GAUGES.flatMap((g) => g.members));
-    expect(memberIds.size).toBe(69); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3/M4.5 shadow gauge's EIGHT context-only members (the five chokepoints + gscpi/us-spr/us-crude-production; 48 + 8 = 56; only the 48 vote) PLUS the S5-M5.2 shadow lanes' SEVEN context-only members (the six activity cards + au-trade-balance; 56 + 7 = 63; still only the 48 vote) PLUS the S6-M6.1 NZ link's THREE context-only members (audnzd + nz-short-rate + nz-10y in the au-external shadow lane; 63 + 3 = 66; still only the 48 vote) PLUS the S6-M6.3 de-dollarization lane's TWO context-only members (usd-reserve-share + sp500-breadth-ratio; 66 + 2 = 68; still only the 48 vote) PLUS GF-P2's cftc-gold-gross-long (F2's real object — the market-stress gauge's scored twin beside the net seat, 2026-11-05; 68 + 1 = 69)
+    expect(memberIds.size).toBe(73); // the 48 voters +yield-curve-10y3m (A-1) +rba-fed-gap (A-5) +us-japan-10y-gap (A-3) +cftc-gold-positioning (A-7) +oecd-cli-us (A-8) — PLUS the S4-M4.3/M4.5 shadow gauge's EIGHT context-only members (the five chokepoints + gscpi/us-spr/us-crude-production; 48 + 8 = 56; only the 48 vote) PLUS the S5-M5.2 shadow lanes' SEVEN context-only members (the six activity cards + au-trade-balance; 56 + 7 = 63; still only the 48 vote) PLUS the S6-M6.1 NZ link's THREE context-only members (audnzd + nz-short-rate + nz-10y in the au-external shadow lane; 63 + 3 = 66; still only the 48 vote) PLUS the S6-M6.3 de-dollarization lane's TWO context-only members (usd-reserve-share + sp500-breadth-ratio; 66 + 2 = 68; still only the 48 vote) PLUS GF-P2's cftc-gold-gross-long (F2's real object — the market-stress gauge's scored twin beside the net seat, 2026-11-05; 68 + 1 = 69; 49 voters) PLUS GF-P3's four FRED-sourced voters (R2 real-yield-5y in borrowing-costs · D2 dollar-broad in dollar-strength · D9 dollar-eme in dollar-strength · S9 bank-stress in market-stress — the standing delegation, 2026-11-06; 69 + 4 = 73; 53 voters)
     // Every gauge member is a scored (non-info) definition. TWO deliberate
     // exceptions: B-14's brent (the card renders on the Prices strip; only
     // the count membership moved) and the S4-M4.3 SHADOW gauge's members

@@ -1285,7 +1285,7 @@ next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
 green; 5. final message = the printed next prompt + the 5-line summary.
 ```
 
-## GF-S9 — the P3 new free sources (the live kickoff)
+## GF-S9 — the P3 new free sources (RUN 2026-11-06 — **GF-P3 EXECUTED**: the four FRED-sourced voter-candidates seated owner-gated through the MEASURED POST-P3-5LANE scenario (the F2 precedent) → GOLD_LANE_VOTERS 32→36 (7/7/11/9/2); the 3 WGC/official flows context cards (F3/F4/F13) landed rule:info per OI-GA-4; the D-11/D-12 real-curve sign question printed as a DECISION LIST item (never seated silently); the harness-first discipline (D-GF-6): gf-p3-record-candidates + the calibration re-run (the existing 5 byte-for-byte + POST-P3-5LANE measured: MIN2 all 27.1%/11.9%/C1 PASS/C2 FAIL 10v8) + the gf-p3-verify twin (production ≡ POST-P3-5LANE in ALL 2512 windows); the tests 14,603 + copy round 80 (81 strings, clean) + gates ALL GREEN; superseded by the GF-S10 prompt below)
 
 ```
 You are working in the Currena repo at the repo root. This is the GF-S9
@@ -1427,6 +1427,162 @@ the recalibration re-run (the extended scenario family committed + the
 production ≡ scenario pin); tests + copy:audit + gates green; PR
 merged; CI green on main. The GF-S10 prompt written, committed, pushed
 and printed (D-GA-9).
+
+AT THE END (the standing close-out, every session)
+1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the
+next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
+green; 5. final message = the printed next prompt + the 5-line summary.
+```
+
+## GF-S10 — the remaining P3 sources + the real-curve sign decision + the P4 context additions (the live kickoff)
+
+```
+You are working in the Currena repo at the repo root. This is the GF-S10
+session of the gold meter gap-fill program (the owner-gated successor to
+the CLOSED gold meter audit program; the program home:
+docs/specs/gold-meter-gapfill/ — README + 01-FILL-SPEC + PROGRESS +
+PROMPTS; the audit's verdict: docs/insights/GOLD-METER-AUDIT-REPORT.md).
+Read this whole prompt before doing anything.
+
+CONTEXT — WHERE WE STAND
+GF-S9 (2026-11-06) EXECUTED GF-P3 on the standing delegation ("Generally,
+I trust your decisions. go full autonomously."): the four FRED-sourced
+voter-candidates seated (R2 real-yield-5y DFII5 · D2 dollar-broad
+DTWEXBGS · D9 dollar-eme DTWEXEMEGS · S9 bank-stress DPCREDIT) —
+owner-gated through the MEASURED POST-P3-5LANE scenario (the F2
+precedent: the harness seat and the production seat agree by
+construction). GOLD_LANE_VOTERS 32→36 (7/7/11/9/2). The harness-first
+discipline (D-GF-6) executed BEFORE any seat: gf-p3-record-candidates
+fetched the 4 FRED series keyless → the candidates fixture extended (20
+series); gf-p0-proposed gained GF_VOTERS_P3_5LANE + GF_MOVE_P3_PROPOSED
++ the POST-P3-5LANE scenario; the calibration re-run (the existing 5
+byte-for-byte) measured POST-P3-5LANE: MIN2 all level 27.1% · full-tip
+11.9% · C1 PASS · C2 FAIL 10 vs 8 (the owner's recorded A resolves the
+shape on judgment — the failure is the recorded price of the coverage).
+The gf-p3-verify twin: production ≡ POST-P3-5LANE in ALL 2512 windows.
+The 3 WGC/official flows context cards (F3 wgc-etf-holdings · F4
+wgc-cb-demand · F13 official-gold-demand) landed as rule:info cards
+(OI-GA-4's recorded context-first answer; the promotion criteria —
+annualised-level extreme bands — recorded in each definition's comments;
+the data adapters DEFERRED to GF-S10). The D-11/D-12 real-curve sign
+question (unlocked by R2's DFII5 fill) is a DECISION LIST item — printed
+in the gf-p3-verify evidence §4, NEVER seated silently. Copy round 80
+(81 strings, clean). Tests 14,603. Gates ALL GREEN. The GF-P3 build
+changed the worker but the DEPLOY rides the owner's go (the GF-S8 worker
+9311eaf3 stays live until the P3 deploy — the live verification deferred
+to GF-S10's close).
+
+WHAT THIS SESSION IS
+GF-S10 — THREE TRACKS:
+(1) THE REMAINING P3 SOURCES (01-FILL-SPEC §1, the ranks GF-S9 deferred):
+F6 the Shanghai premium derivation (SGE Au9999 × gold-api XAU ×
+Frankfurter USD/CNY — "the classic scarcity tell") · F7 the India parity
+(Frankfurter INR + MCX delayed free-view) · I4 the UoM SIE portal (the
+5–10y household anchor) · I9 the nowcast-surprise derivation (Cleveland
+Fed nowcasts vs realised). Each lands with its licence row, its rung,
+its staleness window — the free-first discipline inherited (EODHD: zero
+calls). The WGC/official flows DATA ADAPTERS (F3/F4/F13 — the cards
+exist from GF-S9; the data plane lands now: WGC XLSX + PBoC/SAFE tables
++ CBR).
+(2) THE D-11/D-12 REAL-CURVE SIGN DECISION (the recorded-open decision-
+list item): the derived real curve (DFII10 − DFII5, the 10y−5y real-yield
+slope — R2's fill unlocked it) lands as a CONTEXT CARD (rule: info — the
+slope displays as context). BOTH SIGN VARIANTS measured in the harness
+(POST-P3-5LANE-REALCURVE-+ and POST-P3-5LANE-REALCURVE-- scenarios); the
+sign question PRINTED for the owner. NEVER seat a sign silently — the
+owner's recorded choice gates the seating (if any).
+(3) THE P3 DEPLOY (D-GF-9 — the built worker changed at GF-S9): the web
+app rebuilt + pnpm run deploy → the currena-api worker live; the live
+end-to-end verification over the public snapshot (the 36-voter five-lane
+engine, the four new seats firing on their cadences).
+THEN if budget allows: P4 — THE CONTEXT ADDITIONS (01-FILL-SPEC §1,
+ranks 30–31, 34–47): I10 the Jastram real gold price · X7 gold/platinum ·
+I11 global liquidity · the WGC family F5/F8/F11/F15/F16 · G3 debt/GDP ·
+X5 gold-vs-equities · R11 r-star · F12 · H1–H4. Each with EN+fa copy
+(round 81+).
+
+SESSION SHAPE
+(1) read-first + git pull --rebase (the program home + the GF-S9 block +
+the gf-p3-verify evidence + the audit report §4 rows 22, 24–27, 32–33 +
+the licences register + the adapters/rung patterns the new sources ride);
+(2) THE HARNESS FIRST (D-GF-6) for any NEW voter seat (F6's flows seat?
+F7's? I4's? I9's?): extend gf-p0-proposed.ts with the new scenario family
+(POST-P4-5LANE compositions), re-run the calibration, commit the
+measured record BEFORE any production seat changes; the CONTEXT cards
+(the real-curve sign card, the WGC data cards) need no recalibration but
+DO need the EN+fa copy (round 81+); (3) the D-11/D-12 real-curve sign
+question — measure BOTH variants in the harness, print the question for
+the owner, NEVER seat a sign silently; (4) the tests + the honesty suite
+restated (every delta traced to a recorded answer or a measured
+scenario); (5) the P3 deploy (D-GF-9) + the live verification; (6) the
+gates + the close-out.
+
+WORK ITEMS (in order)
+1. READ FIRST: the program home (README — the GF-S9 execution notes;
+   01-FILL-SPEC §1 P3-remainder + P4; PROGRESS — the GF-S9 block; PROMPTS
+   — this prompt) + evidence/gf-p3-verify-2026-11-06.md + the audit
+   report §4 rows 22, 24–27, 32–33 + the calibration report + the
+   licences register + the existing adapter patterns (fred.ts · goldapi.ts
+   · frankfurter.ts · yahoo.ts · monthly-indexes.ts · the rung2/rung3/rung4
+   gates). Then git pull --rebase.
+2. THE P3 DEPLOY FIRST (D-GF-9): the GF-S9 build changed the worker but
+   the deploy rode the owner's go. Deploy the 36-voter five-lane engine;
+   the live end-to-end verification over the public snapshot (the four
+   new seats firing on their cadences — real-yield-5y · dollar-broad ·
+   dollar-eme daily, bank-stress weekly).
+3. WIRE THE REMAINING P3 SOURCES: F6 (the SGE Au9999 adapter + the
+   Shanghai premium derivation in derived.ts — SGE × XAU × USD/CNY) · F7
+   (Frankfurter INR + the India parity derivation) · I4 (the UoM SIE
+   portal adapter — free download, no API) · I9 (the nowcast-surprise
+   derivation — Cleveland Fed nowcasts vs realised). The WGC/official
+   flows DATA ADAPTERS (F3/F4/F13 — the WGC XLSX + PBoC/SAFE tables).
+   Each with its definition + adapter + rung + staleAfterDays + registry
+   row + EN+fa card copy (round 81+) + the licence register row.
+4. THE D-11/D-12 REAL-CURVE SIGN DECISION: the derived real curve
+   (DFII10 − DFII5) lands as a CONTEXT CARD (rule: info). BOTH sign
+   variants measured in the harness (the POST-P3-5LANE-REALCURVE-±
+   scenarios); the sign question PRINTED for the owner in the evidence.
+   NEVER seat a sign silently — the owner's recorded choice gates the
+   seating (if any).
+5. THE SEATS (owner-gated, per the per-seat approval rule): seat ONLY
+   what a measured P4 scenario covers; the recalibration re-runs BEFORE
+   any new seat counts (the gf-p3-verify pattern extends — a gf-p4-verify
+   twin pinning production ≡ the measured P4 scenario window-for-window).
+6. THE TESTS + COPY: the engine pins restated; the dictionaries gain the
+   new voters/cards (EN+fa); copy:audit clean.
+7. GATES + CLOSE-OUT: pnpm gates green; the PR; self-merge when the
+   exit gate holds; CI green on main verified; PROGRESS block +
+   milestone row (the P3-remainder DELIVERED + P4 if it lands);
+   CHANGELOG [2026-11-06a]; the GF-S11 prompt written (P4 the context
+   additions if not finished, or P5 acceptance + flip); AGENT_HANDOFF
+   restated; the final message = the printed GF-S11 prompt + the 5-line
+   summary.
+
+CONSTRAINTS (standing, every session of this program — README D-GF-1..9)
+- THE PER-SEAT APPROVAL RULE: every gold-score.ts / GOLD_LANE_VOTERS
+  edit requires the owner's RECORDED approval per seat change — the
+  audit report's §4 row is the justification attached to each. The
+  remaining P3 seats ride the standing delegation ONLY through a MEASURED
+  scenario (the harness-first discipline): no measured scenario, no seat.
+- The beam formula, the honesty rules and the no-edge record are
+  inherited UNCHANGED; no forecasting claim anywhere — copy says
+  "conditions"; every number from a run or a citation; free-first
+  (EODHD: zero calls — the owner's recorded E).
+- P0 wraps every voter-set change (D-GF-6): the recalibration re-runs
+  BEFORE the new seat counts anywhere.
+- Branch gf/p3-remainder-and-p4; PR early; pnpm gates green before every
+  push; self-merge when the exit gate holds; CI green on main verified;
+  deploy only when the built worker changes (D-GF-9).
+
+EXIT GATE
+The P3 deploy live-verified (the 36-voter engine over the public
+snapshot); the remaining P3 sources wired (the voter seats owner-gated
+through measured scenarios; the context cards with their recorded
+promotion criteria); the real-curve sign question measured in both
+variants + printed for the owner (never seated silently); the WGC/official
+flows data adapters landed (the cards read live); tests + copy:audit +
+gates green; PR merged; CI green on main. The GF-S11 prompt written,
+committed, pushed and printed (D-GA-9).
 
 AT THE END (the standing close-out, every session)
 1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the

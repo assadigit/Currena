@@ -179,6 +179,20 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   // GF-P2 (D7, §4 row 23 — 2026-11-05): the haven cross — the franc's tight
   // range reads honestly at 4dp like the euro leg (0.9188).
   usdchf: { decimals: 4, unit: 'chf' },
+  // GF-P3 (2026-11-06, the new free sources — audit report §4 ranks 19–21,
+  // 24–26, 28): the four FRED-sourced voter-candidates + the WGC/official
+  // flows context cards. The real-yield-5y reads like its 10y twin (2dp
+  // percent); the two trade-weighted dollar indexes read at 2dp index points
+  // (the dollar-basket's own family); the commercial-paper rate at 2dp
+  // percent (the NFCI/STLFSI family). The three flows context cards read
+  // in tonnes (the WGC's own unit) at 0dp.
+  'real-yield-5y': { decimals: 2, unit: 'percent' },
+  'dollar-broad': { decimals: 2, unit: 'index' },
+  'dollar-eme': { decimals: 2, unit: 'index' },
+  'bank-stress': { decimals: 2, unit: 'percent' },
+  'wgc-etf-holdings': { decimals: 0, unit: 'tonnes' },
+  'wgc-cb-demand': { decimals: 0, unit: 'tonnes' },
+  'official-gold-demand': { decimals: 0, unit: 'tonnes' },
   // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch: the
   // mortgage/liquidity/spending family. WALCL is $ millions → 'usd-tr'
   // ×1e-6 ("US$6.8 trillion"); retail sales $ millions → 'usd-bn' ×1e-3

@@ -613,6 +613,16 @@ export const SIGNAL_LEG_MOVE: Partial<Record<IndicatorId, number>> = {
   'fed-target': 0.25, // points (R5 — the FOMC step grid: one step over 30 days)
   'term-premium-10y': 0.07, // points (R9's promotion threshold — activates at GF-P2)
   t5yie: 0.1, // points (R8's promotion threshold — activates at GF-P2)
+  // ——— GF-P3 (2026-11-06, the owner-gated seating on the measured
+  // ——— POST-P3-5LANE scenario — the F2 precedent): the four FRED-sourced
+  // ——— voter-candidates' thresholds. Proposed from the existing families
+  // ——— (GF_MOVE_P3_PROPOSED); the D-1 derivation for the P3 seats is a
+  // ——— recorded-open refinement. The harness twin GF_MOVE_P3_PROPOSED
+  // ——— mirrors these verbatim (pinned by test, gf-p0-proposed.test.ts).
+  'real-yield-5y': 0.1, // points (R2, rank 19 — the real-yield-10y's threshold family)
+  'dollar-broad': 1.0, // points (D2, rank 20 — the dollar-basket's threshold family)
+  'dollar-eme': 1.0, // points (D9, rank 21 — the dollar-basket's threshold family)
+  'bank-stress': 0.1, // points (S9, rank 28 — the rate-move threshold family)
 };
 
 /** The F3 position bands (one vocabulary with the page's position words). */

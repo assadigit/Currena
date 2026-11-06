@@ -943,7 +943,14 @@ const BUDGETS = [
   // (from 1550.94/358.99 — the GB-S5 log's figures): −23.97 kB raw /
   // −4.81 kB gz. The ceiling re-bases to 1535/355 (≈8 kB raw /
   // ≈0.8 kB gz headroom, the program's tight multiple-of-5 convention).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1535_000, gz: 355_000, label: 'Insights lazy chunk' },
+  // GF-P3 (2026-11-06, the new free sources — CHANGELOG §2026-11-05m):
+  // 1535→1560 / 355→360 — the seven new gold-meter indicators (4 FRED
+  // voters + 3 WGC/official context cards) each carry the full
+  // IndicatorCopyEntry shape × 2 locales (77 new strings, round-80) +
+  // the definitions + the display config + the FRED adapter series.
+  // Measured 1556.48/360.16 — the ceiling re-bases to 1560/365 (the
+  // multiple-of-5 convention, ~3.5 kB raw / ~4.84 kB gz headroom).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1560_000, gz: 365_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

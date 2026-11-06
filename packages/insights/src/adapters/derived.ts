@@ -368,6 +368,12 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // daily bulk group as T10Y2Y — zero new fetches).
   put('yield-curve-10y3m', fred.T10Y3M);
   put('real-yield-10y', fred.DFII10);
+  // GF-P3 (2026-11-06, audit §4 rank 19 — R2): the 5y real yield — the belly
+  // where policy bites first. The real-yield-10y's twin (same family, same
+  // FRED bulk group — zero new subrequests). Unlocks D-11/D-12's derived real
+  // curve (the 10y−5y slope — the object that re-opens the D-7/D-8 sign
+  // question; the sign is a DECISION LIST item, never seated silently).
+  put('real-yield-5y', fred.DFII5);
   put('us10y', fred.DGS10);
   // Step-1 audit item A1: the fed-target series is the range's LOWER bound
   // (DFEDTARL); the snapshot builder attaches the upper bound (DFEDTARU)
@@ -493,6 +499,12 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // M6 Wave 3 (2026-10-25): the liquidity level beside the plumbing gauges.
   put('walcl', fred.WALCL);
   put('nfci', fred.NFCI);
+  // GF-P3 (2026-11-06, audit §4 rank 28 — S9): the 30d commercial paper
+  // rate — the bank-facility usage proxy, "the modern bank-run tell".
+  // A spike = the classic stress signal (the 2008/2020 pattern). Rides
+  // the same weekly FRED bulk group as WALCL/custody (zero new
+  // subrequests). Polarity +1 (rising = stress = gold-positive).
+  put('bank-stress', fred.DPCREDIT);
   // gap-closure S3-M3.2 (2026-11-01): the US liquidity/funding family —
   // the four direct FRED cards + the two derived spreads (SOFR−IORB and
   // WALCL−TGA−RRP; the pure functions live in adapters/rung4.ts and are
@@ -565,6 +577,13 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
 
   /* ---------------- Global — Is the dollar strong? ---------------- */
   put('dollar-basket', basketSeries(fx));
+  // GF-P3 (2026-11-06, audit §4 ranks 20–21 — D2/D9): the trade-weighted
+  // dollar pair — "the honest inverse" (DTWEXBGS, the broad 26-currency
+  // index) + the EME dollar (DTWEXEMEGS, the marginal buyer's leg). Both
+  // ride the daily FRED bulk group (zero new subrequests); the ~5-day
+  // upstream lag accommodated by staleAfterDays:10 on the definitions.
+  put('dollar-broad', fred.DTWEXBGS);
+  put('dollar-eme', fred.DTWEXEMEGS);
   put('usdjpy', fx.JPY);
   // 2026-10-26 gap-audit build, A-3: the US−Japan 10-year yield gap —
   // DGS10 − the MOF daily 10Y (both parents collected; inner join on
@@ -991,6 +1010,28 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     url: 'https://fred.stlouisfed.org/series/T10Y3M',
   },
   'real-yield-10y': { name: 'FRED (DFII10)', url: 'https://fred.stlouisfed.org/series/DFII10' },
+  // GF-P3 (2026-11-06, audit §4 ranks 19–21, 28 — R2/D2/D9/S9).
+  'real-yield-5y': { name: 'FRED (DFII5)', url: 'https://fred.stlouisfed.org/series/DFII5' },
+  'dollar-broad': { name: 'FRED (DTWEXBGS)', url: 'https://fred.stlouisfed.org/series/DTWEXBGS' },
+  'dollar-eme': { name: 'FRED (DTWEXEMEGS)', url: 'https://fred.stlouisfed.org/series/DTWEXEMEGS' },
+  'bank-stress': { name: 'FRED (DPCREDIT)', url: 'https://fred.stlouisfed.org/series/DPCREDIT' },
+  // GF-P3 (2026-11-06, audit §4 — OI-GA-4's recorded context-first answer).
+  // The three WGC/PBoC context cards: their data adapters ship at GF-S10
+  // (the cards display "awaiting data" honestly until then), but the source
+  // metadata is complete so the registry entry carries the source name +
+  // link the B-11/T-13 discipline requires.
+  'wgc-etf-holdings': {
+    name: 'World Gold Council (ETF holdings)',
+    url: 'https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows',
+  },
+  'wgc-cb-demand': {
+    name: 'World Gold Council (Gold Demand Trends)',
+    url: 'https://www.gold.org/goldhub/data/central-bank-gold-purchases',
+  },
+  'official-gold-demand': {
+    name: "People's Bank of China / SAFE (official reserve assets)",
+    url: 'https://www.pbc.gov.cn/en/3688110/index.html',
+  },
   us10y: { name: 'FRED (DGS10)', url: 'https://fred.stlouisfed.org/series/DGS10' },
   'fed-target': { name: 'FRED (DFEDTARL/U)', url: 'https://fred.stlouisfed.org/series/DFEDTARU' },
   'ecb-dfr': {

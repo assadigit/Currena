@@ -107,7 +107,12 @@ describe('fred adapter', () => {
     // The 2026-11-02 gap-closure S6-M6.1 round adds IRLTLT01NZM156N (the
     // NZ 10y OECD mirror) → 58; the S6-M6.3 round adds IRLTLT01ITM156N
     // (the Italy 10y OECD mirror, the btp-bund-spread leg) → 59.
-    expect(Object.values(FRED_SERIES)).toHaveLength(59);
+    // GF-P3 (2026-11-06, the standing delegation — §4 ranks 19/20/21/28):
+    // the four FRED-sourced voter-candidates join — DFII5 (R2 real-yield-5y,
+    // the 5y real yield's belly), DTWEXBGS (D2 dollar-broad, the broad
+    // trade-weighted dollar), DTWEXEMEGS (D9 dollar-eme, the EME dollar)
+    // and DPCREDIT (S9 bank-stress, the 30d commercial paper rate) → 63.
+    expect(Object.values(FRED_SERIES)).toHaveLength(63);
   });
 
   it('rides WSEFINTL1 in the mixed-frequency bulk group beside WALCL (S2-M2.4: zero new subrequests)', () => {

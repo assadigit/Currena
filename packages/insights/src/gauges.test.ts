@@ -298,11 +298,15 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     expect(GAUGES.filter((g) => g.section === 'australia')).toHaveLength(5);
   });
 
-  it('32 global scored + 16 australia scored = 48 voting members (fix B-14: +brent in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims +recession-probability +michigan-sentiment +us-pce-core-yoy; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; the 2026-10-26 gap-audit build adds yield-curve-10y3m in borrowing-costs (A-1), cftc-gold-positioning in market-stress (A-7), us-japan-10y-gap in dollar-strength (A-3) and oecd-cli-us in growth-health (A-8, the licensed-PMI replacement); gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation members are context-only — counted in the 40 GLOBAL members below but NOT in the 48 voters; S4-M4.5 adds the three supply members of the lane — gscpi, us-spr, us-crude-production — the same context-only class)', () => {
+  it('36 global scored + 16 australia scored = 52 voting members (fix B-14: +brent in prices-heat; 2026-10-23 OD-7: m2-us demoted out of growth-health; 2026-10-24 M4 Wave 1: +claims +recession-probability +michigan-sentiment +us-pce-core-yoy; 2026-10-25 M6 Wave 3: +euro-hicp in prices-heat, +au-housing-finance in au-households; 2026-10-26 M7: +china-cpi in growth-health; the 2026-10-26 gap-audit build adds yield-curve-10y3m in borrowing-costs (A-1), cftc-gold-positioning in market-stress (A-7), us-japan-10y-gap in dollar-strength (A-3) and oecd-cli-us in growth-health (A-8, the licensed-PMI replacement); gap-closure S4-M4.3 (2026-11-01): the geo-fragmentation members are context-only — counted in the 40 GLOBAL members below but NOT in the 48 voters; S4-M4.5 adds the three supply members of the lane — gscpi, us-spr, us-crude-production — the same context-only class; GF-P2 (2026-11-05): +cftc-gold-gross-long in market-stress — 49 voters; GF-P3 (2026-11-06, the standing delegation): +real-yield-5y in borrowing-costs, +dollar-broad +dollar-eme in dollar-strength, +bank-stress in market-stress — 53 voters)', () => {
     // GF-P2 (2026-11-05, the owner's recorded answer K — §4 row 12 / F2): the
     // gross-long twin joins market-stress — 42 → 43 global members, 48 → 49
     // voters (the F1 seat's twin, scored on the same share-of-OI units).
-    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(43);
+    // GF-P3 (2026-11-06, the standing delegation — §4 ranks 19/20/21/28):
+    // the four FRED-sourced voters join — real-yield-5y in borrowing-costs,
+    // dollar-broad + dollar-eme in dollar-strength, bank-stress in
+    // market-stress — 43 → 47 global members, 49 → 53 voters.
+    expect(GAUGES.filter((g) => g.section === 'global').flatMap((g) => g.members)).toHaveLength(47);
     expect(GAUGES.filter((g) => g.section === 'australia').flatMap((g) => g.members)).toHaveLength(26);
     // gap-closure S4-M4.3: the shadow gauge never votes — every member
     // context-only, the step stays 0, the region verdict EXCLUDES it (the
@@ -311,7 +315,7 @@ describe('GAUGES table shape (v1 membership, data spec §4)', () => {
     // members; 16 voters + 7 shadow = 23 australia members).
     const shadow = GAUGES.find((g) => g.id === 'geo-fragmentation')!;
     expect(isShadowGauge(shadow)).toBe(true);
-    expect(GAUGES.filter((g) => !isShadowGauge(g)).flatMap((g) => g.members)).toHaveLength(49);
+    expect(GAUGES.filter((g) => !isShadowGauge(g)).flatMap((g) => g.members)).toHaveLength(53);
     for (const id of ['au-activity', 'au-external'] as const) {
       const auShadow = GAUGES.find((g) => g.id === id)!;
       expect(isShadowGauge(auShadow), `${id} must be a shadow gauge (G-5)`).toBe(true);

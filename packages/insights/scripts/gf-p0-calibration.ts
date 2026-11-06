@@ -178,6 +178,13 @@ const CANDIDATE_READ_IDS: readonly string[] = [
   'nyfed-custody',
   'sp500-breadth-ratio',
   't5yie', // R8's promotion seat — a corpus series (the frozen basis), listed here so its readings compute
+  // GF-P3 (GF-S9, 2026-11-06): the four FRED-sourced voter-candidates —
+  // the candidates fixture's P3 series (recorded by gf-p3-record-candidates.ts;
+  // the POST-P3-5LANE scenario seats these beside the 32).
+  'real-yield-5y', // R2 (rank 19) — DFII5
+  'dollar-broad', // D2 (rank 20) — DTWEXBGS
+  'dollar-eme', // D9 (rank 21) — DTWEXEMEGS
+  'bank-stress', // S9 (rank 28) — DPCREDIT
 ];
 const ALL_IDS: readonly string[] = [...new Set([...VOTER_IDS, ...CANDIDATE_READ_IDS, GF_F2_PROXY_ID])];
 

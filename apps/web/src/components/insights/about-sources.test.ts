@@ -51,22 +51,31 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  it('fred: 52 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1; the 2026-10-31 gap-closure S2-M2.4 round adds WSEFINTL1, the weekly custody card; the 2026-11-01 gap-closure S3-M3.2 round adds the four direct liquidity cards — term-premium-10y, tga, reverse-repo, bank-reserves — riding rung4; the 2026-11-01 gap-closure S3-M3.4 round adds the six growth-nowcast/survey cards — gdpnow, empire-state, continuing-claims, median-cpi, sticky-cpi, sloos-ci-tightening; the 2026-11-01 gap-closure S3-M3.5 round registers MTSDS133FMS — the deficit card leg)', () => {
+  it('fred: 56 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1; the 2026-10-31 gap-closure S2-M2.4 round adds WSEFINTL1, the weekly custody card; the 2026-11-01 gap-closure S3-M3.2 round adds the four direct liquidity cards — term-premium-10y, tga, reverse-repo, bank-reserves — riding rung4; the 2026-11-01 gap-closure S3-M3.4 round adds the six growth-nowcast/survey cards — gdpnow, empire-state, continuing-claims, median-cpi, sticky-cpi, sloos-ci-tightening; the 2026-11-01 gap-closure S3-M3.5 round registers MTSDS133FMS — the deficit card leg; the 2026-11-06 GF-P3 round adds the four FRED-sourced voter series — DFII5, DTWEXBGS, DTWEXEMEGS, DPCREDIT)', () => {
     const fred = rows.find((r) => r.provider === 'fred');
     expect(fred).toBeDefined();
-    expect(fred!.seriesCount).toBe(52); // A-2 moves jgb-10y to the mof row; S2-M2.4 adds WSEFINTL1; S3-M3.2 adds the four direct liquidity cards; S3-M3.4 adds the six growth-nowcast/survey cards; S3-M3.5 registers MTSDS133FMS (the deficit leg); S6-M6.1 registers IRLTLT01NZM156N (the NZ 10y mirror)
+    expect(fred!.seriesCount).toBe(56); // A-2 moves jgb-10y to the mof row; S2-M2.4 adds WSEFINTL1; S3-M3.2 adds the four direct liquidity cards; S3-M3.4 adds the six growth-nowcast/survey cards; S3-M3.5 registers MTSDS133FMS (the deficit leg); S6-M6.1 registers IRLTLT01NZM156N (the NZ 10y mirror); GF-P3 (2026-11-06) adds the four FRED-sourced voter series — DFII5 (real-yield-5y), DTWEXBGS (dollar-broad), DTWEXEMEGS (dollar-eme), DPCREDIT (bank-stress)
     expect(fred!.levels).toEqual(['L0', 'L2']);
     expect(fred!.worstLevel).toBe('L2');
-    // 3 distinct licence names across the 16 series (public-domain,
-    // citation-required, varies-by-series) — deduped, order of appearance.
-    // 2026-10-21c: the citation-required class is display-permitted with
-    // "publisher via FRED" attribution (FRED legal read 2026-10-21).
-    expect(fred!.licences.length).toBe(3);
+    // 4 distinct licence names across the 56 series (public-domain,
+    // citation-required, the unofficial-endpoint "no reuse" one, and the
+    // GF-P3 "copyright not scanned (fail closed)" class for the four new
+    // FRED-sourced voters whose T-16 scan lands with the data adapters at
+    // GF-S10) — deduped, order of appearance. 2026-10-21c: the
+    // citation-required class is display-permitted with "publisher via
+    // FRED" attribution (FRED legal read 2026-10-21).
+    expect(fred!.licences.length).toBe(4);
     expect(fred!.licences).toContain('FRED license #copyright-public-domain (public domain)');
     expect(fred!.licences).toContain(
       'FRED license #copyright-citation-required (citation required — display permitted with "Source: publisher via FRED" attribution)',
     );
-    expect(aboutEnabledState(fred!)).toBe('on');
+    expect(fred!.licences).toContain('FRED series — copyright not scanned (fail closed)');
+    // GF-P3: the four new FRED-sourced voters ride the "fail closed" licence
+    // (their T-16 copyright scan lands with the data adapters at GF-S10) →
+    // the provider's kill-switch state is MIXED (52 of 56 enabled — the four
+    // new series sit disabled until the scan promotes them).
+    expect(aboutEnabledState(fred!)).toBe('mixed');
+    expect(fred!.enabledCount).toBe(52);
   });
 
   it('rba: the whole provider sits at L0 and is on', () => {

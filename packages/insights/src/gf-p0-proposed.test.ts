@@ -44,6 +44,7 @@ import {
   GF_VOTERS_FROZEN_21,
   GF_VOTERS_P1_DEMOTE,
   GF_VOTERS_P2_4LANE,
+  GF_VOTERS_P3_5LANE,
   gfCalibrationStats,
   gfEvalLeg,
   gfLaneBalance,
@@ -120,7 +121,7 @@ describe('the equivalence pins — the copies cannot drift from the engines', ()
     }
   });
 
-  it('GF-P2 (the owner\'s recorded answers B/C/K): the production table IS the POST-P2-5LANE composition — modulo the F2 seat\'s RECORDED id mapping, the measured scenario and the shipped meter are the same object', () => {
+  it('GF-P3 (the standing delegation): the production table IS the POST-P3-5LANE composition — modulo the F2 seat\'s RECORDED id mapping, the measured scenario and the shipped meter are the same object', () => {
     // The in-session F2 design decision under the standing delegation (the
     // reason recorded in PROGRESS's GF-S8 block; §4 row 12): the production
     // seat is the REAL OBJECT cftc-gold-gross-long (the production parse of
@@ -130,15 +131,30 @@ describe('the equivalence pins — the copies cannot drift from the engines', ()
     expect(GF_VOTERS_P1_DEMOTE).toHaveLength(19); // the P1-era composition, preserved as the gf-p1-verify basis
     expect(GF_VOTERS_FROZEN_21).toHaveLength(21);
     expect(HARNESS_GOLD_VOTERS_21).toEqual(GF_VOTERS_FROZEN_21); // the two lineage snapshots are one
-    expect(GOLD_LANE_VOTERS).toHaveLength(32);
-    expect(GF_VOTERS_5LANE).toHaveLength(32);
-    const scenarioMapped = GF_VOTERS_5LANE.map((v) =>
+    // GF-P2 (B — EXECUTED): the 32-seat POST-P2-5LANE composition WAS the
+    // production table; GF-P3 (the standing delegation, 2026-11-06) seated
+    // the four FRED-sourced voter-candidates beside it → 36 seats
+    // (7/7/11/9/2). The harness twin is GF_VOTERS_P3_5LANE.
+    expect(GOLD_LANE_VOTERS).toHaveLength(36);
+    expect(GF_VOTERS_5LANE).toHaveLength(32); // the P2 snapshot stays unchanged
+    expect(GF_VOTERS_P3_5LANE).toHaveLength(36);
+    const scenarioMapped = GF_VOTERS_P3_5LANE.map((v) =>
       v.id === GF_F2_PROXY_ID ? { ...v, id: 'cftc-gold-gross-long' as const } : v,
     );
-    expect(scenarioMapped).toEqual(GOLD_LANE_VOTERS);
+    // NOTE on order: the production GOLD_LANE_VOTERS interleaves the four
+    // P3 voters BY LANE (real-yield-5y at the end of borrowing-costs, dollar-
+    // broad + dollar-eme at the end of dollar, bank-stress at the end of
+    // stress); the harness GF_VOTERS_P3_5LANE APPENDS them after the P2
+    // snapshot (the spread lineage discipline, the F2 precedent). The two
+    // are the same SET modulo the F2 mapping — compared here sorted by
+    // (lane, id) so the order difference (a harness convention, never a
+    // semantic one) does not fail the pin.
+    const sortByLaneAndId = (a: { lane: string; id: string }, b: { lane: string; id: string }) =>
+      a.lane.localeCompare(b.lane) || a.id.localeCompare(b.id);
+    expect([...scenarioMapped].sort(sortByLaneAndId)).toEqual([...GOLD_LANE_VOTERS].sort(sortByLaneAndId));
     // the mapping is EXACTLY one seat — the proxy id appears once, the real
     // id once, and nothing else differs.
-    expect(GF_VOTERS_5LANE.filter((v) => v.id === GF_F2_PROXY_ID)).toHaveLength(1);
+    expect(GF_VOTERS_P3_5LANE.filter((v) => v.id === GF_F2_PROXY_ID)).toHaveLength(1);
     expect(GOLD_LANE_VOTERS.filter((v) => v.id === 'cftc-gold-gross-long')).toEqual([
       { lane: 'flows', id: 'cftc-gold-gross-long', polarity: -1 },
     ]);
@@ -235,8 +251,29 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
     expect(flows.map((v) => v.id).sort()).toEqual(['cftc-gold-positioning', GF_F2_PROXY_ID].sort());
   });
 
+  it('POST-P3-5LANE extends POST-P2-5LANE with the four FRED-sourced voter-candidates (36 seats, 7/7/11/9/2 — the measured composition, the standing delegation)', () => {
+    // GF-P3 (2026-11-06, the standing delegation): the four FRED-sourced
+    // voter-candidates seated beside the 32-seat POST-P2-5LANE composition.
+    // The P2 snapshot stays unchanged; the P3 table is the P2 table + 4
+    // new voters (the spread preserves the P2 lineage, the F2 precedent).
+    const counts: Record<string, number> = {};
+    for (const v of GF_VOTERS_P3_5LANE) counts[v.lane] = (counts[v.lane] ?? 0) + 1;
+    expect(counts).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 9, flows: 2 });
+    expect(GF_VOTERS_P3_5LANE).toHaveLength(36);
+    // GF_VOTERS_P3_5LANE is GF_VOTERS_5LANE + the four P3 voters (verbatim
+    // — the spread is the lineage discipline, the F2 precedent).
+    expect(GF_VOTERS_P3_5LANE.slice(0, GF_VOTERS_5LANE.length)).toEqual(GF_VOTERS_5LANE);
+    const p3Additions = GF_VOTERS_P3_5LANE.slice(GF_VOTERS_5LANE.length);
+    expect(p3Additions).toEqual([
+      { lane: 'borrowing-costs', id: 'real-yield-5y', polarity: -1 }, // R2 (rank 19)
+      { lane: 'dollar', id: 'dollar-broad', polarity: -1 }, // D2 (rank 20)
+      { lane: 'dollar', id: 'dollar-eme', polarity: -1 }, // D9 (rank 21)
+      { lane: 'stress', id: 'bank-stress', polarity: 1 }, // S9 (rank 28)
+    ]);
+  });
+
   it('no table carries a duplicate seat; every polarity is ±1', () => {
-    for (const table of [GF_VOTERS_P2_4LANE, GF_VOTERS_5LANE]) {
+    for (const table of [GF_VOTERS_P2_4LANE, GF_VOTERS_5LANE, GF_VOTERS_P3_5LANE]) {
       expect(new Set(table.map((v) => v.id)).size).toBe(table.length);
       for (const v of table) expect(Math.abs(v.polarity)).toBe(1);
     }
@@ -250,12 +287,12 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
     }
   });
 
-  it('the scenario family: 10 scenarios — 5 compositions × both crowd rules — the frozen basis only on FROZEN (the frozen 21-seat snapshot)', () => {
+  it('the scenario family: 12 scenarios — 6 compositions × both crowd rules — the frozen basis only on FROZEN (the frozen 21-seat snapshot); POST-P3-5LANE joins as the sixth composition (GF-P3, the standing delegation)', () => {
     const scenarios = gfScenarios();
-    expect(scenarios).toHaveLength(10);
+    expect(scenarios).toHaveLength(12);
     for (const minFiring of [2, 1]) {
       const names = scenarios.filter((s) => s.minFiring === minFiring).map((s) => s.name.replace(/ \(MIN[12]\)$/, ''));
-      expect(names).toEqual(['FROZEN', 'POST-P1', 'POST-P1-DEMOTE', 'POST-P2-4LANE', 'POST-P2-5LANE']);
+      expect(names).toEqual(['FROZEN', 'POST-P1', 'POST-P1-DEMOTE', 'POST-P2-4LANE', 'POST-P2-5LANE', 'POST-P3-5LANE']);
     }
     for (const s of scenarios) {
       expect(s.inputPresence).toBe(!s.name.startsWith('FROZEN'));
@@ -273,6 +310,14 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
       if (s.name.startsWith('POST-P1-DEMOTE')) {
         expect(s.voters).toBe(GF_VOTERS_P1_DEMOTE); // the P1-era production composition (the gf-p1-verify record's basis)
         expect(s.lanes).toBe(GF_LANES_4);
+      }
+      if (s.name.startsWith('POST-P3-5LANE')) {
+        // GF-P3 (the standing delegation, 2026-11-06): the four FRED-sourced
+        // voter-candidates seated beside the 32-seat POST-P2-5LANE
+        // composition → 36 seats (7/7/11/9/2); the thresholds merge with
+        // the P1 map (GF_MOVE_P3_PROPOSED).
+        expect(s.voters).toBe(GF_VOTERS_P3_5LANE);
+        expect(s.lanes).toBe(GF_LANES_5);
       }
     }
   });

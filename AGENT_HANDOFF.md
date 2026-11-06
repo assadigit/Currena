@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold meter gap-fill program (P0 ANSWERED + P1 + P2 DELIVERED — GF-S8 executed the promotions; GF-S9 = the P3 new free sources next)
+# AGENT_HANDOFF — Currena: the gold meter gap-fill program (P0 ANSWERED + P1 + P2 + P3 DELIVERED — GF-S9 executed the new free sources; GF-S10 = the remaining P3 sources + the real-curve sign decision + the P4 context additions next)
 
 > The owner's **gold meter audit** program (`docs/specs/gold-meter-audit/`)
 > is **CLOSED — COMPLETE 2026-11-05 at GA-S4**: A1–A4 whole (the taxonomy
@@ -19,18 +19,25 @@
 
 ## A. What comes next
 
-The **GF-S9 session** — the P3 new free sources (R2 DFII5 unlocks the
-D-11/D-12 derived real curve and re-opens the D-7/D-8 sign question ·
-D2 DTWEXBGS · D9 DTWEXEMEGS · F6 the Shanghai premium · F3/F4/F13 the
-WGC/official flows per the recorded context-first answer · F7 · S9
-DPCREDIT · I4 · I9). Its kickoff prompt is at the foot of
-`docs/specs/gold-meter-gapfill/PROMPTS.md` (the D-GA-9 convention) —
-paste it into a fresh session at the repo root.
+The **GF-S10 session** — THREE TRACKS: (1) the remaining P3 sources
+(F6 the Shanghai premium derivation · F7 the India parity · I4 the UoM
+SIE portal · I9 the nowcast-surprise derivation) + the WGC/official flows
+DATA ADAPTERS (F3/F4/F13 — the cards exist from GF-S9; the data plane
+lands: WGC XLSX + PBoC/SAFE tables); (2) the D-11/D-12 real-curve sign
+DECISION (the recorded-open decision-list item — DFII10 − DFII5 lands as
+a context card; BOTH sign variants measured in the harness; the sign
+question PRINTED for the owner; never seat a sign silently); (3) the P3
+DEPLOY (D-GF-9 — the GF-S9 build changed the worker; the live
+verification over the public snapshot). Then if budget allows: P4 the
+context additions (I10 · X7 · I11 + the WGC family F5/F8/F11/F15/F16 ·
+G3 · X5 · R11 · F12 · H1–H4, copy round 81+). Its kickoff prompt is at
+the foot of `docs/specs/gold-meter-gapfill/PROMPTS.md` (the D-GA-9
+convention) — paste it into a fresh session at the repo root.
 
 | Program | Milestone | Branch |
 |---|---|---|
 | gold meter audit — **CLOSED (2026-11-05)** | GA-S1 (the taxonomy, LOCKED v1.1 = 85) · GA-S2 + completion (the inventory + wiring pack) · GA-S3 (the matrix + the defects) · GA-S4 (the report + the fill design) | `ga/s1-taxonomy` · `ga/s2-inventory` · `ga/s2-wiring` · `ga/s3-matrix` · `ga/s4-report` — all merged |
-| gold meter gap-fill — **P0 ANSWERED + P1 + P2 DELIVERED (GF-S8, 2026-11-05); GF-S9 = the P3 new free sources NEXT** | GF-S1 delivered P0 (the calibration + the harness tables). GF-S2..GF-S6 re-issued the decision list A–K (the lock-fallback ×5). **GF-S7 recorded the owner's answers A–K + executed GF-P1; GF-S8 EXECUTED GF-P2**: the 32-seat five-lane voter table (6/5/10/9/2 — the measured POST-P2-5LANE composition; the F2 seat is the REAL OBJECT `cftc-gold-gross-long`, the in-session design decision recorded in PROGRESS's GF-S8 block) · the flows lane + GOLD_LANE_STRONG = 4-of-5 (the owner's recorded B) · the N-1 v1.2 taxonomy amendment (the denominator 86) · the D7 usdchf context card · the F2 data plane (the gross-legs parse + the gf-p2-backfill: 522 points written to production KV) · the D-GF-6 recalibration (the committed report byte-for-byte + the gf-p2-verify evidence: production ≡ POST-P2-5LANE in ALL 2512 windows, the F2 id mapping recorded) · the tests restated (insights 1311 · web 12617 — 14,602 total) · copy round-79 triaged. → GF-S9: the P3 new free sources (R2 DFII5 re-opens the D-7/D-8 sign question with the real curve) → P4 the context additions (I10 · X7 · I11 + the WGC family, copy round 80+) → P5 acceptance + flip | `gf/p0-recalibration` (merged) · `gf/s2-reissue`…`gf/s6-reissue` (merged) · `gf/p1-repairs` (merged at GF-S7) · `gf/p2-promotions` (merged at GF-S8) → `gf/p3-new-sources` next |
+| gold meter gap-fill — **P0 ANSWERED + P1 + P2 + P3 DELIVERED (GF-S9, 2026-11-06); GF-S10 = the remaining P3 sources + the real-curve sign decision + P4 NEXT** | GF-S1 delivered P0 (the calibration + the harness tables). GF-S2..GF-S6 re-issued the decision list A–K (the lock-fallback ×5). GF-S7 recorded the owner's answers A–K + executed GF-P1. GF-S8 EXECUTED GF-P2: the 32-seat five-lane voter table (6/5/10/9/2) + the flows lane + STRONG 4-of-5 + the N-1 v1.2 amendment (denominator 86) + the D7 usdchf context card + the F2 data plane + the gf-p2-verify pin. **GF-S9 EXECUTED GF-P3**: the four FRED-sourced voter-candidates seated (R2 real-yield-5y DFII5 · D2 dollar-broad DTWEXBGS · D9 dollar-eme DTWEXEMEGS · S9 bank-stress DPCREDIT) — owner-gated through the MEASURED POST-P3-5LANE scenario (the F2 precedent) → GOLD_LANE_VOTERS 32→36 (7/7/11/9/2) + the 3 WGC/official flows context cards (F3/F4/F13, rule:info per OI-GA-4; data adapters deferred to GF-S10) + the D-11/D-12 real-curve sign question as a DECISION LIST item (printed in the evidence, never seated silently) + the gf-p3-verify twin (production ≡ POST-P3-5LANE in ALL 2512 windows) + copy round 80 (81 strings, clean) + tests 14,603 + gates ALL GREEN. → GF-S10: the remaining P3 sources (F6/F7/I4/I9) + the WGC data adapters + the real-curve sign decision + the P3 deploy + P4 the context additions → P5 acceptance + flip | `gf/p0-recalibration` (merged) · `gf/s2-reissue`…`gf/s6-reissue` (merged) · `gf/p1-repairs` (merged at GF-S7) · `gf/p2-promotions` (merged at GF-S8) · `gf/p3-new-sources` (merged at GF-S9) → `gf/p3-remainder-and-p4` next |
 
 ## B. The standing rules (read before any session)
 

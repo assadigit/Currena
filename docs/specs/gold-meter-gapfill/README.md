@@ -7,10 +7,12 @@ CLOSED gold meter audit program (GA-S1..GA-S4, CLOSED 2026-11-05; its record:
 (D-GA-3); **every change to the meter is THIS program's, owner-gated.** The
 predecessor gold balance consolidation is COMPLETE and LIVE (GB-S7,
 2026-11-04): the consolidated lane balance is THE gold card for every visitor
-on currena.ir. **Program state at GF-S8: P0 ANSWERED + P1 + P2 DELIVERED** —
+on currena.ir. **Program state at GF-S9: P0 ANSWERED + P1 + P2 + P3 DELIVERED** —
 the owner's answers A–K recorded (GF-S7), the repairs landed (GF-P1), the
 promotions landed (GF-P2: the 32-seat five-lane table, the flows lane,
-STRONG 4-of-5, the N-1 v1.2 amendment); P3 (the new free sources) is next.
+STRONG 4-of-5, the N-1 v1.2 amendment); the new free sources landed (GF-P3:
+the four FRED voter-candidates seated → 36 seats, the 3 WGC/official flows
+context cards); P4 (the context additions) is next.
 
 **Owner intent (inherited from the audit's charter, 2026-11-04):** *"Make
 sure nothing is missed or half-implemented."* The audit answered: 8/85 rows
