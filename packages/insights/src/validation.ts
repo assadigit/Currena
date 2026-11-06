@@ -508,6 +508,17 @@ const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'rba-cash-rate',
   'au-home-loan',
   'au-deposit-rate',
+  // GF-S10 (2026-11-06, the GF-P3 wiring defect repair — the P3-deploy
+  // live verification exposed it): DPCREDIT is the Fed's ADMINISTERED
+  // primary-credit (discount-window) rate — the same decision-calendar
+  // class as fed-target above. It sat at 4.00 for every weekly print
+  // since the 2023-07 hike, so T-08 (a) held the seat in check-pending
+  // forever ("weekly series repeated 4 on 2026-11-04") — the duplicate-
+  // print guard misreading an administered rate that legitimately does
+  // not move between FOMC decisions. The seat's own claim is the SPIKE
+  // (2008/2020) — the 0.10-pt move threshold fires only on a genuine
+  // facility-rate change, and the source report still guards the fetch.
+  'bank-stress',
   // S1-M1.6 #1 (2026-10-31 audit): the PEGGED pair. USD/AED has sat on its
   // 3.6725 peg for decades — a full-precision repeat day after day is the
   // peg working, not the duplicate/frozen-cache bug class (T-08 (a)/(b)/(c)
@@ -515,6 +526,16 @@ const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // genuinely broken AED feed is still caught by the source report (the
   // fetch itself failing), which is the honest signal for a peg.
   'usdaed',
+  // GF-S10 (2026-11-06, the selfcheck repair — the session's own run
+  // exposed it): SAHMREALTIME publishes at 2dp, and the Sahm recession
+  // indicator anchors at small values when unemployment sits at its
+  // 12-month low — the live prints read Jul −0.03 · Aug −0.07 · Sep 0.00 ·
+  // Oct 0.00, so consecutive months legitimately ROUND to the same value
+  // (the same plausible-repeat reasoning T-08 (a) already grants DAILY
+  // 2dp series). The date advances with each fresh print — a genuinely
+  // stuck sahm feed is still caught by the source report (the FRED fetch
+  // itself failing), which is the honest signal.
+  'sahm-rule',
 ]);
 
 /**
@@ -746,6 +767,11 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'us-pce-core-yoy',
   'recession-probability',
   'michigan-1y-expectations',
+  // GF-S10 (2026-11-06, the remaining P3 sources): the I4 5–10y household
+  // anchor speaks in percentage points exactly like its 1y sibling — and
+  // the D-11/D-12 derived real curve is a yield slope in points.
+  'michigan-5y-expectations',
+  'real-curve-10y5y',
   // M5 Wave 2 (2026-10-24): the euro-area AAA 10-year yield — a rate-family
   // series in percentage points.
   'euro-aaa-10y',
@@ -773,10 +799,12 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'term-premium-10y',
   'repo-stress',
   // GF-P3 (2026-11-06, the standing delegation — §4 rank 28 / S9): the
-  // commercial paper rate — a rate-family series in percentage points, the
-  // repo-stress/sofr family (the 30d nonfinancial commercial paper rate,
-  // the modern bank-run tell). Polarity +1 (rising = stress = gold-
-  // positive), but the units are rate-points regardless of polarity.
+  // Fed's discount window primary credit rate (the GF-S10 name repair:
+  // DPCREDIT is NOT the commercial paper rate the GF-S9 comment
+  // described) — a rate-family series in percentage points, the
+  // repo-stress/sofr family. Polarity +1 (rising = tighter policy
+  // posture = gold-positive), but the units are rate-points regardless of
+  // polarity.
   'bank-stress',
   // gap-closure S3-M3.3 (2026-11-01): the excess bond premium — a
   // spread in percentage points, the repo-stress family (a premium

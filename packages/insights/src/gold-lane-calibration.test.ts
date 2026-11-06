@@ -98,12 +98,14 @@ describe('the lane tables — MIN2 / MIN1 beside the frozen voter tables', () =>
     // lanes (evidence/gf-p0-calibration-2026-11-05.md §7). GF-P3 (the
     // standing delegation, 2026-11-06): the four FRED-sourced voter-
     // candidates seated (R2/D2/D9/S9) → the measured POST-P3-5LANE
-    // composition — 36 seats over five lanes (7/7/11/9/2; the same
-    // evidence file's new POST-P3-5LANE rows).
+    // composition (36 seats, 7/7/11/9/2); GF-S10 (the standing delegation,
+    // 2026-11-06) seated the I4 household anchor (michigan-5y-expectations)
+    // → the measured POST-P4-5LANE composition — 37 seats over five lanes
+    // (7/7/11/10/2; the extended evidence file's POST-P4-5LANE rows).
     const countsProd: Record<string, number> = {};
     for (const v of GOLD_LANE_VOTERS) countsProd[v.lane] = (countsProd[v.lane] ?? 0) + 1;
-    expect(GOLD_LANE_VOTERS).toHaveLength(36);
-    expect(countsProd).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 9, flows: 2 });
+    expect(GOLD_LANE_VOTERS).toHaveLength(37);
+    expect(countsProd).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 10, flows: 2 });
   });
 });
 

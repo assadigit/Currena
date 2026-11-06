@@ -1,0 +1,14 @@
+# GF-P4 verify run record — 2026-11-06T17:23:20.664Z
+
+windows: 2512 (2016-11-07 → 2026-11-03)
+production voters: 37 (37 seats, 5 lanes)
+production ≡ POST-P4-5LANE (the F2 id mapping recorded): ALL 2512 windows equal (0 mismatches)
+POST-P4-5LANE MIN2 all: level 768/2512 (30.6%) · full-tip 282 (11.2%) · C1 PASS · flips 11 vs 7 · C2 FAIL
+POST-P4-5LANE MIN2 mature: level 412/1287 · full-tip 114 · C1 PASS · flips 10 vs 7 · C2 FAIL
+POST-P4-5LANE MIN1 all: level 666/2512 · full-tip 219 · C1 PASS · flips 11 vs 7 · C2 FAIL
+POST-P4-5LANE MIN1 mature: level 354/1287 · full-tip 92 · C1 PASS · flips 10 vs 7 · C2 FAIL
+committed POST-P4-5LANE rows: reproduced (the drift gate held)
+REALCURVE-PLUS MIN2 all: level 673/2512 (26.8%) · full-tip 310 (12.3%) · C1 PASS · flips 10 vs 7 · C2 FAIL
+REALCURVE-MINUS MIN2 all: level 685/2512 (27.3%) · full-tip 285 (11.3%) · C1 PASS · flips 11 vs 8 · C2 FAIL
+real-curve seat: readable 2512/2512 · firing 1548 (high 675 · low 873) · latest 0.35 @ 2026-10-30
+

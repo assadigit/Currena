@@ -269,6 +269,20 @@ describe('runValidationSuite — the Part D tests', () => {
     expect(t08.flagged).not.toContain('au-home-loan');
   });
 
+  it('T-08 exempts the 2dp Sahm indicator whose consecutive prints legitimately round equal (GF-S10, 2026-11-06 live evidence)', () => {
+    // SAHMREALTIME publishes at 2dp and anchors near zero when unemployment
+    // sits at its 12-month low — the live prints read Jul −0.03 · Aug −0.07
+    // · Sep 0.00 · Oct 0.00. The date advances with each fresh print; the
+    // equal 2dp pair is rounding, not a duplicate publication.
+    const sahm = monthlySeries('2026-10-01', 40, (back) =>
+      back === 0 ? 0.0 : back === 1 ? 0.0 : back === 2 ? -0.07 : back === 3 ? -0.03 : 0.05 + (back % 5) * 0.02,
+    );
+    const out = runValidationSuite(suiteInput({ 'sahm-rule': sahm }));
+    const t08 = out.results.find((r) => r.test === 'T-08')!;
+    expect(t08.ok).toBe(true);
+    expect(t08.flagged).not.toContain('sahm-rule');
+  });
+
   it('M6 weekend fix: a weekend-spanning metal repeat is the market being closed, not a freeze (2026-10-25)', () => {
     // The gold-api spot family serves rows every calendar day; Sat/Sun
     // quotes repeat Friday's spot — the 2026-10-18/25 live-archive shape.

@@ -114,6 +114,33 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     staleAfterDays: 4,
   },
   {
+    // GF-S10 (2026-11-06, the D-11/D-12 repair-if-filled — the audit
+    // report §4 row 3's P3 half, riding R2's DFII5 fill): the DERIVED REAL
+    // CURVE — the 10y−5y real-yield slope (DFII10 − DFII5), the object
+    // that re-opens the D-7/D-8 yield-curve sign question with the
+    // CORRECT curve (the demoted nominal seats' fixed −1 polarity sat on
+    // a regime-dependent claim; the real curve is the priced object the
+    // classic literature actually names). A CONTEXT CARD (rule: info —
+    // never votes): BOTH sign variants (polarity +1: a steepening real
+    // curve = gold-positive; polarity −1: a steepening real curve =
+    // gold-negative) are measured in the harness (the
+    // POST-P3-5LANE-REALCURVE-± scenarios), the sign question is PRINTED
+    // for the owner, and NEVER seated silently — the owner's recorded
+    // choice gates any seating (if any). Zero new fetches: both legs
+    // ride the same FRED 'since' bulk group (the 10y twin's own group).
+    id: 'real-curve-10y5y',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US real yield curve (10Y minus 5Y)',
+    source: 'derived',
+    sourceRef: 'FRED:DFII10 − FRED:DFII5 (daily, derived)',
+    cadence: 'daily',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 4,
+  },
+  {
     id: 'us10y',
     section: 'global',
     group: 'borrowing-costs',
@@ -1509,20 +1536,24 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
   },
   {
     // GF-P3 (2026-11-06, the new free sources — audit report §4 rank 28,
-    // S9 MISSING-FREE → promote): FRED DPCREDIT — the commercial paper
-    // rate (the 30-day nonfinancial commercial paper rate, the bank-
-    // facility usage proxy). "The modern bank-run tell, absent from the
-    // data plane" — a spike in short-term funding rates is the classic
-    // stress signal (the 2008/2020 pattern). Polarity +1 (rising =
-    // stress = gold-positive, the stress lane's own sign). The threshold
-    // (0.10 pts, the rate-move family) enters the production
-    // SIGNAL_LEG_MOVE on the owner-gated seating (the measured
-    // POST-P3-5LANE scenario; the F2 precedent). Keyless FRED
-    // fredgraph.csv (L0/L1, public domain).
+    // S9 MISSING-FREE → promote): FRED DPCREDIT — the Fed's DISCOUNT
+    // WINDOW PRIMARY CREDIT RATE (the GF-S10 name repair: the GF-S9
+    // comment misdescribed the series as the commercial paper rate — the
+    // FRED series page, read live 2026-11-06, names it "Discount Window
+    // Primary Credit Rate"; the seat's id/series/threshold/polarity are
+    // untouched). The standing facility's own PRICE: what a bank pays to
+    // borrow straight from the Fed (set a margin above the policy
+    // target); the facility becomes the story in a bank scare (2008,
+    // March 2023 — borrowing surges when private funding dries up).
+    // Polarity +1 (rising = tighter policy posture = gold-positive, the
+    // stress lane's own sign). The threshold (0.10 pts, the rate-move
+    // family) entered the production SIGNAL_LEG_MOVE on the owner-gated
+    // seating (the measured POST-P3-5LANE scenario; the F2 precedent).
+    // Keyless FRED fredgraph.csv (L0/L1, public domain).
     id: 'bank-stress',
     section: 'global',
     group: 'market-stress',
-    name: 'Commercial paper rate (30d)',
+    name: 'The Fed\u2019s discount window rate',
     source: 'fred',
     sourceRef: 'FRED:DPCREDIT',
     cadence: 'weekly',
@@ -2077,6 +2108,38 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'info' },
     staleAfterDays: 45,
   },
+  {
+    // GF-S10 (2026-11-06, the remaining P3 sources — audit report §4 rank
+    // 22 / F6, "no Shanghai premium — 'the classic scarcity tell'",
+    // severity 18): the SHANGHAI GOLD PREMIUM — the SGE's Au99.99
+    // (CNY/gram) versus the converted London ounce (gold-api XAU × the
+    // ECB's USD/CNY ÷ 31.1034768 grams/ounce), in percent. A POSITIVE
+    // premium = the Chinese physical bid paying over the world price
+    // (the scarcity/import-demand tell); a discount = weak local demand.
+    // A CONTEXT CARD (rule: info — never votes): the F6 SEAT cannot be
+    // measured over the 2512-window corpus (the SGE daily-report
+    // archive reaches back only to ~2024 — the venue measured this
+    // session; "no measured scenario, no seat" — the harness-first
+    // discipline), so the seat question stays recorded-open with the
+    // coverage fact printed in the GF-S10 evidence. The promotion
+    // criteria (the premium's own extreme bands once ≥ 2 years of the
+    // derived history exists — the OI-GA-4 annualised-level family)
+    // ride this comment. The SGE leg is the exchange's own public
+    // delayed-quote page (© SGE — L2, the owner-acceptance class: the
+    // card serves PRIVATE until the owner records acceptance; the
+    // question printed in the GF-S10 evidence).
+    id: 'shanghai-gold-premium',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Shanghai gold premium',
+    source: 'derived',
+    sourceRef: 'SGE Au99.99 (CNY/g) ÷ (gold-api XAU × Frankfurter USD/CNY ÷ 31.1034768) − 1',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 5,
+  },
   /* ---------------- Global — Is growth healthy? ---------------- */
   {
     // M7 (2026-10-26): the manual hand-entry era ends — the NBS English
@@ -2329,6 +2392,37 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P2',
     rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // GF-S10 (2026-11-06, the remaining P3 sources — audit report §4 rank
+    // 32 / I4, "no 5–10y household anchor — 'the slow version of R7'"):
+    // the University of Michigan's 5–10-year median expected price change
+    // — the LONG-RUN household inflation anchor (the question text, quoted
+    // from the SIE workbook itself: "What about the outlook for prices
+    // over the next 5 to 10 years? … By about what percent per year do
+    // you expect prices to go (up/down) on the average, during the next 5
+    // to 10 years?"). The anchor's own voting expression (the I3 1y
+    // sibling's inflation-lane twin): households price inflation in
+    // before the market does, and the 5–10y horizon is the regime label
+    // the long-run breakeven (R7) prices — the seat rides the MEASURED
+    // POST-P4-5LANE scenario (the standing delegation, the F2/GF-P3
+    // precedent: the harness seat and the production seat agree by
+    // construction). LEVEL-LEG ONLY (the percentile fires at the decade
+    // bands) — the I3 precedent (monthly cadence, no move threshold; the
+    // D-1 walk's monthly-cadence exemption). The SIE archive's CC-BY-NC-
+    // ND terms (the quoted copyright notice) ride the licence register's
+    // uom row; the median series displays VERBATIM (never recomputed).
+    id: 'michigan-5y-expectations',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US expected inflation, next 5–10 years (Michigan)',
+    source: 'uom',
+    sourceRef: 'UoM SIE Table 33 (median expected price change, next 5–10 years, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'percentile', tail: 'high', cutoff: 0.2 },
     staleAfterDays: 75,
   },
   {

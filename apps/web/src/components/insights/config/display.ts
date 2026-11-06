@@ -193,6 +193,14 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'wgc-etf-holdings': { decimals: 0, unit: 'tonnes' },
   'wgc-cb-demand': { decimals: 0, unit: 'tonnes' },
   'official-gold-demand': { decimals: 0, unit: 'tonnes' },
+  // GF-S10 (2026-11-06, the remaining P3 sources): the D-11/D-12 derived
+  // real curve (a yield slope in points, rendered like its curve-legend
+  // siblings) + the I4 5–10y household anchor (a percent expectation,
+  // the 1y sibling's own rendering) + the F6 Shanghai premium (a percent
+  // premium, 2dp — a premium is quoted in basis points).
+  'real-curve-10y5y': { decimals: 2, unit: 'points' },
+  'michigan-5y-expectations': { decimals: 1, unit: 'percent' },
+  'shanghai-gold-premium': { decimals: 2, unit: 'percent' },
   // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch: the
   // mortgage/liquidity/spending family. WALCL is $ millions → 'usd-tr'
   // ×1e-6 ("US$6.8 trillion"); retail sales $ millions → 'usd-bn' ×1e-3

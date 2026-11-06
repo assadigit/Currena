@@ -377,7 +377,7 @@ describe('goldBalance — the member vocabulary (02 §2)', () => {
   });
 
   // 04 §4.1 test 11 — the engine's membership IS the frozen table's.
-  it("11. table integrity: the engine's lane membership equals GOLD_LANE_VOTERS (GF-P3's 36 voters, 7/7/11/9/2)", () => {
+  it("11. table integrity: the engine's lane membership equals GOLD_LANE_VOTERS (GF-S10's 37 voters, 7/7/11/10/2)", () => {
     expect(GOLD_LANE_MIN_FIRING).toBe(2); // the P0 calibration decision (MIN2)
     expect(GOLD_LANE_STRONG).toBe(4); // GF-P2 (the owner's recorded answer B): 4 of 5 lanes = 80%, preserving the old 3-of-4 = 75% strictness
     expect(HARNESS_GOLD_LANES_MIN2.minFiring).toBe(GOLD_LANE_MIN_FIRING); // the decision the harness measured
@@ -387,17 +387,19 @@ describe('goldBalance — the member vocabulary (02 §2)', () => {
     expect(b.lanes.map((l) => l.lane)).toEqual([...GOLD_LANES]);
     const memberIds = b.lanes.flatMap((l) => l.members.map((m) => m.id));
     expect(memberIds).toEqual(GOLD_LANE_VOTERS.map((v) => v.id)); // table order, every voter
-    expect(memberIds).toHaveLength(36);
+    expect(memberIds).toHaveLength(37);
     const perLane: Record<string, number> = {};
     for (const id of memberIds) {
       const v = GOLD_LANE_VOTERS.find((x) => x.id === id)!;
       perLane[v.lane] = (perLane[v.lane] ?? 0) + 1;
     }
-    // GF-P3 (the standing delegation, 2026-11-06): the measured POST-P3-5LANE
-    // composition (evidence/gf-p0-calibration-2026-11-05.md §7's new
-    // POST-P3-5LANE rows). The P2-era 32-seat composition (6/5/10/9/2) is
-    // preserved as GF_VOTERS_5LANE.
-    expect(perLane).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 9, flows: 2 });
+    // GF-S10 (the standing delegation, 2026-11-06): the measured
+    // POST-P4-5LANE composition (the extended evidence file's new
+    // POST-P4-5LANE rows — the I4 household anchor joins the inflation
+    // lane, 9 → 10). The P2-era 32-seat composition (6/5/10/9/2) is
+    // preserved as GF_VOTERS_5LANE; the P3-era 36-seat (7/7/11/9/2) as
+    // GF_VOTERS_P3_5LANE.
+    expect(perLane).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 10, flows: 2 });
     // GF-P1 (the owner's recorded decision H, 2026-11-05 — the D-7/D-8
     // context demotion): the two yield-curve seats are NEVER members.
     expect(memberIds).not.toContain('yield-curve-10y2y');

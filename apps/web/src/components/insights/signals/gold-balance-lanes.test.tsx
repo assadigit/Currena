@@ -131,11 +131,11 @@ function reading(id: IndicatorId, extra: Partial<IndicatorReading> = {}): Indica
   };
 }
 
-/** Every one of the 36 voters (the lane ids in table order — GF-P3,
+/** Every one of the 37 voters (the lane ids in table order — GF-S10,
  * 2026-11-06, the standing delegation: GF-P2's twelve promotions + the
- * COBD pair + the flows pair + GF-P3's four FRED-sourced voters; the two
- * yield-curve seats stay demoted), for the synthetic fixtures' shared
- * quiet rows. */
+ * COBD pair + the flows pair + GF-P3's four FRED-sourced voters + GF-S10's
+ * I4 household anchor; the two yield-curve seats stay demoted), for the
+ * synthetic fixtures' shared quiet rows. */
 const ALL_VOTERS: IndicatorId[] = [
   'real-yield-10y',
   'us10y',
@@ -176,6 +176,10 @@ const ALL_VOTERS: IndicatorId[] = [
   'dollar-broad',
   'dollar-eme',
   'bank-stress',
+  // GF-S10 (2026-11-06, the standing delegation — audit §4 rank 32, the
+  // MEASURED POST-P4-5LANE scenario): the I4 5–10y household anchor joins
+  // the inflation lane (its last seat, the table order).
+  'michigan-5y-expectations',
 ];
 
 /** A quiet (steady, typical) row for a voter. */
@@ -236,6 +240,9 @@ const DIRECTIONAL: IndicatorReading[] = [
   quiet('dollar-broad'),
   quiet('dollar-eme'),
   quiet('bank-stress'),
+  // GF-S10 (the standing delegation): the I4 household anchor as a quiet
+  // row — the inflation lane stays readable and steady on this case.
+  quiet('michigan-5y-expectations'),
   // gold itself: context only
   reading('gold-usd', { value: 4166, percentile10y: 0.6, change30d: 5.2 }),
 ];
@@ -285,6 +292,9 @@ const FOR: IndicatorReading[] = [
   quiet('dollar-broad'),
   quiet('dollar-eme'),
   quiet('bank-stress'),
+  // GF-S10 (the standing delegation): the I4 household anchor as a quiet
+  // row — the FOR shape holds (3 for · 0 against · 2 neutral).
+  quiet('michigan-5y-expectations'),
   reading('gold-usd', { value: 4200, percentile10y: 0.6, change30d: 5.1 }),
 ];
 
@@ -335,6 +345,10 @@ const STACK: IndicatorReading[] = [
   reading('dollar-broad', { value: 130, percentile10y: 0.95 }), // a strong broad dollar pressures (polarity −1)
   reading('dollar-eme', { value: 130, percentile10y: 0.95 }), // a strong EME dollar pressures (polarity −1)
   reading('bank-stress', { value: 0.1, percentile10y: 0.05 }), // a calm funding market pressures (polarity +1)
+  // GF-S10 (the standing delegation): the I4 anchor fires on the against
+  // side — a low 5–10y household anchor pressures (polarity +1, the I3
+  // precedent's level-leg-only read).
+  reading('michigan-5y-expectations', { value: 2.2, percentile10y: 0.05 }),
   reading('gold-usd', { value: 4100, percentile10y: 0.6, change30d: -9.0 }),
 ];
 

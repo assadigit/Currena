@@ -139,7 +139,19 @@ function licenceBlockFor(def: { id: string; source: string; sourceRef: string })
   const legs = UPSTREAM_LEGS[def.id];
   if (legs !== undefined) {
     const licences = legs.map(licenceOfLeg);
-    const worst = licences.reduce((acc, l) => ({ ...l, publicDisplayOk: worstDisplay(acc.publicDisplayOk, l.publicDisplayOk) }));
+    const worstFlag = licences.reduce((acc, l) => worstDisplay(acc, l.publicDisplayOk), 'yes' as string);
+    // GF-S10 (2026-11-06): the NAMED licence must be the GOVERNING leg — the
+    // one whose display flag gates the card. When every leg is equally
+    // display-ok the LAST leg keeps naming the block (the historical
+    // behaviour, stable); when a strictly-worse leg exists (the Shanghai
+    // premium's SGE 'no' beside display-ok legs; gold-oil-ratio's Yahoo
+    // metals legs) the first such leg names it — the About table and the
+    // audit trail then show the licence class that actually governs,
+    // mirroring sources.ts riskSummaryForLegs' governing-row rule.
+    const last = licences[licences.length - 1]!;
+    const governing =
+      last.publicDisplayOk === worstFlag ? last : licences.find((l) => l.publicDisplayOk === worstFlag)!;
+    const worst = { ...governing, publicDisplayOk: worstFlag };
     return {
       ...worst,
       termsEvidence: `${worst.termsEvidence} · Legs (${legs.join(', ')}): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).`,

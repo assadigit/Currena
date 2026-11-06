@@ -74,6 +74,53 @@ const SERIES = [
   'WRESBAL',
   'IORB',
   'WSEFINTL1',
+  // GF-S10 (2026-11-06, the P3-deploy defect repair): the four GF-P3 FRED
+  // series (R2/D2/D9/S9 — the 5y real yield, the trade-weighted dollar
+  // pair, the bank-facility rate). GF-S9 wired the definitions + the
+  // bulk groups + the seats but MISSED this list, so the T-16 licence
+  // walk fail-closed all four (unscanned → the M-6 kill switch → the
+  // audit sidecar's enabled=false → the readings land [unavailable] and
+  // the seats can never fire). The deploy-first discipline (GF-S10 work
+  // item 2's live verification) exposed it; the scan re-runs now. The
+  // records verified live 2026-11-06: all four carry the
+  // #copyright-public-domain tag — FRB US-government works, the DFII10
+  // public-domain class.
+  'DFII5',
+  'DTWEXBGS',
+  'DTWEXEMEGS',
+  'DPCREDIT',
+  // GF-S10 (2026-11-06, the record-preservation repair): the committed
+  // file's records that earlier rounds scanned but this list had dropped
+  // — a re-run WITHOUT them would fail-close live cards (UMCSENT, SOFR,
+  // T5YIE… the M-6 kill switch) by deleting their scan records. The list
+  // now carries every id the file holds, so a re-run re-scans the set and
+  // never loses a record again. (BAMLC0A0CM/BAMLH0A0HYM2 stay recorded
+  // as the D-44 pre-approval evidence — the honest no-go record.)
+  'UMCSENT',
+  'MICH',
+  'ICSA',
+  'RECPROUSM156N',
+  'PCEPILFE',
+  'MORTGAGE30US',
+  'WALCL',
+  'CFNAI',
+  'JTSJOL',
+  'AHETPI',
+  'T5YIE',
+  'SOFR',
+  'PERMIT',
+  'RSAFS',
+  'MTSDS133FMS',
+  'DRTSCILM',
+  'GDPNOW',
+  'GACDISA066MSFRBNY',
+  'MEDCPIM158SFRBCLE',
+  'STICKCPIM158SFRBATL',
+  'CCSA',
+  'IRLTLT01ITM156N',
+  'IRLTLT01NZM156N',
+  'BAMLC0A0CM',
+  'BAMLH0A0HYM2',
 ] as const;
 
 interface Record {

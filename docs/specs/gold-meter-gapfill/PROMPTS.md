@@ -1434,7 +1434,7 @@ next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
 green; 5. final message = the printed next prompt + the 5-line summary.
 ```
 
-## GF-S10 — the remaining P3 sources + the real-curve sign decision + the P4 context additions (the live kickoff)
+## GF-S10 — the remaining P3 sources + the real-curve sign decision + the P4 context additions (RUN 2026-11-06 — **THE REMAINING P3 SOURCES + THE REAL-CURVE SIGN DECISION + THE P3 DEPLOY EXECUTED — the recovery landing of TWO interrupted sessions** (every claim re-verified from the recovery's own runs, the record in PROGRESS's GF-S10 block): I4 the UoM 5–10y anchor SEATED owner-gated through the MEASURED POST-P4-5LANE scenario → GOLD_LANE_VOTERS 36→**37 (7/7/11/10/2)**; the D-11/D-12 real curve landed as the CONTEXT CARD `real-curve-10y5y` with BOTH sign variants measured + the question PRINTED (a)–(d) — never seated silently; F6 the Shanghai premium context card + the SGE adapter + the rung-2 wiring + **the backfill EXECUTED** (507 trading days → 488 premium points in production KV, read-back verified; the L2 licence keeps it PRIVATE — question (e)); F7 recorded-open (MCX venue-blocked 403); I9 recorded-open (no nowcast history); F3/F4/F13 the data adapters honestly DO NOT land (the WGC terms REQUIRE written authorisation — question (f), the family licence-blocked); the P3 DEPLOY live-verified (the worker 4b8dcfc7; the earlier session's T-16/T-08 repairs verified; the fresh-snapshot verification: for 2 · against 2 · neutral 1 · unread 0, 5 of 5 lanes readable, the I4 seat firing at the 90th percentile); the gf-p4-verify twin (production ≡ POST-P4-5LANE in ALL 2512 windows; the calibration byte-for-byte); the recovery's repairs (T-19 ×12 · the sahm T-08 exemption + test · the governing-licence generator rule · the lane fixtures + snapshot over 37 · the budget 1572); the tests 14,605 + copy round 81 (45 strings, clean) + gates ALL GREEN; the P4 context additions did NOT run (budget spent on the recovery) — they ride GF-S11 with the owner's decision round; superseded by the GF-S11 prompt below)
 
 ```
 You are working in the Currena repo at the repo root. This is the GF-S10
@@ -1583,6 +1583,160 @@ variants + printed for the owner (never seated silently); the WGC/official
 flows data adapters landed (the cards read live); tests + copy:audit +
 gates green; PR merged; CI green on main. The GF-S11 prompt written,
 committed, pushed and printed (D-GA-9).
+
+AT THE END (the standing close-out, every session)
+1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the
+next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
+green; 5. final message = the printed next prompt + the 5-line summary.
+```
+
+## GF-S11 — the owner's decision round + P4 the context additions (the live kickoff)
+
+```
+You are working in the Currena repo at the repo root. This is the GF-S11
+session of the gold meter gap-fill program (the owner-gated successor to
+the CLOSED gold meter audit program; the program home:
+docs/specs/gold-meter-gapfill/ — README + 01-FILL-SPEC + PROGRESS +
+PROMPTS; the audit's verdict: docs/insights/GOLD-METER-AUDIT-REPORT.md).
+Read this whole prompt before doing anything.
+
+CONTEXT — WHERE WE STAND
+GF-S10 (2026-11-06, the recovery landing of two interrupted sessions —
+the record in PROGRESS's GF-S10 block) executed the remaining P3
+sources: I4 the UoM 5–10y household anchor SEATED (owner-gated through
+the MEASURED POST-P4-5LANE scenario — the standing delegation "Generally,
+I trust your decisions. go full autonomously." riding the F2/GF-P3
+precedent) → GOLD_LANE_VOTERS 36→37 (7/7/11/10/2). The D-11/D-12 real
+curve landed as the CONTEXT CARD real-curve-10y5y (rule: info) with BOTH
+sign variants measured in the harness. F6 the Shanghai premium landed as
+the context card + the SGE adapter + the rung-2 wiring + the one-off
+backfill EXECUTED (507 trading days walked → 488 premium points in
+production KV, read-back verified). F7 recorded-open (MCX venue-blocked
+HTTP 403). I9 recorded-open (the Cleveland Fed publishes no nowcast
+history). F3/F4/F13 the WGC/official flows data adapters honestly DO NOT
+land (the WGC terms REQUIRE prior written authorisation; the PBoC URL
+404s; the cards stay 'awaiting data'). The P3 DEPLOY live-verified (the
+worker 4b8dcfc7; the fresh-snapshot verification: for 2 · against 2 ·
+neutral 1 · unread 0, 5 of 5 lanes readable — the four GF-P3 seats fire
+on their cadences, the I4 seat at the 90th percentile of its decade).
+The gf-p4-verify twin: production ≡ POST-P4-5LANE in ALL 2512 windows.
+Tests 14,605; copy round 81 (45 strings, clean); gates ALL GREEN; the
+PR merged; CI green on main.
+
+THE OWNER'S DECISION LIST — GF-S10's OPEN QUESTIONS (printed in
+evidence/gf-p4-verify-2026-11-06.md §4–§5; re-printed here — the
+session's FIRST work item is to check the repo + the chat for the
+owner's recorded answers, the GF-S7 precedent):
+(a) THE REAL-CURVE SIGN — keep it a context card (the D-7/D-8 lineage's
+    honest endpoint) / seat the PLUS variant (steepening = gold-positive,
+    the classic long-run story) / seat the MINUS variant (steepening =
+    gold-negative, the term-structure story) / re-open the object
+    question (the 10y−2y or 10y−3m REAL curves, measured on the ask).
+    BOTH variants are already measured: PLUS all-windows level 26.8% ·
+    full-tip 12.3% · C1 PASS · C2 FAIL 10 vs 7 — MINUS 27.3% · 11.3% ·
+    C1 PASS · 11 vs 8. NEVER seat a sign silently.
+(b) THE SGE DISPLAY CLASS (question (e)) — accept the SGE L2 licence
+    class for public display (the exchange's own ©-reserved footer, no
+    affirmative reuse grant quoted — the card serves PRIVATE until the
+    answer), or keep the Shanghai premium private-only.
+(c) THE WGC AUTHORISATION (question (f)) — seek/record the WGC's written
+    authorisation (info@gold.org, the terms' own contact — would unlock
+    F3/F4 + the whole WGC family F5/F8/F11/F15/F16/H1–H4), or leave the
+    family context-blocked (the cards stay 'awaiting data').
+If no answers are recorded by the session's start, the GA lock-fallback
+precedent applies (GF-S2..GF-S6): the deliverable halves only — record +
+re-issue the list, NO owner-gated execution (the sign never seats, the
+display classes never flip).
+
+WHAT THIS SESSION IS
+GF-S11 — TWO TRACKS:
+(1) THE OWNER'S DECISION ROUND (the answers first, the GF-S7 precedent:
+    check the repo + the chat; if answers arrived, execute them — a sign
+    seat rides its MEASURED scenario + the per-seat approval rule + a
+    gf-p5-verify twin; a display flip is an ownerAccepts record + the
+    registry regeneration; the WGC authorisation unblocks the family's
+    adapters); if none arrived, re-issue the list + the docs-only
+    session (the lock-fallback).
+(2) P4 — THE CONTEXT ADDITIONS (01-FILL-SPEC §1, ranks 30–31, 34–47,
+    the free-first family the WGC block does not touch): I10 the Jastram
+    real gold price · X7 gold/platinum · I11 global liquidity · G3
+    debt/GDP · X5 gold-vs-equities · R11 r-star · F12 · the WGC family
+    ONLY IF (c) resolves. Each with its definition + adapter + rung +
+    staleAfterDays + registry row + EN+fa card copy (round 82+,
+    copy:audit clean) + the licence register row — the context-first
+    register (rule: info, never votes; the promotion criteria recorded
+    in each definition's comments).
+Then if budget allows: the P5 acceptance-walk preparation (the phase
+gate list, the flip checklist staged on a branch — nothing user-visible
+without the owner's recorded go).
+
+SESSION SHAPE
+(1) read-first + git pull --rebase (the program home + the GF-S10 block
+    + the gf-p4-verify evidence + the audit report §4 rows 30–31, 34–47
+    + the licences register + the adapter patterns the P4 sources ride);
+    check for the owner's answers FIRST (work item 2's gate);
+(2) THE DECISION ROUND: record the answers (or re-issue the list — the
+    lock-fallback); execute any recorded answer through its measured
+    scenario + the per-seat approval rule (a sign seat: P0 wraps it —
+    the recalibration re-runs BEFORE any seat count changes, a verify
+    twin pins it);
+(3) P4 THE CONTEXT ADDITIONS (the free-first family): harness where a
+    seat is even hypothetically possible (none expected — context cards
+    don't vote); the cards land with their full copy + licence rows +
+    adapters + rungs;
+(4) THE TESTS + COPY: the dictionaries gain the new cards (EN+fa, round
+    82+); copy:audit clean; the engine pins restated if any seat moved;
+(5) GATES + CLOSE-OUT: pnpm gates green; the PR; self-merge when the
+    exit gate holds; CI green on main verified; PROGRESS block +
+    milestone row; CHANGELOG [2026-11-07a]; the GF-S12 prompt written
+    (P5 the acceptance walk + the flip, or the re-issue); AGENT_HANDOFF
+    restated; the final message = the printed GF-S12 prompt + the
+    5-line summary.
+
+WORK ITEMS (in order)
+1. READ FIRST: the program home (README — the decision table + GF-S10's
+   execution notes; 01-FILL-SPEC §1 P4 + §2 gates; PROGRESS — the GF-S10
+   block; PROMPTS — this prompt) + evidence/gf-p4-verify-2026-11-06.md
+   (§4 the sign question · §5 the venue verdicts) + the audit report §4
+   (ranks 30–31, 34–47) + the licences register + the adapter patterns.
+   Then git pull --rebase.
+2. THE OWNER'S ANSWERS: check the repo (git log origin/main since the
+   GF-S10 merge) + the session's chat for recorded answers to (a)/(b)/(c).
+   Answers present → execute them (each through its own gate). Absent →
+   the lock-fallback: re-issue the list in the README + the final
+   message; NO owner-gated execution this session.
+3. P4 THE CONTEXT ADDITIONS (the free-first family: I10 · X7 · I11 ·
+   G3 · X5 · R11 · F12): each card with its licence row, its rung, its
+   staleness window, its EN+fa copy. The EODHD rule stands (zero calls).
+4. THE TESTS + COPY: round 82+ triaged; copy:audit clean.
+5. GATES + CLOSE-OUT: pnpm gates green; PR; self-merge when the exit
+   gate holds; CI green on main verified; PROGRESS block + milestone
+   row; CHANGELOG; the GF-S12 prompt written, committed, pushed and
+   printed (D-GA-9); AGENT_HANDOFF restated; the final message = the
+   printed GF-S12 prompt + the 5-line summary.
+
+CONSTRAINTS (standing, every session of this program — README D-GF-1..9)
+- THE PER-SEAT APPROVAL RULE: every gold-score.ts / GOLD_LANE_VOTERS
+  edit requires the owner's RECORDED approval per seat change — the
+  audit report's §4 row is the justification attached to each. No
+  measured scenario, no seat. NEVER seat a sign silently.
+- The beam formula, the honesty rules and the no-edge record are
+  inherited UNCHANGED; no forecasting claim anywhere — copy says
+  "conditions"; every number from a run or a citation; free-first
+  (EODHD: zero calls — the owner's recorded E).
+- P0 wraps every voter-set change (D-GF-6): the recalibration re-runs
+  BEFORE the new seat counts anywhere.
+- Branch gf/p4-context-additions (or the owner-answer branch if the
+  decision round executes); PR early; pnpm gates green before every
+  push; self-merge when the exit gate holds; CI green on main verified;
+  deploy only when the built worker changes (D-GF-9).
+
+EXIT GATE
+The decision round honestly resolved (the answers executed through
+their gates, or the list re-issued — the lock-fallback); the P4 context
+cards wired with their recorded promotion criteria + copy + licence
+rows; tests + copy:audit + gates green; PR merged; CI green on main.
+The GF-S12 prompt written, committed, pushed and printed (D-GA-9).
 
 AT THE END (the standing close-out, every session)
 1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the

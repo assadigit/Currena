@@ -54,7 +54,11 @@
     "gf-p2-backfill": "tsx scripts/gf-p2-backfill.ts",
     "gf-p2-verify": "tsx scripts/gf-p2-verify.ts",
     "gf-p3-record-candidates": "tsx scripts/gf-p3-record-candidates.ts",
-    "gf-p3-verify": "tsx scripts/gf-p3-verify.ts"
+    "gf-p3-verify": "tsx scripts/gf-p3-verify.ts",
+    "gf-live-verify": "tsx scripts/gf-live-verify.ts",
+    "gf-p4-record-candidates": "tsx scripts/gf-p4-record-candidates.ts",
+    "gf-p4-verify": "tsx scripts/gf-p4-verify.ts",
+    "gf-p4-backfill": "tsx scripts/gf-p4-backfill.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",

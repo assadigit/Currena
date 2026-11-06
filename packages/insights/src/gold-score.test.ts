@@ -366,7 +366,7 @@ describe('the compact wire shape + the EN copy blocks', () => {
     expect([...GOLD_LANES]).toEqual(['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows']);
   });
 
-  it('the GF-P3 table pin: 36 voters, lane counts 7/7/11/9/2 (the measured POST-P3-5LANE composition), the tilt exactly once, no duplicates, the curve seats demoted', () => {
+  it('the GF-S10 table pin: 37 voters, lane counts 7/7/11/10/2 (the measured POST-P4-5LANE composition), the tilt exactly once, no duplicates, the curve seats demoted', () => {
     // The production table's exact shape — the pin a future edit cannot
     // drift past silently. Session 6 promoted 20 → 21 (the D-5 tilt); GF-P1
     // (2026-11-05, the owner's recorded decision H — the D-7/D-8 context
@@ -377,12 +377,17 @@ describe('the compact wire shape + the EN copy blocks', () => {
     // §7); GF-P3 (the standing delegation, 2026-11-06) seated the four
     // FRED-sourced voter-candidates (R2 real-yield-5y · D2 dollar-broad ·
     // D9 dollar-eme · S9 bank-stress): 32 → 36 — the calibration's measured
-    // POST-P3-5LANE composition. The pre-demotion 21-seat shape is pinned
+    // POST-P3-5LANE composition; GF-S10 (the standing delegation,
+    // 2026-11-06) seated the I4 household anchor (michigan-5y-expectations,
+    // the UoM SIE 5–10y median): 36 → 37 — the calibration's measured
+    // POST-P4-5LANE composition (the F6 Shanghai premium lands as a
+    // CONTEXT card — its seat unmeasurable over the corpus; the F7/I9
+    // objects recorded-open). The pre-demotion 21-seat shape is pinned
     // VERBATIM in gold-backtest-core.test.ts (HARNESS_GOLD_VOTERS_21) and
     // gf-p0-proposed.test.ts (GF_VOTERS_FROZEN_21); the P1-era 19-seat
     // composition is preserved as GF_VOTERS_P1_DEMOTE; the P2-era 32-seat
     // composition is preserved as GF_VOTERS_5LANE.
-    expect(GOLD_LANE_VOTERS).toHaveLength(36);
+    expect(GOLD_LANE_VOTERS).toHaveLength(37);
     const byLane = { 'borrowing-costs': 0, dollar: 0, stress: 0, inflation: 0, flows: 0 } as Record<string, number>;
     const ids = new Set<string>();
     for (const v of GOLD_LANE_VOTERS) {
@@ -390,7 +395,7 @@ describe('the compact wire shape + the EN copy blocks', () => {
       expect(ids.has(v.id as string), `duplicate voter ${v.id}`).toBe(false);
       ids.add(v.id as string);
     }
-    expect(byLane).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 9, flows: 2 });
+    expect(byLane).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 10, flows: 2 });
     expect(ids.has('yield-curve-10y2y')).toBe(false); // demoted to context (D-7)
     expect(ids.has('yield-curve-10y3m')).toBe(false); // demoted to context (D-8)
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');

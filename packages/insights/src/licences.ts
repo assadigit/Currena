@@ -543,6 +543,116 @@ const IMF_COFER: SourceLicence = {
   termsUrl: 'https://www.imf.org/external/terms.htm',
 };
 
+/**
+ * GF-S10 (2026-11-06, the remaining P3 sources — the audit report §4
+ * rank 32 / I4): the University of Michigan Surveys of Consumers — the
+ * monthly 5–10-year median expected price change (the household anchor,
+ * "the slow version of R7"). The SIE data archive's own usage agreement
+ * (read live 2026-11-06, data.sca.isr.umich.edu/agreement.php) grants a
+ * NAMED standard licence for non-commercial use: "the data is available
+ * under the CC-BY-NC-ND license" with the required copyright notice
+ * quoted verbatim below. The NC condition is satisfied by the owner's
+ * recorded non-commercial posture (RISK_REGISTER.md, 2026-10-17: "It's a
+ * non-commercial website. I take the risk."); the ND condition is
+ * honoured by displaying the median series VERBATIM (values never
+ * recomputed — the card's percentile/position fields are computed
+ * readings OVER the series, the standard card treatment every FRED
+ * series gets, stated here for the record). L1 with the quoted grant.
+ */
+const UOM_SIE: SourceLicence = {
+  provider: 'uom',
+  label: 'University of Michigan Surveys of Consumers (SIE)',
+  licenceName: 'CC BY-NC-ND 4.0 (the SIE usage agreement — non-commercial, attribution, no derivatives)',
+  attributionText:
+    'Surveys of Consumers, Survey Research Center, University of Michigan. Copyright © 1946–2026 The Regents of the University of Michigan',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-06',
+  termsEvidence:
+    'Quoted verbatim from data.sca.isr.umich.edu/agreement.php (read live 2026-11-06, GF-S10): "If you are a researcher at a university, government, or nonprofit research organization, or if you are interested in using the data for strictly internal purposes, without the ability to redistribute the data or the ability to incorporate the data into a commercial data product, the data is available under the CC-BY-NC-ND license. Our copyright notice for required attribution is: Surveys of Consumers, Survey Research Center, University of Michigan. Copyright © 1946–2026 The Regents of the University of Michigan." — the CC-BY-NC-ND licence permits non-commercial redistribution with attribution; the NC condition rides the owner\u2019s recorded non-commercial statement (RISK_REGISTER.md, 2026-10-17); the ND condition is honoured by showing the median series verbatim (never recomputed). The Table 33 CSV download (the time-series archive POST, table=33) is keyless and serves the full monthly history — verified live 2026-11-06 (227 rows Jan 2008 → Sep 2026 in the year-2008 request; the 1978 request serves from 1978).',
+  termsUrl: 'https://data.sca.isr.umich.edu/agreement.php',
+};
+
+/**
+ * GF-S10 (2026-11-06, the remaining P3 sources — the audit report §4
+ * rank 22 / F6, "the classic scarcity tell"): the Shanghai Gold
+ * Exchange's delayed Au99.99 quotes (CNY/gram) + the daily market-data
+ * report. The exchange's own footer reads "Copyright 2016 上海黄金交易所
+ * All Right Reserved" (read live 2026-11-06 on the delayed-quotes page);
+ * the site publishes the delayed quotes and the daily/monthly report
+ * downloads freely on its public website, but NO affirmative
+ * redistribution grant could be quoted from the venue (the English
+ * legal-statement pages render no terms text; the Chinese site carries
+ * no reusable disclaimer on the data pages). L2 — the fail-closed
+ * owner-acceptance class: the card serves PRIVATE until the owner
+ * records acceptance (the agent never edits ownerAccepts — the printed
+ * decision question rides the GF-S10 evidence).
+ */
+const SGE: SourceLicence = {
+  provider: 'sge',
+  label: 'Shanghai Gold Exchange (delayed quotes + daily report)',
+  licenceName: 'Exchange market data — © SGE, no reuse grant quoted (fail closed)',
+  attributionText: 'Source: Shanghai Gold Exchange (Au99.99 delayed)',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'no', // L2: no quoted grant — the owner's recorded acceptance lifts it
+  termsCheckedOn: '2026-11-06',
+  termsEvidence:
+    'The exchange\u2019s own site footer (read live 2026-11-06, www.sge.com.cn/sjzx/mrhq): "Copyright 2016 上海黄金交易所 All Right Reserved" — © reserved, no affirmative reuse or redistribution grant found on any data page this venue could read (the en.sge.com.cn legal-statement routes render the generic shell; the Chinese data pages carry no reusable disclaimer). The delayed quotes page (data_DelayedQuotes, en) and the daily-report endpoint (data_daily_international_new, 20 rows/page, archive back to ~2024) are the site\u2019s own public offerings, served keyless with the honest declared UA (verified live 2026-11-06: Au99.99 884.09 CNY/g close 2026-11-05). L2 fail-closed: public display OFF until the owner records acceptance; the fetch itself is the site\u2019s own public page.',
+  termsUrl: 'https://en.sge.com.cn/',
+};
+
+/**
+ * GF-S10 (2026-11-06, the WGC/official-flows family — F3/F4/F13's data
+ * plane): the World Gold Council's GoldHub. The council's own terms
+ * (read live 2026-11-06, gold.org/terms-and-conditions) REQUIRE prior
+ * written authorisation for any redistribution or scraping, and the
+ * XLSX downloads themselves sit behind a (free) registration login —
+ * the pre-approval class. The data adapters DO NOT LAND (fail closed on
+ * both gates, the D-44 pattern): the three cards stay honestly
+ * 'awaiting data' until the owner records WGC's written authorisation
+ * (info@gold.org, the terms' own contact) or names a licence-clean
+ * alternative. The recorded question rides the GF-S10 evidence.
+ */
+const WGC: SourceLicence = {
+  provider: 'wgc',
+  label: 'World Gold Council (GoldHub)',
+  licenceName: 'Prior written authorisation required (pre-approval class — never fetched)',
+  attributionText: '',
+  attributionRequired: false,
+  privateOk: false,
+  publicDisplayOk: 'no',
+  termsCheckedOn: '2026-11-06',
+  termsEvidence:
+    'Quoted verbatim from gold.org/terms-and-conditions (read live 2026-11-06, GF-S10): "Except as otherwise permitted by these terms and conditions, you are not permitted to modify, copy, scrape, distribute, transmit, display, reproduce, duplicate, publish, license, frame, link, create derivative works from, transfer or otherwise use in any manner, in whole or in part, this Website or the information and materials on this Website without the prior written authorisation of WGC and with suitable accreditation to WGC." and: "Certain market data is the property of the CME Group Inc. … By accessing this Website, you agree that you will not redistribute the website pages and/or the contents thereon to any third party, unless specifically permitted by CME or its affiliates in writing to do so." — PLUS the GoldHub download pages are registration-gated (read live 2026-11-06: "Login or register to read the commentary and download the data files on this page"). The pre-approval class: no fetch, no display, until the owner records WGC\u2019s written authorisation (D-44\u2019s pattern). The GF-S9 CHANGELOG\u2019s "cards render awaiting data honestly" posture stands — now with the terms verdict recorded.',
+  termsUrl: 'https://www.gold.org/terms-and-conditions',
+};
+
+/**
+ * GF-S10 (2026-11-06, the official-sector flows — F13's data plane): the
+ * People's Bank of China / SAFE official-reserve tables. The English
+ * URL the GF-S9 definitions cite 404s today (read live 2026-11-06 — the
+ * PBoC English statistics section restructured); the Chinese-language
+ * statistics pages carry the monthly official-reserve data but no
+ * reusable terms text could be quoted from this venue. L2 fail-closed —
+ * the adapter DEFERRED (recorded-open): the card stays 'awaiting data'
+ * until the venue/terms question is answered on the owner's record.
+ */
+const PBOC: SourceLicence = {
+  provider: 'pboc',
+  label: "People's Bank of China / SAFE (official reserve assets)",
+  licenceName: 'Unreadable from this venue — fail closed (L2, no fetch wired)',
+  attributionText: '',
+  attributionRequired: false,
+  privateOk: true,
+  publicDisplayOk: 'no',
+  termsCheckedOn: '2026-11-06',
+  termsEvidence:
+    'The cited English URL (pbc.gov.cn/en/3688110/index.html) returns HTTP 404 (read live 2026-11-06, GF-S10 — the English statistics section restructured; several /en/3688xxx/ routes probed, all 404). The monthly official-reserve data itself is published (the PBoC\u2019s gold reserves 77.47 million ounces end-Sep-2026, 23 consecutive months of purchases — the China Daily record, 2026-10-07) but no terms text could be quoted from a live official page this session. Fail closed: no fetch wired, the card reads awaiting data, and the venue/terms question rides the GF-S10 evidence (a live official URL + a quoted government-data terms line unlocks it).',
+  termsUrl: 'https://www.pbc.gov.cn/en/3688110/index.html',
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -575,6 +685,13 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   oecd: OECD,
   gpr: GPR,
   epu: EPU,
+  // GF-S10 (2026-11-06, the remaining P3 sources + the WGC/official
+  // verdicts — the terms read live this session, the evidence quoted in
+  // each row).
+  uom: UOM_SIE,
+  sge: SGE,
+  wgc: WGC,
+  pboc: PBOC,
 };
 
 export function licenceForProvider(provider: string): SourceLicence {
