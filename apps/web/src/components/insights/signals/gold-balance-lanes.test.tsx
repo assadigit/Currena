@@ -131,10 +131,11 @@ function reading(id: IndicatorId, extra: Partial<IndicatorReading> = {}): Indica
   };
 }
 
-/** Every one of the 32 voters (the lane ids in table order — GF-P2,
- * 2026-11-05, the owner's recorded answers B/C/K: the twelve promotions +
- * the COBD pair + the flows pair; the two yield-curve seats stay demoted),
- * for the synthetic fixtures' shared quiet rows. */
+/** Every one of the 36 voters (the lane ids in table order — GF-P3,
+ * 2026-11-06, the standing delegation: GF-P2's twelve promotions + the
+ * COBD pair + the flows pair + GF-P3's four FRED-sourced voters; the two
+ * yield-curve seats stay demoted), for the synthetic fixtures' shared
+ * quiet rows. */
 const ALL_VOTERS: IndicatorId[] = [
   'real-yield-10y',
   'us10y',
@@ -168,6 +169,13 @@ const ALL_VOTERS: IndicatorId[] = [
   'us-deficit-12m',
   'cftc-gold-positioning',
   'cftc-gold-gross-long',
+  // GF-P3 (2026-11-06, the standing delegation — audit §4 ranks 19–21, 28):
+  // the four FRED-sourced voters (real-yield-5y in borrowing-costs,
+  // dollar-broad + dollar-eme in dollar, bank-stress in stress).
+  'real-yield-5y',
+  'dollar-broad',
+  'dollar-eme',
+  'bank-stress',
 ];
 
 /** A quiet (steady, typical) row for a voter. */
@@ -221,6 +229,13 @@ const DIRECTIONAL: IndicatorReading[] = [
   // flows: readable, steady (GF-P2's new lane — the CFTC pair)
   quiet('cftc-gold-positioning'),
   quiet('cftc-gold-gross-long'),
+  // GF-P3 (the standing delegation): the four FRED-sourced voters as quiet
+  // rows — the synthetic fixture's lanes stay readable, the new seats fire
+  // nowhere on this case (DIRECTIONAL: 1 for · 2 against · 2 neutral).
+  quiet('real-yield-5y'),
+  quiet('dollar-broad'),
+  quiet('dollar-eme'),
+  quiet('bank-stress'),
   // gold itself: context only
   reading('gold-usd', { value: 4166, percentile10y: 0.6, change30d: 5.2 }),
 ];
@@ -264,6 +279,12 @@ const FOR: IndicatorReading[] = [
   quiet('us-deficit-12m'),
   quiet('cftc-gold-positioning'),
   quiet('cftc-gold-gross-long'),
+  // GF-P3 (the standing delegation): the four FRED-sourced voters as quiet
+  // rows — the FOR case's 3-0-2 shape holds (3 for · 0 against · 2 neutral).
+  quiet('real-yield-5y'),
+  quiet('dollar-broad'),
+  quiet('dollar-eme'),
+  quiet('bank-stress'),
   reading('gold-usd', { value: 4200, percentile10y: 0.6, change30d: 5.1 }),
 ];
 
@@ -308,6 +329,12 @@ const STACK: IndicatorReading[] = [
   reading('us-deficit-12m', { value: 1.1e12, percentile10y: 0.05 }), // GF-P2 (K): G1 — a narrowing deficit pressures
   reading('cftc-gold-positioning', { value: 60, percentile10y: 0.95 }), // GF-P2 (B): F1 — crowded net longs pressure
   reading('cftc-gold-gross-long', { value: 66, percentile10y: 0.95 }), // GF-P2 (K): F2 — crowded gross longs pressure
+  // GF-P3 (the standing delegation): the four FRED-sourced voters fire on
+  // the against side of their polarities (STACK: 0 for · 5 against).
+  reading('real-yield-5y', { value: 2.4, percentile10y: 0.95 }), // high real yield pressures (polarity −1)
+  reading('dollar-broad', { value: 130, percentile10y: 0.95 }), // a strong broad dollar pressures (polarity −1)
+  reading('dollar-eme', { value: 130, percentile10y: 0.95 }), // a strong EME dollar pressures (polarity −1)
+  reading('bank-stress', { value: 0.1, percentile10y: 0.05 }), // a calm funding market pressures (polarity +1)
   reading('gold-usd', { value: 4100, percentile10y: 0.6, change30d: -9.0 }),
 ];
 
@@ -565,9 +592,17 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
     expect(steady.querySelectorAll('[data-balance-member-impact="steady"]').length).toBe(2);
     expect(steady.textContent).toContain('Not firing (2)');
     expect(steady.textContent).toContain('Fed funds target');
-    // The 19 voters are all reachable (AC-2): 6 members in this lane (GF-P1
-    // H: the two yield-curve seats demoted — 8 → 6).
-    expect(members.querySelectorAll('[data-balance-member]').length).toBe(6);
+    // GF-P3 (the standing delegation): the 4 new FRED-sourced voters' readings
+    // are absent from the 2026-10-31 archive → real-yield-5y renders as a third
+    // unread member in this lane (the other 3 new voters sit in the dollar and
+    // stress lanes). The lane is still readable (6 readable voters) → still FOR.
+    const unreadGroup = members.querySelector('[data-balance-member-group="unread"]') as HTMLElement;
+    expect(unreadGroup).not.toBeNull();
+    expect(unreadGroup.textContent).toContain('Could not be read (1)');
+    expect(unreadGroup.textContent).toContain('Real yield (5y)');
+    // The 36-voter table's borrowing-costs lane has 7 members (GF-P1 H: the two
+    // yield-curve seats demoted — 8 → 6; GF-P3: real-yield-5y seated — 6 → 7).
+    expect(members.querySelectorAll('[data-balance-member]').length).toBe(7);
     // A closed row's expansion is hidden.
     expect(document.getElementById('gold-balance-row-dollar')?.hidden).toBe(true);
   });
@@ -591,6 +626,8 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
   it('an unread member group renders only when a voter could not be read', () => {
     // Clone the fixture with two borrowing-costs voters turned stale
     // (GF-P1 H: both are actual members — the demoted curve seats are not).
+    // GF-P3: real-yield-5y is also absent from the 2026-10-31 archive → the
+    // borrowing-costs unread group lists 3 members on this staled clone.
     const readings = fixtureReadings().map((r) =>
       r.id === 'ecb-dfr' || r.id === 'fed-target' ? { ...r, status: 'stale' as const, value: null } : r,
     );
@@ -599,31 +636,38 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
     const members = document.getElementById('gold-balance-row-borrowing-costs') as HTMLElement;
     const unread = members.querySelector('[data-balance-member-group="unread"]') as HTMLElement;
     expect(unread).not.toBeNull();
-    expect(unread.textContent).toContain('Could not be read (2)');
-    expect(unread.querySelectorAll('[data-balance-member-impact="unread"]').length).toBe(2);
-    // The clean fixture has no unread group in the borrowing row…
+    expect(unread.textContent).toContain('Could not be read (3)');
+    expect(unread.querySelectorAll('[data-balance-member-impact="unread"]').length).toBe(3);
+    // The clean fixture's borrowing row now carries GF-P3's real-yield-5y as a
+    // single unread member (the archive predates GF-P3) — the new voter's seat
+    // renders unread, never a steady word (D-18 input-presence rule).
     cleanup();
     renderCard(fixtureReadings());
     openRow('borrowing-costs');
-    expect(
-      document.getElementById('gold-balance-row-borrowing-costs')?.querySelector('[data-balance-member-group="unread"]'),
-    ).toBeNull();
-    // …but GF-P1's D-18 input-presence rule (the owner's recorded decision
+    const cleanUnread = document.getElementById('gold-balance-row-borrowing-costs')?.querySelector(
+      '[data-balance-member-group="unread"]',
+    ) as HTMLElement;
+    expect(cleanUnread).not.toBeNull();
+    expect(cleanUnread.textContent).toContain('Could not be read (1)');
+    expect(cleanUnread.textContent).toContain('Real yield (5y)');
+    // …and GF-P1's D-18 input-presence rule (the owner's recorded decision
     // I, 2026-11-05) renders the FLOWS row's unread group naturally, and
     // GF-P2 (B/C/K) restates the shape twice: the six promoted stress
     // voters' readings are absent from the 2026-10-31 archive → the stress
     // row's unread group lists them; the cftc member (readable-but-inputless,
     // the 1-point staged truth) now lives in the FLOWS row beside the
     // gross-long seat whose reading the archive does not carry — unread,
-    // never a steady word (audit D-18).
+    // never a steady word (audit D-18). GF-P3 (the standing delegation):
+    // bank-stress joins the stress unread group (7 voters total).
     openRow('stress');
     const stressUnread = document.getElementById('gold-balance-row-stress')?.querySelector(
       '[data-balance-member-group="unread"]',
     ) as HTMLElement;
     expect(stressUnread).not.toBeNull();
-    expect(stressUnread.textContent).toContain('Could not be read (6)');
+    expect(stressUnread.textContent).toContain('Could not be read (7)');
     expect(stressUnread.textContent).toContain('10-year term premium');
     expect(stressUnread.textContent).toContain('Excess bond premium');
+    expect(stressUnread.textContent).toContain('Bank stress');
     openRow('flows');
     const flowsUnread = document.getElementById('gold-balance-row-flows')?.querySelector(
       '[data-balance-member-group="unread"]',
@@ -827,20 +871,23 @@ describe('the segmented rim (GB-S4, 05 §4.3 + V-4)', () => {
 
   it('the rendered rim matches the ledger counts on the recorded fixture (V-4)', () => {
     renderCard(fixtureReadings());
-    // borrowing-costs (GF-P1): 3 supports, 1 pressure, 2 steady — 6 members
-    // (engine-verified; the demotion H removed the two curve seats and the
-    // threshold J flipped fed-expectations into the supports).
+    // borrowing-costs (GF-P1): 3 supports, 1 pressure, 2 steady, 1 unread —
+    // 7 members (engine-verified; the demotion H removed the two curve seats,
+    // the threshold J flipped fed-expectations into the supports, and GF-P3
+    // seated real-yield-5y whose reading the 2026-10-31 archive does not carry).
     const weight = document.querySelector('[data-balance-weight="borrowing-costs"]') as HTMLElement;
-    expect(weight.querySelectorAll('[data-bal-seg]').length).toBe(6);
+    expect(weight.querySelectorAll('[data-bal-seg]').length).toBe(7);
     expect(weight.querySelectorAll('[data-bal-seg="supports"]').length).toBe(3);
     expect(weight.querySelectorAll('[data-bal-seg="pressures"]').length).toBe(1);
     expect(weight.querySelectorAll('[data-bal-seg="steady"]').length).toBe(2);
+    expect(weight.querySelectorAll('[data-bal-seg="unread"]').length).toBe(1);
     // The ledger row's open list agrees — the rim is a picture of the same counts.
     openRow('borrowing-costs');
     const members = document.getElementById('gold-balance-row-borrowing-costs') as HTMLElement;
     expect(members.querySelectorAll('[data-balance-member-impact="supports"]').length).toBe(3);
     expect(members.querySelectorAll('[data-balance-member-impact="pressures"]').length).toBe(1);
     expect(members.querySelectorAll('[data-balance-member-impact="steady"]').length).toBe(2);
+    expect(members.querySelectorAll('[data-balance-member-impact="unread"]').length).toBe(1);
   });
 
   it('brass faces on the pans, stone faces in the tray (neutral and unread weigh stone)', () => {
@@ -946,10 +993,11 @@ describe('RTL (04 §4.3 item 9)', () => {
     const forLeft = Number((document.querySelector('[data-balance-assembly="for"]') as HTMLElement).style.left.replace('px', ''));
     expect(forLeft).toBeGreaterThan(360);
     // Persian digits render in the ledger tally (the locale formatter) — the
-    // dollar lane reads against on this fixture: 2 of its 5 voters firing
-    // (GF-P2 C/K: D5 + G4 seat — the quiet rows read steady).
+    // dollar lane reads against on this fixture: 2 of its 7 voters firing
+    // (GF-P2 C/K: D5 + G4 seat — the quiet rows read steady; GF-P3: the
+    // broad + EME dollar twins join as quiet rows — 5 → 7 readable).
     expect(document.querySelector('[data-balance-row="dollar"] [data-balance-tally]')?.textContent).toBe(
-      '۲ مورد از ۵ عامل فعال است',
+      '۲ مورد از ۷ عامل فعال است',
     );
   });
 });

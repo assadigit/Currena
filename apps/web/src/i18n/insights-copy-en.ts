@@ -9254,6 +9254,18 @@ export const insightsCopyEn = {
         'm2-us': 'US money supply',
         'us-deficit-12m': 'US 12-month deficit',
         'cftc-gold-gross-long': 'Gold long positioning (COT)',
+        // GF-P3 (2026-11-06, the standing delegation — audit §4 ranks 19–21,
+        // 28: R2/D2/D9/S9): the four FRED-sourced voters' names — compact
+        // forms of their indicator cards' own names, same family as every
+        // entry above. real-yield-5y is the DFII5 twin of real-yield-10y
+        // (the belly of the curve); dollar-broad and dollar-eme are the
+        // trade-weighted dollar family beside dollar-basket; bank-stress is
+        // the 30-day commercial paper rate, the funding-stress sibling of
+        // ebp/repo-stress.
+        'real-yield-5y': 'Real yield (5y)',
+        'dollar-broad': 'Dollar (broad)',
+        'dollar-eme': 'Dollar (EME)',
+        'bank-stress': 'Bank stress',
       },
       evidenceWords: {
         rising: 'rising',

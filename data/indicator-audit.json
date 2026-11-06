@@ -42,6 +42,19 @@
       "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.2}"
     },
     {
+      "id": "real-yield-5y",
+      "licenceName": "FRED series — copyright not scanned (fail closed)",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": "M1",
+      "maxAgeDays": 4,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.2}"
+    },
+    {
       "id": "us10y",
       "licenceName": "FRED license #copyright-public-domain (public domain)",
       "publicDisplayOk": "yes",
@@ -1004,6 +1017,19 @@
       "rule": "{\"kind\":\"threshold\",\"direction\":\"above\",\"value\":0}"
     },
     {
+      "id": "bank-stress",
+      "licenceName": "FRED series — copyright not scanned (fail closed)",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": "M1",
+      "maxAgeDays": 14,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.1}"
+    },
+    {
       "id": "vix",
       "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
       "publicDisplayOk": "yes",
@@ -1199,6 +1225,32 @@
       "rule": "{\"kind\":\"any-of\",\"of\":[{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.1},{\"kind\":\"change\",\"mode\":\"pct\",\"direction\":\"rise\",\"magnitude\":3,\"windowWeeks\":4}]}"
     },
     {
+      "id": "dollar-broad",
+      "licenceName": "FRED series — copyright not scanned (fail closed)",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": "M1",
+      "maxAgeDays": 10,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.1}"
+    },
+    {
+      "id": "dollar-eme",
+      "licenceName": "FRED series — copyright not scanned (fail closed)",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": "M1",
+      "maxAgeDays": 10,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.1}"
+    },
+    {
       "id": "us-japan-10y-gap",
       "licenceName": "FRED license #copyright-citation-required (citation required — display permitted with \"Source: publisher via FRED\" attribution)",
       "publicDisplayOk": "yes",
@@ -1247,6 +1299,45 @@
       "enabled": true,
       "method": "M1",
       "maxAgeDays": 4,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "wgc-etf-holdings",
+      "licenceName": "Unverified",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": null,
+      "maxAgeDays": 45,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "wgc-cb-demand",
+      "licenceName": "Unverified",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": null,
+      "maxAgeDays": 100,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "official-gold-demand",
+      "licenceName": "Unverified",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": false,
+      "method": null,
+      "maxAgeDays": 45,
       "ruleVersion": 4,
       "rule": "{\"kind\":\"info\"}"
     },

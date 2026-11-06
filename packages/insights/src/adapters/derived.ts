@@ -1015,6 +1015,23 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'dollar-broad': { name: 'FRED (DTWEXBGS)', url: 'https://fred.stlouisfed.org/series/DTWEXBGS' },
   'dollar-eme': { name: 'FRED (DTWEXEMEGS)', url: 'https://fred.stlouisfed.org/series/DTWEXEMEGS' },
   'bank-stress': { name: 'FRED (DPCREDIT)', url: 'https://fred.stlouisfed.org/series/DPCREDIT' },
+  // GF-P3 (2026-11-06, audit §4 — OI-GA-4's recorded context-first answer).
+  // The three WGC/PBoC context cards: their data adapters ship at GF-S10
+  // (the cards display "awaiting data" honestly until then), but the source
+  // metadata is complete so the registry entry carries the source name +
+  // link the B-11/T-13 discipline requires.
+  'wgc-etf-holdings': {
+    name: 'World Gold Council (ETF holdings)',
+    url: 'https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows',
+  },
+  'wgc-cb-demand': {
+    name: 'World Gold Council (Gold Demand Trends)',
+    url: 'https://www.gold.org/goldhub/data/central-bank-gold-purchases',
+  },
+  'official-gold-demand': {
+    name: "People's Bank of China / SAFE (official reserve assets)",
+    url: 'https://www.pbc.gov.cn/en/3688110/index.html',
+  },
   us10y: { name: 'FRED (DGS10)', url: 'https://fred.stlouisfed.org/series/DGS10' },
   'fed-target': { name: 'FRED (DFEDTARL/U)', url: 'https://fred.stlouisfed.org/series/DFEDTARU' },
   'ecb-dfr': {

@@ -213,6 +213,67 @@
       }
     },
     {
+      "id": "real-yield-5y",
+      "title": "US 5-year real yield",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": "borrowing-costs",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (DFII5)",
+        "url": "https://fred.stlouisfed.org/series/DFII5",
+        "seriesIdOrTable": "FRED:DFII5"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DFII5",
+      "methodUrl": "https://fred.stlouisfed.org/series/DFII5",
+      "whatItIs": "The market yield on 5-year US inflation-protected Treasuries (FRED’s DFII5): the return lenders demand after inflation, at the medium-term belly of the curve.",
+      "whatItIsnt": "It prices one point on the curve: not the whole economy, and not future returns on anything.",
+      "trackRecordNote": "Rising 5-year real yields usually mark the early stage of tighter financial conditions; the negative real yields of the 2010s did the opposite for a decade.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "No T-16 scan record for DFII5 — fail closed (treated as copyright-required) until scripts/fred-copyright-scan.ts runs.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DFII5"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.2
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED series — copyright not scanned (fail closed)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "No T-16 scan record matched FRED:DFII5 — fail closed. Run scripts/fred-copyright-scan.ts.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "us10y",
       "title": "US 10-year Treasury yield",
       "area": {
@@ -4702,6 +4763,67 @@
       }
     },
     {
+      "id": "bank-stress",
+      "title": "Commercial paper rate (30d)",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": "market-stress",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (DPCREDIT)",
+        "url": "https://fred.stlouisfed.org/series/DPCREDIT",
+        "seriesIdOrTable": "FRED:DPCREDIT"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DPCREDIT",
+      "methodUrl": "https://fred.stlouisfed.org/series/DPCREDIT",
+      "whatItIs": "The 30-day nonfinancial commercial paper rate (FRED’s DPCREDIT): what top-tier US companies pay to borrow cash for a month, straight from the money market.",
+      "whatItIsnt": "It measures one corner of short-term funding: not the whole banking system, and not future stress.",
+      "trackRecordNote": "Sharp spikes have preceded or coincided with banking stress episodes; calm stretches sit in low single digits, where the plumbing works.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 14 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "No T-16 scan record for DPCREDIT — fail closed (treated as copyright-required) until scripts/fred-copyright-scan.ts runs.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DPCREDIT"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "weekly",
+      "maxAgeDays": 14,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.1
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED series — copyright not scanned (fail closed)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "No T-16 scan record matched FRED:DPCREDIT — fail closed. Run scripts/fred-copyright-scan.ts.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "vix",
       "title": "Market fear gauge (VIX)",
       "area": {
@@ -5610,6 +5732,128 @@
       }
     },
     {
+      "id": "dollar-broad",
+      "title": "Broad trade-weighted dollar",
+      "area": {
+        "section": "global",
+        "group": "dollar-strength",
+        "gauge": "dollar-strength",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (DTWEXBGS)",
+        "url": "https://fred.stlouisfed.org/series/DTWEXBGS",
+        "seriesIdOrTable": "FRED:DTWEXBGS"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DTWEXBGS",
+      "methodUrl": "https://fred.stlouisfed.org/series/DTWEXBGS",
+      "whatItIs": "The Fed’s Broad Trade-Weighted Dollar Index (FRED’s DTWEXBGS): a weighted average of the dollar against 26 currencies, including the major and emerging-market partners the official DXY leaves out.",
+      "whatItIsnt": "It is an index, not an exchange rate: it names no single pair, and its level says nothing about what to do.",
+      "trackRecordNote": "Broad-dollar surges have coincided with global stress episodes, 2008 and 2022 among them; weak stretches usually meant easier world money.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 10 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "No T-16 scan record for DTWEXBGS — fail closed (treated as copyright-required) until scripts/fred-copyright-scan.ts runs.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DTWEXBGS"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 10,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.1
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED series — copyright not scanned (fail closed)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "No T-16 scan record matched FRED:DTWEXBGS — fail closed. Run scripts/fred-copyright-scan.ts.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "dollar-eme",
+      "title": "EME trade-weighted dollar",
+      "area": {
+        "section": "global",
+        "group": "dollar-strength",
+        "gauge": "dollar-strength",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "fred",
+        "name": "FRED (DTWEXEMEGS)",
+        "url": "https://fred.stlouisfed.org/series/DTWEXEMEGS",
+        "seriesIdOrTable": "FRED:DTWEXEMEGS"
+      },
+      "publisher": "FRED series WITH a copyright notice (e.g. VIXCLS, © Cboe)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DTWEXEMEGS",
+      "methodUrl": "https://fred.stlouisfed.org/series/DTWEXEMEGS",
+      "whatItIs": "The Fed’s Emerging Market Economies Trade-Weighted Dollar Index (FRED’s DTWEXEMEGS): a weighted average of the dollar against the currencies of major emerging-market trading partners.",
+      "whatItIsnt": "It is an index, not a single exchange rate: it aggregates many EME currencies, and the marginal buyer’s mix shifts over time.",
+      "trackRecordNote": "EME-dollar surges have lined up with stress in emerging-market gold demand; soft stretches usually meant easier local-currency buying power.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 10 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "No T-16 scan record for DTWEXEMEGS — fail closed (treated as copyright-required) until scripts/fred-copyright-scan.ts runs.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "© Cboe, via FRED (for VIX); Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DTWEXEMEGS"
+        ]
+      },
+      "unit": "index",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 10,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.1
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED series — copyright not scanned (fail closed)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "No T-16 scan record matched FRED:DTWEXEMEGS — fail closed. Run scripts/fred-copyright-scan.ts.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
       "id": "us-japan-10y-gap",
       "title": "US−Japan 10Y yield gap",
       "area": {
@@ -5861,6 +6105,183 @@
         "termsCheckedOn": "2026-10-21",
         "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter.",
         "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
+      }
+    },
+    {
+      "id": "wgc-etf-holdings",
+      "title": "Gold ETF holdings",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "wgc",
+        "name": "World Gold Council (ETF holdings)",
+        "url": "https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows",
+        "seriesIdOrTable": "WGC monthly ETF holdings table (tonnes)"
+      },
+      "publisher": "wgc",
+      "publisherUrl": "https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows",
+      "methodUrl": "https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows",
+      "whatItIs": "Total gold held by the world’s gold-backed exchange-traded funds, in tonnes, published monthly by the World Gold Council.",
+      "whatItIsnt": "A context card: information-only, voting in no gauge. Tonnes held say nothing about price direction, and the data lands monthly with a lag.",
+      "trackRecordNote": "ETF holdings rose sharply through the 2010s and peaked in 2020; the 2022–2025 stretch saw Western investors trim while central banks and EM buyers stepped in.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": null,
+        "runtime": null,
+        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
+        "termsReadOn": "not verified",
+        "attributionText": "",
+        "legs": [
+          "wgc"
+        ]
+      },
+      "unit": "tonnes",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Unverified",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "No register entry — fail closed (T-15 blocks public display) until the terms are read and recorded.",
+        "termsUrl": null
+      }
+    },
+    {
+      "id": "wgc-cb-demand",
+      "title": "Central bank gold demand",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "wgc",
+        "name": "World Gold Council (Gold Demand Trends)",
+        "url": "https://www.gold.org/goldhub/data/central-bank-gold-purchases",
+        "seriesIdOrTable": "WGC Gold Demand Trends quarterly (tonnes)"
+      },
+      "publisher": "wgc",
+      "publisherUrl": "https://www.gold.org/goldhub/data/central-bank-gold-purchases",
+      "methodUrl": "https://www.gold.org/goldhub/data/central-bank-gold-purchases",
+      "whatItIs": "Net gold bought by the world’s central banks, in tonnes per quarter, published by the World Gold Council from reported and estimated reserves.",
+      "whatItIsnt": "A context card: information-only, voting in no gauge. Quarterly data lands with a lag, and reported figures understate unreported purchases.",
+      "trackRecordNote": "Annual central-bank purchases ran near 400–500 tonnes for years, then roughly doubled after 2022; the bulk has come from a small group of EM central banks.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 100 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": null,
+        "runtime": null,
+        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
+        "termsReadOn": "not verified",
+        "attributionText": "",
+        "legs": [
+          "wgc"
+        ]
+      },
+      "unit": "tonnes",
+      "changeUnit": "percentage points",
+      "cadence": "quarterly",
+      "maxAgeDays": 100,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Unverified",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "No register entry — fail closed (T-15 blocks public display) until the terms are read and recorded.",
+        "termsUrl": null
+      }
+    },
+    {
+      "id": "official-gold-demand",
+      "title": "Official-sector gold demand",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "pboc",
+        "name": "People's Bank of China / SAFE (official reserve assets)",
+        "url": "https://www.pbc.gov.cn/en/3688110/index.html",
+        "seriesIdOrTable": "PBoC/SAFE monthly reserves table + CBR (tonnes)"
+      },
+      "publisher": "pboc",
+      "publisherUrl": "https://www.pbc.gov.cn/en/3688110/index.html",
+      "methodUrl": "https://www.pbc.gov.cn/en/3688110/index.html",
+      "whatItIs": "Monthly net gold bought by the official sector, in tonnes, compiled from PBoC/SAFE and CBR reserve updates, the largest reported buyers.",
+      "whatItIsnt": "A context card: information-only, voting in no gauge. It tracks reported buyers only, and a quiet month can mean a pause or an unreported purchase.",
+      "trackRecordNote": "Reported monthly purchases have clustered around a few large buyers since 2022; many purchases go unreported, so the figure is a floor, not a total.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": false,
+        "method": null,
+        "runtime": null,
+        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
+        "termsReadOn": "not verified",
+        "attributionText": "",
+        "legs": [
+          "pboc"
+        ]
+      },
+      "unit": "tonnes",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 45,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "Unverified",
+        "attributionText": "",
+        "attributionRequired": false,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-16",
+        "termsEvidence": "No register entry — fail closed (T-15 blocks public display) until the terms are read and recorded.",
+        "termsUrl": null
       }
     },
     {
