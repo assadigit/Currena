@@ -15,10 +15,16 @@ STRONG 4-of-5, the N-1 v1.2 amendment); the new free sources landed whole
 (GF-P3 + GF-S10: the four FRED voter-candidates + I4 the UoM 5–10y anchor
 seated → **37 seats (7/7/11/10/2)**, the real-curve + Shanghai-premium
 context cards, the P3 deploy live-verified); **GF-S10's decision list is
-OPEN for the owner** — the real-curve sign question (a)–(d), the SGE
-display question (e), the WGC authorisation question (f) (the
-`evidence/gf-p4-verify-2026-11-06.md` §4–§5 record); P4 (the context
-additions, the WGC family licence-blocked) is next.
+ANSWERED — the owner's round-2 answers RECORDED (2026-11-07, the chat
+round; the round-2 table below is the record)**: (a) the real curve
+STAYS a context card (no sign seats — the D-11/D-12 question closes
+context-by-choice) · (e) the SGE L2 class ACCEPTED for public display
+(the Shanghai premium flips public; F15 unblocks) · (f) the WGC
+authorisation email to be DRAFTED for the owner's review · I9 the
+nowcast accumulator APPROVED (build) · F7 stays recorded-open · D7's
+seat question CLOSED no-seat · the P4 scope = the 7-card free-first
+family + F16 BAZG + F15 · P5 = the dedicated GF-S12. **GF-S11 executes
+the answers + P4.**
 
 **Owner intent (inherited from the audit's charter, 2026-11-04):** *"Make
 sure nothing is missed or half-implemented."* The audit answered: 8/85 rows
@@ -90,6 +96,26 @@ execution notes sit in the answer column's own words.
 | The D-18 readable-rule question | Should `readable()` require evalLeg-input presence? | **Adopt the input-presence rule** (a harness-visible rule nuance, owner-gated) | **ADOPT the input-presence rule** — neither input → `unread`, never `steady`. The repair fixes the instance; the rule prevents the class. **EXECUTED at GF-P1** |
 | The D-1 threshold question | Which of the 17 level-only seats deserve move thresholds? | **Derive, don't assume**: the GF-P0 calibration walks the 17 seats against their 02 treatments + the corpus distributions; D-2/D-3 (fed-expectations, usdjpy) are already P1 repairs | **ADOPT the five derived values** — fed-expectations 0.13 pts · usdjpy 1.38 pct · fed-target 0.25 pts (the FOMC step grid) · term-premium-10y 0.07 pts · t5yie 0.10 pts. **The five entered the production `SIGNAL_LEG_MOVE` at GF-P1** (the term-premium-10y and t5yie thresholds activate with their P2 promotions) |
 | The per-row go/no-go | The 12 zero-new-fetch class: R9 · I3 · I10 · S4 · S7 · S8 · S13 · G1 · X7 · F2 · D7 · I11 | Per row: PROMOTE ×8 (R9 · I3 · S4 · S7 · S8 · S13 · G1 · F2) · CONTEXT ADD ×3 (I10 · X7 · I11) · D7 seat-or-context | **PROMOTE ×12**: R9 · S4 (the literature's preferred risk-appetite signal) · G1 (the fiscal-dominance channel) · S13 (polarity note: pessimism reads gold-positive) · S7 the DAILY object (the monthly gpr-index alternative fires 1114) · S8 (the tpu-us alternative fires 1259 — a one-seat swap recorded as the alternative) · I3 · F2 (rides F1's backfill) · R8 (rides J's threshold) · I7 (the debasement channel) · G4 (the foreign-financing retreat). **D7: CONTEXT CARD first** (its row is context-leaning; a seat defensible — the seat question stays recorded-open). **I10 · X7 · I11: CONTEXT ADD** (GF-P4; I10 the Jastram anchor; I11 promotion revisit-able once the card exists — the ECB/BoJ legs absent). **The promotions executed at GF-P2 (GF-S8, 2026-11-05)** — the twelve seated + the D7 usdchf context card shipped (the seat question stays recorded-open); I10/X7/I11 remain GF-P4 context adds |
+
+## The owner's decision list — round 2 (GF-S10's open questions — ANSWERED 2026-11-07)
+
+The GF-S10 close printed three open questions (the gf-p4-verify
+evidence §4–§5) plus the sequencing items; the owner answered them all
+in the chat round of 2026-11-07 — every answer on the agent's printed
+recommendation, the standing delegation standing. This table is the
+recorded answer sheet (the D-GF-1 mechanism — the GF-S7 round-1
+precedent); GF-S11 executes.
+
+| # | The decision | The recommendation (the agent's, printed with the question) | **The owner's recorded answer (2026-11-07)** |
+|---|---|---|---|
+| **(a)** | The D-11/D-12 real-curve sign — context card / seat PLUS / seat MINUS / re-open the object question (the `evidence/gf-p4-verify-2026-11-06.md` §4 record; BOTH variants measured in the calibration) | Keep the context card — the D-7/D-8 lineage's honest endpoint; both signs measure near-identically (PLUS 26.8/12.3 · MINUS 27.3/11.3 level/full-tip %), no legibility edge justifies a contested vote | **KEEP THE CONTEXT CARD** — no sign seats; the D-11/D-12 question CLOSES context-by-choice. `real-curve-10y5y` stands as shipped (rule: info); the measured variants stay in the calibration report as the record of the question |
+| **(e)** | The SGE display class — the Shanghai premium card serves PRIVATE under the SGE L2 footer (©-reserved, no affirmative reuse grant) | Accept for public display — the L2 owner-acceptance mechanism (the Yahoo/Shiller precedent); a derived ratio from an official exchange's factual closes, attributed | **ACCEPT — GO PUBLIC** — the recorded acceptance is the L2 unlock; GF-S11 flips the card public (the licence register's ownerAccepts row + the registry regeneration + the T-15 projection unhide + the notices + the copy) and live-verifies it on the public snapshot. **F15 (the SGE monthly withdrawals) UNBLOCKS for P4** |
+| **(f)** | The WGC authorisation — the terms REQUIRE prior written authorisation for any scraping/redistribution (the CME clause; registration-gated downloads; the PBoC URL 404s) | Draft the request for the owner's review; the owner sends it; the family stays blocked pending the reply | **DRAFT IT** — GF-S11 writes the authorisation-request draft (info@gold.org, the terms' own contact) and prints it in the final message for the owner's review + send; the family stays context-blocked until a recorded reply |
+| **I9** | The nowcast-surprise accumulator — the Cleveland Fed publishes NO nowcast history; the card must accumulate from a standing start (first surprise ~5 weeks; the percentile base ~30 months) | Build it — one keyless fetch per rung; the only expectations-vs-realised surprise object in the set | **BUILD IT** — GF-S11 lands the accumulator: the adapter + the accumulation rung + the rule:info card with the maturity honestly stated in the copy (no predictive claim — the surprise displays as conditions) |
+| **F7** | The India parity — MCX venue-blocked (HTTP 403, the honest UA); the Frankfurter INR leg verified; F6 Shanghai carries the physical-premium channel | Stay recorded-open (zero cost) | **STAY RECORDED-OPEN** — until MCX opens or a licence-clean alternative appears; no probe this phase |
+| **D7** | The usdchf seat question — recorded-open since GF-P2's context card | Keep the card — the dollar lane's 7 voters carry it; no measured scenario exists for a seat | **KEEP THE CARD** — the seat question CLOSES no-seat; the card stands as context |
+| **P4 scope** | Which cards GF-S11 lands (01-FILL-SPEC §1, ranks 30–31, 34–47) | The 7-card committed family + F16 BAZG (government open data, venue-verified live 2026-11-05; severity 8 ≥ F12's 4) | **7 + BAZG (+ F15 via (e))** — the nine cards: I10 · X7 · I11 · G3 · F16 · F15 · X5 · R11 · F12, severity-ordered; the spill rides GF-S12 honestly if the budget runs out |
+| **P5 timing** | When the acceptance walk + the user-visible flip runs (GF-P5 — the last phase) | GF-S12 dedicated — GF-S10 needed three landings when overloaded; the evidence for focused sessions | **GF-S12** — GF-S11 = the decision executions + P4; the GF-S12 prompt = P5 the acceptance walk + the flip preparation |
 
 ## Out of scope
 
