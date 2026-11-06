@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold meter gap-fill program (P0 ANSWERED + P1 + P2 + P3 DELIVERED WHOLE — GF-S10 landed the remainder + the P3 deploy; GF-S11 = the owner's decision round + P4 the context additions next)
+# AGENT_HANDOFF — Currena: the gold meter gap-fill program (P0 ANSWERED + P1 + P2 + P3 DELIVERED WHOLE — GF-S10 landed the remainder + the P3 deploy; the round-2 answers RECORDED 2026-11-07; GF-S11 = the decisions' execution + P4 next)
 
 > The owner's **gold meter audit** program (`docs/specs/gold-meter-audit/`)
 > is **CLOSED — COMPLETE 2026-11-05 at GA-S4**: A1–A4 whole (the taxonomy
@@ -19,27 +19,27 @@
 
 ## A. What comes next
 
-The **GF-S11 session** — TWO TRACKS: (1) **the owner's decision round**
-(the GF-S10 open questions, printed in
-`evidence/gf-p4-verify-2026-11-06.md` §4–§5 and in the GF-S11 prompt:
-(a) the real-curve sign — context card / PLUS / MINUS / re-open the
-object question, BOTH variants already measured; (b) the SGE display
-class (question (e) — the Shanghai premium serves PRIVATE until the
-owner's acceptance); (c) the WGC authorisation (question (f) — unlocks
-F3/F4 + the whole WGC family or leaves it context-blocked); check the
-repo + the chat for answers FIRST — the GF-S7 precedent; absent → the
-GA lock-fallback: docs-only, the list re-issued, NO owner-gated
-execution); (2) **P4 the context additions** (the free-first family:
-I10 · X7 · I11 · G3 · X5 · R11 · F12 — the WGC family only if (c)
-resolves). Then if budget allows: the P5 acceptance-walk preparation.
-Its kickoff prompt is at the foot of `docs/specs/gold-meter-gapfill/
-PROMPTS.md` (the D-GA-9 convention) — paste it into a fresh session at
-the repo root.
+The **GF-S11 session** — TWO TRACKS, the decisions first: (1) **the
+recorded decisions' execution** (the round-2 answers, RECORDED
+2026-11-07 in the README's round-2 decision table — the owner's chat
+round: **(a)** the real curve STAYS a context card, no sign seats ·
+**(e)** the SGE L2 class ACCEPTED for public display — the Shanghai
+premium flips public, F15 unblocks · **(f)** the WGC authorisation
+email DRAFTED for the owner's review + send (info@gold.org) · **I9**
+the nowcast accumulator APPROVED (build) · **F7** recorded-open ·
+**D7** closed no-seat · the P4 scope **7 + BAZG + F15** · **P5** = the
+dedicated GF-S12); (2) **P4 the context additions** (the nine cards:
+I10 · X7 · I11 · G3 · F16 · F15 · X5 · R11 · F12 — severity-ordered,
+rule:info, copy round 82+). No GOLD_LANE_VOTERS edit expected; the
+built worker changes (the display flip + the cards) → deploy +
+live verification. Its kickoff prompt is at the foot of
+`docs/specs/gold-meter-gapfill/PROMPTS.md` (the D-GA-9 convention) —
+paste it into a fresh session at the repo root.
 
 | Program | Milestone | Branch |
 |---|---|---|
 | gold meter audit — **CLOSED (2026-11-05)** | GA-S1 (the taxonomy, LOCKED v1.2 = 86) · GA-S2 + completion (the inventory + wiring pack) · GA-S3 (the matrix + the defects) · GA-S4 (the report + the fill design) | `ga/s1-taxonomy` … `ga/s4-report` — all merged |
-| gold meter gap-fill — **P0 ANSWERED + P1 + P2 + P3 DELIVERED WHOLE (GF-S10, 2026-11-06); GF-S11 = the owner's decision round + P4 NEXT** | GF-S1 delivered P0 (the calibration + the harness tables). GF-S2..GF-S6 re-issued the decision list (the lock-fallback ×5). GF-S7 recorded the owner's answers A–K + executed GF-P1. GF-S8 executed GF-P2 (the 32-seat table + the flows lane + STRONG 4-of-5 + the N-1 v1.2 amendment). GF-S9 executed GF-P3 (the four FRED voters → 36). **GF-S10 executed the REMAINDER (the recovery landing of two interrupted sessions — every claim re-verified from the recovery's own runs)**: I4 the UoM 5–10y anchor seated through the MEASURED POST-P4-5LANE scenario → **GOLD_LANE_VOTERS 37 (7/7/11/10/2)** · the D-11/D-12 real curve as the CONTEXT CARD with BOTH sign variants measured + the question PRINTED (a)–(d) · F6 the Shanghai premium context card + the SGE adapter + the rung-2 wiring + the backfill EXECUTED (488 points in production KV, read-back verified) · F7/I9 recorded-open (MCX 403 / no nowcast history) · F3/F4/F13 honestly DO NOT land (the WGC terms) · the P3 deploy live-verified (the worker 4b8dcfc7: for 2 · against 2 · neutral 1 · unread 0, 5 of 5 lanes readable) · the gf-p4-verify twin (production ≡ POST-P4-5LANE in ALL 2512 windows) · tests 14,605 · copy round 81 (45 strings) · gates ALL GREEN → GF-S11: the decision round + P4 → P5 acceptance + flip | `gf/p0-recalibration` (merged) · `gf/s2-reissue`…`gf/s6-reissue` (merged) · `gf/p1-repairs` (merged) · `gf/p2-promotions` (merged) · `gf/p3-new-sources` (merged) · `gf/p3-remainder-and-p4` (merged at GF-S10) → `gf/p4-context-additions` next |
+| gold meter gap-fill — **P0 ANSWERED + P1 + P2 + P3 DELIVERED WHOLE (GF-S10, 2026-11-06); GF-S11 = the decisions' execution (round-2 answers RECORDED 2026-11-07) + P4 NEXT** | GF-S1 delivered P0 (the calibration + the harness tables). GF-S2..GF-S6 re-issued the decision list (the lock-fallback ×5). GF-S7 recorded the owner's answers A–K + executed GF-P1. GF-S8 executed GF-P2 (the 32-seat table + the flows lane + STRONG 4-of-5 + the N-1 v1.2 amendment). GF-S9 executed GF-P3 (the four FRED voters → 36). **GF-S10 executed the REMAINDER (the recovery landing of two interrupted sessions — every claim re-verified from the recovery's own runs)**: I4 the UoM 5–10y anchor seated through the MEASURED POST-P4-5LANE scenario → **GOLD_LANE_VOTERS 37 (7/7/11/10/2)** · the D-11/D-12 real curve as the CONTEXT CARD with BOTH sign variants measured + the question PRINTED (a)–(d) · F6 the Shanghai premium context card + the SGE adapter + the rung-2 wiring + the backfill EXECUTED (488 points in production KV, read-back verified) · F7/I9 recorded-open (MCX 403 / no nowcast history) · F3/F4/F13 honestly DO NOT land (the WGC terms) · the P3 deploy live-verified (the worker 4b8dcfc7: for 2 · against 2 · neutral 1 · unread 0, 5 of 5 lanes readable) · the gf-p4-verify twin (production ≡ POST-P4-5LANE in ALL 2512 windows) · tests 14,605 · copy round 81 (45 strings) · gates ALL GREEN → GF-S11: the decisions' execution (the round-2 answers RECORDED) + P4 → P5 acceptance + flip (the dedicated GF-S12) | `gf/p0-recalibration` (merged) · `gf/s2-reissue`…`gf/s6-reissue` (merged) · `gf/p1-repairs` (merged) · `gf/p2-promotions` (merged) · `gf/p3-new-sources` (merged) · `gf/p3-remainder-and-p4` (merged at GF-S10) → `gf/s11-decisions-and-p4` next |
 
 ## B. The standing rules (read before any session)
 
@@ -80,10 +80,12 @@ the repo root.
   sign variants measured); the defects remaining: D-9/D-10/D-13/D-15/
   D-16 accept-with-note (stand).
 - **THE OWNER'S ANSWERS A–K ARE RECORDED** (GF-S7) + **the standing
-  delegation**. GF-S10's NEW open questions are printed in the
-  gf-p4-verify evidence §4–§5 and the GF-S11 prompt: **(a)** the
-  real-curve sign · **(b)** the SGE display class (e) · **(c)** the WGC
-  authorisation (f).
+  delegation**. **GF-S10's open questions are ANSWERED (round 2,
+  2026-11-07 — the README's round-2 table)**: **(a)** the real curve
+  STAYS a context card (no sign seats) · **(e)** the SGE class ACCEPTED
+  public (the Shanghai premium flips; F15 unblocks) · **(f)** the WGC
+  email DRAFTED-for-review (GF-S11 writes it) · **I9** build · **F7**
+  recorded-open · **D7** closed no-seat.
 - **THE ENGINE (as deployed)**: the **37-voter five-lane table**
   (borrowing costs 7 · dollar 7 · market stress 11 · inflation 10 ·
   flows 2 — the measured POST-P4-5LANE composition), `evalLeg`, MIN2,
