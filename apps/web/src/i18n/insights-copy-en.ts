@@ -3372,9 +3372,9 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The Fed’s Emerging Market Economies Trade-Weighted Dollar Index (FRED’s DTWEXEMEGS): a weighted average of the dollar against the currencies of major emerging-market trading partners.',
     whyItMatters:
-      'The EME dollar tracks the leg that actually buys gold at the margin: a stronger EME dollar tightens the funding of the world’s biggest physical-gold demand bloc.',
+      'The EME dollar tracks the leg that actually purchases gold at the margin: a stronger EME dollar tightens the funding of the world’s biggest physical-gold demand bloc.',
     tendedToMean:
-      'EME-dollar surges have lined up with stress in emerging-market gold demand; soft stretches usually meant easier local-currency buying power.',
+      'EME-dollar surges have lined up with stress in emerging-market gold demand; soft stretches usually meant easier local-currency purchasing power.',
     cantTell:
       'It is an index, not a single exchange rate: it aggregates many EME currencies, and the marginal buyer’s mix shifts over time.',
     forYou:
@@ -3409,7 +3409,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
   'wgc-etf-holdings': {
     name: 'Gold held by exchange-traded funds',
     oneLiner:
-      'How much gold the world’s gold-backed ETFs hold, in tonnes: a read on the Western investor bid.',
+      'How much gold sits in the world’s gold-backed ETFs, in tonnes: a read on the Western investor bid.',
     lines: {
       highRising: 'ETF holdings are building: Western investor demand is adding to the market.',
       highEasing: 'ETF holdings remain elevated but are easing back.',
@@ -3425,7 +3425,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'A context card: information-only, voting in no gauge. Tonnes held say nothing about price direction, and the data lands monthly with a lag.',
     forYou:
-      'Background on who is buying gold: a rising line means the Western investor bid is back; a falling line means that leg is absent, whatever the price does.',
+      'Background on who is accumulating gold: a rising line means the Western investor bid is back; a falling line means that leg is absent, whatever the price does.',
   },
   'wgc-cb-demand': {
     name: 'Central-bank gold purchases',
@@ -3530,9 +3530,9 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'The Shanghai Gold Exchange’s Au99.99 close (CNY per gram) versus the converted London ounce — the world gold price in dollars times the dollar–yuan rate, converted to CNY per gram — shown as a percentage difference.',
     whyItMatters:
-      'China is the world’s largest gold consumer: a sustained premium means imports are worth the freight and the physical bid is strong; a discount means local demand is too weak to hold the world price.',
+      'China is the world’s largest gold consumer: a sustained premium means imports are worth the freight and the physical bid is strong; a discount means local demand is too weak to support the world price.',
     tendedToMean:
-      'The premium flared in 2013 (the import rush), 2016 and 2023–24 (the buying waves); discounts marked the weak-demand stretches between them.',
+      'The premium flared in 2013 (the import rush), 2016 and 2023–24 (the demand waves); discounts marked the weak-demand stretches between them.',
     cantTell:
       'A premium reflects delivery frictions, quotas and local taxes as well as demand — the classic tell, read as context, never a trading signal.',
     forYou:
@@ -4421,7 +4421,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     whatItIs:
       'China’s monthly crude steel output in the statistics bureau’s own unit (10,000 tons), from the Output of Major Industrial Products table in its English monthly industrial-production release, read verbatim and cross-checked against the release’s own headline sentence.',
     whyItMatters:
-      'China is the world’s largest steel maker, and its mills are the main buyer of the seaborne iron ore Australia ships: the output level is the most direct reading of how much iron-ore buying China is doing.',
+      'China is the world’s largest steel maker, and its mills are the main buyer of the seaborne iron ore Australia ships: the output level is the most direct reading of China’s iron-ore appetite.',
     tendedToMean:
       'Across the sixteen months through September 2026, monthly output has run between about 68 and 87 million tonnes — drifting lower through late 2025, lifting in spring 2026, and easing again in the second half of the year.',
     cantTell:
@@ -5381,7 +5381,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Australian goods trade balance',
     ticker: 'AU trade balance',
     oneLiner:
-      'Whether Australia earned more or less from selling goods abroad than it spent on goods from abroad, in the latest month.',
+      'Whether Australia earned more or less from goods exports than it spent on goods imports, in the latest month.',
     lines: {
       highRising: 'The goods surplus is unusually wide and widening.',
       highEasing: 'The surplus is wide for its decade but narrowing.',
@@ -5623,17 +5623,17 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     name: 'Gold long positioning (COT)',
     ticker: 'Gold COT long',
     oneLiner:
-      'How much of gold futures’ open interest big speculators hold on the long side alone — the buy side, before shorts are netted off.',
+      'How much of gold futures’ open interest big speculators control on the long side alone — the gross long leg, before shorts are netted off.',
     lines: {
       highRising: 'Speculators’ long side is more crowded than usual and still growing: the squeeze-then-slump zone.',
       highEasing: 'The long side remains crowded but is being trimmed.',
       typical: 'The long side sits in its usual range of the past decade.',
-      low: 'Speculators hold an unusually small share on the long side: positioning has thinned out.',
+      low: 'Speculators own an unusually small share on the long side: positioning has thinned out.',
     },
     whatItIs:
       'The gross non-commercial LONG position in gold futures (big speculators’ longs, before their shorts are netted off) as a share of all open interest, from the CFTC’s weekly Commitments of Traders report (Tuesday data, published Fridays) — the same gold row the net-positioning card reads.',
     whyItMatters:
-      'The gross long share reads how crowded the BUY side alone is — a richer read than the net figure when speculators run both sides at once, the classic crowded-book shape.',
+      'The gross long share reads how crowded the long side alone is — a richer read than the net figure when speculators run both sides at once, the classic crowded-book shape.',
     tendedToMean:
       'The crowded-long zone sits at the top of the share’s own trailing decade — the card reads percentiles and its derived band (about 62% of open interest, the recorded archive’s own top decile), never fixed desk numbers.',
     cantTell:

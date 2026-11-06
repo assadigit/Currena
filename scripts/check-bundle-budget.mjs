@@ -950,7 +950,15 @@ const BUDGETS = [
   // the definitions + the display config + the FRED adapter series.
   // Measured 1556.48/360.16 — the ceiling re-bases to 1560/365 (the
   // multiple-of-5 convention, ~3.5 kB raw / ~4.84 kB gz headroom).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1560_000, gz: 365_000, label: 'Insights lazy chunk' },
+  // GF-S10 (2026-11-06, the remaining P3 sources — CHANGELOG §2026-11-06a):
+  // 1560→1572 / 365 stays — the three new gold-meter indicators (I4 the
+  // UoM 5–10y anchor, the seated voter + the D-11/D-12 real-curve context
+  // card + F6 the Shanghai premium context card) each carry the full
+  // IndicatorCopyEntry shape × 2 locales (34 new strings, round-81) + the
+  // definitions + the display config. Measured 1569.21/363.53 — the raw
+  // ceiling re-bases to 1572 (the multiple-of-4 headroom ≈2.8 kB; the gz
+  // stays under its 365 ceiling at 363.53).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1572_000, gz: 365_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

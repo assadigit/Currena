@@ -526,6 +526,16 @@ const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // genuinely broken AED feed is still caught by the source report (the
   // fetch itself failing), which is the honest signal for a peg.
   'usdaed',
+  // GF-S10 (2026-11-06, the selfcheck repair — the session's own run
+  // exposed it): SAHMREALTIME publishes at 2dp, and the Sahm recession
+  // indicator anchors at small values when unemployment sits at its
+  // 12-month low — the live prints read Jul −0.03 · Aug −0.07 · Sep 0.00 ·
+  // Oct 0.00, so consecutive months legitimately ROUND to the same value
+  // (the same plausible-repeat reasoning T-08 (a) already grants DAILY
+  // 2dp series). The date advances with each fresh print — a genuinely
+  // stuck sahm feed is still caught by the source report (the FRED fetch
+  // itself failing), which is the honest signal.
+  'sahm-rule',
 ]);
 
 /**

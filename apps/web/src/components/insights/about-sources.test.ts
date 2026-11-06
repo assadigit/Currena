@@ -71,13 +71,15 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(fred!.licences).toContain(
       'FRED license #copyright-citation-required (citation required — display permitted with "Source: publisher via FRED" attribution)',
     );
-    expect(fred!.licences).toContain('FRED series — copyright not scanned (fail closed)');
-    // GF-P3: the four new FRED-sourced voters ride the "fail closed" licence
-    // (their T-16 copyright scan lands with the data adapters at GF-S10) →
-    // the provider's kill-switch state is MIXED (52 of 56 enabled — the four
-    // new series sit disabled until the scan promotes them).
-    expect(aboutEnabledState(fred!)).toBe('mixed');
-    expect(fred!.enabledCount).toBe(52);
+    expect(fred!.licences).toContain('No reuse licence offered (unofficial endpoints)');
+    // GF-S10 (2026-11-06): the four GF-P3 FRED-sourced voters' T-16 records
+    // landed (all four public-domain) — the "copyright not scanned (fail
+    // closed)" licence class is GONE from the row and the provider's
+    // kill-switch aggregate flips mixed → ON: all 56 series enabled, the
+    // four seats fetch + fire on their cadences.
+    expect(fred!.licences).not.toContain('FRED series — copyright not scanned (fail closed)');
+    expect(fred!.enabledCount).toBe(56);
+    expect(aboutEnabledState(fred!)).toBe('on');
   });
 
   it('rba: the whole provider sits at L0 and is on', () => {
@@ -97,8 +99,13 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
   it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses (silver-btc retired 2026-10-23, OD-7)', () => {
     const derived = rows.find((r) => r.provider === 'derived');
     expect(derived!.seriesCount).toBe(23); // GF-S10 (2026-11-06) adds the D-11/D-12 derived real curve (real-curve-10y5y, DFII10 − DFII5) + the F6 Shanghai premium (shanghai-gold-premium, SGE ÷ converted London ounce) → 23 // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18 + the S3-M3.5 deficit 12-month sum (us-deficit-12m) → 19 + the S6-M6.1 AUD/NZD cross (audnzd) → 20 + the S6-M6.3 Italy−Germany spread (btp-bund-spread) → 21
-    expect(derived!.enabledCount).toBe(22); // GF-S10: the real-curve card is enabled (both legs public-domain); the Shanghai premium's enabled count reflects its WORST leg (the SGE L2 — the private-display gate the owner's acceptance lifts) // the Session-3 tilt card is enabled (both legs' T-16 records + the recorded acceptance); the S3 spreads + the deficit sum + the S6 audnzd cross + the S6-M6.3 BTP−Bund spread (both legs' T-16 records) ride the same acceptance
+    expect(derived!.enabledCount).toBe(23); // GF-S10: ALL 23 enabled — the premium's SGE leg is L2 DISPLAY-gated (private mode until the owner's recorded acceptance, the site-mode hide), but the FETCH is enabled (the exchange's own public page — the register's own sge row: "the fetch runs … the DISPLAY gate is the licence verdict")
     expect(aboutEnabledState(derived!)).toBe('on');
+    // GF-S10: the premium's GOVERNING licence (the SGE ©-reserved class) is
+    // visible in the row's licence set — the About table shows the class
+    // that actually gates the card (the generator's governing-leg rule,
+    // mirroring riskSummaryForLegs).
+    expect(derived!.licences).toContain('Exchange market data — © SGE, no reuse grant quoted (fail closed)');
     // Own-computation series inherit the upstream terms — the blanket
     // sidecar string (audjpy's) is one of the row's licences (sources.ts
     // riskRowForLeg mirrors the same inheritance).

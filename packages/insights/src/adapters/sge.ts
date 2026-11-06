@@ -43,9 +43,26 @@ export interface SgeAu9999Point {
  * Fetch the Au99.99 daily closes for a date range (ONE page — the
  * endpoint paginates at 20 rows ≈ 1.3 trading days; callers ask for a
  * single day). Fails loudly on a block, a non-2xx or a shape change.
+ *
+ * `page` (default 1) and `instIds` (default '' = every contract) exist
+ * for the one-off GF-P4 backfill's archive walk — the production rung
+ * always reads page 1 unfiltered (the latest trading days, exactly what
+ * the daily derivation needs; zero subrequest growth). The venue MEASURES
+ * (live 2026-11-06): ranges longer than ~45 days serve an EMPTY table,
+ * and a PAST-THE-END page serves page 1's content again — a walk uses
+ * ≤31-day windows, `instIds: SGE_AU9999` (20 trading days per page) and
+ * stops on the first non-advancing page, never on an empty one.
  */
-export async function fetchSgeAu9999(start: string, end: string, deps: FetchDeps = {}): Promise<SgeAu9999Point[]> {
-  const url = `${SGE_DAILY_URL}?start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}&inst_ids=&p=1`;
+export async function fetchSgeAu9999(
+  start: string,
+  end: string,
+  deps: FetchDeps = {},
+  page = 1,
+  instIds = '',
+): Promise<SgeAu9999Point[]> {
+  const url =
+    `${SGE_DAILY_URL}?start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}` +
+    `&inst_ids=${encodeURIComponent(instIds)}&p=${page}`;
   const res = await insightsFetch(url, {}, deps);
   const html = await res.text();
   return parseSgeAu9999(html);

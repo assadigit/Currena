@@ -229,10 +229,10 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
   // the same way (a fresh deploy on any day must not wait for Saturday).
   const needCoferQuarterly = missing.has('usd-reserve-share');
   // GF-S10: the UoM 5–10y anchor bootstraps like the other monthlies; the
-  // SGE leg bootstraps like the dailies (a missing stage entry is the
-  // bootstrap itself).
+  // SGE leg needs no bootstrap flag — it fetches EVERY day (the
+  // mof/gprDaily pattern: a missing stage entry is the bootstrap itself,
+  // and the premium derives from the day's own legs).
   const needUomMonthly = missing.has('michigan-5y-expectations');
-  const needSgeDaily = missing.has('shanghai-gold-premium');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
     eiaWeekly:

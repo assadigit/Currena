@@ -472,7 +472,7 @@
     },
     {
       "id": "gold-oil-ratio",
-      "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+      "licenceName": "No reuse licence offered (unofficial endpoints)",
       "publicDisplayOk": "yes",
       "privateOk": true,
       "level": "L2",
@@ -1356,7 +1356,7 @@
     },
     {
       "id": "shanghai-gold-premium",
-      "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+      "licenceName": "Exchange market data — © SGE, no reuse grant quoted (fail closed)",
       "publicDisplayOk": "no",
       "privateOk": true,
       "level": "L2",

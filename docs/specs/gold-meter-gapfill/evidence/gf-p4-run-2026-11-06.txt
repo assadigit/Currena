@@ -1,4 +1,4 @@
-# GF-P4 verify run record — 2026-11-06T15:34:18.789Z
+# GF-P4 verify run record — 2026-11-06T17:23:20.664Z
 
 windows: 2512 (2016-11-07 → 2026-11-03)
 production voters: 37 (37 seats, 5 lanes)
