@@ -508,6 +508,17 @@ const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'rba-cash-rate',
   'au-home-loan',
   'au-deposit-rate',
+  // GF-S10 (2026-11-06, the GF-P3 wiring defect repair — the P3-deploy
+  // live verification exposed it): DPCREDIT is the Fed's ADMINISTERED
+  // primary-credit (discount-window) rate — the same decision-calendar
+  // class as fed-target above. It sat at 4.00 for every weekly print
+  // since the 2023-07 hike, so T-08 (a) held the seat in check-pending
+  // forever ("weekly series repeated 4 on 2026-11-04") — the duplicate-
+  // print guard misreading an administered rate that legitimately does
+  // not move between FOMC decisions. The seat's own claim is the SPIKE
+  // (2008/2020) — the 0.10-pt move threshold fires only on a genuine
+  // facility-rate change, and the source report still guards the fetch.
+  'bank-stress',
   // S1-M1.6 #1 (2026-10-31 audit): the PEGGED pair. USD/AED has sat on its
   // 3.6725 peg for decades — a full-precision repeat day after day is the
   // peg working, not the duplicate/frozen-cache bug class (T-08 (a)/(b)/(c)
