@@ -183,31 +183,52 @@ export interface GoldLaneVoter {
  * `GF_VOTERS_5LANE`, pinned equivalent modulo the F2 seat's recorded
  * id mapping — the F2 design decision, PROGRESS's GF-S8 block). The
  * pre-P2 19-seat table stays preserved as `GF_VOTERS_P1_DEMOTE`.
+ *
+ * GF-P3 (2026-11-06, the new free sources — the standing delegation "go
+ * full autonomously"; every seat line below cites its audit-report §4
+ * row per D-GF-1): the four FRED-sourced voter-candidates seated (R2
+ * real-yield-5y · D2 dollar-broad · D9 dollar-eme · S9 bank-stress) —
+ * owner-gated through the MEASURED POST-P3-5LANE scenario (the F2
+ * precedent: the harness seat and the production seat agree by
+ * construction; evidence/gf-p0-calibration-2026-11-05.md §7's new
+ * POST-P3-5LANE rows; the harness twin `GF_VOTERS_P3_5LANE`). The
+ * composition is now 36 seats: 7/7/11/9/2. The D-11/D-12 real-curve
+ * sign question (unlocked by R2's fill) is a DECISION LIST item — both
+ * variants measured, never seated silently. The P2 verify
+ * (gf-p2-verify) is superseded by gf-p3-verify as the live pin (the P2
+ * evidence stays as the dated record, like P1's before it).
  */
 export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
-  // ——— Borrowing costs (6): TIGHT is the classic gold headwind (real rates
+  // ——— Borrowing costs (7): TIGHT is the classic gold headwind (real rates
   // ——— are gold's opportunity cost); RELIEF (falling/low rates) the tailwind.
   // ——— GF-P1 (the owner's recorded H, 2026-11-05): the two yield-curve
   // ——— seats demoted to context cards (D-7/D-8, R4) — 8 → 6 (unchanged at P2).
+  // ——— GF-P3 (2026-11-06): R2's 5y real yield seated (the real-yield-10y's
+  // ——— twin, the belly where policy bites first) — 6 → 7.
   { lane: 'borrowing-costs', id: 'real-yield-10y', polarity: -1 }, // R1 COVERED — THE textbook driver
   { lane: 'borrowing-costs', id: 'us10y', polarity: -1 }, // R1's belt-and-braces (D-9 accept-with-note)
   { lane: 'borrowing-costs', id: 'us30y', polarity: -1 }, // R1's belt-and-braces (D-10)
   { lane: 'borrowing-costs', id: 'fed-target', polarity: -1 }, // R5 COVERED — high policy rate = tight
   { lane: 'borrowing-costs', id: 'fed-expectations', polarity: -1 }, // R6 PARTIAL → repaired at P1 (D-2 threshold)
   { lane: 'borrowing-costs', id: 'ecb-dfr', polarity: -1 }, // R10's ECB leg
-  // ——— The dollar (5): STRONG is the headwind (gold is priced in USD); a
+  { lane: 'borrowing-costs', id: 'real-yield-5y', polarity: -1 }, // GF-P3 (the standing delegation): R2 MISSING-FREE → promote (§4 rank 19 — the 5y real yield, the belly where policy bites first; the real-yield-10y's twin. Owner-gated through the MEASURED POST-P3-5LANE scenario — the F2 precedent: the harness seat and the production seat agree by construction. Unlocks D-11/D-12's derived real curve — the sign question is a DECISION LIST item, never seated silently)
+  // ——— The dollar (7): STRONG is the headwind (gold is priced in USD); a
   // ——— dollar under STRESS (falling/low) is the tailwind. GF-P2 adds the
   // ——— COBD pair (the owner's recorded C + K: D5 and G4, OI-GA-3's
-  // ——— territory — §4 rows 13 and 18).
+  // ——— territory — §4 rows 13 and 18). GF-P3: the trade-weighted dollar
+  // ——— pair (D2 broad + D9 EME) seated — 5 → 7.
   { lane: 'dollar', id: 'dollar-basket', polarity: -1 }, // D1 COVERED
   { lane: 'dollar', id: 'usdjpy', polarity: -1 }, // D4 PARTIAL → repaired at P1 (D-3 threshold) — the funding currency
   { lane: 'dollar', id: 'us-japan-10y-gap', polarity: -1 }, // R10 PARTIAL → repaired at P1 (D-6 persistence) — carry fuel, dollar-positive
   { lane: 'dollar', id: 'usd-reserve-share', polarity: -1 }, // GF-P2 (C): D5 ★ COBD → promote (§4 rank 13 — a rising USD reserve share = headwind, the dedollarisation inverse; the classic long-run channel)
   { lane: 'dollar', id: 'nyfed-custody', polarity: -1 }, // GF-P2 (K): G4 ★ COBD → promote (§4 rank 18 — rising foreign custody = dollar-asset demand = headwind, the D5 pairing)
-  // ——— Market stress (10): ELEVATED usually supports gold (the safe-haven
+  { lane: 'dollar', id: 'dollar-broad', polarity: -1 }, // GF-P3 (the standing delegation): D2 MISSING-FREE → promote (§4 rank 20 — the broad trade-weighted dollar, "the honest inverse"; the dollar-basket's own family. Owner-gated through the MEASURED POST-P3-5LANE scenario — the F2 precedent)
+  { lane: 'dollar', id: 'dollar-eme', polarity: -1 }, // GF-P3 (the standing delegation): D9 MISSING-FREE → promote (§4 rank 21 — the EME dollar, the marginal buyer's leg; the dollar-basket's EME complement. Owner-gated through the MEASURED POST-P3-5LANE scenario — the F2 precedent)
+  // ——— Market stress (11): ELEVATED usually supports gold (the safe-haven
   // ——— bid); CALM removes it. GF-P2: the six zero-new-fetch stress
   // ——— promotions (the owner's recorded K; §4 rows 6/7/10/11/15) + S6
   // ——— (C, §4 rank 17); cftc LEAVES for the new flows lane (B, D-14).
+  // ——— GF-P3: S9's bank-facility rate seated — 10 → 11.
   { lane: 'stress', id: 'stress-stlfsi', polarity: 1 }, // S5 COVERED
   { lane: 'stress', id: 'nfci', polarity: 1 }, // S5 COVERED
   { lane: 'stress', id: 'vix', polarity: 1 }, // S1 COVERED
@@ -218,6 +239,7 @@ export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
   { lane: 'stress', id: 'gpr-daily', polarity: 1 }, // GF-P2 (K): S7 → promote the DAILY object (§4 rank 11 — the event-risk channel; the owner's object choice: the monthly gpr-index alternative fires 1114 vs the daily's 1316)
   { lane: 'stress', id: 'epu-us', polarity: 1 }, // GF-P2 (K): S8 MISSING-FREE → promote (§4 rank 15 — regime uncertainty raises the hedging premium; the tpu-us alternative fires 1259 — a one-seat swap recorded as the alternative)
   { lane: 'stress', id: 'sp500-breadth-ratio', polarity: -1 }, // GF-P2 (C): S6 ★ COBD → promote (§4 rank 17 — falling breadth = risk-off = the tailwind side; one-directional and measured)
+  { lane: 'stress', id: 'bank-stress', polarity: 1 }, // GF-P3 (the standing delegation): S9 MISSING-FREE → promote (§4 rank 28 — the 30d commercial paper rate, "the modern bank-run tell"; a spike = the classic stress signal (2008/2020). Owner-gated through the MEASURED POST-P3-5LANE scenario — the F2 precedent)
   // ——— Inflation (9): RUNNING HOT usually supports the hedge demand.
   // ——— GF-P2: the four promotions (the owner's recorded K; §4 rows 8/9/16 + I7).
   { lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 }, // I1 COVERED

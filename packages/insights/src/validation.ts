@@ -700,6 +700,10 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'philly-fed',
   'rba-expectations',
   'real-yield-10y',
+  // GF-P3 (2026-11-06, the standing delegation — §4 rank 19 / R2): the 5y
+  // real yield — a rate-family series in percentage points, the real-yield-
+  // 10y's twin (the belly where policy bites first).
+  'real-yield-5y',
   'us10y',
   'fed-target',
   'ecb-dfr',
@@ -768,6 +772,12 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // 'pct' — the walcl convention.
   'term-premium-10y',
   'repo-stress',
+  // GF-P3 (2026-11-06, the standing delegation — §4 rank 28 / S9): the
+  // commercial paper rate — a rate-family series in percentage points, the
+  // repo-stress/sofr family (the 30d nonfinancial commercial paper rate,
+  // the modern bank-run tell). Polarity +1 (rising = stress = gold-
+  // positive), but the units are rate-points regardless of polarity.
+  'bank-stress',
   // gap-closure S3-M3.3 (2026-11-01): the excess bond premium — a
   // spread in percentage points, the repo-stress family (a premium
   // built from corporate yields minus expected default losses).
@@ -809,6 +819,22 @@ const INDEX_POINT_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'china-pmi',
   'gold-silver',
   'dollar-basket',
+  // GF-P3 (2026-11-06, the standing delegation — §4 ranks 20 and 21 / D2
+  // and D9): the trade-weighted dollar pair — index/ratio series in index
+  // points (the dollar-basket's own family), the broad (DTWEXBGS, "the
+  // honest inverse") + the EME twin (DTWEXEMEGS, "the marginal buyer's
+  // leg"). Their changes are index points (a 130 → 128 broad dollar is
+  // −2 index points), never percents.
+  'dollar-broad',
+  'dollar-eme',
+  // GF-P3 (2026-11-06, OI-GA-4's recorded context-first answer — §4 ranks
+  // 24/25/26 / F3/F4/F13): the WGC/official-flows family — COUNTED
+  // QUANTITIES in tonnes (a tonnes level's changes are tonne differences,
+  // never percents), the us-nfp/chokepoint count family. Context cards
+  // (rule: info — never vote); the units discipline applies regardless.
+  'wgc-etf-holdings',
+  'wgc-cb-demand',
+  'official-gold-demand',
   // Step 3 L1-14 (v3, 2026-10-20): the Shiller pair — CAPE is a ratio
   // (like gold-silver); the ECY is a yield-gap measure in points.
   'shiller-cape',

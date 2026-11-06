@@ -45,6 +45,11 @@ export const GAUGES: readonly GaugeDef[] = [
     section: 'global',
     // Fix spec C-03/C-04 (2026-10-14): the Fed-expectations gap and the
     // 30-year yield join the voters (both scored rate series).
+    // GF-P3 (2026-11-06, the standing delegation — audit report §4 rank 19
+    // / R2): real-yield-5y joins beside its 10y twin (the same DFII family,
+    // the belly where policy bites first; the gold meter's borrowing-costs
+    // lane carries both, the question gauge scores both — the real-rate
+    // read at its richest).
     members: [
       'yield-curve-10y2y',
       // 2026-10-26 gap-audit build, A-1: the 10y−3m leg joins the voters —
@@ -52,6 +57,11 @@ export const GAUGES: readonly GaugeDef[] = [
       'yield-curve-10y3m',
       'fed-expectations',
       'real-yield-10y',
+      // GF-P3 (2026-11-06, §4 rank 19 / R2 — the standing delegation): the
+      // 5y real yield, the real-yield-10y's twin (the belly where policy
+      // bites first). Owner-gated through the MEASURED POST-P3-5LANE
+      // scenario — the F2 precedent.
+      'real-yield-5y',
       'us10y',
       'us30y',
       'fed-target',
@@ -81,17 +91,28 @@ export const GAUGES: readonly GaugeDef[] = [
   // row 12 / F2): the GROSS-long twin joins beside the net seat (the same
   // deafut.txt row; the gold meter's flows lane carries both, the question
   // gauge scores both — the crowded-book read at its richest).
+  // GF-P3 (2026-11-06, the standing delegation — audit report §4 rank 28
+  // / S9): bank-stress joins beside the STLFSI/NFCI pair (the 30d
+  // commercial paper rate, "the modern bank-run tell"; the gold meter's
+  // stress lane carries it, the question gauge scores it — the funding-
+  // stress read at its richest).
   {
     id: 'market-stress',
     section: 'global',
-    members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver', 'cftc-gold-positioning', 'cftc-gold-gross-long'],
+    members: ['stress-stlfsi', 'nfci', 'vix', 'gold-silver', 'cftc-gold-positioning', 'cftc-gold-gross-long', 'bank-stress'],
   },
   // 2026-10-26 gap-audit build, A-3: the US−Japan 10y gap joins the
   // voters — the carry trade's fuel line beside USD/JPY.
+  // GF-P3 (2026-11-06, the standing delegation — audit report §4 ranks 20
+  // and 21 / D2 and D9): the trade-weighted dollar pair joins beside the
+  // basket — the broad (DTWEXBGS, "the honest inverse") + the EME twin
+  // (DTWEXEMEGS, "the marginal buyer's leg"); the gold meter's dollar
+  // lane carries both, the question gauge scores both — the dollar read
+  // at its richest.
   {
     id: 'dollar-strength',
     section: 'global',
-    members: ['dollar-basket', 'usdjpy', 'us-japan-10y-gap'],
+    members: ['dollar-basket', 'dollar-broad', 'dollar-eme', 'usdjpy', 'us-japan-10y-gap'],
   },
   // Step-2 add-list §B3/§B4: US unemployment and the Sahm rule join the
   // growth-health voters, next to the US macro series already there.

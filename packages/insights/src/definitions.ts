@@ -1891,7 +1891,10 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P3',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
-    staleAfterDays: 4,
+    // DTWEXBGS lags ~5 days upstream (FRED publishes with a delay); the 10-day
+    // window keeps the card fresh within the publication lag (the asOf date
+    // honest — the card shows the latest available point with its true date).
+    staleAfterDays: 10,
   },
   {
     // GF-P3 (2026-11-06, the new free sources — audit report §4 rank 21,
@@ -1912,7 +1915,9 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     changeKind: 'points',
     phase: 'P3',
     rule: { kind: 'percentile', tail: 'high', cutoff: 0.1 },
-    staleAfterDays: 4,
+    // DTWEXEMEGS lags ~5 days upstream (same publication cadence as DTWEXBGS);
+    // the 10-day window keeps the card fresh within the lag.
+    staleAfterDays: 10,
   },
   {
     // 2026-10-26 gap-audit build, A-3 (INSIGHTS_DATA_SPEC.md): the
@@ -1992,6 +1997,85 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     phase: 'P2',
     rule: { kind: 'info' },
     staleAfterDays: 4,
+  },
+  {
+    // GF-P3 (2026-11-06, the WGC/official-flows family — audit report
+    // §4 rank 24 / F3, OI-GA-4's recorded context-first answer): the
+    // Western investor bid — how many tonnes the world's gold-backed
+    // ETFs hold. A CONTEXT CARD (rule: info — never votes; the tonnes
+    // say nothing about price direction, they read the structural bid
+    // only). The promotion criteria (annualised-level extreme bands —
+    // the 2022-2024 drawdown vs the decade norm) ride the card's own
+    // percentile history once the card exists; the seat question re-
+    // opens only on the owner's recorded go, revisit-able then. WGC's
+    // monthly ETF holdings table (XLSX, free for research/reference
+    // with attribution — L1; the data adapter lands with the card).
+    // The group is 'market-stress' (the cftc-gold-gross-long precedent
+    // — the gold-flows family rides the question-gauge's stress lane;
+    // the gold meter's flows LANE is a separate re-cut of the same
+    // members). NOT a gauge member (rule: info — context cards never
+    // join a scored gauge, the usdchf/eur-usd precedent).
+    id: 'wgc-etf-holdings',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Gold ETF holdings',
+    source: 'wgc',
+    sourceRef: 'WGC monthly ETF holdings table (tonnes)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 45,
+  },
+  {
+    // GF-P3 (2026-11-06, the WGC/official-flows family — audit report
+    // §4 rank 25 / F4, OI-GA-4's recorded context-first answer): the
+    // 2022-2026 regime driver — how many tonnes central banks bought
+    // (quarterly). A CONTEXT CARD (rule: info — never votes; the
+    // tonnes read the structural regime, never a price direction). The
+    // promotion criteria (annualised-level extreme bands) ride the
+    // card's own percentile history once the card exists; the seat
+    // question stays recorded-open, revisit-able then. WGC's Gold
+    // Demand Trends quarterly tonnage table (XLSX, free for
+    // research/reference with attribution — L1; the data adapter lands
+    // with the card). Same group discipline as F3 above
+    // ('market-stress', NOT a gauge member).
+    id: 'wgc-cb-demand',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Central bank gold demand',
+    source: 'wgc',
+    sourceRef: 'WGC Gold Demand Trends quarterly (tonnes)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 100,
+  },
+  {
+    // GF-P3 (2026-11-06, the WGC/official-flows family — audit report
+    // §4 rank 26 / F13, OI-GA-4's recorded context-first answer): F4's
+    // monthly twin — the official-sector gold purchases from PBoC/SAFE
+    // monthly reserves + CBR (tonnes). A CONTEXT CARD (rule: info —
+    // never votes; the tonnes read the official-sector bid, never a
+    // price direction). The promotion criteria (annualised-level
+    // extreme bands) ride the card's own percentile history once the
+    // card exists; the seat question stays recorded-open, revisit-able
+    // then. PBoC's monthly official-reserve / gold-purchase tables
+    // (free official site — L1; the data adapter lands with the card).
+    // Same group discipline as F3/F4 above ('market-stress', NOT a
+    // gauge member).
+    id: 'official-gold-demand',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Official-sector gold demand',
+    source: 'pboc',
+    sourceRef: 'PBoC/SAFE monthly reserves table + CBR (tonnes)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P3',
+    rule: { kind: 'info' },
+    staleAfterDays: 45,
   },
   /* ---------------- Global — Is growth healthy? ---------------- */
   {

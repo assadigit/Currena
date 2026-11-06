@@ -87,19 +87,23 @@ describe('the lane tables — MIN2 / MIN1 beside the frozen voter tables', () =>
     expect(HARNESS_GOLD_LANES_MIN1.voters).toBe(HARNESS_GOLD_VOTERS_21);
     expect(HARNESS_GOLD_LANES_MIN1.minFiring).toBe(1);
   });
-  it('the lineage snapshots keep their recorded shapes (21 · 8/3/5/5 · 20); production is GF-P2\'s 32 · 6/5/10/9/2 (the measured POST-P2-5LANE composition)', () => {
+  it('the lineage snapshots keep their recorded shapes (21 · 8/3/5/5 · 20); production is GF-P3\'s 36 · 7/7/11/9/2 (the measured POST-P3-5LANE composition)', () => {
     const counts21: Record<string, number> = {};
     for (const v of HARNESS_GOLD_VOTERS_21) counts21[v.lane] = (counts21[v.lane] ?? 0) + 1;
     expect(counts21).toEqual({ 'borrowing-costs': 8, dollar: 3, stress: 5, inflation: 5 });
     expect(HARNESS_GOLD_VOTERS_21).toHaveLength(21);
     expect(HARNESS_GOLD_VOTERS_20).toHaveLength(20);
     // GF-P2 (the owner's recorded answers B/C/K, 2026-11-05): the production
-    // table is the measured POST-P2-5LANE composition — 32 seats over five
-    // lanes (evidence/gf-p0-calibration-2026-11-05.md §7).
+    // table was the measured POST-P2-5LANE composition — 32 seats over five
+    // lanes (evidence/gf-p0-calibration-2026-11-05.md §7). GF-P3 (the
+    // standing delegation, 2026-11-06): the four FRED-sourced voter-
+    // candidates seated (R2/D2/D9/S9) → the measured POST-P3-5LANE
+    // composition — 36 seats over five lanes (7/7/11/9/2; the same
+    // evidence file's new POST-P3-5LANE rows).
     const countsProd: Record<string, number> = {};
     for (const v of GOLD_LANE_VOTERS) countsProd[v.lane] = (countsProd[v.lane] ?? 0) + 1;
-    expect(GOLD_LANE_VOTERS).toHaveLength(32);
-    expect(countsProd).toEqual({ 'borrowing-costs': 6, dollar: 5, stress: 10, inflation: 9, flows: 2 });
+    expect(GOLD_LANE_VOTERS).toHaveLength(36);
+    expect(countsProd).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 9, flows: 2 });
   });
 });
 
