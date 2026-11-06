@@ -3311,6 +3311,160 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'Read it beside USD/JPY and the gold cards: the franc and the yen are the two ends of the haven trade, and gold usually trades with the same bid.',
   },
+  // ---- GF-P3 (2026-11-06, the new free sources): the seven free-source
+  //      indicators added to the enum this round — real-yield-5y, dollar-broad,
+  //      dollar-eme, bank-stress (voters) + wgc-etf-holdings, wgc-cb-demand,
+  //      official-gold-demand (context cards; rule: info, never votes). ----
+  'real-yield-5y': {
+    name: 'US 5-year interest after inflation',
+    oneLiner:
+      'What 5-year US government bonds pay after inflation: the “real” return at the belly of the curve, where policy bites first.',
+    lines: {
+      highRising:
+        'Real yields at the 5-year belly are high and rising: the setting that usually tightens conditions for borrowers and riskier assets.',
+      highEasing:
+        'Real yields are high but easing at the 5-year: a little relief for borrowers, if it lasts.',
+      typical: '5-year real yields sit in their usual range: balanced between savers and borrowers.',
+      low: '5-year real yields are low: the setting where holding “safe” money earns little after inflation.',
+    },
+    whatItIs:
+      'The market yield on 5-year US inflation-protected Treasuries (FRED’s DFII5): the return lenders demand after inflation, at the medium-term belly of the curve.',
+    whyItMatters:
+      'The 5-year is the belly where monetary policy bites first: it leads the 10-year in reflecting the real cost of money, and has sat at historic highs since 2023.',
+    tendedToMean:
+      'Rising 5-year real yields usually mark the early stage of tighter financial conditions; the negative real yields of the 2010s did the opposite for a decade.',
+    cantTell:
+      'It prices one point on the curve: not the whole economy, and not future returns on anything.',
+    forYou:
+      'A dial for how attractive “safe” money is at the medium term: high real yields generally mean tighter conditions for borrowers and asset prices.',
+  },
+  'dollar-broad': {
+    name: 'The dollar vs 26 currencies',
+    oneLiner:
+      'The Fed’s broad trade-weighted dollar index: the dollar’s average value against 26 trading partners, “the honest inverse” of gold.',
+    lines: {
+      highRising: 'The broad dollar is strong and strengthening: a mix that usually pressures world prices and debts.',
+      highEasing: 'The broad dollar is strong but easing: pressure on world markets slowly lifting.',
+      typical: 'The broad dollar sits in its usual range for the decade.',
+      low: 'The broad dollar is weak by recent standards: usually easier conditions for world trade and debts.',
+    },
+    whatItIs:
+      'The Fed’s Broad Trade-Weighted Dollar Index (FRED’s DTWEXBGS): a weighted average of the dollar against 26 currencies, including the major and emerging-market partners the official DXY leaves out.',
+    whyItMatters:
+      'A rising broad dollar has historically been a gold headwind: it tightens conditions for nearly everyone and prices commodities in dearer terms worldwide.',
+    tendedToMean:
+      'Broad-dollar surges have coincided with global stress episodes, 2008 and 2022 among them; weak stretches usually meant easier world money.',
+    cantTell:
+      'It is an index, not an exchange rate: it names no single pair, and its level says nothing about what to do.',
+    forYou:
+      'The honest inverse of gold: a sustained strong broad dollar tends to pressure commodity prices and the marginal gold buyer’s funding.',
+  },
+  'dollar-eme': {
+    name: 'The dollar vs emerging-market currencies',
+    oneLiner:
+      'The Fed’s emerging-market dollar index: the dollar’s value against the currencies of the marginal gold buyer.',
+    lines: {
+      highRising: 'The EME dollar is strong and strengthening: the setting that usually tightens the marginal gold buyer’s funding.',
+      highEasing: 'The EME dollar is strong but easing: pressure on emerging-market buyers slowly lifting.',
+      typical: 'The EME dollar sits in its usual range for the decade.',
+      low: 'The EME dollar is weak by recent standards: usually easier funding for emerging-market buyers.',
+    },
+    whatItIs:
+      'The Fed’s Emerging Market Economies Trade-Weighted Dollar Index (FRED’s DTWEXEMEGS): a weighted average of the dollar against the currencies of major emerging-market trading partners.',
+    whyItMatters:
+      'The EME dollar tracks the leg that actually buys gold at the margin: a stronger EME dollar tightens the funding of the world’s biggest physical-gold demand bloc.',
+    tendedToMean:
+      'EME-dollar surges have lined up with stress in emerging-market gold demand; soft stretches usually meant easier local-currency buying power.',
+    cantTell:
+      'It is an index, not a single exchange rate: it aggregates many EME currencies, and the marginal buyer’s mix shifts over time.',
+    forYou:
+      'The marginal buyer’s leg of the dollar story: a sustained strong EME dollar tends to pressure the demand side of the gold market.',
+  },
+  'bank-stress': {
+    name: 'Short-term bank borrowing rate',
+    oneLiner:
+      'The 30-day commercial paper rate: what top US companies pay for very short cash, the modern bank-run tell.',
+    lines: {
+      highRising:
+        'The commercial paper rate is high and rising for its decade: the setting that usually marks funding stress in the banking system.',
+      highEasing: 'The rate is elevated but easing: stress repairing rather than panic.',
+      typical: 'The commercial paper rate sits in its usual range: the market plumbing working normally.',
+      low: 'The rate is low by recent standards: usually easy conditions for short-term funding.',
+    },
+    whatItIs:
+      'The 30-day nonfinancial commercial paper rate (FRED’s DPCREDIT): what top-tier US companies pay to borrow cash for a month, straight from the money market.',
+    whyItMatters:
+      'It is the modern bank-run tell: a spike here marked 2008 and the 2020 COVID shock, when short-term funding dried up and the Fed had to step in.',
+    tendedToMean:
+      'Sharp spikes have preceded or coincided with banking stress episodes; calm stretches sit in low single digits, where the plumbing works.',
+    cantTell:
+      'It measures one corner of short-term funding: not the whole banking system, and not future stress.',
+    forYou:
+      'A dial for short-term funding stress: a sharp rise here usually means the banking system’s plumbing is worth watching, never a signal to act on alone.',
+  },
+  'wgc-etf-holdings': {
+    name: 'Gold held by exchange-traded funds',
+    oneLiner:
+      'How much gold the world’s gold-backed ETFs hold, in tonnes: a read on the Western investor bid.',
+    lines: {
+      highRising: 'ETF holdings are building: Western investor demand is adding to the market.',
+      highEasing: 'ETF holdings remain elevated but are easing back.',
+      typical: 'ETF holdings sit in their usual range for the decade.',
+      low: 'ETF holdings are low for their decade: a quiet Western investor bid.',
+    },
+    whatItIs:
+      'Total gold held by the world’s gold-backed exchange-traded funds, in tonnes, published monthly by the World Gold Council.',
+    whyItMatters:
+      'ETF gold is the Western investor leg of the market: a clean read on whether investment demand is growing or shrinking, separate from central-bank and jewellery demand.',
+    tendedToMean:
+      'ETF holdings rose sharply through the 2010s and peaked in 2020; the 2022–2025 stretch saw Western investors trim while central banks and EM buyers stepped in.',
+    cantTell:
+      'A context card: information-only, voting in no gauge. Tonnes held say nothing about price direction, and the data lands monthly with a lag.',
+    forYou:
+      'Background on who is buying gold: a rising line means the Western investor bid is back; a falling line means that leg is absent, whatever the price does.',
+  },
+  'wgc-cb-demand': {
+    name: 'Central-bank gold purchases',
+    oneLiner:
+      'How much gold central banks bought, in tonnes: the 2022–2026 regime driver for the gold market.',
+    lines: {
+      highRising: 'Central-bank purchases are running above their decade norm: the post-2022 regime in official-sector demand.',
+      highEasing: 'Purchases remain elevated but are easing back from their peaks.',
+      typical: 'Central-bank purchases sit in their usual range for the decade.',
+      low: 'Central-bank purchases are low for their decade: a quieter official-sector bid.',
+    },
+    whatItIs:
+      'Net gold bought by the world’s central banks, in tonnes per quarter, published by the World Gold Council from reported and estimated reserves.',
+    whyItMatters:
+      'Central-bank demand is the structural shift behind the 2022–2026 gold regime: a price-insensitive buyer that emerged after the freezing of Russian reserves, and has not gone away.',
+    tendedToMean:
+      'Annual central-bank purchases ran near 400–500 tonnes for years, then roughly doubled after 2022; the bulk has come from a small group of EM central banks.',
+    cantTell:
+      'A context card: information-only, voting in no gauge. Quarterly data lands with a lag, and reported figures understate unreported purchases.',
+    forYou:
+      'Background on the structural bid under the gold price: a strong reading means the official-sector buyer is still there; a weak one means that leg is fading.',
+  },
+  'official-gold-demand': {
+    name: 'Official-sector gold purchases (monthly)',
+    oneLiner:
+      'Monthly official-sector gold purchases, in tonnes: the monthly twin of the WGC quarterly read.',
+    lines: {
+      highRising: 'Official-sector purchases are running above their recent norm: the post-2022 regime in official-sector demand.',
+      highEasing: 'Purchases remain elevated but are easing back.',
+      typical: 'Official-sector purchases sit in their usual monthly range.',
+      low: 'Official-sector purchases are low for their recent range: a quieter official bid.',
+    },
+    whatItIs:
+      'Monthly net gold bought by the official sector, in tonnes, compiled from PBoC/SAFE and CBR reserve updates, the largest reported buyers.',
+    whyItMatters:
+      'It is the monthly update to the WGC’s quarterly central-bank read: a higher-frequency view of the 2022–2026 regime driver, led by China and Russia.',
+    tendedToMean:
+      'Reported monthly purchases have clustered around a few large buyers since 2022; many purchases go unreported, so the figure is a floor, not a total.',
+    cantTell:
+      'A context card: information-only, voting in no gauge. It tracks reported buyers only, and a quiet month can mean a pause or an unreported purchase.',
+    forYou:
+      'A monthly read on the official-sector bid: a strong reading means the structural buyer is still there; a quiet one means the data is, not necessarily the demand.',
+  },
   // ---- M6 Wave 3 (2026-10-25): the leading-edge batch (recovered from the deployed bundle) ----
   'mortgage-30y': {
     name: 'The US 30-year home-loan rate',

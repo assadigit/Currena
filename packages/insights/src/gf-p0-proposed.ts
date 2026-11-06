@@ -327,6 +327,84 @@ export const GF_VOTERS_5LANE: readonly GfVoter[] = [
 ];
 
 /* ------------------------------------------------------------------ *
+ * GF-P3 — the new free sources (the audit report §4 ranks 19–22, 28;
+ * the FRED-sourced voter-candidates). The D-GF-6 recalibration measures
+ * this composition over the extended candidates fixture (the four FRED
+ * series recorded by scripts/gf-p3-record-candidates.ts) BEFORE any
+ * production seat counts. The seats ride the standing delegation ("go
+ * full autonomously") through the MEASURED scenario — the F2 precedent:
+ * the harness seat and the production seat agree by construction.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The GF-P3 proposed move thresholds — the four FRED-sourced seats'
+ * 30-day move legs. The values are PROPOSED from the existing threshold
+ * families (the D-1 derivation's own anchors — the same units, the same
+ * classic-literature band); the calibration measures the POST-P3-5LANE
+ * scenario with these values, and the owner-gated seating carries them
+ * into the production `SIGNAL_LEG_MOVE` (the D-1 derivation for the P3
+ * seats is a recorded-open refinement — revisit-able once the corpus
+ * distribution walk re-runs over the new series, exactly as P1's five
+ * were derived; the measured firing shares land in the calibration
+ * report's §4).
+ *
+ *  - `real-yield-5y` (R2, rank 19): 0.10 points — the real-yield-10y's
+ *    own threshold (the 5y is the same family, the same units, the belly
+ *    where policy bites first);
+ *  - `dollar-broad` (D2, rank 20): 1.0 pct — the dollar-basket's own
+ *    threshold (the broad trade-weighted index is the same family, the
+ *    "honest inverse");
+ *  - `dollar-eme` (D9, rank 21): 1.0 pct — the EME dollar's threshold
+ *    (the marginal buyer's leg, the same index units);
+ *  - `bank-stress` (S9, rank 28): 0.10 points — a rate-level move
+ *    threshold (DPCREDIT is a weekly facility rate; 0.10 pts is the
+ *    t5yie/fed-expectations band — the same rate-move family).
+ */
+export const GF_MOVE_P3_PROPOSED: Readonly<Partial<Record<IndicatorId, number>>> = {
+  'real-yield-5y': 0.1, // points (R2) — the real-yield-10y's threshold family
+  'dollar-broad': 1.0, // pct (D2) — the dollar-basket's threshold family
+  'dollar-eme': 1.0, // pct (D9) — the dollar-basket's threshold family
+  'bank-stress': 0.1, // points (S9) — the rate-move threshold family
+};
+
+/**
+ * The proposed post-P3 voter set — the 5-LANE table extended with the
+ * four FRED-sourced voter-candidates (the audit report §4 ranks 19–21,
+ * 28): the 32-seat POST-P2-5LANE composition + R2 (the 5y real yield,
+ * borrowing-costs — the belly where policy bites first, the real-yield-10y's
+ * twin, polarity −1) + D2 (the trade-weighted dollar, the dollar lane —
+ * "the honest inverse", polarity −1) + D9 (the EME dollar, the dollar
+ * lane — the marginal buyer's leg, polarity −1) + S9 (the bank-facility
+ * usage, the stress lane — the modern bank-run tell, polarity +1). The
+ * composition is 36 seats: borrowing-costs 7 · dollar 7 · stress 11 ·
+ * inflation 9 · flows 2.
+ *
+ * The D-11/D-12 derived real curve (the 10y−5y real-yield slope, unlocked
+ * by R2's fill) is NOT seated here — the sign question it re-opens (the
+ * D-7/D-8 yield-curve polarity, recorded-open since P1's context demotion)
+ * is a DECISION LIST item: both sign variants are measured in the
+ * calibration (the POST-P3-5LANE-REALCURVE-± scenarios), the question is
+ * printed for the owner, never seated silently. The real-curve CARD lands
+ * as a context card (rule: info) — the slope displays as context; the
+ * sign is the owner's to call.
+ *
+ * The WGC/official flows family (F3/F4/F13, ranks 24–26) lands as CONTEXT
+ * cards per OI-GA-4's recorded answer — they need NO calibration
+ * measurement (rule: info, never votes) and so are NOT in this table.
+ * F6/F7 (the derived premia) + I4/I9 (the UoM/nowcast objects) are GF-S10's
+ * — recorded-open, never silently added.
+ */
+export const GF_VOTERS_P3_5LANE: readonly GfVoter[] = [
+  ...GF_VOTERS_5LANE,
+  // ——— GF-P3 (the four FRED-sourced voter-candidates; the §4 rank cited
+  // ——— per seat, the owner-gated seating riding the measured scenario)
+  { lane: 'borrowing-costs', id: 'real-yield-5y', polarity: -1 }, // R2 (rank 19) — the 5y real yield, the real-yield-10y's twin (rising real yields = headwind)
+  { lane: 'dollar', id: 'dollar-broad', polarity: -1 }, // D2 (rank 20) — the trade-weighted dollar, "the honest inverse" (rising = headwind)
+  { lane: 'dollar', id: 'dollar-eme', polarity: -1 }, // D9 (rank 21) — the EME dollar, the marginal buyer's leg (rising = headwind)
+  { lane: 'stress', id: 'bank-stress', polarity: 1 }, // S9 (rank 28) — the bank-facility usage, the modern bank-run tell (rising = stress = gold-positive)
+];
+
+/* ------------------------------------------------------------------ *
  * gfEvalLeg — the threshold-parameterized evaluator copy
  * ------------------------------------------------------------------ */
 
@@ -750,6 +828,18 @@ export interface GfScenario {
  *    GF-P2 as the production composition, modulo the F2 seat's recorded
  *    id mapping: the scenario seat `gf-f2-gross-long-share` ↔ the
  *    production seat `cftc-gold-gross-long`, the F2 design decision).
+ *  - **POST-P3-5LANE** — the new free sources (GF-S9, 2026-11-06): the
+ *    four FRED-sourced voter-candidates (R2 real-yield-5y · D2
+ *    dollar-broad · D9 dollar-eme · S9 bank-stress) seated beside the
+ *    32-seat POST-P2-5LANE composition → 36 seats (7/7/11/9/2). The
+ *    candidates' histories recorded by `scripts/gf-p3-record-candidates.ts`
+ *    (the four FRED series fresh-fetched keyless; the fixture extended
+ *    in-place, the existing 16 series preserved). The thresholds proposed
+ *    from the existing families (`GF_MOVE_P3_PROPOSED`); the D-1
+ *    derivation for the P3 seats is a recorded-open refinement. The
+ *    D-11/D-12 real-curve sign question re-opens with R2's fill — both
+ *    sign variants measured beside (the decision-list item, never seated
+ *    silently).
  *
  * Each scenario runs under BOTH crowd rules (MIN2 = D-GB-3's default —
  * re-affirmed by the owner's recorded answer A, GF-S7 2026-11-05: keep
@@ -778,6 +868,19 @@ export function gfScenarios(): GfScenario[] {
     push('POST-P1-DEMOTE', GF_LANES_4, p1DemoteVoters, gfMoveMapWith(GF_MOVE_P1_PROPOSED), true, minFiring);
     push('POST-P2-4LANE', GF_LANES_4, GF_VOTERS_P2_4LANE, gfMoveMapWith(GF_MOVE_P1_PROPOSED), true, minFiring);
     push('POST-P2-5LANE', GF_LANES_5, GF_VOTERS_5LANE, gfMoveMapWith(GF_MOVE_P1_PROPOSED), true, minFiring);
+    // GF-P3 (GF-S9, 2026-11-06): the new free sources — the four FRED-sourced
+    // voter-candidates seated beside the 32-seat POST-P2-5LANE composition.
+    // The P3 thresholds merge into the P1 map (the frozen four + the executed
+    // five + the four proposed); the D-11/D-12 real-curve sign variants are
+    // measured beside (the decision-list item — see the P3 evidence).
+    push(
+      'POST-P3-5LANE',
+      GF_LANES_5,
+      GF_VOTERS_P3_5LANE,
+      gfMoveMapWith({ ...GF_MOVE_P1_PROPOSED, ...GF_MOVE_P3_PROPOSED } as Readonly<Partial<Record<IndicatorId, number>>>),
+      true,
+      minFiring,
+    );
   }
   return scenarios;
 }

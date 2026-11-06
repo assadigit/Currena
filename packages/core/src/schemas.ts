@@ -633,6 +633,21 @@ export const IndicatorIdSchema = z.enum([
   'treasury-auction-10y-indirect', // companion: the 10y auction's indirect share of accepted, INSIDE the 10y card
   'treasury-auction-30y', // FiscalData auctions_query: the latest 30y-family bid-to-cover @ auction date — context
   'treasury-auction-30y-indirect', // companion: the 30y auction's indirect share of accepted, INSIDE the 30y card
+  // ---- GF-P3 (2026-11-06, the new free sources — audit report §4 ranks
+  // 19–22, 24–28, 32–33; the owner's recorded standing delegation "go full
+  // autonomously"): the FRED-sourced voter-candidates (R2/D2/D9/S9) wired +
+  // seated owner-gated through the measured POST-P3-5LANE scenario (the F2
+  // precedent); the WGC/official flows family (F3/F4/F13) lands as CONTEXT
+  // cards per the recorded OI-GA-4 answer (rule: info, never votes; the
+  // promotion criteria — annualised-level extreme bands — recorded in each
+  // definition's comments, revisit-able once the cards exist).
+  'real-yield-5y', // R2 (rank 19): FRED DFII5 — the 5y real yield, the belly where policy bites first; unlocks D-11/D-12's derived real curve
+  'dollar-broad', // D2 (rank 20): FRED DTWEXBGS — the trade-weighted dollar ("the honest inverse")
+  'dollar-eme', // D9 (rank 21): FRED DTWEXEMEGS — the EME dollar (the marginal buyer's leg)
+  'bank-stress', // S9 (rank 28): FRED DPCREDIT — the bank-facility usage (the modern bank-run tell, weekly)
+  'wgc-etf-holdings', // F3 (rank 24): WGC monthly ETF holdings — the Western investor bid (CONTEXT card, OI-GA-4)
+  'wgc-cb-demand', // F4 (rank 25): WGC quarterly central-bank purchases — "the 2022–2026 regime driver" (CONTEXT card, OI-GA-4)
+  'official-gold-demand', // F13 (rank 26): PBoC/SAFE + CBR official-sector monthly purchases — F4's monthly twin (CONTEXT card, OI-GA-4)
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 
@@ -692,7 +707,7 @@ export const IndicatorCadenceSchema = z.enum([
 export type IndicatorCadence = z.infer<typeof IndicatorCadenceSchema>;
 
 /** Release wave (roadmap: P1 = first release, P2 = second wave). */
-export const IndicatorPhaseSchema = z.enum(['P1', 'P2']);
+export const IndicatorPhaseSchema = z.enum(['P1', 'P2', 'P3']);
 export type IndicatorPhase = z.infer<typeof IndicatorPhaseSchema>;
 
 /** Upstream provider of the indicator's series. */
@@ -767,6 +782,16 @@ export const IndicatorSourceSchema = z.enum([
   // the card (2026-10-21c owner round); the insights ingest no longer calls
   // EODHD. The id stays OUT of the enum; the markets worker's EODHD usage
   // (the world-markets board) lives in packages/insights/src/markets/.
+  // GF-P3 (2026-11-06): the WGC + PBoC/SAFE official-flows family — the
+  // context cards (F3/F4/F13, OI-GA-4's recorded context-first answer).
+  // WGC: the World Gold Council's own quarterly/monthly demand statistics
+  // (XLSX downloads, free for research/reference with attribution). PBoC:
+  // the People's Bank of China's monthly official-reserve / gold-purchase
+  // tables (free official site). Both L1 (free + attribution); the data
+  // adapters land with the cards (the promotion criteria — annualised-level
+  // extreme bands — recorded in each definition's comments).
+  'wgc',
+  'pboc',
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 
