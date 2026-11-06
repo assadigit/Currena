@@ -45,6 +45,9 @@ import {
   GF_VOTERS_P1_DEMOTE,
   GF_VOTERS_P2_4LANE,
   GF_VOTERS_P3_5LANE,
+  GF_VOTERS_P4_5LANE,
+  GF_VOTERS_REALCURVE_PLUS,
+  GF_VOTERS_REALCURVE_MINUS,
   gfCalibrationStats,
   gfEvalLeg,
   gfLaneBalance,
@@ -134,17 +137,21 @@ describe('the equivalence pins — the copies cannot drift from the engines', ()
     // GF-P2 (B — EXECUTED): the 32-seat POST-P2-5LANE composition WAS the
     // production table; GF-P3 (the standing delegation, 2026-11-06) seated
     // the four FRED-sourced voter-candidates beside it → 36 seats
-    // (7/7/11/9/2). The harness twin is GF_VOTERS_P3_5LANE.
-    expect(GOLD_LANE_VOTERS).toHaveLength(36);
+    // (7/7/11/9/2); GF-S10 (the standing delegation, 2026-11-06) seated the
+    // I4 household anchor beside those → 37 seats (7/7/11/10/2). The
+    // harness twin is GF_VOTERS_P4_5LANE.
+    expect(GOLD_LANE_VOTERS).toHaveLength(37);
     expect(GF_VOTERS_5LANE).toHaveLength(32); // the P2 snapshot stays unchanged
-    expect(GF_VOTERS_P3_5LANE).toHaveLength(36);
-    const scenarioMapped = GF_VOTERS_P3_5LANE.map((v) =>
+    expect(GF_VOTERS_P3_5LANE).toHaveLength(36); // the P3 snapshot stays unchanged
+    expect(GF_VOTERS_P4_5LANE).toHaveLength(37);
+    const scenarioMapped = GF_VOTERS_P4_5LANE.map((v) =>
       v.id === GF_F2_PROXY_ID ? { ...v, id: 'cftc-gold-gross-long' as const } : v,
     );
     // NOTE on order: the production GOLD_LANE_VOTERS interleaves the four
     // P3 voters BY LANE (real-yield-5y at the end of borrowing-costs, dollar-
     // broad + dollar-eme at the end of dollar, bank-stress at the end of
-    // stress); the harness GF_VOTERS_P3_5LANE APPENDS them after the P2
+    // stress) and the P4 anchor at the end of inflation; the harness
+    // GF_VOTERS_P4_5LANE APPENDS them after the P3
     // snapshot (the spread lineage discipline, the F2 precedent). The two
     // are the same SET modulo the F2 mapping — compared here sorted by
     // (lane, id) so the order difference (a harness convention, never a
@@ -154,7 +161,7 @@ describe('the equivalence pins — the copies cannot drift from the engines', ()
     expect([...scenarioMapped].sort(sortByLaneAndId)).toEqual([...GOLD_LANE_VOTERS].sort(sortByLaneAndId));
     // the mapping is EXACTLY one seat — the proxy id appears once, the real
     // id once, and nothing else differs.
-    expect(GF_VOTERS_P3_5LANE.filter((v) => v.id === GF_F2_PROXY_ID)).toHaveLength(1);
+    expect(GF_VOTERS_P4_5LANE.filter((v) => v.id === GF_F2_PROXY_ID)).toHaveLength(1);
     expect(GOLD_LANE_VOTERS.filter((v) => v.id === 'cftc-gold-gross-long')).toEqual([
       { lane: 'flows', id: 'cftc-gold-gross-long', polarity: -1 },
     ]);
@@ -272,8 +279,45 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
     ]);
   });
 
+  it('POST-P4-5LANE extends POST-P3-5LANE with the I4 household anchor (37 seats, 7/7/11/10/2 — the measured composition, the standing delegation); the real-curve sign twins extend P3 with the slope seat under BOTH polarities (the D-11/D-12 decision-list item — measured, never seated silently)', () => {
+    // GF-S10 (2026-11-06, the standing delegation): the ONE remaining P3
+    // voter-candidate the corpus can measure — I4, the UoM SIE 5–10y
+    // median (michigan-5y-expectations) — seated beside the 36. The P3
+    // snapshot stays unchanged; the P4 table is the P3 table + the anchor
+    // (the spread preserves the lineage, the F2 precedent). The real-curve
+    // twins are the sign question's measured halves: both polarities of
+    // the D-11/D-12 derived real-curve seat, measured beside, never
+    // seated silently.
+    const counts: Record<string, number> = {};
+    for (const v of GF_VOTERS_P4_5LANE) counts[v.lane] = (counts[v.lane] ?? 0) + 1;
+    expect(counts).toEqual({ 'borrowing-costs': 7, dollar: 7, stress: 11, inflation: 10, flows: 2 });
+    expect(GF_VOTERS_P4_5LANE).toHaveLength(37);
+    expect(GF_VOTERS_P4_5LANE.slice(0, GF_VOTERS_P3_5LANE.length)).toEqual(GF_VOTERS_P3_5LANE);
+    expect(GF_VOTERS_P4_5LANE.slice(GF_VOTERS_P3_5LANE.length)).toEqual([
+      { lane: 'inflation', id: 'michigan-5y-expectations', polarity: 1 }, // I4 (rank 32)
+    ]);
+    // The sign twins: 37 seats each, the slope seat in borrowing-costs.
+    expect(GF_VOTERS_REALCURVE_PLUS).toHaveLength(37);
+    expect(GF_VOTERS_REALCURVE_MINUS).toHaveLength(37);
+    expect(GF_VOTERS_REALCURVE_PLUS.slice(0, GF_VOTERS_P3_5LANE.length)).toEqual(GF_VOTERS_P3_5LANE);
+    expect(GF_VOTERS_REALCURVE_MINUS.slice(0, GF_VOTERS_P3_5LANE.length)).toEqual(GF_VOTERS_P3_5LANE);
+    expect(GF_VOTERS_REALCURVE_PLUS.slice(GF_VOTERS_P3_5LANE.length)).toEqual([
+      { lane: 'borrowing-costs', id: 'real-curve-10y5y', polarity: 1 },
+    ]);
+    expect(GF_VOTERS_REALCURVE_MINUS.slice(GF_VOTERS_P3_5LANE.length)).toEqual([
+      { lane: 'borrowing-costs', id: 'real-curve-10y5y', polarity: -1 },
+    ]);
+  });
+
   it('no table carries a duplicate seat; every polarity is ±1', () => {
-    for (const table of [GF_VOTERS_P2_4LANE, GF_VOTERS_5LANE, GF_VOTERS_P3_5LANE]) {
+    for (const table of [
+      GF_VOTERS_P2_4LANE,
+      GF_VOTERS_5LANE,
+      GF_VOTERS_P3_5LANE,
+      GF_VOTERS_P4_5LANE,
+      GF_VOTERS_REALCURVE_PLUS,
+      GF_VOTERS_REALCURVE_MINUS,
+    ]) {
       expect(new Set(table.map((v) => v.id)).size).toBe(table.length);
       for (const v of table) expect(Math.abs(v.polarity)).toBe(1);
     }
@@ -287,12 +331,25 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
     }
   });
 
-  it('the scenario family: 12 scenarios — 6 compositions × both crowd rules — the frozen basis only on FROZEN (the frozen 21-seat snapshot); POST-P3-5LANE joins as the sixth composition (GF-P3, the standing delegation)', () => {
+  it('the scenario family: 18 scenarios — 9 compositions × both crowd rules — the frozen basis only on FROZEN (the frozen 21-seat snapshot); POST-P3-5LANE joined as the sixth composition (GF-P3, the standing delegation); GF-S10 adds POST-P4-5LANE (the I4 household anchor) + the two real-curve sign twins (the D-11/D-12 decision-list item, measured beside — never seated silently)', () => {
     const scenarios = gfScenarios();
-    expect(scenarios).toHaveLength(12);
+    expect(scenarios).toHaveLength(18);
     for (const minFiring of [2, 1]) {
       const names = scenarios.filter((s) => s.minFiring === minFiring).map((s) => s.name.replace(/ \(MIN[12]\)$/, ''));
-      expect(names).toEqual(['FROZEN', 'POST-P1', 'POST-P1-DEMOTE', 'POST-P2-4LANE', 'POST-P2-5LANE', 'POST-P3-5LANE']);
+      expect(names).toEqual([
+        'FROZEN',
+        'POST-P1',
+        'POST-P1-DEMOTE',
+        'POST-P2-4LANE',
+        'POST-P2-5LANE',
+        'POST-P3-5LANE',
+        // GF-S10 (2026-11-06): the I4 household anchor's measured composition
+        // + the two D-11/D-12 real-curve sign twins (the decision-list item —
+        // measured in both variants, never seated silently).
+        'POST-P4-5LANE',
+        'POST-P3-5LANE-REALCURVE-PLUS',
+        'POST-P3-5LANE-REALCURVE-MINUS',
+      ]);
     }
     for (const s of scenarios) {
       expect(s.inputPresence).toBe(!s.name.startsWith('FROZEN'));
@@ -315,8 +372,27 @@ describe('the proposed voter tables — the shape the calibration relies on', ()
         // GF-P3 (the standing delegation, 2026-11-06): the four FRED-sourced
         // voter-candidates seated beside the 32-seat POST-P2-5LANE
         // composition → 36 seats (7/7/11/9/2); the thresholds merge with
-        // the P1 map (GF_MOVE_P3_PROPOSED).
+        // the P1 map (GF_MOVE_P3_PROPOSED). GF-S10's sign twins also start
+        // with this prefix — their voter tables are the twins', checked
+        // below; skip them here.
+        if (s.name.includes('REALCURVE')) continue;
         expect(s.voters).toBe(GF_VOTERS_P3_5LANE);
+        expect(s.lanes).toBe(GF_LANES_5);
+      }
+      if (s.name.startsWith('POST-P4-5LANE')) {
+        // GF-S10 (the standing delegation, 2026-11-06): the I4 household
+        // anchor seated beside the 36 → 37 seats (7/7/11/10/2); the same
+        // merged threshold map (the anchor is LEVEL-LEG ONLY — the I3
+        // precedent, no threshold enters).
+        expect(s.voters).toBe(GF_VOTERS_P4_5LANE);
+        expect(s.lanes).toBe(GF_LANES_5);
+      }
+      if (s.name.startsWith('POST-P3-5LANE-REALCURVE-PLUS')) {
+        expect(s.voters).toBe(GF_VOTERS_REALCURVE_PLUS);
+        expect(s.lanes).toBe(GF_LANES_5);
+      }
+      if (s.name.startsWith('POST-P3-5LANE-REALCURVE-MINUS')) {
+        expect(s.voters).toBe(GF_VOTERS_REALCURVE_MINUS);
         expect(s.lanes).toBe(GF_LANES_5);
       }
     }

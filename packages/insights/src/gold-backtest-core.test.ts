@@ -139,20 +139,23 @@ describe('the harness tables — the lineage snapshots (Session 6 → GF-P1 → 
     expect(HARNESS_GOLD_VOTERS_21.at(-1)).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
   });
 
-  it('production is the GF-P3 table: 36 voters (7/7/11/9/2), the tilt in the inflation lane, polarity +1', () => {
+  it('production is the GF-S10 table: 37 voters (7/7/11/10/2), the tilt in the inflation lane, polarity +1', () => {
     // GF-P2 (the owner's recorded answers B/C/K, 2026-11-05): the measured
     // POST-P2-5LANE composition (32 voters, 6/5/10/9/2). GF-P3 (the standing
     // delegation, 2026-11-06): the four FRED-sourced voter-candidates seated
     // (R2 real-yield-5y · D2 dollar-broad · D9 dollar-eme · S9 bank-stress)
-    // → the measured POST-P3-5LANE composition (36 voters, 7/7/11/9/2). The
+    // → the measured POST-P3-5LANE composition (36 voters, 7/7/11/9/2);
+    // GF-S10 (the standing delegation, 2026-11-06) seated the I4 household
+    // anchor (michigan-5y-expectations, the UoM SIE 5–10y median) → the
+    // measured POST-P4-5LANE composition (37 voters, 7/7/11/10/2). The
     // tilt seat keeps its recorded shape.
-    expect(GOLD_LANE_VOTERS).toHaveLength(36);
+    expect(GOLD_LANE_VOTERS).toHaveLength(37);
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
     expect(tilt).toHaveLength(1);
     expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });
   });
 
-  it('the PROMOTION DELTA PIN: production is the 19-seat P1-era table PLUS EXACTLY the GF-P2 + GF-P3 promotions (the owner\'s recorded B/C/K + the standing delegation — the flows re-seat, the COBD pair, the twelve P2 seats and the four P3 seats)', () => {
+  it('the PROMOTION DELTA PIN: production is the 19-seat P1-era table PLUS EXACTLY the GF-P2 + GF-P3 + GF-S10 promotions (the owner\'s recorded B/C/K + the standing delegation — the flows re-seat, the COBD pair, the twelve P2 seats, the four P3 seats and the I4 anchor)', () => {
     // The P1-era composition (the frozen 21 minus the two curve seats) plus
     // the P2 + P3 additions = production. The cftc seat MOVED from stress to
     // flows (D-14's repair) and the F2 real object joined it there; GF-P3
@@ -167,7 +170,7 @@ describe('the harness tables — the lineage snapshots (Session 6 → GF-P1 → 
     // The GF-P1 19 seats' lanes all survive into the 36 — except cftc's
     // re-seat (stress → flows, the owner's recorded B).
     const kept = GOLD_LANE_VOTERS.filter((v) => v.lane !== 'flows' && v.id !== 'cftc-gold-positioning');
-    expect(kept).toHaveLength(34); // 19 − cftc-reseat + the 12 P2 non-flows promotions + the 4 P3 non-flows promotions
+    expect(kept).toHaveLength(35); // 19 − cftc-reseat + the 12 P2 non-flows promotions + the 4 P3 non-flows promotions + the 1 P4 (I4 michigan-5y-expectations)
     for (const v of GF_VOTERS_P1_DEMOTE) {
       if (v.id === 'cftc-gold-positioning') continue;
       const match = kept.find((x) => x.id === v.id);

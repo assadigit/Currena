@@ -648,6 +648,17 @@ export const IndicatorIdSchema = z.enum([
   'wgc-etf-holdings', // F3 (rank 24): WGC monthly ETF holdings — the Western investor bid (CONTEXT card, OI-GA-4)
   'wgc-cb-demand', // F4 (rank 25): WGC quarterly central-bank purchases — "the 2022–2026 regime driver" (CONTEXT card, OI-GA-4)
   'official-gold-demand', // F13 (rank 26): PBoC/SAFE + CBR official-sector monthly purchases — F4's monthly twin (CONTEXT card, OI-GA-4)
+  // GF-S10 (2026-11-06, the remaining P3 sources): the D-11/D-12 derived
+  // real curve (the 10y−5y real-yield slope, DFII10 − DFII5 — a CONTEXT
+  // card; both sign variants measured in the harness, the sign question
+  // printed for the owner, never seated silently) + the I4 5–10y household
+  // anchor (the UoM SIE Table 33 median — the inflation lane's 37th seat
+  // through the MEASURED POST-P4-5LANE scenario) + the F6 Shanghai gold
+  // premium (the SGE Au99.99 ÷ converted-London-ounce derivation — a
+  // CONTEXT card; the seat unmeasurable over the corpus, recorded-open).
+  'real-curve-10y5y', // D-11/D-12 (the derived real curve — CONTEXT card, the sign is the owner's to call)
+  'michigan-5y-expectations', // I4 (rank 32): the UoM 5–10y median expected price change (the household anchor)
+  'shanghai-gold-premium', // F6 (rank 22): the Shanghai premium (the classic scarcity tell — CONTEXT card)
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 
@@ -787,11 +798,26 @@ export const IndicatorSourceSchema = z.enum([
   // WGC: the World Gold Council's own quarterly/monthly demand statistics
   // (XLSX downloads, free for research/reference with attribution). PBoC:
   // the People's Bank of China's monthly official-reserve / gold-purchase
-  // tables (free official site). Both L1 (free + attribution); the data
-  // adapters land with the cards (the promotion criteria — annualised-level
-  // extreme bands — recorded in each definition's comments).
+  // tables (free official site).
+  // GF-S10 CORRECTION (2026-11-06, the terms read live): the WGC's own
+  // terms require PRIOR WRITTEN AUTHORISATION for any scraping or
+  // redistribution and the downloads are registration-gated — the
+  // pre-approval class (L3, never fetched); the PBoC English URL 404s
+  // (L2, fail closed). The F3/F4/F13 data adapters do NOT land — the
+  // cards read 'awaiting data' honestly; the verdicts + the owner
+  // questions are recorded in licences.ts/sources.ts (the GF-S10 record).
   'wgc',
   'pboc',
+  // GF-S10 (2026-11-06, the remaining P3 sources — the audit report §4
+  // ranks 22 and 32): UoM — the University of Michigan Surveys of
+  // Consumers' SIE time-series archive (the monthly 5–10-year median
+  // expected price change, the I4 household anchor; CC-BY-NC-ND with the
+  // quoted copyright notice — L1). SGE — the Shanghai Gold Exchange's
+  // delayed Au99.99 quotes + daily report (the F6 Shanghai premium
+  // derivation's SGE leg; ©-reserved with no reuse grant quoted — L2,
+  // the owner-acceptance class).
+  'uom',
+  'sge',
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 

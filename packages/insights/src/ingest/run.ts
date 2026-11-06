@@ -68,6 +68,7 @@ import {
   applyGapLegDateGuard,
   READING_SOURCES,
   mergeSeries,
+  shanghaiPremiumSeries,
   type SeriesInputs,
 } from '../adapters/index';
 import { runValidationSuite } from '../validation';
@@ -923,6 +924,35 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     }
   }
 
+    // GF-S10 (2026-11-06, audit §4 rank 22 / F6): the SHANGHAI GOLD
+    // PREMIUM — the SGE Au99.99 close (CNY/gram, this phase's own fetch)
+    // versus the converted London ounce (the staged gold-usd × the staged
+    // usdcny ÷ 31.1034768), inner-joined on common dates. The shared pure
+    // function (derived.ts shanghaiPremiumSeries) guarantees the venues
+    // cannot drift (the us-japan-10y-gap discipline). The derived series
+    // PERSISTS — merged with the stored accumulation (the D-6 pattern:
+    // the GF-P4 backfill seeded the ~2-year history the SGE venue
+    // offers), so the percentile and change bases deepen rung over rung.
+    // Fail closed on any leg missing (never a stale premium).
+    const stagedGoldUsd = stage?.series['gold-usd']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+    const stagedUsdCny = stage?.series['usdcny']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+    if (collected.sgeAu9999 !== undefined && stagedGoldUsd !== undefined && stagedUsdCny !== undefined) {
+      const premium = shanghaiPremiumSeries(collected.sgeAu9999, stagedGoldUsd, stagedUsdCny);
+      if (premium.length > 0) {
+        const storedPremium = await storedSeriesOf(opts.store, 'shanghai-gold-premium');
+        series['shanghai-gold-premium'] =
+          storedPremium !== undefined ? mergeSeries(storedPremium, premium) : premium;
+        console.log(
+          `  · shanghai-gold-premium: ${series['shanghai-gold-premium']!.at(-1)!.value}% @ ${series['shanghai-gold-premium']!.at(-1)!.date}` +
+            ` (${series['shanghai-gold-premium']!.length} persisted points)`,
+        );
+      } else {
+        console.log('  · shanghai-gold-premium: the legs share no dates — holding (fail closed)');
+      }
+    } else {
+      console.log('  · shanghai-gold-premium: a leg is missing — holding (fail closed)');
+    }
+
   // A-6/A-7 (2026-10-26 gap-audit build): the weekly pair — the fetched
   // series merge with the stored accumulations (the CFTC file carries
   // only the latest week; the EIA page its full history — fetched wins on
@@ -992,6 +1022,10 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     // arrives with every fetch, fetched wins on collision).
     'usd-reserve-share',
     'sp500-breadth-ratio',
+    // GF-S10 (2026-11-06): the UoM 5–10y anchor joins the merge (full
+    // history per fetch, fetched wins on collision); the premium keeps
+    // its own derivation block above (the stored-merge happens there).
+    'michigan-5y-expectations',
   ] as const) {
     const fetched = collected.series[id];
     if (fetched === undefined) continue;

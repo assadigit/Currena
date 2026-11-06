@@ -229,6 +229,51 @@ function quantized(series: SeriesPoint[], dp: number): SeriesPoint[] {
   return series.map((p) => ({ date: p.date, value: Math.round(p.value * f) / f }));
 }
 
+/** The troy-ounce/gram conversion (the SGE quotes CNY per GRAM; XAU is
+ * USD per TROY OUNCE) — the exact constant the Shanghai premium divides
+ * by (31.1034768 g/oz). */
+export const GRAMS_PER_TROY_OUNCE = 31.1034768;
+
+/**
+ * GF-S10 (2026-11-06, audit §4 rank 22 / F6): the Shanghai gold premium,
+ * in percent — the SGE Au99.99 close (CNY/gram) versus the converted
+ * London ounce (gold-usd × USD/CNY ÷ 31.1034768), inner-joined on
+ * common dates:
+ *
+ *   premium% = (SGE_cny_per_g ÷ (XAU_usd_per_oz × USDCNY ÷ 31.1034768) − 1) × 100
+ *
+ * A POSITIVE premium = the Chinese physical bid paying over the world
+ * price (the scarcity/import-demand tell); a discount = weak local
+ * demand. Pure, exported so the Worker's 04:20 phase and the Node
+ * venue's inline build derive the IDENTICAL series (the venues cannot
+ * drift — the us-japan-10y-gap discipline). Quantized 2dp (a premium is
+ * quoted in basis points; 2dp keeps every honest digit without the
+ * float-noise class).
+ */
+export function shanghaiPremiumSeries(
+  sgeAu9999: readonly SeriesPoint[],
+  goldUsd: readonly SeriesPoint[],
+  usdCny: readonly SeriesPoint[],
+): SeriesPoint[] {
+  // Inner-join the two USD legs first (gold-usd × usdcny → the London
+  // ounce in CNY/gram), then join the SGE leg on the common dates.
+  const byDate = (series: readonly SeriesPoint[]): Map<string, number> =>
+    new Map(series.map((p) => [p.date, p.value]));
+  const goldByDate = byDate(goldUsd);
+  const cnyByDate = byDate(usdCny);
+  const out: SeriesPoint[] = [];
+  for (const sge of sgeAu9999) {
+    const gold = goldByDate.get(sge.date);
+    const cny = cnyByDate.get(sge.date);
+    if (gold === undefined || cny === undefined || gold <= 0 || cny <= 0) continue; // fail closed on a missing leg
+    const londonCnyPerGram = (gold * cny) / GRAMS_PER_TROY_OUNCE;
+    const premium = ((sge.value / londonCnyPerGram) - 1) * 100;
+    out.push({ date: sge.date, value: Math.round(premium * 100) / 100 });
+  }
+  out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  return out;
+}
+
 /**
  * 2026-10-21 data-integrity round: the monthly CHANGE series of a level
  * series (PAYEMS → nonfarm payrolls print, in the level's own units —
@@ -374,6 +419,17 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // curve (the 10y−5y slope — the object that re-opens the D-7/D-8 sign
   // question; the sign is a DECISION LIST item, never seated silently).
   put('real-yield-5y', fred.DFII5);
+  // GF-S10 (2026-11-06, the D-11/D-12 repair-if-filled riding R2's DFII5
+  // fill): the DERIVED REAL CURVE — the 10y−5y real-yield slope
+  // (DFII10 − DFII5), the object that re-opens the D-7/D-8 sign question
+  // with the correct curve. A CONTEXT CARD (rule: info — never votes);
+  // both sign variants are measured in the harness and the sign question
+  // is printed for the owner (never seated silently). Inner join on
+  // common dates, 4dp quantized (the F4/us-japan-10y-gap discipline).
+  // Fail closed on either leg missing (never a stale slope).
+  if (fred.DFII10 !== undefined && fred.DFII5 !== undefined) {
+    put('real-curve-10y5y', quantized(combineSeries(fred.DFII10, fred.DFII5, (ten, five) => ten - five), 4));
+  }
   put('us10y', fred.DGS10);
   // Step-1 audit item A1: the fed-target series is the range's LOWER bound
   // (DFEDTARL); the snapshot builder attaches the upper bound (DFEDTARU)
@@ -612,6 +668,23 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // fx leg that does not ride the Frankfurter request (ECB serves no AED
   // reference rate). Context info card in the dollar lane beside usdtry.
   put('usdaed', fx.AED);
+  // GF-S10 (2026-11-06, the remaining P3 sources — audit §4 rank 22 / F6,
+  // "the classic scarcity tell"): the SHANGHAI GOLD PREMIUM — the SGE's
+  // Au99.99 (CNY/gram) versus the converted London ounce (the build's own
+  // gold-usd series × the Frankfurter CNY leg ÷ 31.1034768 grams/ounce),
+  // in percent. A CONTEXT CARD (rule: info — never votes): the F6 seat
+  // cannot be measured over the corpus (the SGE archive reaches only to
+  // ~2024), so the seat question stays recorded-open (the GF-S10
+  // evidence). Derives ONLY when the rung-2 SGE leg is present (the
+  // Node venue's inline build + the Worker's 04:20 phase pass it; the
+  // 04:10 main rung carries the reading forward).
+  if (inputs.rung2?.sgeAu9999 !== undefined && out['gold-usd'] !== undefined && fx.CNY !== undefined) {
+    put('shanghai-gold-premium', shanghaiPremiumSeries(inputs.rung2.sgeAu9999, out['gold-usd']!, fx.CNY));
+  }
+  // GF-S10 (audit §4 rank 32 / I4): the UoM 5–10y household anchor —
+  // the rung-2 series map carries the fetched full history (the generic
+  // loop below also covers it; kept explicit here for the reading-order
+  // documentation).
   // nzd-usd retired 2026-10-23 (OD-7, D-42): an indicator card for an
   // audience that doesn't exist — no replacement. The NZD LEG returned
   // 2026-11-02 (gap-closure S6-M6.1): not as its own card, but as the
@@ -1015,6 +1088,20 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'dollar-broad': { name: 'FRED (DTWEXBGS)', url: 'https://fred.stlouisfed.org/series/DTWEXBGS' },
   'dollar-eme': { name: 'FRED (DTWEXEMEGS)', url: 'https://fred.stlouisfed.org/series/DTWEXEMEGS' },
   'bank-stress': { name: 'FRED (DPCREDIT)', url: 'https://fred.stlouisfed.org/series/DPCREDIT' },
+  // GF-S10 (2026-11-06): the D-11/D-12 derived real curve (DFII10 − DFII5)
+  // + the I4/F6 cards' source lines.
+  'real-curve-10y5y': {
+    name: 'FRED (DFII10 − DFII5, derived)',
+    url: 'https://fred.stlouisfed.org/series/DFII5',
+  },
+  'michigan-5y-expectations': {
+    name: 'Surveys of Consumers, Survey Research Center, University of Michigan (Table 33 median)',
+    url: 'https://data.sca.isr.umich.edu/tables.php',
+  },
+  'shanghai-gold-premium': {
+    name: 'Shanghai Gold Exchange Au99.99 ÷ (gold-api XAU × Frankfurter USD/CNY), derived',
+    url: 'https://en.sge.com.cn/data_DelayedQuotes',
+  },
   // GF-P3 (2026-11-06, audit §4 — OI-GA-4's recorded context-first answer).
   // The three WGC/PBoC context cards: their data adapters ship at GF-S10
   // (the cards display "awaiting data" honestly until then), but the source

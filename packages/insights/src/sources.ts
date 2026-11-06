@@ -691,6 +691,81 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     termsUrl: null,
     notes: 'NEW — link out for now (no card, no fetch).',
   },
+  // ——— GF-S10 (2026-11-06, the remaining P3 sources + the WGC/official
+  // ——— verdicts — every terms line below was read live this session;
+  // ——— the full quotes live in licences.ts's four new rows).
+  uom: {
+    id: 'uom',
+    provider: 'uom',
+    label: 'University of Michigan Surveys of Consumers (SIE time-series archive)',
+    usedFor: 'michigan-5y-expectations — the monthly 5–10-year median expected price change (I4, audit §4 rank 32)',
+    method: 'M1',
+    runtime: 'worker',
+    level: 'L1',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The SIE usage agreement (read live 2026-11-06): "the data is available under the CC-BY-NC-ND license" — CC-BY-NC-ND with the quoted copyright notice; the NC condition rides the owner\u2019s recorded non-commercial statement (2026-10-17); the archive POST is keyless and serves the full history.',
+    termsReadOn: '2026-11-06',
+    attribution: 'Surveys of Consumers, Survey Research Center, University of Michigan',
+    termsUrl: 'https://data.sca.isr.umich.edu/agreement.php',
+    notes: 'GF-S10: the Table 33 POST (table=33&format=CSV) verified live 2026-11-06 — the full monthly median series from 1978, one request.',
+  },
+  sge: {
+    id: 'sge',
+    provider: 'sge',
+    label: 'Shanghai Gold Exchange (delayed quotes + daily report)',
+    usedFor: 'sge-gold (Au99.99 CNY/gram delayed close) — the Shanghai premium derivation\u2019s SGE leg (F6, audit §4 rank 22)',
+    method: 'M1',
+    runtime: 'worker',
+    level: 'L2',
+    ownerAccepts: false, // the agent never edits this — the owner's recorded acceptance lifts the card to public
+    override: false,
+    enabled: true, // the fetch runs (the site's own public page); the DISPLAY gate is the licence verdict
+    termsLines:
+      'The exchange\u2019s own footer: "Copyright 2016 上海黄金交易所 All Right Reserved" (read live 2026-11-06) — no affirmative reuse grant quoted; the delayed quotes + the daily report are the site\u2019s own public keyless pages (verified live: Au99.99 884.09 CNY/g close 2026-11-05). L2: private display until the owner records acceptance.',
+    termsReadOn: '2026-11-06',
+    attribution: 'Source: Shanghai Gold Exchange (Au99.99 delayed)',
+    termsUrl: 'https://en.sge.com.cn/',
+    notes: 'GF-S10: the public-display question rides the GF-S10 evidence (the printed decision list).',
+  },
+  wgc: {
+    id: 'wgc',
+    provider: 'wgc',
+    label: 'World Gold Council (GoldHub)',
+    usedFor: 'wgc-etf-holdings / wgc-cb-demand — F3/F4 (audit §4 ranks 24–25, OI-GA-4\u2019s context-first answer)',
+    method: null,
+    runtime: null,
+    level: 'L3',
+    ownerAccepts: false,
+    override: false,
+    enabled: false,
+    termsLines:
+      'gold.org/terms-and-conditions (read live 2026-11-06): "you are not permitted to modify, copy, scrape, distribute … without the prior written authorisation of WGC" + "Certain market data is the property of the CME Group Inc. … you will not redistribute the website pages and/or the contents thereon to any third party, unless specifically permitted by CME or its affiliates in writing" + the downloads are registration-gated. The pre-approval class — never fetched (D-44\u2019s pattern).',
+    termsReadOn: '2026-11-06',
+    attribution: '',
+    termsUrl: 'https://www.gold.org/terms-and-conditions',
+    notes: 'GF-S10: the F3/F4 data adapters DO NOT LAND — the audit\u2019s "free for research/reference" characterization is corrected by the terms read (the evidence + the owner question in the GF-S10 record).',
+  },
+  pboc: {
+    id: 'pboc',
+    provider: 'pboc',
+    label: "People's Bank of China / SAFE (official reserve assets)",
+    usedFor: 'official-gold-demand — F13 (audit §4 rank 26, OI-GA-4\u2019s context-first answer)',
+    method: null,
+    runtime: null,
+    level: 'L2',
+    ownerAccepts: false,
+    override: false,
+    enabled: false,
+    termsLines:
+      'The cited English URL 404s (read live 2026-11-06 — the English statistics section restructured); no terms text quotable from a live official page this session. Fail closed: no fetch wired.',
+    termsReadOn: '2026-11-06',
+    attribution: '',
+    termsUrl: 'https://www.pbc.gov.cn/en/3688110/index.html',
+    notes: 'GF-S10: the F13 adapter DEFERRED (recorded-open) — a live official URL + a quoted terms line unlocks it.',
+  },
   'aip-petrol': {
     id: 'aip-petrol',
     provider: 'aip',
@@ -717,6 +792,12 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
 /* ------------------------------------------------------------------ */
 
 export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
+  // GF-S10 (2026-11-06, the remaining P3 sources): the derived real curve
+  // (both FRED legs already registered) + the Shanghai premium (the SGE
+  // leg + the two existing public legs) + the UoM anchor's own row.
+  'real-curve-10y5y': ['fred:DFII10', 'fred:DFII5'],
+  'shanghai-gold-premium': ['sge', 'gold-api', 'frankfurter'],
+  'michigan-5y-expectations': ['uom'],
   brent: ['fred:DCOILBRENTEU', 'yahoo:BZ=F'],
   'gold-usd': ['gold-api:XAU', 'yahoo:GC=F'],
   'silver-usd': ['gold-api:XAG', 'yahoo:SI=F'],

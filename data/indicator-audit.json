@@ -55,6 +55,19 @@
       "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.2}"
     },
     {
+      "id": "real-curve-10y5y",
+      "licenceName": "FRED license #copyright-public-domain (public domain)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L0",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 4,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
       "id": "us10y",
       "licenceName": "FRED license #copyright-public-domain (public domain)",
       "publicDisplayOk": "yes",
@@ -1304,10 +1317,10 @@
     },
     {
       "id": "wgc-etf-holdings",
-      "licenceName": "Unverified",
+      "licenceName": "Prior written authorisation required (pre-approval class — never fetched)",
       "publicDisplayOk": "no",
-      "privateOk": true,
-      "level": "L2",
+      "privateOk": false,
+      "level": "L3",
       "ownerAccepts": false,
       "enabled": false,
       "method": null,
@@ -1317,10 +1330,10 @@
     },
     {
       "id": "wgc-cb-demand",
-      "licenceName": "Unverified",
+      "licenceName": "Prior written authorisation required (pre-approval class — never fetched)",
       "publicDisplayOk": "no",
-      "privateOk": true,
-      "level": "L2",
+      "privateOk": false,
+      "level": "L3",
       "ownerAccepts": false,
       "enabled": false,
       "method": null,
@@ -1330,7 +1343,7 @@
     },
     {
       "id": "official-gold-demand",
-      "licenceName": "Unverified",
+      "licenceName": "Unreadable from this venue — fail closed (L2, no fetch wired)",
       "publicDisplayOk": "no",
       "privateOk": true,
       "level": "L2",
@@ -1338,6 +1351,19 @@
       "enabled": false,
       "method": null,
       "maxAgeDays": 45,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "shanghai-gold-premium",
+      "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+      "publicDisplayOk": "no",
+      "privateOk": true,
+      "level": "L2",
+      "ownerAccepts": false,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 5,
       "ruleVersion": 4,
       "rule": "{\"kind\":\"info\"}"
     },
@@ -1496,6 +1522,19 @@
       "maxAgeDays": 75,
       "ruleVersion": 4,
       "rule": "{\"kind\":\"info\"}"
+    },
+    {
+      "id": "michigan-5y-expectations",
+      "licenceName": "CC BY-NC-ND 4.0 (the SIE usage agreement — non-commercial, attribution, no derivatives)",
+      "publicDisplayOk": "yes",
+      "privateOk": true,
+      "level": "L1",
+      "ownerAccepts": null,
+      "enabled": true,
+      "method": "M1",
+      "maxAgeDays": 75,
+      "ruleVersion": 4,
+      "rule": "{\"kind\":\"percentile\",\"tail\":\"high\",\"cutoff\":0.2}"
     },
     {
       "id": "retail-sales",

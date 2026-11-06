@@ -56,6 +56,11 @@ import {
 // family's fetchers — the IMF COFER adapter + the S&P 500 breadth pair.
 import { fetchCoferUsdShare } from './cofer';
 import { fetchSp500BreadthRatio } from './sp500-breadth';
+// GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive
+// (the I4 5–10y household anchor) + the SGE Au99.99 daily close (the F6
+// Shanghai premium derivation's SGE leg).
+import { fetchUomExpectedPrice5y10y } from './uom';
+import { fetchSgeAu9999Recent, sgeSeriesOf } from './sge';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -125,6 +130,13 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   // All context-only per G-5.
   'usd-reserve-share',
   'sp500-breadth-ratio',
+  // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE Table 33
+  // median — the I4 5–10y household anchor (monthly, the first-of-month
+  // gate + bootstrap; one keyless POST serves the full history) — and the
+  // Shanghai premium (F6, DERIVED at this phase from the SGE leg + the
+  // staged gold-usd + usdcny legs — the us-japan-10y-gap pattern).
+  'michigan-5y-expectations',
+  'shanghai-gold-premium',
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -153,6 +165,12 @@ export interface Rung2FetchPlan {
   /** gap-closure S6-M6.3: the S&P 500 breadth ratio (RSP + SPY) — daily
    * + bootstrap (a missing stage entry IS the bootstrap itself). */
   breadthDaily: boolean;
+  /** GF-S10: the UoM SIE Table 33 archive — first-of-month + bootstrap
+   * (one keyless POST serves the full monthly history). */
+  uomMonthly: boolean;
+  /** GF-S10: the SGE Au99.99 daily close — daily + bootstrap (the
+   * gprDaily pattern: a missing stage entry IS the bootstrap itself). */
+  sgeDaily: boolean;
 }
 
 /** Saturday is fetch day for the weekly pair (data Tue, publish Fri 17:30 ET). */
@@ -210,6 +228,11 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
   // gap-closure S6-M6.3: the COFER share + the breadth ratio bootstrap
   // the same way (a fresh deploy on any day must not wait for Saturday).
   const needCoferQuarterly = missing.has('usd-reserve-share');
+  // GF-S10: the UoM 5–10y anchor bootstraps like the other monthlies; the
+  // SGE leg bootstraps like the dailies (a missing stage entry is the
+  // bootstrap itself).
+  const needUomMonthly = missing.has('michigan-5y-expectations');
+  const needSgeDaily = missing.has('shanghai-gold-premium');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
     eiaWeekly:
@@ -235,6 +258,11 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     // S6-M6.3: the breadth ratio fetches every day (a missing stage entry
     // IS the bootstrap itself — the mof/gpr-daily pattern).
     breadthDaily: true,
+    // GF-S10: the UoM archive rides the monthly gate (the nzMonthly
+    // discipline — one POST per month is politeness itself); the SGE leg
+    // fetches every day (the premium derives from the day's legs).
+    uomMonthly: isFirstOfMonth(date) || needUomMonthly,
+    sgeDaily: true,
   };
 }
 
@@ -244,6 +272,9 @@ export interface Rung2CollectResult {
   series: Partial<Record<IndicatorId, SeriesPoint[]>>;
   /** Per-source fetch outcome rows (appended to insights:status). */
   reports: InsightsSourceReport[];
+  /** GF-S10 (F6): the raw SGE Au99.99 closes (a derivation input, never a
+   * card — the jgb10y pattern; the premium derives from the staged legs). */
+  sgeAu9999?: SeriesPoint[];
 }
 
 function errMessage(err: unknown): string {
@@ -288,6 +319,7 @@ export async function collectRung2Sources(
   }
 
   const series: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
+  let sgeAu9999: SeriesPoint[] | undefined;
 
   // A-2: MOF Japan — the jgb-10y daily primary. The full-history file only
   // rides the monthly/bootstrap rungs (it changes once a month; the
@@ -494,5 +526,32 @@ export async function collectRung2Sources(
     if (breadth !== undefined) series['sp500-breadth-ratio'] = breadth.ratio;
   }
 
-  return { series, reports };
+  // GF-S10 (2026-11-06, audit §4 rank 32 / I4): the UoM SIE Table 33
+  // archive — the monthly 5–10-year median expected price change, the
+  // long-run household anchor. ONE keyless POST serves the FULL monthly
+  // history from 2008 (verified live 2026-11-06), so the fetched series
+  // needs no stored merge on fresh data (fetched wins on collision — the
+  // generic phase merge). First-of-month + bootstrap.
+  if (plan.uomMonthly) {
+    const uom = await fetchLogged('uom', 'Surveys of Consumers Table 33 (5–10-year median expected price change, monthly)', () =>
+      fetchUomExpectedPrice5y10y(),
+    );
+    if (uom !== undefined) series['michigan-5y-expectations'] = uom;
+  }
+
+  // GF-S10 (2026-11-06, audit §4 rank 22 / F6): the SGE Au99.99 daily
+  // close (CNY/gram) — the Shanghai premium derivation's SGE leg. Daily
+  // + bootstrap: one page over the trailing 7-day window carries the
+  // latest ~1–2 trading days (the endpoint paginates at 20 rows ≈ 1.3
+  // days, ordered descending — page 1 is the freshest). The raw leg is
+  // a derivation input (never a card); the phase derives the premium
+  // from the staged gold-usd + usdcny legs beside this fetch.
+  if (plan.sgeDaily) {
+    const sge = await fetchLogged('sge', 'SGE daily report (Au99.99 close, CNY/gram, trailing week page 1)', () =>
+      fetchSgeAu9999Recent(deps.now ?? new Date()),
+    );
+    if (sge !== undefined && sge.length > 0) sgeAu9999 = sgeSeriesOf(sge);
+  }
+
+  return { series, reports, sgeAu9999 };
 }

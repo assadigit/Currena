@@ -108,7 +108,7 @@ describe('breakevenTiltLean — the pure phrase selection', () => {
 });
 
 describe('D-5 — the promotion pinned (Session 6)', () => {
-  it('breakeven-tilt keeps its one gold seat: exactly one entry, inflation lane, polarity +1 (the 21st seat until GF-P1 demoted the curve pair; GF-P2 seated twelve more — 32 then; GF-P3 seated four more — 36 now)', () => {
+  it('breakeven-tilt keeps its one gold seat: exactly one entry, inflation lane, polarity +1 (the 21st seat until GF-P1 demoted the curve pair; GF-P2 seated twelve more — 32 then; GF-P3 seated four more — 36 then; GF-S10 seated the I4 household anchor — 37 now)', () => {
     // Session 6 promoted the table 20 → 21 with the tilt as the last seat;
     // GF-P1 (2026-11-05, the owner's recorded decision H) demoted the two
     // yield-curve seats (21 → 19); GF-P2 (the owner's recorded answers
@@ -119,7 +119,7 @@ describe('D-5 — the promotion pinned (Session 6)', () => {
     // recorded shape — one seat, inflation, polarity +1 — through every
     // change. The pre-demotion 21-seat table is pinned VERBATIM as
     // HARNESS_GOLD_VOTERS_21 (gold-backtest-core.test.ts).
-    expect(GOLD_LANE_VOTERS).toHaveLength(36);
+    expect(GOLD_LANE_VOTERS).toHaveLength(37);
     const tilt = GOLD_LANE_VOTERS.filter((v) => v.id === 'breakeven-tilt');
     expect(tilt).toHaveLength(1);
     expect(tilt[0]).toEqual({ lane: 'inflation', id: 'breakeven-tilt', polarity: 1 });

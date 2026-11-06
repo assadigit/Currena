@@ -79,9 +79,14 @@ export const GAUGES: readonly GaugeDef[] = [
     // M6 Wave 3 (2026-10-25): euro-hicp joins the voters — the euro
     // area's inflation scored against the ECB's own 2% symmetric target
     // (the prices lane's second central-bank goal line beside the Fed's).
+    // GF-S10 (2026-11-06, audit §4 rank 32 / I4 — the standing delegation
+    // through the MEASURED POST-P4-5LANE scenario, the GF-P3 precedent):
+    // the Michigan 5–10-year median joins the voters — the long-run
+    // household anchor beside the realised pair (the slow version of the
+    // 5y5y breakeven; the gold meter's inflation lane carries the seat).
     id: 'prices-heat',
     section: 'global',
-    members: ['us-cpi-yoy', 'us-pce-core-yoy', 'euro-hicp', 'breakeven-5y5y', 'brent'],
+    members: ['us-cpi-yoy', 'us-pce-core-yoy', 'euro-hicp', 'breakeven-5y5y', 'michigan-5y-expectations', 'brent'],
   },
   // Step-2 add-list §B5: VIX joins the market-stress voters (scored on its
   // 10-year position; the calm/nervous word thresholds arrive with Step 3).
@@ -92,10 +97,11 @@ export const GAUGES: readonly GaugeDef[] = [
   // deafut.txt row; the gold meter's flows lane carries both, the question
   // gauge scores both — the crowded-book read at its richest).
   // GF-P3 (2026-11-06, the standing delegation — audit report §4 rank 28
-  // / S9): bank-stress joins beside the STLFSI/NFCI pair (the 30d
-  // commercial paper rate, "the modern bank-run tell"; the gold meter's
-  // stress lane carries it, the question gauge scores it — the funding-
-  // stress read at its richest).
+  // / S9): bank-stress joins beside the STLFSI/NFCI pair (the Fed's
+  // discount window primary credit rate — the GF-S10 name repair: the
+  // GF-S9 comment misdescribed DPCREDIT as the commercial paper rate; the
+  // gold meter's stress lane carries it, the question gauge scores it —
+  // the policy-posture read beside the funding-stress pair).
   {
     id: 'market-stress',
     section: 'global',

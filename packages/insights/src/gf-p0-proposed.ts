@@ -357,7 +357,8 @@ export const GF_VOTERS_5LANE: readonly GfVoter[] = [
  *  - `dollar-eme` (D9, rank 21): 1.0 pct — the EME dollar's threshold
  *    (the marginal buyer's leg, the same index units);
  *  - `bank-stress` (S9, rank 28): 0.10 points — a rate-level move
- *    threshold (DPCREDIT is a weekly facility rate; 0.10 pts is the
+ *    threshold (DPCREDIT is the Fed's weekly discount window primary
+ *    credit rate — the GF-S10 name repair; 0.10 pts is the
  *    t5yie/fed-expectations band — the same rate-move family).
  */
 export const GF_MOVE_P3_PROPOSED: Readonly<Partial<Record<IndicatorId, number>>> = {
@@ -402,6 +403,58 @@ export const GF_VOTERS_P3_5LANE: readonly GfVoter[] = [
   { lane: 'dollar', id: 'dollar-broad', polarity: -1 }, // D2 (rank 20) — the trade-weighted dollar, "the honest inverse" (rising = headwind)
   { lane: 'dollar', id: 'dollar-eme', polarity: -1 }, // D9 (rank 21) — the EME dollar, the marginal buyer's leg (rising = headwind)
   { lane: 'stress', id: 'bank-stress', polarity: 1 }, // S9 (rank 28) — the bank-facility usage, the modern bank-run tell (rising = stress = gold-positive)
+];
+
+/* ------------------------------------------------------------------ *
+ * GF-S10 — the remaining P3 sources (the audit report §4 ranks 22, 32:
+ * the I4 household anchor measured; the F6 Shanghai premium's seat
+ * UNMEASURABLE over the corpus — the SGE archive reaches only to ~2024,
+ * the venue measured this session — so F6 lands as a CONTEXT CARD with
+ * the seat question printed, never silently added).
+ * ------------------------------------------------------------------ */
+
+/**
+ * The proposed post-P4 voter set — the 5-LANE table extended with the ONE
+ * remaining P3 voter-candidate the corpus can measure: I4, the University
+ * of Michigan's 5–10-year median expected price change (the household
+ * anchor, "the slow version of R7" — the audit report §4 rank 32). The
+ * composition is 37 seats: borrowing-costs 7 · dollar 7 · stress 11 ·
+ * inflation 10 · flows 2. The seat is LEVEL-LEG ONLY (the I3 precedent —
+ * monthly cadence, no move threshold; the D-1 walk's cadence exemption),
+ * and its UoM SIE history (2008-01 → 2026-09, 225 monthly medians) rides
+ * the candidates fixture (recorded by scripts/gf-p4-record-candidates.ts
+ * — the SIE archive POST verified live 2026-11-06).
+ */
+export const GF_VOTERS_P4_5LANE: readonly GfVoter[] = [
+  ...GF_VOTERS_P3_5LANE,
+  // ——— GF-S10 (the standing delegation riding the measured scenario —
+  // ——— the GF-P3 precedent)
+  { lane: 'inflation', id: 'michigan-5y-expectations', polarity: 1 }, // I4 (rank 32) — the 5–10y household anchor: rising long-run expectations = the tailwind side (the I3 1y sibling's own polarity)
+];
+
+/**
+ * The D-11/D-12 real-curve sign twins — the derived real curve (DFII10 −
+ * DFII5, the 10y−5y real-yield slope) seated in the BORROWING-COSTS lane
+ * under BOTH polarities, measured beside (the decision-list item — the
+ * owner's recorded choice gates any seating; NEVER seated silently):
+ *   - `GF_VOTERS_REALCURVE_PLUS`  — polarity +1: a steepening real curve
+ *     = gold-POSITIVE (the classic long-run story: a steep real curve
+ *     with a low front end = easy policy + rising inflation
+ *     compensation);
+ *   - `GF_VOTERS_REALCURVE_MINUS` — polarity −1: a steepening real curve
+ *     = gold-NEGATIVE (the term-structure story: a rising long real
+ *     yield = the opportunity cost rising at the long end).
+ * Both are 37-seat compositions over the 36-seat POST-P3-5LANE table
+ * (borrowing-costs grows to 8). LEVEL-LEG ONLY — the variants differ
+ * ONLY in polarity, so the measured delta is the sign question itself.
+ */
+export const GF_VOTERS_REALCURVE_PLUS: readonly GfVoter[] = [
+  ...GF_VOTERS_P3_5LANE,
+  { lane: 'borrowing-costs', id: 'real-curve-10y5y', polarity: 1 },
+];
+export const GF_VOTERS_REALCURVE_MINUS: readonly GfVoter[] = [
+  ...GF_VOTERS_P3_5LANE,
+  { lane: 'borrowing-costs', id: 'real-curve-10y5y', polarity: -1 },
 ];
 
 /* ------------------------------------------------------------------ *
@@ -877,6 +930,35 @@ export function gfScenarios(): GfScenario[] {
       'POST-P3-5LANE',
       GF_LANES_5,
       GF_VOTERS_P3_5LANE,
+      gfMoveMapWith({ ...GF_MOVE_P1_PROPOSED, ...GF_MOVE_P3_PROPOSED } as Readonly<Partial<Record<IndicatorId, number>>>),
+      true,
+      minFiring,
+    );
+    // GF-S10 (2026-11-06): the remaining P3 sources — the I4 household
+    // anchor measured over the UoM SIE history (the POST-P4-5LANE
+    // composition, 37 seats) + the D-11/D-12 real-curve sign twins (both
+    // polarities measured beside — the decision-list item, never seated
+    // silently; the real curve is level-only so no threshold enters).
+    push(
+      'POST-P4-5LANE',
+      GF_LANES_5,
+      GF_VOTERS_P4_5LANE,
+      gfMoveMapWith({ ...GF_MOVE_P1_PROPOSED, ...GF_MOVE_P3_PROPOSED } as Readonly<Partial<Record<IndicatorId, number>>>),
+      true,
+      minFiring,
+    );
+    push(
+      'POST-P3-5LANE-REALCURVE-PLUS',
+      GF_LANES_5,
+      GF_VOTERS_REALCURVE_PLUS,
+      gfMoveMapWith({ ...GF_MOVE_P1_PROPOSED, ...GF_MOVE_P3_PROPOSED } as Readonly<Partial<Record<IndicatorId, number>>>),
+      true,
+      minFiring,
+    );
+    push(
+      'POST-P3-5LANE-REALCURVE-MINUS',
+      GF_LANES_5,
+      GF_VOTERS_REALCURVE_MINUS,
       gfMoveMapWith({ ...GF_MOVE_P1_PROPOSED, ...GF_MOVE_P3_PROPOSED } as Readonly<Partial<Record<IndicatorId, number>>>),
       true,
       minFiring,

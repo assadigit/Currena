@@ -86,11 +86,13 @@ async function main(): Promise<void> {
       nbsMonthly: flag('nbs'),
       coferQuarterly: flag('cofer'),
       breadthDaily: flag('breadth'),
+      uomMonthly: flag('uom'),
+      sgeDaily: flag('sge'),
     };
     const armed = Object.values(plan).some(Boolean);
     if (!armed) {
       console.error(
-        '[rung2-run] FATAL: no plan gate armed — pass at least one of --nbs --nz --monthly --mof --eia --cftc --gpr-daily --cofer --breadth (or --bootstrap).',
+        '[rung2-run] FATAL: no plan gate armed — pass at least one of --nbs --nz --monthly --mof --eia --cftc --gpr-daily --cofer --breadth --uom --sge (or --bootstrap).',
       );
       process.exit(1);
     }

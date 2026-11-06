@@ -81,7 +81,10 @@ const SERIES = [
   // walk fail-closed all four (unscanned → the M-6 kill switch → the
   // audit sidecar's enabled=false → the readings land [unavailable] and
   // the seats can never fire). The deploy-first discipline (GF-S10 work
-  // item 2's live verification) exposed it; the scan re-runs now.
+  // item 2's live verification) exposed it; the scan re-runs now. The
+  // records verified live 2026-11-06: all four carry the
+  // #copyright-public-domain tag — FRB US-government works, the DFII10
+  // public-domain class.
   'DFII5',
   'DTWEXBGS',
   'DTWEXEMEGS',

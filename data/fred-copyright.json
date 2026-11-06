@@ -519,7 +519,7 @@
       "license": "public-domain",
       "copyrightNotice": false,
       "checkedOn": "2026-11-06",
-      "evidence": "FRED license tag: #copyright-public-domain",
+      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title '5-Year Treasury Inflation-Indexed Security Yield', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class, its 10y twin DFII10's own row",
       "url": "https://fred.stlouisfed.org/series/DFII5"
     },
     {
@@ -527,7 +527,7 @@
       "license": "public-domain",
       "copyrightNotice": false,
       "checkedOn": "2026-11-06",
-      "evidence": "FRED license tag: #copyright-public-domain",
+      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Nominal Broad U.S. Dollar Index', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work)",
       "url": "https://fred.stlouisfed.org/series/DTWEXBGS"
     },
     {
@@ -535,7 +535,7 @@
       "license": "public-domain",
       "copyrightNotice": false,
       "checkedOn": "2026-11-06",
-      "evidence": "FRED license tag: #copyright-public-domain",
+      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Emerging Markets Economies Trade-Weighted Dollar Index', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work)",
       "url": "https://fred.stlouisfed.org/series/DTWEXEMEGS"
     },
     {
@@ -543,7 +543,7 @@
       "license": "public-domain",
       "copyrightNotice": false,
       "checkedOn": "2026-11-06",
-      "evidence": "FRED license tag: #copyright-public-domain",
+      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Discount Window Primary Credit Rate', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work)",
       "url": "https://fred.stlouisfed.org/series/DPCREDIT"
     }
   ]

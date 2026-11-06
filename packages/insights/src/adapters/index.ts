@@ -27,6 +27,18 @@ export {
   parseWorldBankMonthlySheet,
 } from './worldbank';
 export { GOLDAPI_SYMBOLS, fetchGoldApiSpot, goldApiPriceUrl, GOLDAPI_BASE } from './goldapi';
+// GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive +
+// the SGE daily report + the shared Shanghai-premium derivation.
+export { fetchUomExpectedPrice5y10y, parseUomExpectedPrice5y10y, UOM_SIE_ARCHIVE_URL, UOM_START_YEAR } from './uom';
+export {
+  fetchSgeAu9999,
+  fetchSgeAu9999Recent,
+  parseSgeAu9999,
+  sgeSeriesOf,
+  SGE_DAILY_URL,
+  SGE_AU9999,
+} from './sge';
+export { shanghaiPremiumSeries, GRAMS_PER_TROY_OUNCE } from './derived';
 export {
   YAHOO_CHART_BASE,
   YAHOO_CHART_USER_AGENT,

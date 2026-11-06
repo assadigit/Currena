@@ -29,4 +29,13 @@ export interface Rung2SeriesInputs {
    * accumulations before this point).
    */
   series?: Partial<Record<IndicatorId, SeriesPoint[]>>;
+  /**
+   * GF-S10 (2026-11-06, audit §4 rank 22 / F6): the Shanghai Gold
+   * Exchange's Au99.99 daily closes (CNY/gram) — the Shanghai premium
+   * derivation's SGE leg. A raw DERIVATION INPUT, never a card of its
+   * own (the jgb10y pattern); the premium derives inside
+   * buildIndicatorSeries from this leg + the gold-usd series + the
+   * Frankfurter CNY leg.
+   */
+  sgeAu9999?: SeriesPoint[];
 }

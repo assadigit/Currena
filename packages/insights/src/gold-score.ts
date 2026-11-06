@@ -144,7 +144,7 @@ export interface GoldLaneVoter {
 }
 
 /**
- * The 32 voters (6 borrowing costs · 5 dollar · 10 stress · 9 inflation ·
+ * The 37 voters (7 borrowing costs · 7 dollar · 11 stress · 10 inflation ·
  * 2 flows).
  *
  * Session 6 (2026-10-31, the D-5 promotion — the owner's "we can have 21"
@@ -192,11 +192,26 @@ export interface GoldLaneVoter {
  * precedent: the harness seat and the production seat agree by
  * construction; evidence/gf-p0-calibration-2026-11-05.md §7's new
  * POST-P3-5LANE rows; the harness twin `GF_VOTERS_P3_5LANE`). The
- * composition is now 36 seats: 7/7/11/9/2. The D-11/D-12 real-curve
+ * composition was 36 seats: 7/7/11/9/2. The D-11/D-12 real-curve
  * sign question (unlocked by R2's fill) is a DECISION LIST item — both
  * variants measured, never seated silently. The P2 verify
  * (gf-p2-verify) is superseded by gf-p3-verify as the live pin (the P2
  * evidence stays as the dated record, like P1's before it).
+ *
+ * GF-S10 (2026-11-06, the remaining P3 sources — the standing delegation
+ * riding the MEASURED POST-P4-5LANE scenario, the GF-P3 precedent): the
+ * I4 5–10y household anchor seated (michigan-5y-expectations, the
+ * inflation lane — "the slow version of R7"; the audit report §4 rank
+ * 32 the justification per D-GF-1; the harness twin `GF_VOTERS_P4_5LANE`;
+ * the UoM SIE series' full monthly history recorded in the candidates
+ * fixture). The composition is now 37 seats: 7/7/11/10/2. The F6
+ * Shanghai premium lands as a CONTEXT CARD (its seat unmeasurable over
+ * the corpus — the SGE archive reaches only to ~2024; the seat question
+ * recorded-open with the coverage fact printed). The D-11/D-12
+ * real-curve sign question stays a DECISION LIST item (both variants
+ * measured, never seated silently). The P3 verify (gf-p3-verify) is
+ * superseded by gf-p4-verify as the live pin (the P3 evidence stays as
+ * the dated record, like P2's before it).
  */
 export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
   // ——— Borrowing costs (7): TIGHT is the classic gold headwind (real rates
@@ -239,9 +254,10 @@ export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
   { lane: 'stress', id: 'gpr-daily', polarity: 1 }, // GF-P2 (K): S7 → promote the DAILY object (§4 rank 11 — the event-risk channel; the owner's object choice: the monthly gpr-index alternative fires 1114 vs the daily's 1316)
   { lane: 'stress', id: 'epu-us', polarity: 1 }, // GF-P2 (K): S8 MISSING-FREE → promote (§4 rank 15 — regime uncertainty raises the hedging premium; the tpu-us alternative fires 1259 — a one-seat swap recorded as the alternative)
   { lane: 'stress', id: 'sp500-breadth-ratio', polarity: -1 }, // GF-P2 (C): S6 ★ COBD → promote (§4 rank 17 — falling breadth = risk-off = the tailwind side; one-directional and measured)
-  { lane: 'stress', id: 'bank-stress', polarity: 1 }, // GF-P3 (the standing delegation): S9 MISSING-FREE → promote (§4 rank 28 — the 30d commercial paper rate, "the modern bank-run tell"; a spike = the classic stress signal (2008/2020). Owner-gated through the MEASURED POST-P3-5LANE scenario — the F2 precedent)
-  // ——— Inflation (9): RUNNING HOT usually supports the hedge demand.
+  { lane: 'stress', id: 'bank-stress', polarity: 1 }, // GF-P3 (the standing delegation): S9 MISSING-FREE → promote (§4 rank 28 — the Fed's discount window primary credit rate, the standing facility's own price; the GF-S10 name repair: the GF-S9 comment's "commercial paper" description was wrong for DPCREDIT, the seat itself untouched. Owner-gated through the MEASURED POST-P3-5LANE scenario — the F2 precedent)
+  // ——— Inflation (10): RUNNING HOT usually supports the hedge demand.
   // ——— GF-P2: the four promotions (the owner's recorded K; §4 rows 8/9/16 + I7).
+  // ——— GF-S10: the I4 5–10y household anchor seated — 9 → 10.
   { lane: 'inflation', id: 'us-cpi-yoy', polarity: 1 }, // I1 COVERED
   { lane: 'inflation', id: 'us-pce-core-yoy', polarity: 1 }, // I2 COVERED
   { lane: 'inflation', id: 'euro-hicp', polarity: 1 }, // N-1 — AMENDED (the owner's recorded G, 2026-11-05): the v1.2 taxonomy amendment records the euro-area realised-inflation row; the seat stays, the denominator becomes 86
@@ -251,6 +267,7 @@ export const GOLD_LANE_VOTERS: readonly GoldLaneVoter[] = [
   { lane: 'inflation', id: 'michigan-1y-expectations', polarity: 1 }, // GF-P2 (K): I3 MISSING-FREE → promote (§4 rank 16 — households price inflation in before the market does)
   { lane: 'inflation', id: 'm2-us', polarity: 1 }, // GF-P2 (K): I7 ★ COBD → promote (§4 rank 14 — the debasement channel, YoY percentile basis)
   { lane: 'inflation', id: 'us-deficit-12m', polarity: 1 }, // GF-P2 (K): G1 MISSING-FREE → promote (§4 rank 8 — fiscal dominance, the debasement channel's fiscal leg)
+  { lane: 'inflation', id: 'michigan-5y-expectations', polarity: 1 }, // GF-S10 (the standing delegation): I4 MISSING-FREE → promote (§4 rank 32 — the 5–10y household anchor, "the slow version of R7": households price inflation in before the market does, and the 5–10y horizon is the regime label the long-run breakeven prices. LEVEL-LEG ONLY (the I3 precedent — monthly cadence, no move threshold). Owner-gated through the MEASURED POST-P4-5LANE scenario — the GF-P3 precedent: the harness seat and the production seat agree by construction (the UoM SIE monthly history rides the candidates fixture))
   // ——— Flows & demand (2 — the owner's recorded B, OI-GA-2's ADD scenario,
   // ——— §4 rows 5 and 12 + D-14's repair): the crowded-positioning family
   // ——— gets its own lane. CFTC re-seated from market stress (F1, the

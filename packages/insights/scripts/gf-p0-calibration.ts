@@ -64,8 +64,13 @@ import {
   GF_F2_PROXY_ID,
   GF_MOVE_FROZEN_BASE,
   GF_MOVE_P1_PROPOSED,
+  GF_MOVE_P3_PROPOSED,
   GF_VOTERS_5LANE,
   GF_VOTERS_P2_4LANE,
+  GF_VOTERS_P3_5LANE,
+  GF_VOTERS_P4_5LANE,
+  GF_VOTERS_REALCURVE_PLUS,
+  GF_VOTERS_REALCURVE_MINUS,
   gfCalibrationStats,
   gfEvalLeg,
   gfLaneBalance,
@@ -136,6 +141,14 @@ function quantizedGap(us: SeriesPoint[], jp: SeriesPoint[]): SeriesPoint[] {
 
 /** The post-P1 gap series: the D-6 repair's persisted history, simulated over the corpus's own us10y. */
 const GAP_DERIVED = quantizedGap(SERIES['us10y']!, CAND_SERIES['jgb-10y']!);
+/** GF-S10: the D-11/D-12 derived real curve — DFII10 − DFII5, 4dp quantized
+ * (the derived.ts production twin; the corpus DFII10 × the candidates DFII5). */
+const REAL_CURVE_DERIVED: SeriesPoint[] =
+  CAND_SERIES['real-yield-5y'] !== undefined
+    ? SERIES['real-yield-10y'] !== undefined
+      ? combineSeries(SERIES['real-yield-10y']!, CAND_SERIES['real-yield-5y']!, (ten, five) => Math.round((ten - five) * 10_000) / 10_000)
+      : []
+    : [];
 
 /** The post-P1 F1 series: the D-4 backfill (the CFTC historical archive's net-share weeks). */
 const CFTC_BACKFILL_NET: SeriesPoint[] = cftc.weeks.map((w) => ({ date: w.date, value: w.netSharePct }));
@@ -185,6 +198,10 @@ const CANDIDATE_READ_IDS: readonly string[] = [
   'dollar-broad', // D2 (rank 20) — DTWEXBGS
   'dollar-eme', // D9 (rank 21) — DTWEXEMEGS
   'bank-stress', // S9 (rank 28) — DPCREDIT
+  // GF-S10 (2026-11-06): the I4 household anchor — the candidates
+  // fixture's UoM SIE series (recorded by gf-p4-record-candidates.ts; the
+  // POST-P4-5LANE scenario seats it beside the 36).
+  'michigan-5y-expectations', // I4 (rank 32) — the UoM 5–10y median
 ];
 const ALL_IDS: readonly string[] = [...new Set([...VOTER_IDS, ...CANDIDATE_READ_IDS, GF_F2_PROXY_ID])];
 
@@ -246,6 +263,17 @@ for (const day of gridDates) {
     GF_F2_PROXY_ID,
     { ...computeReading(defById.get('cftc-gold-positioning')!, seriesUpTo(CFTC_BACKFILL_GROSS_LONG, day), now, source), id: GF_F2_PROXY_ID } as unknown as IndicatorReading,
   );
+  // GF-S10 (2026-11-06): the D-11/D-12 derived real curve — DFII10 − DFII5
+  // over the corpus + candidates series (the exact production derivation,
+  // 4dp quantized — the derived.ts twin), under its PRODUCTION definition
+  // (real-curve-10y5y, rule: info — the sign variants measure over these
+  // readings; the sign question is the decision-list item).
+  if (CAND_SERIES['real-yield-5y'] !== undefined) {
+    const realCurve = REAL_CURVE_DERIVED.length > 0 ? seriesUpTo(REAL_CURVE_DERIVED, day) : undefined;
+    if (realCurve !== undefined) {
+      post.set('real-curve-10y5y', computeReading(defById.get('real-curve-10y5y')!, realCurve, now, source));
+    }
+  }
 
   windows.push({ date: day, frozen, post });
 }
@@ -581,6 +609,10 @@ emit(`| **POST-P1** | the D-2/D-3 + D-1-derived thresholds (§3); the D-4 CFTC b
 emit(`| **POST-P1-DEMOTE** | POST-P1 + the D-7/D-8 context demotion (the audit's recommended option (b): the two yield-curve seats leave the voter set — measured beside the KEEP variant; the owner's sign decision) | 19 | 4 | frozen + ${Object.keys(GF_MOVE_P1_PROPOSED).length} | on |`);
 emit(`| **POST-P2-4LANE** | POST-P1 + the promotions (§7): R9 · S4 · G1 · R8 · S13 · S7 · S8 · I3 · F2-proxy-class promotions + D5 · I7 · S6 · G4 (the COBD promotions) — the yield-curve demotion INCLUDED (the audit's recommended composition; the KEEP variant's delta = the two seats) | ${GF_VOTERS_P2_4LANE.length} | 4 | frozen + ${Object.keys(GF_MOVE_P1_PROPOSED).length} | on |`);
 emit(`| **POST-P2-5LANE** | POST-P2-4LANE with the flows lane (OI-GA-2's ADD scenario): \`cftc-gold-positioning\` re-seated from stress to \`flows\` (D-14) + the F2 proxy seat | ${GF_VOTERS_5LANE.length} | 5 | frozen + ${Object.keys(GF_MOVE_P1_PROPOSED).length} | on |`);
+emit(`| **POST-P3-5LANE** | GF-P3 (GF-S9, 2026-11-06): the four FRED-sourced voter-candidates (R2 real-yield-5y · D2 dollar-broad · D9 dollar-eme · S9 bank-stress) seated beside the 32 | ${GF_VOTERS_P3_5LANE.length} | 5 | frozen + ${Object.keys(GF_MOVE_P1_PROPOSED).length} + ${Object.keys(GF_MOVE_P3_PROPOSED).length} | on |`);
+emit(`| **POST-P4-5LANE** | GF-S10 (2026-11-06): the I4 household anchor (michigan-5y-expectations, the UoM SIE 5–10y median) seated beside the 36 — the ONE remaining P3 candidate the corpus can measure | ${GF_VOTERS_P4_5LANE.length} | 5 | frozen + ${Object.keys(GF_MOVE_P1_PROPOSED).length} + ${Object.keys(GF_MOVE_P3_PROPOSED).length} | on |`);
+emit(`| **POST-P3-5LANE-REALCURVE-PLUS** | GF-S10: the D-11/D-12 derived real curve (DFII10 − DFII5) seated in borrowing-costs at polarity +1 (a steepening real curve = gold-positive) — the sign twin A, measured beside | ${GF_VOTERS_REALCURVE_PLUS.length} | 5 | frozen + ${Object.keys(GF_MOVE_P1_PROPOSED).length} + ${Object.keys(GF_MOVE_P3_PROPOSED).length} | on |`);
+emit(`| **POST-P3-5LANE-REALCURVE-MINUS** | GF-S10: the same real-curve seat at polarity −1 (a steepening real curve = gold-negative) — the sign twin B, measured beside | ${GF_VOTERS_REALCURVE_MINUS.length} | 5 | frozen + ${Object.keys(GF_MOVE_P1_PROPOSED).length} + ${Object.keys(GF_MOVE_P3_PROPOSED).length} | on |`);
 emit();
 emit(`Each scenario runs under BOTH crowd rules — **MIN2** (D-GB-3's default) and **MIN1** (the pre-registered fallback) — and both window scopes (all windows; the mature base ≥ ${MATURE_FROM}), exactly as GB-S1 pre-registered. The beam formula (D-GB-8) is inherited unchanged and is lane-count-agnostic: |net| / (for + against) × 10°, clamped [3, 10].`);
 emit();

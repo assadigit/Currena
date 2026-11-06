@@ -69,7 +69,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T10Y2Y): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -147,7 +147,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T10Y3M): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:T10Y3M): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -208,7 +208,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -269,7 +269,67 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED series page (read live 2026-11-06, GF-S10): title '5-Year Treasury Inflation-Indexed Security Yield', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class, its 10y twin DFII10's own row (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "real-curve-10y5y",
+      "title": "US real yield curve (10Y minus 5Y)",
+      "area": {
+        "section": "global",
+        "group": "borrowing-costs",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "FRED (DFII10 − DFII5, derived)",
+        "url": "https://fred.stlouisfed.org/series/DFII5",
+        "seriesIdOrTable": "FRED:DFII10 − FRED:DFII5 (daily, derived)"
+      },
+      "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
+      "publisherUrl": "https://fred.stlouisfed.org/series/DFII5",
+      "methodUrl": "https://fred.stlouisfed.org/series/DFII5",
+      "whatItIs": "The 10-year minus 5-year real yield (FRED’s DFII10 − DFII5, derived daily): the slope of the inflation-adjusted Treasury curve between the belly and the long end.",
+      "whatItIsnt": "The sign of its gold relation is a genuinely open question — which is exactly why it displays here as context and does not vote (both readings are measured in the program’s harness; the choice is the owner’s to record).",
+      "trackRecordNote": "A steep real curve with a low front end has classically marked easy-policy stretches; a flat or inverted real curve marked the tight ones — the relationship this card displays as context, never as a forecast.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 4 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L0",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "github-action",
+        "termsLines": "FRED carries a machine-readable license tag per series (fred.stlouisfed.org/legal/#copyright-<category>); series without a copyright notice resolve to #copyright-public-domain (scanned 2026-10-16, data/fred-copyright.json). Public domain — free to display with the FRED attribution shown. · Worst of legs (fred:DFII10, fred:DFII5): the L0 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-10-16",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "legs": [
+          "fred:DFII10",
+          "fred:DFII5"
+        ]
+      },
+      "unit": "points",
+      "changeUnit": "percentage points",
+      "cadence": "daily",
+      "maxAgeDays": 4,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED series page (read live 2026-11-06, GF-S10): title '5-Year Treasury Inflation-Indexed Security Yield', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class, its 10y twin DFII10's own row (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DFII10, fred:DFII5): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -342,7 +402,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -404,7 +464,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -467,7 +527,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DGS2, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -540,7 +600,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -658,7 +718,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -840,7 +900,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:A091RC1Q027SBEA, fred:W006RC1Q027SBEA): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -899,7 +959,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -959,7 +1019,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (mof:jgbcme, fred:IRLTLT01JPM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (mof:jgbcme, fred:IRLTLT01JPM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1018,7 +1078,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1077,7 +1137,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1254,7 +1314,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field reads https://fred.stlouisfed.org/legal/#copyright-public-domain (Federal Reserve Board H.4.1 memorandum item: securities in custody for foreign and international accounts; series page read live 2026-10-31, the S2-M2.4 custody-card scan) (checked 2026-10-31) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1669,7 +1729,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -1728,7 +1788,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -2148,7 +2208,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -4103,7 +4163,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -4162,7 +4222,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -4221,7 +4281,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -4697,7 +4757,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -4758,13 +4818,13 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
     {
       "id": "bank-stress",
-      "title": "Commercial paper rate (30d)",
+      "title": "The Fed’s discount window rate",
       "area": {
         "section": "global",
         "group": "market-stress",
@@ -4780,9 +4840,9 @@
       "publisher": "FRED, series WITHOUT a copyright notice (public domain)",
       "publisherUrl": "https://fred.stlouisfed.org/series/DPCREDIT",
       "methodUrl": "https://fred.stlouisfed.org/series/DPCREDIT",
-      "whatItIs": "The 30-day nonfinancial commercial paper rate (FRED’s DPCREDIT): what top-tier US companies pay to borrow cash for a month, straight from the money market.",
-      "whatItIsnt": "It measures one corner of short-term funding: not the whole banking system, and not future stress.",
-      "trackRecordNote": "Sharp spikes have preceded or coincided with banking stress episodes; calm stretches sit in low single digits, where the plumbing works.",
+      "whatItIs": "The primary credit rate (FRED’s DPCREDIT): the interest rate a bank pays when it borrows directly from the Federal Reserve’s discount window — the standing facility’s own price, set a margin above the policy target.",
+      "whatItIsnt": "It is the facility’s PRICE, not its usage: a calm rate says nothing about how much banks are borrowing, and nothing about future stress.",
+      "trackRecordNote": "The rate mostly steps with policy; the stress episodes that made the window famous showed up in borrowed VOLUMES, which this rate does not measure — the honest limit stated below.",
       "definition": null,
       "failClosedConditions": "No value, data older than 14 days, an exact repeat beyond its weekly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
@@ -4819,7 +4879,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Discount Window Primary Credit Rate', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work) (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -4880,7 +4940,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5116,7 +5176,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:THREEFYTP10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve Board Kim-Wright term premium; series page read live 2026-11-01, the gap-closure S3-M3.2 scan — the class the M3.1 verification recorded) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:THREEFYTP10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5175,7 +5235,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WTREGEN): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve H.4.1 Treasury General Account, Wednesday level; series page read live 2026-11-01, the gap-closure S3-M3.2 scan) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WTREGEN): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5234,7 +5294,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:RRPONTSYD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Federal Reserve Bank of New York overnight reverse repo; series page read live 2026-11-01, the gap-closure S3-M3.2 scan — displayed with the FRED attribution per the licence walk, the recorded acceptance the citation-required family rides) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:RRPONTSYD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5293,7 +5353,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WRESBAL): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve H.4.1 reserve balances, Wednesday level; series page read live 2026-11-01, the gap-closure S3-M3.2 scan) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WRESBAL): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5353,7 +5413,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:SOFR, fred:IORB): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field (Federal Reserve interest on reserve balances; series page read live 2026-11-01, the gap-closure S3-M3.2 scan; the series carries administratively announced future-dated rows — trimmed to today at collect) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:SOFR, fred:IORB): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5414,7 +5474,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WALCL, fred:WTREGEN, fred:RRPONTSYD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Federal Reserve Bank of New York overnight reverse repo; series page read live 2026-11-01, the gap-closure S3-M3.2 scan — displayed with the FRED attribution per the licence walk, the recorded acceptance the citation-required family rides) (checked 2026-11-01) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:WALCL, fred:WTREGEN, fred:RRPONTSYD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5788,7 +5848,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Nominal Broad U.S. Dollar Index', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work) (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5849,7 +5909,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Emerging Markets Economies Trade-Weighted Dollar Index', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work) (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -5922,7 +5982,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DGS10, mof:jgbcme, fred:IRLTLT01JPM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:DGS10, mof:jgbcme, fred:IRLTLT01JPM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -6122,7 +6182,7 @@
         "url": "https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows",
         "seriesIdOrTable": "WGC monthly ETF holdings table (tonnes)"
       },
-      "publisher": "wgc",
+      "publisher": "World Gold Council (GoldHub)",
       "publisherUrl": "https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows",
       "methodUrl": "https://www.gold.org/goldhub/data/global-gold-backed-etf-holdings-and-flows",
       "whatItIs": "Total gold held by the world’s gold-backed exchange-traded funds, in tonnes, published monthly by the World Gold Council.",
@@ -6131,13 +6191,13 @@
       "definition": null,
       "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
-        "level": "L2",
+        "level": "L3",
         "ownerAccepts": false,
         "enabled": false,
         "method": null,
         "runtime": null,
-        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
-        "termsReadOn": "not verified",
+        "termsLines": "gold.org/terms-and-conditions (read live 2026-11-06): \"you are not permitted to modify, copy, scrape, distribute … without the prior written authorisation of WGC\" + \"Certain market data is the property of the CME Group Inc. … you will not redistribute the website pages and/or the contents thereon to any third party, unless specifically permitted by CME or its affiliates in writing\" + the downloads are registration-gated. The pre-approval class — never fetched (D-44’s pattern).",
+        "termsReadOn": "2026-11-06",
         "attributionText": "",
         "legs": [
           "wgc"
@@ -6156,14 +6216,14 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "Unverified",
+        "licenceName": "Prior written authorisation required (pre-approval class — never fetched)",
         "attributionText": "",
         "attributionRequired": false,
-        "privateOk": true,
+        "privateOk": false,
         "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "No register entry — fail closed (T-15 blocks public display) until the terms are read and recorded.",
-        "termsUrl": null
+        "termsCheckedOn": "2026-11-06",
+        "termsEvidence": "Quoted verbatim from gold.org/terms-and-conditions (read live 2026-11-06, GF-S10): \"Except as otherwise permitted by these terms and conditions, you are not permitted to modify, copy, scrape, distribute, transmit, display, reproduce, duplicate, publish, license, frame, link, create derivative works from, transfer or otherwise use in any manner, in whole or in part, this Website or the information and materials on this Website without the prior written authorisation of WGC and with suitable accreditation to WGC.\" and: \"Certain market data is the property of the CME Group Inc. … By accessing this Website, you agree that you will not redistribute the website pages and/or the contents thereon to any third party, unless specifically permitted by CME or its affiliates in writing to do so.\" — PLUS the GoldHub download pages are registration-gated (read live 2026-11-06: \"Login or register to read the commentary and download the data files on this page\"). The pre-approval class: no fetch, no display, until the owner records WGC’s written authorisation (D-44’s pattern). The GF-S9 CHANGELOG’s \"cards render awaiting data honestly\" posture stands — now with the terms verdict recorded.",
+        "termsUrl": "https://www.gold.org/terms-and-conditions"
       }
     },
     {
@@ -6181,7 +6241,7 @@
         "url": "https://www.gold.org/goldhub/data/central-bank-gold-purchases",
         "seriesIdOrTable": "WGC Gold Demand Trends quarterly (tonnes)"
       },
-      "publisher": "wgc",
+      "publisher": "World Gold Council (GoldHub)",
       "publisherUrl": "https://www.gold.org/goldhub/data/central-bank-gold-purchases",
       "methodUrl": "https://www.gold.org/goldhub/data/central-bank-gold-purchases",
       "whatItIs": "Net gold bought by the world’s central banks, in tonnes per quarter, published by the World Gold Council from reported and estimated reserves.",
@@ -6190,13 +6250,13 @@
       "definition": null,
       "failClosedConditions": "No value, data older than 100 days, an exact repeat beyond its quarterly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
-        "level": "L2",
+        "level": "L3",
         "ownerAccepts": false,
         "enabled": false,
         "method": null,
         "runtime": null,
-        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
-        "termsReadOn": "not verified",
+        "termsLines": "gold.org/terms-and-conditions (read live 2026-11-06): \"you are not permitted to modify, copy, scrape, distribute … without the prior written authorisation of WGC\" + \"Certain market data is the property of the CME Group Inc. … you will not redistribute the website pages and/or the contents thereon to any third party, unless specifically permitted by CME or its affiliates in writing\" + the downloads are registration-gated. The pre-approval class — never fetched (D-44’s pattern).",
+        "termsReadOn": "2026-11-06",
         "attributionText": "",
         "legs": [
           "wgc"
@@ -6215,14 +6275,14 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "Unverified",
+        "licenceName": "Prior written authorisation required (pre-approval class — never fetched)",
         "attributionText": "",
         "attributionRequired": false,
-        "privateOk": true,
+        "privateOk": false,
         "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "No register entry — fail closed (T-15 blocks public display) until the terms are read and recorded.",
-        "termsUrl": null
+        "termsCheckedOn": "2026-11-06",
+        "termsEvidence": "Quoted verbatim from gold.org/terms-and-conditions (read live 2026-11-06, GF-S10): \"Except as otherwise permitted by these terms and conditions, you are not permitted to modify, copy, scrape, distribute, transmit, display, reproduce, duplicate, publish, license, frame, link, create derivative works from, transfer or otherwise use in any manner, in whole or in part, this Website or the information and materials on this Website without the prior written authorisation of WGC and with suitable accreditation to WGC.\" and: \"Certain market data is the property of the CME Group Inc. … By accessing this Website, you agree that you will not redistribute the website pages and/or the contents thereon to any third party, unless specifically permitted by CME or its affiliates in writing to do so.\" — PLUS the GoldHub download pages are registration-gated (read live 2026-11-06: \"Login or register to read the commentary and download the data files on this page\"). The pre-approval class: no fetch, no display, until the owner records WGC’s written authorisation (D-44’s pattern). The GF-S9 CHANGELOG’s \"cards render awaiting data honestly\" posture stands — now with the terms verdict recorded.",
+        "termsUrl": "https://www.gold.org/terms-and-conditions"
       }
     },
     {
@@ -6240,7 +6300,7 @@
         "url": "https://www.pbc.gov.cn/en/3688110/index.html",
         "seriesIdOrTable": "PBoC/SAFE monthly reserves table + CBR (tonnes)"
       },
-      "publisher": "pboc",
+      "publisher": "People's Bank of China / SAFE (official reserve assets)",
       "publisherUrl": "https://www.pbc.gov.cn/en/3688110/index.html",
       "methodUrl": "https://www.pbc.gov.cn/en/3688110/index.html",
       "whatItIs": "Monthly net gold bought by the official sector, in tonnes, compiled from PBoC/SAFE and CBR reserve updates, the largest reported buyers.",
@@ -6254,8 +6314,8 @@
         "enabled": false,
         "method": null,
         "runtime": null,
-        "termsLines": "No register row — fail closed: not fetched, not shown, until the terms are read and the row is recorded.",
-        "termsReadOn": "not verified",
+        "termsLines": "The cited English URL 404s (read live 2026-11-06 — the English statistics section restructured); no terms text quotable from a live official page this session. Fail closed: no fetch wired.",
+        "termsReadOn": "2026-11-06",
         "attributionText": "",
         "legs": [
           "pboc"
@@ -6274,14 +6334,75 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "Unverified",
+        "licenceName": "Unreadable from this venue — fail closed (L2, no fetch wired)",
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
         "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "No register entry — fail closed (T-15 blocks public display) until the terms are read and recorded.",
-        "termsUrl": null
+        "termsCheckedOn": "2026-11-06",
+        "termsEvidence": "The cited English URL (pbc.gov.cn/en/3688110/index.html) returns HTTP 404 (read live 2026-11-06, GF-S10 — the English statistics section restructured; several /en/3688xxx/ routes probed, all 404). The monthly official-reserve data itself is published (the PBoC’s gold reserves 77.47 million ounces end-Sep-2026, 23 consecutive months of purchases — the China Daily record, 2026-10-07) but no terms text could be quoted from a live official page this session. Fail closed: no fetch wired, the card reads awaiting data, and the venue/terms question rides the GF-S10 evidence (a live official URL + a quoted government-data terms line unlocks it).",
+        "termsUrl": "https://www.pbc.gov.cn/en/3688110/index.html"
+      }
+    },
+    {
+      "id": "shanghai-gold-premium",
+      "title": "Shanghai gold premium",
+      "area": {
+        "section": "global",
+        "group": "market-stress",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "derived",
+        "name": "Shanghai Gold Exchange Au99.99 ÷ (gold-api XAU × Frankfurter USD/CNY), derived",
+        "url": "https://en.sge.com.cn/data_DelayedQuotes",
+        "seriesIdOrTable": "SGE Au99.99 (CNY/g) ÷ (gold-api XAU × Frankfurter USD/CNY ÷ 31.1034768) − 1"
+      },
+      "publisher": "Shanghai Gold Exchange (delayed quotes + daily report)",
+      "publisherUrl": "https://en.sge.com.cn/data_DelayedQuotes",
+      "methodUrl": "https://en.sge.com.cn/data_DelayedQuotes",
+      "whatItIs": "The Shanghai Gold Exchange’s Au99.99 close (CNY per gram) versus the converted London ounce — the world gold price in dollars times the dollar–yuan rate, converted to CNY per gram — shown as a percentage difference.",
+      "whatItIsnt": "A premium reflects delivery frictions, quotas and local taxes as well as demand — the classic tell, read as context, never a trading signal.",
+      "trackRecordNote": "The premium flared in 2013 (the import rush), 2016 and 2023–24 (the buying waves); discounts marked the weak-demand stretches between them.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 5 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L2",
+        "ownerAccepts": false,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "worker",
+        "termsLines": "The exchange’s own footer: \"Copyright 2016 上海黄金交易所 All Right Reserved\" (read live 2026-11-06) — no affirmative reuse grant quoted; the delayed quotes + the daily report are the site’s own public keyless pages (verified live: Au99.99 884.09 CNY/g close 2026-11-05). L2: private display until the owner records acceptance. · Worst of legs (sge, gold-api, frankfurter): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsReadOn": "2026-11-06",
+        "attributionText": "Source: Shanghai Gold Exchange (Au99.99 delayed)",
+        "legs": [
+          "sge",
+          "gold-api",
+          "frankfurter"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percent",
+      "cadence": "daily",
+      "maxAgeDays": 5,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "no",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (sge, gold-api, frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {
@@ -6461,7 +6582,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -6522,7 +6643,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -6762,7 +6883,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -6823,7 +6944,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -7006,6 +7127,67 @@
         "termsCheckedOn": "2026-10-24",
         "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Univ. of Michigan source) (checked 2026-10-24) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
+      }
+    },
+    {
+      "id": "michigan-5y-expectations",
+      "title": "US expected inflation, next 5–10 years (Michigan)",
+      "area": {
+        "section": "global",
+        "group": "prices-heat",
+        "gauge": "prices-heat",
+        "gaugeMembership": "scored member of the area counts (fix B-14: brent counts in prices-heat while its card renders on the prices strip)"
+      },
+      "source": {
+        "provider": "uom",
+        "name": "Surveys of Consumers, Survey Research Center, University of Michigan (Table 33 median)",
+        "url": "https://data.sca.isr.umich.edu/tables.php",
+        "seriesIdOrTable": "UoM SIE Table 33 (median expected price change, next 5–10 years, monthly)"
+      },
+      "publisher": "University of Michigan Surveys of Consumers (SIE time-series archive)",
+      "publisherUrl": "https://data.sca.isr.umich.edu/tables.php",
+      "methodUrl": "https://data.sca.isr.umich.edu/tables.php",
+      "whatItIs": "The median answer to the University of Michigan’s long-run question — “By about what percent per year do you expect prices to go up on average during the next 5 to 10 years?” — asked monthly since 1978 (Table 33’s median, shown verbatim).",
+      "whatItIsnt": "It is what households SAY, not what prices do: a survey median, one input among many, and not a forecast.",
+      "trackRecordNote": "The anchor sat near 2.5–3% for decades, snapped toward 5% in 2022 — the episode that forced the fastest tightening of the cycle — and has cooled since.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M1",
+        "runtime": "worker",
+        "termsLines": "The SIE usage agreement (read live 2026-11-06): \"the data is available under the CC-BY-NC-ND license\" — CC-BY-NC-ND with the quoted copyright notice; the NC condition rides the owner’s recorded non-commercial statement (2026-10-17); the archive POST is keyless and serves the full history.",
+        "termsReadOn": "2026-11-06",
+        "attributionText": "Surveys of Consumers, Survey Research Center, University of Michigan",
+        "legs": [
+          "uom"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": true,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "percentile",
+        "tail": "high",
+        "cutoff": 0.2
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "CC BY-NC-ND 4.0 (the SIE usage agreement — non-commercial, attribution, no derivatives)",
+        "attributionText": "Surveys of Consumers, Survey Research Center, University of Michigan. Copyright © 1946–2026 The Regents of the University of Michigan",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-06",
+        "termsEvidence": "Quoted verbatim from data.sca.isr.umich.edu/agreement.php (read live 2026-11-06, GF-S10): \"If you are a researcher at a university, government, or nonprofit research organization, or if you are interested in using the data for strictly internal purposes, without the ability to redistribute the data or the ability to incorporate the data into a commercial data product, the data is available under the CC-BY-NC-ND license. Our copyright notice for required attribution is: Surveys of Consumers, Survey Research Center, University of Michigan. Copyright © 1946–2026 The Regents of the University of Michigan.\" — the CC-BY-NC-ND licence permits non-commercial redistribution with attribution; the NC condition rides the owner’s recorded non-commercial statement (RISK_REGISTER.md, 2026-10-17); the ND condition is honoured by showing the median series verbatim (never recomputed). The Table 33 CSV download (the time-series archive POST, table=33) is keyless and serves the full monthly history — verified live 2026-11-06 (227 rows Jan 2008 → Sep 2026 in the year-2008 request; the 1978 request serves from 1978). · Legs (uom): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://data.sca.isr.umich.edu/agreement.php"
       }
     },
     {
@@ -7419,7 +7601,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation.",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -7537,7 +7719,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:PAYEMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:PAYEMS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -8267,7 +8449,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (rba:F2, fred:DGS10): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -9119,7 +9301,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (rba:F1, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (rba:F1, fred:DFEDTARL, fred:DFEDTARU): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
@@ -10306,7 +10488,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-24",
-        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-11-06) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:IRLTLT01ITM156N, fred:IRLTLT01DEM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (checked 2026-10-21) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (fred:IRLTLT01ITM156N, fred:IRLTLT01DEM156N): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     }

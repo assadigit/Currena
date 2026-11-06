@@ -757,6 +757,11 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'us-pce-core-yoy',
   'recession-probability',
   'michigan-1y-expectations',
+  // GF-S10 (2026-11-06, the remaining P3 sources): the I4 5–10y household
+  // anchor speaks in percentage points exactly like its 1y sibling — and
+  // the D-11/D-12 derived real curve is a yield slope in points.
+  'michigan-5y-expectations',
+  'real-curve-10y5y',
   // M5 Wave 2 (2026-10-24): the euro-area AAA 10-year yield — a rate-family
   // series in percentage points.
   'euro-aaa-10y',
@@ -784,10 +789,12 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   'term-premium-10y',
   'repo-stress',
   // GF-P3 (2026-11-06, the standing delegation — §4 rank 28 / S9): the
-  // commercial paper rate — a rate-family series in percentage points, the
-  // repo-stress/sofr family (the 30d nonfinancial commercial paper rate,
-  // the modern bank-run tell). Polarity +1 (rising = stress = gold-
-  // positive), but the units are rate-points regardless of polarity.
+  // Fed's discount window primary credit rate (the GF-S10 name repair:
+  // DPCREDIT is NOT the commercial paper rate the GF-S9 comment
+  // described) — a rate-family series in percentage points, the
+  // repo-stress/sofr family. Polarity +1 (rising = tighter policy
+  // posture = gold-positive), but the units are rate-points regardless of
+  // polarity.
   'bank-stress',
   // gap-closure S3-M3.3 (2026-11-01): the excess bond premium — a
   // spread in percentage points, the repo-stress family (a premium
