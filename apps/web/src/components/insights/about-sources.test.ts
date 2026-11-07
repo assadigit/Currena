@@ -101,11 +101,16 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     expect(derived!.seriesCount).toBe(23); // GF-S10 (2026-11-06) adds the D-11/D-12 derived real curve (real-curve-10y5y, DFII10 − DFII5) + the F6 Shanghai premium (shanghai-gold-premium, SGE ÷ converted London ounce) → 23 // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18 + the S3-M3.5 deficit 12-month sum (us-deficit-12m) → 19 + the S6-M6.1 AUD/NZD cross (audnzd) → 20 + the S6-M6.3 Italy−Germany spread (btp-bund-spread) → 21
     expect(derived!.enabledCount).toBe(23); // GF-S10: ALL 23 enabled — the premium's SGE leg is L2 DISPLAY-gated (private mode until the owner's recorded acceptance, the site-mode hide), but the FETCH is enabled (the exchange's own public page — the register's own sge row: "the fetch runs … the DISPLAY gate is the licence verdict")
     expect(aboutEnabledState(derived!)).toBe('on');
-    // GF-S10: the premium's GOVERNING licence (the SGE ©-reserved class) is
-    // visible in the row's licence set — the About table shows the class
-    // that actually gates the card (the generator's governing-leg rule,
-    // mirroring riskSummaryForLegs).
-    expect(derived!.licences).toContain('Exchange market data — © SGE, no reuse grant quoted (fail closed)');
+    // GF-S11 (2026-11-07): the SGE L2 class is OWNER-ACCEPTED (the round-2
+    // answer (e), the README's round-2 decision table in the gap-fill
+    // program) — the Shanghai premium card flipped PUBLIC. The
+    // governing-licence walk now resolves 'yes' across every leg, so the
+    // named governing licence is the LAST leg (Frankfurter, the historical
+    // behaviour when all legs display-ok) and the ©-SGE fail-closed string
+    // is GONE from the row's licence set.
+    expect(derived!.licences).not.toContain('Exchange market data — © SGE, no reuse grant quoted (fail closed)');
+    const shanghai = SIDECAR.find((e) => e.id === 'shanghai-gold-premium');
+    expect(shanghai?.licenceName).toBe('ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)');
     // Own-computation series inherit the upstream terms — the blanket
     // sidecar string (audjpy's) is one of the row's licences (sources.ts
     // riskRowForLeg mirrors the same inheritance).

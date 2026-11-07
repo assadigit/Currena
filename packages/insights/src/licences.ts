@@ -585,21 +585,27 @@ const UOM_SIE: SourceLicence = {
  * redistribution grant could be quoted from the venue (the English
  * legal-statement pages render no terms text; the Chinese site carries
  * no reusable disclaimer on the data pages). L2 — the fail-closed
- * owner-acceptance class: the card serves PRIVATE until the owner
- * records acceptance (the agent never edits ownerAccepts — the printed
- * decision question rides the GF-S10 evidence).
+ * owner-acceptance class.
+ *
+ * GF-S11 (2026-11-07): the OWNER'S RECORDED ACCEPTANCE — the round-2
+ * answer (e), the README's round-2 decision table (the D-GF-1 mechanism):
+ * "ACCEPT — GO PUBLIC". The Yahoo/Shiller L2 owner-acceptance precedent:
+ * a derived ratio from an official exchange's factual closes, attributed,
+ * displayed on the owner's own non-commercial site. The card flips PUBLIC
+ * (the registry regeneration + the T-15 projection unhide ride this
+ * verdict); F15 (the SGE monthly withdrawals) unblocks on the same class.
  */
 const SGE: SourceLicence = {
   provider: 'sge',
   label: 'Shanghai Gold Exchange (delayed quotes + daily report)',
-  licenceName: 'Exchange market data — © SGE, no reuse grant quoted (fail closed)',
+  licenceName: 'Exchange market data — © SGE, owner-accepted for display (2026-11-07)',
   attributionText: 'Source: Shanghai Gold Exchange (Au99.99 delayed)',
   attributionRequired: true,
   privateOk: true,
-  publicDisplayOk: 'no', // L2: no quoted grant — the owner's recorded acceptance lifts it
+  publicDisplayOk: 'yes', // the owner's recorded acceptance, round-2 answer (e), 2026-11-07
   termsCheckedOn: '2026-11-06',
   termsEvidence:
-    'The exchange\u2019s own site footer (read live 2026-11-06, www.sge.com.cn/sjzx/mrhq): "Copyright 2016 上海黄金交易所 All Right Reserved" — © reserved, no affirmative reuse or redistribution grant found on any data page this venue could read (the en.sge.com.cn legal-statement routes render the generic shell; the Chinese data pages carry no reusable disclaimer). The delayed quotes page (data_DelayedQuotes, en) and the daily-report endpoint (data_daily_international_new, 20 rows/page, archive back to ~2024) are the site\u2019s own public offerings, served keyless with the honest declared UA (verified live 2026-11-06: Au99.99 884.09 CNY/g close 2026-11-05). L2 fail-closed: public display OFF until the owner records acceptance; the fetch itself is the site\u2019s own public page.',
+    'The exchange\u2019s own site footer (read live 2026-11-06, www.sge.com.cn/sjzx/mrhq): "Copyright 2016 上海黄金交易所 All Right Reserved" — © reserved, no affirmative reuse or redistribution grant found on any data page this venue could read (the en.sge.com.cn legal-statement routes render the generic shell; the Chinese data pages carry no reusable disclaimer). The delayed quotes page (data_DelayedQuotes, en) and the daily-report endpoint (data_daily_international_new, 20 rows/page, archive back to ~2024) are the site\u2019s own public offerings, served keyless with the honest declared UA (verified live 2026-11-06: Au99.99 884.09 CNY/g close 2026-11-05). L2 owner-acceptance: the owner ACCEPTED this class for public display on 2026-11-07 (the round-2 answer (e) — the README\u2019s round-2 decision table, the D-GF-1 mechanism; the Yahoo/Shiller precedent: a derived ratio from an official exchange\u2019s factual closes, attributed, on the owner\u2019s non-commercial site). The delayed factual closes display with the exchange\u2019s attribution; no modification; no bulk redistribution.',
   termsUrl: 'https://en.sge.com.cn/',
 };
 

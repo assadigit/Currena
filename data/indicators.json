@@ -6369,11 +6369,11 @@
       "failClosedConditions": "No value, data older than 5 days, an exact repeat beyond its daily cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L2",
-        "ownerAccepts": false,
+        "ownerAccepts": true,
         "enabled": true,
         "method": "M1",
         "runtime": "worker",
-        "termsLines": "The exchange’s own footer: \"Copyright 2016 上海黄金交易所 All Right Reserved\" (read live 2026-11-06) — no affirmative reuse grant quoted; the delayed quotes + the daily report are the site’s own public keyless pages (verified live: Au99.99 884.09 CNY/g close 2026-11-05). L2: private display until the owner records acceptance. · Worst of legs (sge, gold-api, frankfurter): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsLines": "The exchange’s own footer: \"Copyright 2016 上海黄金交易所 All Right Reserved\" (read live 2026-11-06) — no affirmative reuse grant quoted; the delayed quotes + the daily report are the site’s own public keyless pages (verified live: Au99.99 884.09 CNY/g close 2026-11-05). L2 owner-ACCEPTED 2026-11-07 (the round-2 answer (e)): public display with the exchange’s attribution, no modification, no bulk redistribution. · Worst of legs (sge, gold-api, frankfurter): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
         "termsReadOn": "2026-11-06",
         "attributionText": "Source: Shanghai Gold Exchange (Au99.99 delayed)",
         "legs": [
@@ -6395,14 +6395,14 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "Exchange market data — © SGE, no reuse grant quoted (fail closed)",
-        "attributionText": "Source: Shanghai Gold Exchange (Au99.99 delayed)",
+        "licenceName": "ECB website terms (free use, accurate + cited) via the Frankfurter project (MIT code)",
+        "attributionText": "Source: European Central Bank (reference rates via Frankfurter)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-11-06",
-        "termsEvidence": "The exchange’s own site footer (read live 2026-11-06, www.sge.com.cn/sjzx/mrhq): \"Copyright 2016 上海黄金交易所 All Right Reserved\" — © reserved, no affirmative reuse or redistribution grant found on any data page this venue could read (the en.sge.com.cn legal-statement routes render the generic shell; the Chinese data pages carry no reusable disclaimer). The delayed quotes page (data_DelayedQuotes, en) and the daily-report endpoint (data_daily_international_new, 20 rows/page, archive back to ~2024) are the site’s own public offerings, served keyless with the honest declared UA (verified live 2026-11-06: Au99.99 884.09 CNY/g close 2026-11-05). L2 fail-closed: public display OFF until the owner records acceptance; the fetch itself is the site’s own public page. · Legs (sge, gold-api, frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://en.sge.com.cn/"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "ECB 'Disclaimer & Copyright' page read verbatim in a browser 2026-10-21 (ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html): users may make free use of website information provided (a) it appears accurately, (b) the ECB is cited as the source, (c) any modification (e.g. derived calculation) is stated explicitly, (d) it is not sold without the free-of-charge notice. Currena shows the reference rates verbatim with ECB attribution, and every derived computation (the dollar basket, gold-AUD) carries its own 'How is this calculated?' definition. The same rates already power the public converter. · Legs (sge, gold-api, frankfurter): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://www.ecb.europa.eu/services/using-our-site/disclaimer/html/index.en.html"
       }
     },
     {

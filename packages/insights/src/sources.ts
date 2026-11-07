@@ -720,15 +720,18 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     method: 'M1',
     runtime: 'worker',
     level: 'L2',
-    ownerAccepts: false, // the agent never edits this — the owner's recorded acceptance lifts the card to public
+    // GF-S11 (2026-11-07): the owner's RECORDED acceptance — the round-2
+    // answer (e), the README's round-2 decision table (the D-GF-1
+    // mechanism). The display class flips public; F15 rides the same class.
+    ownerAccepts: true,
     override: false,
     enabled: true, // the fetch runs (the site's own public page); the DISPLAY gate is the licence verdict
     termsLines:
-      'The exchange\u2019s own footer: "Copyright 2016 上海黄金交易所 All Right Reserved" (read live 2026-11-06) — no affirmative reuse grant quoted; the delayed quotes + the daily report are the site\u2019s own public keyless pages (verified live: Au99.99 884.09 CNY/g close 2026-11-05). L2: private display until the owner records acceptance.',
+      'The exchange\u2019s own footer: "Copyright 2016 上海黄金交易所 All Right Reserved" (read live 2026-11-06) — no affirmative reuse grant quoted; the delayed quotes + the daily report are the site\u2019s own public keyless pages (verified live: Au99.99 884.09 CNY/g close 2026-11-05). L2 owner-ACCEPTED 2026-11-07 (the round-2 answer (e)): public display with the exchange\u2019s attribution, no modification, no bulk redistribution.',
     termsReadOn: '2026-11-06',
     attribution: 'Source: Shanghai Gold Exchange (Au99.99 delayed)',
     termsUrl: 'https://en.sge.com.cn/',
-    notes: 'GF-S10: the public-display question rides the GF-S10 evidence (the printed decision list).',
+    notes: 'GF-S11 (2026-11-07): the ownerAccepts record — the round-2 answer (e) flipped the class public (the Yahoo/Shiller L2 precedent).',
   },
   wgc: {
     id: 'wgc',

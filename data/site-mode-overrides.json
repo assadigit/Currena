@@ -3,7 +3,6 @@
   "version": 1,
   "hiddenIndicatorIds": [
     "official-gold-demand",
-    "shanghai-gold-premium",
     "wgc-cb-demand",
     "wgc-etf-holdings"
   ],

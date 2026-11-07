@@ -36,7 +36,7 @@ describe('the bundled indicator-audit sidecar', () => {
 });
 
 describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
-  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide + the 2026-10-24 M4 Wave-1 + the 2026-10-25 M6 Wave-3 additions)', () => {
+  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide + the 2026-10-24 M4 Wave-1 + the 2026-10-25 M6 Wave-3 additions + the 2026-11-07 SGE owner-acceptance)', () => {
     // brent/gold-usd/silver-usd (Yahoo legs), btc-usd (gold-api), the
     // FRED citation-required set (display-permitted with "publisher via
     // FRED" attribution — FRED legal read 2026-10-21: STLFSI/NFCI/VIX/
@@ -49,6 +49,10 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
     // the audit sidecar today (M6 Wave 3: +cfnai, +mortgage-30y, +t5yie — the
     // citation-required FRED additions; the BoE fix keeps boe-rate here but
     // under the OGL-attribution licence).
+    // GF-S11 (2026-11-07): +shanghai-gold-premium — the SGE L2 class is
+    // owner-ACCEPTED (the round-2 answer (e)); the card flipped public and
+    // the M-2 rule follows automatically (its public history serves the
+    // visible chart window only, exactly like the Yahoo/Shiller L2 set).
     // gap-closure S3-M3.4 (2026-11-01): +empire-state, +gdpnow, +median-cpi,
     // +sticky-cpi — the citation-required FRED additions of the
     // growth-nowcast/survey family (display-permitted with attribution);
@@ -105,6 +109,7 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       // itself (citation-required, display-permitted with attribution).
       'repo-stress',
       'reverse-repo',
+      'shanghai-gold-premium',
       'shiller-cape',
       'shiller-ecy',
       'silver-usd',
