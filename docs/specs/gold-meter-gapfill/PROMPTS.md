@@ -1776,7 +1776,7 @@ green; 5. final message = the printed next prompt + the 5-line summary
 + the WGC draft printed for the owner.
 ```
 
-## GF-S12 — P5: the acceptance walk + the program's close (the dedicated final session — written by GF-S11, 2026-11-07)
+## GF-S12 — P5: the acceptance walk + the program's close (RUN 2026-11-07 — **THE ACCEPTANCE WALK + THE CLOSE DELIVERED: the program CLOSED — COMPLETE**. Every phase's gate re-verified from the closing session's own runs: the calibration re-run **byte-for-byte identical** (sha `212ece76…`) · the gf-p4-verify twin re-run (**production ≡ POST-P4-5LANE in ALL 2512 windows**, the drift gate held) · the licence register audit **37/37 rows evidenced + dated** · the registry pins (184 ids · 130 rule:info · the hidden set 7 · 37/37 voters present · 0 hidden) · copy:audit clean · the full suite **14,620 green** · build + budget under the line. The production matrix over the live public snapshot (177 readings: **for 2 · against 1 · neutral 2 · unread 0 — 5 of 5 lanes readable**; **the (e) flip's own line −0.73% @ 2026-11-06 PUBLIC**; the 7 private ids absent, 0 leaked). The open questions PRINTED (the README's round-3 table: the Cleveland L2 class · the X5 Yahoo class · the WGC reply · the acceptance itself — none gates the close; the owner's round-3 answers did not arrive mid-session). The close-out records written: the README CLOSED + the successor note · PROGRESS final rows + the program's verdict block · CHANGELOG [2026-11-07c] · AGENT_HANDOFF restated · **the final prompt = NONE (the section below)**. No GOLD_LANE_VOTERS edit; nothing deployed (docs+evidence+the read-only gf-p5-verify.ts only). PR #45 merged, CI green on main)
 
 ```
 You are working in the Currena repo at the repo root. This is the GF-S12
@@ -1912,3 +1912,45 @@ prompt per the owner's answers; 4. commit, push, PR, merge when green;
 5. final message = the acceptance summary + the printed open questions
 + the 5-line program summary.
 ```
+
+---
+
+## THE FINAL PROMPT — NONE (the program closed at GF-S12, 2026-11-07)
+
+**There is no next gold-meter-gapfill session. The program is CLOSED —
+COMPLETE.** The D-GA-9 convention's honest endpoint: every session of
+this program ended by handing over the next prompt, and the last one
+ends by handing over NOTHING — the work is done and recorded.
+
+**The records the close leaves (the authoritative set):**
+
+- The program home: `README.md` (the status line **CLOSED — COMPLETE**
+  + the successor note + the round-1/round-2 answer sheets + the
+  **round-3 printed questions**, answers pending) · `01-FILL-SPEC.md`
+  (the phases, all delivered) · `PROGRESS.md` (the twelve session
+  blocks + the milestone table + **the program's own verdict block at
+  the foot**).
+- The acceptance evidence: `evidence/gf-p5-acceptance-2026-11-07.md` +
+  the run record `gf-p5-run-2026-11-07.txt` + the committed machine
+  half `packages/insights/scripts/gf-p5-verify.ts` (read-only).
+- The standing pins: the calibration report (byte-for-byte
+  reproducible — re-verified at P0/P1/P2/P3/P4/P5) · the gf-p4-verify
+  twin (the live production ≡ scenario pin) · the licence register
+  (37 provider rows, every one evidenced + dated) · the registry (184
+  ids · 130 rule:info · the hidden set 7).
+- The deliverable, live on currena.ir: **the 37-voter five-lane table
+  (7/7/11/10/2, MIN2, STRONG 4-of-5) beside the 184-id context
+  register — the worker `8f9e521e`.**
+
+**If the owner's round-3 answers arrive** (the Cleveland L2 class · the
+X5 Yahoo class · the WGC reply · the acceptance): record them in the
+README's round-3 table; (a)/(b)/(d) execute as register flips or
+acceptances, (c) as the WGC family's unlock — each in a **successor
+owner-gated session with its own kickoff prompt** (paste-ready, written
+then, per the D-GA-9 convention — never this program's, which stays
+closed). **If new meter work is ever wanted** (a seat, a lane, a
+threshold, a sign): a NEW owner-gated program starts on the same
+per-seat discipline — the recorded approval + the measured scenario +
+the P0 wrap first (D-GF-1/D-GF-6, unchanged).
+
+**NEVER seat a sign silently.**
