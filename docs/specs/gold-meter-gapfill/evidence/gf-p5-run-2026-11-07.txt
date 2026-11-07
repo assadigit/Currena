@@ -1,0 +1,345 @@
+# GF-P5 run record — the acceptance walk's own runs (2026-11-07)
+
+The GF-S12 session's runnable record (the D-GF-5 discipline: every number
+in evidence/gf-p5-acceptance-2026-11-07.md comes from a command below,
+run this session at the repo root on branch gf/s12-acceptance-close).
+Four runs: (1) the gf-p5-verify acceptance walk (the engine/register
+pins + the licence register audit + the live production matrix over the
+fresh public snapshot); (2) the P0 calibration RE-RUN, verified
+byte-for-byte against the committed report; (3) the gf-p4-verify verify
+twin RE-RUN (production ≡ POST-P4-5LANE); (4) the full pnpm gates.
+
+=======================================================================
+(1) pnpm --filter @currena/insights exec tsx scripts/gf-p5-verify.ts
+    (the committed script — read-only, no KV writes, no product edits)
+=======================================================================
+# GF-P5 acceptance verification — 2026-11-07T03:13:51.764Z
+# the P5 close: the acceptance walk's own machine half (read-only, no deploy)
+
+## A. The engine + register pins (the final shape, re-read from the shipped code)
+  ✓ GOLD_LANE_VOTERS seat count — 37 seats
+  ✓ the five-lane composition (7/7/11/10/2) — borrowing-costs 7 · dollar 7 · stress 11 · inflation 10 · flows 2
+  ✓ the MIN2 lane rule (GOLD_LANE_MIN_FIRING) — min-firing 2
+  ✓ the STRONG bar (GOLD_LANE_STRONG-of-5) — STRONG 4-of-5
+  ✓ the SGE row carries the owner-acceptance trail (round-2 (e)) — publicDisplayOk yes · checked 2026-11-06 · "Exchange market data — © SGE, owner-accepted for display (2026-11-07)"
+  ✓ the Cleveland row stays fail-closed (the GF-S12 question (a) — no affirmative grant) — publicDisplayOk no · checked 2026-11-07
+  ✓ the WGC row stays blocked (the authorisation family) — publicDisplayOk no · checked 2026-11-06
+
+## B. The licence register audit (every row's evidence string present + dated)
+  ✓ every register row carries its evidence + date — 37 rows audited
+  · display classes: yes 28 · no 6 · unknown 3 (unknown fails closed under T-15)
+
+## C. The registry state (the context register + the public-mode hidden set)
+  ✓ the registry id count — 184 ids
+  ✓ the rule:info card count — 130 rule:info cards
+  ✓ the public-mode hidden set (exactly the 7 expected ids) — 7 hidden: cpi-nowcast · cpi-surprise · etf-short-interest · gold-equities-ratio · official-gold-demand · wgc-cb-demand · wgc-etf-holdings
+  ✓ every one of the 37 voter ids exists in the registry (no dead seat) — 37/37 present
+  ✓ no voter sits in the hidden set (the meter's own seats are public) — 0 of 37 hidden
+
+## D. The production matrix (the live public snapshot walk — https://currena.ir/api/insights)
+snapshot: generatedAt 2026-11-07T02:40:06.032Z · readings 177
+engine over the live readings: for 2 · against 1 · neutral 2 · unread 0 (net 1, readable 5)
+  borrowing-costs  for     split=no  readable=7 firing=5 supports=4 pressures=1
+  dollar           against split=no  readable=6 firing=5 supports=2 pressures=3
+  stress           for     split=no  readable=11 firing=4 supports=3 pressures=1
+  inflation        neutral split=yes readable=10 firing=2 supports=1 pressures=1
+  flows            neutral split=no  readable=2 firing=0 supports=0 pressures=0
+
+the 37 voters' own live lines:
+  real-yield-10y             2.6 @ 2026-11-05 [warning] pct10y=98% chg30d=-0.310
+  us10y                      4.84 @ 2026-11-05 [warning] pct10y=98% chg30d=-0.430
+  us30y                      5.25 @ 2026-11-05 [warning] pct10y=98% chg30d=-0.390
+  fed-target                 3.75 @ 2026-11-06 [normal] pct10y=68% chg30d=0.000
+  fed-expectations           0.585 @ 2026-11-05 [normal] pct10y=75% chg30d=-0.330
+  ecb-dfr                    2.5 @ 2026-11-07 [normal] pct10y=77% chg30d=0.000
+  real-yield-5y              2.33 @ 2026-11-05 [warning] pct10y=97% chg30d=-0.330
+  dollar-basket              102.05954532336638 @ 2026-11-06 [normal] pct10y=73% chg30d=-0.349
+  usdjpy                     158.33 @ 2026-11-06 [normal] pct10y=95% chg30d=0.063
+  us-japan-10y-gap           2.034 @ 2026-11-05 [normal]
+  usd-reserve-share          56.704761505127 @ 2026-06-30 [context] pct10y=5% chg30d=-0.474
+  nyfed-custody              2813336 @ 2026-11-04 [context] pct10y=0% chg30d=-1.450
+  dollar-broad               121.6656 @ 2026-10-30 [normal] pct10y=81% chg30d=0.696
+  dollar-eme                 130.8602 @ 2026-10-30 [normal] pct10y=79% chg30d=1.482
+  stress-stlfsi              -0.5224 @ 2026-10-30 [normal] pct10y=43% chg30d=0.283
+  nfci                       -0.459 @ 2026-10-30 [normal] pct10y=63% chg30d=0.051
+  vix                        28.18 @ 2026-11-05 [warning] pct10y=92% chg30d=13.170
+  gold-silver                78.5 @ 2026-11-06 [normal] pct10y=37% chg30d=7.822
+  term-premium-10y           0.9089 @ 2026-10-30 [context] pct10y=99% chg30d=-0.168
+  ebp                        -0.26533114775416333 @ 2026-10-01 [context] pct10y=24% chg30d=0.118
+  michigan-sentiment         48.1 @ 2026-09-01 [warning] pct10y=1% chg30d=-3.600
+  gpr-daily                  137.64205932617188 @ 2026-11-02 [context] pct10y=75% chg30d=-30.089
+  epu-us                     187.92078198152723 @ 2026-10-01 [context] pct10y=57% chg30d=-19.726
+  sp500-breadth-ratio        0.2938 @ 2026-11-06 [context] pct10y=13% chg30d=8.413
+  bank-stress                4 @ 2026-11-05 [normal] pct10y=68% chg30d=0.000
+  us-cpi-yoy                 3.737684729064035 @ 2026-09-01 [warning] pct10y=76% chg30d=0.341
+  us-pce-core-yoy            3.1211596029620208 @ 2026-09-01 [warning] pct10y=69% chg30d=0.087
+  euro-hicp                  4 @ 2026-10-01 [warning] pct10y=80% chg30d=0.200
+  breakeven-5y5y             2.17 @ 2026-11-06 [normal] pct10y=45% chg30d=-0.180
+  breakeven-tilt             -0.12 @ 2026-11-06 [context] pct10y=31% chg30d=-0.100
+  t5yie                      2.29 @ 2026-11-06 [context] pct10y=57% chg30d=-0.080
+  michigan-1y-expectations   4.6 @ 2026-09-01 [context] pct10y=75% chg30d=0.600
+  m2-us                      23413.9 @ 2026-09-01 [context] pct10y=71% chg30d=0.485
+  us-deficit-12m             -1992528.1676 @ 2026-09-01 [context] pct10y=28%
+  michigan-5y-expectations   3.4 @ 2026-09-01 [warning] pct10y=90% chg30d=0.100
+  cftc-gold-positioning      44.9804 @ 2026-11-03 [normal] pct10y=73% chg30d=-8.809
+  cftc-gold-gross-long       55.2473 @ 2026-11-03 [normal] pct10y=52% chg30d=-6.195
+
+the context register on the public wire (140 cards):
+  yield-curve-10y2y          0.35 @ 2026-11-06 [normal] pct10y=48% chg30d=-0.160
+  yield-curve-10y3m          0.67 @ 2026-11-06 [normal] pct10y=57% chg30d=-0.390
+  real-curve-10y5y           0.27 @ 2026-11-05 [context] pct10y=58% chg30d=0.020
+  sofr                       3.92 @ 2026-11-05 [context] pct10y=65% chg30d=0.020
+  us-2y                      4.46 @ 2026-11-05 [context] pct10y=87% chg30d=-0.330
+  euro-aaa-10y               3.2938441917 @ 2026-11-05 [context] pct10y=98% chg30d=-0.225
+  govt-interest-revenue      33.55393513462776 @ 2026-04-01 [stale] pct10y=73% chg30d=-0.162
+  bund-10y                   3.46952380952381 @ 2026-09-01 [context] pct10y=100% chg30d=0.284
+  jgb-10y                    2.806 @ 2026-11-05 [context]
+  gilt-10y                   5.2421 @ 2026-09-01 [context] pct10y=100% chg30d=0.253
+  boj-rate                   1.043 @ 2026-09-01 [context] pct10y=100% chg30d=0.066
+  boe-rate                   4 @ 2026-11-07 [context] pct10y=71% chg30d=0.250
+  mortgage-30y               7.18 @ 2026-11-05 [context] pct10y=96% chg30d=-0.100
+  us-deficit-monthly         -26900.34710202 @ 2026-09-01 [context] pct10y=79%
+  treasury-auction-10y       2.77 @ 2026-10-07 [context] pct10y=99% chg30d=0.060
+  treasury-auction-10y-indirect 77.8014 @ 2026-10-07 [context] pct10y=98% chg30d=-1.183
+  treasury-auction-30y       2.54 @ 2026-10-08 [context] pct10y=96% chg30d=-0.070
+  treasury-auction-30y-indirect 70.4453 @ 2026-10-08 [context] pct10y=95% chg30d=-8.885
+  us-cpi-core-yoy            2.5643583511686696 @ 2026-09-01 [context] pct10y=48% chg30d=0.118
+  median-cpi                 2.8081575376 @ 2026-09-01 [context] pct10y=36% chg30d=0.704
+  sticky-cpi                 3.401271558 @ 2026-09-01 [context] pct10y=59% chg30d=0.311
+  us-wages                   3.3123028391167217 @ 2026-10-01 [context] pct10y=23% chg30d=-0.078
+  gold-oil-ratio             41.73 @ 2026-11-06 [context] pct10y=80% chg30d=26.993
+  eia-crude-stocks           691944 @ 2026-10-30 [context] pct10y=0% chg30d=-2.692
+  oecd-cli-us                100.9993 @ 2026-09-01 [normal] pct10y=91% chg30d=0.053
+  oecd-cli-cn                97.41035 @ 2026-09-01 [context] pct10y=4% chg30d=-0.225
+  oecd-cli-de                101.0066 @ 2026-09-01 [context] pct10y=78% chg30d=0.103
+  gpr-index                  150.52000427246094 @ 2026-10-01 [context] pct10y=85% chg30d=-5.420
+  gpr-threats                156.84356689453125 @ 2026-10-01 [context] pct10y=76% chg30d=-24.416
+  gpr-acts                   167.57229614257812 @ 2026-10-01 [context] pct10y=89% chg30d=13.180
+  gpr-taiwan                 0.08208496123552322 @ 2026-10-01 [context] pct10y=31% chg30d=-0.176
+  gpr-china                  0.8413708209991455 @ 2026-10-01 [context] pct10y=42% chg30d=-0.408
+  gpr-russia                 1.72378408908844 @ 2026-10-01 [context] pct10y=73% chg30d=0.171
+  gpr-ukraine                1.4980504512786865 @ 2026-10-01 [context] pct10y=72% chg30d=0.332
+  gpr-israel                 1.272316813468933 @ 2026-10-01 [context] pct10y=78% chg30d=-0.338
+  gpr-saudi                  0.8550516366958618 @ 2026-10-01 [context] pct10y=96% chg30d=-0.124
+  gpr-australia              0.1710103303194046 @ 2026-10-01 [context] pct10y=67% chg30d=0.055
+  tpu-us                     1326.419349465307 @ 2026-10-01 [context] pct10y=82% chg30d=-74.349
+  chokepoint-suez            41.3 @ 2026-10-25 [context] pct10y=48% chg30d=1.300
+  chokepoint-panama          28.7 @ 2026-10-25 [context] pct10y=17% chg30d=1.700
+  chokepoint-bab-el-mandeb   28.9 @ 2026-10-25 [context] pct10y=18% chg30d=2.500
+  chokepoint-malacca         228 @ 2026-10-25 [context] pct10y=52% chg30d=6.700
+  chokepoint-taiwan          190 @ 2026-10-25 [context] pct10y=4% chg30d=-39.000
+  gscpi                      1.2619111813086497 @ 2026-10-01 [context] pct10y=72% chg30d=-0.099
+  us-spr                     282184 @ 2026-10-30 [context] pct10y=0% chg30d=-0.558
+  us-crude-production        14003 @ 2026-10-30 [context] pct10y=100% chg30d=0.344
+  coal-aus                   152.3 @ 2026-10-01 [context] pct10y=80% chg30d=3.535
+  lng-japan                  16.59 @ 2026-10-01 [context] pct10y=92% chg30d=2.030
+  gas-europe                 28.5 @ 2026-10-01 [context] pct10y=90% chg30d=12.116
+  wti                        99.64 @ 2026-11-03 [context] pct10y=95% chg30d=1.788
+  natgas                     2.63 @ 2026-11-03 [context] pct10y=32% chg30d=-9.310
+  breakeven-10y              2.23 @ 2026-11-06 [context] pct10y=50% chg30d=-0.130
+  food-index                 121.9 @ 2026-10-01 [context] pct10y=75% chg30d=-1.773
+  wheat                      260.3 @ 2026-10-01 [context] pct10y=75% chg30d=-6.569
+  maize                      226.5 @ 2026-10-01 [context] pct10y=72% chg30d=-5.467
+  usdtry                     50.153 @ 2026-11-06 [context] pct10y=100% chg30d=1.954
+  usdaed                     3.6714999675750732 @ 2026-11-06 [context] pct10y=2% chg30d=0.000
+  walcl                      6748145 @ 2026-11-04 [context] pct10y=50% chg30d=0.076
+  crypto-fng                 25 @ 2026-11-07 [context] pct10y=43% chg30d=-39.000
+  shiller-cape               40.71 @ 2026-10-01 [context] pct10y=99% chg30d=0.130
+  shiller-ecy                0.5599999999999999 @ 2026-10-01 [context] pct10y=0% chg30d=-0.260
+  tga                        957175 @ 2026-11-04 [context] pct10y=89% chg30d=0.896
+  reverse-repo               0.15 @ 2026-11-06 [context] pct10y=9% chg30d=-93.584
+  bank-reserves              2930088 @ 2026-11-04 [context] pct10y=41% chg30d=-0.611
+  repo-stress                0.02 @ 2026-11-05 [context] pct10y=93% chg30d=0.020
+  net-liquidity              5790745 @ 2026-11-04 [context] pct10y=48% chg30d=0.137
+  ofr-fsi                    -2.162 @ 2026-11-04 [context] pct10y=44% chg30d=-0.053
+  sloos-ci-tightening        1.7 @ 2026-10-01 [context] pct10y=46% chg30d=1.700
+  eur-usd                    0.89566 @ 2026-11-06 [context] pct10y=55% chg30d=0.108
+  usdchf                     0.8189 @ 2026-11-06 [context] pct10y=13% chg30d=-1.677
+  shanghai-gold-premium      -0.73 @ 2026-11-06 [context] pct10y=39%
+  real-gold-price            1243 @ 2026-09-01 [context] pct10y=93% chg30d=-7.100
+  gold-platinum              2.64 @ 2026-11-07 [context] pct10y=86%
+  global-liquidity           21.55 @ 2026-09-01 [context] pct10y=34% chg30d=-1.822
+  sge-gold-withdrawals       92.08 @ 2026-10-01 [context]
+  swiss-gold-flow            227.9 @ 2026-09-01 [context] pct10y=82% chg30d=21.900
+  rstar-us                   1.01 @ 2026-04-01 [context] pct10y=30% chg30d=-0.080
+  debt-to-gdp                121.18773 @ 2026-04-01 [context] pct10y=81% chg30d=-1.250
+  china-pmi                  49.3 @ 2026-10-31 [warning] pct10y=29% chg30d=-0.800
+  china-cpi                  0.9 @ 2026-09-30 [normal] chg30d=0.100
+  philly-fed                 20.9 @ 2026-10-01 [normal] pct10y=67% chg30d=-16.900
+  empire-state               25.5 @ 2026-10-01 [context] pct10y=93% chg30d=17.900
+  initial-jobless-claims     189000 @ 2026-10-31 [normal] pct10y=0% chg30d=-5.025
+  continuing-claims          1718000 @ 2026-10-24 [context] pct10y=27% chg30d=1.118
+  us-unemployment            4.1 @ 2026-10-01 [normal] pct10y=48% chg30d=-0.100
+  sahm-rule                  0 @ 2026-10-01 [normal] pct10y=32% chg30d=0.000
+  recession-probability      0.4 @ 2026-09-01 [normal] pct10y=68% chg30d=0.200
+  retail-sales               745021 @ 2026-09-01 [context] pct10y=100% chg30d=0.771
+  housing-permits            1398 @ 2026-09-01 [context] pct10y=34% chg30d=-0.356
+  cfnai                      0.07 @ 2026-09-01 [context] pct10y=61% chg30d=0.150
+  job-openings               7523 @ 2026-09-01 [context] pct10y=62% chg30d=4.631
+  copper-gold                3.5342265529841654 @ 2026-10-01 [normal] pct10y=26% chg30d=0.183
+  usdcny                     6.6713 @ 2026-11-06 [context] pct10y=25% chg30d=-0.497
+  us-gdp-growth              3.4 @ 2026-07-01 [context] pct10y=63% chg30d=1.200
+  gdpnow                     3.4408 @ 2026-10-01 [context] pct10y=72% chg30d=0.169
+  us-nfp                     165 @ 2026-10-01 [context] pct10y=44% chg30d=105.000
+  platinum                   1544 @ 2026-11-07 [context] pct10y=89%
+  brent                      97.76 @ 2026-11-06 [normal] pct10y=91% chg30d=0.320
+  gold-usd                   4072.100098 @ 2026-11-07 [context] pct10y=91% chg30d=-2.042
+  silver-usd                 52.070999 @ 2026-11-07 [context] pct10y=91% chg30d=-11.840
+  copper-usd                 14002.684821778821 @ 2026-11-07 [context] pct10y=80% chg30d=-3.358
+  btc-usd                    75968.7 @ 2026-11-07 [context] pct10y=85% chg30d=-6.990
+  gold-btc                   0.0537 @ 2026-11-07 [context]
+  au-cpi                     4.340000000000003 @ 2026-09-01 [warning] chg30d=0.372
+  au-trimmed-mean            3.5886276342485965 @ 2026-09-01 [warning] chg30d=0.046
+  au-10y                     5.082 @ 2026-11-04 [warning] pct10y=98% chg30d=-0.252
+  rba-expectations           -0.095 @ 2026-11-04 [normal] pct10y=31% chg30d=-0.386
+  au-us-10y-gap              0.182 @ 2026-11-04 [normal] pct10y=65% chg30d=0.128
+  au-petrol-yoy              23.58 @ 2026-09-01 [context] pct10y=85% chg30d=10.051
+  rba-cash-rate              4.85 @ 2026-11-05 [context] pct10y=100% chg30d=0.250
+  au-home-loan               6.2 @ 2026-09-30 [warning] pct10y=94% chg30d=0.000
+  au-deposit-rate            4.7 @ 2026-09-30 [context] pct10y=97% chg30d=-0.100
+  au-wage-growth             3.2030749519538757 @ 2026-04-01 [warning] pct10y=62% chg30d=-0.019
+  au-rent-yoy                3.5499999999999967 @ 2026-09-01 [normal] pct10y=3% chg30d=-0.028
+  au-unemployment            4.71834873 @ 2026-09-01 [stale] pct10y=51% chg30d=0.067
+  au-home-values             1100.4 @ 2026-04-01 [normal] pct10y=57% chg30d=-0.740
+  au-household-debt-arrears  178.4 @ 2026-06-30 [normal] pct10y=16% chg30d=1.200
+  au-housing-finance         97647.9 @ 2026-04-01 [normal] pct10y=41% chg30d=-5.222
+  au-saving-ratio            6.5 @ 2026-04-01 [context] pct10y=62% chg30d=0.100
+  au-job-vacancies           325 @ 2026-07-01 [context] pct10y=47% chg30d=-0.915
+  audusd                     0.687096330905593 @ 2026-11-06 [normal] pct10y=40% chg30d=-1.154
+  rba-fed-gap                0.975 @ 2026-11-05 [normal] pct10y=99% chg30d=0.250
+  audjpy                     108.78796207228254 @ 2026-11-06 [normal] pct10y=92% chg30d=-1.092
+  terms-of-trade             94.8 @ 2026-04-01 [stale] pct10y=43% chg30d=-1.500
+  iron-ore                   90.8 @ 2026-10-01 [context] pct10y=28% chg30d=-7.062
+  china-property-investment  -20.6 @ 2026-09-30 [context] chg30d=-0.700
+  china-steel-output         7359 @ 2026-09-30 [context] chg30d=-1.367
+  gold-aud                   5937.3043 @ 2026-11-06 [context]
+  au-gdp-growth              2.137635765206141 @ 2026-04-01 [stale] pct10y=46% chg30d=-0.367
+  au-household-spending      6.2 @ 2026-09-01 [context] pct10y=75% chg30d=-0.100
+  au-building-approvals      18264 @ 2026-09-01 [context] pct10y=78% chg30d=1150.000
+  au-population-growth       1.426890048095782 @ 2026-01-01 [stale] pct10y=25% chg30d=-0.031
+  au-nom                     101 @ 2026-01-01 [stale] pct10y=78% chg30d=44.900
+  au-participation           66.76317272 @ 2026-09-01 [stale] pct10y=80% chg30d=-0.233
+  au-underemployment         6.3258024 @ 2026-09-01 [stale] pct10y=32% chg30d=0.104
+  au-trade-balance           2826 @ 2026-09-01 [context] pct10y=26% chg30d=1435.870
+  audnzd                     1.2394530713205991 @ 2026-11-06 [context] pct10y=99% chg30d=-0.236
+  nz-short-rate              3.13 @ 2026-09-01 [context] pct10y=69% chg30d=0.150
+  nz-10y                     4.94 @ 2026-09-01 [context] pct10y=97% chg30d=0.230
+  btp-bund-spread            0.8003 @ 2026-08-01 [stale] pct10y=4% chg30d=-0.010
+
+the GF-P3 highlight cards (the P3 sources + the two P3 context cards):
+  real-yield-5y              2.33 @ 2026-11-05 [warning] pct10y=97% chg30d=-0.330
+  dollar-broad               121.6656 @ 2026-10-30 [normal] pct10y=81% chg30d=0.696
+  dollar-eme                 130.8602 @ 2026-10-30 [normal] pct10y=79% chg30d=1.482
+  bank-stress                4 @ 2026-11-05 [normal] pct10y=68% chg30d=0.000
+  real-curve-10y5y           0.27 @ 2026-11-05 [context] pct10y=58% chg30d=0.020
+  shanghai-gold-premium      -0.73 @ 2026-11-06 [context] pct10y=39%
+the P4 context cards (the nine, severity-ordered):
+  real-gold-price            1243 @ 2026-09-01 [context] pct10y=93% chg30d=-7.100
+  gold-platinum              2.64 @ 2026-11-07 [context] pct10y=86%
+  global-liquidity           21.55 @ 2026-09-01 [context] pct10y=34% chg30d=-1.822
+  debt-to-gdp                121.18773 @ 2026-04-01 [context] pct10y=81% chg30d=-1.250
+  swiss-gold-flow            227.9 @ 2026-09-01 [context] pct10y=82% chg30d=21.900
+  sge-gold-withdrawals       92.08 @ 2026-10-01 [context]
+  gold-equities-ratio        ABSENT from the public snapshot
+  rstar-us                   1.01 @ 2026-04-01 [context] pct10y=30% chg30d=-0.080
+  etf-short-interest         ABSENT from the public snapshot
+
+## E. The display classes on the wire
+  ✓ THE (e) FLIP LIVE: shanghai-gold-premium PRESENT + readable on the public wire — -0.73 @ 2026-11-06 [context] pct10y=39%
+  ✓ the 7 private/fail-closed ids ABSENT from the public projection — all 7 absent (cpi-nowcast · cpi-surprise · etf-short-interest · gold-equities-ratio · official-gold-demand · wgc-cb-demand · wgc-etf-holdings)
+  ✓ the wire carries exactly the expected reading count (184 − 7 hidden) — 177 readings (expected 177)
+  ✓ all 37 voters on the live wire — 37/37 present
+
+# summary — ALL ACCEPTANCE CHECKS GREEN
+# engine 37 seats (7/7/11/10/2) · MIN2 · STRONG 4-of-5
+# register 37 rows audited (yes 28 · no 6 · unknown 3) · registry 184 ids / 130 info cards · hidden 7
+# live @ 2026-11-07T02:40:06.032Z: for 2 · against 1 · neutral 2 · unread 0 (net 1) · lanes readable 5/5
+
+
+=======================================================================
+(2) pnpm --filter @currena/insights gf-p0-calibration
+    — the calibration RE-RUN (exit 0, 2m07s)
+=======================================================================
+> @currena/insights@0.1.0 gf-p0-calibration /home/z/currena/packages/insights
+> tsx scripts/gf-p0-calibration.ts
+# GF-P0 calibration — 2026-11-07T03:09:35.037Z
+windows: 2512 (2016-11-07 → 2026-11-03); mature base ≥ 2021-09-23: 1287
+corpus: recorded 2026-11-03T04:43:54.969Z; candidates: recorded 2026-11-06T15:15:03.779Z (stage 2026-11-04T04:35:18.079Z); cftc backfill: 565 weeks 2016-01-05 → 2026-10-27 (11 files, 0 failures)
+D-6 gap derivation: 2375 points 2016-09-26 → 2026-10-30
+## The D-1 derivation (the anchors' band)
+  anchor real-yield-10y     t=0.1   n=2512 firing=1417 share=56.4%
+  anchor us10y              t=0.15  n=2512 firing=1166 share=46.4%
+  anchor dollar-basket      t=1     n=2494 firing=1449 share=58.1%
+  anchor breakeven-5y5y     t=0.1   n=2512 firing=885 share=35.2%
+  median anchor share: 51.4%
+  derived fed-expectations     n=2512 value=0.13 share=50.7%
+  derived usdjpy               n=2494 value=1.38 share=51.4%
+  derived fed-target           n=2512 value=0.25 share=7.0%
+  derived term-premium-10y     n=2512 value=0.07 share=49.2%
+  derived t5yie                n=2512 value=0.1 share=50.7%
+## FROZEN (MIN2) — n=2512 (mature 1287)
+  all:    for 885 · level 628 · against 999 · fullTip 1248 · flips 8 vs net 9 · C1 PASS · C2 PASS
+  mature: for 277 · level 249 · against 761 · fullTip 856 · flips 8 vs net 8 · C1 FAIL · C2 PASS
+## POST-P1 (MIN2) — n=2512 (mature 1287)
+  all:    for 941 · level 555 · against 1016 · fullTip 1147 · flips 8 vs net 7 · C1 PASS · C2 FAIL
+  …(the scenario family tables follow; the full console mirrors the committed report)
+
+  diff evidence/gf-p0-calibration-2026-11-05.md (committed) vs the re-run output:
+  → BYTE-FOR-BYTE IDENTICAL (sha256 212ece7652537e9fe06f3078d1c11652dfeb544c77a746279ff540af43f8bcc1, both sides)
+  → git status after the re-run: no change to the committed file (the D-GF-6 pin holds)
+
+
+=======================================================================
+(3) pnpm --filter @currena/insights gf-p4-verify
+    — the verify-twin RE-RUN (exit 0, 1m21s)
+=======================================================================
+
+> @currena/insights@0.1.0 gf-p4-verify /home/z/currena/packages/insights
+> tsx scripts/gf-p4-verify.ts
+
+# GF-P4 verify — 2026-11-07T03:11:07.438Z
+windows: 2512 (2016-11-07 → 2026-11-03); mature ≥ 2021-09-23: 1287
+production voters: 37 (GOLD_LANE_VOTERS, GF-S10's 37-seat table: 5 lanes)
+GOLD_LANE_STRONG: 4 (of 5 — the owner's recorded answer B: 4-of-5 = 80%)
+✓ the production engine ≡ the POST-P4-5LANE scenario (the F2 id mapping recorded) in ALL 2512 windows (every lane field + the rollups)
+✓ POST-P4-5LANE (MIN2)|all: level 768/2512 (30.6%) · full-tip 282 (11.2%) · flips 11 vs net-sign 7 — matches the committed report
+✓ POST-P4-5LANE (MIN2)|mature: level 412/1287 (32.0%) · full-tip 114 (8.9%) · flips 10 vs net-sign 7 — matches the committed report
+✓ POST-P4-5LANE (MIN1)|all: level 666/2512 (26.5%) · full-tip 219 (8.7%) · flips 11 vs net-sign 7 — matches the committed report
+✓ POST-P4-5LANE (MIN1)|mature: level 354/1287 (27.5%) · full-tip 92 (7.1%) · flips 10 vs net-sign 7 — matches the committed report
+
+real-curve seat: readable 2512/2512 · firing at decade bands 1548 (high 675 · low 873) · latest slope 0.35 @ 2026-10-30
+
+## The re-derived verdict (MIN2 — the owner's recorded answer A: keep the criteria + MIN2 on judgment)
+all windows (n=2512): level 768 (30.6%) · full-tip 282 (11.2%) · C1 PASS · lane flips 11 vs the set's own net-sign 7 → C2 FAIL
+mature base (n=1287): level 412 (32.0%) · full-tip 114 (8.9%) · C1 PASS · flips 10 vs 7 → C2 FAIL
+
+✍ /home/z/currena/docs/specs/gold-meter-gapfill/evidence/gf-p4-verify-2026-11-06.md
+✍ /home/z/currena/docs/specs/gold-meter-gapfill/evidence/gf-p4-run-2026-11-06.txt
+
+  diff evidence/gf-p4-verify-2026-11-06.md (committed) vs the re-run output:
+  → IDENTICAL (byte-for-byte)
+  diff evidence/gf-p4-run-2026-11-06.txt (committed) vs the re-run output:
+  → differs ONLY in the wall-clock header line (the run timestamp);
+    the committed .txt restored via git checkout (its record stays GF-S10's;
+    this file carries the re-run's own record)
+
+
+=======================================================================
+(4) pnpm gates (exit 0, 2m06s) — the summary
+=======================================================================
+  ✓ build + bundle budget (5s)
+
+────────────────────────────────────────────────────────────────
+ CURRENA GATES — 2026-11-07 03:13:42
+────────────────────────────────────────────────────────────────
+ 1. secret scan             PASS  clean (8 patterns · 875 files)
+ 2. typecheck               PASS  6 packages
+ 3. lint                    PASS  0 errors, 0 warnings
+ 4. copy:audit              PASS  clean
+ 5. narrator vocabulary     PASS  in sync (190×2 + 56×2)
+ 6. narrator eval           PASS  50 checks (3 prep + 7 section fixtures)
+ 7. layer1 strict validator PASS  11819/11819 assertions
+ 8. full test suite         PASS  14,620 tests (core 195 · scraper 67 · insights 1329 · markets 13 · api 399 · web 12617)
+ 9. build + bundle budget   PASS  entry 294.45/88.49 · Insights lazy 1612.14/373.58
+────────────────────────────────────────────────────────────────
+ ALL GATES GREEN — 2m 6s

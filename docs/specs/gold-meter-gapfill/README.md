@@ -1,38 +1,36 @@
 # Gold meter gap-fill: spec set
 
-**Status:** OPENED (2026-11-05) by GF-S1 — the owner-gated successor to the
-CLOSED gold meter audit program (GA-S1..GA-S4, CLOSED 2026-11-05; its record:
-`docs/specs/gold-meter-audit/PROGRESS.md`; the audit's verdict:
-`docs/insights/GOLD-METER-AUDIT-REPORT.md`). The audit changed nothing
-(D-GA-3); **every change to the meter is THIS program's, owner-gated.** The
-predecessor gold balance consolidation is COMPLETE and LIVE (GB-S7,
-2026-11-04): the consolidated lane balance is THE gold card for every visitor
-on currena.ir. **Program state at GF-S11: P0–P4 DELIVERED WHOLE — the
-round-2 decisions EXECUTED + the nine P4 context cards LIVE
-(GF-S11, 2026-11-07, the recovery landing of an interrupted session —
-every claim re-verified from the recovery's own runs)** — the owner's
-answers A–K recorded (GF-S7), the repairs landed (GF-P1), the promotions
-landed (GF-P2: the 32-seat five-lane table, the flows lane, STRONG
-4-of-5, the N-1 v1.2 amendment); the new free sources landed whole
-(GF-P3 + GF-S10: the four FRED voter-candidates + I4 the UoM 5–10y anchor
-seated → **37 seats (7/7/11/10/2)**, the real-curve + Shanghai-premium
-context cards, the P3 deploy live-verified); **the round-2 answers
-EXECUTED (2026-11-07)**: (a) the real curve STAYS a context card (the
-closure stands) · **(e) the SGE display flip LIVE — the Shanghai premium
-card READABLE PUBLICLY FOR THE FIRST TIME** (−0.73% @ 2026-11-06, the
-stored 488-point history under it) · **I9 the accumulator LIVE** (the
-Cleveland nowcasts accumulating; the cards PRIVATE per the Bank's
-unquoted-reuse terms — the GF-S12 question) · **(f) the WGC
-authorisation draft WRITTEN** (`evidence/wgc-authorisation-draft-2026-11-07.md`,
-printed in the GF-S11 final message for the owner's review + send; the
-family stays blocked, no fetch wired) · **P4's nine cards LIVE** (I10 ·
-X7 · I11 · G3 · F16 · F15 · X5 · R11 · F12 — F12 honestly fail-closed
-'awaiting data'); the recovery's four repairs recorded with their
-regression pins (the evidence §4+§6); tests 14,620 · gates ALL GREEN ·
-the worker **8f9e521e** deployed + live-verified. **GF-S12 = P5: the
-acceptance walk + the program's close** (its prompt at PROMPTS.md's
-foot — the open questions printed: the Cleveland L2 class · the X5
-Yahoo class · the WGC reply · the acceptance itself).
+**Status:** **CLOSED — COMPLETE (2026-11-07) at GF-S12 = P5, the dedicated
+close: THE ACCEPTANCE WALK + THE FLIP** (the acceptance evidence:
+`evidence/gf-p5-acceptance-2026-11-07.md` + the run record beside it — every
+phase's gate re-verified from the closing session's own runs: the
+calibration re-run **byte-for-byte identical** (sha `212ece76…`) · the
+verify-twin re-run **production ≡ POST-P4-5LANE in ALL 2512 windows** · the
+licence register audit **37/37 rows evidenced + dated** · the production
+matrix over the live public snapshot (177 readings: **for 2 · against 1 ·
+neutral 2 · unread 0 — 5 of 5 lanes readable**; **the (e) flip's own line
+live: shanghai-gold-premium −0.73% @ 2026-11-06 PUBLIC**; the 7
+private/fail-closed ids absent, 0 leaked) · gates ALL GREEN · tests 14,620 ·
+the worker `8f9e521e` deployed, nothing re-deployed at P5 — docs+evidence
+only). The program's deliverable, accepted as the final shape: **the
+37-voter five-lane table (7/7/11/10/2, MIN2, STRONG 4-of-5) — UNCHANGED
+since GF-S10 — beside the full context register (184 ids · 130 rule:info
+cards)**, live on currena.ir. The end state (the audit report §6.3) is
+delivered: every classic family covered on record · no half-implemented
+seat · nothing claimed about the future. **The successor note: any future
+change to the meter is a NEW owner-gated program on the same per-seat
+discipline (the recorded approval + the measured scenario + the P0 wrap
+first — D-GF-1/D-GF-6, unchanged).** The open items stand on their
+records: F7 MCX venue-blocked (recorded-open) · F12 fail-closed 'awaiting
+data' · the WGC family pending the authorisation reply · the promotion
+criteria recorded in each context card's comments. The owner-gated
+predecessor programs are both CLOSED: the gold meter audit (GA-S1..GA-S4,
+CLOSED 2026-11-05; its record: `docs/specs/gold-meter-audit/PROGRESS.md`;
+the audit's verdict: `docs/insights/GOLD-METER-AUDIT-REPORT.md`) and the
+gold balance consolidation (COMPLETE, LIVE 2026-11-04, GB-S7 — the
+consolidated lane balance is THE gold card for every visitor on
+currena.ir). The audit changed nothing (D-GA-3); **every change to the
+meter was THIS program's, owner-gated.**
 
 **Owner intent (inherited from the audit's charter, 2026-11-04):** *"Make
 sure nothing is missed or half-implemented."* The audit answered: 8/85 rows
@@ -124,6 +122,24 @@ precedent); GF-S11 executes.
 | **D7** | The usdchf seat question — recorded-open since GF-P2's context card | Keep the card — the dollar lane's 7 voters carry it; no measured scenario exists for a seat | **KEEP THE CARD** — the seat question CLOSES no-seat; the card stands as context |
 | **P4 scope** | Which cards GF-S11 lands (01-FILL-SPEC §1, ranks 30–31, 34–47) | The 7-card committed family + F16 BAZG (government open data, venue-verified live 2026-11-05; severity 8 ≥ F12's 4) | **7 + BAZG (+ F15 via (e))** — the nine cards: I10 · X7 · I11 · G3 · F16 · F15 · X5 · R11 · F12, severity-ordered; the spill rides GF-S12 honestly if the budget runs out |
 | **P5 timing** | When the acceptance walk + the user-visible flip runs (GF-P5 — the last phase) | GF-S12 dedicated — GF-S10 needed three landings when overloaded; the evidence for focused sessions | **GF-S12** — GF-S11 = the decision executions + P4; the GF-S12 prompt = P5 the acceptance walk + the flip preparation |
+
+## The owner's decision list — round 3 (GF-S12's PRINTED open questions — the answers PENDING, the program closed with them standing)
+
+The GF-S12 close (P5) printed these for the owner's final round (the
+evidence `evidence/gf-p5-acceptance-2026-11-07.md` §3 — every one on its
+printed recommendation, the round-2 precedent). **The table gains its
+answer column when the owner's answers arrive**; until then each row
+stands on its recorded state. None of them gates the program's close
+(the acceptance is question (d) itself — the meter's shape stands
+verified either way); the answers either record an acceptance (a/b/d)
+or unlock future work (c) under the successor discipline.
+
+| # | The question | The standing state (verified at the GF-S12 close) | The recommendation (printed) |
+|---|---|---|---|
+| **(a)** | **THE CLEVELAND L2 CLASS** — the I9 cards (`cpi-nowcast` + `cpi-surprise`) serve PRIVATE | The Bank's own terms quote no affirmative reuse grant (the register row `publicDisplayOk no`, checked 2026-11-07) — the SGE-pre-(e) standing; the cards accumulate privately (0 surprises, the accepted standing start) | **ACCEPT FOR PUBLIC DISPLAY** — the same L2 owner-acceptance the SGE class received (round-2 (e)): a derived conditions display from a central bank's own public page, attributed, non-commercial; or keep private until asked |
+| **(b)** | **THE X5 YAHOO CLASS** — the `gold-equities-ratio` card serves PRIVATE | The Yahoo L2 class carries no public-display directive for these tiles (the standing class since the audit) | **KEEP PRIVATE** — the Yahoo endpoints carry no licence; printed for completeness |
+| **(c)** | **THE WGC REPLY** | The authorisation draft (`evidence/wgc-authorisation-draft-2026-11-07.md`) sits printed for the owner's review + send (info@gold.org); no reply recorded, no fetch wired, the family 'awaiting data' | **IF SENT + ANSWERED: record the reply and unlock the family per its terms** (a successor owner-gated session); **else the family stays blocked** — the standing state, nothing owed |
+| **(d)** | **THE PROGRAM'S CLOSE** — the acceptance itself | The meter's final shape verified whole at P5 (the acceptance table + the production matrix): 37 voters (7/7/11/10/2, MIN2, STRONG 4-of-5) · the 184-id register · the flip live · gates green · the worker `8f9e521e`; the recorded-open items honestly listed (F7 · F12 · the WGC family · the promotion criteria in each card's comments) | **ACCEPT THE FINAL SHAPE AS THE PROGRAM'S DELIVERABLE** — the end state (a)/(b)/(c) delivered; the program closes with the open items standing on their records |
 
 ## Out of scope
 
