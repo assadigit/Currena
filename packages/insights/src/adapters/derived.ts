@@ -317,8 +317,12 @@ export function realGoldPriceSeries(
  * (trillions, 2dp), monthly:
  *
  *   GL(M) = [ WALCL(last Wednesday ≤ M-end)
- *           + ECB_T00(M) × EURUSD(M-end)          (EUR millions → $M)
+ *           + ECB_T00(M) ÷ (EUR per USD)(M-end)   (EUR millions → $M)
  *           + JPNASSETS(M) × 100 ÷ USDJPY(M-end) ] (oku ¥ → ¥M → $M) ÷ 1e6
+ *
+ * (The Frankfurter legs serve USD→EUR — euros per dollar — so the ECB
+ * leg DIVIDES by that rate; the JPY leg is yen per dollar and divides
+ * the same way.)
  *
  * The monthly inner join rides the ECB/BoJ legs' month-start dates (the
  * slowest publishers govern); each CB's own latest value at that month is
@@ -352,7 +356,7 @@ export function globalLiquiditySeries(
     const jpy = lastOnOrBefore(usdJpy, monthEnd);
     if (boj === undefined || fed === undefined || eur === undefined || jpy === undefined) continue; // fail closed
     if (boj <= 0 || fed <= 0 || eur <= 0 || jpy <= 0) continue;
-    const usdMillions = fed + ecb.value * eur + boj * 100 / jpy;
+    const usdMillions = fed + ecb.value / eur + (boj * 100) / jpy;
     out.push({ date: ecb.date, value: Math.round((usdMillions / 1e6) * 100) / 100 });
   }
   return out;
