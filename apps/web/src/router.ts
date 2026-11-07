@@ -15,15 +15,37 @@
  * subscribers manually after each push; `popstate` (browser Back/Forward)
  * is also wired so the store re-renders on history navigation.
  *
- * Routes (Phase 5a): converter + live-rates are live; 3–9 are stubs until 5b.
+ * Routes (page-division S1, 2026-11-07 — docs/page-division/02-…-SPEC.md
+ * §18, D-46): the 10 market destinations own the clean top-level slugs —
+ * `/` is the Global world-scan placeholder (D-20: Global becomes the
+ * landing page) — while the currency Converter, the app's founding tool,
+ * moves to `/converter` (display-layer only: the page itself is unchanged,
+ * zero content loss; build-session decision recorded in the roadmap S1
+ * entry, flagged for owner ratification). The legacy all-in-one Insights
+ * page stays at `/insights` with a deprecation banner until retirement
+ * (D-9/D-46). The eight remaining destinations are placeholder routes
+ * until their build sessions (roadmap S3–S18).
  */
 
 import { useSyncExternalStore } from 'react';
 
 export const ROUTES = [
+  // Page-division destinations (D-46 clean top-level slugs).
   '/',
-  '/live-rates',
+  '/gold',
+  '/world-markets',
+  '/currencies',
+  '/commodities',
+  '/usa',
+  '/europe',
+  '/asia-pacific',
+  '/australia',
+  // Legacy all-in-one page (D-46) — deprecation banner, retirement at D-9 conditions.
   '/insights',
+  // The converter tools (the app's founding surface; `/` was the converter
+  // until the page-division program made Global the landing page — D-20).
+  '/converter',
+  '/live-rates',
   '/calculator',
   '/history',
   '/receipt',
@@ -78,7 +100,7 @@ export function routeQuery(): URLSearchParams {
  * Boot-time guard: if the user lands on an unknown path (a stale
  * bookmark to a removed page, or a typo), silently rewrite the URL to
  * `/` via `history.replaceState` — no reload, no history entry, the
- * Converter renders under a clean address. Known routes pass through
+ * Global route renders under a clean address. Known routes pass through
  * untouched. Runs once on the first `useRoute` subscribe.
  */
 let booted = false;

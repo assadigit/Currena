@@ -36,7 +36,9 @@ function ErrorScreen({ onRetry }: { onRetry: () => void }): ReactNode {
             className="px-6 py-3"
             onClick={() => {
               onRetry();
-              navigate('/');
+              // Page-division S1: the converter lives at /converter now —
+              // the copy still says "Go to converter", so land there.
+              navigate('/converter');
             }}
           >
             {t('app.errorHome')}

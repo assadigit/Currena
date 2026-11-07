@@ -13,12 +13,20 @@ describe('parseRouteAndQuery', () => {
     expect(parseRouteAndQuery('/insights').path).toBe('/insights');
   });
 
-  it('empty-ish inputs normalize to the converter', () => {
+  it('parses the page-division destination slugs (D-46, S1)', () => {
+    for (const slug of ['/gold', '/world-markets', '/currencies', '/commodities', '/usa', '/europe', '/asia-pacific', '/australia']) {
+      expect(parseRouteAndQuery(slug).path).toBe(slug);
+    }
+    // The converter's new home (S1: `/` became the Global landing page, D-20).
+    expect(parseRouteAndQuery('/converter').path).toBe('/converter');
+  });
+
+  it('empty-ish inputs normalize to the Global landing route', () => {
     expect(parseRouteAndQuery('').path).toBe('/');
     expect(parseRouteAndQuery('/').path).toBe('/');
   });
 
-  it('unknown paths normalize to the converter — with or without a query', () => {
+  it('unknown paths normalize to the Global landing route — with or without a query', () => {
     expect(parseRouteAndQuery('/nope').path).toBe('/');
     expect(parseRouteAndQuery('/nope?card=us10y').path).toBe('/');
   });

@@ -1,12 +1,19 @@
 /**
  * App shell — providers, path router, per-route titles.
  * Sticky-footer layout: min-h-screen flex column with the footer pushed to
- * the bottom on short pages (converter) and below long content otherwise.
+ * the bottom on short pages (Global) and below long content otherwise.
  *
  * Phase 5b: the seven tool routes are code-split via React.lazy — the entry
- * chunk carries only the shell + converter + live-rates (mission §8 budget;
- * checklist guardrail "converter route ships first; receipt … lazy"). The
- * PWA precaches every emitted chunk, so offline loading is unaffected.
+ * chunk carries only the shell + live-rates (mission §8 budget; checklist
+ * guardrail "converter route ships first; receipt … lazy"). The PWA
+ * precaches every emitted chunk, so offline loading is unaffected.
+ *
+ * Page-division S1 (2026-11-07, D-20/D-46): `/` is now the Global
+ * world-scan placeholder (the landing page) and the converter — the eager
+ * entry-chunk route until now — is a lazy tool route at `/converter`; the
+ * eight market destinations share one lazy placeholder chunk until their
+ * build sessions (roadmap S3–S18). Zero content loss anywhere: the legacy
+ * /insights page is untouched below its deprecation banner.
  */
 
 import { lazy, Suspense, useEffect } from 'react';
@@ -15,7 +22,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast } from './components/ui';
-import { Converter } from './routes/Converter';
+import { GlobalPlaceholder } from './routes/page-division/GlobalPlaceholder';
 import { LiveRates } from './routes/LiveRates';
 import { useRoute } from './router';
 import { useI18n } from './lib/locale';
@@ -35,16 +42,54 @@ const Settle = lazy(() => import('./routes/Settle').then((m) => ({ default: m.Se
 const Receipt = lazy(() => import('./routes/Receipt').then((m) => ({ default: m.Receipt })));
 const About = lazy(() => import('./routes/About').then((m) => ({ default: m.About })));
 const Insights = lazy(() => import('./routes/Insights').then((m) => ({ default: m.Insights })));
+// Page-division S1 (D-46): the Converter — the app's founding tool, eager
+// in the entry chunk until now — becomes a lazy tool route at /converter so
+// the Global placeholder (D-20: the landing page) owns `/`. The placeholder
+// skeleton for the eight destinations is one shared lazy chunk.
+const Converter = lazy(() => import('./routes/Converter').then((m) => ({ default: m.Converter })));
+const PagePlaceholder = lazy(() =>
+  import('./routes/page-division/PagePlaceholder').then((m) => ({ default: m.PagePlaceholder })),
+);
+
+/** The eight destination routes that share the placeholder chunk (S1). */
+const DESTINATION_ROUTES: ReadonlySet<string> = new Set([
+  '/gold',
+  '/world-markets',
+  '/currencies',
+  '/commodities',
+  '/usa',
+  '/europe',
+  '/asia-pacific',
+  '/australia',
+]);
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
   switch (route) {
     case '/':
+      return 'pd.global.title';
+    case '/converter':
       return 'converter.title';
     case '/live-rates':
       return 'liveRates.title';
     case '/insights':
       return 'insights.title';
+    case '/gold':
+      return 'pd.gold.title';
+    case '/world-markets':
+      return 'pd.worldMarkets.title';
+    case '/currencies':
+      return 'pd.currencies.title';
+    case '/commodities':
+      return 'pd.commodities.title';
+    case '/usa':
+      return 'pd.usa.title';
+    case '/europe':
+      return 'pd.europe.title';
+    case '/asia-pacific':
+      return 'pd.asiaPacific.title';
+    case '/australia':
+      return 'pd.australia.title';
     case '/calculator':
       return 'calculator.title';
     case '/history':
@@ -164,9 +209,15 @@ export function App() {
       <Header />
       <main id="main-content" tabIndex={-1} className="flex-1 pt-16 focus:outline-none lg:pt-20">
         <ErrorBoundary>
-          {route === '/' ? <Converter /> : null}
+          {/* Page-division S1 (D-20/D-46): `/` is the Global world-scan
+              placeholder (eager — the landing); the eight destinations
+              share one lazy placeholder chunk; the Converter moved to
+              /converter unchanged. */}
+          {route === '/' ? <GlobalPlaceholder /> : null}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
+            {route === '/converter' ? <Converter /> : null}
+            {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}
             {route === '/history' ? <History /> : null}
             {route === '/receipt' ? <Receipt /> : null}

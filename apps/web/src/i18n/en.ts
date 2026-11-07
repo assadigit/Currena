@@ -44,6 +44,22 @@ export const en = {
     toggleTheme: 'Toggle theme',
     menu: 'Menu',
     installApp: 'Install app',
+    /* ── Page-division S1 (D-45/D-46): the grouped topbar's market
+       destinations + the converter's new home. */
+    global: 'Global',
+    gold: 'Gold',
+    worldMarkets: 'World Markets',
+    currencies: 'Currencies',
+    commodities: 'Commodities',
+    regions: 'Regions',
+    usa: 'USA',
+    europe: 'Europe',
+    asiaPacific: 'Asia & Pacific',
+    australia: 'Australia',
+    tools: 'Tools',
+    legacyBadge: 'legacy',
+    converter: 'Converter',
+    marketsGroup: 'Markets',
   },
 
   common: {
@@ -534,6 +550,90 @@ export const en = {
    * bundle does not regress (roadmap Phase I4 perf constraint). */
   insights: {
     title: 'Insights',
+  },
+
+  /** Page-division S1 (2026-11-07): the destination placeholders' copy —
+   * titles, purposes, membership summaries and the migration bridge. The
+   * per-page content itself arrives with each page's build session
+   * (roadmap S3–S18) in the insights-copy corpora; this section is the
+   * honest skeleton only. */
+  pd: {
+    statusBuilding: 'In build',
+    buildsIn: 'Planned — builds in roadmap sessions {sessions}.',
+    decisionsLabel: 'Decision record',
+    whatLivesHere: 'What will live here',
+    todayOnInsights:
+      'Until then, this content lives — complete and unchanged — on the legacy Insights page.',
+    openInsights: 'Open the legacy Insights page',
+    backToGlobal: 'Back to the Global scan',
+    unknownRoute: 'This destination is not part of the current program.',
+    global: {
+      title: 'Global',
+      purpose: 'The one-screen answer to “how is the world’s economy doing right now?” — for people who scan fast.',
+      summary:
+        'A 10-tile verdict board — gold balance, the five thematic gauges, FX lights, world markets status, a live prices ribbon and the dedollarization context — plus region chips and a one-line “what changed today” narrator. Zero scrolling.',
+      todayTitle: 'During the rebuild',
+      todayText:
+        'The complete picture — every gauge, board and indicator — still lives on the legacy Insights page.',
+      destinations: 'The destinations',
+    },
+    gold: {
+      title: 'Gold',
+      purpose: 'THE gold card — the 37-voter conditions meter plus the complete gold picture.',
+      summary:
+        'A live gold-price hero with the Balance Scale verdict and 7-state outlook, the 37 voter seats grouped by their five lanes, 14 ratio & flow context cards, and the honest-record footnote.',
+    },
+    worldMarkets: {
+      title: 'World Markets',
+      purpose: 'The state of world equities at a glance, plus the world’s risk backdrop.',
+      summary:
+        'The world-index map (16 country indexes, reused from today’s Insights page), Asia · Europe · Americas region grids with correction/bear statuses, and the world risk & liquidity cards.',
+    },
+    usa: {
+      title: 'USA',
+      purpose: 'The American bulk — the deepest page, tiered by world-impact.',
+      summary:
+        'The five thematic gauge verdicts on top, about 72 cards in six tiers — from “the world watches” down to labor, liquidity, stress and valuation — the TIC board (who finances America), and the SPX/NDX/DOW section.',
+    },
+    europe: {
+      title: 'Europe',
+      purpose: 'The European picture — EU members and non-EU members listed apart.',
+      summary:
+        'An EU section (ECB rate, euro-area inflation, AAA yields, Bund, BTP–Bund spread) and a separate United Kingdom section, plus the Europe zoom map and verified FRED fills.',
+    },
+    asiaPacific: {
+      title: 'Asia & Pacific',
+      purpose: 'The world’s growth engine region — organized by sub-region, not by theme.',
+      summary:
+        'Five sub-regions — China, Japan, Korea/Taiwan/Hong Kong, India and the Pacific (New Zealand) — plus the Asia zoom map and verified CPI fills.',
+    },
+    australia: {
+      title: 'Australia',
+      purpose: 'The home market — the AU Markets board plus the five-gauge structure.',
+      summary:
+        'The AU Markets board (All Ordinaries, ten ASX-200 sectors, the four big banks, ASX 200 VIX, NZX50) on top and 28 cards in the unchanged five-gauge structure.',
+    },
+    commodities: {
+      title: 'Commodities & Energy',
+      purpose: 'Every commodity, exclusively here — energy, metals, agriculture and digital.',
+      summary:
+        'Energy · Metals · Agriculture · Digital groups with live prices, plus the trade-routes & supply section (chokepoints, SPR, crude stocks, GSCPI). Gold cross-links to the Gold page.',
+    },
+    currencies: {
+      title: 'Currency Pairs',
+      purpose: 'The FX picture — rules first, the pair board second.',
+      summary:
+        'The seven rule lights (R1–R7) as the hero with plain-language explanations, the 11-pair board with moveRank and big-move flags, and the dollar-standing section.',
+    },
+  },
+
+  /** Page-division S1 (D-46): the legacy /insights page’s deprecation
+   * banner — what is happening, the promise (unchanged until verified),
+   * and the link to the new Global landing page. */
+  deprecation: {
+    title: 'This page is being reorganised',
+    text: 'Currena’s market coverage is moving to dedicated destinations — Global, Gold, World Markets, USA, Europe, Asia & Pacific, Australia, Commodities & Energy and Currency Pairs. This all-in-one page stays here, unchanged, until every indicator is verified in its new home.',
+    cta: 'Open the new Global page',
   },
 
   footer: {
