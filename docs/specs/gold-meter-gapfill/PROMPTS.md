@@ -1954,3 +1954,42 @@ per-seat discipline — the recorded approval + the measured scenario +
 the P0 wrap first (D-GF-1/D-GF-6, unchanged).
 
 **NEVER seat a sign silently.**
+
+---
+
+## THE ROUND-3 SUCCESSION — EXECUTED (GF-S13, 2026-11-07 later the same day; the annotation the close foretold)
+
+The owner's round-3 answers arrived in the chat round of 2026-11-07 — the
+blanket directive: **"Make everything Public, just add in some
+documentation, that some SHOULD be private. dont keep anything private …
+If you can show them. show and calculate them. but add some documentation
+later, so in future, where this legalities are important for me, I can
+hide some or ask for permission."** The successor session GF-S13 executed
+them on the round-3 table's recorded authority: (a) the Cleveland class
+public (on the recommendation) · (b) the Yahoo class public (the owner
+overrode the printed keep-private recommendation) · (c) the WGC family
+staying blocked with nothing to show (the authorisation draft remains the
+owner's lever) · (d) the program staying CLOSED. The SHOULD-be-private
+reference landed in `docs/insights/LICENCES.md`. The record:
+`evidence/gf-s13-flip-2026-11-07.md` + the run record beside it.
+
+**THE FINAL PROMPT = NONE — now doubly so.** The program ended at GF-S12;
+the round-3 successor loop closed at GF-S13. The only remaining open
+threads, both owner-side levers recorded in one place
+(`docs/insights/LICENCES.md`'s "should be private" reference):
+
+1. **The WGC reply** — IF the owner ever sends the authorisation draft
+   (`evidence/wgc-authorisation-draft-2026-11-07.md`) to info@gold.org
+   and a reply arrives: record it and unlock the family per its terms —
+   that unlock is a NEW owner-gated session with its own kickoff prompt
+   (the D-GA-9 convention).
+2. **Any future hide-or-permission round** — the owner's own future
+   lever, documented with its exact mechanism (one register edit + one
+   regen + one deploy; the panic switch `ACCESS_MODE=private`).
+
+**If new meter work is ever wanted** (a seat, a lane, a threshold, a
+sign): a NEW owner-gated program starts on the same per-seat discipline —
+the recorded approval + the measured scenario + the P0 wrap first
+(D-GF-1/D-GF-6, unchanged).
+
+**NEVER seat a sign silently.**
