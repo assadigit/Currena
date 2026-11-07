@@ -2140,6 +2140,306 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     rule: { kind: 'info' },
     staleAfterDays: 5,
   },
+  {
+    // GF-S11 (2026-11-07, the owner's recorded I9 answer — the round-2
+    // decision table): the Cleveland Fed's CURRENT-MONTH CPI nowcast, the
+    // ACCUMULATION card of the inflation-surprise object (audit report §4
+    // rank 33 / I9). The publisher serves no nowcast history (the GF-S10
+    // verdict), so the series accumulates from the standing start: each
+    // rung-2 fetch appends/refines one point per still-unreleased reference
+    // month (fetched wins on collision — the page's own blank-cell rule
+    // freezes a month's final nowcast once the print lands). A CONTEXT
+    // CARD (rule: info — never votes): the nowcast displays as CONDITIONS
+    // ("what the Cleveland Fed expects this month's CPI to print"), never
+    // a forecast the meter claims. The maturity is honest in the copy: the
+    // accumulation started 2026-11-07; the percentile base matures over
+    // ~30 months. Promotion criteria (recorded, revisit-able once the
+    // accumulated history exists): a surprise-percentile band seat would
+    // need (a) ≥ 24 months of accumulated surprises, (b) the C1/C2
+    // re-derivation over the corpus with the seat wired in the harness
+    // FIRST (D-GF-6), and (c) the owner's recorded per-seat approval
+    // (D-GF-1) — never silently.
+    id: 'cpi-nowcast',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US CPI nowcast (Cleveland Fed)',
+    source: 'cleveland',
+    sourceRef: 'Cleveland Fed inflation nowcasting (current-month CPI MoM, SA, nonannualized)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 45,
+  },
+  {
+    // GF-S11 (2026-11-07, the owner's recorded I9 answer): the INFLATION
+    // SURPRISE itself — the realised CPI print (the SA index's MoM change,
+    // CPIAUCSL — the headline print basis) minus the Cleveland Fed's final
+    // nowcast for that month (the last observation before the venue's own
+    // blank-cell release marker), in percentage points. The join runs on
+    // the rung-2 phase: when the CPIAUCSL series gains month M AND the
+    // current fetch no longer carries M's nowcast, the surprise derives
+    // and appends (fail-closed on either leg missing). The standing start:
+    // the accumulation began 2026-11-07, so the FIRST surprise lands with
+    // the next monthly CPI print and the percentile base matures over
+    // ~30 months — the honest maturity the copy states. A CONTEXT CARD
+    // (rule: info — never votes); NO predictive claim anywhere: the
+    // surprise displays as conditions (an upside surprise has classically
+    // accompanied gold strength, but the meter claims nothing about the
+    // future — D-GF-3).
+    id: 'cpi-surprise',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'US CPI surprise (print vs nowcast)',
+    source: 'derived',
+    sourceRef: 'BLS CPI MoM (CPIAUCSL, SA) − the Cleveland Fed final nowcast (pp)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 30 / I10): the JASTRAM
+    // REAL GOLD PRICE — the gold price deflated by the consumer price
+    // index, the classic valuation anchor ("the purchasing power of
+    // gold"). Derived from two legs already on the wire: the month's
+    // closing gold price ÷ the CPI index level (CPIAUCNS, the BLS
+    // headline NSA basis), expressed in the CPI's own 1982–84 dollars
+    // (the index's published base — no invented rebasing). A CONTEXT CARD
+    // (rule: info — never votes): the real price reads the valuation
+    // cycle (the multi-decade purchasing-power swings Jastram
+    // documented), never a price direction. Promotion criteria
+    // (recorded, revisit-able): a percentile-band seat would need the
+    // D-GF-6 harness wrap + the owner's recorded approval — the I10 row
+    // was CONTEXT ADD by the owner's recorded per-row answer.
+    id: 'real-gold-price',
+    section: 'global',
+    group: 'market-stress',
+    name: 'The real gold price (CPI-deflated)',
+    source: 'derived',
+    sourceRef: 'gold-usd (month close) ÷ CPIAUCNS × 100 (1982–84 dollars)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 31 / X7): the
+    // GOLD/PLATINUM RATIO — the second precious-bloc ratio beside
+    // gold-silver, derived from two legs already on the wire (gold-usd ÷
+    // platinum, same-date inner join). A CONTEXT CARD (rule: info —
+    // never votes): the ratio reads the relative valuation inside the
+    // precious complex (platinum's industrial demand cycle vs gold's
+    // monetary demand), never a price direction. Promotion criteria
+    // (recorded, revisit-able): a percentile-band seat would need the
+    // D-GF-6 harness wrap + the owner's recorded approval.
+    id: 'gold-platinum',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Gold to platinum ratio',
+    source: 'derived',
+    sourceRef: 'gold-usd ÷ platinum (same-date closes)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 5,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 34 / I11): GLOBAL
+    // LIQUIDITY — the sum of the three major central banks' balance
+    // sheets (Fed + ECB + BoJ) converted to US dollars, the liquidity
+    // side of money (the quantity the policy rate prices). Legs: FRED
+    // WALCL (weekly, $ millions — the walcl card's own series), the ECB
+    // Data Portal's Eurosystem total assets (BSI.M.U2.N.C.T00.A.1.Z5.
+    // 0000.Z01.E, EUR millions, ~5-week publication lag measured live
+    // 2026-11-07: September's stock already served) and FRED JPNASSETS
+    // (the BoJ's total assets, "100 Million Yen" units — the BoJ's own
+    // oku convention, © Bank of Japan via FRED citation-required), with
+    // the Frankfurter EUR + JPY legs converting at each month's close.
+    // A CONTEXT CARD (rule: info — never votes). The ECB leg's licence
+    // verdict (unknown → fail-closed publicly) governs the card's public
+    // display — the honest default until the ECB terms get quoted.
+    // Promotion criteria (recorded, revisit-able): a percentile-band seat
+    // would need the D-GF-6 harness wrap + the owner's recorded approval.
+    id: 'global-liquidity',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Global liquidity (Fed + ECB + BoJ)',
+    source: 'derived',
+    sourceRef: 'FRED WALCL + ECB BSI T00 (EUR m) + FRED JPNASSETS (¥100m), USD-converted (monthly, $ trillions)',
+    cadence: 'monthly',
+    changeKind: 'pct',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 38 / F15, unblocked by
+    // the owner's round-2 answer (e) — the SGE class acceptance): the SGE
+    // MONTHLY GOLD WITHDRAWALS — the gold physically pulled from Shanghai
+    // Gold Exchange vaults each month, the classic China physical-demand
+    // proxy. The venue: the exchange's own monthly "Data Highlights"
+    // statistics PDF (en.sge.com.cn/data_MonthlyReport lists them; the
+    // "Other Market Data — Delivery Volume" section carries the
+    // withdrawal table, gold first). The adapter extracts the
+    // present-month withdrawal volume (kg → tonnes) with a minimal
+    // CID-font PDF text decode (the ToUnicode CMap walk — the venue's
+    // own encoding, pinned by tests); the month comes from the page's own
+    // link label. A CONTEXT CARD (rule: info — never votes). The
+    // standing start: the monthly-report page lists the recent PDFs
+    // (~10 months — the one-off backfill collects what the page serves);
+    // the percentile base matures from there. Promotion criteria
+    // (recorded, revisit-able): an annualised-level extreme band (the
+    // OI-GA-4 family) once ≥ 2 years accumulate, via the D-GF-6 harness
+    // wrap + the owner's recorded approval.
+    id: 'sge-gold-withdrawals',
+    section: 'global',
+    group: 'market-stress',
+    name: 'SGE gold withdrawals (monthly)',
+    source: 'sge',
+    sourceRef: 'SGE monthly Data Highlights (gold withdrawal volume, tonnes)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 39 / F16): the SWISS
+    // GOLD FLOW — Switzerland's monthly gold imports, the raw-material
+    // side of the world's refinery hub (the evidence family behind F6/F7:
+    // what the Swiss refiners take in determines what flows out to China
+    // and India). The venue: the BAZG's own OPEN DATA export — the
+    // "Goods: Foreign trade - Gold imports by country" CSV served from
+    // ocean.bazg.admin.ch (verified live 2026-11-07: monthly rows by
+    // country × control code, 2021-01 → 2026-09, def/prov statuses, ~2.4
+    // MB; the semicolon CSV sums to monthly tonnes). The licence: the
+    // opendata.swiss "terms_by_ask" class — non-commercial use
+    // permitted, commercial requires the owner's ask; Currena's use
+    // rides the owner's recorded non-commercial statement (the UoM
+    // precedent) with attribution. The monthly TOTAL is a stated
+    // derivation (the country rows summed; the "How is this calculated?"
+    // says so). The EXPORT side (the demand leg to China/India)
+    // publishes only via the SwissImpex app (TLS-blocked from this
+    // session's venue) or a 692 MB all-tariff zip (rejected on weight) —
+    // recorded honestly as the follow-up. A CONTEXT CARD (rule: info).
+    id: 'swiss-gold-flow',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Swiss gold imports (monthly)',
+    source: 'bazg',
+    sourceRef: 'BAZG open data: foreign trade, gold imports by country (7108, monthly tonnes)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 41 / X5): the
+    // GOLD-VS-EQUITIES ROTATION GAUGE — the GLD/SPY ratio (the gold ETF
+    // priced in S&P 500 units), the classic relative-valuation read
+    // between the two reserve assets. Legs: Yahoo's GLD + SPY daily
+    // closes (the sp500-breadth-ratio pattern — sequential chart calls,
+    // same-date inner join, 4dp). The Yahoo L2 class is owner-accepted
+    // for FETCH (2026-10-17) but carries NO public-display directive for
+    // these tiles — the card serves PRIVATE until the owner records one
+    // (the honest default; the four price tiles + the breadth ratio ride
+    // their own standing directives). A CONTEXT CARD (rule: info — never
+    // votes). Promotion criteria (recorded, revisit-able): a
+    // percentile-band seat would need the D-GF-6 harness wrap + the
+    // owner's recorded approval.
+    id: 'gold-equities-ratio',
+    section: 'global',
+    group: 'prices-heat',
+    name: 'Gold vs equities (GLD/SPY)',
+    source: 'derived',
+    sourceRef: 'Yahoo GLD ÷ SPY (same-date closes, daily)',
+    cadence: 'daily',
+    changeKind: 'pct',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 5,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 42 / R11): R-STAR —
+    // the Holston–Laubach–Williams estimate of the US natural rate of
+    // interest, the regime label the whole rates complex orbits (the
+    // neutral setting against which every policy rate reads tight or
+    // loose). Context-only BY TREATMENT (the audit's own classification):
+    // a quarterly model estimate, never a trading signal. The venue: the
+    // NY Fed's own HLW current-estimates XLSX (the rstar page's linked
+    // file; the "HLW Estimates" sheet's US r* column, quarter-dated).
+    // The NY Fed's terms are the affirmative reuse licence (register row
+    // nyfed, L1). The file's own cadence: the estimates update with a
+    // ~1.5-quarter lag (the 2026-11-07 read carries 2026Q2 as the final
+    // data point) — the staleness window states it honestly. A CONTEXT
+    // CARD (rule: info — never votes).
+    id: 'rstar-us',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US r-star (HLW estimate)',
+    source: 'nyfed',
+    sourceRef: 'NY Fed Holston–Laubach–Williams current estimates (quarterly, US r*)',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 340,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 43 / F12): the ETF
+    // SHORT INTEREST — the squeeze-tell complement to the ETF-flows
+    // family (how much of the gold ETF float is sold short). THE HONEST
+    // VENUE VERDICT (triaged live 2026-11-07, the fail-closed
+    // discipline): the fund-page class DISAPPOINTS — nasdaq.com's fund
+    // pages time out from this venue, nyse.com's short-interest page
+    // answers HTTP 403 (the usmint/MCX block class), and FINRA's
+    // equity-short-interest API is registration-gated (the pre-approval
+    // class). The card lands as a DEFINITION with the licence verdict
+    // recorded and NO fetch wired — it renders 'awaiting data' honestly
+    // until a licence-clean venue appears (a venue/owner round, or an
+    // official free feed). A CONTEXT CARD (rule: info — never votes).
+    id: 'etf-short-interest',
+    section: 'global',
+    group: 'market-stress',
+    name: 'Gold ETF short interest',
+    source: 'fund-pages',
+    sourceRef: 'ETF short interest (the fund pages — no licence-clean venue verified)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 75,
+  },
+  {
+    // GF-S11 (P4, 2026-11-07 — audit report §4 rank 40 / G3): the US
+    // FEDERAL DEBT as a share of GDP — the structural anchor of the
+    // fiscal-dominance channel (the long-run story beside us-deficit-12m
+    // and govt-interest-revenue). The venue: FRED GFDEGDQ188S (quarterly,
+    // percent of GDP, public-domain per the T-16 scan 2026-11-07; the
+    // Q2-2026 point 121.19% was the latest at the read — the Treasury's
+    // own quarterly rhythm, ~2 quarters of asOf age between updates,
+    // stated honestly in the staleness window). A CONTEXT CARD (rule:
+    // info — never votes): the level reads the structural regime, never
+    // a price direction. Promotion criteria (recorded, revisit-able): a
+    // threshold seat would need the D-GF-6 harness wrap + the owner's
+    // recorded approval.
+    id: 'debt-to-gdp',
+    section: 'global',
+    group: 'borrowing-costs',
+    name: 'US federal debt to GDP',
+    source: 'fred',
+    sourceRef: 'FRED:GFDEGDQ188S',
+    cadence: 'quarterly',
+    changeKind: 'points',
+    phase: 'P4',
+    rule: { kind: 'info' },
+    staleAfterDays: 280,
+  },
   /* ---------------- Global — Is growth healthy? ---------------- */
   {
     // M7 (2026-10-26): the manual hand-entry era ends — the NBS English

@@ -243,6 +243,21 @@ const OWNER_PUBLIC_DISPLAY_OVERRIDE: Readonly<Record<string, string>> = {
   // stay verbatim (worst-leg L2 disclosed in the register row).
   'gold-silver':
     'The ratio\'s history legs are exactly the gold-usd and silver-usd tiles\' own Yahoo metals legs (GC=F and SI=F — the GF-P1 D-5 recorded base deepening, the repo\'s own L2 owner-accepted pair, both legs same-day so the term structure cancels); the standing owner directives (2026-10-19e) already lifted those legs\' display bars, and the derived ratio inherits them — the gold-oil-ratio (A-4) precedent. The directive lifts its worst-leg display bar.',
+
+  // GF-S11 (P4, 2026-11-07 — audit report §4 rank 30 / I10): the Jastram
+  // REAL GOLD PRICE — its legs are exactly the gold-usd card's own legs
+  // (gold-api XAU + the Yahoo GC=F history) beside the public-domain FRED
+  // CPI index; the standing owner directives (2026-10-19e) already lifted
+  // the metals legs' display bars, and the derived ratio inherits them —
+  // the gold-oil-ratio (A-4) / gold-silver (GF-P2) precedent.
+  'real-gold-price':
+    'The real gold price derives from the gold-usd card\'s own legs (gold-api XAU + the Yahoo GC=F history — the legs the standing owner directives (2026-10-19e) already lifted) plus the public-domain FRED CPI index; the derived series inherits its parents\' lifted display bars, the gold-oil-ratio (A-4) precedent.',
+  // GF-S11 (P4 — §4 rank 31 / X7): the gold/platinum ratio — the same
+  // inheritance: the gold legs are gold-usd\'s own (directives lifted),
+  // the platinum legs are gold-api XPT + the public World Bank Pink
+  // Sheet base. The derived ratio inherits the lifted bars.
+  'gold-platinum':
+    'The gold/platinum ratio derives from the gold-usd card\'s own legs (gold-api XAU + the Yahoo GC=F history — lifted by the standing owner directives, 2026-10-19e) and the platinum card\'s legs (gold-api XPT + the public World Bank Pink Sheet base); the derived ratio inherits its parents\' lifted display bars, the gold-oil-ratio (A-4) precedent.',
 };
 
 /**

@@ -958,7 +958,13 @@ const BUDGETS = [
   // definitions + the display config. Measured 1569.21/363.53 — the raw
   // ceiling re-bases to 1572 (the multiple-of-4 headroom ≈2.8 kB; the gz
   // stays under its 365 ceiling at 363.53).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1572_000, gz: 365_000, label: 'Insights lazy chunk' },
+  // GF-S11 (2026-11-07): 1572→1620 raw / 365→377 gz — ELEVEN new gold-meter
+  // indicators (the I9 accumulator pair + the nine P4 context cards) each
+  // carry the full IndicatorCopyEntry shape × 2 locales (121 new strings,
+  // round-82) + the definitions + the display config + the registry rows.
+  // Measured 1612.14/373.58 — the raw ceiling re-bases to 1620 (the
+  // multiple-of-4 headroom ≈7.9 kB; the gz to 377, headroom ≈3.4 kB).
+  { pattern: /^Insights-[\w-]+\.js$/, raw: 1620_000, gz: 377_000, label: 'Insights lazy chunk' },
 ];
 
 function main() {

@@ -61,6 +61,18 @@ import { fetchSp500BreadthRatio } from './sp500-breadth';
 // Shanghai premium derivation's SGE leg).
 import { fetchUomExpectedPrice5y10y } from './uom';
 import { fetchSgeAu9999Recent, sgeSeriesOf } from './sge';
+// GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+// accumulator's feeds (the Cleveland Fed nowcasting page + the SA CPI
+// index), the I11 global-liquidity legs (the ECB Eurosystem total assets
+// + the BoJ JPNASSETS), the F15 SGE monthly withdrawals (the Data
+// Highlights PDF), the F16 BAZG gold imports, the R11 HLW r-star workbook
+// and the X5 GLD/SPY pair.
+import { fetchClevelandNowcasts, nowcastSeriesOf } from './cleveland';
+import { fetchEcbEurosystemAssets } from './ecb';
+import { fetchBazgGoldImports } from './bazg';
+import { fetchSgeMonthlyWithdrawal } from './sge-monthly';
+import { fetchGoldEquitiesRatio } from './gold-equities';
+import { fetchHlwRstar } from './rstar';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main
@@ -137,6 +149,22 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   // staged gold-usd + usdcny legs — the us-japan-10y-gap pattern).
   'michigan-5y-expectations',
   'shanghai-gold-premium',
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+  // accumulator's cards (the nowcast accumulation + the surprise the
+  // CPI-print join derives at this phase) + the P4 context cards this
+  // phase owns — the derived global liquidity (I11, from the staged
+  // walcl/FX legs + this phase's ECB/BoJ fetches), the F15 SGE monthly
+  // withdrawals, the F16 BAZG gold imports, the X5 GLD/SPY ratio and the
+  // R11 HLW r-star. (The I10 real gold price, the X7 gold/platinum ratio
+  // and the G3 debt/GDP derive on the MAIN rung — their legs ride the
+  // main collect; the F12 card carries no fetch — fail-closed.)
+  'cpi-nowcast',
+  'cpi-surprise',
+  'global-liquidity',
+  'sge-gold-withdrawals',
+  'swiss-gold-flow',
+  'gold-equities-ratio',
+  'rstar-us',
 ];
 
 /** Which feeds a rung-2 execution fetches. */
@@ -171,6 +199,27 @@ export interface Rung2FetchPlan {
   /** GF-S10: the SGE Au99.99 daily close — daily + bootstrap (the
    * gprDaily pattern: a missing stage entry IS the bootstrap itself). */
   sgeDaily: boolean;
+  /** GF-S11 (I9): the Cleveland Fed nowcasting page + the SA CPI index —
+   * daily + bootstrap (the nowcast refines every business day; the
+   * CPI-print join needs the freshest index to detect a new print). */
+  clevelandNowcast: boolean;
+  /** GF-S11 (I11): the global-liquidity legs — the ECB Eurosystem total
+   * assets + the BoJ JPNASSETS — first-of-month + bootstrap (both are
+   * monthly series carrying their full history per fetch). */
+  liquidityMonthly: boolean;
+  /** GF-S11 (F15): the SGE monthly Data Highlights PDF — the 1st + the
+   * 3rd–14th re-check window (the PDFs publish ~the 2nd–12th of M+1;
+   * idempotent re-fetches, the nbsMonthly window discipline) + bootstrap. */
+  sgeMonthly: boolean;
+  /** GF-S11 (F16): the BAZG gold-imports CSV — first-of-month + bootstrap
+   * (the file revises def→prov; the fetched-wins merge refines). */
+  bazgMonthly: boolean;
+  /** GF-S11 (R11): the HLW r-star workbook — quarterly data, re-checked
+   * every Saturday + bootstrap (idempotent; the coferQuarterly pattern). */
+  rstarQuarterly: boolean;
+  /** GF-S11 (X5): the GLD/SPY ratio — daily + bootstrap (a missing stage
+   * entry IS the bootstrap itself — the breadthDaily pattern). */
+  equitiesDaily: boolean;
 }
 
 /** Saturday is fetch day for the weekly pair (data Tue, publish Fri 17:30 ET). */
@@ -233,6 +282,14 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
   // mof/gprDaily pattern: a missing stage entry is the bootstrap itself,
   // and the premium derives from the day's own legs).
   const needUomMonthly = missing.has('michigan-5y-expectations');
+  // GF-S11: the P4 bootstraps — the global-liquidity legs, the BAZG flow,
+  // the SGE withdrawals and the r-star boot a fresh deploy on any day
+  // (the michigan discipline); the nowcast/equities feeds run daily
+  // (a missing stage entry is the bootstrap itself).
+  const needLiquidityMonthly = missing.has('global-liquidity');
+  const needSgeMonthly = missing.has('sge-gold-withdrawals');
+  const needBazgMonthly = missing.has('swiss-gold-flow');
+  const needRstarQuarterly = missing.has('rstar-us');
   return {
     mof: true, // daily; the all-file only on monthly/bootstrap (see collect)
     eiaWeekly:
@@ -263,6 +320,16 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     // fetches every day (the premium derives from the day's legs).
     uomMonthly: isFirstOfMonth(date) || needUomMonthly,
     sgeDaily: true,
+    // GF-S11: the I9 feeds run every day (the nowcast refines; the CPI
+    // index detects the print); the I11 legs + the BAZG flow ride the
+    // monthly gate; the SGE PDFs ride the 1st + the 3rd–14th window; the
+    // r-star rides the Saturday gate; the GLD/SPY pair runs daily.
+    clevelandNowcast: true,
+    liquidityMonthly: isFirstOfMonth(date) || needLiquidityMonthly,
+    sgeMonthly: isFirstOfMonth(date) || (date.getUTCDate() >= 3 && date.getUTCDate() <= 14) || needSgeMonthly,
+    bazgMonthly: isFirstOfMonth(date) || needBazgMonthly,
+    rstarQuarterly: isSaturday(date) || needRstarQuarterly,
+    equitiesDaily: true,
   };
 }
 
@@ -275,6 +342,19 @@ export interface Rung2CollectResult {
   /** GF-S10 (F6): the raw SGE Au99.99 closes (a derivation input, never a
    * card — the jgb10y pattern; the premium derives from the staged legs). */
   sgeAu9999?: SeriesPoint[];
+  /** GF-S11 (I9): the reference months the nowcast page still carries —
+   * the venue's own release marker (a month ABSENT from this set has its
+   * print released; the surprise join's fail-closed race guard). */
+  nowcastMonths?: ReadonlySet<string>;
+  /** GF-S11 (I9): the SA CPI index (CPIAUCSL) — the surprise join's
+   * realised-print leg (a raw derivation input, never a card). */
+  cpiIndexSa?: SeriesPoint[];
+  /** GF-S11 (I11): the ECB Eurosystem total assets (EUR millions, monthly —
+   * a raw derivation input for the global-liquidity aggregate). */
+  ecbEurosystemAssets?: SeriesPoint[];
+  /** GF-S11 (I11): the BoJ total assets (JPNASSETS, ¥100m units, monthly —
+   * a raw derivation input for the global-liquidity aggregate). */
+  bojTotalAssets?: SeriesPoint[];
 }
 
 function errMessage(err: unknown): string {
@@ -320,6 +400,10 @@ export async function collectRung2Sources(
 
   const series: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
   let sgeAu9999: SeriesPoint[] | undefined;
+  let nowcastMonths: ReadonlySet<string> | undefined;
+  let cpiIndexSa: SeriesPoint[] | undefined;
+  let ecbEurosystemAssets: SeriesPoint[] | undefined;
+  let bojTotalAssets: SeriesPoint[] | undefined;
 
   // A-2: MOF Japan — the jgb-10y daily primary. The full-history file only
   // rides the monthly/bootstrap rungs (it changes once a month; the
@@ -553,5 +637,86 @@ export async function collectRung2Sources(
     if (sge !== undefined && sge.length > 0) sgeAu9999 = sgeSeriesOf(sge);
   }
 
-  return { series, reports, sgeAu9999 };
+  // GF-S11 (2026-11-07, the owner's recorded I9 answer): the Cleveland Fed
+  // nowcasting page — the current + still-unreleased prior month's CPI MoM
+  // nowcast (one keyless request; the series is month-start dated, refined
+  // rung over rung) — plus the SA CPI index (CPIAUCSL, one fredgraph
+  // request) the surprise join reads as the realised-print leg. Both run
+  // every day (the print can land on any business day).
+  if (plan.clevelandNowcast) {
+    const nowcasts = await fetchLogged('cleveland', 'Inflation Nowcasting (CPI MoM nowcasts, SA)', () =>
+      fetchClevelandNowcasts(),
+    );
+    if (nowcasts !== undefined && nowcasts.length > 0) {
+      series['cpi-nowcast'] = nowcastSeriesOf(nowcasts);
+      nowcastMonths = new Set(nowcasts.map((r) => r.month));
+      report(
+        'cleveland',
+        true,
+        `nowcast rows: ${nowcasts.map((r) => `${r.month} ${r.cpiMom.toFixed(2)}% MoM`).join(' · ')}`,
+      );
+    }
+    const cpiSa = await fetchLogged('fred', 'CPIAUCSL (SA CPI index — the surprise join realised leg)', () =>
+      fetchFredSeries(FRED_SERIES.usCpiIndexSa),
+    );
+    if (cpiSa !== undefined && cpiSa.length > 0) cpiIndexSa = cpiSa;
+  }
+
+  // GF-S11 (P4 / I11): the global-liquidity legs — the ECB Eurosystem's
+  // total assets (the BSI T00 series, one SDMX CSV) + the BoJ's total
+  // assets (JPNASSETS, one fredgraph CSV). Both monthly, full history per
+  // fetch; raw derivation inputs (the aggregate derives from the staged
+  // walcl/FX legs + these).
+  if (plan.liquidityMonthly) {
+    const ecbAssets = await fetchLogged('ecb', 'Eurosystem total assets (BSI T00, EUR millions, monthly)', () =>
+      fetchEcbEurosystemAssets(),
+    );
+    if (ecbAssets !== undefined && ecbAssets.length > 0) ecbEurosystemAssets = ecbAssets;
+    const bojAssets = await fetchLogged('fred', 'Bank of Japan total assets (JPNASSETS, ¥100 million, monthly)', () =>
+      fetchFredSeries(FRED_SERIES.bojAssets),
+    );
+    if (bojAssets !== undefined && bojAssets.length > 0) bojTotalAssets = bojAssets;
+  }
+
+  // GF-S11 (P4 / F15): the SGE monthly Data Highlights PDF — the gold
+  // withdrawal volume (one index-page request + one PDF request; the
+  // point is month-start dated, the stored accumulation grows month by
+  // month — the china-cpi union discipline).
+  if (plan.sgeMonthly) {
+    const withdrawal = await fetchLogged('sge', 'SGE monthly Data Highlights (gold withdrawal volume, tonnes)', () =>
+      fetchSgeMonthlyWithdrawal(),
+    );
+    if (withdrawal !== undefined) series['sge-gold-withdrawals'] = [withdrawal];
+  }
+
+  // GF-S11 (P4 / F16): the BAZG gold-imports CSV — the monthly tonnage
+  // (the 7108 rows summed; full history per fetch, fetched wins on
+  // collision — the michigan discipline).
+  if (plan.bazgMonthly) {
+    const flow = await fetchLogged('bazg', 'Gold imports by country (7108, monthly tonnes — the Swiss flow)', () =>
+      fetchBazgGoldImports(),
+    );
+    if (flow !== undefined) series['swiss-gold-flow'] = flow;
+  }
+
+  // GF-S11 (P4 / X5): the GLD/SPY ratio — two sequential Yahoo chart
+  // requests, inner-joined and divided (the breadth discipline). Daily;
+  // a missing stage entry IS the bootstrap.
+  if (plan.equitiesDaily) {
+    const equities = await fetchLogged('yahoo', 'Gold vs equities ratio (GLD ÷ SPY, daily closes)', () =>
+      fetchGoldEquitiesRatio(),
+    );
+    if (equities !== undefined) series['gold-equities-ratio'] = equities.ratio;
+  }
+
+  // GF-S11 (P4 / R11): the HLW r-star workbook — quarterly, re-checked
+  // every Saturday (idempotent; the coferQuarterly discipline).
+  if (plan.rstarQuarterly) {
+    const rstar = await fetchLogged('nyfed', 'Holston–Laubach–Williams current estimates (US r*, quarterly)', () =>
+      fetchHlwRstar(),
+    );
+    if (rstar !== undefined) series['rstar-us'] = rstar;
+  }
+
+  return { series, reports, sgeAu9999, nowcastMonths, cpiIndexSa, ecbEurosystemAssets, bojTotalAssets };
 }

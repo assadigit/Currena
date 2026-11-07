@@ -121,6 +121,12 @@ const SERIES = [
   'IRLTLT01NZM156N',
   'BAMLC0A0CM',
   'BAMLH0A0HYM2',
+  // GF-S11 (2026-11-07, P4 — the round-2 answers' execution): the three
+  // new FRED legs — the debt/GDP structural anchor (G3), the BoJ total
+  // assets (I11's global-liquidity leg) and the SA CPI index (I9's
+  // realised-print basis, re-scanned beside the pair).
+  'GFDEGDQ188S',
+  'JPNASSETS',
 ] as const;
 
 interface Record {

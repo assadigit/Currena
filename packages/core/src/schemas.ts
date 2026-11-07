@@ -659,6 +659,24 @@ export const IndicatorIdSchema = z.enum([
   'real-curve-10y5y', // D-11/D-12 (the derived real curve — CONTEXT card, the sign is the owner's to call)
   'michigan-5y-expectations', // I4 (rank 32): the UoM 5–10y median expected price change (the household anchor)
   'shanghai-gold-premium', // F6 (rank 22): the Shanghai premium (the classic scarcity tell — CONTEXT card)
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+  // nowcast accumulator (the owner's recorded BUILD answer — the
+  // Cleveland Fed's current CPI nowcast, accumulated from the standing
+  // start, + the surprise the CPI-print join derives when the realised
+  // print lands) and the nine P4 context cards (rule: info — never
+  // votes; the promotion criteria recorded in each definition's
+  // comments, the OI-GA-4 context-first register).
+  'cpi-nowcast', // I9 (rank 33): the Cleveland Fed's current-month CPI MoM nowcast (the accumulation card)
+  'cpi-surprise', // I9 (rank 33): the realised CPI print minus the final nowcast (the surprise object)
+  'real-gold-price', // I10 (rank 30): the Jastram real gold price (gold ÷ the CPI index — the valuation anchor)
+  'gold-platinum', // X7 (rank 31): the gold/platinum ratio (the second precious-bloc ratio)
+  'global-liquidity', // I11 (rank 34): the Fed+ECB+BoJ balance-sheet aggregate in USD (the liquidity side of money)
+  'swiss-gold-flow', // F16 (rank 39): the Swiss gold imports (the refinery hub's raw inflow — BAZG open data)
+  'sge-gold-withdrawals', // F15 (rank 38): the SGE monthly gold withdrawals (the China physical proxy)
+  'gold-equities-ratio', // X5 (rank 41): the GLD/SPY ratio (the gold-vs-equities rotation gauge)
+  'rstar-us', // R11 (rank 42): the HLW r-star (the natural-rate regime label)
+  'etf-short-interest', // F12 (rank 43): the gold-ETF short interest (the squeeze-tell complement)
+  'debt-to-gdp', // G3 (rank 40): the federal debt as a share of GDP (the structural anchor)
 ]);
 export type IndicatorId = z.infer<typeof IndicatorIdSchema>;
 
@@ -718,7 +736,7 @@ export const IndicatorCadenceSchema = z.enum([
 export type IndicatorCadence = z.infer<typeof IndicatorCadenceSchema>;
 
 /** Release wave (roadmap: P1 = first release, P2 = second wave). */
-export const IndicatorPhaseSchema = z.enum(['P1', 'P2', 'P3']);
+export const IndicatorPhaseSchema = z.enum(['P1', 'P2', 'P3', 'P4']);
 export type IndicatorPhase = z.infer<typeof IndicatorPhaseSchema>;
 
 /** Upstream provider of the indicator's series. */
@@ -818,6 +836,17 @@ export const IndicatorSourceSchema = z.enum([
   // the owner-acceptance class).
   'uom',
   'sge',
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the new
+  // providers — Cleveland (the Fed's inflation-nowcasting page, the I9
+  // accumulator; ©-reserved, no reuse grant quoted — L2, the
+  // owner-acceptance class), BAZG (the Swiss customs office's
+  // foreign-trade open data — the F16 Swiss flow; the opendata.swiss
+  // terms_by_ask class, non-commercial with attribution — L1) and the
+  // fail-closed fund-pages token (the F12 short-interest verdict — no
+  // fetch wired until a licence-clean venue appears).
+  'cleveland',
+  'bazg',
+  'fund-pages',
 ]);
 export type IndicatorSource = z.infer<typeof IndicatorSourceSchema>;
 

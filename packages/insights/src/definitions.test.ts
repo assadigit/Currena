@@ -71,7 +71,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     }
   });
 
-  it('info-only cards never vote: the hundred-and-nine info rules (GF-S10 2026-11-06: +real-curve-10y5y the D-11/D-12 derived real curve + shanghai-gold-premium the F6 classic scarcity tell — both CONTEXT cards, the sign/seat questions recorded-open, never silently seated; 2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair; 2026-10-26 gap-audit: +gold-oil-ratio, +eia-crude-stocks (A-4/A-6), +oecd-cli-cn, +oecd-cli-de, +gpr-index, +epu-us (the A-8 companions and the A-9/A-10 context pair — the CLI US leg is the trio’s voter); 2026-10-29 owner round: +usdaed — the UAE dirham context card; 2026-10-31 Session-3 round: +breakeven-tilt — the G2 interplay context card, D-5 keeps it out of the voter table; 2026-10-31 gap-closure S2-M2.4 round: +nyfed-custody — the weekly custody card, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.2 round: the liquidity/funding six; 2026-11-01 gap-closure S3-M3.3 round: +ebp and +ofr-fsi — the credit pair, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.4 round: the growth-nowcast/survey six, context-only by spec (G-5); the S4-M4.2/M4.3/M4.4 rounds: the geopolitics eleven + the chokepoint five + the supply-chain/energy six, context-only by spec (G-5))', () => {
+  it('info-only cards never vote: the hundred-and-thirty info rules (GF-S11 2026-11-07: +eleven — the I9 accumulator pair + the nine P4 context cards, all rule: info per the context-first register; GF-S10 2026-11-06: +real-curve-10y5y the D-11/D-12 derived real curve + shanghai-gold-premium the F6 classic scarcity tell — both CONTEXT cards, the sign/seat questions recorded-open, never silently seated; 2026-10-24 M4 Wave 1: +sofr, +us-2y, +breakeven-10y, +michigan-1y-expectations; M5 Wave 2: +euro-aaa-10y, +food-index, +wheat, +maize, +usdtry as context; 2026-10-25 M6 Wave 3: +mortgage-30y, +walcl, +retail-sales, +housing-permits, +cfnai, +job-openings, +t5yie, +us-wages, +au-saving-ratio, +au-job-vacancies as context — euro-hicp and au-housing-finance are the scored pair; 2026-10-26 gap-audit: +gold-oil-ratio, +eia-crude-stocks (A-4/A-6), +oecd-cli-cn, +oecd-cli-de, +gpr-index, +epu-us (the A-8 companions and the A-9/A-10 context pair — the CLI US leg is the trio’s voter); 2026-10-29 owner round: +usdaed — the UAE dirham context card; 2026-10-31 Session-3 round: +breakeven-tilt — the G2 interplay context card, D-5 keeps it out of the voter table; 2026-10-31 gap-closure S2-M2.4 round: +nyfed-custody — the weekly custody card, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.2 round: the liquidity/funding six; 2026-11-01 gap-closure S3-M3.3 round: +ebp and +ofr-fsi — the credit pair, context-only by spec (G-5); 2026-11-01 gap-closure S3-M3.4 round: the growth-nowcast/survey six, context-only by spec (G-5); the S4-M4.2/M4.3/M4.4 rounds: the geopolitics eleven + the chokepoint five + the supply-chain/energy six, context-only by spec (G-5))', () => {
     const info = DEFINITIONS.filter((d) => d.rule.kind === 'info').map((d) => d.id).sort();
     expect(info).toEqual([
       'au-building-approvals',
@@ -106,20 +106,27 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'coal-aus',
       'continuing-claims',
       'copper-usd',
+      'cpi-nowcast',
+      'cpi-surprise',
       'crypto-fng',
+      'debt-to-gdp',
       'ebp',
       'eia-crude-stocks',
       'empire-state',
       'epu-us',
+      'etf-short-interest',
       'eur-usd',
       'euro-aaa-10y',
       'food-index',
       'gas-europe',
       'gdpnow',
       'gilt-10y',
+      'global-liquidity',
       'gold-aud',
       'gold-btc',
+      'gold-equities-ratio',
       'gold-oil-ratio',
+      'gold-platinum',
       'gold-usd',
       'gpr-acts',
       'gpr-australia',
@@ -150,19 +157,17 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'nz-short-rate',
       'oecd-cli-cn',
       'oecd-cli-de',
-      // GF-P3 (2026-11-06, OI-GA-4's recorded context-first answer): the
-      // WGC/official-flows family — three context cards, never vote. The
-      // ids sort lexicographically: 'official-gold-demand' falls between
-      // 'oecd-cli-de' and 'ofr-fsi'; 'wgc-cb-demand' and 'wgc-etf-holdings'
-      // fall between 'walcl' and 'wheat'.
       'official-gold-demand',
       'ofr-fsi',
       'platinum',
       'rba-cash-rate',
       'real-curve-10y5y',
+      'real-gold-price',
       'repo-stress',
       'retail-sales',
       'reverse-repo',
+      'rstar-us',
+      'sge-gold-withdrawals',
       'shanghai-gold-premium',
       'shiller-cape',
       'shiller-ecy',
@@ -171,6 +176,7 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'sofr',
       'sp500-breadth-ratio',
       'sticky-cpi',
+      'swiss-gold-flow',
       't5yie',
       'term-premium-10y',
       'tga',
@@ -190,7 +196,6 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'us-wages',
       'usd-reserve-share',
       'usdaed',
-      // GF-P2 (D7, §4 row 23 — 2026-11-05): the haven cross, a context card.
       'usdchf',
       'usdcny',
       'usdtry',

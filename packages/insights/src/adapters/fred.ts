@@ -159,6 +159,20 @@ export const FRED_SERIES = {
   // CPILFENS) — the SA siblings (CPIAUCSL / CPILFESL) can differ by a few
   // hundredths and are retired from this pipeline.
   usCpiIndex: 'CPIAUCNS', // us-cpi-yoy: 12-month % change, computed (NSA — the BLS headline basis)
+  // GF-S11 (2026-11-07, the owner's recorded I9 answer): the SEASONALLY
+  // ADJUSTED index — the realised leg of the CPI surprise join (the MoM
+  // print basis; the Cleveland Fed's own methodology: "The model reports
+  // seasonally adjusted, month-over-month inflation rates"). Fetched on
+  // the rung-2 phase beside the nowcast page (never a main-rung id).
+  usCpiIndexSa: 'CPIAUCSL', // cpi-surprise: the realised MoM print basis (SA)
+  // GF-S11 (P4 / G3, audit §4 rank 40): the federal debt as a share of GDP,
+  // quarterly — the structural-anchor card (the quarterly group's member).
+  debtToGdp: 'GFDEGDQ188S',
+  // GF-S11 (P4 / I11, audit §4 rank 34): the Bank of Japan's total assets,
+  // monthly — the global-liquidity aggregate's BoJ leg ("100 Million Yen"
+  // units — the BoJ's own oku convention; fetched on the rung-2 phase with
+  // the ECB leg, never a main-rung id).
+  bojAssets: 'JPNASSETS',
   // Step-1 audit item A3: core CPI (ex food & energy) — the context
   // companion shown on the US inflation card (NSA, same defect E-14 basis).
   usCpiCoreIndex: 'CPILFENS', // us-cpi-core-yoy: 12-month % change, computed (NSA)
@@ -366,7 +380,8 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
     ],
     window: 'decade',
   },
-  // Quarterly + EIA commodities, decade window (5 series).
+  // Quarterly + EIA commodities, decade window (6 series — GF-S11 (P4 / G3)
+  // adds GFDEGDQ188S, the debt/GDP structural anchor).
   {
     seriesIds: [
       FRED_SERIES.govtInterest,
@@ -374,6 +389,7 @@ export const FRED_BULK_GROUPS: readonly FredBulkGroup[] = [
       FRED_SERIES.brent,
       FRED_SERIES.wti,
       FRED_SERIES.natgas,
+      FRED_SERIES.debtToGdp,
     ],
     window: 'decade',
   },

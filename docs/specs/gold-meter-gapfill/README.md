@@ -7,24 +7,32 @@ CLOSED gold meter audit program (GA-S1..GA-S4, CLOSED 2026-11-05; its record:
 (D-GA-3); **every change to the meter is THIS program's, owner-gated.** The
 predecessor gold balance consolidation is COMPLETE and LIVE (GB-S7,
 2026-11-04): the consolidated lane balance is THE gold card for every visitor
-on currena.ir. **Program state at GF-S10: P0 ANSWERED + P1 + P2 + P3
-DELIVERED (whole — GF-S10 landed the remainder)** —
-the owner's answers A–K recorded (GF-S7), the repairs landed (GF-P1), the
-promotions landed (GF-P2: the 32-seat five-lane table, the flows lane,
-STRONG 4-of-5, the N-1 v1.2 amendment); the new free sources landed whole
+on currena.ir. **Program state at GF-S11: P0–P4 DELIVERED WHOLE — the
+round-2 decisions EXECUTED + the nine P4 context cards LIVE
+(GF-S11, 2026-11-07, the recovery landing of an interrupted session —
+every claim re-verified from the recovery's own runs)** — the owner's
+answers A–K recorded (GF-S7), the repairs landed (GF-P1), the promotions
+landed (GF-P2: the 32-seat five-lane table, the flows lane, STRONG
+4-of-5, the N-1 v1.2 amendment); the new free sources landed whole
 (GF-P3 + GF-S10: the four FRED voter-candidates + I4 the UoM 5–10y anchor
 seated → **37 seats (7/7/11/10/2)**, the real-curve + Shanghai-premium
-context cards, the P3 deploy live-verified); **GF-S10's decision list is
-ANSWERED — the owner's round-2 answers RECORDED (2026-11-07, the chat
-round; the round-2 table below is the record)**: (a) the real curve
-STAYS a context card (no sign seats — the D-11/D-12 question closes
-context-by-choice) · (e) the SGE L2 class ACCEPTED for public display
-(the Shanghai premium flips public; F15 unblocks) · (f) the WGC
-authorisation email to be DRAFTED for the owner's review · I9 the
-nowcast accumulator APPROVED (build) · F7 stays recorded-open · D7's
-seat question CLOSED no-seat · the P4 scope = the 7-card free-first
-family + F16 BAZG + F15 · P5 = the dedicated GF-S12. **GF-S11 executes
-the answers + P4.**
+context cards, the P3 deploy live-verified); **the round-2 answers
+EXECUTED (2026-11-07)**: (a) the real curve STAYS a context card (the
+closure stands) · **(e) the SGE display flip LIVE — the Shanghai premium
+card READABLE PUBLICLY FOR THE FIRST TIME** (−0.73% @ 2026-11-06, the
+stored 488-point history under it) · **I9 the accumulator LIVE** (the
+Cleveland nowcasts accumulating; the cards PRIVATE per the Bank's
+unquoted-reuse terms — the GF-S12 question) · **(f) the WGC
+authorisation draft WRITTEN** (`evidence/wgc-authorisation-draft-2026-11-07.md`,
+printed in the GF-S11 final message for the owner's review + send; the
+family stays blocked, no fetch wired) · **P4's nine cards LIVE** (I10 ·
+X7 · I11 · G3 · F16 · F15 · X5 · R11 · F12 — F12 honestly fail-closed
+'awaiting data'); the recovery's four repairs recorded with their
+regression pins (the evidence §4+§6); tests 14,620 · gates ALL GREEN ·
+the worker **8f9e521e** deployed + live-verified. **GF-S12 = P5: the
+acceptance walk + the program's close** (its prompt at PROMPTS.md's
+foot — the open questions printed: the Cleveland L2 class · the X5
+Yahoo class · the WGC reply · the acceptance itself).
 
 **Owner intent (inherited from the audit's charter, 2026-11-04):** *"Make
 sure nothing is missed or half-implemented."* The audit answered: 8/85 rows

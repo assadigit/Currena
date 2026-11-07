@@ -1,12 +1,12 @@
 {
-  "_comment": "T-16 FRED copyright scan. Three classes (FRED legal, read 2026-10-21): public-domain -> public; citation-required (copyrightNotice=true) -> display-permitted WITH \"Source: publisher via FRED\" attribution; pre-approval (license contains 'pre-approval') -> private-only, no fetch, no display until the publisher's permission is recorded (D-44, 2026-10-24). Re-run the scan when a series is added.",
-  "scannedOn": "2026-11-06",
+  "_comment": "T-16 FRED copyright scan (scripts/fred-copyright-scan.ts). copyrightNotice=true → public_display_ok must be no. Re-run when a series is added.",
+  "scannedOn": "2026-11-07",
   "records": [
     {
       "seriesId": "T10Y2Y",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T10Y2Y"
     },
@@ -14,7 +14,7 @@
       "seriesId": "DFII10",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DFII10"
     },
@@ -22,7 +22,7 @@
       "seriesId": "DGS10",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DGS10"
     },
@@ -30,7 +30,7 @@
       "seriesId": "DFEDTARL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DFEDTARL"
     },
@@ -38,7 +38,7 @@
       "seriesId": "DFEDTARU",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DFEDTARU"
     },
@@ -46,7 +46,7 @@
       "seriesId": "DGS30",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DGS30"
     },
@@ -54,7 +54,7 @@
       "seriesId": "DGS2",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DGS2"
     },
@@ -62,7 +62,7 @@
       "seriesId": "CPIAUCSL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPIAUCSL"
     },
@@ -70,7 +70,7 @@
       "seriesId": "CPIAUCNS",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPIAUCNS"
     },
@@ -78,7 +78,7 @@
       "seriesId": "CPILFESL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPILFESL"
     },
@@ -86,7 +86,7 @@
       "seriesId": "CPILFENS",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/CPILFENS"
     },
@@ -94,7 +94,7 @@
       "seriesId": "T5YIFR",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T5YIFR"
     },
@@ -102,7 +102,7 @@
       "seriesId": "T10YIE",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T10YIE"
     },
@@ -110,7 +110,7 @@
       "seriesId": "STLFSI4",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/STLFSI4"
     },
@@ -118,7 +118,7 @@
       "seriesId": "NFCI",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/NFCI"
     },
@@ -126,7 +126,7 @@
       "seriesId": "VIXCLS",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Chicago Board Options Exchange, Inc\"",
       "url": "https://fred.stlouisfed.org/series/VIXCLS"
     },
@@ -134,7 +134,7 @@
       "seriesId": "M2SL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/M2SL"
     },
@@ -142,7 +142,7 @@
       "seriesId": "GACDFSA066MSFRBPHI",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/GACDFSA066MSFRBPHI"
     },
@@ -150,7 +150,7 @@
       "seriesId": "UNRATE",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/UNRATE"
     },
@@ -158,7 +158,7 @@
       "seriesId": "SAHMREALTIME",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/SAHMREALTIME"
     },
@@ -166,7 +166,7 @@
       "seriesId": "DCOILBRENTEU",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU"
     },
@@ -174,7 +174,7 @@
       "seriesId": "T10Y3M",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/T10Y3M"
     },
@@ -182,7 +182,7 @@
       "seriesId": "DCOILWTICO",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DCOILWTICO"
     },
@@ -190,7 +190,7 @@
       "seriesId": "DHHNGSP",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DHHNGSP"
     },
@@ -198,7 +198,7 @@
       "seriesId": "IRLTLT01DEM156N",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/IRLTLT01DEM156N"
     },
@@ -206,7 +206,7 @@
       "seriesId": "IRLTLT01JPM156N",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/IRLTLT01JPM156N"
     },
@@ -214,7 +214,7 @@
       "seriesId": "IRLTLT01GBM156N",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/IRLTLT01GBM156N"
     },
@@ -222,7 +222,7 @@
       "seriesId": "IRSTCI01JPM156N",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/IRSTCI01JPM156N"
     },
@@ -230,7 +230,7 @@
       "seriesId": "IRSTCI01GBM156N",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/IRSTCI01GBM156N"
     },
@@ -238,7 +238,7 @@
       "seriesId": "PAYEMS",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/PAYEMS"
     },
@@ -246,7 +246,7 @@
       "seriesId": "A191RL1Q225SBEA",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/A191RL1Q225SBEA"
     },
@@ -254,7 +254,7 @@
       "seriesId": "A091RC1Q027SBEA",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA"
     },
@@ -262,151 +262,15 @@
       "seriesId": "W006RC1Q027SBEA",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/W006RC1Q027SBEA"
-    },
-    {
-      "seriesId": "ICSA",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; US Department of Labor source, no copyright notice)",
-      "url": "https://fred.stlouisfed.org/series/ICSA"
-    },
-    {
-      "seriesId": "SOFR",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (New York Fed source)",
-      "url": "https://fred.stlouisfed.org/series/SOFR"
-    },
-    {
-      "seriesId": "RECPROUSM156N",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; Marcelle-Chauvet smoothed recession probabilities)",
-      "url": "https://fred.stlouisfed.org/series/RECPROUSM156N"
-    },
-    {
-      "seriesId": "UMCSENT",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Univ. of Michigan source)",
-      "url": "https://fred.stlouisfed.org/series/UMCSENT"
-    },
-    {
-      "seriesId": "MICH",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Univ. of Michigan source)",
-      "url": "https://fred.stlouisfed.org/series/MICH"
-    },
-    {
-      "seriesId": "PCEPILFE",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-public-domain (series page read 2026-10-24; BEA core PCE price index)",
-      "url": "https://fred.stlouisfed.org/series/PCEPILFE"
-    },
-    {
-      "seriesId": "BAMLH0A0HYM2",
-      "license": "pre-approval",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-pre-approval · page text: \"Copyrighted: pre-approval required\" (ICE BofA Merrill Lynch source) — publisher permission required before any fetch or display (D-44, 2026-10-24)",
-      "url": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2"
-    },
-    {
-      "seriesId": "BAMLC0A0CM",
-      "license": "pre-approval",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-24",
-      "evidence": "FRED license tag: #copyright-pre-approval · page text: \"Copyrighted: pre-approval required\" (ICE BofA Merrill Lynch source) — publisher permission required before any fetch or display (D-44, 2026-10-24)",
-      "url": "https://fred.stlouisfed.org/series/BAMLC0A0CM"
-    },
-    {
-      "seriesId": "MORTGAGE30US",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Freddie Mac weekly PMMS survey; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/MORTGAGE30US"
-    },
-    {
-      "seriesId": "WALCL",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (Federal Reserve H.41 release; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/WALCL"
-    },
-    {
-      "seriesId": "RSAFS",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (US Census advance retail sales; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/RSAFS"
-    },
-    {
-      "seriesId": "PERMIT",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (US Census building permits; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/PERMIT"
-    },
-    {
-      "seriesId": "CFNAI",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (Chicago Fed national activity index; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/CFNAI"
-    },
-    {
-      "seriesId": "JTSJOL",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (BLS JOLTS job openings; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/JTSJOL"
-    },
-    {
-      "seriesId": "T5YIE",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (5-year breakeven inflation; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/T5YIE"
-    },
-    {
-      "seriesId": "AHETPI",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-10-25",
-      "evidence": "FRED license tag: #copyright-public-domain · page text: \"Public Domain: Citation Requested\" (BLS average hourly earnings; series page read live 2026-10-25, matching the deploying session's scan)",
-      "url": "https://fred.stlouisfed.org/series/AHETPI"
-    },
-    {
-      "seriesId": "WSEFINTL1",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
-      "evidence": "FRED license tag: #copyright-public-domain",
-      "url": "https://fred.stlouisfed.org/series/WSEFINTL1"
     },
     {
       "seriesId": "THREEFYTP10",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/THREEFYTP10"
     },
@@ -414,7 +278,7 @@
       "seriesId": "WTREGEN",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/WTREGEN"
     },
@@ -422,7 +286,7 @@
       "seriesId": "RRPONTSYD",
       "license": "citation-required",
       "copyrightNotice": true,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
       "url": "https://fred.stlouisfed.org/series/RRPONTSYD"
     },
@@ -430,7 +294,7 @@
       "seriesId": "WRESBAL",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/WRESBAL"
     },
@@ -438,113 +302,265 @@
       "seriesId": "IORB",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
+      "checkedOn": "2026-11-07",
       "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/IORB"
     },
     {
-      "seriesId": "GDPNOW",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-11-01",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
-      "url": "https://fred.stlouisfed.org/series/GDPNOW"
-    },
-    {
-      "seriesId": "GACDISA066MSFRBNY",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-11-01",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
-      "url": "https://fred.stlouisfed.org/series/GACDISA066MSFRBNY"
-    },
-    {
-      "seriesId": "CCSA",
+      "seriesId": "WSEFINTL1",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-01",
-      "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.4 session; DOL source)",
-      "url": "https://fred.stlouisfed.org/series/CCSA"
-    },
-    {
-      "seriesId": "MEDCPIM158SFRBCLE",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-11-01",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
-      "url": "https://fred.stlouisfed.org/series/MEDCPIM158SFRBCLE"
-    },
-    {
-      "seriesId": "STICKCPIM158SFRBATL",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-11-01",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-citation-required (read live 2026-11-01, the M3.4 session)",
-      "url": "https://fred.stlouisfed.org/series/STICKCPIM158SFRBATL"
-    },
-    {
-      "seriesId": "DRTSCILM",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-11-01",
-      "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.4 session; Federal Reserve source)",
-      "url": "https://fred.stlouisfed.org/series/DRTSCILM"
-    },
-    {
-      "seriesId": "MTSDS133FMS",
-      "license": "public-domain",
-      "copyrightNotice": false,
-      "checkedOn": "2026-11-01",
-      "evidence": "FRED license tag: #copyright-public-domain · the series page's own schema.org Dataset license field https://fred.stlouisfed.org/legal/#copyright-public-domain (read live 2026-11-01, the M3.5 session; U.S. Treasury MTS source)",
-      "url": "https://fred.stlouisfed.org/series/MTSDS133FMS"
-    },
-    {
-      "seriesId": "IRLTLT01NZM156N",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-11-02",
-      "evidence": "FRED series page (read live 2026-11-02, gap-closure S6-M6.1): title 'Interest Rates: Long-Term Government Bond Yields: 10-Year: Main (Including Benchmark) for New Zealand', source Organization for Economic Co-operation and Development, monthly Percent NSA, latest Sep 2026 (updated Oct 15, 2026), copyright class 'Copyrighted: Citation Required' — the IRLTLT01DEM156N bund-10y sibling",
-      "url": "https://fred.stlouisfed.org/series/IRLTLT01NZM156N"
-    },
-    {
-      "seriesId": "IRLTLT01ITM156N",
-      "license": "citation-required",
-      "copyrightNotice": true,
-      "checkedOn": "2026-11-02",
-      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\" (the provider page read live 2026-11-02, the same class as its bund/gilt/NZ siblings)",
-      "url": "https://fred.stlouisfed.org/series/IRLTLT01ITM156N"
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/WSEFINTL1"
     },
     {
       "seriesId": "DFII5",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
-      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title '5-Year Treasury Inflation-Indexed Security Yield', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class, its 10y twin DFII10's own row",
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DFII5"
     },
     {
       "seriesId": "DTWEXBGS",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
-      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Nominal Broad U.S. Dollar Index', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work)",
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DTWEXBGS"
     },
     {
       "seriesId": "DTWEXEMEGS",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
-      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Emerging Markets Economies Trade-Weighted Dollar Index', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work)",
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DTWEXEMEGS"
     },
     {
       "seriesId": "DPCREDIT",
       "license": "public-domain",
       "copyrightNotice": false,
-      "checkedOn": "2026-11-06",
-      "evidence": "FRED series page (read live 2026-11-06, GF-S10): title 'Discount Window Primary Credit Rate', source Board of Governors of the Federal Reserve System (US), the licence tag class [Public Domain: Citation Requested] — the #copyright-public-domain class (US-government work)",
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
       "url": "https://fred.stlouisfed.org/series/DPCREDIT"
+    },
+    {
+      "seriesId": "UMCSENT",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Surveys of Consumers, University of Michigan\"",
+      "url": "https://fred.stlouisfed.org/series/UMCSENT"
+    },
+    {
+      "seriesId": "MICH",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Surveys of Consumers, University of Michigan\"",
+      "url": "https://fred.stlouisfed.org/series/MICH"
+    },
+    {
+      "seriesId": "ICSA",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/ICSA"
+    },
+    {
+      "seriesId": "RECPROUSM156N",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/RECPROUSM156N"
+    },
+    {
+      "seriesId": "PCEPILFE",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/PCEPILFE"
+    },
+    {
+      "seriesId": "MORTGAGE30US",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Freddie Mac\"",
+      "url": "https://fred.stlouisfed.org/series/MORTGAGE30US"
+    },
+    {
+      "seriesId": "WALCL",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/WALCL"
+    },
+    {
+      "seriesId": "CFNAI",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/CFNAI"
+    },
+    {
+      "seriesId": "JTSJOL",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/JTSJOL"
+    },
+    {
+      "seriesId": "AHETPI",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/AHETPI"
+    },
+    {
+      "seriesId": "T5YIE",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/T5YIE"
+    },
+    {
+      "seriesId": "SOFR",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/SOFR"
+    },
+    {
+      "seriesId": "PERMIT",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/PERMIT"
+    },
+    {
+      "seriesId": "RSAFS",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/RSAFS"
+    },
+    {
+      "seriesId": "MTSDS133FMS",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/MTSDS133FMS"
+    },
+    {
+      "seriesId": "DRTSCILM",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/DRTSCILM"
+    },
+    {
+      "seriesId": "GDPNOW",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/GDPNOW"
+    },
+    {
+      "seriesId": "GACDISA066MSFRBNY",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/GACDISA066MSFRBNY"
+    },
+    {
+      "seriesId": "MEDCPIM158SFRBCLE",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/MEDCPIM158SFRBCLE"
+    },
+    {
+      "seriesId": "STICKCPIM158SFRBATL",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/STICKCPIM158SFRBATL"
+    },
+    {
+      "seriesId": "CCSA",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/CCSA"
+    },
+    {
+      "seriesId": "IRLTLT01ITM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01ITM156N"
+    },
+    {
+      "seriesId": "IRLTLT01NZM156N",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyrighted: Citation Required\"",
+      "url": "https://fred.stlouisfed.org/series/IRLTLT01NZM156N"
+    },
+    {
+      "seriesId": "BAMLC0A0CM",
+      "license": "pre-approval",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-pre-approval · page text: \"Copyright, 2023, ICE Data Indices\"",
+      "url": "https://fred.stlouisfed.org/series/BAMLC0A0CM"
+    },
+    {
+      "seriesId": "BAMLH0A0HYM2",
+      "license": "pre-approval",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-pre-approval · page text: \"Copyright, 2023, ICE Data Indices\"",
+      "url": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2"
+    },
+    {
+      "seriesId": "GFDEGDQ188S",
+      "license": "public-domain",
+      "copyrightNotice": false,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-public-domain",
+      "url": "https://fred.stlouisfed.org/series/GFDEGDQ188S"
+    },
+    {
+      "seriesId": "JPNASSETS",
+      "license": "citation-required",
+      "copyrightNotice": true,
+      "checkedOn": "2026-11-07",
+      "evidence": "FRED license tag: #copyright-citation-required · page text: \"Copyright, 2016, Bank of Japan\"",
+      "url": "https://fred.stlouisfed.org/series/JPNASSETS"
     }
   ]
 }
