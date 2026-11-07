@@ -130,7 +130,13 @@ function scanPdfObjects(pdf: Uint8Array<ArrayBuffer>): Map<number, PdfObject> {
     let stream: Uint8Array<ArrayBuffer> | undefined;
     const hasFlate = dict.includes('FlateDecode');
     if (streamAt > 0) {
-      const dataStart = at + text.indexOf('stream', at) + 'stream'.length;
+      // streamAt is RELATIVE to the chunk (which starts at `at`) — the
+      // GF-S11 recovery repair (2026-11-07): the first cut double-counted
+      // `at` (`at + text.indexOf('stream', at)` — an ABSOLUTE index plus
+      // `at`), slicing every stream from deep inside its own bytes; the
+      // CMap inflates then threw bare TypeErrors live (the live venue
+      // verification caught it — the extractor had no test).
+      const dataStart = at + streamAt + 'stream'.length;
       let s = dataStart;
       if (pdf[s] === 0x0d) s++;
       if (pdf[s] === 0x0a) s++;
@@ -309,9 +315,14 @@ export function parseSgeWithdrawal(text: string, month: string): SgeWithdrawalRe
   if (!Number.isFinite(goldKg) || goldKg <= 0 || !Number.isFinite(silverKg) || silverKg <= 0) {
     throw new FormatChangedError(`SGE monthly: the withdrawal values are not positive numbers — "${m[0]}"`);
   }
-  // The column-order pin: the section's own "Gold Silver" header must
+  // The column-order pin: the section's own "Gold … Silver" header must
   // precede the values in the extracted text (a column swap fails loudly).
-  const headerIdx = text.indexOf('Gold Silver');
+  // The header's inter-column spacing is the venue's own layout slop (the
+  // October 2026 PDF renders "Gold   Silver" — three spaces; the recovery
+  // repair, 2026-11-07: the first cut demanded exactly one), so the pin
+  // tolerates any run of whitespace between the two words.
+  const headerMatch = /Gold\s+Silver/.exec(text);
+  const headerIdx = headerMatch === null ? -1 : headerMatch.index;
   const valuesIdx = text.indexOf(m[0]);
   if (headerIdx < 0 || valuesIdx < 0 || headerIdx > valuesIdx) {
     throw new FormatChangedError('SGE monthly: the Gold/Silver column header does not precede the withdrawal values — the table order changed');
