@@ -12,8 +12,21 @@ neutral 2 · unread 0 — 5 of 5 lanes readable**; **the (e) flip's own line
 live: shanghai-gold-premium −0.73% @ 2026-11-06 PUBLIC**; the 7
 private/fail-closed ids absent, 0 leaked) · gates ALL GREEN · tests 14,620 ·
 the worker `8f9e521e` deployed, nothing re-deployed at P5 — docs+evidence
-only). The program's deliverable, accepted as the final shape: **the
-37-voter five-lane table (7/7/11/10/2, MIN2, STRONG 4-of-5) — UNCHANGED
+only). **THE ROUND-3 SUCCESSION, EXECUTED at GF-S13 (2026-11-07, later the
+same day):** the owner's answers arrived — the blanket "Make everything
+Public … dont keep anything private … If you can show them, show and
+calculate them" directive — and the successor session executed them on the
+round-3 table's authority: the Cleveland L2 class owner-accepted ((a) —
+`cpi-nowcast` + `cpi-surprise` PUBLIC), the Yahoo L2 class owner-accepted
+((b) — `gold-equities-ratio` PUBLIC), the WGC family staying blocked with
+nothing to show ((c) — no data, no fetch, the authorisation draft the
+owner's lever), the SHOULD-be-private reference landed in
+`docs/insights/LICENCES.md` (the owner's future hide-or-permission lever) —
+display classes ONLY: **the voter table is UNTOUCHED at 37, no
+GOLD_LANE_VOTERS edit, the meter's meaning unchanged** (the evidence:
+`evidence/gf-s13-flip-2026-11-07.md` + the run record beside it). The
+program's deliverable, accepted as the final shape: **the 37-voter
+five-lane table (7/7/11/10/2, MIN2, STRONG 4-of-5) — UNCHANGED
 since GF-S10 — beside the full context register (184 ids · 130 rule:info
 cards)**, live on currena.ir. The end state (the audit report §6.3) is
 delivered: every classic family covered on record · no half-implemented
@@ -123,23 +136,27 @@ precedent); GF-S11 executes.
 | **P4 scope** | Which cards GF-S11 lands (01-FILL-SPEC §1, ranks 30–31, 34–47) | The 7-card committed family + F16 BAZG (government open data, venue-verified live 2026-11-05; severity 8 ≥ F12's 4) | **7 + BAZG (+ F15 via (e))** — the nine cards: I10 · X7 · I11 · G3 · F16 · F15 · X5 · R11 · F12, severity-ordered; the spill rides GF-S12 honestly if the budget runs out |
 | **P5 timing** | When the acceptance walk + the user-visible flip runs (GF-P5 — the last phase) | GF-S12 dedicated — GF-S10 needed three landings when overloaded; the evidence for focused sessions | **GF-S12** — GF-S11 = the decision executions + P4; the GF-S12 prompt = P5 the acceptance walk + the flip preparation |
 
-## The owner's decision list — round 3 (GF-S12's PRINTED open questions — the answers PENDING, the program closed with them standing)
+## The owner's decision list — round 3 (GF-S12's PRINTED open questions — **ANSWERED 2026-11-07, later the same day; GF-S13 executes**)
 
 The GF-S12 close (P5) printed these for the owner's final round (the
 evidence `evidence/gf-p5-acceptance-2026-11-07.md` §3 — every one on its
-printed recommendation, the round-2 precedent). **The table gains its
-answer column when the owner's answers arrive**; until then each row
-stands on its recorded state. None of them gates the program's close
-(the acceptance is question (d) itself — the meter's shape stands
-verified either way); the answers either record an acceptance (a/b/d)
-or unlock future work (c) under the successor discipline.
+printed recommendation, the round-2 precedent). The owner answered them in
+the chat round of 2026-11-07 — the blanket directive: **"Make everything
+Public, just add in some documentation, that some SHOULD be private. dont
+keep anything private … If you can show them. show and calculate them. but
+add some documentation later, so in future, where this legalities are
+important for me, I can hide some or ask for permission."** This table is
+the recorded answer sheet (the D-GF-1 mechanism — the round-1/round-2
+precedent); **GF-S13 — the successor session the close's own successor
+note announced — executes.** The meter's voter table is UNTOUCHED
+(display classes only; no GOLD_LANE_VOTERS edit, no seat change).
 
-| # | The question | The standing state (verified at the GF-S12 close) | The recommendation (printed) |
-|---|---|---|---|
-| **(a)** | **THE CLEVELAND L2 CLASS** — the I9 cards (`cpi-nowcast` + `cpi-surprise`) serve PRIVATE | The Bank's own terms quote no affirmative reuse grant (the register row `publicDisplayOk no`, checked 2026-11-07) — the SGE-pre-(e) standing; the cards accumulate privately (0 surprises, the accepted standing start) | **ACCEPT FOR PUBLIC DISPLAY** — the same L2 owner-acceptance the SGE class received (round-2 (e)): a derived conditions display from a central bank's own public page, attributed, non-commercial; or keep private until asked |
-| **(b)** | **THE X5 YAHOO CLASS** — the `gold-equities-ratio` card serves PRIVATE | The Yahoo L2 class carries no public-display directive for these tiles (the standing class since the audit) | **KEEP PRIVATE** — the Yahoo endpoints carry no licence; printed for completeness |
-| **(c)** | **THE WGC REPLY** | The authorisation draft (`evidence/wgc-authorisation-draft-2026-11-07.md`) sits printed for the owner's review + send (info@gold.org); no reply recorded, no fetch wired, the family 'awaiting data' | **IF SENT + ANSWERED: record the reply and unlock the family per its terms** (a successor owner-gated session); **else the family stays blocked** — the standing state, nothing owed |
-| **(d)** | **THE PROGRAM'S CLOSE** — the acceptance itself | The meter's final shape verified whole at P5 (the acceptance table + the production matrix): 37 voters (7/7/11/10/2, MIN2, STRONG 4-of-5) · the 184-id register · the flip live · gates green · the worker `8f9e521e`; the recorded-open items honestly listed (F7 · F12 · the WGC family · the promotion criteria in each card's comments) | **ACCEPT THE FINAL SHAPE AS THE PROGRAM'S DELIVERABLE** — the end state (a)/(b)/(c) delivered; the program closes with the open items standing on their records |
+| # | The question | The standing state (verified at the GF-S12 close) | The recommendation (printed) | **The owner's recorded answer (2026-11-07)** |
+|---|---|---|---|---|
+| **(a)** | **THE CLEVELAND L2 CLASS** — the I9 cards (`cpi-nowcast` + `cpi-surprise`) serve PRIVATE | The Bank's own terms quote no affirmative reuse grant (the register row `publicDisplayOk no`, checked 2026-11-07) — the SGE-pre-(e) standing; the cards accumulate privately (0 surprises, the accepted standing start) | **ACCEPT FOR PUBLIC DISPLAY** — the same L2 owner-acceptance the SGE class received (round-2 (e)): a derived conditions display from a central bank's own public page, attributed, non-commercial; or keep private until asked | **ACCEPT — GO PUBLIC** (on the recommendation; the blanket directive) — the recorded acceptance is the L2 unlock: the CLEVELAND licence row flips `publicDisplayOk yes` with the round-3 trail (the Bank's attribution + suggested citation), `cpi-nowcast` + `cpi-surprise` leave the hidden set (7 → 4). **EXECUTED at GF-S13** |
+| **(b)** | **THE X5 YAHOO CLASS** — the `gold-equities-ratio` card serves PRIVATE | The Yahoo L2 class carries no public-display directive for these tiles (the standing class since the audit) | **KEEP PRIVATE** — the Yahoo endpoints carry no licence; printed for completeness | **GO PUBLIC — THE OWNER OVERRODE THE RECOMMENDATION** (the blanket directive: "dont keep anything private") — the YAHOO licence row flips `publicDisplayOk yes` with the round-3 trail (the licence FACTS stay verbatim: no reuse licence offered; the acceptance is the display verdict on the owner's non-commercial site — the SGE (e) mechanism, class-wide); `gold-equities-ratio` leaves the hidden set; the per-card directives (the four price tiles, usdaed, sp500-breadth-ratio) stand unchanged. **EXECUTED at GF-S13** |
+| **(c)** | **THE WGC REPLY** | The authorisation draft (`evidence/wgc-authorisation-draft-2026-11-07.md`) sits printed for the owner's review + send (info@gold.org); no reply recorded, no fetch wired, the family 'awaiting data' | **IF SENT + ANSWERED: record the reply and unlock the family per its terms** (a successor owner-gated session); **else the family stays blocked** — the standing state, nothing owed | **STAYS BLOCKED — nothing to show** (the owner's own TLDR: "If you can show them. show and calculate them" — the WGC family has NO data: no fetch is wired, the terms prohibit scraping without prior written authorisation, so there is nothing to display). The owner's future-facing record — "in future, where this legalities are important for me, I can hide some or ask for permission" — keeps the authorisation draft as the owner's lever (send it to info@gold.org; a recorded reply unlocks the family per its terms in a successor session). The family rides the SHOULD-be-private reference (LICENCES.md) |
+| **(d)** | **THE PROGRAM'S CLOSE** — the acceptance itself | The meter's final shape verified whole at P5 (the acceptance table + the production matrix): 37 voters (7/7/11/10/2, MIN2, STRONG 4-of-5) · the 184-id register · the flip live · gates green · the worker `8f9e521e`; the recorded-open items honestly listed (F7 · F12 · the WGC family · the promotion criteria in each card's comments) | **ACCEPT THE FINAL SHAPE AS THE PROGRAM'S DELIVERABLE** — the end state (a)/(b)/(c) delivered; the program closes with the open items standing on their records | **ACCEPTED — the program stays CLOSED; the round-3 answers opened exactly the successor work the close's successor note announced** (the display-class flip + the SHOULD-be-private documentation — no voter/seat change): GF-S13 executes it on this table's authority, and the successor discipline stands (any future METER change remains a NEW owner-gated program on the same per-seat rule). The documentation the owner asked for lands in `docs/insights/LICENCES.md` (the reference table + the hide/permission levers) |
 
 ## Out of scope
 
