@@ -73,6 +73,7 @@ import {
   parsePinnedIds,
 } from '../components/insights/config';
 import { InsightsHeader } from './insights-sections/InsightsHeader';
+import { DeprecationBanner } from './insights-sections/DeprecationBanner';
 import {
   InsightsErrorState,
   InsightsLoadingState,
@@ -431,6 +432,10 @@ export function Insights() {
     // reading measure. Tablet (md:max-w-3xl) and the phone column are
     // untouched.
     <div className="insights-page mx-auto w-full max-w-[480px] px-4 py-5 sm:max-w-2xl md:max-w-3xl lg:max-w-[calc(100%-40px)] lg:px-8 xl:max-w-[min(calc(100%-56px),1840px)]">
+      {/* Page-division S1 (D-46): the deprecation notice — this page is
+          being reorganised into the ten destinations and stays complete
+          here until then (D-9). Adds a notice only; zero content loss. */}
+      <DeprecationBanner />
       <ReadingProgress label={copy.ui.progressLabel} />
       <InsightsHeader
         t={t}
