@@ -132,14 +132,19 @@ for (const row of rung2.reports) console.log(`  ${row.ok ? 'OK' : 'FAIL'} ${row.
 const rung2Series = rung2.series as Partial<Record<IndicatorId, SeriesPoint[]>>;
 // GF-S11 (2026-11-07, the I9 accumulator + P4): the rung-2 collection's
 // RAW derivation inputs — the Cleveland release-marker months + the SA
-// CPI index (the surprise join) and the ECB/BoJ balance-sheet legs (the
-// global-liquidity aggregate). The inline build consumes them beside the
-// fetched series so this venue derives everything in one run.
+// CPI index (the surprise join), the ECB/BoJ balance-sheet legs (the
+// global-liquidity aggregate) + the SGE Au99.99 daily leg (the Shanghai
+// premium). The inline build consumes them beside the fetched series so
+// this venue derives everything in one run. (The SGE pass-through is the
+// GF-S11 recovery repair: without it every snapshot this venue wrote
+// last carried the premium reading 'unavailable' — the venue-drift
+// defect the (e) flip's own live verification exposed.)
 const rung2Raw = {
   ...(rung2.nowcastMonths !== undefined ? { nowcastMonths: rung2.nowcastMonths } : {}),
   ...(rung2.cpiIndexSa !== undefined ? { cpiIndexSa: rung2.cpiIndexSa } : {}),
   ...(rung2.ecbEurosystemAssets !== undefined ? { ecbEurosystemAssets: rung2.ecbEurosystemAssets } : {}),
   ...(rung2.bojTotalAssets !== undefined ? { bojTotalAssets: rung2.bojTotalAssets } : {}),
+  ...(rung2.sgeAu9999 !== undefined ? { sgeAu9999: rung2.sgeAu9999 } : {}),
 };
 
 /* ------------------------------------------------------------------ *

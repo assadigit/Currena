@@ -801,18 +801,12 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // reference rate). Context info card in the dollar lane beside usdtry.
   put('usdaed', fx.AED);
   // GF-S10 (2026-11-06, the remaining P3 sources — audit §4 rank 22 / F6,
-  // "the classic scarcity tell"): the SHANGHAI GOLD PREMIUM — the SGE's
-  // Au99.99 (CNY/gram) versus the converted London ounce (the build's own
-  // gold-usd series × the Frankfurter CNY leg ÷ 31.1034768 grams/ounce),
-  // in percent. A CONTEXT CARD (rule: info — never votes): the F6 seat
-  // cannot be measured over the corpus (the SGE archive reaches only to
-  // ~2024), so the seat question stays recorded-open (the GF-S10
-  // evidence). Derives ONLY when the rung-2 SGE leg is present (the
-  // Node venue's inline build + the Worker's 04:20 phase pass it; the
-  // 04:10 main rung carries the reading forward).
-  if (inputs.rung2?.sgeAu9999 !== undefined && out['gold-usd'] !== undefined && fx.CNY !== undefined) {
-    put('shanghai-gold-premium', shanghaiPremiumSeries(inputs.rung2.sgeAu9999, out['gold-usd']!, fx.CNY));
-  }
+  // "the classic scarcity tell"): the SHANGHAI GOLD PREMIUM — moved to
+  // sit AFTER the gold-usd derivation (the GF-S11 recovery repair,
+  // 2026-11-07: this block originally sat in the rung-2 region ABOVE,
+  // where out['gold-usd'] is still undefined — the derivation was dead
+  // code in every single-pass build, and only the Worker's 04:20 phase
+  // (which reads the STAGED gold-usd) ever produced the premium).
   // GF-S11 (P4, 2026-11-07 — audit report §4 rank 34 / I11): GLOBAL
   // LIQUIDITY — the Fed + ECB + BoJ balance-sheet aggregate in USD, the
   // liquidity side of money. The ECB/BoJ legs are the rung-2 phase's raw
@@ -958,6 +952,25 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
     } else if (base.length > 0) {
       put('gold-usd', base);
     }
+  }
+
+  // GF-S10 (2026-11-06, the remaining P3 sources — audit §4 rank 22 / F6,
+  // "the classic scarcity tell"): the SHANGHAI GOLD PREMIUM — the SGE's
+  // Au99.99 (CNY/gram) versus the converted London ounce (the build's own
+  // gold-usd series × the Frankfurter CNY leg ÷ 31.1034768 grams/ounce),
+  // in percent. A CONTEXT CARD (rule: info — never votes): the F6 seat
+  // cannot be measured over the corpus (the SGE archive reaches only to
+  // ~2024), so the seat question stays recorded-open (the GF-S10
+  // evidence). Derives ONLY when the rung-2 SGE leg is present (the
+  // Node venue's inline build + the Worker's 04:20 phase pass it; the
+  // 04:10 main rung carries the reading forward). SITS AFTER the
+  // gold-usd derivation (the GF-S11 recovery repair, 2026-11-07: the
+  // block originally lived in the rung-2 region above, where
+  // out['gold-usd'] is still undefined — dead code in every single-pass
+  // build; only the Worker's 04:20 phase, which reads the STAGED
+  // gold-usd, ever produced the premium).
+  if (inputs.rung2?.sgeAu9999 !== undefined && out['gold-usd'] !== undefined && fx.CNY !== undefined) {
+    put('shanghai-gold-premium', shanghaiPremiumSeries(inputs.rung2.sgeAu9999, out['gold-usd']!, fx.CNY));
   }
 
   // GF-S11 (P4, 2026-11-07 — audit report §4 rank 30 / I10): the JASTRAM

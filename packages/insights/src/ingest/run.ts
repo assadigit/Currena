@@ -189,6 +189,8 @@ export interface IngestRunOptions {
     cpiIndexSa?: SeriesPoint[];
     ecbEurosystemAssets?: SeriesPoint[];
     bojTotalAssets?: SeriesPoint[];
+    /** GF-S11 recovery repair (2026-11-07): the SGE Au99.99 daily leg — the inline venue's premium derivation input (the 04:20 phase reads its own collect; without this pass-through every snapshot the Node venue writes last carried the premium reading 'unavailable' — the venue-drift defect the (e) flip's own live verification exposed). */
+    sgeAu9999?: SeriesPoint[];
   };
   /**
    * gap-closure S3-M3.2 (2026-11-01): the fourth-rung series (the S3
@@ -481,6 +483,11 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
           ? { ecbEurosystemAssets: opts.rung2Raw.ecbEurosystemAssets }
           : {}),
         ...(opts.rung2Raw?.bojTotalAssets !== undefined ? { bojTotalAssets: opts.rung2Raw.bojTotalAssets } : {}),
+        // GF-S11 recovery repair (2026-11-07): the SGE daily leg rides the
+        // same pass-through — the build's premium derivation (derived.ts,
+        // the same pure function the 04:20 phase calls) consumes it beside
+        // the build's own gold-usd + CNY legs.
+        ...(opts.rung2Raw?.sgeAu9999 !== undefined ? { sgeAu9999: opts.rung2Raw.sgeAu9999 } : {}),
       }
     : undefined;
   if (mirrorArmsItself) {
@@ -527,6 +534,23 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     shiller,
   });
   const tDerive = performance.now();
+
+  // GF-S11 recovery repair (2026-11-07): the derived accumulation cards'
+  // STORED MERGE on the inline venue — the 04:20 Worker phase merges the
+  // Shanghai premium + the global-liquidity aggregate with their stored
+  // accumulations (the D-6 pattern: the percentile/change bases deepen
+  // rung over rung), but the inline build derived them FRESH, so a
+  // snapshot this venue wrote last would carry the fresh-only base. The
+  // merge fires ONLY when the build produced the series (the Worker's
+  // own main rung never passes the rung-2 raw legs — its build leaves
+  // both ids absent and the 04:20 phase owns them).
+  for (const derivedId of ['shanghai-gold-premium', 'global-liquidity'] as const) {
+    if (series[derivedId] === undefined) continue;
+    const storedDerived = await storedSeriesOf(opts.store, derivedId);
+    if (storedDerived !== undefined) {
+      series[derivedId] = mergeSeries(storedDerived, series[derivedId]!);
+    }
+  }
 
   // Session 3 (GOLD_FRED_GAPFILL_SPEC G1b, decision D-6): the bounded
   // DGS10 − T10YIE cross-fill for the real-yield-10y SCORING INPUT ONLY.

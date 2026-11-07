@@ -12,6 +12,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { InsightsSnapshot, IndicatorHistory, IndicatorId, InsightsStatus } from '@currena/core';
 import { buildInsightsSnapshot, patchInsightsSnapshot } from './snapshot';
+import { buildIndicatorSeries } from './derived';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from './rung2';
 import { runInsightsRung2Phase, runInsightsHistoryPhase, historyPhaseIds } from '../ingest/run';
 import { DEFINITIONS } from '../definitions';
@@ -814,5 +815,71 @@ describe('runInsightsRung2Phase — the CFTC single-point accumulation (the A-7 
     } finally {
       globalThis.fetch = original;
     }
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The inline venue's RAW-LEG PASS-THROUGH (the GF-S11 recovery repair,
+ * 2026-11-07): the (e) flip's own live verification exposed a venue
+ * drift — the Node venue's ingest script never passed the collected
+ * sgeAu9999 leg into the build, so every snapshot THAT venue wrote last
+ * carried the Shanghai premium reading 'unavailable' even though its
+ * SGE fetch had succeeded. These suites pin the build-side wiring the
+ * pass-through feeds (derived.ts consumes inputs.rung2's raw legs
+ * exactly as the 04:20 Worker phase consumes its own collect — the
+ * shared pure functions keep the venues identical).
+ * ------------------------------------------------------------------ */
+
+describe('buildIndicatorSeries consumes the rung-2 raw legs (the inline venue pass-through)', () => {
+  it('derives the Shanghai premium when the sgeAu9999 leg rides inputs.rung2 (the recovery regression pin)', () => {
+    const series = buildIndicatorSeries({
+      fred: {},
+      fx: { CNY: [{ date: '2026-11-06', value: 7.1 }] },
+      yahooHistories: {
+        'gold-usd': {
+          symbol: 'GC=F',
+          livePrice: 4072.1,
+          points: [{ date: '2026-11-06', value: 4072.1 }],
+        },
+      },
+      rung2: { sgeAu9999: [{ date: '2026-11-06', value: 924.5 }] },
+      today: '2026-11-07',
+    });
+    // SGE 924.5 CNY/g vs London (4072.1 × 7.1 ÷ 31.1034768 = 929.539 CNY/g)
+    // → (924.5 ÷ 929.539 − 1) × 100 = −0.54% (2dp), the shared pure
+    // function the 04:20 phase also calls.
+    expect(series['shanghai-gold-premium']).toEqual([{ date: '2026-11-06', value: -0.54 }]);
+  });
+
+  it('leaves the premium ABSENT without the raw leg (the Worker main rung — the 04:20 phase owns it)', () => {
+    const series = buildIndicatorSeries({
+      fred: {},
+      fx: { CNY: [{ date: '2026-11-06', value: 7.1 }] },
+      yahooHistories: {
+        'gold-usd': { symbol: 'GC=F', livePrice: 4072.1, points: [{ date: '2026-11-06', value: 4072.1 }] },
+      },
+      today: '2026-11-07',
+    });
+    expect(series['shanghai-gold-premium']).toBeUndefined();
+  });
+
+  it('derives the global-liquidity aggregate from the ECB/BoJ raw legs — the ECB DIVISION pin (the recovery regression)', () => {
+    const series = buildIndicatorSeries({
+      fred: { WALCL: [{ date: '2026-09-30', value: 6_000_000 }] },
+      fx: {
+        EUR: [{ date: '2026-09-30', value: 0.86 }], // EUR per USD (from=USD)
+        JPY: [{ date: '2026-09-30', value: 150 }],
+      },
+      rung2: {
+        ecbEurosystemAssets: [{ date: '2026-09-01', value: 8_600_000 }], // EUR millions
+        bojTotalAssets: [{ date: '2026-09-01', value: 6_000_000 }], // oku yen
+      },
+      today: '2026-11-07',
+    });
+    // The Frankfurter EUR leg serves euros-per-dollar, so the ECB's EUR
+    // millions DIVIDE: 8.6tn ÷ 0.86 = $10tn (the first GF-S11 cut
+    // multiplied — 7.396 — the defect this pin exists to catch) beside
+    // WALCL $6tn + BoJ (600bn ¥ ÷ 150) $4tn = $20.00tn exactly.
+    expect(series['global-liquidity']).toEqual([{ date: '2026-09-01', value: 20 }]);
   });
 });
