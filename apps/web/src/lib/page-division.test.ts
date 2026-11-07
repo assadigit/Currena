@@ -66,7 +66,7 @@ afterEach(() => {
 
 describe('fetchPageIndex', () => {
   it('validates a contract-shaped index and returns it', async () => {
-    const fetchMock = vi.fn(async () => jsonResponse(INDEX));
+    const fetchMock = vi.fn(async (url: string) => jsonResponse(url === '/api/insights/pages' ? INDEX : {}));
     vi.stubGlobal('fetch', fetchMock);
     const result = await fetchPageIndex();
     expect(result.pages).toHaveLength(2);
@@ -86,7 +86,7 @@ describe('fetchPageIndex', () => {
 
 describe('fetchPageProjection', () => {
   it('validates a contract-shaped projection and returns it', async () => {
-    const fetchMock = vi.fn(async () => jsonResponse(GOLD_PROJECTION));
+    const fetchMock = vi.fn(async (url: string) => jsonResponse(url === '/api/insights/pages/gold' ? GOLD_PROJECTION : {}));
     vi.stubGlobal('fetch', fetchMock);
     const result = await fetchPageProjection('gold');
     expect(result.page).toBe('gold');

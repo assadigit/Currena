@@ -15,7 +15,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading, InsightsSnapshot } from '@currena/core';
 import { PageProjectionSchema } from '@currena/core';
-import { PAGE_PLACEMENTS, pageHomeIds, pageMirrorIds, pageReadingIds } from './placement';
+import { PAGE_PLACEMENTS, pageHomeIds, pageReadingIds } from './placement';
 import { isPageDivisionPageId, projectSnapshotToPage } from './projection';
 
 const registry = JSON.parse(

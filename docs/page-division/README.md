@@ -23,8 +23,10 @@ Commodities & Energy · Currency Pairs · legacy `/insights`), per the owner's
 | 4 | `04-INDICATORS-COMPLETE-INVENTORY.md` | Phase 0 audit: all 184 registry indicators — process, method, source | final |
 | 5 | `05-GOLD-INDICATORS.md` | Phase 0 audit: the 37-voter gold meter and every gold fetch method | final |
 
-Generated during the build: `PLACEMENT.generated.md` (Session 2 — the
-authoritative per-id table reconciled against `data/indicators.json`).
+Generated during the build: `PLACEMENT.generated.md` — **delivered &
+committed GREEN at Session 2 (2026-11-08): 184 ids + 6 boards · 0 unplaced
+· 0 duplicate homes**; the sync test pins it byte-for-byte against the
+regeneration (`pnpm placement:generate`).
 
 ## Program state
 
@@ -36,9 +38,10 @@ authoritative per-id table reconciled against `data/indicators.json`).
 - **Phase 3 (final spec):** pending the investor — roadmap S22 records the
   answers as D-49+.
 - **Phase 4 (build):** **RUNNING — Session 1/30 (S1 scaffold &
-  navigation) delivered & gated 2026-11-07.** Next: Session 2/30 (S2 — the
-  data layer + `PLACEMENT.generated.md`). See the roadmap's progress board
-  for the current position.
+  navigation) delivered & gated 2026-11-07 · Session 2/30 (S2 — the data
+  layer + `PLACEMENT.generated.md`) delivered & gated 2026-11-08.** Next:
+  Session 3/30 (S3 — the Global page build). See the roadmap's progress
+  board for the current position.
 
 ## The one rule that trumps everything
 

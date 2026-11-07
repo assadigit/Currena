@@ -63,7 +63,7 @@ const env: Bindings = {
   SITE_MODE: 'public',
 };
 
-const PASSWORD = 'the-pages-gate-test-password';
+const PASSWORD = 'the-pages-test-pw';
 const authedEnv: Bindings = {
   RATES: { get: async () => null } as unknown as KVNamespace,
   INSIGHTS_PASSWORD: PASSWORD,

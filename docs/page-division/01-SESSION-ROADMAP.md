@@ -61,7 +61,7 @@ VLM visual review pass (pre-existing mobile polish items on the legacy hero
 noted for S19: the Global-gauge emoji spacing, the ⓘ wrap on the data-as-of
 line). Pre-existing display quirk observed, not touched: none in S1 scope.
 
-### ☐ S2 — Data layer & the authoritative placement table · `Session 2/30`
+### ✅ S2 — Data layer & the authoritative placement table · `Session 2/30` · delivered 2026-11-08
 - Page-level data projections from the existing API (per-page payloads or
   query params) + shared types.
 - **Generate `docs/page-division/PLACEMENT.generated.md`** from
@@ -72,6 +72,49 @@ line). Pre-existing display quirk observed, not touched: none in S1 scope.
   membership; placement table reconciles to zero unplaced / zero duplicate
   homes (or drift documented with owner-visible notes).
 - **Deliverable:** the contract between engine and pages.
+
+**S2 delivery record (2026-11-08):** the contract between engine and pages
+is shipped whole — **`packages/insights/src/page-division/`** holds the
+placement table (spec §14's homes hand-encoded with typed `IndicatorId`
+membership) + the ENGINE-DERIVED mirror sets (the gauge voters, the gold
+meter's 37 voters, the AU gauges' moved-out seats — derived from `GAUGES` +
+`GOLD_LANE_VOTERS`, never hand-copied, so an engine change surfaces as
+visible doc drift) + `reconcilePlacement` + `projectSnapshotToPage` + the
+deterministic doc builder. The wire contracts (PageDivisionPageId ·
+BoardAttachmentId · PageProjection · PageIndex) live in `packages/core`
+(zod, rule 3). **The endpoints:** `GET /api/insights/pages` (the 9-destination
+index — counts, boards, decisions — deploy-static, content-hash ETag,
+max-age=3600) + `GET /api/insights/pages/:page` (one destination's curated
+payload: home + mirror + blocked readings in placement order, the boards
+manifest, honest `absentIds`) — mounted INSIDE the insights gate + M-4 data
+bucket, BEFORE `/:id/history`, reusing the mode-aware reader and the
+live-prices overlay merge (inherited disciplines, not reinvented: the
+ribbon/hero live values + the licence hides behave exactly like the legacy
+route's). Boards are attachments (manifest ids), not embedded payloads —
+each page fetches the existing cached board routes. The SPA client
+(`apps/web/src/lib/page-division.ts`, zod-validated, per-page promise cache)
+is ready for the S3+ page builds. **The authoritative table:**
+`docs/page-division/PLACEMENT.generated.md` (pnpm placement:generate —
+`scripts/generate-placement-table.ts`), committed GREEN: **184 ids + 6
+boards · 0 unplaced · 0 duplicate homes · 0 unknown ids · 0 mirror/home
+overlaps** — the sync test (`doc.test.ts`) pins the committed file
+byte-for-byte against the regeneration (registry-sync discipline). **Audit
+findings recorded (never silently fixed):** AF-1 (spec §2's own count line
+sums to 179; Gold is 14 per §5/§14, not §2's 13) · AF-2 (spec §7's tier
+hand-counts drift from their own lists: 22→19 · 13→11 · 19→17) · **AF-3
+(OWNER RATIFICATION PENDING: `michigan-1y-expectations` — the 184th id —
+is absent from every §7/§14 list; the generator places it USA tier-3
+beside its 5y twin per evident intent — same pattern as S1's /converter
+decision)** · AF-4 (gpr-australia: AU home, GLOBAL registry section — both
+true at their layers) · AF-5 (spec §10's gauge numbers are display-group
+counts; the engine's scored AU voters are 26). Gates ALL GREEN (2m 10s:
+secret scan 8/906 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator in
+sync + eval 50 · layer1 11,819/11,819 · **the suite 14,678 = +57 new**
+(placement 13 · projection 18 · doc-sync 3 · api routes 15 · web client 9)
+· build + budgets held — entry 267.63/80.93 gz · Insights chunk
+1,613.28/373.82, the new client tree-shaken out of the entry graph).
+Not deployed (data-layer session — the Worker code changed but the deploy
+stays the owner's lever, unchanged from S1).
 
 ### ☐ S3 — Global page build · `Session 3/30`
 - The 10-tile verdict board (D-21), prices ribbon gold+brent+BTC (D-22),
@@ -219,7 +262,7 @@ line). Pre-existing display quirk observed, not touched: none in S1 scope.
 
 | Phase | Sessions | Status |
 |---|---|---|
-| A Foundations | S1–S4 | 🔄 S1 ✅ delivered & gated 2026-11-07 · S2 next |
+| A Foundations | S1–S4 | 🔄 S1 ✅ 2026-11-07 · S2 ✅ 2026-11-08 · S3 next |
 | B Gold | S5–S6 | ☐ |
 | C World Markets | S7–S8 | ☐ |
 | D USA | S9–S11 | ☐ |
@@ -232,5 +275,6 @@ line). Pre-existing display quirk observed, not touched: none in S1 scope.
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 1/30 delivered 2026-11-07 · 29 remaining — next
-action: Session 2/30 (S2, data layer + the authoritative placement table).**
+**Current position: Session 2/30 delivered 2026-11-08 · 28 remaining — next
+action: Session 3/30 (S3, the Global page build: D-21 tiles · D-22 ribbon ·
+D-23 chips · D-24 narrator · D-25 dedollar context tile).**

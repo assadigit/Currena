@@ -20,18 +20,30 @@
 
 ## A. What comes next
 
-**UPDATE 2026-11-07 (build underway) — THE PAGE-DIVISION BUILD STARTED:
-Session 1/30 (S1 — scaffold & navigation) delivered & gated.** All ten
+**UPDATE 2026-11-08 (build underway) — THE PAGE-DIVISION BUILD: Sessions
+1 and 2 of 30 delivered & gated.** S1 (scaffold & navigation): all ten
 routes live (`/` Global placeholder · the eight destination placeholders ·
 legacy `/insights` with the D-46 deprecation banner, zero content loss);
-the D-45 grouped topbar + mobile drawer are in; the Converter moved
-UNCHANGED to `/converter` (build-session decision recorded in the roadmap
-S1 entry for owner ratification). Gates ALL GREEN (tsc 6/6 · lint 0/0 ·
-copy:audit · secret scan · suite 14,621 · build+budgets · all routes
-browser-verified at 360px & desktop). **Next: Session 2/30 (S2 — the data
-layer + `PLACEMENT.generated.md`); the live position always sits in
+the D-45 grouped topbar + mobile drawer; the Converter moved UNCHANGED to
+`/converter` (build-session decision recorded in the roadmap S1 entry for
+owner ratification). S2 (the data layer, 2026-11-08): **the contract
+between engine and pages** — `@currena/insights/page-division` (the typed
+placement table + ENGINE-DERIVED mirrors + `reconcilePlacement`) · the
+wire contracts in `@currena/core` · `GET /api/insights/pages` +
+`/pages/:page` (inside the insights gate, mode-aware, live-prices merged,
+honest `absentIds`) · the SPA client `apps/web/src/lib/page-division.ts`
+· **`docs/page-division/PLACEMENT.generated.md` committed GREEN: 184 ids
++ 6 boards · 0 unplaced · 0 duplicate homes** (sync-test-pinned; audit
+findings AF-1…AF-5 recorded — **AF-3 owner ratification pending:
+michigan-1y-expectations → USA tier-3**). Gates ALL GREEN both sessions
+(latest: tsc 6/6 · lint 0/0 · copy:audit · secret scan · layer1 11,819 ·
+suite **14,678** · build+budgets held). **Next: Session 3/30 (S3 — the
+Global page build: D-21 tiles · D-22 ribbon · D-23 chips · D-24 narrator
+· D-25 dedollar context tile); the live position always sits in
 `docs/page-division/01-SESSION-ROADMAP.md`'s progress board.** Not
-deployed: the Worker is untouched — the owner deploys when ready.
+deployed: the Worker code changed at S2 but the deploy is the owner's
+lever — deploy when ready (the S2 endpoints sit dormant until the S3
+pages consume them; the legacy surfaces are byte-identical).
 
 **UPDATE 2026-11-07 (earlier the same day) — A SUCCESSOR PROGRAM EXISTS: the
 page-division program** (`docs/page-division/`). The gold-meter program
