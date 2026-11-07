@@ -1,0 +1,15 @@
+# GF-S11 live venue verification — 2026-11-07T02:04:31.220Z
+→ Cleveland Fed nowcasting page (I9) … OK — 2026-10: CPI MoM 0.24% (updated 11/06) · 2026-11: CPI MoM 0.19% (updated 11/06)
+→ FRED CPIAUCSL (the I9 realised leg) … OK — 956 points · realised MoM — 2026-08: 0.40% MoM · 2026-09: 0.65% MoM
+→ the I9 surprise join (the standing start — months still on the page are held) … OK — 0 surprises derived (the honest standing start: every CPI-printed month predates the accumulation or is still on the page)
+→ the I9 join mechanics (a synthetic frozen nowcast for a released month derives its surprise) … OK — synthetic nowcast 0.24 for 2026-09 → surprise 0.41pp (mechanics check, not data)
+→ ECB Eurosystem total assets (the I11 ECB leg) … OK — 121 points · 2026-07-01=9492915.50788153 · 2026-08-01=9639787.918818962 · 2026-09-01=9531118.32269492 (EUR millions)
+→ FRED JPNASSETS (the I11 BoJ leg) … OK — 343 points · 2026-08-01=6446620 · 2026-09-01=6250253 · 2026-10-01=6261882 (¥100 millions)
+→ FRED WALCL (the I11 Fed leg) … OK — 1247 points · 2026-10-28=6745635 · 2026-11-04=6748145 ($ millions)
+→ the I11 global-liquidity derivation (the live legs, USD trillions) … OK — 119 months · 2026-06-01=21.64 · 2026-07-01=21.66 · 2026-08-01=21.95 · 2026-09-01=21.55 ($tn)
+→ BAZG gold imports (F16 — the Swiss flow) … OK — 69 months (2021-01 → 2026-09) · min 124.5 t · max 298.1 t · 2026-07-01=154.8 · 2026-08-01=206 · 2026-09-01=227.9
+→ SGE monthly Data Highlights (F15 — the withdrawals PDF) … OK — 92.08 tonnes withdrawn @ 2026-10-01
+→ the GLD/SPY ratio (X5) … OK — 2514 points · 2026-11-05=0.5123 · 2026-11-06=0.5066
+→ the NY Fed HLW r-star workbook (R11) … OK — 262 quarters (1961 → 2026) · 2025-10-01=0.89 · 2026-01-01=1.09 · 2026-04-01=1.01
+→ the I10 real gold price derivation (gold month-close ÷ CPIAUCNS) … OK — 118 months · 2026-07-01=1230 · 2026-08-01=1338 · 2026-09-01=1243 (1982–84 dollars)
+# done

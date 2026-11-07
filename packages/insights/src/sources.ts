@@ -871,8 +871,21 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   // beside gold-usd's.
   'gold-platinum': ['gold-api:XAU', 'yahoo:GC=F', 'gold-api:XPT', 'world-bank'],
   // I11: the Fed + ECB + BoJ balance-sheet legs + the two Frankfurter FX
-  // legs. The ECB Data Portal row's unquoted terms (unknown → fail-closed
-  // publicly) govern the card's public display — the honest default.
+  // legs. The display verdict (the GF-S11 recovery's re-check, 2026-11-07):
+  // every leg resolves 'yes' — fred:WALCL (public domain) · ecb:BSI.T00
+  // (the ECB row's quoted 2026-10-21 website terms — the affirmative
+  // free-use grant with accurate reproduction + citation + STATED
+  // derivations, the same row that governs the public DFR/AAA-10y/HICP
+  // cards off the same data-api host) · fred:JPNASSETS (citation-required
+  // © Bank of Japan, display permitted with "via FRED" attribution) ·
+  // frankfurter (yes) — so the card serves PUBLIC with the derivation
+  // stated on the card (the whatItIs copy) and the attribution rendered.
+  // (The Data Portal's own terms page is unreachable from the build
+  // sandbox — data.portal.ecb.europa.eu NXDOMAIN there — recorded here;
+  // the quoted website terms are the governing grant on file. The earlier
+  // session's comment claimed the ECB leg was 'unknown'/fail-closed —
+  // that never matched the register row; this comment now records the
+  // verified state.)
   'global-liquidity': ['fred:WALCL', 'ecb:BSI.T00', 'fred:JPNASSETS', 'frankfurter'],
   // X5: the GLD/SPY legs — the Yahoo L2 class is owner-accepted for FETCH
   // but carries NO public-display directive for these tiles (the card
