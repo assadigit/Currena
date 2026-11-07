@@ -659,6 +659,81 @@ const PBOC: SourceLicence = {
   termsUrl: 'https://www.pbc.gov.cn/en/3688110/index.html',
 };
 
+/**
+ * GF-S11 (2026-11-07, the owner's recorded I9 answer — the round-2
+ * decision table): the Cleveland Fed's inflation-nowcasting page — the
+ * current CPI nowcasts that feed the accumulation card + the surprise
+ * join. The Bank's own "Privacy and Terms of Use" (read live 2026-11-07)
+ * serves the Content "free of charge" but quotes NO affirmative reuse
+ * grant (unlike the NY Fed's terms) — the L2 owner-acceptance class: the
+ * fetch runs (the Bank's own public page, keyless), the card serves
+ * PRIVATE until the owner records acceptance (the SGE-pre-(e) standing).
+ */
+const CLEVELAND: SourceLicence = {
+  provider: 'cleveland',
+  label: 'Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
+  licenceName: '© Federal Reserve Bank of Cleveland — no reuse grant quoted (fail closed)',
+  attributionText: 'Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'no', // L2: no quoted grant — the owner's recorded acceptance lifts it
+  termsCheckedOn: '2026-11-07',
+  termsEvidence:
+    'The Bank\u2019s own "Privacy and Terms of Use" (read live 2026-11-07, clevelandfed.org/privacy): "The Federal Reserve Bank of Cleveland (\u201cthe Bank\u201d) owns and operates this website (\u201cWebsite\u201d) and provides its information, data, and materials (collectively referred to as \u201cContent\u201d) free of charge as a convenience to its clients, depository institutions, and the public." and "\u2026information contained on the Bank Website, and on websites linked to or referenced by this Website, may be copyrighted and may or may not carry a copyright notice. Permission to use such copyrighted information must be obtained from the original author or source and cannot be obtained from the Bank." — no affirmative reuse grant quoted (unlike the NY Fed\u2019s terms). The nowcasting page carries "\u00a9 2026 Federal Reserve Bank of Cleveland" and the suggested citation "\u201cInflation Nowcasting.\u201d Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast" (read live 2026-11-07). L2 fail-closed: private display until the owner records acceptance; the fetch itself is the Bank\u2019s own public page.',
+  termsUrl: 'https://www.clevelandfed.org/privacy',
+};
+
+/**
+ * GF-S11 (P4, 2026-11-07 — audit report §4 rank 39 / F16): the BAZG's
+ * Swiss foreign-trade OPEN DATA — the "Gold imports by country" CSV
+ * served from ocean.bazg.admin.ch (the opendata.swiss catalogue's
+ * dataset, harvested from the I14Y/LINDAS DCAT register). The dataset's
+ * DCAT licence (read live 2026-11-07): terms_by_ask — "Open use. Use for
+ * commercial purposes requires permission of the data owner. You may use
+ * this dataset for non-commercial purposes… You are recommended to
+ * provide the source." — the NON-COMMERCIAL class: Currena's display
+ * rides the owner's recorded non-commercial statement (2026-10-17), with
+ * the source provided (the UoM CC-BY-NC-ND precedent). The monthly total
+ * is a stated derivation (the country rows summed).
+ */
+const BAZG: SourceLicence = {
+  provider: 'bazg',
+  label: 'Federal Office for Customs and Border Security FOCBS / BAZG (Swiss foreign-trade open data)',
+  licenceName: 'opendata.swiss terms_by_ask — non-commercial use permitted, source recommended',
+  attributionText: 'Source: Federal Office for Customs and Border Security FOCBS / BAZG (Swiss foreign trade statistics)',
+  attributionRequired: true,
+  privateOk: true,
+  publicDisplayOk: 'yes',
+  termsCheckedOn: '2026-11-07',
+  termsEvidence:
+    'The opendata.swiss terms-of-use page (read live 2026-11-07, opendata.swiss/en/terms-of-use): "The terms of use for datasets of the federal authorities on opendata.swiss are determined by the existing legal framework. If there is a statutory requirement to cite the source, this is indicated by the appropriate symbol next to the dataset concerned. In all other cases, users are recommended to cite the source. The symbols next to each dataset indicate what use is permitted." The dataset\u2019s DCAT licence (read live 2026-11-07 via LINDAS, register.ld.admin.ch/i14y/dataset/BAZG_GOLD_LAND): dcat-ap.ch/vocabulary/licenses/terms_by_ask — the "Open use. Use for commercial purposes requires permission of the data owner" class: non-commercial use permitted, commercial requires the owner\u2019s ask, source recommended. Currena\u2019s non-commercial informational display rides the owner\u2019s recorded non-commercial statement (RISK_REGISTER.md, 2026-10-17 — the UoM CC-BY-NC-ND precedent) with the BAZG source provided; the monthly-tonnes total is a stated derivation (the country × control-code rows summed — the "How is this calculated?" says so). The open-data CSV itself verified live 2026-11-07 (ocean.bazg.admin.ch — 2.4 MB, monthly 2021-01 → 2026-09).',
+  termsUrl: 'https://opendata.swiss/en/terms-of-use',
+};
+
+/**
+ * GF-S11 (P4, 2026-11-07 — audit report §4 rank 43 / F12): the ETF
+ * short-interest fund pages — the HONEST fail-closed verdict (triaged
+ * live 2026-11-07, the honest UA): nasdaq.com's fund pages time out,
+ * nyse.com's short-interest page answers HTTP 403 (the usmint/MCX block
+ * class), and FINRA's equity-short-interest API is registration-gated
+ * (the pre-approval class). No fetch is wired; the card renders
+ * 'awaiting data' until a licence-clean venue appears (a venue/owner
+ * round or an official free feed).
+ */
+const FUND_PAGES: SourceLicence = {
+  provider: 'fund-pages',
+  label: 'ETF short interest (the fund pages — no licence-clean venue)',
+  licenceName: 'No licence-clean venue verified — fail closed (no fetch, awaiting data)',
+  attributionText: '',
+  attributionRequired: false,
+  privateOk: true,
+  publicDisplayOk: 'no',
+  termsCheckedOn: '2026-11-07',
+  termsEvidence:
+    'The venue triage (read live 2026-11-07, the declared CurrenaDashboard UA, single attempt per venue): nasdaq.com/market-activity/funds-and-etfs/gld/short-interest — TIMEOUT from this venue; nyse.com/data/stocks-etf-short-interest — HTTP 403 ("you have been blocked", the Cloudflare security wall — the usmint.gov/MCX block class); finra.org/finra-data/browse-catalog/equity-short-interest — the API is registration-gated (the pre-approval class, the ICE BofA pattern). The fund-page class DISAPPOINTS: no fetch wired, the card reads awaiting data, recorded-open until a licence-clean venue appears.',
+  termsUrl: undefined,
+};
+
 /** The register. Unknown providers resolve to the fail-closed entry. */
 export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   fred: FRED_BASE,
@@ -698,6 +773,11 @@ export const SOURCE_LICENCES: Record<string, SourceLicence> = {
   sge: SGE,
   wgc: WGC,
   pboc: PBOC,
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4 — the terms
+  // read live this session, the evidence quoted in each row).
+  cleveland: CLEVELAND,
+  bazg: BAZG,
+  'fund-pages': FUND_PAGES,
 };
 
 export function licenceForProvider(provider: string): SourceLicence {

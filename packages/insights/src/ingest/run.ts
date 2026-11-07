@@ -69,6 +69,8 @@ import {
   READING_SOURCES,
   mergeSeries,
   shanghaiPremiumSeries,
+  globalLiquiditySeries,
+  cpiSurpriseSeries,
   type SeriesInputs,
 } from '../adapters/index';
 import { runValidationSuite } from '../validation';
@@ -173,6 +175,21 @@ export interface IngestRunOptions {
    * forward (carryForwardIds) until the 04:20 phase patches them.
    */
   rung2Series?: Partial<Record<IndicatorId, SeriesPoint[]>>;
+  /**
+   * GF-S11 (2026-11-07, the I9 accumulator + P4): the rung-2 phase's RAW
+   * derivation inputs the inline build consumes — the Cleveland page's
+   * release-marker months (the surprise join's race guard), the SA CPI
+   * index (the realised-print leg), and the ECB/BoJ balance-sheet legs
+   * (the global-liquidity aggregate). The Node venue passes what its
+   * inline collection fetched (the ingest script); the Worker's phases
+   * read them from their own collect.
+   */
+  rung2Raw?: {
+    nowcastMonths?: ReadonlySet<string>;
+    cpiIndexSa?: SeriesPoint[];
+    ecbEurosystemAssets?: SeriesPoint[];
+    bojTotalAssets?: SeriesPoint[];
+  };
   /**
    * gap-closure S3-M3.2 (2026-11-01): the fourth-rung series (the S3
    * liquidity/funding/macro FRED groups, keyed by FRED series id — the
@@ -431,11 +448,39 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     const stored = await storedSeriesOf(opts.store, id);
     inlineRung2Series[id] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
   }
+  // GF-S11 (I9): the surprise join on the inline venue — the merged
+  // nowcast accumulation (the loop above merged it) + the raw feeds.
+  // The same race guard + immutability the Worker's 04:20 phase applies
+  // (cpiSurpriseSeries holds months still on the page; printed months
+  // never re-derive).
+  if (
+    inlineRung2Series['cpi-nowcast'] !== undefined &&
+    opts.rung2Raw?.nowcastMonths !== undefined &&
+    opts.rung2Raw?.cpiIndexSa !== undefined
+  ) {
+    const existingSurprise = await storedSeriesOf(opts.store, 'cpi-surprise');
+    const surprise = cpiSurpriseSeries(
+      inlineRung2Series['cpi-nowcast'],
+      opts.rung2Raw.nowcastMonths,
+      opts.rung2Raw.cpiIndexSa,
+      existingSurprise ?? [],
+    );
+    if (surprise.length > 0) inlineRung2Series['cpi-surprise'] = surprise;
+  }
   const rung2Inputs = opts.rung2Series !== undefined || opts.jgbMirrorFallback !== undefined
     ? {
         jgb10y: opts.rung2Series?.['jgb-10y'],
         jgbMirror: opts.jgbMirrorFallback ?? (mirrorArmsItself ? inputs.fred.IRLTLT01JPM156N : undefined),
         ...(Object.keys(inlineRung2Series).length > 0 ? { series: inlineRung2Series } : {}),
+        // GF-S11 (I11): the global-liquidity aggregate's raw legs (the
+        // ingest script passes what its inline collection fetched — the
+        // Node venue then derives the aggregate in this one build, the
+        // Worker's 04:20 phase derives it from its own collect; the
+        // shared pure function keeps the venues identical).
+        ...(opts.rung2Raw?.ecbEurosystemAssets !== undefined
+          ? { ecbEurosystemAssets: opts.rung2Raw.ecbEurosystemAssets }
+          : {}),
+        ...(opts.rung2Raw?.bojTotalAssets !== undefined ? { bojTotalAssets: opts.rung2Raw.bojTotalAssets } : {}),
       }
     : undefined;
   if (mirrorArmsItself) {
@@ -951,6 +996,89 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
       }
     } else {
       console.log('  · shanghai-gold-premium: a leg is missing — holding (fail closed)');
+    }
+
+    // GF-S11 (2026-11-07, the owner's recorded I9 answer): the NOWCAST
+    // ACCUMULATION + the CPI-PRINT SURPRISE JOIN. The fetched nowcast
+    // points (month-start dated, one per still-unreleased reference
+    // month) merge with the stored accumulation (fetched wins — each
+    // business day's observation refines the month's point; the venue's
+    // own blank-cell rule freezes a month's final nowcast once its print
+    // lands). The surprise joins ONLY when BOTH the nowcast fetch and the
+    // CPIAUCSL index succeeded (the race guard: a month still on the page
+    // is not released — cpiSurpriseSeries holds it; a failed nowcast
+    // fetch skips the join that day, the next good rung catches up).
+    {
+      const fetchedNowcast = collected.series['cpi-nowcast'];
+      const storedNowcast = await storedSeriesOf(opts.store, 'cpi-nowcast');
+      if (fetchedNowcast !== undefined) {
+        series['cpi-nowcast'] =
+          storedNowcast !== undefined ? mergeSeries(storedNowcast, fetchedNowcast) : fetchedNowcast;
+        console.log(
+          `  · cpi-nowcast: ${series['cpi-nowcast']!.at(-1)!.value}% @ ${series['cpi-nowcast']!.at(-1)!.date}` +
+            ` (${series['cpi-nowcast']!.length} accumulated months)`,
+        );
+      } else if (storedNowcast !== undefined) {
+        series['cpi-nowcast'] = storedNowcast; // hold the accumulation (the reading ages honestly)
+        console.log('  · cpi-nowcast: the page fetch failed — holding the stored accumulation');
+      }
+      const mergedNowcast = series['cpi-nowcast'];
+      if (
+        mergedNowcast !== undefined &&
+        collected.nowcastMonths !== undefined &&
+        collected.cpiIndexSa !== undefined
+      ) {
+        const existingSurprise = await storedSeriesOf(opts.store, 'cpi-surprise');
+        const surprise = cpiSurpriseSeries(mergedNowcast, collected.nowcastMonths, collected.cpiIndexSa, existingSurprise ?? []);
+        if (surprise.length > 0) {
+          series['cpi-surprise'] = surprise;
+          const last = surprise.at(-1)!;
+          console.log(`  · cpi-surprise: ${last.value}pp @ ${last.date} (${surprise.length} printed months)`);
+        } else if (existingSurprise !== undefined) {
+          series['cpi-surprise'] = existingSurprise;
+        }
+      } else if (mergedNowcast !== undefined) {
+        console.log('  · cpi-surprise: a join leg is missing — holding (fail closed)');
+      }
+    }
+
+    // GF-S11 (P4 / I11): GLOBAL LIQUIDITY — the Fed + ECB + BoJ aggregate,
+    // derived at this phase from the staged WALCL + FX legs (the 04:10
+    // build's own series) + this phase's fetched ECB/BoJ legs (full
+    // histories per fetch; the stored merge is belt-and-braces, the D-6
+    // pattern). Fail closed on any leg missing (never a stale aggregate).
+    {
+      const stagedWalcl = stage?.series['walcl']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+      const stagedEurUsd = stage?.series['eur-usd']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+      const stagedUsdJpy = stage?.series['usdjpy']?.map(([day, value]) => ({ date: fromEpochDay(day), value }));
+      if (
+        collected.ecbEurosystemAssets !== undefined &&
+        collected.bojTotalAssets !== undefined &&
+        stagedWalcl !== undefined &&
+        stagedEurUsd !== undefined &&
+        stagedUsdJpy !== undefined
+      ) {
+        const aggregate = globalLiquiditySeries(
+          stagedWalcl,
+          collected.ecbEurosystemAssets,
+          collected.bojTotalAssets,
+          stagedEurUsd,
+          stagedUsdJpy,
+        );
+        if (aggregate.length > 0) {
+          const storedAggregate = await storedSeriesOf(opts.store, 'global-liquidity');
+          series['global-liquidity'] =
+            storedAggregate !== undefined ? mergeSeries(storedAggregate, aggregate) : aggregate;
+          const last = series['global-liquidity']!.at(-1)!;
+          console.log(
+            `  · global-liquidity: $${last.value}tn @ ${last.date} (${series['global-liquidity']!.length} months)`,
+          );
+        } else {
+          console.log('  · global-liquidity: the legs share no months — holding (fail closed)');
+        }
+      } else {
+        console.log('  · global-liquidity: a leg is missing — holding (fail closed)');
+      }
     }
 
   // A-6/A-7 (2026-10-26 gap-audit build): the weekly pair — the fetched

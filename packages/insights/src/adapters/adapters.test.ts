@@ -112,7 +112,7 @@ describe('fred adapter', () => {
     // the 5y real yield's belly), DTWEXBGS (D2 dollar-broad, the broad
     // trade-weighted dollar), DTWEXEMEGS (D9 dollar-eme, the EME dollar)
     // and DPCREDIT (S9 bank-stress, the 30d commercial paper rate) → 63.
-    expect(Object.values(FRED_SERIES)).toHaveLength(63);
+    expect(Object.values(FRED_SERIES)).toHaveLength(66); // GF-S11 (2026-11-07): +CPIAUCSL (the SA index — the I9 surprise join's realised leg) +GFDEGDQ188S (G3 debt/GDP) +JPNASSETS (the BoJ total assets, I11's leg)
   });
 
   it('rides WSEFINTL1 in the mixed-frequency bulk group beside WALCL (S2-M2.4: zero new subrequests)', () => {

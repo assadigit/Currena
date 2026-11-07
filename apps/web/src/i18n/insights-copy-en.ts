@@ -3538,6 +3538,253 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     forYou:
       'A dial for the world’s largest physical market: whether Chinese buyers are paying up for gold right now.',
   },
+  // ---- GF-S11 (2026-11-07) — copy round 82: the round-2 decisions'
+  //      execution (the I9 accumulator's pair) + the nine P4 context
+  //      cards. All rule: info — conditions-descriptive, never a
+  //      forecast (D-GF-3); the two I9 cards state the standing-start
+  //      maturity honestly. ----
+  'cpi-nowcast': {
+    name: 'US CPI nowcast (Cleveland Fed)',
+    oneLiner:
+      'What the Cleveland Fed’s model expects this month’s CPI to print: the live expectations leg of the inflation-surprise read.',
+    lines: {
+      highRising:
+        'The nowcast for this month’s CPI is high and has been rising through the month: the incoming data point to a hot print.',
+      highEasing: 'The nowcast sits high for recent months but has been easing through the month.',
+      typical: 'The current month’s CPI nowcast sits in its usual range.',
+      low: 'The nowcast for this month’s CPI is low by recent standards: the incoming data point to a soft print.',
+    },
+    whatItIs:
+      'The Cleveland Fed’s inflation nowcasting model’s current estimate of this month’s headline CPI month-over-month change (seasonally adjusted, updated each business day as price data arrive). The publisher keeps no nowcast history, so Currena accumulates the daily readings itself.',
+    whyItMatters:
+      'This is the expectations side of the only inflation-surprise object in the meter’s set: the number the model points to, stated before the print exists, from a model whose nowcasts have historically tracked the releases closely.',
+    tendedToMean:
+      'The model nowcasts the headline monthly rate — the number the news reports on release day — revising daily as gasoline prices and weekly data arrive; headline nowcasts move more than core ones.',
+    cantTell:
+      'A model estimate, not data: the honest accumulation started in November 2026 (the publisher serves no history), so the percentile base is still maturing — read the level, not its history, until it deepens. A context card: information-only, voting in no gauge, and no forecast of anything.',
+    forYou:
+      'The number to hold in mind before each CPI release — conditions today, stated as an expectation, never a promise.',
+  },
+  'cpi-surprise': {
+    name: 'US CPI surprise (print vs nowcast)',
+    oneLiner:
+      'How far the realised CPI print landed from the Cleveland Fed’s final nowcast: the month’s inflation surprise, in percentage points.',
+    lines: {
+      highRising:
+        'The last CPI print came in above its nowcast: inflation surprised to the upside this month.',
+      highEasing: 'Recent surprises have run to the upside, with the latest smaller.',
+      typical: 'CPI prints have been landing close to their nowcasts.',
+      low: 'The last CPI print came in below its nowcast: inflation surprised to the downside.',
+    },
+    whatItIs:
+      'The realised headline CPI month-over-month change (the seasonally adjusted index, the print basis) minus the Cleveland Fed’s final nowcast for the same month, in percentage points. Currena derives each surprise when the print lands and keeps it — one immutable point per month.',
+    whyItMatters:
+      'The expectations-versus-reality gap is the classic macro surprise: markets react to the difference, not the level. It is the only object of this kind in the meter’s set.',
+    tendedToMean:
+      'Inflation surprises have historically clustered within a few tenths of a point of the nowcasts, with the occasional outlier month when the models miss a price shock.',
+    cantTell:
+      'The accumulation started in November 2026 and the publisher serves no nowcast history, so the first surprise lands with the next monthly print and the percentile base matures over roughly two and a half years — the honest standing start. A context card: information-only, voting in no gauge, and claiming nothing about what any surprise means for prices to come.',
+    forYou:
+      'A clean read on whether inflation is running hotter or cooler than expected — conditions today, not a prediction.',
+  },
+  'real-gold-price': {
+    name: 'The real gold price (CPI-deflated)',
+    oneLiner:
+      'The gold price in constant 1982–84 dollars: what an ounce actually buys after inflation — the Jastram valuation anchor.',
+    lines: {
+      highRising:
+        'The real gold price is high for its decade and rising: gold’s purchasing power is stretching.',
+      highEasing: 'The real price sits high for its decade but is easing.',
+      typical: 'The real gold price sits in its usual range for the decade.',
+      low: 'The real gold price is low for its decade: an ounce buys relatively little after inflation.',
+    },
+    whatItIs:
+      'The month’s closing gold price divided by the consumer price index (the BLS headline index via FRED), expressed in the CPI’s own 1982–84 dollars — the index’s published base, no rebasing invented.',
+    whyItMatters:
+      'Roy Jastram’s classic finding: gold’s long cycles are purchasing-power cycles. In real terms the 1980 peak and the long bear market that followed are the anchor every valuation argument starts from.',
+    tendedToMean:
+      'In real terms gold’s 1980 peak stood unchallenged for over four decades — the 2011 and 2020 highs both fell just short of it in purchasing-power terms — before the mid-2020s advance finally surpassed it: the multi-decade swing the nominal price hides.',
+    cantTell:
+      'A valuation anchor, not a signal: high or low real prices have accompanied both continuations and reversals. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The long-run answer to “is gold expensive?” — measured against the price of everything else, not the dollar alone.',
+  },
+  'gold-platinum': {
+    name: 'Gold to platinum ratio',
+    oneLiner:
+      'How many ounces of platinum an ounce of gold buys: the relative valuation inside the precious-metals bloc.',
+    lines: {
+      highRising:
+        'Gold is unusually expensive against platinum and the ratio is widening: the monetary metal pulling away from the industrial one.',
+      highEasing: 'Gold sits rich against platinum but the ratio is narrowing.',
+      typical: 'The gold/platinum ratio sits in its usual range for the decade.',
+      low: 'Gold is cheap against platinum by the decade’s standards: the industrial metal holding the premium.',
+    },
+    whatItIs:
+      'The gold price divided by the platinum price, same date — the second precious-bloc ratio beside gold/silver.',
+    whyItMatters:
+      'The two metals answer different demand: gold’s is monetary and store-of-wealth, platinum’s is industrial and catalytic. The ratio is the cleanest single read of which demand is winning.',
+    tendedToMean:
+      'The ratio traded near parity to a small gold premium for most of the 1990s–2000s, then broke out after 2015 to sustained multi-ounce premiums — gold’s monetary re-rating against platinum’s industrial cycle.',
+    cantTell:
+      'A relative-value read, not a direction call for either metal. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The precious-bloc thermometer: whether the market is paying for monetary insurance or industrial demand.',
+  },
+  'global-liquidity': {
+    name: 'Global liquidity (Fed + ECB + BoJ)',
+    oneLiner:
+      'The combined balance sheets of the Federal Reserve, the ECB and the Bank of Japan in US dollars: the quantity of money the big three create.',
+    lines: {
+      highRising:
+        'Global liquidity is expanding: the big three central banks’ balance sheets are growing again.',
+      highEasing: 'The aggregate remains large but is shrinking: quantitative tightening in motion.',
+      typical: 'The aggregate sits in its usual range for the decade.',
+      low: 'Global liquidity has fallen back toward its pre-pandemic trend: the tightening cycle largely done.',
+    },
+    whatItIs:
+      'The sum of the Fed’s total assets (the weekly H.41 report), the Eurosystem’s total assets and the Bank of Japan’s total assets, each converted to US dollars at the month’s exchange rate — a monthly aggregate in trillions.',
+    whyItMatters:
+      'Central banks set the price of money with policy rates and the quantity with these balance sheets. The 2020–26 round of creation and run-off was the largest in history, and asset markets broadly followed its shape.',
+    tendedToMean:
+      'The aggregate lifted in steps through each QE era, exploded in 2020, and has been running off since 2022 — the tightest global liquidity regime in the modern data before the next turn.',
+    cantTell:
+      'Size is not stance: the level alone says nothing about what comes next for any asset. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The quantity side of the money story the interest-rate cards tell the price of.',
+  },
+  'sge-gold-withdrawals': {
+    name: 'SGE gold withdrawals (monthly)',
+    oneLiner:
+      'How much gold was physically pulled from Shanghai Gold Exchange vaults last month: the classic China physical-demand proxy.',
+    lines: {
+      highRising:
+        'SGE withdrawals are running high and rising: Chinese physical demand is pulling metal hard.',
+      highEasing: 'Withdrawals remain elevated but are easing.',
+      typical: 'Monthly withdrawals sit in their usual range.',
+      low: 'Withdrawals are low for their recent range: a quiet month for Chinese physical demand.',
+    },
+    whatItIs:
+      'The gold withdrawal volume from the Shanghai Gold Exchange’s own monthly statistics (the Data Highlights publication), in tonnes per month.',
+    whyItMatters:
+      'Withdrawals are the metal that leaves the exchange for the real economy — jewellery, bars, industrial use. Because China both imports and recycles gold, the withdrawal series is the standard proxy for how hard the world’s largest consumer is pulling.',
+    tendedToMean:
+      'Chinese withdrawals have run at a pace of well over a thousand tonnes a year in the strong years, with the monthly series swinging hard around holidays and price shocks.',
+    cantTell:
+      'A demand proxy, not a census: withdrawals mix consumption, restocking and financial demand, and the exchange’s own archive reaches back only so far — Currena’s series begins with the months its pages serve. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The physical pulse of the world’s largest gold consumer, beside the Shanghai premium card’s price signal.',
+  },
+  'swiss-gold-flow': {
+    name: 'Swiss gold imports (monthly)',
+    oneLiner:
+      'How much raw gold flowed into Switzerland’s refineries last month: the raw-material side of the world’s gold-processing hub.',
+    lines: {
+      highRising:
+        'Swiss gold imports are running high and rising: the refinery hub is taking in heavily.',
+      highEasing: 'Imports remain elevated but are easing.',
+      typical: 'Monthly imports sit in their usual range.',
+      low: 'Imports are low for their recent range: a thin month of raw material for the refiners.',
+    },
+    whatItIs:
+      'Switzerland’s monthly gold imports (all tariff-7108 gold, the customs office’s own open-data series), in tonnes — the country row detail summed into the monthly total.',
+    whyItMatters:
+      'Switzerland refines a large share of the world’s gold: what flows in as doré and scrap flows out as refined bars to China, India and the banks. The import series is the supply side of the physical chain the Shanghai premium and India premium read the demand side of.',
+    tendedToMean:
+      'Swiss gold imports have run between roughly 125 and 300 tonnes a month across 2021–26, swinging with mine supply, price and the refiners’ order books.',
+    cantTell:
+      'A flow, not a verdict: imports show what the hub processed, not why, and the export side (where the metal went) publishes only through a venue Currena cannot yet fetch cleanly — the honest gap, stated. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The refinery hub’s intake — the physical chain’s first link, read beside the China and India demand cards.',
+  },
+  'gold-equities-ratio': {
+    name: 'Gold vs equities (GLD/SPY)',
+    oneLiner:
+      'The gold ETF priced in S&P 500 units: the classic rotation gauge between the two reserve assets.',
+    lines: {
+      highRising:
+        'Gold is strong against equities and the ratio is rising: the rotation toward the hard asset is running.',
+      highEasing: 'Gold holds its high ratio against equities but the gap is narrowing.',
+      typical: 'The gold/equities ratio sits in its usual range for the decade.',
+      low: 'Gold is weak against equities by the decade’s standards: risk appetite holding the upper hand.',
+    },
+    whatItIs:
+      'The ratio of the gold ETF’s price to the S&P 500 ETF’s price (GLD ÷ SPY, same-date closes) — how many S&P units one gold-ETF unit buys.',
+    whyItMatters:
+      'Gold and broad equities are the two deep pools of savings: when capital rotates between them, this ratio is the rotation. The long swings — the 2000s gold bull, the 2010s equity bull — are the asset-allocation story of their decades.',
+    tendedToMean:
+      'The ratio rose through the 2000s gold bull, fell through most of the 2010s, and turned hard from 2022 — the widest gold-versus-equities swing of the modern era.',
+    cantTell:
+      'A relative price, not a preference: the ratio moves when either side moves, and tracking error between the ETFs and their assets sits inside the level. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The one-glance answer to “which reserve asset is winning?” — conditions today, not a call on tomorrow.',
+  },
+  'rstar-us': {
+    name: 'US r-star (HLW estimate)',
+    oneLiner:
+      'The estimated natural rate of interest: the neutral setting around which every actual policy rate reads tight or loose.',
+    lines: {
+      highRising:
+        'The estimated natural rate has moved higher: the neutral setting of US monetary policy is rising.',
+      highEasing: 'The estimate sits elevated but has drifted lower.',
+      typical: 'The r-star estimate sits in its usual post-pandemic range.',
+      low: 'The r-star estimate is low by recent standards: the neutral setting remains historically subdued.',
+    },
+    whatItIs:
+      'The Holston–Laubach–Williams estimate of the US natural rate of interest (the New York Fed’s own quarterly model), the rate that would hold output at potential and inflation stable once temporary forces wash out.',
+    whyItMatters:
+      'Every interest-rate card on this page is judged against an unwritten benchmark: is policy tighter or looser than neutral? R-star is that benchmark, made explicit — the regime label the whole rates complex orbits.',
+    tendedToMean:
+      'The HLW r-star fell from above 2% before 2008 to near zero in the 2010s, and has risen since the pandemic — the debate over how much of that rise is durable is live and unsettled.',
+    cantTell:
+      'A model estimate with wide error bands, not an observable: the authors themselves stress its uncertainty, and it is one of several competing estimates. Context-only by design: a quarterly model number, never a trading signal.',
+    forYou:
+      'The yardstick that gives “tight” and “loose” their meaning — read beside the real-yield cards.',
+  },
+  'etf-short-interest': {
+    name: 'Gold ETF short interest',
+    oneLiner:
+      'How much of the gold ETF float is sold short: the squeeze-tell complement to the ETF-flows reads.',
+    lines: {
+      highRising:
+        'Short interest in the gold ETF is high and rising: a large bearish position is built against the metal.',
+      highEasing: 'Short interest remains elevated but is being covered.',
+      typical: 'ETF short interest sits in its usual range.',
+      low: 'Short interest in the gold ETF is low: few bears are positioned against the metal.',
+    },
+    whatItIs:
+      'The share of the gold ETF’s units sold short (the exchanges’ published short-interest tables for the fund) — the positioning that would have to be bought back in a squeeze.',
+    whyItMatters:
+      'Heavy short interest is fuel: if the price turns against the shorts, their covering buys amplify the move. Beside the ETF holdings cards it completes the positioning picture — who owns it, and who has bet against it.',
+    tendedToMean:
+      'Short interest in the gold ETF has historically been a small fraction of its float, spiking around the sharp drawdowns when bears pressed.',
+    cantTell:
+      'Awaiting data, honestly: no licence-clean venue for the fund pages’ short-interest tables has been verified, so this card carries no number until one is — the licence register records the verdict. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The bearish-positioning gauge — arriving when a clean source does.',
+  },
+  'debt-to-gdp': {
+    name: 'US federal debt to GDP',
+    oneLiner:
+      'What the US government owes as a share of what the economy produces: the structural anchor of the fiscal story.',
+    lines: {
+      highRising:
+        'Federal debt has passed 120% of GDP and is still rising: the structural weight keeps growing.',
+      highEasing: 'The debt ratio sits near its post-war highs but has stabilised.',
+      typical: 'The debt-to-GDP ratio sits in its usual post-pandemic range.',
+      low: 'The debt ratio is lower than its recent range.',
+    },
+    whatItIs:
+      'The US federal government’s total public debt as a share of annual GDP (quarterly, via FRED) — the economy’s total output set against its government’s obligations.',
+    whyItMatters:
+      'The fiscal-dominance channel: a heavy debt load changes what policy can do — how long rates can stay high, how much of the budget goes to interest, and the long-run argument that has accompanied every modern gold cycle.',
+    tendedToMean:
+      'The ratio climbed from about a third of GDP in the early 1980s through each crisis — 2008, 2020 — to above 120%, a level last seen in the Second World War’s aftermath, when it was engineered down by growth and inflation.',
+    cantTell:
+      'A level, not a trigger: high debt has coexisted with both falling and rising rates, and the sustainability question resolves on politics, not arithmetic. A context card: information-only, voting in no gauge.',
+    forYou:
+      'The structural backdrop the deficit and interest-cost cards read the flow of — the long-run shape under the gold story.',
+  },
   // ---- M6 Wave 3 (2026-10-25): the leading-edge batch (recovered from the deployed bundle) ----
   'mortgage-30y': {
     name: 'The US 30-year home-loan rate',

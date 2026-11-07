@@ -42,6 +42,30 @@ export const ECB_AAA_10Y_SERIES_KEY = 'YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y';
  */
 export const ECB_HICP_SERIES_KEY = 'HICP/M.U2.N.000000.4D0.ANR';
 
+/**
+ * GF-S11 (P4, 2026-11-07 — audit report §4 rank 34 / I11): the
+ * EUROSYSTEM's total assets — the global-liquidity aggregate's ECB leg.
+ * The series key verified live 2026-11-07 (this session's own probe, the
+ * honest UA): `BSI/M.U2.N.C.T00.A.1.Z5.0000.Z01.E` — SDMX CSV title
+ * "Total assets of the Eurosystem, Stocks", EUR millions, monthly
+ * (September 2026 already served at the read: 9,531,118.32 — the ~5-week
+ * publication lag measured live). The BSI dimension walk that found the
+ * key: FREQ.REF_AREA.ADJUSTMENT.BS_REP_SECTOR(C = Eurosystem).BS_ITEM
+ * (T00 = Total Assets/Liabilities)… — the CL_BS_ITEM + CL_BS_REP_SECTOR
+ * codelists read live from the Data Portal's structure API.
+ */
+export const ECB_EUROSYSTEM_ASSETS_KEY = 'BSI/M.U2.N.C.T00.A.1.Z5.0000.Z01.E';
+
+/** The decade window's start for the Eurosystem-assets request (the FRED decade-window discipline). */
+export function ecbEurosystemAssetsFrom(now: Date = new Date()): string {
+  return new Date(now.getTime() - (3_650 + 90) * 86_400_000).toISOString().slice(0, 10);
+}
+
+/** URL of the Eurosystem total-assets series (decade window CSV, month-start dated). */
+export function ecbEurosystemAssetsUrl(from: string = ecbEurosystemAssetsFrom()): string {
+  return `${ECB_DATA_BASE}/${ECB_EUROSYSTEM_ASSETS_KEY}?format=csvdata&startPeriod=${from}`;
+}
+
 /** URL of the DFR series (full history CSV). */
 export function ecbDfrUrl(): string {
   return `${ECB_DATA_BASE}/${ECB_DFR_SERIES_KEY}?format=csvdata`;
@@ -95,4 +119,15 @@ export async function fetchEcbAaa10ySeries(deps: FetchDeps = {}): Promise<Series
   const res = await insightsFetch(ecbAaa10yUrl(), {}, deps);
   const text = await res.text();
   return parseEcbDfrCsv(text);
+}
+
+/**
+ * GF-S11 (P4 / I11): fetch and parse the Eurosystem's total assets (decade
+ * window; the same monthly SDMX CSV shape as the HICP — month-start dated,
+ * EUR millions). Fails loudly on a block, a non-2xx or a shape change.
+ */
+export async function fetchEcbEurosystemAssets(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
+  const res = await insightsFetch(ecbEurosystemAssetsUrl(), {}, deps);
+  const text = await res.text();
+  return parseEcbMonthlyCsv(text);
 }

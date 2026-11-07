@@ -275,6 +275,134 @@ export function shanghaiPremiumSeries(
 }
 
 /**
+ * GF-S11 (P4, 2026-11-07 — audit report §4 rank 30 / I10): the JASTRAM
+ * REAL GOLD PRICE — the month's closing gold price deflated by the CPI
+ * index level, expressed in the CPI's own 1982–84 dollars (the index's
+ * published base — gold ÷ (CPIAUCNS ÷ 100)):
+ *
+ *   realGold(month M) = goldClose(M) × 100 ÷ CPIAUCNS(M)
+ *
+ * Pure, exported so every venue derives the identical series (the
+ * us-japan-10y-gap discipline). The monthly join: each CPI point (dated
+ * month-start M) pairs with the LAST gold close on or before M's month
+ * END — both legs then describe the same month, and the derived point
+ * only exists once the CPI publishes (the lagging leg governs, the
+ * us-cpi-yoy cadence). Fail closed per month on either leg missing.
+ */
+export function realGoldPriceSeries(
+  goldUsd: readonly SeriesPoint[],
+  cpiIndex: readonly SeriesPoint[],
+): SeriesPoint[] {
+  const out: SeriesPoint[] = [];
+  for (const cpi of cpiIndex) {
+    if (cpi.value <= 0) continue; // fail closed on a broken index leg
+    // The CPI point is month-start dated: find the month's END, then the
+    // last gold close on or before it.
+    const [y, m] = cpi.date.split('-').map(Number) as [number, number, number];
+    const monthEnd = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+    let goldClose: number | undefined;
+    for (const p of goldUsd) {
+      if (p.date > monthEnd) break;
+      goldClose = p.value;
+    }
+    if (goldClose === undefined || goldClose <= 0) continue; // fail closed
+    out.push({ date: cpi.date, value: Math.round((goldClose * 100) / cpi.value) });
+  }
+  return out;
+}
+
+/**
+ * GF-S11 (P4, 2026-11-07 — audit report §4 rank 34 / I11): GLOBAL
+ * LIQUIDITY — the Fed + ECB + BoJ balance-sheet aggregate in US dollars
+ * (trillions, 2dp), monthly:
+ *
+ *   GL(M) = [ WALCL(last Wednesday ≤ M-end)
+ *           + ECB_T00(M) × EURUSD(M-end)          (EUR millions → $M)
+ *           + JPNASSETS(M) × 100 ÷ USDJPY(M-end) ] (oku ¥ → ¥M → $M) ÷ 1e6
+ *
+ * The monthly inner join rides the ECB/BoJ legs' month-start dates (the
+ * slowest publishers govern); each CB's own latest value at that month is
+ * used (WALCL's weekly Wednesday level, the FX legs' last close ≤ month
+ * end). Pure, exported (the venue-drift discipline). Fail closed per
+ * month on any leg missing.
+ */
+export function globalLiquiditySeries(
+  walcl: readonly SeriesPoint[],
+  ecbAssetsEurMillions: readonly SeriesPoint[],
+  bojAssetsOkuYen: readonly SeriesPoint[],
+  eurUsd: readonly SeriesPoint[],
+  usdJpy: readonly SeriesPoint[],
+): SeriesPoint[] {
+  const lastOnOrBefore = (series: readonly SeriesPoint[], date: string): number | undefined => {
+    let v: number | undefined;
+    for (const p of series) {
+      if (p.date > date) break;
+      v = p.value;
+    }
+    return v;
+  };
+  const bojByMonth = new Map(bojAssetsOkuYen.map((p) => [p.date, p.value]));
+  const out: SeriesPoint[] = [];
+  for (const ecb of ecbAssetsEurMillions) {
+    const [y, m] = ecb.date.split('-').map(Number) as [number, number, number];
+    const monthEnd = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+    const boj = bojByMonth.get(ecb.date);
+    const fed = lastOnOrBefore(walcl, monthEnd);
+    const eur = lastOnOrBefore(eurUsd, monthEnd);
+    const jpy = lastOnOrBefore(usdJpy, monthEnd);
+    if (boj === undefined || fed === undefined || eur === undefined || jpy === undefined) continue; // fail closed
+    if (boj <= 0 || fed <= 0 || eur <= 0 || jpy <= 0) continue;
+    const usdMillions = fed + ecb.value * eur + boj * 100 / jpy;
+    out.push({ date: ecb.date, value: Math.round((usdMillions / 1e6) * 100) / 100 });
+  }
+  return out;
+}
+
+/**
+ * GF-S11 (2026-11-07, the owner's recorded I9 answer): the CPI SURPRISE
+ * join — for every month the CPIAUCSL index has gained, the realised MoM
+ * print (the SA index's own consecutive-pair change — the headline print
+ * basis) minus the Cleveland Fed's FINAL nowcast (the frozen accumulated
+ * observation), in percentage points.
+ *
+ * The release-marker rule (the venue's own semantics): a month still
+ * present in the CURRENT page fetch (`fetchedMonths`) is NOT yet
+ * released — its nowcast is still live, so no surprise derives for it
+ * even if the CPIAUCSL mirror raced ahead (fail closed on the race).
+ * `existing` carries the stored surprise accumulation: a month already
+ * derived is never re-derived (the surprise is immutable once printed —
+ * a CPI revision does not re-fire the join). Pure, exported so the
+ * Worker's 04:20 phase and the Node inline venue derive the identical
+ * series.
+ */
+export function cpiSurpriseSeries(
+  nowcast: readonly SeriesPoint[],
+  fetchedMonths: ReadonlySet<string>,
+  cpiIndexSa: readonly SeriesPoint[],
+  existing: readonly SeriesPoint[],
+): SeriesPoint[] {
+  const nowcastByMonth = new Map(nowcast.map((p) => [p.date.slice(0, 7), p.value]));
+  const derived = new Map(existing.map((p) => [p.date.slice(0, 7), p.value]));
+  const out: SeriesPoint[] = [...existing];
+  let appended = false;
+  for (let i = 1; i < cpiIndexSa.length; i++) {
+    const prev = cpiIndexSa[i - 1]!;
+    const curr = cpiIndexSa[i]!;
+    const month = curr.date.slice(0, 7);
+    if (prev.value <= 0 || curr.value <= 0) continue; // fail closed on a broken index leg
+    if (fetchedMonths.has(month)) continue; // still being nowcast — not released per the venue's own marker
+    if (derived.has(month)) continue; // already printed once — the surprise is immutable
+    const finalNowcast = nowcastByMonth.get(month);
+    if (finalNowcast === undefined || !Number.isFinite(finalNowcast)) continue; // no accumulated nowcast for that month (the standing start)
+    const realisedMom = (curr.value / prev.value - 1) * 100;
+    out.push({ date: curr.date, value: Math.round((realisedMom - finalNowcast) * 100) / 100 });
+    appended = true;
+  }
+  if (appended) out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  return out;
+}
+
+/**
  * 2026-10-21 data-integrity round: the monthly CHANGE series of a level
  * series (PAYEMS → nonfarm payrolls print, in the level's own units —
  * thousands of jobs). Pure: one output point per consecutive input pair,
@@ -681,6 +809,27 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   if (inputs.rung2?.sgeAu9999 !== undefined && out['gold-usd'] !== undefined && fx.CNY !== undefined) {
     put('shanghai-gold-premium', shanghaiPremiumSeries(inputs.rung2.sgeAu9999, out['gold-usd']!, fx.CNY));
   }
+  // GF-S11 (P4, 2026-11-07 — audit report §4 rank 34 / I11): GLOBAL
+  // LIQUIDITY — the Fed + ECB + BoJ balance-sheet aggregate in USD, the
+  // liquidity side of money. The ECB/BoJ legs are the rung-2 phase's raw
+  // derivation inputs (never cards of their own — the sgeAu9999
+  // pattern); the WALCL + FX legs are the build's own series. Derives
+  // ONLY when both rung-2 legs are present (the Worker's 04:20 phase +
+  // the Node inline venue; the 04:10 main rung carries the reading
+  // forward). The ECB leg's licence verdict (unknown → fail-closed
+  // publicly) governs the card's display — recorded in the register.
+  if (
+    inputs.rung2?.ecbEurosystemAssets !== undefined &&
+    inputs.rung2?.bojTotalAssets !== undefined &&
+    out['walcl'] !== undefined &&
+    fx.EUR !== undefined &&
+    fx.JPY !== undefined
+  ) {
+    put(
+      'global-liquidity',
+      globalLiquiditySeries(out['walcl']!, inputs.rung2.ecbEurosystemAssets, inputs.rung2.bojTotalAssets, fx.EUR, fx.JPY),
+    );
+  }
   // GF-S10 (audit §4 rank 32 / I4): the UoM 5–10y household anchor —
   // the rung-2 series map carries the fetched full history (the generic
   // loop below also covers it; kept explicit here for the reading-order
@@ -748,6 +897,12 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   // and the monthly nonfarm-payrolls CHANGE derived from the PAYEMS level
   // (the NFP print the market watches; value in thousands of jobs).
   put('us-gdp-growth', fred.A191RL1Q225SBEA);
+  // GF-S11 (P4, 2026-11-07 — audit report §4 rank 40 / G3): the US federal
+  // debt as a share of GDP — the structural anchor of the fiscal-dominance
+  // channel (beside us-deficit-12m + govt-interest-revenue). The
+  // quarterly FRED group's own member (zero extra subrequests — the
+  // T-16 scan record landed public-domain, 2026-11-07).
+  put('debt-to-gdp', fred.GFDEGDQ188S);
   put('us-nfp', fred.PAYEMS !== undefined ? monthlyChangeSeries(fred.PAYEMS) : undefined);
   // Platinum: the precious/industrial metal from the SAME Pink Sheet
   // workbook the other metals ride (zero extra requests, L1 licence).
@@ -799,6 +954,27 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
     } else if (base.length > 0) {
       put('gold-usd', base);
     }
+  }
+
+  // GF-S11 (P4, 2026-11-07 — audit report §4 rank 30 / I10): the JASTRAM
+  // REAL GOLD PRICE — the month's closing gold price (the series just
+  // built above) deflated by the CPI index level (CPIAUCNS — the BLS
+  // headline NSA basis), in the CPI's own 1982–84 dollars. The lagging
+  // CPI leg governs the monthly cadence (the us-cpi-yoy shape). A
+  // CONTEXT CARD (rule: info — never votes).
+  if (out['gold-usd'] !== undefined && fred.CPIAUCNS !== undefined) {
+    put('real-gold-price', realGoldPriceSeries(out['gold-usd']!, fred.CPIAUCNS));
+  }
+  // GF-S11 (P4, 2026-11-07 — audit report §4 rank 31 / X7): the
+  // GOLD/PLATINUM RATIO — the second precious-bloc ratio beside
+  // gold-silver, derived from the two series this build just made (the
+  // same-date inner join, 2dp — a ~2× ratio reads honestly at 2dp). A
+  // CONTEXT CARD (rule: info — never votes).
+  if (out['gold-usd'] !== undefined && out['platinum'] !== undefined) {
+    put(
+      'gold-platinum',
+      quantized(combineSeries(out['gold-usd']!, out['platinum']!, (g, p) => g / p), 2),
+    );
   }
 
   // Silver: same recipe with XAG.
@@ -1101,6 +1277,52 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
   'shanghai-gold-premium': {
     name: 'Shanghai Gold Exchange Au99.99 ÷ (gold-api XAU × Frankfurter USD/CNY), derived',
     url: 'https://en.sge.com.cn/data_DelayedQuotes',
+  },
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+  // accumulator's cards + the nine P4 context cards' source lines.
+  'cpi-nowcast': {
+    name: 'Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
+    url: 'https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting',
+  },
+  'cpi-surprise': {
+    name: 'BLS CPI (CPIAUCSL via FRED) − the Cleveland Fed final nowcast, derived',
+    url: 'https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting',
+  },
+  'real-gold-price': {
+    name: 'gold-usd ÷ CPIAUCNS (FRED), derived — the CPI’s own 1982–84 dollar base',
+    url: 'https://fred.stlouisfed.org/series/CPIAUCNS',
+  },
+  'gold-platinum': {
+    name: 'gold-usd ÷ platinum (gold-api XPT + the Pink Sheet base), derived',
+    url: 'https://gold-api.com/',
+  },
+  'global-liquidity': {
+    name: 'FRED WALCL + ECB BSI T00 + FRED JPNASSETS (Frankfurter FX-converted), derived',
+    url: 'https://www.ecb.europa.eu/press/pr/wfs/html/index.en.html',
+  },
+  'sge-gold-withdrawals': {
+    name: 'Shanghai Gold Exchange (monthly Data Highlights — withdrawal volume)',
+    url: 'https://en.sge.com.cn/data_MonthlyReport',
+  },
+  'swiss-gold-flow': {
+    name: 'BAZG open data — Goods: foreign trade, gold imports by country',
+    url: 'https://ocean.bazg.admin.ch/open-data-reports/TN8_controlCode_Gold_IMP_en_v1/TN8_controlCode_Gold_IMP_en_v1.csv',
+  },
+  'gold-equities-ratio': {
+    name: 'Yahoo Finance (GLD ÷ SPY daily closes), derived',
+    url: 'https://finance.yahoo.com/',
+  },
+  'rstar-us': {
+    name: 'Federal Reserve Bank of New York (Holston–Laubach–Williams estimates)',
+    url: 'https://www.newyorkfed.org/research/policy/rstar',
+  },
+  'etf-short-interest': {
+    name: 'ETF short interest (the fund pages — no licence-clean venue verified)',
+    url: 'https://www.finra.org/finra-data/browse-catalog/equity-short-interest',
+  },
+  'debt-to-gdp': {
+    name: 'FRED (GFDEGDQ188S)',
+    url: 'https://fred.stlouisfed.org/series/GFDEGDQ188S',
   },
   // GF-P3 (2026-11-06, audit §4 — OI-GA-4's recorded context-first answer).
   // The three WGC/PBoC context cards: their data adapters ship at GF-S10

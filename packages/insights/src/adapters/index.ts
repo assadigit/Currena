@@ -39,6 +39,13 @@ export {
   SGE_AU9999,
 } from './sge';
 export { shanghaiPremiumSeries, GRAMS_PER_TROY_OUNCE } from './derived';
+// GF-S11 (2026-11-07): the P4 derivation functions (the venue-drift
+// discipline — the Worker phases and the Node inline build share them).
+export {
+  realGoldPriceSeries,
+  globalLiquiditySeries,
+  cpiSurpriseSeries,
+} from './derived';
 export {
   YAHOO_CHART_BASE,
   YAHOO_CHART_USER_AGENT,

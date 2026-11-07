@@ -536,6 +536,15 @@ const UNCHANGED_NORMAL_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // stuck sahm feed is still caught by the source report (the FRED fetch
   // itself failing), which is the honest signal.
   'sahm-rule',
+  // GF-S11 (2026-11-07, the owner's recorded I9 answer): the CPI NOWCAST
+  // legitimately repeats its value across rungs — the Cleveland Fed
+  // refines the current month's nowcast each BUSINESS day, and a stable
+  // nowcast prints the same 2dp value day after day while the month's
+  // point refines (the observation stamp is the month, not the day). The
+  // accumulation itself is the fetch report's row (the page fetch
+  // succeeding) — the honest signal for a broken feed, exactly the sahm
+  // reasoning.
+  'cpi-nowcast',
 ]);
 
 /**
@@ -772,6 +781,19 @@ const POINTS_KIND_EXPECTED: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   // the D-11/D-12 derived real curve is a yield slope in points.
   'michigan-5y-expectations',
   'real-curve-10y5y',
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+  // accumulator's cards (the nowcast + the surprise both speak in
+  // percentage points), the G3 debt/GDP share + the R11 r-star (the
+  // borrowing-costs family's own percentage-points convention), and the
+  // two physical-flow tonnage cards + the F12 short-interest share (their
+  // changes are TONNES and share-POINTS — level changes, never %).
+  'cpi-nowcast',
+  'cpi-surprise',
+  'debt-to-gdp',
+  'rstar-us',
+  'swiss-gold-flow',
+  'sge-gold-withdrawals',
+  'etf-short-interest',
   // M5 Wave 2 (2026-10-24): the euro-area AAA 10-year yield — a rate-family
   // series in percentage points.
   'euro-aaa-10y',

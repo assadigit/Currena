@@ -769,6 +769,62 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     termsUrl: 'https://www.pbc.gov.cn/en/3688110/index.html',
     notes: 'GF-S10: the F13 adapter DEFERRED (recorded-open) — a live official URL + a quoted terms line unlocks it.',
   },
+  // ——— GF-S11 (2026-11-07, the round-2 answers' execution + P4 — every
+  // ——— terms line below was read live this session).
+  cleveland: {
+    id: 'cleveland',
+    provider: 'cleveland',
+    label: 'Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
+    usedFor: 'cpi-nowcast / cpi-surprise — I9 (audit §4 rank 33, the owner\u2019s recorded BUILD answer)',
+    method: 'M1',
+    runtime: 'worker',
+    level: 'L2',
+    ownerAccepts: false, // the owner-acceptance class — no affirmative reuse grant quoted from this venue
+    override: false,
+    enabled: true, // the fetch runs (the Bank's own public page, keyless); the DISPLAY gate is the licence verdict
+    termsLines:
+      'The Bank\u2019s own "Privacy and Terms of Use" (read live 2026-11-07, clevelandfed.org/privacy): it "provides its information, data, and materials… free of charge as a convenience to its clients, depository institutions, and the public" but quotes NO affirmative reuse grant (unlike the NY Fed\u2019s terms), and notes information on the site "may be copyrighted". The page carries "© 2026 Federal Reserve Bank of Cleveland" + the suggested citation "Inflation Nowcasting." Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast. L2 fail-closed: private display until the owner records acceptance.',
+    termsReadOn: '2026-11-07',
+    attribution: 'Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
+    termsUrl: 'https://www.clevelandfed.org/privacy',
+    notes: 'GF-S11: the nowcasting page\u2019s tables verified live 2026-11-07 (Nov 2026 CPI +0.19% MoM SA / Oct +0.24% — the blank-cell release marker is the venue\u2019s own).',
+  },
+  bazg: {
+    id: 'bazg',
+    provider: 'bazg',
+    label: 'Federal Office for Customs and Border Security FOCBS / BAZG (Swiss foreign-trade open data)',
+    usedFor: 'swiss-gold-flow — F16 (audit §4 rank 39, the Swiss flow read)',
+    method: 'M1',
+    runtime: 'worker',
+    level: 'L1',
+    ownerAccepts: null,
+    override: false,
+    enabled: true,
+    termsLines:
+      'The opendata.swiss terms-of-use page (read live 2026-11-07): "The terms of use for datasets of the federal authorities on opendata.swiss are determined by the existing legal framework… The symbols next to each dataset indicate what use is permitted." The dataset\u2019s DCAT licence (read live 2026-11-07 from register.ld.admin.ch, LINDAS): dcat-ap.ch/vocabulary/licenses/terms_by_ask — "Open use. Use for commercial purposes requires permission of the data owner. You may use this dataset for non-commercial purposes… You are recommended to provide the source." Currena\u2019s non-commercial display rides the owner\u2019s recorded non-commercial statement (2026-10-17, the UoM precedent) with the source provided.',
+    termsReadOn: '2026-11-07',
+    attribution: 'Source: Federal Office for Customs and Border Security FOCBS / BAZG (Swiss foreign trade statistics)',
+    termsUrl: 'https://opendata.swiss/en/terms-of-use',
+    notes: 'GF-S11: the open-data CSV verified live 2026-11-07 (ocean.bazg.admin.ch — monthly gold imports by country × control code, 2021-01 → 2026-09, ~2.4 MB; the swissimpex.app itself TLS-blocks this venue).',
+  },
+  'fund-pages': {
+    id: 'fund-pages',
+    provider: 'fund-pages',
+    label: 'ETF short interest (the fund pages — no licence-clean venue)',
+    usedFor: 'etf-short-interest — F12 (audit §4 rank 43, the squeeze-tell complement)',
+    method: null,
+    runtime: null,
+    level: 'L2',
+    ownerAccepts: false,
+    override: false,
+    enabled: false, // fail closed — no fetch wired until a licence-clean venue appears
+    termsLines:
+      'The venue triage (read live 2026-11-07, the honest UA): nasdaq.com\u2019s fund pages TIME OUT from this venue; nyse.com\u2019s short-interest page answers HTTP 403 (the usmint/MCX block class); FINRA\u2019s equity-short-interest API is registration-gated (the pre-approval class). The card stays awaiting data (fail closed) until a licence-clean venue appears.',
+    termsReadOn: '2026-11-07',
+    attribution: '',
+    termsUrl: null,
+    notes: 'GF-S11: the F12 licence verdict — the fund-page class DISAPPOINTS; recorded-open (a venue/owner round or an official free feed unlocks it).',
+  },
   'aip-petrol': {
     id: 'aip-petrol',
     provider: 'aip',
@@ -801,6 +857,34 @@ export const UPSTREAM_LEGS: Readonly<Record<string, readonly string[]>> = {
   'real-curve-10y5y': ['fred:DFII10', 'fred:DFII5'],
   'shanghai-gold-premium': ['sge', 'gold-api', 'frankfurter'],
   'michigan-5y-expectations': ['uom'],
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+  // accumulator's surprise join (the Cleveland nowcast + the SA CPI index)
+  // + the P4 derived cards' legs.
+  'cpi-nowcast': ['cleveland'],
+  'cpi-surprise': ['cleveland', 'fred:CPIAUCSL'],
+  // I10: the real gold price rides the gold-usd card's own legs (the
+  // Yahoo history leg's display bar is lifted by the standing owner
+  // directive — the gold-oil-ratio A-4 precedent covers the derived
+  // ratio's inheritance) + the NSA CPI index.
+  'real-gold-price': ['gold-api:XAU', 'yahoo:GC=F', 'fred:CPIAUCNS'],
+  // X7: the platinum card's own legs (gold-api XPT + the Pink Sheet base)
+  // beside gold-usd's.
+  'gold-platinum': ['gold-api:XAU', 'yahoo:GC=F', 'gold-api:XPT', 'world-bank'],
+  // I11: the Fed + ECB + BoJ balance-sheet legs + the two Frankfurter FX
+  // legs. The ECB Data Portal row's unquoted terms (unknown → fail-closed
+  // publicly) govern the card's public display — the honest default.
+  'global-liquidity': ['fred:WALCL', 'ecb:BSI.T00', 'fred:JPNASSETS', 'frankfurter'],
+  // X5: the GLD/SPY legs — the Yahoo L2 class is owner-accepted for FETCH
+  // but carries NO public-display directive for these tiles (the card
+  // serves private until the owner records one).
+  'gold-equities-ratio': ['yahoo:GLD', 'yahoo:SPY'],
+  // F15: the SGE monthly statistics — the same L2 class the owner accepted
+  // for display (the round-2 answer (e), 2026-11-07).
+  'sge-gold-withdrawals': ['sge'],
+  // F16: the BAZG open-data row (terms_by_ask — the non-commercial class).
+  'swiss-gold-flow': ['bazg'],
+  // F12: no fetch wired — the licence verdict records the fail-closed state.
+  'etf-short-interest': ['fund-pages'],
   brent: ['fred:DCOILBRENTEU', 'yahoo:BZ=F'],
   'gold-usd': ['gold-api:XAU', 'yahoo:GC=F'],
   'silver-usd': ['gold-api:XAG', 'yahoo:SI=F'],
@@ -1189,6 +1273,24 @@ export const SANITY_RANGES: Readonly<Record<string, SanityRange>> = {
   'eia-crude-stocks': { minExclusive: true, max: 5_000_000 },
   // A-7: a share of open interest is bounded [-100, 100] by construction.
   'cftc-gold-positioning': { min: -100, max: 100 },
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+  // accumulator's cards + the P4 physical/share levels. The CPI MoM
+  // nowcast and the surprise carry impossibility ceilings far beyond any
+  // printed value (the observed MoM nowcasts ≈ −0.5…+1.5%; surprises
+  // ≈ ±0.5pp); the Swiss gold imports and the SGE withdrawals are
+  // monthly tonnage (the observed Swiss range 124.5–298.1 t across
+  // 2021–2026, the SGE withdrawals ~90–250 t — a 1,000 t ceiling catches
+  // a gross parse break); the debt/GDP share and the r-star carry their
+  // own observed-history ceilings; the real gold price and the two
+  // precious-bloc ratios are positive by construction.
+  'cpi-nowcast': { min: -3, max: 5 },
+  'cpi-surprise': { min: -3, max: 3 },
+  'swiss-gold-flow': { minExclusive: true, max: 1_000 },
+  'sge-gold-withdrawals': { minExclusive: true, max: 1_000 },
+  'debt-to-gdp': { min: 0, max: 300 },
+  'rstar-us': { min: -2, max: 10 },
+  'real-gold-price': { minExclusive: true },
+  'gold-platinum': { minExclusive: true },
   // 2026-10-26 gap-audit build, A-8..A-10: the CLI is an index
   // normalised around 100 (the parser band 50–150); the news-based
   // indexes are positive with an impossibility ceiling far above any

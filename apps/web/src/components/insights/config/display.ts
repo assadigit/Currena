@@ -201,6 +201,26 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'real-curve-10y5y': { decimals: 2, unit: 'points' },
   'michigan-5y-expectations': { decimals: 1, unit: 'percent' },
   'shanghai-gold-premium': { decimals: 2, unit: 'percent' },
+  // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
+  // accumulator's pair + the nine context cards. The nowcast and the
+  // surprise read as percentage points 2dp (a nowcast is quoted in basis
+  // points); the real gold price in whole 1982–84 dollars (the CPI's own
+  // base); the two precious-bloc ratios at 2dp/1dp like gold-silver; the
+  // global-liquidity aggregate in trillions (already USD-converted); the
+  // two physical-flow tonnage cards at 0dp (the WGC convention); the
+  // GLD/SPY ratio at 4dp (the breadth convention); r-star and debt/GDP
+  // as percentage points (the borrowing-costs family).
+  'cpi-nowcast': { decimals: 2, unit: 'percent' },
+  'cpi-surprise': { decimals: 2, unit: 'points' },
+  'real-gold-price': { decimals: 0, unit: 'usd' },
+  'gold-platinum': { decimals: 2, unit: 'ratio' },
+  'global-liquidity': { decimals: 2, unit: 'usd-tr' },
+  'sge-gold-withdrawals': { decimals: 0, unit: 'tonnes' },
+  'swiss-gold-flow': { decimals: 0, unit: 'tonnes' },
+  'gold-equities-ratio': { decimals: 4, unit: 'ratio' },
+  'rstar-us': { decimals: 2, unit: 'percent' },
+  'debt-to-gdp': { decimals: 1, unit: 'percent' },
+  'etf-short-interest': { decimals: 1, unit: 'percent' },
   // M6 Wave 3 (OD-8/D-42, 2026-10-25) — the leading-edge batch: the
   // mortgage/liquidity/spending family. WALCL is $ millions → 'usd-tr'
   // ×1e-6 ("US$6.8 trillion"); retail sales $ millions → 'usd-bn' ×1e-3

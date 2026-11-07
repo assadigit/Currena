@@ -63,78 +63,48 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'boj-rate',
       'breakeven-10y',
       'breakeven-5y5y',
-      // Session 3 (G2, 2026-10-31): the interplay card — derived from the
-      // two citation-required FRED legs (T5YIFR + T5YIE), both already in
-      // this list's licence class (display-permitted with attribution).
       'breakeven-tilt',
       'brent',
       'btc-usd',
-      // gap-closure S6-M6.3 (2026-11-02): the Italy−Germany spread — its
-      // two legs are the FRED OECD citation-required mirrors (the
-      // bund/gilt class), display-permitted with attribution.
       'btp-bund-spread',
       'bund-10y',
       'cfnai',
       'empire-state',
       'gdpnow',
       'gilt-10y',
+      'global-liquidity',
       'gold-oil-ratio',
-      // GF-P2 (2026-11-05): the registry re-run surfaced the GF-P1 drift —
-      // the D-5 base deepening added the Yahoo GC=F ÷ SI=F history legs, so
-      // the ratio's audit level is now L2 (the worst leg) while the
-      // standing owner directives keep it public (the gold-oil-ratio A-4
-      // precedent: the derived ratio inherits its parents' lifted display
-      // bars). The M-2 rule follows automatically: its public history
-      // serves the visible window only, exactly like its parents'.
+      'gold-platinum',
       'gold-silver',
-    'gold-usd',
+      'gold-usd',
       'jgb-10y',
       'median-cpi',
       'michigan-1y-expectations',
       'michigan-sentiment',
       'mortgage-30y',
-      // gap-closure S3-M3.2 (2026-11-01): the net-liquidity spread — its
-      // worst leg is RRPONTSYD (citation-required, display-permitted with
-      // attribution); the term-premium/tga/bank-reserves cards are L0
-      // public-domain and never bounded.
       'net-liquidity',
       'nfci',
-      // gap-closure S6-M6.1 (2026-11-02): the NZ 10-year mirror — FRED
-      // citation-required (the bund/gilt class), display-permitted with
-      // attribution.
       'nz-10y',
       'philly-fed',
-      // gap-closure S3-M3.2: the funding spreads — repo-stress's worst leg
-      // is SOFR (already in this licence class), reverse-repo is RRPONTSYD
-      // itself (citation-required, display-permitted with attribution).
+      'real-gold-price',
       'repo-stress',
       'reverse-repo',
+      'sge-gold-withdrawals',
       'shanghai-gold-premium',
       'shiller-cape',
       'shiller-ecy',
       'silver-usd',
       'sofr',
-      // gap-closure S6-M6.3 (2026-11-02): the S&P 500 breadth ratio — the
-      // Yahoo L2 legs ride the spec-directed display bar (the usdaed
-      // class), so its public history serves the visible window only.
       'sp500-breadth-ratio',
       'sticky-cpi',
       'stress-stlfsi',
       't5yie',
-      // A-3: the US−Japan gap (DGS10 public-domain + MOF PDL1.0 + the OECD
-    // mirror's citation-required leg, display-permitted).
-    'us-japan-10y-gap',
-    // 2026-10-29 owner round ("add dollar against UAE currency"): the
-    // dirham card — Yahoo L2 (ownerAccepts, the register row the Brent
-    // gap-fill already rides) + the owner's own display directive.
-    'usdaed',
-    'vix',
+      'us-japan-10y-gap',
+      'usdaed',
+      'vix',
       'yield-curve-10y2y',
-      // 2026-10-26 gap-audit build, A-1: the 10y−3m curve leg (T10Y3M,
-      // citation-required — display-permitted with attribution).
       'yield-curve-10y3m',
-    ]);
-  });
+    ]);  });
 
   it('an L0 public id (us10y: DGS10, public domain) is never bounded', () => {
     const us10y = INDICATOR_AUDIT_BY_ID.get('us10y')!;

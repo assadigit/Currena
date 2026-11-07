@@ -38,4 +38,19 @@ export interface Rung2SeriesInputs {
    * Frankfurter CNY leg.
    */
   sgeAu9999?: SeriesPoint[];
+  /**
+   * GF-S11 (P4, 2026-11-07 — audit report §4 rank 34 / I11): the ECB
+   * Eurosystem's total assets (BSI T00, EUR millions, monthly) — the
+   * global-liquidity aggregate's ECB leg. A raw DERIVATION INPUT, never
+   * a card of its own (the sgeAu9999 pattern); the aggregate derives
+   * inside buildIndicatorSeries from this leg + the BoJ leg + the WALCL
+   * and Frankfurter FX series.
+   */
+  ecbEurosystemAssets?: SeriesPoint[];
+  /**
+   * GF-S11 (P4 / I11): the Bank of Japan's total assets (FRED JPNASSETS,
+   * ¥100-million units, monthly) — the global-liquidity aggregate's BoJ
+   * leg. A raw DERIVATION INPUT (the sgeAu9999 pattern).
+   */
+  bojTotalAssets?: SeriesPoint[];
 }

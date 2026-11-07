@@ -54,7 +54,7 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
   it('fred: 56 series, worst level L2 across its L0/L2 mix, deduped licences (2026-10-25 M6: +8 Wave-3 series, -boe-rate to the BoE row; the 2026-10-26 gap-audit build adds T10Y3M, A-1; the 2026-10-31 gap-closure S2-M2.4 round adds WSEFINTL1, the weekly custody card; the 2026-11-01 gap-closure S3-M3.2 round adds the four direct liquidity cards — term-premium-10y, tga, reverse-repo, bank-reserves — riding rung4; the 2026-11-01 gap-closure S3-M3.4 round adds the six growth-nowcast/survey cards — gdpnow, empire-state, continuing-claims, median-cpi, sticky-cpi, sloos-ci-tightening; the 2026-11-01 gap-closure S3-M3.5 round registers MTSDS133FMS — the deficit card leg; the 2026-11-06 GF-P3 round adds the four FRED-sourced voter series — DFII5, DTWEXBGS, DTWEXEMEGS, DPCREDIT)', () => {
     const fred = rows.find((r) => r.provider === 'fred');
     expect(fred).toBeDefined();
-    expect(fred!.seriesCount).toBe(56); // A-2 moves jgb-10y to the mof row; S2-M2.4 adds WSEFINTL1; S3-M3.2 adds the four direct liquidity cards; S3-M3.4 adds the six growth-nowcast/survey cards; S3-M3.5 registers MTSDS133FMS (the deficit leg); S6-M6.1 registers IRLTLT01NZM156N (the NZ 10y mirror); GF-P3 (2026-11-06) adds the four FRED-sourced voter series — DFII5 (real-yield-5y), DTWEXBGS (dollar-broad), DTWEXEMEGS (dollar-eme), DPCREDIT (bank-stress)
+    expect(fred!.seriesCount).toBe(57); // GF-S11 (2026-11-07): +GFDEGDQ188S — the G3 debt/GDP structural anchor (public-domain per the T-16 scan) // A-2 moves jgb-10y to the mof row; S2-M2.4 adds WSEFINTL1; S3-M3.2 adds the four direct liquidity cards; S3-M3.4 adds the six growth-nowcast/survey cards; S3-M3.5 registers MTSDS133FMS (the deficit leg); S6-M6.1 registers IRLTLT01NZM156N (the NZ 10y mirror); GF-P3 (2026-11-06) adds the four FRED-sourced voter series — DFII5 (real-yield-5y), DTWEXBGS (dollar-broad), DTWEXEMEGS (dollar-eme), DPCREDIT (bank-stress)
     expect(fred!.levels).toEqual(['L0', 'L2']);
     expect(fred!.worstLevel).toBe('L2');
     // 3 distinct licence names across the 56 series (public-domain,
@@ -78,7 +78,7 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
     // kill-switch aggregate flips mixed → ON: all 56 series enabled, the
     // four seats fetch + fire on their cadences.
     expect(fred!.licences).not.toContain('FRED series — copyright not scanned (fail closed)');
-    expect(fred!.enabledCount).toBe(56);
+    expect(fred!.enabledCount).toBe(57);
     expect(aboutEnabledState(fred!)).toBe('on');
   });
 
@@ -98,8 +98,8 @@ describe('aboutSourceRows — one row per provider from the real sidecar', () =>
 
   it('derived: fully enabled since the 2026-10-21 round un-disabled the crosses (silver-btc retired 2026-10-23, OD-7)', () => {
     const derived = rows.find((r) => r.provider === 'derived');
-    expect(derived!.seriesCount).toBe(23); // GF-S10 (2026-11-06) adds the D-11/D-12 derived real curve (real-curve-10y5y, DFII10 − DFII5) + the F6 Shanghai premium (shanghai-gold-premium, SGE ÷ converted London ounce) → 23 // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18 + the S3-M3.5 deficit 12-month sum (us-deficit-12m) → 19 + the S6-M6.1 AUD/NZD cross (audnzd) → 20 + the S6-M6.3 Italy−Germany spread (btp-bund-spread) → 21
-    expect(derived!.enabledCount).toBe(23); // GF-S10: ALL 23 enabled — the premium's SGE leg is L2 DISPLAY-gated (private mode until the owner's recorded acceptance, the site-mode hide), but the FETCH is enabled (the exchange's own public page — the register's own sge row: "the fetch runs … the DISPLAY gate is the licence verdict")
+    expect(derived!.seriesCount).toBe(28); // GF-S11 (2026-11-07): +5 — the I10 real gold price (gold ÷ CPI) + the X7 gold/platinum ratio + the I11 global-liquidity aggregate (WALCL + ECB T00 + JPNASSETS, FX-converted) + the I9 CPI surprise (the print-minus-nowcast join) + the X5 GLD/SPY ratio // GF-S10 (2026-11-06) adds the D-11/D-12 derived real curve (real-curve-10y5y, DFII10 − DFII5) + the F6 Shanghai premium (shanghai-gold-premium, SGE ÷ converted London ounce) → 23 // A-5 adds rba-fed-gap (A-4's gold-oil-ratio is derived too → 14) + the Session-3 breakeven-tilt (G2, 2026-10-31) + the S3-M3.2 liquidity spreads (repo-stress, net-liquidity) → 18 + the S3-M3.5 deficit 12-month sum (us-deficit-12m) → 19 + the S6-M6.1 AUD/NZD cross (audnzd) → 20 + the S6-M6.3 Italy−Germany spread (btp-bund-spread) → 21
+    expect(derived!.enabledCount).toBe(28); // GF-S10: ALL 23 enabled — the premium's SGE leg is L2 DISPLAY-gated (private mode until the owner's recorded acceptance, the site-mode hide), but the FETCH is enabled (the exchange's own public page — the register's own sge row: "the fetch runs … the DISPLAY gate is the licence verdict")
     expect(aboutEnabledState(derived!)).toBe('on');
     // GF-S11 (2026-11-07): the SGE L2 class is OWNER-ACCEPTED (the round-2
     // answer (e), the README's round-2 decision table in the gap-fill
