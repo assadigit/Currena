@@ -35,8 +35,10 @@ authoritative per-id table reconciled against `data/indicators.json`).
   investor's review** (spec §19 lists the questions).
 - **Phase 3 (final spec):** pending the investor — roadmap S22 records the
   answers as D-49+.
-- **Phase 4 (build):** **30-session roadmap ready — next action: the
-  kickoff prompt in `03-STRATEGY-LOG.md` §9 (Session 1/30).**
+- **Phase 4 (build):** **RUNNING — Session 1/30 (S1 scaffold &
+  navigation) delivered & gated 2026-11-07.** Next: Session 2/30 (S2 — the
+  data layer + `PLACEMENT.generated.md`). See the roadmap's progress board
+  for the current position.
 
 ## The one rule that trumps everything
 

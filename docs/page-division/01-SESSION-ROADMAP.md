@@ -26,7 +26,7 @@
 
 ## Phase A — Foundations (S1–S4)
 
-### ☐ S1 — Scaffold & navigation · `Session 1/30`
+### ✅ S1 — Scaffold & navigation · `Session 1/30` · delivered 2026-11-07
 - Route structure: `/` (Global placeholder), `/gold`, `/world-markets`,
   `/usa`, `/europe`, `/asia-pacific`, `/australia`, `/commodities`,
   `/currencies`.
@@ -37,6 +37,29 @@
 - **Gates:** all 10 routes render (incl. legacy intact at `/insights`);
   typecheck + lint clean; nav at 360px width; commit pushed.
 - **Deliverable:** the skeleton every later session fills.
+
+**S1 delivery record (2026-11-07):** all routes scaffolded and gated green —
+`routes/page-division/` holds the Global migration hub + the shared
+destination placeholder (purpose · membership · build sessions · decision
+traceability per spec §4–§12); the topbar is the D-45 group with two
+disclosure dropdowns (Regions ▾ · Tools ▾) and the legacy Insights pill
+(badged); the drawer groups Markets · Legacy · Tools; the deprecation
+banner rides atop `/insights` in every load state; 55 new fa strings queued
+as unreviewed in the Persian copy manifest. **One build-session decision,
+flagged for owner ratification (not a D-number — those are owner
+decisions):** the Converter — the eager entry-chunk route until S1 — moved
+**unchanged** to `/converter`, because D-20 makes Global the landing page
+and D-46 gives `/` to Global; zero content loss (the page is byte-identical,
+now lazy-loaded, reachable from Tools ▾ / the drawer; the ErrorBoundary
+"Go to converter" button points there too). Gates run: tsc 6/6 packages ·
+eslint 0/0 repo-wide · copy:audit clean (6,920 entries) · secret scan clean
+(8 patterns / 893 files) · suite 14,621 (web 12,618 — +1 router test) ·
+build + budgets held (entry 267.63/80.93 kB gz vs 296/89.5 budgets; Insights
+chunk 1,613.28/373.82 vs 1,620/377) · all 10 routes browser-verified with
+live production data · nav at 360×844 and 1024×768 · RTL/fa verified ·
+VLM visual review pass (pre-existing mobile polish items on the legacy hero
+noted for S19: the Global-gauge emoji spacing, the ⓘ wrap on the data-as-of
+line). Pre-existing display quirk observed, not touched: none in S1 scope.
 
 ### ☐ S2 — Data layer & the authoritative placement table · `Session 2/30`
 - Page-level data projections from the existing API (per-page payloads or
@@ -196,7 +219,7 @@
 
 | Phase | Sessions | Status |
 |---|---|---|
-| A Foundations | S1–S4 | ☐ |
+| A Foundations | S1–S4 | 🔄 S1 ✅ delivered & gated 2026-11-07 · S2 next |
 | B Gold | S5–S6 | ☐ |
 | C World Markets | S7–S8 | ☐ |
 | D USA | S9–S11 | ☐ |
@@ -209,4 +232,5 @@
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 0/30 — kickoff prompt issued (strategy log §9).**
+**Current position: Session 1/30 delivered 2026-11-07 · 29 remaining — next
+action: Session 2/30 (S2, data layer + the authoritative placement table).**

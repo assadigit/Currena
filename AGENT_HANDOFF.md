@@ -20,7 +20,20 @@
 
 ## A. What comes next
 
-**UPDATE 2026-11-07 (later the same day) — A SUCCESSOR PROGRAM EXISTS: the
+**UPDATE 2026-11-07 (build underway) — THE PAGE-DIVISION BUILD STARTED:
+Session 1/30 (S1 — scaffold & navigation) delivered & gated.** All ten
+routes live (`/` Global placeholder · the eight destination placeholders ·
+legacy `/insights` with the D-46 deprecation banner, zero content loss);
+the D-45 grouped topbar + mobile drawer are in; the Converter moved
+UNCHANGED to `/converter` (build-session decision recorded in the roadmap
+S1 entry for owner ratification). Gates ALL GREEN (tsc 6/6 · lint 0/0 ·
+copy:audit · secret scan · suite 14,621 · build+budgets · all routes
+browser-verified at 360px & desktop). **Next: Session 2/30 (S2 — the data
+layer + `PLACEMENT.generated.md`); the live position always sits in
+`docs/page-division/01-SESSION-ROADMAP.md`'s progress board.** Not
+deployed: the Worker is untouched — the owner deploys when ready.
+
+**UPDATE 2026-11-07 (earlier the same day) — A SUCCESSOR PROGRAM EXISTS: the
 page-division program** (`docs/page-division/`). The gold-meter program
 above remains CLOSED and its records authoritative; the successor is a
 **display-layer-only program** — no engine, voter, threshold, or calibration
