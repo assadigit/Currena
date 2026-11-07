@@ -120,6 +120,13 @@ Package manager is **pnpm** (Node ≥ 20).
 
 ## The Insights data inventory (ACTIVELY MAINTAINED — read this before adding/removing/changing any indicator)
 
+> **The gold meter (the gold indicator) has its own complete technical
+> reference — `docs/insights/GOLD_SYSTEM_COMPLETE_REFERENCE.md`.** Read it
+> before touching anything gold: the voter table, the shared evaluator,
+> the lane engine, every threshold and constant, the lineage, the
+> governance rules (per-seat owner approval, D-GF-1), and the step-by-step
+> revision guide. The code is the source of truth; that document is its map.
+
 **This section is the canonical on-disk record of every indicator and every
 data point the Insights page shows.** It is sourced from
 `packages/insights/src/definitions.ts` (the 161 indicators), `packages/

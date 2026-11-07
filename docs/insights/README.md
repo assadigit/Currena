@@ -12,6 +12,10 @@ worker, which is owner-personal-plan).
 
 ## Where to look first
 
+- **The gold system's complete reference** — how the gold indicator works
+  end-to-end (the 37-voter table, the evaluator, the lane engine, every
+  threshold, the lineage, the revision guide; written for humans AND AI
+  agents): **[`GOLD_SYSTEM_COMPLETE_REFERENCE.md`](GOLD_SYSTEM_COMPLETE_REFERENCE.md)**
 - **The consolidated reference** — what indicators Currena has, where each
   one is fetched from and how often, the public JSON API spec, and the
   known gaps: **[`../INDICATORS_AND_DATA_SOURCES.md`](../INDICATORS_AND_DATA_SOURCES.md)**
