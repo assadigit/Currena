@@ -430,13 +430,22 @@ export function pageMirrorIds(page: PageDivisionPageId): readonly IndicatorId[] 
   return PAGE_PLACEMENTS_BY_PAGE.get(page)?.mirrors ?? [];
 }
 
+/** The blocked-note ids attached to a page (spec §16 — Gold's quartet). */
+export function pageBlockedIds(page: PageDivisionPageId): readonly IndicatorId[] {
+  return BLOCKED_NOTES.filter((n) => n.page === page).map((n) => n.id);
+}
+
 /**
- * A page's full reading set — homes then mirrors, each id at most once
- * (mirrors are engine-derived and provably disjoint from homes; a future
- * accidental overlap is caught by reconcilePlacement as a red finding).
+ * A page's full reading set — homes, then mirrors, then blocked notes,
+ * each id at most once (mirrors are engine-derived and provably disjoint
+ * from homes; a future accidental overlap is caught by
+ * reconcilePlacement as a red finding). The blocked ids ride too: in
+ * private mode they arrive as their honest (unavailable) readings; in
+ * public mode the licence-hidden quartet is REPORTED in the projection's
+ * absentIds — the Gold page's notes, never a guess.
  */
 export function pageReadingIds(page: PageDivisionPageId): readonly IndicatorId[] {
-  return [...pageHomeIds(page), ...pageMirrorIds(page)];
+  return [...pageHomeIds(page), ...pageMirrorIds(page), ...pageBlockedIds(page)];
 }
 
 /** Every home id across all pages (the §14 count basis, blocked notes included via reconcile). */

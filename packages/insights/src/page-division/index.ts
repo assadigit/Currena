@@ -25,6 +25,7 @@ export {
   allPlacedHomeIds,
   pageHomeIds,
   pageMirrorIds,
+  pageBlockedIds,
   pageReadingIds,
   reconcilePlacement,
 } from './placement';
