@@ -1,4 +1,4 @@
-# AGENT_HANDOFF — Currena: the gold meter gap-fill program (CLOSED — COMPLETE 2026-11-07 at GF-S12 = P5: the acceptance walk verified every phase's gate from the closing session's own runs; the site LIVE)
+# AGENT_HANDOFF — Currena: the gold meter gap-fill program (CLOSED — COMPLETE 2026-11-07 at GF-S12 = P5: the acceptance walk verified every phase's gate from the closing session's own runs; the site LIVE; **the round-3 succession EXECUTED at GF-S13 (2026-11-07, later the same day): everything public that can be calculated — 180 of 184 ids readable for every visitor**)
 
 > The owner's **gold meter audit** program (`docs/specs/gold-meter-audit/`)
 > is **CLOSED — COMPLETE 2026-11-05 at GA-S4**: A1–A4 whole (the taxonomy
@@ -20,30 +20,31 @@
 
 ## A. What comes next
 
-**Nothing — the program is closed.** The final prompt is **NONE** (the
-D-GA-9 convention's honest endpoint: PROMPTS.md's foot records the
-close). The owner's **round-3 answers** (printed at the close, standing
-in the README's round-3 table) are the only open threads:
+**Nothing — the program is closed AND the round-3 successor loop closed
+with it (GF-S13, 2026-11-07).** The final prompt is **NONE**, doubly so
+(PROMPTS.md's foot records both closes). The owner's round-3 answers
+ARRIVED and were EXECUTED at GF-S13 (the blanket directive "Make
+everything Public … dont keep anything private … If you can show them,
+show and calculate them"): the Cleveland class public ((a) — `cpi-nowcast`
+0.19 + `cpi-surprise` in its honest awaiting state) · the Yahoo class
+public ((b) — `gold-equities-ratio` 0.5066, the owner overrode the
+printed keep-private recommendation) · the WGC family staying blocked
+with nothing to show ((c)) · the program staying CLOSED ((d)). The
+SHOULD-be-private reference — the owner's own ask, the future lever —
+lives in `docs/insights/LICENCES.md`. The only remaining open threads,
+both OWNER-side levers documented in that one place:
 
-- **(a) the Cleveland L2 class** — the I9 cards (`cpi-nowcast` +
-  `cpi-surprise`) serve PRIVATE; the recommendation printed: ACCEPT for
-  public display (the SGE-class L2 owner-acceptance). When the owner
-  answers, record it in the round-3 table and flip the register row in
-  a **successor owner-gated session** (a licence-register + registry
-  regeneration + copy round — the (e) execution's own pattern).
-- **(b) the X5 Yahoo class** — `gold-equities-ratio` serves PRIVATE;
-  the recommendation printed: KEEP PRIVATE (printed for completeness).
-- **(c) the WGC reply** — the authorisation draft sits at
-  `evidence/wgc-authorisation-draft-2026-11-07.md` (printed in the
-  GF-S11 final message) for the OWNER's review + send to
-  info@gold.org. If a reply arrives, record it and unlock the family
-  per its terms — that unlock is a **successor owner-gated program**
-  (the data adapters + the nine WGC-sourced cards, F3/F4/F13 +
-  F5/F11/H1–H4).
-- **(d) the program's acceptance** — the meter's final shape stands
-  verified (the acceptance evidence `evidence/gf-p5-acceptance-2026-11-07.md`);
-  the owner's recorded acceptance closes the loop formally — or the
-  shape simply stands, live.
+- **The WGC reply** — the authorisation draft sits at
+  `evidence/wgc-authorisation-draft-2026-11-07.md` for the OWNER's
+  review + send to info@gold.org. If a reply arrives, record it and
+  unlock the family per its terms — that unlock is a **successor
+  owner-gated program** (the data adapters + the nine WGC-sourced
+  cards, F3/F4/F13 + F5/F11/H1–H4).
+- **Any future hide-or-permission round** — the owner's own words:
+  "in future, where this legalities are important for me, I can hide
+  some or ask for permission" — the exact mechanism is documented
+  (one licence-register edit + `pnpm registry:generate` + one deploy;
+  the panic switch `ACCESS_MODE=private` re-arms the whole gate).
 
 **The successor note (the program's own rule, unchanged):** any future
 change to the meter — a seat, a lane, a threshold, a sign — is a NEW
@@ -57,6 +58,7 @@ D-GF-6). **NEVER seat a sign silently.**
 |---|---|---|
 | gold meter audit — **CLOSED (2026-11-05)** | GA-S1 (the taxonomy, LOCKED v1.2 = 86) · GA-S2 + completion (the inventory + wiring pack) · GA-S3 (the matrix + the defects) · GA-S4 (the report + the fill design) | `ga/s1-taxonomy` … `ga/s4-report` — all merged |
 | gold meter gap-fill — **CLOSED — COMPLETE (2026-11-07, GF-S12)** | GF-S1 delivered P0 (the calibration + the harness tables). GF-S2..GF-S6 re-issued the decision list (the lock-fallback ×5). GF-S7 recorded the owner's answers A–K + executed GF-P1 (the repairs). GF-S8 executed GF-P2 (the 32-seat table + the flows lane + STRONG 4-of-5 + the N-1 v1.2 amendment). GF-S9 executed GF-P3 (the four FRED voters → 36). GF-S10 executed the REMAINDER (I4 seated → **GOLD_LANE_VOTERS 37 (7/7/11/10/2)** · the real-curve + Shanghai-premium context cards · the P3 deploy live-verified · the gf-p4-verify twin). GF-S11 executed the round-2 decisions + P4 whole (the **(e) SGE display flip LIVE** — the Shanghai premium readable publicly for the first time · the **I9 accumulator** (private, the Cleveland L2 class) · the **(f) WGC authorisation draft** · the **nine P4 cards live** · the recovery's four repairs each with its regression pin). **GF-S12 = P5 THE ACCEPTANCE WALK + THE CLOSE (2026-11-07)**: the acceptance table over the five phases, every gate re-verified from the closing session's own runs (the calibration re-run byte-for-byte · the verify-twin re-run production ≡ POST-P4-5LANE in ALL 2512 windows · the licence register audit 37/37 · the registry pins · the gates) + the production matrix over the live public snapshot (177 readings: for 2 · against 1 · neutral 2 · unread 0 — 5 of 5 lanes readable; **the flip's own line −0.73% PUBLIC**; the 7 private ids absent) + the open questions PRINTED (the README's round-3 table) + the close-out records (the README CLOSED + the successor note · PROGRESS final rows + the program's verdict block · CHANGELOG [2026-11-07c] · this handoff · PROMPTS' final prompt = NONE). **The program's deliverable, live on currena.ir: the 37-voter five-lane table (7/7/11/10/2, MIN2, STRONG 4-of-5) beside the 184-id context register — the worker `8f9e521e`** | `gf/p0-recalibration` (merged) · `gf/s2-reissue`…`gf/s6-reissue` (merged) · `gf/p1-repairs` (merged) · `gf/p2-promotions` (merged) · `gf/p3-new-sources` (merged) · `gf/p3-remainder-and-p4` (merged at GF-S10) · `gf/s11-decisions-and-p4` (merged, GF-S11) · `gf/s12-acceptance-close` (GF-S12, the close) |
+| gold meter gap-fill — **THE ROUND-3 SUCCESSION EXECUTED (2026-11-07, GF-S13)** | **GF-S13 — the public flip** (the successor session the close announced; display classes ONLY — the voter table UNTOUCHED at 37): the owner's blanket directive executed — (a) the Cleveland L2 class public (`cpi-nowcast` 0.19 + `cpi-surprise` awaiting-state, the round-3 acceptance trail) · (b) the Yahoo L2 class public (`gold-equities-ratio` 0.5066, the owner OVERRODE the keep-private recommendation) · (c) the WGC family blocked with nothing to show (the draft the owner's lever) · (d) the program staying CLOSED · **the SHOULD-be-private reference delivered** (LICENCES.md — every exposure class with its hide-again + ask-permission levers) · the hidden set **7 → 4** (the no-data quartet) · **the worker `69d935ff` deployed + the fresh projection live: 180 of 184 ids readable** — the evidence `evidence/gf-s13-flip-2026-11-07.md` + the verify script `gf-s13-verify.ts` (ALL CHECKS GREEN) | `gf/s13-round3-public-flip` (GF-S13, the succession) |
 
 ## B. The standing rules (inherited by any successor program, read first)
 

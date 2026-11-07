@@ -438,3 +438,101 @@ class · the X5 Yahoo class · the WGC reply · the acceptance itself) are
 PRINTED and standing; when they arrive they are recorded in the
 README's round-3 table — (a)/(b)/(d) as register flips or acceptances,
 (c) as the successor program's kickoff — none re-opens this program.
+
+---
+
+## THE ROUND-3 SUCCESSION — GF-S13 (2026-11-07, later the same day): the public flip executed + the SHOULD-be-private reference delivered
+
+**The trigger**: the owner's round-3 answers arrived in the chat round of
+2026-11-07 — the blanket directive: **"Make everything Public, just add in
+some documentation, that some SHOULD be private. dont keep anything
+private"** + **"If you can show them. show and calculate them. but add some
+documentation later, so in future, where this legalities are important for
+me, I can hide some or ask for permission."** The GF-S12 close's own
+successor note named exactly this path; the successor session executed on
+the round-3 table's recorded authority (the README's round-3 table gained
+its answer column). **Display classes ONLY — the voter table UNTOUCHED at
+37 (7/7/11/10/2, MIN2, STRONG 4-of-5), no GOLD_LANE_VOTERS edit, no seat,
+no threshold, no beam change; D-GF-1's per-seat rule is not triggered by a
+display-class flip (the (e) precedent).**
+
+- **(a) THE CLEVELAND L2 CLASS → PUBLIC** (on the printed recommendation):
+  the CLEVELAND licence row flips `publicDisplayOk yes` with the round-3
+  acceptance trail (licenceName "© Federal Reserve Bank of Cleveland —
+  owner-accepted for display (2026-11-07)", the Bank's attribution +
+  suggested citation, no modification, no bulk redistribution);
+  `sources.ts`'s cleveland row gains the ownerAccepts record —
+  `cpi-nowcast` + `cpi-surprise` leave the hidden set.
+- **(b) THE YAHOO L2 CLASS → PUBLIC** (the owner OVERRODE the printed
+  keep-private recommendation — the blanket directive): the YAHOO row
+  flips `publicDisplayOk yes` with the round-3 trail, the licence FACTS
+  verbatim (licenceName unchanged — "No reuse licence offered (unofficial
+  endpoints)"); `gold-equities-ratio` (X5) leaves the hidden set; the
+  per-card directives (the four price tiles, usdaed, sp500-breadth-ratio)
+  stand unchanged.
+- **(c) THE WGC FAMILY STAYS BLOCKED** — nothing to show ("if you can
+  show them": no fetch is wired, the terms prohibit scraping without prior
+  written authorisation, there is no data). The authorisation draft
+  remains the owner's lever (send to info@gold.org; a recorded reply
+  unlocks the family per its terms in a future owner-gated session).
+- **(d) THE PROGRAM STAYS CLOSED** — the round-3 answers opened exactly
+  the successor work the close announced (the flip + the documentation),
+  and GF-S13 delivered it; the successor discipline stands unchanged.
+- **THE SHOULD-BE-PRIVATE REFERENCE** (the owner's own ask — the future
+  lever): `docs/insights/LICENCES.md`'s new section — every exposure
+  class ranked by sensitivity (WGC · Yahoo · Cleveland · SGE · the FRED
+  citation-required set · BoJ · PBoC · F12 · the EODHD board), each with
+  its TO-HIDE-IT-AGAIN lever (one register edit + regen + deploy; the
+  panic switch `ACCESS_MODE=private`) and its TO-ASK-PERMISSION path.
+- **The registry regenerated**: the hidden set **7 → 4**
+  (`etf-short-interest` · `official-gold-demand` · `wgc-cb-demand` ·
+  `wgc-etf-holdings` — the no-data quartet, fail closed on the DATA not
+  the display); the M-2 bounded-history pin gains the three
+  (+cpi-nowcast, +cpi-surprise, +gold-equities-ratio); the audit sidecar
+  + indicators.json regenerated; the display classes now **yes 30 · no 4
+  · unknown 3** (was 28/6/3).
+- **THE DEPLOY (D-GF-9 — the built worker changed)**: worker version
+  **`69d935ff`** deployed 12:29:37Z (superseding `8f9e521e`), the
+  REFRESH_SECRET rotation (the lost-sandbox pattern — the new value only
+  in gitignored `apps/api/.dev.vars` + the Worker secret) rolling
+  `aa6542d9` at 12:30:06Z; the manual main-ingest lever fired 12:30:48Z
+  (`{"ok":true}`) — the fresh public projection written with the new
+  hidden set.
+- **THE LIVE ACCEPTANCE CHECK** (the `gf-s13-verify.ts` §D walk — ALL
+  CHECKS GREEN, the evidence `gf-s13-flip-2026-11-07.md` + the run record
+  `gf-s13-run-2026-11-07.txt`): the fresh public snapshot (generatedAt
+  2026-11-07T12:30:10.689Z, **180 readings = 184 − 4**) — **cpi-nowcast
+  0.19 @ 2026-11-01 [context] PUBLIC** · **gold-equities-ratio 0.5066 @
+  2026-11-06 [context] PUBLIC** · **cpi-surprise PUBLIC in its honest
+  awaiting state** (no value yet — the standing start the owner accepted;
+  the first surprise lands with the December CPI print) · the (e) line
+  still live (−0.62 @ 2026-11-06) · the four no-data ids ABSENT (0
+  leaked) · **the engine UNCHANGED: for 2 · against 1 · neutral 2 ·
+  unread 0 (net 1 — 5 of 5 lanes readable), the same lane states the P5
+  matrix recorded**.
+- **The deliverables**: the committed machine half
+  `packages/insights/scripts/gf-s13-verify.ts` (manual, read-only — §A
+  the flip's register pins · §B the licence audit · §C the registry
+  state · §D the live production matrix) + the evidence pack
+  (`evidence/gf-s13-flip-2026-11-07.md` + `gf-s13-run-2026-11-07.txt`) +
+  the records (the README's round-3 answer column + the status line's
+  succession paragraph; this block; CHANGELOG [2026-11-07d];
+  AGENT_HANDOFF restated; PROMPTS.md's annotation — the final prompt
+  stays NONE, the successor loop closed).
+- **Gates**: ALL GREEN — secret scan clean (8 patterns · 878 files) ·
+  typecheck 6 packages · lint 0/0 · copy:audit clean (round 82 unchanged
+  — no new strings: the cards render from the existing copy) · narrator
+  vocabulary in sync (190×2 + 56×2) · narrator eval 50 · layer1 strict
+  11819/11819 · the full suite **14,620** (core 195 · scraper 67 ·
+  insights 1,329 · markets 13 · api 399 · web 12,617) · build + budget
+  (entry 294.45/88.49 · Insights lazy 1612.09/373.56).
+
+**The successor session's own verdict**: the round-3 loop is CLOSED —
+every card that CAN be calculated and has licence-clean or owner-accepted
+data now serves PUBLICLY (the blanket directive honoured); the four
+no-data ids stay hidden honestly (fail-closed on the data, never the
+display); the SHOULD-be-private reference gives the owner the future
+hide-or-permission lever in one documented place. The program's own
+verdict above stands unchanged — the meter is the same 37-voter
+five-lane table, now with its fullest public register: **180 of 184 ids
+readable for every visitor.**

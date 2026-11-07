@@ -487,7 +487,8 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     termsReadOn: SOURCE_RISK_READ_ON,
     attribution: 'Data: Yahoo Finance',
     termsUrl: 'https://finance.yahoo.com/',
-    notes: 'Already live; owner_accepts yes (RISK_REGISTER.md). Fetched with the honest Currena UA; a 403/418/429 or bot-check page means blocked → link out (T-27).',
+    notes:
+      'Already live; owner_accepts yes (RISK_REGISTER.md). Fetched with the honest Currena UA; a 403/418/429 or bot-check page means blocked → link out (T-27). GF-S13 (2026-11-07): the owner\u2019s recorded round-3 answer (b) — the blanket public directive ("Make everything Public … dont keep anything private") — accepts the CLASS for public display (the SGE (e) mechanism): gold-equities-ratio (X5) leaves the hidden set; the per-card directives (the four tiles, usdaed, sp500-breadth-ratio) stand unchanged.',
   },
   'gold-api': {
     id: 'gold-api',
@@ -779,15 +780,19 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     method: 'M1',
     runtime: 'worker',
     level: 'L2',
-    ownerAccepts: false, // the owner-acceptance class — no affirmative reuse grant quoted from this venue
+    // GF-S13 (2026-11-07, later the same day): the owner's RECORDED
+    // acceptance — the round-3 answer (a), the README's round-3 decision
+    // table (the D-GF-1 mechanism; the SGE (e) precedent). The display
+    // class flips public; the I9 pair rides it.
+    ownerAccepts: true,
     override: false,
     enabled: true, // the fetch runs (the Bank's own public page, keyless); the DISPLAY gate is the licence verdict
     termsLines:
-      'The Bank\u2019s own "Privacy and Terms of Use" (read live 2026-11-07, clevelandfed.org/privacy): it "provides its information, data, and materials… free of charge as a convenience to its clients, depository institutions, and the public" but quotes NO affirmative reuse grant (unlike the NY Fed\u2019s terms), and notes information on the site "may be copyrighted". The page carries "© 2026 Federal Reserve Bank of Cleveland" + the suggested citation "Inflation Nowcasting." Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast. L2 fail-closed: private display until the owner records acceptance.',
+      'The Bank\u2019s own "Privacy and Terms of Use" (read live 2026-11-07, clevelandfed.org/privacy): it "provides its information, data, and materials… free of charge as a convenience to its clients, depository institutions, and the public" but quotes NO affirmative reuse grant (unlike the NY Fed\u2019s terms), and notes information on the site "may be copyrighted". The page carries "© 2026 Federal Reserve Bank of Cleveland" + the suggested citation "Inflation Nowcasting." Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast. L2 owner-ACCEPTED 2026-11-07 (the round-3 answer (a)): public display with the Bank\u2019s attribution + suggested citation, no modification, no bulk redistribution.',
     termsReadOn: '2026-11-07',
     attribution: 'Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
     termsUrl: 'https://www.clevelandfed.org/privacy',
-    notes: 'GF-S11: the nowcasting page\u2019s tables verified live 2026-11-07 (Nov 2026 CPI +0.19% MoM SA / Oct +0.24% — the blank-cell release marker is the venue\u2019s own).',
+    notes: 'GF-S13 (2026-11-07): the ownerAccepts record — the round-3 answer (a) flipped the class public (the SGE (e) L2 owner-acceptance precedent); the nowcasting page\u2019s tables verified live 2026-11-07 (Nov 2026 CPI +0.19% MoM SA / Oct +0.24% — the blank-cell release marker is the venue\u2019s own).',
   },
   bazg: {
     id: 'bazg',

@@ -1,0 +1,55 @@
+# GF-S13 round-3 public-flip verification — 2026-11-07T12:30:53.628Z
+# snapshot: https://currena.ir/api/insights
+
+## A. The flip's own register pins (the shipped code, re-read)
+  ✓ the CLEVELAND row publicDisplayOk: 'yes' (the round-3 answer (a), 2026-11-07)
+  ✓ the CLEVELAND acceptance trail present: licenceName "© Federal Reserve Bank of Cleveland — owner-accepted for display (2026-11-07)"
+  ✓ the CLEVELAND attribution + suggested citation ride the row: "Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)"
+  ✓ the YAHOO row publicDisplayOk: 'yes' (the round-3 answer (b) — the blanket directive, 2026-11-07)
+  ✓ the YAHOO acceptance trail present, the licence FACTS verbatim: licenceName "No reuse licence offered (unofficial endpoints)" (unchanged — the facts stay verbatim)
+  ✓ the SGE (e) acceptance still stands: the round-2 answer (e), unchanged
+  ✓ the wgc row stays fail-closed (no data to show): 'no' — Prior written authorisation required (pre-approval class — never fetch
+  ✓ the pboc row stays fail-closed (no data to show): 'no' — Unreadable from this venue — fail closed (L2, no fetch wired)
+  ✓ the fund-pages row stays fail-closed (no data to show): 'no' — No licence-clean venue verified — fail closed (no fetch, awaiting data
+  ✓ the WGC kill switch (enabled false — never fetched): level L3, ownerAccepts false — the pre-approval class
+  ✓ the sources.ts cleveland row's ownerAccepts record: the D-GF-1 mechanism mirror (the round-1/(e) precedent)
+  ✓ the sources.ts yahoo row's round-3 display directive: the class-wide display acceptance recorded in the register notes
+
+## B. The licence register audit (every row evidenced + dated)
+  ✓ every provider row carries its evidence string + a dated termsCheckedOn: 37 rows · display classes: yes 30 · no 4 · unknown 3
+  ✓ the display-class counts after the flip (yes 28 → 30, no 6 → 4): yes 30 · no 4 · unknown 3 (unknown fails closed under T-15)
+
+## C. The registry state (the generated files, re-read)
+  ✓ the registry ids: 184 ids
+  ✓ the rule:info context cards: 130 cards
+  ✓ the public-mode hidden set (exactly the no-data quartet): 4 ids: etf-short-interest · official-gold-demand · wgc-cb-demand · wgc-etf-holdings
+  ✓ no hidden world board: hiddenBoards []
+  ✓ the flipped id cpi-nowcast publicDisplayOk yes in the sidecar: level L2 · enabled true — the M-2 bounded public history follows automatically
+  ✓ the flipped id cpi-surprise publicDisplayOk yes in the sidecar: level L2 · enabled true — the M-2 bounded public history follows automatically
+  ✓ the flipped id gold-equities-ratio publicDisplayOk yes in the sidecar: level L2 · enabled true — the M-2 bounded public history follows automatically
+  ✓ GOLD_LANE_VOTERS seat count UNTOUCHED: 37 seats (7/7/11/10/2) — display classes only, no seat change
+  ✓ the lane shape: borrowing-costs / dollar / stress / inflation / flows — MIN2, STRONG 4-of-5
+  ✓ no voter sits in the hidden set: 0 of 37 hidden (the meter's own seats are public by construction)
+  ✓ every voter id exists in the registry: 37/37 present
+
+## D. The production matrix (the live public snapshot walk)
+  · generatedAt 2026-11-07T12:30:10.689Z · 180 readings on the wire
+  · the engine over the live readings: for 2 · against 1 · neutral 2 · unread 0 (net 1, readable 5)
+    - borrowing-costs: for · readable 7 · firing 5 · supports 4 · pressures 1
+    - dollar: against · readable 6 · firing 5 · supports 2 · pressures 3
+    - stress: for · readable 11 · firing 4 · supports 3 · pressures 1
+    - inflation: neutral (split) · readable 10 · firing 2 · supports 1 · pressures 1
+    - flows: neutral · readable 2 · firing 0 · supports 0 · pressures 0
+  · THE THREE FLIPPED CARDS' OWN LIVE LINES (the round-3 flip's acceptance check):
+  ✓ the flipped card cpi-nowcast PRESENT + readable PUBLICLY: 0.19 @ 2026-11-01 [context]
+  ✓ the flipped card cpi-surprise PRESENT + readable PUBLICLY: no value @ — [unavailable]
+  ✓ the flipped card gold-equities-ratio PRESENT + readable PUBLICLY: 0.5066 @ 2026-11-06 [context]
+  ✓ the (e) line still live (the round-2 flip, unchanged): -0.62 @ 2026-11-06 [context]
+  · the four no-data ids (the honest absences):
+  ✓ the no-data id etf-short-interest ABSENT (0 leaked): absent
+  ✓ the no-data id official-gold-demand ABSENT (0 leaked): absent
+  ✓ the no-data id wgc-cb-demand ABSENT (0 leaked): absent
+  ✓ the no-data id wgc-etf-holdings ABSENT (0 leaked): absent
+  ✓ the wire count exact (184 − 4 = 180): 180 readings
+
+# ALL CHECKS GREEN

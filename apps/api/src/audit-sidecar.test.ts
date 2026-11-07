@@ -36,7 +36,7 @@ describe('the bundled indicator-audit sidecar', () => {
 });
 
 describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
-  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide + the 2026-10-24 M4 Wave-1 + the 2026-10-25 M6 Wave-3 additions + the 2026-11-07 SGE owner-acceptance)', () => {
+  it('is exactly the L2 sources that are public today (the 2026-10-21c licence round + the 2026-10-23 unhide + the 2026-10-24 M4 Wave-1 + the 2026-10-25 M6 Wave-3 additions + the 2026-11-07 SGE owner-acceptance + the 2026-11-07 round-3 public flip)', () => {
     // brent/gold-usd/silver-usd (Yahoo legs), btc-usd (gold-api), the
     // FRED citation-required set (display-permitted with "publisher via
     // FRED" attribution — FRED legal read 2026-10-21: STLFSI/NFCI/VIX/
@@ -53,6 +53,13 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
     // owner-ACCEPTED (the round-2 answer (e)); the card flipped public and
     // the M-2 rule follows automatically (its public history serves the
     // visible chart window only, exactly like the Yahoo/Shiller L2 set).
+    // GF-S13 (2026-11-07, the round-3 public flip): +cpi-nowcast,
+    // +cpi-surprise (the Cleveland L2 class, the round-3 answer (a)) and
+    // +gold-equities-ratio (the Yahoo L2 class, the round-3 answer (b) —
+    // the owner's blanket "dont keep anything private" directive) — the
+    // three cards leave the hidden set and the M-2 rule follows
+    // automatically (L2 + publicDisplayOk yes → the bounded public
+    // history, exactly the SGE (e) pattern).
     // gap-closure S3-M3.4 (2026-11-01): +empire-state, +gdpnow, +median-cpi,
     // +sticky-cpi — the citation-required FRED additions of the
     // growth-nowcast/survey family (display-permitted with attribution);
@@ -69,10 +76,13 @@ describe('PUBLIC_BOUNDED_HISTORY_IDS (M-2: L2 + publicDisplayOk yes)', () => {
       'btp-bund-spread',
       'bund-10y',
       'cfnai',
+      'cpi-nowcast',
+      'cpi-surprise',
       'empire-state',
       'gdpnow',
       'gilt-10y',
       'global-liquidity',
+      'gold-equities-ratio',
       'gold-oil-ratio',
       'gold-platinum',
       'gold-silver',

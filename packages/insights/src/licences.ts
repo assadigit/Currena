@@ -75,6 +75,20 @@ const FRED_BASE: SourceLicence = {
   termsUrl: 'https://fred.stlouisfed.org/legal/',
 };
 
+/**
+ * GF-S13 (2026-11-07, the owner's recorded round-3 answer (b)): the Yahoo
+ * L2 class flips PUBLIC — the owner's blanket directive ("Make everything
+ * Public … dont keep anything private … If you can show them, show and
+ * calculate them"), overriding the printed keep-private recommendation.
+ * The licence FACTS stay verbatim (no reuse licence is offered for these
+ * unofficial endpoints); the owner's acceptance is the display verdict on
+ * their own non-commercial site, exactly the SGE (e) mechanism. Every
+ * Yahoo-leg card that had no per-card directive — today that is
+ * gold-equities-ratio (X5, GLD ÷ SPY) — leaves the public-mode hidden set
+ * with this row; the four price tiles + usdaed + sp500-breadth-ratio keep
+ * their own standing directives; the fail-closed fetch discipline is
+ * untouched (a refusal is a block — F-09/T-27).
+ */
 const YAHOO: SourceLicence = {
   provider: 'yahoo',
   label: 'Yahoo Finance (unofficial endpoints)',
@@ -82,10 +96,10 @@ const YAHOO: SourceLicence = {
   attributionText: '',
   attributionRequired: false,
   privateOk: true,
-  publicDisplayOk: 'no',
+  publicDisplayOk: 'yes', // the owner's recorded round-3 answer (b), 2026-11-07 — the blanket public directive
   termsCheckedOn: TERMS_CHECKED_ON,
   termsEvidence:
-    'Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15).',
+    'Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner\u2019s recorded round-3 answer (b) — "Make everything Public … dont keep anything private … If you can show them, show and calculate them" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27).',
   termsUrl: 'https://finance.yahoo.com/',
 };
 
@@ -668,18 +682,28 @@ const PBOC: SourceLicence = {
  * grant (unlike the NY Fed's terms) — the L2 owner-acceptance class: the
  * fetch runs (the Bank's own public page, keyless), the card serves
  * PRIVATE until the owner records acceptance (the SGE-pre-(e) standing).
+ *
+ * GF-S13 (2026-11-07, later the same day): the OWNER'S RECORDED
+ * ACCEPTANCE — the round-3 answer (a), the README's round-3 decision
+ * table (the D-GF-1 mechanism): "ACCEPT FOR PUBLIC DISPLAY" (on the
+ * printed recommendation — the same L2 owner-acceptance the SGE class
+ * received at round-2 (e)). A derived conditions display from a central
+ * bank's own public page, attributed with the Bank's own suggested
+ * citation, on the owner's non-commercial site. cpi-nowcast +
+ * cpi-surprise leave the public-mode hidden set with this row (the
+ * registry regeneration + the T-15 projection unhide ride this verdict).
  */
 const CLEVELAND: SourceLicence = {
   provider: 'cleveland',
   label: 'Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
-  licenceName: '© Federal Reserve Bank of Cleveland — no reuse grant quoted (fail closed)',
+  licenceName: '© Federal Reserve Bank of Cleveland — owner-accepted for display (2026-11-07)',
   attributionText: 'Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)',
   attributionRequired: true,
   privateOk: true,
-  publicDisplayOk: 'no', // L2: no quoted grant — the owner's recorded acceptance lifts it
+  publicDisplayOk: 'yes', // the owner's recorded acceptance, round-3 answer (a), 2026-11-07
   termsCheckedOn: '2026-11-07',
   termsEvidence:
-    'The Bank\u2019s own "Privacy and Terms of Use" (read live 2026-11-07, clevelandfed.org/privacy): "The Federal Reserve Bank of Cleveland (\u201cthe Bank\u201d) owns and operates this website (\u201cWebsite\u201d) and provides its information, data, and materials (collectively referred to as \u201cContent\u201d) free of charge as a convenience to its clients, depository institutions, and the public." and "\u2026information contained on the Bank Website, and on websites linked to or referenced by this Website, may be copyrighted and may or may not carry a copyright notice. Permission to use such copyrighted information must be obtained from the original author or source and cannot be obtained from the Bank." — no affirmative reuse grant quoted (unlike the NY Fed\u2019s terms). The nowcasting page carries "\u00a9 2026 Federal Reserve Bank of Cleveland" and the suggested citation "\u201cInflation Nowcasting.\u201d Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast" (read live 2026-11-07). L2 fail-closed: private display until the owner records acceptance; the fetch itself is the Bank\u2019s own public page.',
+    'The Bank\u2019s own "Privacy and Terms of Use" (read live 2026-11-07, clevelandfed.org/privacy): "The Federal Reserve Bank of Cleveland (\u201cthe Bank\u201d) owns and operates this website (\u201cWebsite\u201d) and provides its information, data, and materials (collectively referred to as \u201cContent\u201d) free of charge as a convenience to its clients, depository institutions, and the public." and "\u2026information contained on the Bank Website, and on websites linked to or referenced by this Website, may be copyrighted and may or may not carry a copyright notice. Permission to use such copyrighted information must be obtained from the original author or source and cannot be obtained from the Bank." — no affirmative reuse grant quoted (unlike the NY Fed\u2019s terms). The nowcasting page carries "\u00a9 2026 Federal Reserve Bank of Cleveland" and the suggested citation "\u201cInflation Nowcasting.\u201d Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast" (read live 2026-11-07). L2 owner-acceptance: the owner ACCEPTED this class for public display on 2026-11-07 (the round-3 answer (a) — the README\u2019s round-3 decision table, the D-GF-1 mechanism; the SGE (e) precedent): the nowcast-derived conditions display serves with the Bank\u2019s attribution + suggested citation, no modification, no bulk redistribution, on the owner\u2019s non-commercial site.',
   termsUrl: 'https://www.clevelandfed.org/privacy',
 };
 
