@@ -2265,14 +2265,14 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "No reuse licence offered (unofficial endpoints)",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAU, yahoo:GC=F, fred:DCOILBRENTEU, yahoo:BZ=F, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The ratio derives from the gold-usd and brent series whose display bars the standing owner directives (2026-10-19e) already lifted; the Yahoo history legs stay in the engine — the directives cover the ratio’s worst leg exactly as they cover its parents’.",
-        "termsUrl": "https://finance.yahoo.com/"
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (gold-api:XAU, yahoo:GC=F, fred:DCOILBRENTEU, yahoo:BZ=F, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The ratio derives from the gold-usd and brent series whose display bars the standing owner directives (2026-10-19e) already lifted; the Yahoo history legs stay in the engine — the directives cover the ratio’s worst leg exactly as they cover its parents’.",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
       }
     },
     {
@@ -4636,7 +4636,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (yahoo:AED=X): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): Owner-requested card (2026-10-29: \"add dollar against UAE currency\"); the ECB publishes no AED reference rate, so the single leg is Yahoo USD/AED daily closes — the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill and metals history legs ride). The owner directive lifts its worst-leg display bar.",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · Legs (yahoo:AED=X): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): Owner-requested card (2026-10-29: \"add dollar against UAE currency\"); the ECB publishes no AED reference rate, so the single leg is Yahoo USD/AED daily closes — the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill and metals history legs ride). The owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -5714,7 +5714,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (world-bank, gold-api, yahoo:GC=F/SI=F (history leg, GF-P1 D-5)): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The ratio's history legs are exactly the gold-usd and silver-usd tiles' own Yahoo metals legs (GC=F and SI=F — the GF-P1 D-5 recorded base deepening, the repo's own L2 owner-accepted pair, both legs same-day so the term structure cancels); the standing owner directives (2026-10-19e) already lifted those legs' display bars, and the derived ratio inherits them — the gold-oil-ratio (A-4) precedent. The directive lifts its worst-leg display bar.",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · Legs (world-bank, gold-api, yahoo:GC=F/SI=F (history leg, GF-P1 D-5)): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The ratio's history legs are exactly the gold-usd and silver-usd tiles' own Yahoo metals legs (GC=F and SI=F — the GF-P1 D-5 recorded base deepening, the repo's own L2 owner-accepted pair, both legs same-day so the term structure cancels); the standing owner directives (2026-10-19e) already lifted those legs' display bars, and the derived ratio inherits them — the gold-oil-ratio (A-4) precedent. The directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -6430,11 +6430,11 @@
       "failClosedConditions": "No value, data older than 45 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L2",
-        "ownerAccepts": false,
+        "ownerAccepts": true,
         "enabled": true,
         "method": "M1",
         "runtime": "worker",
-        "termsLines": "The Bank’s own \"Privacy and Terms of Use\" (read live 2026-11-07, clevelandfed.org/privacy): it \"provides its information, data, and materials… free of charge as a convenience to its clients, depository institutions, and the public\" but quotes NO affirmative reuse grant (unlike the NY Fed’s terms), and notes information on the site \"may be copyrighted\". The page carries \"© 2026 Federal Reserve Bank of Cleveland\" + the suggested citation \"Inflation Nowcasting.\" Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast. L2 fail-closed: private display until the owner records acceptance.",
+        "termsLines": "The Bank’s own \"Privacy and Terms of Use\" (read live 2026-11-07, clevelandfed.org/privacy): it \"provides its information, data, and materials… free of charge as a convenience to its clients, depository institutions, and the public\" but quotes NO affirmative reuse grant (unlike the NY Fed’s terms), and notes information on the site \"may be copyrighted\". The page carries \"© 2026 Federal Reserve Bank of Cleveland\" + the suggested citation \"Inflation Nowcasting.\" Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast. L2 owner-ACCEPTED 2026-11-07 (the round-3 answer (a)): public display with the Bank’s attribution + suggested citation, no modification, no bulk redistribution.",
         "termsReadOn": "2026-11-07",
         "attributionText": "Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)",
         "legs": [
@@ -6454,13 +6454,13 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "© Federal Reserve Bank of Cleveland — no reuse grant quoted (fail closed)",
+        "licenceName": "© Federal Reserve Bank of Cleveland — owner-accepted for display (2026-11-07)",
         "attributionText": "Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-11-07",
-        "termsEvidence": "The Bank’s own \"Privacy and Terms of Use\" (read live 2026-11-07, clevelandfed.org/privacy): \"The Federal Reserve Bank of Cleveland (“the Bank”) owns and operates this website (“Website”) and provides its information, data, and materials (collectively referred to as “Content”) free of charge as a convenience to its clients, depository institutions, and the public.\" and \"…information contained on the Bank Website, and on websites linked to or referenced by this Website, may be copyrighted and may or may not carry a copyright notice. Permission to use such copyrighted information must be obtained from the original author or source and cannot be obtained from the Bank.\" — no affirmative reuse grant quoted (unlike the NY Fed’s terms). The nowcasting page carries \"© 2026 Federal Reserve Bank of Cleveland\" and the suggested citation \"“Inflation Nowcasting.” Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast\" (read live 2026-11-07). L2 fail-closed: private display until the owner records acceptance; the fetch itself is the Bank’s own public page. · Legs (cleveland): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "The Bank’s own \"Privacy and Terms of Use\" (read live 2026-11-07, clevelandfed.org/privacy): \"The Federal Reserve Bank of Cleveland (“the Bank”) owns and operates this website (“Website”) and provides its information, data, and materials (collectively referred to as “Content”) free of charge as a convenience to its clients, depository institutions, and the public.\" and \"…information contained on the Bank Website, and on websites linked to or referenced by this Website, may be copyrighted and may or may not carry a copyright notice. Permission to use such copyrighted information must be obtained from the original author or source and cannot be obtained from the Bank.\" — no affirmative reuse grant quoted (unlike the NY Fed’s terms). The nowcasting page carries \"© 2026 Federal Reserve Bank of Cleveland\" and the suggested citation \"“Inflation Nowcasting.” Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast\" (read live 2026-11-07). L2 owner-acceptance: the owner ACCEPTED this class for public display on 2026-11-07 (the round-3 answer (a) — the README’s round-3 decision table, the D-GF-1 mechanism; the SGE (e) precedent): the nowcast-derived conditions display serves with the Bank’s attribution + suggested citation, no modification, no bulk redistribution, on the owner’s non-commercial site. · Legs (cleveland): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://www.clevelandfed.org/privacy"
       }
     },
@@ -6489,11 +6489,11 @@
       "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
       "sourceRisk": {
         "level": "L2",
-        "ownerAccepts": false,
+        "ownerAccepts": true,
         "enabled": true,
         "method": "M1",
         "runtime": "worker",
-        "termsLines": "The Bank’s own \"Privacy and Terms of Use\" (read live 2026-11-07, clevelandfed.org/privacy): it \"provides its information, data, and materials… free of charge as a convenience to its clients, depository institutions, and the public\" but quotes NO affirmative reuse grant (unlike the NY Fed’s terms), and notes information on the site \"may be copyrighted\". The page carries \"© 2026 Federal Reserve Bank of Cleveland\" + the suggested citation \"Inflation Nowcasting.\" Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast. L2 fail-closed: private display until the owner records acceptance. · Worst of legs (cleveland, fred:CPIAUCSL): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
+        "termsLines": "The Bank’s own \"Privacy and Terms of Use\" (read live 2026-11-07, clevelandfed.org/privacy): it \"provides its information, data, and materials… free of charge as a convenience to its clients, depository institutions, and the public\" but quotes NO affirmative reuse grant (unlike the NY Fed’s terms), and notes information on the site \"may be copyrighted\". The page carries \"© 2026 Federal Reserve Bank of Cleveland\" + the suggested citation \"Inflation Nowcasting.\" Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast. L2 owner-ACCEPTED 2026-11-07 (the round-3 answer (a)): public display with the Bank’s attribution + suggested citation, no modification, no bulk redistribution. · Worst of legs (cleveland, fred:CPIAUCSL): the L2 leg decides — the walk mirrors defect E-01/LR-02.",
         "termsReadOn": "2026-11-07",
         "attributionText": "Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)",
         "legs": [
@@ -6514,14 +6514,14 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "© Federal Reserve Bank of Cleveland — no reuse grant quoted (fail closed)",
-        "attributionText": "Source: Federal Reserve Bank of Cleveland (Inflation Nowcasting)",
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
         "attributionRequired": true,
         "privateOk": true,
-        "publicDisplayOk": "no",
-        "termsCheckedOn": "2026-11-07",
-        "termsEvidence": "The Bank’s own \"Privacy and Terms of Use\" (read live 2026-11-07, clevelandfed.org/privacy): \"The Federal Reserve Bank of Cleveland (“the Bank”) owns and operates this website (“Website”) and provides its information, data, and materials (collectively referred to as “Content”) free of charge as a convenience to its clients, depository institutions, and the public.\" and \"…information contained on the Bank Website, and on websites linked to or referenced by this Website, may be copyrighted and may or may not carry a copyright notice. Permission to use such copyrighted information must be obtained from the original author or source and cannot be obtained from the Bank.\" — no affirmative reuse grant quoted (unlike the NY Fed’s terms). The nowcasting page carries \"© 2026 Federal Reserve Bank of Cleveland\" and the suggested citation \"“Inflation Nowcasting.” Federal Reserve Bank of Cleveland. https://doi.org/10.26509/frbc-inflationnowcast\" (read live 2026-11-07). L2 fail-closed: private display until the owner records acceptance; the fetch itself is the Bank’s own public page. · Legs (cleveland, fred:CPIAUCSL): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
-        "termsUrl": "https://www.clevelandfed.org/privacy"
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-07) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (cleveland, fred:CPIAUCSL): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
     {
@@ -6575,14 +6575,14 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "No reuse licence offered (unofficial endpoints)",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "FRED license #copyright-public-domain (public domain)",
+        "attributionText": "Source: FRED, Federal Reserve Bank of St. Louis",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAU, yahoo:GC=F, fred:CPIAUCNS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The real gold price derives from the gold-usd card's own legs (gold-api XAU + the Yahoo GC=F history — the legs the standing owner directives (2026-10-19e) already lifted) plus the public-domain FRED CPI index; the derived series inherits its parents' lifted display bars, the gold-oil-ratio (A-4) precedent.",
-        "termsUrl": "https://finance.yahoo.com/"
+        "termsCheckedOn": "2026-10-24",
+        "termsEvidence": "FRED license tag: #copyright-public-domain (checked 2026-11-07) — the citation-required class permits display with source attribution + acknowledgment the data was obtained from FRED (FRED legal, read 2026-10-21); the reading's sourceName carries the 'via FRED' citation. · Legs (gold-api:XAU, yahoo:GC=F, fred:CPIAUCNS): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The real gold price derives from the gold-usd card's own legs (gold-api XAU + the Yahoo GC=F history — the legs the standing owner directives (2026-10-19e) already lifted) plus the public-domain FRED CPI index; the derived series inherits its parents' lifted display bars, the gold-oil-ratio (A-4) precedent.",
+        "termsUrl": "https://fred.stlouisfed.org/legal/"
       }
     },
     {
@@ -6637,14 +6637,14 @@
       "ruleVersion": 4,
       "layer": 1,
       "licence": {
-        "licenceName": "No reuse licence offered (unofficial endpoints)",
-        "attributionText": "",
-        "attributionRequired": false,
+        "licenceName": "CC BY 4.0 (World Bank Dataset Terms)",
+        "attributionText": "The World Bank: Commodity Markets (Pink Sheet)",
+        "attributionRequired": true,
         "privateOk": true,
         "publicDisplayOk": "yes",
-        "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAU, yahoo:GC=F, gold-api:XPT, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The gold/platinum ratio derives from the gold-usd card's own legs (gold-api XAU + the Yahoo GC=F history — lifted by the standing owner directives, 2026-10-19e) and the platinum card's legs (gold-api XPT + the public World Bank Pink Sheet base); the derived ratio inherits its parents' lifted display bars, the gold-oil-ratio (A-4) precedent.",
-        "termsUrl": "https://finance.yahoo.com/"
+        "termsCheckedOn": "2026-10-21",
+        "termsEvidence": "World Bank Dataset Terms read verbatim in a browser 2026-10-21 (worldbank.org/ext/en/legal/terms-conditions/datasets): \"Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0)\" with the required attribution format \"The World Bank: Dataset name: Data source (if known)\"; use of data derived from the Datasets (tables/charts) follows the same terms. The Pink Sheet commodity series carry no contrary label — CC BY 4.0 applies, attribution rendered on the cards and in About this data. · Legs (gold-api:XAU, yahoo:GC=F, gold-api:XPT, world-bank): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): The gold/platinum ratio derives from the gold-usd card's own legs (gold-api XAU + the Yahoo GC=F history — lifted by the standing owner directives, 2026-10-19e) and the platinum card's legs (gold-api XPT + the public World Bank Pink Sheet base); the derived ratio inherits its parents' lifted display bars, the gold-oil-ratio (A-4) precedent.",
+        "termsUrl": "https://www.worldbank.org/ext/en/legal/terms-conditions/datasets"
       }
     },
     {
@@ -6881,9 +6881,9 @@
         "attributionText": "",
         "attributionRequired": false,
         "privateOk": true,
-        "publicDisplayOk": "no",
+        "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (yahoo:GLD, yahoo:SPY): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · Legs (yahoo:GLD, yahoo:SPY): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs).",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -8501,7 +8501,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (fred:DCOILBRENTEU, yahoo:BZ=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): FRED leg is public-domain (T-16: DCOILBRENTEU #copyright-public-domain); the Yahoo BZ=F gap-fill leg stays in the engine — the owner directive lifts its worst-leg display bar.",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · Legs (fred:DCOILBRENTEU, yahoo:BZ=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): FRED leg is public-domain (T-16: DCOILBRENTEU #copyright-public-domain); the Yahoo BZ=F gap-fill leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -8561,7 +8561,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAU, yahoo:GC=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use in web applications, read first-hand 2026-10-16); the Yahoo GC=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · Legs (gold-api:XAU, yahoo:GC=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use in web applications, read first-hand 2026-10-16); the Yahoo GC=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -8621,7 +8621,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:XAG, yahoo:SI=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo SI=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · Legs (gold-api:XAG, yahoo:SI=F): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo SI=F history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -8741,7 +8741,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · Legs (gold-api:BTC, yahoo:BTC-USD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo BTC-USD history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · Legs (gold-api:BTC, yahoo:BTC-USD): the WORST leg decides — derived per defect E-01/LR-02 (T-15 walks the inputs). · OWNER DIRECTIVE (2026-10-19e): gold-api leg is public-display-ok (their §9 permits commercial use, read first-hand 2026-10-16); the Yahoo BTC-USD history leg stays in the engine — the owner directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
@@ -11087,7 +11087,7 @@
         "privateOk": true,
         "publicDisplayOk": "yes",
         "termsCheckedOn": "2026-10-16",
-        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. Never shown in public mode (T-15). · OWNER DIRECTIVE (2026-10-19e): Spec-directed card (gap-closure S6-M6.3, the owner-approved plan: \"equal-weight vs cap-weight S&P 500 ratio from Yahoo (RSP and SPY; L2, already owner-accepted for Yahoo). Add sp500-breadth-ratio.\"); both legs are the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill, the metals histories and usdaed ride). The spec's directive lifts its worst-leg display bar.",
+        "termsEvidence": "Yahoo offers no API terms for these unofficial quote endpoints; Step 3 §2.3 and defect E-01 classify them owner-only personal use. GF-S13 (2026-11-07): the owner’s recorded round-3 answer (b) — \"Make everything Public … dont keep anything private … If you can show them, show and calculate them\" — accepts the class for public display on their own non-commercial site (the SGE (e) L2 owner-acceptance mechanism, now class-wide); the licence facts stay verbatim (no reuse licence offered), every leg keeps the honest declared UA and fails closed on a refusal (F-09/T-25/T-27). · OWNER DIRECTIVE (2026-10-19e): Spec-directed card (gap-closure S6-M6.3, the owner-approved plan: \"equal-weight vs cap-weight S&P 500 ratio from Yahoo (RSP and SPY; L2, already owner-accepted for Yahoo). Add sp500-breadth-ratio.\"); both legs are the register row the owner already accepts (L2, ownerAccepts, 2026-10-16, the same provider the Brent gap-fill, the metals histories and usdaed ride). The spec's directive lifts its worst-leg display bar.",
         "termsUrl": "https://finance.yahoo.com/"
       }
     },
