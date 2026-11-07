@@ -1775,3 +1775,140 @@ next prompt rewritten in PROMPTS.md; 4. commit, push, PR, merge when
 green; 5. final message = the printed next prompt + the 5-line summary
 + the WGC draft printed for the owner.
 ```
+
+## GF-S12 — P5: the acceptance walk + the program's close (the dedicated final session — written by GF-S11, 2026-11-07)
+
+```
+You are working in the Currena repo at the repo root. This is the GF-S12
+session of the gold meter gap-fill program (the owner-gated successor to
+the CLOSED gold meter audit program; the program home:
+docs/specs/gold-meter-gapfill/ — README + 01-FILL-SPEC + PROGRESS +
+PROMPTS; the audit's verdict: docs/insights/GOLD-METER-AUDIT-REPORT.md).
+Read this whole prompt before doing anything.
+
+CONTEXT — WHERE WE STAND
+GF-S11 (2026-11-07, the recovery landing of an interrupted session — the
+record in PROGRESS's GF-S11 block) delivered the round-2 decisions whole
++ P4: the SGE display flip live (the Shanghai premium PUBLIC for every
+visitor, the (e) acceptance) · the I9 accumulator live (the Cleveland
+nowcasts + the CPI-print join, the standing start accepted) · the WGC
+authorisation draft printed for the owner's review + send
+(evidence/wgc-authorisation-draft-2026-11-07.md — the family stays
+blocked pending the reply) · the nine P4 cards landed (I10 · X7 · I11 ·
+G3 · F16 · F15 · X5 · R11 · F12 — F12 honestly fail-closed 'awaiting
+data'; the recovery's own repairs recorded: the I11 ECB-leg conversion,
+the F15 extractor + its 12 test suites, the I11 display verdict trail).
+The meter stands at its FINAL fill-program shape: the 37-voter five-lane
+table (7/7/11/10/2, MIN2, STRONG 4-of-5) — UNCHANGED since GF-S10 (no
+seat change was approved anywhere in the round-2 answers) — beside the
+full context register (184 ids · 130 rule:info cards). Tests 14,617;
+copy round 82; gates ALL GREEN; the worker deployed + live-verified; PR
+#44 merged; CI green on main.
+
+WHAT THIS SESSION IS
+GF-S12 = P5, the dedicated close: THE ACCEPTANCE WALK + THE FLIP. The
+GB 04 §6 precedent, rewritten for this change set: the full acceptance
+table over the program's own spec (every phase's gate re-verified from
+runs, not memory) + the production matrix (the live meter state — every
+voter + every context card over the fresh public snapshot) + the OPEN
+QUESTIONS printed for the owner's final round + the program's close-out
+records. Nothing user-visible ships this session beyond what the owner's
+recorded answers already gated (the (e) flip and the P4 cards are LIVE
+on their recorded goes — this session VERIFIES and CLOSES, it does not
+add). The owner's recorded acceptance closes the program.
+
+THE OPEN QUESTIONS TO PRINT (the session's own decision list — every one
+on its printed recommendation, the round-2 precedent)
+(a) THE CLEVELAND L2 CLASS: the I9 cards (cpi-nowcast + cpi-surprise)
+    serve PRIVATE (the Bank's terms quote no affirmative reuse grant —
+    the SGE-pre-(e) standing). RECOMMEND: accept for public display (the
+    same L2 owner-acceptance the SGE class received — a derived
+    conditions display from a central bank's own public page, attributed;
+    or keep private until asked).
+(b) THE X5 YAHOO CLASS: the gold-equities-ratio card serves PRIVATE (the
+    Yahoo L2 class carries no public-display directive for these tiles).
+    RECOMMEND: keep private (the Yahoo endpoints carry no licence; the
+    standing class) — printed for completeness.
+(c) THE WGC REPLY: if the owner has sent the draft + a reply arrived,
+    record it and unlock the family per its terms; if not, the family
+    stays blocked (the standing state — nothing owed).
+(d) THE PROGRAM'S CLOSE: the acceptance itself — the meter's final
+    shape accepted as the program's deliverable (the P5 flip), with the
+    recorded-open items honestly listed (F7 MCX venue-blocked · F12
+    fail-closed · the WGC family pending · the promotion criteria
+    recorded in each context card's comments for any future program).
+
+SESSION SHAPE
+(1) read-first + git pull --rebase (the program home + the GF-S11 block
+    + the gf-s11-verify evidence + the licence register);
+(2) THE ACCEPTANCE WALK: the AC table over 01-FILL-SPEC §1's five
+    phases (P0 the calibration + the owner's answers A–K + round-2 · P1
+    the repairs · P2 the promotions · P3 the sources + the deploy · P4
+    the context cards) — every cell re-verified from a run (the
+    calibration re-run byte-for-byte; the gf-p4-verify twin re-run; the
+    live snapshot walk); the production matrix (the 37 voters' live
+    state + the context register's live state, from the fresh public
+    snapshot);
+(3) THE OPEN QUESTIONS printed (the decision list above);
+(4) THE CLOSE-OUT RECORDS: the README's status line (the program
+    CLOSED — the successor note: any future change is a NEW owner-gated
+    program on the same per-seat discipline); PROGRESS final rows;
+    CHANGELOG; AGENT_HANDOFF restated (the program closed, the site
+    live, the open items recorded); the final prompt = NONE (the program
+    ends) unless the owner's answers open new work — then the successor
+    program's kickoff prompt per the D-GA-9 convention.
+
+WORK ITEMS (in order)
+1. READ FIRST: the program home (README — the round-2 table + the
+   status line; 01-FILL-SPEC §1–§2; PROGRESS — the GF-S11 block) +
+   evidence/gf-s11-verify-2026-11-07.md + the licence register. Then
+   git pull --rebase.
+2. THE ACCEPTANCE WALK (the AC table): write the acceptance table into
+   the evidence pack (evidence/gf-p5-acceptance-YYYY-MM-DD.md) — every
+   phase's gate re-verified from this session's own runs: the
+   calibration re-run (byte-for-byte), the verify-twin re-run
+   (production ≡ POST-P4-5LANE), the registry state, the copy state,
+   the test state, the licence register audit (every row's evidence
+   string present + dated).
+3. THE PRODUCTION MATRIX: the fresh public snapshot walk — the engine
+   over the live readings (the lane states), the P3/P4 cards' live
+   values, the display classes verified on the wire (the Shanghai
+   premium PUBLIC; the private classes absent from the projection).
+4. THE OPEN QUESTIONS printed (the list above) — the README's decision
+   table gains the round-3 rows when the answers arrive.
+5. THE CLOSE-OUT: the records (the README status line CLOSED + the
+   successor note; PROGRESS final rows + the program's own verdict
+   block; CHANGELOG; AGENT_HANDOFF); commit, push, PR, merge when
+   green; the final message = the acceptance table's summary + the
+   printed open questions + the 5-line program summary.
+
+CONSTRAINTS (standing, every session of this program — README D-GF-1..9)
+- THE PER-SEAT APPROVAL RULE stands: NO GOLD_LANE_VOTERS edit this
+  session (P5 verifies; it does not seat). Any future seat change needs
+  the recorded approval + the measured scenario + the P0 wrap first.
+  NEVER seat a sign silently.
+- The beam formula, the honesty rules and the no-edge record are
+  inherited UNCHANGED; no forecasting claim anywhere — copy says
+  "conditions"; every number from a run or a citation; free-first
+  (EODHD: zero calls).
+- Branch gf/s12-acceptance-close; PR early; pnpm gates green before
+  every push; self-merge when the exit gate holds; CI green on main
+  verified; deploy only if the built worker changes (P5 should be
+  docs+evidence only — if code changes, the D-GF-9 rule applies).
+
+EXIT GATE
+The acceptance table green (every phase's gate re-verified from runs);
+the production matrix verified live; the open questions PRINTED for the
+owner; the program's close-out records written (the README status line
++ PROGRESS + CHANGELOG + the handoff); PR merged; CI green on main. If
+the owner's round-3 answers arrive mid-session, record them and execute
+per their own scope (the round-2 precedent) — otherwise the program
+closes with the questions standing.
+
+AT THE END (the standing close-out, every session)
+1. PROGRESS session block + milestone row; 2. CHANGELOG entry; 3. the
+final prompt: NONE (the program closed) or the successor's kickoff
+prompt per the owner's answers; 4. commit, push, PR, merge when green;
+5. final message = the acceptance summary + the printed open questions
++ the 5-line program summary.
+```
