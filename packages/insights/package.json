@@ -18,7 +18,8 @@
     "./fx/definitions": "./src/fx/definitions.ts",
     "./tic": "./src/tic/index.ts",
     "./prices": "./src/prices/index.ts",
-    "./ingest": "./src/ingest/index.ts"
+    "./ingest": "./src/ingest/index.ts",
+    "./page-division": "./src/page-division/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",

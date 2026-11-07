@@ -62,6 +62,7 @@ import type { TicReader } from '@currena/insights/tic';
 import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
+import { createInsightsPagesRoutes } from './insights-pages';
 import { z } from 'zod';
 import { errorResponse, NO_STORE } from '../http';
 import { getCookie } from 'hono/cookie';
@@ -775,6 +776,18 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     }
     return c.json(snapshot, 200, { 'Cache-Control': 'public, max-age=300', ETag: etag });
   });
+
+  /* ------------------ page-division projections (S2) -------------------- *
+   * GET /api/insights/pages + /pages/:page — the per-destination payloads
+   * (the contract between engine and pages; see routes/insights-pages.ts).
+   * Registered BEFORE /:id/history so the literal /pages paths win (the
+   * /markets, /fx, /tic house pattern). Mounts INSIDE this module's gate +
+   * M-4 data bucket, and reuses the mode-aware reader + the live-prices
+   * overlay — the serving disciplines are inherited, not reinvented. */
+  app.route('/', createInsightsPagesRoutes({
+    getReader: deps.getReader,
+    getPricesReader: deps.getPricesReader,
+  }));
 
   app.get('/:id/history', async (c) => {
     const raw = c.req.param('id');

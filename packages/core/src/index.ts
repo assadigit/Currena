@@ -110,6 +110,11 @@ export {
   PriceAssetIdSchema,
   LivePriceEntrySchema,
   LivePricesSnapshotSchema,
+  PageDivisionPageIdSchema,
+  BoardAttachmentIdSchema,
+  PageProjectionSchema,
+  PageIndexEntrySchema,
+  PageIndexSchema,
 } from './schemas';
 export type {
   Source,
@@ -184,6 +189,11 @@ export type {
   PriceAssetId,
   LivePriceEntry,
   LivePricesSnapshot,
+  PageDivisionPageId,
+  BoardAttachmentId,
+  PageProjection,
+  PageIndexEntry,
+  PageIndex,
 } from './schemas';
 
 export {

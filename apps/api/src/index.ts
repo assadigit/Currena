@@ -33,6 +33,7 @@ import { KvTicStore } from '@currena/insights/tic';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
+import { createInsightsPagesRoutes } from './routes/insights-pages';
 import { createNarrativeRoutes } from './routes/insights-narrative';
 import { createRatesRoutes } from './routes/rates';
 import { createOpsRoutes } from './routes/ops';

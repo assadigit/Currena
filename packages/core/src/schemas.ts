@@ -2265,3 +2265,112 @@ export const LivePricesSnapshotSchema = z.object({
   assets: z.partialRecord(PriceAssetIdSchema, LivePriceEntrySchema),
 });
 export type LivePricesSnapshot = z.infer<typeof LivePricesSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * Page-division wire contracts (page-division S2, 2026-11-08 —
+ * docs/page-division/02-PAGE-DIVISION-SPEC.md §14 + the roadmap's S2).
+ *
+ * The split of the all-in-one Insights page into 9 data destinations
+ * (legacy `/insights` keeps serving the FULL snapshot at GET /api/insights
+ * unchanged). Each destination page fetches ONE curated projection:
+ * the registry readings whose detail-card home is that page, PLUS the
+ * mirror-input readings the page needs to render shared verdict displays
+ * (gauge verdict tiles, gold seat chips, the prices ribbon) — displays of
+ * the SAME computed values, linking to each card's one home (spec §3.2:
+ * one home per card, mirrors are links; nothing is computed twice).
+ *
+ * The placement itself (which id lives on which page) lives in
+ * @currena/insights/page-division — the ENGINE-side module shared by the
+ * API routes, the SPA and the PLACEMENT.generated.md generator, so the
+ * three cannot drift. These schemas are only the WIRE shapes.
+ *
+ * Boards are NOT embedded in the projection: each page payload names the
+ * board endpoints it consumes (`boards`) and the SPA fetches them at
+ * their existing cached routes (GET /api/insights/markets|markets-au|fx|tic)
+ * — the boards keep their own cadences, cache headers and visibility
+ * gates. The live-prices overlay needs no attachment at all: it merges
+ * into the projection's readings at serve time exactly as it does into
+ * GET /api/insights today (prices/merge.ts).
+ * ------------------------------------------------------------------ */
+
+/**
+ * The 9 data destinations (spec §2). NOT 'legacy': `/insights` keeps the
+ * full-snapshot contract and never asks for a projection.
+ */
+export const PageDivisionPageIdSchema = z.enum([
+  'global',
+  'gold',
+  'world-markets',
+  'usa',
+  'europe',
+  'asia-pacific',
+  'australia',
+  'commodities',
+  'currencies',
+]);
+export type PageDivisionPageId = z.infer<typeof PageDivisionPageIdSchema>;
+
+/**
+ * The existing board endpoints a page consumes (spec §14's boards table —
+ * the four served boards; the Prices live board rides the serve-time
+ * merge and the Companies board is feature-flagged OFF, so neither is an
+ * attachment).
+ */
+export const BoardAttachmentIdSchema = z.enum(['markets', 'markets-au', 'fx', 'tic']);
+export type BoardAttachmentId = z.infer<typeof BoardAttachmentIdSchema>;
+
+/**
+ * GET /api/insights/pages/:page — one destination's data projection.
+ *
+ * `readings` carries exactly the page's placement set (detail-card homes +
+ * mirror inputs, in placement order — deterministic, spec-ordered).
+ * `absentIds` is the honest fail-closed remainder: placement ids the
+ * served snapshot did not carry. In public mode that is the licence-hidden
+ * set (the four no-data Gold notes, per the generated site-mode overrides);
+ * in private mode it should be empty — a non-empty private absence is a
+ * data-layer defect the page displays as "can't read", never a guess
+ * (Agent Rule 5).
+ */
+export const PageProjectionSchema = z
+  .object({
+    page: PageDivisionPageIdSchema,
+    /** The serving snapshot's generation stamp (both projections share one snapshot). */
+    generatedAt: z.iso.datetime(),
+    /** When the live-prices overlay last refreshed (stamped at serve time, like GET /api/insights). */
+    pricesAsOf: z.iso.datetime().optional(),
+    /** 'public' ONLY when the projection was built over the public snapshot (mirrors the snapshot's own stamp). */
+    displayMode: z.literal('public').optional(),
+    /** The page's readings (homes + mirror inputs), placement order, each id at most once. */
+    readings: z.array(IndicatorReadingSchema),
+    /** Placement ids absent from the served snapshot — displayed honestly, never guessed. */
+    absentIds: z.array(IndicatorIdSchema),
+    /** The board endpoints this page consumes (existing cached routes). */
+    boards: z.array(BoardAttachmentIdSchema),
+  })
+  .refine((p) => new Set(p.readings.map((r) => r.id)).size === p.readings.length, {
+    message: 'page projection readings must contain each indicator id at most once',
+  })
+  .refine((p) => !p.readings.some((r) => p.absentIds.includes(r.id)), {
+    message: 'a reading cannot be both present and absent on the same page',
+  });
+export type PageProjection = z.infer<typeof PageProjectionSchema>;
+
+/** One destination's entry in the GET /api/insights/pages index. */
+export const PageIndexEntrySchema = z.object({
+  page: PageDivisionPageIdSchema,
+  /** Registry ids whose detail-card HOME is this page (spec §14's count column). */
+  registryCards: z.number().int().nonnegative(),
+  /** Mirror-input readings the page also needs (shared verdict displays). */
+  mirrorInputs: z.number().int().nonnegative(),
+  /** Board endpoints the page consumes. */
+  boards: z.array(BoardAttachmentIdSchema),
+  /** The decision-record entries this page traces to (03-STRATEGY-LOG.md §5). */
+  decisions: z.string().min(1),
+});
+export type PageIndexEntry = z.infer<typeof PageIndexEntrySchema>;
+
+/** GET /api/insights/pages — the projection surface's index (static per deploy). */
+export const PageIndexSchema = z.object({
+  pages: z.array(PageIndexEntrySchema),
+});
+export type PageIndex = z.infer<typeof PageIndexSchema>;

@@ -19,6 +19,7 @@
     "gap:progress:test": "node --test scripts/gap-progress.test.mjs",
     "lint": "eslint .",
     "registry:generate": "tsx scripts/generate-indicators-registry.ts",
+    "placement:generate": "tsx scripts/generate-placement-table.ts",
     "narrator:vocabulary": "pnpm --filter @currena/insights run narrator:vocabulary",
     "narrator:vocabulary:check": "pnpm --filter @currena/insights run narrator:vocabulary:check",
     "gates": "node scripts/gates.mjs",
