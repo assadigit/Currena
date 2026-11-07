@@ -20,6 +20,21 @@
 
 ## A. What comes next
 
+**UPDATE 2026-11-07 (later the same day) — A SUCCESSOR PROGRAM EXISTS: the
+page-division program** (`docs/page-division/`). The gold-meter program
+above remains CLOSED and its records authoritative; the successor is a
+**display-layer-only program** — no engine, voter, threshold, or calibration
+changes — that splits the all-in-one Insights page into **10 destinations**
+per the owner's **48 recorded decisions** (three strategy rounds, Phase 1
+closed 2026-11-07). Read in this order: `AGENT-RULES.md` (repo root — the
+owner's permanent working rules) → `docs/page-division/README.md` →
+`01-SESSION-ROADMAP.md` (the 30-session plan) → `02-PAGE-DIVISION-SPEC.md`
+(v1.0, drafted for the external investor's review) → `03-STRATEGY-LOG.md`
+(D-1…D-48 + the Session 1/30 kickoff prompt in §9). The gold meter's own
+successor rule (below, unchanged) still governs any meter change; the
+page-division program deliberately touches none of it. The historical close
+note follows unchanged:
+
 **Nothing — the program is closed AND the round-3 successor loop closed
 with it (GF-S13, 2026-11-07).** The final prompt is **NONE**, doubly so
 (PROMPTS.md's foot records both closes). The owner's round-3 answers
