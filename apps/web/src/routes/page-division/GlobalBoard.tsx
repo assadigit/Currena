@@ -371,8 +371,9 @@ function RibbonAsset({ entry }: { entry: GlobalRibbonEntry }): React.JSX.Element
             <bdi dir="ltr" className={`shrink-0 text-[9.5px] font-bold leading-none tabular-nums sm:text-[length:var(--type-caption)] ${changeTone}`}>
               {signedPct(change, numberLocale)}
               {/* The VISIBLE window tag (S4: a bare percent never rides
-               * without its window) + the full words for screen readers. */}
-              <span className="ms-0.5 font-semibold text-[var(--color-text-tertiary)]">
+               * without its window) — aria-hidden because the full words
+               * for screen readers follow (no double read). */}
+              <span className="ms-0.5 font-semibold text-[var(--color-text-tertiary)]" aria-hidden="true">
                 {interpolate(t('pd.global.ribbonWindowTag'), { days: formatNumber(changeDays, numberLocale, { maximumFractionDigits: 0 }) })}
               </span>
               <span className="sr-only"> {changeDays === 1 ? t('pd.global.changeOver1d') : interpolate(t('pd.global.changeOver'), { days: formatNumber(changeDays, numberLocale, { maximumFractionDigits: 0 }) })}</span>
@@ -620,7 +621,7 @@ export function RegionChips({
                   e.preventDefault();
                   navigate(d.route);
                 }}
-                className="insights-focusable inline-flex min-h-[36px] shrink-0 items-center gap-2 rounded-full bg-currena-soft px-3 py-1.5 text-[13px] font-bold text-currena-dark no-underline motion-safe:transition-all motion-safe:duration-300 hover:bg-currena-blue hover:text-white sm:px-3.5 sm:text-[length:var(--type-label)]"
+                className="insights-focusable inline-flex min-h-[36px] shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-currena-soft px-3 py-1.5 text-[13px] font-bold text-currena-dark no-underline motion-safe:transition-all motion-safe:duration-300 hover:bg-currena-blue hover:text-white sm:px-3.5 sm:text-[length:var(--type-label)]"
               >
                 <ChipDot state={dot} />
                 {t(d.titleKey)}
@@ -662,16 +663,28 @@ export function NarratorLine({
   if (doc === null || !(doc.visible || preview)) return null;
   const text = locale === 'fa' ? doc.overall.fa : doc.overall.en;
   if (text.trim() === '') return null;
+  // S4 fix (the VLM pass caught the first cut): the clamp lives on an
+  // INNER element with zero vertical padding — a clamped element clips
+  // at its padding edge, so py-2 on the same node bled a sliced third
+  // line into the bottom padding. And the Updated stamp rides the
+  // FRONT of the clamped flow (inside line 1, always visible) — at the
+  // text's end the clamp swallowed it whole.
   return (
     <p
       data-narrator-line
       data-narrator-source={doc.overall.source}
-      className="m-0 rounded-[var(--radius-md)] bg-currena-soft/60 px-3 py-2 text-[11.5px] leading-snug text-currena-dark ring-1 ring-[var(--color-border)]/60 line-clamp-2 sm:px-4 sm:py-2.5 sm:text-[length:var(--type-label)] sm:leading-relaxed"
+      className="m-0 rounded-[var(--radius-md)] bg-currena-soft/60 px-3 py-2 ring-1 ring-[var(--color-border)]/60 sm:px-4 sm:py-2.5"
     >
-      <span className="me-1.5 font-bold text-currena-blue">{t('pd.global.narratorTitle')}:</span>
-      <bdi>{text}</bdi>
-      <span className="ms-1.5 whitespace-nowrap text-[var(--color-text-tertiary)]">
-        · {interpolate(t('pd.global.narratorUpdated'), { time: formatNarratorUpdated(doc.overall.generatedAt, locale, t) })}
+      {/* NOTE: no `block` here — Tailwind's line-clamp carries its own
+          display:-webkit-box, and a display utility beside it would
+          override the clamp entirely (the first mobile-fa cut rendered
+          six unclamped lines before this was caught). */}
+      <span className="line-clamp-2 text-[11.5px] leading-snug text-currena-dark sm:text-[length:var(--type-label)] sm:leading-relaxed">
+        <span className="me-1.5 font-bold text-currena-blue">{t('pd.global.narratorTitle')}</span>
+        <span className="me-1 whitespace-nowrap font-semibold text-[var(--color-text-tertiary)]">
+          · {interpolate(t('pd.global.narratorUpdated'), { time: formatNarratorUpdated(doc.overall.generatedAt, locale, t) })}
+        </span>
+        <bdi>{text}</bdi>
       </span>
     </p>
   );
