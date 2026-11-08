@@ -25,8 +25,16 @@
  */
 
 import type { IndicatorReading } from '@currena/core';
-import { evaluateSignal, goldBalance } from '@currena/insights';
+import { evaluateSignal, goldBalance, GOLD_LANES } from '@currena/insights';
+import type { GoldBalanceReading } from '@currena/insights';
 import { GOLD_VOTER_IDS } from '@currena/insights/page-division';
+import {
+  GF_F2_PROXY_ID,
+  GF_MOVE_P1_PROPOSED,
+  GF_VOTERS_P4_5LANE,
+  gfLaneBalance,
+  gfMoveMapWith,
+} from '@currena/insights/gf-p0-proposed';
 import { goldOutlookOf } from '../../components/insights/signals/outlook-core';
 import { GOLD_CONTEXT_IDS, goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
 import { balanceTilt, balanceVerdictOf } from '../../components/insights/signals/BalanceScale';
@@ -186,6 +194,131 @@ export function backtestGoldPage(pageReadings: readonly IndicatorReading[], engi
       engine: stableStringify(engineReading),
     });
   }
+
+  return checks;
+}
+
+/* ------------------------------------------------------------------ *
+ * S6 — THE FROZEN-SCENARIO SUITE (the §21 zero-tolerance standard over
+ * every recorded corpus window): the frozen harness's OWN arithmetic
+ * (gf-p0-proposed.ts — gfLaneBalance over the frozen scenario tables)
+ * beside the PAGE renderer's derivations (gold-tiles), window by
+ * window, so a drift in either surface's composition, thresholds,
+ * evaluator or presentation math surfaces red over HISTORY — not just
+ * on today's snapshot (the S5 live run).
+ * ------------------------------------------------------------------ */
+
+/**
+ * The frozen harness's PRODUCTION composition — GF_VOTERS_P4_5LANE with
+ * the F2 scenario proxy mapped to its recorded production seat
+ * (gf-f2-gross-long-share ↔ cftc-gold-gross-long, the GF-S8 design
+ * decision; the set-equality with GOLD_LANE_VOTERS is pinned by
+ * gf-p0-proposed.test.ts). The mapping lives HERE, at the consumer, so
+ * the frozen tables stay untouched.
+ */
+export const GF_PRODUCTION_VOTERS = GF_VOTERS_P4_5LANE.map((v) =>
+  v.id === GF_F2_PROXY_ID ? { ...v, id: 'cftc-gold-gross-long' as const } : v,
+);
+
+/** The harness's own GoldBalanceReading-shaped result — the pure
+ * classifier inputs (goldOutlookOf reads counts only; members are never
+ * consulted) rebuilt from the frozen engine's numbers, never the page's. */
+function harnessBalanceOf(readings: readonly IndicatorReading[]): GoldBalanceReading {
+  const h = gfLaneBalance(readings, GF_PRODUCTION_VOTERS, GOLD_LANES, 2, gfMoveMapWith(GF_MOVE_P1_PROPOSED), true);
+  return {
+    lanes: h.lanes.map((l) => ({ ...l, lane: l.lane as GoldBalanceReading['lanes'][number]['lane'], members: [] })),
+    counts: h.counts,
+    net: h.net,
+    readable: h.readable,
+  };
+}
+
+/**
+ * The S6 frozen-scenario window sweep: the PAGE renderer (gold-tiles'
+ * goldHero + goldSeatLanes + the BalanceScale's own presentation math)
+ * vs the FROZEN HARNESS (gfLaneBalance over the production scenario
+ * composition, MIN2, the D-18 input-presence rule, the executed
+ * threshold map). `harnessReadings` defaults to the page's own readings
+ * (the sweep's semantics: both surfaces over the SAME recorded window);
+ * the fail-closed proofs pass a divergent copy — the S5 core's two-path
+ * shape, so a drift in EITHER surface's code path surfaces red. Every
+ * check must hold on EVERY recorded window — meter counts, lane votes,
+ * beam angle, outlook, verdict (§21: byte-identical, zero tolerance).
+ */
+export function backtestGoldPageVsHarness(
+  pageReadings: readonly IndicatorReading[],
+  harnessReadings: readonly IndicatorReading[] = pageReadings,
+): BacktestCheck[] {
+  const checks: BacktestCheck[] = [];
+  const harness = gfLaneBalance(harnessReadings, GF_PRODUCTION_VOTERS, GOLD_LANES, 2, gfMoveMapWith(GF_MOVE_P1_PROPOSED), true);
+  const harnessBalance = harnessBalanceOf(harnessReadings);
+
+  /* ---- 1. The meter counts — page vs the frozen harness ---- */
+  const pageHero = goldHero(pageReadings);
+  checks.push({
+    label: 'frozen-scenario meter counts (for/against/neutral/unread)',
+    ok:
+      pageHero.balance.counts.for === harness.counts.for &&
+      pageHero.balance.counts.against === harness.counts.against &&
+      pageHero.balance.counts.neutral === harness.counts.neutral &&
+      pageHero.balance.counts.unread === harness.counts.unread,
+    page: show([pageHero.balance.counts.for, pageHero.balance.counts.against, pageHero.balance.counts.neutral, pageHero.balance.counts.unread]),
+    engine: show([harness.counts.for, harness.counts.against, harness.counts.neutral, harness.counts.unread]),
+  });
+  checks.push({
+    label: 'frozen-scenario net + readable',
+    ok: pageHero.balance.net === harness.net && pageHero.balance.readable === harness.readable,
+    page: show([pageHero.balance.net, pageHero.balance.readable]),
+    engine: show([harness.net, harness.readable]),
+  });
+
+  /* ---- 2. The lane votes — side/split/readable/firing, lane by lane ---- */
+  const pageLanes = goldSeatLanes(pageHero.balance);
+  for (const harnessLane of harness.lanes) {
+    const pageLane = pageLanes.find((l) => l.lane === harnessLane.lane);
+    checks.push({
+      label: `frozen-scenario lane ${harnessLane.lane} side/split/readable/firing`,
+      ok:
+        pageLane !== undefined &&
+        pageLane.side === harnessLane.side &&
+        pageLane.split === harnessLane.split &&
+        pageLane.readable === harnessLane.readable &&
+        pageLane.firing === harnessLane.firing &&
+        pageLane.supports === harnessLane.supports &&
+        pageLane.pressures === harnessLane.pressures,
+      page: show(pageLane && [pageLane.side, pageLane.split, pageLane.readable, pageLane.firing, pageLane.supports, pageLane.pressures]),
+      engine: show([harnessLane.side, harnessLane.split, harnessLane.readable, harnessLane.firing, harnessLane.supports, harnessLane.pressures]),
+    });
+  }
+
+  /* ---- 3. The beam + the verdict — the presentation math over each
+   *      side's OWN counts must agree (one formula: D-GB-8) ---- */
+  const pageCounts = { ...pageHero.balance.counts, total: pageHero.balance.lanes.length, net: pageHero.balance.net, readable: pageHero.balance.readable };
+  const harnessCounts = { ...harness.counts, total: harness.lanes.length, net: harness.net, readable: harness.readable };
+  checks.push({
+    label: 'frozen-scenario beam angle (harness D-GB-8 vs balanceTilt)',
+    ok: harness.beamAngle === balanceTilt(pageCounts, 320).angleDeg && harness.beamAngle === balanceTilt(harnessCounts, 320).angleDeg,
+    page: show(balanceTilt(pageCounts, 320).angleDeg),
+    engine: show(harness.beamAngle),
+  });
+  const harnessVerdict = balanceVerdictOf(harnessCounts);
+  checks.push({
+    label: 'frozen-scenario verdict word state',
+    ok: balanceVerdictOf(pageCounts) === harnessVerdict,
+    page: show(balanceVerdictOf(pageCounts)),
+    engine: show(harnessVerdict),
+  });
+
+  /* ---- 4. The 7-state outlook — the pure classifier over each side's
+   *      own balance + its own gold signal evidence ---- */
+  const gold = evaluateSignal('gold', harnessReadings);
+  const harnessOutlook = goldOutlookOf(harnessBalance, gold.speed, gold.position);
+  checks.push({
+    label: 'frozen-scenario outlook (7-state)',
+    ok: pageHero.outlook === harnessOutlook,
+    page: show(pageHero.outlook),
+    engine: show(harnessOutlook),
+  });
 
   return checks;
 }

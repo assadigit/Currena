@@ -19,7 +19,8 @@
     "./tic": "./src/tic/index.ts",
     "./prices": "./src/prices/index.ts",
     "./ingest": "./src/ingest/index.ts",
-    "./page-division": "./src/page-division/index.ts"
+    "./page-division": "./src/page-division/index.ts",
+    "./gf-p0-proposed": "./src/gf-p0-proposed.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",

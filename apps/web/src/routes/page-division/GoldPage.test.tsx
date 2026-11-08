@@ -232,7 +232,7 @@ describe('GoldPage', () => {
 
     // Toggle to the minimal view: the glyph appears, the stage leaves,
     // and the choice persists to localStorage.
-    fireEvent.click(radios[1]);
+    fireEvent.click(radios[1]!);
     await waitFor(() => {
       expect(document.querySelector('[data-hero-balance-view]')?.getAttribute('data-hero-balance-view')).toBe('minimal');
     });
