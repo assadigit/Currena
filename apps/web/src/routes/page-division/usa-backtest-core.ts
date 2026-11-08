@@ -1,8 +1,10 @@
 /**
- * usa-backtest-core — the S9 §21 diff, PURE (spec §21's
+ * usa-backtest-core — the S9 + S10 §21 diff, PURE (spec §21's
  * verdict-consistency rule applied to the USA page: "the verdicts match
  * Global's engine values byte-for-byte" — the D-30 contract — plus the
- * §21 per-page trio over the tier cards).
+ * §21 per-page trio over the tier cards, plus the S10 tier-6 TIC board
+ * diff: the page's board ≡ the served snapshot ≡ the arithmetic
+ * restated independently, never through the section's own helper).
  *
  * THREE SIDES, ONE TRUTH (the S4/S7/S8 two-path shape, extended by the
  * session gate's own wording):
@@ -43,8 +45,9 @@
  * only).
  */
 
-import type { IndicatorId, IndicatorReading } from '@currena/core';
+import type { IndicatorId, IndicatorReading, TicHolder, TicSnapshot } from '@currena/core';
 import { GAUGES, gaugeReading, labelForVerdictStep } from '@currena/insights';
+import { TIC_CUSTODY_HUBS, ticHolderDerived, ticIsStale } from '@currena/insights/tic';
 import { THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS } from '@currena/insights/page-division';
 import { globalGaugeTiles, type GlobalGaugeTile } from './global-tiles';
 import { USA_CARD_IDS, usaGaugeVerdicts } from './usa-tiles';
@@ -187,9 +190,246 @@ export function backtestUsaPage(
   return { checks, green: checks.filter((c) => c.ok).length, red: checks.filter((c) => !c.ok).length };
 }
 
+/* ------------------------------------------------------------------ *
+ * The tier-6 TIC board diff (S10, spec §7 item 7 / §21): the REUSED
+ * section renders ticHolderDerived (the insights package's own helper)
+ * over the snapshot GET /api/insights/tic serves. THREE truths, one
+ * board:
+ *
+ *   PAGE side — the payload the page fetched, joined through the SAME
+ *   helper the drawing renders (ticHolderDerived over an INDEPENDENT
+ *   copy — a page-side mutation can never leak into the engine side).
+ *
+ *   PAYLOAD equality — the page's copy and the engine's copy (two HTTP
+ *   payloads of the one stored document) agree on every rendered field.
+ *
+ *   ENGINE side — the derived numbers RESTATED HERE, spelled out from
+ *   the raw months (share, the 1/6/12-month changes, the 12-month
+ *   transactions sum, the 12-month price effect) — never through
+ *   ticHolderDerived. A drift in the helper surfaces as a red check,
+ *   never as two copies of the same bug agreeing.
+ * ------------------------------------------------------------------ */
+
+/** The TIC board's expected holder count (spec §7 item 7: 21 foreign
+ *  holders — the Table 5 top-20 + Australia). */
+export const TIC_EXPECTED_HOLDERS = 21;
+
+export interface TicBacktestOverrides {
+  /** Drop a holder from the PAGE copy (a truncated payload). */
+  dropPageHolder?: string;
+  /** Mutate a PAGE-side holder's latest holdings after the fetch (a
+   *  corrupted copy — the diff must go red, never silently green). */
+  mutatePageHolder?: (holder: TicHolder) => void;
+  /** Mutate the PAGE copy's grand total. */
+  mutatePageTotal?: (snapshot: TicSnapshot) => void;
+}
+
+/** The restated engine-side arithmetic for ONE holder (the compute.ts
+ *  contract, spelled out — never imported): the changes round to 3dp,
+ * the 12-month sums accumulate RAW then round once to 3dp, sharePct is
+ * 1dp with the non-positive-total guard, the pcts 1dp). */
+function restatedDerived(holder: TicHolder, dataMonth: string, totalBn: number): string {
+  const at = (nBack: number): number | null => {
+    const y = Number(dataMonth.slice(0, 4));
+    const m = Number(dataMonth.slice(5, 7));
+    const target = nBack >= m ? `${String(y - 1).padStart(4, '0')}-${String(12 + m - nBack).padStart(2, '0')}` : `${String(y).padStart(4, '0')}-${String(m - nBack).padStart(2, '0')}`;
+    return holder.months.find((x) => x.ym === target)?.v ?? null;
+  };
+  const latest = holder.months.at(-1)!.v;
+  const round3 = (v: number): number => Math.round(v * 1000) / 1000;
+  const chg = (n: number): number | null => {
+    const base = at(n);
+    return base === null ? null : round3(latest - base);
+  };
+  const pct = (delta: number | null, base: number | null): number | null =>
+    delta === null || base === null || base <= 0 ? null : Math.round((delta / base) * 1000) / 10;
+  const inWindow = (ym: string): boolean => {
+    const y = Number(ym.slice(0, 4));
+    const m = Number(ym.slice(5, 7));
+    const dy = Number(dataMonth.slice(0, 4));
+    const dm = Number(dataMonth.slice(5, 7));
+    return y * 12 + m > dy * 12 + dm - 12 && y * 12 + m <= dy * 12 + dm;
+  };
+  let net12m: number | null = null;
+  let netMonths = 0;
+  for (const m of holder.netSalesBn ?? []) {
+    if (inWindow(m.ym)) {
+      net12m = (net12m ?? 0) + m.v; // raw accumulation, rounded once below
+      netMonths += 1;
+    }
+  }
+  let val12m: number | null = null;
+  for (const m of holder.valuationChangeBn ?? []) {
+    if (inWindow(m.ym)) val12m = (val12m ?? 0) + m.v;
+  }
+  const chg12m = chg(12);
+  return stableStringify({
+    sharePct: totalBn > 0 ? Math.round((holder.holdingsBn / totalBn) * 1000) / 10 : 0,
+    chg1mBn: chg(1),
+    chg6mBn: chg(6),
+    chg12mBn: chg12m,
+    chg12mPct: pct(chg12m, at(12)),
+    net12mBn: net12m === null ? null : round3(net12m),
+    netMonths,
+    val12mBn: val12m === null ? null : round3(val12m),
+  });
+}
+
+/** The page-side derivation through the package's own helper (what the
+ *  drawing renders), over the page's INDEPENDENT copy. */
+function pageDerived(holder: TicHolder, snapshot: TicSnapshot): string {
+  const d = ticHolderDerived(holder, snapshot);
+  return stableStringify({
+    sharePct: d.sharePct,
+    chg1mBn: d.chg1mBn,
+    chg6mBn: d.chg6mBn,
+    chg12mBn: d.chg12mBn,
+    chg12mPct: d.chg12mPct,
+    net12mBn: d.net12mBn,
+    netMonths: d.netMonths,
+    val12mBn: d.val12mBn,
+  });
+}
+
+/** The rendered-fields payload fingerprint (fetchedAt excluded — the
+ *  rung's own stamp; the two copies may be served from one document). */
+function ticPayloadFingerprint(s: TicSnapshot): string {
+  return stableStringify({
+    v: s.v,
+    dataMonth: s.dataMonth,
+    releasedAt: s.releasedAt,
+    totalBn: s.totalBn,
+    officialBn: s.officialBn,
+    privateBn: s.privateBn,
+    holders: [...s.holders]
+      .map((h) => ({ id: h.id, name: h.name, holdingsBn: h.holdingsBn, months: h.months, netSalesBn: h.netSalesBn ?? null, valuationChangeBn: h.valuationChangeBn ?? null, isCustodyHub: h.isCustodyHub, flaggedMonths: h.flaggedMonths ?? null }))
+      .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)),
+  });
+}
+
+/** A deep-enough copy of the page's snapshot for the proof seams — the
+ *  nested series arrays are copied too, so a mutation on the page side
+ *  can never leak into the engine side through a shared object (the
+ *  offline suite passes the SAME board object as both feeds; the live
+ *  script passes two HTTP payloads — both must behave identically). */
+function copyTic(s: TicSnapshot): TicSnapshot {
+  return {
+    ...s,
+    holders: s.holders.map((h) => ({
+      ...h,
+      months: h.months.map((m) => ({ ...m })),
+      netSalesBn: h.netSalesBn?.map((m) => ({ ...m })),
+      valuationChangeBn: h.valuationChangeBn?.map((m) => ({ ...m })),
+      flaggedMonths: h.flaggedMonths?.slice(),
+    })),
+  } as TicSnapshot;
+}
+
 /**
- * The LIVE script's card-membership sanity basis: the 26 S9-scope card
- * ids, in placement order (re-exported from usa-tiles — never
+ * The S10 §21 TIC diff: page payload ≡ engine payload, and every derived
+ * number the drawing renders ≡ the arithmetic restated independently.
+ * Any `ok: false` is a §21 red finding.
+ */
+export function backtestUsaTicBoard(
+  pageTic: TicSnapshot,
+  engineTic: TicSnapshot,
+  overrides: TicBacktestOverrides = {},
+): { checks: UsaBacktestCheck[]; green: number; red: number } {
+  const checks: UsaBacktestCheck[] = [];
+  // The PAGE copy is a MUTABLE copy exactly like a second HTTP payload —
+  // the proof seams act here, never on the engine side.
+  const page = copyTic(pageTic);
+  if (overrides.dropPageHolder !== undefined) {
+    (page as { holders: TicHolder[] }).holders = page.holders.filter((h) => h.id !== overrides.dropPageHolder);
+  }
+  for (const h of page.holders) overrides.mutatePageHolder?.(h);
+  overrides.mutatePageTotal?.(page);
+
+  /* ---- 0. Structure: the spec's own board shape, both sides ---- */
+  for (const [side, s] of [['page', page], ['engine', engineTic]] as const) {
+    const ids = s.holders.map((h) => h.id);
+    const unique = new Set(ids).size === ids.length;
+    const count = ids.length === TIC_EXPECTED_HOLDERS;
+    const monthsOk = s.holders.every((h) => h.months.length >= 2 && h.months.at(-1)!.ym === s.dataMonth);
+    const holdingsOk = s.holders.every((h) => Math.abs(h.months.at(-1)!.v - h.holdingsBn) < 0.0005);
+    checks.push({
+      label: `tic structure (${side}): 21 unique holders, every latest month = dataMonth, holdingsBn = latest value`,
+      ok: unique && count && monthsOk && holdingsOk,
+      detail: `holders ${ids.length}/${TIC_EXPECTED_HOLDERS} · unique ${unique} · months ${monthsOk} · holdings ${holdingsOk}`,
+    });
+  }
+
+  /* ---- 1. Payload equality: the page's copy ≡ the engine's copy ---- */
+  const pageFp = ticPayloadFingerprint(page);
+  const engineFp = ticPayloadFingerprint(engineTic);
+  checks.push({
+    label: 'tic payload: the page copy ≡ the served snapshot, every rendered field',
+    ok: pageFp === engineFp,
+    detail: `page ${pageFp.slice(0, 120)}… · engine ${engineFp.slice(0, 120)}…`,
+  });
+
+  /* ---- 2. The aggregates: the split bar's own arithmetic ---- */
+  for (const [side, s] of [['page', page], ['engine', engineTic]] as const) {
+    if (s.officialBn === undefined || s.privateBn === undefined) {
+      checks.push({ label: `tic aggregates (${side}): official + private = total`, ok: false, detail: 'official/private absent' });
+      continue;
+    }
+    const sums = Math.abs(s.officialBn + s.privateBn - s.totalBn) < 0.011;
+    checks.push({
+      label: `tic aggregates (${side}): official + private = total (the split bar's own basis)`,
+      ok: sums,
+      detail: `official ${s.officialBn} + private ${s.privateBn} vs total ${s.totalBn}`,
+    });
+  }
+
+  /* ---- 3. Every holder: the drawing's derivation ≡ the restated
+   *          arithmetic, and the custody-hub set ≡ Treasury's own ---- */
+  const engineById = new Map(engineTic.holders.map((h) => [h.id, h]));
+  for (const pageHolder of page.holders) {
+    const engineHolder = engineById.get(pageHolder.id);
+    if (engineHolder === undefined) {
+      checks.push({ label: `tic holder ${pageHolder.id}: present on the engine side`, ok: false, detail: 'MISSING on the engine side' });
+      continue;
+    }
+    const pageJson = pageDerived(pageHolder, page);
+    const engineJson = restatedDerived(engineHolder, engineTic.dataMonth, engineTic.totalBn);
+    checks.push({
+      label: `tic holder ${pageHolder.id}: the drawing's derived row ≡ the restated arithmetic`,
+      ok: pageJson === engineJson,
+      detail: `page ${pageJson} · engine ${engineJson}`,
+    });
+    const custodyOk = pageHolder.isCustodyHub === engineHolder.isCustodyHub && pageHolder.isCustodyHub === TIC_CUSTODY_HUBS.has(pageHolder.name);
+    checks.push({
+      label: `tic holder ${pageHolder.id}: the custody-hub marker ≡ Treasury's own set`,
+      ok: custodyOk,
+      detail: `page ${pageHolder.isCustodyHub} · engine ${engineHolder.isCustodyHub} · treasury ${TIC_CUSTODY_HUBS.has(pageHolder.name)}`,
+    });
+  }
+  // A holder on the engine side but not the page side is RED (a truncated
+  // page payload must never pass silently).
+  const pageIds = new Set(page.holders.map((h) => h.id));
+  for (const engineHolder of engineTic.holders) {
+    if (!pageIds.has(engineHolder.id)) {
+      checks.push({ label: `tic holder ${engineHolder.id}: present on the page side`, ok: false, detail: 'MISSING on the page side' });
+    }
+  }
+
+  /* ---- 4. The staleness verdict: both copies, the same clock ---- */
+  const NOW = new Date('2026-11-09T12:00:00Z');
+  const pageStale = ticIsStale(page, NOW);
+  const engineStale = ticIsStale(engineTic, NOW);
+  checks.push({
+    label: 'tic staleness: the >70-day badge verdict identical on both copies (the same clock)',
+    ok: pageStale === engineStale,
+    detail: `page ${pageStale} · engine ${engineStale} (dataMonth ${page.dataMonth} at ${NOW.toISOString().slice(0, 10)})`,
+  });
+
+  return { checks, green: checks.filter((c) => c.ok).length, red: checks.filter((c) => !c.ok).length };
+}
+
+/**
+ * The LIVE script's card-membership sanity basis: the 72 S9+S10-scope
+ * card ids, in placement order (re-exported from usa-tiles — never
  * hand-copied).
  */
 export { USA_CARD_IDS as USA_BACKTEST_CARD_IDS };

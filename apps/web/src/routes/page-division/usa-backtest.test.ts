@@ -1,19 +1,24 @@
 /**
- * usa-backtest tests (S9, 2026-11-09) — the offline §21 suite.
+ * usa-backtest tests (S9 + S10, 2026-11-09) — the offline §21 suite.
  *
  * Drives the pure comparison core (usa-backtest-core.ts) on a synthetic
  * snapshot: the full pipeline green, the honest public-mode twin, the
  * THREE fail-closed proofs (a mutated page verdict, a mutated card value,
  * a dropped input on each side) and the key-order-immune stableStringify.
- * The LIVE script (apps/web/scripts/pd-s9-backtest.ts) drives the same
+ * S10 adds the tier-6 TIC board diff (backtestUsaTicBoard): the full
+ * pipeline over a synthetic 21-holder board, and THREE fail-closed proofs
+ * of its own (a dropped page holder, a mutated page holder's value, a
+ * mutated page total).
+ * The LIVE script (apps/web/scripts/pd-s10-backtest.ts) drives the same
  * core over the wire — never in here (tests never hit live sites,
  * AGENTS.md rule 7).
  */
 
 import { describe, expect, it } from 'vitest';
-import type { IndicatorReading } from '@currena/core';
+import type { IndicatorReading, TicHolder, TicSnapshot } from '@currena/core';
 import { THEMATIC_GAUGE_MEMBER_IDS, pageReadingIds, pageMirrorIds } from '@currena/insights/page-division';
-import { backtestUsaPage, stableStringify } from './usa-backtest-core';
+import { TIC_CUSTODY_HUBS } from '@currena/insights/tic';
+import { backtestUsaPage, backtestUsaTicBoard, stableStringify, TIC_EXPECTED_HOLDERS } from './usa-backtest-core';
 import { USA_CARD_IDS } from './usa-tiles';
 
 function reading(id: string, partial: Partial<IndicatorReading> = {}): IndicatorReading {
@@ -103,7 +108,7 @@ describe('backtestUsaPage — the offline §21 suite', () => {
   it('the full pipeline: page ≡ Global ≡ engine over the synthetic snapshot, ZERO red', () => {
     const snapshot = syntheticSnapshot();
     const result = backtestUsaPage(pageFeedOf(snapshot), globalFeedOf(snapshot), engineFeedOf(snapshot));
-    // 38 voter inputs + 5 gauges + 26 cards.
+    // 38 voter inputs + 5 gauges + 72 cards (S9's 26 + S10's 46).
     expect(result.checks).toHaveLength(THEMATIC_GAUGE_MEMBER_IDS.length + 5 + USA_CARD_IDS.length);
     expect(result.red).toBe(0);
     expect(result.green).toBe(result.checks.length);
@@ -194,5 +199,145 @@ describe('backtestUsaPage — the offline §21 suite', () => {
     expect(stableStringify({ a: 1, b: [2, { c: 3 }] })).toBe(stableStringify({ b: [2, { c: 3 }], a: 1 }));
     expect(stableStringify(undefined)).toBe('null');
     expect(stableStringify({ a: undefined, b: 2 })).toBe(stableStringify({ b: 2 }));
+  });
+});
+
+/** A synthetic TIC board: 21 holders (the spec's own count), 14 months of
+ *  history, transactions + valuation series, two custody hubs — real-world
+ *  magnitudes so the derived numbers are the numbers a visitor sees. */
+function syntheticTic(): TicSnapshot {
+  const NAMES: readonly [string, string, number][] = [
+    ['japan', 'Japan', 1120],
+    ['united-kingdom', 'United Kingdom', 800],
+    ['china-mainland', 'China, Mainland', 850],
+    ['belgium', 'Belgium', 380],
+    ['canada', 'Canada', 300],
+    ['cayman-islands', 'Cayman Islands', 350],
+    ['luxembourg', 'Luxembourg', 340],
+    ['france', 'France', 280],
+    ['ireland', 'Ireland', 300],
+    ['taiwan', 'Taiwan', 250],
+    ['switzerland', 'Switzerland', 240],
+    ['singapore', 'Singapore', 230],
+    ['hong-kong', 'Hong Kong', 220],
+    ['india', 'India', 210],
+    ['norway', 'Norway', 150],
+    ['brazil', 'Brazil', 140],
+    ['saudi-arabia', 'Saudi Arabia', 130],
+    ['korea-south', 'Korea, South', 120],
+    ['united-arab-emirates', 'United Arab Emirates', 110],
+    ['bermuda', 'Bermuda', 90],
+    ['australia', 'Australia', 60],
+  ];
+  // 14 ascending months, 2025-07 .. 2026-08 (clean year/month rolls).
+  const monthKeys: string[] = [];
+  for (let i = 0; i < 14; i += 1) {
+    const y = 2025 + Math.floor((7 - 1 + i) / 12);
+    const m = ((7 - 1 + i) % 12) + 1;
+    monthKeys.push(`${y}-${String(m).padStart(2, '0')}`);
+  }
+  expect(monthKeys[0]).toBe('2025-07');
+  expect(monthKeys[13]).toBe('2026-08');
+  const holders: TicHolder[] = NAMES.map(([id, name, base], i) => {
+    // china-mainland declines 1/month — the board carries BOTH directions
+    // of change so the derived rows are non-trivial.
+    const step = id === 'china-mainland' ? -1 : 2;
+    const months = monthKeys.map((ym, k) => ({ ym, v: Math.round((base + k * step - (i % 3)) * 100) / 100 }));
+    return {
+      id,
+      name,
+      holdingsBn: months[months.length - 1]!.v,
+      months,
+      netSalesBn: monthKeys.slice(-12).map((ym, k) => ({ ym, v: Math.round((k % 2 === 0 ? 5 : -3) * 100) / 100 })),
+      valuationChangeBn: monthKeys.slice(-12).map((ym, k) => ({ ym, v: Math.round((k % 3) * 1.5 * 100) / 100 })),
+      isCustodyHub: TIC_CUSTODY_HUBS.has(name),
+    };
+  });
+  const totalBn = 9331.7;
+  const officialBn = 3755.6;
+  return {
+    v: 1,
+    dataMonth: '2026-08',
+    releasedAt: '2026-10-16T20:07:27.000Z',
+    fetchedAt: '2026-11-08T04:35:00.000Z',
+    totalBn,
+    officialBn,
+    privateBn: Math.round((totalBn - officialBn) * 100) / 100,
+    holders,
+    sourceUrls: ['https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt'],
+  };
+}
+
+describe('backtestUsaTicBoard — the S10 offline §21 suite (the tier-6 board)', () => {
+  it('the full pipeline: the page payload ≡ the engine payload, every derived row ≡ the restated arithmetic, ZERO red', () => {
+    const board = syntheticTic();
+    const result = backtestUsaTicBoard(board, board);
+    // 2 structure + 1 payload + 2 aggregates + 21 holders x (derived + custody) + 1 staleness.
+    expect(result.checks).toHaveLength(2 + 1 + 2 + TIC_EXPECTED_HOLDERS * 2 + 1);
+    expect(result.red).toBe(0);
+    expect(result.green).toBe(result.checks.length);
+    // The board is the spec's own: 21 holders, the custody hubs marked.
+    const hubRows = result.checks.filter((c) => c.label.includes('custody-hub marker'));
+    expect(hubRows.every((c) => c.ok)).toBe(true);
+    expect(board.holders.filter((h) => h.isCustodyHub).length).toBe(7);
+  });
+
+  it('the restated arithmetic agrees with the package helper over a NON-trivial board (both directions of change)', () => {
+    // japan rises 2/month for 14 months; china falls 1/month — the
+    // derived rows must reflect both directions through BOTH paths.
+    const board = syntheticTic();
+    const japan = board.holders.find((h) => h.id === 'japan')!;
+    const china = board.holders.find((h) => h.id === 'china-mainland')!;
+    expect(japan.months[0]!.v).toBeLessThan(japan.months.at(-1)!.v);
+    expect(china.months[0]!.v).toBeGreaterThan(china.months.at(-1)!.v);
+    const result = backtestUsaTicBoard(board, board);
+    const jp = result.checks.find((c) => c.label.startsWith('tic holder japan: the drawing'))!;
+    const cn = result.checks.find((c) => c.label.startsWith('tic holder china-mainland: the drawing'))!;
+    expect(jp.ok).toBe(true);
+    expect(cn.ok).toBe(true);
+    // The 12-month transactions sum over the last 12 months: 6 x (+5) + 6 x (-3) = +12.
+    expect(jp.detail).toContain('"net12mBn":12');
+  });
+
+  it('FAIL-CLOSED proof 1: a holder dropped from the PAGE payload reads red (a truncated board never passes silently)', () => {
+    const board = syntheticTic();
+    const result = backtestUsaTicBoard(board, board, { dropPageHolder: 'australia' });
+    expect(result.checks.find((c) => c.label.startsWith('tic structure (page)'))!.ok).toBe(false);
+    expect(result.checks.find((c) => c.label.startsWith('tic payload'))!.ok).toBe(false);
+    expect(result.checks.find((c) => c.label.startsWith('tic holder australia: present on the page side'))!.ok).toBe(false);
+    expect(result.red).toBeGreaterThan(0);
+  });
+
+  it('FAIL-CLOSED proof 2: a mutated PAGE holder value reads red (the derivation AND the payload)', () => {
+    const board = syntheticTic();
+    const result = backtestUsaTicBoard(board, board, {
+      mutatePageHolder: (h) => {
+        if (h.id === 'japan') {
+          h.holdingsBn = 9999;
+          h.months[h.months.length - 1]!.v = 9999;
+        }
+      },
+    });
+    expect(result.checks.find((c) => c.label.startsWith('tic payload'))!.ok).toBe(false);
+    expect(result.checks.find((c) => c.label.startsWith('tic holder japan: the drawing'))!.ok).toBe(false);
+    expect(result.red).toBeGreaterThan(0);
+  });
+
+  it('FAIL-CLOSED proof 3: a mutated PAGE total reads red (the split bar and every share)', () => {
+    const board = syntheticTic();
+    const result = backtestUsaTicBoard(board, board, {
+      mutatePageTotal: (s) => {
+        s.totalBn = 12345.6;
+      },
+    });
+    expect(result.checks.find((c) => c.label.startsWith('tic payload'))!.ok).toBe(false);
+    // The split bar's own basis: official + private no longer equals the
+    // mutated total on the page side only.
+    const pageAgg = result.checks.find((c) => c.label.startsWith('tic aggregates (page)'))!;
+    expect(pageAgg.ok).toBe(false);
+    // And every holder's sharePct diverges (the restated arithmetic uses
+    // the engine's true total).
+    expect(result.checks.find((c) => c.label.startsWith('tic holder japan: the drawing'))!.ok).toBe(false);
+    expect(result.red).toBeGreaterThan(0);
   });
 });
