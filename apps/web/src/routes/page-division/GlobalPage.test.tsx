@@ -400,6 +400,55 @@ describe('GlobalPage', () => {
     });
   });
 
+  it('a failed BOARD refresh keeps the cached tile verdicts, labelled (M-17) — never the unread collapse while a good copy sits in the cache', async () => {
+    // First visit: good boards land in localStorage.
+    stubFeeds();
+    render(<GlobalPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-global-board] [data-tile]').length).toBe(10);
+    });
+    cleanup();
+    vi.unstubAllGlobals();
+    clearProjectionCacheForTests();
+    // Second visit: BOTH board feeds die while the projection stays live —
+    // the S4 mobile/empty-state pass found the old effect REPLACING the
+    // cached copies with `empty` (the unread collapse); the M-17 fix keeps
+    // them on screen, now LABELLED with their own stored dates (never
+    // unlabelled cached data).
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/global')) return jsonResponse(projectionFixture());
+        if (url.includes('/api/insights/markets')) return jsonResponse({ error: { code: 'markets_not_ready', message: 'down' } }, 503);
+        if (url.includes('/api/insights/fx')) return jsonResponse({ error: { code: 'fx_not_ready', message: 'down' } }, 503);
+        return notFound();
+      }),
+    );
+    render(<GlobalPage />);
+    await waitFor(() => {
+      // The tiles render VERDICTS (the cached copies), not the unread
+      // collapse: world-markets keeps 'Mixed', fx keeps 'Needs attention'.
+      const markets = document.querySelector('[data-tile="world-markets"]');
+      expect(markets).not.toBeNull();
+      expect(markets?.textContent).toContain('Mixed');
+      expect(markets?.textContent).toContain('2 of 2 in correction');
+    });
+    const fx = document.querySelector('[data-tile="fx-lights"]');
+    expect(fx?.textContent).toContain('Needs attention');
+    expect(document.querySelector('[data-tile="unread"][data-feed="world-markets"]')).toBeNull();
+    expect(document.querySelector('[data-tile="unread"][data-feed="fx"]')).toBeNull();
+    // Both cached tiles carry the last-good caption with the board's own
+    // stored date (the fixtures' 2026-11-07T23:31 / 17:01 generations).
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-cached-note]').length).toBe(2);
+    });
+    expect(document.querySelector('[data-tile="world-markets"] [data-cached-note]')?.textContent).toContain('Nov 7, 2026');
+    expect(document.querySelector('[data-tile="fx-lights"] [data-cached-note]')?.textContent).toContain('Nov 7, 2026');
+    // A FRESH feed paints no caption (the label rides the cached copies
+    // only — a fresh render was already proven by the board test above).
+  });
+
   it('the ribbon carries VISIBLE window tags — the day change when change1d rides the reading, the 7-day otherwise', async () => {
     const projection = projectionFixture();
     // gold-usd gains the S4 day change (the live entry's change1d);

@@ -233,7 +233,7 @@ const FX_SIGNAL_TONE = {
   unusual: 'text-[var(--color-status-alert)]',
 } as const;
 
-export function FxLightsTile({ tile }: { tile: GlobalFxTile }): React.JSX.Element {
+export function FxLightsTile({ tile, cachedAt }: { tile: GlobalFxTile; cachedAt?: string }): React.JSX.Element {
   const { t, numberLocale } = useI18n();
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
   return (
@@ -250,6 +250,7 @@ export function FxLightsTile({ tile }: { tile: GlobalFxTile }): React.JSX.Elemen
             : t('pd.global.fxNoneActive')}
         </bdi>
       </p>
+      <TileCachedNote cachedAt={cachedAt} />
     </TileLink>
   );
 }
@@ -269,7 +270,7 @@ const MARKETS_TONE: Record<number, string> = {
   4: 'text-[var(--color-status-alert)]',
 };
 
-export function WorldMarketsTile({ tile }: { tile: GlobalMarketsTile }): React.JSX.Element {
+export function WorldMarketsTile({ tile, cachedAt }: { tile: GlobalMarketsTile; cachedAt?: string }): React.JSX.Element {
   const { t, numberLocale } = useI18n();
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
   return (
@@ -288,7 +289,25 @@ export function WorldMarketsTile({ tile }: { tile: GlobalMarketsTile }): React.J
           {tile.inBear > 0 ? interpolate(t('pd.global.marketsInBear'), { n: num(tile.inBear) }) : ''}
         </bdi>
       </p>
+      <TileCachedNote cachedAt={cachedAt} />
     </TileLink>
+  );
+}
+
+/** The M-17 last-good note (S4): when the tile renders the CACHED copy
+ *  (the boot paint while the refresh is in flight, or the outage path
+ *  that kept the last good board), the caption says so with the copy's
+ *  own stored date — never unlabelled cached data, matching the header's
+ *  projection label and the legacy map's "Showing data from {time}" line
+ *  (it speaks only when a cached copy is on screen — a real event, not a
+ *  routine age). */
+function TileCachedNote({ cachedAt }: { cachedAt?: string }): React.JSX.Element | null {
+  const { t, locale } = useI18n();
+  if (cachedAt === undefined) return null;
+  return (
+    <p className="m-0 text-[9.5px] font-semibold leading-tight text-[var(--color-text-tertiary)]" data-cached-note>
+      <bdi>{interpolate(t('pd.global.boardCached'), { time: formatRelativeShort(cachedAt, locale) })}</bdi>
+    </p>
   );
 }
 
@@ -496,14 +515,14 @@ export function GlobalBoard({
           <GaugeTile key={tile.gauge} tile={tile} />
         ))}
         {fxState.kind === 'ready' ? (
-          <FxLightsTile tile={fxState.value} />
+          <FxLightsTile tile={fxState.value} cachedAt={fxState.fromCache === true ? fxState.cachedAt : undefined} />
         ) : fxState.kind === 'loading' ? (
           <BoardLoadingTile title={t('pd.global.tileFxLights')} feed="fx" />
         ) : (
           <BoardUnreadTile title={t('pd.global.tileFxLights')} feed="fx" />
         )}
         {marketsState.kind === 'ready' ? (
-          <WorldMarketsTile tile={marketsState.value} />
+          <WorldMarketsTile tile={marketsState.value} cachedAt={marketsState.fromCache === true ? marketsState.cachedAt : undefined} />
         ) : marketsState.kind === 'loading' ? (
           <BoardLoadingTile title={t('pd.global.tileWorldMarkets')} feed="world-markets" />
         ) : (

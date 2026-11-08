@@ -44,9 +44,10 @@ type ProjectionState =
   | { kind: 'error'; error: ApiError; cached: PageProjection | null };
 
 /** The boards' load states (the markets/fx discipline: last-good cache,
- *  never an error surface — a failed fetch keeps the cached copy flagged,
- *  no cache resolves to the honest empty kind). */
-type BoardState<T> = InsightsLoadStateLike<T> & { fromCache?: boolean };
+ *  never an error surface — a failed fetch keeps the cached copy flagged
+ *  with its `cachedAt`, no cache resolves to the honest empty kind —
+ *  M-17, the legacy route's own world-feeds pattern). */
+type BoardState<T> = InsightsLoadStateLike<T>;
 
 export function GlobalPage(): React.JSX.Element {
   const { t, locale } = useI18n();
@@ -95,7 +96,7 @@ export function GlobalPage(): React.JSX.Element {
   const [marketsState, setMarketsState] = useState<BoardState<MarketsSnapshot>>(() => {
     try {
       const cached = readCachedMarkets();
-      return cached ? { kind: 'ready', value: cached, fromCache: true } : { kind: 'loading' };
+      return cached ? { kind: 'ready', value: cached, fromCache: true, cachedAt: cached.generatedAt } : { kind: 'loading' };
     } catch {
       return { kind: 'loading' };
     }
@@ -103,7 +104,7 @@ export function GlobalPage(): React.JSX.Element {
   const [fxState, setFxState] = useState<BoardState<FxSnapshot>>(() => {
     try {
       const cached = readCachedFx();
-      return cached ? { kind: 'ready', value: cached, fromCache: true } : { kind: 'loading' };
+      return cached ? { kind: 'ready', value: cached, fromCache: true, cachedAt: cached.generatedAt } : { kind: 'loading' };
     } catch {
       return { kind: 'loading' };
     }
@@ -113,7 +114,18 @@ export function GlobalPage(): React.JSX.Element {
     const controller = new AbortController();
     void fetchMarketsSnapshot(controller.signal).then((snapshot) => {
       if (controller.signal.aborted) return;
-      setMarketsState(snapshot !== null ? { kind: 'ready', value: snapshot } : { kind: 'empty' });
+      // M-17 (the S4 mobile/empty-state pass found the gap: this effect
+      // used to REPLACE a good cached copy with `empty` the moment a
+      // refresh failed — the exact collapse the legacy route's world-feeds
+      // never does). A failed refresh keeps the LAST GOOD copy on screen,
+      // flagged with its stored generation; only with no cache at all is
+      // the honest empty kind the answer (fail-closed, Rule 5).
+      setMarketsState((prev) => {
+        if (snapshot !== null) return { kind: 'ready', value: snapshot };
+        const cached = prev.kind === 'ready' ? prev.value : null;
+        if (cached !== null) return { kind: 'ready', value: cached, fromCache: true, cachedAt: cached.generatedAt };
+        return { kind: 'empty' };
+      });
     });
     return () => controller.abort();
   }, []);
@@ -122,7 +134,13 @@ export function GlobalPage(): React.JSX.Element {
     const controller = new AbortController();
     void fetchFxSnapshot(controller.signal).then((snapshot) => {
       if (controller.signal.aborted) return;
-      setFxState(snapshot !== null ? { kind: 'ready', value: snapshot } : { kind: 'empty' });
+      // M-17 for the fx board — the same keep-flagged discipline.
+      setFxState((prev) => {
+        if (snapshot !== null) return { kind: 'ready', value: snapshot };
+        const cached = prev.kind === 'ready' ? prev.value : null;
+        if (cached !== null) return { kind: 'ready', value: cached, fromCache: true, cachedAt: cached.generatedAt };
+        return { kind: 'empty' };
+      });
     });
     return () => controller.abort();
   }, []);
@@ -162,6 +180,25 @@ export function GlobalPage(): React.JSX.Element {
     [marketsState],
   );
   const fxTile = useMemo(() => (fxState.kind === 'ready' ? globalFxTile(fxState.value) : null), [fxState]);
+
+  // The board-tile states the board + chips consume: the derived tile,
+  // carrying the M-17 flag when the copy it renders is the cached one.
+  const marketsBoardState =
+    marketsTile !== null && marketsState.kind === 'ready'
+      ? {
+          kind: 'ready' as const,
+          value: marketsTile,
+          ...(marketsState.fromCache === true ? { fromCache: true, cachedAt: marketsState.cachedAt } : {}),
+        }
+    : { kind: marketsState.kind === 'loading' ? ('loading' as const) : ('empty' as const) };
+  const fxBoardState =
+    fxTile !== null && fxState.kind === 'ready'
+      ? {
+          kind: 'ready' as const,
+          value: fxTile,
+          ...(fxState.fromCache === true ? { fromCache: true, cachedAt: fxState.cachedAt } : {}),
+        }
+    : { kind: fxState.kind === 'loading' ? ('loading' as const) : ('empty' as const) };
 
   const projection: PageProjection | null =
     state.kind === 'ready' ? state.projection : state.kind === 'loading' || state.kind === 'error' ? state.cached : null;
@@ -254,17 +291,14 @@ export function GlobalPage(): React.JSX.Element {
           goldTile={goldTile}
           ribbon={ribbon}
           dedollar={dedollar}
-          marketsState={marketsTile !== null ? { kind: 'ready', value: marketsTile } : { kind: marketsState.kind === 'loading' ? 'loading' : 'empty' }}
-          fxState={fxTile !== null ? { kind: 'ready', value: fxTile } : { kind: fxState.kind === 'loading' ? 'loading' : 'empty' }}
+          marketsState={marketsBoardState}
+          fxState={fxBoardState}
         />
       ) : null}
 
       {/* The D-23 region-chips row. */}
       <div className="mt-1.5 sm:mt-3.5 lg:mt-4">
-        <RegionChips
-          marketsState={marketsTile !== null ? { kind: 'ready', value: marketsTile } : { kind: marketsState.kind === 'loading' ? 'loading' : 'empty' }}
-          fxState={fxTile !== null ? { kind: 'ready', value: fxTile } : { kind: fxState.kind === 'loading' ? 'loading' : 'empty' }}
-        />
+        <RegionChips marketsState={marketsBoardState} fxState={fxBoardState} />
       </div>
 
       {/* The D-24 narrator line (renders nothing when the doc is absent or

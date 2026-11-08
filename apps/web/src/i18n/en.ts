@@ -584,6 +584,10 @@ export const en = {
       errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
       errorRetry: 'Try again',
       fromCache: 'Showing the last good copy — data as of {date}',
+      /* S4 (M-17): the board tiles' own cached caption — speaks only when
+       * the tile renders the cached copy (the boot paint or the outage
+       * path), with the board's own stored date. */
+      boardCached: 'Last good copy · {time}',
       dataAsOf: 'Data as of {date}',
       pricesAsOf: 'Live prices as of {time}',
       absentLine: '{n} of this page’s readings are not published in this mode.',
