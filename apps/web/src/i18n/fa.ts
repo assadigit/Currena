@@ -739,7 +739,7 @@ export const fa: Dictionary = {
         'us-deficit-12m': 'کسری بودجهٔ فدرال آمریکا (۱۲ماهه)',
         'michigan-5y-expectations': 'انتظار تورم ۵ تا ۱۰ ساله',
         'cftc-gold-positioning': 'پوزیشن معامله‌گران طلا',
-        'cftc-gold-gross-long': 'پوزیشن خرید معامله‌گران طلا',
+        'cftc-gold-gross-long': 'پوزیشن خریدِ معامله‌گران طلا',
       },
       contextAria: 'کارت‌های نسبت و جریانِ تصویر طلا',
       ratiosTitle: 'نسبت‌ها',

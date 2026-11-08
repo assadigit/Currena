@@ -724,7 +724,7 @@ export const en = {
       laneStateNeutral: 'Not leaning',
       laneStateUnread: 'Couldn’t be read',
       laneStateSplit: 'Split: {supports} for, {pressures} against',
-      seatLink: 'Open the seat’s home card',
+      seatLink: 'Open indicator',
       /* The lane names + one-sentence intros (the corpus's own, pinned). */
       laneBorrowingCosts: 'Borrowing costs',
       laneDollar: 'Dollar',
