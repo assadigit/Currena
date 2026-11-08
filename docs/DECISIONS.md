@@ -445,3 +445,83 @@
 - **Who decided:** the build session (S9) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-09a.
+
+## 2026-11-09 — BD-S10a: the TIC board is the REUSED legacy drawing through a narrowed copy contract (one drawing, one vocabulary)
+
+- **Decision:** /usa's tier-6 "Who finances America" board (D-31) is the
+  SAME `TicSection` module the legacy /insights page renders — never a
+  restatement (D-48). To make the reuse lean, `TicCustodyCard` (the
+  weekly custody card) was extracted to its own module and the section's
+  copy contract narrowed from the full `InsightsCopy` corpus to its own
+  block (`TicSectionCopy = Pick<InsightsCopy,'tic'>` — the S7 WorldMapCopy
+  pattern); the USA page feeds it the corpus-pinned `pd.usa.tic.*` words
+  through the ONE lean adapter (`usa-tic-copy.ts`), every key pinned
+  byte-for-byte in both locales by `usa-copy-pin.test.ts`.
+- **Options considered:** (a) reuse through the narrowed contract —
+  chosen; (b) rebuild a lean USA-only TIC section — rejected: it would
+  duplicate ~850 lines of already-tested UI against AGENTS rule 4 and
+  D-48; (c) import the legacy section with the full corpus — rejected:
+  it would pull the ~19K-line insights copy chain into the USA chunk.
+- **Reason:** one drawing means the board can never say a different word
+  or compute a different number on /usa than on /insights; the pin test
+  guards the words, the §21 TIC diff guards the numbers; the shared
+  chunk paid the drawing once (the Insights chunk SHRANK through the
+  split).
+- **Who decided:** the build session (S10). **Revisit:** none needed.
+
+## 2026-11-09 — BD-S10b: the placeholder body retired; the In-build chip stays for S11
+
+- **Decision:** the S1 placeholder body ("What will live here…") is
+  RETIRED from /usa — all 72 registry cards + the TIC board are on-page,
+  so the future-tense promise would be dishonest. The honest "In build"
+  chip stays until S11's gates/polish pass (the roadmap's own remaining
+  scope for this page).
+- **Reason:** the body's only job was the honest record of what was
+  still missing; nothing is missing now. The chip speaks the remaining
+  roadmap work (S11's gates) — one honest signal, not two.
+- **Who decided:** the build session (S10), per the session prompt's own
+  scope ("the placeholder body retires as these tiers land; the In-build
+  chip stays until S11's polish"). **Revisit:** S11 (the chip retires
+  with the gates pass).
+
+## 2026-11-09 — BD-S10c: the S8 zoom IS the §7 item-8 index section (nothing invented beyond the spec)
+
+- **Decision:** spec §7 item 8 ("Bottom — US index section (D-44): SPX ·
+  NDX · DOW zoom map + cards") is satisfied by the S8 zoom section that
+  already sits atop /usa — the zoomed map with the three index cards
+  seated. S10 adds NOTHING beyond it; the map is recorded as the
+  section.
+- **Options considered:** (a) record the map as the section — chosen;
+  (b) add per-index detail cards/rows beyond the map — rejected: the
+  spec's own words ask for "zoom map + cards" and nothing more; the
+  indices' full rows live at /world-markets (BD-S8c's recorded link).
+- **Reason:** inventing scope beyond the spec is exactly what the
+  program's rules forbid; the roadmap's S10 entry offered both branches
+  and the spec's text decides.
+- **Who decided:** the build session (S10). **Revisit:** S21's
+  spec-vs-implementation audit (if the investor's review reads item 8
+  wider, that session records the delta).
+
+## 2026-11-09 — The 2026-11-09b deploy (the USA tiers 3–6 + the TIC board live)
+
+- **Decision:** ship at the close of S10 (version `18907d4d`,
+  2026-11-08 22:24 UTC) — the owner's standing in the session prompt
+  ("the deploy at the close is the owner's standing"). The deploy-lock
+  check ran first: the active version was S9's `36f64141` @ 100%, no
+  parallel deploy.
+- **Reason:** all gates green (the suite 14,917 = +11 · tsc 6/6 · lint
+  0/0 · copy:audit clean (7,486 entries, the 116 new fa strings queued)
+  · narrator in sync + 50 · layer1 11,819/11,819 · build + budgets —
+  the UsaPage chunk re-based 24.49/6.38 vs 26/7 and the new shared tic
+  chunk 21.16/5.59 vs 24/7, the Insights chunk SHRINKING
+  1553.17→1532.14 through the split); the live §21 diff 173/173 green
+  BEFORE and AFTER the deploy (the 72-card trio coverage + the TIC board
+  diff + the freshness audit); currena.ir/usa live-verified at 1440×900
+  and 360×844 in BOTH en and fa (all six tiers, zero overlaps, zero
+  errors, the deployed chunks byte-identical to the local build); the
+  Global + Gold + World Markets + region + legacy surfaces intact.
+- **Rollback:** `wrangler rollback` — /usa returns to the S9 page
+  (strip + tiers 1–2); nothing else moves.
+- **Who decided:** the build session (S10) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives in
+  `docs/DEPLOY.md` 2026-11-09b.

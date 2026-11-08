@@ -702,12 +702,70 @@ riding pd.global) · BD-S9b (dollar-strength the only strip link) ·
 BD-S9c (the zoom on top through every state; the placeholder body stays
 until S10) + the deploy, all in `docs/DECISIONS.md`.
 
-### ☐ S10 — USA tiers 3–6 + TIC + index section · `Session 10/30`
+### ✅ S10 — USA tiers 3–6 + TIC + index section · `Session 10/30` · delivered 2026-11-09
 - Tiers 3–6 (inflation · labor & growth · liquidity/stress/valuation · TIC
   "who finances America" D-31) + SPX/NDX/DOW zoom section (the zoom map
   itself already landed in S8 — S10 adds its per-index detail cards/rows
   if the spec's §7 item 8 asks beyond the map, else records the map as
   the section).
+
+**S10 delivery record (2026-11-09):** /usa is the COMPLETE American bulk —
+all 72 registry cards in five tiers (7 + 19 + the S10 tiers: inflation 12
+· labor & growth 17 · liquidity/stress/valuation 17, every id from the
+placement table's own groups via `pageGroupIds`) + the tier-6 TIC board
+"Who finances America" (D-31). **The TIC board is the REUSED legacy
+drawing (BD-S10a, D-48):** `TicCustodyCard` extracted to its own module
+and `TicSection`'s copy contract narrowed to its own `tic` block (the S7
+WorldMapCopy pattern; 14/14 legacy tests green through the refactor), fed
+the corpus-pinned `pd.usa.tic.*` words through the ONE lean adapter
+(`usa-tic-copy.ts`, pinned byte-for-byte in both locales) — the section
+renders over the EXISTING route `GET /api/insights/tic` (one KV read,
+own M-17 loader, independent of the projection): 21 foreign holders +
+aggregates ($9.3tn total, the official/private split bar), 24-month
+history (the Japan+China chart + sparklines), the custody-hub caveat (◆ +
+Treasury's own warning), and the net TRANSACTIONS shown SEPARATELY from
+the price effect (the two 12-month columns + the honest-difference note).
+**The placeholder body RETIRED (BD-S10b)** — nothing promises future
+tiers; the honest In-build chip stays for S11's gates/polish. **The §7
+item-8 index section recorded as the S8 zoom (BD-S10c):** the spec asks
+"SPX · NDX · DOW zoom map + cards" and the S8 zoom renders exactly that
+(the zoomed map with the three cards seated) — the map IS the section,
+nothing invented beyond the spec. **THE §21 DIFF (the S10 gate's own):**
+`usa-backtest-core.ts` extended to the 72 cards + `backtestUsaTicBoard`
+(page payload ≡ engine payload ≡ the derived rows RESTATED with the
+helper's exact arithmetic — 3dp changes, raw-then-round sums — never
+imported; the fail-closed proofs caught a shallow-copy seam in testing,
+exactly what they exist for) + the live script `pd-s10-backtest.ts` with
+the tier membership (7/19/12/17/17 + 72/72) and THE FRESHNESS AUDIT vs
+the registry's own maxAgeDays — **the live run against PRODUCTION: 173
+checks · 173 green · 0 red, TWICE (before and after the deploy)**
+(govt-interest-revenue 221d beyond its 215d grace AND honestly carrying
+the engine's stale status). **The browser pass** (the freshly built SPA
+over real production data): 1440×900 AND 360×844 in BOTH en and fa (RTL,
+Persian digits) — all six tiers with ZERO card overlaps measured in the
+DOM, NO horizontal scroll at any width, the TIC table (8 columns, sort
+with aria-sort) + the mobile card list with the Show-all-16 toggle, the
+zoom period switch (Dow 1Y +8.9%) + the card click → /world-markets,
+dark mode, the legacy /insights TIC section + custody card INTACT, ZERO
+console/page errors across every route; the VLM passes (TIC desktop · fa
+mobile: NO DEFECTS; dark-fa's 'clipped circle' find disproven against the
+DOM — the logo ends 20px inside the viewport). **Gates ALL GREEN**
+(2m24s: secret scan 8/968 · tsc 6/6 · eslint 0/0 · copy:audit clean
+(7,486 entries — the 116 new `pd.usa.*` fa strings queued; the queue now
+~737) · narrator + eval 50 · layer1 11,819/11,819 · **the suite 14,917
+= +11** · build + budgets held — the UsaPage chunk re-based 24.49/6.38
+vs 26/7, the NEW shared tic chunk 21.16/5.59 vs 24/7 with the Insights
+chunk SHRINKING 1553.17→1532.14 through the same split — the drawing
+paid once). **Deployed + live-verified** (version `18907d4d` 2026-11-08
+22:24 UTC, the owner's standing "the deploy at the close is the owner's
+standing"; the deploy-lock check ran first — S9's `36f64141` @ 100%):
+currena.ir/usa renders the complete page (72 cards + the TIC board over
+the live data, the deployed chunks BYTE-IDENTICAL to the local build),
+the §21 diff re-run post-deploy 173/173 green, every other surface
+intact. Decisions: BD-S10a (the TIC reuse through the narrowed
+contract) · BD-S10b (the placeholder body retired) · BD-S10c (the zoom
+recorded as the §7 item-8 section) + the deploy, all in
+`docs/DECISIONS.md`.
 
 ### ☐ S11 — USA gates · `Session 11/30`
 - Full card-render audit vs placement table; freshness within cadence
@@ -804,7 +862,7 @@ until S10) + the deploy, all in `docs/DECISIONS.md`.
 | A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
 | B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ✅ S6 2026-11-08 (deployed `327c7761`, BD-S6a's alternation) |
 | C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ✅ S8 2026-11-08 (deployed `fde50a95`, the four REGION zoom maps — PHASE C CLOSED) |
-| D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) |
+| D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) · ✅ S10 2026-11-09 (deployed `18907d4d`, tiers 3–5 + the TIC board — the 72 cards complete) |
 | E Europe | S12–S13 | ☐ |
 | F Asia & Pacific | S14–S15 | ☐ |
 | G Australia | S16 | ☐ |
@@ -814,7 +872,7 @@ until S10) + the deploy, all in `docs/DECISIONS.md`.
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 9/30 delivered 2026-11-09 · 21 remaining — next
-action: Session 10/30 (S10, Phase D continues — USA tiers 3–6 + the TIC
-board + the index section's cards; gates: the full card-render audit vs
-the placement table, freshness within cadence grace).**
+**Current position: Session 10/30 delivered 2026-11-09 · 20 remaining — next
+action: Session 11/30 (S11, Phase D closes — USA gates: the full
+card-render audit vs the placement table, freshness within cadence grace,
+mobile/ARIA, hand-off).**

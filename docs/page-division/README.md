@@ -68,9 +68,17 @@ regeneration (`pnpm placement:generate`).
   watches" 7 cards and tier-2 rates & the Fed 19, every card with the
   §21 trio; the live three-side §21 diff 69/69 green twice) 2026-11-09 —
   DEPLOYED LIVE at `/usa` (version `36f64141`; the live acceptance
-  record in `docs/DEPLOY.md` 2026-11-09a).** Next: Session
-  10/30 (S10 — USA tiers 3–6 + the TIC board + the index section's
-  cards). See the roadmap's progress board for the current position.
+  record in `docs/DEPLOY.md` 2026-11-09a). S10 (the USA tiers 3–6 + the
+  TIC board: inflation 12 · labor & growth 17 · liquidity/stress/
+  valuation 17 — all 72 registry cards — + the tier-6 "Who finances
+  America" board, the REUSED legacy TIC drawing through the narrowed
+  copy contract over the existing /api/insights/tic route; the
+  placeholder body retired; the live §21 diff 173/173 green twice)
+  2026-11-09 — DEPLOYED LIVE at `/usa` (version `18907d4d`; the live
+  acceptance record in `docs/DEPLOY.md` 2026-11-09b).** Next: Session
+  11/30 (S11 — USA gates: the full card-render audit vs the placement
+  table, freshness within cadence grace, mobile/ARIA, hand-off — Phase D
+  closes). See the roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

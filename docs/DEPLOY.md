@@ -132,6 +132,73 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-09b the page-division S10 deploy (the USA tiers 3–6 + the TIC board — all 72 registry cards in five tiers + the tier-6 "Who finances America" board live for every visitor at /usa; the placeholder body retired)
+
+**Scope (page-division S10, spec §7 items 4–8, D-31):** display-layer
+ONLY. No engine, voter, threshold, calibration or provider change; the
+SAME insights snapshot + the SAME markets board + the EXISTING TIC route
+`GET /api/insights/tic` (one KV read), zero new fetches, zero new KV.
+`/usa` gains the three S10 tiers (inflation 12 · labor & growth 17 ·
+liquidity/stress/valuation 17, every id from the placement table's own
+groups) + the tier-6 TIC board: the REUSED legacy `TicSection` drawing
+through a narrowed copy contract (BD-S10a — `TicCustodyCard` extracted,
+`TicSectionCopy = Pick<InsightsCopy,'tic'>`, the corpus-pinned
+`pd.usa.tic.*` words through the ONE lean adapter) over its own M-17
+loader, INDEPENDENT of the projection. The placeholder body is RETIRED
+(BD-S10b); the honest In-build chip stays for S11's gates; the S8 zoom
+stays on top; the §7 item-8 index section is recorded as the S8 zoom
+(BD-S10c — the spec asks for the zoom map + cards and nothing beyond).
+
+**Gates before the deploy (ALL GREEN, 2m 24s):** secret scan 8/968 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean (7,486 entries — the 116
+new `pd.usa.*` fa strings queued unreviewed; the queue now ~737) ·
+narrator vocabulary in sync + eval 50 · layer1 strict 11,819/11,819 ·
+the full suite **14,917 = +11** (usa-tiles 16 · usa-copy-pin 6 · UsaPage
+7 · usa-backtest 11) · build + budgets held — entry 270.07/81.82 vs
+296/89.5, the UsaPage chunk re-based **24.49/6.38 vs its new 26/7 row**
+(the 46 display configs + the 72-key name map + the TIC wrapper), the
+NEW shared tic chunk **21.16/5.59 vs its new 24/7 row** (the reused
+drawing paid once — the Insights chunk SHRANK 1553.17→1532.14 raw
+through the same split).
+
+**The §21 diff — the S10 gate's own, run LIVE twice (pre-deploy and
+post-deploy): 173 checks · 173 green · 0 red.** The page ≡ Global ≡
+engine comparison over the 72 cards (every card's §21 trio inputs
+byte-identical between the projection and the served snapshot) + the
+tier-6 TIC board diff (the page payload ≡ the engine payload; every
+holder's derived row ≡ the arithmetic restated independently with the
+helper's exact rounding — 3dp changes, raw-then-round sums, 1dp shares;
+the custody-hub set ≡ Treasury's own; the staleness verdict at one
+clock) + the tier membership (7/19/12/17/17 + 72/72 carried) + the
+freshness audit vs the registry's own maxAgeDays (govt-interest-revenue
+221d beyond its 215d grace AND honestly carrying the engine's stale
+status — the page speaks the word).
+
+**The deploy-lock check ran first** (the D-43 lesson): the active
+version was S9's `36f64141` @ 100% — no parallel deploy. `pnpm --filter
+@currena/web build` + `wrangler deploy` → **currena-api `18907d4d` @
+100%** (deployment `18907d4d-2c38-475c-ac36-1640879917b1`,
+2026-11-08T22:24:23Z). currena-markets untouched (code-unchanged).
+
+**The live acceptance (ALL GREEN):** currena.ir/usa renders the complete
+page over the live board at 1440×900 AND 360×844 in BOTH en and fa
+(RTL, Persian digits) — all six tiers (72 cards: 7/19/12/17/17 + the TIC
+board) with ZERO card overlaps measured in the DOM, NO horizontal scroll
+at any width, the TIC board over the live data (the $9.3tn headline, the
+official/private split, the UK/Cayman/Hong Kong buyers chips, the
+Japan+China 24-month chart, all 8 table columns with the net
+transactions SEPARATE from the price effect, the custody caveat + the ◆
+markers, the mobile card list + the Show-all-16 toggle), zero
+console/page errors; the deployed UsaPage + tic chunks are
+**byte-identical to the local build** (24,486 + 21,156 bytes, the hashed
+names match exactly); the §21 backtest re-run against production
+post-deploy 173/173 green; the Global landing + /gold + /world-markets +
+the three region pages + the legacy /insights (the TIC section + the
+custody card intact through the reuse refactor) all verified.
+
+**Rollback lever:** `wrangler rollback` — /usa returns to the S9 page
+(the strip + tiers 1–2 + the zoom); nothing else moves.
+
 ## Session record — 2026-11-09a the page-division S9 deploy (the USA verdicts + tiers 1–2 — the D-30 verdict strip, D-29's seven "the world watches" cards and the 19 rates & the Fed cards live for every visitor at /usa; Phase D open)
 
 **Scope (page-division S9, spec §7 items 1–3, D-29/D-30):** display-layer
