@@ -120,6 +120,28 @@ describe('the Gold page speaks the insights corpus’s verdict words (en)', () =
     expect(pdEn.measuredLink).toBe(corpusEn.signals.goldScore.measuredNoteLink);
   });
 
+  it('S6 (BD-S6a): the classic stage + tray words ↔ the corpus (the previous shape speaks the legacy card\u2019s own words)', () => {
+    expect(pdEn.stageSideFor).toBe(corpusEn.signals.balance.sideFor);
+    expect(pdEn.stageSideAgainst).toBe(corpusEn.signals.balance.sideAgainst);
+    expect(pdEn.stageEmptyFor).toBe(corpusEn.signals.balance.listEmptyFor);
+    expect(pdEn.stageEmptyAgainst).toBe(corpusEn.signals.balance.listEmptyAgainst);
+    expect(pdEn.stageEmptyNone).toBe(corpusEn.signals.balance.listEmptyNone);
+    expect(pdEn.stageAria).toBe(corpusEn.signals.balance.aria);
+    expect(pdEn.stageCountFor).toBe(corpusEn.signals.balance.countFor);
+    expect(pdEn.stageCountAgainst).toBe(corpusEn.signals.balance.countAgainst);
+    expect(pdEn.stageCountNeutral).toBe(corpusEn.signals.balance.countNeutral);
+    expect(pdEn.stageCountUnread).toBe(corpusEn.signals.balance.countUnread);
+    expect(pdEn.laneChipAria).toBe(corpusEn.signals.balance.laneChipAria);
+    expect(pdEn.splitBadge).toBe(corpusEn.signals.balance.splitBadge);
+    expect(pdEn.stateShortSupportive).toBe(corpusEn.signals.conditionStateShort.supportive);
+    expect(pdEn.stateShortAgainst).toBe(corpusEn.signals.conditionStateShort.against);
+    expect(pdEn.stateShortNeutral).toBe(corpusEn.signals.conditionStateShort.neutral);
+    expect(pdEn.stateShortUnknown).toBe(corpusEn.signals.conditionStateShort.unknown);
+    expect(pdEn.trayTitle).toBe(corpusEn.signals.balance.trayTitle);
+    expect(pdEn.trayNote).toBe(corpusEn.signals.balance.trayNote);
+    expect(pdEn.trayEmpty).toBe(corpusEn.signals.balance.trayEmpty);
+  });
+
   it('all 14 context-card names ↔ indicators[id].name', () => {
     const names = pdEn.cardNames as CardNames;
     for (const id of GOLD_CONTEXT_IDS) {
@@ -227,6 +249,28 @@ describe('the Gold page speaks the insights corpus’s verdict words (fa)', () =
   it('the honest-record note + link ↔ balance.measuredNote / goldScore.measuredNoteLink', () => {
     expect(pdFa.measuredNote).toBe(corpusFa.signals.balance.measuredNote);
     expect(pdFa.measuredLink).toBe(corpusFa.signals.goldScore.measuredNoteLink);
+  });
+
+  it('S6 (BD-S6a): the classic stage + tray words ↔ the corpus (the previous shape speaks the legacy card’s own words)', () => {
+    expect(pdFa.stageSideFor).toBe(corpusFa.signals.balance.sideFor);
+    expect(pdFa.stageSideAgainst).toBe(corpusFa.signals.balance.sideAgainst);
+    expect(pdFa.stageEmptyFor).toBe(corpusFa.signals.balance.listEmptyFor);
+    expect(pdFa.stageEmptyAgainst).toBe(corpusFa.signals.balance.listEmptyAgainst);
+    expect(pdFa.stageEmptyNone).toBe(corpusFa.signals.balance.listEmptyNone);
+    expect(pdFa.stageAria).toBe(corpusFa.signals.balance.aria);
+    expect(pdFa.stageCountFor).toBe(corpusFa.signals.balance.countFor);
+    expect(pdFa.stageCountAgainst).toBe(corpusFa.signals.balance.countAgainst);
+    expect(pdFa.stageCountNeutral).toBe(corpusFa.signals.balance.countNeutral);
+    expect(pdFa.stageCountUnread).toBe(corpusFa.signals.balance.countUnread);
+    expect(pdFa.laneChipAria).toBe(corpusFa.signals.balance.laneChipAria);
+    expect(pdFa.splitBadge).toBe(corpusFa.signals.balance.splitBadge);
+    expect(pdFa.stateShortSupportive).toBe(corpusFa.signals.conditionStateShort.supportive);
+    expect(pdFa.stateShortAgainst).toBe(corpusFa.signals.conditionStateShort.against);
+    expect(pdFa.stateShortNeutral).toBe(corpusFa.signals.conditionStateShort.neutral);
+    expect(pdFa.stateShortUnknown).toBe(corpusFa.signals.conditionStateShort.unknown);
+    expect(pdFa.trayTitle).toBe(corpusFa.signals.balance.trayTitle);
+    expect(pdFa.trayNote).toBe(corpusFa.signals.balance.trayNote);
+    expect(pdFa.trayEmpty).toBe(corpusFa.signals.balance.trayEmpty);
   });
 
   it('all 14 context-card names ↔ indicators[id].name', () => {

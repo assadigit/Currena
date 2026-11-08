@@ -704,6 +704,34 @@ export const en = {
       bandTop: 'top {p}%',
       bandMid: 'the middle',
       bandBottom: 'bottom {p}%',
+      /* ---- S6 (BD-S6a): the hero's balance-view ALTERNATION — the
+       * previous brass balance shape (smaller) beside the S5 minimal
+       * glyph. The view words are fresh UI copy; every stage + tray
+       * word below is pinned byte-for-byte to the insights corpus
+       * (signals.balance / conditionStateShort) by gold-copy-pin.test.ts,
+       * so the classic drawing speaks the SAME words as the legacy card. */
+      heroViewLabel: 'Balance view',
+      heroViewClassic: 'The balance',
+      heroViewMinimal: 'Minimal',
+      stageSideFor: 'Factors supporting gold’s price',
+      stageSideAgainst: 'Factors pressuring gold’s price',
+      stageEmptyFor: 'None of the factors checked shows a meaningful signal supporting gold’s price right now.',
+      stageEmptyAgainst: 'None of the factors checked shows a meaningful signal working against gold’s price right now.',
+      stageEmptyNone: 'Nothing could be read yet, so neither side has been weighed.',
+      stageAria: 'Balance for gold: {summary}. {verdict}.',
+      stageCountFor: '{n} for',
+      stageCountAgainst: '{n} against',
+      stageCountNeutral: '{n} neutral',
+      stageCountUnread: "{n} couldn't be read",
+      laneChipAria: '{lane}: {side}. {tally}.',
+      splitBadge: 'Split',
+      stateShortSupportive: 'Supports',
+      stateShortAgainst: 'Works against',
+      stateShortNeutral: 'Sitting neutral',
+      stateShortUnknown: 'Cannot read',
+      trayTitle: 'Not leaning',
+      trayNote: 'Weighed, but no clear lean',
+      trayEmpty: 'Every driver is on a pan.',
       /* The five lanes (D-26 item 2) — names, intros, state words and
        * tallies pinned to the corpus's own lane dictionaries. */
       seatsAria: 'The gold meter’s five lanes and 37 voter seats',

@@ -10,6 +10,12 @@
  *     7-state outlook and the for/against/not-leaning/unread counts —
  *     every one derived from the SAME engines (asserted against
  *     goldBalance over the same fixture, never hand-counted);
+ *   - S6 (BD-S6a): the hero's balance-view ALTERNATION — the classic
+ *     view (the previous brass balance shape, smaller) is the DEFAULT,
+ *     the minimal glyph one radio away, the choice persisted; the
+ *     classic stage renders the engine's own lane sides, weights and
+ *     beam tilt through the SAME extracted drawing the legacy card
+ *     renders (data-balance-*), and its words are the corpus's own;
  *   - the 37 seats: every chip renders with its lean word and, when it
  *     fires, its evidence word — the impact distribution matching the
  *     engine's own member lines;
@@ -27,11 +33,12 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { IndicatorReading, PageProjection } from '@currena/core';
 import { PageProjectionSchema } from '@currena/core';
 import { goldBalance } from '@currena/insights';
 import { GOLD_VOTER_IDS } from '@currena/insights/page-division';
+import { balanceTilt } from '../../components/insights/signals/BalanceScale';
 import { GoldPage } from './GoldPage';
 import { GOLD_CONTEXT_IDS } from './gold-tiles';
 import { clearProjectionCacheForTests } from '../../lib/page-division';
@@ -198,6 +205,102 @@ describe('GoldPage', () => {
     // gold's own 30-day move — the context line, never counted.
     expect(hero.textContent).toContain('Gold over the last 30 days');
     expect(hero.textContent).toContain('−3.42%');
+  });
+
+  it('S6: the hero\u2019s balance view ALTERNATES — the classic previous shape is the default, the minimal glyph one radio away, the choice persisted', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-hero]')).not.toBeNull();
+    });
+
+    // The DEFAULT is the classic view (BD-S6a): the previous shape — the
+    // brass stage + weights + tray through the extracted drawing — and
+    // NO minimal glyph.
+    expect(document.querySelector('[data-hero-balance-view]')?.getAttribute('data-hero-balance-view')).toBe('classic');
+    expect(document.querySelector('[data-balance-classic]')).not.toBeNull();
+    expect(document.querySelector('[data-balance-stage]')).not.toBeNull();
+    expect(document.querySelector('[data-hero-beam]')).toBeNull();
+
+    // The radio group: two real options, the group labelled.
+    const group = document.querySelector('[data-hero-balance-view]')!;
+    expect(group.querySelector('legend')?.textContent).toBe('Balance view');
+    const radios = group.querySelectorAll('input[type="radio"]');
+    expect(radios.length).toBe(2);
+    expect((radios[0] as HTMLInputElement).checked).toBe(true);
+    expect((radios[1] as HTMLInputElement).checked).toBe(false);
+
+    // Toggle to the minimal view: the glyph appears, the stage leaves,
+    // and the choice persists to localStorage.
+    fireEvent.click(radios[1]);
+    await waitFor(() => {
+      expect(document.querySelector('[data-hero-balance-view]')?.getAttribute('data-hero-balance-view')).toBe('minimal');
+    });
+    expect(document.querySelector('[data-hero-beam]')).not.toBeNull();
+    expect(document.querySelector('[data-balance-classic]')).toBeNull();
+    expect(window.localStorage.getItem('currena:pd:gold:balance-view')).toBe('minimal');
+
+    // The engine\u2019s own lines stay in BOTH views: the verdict word +
+    // the outlook + the counts ride the hero block either way.
+    expect(document.querySelector('[data-hero-verdict]')?.getAttribute('data-hero-verdict')).toBe('for');
+    expect(document.querySelector('[data-hero-outlook]')).not.toBeNull();
+  });
+
+  it('S6: the classic view renders the engine\u2019s own lane sides + weights + beam tilt through the SAME drawing the legacy card renders', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-balance-classic]')).not.toBeNull();
+    });
+
+    // The engine\u2019s own derivations over the same fixture — never
+    // hand-counted (the pipes, the engine provides the numbers).
+    const balance = goldBalance(projectionFixture().readings);
+
+    // One WEIGHT per lane (5), each on the pan its side belongs to, its
+    // accessible name the laneChipAria composition (lane + side + tally —
+    // the corpus's own words, gold-copy-pin's pins).
+    const LANE_NAME: Record<string, string> = {
+      'borrowing-costs': 'Borrowing costs',
+      dollar: 'Dollar',
+      stress: 'Market stress',
+      inflation: 'Inflation',
+      flows: 'Flows & demand',
+    };
+    const SIDE_WORD: Record<string, string> = {
+      for: 'Supports',
+      against: 'Works against',
+      neutral: 'Sitting neutral',
+      unread: 'Cannot read',
+    };
+    const weights = document.querySelectorAll('[data-balance-weight]');
+    expect(weights.length).toBe(balance.lanes.length);
+    for (const lane of balance.lanes) {
+      const weight = document.querySelector(`[data-balance-weight="${lane.lane}"]`) as HTMLElement;
+      expect(weight, `weight ${lane.lane}`).not.toBeNull();
+      expect(weight.getAttribute('aria-label')).toContain(`${LANE_NAME[lane.lane]}: ${SIDE_WORD[lane.split ? 'neutral' : lane.side]}.`);
+    }
+    // The pans: the for pan holds the for lanes, the against pan the
+    // against lanes (the fixture: 4 for · 1 against).
+    const forPan = document.querySelector('[data-balance-pan="for"]')!;
+    const againstPan = document.querySelector('[data-balance-pan="against"]')!;
+    expect(forPan.querySelectorAll('[data-balance-weight]').length).toBe(balance.counts.for);
+    expect(againstPan.querySelectorAll('[data-balance-weight]').length).toBe(balance.counts.against);
+    expect(forPan.textContent).toContain('Factors supporting gold’s price');
+    expect(againstPan.textContent).toContain('Factors pressuring gold’s price');
+
+    // The tray speaks its empty state (every lane sits on a pan in this
+    // fixture) — the not-leaning well is part of the previous shape.
+    expect(document.querySelector('[data-balance-tray="not-leaning"]')?.textContent).toContain('Every driver is on a pan.');
+
+    // The beam swings on the engine\u2019s own tilt (balanceTilt over the
+    // same counts — one math with the legacy card\u2019s beam).
+    const beam = document.querySelector('[data-balance-beam]') as HTMLElement;
+    expect(beam).not.toBeNull();
+    const counts = { ...balance.counts, total: balance.lanes.length, net: balance.net, readable: balance.readable };
+    const expectedTilt = balanceTilt(counts, 320);
+    const expectedSigned = expectedTilt.heavy === 'against' ? expectedTilt.angleDeg : expectedTilt.heavy === 'for' ? -expectedTilt.angleDeg : 0;
+    expect(beam.getAttribute('data-tilt')).toBe(String(expectedSigned));
   });
 
   it('renders all 37 seat chips with lean + evidence words, the impact distribution matching the engine', async () => {

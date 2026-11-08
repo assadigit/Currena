@@ -28,8 +28,10 @@ import { navigate } from '../../router';
 import type { TranslationKey } from '../../lib/locale';
 import type { GoldSeat, GoldSeatLane, GoldVoterId } from './gold-tiles';
 
-/* The lane copy keys — five lanes, the corpus's own names + intros. */
-const LANE_TITLE_KEY: Readonly<Record<GoldLane, TranslationKey>> = {
+/* The lane copy keys — five lanes, the corpus's own names + intros.
+ * S6: exported for the hero's classic balance view (the same lane
+ * labels feed the stage's weights — one map, never restated). */
+export const LANE_TITLE_KEY: Readonly<Record<GoldLane, TranslationKey>> = {
   'borrowing-costs': 'pd.gold.laneBorrowingCosts',
   dollar: 'pd.gold.laneDollar',
   stress: 'pd.gold.laneStress',
@@ -44,6 +46,8 @@ const LANE_INTRO_KEY: Readonly<Record<GoldLane, TranslationKey>> = {
   inflation: 'pd.gold.laneIntroInflation',
   flows: 'pd.gold.laneIntroFlows',
 };
+
+export { LANE_INTRO_KEY };
 
 /** The route path of a page id — the destinations' own slugs (D-46). */
 const PAGE_ROUTE: Record<PageDivisionPageId, string> = {
@@ -80,6 +84,8 @@ const EVIDENCE_KEY: Readonly<Record<'rising' | 'falling' | 'high' | 'low', Trans
   low: 'pd.gold.evidenceLow',
 };
 
+export { EVIDENCE_KEY };
+
 const LANE_STATE_KEY: Readonly<Record<GoldSeatLane['side'], TranslationKey>> = {
   for: 'pd.gold.laneStateFor',
   against: 'pd.gold.laneStateAgainst',
@@ -96,8 +102,9 @@ const LANE_STATE_TONE: Record<string, string> = {
 
 /** The voter-name dictionary key for a seat id (37 literal keys — the
  *  copy-pin test iterates GOLD_VOTER_IDS and proves every key exists and
- *  matches the corpus). */
-const VOTER_NAME_KEY: Readonly<Record<GoldVoterId, TranslationKey>> = {
+ *  matches the corpus). S6: exported for the hero's classic balance view
+ *  (the stage's member rows carry the same names). */
+export const VOTER_NAME_KEY: Readonly<Record<GoldVoterId, TranslationKey>> = {
   'real-yield-10y': 'pd.gold.voterNames.real-yield-10y',
   us10y: 'pd.gold.voterNames.us10y',
   us30y: 'pd.gold.voterNames.us30y',
@@ -242,6 +249,7 @@ function LaneCard({ lane }: { lane: GoldSeatLane }): React.JSX.Element {
 
   return (
     <section
+      id={`gold-lane-${lane.lane}`}
       aria-labelledby={`gold-lane-${lane.lane}-title`}
       data-lane={lane.lane}
       data-lane-side={lane.split === true ? 'split' : lane.side}

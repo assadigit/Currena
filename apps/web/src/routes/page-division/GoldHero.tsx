@@ -19,14 +19,49 @@
  * keys. The beam glyph is decorative geometry (role="img" + the corpus's
  * own gauge aria) — the verdict word and counts carry the meaning,
  * colour and geometry never alone.
+ *
+ * S6 (BD-S6a, 2026-11-08): the balance block's visual ALTERNATES — the
+ * previous shape of the gold balance (the classic view: the brass
+ * stage + lane weights + the not-leaning tray, rendered SMALLER through
+ * the extracted BalanceStage/BalanceTray) ↔ the S5 minimal beam glyph —
+ * a real radio group, the classic view the default, the choice persisted
+ * (currena:pd:gold:balance-view). The verdict word, the 7-state outlook,
+ * the counts and the context line render in BOTH views — they are the
+ * engine's words, not the drawing's.
  */
 
+import { useState } from 'react';
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../i18n';
 import { useI18n } from '../../lib/locale';
 import type { GoldHeroModel } from './gold-tiles';
-import { GOLD_DISPLAY, goldHeroCounts, goldHeroTilt, goldHeroVerdict } from './gold-tiles';
+import { GOLD_DISPLAY, goldHeroCounts, goldHeroTilt, goldHeroVerdict, goldHeroVerdictState } from './gold-tiles';
+import { GoldBalanceClassic } from './GoldBalanceClassic';
+
+/* S6 (BD-S6a): the hero's balance-view alternation — the previous brass
+ * balance shape (the classic view, rendered smaller) ↔ the S5 minimal
+ * beam glyph. The choice persists per visitor (the theme pattern); the
+ * DEFAULT is the classic shape — the owner's ask — and a fresh visitor
+ * meets the drawing they know from the legacy card. */
+type BalanceView = 'classic' | 'minimal';
+const BALANCE_VIEW_KEY = 'currena:pd:gold:balance-view';
+
+function readStoredView(): BalanceView {
+  try {
+    return window.localStorage.getItem(BALANCE_VIEW_KEY) === 'minimal' ? 'minimal' : 'classic';
+  } catch {
+    return 'classic';
+  }
+}
+
+function storeView(view: BalanceView): void {
+  try {
+    window.localStorage.setItem(BALANCE_VIEW_KEY, view);
+  } catch {
+    /* a full or blocked store never blocks the view swap */
+  }
+}
 
 /* The outlook word + tone maps — the GlobalBoard tile's own (the words
  * ride pd.global's corpus-pinned keys; the inks mirror verdict.tsx's
@@ -149,6 +184,12 @@ export function GoldHero({
 }): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const num = (n: number, decimals = 0): string => formatNumber(n, numberLocale, { maximumFractionDigits: decimals });
+  /* The balance-view alternation (BD-S6a). */
+  const [view, setViewState] = useState<BalanceView>(readStoredView);
+  const setView = (next: BalanceView): void => {
+    setViewState(next);
+    storeView(next);
+  };
 
   const price: IndicatorReading | undefined = hero.price;
   const cfg = GOLD_DISPLAY['gold-usd'];
@@ -167,16 +208,14 @@ export function GoldHero({
 
   const counts = goldHeroCounts(hero);
   const verdict = goldHeroVerdict(hero);
+  const verdictState = goldHeroVerdictState(hero);
   const tilt = goldHeroTilt(hero);
   // UI-40 (the BalanceScale's own rule): fewer than 3 readable lanes is
   // not a reading — the beam stays level and the honest not-enough word
   // speaks (readable 0 keeps the stronger can't-read word).
   const sparse = counts.readable < 3;
-  const verdictWordKey = sparse
-    ? counts.readable === 0
-      ? 'pd.gold.heroVerdictNone'
-      : 'pd.gold.heroNotEnough'
-    : VERDICT_WORD_KEY[verdict];
+  const verdictWordKey =
+    verdictState === 'none' ? 'pd.gold.heroVerdictNone' : verdictState === 'not-enough' ? 'pd.gold.heroNotEnough' : VERDICT_WORD_KEY[verdictState];
   const verdictTone = sparse ? 'text-[var(--color-text-tertiary)]' : VERDICT_TONE[verdict] ?? 'text-[var(--color-text-primary)]';
 
   // The counts line: for + against ALWAYS render (zeros included — the
@@ -260,17 +299,72 @@ export function GoldHero({
             {t('pd.gold.heroHeading')}
           </h2>
           <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">{t('pd.gold.heroSubtitle')}</p>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <BeamGlyph angleDeg={sparse ? 0 : tilt.angleDeg} heavy={sparse ? null : tilt.heavy} />
-            <div className="flex min-w-0 flex-col gap-0.5">
-              <span className="text-[length:var(--type-caption)] font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">
-                {t('pd.gold.heroVerdictEyebrow')}
-              </span>
-              <span className={`type-verdict text-xl font-bold leading-tight sm:text-2xl ${verdictTone}`} data-hero-verdict={sparse ? 'sparse' : verdict}>
-                {t(verdictWordKey)}
-              </span>
+          {/* The view alternation (BD-S6a): the previous shape (the brass
+           * balance, smaller — the classic view) ↔ the new proposed minimal
+           * glyph. A real radio group: native arrow-key walking, the group
+           * labelled, each option's label its own words. */}
+          <fieldset className="m-0 border-0 p-0" data-hero-balance-view={view}>
+            <legend className="sr-only">{t('pd.gold.heroViewLabel')}</legend>
+            <div className="inline-flex items-center gap-0.5 rounded-full bg-[var(--color-surface)] p-0.5 ring-1 ring-[var(--color-border)]">
+              <input
+                type="radio"
+                id="gold-balance-view-classic"
+                name="gold-balance-view"
+                className="peer sr-only"
+                checked={view === 'classic'}
+                onChange={() => setView('classic')}
+              />
+              <label
+                htmlFor="gold-balance-view-classic"
+                className="min-h-[32px] cursor-pointer rounded-full px-3 py-1 text-[length:var(--type-caption)] font-semibold leading-normal text-[var(--color-text-secondary)] ring-2 ring-transparent motion-safe:transition-colors peer-checked:bg-[var(--color-accent-gold)]/15 peer-checked:font-bold peer-checked:text-[var(--color-text-primary)] peer-focus-visible:ring-[var(--color-accent-gold)]"
+              >
+                {t('pd.gold.heroViewClassic')}
+              </label>
+              <input
+                type="radio"
+                id="gold-balance-view-minimal"
+                name="gold-balance-view"
+                className="peer sr-only"
+                checked={view === 'minimal'}
+                onChange={() => setView('minimal')}
+              />
+              <label
+                htmlFor="gold-balance-view-minimal"
+                className="min-h-[32px] cursor-pointer rounded-full px-3 py-1 text-[length:var(--type-caption)] font-semibold leading-normal text-[var(--color-text-secondary)] ring-2 ring-transparent motion-safe:transition-colors peer-checked:bg-[var(--color-accent-gold)]/15 peer-checked:font-bold peer-checked:text-[var(--color-text-primary)] peer-focus-visible:ring-[var(--color-accent-gold)]"
+              >
+                {t('pd.gold.heroViewMinimal')}
+              </label>
             </div>
-          </div>
+          </fieldset>
+          {view === 'classic' ? (
+            /* The PREVIOUS shape, smaller (the owner's S6 ask): the brass
+             * stage + the lane weights + the not-leaning tray — the same
+             * drawing the legacy card renders, at the s-size metrics. The
+             * verdict word rides its own row above the instrument. */
+            <>
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="text-[length:var(--type-caption)] font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+                  {t('pd.gold.heroVerdictEyebrow')}
+                </span>
+                <span className={`type-verdict text-xl font-bold leading-tight sm:text-2xl ${verdictTone}`} data-hero-verdict={sparse ? 'sparse' : verdict}>
+                  {t(verdictWordKey)}
+                </span>
+              </div>
+              <GoldBalanceClassic hero={hero} />
+            </>
+          ) : (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <BeamGlyph angleDeg={sparse ? 0 : tilt.angleDeg} heavy={sparse ? null : tilt.heavy} />
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="text-[length:var(--type-caption)] font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+                  {t('pd.gold.heroVerdictEyebrow')}
+                </span>
+                <span className={`type-verdict text-xl font-bold leading-tight sm:text-2xl ${verdictTone}`} data-hero-verdict={sparse ? 'sparse' : verdict}>
+                  {t(verdictWordKey)}
+                </span>
+              </div>
+            </div>
+          )}
           <p className="m-0 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
             <span className="sr-only">{t('pd.global.goldOutlookLabel')}: </span>
             {hero.outlook !== null ? (

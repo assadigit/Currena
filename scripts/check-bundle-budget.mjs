@@ -982,7 +982,16 @@ const BUDGETS = [
   // own hash is untouched by S5). The entry chunk gains only the lazy
   // wiring: 268.69/81.33 → 269.00/81.45 vs 296/89.5. Ceiling 30/9 per
   // the tight convention (~3.7 kB raw / ~2.1 kB gz headroom).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 30_000, gz: 9_000, label: 'Gold page lazy chunk (page-division S5)' },
+  // S6 (BD-S6a, 2026-11-08): 30 → 34 raw (gz 9 holds): the hero's
+  // balance-view ALTERNATION — the classic previous-shape view
+  // (GoldBalanceClassic: the lane-driver builder + the corpus-pinned
+  // stage copy + the radio switcher) rides the GoldPage chunk, while
+  // the brass drawing itself (BalanceStage/BalanceTray, extracted S6)
+  // stays in the SHARED chunk both routes load (the Insights chunk is
+  // UNTOUCHED at 1569.16/362.08, byte-stable through the extraction).
+  // Measured 31.23/8.06 — ~2.8 kB raw headroom under 34, gz ~0.9 under
+  // 9. The entry chunk is untouched at 269.00/81.45.
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 34_000, gz: 9_000, label: 'Gold page lazy chunk (page-division S5)' },
 ];
 
 function main() {

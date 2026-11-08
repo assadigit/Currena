@@ -100,6 +100,20 @@ export function goldHeroVerdict(hero: Pick<GoldHeroModel, 'balance'>): BalanceVe
   return balanceVerdictOf(goldHeroCounts(hero));
 }
 
+/** The hero's verdict-word STATE — the sparse-aware UI-40 rule in one
+ *  place (S6): readable 0 keeps the stronger can't-read word; 1–2
+ *  readable is not a reading (the not-enough word); else the verdict.
+ *  The minimal glyph row and the classic stage compose the SAME word
+ *  from this state — one rule, two renderings. */
+export type GoldHeroVerdictState = 'none' | 'not-enough' | BalanceVerdict;
+
+export function goldHeroVerdictState(hero: Pick<GoldHeroModel, 'balance'>): GoldHeroVerdictState {
+  const counts = goldHeroCounts(hero);
+  if (counts.readable === 0) return 'none';
+  if (counts.readable < 3) return 'not-enough';
+  return balanceVerdictOf(counts);
+}
+
 /** The hero's beam tilt — the SAME presentation scale the legacy drawing
  *  swings on (|net| ÷ (for+against) × 10°, floor 3°, level at net 0). */
 export function goldHeroTilt(hero: Pick<GoldHeroModel, 'balance'>): BalanceTilt {
