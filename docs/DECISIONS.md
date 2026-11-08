@@ -71,3 +71,38 @@
 - **Who decided:** the build session (S4) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-08c.
+
+## 2026-11-08 — BD-S5a: the Gold page's cached-copy header (one honest sentence, not a doubled date)
+
+- **Decision:** when the Gold page renders the LAST GOOD cached copy
+  (M-17), the `fromCache` sentence ("Showing the last good copy — data
+  as of {date}") REPLACES the plain data-as-of line in the page header
+  instead of rendering beside it.
+- **Reason:** the sentence carries its own date, so printing both read
+  as a garbled duplicate ("Data as of Nov 8, 2026 · Showing the last
+  good copy — data as of Nov 8, 2026" — flagged by the S5 dark-mode VLM
+  pass; geometry proved no overlap, just the redundant double date).
+  Same information, one honest sentence. The Global landing page keeps
+  the S4 pattern (both lines) until S19's navigation/polish pass aligns
+  it — recorded here so the alignment is a deliberate choice, never a
+  silent drift.
+- **Who decided:** the build session (S5). **Revisit:** S19 (or any
+  earlier polish round) should align Global's header to the same rule;
+  the change is two lines in `GlobalPage.tsx`.
+
+## 2026-11-08 — The 2026-11-08d deploy (the Gold page live)
+
+- **Decision:** deploy the S5 change set to production (version
+  `f2e74f3c`) at the close of S5, although the session prompt marked
+  the deploy optional ("S6's close may ship it").
+- **Reason:** the owner's standing delegation ("the Worker deploy when
+  you choose" + AGENTS.md §5), every gate green INCLUDING the live §21
+  seat-level diff (150/150 against production, run before the deploy),
+  and shipping now gives the owner the Gold page to review between
+  sessions — S6's close can re-ship after its own gates at zero cost.
+  Live-verified after (the backtest re-run against production 150/150,
+  `/gold` at both widths, the Global + legacy surfaces intact).
+  Rollback: `wrangler rollback`.
+- **Who decided:** the build session (S5) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives in
+  `docs/DEPLOY.md` 2026-11-08d.

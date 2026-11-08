@@ -274,12 +274,90 @@ the legacy surfaces intact — the full record in `docs/DEPLOY.md`
 
 ## Phase B — Gold (S5–S6)
 
-### ☐ S5 — Gold page build · `Session 5/30`
+### ✅ S5 — Gold page build · `Session 5/30` · delivered 2026-11-08
 - Hero (live gold price + Balance Scale + 7-state outlook + counts) → the
   37 seats grouped by 5 lanes (D-26) → context cards (D-27) → honest-record
   footnote.
 - **Gates:** seat-level diff vs `/api/insights` = exact match; all 37 seats
   render lean + evidence word; blocked items shown as notes (§16).
+
+**S5 delivery record (2026-11-08):** THE gold card is REAL — `/gold`
+renders the 37-voter conditions meter on the S2 contract
+(`fetchPageProjection('gold')` — the 48-reading payload: 14 homes + 34
+mirror inputs), with every verdict re-derived client-side through the
+SAME engines (never a second arithmetic, D-48): `gold-tiles.ts` (the
+pure derivations — `goldBalance` + `goldOutlookOf` + `evaluateSignal`,
+plus the BalanceScale's OWN `balanceVerdictOf`/`balanceTilt` imported
+verbatim so the hero's beam and the legacy drawing's beam are ONE math)
++ `GoldHero.tsx` (the live price with the BD-S4a window-tagged change +
+the 10-year position + the beam glyph + the verdict word + the 7-state
+outlook + the for/against/not-leaning/unread counts + gold's own 30-day
+context line, never counted) + `GoldSeats.tsx` (the five lane cards,
+D-26's 7/7/11/10/2 — each seat chip: name · lean · evidence word · link
+to the seat's home card per §7 wrap-up note 4, the homes derived from
+the placement table via the new `homePageOfIndicator` helper, never
+hand-copied; the three voters whose home card lives on THIS page link to
+the `#gold-context` anchor) + `GoldContext.tsx` (the D-27 ratios +
+flows groups with value/10-year-position/freshness per the §21
+per-page trio, the four BLOCKED ids as honest notes only §16, and the
+honest-record footnote D-29 — the measured sign-agreement record
+46.8/42.2/32.7% at 5/20/60td, MIN2, the corpus's own measured-note
+sentence + the backtest link) + `GoldPage.tsx` (the container: honest
+loading/error states, the M-17 last-good cache labelled). **THE §21
+SEAT-LEVEL DIFF — the S5 gate's own:** `gold-backtest-core.ts` (the
+page side over the projection vs the engine side — `goldBalance` member
+line by member line over the served snapshot, NEVER through the page
+module) + the offline suite test (7: the full pipeline, the public-mode
+twin, three FAIL-CLOSED proofs — a flipped voter, a mutated hero value,
+a dropped context reading) + the LIVE script
+`apps/web/scripts/pd-s5-backtest.ts` — **the live run against
+PRODUCTION: 150 checks · 150 green · 0 red, twice** (before the deploy
+and after it): every one of the 37 seats' impact + evidence identical
+to the engine's own arithmetic, the hero verdict word + beam angle
+identical, the hero price + all 14 context readings byte-identical
+(stableStringify, key-order-immune), the licence-hidden quartet riding
+`absentIds`. **The copy:** ~110 new `pd.gold.*` keys (en+fa) with the
+verdict vocabulary pinned byte-for-byte to the insights corpus in BOTH
+locales by `gold-copy-pin.test.ts` (24 tests: the lane names + intros,
+all 37 voter names, the evidence words, the seat lean + lane state +
+tally words, the verdict words + counts parts, the beam aria, the
+context line, the measured note + link, all 14 card names, the units +
+position + band + status words — the first run caught TWO real drifts
+and both were fixed to the corpus's own words); 133 new fa strings
+queued unreviewed in the Persian copy manifest (7,118 entries). **One
+build-session decision recorded: BD-S5a** (the cached-copy header — when
+the page renders the last-good copy, the fromCache sentence REPLACES the
+plain data-as-of line instead of doubling the date; Global's header
+keeps the S4 pattern until S19's polish aligns it — found by the
+dark-mode VLM pass). **The browser verification pass** (the freshly
+built SPA over real production data, both widths in en + fa): the hero
+renders the live hourly price (US$4,072 +4.44% `7d`, top 9% of the
+decade) with the beam at 3.33° "for" and the outlook Bullish, the five
+lanes carry the REAL engine verdicts (borrowing-costs for · dollar
+against · stress for · inflation split 1–1 · flows neutral — the SAME
+2-for/1-against/2-not-leaning counts the Global tile's engine values
+carry), all 37 seats with lean + evidence + working home links
+(click-verified through the router), no horizontal scroll at any width,
+dark mode, the keyboard walk, and the M-17 last-good path LIVE (feed
+blocked → the cached page stays, labelled). **The VLM visual pass found
+two real defects, both fixed:** the seat chips' lean+evidence lines
+clipped mid-word by the first build's truncate classes (the chips now
+wrap their words COMPLETE — name / lean / evidence stacked) and the
+cached header's doubled date. Gates ALL GREEN (2m 15s: secret scan
+8/930 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator in sync +
+eval 50 · layer1 11,819/11,819 · **the suite 14,786 = +55** (gold-tiles
+15 · gold-copy-pin 24 · GoldPage characterization 9 · gold-backtest 7)
+· build + budgets held — entry 269.00/81.45 (the lazy /gold wiring),
+GlobalPage UNTOUCHED at 24.26/6.21 (byte-identical hash), **the new
+GoldPage chunk 26.25/6.88 vs its new 30/9 budget row**). **Deployed +
+live-verified** (version `f2e74f3c` ~12:27 UTC, the owner's standing
+applies — the session prompt marked the deploy optional and every gate
+was green including the live backtest, so the Gold page is live for the
+owner's review between sessions; S6's close can re-ship after its own
+gates): currena.ir/gold renders the complete meter, the landing page +
+legacy surfaces intact, the §21 backtest re-run against production
+150/150 green post-deploy — the full record in `docs/DEPLOY.md`
+2026-11-08d.
 
 ### ☐ S6 — Gold gates · `Session 6/30`
 - Verdict-consistency backtest (meter counts, lane votes, beam, outlook);
@@ -404,7 +482,7 @@ the legacy surfaces intact — the full record in `docs/DEPLOY.md`
 | Phase | Sessions | Status |
 |---|---|---|
 | A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
-| B Gold | S5–S6 | ☐ S5 next |
+| B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ☐ S6 next |
 | C World Markets | S7–S8 | ☐ |
 | D USA | S9–S11 | ☐ |
 | E Europe | S12–S13 | ☐ |
@@ -416,7 +494,8 @@ the legacy surfaces intact — the full record in `docs/DEPLOY.md`
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 4/30 delivered 2026-11-08 · 26 remaining — next
-action: Session 5/30 (S5, the Gold page build: the hero — live gold price +
-Balance Scale + 7-state outlook + counts → the 37 seats in five lanes (D-26)
-→ context cards (D-27) → the honest-record footnote, D-26…D-29).**
+**Current position: Session 5/30 delivered 2026-11-08 · 25 remaining — next
+action: Session 6/30 (S6, the Gold gates: the verdict-consistency backtest
+byte-identical — meter counts, lane votes, beam, outlook · the
+frozen-scenario suite re-run against the page renderer · mobile + ARIA
+pass · hand-off).**

@@ -6,53 +6,57 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-## Current state (2026-11-08, after page-division S4)
+## Current state (2026-11-08, after page-division S5)
 
 - **Program:** page-division — splitting the all-in-one Insights page
-  into 10 destinations per D-1…D-48. **Session 4/30 delivered & gated —
-  Phase A (Foundations) CLOSED.** Progress: S1 scaffold & navigation ·
-  S2 data layer + `PLACEMENT.generated.md` (184 ids + 6 boards, 0
-  unplaced / 0 duplicate homes) · S3 the Global landing page (the D-21
-  ten-tile verdict board) · S4 the gates & polish (the §21
-  verdict-consistency backtest 84/84 green over real KV AND against
-  production twice; BD-S4a the `change1d` day change; BD-S4b the
-  narrator discipline; six pass defects found + fixed — the sixth, the
-  M-17 boards fix, found by the closing verification pass and shipped
-  live by the re-deploy).
-- **DEPLOYED & LIVE** (`b1cfa4fe`, 2026-11-08 ~05:00 UTC — the first cut
-  `637db8f8` ~04:36 + the closing pass's M-17 boards re-deploy): the S2
-  projection endpoints (`/api/insights/pages[/:page]`), the S3 Global
-  landing page at `/`, the S4 polish, and the `change1d` live-prices
-  writer (the ribbon's day change appears at the first :13 cron rung
-  post-deploy). The live acceptance record: `docs/DEPLOY.md`
-  2026-11-08c. Legacy `/insights` intact with the deprecation banner.
-- **Gates (last full run):** ALL GREEN — secret scan 8/919 · tsc 6/6 ·
+  into 10 destinations per D-1…D-48. **Session 5/30 delivered & gated —
+  Phase B (Gold) OPEN: the Gold page is REAL and LIVE.** Progress: S1
+  scaffold & navigation · S2 data layer + `PLACEMENT.generated.md` · S3
+  the Global landing page (D-21) · S4 the gates & polish (Phase A
+  CLOSED) · **S5 the Gold page build (D-26…D-29: the hero — live gold
+  price + Balance Scale verdict + 7-state outlook + counts; the 37 seats
+  in five lanes with lean + evidence + placement-derived home links; the
+  D-27 context cards; the four blocked ids as honest §16 notes; the
+  honest-record footnote) — the §21 seat-level diff 150/150 green against
+  production TWICE, and the VLM pass's two finds (the seat-chip
+  truncation, the doubled cached-date header — BD-S5a) fixed.**
+- **DEPLOYED & LIVE** (`f2e74f3c`, 2026-11-08 ~12:27 UTC): the Gold
+  page at **https://currena.ir/gold** for every visitor — the 37-voter
+  conditions meter over the live projection (the same engines the
+  Global tile reads; the live balance: 2 for · 1 against · 2 not
+  leaning, outlook Bullish). The Global landing page and the legacy
+  `/insights` are intact. The live acceptance record:
+  `docs/DEPLOY.md` 2026-11-08d.
+- **Gates (last full run):** ALL GREEN — secret scan 8/930 · tsc 6/6 ·
   eslint 0/0 · copy:audit clean · narrator in sync + eval 50 · layer1
-  11,819/11,819 · **suite 14,731** · build + budgets held (entry
-  268.69/81.33 · Insights 1588.36/367.98 · GlobalPage 33.51/9.82 vs
-  36/11).
+  11,819/11,819 · **suite 14,786** · build + budgets held (entry
+  269.00/81.45 · Insights 1569.16/362.08 · GlobalPage 24.26/6.21
+  untouched · GoldPage 26.25/6.88 vs 30/9).
 
-## Next session (S5 — the Gold page build)
+## Next session (S6 — the Gold gates)
 
-Read `AGENTS.md` first (the owner working rules are consolidated in §14; original archived at `docs/AGENT-RULES.md`), then
-`docs/page-division/01-SESSION-ROADMAP.md` (the S5 entry + the S4
-delivery record), `02-PAGE-DIVISION-SPEC.md` §5 + §21, and the S4
-hand-off prompt (the end of this session's report). Scope: the hero
-(live gold price + Balance Scale + 7-state outlook + counts) → the 37
-seats in five lanes (D-26) → context cards (D-27) → the honest-record
-footnote. Gate: seat-level diff vs `/api/insights` = exact match.
+Read `docs/AGENT-RULES.md` (now also AGENTS.md §14) + `AGENTS.md` first, then
+`docs/page-division/01-SESSION-ROADMAP.md` (the S6 entry + the S5
+delivery record), `02-PAGE-DIVISION-SPEC.md` §5 + §21, and the S5
+hand-off prompt (the end of this session's report). Scope: the
+verdict-consistency backtest byte-identical (meter counts, lane votes,
+beam, outlook — the S5 core `gold-backtest-core.ts` already carries the
+seat-level half; S6 adds the frozen-scenario suite re-run against the
+page renderer) → the full mobile + ARIA pass → the hand-off.
 
 ## Owner-side levers waiting
 
 1. Ratify the `/converter` relocation (S1's build-session decision).
 2. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement).
-3. Ratify or redirect BD-S3a/b/c (the chip dots mirror real verdicts
-   only · the gauge-tile links · the 2-col mobile board) and BD-S4a/b
-   (the change1d day change · the narrator verbatim + stamp) — none
-   blocking, all recorded in the roadmap session records.
-4. Triage the queued unreviewed fa strings (now ~237 in
-   `docs/localization/persian-copy-manifest.json`).
+3. Ratify or redirect BD-S3a/b/c + BD-S4a/b + **BD-S5a** (the Gold
+   page's cached-copy header replaces the plain data-as-of line instead
+   of doubling the date; Global's header keeps the S4 pattern until
+   S19) — all recorded, none blocking.
+4. Triage the queued unreviewed fa strings (now ~369: 236 + the 133 new
+   `pd.gold.*` strings in `docs/localization/persian-copy-manifest.json`
+   — the corpus-mirroring ones are byte-pinned by
+   `gold-copy-pin.test.ts`, the fresh S5 wording awaits review).
 5. The external investor's review of the spec (§19) — Phase 3's input.
 
 ## Known state worth knowing
@@ -62,16 +66,17 @@ footnote. Gate: seat-level diff vs `/api/insights` = exact match.
   hourly (:13); the narrator hourly (:50). A snapshot stored after the
   last :50 rung leaves the narrator one state behind until the next rung
   — honest, self-healing, and the page's "Updated" stamp says so.
-- The `change1d` ribbon day change is LIVE (observed at the first :13
-  rung post-deploy: Brent +0.03% `1d` · Bitcoin +0.06% `1d`). Gold keeps
+- The `change1d` ribbon day change is LIVE (Brent +0.03% `1d` · Bitcoin
+  +0.06% `1d` observed at the first post-deploy :13 rung). Gold keeps
   its labelled 7-day change while its gold-api.com EOD print stays
-  fresher than the Yahoo bar — the merge's never-rewind guard, per-asset
-  honest.
-- The boards' last-good discipline (M-17) now matches the projection's:
-  a failed markets/fx refresh keeps the cached copy on screen, labelled
-  with the board's own stored date ("Last good copy · {date}") — the
-  S4 closing pass found and fixed the collapse (the tiles used to fall
-  to their unread states while good data sat in the cache).>>>>>>> 4c8d6ee (docs: the change1d go-live OBSERVED — the first :13 rung post-deploy wrote the field (brent +0.03% 1d · btc +0.06% 1d live on the ribbon; gold keeps its labelled 7-day change by the merge's never-rewind guard, its gold-api.com EOD print fresher than the Yahoo bar — the per-asset fallback BD-S4a built))
-- The rollback lever for the 2026-11-08c deploy: `wrangler rollback` —
-  the legacy surfaces were byte-identical before it; the new routes are
-  additive.
+  fresher than the Yahoo bar — the merge's never-rewind guard,
+  per-asset honest. The Gold hero follows the same BD-S4a discipline.
+- The Gold page's seat chips link to the seat's home page per the
+  placement table (`homePageOfIndicator`) — the three voters whose home
+  card is the Gold page itself (gold-silver · the CFTC pair) link to the
+  in-page `#gold-context` anchor; the dollar voters → `/currencies`, the
+  euro pair → `/europe`, gpr-daily → `/world-markets`, the rest → `/usa`
+  (their pages build S7+).
+- The rollback lever for the 2026-11-08d deploy: `wrangler rollback` —
+  the Global + legacy surfaces were byte-identical before it; `/gold`
+  was the placeholder there.

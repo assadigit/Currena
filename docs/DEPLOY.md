@@ -205,7 +205,57 @@ had run green over the remote-dev Worker on real KV BEFORE the deploy
   legacy surfaces; the new routes are additive, so a rollback costs only
   the new endpoints, never the existing page.
 
+## Session record — 2026-11-08d the page-division S5 deploy (the Gold page — the 37-voter conditions meter live for every visitor at /gold)
+
+Page-division S5 (main `94af4d4` + the gates/verification commits
+through `2fef139`). **The authority:** the owner's standing ("the Worker
+deploy when you choose" + AGENTS.md §5) — the session prompt records
+"Deploy is optional this session (S6's close may ship it — the owner's
+standing applies either way)"; with every gate green INCLUDING the live
+§21 seat-level diff, shipping now gives the owner the Gold page to
+review between sessions and costs S6 nothing (its own gates re-run and
+can re-deploy). The gates were ALL GREEN over the whole change set
+first (2m 15s: secret scan 8/930 · tsc 6/6 · eslint 0/0 · copy:audit
+clean · narrator in sync + eval 50 · layer1 11,819/11,819 · **the suite
+14,786** · build + budgets held — entry 269.00/81.45 · Insights
+1569.16/362.08 · GlobalPage UNTOUCHED at 24.26/6.21 · the new GoldPage
+chunk 26.25/6.88 vs its new 30/9 row), and the §21 seat-level diff had
+run green against production BEFORE the deploy (150 checks · 150 green
+· 0 red).
+
+- **DEPLOY (~12:27 UTC, version `f2e74f3c-a8b0-495f-8b15-40fb16adace7`):**
+  `pnpm --filter @currena/web build` (the gates' own fresh dist) +
+  `pnpm --filter @currena/api exec wrangler deploy` →
+  currena.ir at 100%. Display-layer only: the SPA's `/gold` route (the
+  lazy GoldPage chunk + the App wiring), the placement module's
+  `homePageOfIndicator` helper (pure; the served endpoints' behaviour
+  unchanged), and the budget row. No engine, voter, threshold or
+  calibration change anywhere; the Global landing page's chunk hash is
+  UNTOUCHED.
+- **LIVE ACCEPTANCE CHECK ALL GREEN (this session's own runs):**
+  `https://currena.ir/gold` renders THE gold card over the live
+  projection — the hero (US$4,072 +4.44% `7d`, top 9% of the decade,
+  prices as of 12:13 UTC, the beam at 3.33° "for", the outlook
+  Bullish, 2 for · 1 against · 2 not leaning), the five lanes with the
+  REAL engine verdicts (borrowing-costs for · dollar against · stress
+  for · inflation split 1–1 · flows neutral), all 37 seats with lean +
+  evidence + home links, 13 context cards, the 4 blocked notes, the
+  honest record · no horizontal scroll at 360×844 · the landing page
+  intact (10 tiles, the Gold Balance tile reading the SAME counts) ·
+  the legacy `/insights` intact with the D-46 banner · **the §21
+  seat-level diff re-run against PRODUCTION post-deploy: 150 checks ·
+  150 green · 0 red** — every seat's impact + evidence identical to the
+  engine's own `goldBalance` over `/api/insights`, the hero price + all
+  14 context readings byte-identical, the licence-hidden quartet riding
+  `absentIds`.
+- **Rollback lever:** `wrangler rollback` (or the dashboard's
+  deployments list) — the previous version served the byte-identical
+  legacy + Global surfaces; `/gold` was a placeholder there, so a
+  rollback costs only the new page, never an existing one.
+
 ## Session record — 2026-11-04e the gold-balance OI-3/GB-S7 wire-cleanup deploy (the goldSummary field OFF the wire + the wind copy keys retired; the page rendering identically)
+
+
 
 GB-S7 (branch `gold-balance/oi3-cleanup`, **PR #24 merged
 `b4acef0`**). The hard gate (this round's own): the GB-S1 recheck
