@@ -162,10 +162,14 @@ function SeatChip({ seat }: { seat: GoldSeat }): React.JSX.Element {
   const aria = evidenceWord !== null ? `${name} — ${leanWord} · ${evidenceWord}` : `${name} — ${leanWord}`;
   const inner = (
     <>
-      <span className="min-w-0 truncate text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</span>
-      <span className={`flex min-w-0 items-baseline gap-1 text-[length:var(--type-caption)] font-semibold leading-tight ${SEAT_LEAN_TONE[seat.impact]}`}>
-        <span className="truncate">{leanWord}</span>
-        {evidenceWord !== null ? <span className="truncate text-[var(--color-text-tertiary)]">· {evidenceWord}</span> : null}
+      <span className="text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</span>
+      {/* The lean + evidence words wrap COMPLETE — the S5 VLM pass caught
+       * the first build's truncate clipping them mid-word ("Supports go… ·
+       * high in it…"); a seat chip states its whole reading, never a
+       * clipped fragment (D-26: name · lean · evidence word). */}
+      <span className={`flex flex-col gap-0.5 text-[length:var(--type-caption)] font-semibold leading-tight ${SEAT_LEAN_TONE[seat.impact]}`}>
+        <span>{leanWord}</span>
+        {evidenceWord !== null ? <span className="text-[var(--color-text-tertiary)]">{evidenceWord}</span> : null}
       </span>
     </>
   );
@@ -177,7 +181,7 @@ function SeatChip({ seat }: { seat: GoldSeat }): React.JSX.Element {
       <li
         data-seat={seat.id}
         data-seat-impact={seat.impact}
-        className="flex min-h-[44px] min-w-[150px] flex-1 flex-col justify-center gap-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]"
+        className="flex min-h-[44px] min-w-[156px] flex-1 flex-col justify-center gap-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]"
         aria-label={aria}
       >
         {inner}
@@ -185,7 +189,7 @@ function SeatChip({ seat }: { seat: GoldSeat }): React.JSX.Element {
     );
   }
   return (
-    <li className="min-w-[150px] flex-1">
+    <li className="min-w-[156px] flex-1">
       <a
         href={href}
         data-seat={seat.id}

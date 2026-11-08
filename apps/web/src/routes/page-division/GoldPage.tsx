@@ -147,8 +147,18 @@ export function GoldPage(): React.JSX.Element {
         </p>
         {dataAsOf !== null ? (
           <p className="m-0 mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[10.5px] font-semibold text-currena-muted sm:mt-1.5 sm:gap-x-3 sm:text-[length:var(--type-caption)]">
-            <bdi>{interpolate(t('pd.global.dataAsOf'), { date: dataAsOf.date })}</bdi>
-            {fromCache ? <bdi className="text-[var(--color-text-tertiary)]">{interpolate(t('pd.global.fromCache'), { date: dataAsOf.date })}</bdi> : null}
+            {/* BD-S5a (the S5 dark-mode VLM pass): when the page renders
+             * the CACHED copy, the fromCache sentence REPLACES the plain
+             * data-as-of line — the sentence already carries the date, and
+             * printing both read as a garbled duplicate ("Data as of Nov 8
+             * · Showing the last good copy — data as of Nov 8"). Same
+             * information, one honest sentence. Global's header keeps the
+             * S4 pattern until S19's polish pass aligns it. */}
+            {fromCache ? (
+              <bdi className="text-[var(--color-text-tertiary)]">{interpolate(t('pd.global.fromCache'), { date: dataAsOf.date })}</bdi>
+            ) : (
+              <bdi>{interpolate(t('pd.global.dataAsOf'), { date: dataAsOf.date })}</bdi>
+            )}
           </p>
         ) : null}
       </header>
