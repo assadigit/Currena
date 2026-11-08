@@ -43,7 +43,7 @@ import type { MapRegionId } from '../../components/insights/world-markets/world-
 
 /** A full 16-row board (the S7 characterization fixture's shape). */
 function boardFixture(): MarketsSnapshot {
-  const markets = MARKETS.map((m, i) => ({
+  const markets: MarketsSnapshot['markets'] = MARKETS.map((m, i) => ({
     id: m.id,
     asOf: '2026-11-07',
     close: 19624,
@@ -217,7 +217,7 @@ describe('RegionPage', () => {
     // The fa locale rides the app's own locale store (the I18nApi's
     // setter — the same door the language switch uses).
     const { useI18n } = await import('../../lib/locale');
-    function SetLocale({ locale }: { locale: 'en' | 'fa' }): React.JSX.Element {
+    function SetLocale({ locale }: { locale: 'en' | 'fa' }): React.JSX.Element | null {
       const { setLocale } = useI18n();
       useEffect(() => {
         setLocale(locale);
@@ -246,7 +246,7 @@ describe('RegionPage', () => {
       unmount();
       cleanup();
       const { useI18n: useI18n2 } = await import('../../lib/locale');
-      const Probe = (): React.JSX.Element => {
+      const Probe = (): React.JSX.Element | null => {
         const { setLocale } = useI18n2();
         useEffect(() => {
           setLocale('en');

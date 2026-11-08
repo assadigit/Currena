@@ -52,7 +52,7 @@ afterEach(() => {
 /** A full 16-row board; the biggest 1D mover (ibov −6.6%) sits in NO
  * zoom so the all-16 scale visibly differs from any subset scale. */
 function boardFixture(): MarketsSnapshot {
-  const markets = MARKETS.map((m, i) => ({
+  const markets: MarketsSnapshot['markets'] = MARKETS.map((m, i) => ({
     id: m.id,
     asOf: '2026-11-07',
     close: 10000 + i * 100,
@@ -163,14 +163,15 @@ describe('WorldMap — the region zoom mode (S8)', () => {
     render(
       <WorldMap snapshot={boardFixture()} copy={copyEn} locale="en" numberLocale="en-US" onOpenMarket={() => undefined} region="us" />,
     );
-    const root = document.querySelector('.wm')!;
+    const root = document.querySelector('.wm')! as HTMLElement;
     expect(root.getAttribute('data-wm-zoom')).toBe('us');
     expect(root.style.getPropertyValue('--wm-zoom-ar')).toBe(`${REGION_ZOOMS.us.viewBox.w} / ${REGION_ZOOMS.us.viewBox.h}`);
     // The world view never sets them.
     cleanup();
     render(<WorldMap snapshot={boardFixture()} copy={copyEn} locale="en" numberLocale="en-US" onOpenMarket={() => undefined} />);
-    expect(document.querySelector('.wm')!.getAttribute('data-wm-zoom')).toBeNull();
-    expect(document.querySelector('.wm')!.style.getPropertyValue('--wm-zoom-ar')).toBe('');
+    const worldRoot = document.querySelector('.wm')! as HTMLElement;
+    expect(worldRoot.getAttribute('data-wm-zoom')).toBeNull();
+    expect(worldRoot.style.getPropertyValue('--wm-zoom-ar')).toBe('');
   });
 
   it('the period switch drives the zoomed hero like the world\'s own (1Y turns the card\'s loud number)', () => {

@@ -30,7 +30,7 @@ import { REGION_ZOOMS } from '../../components/insights/world-markets/world-map-
  * drift in Europe would actually move weights — the fail-closed proof's
  * precondition. */
 function boardFixture(): MarketsSnapshot {
-  const markets = MARKETS.map((m, i) => ({
+  const markets: MarketsSnapshot['markets'] = MARKETS.map((m, i) => ({
     id: m.id,
     asOf: '2026-11-07',
     close: 10000 + i * 100,
