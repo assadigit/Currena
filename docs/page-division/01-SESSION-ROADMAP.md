@@ -180,11 +180,76 @@ state, and a VLM visual review pass (which caught the first build's
 Bitcoin-clipping ribbon — fixed to the row layout). Not deployed (the
 Worker code is unchanged since S2; the deploy stays the owner's lever).
 
-### ☐ S4 — Global gates & polish · `Session 4/30`
+### ✅ S4 — Global gates & polish · `Session 4/30` · delivered 2026-11-08
 - Verdict-consistency backtest: every Global tile byte-identical to engine
   snapshot values; narrator wired to the :50 cron artefact.
 - Full mobile pass, keyboard/ARIA pass, empty/error states.
 - **Gates:** all green; commit pushed; hand-off prompt for Phase B.
+
+**S4 delivery record (2026-11-08):** Phase A is CLOSED — the landing page
+is verified to the §21 zero-tolerance standard. **The verdict-consistency
+backtest, both halves:** `global-backtest-core.ts` (the pure comparison —
+the PAGE's `global-tiles` derivations over the served projection vs the
+ENGINE's own arithmetic over the served snapshot, the engine side spelled
+out through `gaugeReading`/`goldBalance`/`evaluateSignal`/`goldOutlookOf`/
+`marketsVerdictStep`/`summarizeMarkets`/`summarizeFxRules`/`fxRuleView`,
+never through the page module, so drift surfaces red) + the offline suite
+test (`global-backtest.test.ts`, 8: the full pipeline over a synthetic
+snapshot, the public-projection twin, the markets exit-buffer divergence
+as a designed note, three FAIL-CLOSED proofs — a flipped voter, a mutated
+ribbon value, a dropped gold voter — and the key-order-immune
+`stableStringify`) + the LIVE script (`apps/web/scripts/pd-s4-backtest.ts`
+— the five feeds aligned on generatedAt+pricesAsOf, zod-validated, the
+narrator wiring walk incl. the raw-KV stateHash recompute over exactly
+the documents the :50 cron reads). **THE LIVE RUN over the remote-dev
+Worker on real KV: 84 checks · 84 green · 0 red** — every input rides the
+projection (52/52), every gauge step+word+counts identical, the Gold
+Balance [2,1,2,0] net 1 readable 5 outlook bullish identical, markets
+attention/step 3/RAW 7-correction 2-bear identical (the buffered
+nAttention 5 vs RAW 7 divergence reported as the designed S1-M1.6 #2
+note, never a failure), fx normal/0/0 identical, the ribbon+dedollar
+readings byte-identical (gold 4072.10 · brent 98.32 · btc 75808.37), and
+**the narrator's stateHash recompute IDENTICAL — the stored one-liner
+speaks about exactly the state the pages serve** (the artefact's overall
+unit was last regenerated 2026-11-07; `doc.dataAsOf` 2026-11-07 vs the
+snapshot store 2026-11-07T20:11Z reported honestly). **Two build-session
+decisions recorded:** **BD-S4a** (the D-22 day-change call — the TRUE day
+change rides the live-prices contract: `change1d`, optional + additive,
+computed in `buildLivePriceEntry` as the live quote vs the PREVIOUS
+SESSION'S CLOSE, the last series point strictly before the quote's own
+bar — never `pointDaysBack(1)`, which would measure the quote against
+its own session; the ribbon shows it with a VISIBLE window tag and falls
+back to the labelled 7-day change until the deployed prices writer
+carries the field; the history-endpoint option REJECTED — 3 full-series
+fetches on the landing page against the lean-page discipline, and a
+closes-only pair would not correspond to the displayed live hourly
+value; D-48's colour+label discipline now covers changes: a bare percent
+never rides without its window) and **BD-S4b** (the narrator display
+discipline — the narrator's OWN TEXT renders VERBATIM, the template
+fallback's trailing not-advice sentence included, never edited, never
+sentence-suppressed; the line GAINS the legacy block's “Updated {time}”
+stamp so the staleness story is visible). **The pass's finds, fixed
+live:** the last-good-cache path painted UNLABELLED cached data (the
+`fromCache` flag was dead — never set; the label now rides exactly the
+states that render a cached copy, the M-17 pattern); the narrator's
+Updated stamp sat at the clamped text's end (swallowed in every
+locale/width — the VLM pass caught it) and the clamp bled a sliced third
+line into the bottom padding (the clamp now lives on an inner
+padding-free span with the stamp at the FRONT of line 1); a display
+utility beside `line-clamp` overrode its `-webkit-box` (six unclamped
+lines on mobile-fa — caught by the one-screen measurement, 844/844
+restored); mobile chips wrapped to 2–3 lines (`whitespace-nowrap` keeps
+the uniform single-line scrollable pills); reduced-motion guards (the
+loader-dot bounce + the loading tile's pulse + the tile/chip transitions
+now `motion-safe`); the mobile chips scroller's direction-aware fade
+affordance; the ribbon's visible window tag `aria-hidden` (the sr-only
+words carry it). **Browser-verified live at 1440×900 AND 360×844 in en +
+fa (RTL):** one screen exact in all four, ten tiles with live verdicts
+over real KV, the keyboard walk (skip link → nav → tiles, focus rings
+everywhere), dark mode one-screen, BOTH reduced-motion guards verified in
+the live CSSOM, and the live last-good path (feed blocked → the labelled
+cached board renders). 4 new fa strings queued unreviewed (the ribbon
+window tag + the narrator stamp pair).
 
 ## Phase B — Gold (S5–S6)
 
@@ -317,8 +382,8 @@ Worker code is unchanged since S2; the deploy stays the owner's lever).
 
 | Phase | Sessions | Status |
 |---|---|---|
-| A Foundations | S1–S4 | 🔄 S1 ✅ 2026-11-07 · S2 ✅ 2026-11-08 · S3 ✅ 2026-11-08 · S4 next |
-| B Gold | S5–S6 | ☐ |
+| A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
+| B Gold | S5–S6 | ☐ S5 next |
 | C World Markets | S7–S8 | ☐ |
 | D USA | S9–S11 | ☐ |
 | E Europe | S12–S13 | ☐ |
@@ -330,7 +395,7 @@ Worker code is unchanged since S2; the deploy stays the owner's lever).
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 3/30 delivered 2026-11-08 · 27 remaining — next
-action: Session 4/30 (S4, the Global gates & polish: the verdict-consistency
-backtest byte-identical to the engine snapshot values · the narrator wired to
-the :50 cron artefact · the full mobile/ARIA/empty-state pass).**
+**Current position: Session 4/30 delivered 2026-11-08 · 26 remaining — next
+action: Session 5/30 (S5, the Gold page build: the hero — live gold price +
+Balance Scale + 7-state outlook + counts → the 37 seats in five lanes (D-26)
+→ context cards (D-27) → the honest-record footnote, D-26…D-29).**
