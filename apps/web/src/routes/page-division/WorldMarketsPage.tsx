@@ -155,7 +155,7 @@ export function WorldMarketsPage(): React.JSX.Element {
   // The honest load state before any data exists (no cache, first paint).
   if (projection === null && state.kind === 'loading') {
     return (
-      <div className="mx-auto flex w-full max-w-[560px] flex-col items-center px-5 py-16 sm:max-w-[680px] lg:max-w-[1080px]" role="status">
+      <div className="mx-auto flex w-full max-w-[560px] flex-col items-center px-5 py-16 sm:max-w-[680px] lg:max-w-[1280px]" role="status">
         <p className="m-0 text-[length:var(--type-label)] font-semibold text-currena-muted">{t('pd.worldMarkets.loadingLine')}</p>
         <span className="mt-4 flex justify-center gap-2.5" aria-hidden="true">
           <span className="loader-dot" />
@@ -184,9 +184,15 @@ export function WorldMarketsPage(): React.JSX.Element {
     );
   }
 
-  // Ready (fresh or cached): the complete world-markets picture.
+  // Ready (fresh or cached): the complete world-markets picture. The
+  // container matches the Global landing page's 1280px at lg — the REUSED
+  // map module's callout cards are tuned for that stage width (the
+  // legacy /insights shell renders it at ~1272px; a 1080px container
+  // squeezed the stage to 1016px and re-exposed the 4×4px stoxx50×hsi
+  // corner intersection the 2026-10-27 config round tuned away — found by
+  // the S7 browser pass, fixed by giving the drawing its designed width).
   return (
-    <div className="mx-auto w-full max-w-[560px] px-3 py-1.5 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1080px] lg:px-8 lg:py-6">
+    <div className="mx-auto w-full max-w-[560px] px-3 py-1.5 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1280px] lg:px-8 lg:py-6">
       {/* The heading block: title + the one-line purpose + the risk
           cards' data-as-of line + the M-17 cached-copy label when it
           paints (the S4/BD-S5a one-sentence rule). */}
