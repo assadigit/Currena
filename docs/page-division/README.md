@@ -38,7 +38,7 @@ regeneration (`pnpm placement:generate`).
 - **Phase 3 (final spec):** pending the investor — roadmap S22 records the
   answers as D-49+.
 - **Phase 4 (build):** **RUNNING — Phase A (Foundations) CLOSED, Phase B
-  (Gold) CLOSED and Phase C (World Markets) OPEN: S1 (scaffold &
+  (Gold) CLOSED and Phase C (World Markets) CLOSED: S1 (scaffold &
   navigation) 2026-11-07 · S2 (the data layer +
   `PLACEMENT.generated.md`) 2026-11-08 · S3 (the Global page build: the
   D-21 ten-tile verdict board) 2026-11-08 · S4 (Global gates & polish:
@@ -57,9 +57,14 @@ regeneration (`pnpm placement:generate`).
   region grids + the 9 world risk & liquidity cards; the live §21 diff
   56/56 green twice) 2026-11-08 — DEPLOYED LIVE at `/world-markets`
   (version `6e515cf8`; the live acceptance record in `docs/DEPLOY.md`
-  2026-11-08f).** Next: Session 8/30 (S8 — the Regional zoom maps,
-  Phase C continues). See the roadmap's progress board for the current
-  position.
+  2026-11-08f). S8 (the Regional zoom maps: the four REGION pages' D-44
+  index/map sections — the REUSED WorldMap in region mode, ONE drawing,
+  the all-16 colour scale by construction, the live §21 diff 13/13
+  green twice) 2026-11-08 — DEPLOYED LIVE at `/usa` · `/europe` ·
+  `/asia-pacific` · `/australia` (version `fde50a95`; the live
+  acceptance record in `docs/DEPLOY.md` 2026-11-08g).** Next: Session
+  9/30 (S9 — Phase D opens: the USA verdicts + tiers 1–2). See the
+  roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

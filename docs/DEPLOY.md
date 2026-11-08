@@ -205,6 +205,66 @@ had run green over the remote-dev Worker on real KV BEFORE the deploy
   legacy surfaces; the new routes are additive, so a rollback costs only
   the new endpoints, never the existing page.
 
+## Session record — 2026-11-08g the page-division S8 deploy (the Regional zoom maps — the four REGION pages' index/map sections live for every visitor at /usa, /europe, /asia-pacific and /australia; Phase C closed)
+
+Page-division S8 (main `cfe11c6` → `0276c66` → `9118c8d` → the gates
+fix + this record). **The authority:** the owner's standing in the
+session prompt ("the deploy at the close is the owner's standing") +
+AGENTS.md §5 — every gate was green over the whole change set first
+(2m 23s: secret scan 8/954 · tsc 6/6 · eslint 0/0 · copy:audit clean
+(7,311 manifest entries, the 5 new pd.regionZoom fa strings queued
+unreviewed) · narrator in sync + eval 50 · layer1 11,819/11,819 · **the
+suite 14,877 = +38** · build + budgets held — entry 269.71/81.70 ·
+GlobalPage 24.40/6.27 · GoldPage 31.26/8.07 · WorldMarketsPage
+23.10/5.64 (SHRUNK from 26.54 through the adapter sharing) · the NEW
+RegionPage chunk 3.95/1.56 vs its new 8/3 row), and the live §21 diff
+had run green against production BEFORE the deploy (13 checks · 13
+green · 0 red — the four zooms' every seated index's six lenses +
+colour weights + directions ≡ the engine side over the served board,
+the all-16 scale).
+
+- **DEPLOY (~19:25 UTC, version
+  `fde50a95-aeb8-47c5-be0c-5b1011a73f77`):** `pnpm --filter
+  @currena/web build` (the gates' own fresh dist) + `pnpm --filter
+  @currena/api exec wrangler deploy` → currena.ir at 100%. Display-layer
+  only: the SPA's four REGION routes (the REUSED WorldMap in its
+  region-zoom mode — the windows + the seated pins/cards from
+  REGION_ZOOMS; the rows' derivation EXTRACTED to world-map-rows.ts
+  feeding the all-16 colour scale unchanged; the words through the ONE
+  shared corpus-pinned adapter), the `pd.regionZoom.*` copy (en+fa),
+  the §21 backtest core + the offline suites + the live script
+  (test/script seams only), the mobile dot-tap fallback, and the budget
+  row. No engine, voter, threshold, calibration or provider change
+  anywhere.
+- **LIVE ACCEPTANCE CHECK ALL GREEN (this session's own runs):**
+  - the §21 diff re-run against PRODUCTION post-deploy: **13 checks ·
+    13 green · 0 red** — every seated index's six lenses + colour
+    weights + directions identical between the page side (the exact
+    derivation the drawing renders) and the engine side (spelled out
+    over the board's own rows, all-16 scale), and the four zoom
+    memberships' live sanity against the 16-row board.
+  - `https://currena.ir/usa` at 1440×900 (en): the "US stock indexes"
+    section with the zoomed continental-US map, the three callout cards
+    (Dow −3.4% 1D, the period switch, the leader lines), ZERO card
+    overlaps measured in the DOM, NO horizontal scroll, ZERO console
+    errors; the honest still-building chip + the placeholder body
+    below.
+  - `https://currena.ir/europe` · `/asia-pacific` · `/australia` at
+    1440×900 (en): the Europe 4 · Asia 6 · AU 1 zooms with the same
+    zero-overlap / zero-error result and real board values (FTSE −0.4%
+    1D · Nifty +2.4% · ASX +2.6%).
+  - The fa/RTL + mobile cells were verified through the local preview
+    over the same production data (the deployed build is the same dist):
+    the Persian headings + the corpus's own Persian card words, the RTL
+    page with the LTR map, no horizontal scroll at 360×844, the mobile
+    dot taps navigating, zero console errors.
+  - The Global landing page intact (10 tiles) · the Gold page intact ·
+    the World Markets page intact · the legacy `/insights` intact (16
+    map cards, the deprecation banner) · ZERO console errors.
+- **Rollback lever:** `wrangler rollback` — the four region routes
+  return to the S1 placeholders; the Global + Gold + World Markets +
+  legacy surfaces were byte-identical before this deploy.
+
 ## Session record — 2026-11-08f the page-division S7 deploy (the World Markets page — the D-43 map hero + the region grids + the 9 world risk cards live for every visitor at /world-markets; Phase C open)
 
 Page-division S7 (main `bfca921` → `25b6749` → `e579144` → `9d79a7f` →

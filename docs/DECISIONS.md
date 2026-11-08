@@ -256,3 +256,107 @@
 - **Rollback:** `wrangler rollback` — `/world-markets` returns to the S1
   placeholder; nothing else moves.
 - **Who decided:** the build session (S7) under the owner's standing.
+
+## 2026-11-08 — BD-S8a: the one-drawing region prop (the zooms parameterize the SAME WorldMap)
+
+- **Decision:** the region pages' zoom maps render through a `region`
+  prop on the REUSED `WorldMap` module (not a parallel component): the
+  prop swaps the SVG viewBox to REGION_ZOOMS' window, filters which
+  indices seat pins + callout cards, and reads the per-zoom card
+  positions — the rows' derivation NEVER changes (all 16 board rows
+  feed the relative colour scale, so a zoomed market's colour weight +
+  hero number are the world map's own BY CONSTRUCTION), and the words
+  ride the ONE shared corpus-pinned adapter.
+- **Options considered:** (a) a parallel `RegionZoomMap` component —
+  rejected: two card/pin renderers can drift, and D-43/D-48's "one
+  drawing, never restated" is exactly the guarantee a single component
+  gives; (b) restating the rows per zoom (a subset-scale) — rejected:
+  the S8 gate's "the same colours" would break (a mid-size move would
+  read as the biggest on screen), and the backtest's fail-closed proof
+  pins it red; (c) the region prop on the shared module — chosen, the
+  BalanceStage/WorldMapCopy lineage.
+- **Reason:** the world view stays byte-identical when the prop is
+  absent (the legacy /insights + /world-markets hero pass nothing — all
+  208 pre-existing world-markets/page-division tests green untouched);
+  the derivation moved to `world-map-rows.ts` so the §21 backtest drives
+  the exact function the drawing renders.
+- **Who decided:** the build session (S8). **Revisit:** when a future
+  region page grows its own rows (S9+), the card-click handler retargets
+  to them — the S7 hero pattern.
+
+## 2026-11-08 — BD-S8b: the zoom sections' scope (the map now; the region's own cards in S9–S16)
+
+- **Decision:** S8 delivers the region pages' D-44 index/map SECTIONS
+  (the zoom map over the world board) above the unchanged S1
+  placeholder body — the region's own indicator cards, verdicts and
+  fills arrive in their page build sessions (S9–S11 USA · S12–S13
+  Europe · S14–S15 Asia · S16 Australia), and the pages keep the honest
+  "In build" chip until then. The AUSTRALIA zoom seats the world board's
+  one AU row (the ASX 200 anchor): the 19-symbol AU Markets board is
+  S16's own scope and renders as a TABLE there — 18 of its symbols are
+  Sydney-listed (one city: a map of them would be a pin blob, which is
+  exactly why it was never a map). NZX50 is NOT on the Asia zoom in S8:
+  it is not on the world board (the AU board carries it; S14/S16 wire
+  that page section — recorded, never silently faked).
+- **Options considered:** (a) read the AU markets board now (its route
+  exists) — rejected: out of the session's scope ("data from the same
+  markets board payload"), and its symbols have no map seating by
+  design; (b) wait for S16 to give /australia any map — rejected:
+  D-44 says all four region pages get their index/map section, and the
+  world board's Sydney row is an honest zoom today.
+- **Reason:** the smallest change that fully satisfies the recorded
+  decisions; every scope edge is displayed honestly (the still-building
+  chip + the placeholder body stay).
+- **Who decided:** the build session (S8). **Revisit:** S16 (the AU
+  board's table may widen the AU zoom's window if NZX50 ever pins);
+  S14 (the Pacific/NZ section's own cards).
+
+## 2026-11-08 — BD-S8c: the zoomed card click opens the market's full home today (/world-markets)
+
+- **Decision:** on the region pages, a zoomed callout-card click (and a
+  mobile dot tap) navigates to `/world-markets` — the market's complete
+  home today (the region grids + the risk cards). When S9+ builds the
+  region pages' own rows, the handler retargets to them (the S7 hero's
+  scroll-to-row pattern).
+- **Options considered:** (a) a no-op click — rejected: the card is a
+  button, a dead click is a broken promise; (b) scroll to a row that
+  does not exist yet — impossible; (c) navigate to the world page —
+  chosen: honest, useful, zero new surfaces.
+- **Reason:** every interactive element does what it says; the
+  navigation is verified live in both locales and at both widths.
+- **Who decided:** the build session (S8). **Revisit:** S9 (retarget
+  /usa's handler when the USA tiers render).
+
+## 2026-11-08 — The mobile dot-tap fallback (a small S7 fix that rode along)
+
+- **Decision:** the WorldMap's list-layout dot tap (mobile) falls back
+  to the caller's `onOpenMarket` when no `insights-market-tile-*`
+  element exists on the surface — instead of dying silently.
+- **Reason:** the S7 /world-markets mobile dot was dead (the legacy tile
+  id is the only one the dot knew); with the fallback, the dot scrolls
+  to the `wm-row` grid row on /world-markets (the S7 promise the mobile
+  dot never honoured — verified live post-deploy) and navigates on the
+  region pages. The legacy /insights explorer keeps its tile path
+  (found first, unchanged).
+- **Who decided:** the build session (S8), from the browser pass.
+  **Revisit:** none needed.
+
+## 2026-11-08 — The 2026-11-08g deploy (the Regional zoom maps live)
+
+- **Decision:** ship at the close of S8 (version `fde50a95`) — the
+  owner's standing in the session prompt ("the deploy at the close is
+  the owner's standing").
+- **Reason:** all gates green (the suite 14,877 = +38 · tsc 6/6 · lint
+  0/0 · copy:audit clean (7,311 entries, the 5 new fa strings queued)
+  · narrator in sync + 50 · layer1 11,819/11,819 · build + budgets —
+  the new RegionPage chunk 3.95/1.56 vs its 8/3 row, WorldMarketsPage
+  SHRANK 26.54→23.10 through the adapter sharing); the live §21 diff
+  13/13 green BEFORE and AFTER the deploy; the four zooms live-verified
+  on currena.ir (zero card overlaps measured in the DOM, zero console
+  errors, real board values); the Global + Gold + World Markets +
+  legacy surfaces intact.
+- **Rollback:** `wrangler rollback` — the four region routes return to
+  the S1 placeholders; nothing else moves.
+- **Who decided:** the build session (S8) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives in
+  `docs/DEPLOY.md` 2026-11-08g.

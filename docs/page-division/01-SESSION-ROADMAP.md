@@ -532,10 +532,87 @@ banner) intact. Decisions: BD-S7a (the map-copy structural extraction)
 + BD-S7b (the 1280px container) + the deploy, all in
 `docs/DECISIONS.md`.
 
-### ☐ S8 — Regional zoom maps · `Session 8/30`
+### ✅ S8 — Regional zoom maps · `Session 8/30` · delivered 2026-11-08
 - Zoomed continent maps for the region pages (Europe-only, Asia-only,
   Americas/US, AU) per D-13/D-44 — data from the same board payload.
 - **Gates:** all four zooms render; consistency with the world map; hand-off.
+
+**S8 delivery record (2026-11-08):** Phase C (World Markets) is CLOSED —
+the four REGION pages render their D-44 index/map sections LIVE. **The
+zooms:** the REUSED WorldMap module gained a `region` prop — ONE
+drawing, never restated (D-48): the viewBox crops to REGION_ZOOMS'
+hand-tuned windows into the SAME 1000×521 world box (Europe 148×120 ·
+Asia 215×148 · US 155×92 · Australia 115×122 — the projection's own
+coordinates), ONLY the region's indices seat pins + callout cards
+(Europe 4 · Asia 6 · US 3 · AU 1: every world-map index seated in
+EXACTLY ONE zoom except tsx/ibov per D-44, asx200 riding the AU zoom —
+the 19-symbol AU Markets board is S16's own table, never map pins),
+the per-zoom card positions/widths and label-anchor overrides live in
+world-map-config.ts, and the stage carries its window's own aspect
+ratio (height-capped at 600px so a near-square window never dominates
+the page). **THE CONSISTENCY CONTRACT:** the rows' derivation
+(EXTRACTED VERBATIM to world-map-rows.ts) normalises the relative
+colour scale over ALL SIXTEEN board rows REGARDLESS of the region prop
+— a zoomed market's colour weight and hero number are the world map's
+own, by construction; the words ride the ONE shared corpus-pinned
+adapter (useWorldMapCopy EXTRACTED to world-map-copy.ts — the S7 hero
+re-exports it, the copy-pin test unchanged and green). **The pages:**
+RegionIndexSection (the board's M-17 keep-flagged state + the zoom +
+the board stamp + the honest cannot-read empty state; a card click —
+and a mobile dot tap — opens the market's full home today,
+/world-markets) + RegionPage (the destination's own shell + the honest
+still-building chip + the placeholder body BELOW the index section —
+DestinationBody extracted, zero copy duplication; the 1280px container
+at lg per the S7 BD-S7b lesson) + the App wiring (the four region
+routes leave the placeholder set, ONE lazy RegionPage chunk serves all
+four). A small S7 fix rode along: the mobile dot tap now falls back to
+the caller's onOpenMarket when no explorer tile exists — the
+/world-markets mobile dot was dead (it now scrolls to the wm-row grid
+row, verified live; the legacy /insights tile keeps its path). **THE
+§21 DIFF (the S8 gate's own):** region-zoom-backtest-core.ts (the S7
+two-path shape — the PAGE side through deriveWorldMapRows, the exact
+function the drawing renders, vs the ENGINE side spelled out over the
+board's own row fields through the config primitives, all-16 scale) +
+the offline suite (7: the full pipeline, the old-data nulls, THREE
+fail-closed proofs — the naive-subset scale, a mutated value, a
+dropped row) + the live script pd-s8-backtest.ts — **the live run
+against PRODUCTION: 13 checks · 13 green · 0 red, twice (before and
+after the deploy)**. **The copy:** 5 fresh `pd.regionZoom.*` keys
+(en+fa: the four section titles + the intro line) queued unreviewed in
+the Persian manifest (7,311 entries); every word inside the drawing is
+the pinned pd.worldMarkets.map block. **The browser verification pass**
+(the freshly built SPA over real production data): 1440×900 AND
+360×844 in BOTH en and fa (RTL, Persian digits) — all four zooms with
+ZERO card overlaps measured in the DOM, the leader lines'
+window-generalized math landing the pins at the exact world
+coordinates, the country labels at the zoom overrides with zoom-scaled
+sizes (Korea at local (74.4, 36.2) = the override anchor exactly; the
+Eurozone label the world's own anchor cannot carry — outside the
+window), NO horizontal scroll at any width, ZERO console/page errors
+across every route in both locales (the legacy /insights + /gold +
+/world-markets untouched by the extraction), the period switch driving
+the zoomed hero (KOSPI 1D −5.3% → 1Y +34.5%), the keyboard walk, dark
+mode, and the mobile dot taps; the VLM passes' negative reads (the
+'clipped' cards, the 'cropped' western US, 'cut-off' Tasmania) each
+disproven against the DOM — viewport folds and the window's own
+designed edges. **Gates ALL GREEN** (2m 23s: secret scan 8/954 · tsc
+6/6 · eslint 0/0 · copy:audit clean · narrator + eval 50 · layer1
+11,819/11,819 · **the suite 14,877 = +38** (zoom 12 · zoom-component 9
+· backtest 7 · RegionPage 10) · build + budgets held — entry
+269.71/81.70, the NEW RegionPage chunk 3.95/1.56 vs its new 8/3 row,
+WorldMarketsPage SHRANK 26.54→23.10 through the adapter sharing (the
+map's bytes paid once), Insights 1553.13/356.56). **Deployed +
+live-verified** (version `fde50a95` ~19:25 UTC, the owner's standing
+"the deploy at the close is the owner's standing"): currena.ir/usa ·
+/europe · /asia-pacific · /australia render their zooms over the live
+board (Dow −3.4% 1D · ASX +2.6% · Nifty +2.4% — real values, zero
+overlaps, zero errors), the Global landing page (10 tiles) + the Gold
+page + the legacy /insights (16 map cards + the deprecation banner)
+intact — the full record in `docs/DEPLOY.md` 2026-11-08g. Decisions:
+BD-S8a (the one-drawing region prop) · BD-S8b (the zoom sections'
+scope: the map now, the region's own cards in S9–S16; the AU board is
+S16's table) · BD-S8c (the card-click → /world-markets home today) +
+the mobile dot-tap fallback fix, all in `docs/DECISIONS.md`.
 
 ## Phase D — USA (S9–S11)
 
@@ -642,7 +719,7 @@ banner) intact. Decisions: BD-S7a (the map-copy structural extraction)
 |---|---|---|
 | A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
 | B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ✅ S6 2026-11-08 (deployed `327c7761`, BD-S6a's alternation) |
-| C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ☐ S8 |
+| C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ✅ S8 2026-11-08 (deployed `fde50a95`, the four REGION zoom maps — PHASE C CLOSED) |
 | D USA | S9–S11 | ☐ |
 | E Europe | S12–S13 | ☐ |
 | F Asia & Pacific | S14–S15 | ☐ |
@@ -653,8 +730,7 @@ banner) intact. Decisions: BD-S7a (the map-copy structural extraction)
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 7/30 delivered 2026-11-08 · 23 remaining — next
-action: Session 8/30 (S8, the Regional zoom maps: zoomed continent maps
-for the region pages (Europe-only, Asia-only, Americas/US, AU) per
-D-13/D-44 — data from the same board payload; gates: all four zooms
-render, consistency with the world map, hand-off).**
+**Current position: Session 8/30 delivered 2026-11-08 · 22 remaining — next
+action: Session 9/30 (S9, Phase D opens — USA: the 5 gauge verdicts atop
+(D-30) + tier-1 “the world watches” 7 cards (D-29) + tier-2 rates & the
+Fed; gates: verdicts match Global's engine values, tier-1 cards complete).**
