@@ -616,14 +616,98 @@ the mobile dot-tap fallback fix, all in `docs/DECISIONS.md`.
 
 ## Phase D — USA (S9–S11)
 
-### ☐ S9 — USA verdicts + tiers 1–2 · `Session 9/30`
+### ✅ S9 — USA verdicts + tiers 1–2 · `Session 9/30` · delivered 2026-11-09
 - The 5 gauge verdicts atop (D-30); tier-1 "the world watches" 7 cards
   (D-29); tier-2 rates & the Fed.
 - **Gates:** verdicts match Global's engine values; tier-1 cards complete.
 
+**S9 delivery record (2026-11-09):** Phase D is OPEN — the USA page is
+REAL. `/usa` now renders its own layers above the unchanged S8 zoom
+section: **the D-30 verdict strip** (the five thematic gauges in GAUGES
+order — the SAME computed verdicts as Global through ONE derivation:
+`usaGaugeVerdicts` IS `globalGaugeTiles` re-exported, D-48 — with the
+US-framed questions as the only fresh copy; the verdict WORDS and
+why-lines ride the EXISTING `pd.global` keys, one verdict language
+everywhere, zero duplicate fa strings; the honest step-0 'Cannot read
+yet' path) · **tier-1 "the world watches" (D-29's seven)** and **tier-2
+rates & the Fed (the placement's authoritative 19 — the spec's "(22)"
+label is the recorded AF-2 drift)**, every card carrying the §21 trio
+(value / 10-year position / freshness) through the same display
+conventions the legacy cards read (`usaCardValueText` restating the
+DISPLAY registry's own joins — pinned output-for-output against
+`formatReadingValue` by test, so the lean restatement can never drift
+from the legacy renderer: the fed-target true corridor '3.75–4.00%', the
+25bp fallback, the trillion/billion scales, the auction ratio, percent
+binding tight in both locales). The honest paths stay: absent readings
+render 'Cannot read yet', the projection's M-17 last-good cache paints
+labelled (the BD-S5a sentence), the In-build chip + the placeholder body
+stay for tiers 3–6 + TIC (S10's scope, BD-S8b honoured), and the S8 zoom
+stays on top through EVERY page state (a slow or dead projection never
+takes the honest map away). **THE §21 DIFF (the S9 gate's own):**
+`usa-backtest-core.ts` — THREE sides, one truth: the PAGE side
+(`usaGaugeVerdicts` over the USA projection) ≡ the GLOBAL side
+(`globalGaugeTiles` over the Global projection — D-30's 'the same
+computed verdicts as Global' pinned LITERALLY, not assumed) ≡ the ENGINE
+side (`gaugeReading` + `labelForVerdictStep` spelled out over the served
+snapshot, never through a page module) — every gauge voter present on
+all three feeds, every gauge's {step, votingCount, warningCount,
+staleCount, word} byte-identical across the three sides, every one of
+the 26 cards' §21 trio inputs byte-identical between the projection and
+the snapshot (stableStringify, key-order-immune); the offline suite (6:
+the full pipeline green over a synthetic snapshot — borrowing-costs
+cautious and market-stress relaxed-with-a-stale-vix on ALL THREE sides;
+the public-mode twin; THREE fail-closed proofs — a mutated page verdict,
+a mutated page card value with the three feeds as INDEPENDENT copies
+exactly like three HTTP payloads, a dropped input on EACH side redding
+the completeness check AND the affected gauge; the key-order-immune
+stableStringify) + the live script `pd-s9-backtest.ts` — **the live run
+against PRODUCTION: 69 checks · 69 green · 0 red, TWICE (before the
+deploy and after it)**. **The browser verification pass** (the freshly
+built SPA through the local preview server, /api proxied to currena.ir):
+1440×900 AND 360×844 in BOTH en and fa (RTL, Persian digits) — the
+strip's five LIVE engine verdicts (Stressed · Stressed · Cautious ·
+Stable · Cautious with the why-lines' real counts), the tiers with the
+§21 trio on every card (us-cpi-yoy's warning status word; the context
+us-nfp with NO status word; nyfed-custody 'US$2.81 trillion' · low ·
+bottom 0%), the zoom with ZERO card overlaps measured in the DOM at the
+973px stage (viewBox '185 92 155 92', --wm-zoom-ar '155 / 92'), the
+period switch driving the zoomed hero (Dow 1D −3.4% Fall → 1Y +8.9%
+Rise), the dollar-strength strip card → /currencies, the zoomed card
+click → /world-markets, the mobile list layout with 26 cards and NO
+horizontal scroll at any width in any locale, dark mode clean, ZERO
+console/page errors across every route (the Global landing 10 tiles +
+/gold + /world-markets + the legacy /insights 16 cards intact); the VLM
+visual passes (dark-fa-1440 · mobile-en full): the mobile read NO
+DEFECTS; the dark-fa read's one find («زیرک ۱۰۰», a 'clipped name')
+disproven against the DOM — the card is «نزدک ۱۰۰» (Nasdaq 100, the
+corpus's own Persian) misread at small font, and ZERO elements with
+horizontal overflow measured. **Gates ALL GREEN** (2m 28s: secret scan
+8/964 · tsc 6/6 · eslint 0/0 · copy:audit clean (7,370 entries — the 59
+new `pd.usa.*` fa strings queued unreviewed; the queue now ~621) ·
+narrator in sync + eval 50 · layer1 11,819/11,819 · **the suite 14,906
+= +29** (usa-tiles 12 · copy-pin 4 · UsaPage 7 · backtest 6) · build +
+budgets held — entry 270.04/81.81, **the NEW UsaPage chunk 15.21/4.29 vs
+its new 20/6 row**, GlobalPage SHRANK 24.40→23.04 and RegionPage
+3.95→1.65 through the shared global-tiles / RegionIndexSection chunks
+(the derivations' and the zoom's bytes paid once, not per route),
+Insights 1553.17/356.56 untouched). **Deployed + live-verified**
+(version `36f64141` ~2026-11-08 20:35 UTC under the owner's standing
+"the deploy at the close is the owner's standing"): currena.ir/usa
+renders the complete page over the live board (zero overlaps, zero
+errors, real values), the §21 backtest re-run against production
+post-deploy 69/69 green, the Global + Gold + World Markets + legacy
+surfaces intact — the full record in `docs/DEPLOY.md` 2026-11-09a.
+Decisions: BD-S9a (the one-derivation strip + the shared vocabulary
+riding pd.global) · BD-S9b (dollar-strength the only strip link) ·
+BD-S9c (the zoom on top through every state; the placeholder body stays
+until S10) + the deploy, all in `docs/DECISIONS.md`.
+
 ### ☐ S10 — USA tiers 3–6 + TIC + index section · `Session 10/30`
 - Tiers 3–6 (inflation · labor & growth · liquidity/stress/valuation · TIC
-  "who finances America" D-31) + SPX/NDX/DOW zoom section.
+  "who finances America" D-31) + SPX/NDX/DOW zoom section (the zoom map
+  itself already landed in S8 — S10 adds its per-index detail cards/rows
+  if the spec's §7 item 8 asks beyond the map, else records the map as
+  the section).
 
 ### ☐ S11 — USA gates · `Session 11/30`
 - Full card-render audit vs placement table; freshness within cadence
@@ -720,7 +804,7 @@ the mobile dot-tap fallback fix, all in `docs/DECISIONS.md`.
 | A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
 | B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ✅ S6 2026-11-08 (deployed `327c7761`, BD-S6a's alternation) |
 | C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ✅ S8 2026-11-08 (deployed `fde50a95`, the four REGION zoom maps — PHASE C CLOSED) |
-| D USA | S9–S11 | ☐ |
+| D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) |
 | E Europe | S12–S13 | ☐ |
 | F Asia & Pacific | S14–S15 | ☐ |
 | G Australia | S16 | ☐ |
@@ -730,7 +814,7 @@ the mobile dot-tap fallback fix, all in `docs/DECISIONS.md`.
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 8/30 delivered 2026-11-08 · 22 remaining — next
-action: Session 9/30 (S9, Phase D opens — USA: the 5 gauge verdicts atop
-(D-30) + tier-1 “the world watches” 7 cards (D-29) + tier-2 rates & the
-Fed; gates: verdicts match Global's engine values, tier-1 cards complete).**
+**Current position: Session 9/30 delivered 2026-11-09 · 21 remaining — next
+action: Session 10/30 (S10, Phase D continues — USA tiers 3–6 + the TIC
+board + the index section's cards; gates: the full card-render audit vs
+the placement table, freshness within cadence grace).**

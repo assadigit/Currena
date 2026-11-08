@@ -360,3 +360,88 @@
 - **Who decided:** the build session (S8) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-08g.
+
+## 2026-11-09 — BD-S9a: the one-derivation verdict strip (the shared vocabulary riding pd.global)
+
+- **Decision:** the USA page's D-30 verdict strip renders the five
+  thematic gauges through `usaGaugeVerdicts` — which IS `global-tiles`'s
+  own `globalGaugeTiles`, re-exported under the USA page's name (the S8
+  world-map-copy pattern: ONE derivation, both pages). The copy layer
+  splits the same way the Global board's does: the US-framed QUESTIONS
+  (D-30's own example register: "Is borrowing getting costlier in
+  America?") are the strip's only fresh words, while the verdict WORDS
+  (Stable/Cautious/Stressed/Critical) and the why-lines ride the
+  EXISTING `pd.global.*` keys — one verdict language everywhere (D-48),
+  pinned to the insights corpus by `usa-copy-pin.test.ts` (which also
+  pins pd.global's labels against the corpus's own `copy.label`), and
+  zero duplicate fa strings for the shared vocabulary.
+- **Options considered:** (a) a USA-local re-derivation of the gauges —
+  rejected: exactly the "second arithmetic" D-48 forbids, and it would
+  let the two pages drift; (b) new `pd.usa.*` verdict-word keys —
+  rejected: a second wording of the same words for the same visitor,
+  and 8 more fa strings in the owner's triage queue for nothing.
+- **Reason:** the §21 gate ("the verdicts match Global's engine values
+  byte-for-byte") is then true BY CONSTRUCTION and still PROVEN by the
+  three-side backtest (page ≡ Global's page derivation ≡ the engine
+  over the served snapshot — 69/69 green live, twice).
+- **Who decided:** the build session (S9). **Revisit:** none needed.
+
+## 2026-11-09 — BD-S9b: dollar-strength is the only strip link (→ /currencies)
+
+- **Decision:** on the D-30 strip, the dollar-strength card is a real
+  link to `/currencies` — BD-S3b's Global-board mapping honoured on-page
+  (the gauge's detail cards live there by D-32). The other four strip
+  cards render plain (not links): the page IS their destination — their
+  voter cards live on this page's tiers or its S10 sections, and a
+  self-link would be noise.
+- **Options considered:** (a) all five link out — rejected: four of the
+  five would link to the page the visitor is already on; (b) no links
+  at all — rejected: dollar-strength has a real other-destination home,
+  and the Global board already promises the mapping.
+- **Reason:** every link goes somewhere useful; the accessible tree
+  names the link (verified in the browser pass's a11y snapshot).
+- **Who decided:** the build session (S9). **Revisit:** S18 (the
+  currencies page build may want a back-link from its dollar-standing
+  section).
+
+## 2026-11-09 — BD-S9c: the zoom stays on top through every state; the placeholder body stays until S10
+
+- **Decision:** the S8 zoom section renders through EVERY UsaPage state
+  — ready, loading AND error — because its board feed is its own (M-17
+  on its own tracks): a slow or dead PROJECTION never takes the honest
+  map away with it. The In-build chip and the S1 placeholder body stay
+  for tiers 3–6 + the TIC board (BD-S8b's recorded page order and scope,
+  honoured): the S9 layers are real from today, and the page says
+  exactly what remains and when (S10–S11).
+- **Options considered:** (a) the GoldPage early-return pattern without
+  the zoom — rejected: it would hide real, independently-sourced map
+  data during a projection outage (less honest, not more); (b) retire
+  the placeholder body now — rejected: tiers 3–6 + TIC have not landed;
+  the body's "what will live here" record is still the honest promise.
+- **Reason:** each feed governs its own surface; nothing is faked and
+  nothing promised beyond the roadmap.
+- **Who decided:** the build session (S9). **Revisit:** S10's close (the
+  body retires when tiers 3–6 + TIC land; S11 may polish the header).
+
+## 2026-11-09 — The 2026-11-09a deploy (the USA verdicts + tiers 1–2 live)
+
+- **Decision:** ship at the close of S9 (version `36f64141`, ~2026-11-08
+  20:35 UTC) — the owner's standing in the session prompt ("the deploy
+  at the close is the owner's standing").
+- **Reason:** all gates green (the suite 14,906 = +29 · tsc 6/6 · lint
+  0/0 · copy:audit clean (7,370 entries, the 59 new fa strings queued)
+  · narrator in sync + 50 · layer1 11,819/11,819 · build + budgets —
+  the new UsaPage chunk 15.21/4.29 vs its new 20/6 row, GlobalPage
+  SHRANK 24.40→23.04 and RegionPage 3.95→1.65 through the shared
+  global-tiles / RegionIndexSection chunks); the live three-side §21
+  diff 69/69 green BEFORE and AFTER the deploy; currena.ir/usa
+  live-verified at 1440×900 and 360×844 in BOTH en and fa (zero card
+  overlaps measured in the DOM, zero console/page errors, real board
+  values — the strip's five engine verdicts identical in both locales);
+  the Global + Gold + World Markets + the three remaining region pages
+  + the legacy /insights intact.
+- **Rollback:** `wrangler rollback` — /usa returns to the S8 zoom-only
+  page; nothing else moves.
+- **Who decided:** the build session (S9) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives in
+  `docs/DEPLOY.md` 2026-11-09a.

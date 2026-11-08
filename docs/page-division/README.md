@@ -38,8 +38,8 @@ regeneration (`pnpm placement:generate`).
 - **Phase 3 (final spec):** pending the investor — roadmap S22 records the
   answers as D-49+.
 - **Phase 4 (build):** **RUNNING — Phase A (Foundations) CLOSED, Phase B
-  (Gold) CLOSED and Phase C (World Markets) CLOSED: S1 (scaffold &
-  navigation) 2026-11-07 · S2 (the data layer +
+  (Gold) CLOSED, Phase C (World Markets) CLOSED and Phase D (USA) OPEN:
+  S1 (scaffold & navigation) 2026-11-07 · S2 (the data layer +
   `PLACEMENT.generated.md`) 2026-11-08 · S3 (the Global page build: the
   D-21 ten-tile verdict board) 2026-11-08 · S4 (Global gates & polish:
   the §21 verdict-consistency backtest 84/84 green, BD-S4a/b, the
@@ -62,9 +62,15 @@ regeneration (`pnpm placement:generate`).
   the all-16 colour scale by construction, the live §21 diff 13/13
   green twice) 2026-11-08 — DEPLOYED LIVE at `/usa` · `/europe` ·
   `/asia-pacific` · `/australia` (version `fde50a95`; the live
-  acceptance record in `docs/DEPLOY.md` 2026-11-08g).** Next: Session
-  9/30 (S9 — Phase D opens: the USA verdicts + tiers 1–2). See the
-  roadmap's progress board for the current position.
+  acceptance record in `docs/DEPLOY.md` 2026-11-08g). S9 (the USA
+  verdicts + tiers 1–2: the D-30 verdict strip — the same computed
+  verdicts as Global through ONE derivation — plus tier-1 "the world
+  watches" 7 cards and tier-2 rates & the Fed 19, every card with the
+  §21 trio; the live three-side §21 diff 69/69 green twice) 2026-11-09 —
+  DEPLOYED LIVE at `/usa` (version `36f64141`; the live acceptance
+  record in `docs/DEPLOY.md` 2026-11-09a).** Next: Session
+  10/30 (S10 — USA tiers 3–6 + the TIC board + the index section's
+  cards). See the roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

@@ -132,6 +132,94 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-09a the page-division S9 deploy (the USA verdicts + tiers 1–2 — the D-30 verdict strip, D-29's seven "the world watches" cards and the 19 rates & the Fed cards live for every visitor at /usa; Phase D open)
+
+**Scope (page-division S9, spec §7 items 1–3, D-29/D-30):** display-layer
+ONLY. No engine, voter, threshold, calibration or provider change; the
+SAME insights snapshot and the SAME markets board, zero new fetches, zero
+new KV. `/usa` gains its own layers above the unchanged S8 zoom section:
+the D-30 verdict strip (the five thematic gauges — the SAME computed
+verdicts as Global through ONE derivation: `usaGaugeVerdicts` IS
+`globalGaugeTiles` re-exported; the verdict words and why-lines ride the
+existing `pd.global` keys — one verdict language everywhere), tier-1
+"the world watches" (D-29's 7) and tier-2 rates & the Fed (the
+placement's authoritative 19 — the spec's "(22)" label is the recorded
+AF-2 drift), every card with the §21 trio (value / 10-year position /
+freshness) through the DISPLAY registry's own joins
+(`usaCardValueText`, pinned output-for-output against
+`formatReadingValue`). The In-build chip + the placeholder body stay for
+tiers 3–6 + TIC (S10's scope); the zoom stays on top through every page
+state (BD-S9c).
+
+**Gates before the deploy (ALL GREEN, 2m 28s):** secret scan 8/964 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean (7,370 entries — the 59 new
+`pd.usa.*` fa strings queued unreviewed; the queue now ~621) · narrator
+vocabulary in sync + eval 50 · layer1 strict 11,819/11,819 · the full
+suite **14,906 = +29** (usa-tiles 12 · usa-copy-pin 4 · UsaPage 7 ·
+usa-backtest 6) · build + budgets held — entry 270.04/81.81 vs 296/89.5,
+**the new UsaPage lazy chunk 15.21/4.29 vs its new documented row 20/6**,
+GlobalPage SHRANK 24.40→23.04 and RegionPage 3.95→1.65 through the
+shared global-tiles (1.57/0.72) / RegionIndexSection (2.50/1.10) chunks
+(the derivations' and the zoom's bytes paid once), Insights
+1553.17/356.56 untouched.
+
+**The §21 three-side verdict-consistency diff — the S9 gate's own, run
+LIVE twice (pre-deploy and post-deploy): 69 checks · 69 green · 0 red.**
+The PAGE side (`usaGaugeVerdicts` over the USA projection) ≡ the GLOBAL
+side (`globalGaugeTiles` over the Global projection — D-30's "the same
+computed verdicts as Global" pinned literally) ≡ the ENGINE side
+(`gaugeReading` + `labelForVerdictStep` spelled out over the served
+snapshot, never through a page module): every gauge voter present on all
+three feeds (38 inputs), every gauge's {step, votingCount, warningCount,
+staleCount, word} byte-identical across the three sides, and every one
+of the 26 cards' §21 trio inputs (value · range bounds · percentile10y ·
+asOf · status) byte-identical between the projection and the snapshot
+(stableStringify, key-order-immune) — fed-target's true corridor, the
+deficits' scaled magnitudes, govt-interest-revenue's honest stale tag all
+byte-identical. Plus the tier-membership sanity (the placement's four
+/usa groups 7/19/12/17/17 + the 26, all carried by the served
+projection).
+
+**The browser verification pass (the freshly built SPA through the local
+preview server, /api proxied to currena.ir) — 1440×900 AND 360×844 in
+BOTH en and fa (RTL, Persian digits):** the strip's five LIVE engine
+verdicts (Stressed · Stressed · Cautious · Stable · Cautious with the
+why-lines' real counts — identical words in fa), the §21 trio on every
+card (us-cpi-yoy's warning status word; the context us-nfp with NO
+status word; nyfed-custody 'US$2.81 trillion' · low · bottom 0%), the
+zoom with ZERO card overlaps measured in the DOM at the 973px stage
+(viewBox '185 92 155 92', --wm-zoom-ar '155 / 92'), the period switch
+driving the zoomed hero (Dow 1D −3.4% Fall → 1Y +8.9% Rise), the
+dollar-strength strip card → /currencies, the zoomed card click →
+/world-markets, the mobile list layout with 26 cards, NO horizontal
+scroll at any width in any locale, dark mode clean, ZERO console/page
+errors across every route (the Global landing 10 tiles + /gold +
+/world-markets + the legacy /insights 16 cards intact). The VLM visual
+passes: the mobile full-page read NO DEFECTS; the dark-fa read's one
+find («زیرک ۱۰۰», a "clipped name") disproven against the DOM — the card
+is «نزدک ۱۰۰» (Nasdaq 100, the corpus's own Persian) misread at small
+font, and ZERO elements with horizontal overflow measured.
+
+**The deploy:** `pnpm --filter @currena/web build` + `wrangler deploy`
+(the runbook's §Deploy, under the owner's standing "the deploy at the
+close is the owner's standing") — version **`36f64141`**
+(36f64141-a7ca-43b8-92a9-0619469df3ba) at ~2026-11-08 20:35 UTC, upload
+7.44s, triggers 0.87s, the ever-green `* * * * *` cron intact.
+
+**The live acceptance (post-deploy, all green):** https://currena.ir/usa
+renders the complete page over the live board at 1440×900 en (the zoom's
+3 cards with ZERO overlaps, the strip's five engine verdicts, tiers
+7+19, fed-target '3.75–4.00%', the placeholder body) and at 360×844
+(list layout, 26 cards, no horizontal scroll); the fa/RTL render verified
+live (dir=rtl, html lang=fa, the corridor «۳٫۷۵–۴٫۰۰٪» with Persian
+digits, the suffix form «۲٫۸۱ تریلیون دلار», zero console/page errors);
+the live §21 backtest re-run against PRODUCTION 69/69 green; the
+sibling surfaces intact (the Global landing 10 tiles · /gold ·
+/world-markets · the legacy /insights 16 map cards, zero errors).
+
+**Rollback:** `wrangler rollback` — /usa returns to the S8 zoom-only
+page; nothing else moves.
+
 ## Session record — 2026-11-08c the page-division S4 deploy (the S2 projection endpoints + the S3 Global landing page + the S4 polish + the change1d live-prices writer — Phase A live for every visitor)
 
 Page-division S4 (main `a837267` + the records commits + the closing

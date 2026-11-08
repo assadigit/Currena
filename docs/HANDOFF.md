@@ -6,84 +6,65 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-## THIS SESSION (S9, opened 2026-11-09)
-
-**Goal:** the USA page per spec §7 items 1–3 — the 5 thematic gauge
-verdicts atop (D-30: the same computed verdicts as Global, US-framed
-copy) · tier-1 "the world watches" 7 cards (D-29) · tier-2 rates & the
-Fed (the placement's authoritative 19 ids — the spec's "(22)" label is
-the recorded AF-2 drift). The placeholder body stays honest for tiers
-3–6 + TIC (S10's scope); the S8 zoom section stays on top.
-
-**Milestones (commit + push at every checkpoint):**
-1. M1 pure layer — `pageGroupIds` (engine-side accessor) + `usa-tiles.ts`
-   (the verdict strip's derivations + the tier card entries + the display
-   configs) + `usa-tiles.test.ts` (pins vs `config/display.ts`).
-2. M2 copy — `pd.usa.*` en+fa + `usa-copy-pin.test.ts` (26 card names +
-   unit/position/band/status words pinned to the corpus) + the fa strings
-   queued unreviewed in the Persian manifest.
-3. M3 views + wiring — `UsaVerdictStrip` · `UsaTierCards` · `UsaPage`
-   (the GoldPage container pattern) + the App route split (/usa leaves
-   the region set) + the characterization suite.
-4. M4 the §21 backtest — `usa-backtest-core.ts` (page ≡ Global ≡ engine,
-   byte-for-byte) + the offline suite + `pd-s9-backtest.ts`; live run
-   pre-deploy.
-5. M5 full gates — `pnpm gates` green (build + budgets; the new UsaPage
-   budget row).
-6. M6 the browser pass — 1440×900 AND 360×844 in BOTH en and fa over the
-   production API; DOM checks; fixes.
-7. M7 records + the deploy at the close (the owner's standing) + the
-   live acceptance (post-deploy backtest + live page checks).
-
-## Current state (2026-11-08, after page-division S8)
+## Current state (2026-11-09, after page-division S9)
 
 - **Program:** page-division — splitting the all-in-one Insights page
-  into 10 destinations per D-1…D-48. **Phase C (World Markets) CLOSED:
-  Sessions 7 and 8 delivered & gated.** Progress: S1 scaffold &
-  navigation · S2 data layer + `PLACEMENT.generated.md` · S3 the Global
-  landing page (D-21) · S4 the gates & polish (Phase A CLOSED) · S5 the
-  Gold page build · S6 the Gold gates + the owner's alternation (Phase
-  B CLOSED) · S7 the World Markets page (`/world-markets` — the REUSED
-  D-43 map hero, the status summary, the Asia 7 · Europe 4 · Americas 5
-  region grids, the 9 world risk & liquidity cards) · **S8 the Regional
-  zoom maps: the four REGION pages render their D-44 index/map sections
-  LIVE — the REUSED WorldMap in region mode (ONE drawing, the
-  `REGION_ZOOMS` windows + seated pins/cards, the all-16 colour scale BY
-  CONSTRUCTION so a zoomed market's colour + hero number are the world
-  map's own, the words through the ONE shared corpus-pinned adapter),
-  `RegionIndexSection` (the board's M-17 state + the stamp) above the
-  unchanged S1 placeholder body on `RegionPage`; a card click — and a
-  mobile dot tap — opens the market's full home today, /world-markets;
-  the mobile dot-tap fallback also fixed the dead S7 dot on
-  /world-markets.**
-- **DEPLOYED & LIVE** (`fde50a95`, 2026-11-08 ~19:25 UTC): the four
-  zooms are live at **https://currena.ir/usa · /europe · /asia-pacific
-  · /australia** — the §21 zoom-consistency diff re-run against
-  production 13/13 green post-deploy; the Global + Gold + World Markets
-  + legacy surfaces intact. The live acceptance: `docs/DEPLOY.md`
-  2026-11-08g.
-- **Gates (last full run):** ALL GREEN — secret scan 8/954 · tsc 6/6 ·
-  eslint 0/0 · copy:audit clean (7,311 entries) · narrator in sync +
-  eval 50 · layer1 11,819/11,819 · **suite 14,877** · build + budgets
-  held (entry 269.71/81.55→81.70 · GlobalPage 24.40/6.27 · GoldPage
-  31.26/8.07 · WorldMarketsPage 23.10/5.64 — it SHRANK 26.54→23.10
-  through the S8 adapter sharing; **the new RegionPage chunk 3.95/1.56
-  vs its new 8/3 row**; the Insights chunk held 1553.13/356.56 — the
-  map's bytes stay paid once).
+  into 10 destinations per D-1…D-48. **Phase D (USA) OPEN: S9 delivered
+  & gated.** Progress: S1 scaffold & navigation · S2 data layer +
+  `PLACEMENT.generated.md` · S3 the Global landing page (D-21) · S4 the
+  gates & polish (Phase A CLOSED) · S5 the Gold page build · S6 the Gold
+  gates + the owner's alternation (Phase B CLOSED) · S7 the World
+  Markets page (D-43 map hero + region grids + the 9 risk cards) · S8
+  the Regional zoom maps (Phase C CLOSED) · **S9 the USA verdicts +
+  tiers 1–2: `/usa` renders the D-30 verdict strip (the same five
+  computed verdicts as Global through ONE derivation —
+  `usaGaugeVerdicts` IS `globalGaugeTiles`, the verdict words and
+  why-lines riding the existing `pd.global` keys) above tier-1 "the
+  world watches" (D-29's 7) and tier-2 rates & the Fed (the placement's
+  authoritative 19 — the spec's "(22)" label is the recorded AF-2
+  drift), every card with the §21 trio (value / 10-year position /
+  freshness) through the DISPLAY registry's own joins
+  (`usaCardValueText`, pinned output-for-output against
+  `formatReadingValue`). The S8 zoom section stays on top through every
+  page state; the In-build chip + the placeholder body stay for tiers
+  3–6 + TIC (S10's scope).**
+- **DEPLOYED & LIVE** (`36f64141`, 2026-11-08 ~20:35 UTC): the USA page
+  is live at **https://currena.ir/usa** — the §21 three-side diff
+  re-run against production post-deploy 69/69 green (page ≡ Global's
+  page derivation ≡ the engine over the served snapshot, byte-for-byte;
+  all 26 cards' trio inputs byte-identical to the snapshot); the Global
+  + Gold + World Markets + the three remaining region pages + the legacy
+  /insights intact. The live acceptance: `docs/DEPLOY.md` 2026-11-09a.
+- **Gates (last full run):** ALL GREEN — secret scan 8/964 · tsc 6/6 ·
+  eslint 0/0 · copy:audit clean (7,370 entries; the 59 new `pd.usa.*`
+  fa strings queued unreviewed — the queue is now ~621) · narrator in
+  sync + eval 50 · layer1 11,819/11,819 · **suite 14,906 = +29**
+  (usa-tiles 12 · usa-copy-pin 4 · UsaPage 7 · usa-backtest 6) · build +
+  budgets held (entry 270.04/81.81 · GlobalPage SHRANK 24.40→23.04 and
+  RegionPage 3.95→1.65 through the shared global-tiles /
+  RegionIndexSection chunks · **the new UsaPage chunk 15.21/4.29 vs its
+  new 20/6 row** · Insights 1553.17/356.56 untouched).
 
-## Next session (S9 — USA verdicts + tiers 1–2, Phase D opens)
+## Next session (S10 — USA tiers 3–6 + TIC + the index section)
 
 Read `AGENTS.md` (§14 carries the owner's rules) first, then
-`docs/page-division/01-SESSION-ROADMAP.md` (the S9 entry + the S8
-delivery record), `02-PAGE-DIVISION-SPEC.md` §7 + §14 (the USA tiers)
-+ §21, and this file. Scope (S9): the 5 gauge verdicts atop the USA
-page (D-30 — the same computed verdicts as Global, US-framed copy) ·
-tier-1 "the world watches" 7 cards (D-29) · tier-2 rates & the Fed. The
-S8 reuse levers: `RegionPage.tsx` + `RegionIndexSection.tsx` are the
-region-page shell the USA build fills (the placeholder body retires as
-the tiers land); `pd.usa.*` carries the copy; the zoom section already
-tops the page. Gates: the verdicts match Global's engine values; the
-tier-1 cards complete; the §21 trio on every card; mobile/ARIA.
+`docs/page-division/01-SESSION-ROADMAP.md` (the S10 entry + the S9
+delivery record), `02-PAGE-DIVISION-SPEC.md` §7 items 4–8 + §14 + §21,
+and this file. Scope (S10): tier-3 inflation (12) · tier-4 labor &
+growth (17) · tier-5 liquidity/stress/valuation (17) · tier-6 the TIC
+board (D-31: the existing `GET /api/insights/tic` route — one KV read,
+the §16 custody-hub caveat discipline) · the SPX/NDX/DOW index section's
+own cards/rows beyond the S8 zoom map. The S9 reuse levers:
+`UsaTierCards.tsx` is the tier-section pattern to extend (the §21 trio
+per card); `usa-tiles.ts` gains the tier 3–5 display configs the same
+lean-restated way (pinned vs `config/display.ts`); `pageGroupIds` is the
+engine-side accessor; `pd.usa.*` carries the copy (the 26 new card names
+pinned to the corpus by a growing `usa-copy-pin.test.ts`). Gates: the
+full card-render audit vs the placement table; freshness within cadence
+grace; the §21 backtest extended to the new cards; mobile + RTL; typecheck
++ lint + copy:audit + build/budgets; browser verification at 1440×900
+and 360×844 in en + fa; commit pushed at every checkpoint. The deploy at
+the close is the owner's standing.
 
 ## Owner-side levers waiting
 
@@ -91,17 +72,22 @@ tier-1 cards complete; the §21 trio on every card; mobile/ARIA.
 2. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement).
 3. Ratify or redirect BD-S3a/b/c + BD-S4a/b + BD-S5a + BD-S6a +
-   BD-S7a/b + **BD-S8a (the one-drawing region prop) + BD-S8b (the zoom
-   sections' scope — the map now, the region's own cards in S9–S16;
-   the AU Markets board is S16's own table) + BD-S8c (the card click →
-   /world-markets today, retargeting as the region pages grow their own
-   rows)** (all recorded, none blocking).
-4. Triage the queued unreviewed fa strings (now ~562: the ~557 queued +
-   the 5 new S8 `pd.regionZoom` keys in
-   `docs/localization/persian-copy-manifest.json` — fresh words only;
-   every word inside the map drawing is corpus-pinned by
-   `world-markets-copy-pin.test.ts`).
+   BD-S7a/b + BD-S8a/b/c + **BD-S9a (the one-derivation verdict strip
+   with the shared vocabulary riding pd.global) + BD-S9b
+   (dollar-strength the only strip link, → /currencies) + BD-S9c (the
+   zoom on top through every state; the placeholder body stays until
+   S10)** (all recorded, none blocking).
+4. Triage the queued unreviewed fa strings (now ~621: the ~562 queued +
+   the 59 new S9 `pd.usa.*` keys in
+   `docs/localization/persian-copy-manifest.json` — fresh words only
+   (the strip questions + tier headings + loading/error lines); every
+   card name, unit, position, band and status word is corpus-pinned by
+   `usa-copy-pin.test.ts`).
 5. The external investor's review of the spec (§19) — Phase 3's input.
+6. A small pre-existing display quirk (out of S9's scope, noted for
+   S19's polish pass): the Header's language quick-toggle button shows
+   the theme words as its visible label (its aria-label is correct) —
+   `apps/web/src/components/Header.tsx` ~line 316.
 
 ## Known state worth knowing
 
@@ -110,11 +96,11 @@ tier-1 cards complete; the §21 trio on every card; mobile/ARIA.
   hourly (:13); the narrator hourly (:50). A snapshot stored after the
   last :50 rung leaves the narrator one state behind until the next rung
   — honest, self-healing, and the page's "Updated" stamp says so.
-- The S8 zooms read the SAME markets board the world map reads — the
-  board's own stamp rides each region section; when the board is stale
-  the zooms show the same honest grey cards the world map shows (the
-  M17 old-data rule, shared code).
-- The rollback lever for the 2026-11-08g deploy: `wrangler rollback` —
-  the four region routes would return to the S1 placeholders; the
-  Global + Gold + World Markets + legacy surfaces were byte-identical
-  before it.
+- The USA page reads the SAME markets board the world map reads (the
+  zoom) and the SAME insights snapshot (the strip + the tiers, through
+  the S2 projection). When the feed is stale the cards show the same
+  honest states the legacy cards show (the M-17 last-good pattern,
+  shared code).
+- The rollback lever for the 2026-11-09a deploy: `wrangler rollback` —
+  /usa would return to the S8 zoom-only page; the Global + Gold + World
+  Markets + region + legacy surfaces were byte-identical before it.
