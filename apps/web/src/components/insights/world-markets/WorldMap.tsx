@@ -185,6 +185,27 @@ function pctOf(entry: MarketEntry | undefined, period: MapPeriod): number | null
  * The module
  * ------------------------------------------------------------------ */
 
+/**
+ * The narrow copy contract the map reads (page-division S7, 2026-11-08 —
+ * the BalanceStageCopy pattern): the legacy /insights route passes the
+ * insights corpus (it satisfies this shape structurally — zero change
+ * there), and the World Markets page passes its corpus-pinned
+ * `pd.worldMarkets.*` keys, so the SAME drawing never needs the corpus
+ * module in its chunk and can never speak a different word (D-48: one
+ * map, never restated copy — world-markets-copy-pin.test.ts pins the
+ * page's words byte-for-byte to the corpus in both locales).
+ */
+export interface WorldMapCopy {
+  markets: {
+    /** The map's own block — the corpus's exact shape (period switch,
+     * cells, legend, sr glue, short card names, country labels). */
+    map: InsightsCopy['markets']['map'];
+    /** Per-index naming + country (the card's name line and the sr
+     * context sentence read these two fields only). */
+    entries: { [K in MarketId]: { name: string; country: string } };
+  };
+}
+
 export function WorldMap({
   snapshot,
   fromCache = false,
@@ -202,7 +223,7 @@ export function WorldMap({
   fromCache?: boolean;
   /** M17's loading state: grey land, grey hollow dots, no numbers. */
   loading?: boolean;
-  copy: InsightsCopy;
+  copy: WorldMapCopy;
   locale: Locale;
   numberLocale: NumberLocale;
   /** Opens the index's existing detail view (M13) — the section's own
