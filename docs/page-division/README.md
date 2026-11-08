@@ -16,7 +16,7 @@ Commodities & Energy · Currency Pairs · legacy `/insights`), per the owner's
 
 | # | File | What it is | Status |
 |---|---|---|---|
-| 0 | `../../AGENT-RULES.md` (repo root) | The owner's permanent working rules — read before anything | final |
+| 0 | `../AGENT-RULES.md` (docs/; rules consolidated into AGENTS.md §14) | The owner's permanent working rules — read before anything | final |
 | 1 | `01-SESSION-ROADMAP.md` | The 30-session execution plan with per-session gates | final |
 | 2 | `02-PAGE-DIVISION-SPEC.md` | **The spec v1.0** — per-page purpose, layout, membership; the full 184-id placement; risks; acceptance criteria; §19 = questions for the external investor | awaiting investor review (Phase 2→3) |
 | 3 | `03-STRATEGY-LOG.md` | The decision record D-1…D-48, the final page map, the session history, and the Session 1/30 kickoff prompt (§9) | final (Phase 1 closed) |
@@ -51,6 +51,6 @@ regeneration (`pnpm placement:generate`).
 
 ## The one rule that trumps everything
 
-`AGENT-RULES.md` at the repo root. Short sessions. Continuous commits.
+`AGENT-RULES.md` (docs/; the rules are consolidated into AGENTS.md §14). Short sessions. Continuous commits.
 Hand-offs with progress counters. Green gates or no progress. Financial-data
 discipline — never assume; this is people's money.
