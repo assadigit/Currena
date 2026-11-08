@@ -52,7 +52,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { InsightsSnapshotSchema, PageProjectionSchema, TicSnapshotSchema } from '@currena/core';
-import type { PageProjection, TicSnapshot } from '@currena/core';
+import type { TicSnapshot } from '@currena/core';
 import { pageGroupIds } from '@currena/insights/page-division';
 import { backtestUsaPage, backtestUsaTicBoard, USA_BACKTEST_CARD_IDS, TIC_EXPECTED_HOLDERS } from '../src/routes/page-division/usa-backtest-core';
 
