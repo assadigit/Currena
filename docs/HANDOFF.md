@@ -62,14 +62,16 @@ footnote. Gate: seat-level diff vs `/api/insights` = exact match.
   hourly (:13); the narrator hourly (:50). A snapshot stored after the
   last :50 rung leaves the narrator one state behind until the next rung
   — honest, self-healing, and the page's "Updated" stamp says so.
-- The `change1d` ribbon day change lights up when the stored
-  `insights:prices-live:v1` key first carries the field (the deployed
-  writer's next run). Until then the labelled 7-day change shows.
+- The `change1d` ribbon day change is LIVE (observed at the first :13
+  rung post-deploy: Brent +0.03% `1d` · Bitcoin +0.06% `1d`). Gold keeps
+  its labelled 7-day change while its gold-api.com EOD print stays
+  fresher than the Yahoo bar — the merge's never-rewind guard, per-asset
+  honest.
 - The boards' last-good discipline (M-17) now matches the projection's:
   a failed markets/fx refresh keeps the cached copy on screen, labelled
   with the board's own stored date ("Last good copy · {date}") — the
   S4 closing pass found and fixed the collapse (the tiles used to fall
-  to their unread states while good data sat in the cache).
+  to their unread states while good data sat in the cache).>>>>>>> 4c8d6ee (docs: the change1d go-live OBSERVED — the first :13 rung post-deploy wrote the field (brent +0.03% 1d · btc +0.06% 1d live on the ribbon; gold keeps its labelled 7-day change by the merge's never-rewind guard, its gold-api.com EOD print fresher than the Yahoo bar — the per-asset fallback BD-S4a built))
 - The rollback lever for the 2026-11-08c deploy: `wrangler rollback` —
   the legacy surfaces were byte-identical before it; the new routes are
   additive.

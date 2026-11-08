@@ -191,12 +191,15 @@ had run green over the remote-dev Worker on real KV BEFORE the deploy
   stateHash honestly one-state-behind (the 04:35 snapshot post-dates the
   01:50 artefact — the next :50 rung catches up, self-healing by
   design).
-- **The `change1d` go-live cadence:** the stored prices key
-  (`insights:prices-live:v1`) still carries the pre-S4 shape until the
-  deployed worker's next :13 cron rung writes it (within the hour of the
-  deploy); until then the ribbon shows its honest labelled 7-day fallback
-  — the day change (the live quote vs the previous session's close,
-  BD-S4a) appears automatically, no further action.
+- **The `change1d` go-live — OBSERVED (05:13:18 UTC, the first :13 rung
+  post-deploy):** the stored prices key now carries `change1d` on all
+  four assets, and the live ribbon reads **Brent +0.03% `1d` · Bitcoin
+  +0.06% `1d`** — the true day change, live for every visitor. **Gold
+  keeps its labelled 7-day change BY DESIGN:** its snapshot reading (the
+  gold-api.com feed, asOf 2026-11-08) is fresher than the Yahoo quote's
+  daily bar (2026-11-07), so the merge's never-rewind guard defers to
+  the EOD print — the per-asset fallback BD-S4a built, each asset
+  independently honest.
 - **Rollback lever:** `wrangler rollback` (or the dashboard's
   deployments list) — the previous version served the byte-identical
   legacy surfaces; the new routes are additive, so a rollback costs only
