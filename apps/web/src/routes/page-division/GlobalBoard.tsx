@@ -89,9 +89,9 @@ function TileLink({
         e.preventDefault();
         navigate(href);
       }}
-      className="insights-focusable flex min-h-[44px] cursor-pointer flex-col justify-start gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 no-underline ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] transition-shadow hover:shadow-[0_4px_16px_rgba(15,23,42,0.10)] sm:p-3.5"
+      className="insights-focusable flex min-h-[44px] cursor-pointer flex-col justify-start gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2 no-underline ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] transition-shadow hover:shadow-[0_4px_16px_rgba(15,23,42,0.10)] sm:gap-1.5 sm:p-3 lg:min-h-[148px] lg:gap-2.5 lg:p-4"
     >
-      <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+      <h3 className="m-0 text-[9.5px] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)] sm:text-[length:var(--type-label)]">
         {title}
       </h3>
       {children}
@@ -133,16 +133,16 @@ export function GoldBalanceTile({ tile }: { tile: GlobalGoldTile }): React.JSX.E
       <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
         <span className="sr-only">{t('pd.global.goldOutlookLabel')}: </span>
         {tile.outlook !== null ? (
-          <span className={`type-verdict text-[1.15rem] font-bold leading-tight ${OUTLOOK_TONE[tile.outlook] ?? ''}`}>
+          <span className={`type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight ${OUTLOOK_TONE[tile.outlook] ?? ''}`}>
             {t(OUTLOOK_WORD_KEY[tile.outlook])}
           </span>
         ) : (
-          <span className="type-verdict text-[1.15rem] font-bold leading-tight text-[var(--color-text-tertiary)]">
+          <span className="type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight text-[var(--color-text-tertiary)]">
             {t('pd.global.cannotRead')}
           </span>
         )}
       </p>
-      <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+      <p className="m-0 text-[9.5px] font-semibold leading-tight text-[var(--color-text-secondary)] sm:text-[length:var(--type-caption)] sm:leading-snug">
         <bdi>
           {interpolate(t('pd.global.goldCounts'), { for: num(counts.for), against: num(counts.against) })}
           {counts.unread > 0 ? interpolate(t('pd.global.goldUnread'), { n: num(counts.unread) }) : ''}
@@ -191,18 +191,18 @@ export function GaugeTile({ tile }: { tile: GlobalGaugeTile }): React.JSX.Elemen
       <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-0.5">
         {word !== null ? (
           <>
-            <span className={`type-verdict text-[1.15rem] font-bold leading-tight ${STEP_TONE[reading.step] ?? ''}`}>
+            <span className={`type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight ${STEP_TONE[reading.step] ?? ''}`}>
               {t(GAUGE_WORD_KEY[word])}
             </span>
             <TileMeter step={reading.step} ariaLabel={`${t(GAUGE_TITLE_KEY[tile.gauge])}: ${t(GAUGE_WORD_KEY[word])}`} />
           </>
         ) : (
-          <span className="type-verdict text-[1.15rem] font-bold leading-tight text-[var(--color-text-tertiary)]">
+          <span className="type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight text-[var(--color-text-tertiary)]">
             {t('pd.global.cannotRead')}
           </span>
         )}
       </p>
-      <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+      <p className="m-0 text-[9.5px] font-semibold leading-tight text-[var(--color-text-secondary)] sm:text-[length:var(--type-caption)] sm:leading-snug">
         <bdi>
           {reading.step === 0
             ? t('pd.global.gaugeWhyUnread')
@@ -238,11 +238,11 @@ export function FxLightsTile({ tile }: { tile: GlobalFxTile }): React.JSX.Elemen
   return (
     <TileLink href="/currencies" title={t('pd.global.tileFxLights')} data-tile="fx-lights">
       <p className="m-0">
-        <span className={`type-verdict text-[1.15rem] font-bold leading-tight ${FX_SIGNAL_TONE[tile.signal]}`}>
+        <span className={`type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight ${FX_SIGNAL_TONE[tile.signal]}`}>
           {t(FX_SIGNAL_KEY[tile.signal])}
         </span>
       </p>
-      <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+      <p className="m-0 text-[9.5px] font-semibold leading-tight text-[var(--color-text-secondary)] sm:text-[length:var(--type-caption)] sm:leading-snug">
         <bdi>
           {tile.activeRules > 0
             ? interpolate(t('pd.global.fxActive'), { n: num(tile.activeRules), total: num(tile.totalRules) })
@@ -274,12 +274,12 @@ export function WorldMarketsTile({ tile }: { tile: GlobalMarketsTile }): React.J
   return (
     <TileLink href="/world-markets" title={t('pd.global.tileWorldMarkets')} data-tile="world-markets">
       <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-        <span className={`type-verdict text-[1.15rem] font-bold leading-tight ${MARKETS_TONE[tile.step] ?? ''}`}>
+        <span className={`type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight ${MARKETS_TONE[tile.step] ?? ''}`}>
           {t(MARKETS_WORD_KEY[tile.step])}
         </span>
         <TileMeter step={tile.step === 1 ? 1 : tile.step === 4 ? 4 : 2} ariaLabel={t(MARKETS_WORD_KEY[tile.step])} />
       </p>
-      <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+      <p className="m-0 text-[9.5px] font-semibold leading-tight text-[var(--color-text-secondary)] sm:text-[length:var(--type-caption)] sm:leading-snug">
         <bdi>
           {tile.total > 0
             ? interpolate(t('pd.global.marketsInCorrection'), { n: num(tile.inCorrection), total: num(tile.total) })
@@ -346,22 +346,22 @@ function RibbonAsset({ entry }: { entry: GlobalRibbonEntry }): React.JSX.Element
         e.preventDefault();
         navigate(RIBBON_HREF[entry.id]);
       }}
-      className="insights-focusable flex min-h-[44px] flex-1 cursor-pointer flex-col justify-center gap-0.5 rounded-[var(--radius-sm)] bg-currena-soft/50 px-2.5 py-1.5 no-underline ring-1 ring-[var(--color-border)]/60 transition-colors hover:bg-currena-soft"
+      className="insights-focusable flex min-h-[28px] cursor-pointer items-center justify-between gap-1 rounded-[var(--radius-sm)] bg-currena-soft/50 px-1.5 py-1 no-underline ring-1 ring-[var(--color-border)]/60 transition-colors hover:bg-currena-soft lg:px-2"
     >
-      <span className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+      <span className="shrink-0 text-[9px] font-bold uppercase text-[var(--color-text-tertiary)] sm:text-[length:var(--type-caption)]">
         {t(RIBBON_LABEL_KEY[entry.id])}
       </span>
       {unavailable ? (
-        <span className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-tertiary)]">{t('pd.global.ribbonUnavailable')}</span>
+        <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">{t('pd.global.ribbonUnavailable')}</span>
       ) : (
-        <span className="flex flex-wrap items-baseline gap-x-1">
-          <bdi dir={locale === 'fa' ? 'rtl' : 'ltr'} className="type-number text-[1.05rem] font-bold leading-none tabular-nums text-[var(--color-text-primary)]">
+        <span className="flex min-w-0 items-baseline justify-end gap-x-1">
+          <bdi dir={locale === 'fa' ? 'rtl' : 'ltr'} className="min-w-0 shrink text-[0.75rem] font-bold leading-none tabular-nums text-[var(--color-text-primary)] sm:text-[0.85rem]">
             {locale === 'fa' ? `${value} ${unit}` : `${unit}${value}`}
           </bdi>
           {change !== undefined ? (
-            <bdi dir="ltr" className={`text-[length:var(--type-caption)] font-bold leading-none tabular-nums ${changeTone}`}>
+            <bdi dir="ltr" className={`shrink-0 text-[9.5px] font-bold leading-none tabular-nums sm:text-[length:var(--type-caption)] ${changeTone}`}>
               {signedPct(change, numberLocale)}
-              <span className="sr-only"> {interpolate(t('pd.global.changeOver'), { days: 7 })}</span>
+              <span className="sr-only"> {interpolate(t('pd.global.changeOver'), { days: formatNumber(7, numberLocale, { maximumFractionDigits: 0 }) })}</span>
             </bdi>
           ) : null}
         </span>
@@ -375,12 +375,17 @@ export function PricesRibbonTile({ ribbon }: { ribbon: readonly GlobalRibbonEntr
   return (
     <div
       data-tile="prices-ribbon"
-      className="flex min-h-[44px] flex-col justify-start gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
+      className="flex min-h-[44px] flex-col justify-start gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:gap-1.5 sm:p-3 lg:p-3.5"
     >
-      <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+      <h3 className="m-0 text-[9.5px] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)] sm:text-[length:var(--type-label)]">
         {t('pd.global.tilePricesRibbon')}
       </h3>
-      <div className="flex flex-row gap-2">
+      {/* D-22's ribbon: one compact row per asset — label left, the live
+       * value + 7-day change right — the row layout fits BOTH the 165px
+       * mobile tile and the 250px lg tile (the first S3 build's
+       * side-by-side columns clipped Bitcoin at 250px; rows cannot
+       * overflow). */}
+      <div className="flex flex-col gap-1">
         {ribbon.map((entry) => (
           <RibbonAsset key={entry.id} entry={entry} />
         ))}
@@ -423,20 +428,18 @@ export function DedollarTile({ tile }: { tile: GlobalDedollarTile }): React.JSX.
           <span className="font-semibold text-[var(--color-text-tertiary)]">{t('pd.global.cannotRead')}</span>
         )}
       </p>
-      <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+      <p className="m-0 text-[9.5px] font-semibold leading-tight text-[var(--color-text-secondary)] sm:text-[length:var(--type-caption)] sm:leading-snug">
         {custody !== undefined && custody.value !== null && custodyChange !== undefined ? (
           <bdi>
             {t('pd.global.dedollarCustodyLabel')}{' '}
             <span
               dir="ltr"
               className={`tabular-nums ${custodyTone}`}
-              title={interpolate(t('pd.global.dedollarDirection'), {
-                change: signedPct(custodyChange, numberLocale),
-              })}
+              title={interpolate(t('pd.global.dedollarDirection'), { change: signedPct(custodyChange, numberLocale) })}
             >
               {signedPct(custodyChange, numberLocale)}
             </span>
-            <span className="sr-only"> {interpolate(t('pd.global.changeOver'), { days: 30 })}</span>
+            <span className="sr-only"> {interpolate(t('pd.global.changeOver'), { days: formatNumber(30, numberLocale, { maximumFractionDigits: 0 }) })}</span>
           </bdi>
         ) : (
           <span>
@@ -472,7 +475,7 @@ export function GlobalBoard({
   const { t } = useI18n();
   return (
     <section aria-label={t('pd.global.boardAria')} data-global-board>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-5 lg:gap-3">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-2.5 lg:grid-cols-5 lg:gap-4">
         <GoldBalanceTile tile={goldTile} />
         {gaugeTiles.map((tile) => (
           <GaugeTile key={tile.gauge} tile={tile} />
@@ -505,9 +508,9 @@ function BoardLoadingTile({ title, feed }: { title: string; feed: string }): Rea
     <div
       data-tile="loading"
       data-feed={feed}
-      className="flex min-h-[44px] flex-col justify-start gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
+      className="flex min-h-[44px] flex-col justify-start gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:gap-1.5 sm:p-3 lg:p-3.5"
     >
-      <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">{title}</h3>
+      <h3 className="m-0 text-[9.5px] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)] sm:text-[length:var(--type-label)]">{title}</h3>
       <p className="m-0 flex items-center gap-1.5" role="status">
         <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[var(--color-text-tertiary)]/60" />
         <span className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-tertiary)]">…</span>
@@ -524,9 +527,9 @@ function BoardUnreadTile({ title, feed }: { title: string; feed: string }): Reac
     <div
       data-tile="unread"
       data-feed={feed}
-      className="flex min-h-[44px] flex-col justify-start gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
+      className="flex min-h-[44px] flex-col justify-start gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:gap-1.5 sm:p-3 lg:p-3.5"
     >
-      <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">{title}</h3>
+      <h3 className="m-0 text-[9.5px] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)] sm:text-[length:var(--type-label)]">{title}</h3>
       <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-tertiary)]">{t('pd.global.cannotRead')}</p>
     </div>
   );
@@ -587,7 +590,7 @@ export function RegionChips({
   };
   return (
     <nav aria-label={t('pd.global.chipsAria')} data-region-chips>
-      <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+      <ul className="m-0 flex list-none flex-nowrap gap-1.5 overflow-x-auto p-0 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:gap-2 sm:overflow-visible [&::-webkit-scrollbar]:hidden">
         {chips.map((d) => {
           const dot = dotFor(d.route);
           return (
@@ -600,7 +603,7 @@ export function RegionChips({
                   e.preventDefault();
                   navigate(d.route);
                 }}
-                className="insights-focusable inline-flex min-h-[36px] items-center gap-2 rounded-full bg-currena-soft px-3.5 py-1.5 text-[length:var(--type-label)] font-bold text-currena-dark no-underline transition-all duration-300 hover:bg-currena-blue hover:text-white"
+                className="insights-focusable inline-flex min-h-[36px] shrink-0 items-center gap-2 rounded-full bg-currena-soft px-3 py-1.5 text-[13px] font-bold text-currena-dark no-underline transition-all duration-300 hover:bg-currena-blue hover:text-white sm:px-3.5 sm:text-[length:var(--type-label)]"
               >
                 <ChipDot state={dot} />
                 {t(d.titleKey)}
@@ -635,7 +638,7 @@ export function NarratorLine({
   return (
     <p
       data-narrator-line
-      className="m-0 rounded-[var(--radius-md)] bg-currena-soft/60 px-4 py-2.5 text-[length:var(--type-label)] leading-relaxed text-currena-dark ring-1 ring-[var(--color-border)]/60 line-clamp-2 sm:line-clamp-3"
+      className="m-0 rounded-[var(--radius-md)] bg-currena-soft/60 px-3 py-2 text-[11.5px] leading-snug text-currena-dark ring-1 ring-[var(--color-border)]/60 line-clamp-2 sm:px-4 sm:py-2.5 sm:text-[length:var(--type-label)] sm:leading-relaxed"
     >
       <span className="me-1.5 font-bold text-currena-blue">{t('pd.global.narratorTitle')}:</span>
       <bdi>{text}</bdi>

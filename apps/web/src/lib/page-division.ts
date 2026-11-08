@@ -115,10 +115,19 @@ const projectionCache = new Map<PageDivisionPageId, Promise<PageProjection>>();
  * The served payload honours the site's access mode (public projections
  * omit the licence-hidden ids — read `absentIds` and display the honest
  * "not published" note, never a guess).
+ *
+ * S3 defect fix (2026-11-08, found live in dev StrictMode): a
+ * caller-supplied `signal` now BYPASSES the promise cache. The cached
+ * promise is shared across callers, so tying it to ONE caller's abort
+ * poisoned every later caller — React StrictMode's double-mount (mount 1
+ * aborts on cleanup, mount 2 receives the already-aborted promise)
+ * froze the page at its loading state forever. Signal-carrying calls
+ * fetch fresh; signal-free calls share the cache (the common path —
+ * pages own their cancellation via a local flag instead).
  */
 export function fetchPageProjection(page: PageDivisionPageId, signal?: AbortSignal): Promise<PageProjection> {
   const cached = projectionCache.get(page);
-  if (cached) return cached;
+  if (cached && signal === undefined) return cached;
   const url = `/api/insights/pages/${encodeURIComponent(page)}`;
   const promise = (async (): Promise<PageProjection> => {
     const response = await requestPageJson(url, signal);
@@ -131,6 +140,10 @@ export function fetchPageProjection(page: PageDivisionPageId, signal?: AbortSign
     }
     return projection;
   })();
+  if (signal !== undefined) {
+    // An abortable call is single-owner — never shared, never cached.
+    return promise;
+  }
   // A failed fetch must be retryable — drop the rejected promise from the cache.
   promise.catch(() => projectionCache.delete(page));
   projectionCache.set(page, promise);

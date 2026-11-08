@@ -965,6 +965,15 @@ const BUDGETS = [
   // Measured 1612.14/373.58 — the raw ceiling re-bases to 1620 (the
   // multiple-of-4 headroom ≈7.9 kB; the gz to 377, headroom ≈3.4 kB).
   { pattern: /^Insights-[\w-]+\.js$/, raw: 1620_000, gz: 377_000, label: 'Insights lazy chunk' },
+  // Page-division S3 (2026-11-08): the Global world-scan route — the
+  // D-21 verdict board. Measured 31.89/9.41 at first build (the pure
+  // engine modules — gauges, gold-balance, gold-score, connections,
+  // page-division placement — tree-shake lean beside the board/tile
+  // views and the boards/narrative clients; the entry chunk is
+  // UNTOUCHED at 268.72/82.22 vs 296/89.5 — Global replaced the eager
+  // S1 placeholder with a lazy chunk). Ceiling 36/11 per the tight
+  // multiple-of-5 convention (~4 kB raw / ~1.6 kB gz headroom).
+  { pattern: /^GlobalPage-[\w-]+\.js$/, raw: 36_000, gz: 11_000, label: 'Global page lazy chunk (page-division S3)' },
 ];
 
 function main() {
