@@ -14,7 +14,7 @@
  * with it (§3.2: no bare «مختلط»).
  */
 
-import type { MarketEntry, MarketsSnapshot } from '@currena/core';
+import type { MarketsSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { SHOCK_DAY_COUNT, SHOCK_DAY_FALL } from '@currena/insights/markets/definitions';
 import { VerdictMeter } from '../VerdictMeter';
@@ -24,8 +24,15 @@ import { IconImg, stateIconUrl } from '../../icons/currena';
 import { interpolate } from '../../../i18n';
 import type { InsightsCopy } from '../../../i18n/insights-copy-en';
 import { belowHighCount, marketBreadth } from './briefing';
-import { CORRECTION_PCT } from '@currena/insights/markets/definitions';
 import { periodWord, type MarketsView } from './shared';
+
+/* S3 extraction (2026-11-08): the verdict arithmetic moved VERBATIM to
+ * ./verdict-core (pure, lean-chunk importable — the Global page's World
+ * Markets tile needs it without this file's view imports). Re-exported
+ * here so the existing tests and imports keep working unchanged. */
+import { marketsInCorrectionCount, marketsVerdictStep, type MarketsVerdictStep } from './verdict-core';
+export { marketsInCorrectionCount, marketsVerdictStep } from './verdict-core';
+export type { MarketsVerdictStep } from './verdict-core';
 
 /* ------------------------------------------------------------------ *
  * The section verdict (owner round 44) — the focal box's word, computed
@@ -35,29 +42,6 @@ import { periodWord, type MarketsView } from './shared';
  * Bullish, otherwise 2 Mixed. Pure and exported: the test drives it
  * directly (markets-verdict.test.ts).
  * ------------------------------------------------------------------ */
-
-export type MarketsVerdictStep = 1 | 2 | 3 | 4;
-
-export function marketsVerdictStep(snapshot: Pick<MarketsSnapshot, 'markets' | 'summary'>): MarketsVerdictStep {
-  const { summary, markets } = snapshot;
-  if (summary.signal === 'unusual') return 4;
-  if (summary.signal === 'attention') return 3;
-  if (markets.length === 0) return 2;
-  const up = markets.filter((m) => m.chg3m > 0).length;
-  return up > markets.length / 2 ? 1 : 2;
-}
-
-/** How many of the snapshot's markets sit in correction or a bear market.
- * S1-M1.6 #2 (2026-10-31 audit): the RAW ≥10%-below-high rule — the same
- * number belowHighCount reads and the cards' distances show — so every
- * sentence and the stat box share ONE computed value. The stored STATUS
- * keeps its exit-buffer memory for the per-card tags (a −9% market that
- * was ≤ −10% still reads "Correcting"), but no summary count may cite the
- * buffered tag against the visible evidence (the audit saw "7 of 16 in
- * correction" beside six ≥10% distances). */
-export function marketsInCorrectionCount(markets: readonly MarketEntry[]): number {
-  return markets.filter((m) => m.fromHigh <= CORRECTION_PCT).length;
-}
 
 const VERDICT_WORD: Record<MarketsVerdictStep, 'verdictBullish' | 'verdictMixed' | 'verdictCorrecting' | 'verdictBearish'> = {
   1: 'verdictBullish',

@@ -22,7 +22,6 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast } from './components/ui';
-import { GlobalPlaceholder } from './routes/page-division/GlobalPlaceholder';
 import { LiveRates } from './routes/LiveRates';
 import { useRoute } from './router';
 import { useI18n } from './lib/locale';
@@ -44,12 +43,16 @@ const About = lazy(() => import('./routes/About').then((m) => ({ default: m.Abou
 const Insights = lazy(() => import('./routes/Insights').then((m) => ({ default: m.Insights })));
 // Page-division S1 (D-46): the Converter — the app's founding tool, eager
 // in the entry chunk until now — becomes a lazy tool route at /converter so
-// the Global placeholder (D-20: the landing page) owns `/`. The placeholder
+// the Global page (D-20: the landing page) owns `/`. The placeholder
 // skeleton for the eight destinations is one shared lazy chunk.
 const Converter = lazy(() => import('./routes/Converter').then((m) => ({ default: m.Converter })));
 const PagePlaceholder = lazy(() =>
   import('./routes/page-division/PagePlaceholder').then((m) => ({ default: m.PagePlaceholder })),
 );
+// Page-division S3 (2026-11-08): the Global world scan — the D-21 verdict
+// board. Lazy like the Insights route (the engine modules + the board
+// clients ride the chunk; the entry graph stays the money page's own).
+const GlobalPage = lazy(() => import('./routes/page-division/GlobalPage').then((m) => ({ default: m.GlobalPage })));
 
 /** The eight destination routes that share the placeholder chunk (S1). */
 const DESTINATION_ROUTES: ReadonlySet<string> = new Set([
@@ -209,13 +212,13 @@ export function App() {
       <Header />
       <main id="main-content" tabIndex={-1} className="flex-1 pt-16 focus:outline-none lg:pt-20">
         <ErrorBoundary>
-          {/* Page-division S1 (D-20/D-46): `/` is the Global world-scan
-              placeholder (eager — the landing); the eight destinations
-              share one lazy placeholder chunk; the Converter moved to
-              /converter unchanged. */}
-          {route === '/' ? <GlobalPlaceholder /> : null}
+          {/* Page-division S3 (D-20/D-46): `/` is the Global world scan —
+              the D-21 verdict board, built on the S2 projection contract;
+              the eight destinations share one lazy placeholder chunk; the
+              Converter lives at /converter unchanged. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
+            {route === '/' ? <GlobalPage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}

@@ -134,10 +134,53 @@ export function fetchPageProjection(page: PageDivisionPageId, signal?: AbortSign
   // A failed fetch must be retryable — drop the rejected promise from the cache.
   promise.catch(() => projectionCache.delete(page));
   projectionCache.set(page, promise);
+  // S3: persist the last-good projection for the offline/outage fallback.
+  void cacheProjectionOnSuccess(page, promise);
   return promise;
 }
 
 /** Test seam — clears the in-memory projection cache. */
 export function clearProjectionCacheForTests(): void {
   projectionCache.clear();
+}
+
+/* ------------------------------------------------------------------ *
+ * The last-good offline cache (S3, 2026-11-08 — the S2 doc's promised
+ * per-page polish, the lib/insights.ts pattern: a fresh projection
+ * persists to localStorage so the page renders offline or during a feed
+ * outage, clearly labelled with its generation stamp; a poisoned or
+ * older-contract payload fails validation and reads as absent).
+ * ------------------------------------------------------------------ */
+
+const pageCacheKey = (page: PageDivisionPageId): string => `currena:insights:page:${page}`;
+
+function writeCachedProjection(page: PageDivisionPageId, projection: PageProjection): void {
+  try {
+    window.localStorage.setItem(pageCacheKey(page), JSON.stringify(projection));
+  } catch {
+    // Private mode or quota — projection caching is best-effort only.
+  }
+}
+
+/**
+ * Last-good projection from localStorage, zod-validated on read (garbage
+ * from an older contract fails loudly and is discarded, never rendered).
+ * Returns null when absent/unparseable — callers treat it as the offline
+ * fallback and label its date (the snapshot-store discipline).
+ */
+export function readCachedPageProjection(page: PageDivisionPageId): PageProjection | null {
+  try {
+    const raw = window.localStorage.getItem(pageCacheKey(page));
+    if (!raw) return null;
+    const parsed = PageProjectionSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null; // Private mode / quota / corrupted JSON — no fallback.
+  }
+}
+
+/** Wire the cache into the fetch path (called once by the page builds). */
+function cacheProjectionOnSuccess(page: PageDivisionPageId, promise: Promise<PageProjection>): Promise<PageProjection> {
+  promise.then((projection) => writeCachedProjection(page, projection)).catch(() => undefined);
+  return promise;
 }

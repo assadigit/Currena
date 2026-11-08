@@ -90,8 +90,10 @@ export interface BlockedNote {
  * Engine-derived membership (the mirror sources — never hand-copied)
  * ------------------------------------------------------------------ */
 
-/** The 5 thematic global gauges (spec §4's tiles ②–⑥; D-21). */
-const THEMATIC_GAUGE_IDS = ['borrowing-costs', 'prices-heat', 'market-stress', 'dollar-strength', 'growth-health'] as const;
+/** The 5 thematic global gauges (spec §4's tiles ②–⑥; D-21). Exported since
+ *  S3: the Global page's verdict-board tiles derive their gauge list from
+ *  this engine-side constant (never a hand-copied duplicate). */
+export const THEMATIC_GAUGE_IDS = ['borrowing-costs', 'prices-heat', 'market-stress', 'dollar-strength', 'growth-health'] as const;
 
 /**
  * The thematic gauges' scored members — Global's five gauge-verdict tiles

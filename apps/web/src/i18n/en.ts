@@ -572,10 +572,85 @@ export const en = {
       purpose: 'The one-screen answer to “how is the world’s economy doing right now?” — for people who scan fast.',
       summary:
         'A 10-tile verdict board — gold balance, the five thematic gauges, FX lights, world markets status, a live prices ribbon and the dedollarization context — plus region chips and a one-line “what changed today” narrator. Zero scrolling.',
-      todayTitle: 'During the rebuild',
-      todayText:
-        'The complete picture — every gauge, board and indicator — still lives on the legacy Insights page.',
       destinations: 'The destinations',
+      /* ---- S3 (2026-11-08): the verdict board's own copy (D-21…D-25).
+       * The verdict WORDS below are pinned byte-for-byte to the insights
+       * copy corpus (label / verdictStateNames / status / markets verdict
+       * words) by global-copy-pin.test.ts — the Global page speaks the
+       * engine's own language, never a parallel vocabulary. */
+      boardAria: 'The world scan — ten verdict tiles',
+      loadingLine: 'Reading the world’s gauges…',
+      errorTitle: 'The world scan is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      fromCache: 'Showing the last good copy — data as of {date}',
+      dataAsOf: 'Data as of {date}',
+      pricesAsOf: 'Live prices as of {time}',
+      absentLine: '{n} of this page’s readings are not published in this mode.',
+      /* Tile titles (D-21's own names, spec §4). */
+      tileGoldBalance: 'Gold Balance',
+      tileBorrowingCosts: 'Borrowing Costs',
+      tileInflationHeat: 'Inflation Heat',
+      tileMarketStress: 'Market Stress',
+      tileDollarStrength: 'Dollar Strength',
+      tileGrowthHealth: 'Growth Health',
+      tileFxLights: 'FX Lights',
+      tileWorldMarkets: 'World Markets',
+      tilePricesRibbon: 'Prices',
+      tileDedollar: 'Dedollarization',
+      /* The four gauge verdict words (pinned to insights copy.label). */
+      labelRelaxed: 'Stable',
+      labelCautious: 'Cautious',
+      labelStressed: 'Stressed',
+      labelAlarmed: 'Critical',
+      cannotRead: 'Cannot read yet',
+      /* One gauge tile's why-line (computed from the engine's counts). */
+      gaugeWhySome: '{warnings} of {voters} voters need attention',
+      gaugeWhyNone: 'No voter needs attention',
+      gaugeWhyUnread: 'Not enough readable voters',
+      /* The Gold Balance tile (D-21): outlook state + the meter's counts. */
+      goldOutlookLabel: 'Gold outlook',
+      goldCounts: '{for} for · {against} against',
+      goldUnread: ' · {n} unread',
+      /* The 7-state outlook names (pinned to insights signals.verdictStateNames). */
+      outlookStrongBullish: 'Strong bullish',
+      outlookBullish: 'Bullish',
+      outlookNeutral: 'Neutral',
+      outlookRangeBound: 'Range-bound',
+      outlookBearish: 'Bearish',
+      outlookStrongBearish: 'Strong bearish',
+      outlookMixed: 'Mixed signals',
+      /* The FX Lights tile (D-21). Signal words pinned to insights status. */
+      fxSignalNormal: 'Normal',
+      fxSignalAttention: 'Needs attention',
+      fxSignalUnusual: 'Unusual',
+      fxActive: '{n} of {total} rules active',
+      fxNoneActive: 'No rule active',
+      /* The World Markets tile (D-21). Words pinned to insights markets verdicts. */
+      marketsBullish: 'Bullish',
+      marketsMixed: 'Mixed',
+      marketsBearish: 'Bearish',
+      marketsInCorrection: '{n} of {total} in correction',
+      marketsInBear: ' · {n} in a bear market',
+      /* The prices ribbon (D-22): gold · brent · BTC, live hourly. */
+      ribbonGold: 'Gold',
+      ribbonBrent: 'Brent',
+      ribbonBtc: 'Bitcoin',
+      unitUsd: 'US$',
+      changeOver: 'over the past {days} days',
+      ribbonUnavailable: 'Unavailable',
+      /* The dedollarization context tile (D-25, display-only). */
+      dedollarShareLabel: 'USD share of world FX reserves',
+      dedollarCustodyLabel: 'Foreign holdings at the NY Fed',
+      dedollarDirection: '{change} over 30 days',
+      dedollarNote: 'Context only — no verdict',
+      /* The region chips (D-23). */
+      chipsAria: 'The destinations',
+      dotCalm: 'Calm',
+      dotWatch: 'Watch',
+      dotNoVerdict: 'No verdict at this layer yet',
+      /* The narrator line (D-24). */
+      narratorTitle: 'What changed today',
     },
     gold: {
       title: 'Gold',
