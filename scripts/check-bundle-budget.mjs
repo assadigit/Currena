@@ -1004,6 +1004,19 @@ const BUDGETS = [
   // 269.32/81.55 vs 296/89.5). Ceiling 30/8 per the tight convention
   // (~3.5 kB raw / ~1.5 kB gz headroom).
   { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 30_000, gz: 8_000, label: 'World Markets page lazy chunk (page-division S7)' },
+  // Page-division S8 (2026-11-08): the four REGION routes — /usa,
+  // /europe, /asia-pacific, /australia — each carrying its D-44
+  // index/map section (the REUSED WorldMap in region-zoom mode) above
+  // the S1 placeholder body. Measured 3.86/1.52 at first build: ONE
+  // lazy chunk serves all four routes (the region rides the route), and
+  // the map tree keeps riding the SHARED src-* chunk both the Insights
+  // route and the map pages already load (the WorldMap import is shared
+  // with /world-markets, whose own chunk shrank 26.54 → 23.10 through
+  // the adapter extraction — the map's bytes stay paid once). The
+  // entry chunk gains only the lazy wiring (269.32/81.55 → 269.71/81.70
+  // vs 296/89.5). Ceiling 8/3 per the tight convention (~4.1 kB raw /
+  // ~1.5 kB gz headroom).
+  { pattern: /^RegionPage-[\w-]+\.js$/, raw: 8_000, gz: 3_000, label: 'Region pages lazy chunk (page-division S8)' },
 ];
 
 function main() {
