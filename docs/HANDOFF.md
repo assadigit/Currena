@@ -14,19 +14,22 @@
   S2 data layer + `PLACEMENT.generated.md` (184 ids + 6 boards, 0
   unplaced / 0 duplicate homes) · S3 the Global landing page (the D-21
   ten-tile verdict board) · S4 the gates & polish (the §21
-  verdict-consistency backtest 84/84 green over real KV; BD-S4a the
-  `change1d` day change; BD-S4b the narrator discipline; five pass
-  defects found + fixed).
-- **DEPLOYED & LIVE** (`637db8f8`, 2026-11-08 ~04:36 UTC): the S2
+  verdict-consistency backtest 84/84 green over real KV AND against
+  production twice; BD-S4a the `change1d` day change; BD-S4b the
+  narrator discipline; six pass defects found + fixed — the sixth, the
+  M-17 boards fix, found by the closing verification pass and shipped
+  live by the re-deploy).
+- **DEPLOYED & LIVE** (`b1cfa4fe`, 2026-11-08 ~05:00 UTC — the first cut
+  `637db8f8` ~04:36 + the closing pass's M-17 boards re-deploy): the S2
   projection endpoints (`/api/insights/pages[/:page]`), the S3 Global
   landing page at `/`, the S4 polish, and the `change1d` live-prices
   writer (the ribbon's day change appears at the first :13 cron rung
   post-deploy). The live acceptance record: `docs/DEPLOY.md`
   2026-11-08c. Legacy `/insights` intact with the deprecation banner.
-- **Gates (last full run):** ALL GREEN — secret scan 8/917 · tsc 6/6 ·
+- **Gates (last full run):** ALL GREEN — secret scan 8/919 · tsc 6/6 ·
   eslint 0/0 · copy:audit clean · narrator in sync + eval 50 · layer1
-  11,819/11,819 · **suite 14,730** · build + budgets held (entry
-  268.69/81.33 · Insights 1588.36/367.98 · GlobalPage 32.76/9.63 vs
+  11,819/11,819 · **suite 14,731** · build + budgets held (entry
+  268.69/81.33 · Insights 1588.36/367.98 · GlobalPage 33.51/9.82 vs
   36/11).
 
 ## Next session (S5 — the Gold page build)
@@ -62,6 +65,11 @@ footnote. Gate: seat-level diff vs `/api/insights` = exact match.
 - The `change1d` ribbon day change lights up when the stored
   `insights:prices-live:v1` key first carries the field (the deployed
   writer's next run). Until then the labelled 7-day change shows.
+- The boards' last-good discipline (M-17) now matches the projection's:
+  a failed markets/fx refresh keeps the cached copy on screen, labelled
+  with the board's own stored date ("Last good copy · {date}") — the
+  S4 closing pass found and fixed the collapse (the tiles used to fall
+  to their unread states while good data sat in the cache).
 - The rollback lever for the 2026-11-08c deploy: `wrangler rollback` —
   the legacy surfaces were byte-identical before it; the new routes are
   additive.

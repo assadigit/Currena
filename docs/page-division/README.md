@@ -43,7 +43,7 @@ regeneration (`pnpm placement:generate`).
   D-21 ten-tile verdict board) 2026-11-08 · S4 (Global gates & polish:
   the §21 verdict-consistency backtest 84/84 green, BD-S4a/b, the
   mobile/ARIA pass) 2026-11-08 — and the landing page DEPLOYED LIVE
-  (version `637db8f8`; the S2 endpoints + the S3 page + the S4 polish
+  (version `b1cfa4fe`; the S2 endpoints + the S3 page + the S4 polish
   for every visitor; the live acceptance record in
   `docs/DEPLOY.md` 2026-11-08c).** Next: Session 5/30 (S5 — the Gold
   page build). See the roadmap's progress board for the current

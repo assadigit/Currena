@@ -134,8 +134,8 @@ green before every deploy is the runbook rule, CI or not.
 
 ## Session record — 2026-11-08c the page-division S4 deploy (the S2 projection endpoints + the S3 Global landing page + the S4 polish + the change1d live-prices writer — Phase A live for every visitor)
 
-Page-division S4 (main `a837267` + the records commit; the S1–S3 commits
-`45ee4be`…`c14931a` ride it). **The authority:** the owner's session
+Page-division S4 (main `a837267` + the records commits + the closing
+pass's M-17 boards fix; the S1–S3 commits `45ee4be`…`c14931a` ride it). **The authority:** the owner's session
 prompt — "the Worker deploy when you choose (the S2 endpoints + the S3
 page sit ready)" — + the universal AGENTS.md §5 standing approval
 adopted by the owner mid-session (`365a861`). The gates were ALL GREEN
@@ -156,6 +156,26 @@ had run green over the remote-dev Worker on real KV BEFORE the deploy
   (optional + additive on `LivePriceEntry`/`IndicatorReading`), the
   narrator's `Updated` stamp + the ribbon window tags on the display
   side. No engine, voter, threshold or calibration change anywhere.
+- **RE-DEPLOY (~05:00 UTC, version `b1cfa4fe-0d37-4e9d-911d-f361b9ff963f`):**
+  the closing verification pass (after the records' first cut) found the
+  two board attachments breaking the last-good discipline — a failed
+  markets/fx refresh REPLACED a good cached copy with the unread
+  collapse (the legacy route's world-feeds never does this, MAP M17),
+  and the boards' boot-time `fromCache` flag was dead for display. The
+  fix (web-only, +1 characterization, gates ALL GREEN 2m 29s over the
+  rebased main: secret scan 8/919 · suite **14,731** · the GlobalPage
+  chunk 33.51/9.82 vs 36/11) re-deployed under the same standing so the
+  live landing page carries the complete S4. **Verified live on
+  currena.ir post-re-deploy:** the §21 backtest against PRODUCTION
+  **84/84 green** — the narrator's stateHash IDENTICAL this run (the
+  04:50 :50 rung had caught up to the 04:35 snapshot store, the
+  self-healing by design); the landing page one screen at 1440×900 and
+  360×844 in en + fa; and the fixed path itself — both board feeds
+  blocked in the browser → the tiles keep their cached verdicts (Mixed ·
+  Normal) with both "Last good copy" captions (the Jalali
+  'آخرین نسخهٔ سالم · ۱۴ آبان ۱۴۰۵' in fa), 0 unread tiles, one screen
+  exact; fresh feeds paint no caption. The rollback lever below covers
+  both versions.
 - **LIVE ACCEPTANCE CHECK ALL GREEN (this session's own runs):**
   `/api/health` 200 · `/api/insights/pages` serves the 9-destination
   index · `/api/insights/pages/global` serves the 52-reading projection

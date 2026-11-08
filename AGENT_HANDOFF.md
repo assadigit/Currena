@@ -22,7 +22,8 @@
 
 **UPDATE 2026-11-08 (later the same day) — THE PAGE-DIVISION BUILD: Sessions
 1–4 of 30 delivered & gated. PHASE A (Foundations) CLOSED — AND THE
-LANDING PAGE IS DEPLOYED LIVE** (version `637db8f8`, the owner's
+LANDING PAGE IS DEPLOYED LIVE** (version `b1cfa4fe` — the first cut
+`637db8f8` + the closing pass's M-17 boards fix re-deploy; the owner's
 standing "the Worker deploy when you choose" + the universal AGENTS.md
 §5; the live acceptance record in docs/DEPLOY.md's 2026-11-08c session
 record: the §21 backtest re-run against production 84/84 green). S4
@@ -35,13 +36,19 @@ live-prices contract — the live quote vs the previous session's close —
 with a VISIBLE window tag and the labelled 7-day fallback until the
 deployed :13 cron rung writes the field; the history-endpoint option
 rejected) · **BD-S4b** (the narrator's own text VERBATIM + the
-"Updated {time}" stamp) · five pass defects found + fixed live (the dead
-fromCache label, the swallowed stamp, the clamp's sliced third line, the
-line-clamp display-utility override, the wrapped mobile chips) +
+"Updated {time}" stamp) · six pass defects found + fixed live (the dead
+fromCache label; the swallowed stamp; the clamp's sliced third line; the
+line-clamp display-utility override; the wrapped mobile chips; and —
+found by the CLOSING verification pass, after the records' first cut —
+the two board attachments breaking the last-good discipline: a failed
+markets/fx refresh collapsed good cached copies to the unread state;
+fixed to the full M-17 pattern with the tiles' own "Last good copy ·
+{date}" captions, re-deployed live and re-verified over production) +
 reduced-motion guards + the chips fade + the aria-hidden window tag ·
 browser-verified at both widths in en + fa (one screen exact in all
 four, keyboard walk, dark mode, both reduced-motion guards in the live
-CSSOM, the live last-good path) · gates ALL GREEN (suite 14,730). 4 fa
+CSSOM, the live last-good path — the boards' M-17 path verified live on
+currena.ir post-fix) · gates ALL GREEN (suite 14,731). 5 fa
 strings queued unreviewed. **Next: Session 5/30 (S5 — the Gold page
 build: the hero + the 37 seats in five lanes + context cards + the
 honest-record footnote, D-26…D-29); the live position always sits in

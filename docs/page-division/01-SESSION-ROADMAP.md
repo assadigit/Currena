@@ -243,16 +243,32 @@ the uniform single-line scrollable pills); reduced-motion guards (the
 loader-dot bounce + the loading tile's pulse + the tile/chip transitions
 now `motion-safe`); the mobile chips scroller's direction-aware fade
 affordance; the ribbon's visible window tag `aria-hidden` (the sr-only
-words carry it). **Browser-verified live at 1440×900 AND 360×844 in en +
+words carry it); and — found by the CLOSING verification pass, after the
+records' first cut — **the two board attachments broke the last-good
+discipline**: a failed markets/fx refresh REPLACED a good cached `ready`
+with `empty` (the unread collapse while good data sat in localStorage —
+the exact collapse the legacy route's world-feeds never does) and the
+boards' boot-time `fromCache` flag was dead for display; fixed to the
+full M-17 pattern (the functional keep-flagged setState + the tiles'
+own "Last good copy · {date}" caption with the boards' stored dates,
+en+fa, +1 characterization pinning the path). **Browser-verified live at
+1440×900 AND 360×844 in en +
 fa (RTL):** one screen exact in all four, ten tiles with live verdicts
 over real KV, the keyboard walk (skip link → nav → tiles, focus rings
 everywhere), dark mode one-screen, BOTH reduced-motion guards verified in
 the live CSSOM, and the live last-good path (feed blocked → the labelled
-cached board renders). 4 new fa strings queued unreviewed (the ribbon
-window tag + the narrator stamp pair). **Deployed + live-verified at the
-session's close** (version `637db8f8` under the owner's standing "the
+cached board renders — re-verified over PRODUCTION post-fix: both board
+feeds blocked → the tiles keep their cached verdicts with both captions,
+0 unread tiles, one screen exact in en + fa). 5 new fa strings queued
+unreviewed (the ribbon window tag + the narrator stamp pair + the
+board-tiles' cached caption). **Deployed + live-verified at the
+session's close** (version `637db8f8`, then the closing pass's M-17 fix
+re-deployed as `b1cfa4fe` — both under the owner's standing "the
 Worker deploy when you choose" + AGENTS.md §5): the §21 backtest re-run
-against PRODUCTION 84/84 green, one screen at both widths on currena.ir,
+against PRODUCTION 84/84 green twice (the 04:36 deploy; the 05:01
+re-deploy — the narrator's stateHash IDENTICAL on the second run, the
+04:50 :50 rung having caught up to the 04:35 snapshot store), one screen
+at both widths on currena.ir,
 the legacy surfaces intact — the full record in `docs/DEPLOY.md`
 2026-11-08c.
 
