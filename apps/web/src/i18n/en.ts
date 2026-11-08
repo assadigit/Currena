@@ -1042,6 +1042,83 @@ export const en = {
       purpose: 'The American bulk — the deepest page, tiered by world-impact.',
       summary:
         'The five thematic gauge verdicts on top, about 72 cards in six tiers — from “the world watches” down to labor, liquidity, stress and valuation — the TIC board (who finances America), and the SPX/NDX/DOW section.',
+      /* ---- S9 (2026-11-09): the USA page's own copy (D-29/D-30, spec §7
+       * items 1–3). The card names, the unit words, the position + band
+       * words and the status words are the corpus's own, pinned by
+       * usa-copy-pin.test.ts; the verdict WORDS and the why-lines ride the
+       * existing pd.global keys (one verdict language everywhere, D-48) —
+       * never restated here. The strip questions + the tier headings +
+       * the loading/error lines are fresh. */
+      loadingLine: 'Reading the American numbers…',
+      errorTitle: 'The USA page is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      strip: {
+        title: 'America in five verdicts',
+        intro:
+          'The same five computed verdicts as the world scan — the engine’s own numbers, asked the American way.',
+        qBorrowingCosts: 'Is borrowing getting costlier in America?',
+        qInflationHeat: 'Are prices heating up in America?',
+        qMarketStress: 'Is America’s market under stress?',
+        qDollarStrength: 'Is the dollar standing strong?',
+        qGrowthHealth: 'Is America’s economy growing?',
+      },
+      tier1: {
+        title: 'The world watches',
+        intro:
+          'The seven numbers the planet reacts to first — the Fed, prices on both gauges, jobs, and the world’s benchmark yield.',
+      },
+      tier2: {
+        title: 'Rates & the Fed',
+        intro:
+          'The curves, the funding rate, the mortgage rate, the auctions and the fiscal arithmetic behind the price of American money.',
+      },
+      cardNames: {
+        'fed-target': 'The US central bank’s policy rate',
+        'fed-expectations': 'What markets expect from the Fed',
+        'us-cpi-yoy': 'US prices vs a year ago',
+        'us-pce-core-yoy': 'The Fed’s preferred inflation gauge',
+        'us-nfp': 'US jobs added or lost each month',
+        'us-unemployment': 'US unemployment',
+        us10y: 'What the US government pays to borrow for 10 years',
+        'yield-curve-10y2y': 'The gap between 10-year and 2-year US borrowing',
+        'yield-curve-10y3m': 'The gap between 10-year and 3-month US borrowing',
+        'real-yield-10y': 'US 10-year interest after inflation',
+        'real-yield-5y': 'US 5-year interest after inflation',
+        'real-curve-10y5y': 'US real yield curve (10Y minus 5Y)',
+        us30y: 'US 30-year Treasury yield',
+        'us-2y': 'What the US pays to borrow for 2 years',
+        sofr: 'The overnight funding rate',
+        'mortgage-30y': 'The US 30-year home-loan rate',
+        'nyfed-custody': 'Foreign official holdings at the New York Fed (weekly)',
+        'us-deficit-monthly': 'US federal deficit (monthly)',
+        'us-deficit-12m': 'US federal deficit (12-month total)',
+        'treasury-auction-10y': 'US 10-year Treasury auction demand',
+        'treasury-auction-10y-indirect': 'US 10-year auction indirect share',
+        'treasury-auction-30y': 'US 30-year Treasury auction demand',
+        'treasury-auction-30y-indirect': 'US 30-year auction indirect share',
+        'rstar-us': 'US r-star (HLW estimate)',
+        'debt-to-gdp': 'US federal debt to GDP',
+        'govt-interest-revenue': 'The US government’s interest bill vs its income',
+      },
+      unitPercent: '%',
+      unitPoints: 'pts',
+      unitRatio: 'ratio',
+      unitUsdTr: 'trillion',
+      unitUsdBn: 'bn',
+      unitUsd: 'US$',
+      positionLow: 'low',
+      positionTypical: 'typical',
+      positionHigh: 'high',
+      positionWordLine: '{word} · {band}',
+      bandTop: 'top {p}%',
+      bandMid: 'the middle',
+      bandBottom: 'bottom {p}%',
+      statusWarning: 'Needs attention',
+      statusStale: 'Stale',
+      statusCheckPending: "Can't tell right now",
+      statusUnavailable: "Can't tell right now",
+      valueUnavailable: 'Cannot read yet',
     },
     europe: {
       title: 'Europe',
