@@ -187,7 +187,7 @@ export const REGION_ZOOMS: Readonly<Record<MapRegionId, RegionZoomConfig>> = {
   // northern Mexico as context.
   us: {
     viewBox: { x: 185, y: 92, w: 155, h: 92 },
-    indices: ['sp500', 'ndx', 'dow'],
+    indices: ['dow', 'sp500', 'ndx'],
     cards: {
       sp500: { x: 24, y: 18 },
       ndx: { x: 56, y: 14 },
