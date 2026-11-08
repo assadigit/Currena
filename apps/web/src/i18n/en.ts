@@ -1032,7 +1032,7 @@ export const en = {
       bandMid: 'the middle',
       bandBottom: 'bottom {p}%',
       statusWarning: 'Needs attention',
-      statusStale: 'Old data',
+      statusStale: 'Stale',
       statusCheckPending: "Can't tell right now",
       statusUnavailable: "Can't tell right now",
       valueUnavailable: 'Cannot read yet',
