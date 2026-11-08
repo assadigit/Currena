@@ -249,7 +249,12 @@ over real KV, the keyboard walk (skip link → nav → tiles, focus rings
 everywhere), dark mode one-screen, BOTH reduced-motion guards verified in
 the live CSSOM, and the live last-good path (feed blocked → the labelled
 cached board renders). 4 new fa strings queued unreviewed (the ribbon
-window tag + the narrator stamp pair).
+window tag + the narrator stamp pair). **Deployed + live-verified at the
+session's close** (version `637db8f8` under the owner's standing "the
+Worker deploy when you choose" + AGENTS.md §5): the §21 backtest re-run
+against PRODUCTION 84/84 green, one screen at both widths on currena.ir,
+the legacy surfaces intact — the full record in `docs/DEPLOY.md`
+2026-11-08c.
 
 ## Phase B — Gold (S5–S6)
 
