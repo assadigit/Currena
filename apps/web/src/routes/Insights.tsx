@@ -61,7 +61,8 @@ import { WorldMarkets } from '../components/insights/WorldMarkets';
 import { AustralianMarkets } from '../components/insights/AustralianMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
 import { WorldCurrencies } from '../components/insights/WorldCurrencies';
-import { TicSection, TicCustodyCard } from '../components/insights/TicSection';
+import { TicSection } from '../components/insights/TicSection';
+import { TicCustodyCard } from '../components/insights/TicCustodyCard';
 import { DollarStrengthCards } from '../components/insights/world-currencies/DollarStrength';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {

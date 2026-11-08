@@ -1,8 +1,8 @@
 /**
  * @vitest-environment jsdom
  *
- * UsaPage.characterization.test.tsx (S9, 2026-11-09) — the USA page's
- * DOM-level characterization suite. What is pinned:
+ * UsaPage.characterization.test.tsx (S9 + S10, 2026-11-09) — the USA
+ * page's DOM-level characterization suite. What is pinned:
  *
  *   - the page shell: the destination's own title + purpose + the honest
  *     In-build chip (tiers 3–6 + the TIC board are S10's) + the
@@ -16,10 +16,16 @@
  *     carrying the ENGINE's own word + the shared why-line + the
  *     four-step meter — the words asserted against the engine's
  *     gaugeReading over the SAME fixture (never a second arithmetic);
- *   - the tiers: D-29's 7 + the 19 rates & the Fed cards, each with the
- *     §21 trio (value · 10-year position · freshness), the values
- *     rendered through the DISPLAY registry's own joins (the fed-target
- *     corridor, the trillion/billion scales, the auction ratio);
+ *   - the tiers: D-29's 7 + the 19 rates & the Fed + S10's inflation 12
+ *     + labor & growth 17 + liquidity/stress/valuation 17 (72 cards in
+ *     placement order — the full card-render audit vs the placement
+ *     table), each with the §21 trio (value · 10-year position ·
+ *     freshness), the values rendered through the DISPLAY registry's own
+ *     joins (the fed-target corridor, the trillion/billion scales, the
+ *     magnitude words, the ×100 probability, the 4dp breadth ratio);
+ *   - the tier-6 TIC board (D-31): the REUSED section over its own feed —
+ *     the aggregates split, the separate transactions/valuation columns,
+ *     the custody-hub caveat, the placeholder body RETIRED (BD-S10b);
  *   - the honest fail-closed paths: an absent reading renders the
  *     unavailable word; a dead projection with no cache renders the
  *     error state + retry;
@@ -37,14 +43,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
-import type { IndicatorReading, MarketsSnapshot, PageProjection } from '@currena/core';
-import { MarketsSnapshotSchema, PageProjectionSchema } from '@currena/core';
+import type { IndicatorReading, MarketsSnapshot, PageProjection, TicSnapshot } from '@currena/core';
+import { MarketsSnapshotSchema, PageProjectionSchema, TicSnapshotSchema } from '@currena/core';
 import { GAUGES, gaugeReading, labelForVerdictStep } from '@currena/insights';
 import { THEMATIC_GAUGE_IDS, pageReadingIds } from '@currena/insights/page-division';
 import { summarizeMarkets } from '@currena/insights/markets';
 import { MARKETS } from '@currena/insights/markets/definitions';
 import { UsaPage } from './UsaPage';
-import { USA_TIER1_IDS, USA_TIER2_IDS } from './usa-tiles';
+import { USA_TIER1_IDS, USA_TIER2_IDS, USA_TIER3_IDS, USA_TIER4_IDS, USA_TIER5_IDS } from './usa-tiles';
 import { clearProjectionCacheForTests } from '../../lib/page-division';
 
 /* ------------------------------------------------------------------ *
@@ -156,6 +162,80 @@ function boardFixture(): MarketsSnapshot {
   return { v: 1, generatedAt: '2026-11-07T23:31:00Z', markets, summary: summarizeMarkets(markets) };
 }
 
+/** The tier-6 TIC board fixture — a contract-valid snapshot (sanity-parsed
+ *  inside the tests): 4 holders over 3 months, japan + china-mainland (the
+ *  chart pair), belgium (a custody hub) and australia (the always-visible
+ *  row), with the transactions + valuation series the separate-columns
+ *  discipline renders. */
+function ticFixture(): TicSnapshot {
+  const months = (start: number): { ym: string; v: number }[] => [
+    { ym: '2026-06', v: start },
+    { ym: '2026-07', v: start + 10 },
+    { ym: '2026-08', v: start + 20 },
+  ];
+  return {
+    v: 1,
+    dataMonth: '2026-08',
+    releasedAt: '2026-10-16T20:07:27.000Z',
+    fetchedAt: '2026-11-08T04:35:00.000Z',
+    totalBn: 9000,
+    officialBn: 3700,
+    privateBn: 5300,
+    holders: [
+      {
+        id: 'japan',
+        name: 'Japan',
+        holdingsBn: 1120,
+        months: months(1100),
+        netSalesBn: [
+          { ym: '2026-06', v: 30 },
+          { ym: '2026-07', v: -10 },
+          { ym: '2026-08', v: 25 },
+        ],
+        valuationChangeBn: [
+          { ym: '2026-06', v: 5 },
+          { ym: '2026-07', v: -3 },
+          { ym: '2026-08', v: 8 },
+        ],
+        isCustodyHub: false,
+      },
+      {
+        id: 'china-mainland',
+        name: 'China, Mainland',
+        holdingsBn: 890,
+        months: months(870),
+        netSalesBn: [
+          { ym: '2026-06', v: -20 },
+          { ym: '2026-07', v: -15 },
+          { ym: '2026-08', v: -30 },
+        ],
+        valuationChangeBn: [
+          { ym: '2026-06', v: 12 },
+          { ym: '2026-07', v: 6 },
+          { ym: '2026-08', v: 9 },
+        ],
+        isCustodyHub: false,
+      },
+      {
+        id: 'belgium',
+        name: 'Belgium',
+        holdingsBn: 390,
+        months: months(370),
+        netSalesBn: [{ ym: '2026-08', v: 5 }],
+        isCustodyHub: true,
+      },
+      {
+        id: 'australia',
+        name: 'Australia',
+        holdingsBn: 62,
+        months: months(42),
+        isCustodyHub: false,
+      },
+    ],
+    sourceUrls: ['https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/slt_table5.txt'],
+  };
+}
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -170,13 +250,14 @@ function notFound(): Response {
 /** Route the stubbed fetch: the USA projection + the board feed (the
  *  zoom's own) + the map's two static assets (404 — the land never paints
  *  in jsdom; the cards are the DOM under test). */
-function stubFeeds(overrides: { projection?: () => Response; board?: () => Response } = {}): void {
+function stubFeeds(overrides: { projection?: () => Response; board?: () => Response; tic?: () => Response } = {}): void {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes('/api/insights/pages/usa')) return (overrides.projection ?? (() => jsonResponse(usaProjectionFixture())))();
       if (url.includes('/api/insights/markets')) return (overrides.board ?? (() => jsonResponse(boardFixture())))();
+      if (url.includes('/api/insights/tic')) return (overrides.tic ?? (() => jsonResponse(ticFixture())))();
       if (url.includes('/assets/map/')) return new Response('not found', { status: 404 });
       return notFound();
     }),
@@ -204,9 +285,10 @@ afterEach(() => {
  * ------------------------------------------------------------------ */
 
 describe('UsaPage', () => {
-  it('fixture sanity: both payloads satisfy their contracts', () => {
+  it('fixture sanity: all three payloads satisfy their contracts', () => {
     expect(() => PageProjectionSchema.parse(usaProjectionFixture())).not.toThrow();
     expect(() => MarketsSnapshotSchema.parse(boardFixture())).not.toThrow();
+    expect(() => TicSnapshotSchema.parse(ticFixture())).not.toThrow();
   });
 
   it('renders the honest loading line before the projection arrives — and the zoom stays on top', () => {
@@ -308,9 +390,71 @@ describe('UsaPage', () => {
     expect(rstar.textContent).toContain('Cannot read yet');
     expect(rstar.querySelector('[data-usa-value]')).toBeNull();
 
-    // The placeholder body stays honest (tiers 3–6 + TIC are S10's).
-    expect(document.body.textContent).toContain('What will live here');
-    expect(document.body.textContent).toContain('S9–S11');
+    // Tier 3 — inflation (S10): the placement's 12, the AF-3 twin seated.
+    const tier3 = document.querySelector('[data-usa-tier="tier-3"]')!;
+    expect(tier3.querySelectorAll('[data-usa-card]')).toHaveLength(USA_TIER3_IDS.length);
+    expect(tier3.querySelectorAll('[data-usa-card]')).toHaveLength(12);
+    expect(tier3.textContent).toContain('Inflation');
+    expect(tier3.querySelector('[data-usa-card="us-cpi-core-yoy"]')!.textContent).toContain('Core inflation');
+    expect(tier3.querySelector('[data-usa-card="michigan-1y-expectations"]')!.textContent).toContain('Expected inflation next year');
+
+    // Tier 4 — labor & growth (S10): the placement's 17, the magnitude
+    // words and the ×100 probability in their DISPLAY registry joins.
+    const tier4 = document.querySelector('[data-usa-tier="tier-4"]')!;
+    expect(tier4.querySelectorAll('[data-usa-card]')).toHaveLength(USA_TIER4_IDS.length);
+    expect(tier4.querySelectorAll('[data-usa-card]')).toHaveLength(17);
+    expect(tier4.querySelector('[data-usa-card="initial-jobless-claims"] [data-usa-value]')?.textContent).toBe('1 claims');
+    expect(tier4.querySelector('[data-usa-card="recession-probability"] [data-usa-value]')?.textContent).toBe('100%');
+    expect(tier4.querySelector('[data-usa-card="michigan-sentiment"] [data-usa-value]')?.textContent).toBe('1.0 index');
+
+    // Tier 5 — liquidity, stress & valuation (S10): the spec's own 17,
+    // the stale vix speaking its status word (the §21 trio's freshness leg).
+    const tier5 = document.querySelector('[data-usa-tier="tier-5"]')!;
+    expect(tier5.querySelectorAll('[data-usa-card]')).toHaveLength(USA_TIER5_IDS.length);
+    expect(tier5.querySelectorAll('[data-usa-card]')).toHaveLength(17);
+    const vixCard = tier5.querySelector('[data-usa-card="vix"]')!;
+    expect(vixCard.querySelector('[data-usa-value]')?.textContent).toBe('14.84 index');
+    expect(vixCard.querySelector('[data-usa-status-word]')?.textContent).toBe('Stale');
+    expect(tier5.querySelector('[data-usa-card="shiller-cape"] [data-usa-value]')?.textContent).toBe('1.00 ratio');
+    expect(tier5.querySelector('[data-usa-card="sp500-breadth-ratio"] [data-usa-value]')?.textContent).toBe('1.0000 ratio');
+
+    // The whole registry surface: 72 cards in placement order, zero
+    // unrendered ids (the full card-render audit vs the placement table).
+    expect(document.querySelectorAll('[data-usa-card]')).toHaveLength(72);
+    const renderedIds = [...document.querySelectorAll('[data-usa-card]')].map((el) => el.getAttribute('data-usa-card'));
+    expect(renderedIds).toEqual([
+      ...USA_TIER1_IDS,
+      ...USA_TIER2_IDS,
+      ...USA_TIER3_IDS,
+      ...USA_TIER4_IDS,
+      ...USA_TIER5_IDS,
+    ] as string[]);
+
+    // Tier 6 — the TIC board (D-31): the REUSED section over its own feed
+    // (its fetch resolves on its own tracks — wait for its own content).
+    const tier6 = document.querySelector('[data-usa-tier="tier-6"]')!;
+    expect(tier6.textContent).toContain('Who finances America');
+    await waitFor(() => {
+      expect(tier6.textContent).toContain('Who holds US government debt');
+    });
+    expect(tier6.textContent).toContain('Foreign official vs private holders');
+    // The separate-columns discipline: net buying/selling AND the price
+    // effect both render (the honest-difference note speaks once).
+    expect(tier6.textContent).toContain('Net buying/selling, 12m');
+    expect(tier6.textContent).toContain('Price effect, 12m');
+    expect(tier6.textContent).toContain('real transactions');
+    // The custody-hub caveat (Treasury's own warning) + the ◆ row marker
+    // (the marker carries the fuller tooltip; Belgium is the fixture's hub).
+    expect(tier6.textContent).toContain('holdings are recorded where the securities are held');
+    const belgiumMarker = tier6.querySelector('[aria-label="Custody hub"]');
+    expect(belgiumMarker?.textContent).toBe('◆');
+    expect(belgiumMarker?.getAttribute('title')).toContain('US-based custodians');
+
+    // The placeholder body is RETIRED (BD-S10b): nothing still promises
+    // future tiers — the honest In-build chip alone remains (S11's gates).
+    expect(document.body.textContent).not.toContain('What will live here');
+    expect(document.body.textContent).not.toContain('S9–S11');
+    expect(document.body.textContent).toContain('In build');
   });
 
   it('the dollar-strength strip card links to /currencies (BD-S3b honoured on-page); the other four are plain', async () => {
@@ -353,25 +497,30 @@ describe('UsaPage', () => {
     stubFeeds();
     render(<UsaPage />);
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-usa-card]').length).toBe(26);
+      expect(document.querySelectorAll('[data-usa-card]').length).toBe(72);
     });
     cleanup();
     vi.unstubAllGlobals();
     // A fresh page load (the module promise cache resets with the page).
     clearProjectionCacheForTests();
     // Second visit: the projection feed dies; the cached projection paints
-    // — labelled (the zoom's cached board paints with it, its own label).
+    // — labelled (the zoom's cached board paints with it, its own label);
+    // the TIC board keeps its own last-good copy too (its own feed).
     vi.stubGlobal(
       'fetch',
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
+        if (url.includes('/api/insights/tic')) return jsonResponse(ticFixture());
         if (url.includes('/assets/map/')) return new Response('not found', { status: 404 });
         return jsonResponse({ error: { code: 'store_empty', message: 'empty' } }, 503);
       }),
     );
     render(<UsaPage />);
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-usa-card]').length).toBe(26);
+      expect(document.querySelectorAll('[data-usa-card]').length).toBe(72);
+    });
+    await waitFor(() => {
+      expect(document.querySelector('[data-usa-tier="tier-6"]')?.textContent).toContain('Who holds US government debt');
     });
     await waitFor(() => {
       expect(document.body.textContent).toContain('Showing the last good copy');
@@ -414,6 +563,13 @@ describe('UsaPage', () => {
       expect(fed.querySelector('[data-usa-value]')?.textContent).toBe('۳٫۷۵–۴٫۰۰٪');
       const custody = document.querySelector('[data-usa-card="nyfed-custody"] [data-usa-value]')!;
       expect(custody.textContent).toBe('۳٫۴۵ تریلیون دلار');
+      // The tier-6 TIC board in Persian: the reused section's own words
+      // (the corpus's Persian copy.tic through the pd.usa.tic adapter).
+      const tier6 = document.querySelector('[data-usa-tier="tier-6"]')!;
+      expect(tier6.textContent).toContain('چه کسی آمریکا را تأمین مالی می‌کند');
+      await waitFor(() => {
+        expect(tier6.textContent).toContain('چه کسی بدهی دولت آمریکا را نگه می‌دارد');
+      });
       // The RTL document direction rides the store's own apply().
       expect(document.documentElement.dir).toBe('rtl');
     } finally {

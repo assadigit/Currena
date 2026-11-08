@@ -1,25 +1,30 @@
 /**
- * UsaPage — `/usa`, the American bulk (page-division S9, 2026-11-09 —
- * spec §7 items 1–3; D-29/D-30; the session prompt's S9 scope).
+ * UsaPage — `/usa`, the American bulk (page-division S9 + S10,
+ * 2026-11-09 — spec §7 items 1–7; D-29/D-30/D-31; the session prompts'
+ * S9 + S10 scopes).
  *
  * The S8 zoom section stays ON TOP (RegionIndexSection, the region
  * shell's own D-44 section — BD-S8b recorded this page's build order);
- * below it the page now renders the REAL S9 layers: the D-30 verdict
- * strip (the same five computed verdicts as Global, US-framed questions)
- * and the two tiers (D-29's seven "the world watches" + the 19 rates &
- * the Fed cards, each with the §21 trio: value · 10-year position ·
- * freshness). Every verdict is re-derived CLIENT-SIDE through the same
+ * below it the page renders the REAL layers: the D-30 verdict strip (the
+ * same five computed verdicts as Global, US-framed questions), the five
+ * tier sections (D-29's seven "the world watches" + the 19 rates & the
+ * Fed + S10's inflation 12 · labor & growth 17 · liquidity/stress/
+ * valuation 17 — 72 registry cards, each with the §21 trio: value ·
+ * 10-year position · freshness) and the tier-6 TIC board "Who finances
+ * America" (the REUSED legacy drawing over GET /api/insights/tic, its
+ * own feed). Every verdict is re-derived CLIENT-SIDE through the same
  * pure engines (usa-tiles → global-tiles' globalGaugeTiles: one
  * derivation with Global, D-48). Data arrives on the S2 contract: ONE
  * curated projection (GET /api/insights/pages/usa — fetchPageProjection)
- * + the markets board the zoom reads at its existing cached route. The
- * last-good localStorage pattern (the GoldPage container) paints
- * instantly from cache on a slow connection and survives a feed outage,
- * clearly labelled (M-17, the BD-S5a sentence).
+ * + the markets board the zoom reads + the TIC feed the tier-6 board
+ * reads, each at its existing cached route. The last-good localStorage
+ * pattern (the GoldPage container) paints instantly from cache on a slow
+ * connection and survives a feed outage, clearly labelled (M-17, the
+ * BD-S5a sentence).
  *
- * The page is still assembling (BD-S8b's recorded scope): tiers 3–6, the
- * TIC board and the S10 sections are the NEXT session's — the honest
- * "In build" chip and the placeholder body stay until then, saying so.
+ * The S10 milestone retired the placeholder body (all 72 cards + the
+ * TIC board are on-page); the honest In-build chip stays until S11's
+ * gates/polish pass (BD-S10b).
  *
  * Platform: browser only — this module lives in the lazy USA route
  * chunk, never the entry graph.
@@ -33,9 +38,9 @@ import { interpolate } from '../../i18n';
 import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../lib/page-division';
 import { destinationFor } from './destinations';
 import { RegionIndexSection } from './RegionIndexSection';
-import { DestinationBody } from './DestinationBody';
 import { UsaVerdictStrip } from './UsaVerdictStrip';
 import { UsaTierCards } from './UsaTierCards';
+import { UsaTicSection } from './UsaTicSection';
 import { usaGaugeVerdicts } from './usa-tiles';
 
 type ProjectionState =
@@ -163,19 +168,22 @@ export function UsaPage(): React.JSX.Element {
   }
 
   // Ready (fresh or cached): the zoom section on top, the D-30 strip,
-  // the two tiers, then the honest still-building record.
+  // the five tiers + the tier-6 TIC board (its own feed — it renders
+  // through every projection state below, only the projection-gated
+  // layers wait for their data).
   return (
     <div className="mx-auto w-full max-w-[560px] px-3 py-1.5 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1280px] lg:px-8 lg:py-6">
-      {/* The heading block: title + the honest In-build chip (tiers 3–6,
-          the TIC board and the S10 sections are still the roadmap's) +
-          the one-line purpose + the data-as-of line (the BD-S5a sentence
-          replaces the plain line when the copy is the cached one). */}
+      {/* The heading block: title + the honest In-build chip (S11's gates
+          + polish are the remaining roadmap work for this page — the S10
+          layers below are real from today) + the one-line purpose + the
+          data-as-of line (the BD-S5a sentence replaces the plain line
+          when the copy is the cached one). */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.usa.title')}</h1>
-          {/* In-build status chip — the page is still assembling (S10
-           * delivers tiers 3–6 + the TIC board + the index section's
-           * cards); the S9 layers below are real from today. */}
+          {/* In-build status chip — the page's LAYERS are complete since
+           * S10 (the 72 cards + the TIC board); the chip stays honest
+           * until S11's gates + polish pass (BD-S10b). */}
           <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-[10.5px] font-bold text-amber-900 sm:px-3 sm:py-1 sm:text-xs dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200">
             {t('pd.statusBuilding')}
           </span>
@@ -209,8 +217,8 @@ export function UsaPage(): React.JSX.Element {
           it). Its board feed is independent of the projection. */}
       <RegionIndexSection region="us" />
 
-      {/* The D-30 verdict strip + the two S9 tiers (each with the §21
-          trio) — only when the projection has spoken (fresh or cached). */}
+      {/* The D-30 verdict strip + the five tiers (each with the §21 trio)
+          — only when the projection has spoken (fresh or cached). */}
       {readings !== undefined ? (
         <>
           <UsaVerdictStrip verdicts={verdicts} />
@@ -218,13 +226,11 @@ export function UsaPage(): React.JSX.Element {
         </>
       ) : null}
 
-      {/* The honest still-building record (the S1 placeholder's own
-          body — tiers 3–6, the TIC board and the S10 sections are the
-          next sessions'; nothing is faked, nothing promised beyond the
-          roadmap). */}
-      <div className="mx-auto mt-4 w-full max-w-[680px] lg:max-w-[880px]">
-        <DestinationBody spec={spec} />
-      </div>
+      {/* The tier-6 TIC board — "Who finances America" (D-31): the
+          REUSED legacy drawing over its OWN feed, independent of the
+          projection (a slow or dead projection never takes the board
+          away — each feed governs its own surface). */}
+      <UsaTicSection />
     </div>
   );
 }

@@ -42,14 +42,18 @@
  */
 
 import { useMemo, useState } from 'react';
-import type { IndicatorId, IndicatorReading, TicHolder, TicSnapshot } from '@currena/core';
+import type { TicHolder, TicSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { ticHolderDerived, ticIsStale, ticTopMovers } from '@currena/insights/tic';
 import { interpolate } from '../../i18n';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
+
+/** The section's OWN copy contract (S10, the USA-tier-6 reuse): only the
+ *  `tic` block — the legacy Insights page passes the full corpus (it has
+ *  .tic), the /usa page passes the lean pd.usa.tic adapter (every word
+ *  pinned byte-for-byte to the corpus by usa-copy-pin.test.ts). */
+export type TicSectionCopy = Pick<InsightsCopy, 'tic'>;
 import { Skeleton } from '../ui';
-import { CompactRow } from './CompactRow';
-import type { DailyPeers } from './config';
 
 /** The section's own load state (the markets/fx discipline). */
 export type TicLoadState =
@@ -117,7 +121,7 @@ function dateWords(iso: string, locale: Locale): string {
 
 /** The display name: OUR dictionary first, the provider's own string as
  * the honest fallback (a new entrant never crashes the section). */
-function holderName(holder: TicHolder, copy: InsightsCopy): string {
+function holderName(holder: TicHolder, copy: TicSectionCopy): string {
   return copy.tic.countries[holder.id as keyof typeof copy.tic.countries] ?? holder.name;
 }
 
@@ -182,7 +186,7 @@ function JapanChinaChart({
   numberLocale,
 }: {
   snapshot: TicSnapshot;
-  copy: InsightsCopy;
+  copy: TicSectionCopy;
   locale: Locale;
   numberLocale: NumberLocale;
 }) {
@@ -300,7 +304,7 @@ function SplitBar({
   numberLocale,
 }: {
   snapshot: TicSnapshot;
-  copy: InsightsCopy;
+  copy: TicSectionCopy;
   numberLocale: NumberLocale;
 }) {
   if (snapshot.officialBn === undefined || snapshot.privateBn === undefined) return null;
@@ -362,7 +366,7 @@ function MoverChips({
   numberLocale,
 }: {
   snapshot: TicSnapshot;
-  copy: InsightsCopy;
+  copy: TicSectionCopy;
   numberLocale: NumberLocale;
 }) {
   const { buyers, sellers } = ticTopMovers(snapshot, 3);
@@ -435,7 +439,7 @@ function SortHeader({
   sortKey: SortKey;
   sort: { key: SortKey; dir: 'asc' | 'desc' };
   onSort: (key: SortKey) => void;
-  copy: InsightsCopy;
+  copy: TicSectionCopy;
   numeric: boolean;
 }) {
   const active = sort.key === sortKey;
@@ -468,7 +472,7 @@ function HoldersTable({
 }: {
   rows: readonly Row[];
   snapshot: TicSnapshot;
-  copy: InsightsCopy;
+  copy: TicSectionCopy;
   locale: Locale;
   numberLocale: NumberLocale;
 }) {
@@ -588,7 +592,7 @@ function HolderCards({
   numberLocale,
 }: {
   rows: readonly Row[];
-  copy: InsightsCopy;
+  copy: TicSectionCopy;
   numberLocale: NumberLocale;
 }) {
   const [showAll, setShowAll] = useState(false);
@@ -668,51 +672,7 @@ function HolderCards({
   );
 }
 
-/* ------------------------------------------------------------------ *
- * The weekly custody card (S2-M2.4's spec item 6 — FRED WSEFINTL1)
- * ------------------------------------------------------------------ */
 
-/**
- * TicCustodyCard — the standard indicator card (the CompactRow anatomy,
- * with its 10-year position bar via ALWAYS_POSITION_IDS) that closes the
- * TIC section: the WEEKLY foreign-official custody level beside the
- * monthly country table that lags ~6–7 weeks. Renders inside the
- * SectionLane's ticSlot right below the TicSection (Insights.tsx); the
- * reading rides the main insights snapshot (HIDDEN_FROM_LANE_IDS keeps it
- * out of the borrowing-costs lane — one reading, one surface).
- *
- * null reading → nothing (the snapshot is loading or the series is held;
- * the TIC section's own states are independent and never wait on this).
- */
-export function TicCustodyCard({
-  reading,
-  copy,
-  numberLocale,
-  onOpenDetails,
-  pinned,
-  peers,
-}: {
-  reading: IndicatorReading | null;
-  copy: InsightsCopy;
-  numberLocale: NumberLocale;
-  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
-  pinned: boolean;
-  peers?: DailyPeers;
-}) {
-  if (reading === null) return null;
-  return (
-    <div className="lane-fill lane-fill-rows gap-1.5" data-tic-custody>
-      <CompactRow
-        reading={reading}
-        copy={copy}
-        numberLocale={numberLocale}
-        onOpenDetails={onOpenDetails}
-        pinned={pinned}
-        peers={peers}
-      />
-    </div>
-  );
-}
 
 /* ------------------------------------------------------------------ *
  * The section.
@@ -726,7 +686,7 @@ export function TicSection({
   now = () => new Date(),
 }: {
   state: TicLoadState;
-  copy: InsightsCopy;
+  copy: TicSectionCopy;
   locale: Locale;
   numberLocale: NumberLocale;
   /** Clock injection (tests pin the >70-day gate deterministically). */
