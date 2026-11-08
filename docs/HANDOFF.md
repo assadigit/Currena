@@ -6,6 +6,26 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+## THIS SESSION'S GOAL (S6 — in progress, written before coding 2026-11-08)
+
+The owner's in-session request + the S6 gates:
+
+1. **M1 (the owner's ask):** the PREVIOUS shape of the gold balance — the
+   brass assay-office stage (beam, dial, column, hangers, bowl pans with
+   the five lane weights + the not-leaning tray) — on `/gold`, ALTERNATED
+   with the S5 minimal beam glyph (a view switcher in the hero), rendered
+   SMALLER (stage capped at 480px → the s-size metrics). Decision BD-S6a
+   in `docs/DECISIONS.md`.
+2. **M2 (the S6 gate):** the frozen-scenario suite — the recorded corpus
+   windows drive the page renderer (gold-tiles) and pin meter counts,
+   lane votes, beam, outlook byte-identical to the frozen harness's own
+   arithmetic (extend `gold-backtest-core.ts` + the offline test).
+3. **M3–M4:** mobile + ARIA pass on the changed hero (keyboard walk,
+   both widths en+fa, dark mode), full gates, browser verification.
+4. **M5:** records + push + re-deploy (code changed → the owner's
+   standing applies) + live acceptance + hand-off for Phase C (S7).
+
+
 ## Current state (2026-11-08, after page-division S5)
 
 - **Program:** page-division — splitting the all-in-one Insights page

@@ -550,102 +550,140 @@ export interface BalancePoint {
   y: number;
 }
 
+/* ------------------------------------------------------------------ *
+ * S6 (BD-S6a, 2026-11-08): the STAGE + the TRAY as their own exported
+ * pieces — the previous shape's drawing, reusable by the Gold page's
+ * classic hero view. The MECHANICS, the geometry and the DOM are moved
+ * VERBATIM from the BalanceScale render below (ONE drawing, never
+ * restated — D-48): the legacy card feeds the insights corpus's own
+ * strings, the Gold page feeds its corpus-pinned pd.gold words
+ * (gold-copy-pin.test.ts), so both surfaces draw the SAME balance from
+ * the same engines.
+ * ------------------------------------------------------------------ */
 
-export function BalanceScale({
-  drivers,
-  copy,
-  numberLocale,
-  banner,
-  subtitle,
-  contextLine,
-  measuredNote,
-}: {
-  drivers: readonly BalanceDriver[];
-  copy: InsightsCopy;
-  numberLocale: 'en-US' | 'fa-IR';
-  /** The card's existing verdict banner sentence (spec §5.2 — kept
-   * unchanged, rendered inside the aggregate assessment box). */
-  banner?: ReactNode;
-  /** The balance's subtitle — the lane wording (03 §6). Absent → the
-   * dictionary's own `subtitle`. */
-  subtitle?: string;
-  /** GB-S3 (01 §6): the non-voting context line under the verdict box
-   * (gold's own 30-day move, never counted). Absent → nothing renders. */
-  contextLine?: ReactNode;
-  /** GB-S3 (01 §8.2): the measured note + the backtest link, visible
-   * without a tap. Absent → nothing renders. */
-  measuredNote?: ReactNode;
-}): React.JSX.Element | null {
-  // 2026-10-21c owner round: silver's balance (and with it the `metal`
-  // prop + the balanceSilver copy variants) is RETIRED — the merged card
-  // renders GOLD's balance only; the drawing, counts and honesty rules
-  // are unchanged.
-  const b = copy.signals.balance;
-  const metal = 'gold' as const;
-  const rtl = numberLocale === 'fa-IR';
-  const [openKey, setOpenKey] = useState<string | null>(null);
-  /* R9-03 (v8): the v6 "+{n} more" list-expansion state is RETIRED —
-   * every factor chip renders on its pan; there is nothing to expand. */
-
-  /* Model-level reads (pure — an empty driver list yields the level
-   * balance, so every hook below keeps its call order unconditional). */
-  const counts = balanceCounts(drivers);
-  const verdict = balanceVerdictOf(counts);
-  /* The side loads (R9-03: EVERY chip renders on its pan — no capacity
-   * slice, no overflow pill). Computed before the hooks so the pan-height
-   * measurement can depend on the counts. */
-  const forBlocks = drivers.filter((d) => d.state === 'for');
-  const againstBlocks = drivers.filter((d) => d.state === 'against');
-  const neutralChips = drivers.filter((d) => d.state === 'neutral');
-  const unreadChips = drivers.filter((d) => d.state === 'unread');
-  /* The tilt from the fixed design-width arm (rule 5: the model math
-   * never depends on anything measured at runtime; the rendered
-   * geometry scales with the measured stage width below). */
-  const tilt = balanceTilt(counts, BALANCE_LH_PX);
-  /* The PHYSICAL signed angle (against-heavy positive) is the ANGLE
-   * TARGET; the VISUAL beam rotation flips for RTL inside the
-   * geometry so the heavy side's end always dips. */
-  /* v3 UI-40 (2026-10-20, kept through the v3 merge): fewer than 3
-   * readable conditions is NOT a reading — the beam stays level, the
-   * verdict word becomes the honest "not enough readable conditions"
-   * line and the gauge hides. The 2026-10-21c 3° floor still governs every
-   * non-sparse directional result (readable ≥ 3). */
-  const sparse = counts.readable < 3;
-  const targetDeg = sparse ? 0 : signedTiltDeg(tilt);
-
-  /* THE ONE ANIMATED VALUE (addendum §A): θ. The balance starts LEVEL
-   * and swings to the verdict on load (650ms ease-out quartic), then the
-   * rAF timeline below animates it whenever the model's target changes
-   * (a data refresh), re-deriving the beam rotation, joints, pan
-   * translations and hanger endpoints in the SAME frame;
-   * prefers-reduced-motion jumps. */
-  const [theta, setTheta] = useState(0);
-  const thetaRef = useRef(0);
-  const frame = useRef(0);
-
-  /* GB-S4: the VISUAL root's measured width — drives the size steps
-   * (s/m/l by the card's own width, the reference prototype's rule) and
-   * the stage width (min(root, 720)). */
-  const [visualRootW, setVisualRootW] = useState(BALANCE_VISUAL_ROOT_DESIGN);
-  const visualRootEl = useRef<HTMLDivElement | null>(null);
-  const visualWRef = useRef(BALANCE_VISUAL_ROOT_DESIGN);
+/** The root-width measurement every visual balance root shares (GB-S4:
+ * the size steps s/m/l read the ROOT's width — the balance card for the
+ * legacy surface, the hero block for the Gold page's classic view; the
+ * stage itself caps at BALANCE_VISUAL_STAGE_MAX_W). */
+export function useBalanceVisualRootWidth(): [React.RefObject<HTMLDivElement | null>, number] {
+  const [width, setWidth] = useState(BALANCE_VISUAL_ROOT_DESIGN);
+  const el = useRef<HTMLDivElement | null>(null);
+  const widthRef = useRef(BALANCE_VISUAL_ROOT_DESIGN);
   useEffect(() => {
-    const el = visualRootEl.current;
-    if (!el) return undefined;
+    const node = el.current;
+    if (!node) return undefined;
     const apply = (w: number): void => {
-      if (w > 0 && Math.abs(w - visualWRef.current) > 0.5) {
-        visualWRef.current = w;
-        setVisualRootW(w);
+      if (w > 0 && Math.abs(w - widthRef.current) > 0.5) {
+        widthRef.current = w;
+        setWidth(w);
       }
     };
-    apply(el.getBoundingClientRect().width);
+    apply(node.getBoundingClientRect().width);
     if (typeof ResizeObserver === 'undefined') return undefined;
     const ro = new ResizeObserver((entries) => {
       apply(entries[0]?.contentRect.width ?? 0);
     });
-    ro.observe(el);
+    ro.observe(node);
     return () => ro.disconnect();
   }, []);
+  return [el, width];
+}
+
+/** The narrow copy the stage + the tray read (the caller's own words —
+ * the corpus for the legacy card, the corpus-pinned pd.gold keys for
+ * the Gold page's classic view). */
+export interface BalanceStageCopy {
+  sideFor: string;
+  sideAgainst: string;
+  listEmptyFor: string;
+  listEmptyAgainst: string;
+  listEmptyNone: string;
+  /** The weight's accessible name: "{lane}: {side}. {tally}." */
+  laneChipAria: string;
+  splitBadge: string;
+  /** The four side words (the condition-state vocabulary). */
+  sideWords: { supportive: string; against: string; neutral: string; unknown: string };
+  trayTitle: string;
+  trayNote: string;
+  trayEmpty: string;
+}
+
+/** The weight's row wiring when the caller keeps openable rows (the
+ * legacy ledger); the Gold page's classic view passes none — its
+ * weights scroll to the lane cards instead. */
+export interface BalanceStageWeightAria {
+  expanded?: boolean;
+  controls?: string;
+}
+
+/** GB-S3 (03 §5), the lane chip's accessible name — "{lane}: {side}.
+ * {tally}." (laneChipAria); a split lane appends the badge word before
+ * its counts so the badge's meaning is never colour-only. The side word
+ * rides the condition-state vocabulary — no new words. */
+function laneChipAriaWith(d: BalanceDriver, copy: BalanceStageCopy): string {
+  const sideKey =
+    d.state === 'for' ? 'supportive' : d.state === 'against' ? 'against' : d.state === 'neutral' ? 'neutral' : 'unknown';
+  const side = copy.sideWords[sideKey];
+  const tally = d.split === true && d.tally !== undefined ? `${copy.splitBadge}, ${d.tally}` : d.tally;
+  return tally !== undefined ? interpolate(copy.laneChipAria, { lane: d.label, side, tally }) : `${d.label}: ${side}.`;
+}
+
+/**
+ * THE STAGE — the previous shape's mechanical drawing: the brass beam +
+ * pivot + 11-tick dial + column + base (one svg) behind the two bowl
+ * pans hung plumb from the beam ends, every firing lane resting on its
+ * pan as a segmented-rim WEIGHT. The whole drawing is one role="img"
+ * whose label is the gauge's text equivalent; the stage wrapper carries
+ * the group label. Exactly ONE animated value θ drives every frame
+ * (moved verbatim from the card); prefers-reduced-motion jumps.
+ */
+export function BalanceStage({
+  drivers,
+  copy,
+  numberLocale,
+  rootWidth,
+  stageAria,
+  gaugeAria,
+  onWeightOpen,
+  weightAriaOf,
+}: {
+  drivers: readonly BalanceDriver[];
+  copy: BalanceStageCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+  /** The visual root's measured width (the size steps + the geometry). */
+  rootWidth: number;
+  /** The stage group's label — the caller composes it from its own counts + verdict words. */
+  stageAria: string;
+  /** The gauge's text equivalent — the caller composes it (angle + verdict). */
+  gaugeAria: string;
+  onWeightOpen?: (key: string) => void;
+  weightAriaOf?: (key: string) => BalanceStageWeightAria | undefined;
+}): React.JSX.Element | null {
+  const rtl = numberLocale === 'fa-IR';
+  /* Model-level reads (pure — the parent computes the same counts for
+   * its verdict block; ONE helper, called twice, never two maths). */
+  const counts = balanceCounts(drivers);
+  const verdict = balanceVerdictOf(counts);
+  /* The side loads (R9-03: EVERY chip renders on its pan — no capacity
+   * slice, no overflow pill). */
+  const forBlocks = drivers.filter((d) => d.state === 'for');
+  const againstBlocks = drivers.filter((d) => d.state === 'against');
+  /* The tilt from the fixed design-width arm (rule 5: the model math
+   * never depends on anything measured at runtime; the rendered
+   * geometry scales with the root width below). */
+  const tilt = balanceTilt(counts, BALANCE_LH_PX);
+  /* v3 UI-40 (kept through every redesign): fewer than 3 readable
+   * conditions is NOT a reading — the beam stays level. */
+  const sparse = counts.readable < 3;
+  const targetDeg = sparse ? 0 : signedTiltDeg(tilt);
+
+  /* THE ONE ANIMATED VALUE (addendum §A): θ — moved verbatim. The
+   * balance starts LEVEL and swings to the verdict on load (650ms
+   * ease-out quartic), then re-animates whenever the model's target
+   * changes; prefers-reduced-motion jumps. */
+  const [theta, setTheta] = useState(0);
+  const thetaRef = useRef(0);
+  const frame = useRef(0);
 
   useEffect(() => {
     const from = thetaRef.current;
@@ -665,9 +703,6 @@ export function BalanceScale({
       return undefined;
     }
     // GB-S4 (05 §7): 650ms ease-out QUARTIC on load and on data change.
-    // GB-S6: the tween's t0 is the FIRST rAF tick's own timestamp (the
-    // browser's animation clock) — no separate now() call; the tween
-    // starts at the first vsync frame after the data lands.
     const duration = TILT_ANIMATION_VISUAL_MS;
     const easeOf = (p: number) => 1 - (1 - p) ** 4;
     let start: number | null = null;
@@ -687,88 +722,24 @@ export function BalanceScale({
 
   useEffect(() => () => cancelAnimationFrame(frame.current), []);
 
-  /* GB-S4 (05 §4.3/§4.6): pressing a WEIGHT opens its lane's ledger row
-   * and scrolls it to the centre — the row button receives focus after
-   * the row renders (the pending-focus effect below). Declared with the
-   * other hooks, BEFORE the empty-driver guard (the hooks order must be
-   * unconditional); the effect simply no-ops when nothing is pending. */
-  const pendingRowFocus = useRef<string | null>(null);
-  useEffect(() => {
-    const key = pendingRowFocus.current;
-    if (key === null) return;
-    pendingRowFocus.current = null;
-    const btn = document.getElementById(`gold-balance-row-btn-${key}`);
-    if (btn === null) return;
-    const reduced =
-      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (typeof (btn as HTMLElement).scrollIntoView === 'function') {
-      btn.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
-    }
-    (btn as HTMLElement).focus({ preventScroll: true });
-  }, [openKey]);
-
   if (drivers.length === 0) return null;
-  const verdictWord = balanceVerdictWordOf(counts, copy);
-  const parts = countLineParts(counts, copy, numberLocale);
-  const ariaLabel = interpolate(b.aria, { summary: parts.join(' · '), verdict: verdictWord });
   /* The gauge's text equivalent (addendum §B: never colour alone) —
-   * the whole mechanical drawing is one role="img" whose label states
-   * the beam tilt and the verdict. Hidden entirely when the state is
-   * unavailable (no needle, no verdict — the state label in the
-   * assessment box carries it). */
+   * hidden entirely when the state is unavailable (no needle, no
+   * verdict — the caller's verdict word carries it). */
   const gaugeAvailable = !sparse && verdict !== 'none';
-  const gaugeAria = interpolate(b.gaugeAria, {
-    n: formatNumber(tilt.angleDeg, numberLocale, { maximumFractionDigits: 0 }),
-    verdict: verdictWord,
-  });
-
-  const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
-
-  /** Opens a lane's ledger row from a WEIGHT (scroll + focus ride the
-   * pending-focus effect declared with the hooks above). DOM order keeps
-   * the tab order pan weights → tray weights → ledger rows (03 §5). */
-  const openLaneFromWeight = (key: string): void => {
-    setOpenKey(key);
-    pendingRowFocus.current = key;
-  };
 
   /** The empty-side line (v4 semantics, kept verbatim): when the
    * evaluation ran, the side with no qualifying factors carries the
-   * evidence-based line; when NOTHING could be read (readable 0),
-   * both sides carry the unavailable line instead — an absence of
-   * readings is never worded as an absence of pressure — the visual
-   * bowl pans. */
+   * evidence-based line; when NOTHING could be read (readable 0), both
+   * sides carry the unavailable line instead. */
   const emptyLineOf = (side: 'for' | 'against'): string =>
-    counts.readable === 0 ? b.listEmptyNone : side === 'for' ? b.listEmptyFor : b.listEmptyAgainst;
+    counts.readable === 0 ? copy.listEmptyNone : side === 'for' ? copy.listEmptyFor : copy.listEmptyAgainst;
 
-  /** GB-S3 (03 §5): the lane chip's accessible name — "{lane}: {side}.
-   * {tally}." (laneChipAria); a split lane appends the badge word before
-   * its counts so the badge's meaning is never colour-only. The side
-   * word reuses the card's own condition-state vocabulary
-   * (conditionStateShort) — no new words, both locales already carry it. */
-  const laneChipAriaOf = (d: BalanceDriver): string => {
-    const sideKey =
-      d.state === 'for' ? 'supportive' : d.state === 'against' ? 'against' : d.state === 'neutral' ? 'neutral' : 'unknown';
-    const side = copy.signals.conditionStateShort[sideKey];
-    const tally = d.split === true && d.tally !== undefined ? `${b.splitBadge}, ${d.tally}` : d.tally;
-    return tally !== undefined ? interpolate(b.laneChipAria, { lane: d.label, side, tally }) : `${d.label}: ${side}.`;
-  };
-
-/* ---------------------------------------------------------------- *
- * GB-S4 — THE VISUAL REDESIGN (05-VISUAL-DESIGN-SPEC.md, from the
- * owner-approved reference prototype) — since the GB-S6 flip THE
- * balance for every visitor (the legacy branch retired with the
- * flag). Layout, top to bottom (05 §4.1): the head (eyebrow → title →
- * subtitle), the brass STAGE, the VERDICT block (the hero), the
- * context pill, the banner, the "Not leaning" tray, the LEDGER (the
- * detail panel, inline — one row open at a time), the footnote.
- * ---------------------------------------------------------------- */
-  /** The visual stage's metrics + the per-frame derivation (the one
+  /* The visual stage's metrics + the per-frame derivation (the one
    * animated θ drives everything; pans translate only). */
-  const vm = balanceVisualMetrics(visualRootW);
+  const vm = balanceVisualMetrics(rootWidth);
   const vf = balanceVisualFrame(vm, theta, rtl);
-  const vSize = vm.size;
-  const s = vSize === 's';
+  const s = vm.size === 's';
   const bh = vm.beamScale;
   const vCx = vm.stageWidth / 2;
 
@@ -838,6 +809,340 @@ export function BalanceScale({
   const forIsLeft = !rtl;
   const leftEndColor = forIsLeft ? 'var(--color-status-normal)' : 'var(--color-status-alert)';
   const rightEndColor = forIsLeft ? 'var(--color-status-alert)' : 'var(--color-status-normal)';
+
+  return (
+    <div
+      className="bal-stage"
+      data-balance-stage
+      role="group"
+      aria-label={stageAria}
+      style={{ height: `${vm.stageH}px` }}
+    >
+      <svg
+        data-balance-mech
+        className="bal-mech"
+        viewBox={`0 0 ${r2(vm.stageWidth)} ${r2(vm.stageH)}`}
+        role={gaugeAvailable ? 'img' : undefined}
+        aria-label={gaugeAvailable ? gaugeAria : undefined}
+        aria-hidden={gaugeAvailable ? undefined : true}
+      >
+        <defs>
+          <linearGradient id="bal-beam-brass" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--bal-brass-hi)" />
+            <stop offset="50%" stopColor="var(--bal-brass-mid)" />
+            <stop offset="100%" stopColor="var(--bal-brass-lo)" />
+          </linearGradient>
+        </defs>
+        {/* The contact shadow + the tapered column + the rounded
+         * foot (static — the instrument's stand). */}
+        <ellipse cx={r2(vCx)} cy={r2(vm.stageH - 16)} rx={s ? 50 : 68} ry={7} fill="rgba(91,61,8,.18)" />
+        <path
+          d={`M ${r2(vCx - 5)} ${r2(vm.pivotY + 10)} L ${r2(vCx + 5)} ${r2(vm.pivotY + 10)} L ${r2(vCx + 9)} ${r2(vm.stageH - 26)} L ${r2(vCx - 9)} ${r2(vm.stageH - 26)} Z`}
+          fill="url(#bal-beam-brass)"
+          opacity={0.95}
+        />
+        <rect x={r2(vCx - (s ? 44 : 58))} y={r2(vm.stageH - 26)} width={s ? 88 : 116} height={12} rx={6} fill="url(#bal-beam-brass)" />
+        {/* The dial: 11 ticks (centre longer) over a ±35° arc. */}
+        {dialTicks.map((t) => (
+          <line
+            key={t.t}
+            data-balance-dial-tick={t.t}
+            x1={t.x1}
+            y1={t.y1}
+            x2={t.x2}
+            y2={t.y2}
+            stroke="var(--color-text-tertiary)"
+            strokeWidth={t.t === 0 ? 1.6 : 1}
+            strokeLinecap="round"
+            opacity={t.t === 0 ? 0.9 : 0.55}
+          />
+        ))}
+        <path d={dialArc} fill="none" stroke="var(--color-border)" strokeWidth={1} />
+        {/* The hangers — redrawn per frame from the rotated joints. */}
+        {visualHangers('for')}
+        {visualHangers('against')}
+        {/* THE BEAM GROUP — rotate(θ, pivotX, pivotY): the tapered
+         * brass bar with its highlight line + the two side rings.
+         * The one and only transform in the drawing. */}
+        <g data-balance-beam data-tilt={String(targetDeg)} transform={`rotate(${r2(vf.beamDeg)} ${r2(vCx)} ${r2(vm.pivotY)})`}>
+          <g transform={`translate(${r2(vCx)} ${r2(vm.pivotY)})`}>
+            <path data-balance-beam-bar d={beamPath} fill="url(#bal-beam-brass)" stroke="var(--bal-brass-lo)" strokeWidth={0.6} />
+            <path
+              d={`M ${r2(-vm.L / 2 + 6)} ${r2(-1.6 * bh)} L ${r2(vm.L / 2 - 6)} ${r2(-1.6 * bh)}`}
+              fill="none"
+              stroke="rgba(255,255,255,.55)"
+              strokeWidth={1}
+              strokeLinecap="round"
+            />
+          </g>
+          <circle data-balance-bead="for" cx={r2(vCx - vm.L / 2)} cy={r2(vm.pivotY)} r={7} fill="var(--color-surface)" stroke={leftEndColor} strokeWidth={3} />
+          <circle data-balance-bead="against" cx={r2(vCx + vm.L / 2)} cy={r2(vm.pivotY)} r={7} fill="var(--color-surface)" stroke={rightEndColor} strokeWidth={3} />
+        </g>
+        {/* The needle — a 3× magnified readout over the dial (a 3°
+         * lean stays legible); hidden when nothing could be read. */}
+        {gaugeAvailable ? (
+          <line
+            data-balance-needle
+            x1={r2(vCx)}
+            y1={r2(vm.pivotY)}
+            x2={r2(vCx + (vm.dialR - 3) * Math.sin(radOf(vf.needleDeg)))}
+            y2={r2(vm.pivotY - (vm.dialR - 3) * Math.cos(radOf(vf.needleDeg)))}
+            stroke="var(--color-text-primary)"
+            strokeWidth={2}
+            strokeLinecap="round"
+          />
+        ) : null}
+        {/* The brass hub caps it: the hub, its dark centre, the
+         * specular dot. */}
+        <circle cx={r2(vCx)} cy={r2(vm.pivotY)} r={vm.hubR} fill="url(#bal-face-brass)" stroke="var(--bal-brass-lo)" strokeWidth={1} />
+        <circle cx={r2(vCx)} cy={r2(vm.pivotY)} r={s ? 3.6 : 4.4} fill="var(--color-text-primary)" />
+        <circle cx={r2(vCx - 1.2)} cy={r2(vm.pivotY - 1.4)} r={1.2} fill="rgba(255,255,255,.7)" />
+      </svg>
+      {/* The two bowl pans — absolutely positioned at their rest
+       * centres, translated ONLY vertically by their joints' drops
+       * (they hang plumb; the hangers' angles change instead). */}
+      {(['for', 'against'] as const).map((side) => {
+        const blocks = side === 'for' ? forBlocks : againstBlocks;
+        const drop = side === 'for' ? vf.forDrop : vf.againstDrop;
+        const centreX = side === 'for' ? vf.forCentreX : vf.againstCentreX;
+        return (
+          <div
+            key={side}
+            data-balance-assembly={side}
+            data-balance-pan={side}
+            className={`bal-pan ${side === 'for' ? 'bal-pan-for' : 'bal-pan-against'}`}
+            style={{
+              width: `${vm.pw}px`,
+              height: `${vm.panH}px`,
+              left: `${r2(centreX - vm.pw / 2)}px`,
+              top: `${vm.pivotY + vm.hanger}px`,
+              transform: `translate(0px, ${r2(drop)}px)`,
+            }}
+          >
+            <div className="bal-pan-cap">
+              <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={14} className="shrink-0" />
+              <span>{side === 'for' ? copy.sideFor : copy.sideAgainst}</span>
+            </div>
+            {blocks.length > 0 ? (
+              <div className="bal-weights">
+                {blocks.map((d) => (
+                  <BalanceWeight
+                    key={d.key}
+                    laneKey={d.key}
+                    label={d.label}
+                    ariaLabel={laneChipAriaWith(d, copy)}
+                    members={d.members ?? []}
+                    side={side}
+                    split={d.split}
+                    splitBadge={copy.splitBadge}
+                    onOpen={() => onWeightOpen?.(d.key)}
+                    ariaExpanded={weightAriaOf?.(d.key)?.expanded}
+                    ariaControls={weightAriaOf?.(d.key)?.controls}
+                    widthPx={vm.weightW}
+                    discPx={vm.discPx}
+                    testKey={d.key}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bal-pan-empty" data-balance-empty={side}>
+                {emptyLineOf(side)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * THE "NOT LEANING" TRAY (05 §4.5) — one recessed well for the neutral
+ * and unread lane weights; empty when every lane sits on a pan. The
+ * unread ones wear the dotted rim. Moved verbatim from the card.
+ */
+export function BalanceTray({
+  drivers,
+  copy,
+  rootWidth,
+  onWeightOpen,
+  weightAriaOf,
+}: {
+  drivers: readonly BalanceDriver[];
+  copy: BalanceStageCopy;
+  rootWidth: number;
+  onWeightOpen?: (key: string) => void;
+  weightAriaOf?: (key: string) => BalanceStageWeightAria | undefined;
+}): React.JSX.Element {
+  const neutralChips = drivers.filter((d) => d.state === 'neutral');
+  const unreadChips = drivers.filter((d) => d.state === 'unread');
+  const trayLanes = [...neutralChips, ...unreadChips];
+  const s = balanceVisualMetrics(rootWidth).size === 's';
+  return (
+    <div className="bal-tray" data-balance-tray="not-leaning">
+      <div className="bal-tray-head">
+        <span className="bal-tray-title">{copy.trayTitle}</span>
+        <span className="bal-tray-note">{copy.trayNote}</span>
+      </div>
+      {trayLanes.length > 0 ? (
+        <div className="bal-weights">
+          {trayLanes.map((d) => (
+            <BalanceWeight
+              key={d.key}
+              laneKey={d.key}
+              label={d.label}
+              ariaLabel={laneChipAriaWith(d, copy)}
+              members={d.members ?? []}
+              side={d.state}
+              split={d.split}
+              splitBadge={copy.splitBadge}
+              onOpen={() => onWeightOpen?.(d.key)}
+              ariaExpanded={weightAriaOf?.(d.key)?.expanded}
+              ariaControls={weightAriaOf?.(d.key)?.controls}
+              widthPx={s ? 72 : 92}
+              discPx={s ? 42 : 46}
+              testKey={d.key}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="bal-tray-empty">{copy.trayEmpty}</p>
+      )}
+    </div>
+  );
+}
+
+export function BalanceScale({
+  drivers,
+  copy,
+  numberLocale,
+  banner,
+  subtitle,
+  contextLine,
+  measuredNote,
+}: {
+  drivers: readonly BalanceDriver[];
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+  /** The card's existing verdict banner sentence (spec §5.2 — kept
+   * unchanged, rendered inside the aggregate assessment box). */
+  banner?: ReactNode;
+  /** The balance's subtitle — the lane wording (03 §6). Absent → the
+   * dictionary's own `subtitle`. */
+  subtitle?: string;
+  /** GB-S3 (01 §6): the non-voting context line under the verdict box
+   * (gold's own 30-day move, never counted). Absent → nothing renders. */
+  contextLine?: ReactNode;
+  /** GB-S3 (01 §8.2): the measured note + the backtest link, visible
+   * without a tap. Absent → nothing renders. */
+  measuredNote?: ReactNode;
+}): React.JSX.Element | null {
+  // 2026-10-21c owner round: silver's balance (and with it the `metal`
+  // prop + the balanceSilver copy variants) is RETIRED — the merged card
+  // renders GOLD's balance only; the drawing, counts and honesty rules
+  // are unchanged.
+  const b = copy.signals.balance;
+  const metal = 'gold' as const;
+  const rtl = numberLocale === 'fa-IR';
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  /* R9-03 (v8): the v6 "+{n} more" list-expansion state is RETIRED —
+   * every factor chip renders on its pan; there is nothing to expand. */
+
+  /* Model-level reads (pure — an empty driver list yields the level
+   * balance, so every hook below keeps its call order unconditional).
+   * S6 (BD-S6a): the side loads + the ONE animated θ moved INTO the
+   * extracted BalanceStage (the drawing owns its mechanics); the card
+   * keeps the reads its verdict block + gauge aria need. */
+  const counts = balanceCounts(drivers);
+  const verdict = balanceVerdictOf(counts);
+  /* The tilt from the fixed design-width arm (rule 5: the model math
+   * never depends on anything measured at runtime). */
+  const tilt = balanceTilt(counts, BALANCE_LH_PX);
+  /* v3 UI-40 (2026-10-20, kept through the v3 merge): fewer than 3
+   * readable conditions is NOT a reading — the beam stays level, the
+   * verdict word becomes the honest "not enough readable conditions"
+   * line and the gauge hides. The 2026-10-21c 3° floor still governs every
+   * non-sparse directional result (readable ≥ 3). */
+  const sparse = counts.readable < 3;
+
+  /* GB-S4: the VISUAL root's measured width — drives the size steps
+   * (s/m/l by the card's own width, the reference prototype's rule) and
+   * the stage width (min(root, 720)). S6: the shared measurement hook
+   * (useBalanceVisualRootWidth — one code path with the Gold page's
+   * classic view; the same default + threshold, verbatim). */
+  const [visualRootEl, visualRootW] = useBalanceVisualRootWidth();
+
+  /* GB-S4 (05 §4.3/§4.6): pressing a WEIGHT opens its lane's ledger row
+   * and scrolls it to the centre — the row button receives focus after
+   * the row renders (the pending-focus effect below). Declared with the
+   * other hooks, BEFORE the empty-driver guard (the hooks order must be
+   * unconditional); the effect simply no-ops when nothing is pending. */
+  const pendingRowFocus = useRef<string | null>(null);
+  useEffect(() => {
+    const key = pendingRowFocus.current;
+    if (key === null) return;
+    pendingRowFocus.current = null;
+    const btn = document.getElementById(`gold-balance-row-btn-${key}`);
+    if (btn === null) return;
+    const reduced =
+      typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof (btn as HTMLElement).scrollIntoView === 'function') {
+      btn.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+    }
+    (btn as HTMLElement).focus({ preventScroll: true });
+  }, [openKey]);
+
+  if (drivers.length === 0) return null;
+  const verdictWord = balanceVerdictWordOf(counts, copy);
+  const parts = countLineParts(counts, copy, numberLocale);
+  const ariaLabel = interpolate(b.aria, { summary: parts.join(' · '), verdict: verdictWord });
+  /* The gauge's text equivalent (addendum §B: never colour alone) — the
+   * whole mechanical drawing is one role="img" whose label states the
+   * beam tilt and the verdict; the stage itself decides whether the
+   * gauge is available (hidden when nothing could be read). */
+  const gaugeAria = interpolate(b.gaugeAria, {
+    n: formatNumber(tilt.angleDeg, numberLocale, { maximumFractionDigits: 0 }),
+    verdict: verdictWord,
+  });
+
+  const toggle = (key: string): void => setOpenKey((prev) => (prev === key ? null : key));
+
+  /** Opens a lane's ledger row from a WEIGHT (scroll + focus ride the
+   * pending-focus effect declared with the hooks above). DOM order keeps
+   * the tab order pan weights → tray weights → ledger rows (03 §5). */
+  const openLaneFromWeight = (key: string): void => {
+    setOpenKey(key);
+    pendingRowFocus.current = key;
+  };
+
+  /* S6 (BD-S6a): the narrow stage copy the extracted drawing reads —
+   * the corpus's own strings, so the card's markup is unchanged. */
+  const stageCopy: BalanceStageCopy = {
+    sideFor: b.sideFor,
+    sideAgainst: b.sideAgainst,
+    listEmptyFor: b.listEmptyFor,
+    listEmptyAgainst: b.listEmptyAgainst,
+    listEmptyNone: b.listEmptyNone,
+    laneChipAria: b.laneChipAria,
+    splitBadge: b.splitBadge,
+    sideWords: copy.signals.conditionStateShort,
+    trayTitle: b.trayTitle,
+    trayNote: b.trayNote,
+    trayEmpty: b.trayEmpty,
+  };
+  /** The weight → ledger-row wiring (the card's own rows). */
+  const weightAriaOf = (key: string): BalanceStageWeightAria => ({ expanded: openKey === key, controls: `gold-balance-row-${key}` });
+
+/* ---------------------------------------------------------------- *
+ * GB-S4 — THE VISUAL REDESIGN (05-VISUAL-DESIGN-SPEC.md, from the
+ * owner-approved reference prototype) — since the GB-S6 flip THE
+ * balance for every visitor (the legacy branch retired with the
+ * flag). Layout, top to bottom (05 §4.1): the head (eyebrow → title →
+ * subtitle), the brass STAGE (the extracted BalanceStage, S6), the
+ * VERDICT block (the hero), the context pill, the banner, the
+ * "Not leaning" tray (the extracted BalanceTray), the LEDGER (the
+ * detail panel, inline — one row open at a time), the footnote.
+ * ---------------------------------------------------------------- */
 
   /** The LEDGER row's member list — the shared panel's CONTENT contract
    * (03 §3) in the inline look (05 §4.6): dot, name, evidence + value
@@ -938,9 +1243,9 @@ export function BalanceScale({
     return { text, side: d.state };
   };
 
-  /** The tray holds the neutral AND the unread lane weights (05 §4.5)
-   * — the unread ones wear the dotted rim. */
-  const trayLanes = [...neutralChips, ...unreadChips];
+  /* The root's size step (the CSS reads [data-size]; the drawing itself
+   * derives its geometry inside the extracted stage). */
+  const vSize = balanceVisualSizeOf(visualRootW);
 
   return (
     <div
@@ -964,153 +1269,21 @@ export function BalanceScale({
           {subtitle ?? b.subtitle}
         </p>
       </header>
-      {/* 2. THE STAGE: the mechanical layer (one svg — column, base,
-       * dial, hangers, the ONE rotated beam group, the needle, the
-       * hub) behind the two bowl pans. The whole drawing is one
-       * role="img" whose label is the gauge's text equivalent; the
-       * stage wrapper carries the group label. */}
-      <div
-        className="bal-stage"
-        data-balance-stage
-        role="group"
-        aria-label={ariaLabel}
-        style={{ height: `${vm.stageH}px` }}
-      >
-        <svg
-          data-balance-mech
-          className="bal-mech"
-          viewBox={`0 0 ${r2(vm.stageWidth)} ${r2(vm.stageH)}`}
-          role={gaugeAvailable ? 'img' : undefined}
-          aria-label={gaugeAvailable ? gaugeAria : undefined}
-          aria-hidden={gaugeAvailable ? undefined : true}
-        >
-          <defs>
-            <linearGradient id="bal-beam-brass" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--bal-brass-hi)" />
-              <stop offset="50%" stopColor="var(--bal-brass-mid)" />
-              <stop offset="100%" stopColor="var(--bal-brass-lo)" />
-            </linearGradient>
-          </defs>
-          {/* The contact shadow + the tapered column + the rounded
-           * foot (static — the instrument's stand). */}
-          <ellipse cx={r2(vCx)} cy={r2(vm.stageH - 16)} rx={s ? 50 : 68} ry={7} fill="rgba(91,61,8,.18)" />
-          <path
-            d={`M ${r2(vCx - 5)} ${r2(vm.pivotY + 10)} L ${r2(vCx + 5)} ${r2(vm.pivotY + 10)} L ${r2(vCx + 9)} ${r2(vm.stageH - 26)} L ${r2(vCx - 9)} ${r2(vm.stageH - 26)} Z`}
-            fill="url(#bal-beam-brass)"
-            opacity={0.95}
-          />
-          <rect x={r2(vCx - (s ? 44 : 58))} y={r2(vm.stageH - 26)} width={s ? 88 : 116} height={12} rx={6} fill="url(#bal-beam-brass)" />
-          {/* The dial: 11 ticks (centre longer) over a ±35° arc. */}
-          {dialTicks.map((t) => (
-            <line
-              key={t.t}
-              data-balance-dial-tick={t.t}
-              x1={t.x1}
-              y1={t.y1}
-              x2={t.x2}
-              y2={t.y2}
-              stroke="var(--color-text-tertiary)"
-              strokeWidth={t.t === 0 ? 1.6 : 1}
-              strokeLinecap="round"
-              opacity={t.t === 0 ? 0.9 : 0.55}
-            />
-          ))}
-          <path d={dialArc} fill="none" stroke="var(--color-border)" strokeWidth={1} />
-          {/* The hangers — redrawn per frame from the rotated joints. */}
-          {visualHangers('for')}
-          {visualHangers('against')}
-          {/* THE BEAM GROUP — rotate(θ, pivotX, pivotY): the tapered
-           * brass bar with its highlight line + the two side rings.
-           * The one and only transform in the drawing. */}
-          <g data-balance-beam data-tilt={String(targetDeg)} transform={`rotate(${r2(vf.beamDeg)} ${r2(vCx)} ${r2(vm.pivotY)})`}>
-            <g transform={`translate(${r2(vCx)} ${r2(vm.pivotY)})`}>
-              <path data-balance-beam-bar d={beamPath} fill="url(#bal-beam-brass)" stroke="var(--bal-brass-lo)" strokeWidth={0.6} />
-              <path
-                d={`M ${r2(-vm.L / 2 + 6)} ${r2(-1.6 * bh)} L ${r2(vm.L / 2 - 6)} ${r2(-1.6 * bh)}`}
-                fill="none"
-                stroke="rgba(255,255,255,.55)"
-                strokeWidth={1}
-                strokeLinecap="round"
-              />
-            </g>
-            <circle data-balance-bead="for" cx={r2(vCx - vm.L / 2)} cy={r2(vm.pivotY)} r={7} fill="var(--color-surface)" stroke={leftEndColor} strokeWidth={3} />
-            <circle data-balance-bead="against" cx={r2(vCx + vm.L / 2)} cy={r2(vm.pivotY)} r={7} fill="var(--color-surface)" stroke={rightEndColor} strokeWidth={3} />
-          </g>
-          {/* The needle — a 3× magnified readout over the dial (a 3°
-           * lean stays legible); hidden when nothing could be read. */}
-          {gaugeAvailable ? (
-            <line
-              data-balance-needle
-              x1={r2(vCx)}
-              y1={r2(vm.pivotY)}
-              x2={r2(vCx + (vm.dialR - 3) * Math.sin(radOf(vf.needleDeg)))}
-              y2={r2(vm.pivotY - (vm.dialR - 3) * Math.cos(radOf(vf.needleDeg)))}
-              stroke="var(--color-text-primary)"
-              strokeWidth={2}
-              strokeLinecap="round"
-            />
-          ) : null}
-          {/* The brass hub caps it: the hub, its dark centre, the
-           * specular dot. */}
-          <circle cx={r2(vCx)} cy={r2(vm.pivotY)} r={vm.hubR} fill="url(#bal-face-brass)" stroke="var(--bal-brass-lo)" strokeWidth={1} />
-          <circle cx={r2(vCx)} cy={r2(vm.pivotY)} r={s ? 3.6 : 4.4} fill="var(--color-text-primary)" />
-          <circle cx={r2(vCx - 1.2)} cy={r2(vm.pivotY - 1.4)} r={1.2} fill="rgba(255,255,255,.7)" />
-        </svg>
-        {/* The two bowl pans — absolutely positioned at their rest
-         * centres, translated ONLY vertically by their joints' drops
-         * (they hang plumb; the hangers' angles change instead). */}
-        {(['for', 'against'] as const).map((side) => {
-          const blocks = side === 'for' ? forBlocks : againstBlocks;
-          const drop = side === 'for' ? vf.forDrop : vf.againstDrop;
-          const centreX = side === 'for' ? vf.forCentreX : vf.againstCentreX;
-          return (
-            <div
-              key={side}
-              data-balance-assembly={side}
-              data-balance-pan={side}
-              className={`bal-pan ${side === 'for' ? 'bal-pan-for' : 'bal-pan-against'}`}
-              style={{
-                width: `${vm.pw}px`,
-                height: `${vm.panH}px`,
-                left: `${r2(centreX - vm.pw / 2)}px`,
-                top: `${vm.pivotY + vm.hanger}px`,
-                transform: `translate(0px, ${r2(drop)}px)`,
-              }}
-            >
-              <div className="bal-pan-cap">
-                <IconImg src={side === 'for' ? DIRECTION_UP_URL : DIRECTION_DOWN_URL} size={14} className="shrink-0" />
-                <span>{side === 'for' ? b.sideFor : b.sideAgainst}</span>
-              </div>
-              {blocks.length > 0 ? (
-                <div className="bal-weights">
-                  {blocks.map((d) => (
-                    <BalanceWeight
-                      key={d.key}
-                      laneKey={d.key}
-                      label={d.label}
-                      ariaLabel={laneChipAriaOf(d)}
-                      members={d.members ?? []}
-                      side={side}
-                      split={d.split}
-                      splitBadge={b.splitBadge}
-                      onOpen={() => openLaneFromWeight(d.key)}
-                      ariaExpanded={openKey === d.key}
-                      ariaControls={`gold-balance-row-${d.key}`}
-                      widthPx={vm.weightW}
-                      discPx={vm.discPx}
-                      testKey={d.key}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="bal-pan-empty" data-balance-empty={side}>
-                  {emptyLineOf(side)}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {/* 2. THE STAGE (05 §4.2 — the extracted BalanceStage, S6): the
+       * mechanical layer (one svg — column, base, dial, hangers, the
+       * ONE rotated beam group, the needle, the hub) behind the two
+       * bowl pans, every firing lane resting on its pan as a weight.
+       * The same drawing the Gold page's classic view renders. */}
+      <BalanceStage
+        drivers={drivers}
+        copy={stageCopy}
+        numberLocale={numberLocale}
+        rootWidth={visualRootW}
+        stageAria={ariaLabel}
+        gaugeAria={gaugeAria}
+        onWeightOpen={openLaneFromWeight}
+        weightAriaOf={weightAriaOf}
+      />
       {/* 3. THE VERDICT BLOCK — the hero (05 §4.4): eyebrow, the
        * verdict word, the lane strip, the counts line, the sparse
        * note, the context pill. */}
@@ -1134,39 +1307,16 @@ export function BalanceScale({
         {contextLine}
       </div>
       {banner}
-      {/* 4. THE "NOT LEANING" TRAY (05 §4.5): one recessed well for
-       * the neutral and unread lane weights; empty when every lane
-       * sits on a pan. */}
-      <div className="bal-tray" data-balance-tray="not-leaning">
-        <div className="bal-tray-head">
-          <span className="bal-tray-title">{b.trayTitle}</span>
-          <span className="bal-tray-note">{b.trayNote}</span>
-        </div>
-        {trayLanes.length > 0 ? (
-          <div className="bal-weights">
-            {trayLanes.map((d) => (
-              <BalanceWeight
-                key={d.key}
-                laneKey={d.key}
-                label={d.label}
-                ariaLabel={laneChipAriaOf(d)}
-                members={d.members ?? []}
-                side={d.state}
-                split={d.split}
-                splitBadge={b.splitBadge}
-                onOpen={() => openLaneFromWeight(d.key)}
-                ariaExpanded={openKey === d.key}
-                ariaControls={`gold-balance-row-${d.key}`}
-                widthPx={s ? 72 : 92}
-                discPx={s ? 42 : 46}
-                testKey={d.key}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="bal-tray-empty">{b.trayEmpty}</p>
-        )}
-      </div>
+      {/* 4. THE "NOT LEANING" TRAY (05 §4.5 — the extracted BalanceTray,
+       * S6): one recessed well for the neutral and unread lane weights;
+       * empty when every lane sits on a pan. */}
+      <BalanceTray
+        drivers={drivers}
+        copy={stageCopy}
+        rootWidth={visualRootW}
+        onWeightOpen={openLaneFromWeight}
+        weightAriaOf={weightAriaOf}
+      />
       {/* 5. THE LEDGER (05 §4.6): four expandable rows, one per lane —
        * the detail panel, inline. One row open at a time; the chevron
        * rotates 200ms; opening from a weight scrolls the row to the
