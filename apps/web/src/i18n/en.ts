@@ -864,6 +864,178 @@ export const en = {
       purpose: 'The state of world equities at a glance, plus the world’s risk backdrop.',
       summary:
         'The world-index map (16 country indexes, reused from today’s Insights page), Asia · Europe · Americas region grids with correction/bear statuses, and the world risk & liquidity cards.',
+      /* ---- S7 (2026-11-08): the World Markets page's own copy (spec §6,
+       * D-43 · D-47). The verdict + status + naming vocabulary below is
+       * pinned byte-for-byte to the insights copy corpus (markets.* /
+       * indicators / units / ui / signals.band) by
+       * world-markets-copy-pin.test.ts — the page speaks the section's
+       * own language, never a parallel vocabulary (D-48). Generic page
+       * words (dataAsOf · fromCache · absentLine) REUSE pd.global's own
+       * pinned keys. The fresh words (the rule line, the bear line, the
+       * range-position labels, the section headings) are queued unreviewed
+       * in the Persian copy manifest. */
+      loadingLine: 'Reading the world’s markets…',
+      errorTitle: 'The World Markets page is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      /* ---- The hero's status summary (spec §6 item 1: the §5.3 signal
+       * + the RAW counts + the stated rule). The verdict words, the
+       * measure labels, the correction-count and below-high lines are the
+       * corpus's own, pinned. */
+      statusAria: 'World stock markets status',
+      verdictAria: 'World stock markets verdict: {label}, step {step} of 4',
+      verdictBullish: 'Bullish',
+      verdictMixed: 'Mixed',
+      verdictBearish: 'Bearish',
+      measureNormal: 'Stock markets: near their yearly highs',
+      measureAttention: 'Stock markets: several well below their highs',
+      measureUnusual: 'Stock markets: far below their highs',
+      inCorrectionCount: '{n} of {count} markets in correction',
+      belowHighLine: '{n} of {count} indices are at least 10% below their 52-week high',
+      bearLine: '{n} of those are in a bear market — at least 20% below.',
+      ruleLine:
+        'Needs attention when {attention}+ of {count} markets are 10% or more below their 52-week high, unusual at {unusual}+; the S&P 500 or Nasdaq 100 alone can raise the level.',
+      /* ---- The map adapter: the corpus's own markets.map block +
+       * per-index naming, pinned byte-for-byte (the SAME drawing speaks
+       * the SAME words as the legacy card — the WorldMapCopy contract). */
+      map: {
+        periodSwitchAria: 'Choose the period shown on the map',
+        periodToday: 'Today',
+        periodWeek: '1 week',
+        periodMonth: '1 month',
+        periodYear: '1 year',
+        period3M: '3 months',
+        period5Y: '5 years',
+        periodWordToday: 'today',
+        periodWordWeek: 'this week',
+        periodWordMonth: 'this month',
+        periodWordYear: 'this year',
+        periodWord3M: 'over the past 3 months',
+        periodWord5Y: 'over the past 5 years',
+        open: 'Open',
+        closed: 'Closed',
+        noData: 'No data',
+        oldData: 'Old data',
+        stepFall: 'Fall',
+        stepFlat: 'Flat',
+        stepRise: 'Rise',
+        cellD: '1D',
+        cellW: '1W',
+        cellM: '1M',
+        cellY: '1Y',
+        cell3M: '3M',
+        cell5Y: '5Y',
+        legendMoreDown: 'Bigger fall',
+        legendMoreUp: 'Bigger rise',
+        showingFrom: 'Showing data from {time}',
+        srContext: '{country}, {step}',
+        srPerf: 'performance:',
+        srVal: 'last close',
+        cardNameSsec: 'Shanghai',
+        cardNameStoxx: 'Stoxx 50',
+        cardNameTsx: 'S&P/TSX',
+        cardNameNdx: 'Nasdaq',
+        countryNames: {
+          us: 'USA',
+          ca: 'Canada',
+          br: 'Brazil',
+          gb: 'UK',
+          fr: 'France',
+          de: 'Germany',
+          eu: 'Eurozone',
+          in: 'India',
+          hk: 'Hong Kong',
+          cn: 'China',
+          tw: 'Taiwan',
+          kr: 'S. Korea',
+          jp: 'Japan',
+          au: 'Australia',
+        },
+      },
+      /* The 16 index names + countries (the corpus's own, pinned). */
+      entries: {
+        n225: { name: 'Nikkei 225', latin: 'Nikkei 225', country: 'Japan' },
+        asx200: { name: 'ASX 200', latin: 'ASX 200', country: 'Australia' },
+        kospi: { name: 'KOSPI', latin: 'KOSPI', country: 'South Korea' },
+        hsi: { name: 'Hang Seng', latin: 'Hang Seng', country: 'Hong Kong' },
+        ssec: { name: 'Shanghai Composite', latin: 'Shanghai Composite', country: 'China' },
+        taiex: { name: 'TAIEX', latin: 'TAIEX', country: 'Taiwan' },
+        nifty50: { name: 'Nifty 50', latin: 'Nifty 50', country: 'India' },
+        stoxx50: { name: 'Euro Stoxx 50', latin: 'Euro Stoxx 50', country: 'Eurozone' },
+        dax: { name: 'DAX', latin: 'DAX', country: 'Germany' },
+        cac: { name: 'CAC 40', latin: 'CAC 40', country: 'France' },
+        ftse: { name: 'FTSE 100', latin: 'FTSE 100', country: 'United Kingdom' },
+        sp500: { name: 'S&P 500', latin: 'S&P 500', country: 'United States' },
+        ndx: { name: 'Nasdaq 100', latin: 'Nasdaq 100', country: 'United States' },
+        dow: { name: 'Dow Jones', latin: 'Dow Jones', country: 'United States' },
+        tsx: { name: 'S&P/TSX Composite', latin: 'S&P/TSX', country: 'Canada' },
+        ibov: { name: 'Ibovespa', latin: 'Ibovespa', country: 'Brazil' },
+      },
+      /* ---- The region grids (spec §6 item 2). The column headers, the
+       * trend + status words, the delayed tag and the local-currency
+       * note are the corpus's own, pinned; the range-position labels are
+       * fresh (the legacy table showed the from-high distance as a
+       * number — the grid adds the range-position visual). */
+      groups: {
+        asia: 'Asia-Pacific',
+        europe: 'Europe',
+        americas: 'Americas',
+      },
+      gridsAria: 'The region grids — Asia, Europe, Americas',
+      gridsHeading: 'By region',
+      regionTableLabel: '{group} indices',
+      thMarket: 'Market',
+      thToday: 'Today',
+      thWeek: '1 week',
+      thMonth: '1 month',
+      th3m: '3 months',
+      thYear: '1 year',
+      thRange52w: '52-wk range position',
+      thTrend: '3m trend',
+      thStatus: 'Status',
+      trendUp: 'Up',
+      trendFlat: 'Flat',
+      trendDown: 'Down',
+      statusNearHigh: 'Near its high',
+      statusPullback: 'Pullback',
+      statusCorrection: 'Correction',
+      statusBear: 'Bear market',
+      rangeSr: '{p} percent of its 52-week range',
+      delayedTag: 'Delayed',
+      localCurrencyNote: 'Returns in each market’s local currency.',
+      /* ---- The world risk & liquidity section (spec §6 item 3 — the 9
+       * placement homes). The card names, the unit words, the position +
+       * band words and the status words are the corpus's own, pinned;
+       * the section heading + intro are fresh. */
+      riskAria: 'World risk and liquidity',
+      riskTitle: 'World risk & liquidity',
+      riskIntro: 'The risk backdrop behind world markets: geopolitical tension, and the money the biggest central banks create.',
+      cardNames: {
+        'gpr-index': 'Geopolitical Risk Index',
+        'gpr-threats': 'Geopolitical Risk — threats',
+        'gpr-acts': 'Geopolitical Risk — acts',
+        'gpr-daily': 'Geopolitical Risk (7-day average)',
+        'gpr-russia': 'Geopolitical Risk — Russia',
+        'gpr-ukraine': 'Geopolitical Risk — Ukraine',
+        'gpr-israel': 'Geopolitical Risk — Israel',
+        'gpr-saudi': 'Geopolitical Risk — Saudi Arabia',
+        'global-liquidity': 'Global liquidity (Fed + ECB + BoJ)',
+      },
+      unitIndex: 'index',
+      unitUsdTr: 'trillion',
+      unitUsd: 'US$',
+      positionLow: 'low',
+      positionTypical: 'typical',
+      positionHigh: 'high',
+      positionWordLine: '{word} · {band}',
+      bandTop: 'top {p}%',
+      bandMid: 'the middle',
+      bandBottom: 'bottom {p}%',
+      statusWarning: 'Needs attention',
+      statusStale: 'Old data',
+      statusCheckPending: "Can't tell right now",
+      statusUnavailable: "Can't tell right now",
+      valueUnavailable: 'Cannot read yet',
     },
     usa: {
       title: 'USA',

@@ -992,6 +992,18 @@ const BUDGETS = [
   // Measured 31.23/8.06 — ~2.8 kB raw headroom under 34, gz ~0.9 under
   // 9. The entry chunk is untouched at 269.00/81.45.
   { pattern: /^GoldPage-[\w-]+\.js$/, raw: 34_000, gz: 9_000, label: 'Gold page lazy chunk (page-division S5)' },
+  // Page-division S7 (2026-11-08): the World Markets route — the D-43
+  // map hero + the region grids + the 9 world-risk cards. Measured
+  // 26.53/6.49 at first build: the REUSED WorldMap module tree
+  // (WorldMap + briefing + session + geo/config) moved to the SHARED
+  // src-* chunk both the Insights route and this page load (the Insights
+  // chunk shrank 1569.16 → 1553.03 kB through the sharing — the map's
+  // bytes are paid once, not per route), so the page's own chunk carries
+  // only the lean views + the pure derivations + the pd.worldMarkets
+  // copy. The entry chunk gains only the lazy wiring (269.00/81.45 →
+  // 269.32/81.55 vs 296/89.5). Ceiling 30/8 per the tight convention
+  // (~3.5 kB raw / ~1.5 kB gz headroom).
+  { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 30_000, gz: 8_000, label: 'World Markets page lazy chunk (page-division S7)' },
 ];
 
 function main() {

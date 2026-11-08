@@ -57,11 +57,17 @@ const GlobalPage = lazy(() => import('./routes/page-division/GlobalPage').then((
 // meter (D-26…D-29). Lazy like the Global route (the engine modules ride
 // the chunk; the entry graph stays untouched).
 const GoldPage = lazy(() => import('./routes/page-division/GoldPage').then((m) => ({ default: m.GoldPage })));
+// Page-division S7 (2026-11-08): the World Markets page — the D-43 map
+// hero + the region grids + the world risk cards. Lazy like the Gold
+// route (the WorldMap module + the pure derivations ride the chunk; the
+// entry graph stays untouched).
+const WorldMarketsPage = lazy(() =>
+  import('./routes/page-division/WorldMarketsPage').then((m) => ({ default: m.WorldMarketsPage })),
+);
 
-/** The seven destination routes that still share the placeholder chunk
- *  (S5: /gold left the set — its page build landed). */
+/** The six destination routes that still share the placeholder chunk
+ *  (S7: /world-markets left the set — its page build landed). */
 const DESTINATION_ROUTES: ReadonlySet<string> = new Set([
-  '/world-markets',
   '/currencies',
   '/commodities',
   '/usa',
@@ -218,13 +224,15 @@ export function App() {
         <ErrorBoundary>
           {/* Page-division S3 (D-20/D-46): `/` is the Global world scan —
               the D-21 verdict board, built on the S2 projection contract;
-              S5 (D-26…D-29): `/gold` is the Gold conditions meter; the
-              seven remaining destinations share one lazy placeholder
+              S5 (D-26…D-29): `/gold` is the Gold conditions meter;
+              S7 (D-43/D-47): `/world-markets` is the World Markets page;
+              the six remaining destinations share one lazy placeholder
               chunk; the Converter lives at /converter unchanged. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
             {route === '/' ? <GlobalPage /> : null}
             {route === '/gold' ? <GoldPage /> : null}
+            {route === '/world-markets' ? <WorldMarketsPage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}
