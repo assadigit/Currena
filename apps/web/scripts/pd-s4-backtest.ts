@@ -47,7 +47,7 @@
  * Agent Rule 6; the token is NEVER written to the repo).
  */
 
-import type { FxSnapshot, InsightsSnapshot, MarketsSnapshot, PageProjection, TicSnapshot } from '@currena/core';
+import type { FxSnapshot, InsightsSnapshot, MarketsSnapshot, TicSnapshot } from '@currena/core';
 import { FxSnapshotSchema, InsightsSnapshotSchema, MarketsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { buildOverallNarrationState, stateHashOf } from '@currena/insights/narrator';
 import { backtestGlobalTiles } from '../src/routes/page-division/global-backtest-core';

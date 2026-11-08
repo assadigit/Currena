@@ -74,9 +74,25 @@ export function buildLivePriceEntry(
   }
   const live = round2(quote.livePrice);
   if (!(live > 0)) throw new Error(`[prices] ${assetId}: non-positive live price`);
+  // S4 (2026-11-08, D-22's ribbon day change): the TRUE day change — the
+  // live quote vs the PREVIOUS SESSION'S CLOSE, i.e. the last series
+  // point STRICTLY BEFORE the quote's own bar (finance's universal
+  // "today's move" reference). NOT pointDaysBack(last.date, 1): the
+  // nearest point to yesterday is usually TODAY's own bar, which would
+  // measure the live quote against itself. When no earlier close exists
+  // the field stays ABSENT and the ribbon falls back to its labelled
+  // 7-day change (never a guess).
+  let prevClose: SeriesPoint | null = null;
+  for (let i = points.length - 2; i >= 0; i--) {
+    if (points[i]!.date < last.date) {
+      prevClose = points[i]!;
+      break;
+    }
+  }
   return {
     value: live,
     asOf: last.date,
+    change1d: pctChange(live, prevClose),
     change7d: pctChange(live, pointDaysBack(points, last.date, 7)),
     change30d: pctChange(live, pointDaysBack(points, last.date, 30)),
     // 2026-10-29: the quote's OWN symbol when it carries one (Brent names

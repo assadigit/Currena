@@ -68,6 +68,7 @@ function laterDate(a: string, b: string): string {
 interface ReadingPatch {
   value: number;
   asOf: string;
+  change1d?: number;
   change7d?: number;
   change30d?: number;
   sourceName: string;
@@ -81,6 +82,7 @@ function patchReading(reading: IndicatorReading, patch: ReadingPatch): Indicator
     ...reading,
     value: patch.value,
     asOf: patch.asOf,
+    ...(patch.change1d !== undefined ? { change1d: patch.change1d } : {}),
     ...(patch.change7d !== undefined ? { change7d: patch.change7d } : {}),
     ...(patch.change30d !== undefined ? { change30d: patch.change30d } : {}),
     sourceName: patch.sourceName,
@@ -91,10 +93,15 @@ function patchReading(reading: IndicatorReading, patch: ReadingPatch): Indicator
 }
 
 /** Keep the existing change fields when the live entry lacks its own (never removes information). */
-function mergedChanges(reading: IndicatorReading, live: { change7d?: number; change30d?: number }): { change7d?: number; change30d?: number } {
-  const out: { change7d?: number; change30d?: number } = {};
+function mergedChanges(
+  reading: IndicatorReading,
+  live: { change1d?: number; change7d?: number; change30d?: number },
+): { change1d?: number; change7d?: number; change30d?: number } {
+  const out: { change1d?: number; change7d?: number; change30d?: number } = {};
+  const c1 = live.change1d ?? reading.change1d;
   const c7 = live.change7d ?? reading.change7d;
   const c30 = live.change30d ?? reading.change30d;
+  if (c1 !== undefined) out.change1d = c1;
   if (c7 !== undefined) out.change7d = c7;
   if (c30 !== undefined) out.change30d = c30;
   return out;

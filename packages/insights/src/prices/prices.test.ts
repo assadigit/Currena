@@ -89,12 +89,17 @@ function boardReadings(): IndicatorReading[] {
  * ------------------------------------------------------------------ */
 
 describe('buildLivePriceEntry', () => {
-  it('computes the 7/30-day changes from the quote series (2 dp)', () => {
+  it('computes the 1/7/30-day changes from the quote series (2 dp)', () => {
     const e = buildLivePriceEntry('brent', { livePrice: 107.14, points: brentPoints() }, NOW);
     expect(e.value).toBe(107.14);
     expect(e.asOf).toBe('2026-10-12');
     expect(e.sourceSymbol).toBe('BZ=F');
     expect(e.updatedAt).toBe(NOW.toISOString());
+    // S4 (D-22's ribbon day change): the previous session's close — the
+    // last point STRICTLY before the quote's own bar — is 2026-10-09
+    // (value 114); today's own bar (2026-10-12@106) is NEVER the
+    // reference (the live quote is not measured against itself).
+    expect(e.change1d).toBe(round2(((107.14 - 114) / 114) * 100));
     // 7 days back from 2026-10-12 = 2026-10-05 → nearest point 2026-10-05 (value 112).
     expect(e.change7d).toBe(round2(((107.14 - 112) / 112) * 100));
     // 30 days back = 2026-09-12 → nearest point 2026-09-11 (value 102).
@@ -107,9 +112,20 @@ describe('buildLivePriceEntry', () => {
       { date: '2026-10-12', value: 101 },
     ];
     const e = buildLivePriceEntry('brent', { livePrice: 107.14, points: short }, NOW);
+    // S4: change1d DOES resolve here — the previous close (2026-10-11@100)
+    // sits 0 days from the 1-day-back target (2026-10-11).
+    expect(e.change1d).toBe(round2(((107.14 - 100) / 100) * 100));
     expect(e.change7d).toBeUndefined();
     expect(e.change30d).toBeUndefined();
     expect(e.value).toBe(107.14);
+  });
+
+  it('a single-point series leaves even the day change absent (never the last point against itself)', () => {
+    const solo: SeriesPoint[] = [{ date: '2026-10-12', value: 106 }];
+    const e = buildLivePriceEntry('brent', { livePrice: 107.14, points: solo }, NOW);
+    expect(e.change1d).toBeUndefined();
+    expect(e.change7d).toBeUndefined();
+    expect(e.change30d).toBeUndefined();
   });
 
   it('throws on an empty points list and on a non-positive live price', () => {
@@ -380,6 +396,32 @@ describe('mergeLivePricesIntoSnapshot', () => {
     expect(brent.updatedAt).toBe(live.generatedAt);
     // 'warning' is a voting verdict — the merge only heals freshness states.
     expect(brent.status).toBe('warning');
+  });
+
+  it('S4: the day change rides the merge — and an entry without change1d keeps the reading’s existing fields (never removes information)', () => {
+    // gold-usd's live entry carries the S4 day change.
+    const withDay = liveSnapshot({
+      'gold-usd': entry({ value: 4190.6, asOf: '2026-10-12', sourceSymbol: 'GC=F', change1d: 0.52 }),
+    });
+    const merged = mergeLivePricesIntoSnapshot(snapshotFixture(boardReadings()), withDay);
+    const gold = merged.readings.find((r) => r.id === 'gold-usd')!;
+    expect(gold.change1d).toBe(0.52);
+    // The stored pre-S4 shape (no change1d on the entry, none on the
+    // reading — the deployed writer has not caught up): nothing invented;
+    // the entry's own 7/30-day changes still ride.
+    const legacy = liveSnapshot({
+      'gold-usd': entry({ value: 4190.6, asOf: '2026-10-12', sourceSymbol: 'GC=F' }),
+    });
+    const mergedLegacy = mergeLivePricesIntoSnapshot(snapshotFixture(boardReadings()), legacy);
+    const goldLegacy = mergedLegacy.readings.find((r) => r.id === 'gold-usd')!;
+    expect(goldLegacy.change1d).toBeUndefined();
+    expect(goldLegacy.change7d).toBe(5.2);
+    // A reading that CARRIES a stored change1d keeps it when the live
+    // entry lacks its own (the mergedChanges fallback).
+    const stored = boardReadings();
+    stored[1] = { ...stored[1]!, change1d: 0.31 };
+    const mergedKeeps = mergeLivePricesIntoSnapshot(snapshotFixture(stored), legacy);
+    expect(mergedKeeps.readings.find((r) => r.id === 'gold-usd')!.change1d).toBe(0.31);
   });
 
   it('an equal-date live quote still wins (intraday freshness)', () => {

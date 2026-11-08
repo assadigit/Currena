@@ -57,6 +57,7 @@ export function livePriceEntriesEqual(a: LivePriceEntry, b: LivePriceEntry): boo
   return (
     a.value === b.value &&
     a.asOf === b.asOf &&
+    a.change1d === b.change1d &&
     a.change7d === b.change7d &&
     a.change30d === b.change30d &&
     a.sourceSymbol === b.sourceSymbol

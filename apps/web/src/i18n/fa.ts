@@ -616,6 +616,8 @@ export const fa: Dictionary = {
       ribbonBrent: 'برنت',
       ribbonBtc: 'بیت‌کوین',
       unitUsd: 'دلار',
+      ribbonWindowTag: '{days} روز',
+      changeOver1d: 'طی روز گذشته',
       changeOver: 'طی {days} روز گذشته',
       ribbonUnavailable: 'در دسترس نیست',
       dedollarShareLabel: 'سهم دلار از ذخایر ارزی جهان',
@@ -627,6 +629,8 @@ export const fa: Dictionary = {
       dotWatch: 'مراقبت',
       dotNoVerdict: 'فعلاً حکمی در این لایه نیست',
       narratorTitle: 'امروز چه تغییری کرد',
+      narratorUpdated: 'به‌روزرسانی‌شده {time}',
+      narratorUpdatedToday: 'امروز',
     },
     gold: {
       title: 'طلا',

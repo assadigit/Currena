@@ -40,7 +40,7 @@ import { globalDedollarTile, globalFxTile, globalGaugeTiles, globalGoldTile, glo
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
-  | { kind: 'ready'; projection: PageProjection; fromCache: boolean }
+  | { kind: 'ready'; projection: PageProjection }
   | { kind: 'error'; error: ApiError; cached: PageProjection | null };
 
 /** The boards' load states (the markets/fx discipline: last-good cache,
@@ -72,7 +72,7 @@ export function GlobalPage(): React.JSX.Element {
       .then((projection) => {
         if (settled) return;
         settled = true;
-        setState({ kind: 'ready', projection, fromCache: false });
+        setState({ kind: 'ready', projection });
       })
       .catch((err: unknown) => {
         if (settled) return;
@@ -165,7 +165,13 @@ export function GlobalPage(): React.JSX.Element {
 
   const projection: PageProjection | null =
     state.kind === 'ready' ? state.projection : state.kind === 'loading' || state.kind === 'error' ? state.cached : null;
-  const fromCache = state.kind === 'ready' && state.fromCache;
+  // S4 fix (found by the S4 characterization suite): the last-good label
+  // now rides EXACTLY the states that render a cached copy — the boot
+  // paint from localStorage while loading, and the outage path that keeps
+  // the last good copy when a refresh fails (the M-17 pattern: clearly
+  // labelled, never silent). The old `fromCache` flag was dead — never
+  // set — so the outage path painted unlabelled cached data.
+  const fromCache = state.kind !== 'ready' && projection !== null;
 
   /* ---------------- the data-as-of line (the H4/R12 pattern) ---------------- */
   const dataAsOf = useMemo(() => {

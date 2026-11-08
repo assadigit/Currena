@@ -1007,6 +1007,8 @@ export const IndicatorReadingSchema = z
      */
     periodStart: z.iso.date().optional(),
     periodEnd: z.iso.date().optional(),
+    /** 1-day change, same units — the LIVE quote vs the previous daily close (S4, 2026-11-08: D-22's ribbon day change); absent when not measurable. */
+    change1d: z.number().finite().optional(),
     /** 7-day change in `changeKind` units (pct or points); absent when not measurable. */
     change7d: z.number().finite().optional(),
     /** 30-day change, same units; absent when not measurable. */
@@ -2225,6 +2227,9 @@ export type TicSnapshot = z.infer<typeof TicSnapshotSchema>;
  *
  *   asOf          — the date of the quote's daily bar (the market's own
  *                   calendar, matching IndicatorReading.asOf semantics)
+ *   change1d      — the live value vs the PREVIOUS daily close (S4,
+ *                   D-22's ribbon day change — the true day change, not
+ *                   a closes-only pair)
  *   change7d/30d  — the live value vs the daily close ~7/30 days back
  *                   (percent, the tile rows' changeKind), rounded 2 dp
  *   sourceSymbol  — the Yahoo symbol the quote came from (e.g. 'BZ=F')
@@ -2241,6 +2246,8 @@ export const LivePriceEntrySchema = z.object({
   value: z.number().finite().positive(),
   /** Date of the latest daily bar the quote belongs to (YYYY-MM-DD). */
   asOf: z.iso.date(),
+  /** Live value vs the PREVIOUS daily close, percent (S4, 2026-11-08 — D-22's ribbon day change: the live hourly quote measured against the close one session back, computed where the daily series lives); absent when the window is too short. */
+  change1d: z.number().finite().optional(),
   /** Live value vs the daily close ~7 days back, percent; absent when the window is too short. */
   change7d: z.number().finite().optional(),
   /** Live value vs the daily close ~30 days back, percent; absent when the window is too short. */

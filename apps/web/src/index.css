@@ -169,6 +169,40 @@ body {
 .loader-dot:nth-child(2) { animation-delay: -0.16s; background: #7DD3C0; }
 .loader-dot:nth-child(3) { background: #F8A978; }
 
+/* S4 (2026-11-08, page-division): the loading dots respect reduced motion
+ * (mission §4 a11y) — the dots stay visible, only the bounce stops. Used
+ * by the Global page's honest loading line (and any other loader-dot
+ * surface; the class predates this rule with no reduced-motion guard). */
+@media (prefers-reduced-motion: reduce) {
+  .loader-dot { animation: none; }
+}
+
+/* S4 (2026-11-08, page-division): the mobile chips scroller's discoverability
+ * affordance — a soft inline-end fade that says “more this way” without a
+ * scrollbar. Direction-aware (LTR fades the right edge, RTL the left);
+ * retired at the sm breakpoint where the row wraps. Purely decorative —
+ * the chips' own accessible names never depend on it. */
+.chip-scroller { position: relative; }
+.chip-scroller::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  pointer-events: none;
+}
+[dir='ltr'] .chip-scroller::after {
+  right: 0;
+  background: linear-gradient(to right, transparent, var(--color-currena-bg-light));
+}
+[dir='rtl'] .chip-scroller::after {
+  left: 0;
+  background: linear-gradient(to left, transparent, var(--color-currena-bg-light));
+}
+@media (min-width: 640px) {
+  .chip-scroller::after { display: none; }
+}
+
 /* Skeleton shimmer — light uses dark-on-white, dark uses light-on-navy */
 @keyframes currena-shimmer {
   from { background-position: 200% 0; }

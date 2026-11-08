@@ -36,6 +36,7 @@ import {
 } from './global-tiles';
 import { DESTINATIONS } from './destinations';
 import type { NarrativeDoc } from '../../lib/narrative';
+import { formatRelativeShort } from '../../components/insights/world-markets/shared';
 
 /* ------------------------------------------------------------------ *
  * Local mirrors of the shared verdict vocabulary (cited, never forked):
@@ -89,7 +90,7 @@ function TileLink({
         e.preventDefault();
         navigate(href);
       }}
-      className="insights-focusable flex min-h-[44px] cursor-pointer flex-col justify-start gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2 no-underline ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] transition-shadow hover:shadow-[0_4px_16px_rgba(15,23,42,0.10)] sm:gap-1.5 sm:p-3 lg:min-h-[148px] lg:gap-2.5 lg:p-4"
+      className="insights-focusable flex min-h-[44px] cursor-pointer flex-col justify-start gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2 no-underline ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] motion-safe:transition-shadow hover:shadow-[0_4px_16px_rgba(15,23,42,0.10)] sm:gap-1.5 sm:p-3 lg:min-h-[148px] lg:gap-2.5 lg:p-4"
     >
       <h3 className="m-0 text-[9.5px] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)] sm:text-[length:var(--type-label)]">
         {title}
@@ -334,7 +335,15 @@ function RibbonAsset({ entry }: { entry: GlobalRibbonEntry }): React.JSX.Element
     reading !== null && reading !== undefined && reading.value !== null
       ? formatNumber(reading.value, numberLocale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
       : null;
-  const change = reading?.change7d;
+  // BD-S4a (S4, 2026-11-08 — the D-22 day-change call): the TRUE day
+  // change rides the live-prices entry (change1d — the live hourly quote
+  // vs the previous daily close, computed where the daily series lives).
+  // The writer lands with the next Worker deploy; until the stored prices
+  // key carries it, the ribbon shows the labelled 7-day change — the
+  // window is always VISIBLE (D-48's colour+label discipline applies to
+  // changes too: never a bare percent whose window the reader must guess).
+  const change = reading?.change1d ?? reading?.change7d;
+  const changeDays = reading?.change1d !== undefined ? 1 : 7;
   const changeTone =
     change === undefined ? '' : change > 0 ? 'text-[var(--color-return-up)]' : change < 0 ? 'text-[var(--color-return-down)]' : 'text-[var(--color-text-secondary)]';
   const unit = t('pd.global.unitUsd');
@@ -346,7 +355,7 @@ function RibbonAsset({ entry }: { entry: GlobalRibbonEntry }): React.JSX.Element
         e.preventDefault();
         navigate(RIBBON_HREF[entry.id]);
       }}
-      className="insights-focusable flex min-h-[28px] cursor-pointer items-center justify-between gap-1 rounded-[var(--radius-sm)] bg-currena-soft/50 px-1.5 py-1 no-underline ring-1 ring-[var(--color-border)]/60 transition-colors hover:bg-currena-soft lg:px-2"
+      className="insights-focusable flex min-h-[28px] cursor-pointer items-center justify-between gap-1 rounded-[var(--radius-sm)] bg-currena-soft/50 px-1.5 py-1 no-underline ring-1 ring-[var(--color-border)]/60 motion-safe:transition-colors hover:bg-currena-soft lg:px-2"
     >
       <span className="shrink-0 text-[9px] font-bold uppercase text-[var(--color-text-tertiary)] sm:text-[length:var(--type-caption)]">
         {t(RIBBON_LABEL_KEY[entry.id])}
@@ -361,7 +370,12 @@ function RibbonAsset({ entry }: { entry: GlobalRibbonEntry }): React.JSX.Element
           {change !== undefined ? (
             <bdi dir="ltr" className={`shrink-0 text-[9.5px] font-bold leading-none tabular-nums sm:text-[length:var(--type-caption)] ${changeTone}`}>
               {signedPct(change, numberLocale)}
-              <span className="sr-only"> {interpolate(t('pd.global.changeOver'), { days: formatNumber(7, numberLocale, { maximumFractionDigits: 0 }) })}</span>
+              {/* The VISIBLE window tag (S4: a bare percent never rides
+               * without its window) + the full words for screen readers. */}
+              <span className="ms-0.5 font-semibold text-[var(--color-text-tertiary)]">
+                {interpolate(t('pd.global.ribbonWindowTag'), { days: formatNumber(changeDays, numberLocale, { maximumFractionDigits: 0 }) })}
+              </span>
+              <span className="sr-only"> {changeDays === 1 ? t('pd.global.changeOver1d') : interpolate(t('pd.global.changeOver'), { days: formatNumber(changeDays, numberLocale, { maximumFractionDigits: 0 }) })}</span>
             </bdi>
           ) : null}
         </span>
@@ -512,7 +526,7 @@ function BoardLoadingTile({ title, feed }: { title: string; feed: string }): Rea
     >
       <h3 className="m-0 text-[9.5px] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)] sm:text-[length:var(--type-label)]">{title}</h3>
       <p className="m-0 flex items-center gap-1.5" role="status">
-        <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[var(--color-text-tertiary)]/60" />
+        <span className="inline-block h-2 w-2 motion-safe:animate-pulse rounded-full bg-[var(--color-text-tertiary)]/60" />
         <span className="text-[length:var(--type-label)] font-semibold text-[var(--color-text-tertiary)]">…</span>
       </p>
     </div>
@@ -590,7 +604,10 @@ export function RegionChips({
   };
   return (
     <nav aria-label={t('pd.global.chipsAria')} data-region-chips>
-      <ul className="m-0 flex list-none flex-nowrap gap-1.5 overflow-x-auto p-0 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:gap-2 sm:overflow-visible [&::-webkit-scrollbar]:hidden">
+      {/* S4: the mobile scroller gains the inline-end fade (index.css's
+       * .chip-scroller — both directions, LTR/RTL) so the row reads as
+       * scrollable at a glance; ≥sm the row wraps and the fade retires. */}
+      <ul className="chip-scroller m-0 flex list-none flex-nowrap gap-1.5 overflow-x-auto p-0 [-ms-overflow-style:none] [scrollbar-width:none] sm:flex-wrap sm:gap-2 sm:overflow-visible [&::-webkit-scrollbar]:hidden">
         {chips.map((d) => {
           const dot = dotFor(d.route);
           return (
@@ -603,7 +620,7 @@ export function RegionChips({
                   e.preventDefault();
                   navigate(d.route);
                 }}
-                className="insights-focusable inline-flex min-h-[36px] shrink-0 items-center gap-2 rounded-full bg-currena-soft px-3 py-1.5 text-[13px] font-bold text-currena-dark no-underline transition-all duration-300 hover:bg-currena-blue hover:text-white sm:px-3.5 sm:text-[length:var(--type-label)]"
+                className="insights-focusable inline-flex min-h-[36px] shrink-0 items-center gap-2 rounded-full bg-currena-soft px-3 py-1.5 text-[13px] font-bold text-currena-dark no-underline motion-safe:transition-all motion-safe:duration-300 hover:bg-currena-blue hover:text-white sm:px-3.5 sm:text-[length:var(--type-label)]"
               >
                 <ChipDot state={dot} />
                 {t(d.titleKey)}
@@ -622,6 +639,16 @@ export function RegionChips({
  * only when the doc is present AND (visible || the ?narrative=preview
  * marker) — the Insights route's own staged-rollout gate; a missing or
  * failed feed renders nothing (spec §11: nothing breaks).
+ *
+ * S4 display discipline (BD-S4b, 2026-11-08): the narrator's OWN TEXT
+ * renders VERBATIM — never edited, never sentence-suppressed, the
+ * template fallback's trailing not-advice sentence included (it reads
+ * oddly in a one-liner, but the narrator's words are the narrator's
+ * contract; the line-clamp keeps the space honest). What the line GAINS
+ * is the legacy NarrativeBlock's own freshness stamp — "Updated {time}"
+ * from the unit's generatedAt — so a visitor can always tell WHEN the
+ * "what changed today" line was written (the staleness story made
+ * visible, same-day generations collapsing to "today").
  * ------------------------------------------------------------------ */
 
 export function NarratorLine({
@@ -638,10 +665,29 @@ export function NarratorLine({
   return (
     <p
       data-narrator-line
+      data-narrator-source={doc.overall.source}
       className="m-0 rounded-[var(--radius-md)] bg-currena-soft/60 px-3 py-2 text-[11.5px] leading-snug text-currena-dark ring-1 ring-[var(--color-border)]/60 line-clamp-2 sm:px-4 sm:py-2.5 sm:text-[length:var(--type-label)] sm:leading-relaxed"
     >
       <span className="me-1.5 font-bold text-currena-blue">{t('pd.global.narratorTitle')}:</span>
       <bdi>{text}</bdi>
+      <span className="ms-1.5 whitespace-nowrap text-[var(--color-text-tertiary)]">
+        · {interpolate(t('pd.global.narratorUpdated'), { time: formatNarratorUpdated(doc.overall.generatedAt, locale, t) })}
+      </span>
     </p>
   );
+}
+
+/** The unit's generatedAt as the small "Updated {time}" stamp — the
+ *  legacy NarrativeBlock's own discipline verbatim: same-day (UTC)
+ *  generations collapse to the localized "today" word; anything older
+ *  rides the house short-date formatter. Never a live clock. */
+function formatNarratorUpdated(iso: string, locale: 'en' | 'fa', t: ReturnType<typeof useI18n>['t']): string {
+  const generated = new Date(iso);
+  if (Number.isNaN(generated.getTime())) return '';
+  const now = new Date();
+  const sameDay =
+    generated.getUTCFullYear() === now.getUTCFullYear() &&
+    generated.getUTCMonth() === now.getUTCMonth() &&
+    generated.getUTCDate() === now.getUTCDate();
+  return sameDay ? t('pd.global.narratorUpdatedToday') : formatRelativeShort(iso, locale);
 }

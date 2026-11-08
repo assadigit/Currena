@@ -632,11 +632,16 @@ export const en = {
       marketsBearish: 'Bearish',
       marketsInCorrection: '{n} of {total} in correction',
       marketsInBear: ' · {n} in a bear market',
-      /* The prices ribbon (D-22): gold · brent · BTC, live hourly. */
+      /* The prices ribbon (D-22): gold · brent · BTC, live hourly. S4
+       * (BD-S4a): every change carries its VISIBLE window tag — the true
+       * day change when the live entry provides change1d, else the
+       * labelled 7-day change. */
       ribbonGold: 'Gold',
       ribbonBrent: 'Brent',
       ribbonBtc: 'Bitcoin',
       unitUsd: 'US$',
+      ribbonWindowTag: '{days}d',
+      changeOver1d: 'over the past day',
       changeOver: 'over the past {days} days',
       ribbonUnavailable: 'Unavailable',
       /* The dedollarization context tile (D-25, display-only). */
@@ -649,8 +654,12 @@ export const en = {
       dotCalm: 'Calm',
       dotWatch: 'Watch',
       dotNoVerdict: 'No verdict at this layer yet',
-      /* The narrator line (D-24). */
+      /* The narrator line (D-24). S4 (BD-S4b): the text renders verbatim;
+       * the line carries the unit's own freshness stamp (the legacy
+       * NarrativeBlock's "Updated {time}" discipline). */
       narratorTitle: 'What changed today',
+      narratorUpdated: 'Updated {time}',
+      narratorUpdatedToday: 'today',
     },
     gold: {
       title: 'Gold',

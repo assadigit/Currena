@@ -158,8 +158,27 @@ function notFound(): Response {
   return jsonResponse({ error: { code: 'narrative_not_ready', message: 'not ready' } }, 404);
 }
 
+/** A visible narrative doc (the :50 artefact's served shape). */
+function narrativeDocFixture(visible = true): Record<string, unknown> {
+  return {
+    promptVersion: 9,
+    model: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+    generatedAt: '2026-11-08T01:50:18.070Z',
+    dataAsOf: '2026-11-07',
+    overall: {
+      stateHash: 'abc123',
+      en: 'Today’s verdicts: Global reads Stressed (11 of 37 in warning). This page explains the data and is not financial advice.',
+      fa: 'حکم‌های امروز صفحه: جهانی در وضعیت فشار است. این صفحه داده‌ها را ساده می‌کند و توصیهٔ مالی نیست.',
+      source: 'template',
+      generatedAt: new Date().toISOString(), // same-day → the “today” stamp
+    },
+    sections: {},
+    visible,
+  };
+}
+
 /** Route the stubbed fetch by URL — every feed the page asks for. */
-function stubFeeds(overrides: { markets?: () => Response; fx?: () => Response } = {}): void {
+function stubFeeds(overrides: { markets?: () => Response; fx?: () => Response; narrative?: () => Response } = {}): void {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
@@ -167,7 +186,7 @@ function stubFeeds(overrides: { markets?: () => Response; fx?: () => Response } 
       if (url.includes('/api/insights/pages/global')) return jsonResponse(projectionFixture());
       if (url.includes('/api/insights/markets')) return (overrides.markets ?? (() => jsonResponse(marketsFixture())))();
       if (url.includes('/api/insights/fx')) return (overrides.fx ?? (() => jsonResponse(fxFixture())))();
-      if (url.includes('/api/insights/narrative')) return notFound();
+      if (url.includes('/api/insights/narrative')) return (overrides.narrative ?? notFound)();
       return notFound();
     }),
   );
@@ -299,5 +318,116 @@ describe('GlobalPage', () => {
       expect(screen.getByText('The world scan is unavailable right now')).toBeTruthy();
     });
     expect(screen.getByText('Try again')).toBeTruthy();
+  });
+
+  /* ---------------------------------------------------------------- *
+   * S4 (2026-11-08) — the narrator wiring + the honesty surfaces
+   * ---------------------------------------------------------------- */
+
+  it('a visible narrative doc renders the D-24 line VERBATIM with its Updated stamp (same-day → today)', async () => {
+    stubFeeds({ narrative: () => jsonResponse(narrativeDocFixture(true)) });
+    render(<GlobalPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-narrator-line]')).not.toBeNull();
+    });
+    const line = document.querySelector('[data-narrator-line]')!;
+    // The narrator's OWN TEXT verbatim — the trailing not-advice sentence
+    // included (BD-S4b: never edited, never suppressed).
+    expect(line.textContent).toContain('This page explains the data and is not financial advice.');
+    // The freshness stamp rides the unit's own generatedAt.
+    expect(line.textContent).toContain('Updated today');
+    expect(line.getAttribute('data-narrator-source')).toBe('template');
+  });
+
+  it('a NON-visible doc without the preview marker renders NO narrator line (the staged-rollout gate)', async () => {
+    stubFeeds({ narrative: () => jsonResponse(narrativeDocFixture(false)) });
+    render(<GlobalPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-global-board] [data-tile]').length).toBe(10);
+    });
+    expect(document.querySelector('[data-narrator-line]')).toBeNull();
+  });
+
+  it('the absentIds honesty line renders when the projection reports absent readings', async () => {
+    const projection = projectionFixture();
+    projection.absentIds = ['wgc-etf-holdings', 'official-gold-demand'];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/global')) return jsonResponse(projection);
+        if (url.includes('/api/insights/markets')) return jsonResponse(marketsFixture());
+        if (url.includes('/api/insights/fx')) return jsonResponse(fxFixture());
+        return notFound();
+      }),
+    );
+    render(<GlobalPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-absent-note]')).not.toBeNull();
+    });
+    expect(document.querySelector('[data-absent-note]')?.textContent).toContain('2');
+    expect(document.querySelector('[data-absent-note]')?.textContent).toContain('not published');
+  });
+
+  it('a failed refresh with a cached copy keeps the board and shows the last-good label', async () => {
+    // First visit: a good projection lands in localStorage.
+    stubFeeds();
+    render(<GlobalPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-global-board] [data-tile]').length).toBe(10);
+    });
+    cleanup();
+    vi.unstubAllGlobals();
+    // A fresh page load (the module promise cache resets with the page).
+    clearProjectionCacheForTests();
+    // Second visit: the feed dies, the cached projection paints — labelled.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/global')) return jsonResponse({ error: { code: 'pages_unavailable', message: 'down' } }, 503);
+        if (url.includes('/api/insights/markets')) return jsonResponse(marketsFixture());
+        if (url.includes('/api/insights/fx')) return jsonResponse(fxFixture());
+        return notFound();
+      }),
+    );
+    render(<GlobalPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-global-board] [data-tile]').length).toBe(10);
+    });
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Showing the last good copy');
+    });
+  });
+
+  it('the ribbon carries VISIBLE window tags — the day change when change1d rides the reading, the 7-day otherwise', async () => {
+    const projection = projectionFixture();
+    // gold-usd gains the S4 day change (the live entry's change1d);
+    // brent/btc stay on their 7-day changes (the pre-deploy fallback).
+    projection.readings = projection.readings.map((r) =>
+      r.id === 'gold-usd' ? { ...r, change1d: 0.42 } : r,
+    );
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/global')) return jsonResponse(projection);
+        if (url.includes('/api/insights/markets')) return jsonResponse(marketsFixture());
+        if (url.includes('/api/insights/fx')) return jsonResponse(fxFixture());
+        return notFound();
+      }),
+    );
+    render(<GlobalPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-global-board] [data-tile]').length).toBe(10);
+    });
+    const gold = document.querySelector('[data-ribbon-asset="gold-usd"]')!;
+    expect(gold.textContent).toContain('+0.4%');
+    expect(gold.textContent).toContain('1d');
+    expect(gold.textContent).toContain('over the past day');
+    const brent = document.querySelector('[data-ribbon-asset="brent"]')!;
+    expect(brent.textContent).toContain('7d');
+    expect(brent.textContent).toContain('+1.2%');
+    expect(brent.textContent).toContain('over the past 7 days');
   });
 });
