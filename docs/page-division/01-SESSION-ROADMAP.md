@@ -116,7 +116,7 @@ sync + eval 50 · layer1 11,819/11,819 · **the suite 14,678 = +57 new**
 Not deployed (data-layer session — the Worker code changed but the deploy
 stays the owner's lever, unchanged from S1).
 
-### ☐ S3 — Global page build · `Session 3/30`
+### ✅ S3 — Global page build · `Session 3/30` · delivered 2026-11-08
 - The 10-tile verdict board (D-21), prices ribbon gold+brent+BTC (D-22),
   region chips with status dots (D-23), narrator line (D-24), dedollar
   context tile (D-25).
@@ -124,6 +124,61 @@ stays the owner's lever, unchanged from S1).
   explicit unread; ribbon shows live hourly values; chips link all 7
   destinations.
 - **Deliverable:** the landing page (D-20).
+
+**S3 delivery record (2026-11-08):** the landing page is REAL — `/` renders
+the D-21 board on the S2 contract (`fetchPageProjection('global')` + the
+markets/fx board attachments + the narrative client), with every verdict
+re-derived client-side through the SAME pure engines (never invented
+composites, D-48): `routes/page-division/global-tiles.ts` (the pure board
+arithmetic — gauge tiles via `GAUGES`/`labelForVerdictStep`, the Gold
+Balance via `goldBalance` + `goldOutlookOf`, the ribbon/dedollar readings,
+the markets verdict via `marketsVerdictStep`, the fx §9.3 active count) +
+`GlobalBoard.tsx`/`GlobalPage.tsx` (the tile views, the chips row, the
+narrator line, the load/error/unread states, the last-good projection
+cache). Two display-layer extractions landed verbatim with re-exports
+(zero behavior change, the old tests green untouched):
+`signals/outlook-core.ts` (the 7-state classifier) and
+`world-markets/verdict-core.ts` (the markets verdict arithmetic) — both
+needed lean-chunk-importable without the insights corpus's view modules.
+**Three build-session decisions, recorded (not D-numbers — owner
+ratification welcome, none blocking):** **BD-S3a** (the D-23 chip dots
+mirror REAL engine verdicts only — Markets ← the markets verdict,
+Currencies ← the fx signal; the four regions + commodities show the honest
+neutral "no verdict at this layer yet" dot until their pages' own verdicts
+exist, because averaging gauges/voters into a chip status would be an
+invented composite, D-48); **BD-S3b** (the gauge tiles' links: the four
+US-framed gauges → `/usa` where D-30's verdict strip tops the page, Dollar
+Strength → `/currencies`, its detail cards' home by D-32); **BD-S3c** (the
+mobile board is 2-col, not the spec §4 sketch's 1-col — ten verdict tiles
+cannot fit 844px in one column without clipping, and D-11's zero-scroll
+rule outranks the sketch; the ribbon rides as a regular row-layout tile).
+**One honest deviation, recorded:** D-22's "day change" — the projection's
+readings carry `change7d`/`change30d` (the live-merge fields) but NO
+day-change field, so the ribbon shows the live value + the labelled
+7-day change (screen-reader words included); a true day change needs the
+history endpoint (3 extra fetches on the landing page) — S4's call, never
+a silent guess. **One live defect found in dev and fixed:** the projection
+client's promise cache poisoned later callers when one caller aborted
+(React StrictMode's double-mount froze the page at loading forever) —
+signal-carrying calls now bypass the cache and the page owns cancellation
+via settled flags (the S3 test suite pins the paths). **The copy:** ~66
+new `pd.global.*` keys (en+fa) with the verdict WORDS pinned
+byte-for-byte to the insights corpus by `global-copy-pin.test.ts` (both
+locales — one verdict language everywhere, D-48); 62 new fa strings
+queued unreviewed in the Persian copy manifest (+2 retired S1 keys
+removed). **Gates ALL GREEN (2m13s: secret scan 8/914 · tsc 6/6 · lint
+0/0 · copy:audit clean · narrator in sync + eval 50 · layer1
+11,819/11,819 · the suite **14,715 = +37** (global-tiles 19 · copy-pin
+11 · GlobalPage characterization 7) · build + budgets held — entry
+268.73/81.36, Insights 1592.34/368.99, **the new GlobalPage chunk
+31.89/9.41 vs its new 36/11 budget row**). Browser-verified live (the
+remote-dev Worker over real KV): one screen at 1440×900 AND 360×844 in
+BOTH en and fa (RTL, Persian digits), every tile carrying its verdict or
+unread state, the ribbon's live hourly values, all 7 chip links, the
+narrator's real :50 artefact, the A11y tree naming every tile + chip dot
+state, and a VLM visual review pass (which caught the first build's
+Bitcoin-clipping ribbon — fixed to the row layout). Not deployed (the
+Worker code is unchanged since S2; the deploy stays the owner's lever).
 
 ### ☐ S4 — Global gates & polish · `Session 4/30`
 - Verdict-consistency backtest: every Global tile byte-identical to engine
@@ -262,7 +317,7 @@ stays the owner's lever, unchanged from S1).
 
 | Phase | Sessions | Status |
 |---|---|---|
-| A Foundations | S1–S4 | 🔄 S1 ✅ 2026-11-07 · S2 ✅ 2026-11-08 · S3 next |
+| A Foundations | S1–S4 | 🔄 S1 ✅ 2026-11-07 · S2 ✅ 2026-11-08 · S3 ✅ 2026-11-08 · S4 next |
 | B Gold | S5–S6 | ☐ |
 | C World Markets | S7–S8 | ☐ |
 | D USA | S9–S11 | ☐ |
@@ -275,6 +330,7 @@ stays the owner's lever, unchanged from S1).
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 2/30 delivered 2026-11-08 · 28 remaining — next
-action: Session 3/30 (S3, the Global page build: D-21 tiles · D-22 ribbon ·
-D-23 chips · D-24 narrator · D-25 dedollar context tile).**
+**Current position: Session 3/30 delivered 2026-11-08 · 27 remaining — next
+action: Session 4/30 (S4, the Global gates & polish: the verdict-consistency
+backtest byte-identical to the engine snapshot values · the narrator wired to
+the :50 cron artefact · the full mobile/ARIA/empty-state pass).**

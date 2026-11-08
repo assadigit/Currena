@@ -39,8 +39,10 @@ regeneration (`pnpm placement:generate`).
   answers as D-49+.
 - **Phase 4 (build):** **RUNNING — Session 1/30 (S1 scaffold &
   navigation) delivered & gated 2026-11-07 · Session 2/30 (S2 — the data
-  layer + `PLACEMENT.generated.md`) delivered & gated 2026-11-08.** Next:
-  Session 3/30 (S3 — the Global page build). See the roadmap's progress
+  layer + `PLACEMENT.generated.md`) delivered & gated 2026-11-08 ·
+  Session 3/30 (S3 — the Global page build: the D-21 ten-tile verdict
+  board, the landing page live) delivered & gated 2026-11-08.** Next:
+  Session 4/30 (S4 — Global gates & polish). See the roadmap's progress
   board for the current position.
 
 ## The one rule that trumps everything

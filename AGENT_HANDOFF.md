@@ -21,10 +21,10 @@
 ## A. What comes next
 
 **UPDATE 2026-11-08 (build underway) — THE PAGE-DIVISION BUILD: Sessions
-1 and 2 of 30 delivered & gated.** S1 (scaffold & navigation): all ten
-routes live (`/` Global placeholder · the eight destination placeholders ·
-legacy `/insights` with the D-46 deprecation banner, zero content loss);
-the D-45 grouped topbar + mobile drawer; the Converter moved UNCHANGED to
+1, 2 and 3 of 30 delivered & gated.** S1 (scaffold & navigation): all ten
+routes live (`/` Global · the eight destination placeholders · legacy
+`/insights` with the D-46 deprecation banner, zero content loss); the
+D-45 grouped topbar + mobile drawer; the Converter moved UNCHANGED to
 `/converter` (build-session decision recorded in the roadmap S1 entry for
 owner ratification). S2 (the data layer, 2026-11-08): **the contract
 between engine and pages** — `@currena/insights/page-division` (the typed
@@ -35,15 +35,32 @@ honest `absentIds`) · the SPA client `apps/web/src/lib/page-division.ts`
 · **`docs/page-division/PLACEMENT.generated.md` committed GREEN: 184 ids
 + 6 boards · 0 unplaced · 0 duplicate homes** (sync-test-pinned; audit
 findings AF-1…AF-5 recorded — **AF-3 owner ratification pending:
-michigan-1y-expectations → USA tier-3**). Gates ALL GREEN both sessions
-(latest: tsc 6/6 · lint 0/0 · copy:audit · secret scan · layer1 11,819 ·
-suite **14,678** · build+budgets held). **Next: Session 3/30 (S3 — the
-Global page build: D-21 tiles · D-22 ribbon · D-23 chips · D-24 narrator
-· D-25 dedollar context tile); the live position always sits in
-`docs/page-division/01-SESSION-ROADMAP.md`'s progress board.** Not
-deployed: the Worker code changed at S2 but the deploy is the owner's
-lever — deploy when ready (the S2 endpoints sit dormant until the S3
-pages consume them; the legacy surfaces are byte-identical).
+michigan-1y-expectations → USA tier-3**). S3 (the Global page,
+2026-11-08): **the landing page (D-20) is REAL** — the D-21 ten-tile
+verdict board on the S2 contract (every verdict re-derived client-side
+through the same pure engines, never invented composites): the Gold
+Balance outlook + counts · the five gauge verdicts · the FX Lights · the
+World Markets counts · the D-22 live prices ribbon · the D-25 dedollar
+context tile · the D-23 chips (all 7 destinations, honest status dots) ·
+the D-24 narrator line — one screen at 1440×900 AND 360×844 in en + fa;
+build decisions BD-S3a/b/c recorded (chip dots mirror real verdicts
+only · gauge-tile links per D-30/D-32 · 2-col mobile board); the
+D-22 day-change honest deviation recorded (the ribbon shows the labelled
+7-day change — no day field in the reading contract); the projection
+client's StrictMode cache-poison defect found live and fixed; the
+verdict WORDS pinned byte-for-byte to the insights corpus in both
+locales (`global-copy-pin.test.ts`); 62 fa strings queued unreviewed.
+Gates ALL GREEN every session (latest S3: tsc 6/6 · lint 0/0 ·
+copy:audit · secret scan 8/914 · layer1 11,819 · suite **14,715** ·
+build+budgets held — entry 268.73/81.36 · Insights 1592.34/368.99 · the
+new GlobalPage chunk 31.89/9.41 vs its 36/11 budget). **Next: Session
+4/30 (S4 — Global gates & polish: the verdict-consistency backtest
+byte-identical to the engine snapshot values · the narrator wired to the
+:50 cron artefact · the full mobile/ARIA/empty-state pass); the live
+position always sits in `docs/page-division/01-SESSION-ROADMAP.md`'s
+progress board.** Not deployed: the Worker code is unchanged since S2
+and the deploy stays the owner's lever (the S2 endpoints + the S3 page
+sit ready for it; the legacy surfaces are byte-identical).
 
 **UPDATE 2026-11-07 (earlier the same day) — A SUCCESSOR PROGRAM EXISTS: the
 page-division program** (`docs/page-division/`). The gold-meter program
