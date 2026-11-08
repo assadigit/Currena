@@ -6,6 +6,40 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+## THIS SESSION'S GOAL (S10 — written before coding, AGENTS §2.6)
+
+**S10 — USA tiers 3–6 + the TIC board + the index section** (spec §7
+items 4–8; the placement table is the authority). Milestones:
+
+- **M1** the pure layer: `usa-tiles` extended to all 72 card ids
+  (tier-3 inflation 12 · tier-4 labor & growth 17 · tier-5
+  liquidity/stress/valuation 17 via `pageGroupIds`), the display
+  configs + value render for the 46 new ids (4 new unit tokens:
+  index/claims/permits/openings), the equivalence pins extended.
+- **M2** the copy: `pd.usa.*` tier 3–6 headings + the 46 card names +
+  the TIC block (pinned byte-for-byte to the corpus by the extended
+  `usa-copy-pin.test.ts`), en + fa, manifest updated.
+- **M3** the TIC reuse: `TicCustodyCard` split out of `TicSection.tsx`
+  (drops the CompactRow chain), the copy contract narrowed to the
+  section's own `tic` block — ONE drawing reused on /usa (D-48), the
+  legacy tests stay green.
+- **M4** the page: `UsaTierCards` 5 sections + `UsaTicSection` (the
+  tier-6 wrapper: own loader on `lib/tic.ts`, the reused `TicSection`
+  through the lean pd adapter); the placeholder body RETIRES; the
+  In-build chip stays for S11; the S8 zoom stays on top.
+- **M5** the §21 gates: `usa-backtest-core` extended to the 72 cards +
+  the TIC board diff (structure · aggregates · per-holder derivations ·
+  custody-hub set · staleness, fail-closed proofs) + the live script
+  `pd-s10-backtest.ts` + the freshness audit vs cadence grace.
+- **M6** the browser pass: 1440×900 + 360×844 in en + fa (RTL), dark,
+  zero console errors, no horizontal scroll.
+- **M7** the records + the deploy (the owner's standing): roadmap
+  delivery record + progress board, strategy-log row, CHANGELOG,
+  DEPLOY.md, DECISIONS.md (BD-S10a the TIC reuse · BD-S10b the
+  placeholder body retired · BD-S10c the zoom recorded as the §7 item-8
+  index section · the budget bump), HANDOFF rewritten, next-session
+  prompt.
+
 ## Current state (2026-11-09, after page-division S9)
 
 - **Program:** page-division — splitting the all-in-one Insights page
