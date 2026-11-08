@@ -445,12 +445,92 @@ deploy, all in `docs/DECISIONS.md`.
 
 ## Phase C — World Markets (S7–S8)
 
-### ☐ S7 — World Markets build · `Session 7/30`
+### ✅ S7 — World Markets build · `Session 7/30` · delivered 2026-11-08
 - Reuse the existing world-index map as the hero (D-43); region grids (Asia ·
   Europe · Americas); status summaries; world risk & liquidity section (9
   cards).
 - **Gates:** 16 indexes render with full metrics; map dots interactive; EODHD
   primary / Yahoo fallback behaves fail-closed.
+
+**S7 delivery record (2026-11-08):** the World Markets page is REAL —
+`/world-markets` renders the D-43 hero (the REUSED `WorldMap` module, ONE
+drawing never restated: its copy prop loosened to the narrow structural
+`WorldMapCopy` interface — the BalanceStageCopy pattern, the legacy
+/insights route keeps passing the corpus which satisfies it structurally,
+zero behavior change, all 49 world-markets component tests green
+untouched) fed the corpus-pinned `pd.worldMarkets.map.*` keys through the
+page's own adapter, beside the status summary (the board's OWN §5.3
+rollup — signal + counts + worstGroup straight off the stored summary,
+never re-computed — plus the RAW ≥10%/≥20% counts and the STATED rule
+whose thresholds are the definitions' own `ATTENTION_COUNT`/
+`UNUSUAL_COUNT`); the three region grids (Asia 7 · Europe 4 · Americas 5,
+the membership riding `MARKET_GROUP_ORDER` × `MARKETS`, never a
+hand-copied list — a real `<table>` at ≥900px + the mobile row list, the
+MarketsTable pattern) with every row's five lenses (chg 1d/1w/1m/3m/1y,
+the bright-ink triangles), the 52-wk range position (a visual track with
+the position marker + the honest sr sentence), the ±1% trend band and
+the −10%/−20% status pills, the A7 delayed + R6 old tags and the UI-27
+local-currency note; and the world risk & liquidity section (the 9
+placement homes — `pageHomeIds('world-markets')` — with the §21 trio:
+value/10-year-position/freshness, the GoldContext pattern, `usd-tr`'s EN
+prefix form included). Every value flows through the same pure helpers
+the legacy section reads (`world-markets-tiles.ts`: verdict-core +
+shared.tsx's trendOf/statusWordKeyOf/isOld/tradingDaysBehind — D-48,
+never a second arithmetic); a market the board has no row for renders
+the honest no-data row; the map's callout click scrolls to the market's
+region-grid row (the on-page answer to the legacy detail panel). ~160
+new `pd.worldMarkets.*` keys (en+fa) with the whole map block + the 16
+entries' name/latin/country + the verdict/measure/count/table/status
+vocabulary + the 9 card names + the unit/position/band/status words
+pinned byte-for-byte to the insights corpus in BOTH locales by
+`world-markets-copy-pin.test.ts` (the first run caught ONE real drift —
+statusStale said 'Old data' where the corpus says 'Stale' — fixed to
+the corpus's own word); 166 new fa strings queued unreviewed in the
+Persian copy manifest (7,306 entries). **THE §21 DIFF (the S7 gate's
+own):** `world-markets-backtest-core.ts` (the page side over the served
+board + projection vs the engine side — `summarizeMarkets` + verdict-core
++ the shared helpers over the board's own rows and the served snapshot's
+readings, NEVER through the page module) + the offline suite (7: the full
+pipeline 57/57, the designed S1-M1.6 #2 buffered-vs-RAW divergence note,
+THREE fail-closed proofs, the public-mode twin, the key-order-immune
+stableStringify) + the live script `apps/web/scripts/pd-s7-backtest.ts`
+— **the live run against PRODUCTION: 56 checks · 56 green · 0 red, twice
+(before and after the deploy)**: every row's five lenses + fromHigh +
+rangePos byte-identical to the stored board rows, the trend/status words
+≡ the shared helpers, the region structure 7/4/5, and all 9 risk
+readings byte-identical (stableStringify) between the projection and the
+served snapshot. **The browser verification pass** (the freshly built
+SPA over real production data, both widths in en + fa RTL): the status
+summary (Mixed · the attention label · 7-of-16 ≥10% · 2 bears · the
+4+/8+ rule), all 16 interactive map cards (the Dow card's 1D/1W/1M
+changes + last close; the period switch driving the colours — 1Y turns
+Dow's word Fall→Rise at +8.9%; the M11 roving tabindex arrow-walking),
+the grids, the risk cards, the map-callout→row scroll, the keyboard
+walk, dark mode, NO horizontal scroll, ZERO console/page errors; the
+M-17 last-good path LIVE (the board blocked → the cached copy stays,
+labelled). **The pass's ONE find, fixed:** the first build's 1080px
+container squeezed the map stage to 1016px and re-exposed the 4×4px
+stoxx50×hsi corner intersection the 2026-10-27 config round had tuned
+away (the legacy shell renders the map at 1272px — measured in the DOM);
+the container now matches the Global landing page's 1280px (stage 1216px,
+ZERO overlaps measured in both locales); the VLM passes' other reads
+each disproven against the DOM per the S5/S6 discipline. **Gates ALL
+GREEN** (2m 20s: secret scan 8/943 · tsc 6/6 · eslint 0/0 · copy:audit
+clean · narrator + eval 50 · layer1 11,819/11,819 · **the suite 14,839
+= +40** (tiles 16 · copy-pin 8 · backtest 7 · characterization 9) ·
+build + budgets held — entry 269.32/81.55, GlobalPage 24.33/6.23,
+GoldPage 31.26/8.07, **the new WorldMarketsPage chunk 26.54/6.49 vs its
+new 30/8 budget row**; the REUSED map tree rides the SHARED chunk — the
+Insights chunk shrank 1569.16→1553.03 through the sharing, the map's
+bytes paid once). **Deployed + live-verified** (version `6e515cf8`
+~17:45 UTC, the owner's standing "the deploy at the close is the
+owner's standing"): currena.ir/world-markets renders the complete page
+(zero card overlaps, zero console errors), the §21 backtest re-run
+against production post-deploy 56/56 green, the Global landing page (10
+tiles) + the legacy /insights (16 cards, zero overlaps, the deprecation
+banner) intact. Decisions: BD-S7a (the map-copy structural extraction)
++ BD-S7b (the 1280px container) + the deploy, all in
+`docs/DECISIONS.md`.
 
 ### ☐ S8 — Regional zoom maps · `Session 8/30`
 - Zoomed continent maps for the region pages (Europe-only, Asia-only,
@@ -562,7 +642,7 @@ deploy, all in `docs/DECISIONS.md`.
 |---|---|---|
 | A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
 | B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ✅ S6 2026-11-08 (deployed `327c7761`, BD-S6a's alternation) |
-| C World Markets | S7–S8 | ☐ |
+| C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ☐ S8 |
 | D USA | S9–S11 | ☐ |
 | E Europe | S12–S13 | ☐ |
 | F Asia & Pacific | S14–S15 | ☐ |
@@ -573,9 +653,8 @@ deploy, all in `docs/DECISIONS.md`.
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 6/30 delivered 2026-11-08 · 24 remaining — next
-action: Session 7/30 (S7, the World Markets build: reuse the existing
-world-index map as the hero (D-43) · the Asia/Europe/Americas region
-grids · the world risk & liquidity section — 16 indexes with full
-metrics, map dots interactive, EODHD primary / Yahoo fallback
-fail-closed).**
+**Current position: Session 7/30 delivered 2026-11-08 · 23 remaining — next
+action: Session 8/30 (S8, the Regional zoom maps: zoomed continent maps
+for the region pages (Europe-only, Asia-only, Americas/US, AU) per
+D-13/D-44 — data from the same board payload; gates: all four zooms
+render, consistency with the world map, hand-off).**

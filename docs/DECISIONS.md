@@ -194,3 +194,65 @@
 - **Who decided:** the build session (S6) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-08e.
+
+## 2026-11-08 — BD-S7a: the WorldMap copy contract (the REUSED map speaks the corpus's words through a structural interface)
+
+- **Decision:** loosen the `WorldMap` component's `copy` prop from the
+  full `InsightsCopy` corpus to the narrow structural `WorldMapCopy`
+  interface (the `markets.map` block + the entries' name/country — the
+  only fields the module reads), so the World Markets page can feed the
+  SAME drawing its corpus-pinned `pd.worldMarkets.map.*` keys without
+  loading the ~18k-line corpus into its chunk.
+- **Options considered:** (a) import `useInsightsCopy()` on the page —
+  rejected: it pulls both corpus locales into the page-division chunk
+  graph (the lean-chunk discipline every page build has kept since S3);
+  (b) rebuild a lean map view — rejected: D-43 says REUSE, and a second
+  drawing violates D-48; (c) the BalanceStageCopy pattern (S6's
+  extraction for the gold balance) — chosen: the legacy route keeps
+  passing the corpus (it satisfies the narrower type structurally, zero
+  behavior change), and the page's words are pinned byte-for-byte to the
+  corpus in BOTH locales by `world-markets-copy-pin.test.ts` (the whole
+  map block + the 16 entries' name/latin/country), so the drawing can
+  never say something different from the legacy card.
+- **Reason:** the S3 lineage (outlook-core / verdict-core) established
+  that lean-chunk imports of legacy views happen through narrow
+  structural contracts, never through copies; the S6 BalanceStageCopy
+  proved the same for the words a shared drawing speaks.
+- **Who decided:** the build session (S7). **Revisit:** if the map module
+  ever reads a new copy field, the interface and the pin test grow with
+  it (a missing pin fails the test, never a visitor's screen).
+
+## 2026-11-08 — BD-S7b: the World Markets page container at 1280px (the map's designed stage width)
+
+- **Decision:** the page's root container uses the Global landing page's
+  `lg:max-w-[1280px]` rather than the Gold page's 1080px.
+- **Reason:** the browser pass's DOM measurement found the first build's
+  1080px container squeezed the REUSED map's stage to 1016px and
+  re-exposed the 4×4px stoxx50×hsi callout-card corner intersection the
+  2026-10-27 map-config round had tuned away (the legacy /insights shell
+  renders the map at 1272px with zero overlaps); at 1216px the page
+  measures ZERO card overlaps in both locales. The map's card positions
+  are percentage-tuned for the legacy stage width — the page gives the
+  drawing its designed width instead of re-tuning the shared config
+  (which would change the legacy map too, outside S7's scope).
+- **Who decided:** the build session (S7), from the verification pass's
+  measurement. **Revisit:** if the map module ever becomes
+  width-adaptive for its card positions, either container width works.
+
+## 2026-11-08 — The 2026-11-08f deploy (the World Markets page live)
+
+- **Decision:** ship at the close of S7 (version `6e515cf8`) — the
+  owner's standing in the session prompt ("the deploy at the close is
+  the owner's standing").
+- **Reason:** all gates green (the suite 14,839 = +40 · tsc 6/6 · lint
+  0/0 · copy:audit clean (7,306 entries, the 166 new fa strings queued)
+  · narrator in sync + 50 · layer1 11,819/11,819 · build + budgets —
+  the new WorldMarketsPage chunk 26.54/6.49 vs its 30/8 row; the REUSED
+  map tree rides the shared chunk, the Insights chunk shrank
+  1569.16→1553.03 through the sharing); the live §21 diff 56/56 green
+  BEFORE and AFTER the deploy; the page live-verified at
+  currena.ir/world-markets (zero card overlaps measured in the DOM, zero
+  console errors); the Global + Gold + legacy surfaces intact.
+- **Rollback:** `wrangler rollback` — `/world-markets` returns to the S1
+  placeholder; nothing else moves.
+- **Who decided:** the build session (S7) under the owner's standing.

@@ -6,80 +6,65 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-## THIS SESSION (S7 — the World Markets build, Phase C · in progress 2026-11-08)
-
-Goal: `/world-markets` becomes real per spec §6 — (1) the hero REUSING
-the existing world-index map (D-43: one dot per index, colour =
-trend/status, hover = 1d/1w/1m changes) + the status summary (unusual
-≥8 stressed · attention ≥4, the §5.3 signal); (2) the region grids
-(Asia 7 · Europe 4 · Americas 5 — every row chg 1d/1w/1m/3m/1y, 52-wk
-range position, trend band, correction −10% / bear −20% statuses);
-(3) the world risk & liquidity section (the 9 placement homes: gpr-index
-· gpr-threats · gpr-acts · gpr-daily · gpr-russia · gpr-ukraine ·
-gpr-israel · gpr-saudi · global-liquidity). Milestones: M1 the pure
-derivations (`world-markets-tiles.ts`, engines imported never restated —
-D-48) · M2 the WorldMap copy-prop extraction (the BalanceStageCopy
-pattern) · M3 the views + pd copy · M4 the gates (copy-pin,
-characterization, the §21 diff core + suite + live script, budget row)
-· M5 browser verification at 1440×900 + 360×844 in en + fa · M6 the
-deploy (the owner's standing at the close) + records. Gates: 16 indexes
-render with full metrics; map dots interactive; fail-closed everywhere;
-verdicts byte-identical to the engines (§21); commit at every checkpoint.
-
-## Current state (2026-11-08, after page-division S6)
+## Current state (2026-11-08, after page-division S7)
 
 - **Program:** page-division — splitting the all-in-one Insights page
-  into 10 destinations per D-1…D-48. **Phase B (Gold) CLOSED: Session
-  6/30 delivered & gated.** Progress: S1 scaffold & navigation · S2
-  data layer + `PLACEMENT.generated.md` · S3 the Global landing page
+  into 10 destinations per D-1…D-48. **Phase C (World Markets) OPEN:
+  Session 7/30 delivered & gated.** Progress: S1 scaffold & navigation ·
+  S2 data layer + `PLACEMENT.generated.md` · S3 the Global landing page
   (D-21) · S4 the gates & polish (Phase A CLOSED) · S5 the Gold page
-  build (the 37-voter conditions meter) · **S6 the Gold gates + THE
-  OWNER'S ALTERNATION (BD-S6a): `/gold`'s hero now carries BOTH balance
-  designs — the previous brass shape (the stage + lane weights + tray,
-  capped at 480px, the classic view, the DEFAULT) and the S5 minimal
-  beam glyph — through a real radio group, the choice persisted; plus
-  the frozen-scenario suite (the §21 standard over the recorded
-  corpus's 19 windows, page ≡ frozen harness on counts, lane votes,
-  beam, verdict, outlook) and the mobile/ARIA pass.**
-- **DEPLOYED & LIVE** (`327c7761`, 2026-11-08 ~14:55 UTC): the
-  alternation is live at **https://currena.ir/gold** — the classic
-  brass balance greets every visitor by default, one radio tap away
-  from the minimal glyph. The live acceptance: `docs/DEPLOY.md`
-  2026-11-08e (the §21 backtest re-run against production 150/150
-  green post-deploy; Global + legacy surfaces intact).
-- **Gates (last full run):** ALL GREEN — secret scan 8/932 · tsc 6/6 ·
-  eslint 0/0 · copy:audit clean (7,140 entries) · narrator in sync +
-  eval 50 · layer1 11,819/11,819 · **suite 14,799** · build + budgets
-  held (entry 269.00/81.45 · Insights 1569.16/362.08 UNTOUCHED through
-  the BalanceStage extraction · GlobalPage 24.26/6.21 untouched ·
-  GoldPage 31.23/8.06 vs its re-based 34/9 row).
+  build · S6 the Gold gates + the owner's alternation (Phase B CLOSED)
+  · **S7 the World Markets page build: `/world-markets` renders the
+  REUSED world-index map (D-43 — one drawing, never restated, fed the
+  corpus-pinned `pd.worldMarkets.map.*` keys through the S7
+  `WorldMapCopy` structural interface) beside the status summary (the
+  board's own §5.3 rollup + the RAW ≥10%/≥20% counts + the stated
+  4+/8+ rule), the three region grids (Asia 7 · Europe 4 · Americas 5 —
+  every row chg 1d/1w/1m/3m/1y, 52-wk range position, ±1% trend band,
+  −10%/−20% status pills), and the 9 world risk & liquidity cards; a map
+  callout click scrolls to the market's region-grid row.**
+- **DEPLOYED & LIVE** (`6e515cf8`, 2026-11-08 ~17:45 UTC): the page is
+  live at **https://currena.ir/world-markets** — the §21 diff re-run
+  against production 56/56 green post-deploy; the Global + Gold +
+  legacy surfaces intact. The live acceptance: `docs/DEPLOY.md`
+  2026-11-08f.
+- **Gates (last full run):** ALL GREEN — secret scan 8/943 · tsc 6/6 ·
+  eslint 0/0 · copy:audit clean (7,306 entries) · narrator in sync +
+  eval 50 · layer1 11,819/11,819 · **suite 14,839** · build + budgets
+  held (entry 269.32/81.55 · GlobalPage 24.33/6.23 · GoldPage 31.26/8.07
+  · **WorldMarketsPage 26.54/6.49 vs its new 30/8 row**; the REUSED map
+  tree rides the SHARED chunk — the Insights chunk SHRANK
+  1569.16→1553.03 through the sharing, the map's bytes paid once).
 
-## Next session (S7 — the World Markets build, Phase C)
+## Next session (S8 — the Regional zoom maps, Phase C)
 
 Read `AGENTS.md` (§14 carries the owner's rules) first, then
-`docs/page-division/01-SESSION-ROADMAP.md` (the S7 entry + the S6
-delivery record), `02-PAGE-DIVISION-SPEC.md` §6 + §21, and this file.
-Scope (S7): reuse the existing world-index map as the hero (D-43) ·
-the Asia/Europe/Americas region grids (16 indexes with full metrics) ·
-the world risk & liquidity section (9 cards). Gates: 16 indexes render
-with full metrics; map dots interactive; EODHD primary / Yahoo fallback
-behaves fail-closed. S8 follows with the regional zoom maps + gates.
+`docs/page-division/01-SESSION-ROADMAP.md` (the S8 entry + the S7
+delivery record), `02-PAGE-DIVISION-SPEC.md` §6 (the zoom-maps note) +
+§21, and this file. Scope (S8): zoomed continent maps for the region
+pages (Europe-only, Asia-only, Americas/US, AU) per D-13/D-44 — data
+from the same board payload. Gates: all four zooms render; consistency
+with the world map; hand-off. Known lever: the S7 `WorldMapCopy`
+contract + the corpus-pinned adapter (`WorldMarketsHero.tsx`) are the
+reuse pattern for any surface that re-renders the map with its own
+words.
 
 ## Owner-side levers waiting
 
 1. Ratify the `/converter` relocation (S1's build-session decision).
 2. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement).
-3. Ratify or redirect BD-S3a/b/c + BD-S4a/b + BD-S5a (all recorded,
-   none blocking) — and now **BD-S6a** (the alternation's shape: the
-   classic view as the default + the 480px cap; flipping either is a
-   one-line change if you prefer the minimal default or a bigger
-   drawing).
-4. Triage the queued unreviewed fa strings (now ~391: 369 + the 22 new
-   S6 keys in `docs/localization/persian-copy-manifest.json` — 19 of
-   the new ones are byte-pinned to the corpus by
-   `gold-copy-pin.test.ts`, the 3 view words + the S5 fresh wording
-   await review).
+3. Ratify or redirect BD-S3a/b/c + BD-S4a/b + BD-S5a + BD-S6a (all
+   recorded, none blocking) — and now **BD-S7a** (the WorldMapCopy
+   structural interface: the REUSED map fed the corpus-pinned
+   pd.worldMarkets keys) + **BD-S7b** (the page container at 1280px so
+   the map's callout cards keep their designed stage width).
+4. Triage the queued unreviewed fa strings (now ~557: 391 + the 166 new
+   S7 keys in `docs/localization/persian-copy-manifest.json` — the
+   corpus-mirroring ones are byte-pinned to the corpus by
+   `world-markets-copy-pin.test.ts`, the fresh words (the rule line, the
+   bear line, the range-position labels, the section headings, the
+   load/error states) await review).
 5. The external investor's review of the spec (§19) — Phase 3's input.
 
 ## Known state worth knowing
@@ -89,19 +74,11 @@ behaves fail-closed. S8 follows with the regional zoom maps + gates.
   hourly (:13); the narrator hourly (:50). A snapshot stored after the
   last :50 rung leaves the narrator one state behind until the next rung
   — honest, self-healing, and the page's "Updated" stamp says so.
-- The Gold page's hero ALTERNATES (BD-S6a): the classic view (the
-  previous brass balance, smaller — the s-size metrics at a 480px cap)
-  is the default; the minimal glyph is one radio away; the choice
-  persists per visitor (`currena:pd:gold:balance-view`). The two views
-  share ONE drawing with the legacy card (`BalanceStage`/`BalanceTray`,
-  extracted S6 — the legacy `/insights` card renders byte-identically)
-  and ONE verdict (the engine's words render in both views).
-- The Gold page's seat chips link to the seat's home page per the
-  placement table (`homePageOfIndicator`) — the three voters whose home
-  card is the Gold page itself (gold-silver · the CFTC pair) link to the
-  in-page `#gold-context` anchor; the dollar voters → `/currencies`, the
-  euro pair → `/europe`, gpr-daily → `/world-markets`, the rest → `/usa`
-  (their pages build S7+).
-- The rollback lever for the 2026-11-08e deploy: `wrangler rollback` —
-  the Global + legacy surfaces were byte-identical before it; `/gold`
-  would return to the S5 minimal-only hero.
+- The World Markets page's status summary reads the board's OWN §5.3
+  rollup (signal + counts) beside the RAW ≥10%/≥20% counts — the
+  buffered-vs-RAW divergence (the exit-buffer staying rule vs the being
+  rule) is the designed S1-M1.6 #2 note, reported by the §21 backtest as
+  a note, never a failure.
+- The rollback lever for the 2026-11-08f deploy: `wrangler rollback` —
+  `/world-markets` would return to the S1 placeholder; the Global + Gold
+  + legacy surfaces were byte-identical before it.

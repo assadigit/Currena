@@ -205,6 +205,60 @@ had run green over the remote-dev Worker on real KV BEFORE the deploy
   legacy surfaces; the new routes are additive, so a rollback costs only
   the new endpoints, never the existing page.
 
+## Session record — 2026-11-08f the page-division S7 deploy (the World Markets page — the D-43 map hero + the region grids + the 9 world risk cards live for every visitor at /world-markets; Phase C open)
+
+Page-division S7 (main `bfca921` → `25b6749` → `e579144` → `9d79a7f` →
+`b5c306f` + this record). **The authority:** the owner's standing in the
+session prompt ("the deploy at the close is the owner's standing") +
+AGENTS.md §5 — every gate was green over the whole change set first
+(2m 20s: secret scan 8/943 · tsc 6/6 · eslint 0/0 · copy:audit clean
+(7,306 manifest entries, the 166 new pd.worldMarkets fa strings queued
+unreviewed — the corpus-mirroring ones byte-pinned by
+world-markets-copy-pin) · narrator in sync + eval 50 · layer1
+11,819/11,819 · **the suite 14,839 = +40** · build + budgets held —
+entry 269.32/81.55 · GlobalPage 24.33/6.23 · GoldPage 31.26/8.07 · the
+NEW WorldMarketsPage chunk 26.54/6.49 vs its new 30/8 budget row; the
+REUSED map tree rides the SHARED chunk, the Insights chunk SHRANK
+1569.16→1553.03 through the sharing), and the live §21 diff had run
+green against production BEFORE the deploy (56 checks · 56 green · 0
+red).
+
+- **DEPLOY (~17:45 UTC, version
+  `6e515cf8-3085-44d2-ab4b-ae5753da9e66`):** `pnpm --filter
+  @currena/web build` (the gates' own fresh dist) + `pnpm --filter
+  @currena/api exec wrangler deploy` → currena.ir at 100%. Display-layer
+  only: the SPA's `/world-markets` route (the REUSED WorldMap through
+  the WorldMapCopy structural interface — the legacy /insights map
+  unchanged; the region grids; the 9 risk cards), the `pd.worldMarkets.*`
+  copy (en+fa), the pure derivations + the §21 backtest core + the
+  offline suites + the live script (test/script seams only — nothing in
+  the app bundle beyond the page's own chunk), and the budget row. No
+  engine, voter, threshold, calibration or provider change anywhere.
+- **LIVE ACCEPTANCE CHECK ALL GREEN (this session's own runs):**
+  - the §21 diff re-run against PRODUCTION post-deploy: **56 checks · 56
+    green · 0 red** — the §5.3 signal + counts + verdict step identical
+    to `summarizeMarkets` over the served board, every one of the 16
+    rows' five lenses + fromHigh + rangePos byte-identical to the stored
+    board rows, the trend/status words ≡ the shared helpers, the region
+    structure 7/4/5, and all 9 risk readings byte-identical
+    (stableStringify) between the projection and the served snapshot.
+  - `https://currena.ir/world-markets` at 1440×900 (en): the verdict
+    "Mixed" with the attention measure label, the 7-of-16 ≥10% line, 2
+    bears, the stated 4+/8+ rule, all 16 map callout cards with ZERO
+    overlaps (measured in the DOM — the legacy-tuned card positions hold
+    at the 1216px stage), the 7/4/5 region grids with every row's five
+    lenses + range tracks + trend words + status pills, the 9 risk cards
+    with the §21 trio, NO horizontal scroll, ZERO console/page errors;
+    the fa/RTL + mobile cells were verified through the local preview
+    over the same production data (the deployed build is the same dist).
+  - The Global landing page intact (10 tiles) · the legacy `/insights`
+    intact (16 map cards, zero overlaps, the deprecation banner) · ZERO
+    console errors.
+- **Rollback lever:** `wrangler rollback` — the previous version
+  (`327c7761`-era surfaces plus the S7 records): `/world-markets` would
+  return to the S1 placeholder; the Global + Gold + legacy surfaces were
+  byte-identical before this deploy.
+
 ## Session record — 2026-11-08e the page-division S6 deploy (the Gold alternation — the previous balance shape on /gold, smaller, beside the minimal design; Phase B closed)
 
 Page-division S6 (main `25d4910` → `437e201` → `7c0c6fc` + this
