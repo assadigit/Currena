@@ -145,7 +145,7 @@ export function backtestGoldPage(pageReadings: readonly IndicatorReading[], engi
       checks.push({
         label: `seat ${engineLane.lane}/${engineMember.id} evidence`,
         ok: pageSeat !== undefined && pageSeat.evidence === engineMember.evidence,
-        page: show(pageSeat.evidence),
+        page: show(pageSeat?.evidence),
         engine: show(engineMember.evidence),
       });
     }

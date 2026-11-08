@@ -974,6 +974,15 @@ const BUDGETS = [
   // S1 placeholder with a lazy chunk). Ceiling 36/11 per the tight
   // multiple-of-5 convention (~4 kB raw / ~1.6 kB gz headroom).
   { pattern: /^GlobalPage-[\w-]+\.js$/, raw: 36_000, gz: 11_000, label: 'Global page lazy chunk (page-division S3)' },
+  // Page-division S5 (2026-11-08): the Gold conditions-meter route — the
+  // 37-voter meter (D-26…D-29). Measured 26.32/6.92 at first build (the
+  // BalanceScale's pure tilt/verdict helpers + the lean gold-tiles views
+  // ride beside the engine imports, which land in the SHARED
+  // outlook-core-* chunk both route chunks already load — GlobalPage's
+  // own hash is untouched by S5). The entry chunk gains only the lazy
+  // wiring: 268.69/81.33 → 269.00/81.45 vs 296/89.5. Ceiling 30/9 per
+  // the tight convention (~3.7 kB raw / ~2.1 kB gz headroom).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 30_000, gz: 9_000, label: 'Gold page lazy chunk (page-division S5)' },
 ];
 
 function main() {
