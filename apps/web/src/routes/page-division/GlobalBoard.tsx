@@ -480,16 +480,16 @@ export function GlobalBoard({
         {fxState.kind === 'ready' ? (
           <FxLightsTile tile={fxState.value} />
         ) : fxState.kind === 'loading' ? (
-          <BoardLoadingTile title={t('pd.global.tileFxLights')} />
+          <BoardLoadingTile title={t('pd.global.tileFxLights')} feed="fx" />
         ) : (
-          <BoardUnreadTile title={t('pd.global.tileFxLights')} />
+          <BoardUnreadTile title={t('pd.global.tileFxLights')} feed="fx" />
         )}
         {marketsState.kind === 'ready' ? (
           <WorldMarketsTile tile={marketsState.value} />
         ) : marketsState.kind === 'loading' ? (
-          <BoardLoadingTile title={t('pd.global.tileWorldMarkets')} />
+          <BoardLoadingTile title={t('pd.global.tileWorldMarkets')} feed="world-markets" />
         ) : (
-          <BoardUnreadTile title={t('pd.global.tileWorldMarkets')} />
+          <BoardUnreadTile title={t('pd.global.tileWorldMarkets')} feed="world-markets" />
         )}
         <PricesRibbonTile ribbon={ribbon} />
         <DedollarTile tile={dedollar} />
@@ -500,10 +500,11 @@ export function GlobalBoard({
 
 /** A board tile whose feed has not answered yet — the honest loading
  *  state (never a verdict, never blank). */
-function BoardLoadingTile({ title }: { title: string }): React.JSX.Element {
+function BoardLoadingTile({ title, feed }: { title: string; feed: string }): React.JSX.Element {
   return (
     <div
       data-tile="loading"
+      data-feed={feed}
       className="flex min-h-[44px] flex-col justify-start gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
     >
       <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">{title}</h3>
@@ -517,11 +518,12 @@ function BoardLoadingTile({ title }: { title: string }): React.JSX.Element {
 
 /** A board tile whose feed failed with no cached copy — the honest
  *  unread state (fail-closed: "Cannot read yet", never a guess). */
-function BoardUnreadTile({ title }: { title: string }): React.JSX.Element {
+function BoardUnreadTile({ title, feed }: { title: string; feed: string }): React.JSX.Element {
   const { t } = useI18n();
   return (
     <div
       data-tile="unread"
+      data-feed={feed}
       className="flex min-h-[44px] flex-col justify-start gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
     >
       <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">{title}</h3>
