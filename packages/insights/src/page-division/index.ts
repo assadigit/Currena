@@ -26,6 +26,7 @@ export {
   allPlacedHomeIds,
   homePageOfIndicator,
   pageHomeIds,
+  pageGroupIds,
   pageMirrorIds,
   pageBlockedIds,
   pageReadingIds,

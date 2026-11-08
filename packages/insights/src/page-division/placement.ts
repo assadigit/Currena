@@ -444,6 +444,20 @@ export function pageHomeIds(page: PageDivisionPageId): readonly IndicatorId[] {
   return PAGE_PLACEMENTS_BY_PAGE.get(page)?.groups.flatMap((g) => [...g.ids]) ?? [];
 }
 
+/**
+ * A page's NAMED placement group's ids (group order) — page-division S9
+ * (2026-11-09): the USA page's tiers derive their card lists from the
+ * placement table's own groups this way, never a hand-copied list (the S7
+ * pageHomeIds('world-markets') discipline, per-group — a placement change
+ * re-points every tier automatically and surfaces as visible drift in
+ * PLACEMENT.generated.md). Unknown page or group id → empty (fail-closed:
+ * the caller's TOTAL display/copy map turns a missing id into a typecheck
+ * error long before an empty list could render).
+ */
+export function pageGroupIds(page: PageDivisionPageId, groupId: string): readonly IndicatorId[] {
+  return PAGE_PLACEMENTS_BY_PAGE.get(page)?.groups.find((g) => g.id === groupId)?.ids ?? [];
+}
+
 /** A page's mirror-input ids (after pageHomeIds, deterministic order). */
 export function pageMirrorIds(page: PageDivisionPageId): readonly IndicatorId[] {
   return PAGE_PLACEMENTS_BY_PAGE.get(page)?.mirrors ?? [];

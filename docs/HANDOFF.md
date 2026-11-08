@@ -6,6 +6,35 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+## THIS SESSION (S9, opened 2026-11-09)
+
+**Goal:** the USA page per spec §7 items 1–3 — the 5 thematic gauge
+verdicts atop (D-30: the same computed verdicts as Global, US-framed
+copy) · tier-1 "the world watches" 7 cards (D-29) · tier-2 rates & the
+Fed (the placement's authoritative 19 ids — the spec's "(22)" label is
+the recorded AF-2 drift). The placeholder body stays honest for tiers
+3–6 + TIC (S10's scope); the S8 zoom section stays on top.
+
+**Milestones (commit + push at every checkpoint):**
+1. M1 pure layer — `pageGroupIds` (engine-side accessor) + `usa-tiles.ts`
+   (the verdict strip's derivations + the tier card entries + the display
+   configs) + `usa-tiles.test.ts` (pins vs `config/display.ts`).
+2. M2 copy — `pd.usa.*` en+fa + `usa-copy-pin.test.ts` (26 card names +
+   unit/position/band/status words pinned to the corpus) + the fa strings
+   queued unreviewed in the Persian manifest.
+3. M3 views + wiring — `UsaVerdictStrip` · `UsaTierCards` · `UsaPage`
+   (the GoldPage container pattern) + the App route split (/usa leaves
+   the region set) + the characterization suite.
+4. M4 the §21 backtest — `usa-backtest-core.ts` (page ≡ Global ≡ engine,
+   byte-for-byte) + the offline suite + `pd-s9-backtest.ts`; live run
+   pre-deploy.
+5. M5 full gates — `pnpm gates` green (build + budgets; the new UsaPage
+   budget row).
+6. M6 the browser pass — 1440×900 AND 360×844 in BOTH en and fa over the
+   production API; DOM checks; fixes.
+7. M7 records + the deploy at the close (the owner's standing) + the
+   live acceptance (post-deploy backtest + live page checks).
+
 ## Current state (2026-11-08, after page-division S8)
 
 - **Program:** page-division — splitting the all-in-one Insights page
