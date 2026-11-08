@@ -6,6 +6,26 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+## THIS SESSION (S7 — the World Markets build, Phase C · in progress 2026-11-08)
+
+Goal: `/world-markets` becomes real per spec §6 — (1) the hero REUSING
+the existing world-index map (D-43: one dot per index, colour =
+trend/status, hover = 1d/1w/1m changes) + the status summary (unusual
+≥8 stressed · attention ≥4, the §5.3 signal); (2) the region grids
+(Asia 7 · Europe 4 · Americas 5 — every row chg 1d/1w/1m/3m/1y, 52-wk
+range position, trend band, correction −10% / bear −20% statuses);
+(3) the world risk & liquidity section (the 9 placement homes: gpr-index
+· gpr-threats · gpr-acts · gpr-daily · gpr-russia · gpr-ukraine ·
+gpr-israel · gpr-saudi · global-liquidity). Milestones: M1 the pure
+derivations (`world-markets-tiles.ts`, engines imported never restated —
+D-48) · M2 the WorldMap copy-prop extraction (the BalanceStageCopy
+pattern) · M3 the views + pd copy · M4 the gates (copy-pin,
+characterization, the §21 diff core + suite + live script, budget row)
+· M5 browser verification at 1440×900 + 360×844 in en + fa · M6 the
+deploy (the owner's standing at the close) + records. Gates: 16 indexes
+render with full metrics; map dots interactive; fail-closed everywhere;
+verdicts byte-identical to the engines (§21); commit at every checkpoint.
+
 ## Current state (2026-11-08, after page-division S6)
 
 - **Program:** page-division — splitting the all-in-one Insights page
