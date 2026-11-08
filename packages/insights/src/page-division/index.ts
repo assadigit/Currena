@@ -24,6 +24,7 @@ export {
   GOLD_VOTER_IDS,
   AU_GAUGE_MEMBER_IDS,
   allPlacedHomeIds,
+  homePageOfIndicator,
   pageHomeIds,
   pageMirrorIds,
   pageBlockedIds,

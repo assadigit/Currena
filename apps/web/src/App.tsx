@@ -53,10 +53,14 @@ const PagePlaceholder = lazy(() =>
 // board. Lazy like the Insights route (the engine modules + the board
 // clients ride the chunk; the entry graph stays the money page's own).
 const GlobalPage = lazy(() => import('./routes/page-division/GlobalPage').then((m) => ({ default: m.GlobalPage })));
+// Page-division S5 (2026-11-08): the Gold page — the 37-voter conditions
+// meter (D-26…D-29). Lazy like the Global route (the engine modules ride
+// the chunk; the entry graph stays untouched).
+const GoldPage = lazy(() => import('./routes/page-division/GoldPage').then((m) => ({ default: m.GoldPage })));
 
-/** The eight destination routes that share the placeholder chunk (S1). */
+/** The seven destination routes that still share the placeholder chunk
+ *  (S5: /gold left the set — its page build landed). */
 const DESTINATION_ROUTES: ReadonlySet<string> = new Set([
-  '/gold',
   '/world-markets',
   '/currencies',
   '/commodities',
@@ -214,11 +218,13 @@ export function App() {
         <ErrorBoundary>
           {/* Page-division S3 (D-20/D-46): `/` is the Global world scan —
               the D-21 verdict board, built on the S2 projection contract;
-              the eight destinations share one lazy placeholder chunk; the
-              Converter lives at /converter unchanged. */}
+              S5 (D-26…D-29): `/gold` is the Gold conditions meter; the
+              seven remaining destinations share one lazy placeholder
+              chunk; the Converter lives at /converter unchanged. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
             {route === '/' ? <GlobalPage /> : null}
+            {route === '/gold' ? <GoldPage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}

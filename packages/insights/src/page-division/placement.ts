@@ -422,6 +422,23 @@ export const PAGE_PLACEMENTS_BY_PAGE: ReadonlyMap<PageDivisionPageId, PagePlacem
   PAGE_PLACEMENTS.map((p) => [p.page, p]),
 );
 
+/**
+ * The page whose detail-card home holds this registry id — the seat-chip
+ * link target (page-division S5, 2026-11-08 — 03-STRATEGY-LOG §7 wrap-up
+ * note 4: "Seat chips link to the seat's home page"). Derived from the
+ * placement table itself, never hand-copied, so a placement change
+ * re-points every seat chip automatically. Blocked ids count as their
+ * page's placement (they ARE registry ids, spec §16). null = not a placed
+ * id (a mirror-only id or a typo — the caller renders no link, fail-closed).
+ */
+export function homePageOfIndicator(id: IndicatorId): PageDivisionPageId | null {
+  for (const placement of PAGE_PLACEMENTS) {
+    if (pageHomeIds(placement.page).includes(id)) return placement.page;
+  }
+  const note = BLOCKED_NOTES.find((n) => n.id === id);
+  return note !== undefined ? note.page : null;
+}
+
 /** A page's detail-card home ids (group order). */
 export function pageHomeIds(page: PageDivisionPageId): readonly IndicatorId[] {
   return PAGE_PLACEMENTS_BY_PAGE.get(page)?.groups.flatMap((g) => [...g.ids]) ?? [];
