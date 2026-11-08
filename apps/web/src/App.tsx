@@ -64,20 +64,27 @@ const GoldPage = lazy(() => import('./routes/page-division/GoldPage').then((m) =
 const WorldMarketsPage = lazy(() =>
   import('./routes/page-division/WorldMarketsPage').then((m) => ({ default: m.WorldMarketsPage })),
 );
-// Page-division S8 (2026-11-08): the four REGION pages — the USA,
-// Europe, Asia & Pacific and Australia destinations, each carrying its
-// D-44 index/map section (the REUSED world map in region-zoom mode)
-// above the S1 placeholder body. ONE lazy chunk serves all four routes
+// Page-division S8 (2026-11-08): the REGION pages — Europe, Asia & Pacific
+// and Australia (S9: /usa left the set for its own build), each carrying
+// its D-44 index/map section (the REUSED world map in region-zoom mode)
+// above the S1 placeholder body. ONE lazy chunk serves the region routes
 // (the region rides the route); the entry graph stays untouched.
 const RegionPage = lazy(() => import('./routes/page-division/RegionPage').then((m) => ({ default: m.RegionPage })));
+// Page-division S9 (2026-11-09): the USA route leaves the region set —
+// its own lazy chunk (the S5 GoldPage pattern): the D-30 verdict strip
+// + the D-29 tier-1/tier-2 cards render above the SAME S8 zoom section
+// (RegionIndexSection, shared with the region chunk), with the honest
+// still-building record below (tiers 3–6 + the TIC board are S10's).
+const UsaPage = lazy(() => import('./routes/page-division/UsaPage').then((m) => ({ default: m.UsaPage })));
 
 /** The two destination routes that still share the placeholder chunk
  *  (S8: the four region pages left the set — their zoom sections landed
- *  on RegionPage). */
+ *  on RegionPage; S9: /usa left it for its own build). */
 const DESTINATION_ROUTES: ReadonlySet<string> = new Set(['/currencies', '/commodities']);
 
-/** The four region routes that render RegionPage (S8). */
-const REGION_ROUTES: ReadonlySet<string> = new Set(['/usa', '/europe', '/asia-pacific', '/australia']);
+/** The three region routes that render RegionPage (S8; /usa left the set
+ *  in S9 for its own UsaPage chunk). */
+const REGION_ROUTES: ReadonlySet<string> = new Set(['/europe', '/asia-pacific', '/australia']);
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
@@ -229,15 +236,17 @@ export function App() {
               the D-21 verdict board, built on the S2 projection contract;
               S5 (D-26…D-29): `/gold` is the Gold conditions meter;
               S7 (D-43/D-47): `/world-markets` is the World Markets page;
-              S8 (D-13/D-44): the four REGION pages render their zoom
-              sections on RegionPage; Commodities + Currencies share the
-              lazy placeholder chunk until S17/S18; the Converter lives
-              at /converter unchanged. */}
+              S8 (D-13/D-44): the REGION pages render their zoom
+              sections on RegionPage; S9 (D-29/D-30): `/usa` renders its
+              own UsaPage (the verdict strip + tiers 1–2 above the S8
+              zoom); Commodities + Currencies share the lazy placeholder
+              chunk until S17/S18; the Converter lives at /converter. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
             {route === '/' ? <GlobalPage /> : null}
             {route === '/gold' ? <GoldPage /> : null}
             {route === '/world-markets' ? <WorldMarketsPage /> : null}
+            {route === '/usa' ? <UsaPage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {REGION_ROUTES.has(route) ? <RegionPage /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}

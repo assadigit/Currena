@@ -973,6 +973,11 @@ const BUDGETS = [
   // UNTOUCHED at 268.72/82.22 vs 296/89.5 — Global replaced the eager
   // S1 placeholder with a lazy chunk). Ceiling 36/11 per the tight
   // multiple-of-5 convention (~4 kB raw / ~1.6 kB gz headroom).
+  // S9 (2026-11-09): the page's own chunk SHRANK 24.40/6.27 → 23.04/5.80
+  // — usa-tiles imports global-tiles, so the pure derivation moved to the
+  // SHARED global-tiles-* chunk both route chunks load (the same sharing
+  // that shrank WorldMarketsPage in S8: the derivation's bytes are paid
+  // once, not per route). The ceiling holds; no bump needed.
   { pattern: /^GlobalPage-[\w-]+\.js$/, raw: 36_000, gz: 11_000, label: 'Global page lazy chunk (page-division S3)' },
   // Page-division S5 (2026-11-08): the Gold conditions-meter route — the
   // 37-voter meter (D-26…D-29). Measured 26.32/6.92 at first build (the
@@ -1004,7 +1009,7 @@ const BUDGETS = [
   // 269.32/81.55 vs 296/89.5). Ceiling 30/8 per the tight convention
   // (~3.5 kB raw / ~1.5 kB gz headroom).
   { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 30_000, gz: 8_000, label: 'World Markets page lazy chunk (page-division S7)' },
-  // Page-division S8 (2026-11-08): the four REGION routes — /usa,
+  // Page-division S8 (2026-11-08): the REGION routes — /usa,
   // /europe, /asia-pacific, /australia — each carrying its D-44
   // index/map section (the REUSED WorldMap in region-zoom mode) above
   // the S1 placeholder body. Measured 3.86/1.52 at first build: ONE
@@ -1016,7 +1021,25 @@ const BUDGETS = [
   // entry chunk gains only the lazy wiring (269.32/81.55 → 269.71/81.70
   // vs 296/89.5). Ceiling 8/3 per the tight convention (~4.1 kB raw /
   // ~1.5 kB gz headroom).
+  // S9 (2026-11-09): /usa left the set for its own UsaPage build, and
+  // the shared RegionIndexSection moved to its own shared chunk (2.50/
+  // 1.10) both the region routes and the USA page load — the page's own
+  // chunk is now only the shell + DestinationBody, MEASURED 1.65/0.77
+  // (the zoom's bytes paid once, not per region route). The 8/3 ceiling
+  // holds with huge headroom; kept (not re-based down) so a future
+  // region-page build has the same room the S8 row gave it.
   { pattern: /^RegionPage-[\w-]+\.js$/, raw: 8_000, gz: 3_000, label: 'Region pages lazy chunk (page-division S8)' },
+  // Page-division S9 (2026-11-09): the USA route — the D-30 verdict
+  // strip + the D-29 tier-1/tier-2 cards above the SAME S8 zoom section.
+  // Measured 15.21/4.28 at first build: the page's own chunk carries the
+  // strip views + the tier cards + the usa-tiles display configs, while
+  // global-tiles (the shared verdict derivation) and RegionIndexSection
+  // (the zoom section) ride their own shared chunks both routes load
+  // (GlobalPage SHRANK 24.40→23.04 through the same sharing — the
+  // derivation's bytes are paid once). The entry chunk gains only the
+  // lazy wiring (269.71/81.70 → 270.04/81.64 vs 296/89.5). Ceiling 20/6
+  // per the tight convention (~4.8 kB raw / ~1.7 kB gz headroom).
+  { pattern: /^UsaPage-[\w-]+\.js$/, raw: 20_000, gz: 6_000, label: 'USA page lazy chunk (page-division S9)' },
 ];
 
 function main() {
