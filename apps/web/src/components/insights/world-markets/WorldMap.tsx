@@ -35,25 +35,23 @@ import {
   LAYOUT_SWITCH_PX,
   MAP_CARD_NAME_KEY,
   MAP_CARD_WIDTH_PCT,
-  MAP_INDICES,
   MAP_LABELS,
   MAP_LABEL_SIZE_DEFAULT,
   MAP_PERIODS,
   MAP_TINT_COUNTRY_DAMP,
-  OPEN_MAX_AGE_MIN,
   borderMixOf,
   inkMixOf,
-  mapScaleOf,
-  mapWeightOf,
   markMixOf,
+  regionZoomOf,
   rimMixOf,
   tintMixOf,
   type MapDir,
   type MapPeriod,
+  type MapRegionId,
 } from './world-map-config';
-import { isOld, percentGlyph } from './shared';
-import { sessionOpen } from './session';
-import { marketDefinition } from '@currena/insights/markets/definitions';
+import { deriveWorldMapRows } from './world-map-rows';
+import type { MapRow } from './world-map-rows';
+import { percentGlyph } from './shared';
 
 /* ------------------------------------------------------------------ *
  * The static assets (B3) — one shared in-flight promise, fetched when
@@ -108,15 +106,6 @@ type Locale = 'en' | 'fa';
 /** The true minus sign (M15) — never the hyphen-minus. */
 const MINUS = '−';
 
-/** D2 at view time: a stored provider "open" only shows while its quote
- * is still OPEN_MAX_AGE_MIN minutes old — the last refresh is the honest
- * clock, so a state frozen at write time can never go stale on screen. */
-function openAtViewTime(entry: MarketEntry, nowMs: number): boolean {
-  if (entry.open !== true || entry.quoteTime === undefined) return false;
-  const age = nowMs - Date.parse(entry.quoteTime);
-  return Number.isFinite(age) && age >= -60_000 && age <= OPEN_MAX_AGE_MIN * 60_000;
-}
-
 /** 2026-10-27 owner round — the compact D/W/M cells' signed number WITHOUT the
  * percent glyph (the hero row carries the unit loudly; the glyph was
  * what made the old 12.5px triplet overflow its 35px cells — the values
@@ -139,43 +128,15 @@ function heroPct(pct: number, numberLocale: NumberLocale, locale: Locale): strin
   return `${pct > 0 ? '+' : pct < 0 ? MINUS : ''}${num}${percentGlyph(locale)}`;
 }
 
-/** One row of map data, derived purely from the snapshot. */
-export interface MapRow {
-  id: MarketId;
-  /** The registry config row (iso, cc, band, card position). */
-  cfg: (typeof MAP_INDICES)[number];
-  /** The stored entry — absent when the market has no row at all. */
-  entry: MarketEntry | undefined;
-  /** Every period's percent change (the cards show D/W/M side by side);
-   * null = no honest reading for that period. */
-  pcts: Record<MapPeriod, number | null>;
-  /** The RELATIVE colour weight per period, 0…1 (2026-10-20f owner round:
-   * more down = more red, more up = more saturated green). */
-  wts: Record<MapPeriod, number>;
-  /** The selected period's direction; null = flat / no data / old —
-   * neutral grey pin and card (M17's honest rule). */
-  dir: MapDir | null;
-  /** The selected period's percent (the summary + sr words read it). */
-  pct: number | null;
-  /** Old data (last close older than STALE_AFTER_DAYS). */
-  old: boolean;
-  open: boolean;
-}
+/** One row of map data — the pure derivation moved to world-map-rows.ts
+ * (S8: the §21 zoom-consistency backtest drives the exact same function
+ * the drawing renders). Re-exported so existing importers keep working. */
+export type { MapRow } from './world-map-rows';
 
 /** The 3D pin's teardrop in DESIGN units (2026-10-20g owner round): the
  * TIP sits exactly on the index's location, the bulb is centred
  * (0,−9.3) with r 5.2, total height 14.5. Scaled per stage width. */
 const PIN_PATH = 'M0 0C-2.3-3.4-5.2-5.6-5.2-9.3A5.2 5.2 0 1 1 5.2-9.3C5.2-5.6 2.3-3.4 0 0Z';
-
-function pctOf(entry: MarketEntry | undefined, period: MapPeriod): number | null {
-  if (entry === undefined) return null;
-  if (period === '1D') return entry.chg1d;
-  if (period === '1W') return entry.chg1w ?? null;
-  if (period === '1M') return entry.chg1m ?? null;
-  if (period === '3M') return entry.chg3m;
-  if (period === '5Y') return entry.chg5y ?? null;
-  return entry.chg1y ?? null; // 2026-10-20h: yearly returns to the map
-}
 
 /** M10's breadth counts — RETIRED with the map's one-glance breadth line
  * (2026-10-29 owner round); the MarketsVerdict box keeps the section's
@@ -216,6 +177,7 @@ export function WorldMap({
   onOpenMarket,
   period: periodProp,
   onPeriodChange,
+  region,
 }: {
   /** The section's stored snapshot (absent in the loading state). */
   snapshot?: { markets: readonly MarketEntry[]; generatedAt: string };
@@ -237,8 +199,21 @@ export function WorldMap({
    * (the standalone/loading usage). */
   period?: MapPeriod;
   onPeriodChange?: (p: MapPeriod) => void;
+  /** Page-division S8 (D-13/D-43/D-44): render the REGION ZOOM — the
+   * SAME drawing over the SAME payload, with the window, the seated
+   * pins/cards and the card positions from REGION_ZOOMS. Absent → the
+   * world view, byte-identical to before S8 (the legacy /insights
+   * section and the /world-markets hero pass nothing here). The rows'
+   * derivation NEVER changes with this prop: all 16 board rows feed
+   * the relative colour scale, so a zoomed market's colour is the
+   * world map's own colour (the S8 gate, D-48). */
+  region?: MapRegionId;
 }) {
   const mapCopy = copy.markets.map;
+  const zoom = regionZoomOf(region);
+  // The active window in world-box units — the zoom's crop, or the whole
+  // world box (byte-identical viewBox string for the world view).
+  const vb = zoom !== undefined ? zoom.viewBox : { x: 0, y: 0, w: geo.viewBox.width, h: geo.viewBox.height };
   const rootRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const linesGRef = useRef<SVGGElement | null>(null);
@@ -312,65 +287,26 @@ export function WorldMap({
     return () => ro.disconnect();
   }, []);
 
-  /* The rows (§4.1 order = DOM order = tab order), pure derivation. The
-   * relative colour scale normalises on the FRESH readings of each period
-   * separately (the strongest D mover and the strongest M mover each read
-   * weight 1 — "relative" is per lens, never across lenses). */
-  const rows = useMemo<MapRow[]>(() => {
-    const pctsAll = MAP_INDICES.map((cfg) => {
-      const entry = snapshot?.markets.find((m) => m.id === cfg.id);
-      const old = !loading && entry !== undefined && isOld(entry, todayIso);
-      const pcts = {
-        '1D': loading || old ? null : pctOf(entry, '1D'),
-        '1W': loading || old ? null : pctOf(entry, '1W'),
-        '1M': loading || old ? null : pctOf(entry, '1M'),
-        '3M': loading || old ? null : pctOf(entry, '3M'),
-        '1Y': loading || old ? null : pctOf(entry, '1Y'),
-        '5Y': loading || old ? null : pctOf(entry, '5Y'),
-      } as Record<MapPeriod, number | null>;
-      return { cfg, entry, old, pcts };
-    });
-    const scales = {
-      '1D': mapScaleOf(pctsAll.map((r) => r.pcts['1D'])),
-      '1W': mapScaleOf(pctsAll.map((r) => r.pcts['1W'])),
-      '1M': mapScaleOf(pctsAll.map((r) => r.pcts['1M'])),
-      '3M': mapScaleOf(pctsAll.map((r) => r.pcts['3M'])),
-      '1Y': mapScaleOf(pctsAll.map((r) => r.pcts['1Y'])),
-      '5Y': mapScaleOf(pctsAll.map((r) => r.pcts['5Y'])),
-    } as Record<MapPeriod, number>;
-    return pctsAll.map(({ cfg, entry, old, pcts }) => {
-      const wts = {
-        '1D': pcts['1D'] === null ? 0 : mapWeightOf(pcts['1D'], '1D', scales['1D']),
-        '1W': pcts['1W'] === null ? 0 : mapWeightOf(pcts['1W'], '1W', scales['1W']),
-        '1M': pcts['1M'] === null ? 0 : mapWeightOf(pcts['1M'], '1M', scales['1M']),
-        '3M': pcts['3M'] === null ? 0 : mapWeightOf(pcts['3M'], '3M', scales['3M']),
-        '1Y': pcts['1Y'] === null ? 0 : mapWeightOf(pcts['1Y'], '1Y', scales['1Y']),
-        '5Y': pcts['5Y'] === null ? 0 : mapWeightOf(pcts['5Y'], '5Y', scales['5Y']),
-      } as Record<MapPeriod, number>;
-      const pct = pcts[period];
-      const dir: MapDir | null = pct === null || pct === 0 ? null : pct > 0 ? 'u' : 'd';
-      return {
-        id: cfg.id,
-        cfg,
-        entry,
-        pcts,
-        wts,
-        dir,
-        pct,
-        old,
-        // 2026-10-29 owner round: the CALENDAR gates the pin too — a stored
-        // "open" flag written before the weekend must never read "open"
-        // on a Saturday (the quote-flow flag tracks the last refresh, not
-        // the exchange's own clock; sessionOpen reads the definitions'
-        // IANA timezone + session + holiday calendar).
-        open:
-          !loading &&
-          entry !== undefined &&
-          openAtViewTime(entry, nowMs) &&
-          sessionOpen(marketDefinition(entry.id), new Date(nowMs)),
-      };
-    });
-  }, [snapshot, period, loading, todayIso, nowMs]);
+  /* The rows (§4.1 order = DOM order = tab order), pure derivation — the
+   * EXTRACTED module function (S8: world-map-rows.ts, the §21 backtest's
+   * page side drives the same code). The relative colour scale normalises
+   * on the FRESH readings of each period separately (the strongest D
+   * mover and the strongest M mover each read weight 1 — "relative" is
+   * per lens, never across lenses), over ALL SIXTEEN registry indices
+   * regardless of the region prop — a zoomed market's colour is the world
+   * map's own colour (D-48, the S8 gate). */
+  const rows = useMemo<MapRow[]>(
+    () => deriveWorldMapRows(snapshot, { period, loading, todayIso, nowMs }),
+    [snapshot, period, loading, todayIso, nowMs],
+  );
+
+  /* S8 — the ZOOM's seated rows: the presentation subset that gets pins,
+   * callout cards and leader lines in the region view. The FULL rows feed
+   * the colour scale above; only the seating is filtered. */
+  const shownRows = useMemo(
+    () => (zoom !== undefined ? rows.filter((r) => zoom.indices.includes(r.id)) : rows),
+    [rows, zoom],
+  );
 
   /* 2026-10-20g owner round — COUNTRY TINTS: a country that hosts several
    * indices (the US trio on New York) tints by its STRONGEST fresh mover
@@ -396,22 +332,31 @@ export function WorldMap({
   /* The selected COUNTRY's name label (2026-10-20g): the config's tuned
    * anchor + size when present, else the build-time geo centroid (the
    * largest-polygon one) at the default size. Path-less rows (Hong Kong,
-   * the Eurozone) carry an absolute anchor in the config instead. */
+   * the Eurozone) carry an absolute anchor in the config instead.
+   * S8: a zoom overrides the anchor where the world's own sits outside
+   * the window or under a zoom-seated card, and scales the SIZE by the
+   * window ratio so the label renders at exactly the size the world map
+   * shows at the same stage width (spec.size × stageW / 1000 px). */
   const activeLabel = useMemo(() => {
     if (activeRow === undefined) return null;
-    const spec = MAP_LABELS[activeRow.cfg.cc];
+    const zoomAnchor = zoom?.labels?.[activeRow.cfg.cc];
+    const spec = zoomAnchor !== undefined ? { ...zoomAnchor, size: MAP_LABELS[activeRow.cfg.cc]?.size ?? MAP_LABEL_SIZE_DEFAULT } : MAP_LABELS[activeRow.cfg.cc];
+    const sizeScale = zoom !== undefined ? vb.w / geo.viewBox.width : 1;
     if (spec !== undefined) {
-      return { x: (spec.x / 100) * geo.viewBox.width, y: (spec.y / 100) * geo.viewBox.height, size: spec.size, text: mapCopy.countryNames[activeRow.cfg.cc] };
+      return { x: (spec.x / 100) * geo.viewBox.width, y: (spec.y / 100) * geo.viewBox.height, size: spec.size * sizeScale, text: mapCopy.countryNames[activeRow.cfg.cc] };
     }
     const gl = activeRow.cfg.iso !== null ? geo.labels[activeRow.cfg.iso as keyof typeof geo.labels] : undefined;
     if (gl === undefined) return null;
-    return { x: (gl.x / 100) * geo.viewBox.width, y: (gl.y / 100) * geo.viewBox.height, size: MAP_LABEL_SIZE_DEFAULT, text: mapCopy.countryNames[activeRow.cfg.cc] };
-  }, [activeRow, mapCopy]);
+    return { x: (gl.x / 100) * geo.viewBox.width, y: (gl.y / 100) * geo.viewBox.height, size: MAP_LABEL_SIZE_DEFAULT * sizeScale, text: mapCopy.countryNames[activeRow.cfg.cc] };
+  }, [activeRow, mapCopy, zoom, vb.w]);
 
   /* M7: leader lines — from each card's nearest edge to its dot, in the
    * map's own coordinate system, recomputed after every layout change.
    * Drawn imperatively into the <g> layer (a measurement effect — no
-   * state, no re-render, the §9 layout probe reads the same geometry). */
+   * state, no re-render, the §9 layout probe reads the same geometry).
+   * S8: the px→unit math reads the ACTIVE window (vb) instead of the
+   * world box — identical numbers for the world view (vb = the whole
+   * box), and the zoom's own scale for a region view. */
   useLayoutEffect(() => {
     const g = linesGRef.current;
     if (g === null) return;
@@ -419,20 +364,20 @@ export function WorldMap({
     const stage = stageRef.current;
     if (!mapLayout || loading || stage === null) return;
     const sr = stage.getBoundingClientRect();
-    const scale = sr.width / (geo.viewBox.width || 1);
-    for (const r of rows) {
+    const scale = sr.width / (vb.w || 1);
+    for (const r of shownRows) {
       const card = cardRefs.current.get(r.id);
       const dot = geo.dots[r.cfg.id as keyof typeof geo.dots];
       if (card === undefined || dot === undefined) continue;
       const cr = card.getBoundingClientRect();
       const dx = (dot.x / 100) * geo.viewBox.width;
       const dy = (dot.y / 100) * geo.viewBox.height;
-      // The card's edges in viewBox units, then the nearest edge point:
-      // the dot clamped into the card rect.
-      const L = (cr.left - sr.left) / scale;
-      const R = (cr.right - sr.left) / scale;
-      const T = (cr.top - sr.top) / scale;
-      const B = (cr.bottom - sr.top) / scale;
+      // The card's edges in viewBox units (window-relative), then the
+      // nearest edge point: the dot clamped into the card rect.
+      const L = vb.x + (cr.left - sr.left) / scale;
+      const R = vb.x + (cr.right - sr.left) / scale;
+      const T = vb.y + (cr.top - sr.top) / (sr.height / (vb.h || 1));
+      const B = vb.y + (cr.bottom - sr.top) / (sr.height / (vb.h || 1));
       const x = Math.min(Math.max(dx, L), R);
       const y = Math.min(Math.max(dy, T), B);
       const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -444,28 +389,42 @@ export function WorldMap({
       ln.setAttribute('class', `wm-ln ${r.dir !== null ? `s-${r.dir}` : 's-x'}${r.id === activeId ? ' on' : ''}`);
       g.appendChild(ln);
     }
-  }, [mapLayout, loading, rows, assets, stageW, period, activeId]);
+  }, [mapLayout, loading, shownRows, assets, stageW, period, activeId, vb.x, vb.y, vb.w, vb.h]);
 
   /* M13: the list layout's dot tap scrolls to the market's row in the
-   * explorer below and flashes it. */
+   * explorer below and flashes it. S8: when no explorer tile exists on
+   * THIS surface (the page-division pages — /world-markets carries the
+   * wm-row-* grids, the region pages carry their zoom only), the tap
+   * falls back to the caller's own open handler instead of dying — on
+   * /world-markets that scrolls to the region-grid row (the S7 promise
+   * the mobile dot never honoured), on a region page it opens the
+   * market's full home. The legacy /insights explorer keeps its tile. */
   const onDotClick = useCallback(
     (id: MarketId) => {
       if (mapLayout) return; // the cards are the interactive layer there
       const tile = document.getElementById(`insights-market-tile-${id}`);
-      if (tile === null) return;
+      if (tile === null) {
+        onOpenMarket(id);
+        return;
+      }
       tile.scrollIntoView({ block: 'center', behavior: 'smooth' });
       tile.classList.add('wm-flash');
       window.setTimeout(() => tile.classList.remove('wm-flash'), 1600);
     },
-    [mapLayout],
+    [mapLayout, onOpenMarket],
   );
 
   /* Pin scale (2026-10-20g): the design pin is 14.5 viewBox units tall;
    * the RENDERED pin targets ~16px in the map layout and ~12.5px on the
    * phone's list layout (proportionally more units — small maps keep every
-   * pin visible and tappable). The hit circle covers the bulb at ≥12px. */
-  const unitsPerPx = stageW > 0 ? geo.viewBox.width / stageW : 1;
-  const pinK = Math.max(0.55, ((stageW >= LAYOUT_SWITCH_PX ? 16 : 12.5) * unitsPerPx) / 14.5);
+   * pin visible and tappable). The hit circle covers the bulb at ≥12px.
+   * S8: the unit math reads the ACTIVE window — a zoomed window holds
+   * fewer units per px, so the pin scales DOWN to keep the same rendered
+   * target (the world view's 0.55 floor would inflate a zoomed pin to
+   * ~2.5× its target, so the floor applies to the world view only). */
+  const unitsPerPx = stageW > 0 ? vb.w / stageW : 1;
+  const pinTargetK = ((stageW >= LAYOUT_SWITCH_PX ? 16 : 12.5) * unitsPerPx) / 14.5;
+  const pinK = zoom === undefined ? Math.max(0.55, pinTargetK) : pinTargetK;
 
   const dirWord: Record<'u' | 'd' | 'x', string> = {
     d: mapCopy.stepFall,
@@ -497,7 +456,13 @@ export function WorldMap({
       : null;
 
   return (
-    <div ref={rootRef} className="wm @container flex flex-col gap-2" data-wm-layout={mapLayout ? 'map' : 'list'}>
+    <div
+      ref={rootRef}
+      className="wm @container flex flex-col gap-2"
+      data-wm-layout={mapLayout ? 'map' : 'list'}
+      data-wm-zoom={region ?? undefined}
+      style={zoom !== undefined ? { ['--wm-zoom-ar' as string]: `${zoom.viewBox.w} / ${zoom.viewBox.h}` } : undefined}
+    >
       {/* The flags sprite mounts once, hidden (B2). */}
       {assets !== null ? (
         <svg className="wm-sprite" aria-hidden="true" focusable="false" dangerouslySetInnerHTML={{ __html: assets.flagsHtml }} />
@@ -575,15 +540,19 @@ export function WorldMap({
       ) : null}
 
       {/* The stage: the map box — LTR in both languages, fixed aspect
-       * (reserved height in every state, M2/M17). */}
+       * (reserved height in every state, M2/M17). S8: a zoom's stage
+       * carries its window's OWN aspect ratio (the --wm-zoom-ar var the
+       * CSS rules below read) so the viewBox mapping stays exact; the
+       * world view keeps the 1000/521 rule untouched. */}
       <div
         ref={stageRef}
         className={`wm-stage ${activeId !== null ? 'hl' : ''}`}
         data-wm-stage=""
+        data-wm-zoom-stage={region ?? undefined}
       >
         <svg
           className="wm-map"
-          viewBox={`0 0 ${geo.viewBox.width} ${geo.viewBox.height}`}
+          viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
           preserveAspectRatio="xMidYMid meet"
           aria-hidden="true"
           focusable="false"
@@ -627,9 +596,11 @@ export function WorldMap({
            * fall — filled whether open or closed, like a pin on a map), a
            * rim cut stronger than the fill, a specular highlight and a
            * ground shadow for the 3D read. The bulb's inner core keeps
-           * the legend's key: solid = open, hollow = closed. */}
+           * the legend's key: solid = open, hollow = closed.
+           * S8: a zoom seats ONLY its own indices' pins (the colour data
+           * behind them is still the full 16-row derivation). */}
           <g>
-            {rows.map((r) => {
+            {shownRows.map((r) => {
               const dot = geo.dots[r.cfg.id as keyof typeof geo.dots];
               if (dot === undefined) return null;
               const cx = (dot.x / 100) * geo.viewBox.width;
@@ -678,7 +649,7 @@ export function WorldMap({
          * in that same period. */}
         {!loading ? (
           <div className="wm-cards absolute inset-0 hidden @min-[960px]:block">
-            {rows.map((r) => {
+            {shownRows.map((r) => {
               // §M6: the card's SHORT name — the canonical name unless the
               // config shortens it (only Shanghai Composite does); the
               // accessible name and the explorer below keep the full name.
@@ -695,6 +666,11 @@ export function WorldMap({
                 country,
                 step: hasData ? dirWord[r.dir ?? 'x'] : stateWord,
               });
+              // S8: a zoom seats its cards at the ZOOM's own positions and
+              // width (REGION_ZOOMS); the world view keeps MAP_INDICES'
+              // positions and MAP_CARD_WIDTH_PCT — byte-identical styling.
+              const cardPos = zoom?.cards[r.id] ?? r.cfg.card;
+              const cardWidth = zoom?.cardWidthPct ?? MAP_CARD_WIDTH_PCT;
               return (
                 <button
                   key={r.id}
@@ -706,9 +682,9 @@ export function WorldMap({
                   type="button"
                   className={`wm-card insights-focusable ${r.dir !== null ? `s-${r.dir}` : 's-x'}${activeId === r.id ? ' on' : ''}`}
                   style={{
-                    left: `${r.cfg.card.x}%`,
-                    top: `${r.cfg.card.y}%`,
-                    width: `${MAP_CARD_WIDTH_PCT}%`,
+                    left: `${cardPos.x}%`,
+                    top: `${cardPos.y}%`,
+                    width: `${cardWidth}%`,
                     ...(r.dir !== null ? { ['--b' as string]: `${borderMixOf(r.wts[period])}%` } : undefined),
                   }}
                   onMouseEnter={() => setActiveId(r.id)}

@@ -6,6 +6,19 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+## THIS SESSION'S GOAL (S8, written before coding — AGENTS.md §2.6)
+
+**S8 — the Regional zoom maps (Phase C continues, spec §6 note + §7 item 8
++ §8 item 3 + §9 item 6, D-13/D-43/D-44):** zoomed continent maps for the
+four region pages — Europe-only, Asia-only, Americas/US, AU — data from
+the SAME markets board payload (no new fetches, no new KV). Milestones:
+M1 the zoom config (windows + subsets + card positions) · M2 the WorldMap
+region-zoom mode (one drawing, the same rows/colours/words, D-48) · M3
+the region pages render their zoom + the copy · M4 the tests + the §21
+zoom-consistency backtest · M5 the gates + the browser pass (1440×900 +
+360×844, en + fa RTL) · M6 the deploy (the owner's standing) + the
+records + the hand-off.
+
 ## Current state (2026-11-08, after page-division S7)
 
 - **Program:** page-division — splitting the all-in-one Insights page

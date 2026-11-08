@@ -64,17 +64,20 @@ const GoldPage = lazy(() => import('./routes/page-division/GoldPage').then((m) =
 const WorldMarketsPage = lazy(() =>
   import('./routes/page-division/WorldMarketsPage').then((m) => ({ default: m.WorldMarketsPage })),
 );
+// Page-division S8 (2026-11-08): the four REGION pages — the USA,
+// Europe, Asia & Pacific and Australia destinations, each carrying its
+// D-44 index/map section (the REUSED world map in region-zoom mode)
+// above the S1 placeholder body. ONE lazy chunk serves all four routes
+// (the region rides the route); the entry graph stays untouched.
+const RegionPage = lazy(() => import('./routes/page-division/RegionPage').then((m) => ({ default: m.RegionPage })));
 
-/** The six destination routes that still share the placeholder chunk
- *  (S7: /world-markets left the set — its page build landed). */
-const DESTINATION_ROUTES: ReadonlySet<string> = new Set([
-  '/currencies',
-  '/commodities',
-  '/usa',
-  '/europe',
-  '/asia-pacific',
-  '/australia',
-]);
+/** The two destination routes that still share the placeholder chunk
+ *  (S8: the four region pages left the set — their zoom sections landed
+ *  on RegionPage). */
+const DESTINATION_ROUTES: ReadonlySet<string> = new Set(['/currencies', '/commodities']);
+
+/** The four region routes that render RegionPage (S8). */
+const REGION_ROUTES: ReadonlySet<string> = new Set(['/usa', '/europe', '/asia-pacific', '/australia']);
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
@@ -226,14 +229,17 @@ export function App() {
               the D-21 verdict board, built on the S2 projection contract;
               S5 (D-26…D-29): `/gold` is the Gold conditions meter;
               S7 (D-43/D-47): `/world-markets` is the World Markets page;
-              the six remaining destinations share one lazy placeholder
-              chunk; the Converter lives at /converter unchanged. */}
+              S8 (D-13/D-44): the four REGION pages render their zoom
+              sections on RegionPage; Commodities + Currencies share the
+              lazy placeholder chunk until S17/S18; the Converter lives
+              at /converter unchanged. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
             {route === '/' ? <GlobalPage /> : null}
             {route === '/gold' ? <GoldPage /> : null}
             {route === '/world-markets' ? <WorldMarketsPage /> : null}
             {route === '/converter' ? <Converter /> : null}
+            {REGION_ROUTES.has(route) ? <RegionPage /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}
             {route === '/history' ? <History /> : null}

@@ -1061,6 +1061,22 @@ export const en = {
       summary:
         'The AU Markets board (All Ordinaries, ten ASX-200 sectors, the four big banks, ASX 200 VIX, NZX50) on top and 28 cards in the unchanged five-gauge structure.',
     },
+    /* ---- S8 (2026-11-08): the REGION ZOOM sections' own copy (the
+     * four region pages' index/map sections, D-13/D-44). The titles and
+     * the intro line are FRESH words, queued unreviewed in the Persian
+     * copy manifest; every word INSIDE the map drawing is the S7
+     * corpus-pinned pd.worldMarkets.map block through the one shared
+     * adapter (world-map-copy.ts) — never restated here (D-48). */
+    regionZoom: {
+      titles: {
+        us: 'US stock indexes',
+        europe: 'European stock indexes',
+        asia: 'Asia & Pacific stock indexes',
+        australia: 'Australian stock indexes',
+      },
+      introLine:
+        'The same live world-markets map, zoomed to this region — the same board data, the same colours, the same words as the world view.',
+    },
     commodities: {
       title: 'Commodities & Energy',
       purpose: 'Every commodity, exclusively here — energy, metals, agriculture and digital.',

@@ -2629,6 +2629,20 @@ html[dir='rtl'] .insights-panel {
   width: calc(100% - clamp(150px, 20cqw, 280px));
   margin-inline: auto;
 }
+/* Page-division S8 (2026-11-08) — the REGION ZOOM stage: the window's
+ * own aspect ratio (so the viewBox mapping stays exact and the leader
+ * lines' px→unit math is uniform), with the map-layout width capped so
+ * a near-square window (Europe, Australia) never dominates the page:
+ * the width follows the ratio at a ~600px height ceiling. The ratio var
+ * rides the module root inline style ("w / h", a valid aspect-ratio
+ * token stream AND a valid calc factor); the world view never sets it,
+ * so its own rules above stay byte-identical. */
+.wm[data-wm-zoom] .wm-stage {
+  aspect-ratio: var(--wm-zoom-ar, 1000 / 521);
+}
+.wm[data-wm-layout='map'][data-wm-zoom] .wm-stage {
+  width: min(calc(100% - clamp(150px, 20cqw, 280px)), calc(600px * var(--wm-zoom-ar, 1.919)));
+}
 .wm-map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* M3 — quiet land, VISIBLE grey borders (2026-10-20f: a clear grey line

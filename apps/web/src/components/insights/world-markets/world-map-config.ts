@@ -74,6 +74,154 @@ export type MapPeriod = '1D' | '1W' | '1M' | '3M' | '1Y' | '5Y';
 export const MAP_PERIODS: readonly MapPeriod[] = ['1D', '1W', '1M', '3M', '1Y', '5Y'];
 
 /* ------------------------------------------------------------------ *
+ * §REGION ZOOMS (page-division S8, 2026-11-08 — D-13/D-43/D-44): the
+ * zoomed continent windows the four region pages render. THE ONE RULE
+ * (the S8 gate, D-48): a zoom is the SAME drawing over the SAME board
+ * payload — the same rows (all 16 feed the relative colour scale, so a
+ * market's colour on a zoom is byte-identical to its colour on the
+ * world map), the same words (the same WorldMapCopy adapter), the same
+ * pins and cards. Only the WINDOW and WHICH indices get callout cards
+ * change — pure presentation, zero new fetches, zero new KV.
+ *
+ * The windows below are hand-tuned crops of the SAME 1000×521 world box
+ * (the projection's own coordinates — Iberia ≈ x 474, North Cape ≈
+ * (552, 39), Mumbai ≈ (699, 199), Sydney ≈ (896, 370); see
+ * build-world-map.mjs). The card positions are percentages of the ZOOM's
+ * own stage box (the same language as MAP_INDICES' card fields above,
+ * re-based to the window); cardWidthPct is wider than the world's 14.5
+ * because a zoom seats 1–6 cards, not 16.
+ *
+ * Membership (D-43 "Europe-only, Asia-only, …" + D-44 "TSX/IBOV stay on
+ * World Markets until the OECD page exists"): every world-map index
+ * appears in EXACTLY ONE zoom except tsx/ibov; asx200 rides the
+ * AUSTRALIA zoom (the world board's only AU row — the 19-symbol AU
+ * Markets board is S16's own scope, a table there, not map pins).
+ * zoom.test.ts pins all of this.
+ * ------------------------------------------------------------------ */
+
+/** The four region pages' zoom ids (the route mapping lives with the
+ * pages: /usa → 'us', /europe → 'europe', /asia-pacific → 'asia',
+ * /australia → 'australia'). */
+export type MapRegionId = 'europe' | 'asia' | 'us' | 'australia';
+
+/** The zoomed window + its presentation subset (world-box units). */
+export interface RegionZoomConfig {
+  /** The SVG window into the SAME 1000×521 world box — the zoomed
+   * viewBox. Must sit inside the world box and contain every zoomed
+   * dot with margin (zoom.test.ts). */
+  viewBox: { x: number; y: number; w: number; h: number };
+  /** The indices that get pins + callout cards in this zoom (the
+   * presentation subset of MAP_INDICES — D-43/D-44). The colour scale
+   * is NEVER re-derived over this subset: all 16 rows feed it. */
+  indices: readonly MarketId[];
+  /** Per-index callout card centre, % of the ZOOM's stage box. Every
+   * index in `indices` must have an entry (zoom.test.ts pins it). */
+  cards: Readonly<Partial<Record<MarketId, { x: number; y: number }>>>;
+  /** The callout card width, % of the zoom's stage (vs the world's
+   * MAP_CARD_WIDTH_PCT = 14.5). */
+  cardWidthPct: number;
+  /**
+   * Per-country NAME-LABEL anchor overrides for this zoom, in the SAME
+   * world-box percentages as MAP_LABELS (the world-tuned anchors can
+   * fall outside a window — the Eurozone label sits at world x 61.5%,
+   * east of the Europe window — or under a zoom-seated card). Absent →
+   * the world's own MAP_LABELS anchor. Sizes always scale by the zoom
+   * factor so the label renders at the size the world map shows at the
+   * same stage width.
+   */
+  labels?: Readonly<Partial<Record<MapCc, { x: number; y: number }>>>;
+}
+
+export const REGION_ZOOMS: Readonly<Record<MapRegionId, RegionZoomConfig>> = {
+  // Europe — the whole continent framed: Iberia to the Black Sea, North
+  // Cape to the Mediterranean. The four pins (London · Paris · Frankfurt
+  // · Brussels) sit centre-left; the four cards quarter around them.
+  // Window: world x 458→606, y 32→152 (aspect 148/120).
+  europe: {
+    viewBox: { x: 458, y: 32, w: 148, h: 120 },
+    indices: ['ftse', 'cac', 'dax', 'stoxx50'],
+    cards: {
+      ftse: { x: 15, y: 17 },
+      dax: { x: 64, y: 20 },
+      cac: { x: 18, y: 88 },
+      stoxx50: { x: 68, y: 84 },
+    },
+    cardWidthPct: 24,
+    labels: {
+      // The world's own anchor (61.5, 20.8) sits EAST of this window.
+      eu: { x: 58, y: 20.5 },
+    },
+  },
+  // Asia — the six world-board Asian indices: Mumbai in the SW corner,
+  // the Shanghai/Hong Kong/Taipei cluster, Seoul and Tokyo in the NE.
+  // Window: world x 665→880, y 82→230 (aspect 215/148) — India to
+  // Japan, the Himalayas to Sumatra's north coast. NZX50 is NOT here:
+  // it is not on the world board (the AU board carries it; S14/S16
+  // wire that page section — recorded, never silently faked).
+  asia: {
+    viewBox: { x: 665, y: 82, w: 215, h: 148 },
+    indices: ['nifty50', 'hsi', 'ssec', 'taiex', 'kospi', 'n225'],
+    cards: {
+      nifty50: { x: 12, y: 52 },
+      ssec: { x: 58, y: 36 },
+      kospi: { x: 58, y: 12 },
+      n225: { x: 82, y: 14 },
+      taiex: { x: 86, y: 84 },
+      hsi: { x: 62, y: 88 },
+    },
+    cardWidthPct: 20,
+    labels: {
+      // The world's Korea anchor (80, 26) lands under the ssec card
+      // here; Japan's (89.5, 26) sits outside the window's east edge;
+      // Hong Kong's (77.8, 39.2) would sit inside the hsi card.
+      kr: { x: 82.5, y: 26 },
+      jp: { x: 85.5, y: 28.8 },
+      hk: { x: 78.8, y: 37.4 },
+    },
+  },
+  // US — the D-44 index section: the New York trio only (TSX/IBOV stay
+  // on World Markets until the OECD page exists). The pins fan off New
+  // York on the EAST edge; the three cards sit in the wide open west.
+  // Window: world x 185→340, y 92→184 (aspect 155/92) — the continental
+  // US, Seattle to Maine, Florida keys included, southern Canada and
+  // northern Mexico as context.
+  us: {
+    viewBox: { x: 185, y: 92, w: 155, h: 92 },
+    indices: ['sp500', 'ndx', 'dow'],
+    cards: {
+      sp500: { x: 24, y: 18 },
+      ndx: { x: 56, y: 14 },
+      dow: { x: 52, y: 82 },
+    },
+    cardWidthPct: 24,
+  },
+  // Australia — the world board's one AU row (the ASX 200 anchor;
+  // Sydney's pin in the SE). The 19-symbol AU Markets board (All
+  // Ordinaries, sectors, banks, NZX50) is S16's own scope and renders
+  // as a table there — a map with 18 pins on one city would be a blob,
+  // which is exactly why it never was a map. Window: world x 795→910,
+  // y 288→410 (aspect 115/122) — the mainland, Tasmania and the
+  // surrounding seas.
+  australia: {
+    viewBox: { x: 795, y: 288, w: 115, h: 122 },
+    indices: ['asx200'],
+    cards: {
+      asx200: { x: 70, y: 20 },
+    },
+    cardWidthPct: 30,
+    labels: {
+      // The world's anchor (76, 67) sits WEST of this window.
+      au: { x: 83, y: 71 },
+    },
+  },
+};
+
+/** The zoom's window for a region (undefined region → the world view). */
+export function regionZoomOf(region: MapRegionId | undefined): RegionZoomConfig | undefined {
+  return region === undefined ? undefined : REGION_ZOOMS[region];
+}
+
+/* ------------------------------------------------------------------ *
  * §4.2 — the flat band per period (percent change, display only)
  *
  * 2026-10-20f owner round: the five discrete steps retired in favour of
