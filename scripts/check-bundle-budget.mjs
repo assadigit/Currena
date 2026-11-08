@@ -1037,9 +1037,26 @@ const BUDGETS = [
   // (the zoom section) ride their own shared chunks both routes load
   // (GlobalPage SHRANK 24.40→23.04 through the same sharing — the
   // derivation's bytes are paid once). The entry chunk gains only the
-  // lazy wiring (269.71/81.70 → 270.04/81.64 vs 296/89.5). Ceiling 20/6
-  // per the tight convention (~4.8 kB raw / ~1.7 kB gz headroom).
-  { pattern: /^UsaPage-[\w-]+\.js$/, raw: 20_000, gz: 6_000, label: 'USA page lazy chunk (page-division S9)' },
+  // lazy wiring (269.71/81.70 → 270.04/81.64 vs 296/89.5).
+  // S10 (2026-11-09) bump 20/6 → 26/7 (measured 24.49/6.38): the page's
+  // chunk gains the THREE S10 tier sections (the 46 new display configs
+  // + the 72-key name map) + the tier-6 TIC wrapper + the usa-tic-copy
+  // adapter, while the REUSED TicSection drawing moved to its own shared
+  // tic chunk both /usa and /insights load (see the row below — the
+  // drawing's bytes are paid once, BD-S10a). Ceiling 26/7 per the tight
+  // convention (~1.5 kB raw / ~0.6 kB gz headroom).
+  { pattern: /^UsaPage-[\w-]+\.js$/, raw: 26_000, gz: 7_000, label: 'USA page lazy chunk (page-division S9+S10)' },
+  // Page-division S10 (2026-11-09): the shared TIC drawing — the legacy
+  // "Who holds US government debt" section, extracted to its own chunk
+  // the moment /usa's tier-6 board imported it (Vite's shared-chunk
+  // split; the S8 map treatment). Measured 21.16/5.62: the section
+  // drawing + the pure tic compute helpers, every word fed through the
+  // caller's copy contract (the legacy corpus on /insights, the pinned
+  // pd.usa.tic adapter on /usa — one drawing, one vocabulary, D-48). The
+  // Insights chunk itself SHRANK 1553.17→1532.14 raw through the same
+  // split. Ceiling 24/7 per the tight convention (~2.8 kB raw / ~1.4 kB
+  // gz headroom).
+  { pattern: /^tic-[\w-]+\.js$/, raw: 24_000, gz: 7_000, label: 'shared TIC section chunk (page-division S10 — the reused tier-6 drawing)' },
 ];
 
 function main() {
