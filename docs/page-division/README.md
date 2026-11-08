@@ -37,13 +37,17 @@ regeneration (`pnpm placement:generate`).
   investor's review** (spec §19 lists the questions).
 - **Phase 3 (final spec):** pending the investor — roadmap S22 records the
   answers as D-49+.
-- **Phase 4 (build):** **RUNNING — Session 1/30 (S1 scaffold &
-  navigation) delivered & gated 2026-11-07 · Session 2/30 (S2 — the data
-  layer + `PLACEMENT.generated.md`) delivered & gated 2026-11-08 ·
-  Session 3/30 (S3 — the Global page build: the D-21 ten-tile verdict
-  board, the landing page live) delivered & gated 2026-11-08.** Next:
-  Session 4/30 (S4 — Global gates & polish). See the roadmap's progress
-  board for the current position.
+- **Phase 4 (build):** **RUNNING — Phase A (Foundings) CLOSED: S1
+  (scaffold & navigation) 2026-11-07 · S2 (the data layer +
+  `PLACEMENT.generated.md`) 2026-11-08 · S3 (the Global page build: the
+  D-21 ten-tile verdict board) 2026-11-08 · S4 (Global gates & polish:
+  the §21 verdict-consistency backtest 84/84 green, BD-S4a/b, the
+  mobile/ARIA pass) 2026-11-08 — and the landing page DEPLOYED LIVE
+  (version `637db8f8`; the S2 endpoints + the S3 page + the S4 polish
+  for every visitor; the live acceptance record in
+  `docs/DEPLOY.md` 2026-11-08c).** Next: Session 5/30 (S5 — the Gold
+  page build). See the roadmap's progress board for the current
+  position.
 
 ## The one rule that trumps everything
 
