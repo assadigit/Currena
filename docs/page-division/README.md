@@ -38,19 +38,21 @@ regeneration (`pnpm placement:generate`).
 - **Phase 3 (final spec):** pending the investor — roadmap S22 records the
   answers as D-49+.
 - **Phase 4 (build):** **RUNNING — Phase A (Foundations) CLOSED and
-  Phase B (Gold) OPEN: S1 (scaffold & navigation) 2026-11-07 · S2 (the
+  Phase B (Gold) CLOSED: S1 (scaffold & navigation) 2026-11-07 · S2 (the
   data layer + `PLACEMENT.generated.md`) 2026-11-08 · S3 (the Global
   page build: the D-21 ten-tile verdict board) 2026-11-08 · S4 (Global
   gates & polish: the §21 verdict-consistency backtest 84/84 green,
   BD-S4a/b, the mobile/ARIA pass) 2026-11-08 — the landing page
   DEPLOYED LIVE (version `b1cfa4fe`; the live acceptance record in
   `docs/DEPLOY.md` 2026-11-08c). S5 (the Gold page build: the 37-voter
-  conditions meter — the hero, the five lanes, the context cards, the
-  honest record) 2026-11-08 — the §21 seat-level diff 150/150 green
-  against production twice, and the Gold page DEPLOYED LIVE at
-  `/gold` (version `f2e74f3c`; the live acceptance record in
-  `docs/DEPLOY.md` 2026-11-08d).** Next: Session 6/30 (S6 — the Gold
-  gates). See the roadmap's progress board for the current position.
+  conditions meter) 2026-11-08 — DEPLOYED LIVE at `/gold` (version
+  `f2e74f3c`). S6 (the Gold gates + the owner's alternation BD-S6a: the
+  previous brass balance shape on `/gold`, smaller, beside the minimal
+  design — plus the frozen-scenario suite over the recorded corpus and
+  the mobile/ARIA pass) 2026-11-08 — DEPLOYED LIVE (version `327c7761`;
+  the live acceptance record in `docs/DEPLOY.md` 2026-11-08e).** Next:
+  Session 7/30 (S7 — the World Markets build, Phase C opens). See the
+  roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

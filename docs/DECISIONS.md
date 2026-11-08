@@ -106,3 +106,91 @@
 - **Who decided:** the build session (S5) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-08d.
+
+## 2026-11-08 — BD-S6a: the Gold hero's balance-view alternation (the previous shape, smaller, beside the minimal design)
+
+- **Decision:** the Gold page's hero balance block now carries TWO
+  alternating designs through a real radio group — **the classic view**
+  (the PREVIOUS shape of the gold balance: the brass assay-office stage
+  with the five lane weights + the not-leaning tray, rendered SMALLER —
+  the root capped at 480px, always the s-size metrics) and **the
+  minimal view** (the S5 beam glyph, unchanged). The classic view is
+  the DEFAULT; the choice persists per visitor
+  (`currena:pd:gold:balance-view`).
+- **The owner's words:** "I want the previous shape of Gold balance in
+  gold dedicated page, it must be alternated with this new proposed
+  minimal design, just make it smaller." Read as: both designs present,
+  alternating (a switcher), the previous shape smaller. If the owner
+  meant a plain replacement instead, flipping the default (or removing
+  the toggle) is a two-line change — the alternation contains it.
+- **Implementation shape (D-48, one drawing):** the brass stage + tray
+  were EXTRACTED verbatim from the legacy `BalanceScale` as the exported
+  `BalanceStage`/`BalanceTray` (one code path: the legacy card feeds the
+  insights corpus's strings, the Gold hero feeds its corpus-pinned
+  `pd.gold.*` keys — `gold-copy-pin.test.ts` pins 19 of the new keys
+  byte-for-byte to the corpus so the classic drawing speaks EXACTLY the
+  legacy card's words). The legacy card's DOM is byte-identical (the
+  GB-S6 snapshot green untouched). Pressing a lane weight scrolls to
+  that lane's seat card (the on-page answer to the legacy ledger row —
+  the ledger/verdict-block/head/footnote stay out: the hero's own
+  verdict word + counts + the seats section + the honest record already
+  carry that content; duplicating them inside the hero would repeat the
+  page against itself).
+- **Reason:** the owner asked for the drawing they know from the legacy
+  card, on the Gold page, without losing the new minimal design — and
+  the beam, the weights and the tray ARE the shape; the engine's words
+  (verdict, outlook, counts) render in both views so the two designs
+  can never disagree.
+- **Who decided:** the build session (S6) on the owner's in-session
+  request. **Revisit:** any polish round (S19) or the owner's next
+  review — flipping the default to minimal, or widening the stage cap
+  (480 → the m step), are one-line changes.
+
+## 2026-11-08 — The S6 frozen-scenario suite + the gf-p0-proposed package export
+
+- **Decision:** the §21 verdict-consistency standard now sweeps HISTORY:
+  the frozen harness's own arithmetic (`gfLaneBalance` over the frozen
+  scenario tables — the production composition `GF_VOTERS_P4_5LANE`
+  with the recorded F2 seat mapping, MIN2, the D-18 input-presence
+  rule, the executed threshold map) is compared against the PAGE
+  renderer (gold-tiles) window by window over the recorded corpus's 19
+  archive days — meter counts, every lane vote, the beam angle, the
+  verdict state and the 7-state outlook, plus the 18-scenario family
+  re-run deterministically and three fail-closed proofs. The frozen
+  tables became importable by consumers through a new additive package
+  export (`@currena/insights/gf-p0-proposed`); the tables themselves
+  are untouched.
+- **Reason:** the S5 live run pinned one snapshot (today's); a drift in
+  either surface's composition, thresholds, evaluator or presentation
+  math over HISTORICAL shapes (sparse windows, split lanes, unread
+  eras) would not surface from a single live check. The corpus windows
+  carry those shapes. The S5 core's input-presence + context byte
+  checks stay the LIVE tool they are (the recorded archives honestly
+  predate the P2/P3/P4 seat promotions — absent on both sides, the
+  pre-promotion era, never a drift; the derivation families are
+  era-independent and re-run green).
+- **Who decided:** the build session (S6) per the session prompt's gate
+  ("the frozen-scenario suite re-run against the page renderer").
+  **Revisit:** after any corpus refresh (`gold-corpus-dump`), the
+  windows grow for free; after any voter-table change (governance
+  D-GF-1), the production-composition pin surfaces it red here.
+
+## 2026-11-08 — The 2026-11-08e deploy (the Gold alternation live)
+
+- **Decision:** re-ship at the close of S6 (version `327c7761`) — the
+  session changed code (the alternation + the frozen-scenario suite),
+  and the owner's standing from S5's close said "S6's close may
+  re-ship after its own gates".
+- **Reason:** all gates green (the suite 14,799 · tsc 6/6 · lint 0/0 ·
+  copy:audit clean · narrator in sync + 50 · layer1 11,819/11,819 ·
+  build + budgets — GoldPage 31.23/8.06 vs its re-based 34/9 row,
+  justified in `check-bundle-budget.mjs`: the classic-view code rides
+  the Gold chunk while the drawing stays in the shared chunk, the
+  Insights chunk UNTOUCHED at 1569.16/362.08 through the extraction);
+  the live §21 backtest 150/150 green BEFORE and AFTER the deploy; the
+  page live-verified at currena.ir/gold (the classic view default, the
+  radio walk, the Global + legacy surfaces intact). Rollback:
+  `wrangler rollback`.
+- **Who decided:** the build session (S6) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives in
+  `docs/DEPLOY.md` 2026-11-08e.

@@ -205,6 +205,56 @@ had run green over the remote-dev Worker on real KV BEFORE the deploy
   legacy surfaces; the new routes are additive, so a rollback costs only
   the new endpoints, never the existing page.
 
+## Session record — 2026-11-08e the page-division S6 deploy (the Gold alternation — the previous balance shape on /gold, smaller, beside the minimal design; Phase B closed)
+
+Page-division S6 (main `25d4910` → `437e201` → `7c0c6fc` + this
+record). **The authority:** the owner's S5-close standing ("S6's close
+may re-ship after its own gates — re-ship only if S6 changes code";
+it did: BD-S6a's alternation + the frozen-scenario suite) + the
+owner's in-session request this session. The gates were ALL GREEN over
+the whole change set first (2m 20s: secret scan 8/932 · tsc 6/6 ·
+eslint 0/0 · copy:audit clean (7,140 manifest entries, the 22 new fa
+strings queued unreviewed — 19 corpus-pinned by gold-copy-pin) ·
+narrator in sync + eval 50 · layer1 11,819/11,819 · **the suite
+14,799** · build + budgets held — entry 269.00/81.45 UNTOUCHED ·
+Insights UNTOUCHED at 1569.16/362.08 through the BalanceStage
+extraction · GlobalPage untouched · GoldPage 31.23/8.06 vs its
+re-based 34/9 row), and the live §21 seat-level diff had run green
+against production BEFORE the deploy (150 checks · 150 green · 0 red).
+
+- **DEPLOY (~14:55 UTC, version `327c7761-8b6d-4360-8284-3ba06e383334`):**
+  `pnpm --filter @currena/web build` (the gates' own fresh dist) +
+  `pnpm --filter @currena/api exec wrangler deploy` → currena.ir at
+  100%. Display-layer only: the SPA's `/gold` hero (the BalanceStage /
+  BalanceTray extraction is byte-identical for the legacy card — its
+  snapshot green untouched), the classic view + the radio switcher, the
+  `pd.gold.*` copy, the frozen-scenario backtest core + its offline
+  suite (test seams only — nothing in the app bundle), the additive
+  `@currena/insights/gf-p0-proposed` package export (test/script-only
+  consumer), and the budget row. No engine, voter, threshold or
+  calibration change anywhere.
+- **LIVE ACCEPTANCE CHECK ALL GREEN (this session's own runs):**
+  - the §21 seat-level diff re-run against PRODUCTION post-deploy:
+    **150 checks · 150 green · 0 red** — every one of the 37 seats'
+    impact + evidence identical to the engine's own arithmetic over
+    `/api/insights`, the hero verdict + beam identical, the price + all
+    14 context readings byte-identical, the licence quartet riding
+    `absentIds`.
+  - `https://currena.ir/gold` at 1440×900 (en): the CLASSIC view is the
+    default — the brass stage at 480px (the s-size metrics), the five
+    lane weights (2 for · 1 against · the Split inflation + the flows
+    lane in the tray), the beam at −3.33° "for", the verdict "Leaning
+    for gold", the outlook Bullish, the radio group walking to the
+    minimal glyph (the choice persisted), NO horizontal scroll; the
+    fa/RTL mobile cells were verified through the local preview over
+    the same production data (the deployed build is the same dist).
+  - The Global landing page intact (10 tiles) · the legacy `/insights`
+    intact (the balance + ledger + the deprecation banner) · ZERO
+    console/page errors.
+- **Rollback lever:** `wrangler rollback` (the f2e74f3c-era surfaces
+  minus this session's hero alternation; the Global + legacy surfaces
+  were byte-identical before it).
+
 ## Session record — 2026-11-08d the page-division S5 deploy (the Gold page — the 37-voter conditions meter live for every visitor at /gold)
 
 Page-division S5 (main `94af4d4` + the gates/verification commits

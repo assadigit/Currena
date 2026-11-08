@@ -359,10 +359,89 @@ legacy surfaces intact, the §21 backtest re-run against production
 150/150 green post-deploy — the full record in `docs/DEPLOY.md`
 2026-11-08d.
 
-### ☐ S6 — Gold gates · `Session 6/30`
+### ✅ S6 — Gold gates · `Session 6/30` · delivered 2026-11-08
 - Verdict-consistency backtest (meter counts, lane votes, beam, outlook);
   frozen-scenario suite re-run against the page renderer; mobile + ARIA.
 - **Gates:** byte-identical verdicts; 14,620-test harness green; hand-off.
+
+**S6 delivery record (2026-11-08):** Phase B (Gold) is CLOSED — and the
+session also carried THE OWNER'S IN-SESSION REQUEST (BD-S6a): "I want
+the previous shape of Gold balance in gold dedicated page, it must be
+alternated with this new proposed minimal design, just make it
+smaller" — BUILT, GATED, AND DEPLOYED LIVE. **The alternation:** the
+hero's balance block now switches between two designs through a real
+radio group (native arrow-key walking, the group labelled en+fa, the
+gold focus ring verified in the live CSSOM): the CLASSIC view — the
+previous shape of the gold balance, the brass assay-office stage with
+the five lane WEIGHTS on its pans + the not-leaning tray, rendered
+SMALLER (the root capped at 480px → always the s-size metrics: pivot
+56, dial 30, two weights per row) — and the MINIMAL view (the S5 beam
+glyph, unchanged). Classic is the DEFAULT (the owner's ask); the
+choice persists per visitor (`currena:pd:gold:balance-view`). The
+verdict word + 7-state outlook + counts + context line render in BOTH
+views (the engine's words — the two designs can never disagree);
+pressing a lane weight scrolls to that lane's seat card (the seats'
+lane cards gained `#gold-lane-{lane}` ids — the on-page answer to the
+legacy ledger row). **One drawing, never restated (D-48):** the stage
++ tray were EXTRACTED VERBATIM from the legacy `BalanceScale` as the
+exported `BalanceStage`/`BalanceTray` + `useBalanceVisualRootWidth` +
+the narrow `BalanceStageCopy` interface — the legacy card feeds the
+corpus's strings, the Gold hero feeds its corpus-pinned `pd.gold.*`
+keys (19 of the 22 new keys pinned byte-for-byte to the corpus by
+`gold-copy-pin.test.ts`, both locales: the pan captions, the
+empty-pan sentences, the stage aria + count words, laneChipAria, the
+split badge, the condition-state words, the tray trio — the classic
+drawing speaks EXACTLY the legacy card's words); the 3 fresh view
+words queued unreviewed (the Persian manifest at 7,140 entries).
+**VERIFIED BYTE-IDENTICAL through the extraction:** the legacy card's
+snapshot + all 51 gold-balance-lanes tests green untouched — the
+Insights chunk measured UNCHANGED at 1569.16/362.08. **THE FROZEN-
+SCENARIO SUITE (the S6 gate's own):** `gold-backtest-core.ts` gains
+`backtestGoldPageVsHarness` — the PAGE renderer vs the FROZEN
+HARNESS's own arithmetic (`gfLaneBalance` over the production
+scenario composition `GF_VOTERS_P4_5LANE` with the recorded F2 seat
+mapping applied at the consumer, MIN2, the D-18 input-presence rule,
+the executed threshold map), with the S5 core's two-path shape so the
+fail-closed proofs can diverge the sides; the frozen tables opened to
+consumers via the new additive package export
+`@currena/insights/gf-p0-proposed`. The offline suite
+(`gold-frozen-scenarios.test.ts`, 9): the recorded corpus's 19
+archive windows swept — page ≡ harness green on EVERY window (counts,
+lane votes, beam, verdict, outlook); the S5 derivation families re-run
+green over history (the input/context presence checks stay the LIVE
+tool — the archives honestly predate the P2/P3/P4 promotions); the
+18-scenario frozen family re-runs DETERMINISTICALLY over every
+window; the production-composition pin; THREE fail-closed proofs; the
+diverse-verdict-shapes guard. **THE LIVE §21 BACKTEST: 150 checks ·
+150 green · 0 red, TWICE** (against production before the deploy and
+after it — every seat's impact + evidence, the hero verdict + beam,
+the price + all 14 context readings byte-identical). **The mobile +
+ARIA pass:** browser-verified over real production data at 1440×900
+AND 360×844 in BOTH en and fa (RTL, Persian digits) — the classic
+stage at 308–480px, no horizontal scroll at any width, the keyboard
+walk (the radio group's arrow keys with the visible focus ring, the
+weights as real buttons), the weight→lane-card scroll (y 42→1556),
+dark mode, and ZERO page errors; the VLM visual passes (en classic
+clean; fa + dark-mode passes produced 6 small-font Persian
+"garble"/mirroring reads — ALL SIX disproven against the DOM: the RTL
+mirroring is correct by construction (the for pan on the right,
+dipping +7.53px, beam rotate +3.33°), and the "garbled" words are the
+corpus's own pinned wording («تمایل به نفع طلا», «تنش بازار»,
+«جریان‌ها و تقاضا») — no fixes made, the machine's finds checked
+against reality per the S5 discipline). **Gates ALL GREEN** (2m 20s:
+secret scan 8/932 · tsc 6/6 · eslint 0/0 · copy:audit clean ·
+narrator in sync + eval 50 · layer1 11,819/11,819 · **the suite
+14,799 = +13** (the frozen-scenario suite 9 · the GoldPage
+characterization +2 both-views tests) · build + budgets held — entry
+269.00/81.45 UNTOUCHED, GlobalPage untouched, Insights UNTOUCHED,
+GoldPage 31.23/8.06 vs its re-based 34/9 row, justified in
+`check-bundle-budget.mjs`). **DEPLOYED + LIVE-VERIFIED** (version
+`327c7761` ~14:55 UTC, the owner's S5 standing "re-ship only if S6
+changes code" — it did): currena.ir/gold renders the alternation
+(the classic balance the default), the Global landing page + the
+legacy /insights intact — the full record in `docs/DEPLOY.md`
+2026-11-08e. Decisions: BD-S6a + the frozen-scenario suite + the
+deploy, all in `docs/DECISIONS.md`.
 
 ## Phase C — World Markets (S7–S8)
 
@@ -482,7 +561,7 @@ legacy surfaces intact, the §21 backtest re-run against production
 | Phase | Sessions | Status |
 |---|---|---|
 | A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
-| B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ☐ S6 next |
+| B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ✅ S6 2026-11-08 (deployed `327c7761`, BD-S6a's alternation) |
 | C World Markets | S7–S8 | ☐ |
 | D USA | S9–S11 | ☐ |
 | E Europe | S12–S13 | ☐ |
@@ -494,8 +573,9 @@ legacy surfaces intact, the §21 backtest re-run against production
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 5/30 delivered 2026-11-08 · 25 remaining — next
-action: Session 6/30 (S6, the Gold gates: the verdict-consistency backtest
-byte-identical — meter counts, lane votes, beam, outlook · the
-frozen-scenario suite re-run against the page renderer · mobile + ARIA
-pass · hand-off).**
+**Current position: Session 6/30 delivered 2026-11-08 · 24 remaining — next
+action: Session 7/30 (S7, the World Markets build: reuse the existing
+world-index map as the hero (D-43) · the Asia/Europe/Americas region
+grids · the world risk & liquidity section — 16 indexes with full
+metrics, map dots interactive, EODHD primary / Yahoo fallback
+fail-closed).**
