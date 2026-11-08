@@ -1,7 +1,7 @@
 # Currena — Page-Division Build · Session Roadmap
 
 > **The 30-session execution plan** for the page-division spec
-> (`02-PAGE-DIVISION-SPEC.md`), run under `AGENT-RULES.md` (root).
+> (`02-PAGE-DIVISION-SPEC.md`), run under `AGENT-RULES.md` (docs/; consolidated into AGENTS.md §14).
 > Every session reports progress as **`Session X/30 · Y remaining`**.
 > Created 2026-11-07 · owner-approved order (D-20 + D-47).
 
@@ -9,7 +9,7 @@
 
 ## The session protocol (every session, no exceptions)
 
-1. **Start:** read `AGENT-RULES.md` → `01-SESSION-ROADMAP.md` (this file,
+1. **Start:** read `../AGENT-RULES.md` → `01-SESSION-ROADMAP.md` (this file,
    your session's entry) → `02-PAGE-DIVISION-SPEC.md` (the sections your
    session touches) → the previous session's hand-off prompt.
 2. **Work:** exactly one session's scope. Commit + push at every checkpoint

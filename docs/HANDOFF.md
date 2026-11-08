@@ -34,7 +34,7 @@
 
 ## Next session (S5 — the Gold page build)
 
-Read `AGENT-RULES.md` + `AGENTS.md` first, then
+Read `AGENTS.md` first (the owner working rules are consolidated in §14; original archived at `docs/AGENT-RULES.md`), then
 `docs/page-division/01-SESSION-ROADMAP.md` (the S5 entry + the S4
 delivery record), `02-PAGE-DIVISION-SPEC.md` §5 + §21, and the S4
 hand-off prompt (the end of this session's report). Scope: the hero

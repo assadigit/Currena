@@ -4,7 +4,7 @@
 > every session — recorded here so nothing discussed is ever lost.
 > Companion documents: `02-PAGE-DIVISION-SPEC.md` (the investor spec),
 > `04-INDICATORS-COMPLETE-INVENTORY.md` and `05-GOLD-INDICATORS.md` (Phase 0),
-> `AGENT-RULES.md` + `01-SESSION-ROADMAP.md` (execution governance).
+> `../AGENT-RULES.md` + `01-SESSION-ROADMAP.md` (execution governance).
 > Owner: Assad · Assistant: Z.ai · Started 2026-11-07.
 
 ---
@@ -227,7 +227,7 @@ Strategy is settled (D-1…D-48). Your job now: execute the roadmap, phase by
 phase, following the agent rules at all times.
 
 READ FIRST, in this order (all in the repo):
-1. AGENT-RULES.md                            (root — permanent working rules)
+1. AGENT-RULES.md                            (docs/ — permanent working rules; in AGENTS.md §14)
 2. docs/page-division/README.md              (the doc-set index & status)
 3. docs/page-division/01-SESSION-ROADMAP.md  (your session's scope + protocol)
 4. docs/page-division/02-PAGE-DIVISION-SPEC.md (the design source of truth)

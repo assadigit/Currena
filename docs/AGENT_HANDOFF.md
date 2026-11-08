@@ -102,7 +102,7 @@ above remains CLOSED and its records authoritative; the successor is a
 **display-layer-only program** — no engine, voter, threshold, or calibration
 changes — that splits the all-in-one Insights page into **10 destinations**
 per the owner's **48 recorded decisions** (three strategy rounds, Phase 1
-closed 2026-11-07). Read in this order: `AGENT-RULES.md` (repo root — the
+closed 2026-11-07). Read in this order: `AGENT-RULES.md` (docs/ — the
 owner's permanent working rules) → `docs/page-division/README.md` →
 `01-SESSION-ROADMAP.md` (the 30-session plan) → `02-PAGE-DIVISION-SPEC.md`
 (v1.0, drafted for the external investor's review) → `03-STRATEGY-LOG.md`

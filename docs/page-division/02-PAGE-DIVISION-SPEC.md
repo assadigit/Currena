@@ -488,7 +488,7 @@ Asia & Pacific → Australia → Commodities → Currency Pairs → integration 
 investor feedback → legacy retirement.
 
 **30 sessions, always "Session X/30 · Y remaining"** — full plan in
-`01-SESSION-ROADMAP.md`; permanent working rules in `AGENT-RULES.md`.
+`01-SESSION-ROADMAP.md`; permanent working rules in `../AGENT-RULES.md` (consolidated into AGENTS.md §14).
 
 | Phase | Sessions | Scope |
 |---|---|---|
