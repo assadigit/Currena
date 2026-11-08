@@ -31,14 +31,14 @@ import { USA_CARD_IDS } from './usa-tiles';
 
 type Pd = typeof en.pd.usa;
 
-/** Pin the 26 card names + the unit + position + band + status words. */
+/** Pin the 72 card names + the unit + position + band + status words. */
 function pinCardWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'): void {
   const names = pd.cardNames as Record<string, string>;
   const indicators = corpus.indicators as unknown as Record<string, { name: string }>;
   for (const id of USA_CARD_IDS) {
     expect(names[id], `${locale} cardNames.${id}`).toBe(indicators[id]?.name);
   }
-  // TOTAL: exactly the 26 S9 ids, never more.
+  // TOTAL: exactly the 72 S9+S10 ids, never more.
   expect(Object.keys(names)).toHaveLength(USA_CARD_IDS.length);
 
   expect(pd.unitPercent, `${locale} unitPercent`).toBe(corpus.units.percent);
@@ -47,6 +47,11 @@ function pinCardWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'
   expect(pd.unitUsdTr, `${locale} unitUsdTr`).toBe(corpus.units['usd-tr']);
   expect(pd.unitUsdBn, `${locale} unitUsdBn`).toBe(corpus.units['usd-bn']);
   expect(pd.unitUsd, `${locale} unitUsd`).toBe(corpus.units.usd);
+  // S10: the four tier 3–5 word units (the corpus's own).
+  expect(pd.unitIndex, `${locale} unitIndex`).toBe(corpus.units.index);
+  expect(pd.unitClaims, `${locale} unitClaims`).toBe(corpus.units.claims);
+  expect(pd.unitPermits, `${locale} unitPermits`).toBe(corpus.units.permits);
+  expect(pd.unitOpenings, `${locale} unitOpenings`).toBe(corpus.units.openings);
 
   expect(pd.positionLow, `${locale} positionLow`).toBe(corpus.ui.positionLow);
   expect(pd.positionTypical, `${locale} positionTypical`).toBe(corpus.ui.positionTypical);
@@ -59,6 +64,26 @@ function pinCardWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'
   expect(pd.statusStale, `${locale} statusStale`).toBe(corpus.status.stale);
   expect(pd.statusCheckPending, `${locale} statusCheckPending`).toBe(corpus.status['check-pending']);
   expect(pd.statusUnavailable, `${locale} statusUnavailable`).toBe(corpus.status.unavailable);
+}
+
+/** Pin the tier-6 TIC block: the REUSED section's every word (the S10
+ *  tier-6 board) rides pd.usa.tic.* and must be the corpus's own copy.tic
+ *  byte-for-byte — one drawing, one vocabulary (D-48); the camelCase key
+ *  names are the corpus's own so the adapter is a clean pass-through. */
+function pinTicBlock(pdTic: typeof en.pd.usa.tic, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'): void {
+  const corpusTic = corpus.tic as unknown as Record<string, unknown>;
+  const pdTicRec = pdTic as unknown as Record<string, unknown>;
+  for (const [key, value] of Object.entries(corpusTic)) {
+    if (key === 'countries') continue; // pinned below, key-by-key
+    expect(pdTicRec[key], `${locale} tic.${key}`).toBe(value);
+  }
+  // The countries sub-map: every one of the 21 known-holder slugs, exactly.
+  const corpusCountries = corpusTic.countries as Record<string, string>;
+  const pdCountries = pdTicRec.countries as Record<string, string>;
+  expect(Object.keys(pdCountries).sort()).toEqual(Object.keys(corpusCountries).sort());
+  for (const [slug, name] of Object.entries(corpusCountries)) {
+    expect(pdCountries[slug], `${locale} tic.countries.${slug}`).toBe(name);
+  }
 }
 
 /** Pin the strip's ONE-verdict-language discipline: the verdict words and
@@ -78,8 +103,12 @@ function pinVerdictLanguage(pdGlobal: typeof en.pd.global, corpus: typeof insigh
 }
 
 describe('the USA page speaks the insights corpus’s words (en)', () => {
-  it('the 26 card names + the unit + position + band + status words ↔ the corpus', () => {
+  it('the 72 card names + the unit + position + band + status words ↔ the corpus', () => {
     pinCardWords(en.pd.usa, insightsCopyEn, 'en');
+  });
+
+  it('the tier-6 TIC block ↔ the corpus’s own copy.tic, every key byte-for-byte', () => {
+    pinTicBlock(en.pd.usa.tic, insightsCopyEn, 'en');
   });
 
   it('the strip’s verdict words + why-lines ↔ the corpus’s copy.label through the shared pd.global keys', () => {
@@ -88,8 +117,12 @@ describe('the USA page speaks the insights corpus’s words (en)', () => {
 });
 
 describe('the USA page speaks the insights corpus’s words (fa)', () => {
-  it('the 26 card names + the unit + position + band + status words ↔ the corpus', () => {
+  it('the 72 card names + the unit + position + band + status words ↔ the corpus', () => {
     pinCardWords(fa.pd.usa, insightsCopyFa, 'fa');
+  });
+
+  it('the tier-6 TIC block ↔ the corpus’s own copy.tic, every key byte-for-byte', () => {
+    pinTicBlock(fa.pd.usa.tic, insightsCopyFa, 'fa');
   });
 
   it('the strip’s verdict words + why-lines ↔ the corpus’s copy.label through the shared pd.global keys', () => {

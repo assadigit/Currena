@@ -1,8 +1,10 @@
 /**
- * UsaTierCards — the USA page's two S9 tier sections (page-division S9,
- * 2026-11-09 — spec §7 items 2–3: D-29 tier 1 "the world watches" (7) +
- * tier 2 "Rates & the Fed" (the placement's authoritative 19 — the spec's
- * "(22)" label is the recorded AF-2 drift)).
+ * UsaTierCards — the USA page's tier sections (page-division S9 + S10,
+ * 2026-11-09 — spec §7 items 2–6: D-29 tier 1 "the world watches" (7) +
+ * tier 2 "Rates & the Fed" (the placement's authoritative 19) + the S10
+ * tiers: 3 inflation (12) · 4 labor & growth (17) · 5 liquidity/stress/
+ * valuation (17) — 72 registry cards in all; tier 6 is the TIC BOARD,
+ * which rides its own feed through UsaTicSection, not this module).
  *
  * Every card renders the §21 per-page trio — the VALUE (the DISPLAY
  * registry's own decimals + units + scales + ranges through
@@ -26,6 +28,9 @@ import type { TranslationKey } from '../../lib/locale';
 import {
   USA_TIER1_IDS,
   USA_TIER2_IDS,
+  USA_TIER3_IDS,
+  USA_TIER4_IDS,
+  USA_TIER5_IDS,
   usaCardValueText,
   usaCards,
   type UsaCardEntry,
@@ -37,9 +42,12 @@ import {
  *  — the section wiring rides the pure module's single source). */
 const USA_TIER1_ENTRY_IDS: readonly UsaCardId[] = USA_TIER1_IDS as readonly UsaCardId[];
 const USA_TIER2_ENTRY_IDS: readonly UsaCardId[] = USA_TIER2_IDS as readonly UsaCardId[];
+const USA_TIER3_ENTRY_IDS: readonly UsaCardId[] = USA_TIER3_IDS as readonly UsaCardId[];
+const USA_TIER4_ENTRY_IDS: readonly UsaCardId[] = USA_TIER4_IDS as readonly UsaCardId[];
+const USA_TIER5_ENTRY_IDS: readonly UsaCardId[] = USA_TIER5_IDS as readonly UsaCardId[];
 
-/** The card-name keys — 26 literal keys (the copy-pin test proves each
- *  matches the indicators corpus byte-for-byte, both locales). */
+/** The card-name keys — 72 literal keys (the copy-pin test proves each
+ *  matches the insights corpus byte-for-byte, both locales). */
 const CARD_NAME_KEY: Readonly<Record<UsaCardId, TranslationKey>> = {
   'fed-target': 'pd.usa.cardNames.fed-target',
   'fed-expectations': 'pd.usa.cardNames.fed-expectations',
@@ -67,6 +75,55 @@ const CARD_NAME_KEY: Readonly<Record<UsaCardId, TranslationKey>> = {
   'rstar-us': 'pd.usa.cardNames.rstar-us',
   'debt-to-gdp': 'pd.usa.cardNames.debt-to-gdp',
   'govt-interest-revenue': 'pd.usa.cardNames.govt-interest-revenue',
+  // ---- Tier 3 — inflation (S10) ----
+  'us-cpi-core-yoy': 'pd.usa.cardNames.us-cpi-core-yoy',
+  'median-cpi': 'pd.usa.cardNames.median-cpi',
+  'sticky-cpi': 'pd.usa.cardNames.sticky-cpi',
+  'us-wages': 'pd.usa.cardNames.us-wages',
+  t5yie: 'pd.usa.cardNames.t5yie',
+  'breakeven-5y5y': 'pd.usa.cardNames.breakeven-5y5y',
+  'breakeven-10y': 'pd.usa.cardNames.breakeven-10y',
+  'breakeven-tilt': 'pd.usa.cardNames.breakeven-tilt',
+  'cpi-nowcast': 'pd.usa.cardNames.cpi-nowcast',
+  'cpi-surprise': 'pd.usa.cardNames.cpi-surprise',
+  'michigan-5y-expectations': 'pd.usa.cardNames.michigan-5y-expectations',
+  'michigan-1y-expectations': 'pd.usa.cardNames.michigan-1y-expectations',
+  // ---- Tier 4 — labor & growth ----
+  'initial-jobless-claims': 'pd.usa.cardNames.initial-jobless-claims',
+  'continuing-claims': 'pd.usa.cardNames.continuing-claims',
+  'job-openings': 'pd.usa.cardNames.job-openings',
+  'sahm-rule': 'pd.usa.cardNames.sahm-rule',
+  'recession-probability': 'pd.usa.cardNames.recession-probability',
+  'michigan-sentiment': 'pd.usa.cardNames.michigan-sentiment',
+  'oecd-cli-us': 'pd.usa.cardNames.oecd-cli-us',
+  'philly-fed': 'pd.usa.cardNames.philly-fed',
+  'empire-state': 'pd.usa.cardNames.empire-state',
+  cfnai: 'pd.usa.cardNames.cfnai',
+  gdpnow: 'pd.usa.cardNames.gdpnow',
+  'us-gdp-growth': 'pd.usa.cardNames.us-gdp-growth',
+  'retail-sales': 'pd.usa.cardNames.retail-sales',
+  'housing-permits': 'pd.usa.cardNames.housing-permits',
+  'epu-us': 'pd.usa.cardNames.epu-us',
+  'tpu-us': 'pd.usa.cardNames.tpu-us',
+  'm2-us': 'pd.usa.cardNames.m2-us',
+  // ---- Tier 5 — liquidity, stress & valuation ----
+  walcl: 'pd.usa.cardNames.walcl',
+  tga: 'pd.usa.cardNames.tga',
+  'reverse-repo': 'pd.usa.cardNames.reverse-repo',
+  'bank-reserves': 'pd.usa.cardNames.bank-reserves',
+  'repo-stress': 'pd.usa.cardNames.repo-stress',
+  'net-liquidity': 'pd.usa.cardNames.net-liquidity',
+  'stress-stlfsi': 'pd.usa.cardNames.stress-stlfsi',
+  nfci: 'pd.usa.cardNames.nfci',
+  vix: 'pd.usa.cardNames.vix',
+  'bank-stress': 'pd.usa.cardNames.bank-stress',
+  ebp: 'pd.usa.cardNames.ebp',
+  'ofr-fsi': 'pd.usa.cardNames.ofr-fsi',
+  'sloos-ci-tightening': 'pd.usa.cardNames.sloos-ci-tightening',
+  'term-premium-10y': 'pd.usa.cardNames.term-premium-10y',
+  'shiller-cape': 'pd.usa.cardNames.shiller-cape',
+  'shiller-ecy': 'pd.usa.cardNames.shiller-ecy',
+  'sp500-breadth-ratio': 'pd.usa.cardNames.sp500-breadth-ratio',
 };
 
 /** The position word keys (the corpus's own, pinned). */
@@ -208,6 +265,10 @@ export function UsaTierCards({ readings }: { readings: readonly IndicatorReading
     usd: t('pd.usa.unitUsd'),
     'usd-tr': t('pd.usa.unitUsdTr'),
     'usd-bn': t('pd.usa.unitUsdBn'),
+    index: t('pd.usa.unitIndex'),
+    claims: t('pd.usa.unitClaims'),
+    permits: t('pd.usa.unitPermits'),
+    openings: t('pd.usa.unitOpenings'),
   };
   return (
     <>
@@ -226,6 +287,30 @@ export function UsaTierCards({ readings }: { readings: readonly IndicatorReading
         readings={readings}
         units={units}
         dataTier="tier-2"
+      />
+      <TierSection
+        titleKey="pd.usa.tier3.title"
+        introKey="pd.usa.tier3.intro"
+        ids={USA_TIER3_ENTRY_IDS}
+        readings={readings}
+        units={units}
+        dataTier="tier-3"
+      />
+      <TierSection
+        titleKey="pd.usa.tier4.title"
+        introKey="pd.usa.tier4.intro"
+        ids={USA_TIER4_ENTRY_IDS}
+        readings={readings}
+        units={units}
+        dataTier="tier-4"
+      />
+      <TierSection
+        titleKey="pd.usa.tier5.title"
+        introKey="pd.usa.tier5.intro"
+        ids={USA_TIER5_ENTRY_IDS}
+        readings={readings}
+        units={units}
+        dataTier="tier-5"
       />
     </>
   );

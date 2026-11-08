@@ -22,7 +22,7 @@
 import { describe, expect, it } from 'vitest';
 import type { IndicatorReading } from '@currena/core';
 import { GAUGES, gaugeReading, labelForVerdictStep } from '@currena/insights';
-import { THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS, pageGroupIds, PAGE_PLACEMENTS_BY_PAGE } from '@currena/insights/page-division';
+import { THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS, pageGroupIds, pageHomeIds, PAGE_PLACEMENTS_BY_PAGE } from '@currena/insights/page-division';
 import { DISPLAY, formatReadingValue, type UnitLabels } from '../../components/insights/config/display';
 import { insightsCopyEn } from '../../i18n/insights-copy-en';
 import { insightsCopyFa } from '../../i18n/insights-copy-fa';
@@ -32,6 +32,9 @@ import {
   USA_CARD_IDS,
   USA_TIER1_IDS,
   USA_TIER2_IDS,
+  USA_TIER3_IDS,
+  USA_TIER4_IDS,
+  USA_TIER5_IDS,
   usaCards,
   usaCardValueText,
   usaGaugeVerdicts,
@@ -49,6 +52,10 @@ const enUsaUnits: UsaUnitLabels = {
   usd: insightsCopyEn.units.usd,
   'usd-tr': insightsCopyEn.units['usd-tr'],
   'usd-bn': insightsCopyEn.units['usd-bn'],
+  index: insightsCopyEn.units.index,
+  claims: insightsCopyEn.units.claims,
+  permits: insightsCopyEn.units.permits,
+  openings: insightsCopyEn.units.openings,
 };
 const faUsaUnits: UsaUnitLabels = {
   percent: insightsCopyFa.units.percent,
@@ -57,6 +64,10 @@ const faUsaUnits: UsaUnitLabels = {
   usd: insightsCopyFa.units.usd,
   'usd-tr': insightsCopyFa.units['usd-tr'],
   'usd-bn': insightsCopyFa.units['usd-bn'],
+  index: insightsCopyFa.units.index,
+  claims: insightsCopyFa.units.claims,
+  permits: insightsCopyFa.units.permits,
+  openings: insightsCopyFa.units.openings,
 };
 
 /** A representative value per id family (real-world magnitudes — the
@@ -88,6 +99,56 @@ const FIXTURE_VALUE: Readonly<Record<UsaCardId, number>> = {
   'rstar-us': 1.19,
   'debt-to-gdp': 121.3,
   'govt-interest-revenue': 18.7,
+  // ---- Tier 3 — inflation (the live 2026-11-08 projection's own
+  // magnitudes, so the family-convention asserts speak real renders) ----
+  'us-cpi-core-yoy': 2.5643583511686696,
+  'median-cpi': 2.8081575376,
+  'sticky-cpi': 3.401271558,
+  'us-wages': 3.3123028391167217,
+  t5yie: 2.29,
+  'breakeven-5y5y': 2.17,
+  'breakeven-10y': 2.23,
+  'breakeven-tilt': -0.12,
+  'cpi-nowcast': 0.19,
+  'cpi-surprise': 0.05,
+  'michigan-5y-expectations': 3.4,
+  'michigan-1y-expectations': 4.6,
+  // ---- Tier 4 — labor & growth ----
+  'initial-jobless-claims': 189000,
+  'continuing-claims': 1718000,
+  'job-openings': 7523,
+  'sahm-rule': 0,
+  'recession-probability': 0.4,
+  'michigan-sentiment': 48.1,
+  'oecd-cli-us': 100.9993,
+  'philly-fed': 20.9,
+  'empire-state': 25.5,
+  cfnai: 0.07,
+  gdpnow: 3.4408,
+  'us-gdp-growth': 3.4,
+  'retail-sales': 745021,
+  'housing-permits': 1398,
+  'epu-us': 187.92078198152723,
+  'tpu-us': 1326.419349465307,
+  'm2-us': 23413.9,
+  // ---- Tier 5 — liquidity, stress & valuation ----
+  walcl: 6748145,
+  tga: 957175,
+  'reverse-repo': 0.15,
+  'bank-reserves': 2930088,
+  'repo-stress': 0.02,
+  'net-liquidity': 5790745,
+  'stress-stlfsi': -0.5224,
+  nfci: -0.459,
+  vix: 28.18,
+  'bank-stress': 4,
+  ebp: -0.26533114775416333,
+  'ofr-fsi': -2.162,
+  'sloos-ci-tightening': 1.7,
+  'term-premium-10y': 0.9089,
+  'shiller-cape': 40.71,
+  'shiller-ecy': 0.5599999999999999,
+  'sp500-breadth-ratio': 0.2938,
 };
 
 /** One fixture reading for an id (fed-target gains true bounds in the
@@ -123,15 +184,55 @@ describe('the tier lists — the placement table’s own groups', () => {
     expect(group?.note).toContain('AF-2');
   });
 
-  it('the full card list is tier order (7 then 19 = 26), no duplicates', () => {
-    expect(USA_CARD_IDS).toEqual([...USA_TIER1_IDS, ...USA_TIER2_IDS]);
-    expect(USA_CARD_IDS).toHaveLength(26);
-    expect(new Set(USA_CARD_IDS).size).toBe(26);
+  it('tier 3 is pageGroupIds("usa", "tier-3-inflation") byte-for-byte (the placement’s 12 — michigan-1y-expectations is AF-3, owner ratification pending)', () => {
+    expect(USA_TIER3_IDS).toEqual(pageGroupIds('usa', 'tier-3-inflation'));
+    expect(USA_TIER3_IDS).toHaveLength(12);
+    // The spec §7 item 4 list (11 named) + the AF-3 twin.
+    expect(USA_TIER3_IDS).toEqual([
+      'us-cpi-core-yoy',
+      'median-cpi',
+      'sticky-cpi',
+      'us-wages',
+      't5yie',
+      'breakeven-5y5y',
+      'breakeven-10y',
+      'breakeven-tilt',
+      'cpi-nowcast',
+      'cpi-surprise',
+      'michigan-5y-expectations',
+      'michigan-1y-expectations',
+    ]);
+    const group = PAGE_PLACEMENTS_BY_PAGE.get('usa')?.groups.find((g) => g.id === 'tier-3-inflation');
+    expect(group?.note).toContain('AF-3');
+  });
+
+  it('tier 4 is pageGroupIds("usa", "tier-4-labor-growth") byte-for-byte (the placement’s 17 — AF-2’s "(19)" label is the recorded drift)', () => {
+    expect(USA_TIER4_IDS).toEqual(pageGroupIds('usa', 'tier-4-labor-growth'));
+    expect(USA_TIER4_IDS).toHaveLength(17);
+    expect(USA_TIER4_IDS[0]).toBe('initial-jobless-claims');
+    expect(USA_TIER4_IDS).toContain('m2-us');
+  });
+
+  it('tier 5 is pageGroupIds("usa", "tier-5-liquidity-stress-valuation") byte-for-byte (the spec’s own 17)', () => {
+    expect(USA_TIER5_IDS).toEqual(pageGroupIds('usa', 'tier-5-liquidity-stress-valuation'));
+    expect(USA_TIER5_IDS).toHaveLength(17);
+    expect(USA_TIER5_IDS[0]).toBe('walcl');
+    expect(USA_TIER5_IDS).toContain('sp500-breadth-ratio');
+  });
+
+  it('the full card list is tier order (7+19+12+17+17 = 72), no duplicates, and equals the page’s own homes', () => {
+    expect(USA_CARD_IDS).toEqual([...USA_TIER1_IDS, ...USA_TIER2_IDS, ...USA_TIER3_IDS, ...USA_TIER4_IDS, ...USA_TIER5_IDS]);
+    expect(USA_CARD_IDS).toHaveLength(72);
+    expect(new Set(USA_CARD_IDS).size).toBe(72);
+    // The placement table’s own count: the usa page carries 72 registry
+    // cards (tier 6 is the TIC BOARD, not registry cards).
+    expect(pageHomeIds('usa')).toHaveLength(72);
+    expect([...USA_CARD_IDS]).toEqual([...pageHomeIds('usa')]);
   });
 });
 
 describe('the lean display mirror — the DISPLAY registry’s own configs', () => {
-  it('every one of the 26 ids matches decimals + unit + scale + range', () => {
+  it('every one of the 72 ids matches decimals + unit + scale + range', () => {
     for (const id of USA_CARD_IDS) {
       const registry = DISPLAY[id as keyof typeof DISPLAY];
       const lean = USA_CARD_DISPLAY[id as UsaCardId];
@@ -146,6 +247,26 @@ describe('the lean display mirror — the DISPLAY registry’s own configs', () 
     expect(USA_CARD_DISPLAY['nyfed-custody'].scale).toBe(1e-6);
     expect(USA_CARD_DISPLAY['us-deficit-12m'].scale).toBe(1e-6);
     expect(USA_CARD_DISPLAY['us-deficit-monthly'].scale).toBe(1e-3);
+  });
+
+  it('the S10 scaled families ride the DISPLAY registry’s own magnitudes (the M4/M6 Wave conventions)', () => {
+    // The liquidity trio + M2 read $ millions or $ billions as trillions;
+    // the claims pair renders whole; job openings/permits/retail scale to
+    // their magnitude words; the recession probability is a stored
+    // fraction rendered ×100.
+    expect(USA_CARD_DISPLAY.walcl.scale).toBe(1e-6);
+    expect(USA_CARD_DISPLAY.tga.scale).toBe(1e-6);
+    expect(USA_CARD_DISPLAY['bank-reserves'].scale).toBe(1e-6);
+    expect(USA_CARD_DISPLAY['net-liquidity'].scale).toBe(1e-6);
+    expect(USA_CARD_DISPLAY['m2-us'].scale).toBe(0.001);
+    expect(USA_CARD_DISPLAY['job-openings'].scale).toBe(0.001);
+    expect(USA_CARD_DISPLAY['housing-permits'].scale).toBe(0.001);
+    expect(USA_CARD_DISPLAY['retail-sales'].scale).toBe(0.001);
+    expect(USA_CARD_DISPLAY['recession-probability'].scale).toBe(100);
+    expect(USA_CARD_DISPLAY['initial-jobless-claims'].decimals).toBe(0);
+    // reverse-repo is ALREADY billions at the source — no scale (the RRP
+    // family’s own convention).
+    expect(USA_CARD_DISPLAY['reverse-repo'].scale).toBeUndefined();
   });
 });
 
@@ -176,6 +297,22 @@ describe('the value render — EQUIVALENT to formatReadingValue, output-for-outp
     expect(usaCardValueText('us-deficit-monthly', fixtureReading('us-deficit-monthly', false), 'en-US', enUsaUnits)).toBe('US$84.9bn');
     expect(usaCardValueText('us-nfp', fixtureReading('us-nfp', false), 'en-US', enUsaUnits)).toBe('165 pts');
     expect(usaCardValueText('treasury-auction-10y', fixtureReading('treasury-auction-10y', false), 'en-US', enUsaUnits)).toBe('2.63 ratio');
+    // The S10 families: the liquidity trillions, the claims whole
+    // numbers with the count word, the magnitude-word units, the ×100
+    // recession probability, the tight 4dp breadth ratio.
+    expect(usaCardValueText('walcl', fixtureReading('walcl', false), 'en-US', enUsaUnits)).toBe('US$6.75 trillion');
+    expect(usaCardValueText('reverse-repo', fixtureReading('reverse-repo', false), 'en-US', enUsaUnits)).toBe('US$0.15bn');
+    expect(usaCardValueText('initial-jobless-claims', fixtureReading('initial-jobless-claims', false), 'en-US', enUsaUnits)).toBe('189,000 claims');
+    expect(usaCardValueText('job-openings', fixtureReading('job-openings', false), 'en-US', enUsaUnits)).toBe('7.52 m job openings');
+    expect(usaCardValueText('housing-permits', fixtureReading('housing-permits', false), 'en-US', enUsaUnits)).toBe('1.40 m permits a year');
+    expect(usaCardValueText('retail-sales', fixtureReading('retail-sales', false), 'en-US', enUsaUnits)).toBe('US$745.0bn');
+    expect(usaCardValueText('m2-us', fixtureReading('m2-us', false), 'en-US', enUsaUnits)).toBe('US$23.4 trillion');
+    expect(usaCardValueText('recession-probability', fixtureReading('recession-probability', false), 'en-US', enUsaUnits)).toBe('40%');
+    expect(usaCardValueText('vix', fixtureReading('vix', false), 'en-US', enUsaUnits)).toBe('28.18 index');
+    expect(usaCardValueText('shiller-cape', fixtureReading('shiller-cape', false), 'en-US', enUsaUnits)).toBe('40.71 ratio');
+    expect(usaCardValueText('sp500-breadth-ratio', fixtureReading('sp500-breadth-ratio', false), 'en-US', enUsaUnits)).toBe('0.2938 ratio');
+    expect(usaCardValueText('michigan-sentiment', fixtureReading('michigan-sentiment', false), 'fa-IR', faUsaUnits)).toContain('شاخص');
+    expect(usaCardValueText('initial-jobless-claims', fixtureReading('initial-jobless-claims', false), 'fa-IR', faUsaUnits)).toContain('مورد');
   });
 
   it('absent readings and null values stay null (the honest unavailable word, never a guess)', () => {
@@ -186,15 +323,18 @@ describe('the value render — EQUIVALENT to formatReadingValue, output-for-outp
 });
 
 describe('the card entries — placement order, absent stays absent', () => {
-  it('usaCards: the 26 entries in tier order; missing readings stay undefined', () => {
+  it('usaCards: the 72 entries in tier order; missing readings stay undefined', () => {
     const present = fixtureReading('fed-target', true);
     const cpi = fixtureReading('us-cpi-yoy', false);
-    const entries = usaCards([present, cpi], USA_CARD_IDS);
-    expect(entries.map((e) => e.id)).toEqual([...USA_TIER1_IDS, ...USA_TIER2_IDS]);
+    const vix = fixtureReading('vix', false);
+    const entries = usaCards([present, cpi, vix], USA_CARD_IDS);
+    expect(entries.map((e) => e.id)).toEqual([...USA_TIER1_IDS, ...USA_TIER2_IDS, ...USA_TIER3_IDS, ...USA_TIER4_IDS, ...USA_TIER5_IDS]);
     expect(entries.find((e) => e.id === 'fed-target')!.reading).toBeDefined();
     expect(entries.find((e) => e.id === 'us-cpi-yoy')!.reading).toBeDefined();
+    expect(entries.find((e) => e.id === 'vix')!.reading).toBeDefined();
     expect(entries.find((e) => e.id === 'us10y')!.reading).toBeUndefined();
     expect(entries.find((e) => e.id === 'govt-interest-revenue')!.reading).toBeUndefined();
+    expect(entries.find((e) => e.id === 'sp500-breadth-ratio')!.reading).toBeUndefined();
   });
 });
 

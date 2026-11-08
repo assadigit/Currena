@@ -1,7 +1,7 @@
 /**
- * usa-tiles — the USA page's derivations, PURE (page-division S9,
- * 2026-11-09 — docs/page-division/02-PAGE-DIVISION-SPEC.md §7 items 1–3,
- * D-29/D-30; the session prompt's S9 scope).
+ * usa-tiles — the USA page's derivations, PURE (page-division S9 + S10,
+ * 2026-11-09 — docs/page-division/02-PAGE-DIVISION-SPEC.md §7 items 1–6,
+ * D-29/D-30/D-31; the session prompts' S9 + S10 scopes).
  *
  * ONE RULE GOVERNS THIS FILE (D-48 + spec §3.2 + Agent Rule 5, the S3
  * global-tiles / S5 gold-tiles / S7 world-markets-tiles contract): every
@@ -17,12 +17,15 @@
  *     strip's verdicts are Global's own verdicts, byte-for-byte — the §21
  *     backtest (usa-backtest-core.ts) proves it on three sides: page ≡
  *     Global's page derivation ≡ the engine over the served snapshot.
- *   - The tier cards (D-29): the placement table's own groups via
- *     `pageGroupIds` (never hand-copied), the readings straight off the
- *     served projection, and the value render restating the DISPLAY
- *     registry's own decimals/units/scales — pinned byte-for-byte against
- *     `config/display.ts`'s `formatReadingValue` by usa-tiles.test.ts, so
- *     the lean restatement can never drift from the legacy renderer.
+ *   - The tier cards (D-29, spec §7 items 2–6): the placement table's own
+ *     groups via `pageGroupIds` (never hand-copied) — S9's tiers 1–2 plus
+ *     S10's tier-3 inflation (12), tier-4 labor & growth (17) and tier-5
+ *     liquidity/stress/valuation (17), 72 cards in all — the readings
+ *     straight off the served projection, and the value render restating
+ *     the DISPLAY registry's own decimals/units/scales — pinned
+ *     byte-for-byte against `config/display.ts`'s `formatReadingValue` by
+ *     usa-tiles.test.ts, so the lean restatement can never drift from the
+ *     legacy renderer.
  *
  * Pure + platform-free so the unit tests drive it directly
  * (usa-tiles.test.ts) and the §21 backtest can pin it against the engine
@@ -54,7 +57,10 @@ export const usaGaugeVerdicts: (readings: readonly IndicatorReading[]) => Global
 export type UsaGaugeVerdict = GlobalGaugeTile;
 
 /* ------------------------------------------------------------------ *
- * The tiers (spec §7 items 2–3) — D-29 tier 1 · tier 2 rates & the Fed
+ * The tiers (spec §7 items 2–6) — D-29 tier 1 · tier 2 rates & the Fed ·
+ * the S10 tiers 3–5 (inflation · labor & growth · liquidity/stress/
+ * valuation); tier 6 is the TIC BOARD (D-31), not registry cards — it
+ * rides its own feed (GET /api/insights/tic) through UsaTicSection.
  * ------------------------------------------------------------------ */
 
 /**
@@ -71,8 +77,35 @@ export const USA_TIER1_IDS: readonly IndicatorId[] = pageGroupIds('usa', 'tier-1
  */
 export const USA_TIER2_IDS: readonly IndicatorId[] = pageGroupIds('usa', 'tier-2-rates-fed');
 
-/** Every S9-scope card id, tier order (tier 1 then tier 2). */
-export const USA_CARD_IDS: readonly IndicatorId[] = [...USA_TIER1_IDS, ...USA_TIER2_IDS];
+/**
+ * Tier 3 — inflation (§7 item 4): the placement's 12 ids. michigan-1y-
+ * expectations is AF-3 (the 184th id, absent from the spec's own §7
+ * list; placed here beside its 5y twin per evident intent — owner
+ * ratification pending, recorded in PLACEMENT.generated.md).
+ */
+export const USA_TIER3_IDS: readonly IndicatorId[] = pageGroupIds('usa', 'tier-3-inflation');
+
+/**
+ * Tier 4 — labor & growth (§7 item 5): the placement's 17 ids (the spec's
+ * own "(19)" label is the recorded AF-2 hand-count drift).
+ */
+export const USA_TIER4_IDS: readonly IndicatorId[] = pageGroupIds('usa', 'tier-4-labor-growth');
+
+/**
+ * Tier 5 — liquidity, stress & valuation (§7 item 6): the placement's
+ * 17 ids (the Fed's plumbing, the stress indices, the valuation pair and
+ * the S&P breadth ratio — the spec's own 17).
+ */
+export const USA_TIER5_IDS: readonly IndicatorId[] = pageGroupIds('usa', 'tier-5-liquidity-stress-valuation');
+
+/** Every USA registry card id, tier order (tiers 1–5, 72 in all). */
+export const USA_CARD_IDS: readonly IndicatorId[] = [
+  ...USA_TIER1_IDS,
+  ...USA_TIER2_IDS,
+  ...USA_TIER3_IDS,
+  ...USA_TIER4_IDS,
+  ...USA_TIER5_IDS,
+];
 
 /**
  * The literal union that keeps the display + copy maps TOTAL (a missing
@@ -80,6 +113,7 @@ export const USA_CARD_IDS: readonly IndicatorId[] = [...USA_TIER1_IDS, ...USA_TI
  * pins this list against the placement's own groups byte-for-byte.
  */
 export type UsaCardId =
+  // Tiers 1–2 (S9)
   | 'fed-target'
   | 'fed-expectations'
   | 'us-cpi-yoy'
@@ -105,7 +139,56 @@ export type UsaCardId =
   | 'treasury-auction-30y-indirect'
   | 'rstar-us'
   | 'debt-to-gdp'
-  | 'govt-interest-revenue';
+  | 'govt-interest-revenue'
+  // Tier 3 — inflation (S10, §7 item 4)
+  | 'us-cpi-core-yoy'
+  | 'median-cpi'
+  | 'sticky-cpi'
+  | 'us-wages'
+  | 't5yie'
+  | 'breakeven-5y5y'
+  | 'breakeven-10y'
+  | 'breakeven-tilt'
+  | 'cpi-nowcast'
+  | 'cpi-surprise'
+  | 'michigan-5y-expectations'
+  | 'michigan-1y-expectations'
+  // Tier 4 — labor & growth (S10, §7 item 5)
+  | 'initial-jobless-claims'
+  | 'continuing-claims'
+  | 'job-openings'
+  | 'sahm-rule'
+  | 'recession-probability'
+  | 'michigan-sentiment'
+  | 'oecd-cli-us'
+  | 'philly-fed'
+  | 'empire-state'
+  | 'cfnai'
+  | 'gdpnow'
+  | 'us-gdp-growth'
+  | 'retail-sales'
+  | 'housing-permits'
+  | 'epu-us'
+  | 'tpu-us'
+  | 'm2-us'
+  // Tier 5 — liquidity, stress & valuation (S10, §7 item 6)
+  | 'walcl'
+  | 'tga'
+  | 'reverse-repo'
+  | 'bank-reserves'
+  | 'repo-stress'
+  | 'net-liquidity'
+  | 'stress-stlfsi'
+  | 'nfci'
+  | 'vix'
+  | 'bank-stress'
+  | 'ebp'
+  | 'ofr-fsi'
+  | 'sloos-ci-tightening'
+  | 'term-premium-10y'
+  | 'shiller-cape'
+  | 'shiller-ecy'
+  | 'sp500-breadth-ratio';
 
 /** One tier card's reading (undefined = the id is absent from the served
  *  projection — public mode's honest gap, never a guess). */
@@ -126,16 +209,28 @@ export function usaCards(readings: readonly IndicatorReading[], ids: readonly In
 
 /* ------------------------------------------------------------------ *
  * The cards' display configs — the DISPLAY registry's own values for the
- * 26 S9 ids, restated here so the lean USA chunk does not pull the config
- * module chain (the S3 GlobalBoard / S5 GOLD_DISPLAY / S7 WORLD_RISK_
- * DISPLAY pattern). The decimals/units/scales/ranges are pinned against
- * config/display.ts by usa-tiles.test.ts — and the VALUE RENDER is pinned
- * against `formatReadingValue` output-for-output over every id × both
- * locales × both range shapes (a stronger pin than a table echo: the
- * restated join can never drift from the legacy renderer).
+ * 72 USA ids (S9's 26 + S10's 46), restated here so the lean USA chunk
+ * does not pull the config module chain (the S3 GlobalBoard / S5
+ * GOLD_DISPLAY / S7 WORLD_RISK_DISPLAY pattern). The decimals/units/
+ * scales/ranges are pinned against config/display.ts by usa-tiles.test.ts
+ * — and the VALUE RENDER is pinned against `formatReadingValue`
+ * output-for-output over every id × both locales × both range shapes (a
+ * stronger pin than a table echo: the restated join can never drift from
+ * the legacy renderer).
  * ------------------------------------------------------------------ */
 
-export type UsaUnitToken = 'percent' | 'points' | 'ratio' | 'usd-tr' | 'usd-bn';
+export type UsaUnitToken =
+  | 'percent'
+  | 'points'
+  | 'ratio'
+  | 'usd-tr'
+  | 'usd-bn'
+  // S10: the tier 3–5 word units (the corpus's own — 'index', the
+  // claims count word, the permits/openings magnitude words).
+  | 'index'
+  | 'claims'
+  | 'permits'
+  | 'openings';
 
 export interface UsaCardDisplayConfig {
   decimals: number;
@@ -149,6 +244,7 @@ export interface UsaCardDisplayConfig {
 }
 
 export const USA_CARD_DISPLAY: Readonly<Record<UsaCardId, UsaCardDisplayConfig>> = {
+  // ---- Tiers 1–2 (S9) ----
   'fed-target': { decimals: 2, unit: 'percent', range: true },
   'fed-expectations': { decimals: 2, unit: 'points' },
   'us-cpi-yoy': { decimals: 1, unit: 'percent' },
@@ -175,10 +271,60 @@ export const USA_CARD_DISPLAY: Readonly<Record<UsaCardId, UsaCardDisplayConfig>>
   'rstar-us': { decimals: 2, unit: 'percent' },
   'debt-to-gdp': { decimals: 1, unit: 'percent' },
   'govt-interest-revenue': { decimals: 1, unit: 'percent' },
+  // ---- Tier 3 — inflation (S10; the DISPLAY registry's own values) ----
+  'us-cpi-core-yoy': { decimals: 1, unit: 'percent' },
+  'median-cpi': { decimals: 1, unit: 'percent' },
+  'sticky-cpi': { decimals: 1, unit: 'percent' },
+  'us-wages': { decimals: 1, unit: 'percent' },
+  t5yie: { decimals: 2, unit: 'percent' },
+  'breakeven-5y5y': { decimals: 2, unit: 'percent' },
+  'breakeven-10y': { decimals: 2, unit: 'percent' },
+  'breakeven-tilt': { decimals: 2, unit: 'points' },
+  'cpi-nowcast': { decimals: 2, unit: 'percent' },
+  'cpi-surprise': { decimals: 2, unit: 'points' },
+  'michigan-5y-expectations': { decimals: 1, unit: 'percent' },
+  'michigan-1y-expectations': { decimals: 1, unit: 'percent' },
+  // ---- Tier 4 — labor & growth ----
+  'initial-jobless-claims': { decimals: 0, unit: 'claims' },
+  'continuing-claims': { decimals: 0, unit: 'claims' },
+  'job-openings': { decimals: 2, unit: 'openings', scale: 0.001 },
+  'sahm-rule': { decimals: 2, unit: 'points' },
+  'recession-probability': { decimals: 0, unit: 'percent', scale: 100 },
+  'michigan-sentiment': { decimals: 1, unit: 'index' },
+  'oecd-cli-us': { decimals: 1, unit: 'index' },
+  'philly-fed': { decimals: 1, unit: 'points' },
+  'empire-state': { decimals: 1, unit: 'index' },
+  cfnai: { decimals: 2, unit: 'index' },
+  gdpnow: { decimals: 1, unit: 'percent' },
+  'us-gdp-growth': { decimals: 1, unit: 'percent' },
+  'retail-sales': { decimals: 1, unit: 'usd-bn', scale: 0.001 },
+  'housing-permits': { decimals: 2, unit: 'permits', scale: 0.001 },
+  'epu-us': { decimals: 1, unit: 'index' },
+  'tpu-us': { decimals: 1, unit: 'index' },
+  'm2-us': { decimals: 1, unit: 'usd-tr', scale: 0.001 },
+  // ---- Tier 5 — liquidity, stress & valuation ----
+  walcl: { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  tga: { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  'reverse-repo': { decimals: 2, unit: 'usd-bn' },
+  'bank-reserves': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  'repo-stress': { decimals: 2, unit: 'percent' },
+  'net-liquidity': { decimals: 2, unit: 'usd-tr', scale: 1e-6 },
+  'stress-stlfsi': { decimals: 2, unit: 'index' },
+  nfci: { decimals: 2, unit: 'index' },
+  vix: { decimals: 2, unit: 'index' },
+  'bank-stress': { decimals: 2, unit: 'percent' },
+  ebp: { decimals: 2, unit: 'percent' },
+  'ofr-fsi': { decimals: 2, unit: 'index' },
+  'sloos-ci-tightening': { decimals: 1, unit: 'index' },
+  'term-premium-10y': { decimals: 2, unit: 'percent' },
+  'shiller-cape': { decimals: 2, unit: 'ratio' },
+  'shiller-ecy': { decimals: 2, unit: 'percent' },
+  'sp500-breadth-ratio': { decimals: 4, unit: 'ratio' },
 };
 
 /** The locale-dependent unit labels the value render joins (the corpus's
- *  own units block, pinned by usa-copy-pin.test.ts). */
+ *  own units block, pinned by usa-copy-pin.test.ts). S10 adds the four
+ *  tier 3–5 word units (index · claims · permits · openings). */
 export interface UsaUnitLabels {
   percent: string;
   points: string;
@@ -186,6 +332,10 @@ export interface UsaUnitLabels {
   usd: string;
   'usd-tr': string;
   'usd-bn': string;
+  index: string;
+  claims: string;
+  permits: string;
+  openings: string;
 }
 
 /** The Fed target corridor's half-width (the FOMC's 25bp since 2008 —
