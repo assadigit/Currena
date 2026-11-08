@@ -20,6 +20,33 @@
 
 ## A. What comes next
 
+**UPDATE 2026-11-08 (later the same day) — THE PAGE-DIVISION BUILD: Sessions
+1–4 of 30 delivered & gated. PHASE A (Foundations) CLOSED — AND THE
+LANDING PAGE IS DEPLOYED LIVE** (version `637db8f8`, the owner's
+standing "the Worker deploy when you choose" + the universal AGENTS.md
+§5; the live acceptance record in docs/DEPLOY.md's 2026-11-08c session
+record: the §21 backtest re-run against production 84/84 green). S4
+(Global gates & polish): the verdict-consistency backtest shipped whole
+(`global-backtest-core.ts` + the 8-test offline suite with three
+FAIL-CLOSED proofs + the LIVE `apps/web/scripts/pd-s4-backtest.ts` —
+84 checks green over real KV, the narrator's stateHash recompute
+IDENTICAL) · **BD-S4a** (the D-22 day-change call: `change1d` on the
+live-prices contract — the live quote vs the previous session's close —
+with a VISIBLE window tag and the labelled 7-day fallback until the
+deployed :13 cron rung writes the field; the history-endpoint option
+rejected) · **BD-S4b** (the narrator's own text VERBATIM + the
+"Updated {time}" stamp) · five pass defects found + fixed live (the dead
+fromCache label, the swallowed stamp, the clamp's sliced third line, the
+line-clamp display-utility override, the wrapped mobile chips) +
+reduced-motion guards + the chips fade + the aria-hidden window tag ·
+browser-verified at both widths in en + fa (one screen exact in all
+four, keyboard walk, dark mode, both reduced-motion guards in the live
+CSSOM, the live last-good path) · gates ALL GREEN (suite 14,730). 4 fa
+strings queued unreviewed. **Next: Session 5/30 (S5 — the Gold page
+build: the hero + the 37 seats in five lanes + context cards + the
+honest-record footnote, D-26…D-29); the live position always sits in
+`docs/page-division/01-SESSION-ROADMAP.md`'s progress board.**
+
 **UPDATE 2026-11-08 (build underway) — THE PAGE-DIVISION BUILD: Sessions
 1, 2 and 3 of 30 delivered & gated.** S1 (scaffold & navigation): all ten
 routes live (`/` Global · the eight destination placeholders · legacy

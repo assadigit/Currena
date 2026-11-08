@@ -132,6 +132,56 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-08c the page-division S4 deploy (the S2 projection endpoints + the S3 Global landing page + the S4 polish + the change1d live-prices writer — Phase A live for every visitor)
+
+Page-division S4 (main `a837267` + the records commit; the S1–S3 commits
+`45ee4be`…`c14931a` ride it). **The authority:** the owner's session
+prompt — "the Worker deploy when you choose (the S2 endpoints + the S3
+page sit ready)" — + the universal AGENTS.md §5 standing approval
+adopted by the owner mid-session (`365a861`). The gates were ALL GREEN
+over the whole change set first (2m 15s: secret scan 8/917 · tsc 6/6 ·
+eslint 0/0 · copy:audit clean · narrator in sync + eval 50 · layer1
+11,819/11,819 · **the suite 14,730** · build + budgets held — entry
+268.69/81.33 · Insights 1588.36/367.98 · the GlobalPage chunk
+32.76/9.63 vs its 36/11 row), and the §21 verdict-consistency backtest
+had run green over the remote-dev Worker on real KV BEFORE the deploy
+(84 checks · 84 green · 0 red).
+
+- **DEPLOY (~04:36 UTC, version `637db8f8-a1b5-4d94-838b-233b6324b7e0`):**
+  `pnpm --filter @currena/web build` (the gates' own fresh dist) +
+  `pnpm --filter @currena/api exec wrangler deploy` → currena.ir at
+  100%. Additive only: the new routes (`GET /api/insights/pages`,
+  `GET /api/insights/pages/:page`), the SPA's `/` Global page (the lazy
+  GlobalPage chunk), the `change1d` field on the live-prices writer
+  (optional + additive on `LivePriceEntry`/`IndicatorReading`), the
+  narrator's `Updated` stamp + the ribbon window tags on the display
+  side. No engine, voter, threshold or calibration change anywhere.
+- **LIVE ACCEPTANCE CHECK ALL GREEN (this session's own runs):**
+  `/api/health` 200 · `/api/insights/pages` serves the 9-destination
+  index · `/api/insights/pages/global` serves the 52-reading projection
+  (a fresh snapshot had landed 04:35:18Z) · the SPA root renders the
+  D-21 board — **ten tiles with live verdicts, seven chips, the narrator
+  line, ONE SCREEN at 1440×900 (900/900) and 360×844 (844/844)** · the
+  Gold Balance tile navigates to `/gold` (the S5 placeholder) · the
+  legacy `/insights` intact (200, the D-46 deprecation banner present)
+  · **the §21 backtest re-run against PRODUCTION: 84 checks · 84 green ·
+  0 red** (every gauge step+word+counts, the Gold Balance counts +
+  outlook, the markets verdict + RAW counts, the fx signal + active
+  count, the ribbon + dedollar readings byte-identical), the narrator's
+  stateHash honestly one-state-behind (the 04:35 snapshot post-dates the
+  01:50 artefact — the next :50 rung catches up, self-healing by
+  design).
+- **The `change1d` go-live cadence:** the stored prices key
+  (`insights:prices-live:v1`) still carries the pre-S4 shape until the
+  deployed worker's next :13 cron rung writes it (within the hour of the
+  deploy); until then the ribbon shows its honest labelled 7-day fallback
+  — the day change (the live quote vs the previous session's close,
+  BD-S4a) appears automatically, no further action.
+- **Rollback lever:** `wrangler rollback` (or the dashboard's
+  deployments list) — the previous version served the byte-identical
+  legacy surfaces; the new routes are additive, so a rollback costs only
+  the new endpoints, never the existing page.
+
 ## Session record — 2026-11-04e the gold-balance OI-3/GB-S7 wire-cleanup deploy (the goldSummary field OFF the wire + the wind copy keys retired; the page rendering identically)
 
 GB-S7 (branch `gold-balance/oi3-cleanup`, **PR #24 merged
