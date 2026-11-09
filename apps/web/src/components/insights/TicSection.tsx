@@ -41,7 +41,7 @@
  * in the column headers and the phrase copy, never glued to the numbers.
  */
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import type { TicHolder, TicSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { ticHolderDerived, ticIsStale, ticTopMovers } from '@currena/insights/tic';
@@ -596,6 +596,11 @@ function HolderCards({
   numberLocale: NumberLocale;
 }) {
   const [showAll, setShowAll] = useState(false);
+  // The S11 ARIA polish: the toggle's aria-controls points to this list's
+  // id (useId keeps it unique per instance — the REUSED component renders
+  // on both /usa and /insights without an id collision). The link lets a
+  // screen-reader user jump from the toggle to the list it controls.
+  const listId = useId();
   const visible = showAll ? rows : rows.slice(0, 6);
   const tone = (v: number | null): string =>
     v === null || v === 0
@@ -604,7 +609,7 @@ function HolderCards({
         ? 'text-currena-success'
         : 'text-currena-coral';
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2" id={listId}>
       {visible.map((r) => (
         <div
           key={r.holder.id}
@@ -658,6 +663,7 @@ function HolderCards({
           type="button"
           onClick={() => setShowAll((v) => !v)}
           aria-expanded={showAll}
+          aria-controls={listId}
           className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-[var(--color-border)] bg-transparent px-3.5 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/10"
         >
           {showAll

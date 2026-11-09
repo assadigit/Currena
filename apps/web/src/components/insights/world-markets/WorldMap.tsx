@@ -521,7 +521,7 @@ export function WorldMap({
                       if (el === null) periodBtnRefs.current.delete(p);
                       else periodBtnRefs.current.set(p, el);
                     }}
-                    className={`insights-focusable min-h-[41px] cursor-pointer whitespace-nowrap rounded-full px-3.5 py-1 text-[length:calc(var(--type-caption)*1.27)] font-semibold transition-colors @max-[480px]:min-h-[37px] @max-[480px]:px-2.5 @max-[480px]:text-[length:calc(var(--type-caption)*1.06)] ${
+                    className={`insights-focusable min-h-[44px] cursor-pointer whitespace-nowrap rounded-full px-3.5 py-1 text-[length:calc(var(--type-caption)*1.27)] font-semibold transition-colors @max-[480px]:px-2.5 @max-[480px]:text-[length:calc(var(--type-caption)*1.06)] ${
                       selected
                         ? 'bg-[var(--color-surface)] text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]'
                         : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'

@@ -261,6 +261,12 @@ describe('TicSection', () => {
     );
     const showAll = screen.getByRole('button', { name: /Show all 8 holders/ });
     expect(showAll.getAttribute('aria-expanded')).toBe('false');
+    // The S11 ARIA polish: the toggle carries aria-controls pointing to the
+    // list it controls (the useId-generated id resolves to a real element).
+    const controlsId = showAll.getAttribute('aria-controls');
+    expect(controlsId).not.toBeNull();
+    expect(controlsId).not.toBe('');
+    expect(document.getElementById(controlsId!)).not.toBeNull();
     fireEvent.click(showAll);
     expect(showAll.getAttribute('aria-expanded')).toBe('true');
     cleanup();
