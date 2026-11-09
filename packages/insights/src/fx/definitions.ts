@@ -33,6 +33,12 @@ export type { FxCurrency } from '@currena/core';
 export const FX_CURRENCIES: readonly FxCurrency[] = ['EUR', 'JPY', 'GBP', 'CHF', 'CNY', 'AUD'];
 /** Extra currencies the reused dollar basket needs (basket.ts weights). */
 export const FX_BASKET_CURRENCIES: readonly ('CAD' | 'SEK')[] = ['CAD', 'SEK'];
+/** Extra currencies a PAIR needs (page-division S18, D-42): the audnzd
+ *  cross rides NZD — the SAME single Frankfurter timeseries request, zero
+ *  extra provider calls; the job gives it the CAD/SEK pass-through
+ *  treatment (a miss degrades to the previous audnzd row, never a
+ *  whole-run failure). */
+export const FX_PAIR_CURRENCIES: readonly ['NZD'] = ['NZD'];
 /** History window asked from providers: ~400 days back (spec §4.1). */
 export const FX_HISTORY_DAYS = 400;
 /** V4: every fx currency must carry at least this many daily points. */
@@ -105,11 +111,14 @@ export const YAHOO_USER_AGENT = 'CurrenaDashboard/1.0 (+https://github.com/assad
 export const FX_KV_KEY = 'insights:fx:v1';
 
 /* ------------------------------------------------------------------ *
- * The 10 pairs (spec §3.1) — crosses are code, never a provider call
+ * The 11 pairs (spec §3.1 + page-division D-42) — crosses are code, never a provider call
  * ------------------------------------------------------------------ */
 
-/** The three table groups (spec §3.1 + §10.2 render order). */
-export type FxGroupId = 'dollarWorld' | 'warningLights' | 'chinaLink';
+/** The three table groups (spec §3.1 + §10.2 render order) + the S18
+ *  fourth group: the Australia–New Zealand cross (D-42 — audnzd joins the
+ *  board in its OWN group, never shoe-horned into the Australia–China
+ *  block). */
+export type FxGroupId = 'dollarWorld' | 'warningLights' | 'chinaLink' | 'pacificLink';
 
 export interface FxPairDefinition {
   id: FxPairId;
@@ -123,7 +132,8 @@ export interface FxPairDefinition {
   derivation: 'direct' | 'inverse' | 'cross';
 }
 
-/** Fixed for v1 (spec §3.1, order = the spec table's order). */
+/** Fixed for v1 (spec §3.1, order = the spec table's order) + the S18 D-42
+ *  11th pair (the audnzd cross, its own pacificLink group at the end). */
 export const FX_PAIRS: readonly FxPairDefinition[] = [
   { id: 'eurusd', group: 'dollarWorld', derivation: 'inverse' },
   { id: 'usdjpy', group: 'dollarWorld', derivation: 'direct' },
@@ -135,6 +145,7 @@ export const FX_PAIRS: readonly FxPairDefinition[] = [
   { id: 'eurjpy', group: 'warningLights', derivation: 'cross' },
   { id: 'eurchf', group: 'warningLights', derivation: 'cross' },
   { id: 'audcny', group: 'chinaLink', derivation: 'cross' },
+  { id: 'audnzd', group: 'pacificLink', derivation: 'cross' },
 ];
 
 /** All pair ids in spec-table order. */
@@ -149,8 +160,8 @@ export function fxPairDefinition(id: FxPairId): FxPairDefinition {
   return def;
 }
 
-/** Group render order (spec §3.1: Dollar vs the world · Warning lights · Australia–China). */
-export const FX_GROUP_ORDER: readonly FxGroupId[] = ['dollarWorld', 'warningLights', 'chinaLink'];
+/** Group render order (spec §3.1: Dollar vs the world · Warning lights · Australia–China, then the S18 Australia–New Zealand block). */
+export const FX_GROUP_ORDER: readonly FxGroupId[] = ['dollarWorld', 'warningLights', 'chinaLink', 'pacificLink'];
 
 /* ------------------------------------------------------------------ *
  * The seven rules (spec §6.3 + §6.4's pattern table)

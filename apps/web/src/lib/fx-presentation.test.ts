@@ -339,8 +339,13 @@ describe('the copy corpus (both locales, spec-verbatim anchors)', () => {
     expect(copy.fx.level3Toggle).toBeTruthy();
     expect(copy.fx.empty).toBeTruthy();
     expect(copy.fx.footerLine).toBeTruthy();
-    // §8 + §7 coverage: 10 pairs + the dollar row + 7 rules
-    expect(Object.keys(copy.fx.entries)).toHaveLength(10);
+    // §8 + §7 coverage: 11 pairs (10 pre-S18 + audnzd, D-42) + the dollar
+    // row + 7 rules
+    expect(Object.keys(copy.fx.entries)).toHaveLength(11);
+    expect(copy.fx.entries.audnzd.name).toBeTruthy();
+    expect(copy.fx.groups.pacificLink).toBeTruthy();
+    expect(copy.fx.currencyNames.NZD).toBeTruthy();
+    expect(copy.fx.currencyPlural.NZD).toBeTruthy();
     expect(Object.keys(copy.fx.rules)).toHaveLength(7);
     expect(copy.fx.rules.r1.warning.see).toContain('{x}');
     expect(copy.fx.rules.r7.dollarLedEuroDown.see).toContain('{d}');

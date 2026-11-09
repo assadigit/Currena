@@ -8233,7 +8233,13 @@ export const insightsCopyEn = {
     title: 'World currencies',
     subtitle: 'What the big currencies are telling us',
     asOf: 'As of {date}',
-    groups: { dollarWorld: 'Dollar vs the world', warningLights: 'Warning lights', chinaLink: 'Australia–China' },
+    groups: {
+      dollarWorld: 'Dollar vs the world',
+      warningLights: 'Warning lights',
+      chinaLink: 'Australia–China',
+      // Page-division S18 (2026-11-11, D-42): the audnzd block's own group.
+      pacificLink: 'Australia–New Zealand',
+    },
     /** Status words (V1): patterns show only Active, Watching or Quiet. */
     statusActive: 'Active',
     statusWatching: 'Watching',
@@ -8454,6 +8460,9 @@ export const insightsCopyEn = {
       CNY: 'yuan',
       CHF: 'Swiss franc',
       AUD: 'Australian dollar',
+      // Page-division S18 (D-42): the audnzd cross's New Zealand leg
+      // (the S5 money line + the big-mover sentence).
+      NZD: 'New Zealand dollar',
     },
     currencyPlural: {
       USD: 'US dollars',
@@ -8463,6 +8472,7 @@ export const insightsCopyEn = {
       CNY: 'yuan',
       CHF: 'Swiss francs',
       AUD: 'Australian dollars',
+      NZD: 'New Zealand dollars',
     },
     wordLost: 'lost',
     wordGained: 'gained',
@@ -8518,6 +8528,15 @@ export const insightsCopyEn = {
         name: 'Australian dollar vs yuan',
         what: 'The Australian dollar against its biggest customer’s currency.',
         you: 'Shows the China link in one number.',
+      },
+      // Page-division S18 (2026-11-11, D-42): AUDNZD joins the pair board —
+      // the 11th pair, its own pacificLink group. The name is the audnzd
+      // registry card's own name (one vocabulary, D-48); what/you carry the
+      // au-external lane's own framing (the M6.1 New Zealand link evidence).
+      audnzd: {
+        name: 'Australian dollar vs New Zealand dollar',
+        what: 'The cross-Tasman pair: the two dollars usually move together against the world, so this cross reads the small differences between the two economies.',
+        you: 'The closest thing to a house-price gauge for anyone earning on one side of the Tasman and spending on the other.',
       },
     },
     /** The dollar measure's own row (§8's last line + v1.3 §4.9: the

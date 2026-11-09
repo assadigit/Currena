@@ -16,8 +16,9 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { interpolate } from '../../i18n';
 import { fxSignedPct, whole0 } from './format';
 
-/** {first, second} currency codes of a pair (presentation's own map). */
-export const PAIR_CURRENCIES: Record<FxPairId, readonly [FxCurrency | 'USD', FxCurrency | 'USD']> = {
+/** {first, second} currency codes of a pair (presentation's own map; NZD
+ *  joins for the S18 audnzd cross, D-42). */
+export const PAIR_CURRENCIES: Record<FxPairId, readonly [FxCurrency | 'USD' | 'NZD', FxCurrency | 'USD' | 'NZD']> = {
   eurusd: ['EUR', 'USD'],
   usdjpy: ['USD', 'JPY'],
   gbpusd: ['GBP', 'USD'],
@@ -28,6 +29,7 @@ export const PAIR_CURRENCIES: Record<FxPairId, readonly [FxCurrency | 'USD', FxC
   eurjpy: ['EUR', 'JPY'],
   eurchf: ['EUR', 'CHF'],
   audcny: ['AUD', 'CNY'],
+  audnzd: ['AUD', 'NZD'],
 };
 
 export interface FxPairRow {

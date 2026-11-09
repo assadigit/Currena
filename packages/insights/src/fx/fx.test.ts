@@ -45,7 +45,8 @@ import type { FxCrossReader } from './store';
 import { runFxUpdate } from './run';
 
 /* ------------------------------------------------------------------ *
- * The synthetic ECB world: 6 fx currencies + CAD/SEK, ~400 working days
+ * The synthetic ECB world: 6 fx currencies + CAD/SEK + NZD (the S18
+ * audnzd pair's leg, D-42), ~400 working days
  * ------------------------------------------------------------------ */
 
 export function fxWorld(opts: {
@@ -67,6 +68,7 @@ export function fxWorld(opts: {
     AUD: 1.52,
     CAD: 1.37,
     SEK: 9.5,
+    NZD: 1.65,
   };
   const dates: string[] = [];
   let t = new Date(`${lastDate}T00:00:00Z`).getTime();
@@ -134,6 +136,26 @@ describe('step 1 — providers + cross derivation', () => {
     // And the series builder produces it on every common date.
     const series = pairSeriesFromQuotes('eurjpy', quotes);
     expect(series.length).toBe(eur.length);
+  });
+
+  it('S18 (D-42): AUD/NZD derives as NZD÷AUD from the USD-side rates, and an absent NZD leg degrades the pair honestly', () => {
+    const quotes = fxWorld({});
+    const aud = quotes.AUD!;
+    const nzd = quotes.NZD!;
+    const last = aud.length - 1;
+    const derived = pairRateFromUsd('audnzd', { AUD: aud[last]!.value, NZD: nzd[last]!.value })!;
+    const direct = nzd[last]!.value / aud[last]!.value;
+    expect(derived).toBe(direct);
+    // The series builder produces it on every common date (both legs ride
+    // every ECB date in the fixture).
+    const series = pairSeriesFromQuotes('audnzd', quotes);
+    expect(series.length).toBe(aud.length);
+    // An absent NZD leg: no rate, never a guess (the honest undefined).
+    expect(pairRateFromUsd('audnzd', { AUD: 1.5 })).toBeUndefined();
+    // And the series builder rejects loudly (V7 — the job keeps the stored row).
+    const withoutNzd: FxQuoteSet = { ...quotes };
+    delete withoutNzd.NZD;
+    expect(() => pairSeriesFromQuotes('audnzd', withoutNzd)).toThrow(/audnzd/);
   });
 
   it('parses a Frankfurter timeseries answer and drops non-positive rates (V1)', () => {

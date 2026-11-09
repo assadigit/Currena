@@ -11,12 +11,14 @@ import type { FxCurrency } from './definitions';
 import type { FxQuoteSet } from './providers';
 import { pctChange, round2 } from './maths';
 
-/** The USD-side rate of one currency on a date (undefined when absent). */
-type RateMap = Partial<Record<FxCurrency, number>>;
+/** The USD-side rate of one currency on a date (undefined when absent).
+ *  audnzd's NZD leg rides alongside the six spec currencies (S18, D-42). */
+type RateMap = Partial<Record<FxCurrency | 'NZD', number>>;
 
 /**
  * A pair's rate (quote units per 1 base) from the USD-side rates.
- * audjpy = JPY/AUD, eurjpy = JPY/EUR, eurchf = CHF/EUR, audcny = CNY/AUD.
+ * audjpy = JPY/AUD, eurjpy = JPY/EUR, eurchf = CHF/EUR, audcny = CNY/AUD,
+ * audnzd = NZD/AUD (S18, D-42).
  */
 export function pairRateFromUsd(id: FxPairId, r: RateMap): number | undefined {
   switch (id) {
@@ -40,6 +42,8 @@ export function pairRateFromUsd(id: FxPairId, r: RateMap): number | undefined {
       return r.CHF === undefined || r.EUR === undefined ? undefined : r.CHF / r.EUR;
     case 'audcny':
       return r.CNY === undefined || r.AUD === undefined ? undefined : r.CNY / r.AUD;
+    case 'audnzd':
+      return r.NZD === undefined || r.AUD === undefined ? undefined : r.NZD / r.AUD;
   }
 }
 
@@ -74,9 +78,10 @@ export function pairSeriesFromQuotes(id: FxPairId, quotes: FxQuoteSet): SeriesPo
   // ONE ascending pass per currency builds the date -> USD-side rates map
   // (every Frankfurter/Yahoo series is already date-ascending), then each
   // cross point is a single map lookup + arithmetic — linear, no repeated
-  // binary searches (the Worker's CPU budget stays tiny).
-  const byDate = new Map<string, Partial<Record<FxCurrency, number>>>();
-  for (const ccy of Object.keys(quotes) as FxCurrency[]) {
+  // binary searches (the Worker's CPU budget stays tiny). The map carries
+  // every served quote currency (incl. NZD for the S18 audnzd cross).
+  const byDate = new Map<string, Partial<Record<FxCurrency | 'NZD', number>>>();
+  for (const ccy of Object.keys(quotes) as Array<FxCurrency | 'NZD'>) {
     for (const p of quotes[ccy] ?? []) {
       const row = byDate.get(p.date);
       if (row === undefined) byDate.set(p.date, { [ccy]: p.value });

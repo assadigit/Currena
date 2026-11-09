@@ -30,6 +30,7 @@ import {
   FX_BASKET_CURRENCIES,
   FX_CURRENCIES,
   FX_MIN_POINTS,
+  FX_PAIR_CURRENCIES,
   FX_PAIR_IDS,
   FX_STALE_DAYS,
 } from './definitions';
@@ -146,12 +147,12 @@ function validateQuoteSet(quotes: FxQuoteSet, notes: string[]): FxQuoteSet {
   for (const reason of rejected) {
     notes.push(`V4: ${reason} — pairs over it keep their stored rows`);
   }
-  // CAD/SEK are only needed by the reused dollar basket; they ride through
-  // verbatim (a miss degrades to the previous dollar row, noted), never a
-  // failure of the whole run.
-  for (const code of FX_BASKET_CURRENCIES) {
+  // CAD/SEK are only needed by the reused dollar basket; NZD is only needed
+  // by the S18 audnzd pair (D-42). All three ride through verbatim (a miss
+  // degrades to the previous row, noted), never a failure of the whole run.
+  for (const code of [...FX_BASKET_CURRENCIES, ...FX_PAIR_CURRENCIES]) {
     if (quotes[code] === undefined) {
-      notes.push(`V4 note: ${code} absent — the dollar basket may ride the previous row`);
+      notes.push(`V4 note: ${code} absent — the ${code === 'NZD' ? 'audnzd pair' : 'dollar basket'} may ride the previous row`);
     } else {
       usable[code] = quotes[code];
     }

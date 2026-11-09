@@ -24,12 +24,18 @@ import {
   FX_BASKET_CURRENCIES,
   FX_CURRENCIES,
   FX_HISTORY_DAYS,
+  FX_PAIR_CURRENCIES,
   YAHOO_BASE_URL,
 } from './definitions';
 
-/** Every currency the fx run asks providers about (6 fx + CAD + SEK for the basket). */
-export type FxQuoteCurrency = FxCurrency | 'CAD' | 'SEK';
-export const FX_QUOTE_CURRENCIES: readonly FxQuoteCurrency[] = [...FX_CURRENCIES, ...FX_BASKET_CURRENCIES];
+/** Every currency the fx run asks providers about (6 fx + CAD + SEK for the
+ *  basket + NZD for the S18 audnzd pair, D-42). */
+export type FxQuoteCurrency = FxCurrency | 'CAD' | 'SEK' | 'NZD';
+export const FX_QUOTE_CURRENCIES: readonly FxQuoteCurrency[] = [
+  ...FX_CURRENCIES,
+  ...FX_BASKET_CURRENCIES,
+  ...FX_PAIR_CURRENCIES,
+];
 
 /**
  * The per-currency USD-side series a run produced (units of currency X per
@@ -156,8 +162,9 @@ export interface FrankfurterFetchOptions {
 }
 
 /**
- * The ONE primary call (spec §4.2's exact URL shape): all 8 currencies in a
- * single timeseries request with the dollar as base.
+ * The ONE primary call (spec §4.2's exact URL shape): all 9 currencies in a
+ * single timeseries request with the dollar as base (the 8 pre-S18 codes +
+ * NZD for the D-42 audnzd cross — still ONE request, zero extra calls).
  */
 export async function fetchFrankfurterQuotes(opts: FrankfurterFetchOptions = {}): Promise<FxQuotes> {
   // v3 M-6 kill switch (2026-10-20): a disabled register row is never requested.
@@ -198,6 +205,8 @@ const YAHOO_SYMBOLS: Readonly<Record<FxQuoteCurrency, { symbol: string; inverse:
   CNY: { symbol: 'CNY=X', inverse: false },
   CAD: { symbol: 'CAD=X', inverse: false },
   SEK: { symbol: 'SEK=X', inverse: false },
+  // S18 (D-42): the New Zealand dollar leg of the audnzd cross.
+  NZD: { symbol: 'NZD=X', inverse: false },
   // USD-per-quote symbols need the reciprocal
   EUR: { symbol: 'EURUSD=X', inverse: true },
   GBP: { symbol: 'GBPUSD=X', inverse: true },
@@ -209,16 +218,17 @@ export interface YahooFxFetchOptions {
   baseUrl?: string;
   userAgent?: string;
   timeoutMs?: number;
-  /** Restrict the fallback to these currencies (default: all 8). */
+  /** Restrict the fallback to these currencies (default: all 9). */
   only?: readonly FxQuoteCurrency[];
 }
 
 /**
- * The fallback: one chart call per currency (8 calls, spec §4.2's Yahoo
- * column), inverted where Yahoo quotes USD-per-currency, so the answer has
- * the same USD-side shape as Frankfurter's. A single currency's failure
- * drops just that currency (the compute layer degrades honestly) — but the
- * whole fallback fails when NO currency answered.
+ * The fallback: one chart call per currency (9 calls, spec §4.2's Yahoo
+ * column — the 8 pre-S18 codes + NZD), inverted where Yahoo quotes
+ * USD-per-currency, so the answer has the same USD-side shape as
+ * Frankfurter's. A single currency's failure drops just that currency (the
+ * compute layer degrades honestly) — but the whole fallback fails when NO
+ * currency answered.
  */
 export async function fetchYahooQuotes(opts: YahooFxFetchOptions = {}): Promise<FxQuotes> {
   // v3 M-6 kill switch (2026-10-20): a disabled register row is never requested.

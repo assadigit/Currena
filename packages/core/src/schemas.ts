@@ -1919,7 +1919,13 @@ export type AuMarketsSnapshot = z.infer<typeof AuMarketsSnapshotSchema>;
  *               attention, 3+ or the R4 confidence-wobble = unusual
  * ------------------------------------------------------------------ */
 
-/** The 10 pairs (spec §3.1) — 6 direct/inverse + 4 crosses derived in code. */
+/**
+ * The 11 pairs (spec §3.1 + page-division D-42) — 6 direct/inverse + 5
+ * crosses derived in code. `audnzd` joined the board in page-division S18
+ * (2026-11-11, D-42: "AUDNZD becomes the 11th pair on Currency Pairs") — an
+ * ADDITIVE wire-contract change: stored pre-S18 snapshots (10 pairs) keep
+ * parsing; the pair only appears once the fx job writes it.
+ */
 export const FxPairIdSchema = z.enum([
   'eurusd',
   'usdjpy',
@@ -1931,6 +1937,7 @@ export const FxPairIdSchema = z.enum([
   'eurjpy',
   'eurchf',
   'audcny',
+  'audnzd',
 ]);
 export type FxPairId = z.infer<typeof FxPairIdSchema>;
 
