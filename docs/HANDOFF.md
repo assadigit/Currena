@@ -6,6 +6,17 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **IN PROGRESS — S16 (2026-11-10): Australia build & gates · Session
+> 16/30 · Phase G opens.** Goal: the /australia page build + gates in one
+> session — (M1) the pure australia-tiles + the en/fa copy + the pins;
+> (M2) the page build (the REUSED AU Markets board via the lean adapter,
+> the five-gauge structure D-37, the 28 cards with the §21 trio, the 11
+> moved-out seat chips → their new homes); (M3) the §21 backtest (offline
+> suite + the live pd-s16-backtest.ts pre/post-deploy) + the render audit
+> + the full gates + the browser pass + the In-build chip retirement at
+> the gates pass + the docs + the deploy (the owner's standing). This
+> block is replaced by the full rewrite at the session's close.
+
 ## Current state (2026-11-09, after page-division S15)
 
 - **Program:** page-division — splitting the all-in-one Insights page
