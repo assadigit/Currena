@@ -55,7 +55,6 @@ import {
   AUSTRALIA_EXTERNAL_IDS,
   AUSTRALIA_ACTIVITY_IDS,
   AUSTRALIA_WORLD_RISK_IDS,
-  AUSTRALIA_SEAT_IDS,
   AUSTRALIA_MOVED_OUT_IDS,
 } from './australia-tiles';
 import { clearProjectionCacheForTests } from '../../lib/page-division';

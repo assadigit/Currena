@@ -114,8 +114,8 @@ async function main(): Promise<void> {
     `${australia.absentIds.length} absent · ${australia.readings.length} readings · boards ${australia.boards.join('+')}`,
   );
   check(
-    'the Australia projection declares the markets board (the placement §16 contract — the zoom)',
-    (australia.boards as readonly string[]).includes('markets'),
+    'the Australia projection declares the markets-au board (the placement §16 contract — the zoom)',
+    (australia.boards as readonly string[]).includes('markets-au'),
     `boards: ${australia.boards.join(' + ')}`,
   );
 
