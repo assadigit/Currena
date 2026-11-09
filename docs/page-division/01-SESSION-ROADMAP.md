@@ -767,9 +767,76 @@ contract) · BD-S10b (the placeholder body retired) · BD-S10c (the zoom
 recorded as the §7 item-8 section) + the deploy, all in
 `docs/DECISIONS.md`.
 
-### ☐ S11 — USA gates · `Session 11/30`
+### ✅ S11 — USA gates · `Session 11/30` · delivered 2026-11-09 · **Phase D CLOSED**
 - Full card-render audit vs placement table; freshness within cadence
   grace; mobile/ARIA; hand-off.
+
+**S11 delivery record (2026-11-09):** Phase D (USA) is CLOSED — the USA
+gates session delivered the three S11-scope items over the S10-complete
+/usa page (72 cards + the TIC board, no new layers — the gates + polish
+session). **(a) The freshness audit formalized (BD-S11a — spec §21's
+"Data audit" leg):** the freshness-within-cadence-grace audit the live
+`pd-s10-backtest.ts` script carried inline is extracted into a PURE
+function `auditUsaFreshness` in `usa-backtest-core.ts` — takes
+`(readings, registry, cardIds, now)`, returns `{checks, withinGrace,
+beyond[]}` where each beyond-grace finding carries an `honest` flag (true
+iff `status === 'stale'`); the audit PASSES iff every beyond-grace card
+honestly carries the engine's stale status (the govt-interest-revenue
+case: 222d beyond its 215d grace AND status 'stale' — the page speaks the
+engine's own word). The live script now calls the SAME function (no logic
+drift between the test and the gate); the offline suite (5 new tests in
+`usa-backtest.test.ts`): the GREEN path, the HONEST-STALE path (the
+govt-interest-revenue twin), the FAIL-CLOSED proof (a beyond-grace card
+the engine forgot to flag → RED — the audit catches the engine's own
+miss), the EXEMPT path (per-change maxAge null + unavailable asOf null),
+and the ABSENT-TWIN path. **(b) The mobile/ARIA polish (BD-S11b — spec
+§18 D-48's "touch targets ≥ 44px" + the WAI-ARIA disclosure pattern):**
+`TicSection.tsx` — the mobile card list's Show-all toggle already carried
+`aria-expanded` (S10); it now carries `aria-controls` pointing to the list
+it controls (the `useId()`-generated id — unique per instance so the
+REUSED component renders on both /usa and /insights without an id
+collision); `WorldMap.tsx` — the period switch's radio buttons bumped from
+`min-h-[41px]`/`@max-[480px]:min-h-[37px]` to `min-h-[44px]` everywhere
+(the spec §18 D-48 was below on small screens at 37px; the small-screen
+padding/font reductions kept for horizontal fit). **(c) The In-build chip
+retired (BD-S11c — BD-S10b's completion):** the USA page's honest "In
+build" status chip is REMOVED from the heading block — the gates passed
+(the §21 card audit 173/173 green, the freshness audit formalized, the
+mobile/ARIA polish landed); the page's layers are complete and verified.
+The `pd.statusBuilding` key stays for `RegionPage` + `PagePlaceholder`
+(the genuinely-not-yet-built pages). **THE §21 DIFF (the S11 gate's own —
+re-audited as the session's own gate):** the live `pd-s10-backtest.ts`
+re-run against PRODUCTION with the pure `auditUsaFreshness` — **173 checks
+· 173 green · 0 red, TWICE (before and after the deploy)** (115 page-diff +
+48 TIC + 6 tier membership + 1 freshness + 3 feed). **The browser pass**
+(the freshly built SPA through the local preview server, /api proxied to
+currena.ir): 1440×900 AND 360×844 in BOTH en and fa (RTL, Persian digits)
+— all six tiers with ZERO card overlaps measured in the DOM, NO horizontal
+scroll at any width in any locale (overflow 0px on all 4 legs), the period
+switch at 44px on all 4 legs, the Show-all toggle's aria-controls resolving
+on all 4 legs, the In-build chip ABSENT on all 4 legs, ZERO console/page
+errors across all 4 legs; the VLM visual pass (fa-360): 3 findings — ALL
+THREE DISPROVEN against the DOM (the topbar's normal border; the actual
+date "داده‌های ۱۴۰۵/۰۸/۱۷" fits scrollW===clientW — the VLM misread the
+Persian digits; the actual question "آیا بازار آمریکا در تنش است؟" fits
+scrollW===clientW — the VLM dropped "ن" from "تنش" at small font, exactly
+the S10 precedent). **Gates ALL GREEN** (2m 21s: secret scan 8/968 · tsc
+6/6 · eslint 0/0 · copy:audit clean · narrator + eval 50 · layer1
+11,819/11,819 · **the suite 14,922 = +5** · build + budgets held — the
+UsaPage chunk 24.20/6.29 vs 26/7 (the chip removal shaved ~288 bytes), the
+shared tic chunk 21.20/5.61 vs 24/7 (the aria-controls + useId added ~39
+bytes)). **Deployed + live-verified** (version `4f288272` 2026-11-09 00:42
+UTC, the owner's standing "the deploy at the close is the owner's
+standing"; the deploy-lock check ran first — S10's `18907d4d` @ 100%):
+currena.ir/usa live-smoke-verified (72 cards · 5 strip · 6 tiers · In-build
+ABSENT · period switch 44px · aria-controls resolves · 0px overflow · 0
+page errors), the deployed UsaPage + tic chunks BYTE-IDENTICAL to the
+local build (24,198 + 21,195 bytes, the hashed names match exactly), the
+§21 backtest re-run post-deploy 173/173 green, every other surface intact.
+Decisions: BD-S11a (the freshness audit formalized) · BD-S11b (the
+mobile/ARIA polish — aria-controls + 44px touch target) · BD-S11c (the
+In-build chip retired — BD-S10b's completion) + the deploy, all in
+`docs/DECISIONS.md`.
 
 ## Phase E — Europe (S12–S13)
 
@@ -862,8 +929,8 @@ recorded as the §7 item-8 section) + the deploy, all in
 | A Foundations | S1–S4 | ✅ S1 2026-11-07 · S2 2026-11-08 · S3 2026-11-08 · S4 2026-11-08 |
 | B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ✅ S6 2026-11-08 (deployed `327c7761`, BD-S6a's alternation) |
 | C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ✅ S8 2026-11-08 (deployed `fde50a95`, the four REGION zoom maps — PHASE C CLOSED) |
-| D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) · ✅ S10 2026-11-09 (deployed `18907d4d`, tiers 3–5 + the TIC board — the 72 cards complete) |
-| E Europe | S12–S13 | ☐ |
+| D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) · ✅ S10 2026-11-09 (deployed `18907d4d`, tiers 3–5 + the TIC board — the 72 cards complete) · ✅ S11 2026-11-09 (deployed `4f288272`, the USA gates — the freshness audit formalized, the mobile/ARIA polish, the In-build chip retired — **PHASE D CLOSED**) |
+| E Europe | S12–S13 | ☐ next: S12 |
 | F Asia & Pacific | S14–S15 | ☐ |
 | G Australia | S16 | ☐ |
 | H Commodities | S17 | ☐ |
@@ -872,7 +939,7 @@ recorded as the §7 item-8 section) + the deploy, all in
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 10/30 delivered 2026-11-09 · 20 remaining — next
-action: Session 11/30 (S11, Phase D closes — USA gates: the full
-card-render audit vs the placement table, freshness within cadence grace,
-mobile/ARIA, hand-off).**
+**Current position: Session 11/30 delivered 2026-11-09 · 19 remaining — next
+action: Session 12/30 (S12, Phase E opens — Europe build + fills: the
+EU/non-EU split D-33, the Europe zoom map, the FRED-only fills D-34 —
+verify each candidate series live before ingest).**

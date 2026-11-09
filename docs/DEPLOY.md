@@ -199,6 +199,77 @@ custody card intact through the reuse refactor) all verified.
 **Rollback lever:** `wrangler rollback` — /usa returns to the S9 page
 (the strip + tiers 1–2 + the zoom); nothing else moves.
 
+## Session record — 2026-11-09c the page-division S11 deploy (the USA gates — Phase D closes; the freshness audit formalized, the mobile/ARIA polish landed, the honest In-build chip retired)
+
+**Scope (page-division S11, the USA gates):** display-layer ONLY. No
+engine, voter, threshold, calibration or provider change; the SAME
+insights snapshot + the SAME markets board + the EXISTING TIC route
+`GET /api/insights/tic`, zero new fetches, zero new KV. S11 closes Phase D
+(USA) with the gates session: the full card-render audit vs the placement
+table (72 cards + the TIC board, every §21 trio leg re-audited as the
+session's own gate), the freshness-within-cadence-grace audit formalized
+as a pure function + offline suite (BD-S11a), the mobile/ARIA polish
+(BD-S11b — the Show-all toggle's `aria-controls` + the period switch's
+44px touch target), and the honest In-build chip retired (BD-S11c —
+BD-S10b's completion: the gates passed).
+
+**Gates before the deploy (ALL GREEN, 2m 21s):** secret scan 8/968 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean · narrator vocabulary in
+sync + eval 50 · layer1 strict 11,819/11,819 · the full suite **14,922
+= +5** (usa-backtest 16 = +5 for the freshness audit formalization ·
+TicSection 14 = +1 aria-controls assertion · UsaPage 7 · usa-tiles 16 ·
+usa-copy-pin 6) · build + budgets held — entry 270.07/81.83, the UsaPage
+chunk **24.20/6.29 vs its 26/7 row** (the In-build chip removal shaved
+~288 bytes), the shared tic chunk **21.20/5.61 vs its 24/7 row** (the
+aria-controls + useId added ~39 bytes).
+
+**The §21 diff — the S11 gate's own, run LIVE twice (pre-deploy and
+post-deploy): 173 checks · 173 green · 0 red.** The live `pd-s10-backtest.ts`
+re-run against PRODUCTION with the pure `auditUsaFreshness` (the S11
+formalization — the live script now calls the same function the offline
+suite pins, no logic drift): the 72 cards' trio inputs byte-identical
+(page ≡ Global ≡ engine, 115 checks) + the TIC board's every derived row
+byte-identical through both paths (48 checks) + the tier membership
+7/19/12/17/17 + 72/72 carried (6 checks) + the freshness audit honest
+(govt-interest-revenue 222d beyond its 215d grace AND carrying the
+engine's stale status — the page speaks the word, 1 check) + the three
+feeds one snapshot (3 checks).
+
+**The deploy-lock check ran first** (the D-43 lesson): the active
+version was S10's `18907d4d` @ 100% — no parallel deploy. `pnpm
+--filter @currena/web build` + `wrangler deploy` → **currena-api
+`4f288272` @ 100%** (deployment `4f288272-2a51-4e18-a472-4567de0fe5d1`,
+2026-11-09T00:42:24Z). currena-markets untouched (code-unchanged).
+
+**The live acceptance (ALL GREEN):** currena.ir/usa live-smoke-verified
+at 1440×900 en (72 cards · 5 strip · 6 tiers · the In-build chip ABSENT ·
+the period switch at 44px · the Show-all toggle's aria-controls resolving
+to a real element · 0px overflow · 0 page errors); the browser pass (the
+freshly built SPA through the local preview server, /api proxied to
+currena.ir) at 1440×900 AND 360×844 in BOTH en and fa (RTL, Persian
+digits) — all six tiers with ZERO card overlaps measured in the DOM, NO
+horizontal scroll at any width in any locale (overflow 0px on all 4 legs),
+the period switch at 44px on all 4 legs (the S11 touch-target polish
+holds at mobile width), the Show-all toggle's aria-controls resolving on
+all 4 legs, the In-build chip ABSENT on all 4 legs, the TIC table on
+desktop + the mobile card list on mobile, ZERO console/page errors
+across all 4 legs; the VLM visual pass (fa-360): 3 findings (a "stray
+gray bar", a "clipped date ۱۴۰", a "clipped question در تش") — ALL THREE
+DISPROVEN against the DOM (the topbar's normal border; the actual date
+"داده‌های ۱۴۰۵/۰۸/۱۷" fits scrollW===clientW — the VLM misread the Persian
+digits; the actual question "آیا بازار آمریکا در تنش است؟" fits
+scrollW===clientW — the VLM dropped "ن" from "تنش" at small font, exactly
+the S10 precedent); the deployed UsaPage + tic chunks BYTE-IDENTICAL to
+the local build (24,198 + 21,195 bytes, the hashed names
+`UsaPage-Dc8qMK9L.js` + `tic-CVC4yc5d.js` match exactly); the §21 backtest
+re-run against production post-deploy 173/173 green; the Global + Gold +
+World Markets + the three region pages + the legacy /insights (the TIC
+section + custody card intact through the S11 ARIA polish) all verified.
+
+**Rollback lever:** `wrangler rollback` — /usa returns to the S10 page
+(the complete 72 cards + the TIC board with the In-build chip and the
+37px period switch); nothing else moves.
+
 ## Session record — 2026-11-09a the page-division S9 deploy (the USA verdicts + tiers 1–2 — the D-30 verdict strip, D-29's seven "the world watches" cards and the 19 rates & the Fed cards live for every visitor at /usa; Phase D open)
 
 **Scope (page-division S9, spec §7 items 1–3, D-29/D-30):** display-layer

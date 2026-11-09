@@ -525,3 +525,125 @@
 - **Who decided:** the build session (S10) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-09b.
+
+## 2026-11-09 — BD-S11a: the freshness audit formalized as a pure function + offline suite (the §21 "Data audit" leg)
+
+- **Decision:** the freshness-within-cadence-grace audit the live
+  `pd-s10-backtest.ts` script carried inline is extracted into a PURE
+  function (`auditUsaFreshness` in `usa-backtest-core.ts`) and pinned by an
+  offline suite (5 tests in `usa-backtest.test.ts`). The live script now
+  calls the same function — no logic drift between the test and the gate.
+- **Options considered:** (A) leave the audit in the live script only (the
+  S10 state — the logic was correct but unpinned, a future refactor could
+  silently break it); (B) extract the pure function + pin the offline suite
+  with the fail-closed proof (a card beyond grace the engine forgot to flag
+  → RED); (C) add a full registry-freshness test over the live
+  `data/indicators.json` (fragile — the registry changes every ingest).
+- **Reason:** B — the §21 "Data audit" leg ("all listed cards render with
+  value, 10-year position, and freshness within cadence grace") is a gate,
+  and a gate's logic must be regression-pinned. The pure function takes
+  `(readings, registry, cardIds, now)` and returns `{checks, withinGrace,
+  beyond[]}` where each beyond-grace finding carries an `honest` flag (true
+  iff `status === 'stale'`); the audit passes iff every beyond-grace card is
+  honest (the govt-interest-revenue case: 222d beyond its 215d grace AND
+  carrying the engine's stale status — the page speaks the engine's own
+  word). The fail-closed proof (a beyond-grace card with `status: 'normal'`
+  → RED) catches the engine's own miss, never a silent stale-by-age card.
+  The live script's `registryMaxAge()` reads `data/indicators.json` (the
+  generated registry) and passes it to the same function.
+- **Who decided:** the build session (S11). **Revisit:** if the registry's
+  `maxAgeDays` semantics change (a new cadence type, a redefinition of
+  "stale"), the offline suite's synthetic boards must grow the new shape.
+
+## 2026-11-09 — BD-S11b: the mobile/ARIA polish — the Show-all toggle's aria-controls + the period switch's 44px touch target
+
+- **Decision:** two ARIA/touch-target polish passes on the REUSED
+  components the USA page renders (both benefit /usa AND the legacy
+  /insights, since the components are shared):
+  (a) `TicSection.tsx` — the mobile card list's Show-all toggle already
+  carried `aria-expanded` (S10); it now carries `aria-controls` pointing to
+  the list it controls (the `useId()`-generated id on the list container).
+  `useId()` keeps the id unique per instance so the REUSED component renders
+  on both pages without an id collision (the WAI-ARIA disclosure pattern).
+  (b) `WorldMap.tsx` — the period switch's radio buttons bumped from
+  `min-h-[41px]` / `@max-[480px]:min-h-[37px]` to `min-h-[44px]` everywhere
+  (the spec §18 D-48 "touch targets ≥ 44px" was below on small screens at
+  37px; the `@max-[480px]` height override removed, the small-screen
+  padding/font reductions kept for horizontal fit).
+- **Options considered:** (A) leave the toggle without `aria-controls` and
+  the period switch at 37px (the S10 state — compliant with WCAG 2.2's 24px
+  minimum but below the project's own §18 D-48 44px bar); (B) add
+  `aria-controls` + bump to 44px (the polish); (C) defer to S19 (the
+  "Navigation, mobile & SEO polish" integration pass).
+- **Reason:** B — the S11 scope is "the mobile/ARIA polish pass" and the
+  USA page renders both components; the 44px bar is the project's own spec
+  rule (§18 D-48), not an optional AAA. The `aria-controls` link is the
+  WAI-ARIA disclosure pattern (the toggle already had `aria-expanded` — the
+  pair is the contract). The period switch's `overflow-x-auto` radiogroup
+  handles width; the `flex-wrap` container handles height — the bump is
+  vertically safe (the browser pass confirmed ZERO card overlaps + 0px
+  overflow at 360×844). The sort buttons in the TIC table stay at 36px
+  (desktop-only at ≥900px, exceeding WCAG 2.2's 24px minimum; the 44px bar
+  is for touch, and the table doesn't render on touch-width mobile — the
+  mobile card list does, with its 44px Show-all toggle).
+- **Who decided:** the build session (S11). **Revisit:** if the TIC table
+  ever renders on touch-width mobile (a responsive change), the sort buttons
+  must bump to 44px.
+
+## 2026-11-09 — BD-S11c: the In-build chip retired (BD-S10b's completion)
+
+- **Decision:** the USA page's honest "In build" status chip is RETIRED
+  from the heading block (BD-S10b's completion — the chip "stays for S11's
+  gates/polish"; S11's gates passed: the §21 card audit 173/173 green, the
+  freshness audit formalized, the mobile/ARIA polish landed). The
+  `pd.statusBuilding` key stays in both dictionaries — `RegionPage`
+  (Europe/Asia-Pacific/Australia, the not-yet-built region pages) and
+  `PagePlaceholder` (Commodities/Currencies) still carry the honest chip for
+  their own in-build state.
+- **Options considered:** (A) keep the chip (the page is "in build" until
+  the whole 30-session program completes); (B) retire the chip on the USA
+  page only (the page's own layers are complete and verified); (C) retire
+  the key entirely (would break the other placeholder pages).
+- **Reason:** B — the USA page's layers are complete since S10 (the 72
+  cards + the TIC board) and S11's gates verified them green. The honest
+  "in build" claim was for the gates/polish work S11 was scoped to do; that
+  work is done. Keeping the chip after its gate passed would be DISHONEST
+  in the other direction (claiming in-build when the page is verified
+  complete). The key stays for the genuinely-not-yet-built pages.
+- **Who decided:** the build session (S11). **Revisit:** if the USA page
+  gains a new layer in a future session (e.g., S19's SEO/meta pass adds new
+  content), the chip does NOT return — the page is live and verified; a new
+  layer ships when it's ready, not under an in-build banner.
+
+## 2026-11-09 — The 2026-11-09c deploy (the USA gates — Phase D closes)
+
+- **Decision:** ship at the close of S11 (version `4f288272`,
+  2026-11-09 00:42 UTC) — the owner's standing in the session prompt
+  ("the deploy at the close is the owner's standing"). The deploy-lock
+  check ran first: the active version was S10's `18907d4d` @ 100%, no
+  parallel deploy.
+- **Reason:** all gates green (the suite 14,922 = +5 · tsc 6/6 · lint
+  0/0 · copy:audit clean · narrator in sync + 50 · layer1 11,819/11,819 ·
+  build + budgets — the UsaPage chunk 24.20/6.29 vs its 26/7 row (the
+  In-build chip removal shaved ~288 bytes), the shared tic chunk
+  21.20/5.61 vs its 24/7 row (the aria-controls + useId added ~39 bytes));
+  the live §21 diff 173/173 green BEFORE and AFTER the deploy (the 72-card
+  trio coverage + the TIC board diff + the freshness audit through the pure
+  function); currena.ir/usa live-verified at 1440×900 and 360×844 in BOTH
+  en and fa (all six tiers with ZERO card overlaps measured in the DOM, NO
+  horizontal scroll, the period switch at 44px, the Show-all toggle's
+  aria-controls resolving, the In-build chip ABSENT, ZERO console/page
+  errors); the VLM's 3 fa-360 findings (a "stray gray bar", a "clipped
+  date", a "clipped question") DISPROVEN against the DOM (the topbar's
+  normal border; the actual date "داده‌های ۱۴۰۵/۰۸/۱۷" fits scrollW===clientW;
+  the actual question "در تنش" fits scrollW===clientW — the VLM misread at
+  small font, exactly the S10 precedent); the deployed UsaPage + tic chunks
+  BYTE-IDENTICAL to the local build (24,198 + 21,195 bytes, the hashed
+  names match exactly); the Global + Gold + World Markets + region + legacy
+  surfaces intact.
+- **Rollback:** `wrangler rollback` — /usa returns to the S10 page (the
+  complete 72 cards + the TIC board with the In-build chip and the 37px
+  period switch); nothing else moves.
+- **Who decided:** the build session (S11) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives in
+  `docs/DEPLOY.md` 2026-11-09c.

@@ -38,8 +38,8 @@ regeneration (`pnpm placement:generate`).
 - **Phase 3 (final spec):** pending the investor — roadmap S22 records the
   answers as D-49+.
 - **Phase 4 (build):** **RUNNING — Phase A (Foundations) CLOSED, Phase B
-  (Gold) CLOSED, Phase C (World Markets) CLOSED and Phase D (USA) OPEN:
-  S1 (scaffold & navigation) 2026-11-07 · S2 (the data layer +
+  (Gold) CLOSED, Phase C (World Markets) CLOSED and **Phase D (USA)
+  CLOSED**: S1 (scaffold & navigation) 2026-11-07 · S2 (the data layer +
   `PLACEMENT.generated.md`) 2026-11-08 · S3 (the Global page build: the
   D-21 ten-tile verdict board) 2026-11-08 · S4 (Global gates & polish:
   the §21 verdict-consistency backtest 84/84 green, BD-S4a/b, the
@@ -75,10 +75,17 @@ regeneration (`pnpm placement:generate`).
   copy contract over the existing /api/insights/tic route; the
   placeholder body retired; the live §21 diff 173/173 green twice)
   2026-11-09 — DEPLOYED LIVE at `/usa` (version `18907d4d`; the live
-  acceptance record in `docs/DEPLOY.md` 2026-11-09b).** Next: Session
-  11/30 (S11 — USA gates: the full card-render audit vs the placement
-  table, freshness within cadence grace, mobile/ARIA, hand-off — Phase D
-  closes). See the roadmap's progress board for the current position.
+  acceptance record in `docs/DEPLOY.md` 2026-11-09b). S11 (the USA
+  gates: the freshness audit formalized as a pure function + offline
+  suite (BD-S11a), the mobile/ARIA polish — aria-controls on the
+  Show-all toggle + the period switch's 44px touch target (BD-S11b), the
+  In-build chip retired (BD-S11c — BD-S10b's completion); the live §21
+  diff 173/173 green twice; the browser pass at 1440×900 and 360×844 in
+  en + fa with ZERO overlaps/overflow/errors) 2026-11-09 — DEPLOYED
+  LIVE at `/usa` (version `4f288272`; the live acceptance record in
+  `docs/DEPLOY.md` 2026-11-09c).** Next: Session 12/30 (S12 — Phase E
+  opens: Europe build + fills). See the roadmap's progress board for the
+  current position.
 
 ## The one rule that trumps everything
 
