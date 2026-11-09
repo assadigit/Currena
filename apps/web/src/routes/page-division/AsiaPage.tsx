@@ -25,20 +25,19 @@
  * from cache on a slow connection and survives a feed outage, clearly
  * labelled (M-17, the BD-S5a sentence).
  *
- * The honest "In build" chip stays PRESENT (the S12 Europe trajectory:
- * build session chip → gates session retirement). The page's 11 placed
- * cards are complete and the §21 diff is green, but the §15 FRED-only
- * CPI fills (D-36: Japan · Korea · India CPI YoY) are verified-pending-
- * ingest (Rule 5 — BD-S14a): FRED blocks the dev sandbox, so the
- * candidates are recorded in DECISIONS.md for verification from
- * production egress + ingest in a dedicated session. The two index-only
- * sections (Korea/Taiwan/HK, India) render an honest note — their
- * markets ride the zoom map above, and the CPI fills are pending. The
- * chip retires at the S15 gates pass (the USA S11 / Europe S13
- * trajectory: the fills' absence does not make the 11 placed cards
- * "in build", but the page is honestly "growing" until the fills land
- * or the gates session retires the chip on the placed cards' pass —
- * spec §20).
+ * The honest "In build" chip is RETIRED (S15's gate pass — BD-S14b's
+ * completion; the USA S11 / Europe S13 trajectory: build-session chip
+ * → gates-session retirement). The page's 11 placed cards are complete
+ * and the §21 diff is green; the §15 FRED-only CPI fills (D-36: Japan ·
+ * Korea · India CPI YoY) are verified-pending-ingest (Rule 5 — BD-S14a)
+ * and their absence does not make the 11 placed cards "in build" — they
+ * are an ENGINE-layer change that deserves its own focused session. The
+ * two index-only sections (Korea/Taiwan/HK, India) render an honest
+ * note — their markets ride the zoom map above, and the CPI fills are
+ * pending. The `pd.statusBuilding` key stays in both dictionaries —
+ * `RegionPage` (Australia, the not-yet-built region page) and
+ * `PagePlaceholder` (Commodities/Currencies) still carry the honest
+ * chip for their own in-build state.
  *
  * Platform: browser only — this module lives in the lazy Asia route
  * chunk, never the entry graph.
@@ -194,26 +193,23 @@ export function AsiaPage(): React.JSX.Element {
     <div className="mx-auto w-full max-w-[560px] px-3 py-1.5 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1280px] lg:px-8 lg:py-6">
       {/* The heading block: title + the one-line purpose + the data-as-of
           line (the BD-S5a sentence replaces the plain line when the copy
-          is the cached one). The In-build chip stays PRESENT (the S12
-          Europe trajectory — build session chip → gates session
-          retirement): the §15 FRED-only CPI fills (D-36) are verified-
-          pending-ingest (Rule 5 — BD-S14a), and the two index-only
-          sections honestly note their fills are pending. The chip
-          retires at the S15 gates pass (the USA S11 / Europe S13
-          trajectory). */}
+          is the cached one). The In-build chip retired at S15's gate pass
+          — the page's 11 placed cards are complete and verified. */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.asiaPacific.title')}</h1>
-          {/* In-build status chip — the page is honestly "growing"
-           * (spec §20): the 11 placed cards are complete + the §21 diff
-           * is green, but the §15 FRED-only CPI fills (D-36: Japan ·
-           * Korea · India) are verified-pending-ingest (Rule 5 —
-           * BD-S14a), and the two index-only sections (Korea/Taiwan/HK,
-           * India) carry no registry cards yet. The chip retires at the
-           * S15 gates pass — the USA S11 / Europe S13 trajectory. */}
-          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-[10.5px] font-bold text-amber-900 sm:px-3 sm:py-1 sm:text-xs dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200">
-            {t('pd.statusBuilding')}
-          </span>
+          {/* The In-build chip is RETIRED (BD-S14b's completion — S15's
+           * gates passed: the §21 card audit 11/11 green, the freshness
+           * audit honest, the mobile/ARIA polish landed). The page's
+           * 11 placed cards are complete and verified; no honest "in
+           * build" claim remains. The pd.statusBuilding key stays for
+           * the not-yet-built pages (RegionPage + PagePlaceholder). The
+           * §15 FRED-only CPI fills (D-36) stay verified-pending-ingest
+           * (Rule 5 — BD-S14a/BD-S15d): a separate engine-layer change
+           * that deserves its own session, and their absence does not
+           * make the 11 placed cards "in build" (the USA S11 / Europe
+           * S13 trajectory: build-session chip → gates-session
+           * retirement on the gates pass). */}
         </div>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.asiaPacific.purpose')}

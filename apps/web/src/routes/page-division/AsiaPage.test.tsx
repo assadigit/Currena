@@ -1,15 +1,14 @@
 /**
  * @vitest-environment jsdom
  *
- * AsiaPage.test.tsx (S14, 2026-11-09) — the Asia & Pacific page's
+ * AsiaPage.test.tsx (S14 + S15, 2026-11-09) — the Asia & Pacific page's
  * DOM-level characterization suite. What is pinned:
  *
  *   - the page shell: the destination's own title + purpose + the
- *     data-as-of line + the HONEST "In build" chip (the S12 Europe
- *     trajectory — build session chip → gates session retirement; the
- *     §15 FRED-only CPI fills are verified-pending-ingest, Rule 5 —
- *     BD-S14a, and the two index-only sections honestly note their
- *     fills are pending);
+ *     data-as-of line (the In-build chip RETIRED at S15's gate pass —
+ *     BD-S14b's completion; the §15 FRED-only CPI fills stay verified-
+ *     pending-ingest, a separate engine-layer change, and their absence
+ *     does not make the 11 placed cards "in build");
  *   - the S8 zoom section stays on top through EVERY state (the board
  *     feed is its own — a slow or dead projection never takes the map
  *     away): data-region-zoom="asia" + the zoomed viewBox + ONLY the
@@ -206,11 +205,10 @@ describe('AsiaPage', () => {
     });
 
     // The shell: title + purpose + the data-as-of line. The In-build
-    // chip is PRESENT (the S12 Europe trajectory — build session chip →
-    // gates session retirement; the §15 FRED-only CPI fills are
-    // verified-pending-ingest, Rule 5 — BD-S14a).
+    // chip is RETIRED (S15's gate pass — BD-S14b's completion); it must
+    // NOT render on the Asia page anymore.
     expect(screen.getByText('Asia & Pacific')).toBeTruthy();
-    expect(screen.getByText('In build')).toBeTruthy();
+    expect(screen.queryByText('In build')).toBeNull();
     expect(document.body.textContent).toContain('Data as of Nov 8, 2026');
 
     // The S8 zoom section stays on top of the S14 layers.
@@ -322,6 +320,10 @@ describe('AsiaPage', () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe('/currencies');
     });
+
+    // The In-build chip is RETIRED AND no "in build" claim remains —
+    // the page's 11 placed cards are complete and verified.
+    expect(document.body.textContent).not.toContain('In build');
   });
 
   it('the fail-closed path: an absent reading renders the unavailable word, never a guess', async () => {
