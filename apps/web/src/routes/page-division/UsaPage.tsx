@@ -23,8 +23,9 @@
  * BD-S5a sentence).
  *
  * The S10 milestone retired the placeholder body (all 72 cards + the
- * TIC board are on-page); the honest In-build chip stays until S11's
- * gates/polish pass (BD-S10b).
+ * TIC board are on-page); S11 retired the honest In-build chip (BD-S10b's
+ * completion — the gates passed: the §21 card audit green, the freshness
+ * audit formalized, the mobile/ARIA polish landed).
  *
  * Platform: browser only — this module lives in the lazy USA route
  * chunk, never the entry graph.
@@ -173,20 +174,19 @@ export function UsaPage(): React.JSX.Element {
   // layers wait for their data).
   return (
     <div className="mx-auto w-full max-w-[560px] px-3 py-1.5 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1280px] lg:px-8 lg:py-6">
-      {/* The heading block: title + the honest In-build chip (S11's gates
-          + polish are the remaining roadmap work for this page — the S10
-          layers below are real from today) + the one-line purpose + the
-          data-as-of line (the BD-S5a sentence replaces the plain line
-          when the copy is the cached one). */}
+      {/* The heading block: title + the one-line purpose + the data-as-of
+          line (the BD-S5a sentence replaces the plain line when the copy
+          is the cached one). The In-build chip retired at S11's gate
+          pass — the page's layers are complete and verified. */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.usa.title')}</h1>
-          {/* In-build status chip — the page's LAYERS are complete since
-           * S10 (the 72 cards + the TIC board); the chip stays honest
-           * until S11's gates + polish pass (BD-S10b). */}
-          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-[10.5px] font-bold text-amber-900 sm:px-3 sm:py-1 sm:text-xs dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200">
-            {t('pd.statusBuilding')}
-          </span>
+          {/* The In-build chip is RETIRED (BD-S10b's completion — S11's
+           * gates passed: the §21 card audit 173/173 green, the freshness
+           * audit formalized, the mobile/ARIA polish landed). The page's
+           * layers are complete and verified; no honest "in build" claim
+           * remains. The pd.statusBuilding key stays for the not-yet-built
+           * pages (RegionPage + PagePlaceholder). */}
         </div>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.usa.purpose')}

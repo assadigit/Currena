@@ -4,10 +4,10 @@
  * UsaPage.characterization.test.tsx (S9 + S10, 2026-11-09) — the USA
  * page's DOM-level characterization suite. What is pinned:
  *
- *   - the page shell: the destination's own title + purpose + the honest
- *     In-build chip (tiers 3–6 + the TIC board are S10's) + the
- *     placeholder body (what will live here · builds in · the legacy
- *     link);
+ *   - the page shell: the destination's own title + purpose + the
+ *     data-as-of line + the absent note (the In-build chip RETIRED at
+ *     S11's gate pass — BD-S10b's completion; the placeholder body
+ *     retired at S10);
  *   - the S8 zoom section stays on top through EVERY state (the board
  *     feed is its own — a slow or dead projection never takes the map
  *     away): data-region-zoom="us" + the zoomed viewBox + ONLY the US
@@ -309,10 +309,11 @@ describe('UsaPage', () => {
       expect(document.querySelector('[data-usa-strip]')).not.toBeNull();
     });
 
-    // The shell: title + the honest In-build chip + the purpose + the
-    // data-as-of line + the absent note (rstar-us).
+    // The shell: title + the purpose + the data-as-of line + the absent
+    // note (rstar-us). The In-build chip is RETIRED (S11's gate pass —
+    // BD-S10b's completion); it must NOT render on the USA page anymore.
     expect(screen.getByText('USA')).toBeTruthy();
-    expect(screen.getByText('In build')).toBeTruthy();
+    expect(screen.queryByText('In build')).toBeNull();
     expect(document.body.textContent).toContain('Data as of Nov 8, 2026');
     expect(document.body.textContent).toContain('1 of this page’s readings are not published in this mode.');
 
@@ -450,11 +451,13 @@ describe('UsaPage', () => {
     expect(belgiumMarker?.textContent).toBe('◆');
     expect(belgiumMarker?.getAttribute('title')).toContain('US-based custodians');
 
-    // The placeholder body is RETIRED (BD-S10b): nothing still promises
-    // future tiers — the honest In-build chip alone remains (S11's gates).
+    // The placeholder body is RETIRED (BD-S10b) AND the In-build chip is
+    // RETIRED (S11's gate pass — BD-S10b's completion): nothing promises
+    // future tiers and no honest "in build" claim remains — the page's
+    // layers are complete and verified.
     expect(document.body.textContent).not.toContain('What will live here');
     expect(document.body.textContent).not.toContain('S9–S11');
-    expect(document.body.textContent).toContain('In build');
+    expect(document.body.textContent).not.toContain('In build');
   });
 
   it('the dollar-strength strip card links to /currencies (BD-S3b honoured on-page); the other four are plain', async () => {
