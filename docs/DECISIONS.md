@@ -955,3 +955,125 @@
   delegation ("the deploy at the close is the owner's standing").
   **Revisit:** none needed; the record lives in `docs/DEPLOY.md`
   2026-11-09e.
+
+## 2026-11-09 — BD-S14a: the §15 FRED-only CPI fills for Asia — candidates VERIFIED STALE, discarded (Rule 5; none ingested unverified)
+
+- **Decision:** the three D-36 Asia §15 FRED-only CPI fills (Japan ·
+  Korea · India CPI YoY) are NOT ingested in S14. The FRED OECD mirror
+  family candidates were probed LIVE against the publisher (Rule 5 —
+  FRED was REACHABLE from the dev sandbox this session, unlike the S12
+  Europe attempt which hit the JS challenge); the candidates are
+  VERIFIED STALE/discontinued, so per Rule 5 (unverifiable as viable
+  ongoing sources → discard + record) none is ingested and the
+  candidates + the verification status + the alternative sources are
+  recorded for the next session.
+- **Options considered:**
+  (A) Ingest the freshest alternative (the World Bank FP.CPI.TOTL.ZG,
+  annual) within S14 — rejected: the spec §15 names the FRED OECD
+  mirror family (the monthly cadence the dashboard needs); the World
+  Bank series is ANNUAL (a different cadence + a different provider
+  than "already integrated"), and the ingest is an engine-layer change
+  (definitions.ts + adapter + KV + registry + placement + display +
+  copy) that deserves its own focused session with the full AGENTS.md
+  §A maintenance discipline.
+  (B) Verify-only + record + defer the ingest (CHOSEN) — the §21 diff
+  gate is over the 11 placed cards (unaffected); the fill gate ("fills
+  verified against publisher releases (Rule 5)") is met by FOLLOWING
+  Rule 5 (the candidates are verified STALE — a stronger finding than
+  S12's "unverifiable from the sandbox"; no stale data ingested); the
+  page ships with the honest "In build" chip (the thin-region
+  mitigation the spec §20 names) + the two index-only sections' honest
+  notes.
+- **Reason:** Rule 5 (financial-data discipline — never assume; fail
+  closed). The FRED OECD mirror family for JP/KR/IN CPI is
+  discontinued: JPNCPIALLMINMEI + CPALTT01JPM659N end 2021-06;
+  KORCPIALLMINMEI + CPALTT01KRM659N end 2023-11; INDCPIALLMINMEI +
+  CPALTT01INM659N end 2025-03. Ingesting a discontinued series would
+  serve STALE data silently — exactly what Rule 5 forbids. The World
+  Bank FP.CPI.TOTL.ZG (annual, fresh through 2025) is a viable
+  alternative source but a DIFFERENT cadence + provider than the spec
+  §15 names; the national statistics bureaus (the Statistics Bureau of
+  Japan, KOSTAT, MoSPI) publish fresh monthly CPI but are NOT already-
+  integrated providers (would need a new adapter — out of scope for a
+  display-layer session).
+- **Candidates recorded (verified LIVE 2026-11-09):**
+  - Japan CPI YoY — FRED OECD mirror `JPNCPIALLMINMEI` (the OECD MEI
+    CPI all items) + `CPALTT01JPM659N` (the OECD CPI all items); BOTH
+    end 2021-06 — discontinued. Cross-check publisher: the Statistics
+    Bureau of Japan (e-stat.go.jp, CPI monthly, fresh).
+  - Korea CPI YoY — FRED OECD mirror `KORCPIALLMINMEI` +
+    `CPALTT01KRM659N`; BOTH end 2023-11 — discontinued. Cross-check
+    publisher: KOSTAT (kostat.go.kr, CPI monthly, fresh).
+  - India CPI YoY — FRED OECD mirror `INDCPIALLMINMEI` +
+    `CPALTT01INM659N`; BOTH end 2025-03 — stale (the OECD mirror lags
+    ~8 months, likely discontinued). Cross-check publisher: MoSPI
+    (mospi.gov.in, CPI monthly, fresh).
+  - Alternative source noted: the World Bank `FP.CPI.TOTL.ZG`
+    (inflation, consumer prices annual %) is FRESH through 2025 for all
+    three (JPN 3.17% · KOR 2.12% · IND 2.40%) — but ANNUAL, not monthly.
+- **Who decided:** the build session (S14) under Rule 5. **Revisit:** a
+  dedicated fill session (S15's sibling or a one-off) — pick a viable
+  monthly source (the national statistics bureaus directly, or a fresh
+  FRED/IMF IFS series, or the World Bank annual as a lower-resolution
+  fallback), verify from production egress, then ingest with the full
+  §A discipline (definitions.ts → registry:generate → placement →
+  display → copy → the adapter fetch wiring → CHANGELOG); the §21 diff
+  grows to cover the new cards. The chip retires at the S15 gates pass
+  on the 11 placed cards (the USA S11 / Europe S13 trajectory — the
+  fills' absence does not make the 11 placed cards "in build").
+
+## 2026-11-09 — BD-S14b: the Asia & Pacific page build (the five sub-regions, the zoom, the cross-links, the §21 backtest)
+
+- **Decision:** the Asia & Pacific page ships as its own lazy chunk
+  (the UsaPage/EuropePage pattern) — the five sub-regions organized by
+  sub-region NOT by theme (D-35): China (§9 item 1: china-pmi ·
+  china-cpi · oecd-cli-cn · gpr-china · gpr-taiwan · china-property-
+  investment · china-steel-output, 7 cards) · Japan (§9 item 2: jgb-10y
+  · boj-rate, 2 cards) · Korea/Taiwan/HK (§9 item 3: INDEX-ONLY today —
+  KOSPI · TAIEX · HSI ride the zoom; the Korea CPI fill is verified-
+  pending-ingest, Rule 5 — BD-S14a) · India (§9 item 4: INDEX-ONLY
+  today — NIFTY50 rides the zoom; the India CPI fill is verified-
+  pending-ingest) · Pacific New Zealand (§9 item 5: nz-short-rate ·
+  nz-10y, 2 cards) = 11 placed cards, each with the §21 trio (value ·
+  10-year position · freshness) through the pure asia-tiles (pinned
+  output-for-output against config/display.ts's formatReadingValue by
+  asia-tiles.test.ts, the S9 usa-tiles / S12 europe-tiles pattern);
+  the S8 zoom section on top (RegionIndexSection region='asia' — the
+  N225 · KOSPI · HSI · SSEC · TAIEX · NIFTY50 zoom already renders it;
+  the page's own layers seat under it); the cross-links strip (§9:
+  usdcny · usdjpy → /currencies + sge-gold → /gold). The honest "In
+  build" chip stays (BD-S14a — the §15 CPI fills are verified-pending-
+  ingest; the two index-only sections honestly note their fills are
+  pending).
+- **china-steel-output's tonnes+scale:** the ONE Asia id beyond
+  Europe's three-unit lean render — the NBS's own 10,000-ton unit
+  scaled to millions of tonnes (1e-2 → 73.6 m tonnes). The
+  AsiaCardDisplayConfig carries an optional `scale` field; the
+  asiaCardValueText render applies it before formatting, pinned
+  output-for-output against formatReadingValue over all four unit
+  families (percent · points · index · tonnes) × both locales.
+- **The two index-only sections:** Korea/Taiwan/HK + India render an
+  HONEST note (never an empty card grid) — their markets ride the zoom
+  map above, and the §15 CPI fills are verified-pending-ingest (Rule 5).
+  The spec §20 "pages labelled 'growing' honestly" mitigation.
+- **The §21 backtest:** asia-backtest-core.ts (the page ≡ engine trio
+  diff over the 11 cards, reusing S11's pure auditUsaFreshness for the
+  freshness audit — one audit function, no logic drift) +
+  asia-backtest.test.ts (11 tests: the GREEN path, the public-mode
+  twin, four FAIL-CLOSED proofs, the stableStringify immunity, + the
+  freshness audit's own cases on Asia's cadences — jgb-10y daily maxAge
+  4, china-pmi monthly maxAge 45, boj-rate monthly maxAge 75 the
+  honest-stale path; Asia has NO per-change id, unlike Europe's
+  boe-rate) + the live pd-s14-backtest.ts script. The copy pins:
+  asia-copy-pin.test.ts (the 11 card names + units + position/band/
+  status words ↔ the corpus, both locales) + the 47 new pd.asiaPacific.*
+  fa strings queued unreviewed in the manifest (the S9/S10/S12 pattern).
+- **Reason:** the spec §9 (D-35 sub-region split, §9 items 1–6); the
+  S14 scope (the session prompt); the UsaPage/EuropePage pattern (the
+  S9/S10/S12 display-layer discipline — pure tiles, the §21 trio, the
+  copy pins, the live backtest).
+- **Who decided:** the build session (S14). **Revisit:** S15 (the Asia
+  gates session) — the fill verification (a viable monthly source) +
+  the card-render audit + the freshness + the mobile/ARIA pass + the
+  In-build chip retirement (when the fills land OR the gates pass on
+  the 11 placed cards, the USA S11 / Europe S13 trajectory).

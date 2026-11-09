@@ -199,6 +199,73 @@ custody card intact through the reuse refactor) all verified.
 **Rollback lever:** `wrangler rollback` — /usa returns to the S9 page
 (the strip + tiers 1–2 + the zoom); nothing else moves.
 
+## Session record — 2026-11-09f the page-division S14 deploy (the Asia build + fills — Phase F opens; the five sub-regions D-35, the 11 placed cards, the S8 zoom, the cross-links, the honest In-build chip live at /asia-pacific)
+
+**Scope (page-division S14, spec §9 items 1–6, D-35):** display-layer
+ONLY. No engine, voter, threshold, calibration or provider change; the
+SAME insights snapshot + the SAME markets board, zero new fetches, zero
+new KV. The Asia & Pacific route leaves the region set for its own lazy
+chunk (the UsaPage/EuropePage pattern): the five sub-regions organized
+by sub-region NOT by theme (D-35) — China (7 cards) · Japan (2) ·
+Korea/Taiwan/HK (index-only today) · India (index-only today) · Pacific
+New Zealand (2) = 11 placed cards, each with the §21 trio through the
+pure asia-tiles; the S8 zoom on top (N225 · KOSPI · HSI · SSEC · TAIEX ·
+NIFTY50); the cross-links (usdcny · usdjpy → /currencies + sge-gold →
+/gold); the honest In-build chip (the §15 FRED-only CPI fills for
+JP/KR/IN are VERIFIED STALE — the FRED OECD mirror family is
+discontinued, Rule 5 — BD-S14a; the chip retires at the S15 gates pass).
+
+**Gates before the deploy (ALL GREEN, 2m 33s):** secret scan 8/986 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean (818 queued, +47
+pd.asiaPacific.* fa strings) · narrator in sync + eval 50 · layer1
+11,819/11,819 · **the full suite 14,985 = +33** (asia-tiles 13 ·
+asia-backtest 11 · asia-copy-pin 2 · AsiaPage render audit 7) · build +
+budgets held (entry 270.48/81.90; the Asia lazy chunk 12.47/3.47 vs its
+new 16/6 row).
+
+**The §21 diff — the S14 gate's own, run LIVE twice (pre-deploy and
+post-deploy): 11 cards · 11 green · 0 red.** The live pd-s14-backtest.ts
+against PRODUCTION: the 11 cards' trio inputs byte-identical (page ≡
+engine — china-pmi 49.3 warning · china-cpi 0.9 normal · oecd-cli-cn
+97.41 context · gpr-china 0.84 context · gpr-taiwan 0.08 context ·
+china-property-investment -20.6 context · china-steel-output 7359
+context · jgb-10y 2.696 context · boj-rate 1.043 context · nz-short-rate
+3.25 context · nz-10y 4.94 context), the placement group membership
+(china 7 / japan 2 / korea-taiwan-hk 0 index-only / india 0 index-only
+/ pacific-nz 2) + 11/11 carried, the two index-only groups honestly
+empty, the freshness audit honest (all 11 within cadence grace).
+
+**The deploy-lock check ran first** (the D-43 lesson): the active
+version was S13's `b11fd84f` @ 100% — no parallel deploy. `pnpm
+--filter @currena/web build` + `wrangler deploy` → **currena-api
+`68281479` @ 100%** (deployment `68281479-5932-4b2b-8652-51125a537a6f`,
+2026-11-09T04:55Z). currena-markets untouched (code-unchanged).
+
+**The live acceptance (ALL GREEN):** currena.ir/asia-pacific live-smoke-
+verified at 1440×900 en (11 cards · the 5 sections · the zoom · the 3
+cross-links · the In-build chip PRESENT · 0px overflow · 0 page errors ·
+the live value china-pmi 49.3 index); the browser pass (the freshly
+built SPA through the local preview server, /api proxied to currena.ir)
+at 1440×900 AND 360×844 in BOTH en and fa (RTL, Persian digits) — 11
+cards, the zoom (6 N225/KOSPI/HSI/SSEC/TAIEX/NIFTY50), the 5 sections (3
+card + 2 index-only), the 3 cross-links all at 44px, the In-build chip
+PRESENT on all 4 legs, NO horizontal scroll at any width in any locale
+(overflow 0px on all 4 legs), ZERO console/page errors across all 4
+legs; the fa leg dir=rtl + h1="آسیا و اقیانوسیه"; the Global + Gold +
+World Markets + USA + Europe + Australia + legacy /insights surfaces
+intact.
+
+**Rollback:** `wrangler rollback` — /asia-pacific returns to the S8
+RegionPage placeholder (the zoom + the DestinationBody); nothing else
+moves (the S14 change is the AsiaPage + the route wiring + the i18n +
+the tests + the script + the budget row only).
+
+**Who decided:** the build session (S14) under the owner's standing
+delegation ("the deploy at the close is the owner's standing").
+**Revisit:** none needed; the record lives in this entry. Decisions:
+BD-S14a (the §15 CPI fills VERIFIED STALE — Rule 5) · BD-S14b (the Asia
+page build) in `docs/DECISIONS.md`.
+
 ## Session record — 2026-11-09e the page-division S13 deploy (the Europe gates — Phase E closes; the full card-render audit green, the freshness audit honest, the mobile/ARIA pass pinned + browser-verified, the honest In-build chip retired live at /europe)
 
 **Scope (page-division S13, the Europe gates):** display-layer ONLY. No

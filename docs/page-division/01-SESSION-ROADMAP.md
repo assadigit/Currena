@@ -1006,10 +1006,93 @@ forward — Rule 5) + the deploy, all in `docs/DECISIONS.md`.
 
 ## Phase F — Asia & Pacific (S14–S15)
 
-### ☐ S14 — Asia build + fills · `Session 14/30`
+### ✅ S14 — Asia build + fills · `Session 14/30` · delivered 2026-11-09 · **Phase F opens**
 - Five sub-regions (D-35): China · Japan · Korea/Taiwan/HK · India ·
   Pacific (NZ, D-17); Asia zoom map; FRED CPI fills for JP/KR/IN (D-36,
   verify-first).
+
+**S14 delivery record (2026-11-09):** Phase F (Asia & Pacific) is OPEN —
+the Asia build + fills session delivered the /asia-pacific page over the
+S13-complete codebase (the 11 placed cards + the S8 zoom + the cross-
+links + the §21 backtest + the §15 CPI fills VERIFIED STALE — Rule 5).
+**(a) The Asia page build (BD-S14b — spec §9 items 1–6; D-35):** the
+five sub-regions organized by sub-region NOT by theme — China (§9 item
+1: china-pmi · china-cpi · oecd-cli-cn · gpr-china · gpr-taiwan ·
+china-property-investment · china-steel-output, 7 cards) · Japan (§9
+item 2: jgb-10y · boj-rate, 2 cards) · Korea/Taiwan/HK (§9 item 3:
+INDEX-ONLY today — the placement group is empty; KOSPI · TAIEX · HSI
+ride the zoom; the Korea CPI fill is verified-pending-ingest) · India
+(§9 item 4: INDEX-ONLY today — NIFTY50 rides the zoom; the India CPI
+fill is verified-pending-ingest) · Pacific New Zealand (§9 item 5:
+nz-short-rate · nz-10y, 2 cards) = 11 placed cards, each with the §21
+trio (value · 10-year position · freshness) through the pure asia-tiles
+(pinned output-for-output against config/display.ts's formatReadingValue
+by asia-tiles.test.ts, the S9 usa-tiles / S12 europe-tiles pattern); the
+S8 zoom section on top (RegionIndexSection region='asia' — the N225 ·
+KOSPI · HSI · SSEC · TAIEX · NIFTY50 zoom already renders it); the
+cross-links strip (§9: usdcny · usdjpy → /currencies + sge-gold →
+/gold). The honest "In build" chip stays (BD-S14a — the §15 CPI fills
+are verified-pending-ingest; retires at the S15 gates pass, the Europe
+S12→S13 trajectory). china-steel-output's tonnes+scale (1e-2 → 73.6 m
+tonnes) is the ONE Asia id beyond Europe's three-unit lean render — the
+AsiaCardDisplayConfig carries an optional `scale` field, pinned output-
+for-output against formatReadingValue over all four unit families. The
+two index-only sections render an HONEST note (never an empty card grid)
+— their markets ride the zoom, the §15 CPI fills are pending. **(b) The
+§21 backtest (the S14 gate):** asia-backtest-core.ts (the page ≡ engine
+trio diff over the 11 cards, reusing S11's pure auditUsaFreshness — one
+audit function, no logic drift) + asia-backtest.test.ts (11 tests: the
+GREEN path, the public-mode twin, four FAIL-CLOSED proofs, the
+stableStringify immunity, + the freshness audit's own cases on Asia's
+cadences — jgb-10y daily maxAge 4, china-pmi monthly maxAge 45, boj-rate
+monthly maxAge 75 the honest-stale path; Asia has NO per-change id,
+unlike Europe's boe-rate) + the live pd-s14-backtest.ts script. The copy
+pins: asia-copy-pin.test.ts (the 11 card names + units + position/band/
+status words ↔ the corpus, both locales) + the 47 new pd.asiaPacific.*
+fa strings queued unreviewed in the manifest. **(c) The §15 FRED-only
+CPI fills — VERIFIED STALE (BD-S14a, Rule 5):** the three D-36 Asia
+fills (Japan · Korea · India CPI YoY) are NOT ingested in S14. The FRED
+OECD mirror family candidates were probed LIVE (FRED was REACHABLE from
+the dev sandbox this session, unlike the S12 Europe attempt which hit
+the JS challenge); the candidates are VERIFIED STALE/discontinued:
+JPNCPIALLMINMEI + CPALTT01JPM659N end 2021-06; KORCPIALLMINMEI +
+CPALTT01KRM659N end 2023-11; INDCPIALLMINMEI + CPALTT01INM659N end
+2025-03. The World Bank FP.CPI.TOTL.ZG (annual, fresh through 2025) is
+a viable alternative but a different cadence + provider. The candidates
++ the alternative sources are recorded in DECISIONS.md (BD-S14a) for a
+dedicated fill session. **THE §21 DIFF (the S14 gate's own, run LIVE
+twice pre-deploy and post-deploy): 11 cards · 11 green · 0 red.** The
+live pd-s14-backtest.ts against PRODUCTION: the 11 cards' trio inputs
+byte-identical (page ≡ engine — china-pmi 49.3 warning · china-cpi 0.9
+normal · oecd-cli-cn 97.41 context · gpr-china 0.84 context · gpr-taiwan
+0.08 context · china-property-investment -20.6 context · china-steel-
+output 7359 context · jgb-10y 2.696 context · boj-rate 1.043 context ·
+nz-short-rate 3.25 context · nz-10y 4.94 context), the placement group
+membership (china 7 / japan 2 / korea-taiwan-hk 0 index-only / india 0
+index-only / pacific-nz 2) + 11/11 carried, the two index-only groups
+honestly empty, the freshness audit honest (all 11 within cadence
+grace). **The browser pass** (the freshly built SPA through the local
+preview server, /api proxied to currena.ir): 1440×900 AND 360×844 in
+BOTH en and fa (RTL, Persian digits) — 11 cards, the zoom (6 N225/KOSPI/
+HSI/SSEC/TAIEX/NIFTY50), the 5 sections (3 card + 2 index-only), the 3
+cross-links all at 44px, the In-build chip PRESENT on all 4 legs, NO
+horizontal scroll at any width in any locale (overflow 0px on all 4
+legs), ZERO console/page errors across all 4 legs; the fa leg dir=rtl +
+h1="آسیا و اقیانوسیه". **Gates ALL GREEN** (2m 33s: secret scan 8/986 ·
+tsc 6/6 · eslint 0/0 · copy:audit clean (818 queued, +47) · narrator
+vocabulary in sync + eval 50 · layer1 11,819/11,819 · **the suite
+14,985 = +33** (asia-tiles 13 · asia-backtest 11 · asia-copy-pin 2 ·
+AsiaPage render audit 7) · build + budgets held — entry 270.48/81.90,
+the Asia lazy chunk 12.47/3.47 vs its new 16/6 row). **Deployed + live-
+verified** (version `68281479` 2026-11-09 ~04:55 UTC, the owner's
+standing "the deploy at the close is the owner's standing"; the deploy-
+lock check ran first — S13's `b11fd84f` @ 100%): currena.ir/asia-pacific
+live-smoke-verified at 1440×900 en (11 cards · the 5 sections · the zoom
+· the 3 cross-links · the In-build chip PRESENT · 0px overflow · 0 page
+errors · the live value china-pmi 49.3 index) + the live §21 backtest
+re-run post-deploy 11/11 green, every other surface intact. Decisions:
+BD-S14a (the §15 CPI fills VERIFIED STALE — Rule 5) · BD-S14b (the Asia
+page build) + the deploy, all in `docs/DECISIONS.md`.
 
 ### ☐ S15 — Asia gates · `Session 15/30`
 - Fill verification vs national statistics releases; card audit; hand-off.

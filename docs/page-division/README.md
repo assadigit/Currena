@@ -92,8 +92,20 @@ regeneration (`pnpm placement:generate`).
   twice; the browser pass at 1440×900 and 360×844 in en + fa with ZERO
   overlaps/overflow/errors) 2026-11-09 — DEPLOYED LIVE at `/europe`
   (version `84833135`; the live acceptance record in `docs/DEPLOY.md`
-  2026-11-09d).** Next: Session 13/30 (S13 — the Europe gates). See the
-  roadmap's progress board for the current position.
+  2026-11-09d).** S13 (the Europe gates: the card-render audit, the
+  freshness audit formalized + honest, the mobile/ARIA pass pinned, the
+  In-build chip retired — Phase E CLOSED) 2026-11-09 — DEPLOYED LIVE at
+  `/europe` (version `b11fd84f`; the live acceptance record in
+  `docs/DEPLOY.md` 2026-11-09e).** S14 (the Asia build + fills: the
+  five sub-regions D-35 — China 7 · Japan 2 · Korea/Taiwan/HK
+  index-only · India index-only · Pacific-NZ 2 = 11 placed cards — the
+  S8 zoom on top, the cross-links, the §21 backtest; the §15 FRED-only
+  CPI fills for JP/KR/IN VERIFIED STALE — the FRED OECD mirror family
+  is discontinued, Rule 5 — BD-S14a; the honest In-build chip stays
+  until the S15 gates pass) 2026-11-09 — DEPLOYED LIVE at
+  `/asia-pacific` (version `68281479`; the live acceptance record in
+  `docs/DEPLOY.md` 2026-11-09f).** Next: Session 15/30 (S15 — the Asia
+  gates). See the roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 
