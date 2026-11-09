@@ -1511,3 +1511,122 @@
   standing") — the deploy ran 2026-11-10 ~20:30 UTC. **Revisit:** the
   deploy record is final; the full deploy narrative lives in
   `docs/DEPLOY.md`.
+
+## 2026-11-11 — BD-S17a: the §21 Commodities backtest — the pure commodities-backtest-core reusing S11's auditUsaFreshness over COMMODITIES_CARD_IDS (24 cards) + the offline suite (11 tests) + the live pd-s17-backtest.ts (the S16 australia pattern mirrored)
+
+- **Decision:** the S17 §21 diff is the pure `commodities-backtest-core.ts`
+  reusing S11's `auditUsaFreshness` over `COMMODITIES_CARD_IDS` (24 cards —
+  the 4 commodity groups + the supply group: energy 9 · metals 4 ·
+  agriculture 3 · digital 2 · trade-routes-supply 6) + the offline suite
+  (`commodities-backtest.test.ts`, 11 tests: the full pipeline + the
+  public-mode twin + the 4 fail-closed proofs + the key-order immunity +
+  the 4 freshness cases — the honest-stale path over iron-ore monthly
+  maxAge 60) + the live `pd-s17-backtest.ts` (the S16 `pd-s16-backtest.ts`
+  pattern mirrored). The live run vs production (pre- AND post-deploy):
+  24/24 cards green (page ≡ engine byte-for-byte), the 5-group membership
+  green (energy 9/9 · metals 4/4 · agriculture 3/3 · digital 2/2 ·
+  trade-routes-supply 6/6 = 24 cards), the freshness audit honest (24
+  within grace, 0 beyond — all fresh).
+- **Options considered:** (a) a Commodities-specific freshness function
+  (rejected — logic drift from the USA/Europe/Asia/Australia gates); (b)
+  reusing S11's `auditUsaFreshness` (chosen — one audit function, no logic
+  drift, the S12/S14/S16 pattern).
+- **Reason:** spec §21's "verdict consistency" + "data audit" legs, applied
+  to the 24 commodity cards. The §21 trio (value · 10-year position ·
+  freshness) is the per-page gate; the freshness audit rides the same
+  pure function the other gates read.
+- **Who decided:** the build & gates session (S17). **Revisit:** the
+  backtest is final; a future fill-session that adds commodity ids grows
+  the `COMMODITIES_CARD_IDS` list + the offline suite.
+
+## 2026-11-11 — BD-S17b: the CommoditiesPage render audit — the S16 AustraliaPage.test.tsx pattern scoped to Commodities' 24 cards (7 tests)
+
+- **Decision:** `CommoditiesPage.test.tsx` (7 tests — the S16
+  AustraliaPage.test.tsx pattern, scoped to Commodities' 24 cards):
+  fixture sanity + the loading line + the full shell + 5-sections +
+  24-cards + gold-cross-link render with the §21 trio spot checks (the
+  usd prefix 'US$73.45' · the barrels '416.7 m barrels' · the
+  barrels-per-day '13.99 m barrels a day' · the transits '65.3 transits
+  a day' · the index '121.3 index') + the gold link click-nav to /gold at
+  44px + the fail-closed absent + the fail-closed dead-projection + the
+  M-17 last-good + the fa/RTL Persian rendering (h1='کالاها و انرژی' ·
+  brent='۷۳٫۴۵ دلار' · suez='۶۵٫۳ تردد در روز' · dir=rtl). The In-build
+  chip is asserted ABSENT (BD-S17c's retirement, the S16 trajectory).
+- **Reason:** spec §21's "every page: all listed cards render with value,
+  10-year position, and freshness" + the mobile/ARIA pass (spec §18 D-48:
+  touch targets ≥ 44px). The render audit is the DOM-level pin the browser
+  pass re-verifies live.
+- **Who decided:** the build & gates session (S17). **Revisit:** the
+  render audit is final; a future fill-session that adds cards grows the
+  spot checks.
+
+## 2026-11-11 — BD-S17c: the In-build chip RETIRED at the S17 gates pass — the S13 Europe / S15 Asia / S16 Australia trajectory (BD-S16c mirrored); the CommoditiesPage chunk measured 11.93/3.41 vs its 16/5 ceiling (the leanest page-division chunk)
+
+- **Decision:** the Commodities page's honest "In build" chip is REMOVED
+  from the heading block — the 24 placed ids' gates pass (§21 card audit
+  24/24 green vs production, the freshness audit honest, the render audit
+  7/7 green, the browser pass 4/4 green). The page's 24 placed cards are
+  complete and verified; no honest "in build" claim remains. The
+  `pd.statusBuilding` key stays for `PagePlaceholder` (Currencies — the
+  last placeholder). The CommoditiesPage budget row: ceiling 16/5,
+  measured 11.93/3.41 (the leanest page-division chunk — no zoom, no
+  board, no gauges; not re-based down so a future fill-session has the
+  same room).
+- **Reason:** BD-S15c/BD-S16c's reasoning: the build and the gates ship
+  in ONE session (the roadmap's Phase H is a single S17), so once the
+  §21 diff + the freshness audit + the render audit + the browser pass
+  are green, keeping the chip would be dishonest in the other direction
+  (the page IS built + verified). The S13 Europe / S15 Asia / S16
+  Australia retirement trajectory mirrored.
+- **Who decided:** the build & gates session (S17). **Revisit:** the
+  retirement is final; the chip never returns to /commodities.
+
+## 2026-11-11 — BD-S17-deploy: the S17 deploy record — DEPLOYED LIVE (worker `08e0fc64` @ 100%, the owner's standing)
+
+- **Deploy record:** S17 deployed live as the currena-api worker version
+  `08e0fc64` @ 100% (the owner's standing — the deploy-lock check ran
+  first: the active version was S16's `9d60726b` @ 100%, no parallel
+  deploy; `pnpm --filter @currena/web build` + `pnpm --filter @currena/api
+  exec wrangler deploy` → currena-api `08e0fc64` @ 100%; production moved
+  `9d60726b` → `08e0fc64`). The post-deploy §21 backtest 24/24 green; the
+  browser pass 4/4 green; the In-build chip ABSENT on all 4 legs; the
+  rollback lever `npx wrangler rollback` from apps/api if needed.
+  Display-layer ONLY: no engine, voter, threshold, calibration or
+  provider change; the SAME insights snapshot, zero new fetches, zero
+  new KV. The user-visible change: /commodities went from the S1
+  PagePlaceholder (the honest In-build chip) to the full Commodities
+  build (the 4 commodity groups + the supply group — 24 cards with the
+  §21 trio + the gold cross-link to /gold); the In-build chip RETIRED
+  (BD-S17c). The 3 seat chips on /australia that link to /commodities
+  (iron-ore · coal-aus · lng-japan) now resolve to a real page.
+- **Gates before the deploy (ALL GREEN):** typecheck 6/6 · eslint 0/0 ·
+  copy:audit clean (exit 0 — the 57 new pd.commodities.* fa entries
+  queued unreviewed) · **the full suite 15,053 = +34** (commodities-tiles
+  14 · commodities-copy-pin 2 · commodities-backtest 11 · CommoditiesPage
+  render audit 7) · build + budgets held — entry 270.69/81.95, the
+  CommoditiesPage lazy chunk 11.93/3.41 vs its 16/5 row.
+- **The §21 diff — the S17 gate's own, run LIVE twice (pre-deploy and
+  post-deploy): 24 cards · 24 green · 0 red.** The live `pd-s17-backtest.ts`
+  against PRODUCTION: the 24 cards' trio inputs byte-identical (page ≡
+  engine), the 5-group membership green (energy 9 · metals 4 ·
+  agriculture 3 · digital 2 · trade-routes-supply 6 = 24), the freshness
+  audit honest (24 within grace, 0 beyond — all fresh), the two feeds
+  one snapshot (generatedAt aligned), the projection declares NO boards
+  (the placement §11 contract — no zoom, no markets board).
+- **Close-out steps (all RUN, all GREEN):** (1) the pre-deploy live §21
+  diff — 24/24 green; (2) the deploy — worker `08e0fc64` @ 100%; (3) the
+  post-deploy live §21 re-verify — 24/24 green; (4) the 4-leg browser
+  pass — 1440×900 + 360×844 in en + fa, over the REAL production data
+  (24 cards · the 5 sections · the gold cross-link → /gold · the In-build
+  chip ABSENT · 0px overflow · 0 page errors on every leg; the fa legs
+  dir=rtl + h1='کالاها و انرژی' + Persian digits ['۹۲٫۱۷ دلار' · '۶۵٫۳
+  تردد در روز']) — 4/4 GREEN.
+- **Rollback:** `npx wrangler rollback` from apps/api — /commodities
+  returns to the prior surface (`9d60726b`, S16 — the S1 PagePlaceholder
+  with the honest In-build chip); nothing else moves (the S17 change is
+  the /commodities page build + the §21 backtest + the render audit + the
+  chip retirement + the App.tsx wiring only).
+- **Who decided:** the build & gates session (S17) under the owner's
+  standing delegation ("the deploy at the close is the owner's standing")
+  — the deploy ran 2026-11-11. **Revisit:** the deploy record is final;
+  the full deploy narrative lives in `docs/DEPLOY.md`.

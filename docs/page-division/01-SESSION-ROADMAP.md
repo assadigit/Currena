@@ -1254,11 +1254,87 @@ the deploy record (worker `9d60726b`), all in `docs/DECISIONS.md`.
 
 ## Phase H — Commodities (S17)
 
-### ☐ S17 — Commodities build & gates · `Session 17/30`
+### ✅ S17 — Commodities build & gates · `Session 17/30` · delivered 2026-11-11 · **Phase H CLOSED**
 - Energy · Metals · Agriculture · Digital groups + "Trade routes & supply"
   (D-38/D-39); live prices; gold cross-links (D-19/D-27).
 - **Gates:** all 24 cards; chokepoint data within PortWatch cadence;
   hand-off.
+
+**S17 delivery record (2026-11-11):** Phase H (Commodities) is CLOSED —
+every commodity, exclusively here (D-19), reorganize-only, built + gated
+in ONE session (M1 the pure tiles + copy + pins; M2 the page build + the
+App.tsx wiring; M3 the §21 backtest + the render audit + the full gates +
+the In-build chip RETIRED). **(a) M1 — the pure commodities-tiles + the
+en/fa pd.commodities copy + the pins:** the 24 card-display configs (the
+S9–S16 pattern — no new layers, no new fetches) + the en/fa
+`pd.commodities.*` copy (the 57 keys, corpus-pinned by
+`commodities-copy-pin.test.ts` — the 24 card names + the 5 unit words +
+the position/band/status words) + the 5 group headings/intros + the gold
+cross-link words + the loading/error lines (fresh). **(b) M2 — the page
+build:** `CommoditiesTierCards.tsx` (the five group sections — Energy 9 ·
+Metals 4 · Agriculture 3 · Digital 2 · Trade routes & supply 6 = 24 cards
+with the §21 trio, every card context-only per G-5 — no gauges, no
+verdict lines) + `CommoditiesPage.tsx` (the S2 projection contract + the
+M-17 last-good localStorage pattern + the fail-closed loading/error
+states) + the App.tsx wiring (/commodities leaves the placeholder set —
+DESTINATION_ROUTES now holds only /currencies, S18). The metals group
+carries the gold cross-link to /gold (§11 "Cross-links", D-19/D-27 — the
+one commodity exception). **(c) M3 — the §21 backtest (BD-S17a):** the
+pure `commodities-backtest-core.ts` reusing S11's `auditUsaFreshness` over
+`COMMODITIES_CARD_IDS` (24 cards) + the offline suite (11 tests: the full
+pipeline + the public-mode twin + the 4 fail-closed proofs + the
+key-order immunity + the 4 freshness cases — the honest-stale path over
+iron-ore monthly maxAge 60) + the live `pd-s17-backtest.ts` (the S16
+`pd-s16-backtest.ts` pattern mirrored). The live run vs production (pre-
+AND post-deploy): 24/24 green (page ≡ engine byte-for-byte), the 5-group
+membership green (energy 9/9 · metals 4/4 · agriculture 3/3 · digital 2/2
+· trade-routes-supply 6/6 = 24 cards), the freshness audit HONEST (24
+within grace, 0 beyond — all fresh; unlike Australia's 7 honest-stale,
+Commodities had NO honest-stale path to exercise). **(d) The render audit
+(BD-S17b):** `CommoditiesPage.test.tsx` (7 tests — the S16
+AustraliaPage.test.tsx pattern scoped to Commodities' 24 cards): fixture
+sanity + loading + the full shell+5-sections+24-cards+gold-cross-link
+render with the §21 trio spot checks (the usd prefix 'US$73.45' · the
+barrels '416.7 m barrels' · the barrels-per-day '13.99m barrels a day' ·
+the transits '65.3 transits a day' · the index '121.3 index') + the gold
+link click-nav to /gold at 44px + the fail-closed absent + the fail-
+closed dead-projection + the M-17 last-good + the fa/RTL Persian
+rendering (h1='کالاها و انرژی' · brent='۷۳٫۴۵ دلار' · suez='۶۵٫۳ تردد
+در روز' · dir=rtl). **(e) The In-build chip RETIRED at the gates pass
+(BD-S17c — the S13 Europe / S15 Asia / S16 Australia trajectory,
+BD-S16c mirrored):** the Commodities page's honest "In build" chip is
+REMOVED from the heading block — the 24 placed ids' gates pass (§21 card
+audit 24/24 green, the freshness audit honest, the render audit 7/7
+green, the browser pass 4/4 green). The `pd.statusBuilding` key stays for
+`PagePlaceholder` (Currencies — the last placeholder). The CommoditiesPage
+chunk measured 11.93/3.41 vs its 16/5 ceiling (the leanest page-division
+chunk — no zoom, no board, no gauges; not re-based down so a future
+fill-session has the same room). **THE LIVE §21 DIFF (pre-deploy +
+post-deploy re-verified): 24 cards · 24 green · 0 red**, the 5-group
+membership green, the freshness audit HONEST (24 within grace, 0 beyond),
+the two feeds one snapshot (generatedAt aligned), the projection declares
+NO boards (the placement §11 contract). **GATES ALL GREEN** (typecheck
+6/6 · eslint 0/0 · copy:audit clean · **the suite 15,053 = +34**
+[commodities-tiles 14 · commodities-copy-pin 2 · commodities-backtest 11
+· CommoditiesPage render audit 7] · build + budgets held — entry
+270.69/81.95, the CommoditiesPage chunk 11.93/3.41 vs its 16/5 row).
+**Deployed + live-verified** (version `08e0fc64` 2026-11-11, the owner's
+standing — the deploy-lock check ran first: S16's `9d60726b` @ 100%, no
+parallel deploy; production moved `9d60726b` → `08e0fc64`):
+currena.ir/commodities live-smoke-verified at 1440×900 en (24 cards · the
+5 sections · the gold cross-link → /gold · the In-build chip ABSENT · 0px
+overflow · 0 page errors · the live value brent 'US$92.17' · eia-crude-
+stocks '691.9 m barrels' · chokepoint-suez '43.0 transits a day') + at
+360×844 fa (RTL, dir=rtl, h1='کالاها و انرژی', the live value brent
+'۹۲٫۱۷ دلار' · chokepoint-suez '۶۵٫۳ تردد در روز', 0px overflow · 0 page
+errors), the §21 backtest re-run against production post-deploy 24/24
+green, every other surface intact. The 3 seat chips on /australia that
+link to /commodities (iron-ore · coal-aus · lng-japan) now resolve to a
+real page.
+Decisions: BD-S17a (the §21 commodities backtest) · BD-S17b (the
+CommoditiesPage render audit) · BD-S17c (the In-build chip retired + the
+Commodities budget row) + the deploy record (worker `08e0fc64`), all in
+`docs/DECISIONS.md`.
 
 ## Phase I — Currency Pairs (S18)
 
@@ -1317,17 +1393,17 @@ the deploy record (worker `9d60726b`), all in `docs/DECISIONS.md`.
 | E Europe | S12–S13 | ✅ S12 2026-11-09 (deployed `84833135`, the EU + non-EU UK sections + the zoom + the cross-links — the 8 placed ids, the §15 fills verified-pending-ingest — Phase E OPEN) · ✅ S13 2026-11-09 (deployed `b11fd84f`, the Europe gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE E CLOSED**) |
 | F Asia & Pacific | S14–S15 | ✅ S14 2026-11-09 (deployed `68281479`, the five sub-regions D-35 — China 7 · Japan 2 · Korea/Taiwan/HK index-only · India index-only · Pacific-NZ 2 = 11 placed cards, the S8 zoom, the cross-links, the §15 CPI fills VERIFIED STALE — Rule 5 — BD-S14a; the honest In-build chip stays until S15 — Phase F OPEN) · ✅ S15 2026-11-09 (deployed `6f96cd9a`, the Asia gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE F CLOSED**) |
 | G Australia | S16 | ✅ S16 2026-11-10 (deployed `9d60726b` 2026-11-10 ~20:30 UTC — the Australia build & gates: the REUSED AU Markets board [19 symbols], the 5-gauge structure D-37, the 28 cards, the 11 moved-out seat chips, the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 28/28 green + the 4-leg browser pass green — **PHASE G CLOSED**) |
-| H Commodities | S17 | ☐ |
+| H Commodities | S17 | ✅ S17 2026-11-11 (deployed `08e0fc64`, the 4 commodity groups + the trade routes & supply group — 24 cards + the gold cross-link; the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 24/24 green + the 4-leg browser pass green — **PHASE H CLOSED**) |
 | I Currency Pairs | S18 | ☐ |
 | J Integration | S19–S21 | ☐ |
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 16/30 delivered 2026-11-10 · 14 remaining — next
-action: Session 17/30 (S17, Phase H opens — Commodities build & gates:
-Energy/Metals/Agriculture/Digital + Trade routes & supply D-38/D-39, the
-gold cross-links D-19/D-27). The §15 FRED-only CPI fills for Asia
-(BD-S14a/BD-S15d) stay carried forward to a dedicated fill session —
-pick a viable monthly source for JP/KR/IN: the national statistics
-bureaus directly, a fresh FRED/IMF IFS series, or the World Bank annual
-as a lower-resolution fallback.**
+**Current position: Session 17/30 delivered 2026-11-11 · 13 remaining — next
+action: Session 18/30 (S18, Phase I opens — Currencies build & gates:
+the 7 rule lights hero D-41, the 11-pair board D-42 with moveRank &
+bigMove, the dollar-standing section D-32, AUDNZD joins the board). The
+§15 FRED-only CPI fills for Asia (BD-S14a/BD-S15d) stay carried forward
+to a dedicated fill session — pick a viable monthly source for JP/KR/IN:
+the national statistics bureaus directly, a fresh FRED/IMF IFS series,
+or the World Bank annual as a lower-resolution fallback.**

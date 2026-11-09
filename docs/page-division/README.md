@@ -116,7 +116,16 @@ regeneration (`pnpm placement:generate`).
   core + the offline suite + the live pd-s16-backtest.ts, 28/28 green vs
   production pre-deploy] + the render audit [AustraliaPage.test.tsx, 7
   tests] + the In-build chip RETIRED at the gates pass — BD-S16c — Phase
-  G CLOSED) 2026-11-10.** Next: Session 17/30 (S17 — the Commodities
+  G CLOSED) 2026-11-10.** S17 (the Commodities build & gates: the four
+  commodity groups [Energy 9 · Metals 4 · Agriculture 3 · Digital 2] +
+  the Trade routes & supply group [D-38/D-39: the five chokepoints + the
+  GSCPI = 6] — 24 cards with the §21 trio, every card context-only [no
+  gauges, no verdict lines — G-5]; the gold cross-link to /gold on the
+  metals group [D-19/D-27]; the §21 backtest [the pure core + the
+  offline suite + the live pd-s17-backtest.ts, 24/24 green vs production
+  pre- AND post-deploy] + the render audit [CommoditiesPage.test.tsx, 7
+  tests] + the In-build chip RETIRED at the gates pass — BD-S17c — Phase
+  H CLOSED) 2026-11-11.** Next: Session 18/30 (S18 — the Currencies
   build & gates). See the roadmap's progress board for the current
   position.
 
