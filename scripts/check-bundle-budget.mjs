@@ -1046,6 +1046,20 @@ const BUDGETS = [
   // drawing's bytes are paid once, BD-S10a). Ceiling 26/7 per the tight
   // convention (~1.5 kB raw / ~0.6 kB gz headroom).
   { pattern: /^UsaPage-[\w-]+\.js$/, raw: 26_000, gz: 7_000, label: 'USA page lazy chunk (page-division S9+S10)' },
+  // Page-division S12 (2026-11-09): the Europe route — the EU section + the
+  // non-EU United Kingdom section listed apart (D-33), the 8 placed cards
+  // through the pure europe-tiles (pinned output-for-output against
+  // formatReadingValue), the cross-links strip (§8 item 4). The S8 zoom
+  // section rides the SHARED RegionIndexSection chunk every region route
+  // loads (the zoom's bytes are paid once, not per Europe route), and the
+  // page's own chunk carries only the shell + EuropeTierCards + the lean
+  // europe-tiles display configs. Measured 10.07/3.09 at the S12 build;
+  // S13 (2026-11-09) retired the In-build chip (a few bytes shaved) — the
+  // EuropePage render audit is test-only, never in the app bundle.
+  // Ceiling 14/5 per the convention (~3.9 kB raw / ~1.9 kB gz headroom —
+  // room for the §15 FRED-only fill cards when a later session verifies +
+  // ingests them, Rule 5).
+  { pattern: /^EuropePage-[\w-]+\.js$/, raw: 14_000, gz: 5_000, label: 'Europe page lazy chunk (page-division S12)' },
   // Page-division S10 (2026-11-09): the shared TIC drawing — the legacy
   // "Who holds US government debt" section, extracted to its own chunk
   // the moment /usa's tier-6 board imported it (Vite's shared-chunk

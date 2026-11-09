@@ -21,12 +21,15 @@
  * slow connection and survives a feed outage, clearly labelled (M-17,
  * the BD-S5a sentence).
  *
- * The honest "In build" chip stays (the page's 8 placed ids are
- * complete, but the §15 FRED-only fills (D-34) are verified-pending-
- * ingest — recorded in DECISIONS.md; the page is honestly still
- * growing, the thin-region risk mitigation the spec §20 names). The
- * chip retires at the gates session (S13) once the fills land and the
- * gates pass — the USA trajectory (S9/S10 chip → S11 retirement).
+ * The honest "In build" chip RETIRED at the S13 gates pass (BD-S12b's
+ * completion — the USA trajectory: S9/S10 chip → S11 retirement): the
+ * page's 8 placed ids are complete and the gates pass (the §21 card
+ * audit 8/8 green, the freshness audit honest, the mobile/ARIA polish
+ * landed). The §15 FRED-only fills (D-34) stay verified-pending-ingest
+ * (Rule 5 — BD-S12a), a separate engine-layer change that deserves its
+ * own session; their absence does not make the 8 placed cards "in
+ * build". The pd.statusBuilding key stays for the not-yet-built pages
+ * (RegionPage + PagePlaceholder).
  *
  * Platform: browser only — this module lives in the lazy Europe route
  * chunk, never the entry graph.
@@ -177,18 +180,24 @@ export function EuropePage(): React.JSX.Element {
   // when the projection has spoken (fresh or cached).
   return (
     <div className="mx-auto w-full max-w-[560px] px-3 py-1.5 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1280px] lg:px-8 lg:py-6">
-      {/* The heading block: title + the honest "In build" chip + the
-          one-line purpose + the data-as-of line (the BD-S5a sentence
-          replaces the plain line when the copy is the cached one). The
-          chip stays — the §15 fills are verified-pending-ingest; the
-          page is honestly still growing (the spec §20 thin-region
-          mitigation). */}
+      {/* The heading block: title + the one-line purpose + the data-as-of
+          line (the BD-S5a sentence replaces the plain line when the copy
+          is the cached one). The In-build chip retired at S13's gate pass
+          — the page's 8 placed cards are complete and verified. */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.europe.title')}</h1>
-          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-[10.5px] font-bold text-amber-900 sm:px-3 sm:py-1 sm:text-xs dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200">
-            {t('pd.statusBuilding')}
-          </span>
+          {/* The In-build chip is RETIRED (BD-S12b's completion — S13's
+           * gates passed: the §21 card audit 8/8 green, the freshness
+           * audit honest, the mobile/ARIA polish landed). The page's
+           * 8 placed cards are complete and verified; no honest "in
+           * build" claim remains. The pd.statusBuilding key stays for
+           * the not-yet-built pages (RegionPage + PagePlaceholder). The
+           * §15 FRED-only fills (D-34) stay verified-pending-ingest
+           * (Rule 5 — BD-S12a): a separate engine-layer change that
+           * deserves its own session, and their absence does not make
+           * the 8 placed cards "in build" (the USA trajectory: S9/S10
+           * chip → S11 retirement on the gates pass). */}
         </div>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.europe.purpose')}
