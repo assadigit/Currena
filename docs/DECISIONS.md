@@ -771,3 +771,139 @@
 - **Who decided:** the build session (S12) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-09d.
+
+## 2026-11-09 — BD-S13a: the Europe card-render audit + the live §21 diff as the session's own gate (the S11 UsaPage.test.tsx pattern mirrored for Europe)
+
+- **Decision:** the S13 Europe gates session adds the Europe page's
+  DOM-level render audit (`EuropePage.test.tsx`, 7 tests — the
+  `UsaPage.test.tsx` pattern scoped to Europe's 8 placed cards), AND
+  re-audits the live §21 diff as the session's own gate. The render
+  audit pins: the shell (title + purpose + data-as-of, the In-build chip
+  ABSENT), the S8 zoom on top through every state (4 STOXX50E/DAX/CAC/
+  FTSE cards), the EU section (6) + the non-EU UK section (2) listed
+  apart (D-33), the 8 cards in placement order with the §21 trio (value
+  · 10-year position · freshness — the percent/points/index joins), the
+  cross-links (3, 44px, → /currencies), the fail-closed paths (an absent
+  card → "Cannot read yet"; a dead projection → the error state + retry;
+  the M-17 last-good cached paint), and the fa/RTL rendering. The live
+  `pd-s12-backtest.ts` re-run against PRODUCTION: 8 cards · 8 green · 0
+  red (page ≡ engine byte-for-byte), the EU/non-EU membership 6/2 +
+  8/8 carried, the freshness audit honest (btp-bund-spread 100d beyond
+  its 75d monthly grace AND status 'stale').
+- **Options considered:** (A) rely on the S12 §21 trio diff alone (the
+  8-card byte-identical check — correct but unpinned at the DOM level; a
+  render regression like a missing section or a broken cross-link would
+  not surface); (B) add the DOM render audit + re-run the live §21 diff
+  as the session's own gate (the S11 UsaPage.test.tsx pattern); (C) a
+  full Playwright visual suite (heavier than the gates session needs —
+  the DOM characterization + the 4-leg browser pass is the §21
+  discipline).
+- **Reason:** B — the §21 "card-render audit vs the placement table" is
+  a gate, and the S11 pattern (UsaPage.test.tsx's render audit + the live
+  diff re-audited) is the established way to pin it. The render audit
+  catches display-layer regressions the trio-diff can't (a dropped
+  section, a broken link, a chip that didn't retire); the live diff
+  re-confirms the page ≡ engine byte-for-byte. Both ran green.
+- **Who decided:** the gates session (S13). **Revisit:** if the Europe
+  page gains a layer (the §15 fill cards when they land), the render
+  audit grows the new cards' assertions.
+
+## 2026-11-09 — BD-S13b: the Europe mobile/ARIA pass — the 44px touch targets, the section-heading semantics, the RTL flow (pinned + browser-verified)
+
+- **Decision:** the S13 mobile/ARIA pass on /europe (spec §18 D-48's
+  "touch targets ≥ 44px" + the WAI-ARIA disclosure pattern + the RTL
+  flow) is VERIFICATION + the pin: the cross-link cards already carry
+  `min-h-[44px]` (S12 applied the S11 lessons when it built the page),
+  the section headings already carry the `<section aria-label>` + `<h2>`
+  semantics (the established USA pattern — `<article>` + `<h4>` for
+  cards), and the RTL flow already rides the logical CSS + the `<bdi
+  dir>` joins. The render audit (BD-S13a) now PINS the 44px touch target
+  on every cross-link, the section semantics, and the fa/RTL rendering;
+  the 4-leg browser pass (en/fa × 1440/360) confirmed all green.
+- **Options considered:** (A) leave the compliance unpinned (the S12
+  state — compliant but a future refactor could regress without a
+  test); (B) pin the compliance in the render audit + verify in the
+  browser (the S11 pattern); (C) add new ARIA attributes the page
+  doesn't need (a disclosure pattern Europe has no toggle for).
+- **Reason:** B — the S11 gates session pinned the USA ARIA compliance
+  the same way (the render audit asserts the 44px + the disclosure);
+  Europe has no Show-all toggle and no period switch of its own (the
+  zoom's period switch inherited S11's 44px fix globally), so the pass
+  is the cross-link 44px + the section semantics + the RTL flow, all
+  already compliant — the pin keeps them green. No code change was
+  needed (the S12 build carried the S11 lessons); the pass is the
+  verification + the pin, exactly the honest result.
+- **Who decided:** the gates session (S13). **Revisit:** if the Europe
+  page gains a toggle/disclosure (e.g., a future Show-all for the fill
+  cards), it carries aria-controls (the S11 TicSection pattern).
+
+## 2026-11-09 — BD-S13c: the In-build chip retired + the Europe budget row (BD-S12b's completion)
+
+- **Decision:** the Europe page's honest "In build" status chip is
+  RETIRED from the heading block (BD-S12b's completion — S13's gates
+  passed: the §21 card audit 8/8 green, the freshness audit honest, the
+  mobile/ARIA polish landed). The page's 8 placed cards are complete and
+  verified; no honest "in build" claim remains. The `pd.statusBuilding`
+  key stays in both dictionaries — `RegionPage` (Asia-Pacific/Australia,
+  the not-yet-built region pages) and `PagePlaceholder`
+  (Commodities/Currencies) still carry the honest chip for their own
+  in-build state. The Europe lazy chunk gets its own budget row (the
+  S9/S10 pattern): measured 10.07/3.06 vs a 14/5 ceiling (headroom for
+  the §15 fill cards when a later session verifies + ingests them).
+- **Options considered:** (A) keep the chip until the §15 fills land
+  (the page is "honestly still growing"); (B) retire the chip on the
+  gates pass (the 8 placed cards are complete; the fills are a separate
+  engine-layer change); (C) retire the key entirely (would break the
+  other placeholder pages).
+- **Reason:** B — the 8 placed ids' gates pass (§21 diff 8/8 green,
+  freshness honest, mobile/ARIA green), exactly the USA trajectory
+  (S9/S10 chip → S11 retirement on the gates pass). The §15 fills stay
+  verified-pending-ingest (Rule 5 — BD-S13d): they are an ENGINE-layer
+  change (definitions.ts → registry:generate → placement → display →
+  copy → adapter fetch wiring) that deserves its own focused session,
+  and their absence does not make the 8 placed cards "in build" — the
+  page as it stands is complete and verified. Keeping the chip after its
+  gate passed would be DISHONEST in the other direction (claiming
+  in-build when the 8 placed cards are verified complete). The budget
+  row formalizes the Europe chunk gate (the S12 "in budget" claim was
+  loose — no row existed; S13 adds it, the S9/S10 pattern).
+- **Who decided:** the gates session (S13). **Revisit:** if the Europe
+  page gains a new layer (the §15 fill cards), the chip does NOT return
+  — the page is live and verified; the new cards ship when they're
+  ready, not under an in-build banner. Bump the 14/5 budget if the fills
+  push the chunk past it (with a changelog justification, never
+  silently).
+
+## 2026-11-09 — BD-S13d: the §15 FRED-only fills carried forward (verified-pending-ingest — Rule 5; the ingest is engine-layer, a dedicated session)
+
+- **Decision:** S13 (the Europe gates session) does NOT ingest the
+  three D-34 Europe §15 fills (euro-area unemployment · industrial
+  production · ECB-SDMX M3 liquidity). The candidates stay
+  verified-pending-ingest (Rule 5 — BD-S12a). S13's scope is the
+  display-layer gates (the card-render audit, the freshness, the
+  mobile/ARIA pass, the In-build chip retirement); the ingest is an
+  ENGINE-layer change (definitions.ts → registry:generate → placement →
+  display → copy → the adapter fetch wiring → CHANGELOG) that the
+  BD-S12a decision explicitly said "deserves its own focused session
+  with the full AGENTS.md §A maintenance discipline."
+- **Options considered:** (A) ingest the fills in S13 (the gates
+  session — would bloat the session past its short-session scope (Rule
+  1) AND the verification needs production egress the dev sandbox can't
+  reach (FRED serves a JS challenge to the sandbox IP; the ECB M3 SDMX
+  key needs the BSI dimension walk the production adapter does for the
+  Eurosystem-assets series)); (B) carry the fills forward to a
+  dedicated fill session that verifies from production egress + the M3
+  dimension walk + ingests with the full §A discipline (CHOSEN); (C)
+  discard the candidates (rejected — they are verifiable in principle,
+  the production Worker reaches FRED fine).
+- **Reason:** Rule 1 (short sessions — the gates session's scope is the
+  display-layer gates) + Rule 5 (financial-data discipline — never
+  assume; the candidates can't be verified from the dev sandbox, and an
+  unverified ingest is forbidden). The In-build chip retires on the 8
+  placed ids' gate pass (BD-S13c) — the fills' absence does not make
+  the 8 placed cards "in build." The dedicated fill session carries the
+  candidates (BD-S12a's recorded series ids + cross-check publishers).
+- **Who decided:** the gates session (S13) under Rule 1 + Rule 5.
+  **Revisit:** a dedicated fill session (S14's sibling or a one-off) —
+  verify from production egress + the ECB M3 dimension walk, then ingest
+  with the full §A discipline; the §21 diff grows to cover the new cards.
