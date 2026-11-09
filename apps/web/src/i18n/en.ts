@@ -1697,6 +1697,165 @@ export const en = {
       purpose: 'The FX picture — rules first, the pair board second.',
       summary:
         'The seven rule lights (R1–R7) as the hero with plain-language explanations, the 11-pair board with moveRank and big-move flags, and the dollar-standing section.',
+      /* ---- S18 (2026-11-11): the Currencies page's own copy (D-18/D-32/
+       * D-41/D-42, spec §12). The rule-light names + headlines + everyday
+       * explanations, the status/chip/nodata/progress words, the board's
+       * period words + tags + pair names, the registry card names, the unit
+       * words and the position/band/status words are the corpus's own,
+       * pinned byte-for-byte by currencies-copy-pin.test.ts; the
+       * loading/error lines, the section headings + intros and the
+       * move-rank / 52-week words are fresh. */
+      loadingLine: 'Reading the currency numbers…',
+      errorTitle: 'The Currency Pairs page is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      rulesTitle: 'The seven rule lights',
+      rulesIntro:
+        'Seven relationships between the big currencies, stocks and gold — each a tendency that has often shown up around market worries, with its current reading. Tendencies, not predictions.',
+      ruleLights: {
+        r1: {
+          name: 'Nervous or relaxed?',
+          everyday:
+            'When people get scared, they sell riskier money like the Australian dollar and buy the safer Japanese yen. This pair shows which way money is moving.',
+          headlineWarning: 'Investors look nervous',
+          headlineWatch: 'An early hint of nervousness',
+          headlineSupportive: 'Investors look relaxed',
+          headlineQuiet: 'No sign of nervousness',
+        },
+        r2: {
+          name: 'Sudden yen jump',
+          everyday:
+            'Many investors borrow cheap yen to invest elsewhere (a “carry trade”). If the yen suddenly gets stronger, they must repay fast and sell their investments, which can hit stock markets worldwide.',
+          headlineWarning: 'The yen is jumping and markets may shake',
+          headlineWatch: 'The yen is very weak',
+          headlineQuiet: 'No sudden yen moves',
+        },
+        r3: {
+          name: 'Strong or weak dollar',
+          everyday:
+            'Oil, gold and a lot of loans are priced in US dollars. When the dollar gets stronger, they cost more for people who earn in other currencies.',
+          headlineWarning: 'The dollar is getting much stronger',
+          headlineSupportive: 'The dollar is getting much weaker',
+          headlineQuiet: 'The dollar is moving normally',
+        },
+        r4: {
+          name: 'Where does money hide?',
+          everyday:
+            'In a scare, people usually move money into US dollars because it feels safe. When even the dollar is sold, trust is shaky, and gold often rises.',
+          headlineFlight: 'Money is running to the dollar',
+          headlineWobble: 'Money is leaving even the dollar',
+          headlineQuiet: 'No rush to safety',
+        },
+        r5: {
+          name: 'China link',
+          everyday:
+            'China is the biggest buyer of Australia’s iron ore. When China’s economy slows, the Australian dollar and the Chinese yuan often weaken together.',
+          headlineWarning: 'Worry about China’s demand',
+          headlineWatch: 'An early hint of China worry',
+          headlineSupportive: 'China’s demand looks healthy',
+          headlineQuiet: 'No sign of China worry',
+        },
+        r6: {
+          name: 'Europe worry',
+          everyday:
+            'The Swiss franc is a classic safe place for money. When Europeans get nervous they buy francs, so the euro falls against it.',
+          headlineWarning: 'Investors are worried about Europe',
+          headlineWatch: 'The euro is slipping against the Swiss franc',
+          headlineQuiet: 'No sign of Europe worry',
+        },
+        r7: {
+          name: 'Dollar or euro?',
+          everyday:
+            'When the euro falls against the dollar, it can be because the dollar is strong everywhere (a world story) or because the euro itself is weak (a Europe story). This card tells you which.',
+          headlineDollarLed: 'Mostly a dollar story',
+          headlineEuroLed: 'Mostly a euro story',
+        },
+      },
+      statusActive: 'Active',
+      statusWatching: 'Watching',
+      statusQuiet: 'Quiet',
+      chipNormal: 'Normal',
+      chipAttention: 'Needs attention',
+      chipUnusual: 'Unusual',
+      noDataRow: 'Not enough data right now',
+      barLabel: 'How close to the alarm',
+      downgradeCaution: 'The usual pattern has not been reliable lately.',
+      boardTitle: 'The pair board',
+      boardIntro:
+        'The eleven pairs the rules read, each with its rate, the four period changes, its move rank among the past year’s moves, and the past 52 weeks. Gold crosses stay on the Gold page.',
+      thPair: 'Pair',
+      thRate: 'Rate',
+      thToday: 'Today',
+      thM1: '1 month',
+      thM3: '3 months',
+      thY1: '1 year',
+      thMoveRank: 'Move rank (0–100)',
+      weeks52Label: 'Past 52 weeks',
+      bigMoveTag: 'Unusually large move',
+      oldData: 'Old data · {date}',
+      boardFooter: 'European Central Bank (ECB) reference rates, once a day. A pattern is a tendency, not a prediction.',
+      pairNames: {
+        eurusd: 'Euro vs US dollar',
+        usdjpy: 'US dollar vs yen',
+        gbpusd: 'Pound vs US dollar',
+        usdchf: 'US dollar vs Swiss franc',
+        usdcny: 'US dollar vs yuan',
+        audusd: 'Australian dollar vs US dollar',
+        audjpy: 'Australian dollar vs yen',
+        eurjpy: 'Euro vs yen',
+        eurchf: 'Euro vs Swiss franc',
+        audcny: 'Australian dollar vs yuan',
+        audnzd: 'Australian dollar vs New Zealand dollar',
+      },
+      pairsTitle: 'Pair context',
+      pairsIntro:
+        'The same pairs as registry cards — each with its 10-year position and freshness, the reading the rule lights are built on.',
+      pairCardNames: {
+        usdjpy: 'Dollar vs yen',
+        'eur-usd': 'Euro per US dollar',
+        usdchf: 'Dollar vs Swiss franc',
+        usdcny: 'Dollar vs Chinese yuan',
+        audusd: 'Australian dollar vs US dollar',
+        audjpy: 'Australian dollar vs yen',
+        audnzd: 'Australian dollar vs New Zealand dollar',
+      },
+      standingTitle: 'Where the dollar stands',
+      standingIntro:
+        'The dollar’s own position: the basket against six big currencies, the broad and emerging-market measures, the US-Japan rate gap, two pegged or pressured currencies, and the reserve share.',
+      standingCardNames: {
+        'dollar-basket': 'The dollar vs six big currencies',
+        'dollar-broad': 'The dollar vs 26 currencies',
+        'dollar-eme': 'The dollar vs emerging-market currencies',
+        'us-japan-10y-gap': 'The gap between US and Japanese 10-year rates',
+        usdtry: 'Dollar vs Turkish lira',
+        usdaed: 'Dollar vs UAE dirham',
+        'usd-reserve-share': 'USD share of world FX reserves',
+      },
+      units: {
+        index: 'index',
+        points: 'pts',
+        percent: '%',
+        try: '₺',
+        aed: 'AED',
+        jpy: '¥',
+        eur: '€',
+        chf: 'CHF',
+        cny: 'CN¥',
+        usd: 'US$',
+        nzd: 'NZ$',
+      },
+      positionLow: 'low',
+      positionTypical: 'typical',
+      positionHigh: 'high',
+      positionWordLine: '{word} · {band}',
+      bandTop: 'top {p}%',
+      bandMid: 'the middle',
+      bandBottom: 'bottom {p}%',
+      statusWarning: 'Needs attention',
+      statusStale: 'Stale',
+      statusCheckPending: "Can't tell right now",
+      statusUnavailable: "Can't tell right now",
+      valueUnavailable: 'Cannot read yet',
     },
   },
 
