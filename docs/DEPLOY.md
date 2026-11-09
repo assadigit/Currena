@@ -199,6 +199,87 @@ custody card intact through the reuse refactor) all verified.
 **Rollback lever:** `wrangler rollback` — /usa returns to the S9 page
 (the strip + tiers 1–2 + the zoom); nothing else moves.
 
+## Session record — 2026-11-09g the page-division S15 deploy (the Asia gates — Phase F closes; the full card-render audit green, the freshness audit honest, the mobile/ARIA pass pinned + browser-verified, the honest In-build chip retired live at /asia-pacific)
+
+**Scope (page-division S15, the Asia gates):** display-layer ONLY. No
+engine, voter, threshold, calibration or provider change; the SAME
+insights snapshot + the SAME markets board, zero new fetches, zero new
+KV. S15 closes Phase F (Asia & Pacific) with the gates session — the
+S13 Europe-gates pattern applied to Asia over the S14-complete
+/asia-pacific page. The only user-visible change is the In-build chip
+RETIRED at /asia-pacific (BD-S14b's completion — the 11 placed ids'
+gates pass: the §21 card audit 11/11 green, the freshness audit honest,
+the mobile/ARIA pass landed). The `AsiaPage.test.tsx` render audit's
+chip-ABSENT assertion (the S14 render audit's chip assertion flipped
+from `getByText('In build').toBeTruthy()` → `queryByText('In build')
+.toBeNull()` + a final `not.toContain('In build')` — the EuropePage S13
+pattern) is a test-gate addition (never in the bundle's user-visible
+surface). The Asia budget row's COMMENT is tightened (the S13 Europe
+pattern): the 16/6 ceiling holds; the chip removal shaved ~0.28kB raw
+(the measured chunk 12.47/3.47 → 12.19/3.37). The §15 FRED-only CPI
+fills (D-36) stay verified-pending-ingest (Rule 5 — BD-S14a/BD-S15d):
+the FRED OECD mirror family is discontinued, and a viable monthly source
+must be picked (the national statistics bureaus directly, a fresh
+FRED/IMF IFS series, or the World Bank annual as a lower-resolution
+fallback) — a dedicated fill session; their absence does not make the 11
+placed cards "in build."
+
+**Gates before the deploy (ALL GREEN):** secret scan 8/986 · typecheck
+6/6 · eslint 0/0 · copy:audit clean (no new fa strings — S15 only
+removed the chip + flipped the test assertion + tightened the budget
+comment) · narrator vocabulary in sync + eval 50 · layer1
+11,819/11,819 · the full suite **14,985** (unchanged from S14 — the test
+count is the same; the assertions changed) · build + budgets held —
+entry 270.48/81.91, the Asia lazy chunk 12.19/3.37 vs its 16/6 row (the
+chip removal shaved ~0.28kB raw).
+
+**The §21 diff — the S15 gate's own, run LIVE twice (pre-deploy and
+post-deploy): 11 checks · 11 green · 0 red.** The live `pd-s14-backtest.ts`
+against PRODUCTION: the 11 cards' trio inputs byte-identical (page ≡
+engine — china-pmi 49.3 warning · china-cpi 0.9 normal · oecd-cli-cn
+97.41 context · gpr-china 0.84 context · gpr-taiwan 0.08 context ·
+china-property-investment -20.6 context · china-steel-output 7359
+context · jgb-10y 2.696 context · boj-rate 1.043 context · nz-short-rate
+3.25 context · nz-10y 4.94 context), the placement group membership
+china 7 / japan 2 / korea-taiwan-hk 0 index-only / india 0 index-only /
+pacific-nz 2 + 11/11 carried, the freshness audit honest (all 11 within
+cadence grace — Asia has NO honest-stale path, unlike Europe's
+btp-bund-spread), the two feeds one snapshot (generatedAt aligned).
+
+**The deploy-lock check ran first** (the D-43 lesson): the active
+version was S14's `68281479` @ 100% — no parallel deploy. `pnpm
+--filter @currena/web build` + `wrangler deploy` → **currena-api
+`6f96cd9a` @ 100%** (deployment `3ff880ea`, version
+`6f96cd9a-1dee-4611-9309-9872322fd584`, 2026-11-09 ~13:56Z; SITE_MODE
+=public, the RATES KV + AI + ASSETS bindings intact). currena-markets
+untouched (code-unchanged).
+
+**The live acceptance (ALL GREEN):** the live `pd-s14-backtest.ts`
+re-run post-deploy 11/11 green; currena.ir/asia-pacific live-smoke-
+verified at 1440×900 en (11 cards · the China section · the Japan
+section · the 2 index-only sections · the Pacific-NZ section · the zoom
+(6) · the 3 cross-links @ 44px · the In-build chip ABSENT · 0px overflow
+· 0 page errors · the live value china-pmi "49.3 index") + at 360×844 fa
+(RTL, dir=rtl, h1="آسیا و اقیانوسیه", the live value china-pmi
+"۴۹٫۳ به‌صورت شاخص", 0px overflow · 0 page errors); the pre-deploy 4-leg
+browser pass (the freshly built SPA through the local preview server,
+/api proxied to currena.ir) at 1440×900 AND 360×844 in BOTH en and fa
+(RTL, Persian digits) — 11 cards (China=7/Japan=2/NZ=2), the zoom (6
+N225/KOSPI/HSI/SSEC/TAIEX/NIFTY50), the 5 sections (3 card + 2
+index-only), the 3 cross-links all at 44px, the In-build chip ABSENT on
+all 4 legs, NO horizontal scroll at any width in any locale (overflow
+0px on all 4 legs), ZERO console/page errors across all 4 legs; the fa
+legs dir=rtl + Persian digits (۴۹٫۳ به‌صورت شاخص · ۷۳٫۶ میلیون تن ·
+۲٫۷۰٪); the Global + Gold + World Markets + USA + Europe + Australia +
+legacy /insights surfaces intact.
+
+- **Rollback:** `wrangler rollback` — /asia-pacific returns to the S14
+  page (the 11 placed cards + the In-build chip present); nothing else
+  moves (the S15 change is the chip removal + the test assertion flip +
+  the budget comment only).
+- **Who decided:** the gates session (S15) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives above.
+
 ## Session record — 2026-11-09f the page-division S14 deploy (the Asia build + fills — Phase F opens; the five sub-regions D-35, the 11 placed cards, the S8 zoom, the cross-links, the honest In-build chip live at /asia-pacific)
 
 **Scope (page-division S14, spec §9 items 1–6, D-35):** display-layer

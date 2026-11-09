@@ -1077,3 +1077,233 @@
   the card-render audit + the freshness + the mobile/ARIA pass + the
   In-build chip retirement (when the fills land OR the gates pass on
   the 11 placed cards, the USA S11 / Europe S13 trajectory).
+
+## 2026-11-09 — BD-S15a: the Asia card-render audit + the live §21 diff as the session's own gate (the S11 UsaPage.test.tsx / S13 EuropePage.test.tsx pattern mirrored for Asia)
+
+- **Decision:** the S15 Asia gates session re-audits the Asia page's
+  DOM-level render audit (`AsiaPage.test.tsx`, 7 tests — the
+  `UsaPage.test.tsx` / `EuropePage.test.tsx` pattern scoped to Asia's
+  11 placed cards, ALREADY in place from S14) as the session's own gate,
+  AND re-runs the live §21 diff (`pd-s14-backtest.ts`) as the session's
+  own gate. The render audit pins: the shell (title + purpose + data-
+  as-of, the In-build chip ABSENT — BD-S15c's retirement), the S8 zoom
+  on top through every state (6 N225/KOSPI/HSI/SSEC/TAIEX/NIFTY50 cards),
+  the China section (7) + the Japan section (2) + the two index-only
+  sections (Korea/Taiwan/HK, India — honest notes, never empty grids) +
+  the Pacific-NZ section (2), the 11 cards in placement order with the
+  §21 trio (value · 10-year position · freshness — the percent/points/
+  index/tonnes joins, including china-steel-output's scale 1e-2 → 73.6 m
+  tonnes), the cross-links (3, 44px → /currencies + /gold), the fail-
+  closed paths (an absent card → "Cannot read yet"; a dead projection →
+  the error state + retry; the M-17 last-good cached paint), and the
+  fa/RTL rendering. The live `pd-s14-backtest.ts` re-run against
+  PRODUCTION twice (pre-deploy and post-deploy): 11 cards · 11 green ·
+  0 red (page ≡ engine byte-for-byte), the placement group membership
+  china 7 / japan 2 / korea-taiwan-hk 0 index-only / india 0 index-only
+  / pacific-nz 2 + 11/11 carried, the freshness audit honest (all 11
+  within cadence grace — Asia has NO honest-stale path to exercise,
+  unlike Europe's btp-bund-spread).
+- **Options considered:** (A) rely on the S14 §21 trio diff alone (the
+  11-card byte-identical check — correct but unpinned at the DOM level;
+  a render regression like a missing section or a chip that didn't
+  retire would not surface); (B) re-audit the DOM render audit + re-run
+  the live §21 diff as the session's own gate (the S11/S13 pattern);
+  (C) a full Playwright visual suite (heavier than the gates session
+  needs — the DOM characterization + the 4-leg browser pass is the §21
+  discipline).
+- **Reason:** B — the §21 "card-render audit vs the placement table" is
+  a gate, and the S11/S13 pattern (the render audit + the live diff re-
+  audited) is the established way to pin it. The render audit catches
+  display-layer regressions the trio-diff can't (a dropped section, a
+  broken link, a chip that didn't retire — exactly the BD-S15c
+  retirement the S15 audit now PINS chip-ABSENT on); the live diff re-
+  confirms the page ≡ engine byte-for-byte. Both ran green (pre- and
+  post-deploy).
+- **Who decided:** the gates session (S15). **Revisit:** if the Asia
+  page gains a layer (the §15 fill cards when they land), the render
+  audit grows the new cards' assertions.
+
+## 2026-11-09 — BD-S15b: the Asia mobile/ARIA pass — the 44px touch targets, the section-heading semantics, the RTL flow (pinned + browser-verified)
+
+- **Decision:** the S15 mobile/ARIA pass on /asia-pacific (spec §18
+  D-48's "touch targets ≥ 44px" + the WAI-ARIA disclosure pattern + the
+  RTL flow) is VERIFICATION + the pin: the cross-link cards already
+  carry `min-h-[44px]` (S14 applied the S11/S13 lessons when it built
+  the page), the section headings already carry the `<section
+  aria-label>` + `<h2>` semantics (the established USA/Europe pattern —
+  `<article>` + `<h4>` for cards), and the RTL flow already rides the
+  logical CSS + the `<bdi dir>` joins. The render audit (BD-S15a) PINS
+  the 44px touch target on every cross-link, the section semantics, and
+  the fa/RTL rendering; the 4-leg browser pass (en/fa × 1440/360,
+  pre-deploy over the freshly built SPA + post-deploy on the live
+  currena.ir) confirmed all green (chip ABSENT, 11 cards, the zoom (6),
+  the 5 sections, the 3 cross-links @ 44px, overflow 0px, 0 page errors
+  on every leg; the fa legs dir=rtl, h1="آسیا و اقیانوسیه", Persian
+  digits).
+- **Options considered:** (A) leave the compliance unpinned (the S14
+  state — compliant but a future refactor could regress without a
+  test); (B) pin the compliance in the render audit + verify in the
+  browser (the S11/S13 pattern); (C) add new ARIA attributes the page
+  doesn't need (a disclosure pattern Asia has no toggle for).
+- **Reason:** B — the S11 gates session pinned the USA ARIA compliance
+  the same way (the render audit asserts the 44px + the disclosure);
+  Asia has no Show-all toggle and no period switch of its own (the
+  zoom's period switch inherited S11's 44px fix globally), so the pass
+  is the cross-link 44px + the section semantics + the RTL flow, all
+  already compliant — the pin keeps them green. No code change was
+  needed (the S14 build carried the S11/S13 lessons); the pass is the
+  verification + the pin, exactly the honest result.
+- **Who decided:** the gates session (S15). **Revisit:** if the Asia
+  page gains a toggle/disclosure (e.g., a future Show-all for the fill
+  cards), it carries aria-controls (the S11 TicSection pattern).
+
+## 2026-11-09 — BD-S15c: the In-build chip retired + the Asia budget row tightened (BD-S14b's completion)
+
+- **Decision:** the Asia page's honest "In build" status chip is
+  RETIRED from the heading block (BD-S14b's completion — S15's gates
+  passed: the §21 card audit 11/11 green, the freshness audit honest,
+  the mobile/ARIA polish landed). The page's 11 placed cards are
+  complete and verified; no honest "in build" claim remains. The
+  `pd.statusBuilding` key stays in both dictionaries — `RegionPage`
+  (Australia, the not-yet-built region page) and `PagePlaceholder`
+  (Commodities/Currencies) still carry the honest chip for their own
+  in-build state. The Asia budget row's COMMENT is tightened (the S13
+  Europe pattern): the 16/6 ceiling holds (room for the §15 FRED-only
+  fill cards when a later session verifies + ingests them); the chip
+  removal shaved ~0.28kB raw (the measured chunk 12.47/3.47 → 12.19/
+  3.37 — the few bytes of the `<span>` + its classes).
+- **Options considered:** (A) keep the chip until the §15 fills land
+  (the page is "honestly still growing"); (B) retire the chip on the
+  gates pass (the 11 placed cards are complete; the fills are a
+  separate engine-layer change); (C) retire the key entirely (would
+  break the other placeholder pages).
+- **Reason:** B — the 11 placed ids' gates pass (§21 diff 11/11 green,
+  freshness honest, mobile/ARIA green), exactly the USA S11 / Europe
+  S13 trajectory (build-session chip → gates-session retirement on the
+  gates pass). The §15 fills stay verified-pending-ingest (Rule 5 —
+  BD-S15d): they are an ENGINE-layer change (definitions.ts →
+  registry:generate → placement → display → copy → adapter fetch
+  wiring) that deserves its own focused session, and their absence does
+  not make the 11 placed cards "in build" — the page as it stands is
+  complete and verified. Keeping the chip after its gate passed would
+  be DISHONEST in the other direction (claiming in-build when the 11
+  placed cards are verified complete). The budget ceiling stays 16/6
+  (the S13 Europe pattern — the ceiling is not re-based down so a
+  future fill-session has the same room the S14 row gave it).
+- **Who decided:** the gates session (S15). **Revisit:** if the Asia
+  page gains a new layer (the §15 fill cards), the chip does NOT return
+  — the page is live and verified; the new cards ship when they're
+  ready, not under an in-build banner. Bump the 16/6 budget if the
+  fills push the chunk past it (with a changelog justification, never
+  silently).
+
+## 2026-11-09 — BD-S15d: the §15 FRED-only CPI fills carried forward (verified-pending-ingest — Rule 5; the ingest is engine-layer, a dedicated session)
+
+- **Decision:** S15 (the Asia gates session) does NOT ingest the
+  three D-36 Asia §15 FRED-only CPI fills (Japan · Korea · India CPI
+  YoY). The candidates stay verified-pending-ingest (Rule 5 — BD-S14a:
+  the FRED OECD mirror family is VERIFIED STALE/discontinued —
+  JPNCPIALLMINMEI + CPALTT01JPM659N end 2021-06; KORCPIALLMINMEI +
+  CPALTT01KRM659N end 2023-11; INDCPIALLMINMEI + CPALTT01INM659N end
+  2025-03). S15's scope is the display-layer gates (the card-render
+  audit, the freshness, the mobile/ARIA pass, the In-build chip
+  retirement); the ingest is an ENGINE-layer change (definitions.ts →
+  registry:generate → placement → display → copy → the adapter fetch
+  wiring → CHANGELOG) that the BD-S14a decision explicitly said
+  "deserves its own focused session with the full AGENTS.md §A
+  maintenance discipline."
+- **Options considered:** (A) ingest the fills in S15 (the gates
+  session — would bloat the session past its short-session scope (Rule
+  1) AND the viable-source pick needs its own verification (the FRED
+  OECD mirror family is discontinued; a viable monthly source must be
+  picked: the national statistics bureaus directly (the Statistics
+  Bureau of Japan, KOSTAT, MoSPI), a fresh FRED/IMF IFS series, or the
+  World Bank FP.CPI.TOTL.ZG annual as a lower-resolution fallback));
+  (B) carry the fills forward to a dedicated fill session that picks a
+  viable monthly source + verifies from production egress + ingests
+  with the full §A discipline (CHOSEN); (C) discard the candidates
+  (rejected — the national bureaus publish fresh monthly CPI; the
+  candidates are verifiable in principle, the FRED OECD mirror was the
+  stale leg).
+- **Reason:** Rule 1 (short sessions — the gates session's scope is the
+  display-layer gates) + Rule 5 (financial-data discipline — never
+  assume; the FRED OECD mirror is discontinued, and a viable
+  replacement source must be verified live before an adapter merges
+  it). The In-build chip retires on the 11 placed ids' gate pass
+  (BD-S15c) — the fills' absence does not make the 11 placed cards "in
+  build." The dedicated fill session carries the candidate sources
+  (BD-S14a's recorded FRED OECD mirror verification + the three
+  alternative sources: the national statistics bureaus, a fresh FRED/IMF
+  IFS series, the World Bank annual).
+- **Who decided:** the gates session (S15) under Rule 1 + Rule 5.
+  **Revisit:** a dedicated fill session (S16's sibling or a one-off) —
+  pick a viable monthly source (the national statistics bureaus
+  directly, or a fresh FRED/IMF IFS series, or the World Bank annual as
+  a lower-resolution fallback), verify from production egress, then
+  ingest with the full §A discipline; the §21 diff grows to cover the
+  new cards.
+
+## 2026-11-09 — The 2026-11-09g deploy (the Asia gates — Phase F closes; the In-build chip retired live at /asia-pacific)
+
+- **What:** the page-division S15 deploy — the Asia gates (BD-S15a/b/c/d)
+  over the S14-complete codebase. Display-layer ONLY: no engine, voter,
+  threshold, calibration or provider change; the SAME insights snapshot
+  + the SAME markets board, zero new fetches, zero new KV. The only
+  user-visible change is the In-build chip RETIRED at /asia-pacific
+  (BD-S14b's completion — the 11 placed ids' gates pass); the AsiaPage
+  render audit's chip-ABSENT assertion is a test-gate addition (never in
+  the bundle's user-visible surface).
+- **Gates before the deploy (ALL GREEN):** secret scan 8/986 · typecheck
+  6/6 · eslint 0/0 · copy:audit clean (no new fa strings — S15 only
+  removed the chip + flipped the test assertion + tightened the budget
+  comment) · narrator vocabulary in sync + eval 50 · layer1
+  11,819/11,819 · the full suite **14,985** (unchanged from S14 — the
+  test count is the same; the assertions changed) · build + budgets
+  held — entry 270.48/81.91, the Asia lazy chunk 12.19/3.37 vs its 16/6
+  row (the chip removal shaved ~0.28kB raw).
+- **The §21 diff — the S15 gate's own, run LIVE twice (pre-deploy and
+  post-deploy): 11 cards · 11 green · 0 red.** The live `pd-s14-backtest.ts`
+  against PRODUCTION: the 11 cards' trio inputs byte-identical (page ≡
+  engine — china-pmi 49.3 warning · china-cpi 0.9 normal · oecd-cli-cn
+  97.41 context · gpr-china 0.84 context · gpr-taiwan 0.08 context ·
+  china-property-investment -20.6 context · china-steel-output 7359
+  context · jgb-10y 2.696 context · boj-rate 1.043 context ·
+  nz-short-rate 3.25 context · nz-10y 4.94 context), the placement
+  group membership china 7 / japan 2 / korea-taiwan-hk 0 index-only /
+  india 0 index-only / pacific-nz 2 + 11/11 carried, the freshness
+  audit honest (all 11 within cadence grace — no honest-stale path,
+  unlike Europe's btp-bund-spread), the two feeds one snapshot
+  (generatedAt aligned).
+- **The deploy-lock check ran first** (the D-43 lesson): the active
+  version was S14's `68281479` @ 100% — no parallel deploy. `pnpm
+  --filter @currena/web build` + `wrangler deploy` → **currena-api
+  `6f96cd9a` @ 100%** (deployment `3ff880ea`, version
+  `6f96cd9a-1dee-4611-9309-9872322fd584`, 2026-11-09 ~13:56Z; SITE_MODE
+  =public, the RATES KV + AI + ASSETS bindings intact). currena-markets
+  untouched (code-unchanged).
+- **The live acceptance (ALL GREEN):** the live `pd-s14-backtest.ts`
+  re-run post-deploy 11/11 green; currena.ir/asia-pacific live-smoke-
+  verified at 1440×900 en (11 cards · the China section · the Japan
+  section · the 2 index-only sections · the Pacific-NZ section · the
+  zoom (6) · the 3 cross-links @ 44px · the In-build chip ABSENT · 0px
+  overflow · 0 page errors · the live value china-pmi "49.3 index") +
+  at 360×844 fa (RTL, dir=rtl, h1="آسیا و اقیانوسیه", the live value
+  china-pmi "۴۹٫۳ به‌صورت شاخص", 0px overflow · 0 page errors); the
+  pre-deploy 4-leg browser pass (the freshly built SPA through the
+  local preview server, /api proxied to currena.ir) at 1440×900 AND
+  360×844 in BOTH en and fa — the 11 cards (China=7/Japan=2/NZ=2), the
+  zoom (6 N225/KOSPI/HSI/SSEC/TAIEX/NIFTY50), the 5 sections (3 card +
+  2 index-only), the 3 cross-links all at 44px, the In-build chip
+  ABSENT on all 4 legs, NO horizontal scroll at any width in any locale
+  (overflow 0px on all 4 legs), ZERO console/page errors across all 4
+  legs; the fa legs dir=rtl + Persian digits (۴۹٫۳ به‌صورت شاخص ·
+  ۷۳٫۶ میلیون تن · ۲٫۷۰٪); the Global + Gold + World Markets + USA +
+  Europe + Australia + legacy /insights surfaces intact.
+- **Rollback:** `wrangler rollback` — /asia-pacific returns to the S14
+  page (the 11 placed cards + the In-build chip present); nothing else
+  moves (the S15 change is the chip removal + the test assertion flip +
+  the budget comment only).
+- **Who decided:** the gates session (S15) under the owner's standing
+  delegation ("the deploy at the close is the owner's standing").
+  **Revisit:** none needed; the record lives in `docs/DEPLOY.md`
+  2026-11-09g.

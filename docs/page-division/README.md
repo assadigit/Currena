@@ -104,7 +104,12 @@ regeneration (`pnpm placement:generate`).
   is discontinued, Rule 5 — BD-S14a; the honest In-build chip stays
   until the S15 gates pass) 2026-11-09 — DEPLOYED LIVE at
   `/asia-pacific` (version `68281479`; the live acceptance record in
-  `docs/DEPLOY.md` 2026-11-09f).** Next: Session 15/30 (S15 — the Asia
+  `docs/DEPLOY.md` 2026-11-09f).** S15 (the Asia gates: the card-render
+  audit, the freshness-within-cadence-grace audit honest, the
+  mobile/ARIA pass pinned + browser-verified, the In-build chip retired
+  — Phase F CLOSED) 2026-11-09 — DEPLOYED LIVE at `/asia-pacific`
+  (version `6f96cd9a`; the live acceptance record in `docs/DEPLOY.md`
+  2026-11-09g).** Next: Session 16/30 (S16 — the Australia build &
   gates). See the roadmap's progress board for the current position.
 
 ## The one rule that trumps everything

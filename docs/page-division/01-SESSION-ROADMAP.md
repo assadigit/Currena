@@ -1094,8 +1094,89 @@ re-run post-deploy 11/11 green, every other surface intact. Decisions:
 BD-S14a (the §15 CPI fills VERIFIED STALE — Rule 5) · BD-S14b (the Asia
 page build) + the deploy, all in `docs/DECISIONS.md`.
 
-### ☐ S15 — Asia gates · `Session 15/30`
+### ✅ S15 — Asia gates · `Session 15/30` · delivered 2026-11-09 · **Phase F CLOSED**
 - Fill verification vs national statistics releases; card audit; hand-off.
+
+**S15 delivery record (2026-11-09):** Phase F (Asia & Pacific) is CLOSED —
+the Asia gates session applied the S13 Europe-gates pattern to Asia over
+the S14-complete /asia-pacific page (the 11 placed cards, no new layers —
+the gates + polish session). **(a) The card-render audit + the live §21
+diff as the session's own gate (BD-S15a — the S11 UsaPage.test.tsx /
+S13 EuropePage.test.tsx pattern mirrored for Asia):** the S14
+`AsiaPage.test.tsx` render audit (7 tests — ALREADY in place) is re-
+audited as the session's own gate, its chip assertion flipped from
+`getByText('In build').toBeTruthy()` → `queryByText('In build')
+.toBeNull()` + a final `not.toContain('In build')` (the EuropePage S13
+pattern). The live `pd-s14-backtest.ts` re-run against PRODUCTION twice
+(pre-deploy and post-deploy): 11 cards · 11 green · 0 red (page ≡
+engine byte-for-byte — china-pmi 49.3 warning · china-cpi 0.9 normal ·
+oecd-cli-cn 97.41 context · gpr-china 0.84 context · gpr-taiwan 0.08
+context · china-property-investment -20.6 context · china-steel-output
+7359 context · jgb-10y 2.696 context · boj-rate 1.043 context ·
+nz-short-rate 3.25 context · nz-10y 4.94 context), the placement group
+membership china 7 / japan 2 / korea-taiwan-hk 0 index-only / india 0
+index-only / pacific-nz 2 + 11/11 carried, the freshness audit honest
+(all 11 within cadence grace — Asia has NO honest-stale path to
+exercise, unlike Europe's btp-bund-spread). **(b) The freshness-within-
+cadence-grace audit as the session's own gate** (the pure
+`auditUsaFreshness` over `ASIA_CARD_IDS` — already wired in S14's
+`asia-backtest-core.ts` + the offline suite; S15 runs it live as the
+gate — the pd-s14-backtest.ts step 4, all 11 within grace). **(c) The
+mobile/ARIA pass (BD-S15b — spec §18 D-48):** the cross-link cards
+already carry `min-h-[44px]` (S14 applied the S11/S13 lessons), the
+section headings carry the `<section aria-label>` + `<h2>` semantics,
+the RTL flow rides the logical CSS + the `<bdi dir>` joins — the render
+audit PINS the 44px + the section semantics + the fa/RTL rendering, and
+the 4-leg browser pass confirmed all green. No code change was needed
+(the S14 build carried the S11/S13 lessons); the pass is the
+verification + the pin. **(d) The In-build chip retired + the Asia
+budget row tightened (BD-S15c — BD-S14b's completion):** the Asia
+page's honest "In build" status chip is REMOVED from the heading block
+— the 11 placed ids' gates pass (§21 card audit 11/11 green, the
+freshness audit honest, the mobile/ARIA pass landed); the page's 11
+placed cards are complete and verified, no honest "in build" claim
+remains. The `pd.statusBuilding` key stays for `RegionPage` (Australia)
++ `PagePlaceholder` (Commodities/Currencies). The Asia budget row's
+COMMENT is tightened (the S13 Europe pattern): the 16/6 ceiling holds;
+the chip removal shaved ~0.28kB raw (the measured chunk 12.47/3.47 →
+12.19/3.37). **(e) The §15 FRED-only CPI fills carried forward
+(BD-S15d — Rule 5):** the three D-36 Asia fills (Japan · Korea · India
+CPI YoY) are NOT ingested in S15 — the candidates stay verified-
+pending-ingest (Rule 5 — BD-S14a: the FRED OECD mirror family is
+VERIFIED STALE/discontinued). A viable monthly source must be picked
+(the national statistics bureaus directly, a fresh FRED/IMF IFS series,
+or the World Bank annual as a lower-resolution fallback) — a dedicated
+fill session. **THE BROWSER PASS** (the freshly built SPA through the
+local preview server, /api proxied to currena.ir, over the REAL
+production data): 1440×900 AND 360×844 in BOTH en and fa (RTL, Persian
+digits) — 11 cards (China=7/Japan=2/NZ=2), the zoom (6 N225/KOSPI/HSI/
+SSEC/TAIEX/NIFTY50), the 5 sections (3 card + 2 index-only), the 3
+cross-links all at 44px, the In-build chip ABSENT on all 4 legs, NO
+horizontal scroll at any width in any locale (overflow 0px on all 4
+legs), ZERO console/page errors across all 4 legs; the fa legs dir=rtl
++ h1="آسیا و اقیانوسیه" + Persian digits (۴۹٫۳ به‌صورت شاخص · ۷۳٫۶
+میلیون تن · ۲٫۷۰٪). **GATES ALL GREEN** (2m 31s: secret scan 8/986 ·
+tsc 6/6 · eslint 0/0 · copy:audit clean (no new fa strings — S15 only
+removed the chip + flipped the test assertion + tightened the budget
+comment) · narrator vocabulary in sync + eval 50 · layer1
+11,819/11,819 · **the suite 14,985** (unchanged from S14 — the test
+count is the same; the assertions changed) · build + budgets held —
+entry 270.48/81.91, the Asia lazy chunk 12.19/3.37 vs its 16/6 row).
+**Deployed + live-verified** (version `6f96cd9a` 2026-11-09 ~13:56 UTC,
+the owner's standing; the deploy-lock check ran first — S14's
+`68281479` @ 100%): currena.ir/asia-pacific live-smoke-verified at
+1440×900 en (11 cards · the 5 sections · the zoom · the 3 cross-links ·
+the In-build chip ABSENT · 0px overflow · 0 page errors · the live
+value china-pmi "49.3 index") + at 360×844 fa (RTL, dir=rtl,
+h1="آسیا و اقیانوسیه", the live value china-pmi "۴۹٫۳ به‌صورت شاخص",
+0px overflow · 0 page errors), the §21 backtest re-run against
+production post-deploy 11/11 green, every other surface intact.
+Decisions: BD-S15a (the card-render audit + the live §21 diff as the
+session's gate) · BD-S15b (the mobile/ARIA pass — 44px + semantics +
+RTL, pinned + browser-verified) · BD-S15c (the In-build chip retired +
+the Asia budget row tightened — BD-S14b's completion) · BD-S15d (the
+§15 CPI fills carried forward — Rule 5) + the deploy, all in
+`docs/DECISIONS.md`.
 
 ## Phase G — Australia (S16)
 
@@ -1167,7 +1248,7 @@ page build) + the deploy, all in `docs/DECISIONS.md`.
 | C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ✅ S8 2026-11-08 (deployed `fde50a95`, the four REGION zoom maps — PHASE C CLOSED) |
 | D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) · ✅ S10 2026-11-09 (deployed `18907d4d`, tiers 3–5 + the TIC board — the 72 cards complete) · ✅ S11 2026-11-09 (deployed `4f288272`, the USA gates — the freshness audit formalized, the mobile/ARIA polish, the In-build chip retired — **PHASE D CLOSED**) |
 | E Europe | S12–S13 | ✅ S12 2026-11-09 (deployed `84833135`, the EU + non-EU UK sections + the zoom + the cross-links — the 8 placed ids, the §15 fills verified-pending-ingest — Phase E OPEN) · ✅ S13 2026-11-09 (deployed `b11fd84f`, the Europe gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE E CLOSED**) |
-| F Asia & Pacific | S14–S15 | ☐ |
+| F Asia & Pacific | S14–S15 | ✅ S14 2026-11-09 (deployed `68281479`, the five sub-regions D-35 — China 7 · Japan 2 · Korea/Taiwan/HK index-only · India index-only · Pacific-NZ 2 = 11 placed cards, the S8 zoom, the cross-links, the §15 CPI fills VERIFIED STALE — Rule 5 — BD-S14a; the honest In-build chip stays until S15 — Phase F OPEN) · ✅ S15 2026-11-09 (deployed `6f96cd9a`, the Asia gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE F CLOSED**) |
 | G Australia | S16 | ☐ |
 | H Commodities | S17 | ☐ |
 | I Currency Pairs | S18 | ☐ |
@@ -1175,10 +1256,11 @@ page build) + the deploy, all in `docs/DECISIONS.md`.
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 13/30 delivered 2026-11-09 · 17 remaining — next
-action: Session 14/30 (S14, Phase F opens — Asia build + fills: the five
-sub-regions D-35 — China · Japan · Korea/Taiwan/HK · India · Pacific
-(NZ D-17) — the Asia zoom map, the FRED CPI fills for JP/KR/IN D-36,
-verify each candidate series live before ingest, Rule 5; the §15 Europe
-fills carried forward to a dedicated fill session — BD-S13d, the
-candidates recorded in DECISIONS.md BD-S12a).**
+**Current position: Session 15/30 delivered 2026-11-09 · 15 remaining — next
+action: Session 16/30 (S16, Phase G opens — Australia build & gates: the AU
+Markets board on top, the 5-gauge structure unchanged (D-37), the 28 cards,
+the moved-out seat chips link to new homes (currencies/commodities/asia/
+gold); the §15 FRED-only CPI fills for Asia (BD-S14a/BD-S15d) stay carried
+forward to a dedicated fill session — pick a viable monthly source for
+JP/KR/IN: the national statistics bureaus directly, a fresh FRED/IMF IFS
+series, or the World Bank annual as a lower-resolution fallback).**
