@@ -18,7 +18,7 @@ import { describe, expect, it } from 'vitest';
 import type { IndicatorReading, TicHolder, TicSnapshot } from '@currena/core';
 import { THEMATIC_GAUGE_MEMBER_IDS, pageReadingIds, pageMirrorIds } from '@currena/insights/page-division';
 import { TIC_CUSTODY_HUBS } from '@currena/insights/tic';
-import { backtestUsaPage, backtestUsaTicBoard, stableStringify, TIC_EXPECTED_HOLDERS } from './usa-backtest-core';
+import { auditUsaFreshness, backtestUsaPage, backtestUsaTicBoard, stableStringify, TIC_EXPECTED_HOLDERS, type FreshnessRegistryEntry } from './usa-backtest-core';
 import { USA_CARD_IDS } from './usa-tiles';
 
 function reading(id: string, partial: Partial<IndicatorReading> = {}): IndicatorReading {
@@ -339,5 +339,120 @@ describe('backtestUsaTicBoard — the S10 offline §21 suite (the tier-6 board)'
     // the engine's true total).
     expect(result.checks.find((c) => c.label.startsWith('tic holder japan: the drawing'))!.ok).toBe(false);
     expect(result.red).toBeGreaterThan(0);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * The S11 freshness audit (auditUsaFreshness) — the §21 "Data audit"
+ * leg formalized as an offline suite. The audit's own logic is pinned
+ * here on synthetic boards so a regression in the live gate's logic
+ * (pd-s10-backtest.ts calls the SAME function) is caught before the
+ * live run. Three cases: every card within grace (green), the honest
+ * stale path (one card beyond grace AND carrying the engine's stale
+ * status — the govt-interest-revenue case, green), and the FAIL-CLOSED
+ * proof (a card beyond grace the engine forgot to flag — RED, never a
+ * silent stale-by-age card).
+ * ------------------------------------------------------------------ */
+
+/** A minimal registry the synthetic boards read — three ids with the
+ *  cadence/maxAgeDays shape data/indicators.json carries. */
+function freshnessRegistry(entries: Record<string, { cadence: string; maxAgeDays: number | null }>): Map<string, FreshnessRegistryEntry> {
+  return new Map(Object.entries(entries));
+}
+
+describe('auditUsaFreshness — the S11 §21 freshness audit (formalized)', () => {
+  it('GREEN: every seated card within its cadence grace', () => {
+    const now = new Date('2026-11-09T12:00:00Z');
+    const readings: IndicatorReading[] = [
+      reading('fed-target', { asOf: '2026-11-07', status: 'normal' }), // 2d old, daily maxAge 5
+      reading('us-cpi-yoy', { asOf: '2026-10-01', status: 'normal' }), // 39d old, monthly maxAge 75
+    ];
+    const registry = freshnessRegistry({
+      'fed-target': { cadence: 'daily', maxAgeDays: 5 },
+      'us-cpi-yoy': { cadence: 'monthly', maxAgeDays: 75 },
+    });
+    const result = auditUsaFreshness(readings, registry, ['fed-target', 'us-cpi-yoy'], now);
+    expect(result.checks).toHaveLength(1);
+    expect(result.checks[0]!.ok).toBe(true);
+    expect(result.withinGrace).toBe(2);
+    expect(result.beyond).toHaveLength(0);
+    expect(result.checks[0]!.detail).toBe('2 cards within grace');
+  });
+
+  it('GREEN: the honest-stale path — a card beyond grace AND carrying the engine\'s stale status (the govt-interest-revenue case)', () => {
+    const now = new Date('2026-11-09T12:00:00Z');
+    // govt-interest-revenue: quarterly, maxAge 215d; the synthetic board
+    // seats it at 2026-04-01 (222d beyond grace at the 2026-11-09 clock —
+    // the SAME age the live board carries) AND honestly status: 'stale'.
+    const readings: IndicatorReading[] = [
+      reading('fed-target', { asOf: '2026-11-07', status: 'normal' }),
+      reading('govt-interest-revenue', { asOf: '2026-04-01', status: 'stale' }),
+    ];
+    const registry = freshnessRegistry({
+      'fed-target': { cadence: 'daily', maxAgeDays: 5 },
+      'govt-interest-revenue': { cadence: 'quarterly', maxAgeDays: 215 },
+    });
+    const result = auditUsaFreshness(readings, registry, ['fed-target', 'govt-interest-revenue'], now);
+    expect(result.checks[0]!.ok).toBe(true);
+    expect(result.withinGrace).toBe(1);
+    expect(result.beyond).toHaveLength(1);
+    expect(result.beyond[0]!.id).toBe('govt-interest-revenue');
+    expect(result.beyond[0]!.honest).toBe(true);
+    expect(result.beyond[0]!.status).toBe('stale');
+    // The detail speaks the finding — the live gate's own wording.
+    expect(result.checks[0]!.detail).toContain('govt-interest-revenue 222d > 215d');
+    expect(result.checks[0]!.detail).toContain('status stale');
+  });
+
+  it('FAIL-CLOSED: a card beyond grace the engine forgot to flag reads RED (never a silent stale-by-age card)', () => {
+    const now = new Date('2026-11-09T12:00:00Z');
+    // The same card, but the engine did NOT flag it stale (status 'normal')
+    // — the audit catches the engine's own miss, exactly what §21 forbids.
+    const readings: IndicatorReading[] = [
+      reading('fed-target', { asOf: '2026-11-07', status: 'normal' }),
+      reading('govt-interest-revenue', { asOf: '2026-04-01', status: 'normal' }),
+    ];
+    const registry = freshnessRegistry({
+      'fed-target': { cadence: 'daily', maxAgeDays: 5 },
+      'govt-interest-revenue': { cadence: 'quarterly', maxAgeDays: 215 },
+    });
+    const result = auditUsaFreshness(readings, registry, ['fed-target', 'govt-interest-revenue'], now);
+    expect(result.checks[0]!.ok).toBe(false);
+    expect(result.beyond).toHaveLength(1);
+    expect(result.beyond[0]!.honest).toBe(false);
+    expect(result.beyond[0]!.status).toBe('normal');
+  });
+
+  it('exempt cards never trip the audit: maxAgeDays null (per-change) and asOf null (unavailable)', () => {
+    const now = new Date('2026-11-09T12:00:00Z');
+    const readings: IndicatorReading[] = [
+      reading('boe-rate', { asOf: '2024-01-01', status: 'normal' }), // very old, but per-change (maxAge null)
+      reading('usdjpy', { asOf: null, status: 'unavailable', value: null }), // unavailable, asOf null
+      reading('fed-target', { asOf: '2026-11-07', status: 'normal' }),
+    ];
+    const registry = freshnessRegistry({
+      'boe-rate': { cadence: 'per-change', maxAgeDays: null },
+      usdjpy: { cadence: 'daily', maxAgeDays: 4 },
+      'fed-target': { cadence: 'daily', maxAgeDays: 5 },
+    });
+    const result = auditUsaFreshness(readings, registry, ['boe-rate', 'usdjpy', 'fed-target'], now);
+    expect(result.checks[0]!.ok).toBe(true);
+    expect(result.beyond).toHaveLength(0);
+    expect(result.withinGrace).toBe(1); // only fed-target counted
+  });
+
+  it('absent cards (the honest absent twin) are skipped — never a finding', () => {
+    const now = new Date('2026-11-09T12:00:00Z');
+    // rstar-us is absent from the projection (public-mode licence gap);
+    // the audit never trips on a card that isn't seated.
+    const readings: IndicatorReading[] = [reading('fed-target', { asOf: '2026-11-07', status: 'normal' })];
+    const registry = freshnessRegistry({
+      'fed-target': { cadence: 'daily', maxAgeDays: 5 },
+      'rstar-us': { cadence: 'per-change', maxAgeDays: null },
+    });
+    const result = auditUsaFreshness(readings, registry, ['fed-target', 'rstar-us'], now);
+    expect(result.checks[0]!.ok).toBe(true);
+    expect(result.withinGrace).toBe(1);
+    expect(result.beyond).toHaveLength(0);
   });
 });

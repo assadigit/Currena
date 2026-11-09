@@ -427,6 +427,94 @@ export function backtestUsaTicBoard(
   return { checks, green: checks.filter((c) => c.ok).length, red: checks.filter((c) => !c.ok).length };
 }
 
+/* ------------------------------------------------------------------ *
+ * The freshness audit vs cadence grace (S11, spec §21's "Data audit"
+ * leg — "all listed cards render with value, 10-year position, and
+ * freshness within cadence grace"). PURE so the offline suite
+ * (usa-backtest.test.ts) pins the audit's own logic on synthetic
+ * boards, and the LIVE script (pd-s10-backtest.ts) drives the same
+ * function over the registry read from data/indicators.json — no logic
+ * drift between the test and the live gate.
+ *
+ * The audit's rule (the §21 honest-stale path): a card beyond its
+ * registry's own maxAgeDays is BEYOND GRACE; it passes iff the engine
+ * has already flagged it `status: 'stale'` (the page speaks the engine's
+ * own word — never a silent stale-by-age card the engine missed). A
+ * card with `maxAgeDays: null` (per-change/manual) or `asOf: null`
+ * (unavailable) is exempt — age never governs them.
+ * ------------------------------------------------------------------ */
+
+/** One registry entry the audit reads (the generated
+ *  `data/indicators.json` shape — cadence + maxAgeDays per id). */
+export interface FreshnessRegistryEntry {
+  cadence: string;
+  maxAgeDays: number | null;
+}
+
+/** One beyond-grace finding — the audit's own honest report. */
+export interface FreshnessFinding {
+  id: string;
+  ageDays: number;
+  maxAgeDays: number;
+  cadence: string;
+  status: string;
+  /** true iff the engine already flagged this card `stale` — the honest
+   *  path that keeps the audit green (the govt-interest-revenue case). */
+  honest: boolean;
+}
+
+/** The freshness audit's result — the check the live gate prints, plus
+ *  the structured findings for the offline suite's assertions. */
+export interface FreshnessAuditResult {
+  checks: UsaBacktestCheck[];
+  withinGrace: number;
+  beyond: FreshnessFinding[];
+}
+
+/**
+ * The S11 freshness audit. For each seated card id, classifies the
+ * reading's asOf age against the registry's own maxAgeDays; the audit
+ * PASSES iff every beyond-grace card honestly carries the engine's
+ * `stale` status. Returns the one §21 check + the structured findings
+ * (the offline suite asserts the fail-closed path on a synthetic board
+ * the engine forgot to flag).
+ */
+export function auditUsaFreshness(
+  readings: readonly IndicatorReading[],
+  registry: ReadonlyMap<string, FreshnessRegistryEntry>,
+  cardIds: readonly string[],
+  now: Date,
+): FreshnessAuditResult {
+  const byId = new Map(readings.map((r) => [r.id as string, r]));
+  let withinGrace = 0;
+  const beyond: FreshnessFinding[] = [];
+  for (const id of cardIds) {
+    const r = byId.get(id);
+    if (r === undefined) continue; // the honest absent twin, reported above
+    const meta = registry.get(id);
+    if (meta === undefined || meta.maxAgeDays === null || r.asOf === null) continue;
+    const ageDays = Math.floor((now.getTime() - Date.parse(`${r.asOf}T00:00:00Z`)) / 86_400_000);
+    if (ageDays <= meta.maxAgeDays) {
+      withinGrace += 1;
+    } else {
+      beyond.push({ id, ageDays, maxAgeDays: meta.maxAgeDays, cadence: meta.cadence, status: r.status, honest: r.status === 'stale' });
+    }
+  }
+  const passed = beyond.length === 0 || beyond.every((f) => f.honest);
+  const detail =
+    beyond.length === 0
+      ? `${withinGrace} cards within grace`
+      : `${withinGrace} within · beyond-grace: ${beyond.map((f) => `${f.id} ${f.ageDays}d > ${f.maxAgeDays}d (${f.cadence}, status ${f.status})`).join(' · ')}`;
+  const checks: UsaBacktestCheck[] = [
+    {
+      label: `every seated tier card's asOf is within its cadence grace (or honestly stale-flagged by the engine)`,
+      ok: passed,
+      detail,
+    },
+  ];
+  return { checks, withinGrace, beyond };
+}
+
 /**
  * The LIVE script's card-membership sanity basis: the 72 S9+S10-scope
  * card ids, in placement order (re-exported from usa-tiles — never

@@ -54,7 +54,7 @@ import { dirname, resolve } from 'node:path';
 import { InsightsSnapshotSchema, PageProjectionSchema, TicSnapshotSchema } from '@currena/core';
 import type { TicSnapshot } from '@currena/core';
 import { pageGroupIds } from '@currena/insights/page-division';
-import { backtestUsaPage, backtestUsaTicBoard, USA_BACKTEST_CARD_IDS, TIC_EXPECTED_HOLDERS } from '../src/routes/page-division/usa-backtest-core';
+import { auditUsaFreshness, backtestUsaPage, backtestUsaTicBoard, USA_BACKTEST_CARD_IDS, TIC_EXPECTED_HOLDERS, type FreshnessRegistryEntry } from '../src/routes/page-division/usa-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');
@@ -79,7 +79,7 @@ async function getJson<T>(path: string, schema: { safeParse: (v: unknown) => { s
 
 /** The generated indicator registry (cadence + maxAgeDays per id) — the
  *  freshness audit's own basis, read from the repo's generated file. */
-function registryMaxAge(): Map<string, { cadence: string; maxAgeDays: number | null }> {
+function registryMaxAge(): Map<string, FreshnessRegistryEntry> {
   const here = dirname(fileURLToPath(import.meta.url));
   const registry = JSON.parse(readFileSync(resolve(here, '../../../data/indicators.json'), 'utf8')) as {
     indicators: { id: string; cadence: string; maxAgeDays: number | null }[];
@@ -166,34 +166,20 @@ async function main(): Promise<void> {
     allCards.length === 0 ? '72/72 present' : `missing: ${allCards.join(', ')}`,
   );
 
-  /* ---------- 5. The freshness audit vs cadence grace ---------- */
+  /* ---------- 5. The freshness audit vs cadence grace (S11: the pure
+     *              auditUsaFreshness — same function the offline suite
+     *              pins, no logic drift between the test and the gate) ---------- */
   console.log('\n## 5. Freshness within cadence grace (the registry\'s own maxAgeDays)');
 
   const registry = registryMaxAge();
-  const now = Date.now();
-  let withinGrace = 0;
-  const beyond: string[] = [];
-  const byId = new Map(usa.readings.map((r) => [r.id as string, r]));
-  for (const id of USA_BACKTEST_CARD_IDS as readonly string[]) {
-    const r = byId.get(id);
-    if (r === undefined) continue; // the honest absent twin, reported above
-    const meta = registry.get(id);
-    if (meta === undefined || meta.maxAgeDays === null || r.asOf === null) continue;
-    const ageDays = Math.floor((now - Date.parse(`${r.asOf}T00:00:00Z`)) / 86_400_000);
-    if (ageDays <= meta.maxAgeDays) {
-      withinGrace += 1;
-    } else {
-      beyond.push(`${id} ${ageDays}d > ${meta.maxAgeDays}d (${meta.cadence}, status ${r.status})`);
-    }
+  const freshness = auditUsaFreshness(usa.readings, registry, USA_BACKTEST_CARD_IDS, new Date());
+  for (const c of freshness.checks) {
+    console.log(`  ${c.ok ? '✓' : '✗'} ${c.label}: ${c.detail}`);
+    if (!c.ok) failures++;
   }
-  check(
-    `every seated tier card's asOf is within its cadence grace (or honestly stale-flagged by the engine)`,
-    beyond.length === 0 || beyond.every((b) => b.includes('status stale')),
-    beyond.length === 0 ? `${withinGrace} cards within grace` : `${withinGrace} within · beyond-grace: ${beyond.join(' · ')}`,
-  );
-  if (beyond.length > 0) {
-    const honest = beyond.filter((b) => b.includes('status stale'));
-    notes.push(`${beyond.length} card(s) beyond grace — ${honest.length} honestly carrying the engine's stale status; the rest are the cadence audit's findings`);
+  if (freshness.beyond.length > 0) {
+    const honest = freshness.beyond.filter((f) => f.honest);
+    notes.push(`${freshness.beyond.length} card(s) beyond grace — ${honest.length} honestly carrying the engine's stale status; the rest are the cadence audit's findings`);
   }
 
   /* ---------- the one-screen summary ---------- */
