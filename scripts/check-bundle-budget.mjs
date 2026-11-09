@@ -1053,6 +1053,17 @@ const BUDGETS = [
   // adapter on /australia — one drawing, one vocabulary, D-48). Ceiling
   // 15/4.5 per the tight convention (~2.7 kB raw / ~1.0 kB gz headroom).
   { pattern: /^markets-au-[\w-]+\.js$/, raw: 15_000, gz: 4_500, label: 'shared AU Markets board chunk (page-division S16 — the reused drawing)' },
+  // Page-division S17 (2026-11-11): the Commodities route — the four
+  // commodity groups (Energy · Metals · Agriculture · Digital) + the
+  // Trade routes & supply group (D-38/D-39) — 24 cards with the §21 trio
+  // + the gold cross-link to /gold (D-19/D-27). The page's own chunk
+  // carries the shell + CommoditiesTierCards + the lean commodities-tiles
+  // (the 24 display configs + the gold cross-link href + the
+  // value-text join), with NO shared drawing (no zoom, no board — the
+  // leanest page-division chunk). Ceiling 16/5 per the tight convention
+  // (~2 kB raw / ~1 kB gz headroom over Europe's 14/5 — Commodities has
+  // 24 cards vs Europe's 8, but no zoom section).
+  { pattern: /^CommoditiesPage-[\w-]+\.js$/, raw: 16_000, gz: 5_000, label: 'Commodities page lazy chunk (page-division S17)' },
   // Page-division S9 (2026-11-09): the USA route — the D-30 verdict
   // strip + the D-29 tier-1/tier-2 cards above the SAME S8 zoom section.
   // Measured 15.21/4.28 at first build: the page's own chunk carries the

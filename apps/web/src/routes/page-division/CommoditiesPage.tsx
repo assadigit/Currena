@@ -21,13 +21,13 @@
  * connection and survives a feed outage, clearly labelled (M-17, the
  * BD-S5a sentence).
  *
- * The honest "In build" chip is PRESENT at the S17 build (the S9/S10/
- * S12/S14/S16 build-session trajectory) and RETIRES at the S17 gates
- * pass — the build and the gates ship in this one session (the roadmap's
- * Phase H is a single S17), so once the §21 diff, the freshness audit,
- * the render audit and the browser pass are green, keeping the chip would
- * be dishonest in the other direction (BD-S15c/BD-S16c's reasoning); it
- * is removed before the deploy and the render audit asserts it ABSENT.
+ * The honest "In build" chip is RETIRED at the S17 gates pass (BD-S17c —
+ * the S13 Europe / S15 Asia / S16 Australia retirement trajectory): the
+ * build and the gates ship in this one session (the roadmap's Phase H is
+ * a single S17), so once the §21 diff, the freshness audit, the render
+ * audit and the browser pass are green, keeping the chip would be
+ * dishonest in the other direction (BD-S15c/BD-S16c's reasoning); it is
+ * removed before the deploy and the render audit asserts it ABSENT.
  *
  * Platform: browser only — this module lives in the lazy Commodities route
  * chunk, never the entry graph.
@@ -160,23 +160,20 @@ export function CommoditiesPage(): React.JSX.Element {
   // sections — only when the projection has spoken (fresh or cached).
   return (
     <div className="mx-auto w-full max-w-[560px] px-3 py-1.5 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1280px] lg:px-8 lg:py-6">
-      {/* The heading block: title + the honest In-build chip + the
-          one-line purpose + the data-as-of line (the BD-S5a sentence
-          replaces the plain line when the copy is the cached one). */}
+      {/* The heading block: title + the one-line purpose + the data-as-of
+          line (the BD-S5a sentence replaces the plain line when the copy
+          is the cached one). */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.commodities.title')}</h1>
-          {/* The In-build chip is PRESENT at the S17 build (the S9/S10/
-           * S12/S14/S16 build-session trajectory — the §21 diff, the
-           * freshness audit, the render audit and the browser pass have
-           * not yet run at this checkpoint). It RETIRES at the S17 gates
-           * pass (BD-S17c — the S13 Europe / S15 Asia / S16 Australia
-           * retirement trajectory mirrored). The pd.statusBuilding key
-           * is the PagePlaceholder's own (the build-session chip every
-           * later session retires). */}
-          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200">
-            {t('pd.statusBuilding')}
-          </span>
+          {/* The In-build chip is RETIRED (BD-S17c — the S17 gates pass:
+           * the §21 backtest 24/24 green vs production, the freshness
+           * audit honest, the render audit 7/7 green). The page's cards
+           * are complete and verified; no honest "in build" claim
+           * remains. The pd.statusBuilding key stays for the
+           * not-yet-built page (PagePlaceholder — Currencies). Mirrors
+           * the S13 Europe / S15 Asia / S16 Australia retirement
+           * trajectory (BD-S16c). */}
         </div>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.commodities.purpose')}
