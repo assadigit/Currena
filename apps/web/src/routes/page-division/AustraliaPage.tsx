@@ -229,16 +229,14 @@ export function AustraliaPage(): React.JSX.Element {
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.australia.title')}</h1>
-          {/* The honest In-build chip — the build-session trajectory
-           * (S9/S10/S12/S14). RETIRES at the S16 gates pass: the build
-           * and the gates ship in this one session (Phase G = S16), so
-           * once the §21 diff, the freshness audit, the render audit and
-           * the browser pass are green the chip comes off before the
-           * deploy (BD-S15c's reasoning — keeping it after its gate
-           * passed would be dishonest in the other direction). */}
-          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-[10.5px] font-bold text-amber-900 sm:px-3 sm:py-1 sm:text-xs dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200">
-            {t('pd.statusBuilding')}
-          </span>
+          {/* The In-build chip is RETIRED (BD-S16c — the S16 gates pass:
+           * the §21 backtest 28/28 green vs production, the freshness
+           * audit honest, the render audit 7/7 green). The page's cards
+           * are complete and verified; no honest "in build" claim
+           * remains. The pd.statusBuilding key stays for the
+           * not-yet-built pages (PagePlaceholder — Commodities +
+           * Currencies). Mirrors the S13 Europe / S15 Asia retirement
+           * trajectory (BD-S15c). */}
         </div>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.australia.purpose')}

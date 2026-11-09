@@ -261,19 +261,15 @@ describe('AustraliaPage', () => {
       expect(document.querySelector('[data-australia-section="inflation-rates"]')).not.toBeNull();
     });
 
-    // The shell: title + purpose + the data-as-of line. The honest In-build
-    // chip is PRESENT at the S16 build session (the S9/S10/S12/S14
-    // build-session trajectory). RETIRES at the S16 gates pass: the build and
-    // the gates ship in this one session (Phase G = S16), so once the §21
-    // diff, the freshness audit, the render audit and the browser pass are
-    // green the chip comes off before the deploy (BD-S15c's reasoning —
-    // keeping it after its gate passed would be dishonest in the other
-    // direction).
+    // The shell: title + purpose + the data-as-of line. The In-build
+    // chip is RETIRED (S16's gate pass — BD-S16c's completion); it must
+    // NOT render on the Australia page anymore. Mirrors the S13 Europe /
+    // S15 Asia retirement trajectory (BD-S15c).
     const h1 = document.querySelector('h1');
     expect(h1).not.toBeNull();
     expect(h1!.textContent).toMatch(/Australia/i);
-    // BUILD-SESSION: flip to queryByText('In build').toBeNull() at the S16 gates-pass chip retirement (BD-S15c trajectory)
-    expect(screen.getByText('In build')).toBeTruthy();
+    // RETIRED at the S16 gates pass (BD-S15c trajectory — the S13 Europe / S15 Asia pattern)
+    expect(screen.queryByText('In build')).toBeNull();
     expect(document.body.textContent).toContain('Data as of');
 
     // The S8 zoom section stays on top of the S16 layers.
@@ -433,6 +429,11 @@ describe('AustraliaPage', () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe('/currencies');
     });
+
+    // The In-build chip is RETIRED AND no "in build" claim remains —
+    // the page's cards are complete and verified (BD-S16c — the S13
+    // Europe / S15 Asia retirement trajectory).
+    expect(document.body.textContent ?? '').not.toContain('In build');
   });
 
   it('the fail-closed path: an absent reading renders the unavailable word, never a guess', async () => {
