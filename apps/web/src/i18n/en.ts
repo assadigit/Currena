@@ -1610,6 +1610,87 @@ export const en = {
       purpose: 'Every commodity, exclusively here — energy, metals, agriculture and digital.',
       summary:
         'Energy · Metals · Agriculture · Digital groups with live prices, plus the trade-routes & supply section (chokepoints, SPR, crude stocks, GSCPI). Gold cross-links to the Gold page.',
+      /* ---- S17 (2026-11-11): the Commodities page's own copy (D-2/D-19/
+       * D-27/D-28/D-38/D-39/D-40, spec §11). The card names, the unit words
+       * and the position/band/status words are the corpus's own, pinned
+       * byte-for-byte by commodities-copy-pin.test.ts; the loading/error
+       * lines, the group headings + intros and the gold cross-link words
+       * are fresh. */
+      loadingLine: 'Reading the commodities numbers…',
+      errorTitle: 'The Commodities page is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      groups: {
+        energy: {
+          title: 'Energy',
+          intro: 'Oil, gas, LNG and coal prices, plus US crude stocks, the strategic reserve and field production.',
+        },
+        metals: {
+          title: 'Metals',
+          intro: 'Silver, platinum, copper and iron ore prices. The gold ratios (gold/silver, gold/platinum, gold/oil) stay on the Gold page.',
+        },
+        agriculture: {
+          title: 'Agriculture',
+          intro: 'The world food index and the two grain ground-truths — wheat and maize.',
+        },
+        digital: {
+          title: 'Digital',
+          intro: 'Bitcoin and the Crypto Fear & Greed index.',
+        },
+        'trade-routes-supply': {
+          title: 'Trade routes & supply',
+          intro: 'The five maritime chokepoints (Suez, Panama, Bab el-Mandeb, Malacca, Taiwan) and the Global Supply Chain Pressure Index.',
+        },
+      },
+      goldCrossLink: {
+        label: 'Gold and its ratios (gold/silver, gold/platinum, gold/oil) live on the Gold page',
+        text: 'See gold',
+      },
+      cardNames: {
+        brent: 'Oil price (Brent)',
+        wti: 'Oil price (WTI)',
+        natgas: 'US natural gas price',
+        'gas-europe': 'European natural gas price',
+        'lng-japan': 'LNG price (Japan)',
+        'coal-aus': 'Australian coal price',
+        'eia-crude-stocks': 'US crude oil inventories',
+        'us-spr': 'US strategic petroleum reserve',
+        'us-crude-production': 'US crude oil production',
+        'silver-usd': 'Silver price (ounce)',
+        platinum: 'Platinum price (ounce)',
+        'copper-usd': 'Copper price',
+        'iron-ore': 'Iron ore price',
+        'food-index': 'World food prices',
+        wheat: 'Wheat price',
+        maize: 'Maize price',
+        'btc-usd': 'Bitcoin price',
+        'crypto-fng': 'Crypto fear and greed',
+        'chokepoint-suez': 'Suez Canal transits',
+        'chokepoint-panama': 'Panama Canal transits',
+        'chokepoint-bab-el-mandeb': 'Bab el-Mandeb transits',
+        'chokepoint-malacca': 'Strait of Malacca transits',
+        'chokepoint-taiwan': 'Taiwan Strait transits',
+        gscpi: 'Global supply chain pressure',
+      },
+      units: {
+        usd: 'US$',
+        index: 'index',
+        barrels: 'm barrels',
+        'barrels-per-day': 'm barrels a day',
+        transits: 'transits a day',
+      },
+      positionLow: 'low',
+      positionTypical: 'typical',
+      positionHigh: 'high',
+      positionWordLine: '{word} · {band}',
+      bandTop: 'top {p}%',
+      bandMid: 'the middle',
+      bandBottom: 'bottom {p}%',
+      statusWarning: 'Needs attention',
+      statusStale: 'Stale',
+      statusCheckPending: "Can't tell right now",
+      statusUnavailable: "Can't tell right now",
+      valueUnavailable: 'Cannot read yet',
     },
     currencies: {
       title: 'Currency Pairs',
