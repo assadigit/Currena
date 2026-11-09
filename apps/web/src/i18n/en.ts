@@ -1265,6 +1265,56 @@ export const en = {
       purpose: 'The European picture — EU members and non-EU members listed apart.',
       summary:
         'An EU section (ECB rate, euro-area inflation, AAA yields, Bund, BTP–Bund spread) and a separate United Kingdom section, plus the Europe zoom map and verified FRED fills.',
+      /* ---- S12 (2026-11-09): the Europe page's own copy (D-15/D-33,
+       * spec §8 items 1–4). The card names, the unit words, the position +
+       * band words and the status words are the corpus's own, pinned by
+       * europe-copy-pin.test.ts; the section headings + intros + the
+       * loading/error lines + the cross-links copy are fresh. */
+      loadingLine: 'Reading the European numbers…',
+      errorTitle: 'The Europe page is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      eu: {
+        title: 'European Union',
+        intro:
+          'The euro-area rates, prices and growth signals — the ECB’s policy rate, euro-area inflation, the safest and the German long ends, the Italy–Germany spread, and Germany’s leading indicator.',
+      },
+      uk: {
+        title: 'United Kingdom',
+        intro:
+          'The non-EU leg — the Bank of England’s policy rate and the UK 10-year gilt yield. The FTSE 100 rides the Europe zoom map above.',
+      },
+      cardNames: {
+        'ecb-dfr': 'The euro area’s policy rate',
+        'euro-hicp': 'Euro-area inflation (yearly)',
+        'euro-aaa-10y': 'What the safest euro-area governments pay for 10 years',
+        'bund-10y': 'What the German government pays to borrow for 10 years',
+        'btp-bund-spread': 'Italy–Germany 10-year spread',
+        'oecd-cli-de': 'OECD leading indicator (Germany)',
+        'gilt-10y': 'What the UK government pays to borrow for 10 years',
+        'boe-rate': 'The UK central bank’s policy rate',
+      },
+      unitPercent: '%',
+      unitPoints: 'pts',
+      unitIndex: 'index',
+      positionLow: 'low',
+      positionTypical: 'typical',
+      positionHigh: 'high',
+      positionWordLine: '{word} · {band}',
+      bandTop: 'top {p}%',
+      bandMid: 'the middle',
+      bandBottom: 'bottom {p}%',
+      statusWarning: 'Needs attention',
+      statusStale: 'Stale',
+      statusCheckPending: "Can't tell right now",
+      statusUnavailable: "Can't tell right now",
+      valueUnavailable: 'Cannot read yet',
+      crossLinks: {
+        title: 'Currency pairs that move with Europe',
+        intro:
+          'The euro, the Swiss franc and the Turkish lira against the US dollar — their full detail cards live on the Currency Pairs page.',
+        seePairs: 'See pairs',
+      },
     },
     asiaPacific: {
       title: 'Asia & Pacific',

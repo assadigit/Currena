@@ -201,7 +201,7 @@ const EUROPE_GROUPS: readonly PlacementGroup[] = [
     id: 'eu-members',
     ids: ['ecb-dfr', 'euro-hicp', 'euro-aaa-10y', 'bund-10y', 'btp-bund-spread', 'oecd-cli-de'],
     decisions: 'D-15 · D-33',
-    note: '+ the §15 FRED-only fills land with S12 (D-34) after live verification.',
+    note: '+ the §15 FRED-only fills (D-34: euro-area unemployment · industrial production · ECB-SDMX liquidity) are verified-pending-ingest — S12 attempted live verification against the publisher (Rule 5) but FRED serves a JS challenge to the dev sandbox and the ECB M3 SDMX key needs the dimension walk the production adapter does; NO fill ingested unverified. The candidates + the verification status are recorded in DECISIONS.md (BD-S12a) for the next session to verify from production egress + ingest.',
   },
   {
     id: 'non-eu-uk',

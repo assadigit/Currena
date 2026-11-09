@@ -301,7 +301,7 @@ Group notes:
 | `boe-rate` | Bank of England policy rate (overnight) | global/borrowing-costs | non-eu-uk | home |
 
 Group notes:
-- **eu-members** — + the §15 FRED-only fills land with S12 (D-34) after live verification.
+- **eu-members** — + the §15 FRED-only fills (D-34: euro-area unemployment · industrial production · ECB-SDMX liquidity) are verified-pending-ingest — S12 attempted live verification against the publisher (Rule 5) but FRED serves a JS challenge to the dev sandbox and the ECB M3 SDMX key needs the dimension walk the production adapter does; NO fill ingested unverified. The candidates + the verification status are recorded in DECISIONS.md (BD-S12a) for the next session to verify from production egress + ingest.
 - **non-eu-uk** — FTSE rides the markets board (the Europe zoom map).
 
 ### asia-pacific — `/asia-pacific`

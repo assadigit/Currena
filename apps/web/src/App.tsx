@@ -76,15 +76,21 @@ const RegionPage = lazy(() => import('./routes/page-division/RegionPage').then((
 // (RegionIndexSection, shared with the region chunk), with the honest
 // still-building record below (tiers 3–6 + the TIC board are S10's).
 const UsaPage = lazy(() => import('./routes/page-division/UsaPage').then((m) => ({ default: m.UsaPage })));
+// Page-division S12 (2026-11-09): the Europe route leaves the region set
+// — its own lazy chunk (the UsaPage pattern): the EU section + the non-EU
+// UK section (D-33) render above the SAME S8 zoom section (the STOXX50E ·
+// DAX · CAC · FTSE zoom), plus the cross-links to /currencies (§8 item 4).
+const EuropePage = lazy(() => import('./routes/page-division/EuropePage').then((m) => ({ default: m.EuropePage })));
 
 /** The two destination routes that still share the placeholder chunk
  *  (S8: the four region pages left the set — their zoom sections landed
- *  on RegionPage; S9: /usa left it for its own build). */
+ *  on RegionPage; S9: /usa + S12: /europe left it for their own builds). */
 const DESTINATION_ROUTES: ReadonlySet<string> = new Set(['/currencies', '/commodities']);
 
-/** The three region routes that render RegionPage (S8; /usa left the set
- *  in S9 for its own UsaPage chunk). */
-const REGION_ROUTES: ReadonlySet<string> = new Set(['/europe', '/asia-pacific', '/australia']);
+/** The two region routes that render RegionPage (S8; /usa left the set
+ *  in S9 for its own UsaPage chunk; /europe left it in S12 for its own
+ *  EuropePage chunk). */
+const REGION_ROUTES: ReadonlySet<string> = new Set(['/asia-pacific', '/australia']);
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
@@ -247,6 +253,7 @@ export function App() {
             {route === '/gold' ? <GoldPage /> : null}
             {route === '/world-markets' ? <WorldMarketsPage /> : null}
             {route === '/usa' ? <UsaPage /> : null}
+            {route === '/europe' ? <EuropePage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {REGION_ROUTES.has(route) ? <RegionPage /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
