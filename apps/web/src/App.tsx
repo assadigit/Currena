@@ -64,12 +64,6 @@ const GoldPage = lazy(() => import('./routes/page-division/GoldPage').then((m) =
 const WorldMarketsPage = lazy(() =>
   import('./routes/page-division/WorldMarketsPage').then((m) => ({ default: m.WorldMarketsPage })),
 );
-// Page-division S8 (2026-11-08): the REGION pages — Europe, Asia & Pacific
-// and Australia (S9: /usa left the set for its own build), each carrying
-// its D-44 index/map section (the REUSED world map in region-zoom mode)
-// above the S1 placeholder body. ONE lazy chunk serves the region routes
-// (the region rides the route); the entry graph stays untouched.
-const RegionPage = lazy(() => import('./routes/page-division/RegionPage').then((m) => ({ default: m.RegionPage })));
 // Page-division S9 (2026-11-09): the USA route leaves the region set —
 // its own lazy chunk (the S5 GoldPage pattern): the D-30 verdict strip
 // + the D-29 tier-1/tier-2 cards render above the SAME S8 zoom section
@@ -90,17 +84,29 @@ const EuropePage = lazy(() => import('./routes/page-division/EuropePage').then((
 // CPI fills are verified-pending-ingest, Rule 5 — BD-S14a; the chip
 // retires at the S15 gates pass, the Europe S12→S13 trajectory).
 const AsiaPage = lazy(() => import('./routes/page-division/AsiaPage').then((m) => ({ default: m.AsiaPage })));
+// Page-division S16 (2026-11-10): the Australia route leaves the region
+// set — its own lazy chunk (the UsaPage/EuropePage/AsiaPage pattern): the
+// AU Markets board (the REUSED AustralianMarkets drawing through the lean
+// pd.australia adapter, its own board feed) renders above the SAME S8
+// zoom section (the ASX 200 map), then the five gauge sections (D-37: the
+// unchanged 3-voting + 2-shadow structure — 28 cards) with the 11
+// moved-out seat chips linking to their new homes (§10 "Moved out").
+// RegionPage serves no route anymore (all four region routes have their
+// own pages) — the shared RegionIndexSection (the S8 zoom section) rides
+// its own shared chunk every region page loads.
+const AustraliaPage = lazy(() => import('./routes/page-division/AustraliaPage').then((m) => ({ default: m.AustraliaPage })));
 
 /** The two destination routes that still share the placeholder chunk
  *  (S8: the four region pages left the set — their zoom sections landed
- *  on RegionPage; S9: /usa + S12: /europe + S14: /asia-pacific left it
- *  for their own builds). */
+ *  on RegionPage; S9: /usa + S12: /europe + S14: /asia-pacific + S16:
+ *  /australia left it for their own builds). */
 const DESTINATION_ROUTES: ReadonlySet<string> = new Set(['/currencies', '/commodities']);
 
-/** The one region route that still renders RegionPage (S8; /usa left
- *  the set in S9, /europe in S12, /asia-pacific in S14 — each for its
- *  own page chunk). */
-const REGION_ROUTES: ReadonlySet<string> = new Set(['/australia']);
+/* Page-division S16 (2026-11-10): no route renders RegionPage anymore —
+ * all four region routes (/usa S9 · /europe S12 · /asia-pacific S14 ·
+ * /australia S16) left the set for their own page chunks, and the module
+ * retired (the shared RegionIndexSection they all render rides its own
+ * shared chunk). */
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
@@ -253,10 +259,13 @@ export function App() {
               S5 (D-26…D-29): `/gold` is the Gold conditions meter;
               S7 (D-43/D-47): `/world-markets` is the World Markets page;
               S8 (D-13/D-44): the REGION pages render their zoom
-              sections on RegionPage; S9 (D-29/D-30): `/usa` renders its
-              own UsaPage (the verdict strip + tiers 1–2 above the S8
-              zoom); Commodities + Currencies share the lazy placeholder
-              chunk until S17/S18; the Converter lives at /converter. */}
+              sections; S9 (D-29/D-30): `/usa` renders its own UsaPage
+              (the verdict strip + tiers 1–2 above the S8 zoom); S16
+              (D-6/D-37): `/australia` renders its own AustraliaPage
+              (the AU Markets board + the five gauge sections above the
+              S8 zoom); Commodities + Currencies share the lazy
+              placeholder chunk until S17/S18; the Converter lives at
+              /converter. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
             {route === '/' ? <GlobalPage /> : null}
@@ -265,8 +274,8 @@ export function App() {
             {route === '/usa' ? <UsaPage /> : null}
             {route === '/europe' ? <EuropePage /> : null}
             {route === '/asia-pacific' ? <AsiaPage /> : null}
+            {route === '/australia' ? <AustraliaPage /> : null}
             {route === '/converter' ? <Converter /> : null}
-            {REGION_ROUTES.has(route) ? <RegionPage /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}
             {route === '/history' ? <History /> : null}

@@ -713,7 +713,7 @@ export function Insights() {
                 {marketsFeedEnabled ? (
                   <AustralianMarkets
                     state={auMarketsState}
-                    copy={copy}
+                    copy={copy.marketsAu}
                     locale={locale}
                     numberLocale={numberLocale}
                   />

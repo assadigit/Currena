@@ -186,7 +186,7 @@ export function UsaPage(): React.JSX.Element {
            * audit formalized, the mobile/ARIA polish landed). The page's
            * layers are complete and verified; no honest "in build" claim
            * remains. The pd.statusBuilding key stays for the not-yet-built
-           * pages (RegionPage + PagePlaceholder). */}
+           * pages (PagePlaceholder — Commodities + Currencies; S16 built Australia). */}
         </div>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.usa.purpose')}

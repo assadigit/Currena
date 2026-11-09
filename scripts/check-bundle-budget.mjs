@@ -1021,14 +1021,38 @@ const BUDGETS = [
   // entry chunk gains only the lazy wiring (269.32/81.55 → 269.71/81.70
   // vs 296/89.5). Ceiling 8/3 per the tight convention (~4.1 kB raw /
   // ~1.5 kB gz headroom).
-  // S9 (2026-11-09): /usa left the set for its own UsaPage build, and
-  // the shared RegionIndexSection moved to its own shared chunk (2.50/
-  // 1.10) both the region routes and the USA page load — the page's own
-  // chunk is now only the shell + DestinationBody, MEASURED 1.65/0.77
-  // (the zoom's bytes paid once, not per region route). The 8/3 ceiling
-  // holds with huge headroom; kept (not re-based down) so a future
-  // region-page build has the same room the S8 row gave it.
-  { pattern: /^RegionPage-[\w-]+\.js$/, raw: 8_000, gz: 3_000, label: 'Region pages lazy chunk (page-division S8)' },
+  // S16 (2026-11-10): the RegionPage chunk is RETIRED — /australia (the
+  // last region route on it) left for its own AustraliaPage build, so no
+  // route renders RegionPage anymore and the row finds no chunk. The
+  // shared RegionIndexSection (the S8 zoom section every region page
+  // renders) keeps riding its own shared chunk below (2.50/1.10).
+  // Page-division S16 (2026-11-10): the Australia route — the AU Markets
+  // board section (the REUSED AustralianMarkets drawing through the lean
+  // pd.australia adapter, its own board feed) + the five gauge sections
+  // (D-37: the unchanged 3-voting + 2-shadow structure, 28 cards with
+  // the §21 trio) + the 11 moved-out seat chips linking to their new
+  // homes + the world-risk group. Measured 22.76/5.92 at the S16 build:
+  // the page's own chunk carries the shell + AustraliaTierCards + the
+  // lean australia-tiles (the 28 display configs + the seat-chip +
+  // gauge-verdict derivations) + the board adapter, while the REUSED AU
+  // board drawing moved to its own shared markets-au chunk both
+  // /australia and /insights load (the row below — the drawing's bytes
+  // paid once, the S10 tic treatment; the Insights chunk SHRANK
+  // 1526.97 → 1520.13 through the split) and the S8 zoom section rides
+  // the SHARED RegionIndexSection chunk every region route loads.
+  // Ceiling 26/7 per the tight convention (~3.2 kB raw / ~1.1 kB gz
+  // headroom).
+  { pattern: /^AustraliaPage-[\w-]+\.js$/, raw: 26_000, gz: 7_000, label: 'Australia page lazy chunk (page-division S16)' },
+  // Page-division S16 (2026-11-10): the shared AU Markets board drawing —
+  // the legacy "The Australian market up close" section, extracted to its
+  // own chunk the moment /australia's board section imported it (Vite's
+  // shared-chunk split; the S10 tic treatment). Measured 12.33/3.49: the
+  // section drawing + the au-markets briefing/shared helpers + the
+  // markets-au definitions, every word fed through the caller's copy
+  // contract (the legacy corpus on /insights, the pinned pd.australia
+  // adapter on /australia — one drawing, one vocabulary, D-48). Ceiling
+  // 15/4.5 per the tight convention (~2.7 kB raw / ~1.0 kB gz headroom).
+  { pattern: /^markets-au-[\w-]+\.js$/, raw: 15_000, gz: 4_500, label: 'shared AU Markets board chunk (page-division S16 — the reused drawing)' },
   // Page-division S9 (2026-11-09): the USA route — the D-30 verdict
   // strip + the D-29 tier-1/tier-2 cards above the SAME S8 zoom section.
   // Measured 15.21/4.28 at first build: the page's own chunk carries the

@@ -35,9 +35,9 @@
  * two index-only sections (Korea/Taiwan/HK, India) render an honest
  * note — their markets ride the zoom map above, and the CPI fills are
  * pending. The `pd.statusBuilding` key stays in both dictionaries —
- * `RegionPage` (Australia, the not-yet-built region page) and
- * `PagePlaceholder` (Commodities/Currencies) still carry the honest
- * chip for their own in-build state.
+ * `PagePlaceholder` (Commodities/Currencies) still carries the honest
+ * chip for its own in-build state (S16 built Australia — its own chip
+ * retired at its gates pass).
  *
  * Platform: browser only — this module lives in the lazy Asia route
  * chunk, never the entry graph.
@@ -203,7 +203,7 @@ export function AsiaPage(): React.JSX.Element {
            * audit honest, the mobile/ARIA polish landed). The page's
            * 11 placed cards are complete and verified; no honest "in
            * build" claim remains. The pd.statusBuilding key stays for
-           * the not-yet-built pages (RegionPage + PagePlaceholder). The
+           * the not-yet-built pages (PagePlaceholder — Commodities + Currencies; S16 built Australia). The
            * §15 FRED-only CPI fills (D-36) stay verified-pending-ingest
            * (Rule 5 — BD-S14a/BD-S15d): a separate engine-layer change
            * that deserves its own session, and their absence does not

@@ -14,9 +14,10 @@
  * The honest scope note: this is the region page's INDEX section only.
  * The region's own indicator cards, verdicts and fills are the page
  * build sessions' scope (S9–S11 USA, S12–S13 Europe, S14–S15 Asia,
- * S16 Australia — the placeholder body below says so). A zoomed card
- * click (and a mobile dot tap) opens the market's full home today —
- * /world-markets, where the region grids carry every row.
+ * S16 Australia — every region page now carries its own layers above
+ * this section). A zoomed card click (and a mobile dot tap) opens the
+ * market's full home today — /world-markets, where the region grids
+ * carry every row.
  *
  * Platform: browser only — this module lives in the lazy region-page
  * chunk, never the entry graph.

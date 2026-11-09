@@ -29,7 +29,7 @@
  * (Rule 5 — BD-S12a), a separate engine-layer change that deserves its
  * own session; their absence does not make the 8 placed cards "in
  * build". The pd.statusBuilding key stays for the not-yet-built pages
- * (RegionPage + PagePlaceholder).
+ * (PagePlaceholder — Commodities + Currencies; S16 built Australia).
  *
  * Platform: browser only — this module lives in the lazy Europe route
  * chunk, never the entry graph.
@@ -192,7 +192,7 @@ export function EuropePage(): React.JSX.Element {
            * audit honest, the mobile/ARIA polish landed). The page's
            * 8 placed cards are complete and verified; no honest "in
            * build" claim remains. The pd.statusBuilding key stays for
-           * the not-yet-built pages (RegionPage + PagePlaceholder). The
+           * the not-yet-built pages (PagePlaceholder — Commodities + Currencies; S16 built Australia). The
            * §15 FRED-only fills (D-34) stay verified-pending-ingest
            * (Rule 5 — BD-S12a): a separate engine-layer change that
            * deserves its own session, and their absence does not make

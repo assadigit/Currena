@@ -20,15 +20,23 @@
  * shell — the region's soft tint + ring already wraps it. Self-contained
  * feed: own loading/empty states, never an error surface for the page.
  *
+ * Page-division S16 (2026-11-10): the copy prop is NARROWED to the
+ * section's own `marketsAu` contract (the TicSection discipline — the
+ * /australia page feeds the SAME drawing through the lean pd.australia
+ * adapter, one drawing one vocabulary D-48, without loading the whole
+ * insights corpus), and the ASX 200 anchor gains an optional route target
+ * — on /australia it links to the ASX 200's home board (/world-markets,
+ * the S10 UsaTicSection pattern) instead of the /insights in-page scroll.
+ *
  * Data: the page-level fetch of GET /api/insights/markets-au (lib/markets-au)
  * — a stored copy only; a page request can never reach a provider.
  */
 
 import { useMemo } from 'react';
-import type { AuMarketEntry, AuMarketId } from '@currena/core';
+import type { AuMarketEntry, AuMarketGroupId, AuMarketId } from '@currena/core';
 import { AU_MARKETS, AU_MARKET_GROUP_ORDER, auMarketDefinition } from '@currena/insights/markets-au/definitions';
 import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { navigate } from '../../router';
 import { auGroupBreadth, auLeadingGroup, auLaggingGroup } from './au-markets/briefing';
 import type { AuMarketsLoadState } from './au-markets/shared';
 import {
@@ -45,6 +53,40 @@ import { formatDateShort } from './world-markets/shared';
 
 export type { AuMarketsLoadState } from './au-markets/shared';
 
+/** The drawing's own copy contract (page-division S16 — the TicSectionCopy
+ *  discipline): the REUSED drawing declares exactly the words it consumes,
+ *  so the lean pd.australia adapter on /australia never loads the corpus
+ *  (the legacy /insights call site passes the corpus's own marketsAu block
+ *  — structurally a superset of this contract). The `latin` row labels
+ *  come from the definitions (auMarketDefinition), never from copy. */
+export interface AuMarketsBoardCopy {
+  title: string;
+  sectionLabel: string;
+  subtitle: string;
+  lastCloseBadge: string;
+  asOf: string;
+  groups: Record<AuMarketGroupId, string>;
+  asx200Anchor: string;
+  asx200AnchorHint: string;
+  summaryLeading: string;
+  summaryLagging: string;
+  summaryMixed: string;
+  summaryCalm: string;
+  summaryNoReading: string;
+  thIndex: string;
+  thToday: string;
+  thWeek: string;
+  thMonth: string;
+  thYear: string;
+  thFromHigh: string;
+  thClose: string;
+  delayedTag: string;
+  oldData: string;
+  localCurrencyNote: string;
+  empty: string;
+  entries: Record<AuMarketId, { name: string }>;
+}
+
 /** Today's UTC date as YYYY-MM-DD — the freshness clock. */
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -55,13 +97,19 @@ export function AustralianMarkets({
   copy,
   locale,
   numberLocale,
+  asx200AnchorTo,
 }: {
   state: AuMarketsLoadState;
-  copy: InsightsCopy;
+  copy: AuMarketsBoardCopy;
   locale: 'en' | 'fa';
   numberLocale: 'en-US' | 'fa-IR';
+  /** The ASX 200 anchor's route target (page-division S16): when set
+   *  (the /australia page passes '/world-markets'), the anchor is a REAL
+   *  link to the ASX 200's home board; the default (undefined) keeps the
+   *  /insights in-page scroll to the world board section. */
+  asx200AnchorTo?: string;
 }) {
-  const auCopy = copy.marketsAu;
+  const auCopy = copy;
   const today = todayIso();
 
   // The as-of date: the freshest close any AU market carries.
@@ -146,18 +194,34 @@ export function AustralianMarkets({
         {summary}
       </p>
 
-      {/* The ASX 200 anchor label — links to the world board (no second fetch, G-3). */}
+      {/* The ASX 200 anchor label — links to the world board (no second fetch, G-3).
+          Page-division S16: with a route target the anchor navigates there
+          (the /australia page → /world-markets); without one it keeps the
+          /insights in-page scroll. */}
       <p className="m-0 flex flex-wrap items-baseline gap-x-2 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
-        <a
-          href="#insights-markets"
-          className="font-semibold text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
-          onClick={(e) => {
-            e.preventDefault();
-            document.getElementById('insights-markets')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-          }}
-        >
-          {auCopy.asx200Anchor}
-        </a>
+        {asx200AnchorTo !== undefined ? (
+          <a
+            href={asx200AnchorTo}
+            className="font-semibold text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(asx200AnchorTo);
+            }}
+          >
+            {auCopy.asx200Anchor}
+          </a>
+        ) : (
+          <a
+            href="#insights-markets"
+            className="font-semibold text-[var(--color-text-secondary)] underline-offset-2 hover:underline"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('insights-markets')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            }}
+          >
+            {auCopy.asx200Anchor}
+          </a>
+        )}
         <span>{auCopy.asx200AnchorHint}</span>
       </p>
 
@@ -197,7 +261,7 @@ function AuMarketsTable({
 }: {
   ids: readonly AuMarketId[];
   entryById: Map<string, AuMarketEntry>;
-  copy: InsightsCopy['marketsAu'];
+  copy: AuMarketsBoardCopy;
   locale: 'en' | 'fa';
   todayIso: string;
   freshestIso: string;
@@ -276,7 +340,7 @@ function AuMarketsTable({
 /** Build the one-line "leading or lagging" summary from the per-group chg1d extrema. */
 function buildSummary(
   markets: readonly AuMarketEntry[],
-  copy: InsightsCopy['marketsAu'],
+  copy: AuMarketsBoardCopy,
   locale: 'en' | 'fa',
   numberLocale: 'en-US' | 'fa-IR',
 ): string {
