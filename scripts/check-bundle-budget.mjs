@@ -1064,6 +1064,19 @@ const BUDGETS = [
   // (~2 kB raw / ~1 kB gz headroom over Europe's 14/5 — Commodities has
   // 24 cards vs Europe's 8, but no zoom section).
   { pattern: /^CommoditiesPage-[\w-]+\.js$/, raw: 16_000, gz: 5_000, label: 'Commodities page lazy chunk (page-division S17)' },
+  // Page-division S18 (2026-11-11): the Currencies route — the 7 rule
+  // lights hero (D-41) + the 11-pair board (D-42, AUDNZD the 11th pair)
+  // + the two registry-card sections (D-32/D-42: 7 pair-context + 7
+  // dollar-standing cards with the §21 trio) over the S2 projection,
+  // plus the FX-board payload wiring (lib/fx.ts — the second feed's
+  // fetch + last-good cache). The page's own chunk carries the shell +
+  // RuleLights + PairBoard + TierCards + the lean currencies-tiles (14
+  // display configs + the headline-key derivation + the D-42 board
+  // order), with NO shared drawing (no zoom, no markets board — the
+  // CommoditiesPage shape plus the fx presentation's tiny pure rules
+  // module). Measured 21.34/5.40 at the S18 build. Ceiling 24/6.5 per
+  // the tight convention (~2.7 kB raw / ~1.1 kB gz headroom).
+  { pattern: /^CurrenciesPage-[\w-]+\.js$/, raw: 24_000, gz: 6_500, label: 'Currencies page lazy chunk (page-division S18)' },
   // Page-division S9 (2026-11-09): the USA route — the D-30 verdict
   // strip + the D-29 tier-1/tier-2 cards above the SAME S8 zoom section.
   // Measured 15.21/4.28 at first build: the page's own chunk carries the

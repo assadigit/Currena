@@ -75,6 +75,7 @@ function pinWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'): v
   expect(pd.chipUnusual, `${locale} chipUnusual`).toBe(corpus.fx.chipUnusual);
   expect(pd.noDataRow, `${locale} noDataRow`).toBe(corpus.fx.noDataRow);
   expect(pd.barLabel, `${locale} barLabel`).toBe(corpus.fx.barLabel);
+  expect(pd.reliabilityDetail, `${locale} reliabilityDetail`).toBe(corpus.fx.reliabilityDetail);
   expect(pd.downgradeCaution, `${locale} downgradeCaution`).toBe(corpus.fx.downgradeCaution);
 
   // The board's period words + rate word + tags + footer.
@@ -87,6 +88,7 @@ function pinWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'): v
   expect(pd.bigMoveTag, `${locale} bigMoveTag`).toBe(corpus.fx.bigMoveTag);
   expect(pd.oldData, `${locale} oldData`).toBe(corpus.fx.oldData);
   expect(pd.boardFooter, `${locale} boardFooter`).toBe(corpus.fx.footerLine);
+  expect(pd.fxEmpty, `${locale} fxEmpty`).toBe(corpus.fx.empty);
 
   // The 11 pair names ↔ the corpus's own fx.entries (audnzd included —
   // the S18 engine leg's own entry, D-42).

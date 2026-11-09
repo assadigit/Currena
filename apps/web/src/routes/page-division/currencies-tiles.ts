@@ -44,7 +44,7 @@
  * (currencies-backtest-core.ts).
  */
 
-import type { FxPairId, IndicatorId, IndicatorReading } from '@currena/core';
+import type { FxPairId, FxRuleState, IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { FX_PAIR_IDS } from '@currena/insights/fx/definitions';
 import { pageGroupIds } from '@currena/insights/page-division';
@@ -242,4 +242,77 @@ export function currenciesCardValueText(
   }
   // The word units (index · points) suffix with a space in both locales.
   return `${num} ${unit}`;
+}
+
+/* ------------------------------------------------------------------ *
+ * The rule lights hero (§12 item 1, D-41) — the headline-key derivation
+ * ------------------------------------------------------------------ */
+
+/** The pd.currencies.ruleLights copy key a rule's CURRENT state speaks
+ *  (null = no headline sentence: nodata rows speak the noData word, and a
+ *  quiet R7 has no sentence at all — the legacy §9.3 card stays away
+ *  below the 2.5% trigger, so the corpus carries no quiet wording for
+ *  it). */
+export type CurrenciesHeadlineKey =
+  | 'headlineWarning'
+  | 'headlineWatch'
+  | 'headlineSupportive'
+  | 'headlineQuiet'
+  | 'headlineFlight'
+  | 'headlineWobble'
+  | 'headlineDollarLed'
+  | 'headlineEuroLed';
+
+/**
+ * Which headline sentence one rule's stored state renders — the SAME
+ * discipline the legacy surface's §7 sentences use (sentences.ts: "A
+ * DOWNGRADED warning (§6.4: fired but not holding lately) keeps its
+ * WARNING sentence — the numbers are facts; the Watching status word and
+ * the caution line carry the reliability caveat"): a downgraded warning
+ * shows its warning-shape headline while fxRuleView keeps the Watching
+ * status word, and the light adds the downgrade caution line.
+ *
+ * R4's two warning shapes pick their own headline by variant (flight /
+ * wobble); R7's context card picks its lead (dollar-led / euro-led); R3
+ * has no watch wording because its only watch shape IS the downgrade.
+ */
+export function currenciesRuleHeadlineKey(rule: FxRuleState): CurrenciesHeadlineKey | null {
+  // The downgrade pass (§6.4): a Warning whose pattern is not holding
+  // lately became a Watch — the warning sentence stays (the caveat rides
+  // the status word + the caution line).
+  const downgraded = rule.outcome === 'watch' && rule.downgraded === true;
+  switch (rule.id) {
+    case 'r1_risk_mood':
+    case 'r5_china_link':
+      if (rule.outcome === 'warning' || downgraded) return 'headlineWarning';
+      if (rule.outcome === 'watch') return 'headlineWatch';
+      if (rule.outcome === 'supportive') return 'headlineSupportive';
+      return rule.outcome === 'quiet' ? 'headlineQuiet' : null; // nodata/context
+    case 'r2_carry_trade':
+      if (rule.outcome === 'warning' || downgraded) return 'headlineWarning';
+      if (rule.outcome === 'watch') return 'headlineWatch';
+      return rule.outcome === 'quiet' ? 'headlineQuiet' : null;
+    case 'r3_dollar_strength':
+      // No headlineWatch exists in the corpus: R3's only watch shape is
+      // the downgrade, which keeps its warning headline.
+      if (rule.outcome === 'warning' || downgraded) return 'headlineWarning';
+      if (rule.outcome === 'supportive') return 'headlineSupportive';
+      return rule.outcome === 'quiet' ? 'headlineQuiet' : null;
+    case 'r4_money_hiding':
+      if (rule.outcome === 'warning' || downgraded) {
+        return rule.variant === 'wobble' ? 'headlineWobble' : 'headlineFlight';
+      }
+      return rule.outcome === 'quiet' ? 'headlineQuiet' : null;
+    case 'r6_europe_worry':
+      if (rule.outcome === 'warning' || downgraded) return 'headlineWarning';
+      if (rule.outcome === 'watch') return 'headlineWatch';
+      return rule.outcome === 'quiet' ? 'headlineQuiet' : null;
+    case 'r7_dollar_or_euro':
+      if (rule.outcome === 'context') {
+        return rule.variant === 'euro-led' ? 'headlineEuroLed' : 'headlineDollarLed';
+      }
+      // Below the 2.5% trigger the legacy card stays away entirely — no
+      // quiet sentence exists for R7, and none is invented here.
+      return null;
+  }
 }

@@ -1779,6 +1779,7 @@ export const en = {
       chipUnusual: 'Unusual',
       noDataRow: 'Not enough data right now',
       barLabel: 'How close to the alarm',
+      reliabilityDetail: 'Held in {k} of the last 13 weeks',
       downgradeCaution: 'The usual pattern has not been reliable lately.',
       boardTitle: 'The pair board',
       boardIntro:
@@ -1794,6 +1795,7 @@ export const en = {
       bigMoveTag: 'Unusually large move',
       oldData: 'Old data · {date}',
       boardFooter: 'European Central Bank (ECB) reference rates, once a day. A pattern is a tendency, not a prediction.',
+      fxEmpty: 'Currency data is being prepared. Check back after the next daily update.',
       pairNames: {
         eurusd: 'Euro vs US dollar',
         usdjpy: 'US dollar vs yen',
