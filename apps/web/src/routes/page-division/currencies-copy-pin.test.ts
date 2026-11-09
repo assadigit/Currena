@@ -58,7 +58,7 @@ function pinWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'): v
   // The 7 rule lights ↔ the corpus's own fx.rules block.
   for (const [light, keys] of Object.entries(RULE_LIGHT_KEYS)) {
     const pdRule = pd.ruleLights[light as keyof typeof pd.ruleLights] as Record<string, string>;
-    const corpusRule = corpus.fx.rules[light as keyof typeof corpus.fx.rules] as Record<string, string>;
+    const corpusRule = (corpus.fx.rules as unknown as Record<string, Record<string, string>>)[light]!;
     for (const key of keys) {
       expect(pdRule[key], `${locale} ruleLights.${light}.${key}`).toBe(corpusRule[key]);
     }

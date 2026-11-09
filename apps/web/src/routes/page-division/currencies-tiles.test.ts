@@ -161,7 +161,9 @@ describe('the display configs — the DISPLAY registry’s own values for the 14
       const lean = CURRENCIES_CARD_DISPLAY[id];
       expect(lean.decimals, `${id} decimals`).toBe(registry.decimals);
       expect(lean.unit, `${id} unit`).toBe(registry.unit);
-      expect(lean.scale, `${id} scale (none on this page — no family is rescaled)`).toBe(registry.scale);
+      // No id on this page is rescaled (no barrels-style family here) — the
+      // registry's own scale must be absent for every one of the 14.
+      expect(registry.scale ?? null, `${id} registry scale`).toBeNull();
     }
   });
 
