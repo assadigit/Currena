@@ -199,6 +199,71 @@ custody card intact through the reuse refactor) all verified.
 **Rollback lever:** `wrangler rollback` — /usa returns to the S9 page
 (the strip + tiers 1–2 + the zoom); nothing else moves.
 
+## Session record — 2026-11-09e the page-division S13 deploy (the Europe gates — Phase E closes; the full card-render audit green, the freshness audit honest, the mobile/ARIA pass pinned + browser-verified, the honest In-build chip retired live at /europe)
+
+**Scope (page-division S13, the Europe gates):** display-layer ONLY. No
+engine, voter, threshold, calibration or provider change; the SAME
+insights snapshot + the SAME markets board, zero new fetches, zero new
+KV. S13 closes Phase E (Europe) with the gates session — the S11 pattern
+applied to Europe. The only user-visible change is the In-build chip
+RETIRED at /europe (BD-S12b's completion — the 8 placed ids' gates pass:
+the §21 card audit 8/8 green, the freshness audit honest, the mobile/ARIA
+pass landed). The new `EuropePage.test.tsx` render audit (7 tests — the
+`UsaPage.test.tsx` pattern scoped to Europe's 8 placed cards) pins the
+shell + the zoom on top + the EU/UK sections + the 8 cards in placement
+order with the §21 trio + the cross-links (44px → /currencies) + the
+fail-closed paths + the fa/RTL rendering. The Europe lazy chunk gets
+its own budget row (the S9/S10 pattern): measured 10.07/3.06 vs a 14/5
+ceiling. The §15 FRED-only fills stay verified-pending-ingest (Rule 5 —
+BD-S13d): the ingest is an ENGINE-layer change that deserves its own
+focused session, and the verification needs production egress the dev
+sandbox can't reach; their absence does not make the 8 placed cards
+"in build."
+
+**Gates before the deploy (ALL GREEN):** secret scan 8/977 · typecheck
+6/6 · eslint 0/0 · copy:audit clean (no new fa strings — S13 only
+removed the chip + added a test) · narrator vocabulary in sync + eval
+50 · layer1 11,819/11,819 · the full suite **14,952 = +7** (EuropePage
+render audit) · build + budgets held — entry 270.28/81.87, the Europe
+lazy chunk 10.07/3.06 vs its new 14/5 row.
+
+**The §21 diff — the S13 gate's own, run LIVE twice (pre-deploy and
+post-deploy): 8 checks · 8 green · 0 red.** The live `pd-s12-backtest.ts`
+against PRODUCTION: the 8 cards' trio inputs byte-identical (page ≡
+engine — ecb-dfr 2.5 normal · euro-hicp 4.0 warning · euro-aaa-10y 3.29
+context · bund-10y 3.47 context · btp-bund-spread 0.80 stale ·
+oecd-cli-de 101.0 context · gilt-10y 5.24 context · boe-rate 4.0
+context), the EU/non-EU group membership 6/2 + 8/8 carried, the
+freshness audit honest (btp-bund-spread 100d beyond its 75d monthly
+grace AND carrying the engine's stale status — the page speaks the
+word), the two feeds one snapshot (generatedAt aligned).
+
+**The deploy-lock check ran first** (the D-43 lesson): the active version
+was S12's `84833135` @ 100% — no parallel deploy. `pnpm --filter
+@currena/web build` + `wrangler deploy` → **currena-api `b11fd84f` @ 100%**
+(deployment `b11fd84f-7e43-4aa2-a932-66749807d557`, 2026-11-09 ~03:44Z;
+SITE_MODE=public, the RATES KV + AI + ASSETS bindings intact).
+currena-markets untouched (code-unchanged).
+
+**The live acceptance (ALL GREEN):** currena.ir/europe live-smoke-verified
+at 1440×900 en (8 cards · the EU section · the UK section · the zoom
+· the 3 cross-links · the In-build chip ABSENT · 0px overflow · 0
+page errors · the live value ecb-dfr 2.50%) + at 360×844 fa (RTL,
+dir=rtl, h1="اروپا", 0px overflow · 0 page errors); the browser pass
+(the freshly built SPA through the local preview server, /api proxied
+to currena.ir) at 1440×900 AND 360×844 in BOTH en and fa (RTL, Persian
+digits) — the 8 cards (EU=6/UK=2), the zoom (4 STOXX50E/DAX/CAC/FTSE),
+the 3 cross-links all at 44px, the In-build chip ABSENT on all 4 legs,
+NO horizontal scroll at any width in any locale (overflow 0px on all 4
+legs), ZERO console/page errors across all 4 legs; the Global + Gold +
+World Markets + USA + region + legacy /insights surfaces intact.
+
+- **Rollback:** `wrangler rollback` — /europe returns to the S12 page
+  (the 8 placed cards + the In-build chip present); nothing else moves
+  (the S13 change is the chip removal + the test/budget additions only).
+- **Who decided:** the gates session (S13) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives above.
+
 ## Session record — 2026-11-09d the page-division S12 deploy (the Europe page — Phase E opens; the EU section + the non-EU United Kingdom section listed apart (D-33), the 8 placed cards with the §21 trio, the S8 STOXX50E/DAX/CAC/FTSE zoom on top, the cross-links to /currencies live for every visitor at /europe; the §15 FRED-only fills verified-pending-ingest)
 
 **Scope (page-division S12, the Europe page build):** display-layer ONLY. No
