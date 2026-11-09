@@ -1321,6 +1321,81 @@ export const en = {
       purpose: 'The world’s growth engine region — organized by sub-region, not by theme.',
       summary:
         'Five sub-regions — China, Japan, Korea/Taiwan/Hong Kong, India and the Pacific (New Zealand) — plus the Asia zoom map and verified CPI fills.',
+      /* ---- S14 (2026-11-09): the Asia & Pacific page's own copy
+       * (D-16/D-17/D-35/D-36, spec §9 items 1–6). The card names, the
+       * unit words, the position + band words and the status words are
+       * the corpus's own, pinned by asia-copy-pin.test.ts; the section
+       * headings + intros + the loading/error lines + the cross-links
+       * copy + the index-only notes are fresh. */
+      loadingLine: 'Reading the Asia & Pacific numbers…',
+      errorTitle: 'The Asia & Pacific page is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      china: {
+        title: 'China',
+        intro:
+          'Factory activity, inflation, the OECD leading indicator, the China and Taiwan geopolitical-risk reads, property investment and crude steel output — the world’s growth engine at a glance.',
+      },
+      japan: {
+        title: 'Japan',
+        intro:
+          'The 10-year Japanese government bond yield and the Bank of Japan’s policy rate. The Japan CPI fill is verified-pending-ingest (§15, Rule 5).',
+      },
+      koreaTaiwanHk: {
+        title: 'Korea · Taiwan · Hong Kong',
+        intro:
+          'The Korea, Taiwan and Hong Kong markets — KOSPI, TAIEX and HSI — ride the Asia zoom map above. The Korea CPI fill is verified-pending-ingest (§15, Rule 5).',
+        indexOnlyNote:
+          'These three markets ride the zoom map above. Their consumer-price reads land here once the FRED mirror family is verified against the national statistics releases (§15, Rule 5).',
+      },
+      india: {
+        title: 'India',
+        intro:
+          'The Indian market — NIFTY50 — rides the Asia zoom map above. The India CPI fill is verified-pending-ingest (§15, Rule 5).',
+        indexOnlyNote:
+          'NIFTY50 rides the zoom map above. India’s consumer-price read lands here once the FRED mirror family is verified against the MoSPI release (§15, Rule 5).',
+      },
+      pacificNz: {
+        title: 'Pacific — New Zealand',
+        intro:
+          'New Zealand’s short-term interest rate and 10-year government bond yield. The NZX50 rides the Asia zoom map above.',
+      },
+      cardNames: {
+        'china-pmi': 'Chinese factory activity',
+        'china-cpi': 'China inflation (yearly)',
+        'oecd-cli-cn': 'OECD leading indicator (China)',
+        'gpr-china': 'Geopolitical Risk — China',
+        'gpr-taiwan': 'Geopolitical Risk — Taiwan',
+        'china-property-investment': 'China property investment (year-to-date, yearly)',
+        'china-steel-output': 'China crude steel output (monthly)',
+        'jgb-10y': 'What the Japanese government pays to borrow for 10 years',
+        'boj-rate': 'The Japanese central bank’s policy rate',
+        'nz-short-rate': 'New Zealand short-term interest rate',
+        'nz-10y': 'New Zealand 10-year government bond yield',
+      },
+      unitPercent: '%',
+      unitPoints: 'pts',
+      unitIndex: 'index',
+      unitTonnes: 'm tonnes',
+      positionLow: 'low',
+      positionTypical: 'typical',
+      positionHigh: 'high',
+      positionWordLine: '{word} · {band}',
+      bandTop: 'top {p}%',
+      bandMid: 'the middle',
+      bandBottom: 'bottom {p}%',
+      statusWarning: 'Needs attention',
+      statusStale: 'Stale',
+      statusCheckPending: "Can't tell right now",
+      statusUnavailable: "Can't tell right now",
+      valueUnavailable: 'Cannot read yet',
+      crossLinks: {
+        title: 'Currency pairs and gold that move with Asia',
+        intro:
+          'The Chinese yuan and the Japanese yen against the US dollar, plus the Shanghai gold link — their full detail cards live on the Currency Pairs and Gold pages.',
+        seePairs: 'See pairs',
+        seeGold: 'See gold',
+      },
     },
     australia: {
       title: 'Australia',

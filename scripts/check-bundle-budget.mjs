@@ -1060,6 +1060,25 @@ const BUDGETS = [
   // room for the §15 FRED-only fill cards when a later session verifies +
   // ingests them, Rule 5).
   { pattern: /^EuropePage-[\w-]+\.js$/, raw: 14_000, gz: 5_000, label: 'Europe page lazy chunk (page-division S12)' },
+  // Page-division S14 (2026-11-09): the Asia & Pacific route — the five
+  // sub-regions (D-35: China 7 · Japan 2 · Korea/Taiwan/HK index-only ·
+  // India index-only · Pacific-NZ 2 = 11 placed cards) through the pure
+  // asia-tiles (pinned output-for-output against formatReadingValue,
+  // including china-steel-output's tonnes+scale — the ONE Asia id beyond
+  // Europe's three-unit lean render), the two index-only honest notes,
+  // the cross-links strip (§9: usdcny/usdjpy → /currencies + sge-gold →
+  // /gold), the honest In-build chip (the §15 FRED-only CPI fills are
+  // verified-pending-ingest, Rule 5 — BD-S14a; retires at the S15 gates
+  // pass). The S8 zoom section rides the SHARED RegionIndexSection chunk
+  // every region route loads (the zoom's bytes are paid once, not per
+  // Asia route), and the page's own chunk carries only the shell +
+  // AsiaTierCards + the lean asia-tiles display configs. The AsiaPage
+  // render audit is test-only, never in the app bundle. Ceiling 16/6
+  // per the convention (the 5 sections + the index-only notes + the
+  // 3-destination cross-links are a touch heavier than Europe's 2
+  // sections; room for the §15 FRED-only CPI fill cards when a later
+  // session verifies + ingests them, Rule 5).
+  { pattern: /^AsiaPage-[\w-]+\.js$/, raw: 16_000, gz: 6_000, label: 'Asia & Pacific page lazy chunk (page-division S14)' },
   // Page-division S10 (2026-11-09): the shared TIC drawing — the legacy
   // "Who holds US government debt" section, extracted to its own chunk
   // the moment /usa's tier-6 board imported it (Vite's shared-chunk

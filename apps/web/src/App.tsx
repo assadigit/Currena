@@ -81,16 +81,26 @@ const UsaPage = lazy(() => import('./routes/page-division/UsaPage').then((m) => 
 // UK section (D-33) render above the SAME S8 zoom section (the STOXX50E ·
 // DAX · CAC · FTSE zoom), plus the cross-links to /currencies (§8 item 4).
 const EuropePage = lazy(() => import('./routes/page-division/EuropePage').then((m) => ({ default: m.EuropePage })));
+// Page-division S14 (2026-11-09): the Asia & Pacific route leaves the
+// region set — its own lazy chunk (the UsaPage/EuropePage pattern): the
+// five sub-regions (D-35: China · Japan · Korea/Taiwan/HK · India ·
+// Pacific-NZ) render above the SAME S8 zoom section (the N225 · KOSPI ·
+// HSI · SSEC · TAIEX · NIFTY50 zoom), plus the cross-links to
+// /currencies + /gold (§9). The In-build chip stays (the §15 FRED-only
+// CPI fills are verified-pending-ingest, Rule 5 — BD-S14a; the chip
+// retires at the S15 gates pass, the Europe S12→S13 trajectory).
+const AsiaPage = lazy(() => import('./routes/page-division/AsiaPage').then((m) => ({ default: m.AsiaPage })));
 
 /** The two destination routes that still share the placeholder chunk
  *  (S8: the four region pages left the set — their zoom sections landed
- *  on RegionPage; S9: /usa + S12: /europe left it for their own builds). */
+ *  on RegionPage; S9: /usa + S12: /europe + S14: /asia-pacific left it
+ *  for their own builds). */
 const DESTINATION_ROUTES: ReadonlySet<string> = new Set(['/currencies', '/commodities']);
 
-/** The two region routes that render RegionPage (S8; /usa left the set
- *  in S9 for its own UsaPage chunk; /europe left it in S12 for its own
- *  EuropePage chunk). */
-const REGION_ROUTES: ReadonlySet<string> = new Set(['/asia-pacific', '/australia']);
+/** The one region route that still renders RegionPage (S8; /usa left
+ *  the set in S9, /europe in S12, /asia-pacific in S14 — each for its
+ *  own page chunk). */
+const REGION_ROUTES: ReadonlySet<string> = new Set(['/australia']);
 
 /** <title> per route — legacy pattern "<Page> - Currena". */
 function titleKeyFor(route: string): TranslationKey {
@@ -254,6 +264,7 @@ export function App() {
             {route === '/world-markets' ? <WorldMarketsPage /> : null}
             {route === '/usa' ? <UsaPage /> : null}
             {route === '/europe' ? <EuropePage /> : null}
+            {route === '/asia-pacific' ? <AsiaPage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {REGION_ROUTES.has(route) ? <RegionPage /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
