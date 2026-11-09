@@ -199,6 +199,81 @@ custody card intact through the reuse refactor) all verified.
 **Rollback lever:** `wrangler rollback` — /usa returns to the S9 page
 (the strip + tiers 1–2 + the zoom); nothing else moves.
 
+## Session record — 2026-11-09d the page-division S12 deploy (the Europe page — Phase E opens; the EU section + the non-EU United Kingdom section listed apart (D-33), the 8 placed cards with the §21 trio, the S8 STOXX50E/DAX/CAC/FTSE zoom on top, the cross-links to /currencies live for every visitor at /europe; the §15 FRED-only fills verified-pending-ingest)
+
+**Scope (page-division S12, the Europe page build):** display-layer ONLY. No
+engine, voter, threshold, calibration or provider change; the SAME
+insights snapshot + the SAME markets board, zero new fetches, zero new
+KV. S12 opens Phase E (Europe) with the build session: the Europe route
+leaves the region set for its own lazy chunk (the UsaPage pattern) —
+the EU section (ecb-dfr · euro-hicp · euro-aaa-10y · bund-10y ·
+btp-bund-spread · oecd-cli-de) and the non-EU United Kingdom section
+(gilt-10y · boe-rate) listed APART per D-33, each card with the §21
+trio (value · 10-year position · freshness) through the PURE
+`europe-tiles.ts`; the S8 zoom section on top (RegionIndexSection
+region='europe' — the STOXX50E/DAX/CAC/FTSE zoom already renders it);
+the cross-links strip (§8 item 4: eur-usd · usdchf · usdtry →
+/currencies). The honest "In build" chip stays (the §15 fills are
+verified-pending-ingest). The §15 FRED-only fills (D-34: euro-area
+unemployment · industrial production · ECB-SDMX M3 liquidity) are NOT
+ingested — the candidates were probed live against the publisher (Rule 5);
+none could be verified cleanly from the dev sandbox (FRED serves a JS
+challenge to the sandbox IP — the production Worker reaches FRED fine; the
+ECB M3 SDMX key needs the BSI dimension walk the production adapter does).
+Per Rule 5, NO fill is ingested unverified; the candidates + the
+verification status are recorded in DECISIONS.md (BD-S12a) for the next
+session. The §21 backtest: `europe-backtest-core.ts` (the page ≡ engine
+trio diff over the 8 cards, reusing S11's PURE `auditUsaFreshness` for the
+freshness audit) + `europe-backtest.test.ts` (12 tests) + the live
+`pd-s12-backtest.ts` script. The copy pins: `europe-copy-pin.test.ts` (the
+8 card names + units + position/band/status words ↔ the corpus, both
+locales) + the 34 new `pd.europe.*` fa strings queued unreviewed in the
+manifest.
+
+**Gates before the deploy (ALL GREEN, 2m 26s):** secret scan 8/968 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean · narrator vocabulary in
+sync + eval 50 · layer1 strict 11,819/11,819 · the full suite **14,945
+= +23** (europe-tiles 9 · europe-copy-pin 2 · europe-backtest 12) ·
+build + budgets held (entry 270.28/81.86; the Europe lazy chunk in
+budget).
+
+**The §21 diff — the S12 gate's own, run LIVE twice (pre-deploy and
+post-deploy): 8 checks · 8 green · 0 red.** The live `pd-s12-backtest.ts`
+against PRODUCTION: the 8 cards' trio inputs byte-identical (page ≡
+engine — ecb-dfr 2.5 normal · euro-hicp 4.0 warning · euro-aaa-10y 3.29
+context · bund-10y 3.47 context · btp-bund-spread 0.80 stale ·
+oecd-cli-de 101.0 context · gilt-10y 5.24 context · boe-rate 4.0
+context), the EU/non-EU group membership 6/2 + 8/8 carried, the freshness
+audit honest (btp-bund-spread 100d beyond its 75d monthly grace AND
+carrying the engine's stale status — the page speaks the word), the two
+feeds one snapshot (generatedAt aligned).
+
+**The deploy-lock check ran first** (the D-43 lesson): the active version
+was S11's `4f288272` @ 100% — no parallel deploy. `pnpm --filter
+@currena/web build` + `wrangler deploy` → **currena-api `84833135` @ 100%**
+(deployment `84833135-c8b4-48d4-a4aa-da4e57a04ae0`, 2026-11-09T02:20Z).
+currena-markets untouched (code-unchanged).
+
+**The live acceptance (ALL GREEN):** currena.ir/europe live-smoke-verified
+at 1440×900 en (8 cards · the EU section · the UK section · the zoom
+· the 3 cross-links · the In-build chip present · 0px overflow · 0
+page errors · the live values ecb-dfr 2.50% · euro-hicp 4.0%); the
+browser pass (the freshly built SPA through the local preview server,
+/api proxied to currena.ir) at 1440×900 AND 360×844 in BOTH en and fa
+(RTL, Persian digits) — the 8 cards with the §21 trio rendering (8
+values measured in the DOM), the EU + UK sections + the zoom + the 3
+cross-links all present, the In-build chip present, NO horizontal scroll
+at any width in any locale (overflow 0px on all 4 legs), ZERO console/page
+errors across all 4 legs; the rendered values match the live §21 data
+byte-for-byte; the Global + Gold + World Markets + USA + region + legacy
+/insights surfaces intact.
+
+- **Rollback:** `wrangler rollback` — /europe returns to the S8
+  RegionPage placeholder (the zoom + the DestinationBody); every other
+  surface was byte-identical before it.
+- **Who decided:** the build session (S12) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives above.
+
 ## Session record — 2026-11-09c the page-division S11 deploy (the USA gates — Phase D closes; the freshness audit formalized, the mobile/ARIA polish landed, the honest In-build chip retired)
 
 **Scope (page-division S11, the USA gates):** display-layer ONLY. No

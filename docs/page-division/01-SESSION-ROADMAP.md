@@ -840,7 +840,7 @@ In-build chip retired — BD-S10b's completion) + the deploy, all in
 
 ## Phase E — Europe (S12–S13)
 
-### ☐ S12 — Europe build + fills · `Session 12/30`
+### ✅ S12 — Europe build + fills · `Session 12/30` · delivered 2026-11-09 · **Phase E OPEN**
 - EU section & non-EU (UK) section apart (D-33); Europe zoom map.
 - FRED-only fills (D-34): euro unemployment · industrial production ·
   ECB-SDMX liquidity — **verify each candidate series live before ingest**
@@ -848,8 +848,82 @@ In-build chip retired — BD-S10b's completion) + the deploy, all in
 - **Gates:** fills verified against publisher releases; EU/non-EU split
   correct; gates on cards.
 
+**S12 delivery record (2026-11-09):** Phase E (Europe) is OPEN — the
+Europe page build session delivered the page over the 8 placed ids with
+the §15 fills verified-pending-ingest (Rule 5). **(a) The Europe page
+(BD-S12b — spec §8 items 1–4; D-15/D-33):** the Europe route leaves the
+region set for its own lazy chunk (the UsaPage pattern) — the EU section
+(ecb-dfr · euro-hicp · euro-aaa-10y · bund-10y · btp-bund-spread ·
+oecd-cli-de) and the non-EU United Kingdom section (gilt-10y · boe-rate)
+listed APART per D-33, each card with the §21 trio (value · 10-year
+position · freshness) through the PURE `europe-tiles.ts` (pinned
+output-for-output against `config/display.ts`'s `formatReadingValue` by
+`europe-tiles.test.ts`, the S9 usa-tiles pattern — 9 tests); the S8 zoom
+section on top (`RegionIndexSection region='europe'` — the STOXX50E ·
+DAX · CAC · FTSE zoom the S8 map already renders; the page's own layers
+seat under it); the cross-links strip (§8 item 4: eur-usd · usdchf ·
+usdtry → /currencies). The honest "In build" chip stays (the §15 fills
+are verified-pending-ingest; the page is honestly still growing, the
+spec §20 thin-region mitigation — the USA trajectory: S9/S10 chip → S11
+retirement). **(b) The §15 FRED-only fills verified-pending-ingest
+(BD-S12a — Rule 5):** the three D-34 Europe fills (euro-area
+unemployment · industrial production · ECB-SDMX M3 liquidity) are NOT
+ingested — the candidates were probed live against the publisher (Rule
+5); none could be verified cleanly from the dev sandbox (FRED serves a
+JS challenge to the sandbox IP — the production Worker reaches FRED
+fine, the bund/gilt/italy mirrors prove the adapter works in egress; the
+ECB M3 SDMX key needs the BSI dimension walk the production adapter
+does for the Eurosystem-assets series). Per Rule 5, NO fill is ingested
+unverified; the candidates + the verification status are recorded in
+DECISIONS.md for the next session to verify from production egress +
+ingest with the full §A discipline. The placement `eu-members` note
+updated. **(c) The §21 backtest:** `europe-backtest-core.ts` (the page ≡
+engine trio diff over the 8 cards, reusing S11's PURE
+`auditUsaFreshness` for the freshness audit — one audit function, no
+logic drift) + `europe-backtest.test.ts` (12 tests: the GREEN path, the
+public-mode twin, four FAIL-CLOSED proofs, the stableStringify immunity,
++ the freshness audit's own cases on Europe's cadences) + the live
+`pd-s12-backtest.ts` script. **(d) The copy pins:**
+`europe-copy-pin.test.ts` (the 8 card names + units + position/band/
+status words ↔ the corpus, both locales) + the 34 new `pd.europe.*` fa
+strings queued unreviewed in the manifest (the S9/S10 pattern).
+**THE §21 DIFF (the S12 gate's own — run LIVE twice, before and after
+the deploy): 8 cards · 8 green · 0 red.** The live `pd-s12-backtest.ts`
+against PRODUCTION: the 8 cards' trio inputs byte-identical (page ≡
+engine — ecb-dfr 2.5 · euro-hicp 4.0 warning · euro-aaa-10y 3.29 ·
+bund-10y 3.47 · btp-bund-spread 0.80 stale · oecd-cli-de 101.0 ·
+gilt-10y 5.24 · boe-rate 4.0), the EU/non-EU group membership 6/2 +
+8/8 carried, the freshness audit honest (btp-bund-spread 100d beyond
+its 75d monthly grace AND carrying the engine's stale status — the page
+speaks the word). **The browser pass** (the freshly built SPA through
+the local preview server, /api proxied to currena.ir): 1440×900 AND
+360×844 in BOTH en and fa (RTL, Persian digits) — the 8 cards with the
+§21 trio rendering (8 values measured), the EU + UK sections + the zoom
++ the 3 cross-links all present, the In-build chip present, NO
+horizontal scroll at any width in any locale (overflow 0px on all 4
+legs), ZERO console/page errors across all 4 legs; the rendered values
+match the live §21 data byte-for-byte. **Gates ALL GREEN** (2m 26s:
+secret scan 8/968 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator
+in sync + eval 50 · layer1 11,819/11,819 · **the suite 14,945 = +23**
+(europe-tiles 9 · europe-copy-pin 2 · europe-backtest 12) · build +
+budgets held — entry 270.28/81.86). **Deployed + live-verified**
+(version `84833135` 2026-11-09 02:20 UTC, the owner's standing "the
+deploy at the close is the owner's standing"; the deploy-lock check ran
+first — S11's `4f288272` @ 100%): currena.ir/europe live-smoke-verified
+at 1440×900 en (8 cards · the EU section · the UK section · the zoom ·
+the 3 cross-links · the In-build chip present · 0px overflow · 0 page
+errors · the live values ecb-dfr 2.50% · euro-hicp 4.0%), the §21
+backtest re-run post-deploy 8/8 green, every other surface intact.
+Decisions: BD-S12a (the §15 fills verified-pending-ingest — Rule 5) ·
+BD-S12b (the Europe page build) + the deploy, all in `docs/DECISIONS.md`.
+
 ### ☐ S13 — Europe gates · `Session 13/30`
-- Card audit, freshness, mobile/ARIA; hand-off.
+- Card audit, freshness, mobile/ARIA; hand-off. The In-build chip
+  retires when the gates pass on the 8 placed ids (the USA trajectory:
+  S9/S10 chip → S11 retirement). The §15 fill ingest (verified from
+  production egress + the ECB M3 dimension walk) may land here or in a
+  dedicated fill session — the candidates are recorded in DECISIONS.md
+  (BD-S12a).
 
 ## Phase F — Asia & Pacific (S14–S15)
 
@@ -930,7 +1004,7 @@ In-build chip retired — BD-S10b's completion) + the deploy, all in
 | B Gold | S5–S6 | ✅ S5 2026-11-08 (deployed `f2e74f3c`) · ✅ S6 2026-11-08 (deployed `327c7761`, BD-S6a's alternation) |
 | C World Markets | S7–S8 | ✅ S7 2026-11-08 (deployed `6e515cf8`, the D-43 map hero + the region grids + the 9 risk cards) · ✅ S8 2026-11-08 (deployed `fde50a95`, the four REGION zoom maps — PHASE C CLOSED) |
 | D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) · ✅ S10 2026-11-09 (deployed `18907d4d`, tiers 3–5 + the TIC board — the 72 cards complete) · ✅ S11 2026-11-09 (deployed `4f288272`, the USA gates — the freshness audit formalized, the mobile/ARIA polish, the In-build chip retired — **PHASE D CLOSED**) |
-| E Europe | S12–S13 | ☐ next: S12 |
+| E Europe | S12–S13 | ✅ S12 2026-11-09 (deployed `84833135`, the EU + non-EU UK sections + the zoom + the cross-links — the 8 placed ids, the §15 fills verified-pending-ingest — Phase E OPEN) · ☐ S13 |
 | F Asia & Pacific | S14–S15 | ☐ |
 | G Australia | S16 | ☐ |
 | H Commodities | S17 | ☐ |
@@ -939,7 +1013,9 @@ In-build chip retired — BD-S10b's completion) + the deploy, all in
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 11/30 delivered 2026-11-09 · 19 remaining — next
-action: Session 12/30 (S12, Phase E opens — Europe build + fills: the
-EU/non-EU split D-33, the Europe zoom map, the FRED-only fills D-34 —
-verify each candidate series live before ingest).**
+**Current position: Session 12/30 delivered 2026-11-09 · 18 remaining — next
+action: Session 13/30 (S13, the Europe gates: the card-render audit, the
+freshness, the mobile/ARIA pass, the In-build chip retirement when the
+gates pass on the 8 placed ids; the §15 fill ingest may land here or in
+a dedicated fill session — the candidates are recorded in DECISIONS.md
+BD-S12a, verified from production egress + the ECB M3 dimension walk).**

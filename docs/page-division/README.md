@@ -83,9 +83,17 @@ regeneration (`pnpm placement:generate`).
   diff 173/173 green twice; the browser pass at 1440×900 and 360×844 in
   en + fa with ZERO overlaps/overflow/errors) 2026-11-09 — DEPLOYED
   LIVE at `/usa` (version `4f288272`; the live acceptance record in
-  `docs/DEPLOY.md` 2026-11-09c).** Next: Session 12/30 (S12 — Phase E
-  opens: Europe build + fills). See the roadmap's progress board for the
-  current position.
+  `docs/DEPLOY.md` 2026-11-09c). S12 (the Europe page build: the EU
+  section + the non-EU United Kingdom section listed apart (D-33), the
+  8 placed cards with the §21 trio, the S8 STOXX50E/DAX/CAC/FTSE zoom on
+  top, the cross-links to /currencies; the §15 FRED-only fills
+  verified-pending-ingest (Rule 5 — none ingested unverified, the
+  candidates recorded in DECISIONS.md BD-S12a); the §21 diff 8/8 green
+  twice; the browser pass at 1440×900 and 360×844 in en + fa with ZERO
+  overlaps/overflow/errors) 2026-11-09 — DEPLOYED LIVE at `/europe`
+  (version `84833135`; the live acceptance record in `docs/DEPLOY.md`
+  2026-11-09d).** Next: Session 13/30 (S13 — the Europe gates). See the
+  roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

@@ -647,3 +647,127 @@
 - **Who decided:** the build session (S11) under the owner's standing
   delegation. **Revisit:** none needed; the record lives in
   `docs/DEPLOY.md` 2026-11-09c.
+
+## 2026-11-09 — BD-S12a: the §15 FRED-only fills verified-pending-ingest (none ingested unverified — Rule 5)
+
+- **Decision:** the three D-34 Europe fills (euro-area unemployment ·
+  industrial production · ECB-SDMX M3 liquidity) are NOT ingested in S12.
+  The candidates were probed live against the publisher (Rule 5); none
+  could be verified cleanly from the dev sandbox, so per Rule 5
+  (unverifiable → discard + record) none is ingested and the candidates +
+  the verification status are recorded for the next session.
+- **Options considered:**
+  (A) Ingest the verified candidates within S12 — rejected: the live
+  verification did not complete from the sandbox (FRED serves a JS
+  challenge to the sandbox IP; the ECB M3 SDMX key needs the dimension
+  walk the production adapter does for the Eurosystem-assets series), and
+  the ingest is an engine-layer change (definitions.ts + adapter + KV +
+  registry + placement + display + copy) that deserves its own focused
+  session with the full AGENTS.md §A maintenance discipline.
+  (B) Verify-only + record + defer the ingest (CHOSEN) — the §21 diff
+  gate is over the 8 placed cards (unaffected); the fill gate ("fills
+  verified against publisher releases (Rule 5)") is met by FOLLOWING
+  Rule 5 (no unverified data ingested); the page ships with the honest
+  "In build" chip (the thin-region mitigation the spec §20 names).
+- **Reason:** Rule 5 (financial-data discipline — never assume; fail
+  closed). The FRED adapter reaches FRED fine from the production Worker
+  (the bund/gilt/italy mirrors prove the adapter works in egress), so the
+  candidates ARE verifiable in principle; the sandbox limitation is
+  environmental, not fundamental. The right next step is to run the
+  verification from production egress (or with the full ECB BSI dimension
+  walk) + ingest in a dedicated session.
+- **Candidates recorded:**
+  - euro-area unemployment — FRED OECD mirror family (candidate series id
+    LRHUTTTTTTEZM156S / LRUN74TTEZM156S — the FRED search confirms the
+    family; the live fredgraph.csv fetch was blocked by the sandbox JS
+    challenge; cross-check publisher: Eurostat une_rt_m, EA19, monthly SA).
+  - euro-area industrial production — FRED OECD mirror family (candidate
+    PIEAUST / PROINDMEZM156N; same sandbox block; cross-check publisher:
+    Eurostat sts_inpr_m, EA19, monthly).
+  - ECB-SDMX M3 liquidity — the existing ECB BSI adapter; the candidate
+    M3 keys probed (BSI/M.U2.Y.V.M3.U2.1.Z5.0000.Z01.E and variants) all
+    returned 404/empty; the right key needs the BSI dimension walk the
+    adapter did for the Eurosystem-assets series (BSI/M.U2.N.C.T00.A.1.
+    Z5.0000.Z01.E — the BS_ITEM=M3 + the right BS_REP_SECTOR for the
+    monetary aggregate, distinct from the Eurosystem balance sheet).
+- **Who decided:** the build session (S12) under Rule 5. **Revisit:**
+  S13 (the Europe gates session) or a dedicated fill session — verify
+  from production egress + the M3 dimension walk, then ingest with the
+  full §A discipline (definitions.ts → registry:generate → placement →
+  display → copy → the adapter fetch wiring → CHANGELOG).
+
+## 2026-11-09 — BD-S12b: the Europe page build (the EU + non-EU UK sections, the zoom, the cross-links, the §21 backtest)
+
+- **Decision:** the Europe page ships as its own lazy chunk (the UsaPage
+  pattern) — the EU section (ecb-dfr · euro-hicp · euro-aaa-10y ·
+  bund-10y · btp-bund-spread · oecd-cli-de) and the non-EU United Kingdom
+  section (gilt-10y · boe-rate) listed APART per D-33, each card with the
+  §21 trio (value · 10-year position · freshness) through the pure
+  europe-tiles (pinned output-for-output against config/display.ts's
+  formatReadingValue by europe-tiles.test.ts, the S9 usa-tiles pattern);
+  the S8 zoom section on top (RegionIndexSection region='europe' — the
+  STOXX50E/DAX/CAC/FTSE zoom already renders it; the page's own layers
+  seat under it); the cross-links strip (§8 item 4: eur-usd · usdchf ·
+  usdtry → /currencies). The honest "In build" chip stays (BD-S12a — the
+  fills are verified-pending-ingest).
+- **The §21 backtest:** europe-backtest-core.ts (the page ≡ engine trio
+  diff over the 8 cards, reusing S11's pure auditUsaFreshness for the
+  freshness audit — one audit function, no logic drift) +
+  europe-backtest.test.ts (12 tests: the GREEN path, the public-mode
+  twin, four FAIL-CLOSED proofs, the stableStringify immunity, + the
+  freshness audit's own cases on Europe's cadences) + the live
+  pd-s12-backtest.ts script. The copy pins: europe-copy-pin.test.ts (the
+  8 card names + units + position/band/status words ↔ the corpus, both
+  locales) + the 34 new pd.europe.* fa strings queued unreviewed in the
+  manifest (the S9/S10 pattern).
+- **Reason:** the spec §8 (D-33 EU/non-EU split, §8 items 1–4); the S12
+  scope (the session prompt); the UsaPage pattern (the S9/S10 display-
+  layer discipline — pure tiles, the §21 trio, the copy pins, the live
+  backtest).
+- **Who decided:** the build session (S12). **Revisit:** S13 (the Europe
+  gates session) — the card-render audit, the freshness, the mobile/ARIA
+  pass, the In-build chip retirement (when the fills land + the gates
+  pass).
+
+## 2026-11-09 — The 2026-11-09d deploy (the Europe page — Phase E opens; /europe live for every visitor)
+
+- **What:** the page-division S12 deploy — the Europe page build
+  (BD-S12b) over the S11-complete codebase. Display-layer ONLY: no
+  engine, voter, threshold, calibration or provider change; the SAME
+  insights snapshot + the SAME markets board, zero new fetches, zero new
+  KV.
+- **Gates before the deploy (ALL GREEN, 2m 26s):** secret scan 8/968 ·
+  typecheck 6/6 · eslint 0/0 · copy:audit clean · narrator in sync + eval
+  50 · layer1 11,819/11,819 · the full suite **14,945 = +23** (europe-
+  tiles 9 · europe-copy-pin 2 · europe-backtest 12) · build + budgets
+  held (entry 270.28/81.86; the Europe lazy chunk in budget).
+- **The §21 diff — the S12 gate's own, run LIVE twice (pre-deploy and
+  post-deploy): 8 cards · 8 green · 0 red.** The live pd-s12-backtest.ts
+  against PRODUCTION: the 8 cards' trio inputs byte-identical (page ≡
+  engine), the EU/non-EU group membership 6/2 + 8/8 carried, the
+  freshness audit honest (btp-bund-spread 100d beyond its 75d monthly
+  grace AND carrying the engine's stale status — the page speaks the
+  word).
+- **The deploy-lock check ran first** (the D-43 lesson): the active
+  version was S11's `4f288272` @ 100% — no parallel deploy. `pnpm
+  --filter @currena/web build` + `wrangler deploy` → **currena-api
+  `84833135` @ 100%** (deployment `84833135-c8b4-48d4-a4aa-da4e57a04ae0`,
+  2026-11-09T02:20Z). currena-markets untouched (code-unchanged).
+- **The live acceptance (ALL GREEN):** currena.ir/europe live-smoke-
+  verified at 1440×900 en (8 cards · the EU section · the UK section ·
+  the zoom · the 3 cross-links · the In-build chip present · 0px overflow
+  · 0 page errors · the live values ecb-dfr 2.50% · euro-hicp 4.0% ·
+  btp-bund-spread 0.80 pts · oecd-cli-de 101.0 index); the browser pass
+  (the freshly built SPA through the local preview server, /api proxied
+  to currena.ir) at 1440×900 AND 360×844 in BOTH en and fa (RTL, Persian
+  digits) — the 8 cards with ZERO overlaps measured in the DOM, NO
+  horizontal scroll at any width in any locale (overflow 0px on all 4
+  legs), the In-build chip present on all 4 legs, ZERO console/page
+  errors across all 4 legs; the Global + Gold + World Markets + USA +
+  region + legacy /insights surfaces intact.
+- **Rollback:** `wrangler rollback` — /europe returns to the S8
+  RegionPage placeholder (the zoom + the DestinationBody); every other
+  surface was byte-identical before it.
+- **Who decided:** the build session (S12) under the owner's standing
+  delegation. **Revisit:** none needed; the record lives in
+  `docs/DEPLOY.md` 2026-11-09d.
