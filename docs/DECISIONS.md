@@ -1457,14 +1457,20 @@
   the §21 diff grows to cover the new readings. The honest-stale
   state is the verified current state until then.
 
-## 2026-11-10 — The S16 deploy (pending the owner's standing — the browser pass + the wrangler deploy + the post-deploy live §21 re-verify run as the close-out steps after this hand-off is pushed)
+## 2026-11-10 — BD-S16-deploy: the S16 deploy record — DEPLOYED LIVE (worker `9d60726b` @ 100%, the owner's standing)
 
-- **What:** the page-division S16 deploy — the Australia build & gates
-  (BD-S16a/b/c/d) — is PENDING. Display-layer ONLY: no engine, voter,
-  threshold, calibration or provider change; the SAME insights
-  snapshot + the SAME markets board, zero new fetches, zero new KV.
-  The user-visible change is the /australia page going from the S8
-  RegionPage placeholder (the honest In-build chip) to the full
+- **Deploy record:** S16 deployed live as the currena-api worker version
+  `9d60726b` @ 100% (the owner's standing — the deploy-lock check
+  skipped: no deploy-lock script in the repo; the web build green
+  [AustraliaPage chunk 21.95 KiB]; the deploy uploaded 48 assets, 95
+  already on CDN; the worker startup 47ms; production moved `6f96cd9a`
+  → `9d60726b`). The post-deploy §21 backtest 28/28 green; the browser
+  pass 4/4 green; the In-build chip ABSENT on all 4 legs; the rollback
+  lever `npx wrangler rollback` from apps/api if needed. Display-layer
+  ONLY: no engine, voter, threshold, calibration or provider change;
+  the SAME insights snapshot + the SAME markets board, zero new
+  fetches, zero new KV. The user-visible change: /australia went from
+  the S8 RegionPage placeholder (the honest In-build chip) to the full
   Australia build (the REUSED AU Markets board + the 5-gauge structure
   D-37 + the 28 cards with the §21 trio + the 11 moved-out seat chips
   → their new homes); the In-build chip RETIRED (BD-S16c).
@@ -1482,23 +1488,26 @@
   world-risk 1 = 28), the freshness audit HONEST (19 within grace +
   7 beyond grace all honestly stale-flagged — BD-S16d), the two
   feeds one snapshot (generatedAt aligned).
-- **Close-out steps (run AFTER this hand-off is committed + pushed):**
-  (1) the browser pass — 1440×900 + 360×844 in en + fa, the freshly
-  built SPA through the local preview server, /api proxied to
-  currena.ir, over the REAL production data (28 cards · the 5 gauges ·
-  the zoom · the AU Markets board · the 11 seat chips @ 44px · the
-  In-build chip ABSENT · 0px overflow · 0 page errors on every leg;
-  the fa legs dir=rtl + Persian digits); (2) the deploy —
+- **Close-out steps (all RUN, all GREEN):** (1) the browser pass —
+  1440×900 + 360×844 in en + fa, the freshly built SPA through the
+  local preview server, /api proxied to currena.ir, over the REAL
+  production data (28 cards · the 6 sections · the zoom · the AU
+  Markets board · the 11 seat chips @ 44px · the In-build chip
+  ABSENT · 0px overflow · 0 page errors on every leg; the fa legs
+  dir=rtl + Persian digits) — 4/4 GREEN; (2) the deploy —
   `pnpm --filter @currena/api deploy` under the owner's standing
-  delegation (the deploy-lock check runs first — the active version
-  is S15's `6f96cd9a` @ 100%); (3) the post-deploy live §21 re-verify
-  — the live `pd-s16-backtest.ts` re-run against production 28/28
-  green + currena.ir/australia live-smoke-verified.
-- **Rollback:** `wrangler rollback` — /australia returns to the S8
-  RegionPage placeholder (the honest In-build chip present); nothing
-  else moves (the S16 change is the /australia page build + the §21
+  delegation — worker `9d60726b` @ 100% (the prior active version was
+  S15's `6f96cd9a` @ 100%); (3) the post-deploy live §21 re-verify —
+  the live `pd-s16-backtest.ts` re-run against production 28/28 green
+  + currena.ir/australia live-smoke-verified (HTTP 200 + 33 readings
+  + boards markets-au).
+- **Rollback:** `npx wrangler rollback` from apps/api — /australia
+  returns to the prior surface (`6f96cd9a`, S15 — the S8 RegionPage
+  placeholder with the honest In-build chip present); nothing else
+  moves (the S16 change is the /australia page build + the §21
   backtest + the render audit + the chip retirement only).
 - **Who decided:** the build & gates session (S16) under the owner's
   standing delegation ("the deploy at the close is the owner's
-  standing"). **Revisit:** the deploy record finalizes in
-  `docs/DEPLOY.md` once the close-out steps run.
+  standing") — the deploy ran 2026-11-10 ~20:30 UTC. **Revisit:** the
+  deploy record is final; the full deploy narrative lives in
+  `docs/DEPLOY.md`.

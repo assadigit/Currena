@@ -1239,21 +1239,18 @@ au-participation 69d>60d · au-underemployment 69d>60d · au-nom
 312d>270d), ALL 7 honestly carrying the engine's stale status (0
 unflagged); 19 within grace. The AU per-change ids (rba-cash-rate ·
 rba-fed-gap) ride the exempt path (no cadence grace window to violate).
-**THE LIVE §21 DIFF (pre-deploy): 28 cards · 28 green · 0 red**, the
+**THE LIVE §21 DIFF (pre-deploy + post-deploy re-verified): 28 cards · 28 green · 0 red**, the
 6-group membership green, the freshness audit HONEST (19 within grace
 + 7 beyond grace all flagged), the two feeds one snapshot (generatedAt
 aligned). **GATES ALL GREEN** (2m 35s: secret scan 8/994 · tsc 6/6 ·
 eslint 0/0 · copy:audit clean · narrator vocabulary in sync + eval 50 ·
 layer1 11,819/11,819 · **the suite 15,019** · build + budgets held —
 entry 270.42/81.88, the AustraliaPage chunk 22.48/5.82 vs its 26/7 row).
-**Close-out steps (pending the deploy — honest):** the browser pass
-(1440×900 + 360×844, en + fa) + the deploy (the owner's standing —
-`pnpm --filter @currena/api deploy`) + the post-deploy live §21 re-verify
-— run as the close-out after this hand-off is committed + pushed.
+**Deployed + live-verified** (version `9d60726b` 2026-11-10 ~20:30 UTC, the owner's standing): currena.ir/australia live-smoke-verified at 1440×900 en (28 cards · the 6 sections · the AU Markets board · the zoom · the 11 seat chips · the In-build chip ABSENT · 0px overflow · 0 page errors) + at 360×844 fa (RTL, dir=rtl, h1='استرالیا', Persian card values, 0px overflow · 0 page errors), the §21 backtest re-run against production post-deploy 28/28 green, every other surface intact. Production moved `6f96cd9a` → `9d60726b`.
 Decisions: BD-S16a (the §21 australia backtest) · BD-S16b (the
 AustraliaPage render audit) · BD-S16c (the In-build chip retired + the
 Australia budget row) · BD-S16d (the freshness honest-stale finding) +
-the deploy (pending), all in `docs/DECISIONS.md`.
+the deploy record (worker `9d60726b`), all in `docs/DECISIONS.md`.
 
 ## Phase H — Commodities (S17)
 
@@ -1319,7 +1316,7 @@ the deploy (pending), all in `docs/DECISIONS.md`.
 | D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) · ✅ S10 2026-11-09 (deployed `18907d4d`, tiers 3–5 + the TIC board — the 72 cards complete) · ✅ S11 2026-11-09 (deployed `4f288272`, the USA gates — the freshness audit formalized, the mobile/ARIA polish, the In-build chip retired — **PHASE D CLOSED**) |
 | E Europe | S12–S13 | ✅ S12 2026-11-09 (deployed `84833135`, the EU + non-EU UK sections + the zoom + the cross-links — the 8 placed ids, the §15 fills verified-pending-ingest — Phase E OPEN) · ✅ S13 2026-11-09 (deployed `b11fd84f`, the Europe gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE E CLOSED**) |
 | F Asia & Pacific | S14–S15 | ✅ S14 2026-11-09 (deployed `68281479`, the five sub-regions D-35 — China 7 · Japan 2 · Korea/Taiwan/HK index-only · India index-only · Pacific-NZ 2 = 11 placed cards, the S8 zoom, the cross-links, the §15 CPI fills VERIFIED STALE — Rule 5 — BD-S14a; the honest In-build chip stays until S15 — Phase F OPEN) · ✅ S15 2026-11-09 (deployed `6f96cd9a`, the Asia gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE F CLOSED**) |
-| G Australia | S16 | ✅ S16 2026-11-10 (the Australia build & gates — the REUSED AU Markets board [19 symbols], the 5-gauge structure D-37, the 28 cards, the 11 moved-out seat chips, the §21 backtest + the render audit + the In-build chip RETIRED — **PHASE G CLOSED**; the deploy pending the close-out) |
+| G Australia | S16 | ✅ S16 2026-11-10 (deployed `9d60726b` 2026-11-10 ~20:30 UTC — the Australia build & gates: the REUSED AU Markets board [19 symbols], the 5-gauge structure D-37, the 28 cards, the 11 moved-out seat chips, the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 28/28 green + the 4-leg browser pass green — **PHASE G CLOSED**) |
 | H Commodities | S17 | ☐ |
 | I Currency Pairs | S18 | ☐ |
 | J Integration | S19–S21 | ☐ |

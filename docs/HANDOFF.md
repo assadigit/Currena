@@ -16,12 +16,12 @@
 > [offline suite + the live pd-s16-backtest.ts] + the render audit
 > [AustraliaPage.test.tsx, 7 tests] + the full gates + the In-build chip
 > RETIRED at the gates pass (BD-S16c). Live §21 diff 28/28 green pre-
-> deploy (post-deploy pending the close-out). Freshness HONEST (BD-S16d
-> — 7 beyond grace, all honestly flagged). Gates ALL GREEN. **Remaining
-> close-out steps (honest): the browser pass (1440×900 + 360×844, en +
-> fa) + the deploy (the owner's standing) + the post-deploy live §21
-> re-verify — run as the close-out after this hand-off is committed +
-> pushed.**
+> deploy AND post-deploy. Freshness HONEST (BD-S16d — 7 beyond grace,
+> all honestly flagged). Gates ALL GREEN. **Close-out COMPLETE:
+> DEPLOYED LIVE (worker `9d60726b`, 2026-11-10 ~20:30 UTC, the owner's
+> standing); the post-deploy live §21 re-verify 28/28 green; the 4-leg
+> browser pass (1440×900 + 360×844, en + fa) green — the In-build chip
+> ABSENT on all 4 legs, 0px overflow, 0 page errors.**
 
 ## Current state (2026-11-10, after page-division S16)
 
@@ -54,24 +54,29 @@
   green, the page live + verified) · **S16 the Australia build & gates
   (Phase G CLOSED — the chip retired at the gates pass, the gates
   green, the §21 diff 28/28 green pre-deploy, the freshness HONEST).**
-- **BUILT & GATED (pending the close-out deploy):** the /australia page
-  is built + gated in the working tree; the live §21 diff ran against
-  production (pre-deploy) 28/28 green (page ≡ engine byte-for-byte, the
-  6-group membership green, the freshness honest). The S8 RegionPage
-  placeholder (the honest In-build chip) remains live at
-  currena.ir/australia until the close-out deploy. The deploy at the
-  close is the owner's standing — `pnpm --filter @currena/api deploy`
-  — run as a close-out step after this hand-off is committed + pushed,
-  followed by the post-deploy live §21 re-verify + the 4-leg browser
-  pass (1440×900 + 360×844, en + fa). The prior surface (`6f96cd9a`,
-  S15, /asia-pacific) remains the live API until then.
+- **DEPLOYED LIVE (version `9d60726b`, 2026-11-10 ~20:30 UTC, the
+  owner's standing):** the /australia page is built + gated + live. The
+  live acceptance: the §21 diff re-run against production post-deploy
+  28/28 green (the 28 cards' trio inputs byte-identical page ≡ engine;
+  the freshness audit honest — 19 within grace + 7 beyond grace all
+  honestly stale-flagged, 0 unflagged); currena.ir/australia renders
+  the complete page over the live board at 1440×900 AND 360×844 in en
+  AND fa (the 5 gauge sections + the world-risk group = 6 sections,
+  the 28 cards with the §21 trio, the AU Markets board, the S8 ASX 200
+  zoom, the 11 moved-out seat chips resolving to /currencies + /asia-
+  pacific + /commodities + /gold at 44px, the In-build chip ABSENT on
+  all 4 legs, NO horizontal scroll, ZERO console/page errors); the
+  Global + Gold + World Markets + USA + Europe + Asia & Pacific +
+  legacy /insights surfaces intact. The prior surface was `6f96cd9a`
+  (S15, /asia-pacific); production moved `6f96cd9a` → `9d60726b`.
 - **Gates (last full run, S16 — ALL GREEN, 2m 35s):** secret scan
   8/994 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator vocabulary
   in sync + eval 50 · layer1 11,819/11,819 · **suite 15,019** · build +
   budgets held (entry 270.42/81.88, the AustraliaPage chunk 22.48/5.82
   vs its 26/7 row — the In-build chip RETIREMENT [BD-S16c] shaved the
   chunk 22.76→22.48 raw / 5.92→5.82 gzip).
-- **The live §21 diff (pre-deploy, vs https://currena.ir):** 28/28
+- **The live §21 diff (pre-deploy + post-deploy re-verified, vs
+  https://currena.ir):** 28/28
   cards green (page ≡ engine byte-for-byte), the 6-group membership
   green (inflation-rates 6/6 · households 11/11 · trade-currency 2/2 ·
   activity 7/7 · external 1/1 · world-risk 1/1 = 28 cards; 11 moved-
@@ -180,8 +185,9 @@ the S15 gates pass (BD-S15c).
   AustraliaPage lazy chunk measured 22.48/5.82 (S16, chip retired)
   vs a 26/7 ceiling (the S13 Europe / S15 Asia pattern — not re-based
   down so a future fill-session has the same room).
-- The rollback lever for the S16 deploy (pending): `wrangler rollback`
-  — /australia returns to the S8 RegionPage placeholder (the honest
-  In-build chip present); every other surface was byte-identical
-  before it (the S16 change is the /australia page build + the §21
-  backtest + the render audit + the chip retirement only).
+- The rollback lever for the S16 deploy: `npx wrangler rollback` from
+  apps/api — /australia returns to the prior surface (`6f96cd9a`, S15,
+  the S8 RegionPage placeholder with the honest In-build chip present);
+  every other surface was byte-identical before it (the S16 change is
+  the /australia page build + the §21 backtest + the render audit +
+  the chip retirement only).
