@@ -48,7 +48,6 @@ import { dirname, resolve } from 'node:path';
 import { InsightsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { auditUsaFreshness, backtestCommoditiesPage, COMMODITIES_BACKTEST_CARD_IDS, type FreshnessRegistryEntry } from '../src/routes/page-division/commodities-backtest-core';
 import {
-  COMMODITIES_CARD_IDS,
   COMMODITIES_ENERGY_IDS,
   COMMODITIES_METALS_IDS,
   COMMODITIES_AGRICULTURE_IDS,
