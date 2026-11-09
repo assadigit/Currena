@@ -109,8 +109,16 @@ regeneration (`pnpm placement:generate`).
   mobile/ARIA pass pinned + browser-verified, the In-build chip retired
   — Phase F CLOSED) 2026-11-09 — DEPLOYED LIVE at `/asia-pacific`
   (version `6f96cd9a`; the live acceptance record in `docs/DEPLOY.md`
-  2026-11-09g).** Next: Session 16/30 (S16 — the Australia build &
-  gates). See the roadmap's progress board for the current position.
+  2026-11-09g).** S16 (the Australia build & gates: the REUSED AU
+  Markets board [19 symbols] via the lean adapter, the 5-gauge structure
+  D-37, the 28 cards with the §21 trio, the 11 moved-out seat chips →
+  currencies/asia-pacific/commodities/gold; the §21 backtest [the pure
+  core + the offline suite + the live pd-s16-backtest.ts, 28/28 green vs
+  production pre-deploy] + the render audit [AustraliaPage.test.tsx, 7
+  tests] + the In-build chip RETIRED at the gates pass — BD-S16c — Phase
+  G CLOSED) 2026-11-10.** Next: Session 17/30 (S17 — the Commodities
+  build & gates). See the roadmap's progress board for the current
+  position.
 
 ## The one rule that trumps everything
 

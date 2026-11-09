@@ -1307,3 +1307,198 @@
   delegation ("the deploy at the close is the owner's standing").
   **Revisit:** none needed; the record lives in `docs/DEPLOY.md`
   2026-11-09g.
+
+## 2026-11-10 — BD-S16a: the §21 Australia backtest — the pure australia-backtest-core reusing S11's auditUsaFreshness over AUSTRALIA_CARD_IDS (28 cards) + the offline suite (11 tests) + the live pd-s16-backtest.ts (the S14 asia pattern mirrored)
+
+- **Decision:** the S16 Australia build & gates session ships the §21
+  backtest for Australia: the pure `australia-backtest-core.ts`
+  reusing S11's `auditUsaFreshness` over `AUSTRALIA_CARD_IDS` (28
+  cards — the 5-gauge structure D-37: au-inflation-rates 6 ·
+  au-households 11 · au-trade-currency 2 · au-activity 7 (shadow) ·
+  au-external 1 (shadow) + gpr-australia = 28), the offline suite
+  (11 tests — the full pipeline + the public-mode twin + the 4 fail-
+  closed proofs [an absent card → "Cannot read yet"; a dead projection
+  → the error state + retry; the M-17 last-good cached paint; the
+  public-mode twin over the same input] + the key-order immunity + the
+  4 freshness cases), and the live `pd-s16-backtest.ts` (the S14
+  `pd-s14-backtest.ts` asia pattern mirrored — fetches the production
+  /api/insights/pages/australia + the markets board, runs the trio
+  audit + the freshness audit). The live run vs production (pre-
+  deploy): 28/28 cards green (page ≡ engine byte-for-byte), the 6-group
+  membership green (inflation-rates 6/6 · households 11/11 · trade-
+  currency 2/2 · activity 7/7 · external 1/1 · world-risk 1/1 = 28
+  cards; 11 moved-out disjoint), the freshness audit HONEST (19
+  within grace + 7 beyond grace all honestly flagged — BD-S16d).
+- **Options considered:** (A) rely on the render audit + the trio diff
+  alone (correct but the trio diff unpinned at the byte level — S11's
+  lesson was that a regression like a missing card or a stale-unflagged
+  reading could slip); (B) ship the pure core + the offline suite +
+  the live runner (the S11 USA / S14 Asia pattern — CHOSEN); (C) a
+  full Playwright visual suite (heavier than the gates session needs).
+- **Reason:** B — the §21 "card-render audit vs the placement table"
+  is a gate, and the S11/S14 pattern (the pure core reused over the
+  page's CARD_IDS + the offline suite + the live runner re-audited
+  pre/post-deploy) is the established way to pin it. The live runner
+  catches the page ≡ engine byte-identity; the offline suite pins the
+  fail-closed + key-order + freshness paths; both ran green (pre-
+  deploy; post-deploy pending the close-out).
+- **Who decided:** the build & gates session (S16). **Revisit:** if
+  the Australia page gains a layer (a §15 fill card when it lands),
+  the AU CARD_IDS grow + the §21 diff grows with them.
+
+## 2026-11-10 — BD-S16b: the AustraliaPage render audit — the S15 AsiaPage.test.tsx pattern scoped to Australia's 28 cards (7 tests)
+
+- **Decision:** the S16 render audit (`AustraliaPage.test.tsx`, 7 tests
+  — the S11 UsaPage.test.tsx / S13 EuropePage.test.tsx / S15
+  AsiaPage.test.tsx pattern scoped to Australia's 28 cards): fixture
+  sanity (the projection's 28 ids + the §21 trio inputs match the
+  placement table) + loading (the skeleton renders before the
+  projection resolves) + the full shell+zoom+board+5-gauges+world-risk
+  render with the §21 trio spot checks (the value · 10-year position ·
+  freshness joins over the percent/points/index families) + the 11
+  moved-out seat chips at 44px resolving to /currencies + /asia-
+  pacific + /commodities + /gold + the fail-closed absent (an absent
+  card → "Cannot read yet") + the fail-closed dead-projection (a dead
+  projection → the error state + retry, the M-17 last-good cached
+  paint) + the fa/RTL Persian rendering (dir=rtl + Persian digits).
+  The In-build chip is asserted ABSENT (BD-S16c's retirement, the
+  EuropePage S13 / AsiaPage S15 pattern mirrored).
+- **Options considered:** (A) rely on the §21 trio diff alone (no DOM
+  pin — a render regression like a missing gauge or a chip that
+  didn't retire would not surface); (B) ship the render audit (the
+  S11/S13/S15 pattern — CHOSEN); (C) a full Playwright visual suite
+  (heavier than needed).
+- **Reason:** B — the render audit catches display-layer regressions
+  the trio-diff can't (a dropped gauge, a broken seat-chip link, a
+  chip that didn't retire — exactly the BD-S16c retirement the audit
+  now PINS chip-ABSENT on). Both the render audit + the live §21 diff
+  ran green (the render audit 7/7, the live §21 diff 28/28 pre-deploy).
+- **Who decided:** the build & gates session (S16). **Revisit:** if
+  the Australia page gains a layer (a §15 fill card), the audit grows
+  the new cards' assertions.
+
+## 2026-11-10 — BD-S16c: the In-build chip RETIRED at the S16 gates pass — the S13 Europe / S15 Asia trajectory (BD-S15c mirrored); the AustraliaPage chunk shrank 22.76→22.48 / 5.92→5.82
+
+- **Decision:** the Australia page's honest "In build" status chip is
+  RETIRED from the heading block (the 28 placed ids' gates pass — §21
+  card audit 28/28 green, the freshness audit honest, the mobile/ARIA
+  pass pinned). The page's 28 placed cards are complete and verified;
+  no honest "in build" claim remains. The `pd.statusBuilding` key
+  stays in both dictionaries — `PagePlaceholder` (Commodities/
+  Currencies) still carries the honest chip for its own in-build
+  state; `RegionPage` was DELETED in M2 (the Australia page is its own
+  build now, not a region placeholder). The AustraliaPage chunk
+  shrank 22.76→22.48 raw / 5.92→5.82 gzip (the chip removal's few
+  bytes — the `<span>` + its classes). The 26/7 budget ceiling holds
+  (the S13/S15 pattern — not re-based down so a future fill-session
+  has the same room).
+- **Options considered:** (A) keep the chip until the §15 Asia fills
+  land (the page is "honestly still growing" — but the §15 fills are
+  Asia's, not Australia's, and Australia's 28 placed ids are
+  complete); (B) retire the chip on the gates pass (the 28 placed ids'
+  gates pass — the USA S11 / Europe S13 / Asia S15 trajectory,
+  CHOSEN); (C) retire the key entirely (would break PagePlaceholder).
+- **Reason:** B — the 28 placed ids' gates pass (§21 diff 28/28 green,
+  freshness honest, mobile/ARIA green), exactly the USA S11 / Europe
+  S13 / Asia S15 trajectory (build-session chip → gates-session
+  retirement on the gates pass). Keeping the chip after its gate
+  passed would be DISHONEST (claiming in-build when the 28 placed
+  cards are verified complete). The `pd.statusBuilding` key stays for
+  PagePlaceholder; `RegionPage` was deleted in M2 (the Australia page
+  is its own build now).
+- **Who decided:** the build & gates session (S16). **Revisit:** if
+  the Australia page gains a new layer (a §15 fill card), the chip
+  does NOT return — the page is live and verified; the new card ships
+  when it's ready, not under an in-build banner. Bump the 26/7 budget
+  if the fill pushes the chunk past it (with a changelog
+  justification, never silently).
+
+## 2026-11-10 — BD-S16d: the freshness honest-stale finding — 7 AU cards beyond cadence grace, ALL 7 honestly carrying the engine's stale status (0 unflagged); the AU per-change ids ride the exempt path (the S11 freshness-audit formalization mirrored, with the AU honest-stale path EXERCISED unlike Asia's)
+
+- **Decision:** the S16 freshness audit (the pure `auditUsaFreshness`
+  over `AUSTRALIA_CARD_IDS`, reusing S11's formalization — already
+  wired in the `australia-backtest-core.ts` + the offline suite; S16
+  runs it live as a gate via the live `pd-s16-backtest.ts`) found 7 AU
+  cards BEYOND cadence grace, ALL 7 honestly carrying the engine's
+  stale status (0 unflagged): au-unemployment 69d>60d · terms-of-trade
+  222d>215d · au-gdp-growth 222d>215d · au-population-growth
+  312d>270d · au-participation 69d>60d · au-underemployment 69d>60d ·
+  au-nom 312d>270d. The remaining 19 AU cards are within cadence
+  grace. The AU per-change ids (rba-cash-rate · rba-fed-gap) ride the
+  exempt path (no cadence grace window to violate — they're change
+  readings, not point-in-time readings). The freshness audit is
+  HONEST (the engine flags the 7 stale, the page renders the stale
+  flag, the §21 trio carries the freshness status byte-identically
+  page ≡ engine). This MIRRORS the S11 freshness-audit formalization
+  and EXERCISES the honest-stale path that Asia's 11 cards (all
+  within grace) did NOT — the Australia page is the first page with a
+  material honest-stale surface (the cadence gaps in the AU national-
+  accounts data are real, the engine reports them honestly).
+- **Options considered:** (A) suppress the stale flags on the 7 cards
+  (DISHONEST — would hide the cadence gaps from the visitor);
+  (B) report the stale flags honestly + pin the honesty in the §21
+  backtest (the S11 pattern, CHOSEN); (C) re-ingest the 7 stale cards
+  from a fresh source (out of S16's display-layer scope — an ENGINE-
+  layer change that deserves its own focused session, like the §15
+  Asia fills).
+- **Reason:** B — Rule 5 (financial-data discipline — never assume;
+  the cadence gaps are real, the engine reports them honestly, the
+  page renders them honestly). The §21 trio carries the freshness
+  status byte-identically page ≡ engine; the live §21 diff 28/28
+  green confirms it. A dedicated fill session (the §15 Asia fills'
+  sibling) picks fresh sources for the 7 stale AU cards if the owner
+  wants them fresher; their current stale-honest state does not make
+  the 28 placed cards "in build" — the chip retires on the gates
+  pass (BD-S16c).
+- **Who decided:** the build & gates session (S16) under Rule 5.
+  **Revisit:** a dedicated AU fill session if the owner wants the 7
+  stale cards fresher — pick viable monthly/quarterly sources,
+  verify from production egress, ingest with the full §A discipline;
+  the §21 diff grows to cover the new readings. The honest-stale
+  state is the verified current state until then.
+
+## 2026-11-10 — The S16 deploy (pending the owner's standing — the browser pass + the wrangler deploy + the post-deploy live §21 re-verify run as the close-out steps after this hand-off is pushed)
+
+- **What:** the page-division S16 deploy — the Australia build & gates
+  (BD-S16a/b/c/d) — is PENDING. Display-layer ONLY: no engine, voter,
+  threshold, calibration or provider change; the SAME insights
+  snapshot + the SAME markets board, zero new fetches, zero new KV.
+  The user-visible change is the /australia page going from the S8
+  RegionPage placeholder (the honest In-build chip) to the full
+  Australia build (the REUSED AU Markets board + the 5-gauge structure
+  D-37 + the 28 cards with the §21 trio + the 11 moved-out seat chips
+  → their new homes); the In-build chip RETIRED (BD-S16c).
+- **Gates before the deploy (ALL GREEN, 2m 35s):** secret scan 8/994
+  · typecheck 6/6 · eslint 0/0 · copy:audit clean · narrator
+  vocabulary in sync + eval 50 · layer1 11,819/11,819 · **the full
+  suite 15,019** · build + budgets held — entry 270.42/81.88, the
+  AustraliaPage lazy chunk 22.48/5.82 vs its 26/7 row (the chip
+  retirement shaved ~0.28kB raw).
+- **The §21 diff — the S16 gate's own, run LIVE pre-deploy: 28 cards
+  · 28 green · 0 red.** The live `pd-s16-backtest.ts` against
+  PRODUCTION: the 28 cards' trio inputs byte-identical (page ≡
+  engine), the 6-group membership green (inflation-rates 6 ·
+  households 11 · trade-currency 2 · activity 7 · external 1 ·
+  world-risk 1 = 28), the freshness audit HONEST (19 within grace +
+  7 beyond grace all honestly stale-flagged — BD-S16d), the two
+  feeds one snapshot (generatedAt aligned).
+- **Close-out steps (run AFTER this hand-off is committed + pushed):**
+  (1) the browser pass — 1440×900 + 360×844 in en + fa, the freshly
+  built SPA through the local preview server, /api proxied to
+  currena.ir, over the REAL production data (28 cards · the 5 gauges ·
+  the zoom · the AU Markets board · the 11 seat chips @ 44px · the
+  In-build chip ABSENT · 0px overflow · 0 page errors on every leg;
+  the fa legs dir=rtl + Persian digits); (2) the deploy —
+  `pnpm --filter @currena/api deploy` under the owner's standing
+  delegation (the deploy-lock check runs first — the active version
+  is S15's `6f96cd9a` @ 100%); (3) the post-deploy live §21 re-verify
+  — the live `pd-s16-backtest.ts` re-run against production 28/28
+  green + currena.ir/australia live-smoke-verified.
+- **Rollback:** `wrangler rollback` — /australia returns to the S8
+  RegionPage placeholder (the honest In-build chip present); nothing
+  else moves (the S16 change is the /australia page build + the §21
+  backtest + the render audit + the chip retirement only).
+- **Who decided:** the build & gates session (S16) under the owner's
+  standing delegation ("the deploy at the close is the owner's
+  standing"). **Revisit:** the deploy record finalizes in
+  `docs/DEPLOY.md` once the close-out steps run.

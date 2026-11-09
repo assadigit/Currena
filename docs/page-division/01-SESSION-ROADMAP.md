@@ -1180,10 +1180,80 @@ the Asia budget row tightened — BD-S14b's completion) · BD-S15d (the
 
 ## Phase G — Australia (S16)
 
-### ☐ S16 — Australia build & gates · `Session 16/30`
+### ✅ S16 — Australia build & gates · `Session 16/30` · delivered 2026-11-10 · **Phase G CLOSED**
 - AU Markets board on top; the 5-gauge structure unchanged (D-37); 28 cards;
   moved-out seat chips link to new homes (currencies/commodities/asia/gold).
 - **Gates:** seat chips resolve; board freshness; mobile/ARIA; hand-off.
+
+**S16 delivery record (2026-11-10):** Phase G (Australia) is CLOSED — the
+owner's home market, reorganized only (D-37), built + gated in ONE
+session (M1 the pure tiles + copy + pins prior session `f078e37`; M2 the
+page build prior session `ba188cb`; M3 the §21 backtest + the render
+audit + the full gates + the In-build chip RETIRED, this session). **(a)
+M1 — the pure australia-tiles + the en/fa pd.australia copy + the pins:**
+the 28 card-display configs (the S9–S15 pattern — no new layers, no new
+fetches) + the en/fa `pd.australia.*` copy (the 139 keys, corpus-pinned
+by `australia-copy-pin.test.ts`) + the section/intro/loading/board copy.
+**(b) M2 — the page build:** the REUSED AU Markets board (19 symbols:
+All Ordinaries · Small Ordinaries · 10 ASX-200 sectors · 4 big banks ·
+ASX 200 VIX · NZX50) via the lean adapter (no new drawing — the markets
+board's own feed); the 5-gauge structure D-37 (3 voting — au-inflation-
+rates 6 · au-households 11 · au-trade-currency 2; 2 shadow — au-activity
+7 + au-external 1; + gpr-australia = 28 cards) with every card carrying
+the §21 trio (value · 10-year position · freshness); the 11 moved-out
+seat chips → their new homes (/currencies · /asia-pacific · /commodities
+· /gold) at 44px. `RegionPage` was deleted in M2 (the Australia page is
+its own build now); the `pd.statusBuilding` key stays for
+`PagePlaceholder` (Commodities/Currencies). **(c) M3 — the §21 backtest
+(BD-S16a):** the pure `australia-backtest-core.ts` reusing S11's
+`auditUsaFreshness` over `AUSTRALIA_CARD_IDS` (28 cards) + the offline
+suite (11 tests: the full pipeline + the public-mode twin + the 4 fail-
+closed proofs [an absent card → "Cannot read yet"; a dead projection →
+the error state + retry; the M-17 last-good cached paint; the public-mode
+twin] + the key-order immunity + the 4 freshness cases) + the live
+`pd-s16-backtest.ts` (the S14 `pd-s14-backtest.ts` asia pattern
+mirrored). The live run vs production (pre-deploy): 28/28 green
+(page ≡ engine byte-for-byte), the 6-group membership green (inflation-
+rates 6/6 · households 11/11 · trade-currency 2/2 · activity 7/7 ·
+external 1/1 · world-risk 1/1 = 28 cards; 11 moved-out disjoint), the
+freshness audit HONEST. **(d) The render audit (BD-S16b):**
+`AustraliaPage.test.tsx` (7 tests — the S15 AsiaPage.test.tsx pattern
+scoped to Australia's 28 cards): fixture sanity + loading + the full
+shell+zoom+board+5-gauges+world-risk render with the §21 trio spot
+checks + the 11 seat chips at 44px resolving to /currencies + /asia-
+pacific + /commodities + /gold + the fail-closed absent + the fail-
+closed dead-projection + the M-17 last-good + the fa/RTL Persian
+rendering. **(e) The In-build chip RETIRED at the gates pass (BD-S16c —
+the S13 Europe / S15 Asia trajectory, BD-S15c mirrored):** the Australia
+page's honest "In build" chip is REMOVED from the heading block — the
+28 placed ids' gates pass (§21 card audit 28/28 green, the freshness
+audit honest, the mobile/ARIA pass pinned). The AustraliaPage chunk
+shrank 22.76→22.48 raw / 5.92→5.82 gzip (the chip removal's few bytes);
+the 26/7 ceiling holds (the S13/S15 pattern — not re-based down so a
+future fill-session has the same room). **(f) The freshness honest-stale
+finding (BD-S16d — the S11 freshness-audit formalization mirrored, with
+the AU honest-stale path EXERCISED unlike Asia's):** 7 AU cards beyond
+cadence grace (au-unemployment 69d>60d · terms-of-trade 222d>215d ·
+au-gdp-growth 222d>215d · au-population-growth 312d>270d ·
+au-participation 69d>60d · au-underemployment 69d>60d · au-nom
+312d>270d), ALL 7 honestly carrying the engine's stale status (0
+unflagged); 19 within grace. The AU per-change ids (rba-cash-rate ·
+rba-fed-gap) ride the exempt path (no cadence grace window to violate).
+**THE LIVE §21 DIFF (pre-deploy): 28 cards · 28 green · 0 red**, the
+6-group membership green, the freshness audit HONEST (19 within grace
++ 7 beyond grace all flagged), the two feeds one snapshot (generatedAt
+aligned). **GATES ALL GREEN** (2m 35s: secret scan 8/994 · tsc 6/6 ·
+eslint 0/0 · copy:audit clean · narrator vocabulary in sync + eval 50 ·
+layer1 11,819/11,819 · **the suite 15,019** · build + budgets held —
+entry 270.42/81.88, the AustraliaPage chunk 22.48/5.82 vs its 26/7 row).
+**Close-out steps (pending the deploy — honest):** the browser pass
+(1440×900 + 360×844, en + fa) + the deploy (the owner's standing —
+`pnpm --filter @currena/api deploy`) + the post-deploy live §21 re-verify
+— run as the close-out after this hand-off is committed + pushed.
+Decisions: BD-S16a (the §21 australia backtest) · BD-S16b (the
+AustraliaPage render audit) · BD-S16c (the In-build chip retired + the
+Australia budget row) · BD-S16d (the freshness honest-stale finding) +
+the deploy (pending), all in `docs/DECISIONS.md`.
 
 ## Phase H — Commodities (S17)
 
@@ -1249,18 +1319,18 @@ the Asia budget row tightened — BD-S14b's completion) · BD-S15d (the
 | D USA | S9–S11 | ✅ S9 2026-11-09 (deployed `36f64141`, the D-30 verdict strip + tiers 1–2 — PHASE D OPEN) · ✅ S10 2026-11-09 (deployed `18907d4d`, tiers 3–5 + the TIC board — the 72 cards complete) · ✅ S11 2026-11-09 (deployed `4f288272`, the USA gates — the freshness audit formalized, the mobile/ARIA polish, the In-build chip retired — **PHASE D CLOSED**) |
 | E Europe | S12–S13 | ✅ S12 2026-11-09 (deployed `84833135`, the EU + non-EU UK sections + the zoom + the cross-links — the 8 placed ids, the §15 fills verified-pending-ingest — Phase E OPEN) · ✅ S13 2026-11-09 (deployed `b11fd84f`, the Europe gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE E CLOSED**) |
 | F Asia & Pacific | S14–S15 | ✅ S14 2026-11-09 (deployed `68281479`, the five sub-regions D-35 — China 7 · Japan 2 · Korea/Taiwan/HK index-only · India index-only · Pacific-NZ 2 = 11 placed cards, the S8 zoom, the cross-links, the §15 CPI fills VERIFIED STALE — Rule 5 — BD-S14a; the honest In-build chip stays until S15 — Phase F OPEN) · ✅ S15 2026-11-09 (deployed `6f96cd9a`, the Asia gates — the card-render audit, the freshness honest, the mobile/ARIA pass, the In-build chip retired — **PHASE F CLOSED**) |
-| G Australia | S16 | ☐ |
+| G Australia | S16 | ✅ S16 2026-11-10 (the Australia build & gates — the REUSED AU Markets board [19 symbols], the 5-gauge structure D-37, the 28 cards, the 11 moved-out seat chips, the §21 backtest + the render audit + the In-build chip RETIRED — **PHASE G CLOSED**; the deploy pending the close-out) |
 | H Commodities | S17 | ☐ |
 | I Currency Pairs | S18 | ☐ |
 | J Integration | S19–S21 | ☐ |
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 15/30 delivered 2026-11-09 · 15 remaining — next
-action: Session 16/30 (S16, Phase G opens — Australia build & gates: the AU
-Markets board on top, the 5-gauge structure unchanged (D-37), the 28 cards,
-the moved-out seat chips link to new homes (currencies/commodities/asia/
-gold); the §15 FRED-only CPI fills for Asia (BD-S14a/BD-S15d) stay carried
-forward to a dedicated fill session — pick a viable monthly source for
-JP/KR/IN: the national statistics bureaus directly, a fresh FRED/IMF IFS
-series, or the World Bank annual as a lower-resolution fallback).**
+**Current position: Session 16/30 delivered 2026-11-10 · 14 remaining — next
+action: Session 17/30 (S17, Phase H opens — Commodities build & gates:
+Energy/Metals/Agriculture/Digital + Trade routes & supply D-38/D-39, the
+gold cross-links D-19/D-27). The §15 FRED-only CPI fills for Asia
+(BD-S14a/BD-S15d) stay carried forward to a dedicated fill session —
+pick a viable monthly source for JP/KR/IN: the national statistics
+bureaus directly, a fresh FRED/IMF IFS series, or the World Bank annual
+as a lower-resolution fallback.**
