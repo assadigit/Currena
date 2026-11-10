@@ -6,6 +6,23 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **S19 (2026-11-12, IN PROGRESS — this session's goal, written before
+> coding per AGENTS.md §2.6):** Navigation, mobile & SEO polish — Phase J
+> opens. Milestones: **M1** the topbar/drawer final pass across all pages
+> + the HANDOFF item 6 language quick-toggle (verified: the earlier
+> "theme words" read is disproven against the deployed DOM — the visible
+> label is the target-language word 'فا'/'EN' and the aria-label is
+> correct; a target-naming label polish rides the pass) + the two
+> S1-noted legacy-hero mobile items (the ⓘ wrap on the data-as-of line ·
+> the state-pill icon spacing). **M2** breadcrumbs on every destination
+> page + per-page meta/OG tags (client-side per route over the existing
+> title effect + refreshed static defaults) + sticky-footer verification
+> (the safe-area rider). **M3** gates whole (typecheck + lint +
+> copy:audit + build/budgets + the suite) + the browser pass on every
+> touched surface at 1440×900 AND 360×844 in en + fa + the deploy (the
+> owner's standing) + the records. Scope guard: exactly S19 — no S20
+> regression work, no engine changes.
+
 > **S18 (2026-11-11) — Currencies build & gates — Phase I OPENED AND
 > CLOSED IN ONE SESSION. Session 18/30 · 12 remaining.** Delivered the
 > /currencies page build + gates whole (the S16/S17 one-session

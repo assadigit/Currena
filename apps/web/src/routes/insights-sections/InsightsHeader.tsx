@@ -363,13 +363,23 @@ export function InsightsHeader({
               className="mt-1 mb-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]"
               title={dataAsOfLine.tooltip}
             >
-              <bdi>
-                {interpolate(copy.ui.dataAsOf, { date: dataAsOfLine.date })}
-                {dataAsOfLine.prices !== null ? (
-                  <span className="opacity-80"> · {interpolate(copy.ui.pricesUpdated, { time: dataAsOfLine.prices })}</span>
-                ) : null}
-                <span aria-hidden="true"> ⓘ</span>
-              </bdi>
+              {/* S19 mobile polish (the S1-noted ⓘ wrap): each unit — the
+                  date sentence, then the prices sentence WITH its ⓘ — is
+                  its own non-breaking bdi, so a narrow viewport wraps ONLY
+                  between units. The old single-bdi line broke mid-value
+                  ("01:13 am / UTC ⓘ"), leaving "UTC ⓘ" orphaned on its
+                  own line at 360px. */}
+              <bdi className="whitespace-nowrap">{interpolate(copy.ui.dataAsOf, { date: dataAsOfLine.date })}</bdi>
+              {dataAsOfLine.prices !== null ? (
+                <bdi className="whitespace-nowrap opacity-80">
+                  · {interpolate(copy.ui.pricesUpdated, { time: dataAsOfLine.prices })}
+                  <span aria-hidden="true"> ⓘ</span>
+                </bdi>
+              ) : (
+                <bdi className="whitespace-nowrap" aria-hidden="true">
+                  ⓘ
+                </bdi>
+              )}
               <span className="sr-only">, {dataAsOfLine.tooltip}</span>
               {/* v3 UI-50: the data-health chip — worst wins; the title
                * carries the stale count when both groups exist. Static per

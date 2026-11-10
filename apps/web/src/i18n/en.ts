@@ -38,7 +38,12 @@ export const en = {
     back: 'Back',
     backToHome: 'Back to Home',
     language: 'Language',
-    toggleLanguage: 'Toggle language',
+    /* S19 (2026-11-12): the language quick-toggle's label now NAMES THE
+       TARGET (the HANDOFF item 6 polish — the button shows the target
+       language's own word 'فا'/'EN' visibly; the accessible name says
+       what clicking does, in the CURRENT locale's language). */
+    switchToFa: 'Switch to Farsi',
+    switchToEn: 'Switch to English',
     themeLight: 'Light mode',
     themeDark: 'Dark mode',
     toggleTheme: 'Toggle theme',

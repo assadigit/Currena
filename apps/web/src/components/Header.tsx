@@ -310,12 +310,17 @@ export function Header() {
               captured beforeinstallprompt and the app isn't already
               standalone; zero footprint otherwise. */}
           <InstallButton variant="icon" />
-          {/* Language quick-toggle */}
+          {/* Language quick-toggle — S19 (HANDOFF item 6's polish): the
+              visible label stays the TARGET language's own word ('فا' in
+              en · 'EN' in fa) and the accessible name + tooltip now NAME
+              THE TARGET in the current locale's language (nav.switchToFa /
+              nav.switchToEn — clearer for assistive tech than the old
+              generic "Toggle language"). */}
           <button
             type="button"
             onClick={() => setLocale(locale === 'en' ? 'fa' : 'en')}
-            title={t('nav.toggleLanguage')}
-            aria-label={t('nav.toggleLanguage')}
+            title={t(locale === 'en' ? 'nav.switchToFa' : 'nav.switchToEn')}
+            aria-label={t(locale === 'en' ? 'nav.switchToFa' : 'nav.switchToEn')}
             className={`${HEADER_ICON_BUTTON_CLASS} text-sm font-bold`}
           >
             {locale === 'en' ? 'فا' : 'EN'}
