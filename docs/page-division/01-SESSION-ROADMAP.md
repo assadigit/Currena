@@ -20,7 +20,7 @@
    progress counter `Session X/30 · Y remaining` and the next session's
    scope (Rule 3).
 
-**Status legend:** ☐ not started · 🔄 in progress · ✅ done & gated.
+**Status legend:** ☐ not started · 🔄 in progress · ✅ done & gated · ⏸ waiting (blocked on the owner/investor — closed honestly) · ⏭ pulled forward.
 
 ---
 
@@ -1654,12 +1654,34 @@ deploy record, all in `docs/DECISIONS.md` + `docs/DEPLOY.md`.
 
 ## Phase K — Investor + final (S22–S24)
 
-### ☐ S22 — Investor feedback → spec v2 · `Session 22/30`
+### ⏸ S22 — Investor feedback → spec v2 · `Session 22/30` · closed as a WAITING slot 2026-11-12
 - Collect the investor's answers to spec §19; record as D-49+ in the
   strategy log; produce spec v2 entries.
 
-### ☐ S23 — Feedback build changes · `Session 23/30`
-- Implement the accepted v2 deltas (e.g., PMI program if approved).
+**S22 waiting-slot close record (2026-11-12):** the investor's review was
+NOT yet arranged — verified against every record the program can read (no
+answers supplied with the session kickoff; origin/main at HEAD `384dfd1`
+= the S21 counterpart close, nothing past the S21 records; the GitHub
+issues/PRs hold nothing since PR #47 [2026-11-08]; no uploaded file;
+HANDOFF's owner-side lever #8 still stands) — so, per the owner's standing
+instruction for this slot and the roadmap's own reserve rule, the slot
+closes **honestly as a WAITING slot** (BD-S22): NO answers collected, NO
+D-49+ recorded (the strategy log §5 carries the explicit Round-4 pending
+marker instead), NO spec v2 entries produced, and the AF-1…AF-7 spec-side
+drift findings REMAIN parked for the spec v2 pass (never silent edits —
+the spec file was not touched). NO deploy — a records session; nothing
+was fixed, so nothing shipped. The reserve pull-forward: the first
+reserve session — **the §15 Asia CPI fill session** (the dedicated fill
+session carried since S14, BD-S14a/BD-S15d) — is pulled forward into the
+**Session 23 slot**; S23's own scope is DEFERRED (below). The gates re-run
+ALL GREEN on the records-only tree (the full `pnpm gates`, incl. every
+doc-sensitive gate). **Session 22/30 · 8 remaining** — the investor round
+re-opens at the next free slot the moment the owner supplies the answers.
+
+### ⏸ S23 — Feedback build changes · `Session 23/30` (DEFERRED — blocked on the investor's answers; the Session 23 slot runs the pulled-forward S25 fill session meanwhile, per BD-S22)
+- Implement the accepted v2 deltas (e.g., PMI program if approved). Runs
+  in the first free slot after the investor's answers land and the spec v2
+  entries exist.
 
 ### ☐ S24 — Legacy retirement readiness · `Session 24/30`
 - The D-9 audit: every indicator verified categorized; retirement checklist
@@ -1668,7 +1690,26 @@ deploy record, all in `docs/DECISIONS.md` + `docs/DEPLOY.md`.
 
 ## Reserve (S25–S30)
 
-### ☐ S25–S30 — Fix rounds · performance · retirement execution
+### ⏭ S25 — the §15 Asia CPI fill session · PULLED FORWARD into the Session 23 slot · 2026-11-12 (BD-S22)
+- The dedicated fill session carried since S14 (BD-S14a/BD-S15d): pick a
+  viable monthly source for the three D-36 Asia fills (Japan · Korea ·
+  India CPI YoY) — the national statistics bureaus directly (the
+  Statistics Bureau of Japan, KOSTAT, MoSPI), a fresh FRED/IMF IFS
+  series, or the World Bank annual as the lower-resolution fallback; the
+  FRED OECD mirror family is DEAD (verified stale in S14 — never re-try
+  those ids).
+- Verify live against the publisher (Rule 5 — verify-before-ingest,
+  including from production egress); ingest with the full §A discipline
+  (definitions → `registry:generate` → the AGENTS.md §A inventory →
+  INDICATORS_AND_DATA_SOURCES.md → the pin tests → CHANGELOG); render the
+  three cards on /asia-pacific with the §21 trio + the fa copy through
+  the manifest; extend pd-s14; the spec-v2 diff grows to cover the new
+  cards.
+- **Gates:** source verification green at both venues; the registry +
+  inventory + doc tables reconciled; the suite green; the §21 diff green
+  (incl. the new cards); deploy + live verify (this session ships code).
+
+### ☐ S26–S30 — Fix rounds · performance · retirement execution
 - Buffer sessions for anything red, slow, or delayed; the final legacy
   retirement + redirect when the owner signs off. If unused, the project
   simply finishes early — counter still reports `Session X/30`.
@@ -1689,26 +1730,30 @@ deploy record, all in `docs/DECISIONS.md` + `docs/DEPLOY.md`.
 | H Commodities | S17 | ✅ S17 2026-11-11 (deployed `08e0fc64`, the 4 commodity groups + the trade routes & supply group — 24 cards + the gold cross-link; the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 24/24 green + the 4-leg browser pass green — **PHASE H CLOSED**) |
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
-| K Investor + final | S22–S24 | ☐ |
-| Reserve | S25–S30 | ☐ |
+| K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot runs the pulled-forward S25 fill session) · ☐ S24 |
+| Reserve | S25–S30 | ⏭ S25 PULLED FORWARD 2026-11-12 (BD-S22 — the §15 Asia CPI fill session runs in the Session 23 slot) · ☐ S26–S30 buffer |
 
-**Current position: Session 21/30 delivered 2026-11-12 · 9 remaining — next
-action: Session 22/30 (S22 — Phase K OPENS: the investor feedback → spec
-v2 — collect the external investor's answers to spec §19, record them as
-D-49+ in the strategy log, and produce the spec v2 entries; the owner's
-lever is arranging the review — spec §19 lists the seven questions). The
-§15 FRED-only CPI fills for Asia (BD-S14a/BD-S15d) stay carried forward
-to a dedicated fill session — pick a viable monthly source for JP/KR/IN:
-the national statistics bureaus directly, a fresh FRED/IMF IFS series, or
-the World Bank annual as a lower-resolution fallback. The ecb-dfr
-provider timeout from the S18 data-refresh runs (held on last-good at
-2.5, flagged stale) did NOT self-clear across rungs — it belongs to a
-maintenance session now (the runbook: docs/INDICATORS_AND_DATA_SOURCES.md
-+ the /admin console's per-source status, which needs the owner's
-REFRESH_SECRET). The S20 data-audit tool is re-runnable for any later
-session's §21 data-audit gate: `pnpm --filter @currena/web exec tsx
+**Current position: Session 22/30 delivered (the WAITING-slot close)
+2026-11-12 · 8 remaining — next action: Session 23/30 runs the
+PULLED-FORWARD reserve session (S25 → the §15 Asia CPI fill session: pick
+a viable monthly source for JP/KR/IN — the national statistics bureaus
+directly, a fresh FRED/IMF IFS series, or the World Bank annual as a
+lower-resolution fallback; the FRED OECD mirror family is DEAD, verified
+stale in S14 — never re-try those ids; verify before ingest from both
+venues; the full §A discipline; the three cards on /asia-pacific + the
+pd-s14 extension; the spec-v2 diff grows to cover the new cards). THE
+OWNER'S LEVER REMAINS: arrange the external investor's review of the spec
+(§19's seven questions) — Phase K's input; the moment the answers exist,
+the next free slot re-opens the investor round (collect → D-49+ in the
+strategy log §5 Round 4 → the spec v2 entries — the AF-1…AF-7 spec-side
+hand-count drift rides that pass, never silent edits), and S23's deferred
+feedback-build scope follows it. The ecb-dfr provider timeout from the S18
+data-refresh runs (held on last-good at 2.5, flagged stale) did NOT
+self-clear across rungs — it belongs to a maintenance session (the
+runbook: docs/INDICATORS_AND_DATA_SOURCES.md + the /admin console's
+per-source status, which needs the owner's REFRESH_SECRET). The S20
+data-audit tool is re-runnable for any later session's §21 data-audit
+gate: `pnpm --filter @currena/web exec tsx
 ../../apps/web/scripts/pd-s20-data-audit.ts` — RUNBOOK NOTE (BD-S21e):
 never run it Tuesdays 11:00–14:00 UTC (the IMF PortWatch scheduled
-maintenance window). The spec audit findings AF-1…AF-7 (the spec's own
-hand-count drift) wait for the S22+ investor-review spec v2 pass — never
-silent edits.**
+maintenance window).**
