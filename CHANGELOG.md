@@ -50,6 +50,10 @@ than a semver tag.
   with AF-8 on record; the backtest surfaces extended (asia-tiles 13 ·
   asia-backtest 11 · AsiaPage 10 tests; pd-s14-backtest.ts expects the
   14 cards + the 1/1/3/1/2 group shape).
+- **The budget:** the AsiaPage lazy chunk moved 15.68/4.04 → 16.20/4.07
+  kB with the three new cards — the raw ceiling re-based 16.0 → 16.5
+  (scripts/check-bundle-budget.mjs, the growth justified above; the gz
+  side stays far under its 6.0 row). Every other chunk within its row.
 - **Session 23/30 · 7 remaining.** The owner's lever stays: arrange the
   investor's review of spec §19.
 

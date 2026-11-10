@@ -4649,7 +4649,7 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     band: { min: 2, label: 'the Bank of Japan’s 2% price-stability goal' },
     lines: {
       highRising: 'Japanese consumer prices are rising faster than usual, pressuring the world’s largest creditor nation to tighten.',
-      highEasing: 'Japanese inflation is above its usual range but easing back toward it.',
+      highEasing: 'Japanese inflation is above its 2% price-stability goal but easing toward it.',
       typical: 'Japanese inflation sits in its usual range for the past decade.',
       low: 'Japanese prices are barely rising: the weak-demand reading that haunted Japan for decades.',
     },

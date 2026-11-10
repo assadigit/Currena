@@ -1767,6 +1767,21 @@ export const READING_SOURCES: Readonly<Partial<Record<IndicatorId, { name: strin
     name: 'International Monetary Fund, COFER',
     url: 'https://data.imf.org/en/datasets/IMF.STA:COFER',
   },
+  // page-division S25 fill session (2026-11-12, BD-S23a): the three
+  // §15 D-36 Asia CPI cards — the IMF's own CPI dataflow (the COFER
+  // sibling dataset page; the per-country query rides the SDMX 3.0 API).
+  'japan-cpi': {
+    name: 'International Monetary Fund, CPI dataflow (Japan)',
+    url: 'https://data.imf.org/en/datasets/IMF.STA:CPI',
+  },
+  'korea-cpi': {
+    name: 'International Monetary Fund, CPI dataflow (Korea)',
+    url: 'https://data.imf.org/en/datasets/IMF.STA:CPI',
+  },
+  'india-cpi': {
+    name: 'International Monetary Fund, CPI dataflow (India — a mirror that lags MoSPI by 1–3 months)',
+    url: 'https://data.imf.org/en/datasets/IMF.STA:CPI',
+  },
   'sp500-breadth-ratio': {
     name: 'Yahoo Finance (RSP, SPY daily closes)',
     url: 'https://finance.yahoo.com/quote/RSP',

@@ -1125,8 +1125,15 @@ const BUDGETS = [
   // the app bundle. Ceiling 16/6 per the convention (the 5 sections + the
   // index-only notes + the 3-destination cross-links are a touch heavier
   // than Europe's 2 sections; room for the §15 FRED-only CPI fill cards
-  // when a later session verifies + ingests them, Rule 5).
-  { pattern: /^AsiaPage-[\w-]+\.js$/, raw: 16_000, gz: 6_000, label: 'Asia & Pacific page lazy chunk (page-division S14)' },
+  // when a later session verifies + ingests them, Rule 5). — S25 fill
+  // session (2026-11-12, BD-S23a): the three §15 D-36 CPI cards LANDED
+  // (japan-cpi joins the Japan section; korea-cpi + india-cpi give the
+  // two index-only sections their card grids — the sections keep their
+  // honest index notes, now as index-note sections). Measured
+  // 16.20/4.07; the raw ceiling re-based 16.0 → 16.5 kB (the growth IS
+  // the three new cards — intended, justified in the CHANGELOG; the gz
+  // side stays far under 6.0).
+  { pattern: /^AsiaPage-[\w-]+\.js$/, raw: 16_500, gz: 6_000, label: 'Asia & Pacific page lazy chunk (page-division S14)' },
   // Page-division S10 (2026-11-09): the shared TIC drawing — the legacy
   // "Who holds US government debt" section, extracted to its own chunk
   // the moment /usa's tier-6 board imported it (Vite's shared-chunk

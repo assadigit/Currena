@@ -3,8 +3,8 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "b56d4d902fc96e3c5746e86a95e6c1a7a2903ccd77afc42e96de3acbacd0c41d",
-    "faSha256": "86cdd9acbe65257e571735b8b4c69db5b8c6dc1088a0ff14b36ceee58c7d66ce",
+    "enSha256": "1c4f1d61e6848bfb9cd02ab351008b173dab18cdf42fe75735ffcd278c33b40d",
+    "faSha256": "afec8aa404379a9b5e1c9529dd3f1643d84c4d15734af1dfb1feac68ce33074c",
     "indicatorCount": 193,
     "glossaryCount": 56
   },
@@ -619,7 +619,9 @@
         ],
         "glossaryTerms": [
           "inflation",
-          "bond"
+          "bond",
+          "central-bank",
+          "yield"
         ]
       },
       "korea-cpi": {
@@ -651,7 +653,8 @@
           }
         ],
         "glossaryTerms": [
-          "inflation"
+          "inflation",
+          "central-bank"
         ]
       },
       "copper-gold": {
@@ -5020,7 +5023,9 @@
         ],
         "glossaryTerms": [
           "inflation",
-          "bond"
+          "bond",
+          "central-bank",
+          "yield"
         ]
       },
       "korea-cpi": {
@@ -5052,7 +5057,8 @@
           }
         ],
         "glossaryTerms": [
-          "inflation"
+          "inflation",
+          "central-bank"
         ]
       },
       "copper-gold": {
