@@ -132,6 +132,126 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-11 the page-division S18 deploy (the Currencies build & gates — Phase I opens and closes in one session; the 7 rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42 — the one named engine addition] + the dollar-standing cards live for every visitor at /currencies; the LAST placeholder page is real)
+
+**Scope (page-division S18, the Currencies build & gates):** display-layer
+only for the PAGE + the one engine addition the roadmap's S18 scope
+itself names ("AUDNZD joins the board", D-42). The page: the 7 rule
+lights hero (D-41) through the SAME §9.3 fxRuleView mapping the legacy
+page reads; the 11-pair board (D-42) over the fx snapshot (GET
+/api/insights/fx — the FX-board payload wiring, the markets/fx last-good
+discipline); the 14 registry cards (D-32: 7 pair-context + 7
+dollar-standing) over the S2 projection with the §21 trio. The engine:
+FxPairIdSchema += audnzd (ADDITIVE — pre-S18 stored snapshots keep
+parsing) · FX_PAIRS += the audnzd cross in its own pacificLink group ·
+NZD rides the single Frankfurter timeseries request (FX_PAIR_CURRENCIES,
+the CAD/SEK pass-through treatment) · pairRateFromUsd += NZD÷AUD · the
+Yahoo NZD=X fallback symbol · the legacy corpus's own words for the new
+surface (fx.groups.pacificLink · fx.entries.audnzd ·
+currencyNames/Plural.NZD, en + fa — the 6 new fa strings queued
+unreviewed). The seven RULES, every threshold, every pattern check and
+the summary rollup are UNTOUCHED. The only user-visible changes: the
+/currencies page is real (the In-build chip RETIRED at the gates pass —
+the last placeholder page), and the legacy /insights fx table honestly
+gains the fourth group block "Australia–New Zealand (1)" with the
+audnzd row.
+
+**Gates before the deploy (ALL GREEN, 2m 34s):** secret scan 8/1013 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean (the 118 new
+pd.currencies.* fa entries + the 6 fx.* engine strings queued
+unreviewed) · narrator vocabulary in sync (REGENERATED for the corpus
+additions — the drift gate caught it) + eval 50 · layer1
+11,819/11,819 · the full suite **15,088 = +35** (currencies-tiles 10 ·
+currencies-copy-pin 2 · currencies-backtest 14 · CurrenciesPage render
+audit 8 · fx.test +1) · build + budgets held — entry 271.02/82.06, the
+CurrenciesPage lazy chunk 21.09/5.33 vs its new 24/6.5 row.
+
+**The §21 diff — the S18 gate's own, run LIVE twice.** PRE-deploy
+(23:56Z): the 14 registry cards' trio diff 14/14 green · the rules gate
+16/16 green (the §9.3 table row-by-row + the renderable-domain
+invariant + the stored summary ≡ the engine's own summarizeFxRules
+recomputed) · the board's per-row derivations green — and the D-42
+coverage leg honestly RED ("missing: audnzd" — the engine addition not
+yet on the live board; the S16-shaped pre-deploy record: the deploy's
+own to-do). POST-deploy (00:27Z, after the fx-run KV seed): **ALL
+CHECKS GREEN** — cards 14/14 · rules 16/16 · board 23/23 (11/11 pairs,
+D-42 complete) · the freshness audit 14 within grace.
+
+**The freshness finding + the data refresh (the audit doing its job):**
+the first post-deploy §21 run crossed the UTC-midnight grace boundary on
+dollar-broad/dollar-eme (asOf 2026-10-30, 11d > the 10-day maxAge,
+status normal) — a PRE-EXISTING upstream lag, verified against FRED
+directly (the source's own fredgraph answer now carries 2026-11-06; the
+last two ingest runs had seen only the 2026-10-30 tail — the
+FRED-at-rung-time edge staleness the adapter's own D-4 note documents).
+Fixed through the pipeline's own lever: a workflow_dispatch
+insights-ingest run (#87, 2026-11-10T00:22Z) wrote the refreshed
+snapshot — dollar-broad 121.8803 @ 2026-11-06 · dollar-eme 130.7713 @
+2026-11-06 — and the §21 freshness leg went green. That run's designed
+exit-1 alerting fires for two TRANSIENT P1 provider timeouts (ecb-dfr +
+gold-api XAU spot) held on last-good values and flagged stale — exactly
+the fail-closed design; the next scheduled rung retries them (a
+pre-existing provider condition, recorded for the maintenance session,
+not an S18 regression).
+
+**The deploy-lock check ran first** (the D-43 lesson): the active
+version was S17's `08e0fc64` @ 100% — no parallel deploy. The deploy,
+BOTH workers in the schema-safe order: (1) `pnpm --filter @currena/web
+build` + `wrangler deploy` → **currena-api `51a0fe45` @ 100%** (version
+`51a0fe45-22e5-4b78-89e6-e8130f23b19d`, 2026-11-10 ~00:05Z; SITE_MODE
+=public, the RATES KV + AI + ASSETS bindings intact) — the new SPA +
+the additive FxSnapshotSchema that accepts both the 10-pair and 11-pair
+stored documents; (2) **currena-markets `8f63c8fa` @ 100%** (version
+`8f63c8fa-914b-477a-a974-0195c1a996be`) — the fx engine's new pair
+rides its four crons (the first S-session to redeploy the markets
+worker since the fx build era: the engine code changed, the
+"code-unchanged" convention does not apply); (3) the manual `fx-run`
+(the markets-au-run Path-B pattern) — the LIVE Frankfurter fetch (ONE
+call) → the 11-pair snapshot → the KV REST write (generatedAt
+2026-11-10T00:11:56Z; the 10 existing pairs held same-date-stable +
+audnzd the new row: rate 1.22827 · asOf 2026-11-09 · chg
+{d1 −0.9 · m1 −1.23 · m3 +2.43 · y1 +6.51} · moveRank 60.39 · bigMove
+false · 52 weekly closes · source frankfurter). Production smoke:
+/api/health 200 · /currencies 200 · the projection 200 ·
+/api/insights/fx 200 with the audnzd row (the 5-minute edge cache
+served the pre-write document until it expired — the cache-busted
+fetch verified the new board immediately).
+
+**The live acceptance (ALL GREEN):** the live `pd-s18-backtest.ts`
+re-run post-deploy ALL GREEN (above); currena.ir/currencies
+live-smoke-verified at 1440×900 en (7 rule lights with the live
+outcomes — r5 "China link" Watching + "An early hint of China worry" ·
+11 pair cards with audnzd last [rate 1.2283 · moveRank 60 · the
+52-week chart] · 14 registry cards [₺50.14 · "101.85 index" · "56.70%"
+· "3.67 AED" · "NZ$1.2283"] · the In-build chip ABSENT · 0px overflow ·
+0 page errors) + at 360×844 fa (RTL, dir=rtl, h1="جفت‌ارزها", the live
+values «۵۰٫۱۴ لیر ترکیه» · «۱٫۲۲۸۳ دلار نیوزیلند» · «۵۶٫۷۰٪», 0px
+overflow · 0 page errors) + the 4-leg browser pass (1440×900 AND
+360×844 in BOTH en and fa) — the 7 lights with every outcome shape ·
+the 11 pair cards · the 14 registry cards · the In-build chip ABSENT on
+all 4 legs · NO horizontal scroll at any width in any locale (overflow
+0px on all 4 legs) · ZERO console/page errors across all 4 legs; the fa
+legs dir=rtl + Persian digits; the Global + Gold + World Markets + USA
++ Europe + Asia & Pacific + Australia + Commodities + legacy /insights
+surfaces intact — the legacy fx table verified live with the FOUR group
+blocks ("Dollar vs the world (6)" · "Warning lights (3)" ·
+"Australia–China (1)" · "Australia–New Zealand (1)") and the audnzd row
+under its own honest header.
+
+- **Rollback:** `npx wrangler rollback` from apps/api — /currencies
+  returns to the prior surface (`08e0fc64`, S17 — the S1
+  PagePlaceholder with the honest In-build chip). The markets worker
+  rolls back separately (a markets-only rollback also needs a 10-pair
+  fx-run reseed, because the OLD api schema rejects the stored audnzd
+  row — the safe order is markets first, then the reseed, then api).
+  Nothing else moves (the S18 change is the engine pair + the corpus
+  words + the /currencies page build + the §21 backtest + the render
+  audit + the chip retirement + the App.tsx wiring only).
+- **Who decided:** the build & gates session (S18) under the owner's
+  standing delegation ("the deploy at the close is the owner's
+  standing"). **Revisit:** the record is final; the next session (S19)
+  opens Phase J (Navigation, mobile & SEO polish).
+
 ## Session record — 2026-11-09b the page-division S10 deploy (the USA tiers 3–6 + the TIC board — all 72 registry cards in five tiers + the tier-6 "Who finances America" board live for every visitor at /usa; the placeholder body retired)
 
 **Scope (page-division S10, spec §7 items 4–8, D-31):** display-layer

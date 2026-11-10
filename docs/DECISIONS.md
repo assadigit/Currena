@@ -1630,3 +1630,155 @@
   standing delegation ("the deploy at the close is the owner's standing")
   — the deploy ran 2026-11-11. **Revisit:** the deploy record is final;
   the full deploy narrative lives in `docs/DEPLOY.md`.
+
+## 2026-11-11 — BD-S18a: AUDNZD joins the FX board — the D-42 engine leg (the 11th pair, its own pacificLink group; NZD rides the single Frankfurter request, zero new provider calls)
+
+- **Decision:** the fx engine gains the 11th pair — `audnzd` (D-42: "AUDNZD
+  becomes the 11th pair on Currency Pairs"; the roadmap S18 scope's own
+  "AUDNZD joins the board"). The change set: `FxPairIdSchema` += 'audnzd'
+  (an ADDITIVE wire-contract change — stored pre-S18 snapshots keep
+  parsing), `FX_PAIRS` += `{ id: 'audnzd', group: 'pacificLink',
+  derivation: 'cross' }` (its OWN fourth group — never shoe-horned into
+  the Australia–China block), `FX_PAIR_CURRENCIES = ['NZD']` (the
+  pass-through treatment in the job: a miss degrades to the previous
+  audnzd row, never a whole-run failure — the CAD/SEK discipline),
+  `pairRateFromUsd` += audnzd → NZD÷AUD, the Yahoo fallback's `NZD=X`
+  symbol, and the legacy corpus's own words for the new surface
+  (fx.groups.pacificLink 'Australia–New Zealand' · fx.entries.audnzd
+  {name/what/you} — the name IS the audnzd registry card's name, one
+  vocabulary per D-48 — · currencyNames/Plural.NZD, en + fa, all six
+  strings queued unreviewed in the Persian-copy manifest). The seven
+  RULES, every threshold, the pattern checks and the summary rollup are
+  UNTOUCHED (audnzd is not a rule input — the page-division display-layer
+  discipline holds; the only engine change is the board's own membership,
+  which the roadmap's S18 scope names explicitly).
+- **Options considered:** (a) render the 11th pair from the audnzd
+  registry reading (rejected — D-42's board fields [rate · d1/m1/m3/y1 ·
+  moveRank · bigMove · 52-week closes] are the fx snapshot's own shape;
+  the registry reading carries none of them — a second, invented
+  derivation); (b) audnzd in the chinaLink group (rejected — wrong
+  semantics, and it would rename reviewed copy); (c) its own pacificLink
+  group (chosen — the honest block, additive copy only).
+- **Verified:** fx.test.ts 51 tests (+1: the audnzd cross derives as
+  NZD÷AUD, the absent-NZD leg degrades loudly); the fx-presentation
+  corpus anchors extended (11 entries + the group + the NZD names); the
+  dry-run fx-run over the LIVE provider computed 11 pairs with ONE
+  Frankfurter call (the same single timeseries request — NZD joined the
+  symbols list, zero extra calls); the live board post-deploy carries
+  the audnzd row (rate 1.22827, asOf 2026-11-09, 52 weekly closes).
+- **Who decided:** the build & gates session (S18) under D-42 + the
+  roadmap's S18 scope. **Revisit:** none — the pair is permanent; the
+  legacy /insights table honestly renders the fourth group block
+  ("Australia–New Zealand (1)", verified live).
+
+## 2026-11-11 — BD-S18b: the §21 Currencies backtest — the pure currencies-backtest-core (the 14-card trio diff + the RULES gate + the BOARD gate) + the offline suite (14 tests) + the live pd-s18-backtest.ts
+
+- **Decision:** the S18 §21 diff is the pure `currencies-backtest-core.ts`
+  with THREE gates over the page's TWO feeds + the served snapshot: (1)
+  the 14 registry cards' trio diff (the S17 pattern — projection ≡
+  snapshot on value/range/percentile10y/asOf/status, key-order-immune,
+  absent-on-both green, absent-on-one red); (2) the RULES gate ("the
+  rules match the FX board KV logic exactly"): the §9.3 status table
+  applied row-by-row through the SAME `fxRuleView` the legacy page reads
+  + the renderable-domain invariant (every stored state carries a
+  headline, the noData word, or is a legitimately silent quiet-R7; an
+  undowngraded R3/R4 watch is a display hole, RED) + the stored summary ≡
+  the engine's own `summarizeFxRules` recomputed over the stored rules
+  (zero tolerance); (3) the BOARD gate ("11 pairs complete"): the D-42
+  coverage over FX_PAIR_IDS + the bigMove ≡ moveRank ≥ 90 derivation per
+  row + the stale-flag honesty against the asOf age (the FX_STALE_DAYS
+  ladder). The freshness audit rides S11's `auditUsaFreshness` over the
+  14 cards (the one-audit-function discipline). The offline suite (14
+  tests: the full pipeline + the public-mode twin + 7 fail-closed proofs
+  + the freshness cases) + the live `pd-s18-backtest.ts` (the pd-s17
+  pattern, three feeds).
+- **Options considered:** (a) only the card trio diff (rejected — the
+  session prompt names the rules + the 11-pairs gates explicitly); (b)
+  the full three-gate core (chosen).
+- **The live runs:** PRE-deploy — cards 14/14 green · rules 16/16 green ·
+  per-row derivations green · the D-42 coverage leg honestly RED (audnzd
+  not yet on the live board — the deploy's own to-do, the S16-shaped
+  pre-deploy record); POST-deploy (after the fx-run KV seed) — ALL GREEN:
+  cards 14/14 · rules 16/16 · board 23/23 (11/11 pairs) · freshness 14
+  within grace.
+- **Who decided:** the build & gates session (S18). **Revisit:** the
+  backtest is final; S20's full-site regression re-runs it.
+
+## 2026-11-11 — BD-S18c: the CurrenciesPage render audit (8 tests) + the In-build chip RETIRED at the S18 gates pass + the budget row (24/6.5)
+
+- **Decision:** `CurrenciesPage.test.tsx` (8 tests — the S17
+  CommoditiesPage.test.tsx pattern scoped to Currencies' surfaces):
+  fixture sanity + loading + the full shell + 7-rule-lights + 11-pair
+  board + 2 card sections render with the §21 trio spot checks (the
+  currency prefixes '₺34.56'/'NZ$1.2283' EN · the fa suffixes '۳۴٫۵۶ لیر
+  ترکیه'/'۱٫۲۲۸۳ دلار نیوزیلند' · the AED suffix '3.67 AED' · the tight
+  percent '56.70%') + every rule-outcome shape (warning + chip · watch ·
+  supportive · the downgraded wobble keeping its warning sentence + the
+  caution line · nodata · the R7 context lead) + the bigMove tag + the
+  stale tag + the fail-closed paths (an absent card · a dead fx feed
+  rendering the calm "being prepared" line, never an error · a dead
+  projection with retry) + the M-17 last-good path (BOTH feeds cached)
+  + the fa/RTL rendering. The In-build chip is RETIRED at the gates pass
+  (the S16/S17 one-session trajectory — the render audit asserts it
+  ABSENT); the pd.statusBuilding key stays for any future not-yet-built
+  destination (PagePlaceholder serves no route today). The
+  CurrenciesPage lazy chunk measured 21.09/5.33 vs its new 24/6.5 row
+  (the tight convention's ~2.9 kB raw headroom).
+- **Who decided:** the build & gates session (S18). **Revisit:** none.
+
+## 2026-11-11 — BD-S18-deploy: the S18 deploy record — DEPLOYED LIVE (currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed, the owner's standing)
+
+- **Deployed:** BOTH workers, in the schema-safe order — (1) currena-api
+  `51a0fe45` (the new SPA + the FxSnapshotSchema that accepts both the
+  10-pair and 11-pair stored documents) — the deploy-lock check ran first
+  (S17's `08e0fc64` @ 100%, no parallel deploy); (2) currena-markets
+  `8f63c8fa` (the fx engine's new pair rides its four crons — the first
+  S-session to redeploy the markets worker since the fx build era: the
+  engine code changed, the "code-unchanged" convention does not apply);
+  (3) the manual `fx-run` (the markets-au-run Path-B pattern: the LIVE
+  Frankfurter fetch → the 11-pair snapshot → the KV REST write,
+  generatedAt 2026-11-10T00:11:56Z — 10 pairs held same-date-stable +
+  audnzd the new row). Production smoke: /api/health 200 · /currencies
+  200 · the projection 200 · /api/insights/fx 200 with the audnzd row.
+- **The data-refresh note (the freshness audit's own finding):** the
+  post-deploy §21 run crossed the UTC-midnight grace boundary on
+  dollar-broad/dollar-eme (asOf 2026-10-30, 11 days > the 10-day
+  maxAge, status normal) — a PRE-EXISTING upstream lag (FRED's edge
+  served the DTWEX tail a week behind; verified: FRED's own fredgraph
+  answer now carries 2026-11-06). Fixed through the pipeline's own lever:
+  a workflow_dispatch insights-ingest run (#87, 2026-11-10T00:22Z)
+  wrote the refreshed snapshot (dollar-broad 121.8803 @ 2026-11-06 ·
+  dollar-eme 130.7713 @ 2026-11-06; the run's designed exit-1 alerting
+  fires for two TRANSIENT P1 provider timeouts — ecb-dfr + gold-aud —
+  held on last-good values, flagged stale, exactly the fail-closed
+  design; the next scheduled rung retries them).
+- **The post-deploy §21 re-verify: ALL CHECKS GREEN** — cards 14/14 ·
+  rules 16/16 · board 23/23 (11/11 pairs, D-42 complete) · freshness 14
+  within grace.
+- **The 4-leg browser pass (1440×900 + 360×844, en + fa):** 4/4 GREEN —
+  the shell (h1 'Currency Pairs'/«جفت‌ارزها») · 7 rule lights (the live
+  r5 watch with «نشانهٔ اولیهٔ نگرانی از چین») · 11 pair cards (audnzd
+  last: rate 1.2283, moveRank 60, the 52-week chart) · 14 registry cards
+  (₺50.14 · '101.85 index' · '56.70%' · «۵۰٫۱۴ لیر ترکیه» · «۱٫۲۲۸۳ دلار
+  نیوزیلند») · the In-build chip ABSENT on every leg · 0px horizontal
+  overflow on every leg · ZERO console/page errors on every leg · the fa
+  legs dir=rtl with Persian digits. The legacy surfaces verified intact:
+  / (Global) · /insights (the deprecation banner + the fx table now
+  honestly showing the FOURTH group block "Australia–New Zealand (1)"
+  with the audnzd row).
+- **Rollback:** `npx wrangler rollback` from apps/api — /currencies
+  returns to the prior surface (`08e0fc64`, S17 — the S1 PagePlaceholder
+  with the honest In-build chip); `npx wrangler rollback` from
+  apps/markets returns the fx engine to the 10-pair board (the stored
+  11-pair KV document keeps parsing under the OLD schema? NO — the old
+  schema rejects audnzd, so a markets-only rollback requires also
+  re-running the 10-pair fx-run; the safe rollback order is api LAST:
+  markets first, then the fx-run reseed, then api). Nothing else moves
+  (the S18 change is the engine pair + the corpus words + the
+  /currencies page build + the §21 backtest + the render audit + the
+  chip retirement + the App.tsx wiring only).
+- **Who decided:** the build & gates session (S18) under the owner's
+  standing delegation ("the deploy at the close is the owner's
+  standing") — the deploy ran 2026-11-10 ~00:05 UTC (recorded 2026-11-11
+  in the session convention). **Revisit:** the deploy record is final;
+  the full deploy narrative lives in `docs/DEPLOY.md`.

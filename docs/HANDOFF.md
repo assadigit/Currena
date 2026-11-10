@@ -6,108 +6,112 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **S17 (2026-11-11) — Commodities build & gates — Phase H CLOSED. Session
-> 17/30 · 13 remaining.** Delivered the Commodities page build + gates in
-> one session: (M1) the pure commodities-tiles + the en/fa pd.commodities
-> copy + the pins (the 24 card names + 5 unit words + position/band/status
-> words pinned to the corpus byte-for-byte; the 57 new fa strings queued
-> unreviewed); (M2) the page build — CommoditiesTierCards (the 5 group
-> sections: Energy 9 · Metals 4 · Agriculture 3 · Digital 2 · Trade
-> routes & supply 6 = 24 cards with the §21 trio) + CommoditiesPage (the
-> S2 projection contract + the M-17 last-good + the fail-closed states) +
-> the App.tsx wiring (/commodities leaves the placeholder set —
-> DESTINATION_ROUTES now holds only /currencies); (M3) the §21 backtest
-> [offline suite 11 tests + the live pd-s17-backtest.ts, 24/24 green vs
-> production pre- AND post-deploy] + the render audit [CommoditiesPage.test.tsx,
-> 7 tests] + the full gates + the In-build chip RETIRED at the gates pass
-> (BD-S17c). Live §21 diff 24/24 green pre-deploy AND post-deploy.
-> Freshness HONEST (24 within grace, 0 beyond — all fresh). Gates ALL
-> GREEN. **Close-out COMPLETE: DEPLOYED LIVE (worker `08e0fc64`, 2026-11-11,
-> the owner's standing); the post-deploy live §21 re-verify 24/24 green;
-> the 4-leg browser pass (1440×900 + 360×844, en + fa) green — the In-build
-> chip ABSENT on all 4 legs, 0px overflow, 0 page errors.**
+> **S18 (2026-11-11) — Currencies build & gates — Phase I OPENED AND
+> CLOSED IN ONE SESSION. Session 18/30 · 12 remaining.** Delivered the
+> /currencies page build + gates whole (the S16/S17 one-session
+> trajectory): (a) the engine leg — AUDNZD joins the FX board (D-42: its
+> own pacificLink group, NZD riding the SAME single Frankfurter request —
+> zero new provider calls; the seven rules/thresholds/pattern checks
+> untouched); (b) the pure currencies-tiles + the en/fa pd.currencies
+> copy (~118 keys/locale, the corpus-pinned words verified byte-for-byte
+> by currencies-copy-pin.test.ts) + the pins; (c) the page build — the 7
+> rule lights hero (through the SAME §9.3 fxRuleView mapping the legacy
+> page reads) + the 11-pair board (rate · d1/m1/m3/y1 · moveRank ·
+> bigMove · the 52-week closes) + the dollar-standing cards (14 §21-trio
+> registry cards) + the FX-board payload wiring (two feeds, the M-17
+> last-good on both); (d) the §21 backtest (the pure core with THREE
+> gates + the offline suite [14 tests] + the live pd-s18-backtest.ts —
+> post-deploy ALL GREEN: cards 14/14 · rules 16/16 · board 23/23 [11/11
+> pairs] · freshness 14 within grace); (e) the render audit
+> (CurrenciesPage.test.tsx, 8 tests) + the In-build chip RETIRED at the
+> gates pass — the LAST placeholder page is real (DESTINATION_ROUTES is
+> empty; every destination renders its own page chunk). **DEPLOYED LIVE
+> (BOTH workers: currena-api `51a0fe45` + currena-markets `8f63c8fa` +
+> the manual fx-run KV seed — the 11th pair landed on the live board at
+> rate 1.22827, asOf 2026-11-09; the post-deploy §21 ALL GREEN; the
+> 4-leg browser pass green; the legacy /insights fx table now honestly
+> shows the fourth group "Australia–New Zealand (1)" with the audnzd
+> row).** The one data event of the session: the post-deploy freshness
+> audit caught dollar-broad/dollar-eme crossing their 10-day grace (a
+> PRE-EXISTING FRED edge-lag, verified against the source), fixed
+> through the pipeline's own lever (a workflow_dispatch ingest run
+> refreshed them to 2026-11-06).
 
-## Current state (2026-11-11, after page-division S17)
+## Current state (2026-11-11, after page-division S18)
 
 - **Program:** page-division — splitting the all-in-one Insights page
-  into 10 destinations per D-1…D-48. **Phase H (Commodities) CLOSED: S17
-  delivered the Commodities page build + gates in one session — every
-  commodity, exclusively here (D-19), reorganize-only. The four
-  commodity groups (Energy · Metals · Agriculture · Digital) + the Trade
-  routes & supply group (D-38/D-39) = 24 cards with the §21 trio (value
-  · 10-year position · freshness), every card context-only (no gauges,
-  no verdict lines — G-5); the gold cross-link to /gold on the metals
-  group (D-19/D-27 — the one commodity exception). M1 the pure tiles +
-  copy + pins; M2 the page build + the App.tsx wiring; M3 the §21
-  backtest + the render audit + the full gates + the In-build chip
-  RETIRED at the gates pass (BD-S17c — the S13/S15/S16 retirement
-  trajectory mirrored).** Progress: S1 scaffold & navigation · S2 data
-  layer + `PLACEMENT.generated.md` · S3 the Global landing page (D-21)
-  · S4 the gates & polish (Phase A CLOSED) · S5 the Gold page build · S6
-  the Gold gates + the owner's alternation (Phase B CLOSED) · S7 the
-  World Markets page (D-43 map hero + region grids + the 9 risk cards)
-  · S8 the Regional zoom maps (Phase C CLOSED) · S9 the USA verdicts +
-  tiers 1–2 · S10 the USA tiers 3–6 + the TIC board · S11 the USA gates
-  (Phase D CLOSED) · S12 the Europe page build · S13 the Europe gates
-  (Phase E CLOSED) · S14 the Asia build + fills · S15 the Asia gates
-  (Phase F CLOSED) · S16 the Australia build & gates (Phase G CLOSED) ·
-  **S17 the Commodities build & gates (Phase H CLOSED — the chip
-  retired at the gates pass, the gates green, the §21 diff 24/24 green
-  pre- + post-deploy, the freshness honest [24 within grace, 0
-  beyond]).**
-- **DEPLOYED LIVE (version `08e0fc64`, 2026-11-11, the owner's
-  standing):** the /commodities page is built + gated + live. The live
-  acceptance: the §21 diff re-run against production post-deploy 24/24
-  green (the 24 cards' trio inputs byte-identical page ≡ engine; the
-  freshness audit honest — 24 within grace, 0 beyond, 0 unflagged);
-  currena.ir/commodities renders the complete page over the live
-  projection at 1440×900 AND 360×844 in en AND fa (the 5 group sections,
-  the 24 cards with the §21 trio, the gold cross-link → /gold at 44px,
-  the In-build chip ABSENT on all 4 legs, NO horizontal scroll, ZERO
-  console/page errors; the fa legs dir=rtl + h1='کالاها و انرژی' +
-  Persian digits ['۹۲٫۱۷ دلار' · '۶۵٫۳ تردد در روز']); the Global + Gold
-  + World Markets + USA + Europe + Asia & Pacific + Australia + legacy
-  /insights surfaces intact. The 3 seat chips on /australia that link to
-  /commodities (iron-ore · coal-aus · lng-japan) now resolve to a real
-  page instead of the placeholder. The prior surface was `9d60726b`
-  (S16, /australia); production moved `9d60726b` → `08e0fc64`.
-- **Gates (last full run, S17 — ALL GREEN):** typecheck 6/6 · eslint 0/0
-  · copy:audit clean (exit 0 — the 57 new pd.commodities.* fa entries
-  queued unreviewed) · **suite 15,053 = +34** (commodities-tiles 14 ·
-  commodities-copy-pin 2 · commodities-backtest 11 · CommoditiesPage
-  render audit 7) · build + budgets held (entry 270.69/81.95, the
-  CommoditiesPage chunk 11.93/3.41 vs its 16/5 row — the leanest
-  page-division chunk: no zoom, no board, no gauges).
-- **The live §21 diff (pre-deploy + post-deploy re-verified, vs
-  https://currena.ir):** 24/24 cards green (page ≡ engine
-  byte-for-byte), the 5-group membership green (energy 9/9 · metals 4/4
-  · agriculture 3/3 · digital 2/2 · trade-routes-supply 6/6 = 24 cards),
-  the freshness audit HONEST (24 within cadence grace, 0 beyond — all
-  fresh; 0 unflagged).
+  into 10 destinations per D-1…D-48. **Phase I (Currency Pairs) CLOSED:
+  S18 delivered the Currencies page build + gates in one session — the
+  last placeholder page is real.** All TEN destinations now render their
+  own pages: Global (/) · Gold · World Markets · USA · Europe · Asia &
+  Pacific · Australia · Commodities · **Currency Pairs (/currencies)** ·
+  legacy /insights (the deprecation banner, unchanged below it — its fx
+  table honestly gained the fourth group block "Australia–New Zealand
+  (1)" with the audnzd row, the D-42 consequence).** Progress: S1
+  scaffold & navigation · S2 data layer + `PLACEMENT.generated.md` ·
+  S3–S4 the Global landing (Phase A CLOSED) · S5–S6 Gold (Phase B
+  CLOSED) · S7–S8 World Markets + the zoom maps (Phase C CLOSED) ·
+  S9–S11 USA (Phase D CLOSED) · S12–S13 Europe (Phase E CLOSED) ·
+  S14–S15 Asia (Phase F CLOSED) · S16 Australia (Phase G CLOSED) · S17
+  Commodities (Phase H CLOSED) · **S18 Currencies (Phase I CLOSED).**
+- **DEPLOYED LIVE (2026-11-10 ~00:05 UTC, the owner's standing):**
+  **currena-api `51a0fe45`** (the new SPA + the additive
+  FxSnapshotSchema) + **currena-markets `8f63c8fa`** (the fx engine's
+  new pair rides its four crons — the first session to redeploy the
+  markets worker since the fx build era) + the manual fx-run KV seed
+  (the Path-B pattern). The live acceptance: the §21 diff re-run
+  post-deploy ALL GREEN (cards 14/14 · rules 16/16 · board 23/23 [11/11
+  pairs, D-42 complete] · freshness 14 within grace);
+  currena.ir/currencies renders the complete page over the live feeds at
+  1440×900 AND 360×844 in en AND fa (7 rule lights with the live
+  outcomes · 11 pair cards with audnzd last · 14 registry cards · the
+  In-build chip ABSENT on all 4 legs · NO horizontal scroll · ZERO
+  console/page errors; the fa legs dir=rtl + h1='جفت‌ارزها' + Persian
+  digits ['۵۰٫۱۴ لیر ترکیه' · '۱٫۲۲۸۳ دلار نیوزیلند' · '۵۶٫۷۰٪']). The
+  prior surface was `08e0fc64` (S17, /commodities); production moved
+  `08e0fc64` → `51a0fe45`.
+- **The AUDNZD engine addition (BD-S18a, D-42):** the fx board's pairs
+  are now ELEVEN (audnzd in its own pacificLink group). An ADDITIVE
+  wire-contract change (FxPairIdSchema) — pre-S18 stored snapshots kept
+  parsing. NZD rides the same single Frankfurter timeseries request
+  (zero new provider calls; the Yahoo fallback gained the NZD=X symbol).
+  The seven rules, every threshold, every pattern check and the summary
+  rollup are untouched (audnzd is not a rule input). The legacy corpus
+  gained the new surface's own words (fx.groups.pacificLink ·
+  fx.entries.audnzd · currencyNames/Plural.NZD — en + fa, the 6 fa
+  strings queued unreviewed).
+- **Gates (last full run, S18 — ALL GREEN):** typecheck 6/6 · eslint 0/0
+  · copy:audit clean (exit 0 — the 118 new pd.currencies.* + the 6 new
+  fx.* fa entries queued unreviewed; the narrator vocabulary REGENERATED
+  for the corpus additions) · **suite 15,088 = +35** (currencies-tiles
+  10 · currencies-copy-pin 2 · currencies-backtest 14 · CurrenciesPage
+  render audit 8 · fx.test +1) · build + budgets held (entry
+  271.02/82.06, the CurrenciesPage chunk 21.09/5.33 vs its 24/6.5 row).
+- **The live §21 diff (post-deploy, vs https://currena.ir): ALL CHECKS
+  GREEN** — the 14 registry cards' trio inputs page ≡ engine
+  byte-for-byte; the rules gate green (the §9.3 status table row-by-row
+  through the SAME fxRuleView + the renderable-domain invariant + the
+  stored summary ≡ the engine's own summarizeFxRules recomputed); the
+  board gate green (11/11 pairs · the bigMove ≡ moveRank ≥ 90
+  derivation · the stale-flag honesty); the freshness audit honest (14
+  within grace). PRE-deploy, the same run showed the D-42 coverage leg
+  honestly RED (audnzd not yet live) — the deploy + the fx-run seed
+  closed it (the S16-shaped pre-deploy record).
 
-## Next session (S18 — Currencies build & gates · Session 18/30)
+## Next session (S19 — Navigation, mobile & SEO polish · Session 19/30)
 
 Read `AGENTS.md` (§14 carries the owner's rules) first, then
-`docs/page-division/01-SESSION-ROADMAP.md` (the S18 entry + the S17
-delivery record), `02-PAGE-DIVISION-SPEC.md` §12 + §21, and this
-file. Scope (S18 — Currencies build & gates, Phase I opens): the
-`/currencies` page — the 7 rule lights hero (D-41: R1 risk-mood · R2
-carry unwind · R3 dollar strength · R4 money-hiding · R5 China link ·
-R6 Europe worry · R7 dollar-or-euro) + the 11-pair board (D-42:
-EURUSD · USDJPY · GBPUSD · USDCHF · USDCNY · AUDUSD · AUDJPY · EURJPY ·
-EURCHF · AUDCNY · AUDNZD — each: rate, d1/m1/m3/y1 changes, moveRank
-0–100, bigMove flag, 52-week closes) + the dollar-standing section
-(D-32: dollar-basket · dollar-broad · dollar-eme · us-japan-10y-gap ·
-usdtry · usdaed · usd-reserve-share) + the FX-board payload wiring.
-The S9–S17 display-layer pattern to mirror: pure tiles + the §21 trio
-+ the copy pins + the live backtest + the render audit + the
-mobile/ARIA pass + the In-build chip (build-session chip →
-gates-session retirement). **Gates:** the rules match the FX board KV
-logic exactly; 11 pairs complete; the §21 diff over the cards green
-twice (pre- and post-deploy); typecheck + lint + copy:audit +
-build/budgets; browser verification at 1440×900 and 360×844 in en +
-fa; commit pushed at every checkpoint. The deploy at the close is the
-owner's standing.
+`docs/page-division/01-SESSION-ROADMAP.md` (the S19 entry + the S18
+delivery record), `02-PAGE-DIVISION-SPEC.md` §18 (the navigation/routes
+/visual-language contract) + §21, and this file. Scope (S19 — Phase J
+opens): the topbar/drawer final pass across all pages; sticky footers;
+meta/OG tags per page; breadcrumbs; the known Header language-toggle
+display quirk (HANDOFF item 6 — the button shows the theme words as its
+visible label; its aria-label is correct) rides this pass. Gates: every
+page × the mobile/ARIA pass; typecheck + lint + copy:audit +
+build/budgets; browser verification on the touched surfaces; commit
+pushed at every checkpoint. The deploy at the close is the owner's
+standing.
 
 ### The §15 FRED-only CPI fills for Asia — carried forward (BD-S14a / BD-S15d)
 
@@ -122,11 +126,10 @@ a viable alternative but a DIFFERENT cadence + provider than the spec
 Japan, KOSTAT, MoSPI) publish fresh monthly CPI but are NOT
 already-integrated providers. The candidates + the alternative sources
 are recorded in DECISIONS.md (BD-S14a + BD-S15d). **A dedicated fill
-session (S18's sibling or a one-off) picks a viable monthly source,
-verifies from production egress, then ingests with the full §A
-discipline; the §21 diff grows to cover the new cards.** Their absence
-does not make the 11 placed Asia cards "in build" — the chip retired at
-the S15 gates pass (BD-S15c).
+session picks a viable monthly source, verifies from production egress,
+then ingests with the full §A discipline; the §21 diff grows to cover
+the new cards.** Their absence does not make the 11 placed Asia cards
+"in build" — the chip retired at the S15 gates pass (BD-S15c).
 
 ## Owner-side levers waiting
 
@@ -135,58 +138,69 @@ the S15 gates pass (BD-S15c).
    finding — the 184th id's placement; RENDERED on /usa tier-3).
 3. Ratify or redirect BD-S3a/b/c + BD-S4a/b + BD-S5a + BD-S6a +
    BD-S7a/b + BD-S8a/b/c + BD-S9a/b/c + BD-S10a/b/c + BD-S11a/b/c +
-   BD-S12a (the §15 Europe fills verified-pending-ingest — Rule 5)
-   + BD-S12b (the Europe page build) + BD-S13a/b/c/d (the Europe
-   gates) + BD-S14a (the §15 Asia CPI fills — VERIFIED STALE,
-   discarded) + BD-S14b (the Asia page build) + BD-S15a/b/c/d (the
-   Asia gates — Phase F CLOSED) + BD-S16a/b/c/d (the Australia build
-   & gates — Phase G CLOSED) + **BD-S17a/b/c + the deploy (the
-   Commodities build & gates — Phase H CLOSED)** (all recorded, none
-   blocking).
-4. Triage the queued unreviewed fa strings (now ~1014: the ~957
-   previous + the 57 S17 `pd.commodities.*` keys; the S17 corpus-pinned
-   values — the 24 card names + the 5 unit words + the position/band/
-   status words — are verified byte-for-byte by
-   `commodities-copy-pin.test.ts`, the fresh section/intro/loading/
-   gold-cross-link copy pending review).
+   BD-S12a/b + BD-S13a/b/c/d + BD-S14a/b/c/d + BD-S15a/b/c/d +
+   BD-S16a/b/c/d + BD-S17a/b/c + **BD-S18a/b/c + the deploy (the
+   Currencies build & gates — Phase I CLOSED, incl. the AUDNZD engine
+   addition)** (all recorded, none blocking).
+4. Triage the queued unreviewed fa strings (now ~1138: the ~1014
+   previous + the 6 fx.* engine strings + the 118 S18
+   `pd.currencies.*` keys; the S18 corpus-pinned values — the rule-light
+   names/headlines/everyday words, the pair/card names, the unit words,
+   the position/band/status words — are verified byte-for-byte by
+   `currencies-copy-pin.test.ts`; the fresh section/intro/loading/error
+   + move-rank/52-week copy pending review).
 5. The external investor's review of the spec (§19) — Phase 3's input.
-6. A small pre-existing display quirk (out of S9–S17's scope, noted for
-   S19's polish pass): the Header's language quick-toggle button shows
-   the theme words as its visible label (its aria-label is correct) —
-   `apps/web/src/components/Header.tsx` ~line 316.
+6. The Header's language quick-toggle display quirk (S19's polish pass
+   carries it): the button shows the theme words as its visible label
+   (its aria-label is correct) — `apps/web/src/components/Header.tsx`
+   ~line 316.
 7. The §15 FRED-only CPI fills for JP/KR/IN — still carried forward to
    a dedicated fill session (BD-S14a/BD-S15d, §"The §15 FRED-only CPI
    fills for Asia" above).
+8. A glance at the two TRANSIENT P1 provider timeouts from the S18
+   data-refresh ingest run (#87: ecb-dfr + gold-aud, held on last-good
+   and flagged stale by the fail-closed design): they should self-clear
+   at the next ingest rung; if they persist across runs, they belong to
+   a maintenance session.
 
 ## Known state worth knowing
 
-- The Commodities page reads ONE feed: the S2 projection (GET
-  /api/insights/pages/commodities — the 24 home readings, no mirrors,
-  no boards). A slow or dead projection takes only the cards away (the
-  M-17 last-good localStorage pattern paints the cached copy, labelled).
-- The Commodities render audit (`CommoditiesPage.test.tsx`, 7 tests — the
-  S16 AustraliaPage.test.tsx pattern scoped to Commodities' 24 cards)
-  pins the shell + the 5 group sections + the 24 cards with the §21 trio
-  + the gold cross-link to /gold at 44px + the fail-closed paths +
-  the fa/RTL Persian rendering. The In-build chip is asserted ABSENT
-  (the S17 gates session — BD-S17c's retirement, the S16 trajectory
-  mirrored).
-- The §21 backtest for Commodities (`commodities-backtest-core.ts`
-  reusing S11's pure `auditUsaFreshness` over `COMMODITIES_CARD_IDS`
-  [24 cards] + the offline suite [11 tests] + the live
-  `pd-s17-backtest.ts`) is the S17 gate; the live run against production
-  pre- AND post-deploy: 24/24 green, 5-group membership green,
-  freshness honest (24 within grace, 0 beyond — all fresh; unlike
-  Australia's 7 honest-stale, Commodities had NO honest-stale path to
-  exercise).
-- The Commodities budget row (`scripts/check-bundle-budget.mjs`): the
-  CommoditiesPage lazy chunk measured 11.93/3.41 (S17, chip retired) vs
-  a 16/5 ceiling (the leanest page-division chunk — no zoom, no board,
-  no gauges; not re-based down so a future fill-session has the same
-  room).
-- The rollback lever for the S17 deploy: `npx wrangler rollback` from
-  apps/api — /commodities returns to the prior surface (`9d60726b`, S16,
-  the S1 PagePlaceholder with the honest In-build chip present); every
-  other surface was byte-identical before it (the S17 change is the
-  /commodities page build + the §21 backtest + the render audit + the
-  chip retirement + the App.tsx wiring only).
+- The Currencies page reads TWO feeds: the S2 projection (GET
+  /api/insights/pages/currencies — the 14 home readings) + the fx board
+  (GET /api/insights/fx — the 7 rule states + the 11 pair rows + the
+  dollar measure). A slow or dead projection takes only the cards away
+  (the M-17 last-good localStorage pattern paints the cached copy,
+  labelled); a dead fx feed renders the calm "being prepared" line
+  (never an error — the markets/fx discipline).
+- The Currencies render audit (`CurrenciesPage.test.tsx`, 8 tests) pins
+  the shell + the 7-light hero with EVERY rule-outcome shape (a
+  downgraded warning keeps its warning sentence + the caution line; a
+  quiet R7 stays legitimately silent) + the 11-pair board (the bigMove
+  + stale tags, the 52-week chart) + the two card sections with the §21
+  trio + the fail-closed paths + the M-17 last-good on both feeds + the
+  fa/RTL Persian rendering. The In-build chip is asserted ABSENT (the
+  S18 gates session — BD-S18c's retirement).
+- The §21 backtest for Currencies (`currencies-backtest-core.ts` with
+  THREE gates + the offline suite [14 tests] + the live
+  `pd-s18-backtest.ts`) is the S18 gate; the live run against production
+  post-deploy: ALL GREEN. The live script fetches THREE feeds (the
+  snapshot + the projection + the fx board) — re-run it any time with:
+  `pnpm --filter @currena/web exec tsx ../../apps/web/scripts/pd-s18-backtest.ts`.
+- The Currencies budget row (`scripts/check-bundle-budget.mjs`): the
+  CurrenciesPage lazy chunk measured 21.09/5.33 (S18, chip retired) vs
+  a 24/6.5 ceiling.
+- The rollback lever for the S18 deploy (BOTH workers, the safe order is
+  markets first, then a 10-pair fx-run reseed, then api — the OLD api
+  schema rejects the stored audnzd row): `npx wrangler rollback` from
+  each app — /currencies returns to the prior surface (`08e0fc64`, S17,
+  the S1 PagePlaceholder with the honest In-build chip); every other
+  surface was byte-identical before it (the S18 change is the engine
+  pair + the corpus words + the /currencies page build + the §21
+  backtest + the render audit + the chip retirement + the App.tsx
+  wiring only).
+- The fx-run manual lever (`pnpm --filter @currena/insights fx-run`,
+  needs CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID +
+  INSIGHTS_KV_NAMESPACE_ID) rewrites the fx KV through the REST API —
+  used post-deploy to land the audnzd pair immediately (the
+  markets-au-run Path-B pattern); the markets worker's four crons keep
+  it fresh from now on.

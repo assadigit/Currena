@@ -125,9 +125,24 @@ regeneration (`pnpm placement:generate`).
   offline suite + the live pd-s17-backtest.ts, 24/24 green vs production
   pre- AND post-deploy] + the render audit [CommoditiesPage.test.tsx, 7
   tests] + the In-build chip RETIRED at the gates pass — BD-S17c — Phase
-  H CLOSED) 2026-11-11.** Next: Session 18/30 (S18 — the Currencies
-  build & gates). See the roadmap's progress board for the current
-  position.
+  H CLOSED) 2026-11-11.** S18 (the Currencies build & gates — Phase I
+  OPENED AND CLOSED IN ONE SESSION: the 7 rule lights hero D-41 [through
+  the SAME §9.3 fxRuleView mapping the legacy page reads] + the 11-pair
+  board D-42 [AUDNZD the 11th pair — the one named engine addition: its
+  own pacificLink group, NZD on the same single Frankfurter request] +
+  the dollar-standing cards D-32 [14 registry cards with the §21 trio
+  over the S2 projection] + the FX-board payload wiring [GET
+  /api/insights/fx, the markets/fx last-good discipline]; the §21
+  backtest [the pure core with THREE gates — the 14-card trio diff + the
+  RULES gate (the §9.3 table + the renderable-domain invariant + the
+  stored summary ≡ the engine's own rollup) + the BOARD gate (11 pairs
+  complete)] + the render audit [CurrenciesPage.test.tsx, 8 tests] + the
+  In-build chip RETIRED at the gates pass — the LAST placeholder page is
+  real — deployed BOTH workers [currena-api `51a0fe45` + currena-markets
+  `8f63c8fa` + the fx-run KV seed] with the post-deploy §21 ALL GREEN +
+  the 4-leg browser pass green) 2026-11-11.** Next: Session 19/30 (S19 —
+  Phase J opens: Navigation, mobile & SEO polish). See the roadmap's
+  progress board for the current position.
 
 ## The one rule that trumps everything
 
