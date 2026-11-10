@@ -3,10 +3,10 @@
  * frozen ECB-only API, primary) and Yahoo Finance (keyless fallback)
  * returning ONE common shape: per-currency USD-side series.
  *
- * All 10 pairs come from ONE request (spec §4.1 rule 4): the crosses are
+ * All 11 pairs come from ONE request (spec §4.1 rule 4): the crosses are
  * derived in code (compute.ts), never fetched. The Yahoo fallback fetches
- * the 6 fx currencies + the 2 basket currencies (CAD, SEK) as pair symbols
- * (one call each) and inverts the ones quoted the other way — 8 calls,
+ * the 7 fx currencies + the 2 basket currencies (CAD, SEK) as pair symbols
+ * (one call each) and inverts the ones quoted the other way — 9 calls,
  * used only when the primary fails.
  *
  * Parse halves are pure and total: a malformed answer throws a ProviderError
@@ -27,7 +27,7 @@ import {
   YAHOO_BASE_URL,
 } from './definitions';
 
-/** Every currency the fx run asks providers about (6 fx + CAD + SEK for the basket). */
+/** Every currency the fx run asks providers about (7 fx + CAD + SEK for the basket). */
 export type FxQuoteCurrency = FxCurrency | 'CAD' | 'SEK';
 export const FX_QUOTE_CURRENCIES: readonly FxQuoteCurrency[] = [...FX_CURRENCIES, ...FX_BASKET_CURRENCIES];
 
@@ -156,8 +156,8 @@ export interface FrankfurterFetchOptions {
 }
 
 /**
- * The ONE primary call (spec §4.2's exact URL shape): all 8 currencies in a
- * single timeseries request with the dollar as base.
+ * The ONE primary call (spec §4.2's exact URL shape): all 9 currencies in
+ * a single timeseries request with the dollar as base.
  */
 export async function fetchFrankfurterQuotes(opts: FrankfurterFetchOptions = {}): Promise<FxQuotes> {
   // v3 M-6 kill switch (2026-10-20): a disabled register row is never requested.
@@ -198,6 +198,7 @@ const YAHOO_SYMBOLS: Readonly<Record<FxQuoteCurrency, { symbol: string; inverse:
   CNY: { symbol: 'CNY=X', inverse: false },
   CAD: { symbol: 'CAD=X', inverse: false },
   SEK: { symbol: 'SEK=X', inverse: false },
+  NZD: { symbol: 'NZD=X', inverse: false },
   // USD-per-quote symbols need the reciprocal
   EUR: { symbol: 'EURUSD=X', inverse: true },
   GBP: { symbol: 'GBPUSD=X', inverse: true },
@@ -209,12 +210,12 @@ export interface YahooFxFetchOptions {
   baseUrl?: string;
   userAgent?: string;
   timeoutMs?: number;
-  /** Restrict the fallback to these currencies (default: all 8). */
+  /** Restrict the fallback to these currencies (default: all 9). */
   only?: readonly FxQuoteCurrency[];
 }
 
 /**
- * The fallback: one chart call per currency (8 calls, spec §4.2's Yahoo
+ * The fallback: one chart call per currency (9 calls, spec §4.2's Yahoo
  * column), inverted where Yahoo quotes USD-per-currency, so the answer has
  * the same USD-side shape as Frankfurter's. A single currency's failure
  * drops just that currency (the compute layer degrades honestly) — but the

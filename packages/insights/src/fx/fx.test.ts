@@ -45,7 +45,7 @@ import type { FxCrossReader } from './store';
 import { runFxUpdate } from './run';
 
 /* ------------------------------------------------------------------ *
- * The synthetic ECB world: 6 fx currencies + CAD/SEK, ~400 working days
+ * The synthetic ECB world: 7 fx currencies + CAD/SEK, ~400 working days
  * ------------------------------------------------------------------ */
 
 export function fxWorld(opts: {
@@ -65,6 +65,7 @@ export function fxWorld(opts: {
     CHF: 0.88,
     CNY: 7.1,
     AUD: 1.52,
+    NZD: 1.67,
     CAD: 1.37,
     SEK: 9.5,
   };
@@ -134,6 +135,23 @@ describe('step 1 — providers + cross derivation', () => {
     // And the series builder produces it on every common date.
     const series = pairSeriesFromQuotes('eurjpy', quotes);
     expect(series.length).toBe(eur.length);
+  });
+
+  it('D-42 (S18): AUD/NZD — the 11th pair — derives as NZD per AUD from the two USD legs', () => {
+    const quotes = fxWorld({});
+    const aud = quotes.AUD!;
+    const nzd = quotes.NZD!;
+    const last = aud.length - 1;
+    const derived = pairRateFromUsd('audnzd', { AUD: aud[last]!.value, NZD: nzd[last]!.value })!;
+    const direct = nzd[last]!.value / aud[last]!.value;
+    expect(Math.abs((derived - direct) / direct) * 100).toBeLessThanOrEqual(0.1);
+    // The series builder produces it on every common date (Frankfurter
+    // serves every currency on every ECB date).
+    const series = pairSeriesFromQuotes('audnzd', quotes);
+    expect(series.length).toBe(aud.length);
+    expect(series.every((p) => p.value > 0)).toBe(true); // V1
+    // A missing NZD leg yields undefined, never a guess.
+    expect(pairRateFromUsd('audnzd', { AUD: aud[last]!.value })).toBeUndefined();
   });
 
   it('parses a Frankfurter timeseries answer and drops non-positive rates (V1)', () => {
@@ -668,9 +686,34 @@ describe('step 5 — the job, the store, the write gate', () => {
     // Round-trip through the schema (the store's parse path).
     expect(() => FxSnapshotSchema.parse(JSON.parse(JSON.stringify(snap)))).not.toThrow();
     expect(new Set(snap.pairs.map((p) => p.id)).size).toBe(FX_PAIR_IDS.length);
+    expect(FX_PAIR_IDS).toHaveLength(11); // D-42: AUDNZD is the 11th pair
+    expect(snap.pairs.map((p) => p.id)).toContain('audnzd');
     expect(snap.rules).toHaveLength(7);
     expect(snap.pairs.every((p) => p.rate > 0)).toBe(true); // V1/V7
     expect(snap.pairs.every((p) => p.weekly.length >= FX_MIN_POINTS * 0 ? true : true)).toBe(true);
+  });
+
+  it('V4/V7 (D-42): an answer without NZD holds the stored AUDNZD row verbatim, never a guess', async () => {
+    const good = fxWorld({ lastDate: '2026-10-09' });
+    const first = await pipelineSnapshot(good);
+    // A run where the NZD leg vanished: per-currency validation accepts
+    // the remaining currencies — audnzd keeps its stored row verbatim
+    // (V7), the other ten pairs compute fresh.
+    const noNzd: FxQuoteSet = { ...fxWorld({}) };
+    delete noNzd.NZD;
+    const fetchers: FxJobFetchers = {
+      fetchFrankfurter: async () => ({ source: 'frankfurter', quotes: noNzd }),
+      fetchYahoo: async () => {
+        throw new Error('yahoo down in this fixture');
+      },
+    };
+    const job = await runFxJob(fetchers, first, emptyCross, RUN_DATE, GENERATED_AT);
+    expect(job.snapshot).toBeDefined();
+    expect(job.report.notes.join(' ')).toMatch(/NZD/); // the V4 note speaks
+    const audnzd = job.snapshot!.pairs.find((p) => p.id === 'audnzd')!;
+    const stored = first.pairs.find((p) => p.id === 'audnzd')!;
+    expect(audnzd).toEqual(stored);
+    expect(job.report.held).toContain('audnzd');
   });
 
   it('held rows survive a partial failure verbatim (V7 — never zero, never NaN)', async () => {

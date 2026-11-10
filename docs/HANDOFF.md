@@ -6,6 +6,19 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **SESSION 18/30 IN PROGRESS (S18 — Currencies build & gates · Phase I
+> opens).** Goal: the `/currencies` page — the 7 rule lights hero (D-41)
+> + the 11-pair board (D-42 — AUDNZD joins the FX board: a real engine
+> change, core `FxPairIdSchema` + `FX_PAIRS` + NZD quote currency + the
+> markets-worker redeploy so the crons keep 11 pairs) + the
+> dollar-standing section (D-32, 14 registry cards with the §21 trio) +
+> the FX-board payload wiring. Milestones: M1a the fx engine (audnzd) ·
+> M1b the pure tiles + copy + pins · M2 the page build + the App wiring ·
+> M3 the §21 backtest + the render audit + the full gates + the deploy
+> (currena-api → fx-run → currena-markets) + the browser pass. Baseline
+> at session start: clean tree at the S17 close (`47945fc`), fx suite
+> 1364 green, typecheck 6/6.
+
 > **S17 (2026-11-11) — Commodities build & gates — Phase H CLOSED. Session
 > 17/30 · 13 remaining.** Delivered the Commodities page build + gates in
 > one session: (M1) the pure commodities-tiles + the en/fa pd.commodities

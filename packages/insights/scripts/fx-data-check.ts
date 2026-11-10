@@ -1,7 +1,7 @@
 /**
  * World currencies — the fx data check (spec build step 0).
  *
- * Calls BOTH providers for the eight quote currencies (the 10 pairs are
+ * Calls BOTH providers for the nine quote currencies (the 11 pairs are
  * derived in code, so the pair table below computes the crosses from the
  * USD-side quotes), prints the latest value of each pair from each provider
  * side by side, and writes docs/specs/insights-world-currencies-data-check.md
@@ -91,6 +91,11 @@ function pairValue(quotes: FxQuoteSet | undefined, id: FxPairId): { value: numbe
       const aud = usd('AUD');
       return cny && aud && aud.value > 0 ? { value: cny.value / aud.value, date: cny.date } : undefined;
     }
+    case 'audnzd': {
+      const nzd = usd('NZD');
+      const aud = usd('AUD');
+      return nzd && aud && aud.value > 0 ? { value: nzd.value / aud.value, date: nzd.date } : undefined;
+    }
     default:
       return undefined;
   }
@@ -127,13 +132,13 @@ const md = `# World currencies — provider data check (build step 0)
 
 **Run:** ${new Date().toISOString()} · spec §11 step 0 · committed as the step-0 acceptance artifact.
 
-## The 10 pairs, both providers side by side
+## The 11 pairs, both providers side by side
 
 The crosses (AUD/JPY, EUR/JPY, EUR/CHF, EUR/GBP) are computed from each provider's own USD-side quotes — exactly what the production engine does (compute.ts derives crosses in code; a provider is never asked for a cross).
 
 ${rows.join('\n')}
 
-**Summary:** ${both} of 10 pairs answered by both providers; ${agree} agree within the 0.5% validation rule (V5).
+**Summary:** ${both} of 11 pairs answered by both providers; ${agree} agree within the 0.5% validation rule (V5).
 
 ## The raw currency quotes (Frankfurter, the production primary)
 

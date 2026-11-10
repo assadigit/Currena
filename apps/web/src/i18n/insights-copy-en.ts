@@ -8233,7 +8233,7 @@ export const insightsCopyEn = {
     title: 'World currencies',
     subtitle: 'What the big currencies are telling us',
     asOf: 'As of {date}',
-    groups: { dollarWorld: 'Dollar vs the world', warningLights: 'Warning lights', chinaLink: 'Australia–China' },
+    groups: { dollarWorld: 'Dollar vs the world', warningLights: 'Warning lights', chinaLink: 'Australia–China', auLink: 'Australia–New Zealand' },
     /** Status words (V1): patterns show only Active, Watching or Quiet. */
     statusActive: 'Active',
     statusWatching: 'Watching',
@@ -8454,6 +8454,7 @@ export const insightsCopyEn = {
       CNY: 'yuan',
       CHF: 'Swiss franc',
       AUD: 'Australian dollar',
+      NZD: 'New Zealand dollar',
     },
     currencyPlural: {
       USD: 'US dollars',
@@ -8463,6 +8464,7 @@ export const insightsCopyEn = {
       CNY: 'yuan',
       CHF: 'Swiss francs',
       AUD: 'Australian dollars',
+      NZD: 'New Zealand dollars',
     },
     wordLost: 'lost',
     wordGained: 'gained',
@@ -8518,6 +8520,11 @@ export const insightsCopyEn = {
         name: 'Australian dollar vs yuan',
         what: 'The Australian dollar against its biggest customer’s currency.',
         you: 'Shows the China link in one number.',
+      },
+      audnzd: {
+        name: 'Australian dollar vs New Zealand dollar',
+        what: 'The Tasman pair: Australia’s dollar against its closest neighbour’s. The two economies are tightly linked, so the cross mostly reads the gap between the two countries’ interest rates.',
+        you: 'Travellers and trade across the Tasman feel this one directly.',
       },
     },
     /** The dollar measure's own row (§8's last line + v1.3 §4.9: the

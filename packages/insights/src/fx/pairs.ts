@@ -16,7 +16,8 @@ type RateMap = Partial<Record<FxCurrency, number>>;
 
 /**
  * A pair's rate (quote units per 1 base) from the USD-side rates.
- * audjpy = JPY/AUD, eurjpy = JPY/EUR, eurchf = CHF/EUR, audcny = CNY/AUD.
+ * audjpy = JPY/AUD, eurjpy = JPY/EUR, eurchf = CHF/EUR, audcny = CNY/AUD,
+ * audnzd = NZD/AUD (D-42, S18 — the Australia–New Zealand cross).
  */
 export function pairRateFromUsd(id: FxPairId, r: RateMap): number | undefined {
   switch (id) {
@@ -40,6 +41,8 @@ export function pairRateFromUsd(id: FxPairId, r: RateMap): number | undefined {
       return r.CHF === undefined || r.EUR === undefined ? undefined : r.CHF / r.EUR;
     case 'audcny':
       return r.CNY === undefined || r.AUD === undefined ? undefined : r.CNY / r.AUD;
+    case 'audnzd':
+      return r.NZD === undefined || r.AUD === undefined ? undefined : r.NZD / r.AUD;
   }
 }
 
