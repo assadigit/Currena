@@ -157,6 +157,11 @@ export const LAYER1_INVENTORY_IDS: readonly string[] = [
   'coal-aus',
   'lng-japan',
   'gas-europe',
+  // page-division S25 fill session (2026-11-12, BD-S23a): the three
+  // §15 D-36 Asia CPI cards.
+  'japan-cpi',
+  'korea-cpi',
+  'india-cpi',
   // ----- 16 markets (packages/insights/src/markets/definitions.ts) -----
   'n225', 'asx200', 'kospi', 'hsi', 'ssec', 'taiex', 'nifty50', 'stoxx50', 'dax',
   'cac', 'ftse', 'sp500', 'ndx', 'dow', 'tsx', 'ibov',

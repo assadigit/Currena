@@ -55,6 +55,7 @@ import {
 // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
 // family's fetchers — the IMF COFER adapter + the S&P 500 breadth pair.
 import { fetchCoferUsdShare } from './cofer';
+import { fetchImfCpiYoy, imfCpiLabel } from './imf-cpi';
 import { fetchSp500BreadthRatio } from './sp500-breadth';
 // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive
 // (the I4 5–10y household anchor) + the SGE Au99.99 daily close (the F6
@@ -142,6 +143,17 @@ export const RUNG2_IDS: readonly IndicatorId[] = [
   // All context-only per G-5.
   'usd-reserve-share',
   'sp500-breadth-ratio',
+  // page-division S25 fill session (2026-11-12, BD-S23a): the §15 D-36
+  // Asia CPI family — the IMF SDMX 3.0 CPI dataflow's own YoY series for
+  // Japan · Korea · India (monthly; one keyless request per country on
+  // the COFER venue). First-of-month + bootstrap (the nzMonthly
+  // discipline: the three national prints land on different days of
+  // M+1 — Japan ~T+23d, Korea ~T+5d, India's mirror T+1..T+3 months —
+  // so the 1st-of-month gate catches each country's freshest existing
+  // print without a per-country calendar). All context-only.
+  'japan-cpi',
+  'korea-cpi',
+  'india-cpi',
   // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE Table 33
   // median — the I4 5–10y household anchor (monthly, the first-of-month
   // gate + bootstrap; one keyless POST serves the full history) — and the
@@ -190,6 +202,12 @@ export interface Rung2FetchPlan {
    * data, re-checked every Saturday + bootstrap (idempotent fetch of a
    * ~127 kB dataset; the publication cadence is ~1 quarter). */
   coferQuarterly: boolean;
+  /** page-division S25 (2026-11-12, BD-S23a): the IMF SDMX 3.0 CPI
+   * dataflow's three Asia CPI series (Japan · Korea · India, monthly,
+   * one keyless request per country) — first-of-month + bootstrap (the
+   * nzMonthly discipline: each fetch carries the full history, fetched
+   * wins on collision). */
+  imfCpiMonthly: boolean;
   /** gap-closure S6-M6.3: the S&P 500 breadth ratio (RSP + SPY) — daily
    * + bootstrap (a missing stage entry IS the bootstrap itself). */
   breadthDaily: boolean;
@@ -277,6 +295,12 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
   // gap-closure S6-M6.3: the COFER share + the breadth ratio bootstrap
   // the same way (a fresh deploy on any day must not wait for Saturday).
   const needCoferQuarterly = missing.has('usd-reserve-share');
+  // page-division S25 (BD-S23a): the three Asia CPI series bootstrap the
+  // same way (a fresh deploy on any day must not wait for the 1st — the
+  // post-deploy landing runs rung2-run --imf-cpi, and every later
+  // missing-history event re-arms the fetch here too).
+  const needImfCpiMonthly =
+    missing.has('japan-cpi') || missing.has('korea-cpi') || missing.has('india-cpi');
   // GF-S10: the UoM 5–10y anchor bootstraps like the other monthlies; the
   // SGE leg needs no bootstrap flag — it fetches EVERY day (the
   // mof/gprDaily pattern: a missing stage entry is the bootstrap itself,
@@ -312,6 +336,11 @@ export function rung2FetchPlanFor(date: Date, missing: ReadonlySet<string>): Run
     // needs no daily fetch — the eiaWeekly/cftcWeekly discipline; the
     // sweeps heal a missed Saturday within hours anyway).
     coferQuarterly: isSaturday(date) || needCoferQuarterly,
+    // page-division S25 (BD-S23a): the three Asia CPI series ride the
+    // first-of-month gate (the nzMonthly discipline — monthly mirrors,
+    // full history per fetch; ~3 subrequests on the 1st, never a daily
+    // fetch).
+    imfCpiMonthly: isFirstOfMonth(date) || needImfCpiMonthly,
     // S6-M6.3: the breadth ratio fetches every day (a missing stage entry
     // IS the bootstrap itself — the mof/gpr-daily pattern).
     breadthDaily: true,
@@ -597,6 +626,22 @@ export async function collectRung2Sources(
       fetchCoferUsdShare(),
     );
     if (cofer !== undefined) series['usd-reserve-share'] = cofer;
+  }
+
+  // page-division S25 fill session (2026-11-12, BD-S23a): the three
+  // §15 D-36 Asia CPI series — the IMF's own SDMX 3.0 CPI dataflow, one
+  // keyless request per country ({CC}.CPI._T.YOY_PCH_PA_PT.M), each
+  // carrying the provider's OWN year-over-year percent-change series
+  // with its full history (the COFER venue + discipline: fail-soft per
+  // country, the parse fails closed on any shape drift). First-of-month
+  // + bootstrap.
+  if (plan.imfCpiMonthly) {
+    const japanCpi = await fetchLogged('imf', imfCpiLabel('JPN'), () => fetchImfCpiYoy('JPN'));
+    if (japanCpi !== undefined) series['japan-cpi'] = japanCpi;
+    const koreaCpi = await fetchLogged('imf', imfCpiLabel('KOR'), () => fetchImfCpiYoy('KOR'));
+    if (koreaCpi !== undefined) series['korea-cpi'] = koreaCpi;
+    const indiaCpi = await fetchLogged('imf', imfCpiLabel('IND'), () => fetchImfCpiYoy('IND'));
+    if (indiaCpi !== undefined) series['india-cpi'] = indiaCpi;
   }
 
   // gap-closure S6-M6.3 (2026-11-02): the S&P 500 breadth ratio — two

@@ -4,19 +4,19 @@
 > (scripts/generate-placement-table.ts) from `data/indicators.json` v4 + the spec §14 rules encoded in `packages/insights/src/page-division/placement.ts` (the mirror sets derive from the engine’s own tables — GAUGES + GOLD_LANE_VOTERS — so this table cannot drift from the engine silently).
 > Page-division Session 2/30 · 2026-11-08 · drift is recorded as audit findings below, never silently fixed (AGENT-RULES.md §5).
 
-## Reconciliation — 184 ids + 6 boards
+## Reconciliation — 187 ids + 6 boards
 
 | Check | Result |
 |---|---|
-| Registry ids (`data/indicators.json` v4) | 184 |
-| Placed (one home each — blocked notes included) | 184 |
+| Registry ids (`data/indicators.json` v4) | 187 |
+| Placed (one home each — blocked notes included) | 187 |
 | Unplaced | 0 |
 | Duplicate homes | 0 |
 | Unknown ids (placement ∖ registry) | 0 |
 | Mirror/home overlaps | 0 |
 | Boards | 6 — 4 served + the Prices live overlay + Companies (flag OFF) |
 
-**Verdict: reconciles** — zero unplaced, zero duplicate homes. The spec’s own hand-count drift is recorded as the audit findings AF-1…AF-7 below.
+**Verdict: reconciles** — zero unplaced, zero duplicate homes. The spec’s own hand-count drift is recorded as the audit findings AF-1…AF-8 below.
 
 | Page | Route | Registry cards | Mirror inputs | Boards | Decisions |
 |---|---|---|---|---|---|
@@ -25,12 +25,12 @@
 | world-markets | `/world-markets` | 9 | 0 | World Markets board | D-13 · D-43 · D-47 |
 | usa | `/usa` | 72 | 14 | World Markets board · TIC board | D-14 · D-29…D-32 · D-44 |
 | europe | `/europe` | 8 | 0 | World Markets board | D-15 · D-33 · D-34 |
-| asia-pacific | `/asia-pacific` | 11 | 0 | World Markets board | D-16 · D-17 · D-35 · D-36 |
+| asia-pacific | `/asia-pacific` | 14 | 0 | World Markets board | D-16 · D-17 · D-35 · D-36 |
 | australia | `/australia` | 28 | 5 | AU Markets board | D-6 · D-37 |
 | commodities | `/commodities` | 24 | 0 | — | D-2 · D-19 · D-38…D-40 |
 | currencies | `/currencies` | 14 | 0 | FX board | D-18 · D-32 · D-41 · D-42 |
 
-Count check: 0 + 14 + 4 blocked + 9 + 72 + 8 + 11 + 28 + 24 + 14 = **184 registry ids placed** (+ 0 unplaced). Dual-membership ids keep ONE home each (spec §14); engine membership is untouched (spec §3.3).
+Count check: 0 + 14 + 4 blocked + 9 + 72 + 8 + 14 + 28 + 24 + 14 = **187 registry ids placed** (+ 0 unplaced). Dual-membership ids keep ONE home each (spec §14); engine membership is untouched (spec §3.3).
 
 ## Per-page membership
 
@@ -306,7 +306,7 @@ Group notes:
 
 ### asia-pacific — `/asia-pacific`
 
-> 11 registry cards · 0 mirror inputs · boards: World Markets board · D-16 · D-17 · D-35 · D-36
+> 14 registry cards · 0 mirror inputs · boards: World Markets board · D-16 · D-17 · D-35 · D-36
 
 | id | title | registry area | group | role |
 |---|---|---|---|---|
@@ -319,14 +319,17 @@ Group notes:
 | `china-steel-output` | China crude steel output (monthly) | australia/au-trade-currency | china | home |
 | `jgb-10y` | Japan 10-year government bond yield | global/borrowing-costs | japan | home |
 | `boj-rate` | Bank of Japan policy rate (overnight) | global/borrowing-costs | japan | home |
+| `japan-cpi` | Japan inflation (yearly) | global/growth-health | japan | home |
+| `korea-cpi` | Korea inflation (yearly) | global/growth-health | korea-taiwan-hk | home |
+| `india-cpi` | India inflation (yearly) | global/growth-health | india | home |
 | `nz-short-rate` | New Zealand short-term interest rate (monthly average) | australia/au-external | pacific-nz | home |
 | `nz-10y` | New Zealand 10-year government bond yield | australia/au-external | pacific-nz | home |
 
 Group notes:
 - **china** — china-property-investment + china-steel-output moved in from the AU page (D-35); SGE links point to /gold.
-- **japan** — + the Japan CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a: the FRED OECD mirror candidates VERIFIED STALE, discarded; BD-S15d carried the fill to a dedicated session — the World Bank annual or the national bureau are the recorded alternatives).
-- **korea-taiwan-hk** — Index-only today (KOSPI · TAIEX · HSI on the markets board); the Korea CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a/BD-S15d).
-- **india** — Index-only today (NIFTY50 on the markets board); the India CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a/BD-S15d).
+- **japan** — + the Japan CPI fill (D-36) LANDED in the S25 fill session (BD-S23a): the IMF SDMX 3.0 CPI dataflow card — verified live at both venues + against the Statistics Bureau’s own release, the FRED OECD mirror family is DEAD (BD-S14a).
+- **korea-taiwan-hk** — KOSPI · TAIEX · HSI ride the markets board (the Asia zoom map); the Korea CPI fill (D-36) LANDED in the S25 fill session (BD-S23a) — the IMF SDMX 3.0 CPI dataflow card, verified against KOSTAT’s own October release.
+- **india** — NIFTY50 rides the markets board (the Asia zoom map); the India CPI fill (D-36) LANDED in the S25 fill session (BD-S23a) — the IMF SDMX 3.0 CPI dataflow card, verified against MoSPI’s own July press note (the mirror lags MoSPI by 1–3 months, labelled).
 - **pacific-nz** — New Zealand lives here (D-17); NZX50 rides the AU Markets board — the S21 Pacific—NZ mirror card renders its row here (BD-S21b), and the board's home is /australia.
 
 ### australia — `/australia`
@@ -460,6 +463,7 @@ Group notes:
 - **AF-5 (info)** — Spec §10's gauge numbers (au-inflation-rates 6 · au-households 11 · au-trade-currency 10 · au-activity 7 · au-external 4 = 38) are the registry DISPLAY-group counts; the engine's scored AU gauge voters are 26 (5 · 7 · 4 · 6 · 4). Both true at their layers — the page renders registry groups; the gauge verdicts score the engine's voters. Recorded so neither gets "fixed" into the other.
 - **AF-6 (info)** — S21 spec audit (2026-11-12): spec §6 item 2 lists the Asia grid as "N225 · KOSPI · HSI · SSEC · TAIEX · NIFTY50" (6) while its own §6 hero requires 16 map indices — the three grid lists total 15, missing ASX200. The world-board registry is the authority (16 = Asia-Pacific 7 [incl. ASX200] · Europe 4 · Americas 5, the engine's own MARKETS table); the /world-markets Asia grid renders the registry's 7, heading "Asia-Pacific". Spec-side hand-list drift, the AF-2 class — recorded, not corrected in the spec.
 - **AF-7 (info)** — S21 spec audit (2026-11-12): spec §10 item 1 says the AU Markets board is "19 symbols: … 10 ASX-200 sectors …" — but 2 broad + 10 sectors + 4 banks + VIX + NZX50 sums to 18, not its own 19. The board carries ELEVEN ASX 200 GICS sector rows (markets-au/definitions.ts, self-described "the eleven ASX 200 GICS sector indices") and totals 19 ✓. The "10" is a spec typo — the code is right; recorded so nobody "fixes" the board to match the typo.
+- **AF-8 (info)** — S25 fill session (2026-11-12, BD-S23a): spec §15's three D-36 Asia fills name the "FRED OECD mirror family" as the candidate source — that family is DEAD (verified stale/discontinued live in S14, BD-S14a: JPNCPIALLMINMEI + CPALTT01JPM659N end 2021-06; the KR pair ends 2023-11; the IN pair ends 2025-03 — never re-try those ids). The fills LANDED from the IMF's own SDMX 3.0 CPI dataflow instead (Rule 5 verified at both venues + against the national bureaus — Japan's Statistics Bureau, KOSTAT, MoSPI, and the World Bank annual cross-check), the "fresh FRED/IMF IFS series" option the roadmap recorded. The spec §15 table (and §9's "+ fill" notes naming it) rides the spec-v2 pass — recorded here, never silently edited.
 
 ---
 

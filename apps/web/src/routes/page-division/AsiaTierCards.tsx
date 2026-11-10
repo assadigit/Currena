@@ -1,18 +1,20 @@
 /**
  * AsiaTierCards — the Asia & Pacific page's five sections (page-division
  * S14, 2026-11-09 — spec §9 items 1–5; D-35: organized by sub-region,
- * not by theme).
+ * not by theme; the S25 fill session 2026-11-12 lands the three §15
+ * D-36 CPI cards — BD-S23a).
  *
  *   - China section (§9 item 1): china-pmi · china-cpi · oecd-cli-cn ·
  *     gpr-china · gpr-taiwan · china-property-investment ·
  *     china-steel-output.
- *   - Japan section (§9 item 2): jgb-10y · boj-rate.
- *   - Korea · Taiwan · Hong Kong section (§9 item 3): INDEX-ONLY today
- *     (KOSPI · TAIEX · HSI ride the markets board / the Asia zoom map);
- *     the Korea CPI fill (D-36) is verified-pending-ingest (Rule 5).
- *   - India section (§9 item 4): INDEX-ONLY today (NIFTY50 rides the
- *     markets board); the India CPI fill (D-36) is verified-pending-
- *     ingest (Rule 5).
+ *   - Japan section (§9 item 2): jgb-10y · boj-rate · japan-cpi (the
+ *     S25 fill — the IMF SDMX 3.0 CPI dataflow card).
+ *   - Korea · Taiwan · Hong Kong section (§9 item 3): korea-cpi (the
+ *     S25 fill) — KOSPI · TAIEX · HSI ride the markets board / the
+ *     Asia zoom map (the intro copy says so).
+ *   - India section (§9 item 4): india-cpi (the S25 fill; the mirror
+ *     lags MoSPI by 1–3 months, labelled) — NIFTY50 rides the markets
+ *     board.
  *   - Pacific — New Zealand section (§9 item 5, D-17): nz-short-rate ·
  *     nz-10y + the NZX50 card (S21: the BD-S8b commitment wired at
  *     last — NZX50 is NOT a world-board index, so it cannot ride the
@@ -29,11 +31,6 @@
  * UsaTierCards / GoldContext / WorldRiskCards / EuropeTierCards pattern.
  * An absent reading (public mode's licence-hidden ids, a failed id)
  * renders the honest unavailable word, never a guess.
- *
- * The two index-only sections render an HONEST note (never an empty
- * card grid): their markets ride the zoom map above, and the §15 CPI
- * fills are verified-pending-ingest (Rule 5 — BD-S14a). The note is the
- * spec §20 "pages labelled 'growing' honestly" mitigation.
  *
  * Platform: browser only — this module lives in the lazy Asia route
  * chunk, never the entry graph.
@@ -62,9 +59,11 @@ import { AsiaNzx50Card } from './AsiaNzx50Card';
  *  here — the section wiring rides the pure module's single source). */
 const CHINA_ENTRY_IDS: readonly AsiaCardId[] = ASIA_CHINA_IDS as readonly AsiaCardId[];
 const JAPAN_ENTRY_IDS: readonly AsiaCardId[] = ASIA_JAPAN_IDS as readonly AsiaCardId[];
+const KOREA_ENTRY_IDS: readonly AsiaCardId[] = ASIA_KOREA_TAIWAN_HK_IDS as readonly AsiaCardId[];
+const INDIA_ENTRY_IDS: readonly AsiaCardId[] = ASIA_INDIA_IDS as readonly AsiaCardId[];
 const NZ_ENTRY_IDS: readonly AsiaCardId[] = ASIA_PACIFIC_NZ_IDS as readonly AsiaCardId[];
 
-/** The card-name keys — 11 literal keys (the copy-pin test proves each
+/** The card-name keys — 14 literal keys (the copy-pin test proves each
  *  matches the insights corpus byte-for-byte, both locales). */
 const CARD_NAME_KEY: Readonly<Record<AsiaCardId, TranslationKey>> = {
   'china-pmi': 'pd.asiaPacific.cardNames.china-pmi',
@@ -76,6 +75,10 @@ const CARD_NAME_KEY: Readonly<Record<AsiaCardId, TranslationKey>> = {
   'china-steel-output': 'pd.asiaPacific.cardNames.china-steel-output',
   'jgb-10y': 'pd.asiaPacific.cardNames.jgb-10y',
   'boj-rate': 'pd.asiaPacific.cardNames.boj-rate',
+  // S25 (BD-S23a): the three §15 D-36 CPI cards.
+  'japan-cpi': 'pd.asiaPacific.cardNames.japan-cpi',
+  'korea-cpi': 'pd.asiaPacific.cardNames.korea-cpi',
+  'india-cpi': 'pd.asiaPacific.cardNames.india-cpi',
   'nz-short-rate': 'pd.asiaPacific.cardNames.nz-short-rate',
   'nz-10y': 'pd.asiaPacific.cardNames.nz-10y',
 };
@@ -216,34 +219,45 @@ function AsiaSection({
 }
 
 /* ------------------------------------------------------------------ *
- * One Asia index-only section (Korea/Taiwan/HK, India — the two empty
- * placement groups whose markets ride the zoom map above; the §15 CPI
- * fills are verified-pending-ingest, Rule 5). Renders an HONEST note,
- * never an empty card grid.
+ * One Asia index-note section (Korea/Taiwan/HK, India — their markets
+ * ride the zoom map above; the §15 CPI cards render inside the same
+ * sections' grids). The honest note names what rides the map, never a
+ * silently-empty claim.
  * ------------------------------------------------------------------ */
 
-function AsiaIndexOnlySection({
+function AsiaIndexNoteSection({
   titleKey,
   introKey,
   noteKey,
+  ids,
+  readings,
+  units,
   dataSection,
 }: {
   titleKey: TranslationKey;
   introKey: TranslationKey;
   noteKey: TranslationKey;
+  ids: readonly AsiaCardId[];
+  readings: readonly IndicatorReading[];
+  units: AsiaUnitLabels;
   dataSection: string;
 }): React.JSX.Element {
   const { t } = useI18n();
+  const entries = asiaCards(readings, ids);
   return (
-    <section aria-label={t(titleKey)} data-asia-section={dataSection} data-asia-index-only className="mt-3 scroll-mt-24 sm:mt-5">
+    <section aria-label={t(titleKey)} data-asia-section={dataSection} data-asia-index-note className="mt-3 scroll-mt-24 sm:mt-5">
       <div className="mb-1.5 sm:mb-2">
         <h2 className="m-0 text-base font-extrabold leading-tight text-currena-dark sm:text-lg lg:text-xl">{t(titleKey)}</h2>
         <p className="m-0 mt-0.5 max-w-prose text-[length:var(--type-label)] leading-snug text-currena-muted sm:text-[length:var(--type-label)]">{t(introKey)}</p>
       </div>
-      {/* The honest index-only note — these markets ride the zoom map
-          above; the §15 CPI fill is verified-pending-ingest (Rule 5).
-          The spec §20 "pages labelled 'growing' honestly" mitigation. */}
-      <p className="m-0 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
+        {entries.map((entry) => (
+          <AsiaCard key={entry.id} entry={entry} units={units} />
+        ))}
+      </div>
+      {/* The honest index note — these markets ride the zoom map above;
+          the CPI card beside it is the section's data card (S25, BD-S23a). */}
+      <p className="m-0 mt-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
         <bdi>{t(noteKey)}</bdi>
       </p>
     </section>
@@ -278,16 +292,22 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
         units={units}
         dataSection="japan"
       />
-      <AsiaIndexOnlySection
+      <AsiaIndexNoteSection
         titleKey="pd.asiaPacific.koreaTaiwanHk.title"
         introKey="pd.asiaPacific.koreaTaiwanHk.intro"
-        noteKey="pd.asiaPacific.koreaTaiwanHk.indexOnlyNote"
+        noteKey="pd.asiaPacific.koreaTaiwanHk.indexNote"
+        ids={KOREA_ENTRY_IDS}
+        readings={readings}
+        units={units}
         dataSection="korea-taiwan-hk"
       />
-      <AsiaIndexOnlySection
+      <AsiaIndexNoteSection
         titleKey="pd.asiaPacific.india.title"
         introKey="pd.asiaPacific.india.intro"
-        noteKey="pd.asiaPacific.india.indexOnlyNote"
+        noteKey="pd.asiaPacific.india.indexNote"
+        ids={INDIA_ENTRY_IDS}
+        readings={readings}
+        units={units}
         dataSection="india"
       />
       <AsiaSection
@@ -307,7 +327,8 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
   );
 }
 
-/* The two index-only groups' id lists are re-exported here so the
- * render audit (AsiaPage.test.tsx) can assert they are empty (the
- * honest index-only contract — never a silently-empty card grid). */
+/* The two index-note groups' id lists are re-exported here so the
+ * render audit (AsiaPage.test.tsx) can assert their membership (the
+ * honest index-note contract — the CPI cards render inside these
+ * sections, the markets ride the zoom). */
 export { ASIA_KOREA_TAIWAN_HK_IDS, ASIA_INDIA_IDS };

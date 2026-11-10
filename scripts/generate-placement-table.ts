@@ -12,7 +12,7 @@
  *
  * Discipline:
  *   - Drift is an AUDIT FINDING, never a silent fix (Agent Rule 5): the
- *     spec's own hand-count defects are recorded in the doc (AF-1…AF-7 — AF-6/AF-7 added at the S21 spec audit);
+ *     spec's own hand-count defects are recorded in the doc (AF-1…AF-8 — AF-6/AF-7 added at the S21 spec audit, AF-8 at the S25 fill session);
  *     STRUCTURAL drift (unknown/duplicate/unplaced/mirror-overlap) is
  *     printed AND exits non-zero — the table is only committed green.
  *   - The output is DETERMINISTIC (no timestamps/env): the sync test
@@ -51,7 +51,7 @@ if (rec.unplaced.length > 0) console.error(`[placement] UNPLACED (structural red
 if (rec.duplicateHomes.length > 0) console.error(`[placement] DUPLICATE HOMES (structural red): ${rec.duplicateHomes.join(', ')}`);
 if (rec.unknownIds.length > 0) console.error(`[placement] UNKNOWN IDS (structural red): ${rec.unknownIds.join(', ')}`);
 if (rec.mirrorOverlaps.length > 0) console.error(`[placement] MIRROR/HOME OVERLAPS (structural red): ${rec.mirrorOverlaps.join(', ')}`);
-console.log(`[placement] static audit findings on record: AF-1…AF-7 (see the doc's audit section)`);
+console.log(`[placement] static audit findings on record: AF-1…AF-8 (see the doc's audit section)`);
 
 /* --------------------------- the document --------------------------- */
 

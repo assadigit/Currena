@@ -3,9 +3,9 @@
   "source": {
     "enPath": "apps/web/src/i18n/insights-copy-en.ts",
     "faPath": "apps/web/src/i18n/insights-copy-fa.ts",
-    "enSha256": "0b9d5ba9def2f276ee3e87f7c43ace6d1467c5a93c6dd94e6b5b7aaacf53c2d5",
-    "faSha256": "d597731a072da54e5db07a1f2c891b62dc73de759799e9d56c0984a7210541c0",
-    "indicatorCount": 190,
+    "enSha256": "b56d4d902fc96e3c5746e86a95e6c1a7a2903ccd77afc42e96de3acbacd0c41d",
+    "faSha256": "86cdd9acbe65257e571735b8b4c69db5b8c6dc1088a0ff14b36ceee58c7d66ce",
+    "indicatorCount": 193,
     "glossaryCount": 56
   },
   "en": {
@@ -598,6 +598,60 @@
         "glossaryTerms": [
           "inflation",
           "commodity"
+        ]
+      },
+      "japan-cpi": {
+        "plainName": "Japan’s inflation rate",
+        "oneLine": "How fast consumer prices in Japan are rising, versus a year ago.",
+        "ifRising": "Pressure usually builds on Japan’s central bank to tighten after decades of easy money.",
+        "ifFalling": "Weak Japanese demand usually keeps its giant savings pool parked in world markets.",
+        "connections": [
+          {
+            "with": "boj-rate",
+            "text": "The central bank’s setting answers this price gauge.",
+            "strength": "reliable"
+          },
+          {
+            "with": "jgb-10y",
+            "text": "Sticky inflation usually steers the long-term yield higher.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation",
+          "bond"
+        ]
+      },
+      "korea-cpi": {
+        "plainName": "Korea’s inflation rate",
+        "oneLine": "How fast consumer prices in Korea are rising, versus a year ago.",
+        "ifRising": "Korean households usually feel the squeeze first in one of Asia’s most indebted consumer economies.",
+        "ifFalling": "Soft domestic demand usually cools Korea’s export-led growth engine too.",
+        "connections": [
+          {
+            "with": "japan-cpi",
+            "text": "The two export neighbours’ price gauges usually move together.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation"
+        ]
+      },
+      "india-cpi": {
+        "plainName": "India’s inflation rate",
+        "oneLine": "How fast consumer prices in India are rising, versus a year ago.",
+        "ifRising": "Indian households usually cut back first, and food prices hit the poorest hardest.",
+        "ifFalling": "Cooling prices usually give India’s central bank room to support growth.",
+        "connections": [
+          {
+            "with": "china-cpi",
+            "text": "The two Asian giants’ price gauges frame the region’s demand story.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation"
         ]
       },
       "copper-gold": {
@@ -4945,6 +4999,60 @@
         "glossaryTerms": [
           "inflation",
           "commodity"
+        ]
+      },
+      "japan-cpi": {
+        "plainName": "نرخ تورم ژاپن",
+        "oneLine": "سرعت گران شدن قیمت مصرفی در ژاپن از سال گذشته.",
+        "ifRising": "فشار بر بانک مرکزی ژاپن معمولاً برای سخت‌گیری پس از دهه‌ها پول آسان بالا می‌آید.",
+        "ifFalling": "تقاضای ضعیف ژاپن معمولاً پس‌انداز عظیم این کشور را در بازارهای جهان نگه می‌دارد.",
+        "connections": [
+          {
+            "with": "boj-rate",
+            "text": "تنظیم بانک مرکزی پاسخ همین دماسنج قیمت است.",
+            "strength": "reliable"
+          },
+          {
+            "with": "jgb-10y",
+            "text": "تورم چسبنده معمولاً بازده بلندمدت را بالا می‌برد.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation",
+          "bond"
+        ]
+      },
+      "korea-cpi": {
+        "plainName": "نرخ تورم کره",
+        "oneLine": "سرعت گران شدن قیمت مصرفی در کره از سال گذشته.",
+        "ifRising": "خانوارهای کره‌ای معمولاً اول قربانی‌اند؛ در یکی از بدهیک‌ترین اقتصادهای مصرفی آسیا.",
+        "ifFalling": "تقاضای داخلی نرم معمولاً موتور رشد صادرات‌محور کره را هم خنک می‌کند.",
+        "connections": [
+          {
+            "with": "japan-cpi",
+            "text": "دماسنج قیمت دو همسایهٔ صادرات‌محور معمولاً با هم حرکت می‌کند.",
+            "strength": "usually"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation"
+        ]
+      },
+      "india-cpi": {
+        "plainName": "نرخ تورم هند",
+        "oneLine": "سرعت گران شدن قیمت مصرفی در هند از سال گذشته.",
+        "ifRising": "خانوارهای هندی معمولاً اول خرجشان را کم می‌کنند و قیمت خوراکی سخت‌ترین ضربه را می‌زند.",
+        "ifFalling": "قیمت‌های خنک معمولاً به بانک مرکزی هند جای مانور برای حمایت از رشد می‌دهد.",
+        "connections": [
+          {
+            "with": "china-cpi",
+            "text": "دماسنج قیمت دو غول آسیایی قاب داستان تقاضای منطقه را می‌سازد.",
+            "strength": "sometimes"
+          }
+        ],
+        "glossaryTerms": [
+          "inflation"
         ]
       },
       "copper-gold": {

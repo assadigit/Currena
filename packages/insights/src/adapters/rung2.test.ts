@@ -50,7 +50,7 @@ describe('rung2FetchPlanFor (the cadence gates + the bootstrap rule)', () => {
 
   it('an ordinary Tuesday: MOF + the GPR daily file only (the weekly pair waits for Saturday, the monthly trio for the first)', () => {
     const plan = rung2FetchPlanFor(new Date('2026-10-27T04:20:00Z'), all);
-    expect(plan).toEqual({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: true, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, breadthDaily: true, uomMonthly: false, sgeDaily: true, clevelandNowcast: true, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: true }); // 2026-10-27 sits outside the 21st-25th window; GF-S10: the SGE leg fetches daily; GF-S11: the Cleveland nowcast + the GLD/SPY pair fetch daily, the 27th sits outside the SGE PDF's 3rd–14th window
+    expect(plan).toEqual({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: true, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, imfCpiMonthly: false, breadthDaily: true, uomMonthly: false, sgeDaily: true, clevelandNowcast: true, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: true }); // 2026-10-27 sits outside the 21st-25th window; GF-S10: the SGE leg fetches daily; GF-S11: the Cleveland nowcast + the GLD/SPY pair fetch daily, the 27th sits outside the SGE PDF's 3rd–14th window
   });
 
   it('Saturday arms the weekly pair; the first of the month arms the monthly trio', () => {
@@ -60,7 +60,7 @@ describe('rung2FetchPlanFor (the cadence gates + the bootstrap rule)', () => {
 
   it('a MISSING id bootstraps its feed regardless of the date (first deploy / disaster recovery)', () => {
     const plan = rung2FetchPlanFor(new Date('2026-10-27T04:20:00Z'), new Set(['eia-crude-stocks', 'epu-us']));
-    expect(plan).toEqual({ mof: true, eiaWeekly: true, cftcWeekly: false, monthly: true, gprDaily: true, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, breadthDaily: true, uomMonthly: false, sgeDaily: true, clevelandNowcast: true, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: true });
+    expect(plan).toEqual({ mof: true, eiaWeekly: true, cftcWeekly: false, monthly: true, gprDaily: true, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, imfCpiMonthly: false, breadthDaily: true, uomMonthly: false, sgeDaily: true, clevelandNowcast: true, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: true });
   });
 
   // gap-closure S4-M4.4 (2026-11-01): the new family's bootstrap legs.
@@ -477,7 +477,7 @@ describe('collectRung2Sources (the shared collect)', () => {
     const before = register.SOURCE_RISK_REGISTER['mof-japan']!.enabled;
     register.SOURCE_RISK_REGISTER['mof-japan']!.enabled = false;
     try {
-      const out = await collectRung2Sources({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
+      const out = await collectRung2Sources({ mof: true, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, imfCpiMonthly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
       expect(called).toBe(false);
       expect(out.series['jgb-10y']).toBeUndefined();
       expect(out.reports.some((r) => r.source === 'mof' && r.kind === 'disabled')).toBe(true);
@@ -498,7 +498,7 @@ describe('collectRung2Sources (the shared collect)', () => {
       throw new Error(`unexpected fetch: ${url}`);
     }) as typeof fetch;
     try {
-      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, imfCpiMonthly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
       expect(out.series['oecd-cli-us']!.at(-1)).toEqual({ date: '2026-09-01', value: 100.9993 });
       expect(out.series['oecd-cli-cn']!.at(-1)).toEqual({ date: '2026-09-01', value: 97.41035 });
       expect(out.series['oecd-cli-de']!.at(-1)).toEqual({ date: '2026-09-01', value: 101.0066 });
@@ -534,7 +534,7 @@ describe('collectRung2Sources (the shared collect)', () => {
       throw new Error(`unexpected fetch: ${url}`);
     }) as typeof fetch;
     try {
-      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: true, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: false, gprDaily: true, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, imfCpiMonthly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
       const gprDaily = out.series['gpr-daily']!;
       expect(gprDaily.length).toBe(15274);
       expect(gprDaily[0]).toEqual({ date: '1985-01-01', value: 230.0394287109375 });
@@ -560,7 +560,7 @@ describe('collectRung2Sources (the shared collect)', () => {
       throw new Error(`unexpected fetch: ${url}`);
     }) as typeof fetch;
     try {
-      const out = await collectRung2Sources({ mof: false, eiaWeekly: true, cftcWeekly: false, monthly: false, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: true, cftcWeekly: false, monthly: false, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, imfCpiMonthly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
       expect(out.series['eia-crude-stocks']!.at(-1)).toEqual({ date: '2026-10-16', value: 695200 });
       expect(out.series['us-spr']!.at(-1)).toEqual({ date: '2026-10-23', value: 282583 });
       expect(out.series['us-spr']!.length).toBeGreaterThan(2000);
@@ -587,7 +587,7 @@ describe('collectRung2Sources (the shared collect)', () => {
       throw new Error(`unexpected fetch: ${url}`);
     }) as typeof fetch;
     try {
-      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
+      const out = await collectRung2Sources({ mof: false, eiaWeekly: false, cftcWeekly: false, monthly: true, gprDaily: false, nzMonthly: false, nbsMonthly: false, coferQuarterly: false, imfCpiMonthly: false, breadthDaily: false, uomMonthly: false, sgeDaily: false, clevelandNowcast: false, liquidityMonthly: false, sgeMonthly: false, bazgMonthly: false, rstarQuarterly: false, equitiesDaily: false });
       expect(out.series['gscpi']!.length).toBe(345);
       expect(out.series['gscpi']!.at(-1)).toEqual({ date: '2026-09-01', value: 1.284014886203148 });
       expect(out.reports.filter((r) => r.source === 'nyfed' && r.ok)).toHaveLength(1);
@@ -732,7 +732,7 @@ describe('runInsightsRung2Phase — the first-of-month monthly trio', () => {
         now: new Date('2026-11-01T04:40:00Z'),
       });
       expect(hist.written).toBeGreaterThan(0);
-      expect(store.snapshot!.readings).toHaveLength(184); // GF-S11 (2026-11-07): +11 (the I9 accumulator pair + the nine P4 context cards) // GF-S10 (2026-11-06): +3 (the I4 anchor + the D-11/D-12 real-curve card + the F6 Shanghai premium card) // GF-P3 (2026-11-06): +real-yield-5y +dollar-broad +dollar-eme +bank-stress (the four FRED-sourced voters, all on the FRED bulk group — zero new subrequests) +wgc-etf-holdings +wgc-cb-demand +official-gold-demand (the three WGC/official-flows context cards, OI-GA-4's recorded context-first answer — the data adapters land with the cards) // GF-P2 (2026-11-05): +cftc-gold-gross-long (F2, the same Saturday file) + usdchf (D7, the already-fetched CHF leg) // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card) + the S3-M3.2 liquidity/funding six + the S3-M3.3 credit pair + the S3-M3.4 growth-nowcast/survey six + the S3-M3.5 fiscal/Treasury-supply six + the S4-M4.2 geopolitics eleven + the S4-M4.3 chokepoint five + the S4-M4.4 supply-chain/energy six + the S6-M6.1 New Zealand link three (audnzd + the two NZ mirrors) + the S6-M6.2 China property/steel two + the S6-M6.3 de-dollarization/concentration two + the btp-bund-spread
+      expect(store.snapshot!.readings).toHaveLength(187); // page-division S25 fill session (2026-11-12, BD-S23a): +3 — the §15 D-36 Asia CPI cards (all context-only on the IMF SDMX 3.0 CPI dataflow) // GF-S11 (2026-11-07): +11 (the I9 accumulator pair + the nine P4 context cards) // GF-S10 (2026-11-06): +3 (the I4 anchor + the D-11/D-12 real-curve card + the F6 Shanghai premium card) // GF-P3 (2026-11-06): +real-yield-5y +dollar-broad +dollar-eme +bank-stress (the four FRED-sourced voters, all on the FRED bulk group — zero new subrequests) +wgc-etf-holdings +wgc-cb-demand +official-gold-demand (the three WGC/official-flows context cards, OI-GA-4's recorded context-first answer — the data adapters land with the cards) // GF-P2 (2026-11-05): +cftc-gold-gross-long (F2, the same Saturday file) + usdchf (D7, the already-fetched CHF leg) // 96 + the five (2026-10-29 owner round: +usdaed) + the Session-3 breakeven-tilt (G2) + the S2-M2.4 nyfed-custody (the weekly custody card) + the S3-M3.2 liquidity/funding six + the S3-M3.3 credit pair + the S3-M3.4 growth-nowcast/survey six + the S3-M3.5 fiscal/Treasury-supply six + the S4-M4.2 geopolitics eleven + the S4-M4.3 chokepoint five + the S4-M4.4 supply-chain/energy six + the S6-M6.1 New Zealand link three (audnzd + the two NZ mirrors) + the S6-M6.2 China property/steel two + the S6-M6.3 de-dollarization/concentration two + the btp-bund-spread
     } finally {
       globalThis.fetch = original;
     }

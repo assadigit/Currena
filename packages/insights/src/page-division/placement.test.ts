@@ -40,17 +40,17 @@ const hiddenSet = JSON.parse(
 describe('reconcilePlacement (the S2 gate)', () => {
   const rec = reconcilePlacement(registryIds);
 
-  it('reconciles the whole registry: 184 placed, zero unplaced, zero duplicate homes', () => {
-    expect(registryIds).toHaveLength(184);
+  it('reconciles the whole registry: 187 placed, zero unplaced, zero duplicate homes', () => {
+    expect(registryIds).toHaveLength(187); // page-division S25 (2026-11-12, BD-S23a): +3 — the §15 D-36 Asia CPI cards
     expect(rec.ok).toBe(true);
-    expect(rec.placedCount).toBe(184);
+    expect(rec.placedCount).toBe(187);
     expect(rec.unplaced).toEqual([]);
     expect(rec.duplicateHomes).toEqual([]);
     expect(rec.unknownIds).toEqual([]);
     expect(rec.mirrorOverlaps).toEqual([]);
   });
 
-  it('places the spec §14 card counts (AF-1’s authoritative arithmetic)', () => {
+  it('places the spec §14 card counts (AF-1’s authoritative arithmetic + the S25 Asia fills)', () => {
     const cards = Object.fromEntries(rec.perPage.map((p) => [p.page, p.registryCards]));
     expect(cards).toEqual({
       global: 0,
@@ -58,7 +58,7 @@ describe('reconcilePlacement (the S2 gate)', () => {
       'world-markets': 9,
       usa: 72,
       europe: 8,
-      'asia-pacific': 11,
+      'asia-pacific': 14, // S25 (BD-S23a): 11 + the three §15 D-36 CPI fills
       australia: 28,
       commodities: 24,
       currencies: 14,
@@ -150,8 +150,8 @@ describe('the blocked notes vs the public-mode hidden set', () => {
 });
 
 describe('the audit findings (drift — recorded, never silently fixed)', () => {
-  it('carries the seven static findings with stable AF ids (AF-6/AF-7 added at the S21 spec audit)', () => {
-    expect(PLACEMENT_AUDIT_FINDINGS.map((f) => f.id)).toEqual(['AF-1', 'AF-2', 'AF-3', 'AF-4', 'AF-5', 'AF-6', 'AF-7']);
+  it('carries the eight static findings with stable AF ids (AF-6/AF-7 added at the S21 spec audit; AF-8 at the S25 fill session)', () => {
+    expect(PLACEMENT_AUDIT_FINDINGS.map((f) => f.id)).toEqual(['AF-1', 'AF-2', 'AF-3', 'AF-4', 'AF-5', 'AF-6', 'AF-7', 'AF-8']);
     for (const f of PLACEMENT_AUDIT_FINDINGS) {
       expect(f.severity === 'red' || f.severity === 'amber' || f.severity === 'info').toBe(true);
       expect(f.text.length).toBeGreaterThan(40);

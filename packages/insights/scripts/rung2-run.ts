@@ -22,6 +22,9 @@
  *   --gpr-daily   the GPR daily export
  *   --cofer       the IMF COFER USD reserve share (gap-closure S6-M6.3;
  *                 the post-cap/landing lever for the quarterly card)
+ *   --imf-cpi     the IMF SDMX 3.0 CPI dataflow's three Asia CPI series
+ *                 (page-division S25, BD-S23a: Japan · Korea · India —
+ *                 the post-deploy landing lever for the §15 D-36 fills)
  *   --breadth     the S&P 500 breadth ratio pair (RSP + SPY)
  *   --bootstrap   ignore the flags: derive the plan from the stored
  *                 histories exactly like the Node inline build does
@@ -85,6 +88,7 @@ async function main(): Promise<void> {
       nzMonthly: flag('nz'),
       nbsMonthly: flag('nbs'),
       coferQuarterly: flag('cofer'),
+      imfCpiMonthly: flag('imf-cpi'),
       breadthDaily: flag('breadth'),
       uomMonthly: flag('uom'),
       sgeDaily: flag('sge'),
@@ -98,13 +102,13 @@ async function main(): Promise<void> {
     const armed = Object.values(plan).some(Boolean);
     if (!armed) {
       console.error(
-        '[rung2-run] FATAL: no plan gate armed — pass at least one of --nbs --nz --monthly --mof --eia --cftc --gpr-daily --cofer --breadth --uom --sge --cleveland --liquidity --sge-monthly --bazg --rstar --equities (or --bootstrap).',
+        '[rung2-run] FATAL: no plan gate armed — pass at least one of --nbs --nz --monthly --mof --eia --cftc --gpr-daily --cofer --imf-cpi --breadth --uom --sge --cleveland --liquidity --sge-monthly --bazg --rstar --equities (or --bootstrap).',
       );
       process.exit(1);
     }
   }
   console.log(
-    `[rung2-run] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} gprDaily=${plan.gprDaily} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly} coferQuarterly=${plan.coferQuarterly} breadthDaily=${plan.breadthDaily}`,
+    `[rung2-run] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} gprDaily=${plan.gprDaily} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly} coferQuarterly=${plan.coferQuarterly} imfCpiMonthly=${plan.imfCpiMonthly} breadthDaily=${plan.breadthDaily}`,
   );
 
   const result = await runInsightsRung2Phase({

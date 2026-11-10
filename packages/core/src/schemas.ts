@@ -465,6 +465,15 @@ export const IndicatorIdSchema = z.enum([
   'usd-reserve-share', // IMF COFER USD share of world allocated FX reserves, quarterly — context, dedollar-concentration
   'sp500-breadth-ratio', // RSP/SPY equal-vs-cap-weight S&P 500 ratio (Yahoo), daily — context, dedollar-concentration
   'btp-bund-spread', // Italy−Germany 10y yield spread (FRED OECD monthly mirrors), monthly — context, borrowing-costs
+  // ---- page-division S25 fill session (2026-11-12, BD-S23a/BD-S22): the
+  // §15 D-36 Asia CPI fills — the three context cards beside china-cpi in
+  // the growth lane, sourced from the IMF's own SDMX 3.0 CPI dataflow (the
+  // provider's OWN YoY transformation, never a Currena-derived YoY; the
+  // COFER venue). Rendered on /asia-pacific's Japan · Korea/Taiwan/HK ·
+  // India sub-regions per the spec §9 items 2–4.
+  'japan-cpi', // IMF SDMX CPI JPN all-items YoY %, monthly — context, growth-health
+  'korea-cpi', // IMF SDMX CPI KOR all-items YoY %, monthly — context, growth-health
+  'india-cpi', // IMF SDMX CPI IND all-items YoY %, monthly — context, growth-health
   // Global — Prices lane companions (context rows rendered in lanes)
   // 2026-10-26 gap-audit build (A-4): gold measured in oil — the classic
   // long-run relative-value ratio, derived gold-usd ÷ brent.

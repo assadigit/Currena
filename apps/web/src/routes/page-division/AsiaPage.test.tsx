@@ -56,7 +56,7 @@ import { pageReadingIds } from '@currena/insights/page-division';
 import { summarizeMarkets } from '@currena/insights/markets';
 import { MARKETS } from '@currena/insights/markets/definitions';
 import { AsiaPage } from './AsiaPage';
-import { ASIA_CHINA_IDS, ASIA_JAPAN_IDS, ASIA_PACIFIC_NZ_IDS, ASIA_CARD_IDS } from './asia-tiles';
+import { ASIA_CHINA_IDS, ASIA_JAPAN_IDS, ASIA_KOREA_TAIWAN_HK_IDS, ASIA_INDIA_IDS, ASIA_PACIFIC_NZ_IDS, ASIA_CARD_IDS } from './asia-tiles';
 import { clearProjectionCacheForTests } from '../../lib/page-division';
 
 /* ------------------------------------------------------------------ *
@@ -91,11 +91,16 @@ const CARD_OVERRIDES: Record<string, Partial<IndicatorReading>> = {
   'china-steel-output': { value: 7359, percentile10y: 0.78, status: 'context', asOf: '2026-10-31' }, // typical (scaled → 73.6 m tonnes)
   'jgb-10y': { value: 1.07, percentile10y: 0.22, status: 'context', asOf: '2026-11-08' }, // typical
   'boj-rate': { value: 0.25, percentile10y: 0.18, status: 'context', asOf: '2026-10-31' }, // low · bottom 18%
+  // S25 (BD-S23a): the three §15 D-36 CPI cards — the mirror's live
+  // magnitudes (Japan Sep 2.2 · Korea Oct 2.8 · India Jul 4.4).
+  'japan-cpi': { value: 2.2, percentile10y: 0.62, status: 'context', asOf: '2026-09-30' }, // typical
+  'korea-cpi': { value: 2.8, percentile10y: 0.45, status: 'context', asOf: '2026-10-31' }, // typical
+  'india-cpi': { value: 4.4, percentile10y: 0.55, status: 'context', asOf: '2026-07-31' }, // typical (the mirror's lag)
   'nz-short-rate': { value: 4.75, percentile10y: 0.88, status: 'context', asOf: '2026-09-01' }, // high · top 12%
   'nz-10y': { value: 4.55, percentile10y: 0.72, status: 'context', asOf: '2026-09-01' }, // typical
 };
 
-/** The Asia projection: the placement's own reading order (11 homes),
+/** The Asia projection: the placement's own reading order (14 homes),
  *  every card present in public mode (absentIds empty — the live §21
  *  diff's own honest report). */
 function asiaProjectionFixture(): PageProjection {
@@ -276,27 +281,42 @@ describe('AsiaPage', () => {
     expect(china.querySelectorAll('[data-asia-card]')).toHaveLength(ASIA_CHINA_IDS.length);
     expect(china.querySelectorAll('[data-asia-card]')).toHaveLength(7);
 
-    // The Japan section (§9 item 2): two cards.
+    // The Japan section (§9 item 2): three cards (the S25 CPI fill landed
+    // beside jgb-10y + boj-rate — BD-S23a).
     const japan = document.querySelector('[data-asia-section="japan"]')!;
     expect(japan.querySelector('h2')?.textContent).toBe('Japan');
     expect(japan.querySelectorAll('[data-asia-card]')).toHaveLength(ASIA_JAPAN_IDS.length);
-    expect(japan.querySelectorAll('[data-asia-card]')).toHaveLength(2);
+    expect(japan.querySelectorAll('[data-asia-card]')).toHaveLength(3);
+    // The Japan CPI card renders its live value (the §21 trio spot check).
+    const japanCpi = japan.querySelector('[data-asia-card="japan-cpi"]')!;
+    expect(japanCpi.textContent).toContain('Japan inflation (yearly)');
+    expect(japanCpi.querySelector('[data-asia-value]')?.textContent).toBe('2.2%');
 
-    // The Korea/Taiwan/HK section (§9 item 3): INDEX-ONLY today — NO
-    // cards, just the honest index-only note (the markets ride the zoom
-    // above; the Korea CPI fill is verified-pending-ingest).
+    // The Korea/Taiwan/HK section (§9 item 3): the S25 Korea CPI card
+    // landed (BD-S23a) beside the honest index note (the markets ride
+    // the zoom above).
     const krTwHk = document.querySelector('[data-asia-section="korea-taiwan-hk"]')!;
-    expect(krTwHk.getAttribute('data-asia-index-only')).not.toBeNull();
-    expect(krTwHk.querySelectorAll('[data-asia-card]')).toHaveLength(0);
+    expect(krTwHk.getAttribute('data-asia-index-note')).not.toBeNull();
+    expect(krTwHk.querySelectorAll('[data-asia-card]')).toHaveLength(ASIA_KOREA_TAIWAN_HK_IDS.length);
+    expect(krTwHk.querySelectorAll('[data-asia-card]')).toHaveLength(1);
     expect(krTwHk.querySelector('h2')?.textContent).toBe('Korea · Taiwan · Hong Kong');
-    // The honest index-only note speaks.
+    // The Korea CPI card renders its live value.
+    const koreaCpi = krTwHk.querySelector('[data-asia-card="korea-cpi"]')!;
+    expect(koreaCpi.textContent).toContain('Korea inflation (yearly)');
+    expect(koreaCpi.querySelector('[data-asia-value]')?.textContent).toBe('2.8%');
+    // The honest index note speaks.
     expect(krTwHk.textContent).toContain('zoom map above');
 
-    // The India section (§9 item 4): INDEX-ONLY today — same honest note.
+    // The India section (§9 item 4): the S25 India CPI card landed
+    // (BD-S23a) beside the honest index note.
     const india = document.querySelector('[data-asia-section="india"]')!;
-    expect(india.getAttribute('data-asia-index-only')).not.toBeNull();
-    expect(india.querySelectorAll('[data-asia-card]')).toHaveLength(0);
+    expect(india.getAttribute('data-asia-index-note')).not.toBeNull();
+    expect(india.querySelectorAll('[data-asia-card]')).toHaveLength(ASIA_INDIA_IDS.length);
+    expect(india.querySelectorAll('[data-asia-card]')).toHaveLength(1);
     expect(india.querySelector('h2')?.textContent).toBe('India');
+    const indiaCpi = india.querySelector('[data-asia-card="india-cpi"]')!;
+    expect(indiaCpi.textContent).toContain('India inflation (yearly)');
+    expect(indiaCpi.querySelector('[data-asia-value]')?.textContent).toBe('4.4%');
     expect(india.textContent).toContain('zoom map above');
 
     // The Pacific NZ section (§9 item 5): two registry cards + the S21
@@ -357,11 +377,11 @@ describe('AsiaPage', () => {
     expect(boj.querySelector('[data-asia-value]')?.textContent).toBe('0.25%');
     expect(boj.textContent).toContain('low · bottom 18%');
 
-    // The whole registry surface: 11 cards in placement order, zero
+    // The whole registry surface: 14 cards in placement order, zero
     // unrendered ids (the full card-render audit vs the placement table).
-    expect(document.querySelectorAll('[data-asia-card]')).toHaveLength(11);
+    expect(document.querySelectorAll('[data-asia-card]')).toHaveLength(14);
     const renderedIds = [...document.querySelectorAll('[data-asia-card]')].map((el) => el.getAttribute('data-asia-card'));
-    expect(renderedIds).toEqual([...ASIA_CHINA_IDS, ...ASIA_JAPAN_IDS, ...ASIA_PACIFIC_NZ_IDS] as string[]);
+    expect(renderedIds).toEqual([...ASIA_CHINA_IDS, ...ASIA_JAPAN_IDS, ...ASIA_KOREA_TAIWAN_HK_IDS, ...ASIA_INDIA_IDS, ...ASIA_PACIFIC_NZ_IDS] as string[]);
     expect(renderedIds).toEqual(ASIA_CARD_IDS as string[]);
 
     // The cross-links strip (§9): usdcny · usdjpy → /currencies +
@@ -416,8 +436,8 @@ describe('AsiaPage', () => {
     expect(cli.getAttribute('data-asia-status')).toBe('absent');
     expect(cli.textContent).toContain('Cannot read yet');
     expect(cli.querySelector('[data-asia-value]')).toBeNull();
-    // The 11 cards still render (the absent one speaks the word).
-    expect(document.querySelectorAll('[data-asia-card]')).toHaveLength(11);
+    // The 14 cards still render (the absent one speaks the word).
+    expect(document.querySelectorAll('[data-asia-card]')).toHaveLength(14);
     // The absent note speaks (the projection's own honest report).
     expect(document.body.textContent).toContain('1 of this page’s readings are not published in this mode.');
   });
@@ -442,7 +462,7 @@ describe('AsiaPage', () => {
     stubFeeds();
     render(<AsiaPage />);
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-asia-card]').length).toBe(11);
+      expect(document.querySelectorAll('[data-asia-card]').length).toBe(14);
     });
     cleanup();
     vi.unstubAllGlobals();
@@ -462,7 +482,7 @@ describe('AsiaPage', () => {
     );
     render(<AsiaPage />);
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-asia-card]').length).toBe(11);
+      expect(document.querySelectorAll('[data-asia-card]').length).toBe(14);
     });
     await waitFor(() => {
       expect(document.body.textContent).toContain('Showing the last good copy');

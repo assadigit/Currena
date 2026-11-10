@@ -103,7 +103,9 @@ export function buildPlacementMarkdown(registry: PlacementRegistry): string {
   w();
 
   /* ------------------------- reconciliation ------------------------- */
-  w('## Reconciliation — 184 ids + 6 boards');
+  // page-division S25 fill session (2026-11-12, BD-S23a): the count derives
+  // from the registry (187 since the three §15 D-36 Asia CPI cards landed).
+  w('## Reconciliation — ' + registry.indicators.length + ' ids + 6 boards');
   w();
   w('| Check | Result |');
   w('|---|---|');

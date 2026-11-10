@@ -750,6 +750,39 @@ const LAYER1 = {
       ],
       glossaryTerms: ['inflation', 'commodity'],
     },
+    // page-division S25 fill session (2026-11-12, BD-S23a): the three
+    // §15 D-36 Asia CPI cards' Layer-1 entries.
+    'japan-cpi': {
+      plainName: 'Japan’s inflation rate',
+      oneLine: 'How fast consumer prices in Japan are rising, versus a year ago.',
+      ifRising: 'Pressure usually builds on Japan’s central bank to tighten after decades of easy money.',
+      ifFalling: 'Weak Japanese demand usually keeps its giant savings pool parked in world markets.',
+      connections: [
+        { with: 'boj-rate', text: 'The central bank’s setting answers this price gauge.', strength: 'reliable' },
+        { with: 'jgb-10y', text: 'Sticky inflation usually steers the long-term yield higher.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation', 'bond', 'central-bank', 'yield'],
+    },
+    'korea-cpi': {
+      plainName: 'Korea’s inflation rate',
+      oneLine: 'How fast consumer prices in Korea are rising, versus a year ago.',
+      ifRising: 'Korean households usually feel the squeeze first in one of Asia’s most indebted consumer economies.',
+      ifFalling: 'Soft domestic demand usually cools Korea’s export-led growth engine too.',
+      connections: [
+        { with: 'japan-cpi', text: 'The two export neighbours’ price gauges usually move together.', strength: 'usually' },
+      ],
+      glossaryTerms: ['inflation'],
+    },
+    'india-cpi': {
+      plainName: 'India’s inflation rate',
+      oneLine: 'How fast consumer prices in India are rising, versus a year ago.',
+      ifRising: 'Indian households usually cut back first, and food prices hit the poorest hardest.',
+      ifFalling: 'Cooling prices usually give India’s central bank room to support growth.',
+      connections: [
+        { with: 'china-cpi', text: 'The two Asian giants’ price gauges frame the region’s demand story.', strength: 'sometimes' },
+      ],
+      glossaryTerms: ['inflation', 'central-bank'],
+    },
     'copper-gold': {
       plainName: 'Growth versus fear in metals',
       oneLine: 'Copper’s price measured against gold’s.',
@@ -4605,6 +4638,72 @@ const INDICATORS: Record<IndicatorId, IndicatorCopyEntry> = {
     cantTell:
       'It measures breadth (how many firms grew), not size: one month’s dip is not a trend.',
     forYou: 'A key early indicator of demand for Australian exports.',
+  },
+  // page-division S25 fill session (2026-11-12, BD-S23a): the three §15
+  // D-36 Asia CPI cards — the IMF's own SDMX 3.0 CPI dataflow series,
+  // context-only, cross-checked against the national bureaus (BD-S23a).
+  'japan-cpi': {
+    name: 'Japan inflation (yearly)',
+    ticker: 'Japan CPI',
+    oneLiner: 'How fast Japanese consumer prices are rising, compared with a year ago.',
+    band: { min: 2, label: 'the Bank of Japan’s 2% price-stability goal' },
+    lines: {
+      highRising: 'Japanese consumer prices are rising faster than usual, pressuring the world’s largest creditor nation to tighten.',
+      highEasing: 'Japanese inflation is above its usual range but easing back toward it.',
+      typical: 'Japanese inflation sits in its usual range for the past decade.',
+      low: 'Japanese prices are barely rising: the weak-demand reading that haunted Japan for decades.',
+    },
+    whatItIs:
+      'The year-on-year change in Japan’s all-items Consumer Price Index, published monthly by the Statistics Bureau and read here from the IMF’s own CPI dataset (the international mirror of the national series; the mirror continues the pre-2025-base series, so it can differ from the bureau’s newest headline by around a tenth of a percentage point).',
+    whyItMatters:
+      'Japan is the world’s largest creditor and a giant in global bond markets: when its inflation finally stirs after decades of deflation, its central bank’s response moves yields everywhere.',
+    tendedToMean:
+      'Japan spent 1998–2022 fighting deflation with rates near zero; the 2022–24 wave pushed inflation above 2% for the longest stretch since the 1990s and ended negative rates.',
+    cantTell:
+      'A national average that strips away regional differences, and the fresh-food and energy swings can mask the underlying trend for months.',
+    forYou: 'The Japan pair’s third card: read it with the policy rate to judge whether the inflation turn is sticking.',
+  },
+  'korea-cpi': {
+    name: 'Korea inflation (yearly)',
+    ticker: 'Korea CPI',
+    oneLiner: 'How fast Korean consumer prices are rising, compared with a year ago.',
+    band: { min: 2, label: 'the Bank of Korea’s 2% target' },
+    lines: {
+      highRising: 'Korean consumer prices are rising faster than usual, a squeeze on households in a nation built on exports.',
+      highEasing: 'Korean inflation is above target but easing toward it.',
+      typical: 'Korean inflation sits in its usual range for the past decade.',
+      low: 'Korean prices are barely rising: weak domestic demand beside the export engine.',
+    },
+    whatItIs:
+      'The year-on-year change in Korea’s all-items Consumer Price Index, published monthly by the national statistics office (KOSTAT) and read here from the IMF’s own CPI dataset — the international mirror that matches the national release.',
+    whyItMatters:
+      'Korea is a bellwether for world trade — chips, cars, ships — and its households carry high debt: inflation here speaks for both export demand and Asian consumer health.',
+    tendedToMean:
+      'Korean inflation ran 2–5% through the 2010s, spiked with the 2022 world wave, then cooled back inside the target band.',
+    cantTell:
+      'A national average, and one monthly print can swing on food and energy alone: never a trend by itself.',
+    forYou: 'Context for Asia’s export economies beside the factory gauges on this page.',
+  },
+  'india-cpi': {
+    name: 'India inflation (yearly)',
+    ticker: 'India CPI',
+    oneLiner: 'How fast Indian consumer prices are rising, compared with a year ago.',
+    band: { min: 4, label: 'the Reserve Bank of India’s 4% target' },
+    lines: {
+      highRising: 'Indian consumer prices are rising faster than usual, squeezing the world’s largest population of households.',
+      highEasing: 'Indian inflation is above its target band but easing toward it.',
+      typical: 'Indian inflation sits in its usual range for the past decade.',
+      low: 'Indian prices are rising unusually slowly: rare softness in a high-growth economy.',
+    },
+    whatItIs:
+      'The year-on-year change in India’s all-items Consumer Price Index, published monthly by the Ministry of Statistics (MoSPI) and read here from the IMF’s own CPI dataset — an international mirror that typically lags the national release by one to three months.',
+    whyItMatters:
+      'India is the world’s fastest-growing large economy and its households feel food prices first: inflation decides how much room its central bank has to keep growth funded.',
+    tendedToMean:
+      'Indian inflation spent the 2010s between 4 and 10%, cooled into the target band after 2023, and food prices still drive the swings.',
+    cantTell:
+      'The mirror trails the national release by a month or three, and food — a third of the basket — can swing the headline alone.',
+    forYou: 'The India section’s first data card: the demand-side temperature beside the NIFTY50 market gauge above.',
   },
   'china-cpi': {
     name: 'China inflation (yearly)',

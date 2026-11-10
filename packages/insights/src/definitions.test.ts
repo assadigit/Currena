@@ -32,7 +32,10 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
     // GF-P2 (2026-11-05, the owner's recorded answers K + the per-row D7
     // answer): +cftc-gold-gross-long (F2's real object) + usdchf (the haven
     // cross context card) — two P2 cards.
-    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(53);
+    expect(DEFINITIONS.filter((d) => d.phase === 'P2')).toHaveLength(56);
+    // page-division S25 fill session (2026-11-12, BD-S23a): +japan-cpi +
+    // korea-cpi + india-cpi — the three §15 D-36 Asia CPI cards, all P2
+    // context cards on the IMF SDMX 3.0 CPI dataflow.
   });
 
   it('groups are the question groups (global 7 + prices-board, australia 3)', () => {
@@ -141,9 +144,12 @@ describe('DEFINITIONS (the v2 indicator table, I15)', () => {
       'gpr-ukraine',
       'gscpi',
       'housing-permits',
+      'india-cpi',
       'iron-ore',
+      'japan-cpi',
       'jgb-10y',
       'job-openings',
+      'korea-cpi',
       'lng-japan',
       'm2-us',
       'maize',

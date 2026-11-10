@@ -35,9 +35,9 @@ describe('docs/page-division/PLACEMENT.generated.md (the sync pin)', () => {
   });
 
   it('carries the reconciliation verdict and the audit findings', () => {
-    expect(committed).toContain('## Reconciliation — 184 ids + 6 boards');
+    expect(committed).toContain('## Reconciliation — 187 ids + 6 boards'); // S25 (BD-S23a): +3 — the §15 D-36 Asia CPI cards
     expect(committed).toContain('**Verdict: reconciles**');
-    expect(committed).toContain('**184 registry ids placed** (+ 0 unplaced)');
+    expect(committed).toContain('**187 registry ids placed** (+ 0 unplaced)');
     expect(committed).toContain('## Audit findings (drift — recorded, never silently fixed)');
     expect(committed).toContain('**AF-3 (amber)**');
     expect(committed).toContain('OWNER RATIFICATION PENDING');

@@ -1,7 +1,8 @@
 /**
  * asia-tiles — the Asia & Pacific page's derivations, PURE (page-division
  * S14, 2026-11-09 — docs/page-division/02-PAGE-DIVISION-SPEC.md §9 items
- * 1–6; D-16/D-17/D-35/D-36; the session prompt's S14 scope).
+ * 1–6; D-16/D-17/D-35/D-36; the session prompt's S14 scope; the S25 fill
+ * session 2026-11-12 adds the three §15 D-36 CPI cards — BD-S23a).
  *
  * ONE RULE GOVERNS THIS FILE (D-48 + spec §3.2 + Agent Rule 5, the S3
  * global-tiles / S5 gold-tiles / S7 world-markets-tiles / S9 usa-tiles /
@@ -16,20 +17,18 @@
  *     gpr-taiwan · china-property-investment · china-steel-output). SGE
  *     links point to /gold (the cross-links strip, §9 item 1's note).
  *   - The Japan section (D-35, §9 item 2): the placement's `japan`
- *     group — jgb-10y · boj-rate. The §15 Japan CPI fill (D-36) lands
- *     in a later session after live verification (Rule 5: S14's
- *     verification attempt is recorded in DECISIONS.md — none ingested
- *     unverified, the BD-S12a/BD-S13d pattern).
+ *     group — jgb-10y · boj-rate · japan-cpi (the S25 fill landed:
+ *     BD-S23a — the IMF SDMX 3.0 CPI dataflow card, verified against the
+ *     Statistics Bureau's own release).
  *   - The Korea · Taiwan · Hong Kong section (D-35, §9 item 3): the
- *     placement's `korea-taiwan-hk` group — INDEX-ONLY today (KOSPI ·
- *     TAIEX · HSI ride the markets board / the Asia zoom map); the
- *     group carries NO registry cards, and the Korea CPI fill (D-36)
- *     is verified-pending-ingest. The section renders an honest
- *     index-only note, never an empty card grid.
+ *     placement's `korea-taiwan-hk` group — KOSPI · TAIEX · HSI ride the
+ *     markets board (the Asia zoom map); the Korea CPI fill (D-36)
+ *     LANDED (BD-S23a) — korea-cpi, verified against KOSTAT's own
+ *     October release. The section renders the card + its index note.
  *   - The India section (D-35, §9 item 4): the placement's `india`
- *     group — INDEX-ONLY today (NIFTY50 rides the markets board); the
- *     India CPI fill (D-36) is verified-pending-ingest. Same honest
- *     index-only note.
+ *     group — NIFTY50 rides the markets board; the India CPI fill
+ *     (D-36) LANDED (BD-S23a) — india-cpi, verified against MoSPI's own
+ *     press note (the mirror lags MoSPI by 1–3 months, labelled).
  *   - The Pacific — New Zealand section (D-17, §9 item 5): the
  *     placement's `pacific-nz` group — nz-short-rate · nz-10y — plus
  *     the NZX50 mirror card (S21, BD-S21b: NZX50 is NOT a world-board
@@ -42,10 +41,11 @@
  *     restatement can never drift from the legacy renderer.
  *
  * Asia has NO thematic gauge of its own (china-pmi + china-cpi vote in
- * growth-health / prices-heat — both are Global gauges); there is no
- * verdict strip on this page. The §21 diff is the card trio (value ·
- * 10-year position · freshness) over the 11 placed ids, page ≡ the
- * served snapshot (asia-backtest-core.ts).
+ * growth-health / prices-heat — both are Global gauges; the three S25
+ * CPI cards are context-only, never votes); there is no verdict strip on
+ * this page. The §21 diff is the card trio (value · 10-year position ·
+ * freshness) over the 14 placed ids, page ≡ the served snapshot
+ * (asia-backtest-core.ts).
  *
  * Pure + platform-free so the unit tests drive it directly
  * (asia-tiles.test.ts) and the §21 backtest can pin it against the
@@ -72,24 +72,22 @@ import { pageGroupIds } from '@currena/insights/page-division';
 export const ASIA_CHINA_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific', 'china');
 
 /**
- * The Japan section (§9 item 2): jgb-10y · boj-rate. The §15 Japan CPI
- * fill (D-36) is verified-pending-ingest (Rule 5 — BD-S14a).
+ * The Japan section (§9 item 2): jgb-10y · boj-rate · japan-cpi (the
+ * §15 Japan CPI fill LANDED in the S25 fill session — BD-S23a).
  */
 export const ASIA_JAPAN_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific', 'japan');
 
 /**
- * The Korea · Taiwan · Hong Kong section (§9 item 3): INDEX-ONLY today
- * (the placement group is empty — KOSPI · TAIEX · HSI ride the markets
- * board / the Asia zoom map). The Korea CPI fill (D-36) is verified-
- * pending-ingest. The page renders an honest index-only note for this
- * section, never an empty card grid.
+ * The Korea · Taiwan · Hong Kong section (§9 item 3): korea-cpi — the
+ * §15 Korea CPI fill LANDED (BD-S23a). KOSPI · TAIEX · HSI ride the
+ * markets board / the Asia zoom map (the section's intro copy says so).
  */
 export const ASIA_KOREA_TAIWAN_HK_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific', 'korea-taiwan-hk');
 
 /**
- * The India section (§9 item 4): INDEX-ONLY today (the placement group
- * is empty — NIFTY50 rides the markets board). The India CPI fill
- * (D-36) is verified-pending-ingest. Same honest index-only note.
+ * The India section (§9 item 4): india-cpi — the §15 India CPI fill
+ * LANDED (BD-S23a; the mirror lags MoSPI by 1–3 months, labelled).
+ * NIFTY50 rides the markets board / the Asia zoom map.
  */
 export const ASIA_INDIA_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific', 'india');
 
@@ -101,15 +99,15 @@ export const ASIA_INDIA_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific
 export const ASIA_PACIFIC_NZ_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific', 'pacific-nz');
 
 /**
- * Every Asia registry card id, section order (China 7 · Japan 2 ·
- * Pacific-NZ 2 = 11 in all). The two index-only groups
- * (korea-taiwan-hk, india) contribute NO registry cards — their
- * content rides the zoom map above, and the §15 CPI fills stay
- * verified-pending-ingest (Rule 5 — BD-S14a).
+ * Every Asia registry card id, section order (China 7 · Japan 3 ·
+ * Korea/Taiwan/HK 1 · India 1 · Pacific-NZ 2 = 14 in all — the S25
+ * fill session added the three §15 D-36 CPI cards, BD-S23a).
  */
 export const ASIA_CARD_IDS: readonly IndicatorId[] = [
   ...ASIA_CHINA_IDS,
   ...ASIA_JAPAN_IDS,
+  ...ASIA_KOREA_TAIWAN_HK_IDS,
+  ...ASIA_INDIA_IDS,
   ...ASIA_PACIFIC_NZ_IDS,
 ];
 
@@ -128,6 +126,9 @@ export type AsiaCardId =
   | 'china-steel-output'
   | 'jgb-10y'
   | 'boj-rate'
+  | 'japan-cpi'
+  | 'korea-cpi'
+  | 'india-cpi'
   | 'nz-short-rate'
   | 'nz-10y';
 
@@ -189,6 +190,11 @@ export const ASIA_CARD_DISPLAY: Readonly<Record<AsiaCardId, AsiaCardDisplayConfi
   'china-steel-output': { decimals: 1, unit: 'tonnes', scale: 1e-2 },
   'jgb-10y': { decimals: 2, unit: 'percent' },
   'boj-rate': { decimals: 2, unit: 'percent' },
+  // S25 (BD-S23a): the three §15 D-36 CPI cards — the china-cpi percent
+  // convention (1dp).
+  'japan-cpi': { decimals: 1, unit: 'percent' },
+  'korea-cpi': { decimals: 1, unit: 'percent' },
+  'india-cpi': { decimals: 1, unit: 'percent' },
   'nz-short-rate': { decimals: 2, unit: 'percent' },
   'nz-10y': { decimals: 2, unit: 'percent' },
 };

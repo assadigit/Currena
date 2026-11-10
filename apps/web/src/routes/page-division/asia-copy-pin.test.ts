@@ -8,7 +8,8 @@
  * legacy /insights page (and every destination page) renders, in BOTH
  * locales:
  *
- *   - the 11 card names ↔ indicators[id].name
+ *   - the 14 card names ↔ indicators[id].name (the three S25 CPI ids
+ *     joined — BD-S23a)
  *   - the unit words ↔ copy.units (percent · points · index · tonnes)
  *   - the position + band words ↔ copy.ui.position* / signals.band*
  *   - the status words ↔ copy.status
@@ -27,14 +28,14 @@ import { ASIA_CARD_IDS } from './asia-tiles';
 
 type Pd = typeof en.pd.asiaPacific;
 
-/** Pin the 11 card names + the unit + position + band + status words. */
+/** Pin the 14 card names + the unit + position + band + status words. */
 function pinCardWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'): void {
   const names = pd.cardNames as Record<string, string>;
   const indicators = corpus.indicators as unknown as Record<string, { name: string }>;
   for (const id of ASIA_CARD_IDS) {
     expect(names[id], `${locale} cardNames.${id}`).toBe(indicators[id]?.name);
   }
-  // TOTAL: exactly the 11 S14 ids, never more.
+  // TOTAL: exactly the 14 S14+S25 ids, never more.
   expect(Object.keys(names)).toHaveLength(ASIA_CARD_IDS.length);
 
   expect(pd.unitPercent, `${locale} unitPercent`).toBe(corpus.units.percent);
@@ -58,13 +59,13 @@ function pinCardWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'
 }
 
 describe('the Asia & Pacific page speaks the insights corpus’s words (en)', () => {
-  it('the 11 card names + the unit + position + band + status words ↔ the corpus', () => {
+  it('the 14 card names + the unit + position + band + status words ↔ the corpus', () => {
     pinCardWords(en.pd.asiaPacific, insightsCopyEn, 'en');
   });
 });
 
 describe('the Asia & Pacific page speaks the insights corpus’s words (fa)', () => {
-  it('the 11 card names + the unit + position + band + status words ↔ the corpus', () => {
+  it('the 14 card names + the unit + position + band + status words ↔ the corpus', () => {
     pinCardWords(fa.pd.asiaPacific, insightsCopyFa, 'fa');
   });
 });

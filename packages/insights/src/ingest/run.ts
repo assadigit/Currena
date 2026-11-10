@@ -902,7 +902,7 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
   const missing = new Set<string>(RUNG2_IDS.filter((id) => (stage ? stage.series[id] === undefined : true)));
   const plan = opts.plan ?? rung2FetchPlanFor(now, missing);
   console.log(
-    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly} coferQuarterly=${plan.coferQuarterly} breadthDaily=${plan.breadthDaily}` +
+    `[rung2] plan — mof=${plan.mof} eiaWeekly=${plan.eiaWeekly} cftcWeekly=${plan.cftcWeekly} monthly=${plan.monthly} nzMonthly=${plan.nzMonthly} nbsMonthly=${plan.nbsMonthly} coferQuarterly=${plan.coferQuarterly} imfCpiMonthly=${plan.imfCpiMonthly} breadthDaily=${plan.breadthDaily}` +
       (stage === undefined ? ' (no stage — the Node/manual venue)' : ` (bootstrap-missing: ${[...missing].join(', ') || 'none'})`),
   );
 
@@ -1174,6 +1174,13 @@ export async function runInsightsRung2Phase(opts: Rung2PhaseOptions): Promise<Ru
     // arrives with every fetch, fetched wins on collision).
     'usd-reserve-share',
     'sp500-breadth-ratio',
+    // page-division S25 fill session (2026-11-12, BD-S23a): the three
+    // §15 D-36 Asia CPI series join the same merge — each fetch carries
+    // its full monthly history (the provider's own YoY series), fetched
+    // wins on collision (the michigan discipline).
+    'japan-cpi',
+    'korea-cpi',
+    'india-cpi',
     // GF-S10 (2026-11-06): the UoM 5–10y anchor joins the merge (full
     // history per fetch, fetched wins on collision); the premium keeps
     // its own derivation block above (the stored-merge happens there).

@@ -296,6 +296,11 @@ export const DISPLAY: Readonly<Record<IndicatorId, DisplayConfig>> = {
   'china-pmi': { decimals: 1, unit: 'index' },
   // M7 (2026-10-26): the NBS CPI card — the us-cpi-yoy percent convention.
   'china-cpi': { decimals: 1, unit: 'percent' },
+  // page-division S25 fill session (2026-11-12, BD-S23a): the three
+  // §15 D-36 Asia CPI cards — the china-cpi percent convention.
+  'japan-cpi': { decimals: 1, unit: 'percent' },
+  'korea-cpi': { decimals: 1, unit: 'percent' },
+  'india-cpi': { decimals: 1, unit: 'percent' },
   // Step-1 audit item C7: "US$23.3 trillion", not "bn23,343".
   'm2-us': { decimals: 1, unit: 'usd-tr', scale: 0.001 },
   // Step-2 add-list §B3/§B4: the US labour-market pair (both in percentage

@@ -1,18 +1,19 @@
 /**
- * asia-tiles tests (S14, 2026-11-09) — the pure-derivation pins.
+ * asia-tiles tests (S14, 2026-11-09; the S25 fill session 2026-11-12 adds
+ * the three §15 D-36 CPI cards — BD-S23a) — the pure-derivation pins.
  *
  * What is pinned here (the S9 usa-tiles.test.ts / S12 europe-tiles.test.ts
- * pattern, scoped to Asia's 11 placed ids):
+ * pattern, scoped to Asia's 14 placed ids):
  *
  *   - the five section lists ↔ the placement table's own groups
  *     (pageGroupIds), byte-for-byte, and the full card list is section
- *     order (7 + 2 + 2 = 11 — the two index-only groups contribute NO
- *     registry cards), no duplicates, and equals the page's own homes;
- *   - the two index-only groups (korea-taiwan-hk, india) are EMPTY —
- *     the honest index-only contract (their markets ride the zoom, the
- *     §15 CPI fills are verified-pending-ingest, never a silently-empty
- *     card grid);
- *   - the 11 display configs (decimals + unit + scale) ↔ the DISPLAY
+ *     order (7 + 3 + 1 + 1 + 2 = 14 — the S25 fills gave the two
+ *     index-note groups their CPI cards), no duplicates, and equals the
+ *     page's own homes;
+ *   - the two index-note groups (korea-taiwan-hk, india) carry their
+ *     CPI cards (S25, BD-S23a) while their markets ride the zoom —
+ *     the honest index-note contract;
+ *   - the 14 display configs (decimals + unit + scale) ↔ the DISPLAY
  *     registry (config/display.ts), byte-for-byte;
  *   - the value render (asiaCardValueText) ↔ `formatReadingValue`,
  *     output-for-output, over every id × both locales (the strongest
@@ -72,6 +73,11 @@ const FIXTURE_VALUE: Readonly<Record<AsiaCardId, number>> = {
   'china-steel-output': 7359,
   'jgb-10y': 1.07,
   'boj-rate': 0.25,
+  // S25 (BD-S23a): the three §15 D-36 CPI cards — real-world magnitudes
+  // (the mirror's Sep 2026 prints: Japan 2.2, Korea 2.8, India 4.4).
+  'japan-cpi': 2.2,
+  'korea-cpi': 2.8,
+  'india-cpi': 4.4,
   'nz-short-rate': 4.75,
   'nz-10y': 4.55,
 };
@@ -94,25 +100,25 @@ describe('the section lists — the placement table’s own groups (D-35)', () =
     expect(ASIA_CHINA_IDS).toHaveLength(7);
   });
 
-  it('the Japan section is pageGroupIds("asia-pacific", "japan") byte-for-byte (§9 item 2: jgb-10y · boj-rate)', () => {
+  it('the Japan section is pageGroupIds("asia-pacific", "japan") byte-for-byte (§9 item 2: jgb-10y · boj-rate · japan-cpi — the S25 fill landed)', () => {
     expect(ASIA_JAPAN_IDS).toEqual(pageGroupIds('asia-pacific', 'japan'));
-    expect(ASIA_JAPAN_IDS).toEqual(['jgb-10y', 'boj-rate']);
-    expect(ASIA_JAPAN_IDS).toHaveLength(2);
+    expect(ASIA_JAPAN_IDS).toEqual(['jgb-10y', 'boj-rate', 'japan-cpi']);
+    expect(ASIA_JAPAN_IDS).toHaveLength(3);
   });
 
-  it('the Korea/Taiwan/HK section is INDEX-ONLY today (§9 item 3 — the placement group is empty; KOSPI · TAIEX · HSI ride the markets board)', () => {
+  it('the Korea/Taiwan/HK section carries its CPI card (§9 item 3 — korea-cpi, the S25 fill; KOSPI · TAIEX · HSI ride the markets board)', () => {
     expect(ASIA_KOREA_TAIWAN_HK_IDS).toEqual(pageGroupIds('asia-pacific', 'korea-taiwan-hk'));
-    expect(ASIA_KOREA_TAIWAN_HK_IDS).toEqual([]);
-    // The placement group's own note carries the index-only story.
+    expect(ASIA_KOREA_TAIWAN_HK_IDS).toEqual(['korea-cpi']);
+    // The placement group's own note carries the landed-fill story.
     const group = PAGE_PLACEMENTS_BY_PAGE.get('asia-pacific')?.groups.find((g) => g.id === 'korea-taiwan-hk');
-    expect(group?.note).toContain('Index-only');
+    expect(group?.note).toContain('LANDED');
   });
 
-  it('the India section is INDEX-ONLY today (§9 item 4 — the placement group is empty; NIFTY50 rides the markets board)', () => {
+  it('the India section carries its CPI card (§9 item 4 — india-cpi, the S25 fill; NIFTY50 rides the markets board)', () => {
     expect(ASIA_INDIA_IDS).toEqual(pageGroupIds('asia-pacific', 'india'));
-    expect(ASIA_INDIA_IDS).toEqual([]);
+    expect(ASIA_INDIA_IDS).toEqual(['india-cpi']);
     const group = PAGE_PLACEMENTS_BY_PAGE.get('asia-pacific')?.groups.find((g) => g.id === 'india');
-    expect(group?.note).toContain('Index-only');
+    expect(group?.note).toContain('LANDED');
   });
 
   it('the Pacific NZ section is pageGroupIds("asia-pacific", "pacific-nz") byte-for-byte (§9 item 5: nz-short-rate · nz-10y)', () => {
@@ -121,19 +127,19 @@ describe('the section lists — the placement table’s own groups (D-35)', () =
     expect(ASIA_PACIFIC_NZ_IDS).toHaveLength(2);
   });
 
-  it('the full card list is section order (7 + 2 + 2 = 11 — the two index-only groups contribute NO registry cards), no duplicates, and equals the page’s own homes', () => {
-    expect(ASIA_CARD_IDS).toEqual([...ASIA_CHINA_IDS, ...ASIA_JAPAN_IDS, ...ASIA_PACIFIC_NZ_IDS]);
-    expect(ASIA_CARD_IDS).toHaveLength(11);
-    expect(new Set(ASIA_CARD_IDS).size).toBe(11);
-    // The placement table's own count: the asia-pacific page carries 11
-    // registry cards (the §15 FRED-only CPI fills land in a later session
-    // after live verification — Rule 5).
-    expect(pageHomeIds('asia-pacific')).toHaveLength(11);
+  it('the full card list is section order (7 + 3 + 1 + 1 + 2 = 14 — the S25 fills gave the two index-note groups their CPI cards), no duplicates, and equals the page’s own homes', () => {
+    expect(ASIA_CARD_IDS).toEqual([...ASIA_CHINA_IDS, ...ASIA_JAPAN_IDS, ...ASIA_KOREA_TAIWAN_HK_IDS, ...ASIA_INDIA_IDS, ...ASIA_PACIFIC_NZ_IDS]);
+    expect(ASIA_CARD_IDS).toHaveLength(14);
+    expect(new Set(ASIA_CARD_IDS).size).toBe(14);
+    // The placement table's own count: the asia-pacific page carries 14
+    // registry cards (the three §15 D-36 CPI fills LANDED in the S25 fill
+    // session — BD-S23a).
+    expect(pageHomeIds('asia-pacific')).toHaveLength(14);
   });
 });
 
-describe('the display configs — the DISPLAY registry’s own values for the 11 ids', () => {
-  it('every one of the 11 ids matches decimals + unit (+ scale)', () => {
+describe('the display configs — the DISPLAY registry’s own values for the 14 ids', () => {
+  it('every one of the 14 ids matches decimals + unit (+ scale)', () => {
     for (const id of ASIA_CARD_IDS as readonly AsiaCardId[]) {
       const registry = DISPLAY[id as IndicatorId];
       expect(registry, `${id} exists in the DISPLAY registry`).toBeDefined();
@@ -146,7 +152,7 @@ describe('the display configs — the DISPLAY registry’s own values for the 11
     }
   });
 
-  it('the 11 ids span the percent / index / tonnes families (points kept for parity, no Asia id uses it today)', () => {
+  it('the 14 ids span the percent / index / tonnes families (points kept for parity, no Asia id uses it today)', () => {
     const units = new Set(ASIA_CARD_IDS.map((id) => ASIA_CARD_DISPLAY[id as AsiaCardId].unit));
     expect(units).toEqual(new Set(['percent', 'index', 'tonnes']));
   });
@@ -177,6 +183,10 @@ describe('the value render — EQUIVALENT to formatReadingValue, output-for-outp
     // china-steel-output: the raw 7359 × scale 1e-2 → 73.6 m tonnes.
     expect(asiaCardValueText('china-steel-output', fixtureReading('china-steel-output'), 'en-US', enAsiaUnits)).toBe('73.6 m tonnes');
     expect(asiaCardValueText('jgb-10y', fixtureReading('jgb-10y'), 'en-US', enAsiaUnits)).toBe('1.07%');
+    // The S25 CPI cards join the percent family (1dp, tight bind).
+    expect(asiaCardValueText('japan-cpi', fixtureReading('japan-cpi'), 'en-US', enAsiaUnits)).toBe('2.2%');
+    expect(asiaCardValueText('korea-cpi', fixtureReading('korea-cpi'), 'en-US', enAsiaUnits)).toBe('2.8%');
+    expect(asiaCardValueText('india-cpi', fixtureReading('india-cpi'), 'fa-IR', faAsiaUnits)).toBe('۴٫۴٪');
     // The fa percent binds tight (Persian digits).
     expect(asiaCardValueText('china-cpi', fixtureReading('china-cpi'), 'fa-IR', faAsiaUnits)).toBe('۰٫۴٪');
     // The fa tonnes suffix with a space (the suffix-with-space join).
@@ -191,14 +201,15 @@ describe('the value render — EQUIVALENT to formatReadingValue, output-for-outp
 });
 
 describe('the card entries — placement order, absent stays absent', () => {
-  it('asiaCards: the 11 entries in section order; missing readings stay undefined', () => {
+  it('asiaCards: the 14 entries in section order; missing readings stay undefined', () => {
     const pmi = fixtureReading('china-pmi');
     const jgb = fixtureReading('jgb-10y');
     const entries = asiaCards([pmi, jgb], ASIA_CARD_IDS);
-    expect(entries.map((e) => e.id)).toEqual([...ASIA_CHINA_IDS, ...ASIA_JAPAN_IDS, ...ASIA_PACIFIC_NZ_IDS]);
+    expect(entries.map((e) => e.id)).toEqual([...ASIA_CHINA_IDS, ...ASIA_JAPAN_IDS, ...ASIA_KOREA_TAIWAN_HK_IDS, ...ASIA_INDIA_IDS, ...ASIA_PACIFIC_NZ_IDS]);
     expect(entries.find((e) => e.id === 'china-pmi')!.reading).toBeDefined();
     expect(entries.find((e) => e.id === 'jgb-10y')!.reading).toBeDefined();
     expect(entries.find((e) => e.id === 'china-cpi')!.reading).toBeUndefined();
+    expect(entries.find((e) => e.id === 'korea-cpi')!.reading).toBeUndefined();
     expect(entries.find((e) => e.id === 'nz-10y')!.reading).toBeUndefined();
   });
 });

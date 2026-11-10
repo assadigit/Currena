@@ -1,16 +1,17 @@
 /**
  * asia-backtest.test.ts — the S14 §21 offline suite (spec §21 applied
- * to the Asia & Pacific page: the 11-card trio coverage, page ≡ engine,
+ * to the Asia & Pacific page: the 14-card trio coverage (the three S25
+ * CPI fills landed — BD-S23a), page ≡ engine,
  * plus the freshness audit reused from S11's pure auditUsaFreshness).
  *
  * The S9/S10 usa-backtest.test.ts / S12 europe-backtest.test.ts pattern,
- * scoped to Asia's 11 placed ids (no verdict strip, no TIC board): the
+ * scoped to Asia's 14 placed ids (no verdict strip, no TIC board): the
  * GREEN path, the public-mode twin, the FAIL-CLOSED proofs (a mutated
  * page card, a dropped page input, a dropped engine input), the
  * stableStringify key-order-immunity, and the freshness audit's own
  * cases on Asia's cadences — jgb-10y (daily maxAge 4, the daily path),
  * china-pmi (monthly maxAge 45), boj-rate (monthly maxAge 75, the
- * honest-stale path). Asia has NO per-change id (all 11 are daily or
+ * honest-stale path). Asia has NO per-change id (all 14 are daily or
  * monthly — no exempt path to test, unlike Europe's boe-rate).
  */
 
@@ -78,8 +79,9 @@ describe('backtestAsiaPage — the offline §21 suite', () => {
   it('the full pipeline: page ≡ engine over the synthetic snapshot, ZERO red', () => {
     const snapshot = syntheticSnapshot();
     const result = backtestAsiaPage(pageFeedOf(snapshot), engineFeedOf(snapshot));
-    // 11 cards (the §21 trio per card).
-    expect(result.checks).toHaveLength(11);
+    // 14 cards (the §21 trio per card — the three S25 CPI fills landed,
+    // BD-S23a).
+    expect(result.checks).toHaveLength(14);
     expect(result.red).toBe(0);
     expect(result.green).toBe(result.checks.length);
     // The designed states survive the join: the china-pmi warning, the
@@ -149,7 +151,7 @@ describe('backtestAsiaPage — the offline §21 suite', () => {
  * — the §21 "Data audit" leg on Asia's own cadences. jgb-10y is daily
  * maxAge 4 (the daily path); china-pmi is monthly maxAge 45; boj-rate
  * is monthly maxAge 75 (the honest-stale path). Asia has NO per-change
- * id (all 11 are daily or monthly — no exempt path, unlike Europe's
+ * id (all 14 are daily or monthly — no exempt path, unlike Europe's
  * boe-rate).
  * ------------------------------------------------------------------ */
 
@@ -229,11 +231,16 @@ describe('auditUsaFreshness over ASIA_CARD_IDS — the S14 §21 freshness audit'
       'china-steel-output': { cadence: 'monthly', maxAgeDays: 75 },
       'jgb-10y': { cadence: 'daily', maxAgeDays: 4 },
       'boj-rate': { cadence: 'monthly', maxAgeDays: 75 },
+      // S25 (BD-S23a): the three §15 D-36 CPI cards — Japan/Korea at the
+      // monthly 75; India's mirror-lag grace 150.
+      'japan-cpi': { cadence: 'monthly', maxAgeDays: 75 },
+      'korea-cpi': { cadence: 'monthly', maxAgeDays: 75 },
+      'india-cpi': { cadence: 'monthly', maxAgeDays: 150 },
       'nz-short-rate': { cadence: 'monthly', maxAgeDays: 75 },
       'nz-10y': { cadence: 'monthly', maxAgeDays: 75 },
     });
     // The card list the live script passes is EXACTLY ASIA_BACKTEST_CARD_IDS.
-    expect(ASIA_BACKTEST_CARD_IDS).toHaveLength(11);
+    expect(ASIA_BACKTEST_CARD_IDS).toHaveLength(14);
     for (const id of ASIA_BACKTEST_CARD_IDS) {
       expect(registry.has(id), `${id} in the registry`).toBe(true);
     }

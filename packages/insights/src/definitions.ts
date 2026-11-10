@@ -2487,6 +2487,94 @@ export const DEFINITIONS: readonly IndicatorDefinition[] = [
     // cadence's 45-day grace covers it without a false stale.
   },
   {
+    // page-division S25 fill session (2026-11-12, BD-S23a): the §15 D-36
+    // Japan CPI fill — the third Japan card on /asia-pacific beside
+    // jgb-10y + boj-rate (spec §9 item 2). The IMF's own SDMX 3.0 CPI
+    // dataflow (JPN.CPI._T.YOY_PCH_PA_PT.M): the provider's OWN
+    // year-over-year percent-change series, full history per fetch
+    // (849 obs 1956-M01→), keyless — the COFER venue (api.imf.org,
+    // Worker-egress verified byte-identical, BD-S23a). Cross-checked
+    // against the Statistics Bureau's own latest-results page (Sep 2026:
+    // the bureau's 2025-base headline reads +2.1% vs the mirror's +2.23%
+    // on the pre-revision base — the Aug-2026 re-weighting wedge,
+    // documented; the vintage is CURRENT: the mirror carries the
+    // freshest print that exists, Sep out Oct 23 per the bureau's own
+    // schedule). Context-only per the display-layer program; rides
+    // rung2's first-of-month gate + the missing-history bootstrap.
+    id: 'japan-cpi',
+    section: 'global',
+    group: 'growth-health',
+    name: 'Japan inflation (yearly)',
+    source: 'imf',
+    sourceRef: 'IMF SDMX 3.0 CPI dataflow (Japan all-items CPI, year-over-year percent change, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // The mirror rides at T+0 (the bureau publishes ~T+23d; verified:
+    // the Sep print out Oct 23, the Oct print lands Nov 20) → the obs
+    // ages ~55 days between releases; 75 keeps the monthly cadence
+    // honest with margin (the us-cpi-yoy convention).
+    staleAfterDays: 75,
+  },
+  {
+    // page-division S25 fill session (2026-11-12, BD-S23a): the §15 D-36
+    // Korea CPI fill — the first registry card of the Korea/Taiwan/HK
+    // sub-region on /asia-pacific (spec §9 item 3; the section's markets
+    // ride the Asia zoom). The IMF's own SDMX 3.0 CPI dataflow
+    // (KOR.CPI._T.YOY_PCH_PA_PT.M): the provider's OWN YoY series, full
+    // history per fetch (891 obs 1952-M08→), keyless — the COFER venue.
+    // Cross-checked against the national release ITSELF (the October
+    // 2026 소비자물가동향 via the 국가데이터처 portal: consumer prices
+    // +2.8% YoY — the mirror's 2.8189% matches EXACTLY; kostat.go.kr's
+    // own site is under maintenance, BD-S23a). Context-only; rides
+    // rung2's first-of-month gate + the missing-history bootstrap.
+    id: 'korea-cpi',
+    section: 'global',
+    group: 'growth-health',
+    name: 'Korea inflation (yearly)',
+    source: 'imf',
+    sourceRef: 'IMF SDMX 3.0 CPI dataflow (Korea all-items CPI, year-over-year percent change, monthly)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    // KOSTAT publishes ~T+5d (the Oct print out ~Nov 1) → the obs ages
+    // ~35 days between releases; 75 keeps the cadence honest (the
+    // monthly convention, uniform with japan-cpi).
+    staleAfterDays: 75,
+  },
+  {
+    // page-division S25 fill session (2026-11-12, BD-S23a): the §15 D-36
+    // India CPI fill — the first registry card of the India sub-region on
+    // /asia-pacific (spec §9 item 4; NIFTY50 rides the Asia zoom). The
+    // IMF's own SDMX 3.0 CPI dataflow (IND.CPI._T.YOY_PCH_PA_PT.M): the
+    // provider's OWN YoY series, full history per fetch (823 obs
+    // 1958-M01→), keyless — the COFER venue. Cross-checked against
+    // MoSPI's own July 2026 press note (fetched live: all-India CPI
+    // 4.45% provisional vs the mirror's 4.4412% — the same number
+    // within display rounding). The mirror's India publication lag is
+    // MEASURED (the frozen vintages + the live read): the IMF ingests
+    // India with a T+1..T+3-month lag behind MoSPI's freshest print —
+    // the card's copy names the mirror honestly (the nz-short-rate
+    // "honest mirror" naming discipline) and the maxAge covers the
+    // measured worst case (asOf can sit ~102–130 days behind today
+    // between mirror refreshes; 150 = two consecutive missed mirror
+    // refreshes before the card honestly reads stale — the
+    // usd-reserve-share two-missed-releases arithmetic).
+    id: 'india-cpi',
+    section: 'global',
+    group: 'growth-health',
+    name: 'India inflation (yearly)',
+    source: 'imf',
+    sourceRef: 'IMF SDMX 3.0 CPI dataflow (India all-items CPI, year-over-year percent change, monthly — a mirror that lags MoSPI by 1–3 months)',
+    cadence: 'monthly',
+    changeKind: 'points',
+    phase: 'P2',
+    rule: { kind: 'info' },
+    staleAfterDays: 150,
+  },
+  {
     id: 'm2-us',
     section: 'global',
     group: 'growth-health',

@@ -1,7 +1,8 @@
 /**
  * pd-s14-backtest.ts — the S14 §21 diff, LIVE (spec §21's
- * verdict-consistency rule applied to the Asia & Pacific page's 11
- * placed cards: the trio coverage + the freshness audit — "page-
+ * verdict-consistency rule applied to the Asia & Pacific page's 14
+ * placed cards — the three §15 D-36 CPI fills landed in the S25 fill
+ * session, BD-S23a: the trio coverage + the freshness audit — "page-
  * rendered values must match engine values byte-for-byte").
  *
  * A MANUAL script, never part of the test suite (tests never hit live
@@ -15,26 +16,27 @@
  *                                              side's own document)
  *        GET /api/insights/pages/asia-pacific — the Asia projection (the PAGE
  *                                              side: the China + Japan +
- *                                              Pacific-NZ sections; the two
- *                                              index-only groups carry no
- *                                              registry cards)
+ *                                              Korea/Taiwan/HK + India +
+ *                                              Pacific-NZ sections — every
+ *                                              section carries its registry
+ *                                              cards since the S25 fills)
  *      and proves the two documents derive from one snapshot
  *      (generatedAt alignment) + the projection's honest absentIds.
  *
  *   2. Runs the pure comparison core (asia-backtest-core.ts): every
- *      one of the 11 cards' §21 trio inputs byte-identical between the
+ *      one of the 14 cards' §21 trio inputs byte-identical between the
  *      projection and the snapshot.
  *
- *   3. The section membership's live sanity: the placement's three
- *      card-carrying groups (china 7 / japan 2 / pacific-nz 2) all
- *      carried + the two index-only groups (korea-taiwan-hk 0 /
- *      india 0) honestly empty.
+ *   3. The section membership's live sanity: the placement's five
+ *      groups (china 7 / japan 3 / korea-taiwan-hk 1 / india 1 /
+ *      pacific-nz 2) all carried.
  *
  *   4. The freshness audit vs cadence grace (S11's pure auditUsaFreshness,
  *      reused with ASIA_CARD_IDS): every card's asOf age checked against
  *      the registry's own maxAgeDays (the data audit's §21 leg — a card
  *      beyond its grace is RED, the engine's own stale status is the
- *      page's honest word).
+ *      page's honest word; india-cpi's 150-day grace covers the IMF
+ *      mirror's measured 1–3-month lag — BD-S23a).
  *
  * Writes NOTHING (no KV, no repo file). Read-only.
  *
@@ -82,7 +84,7 @@ function registryMaxAge(): Map<string, FreshnessRegistryEntry> {
 }
 
 async function main(): Promise<void> {
-  console.log(`# PD-S14 §21 diff (the Asia & Pacific page's 11 placed cards) — ${new Date().toISOString()}`);
+  console.log(`# PD-S14 §21 diff (the Asia & Pacific page's 14 placed cards — the S25 CPI fills landed) — ${new Date().toISOString()}`);
   console.log(`# base: ${BASE}\n`);
 
   /* ---------- 1. The two feeds ---------- */
@@ -128,7 +130,7 @@ async function main(): Promise<void> {
     pageGroupIds('asia-pacific', 'pacific-nz'),
   ];
   const seated = new Set(asia.readings.map((r) => (r.id as string)));
-  const groupNames = ['china (7)', 'japan (2)', 'korea-taiwan-hk (0 — index-only)', 'india (0 — index-only)', 'pacific-nz (2)'];
+  const groupNames = ['china (7)', 'japan (3 — the S25 Japan CPI fill)', 'korea-taiwan-hk (1 — the S25 Korea CPI fill)', 'india (1 — the S25 India CPI fill)', 'pacific-nz (2)'];
   groups.forEach((ids, i) => {
     const missing = ids.filter((id) => !seated.has(id));
     check(
@@ -139,21 +141,20 @@ async function main(): Promise<void> {
   });
   const allCards = ASIA_BACKTEST_CARD_IDS.filter((id) => !seated.has(id));
   check(
-    'every Asia registry card (the 11) is carried by the projection',
+    'every Asia registry card (the 14) is carried by the projection',
     allCards.length === 0,
-    allCards.length === 0 ? '11/11 present' : `missing: ${allCards.join(', ')}`,
+    allCards.length === 0 ? '14/14 present' : `missing: ${allCards.join(', ')}`,
   );
-  // The two index-only groups are honestly empty (no registry cards —
-  // their markets ride the zoom, the §15 CPI fills are verified-pending-
-  // ingest).
+  // The two index-note groups carry their S25 CPI cards (BD-S23a) while
+  // their markets ride the zoom map above.
   check(
-    'the korea-taiwan-hk group is INDEX-ONLY (empty — KOSPI/TAIEX/HSI ride the zoom)',
-    pageGroupIds('asia-pacific', 'korea-taiwan-hk').length === 0,
+    'the korea-taiwan-hk group carries its CPI card (korea-cpi — KOSPI/TAIEX/HSI ride the zoom)',
+    pageGroupIds('asia-pacific', 'korea-taiwan-hk').length === 1,
     `${pageGroupIds('asia-pacific', 'korea-taiwan-hk').length} ids`,
   );
   check(
-    'the india group is INDEX-ONLY (empty — NIFTY50 rides the zoom)',
-    pageGroupIds('asia-pacific', 'india').length === 0,
+    'the india group carries its CPI card (india-cpi — NIFTY50 rides the zoom)',
+    pageGroupIds('asia-pacific', 'india').length === 1,
     `${pageGroupIds('asia-pacific', 'india').length} ids`,
   );
 

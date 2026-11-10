@@ -542,6 +542,31 @@ currencies container per R9-04):
 | [C] | `gdpnow` | quarterly | 150 | info | fred |
 | [C] | `empire-state` | monthly | 60 | info | fred |
 | [C] | `continuing-claims` | weekly | 28 | info | fred |
+| [C] | `japan-cpi` | monthly | 75 | info | imf |
+| [C] | `korea-cpi` | monthly | 75 | info | imf |
+| [C] | `india-cpi` | monthly | 150 | info | imf |
+
+*(page-division S25 fill session, 2026-11-12 — BD-S23a: the three §15
+D-36 Asia CPI fills. Japan · Korea · India CPI YoY, all context-only,
+all from the IMF's own SDMX 3.0 CPI dataflow (`{CC}.CPI._T.YOY_PCH_PA_PT.M`
+on api.imf.org — the COFER venue, keyless, L1): the provider's OWN
+year-over-year percent-change series with the full monthly history per
+fetch. Rule 5 verified at BOTH venues (the temp-probe Worker-egress
+read: 200, byte-identical) + against the national bureaus — Japan's
+Statistics Bureau latest-results page (the 2025-base headline +2.1% vs
+the mirror's +2.23% on the pre-revision base: the Aug-2026 re-weighting
+wedge, documented; the vintage CURRENT), KOSTAT's own October release
+(+2.8% — the mirror's 2.8189 matches EXACTLY), MoSPI's own July 2026
+press note (4.45% vs 4.4412 — display rounding), and the World Bank
+FP.CPI.TOTL.ZG annual cross-check (the 2025 averages match all three
+EXACTLY). The FRED OECD mirror family is DEAD (BD-S14a — never re-try
+those ids). Japan/Korea ride at T+0 (maxAge 75); the India mirror's
+lag is MEASURED at T+1..T+3 months behind MoSPI (maxAge 150, the
+mirror named in the card copy — the nz-short-rate honest-mirror
+discipline). Rides rung2's first-of-month gate + the missing-history
+bootstrap; rendered on /asia-pacific's Japan (2→3) · Korea/Taiwan/HK ·
+India sections per the spec §9 items 2–4. Fixtures:
+packages/insights/fixtures/s25/ — BD-S23a carries the full record.)*
 
 **Market stress** (`market-stress` gauge):
 | | id | cadence | maxAge | rule | source |

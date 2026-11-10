@@ -1333,7 +1333,7 @@ export const en = {
       title: 'Asia & Pacific',
       purpose: 'The world’s growth engine region — organized by sub-region, not by theme.',
       summary:
-        'Five sub-regions — China, Japan, Korea/Taiwan/Hong Kong, India and the Pacific (New Zealand) — plus the Asia zoom map and verified CPI fills.',
+        'Five sub-regions — China, Japan, Korea/Taiwan/Hong Kong, India and the Pacific (New Zealand) — plus the Asia zoom map and the three verified CPI cards (the IMF’s own CPI series, cross-checked against the national releases).',
       /* ---- S14 (2026-11-09): the Asia & Pacific page's own copy
        * (D-16/D-17/D-35/D-36, spec §9 items 1–6). The card names, the
        * unit words, the position + band words and the status words are
@@ -1352,21 +1352,21 @@ export const en = {
       japan: {
         title: 'Japan',
         intro:
-          'The 10-year Japanese government bond yield and the Bank of Japan’s policy rate. The Japan CPI fill is verified-pending-ingest (§15, Rule 5).',
+          'The 10-year Japanese government bond yield, the Bank of Japan’s policy rate, and yearly consumer-price inflation — the country’s full rates-and-prices trio (the inflation card reads the IMF’s own CPI series, verified against the national release).',
       },
       koreaTaiwanHk: {
         title: 'Korea · Taiwan · Hong Kong',
         intro:
-          'The Korea, Taiwan and Hong Kong markets — KOSPI, TAIEX and HSI — ride the Asia zoom map above. The Korea CPI fill is verified-pending-ingest (§15, Rule 5).',
-        indexOnlyNote:
-          'These three markets ride the zoom map above. Their consumer-price reads land here once the FRED mirror family is verified against the national statistics releases (§15, Rule 5).',
+          'Korea’s yearly consumer-price inflation (the IMF’s own CPI series, verified against KOSTAT’s release) — the Korea, Taiwan and Hong Kong markets (KOSPI, TAIEX and HSI) ride the Asia zoom map above.',
+        indexNote:
+          'KOSPI, TAIEX and HSI ride the zoom map above. The consumer-price read here is Korea’s national CPI, mirrored from the IMF’s own dataset.',
       },
       india: {
         title: 'India',
         intro:
-          'The Indian market — NIFTY50 — rides the Asia zoom map above. The India CPI fill is verified-pending-ingest (§15, Rule 5).',
-        indexOnlyNote:
-          'NIFTY50 rides the zoom map above. India’s consumer-price read lands here once the FRED mirror family is verified against the MoSPI release (§15, Rule 5).',
+          'India’s yearly consumer-price inflation (the IMF’s own CPI series, cross-checked against the MoSPI release) — the Indian market (NIFTY50) rides the Asia zoom map above.',
+        indexNote:
+          'NIFTY50 rides the zoom map above. The consumer-price read is India’s national CPI, mirrored from the IMF’s own dataset — a mirror that typically trails the official release by one to three months.',
       },
       pacificNz: {
         title: 'Pacific — New Zealand',
@@ -1385,6 +1385,9 @@ export const en = {
         'china-steel-output': 'China crude steel output (monthly)',
         'jgb-10y': 'What the Japanese government pays to borrow for 10 years',
         'boj-rate': 'The Japanese central bank’s policy rate',
+        'japan-cpi': 'Japan inflation (yearly)',
+        'korea-cpi': 'Korea inflation (yearly)',
+        'india-cpi': 'India inflation (yearly)',
         'nz-short-rate': 'New Zealand short-term interest rate',
         'nz-10y': 'New Zealand 10-year government bond yield',
       },

@@ -7187,6 +7187,183 @@
       }
     },
     {
+      "id": "japan-cpi",
+      "title": "Japan inflation (yearly)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "imf",
+        "name": "IMF SDMX 3.0 CPI dataflow (Japan all-items CPI, year-over-year percent change, monthly)",
+        "url": null,
+        "seriesIdOrTable": "IMF SDMX 3.0 CPI dataflow (Japan all-items CPI, year-over-year percent change, monthly)"
+      },
+      "publisher": "International Monetary Fund (COFER)",
+      "publisherUrl": null,
+      "methodUrl": null,
+      "whatItIs": "The year-on-year change in Japan’s all-items Consumer Price Index, published monthly by the Statistics Bureau and read here from the IMF’s own CPI dataset (the international mirror of the national series; the mirror continues the pre-2025-base series, so it can differ from the bureau’s newest headline by around a tenth of a percentage point).",
+      "whatItIsnt": "A national average that strips away regional differences, and the fresh-food and energy swings can mask the underlying trend for months.",
+      "trackRecordNote": "Japan spent 1998–2022 fighting deflation with rates near zero; the 2022–24 wave pushed inflation above 2% for the longest stretch since the 1990s and ended negative rates.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The IMF’s own Special Terms for Statistical Data, quoted verbatim (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the gap-closure S4-M4.3 PortWatch record, the same terms page; the plain fetch is bot-filtered and the link currently 301-redirects to a 404 marker, but the terms were read and recorded then): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — L1 with affirmative redistribution permission (the PortWatch precedent, the same IMF statistical-data terms). The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.”",
+        "termsReadOn": "2026-11-02",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "legs": [
+          "imf"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "IMF Terms of Use — special terms for statistical data",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-02",
+        "termsEvidence": "The IMF’s own Special Terms for Statistical Data, quoted verbatim in the gap-closure S4-M4.3 record (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the same terms page PortWatch’s own licence field declares; the plain fetch is bot-filtered and the URL now 301-redirects to a 404 marker, so the S4 read is the terms record of reference): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — affirmative redistribution permission with the attribution condition. The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.” L1 with quoted permission → public display with the attribution string above.",
+        "termsUrl": "https://www.imf.org/external/terms.htm"
+      }
+    },
+    {
+      "id": "korea-cpi",
+      "title": "Korea inflation (yearly)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "imf",
+        "name": "IMF SDMX 3.0 CPI dataflow (Korea all-items CPI, year-over-year percent change, monthly)",
+        "url": null,
+        "seriesIdOrTable": "IMF SDMX 3.0 CPI dataflow (Korea all-items CPI, year-over-year percent change, monthly)"
+      },
+      "publisher": "International Monetary Fund (COFER)",
+      "publisherUrl": null,
+      "methodUrl": null,
+      "whatItIs": "The year-on-year change in Korea’s all-items Consumer Price Index, published monthly by the national statistics office (KOSTAT) and read here from the IMF’s own CPI dataset — the international mirror that matches the national release.",
+      "whatItIsnt": "A national average, and one monthly print can swing on food and energy alone: never a trend by itself.",
+      "trackRecordNote": "Korean inflation ran 2–5% through the 2010s, spiked with the 2022 world wave, then cooled back inside the target band.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 75 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The IMF’s own Special Terms for Statistical Data, quoted verbatim (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the gap-closure S4-M4.3 PortWatch record, the same terms page; the plain fetch is bot-filtered and the link currently 301-redirects to a 404 marker, but the terms were read and recorded then): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — L1 with affirmative redistribution permission (the PortWatch precedent, the same IMF statistical-data terms). The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.”",
+        "termsReadOn": "2026-11-02",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "legs": [
+          "imf"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 75,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "IMF Terms of Use — special terms for statistical data",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-02",
+        "termsEvidence": "The IMF’s own Special Terms for Statistical Data, quoted verbatim in the gap-closure S4-M4.3 record (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the same terms page PortWatch’s own licence field declares; the plain fetch is bot-filtered and the URL now 301-redirects to a 404 marker, so the S4 read is the terms record of reference): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — affirmative redistribution permission with the attribution condition. The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.” L1 with quoted permission → public display with the attribution string above.",
+        "termsUrl": "https://www.imf.org/external/terms.htm"
+      }
+    },
+    {
+      "id": "india-cpi",
+      "title": "India inflation (yearly)",
+      "area": {
+        "section": "global",
+        "group": "growth-health",
+        "gauge": null,
+        "gaugeMembership": "context only — never counts"
+      },
+      "source": {
+        "provider": "imf",
+        "name": "IMF SDMX 3.0 CPI dataflow (India all-items CPI, year-over-year percent change, monthly — a mirror that lags MoSPI by 1–3 months)",
+        "url": null,
+        "seriesIdOrTable": "IMF SDMX 3.0 CPI dataflow (India all-items CPI, year-over-year percent change, monthly — a mirror that lags MoSPI by 1–3 months)"
+      },
+      "publisher": "International Monetary Fund (COFER)",
+      "publisherUrl": null,
+      "methodUrl": null,
+      "whatItIs": "The year-on-year change in India’s all-items Consumer Price Index, published monthly by the Ministry of Statistics (MoSPI) and read here from the IMF’s own CPI dataset — an international mirror that typically lags the national release by one to three months.",
+      "whatItIsnt": "The mirror trails the national release by a month or three, and food — a third of the basket — can swing the headline alone.",
+      "trackRecordNote": "Indian inflation spent the 2010s between 4 and 10%, cooled into the target band after 2023, and food prices still drive the swings.",
+      "definition": null,
+      "failClosedConditions": "No value, data older than 150 days, an exact repeat beyond its monthly cadence, a value outside its allowed range, or a failed validation test → the card shows Stale or Can't tell right now, never a verdict (fail closed).",
+      "sourceRisk": {
+        "level": "L1",
+        "ownerAccepts": null,
+        "enabled": true,
+        "method": "M2",
+        "runtime": "worker",
+        "termsLines": "The IMF’s own Special Terms for Statistical Data, quoted verbatim (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the gap-closure S4-M4.3 PortWatch record, the same terms page; the plain fetch is bot-filtered and the link currently 301-redirects to a 404 marker, but the terms were read and recorded then): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — L1 with affirmative redistribution permission (the PortWatch precedent, the same IMF statistical-data terms). The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.”",
+        "termsReadOn": "2026-11-02",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "legs": [
+          "imf"
+        ]
+      },
+      "unit": "percent",
+      "changeUnit": "percentage points",
+      "cadence": "monthly",
+      "maxAgeDays": 150,
+      "maxAgeBasis": "per-series override",
+      "scored": false,
+      "historyWindow": "10 years of stored history (downsampled to ≤2700 points; ≥2 years of daily data)",
+      "rule": {
+        "kind": "info"
+      },
+      "ruleVersion": 4,
+      "layer": 1,
+      "licence": {
+        "licenceName": "IMF Terms of Use — special terms for statistical data",
+        "attributionText": "Source: International Monetary Fund, COFER",
+        "attributionRequired": true,
+        "privateOk": true,
+        "publicDisplayOk": "yes",
+        "termsCheckedOn": "2026-11-02",
+        "termsEvidence": "The IMF’s own Special Terms for Statistical Data, quoted verbatim in the gap-closure S4-M4.3 record (read 2026-11-01 via a real-browser read of imf.org/external/terms.htm — the same terms page PortWatch’s own licence field declares; the plain fetch is bot-filtered and the URL now 301-redirects to a 404 marker, so the S4 read is the terms record of reference): “Special Terms for Statistical Data… Users may download, extract, copy, create derivative works, publish, distribute, and use Data obtained from IMF Sites subject to these conditions: Distributed or reproduced Data must appear accurately with attribution to the IMF as the source… Users shall not infringe upon the integrity of the Data…” — affirmative redistribution permission with the attribution condition. The provider’s own API page (data.imf.org/en/Resource-Pages/IMF-API, read 2026-11-02) states: “Our data are available through SDMX 2.1 and SDMX 3.0 APIs. You can use the APIs to import data from datasets available on http://data.imf.org into your data systems or applications.” L1 with quoted permission → public display with the attribution string above.",
+        "termsUrl": "https://www.imf.org/external/terms.htm"
+      }
+    },
+    {
       "id": "m2-us",
       "title": "US M2 money supply",
       "area": {

@@ -220,21 +220,21 @@ const ASIA_GROUPS: readonly PlacementGroup[] = [
   },
   {
     id: 'japan',
-    ids: ['jgb-10y', 'boj-rate'],
-    decisions: 'D-35',
-    note: '+ the Japan CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a: the FRED OECD mirror candidates VERIFIED STALE, discarded; BD-S15d carried the fill to a dedicated session — the World Bank annual or the national bureau are the recorded alternatives).',
+    ids: ['jgb-10y', 'boj-rate', 'japan-cpi'],
+    decisions: 'D-35 · D-36',
+    note: '+ the Japan CPI fill (D-36) LANDED in the S25 fill session (BD-S23a): the IMF SDMX 3.0 CPI dataflow card — verified live at both venues + against the Statistics Bureau’s own release, the FRED OECD mirror family is DEAD (BD-S14a).',
   },
   {
     id: 'korea-taiwan-hk',
-    ids: [],
-    decisions: 'D-35',
-    note: 'Index-only today (KOSPI · TAIEX · HSI on the markets board); the Korea CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a/BD-S15d).',
+    ids: ['korea-cpi'],
+    decisions: 'D-35 · D-36',
+    note: 'KOSPI · TAIEX · HSI ride the markets board (the Asia zoom map); the Korea CPI fill (D-36) LANDED in the S25 fill session (BD-S23a) — the IMF SDMX 3.0 CPI dataflow card, verified against KOSTAT’s own October release.',
   },
   {
     id: 'india',
-    ids: [],
-    decisions: 'D-35',
-    note: 'Index-only today (NIFTY50 on the markets board); the India CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a/BD-S15d).',
+    ids: ['india-cpi'],
+    decisions: 'D-35 · D-36',
+    note: 'NIFTY50 rides the markets board (the Asia zoom map); the India CPI fill (D-36) LANDED in the S25 fill session (BD-S23a) — the IMF SDMX 3.0 CPI dataflow card, verified against MoSPI’s own July press note (the mirror lags MoSPI by 1–3 months, labelled).',
   },
   {
     id: 'pacific-nz',
@@ -535,6 +535,11 @@ export const PLACEMENT_AUDIT_FINDINGS: readonly PlacementFinding[] = [
     id: 'AF-7',
     severity: 'info',
     text: 'S21 spec audit (2026-11-12): spec §10 item 1 says the AU Markets board is "19 symbols: … 10 ASX-200 sectors …" — but 2 broad + 10 sectors + 4 banks + VIX + NZX50 sums to 18, not its own 19. The board carries ELEVEN ASX 200 GICS sector rows (markets-au/definitions.ts, self-described "the eleven ASX 200 GICS sector indices") and totals 19 ✓. The "10" is a spec typo — the code is right; recorded so nobody "fixes" the board to match the typo.',
+  },
+  {
+    id: 'AF-8',
+    severity: 'info',
+    text: 'S25 fill session (2026-11-12, BD-S23a): spec §15\'s three D-36 Asia fills name the "FRED OECD mirror family" as the candidate source — that family is DEAD (verified stale/discontinued live in S14, BD-S14a: JPNCPIALLMINMEI + CPALTT01JPM659N end 2021-06; the KR pair ends 2023-11; the IN pair ends 2025-03 — never re-try those ids). The fills LANDED from the IMF\'s own SDMX 3.0 CPI dataflow instead (Rule 5 verified at both venues + against the national bureaus — Japan\'s Statistics Bureau, KOSTAT, MoSPI, and the World Bank annual cross-check), the "fresh FRED/IMF IFS series" option the roadmap recorded. The spec §15 table (and §9\'s "+ fill" notes naming it) rides the spec-v2 pass — recorded here, never silently edited.',
   },
 ];
 

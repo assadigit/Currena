@@ -5,6 +5,54 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-12] page-division S25 fill session (the PULLED-FORWARD Session 23 slot, BD-S22): **THE THREE §15 D-36 ASIA CPI FILLS LANDED (Japan · Korea · India CPI YoY) — the IMF's own SDMX 3.0 CPI dataflow, Rule 5 verified at BOTH venues + against the three national bureaus (BD-S23a); the full §A ingest discipline; the three cards rendered on /asia-pacific with the §21 trio + the fa copy through the manifest; the registry 184 → 187 ids; pd-s14 extended to the 14 cards; the spec-v2 diff grown (AF-8 — the dead FRED-mirror candidate recorded, the spec untouched); SHIPS with this session's deploy.**
+
+- **The source (BD-S23a):** the IMF's dedicated CPI dataflow on api.imf.org
+  (the COFER venue — keyless, L1, one filtered request per country:
+  `{CC}.CPI._T.YOY_PCH_PA_PT.M`), carrying the provider's OWN
+  year-over-year percent-change series with the full monthly history
+  per fetch (JPN 849 obs 1956-M01→ · KOR 891 obs 1952-M08→ · IND 823
+  obs 1958-M01→). The FRED OECD mirror family stays DEAD (BD-S14a).
+- **Rule 5 verification (all green):** sandbox 200s + the temp-probe
+  Worker-egress read (a throwaway `currena-probe` through
+  `wrangler dev --remote`, deleted after) — 200, application/json,
+  BYTE-IDENTICAL responses (JPN 58,498 B · KOR 61,187 B · IND 56,625
+  B); the second voices — Japan's Statistics Bureau latest-results
+  page (Sep 2026 +2.1% on the 2025-base vs the mirror's +2.23% on the
+  pre-revision base: the Aug-2026 re-weighting wedge, documented; the
+  vintage CURRENT per the bureau's own schedule), KOSTAT's own October
+  release (+2.8% — the mirror's 2.8189 matches EXACTLY), MoSPI's own
+  July 2026 press note (4.45% vs 4.4412 — display rounding), and the
+  World Bank FP.CPI.TOTL.ZG annual cross-check (the 2025 monthly
+  averages match all three EXACTLY).
+- **The cadence honesty:** Japan/Korea ride at T+0 (maxAge 75); the
+  India mirror's lag MEASURED at T+1..T+3 months behind MoSPI (maxAge
+  150, the mirror named in the card copy — the nz-short-rate
+  honest-mirror discipline). Rides rung2's first-of-month gate + the
+  missing-history bootstrap (~3 subrequests on the 1st).
+- **The §A discipline:** the three definitions (global · growth-health,
+  context-only, P2) → `registry:generate` (187) → the AGENTS §A
+  growth-health rows + the S25 note → INDICATORS_AND_DATA_SOURCES §1/§2
+  (the three per-indicator rows + the imf provider row) → the pin tests
+  (definitions/snapshot/rung2/validation/vocabulary counts) → this
+  CHANGELOG. The new adapter `adapters/imf-cpi.ts` (the cofer.ts
+  pattern — fail-closed on every shape assumption) + 15 tests + the
+  fixtures `fixtures/s25/imf-cpi-{jpn,kor,ind}-2026-11-12.json`.
+- **The display layer:** the placement's japan group 2→3, the
+  korea-taiwan-hk + india groups gain their CPI cards (the two
+  index-only sections become index-note sections — the card grid + the
+  honest note; the indexOnlyNote keys retired, the indexNote keys
+  born); asia-tiles' AsiaCardId/display maps +3 (the china-cpi percent
+  convention); the full insights-copy corpus (INDICATORS + layer1
+  entries, EN + fa — 75 new fa strings queued unreviewed + 4 changed
+  intros triaged needs-review through the manifest; copy:audit clean);
+  PLACEMENT.generated.md regenerated (187 · 0 unplaced · 0 duplicates)
+  with AF-8 on record; the backtest surfaces extended (asia-tiles 13 ·
+  asia-backtest 11 · AsiaPage 10 tests; pd-s14-backtest.ts expects the
+  14 cards + the 1/1/3/1/2 group shape).
+- **Session 23/30 · 7 remaining.** The owner's lever stays: arrange the
+  investor's review of spec §19.
+
 ## [2026-11-12] page-division S22 (waiting-slot close): **THE PHASE K COLLECTION SLOT CLOSED HONESTLY AS A WAITING SLOT (BD-S22) — the investor's review of spec §19 was NOT yet arranged, verified against every record the program can read (no answers supplied with the session kickoff; origin/main at HEAD `384dfd1` = the S21 counterpart close, nothing past the S21 records; the GitHub issues/PRs hold nothing since PR #47 [2026-11-08]; no uploaded file; the owner-side lever "Arrange the investor review — the S22 gate" standing unanswered). Per the owner's standing instruction for this slot and the roadmap's own reserve rule: NO answers collected · NO D-49+ recorded (the strategy log §5 gains the explicit Round-4 PENDING marker — the answers land there as D-49+ the moment they exist; the Phase-3 plan row updated to match) · NO spec v2 entries produced (the AF-1…AF-7 spec-side drift findings REMAIN parked for the v2 pass — the spec file untouched, never silent edits) · NO deploy (a records session; nothing was fixed, so nothing shipped). THE RESERVE PULL-FORWARD: the first reserve session — the §15 Asia CPI fill session (the dedicated fill session carried since S14, BD-S14a/BD-S15d) — is pulled forward into the Session 23 slot (S25's own roadmap entry now spells the scope: pick a viable monthly source for JP/KR/IN — the national statistics bureaus directly, a fresh FRED/IMF IFS series, or the World Bank annual fallback; the FRED OECD mirror family is DEAD, never re-try those ids; verify-before-ingest from both venues; the full §A discipline; the three cards on /asia-pacific + the pd-s14 extension; the spec-v2 diff grows); S23's feedback-build scope is DEFERRED (blocked on the same investor input — it runs in the first free slot after the answers land and the spec v2 entries exist). The roadmap's legend gains the ⏸ waiting + ⏭ pulled-forward markers; the progress board + the current-position note rewritten to match. THE GATES: the full `pnpm gates` re-run ALL GREEN on the records-only tree (2m 39s: secret scan 8/1020 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator in sync + eval 50 · layer1 11,819/11,819 · **the suite 15,102 — exactly the S21 count, no code changed** · build + budgets held — entry 272.88/82.55, every page chunk within its row) — every doc-sensitive gate green over the touched docs. Zero code, zero spec, zero deploy: production stays currena-api `5593fd43` + currena-markets `8f63c8fa`. Progress: **Session 22/30 · 8 remaining · next Session 23/30 runs the PULLED-FORWARD reserve session (S25 — the §15 Asia CPI fill session); THE OWNER'S LEVER: arrange the investor's review of spec §19 (the seven questions).**
 
 ## [2026-11-12] page-division S21 (counterpart close): **THE DUPLICATE S21 ARRIVAL RECONCILED — BD-S21-parallel: a session started from the standing S21 kickoff prompt AFTER the slot was already delivered (origin/main at `84486c0` carries S21 whole — the M1/M2/M3 records, the deploy `5593fd43`/`8f63c8fa`, Phase J CLOSED, HANDOFF rewritten for S22 — with a clean tree). Under the hardened BD-S18-parallel-3 rule ("exactly ONE session per roadmap slot") this session did NOT re-execute the slot; it ran the counterpart close: the shipped S21 INDEPENDENTLY re-verified with this session's own gates, ALL GREEN — (1) the full gates 15,102 (2m 46s: secret scan 8/1020 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator in sync + eval 50 · layer1 11,819/11,819 · build + budgets held, entry 272.88/82.55 — byte-identical to the S21 record) + `placement:generate` regenerating the §14 table with ZERO diff (184 ids · 0 unplaced · 0 duplicate homes · AF-1…AF-7 on record); (2) ALL ELEVEN live pd-* backtests re-run vs production — 715 checks ALL GREEN (s4 Global 84 + the narrator raw-KV stateHash recompute IDENTICAL · s5 150 · s7 56 · s8 9 · s9 115 · s10 115+48 · s12 8 · s14 11 · s16 28 · s17 24 · s18 14+16+23); (3) the §21 data audit (the frozen N=20 sample) re-run — ALL 20 GREEN (19 byte-exact + platinum's recorded live-spot arm, 0.90% intraday), with chokepoint-malacca verified green OUTSIDE the PortWatch Tuesday-maintenance window exactly per the BD-S21e runbook note (~17:50 UTC probes); (4) the production deploy-state cross-check via the Cloudflare API — currena-api's latest version IS `5593fd43` (version 358, uploaded 2026-11-10T11:48:55Z; 357 = `74777037`, the rollback lever) and currena-markets' IS `8f63c8fa` (version 31); (5) the browser pass on production — the NZX50 card READY on /asia-pacific at 1440×900 + 360×844 in en + fa (S&P/NZX 50 · 14,167.41 · +1.3% 1d · 100% of its 52-week range · the REAL /australia link; the fa card fully Persian), the false "rides the Asia zoom map" sentence GONE in both locales while the Korea/India TRUE zoom sentences stay and the zoom seats its six world-board indices, the Global header verified BOTH ways (the fresh single data-as-of line; the cached path — exercised live by blocking the API — renders "Showing the last good copy — data as of Nov 10, 2026" REPLACING the plain line, the prices stamp staying: the BD-S21c fix), 0px horizontal overflow on every leg, ZERO console/page errors on all 10 routes, every internal link resolves (no dead links). No re-deploy, no shipped-code change — the deployed `5593fd43`/`8f63c8fa` truth stands; this session's only tree changes are the counterpart records (DECISIONS BD-S21-parallel · this entry · the HANDOFF note).**
