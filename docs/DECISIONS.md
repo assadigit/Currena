@@ -2533,3 +2533,86 @@
   the next free slot the moment the answers exist. Until then Phase K's
   investor-dependent slots wait and the reserve/buffer work (the fill
   session first) keeps the program moving.
+
+## 2026-11-12 — BD-S23a: the §15 Asia CPI fills — the viable monthly source PICKED AND VERIFIED (the IMF SDMX 3.0 CPI dataflow; Rule 5 satisfied at BOTH venues + three national-bureau second voices; the FRED OECD mirror family stays DEAD)
+
+- **Decision:** the three D-36 Asia §15 fills (Japan · Korea · India CPI
+  YoY) ingest from the **IMF's own SDMX 3.0 CPI dataflow**
+  (`IMF.STA/CPI/5.0.0`, the dedicated Consumer Price Index dataset on
+  the SAME api.imf.org host the COFER adapter already rides —
+  gap-closure S6-M6.3). One keyless request per country
+  (`{CC}.CPI._T.YOY_PCH_PA_PT.M`) serves the provider's OWN
+  year-over-year percent-change transformation (never a Currena-derived
+  YoY) with the full monthly history (JPN 849 obs 1956-M01→ · KOR 891
+  obs 1952-M08→ · IND 823 obs 1958-M01→) — exactly the "fresh FRED/IMF
+  IFS series" option the roadmap names (the IMF reorganized the old IFS
+  prices block into the dedicated CPI dataflow; the venue, licence and
+  adapter pattern are the recorded COFER precedent).
+- **Rule 5 verification (all green, 2026-11-10/12):**
+  - **Sandbox venue:** all three URLs answer HTTP 200 `application/json`
+    (~56–61 kB each, ~1.4 s) with fresh monthly tails — JPN through
+    2026-M09, KOR through 2026-M10, IND through 2026-M07.
+  - **Production (Worker) egress venue — the temp-probe pattern
+    (S1-M1.1/S6-M6.3, a throwaway `currena-probe` run through
+    `wrangler dev --remote`, deleted after the read):** all three URLs
+    answer HTTP 200 `application/json`, **byte-identical to the sandbox
+    fetches** (JPN 58,498 B · KOR 61,187 B · IND 56,625 B; the SHA-256
+    of each response's first 4 kB matches the sandbox fetch exactly),
+    ~0.4–1.2 s.
+  - **Second voices (the BD-S14a cross-check publishers):**
+    - **Japan** — the Statistics Bureau's own latest-results page (live
+      read): Sep 2026 all-items **+2.1% YoY** (2025-base, published
+      2026-10-23) vs the IMF's 2.2321% on the pre-revision base — same
+      month, same series lineage; the 0.13pp wedge is the bureau's
+      Aug-2026 2025-base re-weighting (the IMF continues the previous
+      base; its own IX series internally reproduces its YoY exactly:
+      114.5 ÷ 112.0 = +2.232%). Vintage verified CURRENT via the
+      bureau's own release schedule (Sep out Oct 23; Oct out Nov 20 —
+      the mirror carries the freshest print that exists).
+    - **Korea** — the national release itself (2026년 10월
+      소비자물가동향, served via the 국가데이터처 press-release portal;
+      kostat.go.kr's own site is under maintenance): October consumer
+      prices **+2.8% YoY** — the IMF mirror (2.8189% → 2.8%) matches
+      EXACTLY, and it is the freshest print (published ~Nov 1).
+    - **India** — MoSPI's own July 2026 press note (fetched live from
+      mospi.gov.in): all-India CPI **4.45% (Provisional)** vs the IMF's
+      4.4412% → 4.44% — the same number within display rounding. The
+      mirror's India publication lag is MEASURED (the frozen vintage
+      dataflows + today's live read): the IMF ingests India with a
+      T+1..T+3-month lag (today: MoSPI's freshest is Sep 2026 = 5.54%
+      per its own homepage; the IMF carries Jul) — the card's honest
+      maxAge is set accordingly (150 days, labelled in copy) and the
+      India card names the mirror's lag.
+    - **World Bank annual cross-check:** the IMF monthly YoY 2025
+      averages reproduce the World Bank's independently-compiled
+      `FP.CPI.TOTL.ZG` annual figures (recorded live in BD-S14a)
+      EXACTLY — JPN 3.178 vs 3.17 · KOR 2.123 vs 2.12 · IND 2.426 vs
+      2.40.
+- **Options considered:** (A) the national bureaus directly — REJECTED
+  for this session: KOSTAT's own site is under maintenance (only the
+  KOSIS/국가데이터처 portals answer, and KOSIS is a JS portal with no
+  keyless data route); MoSPI serves its numbers through press-note PDFs
+  (no PDF parser in the Worker stack) and a per-month item-level XLSX
+  (7.8 MB, one month per file, unstable timestamped URLs — a fragile
+  multi-file chain for one card); e-stat (Japan's portal) requires an
+  appId. (B) the IMF SDMX 3.0 CPI dataflow (CHOSEN — the
+  already-integrated venue, the provider's own YoY series, full
+  history per fetch, keyless, L1 licence recorded since COFER). (C)
+  the World Bank annual fallback — rejected as the lower-resolution
+  option (annual, not the monthly cadence the spec §15 asks for) now
+  that a verified monthly source exists.
+- **The cadence gates:** Japan rides at T+0 (the mirror carries the
+  bureau's freshest print); Korea at T+0; India at T+1..T+3 — the
+  staleAfterDays are set per country (JP 75 · KR 75 — the monthly
+  convention; IN 150 — the honest mirror-lag grace, labelled in the
+  card copy), and the fetch rides rung2's first-of-month gate + the
+  missing-history bootstrap (3 subrequests on the 1st, ~11 total on
+  the rung — the ceiling arithmetic stays safe).
+- **Who decided:** this session (S23, the pulled-forward S25 fill
+  session) under Rule 5 + the roadmap's recorded source options.
+  **Revisit:** the India mirror's lag — if the IMF's India ingestion
+  ever stalls past the 150-day grace, the card honestly reads stale
+  (the fail-closed design); a later maintenance session may re-check
+  whether the IMF rebases Japan onto the bureau's 2025-base (the
+  0.13pp wedge closes when it does) or whether MoSPI grows a stable
+  keyless machine-readable route.

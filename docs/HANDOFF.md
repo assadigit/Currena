@@ -6,6 +6,19 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **SESSION 23/30 (2026-11-12) — the PULLED-FORWARD reserve session: S25,
+> the §15 Asia CPI fill session (BD-S22). GOAL: land the three D-36 Asia
+> fills (Japan · Korea · India CPI YoY) end to end — the viable monthly
+> source picked + verified (Rule 5, sandbox AND Worker egress, BD-S23a),
+> the full §A ingest discipline (definitions → registry:generate → the
+> AGENTS §A inventory → INDICATORS_AND_DATA_SOURCES.md → the pin tests →
+> CHANGELOG), the three cards rendered on /asia-pacific with the §21 trio
+> + the fa copy through the manifest, pd-s14 extended, the spec-v2 diff
+> grown (recorded, never silent edits), gates ALL GREEN, DEPLOY + live
+> verify. Milestones: M0 setup · M1 source verification (BD-S23a) · M2
+> engine ingest · M3 display layer · M4 spec-v2 diff · M5 gates · M6
+> deploy + live verify + records.**
+
 > **S22 (2026-11-12) — the Phase K collection slot, CLOSED AS A WAITING
 > SLOT · Session 22/30 · 8 remaining (BD-S22).** The external investor's
 > review of spec §19 was NOT yet arranged — verified against every
