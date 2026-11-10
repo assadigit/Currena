@@ -174,9 +174,25 @@ regeneration (`pnpm placement:generate`).
   backtests 715 green · the §21 data audit green after the PortWatch
   Tuesday-maintenance window [BD-S21e's runbook note: never run the
   portwatch leg Tuesdays 11:00–14:00 UTC] · the 24-leg browser
-  regression — **PHASE J CLOSED**) 2026-11-12.**
-  Next: Session 22/30 (S22 — Phase K OPENS: the investor feedback →
-  spec v2). See the roadmap's progress board for the current position.
+  regression — **PHASE J CLOSED**) 2026-11-12.** **S22 (the Phase K
+  collection slot — CLOSED AS A WAITING SLOT 2026-11-12: the investor's
+  review of spec §19 was NOT yet arranged — verified against every
+  record the program can read — so per the owner's standing instruction
+  and the roadmap's reserve rule, NO answers collected · NO D-49+
+  recorded (the strategy log §5 carries the Round-4 PENDING marker) ·
+  NO spec v2 entries produced (AF-1…AF-7 stay parked — the spec
+  untouched, never silent edits) · NO deploy (a records session); the
+  first reserve session — the §15 Asia CPI fill session — is PULLED
+  FORWARD into the Session 23 slot (S23's feedback-build scope
+  deferred, blocked on the investor; BD-S22); the gates re-run ALL
+  GREEN on the records-only tree — the suite 15,102, the S21 count
+  exactly).**
+  Next: Session 23/30 — the pulled-forward reserve session (S25 → the
+  §15 Asia CPI fill session). **The owner's lever: arrange the
+  investor's review of spec §19 (the seven questions) — Phase K's
+  input; the investor round re-opens at the next free slot the moment
+  the answers exist.** See the roadmap's progress board for the current
+  position.
 
 ## The one rule that trumps everything
 
