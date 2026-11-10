@@ -2267,3 +2267,169 @@
   deploy at the close is the owner's standing — expected: none, unless
   something is fixed"). **Revisit:** S21 (the spec-vs-implementation
   audit) may surface fixes; its own session decides its own deploy.
+
+## 2026-11-10 — BD-S21a: the spec-vs-implementation audit (the full §4–§14 diff vs the live site) — the method + the verdict
+
+- **The decision (method):** the S21 diff ran as a four-way parallel code
+  audit (spec §4–§5 Global+Gold · §6–§7 World Markets+USA · §8–§10
+  Europe+Asia+Australia · §11–§13 Commodities+Currencies+Legacy — each
+  checklist item traced to file:line evidence, every recorded BD-S3…S20
+  deviation re-confirmed as holding) + a live production verification of
+  every page's spec-visible structure (the 10 tiles · 37 seats in
+  7/7/11/10/2 lanes · the Asia-Pacific 7-row grid · the 72 USA cards ·
+  the 8+11+28+24+14 cards · the 7 lights + 11 pairs · the deprecation
+  banner — all confirmed on currena.ir) + the §14 placement regeneration
+  (184 ids · 0 unplaced · 0 duplicate homes · 0 unknown · 0 mirror
+  overlaps — reconciles, zero unintentional diff).
+- **The verdict:** the spec is implemented faithfully — 100+ checklist
+  items MATCH or hold as RECORDED deviations (BD-S3a/b/c · BD-S4a/b ·
+  BD-S5a · BD-S6a · BD-S7a/b · BD-S8a/b/c · BD-S9a/b/c · BD-S10a/b/c ·
+  BD-S11a/b/c · BD-S12a/b · BD-S13a/b/c/d · BD-S14a/b · BD-S15a/b/c/d ·
+  BD-S16a/b/c/d · BD-S17a/b/c · BD-S18a/b/c · BD-S19a/b/c/d — every one
+  re-confirmed against the code this session). NEW findings: four fixed
+  (BD-S21b/c/d below) + two spec-side drift findings recorded as AF-6
+  and AF-7 (info class, the AF-2 family) + two informational notes:
+  (i) the Global narrator line renders with a 2-line clamp (the spec
+  sketch's "one line" — BD-S4b's verbatim text + Updated stamp needs
+  the second line; the S4 record's own clamp-tuning history; recorded
+  here, no change), and (ii) the REUSED world map (D-43) shows
+  always-visible per-index Day/Week/Month callout cards with hover for
+  emphasis, not the spec's loose "hover = 1d/1w/1m changes" phrasing —
+  the reuse mandate governs the wording; the substance is delivered
+  permanently, which exceeds hover.
+- **The S20 tools re-used:** the re-runnable data audit (see BD-S21e)
+  and the eleven live pd-* backtests — ALL GREEN, 715 checks (s4 Global
+  84 + the narrator raw-KV stateHash recompute IDENTICAL · s5 Gold 150 ·
+  s7 56 · s8 9 · s9 115 · s10 115+48 · s12 8 · s14 11 · s16 28 · s17
+  24 · s18 14+16+23).
+- **Who decided:** this session (S21) per the roadmap's own scope. No
+  owner input needed (the fixes ride standing decisions; the records
+  ride the established BD pattern).
+
+## 2026-11-10 — BD-S21b: the §9 item 5 NZX50 surface lands on /asia-pacific (the BD-S8b commitment wired at last)
+
+- **The finding:** spec §9 item 5 lists the Pacific—New Zealand section
+  as "nz-short-rate · nz-10y · NZX50" — but the page carried only the
+  two registry cards, and BOTH locales' section intro claimed "The
+  NZX50 rides the Asia zoom map above" (en.ts/fa.ts) while the Asia
+  zoom (BD-S8a's one-drawing region cut over the world board's 16
+  indices) carries only the six world-board Asian indices. NZX50 is not
+  a world-board index — it lives on the AU Markets board (S6-M6.1's
+  NZD rider), whose home is /australia. Verified LIVE on production
+  (the false sentence rendered with 6 zoom cards). BD-S8b had recorded
+  the gap with the commitment "S14/S16 wire that page section —
+  recorded, never silently faked" — never discharged on /asia-pacific
+  (S16 wired the board on /australia instead).
+- **The fix (display-layer ONLY — no engine, no new provider, no KV
+  change):** the new `AsiaNzx50Card` renders the AU Markets board's own
+  nz50 row inside the Pacific—NZ section — the SAME payload through the
+  SAME cached `GET /api/insights/markets-au` route + the SAME
+  `au-markets/shared` formatting helpers the board's own table reads
+  (one board, one vocabulary — D-48), the corpus-pinned name
+  (`pd.australia.boardCopy.entries.nz50` — the same key the AU board
+  copy pins), the close + the window-tagged day change (never a bare
+  percent) + the 52-week range sentence (`pd.worldMarkets.rangeSr`) +
+  the as-of + the stale word when the row is stale, and a REAL link to
+  the board's home `/australia` (spec §3.2: mirrors are links; the
+  BD-S8c zoom-card precedent for board rows). States: the M-17 last-good
+  localStorage paint, the honest "being prepared" line on the dead path
+  (the AU board's own loading/empty discipline), never a fake value.
+- **The §9.6 zoom-map deviation RECORDED (not fixed by design):** the
+  spec's Asia zoom list includes NZX50 — seating it would require a pin
+  on the world map, i.e. NZX50 joining the 16-index world board (a
+  fetch + KV + engine change), which is outside the display-layer-only
+  program (§3.3). The zoom keeps its six world-board Asian indices; the
+  NZX50 surface is the section card.
+- **The copy:** the false sentence replaced in both locales (en: "…
+  plus the S&P/NZX 50 index from the AU Markets board."; fa: «…،
+  به‌همراه شاخص ۵۰ شرکت بزرگ نیوزیلند از تابلوی بازار استرالیا.»); the
+  two new fa strings (nzxPreparing · nzxBoardLink) queued unreviewed
+  (round 57), pacificNz.intro triaged needs-review — copy:audit clean
+  (7,892 entries).
+- **The gates:** AsiaPage +3 tests (the dead-feed fail-closed proof ·
+  the M-17 cached paint · the /australia link navigation) + the
+  Pacific—NZ section assertions extended (the card's full content +
+  the fixed copy asserted in en, the corpus-pinned fa name asserted);
+  the AsiaPage chunk 15,679/4,036 bytes vs its 16,000/6,000 row (held).
+- **Who decided:** this session (S21). **Revisit:** if the owner ever
+  wants NZX50 as a world-board pin (the zoom-map literal reading), that
+  is an engine-layer change with its own session + gates.
+
+## 2026-11-10 — BD-S21c: the Global header's cached path stops doubling the date (BD-S5a's revisit clause discharged)
+
+- **The finding:** BD-S5a (S5) fixed the Gold page's cached header (the
+  fromCache sentence REPLACES the plain data-as-of line — printing both
+  read as a garbled duplicate) and recorded "Global's header keeps the
+  S4 pattern until S19's polish pass aligns it" — but S19/S20 never
+  touched it and no deferral was recorded. GlobalPage.tsx rendered
+  dataAsOf + pricesAsOf + fromCache together on the cached path.
+- **The fix (the two lines BD-S5a promised):** the exclusive pattern —
+  fromCache replaces the data-as-of line; the prices stamp stays (it
+  carries the ribbon's own price time, a different fact from the
+  snapshot date). Pinned by the extended cached-path test (the
+  data-global-cached element + no doubled "Data as of").
+- **Who decided:** this session (S21), executing BD-S5a's own recorded
+  clause.
+
+## 2026-11-10 — BD-S21d: the stale doc notes + comments aligned with the recorded truth (AF-6/AF-7 recorded)
+
+- **The finding (doc drift):** the three Asia placement notes still said
+  the §15 CPI fills "land with S14" — contradicting BD-S14a/BD-S15d
+  (the FRED OECD mirror candidates VERIFIED STALE and discarded; the
+  fills carried forward to a dedicated session). The Europe note had
+  been updated; the Asia notes had not — and the stale text propagated
+  into PLACEMENT.generated.md.
+- **The fix:** the japan/korea-taiwan-hk/india notes now speak the
+  BD-S14a/BD-S15d truth; the pacific-nz note names the AU Markets board
+  (BD-S21b); PLACEMENT.generated.md regenerated (reconciles — 184 · 0
+  · 0; the diff is the intentional notes + the two new findings only).
+- **The spec-side drift recorded (never corrected in the spec):**
+  **AF-6** — spec §6 item 2 lists the Asia grid as 6 indices while its
+  own §6 hero requires 16 (the three grid lists total 15, missing
+  ASX200); the registry is the authority (Asia-Pacific 7 incl. ASX200 ·
+  Europe 4 · Americas 5) and the /world-markets grid renders the
+  registry's 7 under the heading "Asia-Pacific" — verified live. The
+  AF-2 class: recorded, nobody "fixes" the grid to match the typo.
+  **AF-7** — spec §10 says "19 symbols: … 10 ASX-200 sectors …" but
+  2+10+4+1+1 = 18 ≠ its own 19; the board carries ELEVEN GICS sector
+  rows and totals 19 ✓ — the "10" is a spec typo; the code is right.
+  Both added to PLACEMENT_AUDIT_FINDINGS + the doc + the test pin
+  (AF-1…AF-7).
+- **The stale comments fixed:** GlobalBoard.tsx (BD-S3c's 2-col mobile
+  vs the header's "1-col stack"; BD-S4a's LANDED change1d vs the
+  ribbon comments' "not part of the projection contract" transitional
+  note), asia-tiles.ts + AsiaTierCards.tsx + world-map-config.ts (the
+  NZX50 wiring notes). Zero behavior change — a future auditor reading
+  the headers alone would no longer mis-conclude.
+- **Who decided:** this session (S21). **Revisit:** the spec itself is
+  never edited silently — AF-6/AF-7 wait for the investor-review spec
+  v2 pass (S22+) alongside AF-1…AF-5.
+
+## 2026-11-10 — BD-S21e: the §21 data audit's one RED — the PortWatch Tuesday maintenance window (recorded, explained; the re-run closes it)
+
+- **The finding:** the S20 data-audit tool's re-run (the frozen
+  seed-20261112 N=20 sample) returned 19/20 green (18 byte-exact +
+  platinum's live-spot arm) and ONE red: chokepoint-malacca — "the
+  PortWatch collection carried no chokepoint-malacca series". The
+  probes: the IMF's ArcGIS FeatureServer (services9 …/Daily_
+  Chokepoints_Data/FeatureServer/0) answered **499 Token Required**
+  to EVERYTHING from this venue (metadata, bare query, the filtered
+  query) at 11:38–11:50 UTC.
+- **The root cause (the provider's own banner, live on portwatch.imf.org
+  during the probes):** "Scheduled Maintenance: Every Tuesday from
+  6:00 AM to 9:00 AM (ET), Daily Ports and Daily Chokepoints Data will
+  be temporarily unavailable while we perform routine data updates."
+  2026-11-10 is a Tuesday; 11:38–11:50 UTC = 6:38–6:50 AM ET — inside
+  the window. The S20 green run (04:07 UTC = Monday 23:07 ET) sat
+  before it. NOT a policy change, NOT a data error, NOT a code defect.
+- **The disposition:** the re-run after the window closes (≥ 14:00 UTC)
+  is the audit's own gate — this session re-ran it and records the
+  result (see the delivery record). The stored production values (all
+  five chokepoints, asOf 2026-11-01 — the provider's own ~7-day
+  publication lag, status context, WITHIN the 14-day maxAge grace) are
+  the last-good verified copy; the fail-closed design + the engine's
+  own stale status govern any future gap. **Operational note for every
+  future §21 data audit: never run the portwatch leg Tuesdays
+  11:00–14:00 UTC** (the maintenance window).
+- **Who decided:** this session (S21). **Revisit:** none (the window is
+  the provider's own schedule; the runbook note above is the fix).
