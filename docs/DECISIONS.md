@@ -1832,3 +1832,49 @@
   next push will hit a non-fast-forward rejection; it must rebase onto
   `9e08455` and adopt the deployed `pacificLink` implementation, or stop.
   The owner should check how two S18 sessions were launched.**
+
+## 2026-11-12 — BD-S18-parallel-2: the second session's counterpart close — the duplicate S18 session reconciled onto the deployed tree and INDEPENDENTLY re-verified it (its own gates run + its own live §21 run + its own 4-leg browser pass, ALL GREEN); no re-deploy, no code change
+
+- **Event (the counterpart of BD-S18-parallel, from the second session's
+  side):** the duplicate S18 session (this one) had pushed M1a (`4fea60a`
+  — the AUDNZD engine leg, the `auLink` variant), M1b (`59b0388` — the
+  tiles + copy + pins) and M2 (`2f1e0f1` — an alternative page build)
+  before discovering — mid-M3, on a non-fast-forward push — that a
+  parallel session had already completed S18 whole (its own M1→M3, gates
+  ALL GREEN 15,088, BOTH workers deployed `51a0fe45`/`8f63c8fa`, the
+  fx-run KV seed, the records) and had merged this session's commits
+  with every conflict resolved to the deployed `pacificLink`
+  implementation (BD-S18-parallel). Its own M3 commit (the §21 backtest
+  core + a 16-test offline suite + a live pd-s18-backtest variant + a
+  9-test render audit — sha `966c42b`, superseded and dropped from the
+  branch; preserved in the reflog) duplicated the shipped artifacts and
+  was NOT pushed.
+- **Resolution:** the deployed-state rule, honoured from the other side:
+  `git reset --hard origin/main` (the merged `1941197`) — no force-push,
+  no history rewrite, no re-deploy (the deployed workers already carry
+  the merged tree's exact engine code). The session then INDEPENDENTLY
+  verified the shipped S18 rather than re-shipping its duplicate:
+  (1) the FULL GATES re-run on the merged tree by this session — ALL
+  GREEN in 2m 40s (secret scan 8/1014 · tsc 6/6 · eslint 0/0 ·
+  copy:audit clean · narrator in sync + eval 50 · layer1 11,819/11,819 ·
+  the suite 15,088 · build + budgets held, entry 271.02/82.05);
+  (2) the CANONICAL live pd-s18-backtest.ts re-run against production —
+  ALL CHECKS GREEN (cards 14/14 · the rules gate · the board gate 23/23
+  with audnzd live at rate 1.22827/moveRank 60.39 · freshness 14 within
+  grace); (3) the 4-leg browser pass re-run (1440×900 + 360×844, en +
+  fa): the h1 'Currency Pairs'/«جفت‌ارزها», the 7 rule lights, the 11
+  pair rows (audnzd last), the 14 §21-trio cards, the In-build chip
+  ABSENT on all four legs, 0px horizontal overflow, ZERO console/page
+  errors; (4) the cross-surfaces: the legacy /insights fx table now
+  honestly renders the FOURTH group "Australia–New Zealand" with the
+  audnzd row (verified live, zero errors), and the /australia seat chips
+  resolve to the real /currencies page.
+- **Who decided:** this session, under the same deployed-state rule the
+  first session applied (production truth; a second implementation
+  shipping over a live, gated, verified one buys nothing but risk).
+- **Revisit:** the OWNER post-mortem stands (BD-S18-parallel's own
+  question): how were two S18 sessions launched from one prompt? No
+  production collision occurred (the first session's deploy completed
+  before this session's first push landed; this session never deployed).
+  The owner should ensure S19+ launches exactly ONE session per roadmap
+  slot.

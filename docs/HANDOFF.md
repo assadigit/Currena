@@ -162,21 +162,24 @@ the new cards.** Their absence does not make the 11 placed Asia cards
    and flagged stale by the fail-closed design): they should self-clear
    at the next ingest rung; if they persist across runs, they belong to
    a maintenance session.
-9. **THE PARALLEL S18 SESSION (BD-S18-parallel — read this before
-   anything else):** a SECOND agent session committed its own S18
-   milestones (M1a/M1b/M2 — the `auLink` variant, an alternative page
-   build) to origin/main WHILE this session ran. This session had
-   already passed all gates and DEPLOYED both workers, so every merge
-   conflict was resolved to THIS session's deployed implementation
-   (`pacificLink`, the live `51a0fe45`/`8f63c8fa` truth); their
-   non-conflicting contributions were kept and their orphan component
-   removed (their content stays in their commits `4fea60a`/`59b0388`/
-   `2f1e0f1`). main is now the merged tree `9e08455` (byte-identical to
-   the gated ALL-GREEN HEAD). If that parallel session is STILL running,
-   its next push will be rejected (non-fast-forward) — the owner should
-   check how two S18 sessions were launched, and stop the duplicate if
-   it is still active; a still-running duplicate must NOT deploy (its
-   tree differs from production's).
+9. **THE PARALLEL S18 SESSION (BD-S18-parallel + BD-S18-parallel-2 —
+   RESOLVED, both sessions closed):** a SECOND agent session committed
+   its own S18 milestones (M1a/M1b/M2 — the `auLink` variant, an
+   alternative page build) to origin/main WHILE the primary session ran.
+   The primary session had already passed all gates and DEPLOYED both
+   workers, so every merge conflict was resolved to its deployed
+   implementation (`pacificLink`, the live `51a0fe45`/`8f63c8fa` truth);
+   the duplicate's non-conflicting contributions were kept and its orphan
+   component removed (its content stays in its commits `4fea60a`/
+   `59b0388`/`2f1e0f1`). **The duplicate session then closed honestly
+   (BD-S18-parallel-2): it aligned to the merged `1941197`, dropped its
+   superseded M3 commit, and INDEPENDENTLY re-verified the shipped S18
+   (its own full-gates run ALL GREEN 15,088 · its own live pd-s18 run
+   ALL GREEN · its own 4-leg browser pass green · the legacy /insights
+   fourth-group + /australia chips verified). No re-deploy, no code
+   change; the two records together are the complete story.** The
+   owner-side post-mortem: how were two S18 sessions launched from one
+   prompt? Ensure S19+ launches exactly ONE session per roadmap slot.
 
 ## Known state worth knowing
 
