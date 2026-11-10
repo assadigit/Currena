@@ -36,6 +36,23 @@
 > PRE-EXISTING FRED edge-lag, verified against the source), fixed
 > through the pipeline's own lever (a workflow_dispatch ingest run
 > refreshed them to 2026-11-06).
+>
+> **THE THIRD S18 ARRIVAL (2026-11-12, BD-S18-parallel-3 — resolved the
+> same session):** a third session from the same prompt, resumed from
+> the first duplicate's interrupted local checkpoints, built a
+> duplicate M2 against a stale view and discovered the close only on
+> its rejected push. It preserved its duplicate on
+> `archive/s18-duplicate-m2`, reset onto the deployed `52a378b`, landed
+> its one unique salvage (`1fc94e0` — the local-seed NZD fixture line,
+> dev harness only), and INDEPENDENTLY re-verified the shipped S18 a
+> third time: its own gates run ALL GREEN 15,088 (2m 38s) · its own
+> live pd-s18-backtest ALL CHECKS GREEN (cards 14/14 · rules 16/16 ·
+> board 23/23 with audnzd at moveRank 60.39 · freshness 14 within
+> grace) · its own 4-leg browser pass green (chip ABSENT, 0px overflow,
+> ZERO errors, «۱٫۲۲۸۳ دلار نیوزیلند» live) · the legacy fourth-group +
+> /australia seat chips verified. No re-deploy, no shipped-code change.
+> The session's own standing note: launch exactly ONE session per
+> roadmap slot — S19 first, then wait for its hand-off.
 
 ## Current state (2026-11-11, after page-division S18)
 
@@ -162,10 +179,11 @@ the new cards.** Their absence does not make the 11 placed Asia cards
    and flagged stale by the fail-closed design): they should self-clear
    at the next ingest rung; if they persist across runs, they belong to
    a maintenance session.
-9. **THE PARALLEL S18 SESSION (BD-S18-parallel + BD-S18-parallel-2 —
-   RESOLVED, both sessions closed):** a SECOND agent session committed
-   its own S18 milestones (M1a/M1b/M2 — the `auLink` variant, an
-   alternative page build) to origin/main WHILE the primary session ran.
+9. **THE PARALLEL S18 SESSIONS (BD-S18-parallel + BD-S18-parallel-2 +
+   BD-S18-parallel-3 — RESOLVED, all three sessions closed):** a SECOND
+   agent session committed its own S18 milestones (M1a/M1b/M2 — the
+   `auLink` variant, an alternative page build) to origin/main WHILE the
+   primary session ran.
    The primary session had already passed all gates and DEPLOYED both
    workers, so every merge conflict was resolved to its deployed
    implementation (`pacificLink`, the live `51a0fe45`/`8f63c8fa` truth);
@@ -177,9 +195,22 @@ the new cards.** Their absence does not make the 11 placed Asia cards
    (its own full-gates run ALL GREEN 15,088 · its own live pd-s18 run
    ALL GREEN · its own 4-leg browser pass green · the legacy /insights
    fourth-group + /australia chips verified). No re-deploy, no code
-   change; the two records together are the complete story.** The
-   owner-side post-mortem: how were two S18 sessions launched from one
-   prompt? Ensure S19+ launches exactly ONE session per roadmap slot.
+   change; the two records together are the complete story.** A THIRD
+   session then arrived from the same prompt (resumed from the first
+   duplicate's interrupted local checkpoints, unaware of the close until
+   its own push was rejected): it too honoured the deployed-state rule
+   (BD-S18-parallel-3) — its duplicate M2 preserved on the pushed branch
+   `archive/s18-duplicate-m2`, main reset to `52a378b`, its ONE unique
+   salvage landed (`1fc94e0` — the local-seed NZD fixture line, dev
+   harness only), and the shipped S18 independently re-verified a third
+   time (its own gates run ALL GREEN 15,088 · its own live pd-s18 run
+   ALL GREEN · its own 4-leg browser pass green · the cross-surfaces
+   verified). No re-deploy, no shipped-code change.
+   The owner-side post-mortem: THREE S18 sessions were launched from one
+   prompt (the primary + two duplicates; zero production collisions —
+   neither duplicate ever deployed or pushed to main). Ensure S19+
+   launches exactly ONE session per roadmap slot — launch S19 first, then
+   wait for its hand-off before any further session.
 
 ## Known state worth knowing
 

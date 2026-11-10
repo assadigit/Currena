@@ -1878,3 +1878,62 @@
   before this session's first push landed; this session never deployed).
   The owner should ensure S19+ launches exactly ONE session per roadmap
   slot.
+
+## 2026-11-12 — BD-S18-parallel-3: the THIRD S18 session's counterpart close — a late duplicate (resumed from the interrupted session's local M1a/M1b, its M2 built against a stale view) reconciled onto the deployed tree; its duplicate page build preserved on `archive/s18-duplicate-m2`, its one unique salvage (the local-seed NZD fixture) landed, and the shipped S18 INDEPENDENTLY re-verified once more (gates + live §21 + the 4-leg browser pass, ALL GREEN); no re-deploy, no shipped-code change
+
+- **Event (the third arrival, from its own side):** a third S18 session
+  started from the same standing prompt. Its sandbox carried the
+  INTERRUPTED first duplicate session's local checkpoints (M1a `4fea60a`
+  + M1b `59b0388` — already merged into origin/main at `c28b930`,
+  resolved to the deployed `pacificLink` implementation) and a clean
+  `git status`, so the session read the tree as "M1 done, M2/M3 to
+  build" and built its OWN M2 (a3eb390: a `CurrenciesFxSections`
+  hero+board variant + its own copy keys + budget rows + a
+  PagePlaceholder/DestinationBody retirement). Only its first `git
+  push` — rejected as non-fast-forward — revealed that origin/main had
+  meanwhile closed S18 whole (the primary's deploy `51a0fe45`/
+  `8f63c8fa` + the first duplicate's reconciliation,
+  BD-S18-parallel/-2, HEAD `52a378b`). No push of the duplicate ever
+  landed on main.
+- **Resolution (the deployed-state rule, honoured a third time):** the
+  duplicate M2 was preserved on the pushed branch
+  `archive/s18-duplicate-m2` (nothing lost, nothing merged), local main
+  was reset to `origin/main` (`52a378b`) — no force-push, no history
+  rewrite — and the tree diffed line-by-line against the duplicate:
+  everything the duplicate's page carried already ships richer in the
+  deployed build (their per-rule outcome-specific headline sentences,
+  the reliability line + the §6.7 progress bar, `thPair`, the ECB
+  `boardFooter`, the calm empty line, their own 24/6.5 budget row; the
+  remote kept PagePlaceholder/DestinationBody with
+  `DESTINATION_ROUTES` empty — their documented choice). ONE unique
+  contribution survived the diff and landed as `1fc94e0`: the
+  `scripts/local-seed-fixtures.ts` NZD line (dev-harness only — without
+  it a locally seeded fx snapshot carries 10 pairs, V4/V7 holds the
+  audnzd row out, so a local /currencies render can never exercise the
+  11th pair; verified: the harness now writes 11 pairs).
+- **The independent re-verification (this session's own, all green):**
+  (1) the FULL GATES on the reconciled tree — ALL GREEN in 2m 38s
+  (secret scan 8/1014 · tsc 6/6 · eslint 0/0 · copy:audit clean ·
+  narrator in sync + eval 50 · layer1 11,819/11,819 · the suite 15,088 ·
+  build + budgets held, entry 271.02/82.05, the CurrenciesPage chunk
+  21.09/5.33); (2) the CANONICAL live `pd-s18-backtest.ts` vs
+  production — ALL CHECKS GREEN (cards 14/14 · the rules gate 16/16 ·
+  the board gate 23/23 with audnzd live at moveRank 60.39 · freshness
+  14 within grace); (3) the 4-leg browser pass (1440×900 + 360×844,
+  en + fa): h1 'Currency Pairs'/«جفت‌ارزها» · the 7 rule lights (the
+  live r5 watch «نشانهٔ اولیهٔ نگرانی از چین») · the 11 pair rows
+  (audnzd last, rate 1.2283 / «۱٫۲۲۸۳ دلار نیوزیلند») · the 14
+  §21-trio cards («۵۰٫۱۴ لیر ترکیه» · «۵۶٫۷۰٪») · the In-build chip
+  ABSENT on all four legs · 0px overflow · ZERO console/page errors;
+  (4) the cross-surfaces: the legacy /insights fx table's fourth group
+  "Australia–New Zealand (1)" with the audnzd row, and the /australia
+  seat chips (audusd · audjpy · audnzd) resolving to the real page.
+- **Who decided:** this session, under the deployed-state rule (the
+  production truth stands; a third implementation over a live, gated,
+  twice-verified one buys nothing but risk).
+- **Revisit:** the owner post-mortem now covers THREE S18 sessions
+  launched from one prompt (the primary + two duplicates; zero
+  production collisions — neither duplicate ever deployed or pushed to
+  main). The standing instruction hardens: **launch exactly ONE
+  session per roadmap slot — S19 first, then wait for its hand-off
+  before any further session.**
