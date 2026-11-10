@@ -32,11 +32,13 @@
  *     are the designed fallbacks, so a missing fx feed can never break
  *     the page; a page request can never reach a provider).
  *
- * The honest "In build" chip rides the BUILD phase and RETIRES at the S18
- * gates pass (the S16/S17 one-session trajectory): once the §21 diff, the
- * freshness audit, the render audit and the browser pass are green, the
- * chip comes off before the deploy and the render audit asserts it
- * ABSENT.
+ * The honest "In build" chip is RETIRED at the S18 gates pass (the
+ * S16/S17 one-session trajectory): the build and the gates ship in this
+ * one session (the roadmap's Phase I is a single S18), so once the §21
+ * diff, the freshness audit, the render audit and the browser pass are
+ * green, keeping the chip would be dishonest in the other direction
+ * (BD-S16c/BD-S17c's reasoning); it is removed before the deploy and
+ * the render audit asserts it ABSENT.
  *
  * Platform: browser only — this module lives in the lazy Currencies route
  * chunk, never the entry graph.
@@ -221,15 +223,14 @@ export function CurrenciesPage(): React.JSX.Element {
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.currencies.title')}</h1>
-          {/* The honest In-build chip (the BUILD phase — the §21 diff, the
-           * freshness audit, the render audit and the browser pass have
-           * not yet run at this checkpoint). It RETIRES at the S18 gates
-           * pass (the S16/S17 one-session trajectory mirrored). The
-           * pd.statusBuilding key is the PagePlaceholder's own (the
-           * build-session chip every later session retires). */}
-          <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-200">
-            {t('pd.statusBuilding')}
-          </span>
+          {/* The In-build chip is RETIRED (the S18 gates pass: the §21
+           * diff 14/14 cards + rules 16/16 green vs production, the
+           * freshness audit honest, the render audit green, the browser
+           * pass green). The page's cards and board are complete and
+           * verified; no honest "in build" claim remains. The
+           * pd.statusBuilding key stays for any future not-yet-built
+           * destination (PagePlaceholder — no route today). Mirrors the
+           * S13/S15/S16/S17 retirement trajectory (BD-S16c/BD-S17c). */}
         </div>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.currencies.purpose')}
