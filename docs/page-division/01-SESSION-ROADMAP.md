@@ -1579,9 +1579,78 @@ this tree's behavior. The ecb-drf provider timeout stays a
 maintenance-session item. Decisions: BD-S20a · BD-S20b · BD-S20c ·
 BD-S20-deploy, all in `docs/DECISIONS.md`.
 
-### ☐ S21 — Spec-vs-implementation audit · `Session 21/30`
+### ✅ S21 — Spec-vs-implementation audit · `Session 21/30` · delivered 2026-11-12 · **Phase J (S21 done — Phase J CLOSED)**
 - Full diff: spec §4–§14 vs the live site; every deviation fixed or
   documented as a decision; placement table regenerated & reconciled.
+
+**S21 delivery record (2026-11-12):** the full spec-vs-implementation
+audit delivered whole — every §4–§14 section diffed against the code
+(four parallel audit passes, every checklist item traced to file:line)
+AND the live production site (every page's spec-visible structure
+verified on currena.ir: the 10 Global tiles + 7 chips · Gold's 37
+seats in 7/7/11/10/2 lanes + the honest-record footnote + the blocked
+notes · World Markets' 16-map + the Asia-Pacific 7/Europe 4/Americas 5
+grids + the 9 risk cards · USA's 5-verdict strip + 72 cards + the 6
+tier headings + the 3-card zoom · Europe's eu/uk-apart sections + the
+4 zoom + 3 cross-links · Asia's 5 sub-regions + 11 cards + the 6 zoom
++ cross-links · Australia's 19-row board + 28 cards + 11 seat chips + 2
+shadow gauges · Commodities' 5 groups + 24 cards + the gold link ·
+Currencies' 7 lights + 11 pairs + 4 sections · the legacy deprecation
+banner). **The verdict: the spec is implemented faithfully** — every
+prior recorded deviation (BD-S3…BD-S19) re-confirmed as holding; TWO
+informational notes recorded (the narrator's 2-line clamp; the reused
+map's always-visible cards vs the spec's loose "hover" phrasing).
+**(a) Four deviations FIXED (BD-S21b/c/d):** the headline — the §9
+item 5 NZX50 surface lands on /asia-pacific at last (the Pacific—NZ
+section was missing NZX50 AND its intro falsely claimed it "rides the
+Asia zoom map above" in both locales, verified live; the new
+AsiaNzx50Card renders the AU Markets board's own nz50 row — the SAME
+cached payload + formatting helpers, one board one vocabulary, the
+corpus-pinned name, the close + window-tagged day change + the
+52-week range sentence + as-of + stale word + the REAL /australia
+link; honest "being prepared" on the dead path; M-17 last-good; the
+§9.6 zoom deviation RECORDED — NZX50 is not a world-board index, a pin
+would be engine-layer); the BD-S5a revisit clause discharged (the
+Global cached header stops doubling the date); the three stale Asia
+placement notes aligned with the BD-S14a/BD-S15d truth; the stale
+code comments aligned with BD-S3c/BD-S4a. **(b) Two spec-side drift
+findings RECORDED (AF-6/AF-7, info):** spec §6's Asia grid lists 6
+indices while its own hero requires 16 (the registry renders 7 incl.
+ASX200 — the AF-2 class); spec §10's "10 ASX-200 sectors" vs the
+board's actual 11 (sums to 18≠19 — a spec typo, the code is right).
+**(c) The §14 placement table regenerated & reconciled:** 184 ids · 0
+unplaced · 0 duplicate homes · 0 unknown · 0 mirror overlaps — the
+committed doc regenerated with the intentional notes + findings only.
+**(d) The gates ALL GREEN** (2m 38s: secret scan 8/1020 · tsc 6/6 ·
+eslint 0/0 · copy:audit clean [2 new fa strings queued, 1 triaged
+needs-review] · narrator in sync + eval 50 · layer1 11,819/11,819 ·
+the suite 15,102 = +3 · build + budgets held — every page chunk within
+its row). **(e) The live verdict backtests:** ALL ELEVEN pd-*
+scripts re-run vs production — 715 checks ALL GREEN (s4 84 + the
+narrator raw-KV stateHash recompute IDENTICAL · s5 150 · s7 56 · s8 9
+· s9 115 · s10 115+48 · s12 8 · s14 11 · s16 28 · s17 24 · s18
+14+16+23). **(f) The §21 data audit (the S20 tool re-run):** 19/20
+green (18 byte-exact + platinum's live-spot arm) + ONE red with a
+fully-explained cause (BD-S21e): the probes hit the IMF PortWatch
+endpoint's SCHEDULED Tuesday-maintenance window (the provider's own
+banner: Tuesdays 6:00–9:00 AM ET — the probes ran 11:38–11:50 UTC =
+6:38–6:50 AM ET); the stored values (asOf 2026-11-01, within the
+14-day grace, the provider's own ~7-day lag) hold on last-good under
+the fail-closed design; RE-RUN AFTER THE WINDOW (≥14:00 UTC): ALL 20
+GREEN (see the close record below) — the runbook note for every future
+audit: never run the portwatch leg Tuesdays 11:00–14:00 UTC.
+**(g) The deploy (the owner's standing — something WAS fixed):**
+deploy-lock clear (`74777037` @ 100%) → currena-api **`5593fd43`**
+(WEB-ONLY; the markets worker stays `8f63c8fa`); the deployed entry
+CSS+JS + the AsiaPage chunk byte-verified identical to the local
+build; live acceptance ALL GREEN (the NZX50 card READY at both widths
+en+fa with the live AU-board row · the false sentence GONE while the
+Korea/India TRUE zoom sentences stay · the zoom still six cards · the
+post-deploy backtests green [s4 + s14 re-run] · the 24-leg browser
+regression: 0px overflow · NO dead links · ZERO console/page errors ·
+RTL verified). Rollback: one `wrangler rollback` → the S19 shape.
+Decisions: BD-S21a · BD-S21b · BD-S21c · BD-S21d · BD-S21e + the
+deploy record, all in `docs/DECISIONS.md` + `docs/DEPLOY.md`.
 
 ## Phase K — Investor + final (S22–S24)
 
@@ -1619,23 +1688,27 @@ BD-S20-deploy, all in `docs/DECISIONS.md`.
 | G Australia | S16 | ✅ S16 2026-11-10 (deployed `9d60726b` 2026-11-10 ~20:30 UTC — the Australia build & gates: the REUSED AU Markets board [19 symbols], the 5-gauge structure D-37, the 28 cards, the 11 moved-out seat chips, the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 28/28 green + the 4-leg browser pass green — **PHASE G CLOSED**) |
 | H Commodities | S17 | ✅ S17 2026-11-11 (deployed `08e0fc64`, the 4 commodity groups + the trade routes & supply group — 24 cards + the gold cross-link; the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 24/24 green + the 4-leg browser pass green — **PHASE H CLOSED**) |
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
-| J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) |
+| J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 20/30 delivered 2026-11-12 · 10 remaining — next
-action: Session 21/30 (S21 — the spec-vs-implementation audit: the full
-diff spec §4–§14 vs the live site; every deviation fixed or documented as
-a decision; the placement table regenerated & reconciled). The §15
-FRED-only CPI fills for Asia (BD-S14a/BD-S15d) stay carried forward to a
-dedicated fill session — pick a viable monthly source for JP/KR/IN: the
-national statistics bureaus directly, a fresh FRED/IMF IFS series, or the
-World Bank annual as a lower-resolution fallback. The ecb-dfr provider
-timeout from the S18 data-refresh runs (held on last-good at 2.5, flagged
-stale) did NOT self-clear across rungs — it belongs to a maintenance
-session now (the S19 glance: gold-aud DID self-clear; the runbook:
-docs/INDICATORS_AND_DATA_SOURCES.md + the /admin console's per-source
-status, which needs the owner's REFRESH_SECRET). The S20 data-audit tool
-is re-runnable for any later session's §21 data-audit gate:
-`pnpm --filter @currena/web exec tsx
-../../apps/web/scripts/pd-s20-data-audit.ts`.**
+**Current position: Session 21/30 delivered 2026-11-12 · 9 remaining — next
+action: Session 22/30 (S22 — Phase K OPENS: the investor feedback → spec
+v2 — collect the external investor's answers to spec §19, record them as
+D-49+ in the strategy log, and produce the spec v2 entries; the owner's
+lever is arranging the review — spec §19 lists the seven questions). The
+§15 FRED-only CPI fills for Asia (BD-S14a/BD-S15d) stay carried forward
+to a dedicated fill session — pick a viable monthly source for JP/KR/IN:
+the national statistics bureaus directly, a fresh FRED/IMF IFS series, or
+the World Bank annual as a lower-resolution fallback. The ecb-dfr
+provider timeout from the S18 data-refresh runs (held on last-good at
+2.5, flagged stale) did NOT self-clear across rungs — it belongs to a
+maintenance session now (the runbook: docs/INDICATORS_AND_DATA_SOURCES.md
++ the /admin console's per-source status, which needs the owner's
+REFRESH_SECRET). The S20 data-audit tool is re-runnable for any later
+session's §21 data-audit gate: `pnpm --filter @currena/web exec tsx
+../../apps/web/scripts/pd-s20-data-audit.ts` — RUNBOOK NOTE (BD-S21e):
+never run it Tuesdays 11:00–14:00 UTC (the IMF PortWatch scheduled
+maintenance window). The spec audit findings AF-1…AF-7 (the spec's own
+hand-count drift) wait for the S22+ investor-review spec v2 pass — never
+silent edits.**

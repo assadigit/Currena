@@ -162,8 +162,21 @@ regeneration (`pnpm placement:generate`).
   performance check [COLD 380ms/485KB · WARM 59–81ms — no budget
   breach]; NO deploy — nothing was fixed, the tree changes are dev
   tooling only, production stays at `74777037`/`8f63c8fa`) 2026-11-12.**
-  Next: Session 21/30 (S21 — the spec-vs-implementation audit). See the
-  roadmap's progress board for the current position.
+  **S21 (the spec-vs-implementation audit — the full §4–§14 diff vs the
+  live site: every prior recorded deviation re-confirmed as holding ·
+  FOUR deviations FIXED and DEPLOYED as currena-api `5593fd43`
+  [WEB-ONLY — the NZX50 mirror card on /asia-pacific's Pacific—NZ
+  section replacing the false both-locale "rides the Asia zoom map"
+  sentence + the Global cached-header BD-S5a alignment + the stale Asia
+  placement notes + the stale comments] · two spec-side drift findings
+  recorded as AF-6/AF-7 · the §14 placement table regenerated &
+  reconciled [184 · 0 · 0] · the gates 15,102 · the 11 live pd-*
+  backtests 715 green · the §21 data audit green after the PortWatch
+  Tuesday-maintenance window [BD-S21e's runbook note: never run the
+  portwatch leg Tuesdays 11:00–14:00 UTC] · the 24-leg browser
+  regression — **PHASE J CLOSED**) 2026-11-12.**
+  Next: Session 22/30 (S22 — Phase K OPENS: the investor feedback →
+  spec v2). See the roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

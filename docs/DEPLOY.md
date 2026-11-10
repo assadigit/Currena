@@ -132,6 +132,78 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-12 the page-division S21 deploy (the spec-vs-implementation audit's fixes — the NZX50 mirror card on /asia-pacific + the Global cached-header alignment + the honest copy, live for every visitor)
+
+**Scope (page-division S21, Phase J continues):** display-layer ONLY —
+the web SPA, its dictionaries, and the placement module's doc strings.
+NO engine change, NO API-code change, NO wire-contract change, NO
+markets-worker change (currena-markets stays at `8f63c8fa`). The
+shipped surface: (a) the §9 item 5 NZX50 leg — the new
+`AsiaNzx50Card` renders the AU Markets board's own nz50 row inside the
+Pacific—New Zealand section on /asia-pacific (the SAME cached
+`GET /api/insights/markets-au` payload + the SAME
+`au-markets/shared` formatting helpers — one board, one vocabulary;
+the corpus-pinned name, the close, the window-tagged day change, the
+52-week range sentence, the as-of + stale word, and a REAL link to the
+board's home /australia; the honest "being prepared" line on the dead
+path; the M-17 last-good paint — BD-S21b), replacing the FALSE
+both-locale intro sentence that claimed NZX50 "rides the Asia zoom map
+above" (the zoom carries only the six world-board Asian indices —
+verified live before the fix); (b) the Global header's cached path no
+longer doubles the date (BD-S5a's revisit clause discharged — the
+fromCache sentence REPLACES the plain data-as-of line; the prices
+stamp stays — BD-S21c); (c) the placement doc notes aligned with the
+BD-S14a/BD-S15d truth + AF-6/AF-7 recorded (BD-S21d) — the notes ride
+the bundle but change zero runtime behavior.
+
+**Gates before the deploy (ALL GREEN, 2m 38s):** secret scan 8/1020 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean (the 2 new fa strings —
+pd.asiaPacific.nzxPreparing · nzxBoardLink — queued unreviewed;
+pacificNz.intro triaged needs-review) · narrator in sync + eval 50 ·
+layer1 11,819/11,819 · the full suite **15,102 = +3** (the three new
+NZX50 card tests: the dead-feed fail-closed proof · the M-17 cached
+paint · the /australia link navigation; plus the extended Pacific—NZ +
+Global cached-path assertions) · build + budgets held — entry
+272.88/82.55, every page chunk within its row (the AsiaPage chunk
+15,679/4,036 vs its 16,000/6,000 row).
+
+**The deploy (the owner's standing — something WAS fixed):** the
+deploy-lock check ran first (S19's `74777037` @ 100%, no parallel
+deploy); `pnpm --filter @currena/web build` +
+`pnpm --filter @currena/api exec wrangler deploy` → **currena-api
+`5593fd43`** (the S21 SPA; the markets worker untouched by the
+code-unchanged convention).
+
+**Live acceptance (all green on currena.ir):** the NZX50 card renders
+READY with the live AU-board row (S&P/NZX 50 · 14,167.41 · +1.3% 1d ·
+100 percent of its 52-week range · Data as of Nov 10, 2026 · the
+board link → /australia) — verified at BOTH widths, en + fa (the fa
+card: «شاخص ۵۰ شرکت بزرگ نیوزیلند | ۱۴٬۱۶۷٫۴۱ | +۱٫۳٪ ۱ روز | طی روز
+گذشته | ۱۰۰ درصد از دامنهٔ یک‌ساله خود») · the false sentence GONE
+(both locales) while the Korea/India sections' TRUE "ride the Asia
+zoom map" sentences stay · the zoom still seats its six world-board
+cards · the Global fresh header shows the exclusive pattern (the
+cached path is test-pinned) · the deployed entry CSS+JS and the
+AsiaPage chunk **byte-verified identical** to the local build · the
+post-deploy live backtests re-run green (pd-s4 Global 84/84 · pd-s14
+Asia 11/11 — the data layer unchanged) · the browser regression: 24
+legs (all 10 routes × 1440×900 + 360×844 in en + the two changed
+routes × both widths in fa) — 0px horizontal overflow on every leg ·
+NO dead links · ZERO console/page errors · RTL + Persian titles on the
+fa legs.
+
+**Rollback:** one `npx wrangler rollback` from apps/api — every
+surface returns to the S19 shape (`74777037`); nothing else moves
+(the change is display-layer only).
+
+**The session's one RED, resolved as a recorded finding:** the §21
+data-audit re-run hit the IMF PortWatch endpoint's SCHEDULED
+Tuesday-maintenance window (the provider's own banner: "Every Tuesday
+from 6:00 AM to 9:00 AM (ET), Daily Ports and Daily Chokepoints Data
+will be temporarily unavailable") — chokepoint-malacca unverifiable
+at probe time, re-run after the window (BD-S21e; the runbook note:
+never run the portwatch leg Tuesdays 11:00–14:00 UTC).
+
 ## Session record — 2026-11-12 the page-division S19 deploy (the Navigation, mobile & SEO polish — Phase J opens; the breadcrumbs + the per-page meta/OG tags + the language-toggle polish + the sticky-footer verification live for every visitor on every page)
 
 **Scope (page-division S19, Phase J opens):** display-layer ONLY — the
