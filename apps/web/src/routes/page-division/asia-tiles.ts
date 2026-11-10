@@ -31,9 +31,10 @@
  *     India CPI fill (D-36) is verified-pending-ingest. Same honest
  *     index-only note.
  *   - The Pacific — New Zealand section (D-17, §9 item 5): the
- *     placement's `pacific-nz` group — nz-short-rate · nz-10y. NZX50
- *     rides the markets board (the Asia zoom map — the S8 section the
- *     page seats under its own layers).
+ *     placement's `pacific-nz` group — nz-short-rate · nz-10y — plus
+ *     the NZX50 mirror card (S21, BD-S21b: NZX50 is NOT a world-board
+ *     index, so it cannot ride the Asia zoom; the section renders the
+ *     AU Markets board's own row, linking to /australia).
  *   - The cards' value render restates the DISPLAY registry's own
  *     decimals/units (the S9 usa-tiles / S12 europe-tiles pattern),
  *     pinned byte-for-byte against `config/display.ts`'s
@@ -94,7 +95,8 @@ export const ASIA_INDIA_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific
 
 /**
  * The Pacific — New Zealand section (§9 item 5, D-17): nz-short-rate ·
- * nz-10y. NZX50 rides the markets board (the Asia zoom map).
+ * nz-10y. NZX50 rides the AU Markets board (the S21 mirror card in the
+ * section renders its row; the board's home is /australia).
  */
 export const ASIA_PACIFIC_NZ_IDS: readonly IndicatorId[] = pageGroupIds('asia-pacific', 'pacific-nz');
 

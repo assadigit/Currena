@@ -14,7 +14,11 @@
  *     markets board); the India CPI fill (D-36) is verified-pending-
  *     ingest (Rule 5).
  *   - Pacific — New Zealand section (§9 item 5, D-17): nz-short-rate ·
- *     nz-10y. NZX50 rides the markets board (the Asia zoom map).
+ *     nz-10y + the NZX50 card (S21: the BD-S8b commitment wired at
+ *     last — NZX50 is NOT a world-board index, so it cannot ride the
+ *     Asia zoom; its home is the AU Markets board on /australia, and
+ *     the Pacific—NZ section renders its mirror through the SAME
+ *     board payload + formatting helpers, linking to /australia).
  *
  * Every card renders the §21 per-page trio — the VALUE (the DISPLAY
  * registry's own decimals + units through asiaCardValueText, restated
@@ -52,6 +56,7 @@ import {
   type AsiaCardId,
   type AsiaUnitLabels,
 } from './asia-tiles';
+import { AsiaNzx50Card } from './AsiaNzx50Card';
 
 /** The section id lists, typed against asia-tiles' own (never re-derived
  *  here — the section wiring rides the pure module's single source). */
@@ -179,6 +184,7 @@ function AsiaSection({
   readings,
   units,
   dataSection,
+  children,
 }: {
   titleKey: TranslationKey;
   introKey: TranslationKey;
@@ -186,6 +192,10 @@ function AsiaSection({
   readings: readonly IndicatorReading[];
   units: AsiaUnitLabels;
   dataSection: string;
+  /** Extra grid members after the registry cards (the Pacific—NZ
+   * section's NZX50 mirror card, S21 — a board-row display, not a
+   * registry card). */
+  children?: React.ReactNode;
 }): React.JSX.Element {
   const { t } = useI18n();
   const entries = asiaCards(readings, ids);
@@ -199,6 +209,7 @@ function AsiaSection({
         {entries.map((entry) => (
           <AsiaCard key={entry.id} entry={entry} units={units} />
         ))}
+        {children}
       </div>
     </section>
   );
@@ -286,7 +297,12 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
         readings={readings}
         units={units}
         dataSection="pacific-nz"
-      />
+      >
+        {/* S21 (BD-S21b): the §9 item 5 NZX50 leg — the AU board's own
+            row mirrored here (one board, one vocabulary), linking to its
+            home on /australia. */}
+        <AsiaNzx50Card />
+      </AsiaSection>
     </>
   );
 }

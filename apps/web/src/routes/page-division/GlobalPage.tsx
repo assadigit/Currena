@@ -268,9 +268,22 @@ export function GlobalPage(): React.JSX.Element {
         <p className="m-0 mt-0.5 line-clamp-1 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">{t('pd.global.purpose')}</p>
         {dataAsOf !== null ? (
           <p className="m-0 mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[10.5px] font-semibold text-currena-muted sm:mt-1.5 sm:gap-x-3 sm:text-[length:var(--type-caption)]">
-            <bdi>{interpolate(t('pd.global.dataAsOf'), { date: dataAsOf.date })}</bdi>
+            {/* BD-S5a's revisit clause, discharged at S21 (BD-S21c): when
+             * the page renders the CACHED copy, the fromCache sentence
+             * REPLACES the plain data-as-of line — the sentence already
+             * carries the date, and printing both read as a garbled
+             * duplicate ("Data as of Nov 8 · Showing the last good copy —
+             * data as of Nov 8"). The GoldPage discipline, aligned here.
+             * The prices stamp stays: it carries the ribbon's own price
+             * time, a different fact from the snapshot date. */}
+            {fromCache ? (
+              <bdi className="text-[var(--color-text-tertiary)]" data-global-cached>
+                {interpolate(t('pd.global.fromCache'), { date: dataAsOf.date })}
+              </bdi>
+            ) : (
+              <bdi>{interpolate(t('pd.global.dataAsOf'), { date: dataAsOf.date })}</bdi>
+            )}
             {dataAsOf.prices !== null ? <bdi>{interpolate(t('pd.global.pricesAsOf'), { time: dataAsOf.prices })}</bdi> : null}
-            {fromCache ? <bdi className="text-[var(--color-text-tertiary)]">{interpolate(t('pd.global.fromCache'), { date: dataAsOf.date })}</bdi> : null}
           </p>
         ) : null}
       </header>

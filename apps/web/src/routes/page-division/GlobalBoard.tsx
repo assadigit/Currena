@@ -2,11 +2,14 @@
  * GlobalBoard — the D-21 10-tile verdict board + the D-23 region-chips row
  * + the D-24 narrator line (page-division S3, 2026-11-08 — spec §4).
  *
- * STRICTLY ONE SCREEN (D-11): 5×2 tile grid on desktop, a compact 1-col
- * stack on mobile; every tile shows a VERDICT or an explicit unread state
- * (fail-closed, Agent Rule 5); no detail cards, no history charts, no
- * scrolling — everything deep is one click away (each tile links to the
- * page holding its detail cards, spec §4's link column).
+ * STRICTLY ONE SCREEN (D-11): 5×2 tile grid on desktop, a compact
+ * 2-col grid on mobile (BD-S3c — ten verdict tiles cannot fit 844px
+ * in one column without clipping, and D-11's zero-scroll rule
+ * outranks the spec §4 sketch's 1-col); every tile shows a VERDICT or
+ * an explicit unread state (fail-closed, Agent Rule 5); no detail
+ * cards, no history charts, no scrolling — everything deep is one
+ * click away (each tile links to the page holding its detail cards,
+ * spec §4's link column).
  *
  * The visual language is the house one (D-48): colour + label verdicts
  * (the four-step meters wear the shared .verdict-meter styles from
@@ -313,10 +316,13 @@ function TileCachedNote({ cachedAt }: { cachedAt?: string }): React.JSX.Element 
 
 /* ------------------------------------------------------------------ *
  * Tile ⑨ — the prices ribbon (D-22): gold · brent · BTC, live hourly
- * (the serve-time merge's values + the 7-day change the merged reading
- * carries — a day change is not part of the projection contract; the
- * honest label rides with the number). Each asset links to its own page
- * (/gold for gold; /commodities for brent and BTC — spec §4).
+ * (the serve-time merge's values + the TRUE day change — change1d,
+ * the live hourly quote vs the previous daily close, BD-S4a — with
+ * the labelled 7-day change as the honest fallback when the stored
+ * prices entry carries no change1d; the window is always VISIBLE so
+ * the reader never guesses which change a percent is). Each asset
+ * links to its own page (/gold for gold; /commodities for brent and
+ * BTC — spec §4).
  * ------------------------------------------------------------------ */
 
 const RIBBON_LABEL_KEY = {
@@ -354,13 +360,14 @@ function RibbonAsset({ entry }: { entry: GlobalRibbonEntry }): React.JSX.Element
     reading !== null && reading !== undefined && reading.value !== null
       ? formatNumber(reading.value, numberLocale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
       : null;
-  // BD-S4a (S4, 2026-11-08 — the D-22 day-change call): the TRUE day
-  // change rides the live-prices entry (change1d — the live hourly quote
-  // vs the previous daily close, computed where the daily series lives).
-  // The writer lands with the next Worker deploy; until the stored prices
-  // key carries it, the ribbon shows the labelled 7-day change — the
-  // window is always VISIBLE (D-48's colour+label discipline applies to
-  // changes too: never a bare percent whose window the reader must guess).
+  // BD-S4a (S4, 2026-11-08 — the D-22 day-change call, LANDED): the
+  // TRUE day change rides the live-prices entry (change1d — the live
+  // hourly quote vs the previous daily close, computed where the daily
+  // series lives and carried by the projection contract since the
+  // writer's deploy). The labelled 7-day change is the fallback when a
+  // stored entry predates the field — the window is always VISIBLE
+  // (D-48's colour+label discipline applies to changes too: never a
+  // bare percent whose window the reader must guess).
   const change = reading?.change1d ?? reading?.change7d;
   const changeDays = reading?.change1d !== undefined ? 1 : 7;
   const changeTone =
@@ -415,10 +422,10 @@ export function PricesRibbonTile({ ribbon }: { ribbon: readonly GlobalRibbonEntr
         {t('pd.global.tilePricesRibbon')}
       </h3>
       {/* D-22's ribbon: one compact row per asset — label left, the live
-       * value + 7-day change right — the row layout fits BOTH the 165px
-       * mobile tile and the 250px lg tile (the first S3 build's
-       * side-by-side columns clipped Bitcoin at 250px; rows cannot
-       * overflow). */}
+       * value + the day change (7-day fallback, always window-tagged)
+       * right — the row layout fits BOTH the 165px mobile tile and the
+       * 250px lg tile (the first S3 build's side-by-side columns clipped
+       * Bitcoin at 250px; rows cannot overflow). */}
       <div className="flex flex-col gap-1">
         {ribbon.map((entry) => (
           <RibbonAsset key={entry.id} entry={entry} />
@@ -487,8 +494,8 @@ export function DedollarTile({ tile }: { tile: GlobalDedollarTile }): React.JSX.
 }
 
 /* ------------------------------------------------------------------ *
- * The board itself — 10 tiles in D-21's order, 5×2 desktop / 1-col
- * mobile (spec §4's layout), the boards' tiles honest while loading.
+ * The board itself — 10 tiles in D-21's order, 5×2 desktop / 2-col
+ * mobile (BD-S3c), the boards' tiles honest while loading.
  * ------------------------------------------------------------------ */
 
 export function GlobalBoard({

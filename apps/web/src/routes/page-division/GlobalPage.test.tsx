@@ -398,6 +398,14 @@ describe('GlobalPage', () => {
     await waitFor(() => {
       expect(document.body.textContent).toContain('Showing the last good copy');
     });
+    // BD-S21c (the BD-S5a alignment): on the cached path the fromCache
+    // sentence REPLACES the plain data-as-of line — the doubled date
+    // ("Data as of Nov 7 · Showing the last good copy — data as of Nov 7")
+    // is gone; the header renders the cache label element.
+    expect(document.querySelector('[data-global-cached]')).not.toBeNull();
+    const header = document.querySelector('[data-global-cached]')!.closest('p')!;
+    expect(header.textContent).not.toMatch(/^Data as of/);
+    expect(header.textContent).not.toMatch(/Data as of.*Data as of/);
   });
 
   it('a failed BOARD refresh keeps the cached tile verdicts, labelled (M-17) — never the unread collapse while a good copy sits in the cache', async () => {

@@ -222,25 +222,25 @@ const ASIA_GROUPS: readonly PlacementGroup[] = [
     id: 'japan',
     ids: ['jgb-10y', 'boj-rate'],
     decisions: 'D-35',
-    note: '+ the Japan CPI fill lands with S14 (D-36, verify-first).',
+    note: '+ the Japan CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a: the FRED OECD mirror candidates VERIFIED STALE, discarded; BD-S15d carried the fill to a dedicated session — the World Bank annual or the national bureau are the recorded alternatives).',
   },
   {
     id: 'korea-taiwan-hk',
     ids: [],
     decisions: 'D-35',
-    note: 'Index-only today (KOSPI · TAIEX · HSI on the markets board); the Korea CPI fill lands with S14 (D-36).',
+    note: 'Index-only today (KOSPI · TAIEX · HSI on the markets board); the Korea CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a/BD-S15d).',
   },
   {
     id: 'india',
     ids: [],
     decisions: 'D-35',
-    note: 'Index-only today (NIFTY50 on the markets board); the India CPI fill lands with S14 (D-36).',
+    note: 'Index-only today (NIFTY50 on the markets board); the India CPI fill (D-36) stays verified-pending-ingest (Rule 5 — BD-S14a/BD-S15d).',
   },
   {
     id: 'pacific-nz',
     ids: ['nz-short-rate', 'nz-10y'],
     decisions: 'D-17 · D-35',
-    note: 'New Zealand lives here (D-17); NZX50 rides the markets board.',
+    note: 'New Zealand lives here (D-17); NZX50 rides the AU Markets board — the S21 Pacific—NZ mirror card renders its row here (BD-S21b), and the board\'s home is /australia.',
   },
 ];
 
@@ -525,6 +525,16 @@ export const PLACEMENT_AUDIT_FINDINGS: readonly PlacementFinding[] = [
     id: 'AF-5',
     severity: 'info',
     text: 'Spec §10\'s gauge numbers (au-inflation-rates 6 · au-households 11 · au-trade-currency 10 · au-activity 7 · au-external 4 = 38) are the registry DISPLAY-group counts; the engine\'s scored AU gauge voters are 26 (5 · 7 · 4 · 6 · 4). Both true at their layers — the page renders registry groups; the gauge verdicts score the engine\'s voters. Recorded so neither gets "fixed" into the other.',
+  },
+  {
+    id: 'AF-6',
+    severity: 'info',
+    text: 'S21 spec audit (2026-11-12): spec §6 item 2 lists the Asia grid as "N225 · KOSPI · HSI · SSEC · TAIEX · NIFTY50" (6) while its own §6 hero requires 16 map indices — the three grid lists total 15, missing ASX200. The world-board registry is the authority (16 = Asia-Pacific 7 [incl. ASX200] · Europe 4 · Americas 5, the engine\'s own MARKETS table); the /world-markets Asia grid renders the registry\'s 7, heading "Asia-Pacific". Spec-side hand-list drift, the AF-2 class — recorded, not corrected in the spec.',
+  },
+  {
+    id: 'AF-7',
+    severity: 'info',
+    text: 'S21 spec audit (2026-11-12): spec §10 item 1 says the AU Markets board is "19 symbols: … 10 ASX-200 sectors …" — but 2 broad + 10 sectors + 4 banks + VIX + NZX50 sums to 18, not its own 19. The board carries ELEVEN ASX 200 GICS sector rows (markets-au/definitions.ts, self-described "the eleven ASX 200 GICS sector indices") and totals 19 ✓. The "10" is a spec typo — the code is right; recorded so nobody "fixes" the board to match the typo.',
   },
 ];
 

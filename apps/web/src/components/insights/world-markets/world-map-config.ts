@@ -156,8 +156,9 @@ export const REGION_ZOOMS: Readonly<Record<MapRegionId, RegionZoomConfig>> = {
   // the Shanghai/Hong Kong/Taipei cluster, Seoul and Tokyo in the NE.
   // Window: world x 665→880, y 82→230 (aspect 215/148) — India to
   // Japan, the Himalayas to Sumatra's north coast. NZX50 is NOT here:
-  // it is not on the world board (the AU board carries it; S14/S16
-  // wire that page section — recorded, never silently faked).
+  // it is not on the world board (the AU board carries it; the S21
+  // audit wired its page surface as the Pacific—NZ mirror card on
+  // /asia-pacific — BD-S21b — with the board's home on /australia).
   asia: {
     viewBox: { x: 665, y: 82, w: 215, h: 148 },
     indices: ['nifty50', 'hsi', 'ssec', 'taiex', 'kospi', 'n225'],

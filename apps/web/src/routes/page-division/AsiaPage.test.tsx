@@ -23,7 +23,11 @@
  *   - the India section (§9 item 4): INDEX-ONLY today — same honest
  *     note;
  *   - the Pacific New Zealand section (§9 item 5): nz-short-rate ·
- *     nz-10y;
+ *     nz-10y + the NZX50 mirror card (S21, BD-S21b: the AU Markets
+ *     board's own row — name corpus-pinned, close + window-tagged day
+ *     change + the 52-week range sentence + as-of, linking to the
+ *     board's home /australia; the honest "being prepared" line when
+ *     the board feed has no answer and no cache);
  *   - every card carries the §21 trio (value · 10-year position ·
  *     freshness), the values rendered through the DISPLAY registry's own
  *     joins (percent binds tight, index + tonnes suffix with a space —
@@ -46,8 +50,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
-import type { IndicatorReading, MarketsSnapshot, PageProjection } from '@currena/core';
-import { MarketsSnapshotSchema, PageProjectionSchema } from '@currena/core';
+import type { AuMarketsSnapshot, IndicatorReading, MarketsSnapshot, PageProjection } from '@currena/core';
+import { AuMarketsSnapshotSchema, MarketsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { pageReadingIds } from '@currena/insights/page-division';
 import { summarizeMarkets } from '@currena/insights/markets';
 import { MARKETS } from '@currena/insights/markets/definitions';
@@ -133,6 +137,42 @@ function boardFixture(): MarketsSnapshot {
   return { v: 1, generatedAt: '2026-11-07T23:31:00Z', markets, summary: summarizeMarkets(markets) };
 }
 
+/** The AU Markets board (the NZX50 card's own feed, S21): one honest
+ *  nz50 row — the shape the cached /api/insights/markets-au route
+ *  serves (the full 19-row board is the AustraliaPage suite's own
+ *  fixture; the card reads ONLY the nz50 row). */
+function auBoardFixture(): AuMarketsSnapshot {
+  return {
+    v: 1,
+    generatedAt: '2026-11-07T21:05:00Z',
+    markets: [
+      {
+        id: 'nz50',
+        asOf: '2026-11-07',
+        close: 13999.5,
+        chg1d: -0.42,
+        chg1w: 1.1,
+        chg1m: -2.2,
+        chg3m: 3.3,
+        chg1y: 8.8,
+        high52w: 14300.25,
+        low52w: 12000.1,
+        fromHigh: -2.1,
+        rangePos: 87,
+        trend: 'flat',
+        status: 'normal',
+        source: 'yahoo',
+        stale: false,
+        weekly: [
+          [0, 13940.18],
+          [7, 13851.84],
+        ],
+      },
+    ],
+    summary: { count: 1, roseToday: 0, nAttention: 0, nUnusual: 0, signal: 'normal', worstGroup: null },
+  };
+}
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -145,14 +185,17 @@ function notFound(): Response {
 }
 
 /** Route the stubbed fetch: the Asia projection + the board feed (the
- *  zoom's own) + the map's static assets (404 — the land never paints
- *  in jsdom; the cards are the DOM under test). */
-function stubFeeds(overrides: { projection?: () => Response; board?: () => Response } = {}): void {
+ *  zoom's own) + the AU board feed (the NZX50 card's own, S21 — routed
+ *  BEFORE the world-markets check: '/api/insights/markets-au' also
+ *  includes '/api/insights/markets') + the map's static assets (404 —
+ *  the land never paints in jsdom; the cards are the DOM under test). */
+function stubFeeds(overrides: { projection?: () => Response; board?: () => Response; auBoard?: () => Response } = {}): void {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes('/api/insights/pages/asia-pacific')) return (overrides.projection ?? (() => jsonResponse(asiaProjectionFixture())))();
+      if (url.includes('/api/insights/markets-au')) return (overrides.auBoard ?? (() => jsonResponse(auBoardFixture())))();
       if (url.includes('/api/insights/markets')) return (overrides.board ?? (() => jsonResponse(boardFixture())))();
       if (url.includes('/assets/map/')) return new Response('not found', { status: 404 });
       return notFound();
@@ -184,6 +227,7 @@ describe('AsiaPage', () => {
   it('fixture sanity: both payloads satisfy their contracts', () => {
     expect(() => PageProjectionSchema.parse(asiaProjectionFixture())).not.toThrow();
     expect(() => MarketsSnapshotSchema.parse(boardFixture())).not.toThrow();
+    expect(() => AuMarketsSnapshotSchema.parse(auBoardFixture())).not.toThrow();
   });
 
   it('renders the honest loading line before the projection arrives — and the zoom stays on top', () => {
@@ -255,11 +299,31 @@ describe('AsiaPage', () => {
     expect(india.querySelector('h2')?.textContent).toBe('India');
     expect(india.textContent).toContain('zoom map above');
 
-    // The Pacific NZ section (§9 item 5): two cards.
+    // The Pacific NZ section (§9 item 5): two registry cards + the S21
+    // NZX50 mirror card (BD-S21b). The intro no longer claims the zoom
+    // map — it names the AU Markets board, the card's real feed.
     const nz = document.querySelector('[data-asia-section="pacific-nz"]')!;
     expect(nz.querySelector('h2')?.textContent).toBe('Pacific — New Zealand');
     expect(nz.querySelectorAll('[data-asia-card]')).toHaveLength(ASIA_PACIFIC_NZ_IDS.length);
     expect(nz.querySelectorAll('[data-asia-card]')).toHaveLength(2);
+    expect(nz.textContent).toContain('plus the S&P/NZX 50 index from the AU Markets board');
+    expect(nz.textContent).not.toContain('rides the Asia zoom map');
+    // The NZX50 card: the corpus-pinned name + the close + the
+    // window-tagged day change + the 52-week range sentence + the
+    // as-of + the wayfinding link to the board's home (the AU board
+    // feed resolves on its own tracks — wait for the row's value).
+    const nzx = nz.querySelector('[data-asia-nzx50]')!;
+    expect(nzx).not.toBeNull();
+    await waitFor(() => {
+      expect(nzx.querySelector('[data-asia-nzx50-close]')?.textContent).toBe('13,999.50');
+    });
+    expect(nzx.querySelector('h4')?.textContent).toBe('S&P/NZX 50');
+    expect(nzx.textContent).toContain('-0.4%');
+    expect(nzx.textContent).toContain('1d');
+    expect(nzx.textContent).toContain('87 percent of its 52-week range');
+    expect(nzx.textContent).toContain('Nov 7, 2026');
+    const boardLink = nzx.querySelector('[data-asia-nzx50-board-link]')!;
+    expect(boardLink.getAttribute('href')).toBe('/australia');
 
     // The §21 trio per card — the value render (the DISPLAY registry's
     // own joins), the 10-year position (the band word, fail-closed when
@@ -406,6 +470,70 @@ describe('AsiaPage', () => {
     expect(document.querySelector('[data-asia-cached]')).not.toBeNull();
   });
 
+  it('the NZX50 card (S21, BD-S21b): a dead AU board with no cache renders the honest "being prepared" line — never a fake value', async () => {
+    atRoute('/asia-pacific');
+    stubFeeds({ auBoard: () => jsonResponse({ error: { code: 'markets_au_not_ready', message: 'not ready' } }, 503) });
+    render(<AsiaPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-asia-section="pacific-nz"]')).not.toBeNull();
+    });
+    const nzx = document.querySelector('[data-asia-nzx50]')!;
+    await waitFor(() => {
+      expect(nzx.getAttribute('data-asia-nzx50-status')).toBe('empty');
+    });
+    expect(nzx.textContent).toContain('NZX 50 data is being prepared. Check back after the next daily update.');
+    // Nothing is faked — no close value on the dead path.
+    expect(nzx.querySelector('[data-asia-nzx50-close]')).toBeNull();
+    // The section's two registry cards still render (their feed is the
+    // projection, not the AU board).
+    expect(document.querySelectorAll('[data-asia-section="pacific-nz"] [data-asia-card]')).toHaveLength(2);
+  });
+
+  it('the NZX50 card M-17 path: a dead AU refresh after a good load keeps the last good row on screen', async () => {
+    atRoute('/asia-pacific');
+    stubFeeds();
+    render(<AsiaPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-asia-nzx50-close]')?.textContent).toBe('13,999.50');
+    });
+    cleanup();
+    vi.unstubAllGlobals();
+    clearProjectionCacheForTests();
+    // Second visit: the AU board feed dies (503 — the expected "being
+    // prepared" answer); the cached nz50 row paints from localStorage.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/asia-pacific')) return jsonResponse(asiaProjectionFixture());
+        if (url.includes('/api/insights/markets-au')) return jsonResponse({ error: { code: 'markets_au_not_ready', message: 'not ready' } }, 503);
+        if (url.includes('/api/insights/markets')) return jsonResponse(boardFixture());
+        if (url.includes('/assets/map/')) return new Response('not found', { status: 404 });
+        return notFound();
+      }),
+    );
+    render(<AsiaPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-asia-nzx50-close]')?.textContent).toBe('13,999.50');
+    });
+    expect(document.querySelector('[data-asia-nzx50]')?.getAttribute('data-asia-nzx50-status')).toBe('cached');
+  });
+
+  it('the NZX50 card wayfinding: a click on the board link navigates to /australia', async () => {
+    atRoute('/asia-pacific');
+    stubFeeds();
+    render(<AsiaPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-asia-nzx50-board-link]')).not.toBeNull();
+    });
+    const link = document.querySelector('[data-asia-nzx50-board-link]')!;
+    expect(link.textContent).toBe('See the full AU Markets board on the Australia page');
+    fireEvent.click(link);
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/australia');
+    });
+  });
+
   it('the fa/RTL rendering: the Persian title + the Persian China section + the Persian card name + the Persian value join', async () => {
     // The fa locale rides the app's own locale store (the I18nApi's
     // setter — the same door the language switch uses).
@@ -443,6 +571,10 @@ describe('AsiaPage', () => {
       // The status word in Persian (china-pmi is a warning reading).
       const pmi = document.querySelector('[data-asia-card="china-pmi"]')!;
       expect(pmi.querySelector('[data-asia-status-word]')?.textContent).toBe('نیازمند توجه');
+      // The NZX50 card in Persian (the corpus-pinned fa name — the same
+      // key the AU board copy pins, one vocabulary both locales).
+      const nzx = document.querySelector('[data-asia-nzx50]')!;
+      expect(nzx.querySelector('h4')?.textContent).toBe('شاخص ۵۰ شرکت بزرگ نیوزیلند');
       // The RTL document direction rides the store's own apply().
       expect(document.documentElement.dir).toBe('rtl');
     } finally {

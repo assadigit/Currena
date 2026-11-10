@@ -150,8 +150,8 @@ describe('the blocked notes vs the public-mode hidden set', () => {
 });
 
 describe('the audit findings (drift — recorded, never silently fixed)', () => {
-  it('carries the five static findings with stable AF ids', () => {
-    expect(PLACEMENT_AUDIT_FINDINGS.map((f) => f.id)).toEqual(['AF-1', 'AF-2', 'AF-3', 'AF-4', 'AF-5']);
+  it('carries the seven static findings with stable AF ids (AF-6/AF-7 added at the S21 spec audit)', () => {
+    expect(PLACEMENT_AUDIT_FINDINGS.map((f) => f.id)).toEqual(['AF-1', 'AF-2', 'AF-3', 'AF-4', 'AF-5', 'AF-6', 'AF-7']);
     for (const f of PLACEMENT_AUDIT_FINDINGS) {
       expect(f.severity === 'red' || f.severity === 'amber' || f.severity === 'info').toBe(true);
       expect(f.text.length).toBeGreaterThan(40);

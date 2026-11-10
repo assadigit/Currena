@@ -12,9 +12,10 @@
  * Taiwan/HK (§9 item 3: index-only today, the §15 Korea CPI fill
  * verified-pending-ingest) · India (§9 item 4: index-only today, the
  * §15 India CPI fill verified-pending-ingest) · Pacific New Zealand
- * (§9 item 5: two cards) — each card with the §21 trio (value · 10-year
- * position · freshness), and the cross-links strip (§9: usdcny · usdjpy
- * → /currencies; the SGE Shanghai gold link → /gold). Every value is
+ * (§9 item 5: two registry cards + the S21 NZX50 mirror card) — each
+ * card with the §21 trio (value · 10-year position · freshness), and
+ * the cross-links strip (§9: usdcny · usdjpy → /currencies; the SGE
+ * Shanghai gold link → /gold). Every value is
  * re-derived CLIENT-SIDE through the same pure engine display (asia-
  * tiles → config/display.ts's formatReadingValue, pinned output-for-
  * output by asia-tiles.test.ts — D-48). Data arrives on the S2

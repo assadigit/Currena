@@ -1371,8 +1371,10 @@ export const en = {
       pacificNz: {
         title: 'Pacific — New Zealand',
         intro:
-          'New Zealand’s short-term interest rate and 10-year government bond yield. The NZX50 rides the Asia zoom map above.',
+          'New Zealand’s short-term interest rate and 10-year government bond yield, plus the S&P/NZX 50 index from the AU Markets board.',
       },
+      nzxPreparing: 'NZX 50 data is being prepared. Check back after the next daily update.',
+      nzxBoardLink: 'See the full AU Markets board on the Australia page',
       cardNames: {
         'china-pmi': 'Chinese factory activity',
         'china-cpi': 'China inflation (yearly)',
