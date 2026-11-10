@@ -2489,3 +2489,47 @@
 - **Revisit:** the owner-side launch discipline stands — exactly ONE
   session per roadmap slot; S22 (Phase K, the investor feedback) is the
   next slot, and its scope is already written in HANDOFF.md.
+
+## 2026-11-12 — BD-S22: the S22 waiting-slot close — the investor review NOT yet arranged (verified against every record the program can read); the slot closed honestly as a WAITING slot, and the first reserve session (the §15 Asia CPI fill session) PULLED FORWARD into the Session 23 slot
+
+- **Event:** the S22 kickoff (Session 22/30 · Phase K OPENS — the investor
+  feedback → spec v2) arrived with its standing scope — collect the
+  external investor's answers to spec §19, record them as D-49+ in the
+  strategy log, produce the spec v2 entries (the AF-1…AF-7 spec-side
+  drift findings riding the pass) — but the session carried **no investor
+  answers**, and no investor-side artifact exists anywhere the program
+  can read: origin/main (HEAD `384dfd1`, the S21 counterpart close, clean
+  tree) holds nothing past the S21 records; the GitHub issues/PRs carry
+  nothing since PR #47 (2026-11-08, the root tidy-up); no uploaded file
+  accompanied the session; and HANDOFF's owner-side lever #8 ("Arrange the
+  investor review — the S22 gate") still stands unanswered. **The review is
+  not yet arranged; the S22 input does not exist.**
+- **The close (honest, per the owner's standing instruction for this slot
+  and the roadmap's own reserve rule):** S22 closes as a **WAITING slot** —
+  NO answers collected, NO D-49+ recorded (the strategy log §5 carries the
+  explicit Round-4 pending marker instead), NO spec v2 entries produced,
+  and the AF-1…AF-7 spec-side drift findings REMAIN parked for the spec v2
+  pass (never silent edits — the spec file was not touched). No deploy: a
+  records session; nothing was fixed, so nothing shipped. The slot is
+  consumed honestly — **Session 22/30 · 8 remaining.**
+- **The reserve pull-forward (the roadmap's reserve rule — the buffer
+  exists for delayed work):** the first reserve session is pulled forward
+  into the **Session 23 slot**: **the §15 Asia CPI fill session** — the
+  dedicated fill session carried since S14 (BD-S14a/BD-S15d), whose source
+  options the roadmap's current-position note already records (the
+  national statistics bureaus directly — the Statistics Bureau of Japan,
+  KOSTAT, MoSPI; a fresh FRED/IMF IFS series; or the World Bank annual as
+  the lower-resolution fallback). S23's own scope (feedback build changes)
+  is **DEFERRED** — it is blocked on the same investor input; when the
+  answers arrive, the next free slot re-opens the investor round (collect
+  → D-49+ → spec v2 → the build). The ecb-drf provider timeout stays
+  queued for a later maintenance slot (unchanged).
+- **Who decided:** this session (S22), under the owner's standing
+  instruction ("if the investor's review is NOT yet arranged, S22 becomes
+  a waiting slot: close it honestly as such and pull a reserve session
+  (S25+) forward per the roadmap's rule — do not invent work").
+- **Revisit:** the owner's lever stays — **arrange the investor's review
+  of spec §19 (the seven questions)**; the S22 collection work re-opens at
+  the next free slot the moment the answers exist. Until then Phase K's
+  investor-dependent slots wait and the reserve/buffer work (the fill
+  session first) keeps the program moving.

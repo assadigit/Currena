@@ -15,7 +15,7 @@
 2. [Where we stand — the phase plan](#2-where-we-stand--the-phase-plan)
 3. [Phase 0 recap — what the audit found](#3-phase-0-recap--what-the-audit-found)
 4. [The regional reality check](#4-the-regional-reality-check)
-5. [The decision record — D-1 … D-48 (FINAL)](#5-the-decision-record--d-1--d-48-final)
+5. [The decision record — D-1 … D-48 (FINAL) + the pending investor round](#5-the-decision-record--d-1--d-48-final--the-pending-investor-round)
 6. [The final page map — settled 2026-11-07](#6-the-final-page-map--settled-2026-11-07)
 7. [Wrap-up notes & reconciliations](#7-wrap-up-notes--reconciliations)
 8. [Session log](#8-session-log)
@@ -43,7 +43,7 @@
 | **Phase 0** | Collect & audit ALL indicators, methods, data sources | ✅ **Complete** — `04-INDICATORS-COMPLETE-INVENTORY.md` + `05-GOLD-INDICATORS.md` |
 | **Phase 1** | Strategy discussion — question rounds, co-designed taxonomy | ✅ **Complete** — Rounds 1–3 answered; **D-1 … D-48 recorded; taxonomy settled** (this doc, §5–§6) |
 | **Phase 2** | Spec for the external financial investor | ✅ **Drafted & pushed** — `02-PAGE-DIVISION-SPEC.md` v1.0 (awaiting the investor's review) |
-| **Phase 3** | Final spec — incorporate the investor's feedback | ⏳ pending the investor (roadmap S21–S23) |
+| **Phase 3** | Final spec — incorporate the investor's feedback | ⏳ **pending the investor** — the S22 collection slot closed as a WAITING slot 2026-11-12 (the review not yet arranged; BD-S22); the answers land as D-49+ (§5 Round 4) the moment they arrive |
 | **Phase 4** | Build the pages & split the information | ⏳ **30-session plan ready** — `01-SESSION-ROADMAP.md`; kicks off with Session 1/30 |
 
 **Working method (D-8):** multiple short sessions, each ending with a
@@ -83,7 +83,7 @@ Global" + building up thin regions.
 | Commodities & energy | 24+ ids incl. chokepoints (shadow) | Medium |
 | FX | 10 pairs + 7 rules | Own board |
 
-## 5. The decision record — D-1 … D-48 (FINAL)
+## 5. The decision record — D-1 … D-48 (FINAL) + the pending investor round
 
 ### Round 1 (2026-11-07)
 
@@ -147,6 +147,19 @@ Global" + building up thin regions.
 | **D-46** | Routes = **clean top-level slugs** (`/`, `/gold`, `/world-markets`, `/usa`, `/europe`, `/asia-pacific`, `/australia`, `/commodities`, `/currencies`); **legacy stays at `/insights`** with a deprecation banner. | F26-A |
 | **D-47** | **World Markets builds immediately after Gold** — the board already runs daily; reorganize, don't rebuild. | F27-B |
 | **D-48** | Verdict visual language = **the existing engine language**: 5-step gauge verdicts + gold's 7-state outlook; colour + label; honest "can't read / not enough readable" states — never bare traffic-lights. | F28-A |
+
+### Round 4 — the investor round (Phase K · PENDING)
+
+Spec §19's seven questions went to the external investor with the spec
+v1.0. **The S22 collection slot (2026-11-12) closed as a WAITING slot:
+the review was not yet arranged and no answers arrived — so NOTHING is
+recorded here yet** (BD-S22; verified against the repo, the GitHub
+issues/PRs, and the session kickoff itself). The investor's answers land
+below as **D-49+** the moment they are collected; the AF-1…AF-7
+spec-side drift findings ride the same spec v2 pass (never silent
+edits). Meanwhile the reserve work keeps the program moving — the §15
+Asia CPI fill session pulled forward into the Session 23 slot (the
+roadmap's reserve rule).
 
 ## 6. The final page map — settled 2026-11-07
 
