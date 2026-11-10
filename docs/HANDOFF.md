@@ -6,6 +6,18 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **S22 GOAL (written at session start, 2026-11-12):** Phase K slot —
+> collect the external investor's answers to spec §19 → record as D-49+ →
+> produce the spec v2 entries. **If the review is not yet arranged (the
+> owner's standing instruction for this slot): close S22 honestly as a
+> WAITING slot and pull the first reserve session forward into the Session
+> 23 slot — do not invent work.** Milestones: M0 this goal · M1 the
+> waiting-close decision records (DECISIONS BD-S22 + the strategy log's
+> Round-4 pending marker) · M2 the roadmap resequencing (the S23 slot ←
+> the pulled-forward §15 Asia CPI fill session) · M3 the full gates green
+> on the records-only tree · M4 the mirrors + this file's close rewrite +
+> the next-session prompt.
+
 > **S21 (2026-11-12) — the spec-vs-implementation audit — Phase J
 > CLOSED. Session 21/30 · 9 remaining.** The S21 scope delivered
 > whole: (a) the full §4–§14 diff vs the code AND the live site — the
