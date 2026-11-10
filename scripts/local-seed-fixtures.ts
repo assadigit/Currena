@@ -106,6 +106,8 @@ console.log('markets.json written:', markets.length, 'rows; summary:', JSON.stri
 
 /* ---------------- fx ---------------- */
 function fxWorld(days = 420): FxQuoteSet {
+  // S18/M1a (2026-11-12): NZD joins the fixture world — the 11-pair
+  // engine's audnzd cross needs it (the fx.test.ts fxWorld twin).
   const base: Record<string, number> = {
     EUR: 0.9,
     JPY: 150,
@@ -113,6 +115,7 @@ function fxWorld(days = 420): FxQuoteSet {
     CHF: 0.88,
     CNY: 7.1,
     AUD: 1.52,
+    NZD: 1.67,
     CAD: 1.37,
     SEK: 9.5,
   };

@@ -43,12 +43,8 @@ const About = lazy(() => import('./routes/About').then((m) => ({ default: m.Abou
 const Insights = lazy(() => import('./routes/Insights').then((m) => ({ default: m.Insights })));
 // Page-division S1 (D-46): the Converter — the app's founding tool, eager
 // in the entry chunk until now — becomes a lazy tool route at /converter so
-// the Global page (D-20: the landing page) owns `/`. The placeholder
-// skeleton for the eight destinations is one shared lazy chunk.
+// the Global page (D-20: the landing page) owns `/`.
 const Converter = lazy(() => import('./routes/Converter').then((m) => ({ default: m.Converter })));
-const PagePlaceholder = lazy(() =>
-  import('./routes/page-division/PagePlaceholder').then((m) => ({ default: m.PagePlaceholder })),
-);
 // Page-division S3 (2026-11-08): the Global world scan — the D-21 verdict
 // board. Lazy like the Insights route (the engine modules + the board
 // clients ride the chunk; the entry graph stays the money page's own).
@@ -103,12 +99,24 @@ const AustraliaPage = lazy(() => import('./routes/page-division/AustraliaPage').
 // /gold (D-19/D-27). The In-build chip stays (the S17 build session —
 // the chip retires at the S17 gates pass, the S13/S15/S16 trajectory).
 const CommoditiesPage = lazy(() => import('./routes/page-division/CommoditiesPage').then((m) => ({ default: m.CommoditiesPage })));
+// Page-division S18 (2026-11-12): the Currencies route leaves the
+// placeholder set — its own lazy chunk (the UsaPage/EuropePage/AsiaPage/
+// AustraliaPage/CommoditiesPage pattern): the 7 rule lights hero (D-41)
+// + the 11-pair board (D-42, AUDNZD included) + the dollar-standing
+// section (D-32) + the pairs over the decade — the fx feed and the S2
+// projection each governing their own surface. The In-build chip stays
+// (the S18 build session — the chip retires at the S18 gates pass, the
+// S13/S15/S16/S17 trajectory).
+const CurrenciesPage = lazy(() => import('./routes/page-division/CurrenciesPage').then((m) => ({ default: m.CurrenciesPage })));
 
-/** The one destination route that still shares the placeholder chunk
- *  (S8: the four region pages left the set — their zoom sections landed
- *  on RegionPage; S9: /usa + S12: /europe + S14: /asia-pacific + S16:
- *  /australia + S17: /commodities left it for their own builds). */
-const DESTINATION_ROUTES: ReadonlySet<string> = new Set(['/currencies']);
+/* Page-division S18 (2026-11-12): the placeholder set is EMPTY and the
+ * PagePlaceholder module is RETIRED — every one of the nine destination
+ * routes (/ · /gold · /world-markets · /usa · /europe · /asia-pacific ·
+ * /australia · /commodities · /currencies) now renders its own built
+ * page (the S16 RegionPage retirement precedent: no route renders the
+ * module anymore, so the module goes). The pd.statusBuilding key stays
+ * in the dictionaries (the In-build chip's own word — the scaffold's
+ * documented trajectory). */
 
 /* Page-division S16 (2026-11-10): no route renders RegionPage anymore —
  * all four region routes (/usa S9 · /europe S12 · /asia-pacific S14 ·
@@ -274,8 +282,10 @@ export function App() {
               S8 zoom); S17 (D-19/D-38/D-39): `/commodities` renders its
               own CommoditiesPage (the four commodity groups + the trade
               routes & supply group — 24 cards + the gold cross-link);
-              Currencies shares the lazy placeholder chunk until S18; the
-              Converter lives at /converter. */}
+              S18 (D-41/D-42/D-32): `/currencies` renders its own
+              CurrenciesPage (the 7 rule lights hero + the 11-pair board
+              + the dollar-standing + decade sections); the Converter
+              lives at /converter. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
             {route === '/' ? <GlobalPage /> : null}
@@ -286,8 +296,8 @@ export function App() {
             {route === '/asia-pacific' ? <AsiaPage /> : null}
             {route === '/australia' ? <AustraliaPage /> : null}
             {route === '/commodities' ? <CommoditiesPage /> : null}
+            {route === '/currencies' ? <CurrenciesPage /> : null}
             {route === '/converter' ? <Converter /> : null}
-            {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}
             {route === '/history' ? <History /> : null}
             {route === '/receipt' ? <Receipt /> : null}

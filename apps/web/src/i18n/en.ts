@@ -1766,6 +1766,7 @@ export const en = {
         audcny: 'Australian dollar vs yuan',
         audnzd: 'Australian dollar vs New Zealand dollar',
       },
+      thPair: 'Pair',
       thRate: 'Rate',
       thToday: 'Today',
       thM1: '1 month',
@@ -1775,6 +1776,13 @@ export const en = {
       th52w: '52-week closes',
       bigMoveTag: 'Unusually large move',
       oldData: 'Old data · {date}',
+      /* M2 (2026-11-12): the fx feed's own two lines — the calm "being
+       * prepared" answer when the board feed has nothing honest to show
+       * (pinned to the corpus's own fx.empty) and the board's source +
+       * honesty note (pinned to the corpus's own fx.footerLine — §21
+       * "source & licence badges visible"). */
+      boardEmpty: 'Currency data is being prepared. Check back after the next daily update.',
+      boardSourceLine: 'European Central Bank (ECB) reference rates, once a day. A pattern is a tendency, not a prediction.',
       /* The dollar-standing section (§12 item 3, D-32). */
       dollarStandingTitle: 'Where the dollar stands',
       dollarStandingIntro:

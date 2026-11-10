@@ -98,11 +98,18 @@ function pinPageWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'
   expect(pd.groups.warningLights, `${locale} groups.warningLights`).toBe(corpus.fx.groups.warningLights);
   expect(pd.groups.chinaLink, `${locale} groups.chinaLink`).toBe(corpus.fx.groups.chinaLink);
   expect(pd.groups.auLink, `${locale} groups.auLink`).toBe(corpus.fx.groups.auLink);
+  expect(pd.thPair, `${locale} thPair`).toBe(corpus.fx.thPair);
   expect(pd.thRate, `${locale} thRate`).toBe(corpus.fx.csvColRate);
   expect(pd.thToday, `${locale} thToday`).toBe(corpus.fx.thToday);
   expect(pd.thM1, `${locale} thM1`).toBe(corpus.fx.thM1);
   expect(pd.thM3, `${locale} thM3`).toBe(corpus.fx.thM3);
   expect(pd.thY1, `${locale} thY1`).toBe(corpus.fx.thY1);
+
+  // M2: the fx feed's own lines — the calm "being prepared" answer
+  // (corpus.fx.empty) + the board's source/honesty note (corpus.fx.
+  // footerLine — §21 "source & licence badges visible").
+  expect(pd.boardEmpty, `${locale} boardEmpty`).toBe(corpus.fx.empty);
+  expect(pd.boardSourceLine, `${locale} boardSourceLine`).toBe(corpus.fx.footerLine);
 
   // The position + band words (the corpus's own).
   expect(pd.positionLow, `${locale} positionLow`).toBe(corpus.ui.positionLow);

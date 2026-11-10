@@ -1064,6 +1064,35 @@ const BUDGETS = [
   // (~2 kB raw / ~1 kB gz headroom over Europe's 14/5 — Commodities has
   // 24 cards vs Europe's 8, but no zoom section).
   { pattern: /^CommoditiesPage-[\w-]+\.js$/, raw: 16_000, gz: 5_000, label: 'Commodities page lazy chunk (page-division S17)' },
+  // Page-division S18 (2026-11-12): the Currencies route — the 7 rule
+  // lights hero (D-41) + the 11-pair board (D-42, AUDNZD included: rate ·
+  // the four period changes · moveRank · bigMove · the 52-week closes
+  // sparklines) + the dollar-standing section (D-32) + the pairs over the
+  // decade — the fx feed and the S2 projection each governing their own
+  // surface. Measured 26.45/6.02 at the S18 build: the page's own chunk
+  // carries the shell + CurrenciesFxSections (the hero + the desktop
+  // table + the mobile pair cards + the sparkline drawing) +
+  // CurrenciesTierCards + the lean currencies-tiles, while the fx engine
+  // definitions + fx-presentation + the world-currencies display helpers
+  // moved to the SHARED display-* chunk both this route and /insights
+  // load (the row below — the S16 markets-au treatment: the shared bytes
+  // are paid once; the Insights chunk SHRANK ~1520 → 1508.79 through the
+  // split). Ceiling 30/8 per the tight convention (~3.5 kB raw / ~2 kB gz
+  // headroom — the richest page-division card chunk: the 14 registry
+  // cards + the 11-pair board + the 7 rule lights).
+  { pattern: /^CurrenciesPage-[\w-]+\.js$/, raw: 30_000, gz: 8_000, label: 'Currencies page lazy chunk (page-division S18)' },
+  // Page-division S18 (2026-11-12): the shared fx display chunk — born the
+  // moment /currencies imported the fx presentation stack the legacy
+  // /insights WorldCurrencies section already owns (Vite's shared-chunk
+  // split; the S10 tic / S16 markets-au treatment): the fx engine
+  // definitions (FX_PAIRS/FX_RULES) + the fx-presentation barrel's
+  // rules/pairs/format modules + the world-currencies display helpers
+  // (signedPct · isOld · formatDateShort), every word fed through the
+  // caller's own copy (the corpus on /insights, the pinned pd.currencies
+  // adapter on /currencies — one drawing vocabulary, D-48). Measured
+  // 13.06/4.05. Ceiling 16/5 per the tight convention (~2.9 kB raw /
+  // ~0.9 kB gz headroom).
+  { pattern: /^display-[\w-]+\.js$/, raw: 16_000, gz: 5_000, label: 'shared fx display chunk (page-division S18 — the fx engine + presentation stack)' },
   // Page-division S9 (2026-11-09): the USA route — the D-30 verdict
   // strip + the D-29 tier-1/tier-2 cards above the SAME S8 zoom section.
   // Measured 15.21/4.28 at first build: the page's own chunk carries the
