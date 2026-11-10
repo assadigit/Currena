@@ -6,146 +6,101 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **S19 (2026-11-12, IN PROGRESS — this session's goal, written before
-> coding per AGENTS.md §2.6):** Navigation, mobile & SEO polish — Phase J
-> opens. Milestones: **M1** the topbar/drawer final pass across all pages
-> + the HANDOFF item 6 language quick-toggle (verified: the earlier
-> "theme words" read is disproven against the deployed DOM — the visible
-> label is the target-language word 'فا'/'EN' and the aria-label is
-> correct; a target-naming label polish rides the pass) + the two
-> S1-noted legacy-hero mobile items (the ⓘ wrap on the data-as-of line ·
-> the state-pill icon spacing). **M2** breadcrumbs on every destination
-> page + per-page meta/OG tags (client-side per route over the existing
-> title effect + refreshed static defaults) + sticky-footer verification
-> (the safe-area rider). **M3** gates whole (typecheck + lint +
-> copy:audit + build/budgets + the suite) + the browser pass on every
-> touched surface at 1440×900 AND 360×844 in en + fa + the deploy (the
-> owner's standing) + the records. Scope guard: exactly S19 — no S20
-> regression work, no engine changes.
+> **S19 (2026-11-12) — Navigation, mobile & SEO polish — Phase J OPEN.
+> Session 19/30 · 11 remaining.** Delivered the S19 scope whole: (a) the
+> breadcrumbs — the shared `PageBreadcrumbs` (a REAL Home link through
+> the path router, the current page as an aria-current span, the
+> separator aria-hidden + RTL-mirrored) wired into the EIGHT
+> destinations' heading blocks (BD-S19b: Global IS Home — no trail; the
+> legacy /insights keeps its deprecation banner as the wayfinding
+> bridge; the tools keep the topbar); (b) the per-page meta/OG pass —
+> the pure `lib/route-meta` table (the S1 titleKeyFor switch moved
+> verbatim + regression-pinned) feeding the App shell's extended
+> `<head>` effect (per-route description [the nine destinations REUSE
+> their dictionary PURPOSE lines, D-48], og:title/og:description/
+> og:url/og:locale, twitter:*, the canonical link — find-or-create
+> idempotent writers) + the refreshed static index.html defaults + PWA
+> manifest description (BD-S19c: true per-route SSR OG is out of scope
+> by the repo's own SPA-only rule — non-JS crawlers see the static
+> defaults); (c) the HANDOFF item 6 language quick-toggle — the "theme
+> words" read DISPROVEN against the deployed DOM (the visible label is
+> the target language's own word 'فا'/'EN'; the aria-label was already
+> correct); the polish: the accessible name + tooltip now NAME THE
+> TARGET ('Switch to Farsi' / «تغییر به انگلیسی», BD-S19a); (d) the
+> sticky footers VERIFIED on every route × both widths × both locales
+> (Global exactly one screen WITH the footer at 1440×900 AND 360×844;
+> long pages push it below content) + the iOS safe-area rider landed
+> (`.app-footer` respects env(safe-area-inset-bottom), BD-S19d), and
+> the two S1-noted legacy-hero mobile items CLOSED (the ⓘ wrap — the
+> date + prices units are separate non-breaking bdis; the state-pill
+> icon gap 0.375rem → 0.5rem). **GATES ALL GREEN** (2m 38s · the suite
+> 15,099 = +11 [PageBreadcrumbs 4 · route-meta 7] + the 8 pages'
+> wiring pins · entry 272.83/82.52, every chunk within its row ·
+> copy:audit clean, the 4 new fa strings queued unreviewed).
+> **DEPLOYED LIVE (currena-api `74777037` — a WEB-ONLY deploy, the
+> markets worker untouched by the code-unchanged convention; the
+> deploy-lock check ran first: S18's `51a0fe45` @ 100%; the deployed
+> entry chunk byte-verified identical to the local build; the live
+> acceptance on currena.ir re-ran the 4-leg checks — all green:
+> trails · meta · labels · hero fixes · 0px overflow · ZERO errors).**
+> The S18 transient P1 glance: gold-aud SELF-CLEARED; ecb-drf still
+> flagged stale (2.5 held on last-good) — a maintenance-session item
+> now.
 
-> **S18 (2026-11-11) — Currencies build & gates — Phase I OPENED AND
-> CLOSED IN ONE SESSION. Session 18/30 · 12 remaining.** Delivered the
-> /currencies page build + gates whole (the S16/S17 one-session
-> trajectory): (a) the engine leg — AUDNZD joins the FX board (D-42: its
-> own pacificLink group, NZD riding the SAME single Frankfurter request —
-> zero new provider calls; the seven rules/thresholds/pattern checks
-> untouched); (b) the pure currencies-tiles + the en/fa pd.currencies
-> copy (~118 keys/locale, the corpus-pinned words verified byte-for-byte
-> by currencies-copy-pin.test.ts) + the pins; (c) the page build — the 7
-> rule lights hero (through the SAME §9.3 fxRuleView mapping the legacy
-> page reads) + the 11-pair board (rate · d1/m1/m3/y1 · moveRank ·
-> bigMove · the 52-week closes) + the dollar-standing cards (14 §21-trio
-> registry cards) + the FX-board payload wiring (two feeds, the M-17
-> last-good on both); (d) the §21 backtest (the pure core with THREE
-> gates + the offline suite [14 tests] + the live pd-s18-backtest.ts —
-> post-deploy ALL GREEN: cards 14/14 · rules 16/16 · board 23/23 [11/11
-> pairs] · freshness 14 within grace); (e) the render audit
-> (CurrenciesPage.test.tsx, 8 tests) + the In-build chip RETIRED at the
-> gates pass — the LAST placeholder page is real (DESTINATION_ROUTES is
-> empty; every destination renders its own page chunk). **DEPLOYED LIVE
-> (BOTH workers: currena-api `51a0fe45` + currena-markets `8f63c8fa` +
-> the manual fx-run KV seed — the 11th pair landed on the live board at
-> rate 1.22827, asOf 2026-11-09; the post-deploy §21 ALL GREEN; the
-> 4-leg browser pass green; the legacy /insights fx table now honestly
-> shows the fourth group "Australia–New Zealand (1)" with the audnzd
-> row).** The one data event of the session: the post-deploy freshness
-> audit caught dollar-broad/dollar-eme crossing their 10-day grace (a
-> PRE-EXISTING FRED edge-lag, verified against the source), fixed
-> through the pipeline's own lever (a workflow_dispatch ingest run
-> refreshed them to 2026-11-06).
->
-> **THE THIRD S18 ARRIVAL (2026-11-12, BD-S18-parallel-3 — resolved the
-> same session):** a third session from the same prompt, resumed from
-> the first duplicate's interrupted local checkpoints, built a
-> duplicate M2 against a stale view and discovered the close only on
-> its rejected push. It preserved its duplicate on
-> `archive/s18-duplicate-m2`, reset onto the deployed `52a378b`, landed
-> its one unique salvage (`1fc94e0` — the local-seed NZD fixture line,
-> dev harness only), and INDEPENDENTLY re-verified the shipped S18 a
-> third time: its own gates run ALL GREEN 15,088 (2m 38s) · its own
-> live pd-s18-backtest ALL CHECKS GREEN (cards 14/14 · rules 16/16 ·
-> board 23/23 with audnzd at moveRank 60.39 · freshness 14 within
-> grace) · its own 4-leg browser pass green (chip ABSENT, 0px overflow,
-> ZERO errors, «۱٫۲۲۸۳ دلار نیوزیلند» live) · the legacy fourth-group +
-> /australia seat chips verified. No re-deploy, no shipped-code change.
-> The session's own standing note: launch exactly ONE session per
-> roadmap slot — S19 first, then wait for its hand-off.
-
-## Current state (2026-11-11, after page-division S18)
+## Current state (2026-11-12, after page-division S19)
 
 - **Program:** page-division — splitting the all-in-one Insights page
-  into 10 destinations per D-1…D-48. **Phase I (Currency Pairs) CLOSED:
-  S18 delivered the Currencies page build + gates in one session — the
-  last placeholder page is real.** All TEN destinations now render their
-  own pages: Global (/) · Gold · World Markets · USA · Europe · Asia &
-  Pacific · Australia · Commodities · **Currency Pairs (/currencies)** ·
-  legacy /insights (the deprecation banner, unchanged below it — its fx
-  table honestly gained the fourth group block "Australia–New Zealand
-  (1)" with the audnzd row, the D-42 consequence).** Progress: S1
-  scaffold & navigation · S2 data layer + `PLACEMENT.generated.md` ·
-  S3–S4 the Global landing (Phase A CLOSED) · S5–S6 Gold (Phase B
-  CLOSED) · S7–S8 World Markets + the zoom maps (Phase C CLOSED) ·
-  S9–S11 USA (Phase D CLOSED) · S12–S13 Europe (Phase E CLOSED) ·
-  S14–S15 Asia (Phase F CLOSED) · S16 Australia (Phase G CLOSED) · S17
-  Commodities (Phase H CLOSED) · **S18 Currencies (Phase I CLOSED).**
-- **DEPLOYED LIVE (2026-11-10 ~00:05 UTC, the owner's standing):**
-  **currena-api `51a0fe45`** (the new SPA + the additive
-  FxSnapshotSchema) + **currena-markets `8f63c8fa`** (the fx engine's
-  new pair rides its four crons — the first session to redeploy the
-  markets worker since the fx build era) + the manual fx-run KV seed
-  (the Path-B pattern). The live acceptance: the §21 diff re-run
-  post-deploy ALL GREEN (cards 14/14 · rules 16/16 · board 23/23 [11/11
-  pairs, D-42 complete] · freshness 14 within grace);
-  currena.ir/currencies renders the complete page over the live feeds at
-  1440×900 AND 360×844 in en AND fa (7 rule lights with the live
-  outcomes · 11 pair cards with audnzd last · 14 registry cards · the
-  In-build chip ABSENT on all 4 legs · NO horizontal scroll · ZERO
-  console/page errors; the fa legs dir=rtl + h1='جفت‌ارزها' + Persian
-  digits ['۵۰٫۱۴ لیر ترکیه' · '۱٫۲۲۸۳ دلار نیوزیلند' · '۵۶٫۷۰٪']). The
-  prior surface was `08e0fc64` (S17, /commodities); production moved
-  `08e0fc64` → `51a0fe45`.
-- **The AUDNZD engine addition (BD-S18a, D-42):** the fx board's pairs
-  are now ELEVEN (audnzd in its own pacificLink group). An ADDITIVE
-  wire-contract change (FxPairIdSchema) — pre-S18 stored snapshots kept
-  parsing. NZD rides the same single Frankfurter timeseries request
-  (zero new provider calls; the Yahoo fallback gained the NZD=X symbol).
-  The seven rules, every threshold, every pattern check and the summary
-  rollup are untouched (audnzd is not a rule input). The legacy corpus
-  gained the new surface's own words (fx.groups.pacificLink ·
-  fx.entries.audnzd · currencyNames/Plural.NZD — en + fa, the 6 fa
-  strings queued unreviewed).
-- **Gates (last full run, S18 — ALL GREEN):** typecheck 6/6 · eslint 0/0
-  · copy:audit clean (exit 0 — the 118 new pd.currencies.* + the 6 new
-  fx.* fa entries queued unreviewed; the narrator vocabulary REGENERATED
-  for the corpus additions) · **suite 15,088 = +35** (currencies-tiles
-  10 · currencies-copy-pin 2 · currencies-backtest 14 · CurrenciesPage
-  render audit 8 · fx.test +1) · build + budgets held (entry
-  271.02/82.06, the CurrenciesPage chunk 21.09/5.33 vs its 24/6.5 row).
-- **The live §21 diff (post-deploy, vs https://currena.ir): ALL CHECKS
-  GREEN** — the 14 registry cards' trio inputs page ≡ engine
-  byte-for-byte; the rules gate green (the §9.3 status table row-by-row
-  through the SAME fxRuleView + the renderable-domain invariant + the
-  stored summary ≡ the engine's own summarizeFxRules recomputed); the
-  board gate green (11/11 pairs · the bigMove ≡ moveRank ≥ 90
-  derivation · the stale-flag honesty); the freshness audit honest (14
-  within grace). PRE-deploy, the same run showed the D-42 coverage leg
-  honestly RED (audnzd not yet live) — the deploy + the fx-run seed
-  closed it (the S16-shaped pre-deploy record).
+  into 10 destinations per D-1…D-48. **All TEN destinations render
+  their own pages and every page now carries its S19 polish: the
+  breadcrumb trail, the per-route meta/OG, the verified sticky footer.
+  Phase J (Integration) is OPEN — S19 done; S20 (the full-site
+  regression + verdict backtest + data audit) and S21 (the
+  spec-vs-implementation audit) remain.** Progress: S1 scaffold &
+  navigation · S2 data layer + `PLACEMENT.generated.md` · S3–S4 the
+  Global landing (Phase A CLOSED) · S5–S6 Gold (Phase B CLOSED) ·
+  S7–S8 World Markets + the zoom maps (Phase C CLOSED) · S9–S11 USA
+  (Phase D CLOSED) · S12–S13 Europe (Phase E CLOSED) · S14–S15 Asia
+  (Phase F CLOSED) · S16 Australia (Phase G CLOSED) · S17 Commodities
+  (Phase H CLOSED) · S18 Currencies (Phase I CLOSED) · **S19
+  Navigation, mobile & SEO polish (Phase J OPEN).**
+- **DEPLOYED LIVE (2026-11-10 ~03:1x UTC, the owner's standing):**
+  **currena-api `74777037`** (the S19 SPA: the breadcrumbs + the
+  route-meta pass + the language-toggle labels + the footer rider +
+  the two hero fixes; the markets worker stays at `8f63c8fa` — no
+  engine change this session, the code-unchanged convention). The
+  prior surface was `51a0fe45` (S18, BOTH workers + the fx-run KV
+  seed); production moved `51a0fe45` → `74777037`.
+- **Gates (last full run, S19 — ALL GREEN):** secret scan 8/1018 ·
+  typecheck 6/6 · eslint 0/0 · copy:audit clean (the 4 new fa strings
+  — nav.switchToFa · nav.switchToEn · nav.breadcrumb ·
+  app.metaDescription — queued unreviewed; the retired
+  nav.toggleLanguage removed from the manifest) · narrator in sync +
+  eval 50 · layer1 11,819/11,819 · **the suite 15,099 = +11** ·
+  build + budgets held (entry 272.83/82.52, every page chunk within
+  its row).
+- **The S19 surfaces (what changed where):** `PageBreadcrumbs.tsx` +
+  the 8 page wirings · `lib/route-meta.ts` + the App `<head>` effect ·
+  the dictionaries (4 new keys, 1 retired) · the static index.html +
+  the PWA manifest description · `.app-footer` + `.ei-state-pill` in
+  index.css · the InsightsHeader data-as-of line · the Header language
+  quick-toggle labels. Rollback: ONE `npx wrangler rollback` from
+  apps/api returns every surface to the S18 shape.
 
-## Next session (S19 — Navigation, mobile & SEO polish · Session 19/30)
+## Next session (S20 — Full-site regression + verdict backtest + data audit · Session 20/30)
 
 Read `AGENTS.md` (§14 carries the owner's rules) first, then
-`docs/page-division/01-SESSION-ROADMAP.md` (the S19 entry + the S18
-delivery record), `02-PAGE-DIVISION-SPEC.md` §18 (the navigation/routes
-/visual-language contract) + §21, and this file. Scope (S19 — Phase J
-opens): the topbar/drawer final pass across all pages; sticky footers;
-meta/OG tags per page; breadcrumbs; the known Header language-toggle
-display quirk (HANDOFF item 6 — the button shows the theme words as its
-visible label; its aria-label is correct) rides this pass. Gates: every
-page × the mobile/ARIA pass; typecheck + lint + copy:audit +
-build/budgets; browser verification on the touched surfaces; commit
-pushed at every checkpoint. The deploy at the close is the owner's
-standing.
+`docs/page-division/01-SESSION-ROADMAP.md` (the S20 entry + the S19
+delivery record), `02-PAGE-DIVISION-SPEC.md` §21 (the acceptance
+criteria & test gates — S20's own checklist), and this file. Scope
+(S20): every page × every gate from §21 of the spec; the N=20
+random-id source spot-check (Rule 5 — fetch each id's value from its
+upstream source and cross-check, 100% match or a recorded, explained
+difference); the performance budget check (the bundle rows + a
+performance pass at both widths). The tools for the verdict gates are
+the per-page live backtests already shipped (pd-s4/s5/s7/s8/s9/s10/
+s12/s14/s16/s17/s18-backtest.ts — re-run them all against production).
+Gates: all green; commit pushed at every checkpoint. The deploy at the
+close is the owner's standing.
 
 ### The §15 FRED-only CPI fills for Asia — carried forward (BD-S14a / BD-S15d)
 
@@ -173,100 +128,56 @@ the new cards.** Their absence does not make the 11 placed Asia cards
 3. Ratify or redirect BD-S3a/b/c + BD-S4a/b + BD-S5a + BD-S6a +
    BD-S7a/b + BD-S8a/b/c + BD-S9a/b/c + BD-S10a/b/c + BD-S11a/b/c +
    BD-S12a/b + BD-S13a/b/c/d + BD-S14a/b/c/d + BD-S15a/b/c/d +
-   BD-S16a/b/c/d + BD-S17a/b/c + **BD-S18a/b/c + the deploy (the
-   Currencies build & gates — Phase I CLOSED, incl. the AUDNZD engine
-   addition)** (all recorded, none blocking).
-4. Triage the queued unreviewed fa strings (now ~1138: the ~1014
-   previous + the 6 fx.* engine strings + the 118 S18
-   `pd.currencies.*` keys; the S18 corpus-pinned values — the rule-light
-   names/headlines/everyday words, the pair/card names, the unit words,
-   the position/band/status words — are verified byte-for-byte by
-   `currencies-copy-pin.test.ts`; the fresh section/intro/loading/error
-   + move-rank/52-week copy pending review).
+   BD-S16a/b/c/d + BD-S17a/b/c + BD-S18a/b/c + **BD-S19a/b/c/d (the
+   S19 polish: the language-toggle verification + target-naming labels
+   · the breadcrumb scope · the SPA meta/OG approach · the
+   sticky-footer verification + the safe-area rider + the two S1-noted
+   hero items)** (all recorded, none blocking).
+4. Triage the queued unreviewed fa strings (now ~1142: the ~1014
+   previous + the S18 additions + the 4 S19 strings; every session's
+   corpus-pinned values are verified byte-for-byte by their copy-pin
+   tests — the fresh section/intro/loading/error + the S19 labels +
+   descriptions pending review).
 5. The external investor's review of the spec (§19) — Phase 3's input.
-6. The Header's language quick-toggle display quirk (S19's polish pass
-   carries it): the button shows the theme words as its visible label
-   (its aria-label is correct) — `apps/web/src/components/Header.tsx`
-   ~line 316.
+6. ~~The Header's language quick-toggle display quirk~~ — **CLOSED at
+   S19 (BD-S19a): the "theme words" read was disproven against the
+   deployed DOM; the labels now name the target language; verified on
+   all four legs.**
 7. The §15 FRED-only CPI fills for JP/KR/IN — still carried forward to
    a dedicated fill session (BD-S14a/BD-S15d, §"The §15 FRED-only CPI
    fills for Asia" above).
-8. A glance at the two TRANSIENT P1 provider timeouts from the S18
-   data-refresh ingest run (#87: ecb-dfr + gold-aud, held on last-good
-   and flagged stale by the fail-closed design): they should self-clear
-   at the next ingest rung; if they persist across runs, they belong to
-   a maintenance session.
-9. **THE PARALLEL S18 SESSIONS (BD-S18-parallel + BD-S18-parallel-2 +
-   BD-S18-parallel-3 — RESOLVED, all three sessions closed):** a SECOND
-   agent session committed its own S18 milestones (M1a/M1b/M2 — the
-   `auLink` variant, an alternative page build) to origin/main WHILE the
-   primary session ran.
-   The primary session had already passed all gates and DEPLOYED both
-   workers, so every merge conflict was resolved to its deployed
-   implementation (`pacificLink`, the live `51a0fe45`/`8f63c8fa` truth);
-   the duplicate's non-conflicting contributions were kept and its orphan
-   component removed (its content stays in its commits `4fea60a`/
-   `59b0388`/`2f1e0f1`). **The duplicate session then closed honestly
-   (BD-S18-parallel-2): it aligned to the merged `1941197`, dropped its
-   superseded M3 commit, and INDEPENDENTLY re-verified the shipped S18
-   (its own full-gates run ALL GREEN 15,088 · its own live pd-s18 run
-   ALL GREEN · its own 4-leg browser pass green · the legacy /insights
-   fourth-group + /australia chips verified). No re-deploy, no code
-   change; the two records together are the complete story.** A THIRD
-   session then arrived from the same prompt (resumed from the first
-   duplicate's interrupted local checkpoints, unaware of the close until
-   its own push was rejected): it too honoured the deployed-state rule
-   (BD-S18-parallel-3) — its duplicate M2 preserved on the pushed branch
-   `archive/s18-duplicate-m2`, main reset to `52a378b`, its ONE unique
-   salvage landed (`1fc94e0` — the local-seed NZD fixture line, dev
-   harness only), and the shipped S18 independently re-verified a third
-   time (its own gates run ALL GREEN 15,088 · its own live pd-s18 run
-   ALL GREEN · its own 4-leg browser pass green · the cross-surfaces
-   verified). No re-deploy, no shipped-code change.
-   The owner-side post-mortem: THREE S18 sessions were launched from one
-   prompt (the primary + two duplicates; zero production collisions —
-   neither duplicate ever deployed or pushed to main). Ensure S19+
-   launches exactly ONE session per roadmap slot — launch S19 first, then
-   wait for its hand-off before any further session.
+8. **The ecb-drf provider timeout (a maintenance-session item now):**
+   the S18/S19 data-refresh runs kept it held on last-good (2.5%,
+   flagged stale) — it did NOT self-clear across rungs (gold-aud, the
+   other S18 transient, DID self-clear). The fail-closed design is
+   holding the correct value honestly; a maintenance session should
+   look at the ECB fetch (the runbook: docs/INDICATORS_AND_DATA_
+   SOURCES.md + the /admin console's per-source status, which needs
+   the owner's REFRESH_SECRET).
 
 ## Known state worth knowing
 
-- The Currencies page reads TWO feeds: the S2 projection (GET
-  /api/insights/pages/currencies — the 14 home readings) + the fx board
-  (GET /api/insights/fx — the 7 rule states + the 11 pair rows + the
-  dollar measure). A slow or dead projection takes only the cards away
-  (the M-17 last-good localStorage pattern paints the cached copy,
-  labelled); a dead fx feed renders the calm "being prepared" line
-  (never an error — the markets/fx discipline).
-- The Currencies render audit (`CurrenciesPage.test.tsx`, 8 tests) pins
-  the shell + the 7-light hero with EVERY rule-outcome shape (a
-  downgraded warning keeps its warning sentence + the caution line; a
-  quiet R7 stays legitimately silent) + the 11-pair board (the bigMove
-  + stale tags, the 52-week chart) + the two card sections with the §21
-  trio + the fail-closed paths + the M-17 last-good on both feeds + the
-  fa/RTL Persian rendering. The In-build chip is asserted ABSENT (the
-  S18 gates session — BD-S18c's retirement).
-- The §21 backtest for Currencies (`currencies-backtest-core.ts` with
-  THREE gates + the offline suite [14 tests] + the live
-  `pd-s18-backtest.ts`) is the S18 gate; the live run against production
-  post-deploy: ALL GREEN. The live script fetches THREE feeds (the
-  snapshot + the projection + the fx board) — re-run it any time with:
-  `pnpm --filter @currena/web exec tsx ../../apps/web/scripts/pd-s18-backtest.ts`.
-- The Currencies budget row (`scripts/check-bundle-budget.mjs`): the
-  CurrenciesPage lazy chunk measured 21.09/5.33 (S18, chip retired) vs
-  a 24/6.5 ceiling.
-- The rollback lever for the S18 deploy (BOTH workers, the safe order is
-  markets first, then a 10-pair fx-run reseed, then api — the OLD api
-  schema rejects the stored audnzd row): `npx wrangler rollback` from
-  each app — /currencies returns to the prior surface (`08e0fc64`, S17,
-  the S1 PagePlaceholder with the honest In-build chip); every other
-  surface was byte-identical before it (the S18 change is the engine
-  pair + the corpus words + the /currencies page build + the §21
-  backtest + the render audit + the chip retirement + the App.tsx
-  wiring only).
-- The fx-run manual lever (`pnpm --filter @currena/insights fx-run`,
-  needs CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID +
-  INSIGHTS_KV_NAMESPACE_ID) rewrites the fx KV through the REST API —
-  used post-deploy to land the audnzd pair immediately (the
-  markets-au-run Path-B pattern); the markets worker's four crons keep
-  it fresh from now on.
+- The S19 meta/OG pass is CLIENT-SIDE (the SPA-honest approach,
+  BD-S19c): JS-executing readers get the per-route tags; non-JS
+  crawlers see the static whole-product defaults in index.html. If the
+  owner ever wants per-route link previews for non-JS crawlers
+  (Telegram/X cards), the options are SSR/prerender or a Worker-side
+  <head> injection — an owner decision, recorded in BD-S19c.
+- The breadcrumbs render in the pages' ready + cached states (they
+  ride each page's own heading block — BD-S19b). The loading/error
+  states show the page's own honest lines, no trail; that is by design
+  (the trail is wayfinding for content, not a chrome element).
+- The strategy log's §8 session table (docs/page-division/
+  03-STRATEGY-LOG.md) stops at S11 — the later sessions' records live
+  in the roadmap delivery records + this file (the convention moved at
+  S12). A back-fill is a nice-to-have, never blocking.
+- The rollback lever for the S19 deploy (ONE worker, web-only):
+  `npx wrangler rollback` from apps/api — every surface returns to
+  the S18 shape (`51a0fe45`); nothing else moves (the S19 change is
+  display-layer only).
+- The per-page live backtests (the S20 toolkit): pd-s4 (Global 84) ·
+  pd-s5 (Gold 150) · pd-s7 (World Markets 56) · pd-s8 (zooms 13) ·
+  pd-s9/s10 (USA 69/173) · pd-s12 (Europe 8) · pd-s14 (Asia 11) ·
+  pd-s16 (Australia 28) · pd-s17 (Commodities 24) · pd-s18
+  (Currencies: cards + rules + board) — all re-runnable against
+  production from apps/web/scripts/.

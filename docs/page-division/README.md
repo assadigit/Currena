@@ -140,9 +140,19 @@ regeneration (`pnpm placement:generate`).
   In-build chip RETIRED at the gates pass — the LAST placeholder page is
   real — deployed BOTH workers [currena-api `51a0fe45` + currena-markets
   `8f63c8fa` + the fx-run KV seed] with the post-deploy §21 ALL GREEN +
-  the 4-leg browser pass green) 2026-11-11.** Next: Session 19/30 (S19 —
-  Phase J opens: Navigation, mobile & SEO polish). See the roadmap's
-  progress board for the current position.
+  the 4-leg browser pass green) 2026-11-11.** S19 (the Navigation,
+  mobile & SEO polish — Phase J OPENS: the breadcrumbs on the eight
+  destinations + the per-page meta/OG pass [the route-meta table + the
+  App <head> effect + the refreshed static defaults] + the HANDOFF item
+  6 language-toggle polish [the "theme words" read disproven against
+  the deployed DOM; the labels now name the target] + the sticky-footer
+  verification with the iOS safe-area rider + the two S1-noted
+  legacy-hero mobile items closed; the suite 15,099 = +11; the browser
+  pass on all 10 routes × both widths × both locales) 2026-11-12 —
+  DEPLOYED LIVE (currena-api `74777037`, a WEB-ONLY deploy — the
+  markets worker untouched).** Next: Session 20/30 (S20 — the
+  full-site regression + verdict backtest + data audit). See the
+  roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

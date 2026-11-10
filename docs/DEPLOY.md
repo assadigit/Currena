@@ -132,6 +132,83 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-12 the page-division S19 deploy (the Navigation, mobile & SEO polish — Phase J opens; the breadcrumbs + the per-page meta/OG tags + the language-toggle polish + the sticky-footer verification live for every visitor on every page)
+
+**Scope (page-division S19, Phase J opens):** display-layer ONLY — the
+web SPA and its dictionaries; NO engine change, NO API-code change, NO
+wire-contract change. The shipped surface: (a) the shared
+`PageBreadcrumbs` component wired into the EIGHT destinations' heading
+blocks (Home a REAL link through the path router + the current page as
+an aria-current span + the separator aria-hidden and RTL-mirrored;
+Global IS Home, the legacy /insights keeps its deprecation banner as
+the wayfinding bridge — BD-S19b); (b) the per-page meta/OG pass (the
+pure `lib/route-meta` table + the App shell's extended <head> effect:
+per-route description [the nine destinations' dictionary PURPOSE
+lines], og:title/og:description/og:url/og:locale, twitter:* and the
+canonical link — find-or-create idempotent writers; the static
+index.html defaults + the PWA manifest description refreshed to the
+whole-product sentence — BD-S19c); (c) the language quick-toggle's
+accessible name + tooltip now NAME THE TARGET ('Switch to Farsi' /
+«تغییر به انگلیسی» — the HANDOFF item 6 "theme words" read disproven
+against the deployed DOM; BD-S19a); (d) the footer's iOS safe-area
+rider (`.app-footer` padding-block-end respects
+env(safe-area-inset-bottom) on viewport-fit=cover devices — the
+sticky-footer layout itself verified on every route, BD-S19d); (e) the
+two S1-noted legacy-hero mobile fixes (the ⓘ wrap on the data-as-of
+line — the date + prices units are separate non-breaking bdis — and
+the state-pill icon-to-word gap 0.375rem → 0.5rem).
+
+**Gates before the deploy (ALL GREEN, 2m 38s):** secret scan 8/1018 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean (the 4 new fa strings —
+nav.switchToFa · nav.switchToEn · nav.breadcrumb ·
+app.metaDescription — queued unreviewed) · narrator in sync + eval 50 ·
+layer1 11,819/11,819 · the full suite **15,099 = +11**
+(PageBreadcrumbs 4 · route-meta 7, plus the 8 pages' breadcrumb wiring
+pins + 3 title assertions tightened to the h1 role) · build + budgets
+held — entry 272.83/82.52, every page chunk within its row.
+
+**The deploy-lock check ran first** (the D-43 lesson): the active
+version was S18's `51a0fe45` @ 100% — no parallel deploy. The deploy
+(WEB-ONLY — the markets worker untouched, the code-unchanged
+convention): `pnpm --filter @currena/web build` + `wrangler deploy` →
+**currena-api `74777037` @ 100%** (version
+`74777037-2007-47b6-ad73-69904ceea8ba`, 2026-11-10 ~03:1x UTC). The
+deployed entry chunk (`index-IjAwPQA1.js`) byte-verified IDENTICAL to
+the local build. Production smoke: /api/health 200 · / 200 · /gold
+200 · the static meta description refreshed.
+
+**The live acceptance (ALL GREEN):** currena.ir verified at 1440×900 +
+360×844 in en + fa — the breadcrumb trails on the eight destinations
+(en `Home › Gold` · fa «صفحهٔ اصلی›طلا» with the RTL-mirrored chevron,
+`scale: -1 1` verified in the CSSOM + the VLM read), NO trail on
+Global + /insights (BD-S19b), the per-route titles/descriptions/
+canonicals + og:locale en_US/fa_IR live on every route, the language
+quick-toggle's new labels ('Switch to Farsi'/«تغییر به انگلیسی»,
+visible 'فا'/'EN'), the /insights hero fixes live in the DOM (the two
+nowrap bdis + the ⓘ inside the prices unit + the 8px pill gap), 0px
+horizontal overflow on every route in every leg, ZERO console/page
+errors, the Global one-screen rule intact WITH the footer (docScrollH
+= 900 at 1440×900), the topbar on one unwrapped line at exactly
+1024×768, the mobile drawer's 19 rows all ≥44px with navigation +
+auto-close, and every other surface intact (the S18 pages' content is
+byte-identical below the new trail row).
+
+**The S18 transient P1 glance (the roadmap's ask):** gold-aud
+SELF-CLEARED (asOf 2026-11-10, status context — fresh at the latest
+rung); ecb-dfr still carries the stale flag (asOf 2026-11-09, value
+2.5 held on last-good) — it did not self-clear at the 00:23Z rung, so
+per the HANDOFF's own rule it now belongs to a maintenance session
+(the fail-closed design is holding the correct value honestly).
+
+- **Rollback:** `npx wrangler rollback` from apps/api — every surface
+  returns to the S18 shape (`51a0fe45`): the trails, the meta pass,
+  the labels, the rider and the two hero fixes vanish; nothing else
+  moves (the S19 change is display-layer only).
+- **Who decided:** the build & gates session (S19) under the owner's
+  standing delegation ("the deploy at the close is the owner's
+  standing"). **Revisit:** the record is final; the next session (S20)
+  is the full-site regression + verdict backtest + data audit.
+
 ## Session record — 2026-11-11 the page-division S18 deploy (the Currencies build & gates — Phase I opens and closes in one session; the 7 rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42 — the one named engine addition] + the dollar-standing cards live for every visitor at /currencies; the LAST placeholder page is real)
 
 **Scope (page-division S18, the Currencies build & gates):** display-layer

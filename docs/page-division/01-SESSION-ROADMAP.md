@@ -1446,9 +1446,75 @@ retired + the budget row) + the deploy record, all in
 
 ## Phase J — Integration (S19–S21)
 
-### ☐ S19 — Navigation, mobile & SEO polish · `Session 19/30`
+### ✅ S19 — Navigation, mobile & SEO polish · `Session 19/30` · delivered 2026-11-12 · **Phase J OPEN**
 - Topbar/drawer final pass across all pages; sticky footers; meta/OG tags
   per page; breadcrumbs.
+
+**S19 delivery record (2026-11-12):** Phase J (Integration) is OPEN — the
+navigation, mobile & SEO polish delivered whole over the S18-complete
+tree (every page real; the pass is the polish + verification session).
+**(a) The topbar/drawer final pass + the language quick-toggle
+(BD-S19a — the HANDOFF item 6):** the pass verified the D-45 topbar and
+the mobile drawer on EVERY route × both widths × both locales (the
+dropdowns + active states + the 44px drawer rows + the one-unwrapped-
+line-at-1024 constraint all re-proven live); the HANDOFF item 6's
+"theme words" read is DISPROVEN against the deployed DOM (both locales ×
+both widths: the visible label is the target language's own word
+'فا'/'EN', the aria-label was already the correct 'Toggle language'/
+«تغییر زبان») — the polish that rides it: the accessible name + tooltip
+now NAME THE TARGET ('Switch to Farsi' / «تغییر به انگلیسی»; the generic
+'toggle language' retired from both dictionaries + the manifest). The
+two S1-noted legacy-hero mobile items closed with it (BD-S19d): the ⓘ
+wrap on the data-as-of line (the date + prices units are separate
+non-breaking bdis — "UTC ⓘ" never orphans, verified in the live DOM)
+and the state-pill icon spacing (the gap 0.375rem → 0.5rem + a touch
+more padding). **(b) The breadcrumbs (BD-S19b):** the shared
+`PageBreadcrumbs` — a REAL Home link routed through the path router
+once (no reload), the current page as an aria-current span (the
+WAI-ARIA pattern), the separator aria-hidden + mirrored in RTL, the
+Footer's 32px hit-area precedent — wired into the EIGHT destinations'
+heading blocks; Global IS Home (no trail) and the legacy /insights
+keeps its deprecation banner as the wayfinding bridge; the wiring
+pinned in every page's shell test + the component's own 4-test suite.
+**(c) The per-page meta/OG (BD-S19c):** the pure `lib/route-meta`
+table (the S1 titleKeyFor switch moved verbatim + regression-pinned)
+feeds the App shell's extended <head> effect — per-route description
+(the nine destinations REUSE their dictionary PURPOSE lines, D-48;
+everything else the new app-wide `app.metaDescription`), og:title/
+og:description/og:url/og:locale + twitter:title/description + the
+canonical link, find-or-create idempotent writers (7 tests); the static
+index.html defaults + the PWA manifest description refreshed from the
+converter-era wording to the whole-product sentence; true per-route SSR
+OG recorded as out of scope by the repo's own SPA-only rule.
+**(d) The sticky footers (BD-S19d):** the shell's min-h-screen flex
+column seats the footer at the viewport bottom on short pages — VERIFIED
+on every route at both widths in both locales (Global exactly one
+screen at 1440×900 AND 360×844, footer bottom = viewport height; long
+pages push it below content, never overlapping); the rider that landed:
+`.app-footer`'s padding-block-end respects the iOS home-indicator inset
+on viewport-fit=cover devices. **(e) The S18 transient P1 glance (the
+roadmap's own ask):** gold-aud SELF-CLEARED (asOf 2026-11-10, fresh at
+the latest rung); ecb-drf still carries the stale flag (value 2.5 held
+on last-good) — per the HANDOFF's own rule it now belongs to a
+maintenance session. **GATES ALL GREEN** (2m 38s: secret scan 8/1018 ·
+tsc 6/6 · eslint 0/0 · copy:audit clean (the 4 new fa strings queued
+unreviewed) · narrator in sync + eval 50 · layer1 11,819/11,819 · the
+suite **15,099 = +11** (PageBreadcrumbs 4 · route-meta 7) · build +
+budgets held — entry 272.83/82.52, every page chunk within its row).
+**The browser pass:** all 10 routes × 1440×900 + 360×844 × en + fa over
+the live production data — the per-route titles/descriptions/canonicals/
+og:locale, the trails on the 8 destinations only, the RTL-mirrored
+chevron (CSSOM + VLM verified), the drawer + dropdowns, the language
+toggle's new labels, the hero fixes in the live DOM, 0px overflow on
+every leg, ZERO console/page errors. **Deployed + live-verified**
+(currena-api **`74777037`**, the owner's standing — a WEB-ONLY deploy,
+the markets worker untouched by the code-unchanged convention; the
+deploy-lock check ran first: S18's `51a0fe45` @ 100%; the deployed
+entry chunk byte-verified identical to the local build; the live
+acceptance re-ran the checks on currena.ir — all green; rollback: one
+`wrangler rollback`, every surface returns to the S18 shape).
+Decisions: BD-S19a · BD-S19b · BD-S19c · BD-S19d + the deploy record
+(`74777037`), all in `docs/DECISIONS.md`.
 
 ### ☐ S20 — Full-site regression + verdict backtest + data audit · `Session 20/30`
 - Every page × every gate from §21 of the spec; N=20 random-id source
@@ -1494,18 +1560,18 @@ retired + the budget row) + the deploy record, all in
 | G Australia | S16 | ✅ S16 2026-11-10 (deployed `9d60726b` 2026-11-10 ~20:30 UTC — the Australia build & gates: the REUSED AU Markets board [19 symbols], the 5-gauge structure D-37, the 28 cards, the 11 moved-out seat chips, the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 28/28 green + the 4-leg browser pass green — **PHASE G CLOSED**) |
 | H Commodities | S17 | ✅ S17 2026-11-11 (deployed `08e0fc64`, the 4 commodity groups + the trade routes & supply group — 24 cards + the gold cross-link; the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 24/24 green + the 4-leg browser pass green — **PHASE H CLOSED**) |
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
-| J Integration | S19–S21 | ☐ |
+| J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — **Phase J OPEN**) |
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 18/30 delivered 2026-11-11 · 12 remaining — next
-action: Session 19/30 (S19, Phase J opens — Navigation, mobile & SEO polish:
-the topbar/drawer final pass across all pages, sticky footers, meta/OG tags
-per page, breadcrumbs; the known Header language-toggle display quirk
-[HANDOFF item 6] rides this pass). The §15 FRED-only CPI fills for Asia
+**Current position: Session 19/30 delivered 2026-11-12 · 11 remaining — next
+action: Session 20/30 (S20 — the full-site regression: every page × every
+gate from §21 of the spec; the N=20 random-id source spot-check per Rule 5;
+the performance budget check). The §15 FRED-only CPI fills for Asia
 (BD-S14a/BD-S15d) stay carried forward to a dedicated fill session — pick a
 viable monthly source for JP/KR/IN: the national statistics bureaus
 directly, a fresh FRED/IMF IFS series, or the World Bank annual as a
-lower-resolution fallback. The transient P1 provider timeouts from the S18
-data-refresh run (ecb-dfr + gold-aud, held on last-good, flagged stale)
-should self-clear at the next ingest rung — worth a glance in S19.**
+lower-resolution fallback. The ecb-dfr provider timeout from the S18
+data-refresh runs (held on last-good at 2.5, flagged stale) did NOT
+self-clear across rungs — it belongs to a maintenance session now (the S19
+glance: gold-aud DID self-clear).**

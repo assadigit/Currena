@@ -1937,3 +1937,184 @@
   main). The standing instruction hardens: **launch exactly ONE
   session per roadmap slot — S19 first, then wait for its hand-off
   before any further session.**
+
+## 2026-11-12 — BD-S19a: the HANDOFF item 6 language quick-toggle pass — the "theme words" read DISPROVEN against the deployed DOM; the polish that rides it: the accessible name + tooltip now NAME THE TARGET language
+
+- **Context:** the HANDOFF (item 6, first recorded at S9's close) carried
+  a "pre-existing display quirk" for the Header's language quick-toggle:
+  "the button shows the theme words as its visible label (its aria-label
+  is correct)" — slated for S19's polish pass.
+- **The verification (this session, against the DEPLOYED site + the
+  freshly built SPA):** the claim does not reproduce. On every leg
+  (currena.ir + the local preview, en + fa, 1440×900 + 360×844) the
+  button's visible label is the TARGET language's own word ('فا' in en ·
+  'EN' in fa) and its aria-label + title are the correct
+  'Toggle language' / «تغییر زبان» strings. The source has carried this
+  exact behaviour since the S1 topbar rebuild (`cdc5e7c`) and the
+  deployed bundle (byte-verified `51a0fe45`) matches it — the S9-era
+  read is disproven against the DOM (the S5/S6/S10/S11 discipline: the
+  machine's finds checked against reality).
+- **The polish (what actually rides the pass):** the accessible name +
+  tooltip now NAME THE TARGET in the current locale's language —
+  `nav.switchToFa` 'Switch to Farsi' (en) / `nav.switchToEn`
+  «تغییر به انگلیسی» (fa) — clearer for assistive-tech users than the
+  retired generic 'Toggle language' («تغییر زبان», removed from both
+  dictionaries + the manifest). The visible label stays 'فا'/'EN' (the
+  standard quick-toggle convention). 2 fresh fa strings queued
+  unreviewed (the manifest round note).
+- **Who decided:** this session (S19), per the roadmap's own scope line
+  ("the known Header language quick-toggle display quirk … rides this
+  pass").
+- **Revisit:** none needed — the HANDOFF item closes verified.
+
+## 2026-11-12 — BD-S19b: the breadcrumbs' scope — the eight destinations render Home › Page; Global IS Home (no trail) and the legacy /insights keeps its deprecation banner as the wayfinding bridge
+
+- **Decision:** the shared `PageBreadcrumbs` component renders the
+  honest two-level trail the D-46 routes actually have — every
+  destination is a TOP-LEVEL sibling of Home, so the trail is exactly
+  `Home › <Page>`: Home is a REAL link (routed through the path router
+  once, no reload — the house pattern), the current page is a plain
+  span with `aria-current="page"` (the WAI-ARIA breadcrumb pattern),
+  the separator is aria-hidden and mirrored in RTL
+  (`rtl:-scale-x-100`), and the Home link rides the Footer's 32px
+  `py-2` hit-area precedent (WCAG 2.5.8 AA floor with room to spare —
+  full 44px buttons would bloat a caption-size wayfinding row).
+- **Scope:** the EIGHT destinations beyond Global render it (gold ·
+  world-markets · usa · europe · asia-pacific · australia ·
+  commodities · currencies — wired inside each page's own heading
+  block, so it renders in the ready + cached states). Global gets NO
+  trail (a "Home › Global" row on the landing page is noise — the
+  landing IS Home). The legacy /insights keeps its deprecation banner
+  as the wayfinding bridge (retirement ahead at D-9/D-46; the banner
+  already links home). The tool routes keep the topbar.
+- **Options considered:** (a) a three-level trail through "Regions" for
+  the four region pages — REJECTED: "Regions" is a nav group, not a
+  page; a breadcrumb crumb that is not a page is an anti-pattern;
+  (b) App-level rendering above <main> — REJECTED: each page owns its
+  container widths/paddings (the S7 BD-S7b lesson), so an App-level
+  row would break the per-page layout rhythm.
+- **Who decided:** this session (S19), per the roadmap's S19 scope
+  line ("breadcrumbs").
+- **Revisit:** if a future session adds second-level routes (e.g.
+  per-indicator pages), the component grows a middle crumb then.
+
+## 2026-11-12 — BD-S19c: the per-page meta/OG tags — the SPA-honest client-side pass (the destinations' PURPOSE lines as descriptions) + the refreshed static defaults; true per-route SSR OG is out of scope by the repo's own SPA-only rule
+
+- **Decision:** a pure `lib/route-meta` table (the S1 `titleKeyFor`
+  switch moved verbatim + regression-pinned byte-for-byte) feeds the
+  App shell's extended <head> effect: per-route `<title>` (unchanged
+  behaviour) + meta description + `og:title` / `og:description` /
+  `og:url` / `og:locale` + `twitter:title` / `twitter:description` +
+  the canonical link — all find-or-create idempotent writers (safe on
+  every route change). The NINE destinations (incl. Global) reuse
+  their DICTIONARY PURPOSE lines as descriptions (D-48: one wording
+  per concept — the spec §4–§12 "Purpose" sentences ARE the meta
+  descriptions, never a second copy); every other route falls back to
+  the new app-wide `app.metaDescription` (the whole product in one
+  sentence). The static `index.html` defaults + the PWA manifest
+  description carry the same sentence (refreshed from the converter-era
+  "LED boards" wording).
+- **The honesty (why not SSR OG):** this is a client-rendered SPA —
+  the tags serve every JS-executing reader (browsers, the PWA,
+  JS-aware crawlers); non-JS crawlers see the static defaults for
+  every route. TRUE per-route server-rendered OG would need SSR —
+  forbidden by the repo's own SPA-only rule (AGENTS.md §14 rule 4).
+  The limitation is recorded here rather than silently absorbed.
+- **Options considered:** per-route HTML injection in the Worker
+  (rewrite <head> per navigation request) — REJECTED: the platform's
+  SPA fallback serves the static shell for non-asset navigations;
+  routing them through the Worker for a meta rewrite is an infra-level
+  change with real risk, out of a display-layer session's scope.
+- **Who decided:** this session (S19), per the roadmap's S19 scope
+  line ("meta/OG tags per page").
+- **Revisit:** if the owner ever wants link-previews per route for
+  non-JS crawlers (Telegram/X cards), the options are SSR/prerender or
+  the Worker-side injection above — an owner decision.
+
+## 2026-11-12 — BD-S19d: the sticky-footer verification + the mobile safe-area rider (and the two S1-noted legacy-hero mobile items closed)
+
+- **The sticky footers (spec §18):** the shell's `min-h-screen` flex
+  column with `main.flex-1` already seats the footer at the viewport
+  bottom on short pages and below long content otherwise — VERIFIED on
+  every route at both widths in both locales (Global: footerBottom =
+  viewport height exactly, one screen at 1440×900 AND 360×844; the
+  long pages: the footer pushed below content, never overlapping).
+  No layout change needed; the pass is the verification.
+- **The rider that DID land:** `.app-footer` gains
+  `padding-block-end: max(1.25rem, env(safe-area-inset-bottom, 0px))`
+  — the footer now respects the iOS home-indicator inset on
+  viewport-fit=cover devices (the standalone PWA), with the design's
+  own 20px padding as the floor on devices without an inset.
+- **The two S1-noted legacy-hero mobile items (the S1 VLM pass's
+  finds, carried since 2026-11-07):** (1) the ⓘ wrap on the
+  data-as-of line — the date sentence and the prices sentence (+ its
+  ⓘ) are now separate non-breaking `<bdi>` units, so a narrow viewport
+  wraps ONLY between units ("UTC ⓘ" never orphans — verified in the
+  live DOM: 2 nowrap bdis, the ⓘ inside the second, never alone);
+  (2) the "Global-gauge emoji spacing" — the `.ei-state-pill`
+  icon-to-word gap widens 0.375rem → 0.5rem + a touch more inline
+  padding (the state artwork's full-bleed glyph visually merged with
+  the verdict word at 360px; the DOM-measured 12px section-icon gap
+  was already correct — the pill was the offender).
+- **Who decided:** this session (S19), per the roadmap's S19 scope
+  ("sticky footers") + the S1 delivery record's own note ("pre-
+  existing mobile polish items on the legacy hero noted for S19").
+- **Revisit:** none needed.
+
+## 2026-11-12 — BD-S19-deploy: the S19 deploy record — DEPLOYED LIVE (currena-api `74777037`, the owner's standing; a WEB-ONLY deploy — the markets worker untouched, the code-unchanged convention)
+
+- **Scope (page-division S19, Navigation, mobile & SEO polish — Phase J
+  opens):** display-layer only — the SPA (the breadcrumbs component +
+  the 8 page wirings, the route-meta module + the App <head> effect,
+  the language-toggle labels, the footer safe-area rider, the two
+  legacy-hero mobile fixes), the dictionaries (4 new keys, 1 retired),
+  the Persian copy manifest, the static index.html defaults + the PWA
+  manifest description, and the tests (11 new: PageBreadcrumbs 4 ·
+  route-meta 7; + the 8 pages' breadcrumb wiring pins + the 3 title
+  assertions tightened to the h1 role). NO engine change, NO API-code
+  change, NO wire-contract change — the markets worker is untouched
+  (the code-unchanged convention, the S4–S17 web-only pattern).
+- **Gates before the deploy (ALL GREEN, 2m 38s):** secret scan 8/1018
+  · typecheck 6/6 · eslint 0/0 · copy:audit clean (the 4 new fa
+  strings queued unreviewed) · narrator in sync + eval 50 · layer1
+  11,819/11,819 · the full suite **15,099 = +11** · build + budgets
+  held — entry 272.83/82.52, every page chunk within its row.
+- **The deploy-lock check ran first** (the D-43 lesson): the active
+  version was S18's `51a0fe45` @ 100% — no parallel deploy.
+- **The deploy:** `pnpm --filter @currena/web build` + `wrangler
+  deploy` → **currena-api `74777037` @ 100%** (version
+  `74777037-2007-47b6-ad73-69904ceea8ba`, 2026-11-10 ~03:1x UTC).
+  The deployed entry chunk byte-verified IDENTICAL to the local build
+  (`index-IjAwPQA1.js`). Production smoke: /api/health 200 · / 200 ·
+  /gold 200.
+- **The live acceptance (ALL GREEN):** currena.ir verified at
+  1440×900 + 360×844 in en + fa — the breadcrumb trails on the eight
+  destinations (en `Home › Gold` · fa «صفحهٔ اصلی›طلا» with the
+  RTL-mirrored chevron, scale −1 1 verified in the CSSOM + the VLM
+  read), NO trail on Global + /insights (BD-S19b), the per-route
+  titles/descriptions/canonicals + og:locale en_US/fa_IR live on every
+  route, the language quick-toggle's new labels
+  ('Switch to Farsi'/«تغییر به انگلیسی», visible 'فا'/'EN'), the
+  /insights hero fixes live in the DOM (the 2 nowrap bdis + the 8px
+  pill gap), 0px horizontal overflow on every route in every leg,
+  ZERO console/page errors, the Global one-screen rule intact WITH the
+  footer (docScrollH = 900 at 1440×900), the footer at the viewport
+  bottom on short pages + pushed below content on long pages, the
+  topbar on ONE unwrapped line at exactly 1024×768 (the S1
+  constraint), the mobile drawer's 19 rows all ≥44px with the
+  active-route highlighting + the navigation + auto-close verified.
+- **The S18 transient P1 glance (the roadmap's own ask):** gold-aud
+  SELF-CLEARED (asOf 2026-11-10, status context — fresh at the latest
+  rung); ecb-dfr still carries the stale flag (asOf 2026-11-09,
+  value 2.5 held on last-good) — it did NOT self-clear at the 00:23Z
+  rung, so per the HANDOFF's own rule it now belongs to a maintenance
+  session (recorded in the hand-off; the fail-closed design is holding
+  the correct value honestly).
+- **Rollback:** `npx wrangler rollback` from apps/api — every surface
+  returns to the S18 shape (`51a0fe45`): the trails, the meta pass,
+  the labels, the rider and the two hero fixes vanish; nothing else
+  moves (the S19 change is display-layer only).
+- **Who decided:** this session (S19) under the owner's standing
+  delegation ("the deploy at the close is the owner's standing").
+  **Revisit:** the record is final; the next session (S20) is the
+  full-site regression + verdict backtest + data audit.
