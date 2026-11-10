@@ -1690,7 +1690,7 @@ re-opens at the next free slot the moment the owner supplies the answers.
 
 ## Reserve (S25–S30)
 
-### ⏭ S25 — the §15 Asia CPI fill session · PULLED FORWARD into the Session 23 slot · 2026-11-12 (BD-S22)
+### ⏭ S25 — the §15 Asia CPI fill session · PULLED FORWARD into the Session 23 slot · DELIVERED 2026-11-12 (BD-S22 · BD-S23a · BD-S23-parallel)
 - The dedicated fill session carried since S14 (BD-S14a/BD-S15d): pick a
   viable monthly source for the three D-36 Asia fills (Japan · Korea ·
   India CPI YoY) — the national statistics bureaus directly (the
@@ -1708,6 +1708,23 @@ re-opens at the next free slot the moment the owner supplies the answers.
 - **Gates:** source verification green at both venues; the registry +
   inventory + doc tables reconciled; the suite green; the §21 diff green
   (incl. the new cards); deploy + live verify (this session ships code).
+
+**S25 (delivered in the Session 23 slot) — the delivery record:** the
+source is the IMF's own SDMX 3.0 CPI dataflow (BD-S23a — verified at
+BOTH venues + the three national-bureau second voices + the World Bank
+annual cross-check; the FRED OECD mirror candidates verified STALE and
+discarded, BD-S14a); the three fills (japan-cpi · korea-cpi · india-cpi)
+landed as context-only cards (G-5) with the full §A discipline, the
+registry 184 → 187, the /asia-pacific page's five card-carrying sections
+(China 7 · Japan 3 · Korea/Taiwan/HK 1 · India 1 · Pacific-NZ 2 — the
+two index-only sections retired), the fa copy through the manifest
+(round-83), pd-s14 extended to the 14 cards, the spec-v2 diff grown
+(AF-8). A duplicate arrival landed the build (BD-S23-parallel — the
+pushed implementation governs, the duplicate preserved on
+archive/s23-duplicate-m2-m5, the shipped tree independently
+re-verified); the deploy is currena-api `2c61c187` (the markets worker
+untouched, code-unchanged) + the KV seed (rung2-run --imf-cpi). The
+gates ALL GREEN on the shipped tree (15,267).
 
 ### ☐ S26–S30 — Fix rounds · performance · retirement execution
 - Buffer sessions for anything red, slow, or delayed; the final legacy
@@ -1730,30 +1747,32 @@ re-opens at the next free slot the moment the owner supplies the answers.
 | H Commodities | S17 | ✅ S17 2026-11-11 (deployed `08e0fc64`, the 4 commodity groups + the trade routes & supply group — 24 cards + the gold cross-link; the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 24/24 green + the 4-leg browser pass green — **PHASE H CLOSED**) |
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
-| K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot runs the pulled-forward S25 fill session) · ☐ S24 |
-| Reserve | S25–S30 | ⏭ S25 PULLED FORWARD 2026-11-12 (BD-S22 — the §15 Asia CPI fill session runs in the Session 23 slot) · ☐ S26–S30 buffer |
+| K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ☐ S24 |
+| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + the KV seed, /asia-pacific's 14 cards, the registry 187, AF-8, the gates 15,267 green) · ☐ S26–S30 buffer |
 
-**Current position: Session 22/30 delivered (the WAITING-slot close)
-2026-11-12 · 8 remaining — next action: Session 23/30 runs the
-PULLED-FORWARD reserve session (S25 → the §15 Asia CPI fill session: pick
-a viable monthly source for JP/KR/IN — the national statistics bureaus
-directly, a fresh FRED/IMF IFS series, or the World Bank annual as a
-lower-resolution fallback; the FRED OECD mirror family is DEAD, verified
-stale in S14 — never re-try those ids; verify before ingest from both
-venues; the full §A discipline; the three cards on /asia-pacific + the
-pd-s14 extension; the spec-v2 diff grows to cover the new cards). THE
-OWNER'S LEVER REMAINS: arrange the external investor's review of the spec
-(§19's seven questions) — Phase K's input; the moment the answers exist,
-the next free slot re-opens the investor round (collect → D-49+ in the
-strategy log §5 Round 4 → the spec v2 entries — the AF-1…AF-7 spec-side
-hand-count drift rides that pass, never silent edits), and S23's deferred
-feedback-build scope follows it. The ecb-dfr provider timeout from the S18
-data-refresh runs (held on last-good at 2.5, flagged stale) did NOT
-self-clear across rungs — it belongs to a maintenance session (the
-runbook: docs/INDICATORS_AND_DATA_SOURCES.md + the /admin console's
-per-source status, which needs the owner's REFRESH_SECRET). The S20
-data-audit tool is re-runnable for any later session's §21 data-audit
-gate: `pnpm --filter @currena/web exec tsx
-../../apps/web/scripts/pd-s20-data-audit.ts` — RUNBOOK NOTE (BD-S21e):
-never run it Tuesdays 11:00–14:00 UTC (the IMF PortWatch scheduled
-maintenance window).**
+**Current position: Session 23/30 delivered (the PULLED-FORWARD S25 —
+the §15 Asia CPI fill session) 2026-11-12 · 7 remaining. The three D-36
+fills (japan-cpi · korea-cpi · india-cpi) are LIVE from the IMF's own
+SDMX 3.0 CPI dataflow (BD-S23a — Rule 5 verified at both venues + the
+three national-bureau second voices; the FRED OECD mirror family is
+DEAD, BD-S14a — never re-try those ids); the registry is 187 ids; the
+/asia-pacific page renders its 14 placed cards (the two index-only
+sections retired with their fills landed); production runs currena-api
+`2c61c187` (the fill deploy) + currena-markets `8f63c8fa` (unchanged).
+A duplicate arrival landed the build (BD-S23-parallel — the pushed
+implementation governs, the duplicate archived, the shipped tree
+independently re-verified, the KV write-cap finding recorded).
+NEXT: Session 24/30 — the legacy retirement readiness review (the D-9
+audit: every indicator verified categorized; the retirement checklist —
+execution itself may wait for the burn-in period, investor question
+§19.6). THE OWNER'S LEVER REMAINS: arrange the external investor's
+review of the spec (§19's seven questions) — Phase K's input; the moment
+the answers exist, the next free slot re-opens the investor round
+(collect → D-49+ in the strategy log §5 Round 4 → the spec v2 entries —
+the AF-1…AF-8 spec-side findings ride that pass, never silent edits),
+and S23's deferred feedback-build scope follows it. The ecb-drf provider
+timeout stays queued for a maintenance slot (the runbook: the /admin
+console's per-source status, which needs the owner's REFRESH_SECRET).
+The S20 data-audit tool is re-runnable for any later session's §21
+data-audit gate — RUNBOOK NOTE (BD-S21e): never run it Tuesdays
+11:00–14:00 UTC (the IMF PortWatch maintenance window).**

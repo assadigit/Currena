@@ -187,12 +187,28 @@ regeneration (`pnpm placement:generate`).
   deferred, blocked on the investor; BD-S22); the gates re-run ALL
   GREEN on the records-only tree — the suite 15,102, the S21 count
   exactly).**
-  Next: Session 23/30 — the pulled-forward reserve session (S25 → the
-  §15 Asia CPI fill session). **The owner's lever: arrange the
-  investor's review of spec §19 (the seven questions) — Phase K's
-  input; the investor round re-opens at the next free slot the moment
-  the answers exist.** See the roadmap's progress board for the current
-  position.
+  **S23 (the PULLED-FORWARD reserve session — the §15 Asia CPI fill
+  session, delivered in the Session 23 slot 2026-11-12): the three D-36
+  §15 Asia CPI fills (japan-cpi · korea-cpi · india-cpi) LANDED from the
+  IMF's own SDMX 3.0 CPI dataflow (BD-S23a — Rule 5 verified at both
+  venues + the three national-bureau second voices + the World Bank annual
+  cross-check; the FRED OECD mirror family verified DEAD in S14, BD-S14a —
+  never re-try those ids): the full §A ingest discipline (the registry
+  184 → 187 ids), the three cards rendered on /asia-pacific with the §21
+  trio + the fa copy through the manifest (round-83) — the page’s 14
+  placed cards (China 7 · Japan 3 · Korea/Taiwan/HK 1 · India 1 ·
+  Pacific-NZ 2, the two index-only sections retired), pd-s14 extended to
+  the 14 cards, the spec-v2 diff grown (AF-8). DEPLOYED as currena-api
+  `2c61c187` (the markets worker untouched) + the KV seed; a duplicate
+  arrival landed the build (BD-S23-parallel — the pushed implementation
+  governs, the duplicate archived on archive/s23-duplicate-m2-m5, the
+  shipped tree independently re-verified: the gates 15,267 ALL GREEN).
+  Next: Session 24/30 — the legacy retirement readiness review (the D-9
+  audit; execution may wait for the burn-in period, investor question
+  §19.6). **The owner's lever: arrange the investor's review of spec §19
+  (the seven questions) — Phase K's input; the investor round re-opens at
+  the next free slot the moment the answers exist.** See the roadmap’s
+  progress board for the current position.
 
 ## The one rule that trumps everything
 
