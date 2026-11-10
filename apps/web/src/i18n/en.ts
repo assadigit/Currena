@@ -1697,6 +1697,135 @@ export const en = {
       purpose: 'The FX picture — rules first, the pair board second.',
       summary:
         'The seven rule lights (R1–R7) as the hero with plain-language explanations, the 11-pair board with moveRank and big-move flags, and the dollar-standing section.',
+      /* ---- S18 (2026-11-12): the Currencies page's own copy (D-18/D-32/
+       * D-41/D-42, spec §12). The card names, the unit words, the pair
+       * names, the rule names + everyday explanations, the status/chip/
+       * measure words, the big-move tag, the stale line, the board group
+       * labels and the table headers are the corpus's own, pinned
+       * byte-for-byte by currencies-copy-pin.test.ts; the loading/error
+       * lines, the section headings + intros and the two fresh board
+       * column headers (move rank, 52-week closes) are fresh. */
+      loadingLine: 'Reading the currency numbers…',
+      errorTitle: 'The Currencies page is unavailable right now',
+      errorText: 'The data did not arrive. Nothing is shown rather than a guess.',
+      errorRetry: 'Try again',
+      /* The hero (§12 item 1, D-41 — rules first): the measure label +
+       * the section chip + the 7 rule lights, each with its
+       * plain-language explanation. */
+      heroTitle: 'The seven rules',
+      heroIntro:
+        'Seven patterns that connect the big currencies (sometimes stocks or gold) — each light says whether it is showing right now.',
+      measureNormal: 'Currency patterns: calm',
+      measureAttention: 'Currency patterns: worry signs',
+      measureUnusual: 'Currency patterns: several warnings at once',
+      chipNormal: 'Normal',
+      chipAttention: 'Needs attention',
+      chipUnusual: 'Unusual',
+      statusActive: 'Active',
+      statusWatching: 'Watching',
+      statusQuiet: 'Quiet',
+      noDataRule: 'Not enough data right now',
+      ruleNames: {
+        r1: 'Nervous or relaxed?',
+        r2: 'Sudden yen jump',
+        r3: 'Strong or weak dollar',
+        r4: 'Where does money hide?',
+        r5: 'China link',
+        r6: 'Europe worry',
+        r7: 'Dollar or euro?',
+      },
+      ruleEveryday: {
+        r1: 'When people get scared, they sell riskier money like the Australian dollar and buy the safer Japanese yen. This pair shows which way money is moving.',
+        r2: 'Many investors borrow cheap yen to invest elsewhere (a “carry trade”). If the yen suddenly gets stronger, they must repay fast and sell their investments, which can hit stock markets worldwide.',
+        r3: 'Oil, gold and a lot of loans are priced in US dollars. When the dollar gets stronger, they cost more for people who earn in other currencies.',
+        r4: 'In a scare, people usually move money into US dollars because it feels safe. When even the dollar is sold, trust is shaky, and gold often rises.',
+        r5: 'China is the biggest buyer of Australia’s iron ore. When China’s economy slows, the Australian dollar and the Chinese yuan often weaken together.',
+        r6: 'The Swiss franc is a classic safe place for money. When Europeans get nervous they buy francs, so the euro falls against it.',
+        r7: 'When the euro falls against the dollar, it can be because the dollar is strong everywhere (a world story) or because the euro itself is weak (a Europe story). This card tells you which.',
+      },
+      /* The pair board (§12 item 2, D-42 — the 11 pairs incl. AUDNZD). */
+      boardTitle: 'The 11 pairs',
+      boardIntro:
+        'Every pair on the board: the latest rate, today / one-month / three-month / one-year changes, how big this month’s move is against the past year (move rank 0–100), and the 52-week closes.',
+      groups: {
+        dollarWorld: 'Dollar vs the world',
+        warningLights: 'Warning lights',
+        chinaLink: 'Australia–China',
+        auLink: 'Australia–New Zealand',
+      },
+      pairNames: {
+        eurusd: 'Euro vs US dollar',
+        usdjpy: 'US dollar vs yen',
+        gbpusd: 'Pound vs US dollar',
+        usdchf: 'US dollar vs Swiss franc',
+        usdcny: 'US dollar vs yuan',
+        audusd: 'Australian dollar vs US dollar',
+        audjpy: 'Australian dollar vs yen',
+        eurjpy: 'Euro vs yen',
+        eurchf: 'Euro vs Swiss franc',
+        audcny: 'Australian dollar vs yuan',
+        audnzd: 'Australian dollar vs New Zealand dollar',
+      },
+      thRate: 'Rate',
+      thToday: 'Today',
+      thM1: '1 month',
+      thM3: '3 months',
+      thY1: '1 year',
+      thMoveRank: 'Move rank',
+      th52w: '52-week closes',
+      bigMoveTag: 'Unusually large move',
+      oldData: 'Old data · {date}',
+      /* The dollar-standing section (§12 item 3, D-32). */
+      dollarStandingTitle: 'Where the dollar stands',
+      dollarStandingIntro:
+        'The dollar against the world — Currena’s own basket, the broad and emerging-market measures, the US–Japan rate gap behind the carry trade, and two pegged/emerging rates beside the dollar’s reserve share.',
+      /* The pairs over the decade (§14’s pairs group — the registry pair
+       * cards with 10-year history; the board above shows this week’s
+       * rates, these cards show the decade). */
+      pairsTitle: 'The pairs over the decade',
+      pairsIntro:
+        'The same pairs, placed against their own 10-year range — where today’s rate sits compared with the past decade.',
+      cardNames: {
+        'dollar-basket': 'The dollar vs six big currencies',
+        'dollar-broad': 'The dollar vs 26 currencies',
+        'dollar-eme': 'The dollar vs emerging-market currencies',
+        'us-japan-10y-gap': 'The gap between US and Japanese 10-year rates',
+        usdtry: 'Dollar vs Turkish lira',
+        usdaed: 'Dollar vs UAE dirham',
+        'usd-reserve-share': 'USD share of world FX reserves',
+        usdjpy: 'Dollar vs yen',
+        'eur-usd': 'Euro per US dollar',
+        usdchf: 'Dollar vs Swiss franc',
+        usdcny: 'Dollar vs Chinese yuan',
+        audusd: 'Australian dollar vs US dollar',
+        audjpy: 'Australian dollar vs yen',
+        audnzd: 'Australian dollar vs New Zealand dollar',
+      },
+      units: {
+        percent: '%',
+        points: 'pts',
+        index: 'index',
+        try: '₺',
+        aed: 'AED',
+        jpy: '¥',
+        eur: '€',
+        chf: 'CHF',
+        cny: 'CN¥',
+        usd: 'US$',
+        nzd: 'NZ$',
+      },
+      positionLow: 'low',
+      positionTypical: 'typical',
+      positionHigh: 'high',
+      positionWordLine: '{word} · {band}',
+      bandTop: 'top {p}%',
+      bandMid: 'the middle',
+      bandBottom: 'bottom {p}%',
+      statusWarning: 'Needs attention',
+      statusStale: 'Stale',
+      statusCheckPending: "Can't tell right now",
+      statusUnavailable: "Can't tell right now",
+      valueUnavailable: 'Cannot read yet',
     },
   },
 
