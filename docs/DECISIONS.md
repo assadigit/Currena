@@ -1816,3 +1816,19 @@
   collision occurred); if the parallel session is still running it will
   hit a non-fast-forward push on its next commit and must rebase onto
   this merged tree.
+
+- **Addendum (the M2 leg, ~00:50Z):** the parallel session pushed its own
+  M2 (`2f1e0f1` — an alternative page build: their `CurrenciesRuleHero`
+  component, a desktop-table board, a 26/7 budget row) while the first
+  merge was being made. The second merge (`9e08455`) resolved every
+  conflict to THIS session's deployed implementation and REMOVED their
+  orphan `CurrenciesRuleHero.tsx` from the merged tree (it imports their
+  tiles' export names — `CURRENCIES_RULE_IDS`/`currenciesRuleCopyKey` —
+  which the merged [deployed] tiles module does not carry, so keeping it
+  would break typecheck; their content is preserved verbatim in their
+  commit `2f1e0f1`). The merged tree came out BYTE-IDENTICAL to the
+  gated ALL-GREEN HEAD — the second merge changed no bytes, it only
+  records the topology. **If the parallel session is still running, its
+  next push will hit a non-fast-forward rejection; it must rebase onto
+  `9e08455` and adopt the deployed `pacificLink` implementation, or stop.
+  The owner should check how two S18 sessions were launched.**
