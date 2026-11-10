@@ -48,7 +48,11 @@ export default defineConfig({
         // manifest names made the installed PWA look like a different product.
         name: 'Currena | Currency Converter',
         short_name: 'Currena',
-        description: 'Modern currency converter with live Iranian Toman rates',
+        // S19 (2026-11-12): aligned with the app-wide default meta
+        // description (index.html + app.metaDescription) — the install
+        // surface describes the whole product, not the converter era.
+        description:
+          "The world's economy at a glance: the gold conditions meter, world markets, regional gauges, commodities, FX rule lights, and the live Iranian Toman converter.",
         // Task 23 (Android packaging prep): stable app identity. Chrome
         // derives it from start_url when omitted; an explicit id keeps the
         // installed app identity stable across minor URL changes and is what

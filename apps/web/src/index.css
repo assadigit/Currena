@@ -2823,3 +2823,19 @@ html[dir='rtl'] .insights-panel {
 
 /* M13 — the list-layout dot tap flashes the row it scrolled to. */
 .wm-flash { outline: 2px solid var(--color-accent-brand); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------ *
+ * S19 (2026-11-12) — the app footer's mobile safe-area rider.
+ *
+ * The sticky-footer layout (the shell's min-h-screen flex column with
+ * main as flex-1) already seats the footer at the viewport bottom on
+ * short pages and below long content otherwise; this rider makes the
+ * footer RESPECT the iOS home-indicator inset on devices with a safe
+ * area (the app ships viewport-fit=cover for the standalone PWA, where
+ * the system inset would otherwise collide with the trust-row links).
+ * max() keeps the design's own 20px padding as the floor on devices
+ * without an inset.
+ * ------------------------------------------------------------------ */
+.app-footer {
+  padding-block-end: max(1.25rem, env(safe-area-inset-bottom, 0px));
+}

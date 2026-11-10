@@ -56,6 +56,7 @@ import { AustraliaTierCards } from './AustraliaTierCards';
 import { useAustraliaBoardCopy } from './australia-board-copy';
 import { AustralianMarkets } from '../../components/insights/AustralianMarkets';
 import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
+import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
@@ -228,6 +229,8 @@ export function AustraliaPage(): React.JSX.Element {
           is the cached one). */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
+          {/* S19 (2026-11-12): the wayfinding row — Home › Australia (BD-S19b). */}
+          <PageBreadcrumbs pageKey="pd.australia.title" />
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.australia.title')}</h1>
           {/* The In-build chip is RETIRED (BD-S16c — the S16 gates pass:
            * the §21 backtest 28/28 green vs production, the freshness

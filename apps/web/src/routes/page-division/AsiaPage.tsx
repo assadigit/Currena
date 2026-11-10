@@ -53,6 +53,7 @@ import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../l
 import { destinationFor } from './destinations';
 import { RegionIndexSection } from './RegionIndexSection';
 import { AsiaTierCards } from './AsiaTierCards';
+import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
@@ -197,6 +198,8 @@ export function AsiaPage(): React.JSX.Element {
           — the page's 11 placed cards are complete and verified. */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
+          {/* S19 (2026-11-12): the wayfinding row — Home › Asia (BD-S19b). */}
+          <PageBreadcrumbs pageKey="pd.asiaPacific.title" />
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.asiaPacific.title')}</h1>
           {/* The In-build chip is RETIRED (BD-S14b's completion — S15's
            * gates passed: the §21 card audit 11/11 green, the freshness

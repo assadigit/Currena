@@ -227,12 +227,17 @@ describe('CurrenciesPage', () => {
   });
 
   it('renders the shell + the 7 rule lights + the 11-pair board + the two card sections over the real derivations', async () => {
+
     atRoute('/currencies');
     stubFeeds();
     render(<CurrenciesPage />);
     await waitFor(() => {
       expect(document.querySelector('[data-currencies-section="rules"]')).not.toBeNull();
     });
+
+    // S19 (2026-11-12): the wayfinding row — Home › Currency Pairs (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('Currency Pairs');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
 
     // The shell: title + purpose + the data-as-of line. The In-build chip
     // is RETIRED (S18's gate pass — the one-session trajectory); it must

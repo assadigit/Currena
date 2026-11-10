@@ -160,11 +160,16 @@ describe('WorldMarketsPage', () => {
   });
 
   it('renders the hero: the status summary + the REUSED map (the engines\' own values)', async () => {
+
     stubFeeds();
     render(<WorldMarketsPage />);
     await waitFor(() => {
       expect(document.querySelector('[data-wm-status-box]')).not.toBeNull();
     });
+
+    // S19 (2026-11-12): the wayfinding row — Home › World Markets (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('World Markets');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
 
     // The engine's own derivations over the same fixture — never
     // hand-counted (the characterization pins the PIPE, the engine

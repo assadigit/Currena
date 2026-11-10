@@ -36,6 +36,7 @@ import type { WorldMarketsBoardState } from './WorldMarketsHero';
 import { WorldMarketsGrids } from './WorldMarketsGrids';
 import { WorldRiskCards } from './WorldRiskCards';
 import { worldMarketsStatus, worldRiskCards } from './world-markets-tiles';
+import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
@@ -197,6 +198,8 @@ export function WorldMarketsPage(): React.JSX.Element {
           cards' data-as-of line + the M-17 cached-copy label when it
           paints (the S4/BD-S5a one-sentence rule). */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
+        {/* S19 (2026-11-12): the wayfinding row — Home › WorldMarkets (BD-S19b). */}
+        <PageBreadcrumbs pageKey="pd.worldMarkets.title" />
         <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.worldMarkets.title')}</h1>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.worldMarkets.purpose')}

@@ -9,6 +9,12 @@ export const en = {
   app: {
     name: 'Currena',
     tagline: 'Real-time rates, easy conversion', // legacy About tagline (fa original: نرخ ارز لحظه‌ای، تبدیل آسان)
+    /* S19 (2026-11-12): the app-wide default meta/OG description — the
+       whole product in one sentence (the world scan + the destinations
+       + the Toman converter). The static index.html + the PWA manifest
+       carry the same wording; the per-route pass overrides it with each
+       destination's own purpose line. */
+    metaDescription: "The world's economy at a glance: the gold conditions meter, world markets, regional gauges, commodities, FX rule lights, and the live Iranian Toman converter.",
     versionLabel: 'Version {version}',
     madeBy: 'Made with ❤️ by Ali Assadi',
     createdBy: 'Created by',
@@ -21,6 +27,8 @@ export const en = {
 
   nav: {
     home: 'Home',
+    /* S19 (2026-11-12): the breadcrumb row's nav aria-label. */
+    breadcrumb: 'Breadcrumb',
     skipToContent: 'Skip to main content',
     receiptGenerator: 'Receipt Generator',
     calculator: 'Calculator',

@@ -30,6 +30,7 @@ import { GoldHero } from './GoldHero';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
 import { goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
+import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
@@ -141,6 +142,8 @@ export function GoldPage(): React.JSX.Element {
           line (the honest "daily snapshot + hourly prices" story) + the
           M-17 cached-copy label when it paints. */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
+        {/* S19 (2026-11-12): the wayfinding row — Home › Gold (BD-S19b). */}
+        <PageBreadcrumbs pageKey="pd.gold.title" />
         <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.gold.title')}</h1>
         <p className="m-0 mt-0.5 line-clamp-2 max-w-prose text-[10.5px] leading-snug text-currena-muted sm:mt-1 sm:line-clamp-none sm:text-[length:var(--type-label)]">
           {t('pd.gold.purpose')}

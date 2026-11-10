@@ -199,7 +199,11 @@ describe('EuropePage', () => {
     // The shell: title + purpose + the data-as-of line. The In-build
     // chip is RETIRED (S13's gate pass — BD-S12b's completion); it must
     // NOT render on the Europe page anymore.
-    expect(screen.getByText('Europe')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Europe' })).toBeTruthy();
+    // S19 (2026-11-12): the wayfinding row — Home › Europe (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('Europe');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
+
     expect(screen.queryByText('In build')).toBeNull();
     expect(document.body.textContent).toContain('Data as of Nov 8, 2026');
 
@@ -400,7 +404,7 @@ describe('EuropePage', () => {
         expect(document.querySelector('[data-europe-section="eu"]')).not.toBeNull();
       });
       // The page title + the EU section heading in the corpus's Persian.
-      expect(screen.getByText('اروپا')).toBeTruthy();
+      expect(screen.getByRole('heading', { level: 1, name: 'اروپا' })).toBeTruthy();
       expect(document.querySelector('[data-europe-section="eu"] h2')?.textContent).toBe('اتحادیهٔ اروپا');
       // The card name + the fa value join (percent binds tight: ۲٫۵۰٪).
       const dfr = document.querySelector('[data-europe-card="ecb-dfr"]')!;

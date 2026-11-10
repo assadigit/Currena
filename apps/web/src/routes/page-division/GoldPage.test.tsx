@@ -173,11 +173,16 @@ describe('GoldPage', () => {
   });
 
   it('renders the hero: live price + change + position + verdict + outlook + counts (the engines\' own values)', async () => {
+
     stubFeeds();
     render(<GoldPage />);
     await waitFor(() => {
       expect(document.querySelector('[data-gold-hero]')).not.toBeNull();
     });
+
+    // S19 (2026-11-12): the wayfinding row — Home › Gold (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('Gold');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
 
     // The engine's own derivations over the same fixture — never
     // hand-counted (the characterization pins the PIPE, the engine

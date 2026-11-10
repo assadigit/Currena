@@ -207,7 +207,11 @@ describe('AsiaPage', () => {
     // The shell: title + purpose + the data-as-of line. The In-build
     // chip is RETIRED (S15's gate pass — BD-S14b's completion); it must
     // NOT render on the Asia page anymore.
-    expect(screen.getByText('Asia & Pacific')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Asia & Pacific' })).toBeTruthy();
+    // S19 (2026-11-12): the wayfinding row — Home › Asia & Pacific (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('Asia & Pacific');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
+
     expect(screen.queryByText('In build')).toBeNull();
     expect(document.body.textContent).toContain('Data as of Nov 8, 2026');
 
@@ -426,7 +430,7 @@ describe('AsiaPage', () => {
         expect(document.querySelector('[data-asia-section="china"]')).not.toBeNull();
       });
       // The page title + the China section heading in the corpus's Persian.
-      expect(screen.getByText('آسیا و اقیانوسیه')).toBeTruthy();
+      expect(screen.getByRole('heading', { level: 1, name: 'آسیا و اقیانوسیه' })).toBeTruthy();
       expect(document.querySelector('[data-asia-section="china"] h2')?.textContent).toBe('چین');
       // The card name + the fa value join (percent binds tight: ۰٫۴٪).
       const cpi = document.querySelector('[data-asia-card="china-cpi"]')!;

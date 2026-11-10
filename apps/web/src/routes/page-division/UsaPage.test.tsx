@@ -312,7 +312,11 @@ describe('UsaPage', () => {
     // The shell: title + the purpose + the data-as-of line + the absent
     // note (rstar-us). The In-build chip is RETIRED (S11's gate pass —
     // BD-S10b's completion); it must NOT render on the USA page anymore.
-    expect(screen.getByText('USA')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'USA' })).toBeTruthy();
+    // S19 (2026-11-12): the wayfinding row — Home › USA (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('USA');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
+
     expect(screen.queryByText('In build')).toBeNull();
     expect(document.body.textContent).toContain('Data as of Nov 8, 2026');
     expect(document.body.textContent).toContain('1 of this page’s readings are not published in this mode.');

@@ -181,12 +181,17 @@ describe('CommoditiesPage', () => {
   });
 
   it('renders the shell + the five group sections + the 24 cards + the gold cross-link over the real derivations', async () => {
+
     atRoute('/commodities');
     stubFeeds();
     render(<CommoditiesPage />);
     await waitFor(() => {
       expect(document.querySelector('[data-commodities-section="energy"]')).not.toBeNull();
     });
+
+    // S19 (2026-11-12): the wayfinding row — Home › Commodities & Energy (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('Commodities & Energy');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
 
     // The shell: title + purpose + the data-as-of line. The In-build
     // chip is RETIRED (S17's gate pass — BD-S17c's completion); it must

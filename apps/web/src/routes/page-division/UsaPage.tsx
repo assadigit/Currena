@@ -43,6 +43,7 @@ import { UsaVerdictStrip } from './UsaVerdictStrip';
 import { UsaTierCards } from './UsaTierCards';
 import { UsaTicSection } from './UsaTicSection';
 import { usaGaugeVerdicts } from './usa-tiles';
+import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
@@ -180,6 +181,8 @@ export function UsaPage(): React.JSX.Element {
           pass — the page's layers are complete and verified. */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
+          {/* S19 (2026-11-12): the wayfinding row — Home › Usa (BD-S19b). */}
+          <PageBreadcrumbs pageKey="pd.usa.title" />
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.usa.title')}</h1>
           {/* The In-build chip is RETIRED (BD-S10b's completion — S11's
            * gates passed: the §21 card audit 173/173 green, the freshness

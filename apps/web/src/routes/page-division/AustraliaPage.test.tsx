@@ -254,12 +254,17 @@ describe('AustraliaPage', () => {
   });
 
   it('renders the shell + the zoom + the AU Markets board + the five gauge sections + the world-risk group over the real derivations', async () => {
+
     atRoute('/australia');
     stubFeeds();
     render(<AustraliaPage />);
     await waitFor(() => {
       expect(document.querySelector('[data-australia-section="inflation-rates"]')).not.toBeNull();
     });
+
+    // S19 (2026-11-12): the wayfinding row — Home › Australia (BD-S19b).
+    expect(document.querySelector('[data-page-breadcrumbs] [aria-current=\'page\']')?.textContent).toBe('Australia');
+    expect(screen.getByRole('link', { name: 'Home' }).getAttribute('href')).toBe('/');
 
     // The shell: title + purpose + the data-as-of line. The In-build
     // chip is RETIRED (S16's gate pass — BD-S16c's completion); it must

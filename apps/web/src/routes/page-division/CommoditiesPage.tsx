@@ -41,6 +41,7 @@ import { interpolate } from '../../i18n';
 import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../lib/page-division';
 import { destinationFor } from './destinations';
 import { CommoditiesTierCards } from './CommoditiesTierCards';
+import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
@@ -165,6 +166,8 @@ export function CommoditiesPage(): React.JSX.Element {
           is the cached one). */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
+          {/* S19 (2026-11-12): the wayfinding row — Home › Commodities (BD-S19b). */}
+          <PageBreadcrumbs pageKey="pd.commodities.title" />
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.commodities.title')}</h1>
           {/* The In-build chip is RETIRED (BD-S17c — the S17 gates pass:
            * the §21 backtest 24/24 green vs production, the freshness

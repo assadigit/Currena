@@ -25,11 +25,11 @@ import { Toast } from './components/ui';
 import { LiveRates } from './routes/LiveRates';
 import { useRoute } from './router';
 import { useI18n } from './lib/locale';
+import { routeMetaFor, setCanonical, setMetaTag } from './lib/route-meta';
 import { snapshotStore } from './lib/snapshot-store';
 import { hydrateServerHistory } from './lib/rate-history';
 import { alertsStore } from './lib/alerts';
 import { useAlertEvaluation } from './lib/use-alert-evaluation';
-import type { TranslationKey } from './lib/locale';
 
 const Calculator = lazy(() => import('./routes/Calculator').then((m) => ({ default: m.Calculator })));
 const History = lazy(() => import('./routes/History').then((m) => ({ default: m.History })));
@@ -128,52 +128,6 @@ const DESTINATION_ROUTES: ReadonlySet<string> = new Set([]);
  * retired (the shared RegionIndexSection they all render rides its own
  * shared chunk). */
 
-/** <title> per route — legacy pattern "<Page> - Currena". */
-function titleKeyFor(route: string): TranslationKey {
-  switch (route) {
-    case '/':
-      return 'pd.global.title';
-    case '/converter':
-      return 'converter.title';
-    case '/live-rates':
-      return 'liveRates.title';
-    case '/insights':
-      return 'insights.title';
-    case '/gold':
-      return 'pd.gold.title';
-    case '/world-markets':
-      return 'pd.worldMarkets.title';
-    case '/currencies':
-      return 'pd.currencies.title';
-    case '/commodities':
-      return 'pd.commodities.title';
-    case '/usa':
-      return 'pd.usa.title';
-    case '/europe':
-      return 'pd.europe.title';
-    case '/asia-pacific':
-      return 'pd.asiaPacific.title';
-    case '/australia':
-      return 'pd.australia.title';
-    case '/calculator':
-      return 'calculator.title';
-    case '/history':
-      return 'history.title';
-    case '/receipt':
-      return 'receipt.title';
-    case '/splitter':
-      return 'expenseSplitter.title';
-    case '/settle':
-      return 'splitSettle.title';
-    case '/batch':
-      return 'batchConverter.title';
-    case '/about':
-      return 'about.title';
-    default:
-      return 'app.name';
-  }
-}
-
 function RouteFallback(): React.JSX.Element {
   return (
     // 2026-10-29 owner round ("the three circles must sit dead centre"):
@@ -248,9 +202,29 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const key = titleKeyFor(route);
-    const base = t(key);
-    document.title = key === 'converter.title' || key === 'app.name' ? base : `${base} - Currena`;
+    // S19 (2026-11-12): the per-route <head> pass. The S1 title wiring
+    // moved verbatim into lib/route-meta (one table, unit-tested); the
+    // effect now also sets the meta description, the Open Graph /
+    // Twitter card fields, og:locale and the canonical URL per route —
+    // the nine destinations reuse their DICTIONARY PURPOSE lines as
+    // descriptions (D-48: one wording per concept), everything else
+    // falls back to the app-wide default (app.metaDescription). SPA
+    // honesty (BD-S19c): these serve every JS-executing reader; the
+    // static index.html defaults serve non-JS crawlers.
+    const meta = routeMetaFor(route);
+    const base = t(meta.titleKey);
+    const title = meta.titleKey === 'converter.title' || meta.titleKey === 'app.name' ? base : `${base} - Currena`;
+    document.title = title;
+    const description = meta.descriptionKey !== null ? t(meta.descriptionKey) : t('app.metaDescription');
+    const url = `${window.location.origin}${meta.path}`;
+    setMetaTag('description', 'name', description);
+    setMetaTag('og:title', 'property', title);
+    setMetaTag('og:description', 'property', description);
+    setMetaTag('og:url', 'property', url);
+    setMetaTag('og:locale', 'property', locale === 'fa' ? 'fa_IR' : 'en_US');
+    setMetaTag('twitter:title', 'name', title);
+    setMetaTag('twitter:description', 'name', description);
+    setCanonical(url);
   }, [route, t, locale]);
 
   return (

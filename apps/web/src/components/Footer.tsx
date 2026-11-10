@@ -7,7 +7,9 @@
  * staged in sessionStorage and About scrolls to it after mount); Contact
  * opens the developer's GitHub profile (the owner's public contact
  * channel). Sticky to the viewport bottom on short pages via the app's
- * min-h-screen flex column layout.
+ * min-h-screen flex column layout; S19 (2026-11-12) adds the mobile
+ * safe-area rider (.app-footer in index.css — the padding-block-end
+ * respects the iOS home-indicator inset on viewport-fit=cover devices).
  */
 
 import { useI18n } from '../lib/locale';
@@ -36,7 +38,7 @@ export function Footer() {
     'inline-flex cursor-pointer items-center border-0 bg-transparent py-2 font-semibold text-currena-blue underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-currena-blue';
 
   return (
-    <footer className="px-5 py-5 text-center text-xs text-currena-muted opacity-80">
+    <footer className="app-footer px-5 py-5 text-center text-xs text-currena-muted opacity-80">
       <p className="mb-1.5">{t('app.madeBy')}</p>
       {/* Trust row — privacy · terms · contact · about (financial-utility
           credibility; owner request 2026-09-20). */}

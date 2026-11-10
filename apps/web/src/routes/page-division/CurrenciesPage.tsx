@@ -55,6 +55,7 @@ import { destinationFor } from './destinations';
 import { CurrenciesRuleLights } from './CurrenciesRuleLights';
 import { CurrenciesPairBoard } from './CurrenciesPairBoard';
 import { CurrenciesTierCards } from './CurrenciesTierCards';
+import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
   | { kind: 'loading'; cached: PageProjection | null }
@@ -222,6 +223,8 @@ export function CurrenciesPage(): React.JSX.Element {
           is the cached one). */}
       <header className="mb-2.5 sm:mb-4 lg:mb-5">
         <div className="mb-1 flex flex-wrap items-center gap-2.5 sm:mb-2">
+          {/* S19 (2026-11-12): the wayfinding row — Home › Currencies (BD-S19b). */}
+          <PageBreadcrumbs pageKey="pd.currencies.title" />
           <h1 className="m-0 text-lg font-extrabold leading-tight text-currena-dark sm:text-2xl lg:text-[1.75rem]">{t('pd.currencies.title')}</h1>
           {/* The In-build chip is RETIRED (the S18 gates pass: the §21
            * diff 14/14 cards + rules 16/16 green vs production, the
