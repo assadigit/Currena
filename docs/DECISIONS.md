@@ -2616,3 +2616,67 @@
   whether the IMF rebases Japan onto the bureau's 2025-base (the
   0.13pp wedge closes when it does) or whether MoSPI grows a stable
   keyless machine-readable route.
+
+## 2026-11-12 — BD-S23-parallel: the duplicate Session-23 arrival reconciled onto the pushed implementation (BD-S18-parallel-3/BD-S21-parallel discipline); this session runs the counterpart close — the KV seed + the live verify + the records
+
+- **Event:** two agents worked the SAME pulled-forward Session-23 slot
+  (S25, the §15 Asia CPI fill session) in parallel. The parallel arrival
+  landed M0–M5 on origin/main (M0+M1 `6bfe87b` [the shared opening —
+  BD-S23a's source verification]; M2+M3+M4 `67afc3b`; M5 `5ce9925`) and
+  DEPLOYED currena-api **`2c61c187`** @ 100% (2026-11-10 ~23:04 UTC —
+  the new Worker code + the new SPA; the deployed entry chunk
+  `index-De-odUOp.js` byte-matches the local build of `5ce9925`); this
+  session's own M2–M5 work (a parallel implementation of the same fills:
+  prices-heat lane · P1 · full-history fixtures · the same AF-8 +
+  docs discipline) was pushed FIRST and REJECTED — the fast-forward
+  refusal exposed the collision.
+- **The reconciliation (the hardened parallel-session rule, BD-S18-
+  parallel-3 / BD-S21-parallel):** one prompt = one session = one slot —
+  the slot was NOT yet fully delivered (no KV seed, no live verify, no
+  close records), so this session does NOT re-execute and does NOT
+  merge two implementations: the local duplicate is preserved verbatim
+  on the local branch `archive/s23-duplicate-m2-m5` (the
+  `archive/s18-duplicate-m2` precedent) and the tree is reset onto
+  origin/main — the PUSHED implementation is the record.
+- **The independent re-verification (never trust, verify):** this
+  session re-verified the shipped tree with its OWN gates + its OWN
+  live reads: (a) the fixtures/s25 captures' tails match THIS session's
+  OWN independent live fetches EXACTLY (JPN 2.232142857142857 @
+  2026-M09 · KOR 2.818940555271674 @ 2026-M10 · IND 4.44121915820029 @
+  2026-M07 — the BD-S23a-verified values, Rule 5 re-satisfied at the
+  sandbox venue by a second agent); (b) the FULL `pnpm gates` re-run on
+  the shipped tree — ALL GREEN, 2m 45s (secret scan 8/1025 · typecheck
+  6/6 · eslint 0/0 · copy:audit clean · narrator 193×2 + eval 50 ·
+  layer1 11,969/11,969 · the suite 15,267 · build + budgets held — the
+  AsiaPage chunk 16.20/4.07 within its re-based 16.5/6.0 row); (c) the
+  browser pass over the freshly built SPA (the local preview, /api
+  proxied to currena.ir): 14 cards (china 7 · japan 3 ·
+  korea-taiwan-hk 1 · india 1 · pacific-nz 2), the zoom's 6 indices,
+  0px overflow at 1440×900 + 360×844 in en + fa/RTL, ZERO console/page
+  errors, the three CPI cards honestly "Cannot read yet" against the
+  not-yet-seeded feed.
+- **The recorded implementation deltas (the pushed implementation
+  governs; recorded for the record, none blocking):** the lane is
+  growth-health (beside china-cpi) not prices-heat; phase P2 (no
+  P1-unavailable page-degraded alert for the fill cards); the fixtures
+  are decade-trimmed captures (129–130 obs, floor ≥60) not full-history
+  captures; layer-1 entries ARE written (the vocabulary 193×2); the
+  AsiaPage budget row re-based 16/6 → 16.5/6.0 (justified in the
+  changelog).
+- **The counterpart continuation (this session's remaining M6):** the
+  KV seed (rung2-run --imf-cpi — the landing lever) + the live verify
+  (pd-s14 vs production + the browser pass on currena.ir) + the close
+  records. First seed attempt 2026-11-10 23:24 UTC: the THREE FETCHES
+  SUCCEEDED (japan-cpi 2.232142857142857 @ 2026-09-30 pct10y 64% ·
+  korea-cpi 2.818940555271674 @ 2026-10-31 pct10y 73% · india-cpi
+  4.44121915820029 @ 2026-07-31 pct10y 46% — computed readings, exactly
+  the BD-S23a values) but the KV WRITE hit the account's daily
+  free-tier cap (HTTP 429 code 10048, the documented ~19:00-UTC
+  exhaustion, DEPLOY.md's insights-ingestion note) — the phase aborted
+  BEFORE any write (the snapshot PUT is the first write; the clean
+  re-run re-does everything). The seed re-runs after the 00:00 UTC
+  counter reset.
+- **Who decided:** this session (the second arrival) under the hardened
+  parallel-session rule. **Revisit:** none — the reconciliation is the
+  record; the KV-cap pattern is the documented operational reality (the
+  04:20 UTC GHA/Worker rungs self-heal any missed seed).
