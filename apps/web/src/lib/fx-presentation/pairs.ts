@@ -62,7 +62,7 @@ export function fxPairRows(pairs: readonly FxPairEntry[], sort: 'group' | 'm1' =
  * — from the rule's chart series keys, mapped back to pair rows. */
 export function fxRulePairIds(rule: FxRuleState): FxPairId[] {
   const ids: FxPairId[] = [];
-  for (const key of ['eurusd', 'usdjpy', 'gbpusd', 'usdchf', 'usdcny', 'audusd', 'audjpy', 'eurjpy', 'eurchf', 'audcny'] as FxPairId[]) {
+  for (const key of ['eurusd', 'usdjpy', 'gbpusd', 'usdchf', 'usdcny', 'audusd', 'audjpy', 'eurjpy', 'eurchf', 'audcny', 'audnzd'] as FxPairId[]) {
     // A pair rides the rule's Level-3 table when it appears in the chart
     // series or the legs (the numbers the sentence used).
     if (rule.chart.series.some((s) => s.id === key)) ids.push(key);

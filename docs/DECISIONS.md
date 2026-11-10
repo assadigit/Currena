@@ -1782,3 +1782,37 @@
   standing") — the deploy ran 2026-11-10 ~00:05 UTC (recorded 2026-11-11
   in the session convention). **Revisit:** the deploy record is final;
   the full deploy narrative lives in `docs/DEPLOY.md`.
+
+## 2026-11-11 — BD-S18-parallel: the parallel-session merge record — a SECOND agent session committed the same S18 milestones (M1a/M1b, the `auLink` variant) to origin/main WHILE this session ran; resolved by favouring THIS session's deployed implementation (the live workers run `pacificLink`)
+
+- **Event:** a parallel agent session (author "Z User z@container") pushed
+  `4fea60a` ("M1a — AUDNZD joins the FX board", 2026-11-10T00:18Z) and
+  `59b0388` ("M1b — the pure currencies-tiles + the en/fa pd.currencies
+  copy + the pins", 2026-11-10T00:30Z) to origin/main while THIS session
+  (which had already built M1→M3, passed all gates, and DEPLOYED both
+  workers at ~00:05 UTC) was writing its close-out records. The two
+  implementations cover the same scope with one material difference:
+  theirs named the fourth fx group `auLink`; this session's — deployed,
+  gated, and live — named it `pacificLink`.
+- **Resolution:** a MERGE (no force-push, no history rewrite — both
+  sessions' commits stay in history). Every conflicting file resolved to
+  THIS session's side (the deployed truth: the live currena-api
+  `51a0fe45` + currena-markets `8f63c8fa` bundles carry the `pacificLink`
+  implementation, the gated tests pin it, and the pushed tree must match
+  production). The parallel session's NON-conflicting contributions were
+  kept: the `fxRulePairIds` Level-3 loop now includes 'audnzd'
+  (harmless + future-proof — no rule's chart series references it) and
+  the `fx-data-check.ts` probe script's 9-quote-currency update. The
+  merged tree re-ran the FULL GATES: ALL GREEN (typecheck 6/6 · eslint
+  0/0 · copy:audit clean · the suite 15,088 — the same count, my
+  implementations won every conflict).
+- **Who decided:** this session (S18) under the deployed-state rule (the
+  repo must match production; the alternative — adopting `auLink` —
+  would require re-deploying both workers for zero user-visible gain and
+  would orphan the gated test pins). **Revisit:** the OWNER should check
+  how two S18 sessions were launched in parallel (this is the exact
+  scenario the deploy-lock check guards against — the deploy here had
+  already completed before their first push landed, so no production
+  collision occurred); if the parallel session is still running it will
+  hit a non-fast-forward push on its next commit and must rebase onto
+  this merged tree.
