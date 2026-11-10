@@ -1725,6 +1725,7 @@ export const en = {
       statusWatching: 'Watching',
       statusQuiet: 'Quiet',
       noDataRule: 'Not enough data right now',
+      fxPreparing: 'Currency data is being prepared. Check back after the next daily update.',
       ruleNames: {
         r1: 'Nervous or relaxed?',
         r2: 'Sudden yen jump',
@@ -1766,6 +1767,7 @@ export const en = {
         audcny: 'Australian dollar vs yuan',
         audnzd: 'Australian dollar vs New Zealand dollar',
       },
+      thPair: 'Pair',
       thRate: 'Rate',
       thToday: 'Today',
       thM1: '1 month',

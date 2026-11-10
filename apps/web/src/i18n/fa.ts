@@ -1654,6 +1654,7 @@ export const fa: Dictionary = {
       statusWatching: 'زیر نظر',
       statusQuiet: 'آرام',
       noDataRule: 'دادهٔ کافی در دسترس نیست',
+      fxPreparing: 'داده‌های ارزی هنوز آماده نیست. پس از به‌روزرسانی روزانهٔ بعدی دوباره مراجعه کنید.',
       ruleNames: {
         r1: 'نگران یا آرام؟',
         r2: 'جهش ناگهانی ین',
@@ -1695,6 +1696,7 @@ export const fa: Dictionary = {
         audcny: 'دلار استرالیا در برابر یوان چین',
         audnzd: 'دلار استرالیا در برابر دلار نیوزیلند',
       },
+      thPair: 'جفت‌ارز',
       thRate: 'نرخ برابری',
       thToday: 'امروز',
       thM1: 'یک ماه',

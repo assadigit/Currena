@@ -100,15 +100,21 @@ const AustraliaPage = lazy(() => import('./routes/page-division/AustraliaPage').
 // AustraliaPage pattern): the four commodity groups (Energy · Metals ·
 // Agriculture · Digital) + the Trade routes & supply group (D-38/D-39)
 // render as 24 cards with the §21 trio, plus the gold cross-link to
-// /gold (D-19/D-27). The In-build chip stays (the S17 build session —
-// the chip retires at the S17 gates pass, the S13/S15/S16 trajectory).
+// /gold (D-19/D-27).
 const CommoditiesPage = lazy(() => import('./routes/page-division/CommoditiesPage').then((m) => ({ default: m.CommoditiesPage })));
+// Page-division S18 (2026-11-12): the Currencies route leaves the
+// placeholder set — its own lazy chunk (the S17 CommoditiesPage
+// pattern): the 7 rule lights hero (D-41) + the 11-pair board (D-42 —
+// AUDNZD joins the FX board, the fx engine change riding this deploy)
+// + the dollar-standing section (D-32 — the 14 registry cards with the
+// §21 trio) over the TWO feeds (the S2 projection + the fx snapshot).
+const CurrenciesPage = lazy(() => import('./routes/page-division/CurrenciesPage').then((m) => ({ default: m.CurrenciesPage })));
 
-/** The one destination route that still shares the placeholder chunk
- *  (S8: the four region pages left the set — their zoom sections landed
- *  on RegionPage; S9: /usa + S12: /europe + S14: /asia-pacific + S16:
- *  /australia + S17: /commodities left it for their own builds). */
-const DESTINATION_ROUTES: ReadonlySet<string> = new Set(['/currencies']);
+/** The destination routes that still share the placeholder chunk (S18:
+ *  /currencies left it for its own build — the set is EMPTY now, every
+ *  destination has its own page; the placeholder module retires at the
+ *  S18 gates pass with the In-build chip). */
+const DESTINATION_ROUTES: ReadonlySet<string> = new Set<string>();
 
 /* Page-division S16 (2026-11-10): no route renders RegionPage anymore —
  * all four region routes (/usa S9 · /europe S12 · /asia-pacific S14 ·
@@ -274,8 +280,10 @@ export function App() {
               S8 zoom); S17 (D-19/D-38/D-39): `/commodities` renders its
               own CommoditiesPage (the four commodity groups + the trade
               routes & supply group — 24 cards + the gold cross-link);
-              Currencies shares the lazy placeholder chunk until S18; the
-              Converter lives at /converter. */}
+              S18 (D-41/D-42/D-32): `/currencies` renders its own
+              CurrenciesPage (the rule lights hero + the 11-pair board +
+              the dollar-standing cards — every destination is built
+              now); the Converter lives at /converter. */}
           {route === '/live-rates' ? <LiveRates /> : null}
           <Suspense fallback={<RouteFallback />}>
             {route === '/' ? <GlobalPage /> : null}
@@ -286,6 +294,7 @@ export function App() {
             {route === '/asia-pacific' ? <AsiaPage /> : null}
             {route === '/australia' ? <AustraliaPage /> : null}
             {route === '/commodities' ? <CommoditiesPage /> : null}
+            {route === '/currencies' ? <CurrenciesPage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}

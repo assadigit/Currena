@@ -83,6 +83,7 @@ function pinPageWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'
   expect(pd.statusWatching, `${locale} statusWatching`).toBe(corpus.fx.statusWatching);
   expect(pd.statusQuiet, `${locale} statusQuiet`).toBe(corpus.fx.statusQuiet);
   expect(pd.noDataRule, `${locale} noDataRule`).toBe(corpus.fx.noDataRow);
+  expect(pd.fxPreparing, `${locale} fxPreparing`).toBe(corpus.fx.empty);
   expect(pd.chipNormal, `${locale} chipNormal`).toBe(corpus.fx.chipNormal);
   expect(pd.chipAttention, `${locale} chipAttention`).toBe(corpus.fx.chipAttention);
   expect(pd.chipUnusual, `${locale} chipUnusual`).toBe(corpus.fx.chipUnusual);
@@ -98,6 +99,7 @@ function pinPageWords(pd: Pd, corpus: typeof insightsCopyEn, locale: 'en' | 'fa'
   expect(pd.groups.warningLights, `${locale} groups.warningLights`).toBe(corpus.fx.groups.warningLights);
   expect(pd.groups.chinaLink, `${locale} groups.chinaLink`).toBe(corpus.fx.groups.chinaLink);
   expect(pd.groups.auLink, `${locale} groups.auLink`).toBe(corpus.fx.groups.auLink);
+  expect(pd.thPair, `${locale} thPair`).toBe(corpus.fx.thPair);
   expect(pd.thRate, `${locale} thRate`).toBe(corpus.fx.csvColRate);
   expect(pd.thToday, `${locale} thToday`).toBe(corpus.fx.thToday);
   expect(pd.thM1, `${locale} thM1`).toBe(corpus.fx.thM1);
