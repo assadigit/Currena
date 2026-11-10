@@ -113,3 +113,32 @@ export {
   HISTORY_WINDOW_DAYS,
 } from './snapshot';
 export type { ReleaseScheduleEntry, SnapshotBuildInputs, PolicyDecision, ContextNote, PeakInput } from './snapshot';
+
+/* ------------------------------------------------------------------ *
+ * page-division S20 (2026-11-12): the §21 data-audit surface — the
+ * per-source fetch/parse functions the N=20 random-id spot-check
+ * (apps/web/scripts/pd-s20-data-audit.ts, Rule 5) re-runs live against
+ * the upstream publishers. Additive exports ONLY: every symbol is
+ * already exported from its own module; this block just opens the
+ * public door the audit script needs so it can import the repo's own
+ * parsers verbatim (never a re-implementation). No behavior change.
+ * ------------------------------------------------------------------ */
+export { fetchGprExportAll, parseGprExportAll, GPR_URL } from './monthly-indexes';
+export type { GprExportSeries } from './monthly-indexes';
+export { fetchEbpCsv, parseEbpCsv, EBP_CSV_URL } from './credit';
+export { collectPortwatch, ma7Series, portwatchQueryUrl } from './portwatch';
+export { collectTreasuryAuctions, selectAuctionFamily, auctionsUrl, AUCTIONS_URL } from './auctions';
+export type { AuctionsCollectResult, AuctionFamilySeries } from './auctions';
+export { fetchEiaSprLevel, fetchEiaCrudeProduction, EIA_SPR_URL, EIA_CRUDE_PRODUCTION_URL } from './eia-stocks';
+export { fetchBazgGoldImports, parseBazgGoldImports, BAZG_GOLD_IMPORTS_URL } from './bazg';
+export {
+  fetchSgeMonthlyWithdrawal,
+  parseSgeMonthlyReportIndex,
+  parseSgeWithdrawal,
+  extractPdfText,
+  SGE_MONTHLY_REPORT_URL,
+} from './sge-monthly';
+export type { SgeMonthlyReportLink, SgeWithdrawalReading } from './sge-monthly';
+export { fetchMofJgb10y, parseMofJgbCsv, MOF_JGBCME_URL } from './mof';
+export { insightsFetch, CURRENA_UA } from './fetch-policy';
+export { combineSeries } from '../series';

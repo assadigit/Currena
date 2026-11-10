@@ -6,6 +6,16 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **S20 (in flight, 2026-11-12) — Full-site regression + verdict backtest
+> + data audit · Session 20/30 · 10 remaining.** Session goal: every page
+> × every §21 gate re-run against the S19 tree + production; the N=20
+> seeded-random-id source spot-check (Rule 5); the performance budget
+> check. Milestones: M1 local `pnpm gates` + placement audit · M2 the 11
+> live pd-* backtests vs production · M3 the data audit (new
+> `pd-s20-data-audit.ts`) · M4 the browser regression (10 routes × both
+> widths × both locales) · M5 the records + close (deploy expected: none,
+> per the owner's standing, unless something is fixed).
+
 > **S19 (2026-11-12) — Navigation, mobile & SEO polish — Phase J OPEN.
 > Session 19/30 · 11 remaining.** Delivered the S19 scope whole: (a) the
 > breadcrumbs — the shared `PageBreadcrumbs` (a REAL Home link through
