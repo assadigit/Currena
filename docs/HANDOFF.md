@@ -15,6 +15,19 @@
 > `pd-s20-data-audit.ts`) · M4 the browser regression (10 routes × both
 > widths × both locales) · M5 the records + close (deploy expected: none,
 > per the owner's standing, unless something is fixed).
+>
+> **Checkpoint 1 (M1+M2+M3 all green):** `pnpm gates` ALL GREEN on the
+> S19 tree + the audit toolkit (2m 42s: secret scan 8/1019 · tsc 6/6 ·
+> eslint 0/0 · copy:audit clean · narrator in sync + eval 50 · layer1
+> 11,819/11,819 · the suite 15,099 · build + budgets — entry
+> 272.83/82.52, every page chunk within its row) · `placement:generate`
+> reconciles (184 ids · 0 unplaced · 0 duplicate homes, no diff) · the
+> 11 live pd-* backtests vs production ALL GREEN (s4 84 + narrator
+> stateHash identical · s5 150 · s7 56 · s8 9 · s9 115 · s10 115+48 ·
+> s12 8 · s14 11 · s16 28 · s17 24 · s18 14+16+23+freshness 14 = 715
+> checks) · the N=20 data audit (seed 20261112, 11 providers) ALL 20
+> GREEN — 19 byte-exact + platinum the 0.25% intraday live-spot arm
+> (recorded). Remaining: M4 the browser pass · M5 the records + close.
 
 > **S19 (2026-11-12) — Navigation, mobile & SEO polish — Phase J OPEN.
 > Session 19/30 · 11 remaining.** Delivered the S19 scope whole: (a) the
