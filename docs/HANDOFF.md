@@ -6,124 +6,93 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **S20 (in flight, 2026-11-12) — Full-site regression + verdict backtest
-> + data audit · Session 20/30 · 10 remaining.** Session goal: every page
-> × every §21 gate re-run against the S19 tree + production; the N=20
-> seeded-random-id source spot-check (Rule 5); the performance budget
-> check. Milestones: M1 local `pnpm gates` + placement audit · M2 the 11
-> live pd-* backtests vs production · M3 the data audit (new
-> `pd-s20-data-audit.ts`) · M4 the browser regression (10 routes × both
-> widths × both locales) · M5 the records + close (deploy expected: none,
-> per the owner's standing, unless something is fixed).
->
-> **Checkpoint 1 (M1+M2+M3 all green):** `pnpm gates` ALL GREEN on the
-> S19 tree + the audit toolkit (2m 42s: secret scan 8/1019 · tsc 6/6 ·
-> eslint 0/0 · copy:audit clean · narrator in sync + eval 50 · layer1
-> 11,819/11,819 · the suite 15,099 · build + budgets — entry
-> 272.83/82.52, every page chunk within its row) · `placement:generate`
-> reconciles (184 ids · 0 unplaced · 0 duplicate homes, no diff) · the
-> 11 live pd-* backtests vs production ALL GREEN (s4 84 + narrator
-> stateHash identical · s5 150 · s7 56 · s8 9 · s9 115 · s10 115+48 ·
-> s12 8 · s14 11 · s16 28 · s17 24 · s18 14+16+23+freshness 14 = 715
-> checks) · the N=20 data audit (seed 20261112, 11 providers) ALL 20
-> GREEN — 19 byte-exact + platinum the 0.25% intraday live-spot arm
-> (recorded). Remaining: M4 the browser pass · M5 the records + close.
+> **S20 (2026-11-12) — the full-site regression + verdict backtest +
+> data audit — every page × every §21 gate ALL GREEN; NO deploy.
+> Session 20/30 · 10 remaining.** The S20 scope delivered whole: (a)
+> the §21 data audit (Rule 5, BD-S20a) — the N=20 random-id source
+> spot-check shipped as a re-runnable LIVE tool
+> (`apps/web/scripts/pd-s20-data-audit.ts`; the frozen seed-20261112
+> sample over the 184 registry ids, 11 providers; the repo's own
+> adapters imported verbatim through a new ADDITIVE export block on
+> `@currena/insights/adapters`; compared AT THE STORED asOf; the
+> platinum live-spot arm records the intraday move) — THE RUN: ALL 20
+> GREEN (19 byte-exact + platinum the 0.25% intraday move); (b) the
+> verdict backtests — ALL ELEVEN live pd-* scripts re-run against
+> production: 715 checks, ALL GREEN (s4 Global 84 + the narrator
+> raw-KV stateHash recompute IDENTICAL · s5 Gold 150 · s7 56 · s8 9 ·
+> s9 115 · s10 115+48 · s12 8 · s14 11 · s16 28 · s17 24 · s18
+> 14+16+23 + freshness 14-within-grace); (c) the placement audit —
+> `placement:generate` reconciles (184 ids · 0 unplaced · 0 duplicate
+> homes · zero diff); (d) the gates ALL GREEN (2m 42s · the suite
+> 15,099 — the S19 count EXACTLY · entry 272.83/82.52, IDENTICAL rows);
+> (e) the browser regression — all 10 routes × 1440×900 + 360×844 ×
+> en + fa (40 legs, LIVE on production): the per-route meta + the
+> trails on the 8 destinations + the legacy deprecation banner + 0px
+> overflow + ZERO errors on every leg + the Global one-screen rule +
+> Gold's 37 seats + the honest-record footnote + Currencies' 7 lights +
+> 14 cards + 11 pairs + NO DEAD LINKS + the interaction golden path;
+> (f) the performance budget check (BD-S20c) — the bundle rows held +
+> the measured live pass (COLD 380ms/485KB at 1440×900 — the font +
+> the shell dominate · COLD /gold 76ms/14KB at 360×844 · WARM 59–81ms
+> per route); (g) the close (BD-S20-deploy) — NO deploy: nothing was
+> fixed; the tree changes are dev tooling only; production stays at
+> currena-api `74777037` + currena-markets `8f63c8fa`, and this
+> session's own sweep is the proof that production serves exactly this
+> tree's behavior.
 
-> **S19 (2026-11-12) — Navigation, mobile & SEO polish — Phase J OPEN.
-> Session 19/30 · 11 remaining.** Delivered the S19 scope whole: (a) the
-> breadcrumbs — the shared `PageBreadcrumbs` (a REAL Home link through
-> the path router, the current page as an aria-current span, the
-> separator aria-hidden + RTL-mirrored) wired into the EIGHT
-> destinations' heading blocks (BD-S19b: Global IS Home — no trail; the
-> legacy /insights keeps its deprecation banner as the wayfinding
-> bridge; the tools keep the topbar); (b) the per-page meta/OG pass —
-> the pure `lib/route-meta` table (the S1 titleKeyFor switch moved
-> verbatim + regression-pinned) feeding the App shell's extended
-> `<head>` effect (per-route description [the nine destinations REUSE
-> their dictionary PURPOSE lines, D-48], og:title/og:description/
-> og:url/og:locale, twitter:*, the canonical link — find-or-create
-> idempotent writers) + the refreshed static index.html defaults + PWA
-> manifest description (BD-S19c: true per-route SSR OG is out of scope
-> by the repo's own SPA-only rule — non-JS crawlers see the static
-> defaults); (c) the HANDOFF item 6 language quick-toggle — the "theme
-> words" read DISPROVEN against the deployed DOM (the visible label is
-> the target language's own word 'فا'/'EN'; the aria-label was already
-> correct); the polish: the accessible name + tooltip now NAME THE
-> TARGET ('Switch to Farsi' / «تغییر به انگلیسی», BD-S19a); (d) the
-> sticky footers VERIFIED on every route × both widths × both locales
-> (Global exactly one screen WITH the footer at 1440×900 AND 360×844;
-> long pages push it below content) + the iOS safe-area rider landed
-> (`.app-footer` respects env(safe-area-inset-bottom), BD-S19d), and
-> the two S1-noted legacy-hero mobile items CLOSED (the ⓘ wrap — the
-> date + prices units are separate non-breaking bdis; the state-pill
-> icon gap 0.375rem → 0.5rem). **GATES ALL GREEN** (2m 38s · the suite
-> 15,099 = +11 [PageBreadcrumbs 4 · route-meta 7] + the 8 pages'
-> wiring pins · entry 272.83/82.52, every chunk within its row ·
-> copy:audit clean, the 4 new fa strings queued unreviewed).
-> **DEPLOYED LIVE (currena-api `74777037` — a WEB-ONLY deploy, the
-> markets worker untouched by the code-unchanged convention; the
-> deploy-lock check ran first: S18's `51a0fe45` @ 100%; the deployed
-> entry chunk byte-verified identical to the local build; the live
-> acceptance on currena.ir re-ran the 4-leg checks — all green:
-> trails · meta · labels · hero fixes · 0px overflow · ZERO errors).**
-> The S18 transient P1 glance: gold-aud SELF-CLEARED; ecb-drf still
-> flagged stale (2.5 held on last-good) — a maintenance-session item
-> now.
-
-## Current state (2026-11-12, after page-division S19)
+## Current state (2026-11-12, after page-division S20)
 
 - **Program:** page-division — splitting the all-in-one Insights page
   into 10 destinations per D-1…D-48. **All TEN destinations render
-  their own pages and every page now carries its S19 polish: the
-  breadcrumb trail, the per-route meta/OG, the verified sticky footer.
-  Phase J (Integration) is OPEN — S19 done; S20 (the full-site
-  regression + verdict backtest + data audit) and S21 (the
-  spec-vs-implementation audit) remain.** Progress: S1 scaffold &
-  navigation · S2 data layer + `PLACEMENT.generated.md` · S3–S4 the
-  Global landing (Phase A CLOSED) · S5–S6 Gold (Phase B CLOSED) ·
-  S7–S8 World Markets + the zoom maps (Phase C CLOSED) · S9–S11 USA
-  (Phase D CLOSED) · S12–S13 Europe (Phase E CLOSED) · S14–S15 Asia
-  (Phase F CLOSED) · S16 Australia (Phase G CLOSED) · S17 Commodities
-  (Phase H CLOSED) · S18 Currencies (Phase I CLOSED) · **S19
-  Navigation, mobile & SEO polish (Phase J OPEN).**
-- **DEPLOYED LIVE (2026-11-10 ~03:1x UTC, the owner's standing):**
-  **currena-api `74777037`** (the S19 SPA: the breadcrumbs + the
-  route-meta pass + the language-toggle labels + the footer rider +
-  the two hero fixes; the markets worker stays at `8f63c8fa` — no
-  engine change this session, the code-unchanged convention). The
-  prior surface was `51a0fe45` (S18, BOTH workers + the fx-run KV
-  seed); production moved `51a0fe45` → `74777037`.
-- **Gates (last full run, S19 — ALL GREEN):** secret scan 8/1018 ·
-  typecheck 6/6 · eslint 0/0 · copy:audit clean (the 4 new fa strings
-  — nav.switchToFa · nav.switchToEn · nav.breadcrumb ·
-  app.metaDescription — queued unreviewed; the retired
-  nav.toggleLanguage removed from the manifest) · narrator in sync +
-  eval 50 · layer1 11,819/11,819 · **the suite 15,099 = +11** ·
-  build + budgets held (entry 272.83/82.52, every page chunk within
-  its row).
-- **The S19 surfaces (what changed where):** `PageBreadcrumbs.tsx` +
-  the 8 page wirings · `lib/route-meta.ts` + the App `<head>` effect ·
-  the dictionaries (4 new keys, 1 retired) · the static index.html +
-  the PWA manifest description · `.app-footer` + `.ei-state-pill` in
-  index.css · the InsightsHeader data-as-of line · the Header language
-  quick-toggle labels. Rollback: ONE `npx wrangler rollback` from
-  apps/api returns every surface to the S18 shape.
+  their own pages with the S19 polish; the S20 full-site regression
+  re-proved every §21 gate green (the backtests · the data audit ·
+  the browser pass · the performance check). Phase J (Integration):
+  S19 done, S20 done — S21 (the spec-vs-implementation audit)
+  remains.** Progress: S1 scaffold & navigation · S2 data layer +
+  `PLACEMENT.generated.md` · S3–S4 the Global landing (Phase A
+  CLOSED) · S5–S6 Gold (Phase B CLOSED) · S7–S8 World Markets + the
+  zoom maps (Phase C CLOSED) · S9–S11 USA (Phase D CLOSED) · S12–S13
+  Europe (Phase E CLOSED) · S14–S15 Asia (Phase F CLOSED) · S16
+  Australia (Phase G CLOSED) · S17 Commodities (Phase H CLOSED) · S18
+  Currencies (Phase I CLOSED) · S19 the polish (Phase J OPEN) · **S20
+  the full-site regression + verdict backtest + data audit (ALL
+  GREEN, no deploy).**
+- **DEPLOYED LIVE (unchanged this session — nothing was fixed):**
+  **currena-api `74777037`** (the S19 SPA) + **currena-markets
+  `8f63c8fa`** (the S18 markets worker). The S20 tree adds no
+  shipped-code change (the manual audit script never enters the Vite
+  build; the adapters export block is tooling-only) — production
+  serves exactly this tree's behavior, proven by this session's own
+  715-check live sweep + the 40-leg browser pass + the 20-id upstream
+  audit.
+- **Gates (last full run, S20 — ALL GREEN, 2m 42s):** secret scan
+  8/1019 · typecheck 6/6 · eslint 0/0 · copy:audit clean (no new
+  strings this session) · narrator in sync + eval 50 · layer1
+  11,819/11,819 · **the suite 15,099** (the S19 count exactly — no
+  test change) · build + budgets held (entry 272.83/82.52, every page
+  chunk within its row, IDENTICAL to the S19 rows).
+- **The S20 surfaces (what changed where):** ONE new manual script
+  (`apps/web/scripts/pd-s20-data-audit.ts` — the §21 data-audit tool)
+  + ONE additive export block (`packages/insights/src/adapters/
+  index.ts` — the audit surface) + the records (DECISIONS BD-S20a/b/c/
+  deploy · CHANGELOG · the roadmap S20 delivery record + the progress
+  board · this file · the README program state). Rollback: nothing to
+  roll back (no deploy); the S19 lever stands (one `npx wrangler
+  rollback` from apps/api returns the SPA to the S18 shape).
 
-## Next session (S20 — Full-site regression + verdict backtest + data audit · Session 20/30)
+## Next session (S21 — Spec-vs-implementation audit · Session 21/30)
 
 Read `AGENTS.md` (§14 carries the owner's rules) first, then
-`docs/page-division/01-SESSION-ROADMAP.md` (the S20 entry + the S19
-delivery record), `02-PAGE-DIVISION-SPEC.md` §21 (the acceptance
-criteria & test gates — S20's own checklist), and this file. Scope
-(S20): every page × every gate from §21 of the spec; the N=20
-random-id source spot-check (Rule 5 — fetch each id's value from its
-upstream source and cross-check, 100% match or a recorded, explained
-difference); the performance budget check (the bundle rows + a
-performance pass at both widths). The tools for the verdict gates are
-the per-page live backtests already shipped (pd-s4/s5/s7/s8/s9/s10/
-s12/s14/s16/s17/s18-backtest.ts — re-run them all against production).
-Gates: all green; commit pushed at every checkpoint. The deploy at the
-close is the owner's standing.
+`docs/page-division/01-SESSION-ROADMAP.md` (the S21 entry + the S20
+delivery record), `02-PAGE-DIVISION-SPEC.md` §4–§14 (the per-page
+spec sections S21 diffs against the live site) + §21, and this file.
+Scope (S21): the full diff — spec §4–§14 vs the live site (every
+deviation fixed or documented as a decision); the placement table
+regenerated & reconciled. The S20 tools that help: the re-runnable
+data audit (`pnpm --filter @currena/web exec tsx
+../../apps/web/scripts/pd-s20-data-audit.ts`) + the eleven live
+pd-* backtests. Gates: all green; commit pushed at every checkpoint.
+The deploy at the close is the owner's standing.
 
 ### The §15 FRED-only CPI fills for Asia — carried forward (BD-S14a / BD-S15d)
 
@@ -151,11 +120,14 @@ the new cards.** Their absence does not make the 11 placed Asia cards
 3. Ratify or redirect BD-S3a/b/c + BD-S4a/b + BD-S5a + BD-S6a +
    BD-S7a/b + BD-S8a/b/c + BD-S9a/b/c + BD-S10a/b/c + BD-S11a/b/c +
    BD-S12a/b + BD-S13a/b/c/d + BD-S14a/b/c/d + BD-S15a/b/c/d +
-   BD-S16a/b/c/d + BD-S17a/b/c + BD-S18a/b/c + **BD-S19a/b/c/d (the
+   BD-S16a/b/c/d + BD-S17a/b/c + BD-S18a/b/c + BD-S19a/b/c/d (the
    S19 polish: the language-toggle verification + target-naming labels
    · the breadcrumb scope · the SPA meta/OG approach · the
    sticky-footer verification + the safe-area rider + the two S1-noted
-   hero items)** (all recorded, none blocking).
+   hero items) + **BD-S20a/b/c/deploy (the S20 verification session:
+   the data-audit tool + its ALL-GREEN run · the regression + backtest
+   re-run record · the performance check · the no-deploy close)** (all
+   recorded, none blocking).
 4. Triage the queued unreviewed fa strings (now ~1142: the ~1014
    previous + the S18 additions + the 4 S19 strings; every session's
    corpus-pinned values are verified byte-for-byte by their copy-pin

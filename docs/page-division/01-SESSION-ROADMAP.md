@@ -1516,9 +1516,68 @@ acceptance re-ran the checks on currena.ir — all green; rollback: one
 Decisions: BD-S19a · BD-S19b · BD-S19c · BD-S19d + the deploy record
 (`74777037`), all in `docs/DECISIONS.md`.
 
-### ☐ S20 — Full-site regression + verdict backtest + data audit · `Session 20/30`
+### ✅ S20 — Full-site regression + verdict backtest + data audit · `Session 20/30` · delivered 2026-11-12 · **Phase J (S20 done)**
 - Every page × every gate from §21 of the spec; N=20 random-id source
   spot-check (Rule 5); performance budget check.
+
+**S20 delivery record (2026-11-12):** the full-site regression delivered
+whole — every page × every §21 gate re-run against the S19 tree AND
+production, ALL GREEN, and NO deploy (nothing was fixed; the owner's
+standing). **(a) The §21 data audit (Rule 5, BD-S20a):** the N=20
+random-id source spot-check shipped as a re-runnable LIVE tool —
+`apps/web/scripts/pd-s20-data-audit.ts` (the pd-* backtest family's own
+pattern: manual, never in the suite, writes nothing) — with the sample
+FROZEN for the record (seeded uniform random `random.Random(20261112)
+.sample` over the 184 registry ids; 11 distinct providers: fred 6 · gpr
+3 · eia 2 · derived 2 · abs/portwatch/frb/gold-api/sge/bazg/fiscaldata
+1 each); each id's value fetched from ITS OWN upstream publisher through
+the repo's own adapter parsers (imported verbatim through a new
+ADDITIVE export block on `@currena/insights/adapters` — zero behavior
+change), the derivation replicated exactly as the ingest computes it
+(`yoyPctSeries` · the Pink Sheet copper÷gold ratio · the 4dp
+`quantizedGap` DGS10−jgbcme discipline · the PortWatch MA7 · the SGE
+month's OWN PDF), compared AT THE STORED asOf (freshness notes, never
+silent mismatches; the platinum live-spot arm records the intraday move
+as the §21 designed, explained difference). THE RUN (2026-11-10T04:07Z,
+vs production): ALL 20 GREEN — 19 byte-exact + platinum the 0.25%
+intraday spot move (recorded). **(b) The verdict backtests (§21 zero
+tolerance):** ALL ELEVEN live pd-* scripts re-run against production —
+715 checks, ALL GREEN (s4 Global 84 + the narrator raw-KV stateHash
+recompute IDENTICAL · s5 Gold 150 · s7 World Markets 56 · s8 zooms 9 ·
+s9 USA 115 · s10 USA tiers+TIC 115+48 · s12 Europe 8 · s14 Asia 11 ·
+s16 Australia 28 · s17 Commodities 24 · s18 Currencies 14+16+23 +
+freshness 14-within-grace). **(c) The placement audit:** `placement:
+generate` reconciles — 184 ids + 6 boards · 0 unplaced · 0 duplicate
+homes · zero diff. **(d) The gates:** ALL GREEN (2m 42s: secret scan
+8/1019 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator in sync +
+eval 50 · layer1 11,819/11,819 · the suite 15,099 — the S19 count
+EXACTLY · build + budgets: entry 272.83/82.52, every page chunk within
+its row, IDENTICAL to the S19 rows). **(e) The browser regression
+(BD-S20b):** all 10 routes × 1440×900 + 360×844 × en + fa (40 legs,
+LIVE on production) — the per-route titles/descriptions/canonicals +
+og:locale (en_US/fa_IR), the trails on the EIGHT destinations only, the
+legacy deprecation banner live, 0px horizontal overflow on every leg,
+ZERO console/page errors on every leg, the Global one-screen rule WITH
+the footer at BOTH widths, long pages push the footer below content,
+dir=rtl + Persian titles on every fa leg, Global's 10 tiles
+verdicts-or-designed-live-content (the prices ribbon matching the
+snapshot byte-for-byte) + the 7 destination chips, Gold's 37 seats with
+lean + evidence + the honest-record footnote, Currencies' 7 rule lights
++ 14 registry cards + 11-pair board, NO DEAD LINKS on any route, the
+interaction golden path (the Global tile SPA navigation + the mobile
+drawer). **(f) The performance budget check (BD-S20c):** the bundle
+rows held + the measured live pass — COLD first visit at 1440×900: load
+380ms, 485KB (the font + the shell dominate; the page code does not) ·
+COLD /gold at 360×844: 76ms/14KB · WARM per route: DCL/load 59–81ms,
+8–28KB. **(g) The close (BD-S20-deploy):** NO deploy — the session's
+only tree changes are the manual audit script (dev tooling, never
+shipped) + the additive adapters export block (zero runtime change);
+production stays at currena-api `74777037` + currena-markets
+`8f63c8fa`; this session's own 715-check live sweep + 40-leg browser
+pass + 20-id upstream audit IS the proof that production serves exactly
+this tree's behavior. The ecb-drf provider timeout stays a
+maintenance-session item. Decisions: BD-S20a · BD-S20b · BD-S20c ·
+BD-S20-deploy, all in `docs/DECISIONS.md`.
 
 ### ☐ S21 — Spec-vs-implementation audit · `Session 21/30`
 - Full diff: spec §4–§14 vs the live site; every deviation fixed or
@@ -1560,18 +1619,23 @@ Decisions: BD-S19a · BD-S19b · BD-S19c · BD-S19d + the deploy record
 | G Australia | S16 | ✅ S16 2026-11-10 (deployed `9d60726b` 2026-11-10 ~20:30 UTC — the Australia build & gates: the REUSED AU Markets board [19 symbols], the 5-gauge structure D-37, the 28 cards, the 11 moved-out seat chips, the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 28/28 green + the 4-leg browser pass green — **PHASE G CLOSED**) |
 | H Commodities | S17 | ✅ S17 2026-11-11 (deployed `08e0fc64`, the 4 commodity groups + the trade routes & supply group — 24 cards + the gold cross-link; the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 24/24 green + the 4-leg browser pass green — **PHASE H CLOSED**) |
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
-| J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — **Phase J OPEN**) |
+| J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) |
 | K Investor + final | S22–S24 | ☐ |
 | Reserve | S25–S30 | ☐ |
 
-**Current position: Session 19/30 delivered 2026-11-12 · 11 remaining — next
-action: Session 20/30 (S20 — the full-site regression: every page × every
-gate from §21 of the spec; the N=20 random-id source spot-check per Rule 5;
-the performance budget check). The §15 FRED-only CPI fills for Asia
-(BD-S14a/BD-S15d) stay carried forward to a dedicated fill session — pick a
-viable monthly source for JP/KR/IN: the national statistics bureaus
-directly, a fresh FRED/IMF IFS series, or the World Bank annual as a
-lower-resolution fallback. The ecb-dfr provider timeout from the S18
-data-refresh runs (held on last-good at 2.5, flagged stale) did NOT
-self-clear across rungs — it belongs to a maintenance session now (the S19
-glance: gold-aud DID self-clear).**
+**Current position: Session 20/30 delivered 2026-11-12 · 10 remaining — next
+action: Session 21/30 (S21 — the spec-vs-implementation audit: the full
+diff spec §4–§14 vs the live site; every deviation fixed or documented as
+a decision; the placement table regenerated & reconciled). The §15
+FRED-only CPI fills for Asia (BD-S14a/BD-S15d) stay carried forward to a
+dedicated fill session — pick a viable monthly source for JP/KR/IN: the
+national statistics bureaus directly, a fresh FRED/IMF IFS series, or the
+World Bank annual as a lower-resolution fallback. The ecb-dfr provider
+timeout from the S18 data-refresh runs (held on last-good at 2.5, flagged
+stale) did NOT self-clear across rungs — it belongs to a maintenance
+session now (the S19 glance: gold-aud DID self-clear; the runbook:
+docs/INDICATORS_AND_DATA_SOURCES.md + the /admin console's per-source
+status, which needs the owner's REFRESH_SECRET). The S20 data-audit tool
+is re-runnable for any later session's §21 data-audit gate:
+`pnpm --filter @currena/web exec tsx
+../../apps/web/scripts/pd-s20-data-audit.ts`.**

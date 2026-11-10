@@ -2118,3 +2118,152 @@
   delegation ("the deploy at the close is the owner's standing").
   **Revisit:** the record is final; the next session (S20) is the
   full-site regression + verdict backtest + data audit.
+
+## 2026-11-12 — BD-S20a: the §21 data audit — the N=20 random-id source spot-check (Rule 5) shipped as a re-runnable LIVE tool and run ALL GREEN against production
+
+- **What was decided:** the S20 data audit is a NEW manual script
+  (`apps/web/scripts/pd-s20-data-audit.ts`, the pd-* backtest family's
+  own pattern — never in the test suite, writes nothing, read-only
+  against production AND the upstream publishers), with the sample
+  FROZEN for the record: a seeded uniform random draw
+  (`random.Random(20261112).sample` over the 184 registry ids — seed
+  20261112, sorted, recorded in the script header) → N=20 across 11
+  distinct providers (fred 6 · gpr 3 · eia 2 · derived 2 · abs 1 ·
+  portwatch 1 · frb 1 · gold-api 1 · sge 1 · bazg 1 · fiscaldata 1) —
+  a fair provider spread, no cherry-picking.
+- **The method (the honest arm of Rule 5):** each id's value is
+  fetched from ITS OWN upstream publisher through the repo's own
+  adapter parsers (imported verbatim — never re-implemented) from the
+  audit machine's venue, the derivation replicated exactly as the
+  ingest computes it (`yoyPctSeries` for the WPI/PCE YoY cards, the
+  Pink Sheet copper÷gold ratio, the 4dp `quantizedGap` discipline for
+  the US−Japan 10y gap, the PortWatch MA7 window, the SGE month's OWN
+  PDF — never only the newest), and compared AT THE STORED asOf; a
+  newer upstream point past the stored asOf is a freshness NOTE (the
+  freshness gate owns that), never a silent mismatch.
+- **The two live-price arms:** `platinum` is the designed,
+  explained-difference arm (the stored value is the :13 hourly rung's
+  own snapshot of a continuously-moving market — the intraday move is
+  recorded, <2% passes); the FRED venue quirk (fredgraph.csv is
+  TLS-fingerprint-blocked from the audit machine's curl but Node's
+  undici fetch passes — the same venue behavior past sessions hit the
+  other way round) is recorded in the script header.
+- **The result (this session's own run, 2026-11-10T04:07Z):** ALL 20
+  CROSS-CHECKS GREEN — 19 byte-exact matches (au-wage-growth ABS WPI
+  YoY 3.2030749519538757 · chokepoint-malacca MA7 202.7 · copper-gold
+  3.5342265529841654 · ebp −0.26533114775416333 · fed-target DFEDTARL
+  3.75 · the GPR trio · ICSA 189000 · UMCSENT 48.1 · RSAFS 745021 ·
+  SGE 92.08 tonnes · STLFSI4 −0.5224 · BAZG 227.9 · the auction
+  bid-to-cover 2.77 · WCRFPUS2 14003 · the DGS10−jgbcme gap 2.164 ·
+  PCEPILFE YoY 3.1211596029620208 · WCSSTUS1 282184) + platinum the
+  0.25% intraday spot move (1581 vs 1577, recorded).
+- **The additive export surface:** the audit needs the repo's own
+  parsers through the public door — `@currena/insights/adapters` gains
+  a clearly-commented export block (fetch/parse for GPR, EBP,
+  PortWatch, auctions, EIA stocks, BAZG, SGE monthly, MOF +
+  `insightsFetch`/`CURRENA_UA` + `combineSeries`). Every symbol was
+  already exported from its own module; the block changes ZERO
+  behavior (the web bundle discipline is untouched — the adapters are
+  server-side tooling).
+- **Who decided:** this session (S20) per the roadmap's own S20 scope
+  ("the N=20 random-id source spot-check (Rule 5)").
+  **Revisit:** the tool is re-runnable (`pnpm --filter @currena/web
+  exec tsx ../../apps/web/scripts/pd-s20-data-audit.ts`) — every later
+  session's data audit can re-run it or freeze a NEW seed; the §21
+  gate is satisfied by ANY recorded N=20 run.
+
+## 2026-11-12 — BD-S20b: the S20 full-site regression + verdict backtest — every page × every §21 gate re-run against the S19 tree AND production, ALL GREEN
+
+- **The gates run (local, the S19 tree + the audit toolkit):** ALL
+  GREEN in 2m 42s — secret scan 8/1019 · typecheck 6/6 · eslint 0/0 ·
+  copy:audit clean · narrator in sync + eval 50 · layer1
+  11,819/11,819 · the full suite 15,099 (the S19 count EXACTLY — the
+  session's code adds a manual script + additive exports, no test
+  change) · build + budgets: entry 272.83/82.52, every page chunk
+  within its row (IDENTICAL to the S19 rows — the display layer did
+  not move).
+- **The placement audit (§21):** `pnpm placement:generate` reconciles —
+  184 registry ids + 6 boards · 0 unplaced · 0 duplicate homes · zero
+  diff on the committed table.
+- **The verdict-consistency backtests (§21 zero tolerance), ALL 11
+  re-run LIVE against production (currena.ir, 715 checks):** pd-s4
+  Global 84/84 (+ the narrator wiring: the raw-KV stateHash recompute
+  IDENTICAL — the artefact narrates exactly the state the pages serve)
+  · pd-s5 Gold 150/150 (the seat-level diff) · pd-s7 World Markets
+  56/56 · pd-s8 zooms 9/9 · pd-s9 USA 115/115 · pd-s10 USA tiers+TIC
+  115+48 · pd-s12 Europe 8/8 · pd-s14 Asia 11/11 · pd-s16 Australia
+  28/28 · pd-s17 Commodities 24/24 · pd-s18 Currencies 14+16+23 +
+  freshness 14-within-grace.
+- **The browser regression (the §21 per-page gates, LIVE on
+  production):** all 10 routes × 1440×900 + 360×844 × en + fa (40
+  legs) — the per-route titles/descriptions/canonicals + og:locale
+  (en_US/fa_IR) on every route, the breadcrumb trails on the EIGHT
+  destinations only (Global IS Home; the legacy keeps its deprecation
+  banner — verified live: "This page is being reorganised…"), 0px
+  horizontal overflow on every leg, ZERO console/page errors on every
+  leg, the Global one-screen rule WITH the footer at BOTH widths
+  (footerGap 0), long pages push the footer below content (never
+  overlapping), dir=rtl + Persian titles on every fa leg. The
+  page-specific gates: Global's 10 tiles all show verdicts or their
+  designed live content (the prices ribbon — Gold US$4,120 +0.1%
+  matching the snapshot byte-for-byte — + the dedollarization context
+  tile) and the 7 destination chips all link; Gold's 37 seats render
+  with lean + evidence + the honest-record footnote ("Measured against
+  gold's actual moves over 2016 to 2026…"); Currencies' 7 rule lights +
+  14 registry cards + 11-pair board; USA's 72 cards; Europe 8 · Asia
+  11 · Australia 28 · Commodities 24. NO DEAD LINKS on any route (every
+  internal href resolves to a known route; zero empty/javascript:
+  links). The interaction golden path: the Global tile navigation
+  (→ /world-markets, SPA-routed, no reload) + the mobile drawer (19
+  rows) verified live.
+- **Who decided:** this session (S20) per the roadmap's own S20 scope.
+  **Revisit:** none — the regression record stands; S21 (the
+  spec-vs-implementation audit) is the next session's own pass.
+
+## 2026-11-12 — BD-S20c: the S20 performance budget check — the bundle rows held + the measured live pass at both widths
+
+- **The bundle budget (the gates' own row check):** entry
+  272.83/82.52 kB (raw/gzip) — IDENTICAL to the S19 row; every page
+  lazy chunk within its row (the rows from the S16–S19 budget table:
+  Currencies 24/6.5 · Gold 1540/355.5 · every other page at or under
+  its ceiling; the measured Insights lazy 1519.63/349.51).
+- **The live performance pass (production, measured this session):**
+  COLD first visit at 1440×900 — load 380ms, 485KB total transfer (the
+  Vazirmatn variable font 109KB + the entry chunk 84KB + the main app
+  chunk 80KB + the logo 33KB — the biggest items are the font and the
+  app shell, not the page code) · COLD /gold at 360×844 — load
+  76ms/14KB · WARM navigation per route — DOMContentLoaded 59–81ms,
+  load 59–81ms, 8–28KB transferred (the per-route lazy chunks are
+  single-digit-KB gzip). ZERO console errors on every measured leg.
+- **The reading:** the page-division split is doing its job — every
+  destination's code arrives as a small lazy chunk; the entry shell +
+  the font dominate the cold path (the PWA service worker then caches
+  them). No budget breach, no performance debt found.
+- **Who decided:** this session (S20) per the roadmap's own S20 scope.
+  **Revisit:** the next full performance re-measure belongs to a
+  reserve session (S25–S30) if one is ever needed; nothing is red.
+
+## 2026-11-12 — BD-S20-deploy: the S20 close — NO deploy (the owner's standing; nothing was fixed)
+
+- **The decision:** S20 is a verification session; its only tree
+  changes are (a) the manual audit script (dev tooling — the Vite
+  build never ships apps/web/scripts/) and (b) the additive
+  `@currena/insights/adapters` export block (a package export surface
+  for tooling; zero runtime behavior change — the api worker and the
+  web bundle import the same modules as before). NOTHING was fixed —
+  every gate, every backtest, every audit came back green on the first
+  or second run (the two first-run audit failures were the audit
+  script's own fetch bugs: a wrong ABS key parameter + a custom UA the
+  SGE venue 403s — fixed in the script, never in shipped code).
+- **Production stays at currena-api `74777037`** (the S19 surface, the
+  markets worker at `8f63c8fa`) — and this session's own 715-check
+  live backtest sweep + the 40-leg browser pass + the 20-id upstream
+  audit IS the proof that production serves exactly this tree's
+  behavior (the deployed entry chunk was byte-verified at S19; the S20
+  tree adds no shipped-code change).
+- **Rollback story:** unchanged from S19 — one `npx wrangler
+  rollback` from apps/api.
+- **Who decided:** this session (S20) under the owner's standing ("the
+  deploy at the close is the owner's standing — expected: none, unless
+  something is fixed"). **Revisit:** S21 (the spec-vs-implementation
+  audit) may surface fixes; its own session decides its own deploy.

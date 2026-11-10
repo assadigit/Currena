@@ -150,8 +150,19 @@ regeneration (`pnpm placement:generate`).
   legacy-hero mobile items closed; the suite 15,099 = +11; the browser
   pass on all 10 routes × both widths × both locales) 2026-11-12 —
   DEPLOYED LIVE (currena-api `74777037`, a WEB-ONLY deploy — the
-  markets worker untouched).** Next: Session 20/30 (S20 — the
-  full-site regression + verdict backtest + data audit). See the
+  markets worker untouched).** **S20 (the full-site regression +
+  verdict backtest + data audit — every page × every §21 gate re-run
+  against the S19 tree AND production, ALL GREEN: the 11 live pd-*
+  backtests 715 checks [the narrator raw-KV stateHash recompute
+  identical] · the N=20 random-id source spot-check 20/20 [the new
+  re-runnable `pd-s20-data-audit.ts`, seed 20261112 — 19 byte-exact +
+  platinum the recorded live-spot arm] · the placement reconciliation
+  [184 ids · 0 unplaced · 0 duplicate homes] · the gates 15,099 · the
+  40-leg browser pass [0px overflow + ZERO errors on every leg] · the
+  performance check [COLD 380ms/485KB · WARM 59–81ms — no budget
+  breach]; NO deploy — nothing was fixed, the tree changes are dev
+  tooling only, production stays at `74777037`/`8f63c8fa`) 2026-11-12.**
+  Next: Session 21/30 (S21 — the spec-vs-implementation audit). See the
   roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
