@@ -39,6 +39,19 @@
 > 24-leg browser regression on production (0px overflow · NO dead
 > links · ZERO console/page errors · the NZX50 card live at both
 > widths en+fa).
+>
+> **Counterpart addendum (BD-S21-parallel):** a duplicate S21 arrival
+> (the same standing kickoff prompt, reaching a sandbox after the slot
+> was already delivered) ran the counterpart close per the hardened
+> one-session-per-slot rule: the shipped S21 INDEPENDENTLY re-verified
+> with that session's own gates — all green (the full gates 15,102 ·
+> placement regeneration zero-diff · the 11 live backtests 715/715 ·
+> the §21 data audit 20/20, malacca green outside the PortWatch
+> window · the CF API deploy-state check confirming `5593fd43`/`8f63c8fa`
+> · the browser pass re-proving the NZX50 card + the Global
+> cached-header fix live at both widths en+fa, 0px overflow, zero
+> errors, no dead links). No re-deploy, no shipped-code change; the
+> records live in DECISIONS.md (BD-S21-parallel) + CHANGELOG.md.
 
 ## Current state (2026-11-12, after page-division S21)
 

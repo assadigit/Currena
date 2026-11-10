@@ -2433,3 +2433,59 @@
   11:00–14:00 UTC** (the maintenance window).
 - **Who decided:** this session (S21). **Revisit:** none (the window is
   the provider's own schedule; the runbook note above is the fix).
+
+## 2026-11-10 — BD-S21-parallel: the duplicate S21 arrival's counterpart close — the shipped S21 (already delivered at HEAD `84486c0`, deployed as currena-api `5593fd43`/currena-markets `8f63c8fa`, Phase J CLOSED) honoured under the deployed-state rule and INDEPENDENTLY re-verified by this session's own gates; no re-deploy, no shipped-code change
+
+- **Event (the fourth arrival pattern, this time on S21):** this session
+  started from the standing S21 kickoff prompt ("Session 21/30 · Phase J ·
+  the spec-vs-implementation audit") — but the fresh clone showed
+  origin/main already carries the S21 delivery whole (M1 `733302d` + M2
+  `f170fd3` + M3 `84486c0`: the four fixes, AF-6/AF-7, the placement
+  regeneration, the BD-S21a–e records, the DEPLOY.md session record, the
+  roadmap delivery record + progress board, the HANDOFF rewritten for
+  S22) with a clean working tree — the slot was executed and closed
+  before this arrival ran. Per the hardened rule from BD-S18-parallel-3
+  ("launch exactly ONE session per roadmap slot"), this session did NOT
+  re-execute S21; it ran the counterpart close instead.
+- **The independent re-verification (this session's own, all green):**
+  (1) the FULL GATES on the shipped tree — ALL GREEN in 2m 46s (secret
+  scan 8/1020 · tsc 6/6 · eslint 0/0 · copy:audit clean · narrator in
+  sync + eval 50 · layer1 11,819/11,819 · the suite **15,102 — exactly
+  the S21 record's count** · build + budgets held, entry 272.88/82.55 —
+  byte-identical to the record); `pnpm placement:generate` regenerated
+  the §14 table with ZERO diff against the committed doc (184 ids · 0
+  unplaced · 0 duplicate homes · the AF-1…AF-7 findings section). (2)
+  ALL ELEVEN live pd-* backtests re-run vs production currena.ir —
+  **715 checks ALL GREEN** (s4 Global 84/84 + the narrator raw-KV
+  stateHash recompute IDENTICAL · s5 150 · s7 56 · s8 9 · s9 115 ·
+  s10 115+48 · s12 8 · s14 11 · s16 28 · s17 24 · s18 14+16+23). (3)
+  The §21 data audit (the S20 tool, frozen seed) re-run — **ALL 20
+  GREEN** (19 byte-exact + platinum's recorded live-spot arm at a 0.90%
+  intraday move), with chokepoint-malacca verified green OUTSIDE the
+  PortWatch Tuesday-maintenance window exactly per BD-S21e's runbook
+  note (the probes ran ~17:50 UTC, after the 14:00 UTC window close).
+  (4) The production deploy-state cross-check via the Cloudflare API:
+  currena-api's latest version is **`5593fd43`** (version 358, uploaded
+  2026-11-10T11:48:55Z — the S21 deploy; version 357 = `74777037`, the
+  rollback lever) and currena-markets' latest is **`8f63c8fa`** (version
+  31) — the deployed truth the records state. (5) The browser pass on
+  production: the S21 surfaces re-proven — the NZX50 card READY on
+  /asia-pacific at 1440×900 + 360×844 in en + fa (en: "S&P/NZX 50 ·
+  14,167.41 · +1.3% 1d · 100 percent of its 52-week range · Data as of
+  Nov 10, 2026"; fa: «شاخص ۵۰ شرکت بزرگ نیوزیلند | ۱۴٬۱۶۷٫۴۱ | +۱٫۳٪
+  ۱ روز | طی روز گذشته | ۱۰۰ درصد از دامنهٔ یک‌ساله خود») with its
+  REAL /australia link; the false "rides the Asia zoom map" sentence
+  GONE in both locales while the Korea/India TRUE zoom sentences stay
+  and the zoom still seats its six world-board Asian indices; the
+  Global header verified BOTH ways (the fresh path's single data-as-of
+  line; the cached path — exercised live by blocking the API — renders
+  "Showing the last good copy — data as of Nov 10, 2026" REPLACING the
+  plain line, the prices stamp staying: the BD-S21c fix); 0px
+  horizontal overflow on every leg; ZERO console/page errors on all
+  10 routes; every internal link resolves (no dead links).
+- **Who decided:** this session, under the deployed-state rule (the
+  BD-S18-parallel-2/-3 precedent: the production truth stands; a second
+  execution over a live, gated, deployed one buys nothing but risk).
+- **Revisit:** the owner-side launch discipline stands — exactly ONE
+  session per roadmap slot; S22 (Phase K, the investor feedback) is the
+  next slot, and its scope is already written in HANDOFF.md.
