@@ -222,12 +222,25 @@ regeneration (`pnpm placement:generate`).
   execution itself does NOT ship — the timing is investor question
   §19.6 (Gate 0 = the owner's recorded sign-off; the gates ALL GREEN
   2m 36s on the records tree; production unchanged: currena-api
-  `33ff60c0` + currena-markets `8f63c8fa`). **The owner's levers:
-  (1) arrange the investor's review of spec §19 (the seven questions)
-  — Phase K's remaining input; the investor round re-opens at the next
-  free slot the moment the answers exist; (2) the §19.6 retirement
-  timing answer.** See the roadmap's progress board for the current
-  position.
+  `33ff60c0` + currena-markets `8f63c8fa`). The Session 25 SLOT then
+  ran the first reserve session (BD-S25, 2026-11-12 — the owner's
+  kickoff supplied no investor §19 answers): the ecb provider-timeout
+  maintenance — the failing leg is the ECB HICP fetch (timed out at
+  the 12 s default on every rung 2026-11-06→11 while DFR/AAA stayed
+  green; euro-hicp held on last-good 4.0 @ 2026-10, verified exactly
+  against Eurostat's own 2026-11-04 flash release); the venue probe
+  matrix measured the provider-side cause (the ECB gateway
+  intermittently answers HTTP 504 after ~30.2 s on ANY request from
+  Worker egress); the fix shipped + deployed (the stable full-history
+  HICP request + the 45 s patient single attempt + the two pins +
+  the truthfulness updates — currena-api `9861a927`, the markets
+  worker untouched, the SPA byte-identical, the gates ALL GREEN twice
+  at 15,270 tests) with the rung-level proof riding the standing
+  sweeps. **The owner's levers: (1) arrange the investor's review of
+  spec §19 (the seven questions) — Phase K's remaining input; the
+  investor round re-opens at the next free slot the moment the
+  answers exist; (2) the §19.6 retirement timing answer.** See the
+  roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 

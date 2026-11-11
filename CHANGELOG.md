@@ -5,6 +5,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-12] page-division S25 (the first reserve session — the ecb provider-timeout maintenance item): **THE ECB HICP LEG'S SIX-DAY RUNG TIMEOUTS DIAGNOSED AND FIXED — the stable full-history request + the 45 s patient single attempt + the two regression pins; the provider-side cause measured live (the ECB gateway's ~30.2 s HTTP 504 roulette on ANY request from Worker egress — the DFR control itself 504'd in the same probe run that four HICP shapes answered 200); DEPLOYED currena-api `9861a927` (the markets worker untouched `8f63c8fa`); the held euro-hicp value verified EXACTLY against Eurostat's own 2026-11-04 flash release (4.0 Oct · 3.8 Sep · 3.2 Aug).**
+
+- **The diagnosis (the session's first half):** the failing status row
+  (read from the KV `insights:status` blob + the public `/status` endpoint
+  + the KV daily archives) is the ECB **HICP** leg
+  `HICP/M.U2.N.000000.4D0.ANR` — "The operation was aborted due to
+  timeout" at the 12 s default on every rung 2026-11-06 → 2026-11-11
+  (04:10 main + the 10:10 sweep; the last healthy HICP fetch 2026-11-05
+  04:10, the morning the 2026-10 flash landed; DFR + AAA green
+  throughout — the "ecb-drf provider timeout" handoff note's true body).
+  `euro-hicp` held on last-good 4.0 @ 2026-10 with the honest threshold
+  verdict (4.0 > 2 → warning) — the fail-closed design holding the
+  publisher's own freshest print, verified exactly against Eurostat's
+  own euro-indicators releases.
+- **The venue probe matrix (the S1-M1.1 temp-probe pattern — a
+  throwaway probe worker via `wrangler dev --remote`, deleted after):**
+  the ECB API gateway intermittently 504s at ~30.2 s on ANY request from
+  Worker egress (a no-filter HICP request 504'd in one minute and
+  answered 200 in ~1.9 s the next; the DFR control 504'd in the same
+  probe run while csvdata filtered/unfiltered · dataonly · jsondata ·
+  lastN all answered 200 in <2 s; the sandbox venue fast throughout) —
+  a per-request roulette, undocumented by the provider (their own
+  status-codes page covers only 500s). No shape avoids it; the fix is
+  patience + stability + the sweeps, and the escalation options are
+  recorded (the provider channel; the Eurostat-origin dissemination API
+  as the HICP leg's second venue, a new-adapter session).
+- **The fix (adapters/ecb.ts + the pins):** `ecbHicpUrl()` is the stable
+  unfiltered full-history URL (the DFR discipline — the same URL every
+  day, never the rolling `startPeriod`; the content verified at both
+  venues: 358 rows 1997-01 → 2026-10, the old decade window byte-equal as
+  the tail) · `ECB_PORTAL_TIMEOUT_MS = 45_000` on all four portal legs
+  (F-11 kept — one honest attempt, more patient; the COFER 15 s +
+  brent 15 s precedents) · the two regression pins (the URL + the
+  timeout) · the truthfulness updates (sources.ts ecb-portal usedFor
+  names all four legs + the notes record · RISK_REGISTER row +
+  change-log row · IADS §2). No indicator, definition, placement or §A
+  row changed (the source stays `ecb`; the D-9 audit re-run MET as
+  belt-and-braces).
+- **Gates + deploy:** the full `pnpm gates` ALL GREEN twice (2m 39s +
+  2m 41s; the suite **15,270** = +2 pins; build + budgets held — entry
+  272.88/82.55) · the D-9 audit MET · deployed currena-api `3e568964`
+  (12:12 UTC) then `9861a927` (12:21 UTC — the evidence-corrected tree;
+  production ≡ HEAD `0568232`) · currena-markets UNTOUCHED (`8f63c8fa`)
+  · the SPA byte-identical (`index-De-odUOp.js`) · the post-deploy smoke
+  green (the API + all 10 routes). The rung-level proof rides the
+  standing schedule (tonight's 20:10 sweep + tomorrow's 04:10 rung —
+  the KV write-cap note applies); the next session's first check is the
+  status endpoint's ecb row.
+
 ## [2026-11-12] page-division S24 (Phase K): **THE LEGACY RETIREMENT READINESS REVIEW DELIVERED — the D-9 condition MET: every one of the 187 ids verified categorized (one engine lane + one page home each; registry ↔ engine ↔ placement reconciled, 18 checks ALL GREEN via the new re-runnable `pnpm s24:d9-audit`); the retirement checklist landed as the spec-grade doc `docs/page-division/06-LEGACY-RETIREMENT-S24.md` (per-item evidence: the redirect A/B decision, the banner's exit, the /insights-only engine surfaces — the region verdicts, the two global shadow-gauge headers, the details panels + per-id history, the narrator's full set, the watchlist/search/exports, the calendar/About/Together/MoneyPanel — the per-page gap table, the sign-off-gated execution plan + done criteria); the audit's doc-side drift reconciled same-session (AGENTS §A 187/54/133 + the 23 missing + 3 misplaced rows · IADS §1 · the 04 audit basis); EXECUTION DOES NOT SHIP (the timing is investor question §19.6); NO deploy — a records session (the code layers were already green).**
 
 - **The D-9 audit (the retirement gate):** `scripts/s24-d9-audit.ts`

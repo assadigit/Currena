@@ -1758,6 +1758,41 @@ readings; the markets worker untouched, code-unchanged) + the KV seed
 (rung2-run --imf-cpi — the three readings LIVE). The gates ALL GREEN on
 the shipped tree (15,267) and with the fix (15,268).
 
+### ✅ The Session 25 SLOT — the first reserve session: the ecb provider-timeout maintenance · `Session 25/30` · delivered 2026-11-12 (BD-S25)
+- The owner's kickoff supplied NO investor §19 answers, so per the kickoff's
+  own rule the slot ran the first reserve item — the queued ecb provider
+  timeout maintenance (the runbook's /admin per-source status read from the
+  KV status blob; the /admin console's own refresh needs the owner's
+  REFRESH_SECRET, not supplied this session). The retirement execution
+  stayed untouched (behind the recorded §19.6 sign-off, per the S24
+  checklist's Gate 0).
+- **The delivery record:** the failing leg is the ECB **HICP** fetch
+  (`HICP/M.U2.N.000000.4D0.ANR` — the euro-hicp voter; the handoff note
+  had named the lever "ecb-drf", the source row's own name — its
+  substance right, its id wrong): "The operation was aborted due to
+  timeout" at the 12 s default on every rung 2026-11-06 → 11 (the last
+  healthy fetch 2026-11-05, the morning the 2026-10 flash landed; DFR +
+  AAA green throughout; euro-hicp held on last-good 4.0 @ 2026-10 —
+  Eurostat's own 2026-11-04 flash print, verified EXACTLY: 4.0 Oct · 3.8
+  Sep · 3.2 Aug). The venue probe matrix (the temp-probe pattern) measured
+  the provider-side cause: the ECB gateway INTERMITTENTLY answers HTTP
+  504 after ~30.2 s on ANY request from Worker egress (the DFR control
+  itself 504'd in the same probe run that four HICP shapes answered 200;
+  the sandbox venue fast throughout — a per-request roulette, undocumented
+  by the provider). Fix: the stable unfiltered full-history HICP URL (the
+  DFR discipline; content byte-equal at both venues) + `ECB_PORTAL_TIMEOUT_MS
+  = 45_000` on all four portal legs (F-11 kept, more patient) + the two
+  regression pins + the truthfulness updates (sources.ts usedFor ·
+  RISK_REGISTER row + change-log · IADS §2). Deployed currena-api
+  `3e568964` → `9861a927` (production ≡ HEAD; the markets worker
+  untouched `8f63c8fa`; the SPA byte-identical); the gates ALL GREEN
+  twice (the suite 15,270 = +2 pins) + the D-9 audit re-run MET. The
+  rung-level proof rides the standing schedule (the 20:10 sweep + the
+  04:10 rung) — the NEXT session's first check is the status endpoint's
+  ecb row; the escalation options (the ECB provider channel; the
+  Eurostat-origin dissemination-API fallback as a new-adapter session)
+  are recorded in RISK_REGISTER. **Session 25/30 · 5 remaining.**
+
 ### ☐ S26–S30 — Fix rounds · performance · retirement execution
 - Buffer sessions for anything red, slow, or delayed; the final legacy
   retirement + redirect when the owner signs off. If unused, the project
@@ -1780,38 +1815,45 @@ the shipped tree (15,267) and with the fix (15,268).
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
 | K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ✅ S24 2026-11-12 (NO deploy — the D-9 audit ALL GREEN via pnpm s24:d9-audit [187 ids, one lane + one home each] + the doc-side drift reconciled doc-only + the retirement checklist landed spec-grade [06-LEGACY-RETIREMENT-S24.md]; execution gated on the owner's §19.6 sign-off) |
-| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ☐ S26–S30 buffer |
+| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ✅ the Session 25 SLOT 2026-11-12 (BD-S25 — the first reserve session: the ecb provider-timeout maintenance — the ECB HICP leg's six-day rung timeouts diagnosed [the ECB gateway's ~30.2 s 504 roulette on ANY request from Worker egress], the stable full-history request + the 45 s patient single attempt + the two pins, deployed `9861a927`, the rung-level proof rides the 20:10/04:10 rungs) · ☐ S26–S30 buffer |
 
-**Current position: Session 24/30 delivered (Phase K: the legacy
-retirement readiness review) 2026-11-12 · 6 remaining. The D-9 condition
-is MET — every one of the 187 ids verified categorized (one engine lane +
-one page home each; registry ↔ engine ↔ placement reconciled) via the
-re-runnable `pnpm s24:d9-audit` (18 checks ALL GREEN; the H checks also
-pin AGENTS §A against the registry). The retirement checklist is landed
-spec-grade: `docs/page-division/06-LEGACY-RETIREMENT-S24.md` (the
-redirect A/B decision — the card-aware option B recommended; the banner's
-exit; the /insights-only surfaces — the region verdicts, the two global
-shadow-gauge headers, the details panels + per-id history [the largest
-gap, the port recommended], the narrator's full set, the
-watchlist/search/exports, the calendar/About/Together/MoneyPanel; the
-per-page gap table; the sign-off-gated execution plan + done criteria).
-EXECUTION DOES NOT SHIP — the timing is investor question §19.6 (Gate 0 =
-the owner's recorded sign-off; the execution rides a reserve session
-S26–S30). The audit's doc-side drift was reconciled same-session
-doc-only (§A 187/54/133 + the 23 missing + 3 misplaced rows · IADS §1 ·
-the 04 audit basis); NO deploy (the gates ALL GREEN 2m 36s on the
-records tree, the suite 15,268; production unchanged: currena-api
-`33ff60c0` + currena-markets `8f63c8fa`).
+**Current position: Session 25/30 delivered (the first reserve session —
+the ecb provider-timeout maintenance item) 2026-11-12 · 5 remaining
+(BD-S25). The owner's kickoff supplied no investor §19 answers, so the
+slot ran the queued maintenance lever: the failing leg is the ECB HICP
+fetch (`HICP/M.U2.N.000000.4D0.ANR` — the euro-hicp voter; the handoff
+note's "ecb-drf" name corrected: substance right, id wrong) — timed out
+at the 12 s default on every rung 2026-11-06→11 while DFR/AAA stayed
+green; euro-hicp held on last-good 4.0 @ 2026-10, verified EXACTLY
+against Eurostat's own 2026-11-04 flash release. The venue probe
+matrix (the temp-probe pattern) measured the provider-side cause: the
+ECB gateway INTERMITTENTLY answers HTTP 504 after ~30.2 s on ANY
+request from Worker egress (the DFR control itself 504'd in the same
+probe run that four HICP shapes answered 200 — a per-request roulette,
+undocumented by the provider). The fix shipped + DEPLOYED: the stable
+unfiltered full-history HICP URL (the DFR discipline; content
+byte-equal at both venues) + `ECB_PORTAL_TIMEOUT_MS = 45_000` on all
+four portal legs (F-11 kept, one honest attempt, more patient) + the
+two regression pins + the truthfulness updates (sources.ts usedFor ·
+RISK_REGISTER row + change-log · IADS §2) — currena-api `9861a927`
+(the markets worker untouched `8f63c8fa`; the SPA byte-identical); the
+gates ALL GREEN twice (the suite 15,270 = +2 pins) + the D-9 audit
+re-run MET. THE RUNG-LEVEL PROOF RIDES THE STANDING SCHEDULE: the next
+session's FIRST check is the status endpoint's ecb row (the 20:10
+sweep + the 04:10 rung carry it — mind the KV write-cap window); if
+the HICP leg still fails across multiple days, the escalation options
+(the ECB provider channel; the Eurostat-origin dissemination-API
+fallback as a new-adapter session) are recorded in RISK_REGISTER and
+come to the owner for the choice.
 NEXT: the investor round the moment the owner supplies the §19 answers
 (collect → D-49+ in the strategy log §5 Round 4 → the spec v2 entries —
 the AF-1…AF-8 findings ride that pass, never silent edits), then S23's
-deferred feedback-build scope; the reserve slots hold the retirement
-execution (behind the §19.6 sign-off), the ecb-drf provider timeout
-maintenance item (the runbook: the /admin console's per-source status,
-which needs the owner's REFRESH_SECRET), and the buffers. THE OWNER'S
-LEVERS: (1) arrange the external investor's review of the spec (§19's
-seven questions) — Phase K's remaining input; (2) the §19.6 retirement
-timing answer (directly, or via the investor round). The S20 data-audit
-tool is re-runnable for any later session's §21 data-audit gate —
-RUNBOOK NOTE (BD-S21e): never run it Tuesdays 11:00–14:00 UTC (the IMF
-PortWatch maintenance window).**
+deferred feedback-build scope; the remaining reserve slots (S26–S30)
+hold the retirement execution (behind the recorded §19.6 sign-off),
+the ecb follow-up if the rung evidence demands it, and the buffers.
+THE OWNER'S LEVERS: (1) arrange the external investor's review of the
+spec (§19's seven questions) — Phase K's remaining input; (2) the
+§19.6 retirement timing answer (directly, or via the investor round).
+The S20 data-audit tool is re-runnable for any later session's §21
+data-audit gate — RUNBOOK NOTE (BD-S21e): never run it Tuesdays
+11:00–14:00 UTC (the IMF PortWatch maintenance window).**

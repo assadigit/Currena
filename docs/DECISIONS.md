@@ -2758,3 +2758,71 @@
   §19 answers arrive); the accepted-losses list (R-3/R-4/R-6/R-7/R-8)
   is decided at that same gate, recorded in DECISIONS.md with the
   burn-in evidence.
+
+## 2026-11-12 — BD-S25: the first reserve session runs the ecb provider-timeout maintenance — the failing leg is the ECB HICP fetch (not the DFR the handoff note named); the provider-side cause measured live (the ECB gateway's ~30.2 s HTTP 504 roulette on ANY request from Worker egress); the fix ships the stable full-history HICP request + the 45 s patient single attempt; the rung-level proof rides the standing sweeps
+
+- **Event:** the Session 25 slot. The owner's kickoff supplied NO investor
+  §19 answers (only the session credentials), so per the kickoff's own
+  rule the slot ran the first reserve item — the queued ecb-drf provider
+  timeout maintenance (HANDOFF's owner-side lever #7). The retirement
+  execution stayed untouched (behind the recorded §19.6 sign-off, per the
+  S24 checklist's Gate 0).
+- **The diagnosis (evidence-first, per Rule 5):** the live status blob
+  (KV `insights:status`) + the public `/status` + the KV daily archives
+  pinned the failing row: the ECB **HICP** leg
+  `HICP/M.U2.N.000000.4D0.ANR` — "The operation was aborted due to
+  timeout" at the 12 s default, every rung 2026-11-06 → 2026-11-11
+  (04:10 + the 10:10 sweep), while DFR + AAA stayed green (the DFR's
+  one Nov-10 manual-run blip self-healed). The last healthy HICP fetch:
+  2026-11-05 04:10 (the morning the 2026-10 flash landed).
+  `euro-hicp` held on last-good 4.0 @ 2026-10 — Eurostat's own
+  2026-11-04 flash print, verified EXACTLY (4.0 Oct · 3.8 Sep · 3.2 Aug
+  against the publisher's own releases). The handoff note had named the
+  lever "ecb-drf" (the source row's own name); the maintenance session
+  corrected the record: the failing LEG is HICP — the note's substance
+  (a provider timeout held honestly) was right, its id was wrong.
+- **The venue probe matrix (the temp-probe pattern, a throwaway worker
+  via `wrangler dev --remote`, deleted after):** the ECB API gateway
+  INTERMITTENTLY answers HTTP 504 after ~30.2 s on ANY request from
+  Worker egress — any series, any shape (probe v2: a no-filter HICP
+  request 504'd in one minute and answered 200 in ~1.9 s the next; the
+  DFR control itself 504'd in the same probe run while four HICP shapes
+  — csvdata filtered/unfiltered · dataonly · jsondata · lastN —
+  answered 200 in <2 s; the sandbox venue fast throughout). A
+  per-request roulette, UNDOCUMENTED by the provider (their
+  status-codes page covers only 500s as "an issue on our side… try
+  again later"; the portal's feedback form lists "Performance problems /
+  API issues" as known categories). Options considered: request-shape
+  changes (disproven — no shape avoids the roulette); a retry (rejected
+  — F-11 forbids retry loops; the 10:10/20:10 sweeps ARE the designed
+  hours-level retry); a second venue (the Eurostat-origin dissemination
+  API — RECORDED as the escalation if the leg keeps failing, a
+  new-adapter session of its own: Rule 5 + the licence read + the §A
+  discipline).
+- **The fix (strictly-improving-or-neutral on every path):**
+  `ecbHicpUrl()` = the stable unfiltered full-history URL (the DFR
+  discipline — the same URL every day, never the rolling startPeriod;
+  content verified at both venues: 358 rows 1997-01 → 2026-10, the old
+  decade window byte-equal as the tail) + `ECB_PORTAL_TIMEOUT_MS =
+  45_000` on all four portal legs (DFR · HICP · AAA · BSI; F-11 kept —
+  ONE honest attempt, more patient; the COFER 15 s + brent 15 s
+  precedents) + the two regression pins in `adapters.test.ts` + the
+  truthfulness updates (sources.ts ecb-portal usedFor → all four legs +
+  the notes record; RISK_REGISTER row + change-log row; IADS §2 ecb
+  row). NO indicator, definition, placement or §A row changed — the
+  D-9 standing audit re-run MET (belt-and-braces).
+- **Gates + deploy:** the full gates ALL GREEN twice (2m 39s + 2m 41s;
+  the suite 15,270 = +2 pins; budgets held); deployed currena-api
+  `3e568964` (12:12 UTC) then `9861a927` (12:21 UTC — the
+  evidence-corrected tree; production ≡ HEAD `0568232`); currena-markets
+  untouched (`8f63c8fa`); the SPA byte-identical; the post-deploy smoke
+  green (the API + all 10 routes). The rung-level proof rides the
+  standing schedule: tonight's 20:10 sweep (the status still carries
+  failures → it fires) + tomorrow's 04:10 rung — mind the KV write-cap
+  window (the 04:10 rung always lands fresh).
+- **Who decided:** this session (S25) under the roadmap's reserve
+  scope + the handoff's queued item. **Revisit:** the next session's
+  FIRST check — the status endpoint's ecb row after the coming
+  rungs/sweeps; if the HICP leg still fails across multiple days, the
+  recorded escalation options (the ECB provider channel; the
+  Eurostat-origin fallback session) come to the owner for the choice.

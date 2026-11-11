@@ -132,6 +132,105 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-12 the page-division S25 deploy (the first reserve slot — the ecb provider-timeout maintenance: the ECB HICP leg's six-day rung timeouts diagnosed, the stable full-history request + the 45 s patient single attempt + the two regression pins)
+
+**Scope (page-division S25, the first reserve session per the owner's
+kickoff — the queued maintenance item; the investor's §19 answers were
+NOT supplied, so the investor round does not open):** the ecb-drf
+provider-timeout lever from HANDOFF. The true body of it, diagnosed live
+this session: the failing status row is the ECB **HICP** leg
+(`HICP/M.U2.N.000000.4D0.ANR` — the `euro-hicp` voter) — "The operation
+was aborted due to timeout" at the 12 s default on **every rung from
+2026-11-06 to 2026-11-11** (04:10 main + the 10:10 sweep; the last healthy
+HICP fetch landed 2026-11-05 04:10, the morning the 2026-10 flash
+arrived; the DFR + AAA legs stayed green throughout except the DFR's one
+Nov-10 manual-run blip that self-healed — the reading history was dated
+row-by-row from the KV daily archives). `euro-hicp` was held on last-good
+**4.0 @ 2026-10** — exactly Eurostat's own 2026-11-04 flash print
+("Euro area annual inflation is expected to be 4.0% in October 2026, up
+from 3.8% in September", release 2-04112026-ap; the series tail
+3.2/3.8/4.0 for Aug/Sep/Oct verified against the publisher's own
+releases) — the fail-closed design holding the correct value honestly,
+exactly as the handoff claimed.
+
+**The diagnosis (the venue probe matrix, the S1-M1.1/S6-M6.3
+temp-probe pattern — a throwaway `currena-probe-ecb` run through
+`wrangler dev --remote`, deleted after the read):** the ECB API gateway
+INTERMITTENTLY answers **HTTP 504 after ~30.2 s** on ANY request from
+Worker egress — any series, any shape (probe v2: a no-filter HICP
+request 504'd at 30.2 s in one minute and answered 200 in ~1.9 s the
+next; the **DFR control itself** — the module's healthiest production
+leg — 504'd at 30.2 s in the same probe run while four HICP shapes
+(csvdata filtered/unfiltered · dataonly · jsondata · lastN) answered
+200 in <2 s; the sandbox venue stayed fast throughout). A per-request
+roulette, undocumented by the provider (their status-codes page covers
+only 500s as "an issue on our side… try again later"; the portal's own
+feedback form carries "Performance problems / API issues" as known
+categories). No request shape avoids it — the shape is chosen for
+stability, never as a latency claim.
+
+**The fix (strictly-improving-or-neutral on every path):**
+1. `ecbHicpUrl()` is the **stable unfiltered full-history URL**
+   (the DFR discipline — the same URL every day, never the rolling
+   `startPeriod` that moved with every rung so no cache could serve it).
+   Content verified at BOTH venues: 358 rows 1997-01 → 2026-10, 164 kB,
+   the old decade window byte-equal as its exact tail.
+2. **`ECB_PORTAL_TIMEOUT_MS = 45_000`** — all four portal legs (DFR ·
+   HICP · AAA · BSI) take the 45 s single-attempt default (F-11 kept —
+   ONE honest attempt, more patient; precedents: the COFER 15 s row +
+   the brent front-month 15 s call-site). Healthy paths answer in <3 s
+   (unchanged); dead paths surface the gateway's own 504 as an honest
+   `failed` row instead of a client abort; the 10:10/20:10 sweeps remain
+   the designed hours-level retry.
+3. **Two regression pins** in `adapters.test.ts` (the URL shape + the
+   timeout), plus the truthfulness updates: `sources.ts` ecb-portal
+   `usedFor` now names all four legs + the notes record; RISK_REGISTER
+   row + change-log row; IADS §2 ecb row. The escalation options are
+   recorded in RISK_REGISTER (the provider channel; a Eurostat-origin
+   dissemination-API fallback for the HICP leg as a new-adapter session)
+   if the leg still fails across the coming rungs.
+
+**Gates (ALL GREEN, run twice):** 2m 39s then 2m 41s — secret scan
+8/1027 · typecheck 6/6 · eslint 0/0 · copy:audit clean · narrator
+193×2 + 56×2, eval 50 · layer1 11,969/11,969 · the suite **15,270**
+(= the S23/S24 close 15,268 + the two new pins) · build + budgets held
+(entry 272.88/82.55 · the Insights chunks unchanged). The D-9 standing
+audit re-run: **MET** (nothing touched indicators, definitions,
+placement or §A — the re-run is belt-and-braces).
+
+**Deploys (TWO, the second supersedes so production ≡ HEAD):**
+1. **currena-api `3e568964`** @ 100% (2026-11-11 12:12 UTC) — the fix
+   build (the first evidence wording).
+2. **currena-api `9861a927`** @ 100% (2026-11-11 12:21 UTC) — the
+   evidence-corrected tree (the probe-v2 correction re-worded the
+   comments + the sources/RISK_REGISTER notes; `sources.ts` rides the
+   Worker bundle, so the redeploy keeps production byte-matched to
+   `0568232`).
+currena-markets UNTOUCHED (`8f63c8fa` — the code-unchanged convention,
+verified via `wrangler deployments list`). The SPA is byte-identical
+(the deployed entry chunk stays `index-De-odUOp.js` — the fix is
+Worker-side only).
+
+**Live acceptance:** the API smoke green (`/api/health` ·
+`/api/insights` · `/api/insights/status` · `/api/rates`) + the 10-route
+smoke all 200 + zero console-visible regressions; the new request URL
+verified from BOTH venues (the sandbox fetch + the Worker-egress probe:
+200, 164,417 bytes, the same tail); the values verified against
+Eurostat's own releases. **The rung-level proof rides the standing
+schedule:** tonight's 20:10 sweep fires (the current status still
+carries today's ecb failure rows, so `sweepShouldFire` is true) and
+runs the full collect with the new code from the production venue;
+tomorrow's 04:10 rung owns the day. NOTE the standing KV write-cap
+window (this runbook's insights-ingestion note): if the account's
+daily KV quota is exhausted by ~19:00 UTC, the 20:10 sweep's writes
+fail loudly and the 04:10 rung (fresh window) carries the heal — the
+next session's first check is the status endpoint's ecb row.
+
+**Rollback:** one `npx wrangler rollback` from apps/api + the git revert
+— the change is ingest-side only (the SPA is byte-identical; the stored
+snapshot serves identically under the old code; the held `euro-hicp`
+value was already honest under both).
+
 ## Session record — 2026-11-12 the page-division S23 deploy (the pulled-forward S25 fill session — the three §15 Asia CPI fills LIVE on /asia-pacific: Japan 2.2% · Korea 2.8% · India 4.4%, plus the KV-seed patch fix)
 
 **Scope (page-division S23, the pulled-forward S25 — the §15 Asia CPI fill
