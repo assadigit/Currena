@@ -723,7 +723,17 @@ export function patchInsightsSnapshot(
   now: string,
 ): InsightsSnapshot {
   const byId = new Map(patchedReadings.map((r) => [r.id as string, r]));
-  const readings = stored.readings.map((r) => byId.get(r.id as string) ?? r);
+  // page-division S23 (2026-11-12, the fill session's KV-seed finding):
+  // a rung patch must ADD readings for ids the stored snapshot lacks
+  // (a fresh card's first landing — the fill family's bootstrap), never
+  // silently drop them. The replace-or-keep walk stays byte-equal for
+  // every stored row; the genuinely-new readings append after (the
+  // snapshot schema pins no order; every consumer joins by id).
+  const storedIds = new Set(stored.readings.map((r) => r.id as string));
+  const readings = [
+    ...stored.readings.map((r) => byId.get(r.id as string) ?? r),
+    ...patchedReadings.filter((r) => !storedIds.has(r.id as string)),
+  ];
   // "What changed this week": the patch's own flips merge with the events
   // the stored snapshot had accumulated (today's flip wins per id — the
   // same merge buildInsightsSnapshot performs).

@@ -240,6 +240,48 @@ describe('patchInsightsSnapshot', () => {
     expect(patched.readings.find((r) => r.id === 'us10y')).toEqual(stored.readings.find((r) => r.id === 'us10y'));
     expect(patched.generatedAt).toBe(NOW);
   });
+
+  // page-division S23 (2026-11-12, the KV-seed finding — BD-S23-parallel's
+  // counterpart continuation): a rung patch must ADD readings for ids the
+  // stored snapshot lacks (a fresh card's first landing — the fill
+  // family's bootstrap), never silently drop them. The production seed
+  // run 2026-11-11 00:02 UTC proved the drop live: the phase fetched all
+  // three CPI series, patched, wrote — and the written snapshot still
+  // lacked the three rows (the old replace-only walk dropped them).
+  it('S23: a patch ADDS readings for ids the stored snapshot lacks (the fresh-card bootstrap), never drops them', () => {
+    const series: Partial<Record<IndicatorId, SeriesPoint[]>> = {};
+    for (const def of DEFINITIONS) series[def.id] = [{ date: '2026-10-26', value: 1 }];
+    // The stored snapshot predates the fill family: strip the three rows
+    // (exactly the production state the seed ran against).
+    const fresh = buildInsightsSnapshot({ series, calendar: [], now: '2026-10-27T04:10:00.000Z' });
+    const stored: InsightsSnapshot = {
+      ...fresh,
+      readings: fresh.readings.filter((r) => !['japan-cpi', 'korea-cpi', 'india-cpi'].includes(r.id as string)),
+    };
+    expect(stored.readings).toHaveLength(fresh.readings.length - 3);
+
+    const japanCpi = fresh.readings.find((r) => r.id === 'japan-cpi')!;
+    const koreaCpi = fresh.readings.find((r) => r.id === 'korea-cpi')!;
+    const indiaCpi = fresh.readings.find((r) => r.id === 'india-cpi')!;
+    const patched = patchInsightsSnapshot(
+      stored,
+      [
+        { ...japanCpi, value: 2.232142857142857, asOf: '2026-09-30', updatedAt: NOW },
+        { ...koreaCpi, value: 2.818940555271674, asOf: '2026-10-31', updatedAt: NOW },
+        { ...indiaCpi, value: 4.44121915820029, asOf: '2026-07-31', updatedAt: NOW },
+      ],
+      NOW,
+    );
+    // The three land (the fresh-card bootstrap)…
+    expect(patched.readings).toHaveLength(stored.readings.length + 3);
+    expect(patched.readings.find((r) => r.id === 'japan-cpi')!.value).toBe(2.232142857142857);
+    expect(patched.readings.find((r) => r.id === 'korea-cpi')!.asOf).toBe('2026-10-31');
+    expect(patched.readings.find((r) => r.id === 'india-cpi')!.value).toBe(4.44121915820029);
+    // …every stored row keeps its identity (the replace-or-keep walk).
+    for (const row of stored.readings) {
+      expect(patched.readings.find((r) => r.id === row.id)).toEqual(row);
+    }
+  });
 });
 
 /* ------------------------------------------------------------------ *
