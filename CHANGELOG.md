@@ -5,6 +5,64 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-11] page-division S26 (the second reserve session — the ecb FIRST-CHECK follow-through): **THE POST-FIX EVIDENCE SESSION — the first check found the live status still PRE-FIX (no scheduled rung had carried the new code yet), so the session generated the missing evidence via the belt-and-braces path: the FIRST post-fix full collect (DFR ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504 — the designed honest failure shape; 50/52 rows green; the two voting cards held on last-good; the run exited 1 by design), the held/fresh card values verified EXACTLY against the publisher's own API (DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 · AAA 3.3308865271 @ 2026-11-10), and the ECB gateway's ~30.2 s 504 roulette now measured at ALL THREE observed venues (the sandbox included: 504 at ~31 s then 200 at ~2 s one minute later). The verdict stays PENDING, riding tonight's 20:10 sweep + tomorrow's 04:10 rung; NO deploy — the code is unchanged (production `9861a927` ≡ HEAD; the markets worker `8f63c8fa`).**
+
+- **The first check (the honest state at ~14:05 UTC):** the live status
+  blob (KV `insights:status` + the public `/status`) was generatedAt
+  2026-11-11T11:57:33.966Z — the mid-day Node-venue run on the PRE-FIX
+  tree, carrying ONE red row (the AAA leg's 12 s timeout abort; 51/52
+  green). The S25 fix was verified deployed (currena-api `9861a927` @
+  100 %, created 12:21:26Z, via the Cloudflare deployments API) but NO
+  scheduled rung had carried the new code yet — the first is the 20:10
+  UTC sweep tonight (armed: the status carries `kind: failed` rows →
+  `sweepShouldFire` true). Neither kickoff branch applied: the verdict
+  was PENDING on evidence that did not yet exist.
+- **The post-fix evidence run (the session's action):** a GHA
+  `insights-ingest` `workflow_dispatch` on main (`ab1f316` ≡ the
+  production tree; run id 43036550865, 14:14:23Z → 14:17:17Z) — the
+  FIRST post-fix full collect. The result is the designed honest shape:
+  DFR ❌ HTTP 504 · AAA ✅ fetched (fresh 3.3308865271 @ 2026-11-10) ·
+  HICP ❌ HTTP 504 (the BSI leg rides rung2's monthly
+  `liquidityMonthly` gate and did not run today); 50/52 rows green;
+  `ecb-dfr` + `euro-hicp` held on last-good and flagged stale; the run
+  exited 1 BY DESIGN (the P1 alerting). The new error row — "HTTP 504
+  from data-api.ecb.europa.eu — single attempt, no retry (F-11)" —
+  surfaces the gateway's OWN answer truthfully (not a client abort),
+  the 45 s patience giving slow-but-alive paths the room the 12 s
+  default denied. Within one day the roulette hit a DIFFERENT pair of
+  legs than the 11:57 run (AAA↔HICP swapped, DFR newly bitten) — the
+  per-request finding re-confirmed at the leg level.
+- **The Rule-5 publisher verification (the same-series second voice,
+  live from the sandbox venue):** DFR 2.5 @ 2026-11-11 · HICP 4.0 @
+  2026-10 (tail 3.2 Aug · 3.8 Sep · 4.0 Oct — re-matching Eurostat's
+  2026-11-04 flash sequence verified in S25) · AAA 3.3308865271 @
+  2026-11-10 — ALL THREE match the served/held card values EXACTLY,
+  digit-for-digit against the run's own P1 lines. The public page
+  remains truthful.
+- **The roulette grew one venue further:** the SANDBOX hit it too (the
+  DFR control: HTTP 504 at ~31 s, then HTTP 200 in ~2 s one minute
+  later on the identical request) — all three observed venues (Worker
+  egress · the GitHub runner · the work sandbox) now carry the
+  per-request roulette; S25's "sandbox fast throughout" was luck, not
+  immunity. The provider-side condition is ACTIVE today, undocumented
+  by the provider.
+- **One S25 record correction:** the 11:57 run was the daily SCHEDULE
+  event delayed ~7.6 h by GitHub's scheduler queue (the API's run
+  record: id 43016096779, `event: schedule`, head `6cb5d54`) — NOT a
+  `workflow_dispatch` as BD-S25's addendum recorded; the week's
+  scheduled runs all landed 11:22–13:00 UTC (the belt-and-braces is
+  effectively a ~12:00 UTC run in practice — still inside the fresh KV
+  slice). Substance unchanged: the Node venue, the pre-fix tree, the
+  HICP-fetched + AAA-timed-out same-run evidence.
+- **The records:** BD-S26 (DECISIONS) with the full evidence + the
+  PENDING verdict + the revisit clause; the RISK_REGISTER ecb-portal
+  row extended + its change-log row; the roadmap's Session 26 SLOT
+  delivery record + the progress board's Reserve row + the
+  current-position note rewritten (Session 26/30 · 4 remaining); the
+  page-division README program state; HANDOFF.md fully rewritten. NO
+  code changed — the full gates re-run ALL GREEN on the records-only
+  tree + the D-9 standing audit re-run MET (belt-and-braces).
+
 ## [2026-11-12] page-division S25 (the first reserve session — the ecb provider-timeout maintenance item): **THE ECB HICP LEG'S SIX-DAY RUNG TIMEOUTS DIAGNOSED AND FIXED — the stable full-history request + the 45 s patient single attempt + the two regression pins; the provider-side cause measured live (the ECB gateway's ~30.2 s HTTP 504 roulette on ANY request from Worker egress — the DFR control itself 504'd in the same probe run that four HICP shapes answered 200); DEPLOYED currena-api `9861a927` (the markets worker untouched `8f63c8fa`); the held euro-hicp value verified EXACTLY against Eurostat's own 2026-11-04 flash release (4.0 Oct · 3.8 Sep · 3.2 Aug).**
 
 - **The diagnosis (the session's first half):** the failing status row

@@ -2836,3 +2836,86 @@
   GitHub-runner venue all carry it; this session's sandbox stayed fast
   throughout — an egress-routing outlier, not a fix). The posture is
   unchanged; the evidence got stronger.
+
+## 2026-11-11 — BD-S26: the second reserve session runs the ecb FIRST-CHECK follow-through — the live status at session open was still the PRE-FIX 11:57 run (no post-fix rung had carried the new code yet), so the session generated the missing evidence itself via the belt-and-braces path: the post-fix full collect (DFR ❌ 504 · AAA ✅ · HICP ❌ 504 — the honest designed failure shape), the held/fresh card values verified EXACTLY against the publisher's own API, and the roulette now measured at ALL THREE observed venues (the sandbox included); the verdict stays PENDING, riding tonight's 20:10 sweep + tomorrow's 04:10 rung
+
+- **Event:** the Session 26 slot. The owner's kickoff supplied NO investor
+  §19 answers (only the session credentials), so per the kickoff's own rule
+  the slot ran the standing branch's reserve items: the FIRST CHECK (the
+  S25 follow-up) + the post-fix evidence generation. The retirement
+  execution stayed untouched (behind the recorded §19.6 sign-off, per the
+  S24 checklist's Gate 0).
+- **The first check read (the honest state at session open, 2026-11-11
+  ~14:05 UTC):** the live status blob (KV `insights:status` + the public
+  `/status`) was generatedAt **2026-11-11T11:57:33.966Z** — the mid-day
+  Node-venue run on the PRE-FIX tree — carrying ONE red row (the AAA leg's
+  12 s timeout abort; 51/52 green). The S25 fix was verified deployed
+  (currena-api `9861a927` @ 100 %, created 12:21:26Z, via the Cloudflare
+  deployments API) but **NO scheduled rung had carried the new code yet**
+  — the first is the 20:10 UTC sweep tonight (armed: the status carries
+  `kind: failed` rows → `sweepShouldFire` true). NEITHER kickoff branch
+  applied (not green-with-clean-rungs; not failing-across-multiple-days of
+  the new code): the verdict was **PENDING** on evidence that did not yet
+  exist.
+- **The record correction (S25's addendum, one detail):** the 11:57 run
+  was the daily **schedule** event (the 04:20 cron delayed ~7.6 h by
+  GitHub's scheduler queue — the week's scheduled runs landed 11:22–13:00
+  UTC every day), NOT a `workflow_dispatch` as BD-S25's addendum recorded;
+  the GitHub API's run record (id 43016096779, `event: schedule`, head
+  `6cb5d54`) is the authority. The substance stands unchanged (the Node
+  venue, the pre-fix tree, the HICP-fetched + AAA-timed-out same-run
+  evidence); the belt-and-braces schedule delay is itself worth knowing —
+  the 04:20 belt-and-braces has effectively become a ~12:00 UTC run in
+  practice (still inside the fresh KV slice, still belt-and-braces for the
+  Worker's own 04:10–04:40 rungs which run on time).
+- **The post-fix evidence run (the session's action):** the sanctioned
+  manual lever — a GHA `insights-ingest` `workflow_dispatch` on main
+  (`ab1f316` ≡ the production tree; run id 43036550865, 14:14:23Z →
+  14:17:17Z, ~2 m 51 s) — executed the FIRST post-fix full collect: **DFR
+  ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504** (the BSI leg rides
+  rung2's monthly `liquidityMonthly` gate and did not run today); 50/52
+  rows green; the two voting cards (`ecb-dfr`, `euro-hicp`) held on
+  last-good and flagged stale; the run exited 1 BY DESIGN (the P1
+  alerting). The error shape is exactly what S25 built: the honest row
+  "HTTP 504 from data-api.ecb.europa.eu — single attempt, no retry
+  (F-11)" — the gateway's OWN answer surfaced truthfully (not a client
+  abort), the 45 s patience giving slow-but-alive paths the room the 12 s
+  default denied. Within one day the roulette hit a DIFFERENT pair of
+  legs than the 11:57 run (AAA↔HICP swapped, DFR newly bitten) — the
+  per-request finding re-confirmed at the leg level.
+- **The Rule-5 publisher verification (the same-series second voice,
+  fetched live from the sandbox venue this session):** DFR **2.5 @
+  2026-11-11** · HICP **4.0 @ 2026-10** (tail 3.2 Aug · 3.8 Sep · 4.0 Oct)
+  · AAA **3.3308865271 @ 2026-11-10** — ALL THREE match the served/held
+  card values EXACTLY (the run's own P1 lines agree digit-for-digit; the
+  HICP tail re-matches Eurostat's 2026-11-04 flash sequence verified in
+  S25). The public page remains truthful: the held cards carry the
+  publisher's own freshest prints, the fresh card carries today's fetch.
+- **The roulette evidence grew one venue further:** the SANDBOX hit it
+  too, this session (the DFR control: HTTP 504 at ~31 s, then HTTP 200 in
+  ~2 s one minute later on the identical request) — all three observed
+  venues (Worker egress · the GitHub runner · the work sandbox) now carry
+  the per-request roulette; S25's "sandbox fast throughout" was luck, not
+  immunity. The provider-side condition is ACTIVE today, undocumented by
+  the provider.
+- **The verdict:** **PENDING** — the new code works exactly as designed
+  (honest 504 rows, held-true cards, the sweep armed), but the post-fix
+  posture is hours old; the kickoff's escalation trigger ("an ecb leg
+  still fails across multiple days" of the NEW code) needs the coming
+  days' rungs. The designed healing paths are all armed: tonight's 20:10
+  sweep (the status carries failed rows) — mind the KV write cap (~19:00
+  UTC; if the cap eats the sweep's writes, tomorrow's 04:10 rung owns the
+  heal, harmless by design) — tomorrow's 04:10–04:40 Worker rungs + the
+  ~12:00 belt-and-braces. The KV budget at the evidence run: 16 writes,
+  0 cap-retries (the cap not yet hit at 14:16 UTC).
+- **Who decided:** this session (S26) under the roadmap's reserve scope +
+  the kickoff's FIRST-CHECK instruction + BD-S25's revisit clause.
+  **Revisit:** the next session's FIRST check — the status endpoint's ecb
+  rows after tonight's sweep + tomorrow's rungs (the real Worker-venue
+  rung-level proof); if the post-fix days keep failing (the cards going
+  user-visibly stale past their maxAge windows — not just honest failed
+  rows on held-true values), the recorded escalation options (the ECB
+  provider channel; the Eurostat-origin dissemination-API fallback
+  session) come to the owner for the choice. NO deploy this session —
+  the code is unchanged (production already `9861a927` ≡ HEAD); the
+  evidence + the records are the deliverable.

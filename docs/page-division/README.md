@@ -237,7 +237,21 @@ regeneration (`pnpm placement:generate`).
   the truthfulness updates — currena-api `9861a927`, the markets
   worker untouched, the SPA byte-identical, the gates ALL GREEN twice
   at 15,270 tests) with the rung-level proof riding the standing
-  sweeps. **The owner's levers: (1) arrange the investor's review of
+  sweeps. The Session 26 SLOT (2026-11-11, BD-S26) then ran the second
+  reserve session — the ecb FIRST-CHECK follow-through: the live status
+  at session open was still PRE-FIX (no scheduled rung had carried the
+  new code yet — the first is the 20:10 sweep tonight, armed), so the
+  session generated the missing evidence via the belt-and-braces path
+  (a GHA `insights-ingest` dispatch on main ≡ production, 14:15 UTC):
+  the FIRST post-fix full collect recorded the designed honest shape
+  (DFR ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504; 50/52 green; the
+  two voting cards held on last-good; the run exited 1 by design); the
+  held/fresh values verified EXACTLY against the publisher's own API
+  (DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 · AAA 3.3308865271 @
+  2026-11-10); the roulette now measured at ALL THREE observed venues
+  (the sandbox included). The verdict stays PENDING, riding the coming
+  rungs; NO deploy (the code is unchanged — production `9861a927` ≡
+  HEAD). **The owner's levers: (1) arrange the investor's review of
   spec §19 (the seven questions) — Phase K's remaining input; the
   investor round re-opens at the next free slot the moment the
   answers exist; (2) the §19.6 retirement timing answer.** See the

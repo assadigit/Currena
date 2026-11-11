@@ -6,107 +6,95 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **SESSION 25/30 (2026-11-12) — the first reserve session: the ecb
-> provider-timeout maintenance — DELIVERED (BD-S25, ships code, deployed
-> currena-api `9861a927`).** The owner's kickoff supplied NO investor
-> §19 answers, so per the kickoff's own rule the slot ran the queued
-> maintenance lever. The diagnosis: the failing leg is the ECB **HICP**
-> fetch (`HICP/M.U2.N.000000.4D0.ANR` — the euro-hicp voter; the
-> handoff note had named the lever "ecb-drf" — the source row's own
-> name; its substance right, its id wrong) — "The operation was aborted
-> due to timeout" at the 12 s default on EVERY rung 2026-11-06→11 (the
-> last healthy fetch 2026-11-05, the morning the 2026-10 flash landed;
-> DFR + AAA green throughout; euro-hicp held on last-good 4.0 @
-> 2026-10 — Eurostat's own 2026-11-04 flash print, verified EXACTLY:
-> 4.0 Oct · 3.8 Sep · 3.2 Aug). The venue probe matrix (the
-> temp-probe pattern) measured the provider-side cause: the ECB API
-> gateway INTERMITTENTLY answers HTTP 504 after ~30.2 s on ANY request
-> from Worker egress (the DFR control itself 504'd in the same probe
-> run that four HICP shapes answered 200 in <2 s; the sandbox venue
-> fast throughout — a per-request roulette, undocumented by the
-> provider). The fix (strictly-improving-or-neutral): the stable
-> unfiltered full-history HICP URL (the DFR discipline; content
-> byte-equal at both venues — 358 rows, the old decade window as the
-> exact tail) + `ECB_PORTAL_TIMEOUT_MS = 45_000` on all four portal
-> legs (F-11 kept — one honest attempt, more patient) + the two
-> regression pins + the truthfulness updates (sources.ts usedFor ·
-> RISK_REGISTER row + change-log · IADS §2). The rung-level proof
-> rides the standing schedule — see the FIRST CHECK below.**
+> **SESSION 26/30 (2026-11-11) — the second reserve session: the ecb
+> FIRST-CHECK follow-through (the post-fix evidence session) — DELIVERED
+> (BD-S26, no code change, no deploy; production already ≡ HEAD).** The
+> owner's kickoff supplied NO investor §19 answers, so per the kickoff's
+> own rule the slot ran the standing branch's reserve items. The first
+> check at session open (~14:05 UTC) found the live status blob still
+> PRE-FIX (generatedAt 11:57Z — the AAA leg's 12 s timeout; 51/52 green)
+> and the deployed fix `9861a927` @ 100 % not yet carried by ANY
+> scheduled rung (the first: tonight's 20:10 sweep, armed) — so NEITHER
+> kickoff branch applied and the session GENERATED the missing evidence
+> via the sanctioned belt-and-braces path (a GHA `insights-ingest`
+> dispatch on main ≡ production, run 43036550865, 14:14→14:17 UTC): the
+> FIRST post-fix full collect recorded the designed honest shape — **DFR
+> ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504** (the BSI leg rides
+> rung2's monthly gate); 50/52 rows green; `ecb-dfr` + `euro-hicp` held
+> on last-good; the run exited 1 BY DESIGN (the P1 alert). The Rule-5
+> second voice (live from the sandbox): DFR 2.5 @ 2026-11-11 · HICP 4.0
+> @ 2026-10 · AAA 3.3308865271 @ 2026-11-10 — ALL EXACT matches to the
+> served/held values (the public page stays truthful). The roulette grew
+> one venue further: the SANDBOX hit it too (the DFR control: 504 at
+> ~31 s, then 200 at ~2 s one minute later) — all three observed venues
+> now carry the per-request condition. The VERDICT: **PENDING**, riding
+> tonight's sweep + tomorrow's rungs.**
 
-## Current state (after the S25 close)
+## Current state (after the S26 close)
 
 - **Program:** page-division — all TEN destinations render their own
   pages; Phases A–J CLOSED; Phase K: S22 closed as a WAITING slot ·
   S23 DEFERRED (blocked on the investor) · S24 DELIVERED (the D-9
   condition MET + the retirement checklist landed) · the S25 roadmap
-  item itself was delivered early (pulled forward into the Session 23
-  slot) · **the Session 25 SLOT ran the first reserve session (the
-  ecb maintenance) — DELIVERED**. Remaining: S23's feedback-build
-  scope (blocked on the investor) + the reserve S26–S30 (the
-  retirement execution behind the §19.6 sign-off, the ecb follow-up if
-  the rung evidence demands it, buffers). **Counter: Session 25/30 ·
-  5 remaining.**
-- **DEPLOYED LIVE:** currena-api **`9861a927`** (this session — the
-  two-step deploy `3e568964` → `9861a927`; production ≡ HEAD `0568232`;
-  the SPA byte-identical, the entry chunk `index-De-odUOp.js`) +
-  currena-markets `8f63c8fa` (UNTOUCHED — the code-unchanged
-  convention).
-- **Gates (the shipped tree, run twice): ALL GREEN** — 2m 39s + 2m 41s
-  · secret scan 8/1027 · typecheck 6/6 · eslint 0/0 · copy:audit
-  clean · narrator 193×2 + 56×2, eval 50 · layer1 11,969/11,969 · the
-  suite **15,270** (= the S24 close 15,268 + the two new pins) · build
-  + budgets held (entry 272.88/82.55). **The D-9 standing audit re-run:
-  MET** (nothing touched indicators/definitions/placement/§A — the
-  re-run is belt-and-braces per the session rules).
-- **The S25 surfaces (what changed where):** the adapter
-  (`packages/insights/src/adapters/ecb.ts` — `ecbHicpUrl()` the stable
-  full-history URL + `ECB_PORTAL_TIMEOUT_MS = 45_000` on DFR · HICP ·
-  AAA · BSI, both with the full evidence comments) · the pins
-  (`adapters.test.ts` — the URL + the timeout) · the truthfulness
-  updates (`sources.ts` ecb-portal usedFor names all four legs + the
-  notes record · `docs/insights/RISK_REGISTER.md` row + change-log row
-  · IADS §2 ecb row) · the records (DEPLOY.md session record ·
-  CHANGELOG · BD-S25 · the roadmap's Reserve entry + progress board +
-  current position · the page-division README · this file).
-- **The standing next-verification (NOT yet proven — rides the
-  schedule):** mid-session, a **Node-venue ingest ran at 11:57:33 UTC**
-  (a GHA `insights-ingest` workflow_dispatch — the fetched F2 row proves
-  the Node venue; the tree was the pre-fix S24 close): the HICP leg
-  **FETCHED** (a good roulette window — same value 4.0 @ 2026-10) while
-  the **AAA leg timed out instead** — the roulette confirmed PER-REQUEST
-  within a single run, and venue-independent (it hits the Node venue too;
-  `euro-aaa-10y` is held-stale until the next good run). The current
-  status therefore carries the AAA failure row — so the 20:10 UTC sweep
-  TONIGHT still fires (`sweepShouldFire` true) and runs the full collect
-  with the NEW code (45 s timeouts + the stable HICP URL) from the
-  production Worker venue; tomorrow's 04:10 rung owns the day. The card
-  itself stays honestly held at the publisher's own freshest print
-  meanwhile.
+  item delivered early (the Session 23 slot) · the Session 25 SLOT ran
+  the first reserve session (the ecb maintenance, BD-S25) · **the
+  Session 26 SLOT ran the second reserve session (the ecb first-check
+  follow-through, BD-S26) — DELIVERED**. Remaining: S23's
+  feedback-build scope (blocked on the investor) + the reserve S27–S30
+  (the retirement execution behind the §19.6 sign-off, the ecb
+  escalation decision if the rung evidence demands it, buffers).
+  **Counter: Session 26/30 · 4 remaining.**
+- **DEPLOYED LIVE:** currena-api **`9861a927`** (UNCHANGED this session
+  — the S25 fix; production ≡ HEAD `ab1f316` modulo the records commits
+  that carry no code change; verified @ 100 % via the deployments API)
+  + currena-markets `8f63c8fa` (UNTOUCHED).
+- **The ecb posture (BD-S25 + BD-S26, the live evidence):** the four
+  portal legs ride `ECB_PORTAL_TIMEOUT_MS = 45_000` (F-11 single
+  attempt kept) + the HICP request is the stable full-history URL. The
+  provider-side roulette (the gateway's ~30.2 s HTTP 504, per-request)
+  is ACTIVE, now measured at ALL THREE observed venues (Worker egress ·
+  the GitHub runner · the work sandbox). The post-fix evidence run
+  (14:15 UTC): DFR ❌ 504 · AAA ✅ (fresh) · HICP ❌ 504 — the honest
+  designed failure shape; the two voting cards held on publisher-true
+  values (verified EXACTLY); the status carries two `kind: failed` rows
+  → tonight's 20:10 sweep is ARMED. A `failed` row naming a timeout OR
+  an HTTP 504 on ANY ecb leg is an expected honest shape on bad days;
+  the sweeps + the rungs + the belt-and-braces are the healing paths.
+- **Gates (the records-only tree): ALL GREEN** — re-run this session
+  (the full `pnpm gates` + the D-9 standing audit re-run MET,
+  belt-and-braces: nothing touched indicators/definitions/placement/§A).
+- **The S26 surfaces (what changed where):** the evidence run (GHA
+  dispatch 43036550865 + its status blob + the public /status now
+  serving the honest two-row failure shape) · the records (BD-S26 in
+  DECISIONS · RISK_REGISTER row extension + change-log row · the
+  roadmap's Session 26 SLOT record + progress board + current position
+  · the page-division README · the CHANGELOG S26 entry · this file).
+  One S25 record correction: the 11:57 run was the daily SCHEDULE
+  delayed ~7.6 h by GitHub's scheduler queue (NOT a workflow_dispatch
+  as BD-S25's addendum said) — the week's scheduled runs all landed
+  11:22–13:00 UTC.
 
-## Next session (Session 26/30)
+## Next session (Session 27/30)
 
-**FIRST CHECK — the ecb rung evidence (the S25 follow-up):** read
-`GET https://currena.ir/api/insights/status` (or the KV
-`insights:status` blob — the /admin console itself needs the owner's
-REFRESH_SECRET). Expected: the `ecb` row green (or an honest HTTP-504
-row naming the gateway — a different, truthful failure kind than the
-old timeout abort) and `euro-hicp` still served at its held-or-fresh
-print. If the HICP leg is STILL failing across the coming days of
-rungs+sweeps, the provider-side condition is confirmed persistent —
-the recorded escalation options (RISK_REGISTER + BD-S25): (a) the ECB
-provider channel (their feedback form lists "Performance problems /
-API issues"), (b) the **Eurostat-origin dissemination-API fallback**
-for the HICP leg — a new-adapter session of its own (Rule 5 venue
-verification + the licence read + the full §A discipline). Bring the
-choice to the owner.
+**FIRST CHECK — the ecb rung evidence, round 2 (the BD-S26 revisit):**
+read `GET https://currena.ir/api/insights/status` (or the KV
+`insights:status` blob via the Cloudflare API). By then the new code
+will have been carried by: tonight's 20:10 UTC sweep (armed — but mind
+the KV write cap ~19:00 UTC: if the cap ate its writes, the blob keeps
+the 14:15 stamp, harmless by design), tomorrow's 04:10–04:40 Worker
+rungs, and the ~12:00 belt-and-braces (the delayed schedule). Decide:
+- **Green rows / a clean rung under the new code** (the sweep or rung
+  fetched the ecb legs clean): the maintenance item is CLOSED — record
+  the verdict in DECISIONS.md (BD-S26's revisit) and move to the
+  standing branch.
+- **Honest failed rows persisting across multiple days of the NEW code**
+  (the cards going user-visibly stale past their maxAge windows, not
+  just failed rows on held-true values): the provider-side condition is
+  confirmed persistent — present the escalation choice to the owner
+  (wait it out vs the Eurostat-origin dissemination-API fallback
+  session), per the options recorded in BD-S25/BD-S26 + RISK_REGISTER.
 
-Then the standing branch: **the investor round if the answers exist,
-else the next reserve slot.** Read `AGENTS.md` (§14 — the owner's
-rules, incl. the §A indicator maintenance discipline) first, then
-`docs/page-division/01-SESSION-ROADMAP.md` (the progress board + the
-current-position note), this file, and — for the retirement path —
-`docs/page-division/06-LEGACY-RETIREMENT-S24.md`.
-
+Then the standing branch — decided by the owner's kickoff prompt:
 - **If the owner supplies the investor's §19 answers:** run the investor
   round (collect → D-49+ in the strategy log §5 Round 4 → the spec v2
   entries — the AF-1…AF-8 findings ride that pass, never silent edits);
@@ -114,43 +102,37 @@ current-position note), this file, and — for the retirement path —
   also opens (or delays) the retirement execution** — record it as
   Gate 0 in DECISIONS.md and schedule the execution session per the
   checklist's §7.
-- **If not:** the roadmap's reserve slots (S26–S30) hold the retirement
+- **If not:** the roadmap's reserve slots (S27–S30) hold the retirement
   execution (ONLY behind the recorded §19.6 sign-off), the ecb
-  escalation decision if the rung evidence demands it, and the
-  buffers — pick per the owner's kickoff prompt (one session per slot,
-  the parallel-session rule).
+  escalation decision if the rung evidence demands it, and the buffers
+  — pick per the owner's kickoff prompt (one session per slot, the
+  parallel-session rule).
 
 ### Operational notes worth carrying
 
 - **The KV write cap:** the account's free-tier daily KV quota exhausts
   ~19:00 UTC (HTTP 429 10048 on the REST path) — any manual KV seeding
-  (rung2-run / fx-run / markets-au-run) after ~19:00 UTC waits for the
-  00:00 UTC reset; the 04:10/04:20 UTC Worker rungs always land in the
-  fresh window (DEPLOY.md's insights-ingestion note). NOTE: tonight's
-  20:10 sweep writes KV late in the day — if the quota is already
-  exhausted its writes fail loudly and tomorrow's 04:10 rung carries
-  the heal (harmless, by design).
-- **The ECB portal posture (BD-S25):** the four portal legs ride
-  `ECB_PORTAL_TIMEOUT_MS = 45_000` (F-11 single attempt kept) + the
-  HICP request is the stable full-history URL. The provider-side
-  condition (the ~30.2 s 504/timeout roulette) is UNDOCUMENTED,
-  intermittent, **per-request and venue-independent** — measured from
-  the Worker-egress probe venue, observed on the production schedule
-  (the HICP leg's six-day failure streak), and from the Node venue
-  (the 11:57 GHA run: HICP fetched while the AAA leg timed out in the
-  SAME run). A `failed` row — naming either a timeout or HTTP 504 —
-  on ANY ecb leg is now an expected honest shape on bad days; the
-  10:10/20:10 sweeps + the GHA belt-and-braces are the healing paths,
-  and the affected card holds last-good meanwhile (the euro-hicp hold
-  verified exactly against the publisher's own releases).
+  (rung2-run / fx-run / markets-au-run / a GHA ingest dispatch) after
+  ~19:00 UTC waits for the 00:00 UTC reset; the 04:10/04:20 UTC rungs
+  always land in the fresh window. At the 14:15 evidence run the budget
+  read 16 writes, 0 cap-retries.
+- **The GHA belt-and-braces schedule delay:** GitHub's scheduler queue
+  has delayed the 04:20 UTC scheduled `insights-ingest` run by ~7–9 h
+  all week (the runs land 11:22–13:00 UTC) — still inside the fresh KV
+  slice; the Worker's own 04:10–04:40 rungs run on time and remain the
+  primary venue. A `workflow_dispatch` (as used by S26) runs immediately.
+- **The ECB portal posture:** see "Current state" above — a failed row
+  (timeout OR 504) on any ecb leg is an expected honest shape; the
+  cards hold last-good meanwhile (the held values verified against the
+  publisher's own API exactly: DFR 2.5 @ 2026-11-11 · HICP 4.0 @
+  2026-10 · AAA 3.3308865271 @ 2026-11-10).
 - **The fresh-card bootstrap is FIXED** (`patchInsightsSnapshot` ADDS
   readings for ids the stored snapshot lacks — the regression test pins
   it); the three Asia CPI fills' normal cadence takes over at the next
   first-of-month rung2 gate (Dec 1 UTC).
 - **The D-9 audit is a standing gate:** `pnpm s24:d9-audit` (18 checks
   incl. the §A ↔ registry pin) — re-run it in any session that touches
-  indicators, definitions, placement or §A; it exits non-zero on
-  drift.
+  indicators, definitions, placement or §A; it exits non-zero on drift.
 - **The PortWatch runbook note (BD-S21e):** never run the §21 data
   audit's portwatch leg Tuesdays 11:00–14:00 UTC (the IMF's scheduled
   maintenance window).
@@ -170,22 +152,24 @@ current-position note), this file, and — for the retirement path —
    behind the recorded sign-off. The A/B redirect decision (the
    card-aware option B recommended) and the details-panel port
    recommendation ride the same gate.
-3. **The ecb escalation choice (NEW, only if the rung evidence demands
-   it):** if the ECB HICP leg still fails across the coming days after
-   the S25 fix, decide between (a) waiting out the provider-side
-   condition (the sweeps keep healing on good windows — the card stays
-   honestly held meanwhile) and (b) the Eurostat-origin
+3. **The ecb escalation choice (standing, only if the rung evidence
+   demands it):** if the post-fix days keep failing (the cards going
+   user-visibly stale, not just honest failed rows on held-true
+   values), decide between (a) waiting out the provider-side roulette
+   (the sweeps keep healing on good windows — the 11:57 and 14:15 runs
+   each fetched at least one leg green) and (b) the Eurostat-origin
    dissemination-API fallback session. The evidence + the options are
-   recorded in BD-S25 + RISK_REGISTER.
+   recorded in BD-S25/BD-S26 + RISK_REGISTER.
 4. Ratify the `/converter` relocation (S1's build-session decision).
 5. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement; RENDERED on /usa tier-3).
-6. Ratify or redirect the BD-S3…BD-S25 decision set (the latest:
-   **BD-S25** — the ecb maintenance + the provider-side 504 roulette
-   record + the escalation options; all recorded, none blocking).
-7. Triage the queued unreviewed fa strings (now 1,217 of 7,965 manifest
-   entries; every session's corpus-pinned values are verified
-   byte-for-byte by their copy-pin tests).
+6. Ratify or redirect the BD-S3…BD-S26 decision set (the latest:
+   **BD-S26** — the first-check follow-through: the post-fix evidence
+   run + the three-venue roulette + the PENDING verdict riding the
+   schedule; all recorded, none blocking).
+7. Triage the queued unreviewed fa strings (every session's
+   corpus-pinned values are verified byte-for-byte by their copy-pin
+   tests).
 
 ## Known state worth knowing
 
@@ -206,7 +190,7 @@ current-position note), this file, and — for the retirement path —
   exec tsx ../../apps/web/scripts/pd-s20-data-audit.ts` (mind the
   PortWatch Tuesday window above).
 - **The parallel-session rule (hardened through BD-S18-parallel-3,
-  BD-S21-parallel, and BD-S23-parallel):** launch exactly ONE session
+  BD-S21-parallel, BD-S23-parallel):** launch exactly ONE session
   per roadmap slot — one prompt = one session = one slot. If a kickoff
   arrives for a slot already delivered (origin/main carries its
   records), run the counterpart close, never a re-execution; if a

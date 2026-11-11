@@ -1793,7 +1793,47 @@ the shipped tree (15,267) and with the fix (15,268).
   Eurostat-origin dissemination-API fallback as a new-adapter session)
   are recorded in RISK_REGISTER. **Session 25/30 · 5 remaining.**
 
-### ☐ S26–S30 — Fix rounds · performance · retirement execution
+### ✅ The Session 26 SLOT — the second reserve session: the ecb FIRST-CHECK follow-through · `Session 26/30` · delivered 2026-11-11 (BD-S26)
+- The owner's kickoff supplied NO investor §19 answers, so per the
+  kickoff's own rule the slot ran the standing branch's reserve items: the
+  FIRST CHECK (the S25 follow-up) — then, because the rung evidence the
+  check wanted did not exist yet, the session generated it via the
+  sanctioned belt-and-braces path. The retirement execution stayed
+  untouched (behind the recorded §19.6 sign-off, per the S24 checklist's
+  Gate 0).
+- **The delivery record:** at session open (~14:05 UTC) the live status
+  blob was still the PRE-FIX 11:57 run (the AAA leg's 12 s timeout; 51/52
+  green) — the deployed fix `9861a927` @ 100 % had not yet been carried by
+  ANY scheduled rung (the first: tonight's 20:10 sweep, armed because the
+  status carries `kind: failed` rows) — so NEITHER kickoff branch applied;
+  the verdict was PENDING on evidence that did not yet exist. The session
+  dispatched the GHA `insights-ingest` belt-and-braces on main ≡
+  production (run 43036550865, 14:14→14:17 UTC): the FIRST post-fix full
+  collect recorded the designed honest shape — **DFR ❌ HTTP 504 · AAA ✅
+  fetched · HICP ❌ HTTP 504** (the BSI leg rides rung2's monthly gate);
+  50/52 rows green; `ecb-dfr` + `euro-hicp` held on last-good, flagged
+  stale; the run exited 1 BY DESIGN (the P1 alert). The Rule-5 second
+  voice (live from the sandbox): DFR 2.5 @ 2026-11-11 · HICP 4.0 @
+  2026-10 (tail 3.2/3.8/4.0) · AAA 3.3308865271 @ 2026-11-10 — ALL
+  EXACT matches to the served/held values (the page stays truthful). The
+  roulette grew one venue further: the SANDBOX hit it too (the DFR
+  control: 504 at ~31 s, then 200 at ~2 s one minute later) — all three
+  observed venues carry the per-request condition; S25's "sandbox fast
+  throughout" was luck, not immunity. One S25 record correction: the
+  11:57 run was the daily SCHEDULE delayed ~7.6 h by GitHub's scheduler
+  queue (not a `workflow_dispatch`; the week's scheduled runs all landed
+  11:22–13:00 UTC — the belt-and-braces is effectively a ~12:00 UTC run
+  in practice). The VERDICT: **PENDING** — the new code works exactly as
+  designed; the escalation trigger ("still fails across multiple days"
+  of the NEW code) needs the coming days' rungs (tonight's 20:10 sweep —
+  mind the ~19:00 KV cap, harmless by design — tomorrow's 04:10–04:40
+  rungs + the ~12:00 belt-and-braces). NO deploy — the code is unchanged
+  (production already `9861a927` ≡ HEAD); the evidence + the records are
+  the deliverable; the gates re-run ALL GREEN on the records-only tree +
+  the D-9 standing audit MET (belt-and-braces). **Session 26/30 · 4
+  remaining.**
+
+### ☐ S27–S30 — Fix rounds · performance · retirement execution
 - Buffer sessions for anything red, slow, or delayed; the final legacy
   retirement + redirect when the owner signs off. If unused, the project
   simply finishes early — counter still reports `Session X/30`.
@@ -1815,46 +1855,48 @@ the shipped tree (15,267) and with the fix (15,268).
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
 | K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ✅ S24 2026-11-12 (NO deploy — the D-9 audit ALL GREEN via pnpm s24:d9-audit [187 ids, one lane + one home each] + the doc-side drift reconciled doc-only + the retirement checklist landed spec-grade [06-LEGACY-RETIREMENT-S24.md]; execution gated on the owner's §19.6 sign-off) |
-| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ✅ the Session 25 SLOT 2026-11-12 (BD-S25 — the first reserve session: the ecb provider-timeout maintenance — the ECB HICP leg's six-day rung timeouts diagnosed [the ECB gateway's ~30.2 s 504 roulette on ANY request from Worker egress], the stable full-history request + the 45 s patient single attempt + the two pins, deployed `9861a927`, the rung-level proof rides the 20:10/04:10 rungs) · ☐ S26–S30 buffer |
+| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ✅ the Session 25 SLOT 2026-11-12 (BD-S25 — the first reserve session: the ecb provider-timeout maintenance — the ECB HICP leg's six-day rung timeouts diagnosed [the ECB gateway's ~30.2 s 504 roulette on ANY request from Worker egress], the stable full-history request + the 45 s patient single attempt + the two pins, deployed `9861a927`, the rung-level proof rides the 20:10/04:10 rungs) · ✅ the Session 26 SLOT 2026-11-11 (BD-S26 — the second reserve session: the ecb FIRST-CHECK follow-through — the pre-fix status read + the post-fix belt-and-braces run dispatched [run 43036550865: DFR ❌ 504 · AAA ✅ · HICP ❌ 504, the designed honest shape; the held/fresh values verified EXACTLY against the publisher; the roulette now measured at all three venues incl. the sandbox]; the verdict PENDING, riding the 20:10 sweep + the 04:10 rung; NO deploy — the evidence + the records are the deliverable) · ☐ S27–S30 buffer |
 
-**Current position: Session 25/30 delivered (the first reserve session —
-the ecb provider-timeout maintenance item) 2026-11-12 · 5 remaining
-(BD-S25). The owner's kickoff supplied no investor §19 answers, so the
-slot ran the queued maintenance lever: the failing leg is the ECB HICP
-fetch (`HICP/M.U2.N.000000.4D0.ANR` — the euro-hicp voter; the handoff
-note's "ecb-drf" name corrected: substance right, id wrong) — timed out
-at the 12 s default on every rung 2026-11-06→11 while DFR/AAA stayed
-green; euro-hicp held on last-good 4.0 @ 2026-10, verified EXACTLY
-against Eurostat's own 2026-11-04 flash release. The venue probe
-matrix (the temp-probe pattern) measured the provider-side cause: the
-ECB gateway INTERMITTENTLY answers HTTP 504 after ~30.2 s on ANY
-request from Worker egress (the DFR control itself 504'd in the same
-probe run that four HICP shapes answered 200 — a per-request roulette,
-undocumented by the provider, and VENUE-INDEPENDENT: the mid-session
-Node-venue ingest at 11:57 UTC fetched HICP while the AAA leg timed
-out in the SAME run). The fix shipped + DEPLOYED: the stable
-unfiltered full-history HICP URL (the DFR discipline; content
-byte-equal at both venues) + `ECB_PORTAL_TIMEOUT_MS = 45_000` on all
-four portal legs (F-11 kept, one honest attempt, more patient) + the
-two regression pins + the truthfulness updates (sources.ts usedFor ·
-RISK_REGISTER row + change-log · IADS §2) — currena-api `9861a927`
-(the markets worker untouched `8f63c8fa`; the SPA byte-identical); the
-gates ALL GREEN twice (the suite 15,270 = +2 pins) + the D-9 audit
-re-run MET. THE RUNG-LEVEL PROOF RIDES THE STANDING SCHEDULE: the next
-session's FIRST check is the status endpoint's ecb row (the 20:10
-sweep + the 04:10 rung carry it — mind the KV write-cap window); if
-the HICP leg still fails across multiple days, the escalation options
-(the ECB provider channel; the Eurostat-origin dissemination-API
-fallback as a new-adapter session) are recorded in RISK_REGISTER and
-come to the owner for the choice.
+**Current position: Session 26/30 delivered (the second reserve session —
+the ecb FIRST-CHECK follow-through: the post-fix evidence session)
+2026-11-11 · 4 remaining (BD-S26). The owner's kickoff supplied no
+investor §19 answers, so the slot ran the standing branch's reserve
+items. The first check at session open (~14:05 UTC) found the live
+status blob still PRE-FIX (generatedAt 11:57Z — the AAA leg's 12 s
+timeout; 51/52 green) and the deployed fix `9861a927` @ 100 % not yet
+carried by ANY scheduled rung (the first: the 20:10 sweep tonight,
+armed) — so neither kickoff branch applied and the session GENERATED
+the missing evidence via the sanctioned belt-and-braces path (a GHA
+`insights-ingest` dispatch on main ≡ production, run 43036550865,
+14:14→14:17 UTC): the FIRST post-fix full collect recorded the designed
+honest shape — DFR ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504 (the
+BSI leg rides rung2's monthly gate); 50/52 rows green; ecb-dfr +
+euro-hicp held on last-good; the run exited 1 by design (the P1 alert).
+The Rule-5 second voice (live from the sandbox): DFR 2.5 @ 2026-11-11 ·
+HICP 4.0 @ 2026-10 · AAA 3.3308865271 @ 2026-11-10 — ALL EXACT matches
+to the served/held values (the public page stays truthful). The
+roulette grew one venue further — the SANDBOX hit it too (the DFR
+control: 504 at ~31 s, then 200 at ~2 s one minute later); all three
+observed venues now carry the per-request condition, and S25's "sandbox
+fast throughout" was luck, not immunity. One S25 record correction: the
+11:57 run was the daily SCHEDULE delayed ~7.6 h by GitHub's scheduler
+queue (not a workflow_dispatch; the week's scheduled runs all landed
+11:22–13:00 UTC — the belt-and-braces is effectively a ~12:00 UTC run
+in practice). THE VERDICT: PENDING — the new code works exactly as
+designed; the escalation trigger ("still fails across multiple days" of
+the NEW code) needs the coming days' rungs (tonight's 20:10 sweep —
+mind the ~19:00 KV cap, harmless by design — tomorrow's 04:10–04:40
+rungs + the ~12:00 belt-and-braces). NO deploy (production `9861a927` ≡
+HEAD; the markets worker `8f63c8fa`); the gates re-run ALL GREEN on the
+records-only tree + the D-9 standing audit MET (belt-and-braces).
 NEXT: the investor round the moment the owner supplies the §19 answers
 (collect → D-49+ in the strategy log §5 Round 4 → the spec v2 entries —
 the AF-1…AF-8 findings ride that pass, never silent edits), then S23's
-deferred feedback-build scope; the remaining reserve slots (S26–S30)
-hold the retirement execution (behind the recorded §19.6 sign-off),
-the ecb follow-up if the rung evidence demands it, and the buffers.
-THE OWNER'S LEVERS: (1) arrange the external investor's review of the
-spec (§19's seven questions) — Phase K's remaining input; (2) the
+deferred feedback-build scope; the remaining reserve slots (S27–S30)
+hold the retirement execution (behind the recorded §19.6 sign-off), the
+ecb escalation decision if the rung evidence demands it, and the
+buffers. THE OWNER'S LEVERS: (1) arrange the external investor's review
+of the spec (§19's seven questions) — Phase K's remaining input; (2) the
 §19.6 retirement timing answer (directly, or via the investor round).
 The S20 data-audit tool is re-runnable for any later session's §21
 data-audit gate — RUNBOOK NOTE (BD-S21e): never run it Tuesdays
