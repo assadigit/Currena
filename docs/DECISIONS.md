@@ -2826,3 +2826,13 @@
   rungs/sweeps; if the HICP leg still fails across multiple days, the
   recorded escalation options (the ECB provider channel; the
   Eurostat-origin fallback session) come to the owner for the choice.
+- **Addendum (mid-session evidence, 2026-11-11 11:57:33 UTC):** a
+  Node-venue ingest ran mid-session (a GHA `insights-ingest`
+  workflow_dispatch — the FETCHED F2 row proves the Node venue; the
+  tree was the pre-fix S24 close): the HICP leg FETCHED (a good
+  roulette window — same value 4.0 @ 2026-10) while the AAA leg timed
+  out in the SAME run. The roulette is therefore PER-REQUEST and
+  venue-independent (Worker egress + the production schedule + the
+  GitHub-runner venue all carry it; this session's sandbox stayed fast
+  throughout — an egress-routing outlier, not a fix). The posture is
+  unchanged; the evidence got stronger.

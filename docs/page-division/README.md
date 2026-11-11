@@ -230,8 +230,9 @@ regeneration (`pnpm placement:generate`).
   green; euro-hicp held on last-good 4.0 @ 2026-10, verified exactly
   against Eurostat's own 2026-11-04 flash release); the venue probe
   matrix measured the provider-side cause (the ECB gateway
-  intermittently answers HTTP 504 after ~30.2 s on ANY request from
-  Worker egress); the fix shipped + deployed (the stable full-history
+  intermittently answers HTTP 504 after ~30.2 s on ANY request —
+  venue-independent: Worker egress + the Node venue both carry the
+  per-request roulette); the fix shipped + deployed (the stable full-history
   HICP request + the 45 s patient single attempt + the two pins +
   the truthfulness updates — currena-api `9861a927`, the markets
   worker untouched, the SPA byte-identical, the gates ALL GREEN twice

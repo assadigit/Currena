@@ -216,7 +216,12 @@ Worker-side only).
 smoke all 200 + zero console-visible regressions; the new request URL
 verified from BOTH venues (the sandbox fetch + the Worker-egress probe:
 200, 164,417 bytes, the same tail); the values verified against
-Eurostat's own releases. **The rung-level proof rides the standing
+Eurostat's own releases. **Mid-session evidence (pre-deploy, recorded
+for the venue map):** a Node-venue ingest ran at 2026-11-11 11:57:33 UTC
+(a GHA `insights-ingest` workflow_dispatch — the FETCHED F2 row proves
+the venue; the pre-fix tree): the HICP leg FETCHED while the AAA leg
+timed out in the SAME run — the roulette is PER-REQUEST and
+venue-independent (the GitHub-runner venue carries it too). **The rung-level proof rides the standing
 schedule:** tonight's 20:10 sweep fires (the current status still
 carries today's ecb failure rows, so `sweepShouldFire` is true) and
 runs the full collect with the new code from the production venue;

@@ -69,12 +69,19 @@
   CHANGELOG · BD-S25 · the roadmap's Reserve entry + progress board +
   current position · the page-division README · this file).
 - **The standing next-verification (NOT yet proven — rides the
-  schedule):** the current live status still carries today's 10:10
-  ecb failure row (the pre-fix sweep). The 20:10 UTC sweep TONIGHT
-  fires (the status shows failures → `sweepShouldFire` true) and runs
-  the full collect with the new code from the production venue;
-  tomorrow's 04:10 rung owns the day. The card itself is honestly held
-  at the publisher's own freshest print meanwhile.
+  schedule):** mid-session, a **Node-venue ingest ran at 11:57:33 UTC**
+  (a GHA `insights-ingest` workflow_dispatch — the fetched F2 row proves
+  the Node venue; the tree was the pre-fix S24 close): the HICP leg
+  **FETCHED** (a good roulette window — same value 4.0 @ 2026-10) while
+  the **AAA leg timed out instead** — the roulette confirmed PER-REQUEST
+  within a single run, and venue-independent (it hits the Node venue too;
+  `euro-aaa-10y` is held-stale until the next good run). The current
+  status therefore carries the AAA failure row — so the 20:10 UTC sweep
+  TONIGHT still fires (`sweepShouldFire` true) and runs the full collect
+  with the NEW code (45 s timeouts + the stable HICP URL) from the
+  production Worker venue; tomorrow's 04:10 rung owns the day. The card
+  itself stays honestly held at the publisher's own freshest print
+  meanwhile.
 
 ## Next session (Session 26/30)
 
@@ -126,10 +133,16 @@ current-position note), this file, and — for the retirement path —
 - **The ECB portal posture (BD-S25):** the four portal legs ride
   `ECB_PORTAL_TIMEOUT_MS = 45_000` (F-11 single attempt kept) + the
   HICP request is the stable full-history URL. The provider-side
-  condition (the ~30.2 s 504 roulette from Worker egress) is
-  UNDOCUMENTED and intermittent — a `failed` row naming HTTP 504 on
-  an ecb leg is now an expected honest shape on bad days; the
-  10:10/20:10 sweeps are the designed hours-level retry.
+  condition (the ~30.2 s 504/timeout roulette) is UNDOCUMENTED,
+  intermittent, **per-request and venue-independent** — measured from
+  the Worker-egress probe venue, observed on the production schedule
+  (the HICP leg's six-day failure streak), and from the Node venue
+  (the 11:57 GHA run: HICP fetched while the AAA leg timed out in the
+  SAME run). A `failed` row — naming either a timeout or HTTP 504 —
+  on ANY ecb leg is now an expected honest shape on bad days; the
+  10:10/20:10 sweeps + the GHA belt-and-braces are the healing paths,
+  and the affected card holds last-good meanwhile (the euro-hicp hold
+  verified exactly against the publisher's own releases).
 - **The fresh-card bootstrap is FIXED** (`patchInsightsSnapshot` ADDS
   readings for ids the stored snapshot lacks — the regression test pins
   it); the three Asia CPI fills' normal cadence takes over at the next

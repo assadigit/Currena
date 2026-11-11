@@ -1830,7 +1830,9 @@ matrix (the temp-probe pattern) measured the provider-side cause: the
 ECB gateway INTERMITTENTLY answers HTTP 504 after ~30.2 s on ANY
 request from Worker egress (the DFR control itself 504'd in the same
 probe run that four HICP shapes answered 200 — a per-request roulette,
-undocumented by the provider). The fix shipped + DEPLOYED: the stable
+undocumented by the provider, and VENUE-INDEPENDENT: the mid-session
+Node-venue ingest at 11:57 UTC fetched HICP while the AAA leg timed
+out in the SAME run). The fix shipped + DEPLOYED: the stable
 unfiltered full-history HICP URL (the DFR discipline; content
 byte-equal at both venues) + `ECB_PORTAL_TIMEOUT_MS = 45_000` on all
 four portal legs (F-11 kept, one honest attempt, more patient) + the

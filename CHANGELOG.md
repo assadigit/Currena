@@ -27,10 +27,12 @@ than a semver tag.
   probe run while csvdata filtered/unfiltered · dataonly · jsondata ·
   lastN all answered 200 in <2 s; the sandbox venue fast throughout) —
   a per-request roulette, undocumented by the provider (their own
-  status-codes page covers only 500s). No shape avoids it; the fix is
-  patience + stability + the sweeps, and the escalation options are
-  recorded (the provider channel; the Eurostat-origin dissemination API
-  as the HICP leg's second venue, a new-adapter session).
+  status-codes page covers only 500s) — and VENUE-INDEPENDENT (the
+  mid-session Node-venue ingest at 11:57 UTC: the HICP leg fetched
+  while the AAA leg timed out in the SAME run). No shape avoids it; the
+  fix is patience + stability + the sweeps, and the escalation options
+  are recorded (the provider channel; the Eurostat-origin dissemination
+  API as the HICP leg's second venue, a new-adapter session).
 - **The fix (adapters/ecb.ts + the pins):** `ecbHicpUrl()` is the stable
   unfiltered full-history URL (the DFR discipline — the same URL every
   day, never the rolling `startPeriod`; the content verified at both
