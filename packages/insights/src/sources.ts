@@ -544,7 +544,7 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     attribution: 'Source: European Central Bank',
     termsUrl: 'https://data.ecb.europa.eu/',
     notes:
-      'Page-division S25 (2026-11-12, the ecb provider-timeout maintenance): the portal legs share a 45 s single-attempt timeout (ECB_PORTAL_TIMEOUT_MS) and the HICP request is the unfiltered full history — the ECB gateway intermittently serves time-filtered slices of the HICP dataflow slowly (six days of 12 s rung timeouts 2026-11-06→11 + a measured 30.2 s gateway 504 on the filtered shape); the unfiltered request answers ~1–2 s from both venues. See adapters/ecb.ts for the full evidence record.',
+      'Page-division S25 (2026-11-12, the ecb provider-timeout maintenance): the portal legs share a 45 s single-attempt timeout (ECB_PORTAL_TIMEOUT_MS) and the HICP request is the stable unfiltered full-history URL (the DFR discipline — never the rolling startPeriod). The provider-side finding: the ECB API gateway INTERMITTENTLY answers HTTP 504 after ~30.2 s on ANY request from Worker egress (the probe matrix: a no-filter HICP request 504\'d in one minute and answered 200 the next; the DFR control 504\'d in the same run while four HICP shapes succeeded — a per-request roulette, undocumented by the provider). The production rungs\' HICP leg timed out at the 12 s default 2026-11-06→11; the 45 s patience + the 10:10/20:10 sweeps are the posture. See adapters/ecb.ts for the full evidence record.',
   },
   'alternative-me': {
     id: 'alternative-me',

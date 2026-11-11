@@ -21,27 +21,31 @@ export const ECB_DATA_BASE = 'https://data-api.ecb.europa.eu/service/data';
  * 2026-11-12): the portal legs share a 45-second single-attempt timeout —
  * still F-11 (ONE honest attempt, no retry), only more patient.
  *
- * Evidence: the HICP leg's time-filtered request
- * (`?format=csvdata&startPeriod=<decade>` — the rolling window) timed out
- * at the 12-second default on EVERY rung from 2026-11-06 to 2026-11-11
- * (04:10 main + the 10:10 sweep; the status rows read "The operation was
- * aborted due to timeout"; the last healthy HICP fetch landed 2026-11-05,
- * the morning the 2026-10 flash arrived). The venue probes measured the
- * cause server-side: the ECB API's gateway intermittently serves the
- * time-filtered slices of the HICP dataflow slowly — a startPeriod+endPeriod
- * probe answered **HTTP 504 after 30.2 s** (the gateway's own upstream
- * timeout), while the same series from the same venue answered in ~1.5 s
- * later the same hour. The default 12 s cut those slow-but-alive paths off
- * mid-flight; 45 s sits past the gateway's 30 s give-up so a slow success
- * lands and a dead path surfaces the gateway's own 504 (an honest 'failed'
- * row naming HTTP 504 instead of a client abort).
+ * Evidence: the HICP leg's request timed out at the 12-second default on
+ * EVERY rung from 2026-11-06 to 2026-11-11 (04:10 main + the 10:10 sweep;
+ * the status rows read "The operation was aborted due to timeout"; the last
+ * healthy HICP fetch landed 2026-11-05, the morning the 2026-10 flash
+ * arrived). The venue probes (sandbox + Worker egress) then measured the
+ * provider-side condition: the ECB API gateway INTERMITTENTLY routes a
+ * request to a slow/dead backend and answers HTTP 504 after ~30.2 s — ANY
+ * request, any series, any shape (probe v2 from Worker egress: a no-filter
+ * HICP request 504'd at 30.2 s in one minute and answered 200 in ~1.9 s the
+ * next; the DFR control — the module's healthiest leg — 504'd at 30.2 s in
+ * that same probe run while four HICP shapes succeeded). It is a
+ * per-request roulette, not a shape defect — and it is UNDOCUMENTED (the
+ * ECB's own status-codes page lists 500s as "an issue on our side… try again
+ * later"; the portal's own feedback form carries "Performance problems /
+ * API issues" as known categories).
  *
- * Precedents: the IMF COFER request's own 15 s single-attempt (its
- * RISK_REGISTER row) and the brent front-month's 15 s call-site override —
- * per-source patience overrides are the established pattern. All four
- * portal legs (DFR, HICP, AAA, BSI) take this default: healthy days are
- * unchanged (every leg answers in <3 s), slow days gain the room the
- * gateway itself needs.
+ * The 45 s default: healthy paths answer in <3 s (unchanged); slow-but-alive
+ * paths get 33 s of room they never had at 12 s; dead paths surface the
+ * gateway's OWN 504 as an honest 'failed' row (HTTP 504 — single attempt,
+ * no retry) instead of a client abort, and the 10:10/20:10 sweeps remain
+ * the designed hours-level retry. Precedents: the IMF COFER request's own
+ * 15 s single-attempt (its RISK_REGISTER row) and the brent front-month's
+ * 15 s call-site override — per-source patience overrides are the
+ * established pattern. All four portal legs (DFR, HICP, AAA, BSI) take
+ * this default.
  */
 export const ECB_PORTAL_TIMEOUT_MS = 45_000;
 
@@ -115,18 +119,20 @@ export function ecbAaa10yUrl(from: string = ecbAaaFrom()): string {
  * URL of the HICP annual-rate series — the FULL HISTORY, no time filter
  * (the DFR discipline; page-division S25, 2026-11-12).
  *
- * Why no startPeriod: the maintenance round's probes showed the ECB
- * gateway's intermittent slowness is confined to TIME-FILTERED slices of
- * the HICP dataflow (a startPeriod+endPeriod probe 504'd at 30.2 s; the
- * startPeriod-only shape timed out at the 12 s default on six days of
- * rungs), while the unfiltered full-series request — served from the
- * warmer path — answered ~1.7 s from BOTH venues (sandbox + Worker
- * egress) with the decade window byte-equal as its tail (358 rows,
- * 1997-01 → 2026-10; the DFR leg already proves a full-history portal
- * request of 3 MB is a healthy daily fetch, and this one is 164 kB).
- * parseEcbMonthlyCsv is window-agnostic and the engine slices its own
- * 10-year windows, so the extra pre-decade rows change nothing but the
- * request's health.
+ * The maintenance round kept this shape deliberately, three reasons, all
+ * measured: (1) the STABLE URL — the old request's rolling startPeriod
+ * moved with every day (now − 3650d − 90d), so no cache along the path
+ * could ever serve it; the unfiltered series key is the same URL every
+ * day (the DFR leg — a 3 MB full-history fetch — is the module's
+ * healthiest production leg on exactly this discipline); (2) the content
+ * is IDENTICAL — the decade window is byte-equal the full history's tail
+ * (verified at both venues: 358 rows 1997-01 → 2026-10, the window's
+ * 120 rows match row-for-row), and parseEcbMonthlyCsv is window-agnostic
+ * with the engine slicing its own 10-year windows; (3) the probe matrix
+ * proved NO shape avoids the gateway's intermittent ~30 s 504 roulette
+ * (csvdata filtered/unfiltered, dataonly, jsondata, lastN all answered
+ * 200 within one probe while the DFR control 504'd) — so the shape is
+ * chosen for stability + precedent, never as a latency claim.
  */
 export function ecbHicpUrl(): string {
   return `${ECB_DATA_BASE}/${ECB_HICP_SERIES_KEY}?format=csvdata`;

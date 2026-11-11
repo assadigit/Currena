@@ -309,11 +309,13 @@ describe('ecb adapter (I15 — deposit facility rate)', () => {
   });
 
   // The S25 maintenance pins (2026-11-12, the ecb provider-timeout item):
-  // the HICP request carries NO time filter — the ECB gateway's intermittent
-  // slowness lives on the time-filtered slices of the HICP dataflow (six days
-  // of 12 s rung timeouts + a 30.2 s gateway 504 on the filtered shape; the
-  // unfiltered full-history answers ~1–2 s from both venues). A regression
-  // back to startPeriod would revive the dead fetch.
+  // the HICP request is the STABLE full-history URL (the DFR discipline —
+  // the same URL every day, never the rolling startPeriod the rungs rode
+  // through six days of 12 s timeouts), and the portal legs ride the 45 s
+  // single-attempt timeout: the ECB gateway's intermittent ~30 s 504
+  // roulette hits ANY request from Worker egress (probe v2: the DFR control
+  // itself 504'd while four HICP shapes answered), so no shape is a latency
+  // claim — these pins keep the shipped posture from regressing silently.
   it('the HICP request is the unfiltered full history (no startPeriod)', () => {
     expect(ecbHicpUrl()).toBe('https://data-api.ecb.europa.eu/service/data/HICP/M.U2.N.000000.4D0.ANR?format=csvdata');
   });
