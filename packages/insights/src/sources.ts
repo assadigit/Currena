@@ -530,7 +530,8 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     id: 'ecb-portal',
     provider: 'ecb',
     label: 'ECB Data Portal',
-    usedFor: 'the euro area policy rate (DFR)',
+    usedFor:
+      'the euro area policy rate (DFR), the AAA 10y yield, the HICP annual rate, the Eurosystem total assets (the global-liquidity ECB leg)',
     method: 'M1',
     runtime: 'github-action',
     level: 'L1',
@@ -542,7 +543,8 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     termsReadOn: SOURCE_RISK_READ_ON,
     attribution: 'Source: European Central Bank',
     termsUrl: 'https://data.ecb.europa.eu/',
-    notes: '',
+    notes:
+      'Page-division S25 (2026-11-12, the ecb provider-timeout maintenance): the portal legs share a 45 s single-attempt timeout (ECB_PORTAL_TIMEOUT_MS) and the HICP request is the unfiltered full history — the ECB gateway intermittently serves time-filtered slices of the HICP dataflow slowly (six days of 12 s rung timeouts 2026-11-06→11 + a measured 30.2 s gateway 504 on the filtered shape); the unfiltered request answers ~1–2 s from both venues. See adapters/ecb.ts for the full evidence record.',
   },
   'alternative-me': {
     id: 'alternative-me',

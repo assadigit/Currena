@@ -16,6 +16,35 @@ import type { FetchDeps } from './types';
 
 export const ECB_DATA_BASE = 'https://data-api.ecb.europa.eu/service/data';
 
+/**
+ * The maintenance round (page-division S25, the ecb provider-timeout item,
+ * 2026-11-12): the portal legs share a 45-second single-attempt timeout —
+ * still F-11 (ONE honest attempt, no retry), only more patient.
+ *
+ * Evidence: the HICP leg's time-filtered request
+ * (`?format=csvdata&startPeriod=<decade>` — the rolling window) timed out
+ * at the 12-second default on EVERY rung from 2026-11-06 to 2026-11-11
+ * (04:10 main + the 10:10 sweep; the status rows read "The operation was
+ * aborted due to timeout"; the last healthy HICP fetch landed 2026-11-05,
+ * the morning the 2026-10 flash arrived). The venue probes measured the
+ * cause server-side: the ECB API's gateway intermittently serves the
+ * time-filtered slices of the HICP dataflow slowly — a startPeriod+endPeriod
+ * probe answered **HTTP 504 after 30.2 s** (the gateway's own upstream
+ * timeout), while the same series from the same venue answered in ~1.5 s
+ * later the same hour. The default 12 s cut those slow-but-alive paths off
+ * mid-flight; 45 s sits past the gateway's 30 s give-up so a slow success
+ * lands and a dead path surfaces the gateway's own 504 (an honest 'failed'
+ * row naming HTTP 504 instead of a client abort).
+ *
+ * Precedents: the IMF COFER request's own 15 s single-attempt (its
+ * RISK_REGISTER row) and the brent front-month's 15 s call-site override —
+ * per-source patience overrides are the established pattern. All four
+ * portal legs (DFR, HICP, AAA, BSI) take this default: healthy days are
+ * unchanged (every leg answers in <3 s), slow days gain the room the
+ * gateway itself needs.
+ */
+export const ECB_PORTAL_TIMEOUT_MS = 45_000;
+
 /** The ECB series key for the deposit facility rate (confirmed on the portal). */
 export const ECB_DFR_SERIES_KEY = 'FM/D.U2.EUR.4F.KR.DFR.LEV';
 
@@ -82,31 +111,42 @@ export function ecbAaa10yUrl(from: string = ecbAaaFrom()): string {
   return `${ECB_DATA_BASE}/${ECB_AAA_10Y_SERIES_KEY}?format=csvdata&startPeriod=${from}`;
 }
 
-/** The decade window's start for the HICP request (the FRED decade-window discipline). */
-export function ecbHicpFrom(now: Date = new Date()): string {
-  return new Date(now.getTime() - (3_650 + 90) * 86_400_000).toISOString().slice(0, 10);
-}
-
-/** URL of the HICP annual-rate series (decade window CSV). */
-export function ecbHicpUrl(from: string = ecbHicpFrom()): string {
-  return `${ECB_DATA_BASE}/${ECB_HICP_SERIES_KEY}?format=csvdata&startPeriod=${from}`;
+/**
+ * URL of the HICP annual-rate series — the FULL HISTORY, no time filter
+ * (the DFR discipline; page-division S25, 2026-11-12).
+ *
+ * Why no startPeriod: the maintenance round's probes showed the ECB
+ * gateway's intermittent slowness is confined to TIME-FILTERED slices of
+ * the HICP dataflow (a startPeriod+endPeriod probe 504'd at 30.2 s; the
+ * startPeriod-only shape timed out at the 12 s default on six days of
+ * rungs), while the unfiltered full-series request — served from the
+ * warmer path — answered ~1.7 s from BOTH venues (sandbox + Worker
+ * egress) with the decade window byte-equal as its tail (358 rows,
+ * 1997-01 → 2026-10; the DFR leg already proves a full-history portal
+ * request of 3 MB is a healthy daily fetch, and this one is 164 kB).
+ * parseEcbMonthlyCsv is window-agnostic and the engine slices its own
+ * 10-year windows, so the extra pre-decade rows change nothing but the
+ * request's health.
+ */
+export function ecbHicpUrl(): string {
+  return `${ECB_DATA_BASE}/${ECB_HICP_SERIES_KEY}?format=csvdata`;
 }
 
 /** Fetch and parse the ECB deposit facility rate series (full history). */
 export async function fetchEcbDfrSeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const res = await insightsFetch(ecbDfrUrl(), {}, deps);
+  const res = await insightsFetch(ecbDfrUrl(), {}, { timeoutMs: ECB_PORTAL_TIMEOUT_MS, ...deps });
   const text = await res.text();
   return parseEcbDfrCsv(text);
 }
 
 /**
- * Fetch and parse the euro-area HICP annual rate series (decade window;
- * the same SDMX wide CSV shape as the DFR but with MONTHLY YYYY-MM
- * periods — parseEcbMonthlyCsv normalizes to the month start; the ANR
- * obs is the annual rate of change itself, no derivation needed).
+ * Fetch and parse the euro-area HICP annual rate series (full history;
+ * the same monthly SDMX CSV shape — parseEcbMonthlyCsv normalizes YYYY-MM
+ * to the month start; the ANR obs is the annual rate of change itself, no
+ * derivation needed).
  */
 export async function fetchEcbHicpSeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const res = await insightsFetch(ecbHicpUrl(), {}, deps);
+  const res = await insightsFetch(ecbHicpUrl(), {}, { timeoutMs: ECB_PORTAL_TIMEOUT_MS, ...deps });
   const text = await res.text();
   return parseEcbMonthlyCsv(text);
 }
@@ -116,7 +156,7 @@ export async function fetchEcbHicpSeries(deps: FetchDeps = {}): Promise<SeriesPo
  * the same SDMX wide CSV as the DFR — parseEcbDfrCsv is series-agnostic).
  */
 export async function fetchEcbAaa10ySeries(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const res = await insightsFetch(ecbAaa10yUrl(), {}, deps);
+  const res = await insightsFetch(ecbAaa10yUrl(), {}, { timeoutMs: ECB_PORTAL_TIMEOUT_MS, ...deps });
   const text = await res.text();
   return parseEcbDfrCsv(text);
 }
@@ -127,7 +167,7 @@ export async function fetchEcbAaa10ySeries(deps: FetchDeps = {}): Promise<Series
  * EUR millions). Fails loudly on a block, a non-2xx or a shape change.
  */
 export async function fetchEcbEurosystemAssets(deps: FetchDeps = {}): Promise<SeriesPoint[]> {
-  const res = await insightsFetch(ecbEurosystemAssetsUrl(), {}, deps);
+  const res = await insightsFetch(ecbEurosystemAssetsUrl(), {}, { timeoutMs: ECB_PORTAL_TIMEOUT_MS, ...deps });
   const text = await res.text();
   return parseEcbMonthlyCsv(text);
 }

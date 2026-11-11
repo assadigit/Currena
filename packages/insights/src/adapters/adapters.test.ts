@@ -9,7 +9,7 @@ import { absDataUrl, ABS_SERIES, fetchAbsSeries } from './abs';
 import { fetchGoldApiSpot, goldApiPriceUrl } from './goldapi';
 import { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
 import { parseManualSeries } from './manual';
-import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY } from './ecb';
+import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY, ecbHicpUrl, ECB_PORTAL_TIMEOUT_MS } from './ecb';
 import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from './rba';
 import { computeHighestSinceYear } from './derived';
 
@@ -306,6 +306,22 @@ describe('ecb adapter (I15 — deposit facility rate)', () => {
 
   it('the series key is the confirmed FM dataflow key', () => {
     expect(ECB_DFR_SERIES_KEY).toBe('FM/D.U2.EUR.4F.KR.DFR.LEV');
+  });
+
+  // The S25 maintenance pins (2026-11-12, the ecb provider-timeout item):
+  // the HICP request carries NO time filter — the ECB gateway's intermittent
+  // slowness lives on the time-filtered slices of the HICP dataflow (six days
+  // of 12 s rung timeouts + a 30.2 s gateway 504 on the filtered shape; the
+  // unfiltered full-history answers ~1–2 s from both venues). A regression
+  // back to startPeriod would revive the dead fetch.
+  it('the HICP request is the unfiltered full history (no startPeriod)', () => {
+    expect(ecbHicpUrl()).toBe('https://data-api.ecb.europa.eu/service/data/HICP/M.U2.N.000000.4D0.ANR?format=csvdata');
+  });
+
+  it('the portal legs ride the 45s single-attempt timeout (F-11 kept, more patient)', () => {
+    // 45 s sits past the gateway's own ~30 s give-up so a slow-but-alive
+    // fetch lands and a dead path surfaces the gateway's 504 honestly.
+    expect(ECB_PORTAL_TIMEOUT_MS).toBe(45_000);
   });
 });
 

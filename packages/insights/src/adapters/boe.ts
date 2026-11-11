@@ -102,7 +102,7 @@ export function parseBoeBankRateHtml(html: string): SeriesPoint[] {
 
 /**
  * The percentile-decade window the daily expansion covers (10y + 90d
- * margin, the FRED cosd discipline — ecbHicpFrom's sibling).
+ * margin, the FRED cosd discipline — ecbAaaFrom's sibling).
  */
 export function boeWindowStart(now: Date = new Date()): string {
   return new Date(now.getTime() - (3_650 + 90) * 86_400_000).toISOString().slice(0, 10);

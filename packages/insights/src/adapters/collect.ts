@@ -373,8 +373,10 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
   // M6 Wave 3 (2026-10-25): the euro-area HICP annual rate — from the NEW
   // post-Feb-2026 HICP dataset (the old ICP flow died 2025-12 upstream;
   // HICP/M.U2.N.000000.4D0.ANR verified live at build time, history
-  // back-filled to the full decade).
-  const ecbHicp = await fetchLogged('ecb', 'HICP/M.U2.N.000000.4D0.ANR (decade window)', () =>
+  // back-filled to the full decade). S25 (2026-11-12): the request is the
+  // FULL HISTORY now — the ECB gateway's intermittent slowness lives on the
+  // time-filtered slices (see ecb.ts's ecbHicpUrl note).
+  const ecbHicp = await fetchLogged('ecb', 'HICP/M.U2.N.000000.4D0.ANR (full history)', () =>
     fetchEcbHicpSeries(),
   );
 
