@@ -23,6 +23,25 @@
 > evidence round recorded, verdict PENDING on the multi-day criterion; no
 > blob update → the ~19:00 KV cap ate the writes, harmless by design, the
 > verdict rides tomorrow's 04:10–04:40 rungs); (M4) the records + the close.
+> **M2 CHECKPOINT (18:11–18:31 UTC, ALL GREEN):** the buffer health pass
+> done — the full `pnpm gates` 9/9 GREEN in 2m 45s (the suite 15,270 =
+> the S26 close count exactly, the records-only tree; secret scan 8/1027 ·
+> typecheck 6/6 · lint 0/0 · copy:audit · narrator in sync + eval 50 ·
+> layer1 11,969/11,969 · build + budgets held, entry 272.88/82.55) · the
+> D-9 standing audit re-run 18/18 PASS (belt-and-braces; exit 0) · the
+> live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production
+> (pd-s4 Global 84/84 incl. the raw-KV stateHash recompute IDENTICAL ·
+> pd-s5 Gold 150/150 · pd-s7 World Markets 56/56 · pd-s8 zooms 9/9 ·
+> pd-s9 USA 115/115 · pd-s10 USA 115/115 + the TIC sub-gate green ·
+> pd-s12 Europe 8/8 · pd-s14 Asia 14/14 · pd-s16 Australia 28/28 ·
+> pd-s17 Commodities 24/24 · pd-s18 Currencies 14/14 + the rules/board
+> gates; the beyond-grace cards on pd-s10/pd-s12/pd-s16 all honestly
+> carrying the engine's stale status — designed, none failing). The
+> 17:07→18:02 status re-read: the blob UNCHANGED (14:15:19Z, armed, the
+> public summary 14/14 validation checks green) and the GHA history
+> confirms no run since the 14:14 dispatch — the 20:10 sweep remains the
+> next carrier. M2a (the strategy-log §8 back-fill, commit 8dcde14) had
+> landed earlier in the session.
 
 ## Current state (after the S26 close)
 
