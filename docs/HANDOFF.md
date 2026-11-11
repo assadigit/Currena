@@ -6,6 +6,29 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **SESSION 29/30 (2026-11-11, opening ~23:42 UTC) — the fifth reserve
+> session (the buffer slot): the first-check green-rows CONFIRMATION (the
+> BD-S28 residual) + the buffer health pass — IN PROGRESS.** The owner's
+> kickoff supplied NO investor §19 answers and NO §19.6 sign-off, so per
+> the kickoff's own rule the slot runs the reserve branch (the retirement
+> execution untouched behind Gate 0). The session opened ~1 h after the
+> S28 close and ~4.5 h BEFORE the round-5 evidence window (the
+> 2026-11-12 04:10–04:40 rungs) — the kickoff's premise ("the rungs
+> should have landed the green rows by now") is not yet true at open (the
+> S28-shape early read): the live blob still carries the S26 evidence run
+> (generatedAt 14:15:19.239Z — DFR ❌ 504 · AAA ✅ · HICP ❌ 504, the two
+> honest ecb failed rows, 50/52 green, T-01…T-14 green), production
+> verified unchanged (currena-api `9861a927` the newest of 362 versions ·
+> currena-markets `8f63c8fa` the newest), and no insights-ingest run
+> since run 91 (the GHA history confirms). The plan: land the green rows
+> EARLY via the sanctioned belt-and-braces dispatch (the BD-S26/S28
+> precedent; the workflow's own header documents the fresh post-midnight
+> KV slice — 1,000 writes/day account-wide, ~750 of headroom at 04:20),
+> read the confirmation, then the buffer health pass (the gates + the
+> D-9 audit + the 11 live backtests + the S20 data audit), then the
+> records + the close. The retirement execution stays untouched (behind
+> the recorded §19.6 sign-off).
+
 > **SESSION 28/30 (2026-11-11) — the fourth reserve session (the buffer
 > slot): the ecb first-check ROUND 4 + the buffer health pass — CLOSED
 > (BD-S28). THE BD-S25 PROVIDER-TIMEOUT MAINTENANCE ITEM IS CLOSED.**
