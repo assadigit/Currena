@@ -113,10 +113,11 @@ never silent edits); the owner's kickoff prompt decides.
 4. Ratify or redirect the BD-S3…BD-S23 decision set (the latest:
    **BD-S23-parallel** — the duplicate Session-23 arrival reconciled
    onto the pushed implementation; all recorded, none blocking).
-5. Triage the queued unreviewed fa strings (now ~1230: the ~1184
-   previous + the 42 round-83 S23 strings + 4 needs-review intros;
-   every session's corpus-pinned values are verified byte-for-byte by
-   their copy-pin tests).
+5. Triage the queued unreviewed fa strings (now 1,217 of 7,965 manifest
+   entries: the ~1,144 previous + the S23 fill session's round-83
+   additions, incl. 4 needs-review intros; every session's
+   corpus-pinned values are verified byte-for-byte by their copy-pin
+   tests).
 6. The ecb-drf provider timeout (a maintenance-session item, queued
    behind the fill session): the S18/S19 data-refresh runs kept it held
    on last-good (2.5%, flagged stale) — it did NOT self-clear across
