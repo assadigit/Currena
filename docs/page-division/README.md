@@ -269,7 +269,30 @@ regeneration (`pnpm placement:generate`).
   day; no card past its maxAge window — DFR asOf today · AAA 1 day ·
   HICP day 41 of 60). Round 4 = the next session's first check. NO
   deploy (production verified unchanged: currena-api `9861a927` +
-  currena-markets `8f63c8fa`). **The owner's levers: (1) arrange the investor's review of
+  currena-markets `8f63c8fa`). The Session 28 SLOT (2026-11-11, BD-S28)
+  then ran the fourth reserve session — the ecb first-check ROUND 4 +
+  the buffer health pass: the session opened ~1.5 h after the S27 close
+  and ~6 h BEFORE the evidence window (the 2026-11-12 04:10–04:40
+  rungs), the early read finding the blob still the S26 evidence run
+  with the write budget demonstrably alive (the :13 prices write landed
+  at 21:13) — so the session dispatched the sanctioned belt-and-braces
+  rung (GHA insights-ingest run 91, 22:07:46Z): THE COLLECT RAN THE NEW
+  CODE CLEAN — all three ecb legs green in one rung for the first time
+  (DFR · AAA · HICP; zero failed source rows; T-01…T-14 green; the
+  readings exactly the served publisher-true values — the third
+  same-day independent verification) — while its writes were all
+  refused by the daily cap (the direct 429-10048 + retry-ladder
+  evidence, the 15-minute job timeout cancelling the run mid-chain;
+  S27's indistinguishability RESOLVED). **THE VERDICT: the BD-S25
+  provider-timeout maintenance item is CLOSED** — the observable green
+  rows ride the fresh-window rungs; the next session's first check is
+  the one-read confirmation. The buffer health pass ALL GREEN (the full
+  gates 9/9 in 2m 37s — the suite 15,270 — + the D-9 standing audit
+  18/18 + the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN + the S20
+  data audit 20/20). NO deploy (production verified unchanged:
+  currena-api `9861a927` + currena-markets `8f63c8fa`); the ecb
+  escalation choice has retired to the RISK_REGISTER standing posture.
+  **The owner's levers: (1) arrange the investor's review of
   spec §19 (the seven questions) — Phase K's remaining input; the
   investor round re-opens at the next free slot the moment the
   answers exist; (2) the §19.6 retirement timing answer.** See the

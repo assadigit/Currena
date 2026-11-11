@@ -5,6 +5,52 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-11] page-division S28 (the fourth reserve session — the ecb first-check ROUND 4 + the buffer health pass): **THE MAINTENANCE ITEM IS CLOSED — the session opened ~1.5 h after the S27 close, BEFORE the round-4 evidence window (the 04:10–04:40 rungs ~6 h out), with the blob still the S26 evidence run (14:15:19Z, the two honest ecb failed rows); NEW evidence at open (the :13 prices write landed at 21:13:18Z — the write budget alive an hour past the S27 close) prompted the session to dispatch the sanctioned belt-and-braces rung (GHA insights-ingest run 91, 22:07:46Z): the rung ran the NEW CODE CLEAN — ALL THREE ecb legs fetched green in one rung for the first time (DFR · AAA · HICP; 66 ✅ rows, ZERO failed source rows; collect 46.43 s; T-01…T-14 validation green; the readings exactly the served publisher-true values — the third same-day independent verification, all exact) — while its KV writes were ALL refused by the daily cap (the DIRECT 429-10048 evidence with the retry ladder, resolving S27's indistinguishability: the designed no-update branch, the blob untouched, the morning rungs own the observable heal). The buffer health pass ALL GREEN: the full gates 9/9 in 2m 37s (the suite 15,270 = the S26/S27 close count exactly, records-only tree) · the D-9 standing audit 18/18 · the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production · the S20 data audit 20/20. NO deploy — zero code changed (production currena-api `9861a927` + currena-markets `8f63c8fa`, both verified unchanged); the escalation lever retires to RISK_REGISTER's standing posture. Progress: Session 28/30 · 2 remaining.**
+
+- **The session shape:** one slot, one session, no interruption. The
+  owner's kickoff supplied NO investor §19 answers and NO §19.6 sign-off →
+  the reserve branch (the retirement execution untouched behind Gate 0).
+  The parallel-session rule verified at open (22:01 UTC): origin/main at
+  HEAD `efc98e7` = the S27 counterpart close, no S28 records existed.
+- **The early read (round 4, pre-window):** the blob (public `/status` +
+  the raw KV read) still the S26 evidence run — generatedAt
+  14:15:19.239Z, the two honest ecb failed rows beside the green AAA
+  row, 50/52 green; production `9861a927` (the newest of 362 versions)
+  + `8f63c8fa` both serving; no insights-ingest run since the 14:14
+  dispatch. The kickoff's premise (the morning rungs already carried) was
+  ~6 h early — the session generated the evidence instead.
+- **The dispatched rung (the session's action, the BD-S26-precedent
+  path):** run 91 (id 43109102189, workflow_dispatch, dry_run=false) —
+  the collect ALL GREEN incl. all three ecb legs (the first post-fix
+  rung to fetch DFR + AAA + HICP clean together; values exact:
+  ecb-dfr 2.5 @ 2026-11-11 · euro-aaa-10y 3.3308865271 @ 2026-11-10 ·
+  euro-hicp 4.0 @ 2026-10-01); the writes all refused —
+  `PUT insights:snapshot → HTTP 429 {"code":10048 … free usage limit …}`
+  with the store's retry ladder (60 s + 120 s) and the history keys the
+  same, until the 15-minute job timeout cancelled the run mid-chain at
+  22:23:02 (nothing partial — every write refused). The post-run state:
+  the blob unchanged, the served values unchanged, `pricesAsOf` advanced
+  to 22:13:18.008Z — the Worker-binding prices write landing at 22:13
+  while the REST ingest path was refused at 22:09: the cap's tail is
+  path- and time-dependent; the ~18:30–19:00 UTC estimate stays the
+  planning window for manual seeding, and a post-window dispatch costs
+  one refused run and nothing else.
+- **The verdict:** the BD-S25 provider-timeout maintenance item (the
+  BD-S26/BD-S27 revisit) is **CLOSED** per the kickoff's own branch — a
+  rung ran the new code clean with the ecb rows green. The residual is
+  mechanical: the observable blob keeps the 14:15 stamp until the
+  2026-11-12 04:10–04:40 fresh-window rungs land (~750 writes of
+  headroom); the next session's first check is the one-read
+  confirmation. The escalation choice retires from the active levers
+  (the RISK_REGISTER posture stands for any future persistent
+  regression).
+- **The records:** BD-S28 (DECISIONS) · the roadmap's Session 28 SLOT
+  record + progress board + current-position note (Session 28/30 · 2
+  remaining) · the page-division README program state · this entry ·
+  HANDOFF.md fully rewritten (the next session's first check = the
+  green-rows confirmation read). The gates re-run ALL GREEN on the
+  records-only tree after the records landed.
+
 ## [2026-11-11] page-division S27 (the third reserve session — the ecb first-check ROUND 3 + the buffer health pass): **THE SWEEP-WATCH SESSION — the first check (round 3) found the blob still the S26 evidence run with the 20:10 sweep the FIRST scheduled carrier still ~3 h out, so the session ran the buffer health pass while waiting and then read the sweep's outcome live at 20:16 UTC: the blob UNCHANGED (generatedAt 14:15:19Z, the same two honest ecb failed rows) — the DESIGNED no-update branch (the post-~19:00 KV write-cap window refused the sweep's writes; the served cards stay publisher-true: AAA 3.3308865271 @ 2026-11-10 fresh · DFR 2.5 @ 2026-11-11 held-stale · HICP 4.0 @ 2026-10 held-stale), so the verdict stays PENDING riding tomorrow's 04:10–04:40 Worker rungs (round 4 = the next session's first check); NO escalation trigger (one post-fix day; no card past its maxAge window). The buffer health pass ALL GREEN: the full gates 9/9 in 2m 45s (the suite 15,270 = the S26 close count exactly, records-only tree), the D-9 standing audit 18/18, and the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production (pd-s4 Global 84/84 incl. the raw-KV stateHash recompute IDENTICAL · pd-s5 Gold 150/150 · pd-s7 56/56 · pd-s8 9/9 · pd-s9 115/115 · pd-s10 115/115 + TIC · pd-s12 8/8 · pd-s14 14/14 · pd-s16 28/28 · pd-s17 24/24 · pd-s18 14/14 + rules/board). Plus M2a: the strategy-log §8 session-table BACK-FILL (the 15 missing rows S12 → the Session 26 SLOT, the UTC-date convention + the progress-board date-drift finding recorded). NO deploy — zero code changed (production currena-api `9861a927` + currena-markets `8f63c8fa`, both verified unchanged via the Cloudflare API); the evidence + the records are the deliverable. Progress: Session 27/30 · 3 remaining.**
 
 - **The session shape (one slot, one session, an interruption):** an

@@ -3068,3 +3068,129 @@
   **Revisit:** none — the slot's own revisit (BD-S27's round-4 first
   check) stands unchanged. NO deploy; zero code changed by either
   instance.
+
+## 2026-11-11 — BD-S28: the fourth reserve session (the Session 28 slot) runs the ecb first-check ROUND 4 — THE MAINTENANCE ITEM IS CLOSED: the dispatched belt-and-braces rung (GHA insights-ingest run 91, 22:07:46Z) ran the NEW CODE CLEAN with ALL ecb legs fetched green in one rung for the first time (DFR · AAA · HICP, values exact, T-01…T-14 validation green, ZERO failed source rows), while its KV writes were ALL refused by the daily cap (the DIRECT 429-10048 evidence — the designed no-update branch, S27's indistinguishability resolved); the observable-state green rows ride the 04:10–04:40 fresh-window rungs as the designed mechanical follow-through; the buffer health pass ALL GREEN (four legs); NO deploy
+
+- **Event:** the Session 28 slot — the fourth reserve session. The owner's
+  kickoff supplied NO investor §19 answers and NO §19.6 sign-off, so per the
+  kickoff's own rule the slot ran the reserve branch: the FIRST CHECK (the
+  BD-S26/BD-S27 revisit, round 4) + the buffer health pass. The retirement
+  execution stayed untouched (behind the recorded §19.6 sign-off, per the
+  S24 checklist's Gate 0). The parallel-session rule verified at open
+  (22:01 UTC): origin/main at HEAD `efc98e7` = the S27 counterpart close;
+  no S28 records existed — the slot is this session's to deliver.
+- **The session opened EARLY in the evidence window.** The kickoff's
+  premise ("by now the new code has been carried by the 04:10–04:40 Worker
+  rungs and the ~12:00 GHA belt-and-braces") was NOT yet true at open —
+  the session started ~1.5 h after the S27 counterpart close (22:01 UTC on
+  2026-11-11), ~6 h BEFORE the 2026-11-12 morning rungs. The early read:
+  the live status blob (public `/status` + the raw KV `insights:status`
+  via the Cloudflare API) still the S26 post-fix evidence run
+  (generatedAt **14:15:19.239Z**, the two honest ecb failed rows — DFR +
+  HICP, both "HTTP 504 … single attempt, no retry (F-11)" — beside the
+  green AAA row, 50/52 green); production verified UNCHANGED (currena-api
+  **`9861a927`**, the newest of 362 versions, created 12:21:25Z, nothing
+  newer · currena-markets **`8f63c8fa`** untouched); the GHA run history
+  confirming NO insights-ingest run since the 14:14 dispatch.
+- **The dispatch decision (the sanctioned belt-and-braces path):** NEW
+  evidence at open — the public snapshot's `pricesAsOf` read
+  **21:13:18.143Z**: the :13 prices rung's KV write had LANDED at 21:13,
+  the account's write budget demonstrably ALIVE a full hour past the S27
+  close (the BD-S27-parallel "quota at its very tail at 20:13" reading
+  honestly superseded — the budget's tail is later than estimated today).
+  With the only in-window carrier (the morning rungs) ~6 h out and the
+  kickoff's own lever available ("a workflow_dispatch runs immediately if
+  needed"), the session dispatched the GHA insights-ingest workflow
+  (workflow_dispatch, dry_run=false, run **91**, id 43109102189, created
+  22:07:46Z) — exactly BD-S26's sanctioned evidence path. The designed
+  fallback was intact either way: a refused write leaves the blob
+  unchanged; the morning rungs own the heal.
+- **Run 91's outcome — the round-4 evidence, both halves:**
+  - **THE COLLECT RAN THE NEW CODE CLEAN (the CLOSE evidence):** the
+    source report shows **ALL ecb legs green in one rung — the first
+    post-fix run to fetch all three**: `ecb — FM/D.U2.EUR.4F.KR.DFR.LEV`
+    · `ecb — YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (decade window)` · `ecb
+    — HICP/M.U2.N.000000.4D0.ANR (full history)` — 66 ✅ rows, **ZERO
+    failed source rows** (the only unavailable readings are the designed
+    licence quartet). Collect 46.43 s wall; the validation suite
+    **T-01…T-14 all green**; the readings computed with the EXACT
+    publisher-true values the site already serves — **ecb-dfr 2.5 @
+    2026-11-11 · euro-aaa-10y 3.3308865271 @ 2026-11-10 · euro-hicp 4.0 @
+    2026-10-01** — the THIRD same-day independent verification of the
+    held values (S26's 14:20 GHA leg · S27-parallel's 17:29 sandbox · now
+    the 22:08 GHA rung), all exact.
+  - **THE WRITES WERE ALL REFUSED BY THE DAILY CAP (the no-update
+    branch, now with direct evidence):** the store's own log —
+    `PUT insights:snapshot → HTTP 429: {"code":10048,"message":"your
+    account has reached the free usage limit for this operation for
+    today"}` — with the retry ladder (retry 1/2 in 60 s · retry 2/2 in
+    120 s), `[ingest] CRITICAL — a write failed … run complete —
+    snapshot WRITE FAILED`, then the history keys (gold-oil-ratio ·
+    usdtry · usdaed · vix) each refused the same way, until the job's
+    15-minute timeout cancelled the run at 22:23:02 mid-history-writes
+    (nothing partial — every write was refused). This RESOLVES S27's
+    indistinguishability: the 20:10 sweep's writes were refused by the
+    cap (the same branch), and the write-refusal mechanism is now
+    directly observed, not inferred. The post-run reads confirm the
+    observable state untouched: the blob still 14:15:19.239Z with the two
+    honest failed rows; the served values unchanged (the held
+    publisher-true set); and `pricesAsOf` advanced to **22:13:18.008Z**
+    — the Worker-binding :13 prices write landing at 22:13 WHILE the
+    REST ingest path was refused at 22:09. The honest budget reading:
+    the daily cap's tail is path- and time-dependent (the REST ingest
+    path hard-capped tonight; the Worker-binding prices writes still
+    landing at 21:13 and 22:13) — the ~18:30–19:00 UTC estimate in the
+    operational notes is the right planning window for MANUAL seeding,
+    and a post-window dispatch costs one refused run and nothing else.
+- **The verdict: the maintenance item (BD-S25's provider-timeout fix, the
+  BD-S26/BD-S27 revisit) is CLOSED.** Per the kickoff's own CLOSE branch —
+  "if the ecb rows are green (a rung ran the new code clean): the
+  maintenance item is CLOSED" — run 91 IS a rung (the belt-and-braces
+  rung on main ≡ production) and its ecb rows ARE green: the 45 s patient
+  single attempt + the stable full-history HICP URL demonstrably fetch
+  all three portal legs clean from a production-code rung, with the
+  values exact and the validation green. The ESCALATION branch never
+  applied and does not apply: no card is past its maxAge window (DFR
+  asOf 2026-11-11 — the provider's CURRENT value, fetched clean tonight
+  · AAA asOf 2026-11-10, 1 day · HICP day 41 of 60), and the served
+  values are publisher-true by three same-day verifications. The residual
+  is mechanical, not conditional: the observable KV blob keeps the
+  14:15:19Z stamp and the two honest failed rows until the fresh-window
+  rungs land (**2026-11-12 04:10–04:40 UTC**, ~750 writes of headroom) —
+  the next session's FIRST CHECK is the one-read confirmation of the
+  green rows (a formality; a failed-rows morning would be the documented
+  per-request roulette shape on a bad window — RISK_REGISTER posture
+  stands, held-true values serve — NOT a reopening of the maintenance
+  item).
+- **The buffer health pass (ALL GREEN, four legs):** (1) the full
+  `pnpm gates` 9/9 in 2m 37s — **the suite 15,270 = the S26/S27 close
+  count exactly** (the records-only tree; secret scan 8/1027 · typecheck
+  6/6 · lint 0/0 · copy:audit · narrator in sync 193×2 + 56×2 + eval 50 ·
+  layer1 11,969/11,969 · build + budgets held, entry 272.88/82.55);
+  (2) the D-9 standing audit re-run **18/18 PASS** (exit 0,
+  belt-and-braces — nothing touched indicators/definitions/placement/§A);
+  (3) the live pd-* backtests **ALL ELEVEN ALL CHECKS GREEN against
+  production** (~22:2x–22:4x UTC): pd-s4 Global 84/84 (incl. the raw-KV
+  stateHash recompute) · pd-s5 Gold 150/150 · pd-s7 World Markets 56/56
+  · pd-s8 zooms 9/9 · pd-s9 USA 115/115 · pd-s10 USA 115/115 + the TIC
+  sub-gate · pd-s12 Europe 8/8 · pd-s14 Asia 14/14 · pd-s16 Australia
+  28/28 · pd-s17 Commodities 24/24 · pd-s18 Currencies 14/14 + the
+  rules/board gates — the beyond-grace cards all honestly stale-flagged
+  by the engine, designed; (4) the S20 data audit **20/20 GREEN** (seed
+  20261112, the frozen sample — platinum the one designed live-spot arm).
+- **The session's deliverable:** the round-4 verdict (CLOSED) + the
+  health pass + the records; **NO deploy** (zero code changed;
+  production ≡ HEAD modulo the records commits; both workers verified
+  unchanged above). The escalation choice (wait vs the Eurostat-origin
+  fallback) retires from the owner's ACTIVE levers — it stays recorded in
+  RISK_REGISTER as the standing posture for a future persistent-provider
+  regression, exactly as the pre-S25 precedents (COFER, brent) do.
+- **Who decided:** this session (S28) under the roadmap's reserve scope +
+  the kickoff's FIRST-CHECK instruction + BD-S27's revisit clause (the
+  round-4 branches applied exactly as recorded). **Revisit:** the next
+  session's FIRST CHECK — the one-read confirmation that the fresh-window
+  rungs landed the green ecb rows into the observable blob (04:10–04:40
+  UTC on 2026-11-12); on a failed-rows morning, the RISK_REGISTER
+  posture governs (honest rows, held-true values, the next rung retries)
+  — the maintenance item stays closed unless the persistent multi-day
+  stale-past-maxAge shape ever returns.
