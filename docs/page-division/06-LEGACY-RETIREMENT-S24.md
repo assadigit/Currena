@@ -1,0 +1,405 @@
+# 06 — The legacy `/insights` retirement checklist (S24, the D-9 readiness review)
+
+> Agents: read AGENTS.md in the repo root first, and follow it for this whole task.
+
+> **Page-division Session 24/30 · 2026-11-12 · Phase K.** This document is
+> the S24 deliverable: the D-9 categorization audit's verdict over the 187
+> registry ids, and the retirement checklist for the legacy all-in-one
+> `/insights` page (spec §13) — what breaks if it goes, what each
+> destination page still lacks, and what the execution session must do.
+> **Execution itself does NOT ship in S24** — the timing question (retire
+> now vs after a burn-in period of parallel running) is investor question
+> §19.6 and stays with the owner + the investor round. This doc is the
+> plan that session follows when the sign-off exists.
+
+---
+
+## Table of contents
+
+1. [What this is — scope](#1-what-this-is--scope)
+2. [The D-9 audit verdict](#2-the-d-9-audit-verdict)
+3. [The audit findings + the S24 reconciliation](#3-the-audit-findings--the-s24-reconciliation)
+4. [The retirement checklist — what breaks if `/insights` goes](#4-the-retirement-checklist--what-breaks-if-insights-goes)
+5. [What each destination page still lacks](#5-what-each-destination-page-still-lacks)
+6. [What retirement does NOT touch](#6-what-retirement-does-not-touch)
+7. [The execution plan (the sign-off-gated session)](#7-the-execution-plan-the-sign-off-gated-session)
+8. [Done criteria for the execution session](#8-done-criteria-for-the-execution-session)
+
+---
+
+## 1. What this is — scope
+
+- **D-9** (03-STRATEGY-LOG §5 Round 1): *"The old all-in-one page is kept
+  for now; retired only when every indicator is properly categorized."*
+  Spec §13: *"It is retired only when every indicator is verified
+  categorized (D-9) — the retirement readiness review is roadmap S24;
+  execution is S25–S30 (reserve). Bookmarks to the old URL keep working
+  until then."*
+- **In scope (this session):** the audit (§2–§3), the checklist (§4–§6),
+  the execution plan (§7–§8). Records only — no code shipped, no deploy
+  (the audit's doc-side remediation is doc-only; §3).
+- **Out of scope:** the retirement execution itself; any engine, voter,
+  threshold or calibration change (the page-division display-layer
+  discipline); the spec §19 investor round (it owns the §19.6 timing
+  answer; AF-1…AF-8 ride that pass, never silent edits).
+
+## 2. The D-9 audit verdict
+
+**The condition is MET — every one of the 187 registry ids is verified
+categorized: exactly one engine lane and exactly one page home each, with
+the registry, the engine and the placement reconciled.**
+
+The audit is **`pnpm s24:d9-audit`** (`scripts/s24-d9-audit.ts`, added
+this session — deterministic, re-runnable, exits non-zero on any red). It
+runs 18 checks over the three layers and prints the per-id evidence table
+(187 rows: id · lane · role V/C · gold-voter ◆ · home page). The run at
+S24 close (registry `data/indicators.json` v4 @ `ca722a5`):
+
+| # | Check | Verdict |
+|---|---|---|
+| A1 | Registry ↔ DEFINITIONS 1:1 (zero orphans either way) | **PASS** — 187 = 187 |
+| A2 | Per-id group + section match (registry vs engine definitions) | **PASS** — all 187 agree |
+| B1 | One engine lane per id (no duplicate definitions) | **PASS** |
+| B2 | The 13 lanes' membership counts reconcile (registry vs engine) | **PASS** |
+| C1 | One gauge per member (no id in two gauges' members lists) | **PASS** — 74 members |
+| C2 | The registry's own `area.gauge` field ↔ GAUGES membership 1:1 | **PASS** — 74 named, 113 null |
+| C3 | The B-14 brent record (the one documented gauge ≠ lane id) | **PASS** — prices-heat gauge / prices-board lane, recorded in the registry itself |
+| C4 | Rule ↔ membership coherence (8 voting gauges score exactly the 54 scored rules; the 4 shadow gauges mirror only context members) | **PASS** |
+| D1 | `reconcilePlacement` over the registry | **PASS** — 187 placed · 0 unplaced · 0 duplicates · 0 unknown · 0 mirror overlaps |
+| D2 | One page home per id (`homePageOfIndicator`, blocked notes included) | **PASS** |
+| D3 | Global carries zero registry homes (D-7/D-11 by design) | **PASS** |
+| E1 | The gold meter's voters ⊆ the registry (the documented dual-membership engine, spec §3.3) | **PASS** — 37/37 |
+| E2 | The gold voter count pinned (the frozen five-lane table) | **PASS** — 37 |
+| F1 | Role counts | **PASS** — 54 voting + 133 context = 187; the gauges' 74 members = the 54 voters + the 20 shadow-lane context members |
+| G1 | The lane-render exceptions (17 hidden-from-lane + 6 companion-only + 7 companion values) are all registry ids | **PASS** |
+| H1 | AGENTS.md §A carries a row for every registry id | **PASS** — 187 rows (post-§3 reconciliation) |
+| H2 | §A roles ([V]/[C]) match the engine's scoring membership | **PASS** |
+| H3 | §A header counts match the registry | **PASS** — 187 (54 + 133); GLOBAL 149/38; AUSTRALIA 38/16 |
+
+**The placement counts (PLACEMENT.generated.md, regenerated byte-identical
+this session):** gold 14 + 4 blocked · world-markets 9 · usa 72 · europe 8
+· asia-pacific 14 · australia 28 · commodities 24 · currencies 14 = **187
+registry ids placed** (+ Global 0 by design; the mirror inputs: global 52
+· gold 34 · usa 14 · australia 5). The sync test
+(`packages/insights/src/page-division/doc.test.ts`) pins the committed
+table byte-for-byte against a regeneration.
+
+**The per-id evidence:** `docs/page-division/PLACEMENT.generated.md`
+(the committed per-id table — id · title · registry area · group · home)
++ the audit script's printed table. The static audit findings on record:
+AF-1…AF-8 (the spec's own hand-count defects, recorded never silently
+fixed — the spec v2 pass owns them).
+
+## 3. The audit findings + the S24 reconciliation
+
+The audit found **zero structural drift in the code layers** — but the
+doc-side records had drifted. All findings were reconciled **this session,
+doc-only** (commit `ca722a5`; zero code, zero deploy):
+
+| Finding | What was wrong | The fix |
+|---|---|---|
+| §A header counts stale | AGENTS.md §A read "The 161 indicators (48 V + 113 C) · GLOBAL (125, 32) · AUSTRALIA (36, 16)" — three program-generations behind the registry | Re-derived: **187 (54 V + 133 C) · GLOBAL (149, 38) · AUSTRALIA (38, 16)** |
+| §A missing rows | 23 registry ids had no §A row: real-yield-5y · real-curve-10y5y · rstar-us · debt-to-gdp (borrowing-costs) · dollar-broad · dollar-eme · usdchf (dollar-strength) · bank-stress · cftc-gold-gross-long · global-liquidity + the gold-system block (real-gold-price · gold-platinum · shanghai-gold-premium · sge-gold-withdrawals · swiss-gold-flow · wgc-etf-holdings · wgc-cb-demand · official-gold-demand · etf-short-interest) (market-stress) · cpi-nowcast · cpi-surprise · gold-equities-ratio · michigan-5y-expectations (prices-heat) | All 23 rows added to their true lanes (data from definitions.ts + indicator-audit.json); the gold block's §A note points to 05-GOLD-INDICATORS for the deep reference — both layers, the AF-4 discipline |
+| §A misplaced rows | coal-aus + lng-japan + gas-europe sat under the geo-fragmentation heading (the S4-M4.4 §A update grouped the Pink Sheet energy trio there) while the definitions place them in au-trade-currency (×2) + prices-heat | Moved to their true lanes; geo-fragmentation now carries its true 8 |
+| IADS §1 stale | INDICATORS_AND_DATA_SOURCES §1 read 161/48/113; the gauge table's voter counts were pre-GF-P2/P3 (borrowing 9 · prices 5 · stress 5 · dollar 3); 25 alphabetical rows absent (incl. usdchf, an original FX pair) | 187/54/133 header; the gauge table's true counts (10 · 6 · 7 · 5); all 25 rows added |
+| 04 stale | 04-INDICATORS-COMPLETE-INVENTORY (the audit basis) read 184 (Global 146); §4.5 growth-health listed 27 of the true 30 (the three §15 CPI fills + michigan-1y-expectations absent); §10 read "180 of 184" | 187 header (Global 149); §4.5 = 30 with the four rows added; §10 = "183 of 187" (the three fills serve public) |
+
+**Standing note:** the H checks now pin §A against the registry inside
+`pnpm s24:d9-audit` — a future indicator change that forgets §A fails the
+audit, not just the review.
+
+## 4. The retirement checklist — what breaks if `/insights` goes
+
+Every item carries its evidence (file · component · count). "Breaks"
+means: the surface disappears unless the execution session handles it.
+
+### R-1 · The route + the redirect
+
+- **The route registration:** `ROUTES` in `apps/web/src/router.ts`
+  (`'/insights'` at the list's tail) · `App.tsx` line ~288
+  (`route === '/insights' ? <Insights /> : null`) · `route-meta.ts` line
+  ~46 (the `/insights` title row). Removing the route makes
+  `parseRouteAndQuery` treat `/insights` as unknown → it normalizes to
+  `'/'`, and the boot guard (`ensureBooted`) rewrites the stale bookmark's
+  URL to `/` via `history.replaceState` — **bookmarks keep working
+  (they land on Global), but silently, with no "this page moved" message
+  and no deep-link translation.**
+- **The deep links:** `/insights?card=<id>` (the per-indicator share
+  links, F5 "give each indicator its own address" — `routeQuery().get('card')`
+  in `Insights.tsx`). After retirement the param is dropped: the reader
+  lands on Global with no card opened. `homePageOfIndicator(id)` already
+  exists (`packages/insights/src/page-division/placement.ts`) — a
+  one-place redirect (`?card=us10y` → `/usa`) is a small, closed change.
+- **DECISION for the execution session (presented to the owner):**
+  - **(A) plain normalization** (remove the route; bookmarks land on `/`)
+    — zero code beyond the removal, but silent;
+  - **(B) the card-aware redirect** (a tiny `/insights` branch that maps
+    `?card=` through `homePageOfIndicator` and `navigate()`s to the home
+    page, else `/`) — RECOMMENDED: it keeps every share link ever
+    published useful, costs ~20 lines in the router, and retires a
+    session later.
+
+### R-2 · The deprecation banner's exit
+
+- `apps/web/src/routes/insights-sections/DeprecationBanner.tsx` (the
+  D-46 amber notice) + its copy keys `deprecation.title` / `deprecation.text`
+  / `deprecation.cta` in **both** dictionaries (`apps/web/src/i18n/en.ts`
+  ~line 1882 + `fa.ts`) — the fa strings are fingerprinted in
+  `docs/localization/persian-copy-manifest.json` (the S1 round): retiring
+  the keys takes a manifest update (`pnpm copy:audit` gate).
+- **The Header's legacy pill** (desktop `Header.tsx` ~lines 276–295 +
+  the mobile drawer ~390–411): the subdued "Insights" entry badged
+  "legacy" (`nav.insights` + `nav.legacyBadge` keys, both locales).
+- **The dormant placeholder bridge:** `DestinationBody.tsx` line ~43
+  (`navigate('/insights')` — the "where the content lives today" card) +
+  the `pd.todayOnInsights` / `pd.openInsights` keys. `DESTINATION_ROUTES`
+  is empty (every destination renders its own page since S18), so nothing
+  renders it today — but the module stays wired for future destinations,
+  and its /insights link + keys become dead copy at retirement.
+- The banner copy's "whose placeholder links back here" sentence (the S1
+  Global placeholder era) is already stale — the Global page renders the
+  real verdict board since S3 and no longer links back. The execution
+  session deletes the whole component anyway.
+
+### R-3 · The region verdicts (the hero) — ONLY `/insights` carries them
+
+- `HeroBlock.tsx` → `VerdictMeter.tsx`'s `VerdictBlock` computes
+  **`sectionVerdictStep(section, readings)`** — the GLOBAL verdict and
+  the AUSTRALIA verdict (the two region-level summary steps, the E1 count
+  rule) with the meters, the why-lines, the needs-attention tiles and the
+  biggest-move line. **No destination page renders a region-level
+  verdict**: Global renders ten per-gauge tiles (D-21), the USA page the
+  five-gauge strip (D-30), /australia the five gauge verdict lines
+  (D-37) — per-GAUGE verdicts are fully carried; the two REGION
+  aggregates are not, anywhere.
+- **Gap to close (or accept):** the region verdict is a computed engine
+  surface (`sectionVerdictStep` is pure, exported from `@currena/insights`).
+  The execution session either (a) accepts the loss (the ten tiles answer
+  the same question in pieces — the D-11 one-screen rule made this
+  trade explicit at S3), or (b) adds a one-line region verdict to Global
+  (the readings already arrive as mirrors). Present to the owner with the
+  burn-in evidence (which verdict readers actually used — the analytics
+  question §7 records).
+
+### R-4 · The two global SHADOW-gauge question headers — ONLY `/insights`
+
+- `QuestionGroup` renders the lane groups
+  (`LANE_GROUP_ORDER.global`: borrowing-costs · prices-heat ·
+  market-stress · growth-health · **geo-fragmentation** ·
+  **dedollar-concentration**). The four SHADOW gauges render their
+  question headers with the honest "not scored yet" + context-count
+  words (G-5). The Australian shadows are carried: /australia renders
+  all five AU gauge groups with the shadow honesty (D-37). **The two
+  GLOBAL shadow headers are not:**
+  - *geo-fragmentation* ("Is the world getting more fragmented?") — its
+    8 member cards all have homes (chokepoints + gscpi on
+    /commodities trade-routes-supply; us-spr + us-crude-production on
+    /commodities energy), but **no destination page asks the question**.
+  - *dedollar-concentration* ("Is the world's money concentrating?") —
+    Global's tile ⑩ (D-25) carries the FACTS (usd-reserve-share +
+    nyfed-custody, display-only) and links to /currencies, but not the
+    gauge question header.
+- **Gap to close (or accept):** (a) accept (the members render; the
+  question header is a shadow with no verdict to lose), or (b) a
+  one-line "not scored yet" note on /commodities' trade-routes group +
+  Global's dedollar tile. Small, closed, display-layer.
+
+### R-5 · The details panels + the per-id history — ONLY `/insights`
+
+- `DetailsPanel.tsx` (F5) — the side/bottom sheet every card opens:
+  the five editorial sections (what it means for you → why it matters →
+  what usually follows → what it cannot tell you → the technical
+  definition), **the Layer-1 plain-language block** (11,969-entry
+  corpus, the layer1 gate), the large `HistoryChart` (10-year), the
+  chart-data table (SR path), the watchlist pin, the linked source +
+  as-of. **`import { DetailsPanel }` exists in exactly one route**
+  (`routes/Insights.tsx` line 51 — verified by grep this session).
+- **The endpoint:** `GET /api/insights/:id/history`
+  (`fetchIndicatorHistory`) — its only page consumers are the /insights
+  surfaces (DetailsPanel + PricesBoard + TrendChart + PriceDetails).
+  After retirement the endpoint keeps serving (it is part of the
+  documented API surface, IADS §3) but no page calls it.
+- **This is the largest single gap:** the destination pages' cards carry
+  the §21 trio (value · 10-year position bar · freshness) and are
+  **non-interactive** (no click-through — verified: `UsaTierCards` etc.
+  render no onClick/panel). All 187 cards lose their detail view, their
+  history charts and their Layer-1 explanations unless the execution
+  session ports a details surface (the panel is a self-contained
+  component over data every projection already carries or can fetch —
+  the port is mechanical, the copy is already bilingual).
+- **RECOMMENDATION:** port `DetailsPanel` (or a per-page variant) as
+  part of the retirement execution — the §19.6 burn-in exists partly to
+  measure whether readers used it.
+
+### R-6 · The narrator's full set — ONLY `/insights` (Global carries one line)
+
+- The narrative doc (`GET /api/insights/narrative`, the staged-rollout
+  gate `?narrative=preview` / `NARRATOR_VISIBLE`) feeds: the overall
+  `NarrativeBlock` + `InTheNews` (Insights.tsx), the per-section blocks
+  (SectionLane), and the world-markets/world-currencies units
+  (world-feeds.ts). **Global carries only the D-24 NarratorLine** (one
+  line, `GlobalBoard.tsx` ~line 664).
+- The narrator's vocabulary (193×2) + eval (50) stay green regardless —
+  the engine side is untouched by page retirement; the /insights-only
+  part is the multi-block presentation.
+- **Gap:** accept (the one-line summary is the D-48-compliant
+  destination presentation) or extend Global's line into the collapsed
+  block. The staged rollout is still closed by default
+  (`NARRATOR_VISIBLE` unset) — nothing renders for the public today;
+  the gap only opens when the owner flips the gate.
+
+### R-7 · The watchlist, the search/filter Tools, the exports — ONLY `/insights`
+
+- **The watchlist (I10):** pinned cards strip (`PinnedSection`,
+  localStorage `currena.insights.pinned.v1`, cross-tab sync) — no
+  destination equivalent.
+- **The Tools (I13 + R15):** the status filter + text search + the "/"
+  and j/k shortcuts (`useInsightsToolsNav`) — the destination pages have
+  no search.
+- **The exports:** `DataExportMenu` (InsightsHeader) — the snapshot CSV
+  (`insights-csv.ts`), the markets CSV, the fx CSV, the full export
+  (`full-export.ts`, ANSI-1256 finding) + the calendar `.ics` (`ics.ts`).
+  The `/api/insights/export` endpoint stays (owner tools); the UI door
+  goes with the page.
+- **Gap:** accept or port. The watchlist is the most-used-shaped feature
+  of the three (the burn-in measures it); search across 187 ids is the
+  all-in-one page's own argument and does not port per-page cheaply.
+
+### R-8 · The remaining /insights-only sections
+
+| Surface | Component | Evidence | Destination equivalent |
+|---|---|---|---|
+| The calendar ("Next up") | `NextUpStrip` + `EVENT_TARGETS` | rendered only by Insights.tsx; the feed is `data/insights-calendar.json` (spec §E — a separate feed, NOT indicators) | none — accept or port to Global |
+| About this data | `AboutTheData` (+ `GET /api/insights/status`) | the per-source table, the stale/unavailable card list, the rule-version line | none — the source table is also served by `/admin` (owner-side); the public door goes |
+| Top movers | `TopMoversStrip` (the sticky bar's top-5 changes) | Insights.tsx only | none |
+| Together (connections) | `Together` + `evaluateConnections` | the relationship cards (R1–R7's cousins) | the 7 FX rule lights live on /currencies (the R1–R7 hero, D-41) — the broader connection cards do not |
+| "What it means for my money" | `MoneyPanel` (AU households) | the 2026-10-29 AU-scope placement | none — the AU page's 28 cards answer in pieces |
+| The US-global-reach container | `UsGlobalReachGroup` (9 ids + the analytical brief) | the R9-07 special container | the 9 ids' cards live on /usa tiers; the brief + the one-container framing goes |
+| The companies table | `CompaniesTable` (flag OFF — the empty state) | nothing renders live (spec §16) | nothing lost |
+| Reading progress + JumpNav | `ReadingProgress` + `JumpNav` | page furniture for a very long page | the destination pages are one-screen-ish; breadcrumbs + the topbar carry the wayfinding |
+
+### What is ALREADY carried (no action)
+
+- **The five thematic gauge verdicts** — Global's 10-tile board (D-21) +
+  the USA page's D-30 strip (the same pure engines, US-framed copy).
+- **The gold balance** — /gold (the flipped lane balance, GB-P5) +
+  Global's Gold tile.
+- **The five AU gauges** (3 voting + 2 shadow, verdict lines + shadow
+  honesty) — /australia (D-37), with the moved-out seat chips linking to
+  the new homes.
+- **The boards** — markets → /world-markets (+ the four region zooms,
+  D-44) · markets-au → /australia · fx → /currencies (the 11-pair board,
+  D-42; the licence-hidden public mode unchanged) · tic → /usa (tier 6,
+  D-31) + the nyfed-custody card (USA tier-2 home).
+- **The prices** — the Global ribbon (gold · brent · BTC, D-22 — silver
+  deliberately absent, its story lives on Gold/Commodities), the Gold
+  hero, the Commodities live prices; all four strip assets have homes.
+- **All 187 cards** — the placement table (§2): every id renders its
+  home page with the §21 trio.
+
+## 5. What each destination page still lacks
+
+The shared gaps (every destination page): **the details panels + history
+charts + Layer-1 copy (R-5), the watchlist (R-7), search/filter (R-7),
+the CSV/ics exports (R-7), the calendar (R-8), About-this-data (R-8),
+the narrator blocks (R-6), the region verdicts (R-3).** Per-page
+specifics beyond those:
+
+| Page | Carries | Still lacks (beyond the shared gaps) |
+|---|---|---|
+| `/` Global | the 10 verdict tiles, the ribbon, region chips, the narrator line, the dedollar facts tile | silver in the ribbon (by D-22 design); the two global shadow-gauge question headers (R-4); the region verdict one-liner (R-3) |
+| `/gold` | the hero + the balance + the seats + all 14 cards (+4 blocked notes) | — (the page is the gold system's complete home) |
+| `/world-markets` | the map hero + region grids + the 9 risk cards + the board | the world-markets narrator unit (R-6); nothing else recorded |
+| `/usa` | the D-30 strip + tiers 1–6 + the TIC board + the zoom | the US-global-reach one-container framing (R-8; the 9 cards are in the tiers) |
+| `/europe` | the EU + non-EU sections + the zoom | the §15 euro-area fills (D-34 — verified-pending-ingest, BD-S12a; blocked on the investor round's PMI/deferral answer, spec §19.3) |
+| `/asia-pacific` | the five sub-regions, 14 cards, the zoom | the §15 fills are LANDED (BD-S23a); nothing open |
+| `/australia` | the board + the 5 gauge groups + 28 cards + seat chips | the AUSTRALIA region verdict (R-3); the money panel (R-8) |
+| `/commodities` | the 4 groups + trade routes + the gold cross-link | the geo-fragmentation question header (R-4 — its chokepoint/gscpi members are the trade-routes group) |
+| `/currencies` | the rule lights + the 11-pair board + the 14 cards | the dollar-strength gauge verdict (by D-30 design it tops the USA page — the strip's verdicts mirror, the detail cards live here); the world-currencies narrator unit (R-6) |
+
+## 6. What retirement does NOT touch
+
+- **The engine** — definitions, GAUGES, gold-score, the ingest rungs, the
+  KV snapshot, the cron schedule, the validation suite: the page is a
+  display layer (the program's founding rule; zero engine change rides
+  the retirement).
+- **The API** — `GET /api/insights` (the full snapshot: the documented
+  public API + the live-prices merge + the projections' source), `/pages/:page`,
+  the boards, `/:id/history`, `/narrative`, `/status`, the owner tools.
+  The endpoints keep serving; only the full-snapshot page consumer goes.
+- **The placement + the projections** — the S2 contract
+  (`projectSnapshotToPage`) is the destination pages' data path and is
+  independent of the legacy route.
+- **The PWA, the converter tools, the Toman core** — untouched.
+- **The tests** — the suite pins the ENGINE and the DESTINATION surfaces;
+  the /insights-specific test files retire WITH the page (see R-9 in §7).
+
+## 7. The execution plan (the sign-off-gated session)
+
+**Gate 0 — the owner's recorded sign-off** (the §19.6 answer: retire now
+or after a burn-in; if burn-in, the date). Without it, nothing below
+runs. The execution slot is a reserve session (S26–S30), one session,
+its own gates.
+
+1. **R-9 the route + redirect (the R-1 decision applied):** remove
+   `'/insights'` from `ROUTES` + the App render branch + the route-meta
+   row + the `Insights` lazy import; land the chosen redirect (A or B).
+2. **R-2 the banner + the nav:** delete `DeprecationBanner.tsx`, the
+   Header legacy pill + drawer entry, `DestinationBody`'s /insights
+   link; retire the dead copy keys (`deprecation.*`, `nav.insights`,
+   `nav.legacyBadge`, `pd.todayOnInsights`, `pd.openInsights`) in BOTH
+   dictionaries + the manifest (`pnpm copy:audit` green).
+3. **R-5 the details port (if the owner takes the recommendation):** port
+   `DetailsPanel` (+ `HistoryChart` + `Layer1Block`) behind the
+   destination cards' click; wire `fetchIndicatorHistory`.
+4. **The accepted losses, recorded:** whichever of R-3/R-4/R-6/R-7/R-8
+   the owner accepted — each recorded in DECISIONS.md with the burn-in
+   evidence.
+5. **The dead code sweep:** the /insights-only modules that lose their
+   last consumer (Insights.tsx, insights-sections/*, HeroBlock,
+   VerdictMeter's VerdictBlock, SectionLane, QuestionGroup,
+   UsGlobalReachGroup, world-feeds, useInsightsToolsNav, MoneyPanel,
+   Together, TopMoversStrip, NextUpStrip, AboutTheData, PricesBoard,
+   CompaniesTable, DataExportMenu + the csv/ics builders, DetailsPanel
+   if not ported) — delete or archive; shared components (CompactRow,
+   AlertCard, TicSection, AustralianMarkets, WorldMarkets…) stay (the
+   destination pages render them).
+6. **The tests:** retire the /insights-only test files with their
+   modules (hero-editorial, freshness-line, prices-cards, round2, step2,
+   money-direction, together-signals, insights-csv, ics, full-export,
+   fx-csv [unless the export ports], data-health, router.test's
+   /insights cases); the placement/doc/layer1/narrator/copy gates stay.
+7. **The bundle re-baseline:** the Insights lazy chunk leaves the build —
+   re-baseline `scripts/check-bundle-budget.mjs` (justify the row) and
+   the CHANGELOG record.
+8. **The records:** CHANGELOG + DECISIONS (the execution record, the
+   accepted-losses list) + this doc's §8 walked + the roadmap progress
+   board + HANDOFF + spec §13's v2 entry (the retirement happened —
+   rides the spec v2 pass, AF discipline).
+9. **Gates + deploy + live verify:** the full `pnpm gates`; the deploy
+   (currena-api — the SPA rides it); the live matrix: the 10 routes, a
+   stale `/insights` bookmark landing correctly, a `?card=` deep link
+   (if option B), zero console errors, mobile + RTL.
+10. **Rollback:** one `npx wrangler rollback` from `apps/api` + the git
+    revert — the retirement is display-layer, nothing else moved.
+
+## 8. Done criteria for the execution session
+
+- [ ] The owner's sign-off recorded (DECISIONS.md) with the §19.6 answer.
+- [ ] `/insights` no longer serves the legacy page; stale URLs behave per
+      the chosen redirect option (A or B) — verified live.
+- [ ] The deprecation banner, the legacy nav pill and the dead copy keys
+      are gone; `copy:audit` green; the fa manifest updated.
+- [ ] Every retained surface from §4 has its stated disposition
+      (ported / accepted-and-recorded).
+- [ ] All 187 cards still render their homes (re-run `pnpm s24:d9-audit`
+      + the 11 pd-* live backtests — 715 checks — green).
+- [ ] The full `pnpm gates` green; the bundle budgets re-baselined.
+- [ ] Deployed + live-verified (the §7.9 matrix); the records landed
+      (§7.8); the roadmap + HANDOFF closed with the program counter.
+
+---
+
+*End of the S24 deliverable. The D-9 condition is met (§2); the timing is
+the owner's + the investor's §19.6 answer; the plan above is what the
+execution session follows.*
