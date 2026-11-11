@@ -6,6 +6,22 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **SESSION 24/30 (2026-11-12, IN FLIGHT) — Phase K: the legacy
+> retirement readiness review (S24).** Goal: the D-9 audit — every one of
+> the 187 registry ids verified categorized (exactly one page home +
+> exactly one engine lane; placement ↔ registry ↔ engine reconciled) —
+> and the retirement checklist for the legacy all-in-one `/insights` page
+> (the deprecation banner's exit, the redirect decision, the engine
+> surfaces ONLY /insights carries — the shadow-gauge question headers,
+> the details panels, the narrator blocks, the watchlist/search/exports,
+> the calendar, About-the-data — and what each destination page still
+> lacks), landed as a spec-grade doc with per-item evidence. Execution
+> itself does NOT ship (it may wait for a burn-in period — investor
+> question §19.6); NO deploy unless something is fixed (a records
+> session if the audit is clean). Milestones: M0 session opening · M1
+> the D-9 audit (a re-runnable script + the doc) · M2 the retirement
+> checklist doc · M3 the gates · M4 the records close.
+
 > **SESSION 23/30 (2026-11-12) — the PULLED-FORWARD reserve session: S25,
 > the §15 Asia CPI fill session — DELIVERED AND VERIFIED LIVE (BD-S22 ·
 > BD-S23a · BD-S23-parallel).** The three D-36 fills (japan-cpi ·
