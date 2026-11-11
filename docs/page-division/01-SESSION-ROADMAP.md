@@ -1883,6 +1883,23 @@ the shipped tree (15,267) and with the fix (15,268).
   program state + HANDOFF.md fully rewritten. The gates re-run ALL GREEN
   on the records-only tree after the records landed. **Session 27/30 · 3
   remaining.**
+- **The counterpart close (BD-S27-parallel, ~20:35 UTC):** the slot's
+  duplicate arrival reconciled — a SECOND concurrent instance had run
+  the same session from the same kickoff (the earlier instance: M0
+  `cc1f069` + M2a `8dcde14` + its own M4 close, rejected at push with
+  zero force, archived on `archive/s27-duplicate-m4`); the pushed close
+  `a052631` governs. The counterpart folded the earlier instance's
+  UNIQUE evidence into the record (the full set in BD-S27-parallel):
+  the 17:29 UTC live Rule-5 publisher verification (all three ecb legs
+  200 in 2–4 s — DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 · AAA
+  3.3308865271 @ 2026-11-10, ALL EXACT) · the HICP full-history
+  backward growth at the provider (429 periods from 1991-01 vs S25's
+  358 from 1997-01 — content-neutral) · the pricesAsOf 20:13:18Z
+  evidence (the minute-cron alive at the sweep minute + the quota at
+  its tail — strongly favoring "the sweep fired, the cap refused its
+  writes") · the S20 data audit 20/20 GREEN (the buffer health pass's
+  fourth leg). The verdict, the revisit and the counter stand as
+  pushed.
 
 ### ☐ S28–S30 — Fix rounds · performance · retirement execution
 - Buffer sessions for anything red, slow, or delayed; the final legacy

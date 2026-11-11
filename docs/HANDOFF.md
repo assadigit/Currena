@@ -76,6 +76,24 @@
   · the CHANGELOG S27 entry · the roadmap's Session 27 SLOT record +
   progress board + current position · the page-division README · this
   file). Zero code, zero deploy.
+- **The counterpart close (BD-S27-parallel):** the slot's duplicate
+  arrival reconciled — a second concurrent instance ran the same
+  session; the pushed close `a052631` governs (it integrates the
+  earlier instance's M0/M2a), the rejected local close is archived on
+  `archive/s27-duplicate-m4`. The earlier instance's unique evidence is
+  folded into the record: the **17:29 UTC live Rule-5 publisher
+  verification** (all three ecb legs HTTP 200 in 2–4 s — DFR 2.5 @
+  2026-11-11 · HICP 4.0 @ 2026-10 · AAA 3.3308865271 @ 2026-11-10, ALL
+  EXACT matches to the served values: the "publisher-true" claim now
+  rests on a same-day live fetch) · the HICP full-history backward
+  growth at the provider (429 distinct periods from 1991-01 vs S25's
+  358 from 1997-01 — content-neutral: the parser is window-agnostic,
+  the tail identical) · the **pricesAsOf 20:13:18Z evidence** (the :13
+  prices rung's write landed — the minute-cron alive at the sweep
+  minute + the quota at its very tail, strongly favoring "the sweep
+  FIRED and the cap refused its writes" over "did not fire") · the
+  **S20 data audit 20/20 GREEN** (seed 20261112 — the buffer health
+  pass's fourth leg, matching the S20/S21 regression standard).
 
 ## Next session (Session 28/30)
 

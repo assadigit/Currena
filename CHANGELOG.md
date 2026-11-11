@@ -39,6 +39,25 @@ than a semver tag.
   HANDOFF.md fully rewritten (the next session's first check = round 4
   after the 04:10–04:40 rungs). The gates re-run ALL GREEN on the
   records-only tree after the records landed.
+- **The counterpart close (BD-S27-parallel, ~20:35 UTC):** the slot's
+  duplicate arrival reconciled — TWO concurrent instances ran the
+  session; the pushed close `a052631` governs (it already integrates
+  the earlier instance's M0 `cc1f069` + M2a `8dcde14`); the later
+  instance's local M4 close was rejected at push (zero force) and is
+  archived on `archive/s27-duplicate-m4` (`9446094`). The earlier
+  instance's unique evidence folded into the record by the counterpart:
+  the **17:29 UTC live Rule-5 publisher verification** (all three ecb
+  legs HTTP 200 in 2–4 s; DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 ·
+  AAA 3.3308865271 @ 2026-11-10 — ALL EXACT matches to the served
+  values) · the HICP full-history backward growth at the provider (429
+  distinct periods from 1991-01 vs S25's 358 from 1997-01 —
+  content-neutral) · the **pricesAsOf 20:13:18Z evidence** (the :13
+  prices rung's write landed — the minute-cron alive at the sweep
+  minute and the quota at its tail, strongly favoring "the sweep fired
+  and the cap refused its writes" over "did not fire") · the **S20 data
+  audit 20/20 GREEN** (seed 20261112 — the buffer health pass's fourth
+  leg). Nothing else changed; the verdict, the revisit and the counter
+  stand as pushed.
 
 ## [2026-11-11] page-division S26 (the second reserve session — the ecb FIRST-CHECK follow-through): **THE POST-FIX EVIDENCE SESSION — the first check found the live status still PRE-FIX (no scheduled rung had carried the new code yet), so the session generated the missing evidence via the belt-and-braces path: the FIRST post-fix full collect (DFR ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504 — the designed honest failure shape; 50/52 rows green; the two voting cards held on last-good; the run exited 1 by design), the held/fresh card values verified EXACTLY against the publisher's own API (DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 · AAA 3.3308865271 @ 2026-11-10), and the ECB gateway's ~30.2 s 504 roulette now measured at ALL THREE observed venues (the sandbox included: 504 at ~31 s then 200 at ~2 s one minute later). The verdict stays PENDING, riding tonight's 20:10 sweep + tomorrow's 04:10 rung; NO deploy — the code is unchanged (production `9861a927` ≡ HEAD; the markets worker `8f63c8fa`).**
 

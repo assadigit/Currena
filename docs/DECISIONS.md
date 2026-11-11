@@ -2999,3 +2999,72 @@
   persisting across the post-fix days with the cards going
   user-visibly stale past their maxAge windows → the escalation choice
   comes to the owner.
+
+## 2026-11-11 — BD-S27-parallel: the Session 27 duplicate arrival reconciled (the counterpart close) — TWO concurrent instances ran the slot; the pushed close `a052631` governs and already integrates the earlier instance's M0/M2a; the later instance's local M4 close (rejected at push, zero force) is archived on `archive/s27-duplicate-m4`; the earlier instance's UNIQUE evidence now folded into the record: the 17:29 UTC live Rule-5 publisher verification (ALL EXACT), the HICP full-history backward growth at the provider, the pricesAsOf 20:13:18Z cron-alive + quota-tail evidence narrowing the sweep ambiguity, and the S20 data audit 20/20 GREEN
+
+- **Event:** at 20:30 UTC the later instance's S27 close commit was
+  REJECTED at push — origin/main had moved (`64de135` + `a052631`, the
+  continuation's M2 checkpoint + M4 close, pushed 18:14→20:30 UTC) while
+  the later instance was writing its own close from the shared base
+  `8dcde14`. The hardened parallel-session rule applied verbatim: the
+  PUSHED implementation governs; the local duplicate was NOT forced —
+  it is preserved on the archive branch **`archive/s27-duplicate-m4`**
+  (commit `9446094`); local main reset to `a052631`; this counterpart
+  close reconciles and finishes the slot. Both instances ran the SAME
+  session scope from the SAME kickoff (the duplicate-arrival pattern of
+  BD-S18-parallel-3 / BD-S21-parallel / BD-S23-parallel; the S27 twist:
+  the arrivals were CONCURRENT, ~3.5 h apart, each reading the other's
+  commits as it went — the continuation's close already names the
+  earlier instance's M0 `cc1f069` + M2a `8dcde14` as kept, nothing
+  duplicated).
+- **The independent re-verification (this counterpart, on the pushed
+  tree):** the pushed BD-S27 record checked against the earlier
+  instance's own concurrent ground truth — CONSISTENT on every material
+  point (the 14:15:19Z blob with the two honest ecb failed rows through
+  the session; the sweep-read no-update outcome; the verdict PENDING
+  round 3 with the maxAge arithmetic; production `9861a927` +
+  `8f63c8fa` unchanged; the gates 15,270; the 11 backtests green — two
+  independent runs each, 17:2x and 18:2x UTC). FOUR pieces of the
+  earlier instance's evidence were NOT in the pushed record; they are
+  folded in by this entry (the substance, so no doc rewrite is needed):
+- **(1) The 17:29 UTC Rule-5 LIVE publisher verification (the earlier
+  instance, from the sandbox — a good roulette window):** all three ecb
+  legs answered HTTP 200 in 2.0–4.0 s on single patient attempts —
+  **DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 (tail 3.2/3.8/4.0) · AAA
+  3.3308865271 @ 2026-11-10 — ALL EXACT matches** to the served/held
+  values. The pushed record's "the served cards stay publisher-true"
+  now rests on a same-day live fetch, not only S26's 14:20 one.
+- **(2) The HICP full-history observation:** the provider's unfiltered
+  series now returns **429 distinct monthly periods, 1991-01 → 2026-10**
+  (zero duplicates — verified), vs the S25-recorded 358 rows from
+  1997-01: the provider EXTENDED the history backward (~71 months)
+  since the S25 probe. Content-neutral by construction (the parser is
+  window-agnostic; the engine slices its own 10-year windows; the tail
+  identical) — recorded for the ecb thread's continuity.
+- **(3) The pricesAsOf 20:13:18.136Z evidence (narrows the pushed
+  record's "indistinguishable" reading):** the :13 hourly prices rung's
+  KV write LANDED at 20:13:18 — the Worker minute-cron was alive at the
+  sweep minute, and the account's write quota was still serving at
+  20:13. With the sweep's fire-path deterministic on the two
+  `kind: failed` rows, the prior now strongly favors **the sweep FIRED
+  and the cap refused its write chain** over "the sweep did not fire"
+  (not certain — the prices rung is one write; the sweep's chain is
+  snapshot+status+public and the refusal could have bitten between
+  them — but the cron-alive + quota-tail evidence is new and material).
+  The designed fallback is unchanged either way: tomorrow's 04:10–04:40
+  rungs.
+- **(4) The S20 data audit 20/20 GREEN (the buffer health pass's fourth
+  leg):** the earlier instance ran `pd-s20-data-audit.ts` (seed
+  20261112, ~17:33 UTC) — the N=20 random-id upstream cross-check over
+  the stored 14:15 snapshot, **20/20 GREEN** (100 % match; platinum the
+  one designed live-spot arm at 0.83 % intraday). The pushed record
+  carries the gates + the D-9 audit + the 11 backtests; the data audit
+  completes the pass at four legs, matching the S20/S21 regression
+  standard.
+- **Who decided:** the later instance under the hardened
+  parallel-session rule (BD-S18-parallel-3 / BD-S21-parallel /
+  BD-S23-parallel — the pushed implementation governs, the duplicate
+  archived, the reconciliation recorded, the slot finished).
+  **Revisit:** none — the slot's own revisit (BD-S27's round-4 first
+  check) stands unchanged. NO deploy; zero code changed by either
+  instance.
