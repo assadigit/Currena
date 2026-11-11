@@ -205,12 +205,29 @@ regeneration (`pnpm placement:generate`).
   arrival landed the build (BD-S23-parallel — the pushed implementation
   governs, the duplicate archived on archive/s23-duplicate-m2-m5, the
   shipped tree independently re-verified: the gates 15,267 ALL GREEN).
-  Next: Session 24/30 — the legacy retirement readiness review (the D-9
-  audit; execution may wait for the burn-in period, investor question
-  §19.6). **The owner's lever: arrange the investor's review of spec §19
-  (the seven questions) — Phase K's input; the investor round re-opens at
-  the next free slot the moment the answers exist.** See the roadmap’s
-  progress board for the current position.
+  Session 24/30 then delivered the legacy retirement readiness review
+  (BD-S24, NO deploy — a records session): the D-9 condition MET (every
+  one of the 187 ids verified categorized — one engine lane + one page
+  home each; 18 checks ALL GREEN via the re-runnable `pnpm
+  s24:d9-audit`, which now also pins AGENTS §A against the registry),
+  the audit's doc-side drift reconciled same-session doc-only (§A's
+  stale headers + 23 missing + 3 misplaced rows · IADS §1 · the 04
+  audit basis), and the retirement checklist landed as the spec-grade
+  `06-LEGACY-RETIREMENT-S24.md` (the redirect A/B decision — the
+  card-aware option B recommended; the /insights-only surfaces — the
+  region verdicts, the two global shadow-gauge headers, the details
+  panels + per-id history, the narrator's full set, the
+  watchlist/search/exports, the calendar/About/Together/MoneyPanel;
+  the per-page gap table; the sign-off-gated execution plan). The
+  execution itself does NOT ship — the timing is investor question
+  §19.6 (Gate 0 = the owner's recorded sign-off; the gates ALL GREEN
+  2m 36s on the records tree; production unchanged: currena-api
+  `33ff60c0` + currena-markets `8f63c8fa`). **The owner's levers:
+  (1) arrange the investor's review of spec §19 (the seven questions)
+  — Phase K's remaining input; the investor round re-opens at the next
+  free slot the moment the answers exist; (2) the §19.6 retirement
+  timing answer.** See the roadmap's progress board for the current
+  position.
 
 ## The one rule that trumps everything
 

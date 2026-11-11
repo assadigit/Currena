@@ -5,6 +5,79 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-12] page-division S24 (Phase K): **THE LEGACY RETIREMENT READINESS REVIEW DELIVERED — the D-9 condition MET: every one of the 187 ids verified categorized (one engine lane + one page home each; registry ↔ engine ↔ placement reconciled, 18 checks ALL GREEN via the new re-runnable `pnpm s24:d9-audit`); the retirement checklist landed as the spec-grade doc `docs/page-division/06-LEGACY-RETIREMENT-S24.md` (per-item evidence: the redirect A/B decision, the banner's exit, the /insights-only engine surfaces — the region verdicts, the two global shadow-gauge headers, the details panels + per-id history, the narrator's full set, the watchlist/search/exports, the calendar/About/Together/MoneyPanel — the per-page gap table, the sign-off-gated execution plan + done criteria); the audit's doc-side drift reconciled same-session (AGENTS §A 187/54/133 + the 23 missing + 3 misplaced rows · IADS §1 · the 04 audit basis); EXECUTION DOES NOT SHIP (the timing is investor question §19.6); NO deploy — a records session (the code layers were already green).**
+
+- **The D-9 audit (the retirement gate):** `scripts/s24-d9-audit.ts`
+  (`pnpm s24:d9-audit` — deterministic, exits non-zero on red) runs 18
+  checks across the three layers: the registry ↔ DEFINITIONS 1:1 + the
+  per-id group/section match · one lane per id + the 13 lanes' counts ·
+  the gauge membership (one gauge per member, the registry's own
+  `area.gauge` field ↔ GAUGES 1:1, the documented B-14 brent record,
+  the voting/shadow rule coherence — the 8 voting gauges score exactly
+  the 54 scored rules, the 4 shadow gauges mirror only context) · the
+  placement (`reconcilePlacement` green — 187 placed · 0 unplaced · 0
+  duplicates · 0 unknown · 0 mirror overlaps; one home per id; Global
+  zero homes by design) · the gold meter's 37 voters ⊆ the registry
+  (the documented dual-membership engine) · the role counts (54 V + 133
+  C = 187) · the lane-render exceptions all categorized · the §A record
+  (every id present with the correct role + the header counts). ALL
+  GREEN; the per-id evidence table prints for all 187 (id · lane · role
+  · gold-voter ◆ · home page); PLACEMENT.generated.md regenerated
+  byte-identical (the sync test pins it).
+- **The doc-side drift the audit caught, reconciled same-session
+  (doc-only, zero code):** AGENTS §A's header counts were three
+  program-generations stale (161/48/113 + 125/32 + 36/16 → the registry
+  truth **187/54/133 + 149/38 + 38/16**) + 23 missing rows added
+  (real-yield-5y · real-curve-10y5y · rstar-us · debt-to-gdp ·
+  dollar-broad · dollar-eme · usdchf · bank-stress ·
+  cftc-gold-gross-long · global-liquidity · the gold-system context
+  block incl. the DISABLED quartet · cpi-nowcast · cpi-surprise ·
+  gold-equities-ratio · michigan-5y-expectations) + the 3 misplaced
+  S4-M4.4 rows moved to their true lanes (coal-aus + lng-japan →
+  au-trade-currency; gas-europe → prices-heat); INDICATORS_AND_DATA_
+  SOURCES §1 (the 187/54/133 header, the gauge-table voter counts 10/6/7/5,
+  the 25 missing alphabetical rows); 04-INDICATORS (the 187 header,
+  growth-health 27 → 30 with the three CPI fills +
+  michigan-1y-expectations, §10's 183-of-187 public line). The new H
+  checks pin §A against the registry inside the audit — a future
+  indicator change that forgets §A fails `pnpm s24:d9-audit`.
+- **The retirement checklist (`06-LEGACY-RETIREMENT-S24.md`):** §4 the
+  per-item "what breaks" — R-1 the route + redirect (the boot guard's
+  silent '/' normalization today; the card-aware option B via
+  `homePageOfIndicator` RECOMMENDED; the A/B decision presented for the
+  owner) · R-2 the deprecation banner's exit (the component + the
+  deprecation.* keys both locales + the manifest + the Header legacy
+  pill + DestinationBody's dormant bridge) · R-3 the REGION verdicts
+  ONLY /insights carries (VerdictBlock's sectionVerdictStep ×2 — the
+  destinations carry per-GAUGE verdicts only) · R-4 the two GLOBAL
+  shadow-gauge question headers ONLY /insights (the AU shadows ARE
+  carried; Global's dedollar tile carries facts, not the question) ·
+  R-5 the details panels + the per-id history (the largest gap —
+  DetailsPanel imported by exactly one route, the destination cards
+  non-interactive; the port recommended) · R-6 the narrator's full set ·
+  R-7 the watchlist + search/Tools + the CSV/ics exports · R-8 the
+  calendar + About-the-data + top-movers + Together + MoneyPanel + the
+  US-global-reach container — every claim verified against the tree this
+  session; §5 the per-page gap table; §6 what retirement does NOT touch
+  (the engine, the API, the projections); §7 the sign-off-gated
+  execution plan (Gate 0 = the owner's §19.6 answer + 10 steps incl.
+  the dead-code keep/delete lists + the test retirements + the bundle
+  re-baseline + the rollback); §8 the execution session's done
+  criteria.
+- **Gates (the records tree):** the FULL `pnpm gates` — **ALL GREEN,
+  2m 36s** (secret scan 8/1027 · typecheck 6/6 · eslint 0/0 ·
+  copy:audit clean · narrator 193×2 + 56×2, eval 50 · layer1
+  11,969/11,969 · the suite **15,268** = exactly the S23 close count,
+  zero code changed · build + budgets held — entry 272.88/82.55, the
+  AsiaPage chunk 16.20/4.07 within its 16.5/6.0 row). No deploy —
+  nothing shipped to the Worker; production stays currena-api
+  `33ff60c0` + currena-markets `8f63c8fa`.
+- **Counter: Session 24/30 · 6 remaining.** Phase K's remaining lever
+  is unchanged: the investor's §19 answers (the round re-opens the
+  moment they exist; S23's deferred feedback-build scope follows).
+  Reserve S26–S30: the retirement execution when the owner signs off
+  (§19.6), the fix rounds, the buffers.
+
 ## [2026-11-12] page-division S25 fill session (the PULLED-FORWARD Session 23 slot, BD-S22): **THE THREE §15 D-36 ASIA CPI FILLS LANDED (Japan · Korea · India CPI YoY) — the IMF's own SDMX 3.0 CPI dataflow, Rule 5 verified at BOTH venues + against the three national bureaus (BD-S23a); the full §A ingest discipline; the three cards rendered on /asia-pacific with the §21 trio + the fa copy through the manifest; the registry 184 → 187 ids; pd-s14 extended to the 14 cards; the spec-v2 diff grown (AF-8 — the dead FRED-mirror candidate recorded, the spec untouched); SHIPS with this session's deploy.**
 
 - **The session's close (the parallel reconciliation + the live landing,

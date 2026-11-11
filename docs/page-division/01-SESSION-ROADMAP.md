@@ -1683,10 +1683,40 @@ re-opens at the next free slot the moment the owner supplies the answers.
   in the first free slot after the investor's answers land and the spec v2
   entries exist.
 
-### ☐ S24 — Legacy retirement readiness · `Session 24/30`
+### ✅ S24 — Legacy retirement readiness · `Session 24/30` · DELIVERED 2026-11-12 (BD-S24)
 - The D-9 audit: every indicator verified categorized; retirement checklist
   produced (execution itself may wait for a burn-in period — investor
   question §19.6).
+
+**S24 delivery record (2026-11-12, BD-S24):** the D-9 condition is MET —
+every one of the 187 ids verified categorized (exactly one engine lane +
+exactly one page home each; registry ↔ engine ↔ placement reconciled)
+via the new re-runnable **`pnpm s24:d9-audit`** (`scripts/
+s24-d9-audit.ts` — 18 checks ALL GREEN, the per-id evidence table for
+all 187, exits non-zero on red; the new H checks also pin AGENTS §A
+against the registry). The audit caught doc-side drift — reconciled
+same-session, doc-only: §A's stale headers (161/48/113 → the registry
+truth 187/54/133 · Global 149/38 · Australia 38/16) + 23 missing rows
++ the 3 misplaced S4-M4.4 rows (coal-aus + lng-japan → au-trade-
+currency; gas-europe → prices-heat); IADS §1 (the gauge-table voter
+counts + the 25 missing rows); 04-INDICATORS (187 · growth-health
+27 → 30 · the 183-of-187 public line). The retirement checklist landed
+as the spec-grade doc **`docs/page-division/06-LEGACY-RETIREMENT-S24.md`**
+(per-item evidence: the redirect A/B decision [the card-aware option B
+via homePageOfIndicator recommended, presented for the owner] · the
+deprecation banner's exit · the /insights-only engine surfaces [the
+region verdicts · the two global shadow-gauge question headers · the
+details panels + the per-id history — the largest gap, the port
+recommended · the narrator's full set · the watchlist/search/exports ·
+the calendar/About/Together/MoneyPanel/US-global-reach] · the per-page
+gap table · what retirement does NOT touch · the sign-off-gated
+execution plan + its done criteria). **Execution does NOT ship** — the
+timing is investor question §19.6 (Gate 0 of the execution plan = the
+owner's recorded sign-off; the execution rides a reserve session).
+NO deploy — a records session (the full gates ALL GREEN 2m 36s on the
+records tree; the suite 15,268 = the S23 count, zero code changed;
+production unchanged: currena-api `33ff60c0` + currena-markets
+`8f63c8fa`). **Session 24/30 · 6 remaining.**
 
 ## Reserve (S25–S30)
 
@@ -1749,33 +1779,39 @@ the shipped tree (15,267) and with the fix (15,268).
 | H Commodities | S17 | ✅ S17 2026-11-11 (deployed `08e0fc64`, the 4 commodity groups + the trade routes & supply group — 24 cards + the gold cross-link; the §21 backtest + the render audit + the In-build chip RETIRED; the post-deploy §21 24/24 green + the 4-leg browser pass green — **PHASE H CLOSED**) |
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
-| K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ☐ S24 |
+| K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ✅ S24 2026-11-12 (NO deploy — the D-9 audit ALL GREEN via pnpm s24:d9-audit [187 ids, one lane + one home each] + the doc-side drift reconciled doc-only + the retirement checklist landed spec-grade [06-LEGACY-RETIREMENT-S24.md]; execution gated on the owner's §19.6 sign-off) |
 | Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ☐ S26–S30 buffer |
 
-**Current position: Session 23/30 delivered (the PULLED-FORWARD S25 —
-the §15 Asia CPI fill session) 2026-11-12 · 7 remaining. The three D-36
-fills (japan-cpi · korea-cpi · india-cpi) are LIVE from the IMF's own
-SDMX 3.0 CPI dataflow (BD-S23a — Rule 5 verified at both venues + the
-three national-bureau second voices; the FRED OECD mirror family is
-DEAD, BD-S14a — never re-try those ids); the registry is 187 ids; the
-/asia-pacific page renders its 14 placed cards (the two index-only
-sections retired with their fills landed); production runs currena-api
-`33ff60c0` (the fill build `2c61c187` + the KV-seed patch fix) +
-currena-markets `8f63c8fa` (unchanged).
-A duplicate arrival landed the build (BD-S23-parallel — the pushed
-implementation governs, the duplicate archived, the shipped tree
-independently re-verified, the KV write-cap finding recorded).
-NEXT: Session 24/30 — the legacy retirement readiness review (the D-9
-audit: every indicator verified categorized; the retirement checklist —
-execution itself may wait for the burn-in period, investor question
-§19.6). THE OWNER'S LEVER REMAINS: arrange the external investor's
-review of the spec (§19's seven questions) — Phase K's input; the moment
-the answers exist, the next free slot re-opens the investor round
+**Current position: Session 24/30 delivered (Phase K: the legacy
+retirement readiness review) 2026-11-12 · 6 remaining. The D-9 condition
+is MET — every one of the 187 ids verified categorized (one engine lane +
+one page home each; registry ↔ engine ↔ placement reconciled) via the
+re-runnable `pnpm s24:d9-audit` (18 checks ALL GREEN; the H checks also
+pin AGENTS §A against the registry). The retirement checklist is landed
+spec-grade: `docs/page-division/06-LEGACY-RETIREMENT-S24.md` (the
+redirect A/B decision — the card-aware option B recommended; the banner's
+exit; the /insights-only surfaces — the region verdicts, the two global
+shadow-gauge headers, the details panels + per-id history [the largest
+gap, the port recommended], the narrator's full set, the
+watchlist/search/exports, the calendar/About/Together/MoneyPanel; the
+per-page gap table; the sign-off-gated execution plan + done criteria).
+EXECUTION DOES NOT SHIP — the timing is investor question §19.6 (Gate 0 =
+the owner's recorded sign-off; the execution rides a reserve session
+S26–S30). The audit's doc-side drift was reconciled same-session
+doc-only (§A 187/54/133 + the 23 missing + 3 misplaced rows · IADS §1 ·
+the 04 audit basis); NO deploy (the gates ALL GREEN 2m 36s on the
+records tree, the suite 15,268; production unchanged: currena-api
+`33ff60c0` + currena-markets `8f63c8fa`).
+NEXT: the investor round the moment the owner supplies the §19 answers
 (collect → D-49+ in the strategy log §5 Round 4 → the spec v2 entries —
-the AF-1…AF-8 spec-side findings ride that pass, never silent edits),
-and S23's deferred feedback-build scope follows it. The ecb-drf provider
-timeout stays queued for a maintenance slot (the runbook: the /admin
-console's per-source status, which needs the owner's REFRESH_SECRET).
-The S20 data-audit tool is re-runnable for any later session's §21
-data-audit gate — RUNBOOK NOTE (BD-S21e): never run it Tuesdays
-11:00–14:00 UTC (the IMF PortWatch maintenance window).**
+the AF-1…AF-8 findings ride that pass, never silent edits), then S23's
+deferred feedback-build scope; the reserve slots hold the retirement
+execution (behind the §19.6 sign-off), the ecb-drf provider timeout
+maintenance item (the runbook: the /admin console's per-source status,
+which needs the owner's REFRESH_SECRET), and the buffers. THE OWNER'S
+LEVERS: (1) arrange the external investor's review of the spec (§19's
+seven questions) — Phase K's remaining input; (2) the §19.6 retirement
+timing answer (directly, or via the investor round). The S20 data-audit
+tool is re-runnable for any later session's §21 data-audit gate —
+RUNBOOK NOTE (BD-S21e): never run it Tuesdays 11:00–14:00 UTC (the IMF
+PortWatch maintenance window).**
