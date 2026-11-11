@@ -13,19 +13,19 @@ and the per-round specs that drove each wave (both removed in the
 
 ---
 
-## 1. What indicators Currena has — the 161-indicator dashboard
+## 1. What indicators Currena has — the 187-indicator dashboard
 
-The Insights page renders **161 indicators** across **2 sections** (Global
-125, Australia 36 — see the
+The Insights page renders **187 indicators** across **2 sections** (Global
+149, Australia 38 — see the
 breakdown below), grouped under **12 question gauges** (7 global + 5
 australia + the prices-board strip; the global shadows are the S4
 geo-fragmentation + the S6-M6.3 dedollar-concentration lanes, and the
 Australian shadows the S5 au-activity/au-external lanes — context-only
 members, never votes until S6-M6.4's promotion decision). Of those,
-**48 are scored voters** (contribute to a gauge's verdict) and
-**113 are context rows** (live value + 10-year position bar, never vote).
+**54 are scored voters** (contribute to a gauge's verdict) and
+**133 are context rows** (live value + 10-year position bar, never vote).
 
-The live snapshot is served at `GET /api/insights` — 161 `readings` plus
+The live snapshot is served at `GET /api/insights` — 187 `readings` plus
 the two summary lines (Global and Australia). Each reading carries its
 current value, the data date (`asOf`), the 7-day and 30-day changes, the
 **10-year percentile position** (`percentile10y`), the **10-year z-score**
@@ -37,11 +37,11 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 
 | gauge | section | members (voters in **bold**, context in plain) | voting count |
 |---|---|---|---|
-| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section), `us-deficit-12m` (the us-deficit-monthly companion renders inside it), `treasury-auction-10y` + `treasury-auction-30y` (their *-indirect companions render inside them) (S3-M3.5), `btp-bund-spread` (S6-M6.3: the Italy−Germany 10-year spread from the FRED OECD mirrors — the euro area's own stress gauge) | 9 |
+| **borrowing-costs** | global | **yield-curve-10y2y**, **yield-curve-10y3m**, **fed-expectations**, **real-yield-10y**, **real-yield-5y** (GF-P3), **us10y**, **us30y**, **fed-target**, **ecb-dfr**, **govt-interest-revenue** + context: ecb-dfr-twin `euro-aaa-10y`, `sofr`, `us-2y`, `mortgage-30y`, `bund-10y`, `jgb-10y`, `gilt-10y`, `boj-rate`, `boe-rate`, `nyfed-custody` (renders inside the TIC section), `us-deficit-12m` (the us-deficit-monthly companion renders inside it), `treasury-auction-10y` + `treasury-auction-30y` (their *-indirect companions render inside them) (S3-M3.5), `btp-bund-spread` (S6-M6.3: the Italy−Germany 10-year spread from the FRED OECD mirrors — the euro area's own stress gauge), `real-curve-10y5y` (the real slope), `rstar-us` (the HLW r*), `debt-to-gdp` | 10 |
 
-| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `gas-europe` (S4-M4.4, the European gas benchmark beside WTI/Henry Hub), `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio`, `median-cpi`, `sticky-cpi` (S3-M3.4) | 5 |
-| **market-stress** | global | **stress-stlfsi**, **nfci**, **vix**, **gold-silver**, **cftc-gold-positioning** + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `gpr-threats`, `gpr-acts`, `gpr-daily`, `gpr-taiwan`, `gpr-china`, `gpr-russia`, `gpr-ukraine`, `gpr-israel`, `gpr-saudi`, `gpr-australia` (S4-M4.2), `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4) | 5 |
-| **dollar-strength** | global | **dollar-basket**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed` | 3 |
+| **prices-heat** | global | **us-cpi-yoy**, **us-pce-core-yoy**, **euro-hicp**, **breakeven-5y5y**, **michigan-5y-expectations** (GF-S10), **brent** + context: `us-cpi-core-yoy`, `t5yie`, `us-wages`, `breakeven-tilt`, `breakeven-10y`, `wti`, `natgas`, `gas-europe` (S4-M4.4, the European gas benchmark beside WTI/Henry Hub), `eia-crude-stocks`, `platinum`, `food-index`, `wheat`, `maize`, `gold-oil-ratio`, `median-cpi`, `sticky-cpi` (S3-M3.4), `cpi-nowcast`, `cpi-surprise` (the Cleveland Fed nowcast pair), `gold-equities-ratio` | 6 |
+| **market-stress** | global | **stress-stlfsi**, **nfci**, **bank-stress** (GF-P3, the discount-window rate), **vix**, **gold-silver**, **cftc-gold-positioning**, **cftc-gold-gross-long** (GF-P2) + context: `walcl`, `crypto-fng`, `shiller-cape`, `shiller-ecy`, `gpr-index`, `gpr-threats`, `gpr-acts`, `gpr-daily`, `gpr-taiwan`, `gpr-china`, `gpr-russia`, `gpr-ukraine`, `gpr-israel`, `gpr-saudi`, `gpr-australia` (S4-M4.2), `term-premium-10y`, `tga`, `reverse-repo`, `bank-reserves`, `repo-stress`, `net-liquidity` (S3-M3.2), `ebp`, `ofr-fsi` (S3-M3.3), `sloos-ci-tightening` (S3-M3.4), `global-liquidity` (the Fed+ECB+BoJ aggregate) + the gold-system context block (lane members; the deep reference is 05-GOLD-INDICATORS): `real-gold-price`, `gold-platinum`, `shanghai-gold-premium`, `sge-gold-withdrawals`, `swiss-gold-flow`, and the DISABLED quartet `wgc-etf-holdings`, `wgc-cb-demand`, `official-gold-demand`, `etf-short-interest` | 7 |
+| **dollar-strength** | global | **dollar-basket**, **dollar-broad**, **dollar-eme**, **usdjpy**, **us-japan-10y-gap** + context: `eur-usd`, `usdtry`, `usdaed`, `usdchf` | 5 |
 | **growth-health** | global | **china-pmi**, **china-cpi**, **philly-fed**, **initial-jobless-claims**, **us-unemployment**, **sahm-rule**, **recession-probability**, **michigan-sentiment**, **copper-gold**, **oecd-cli-us** + context: `m2-us`, `retail-sales`, `housing-permits`, `cfnai`, `job-openings`, `us-gdp-growth`, `us-nfp`, `usdcny`, `michigan-1y-expectations`, `epu-us`, `copper-usd`, `oecd-cli-cn`, `oecd-cli-de`, `gdpnow`, `empire-state`, `continuing-claims` (S3-M3.4), `japan-cpi`, `korea-cpi`, `india-cpi` (S25, BD-S23a — the §15 D-36 Asia CPI fills, IMF SDMX 3.0 CPI dataflow) | 10 |
 | **geo-fragmentation** (shadow, S4-M4.3/M4.4) | global | context only (never votes until S6): `chokepoint-suez`, `chokepoint-panama`, `chokepoint-bab-el-mandeb`, `chokepoint-malacca`, `chokepoint-taiwan` — the IMF PortWatch transits — plus `gscpi`, `us-spr`, `us-crude-production` (S4-M4.4: the supply-pressure and US-oil-supply members) | 0 |
 | **dedollar-concentration** (shadow, S6-M6.3) | global | context only (never votes until the S6-M6.4 promotion decision): `usd-reserve-share` (the IMF COFER quarterly USD share of world allocated FX reserves — the de-dollarization drift, api.imf.org SDMX 3.0, rung2 Saturday gate; the layer-1 copy cross-links the Treasury-holders section) + `sp500-breadth-ratio` (the equal-weight/cap-weight S&P 500 PROXY, Yahoo RSP ÷ SPY daily closes, rung2 daily gate — labelled a proxy, the spec's own limitation note) | 0 |
@@ -52,11 +52,12 @@ status (`normal` / `warning` / `stale` / `unavailable` / `context`).
 | **au-activity** (shadow, S5-M5.2) | australia | context only (never votes until S6): `au-gdp-growth` (the chain-volume GDP annual rate), `au-household-spending` (the CEASED Retail Trade flow's HSI successor), `au-building-approvals` (the dwelling-unit count, original terms), `au-population-growth` (the ERP annual rate, with the `au-nom` net-migration companion rendered inside its card), `au-participation`, `au-underemployment` (the LF_UNDER series the LF flow does not carry) | 0 |
 | **au-external** (shadow, S5-M5.2 + S6-M6.1) | australia | context only (never votes until S6): `au-trade-balance` (the ABS's own "Balance on goods", SA $m) + the New Zealand link family `audnzd` (AUD/NZD from the Frankfurter legs) / `nz-short-rate` (OECD FINMARK monthly average) / `nz-10y` (FRED OECD mirror) — included on the measured evidence (evidence/M6.1/). The spec's wider membership (terms of trade, iron ore, coal, LNG, AUD/CNY) needs the S6 owner decision — moving the existing ids would reweight their current lanes (G-3) | 0 |
 
-**Voter total:** 9+5+5+3+10 + 5+7+4 = **48** (the market-stress fifth is
-the A-7 cftc-gold-positioning card; the growth-health tenth is the A-8
-oecd-cli-us voter — see §4).
+**Voter total:** 10+6+7+5+10 + 5+7+4 = **54** (the market-stress voters
+grew to seven — the A-7 cftc-gold-positioning card, its GF-P2
+cftc-gold-gross-long twin and the GF-P3 bank-stress seat; the growth-health
+tenth is the A-8 oecd-cli-us voter — see §4).
 
-### The complete indicator inventory (161 ids, alphabetical)
+### The complete indicator inventory (187 ids, alphabetical)
 
 Each row: **id** · provider · cadence · max-age-days · licence level ·
 public-display-ok · scored voter? · short description.
@@ -112,11 +113,16 @@ public-display-ok · scored voter? · short description.
 | `breakeven-5y5y` | fred | daily | 4 | L2 | yes | ✓ | Inflation expectations (5y5y forward) |
 | `brent` | fred | daily | 12 | L2 | yes | ✓ | Brent oil (EIA via FRED + Yahoo BZ=F gap-fill) |
 | `bank-reserves` | fred | weekly | 21 | L0 | yes | – | US bank reserve balances at the Fed (WRESBAL) |
+| `bank-stress` | fred | weekly | 14 | L0 | yes | ✓ | The Fed's discount-window primary-credit rate (DPCREDIT; the GF-P3 stress voter) |
 | `btc-usd` | gold-api | daily | 2 | L2 | yes | – | Bitcoin price |
 | `btp-bund-spread` | derived | monthly | 75 | L2 | yes | – | Italy−Germany 10-year government bond spread (the FRED OECD mirrors IRLTLT01ITM156N − IRLTLT01DEM156N, the euro area's stress gauge; S6-M6.3; the OECD-yields bulk group's 5th id — zero new subrequests; the audnzd inner-join discipline) |
 | `bund-10y` | fred | monthly | 75 | L2 | yes | – | German 10-year government bond yield (OECD mirror) |
 | `cfnai` | fred | monthly | 95 | L2 | yes | – | US economic activity scorecard (Chicago Fed) |
 | `cftc-gold-positioning` | cftc | weekly | 12 | L0 | yes | ✓ | Trader positioning in gold (COT, net non-commercial share of OI) |
+| `cftc-gold-gross-long` | cftc | weekly | 12 | L0 | yes | ✓ | Gross-long managed-money gold positioning (COT; the GF-P2 twin) |
+| `cpi-nowcast` | cleveland | monthly | 45 | L2 | yes | – | US CPI nowcast (Cleveland Fed, current-month MoM) |
+| `cpi-surprise` | derived | monthly | 75 | L2 | yes | – | CPI print vs the prior nowcast (pp) |
+| `debt-to-gdp` | fred | quarterly | 280 | L0 | yes | – | US federal debt as a share of GDP (GFDEGDQ188S) |
 | `coal-aus` | world-bank | monthly | 60 | L1 | yes | – | Australian coal price (Pink Sheet, $/mt — the Newcastle benchmark) |
 | `china-cpi` | nbs | monthly | 45 | L1 | yes | ✓ | China inflation (yearly) |
 | `china-property-investment` | nbs | monthly | 75 | L2 | yes | – | China real-estate development investment, YTD year-on-year % (S6-M6.2; the dedicated NBS English release, headline-cross-checked; rung2 21st-25th window) |
@@ -127,11 +133,14 @@ public-display-ok · scored voter? · short description.
 | `copper-usd` | gold-api | daily | 2 | L1 | yes | – | Copper price |
 | `crypto-fng` | alternative-me | daily | 4 | L0 | yes | – | Crypto Fear and Greed Index |
 | `dollar-basket` | derived | daily | 4 | L1 | yes | ✓ | Currena dollar basket (DXY-style, ECB rates via Frankfurter) |
+| `dollar-broad` | fred | daily | 10 | L0 | yes | ✓ | Broad trade-weighted dollar index (DTWEXBGS) |
+| `dollar-eme` | fred | daily | 10 | L0 | yes | ✓ | Emerging-markets trade-weighted dollar index (DTWEXEMEGS) |
 | `ecb-dfr` | ecb | daily | 7 | L1 | yes | ✓ | ECB deposit facility rate |
 | `eia-crude-stocks` | eia | weekly | 12 | L0 | yes | – | US crude oil inventories (EIA LeafHandler, keyless) |
 | `empire-state` | fred | monthly | 60 | L2 | yes | – | Empire State manufacturing survey (the NY Fed factory diffusion, the philly-fed twin) |
 | `ebp` | frb | monthly | 75 | L0 | yes | – | The Fed Board's own excess bond premium file (the credit-cycle gauge) |
 | `epu-us` | epu | monthly | 75 | L0 | yes | – | US policy uncertainty (EPU) |
+| `etf-short-interest` | fund-pages | monthly | 75 | L2 | no | – | Gold ETF short interest (DISABLED — no licence-clean venue) |
 | `eur-usd` | frankfurter | daily | 4 | L1 | yes | – | EUR/USD |
 | `euro-aaa-10y` | ecb | daily | 7 | L1 | yes | – | Euro-area AAA 10-year yield |
 | `euro-hicp` | ecb | monthly | 60 | L1 | yes | ✓ | Euro-area inflation (yearly, HICP) |
@@ -140,9 +149,12 @@ public-display-ok · scored voter? · short description.
 | `food-index` | world-bank | monthly | 60 | L1 | yes | – | World food prices (Pink Sheet) |
 | `gdpnow` | fred | quarterly | 150 | L2 | yes | – | Atlanta Fed GDPNow: the running nowcast of the CURRENT quarter's real GDP growth (quarter-start stamps) |
 | `gilt-10y` | fred | monthly | 75 | L2 | yes | – | UK 10-year government bond yield (OECD mirror) |
+| `global-liquidity` | derived | monthly | 75 | L2 | yes | – | Global liquidity — the Fed + ECB + BoJ balance sheets, USD-converted ($trn) |
 | `gold-aud` | derived | daily | 4 | L1 | yes | – | Gold price in AUD |
 | `gold-btc` | derived | daily | 4 | L0 | yes | – | Bitcoin priced in gold (BTC per ounce) |
+| `gold-equities-ratio` | yahoo | daily | 5 | L2 | yes | – | Gold vs equities — GLD ÷ SPY same-date closes |
 | `gold-oil-ratio` | derived | daily | 3 | L2 | yes | – | Gold measured in oil (barrels per ounce) |
+| `gold-platinum` | derived | daily | 5 | L2 | yes | – | Gold measured in platinum (ounces per ounce) |
 | `gold-silver` | derived | daily | 2 | L1 | yes | ✓ | Gold / Silver ratio |
 | `gold-usd` | gold-api | daily | 2 | L2 | yes | – | Gold price (ounce) |
 | `gas-europe` | world-bank | monthly | 60 | L1 | yes | – | European natural gas price (Pink Sheet, $/mmbtu) |
@@ -174,6 +186,7 @@ public-display-ok · scored voter? · short description.
 | `m2-us` | fred | monthly | 90 | L0 | yes | – | US M2 money supply |
 | `maize` | world-bank | monthly | 60 | L1 | yes | – | Maize price (Pink Sheet) |
 | `michigan-1y-expectations` | fred | monthly | 75 | L2 | yes | – | US expected inflation next year (Michigan) |
+| `michigan-5y-expectations` | uom | monthly | 75 | L1 | yes | ✓ | US expected inflation, next 5–10 years (Michigan median, SIE Table 33; the GF-S10 voter) |
 | `median-cpi` | fred | monthly | 75 | L2 | yes | – | Cleveland Fed median CPI (12-month, the quiet-inflation middle read) |
 | `michigan-sentiment` | fred | monthly | 75 | L2 | yes | ✓ | US consumer mood (Michigan survey) |
 | `mortgage-30y` | fred | weekly | 14 | L2 | yes | – | The US 30-year home-loan rate |
@@ -181,6 +194,7 @@ public-display-ok · scored voter? · short description.
 | `net-liquidity` | derived | weekly | 21 | L0 | yes | – | Net liquidity: WALCL − TGA − RRP (the money actually available) |
 | `nfci` | fred | weekly | 14 | L2 | yes | ✓ | Chicago Fed National Financial Conditions Index |
 | `nyfed-custody` | fred | weekly | 21 | L0 | yes | – | Foreign official holdings at the New York Fed (WSEFINTL1; renders inside the TIC section) |
+| `official-gold-demand` | pboc | monthly | 45 | L2 | no | – | Official-sector gold demand, PBoC/CBR (DISABLED — venue re-find pending) |
 | `oecd-cli-cn` | oecd | monthly | 75 | L0 | yes | – | OECD leading indicator (China) |
 | `oecd-cli-de` | oecd | monthly | 75 | L0 | yes | – | OECD leading indicator (Germany) |
 | `ofr-fsi` | ofr | daily | 7 | L0 | yes | – | The OFR Financial Stress Index aggregate (the Treasury's own daily composite) |
@@ -190,15 +204,22 @@ public-display-ok · scored voter? · short description.
 | `rba-cash-rate` | rba | per-change | – | L0 | yes | – | RBA cash rate |
 | `rba-expectations` | derived | daily | 40 | L0 | yes | ✓ | What markets expect from the RBA (3-year gap) |
 | `rba-fed-gap` | derived | per-change | – | L0 | yes | ✓ | RBA−Fed policy rate gap |
+| `real-curve-10y5y` | derived | daily | 4 | L0 | yes | – | US real yield curve slope (DFII10 − DFII5) |
 | `real-yield-10y` | fred | daily | 4 | L0 | yes | ✓ | US 10-year real yield |
+| `real-yield-5y` | fred | daily | 4 | L0 | yes | ✓ | US 5-year real yield — the belly (DFII5; the GF-P3 voter) |
 | `recession-probability` | fred | monthly | 100 | L0 | yes | ✓ | US recession probability (Chauvet) |
 | `retail-sales` | fred | monthly | 75 | L0 | yes | – | US retail sales (monthly) |
 | `repo-stress` | derived | daily | 4 | L0 | yes | – | Repo funding pressure: SOFR − IORB |
 | `reverse-repo` | fred | daily | 4 | L1 | yes | – | The overnight reverse repo pile (RRPONTSYD, citation-required) |
+| `real-gold-price` | derived | monthly | 75 | L2 | yes | – | The real gold price — CPI-deflated gold (1982–84 dollars) |
+| `rstar-us` | nyfed | quarterly | 340 | L1 | yes | – | US r-star — the Holston–Laubach–Williams natural-rate estimate |
 | `sahm-rule` | fred | monthly | 75 | L0 | yes | ✓ | US recession alarm (Sahm rule) |
 | `shiller-cape` | shiller | monthly | 45 | L2 | yes | – | US share prices vs long-run earnings (Shiller CAPE) |
 | `sloos-ci-tightening` | fred | quarterly | 215 | L0 | yes | – | SLOOS: net share of US banks tightening business lending standards (DRTSCILM) |
 | `shiller-ecy` | shiller | monthly | 45 | L2 | yes | – | Excess CAPE Yield (Shiller) |
+| `sge-gold-withdrawals` | sge | monthly | 75 | L2 | yes | – | Shanghai Gold Exchange monthly withdrawals (tonnes) |
+| `shanghai-gold-premium` | derived | daily | 5 | L2 | yes | – | Shanghai vs London gold premium (SGE Au99.99 vs XAU×USD/CNY) |
+| `swiss-gold-flow` | bazg | monthly | 75 | L1 | yes | – | Swiss gold imports by country (BAZG open data, tonnes) |
 | `silver-usd` | gold-api | daily | 2 | L2 | yes | – | Silver price (ounce) |
 | `sofr` | fred | daily | 4 | L2 | yes | – | The overnight funding rate (SOFR) |
 | `sp500-breadth-ratio` | yahoo | daily | 4 | L2 | yes | – | S&P 500 equal-weight ÷ cap-weight (RSP ÷ SPY daily closes — the market-concentration PROXY, labelled; S6-M6.3; rung2 daily gate, 2 sequential Yahoo calls) |
@@ -210,6 +231,8 @@ public-display-ok · scored voter? · short description.
 | `treasury-auction-30y` | fiscaldata | monthly | 45 | L0 | yes | – | The latest 30-Year-family auction's bid-to-cover @ the auction date (ex TIPS) |
 | `treasury-auction-30y-indirect` | fiscaldata | monthly | 45 | L0 | yes | – | The same long-bond auction's indirect share of accepted (renders INSIDE the 30y card) |
 | `terms-of-trade` | abs | quarterly | 215 | L0 | yes | ✓ | Australia's terms of trade |
+| `term-premium-10y` | fred | daily | 14 | L0 | yes | – | US 10-year term premium (Kim-Wright, THREEFYTP10) |
+| `tga` | fred | weekly | 21 | L0 | yes | – | Treasury General Account balance (WTREGEN) |
 | `us-2y` | fred | daily | 4 | L0 | yes | – | US 2-year Treasury yield |
 | `us-cpi-core-yoy` | derived | monthly | 75 | L0 | yes | – | US core inflation (yearly, NSA) |
 | `us-cpi-yoy` | derived | monthly | 75 | L0 | yes | ✓ | US inflation (yearly, NSA) |
@@ -226,6 +249,7 @@ public-display-ok · scored voter? · short description.
 | `us10y` | fred | daily | 4 | L0 | yes | ✓ | US 10-year Treasury yield |
 | `us30y` | fred | daily | 4 | L0 | yes | ✓ | US 30-year Treasury yield |
 | `usdaed` | yahoo | daily | 4 | L2 | yes | – | USD/AED (UAE dirham, the pegged pair) |
+| `usdchf` | frankfurter | daily | 4 | L1 | yes | – | USD/CHF (Swiss franc) |
 | `usdcny` | frankfurter | daily | 4 | L1 | yes | – | USD/CNY |
 | `usd-reserve-share` | imf | quarterly | 200 | L1 | yes | – | USD share of world allocated FX reserves (IMF COFER, the SDMX 3.0 API at api.imf.org — the de-dollarization drift; S6-M6.3; rung2 Saturday gate; latest 56.70 % @ 2026-Q2 matches the IMF's own brief) |
 | `japan-cpi` | imf | monthly | 75 | L1 | yes | – | Japan all-items CPI YoY (the IMF SDMX 3.0 CPI dataflow, the provider's own YOY_PCH_PA_PT series; S25, BD-S23a; rung2 first-of-month gate; the mirror rides at T+0 — the Sep 2026 print 2.23 % carries the Statistics Bureau's freshest release, the 2025-base headline reads +2.1 % on the revised basket, the documented re-weighting wedge) |
@@ -235,6 +259,8 @@ public-display-ok · scored voter? · short description.
 | `usdtry` | frankfurter | daily | 4 | L1 | yes | – | USD/TRY (Turkey, EM-pressure case study) |
 | `vix` | fred | daily | 4 | L2 | yes | ✓ | Market fear gauge (VIX, Cboe via FRED) |
 | `walcl` | fred | weekly | 21 | L0 | yes | – | The Fed's balance sheet |
+| `wgc-cb-demand` | wgc | quarterly | 100 | L3 | no | – | Central-bank gold demand (DISABLED — L3 authorisation pending) |
+| `wgc-etf-holdings` | wgc | monthly | 45 | L3 | no | – | World gold ETF holdings (DISABLED — L3 authorisation pending) |
 | `wheat` | world-bank | monthly | 60 | L1 | yes | – | Wheat price (Pink Sheet) |
 | `wti` | fred | daily | 12 | L0 | yes | – | WTI crude oil |
 | `yield-curve-10y2y` | fred | daily | 4 | L2 | yes | ✓ | US 10Y minus 2Y yield |

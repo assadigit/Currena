@@ -5,6 +5,13 @@
 > Purpose: consolidate *every* indicator Currena currently fetches or computes —
 > what it is, where it comes from, how it is fetched, how it is calculated.
 > This document is the inventory baseline for the page-division project.
+>
+> **S24 reconciliation (2026-11-12):** the counts and the growth-health table
+> were reconciled onto the live registry — 187 ids (Global 149 · Australia 38;
+> 54 voters + 133 context), the three §15 D-36 Asia CPI fills (japan-cpi ·
+> korea-cpi · india-cpi, S25/BD-S23a) + `michigan-1y-expectations` (the
+> 04-side gap the D-9 audit found) added to §4.5, and §10's public line
+> updated. The per-id facts are re-derivable via `pnpm s24:d9-audit`.
 
 ---
 
@@ -13,8 +20,8 @@
 1. [Executive summary — the numbers](#1-executive-summary)
 2. [How an indicator is born — the pipeline](#2-how-an-indicator-is-born)
 3. [The data-source registry — 32 providers](#3-the-data-source-registry)
-4. [The complete 184-indicator registry (Global · 146)](#4-the-global-registry)
-5. [The complete 184-indicator registry (Australia · 38)](#5-the-australia-registry)
+4. [The complete 187-indicator registry (Global · 149)](#4-the-global-registry)
+5. [The complete 187-indicator registry (Australia · 38)](#5-the-australia-registry)
 6. [The boards beyond the registry](#6-the-boards-beyond-the-registry)
 7. [Derived indicators — every formula](#7-derived-indicators--every-formula)
 8. [The scheduling system — crons & rungs](#8-the-scheduling-system)
@@ -28,11 +35,11 @@
 
 | What | Count | Notes |
 |---|---|---|
-| **Registry indicators** | **184** | `data/indicators.json` v4 — the Insights page inventory |
-| — Global section | 146 | 8 voting gauges + 3 shadow gauges + prices board |
+| **Registry indicators** | **187** | `data/indicators.json` v4 — the Insights page inventory |
+| — Global section | 149 | 8 voting gauges + 3 shadow gauges + prices board |
 | — Australia section | 38 | 3 voting gauges + 2 shadow gauges |
 | **Scored voters** (gauge verdicts) | 54 | contribute to a question-gauge verdict |
-| **Context cards** (rule: info) | 130 | live value + 10-year position bar, never vote |
+| **Context cards** (rule: info) | 133 | live value + 10-year position bar, never vote |
 | **Data providers** | 32 | FRED 57 · derived 28 · ABS 19 · GPR 11 · World Bank 7 · … (see §3) |
 | **Boards beyond the registry** | 6 | FX (10 pairs) · World Markets (16 indexes) · AU Markets (19) · Prices live (4) · TIC (21 holders) · Companies (49, flag OFF) |
 | **Gold-meter voters** | 37 | the separate 5-lane gold balance — see the companion doc `05-GOLD-INDICATORS.md` |
@@ -47,7 +54,7 @@
 | prices-heat | global | 24 | 6 | voting gauge — "Is inflation heating up?" |
 | market-stress | global | 41 | 7 | voting gauge — "Is the system under stress?" |
 | dollar-strength | global | 9 | 5 | voting gauge — "Is the dollar strong?" |
-| growth-health | global | 27 | 10 | voting gauge — "Is growth healthy?" |
+| growth-health | global | 30 | 10 | voting gauge — "Is growth healthy?" |
 | prices-board | global | 5 | 0 | the price strip (gold, silver, btc, brent, gold-btc) |
 | geo-fragmentation | global | 8 | 0 | shadow gauge (context only) |
 | dedollar-concentration | global | 2 | 0 | shadow gauge (context only) |
@@ -261,7 +268,7 @@ single attempt, no retries, blocked-HTTP → fail closed.
 | `usdtry` | USD/TRY | Frankfurter (ECB ref) | context | daily | – |
 | `usdaed` | USD/AED | Yahoo AED=X (10 y) | ECB publishes no dirham — Yahoo only; context | daily | – |
 
-### 4.5 growth-health — "Is growth healthy?" (27 members · 10 voters)
+### 4.5 growth-health — "Is growth healthy?" (30 members · 10 voters)
 
 | id | What it is | Source · series | Process / method | Cadence | Voter |
 |---|---|---|---|---|---|
@@ -289,6 +296,10 @@ single attempt, no retries, blocked-HTTP → fail closed.
 | `us-nfp` | Non-farm payrolls change | derived PAYEMS monthly Δ | context | monthly | – |
 | `usdcny` | USD/CNY | Frankfurter | context | daily | – |
 | `copper-usd` | Copper spot, $/mt | gold-api HG × 2204.62262 | lb→t conversion; Pink Sheet history | daily | – |
+| `michigan-1y-expectations` | UoM 1y inflation expectations | FRED MICH | context (companion-only on /insights — renders inside the sentiment card) | monthly | – |
+| `japan-cpi` | Japan all-items CPI YoY | IMF SDMX 3.0 CPI dataflow (`JPN.CPI._T.YOY_PCH_PA_PT.M`) | the provider's own YoY series, full monthly history; S25/BD-S23a; T+0 mirror | monthly | – |
+| `korea-cpi` | Korea all-items CPI YoY | IMF SDMX 3.0 CPI dataflow (`KOR.CPI._T.YOY_PCH_PA_PT.M`) | same adapter; verified EXACT vs KOSTAT's own October release | monthly | – |
+| `india-cpi` | India all-items CPI YoY | IMF SDMX 3.0 CPI dataflow (`IND.CPI._T.YOY_PCH_PA_PT.M`) | same adapter; the MEASURED 1–3-month MoSPI mirror lag (maxAge 150, labelled) | monthly | – |
 
 ### 4.6 geo-fragmentation (shadow, context-only, 8 members)
 
@@ -521,8 +532,9 @@ quarterly 120 · per-change exempt — per-definition `staleAfterDays` overrides
 | L2 | Restricted — owner-accepted for display | 50 | FRED copyright series (VIXCLS, STLFSI4, breakevens, Cleveland…), Yahoo, SGE, PBoC, fund-pages |
 | L3 | Blocked — prior written permission | 2 | WGC family (wgc-etf-holdings, wgc-cb-demand) |
 
-**Public/private state (GF-S13, 2026-11-07 — "make everything public"):**
-180 of 184 ids served publicly; **4 hidden (no data)**: `etf-short-interest`,
+**Public/private state (GF-S13, 2026-11-07 — "make everything public";
+S24 count refresh: the three CPI fills serve public too):**
+183 of 187 ids served publicly; **4 hidden (no data)**: `etf-short-interest`,
 `official-gold-demand`, `wgc-cb-demand`, `wgc-etf-holdings`. All boards public
 (dated owner directives). Panic lever: `ACCESS_MODE=private` + register regen.
 

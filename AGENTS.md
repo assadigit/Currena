@@ -411,7 +411,7 @@ Package manager is **pnpm** (Node ≥ 20).
 
 **This section is the canonical on-disk record of every indicator and every
 data point the Insights page shows.** It is sourced from
-`packages/insights/src/definitions.ts` (the 161 indicators), `packages/
+`packages/insights/src/definitions.ts` (the 187 indicators), `packages/
 insights/src/markets/definitions.ts` (the 16 market indices), and
 `packages/insights/src/fx/definitions.ts` (the 10 FX pairs + the dollar
 basket + the 7 FX patterns). `data/indicators.json` is the generated
@@ -434,14 +434,23 @@ removed, renamed, or its rule/cadence/maxAge/source changes, you MUST:
 A pull request that changes an indicator without updating this section is
 incomplete and will be rejected at review.
 
-#### A. The 161 indicators (48 voting [V] + 113 context [C])
+#### A. The 187 indicators (54 voting [V] + 133 context [C])
 
 Every indicator below renders as a card on `#/insights`. `[V]` = scored
 (contributes to its gauge's verdict); `[C]` = context (value + 10-year
 position bar, never votes). `maxAge` = staleAfterDays (days before the
 "stale" tag fires; `—` = per-change/manual, never stale by age).
 
-##### GLOBAL (125 indicators, 32 voting)
+*(S24, 2026-11-12 — the D-9 audit reconciliation: this header's counts
+were re-derived from the registry (187 = 54 voting + 133 context;
+Global 149/38 · Australia 38/16) and 23 missing rows + 3 misplaced rows
+were reconciled onto their true lanes — the full record is
+`docs/page-division/06-LEGACY-RETIREMENT-S24.md` §3 + the re-runnable
+`pnpm s24:d9-audit`. The gold-system ids now carry their §A lane rows
+here AND their deep reference in `05-GOLD-INDICATORS.md` — both layers,
+the AF-4 discipline.)*
+
+##### GLOBAL (149 indicators, 38 voting)
 
 **Borrowing costs** (`borrowing-costs` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -451,6 +460,7 @@ position bar, never votes). `maxAge` = staleAfterDays (days before the
 | [V] | `us10y` | daily | 4 | any-of | fred |
 | [V] | `us30y` | daily | 4 | any-of | fred |
 | [V] | `real-yield-10y` | daily | 4 | percentile | fred |
+| [V] | `real-yield-5y` | daily | 4 | percentile | fred |
 | [V] | `fed-target` | daily | 5 | percentile | fred |
 | [V] | `ecb-dfr` | daily | 7 | percentile | ecb |
 | [V] | `fed-expectations` | daily | 4 | percentile | derived |
@@ -472,6 +482,9 @@ position bar, never votes). `maxAge` = staleAfterDays (days before the
 | [C] | `treasury-auction-30y` | monthly | 45 | info | fiscaldata |
 | [C] | `treasury-auction-30y-indirect` | monthly | 45 | info | fiscaldata |
 | [C] | `btp-bund-spread` | monthly | 75 | info | derived |
+| [C] | `real-curve-10y5y` | daily | 4 | info | derived |
+| [C] | `rstar-us` | quarterly | 340 | info | nyfed |
+| [C] | `debt-to-gdp` | quarterly | 280 | info | fred |
 
 *(gap-closure S2-M2.4, 2026-10-31: `nyfed-custody` — Treasuries held in
 custody at the New York Fed for foreign official accounts, FRED
@@ -506,11 +519,14 @@ currencies container per R9-04):
 | | id | cadence | maxAge | rule | source |
 |---|---|---|---|---|---|
 | [V] | `dollar-basket` | daily | 4 | any-of | derived |
+| [V] | `dollar-broad` | daily | 10 | percentile | fred |
+| [V] | `dollar-eme` | daily | 10 | percentile | fred |
 | [V] | `usdjpy` | daily | 4 | change | frankfurter |
 | [V] | `us-japan-10y-gap` | daily | 5 | any-of | derived |
 | [C] | `eur-usd` | daily | 4 | info | frankfurter |
 | [C] | `usdtry` | daily | 4 | info | frankfurter |
 | [C] | `usdaed` | daily | 4 | info | yahoo |
+| [C] | `usdchf` | daily | 4 | info | frankfurter |
 
 **Growth health** (`growth-health` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -573,9 +589,11 @@ packages/insights/fixtures/s25/ — BD-S23a carries the full record.)*
 |---|---|---|---|---|---|
 | [V] | `stress-stlfsi` | weekly | 14 | threshold | fred |
 | [V] | `nfci` | weekly | 14 | threshold | fred |
+| [V] | `bank-stress` | weekly | 14 | percentile | fred |
 | [V] | `vix` | daily | 4 | percentile | fred |
 | [V] | `gold-silver` | daily | 2 | percentile | derived |
 | [V] | `cftc-gold-positioning` | weekly | 12 | any-of | cftc |
+| [V] | `cftc-gold-gross-long` | weekly | 12 | any-of | cftc |
 | [C] | `walcl` | weekly | 21 | info | fred |
 | [C] | `crypto-fng` | daily | 4 | info | alternative-me |
 | [C] | `shiller-cape` | monthly | 45 | info | shiller |
@@ -600,6 +618,24 @@ packages/insights/fixtures/s25/ — BD-S23a carries the full record.)*
 | [C] | `ebp` | monthly | 75 | info | frb |
 | [C] | `ofr-fsi` | daily | 7 | info | ofr |
 | [C] | `sloos-ci-tightening` | quarterly | 215 | info | fred |
+| [C] | `global-liquidity` | monthly | 75 | info | derived |
+| [C] | `real-gold-price` | monthly | 75 | info | derived |
+| [C] | `gold-platinum` | daily | 5 | info | derived |
+| [C] | `shanghai-gold-premium` | daily | 5 | info | derived |
+| [C] | `sge-gold-withdrawals` | monthly | 75 | info | sge |
+| [C] | `swiss-gold-flow` | monthly | 75 | info | bazg |
+| [C] | `wgc-etf-holdings` | monthly | 45 | info | wgc |
+| [C] | `wgc-cb-demand` | quarterly | 100 | info | wgc |
+| [C] | `official-gold-demand` | monthly | 45 | info | pboc |
+| [C] | `etf-short-interest` | monthly | 75 | info | fund-pages |
+
+*(S24, 2026-11-12 — the gold-system block rides this lane (their registry
+group is market-stress — the Gold page's §14 homes are the PLACEMENT
+layer, not the lane); their deep reference is
+`05-GOLD-INDICATORS.md` + `docs/insights/GOLD_SYSTEM_COMPLETE_REFERENCE.md`.
+The four L3/blocked ids (wgc-etf-holdings · wgc-cb-demand ·
+official-gold-demand · etf-short-interest) are registry ids whose sources
+are DISABLED — they render as honest unavailable cards, never fetched.)*
 
 *(gap-closure S4-M4.2, 2026-11-01: the geopolitics family — the GPR
 export's threat (GPRT) and act (GPRA) sub-indices, the seven country
@@ -816,6 +852,7 @@ the wind copy keys; the rewritten prompt is in PROMPTS.md).*
 | [V] | `us-pce-core-yoy` | monthly | 95 | threshold | fred |
 | [V] | `euro-hicp` | monthly | 60 | threshold | ecb |
 | [V] | `breakeven-5y5y` | daily | 4 | threshold | fred |
+| [V] | `michigan-5y-expectations` | monthly | 75 | percentile | uom |
 | [C] | `us-cpi-core-yoy` | monthly | 75 | info | fred |
 | [C] | `us-wages` | monthly | 75 | info | fred |
 | [C] | `breakeven-10y` | daily | 4 | info | fred |
@@ -831,6 +868,10 @@ the wind copy keys; the rewritten prompt is in PROMPTS.md).*
 | [C] | `maize` | monthly | 60 | info | world-bank |
 | [C] | `median-cpi` | monthly | 75 | info | fred |
 | [C] | `sticky-cpi` | monthly | 75 | info | fred |
+| [C] | `gas-europe` | monthly | 60 | info | world-bank |
+| [C] | `cpi-nowcast` | monthly | 45 | info | cleveland |
+| [C] | `cpi-surprise` | monthly | 75 | info | derived |
+| [C] | `gold-equities-ratio` | daily | 5 | info | derived |
 
 *(gap-closure S3-M3.4, 2026-11-01: the quiet-inflation pair — `median-cpi`
 (FRED MEDCPIM158SFRBCLE, the Cleveland Fed median CPI, 12-month) and
@@ -854,9 +895,13 @@ region verdict by design):
 | [C] | `gscpi` | monthly | 75 | info | nyfed |
 | [C] | `us-spr` | weekly | 12 | info | eia |
 | [C] | `us-crude-production` | weekly | 12 | info | eia |
-| [C] | `coal-aus` | monthly | 60 | info | world-bank |
-| [C] | `lng-japan` | monthly | 60 | info | world-bank |
-| [C] | `gas-europe` | monthly | 60 | info | world-bank |
+
+*(S24, 2026-11-12 — the D-9 audit moved three rows to their true lanes:
+`coal-aus` + `lng-japan` (australia/au-trade-currency — the S4-M4.4
+§A update had grouped the Pink Sheet energy trio under this heading while
+the definitions place them in the Australian trade lane) and `gas-europe`
+(global/prices-heat — the prices lane's third fossil-fuel column). The
+lane is 8 members; the §A row set now matches the registry exactly.)*
 
 *(gap-closure S4-M4.3, 2026-11-01: the chokepoint transit cards — the IMF
 PortWatch daily transits (n_total, an ESTIMATE from ship-tracking data,
@@ -901,7 +946,7 @@ main rung's OECD-yields bulk group as its 5th id (zero new
 subrequests, the WSEFINTL1 precedent; T-16 citation-required record
 added).)*
 
-##### AUSTRALIA (36 indicators, 16 voting)
+##### AUSTRALIA (38 indicators, 16 voting)
 
 **Inflation and rates** (`au-inflation-rates` gauge):
 | | id | cadence | maxAge | rule | source |
@@ -937,6 +982,8 @@ added).)*
 | [V] | `rba-fed-gap` | per-change | — | any-of | derived |
 | [C] | `gold-aud` | daily | 4 | info | derived |
 | [C] | `iron-ore` | monthly | 60 | info | world-bank |
+| [C] | `coal-aus` | monthly | 60 | info | world-bank |
+| [C] | `lng-japan` | monthly | 60 | info | world-bank |
 | [C] | `china-property-investment` | monthly | 75 | info | nbs |
 | [C] | `china-steel-output` | monthly | 75 | info | nbs |
 
