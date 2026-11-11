@@ -6,29 +6,23 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **SESSION 26/30 (2026-11-11) — the second reserve session: the ecb
-> FIRST-CHECK follow-through (the post-fix evidence session) — DELIVERED
-> (BD-S26, no code change, no deploy; production already ≡ HEAD).** The
-> owner's kickoff supplied NO investor §19 answers, so per the kickoff's
-> own rule the slot ran the standing branch's reserve items. The first
-> check at session open (~14:05 UTC) found the live status blob still
-> PRE-FIX (generatedAt 11:57Z — the AAA leg's 12 s timeout; 51/52 green)
-> and the deployed fix `9861a927` @ 100 % not yet carried by ANY
-> scheduled rung (the first: tonight's 20:10 sweep, armed) — so NEITHER
-> kickoff branch applied and the session GENERATED the missing evidence
-> via the sanctioned belt-and-braces path (a GHA `insights-ingest`
-> dispatch on main ≡ production, run 43036550865, 14:14→14:17 UTC): the
-> FIRST post-fix full collect recorded the designed honest shape — **DFR
-> ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504** (the BSI leg rides
-> rung2's monthly gate); 50/52 rows green; `ecb-dfr` + `euro-hicp` held
-> on last-good; the run exited 1 BY DESIGN (the P1 alert). The Rule-5
-> second voice (live from the sandbox): DFR 2.5 @ 2026-11-11 · HICP 4.0
-> @ 2026-10 · AAA 3.3308865271 @ 2026-11-10 — ALL EXACT matches to the
-> served/held values (the public page stays truthful). The roulette grew
-> one venue further: the SANDBOX hit it too (the DFR control: 504 at
-> ~31 s, then 200 at ~2 s one minute later) — all three observed venues
-> now carry the per-request condition. The VERDICT: **PENDING**, riding
-> tonight's sweep + tomorrow's rungs.**
+> **SESSION 27/30 (2026-11-11) — the third reserve session (the buffer slot):
+> the ecb first-check ROUND 3 + the buffer health pass — OPENED.** The owner's
+> kickoff supplied NO investor §19 answers and NO §19.6 sign-off, so per the
+> kickoff's own rule the slot runs the reserve branch (the retirement
+> execution stays untouched, behind Gate 0). The FIRST CHECK at session open
+> (~17:07 UTC) read the live status blob still the S26 evidence run
+> (generatedAt 14:15:19Z — DFR ❌ 504 · AAA ✅ · HICP ❌ 504, the designed
+> honest shape) with production `9861a927` @ 100 % verified — the session
+> opened ~3 h BEFORE tonight's armed 20:10 sweep (the FIRST scheduled
+> carrier of the new code), so neither first-check branch applies YET.
+> Session shape: (M1) the first-check reading recorded; (M2) the buffer
+> health pass while the sweep approaches (the full gates + the D-9 standing
+> audit + the live pd-* backtests); (M3) the sweep outcome read at ~20:15
+> UTC (green ecb rows → the maintenance item CLOSES; failed rows → the
+> evidence round recorded, verdict PENDING on the multi-day criterion; no
+> blob update → the ~19:00 KV cap ate the writes, harmless by design, the
+> verdict rides tomorrow's 04:10–04:40 rungs); (M4) the records + the close.
 
 ## Current state (after the S26 close)
 
