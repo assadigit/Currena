@@ -199,7 +199,9 @@ regeneration (`pnpm placement:generate`).
   placed cards (China 7 · Japan 3 · Korea/Taiwan/HK 1 · India 1 ·
   Pacific-NZ 2, the two index-only sections retired), pd-s14 extended to
   the 14 cards, the spec-v2 diff grown (AF-8). DEPLOYED as currena-api
-  `2c61c187` (the markets worker untouched) + the KV seed; a duplicate
+  `2c61c187` (the fill build) + `33ff60c0` (the KV-seed patch fix —
+  patchInsightsSnapshot now ADDS fresh-card readings, a bug the live
+  seed exposed) + the KV seed (the three readings LIVE); a duplicate
   arrival landed the build (BD-S23-parallel — the pushed implementation
   governs, the duplicate archived on archive/s23-duplicate-m2-m5, the
   shipped tree independently re-verified: the gates 15,267 ALL GREEN).

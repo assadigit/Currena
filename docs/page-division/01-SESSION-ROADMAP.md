@@ -1722,9 +1722,11 @@ two index-only sections retired), the fa copy through the manifest
 (AF-8). A duplicate arrival landed the build (BD-S23-parallel — the
 pushed implementation governs, the duplicate preserved on
 archive/s23-duplicate-m2-m5, the shipped tree independently
-re-verified); the deploy is currena-api `2c61c187` (the markets worker
-untouched, code-unchanged) + the KV seed (rung2-run --imf-cpi). The
-gates ALL GREEN on the shipped tree (15,267).
+re-verified); the deploys are currena-api `2c61c187` (the fill build) + `33ff60c0`
+(the KV-seed patch fix — patchInsightsSnapshot now ADDS fresh-card
+readings; the markets worker untouched, code-unchanged) + the KV seed
+(rung2-run --imf-cpi — the three readings LIVE). The gates ALL GREEN on
+the shipped tree (15,267) and with the fix (15,268).
 
 ### ☐ S26–S30 — Fix rounds · performance · retirement execution
 - Buffer sessions for anything red, slow, or delayed; the final legacy
@@ -1748,7 +1750,7 @@ gates ALL GREEN on the shipped tree (15,267).
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
 | K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ☐ S24 |
-| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + the KV seed, /asia-pacific's 14 cards, the registry 187, AF-8, the gates 15,267 green) · ☐ S26–S30 buffer |
+| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ☐ S26–S30 buffer |
 
 **Current position: Session 23/30 delivered (the PULLED-FORWARD S25 —
 the §15 Asia CPI fill session) 2026-11-12 · 7 remaining. The three D-36
@@ -1758,7 +1760,8 @@ three national-bureau second voices; the FRED OECD mirror family is
 DEAD, BD-S14a — never re-try those ids); the registry is 187 ids; the
 /asia-pacific page renders its 14 placed cards (the two index-only
 sections retired with their fills landed); production runs currena-api
-`2c61c187` (the fill deploy) + currena-markets `8f63c8fa` (unchanged).
+`33ff60c0` (the fill build `2c61c187` + the KV-seed patch fix) +
+currena-markets `8f63c8fa` (unchanged).
 A duplicate arrival landed the build (BD-S23-parallel — the pushed
 implementation governs, the duplicate archived, the shipped tree
 independently re-verified, the KV write-cap finding recorded).

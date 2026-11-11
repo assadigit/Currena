@@ -7,6 +7,28 @@ than a semver tag.
 
 ## [2026-11-12] page-division S25 fill session (the PULLED-FORWARD Session 23 slot, BD-S22): **THE THREE §15 D-36 ASIA CPI FILLS LANDED (Japan · Korea · India CPI YoY) — the IMF's own SDMX 3.0 CPI dataflow, Rule 5 verified at BOTH venues + against the three national bureaus (BD-S23a); the full §A ingest discipline; the three cards rendered on /asia-pacific with the §21 trio + the fa copy through the manifest; the registry 184 → 187 ids; pd-s14 extended to the 14 cards; the spec-v2 diff grown (AF-8 — the dead FRED-mirror candidate recorded, the spec untouched); SHIPS with this session's deploy.**
 
+- **The session's close (the parallel reconciliation + the live landing,
+  BD-S23-parallel):** a duplicate arrival landed the build on origin/main
+  (the pushed implementation governs; the duplicate preserved on
+  `archive/s23-duplicate-m2-m5`; the shipped tree independently
+  re-verified — this session's own live IMF fetches matching the fixtures'
+  tails EXACTLY, the full gates ALL GREEN 2m 45s / 15,267, the 4-leg
+  browser pass). TWO deploys + the KV seed land it live: currena-api
+  `2c61c187` (the fill build) + `33ff60c0` (the KV-seed patch fix —
+  `patchInsightsSnapshot` now ADDS readings for ids the stored snapshot
+  lacks [the fresh-card bootstrap]; the live seed exposed the old
+  replace-only walk dropping the three fresh rows — the Worker's own 04:20
+  rung2 phase carried the same bug) + `rung2-run --imf-cpi` (the KV write
+  cap HTTP 429 10048 hit at 23:24 UTC, the documented daily exhaustion;
+  the re-run after the 00:00 UTC reset landed the readings). LIVE VERIFIED:
+  the public snapshot carries the three readings (2.232142857142857 @
+  2026-09-30 pct10y 64% · 2.818940555271674 @ 2026-10-31 pct10y 73% ·
+  4.44121915820029 @ 2026-07-31 pct10y 46% — the BD-S23a values); the live
+  pd-s14 §21 diff 14/14 green; the live browser pass both widths × both
+  locales (Japan 2.2% · Korea 2.8% · India 4.4%, the fa legs ۲٫۲٪ · ۲٫۸٪ ·
+  ۴٫۴٪) with ZERO console/page errors; the 10-route smoke all 200. The
+  gates with the fix: 15,268 ALL GREEN. **Session 23/30 · 7 remaining.**
+
 - **The source (BD-S23a):** the IMF's dedicated CPI dataflow on api.imf.org
   (the COFER venue — keyless, L1, one filtered request per country:
   `{CC}.CPI._T.YOY_PCH_PA_PT.M`), carrying the provider's OWN

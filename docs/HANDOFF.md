@@ -7,191 +7,151 @@
 > first, and it never replaces those records.
 
 > **SESSION 23/30 (2026-11-12) — the PULLED-FORWARD reserve session: S25,
-> the §15 Asia CPI fill session (BD-S22). GOAL: land the three D-36 Asia
-> fills (Japan · Korea · India CPI YoY) end to end — the viable monthly
-> source picked + verified (Rule 5, sandbox AND Worker egress, BD-S23a),
-> the full §A ingest discipline (definitions → registry:generate → the
-> AGENTS §A inventory → INDICATORS_AND_DATA_SOURCES.md → the pin tests →
-> CHANGELOG), the three cards rendered on /asia-pacific with the §21 trio
-> + the fa copy through the manifest, pd-s14 extended, the spec-v2 diff
-> grown (recorded, never silent edits), gates ALL GREEN, DEPLOY + live
-> verify. Milestones: M0 setup · M1 source verification (BD-S23a) · M2
-> engine ingest · M3 display layer · M4 spec-v2 diff · M5 gates · M6
-> deploy + live verify + records.**
+> the §15 Asia CPI fill session — DELIVERED AND VERIFIED LIVE (BD-S22 ·
+> BD-S23a · BD-S23-parallel).** The three D-36 fills (japan-cpi ·
+> korea-cpi · india-cpi) are LIVE from the IMF's own SDMX 3.0 CPI
+> dataflow: the full §A ingest discipline, the /asia-pacific page's 14
+> placed cards (the two index-only sections retired), the registry 187
+> ids, the spec-v2 diff grown (AF-8), TWO deploys + the KV seed + the
+> live §21 verify 14/14 green. A duplicate arrival landed the build
+> (BD-S23-parallel — the pushed implementation governs, the duplicate
+> archived, the shipped tree independently re-verified); this session ran
+> the counterpart close: the KV seed + the KV-seed patch fix
+> (`patchInsightsSnapshot` now ADDS fresh-card readings — the live seed
+> exposed the old replace-only walk dropping them) + the live acceptance
+> + every record.**
 
-> **S22 (2026-11-12) — the Phase K collection slot, CLOSED AS A WAITING
-> SLOT · Session 22/30 · 8 remaining (BD-S22).** The external investor's
-> review of spec §19 was NOT yet arranged — verified against every
-> record the program can read (no answers supplied with the session
-> kickoff; origin/main at HEAD `384dfd1` = the S21 counterpart close,
-> nothing past the S21 records; the GitHub issues/PRs hold nothing since
-> PR #47 [2026-11-08]; no uploaded file; the owner-side lever standing
-> unanswered) — so, per the owner's standing instruction for this slot
-> and the roadmap's own reserve rule, the slot closed honestly: NO
-> answers collected, NO D-49+ recorded (the strategy log §5 carries the
-> Round-4 PENDING marker — the answers land there as D-49+ the moment
-> they exist), NO spec v2 entries produced, and the AF-1…AF-7 spec-side
-> drift findings REMAIN parked for the spec v2 pass (never silent edits
-> — the spec file untouched). NO deploy — a records session; nothing
-> was fixed, so nothing shipped. The reserve pull-forward: **the §15
-> Asia CPI fill session (the dedicated fill session carried since S14,
-> BD-S14a/BD-S15d) is pulled forward into the Session 23 slot**; S23's
-> feedback-build scope is DEFERRED (blocked on the same investor input
-> — it runs in the first free slot after the answers land and the spec
-> v2 entries exist). The full gates re-run ALL GREEN on the
-> records-only tree (2m 39s · the suite 15,102 — exactly the S21
-> count, no code changed · every doc-sensitive gate green over the
-> touched docs).
+## Current state (2026-11-11 ~00:15 UTC, after the S23 close)
 
-## Current state (2026-11-12, after the S22 waiting-slot close)
+- **Program:** page-division — all TEN destinations render their own
+  pages; Phases A–J CLOSED; **S25 (the §15 Asia CPI fill session)
+  DELIVERED in the Session 23 slot**. Phase K remains: the investor
+  round waits on the owner's lever; S23's feedback-build scope stays
+  DEFERRED (blocked on the same input); S24 (legacy retirement
+  readiness) is next.
+- **DEPLOYED LIVE: currena-api `33ff60c0`** (the fill build `2c61c187` +
+  the KV-seed patch fix — the SPA byte-identical `index-De-odUOp.js`) +
+  **currena-markets `8f63c8fa`** (unchanged). The three fill readings
+  are LIVE in the KV snapshot (japan-cpi 2.232142857142857 @ 2026-09-30
+  pct10y 64% · korea-cpi 2.818940555271674 @ 2026-10-31 pct10y 73% ·
+  india-cpi 4.44121915820029 @ 2026-07-31 pct10y 46%). Rollback stays
+  one `npx wrangler rollback` from apps/api (→ the S21 shape
+  `5593fd43`; the fill readings survive as plain snapshot rows).
+- **Gates (last full runs, BOTH green):** the shipped fill build — ALL
+  GREEN 2m 45s (suite 15,267); with the patch fix — ALL GREEN 2m 44s
+  (suite **15,268**, +1 the fresh-card-bootstrap regression test;
+  secret scan 8/1025 · typecheck 6/6 · eslint 0/0 · copy:audit clean ·
+  narrator 193×2 + eval 50 · layer1 11,969/11,969 · build + budgets
+  held — entry 272.88/82.55, the AsiaPage chunk 16.20/4.07 within its
+  re-based 16.5/6.0 row).
+- **The S23 surfaces (what changed where):** the engine (schemas enum
+  +3, definitions +3 [global/growth-health, context-only, P2, source
+  imf], the adapters/imf-cpi.ts + 15 tests + fixtures/s25, the rung2
+  imfCpiMonthly wiring + the rung2-run --imf-cpi lever, READING_SOURCES
+  +3, the imf register row + licence) · the display (placement japan
+  2→3 + korea-taiwan-hk/india gain their cards — 11→14; asia-tiles +
+  AsiaTierCards/AsiaPage; the full corpus INDICATORS + layer1 entries
+  EN + fa; the i18n pd.asiaPacific copy; the manifest round-83) · the
+  records (AGENTS §A rows + the count reconciliation [the registry's
+  true count 187 = 54 voting + 133 context], INDICATORS_AND_DATA_SOURCES
+  §1/§2, CHANGELOG, DEPLOY.md's S23 record, BD-S23a + BD-S23-parallel,
+  AF-8, the roadmap + README program state) · pd-s14 extended to the
+  14 cards.
+- **The parallel-session note (BD-S23-parallel):** a duplicate arrival
+  landed M0–M5 on origin/main; the pushed implementation governs (the
+  recorded deltas: growth-health lane · P2 phase · decade-trimmed
+  fixtures · layer1 entries included · the 16.5/6.0 budget row), the
+  duplicate is preserved on the local branch
+  `archive/s23-duplicate-m2-m5`, and the shipped tree was independently
+  re-verified before this session continued with the deploy-side work.
+  The KV write cap (HTTP 429 10048, the documented daily exhaustion) and
+  the patch-drop bug were both found LIVE and are recorded in
+  BD-S23-parallel + DEPLOY.md.
 
-- **Program:** page-division — splitting the all-in-one Insights page
-  into 10 destinations per D-1…D-48. **All TEN destinations render
-  their own pages; Phases A–J are CLOSED** (S1 scaffold & navigation ·
-  S2 data layer + `PLACEMENT.generated.md` · S3–S4 Global · S5–S6 Gold
-  · S7–S8 World Markets + the zoom maps · S9–S11 USA · S12–S13 Europe
-  · S14–S15 Asia · S16 Australia · S17 Commodities · S18 Currencies ·
-  S19–S21 Integration). **Phase K is OPEN and WAITING on the
-  investor**: S22 closed as a waiting slot (no answers to collect);
-  S23 (feedback build) deferred; S24 (legacy retirement readiness)
-  pending. The reserve work fills the gap — the §15 Asia CPI fill
-  session pulled forward into the Session 23 slot.
-- **DEPLOYED LIVE: currena-api `5593fd43`** (the S21 SPA — the NZX50
-  mirror card + the honest copy + the Global cached-header fix) +
-  **currena-markets `8f63c8fa`** (the S18 markets worker) —
-  **UNCHANGED this session** (no deploy: a records session, nothing was
-  fixed). Rollback stays one `npx wrangler rollback` from apps/api
-  (every surface returns to the S19 shape `74777037`).
-- **Gates (last full run, S22 on the records-only tree — ALL GREEN,
-  2m 39s):** secret scan 8/1020 · typecheck 6/6 · eslint 0/0 ·
-  copy:audit clean · narrator in sync + eval 50 · layer1
-  11,819/11,819 · **the suite 15,102 — exactly the S21 count (zero
-  code changed this session)** · build + budgets held (entry
-  272.88/82.55, every page chunk within its row).
-- **The S22 surfaces (what changed where):** records only — DECISIONS
-  BD-S22 · the roadmap (the ⏸/⏭ legend markers + the S22
-  waiting-close record + the S23 deferral + the S25 pull-forward entry
-  + the progress board + the current-position note) · the strategy
-  log (the Round-4 PENDING marker + the Phase-3 plan row) · CHANGELOG ·
-  this file · the page-division README program state. Zero code, zero
-  spec text, zero deploy.
-
-## Next session (Session 23/30 — the PULLED-FORWARD reserve session: S25, the §15 Asia CPI fill session)
+## Next session (Session 24/30 — the legacy retirement readiness review)
 
 Read `AGENTS.md` (§14 — the owner's rules, incl. the §A indicator
 maintenance discipline) first, then `docs/page-division/
-01-SESSION-ROADMAP.md` (the S25 pulled-forward entry + the
-current-position note), `02-PAGE-DIVISION-SPEC.md` §15 + §9 (the fills
-+ the Asia sub-region sections), `docs/DECISIONS.md` (BD-S14a/BD-S15d
-— the stale FRED-mirror evidence; BD-S22 — the pull-forward), and this
-file. **This session SHIPS code → deploy + live verify at the close
-(per DEPLOY.md).** Scope (the fill session):
+01-SESSION-ROADMAP.md` (the S24 entry + the progress board + the
+current-position note), `02-PAGE-DIVISION-SPEC.md` §13 (legacy &
+retirement), `docs/DECISIONS.md` (D-9; BD-S22/BD-S23a/BD-S23-parallel),
+and this file. **Scope (S24):** the D-9 audit — every indicator verified
+categorized; the retirement checklist produced (execution itself may
+wait for a burn-in period — investor question §19.6). **If the
+investor's answers to spec §19 arrive before the session starts, run
+the investor round INSTEAD** (collect → D-49+ in the strategy log §5
+Round 4 → the spec v2 entries — the AF-1…AF-8 findings ride that pass,
+never silent edits); the owner's kickoff prompt decides.
 
-1. **Pick a viable monthly source** for the three D-36 Asia fills
-   (Japan · Korea · India CPI YoY): the national statistics bureaus
-   directly (the Statistics Bureau of Japan, KOSTAT, MoSPI), a fresh
-   FRED/IMF IFS series, or the World Bank annual as the
-   lower-resolution fallback. **The FRED OECD mirror family is DEAD**
-   (JPNCPIALLMINMEI + CPALTT01JPM659N end 2021-06; the KR pair ends
-   2023-11; the IN pair ends 2025-03 — verified live in S14,
-   BD-S14a); never re-try those ids.
-2. **Verify before ingest (Rule 5):** candidate series verified live
-   against the publisher — value + vintage — from this sandbox AND
-   from production egress (the temp-probe pattern); unverifiable →
-   discarded and recorded (DECISIONS.md).
-3. **Ingest with the full §A discipline:** the definitions edit →
-   `pnpm registry:generate` → the AGENTS.md §A inventory row →
-   `docs/INDICATORS_AND_DATA_SOURCES.md` §1/§2 → the pin tests →
-   `CHANGELOG.md`.
-4. **Render the three cards on /asia-pacific** (Japan 2→3 · the
-   Korea/Taiwan/HK + India sub-regions gain their CPI cards) with the
-   §21 trio + the fa copy through the manifest; extend
-   `pd-s14-backtest.ts`; the spec-v2 diff grows to cover the new
-   cards (the spec §15 table rides the v2 pass — no silent edits).
-5. **Gates:** source verification green at both venues · the
-   registry/inventory/doc tables reconciled · the suite green · the
-   §21 diff green incl. the new cards · the browser pass · deploy +
-   live verify.
+### Operational notes worth carrying
 
-### The §15 FRED-only CPI fills for Asia — now the pulled-forward Session 23 scope (BD-S14a / BD-S15d / BD-S22)
-
-The three D-36 fills (Japan · Korea · India CPI YoY) stay
-verified-pending-ingest (Rule 5). The FRED OECD mirror family
-candidates were VERIFIED STALE/discontinued live in S14 (BD-S14a):
-JPNCPIALLMINMEI + CPALTT01JPM659N end 2021-06; KORCPIALLMINMEI +
-CPALTT01KRM659N end 2023-11; INDCPIALLMINMEI + CPALTT01INM659N end
-2025-03. The World Bank FP.CPI.TOTL.ZG (annual, fresh through 2025) is
-a viable alternative but a DIFFERENT cadence + provider than the spec
-§15 names. The national statistics bureaus (the Statistics Bureau of
-Japan, KOSTAT, MoSPI) publish fresh monthly CPI but are NOT
-already-integrated providers. The candidates + the alternative sources
-are recorded in DECISIONS.md (BD-S14a + BD-S15d). **A dedicated fill
-session picks a viable monthly source, verifies from production egress,
-then ingests with the full §A discipline; the spec-v2 diff grows to
-cover the new cards.** Their absence does not make the 11 placed Asia
-cards "in build" — the chip retired at the S15 gates pass (BD-S15c).
+- **The KV write cap:** the account's free-tier daily KV quota exhausts
+  ~19:00 UTC (HTTP 429 10048 on the REST path) — any manual KV seeding
+  (rung2-run / fx-run / markets-au-run) after ~19:00 UTC waits for the
+  00:00 UTC reset; the 04:10/04:20 UTC Worker rungs always land in the
+  fresh window (DEPLOY.md's insights-ingestion note).
+- **The fresh-card bootstrap is FIXED:** `patchInsightsSnapshot` now
+  ADDS readings for ids the stored snapshot lacks (the regression test
+  pins the exact production shape) — any future fill family lands
+  cleanly on its first phase run.
+- The three fill cards' first month rides the manual seed; the normal
+  cadence takes over at the next first-of-month rung2 gate (Dec 1 UTC)
+  — JP/KR at T+0, IN at its measured T+1..T+3-month mirror lag (maxAge
+  150, labelled in copy).
 
 ## Owner-side levers waiting
 
 1. **Arrange the external investor's review of the spec (§19 — the
-   seven questions): Phase K's input and THE top lever.** The S22
-   collection re-opens at the next free slot the moment the answers
-   exist (→ D-49+ in the strategy log §5 Round 4 → the spec v2 entries,
-   with AF-1…AF-7 riding that pass); S23's feedback-build scope follows
-   it.
+   seven questions): Phase K's input and THE top lever.** The investor
+   round re-opens at the next free slot the moment the answers exist
+   (→ D-49+ in the strategy log §5 Round 4 → the spec v2 entries, with
+   AF-1…AF-8 riding that pass); S23's deferred feedback-build scope
+   follows it.
 2. Ratify the `/converter` relocation (S1's build-session decision).
 3. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement; RENDERED on /usa tier-3).
-4. Ratify or redirect the BD-S3…BD-S22 decision set (the latest:
-   **BD-S22** — the S22 waiting-slot close + the §15 fill-session
-   pull-forward; all recorded, none blocking).
-5. Triage the queued unreviewed fa strings (now ~1146: the ~1142
-   previous + the 2 S21 strings; every session's corpus-pinned values
-   are verified byte-for-byte by their copy-pin tests).
+4. Ratify or redirect the BD-S3…BD-S23 decision set (the latest:
+   **BD-S23-parallel** — the duplicate Session-23 arrival reconciled
+   onto the pushed implementation; all recorded, none blocking).
+5. Triage the queued unreviewed fa strings (now ~1230: the ~1184
+   previous + the 42 round-83 S23 strings + 4 needs-review intros;
+   every session's corpus-pinned values are verified byte-for-byte by
+   their copy-pin tests).
 6. The ecb-drf provider timeout (a maintenance-session item, queued
-   behind the fill session): the S18/S19 data-refresh runs kept it
-   held on last-good (2.5%, flagged stale) — it did NOT self-clear
-   across rungs (gold-aud, the other S18 transient, DID self-clear).
-   The fail-closed design is holding the correct value honestly; a
-   maintenance session should look at the ECB fetch (the runbook:
-   docs/INDICATORS_AND_DATA_SOURCES.md + the /admin console's
-   per-source status, which needs the owner's REFRESH_SECRET).
+   behind the fill session): the S18/S19 data-refresh runs kept it held
+   on last-good (2.5%, flagged stale) — it did NOT self-clear across
+   rungs. The fail-closed design is holding the correct value honestly;
+   a maintenance session should look at the ECB fetch (the runbook: the
+   /admin console's per-source status, which needs the owner's
+   REFRESH_SECRET).
 
 ## Known state worth knowing
 
 - **The PortWatch runbook note (BD-S21e):** never run the §21 data
   audit's portwatch leg Tuesdays 11:00–14:00 UTC — the IMF's scheduled
-  maintenance window ("Every Tuesday from 6:00 AM to 9:00 AM ET, Daily
-  Ports and Daily Chokepoints Data will be temporarily unavailable");
-  the endpoint answers 499 Token Required to everything inside the
-  window and returns after it.
+  maintenance window; the endpoint answers 499 Token Required inside
+  the window and returns after it.
 - The S19 meta/OG pass is CLIENT-SIDE (the SPA-honest approach,
   BD-S19c): JS-executing readers get the per-route tags; non-JS
-  crawlers see the static whole-product defaults in index.html. If the
-  owner ever wants per-route link previews for non-JS crawlers
-  (Telegram/X cards), the options are SSR/prerender or a Worker-side
-  <head> injection — an owner decision, recorded in BD-S19c.
-- The breadcrumbs render in the pages' ready + cached states (they
-  ride each page's own heading block — BD-S19b). The loading/error
-  states show the page's own honest lines, no trail; that is by design
-  (the trail is wayfinding for content, not a chrome element).
+  crawlers see the static whole-product defaults in index.html.
 - The strategy log's §8 session table (docs/page-division/
   03-STRATEGY-LOG.md) stops at S11 — the later sessions' records live
-  in the roadmap delivery records + this file (the convention moved at
-  S12). A back-fill is a nice-to-have, never blocking.
+  in the roadmap delivery records + this file. A back-fill is a
+  nice-to-have, never blocking.
 - The per-page live backtests (the S20 toolkit): pd-s4 (Global 84) ·
   pd-s5 (Gold 150) · pd-s7 (World Markets 56) · pd-s8 (zooms 13) ·
-  pd-s9/s10 (USA 69/173) · pd-s12 (Europe 8) · pd-s14 (Asia 11) ·
-  pd-s16 (Australia 28) · pd-s17 (Commodities 24) · pd-s18
-  (Currencies: cards + rules + board) — all re-runnable against
-  production from apps/web/scripts/ (pass `--base https://currena.ir`
-  where the default is localhost).
-- The S20 data-audit tool is re-runnable for any later session's §21
-  data-audit gate: `pnpm --filter @currena/web exec tsx
-  ../../apps/web/scripts/pd-s20-data-audit.ts` (mind the PortWatch
-  Tuesday window above).
-- **The parallel-session rule (hardened through BD-S18-parallel-3 and
-  BD-S21-parallel):** launch exactly ONE session per roadmap slot —
-  one prompt = one session = one slot. If a kickoff arrives for a slot
-  already delivered (origin/main carries its records), run the
-  counterpart close, never a re-execution.
+  pd-s9/s10 (USA 69/173) · pd-s12 (Europe 8) · **pd-s14 (Asia 14 — the
+  S23 extension)** · pd-s16 (Australia 28) · pd-s17 (Commodities 24) ·
+  pd-s18 (Currencies) — all re-runnable against production from
+  apps/web/scripts/ (pass `--base https://currena.ir`).
+- The S20 data-audit tool is re-runnable: `pnpm --filter @currena/web
+  exec tsx ../../apps/web/scripts/pd-s20-data-audit.ts` (mind the
+  PortWatch Tuesday window above).
+- **The parallel-session rule (hardened through BD-S18-parallel-3,
+  BD-S21-parallel, and now BD-S23-parallel):** launch exactly ONE
+  session per roadmap slot — one prompt = one session = one slot. If a
+  kickoff arrives for a slot already delivered (origin/main carries its
+  records), run the counterpart close, never a re-execution; if a
+  duplicate is already PUSHED, reconcile onto it (the pushed
+  implementation governs), archive the local duplicate, independently
+  re-verify, and finish the slot's remaining milestones.

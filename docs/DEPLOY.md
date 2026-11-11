@@ -132,6 +132,75 @@ the fix is owner-side at github.com/settings/billing (payment method /
 spending limit). Keep the local-gate discipline regardless: `pnpm gates`
 green before every deploy is the runbook rule, CI or not.
 
+## Session record — 2026-11-12 the page-division S23 deploy (the pulled-forward S25 fill session — the three §15 Asia CPI fills LIVE on /asia-pacific: Japan 2.2% · Korea 2.8% · India 4.4%, plus the KV-seed patch fix)
+
+**Scope (page-division S23, the pulled-forward S25 — the §15 Asia CPI fill
+session):** engine + display (the three D-36 fills japan-cpi · korea-cpi ·
+india-cpi from the IMF SDMX 3.0 CPI dataflow, BD-S23a) + the parallel-session
+reconciliation (BD-S23-parallel) + the KV-seed patch fix. TWO deploys + the
+KV seed land the session:
+
+1. **currena-api `2c61c187`** @ 100% (2026-11-10 ~23:04 UTC — the parallel
+   arrival's deploy of the fill build, M0–M5: the new Worker code + the new
+   SPA; the deployed entry chunk `index-De-odUOp.js` byte-matches the local
+   build of `5ce9925`). currena-markets UNTOUCHED (`8f63c8fa` — the
+   code-unchanged convention, verified via `wrangler deployments list`).
+2. **The KV seed** (`rung2-run --imf-cpi`, the landing lever — the
+   markets-au-run "Path B" pattern applied to the insights snapshot family):
+   the first attempt 2026-11-10 23:24 UTC fetched all three series GREEN but
+   the KV WRITE hit the account's daily free-tier cap (HTTP 429 code 10048 —
+   the documented ~19:00-UTC exhaustion, this runbook's insights-ingestion
+   note; the phase aborted BEFORE any write). The re-run after the 00:00 UTC
+   counter reset (2026-11-11 00:02:55 UTC) wrote — and EXPOSED THE PATCH
+   BUG: the phase patched snapshot + public + status, yet the written
+   snapshot still lacked the three rows (the old replace-only
+   `patchInsightsSnapshot` walk silently dropped readings whose ids the
+   stored snapshot never carried — a fresh card's first landing could never
+   stick; the Worker's own 04:20 rung2 phase carried the same bug).
+3. **currena-api `33ff60c0`** @ 100% (2026-11-11 00:09 UTC — THIS session's
+   fix deploy: `patchInsightsSnapshot` now ADDS readings for ids the stored
+   snapshot lacks [the fresh-card bootstrap] while keeping every stored row
+   byte-equal; the regression test reproduces the exact production shape).
+   The SPA is byte-identical to `2c61c187`'s (the fix is Worker-side only —
+   the deployed entry chunk stays `index-De-odUOp.js`). The seed re-ran
+   clean (00:10 UTC): snapshot + public patched, +3 status rows, the three
+   readings LIVE.
+
+**Gates before the fix deploy (ALL GREEN, 2m 44s):** secret scan 8/1025 ·
+typecheck 6/6 · eslint 0/0 · copy:audit clean · narrator 193×2 + eval 50 ·
+layer1 11,969/11,969 · the suite **15,268** (+1 — the fresh-card-bootstrap
+regression test) · build + budgets held (entry 272.88/82.55 · the AsiaPage
+chunk 16.20/4.07 within its 16.5/6.0 row). The shipped fill build itself
+was independently re-verified by the second arrival (BD-S23-parallel): the
+full gates ALL GREEN 2m 45s (15,267) + this session's OWN live fetches
+matching the fixtures' tails EXACTLY (JPN 2.232142857142857 @ 2026-M09 ·
+KOR 2.818940555271674 @ 2026-M10 · IND 4.44121915820029 @ 2026-M07).
+
+**Live acceptance (ALL GREEN on currena.ir):** the public snapshot carries
+the three readings (japan-cpi 2.232142857142857 @ 2026-09-30 pct10y 64% ·
+korea-cpi 2.818940555271674 @ 2026-10-31 pct10y 73% · india-cpi
+4.44121915820029 @ 2026-07-31 pct10y 46% — exactly the BD-S23a-verified
+values); the Asia projection carries all 14 readings, absentIds []; **the
+live pd-s14 §21 diff: 14 cards · 14 green · 0 red** (page ≡ engine
+byte-for-byte — the three fills' trio inputs identical on both sides), the
+five placement groups seated (china 7 / japan 3 / korea-taiwan-hk 1 /
+india 1 / pacific-nz 2), the freshness audit honest (14 within grace); the
+live browser pass at BOTH widths × BOTH locales: EN 1440×900 (the three
+cards with their live values — Japan inflation (yearly) 2.2% typical ·
+Data as of Sep 30, 2026 · Korea 2.8% Oct 31, 2026 · India 4.4% Jul 31,
+2026 · the zoom's 6 indices · 0px overflow) · EN 360×844 (2.2% renders ·
+0px overflow) · fa/RTL 360×844 (dir=rtl · the Persian card names + Persian
+digits — ۲٫۲٪ · ۲٫۸٪ · ۴٫۴٪ — + the Jalali as-of dates · 0px overflow) ·
+fa 1440×900 — ZERO console/page errors on every leg; the 10-route smoke
+all 200; the deployed entry chunk byte-verified identical.
+
+**Rollback:** one `npx wrangler rollback` from apps/api — every surface
+returns to the S21 shape (`5593fd43`); the KV snapshot survives rollbacks
+(schema-validated on read). The three fill readings would keep serving
+from the stored snapshot (the readings are plain snapshot rows — an older
+Worker serves them fine; the patch fix only matters for the NEXT
+fresh-family bootstrap).
+
 ## Session record — 2026-11-12 the page-division S21 deploy (the spec-vs-implementation audit's fixes — the NZX50 mirror card on /asia-pacific + the Global cached-header alignment + the honest copy, live for every visitor)
 
 **Scope (page-division S21, Phase J continues):** display-layer ONLY —
