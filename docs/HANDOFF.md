@@ -6,6 +6,27 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **SESSION 28/30 (2026-11-11, opened 22:01 UTC) — the fourth reserve
+> session (the buffer slot): the ecb first-check ROUND 4 (the early
+> read) + the belt-and-braces evidence run + the buffer health pass.**
+> The owner's kickoff supplied NO investor §19 answers and NO §19.6
+> sign-off, so per the kickoff's own rule the slot runs the reserve
+> branch (the retirement execution untouched behind Gate 0). The
+> parallel-session rule verified: origin/main at HEAD `efc98e7` = the
+> S27 counterpart close; no S28 records exist. The session opened
+> ~1.5 h after the S27 close — BEFORE the round-4 evidence window (the
+> 2026-11-12 04:10–04:40 Worker rungs): the first check read the blob
+> still the S26 evidence run (generatedAt 14:15:19Z — DFR ❌ 504 ·
+> AAA ✅ · HICP ❌ 504, 50/52 green) with production `9861a927`
+> (newest of 362 api versions, created 12:21:25Z — nothing newer) and
+> no insights-ingest run since the 14:14 dispatch. NEW evidence: the
+> :13 prices write landed at 21:13:18Z — the KV write budget ALIVE an
+> hour past the S27 close — so the session dispatched the sanctioned
+> belt-and-braces run (GHA insights-ingest, run 91, 22:07:46Z) to
+> generate the round-4 evidence tonight; the designed fallback intact
+> either way (a refused write leaves the blob unchanged; the morning
+> rungs own the heal).
+
 > **SESSION 27/30 (2026-11-11) — the third reserve session (the buffer
 > slot): the ecb first-check ROUND 3 + the buffer health pass — CLOSED
 > (BD-S27).** The owner's kickoff supplied NO investor §19 answers and
