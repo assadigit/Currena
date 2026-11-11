@@ -251,10 +251,32 @@ regeneration (`pnpm placement:generate`).
   2026-11-10); the roulette now measured at ALL THREE observed venues
   (the sandbox included). The verdict stays PENDING, riding the coming
   rungs; NO deploy (the code is unchanged — production `9861a927` ≡
-  HEAD). **The owner's levers: (1) arrange the investor's review of
-  spec §19 (the seven questions) — Phase K's remaining input; the
-  investor round re-opens at the next free slot the moment the
-  answers exist; (2) the §19.6 retirement timing answer.** See the
+  HEAD). The Session 27 SLOT (2026-11-11, BD-S27) then ran the third
+  reserve session — the buffer slot: the first-check round 3 + the
+  buffer health pass. The session opened at 17:07 UTC, ~3 h BEFORE the
+  armed 20:10 sweep (the first scheduled carrier of the new code), so
+  neither first-check branch could fire yet; the slot waited for the
+  sweep and filled the wait with the buffer work — the full gates ALL
+  GREEN (2 m 41 s, the suite 15,270) + the D-9 audit MET + the 11 live
+  pd-\* backtests ALL GREEN + the S20 data audit 20/20 GREEN + the
+  served ecb values re-verified EXACTLY against the publisher at 17:29
+  UTC (all three legs 200 in 2–4 s — the page stays truthful; honest
+  note: the HICP full-history grew backward at the provider, 1991-01
+  start vs S25's 1997-01 — content-neutral) + the strategy-log §8
+  session table back-filled (the 15 missing rows S12→the S26 SLOT,
+  dated by the close commits cross-checked against the Cloudflare
+  deployments API — surfacing the progress-board date-stamp drift
+  finding, flagged for the owner). The 20:10 sweep FIRED armed but the
+  daily KV write cap ate its write chain (the blob/snapshot/public all
+  keep the 14:15 stamps; the :13 prices rung's 20:13:18Z write proves
+  the cron alive — harmless by design); the verdict stays PENDING on
+  tomorrow's fresh-window carriers (the 04:10–04:40 Worker rungs + the
+  ~12:00 GHA belt-and-braces); NO deploy. **The owner's levers: (1)
+  arrange the investor's review of spec §19 (the seven questions) —
+  Phase K's remaining input; the investor round re-opens at the next
+  free slot the moment the answers exist; (2) the §19.6 retirement
+  timing answer; (3) the ecb escalation choice, only if the coming
+  days' rung evidence demands it.** See the
   roadmap's progress board for the current position.
 
 ## The one rule that trumps everything

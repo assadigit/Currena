@@ -6,87 +6,93 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **SESSION 27/30 (2026-11-11) — the third reserve session (the buffer slot):
-> the ecb first-check ROUND 3 + the buffer health pass — OPENED.** The owner's
-> kickoff supplied NO investor §19 answers and NO §19.6 sign-off, so per the
-> kickoff's own rule the slot runs the reserve branch (the retirement
-> execution stays untouched, behind Gate 0). The FIRST CHECK at session open
-> (~17:07 UTC) read the live status blob still the S26 evidence run
-> (generatedAt 14:15:19Z — DFR ❌ 504 · AAA ✅ · HICP ❌ 504, the designed
-> honest shape) with production `9861a927` @ 100 % verified — the session
-> opened ~3 h BEFORE tonight's armed 20:10 sweep (the FIRST scheduled
-> carrier of the new code), so neither first-check branch applies YET.
-> Session shape: (M1) the first-check reading recorded; (M2) the buffer
-> health pass while the sweep approaches (the full gates + the D-9 standing
-> audit + the live pd-* backtests); (M3) the sweep outcome read at ~20:15
-> UTC (green ecb rows → the maintenance item CLOSES; failed rows → the
-> evidence round recorded, verdict PENDING on the multi-day criterion; no
-> blob update → the ~19:00 KV cap ate the writes, harmless by design, the
-> verdict rides tomorrow's 04:10–04:40 rungs); (M4) the records + the close.
+> **SESSION 27/30 (2026-11-11) — the third reserve session (the buffer
+> slot): the ecb first-check ROUND 3 + the buffer health pass — DELIVERED
+> (BD-S27, no code change, no deploy; production already ≡ HEAD).** The
+> owner's kickoff supplied NO investor §19 answers and NO §19.6
+> sign-off, so per the kickoff's own rule the slot ran the reserve
+> branch (the retirement execution stays untouched, behind Gate 0). The
+> session opened at 17:07 UTC — ~3 h BEFORE the armed 20:10 sweep (the
+> FIRST scheduled carrier of the S25 fix) — so neither first-check
+> branch could fire yet; the slot waited for the sweep and filled the
+> wait with the buffer work. The 20:10 sweep FIRED armed but the daily
+> KV write cap ate its write chain (the blob keeps the 14:15 stamp —
+> harmless by design, exactly the anticipated branch); the verdict stays
+> **PENDING**, riding tomorrow's fresh-window rungs.**
 
-## Current state (after the S26 close)
+## Current state (after the S27 close)
 
 - **Program:** page-division — all TEN destinations render their own
   pages; Phases A–J CLOSED; Phase K: S22 closed as a WAITING slot ·
   S23 DEFERRED (blocked on the investor) · S24 DELIVERED (the D-9
   condition MET + the retirement checklist landed) · the S25 roadmap
   item delivered early (the Session 23 slot) · the Session 25 SLOT ran
-  the first reserve session (the ecb maintenance, BD-S25) · **the
-  Session 26 SLOT ran the second reserve session (the ecb first-check
-  follow-through, BD-S26) — DELIVERED**. Remaining: S23's
-  feedback-build scope (blocked on the investor) + the reserve S27–S30
-  (the retirement execution behind the §19.6 sign-off, the ecb
-  escalation decision if the rung evidence demands it, buffers).
-  **Counter: Session 26/30 · 4 remaining.**
+  the first reserve session (the ecb maintenance, BD-S25) · the Session
+  26 SLOT ran the second reserve session (the ecb first-check
+  follow-through, BD-S26) · **the Session 27 SLOT ran the third reserve
+  session (the buffer slot: the first-check round 3 + the buffer health
+  pass, BD-S27) — DELIVERED**. Remaining: S23's feedback-build scope
+  (blocked on the investor) + the reserve S28–S30 (the retirement
+  execution behind the §19.6 sign-off, the ecb escalation decision if
+  the rung evidence demands it, buffers). **Counter: Session 27/30 · 3
+  remaining.**
 - **DEPLOYED LIVE:** currena-api **`9861a927`** (UNCHANGED this session
-  — the S25 fix; production ≡ HEAD `ab1f316` modulo the records commits
-  that carry no code change; verified @ 100 % via the deployments API)
-  + currena-markets `8f63c8fa` (UNTOUCHED).
-- **The ecb posture (BD-S25 + BD-S26, the live evidence):** the four
-  portal legs ride `ECB_PORTAL_TIMEOUT_MS = 45_000` (F-11 single
-  attempt kept) + the HICP request is the stable full-history URL. The
-  provider-side roulette (the gateway's ~30.2 s HTTP 504, per-request)
-  is ACTIVE, now measured at ALL THREE observed venues (Worker egress ·
-  the GitHub runner · the work sandbox). The post-fix evidence run
-  (14:15 UTC): DFR ❌ 504 · AAA ✅ (fresh) · HICP ❌ 504 — the honest
-  designed failure shape; the two voting cards held on publisher-true
-  values (verified EXACTLY); the status carries two `kind: failed` rows
-  → tonight's 20:10 sweep is ARMED. A `failed` row naming a timeout OR
-  an HTTP 504 on ANY ecb leg is an expected honest shape on bad days;
-  the sweeps + the rungs + the belt-and-braces are the healing paths.
-- **Gates (the records-only tree): ALL GREEN** — re-run this session
-  (the full `pnpm gates` + the D-9 standing audit re-run MET,
-  belt-and-braces: nothing touched indicators/definitions/placement/§A).
-- **The S26 surfaces (what changed where):** the evidence run (GHA
-  dispatch 43036550865 + its status blob + the public /status now
-  serving the honest two-row failure shape) · the records (BD-S26 in
-  DECISIONS · RISK_REGISTER row extension + change-log row · the
-  roadmap's Session 26 SLOT record + progress board + current position
-  · the page-division README · the CHANGELOG S26 entry · this file).
-  One S25 record correction: the 11:57 run was the daily SCHEDULE
-  delayed ~7.6 h by GitHub's scheduler queue (NOT a workflow_dispatch
-  as BD-S25's addendum said) — the week's scheduled runs all landed
-  11:22–13:00 UTC.
+  — the S25 fix; production ≡ HEAD `8dcde14` modulo records commits
+  that carry no code change; verified @ 100 % via the deployments API,
+  created 12:21:26Z) + currena-markets `8f63c8fa` (UNTOUCHED).
+- **The ecb posture (BD-S25 + BD-S26 + BD-S27, the live evidence):**
+  the four portal legs ride `ECB_PORTAL_TIMEOUT_MS = 45_000` (F-11
+  single attempt) + the HICP request is the stable full-history URL.
+  The provider-side roulette (the gateway's ~30.2 s HTTP 504,
+  per-request) is ACTIVE at all three observed venues. The new code's
+  carriers so far: S26's 14:15 belt-and-braces run (DFR ❌ 504 · AAA ✅ ·
+  HICP ❌ 504 — the designed honest shape) and — armed but
+  write-capped — tonight's 20:10 sweep (fired; its status/snapshot/
+  public writes all capped; the fetch outcome unobservable). The Rule-5
+  re-verification at 17:29 UTC (sandbox, a good window, all three legs
+  200 in 2–4 s): **DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 · AAA
+  3.3308865271 @ 2026-11-10 — ALL EXACT matches** to the served/held
+  values (the page stays truthful). Honest observation: the HICP
+  full-history grew backward at the provider (429 distinct periods,
+  1991-01 start vs S25's 358 from 1997-01 — content-neutral; the parser
+  is window-agnostic, the tail identical).
+- **Gates (the records tree): ALL GREEN** — the full `pnpm gates` run
+  this session (2 m 41 s, the suite **15,270** = the S25/S26 close
+  count) + the D-9 standing audit re-run MET (belt-and-braces) + the 11
+  live pd-\* backtests against production ALL GREEN + the S20 data
+  audit **20/20 GREEN** (the N=20 upstream cross-check over the stored
+  14:15 snapshot — 100 % match; platinum the one designed live-spot arm
+  at 0.83 % intraday).
+- **The S27 surfaces (what changed where):** the records (BD-S27 in
+  DECISIONS · the RISK_REGISTER change-log row · the roadmap's Session
+  27 SLOT record + progress board + current position · the page-division
+  README program state · the CHANGELOG S27 entry · this file) + the
+  strategy-log **§8 session table back-filled** (the 15 missing rows
+  S12 → the Session 26 SLOT, pushed as the session's own checkpoint
+  `8dcde14` — with the progress-board DATE-STAMP DRIFT finding flagged
+  for the owner in the table's note; the historical board rows are NOT
+  rewritten).
 
-## Next session (Session 27/30)
+## Next session (Session 28/30)
 
-**FIRST CHECK — the ecb rung evidence, round 2 (the BD-S26 revisit):**
-read `GET https://currena.ir/api/insights/status` (or the KV
-`insights:status` blob via the Cloudflare API). By then the new code
-will have been carried by: tonight's 20:10 UTC sweep (armed — but mind
-the KV write cap ~19:00 UTC: if the cap ate its writes, the blob keeps
-the 14:15 stamp, harmless by design), tomorrow's 04:10–04:40 Worker
-rungs, and the ~12:00 belt-and-braces (the delayed schedule). Decide:
-- **Green rows / a clean rung under the new code** (the sweep or rung
-  fetched the ecb legs clean): the maintenance item is CLOSED — record
-  the verdict in DECISIONS.md (BD-S26's revisit) and move to the
-  standing branch.
+**FIRST CHECK — the ecb rung evidence, round 4 (the BD-S26/BD-S27
+revisit):** read `GET https://currena.ir/api/insights/status` (or the
+KV `insights:status` blob via the Cloudflare API). By then the new code
+will have been carried by tomorrow's **04:10–04:40 Worker rungs** (the
+reliable carriers — always inside the fresh post-00:00-reset KV slice)
+and the **~12:00 GHA belt-and-braces** (the 04:20 schedule delayed by
+GitHub's queue all week; a `workflow_dispatch` runs immediately if
+needed — before ~19:00 UTC, mind the KV cap). Decide:
+- **Green ecb rows / a clean rung under the new code:** the maintenance
+  item is CLOSED — record the verdict in DECISIONS.md (BD-S26/BD-S27's
+  revisit) and move to the standing branch.
 - **Honest failed rows persisting across multiple days of the NEW code**
-  (the cards going user-visibly stale past their maxAge windows, not
-  just failed rows on held-true values): the provider-side condition is
-  confirmed persistent — present the escalation choice to the owner
-  (wait it out vs the Eurostat-origin dissemination-API fallback
-  session), per the options recorded in BD-S25/BD-S26 + RISK_REGISTER.
+  (the cards going user-visibly stale past their maxAge windows —
+  ecb-dfr's maxAge 7, euro-hicp's 60 — not just failed rows on
+  held-true values): the provider-side condition is confirmed
+  persistent — present the escalation choice to the owner (wait it out
+  vs the Eurostat-origin dissemination-API fallback session), per
+  BD-S25/BD-S26/BD-S27 + RISK_REGISTER.
 
 Then the standing branch — decided by the owner's kickoff prompt:
 - **If the owner supplies the investor's §19 answers:** run the investor
@@ -96,7 +102,7 @@ Then the standing branch — decided by the owner's kickoff prompt:
   also opens (or delays) the retirement execution** — record it as
   Gate 0 in DECISIONS.md and schedule the execution session per the
   checklist's §7.
-- **If not:** the roadmap's reserve slots (S27–S30) hold the retirement
+- **If not:** the roadmap's reserve slots (S28–S30) hold the retirement
   execution (ONLY behind the recorded §19.6 sign-off), the ecb
   escalation decision if the rung evidence demands it, and the buffers
   — pick per the owner's kickoff prompt (one session per slot, the
@@ -104,22 +110,28 @@ Then the standing branch — decided by the owner's kickoff prompt:
 
 ### Operational notes worth carrying
 
-- **The KV write cap:** the account's free-tier daily KV quota exhausts
-  ~19:00 UTC (HTTP 429 10048 on the REST path) — any manual KV seeding
-  (rung2-run / fx-run / markets-au-run / a GHA ingest dispatch) after
-  ~19:00 UTC waits for the 00:00 UTC reset; the 04:10/04:20 UTC rungs
-  always land in the fresh window. At the 14:15 evidence run the budget
-  read 16 writes, 0 cap-retries.
+- **The KV write cap:** the account's free-tier daily KV quota (1,000
+  writes/day, account-wide) exhausts ~18:30–19:00 UTC — any manual KV
+  seeding (rung2-run / fx-run / markets-au-run / a GHA ingest dispatch)
+  after ~19:00 UTC waits for the 00:00 UTC reset; the 04:10/04:20 UTC
+  rungs always land in the fresh window. NEW EVIDENCE (S27, tonight):
+  the cap ate the 20:10 sweep's write chain (the blob/snapshot/public
+  all kept the 14:15 stamps) while the :13 prices rung's write still
+  landed at 20:13:18Z — the cap bites at the quota's very tail, and a
+  sweep whose writes cap leaves its fetch outcome unobservable (the
+  status blob is the only outside-visible channel; the Worker
+  observability telemetry query API returns no event rows for this
+  account — probed and dropped, BD-S27).
 - **The GHA belt-and-braces schedule delay:** GitHub's scheduler queue
   has delayed the 04:20 UTC scheduled `insights-ingest` run by ~7–9 h
   all week (the runs land 11:22–13:00 UTC) — still inside the fresh KV
   slice; the Worker's own 04:10–04:40 rungs run on time and remain the
-  primary venue. A `workflow_dispatch` (as used by S26) runs immediately.
+  primary venue. A `workflow_dispatch` (as S26 used at 14:15) runs
+  immediately — fine before the cap window, useless after it.
 - **The ECB portal posture:** see "Current state" above — a failed row
   (timeout OR 504) on any ecb leg is an expected honest shape; the
   cards hold last-good meanwhile (the held values verified against the
-  publisher's own API exactly: DFR 2.5 @ 2026-11-11 · HICP 4.0 @
-  2026-10 · AAA 3.3308865271 @ 2026-11-10).
+  publisher's own API exactly, re-verified 17:29 UTC this session).
 - **The fresh-card bootstrap is FIXED** (`patchInsightsSnapshot` ADDS
   readings for ids the stored snapshot lacks — the regression test pins
   it); the three Asia CPI fills' normal cadence takes over at the next
@@ -150,18 +162,24 @@ Then the standing branch — decided by the owner's kickoff prompt:
    demands it):** if the post-fix days keep failing (the cards going
    user-visibly stale, not just honest failed rows on held-true
    values), decide between (a) waiting out the provider-side roulette
-   (the sweeps keep healing on good windows — the 11:57 and 14:15 runs
-   each fetched at least one leg green) and (b) the Eurostat-origin
-   dissemination-API fallback session. The evidence + the options are
-   recorded in BD-S25/BD-S26 + RISK_REGISTER.
+   (the sweeps keep healing on good windows) and (b) the
+   Eurostat-origin dissemination-API fallback session. The evidence +
+   the options are recorded in BD-S25/BD-S26/BD-S27 + RISK_REGISTER.
 4. Ratify the `/converter` relocation (S1's build-session decision).
 5. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement; RENDERED on /usa tier-3).
-6. Ratify or redirect the BD-S3…BD-S26 decision set (the latest:
-   **BD-S26** — the first-check follow-through: the post-fix evidence
-   run + the three-venue roulette + the PENDING verdict riding the
-   schedule; all recorded, none blocking).
-7. Triage the queued unreviewed fa strings (every session's
+6. **Note the progress-board date-stamp drift finding (BD-S27):** the
+   S16–S25 SLOT date stamps in the roadmap's progress board run 1–2
+   days later than the git/Cloudflare record (e.g. the board says
+   S19–S21 delivered 2026-11-12; the deploys + close commits are
+   2026-11-10 UTC). The delivery records' content stands; the
+   strategy-log §8 back-fill table carries the verified dates + the
+   note. No action needed unless you want the board normalized — say
+   the word and a later session can annotate it.
+7. Ratify or redirect the BD-S3…BD-S27 decision set (the latest:
+   **BD-S27** — the first-check round 3 + the buffer health pass + the
+   sweep's write-capped outcome; all recorded, none blocking).
+8. Triage the queued unreviewed fa strings (every session's
    corpus-pinned values are verified byte-for-byte by their copy-pin
    tests).
 
@@ -170,19 +188,20 @@ Then the standing branch — decided by the owner's kickoff prompt:
 - The S19 meta/OG pass is CLIENT-SIDE (the SPA-honest approach,
   BD-S19c): JS-executing readers get the per-route tags; non-JS
   crawlers see the static whole-product defaults in index.html.
-- The strategy log's §8 session table (docs/page-division/
-  03-STRATEGY-LOG.md) stops at S11 — the later sessions' records live
-  in the roadmap delivery records + this file. A back-fill is a
-  nice-to-have, never blocking.
+- **The strategy log's §8 session table is now COMPLETE through the
+  Session 27 SLOT** (back-filled this session, rows 16–31; the deep
+  per-session records remain the roadmap's delivery records + this file
+  + CHANGELOG).
 - The per-page live backtests (the S20 toolkit): pd-s4 (Global 84) ·
   pd-s5 (Gold 150) · pd-s7 (World Markets 56) · pd-s8 (zooms 13) ·
   pd-s9/s10 (USA 69/173) · pd-s12 (Europe 8) · pd-s14 (Asia 14) ·
   pd-s16 (Australia 28) · pd-s17 (Commodities 24) · pd-s18
   (Currencies) — all re-runnable against production from
-  apps/web/scripts/ (pass `--base https://currena.ir`).
+  apps/web/scripts/ (pass `--base https://currena.ir`); **re-run ALL
+  GREEN this session**.
 - The S20 data-audit tool is re-runnable: `pnpm --filter @currena/web
   exec tsx ../../apps/web/scripts/pd-s20-data-audit.ts` (mind the
-  PortWatch Tuesday window above).
+  PortWatch Tuesday window above; **re-run 20/20 GREEN this session**).
 - **The parallel-session rule (hardened through BD-S18-parallel-3,
   BD-S21-parallel, BD-S23-parallel):** launch exactly ONE session
   per roadmap slot — one prompt = one session = one slot. If a kickoff

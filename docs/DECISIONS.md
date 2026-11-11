@@ -2919,3 +2919,111 @@
   session) come to the owner for the choice. NO deploy this session —
   the code is unchanged (production already `9861a927` ≡ HEAD); the
   evidence + the records are the deliverable.
+
+## 2026-11-11 — BD-S27: the third reserve session (the buffer slot) runs the ecb first-check ROUND 3 — the session opened ~3 h BEFORE the armed 20:10 sweep (the first scheduled carrier of the new code), so the slot ran the buffer health pass while waiting: the full gates + the D-9 audit + the 11 live backtests + the 20-point data audit ALL GREEN, the served ecb values re-verified EXACTLY against the publisher at 17:29 UTC, and the strategy-log §8 session table back-filled (S12→the S26 SLOT); the 20:10 sweep fired armed but the daily KV write cap ate its writes (the blob keeps the 14:15 stamp, harmless by design) — the verdict stays PENDING, riding tomorrow's fresh-window rungs
+
+- **Event:** the Session 27 slot. The owner's kickoff supplied NO investor
+  §19 answers and NO §19.6 sign-off, so per the kickoff's own rule the
+  slot ran the reserve branch (the retirement execution stays untouched,
+  behind the S24 checklist's Gate 0). The kickoff's FIRST CHECK expected
+  the new code to have been carried by the 20:10 sweep + the 04:10–04:40
+  rungs + the ~12:00 belt-and-braces by session open — but the session
+  opened at **17:07 UTC on 2026-11-11**, ~3 h BEFORE the sweep (the first
+  scheduled carrier; the morning's rungs ran the pre-fix tree before the
+  12:21:26Z deploy, and the GHA run history shows no run since S26's
+  14:14 dispatch). The parallel-session rule verified: origin/main at
+  HEAD `8561e1d` = the S26 close; no S27 records existed.
+- **The first-check reading (17:07–17:10 UTC):** the live status blob
+  (the public `/status` + the raw KV read via the Cloudflare API) still
+  the S26 evidence run — generatedAt **2026-11-11T14:15:19.239Z**, the
+  two `kind: failed` ecb rows (DFR + HICP, both "HTTP 504 … single
+  attempt, no retry (F-11)"), the AAA leg `fetched` (hash `2b63af83`),
+  50/52 green, 14/14 validation checks green, staleCount 11. Production
+  verified: currena-api `9861a927` @ 100 % (created 12:21:26Z) — the S25
+  fix live, production ≡ HEAD modulo records commits. NEITHER kickoff
+  branch applied (no scheduled rung had run the new code at all, clean or
+  otherwise; the new code was hours old, so "multiple days" was
+  impossible): the verdict **PENDING** — and the session chose to WAIT
+  for the armed sweep rather than close blind (the buffer work filled
+  the wait).
+- **The buffer health pass (M2, 17:10–17:35 UTC) — the reserve slot's
+  "anything red, slow, or delayed" check, ALL GREEN:** the full
+  `pnpm gates` (2 m 41 s: secret scan 8/1027 · typecheck 6/6 · lint 0/0 ·
+  copy:audit · narrator 193×2+56×2 + eval 50 · layer1 11,969/11,969 ·
+  **the suite 15,270** = the S25/S26 close count · build + budgets held —
+  entry 272.88/82.55) + the D-9 standing audit re-run (MET — 187 ids,
+  one lane + one home each; belt-and-braces, nothing touched indicators)
+  + **the 11 live pd-\* backtests against production** (pd-s4 Global ·
+  s5 Gold · s7 World Markets · s8 zooms · s9/s10 USA · s12 Europe · s14
+  Asia · s16 Australia · s17 Commodities · s18 Currencies — every one
+  `# ALL CHECKS GREEN`, exit 0) + **the S20 data audit** (the N=20
+  random-id upstream cross-check, seed 20261112: **20/20 GREEN** against
+  the stored 14:15 snapshot — 100 % match, one designed live-spot arm:
+  platinum intraday 0.83 %). The production surface is healthy at the
+  honest 14:15 state.
+- **The Rule-5 re-verification (17:29 UTC, live from the sandbox — the
+  page-stays-truthful check ahead of the sweep):** all three ecb legs
+  answered HTTP 200 in a good roulette window (2.0–4.0 s, single
+  attempts, no retry): **DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10
+  (tail 3.2/3.8/4.0) · AAA 3.3308865271 @ 2026-11-10 — ALL EXACT
+  matches** to the served/held values (ecb-dfr 2.5 @ 11-11 stale-held ·
+  euro-hicp 4 @ 10-01 stale-held · euro-aaa-10y 3.3308865271 @ 11-10
+  fresh). One honest observation recorded: the HICP full-history grew
+  BACKWARD at the provider since S25 (now 429 distinct monthly periods,
+  1991-01 → 2026-10, vs the S25-recorded 358 rows from 1997-01 — no
+  duplicates; content-neutral by construction: `parseEcbMonthlyCsv` is
+  window-agnostic and the engine slices its own 10-year windows; the
+  tail identical).
+- **The strategy-log §8 back-fill (the documented HANDOFF nice-to-have,
+  pushed as the session's own checkpoint `8dcde14`):** the 15 missing
+  session-table rows (S12 → the Session 26 SLOT) land in the table's own
+  style, dated by each session's close commits and cross-checked against
+  the Cloudflare deployments API. The back-fill surfaced a record
+  finding, flagged honestly for the owner (NOT silently normalized): the
+  progress-board date stamps in `01-SESSION-ROADMAP.md` for S16–S25 SLOT
+  drift 1–2 days later than the git/Cloudflare record (e.g. the board
+  says S19–S21 delivered 2026-11-12; the deploys + close commits are
+  2026-11-10 UTC — `74777037` created 2026-11-10T02:50Z, `08e0fc64`
+  2026-11-09T22:29Z, `9d60726b` 2026-11-09T20:43Z all confirm). The
+  delivery records' CONTENT stands; only the date stamps drifted; the
+  historical board rows are NOT rewritten (the back-fill table carries
+  the verified dates + the note). Also fixed in passing: a pre-existing
+  blank line split the §8 markdown table between the S9/S10 rows.
+- **The sweep watch (M3, 20:08–20:22 UTC):** the 20:10 sweep FIRED armed
+  (deterministic: the blob it read carried the two `kind: failed` rows →
+  `sweepShouldFire` true). The evidence it left: the **:13 prices rung's
+  write landed at 20:13:18Z** (`pricesAsOf` fresh — the minute-cron is
+  alive and the write quota still had its very tail) while the **status
+  blob, the served snapshot, and the public projection ALL keep the
+  14:15:19Z stamps** through 20:22 — the sweep's write chain
+  (putSnapshot → putStatus → putPublicSnapshot) did NOT land, the daily
+  KV write cap the designed suspect (the kickoff's own anticipated
+  branch: "if the ~19:00 KV cap ate its writes the blob keeps the 14:15
+  stamp, harmless by design"). The sweep's FETCH outcome is unobservable
+  from outside tonight (the Worker observability telemetry query API
+  returns no event rows for this account with the session's token —
+  probed, dropped per the 3-attempt discipline). NO belt-and-braces
+  dispatch was forced after the cap: a GHA dispatch writes via the same
+  capped REST path (S23's finding — it waits for the 00:00 UTC reset),
+  so the honest move is the designed one: tomorrow's fresh-window
+  carriers.
+- **The verdict (unchanged, now on the reliable carriers):** **PENDING.**
+  The new code remains verified-working-as-designed (S26's 14:15 run +
+  this session's 17:29 publisher verification — the served values exact);
+  the escalation trigger ("honest failed rows persisting across multiple
+  days of the NEW code", the cards going user-visibly stale past their
+  maxAge windows) cannot be met on day 0 — the reliable evidence carriers
+  are tomorrow's **04:10–04:40 Worker rungs** (always inside the fresh
+  post-reset KV slice) + the **~12:00 GHA belt-and-braces** (the delayed
+  04:20 schedule).
+- **Who decided:** this session (S27) under the roadmap's reserve scope +
+  the kickoff's FIRST-CHECK instruction + BD-S26's revisit clause.
+  **Revisit:** the next session's FIRST check — the status endpoint's
+  ecb rows after tomorrow's rungs (the true rung-level proof under the
+  new code): green rows → the maintenance item CLOSES (record here);
+  persistent failed rows across the coming days (the user-visible
+  staleness criterion) → the recorded escalation options (the ECB
+  provider channel; the Eurostat-origin dissemination-API fallback
+  session) come to the owner for the choice. NO deploy this session —
+  the code is unchanged (production `9861a927` ≡ HEAD; the markets
+  worker `8f63c8fa`); the evidence + the records are the deliverable.

@@ -5,6 +5,67 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-11] page-division S27 (the third reserve session — the buffer slot): **THE FIRST-CHECK ROUND 3 + THE BUFFER HEALTH PASS — the session opened ~3 h BEFORE the armed 20:10 sweep (the FIRST scheduled carrier of the new code), so neither kickoff branch could fire yet; the slot delivered the full production health pass (the gates ALL GREEN 2m41s · the suite 15,270 = the S25/S26 count · the D-9 audit MET · the 11 live pd-* backtests ALL GREEN · the S20 data audit 20/20 GREEN), the Rule-5 re-verification of the served ecb values (ALL EXACT against the publisher at 17:29 UTC), and the strategy-log §8 session-table back-fill (S12→the S26 SLOT, 15 rows); the 20:10 sweep FIRED armed but the daily KV write cap ate its write chain (the blob keeps the 14:15 stamp — harmless by design; the :13 prices rung's 20:13:18Z write proves the cron alive) — the verdict stays PENDING, riding tomorrow's fresh-window rungs; NO deploy — the code is unchanged (production `9861a927` ≡ HEAD; the markets worker `8f63c8fa`).**
+
+- **The first check (the honest state at 17:07 UTC):** the live status
+  blob (the public `/status` + the raw KV read) still the S26 evidence
+  run — generatedAt 2026-11-11T14:15:19.239Z, the two `kind: failed`
+  ecb rows (DFR + HICP, both HTTP 504), the AAA leg fetched, 50/52
+  green; production verified `9861a927` @ 100 % (created 12:21:26Z).
+  The GHA run history confirmed NO run since S26's 14:14 dispatch, and
+  the morning's Worker rungs ran the pre-fix tree — so the verdict was
+  PENDING on carriers that had not yet run; the session waited for the
+  armed sweep and filled the wait with the buffer work.
+- **The buffer health pass (the reserve slot's own mandate — "anything
+  red, slow, or delayed"):** the full `pnpm gates` ALL GREEN (2m 41s;
+  secret scan 8/1027 · typecheck 6/6 · lint 0/0 · copy:audit · narrator
+  193×2+56×2 + eval 50 · layer1 11,969/11,969 · the suite **15,270** ·
+  build + budgets held — entry 272.88/82.55) + the D-9 standing audit
+  re-run MET (belt-and-braces) + the **11 live pd-\* backtests against
+  production ALL GREEN** (Global · Gold · World Markets · zooms · USA ×2
+  · Europe · Asia · Australia · Commodities · Currencies) + the **S20
+  data audit 20/20 GREEN** (the N=20 upstream cross-check over the
+  stored 14:15 snapshot — 100 % match; platinum the one designed
+  live-spot arm at 0.83 % intraday). The production surface is healthy
+  at the honest 14:15 state.
+- **The Rule-5 re-verification (17:29 UTC, from the sandbox):** DFR
+  2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 (tail 3.2/3.8/4.0) · AAA
+  3.3308865271 @ 2026-11-10 — all three legs HTTP 200 in 2.0–4.0 s (a
+  good roulette window) and ALL EXACT matches to the served/held
+  values; the public page stays truthful. Honest observation: the HICP
+  full-history grew backward at the provider (429 distinct periods,
+  1991-01 → 2026-10, vs S25's 358 from 1997-01 — content-neutral; the
+  parser is window-agnostic, the tail identical).
+- **The strategy-log §8 back-fill (pushed `8dcde14`):** the 15 missing
+  session-table rows land (S12 → the Session 26 SLOT), dated by the
+  close commits and cross-checked against the Cloudflare deployments
+  API. The finding flagged for the owner: several progress-board date
+  stamps (S16–S25 SLOT) drift 1–2 days later than the git/Cloudflare
+  record — the delivery records' content stands, only the stamps
+  drifted; the historical rows are NOT rewritten. Also fixed in
+  passing: a pre-existing blank line split the §8 table between the
+  S9/S10 rows.
+- **The sweep watch (20:08–20:22 UTC):** the 20:10 sweep fired armed
+  (the two `kind: failed` rows gate it deterministically). The :13
+  prices rung's write landed at 20:13:18Z (the minute-cron alive, the
+  write quota at its very tail) while the status blob, the served
+  snapshot, and the public projection ALL keep the 14:15:19Z stamps —
+  the sweep's write chain did not land (the daily KV write cap, the
+  designed fallback the kickoff itself anticipated); the fetch outcome
+  is unobservable tonight. NO forced belt-and-braces dispatch after the
+  cap (it writes via the same capped REST path — S23's finding); the
+  honest move is the designed one: tomorrow's carriers.
+- **The verdict: PENDING** — the new code is day-0 old in production
+  terms; the reliable evidence carriers are tomorrow's 04:10–04:40
+  Worker rungs (always inside the fresh post-reset KV slice) + the
+  ~12:00 GHA belt-and-braces (the delayed 04:20 schedule). The records:
+  BD-S27 (DECISIONS) + the RISK_REGISTER change-log row + the roadmap's
+  Session 27 SLOT record + progress board + current position + the
+  page-division README program state + the strategy-log §8 row + this
+  entry + HANDOFF.md fully rewritten (the next session's first check =
+  the ecb rung evidence after tomorrow's rungs). **Session 27/30 · 3
+  remaining.**
+
 ## [2026-11-11] page-division S26 (the second reserve session — the ecb FIRST-CHECK follow-through): **THE POST-FIX EVIDENCE SESSION — the first check found the live status still PRE-FIX (no scheduled rung had carried the new code yet), so the session generated the missing evidence via the belt-and-braces path: the FIRST post-fix full collect (DFR ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504 — the designed honest failure shape; 50/52 rows green; the two voting cards held on last-good; the run exited 1 by design), the held/fresh card values verified EXACTLY against the publisher's own API (DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 · AAA 3.3308865271 @ 2026-11-10), and the ECB gateway's ~30.2 s 504 roulette now measured at ALL THREE observed venues (the sandbox included: 504 at ~31 s then 200 at ~2 s one minute later). The verdict stays PENDING, riding tonight's 20:10 sweep + tomorrow's 04:10 rung; NO deploy — the code is unchanged (production `9861a927` ≡ HEAD; the markets worker `8f63c8fa`).**
 
 - **The first check (the honest state at ~14:05 UTC):** the live status
