@@ -2919,3 +2919,83 @@
   session) come to the owner for the choice. NO deploy this session —
   the code is unchanged (production already `9861a927` ≡ HEAD); the
   evidence + the records are the deliverable.
+
+## 2026-11-11 — BD-S27: the third reserve session (the buffer slot) runs the ecb first-check ROUND 3 + the buffer health pass — the 20:10 sweep's writes did NOT land (the blob unchanged at 20:17 UTC, the designed no-update branch: the post-~19:00 KV write-cap window), so the verdict stays PENDING riding tomorrow's 04:10–04:40 rungs; the maintenance item stays OPEN with NO escalation trigger (no card is user-visibly stale past its maxAge window); the buffer health pass ALL GREEN and production verified unchanged
+
+- **Event:** the Session 27 slot — the third reserve session. The owner's
+  kickoff supplied NO investor §19 answers and NO §19.6 sign-off, so per the
+  kickoff's own rule the slot ran the reserve branch: the FIRST CHECK (the
+  BD-S26 revisit, round 3) + the buffer health pass. The retirement
+  execution stayed untouched (behind the recorded §19.6 sign-off, per the
+  S24 checklist's Gate 0). The slot ran as ONE session across an
+  interruption: an earlier instance opened it (M0, commit `cc1f069`,
+  ~17:07 UTC — the parallel-session rule verified: origin/main at HEAD
+  `8561e1d` = the S26 close, no S27 records existed) and landed M2a (the
+  strategy-log §8 back-fill, commit `8dcde14`); this continuation
+  re-verified the state, finished the slot's remaining milestones and
+  closed it — the pushed implementation governs, nothing duplicated.
+- **The first-check round 3 (the honest state, read at open and re-read
+  through the session):** the live status blob (the public `/status` AND
+  the raw KV `insights:status` read via the Cloudflare API) stayed
+  generatedAt **2026-11-11T14:15:19.239Z** — the S26 post-fix evidence run
+  — carrying exactly two `kind: failed` ecb rows (DFR + HICP, both
+  "HTTP 504 from data-api.ecb.europa.eu — single attempt, no retry
+  (F-11)") beside the green AAA row; 14/14 public validation checks green;
+  the GHA run history confirms no run since the 14:14 dispatch. Production
+  verified UNCHANGED: currena-api **`9861a927`** (the newest of 362
+  versions, `modified_on` 12:21:27Z — nothing deployed since the S25 fix)
+  + currena-markets **`8f63c8fa`** (newest; the markets endpoint serves
+  200). The kickoff's evidence window (the 20:10 sweep + the 04:10–04:40
+  rungs + the ~12:00 belt-and-braces) was NOT yet closed at open — the
+  session watched the FIRST carrier live instead.
+- **The buffer health pass (M2, 18:11–18:31 UTC, ALL GREEN):** the full
+  `pnpm gates` 9/9 in 2m 45s — **the suite 15,270 = the S26 close count
+  exactly** (the records-only tree; secret scan 8/1027 · typecheck 6/6 ·
+  lint 0/0 · copy:audit · narrator in sync + eval 50 · layer1
+  11,969/11,969 · build + budgets held, entry 272.88/82.55) — plus the
+  D-9 standing audit re-run **18/18 PASS** (belt-and-braces, exit 0) and
+  the live pd-* backtests **ALL ELEVEN ALL CHECKS GREEN against
+  production**: pd-s4 Global 84/84 (incl. the raw-KV stateHash recompute
+  IDENTICAL over the CF API) · pd-s5 Gold 150/150 · pd-s7 World Markets
+  56/56 · pd-s8 zooms 9/9 · pd-s9 USA 115/115 · pd-s10 USA 115/115 + the
+  TIC sub-gate · pd-s12 Europe 8/8 · pd-s14 Asia 14/14 · pd-s16 Australia
+  28/28 · pd-s17 Commodities 24/24 · pd-s18 Currencies 14/14 + the
+  rules/board gates. The beyond-grace cards (pd-s10/pd-s12 one each,
+  pd-s16 seven) all honestly carry the engine's stale status — designed,
+  none failing.
+- **The sweep outcome read (M3, 20:16–20:17 UTC):** the blob UNCHANGED
+  after the 20:10 sweep — the raw KV read confirms generatedAt
+  **14:15:19.239Z**, the same two failed ecb rows, and the public
+  snapshot still serves the held values (AAA **3.3308865271 @ 2026-11-10**
+  fresh · DFR **2.5 @ 2026-11-11** held-stale · HICP **4.0 @ 2026-10**
+  held-stale). This is the DESIGNED no-update branch: the account's free
+  KV write budget (saturated by the ever-green crons by ~18:30–19:00 UTC
+  daily) refused the sweep's writes at 20:10 — or the sweep did not fire;
+  the two are indistinguishable on the available surface (the Workers
+  observability telemetry query API answers success but projects zero
+  rows for every query shape tried this session), and the designed
+  fallback is IDENTICAL either way: **tomorrow's 04:10–04:40 Worker rungs
+  own the heal in the fresh KV window.** The blob keeping the 14:15 stamp
+  is harmless by design — the served cards stay publisher-true.
+- **The verdict: PENDING (round 3).** The CLOSE branch did not apply (no
+  rung or sweep carried the new code clean into the observable state
+  today). The ESCALATION branch did not apply either: the trigger is
+  "honest failed rows persisting across MULTIPLE DAYS of the NEW code
+  with the cards going user-visibly stale past their maxAge windows" —
+  the new code has ONE post-fix day, and NO card is past its window
+  (DFR asOf 2026-11-11 = today, maxAge 7 · AAA asOf 2026-11-10, maxAge 7
+  · HICP asOf 2026-10-01 = day 41 of 60). The escalation choice stays
+  recorded and dormant (the ECB provider channel; the Eurostat-origin
+  dissemination-API fallback session — BD-S25/BD-S26 + RISK_REGISTER).
+- **The session's deliverable:** the evidence + the records + the M2a
+  back-fill; **NO deploy** (zero code changed; production ≡ HEAD modulo
+  the records commits; both workers verified unchanged above).
+- **Who decided:** this session (S27) under the roadmap's reserve scope +
+  the kickoff's FIRST-CHECK instruction + BD-S26's revisit clause.
+  **Revisit:** the NEXT session's FIRST check — round 4: read the blob
+  after tomorrow's 04:10–04:40 Worker rungs (the fresh-window carriers;
+  the ~12:00 belt-and-braces behind them) and apply the same two
+  branches: green ecb rows → the maintenance item CLOSES; failed rows
+  persisting across the post-fix days with the cards going
+  user-visibly stale past their maxAge windows → the escalation choice
+  comes to the owner.

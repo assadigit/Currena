@@ -251,7 +251,25 @@ regeneration (`pnpm placement:generate`).
   2026-11-10); the roulette now measured at ALL THREE observed venues
   (the sandbox included). The verdict stays PENDING, riding the coming
   rungs; NO deploy (the code is unchanged — production `9861a927` ≡
-  HEAD). **The owner's levers: (1) arrange the investor's review of
+  HEAD). The Session 27 SLOT (2026-11-11, BD-S27) then ran the third
+  reserve session — the ecb first-check ROUND 3 + the buffer health
+  pass (the sweep-watch session, run as one session across an
+  interruption): the buffer health pass ALL GREEN (the full gates 9/9
+  in 2m 45s — the suite 15,270, the S26 close count exactly — + the
+  D-9 standing audit 18/18 + the live pd-* backtests ALL ELEVEN ALL
+  CHECKS GREEN against production, the stateHash recompute IDENTICAL)
+  plus the M2a strategy-log §8 back-fill (the 15 missing session-table
+  rows, the UTC-date convention recorded); the 20:16 UTC sweep read
+  found the blob UNCHANGED (generatedAt 14:15:19Z) — the DESIGNED
+  no-update branch (the post-~19:00 KV write-cap window refused the
+  20:10 sweep's writes, or the sweep did not fire — indistinguishable
+  on the available surface; the designed fallback is identical either
+  way) — so the verdict stays PENDING (round 3) riding tomorrow's
+  04:10–04:40 Worker rungs, with NO escalation trigger (one post-fix
+  day; no card past its maxAge window — DFR asOf today · AAA 1 day ·
+  HICP day 41 of 60). Round 4 = the next session's first check. NO
+  deploy (production verified unchanged: currena-api `9861a927` +
+  currena-markets `8f63c8fa`). **The owner's levers: (1) arrange the investor's review of
   spec §19 (the seven questions) — Phase K's remaining input; the
   investor round re-opens at the next free slot the moment the
   answers exist; (2) the §19.6 retirement timing answer.** See the

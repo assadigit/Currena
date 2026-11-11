@@ -5,6 +5,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-11] page-division S27 (the third reserve session — the ecb first-check ROUND 3 + the buffer health pass): **THE SWEEP-WATCH SESSION — the first check (round 3) found the blob still the S26 evidence run with the 20:10 sweep the FIRST scheduled carrier still ~3 h out, so the session ran the buffer health pass while waiting and then read the sweep's outcome live at 20:16 UTC: the blob UNCHANGED (generatedAt 14:15:19Z, the same two honest ecb failed rows) — the DESIGNED no-update branch (the post-~19:00 KV write-cap window refused the sweep's writes; the served cards stay publisher-true: AAA 3.3308865271 @ 2026-11-10 fresh · DFR 2.5 @ 2026-11-11 held-stale · HICP 4.0 @ 2026-10 held-stale), so the verdict stays PENDING riding tomorrow's 04:10–04:40 Worker rungs (round 4 = the next session's first check); NO escalation trigger (one post-fix day; no card past its maxAge window). The buffer health pass ALL GREEN: the full gates 9/9 in 2m 45s (the suite 15,270 = the S26 close count exactly, records-only tree), the D-9 standing audit 18/18, and the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production (pd-s4 Global 84/84 incl. the raw-KV stateHash recompute IDENTICAL · pd-s5 Gold 150/150 · pd-s7 56/56 · pd-s8 9/9 · pd-s9 115/115 · pd-s10 115/115 + TIC · pd-s12 8/8 · pd-s14 14/14 · pd-s16 28/28 · pd-s17 24/24 · pd-s18 14/14 + rules/board). Plus M2a: the strategy-log §8 session-table BACK-FILL (the 15 missing rows S12 → the Session 26 SLOT, the UTC-date convention + the progress-board date-drift finding recorded). NO deploy — zero code changed (production currena-api `9861a927` + currena-markets `8f63c8fa`, both verified unchanged via the Cloudflare API); the evidence + the records are the deliverable. Progress: Session 27/30 · 3 remaining.**
+
+- **The session shape (one slot, one session, an interruption):** an
+  earlier instance opened the slot (M0, commit `cc1f069`, ~17:07 UTC —
+  the parallel-session rule verified: origin/main at HEAD `8561e1d` = the
+  S26 close, no S27 records existed) and landed M2a (the strategy-log
+  back-fill, commit `8dcde14`); this continuation re-verified the state,
+  finished the remaining milestones and closed the slot — nothing
+  duplicated, the pushed implementation governs. The owner's kickoff
+  supplied NO investor §19 answers and NO §19.6 sign-off → the reserve
+  branch; the retirement execution untouched behind Gate 0.
+- **The first check (round 3):** the blob (public `/status` + the raw KV
+  read) stayed the S26 post-fix evidence run — generatedAt
+  14:15:19.239Z, two `kind: failed` ecb rows (DFR + HICP, both HTTP 504
+  single-attempt F-11 shapes) beside the green AAA row; 14/14 public
+  validation checks green; no GHA run since the 14:14 dispatch;
+  production `9861a927` (the newest of 362 versions, modified_on
+  12:21:27Z — nothing newer) + `8f63c8fa` both serving. The kickoff's
+  evidence window was not yet closed, so the session watched the first
+  carrier live.
+- **The sweep read (20:16–20:17 UTC):** the blob unchanged — the designed
+  no-update branch. The write-cap exhaustion (~18:30–19:00 UTC daily) is
+  the expected cause; "the sweep did not fire" is the indistinguishable
+  alternative (the observability telemetry query API projects zero rows
+  for every query shape tried), and the designed fallback is identical
+  either way: tomorrow's 04:10–04:40 rungs own the heal in the fresh KV
+  window. The honest state: no card past its maxAge (DFR asOf today ·
+  AAA 1 day · HICP day 41 of 60) — the escalation trigger is NOT met.
+- **The records:** BD-S27 (DECISIONS) · the roadmap's Session 27 SLOT
+  record + progress board + current-position note (Session 27/30 · 3
+  remaining) · the page-division README program state · this entry ·
+  HANDOFF.md fully rewritten (the next session's first check = round 4
+  after the 04:10–04:40 rungs). The gates re-run ALL GREEN on the
+  records-only tree after the records landed.
+
 ## [2026-11-11] page-division S26 (the second reserve session — the ecb FIRST-CHECK follow-through): **THE POST-FIX EVIDENCE SESSION — the first check found the live status still PRE-FIX (no scheduled rung had carried the new code yet), so the session generated the missing evidence via the belt-and-braces path: the FIRST post-fix full collect (DFR ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504 — the designed honest failure shape; 50/52 rows green; the two voting cards held on last-good; the run exited 1 by design), the held/fresh card values verified EXACTLY against the publisher's own API (DFR 2.5 @ 2026-11-11 · HICP 4.0 @ 2026-10 · AAA 3.3308865271 @ 2026-11-10), and the ECB gateway's ~30.2 s 504 roulette now measured at ALL THREE observed venues (the sandbox included: 504 at ~31 s then 200 at ~2 s one minute later). The verdict stays PENDING, riding tonight's 20:10 sweep + tomorrow's 04:10 rung; NO deploy — the code is unchanged (production `9861a927` ≡ HEAD; the markets worker `8f63c8fa`).**
 
 - **The first check (the honest state at ~14:05 UTC):** the live status

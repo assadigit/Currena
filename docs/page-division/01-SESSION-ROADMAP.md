@@ -1833,7 +1833,58 @@ the shipped tree (15,267) and with the fix (15,268).
   the D-9 standing audit MET (belt-and-braces). **Session 26/30 · 4
   remaining.**
 
-### ☐ S27–S30 — Fix rounds · performance · retirement execution
+### ✅ The Session 27 SLOT — the third reserve session: the ecb first-check ROUND 3 + the buffer health pass · `Session 27/30` · delivered 2026-11-11 (BD-S27)
+- The owner's kickoff supplied NO investor §19 answers and NO §19.6
+  sign-off, so per the kickoff's own rule the slot ran the reserve branch:
+  the FIRST CHECK (the BD-S26 revisit, round 3) + the buffer health pass.
+  The retirement execution stayed untouched (behind the recorded §19.6
+  sign-off, per the S24 checklist's Gate 0).
+- **The delivery record:** the slot ran as ONE session across an
+  interruption — an earlier instance opened it (M0, commit `cc1f069`,
+  ~17:07 UTC: the parallel-session rule verified against origin/main at
+  the S26 close; the first check read the blob still the S26 evidence run
+  14:15:19Z with production `9861a927` @ 100 % and the 20:10 sweep ~3 h
+  out — neither kickoff branch applied YET) and landed M2a (the
+  strategy-log §8 session-table BACK-FILL, commit `8dcde14`: the 15
+  missing rows S12 → the Session 26 SLOT in the table's own style, the
+  UTC-date convention + the progress-board date-drift finding recorded
+  honestly under the table). This continuation re-verified everything,
+  ran the buffer health pass, watched the sweep, and closed the slot.
+  **The buffer health pass (ALL GREEN):** the full `pnpm gates` 9/9 in
+  2m 45s — the suite 15,270 = the S26 close count exactly (records-only
+  tree) — + the D-9 standing audit re-run 18/18 PASS (belt-and-braces) +
+  the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production
+  (pd-s4 Global 84/84 incl. the raw-KV stateHash recompute IDENTICAL ·
+  pd-s5 Gold 150/150 · pd-s7 World Markets 56/56 · pd-s8 zooms 9/9 ·
+  pd-s9 USA 115/115 · pd-s10 USA 115/115 + the TIC sub-gate · pd-s12
+  Europe 8/8 · pd-s14 Asia 14/14 · pd-s16 Australia 28/28 · pd-s17
+  Commodities 24/24 · pd-s18 Currencies 14/14 + the rules/board gates;
+  the beyond-grace cards honestly stale-flagged — designed). **The sweep
+  read (20:16–20:17 UTC):** the blob UNCHANGED after the 20:10 sweep —
+  the raw KV read confirms generatedAt 14:15:19.239Z, the same two
+  honest ecb failed rows (DFR + HICP, both HTTP 504 single-attempt F-11
+  shapes), the public snapshot serving the held publisher-true values
+  (AAA 3.3308865271 @ 2026-11-10 fresh · DFR 2.5 @ 2026-11-11 held-stale
+  · HICP 4.0 @ 2026-10 held-stale) — the DESIGNED no-update branch (the
+  post-~19:00 KV write-cap window refused the sweep's writes, or the
+  sweep did not fire — indistinguishable on the available surface, the
+  telemetry query API projecting zero rows; the designed fallback is
+  identical: tomorrow's 04:10–04:40 Worker rungs own the heal in the
+  fresh KV window). **The verdict: PENDING (round 3)** — no CLOSE (no
+  rung carried the new code clean into the observable state today), no
+  ESCALATION (one post-fix day; no card past its maxAge window — DFR
+  asOf today · AAA 1 day · HICP day 41 of 60). Round 4 = the next
+  session's first check, after tomorrow's 04:10–04:40 rungs. NO deploy —
+  zero code changed (production currena-api `9861a927` + currena-markets
+  `8f63c8fa`, both verified unchanged via the Cloudflare API: the newest
+  of 362 api versions, modified_on 12:21:27Z, nothing newer). The
+  records: BD-S27 (DECISIONS) + the CHANGELOG entry + this record + the
+  progress board + the current-position note + the page-division README
+  program state + HANDOFF.md fully rewritten. The gates re-run ALL GREEN
+  on the records-only tree after the records landed. **Session 27/30 · 3
+  remaining.**
+
+### ☐ S28–S30 — Fix rounds · performance · retirement execution
 - Buffer sessions for anything red, slow, or delayed; the final legacy
   retirement + redirect when the owner signs off. If unused, the project
   simply finishes early — counter still reports `Session X/30`.
@@ -1855,49 +1906,59 @@ the shipped tree (15,267) and with the fix (15,268).
 | I Currency Pairs | S18 | ✅ S18 2026-11-11 (deployed currena-api `51a0fe45` + currena-markets `8f63c8fa` + the fx-run KV seed — the rule lights hero + the 11-pair board [AUDNZD the 11th pair, D-42] + the dollar-standing cards; the §21 backtest [3 gates] + the render audit + the In-build chip RETIRED — **PHASE I CLOSED**) |
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
 | K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ✅ S24 2026-11-12 (NO deploy — the D-9 audit ALL GREEN via pnpm s24:d9-audit [187 ids, one lane + one home each] + the doc-side drift reconciled doc-only + the retirement checklist landed spec-grade [06-LEGACY-RETIREMENT-S24.md]; execution gated on the owner's §19.6 sign-off) |
-| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ✅ the Session 25 SLOT 2026-11-12 (BD-S25 — the first reserve session: the ecb provider-timeout maintenance — the ECB HICP leg's six-day rung timeouts diagnosed [the ECB gateway's ~30.2 s 504 roulette on ANY request from Worker egress], the stable full-history request + the 45 s patient single attempt + the two pins, deployed `9861a927`, the rung-level proof rides the 20:10/04:10 rungs) · ✅ the Session 26 SLOT 2026-11-11 (BD-S26 — the second reserve session: the ecb FIRST-CHECK follow-through — the pre-fix status read + the post-fix belt-and-braces run dispatched [run 43036550865: DFR ❌ 504 · AAA ✅ · HICP ❌ 504, the designed honest shape; the held/fresh values verified EXACTLY against the publisher; the roulette now measured at all three venues incl. the sandbox]; the verdict PENDING, riding the 20:10 sweep + the 04:10 rung; NO deploy — the evidence + the records are the deliverable) · ☐ S27–S30 buffer |
+| Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ✅ the Session 25 SLOT 2026-11-12 (BD-S25 — the first reserve session: the ecb provider-timeout maintenance — the ECB HICP leg's six-day rung timeouts diagnosed [the ECB gateway's ~30.2 s 504 roulette on ANY request from Worker egress], the stable full-history request + the 45 s patient single attempt + the two pins, deployed `9861a927`, the rung-level proof rides the 20:10/04:10 rungs) · ✅ the Session 26 SLOT 2026-11-11 (BD-S26 — the second reserve session: the ecb FIRST-CHECK follow-through — the pre-fix status read + the post-fix belt-and-braces run dispatched [run 43036550865: DFR ❌ 504 · AAA ✅ · HICP ❌ 504, the designed honest shape; the held/fresh values verified EXACTLY against the publisher; the roulette now measured at all three venues incl. the sandbox]; the verdict PENDING, riding the 20:10 sweep + the 04:10 rung; NO deploy — the evidence + the records are the deliverable) · ✅ the Session 27 SLOT 2026-11-11 (BD-S27 — the third reserve session: the ecb first-check ROUND 3 + the buffer health pass: the gates 9/9 [suite 15,270, the S26 count exactly] + the D-9 audit 18/18 + the 11 live backtests ALL GREEN while the sweep approached, then the 20:16 UTC sweep read: the blob UNCHANGED — the designed no-update branch [the post-~19:00 KV write cap], the verdict PENDING riding tomorrow's 04:10–04:40 rungs, NO escalation trigger [no card past its maxAge]; plus the M2a strategy-log §8 back-fill; NO deploy — production verified unchanged 9861a927 + 8f63c8fa) · ☐ S28–S30 buffer |
 
-**Current position: Session 26/30 delivered (the second reserve session —
-the ecb FIRST-CHECK follow-through: the post-fix evidence session)
-2026-11-11 · 4 remaining (BD-S26). The owner's kickoff supplied no
-investor §19 answers, so the slot ran the standing branch's reserve
-items. The first check at session open (~14:05 UTC) found the live
-status blob still PRE-FIX (generatedAt 11:57Z — the AAA leg's 12 s
-timeout; 51/52 green) and the deployed fix `9861a927` @ 100 % not yet
-carried by ANY scheduled rung (the first: the 20:10 sweep tonight,
-armed) — so neither kickoff branch applied and the session GENERATED
-the missing evidence via the sanctioned belt-and-braces path (a GHA
-`insights-ingest` dispatch on main ≡ production, run 43036550865,
-14:14→14:17 UTC): the FIRST post-fix full collect recorded the designed
-honest shape — DFR ❌ HTTP 504 · AAA ✅ fetched · HICP ❌ HTTP 504 (the
-BSI leg rides rung2's monthly gate); 50/52 rows green; ecb-dfr +
-euro-hicp held on last-good; the run exited 1 by design (the P1 alert).
-The Rule-5 second voice (live from the sandbox): DFR 2.5 @ 2026-11-11 ·
-HICP 4.0 @ 2026-10 · AAA 3.3308865271 @ 2026-11-10 — ALL EXACT matches
-to the served/held values (the public page stays truthful). The
-roulette grew one venue further — the SANDBOX hit it too (the DFR
-control: 504 at ~31 s, then 200 at ~2 s one minute later); all three
-observed venues now carry the per-request condition, and S25's "sandbox
-fast throughout" was luck, not immunity. One S25 record correction: the
-11:57 run was the daily SCHEDULE delayed ~7.6 h by GitHub's scheduler
-queue (not a workflow_dispatch; the week's scheduled runs all landed
-11:22–13:00 UTC — the belt-and-braces is effectively a ~12:00 UTC run
-in practice). THE VERDICT: PENDING — the new code works exactly as
-designed; the escalation trigger ("still fails across multiple days" of
-the NEW code) needs the coming days' rungs (tonight's 20:10 sweep —
-mind the ~19:00 KV cap, harmless by design — tomorrow's 04:10–04:40
-rungs + the ~12:00 belt-and-braces). NO deploy (production `9861a927` ≡
-HEAD; the markets worker `8f63c8fa`); the gates re-run ALL GREEN on the
-records-only tree + the D-9 standing audit MET (belt-and-braces).
-NEXT: the investor round the moment the owner supplies the §19 answers
-(collect → D-49+ in the strategy log §5 Round 4 → the spec v2 entries —
-the AF-1…AF-8 findings ride that pass, never silent edits), then S23's
-deferred feedback-build scope; the remaining reserve slots (S27–S30)
-hold the retirement execution (behind the recorded §19.6 sign-off), the
-ecb escalation decision if the rung evidence demands it, and the
-buffers. THE OWNER'S LEVERS: (1) arrange the external investor's review
-of the spec (§19's seven questions) — Phase K's remaining input; (2) the
-§19.6 retirement timing answer (directly, or via the investor round).
-The S20 data-audit tool is re-runnable for any later session's §21
-data-audit gate — RUNBOOK NOTE (BD-S21e): never run it Tuesdays
-11:00–14:00 UTC (the IMF PortWatch maintenance window).**
+**Current position: Session 27/30 delivered (the third reserve session —
+the ecb first-check ROUND 3 + the buffer health pass: the sweep-watch
+session) 2026-11-11 · 3 remaining (BD-S27). The owner's kickoff supplied
+no investor §19 answers and no §19.6 sign-off, so the slot ran the
+reserve branch (the retirement execution untouched behind Gate 0). The
+slot ran as ONE session across an interruption: an earlier instance
+opened it (M0, commit `cc1f069`, ~17:07 UTC — the parallel-session rule
+verified; the first check read the blob still the S26 evidence run,
+14:15:19Z, with the 20:10 sweep ~3 h out — neither kickoff branch
+applied yet) and landed M2a (the strategy-log §8 session-table
+BACK-FILL, commit `8dcde14` — the 15 missing rows S12 → the Session 26
+SLOT, the UTC-date convention + the progress-board date-drift finding
+recorded honestly); this continuation re-verified everything, ran the
+buffer health pass, watched the sweep, and closed the slot. THE BUFFER
+HEALTH PASS (ALL GREEN): the full `pnpm gates` 9/9 in 2m 45s — the
+suite 15,270 = the S26 close count exactly (records-only tree) — + the
+D-9 standing audit re-run 18/18 PASS + the live pd-* backtests ALL
+ELEVEN ALL CHECKS GREEN against production (pd-s4 Global 84/84 incl.
+the raw-KV stateHash recompute IDENTICAL · pd-s5 Gold 150/150 · pd-s7
+World Markets 56/56 · pd-s8 zooms 9/9 · pd-s9 USA 115/115 · pd-s10 USA
+115/115 + TIC · pd-s12 Europe 8/8 · pd-s14 Asia 14/14 · pd-s16
+Australia 28/28 · pd-s17 Commodities 24/24 · pd-s18 Currencies 14/14 +
+rules/board; the beyond-grace cards honestly stale-flagged — designed).
+THE SWEEP READ (20:16–20:17 UTC): the blob UNCHANGED after the 20:10
+sweep — the raw KV read confirms generatedAt 14:15:19.239Z, the same
+two honest ecb failed rows (DFR + HICP, both HTTP 504 single-attempt
+F-11 shapes), the public snapshot serving the held publisher-true
+values (AAA 3.3308865271 @ 2026-11-10 fresh · DFR 2.5 @ 2026-11-11
+held-stale · HICP 4.0 @ 2026-10 held-stale) — the DESIGNED no-update
+branch: the post-~19:00 KV write-cap window refused the sweep's writes
+(or the sweep did not fire — indistinguishable on the available
+surface; the telemetry query API projects zero rows), and the designed
+fallback is identical either way: tomorrow's 04:10–04:40 Worker rungs
+own the heal in the fresh KV window. THE VERDICT: PENDING (round 3) —
+no CLOSE (no rung carried the new code clean into the observable state
+today), no ESCALATION (one post-fix day; no card past its maxAge
+window — DFR asOf today · AAA 1 day · HICP day 41 of 60). Round 4 =
+the next session's first check, after tomorrow's 04:10–04:40 rungs.
+NO deploy (zero code changed; production currena-api `9861a927` +
+currena-markets `8f63c8fa`, both verified unchanged via the Cloudflare
+API); the gates re-run ALL GREEN on the records-only tree after the
+records landed. NEXT: the investor round the moment the owner supplies
+the §19 answers (collect → D-49+ in the strategy log §5 Round 4 → the
+spec v2 entries — the AF-1…AF-8 findings ride that pass, never silent
+edits), then S23's deferred feedback-build scope; the remaining
+reserve slots (S28–S30) hold the retirement execution (behind the
+recorded §19.6 sign-off), the ecb escalation decision if the rung
+evidence demands it, and the buffers. THE OWNER'S LEVERS: (1) arrange
+the external investor's review of the spec (§19's seven questions) —
+Phase K's remaining input; (2) the §19.6 retirement timing answer
+(directly, or via the investor round). The S20 data-audit tool is
+re-runnable for any later session's §21 data-audit gate — RUNBOOK NOTE
+(BD-S21e): never run it Tuesdays 11:00–14:00 UTC (the IMF PortWatch
+maintenance window).**
