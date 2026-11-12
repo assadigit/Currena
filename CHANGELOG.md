@@ -5,6 +5,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-12] page-division S30 (the FINAL slot — the program close-out): **THE 30-SESSION PROGRAM IS COMPLETE.** The owner's kickoff supplied no investor §19 answers and no §19.6 sign-off, so the slot ran the final buffer branch per its own standing rule: the buffer health pass + the program close-out records — the counter reaches 30/30 · 0 remaining; the project finishes; the remaining levers stay with the owner (the investor round behind §19; the legacy retirement behind the §19.6 sign-off — Gate 0 untouched). The health pass ALL GREEN four legs: the full gates 9/9 in 2m37s (the suite 15,270 = the S26–S29 close count exactly) · the D-9 standing audit exit 0 · the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production (705 checks/0 red — the narrator stateHash IDENTICAL, the S29 one-state-behind note healed by the 00:50 rung; the EIA trio beyond-grace + honestly stale, the S29 re-score holding) · the S20 data audit 20/20 (both EIA sample members EXACT). NO deploy — zero code changed; production currena-api `9861a927` + currena-markets `8f63c8fa` verified unchanged (the program's last code change remains the S25 fix, live since 2026-11-11). The two optional observation reads (the 04:10 UTC rung's T-04 re-validation; the Saturday 11-14 rung-2 gate) fell outside the session window — recorded as expected outcomes, no decisions pending. The owner should now revoke or rotate the session credentials (used, never stored). Progress: Session 30/30 · 0 remaining.**
+
+- **The session shape:** one slot, one session, no interruption —
+  opened ~01:45 UTC (~1.5 h after the S29 close), the first check
+  finding the observable state exactly as the S29 close recorded it
+  (the patched blob 00:12:25.662Z, failedSources EMPTY, T-04 the only
+  red — the honest carry until the 04:10 full collect re-validates;
+  production 9861a927 + 8f63c8fa unchanged; no ingest run since run 92).
+- **The four-leg health pass** (01:50–01:52 UTC, all read-only/local —
+  zero KV writes): gates 9/9 (secret scan 8/1027 · typecheck 6/6 · lint
+  0/0 · copy:audit · narrator in sync + eval 50 · layer1 11,969/11,969
+  · build + budgets held, entry 272.88/82.55) · the D-9 audit exit 0 ·
+  the 11 backtests (pd-s4 84/84 stateHash IDENTICAL · pd-s5 150/150 ·
+  pd-s7 57/57 · pd-s8 9/9 · pd-s9 115/115 · pd-s10 163/163 + TIC 48/48
+  · pd-s12 8/8 · pd-s14 14/14 · pd-s16 28/28 · pd-s17 24/24 · pd-s18
+  53/53) · the S20 audit 20/20 (us-crude-production 14,003 · us-spr
+  282,184 EXACT; platinum on the live-price arm's designed difference).
+- **The close-out records:** BD-S30 (DECISIONS) + this entry + the
+  roadmap's Session 30 SLOT record + the progress board's Reserve row +
+  the current-position note (Session 30/30 · 0 remaining — the program
+  complete) + the page-division README program state + the strategy-log
+  §8 row 34 + HANDOFF.md fully rewritten. Zero code, zero deploy; the
+  gates re-run ALL GREEN on the records-only tree at close.
+
 ## [2026-11-12] page-division S29 (the fifth reserve session — the first-check green-rows CONFIRMATION + the EIA-trio wire-honesty heal + the buffer health pass): **THE OBSERVABLE STATE HAS CAUGHT UP WITH THE CLOSED VERDICT — the session opened ~1 h after the S28 close, ~4.5 h BEFORE the 04:10–04:40 evidence window (the blob still the S26 evidence run), so it landed the green rows EARLY via the sanctioned dispatch in the fresh post-midnight KV slice (GHA insights-ingest run 92, 00:01:44Z, success in 2m36s, all writes landed): failedSources EMPTY, all three ecb rows GREEN in the served blob for the first time (DFR · AAA · HICP, the values exactly the publisher-true trio — the one-line confirmation, no new decision needed). The fresh rung surfaced a NEW finding: the EIA weekly trio (eia-crude-stocks · us-spr · us-crude-production) past the 12-day wire-guard grace at the 2026-11-12 day boundary (T-04 red, age 13) — a provider-schedule hiccup Rule-5-verified against the provider's own page (the last release 11/04, the next release 11/12 per its own footer; the Saturday 11-07 rungs had correctly fetched the 10-30 tail; the values EXACT), healed on the wire via the DESIGNED rung2-run --eia landing lever (the production phase, the honest [stale] re-marking, ~10 KV writes) — the pd-s17 freshness arm back to its designed pass (beyond-grace + honestly stale); the trio self-heals to fresh/context at the Saturday 11-14 gate. The buffer health pass ALL GREEN: the full gates 9/9 in 2m 35s (the suite 15,270 = the S26/S27/S28 close count exactly, records-only tree) · the D-9 standing audit exit 0 · the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production (705 checks/0 red) · the S20 data audit 20/20 (both EIA sample members EXACT). NO deploy — zero code changed (production currena-api `9861a927` + currena-markets `8f63c8fa`, both verified unchanged). Progress: Session 29/30 · 1 remaining.**
 
 - **The session shape:** one slot, one session, no interruption. The

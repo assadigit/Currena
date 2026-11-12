@@ -53,6 +53,16 @@
 > page: us-crude-production 14,003 · us-spr 282,184; platinum on the
 > live-price arm's designed difference). Zero KV writes this session —
 > all four legs are read-only/local.
+>
+> **M2 — the close-out records landed whole (the S30 close):** BD-S30
+> (DECISIONS) + the CHANGELOG S30 entry + the roadmap (the Session 30
+> SLOT record + the reserve-buffers section close + the progress
+> board's Reserve row + the current-position note: Session 30/30 · 0
+> remaining — the program complete) + the page-division README program
+> state + the strategy-log §8 row 34 + this file fully rewritten (the
+> program close-out below). The gates re-run ALL GREEN on the
+> records-only tree at close. **Session 30/30 · 0 remaining — THE
+> PROGRAM COMPLETE.**
 
 > **SESSION 29/30 (2026-11-11 → 2026-11-12) — the fifth reserve session
 > (the buffer slot): the first-check green-rows CONFIRMATION (the
@@ -104,96 +114,94 @@
 > 04:10–04:40 fresh-window rungs — CONFIRMED by the Session 29 slot
 > (landed early via its own fresh-slice dispatch).
 
-## Current state (after the S29 close)
+## Current state (after the S30 close — THE PROGRAM COMPLETE)
 
-- **Program:** page-division — all TEN destinations render their own
-  pages; Phases A–J CLOSED; Phase K: S22 closed as a WAITING slot ·
-  S23 DEFERRED (blocked on the investor) · S24 DELIVERED (the D-9
-  condition MET + the retirement checklist landed) · the S25 roadmap
-  item delivered early (the Session 23 slot) · the Session 25–29 SLOTS
-  ran the five reserve sessions (BD-S25 the ecb maintenance, deployed
-  `9861a927` · BD-S26/BD-S27/BD-S28 the first-check rounds 1–4 — the
-  maintenance item CLOSED · **BD-S29 the green-rows confirmation + the
-  EIA-trio heal — DELIVERED**). Remaining: S23's feedback-build scope
-  (blocked on the investor) + the final reserve slot S30 (the
-  retirement execution behind the §19.6 sign-off, buffers).
-  **Counter: Session 29/30 · 1 remaining.**
+- **Program:** page-division — **all 30 sessions delivered; the program
+  is finished (Session 30/30 · 0 remaining).** All TEN destinations
+  render their own pages; Phases A–J CLOSED; Phase K: S22 closed as a
+  WAITING slot · S23 DEFERRED (blocked on the investor) · S24 DELIVERED
+  (the D-9 condition MET + the retirement checklist landed); the five
+  reserve slots (the Session 25–29 slots) delivered the ecb maintenance
+  arc (BD-S25, deployed currena-api `9861a927` → BD-S26/BD-S27/BD-S28
+  the first-check rounds — the item CLOSED → BD-S29 the green-rows
+  confirmation + the EIA-trio wire-honesty heal); the FINAL slot (S30)
+  delivered the buffer health pass + these close-out records (BD-S30).
+  **The project finishes here; the remaining levers stay with the
+  owner** (the list below).
 - **DEPLOYED LIVE:** currena-api **`9861a927`** (UNCHANGED this session
-  — the S25 fix; verified via the Cloudflare API: the newest of 362
-  versions, created 12:21:25Z, nothing newer) + currena-markets
-  **`8f63c8fa`** (UNTOUCHED, newest version). Production ≡ HEAD modulo
-  the records commits (zero code changed since the S25 deploy).
-- **The ecb posture (BD-S29 — the observable state has caught up):**
-  the served blob (generatedAt 2026-11-12T00:02:45.793Z, run 92) shows
-  **failedSources EMPTY — all three ecb rows green** for the first time
-  (DFR `FM/D.U2.EUR.4F.KR.DFR.LEV` · AAA
-  `YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y` · HICP
-  `M.U2.N.000000.4D0.ANR`), the readings exactly the publisher-true
-  values (ecb-dfr 2.5 @ 2026-11-11 normal · euro-aaa-10y
-  3.3308865271 @ 2026-11-10 · euro-hicp 4.0 @ 2026-10-01). The BD-S25
-  maintenance item stays CLOSED; the per-request ECB roulette remains
-  REAL (a failed row — timeout OR 504 — on any rung is the documented
-  RISK_REGISTER honest shape: the cards hold last-good, the next rung
-  retries). Only the persistent multi-day stale-past-maxAge shape
-  (DFR/AAA past ~2026-11-17/18 · HICP past ~2026-11-30, never
-  refreshed) would re-open the escalation question.
-- **The EIA trio posture (BD-S29's NEW finding — healed, self-healing
-  at the Saturday gate):** the provider's own release delay (the 11/11
-  weekly release slipped to 11/12 per its own LeafHandler footer) left
-  `eia-crude-stocks` · `us-spr` · `us-crude-production` at asOf
-  2026-10-30 — the age crossed the 12-day wire grace at the 2026-11-12
-  day boundary (T-04 red on the run-92 blob; the values verified EXACT
-  against the provider's page: 691,944 · 282,184 · 14,003). The
-  designed `rung2-run --eia` landing lever re-scored the trio to the
-  honest **[stale]** status at 00:12:25 UTC (values unchanged); the
-  pd-s17 freshness arm passes (beyond-grace + honestly stale); the
-  status summary's T-04 row re-validates green at the next full collect
-  (the 04:10 rung — the rung-2 phase appends rows, it does not re-run
-  the suite). The 11/12 release (~15:30 UTC) covers the week ending
-  11/06; the Saturday 11-14 rung-2 gate lands it → the trio returns to
-  fresh/context at age ~8. Only a multi-week stall (still stale past
-  ~2026-11-28 with the Saturday gates failing) raises a new provider
-  question. The RISK_REGISTER eia row carries the posture note.
-- **Gates (the records-only tree): ALL GREEN** — the full `pnpm gates`
-  9/9 in 2m35s (the suite **15,270** = the S26/S27/S28 close count
-  exactly) + the D-9 standing audit exit 0 (the condition MET,
-  belt-and-braces) + the 11 live pd-* backtests ALL ELEVEN ALL CHECKS
-  GREEN against production (705 checks/0 red) + the S20 data audit
-  20/20 GREEN (seed 20261112 — both EIA sample members EXACT).
-- **The S29 surfaces (what changed where):** BD-S29 (DECISIONS) · the
-  RISK_REGISTER eia-row schedule note · the CHANGELOG S29 entry · the
-  roadmap's Session 29 SLOT record + progress board + current position
-  (Session 29/30 · 1 remaining) · the page-division README program
-  state · the strategy-log §8 row 33 · this file. Zero code, zero
-  deploy. The session's live actions: the run-92 GHA dispatch (the
-  fresh-slice ingest — the blob + histories refreshed), the
-  `rung2-run --eia` patch (the honest stale-marking), and one KV
-  scope-test write/delete pair — all inside the 2026-11-12 quota day.
+  — the S25 fix, the program's last code change, live since
+  2026-11-11; verified via the Cloudflare versions API: the newest of
+  362 versions, number 362, created 12:21:25Z, nothing newer) +
+  currena-markets **`8f63c8fa`** (UNTOUCHED, the newest version, number
+  31, created 2026-11-10T00:11:27Z). Production ≡ HEAD modulo the
+  records commits (zero code changed since the S25 deploy).
+- **The ecb posture (BD-S29, carried):** the served blob shows
+  failedSources EMPTY — all three ecb rows green (DFR · AAA · HICP; the
+  values exactly the publisher-true trio). The BD-S25 maintenance item
+  stays CLOSED; the per-request ECB roulette remains REAL (a failed row
+  — timeout OR 504 — on any rung is the documented RISK_REGISTER honest
+  shape: the cards hold last-good, the next rung retries). Only the
+  persistent multi-day stale-past-maxAge shape would re-open the
+  escalation question.
+- **The EIA trio posture (BD-S29, carried — self-healing at the
+  Saturday 11-14 gate):** the provider's own release delay left the
+  trio honestly [stale]-marked (the `rung2-run --eia` re-score at
+  00:12:25 UTC on 2026-11-12; values unchanged and EXACT). The 11/12
+  release (~15:30 UTC) covers the week ending 11/06; the Saturday 11-14
+  rung-2 gate lands it → the trio returns to fresh/context at age ~8.
+  Only a multi-week stall (still stale past ~2026-11-28 with the
+  Saturday gates failing) raises a new provider question. The
+  RISK_REGISTER eia row carries the posture note.
+- **The S30 health pass (the final buffer leg, ALL GREEN four legs):**
+  the full `pnpm gates` 9/9 in 2m37s (the suite **15,270** = the
+  S26–S29 close count exactly; records-only tree) + the D-9 standing
+  audit exit 0 + the 11 live pd-* backtests ALL ELEVEN ALL CHECKS GREEN
+  against production (705 checks/0 red — the narrator stateHash
+  IDENTICAL, the S29 one-state-behind note healed by the 00:50 rung;
+  the EIA trio beyond-grace + honestly stale, the S29 re-score holding)
+  + the S20 data audit 20/20 GREEN (seed 20261112 — both EIA sample
+  members EXACT).
+- **The S30 surfaces (what changed where):** BD-S30 (DECISIONS) · the
+  CHANGELOG S30 entry · the roadmap's Session 30 SLOT record + the
+  reserve-buffers section close + the progress board's Reserve row +
+  the current-position note (Session 30/30 · 0 remaining — the program
+  complete) · the page-division README program state · the
+  strategy-log §8 row 34 (the table now complete through the Session
+  30 SLOT) · this file. Zero code, zero deploy, zero KV writes (all
+  four health-pass legs read-only/local).
 
-## Next session (Session 30/30 — the FINAL slot)
+## The program is finished — what a future session looks like
 
-The standing branch — decided by the owner's kickoff prompt:
+There is no next-session prompt: the 30-session roadmap is complete
+(30/30 · 0 remaining). Work re-opens ONLY through the owner's levers
+(listed below), and any future session starts the same way every
+session does — read `AGENTS.md` first, then this file, then the
+roadmap's progress board + current-position note. The standing
+branches for whichever lever arrives:
+
 - **If the owner supplies the investor's §19 answers:** run the
   INVESTOR ROUND (collect → D-49+ in the strategy log §5 Round 4 → the
-  spec v2 entries — the AF-1…AF-8 findings ride that pass, never silent
-  edits); S23's deferred feedback-build scope follows it. **The §19.6
-  answer also opens (or delays) the retirement execution** — record it
-  as Gate 0 in DECISIONS.md and schedule the execution per the
-  checklist's §7 (this final slot or a later one).
+  spec v2 entries — the AF-1…AF-8 findings ride that pass, never
+  silent edits); S23's deferred feedback-build scope follows it. The
+  §19.6 answer also opens (or delays) the retirement execution —
+  record it as Gate 0 in DECISIONS.md and schedule the execution per
+  the checklist's §7.
 - **If the owner supplies the §19.6 sign-off (directly):** the
-  retirement execution may run in the final slot per
-  `06-LEGACY-RETIREMENT-S24.md` §7 (the checklist) — ONLY behind the
-  recorded sign-off.
-- **If neither:** the final buffer slot — the buffer health pass + the
-  program close-out records (the counter reaches 30/30; the project
-  finishes, the remaining levers stay with the owner).
-
-Two OPTIONAL observation reads (no decisions pending on either — record
-only if convenient):
-- The 04:10 UTC rung re-validates T-04 against the patched snapshot
-  (expected green — the trio now stale-marked).
-- The Saturday 11-14 rung-2 gate lands the 11/12 EIA release (expected:
-  the trio returns to fresh/context at age ~8).
+  retirement execution may run per `06-LEGACY-RETIREMENT-S24.md` §7
+  (the checklist) — ONLY behind the recorded sign-off.
+- **If a kickoff arrives for a slot already delivered:** run the
+  counterpart close, never a re-execution; if a duplicate is already
+  pushed, reconcile onto it.
+- **Routine observations need no session:** the standing schedule owns
+  them (the 04:10–04:40 Worker rungs; the Saturday rung-2 gates; the
+  :13/:50 hourly rungs). The two S30-window observations remained
+  expectations at close — the 04:10 UTC rung re-validates T-04 against
+  the patched snapshot (expected green — the trio now stale-marked);
+  the Saturday 11-14 rung-2 gate lands the 11/12 EIA release
+  (expected: the trio returns to fresh/context at age ~8). No decisions
+  pending on either; only the recorded RISK_REGISTER escalation shapes
+  (a multi-week EIA stall past ~2026-11-28; a persistent multi-day ecb
+  stale-past-maxAge) would re-open a question.
 
 ### Operational notes worth carrying
 
@@ -263,14 +271,17 @@ only if convenient):
 3. Ratify the `/converter` relocation (S1's build-session decision).
 4. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement; RENDERED on /usa tier-3).
-5. Ratify or redirect the BD-S3…BD-S29 decision set (the latest:
-   **BD-S29** — the green-rows confirmation landed early via the
-   fresh-slice dispatch, the EIA-trio release-delay finding + the
-   designed-lever heal, the buffer health pass ALL GREEN; all recorded,
-   none blocking).
+5. Ratify or redirect the BD-S3…BD-S30 decision set (the latest:
+   **BD-S30** — the program close-out: the health pass ALL GREEN four
+   legs, the two observation reads left to the standing schedule as
+   expected outcomes, zero KV writes; all recorded, none blocking).
 6. Triage the queued unreviewed fa strings (every session's
    corpus-pinned values are verified byte-for-byte by their copy-pin
    tests).
+7. **Revoke or rotate the session credentials** (the GitHub token, the
+   Cloudflare tokens, the EODHD key): the development work has ended —
+   they were used across the sessions, never stored in the repo, and
+   should now be retired per `AGENTS.md` §7.
 
 ## Known state worth knowing
 
@@ -278,8 +289,8 @@ only if convenient):
   BD-S19c): JS-executing readers get the per-route tags; non-JS
   crawlers see the static whole-product defaults in index.html.
 - The strategy log's §8 session table (docs/page-division/
-  03-STRATEGY-LOG.md) is COMPLETE through the Session 29 SLOT (row 33,
-  added by the S29 close).
+  03-STRATEGY-LOG.md) is COMPLETE through the Session 30 SLOT (row 34,
+  added by the S30 close — the table now covers all 30 sessions).
 - The per-page live backtests (the S20 toolkit): pd-s4 (Global 84) ·
   pd-s5 (Gold 150) · pd-s7 (World Markets 57 — the count scales with
   the served board's present readings) · pd-s8 (zooms 9) ·
@@ -288,8 +299,8 @@ only if convenient):
   pd-s18 (Currencies 53 incl. the rules + board gates) — all
   re-runnable against production from apps/web/scripts/ (pass
   `--base https://currena.ir`; the pd-s4 stateHash arm needs
-  CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in env). S29 re-ran all
-  eleven ALL GREEN (2026-11-12 00:13–00:14 UTC, 705 checks/0 red).
+  CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in env). S30 re-ran all
+  eleven ALL GREEN (2026-11-12 01:50–01:52 UTC, 705 checks/0 red).
 - The S20 data-audit tool is re-runnable: `pnpm --filter @currena/web
   exec tsx ../../apps/web/scripts/pd-s20-data-audit.ts` (mind the
   PortWatch Tuesday window above).

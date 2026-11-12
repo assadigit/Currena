@@ -3321,3 +3321,110 @@
   the Saturday 11-14 gate (a fresh context reading expected; only a
   multi-week provider stall — the trio stale past ~2026-11-28 with the
   Saturday gates all failing — would raise a new provider question).
+
+## 2026-11-12 — BD-S30: the FINAL slot (the Session 30 slot) runs the program close-out — the last buffer branch: the buffer health pass ALL GREEN (four legs) + the close-out records (the counter reaches 30/30; the project finishes; the remaining levers stay with the owner); the retirement execution untouched behind Gate 0; NO deploy (the program's last code change remains the S25 fix, live as `9861a927`)
+
+- **Event:** the Session 30 slot — the FINAL slot of the 30-session
+  page-division roadmap. The owner's kickoff supplied NO investor §19
+  answers and NO §19.6 sign-off, so per the kickoff's own standing-branch
+  rule the slot ran the final buffer branch: the buffer health pass + the
+  program close-out records. The retirement execution stayed untouched
+  (behind the recorded §19.6 sign-off, per the S24 checklist's Gate 0).
+  The parallel-session rule verified at open (~01:45 UTC on 2026-11-12):
+  origin/main at HEAD `d68ac1b` = the S29 close; no S30 records existed —
+  the slot is this session's to deliver.
+- **The delivery record:** one slot, one session, no interruption. The
+  session opened ~1.5 h after the S29 close (00:18:40Z). The first check
+  (the observable state at open): the live status blob is the S29-patched
+  state (generatedAt **2026-11-12T00:12:25.662Z** — the rung2 `--eia`
+  patch; **failedSources EMPTY**; T-01…T-14 with **T-04 the only red**,
+  exactly the S29-recorded honest carry — the rung-2 phase appends rows,
+  it does not re-run the suite, so the 04:10 full collect re-validates
+  T-04 against the patched snapshot; staleCount 12, the honest
+  stale-marked set). Production verified UNCHANGED: currena-api
+  **`9861a927`** (the newest of 362 versions, number 362, created
+  2026-11-11T12:21:25Z) + currena-markets **`8f63c8fa`** (the newest,
+  number 31, created 2026-11-10T00:11:27Z) — both via the Cloudflare
+  versions API. No insights-ingest run since run 92 (the GHA history
+  confirms: 92 workflow_dispatch 00:01:43Z→00:04:19Z success, nothing
+  newer). **The two OPTIONAL observation reads fell OUTSIDE the session's
+  window** (~2.3 h and ~2 days out) and were recorded as expected
+  outcomes only, no decisions pending on either: the 04:10 UTC rung
+  re-validates T-04 against the patched snapshot (expected green — the
+  EIA trio now stale-marked); the Saturday 11-14 rung-2 gate lands the
+  11/12 EIA release (expected: the trio returns to fresh/context at age
+  ~8). The standing schedule owns both; the RISK_REGISTER postures carry
+  them (only a multi-week stall — the trio still stale past ~2026-11-28
+  with the Saturday gates failing — would raise a new provider question).
+- **The buffer health pass (ALL GREEN, four legs, 01:50–01:52 UTC):**
+  (1) the full `pnpm gates` 9/9 in 2m37s — the suite **15,270** = the
+  S26/S27/S28/S29 close count exactly (records-only tree; secret scan 8
+  patterns/1027 files · typecheck 6/6 · lint 0/0 · copy:audit clean ·
+  narrator in sync 193×2+56×2 + eval 50 · layer1 11,969/11,969 · build +
+  budgets held, entry 272.88/82.55); (2) the D-9 standing audit exit 0 —
+  the condition MET (every indicator one lane + one home each; registry ↔
+  engine ↔ placement reconciled; belt-and-braces — nothing this session
+  touched indicators/definitions/placement/§A); (3) the live pd-*
+  backtests ALL ELEVEN ALL CHECKS GREEN against production — **705
+  checks/0 red**, the S29 count exactly: pd-s4 Global 84/84 incl. the
+  raw-KV stateHash arm (the narrator artefact 00:50:18Z post-dates the
+  patched 00:12:25Z snapshot — stateHash IDENTICAL; the S29
+  one-state-behind note healed by the 00:50 rung) · pd-s5 Gold 150/150 ·
+  pd-s7 World Markets 57/57 (the fresh 23:30 markets board, 9 present
+  readings) · pd-s8 zooms 9/9 · pd-s9 USA 115/115 · pd-s10 USA 163/163
+  incl. the TIC sub-gate 48/48 (TIC dataMonth 2026-08 · released
+  2026-10-16 · 21/21 holders · total $9331.7bn) · pd-s12 Europe 8/8 ·
+  pd-s14 Asia 14/14 · pd-s16 Australia 28/28 (7 beyond-grace, all
+  honestly stale) · pd-s17 Commodities 24/24 (the EIA trio
+  beyond-grace + honestly stale — the S29 re-score holds on the wire) ·
+  pd-s18 Currencies 53/53 (14 cards + the rules gate 16 + the board gate
+  23); (4) the S20 data audit 20/20 GREEN (seed 20261112, the frozen
+  sample — both EIA members EXACT against the live LeafHandler page:
+  us-crude-production 14,003 · us-spr 282,184; platinum on the live-price
+  arm's designed difference, intraday 0.33%). All four legs
+  read-only/local — ZERO KV writes this session (the ~18:30–19:00 UTC
+  REST-path cap window and the PortWatch Tuesday window were both moot).
+- **NO deploy** — zero code changed; production currena-api `9861a927` +
+  currena-markets `8f63c8fa` verified unchanged at open. The program's
+  last code change remains the S25 ecb fix (deployed `9861a927`,
+  2026-11-11); every session since has been records + evidence only.
+  Production ≡ HEAD modulo the records commits.
+- **The program close-out (the counter reaches 30/30):** all TEN
+  destinations render their own pages; Phases A–J CLOSED; Phase K: S22
+  closed as a WAITING slot · S23 DEFERRED (blocked on the investor) ·
+  S24 DELIVERED (the D-9 condition MET + the retirement checklist
+  landed); the five reserve slots (the Session 25–29 slots) delivered
+  the ecb maintenance arc through its close and confirmation; the FINAL
+  slot (S30) delivers the health pass + these records. **The project
+  finishes; the remaining levers stay with the owner:** (1) arrange the
+  external investor's review of the spec (§19's seven questions) — the
+  investor round re-opens at the next free slot the moment the answers
+  exist (collect → D-49+ in the strategy log §5 Round 4 → the spec v2
+  entries, with AF-1…AF-8 riding that pass, never silent edits), then
+  S23's deferred feedback-build scope follows it; (2) the §19.6
+  retirement timing answer (directly, or via the investor round) —
+  retire the legacy /insights now that the D-9 audit is green, or after
+  a burn-in period of parallel running; the execution session runs per
+  `06-LEGACY-RETIREMENT-S24.md` §7 ONLY behind the recorded sign-off
+  (the A/B redirect decision — the card-aware option B recommended — and
+  the details-panel port recommendation ride the same gate); (3) ratify
+  the `/converter` relocation (S1); (4) ratify AF-3
+  (`michigan-1y-expectations` → USA tier-3); (5) ratify or redirect the
+  BD-S3…BD-S30 decision set; (6) triage the queued unreviewed fa strings
+  (every session's corpus-pinned values are verified byte-for-byte by
+  their copy-pin tests).
+- **Records:** BD-S30 (this entry) · the CHANGELOG S30 entry · the
+  roadmap: the Session 30 SLOT delivery record + the progress board's
+  Reserve row + the current-position note rewritten (Session 30/30 · 0
+  remaining — the program complete) · the page-division README program
+  state · the strategy-log §8 row 34 (the table now complete through the
+  Session 30 SLOT) · HANDOFF.md fully rewritten (the program close-out).
+- **Revisit:** the standing branches hold for any future session: the
+  investor round the moment the owner supplies the §19 answers; the
+  retirement execution ONLY behind the recorded §19.6 sign-off; the EIA
+  trio self-heals at the Saturday 11-14 gate; the ecb roulette stays
+  per-request (the RISK_REGISTER standing postures). If a kickoff
+  arrives for a slot already delivered, run the counterpart close, never
+  a re-execution. **Credential rotation:** the program's development
+  work is ended — the owner should revoke or rotate every credential
+  supplied across the sessions (they were used, never stored).

@@ -292,11 +292,6 @@ regeneration (`pnpm placement:generate`).
   data audit 20/20). NO deploy (production verified unchanged:
   currena-api `9861a927` + currena-markets `8f63c8fa`); the ecb
   escalation choice has retired to the RISK_REGISTER standing posture.
-  **The owner's levers: (1) arrange the investor's review of
-  spec §19 (the seven questions) — Phase K's remaining input; the
-  investor round re-opens at the next free slot the moment the
-  answers exist; (2) the §19.6 retirement timing answer.** See the
-  roadmap's progress board for the current position.
 
   The Session 29 SLOT (2026-11-12, BD-S29) then ran the fifth reserve
   session — the first-check green-rows CONFIRMATION + the EIA-trio
@@ -324,11 +319,43 @@ regeneration (`pnpm placement:generate`).
   (production verified unchanged: currena-api `9861a927` +
   currena-markets `8f63c8fa`).
 
-  **The owner's levers (unchanged): (1) arrange the investor's review of
-  spec §19 (the seven questions) — Phase K's remaining input; the
-  investor round re-opens at the next free slot the moment the answers
-  exist; (2) the §19.6 retirement timing answer.** See the
-  roadmap's progress board for the current position.
+  The Session 30 SLOT (2026-11-12, BD-S30) then ran the FINAL slot —
+  **the program close-out: THE 30-SESSION PROGRAM IS COMPLETE.** The
+  owner's kickoff supplied no investor §19 answers and no §19.6
+  sign-off, so the slot ran the last buffer branch per its own
+  standing rule: the buffer health pass ALL GREEN four legs (the full
+  gates 9/9 in 2m37s — the suite 15,270, the S26–S29 close count
+  exactly — + the D-9 standing audit exit 0 + the live pd-* backtests
+  ALL ELEVEN ALL CHECKS GREEN against production, 705 checks/0 red
+  [the narrator stateHash IDENTICAL — the S29 one-state-behind note
+  healed by the 00:50 rung; the EIA trio beyond-grace + honestly
+  stale, the S29 re-score holding] + the S20 data audit 20/20, both
+  EIA sample members EXACT) — all read-only/local, zero KV writes —
+  plus the close-out records: the counter reaches **30/30 · 0
+  remaining; the project finishes; the remaining levers stay with the
+  owner**. The two optional observation reads (the 04:10 UTC rung's
+  T-04 re-validation; the Saturday 11-14 rung-2 gate landing the 11/12
+  EIA release) fell outside the session's window — recorded as
+  expected outcomes only, no decisions pending. NO deploy (zero code
+  changed; the program's last code change remains the S25 ecb fix,
+  live as `9861a927` since 2026-11-11; production verified unchanged
+  `9861a927` + `8f63c8fa`). The legacy retirement execution NEVER ran
+  — Gate 0 (the recorded §19.6 sign-off) holds.
+
+  **The owner's levers (the program is finished — these re-open work
+  at the next free slot): (1) arrange the external investor's review
+  of spec §19 (the seven questions) — the investor round re-opens the
+  moment the answers exist (collect → D-49+ in the strategy log §5
+  Round 4 → the spec v2 entries, the AF-1…AF-8 findings riding that
+  pass, never silent edits), then S23's deferred feedback-build scope
+  follows it; (2) the §19.6 retirement timing answer (directly, or via
+  the investor round) — the execution session runs per
+  `06-LEGACY-RETIREMENT-S24.md` §7 ONLY behind the recorded sign-off;
+  (3) ratify the `/converter` relocation (S1) + AF-3 + the
+  BD-S3…BD-S30 decision set; (4) triage the queued unreviewed fa
+  strings; and (5) revoke or rotate the session credentials now that
+  the development work has ended (they were used, never stored).** See
+  the roadmap's progress board for the current position.
 
 ## The one rule that trumps everything
 
