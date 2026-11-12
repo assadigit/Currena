@@ -1,0 +1,213 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Currena market surfaces — warm editorial palette + return inks.
+ * The treemap is a DARK drawing inside a LIGHT card treatment (the TE
+ * contrast), so the page tokens stay warm-light while the canvas uses
+ * literal dark tones (#141210). These are the semantic tokens the
+ * markets components read: --color-surface (card), --color-border
+ * (ring), --color-return-up/down (bright return inks), --currena-*
+ * (status accents), --type-caption (eyebrow), --radius-md/sm.
+ * ------------------------------------------------------------------ */
+:root {
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-background: #f7f5f1;
+  --color-card-dark: #211d19;
+  --color-border: rgba(44, 38, 33, 0.14);
+  --color-border-strong: rgba(44, 38, 33, 0.22);
+  --color-text-primary: #2c2622;
+  --color-text-secondary: #5c544c;
+  --color-text-tertiary: #8a7f74;
+  --color-return-up: #2e9e5b;
+  --color-return-down: #c0392b;
+  --currena-success: #2e9e5b;
+  --currena-warning: #e8a33d;
+  --currena-accent: #4a90e2;
+  --currena-muted: #6b7280;
+  --color-status-alert: #c0392b;
+  --color-status-watch: #e8a33d;
+  --color-status-normal: #2e9e5b;
+  --type-caption: 0.78rem;
+  --type-label: 0.875rem;
+  --type-number: 1.45rem;
+}
+
+.dark {
+  --color-surface: #211d19;
+  --color-surface-raised: #2a2520;
+  --color-background: #141210;
+  --color-card-dark: #211d19;
+  --color-border: rgba(245, 241, 234, 0.14);
+  --color-border-strong: rgba(245, 241, 234, 0.22);
+  --color-text-primary: #f5f1ea;
+  --color-text-secondary: #c4b8a9;
+  --color-text-tertiary: #9a8d7e;
+  --color-return-up: #3ec371;
+  --color-return-down: #e85a4a;
+  --currena-success: #3ec371;
+  --currena-warning: #f0b856;
+  --currena-accent: #6aa8e8;
+  --color-status-alert: #e85a4a;
+  --color-status-watch: #f0b856;
+  --color-status-normal: #3ec371;
+}
+
+/* The keyboard focus ring every markets tile/button wears. */
+.insights-focusable:focus-visible {
+  outline: 2px solid var(--currena-warning);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Treemap tile rect: fill morphs on period change, hover brightens,
+ * selected/focused also brightens; reduced-motion disables the fade. */
+[data-treemap-tile] > .treemap-tile-rect {
+  transition: fill 0.3s ease, filter 0.15s ease;
+}
+[data-treemap-tile]:hover > .treemap-tile-rect,
+[data-treemap-tile]:focus-visible > .treemap-tile-rect {
+  filter: brightness(1.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-treemap-tile] > .treemap-tile-rect {
+    transition: none;
+  }
+}
+
+/* The dark canvas's custom horizontal-pan scrollbar (mobile). */
+.markets-treemap-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+.markets-treemap-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.markets-treemap-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.markets-treemap-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 9999px;
+}

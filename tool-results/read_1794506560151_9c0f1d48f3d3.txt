@@ -1,0 +1,653 @@
+     1→/**
+     2→ * WorldMarketsBriefing — the legacy section's editorial layer restored on
+     3→ * the standalone /world-markets page (the 2026-11-12 owner round: the
+     4→ * "pulse of world markets" briefing the refactored page had omitted).
+     5→ *
+     6→ * Three surfaces, each a faithful port of the legacy /insights section's
+     7→ * own anatomy (the owner: "I worked hard on their UI/UX, so make sure
+     8→ * they are present in this new page"):
+     9→ *
+    10→ *   1. THE BREADTH HEADLINE (MarketsVerdict's R9-06 layer, §3.2): the
+    11→ *      selected period's up/down/flat counts as LARGE numbers over a
+    12→ *      proportional green/red/grey bar, under the period's own label,
+    13→ *      with the stated flat band — marketBreadth's ONE ±1% definition,
+    14→ *      raw values, honest denominator (coverage note when a stored row
+    15→ *      predates the lens).
+    16→ *   2. THE TWO FEATURED MOVERS (MarketMovers, §3.4): true extrema of the
+    17→ *      RAW selected-period values — topMovers, never a fake winner; the
+    18→ *      96/112 wordmark, the signed hero number in the bright return inks
+    19→ *      with the crisp triangle, the separate 52-week-distance line with
+    20→ *      its status chip, and the unambiguous period caption.
+    21→ *   3. THE REGIONAL TILE EXPLORER (MarketTile + MarketDetail, §3.5/§6.3):
+    22→ *      three labelled groups east→west (Asia-Pacific · Europe ·
+    23→ *      Americas), one quiet button-tile per index — the stacked ≥96px
+    24→ *      wordmark, the canonical name + country, the selected-period
+    25→ *      return + triangle, the 52-week-distance tag EVERY tile carries
+    26→ *      (the correcting/bear rings the warning tone), the delayed/old
+    27→ *      honesty tags — expanding the detail panel (the 52-week chart +
+    28→ *      the levels) under its group, one open at a time.
+    29→ *
+    30→ * D-48 discipline (never a second arithmetic): every number flows through
+    31→ * the SAME pure helpers the legacy section reads — marketBreadth /
+    32→ * topMovers / periodValueOf (briefing.ts), viewValue / signOf /
+    33→ * returnToneClass / DirTriangle / statusToneOf / statusWordKeyOf / isOld /
+    34→ * tradingDaysBehind (shared.tsx) — and the REUSED MarketsChart drawing.
+    35→ * The words arrive through the corpus-pinned pd.worldMarkets keys
+    36→ * (world-markets-copy-pin.test.ts pins them byte-for-byte against the
+    37→ * insights corpus in both locales — the lean chunk never imports the
+    38→ * corpus, the WorldMapCopy adapter pattern).
+    39→ *
+    40→ * The lens: the page owns the MarketsView and hands it to the hero's map
+    41→ * as a CONTROLLED period (PERIOD_OF_VIEW below — the legacy bridge), so
+    42→ * the map's segmented switch stays the page's ONE period control, exactly
+    43→ * as the 2026-10-21 unification round established on the legacy section.
+    44→ */
+    45→
+    46→import { useCallback, useMemo, useState } from 'react';
+    47→import type { MarketEntry, MarketId, MarketGroupId, MarketsSnapshot } from '@currena/core';
+    48→import { formatNumber } from '@currena/core';
+    49→import { MARKETS, MARKET_GROUP_ORDER, decodeWeeklySeries } from '@currena/insights/markets/definitions';
+    50→import { interpolate } from '../../i18n';
+    51→import { useI18n } from '../../lib/locale';
+    52→import type { TranslationKey } from '../../lib/locale';
+    53→import { MarketsChart } from '../../components/insights/MarketsChart';
+    54→import type { MarketsChartCopy } from '../../components/insights/MarketsChart';
+    55→import { MarketLogo } from '../../components/insights/world-markets/MarketLogo';
+    56→import { MarketsTreemap } from '../../components/insights/world-markets/MarketsTreemap';
+    57→import { formatAsOf } from '../../components/insights/HistoryChart';
+    58→import { marketBreadth, topMovers, periodValueOf } from '../../components/insights/world-markets/briefing';
+    59→import type { MarketBreadth } from '../../components/insights/world-markets/briefing';
+    60→import {
+    61→  DirTriangle,
+    62→  NO_READING,
+    63→  returnToneClass,
+    64→  signOf,
+    65→  signedPct,
+    66→  signedPctOrDash,
+    67→  statusToneOf,
+    68→  statusWordKeyOf,
+    69→  tradingDaysBehind,
+    70→  trendOf,
+    71→  viewValue,
+    72→  isOld,
+    73→  type MarketsView,
+    74→} from '../../components/insights/world-markets/shared';
+    75→import type { StockStateWordKey } from '../../components/insights/world-markets/shared';
+    76→import type { MapPeriod } from '../../components/insights/world-markets/world-map-config';
+    77→
+    78→/* ------------------------------------------------------------------ *
+    79→ * The lens bridge — the legacy section's own closed-set lookup tables
+    80→ * (2026-10-21 unification round): the map's switch speaks MapPeriod,
+    81→ * the briefing speaks MarketsView; the page owns the view and hands the
+    82→ * map the period, so ONE switch drives the hero, the breadth, the movers
+    83→ * and the tiles.
+    84→ * ------------------------------------------------------------------ */
+    85→
+    86→export const PERIOD_OF_VIEW: Record<MarketsView, MapPeriod> = {
+    87→  today: '1D',
+    88→  '1w': '1W',
+    89→  '1m': '1M',
+    90→  '3m': '3M',
+    91→  '1y': '1Y',
+    92→  '5y': '5Y',
+    93→};
+    94→
+    95→export const VIEW_OF_PERIOD: Record<MapPeriod, MarketsView> = {
+    96→  '1D': 'today',
+    97→  '1W': '1w',
+    98→  '1M': '1m',
+    99→  '3M': '3m',
+   100→  '1Y': '1y',
+   101→  '5Y': '5y',
+   102→};
+   103→
+   104→/* The localized period word for a lens — one mapping drives every
+   105→ * mention of "which period am I in" (the corpus's own map period words,
+   106→ * pinned byte-for-byte). */
+   107→const PERIOD_WORD_KEY: Record<MarketsView, TranslationKey> = {
+   108→  today: 'pd.worldMarkets.map.periodWordToday',
+   109→  '1w': 'pd.worldMarkets.map.periodWordWeek',
+   110→  '1m': 'pd.worldMarkets.map.periodWordMonth',
+   111→  '3m': 'pd.worldMarkets.map.periodWord3M',
+   112→  '1y': 'pd.worldMarkets.map.periodWordYear',
+   113→  '5y': 'pd.worldMarkets.map.periodWord5Y',
+   114→};
+   115→
+   116→/* The status words (the L2-01 −5/−10/−20 convention) — the corpus's own,
+   117→ * the same keys the region grids speak. */
+   118→const STATUS_KEY: Record<StockStateWordKey, TranslationKey> = {
+   119→  statusNearHigh: 'pd.worldMarkets.statusNearHigh',
+   120→  statusPullback: 'pd.worldMarkets.statusPullback',
+   121→  statusCorrection: 'pd.worldMarkets.statusCorrection',
+   122→  statusBear: 'pd.worldMarkets.statusBear',
+   123→};
+   124→
+   125→/* The trend band's words (chg3m ±1%) — the corpus's own. */
+   126→const TREND_KEY: Record<'up' | 'flat' | 'down', TranslationKey> = {
+   127→  up: 'pd.worldMarkets.trendUp',
+   128→  flat: 'pd.worldMarkets.trendFlat',
+   129→  down: 'pd.worldMarkets.trendDown',
+   130→};
+   131→
+   132→const GROUP_KEY: Record<MarketGroupId, TranslationKey> = {
+   133→  asia: 'pd.worldMarkets.groups.asia',
+   134→  europe: 'pd.worldMarkets.groups.europe',
+   135→  americas: 'pd.worldMarkets.groups.americas',
+   136→};
+   137→
+   138→/* ------------------------------------------------------------------ *
+   139→ * 1 — the breadth headline (MarketsVerdict's R9-06 layer, §3.2)
+   140→ * ------------------------------------------------------------------ */
+   141→
+   142→const BREADTH_TONE: Record<'up' | 'down' | 'flat', string> = {
+   143→  up: 'text-[var(--color-return-up)]',
+   144→  down: 'text-[var(--color-return-down)]',
+   145→  flat: 'text-[var(--color-text-secondary)]',
+   146→};
+   147→
+   148→const BREADTH_BAR: Record<'up' | 'down' | 'flat', string> = {
+   149→  up: 'bg-[var(--color-return-up)]',
+   150→  down: 'bg-[var(--color-return-down)]',
+   151→  flat: 'bg-[var(--color-text-tertiary)] opacity-40',
+   152→};
+   153→
+   154→function BreadthBlock({ breadth, periodWord }: { breadth: MarketBreadth; periodWord: string }): React.JSX.Element {
+   155→  const { t, numberLocale } = useI18n();
+   156→  const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+   157→  const cells: Array<['up' | 'down' | 'flat', string, number]> = [
+   158→    ['up', t('pd.worldMarkets.breadthUp'), breadth.up],
+   159→    ['down', t('pd.worldMarkets.breadthDown'), breadth.down],
+   160→    ['flat', t('pd.worldMarkets.breadthFlat'), breadth.flat],
+   161→  ];
+   162→  const barTotal = breadth.up + breadth.down + breadth.flat;
+   163→  return (
+   164→    <div
+   165→      data-markets-breadth-block
+   166→      className="flex min-w-0 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-4"
+   167→    >
+   168→      <p className="m-0 mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+   169→        <span className="text-[length:var(--type-caption)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+   170→          <bdi>{interpolate(t('pd.worldMarkets.breadthPeriod'), { period: periodWord })}</bdi>
+   171→        </span>
+   172→        {breadth.valid < breadth.total ? (
+   173→          <span className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+   174→            <bdi>{interpolate(t('pd.worldMarkets.coverageNote'), { count: num(breadth.valid), total: num(breadth.total) })}</bdi>
+   175→          </span>
+   176→        ) : null}
+   177→      </p>
+   178→      {/* DOM order keeps dt → dd (label then number) inside each block;
+   179→       * the blocks lay out number-first via flex-col-reverse (§3.2). */}
+   180→      <dl className="m-0 grid grid-cols-3 gap-2" data-markets-breadth>
+   181→        {cells.map(([kind, label, count]) => (
+   182→          <div
+   183→            key={kind}
+   184→            data-breadth-kind={kind}
+   185→            className="flex flex-col-reverse items-center justify-end gap-1.5 rounded-[var(--radius-sm)] bg-currena-soft/50 px-1.5 py-2.5 ring-1 ring-[var(--color-border)]/60"
+   186→          >
+   187→            <dt className="text-center text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">{label}</dt>
+   188→            <dd className={`m-0 text-[1.75rem] font-bold leading-none tabular-nums sm:text-[2rem] ${BREADTH_TONE[kind]}`}>
+   189→              <bdi>{num(count)}</bdi>
+   190→            </dd>
+   191→          </div>
+   192→        ))}
+   193→      </dl>
+   194→      {/* The proportional breadth bar (R9-06): decorative — aria-hidden,
+   195→       * the numbers carry the meaning; in RTL the row mirrors with the
+   196→       * document direction, which is exactly the reading order the
+   197→       * counts above already speak. */}
+   198→      {barTotal > 0 ? (
+   199→        <div
+   200→          aria-hidden="true"
+   201→          data-markets-breadth-bar
+   202→          className="mt-2 flex h-2.5 w-full overflow-hidden rounded-full ring-1 ring-[var(--color-border)]/70"
+   203→        >
+   204→          <span style={{ flexGrow: breadth.up }} className={BREADTH_BAR.up} />
+   205→          <span style={{ flexGrow: breadth.down }} className={BREADTH_BAR.down} />
+   206→          <span style={{ flexGrow: breadth.flat }} className={BREADTH_BAR.flat} />
+   207→        </div>
+   208→      ) : null}
+   209→      {/* S1-M1.6 #2: the flat threshold stated — the band that decides
+   210→       * up/flat/down is a rule the reader can check against the numbers. */}
+   211→      <p className="m-0 mt-1.5 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-markets-flat-band-note>
+   212→        {t('pd.worldMarkets.flatBandNote')}
+   213→      </p>
+   214→    </div>
+   215→  );
+   216→}
+   217→
+   218→/* ------------------------------------------------------------------ *
+   219→ * 2 — the two featured movers (MarketMovers, §3.4)
+   220→ * ------------------------------------------------------------------ */
+   221→
+   222→function MoverCard({
+   223→  entry,
+   224→  kind,
+   225→  view,
+   226→  periodWord,
+   227→}: {
+   228→  entry: MarketEntry;
+   229→  kind: 'gain' | 'fall';
+   230→  view: MarketsView;
+   231→  periodWord: string;
+   232→}): React.JSX.Element {
+   233→  const { t, locale, numberLocale } = useI18n();
+   234→  const pct = periodValueOf(entry, view);
+   235→  // The ink + triangle follow the NUMBER'S own sign; the gainer/decliner
+   236→  // VALENCE stays on the card's title label (a decliner card can still
+   237→  // carry a bright green weekly number when that week rose).
+   238→  const dir = signOf(pct);
+   239→  const atHigh = entry.fromHigh > -0.5;
+   240→  const name = t(`pd.worldMarkets.entries.${entry.id}.name`);
+   241→  const country = t(`pd.worldMarkets.entries.${entry.id}.country`);
+   242→  const latin = t(`pd.worldMarkets.entries.${entry.id}.latin`);
+   243→  const aria = interpolate(t('pd.worldMarkets.valueAria'), {
+   244→    name,
+   245→    country,
+   246→    value: pct === null ? t('pd.worldMarkets.noReadingAria') : signedPct(pct, numberLocale, locale),
+   247→    period: periodWord,
+   248→  });
+   249→  return (
+   250→    <article
+   251→      data-markets-biggest={kind}
+   252→      aria-label={aria}
+   253→      className="flex min-w-0 flex-col gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-4"
+   254→    >
+   255→      {/* The card's own role label wears the calm valence ink. */}
+   256→      <p
+   257→        className={`m-0 text-[length:var(--type-caption)] font-bold uppercase tracking-wide ${
+   258→          kind === 'gain' ? 'text-[var(--color-status-normal)]' : 'text-[var(--color-status-alert)]'
+   259→        }`}
+   260→      >
+   261→        {kind === 'gain' ? t('pd.worldMarkets.moverGain') : t('pd.worldMarkets.moverLoss')}
+   262→      </p>
+   263→      <div className="flex min-w-0 items-center gap-3">
+   264→        {/* The featured mover wordmark: 96px (112 on desktop) — the
+   265→         * 2026-10-18 owner follow-up's ≥96px floor. */}
+   266→        <MarketLogo id={entry.id} latin={latin} size={96} desktopSize={112} />
+   267→        <span className="min-w-0 flex-1">
+   268→          <span className="block truncate text-[1rem] font-bold leading-snug text-[var(--color-text-primary)]">
+   269→            {name}
+   270→            {locale === 'fa' ? (
+   271→              <span lang="en" dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+   272→                {latin}
+   273→              </span>
+   274→            ) : null}
+   275→          </span>
+   276→          <span className="block truncate text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{country}</span>
+   277→        </span>
+   278→      </div>
+   279→      {/* The hero number: the bright return inks + the crisp triangle; a
+   280→       * missing lens reading renders the honest dash (never a fake 0). */}
+   281→      <p
+   282→        className={`m-0 inline-flex items-center gap-1.5 text-[length:var(--type-number)] font-bold leading-none ${
+   283→          dir === 'flat' ? 'text-[var(--color-text-primary)]' : returnToneClass(dir)
+   284→        }`}
+   285→      >
+   286→        <bdi dir="ltr" className="type-number tabular-nums">
+   287→          {pct === null ? NO_READING : signedPct(pct, numberLocale, locale)}
+   288→        </bdi>
+   289→        {pct === null ? null : <DirTriangle dir={dir} size={14} />}
+   290→      </p>
+   291→      {/* The quiet secondary line: the distance from the 52-week high — a
+   292→       * SEPARATE metric, never the period's return (§3.3). */}
+   293→      <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+   294→        <span>{t('pd.worldMarkets.thFromHigh')}:</span>
+   295→        <bdi dir="ltr" className="font-semibold tabular-nums text-[var(--color-text-secondary)]">
+   296→          {signedPct(entry.fromHigh, numberLocale, locale)}
+   297→        </bdi>
+   298→        <span
+   299→          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${
+   300→            atHigh ? 'bg-currena-success/10 text-[var(--color-status-normal)]' : statusToneOf(entry.fromHigh)
+   301→          }`}
+   302→        >
+   303→          {atHigh ? t('pd.worldMarkets.atHighTag') : t(STATUS_KEY[statusWordKeyOf(entry.fromHigh)])}
+   304→        </span>
+   305→      </p>
+   306→      {/* The unambiguous period caption (§3.4). */}
+   307→      <p className="m-0 mt-auto text-[0.68rem] font-semibold text-[var(--color-text-tertiary)]">
+   308→        <bdi>{interpolate(t('pd.worldMarkets.moverPeriodLabel'), { period: periodWord })}</bdi>
+   309→      </p>
+   310→    </article>
+   311→  );
+   312→}
+   313→
+   314→/** §3.4's honest empty state — no valid values, no fake winner. */
+   315→function MoverEmpty({ kind }: { kind: 'gain' | 'fall' }): React.JSX.Element {
+   316→  const { t } = useI18n();
+   317→  return (
+   318→    <article
+   319→      data-markets-biggest={kind}
+   320→      className="flex min-w-0 flex-col gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:p-4"
+   321→    >
+   322→      <p
+   323→        className={`m-0 text-[length:var(--type-caption)] font-bold uppercase tracking-wide ${
+   324→          kind === 'gain' ? 'text-[var(--color-status-normal)]' : 'text-[var(--color-status-alert)]'
+   325→        }`}
+   326→      >
+   327→        {kind === 'gain' ? t('pd.worldMarkets.moverGain') : t('pd.worldMarkets.moverLoss')}
+   328→      </p>
+   329→      <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+   330→        {t('pd.worldMarkets.moversNone')}
+   331→      </p>
+   332→    </article>
+   333→  );
+   334→}
+   335→
+   336→/* ------------------------------------------------------------------ *
+   337→ * 3a — one market tile (MarketTile, §6.3: quiet by default, real button)
+   338→ * ------------------------------------------------------------------ */
+   339→
+   340→function BriefingTile({
+   341→  entry,
+   342→  view,
+   343→  open,
+   344→  todayIso,
+   345→  freshestIso,
+   346→  onToggle,
+   347→}: {
+   348→  entry: MarketEntry;
+   349→  view: MarketsView;
+   350→  open: boolean;
+   351→  todayIso: string;
+   352→  /** The snapshot's freshest close — the delayed tag's baseline (A7). */
+   353→  freshestIso: string;
+   354→  onToggle: (id: MarketId) => void;
+   355→}): React.JSX.Element {
+   356→  const { t, locale, numberLocale } = useI18n();
+   357→  const { pct } = viewValue(entry, view);
+   358→  const dir = signOf(pct);
+   359→  const old = isOld(entry, todayIso);
+   360→  const delayed = !old && tradingDaysBehind(entry.asOf, freshestIso) > 1;
+   361→  // F5: EVERY tile shows its distance from the 52-week high (not only the
+   362→  // correcting markets); the correcting/bear tiles keep their warning ring.
+   363→  const tagX = formatNumber(Math.abs(entry.fromHigh), numberLocale, { maximumFractionDigits: 0 });
+   364→  const name = t(`pd.worldMarkets.entries.${entry.id}.name`);
+   365→  const country = t(`pd.worldMarkets.entries.${entry.id}.country`);
+   366→  const latin = t(`pd.worldMarkets.entries.${entry.id}.latin`);
+   367→  const periodWord = t(PERIOD_WORD_KEY[view]);
+   368→  const srValue = pct === null ? t('pd.worldMarkets.noReadingAria') : signedPct(pct, numberLocale, locale);
+   369→  return (
+   370→    <button
+   371→      type="button"
+   372→      id={`insights-market-tile-${entry.id}`}
+   373→      aria-expanded={open}
+   374→      aria-controls={`insights-market-detail-${entry.id}`}
+   375→      data-markets-tile={entry.id}
+   376→      onClick={() => onToggle(entry.id)}
+   377→      className={`insights-focusable flex min-h-[44px] w-full cursor-pointer flex-col items-start gap-0.5 rounded-[var(--radius-md)] px-2.5 py-2 text-start ring-1 transition-colors ${
+   378→        entry.status === 'correction'
+   379→          ? 'ring-currena-warning/30 hover:bg-currena-warning/[0.06]'
+   380→          : entry.status === 'bear'
+   381→            ? 'ring-currena-warning/40 hover:bg-currena-warning/[0.06]'
+   382→            : 'ring-[var(--color-border)] hover:bg-currena-soft/60'
+   383→      } ${open ? 'bg-currena-warning/[0.05]' : 'bg-[var(--color-surface)]'} ${old ? 'opacity-80' : ''}`}
+   384→    >
+   385→      {/* The identity row: the stacked ≥96px wordmark above the canonical
+   386→       * name + country (the explorer tiles stay narrow at 2→7 columns). */}
+   387→      <span className="flex w-full flex-col gap-1.5">
+   388→        <MarketLogo id={entry.id} latin={latin} size={96} desktopSize={96} />
+   389→        <span className="min-w-0">
+   390→          <span className="block truncate text-[length:var(--type-label)] font-bold leading-snug text-[var(--color-text-secondary)]">
+   391→            {name}
+   392→          </span>
+   393→          <span className="block truncate text-[0.68rem] leading-snug text-[var(--color-text-tertiary)]">{country}</span>
+   394→        </span>
+   395→      </span>
+   396→      {/* The selected-period return: the bright return inks + the crisp
+   397→       * triangle; a missing lens shows the honest dash, never a guess. */}
+   398→      <span className={`inline-flex items-center gap-1 font-semibold ${returnToneClass(dir)}`}>
+   399→        <bdi dir="ltr" className="type-number tabular-nums">
+   400→          {signedPctOrDash(pct, numberLocale, locale)}
+   401→        </bdi>
+   402→        {pct === null ? null : <DirTriangle dir={dir} size={11} />}
+   403→      </span>
+   404→      {/* The 52-week distance tag EVERY tile carries. */}
+   405→      {entry.fromHigh > -0.5 ? (
+   406→        <span className="inline-flex items-center rounded-full bg-currena-success/10 px-2 py-0.5 text-[0.68rem] font-bold text-[var(--color-status-normal)]">
+   407→          {t('pd.worldMarkets.atHighTag')}
+   408→        </span>
+   409→      ) : (
+   410→        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${statusToneOf(entry.fromHigh)}`}>
+   411→          {interpolate(t('pd.worldMarkets.tileTagBelow'), { x: tagX })}
+   412→        </span>
+   413→      )}
+   414→      {delayed ? (
+   415→        <span className="inline-flex items-center rounded-full bg-currena-muted/15 px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--color-text-secondary)]">
+   416→          {t('pd.worldMarkets.delayedTag')}
+   417→        </span>
+   418→      ) : null}
+   419→      {old ? (
+   420→        <span className="inline-flex items-center rounded-full bg-currena-muted/15 px-2 py-0.5 text-[0.68rem] font-semibold text-[var(--color-text-stale)]">
+   421→          {interpolate(t('pd.worldMarkets.oldDataLine'), { date: formatAsOf(entry.asOf, locale) })}
+   422→        </span>
+   423→      ) : null}
+   424→      {/* §9: the screen reader hears name, country, selected period and
+   425→       * value, then the trend word + the status word + the as-of date. */}
+   426→      <span className="sr-only">
+   427→        {interpolate(t('pd.worldMarkets.valueAria'), { name, country, value: srValue, period: periodWord })}
+   428→        , {t(TREND_KEY[trendOf(entry)])}, {t(STATUS_KEY[statusWordKeyOf(entry.fromHigh)])},{' '}
+   429→        {interpolate(t('pd.worldMarkets.asOfLine'), { date: formatAsOf(entry.asOf, locale) })}
+   430→      </span>
+   431→    </button>
+   432→  );
+   433→}
+   434→
+   435→/* ------------------------------------------------------------------ *
+   436→ * 3b — the detail panel (MarketDetail's board-true anatomy, §6.5): the
+   437→ * identity row, the REUSED 52-week chart, and the levels — every value a
+   438→ * stored field, never a re-derivation.
+   439→ * ------------------------------------------------------------------ */
+   440→
+   441→function BriefingDetail({ entry }: { entry: MarketEntry }): React.JSX.Element {
+   442→  const { t, locale, numberLocale } = useI18n();
+   443→  const weekly = useMemo(() => decodeWeeklySeries(entry.weekly), [entry.weekly]);
+   444→  const atHigh = entry.fromHigh > -0.5;
+   445→  const name = t(`pd.worldMarkets.entries.${entry.id}.name`);
+   446→  const country = t(`pd.worldMarkets.entries.${entry.id}.country`);
+   447→  const latin = t(`pd.worldMarkets.entries.${entry.id}.latin`);
+   448→  const chartCopy = useMemo<MarketsChartCopy>(
+   449→    () => ({
+   450→      markets: {
+   451→        chartAria: t('pd.worldMarkets.chartAria'),
+   452→        high52wLabel: t('pd.worldMarkets.high52wLabel'),
+   453→        low52wLabel: t('pd.worldMarkets.low52wLabel'),
+   454→        lastCloseLabel: t('pd.worldMarkets.lastCloseLabel'),
+   455→      },
+   456→      ui: { na: t('pd.worldMarkets.naWord') },
+   457→    }),
+   458→    [t],
+   459→  );
+   460→  const levels: Array<[string, string]> = [
+   461→    [t('pd.worldMarkets.lastCloseLabel'), formatNumber(entry.close, numberLocale, { maximumFractionDigits: entry.close >= 1000 ? 0 : 2 })],
+   462→    [t('pd.worldMarkets.high52wLabel'), formatNumber(entry.high52w, numberLocale, { maximumFractionDigits: entry.high52w >= 1000 ? 0 : 2 })],
+   463→    [t('pd.worldMarkets.low52wLabel'), formatNumber(entry.low52w, numberLocale, { maximumFractionDigits: entry.low52w >= 1000 ? 0 : 2 })],
+   464→  ];
+   465→  return (
+   466→    <div
+   467→      id={`insights-market-detail-${entry.id}`}
+   468→      className="mt-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-4"
+   469→    >
+   470→      {/* The heading row: the same ≥96px wordmark + name + country + the
+   471→       * 52-week status chip every surface wears. */}
+   472→      <p className="m-0 mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+   473→        <MarketLogo id={entry.id} latin={latin} size={96} desktopSize={96} />
+   474→        <span className="min-w-0">
+   475→          <span className="block truncate text-[length:var(--type-number)] font-bold leading-tight text-[var(--color-text-primary)]">
+   476→            {name}
+   477→          </span>
+   478→          <span className="block truncate text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
+   479→            {country}
+   480→            {locale === 'fa' ? (
+   481→              <span lang="en" dir="ltr" className="ms-1.5">
+   482→                {latin}
+   483→              </span>
+   484→            ) : null}
+   485→          </span>
+   486→        </span>
+   487→        <span className={`ms-auto inline-flex items-center rounded-full px-2 py-0.5 text-[0.68rem] font-bold ${statusToneOf(entry.fromHigh)}`}>
+   488→          {atHigh ? t('pd.worldMarkets.atHighTag') : t(STATUS_KEY[statusWordKeyOf(entry.fromHigh)])}
+   489→        </span>
+   490→      </p>
+   491→      {/* §6.5: time runs left to right on the chart in Farsi too. */}
+   492→      <div dir="ltr" className="not-prose">
+   493→        <MarketsChart weekly={weekly} close={entry.close} high52w={entry.high52w} low52w={entry.low52w} copy={chartCopy} numberLocale={numberLocale} />
+   494→      </div>
+   495→      <dl className="m-0 mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+   496→        {levels.map(([label, value]) => (
+   497→          <div key={label} className="flex items-baseline gap-1.5">
+   498→            <dt className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{label}</dt>
+   499→            <dd className="m-0">
+   500→              <bdi dir="ltr" className="type-number font-semibold tabular-nums text-[var(--color-text-primary)]">
+   501→                {value}
+   502→              </bdi>
+   503→            </dd>
+   504→          </div>
+   505→        ))}
+   506→        <div className="flex items-baseline gap-1.5">
+   507→          <dt className="text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{t('pd.worldMarkets.thFromHigh')}</dt>
+   508→          <dd className="m-0">
+   509→            <bdi dir="ltr" className="type-number font-semibold tabular-nums text-[var(--color-text-primary)]">
+   510→              {signedPct(entry.fromHigh, numberLocale, locale)}
+   511→            </bdi>
+   512→          </dd>
+   513→        </div>
+   514→        <div className="flex items-baseline gap-1.5">
+   515→          <dd className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">
+   516→            <bdi>{interpolate(t('pd.worldMarkets.asOfLine'), { date: formatAsOf(entry.asOf, locale) })}</bdi>
+   517→          </dd>
+   518→        </div>
+   519→      </dl>
+   520→    </div>
+   521→  );
+   522→}
+   523→
+   524→/* ------------------------------------------------------------------ *
+   525→ * The section
+   526→ * ------------------------------------------------------------------ */
+   527→
+   528→export function WorldMarketsBriefing({
+   529→  snapshot,
+   530→  view,
+   531→  todayIso,
+   532→}: {
+   533→  snapshot: MarketsSnapshot;
+   534→  /** The selected return lens — the page-owned view the map's switch
+   535→   * drives (one period control for the whole page). */
+   536→  view: MarketsView;
+   537→  todayIso: string;
+   538→}): React.JSX.Element {
+   539→  const { t, numberLocale } = useI18n();
+   540→  const [openId, setOpenId] = useState<MarketId | null>(null);
+   541→  const periodWord = t(PERIOD_WORD_KEY[view]);
+   542→
+   543→  const onToggleTile = useCallback((id: MarketId) => {
+   544→    // One panel open at a time (§6.3); the newly opened panel scrolls
+   545→    // into view so a keyboard/tap activation is never answered with an
+   546→    // invisible panel (the legacy onOpenRow discipline).
+   547→    setOpenId((prev) => {
+   548→      const next = prev === id ? null : id;
+   549→      if (next !== null) {
+   550→        requestAnimationFrame(() => {
+   551→          document.getElementById(`insights-market-detail-${next}`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+   552→        });
+   553→      }
+   554→      return next;
+   555→    });
+   556→  }, []);
+   557→
+   558→  const breadth = useMemo(() => marketBreadth(snapshot.markets, view), [snapshot, view]);
+   559→  const movers = useMemo(() => topMovers(snapshot.markets, view), [snapshot, view]);
+   560→  // The freshest close any market carries — the delayed tag's baseline.
+   561→  const freshestIso = useMemo(
+   562→    () => snapshot.markets.reduce((max, m) => (m.asOf > max ? m.asOf : max), snapshot.markets[0]?.asOf ?? todayIso),
+   563→    [snapshot, todayIso],
+   564→  );
+   565→
+   566→  const groups = useMemo(
+   567→    () =>
+   568→      MARKET_GROUP_ORDER.map((group) => ({
+   569→        group,
+   570→        entries: MARKETS.filter((m) => m.group === group)
+   571→          .map((m) => snapshot.markets.find((e) => e.id === m.id))
+   572→          .filter((e): e is MarketEntry => e !== undefined),
+   573→      })),
+   574→    [snapshot],
+   575→  );
+   576→
+   577→  return (
+   578→    <section aria-label={t('pd.worldMarkets.briefingAria')} data-wm-briefing className="mt-3 flex flex-col gap-3 scroll-mt-24 sm:mt-5 sm:gap-4">
+   579→      <h2 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">
+   580→        {t('pd.worldMarkets.briefingHeading')}
+   581→      </h2>
+   582→
+   583→      {/* The breadth headline + the two featured movers — the owner's
+   584→       * approved three-card row (breadth · biggest gain · biggest fall). */}
+   585→      <div className="grid gap-3 lg:grid-cols-3">
+   586→        <BreadthBlock breadth={breadth} periodWord={periodWord} />
+   587→        {movers.gainer !== null ? (
+   588→          <MoverCard entry={movers.gainer} kind="gain" view={view} periodWord={periodWord} />
+   589→        ) : (
+   590→          <MoverEmpty kind="gain" />
+   591→        )}
+   592→        {movers.decliner !== null ? (
+   593→          <MoverCard entry={movers.decliner} kind="fall" view={view} periodWord={periodWord} />
+   594→        ) : (
+   595→          <MoverEmpty kind="fall" />
+   596→        )}
+   597→      </div>
+   598→
+   599→      {/* UI-27 (the legacy §3.3 note): returns are in each market's own
+   600→       * currency — explaining every tile below it. */}
+   601→      <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-local-currency-note>
+   602→        {t('pd.worldMarkets.localCurrencyNote')}
+   603→      </p>
+   604→
+   605→      {/* The market heat map (the 2026-11-12 treemap round): the TE-style
+   606→       * treemap between the movers and the regional explorer — tile size
+   607→       * ≈ market cap, colour ≈ the selected period's return, the tiles
+   608→       * opening the SAME detail panel the explorer's tiles open (the
+   609→       * shared openId — one panel at a time, never two entry points
+   610→       * diverging). */}
+   611→      <MarketsTreemap snapshot={snapshot} view={view} openId={openId} onToggle={onToggleTile} />
+   612→
+   613→      {/* The regional tile explorer (§3.5): three labelled groups, the
+   614→       * world waking up east to west (§6.3) — DOM order = trading-day
+   615→       * order; in Farsi the RTL flow puts Asia-Pacific at the right. */}
+   616→      <div className="flex flex-col gap-3">
+   617→        {groups.map(({ group, entries }) => {
+   618→          if (entries.length === 0) return null;
+   619→          const openEntry = entries.find((e) => e.id === openId) ?? null;
+   620→          return (
+   621→            <div key={group} data-markets-region={group} aria-label={t(GROUP_KEY[group])}>
+   622→              {/* Region headings create the explorer's rhythm (§3.5) —
+   623→               * counts from the loaded dataset, never a hardcoded 16. */}
+   624→              <h3 className="m-0 mb-1 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
+   625→                {t(GROUP_KEY[group])}{' '}
+   626→                <span className="font-semibold">
+   627→                  ({formatNumber(entries.length, numberLocale, { maximumFractionDigits: 0 })})
+   628→                </span>
+   629→              </h3>
+   630→              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+   631→                {entries.map((entry) => (
+   632→                  <BriefingTile
+   633→                    key={entry.id}
+   634→                    entry={entry}
+   635→                    view={view}
+   636→                    open={openId === entry.id}
+   637→                    todayIso={todayIso}
+   638→                    freshestIso={freshestIso}
+   639→                    onToggle={onToggleTile}
+   640→                  />
+   641→                ))}
+   642→              </div>
+   643→              {/* The open market's detail panel renders under ITS group
+   644→               * (§6.3) — only one panel is open at a time. */}
+   645→              {openEntry !== null ? <BriefingDetail entry={openEntry} /> : null}
+   646→            </div>
+   647→          );
+   648→        })}
+   649→      </div>
+   650→    </section>
+   651→  );
+   652→}
+   653→

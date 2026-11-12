@@ -1,0 +1,252 @@
+/tmp/currena-ref/CHANGELOG.md-5-as a private monorepo, releases are tracked by date and Workers version rather
+/tmp/currena-ref/CHANGELOG.md-6-than a semver tag.
+/tmp/currena-ref/CHANGELOG.md-7-
+/tmp/currena-ref/CHANGELOG.md:8:## [2026-11-12] Treemap (the owner-requested market heat map round): **the TE-style treemap on /world-markets — tile size ≈ market capitalization, colour ≈ the selected period's return.** A tradingeconomics-style two-level squarified treemap now renders between the briefing's movers row and the regional tile explorer: the three region bands (AMERICAS · 5 / ASIA-PACIFIC · 7 / EUROPE · 4, TE order — biggest first) sized by their summed constituent caps, the 16 leaf tiles sized by each index's own cap (S&P 500 the biggest, Ibovespa the smallest; Americas ≈ 72% of the canvas, Asia-Pacific ≈ 20%, Europe ≈ 8% — TE's authentic proportions) and coloured by the selected period's return on a diverging red ↔ warm-gray ↔ green ramp (Currena's own return inks) with a per-lens saturation clamp (±3% today · ±5% 1w · ±8% 1m · ±12% 3m · ±15% 1y · ±20% 5y) so longer horizons do not read as wall-to-wall extremes; the legend and footer re-clamp live with the period switch. The discipline set: the return the colour encodes is the SAME periodValueOf read the breadth/movers/tiles speak (D-48 — never a second arithmetic; a missing lens keeps the neutral gray + the honest dash), the tiles are real buttons that toggle the briefing's SHARED detail panel (one open at a time, the amber selection ring, Enter/Space, aria-expanded/aria-controls, the .insights-focusable ring), and the layout itself is a zero-dependency deterministic pure function (Bruls et al. squarified treemap, two passes — SSR-safe, no library). The cap table is ILLUSTRATIVE DEMO DATA, plainly labelled in the card's footer (no cap field exists in the stored contract — BD-TM1 records the decision and the revisit condition). 7 new `pd.worldMarkets.treemap.*` keys × 2 locales (the borrowed period/status/entry words are the section's own pinned keys; the 7 fa strings queued in the Persian copy manifest, the S7/S31 precedent). The World Markets lazy-chunk budget bumps 40/9 → 50/11 kB (measured 46.41/10.78 — the treemap module + the copy pair, justified here). The verification: 27 new unit tests (squarify coverage/containment/no-overlap/determinism, the region proportions, the per-lens clamp, the label rules) + the full web suite 13,230 green + lint 0 + typecheck 0 + the copy audit clean; the browser pass over the built dist + live feeds (EN + FA/RTL + 390px mobile): all 16 tiles labelled, the tooltip/aria anatomy per spec, the click → shared panel + smooth scroll, the period switch recolouring all 16 tiles with the legend re-clamping ±3% → ±5%, the mobile horizontal pan inside the card with no body overflow, zero console errors. NOT yet deployed (see HANDOFF — the deploy follows this commit per the standing approval).
+/tmp/currena-ref/CHANGELOG.md-9-
+/tmp/currena-ref/CHANGELOG.md-10-- **What changed (plain words):** the `/world-markets` page now shows a
+/tmp/currena-ref/CHANGELOG.md-11-  "Market heat map" card between the movers and the regional tiles —
+--
+/tmp/currena-ref/apps/web/src/index.css-2463-/* Focus outlines (G6): every interactive control keeps a visible ring.
+/tmp/currena-ref/apps/web/src/index.css-2464- * (Restored 2026-10-18: the owner kept the grayscale redesign for the
+/tmp/currena-ref/apps/web/src/index.css-2465- * header/hero ONLY — the page-wide brand-blue ring is back.) */
+/tmp/currena-ref/apps/web/src/index.css:2466:.insights-focusable:focus-visible {
+/tmp/currena-ref/apps/web/src/index.css-2467-  outline: 2px solid var(--color-accent-brand);
+/tmp/currena-ref/apps/web/src/index.css-2468-  outline-offset: 2px;
+/tmp/currena-ref/apps/web/src/index.css-2469-  border-radius: var(--radius-sm);
+--
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-54-/** v3 UI-53 (2026-10-20, kept through the merge): every control's touch
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-55- * target is ≥44px — the 36px height of the grayscale round is superseded. */
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-56-const DOWNLOAD_BUTTON_CLASS =
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx:57:  'insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/50 hover:text-[var(--color-text-primary)]';
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-58-
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-59-interface ToolsMenuProps {
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-60-  copy: InsightsCopy;
+--
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-169-        aria-expanded={open}
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-170-        aria-controls="insights-tools-panel"
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-171-        onClick={() => onOpenChange(!open)}
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx:172:        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-text-secondary)]/50 hover:text-[var(--color-text-primary)]"
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-173-      >
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-174-        <Wrench aria-hidden size={17} strokeWidth={1.9} className="shrink-0" />
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-175-        {copy.ui.toolsLabel}
+--
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-351-                    // place (after the commit, one frame out).
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-352-                    requestAnimationFrame(() => ownerTokenInputRef.current?.focus());
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-353-                  }}
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx:354:                  className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center rounded-full border border-[var(--color-border)] bg-transparent px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-currena-blue/50 hover:text-[var(--color-status-context)]"
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-355-                >
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-356-                  {copy.ui.ownerSignOut}
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-357-                </button>
+--
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-411-                  <button
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-412-                    type="submit"
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-413-                    disabled={signInBusy}
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx:414:                    className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-currena-blue/40 bg-currena-blue/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/25 disabled:cursor-wait disabled:opacity-60"
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-415-                  >
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-416-                    <KeyRound aria-hidden size={15} strokeWidth={1.9} className="shrink-0" />
+/tmp/currena-ref/apps/web/src/components/insights/ToolsMenu.tsx-417-                    {copy.ui.ownerSignInSubmit}
+--
+/tmp/currena-ref/apps/web/src/components/insights/MoneyPanel.tsx-371-                                key={id}
+/tmp/currena-ref/apps/web/src/components/insights/MoneyPanel.tsx-372-                                type="button"
+/tmp/currena-ref/apps/web/src/components/insights/MoneyPanel.tsx-373-                                onClick={(e) => onFocusCard(id, e.currentTarget)}
+/tmp/currena-ref/apps/web/src/components/insights/MoneyPanel.tsx:374:                                className="insights-focusable inline-flex min-h-[24px] cursor-pointer flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-sm border-0 bg-transparent p-0 text-start underline-offset-4 transition-colors hover:underline"
+/tmp/currena-ref/apps/web/src/components/insights/MoneyPanel.tsx-375-                              >
+/tmp/currena-ref/apps/web/src/components/insights/MoneyPanel.tsx-376-                                {valueText !== null ? (
+/tmp/currena-ref/apps/web/src/components/insights/MoneyPanel.tsx-377-                                  <bdi className="type-number whitespace-nowrap text-[var(--color-text-primary)]">
+--
+/tmp/currena-ref/apps/web/src/components/insights/WorldCurrencies.tsx-324-          aria-expanded={tableOpen}
+/tmp/currena-ref/apps/web/src/components/insights/WorldCurrencies.tsx-325-          aria-controls="insights-fx-table"
+/tmp/currena-ref/apps/web/src/components/insights/WorldCurrencies.tsx-326-          onClick={() => setTableOpen((v) => !v)}
+/tmp/currena-ref/apps/web/src/components/insights/WorldCurrencies.tsx:327:          className="insights-focusable inline-flex min-h-[36px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-3 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+/tmp/currena-ref/apps/web/src/components/insights/WorldCurrencies.tsx-328-        >
+/tmp/currena-ref/apps/web/src/components/insights/WorldCurrencies.tsx-329-          {tableOpen ? copy.fx.hideTable : copy.fx.showTable}
+/tmp/currena-ref/apps/web/src/components/insights/WorldCurrencies.tsx-330-          <span aria-hidden="true" className="ms-1">{tableOpen ? '▴' : '▾'}</span>
+--
+/tmp/currena-ref/apps/web/src/components/insights/InTheNews.tsx-90-                  href={url}
+/tmp/currena-ref/apps/web/src/components/insights/InTheNews.tsx-91-                  target="_blank"
+/tmp/currena-ref/apps/web/src/components/insights/InTheNews.tsx-92-                  rel="noopener noreferrer"
+/tmp/currena-ref/apps/web/src/components/insights/InTheNews.tsx:93:                  className="insights-focusable text-[var(--color-status-context)] underline underline-offset-2 hover:text-[var(--color-text-primary)]"
+/tmp/currena-ref/apps/web/src/components/insights/InTheNews.tsx-94-                >
+/tmp/currena-ref/apps/web/src/components/insights/InTheNews.tsx-95-                  <bdi>{title}</bdi>
+/tmp/currena-ref/apps/web/src/components/insights/InTheNews.tsx-96-                </a>
+--
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-141-      <button
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-142-        type="button"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-143-        onClick={() => onFocusCard(id)}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx:144:        className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:border-currena-blue/50 hover:bg-currena-blue/10"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-145-      >
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-146-        {copy.indicators[id]?.name ?? id}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-147-        <span className="sr-only">, {copy.ui.viewCard}</span>
+--
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-287-          aria-expanded={open}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-288-          aria-controls="insights-about-body"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-289-          onClick={() => setOpen(!open)}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx:290:          className="insights-focusable inline-flex min-h-[44px] min-w-[44px] -my-2.5 cursor-pointer items-center gap-1 rounded-lg px-1.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-291-        >
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-292-          <span aria-hidden="true">
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-293-            <ChevronDown
+--
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-314-            href={FRED_TERMS_URL}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-315-            target="_blank"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-316-            rel="noopener noreferrer"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx:317:            className="insights-focusable font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-318-          >
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-319-            {copy.ui.fredTerms} ↗
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-320-          </a>
+--
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-425-                          href={row.url}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-426-                          target="_blank"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-427-                          rel="noopener noreferrer"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx:428:                          className="insights-focusable inline-flex items-baseline gap-0.5 font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-429-                        >
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-430-                          {row.name}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-431-                          <ExternalLink aria-hidden size={11} strokeWidth={2} className="shrink-0 self-center" />
+--
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-470-                        href={row.url}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-471-                        target="_blank"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-472-                        rel="noopener noreferrer"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx:473:                        className="insights-focusable inline-flex items-baseline gap-0.5 font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-474-                      >
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-475-                        {row.name}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-476-                        <ExternalLink aria-hidden size={11} strokeWidth={2} className="shrink-0 self-center" />
+--
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-552-                target="_blank"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-553-                rel="noopener noreferrer"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-554-                dir="ltr"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx:555:                className="insights-focusable text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2"
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-556-              >
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-557-                {DATA_CONTACT_URL}
+/tmp/currena-ref/apps/web/src/components/insights/AboutTheData.tsx-558-              </a>
+--
+/tmp/currena-ref/apps/web/src/components/insights/PriceDetails.tsx-460-            href={reading.sourceUrl}
+/tmp/currena-ref/apps/web/src/components/insights/PriceDetails.tsx-461-            target="_blank"
+/tmp/currena-ref/apps/web/src/components/insights/PriceDetails.tsx-462-            rel="noopener noreferrer"
+/tmp/currena-ref/apps/web/src/components/insights/PriceDetails.tsx:463:            className="insights-focusable inline-flex items-center gap-1 rounded-full bg-currena-muted/10 px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-primary)] transition-colors hover:bg-currena-muted/20"
+/tmp/currena-ref/apps/web/src/components/insights/PriceDetails.tsx-464-          >
+/tmp/currena-ref/apps/web/src/components/insights/PriceDetails.tsx-465-            {reading.sourceName}
+/tmp/currena-ref/apps/web/src/components/insights/PriceDetails.tsx-466-            <span aria-hidden="true">↗</span>
+--
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-155-          aria-expanded={open}
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-156-          aria-controls="insights-together-body"
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-157-          onClick={() => setOpen(!open)}
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx:158:          className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-159-        >
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-160-          <span aria-hidden="true">
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-161-            <ChevronDown
+--
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-201-              <button
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-202-                type="button"
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-203-                onClick={() => setShowAll(true)}
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx:204:                className="insights-focusable mt-2 inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-status-context)]"
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-205-              >
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-206-                {interpolate(copy.together.seeAllConnections, { n: formatNumber(ordered.length, numberLocale, { maximumFractionDigits: 0 }) })}
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-207-              </button>
+--
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-219-                  <button
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-220-                    type="button"
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-221-                    onClick={() => expandTo(conn.connection)}
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx:222:                    className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-status-context)]"
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-223-                  >
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-224-                    {copy.together.connections[conn.connection as keyof typeof copy.together.connections]?.name ?? conn.connection}
+/tmp/currena-ref/apps/web/src/components/insights/Together.tsx-225-                    <span
+--
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-90-              m: num(labels.length, numberLocale),
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-91-            })}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-92-            aria-current={active === i ? 'true' : 'false'}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx:93:            className="insights-focusable flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 transition-opacity hover:opacity-100"
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-94-            data-carousel-dot={i}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-95-          >
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-96-            {/* The dot: 8px ink mark, aria-hidden — the button's accessible
+--
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-274-            type="button"
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-275-            onClick={() => goToCard(Math.max(0, activeCard - 1))}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-276-            disabled={activeCard === 0}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx:277:            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-278-          >
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-279-            {/* Mirrors with the reading flow (RTL = visually points the
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-280-             * other way) — the shared flow glyph, flipped. */}
+--
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-285-            type="button"
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-286-            onClick={() => goToCard(Math.min(labels.length - 1, activeCard + 1))}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-287-            disabled={activeCard === labels.length - 1}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx:288:            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-289-          >
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-290-            {copy.ui.nextCard}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-291-            <FlowChevron />
+--
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-356-            <button
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-357-              type="button"
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-358-              onClick={() => onFocusCard(mover.id)}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx:359:              className="insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 font-bold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-text-secondary)]"
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-360-            >
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-361-              {moverEntry.name}
+/tmp/currena-ref/apps/web/src/components/insights/HeroBlock.tsx-362-            </button>
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-475-                  <button
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-476-                    type="button"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-477-                    onClick={(e) => onFocusCard(id, e.currentTarget)}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:478:                    className="insights-focusable ei-row-accent flex min-h-[76px] w-full cursor-pointer items-start gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] px-3 py-3 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-currena-muted/[0.06] hover:ring-[var(--color-border)]/90"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-479-                  >
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-480-                    {/* The leading mark — the indicator's own subject
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-481-                     * artwork in a soft neutral container where the set
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-552-              onClick={() => setRevealAllTiles(true)}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-553-              aria-expanded="false"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-554-              aria-controls={`attention-list-${section}`}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:555:              className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-556-            >
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-557-              {interpolate(copy.ui.attentionTileMore, { n: num(tiles.length - shown.length, numberLocale) })}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-558-            </button>
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-565-              onClick={() => setRevealAllTiles(false)}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-566-              aria-expanded="true"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-567-              aria-controls={`attention-list-${section}`}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:568:              className="insights-focusable mt-1.5 inline-flex min-h-[24px] cursor-pointer items-center rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-569-            >
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-570-              {copy.ui.showFewer}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-571-            </button>
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-755-                  aria-expanded={ruleOpen}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-756-                  aria-controls={rulePanelId}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-757-                  data-ei-rule-toggle
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:758:                  className="insights-focusable inline-flex min-h-[24px] cursor-pointer items-center gap-1 self-start rounded-full bg-currena-muted/15 px-2.5 py-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-759-                >
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-760-                  <svg
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-761-                    width="12"
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-880-                              if (focusId !== null) onFocusCard(focusId, e.currentTarget);
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-881-                              else onJumpSection(section);
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-882-                            }}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:883:                            className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${stepToneClass(g.step)}`}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-884-                            data-ei-area-signal="raised"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-885-                            data-ei-area-step={g.step}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-886-                          >
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-954-                    <button
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-955-                      type="button"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-956-                      onClick={() => onJumpMarkets?.()}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:957:                      className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-958-                        marketsAlert.signal === 'unusual'
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-959-                          ? 'text-[var(--color-status-watch)]'
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-960-                          : 'text-[var(--color-status-alert)]'
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-984-                    <button
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-985-                      type="button"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-986-                      onClick={() => onJumpFx?.()}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:987:                      className={`insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-988-                        fxAlert.signal === 'unusual'
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-989-                          ? 'text-[var(--color-status-watch)]'
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-990-                          : 'text-[var(--color-status-alert)]'
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1013-                        type="button"
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1014-                        onClick={ind.onJump}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1015-                        data-section-indicator={ind.signal}
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx:1016:                        className={`insights-focusable -ms-1 cursor-pointer rounded-md border-0 bg-transparent px-1 py-0.5 text-start text-[0.9375rem] font-bold leading-relaxed transition-opacity hover:opacity-80 ${
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1017-                          ind.signal === 'unusual'
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1018-                            ? 'text-[var(--color-status-watch)]'
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1019-                            : 'text-[var(--color-status-alert)]'
+--
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1047-        <button
+/tmp/currena-ref/apps/web/src/components/insights/VerdictMeter.tsx-1048-          type="button"
+
+[Showing results with pagination = limit: 250]

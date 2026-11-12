@@ -1,0 +1,2002 @@
+     1→@import "tailwindcss";
+     2→
+     3→/* Class-based dark mode (restored by owner request 2026-09-17: "I want both
+     4→ * light mode and dark mode"). The pre-paint script in index.html + the theme
+     5→ * store (lib/theme.ts) toggle the `.dark` class on <html>; light stays the
+     6→ * default and the choice persists under the legacy `theme` key. */
+     7→@custom-variant dark (&:where(.dark, .dark *));
+     8→
+     9→/*
+    10→ * Currena SPA styles (Phase 5).
+    11→ *
+    12→ * - Legacy palette ported 1:1 from the Django templates (Phase 1 extraction,
+    13→ *   docs/FEATURE_MAP.md §8).
+    14→ * - DUAL THEME: light is the site's primary identity; dark ("Currena Night")
+    15→ *   is a first-class alternative with the same design language — the brand
+    16→ *   navy ink simply inverts. Dark works by OVERRIDING the @theme CSS
+    17→ *   variables inside `.dark` (Tailwind v4 pattern: utilities reference the
+    18→ *   vars, so `bg-currena-soft`, `text-currena-dark`, … all re-theme
+    19→ *   automatically) plus explicit `dark:` utilities for raw colors
+    20→ *   (bg-white cards, border-gray-200 inputs, black/5 hairlines) in the
+    21→ *   components.
+    22→ * - CSS logical properties only (ms-/me-/ps-/pe-, start/end) — RTL-safe.
+    23→ * - Legacy motion (loader dots, shimmer, popup slide-up, live-dot pulse,
+    24→ *   warning pulse, button shine) ported as plain CSS below.
+    25→ * - Farsi typography: self-hosted Vazirmatn variable font (OFL-1.1, see
+    26→ *   public/fonts/) applied via :lang(fa) — English pages keep the system
+    27→ *   stack and never download the Farsi font (owner request 2026-09-17).
+    28→ */
+    29→
+    30→@theme {
+    31→  --color-currena-soft: #E8F4F8;
+    32→  --color-currena-blue: #4A90E2;
+    33→  --color-currena-cyan: #7DD3C0;
+    34→  --color-currena-coral: #F8A978;
+    35→  --color-currena-dark: #2C3E50;
+    36→  --color-currena-muted: #6B7280;
+    37→  --color-currena-warning: #FF6B6B;
+    38→  --color-currena-success: #4CAF50;
+    39→  --color-currena-bg-light: #F8FAFB;
+    40→
+    41→  /* "Deep" text-safe accents (Insights UI/UX pass, docs/insights/05-ux-audit-I6.md
+    42→   * F1–F5): the brand accents above are decorative/large-fill hues — as SMALL
+    43→   * TEXT on light surfaces they fail WCAG AA (blue 3.14:1, success 2.78:1,
+    44→   * warning 2.78:1, coral 1.92:1 on white). These ink-grade siblings keep the
+    45→   * same hue family while holding ≥4.5:1 on white, on --color-currena-bg-light,
+    46→   * and on each colour's own /10–/15 tint (chips, status rows). Dark mode
+    47→   * remaps them to the existing bright accents below — components use the
+    48→   * -deep names unconditionally. */
+    49→  --color-currena-blue-deep: #245E9F;
+    50→  --color-currena-success-deep: #256D29;
+    51→  --color-currena-warning-deep: #B92E2E;
+    52→  --color-currena-coral-deep: #9C5019;
+    53→
+    54→  /* Typography: system stack for LTR/en; Farsi (lang=fa) switches to the
+    55→   * self-hosted Vazirmatn variable font below. */
+    56→  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+    57→}
+    58→
+    59→/* ------------------------------------------------------------------ *
+    60→ * Currena Night — dark theme token overrides
+    61→ *
+    62→ * The brand ink (#2C3E50 navy) inverts into the light slate ink, the page
+    63→ * becomes deep navy, and the soft tint becomes the elevated card tint.
+    64→ * Accent hues are brightened one step so they hold contrast on dark
+    65→ * surfaces. Surfaces that used raw `bg-white` get `dark:bg-[#1A222E]`
+    66→ * utilities in the components (same family as --color-currena-soft here).
+    67→ * ------------------------------------------------------------------ */
+    68→
+    69→:root {
+    70→  color-scheme: light;
+    71→}
+    72→
+    73→.dark {
+    74→  color-scheme: dark;
+    75→
+    76→  --color-currena-soft: #232E40;
+    77→  --color-currena-blue: #6FAEEC;
+    78→  --color-currena-cyan: #8FDCCB;
+    79→  --color-currena-coral: #FBB48C;
+    80→  --color-currena-dark: #E8EDF4;
+    81→  --color-currena-muted: #93A1B5;
+    82→  --color-currena-warning: #FF8080;
+    83→  --color-currena-success: #63C06C;
+    84→  --color-currena-bg-light: #10151D;
+    85→
+    86→  /* Deep accents → the bright dark-mode hues (all ≥6.5:1 on #1A222E cards,
+    87→   * verified in the I6 audit) — one class name works in both themes. */
+    88→  --color-currena-blue-deep: #6FAEEC;
+    89→  --color-currena-success-deep: #63C06C;
+    90→  --color-currena-warning-deep: #FF8080;
+    91→  --color-currena-coral-deep: #FBB48C;
+    92→}
+    93→
+    94→/* Vazirmatn — the owner-requested Farsi typeface. One variable file covers
+    95→ * every weight (100–900). Only fetched by the browser when the document
+    96→ * (or a nested element) is language-tagged Farsi; font-display: swap keeps
+    97→ * first paint on the fallback. License: public/fonts/Vazirmatn-OFL.txt. */
+    98→@font-face {
+    99→  font-family: "Vazirmatn";
+   100→  src: url("/fonts/vazirmatn-var.woff2") format("woff2");
+   101→  font-weight: 100 900;
+   102→  font-style: normal;
+   103→  font-display: swap;
+   104→}
+   105→
+   106→/* Farsi rendering — html[lang="fa"] AND nested lang="fa" islands on English
+   107→ * pages (e.g. the About quote) all pick Vazirmatn, including its Latin
+   108→ * glyphs so fa pages keep one consistent voice for digits and codes. */
+   109→:lang(fa) {
+   110→  font-family: "Vazirmatn", "Poppins", ui-sans-serif, system-ui, sans-serif;
+   111→}
+   112→
+   113→/* ------------------------------------------------------------------ *
+   114→ * Base
+   115→ * ------------------------------------------------------------------ */
+   116→
+   117→body {
+   118→  font-family: var(--font-sans);
+   119→}
+   120→
+   121→/* CTA gradient — legacy `linear-gradient(135deg, #667eea, #764ba2)`.
+   122→ * Reads equally well on light and dark surfaces — unchanged in dark mode. */
+   123→.cta-gradient {
+   124→  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+   125→}
+   126→
+   127→/* Gradient text (legacy .popup-amount) */
+   128→.cta-gradient-text {
+   129→  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+   130→  -webkit-background-clip: text;
+   131→  background-clip: text;
+   132→  color: transparent;
+   133→}
+   134→
+   135→/* Button shine sweep (legacy .convert-btn:before) */
+   136→.btn-shine {
+   137→  position: relative;
+   138→  overflow: hidden;
+   139→}
+   140→.btn-shine::before {
+   141→  content: "";
+   142→  position: absolute;
+   143→  inset-block: 0;
+   144→  inset-inline-start: -100%;
+   145→  width: 100%;
+   146→  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+   147→  transition: inset-inline-start 0.5s;
+   148→}
+   149→.btn-shine:hover::before {
+   150→  inset-inline-start: 100%;
+   151→}
+   152→
+   153→/* ------------------------------------------------------------------ *
+   154→ * Motion (legacy ports)
+   155→ * ------------------------------------------------------------------ */
+   156→
+   157→/* 3-dot loader: bounce with staggered delays, blue/cyan/coral */
+   158→@keyframes currena-bounce {
+   159→  0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+   160→  40% { transform: scale(1.2); opacity: 1; }
+   161→}
+   162→.loader-dot {
+   163→  width: 15px;
+   164→  height: 15px;
+   165→  border-radius: 9999px;
+   166→  animation: currena-bounce 1.4s infinite ease-in-out both;
+   167→}
+   168→.loader-dot:nth-child(1) { animation-delay: -0.32s; background: #667eea; }
+   169→.loader-dot:nth-child(2) { animation-delay: -0.16s; background: #7DD3C0; }
+   170→.loader-dot:nth-child(3) { background: #F8A978; }
+   171→
+   172→/* S4 (2026-11-08, page-division): the loading dots respect reduced motion
+   173→ * (mission §4 a11y) — the dots stay visible, only the bounce stops. Used
+   174→ * by the Global page's honest loading line (and any other loader-dot
+   175→ * surface; the class predates this rule with no reduced-motion guard). */
+   176→@media (prefers-reduced-motion: reduce) {
+   177→  .loader-dot { animation: none; }
+   178→}
+   179→
+   180→/* S4 (2026-11-08, page-division): the mobile chips scroller's discoverability
+   181→ * affordance — a soft inline-end fade that says “more this way” without a
+   182→ * scrollbar. Direction-aware (LTR fades the right edge, RTL the left);
+   183→ * retired at the sm breakpoint where the row wraps. Purely decorative —
+   184→ * the chips' own accessible names never depend on it. */
+   185→.chip-scroller { position: relative; }
+   186→.chip-scroller::after {
+   187→  content: '';
+   188→  position: absolute;
+   189→  top: 0;
+   190→  bottom: 0;
+   191→  width: 30px;
+   192→  pointer-events: none;
+   193→}
+   194→[dir='ltr'] .chip-scroller::after {
+   195→  right: 0;
+   196→  background: linear-gradient(to right, transparent, var(--color-currena-bg-light));
+   197→}
+   198→[dir='rtl'] .chip-scroller::after {
+   199→  left: 0;
+   200→  background: linear-gradient(to left, transparent, var(--color-currena-bg-light));
+   201→}
+   202→@media (min-width: 640px) {
+   203→  .chip-scroller::after { display: none; }
+   204→}
+   205→
+   206→/* Skeleton shimmer — light uses dark-on-white, dark uses light-on-navy */
+   207→@keyframes currena-shimmer {
+   208→  from { background-position: 200% 0; }
+   209→  to { background-position: -200% 0; }
+   210→}
+   211→.skeleton {
+   212→  border-radius: 0.5rem;
+   213→  background: linear-gradient(
+   214→    90deg,
+   215→    rgba(0, 0, 0, 0.06) 25%,
+   216→    rgba(0, 0, 0, 0.12) 37%,
+   217→    rgba(0, 0, 0, 0.06) 63%
+   218→  );
+   219→  background-size: 200% 100%;
+   220→  animation: currena-shimmer 1.4s ease infinite;
+   221→}
+   222→.dark .skeleton {
+   223→  background: linear-gradient(
+   224→    90deg,
+   225→    rgba(255, 255, 255, 0.05) 25%,
+   226→    rgba(255, 255, 255, 0.11) 37%,
+   227→    rgba(255, 255, 255, 0.05) 63%
+   228→  );
+   229→  background-size: 200% 100%;
+   230→}
+   231→
+   232→/* Live dot pulse (legacy beepingLive) */
+   233→@keyframes currena-live-pulse {
+   234→  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+   235→  50% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); }
+   236→  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+   237→}
+   238→.live-dot {
+   239→  width: 8px;
+   240→  height: 8px;
+   241→  border-radius: 9999px;
+   242→  background: #4CAF50;
+   243→  animation: currena-live-pulse 1.5s infinite;
+   244→}
+   245→
+   246→/* Warning pulse (legacy warningPulse — cache banners) */
+   247→@keyframes currena-warning-pulse {
+   248→  0%, 100% { opacity: 1; transform: scale(1); }
+   249→  50% { opacity: 0.7; transform: scale(1.1); }
+   250→}
+   251→.warning-pulse {
+   252→  animation: currena-warning-pulse 2s infinite;
+   253→}
+   254→
+   255→/* Result popup slide-up (legacy slideUp 0.4s) */
+   256→@keyframes currena-slide-up {
+   257→  from { opacity: 0; transform: translateY(50px); }
+   258→  to { opacity: 1; transform: translateY(0); }
+   259→}
+   260→.popup-slide-up {
+   261→  animation: currena-slide-up 0.4s ease;
+   262→}
+   263→
+   264→@keyframes currena-fade-in {
+   265→  from { opacity: 0; }
+   266→  to { opacity: 1; }
+   267→}
+   268→.fade-in {
+   269→  animation: currena-fade-in 0.3s ease;
+   270→}
+   271→
+   272→/* Banner slide-down (legacy slideDown) */
+   273→@keyframes currena-slide-down {
+   274→  from { opacity: 0; transform: translateY(-20px); }
+   275→  to { opacity: 1; transform: translateY(0); }
+   276→}
+   277→.slide-down {
+   278→  animation: currena-slide-down 0.3s ease;
+   279→}
+   280→
+   281→/* Live-rates loading value (legacy fadeLoad) */
+   282→@keyframes currena-fade-load {
+   283→  0%, 100% { opacity: 0.3; }
+   284→  50% { opacity: 0.7; }
+   285→}
+   286→.rate-loading {
+   287→  animation: currena-fade-load 1.5s infinite;
+   288→}
+   289→
+   290→/* Refresh FAB spin (legacy .refresh-btn.spinning) */
+   291→@keyframes currena-spin {
+   292→  from { transform: rotate(0deg); }
+   293→  to { transform: rotate(360deg); }
+   294→}
+   295→.refresh-spinning {
+   296→  animation: currena-spin 1s linear;
+   297→}
+   298→
+   299→/* Side menu slide (logical: from the inline-end edge, like legacy right-side) */
+   300→.side-menu {
+   301→  transition: transform 0.3s ease;
+   302→}
+   303→
+   304→/* ------------------------------------------------------------------ *
+   305→ * Amount input panel — THE hero of the converter (owner request
+   306→ * 2026-09-18: "make the input box of number pastel gold (like it used
+   307→ * to be) … an animating css effect eye-grabbing box, so user know what
+   308→ * to do. with proper contrast").
+   309→ *
+   310→ * LIGHT mode returns to the legacy PASTEL GOLD the owner remembers
+   311→ * (legacy .amount-section: linear-gradient(135deg,#FFF9E6,#FFE999),
+   312→ * border #FFE066, gold-tinted shadow) — restyled at today's fidelity.
+   313→ * While the field is IDLE (empty + unfocused) the panel becomes an
+   314→ * eye-grabbing attractor: a warm sheen sweeps the gold gradient and
+   315→ * the border breathes a soft glow, so users know exactly where to type.
+   316→ * The moment they engage (focus or value) the attract animations settle
+   317→ * and focus lands a crisp gold ring — attention without annoyance.
+   318→ * DARK mode keeps the Currena Night family with the same affordance in
+   319→ * blue. All motion is disabled under prefers-reduced-motion.
+   320→ * ------------------------------------------------------------------ */
+   321→
+   322→.amount-panel {
+   323→  position: relative;
+   324→  /* pastel gold, like it used to be */
+   325→  background: linear-gradient(135deg, #fffbea 0%, #fff3c2 48%, #ffe999 100%);
+   326→  border: 2px solid #ffe066;
+   327→  box-shadow:
+   328→    0 10px 30px rgba(255, 213, 79, 0.28),
+   329→    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+   330→  transition:
+   331→    box-shadow 0.45s ease,
+   332→    border-color 0.45s ease;
+   333→}
+   334→
+   335→/* Sheen band that sweeps the gold while idle (attract mode only).
+   336→ * Clipped to the rounded panel by its own border-radius — the panel's
+   337→ * outer glows are never cut. */
+   338→.amount-panel::before {
+   339→  content: "";
+   340→  position: absolute;
+   341→  inset: 0;
+   342→  border-radius: inherit;
+   343→  pointer-events: none;
+   344→  background: linear-gradient(
+   345→    105deg,
+   346→    transparent 32%,
+   347→    rgba(255, 255, 255, 0.65) 50%,
+   348→    transparent 68%
+   349→  );
+   350→  background-size: 250% 100%;
+   351→  background-position: 200% 0;
+   352→  opacity: 0;
+   353→  transition: opacity 0.6s ease;
+   354→}
+   355→
+   356→/* IDLE attractor: breathing gold glow + sweeping sheen + coin bob. */
+   357→.amount-panel.amount-attract {
+   358→  animation: currena-amount-glow 2.8s ease-in-out infinite;
+   359→}
+   360→.amount-panel.amount-attract::before {
+   361→  opacity: 1;
+   362→  animation: currena-amount-sheen 4.6s ease-in-out infinite;
+   363→}
+   364→
+   365→/* ENGAGED: the panel leans in while you type — warmer, crisper. */
+   366→.amount-panel:focus-within {
+   367→  border-color: #f5bd1f;
+   368→  box-shadow:
+   369→    0 12px 36px rgba(240, 180, 41, 0.38),
+   370→    0 0 0 3px rgba(255, 213, 79, 0.35),
+   371→    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+   372→}
+   373→
+   374→.dark .amount-panel {
+   375→  background:
+   376→    linear-gradient(180deg, rgba(111, 174, 236, 0.14) 0%, rgba(111, 174, 236, 0.05) 42%, rgba(111, 174, 236, 0) 100%),
+   377→    #1A222E;
+   378→  border-color: rgba(111, 174, 236, 0.32);
+   379→  box-shadow:
+   380→    0 10px 30px rgba(0, 0, 0, 0.5),
+   381→    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+   382→}
+   383→.dark .amount-panel::before {
+   384→  background: linear-gradient(
+   385→    105deg,
+   386→    transparent 35%,
+   387→    rgba(170, 210, 250, 0.12) 50%,
+   388→    transparent 65%
+   389→  );
+   390→  background-size: 250% 100%;
+   391→  background-position: 200% 0;
+   392→}
+   393→.dark .amount-panel.amount-attract {
+   394→  animation-name: currena-amount-glow-night;
+   395→}
+   396→.dark .amount-panel:focus-within {
+   397→  border-color: rgba(111, 174, 236, 0.55);
+   398→  box-shadow:
+   399→    0 12px 36px rgba(0, 0, 0, 0.55),
+   400→    0 0 0 3px rgba(111, 174, 236, 0.16),
+   401→    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+   402→}
+   403→
+   404→@keyframes currena-amount-glow {
+   405→  0%, 100% {
+   406→    border-color: #ffe066;
+   407→    box-shadow:
+   408→      0 10px 30px rgba(255, 213, 79, 0.25),
+   409→      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+   410→  }
+   411→  50% {
+   412→    border-color: #ffcf33;
+   413→    box-shadow:
+   414→      0 14px 44px rgba(255, 200, 40, 0.5),
+   415→      0 0 0 4px rgba(255, 213, 79, 0.22),
+   416→      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+   417→  }
+   418→}
+   419→@keyframes currena-amount-glow-night {
+   420→  0%, 100% {
+   421→    border-color: rgba(111, 174, 236, 0.32);
+   422→    box-shadow:
+   423→      0 10px 30px rgba(0, 0, 0, 0.5),
+   424→      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+   425→  }
+   426→  50% {
+   427→    border-color: rgba(111, 174, 236, 0.6);
+   428→    box-shadow:
+   429→      0 14px 44px rgba(0, 0, 0, 0.6),
+   430→      0 0 0 4px rgba(111, 174, 236, 0.14),
+   431→      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+   432→  }
+   433→}
+   434→@keyframes currena-amount-sheen {
+   435→  0% { background-position: 200% 0; }
+   436→  55% { background-position: -200% 0; }
+   437→  100% { background-position: -200% 0; }
+   438→}
+   439→
+   440→/* 💰 coin bob — a small double-bounce each attract cycle (light+dark). */
+   441→@keyframes currena-amount-coin {
+   442→  0%, 10%, 22%, 100% { transform: translateY(0); }
+   443→  5%, 16% { transform: translateY(-6px); }
+   444→}
+   445→.amount-coin {
+   446→  animation: currena-amount-coin 4.6s ease-in-out infinite;
+   447→}
+   448→
+   449→/* Quick-amount chip — SELECTED state inside the pastel-gold panel: a warm
+   450→ * gold fill with deep-brown text (contrast ≈ 7:1) in light mode; the app's
+   451→ * Currena Night CTA gradient in dark mode (custom classes can't take
+   452→ * Tailwind `dark:` variants, so the theme split lives here). */
+   453→.amount-chip-active {
+   454→  background-image: linear-gradient(135deg, #ffd34d 0%, #f0b429 100%);
+   455→  color: #4a3705;
+   456→}
+   457→.dark .amount-chip-active {
+   458→  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+   459→  color: #ffffff;
+   460→}
+   461→
+   462→/* Scrollbar (thin, subtle) */
+   463→* {
+   464→  scrollbar-width: thin;
+   465→}
+   466→
+   467→/* ------------------------------------------------------------------ *
+   468→ * Brand logo — the logo file is monochrome navy on transparency (the
+   469→ * light-mode identity). On the night surfaces it would vanish (navy on
+   470→ * navy — the classic dark-mode bug), so it inverts to a clean white
+   471→ * mark via filter. Applied to every <img class="currena-brand-logo">
+   472→ * (header brand + About page logo).
+   473→ * ------------------------------------------------------------------ */
+   474→
+   475→.dark img.currena-brand-logo {
+   476→  filter: brightness(0) invert(1);
+   477→}
+   478→
+   479→/* ------------------------------------------------------------------ *
+   480→ * Rate intelligence — flash pulse when a board rate changes.
+   481→ * The resting surface is theme-aware via --flash-rest-bg (the keyframes
+   482→ * must land back on the card's own background, white in light / night
+   483→ * navy in dark — hardcoding #fff was a dark-mode bug).
+   484→ * ------------------------------------------------------------------ */
+   485→
+   486→:root {
+   487→  --flash-rest-bg: #ffffff;
+   488→}
+   489→.dark {
+   490→  --flash-rest-bg: #1A222E;
+   491→}
+   492→
+   493→@keyframes currena-rate-flash-up {
+   494→  0% {
+   495→    background-color: rgba(16, 185, 129, 0.22);
+   496→    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
+   497→  }
+   498→  100% {
+   499→    background-color: var(--flash-rest-bg);
+   500→    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0);
+   501→  }
+   502→}
+   503→@keyframes currena-rate-flash-down {
+   504→  0% {
+   505→    background-color: rgba(239, 68, 68, 0.22);
+   506→    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.4);
+   507→  }
+   508→  100% {
+   509→    background-color: var(--flash-rest-bg);
+   510→    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0);
+   511→  }
+   512→}
+   513→.rate-flash-up {
+   514→  animation: currena-rate-flash-up 1.6s ease-out;
+   515→}
+   516→.rate-flash-down {
+   517→  animation: currena-rate-flash-down 1.6s ease-out;
+   518→}
+   519→
+   520→/* Respect users who prefer calm (mission §4 a11y). */
+   521→@media (prefers-reduced-motion: reduce) {
+   522→  .rate-flash-up,
+   523→  .rate-flash-down {
+   524→    animation: none;
+   525→  }
+   526→  .amount-panel.amount-attract,
+   527→  .amount-panel.amount-attract::before,
+   528→  .amount-coin {
+   529→    animation: none;
+   530→  }
+   531→}
+   532→
+   533→/* ------------------------------------------------------------------ *
+   534→ * LED shopfront rate board (2026-09-18) — recreates a currency-exchange
+   535→ * window display: near-black housing (#0d0d0d), red seven-segment digits
+   536→ * (DSEG7 Classic, OFL-1.1 — public/fonts/dseg/), soft glow bloom, and a
+   537→ * glow-pulse on every rate update so the board reads as a live electronic
+   538→ * sign, not a static table.
+   539→ *
+   540→ * A11y (WCAG 2.3.1 photosensitivity): the update-flash runs ONCE per rate
+   541→ * change (changes arrive at most once per refresh window), lasts ~260ms and
+   542→ * rows are staggered 0-210ms — far below the 3-flashes-per-second general
+   543→ * threshold. The header clock's colon dims at 0.5Hz, never blinks fully
+   544→ * off. Everything is disabled under prefers-reduced-motion.
+   545→ *
+   546→ * RTL: the board uses logical properties throughout (ps-/pe-, text-start);
+   547→ * only the two rate columns keep PHYSICAL right alignment per spec (digits
+   548→ * are LTR runs — a stable numeric column edge in both directions).
+   549→ * ------------------------------------------------------------------ */
+   550→
+   551→@font-face {
+   552→  font-family: "DSEG7 Classic";
+   553→  src: url("/fonts/dseg/DSEG7Classic-Regular.woff2") format("woff2");
+   554→  font-weight: 400;
+   555→  font-style: normal;
+   556→  font-display: swap;
+   557→}
+   558→@font-face {
+   559→  font-family: "DSEG7 Classic";
+   560→  src: url("/fonts/dseg/DSEG7Classic-Bold.woff2") format("woff2");
+   561→  font-weight: 700;
+   562→  font-style: normal;
+   563→  font-display: swap;
+   564→}
+   565→
+   566→/* =====================================================================
+   567→ * LED signboard — physical panel system (dot-matrix rework, 2026-09-26;
+   568→ * bezel-frame rework 2026-09-27).
+   569→ *
+   570→ * Layers, outermost → innermost:
+   571→ *   1. Bezel frame (.led-frame): the machined metal mount around each
+   572→ *      board — visible thickness via padding, a multi-stop REFLECTIVE
+   573→ *      metal gradient (bright catch-light through mid tones into shadow
+   574→ *      and back — value variation, not a flat fill), concentric corner
+   575→ *      radii, a specular inset top highlight, the groove shadow under
+   576→ *      the bottom edge and the page-lifting outer drop shadow (brushed
+   577→ *      steel for the currency board, polished gold with a near-white
+   578→ *      cream highlight for the GOLD & COINS board).
+   579→ *   2. Housing (.led-board): near-black body RECESSED behind the
+   580→ *      frame's glass — inward-pointing shadows (tight top edge shadow,
+   581→ *      bottom catch-light, glass hairline ring, deep interior) + faint
+   582→ *      perforated grid.
+   583→ *   3. Modules (.led-cell): recessed dark wells (inset shadow) holding
+   584→ *      one value each — a rate.
+   585→ *   4. Digits: real seven-segment glyphs (DSEG7) painted as THREE stacked
+   586→ *      layers — ghost "8888…" (all segments faintly visible, dim bulbs),
+   587→ *      glow (bloom halo only), lit (bright dot-matrix bulbs). Numbers
+   588→ *      share ONE bulb pattern (uniform board-wide pitch); row captions
+   589→ *      reuse the same technique at a tighter pitch.
+   590→ *
+   591→ * The two depth cues are deliberately split across two elements (owner
+   592→ * spec 2026-09-27): the frame lifts OUTWARD off the page, the board
+   593→ * recesses INWARD behind the glass — two separate boxes, two separate
+   594→ * shadow stacks, never one combined effect.
+   595→ *
+   596→ * The bulb gradients are defined ONCE here and reused via classes —
+   597→ * never re-declared per element — so live updates repaint cheaply.
+   598→ * ===================================================================== */
+   599→
+   600→.led-board {
+   601→  --led-red: #ff1e1e;
+   602→  /* Ghost-bulb color. Spec's flat-fill example was #2a1414, but bulbs only
+   603→   * cover ~22% of the stroke area on the 4px pitch — the color is lifted
+   604→   * so unlit segments stay FAINTLY visible (≈2:1) through the dot texture. */
+   605→  --led-ghost: #5a2828;
+   606→
+   607→  /* One shared bulb: bright core + soft falloff edge, tiled on a fixed
+   608→   * pitch. Segments use the coarse pitch; labels the tight one. */
+   609→  --led-dot-bulb: 1.05px;
+   610→  --led-dot-gap: 0.45px;
+   611→  --led-dot-pitch: 4px;
+   612→  --led-label-bulb: 0.8px;
+   613→  --led-label-gap: 0.35px;
+   614→  --led-label-pitch: 2.6px;
+   615→
+   616→  --led-glow: 0 0 1px rgba(255, 30, 30, 0.55), 0 0 6px rgba(255, 30, 30, 0.4),
+   617→    0 0 15px rgba(255, 30, 30, 0.22);
+   618→
+   619→  /* Horizontal gap between the board columns — ONE variable read by
+   620→   * the table grid and every subgrid row (2026-09-27 grid rework). The
+   621→   * tiers below grow it with the larger digits so columns keep their
+   622→   * breathing room. */
+   623→  --led-col-gap: 3px;
+   624→
+   625→  background-color: #0d0d0d;
+   626→  /* Faint perforated-module grid: thin row/column lines behind the cells. */
+   627→  background-image:
+   628→    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 40px),
+   629→    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.017) 0 1px, transparent 1px 26px);
+   630→  border-radius: 16px;
+   631→  /* Recessed behind the bezel frame's glass (owner request 2026-09-27): ALL
+   632→   * of the board's own shadows now point INWARD — a tight edge shadow at
+   633→   * the top, a catch-light at the bottom, a glass hairline ring and a deep
+   634→   * interior — while the outward LIFT moved to the .led-frame wrapper (the
+   635→   * former raised-bevel lips and the outer drop shadow retired with it). */
+   636→  box-shadow:
+   637→    inset 0 2px 8px rgba(0, 0, 0, 0.8),
+   638→    inset 0 -1px 2px rgba(255, 255, 255, 0.04),
+   639→    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+   640→    inset 0 3px 20px rgba(0, 0, 0, 0.75);
+   641→}
+   642→
+   643→/* Bezel frame — the physical metal mount around each shopfront board
+   644→ * (owner request 2026-09-27; material rework 2026-09-28).
+   645→ *
+   646→ * MATERIAL, not paint (owner critique 2026-09-28): a single flat tone
+   647→ * next to the near-black board interior reads as a border/drop shadow,
+   648→ * and nothing brighter than the base color reads as matte. So the fill
+   649→ * is a SIX-stop 135° ramp — light catches the top-left edge, falls
+   650→ * through mid tones into the shadowed bottom-right, brightening again
+   651→ * mid-edge — the undulating value range is what makes a flat shape read
+   652→ * as curved, reflective metal. The 135° diagonal (light from top-left)
+   653→ * wraps corners more physically than an axis-aligned gradient; it is a
+   654→ * LIGHTING effect, not a layout position, so it deliberately does NOT
+   655→ * flip for RTL. On top of the ramp: a thin specular inset along the top
+   656→ * edge (brighter than any gradient stop — the "catch light" where the
+   657→ * surface turns toward the source) and a dark inset under the bottom
+   658→ * edge (the shadow falling into the groove where the frame meets the
+   659→ * page) — light on one edge, shadow on the other, groove between.
+   660→ *
+   661→ * Geometry (2026-09-27, unchanged): visible thickness via padding, corner
+   662→ * radii kept CONCENTRIC with the board inside (frame radius = board's
+   663→ * 16px + the frame padding, so the gap stays uniform into the corners),
+   664→ * and the page-lifting outer drop shadow.
+   665→ *
+   666→ * Phones: the bezel thins to 6px AND leans 6px into the page's own
+   667→ * side padding (margin-inline: -6px) — the board inside keeps EXACTLY
+   668→ * its pre-frame width, so the audited mobile name budget (2x flag
+   669→ * sharing the name line) is untouched and no new truncation appears;
+   670→ * the page keeps a 10px visible gap each side. From sm up the full
+   671→ * 12px-thick mount sits squarely inside the page padding. */
+   672→.led-frame {
+   673→  padding: 6px;
+   674→  border-radius: 22px;
+   675→  margin-inline: -6px;
+   676→  /* Brushed steel — bright #9a9ea3 catch-light at the top-left corner
+   677→   * falling through alternating mid/dark stops to #1c1d1f at the
+   678→   * bottom-right: the multi-stop ramp simulates a surface reflecting
+   679→   * an off-center light source, NOT one flat gray. */
+   680→  background: linear-gradient(
+   681→    135deg,
+   682→    #9a9ea3 0%,
+   683→    #4a4d52 20%,
+   684→    #6b6e73 38%,
+   685→    #2b2d30 58%,
+   686→    #55585c 78%,
+   687→    #1c1d1f 100%
+   688→  );
+   689→  box-shadow:
+   690→    /* specular catch-light — the top edge turning toward the light */
+   691→    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+   692→    /* shadow falling into the groove under the bottom edge */
+   693→    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+   694→    /* the whole assembly lifts off the page */
+   695→    0 20px 40px rgba(0, 0, 0, 0.35),
+   696→    0 4px 10px rgba(0, 0, 0, 0.2);
+   697→}
+   698→@media (min-width: 640px) {
+   699→  .led-frame {
+   700→    padding: 12px;
+   701→    border-radius: 28px;
+   702→    margin-inline: 0;
+   703→  }
+   704→}
+   705→
+   706→/* Polished-gold variant — the GOLD & COINS board's mount (same
+   707→ * thickness/radii; the metal and its specular intensity change).
+   708→ *
+   709→ * The brightest stop (#fff6d8) is a near-white CREAM, not a lighter
+   710→ * gold: a real specular highlight on shiny metal is BRIGHTER than the
+   711→ * base material's brightest tone — that single stop is what separates
+   712→ * "polished gold" from "painted yellow". The top-edge inset runs at
+   713→ * 0.45 white (vs steel's 0.18) because gold's specular is fierce; the
+   714→ * groove shadow and the page lift stay shared with the steel mount. */
+   715→.led-frame-gold {
+   716→  background: linear-gradient(
+   717→    135deg,
+   718→    #fff6d8 0%,
+   719→    #f0c94a 18%,
+   720→    #b8860b 38%,
+   721→    #7a5a06 55%,
+   722→    #e8b923 72%,
+   723→    #8a6a10 100%
+   724→  );
+   725→  box-shadow:
+   726→    /* fierce specular catch-light along the top edge */
+   727→    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+   728→    /* shadow falling into the groove under the bottom edge */
+   729→    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+   730→    /* the whole assembly lifts off the page */
+   731→    0 20px 40px rgba(0, 0, 0, 0.35),
+   732→    0 4px 10px rgba(0, 0, 0, 0.2);
+   733→}
+   734→
+   735→/* Column-gap tiers — the sm/lg digit bumps (+20-25%) come with +17-20%
+   736→ * proportional air; mobile keeps its tight budget (see .led-row notes). */
+   737→@media (min-width: 640px) {
+   738→  .led-board {
+   739→    --led-col-gap: 20px;
+   740→  }
+   741→}
+   742→@media (min-width: 1024px) {
+   743→  .led-board {
+   744→    --led-col-gap: 28px;
+   745→  }
+   746→}
+   747→
+   748→/* ------------------------------------------------------------------ *
+   749→ * THE shared column grid (2026-09-27 owner spec: one grid-template-
+   750→ * columns definition for the header row AND every value row).
+   751→ *
+   752→ * .led-table owns the track ladder, now SHARED by both boards (currency
+   753→ * + gold): below md the table carries TWO tracks (name · CURRENT) — the
+   754→ * single-column mobile layout (owner request 2026-09-19: phones show
+   755→ * only the current price, bigger); from md (768px) up the full four
+   756→ * tracks (name · current · high · low) return, matching their cells'
+   757→ * hidden→md:block wrappers. The header row, the <ul> and every <li> opt
+   758→ * in via CSS subgrid and span the full row (grid-column: 1 / -1), so
+   759→ * every row resolves to the SAME track widths: an `auto` track sizes to
+   760→ * the widest module in that column across ALL rows, and each header
+   761→ * label stays locked directly above its own column of numbers at any
+   762→ * digit size — no eyeballing positions per row. Value columns (headers
+   763→ * and digits alike) align to the physical right edge inside the shared
+   764→ * grid; digits stack cleanly under their labels regardless of digit
+   765→ * count, in both LTR and RTL.
+   766→ *
+   767→ * Gaps: column-gap is set to the same --led-col-gap at EVERY subgrid
+   768→ * level, so tracks can never disagree whether an engine honors a
+   769→ * subgrid's own gap or takes the parent's.
+   770→ *
+   771→ * Browsers without subgrid keep per-row grids with the identical track
+   772→ * definition (the previous approximate alignment) — pure progressive
+   773→ * enhancement.
+   774→ * ------------------------------------------------------------------ */
+   775→
+   776→.led-row {
+   777→  display: grid;
+   778→  /* Fallback track definition — overridden by subgrid when supported.
+   779→     Two tracks below md (single price column), four from md up. */
+   780→  grid-template-columns: minmax(0, 1fr) auto;
+   781→  align-items: center;
+   782→  column-gap: var(--led-col-gap, 3px);
+   783→}
+   784→
+   785→@media (min-width: 768px) {
+   786→  .led-row {
+   787→    grid-template-columns: minmax(0, 1fr) auto auto auto;
+   788→  }
+   789→}
+   790→
+   791→@supports (grid-template-columns: subgrid) {
+   792→  .led-table {
+   793→    display: grid;
+   794→    grid-template-columns: minmax(0, 1fr) auto;
+   795→    column-gap: var(--led-col-gap, 3px);
+   796→  }
+   797→  @media (min-width: 768px) {
+   798→    .led-table {
+   799→      grid-template-columns: minmax(0, 1fr) auto auto auto;
+   800→    }
+   801→  }
+   802→  /* Header row and the row list each span the full table width. */
+   803→  .led-table > * {
+   804→    grid-column: 1 / -1;
+   805→  }
+   806→  .led-table > .led-row,
+   807→  .led-table-body {
+   808→    display: grid;
+   809→    grid-template-columns: subgrid;
+   810→    column-gap: var(--led-col-gap, 3px);
+   811→  }
+   812→  /* Rows subgrid through the <ul> (nested subgrid: table → list → row),
+   813→   * so the <ul> keeps its box and list semantics. */
+   814→  .led-table-body > .led-row {
+   815→    grid-column: 1 / -1;
+   816→    grid-template-columns: subgrid;
+   817→  }
+   818→}
+   819→
+   820→/* ------------------------------------------------------------------ *
+   821→ * GOLD & COINS table (2026-09-27) — the second LED panel. Its former
+   822→ * separate track ladder (one price column below md because 13-glyph
+   823→ * RIAL coin values could not fit three columns on phones) merged into
+   824→ * the shared .led-table ladder above when the currency board adopted
+   825→ * the same single-column mobile layout (2026-09-19) AND the Tehran
+   826→ * values became Toman (11-glyph runs, ÷10 from TGJU's printed Rial).
+   827→ * Only the section divider below remains gold-specific.
+   828→ * ------------------------------------------------------------------ */
+   829→
+   830→/* Tehran-market silkscreen divider between the gold table's two lists —
+   831→ * hairlines top and bottom, spanning all tracks (grid-column 1 / -1 via
+   832→ * the .led-table > * rule; its intrinsic width stays far below the module
+   833→ * columns, so it can never bloat the auto tracks). */
+   834→.led-gold-divider {
+   835→  display: flex;
+   836→  align-items: center;
+   837→  margin-top: 2px;
+   838→  padding: 5px 0;
+   839→  border-top: 1px solid rgba(255, 255, 255, 0.06);
+   840→  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+   841→}
+   842→
+   843→/* ------------------------------------------------------------------ *
+   844→ * CURRENT-only variant (owner wireframe 2026-09-20) — the homepage
+   845→ * two-up placement of BOTH boards: the DAY HIGH / DAY LOW cells are
+   846→ * removed from the DOM entirely (showDayStats={false}) and the shared
+   847→ * track ladder collapses to TWO tracks (name · CURRENT) at EVERY
+   848→ * viewport width — the homepage slot is half the /live-rates width even
+   849→ * on large screens, so the day columns must never rejoin there.
+   850→ *
+   851→ * Order/specificity: these rules sit AFTER the shared-ladder block
+   852→ * above, so they win over both the fallback .led-row templates and the
+   853→ * md+ four-track ladder at equal or higher specificity; under subgrid
+   854→ * the rows keep subgridding (re-asserted below) and inherit the
+   855→ * two-track parent, so column widths stay shared across all rows.
+   856→ * ------------------------------------------------------------------ */
+   857→.led-table.led-current-only {
+   858→  grid-template-columns: minmax(0, 1fr) auto;
+   859→}
+   860→.led-current-only .led-row {
+   861→  grid-template-columns: minmax(0, 1fr) auto;
+   862→}
+   863→@supports (grid-template-columns: subgrid) {
+   864→  .led-table.led-current-only .led-table-body,
+   865→  .led-table.led-current-only .led-table-body > .led-row,
+   866→  .led-table.led-current-only > .led-row {
+   867→    grid-template-columns: subgrid;
+   868→  }
+   869→}
+   870→
+   871→/* Seven-segment font stack — the PRICE VALUES only (rates, high/low).
+   872→ * Owner request 2026-09-27: the clock, the dates, the column headers and
+   873→ * the board titles/headings left the seven-segment look for a standard
+   874→ * sans-serif (readable at a glance) — DSEG7 is now the price digits'
+   875→ * signature. Latin digits only; Persian stays in Vazirmatn. Bold: chunkier
+   876→ * strokes sample the bulb pattern better. */
+   877→.led-digits {
+   878→  font-family: "DSEG7 Classic", "Vazirmatn", monospace;
+   879→  font-weight: 700;
+   880→  line-height: 1;
+   881→  font-variant-ligatures: none;
+   882→  font-variant-numeric: tabular-nums;
+   883→  letter-spacing: 0.04em;
+   884→  -webkit-font-smoothing: antialiased;
+   885→}
+   886→
+   887→/* A recessed module well: darker pit + inset shadow, so the digits sit
+   888→ * INTO the panel rather than on top of it. The in-flow lit layer sizes
+   889→ * it; ghost/glow are stacked absolutely inside. */
+   890→.led-cell {
+   891→  /* Per-module brightness params — defaults are the "standard" module;
+   892→   * .led-cell-hot (the CURRENT column) overrides them for full visual
+   893→   * weight next to the secondary high/low modules. */
+   894→  --led-lit-core: #ff3232;
+   895→  --led-lit-solid: var(--led-red);
+   896→
+   897→  position: relative;
+   898→  display: inline-block;
+   899→  padding: 2px 4px;
+   900→  border-radius: 4px;
+   901→  background: rgba(0, 0, 0, 0.32);
+   902→  box-shadow:
+   903→    inset 0 2px 5px rgba(0, 0, 0, 0.8),
+   904→    inset 0 -1px 0 rgba(255, 255, 255, 0.035);
+   905→  line-height: 1;
+   906→  user-select: none;
+   907→  vertical-align: middle;
+   908→}
+   909→@media (min-width: 640px) {
+   910→  .led-cell {
+   911→    padding: 3px 9px;
+   912→    border-radius: 5px;
+   913→  }
+   914→}
+   915→
+   916→/* Primary module (the CURRENT column) — the number the window is
+   917→ * actually selling (owner request 2026-09-27: brighter, more visual
+   918→ * weight than high/low). Fatter bulbs (denser lit coverage), hotter
+   919→ * bulb core, stronger bloom halo and a shallower well; the ghost layer
+   920→ * and the no-background-clip fallback pick the same hotter values up
+   921→ * through the CSS vars. Secondary high/low modules stay on the standard
+   922→ * treatment at 75% power. */
+   923→.led-cell-hot {
+   924→  --led-dot-bulb: 1.18px;
+   925→  --led-lit-core: #ff4a4a;
+   926→  --led-lit-solid: #ff2e2e;
+   927→  --led-glow: 0 0 1px rgba(255, 70, 70, 0.85), 0 0 8px rgba(255, 40, 40, 0.6),
+   928→    0 0 22px rgba(255, 30, 30, 0.34);
+   929→  background: rgba(0, 0, 0, 0.22);
+   930→}
+   931→
+   932→/* Secondary modules (day high / day low): a SOFTER halo on top of the
+   933→ * 75% power treatment — the bloom delta against .led-cell-hot is what
+   934→ * makes the CURRENT column read as the bright primary. */
+   935→.led-cell-soft {
+   936→  --led-glow: 0 0 1px rgba(255, 30, 30, 0.35), 0 0 4px rgba(255, 30, 30, 0.22);
+   937→}
+   938→
+   939→/* Fallback for engines without background-clip:text: plain glowing red
+   940→ * digits, no ghost/dot layers. */
+   941→.led-lit {
+   942→  position: relative;
+   943→  white-space: nowrap;
+   944→  color: var(--led-lit-solid, var(--led-red));
+   945→  text-shadow: var(--led-glow);
+   946→}
+   947→.led-ghost,
+   948→.led-glow {
+   949→  display: none;
+   950→}
+   951→
+   952→@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+   953→  .led-ghost,
+   954→  .led-glow {
+   955→    display: block;
+   956→  }
+   957→
+   958→  /* Ghost layer — the full unlit seven-segment shape ('8' per digit
+   959→   * position) in dim bulbs, faintly visible behind the lit value. */
+   960→  .led-ghost {
+   961→    position: absolute;
+   962→    inset: 0;
+   963→    padding: inherit;
+   964→    white-space: nowrap;
+   965→    color: transparent;
+   966→    background-image: radial-gradient(
+   967→      circle,
+   968→      var(--led-ghost) 0 var(--led-dot-bulb),
+   969→      rgba(0, 0, 0, 0) calc(var(--led-dot-bulb) + var(--led-dot-gap))
+   970→    );
+   971→    background-size: var(--led-dot-pitch) var(--led-dot-pitch);
+   972→    -webkit-background-clip: text;
+   973→    background-clip: text;
+   974→  }
+   975→
+   976→  /* Glow layer — pure bloom halo (transparent fill, text-shadow only).
+   977→   * It paints over the value's own silhouette and bleeds a few px into
+   978→   * the neighboring ghost segments — light bleed, like real hardware. */
+   979→  .led-glow {
+   980→    position: absolute;
+   981→    inset: 0;
+   982→    padding: inherit;
+   983→    white-space: nowrap;
+   984→    color: transparent;
+   985→    text-shadow: var(--led-glow);
+   986→  }
+   987→
+   988→  /* Lit layer — the value itself, filled with bright dot-matrix bulbs
+   989→   * (core color via --led-lit-core: hotter on .led-cell-hot modules). */
+   990→  .led-lit {
+   991→    color: transparent;
+   992→    text-shadow: none;
+   993→    background-image: radial-gradient(
+   994→      circle,
+   995→      var(--led-lit-core, #ff3232) 0 var(--led-dot-bulb),
+   996→      rgba(255, 50, 50, 0) calc(var(--led-dot-bulb) + var(--led-dot-gap))
+   997→    );
+   998→    background-size: var(--led-dot-pitch) var(--led-dot-pitch);
+   999→    -webkit-background-clip: text;
+  1000→    background-clip: text;
+  1001→  }
+  1002→
+  1003→  /* Row captions (the currency codes, the gold change %) — the same bulb
+  1004→   * fill at a tighter pitch; the ONLY dot-matrix labels left since the
+  1005→   * column headers/titles went sans-serif (owner request 2026-09-27).
+  1006→   * Color comes from --led-label-c; any Tailwind text color on the element
+  1007→   * remains as the fallback. */
+  1008→  .led-label {
+  1009→    -webkit-background-clip: text;
+  1010→    background-clip: text;
+  1011→    color: transparent;
+  1012→    background-image: radial-gradient(
+  1013→      circle,
+  1014→      var(--led-label-c, rgba(255, 40, 40, 0.85)) 0 var(--led-label-bulb),
+  1015→      rgba(0, 0, 0, 0) calc(var(--led-label-bulb) + var(--led-label-gap))
+  1016→    );
+  1017→    background-size: var(--led-label-pitch) var(--led-label-pitch);
+  1018→  }
+  1019→}
+  1020→
+  1021→.led-label-red-dim {
+  1022→  --led-label-c: rgba(255, 44, 44, 0.62);
+  1023→}
+  1024→
+  1025→/* Clock colon (sans-serif since 2026-09-27 — the clock left DSEG7): solid
+  1026→ * red + soft 0.5Hz dim (amplitude 0.45→1 — well under any photosensitivity
+  1027→ * threshold; the one LED habit the sans clock keeps). */
+  1028→.led-colon {
+  1029→  color: var(--led-red);
+  1030→  text-shadow: var(--led-glow);
+  1031→  animation: currena-led-colon 1s steps(1, end) infinite;
+  1032→}
+  1033→@keyframes currena-led-colon {
+  1034→  0%,
+  1035→  49.9% {
+  1036→    opacity: 1;
+  1037→  }
+  1038→  50%,
+  1039→  100% {
+  1040→    opacity: 0.45;
+  1041→  }
+  1042→}
+  1043→
+  1044→/* Electronic-refresh pulse: a changed value surges its whole module —
+  1045→ * bulbs + halo together — for ~260ms (ONE flash per change, rows
+  1046→ * staggered 0–210ms; far below the WCAG 2.3.1 3/sec threshold). */
+  1047→.led-flash {
+  1048→  animation: currena-led-pulse 260ms ease-out;
+  1049→}
+  1050→@keyframes currena-led-pulse {
+  1051→  0% {
+  1052→    filter: brightness(1);
+  1053→  }
+  1054→  15% {
+  1055→    filter: brightness(1.55);
+  1056→  }
+  1057→  100% {
+  1058→    filter: brightness(1);
+  1059→  }
+  1060→}
+  1061→
+  1062→/* Loading state: the whole module at half power, like an off display. */
+  1063→.led-idle {
+  1064→  opacity: 0.5;
+  1065→}
+  1066→
+  1067→/* Status LED in the header — a physical indicator dot. */
+  1068→.led-status {
+  1069→  box-shadow: 0 0 6px currentColor;
+  1070→}
+  1071→
+  1072→/* LIVE state: red LED heartbeat (soft opacity/glow breath, 0.7Hz — never a
+  1073→ * hard blink). Amber (cached) / gray (offline) stay steady. */
+  1074→.led-status-live {
+  1075→  animation: currena-led-status 1.4s ease-in-out infinite;
+  1076→}
+  1077→@keyframes currena-led-status {
+  1078→  0%,
+  1079→  100% {
+  1080→    opacity: 1;
+  1081→    box-shadow: 0 0 7px currentColor;
+  1082→  }
+  1083→  50% {
+  1084→    opacity: 0.55;
+  1085→    box-shadow: 0 0 3px currentColor;
+  1086→  }
+  1087→}
+  1088→
+  1089→@media (prefers-reduced-motion: reduce) {
+  1090→  .led-flash,
+  1091→  .led-colon,
+  1092→  .led-status,
+  1093→  .led-status-live {
+  1094→    animation: none;
+  1095→  }
+  1096→}
+  1097→
+  1098→/* ------------------------------------------------------------------ *
+  1099→ * Insights I15 (2026-10-08 owner UI/UX spec) — design tokens (G2), type
+  1100→ * roles (G3), ink-grade secondary text (G4), sticky section nav (P1),
+  1101→ * verdict meters (H1), the details side-panel / bottom sheet (F5), the
+  1102→ * prices board (PB1) and the lane switch (L1).
+  1103→ *
+  1104→ * Token rules: each token maps to the CURRENT value (G2 — the palette step
+  1105→ * changes values later, in ONE place). Only rules the I15 pass touched use
+  1106→ * the tokens; untouched components keep their existing utilities.
+  1107→ * ------------------------------------------------------------------ */
+  1108→
+  1109→:root {
+  1110→  /* Text (G4 + owner audit A1: the ink ramp must be a VISIBLE ramp —
+  1111→   * secondary steps clearly below primary, tertiary carries meta only)
+  1112→   * R30 (roast 11 Oct): captions measured ~4.3:1 — below the 7:1 target.
+  1113→   * The ramp compresses to keep EVERY ink ≥ 7:1 on white: primary 10.9,
+  1114→   * secondary 7.98, tertiary 7.03. */
+  1115→  --color-text-primary: #2C3E50;   /* = currena-dark light */
+  1116→  --color-text-secondary: #47525D; /* 7.98:1 on white — body/labels */
+  1117→  --color-text-tertiary: #4F5A66;  /* 7.03:1 on white — captions, timestamps, sources */
+  1118→  /* Surfaces */
+  1119→  --color-surface: #FFFFFF;
+  1120→  --color-surface-raised: #FFFFFF;
+  1121→  --color-surface-alert-tint: rgba(218, 30, 40, 0.05);
+  1122→  --color-border: rgba(44, 62, 80, 0.14);
+  1123→  /* Status inks (icon + word chips — never colour alone, G5). R29 adds
+  1124→   * status-watch: the cautious/middle step word gets its own ink.
+  1125→   * R30 adds status-stressed: the FOUR-STEP verdict scale gets four
+  1126→   * DISTINCT hues — relaxed green · cautious amber · stressed orange ·
+  1127→   * alarmed red (the roast: "Stressed and Alarmed are close hues").
+  1128→   * Red now means needs-attention ONLY.
+  1129→   * Round 22 (owner): the R30 inks read "dark saturated" — retuned to the
+  1130→   * fresh traffic-light hues the owner asked for (green · yellow · orange ·
+  1131→   * red) while holding ≥4.5:1 on white, on --color-currena-bg-light AND on
+  1132→   * each status chip's own tint (verified by script, see CHANGELOG).
+  1133→   * Round 23 (owner, again): round 22's retunes STILL read dark — the owner
+  1134→   * pinned the exact palette: IBM Carbon's signature state hues, verbatim —
+  1135→   * Green 50 #24a148 · Yellow 30 #f1c21b · Orange 40 #ff832b · Red 60
+  1136→   * #da1e28 (image in chat, "use the given colors for states"). Light mode
+  1137→   * uses the four hexes EXACTLY as given. */
+  1138→  --color-accent-brand: #4A90E2;
+  1139→  /* Round 24 (roast): brand gold — the ONE accent for selected states and
+  1140→   * key highlights (the roast: the page had no focal moment and never
+  1141→   * used the brand's own gold). -gold is the FILL (pill selected states,
+  1142→   * dark ink on top), -ink is the text/icon colour ON that fill,
+  1143→   * -deep is the gold-family ink for highlights on the page surface
+  1144→   * (light mode needs the darker sibling for contrast; dark mode takes
+  1145→   * the brighter one). */
+  1146→  --color-accent-gold: #F3B13F;
+  1147→  --color-accent-gold-ink: #2A1F04;
+  1148→  --color-accent-gold-deep: #A87E1C;
+  1149→  --color-status-alert: #da1e28;   /* owner palette: Carbon Red 60, verbatim */
+  1150→  --color-status-stressed: #ff832b; /* owner palette: Carbon Orange 40, verbatim — the Stressed word */
+  1151→  --color-status-normal: #24a148;  /* owner palette: Carbon Green 50, verbatim — the Stable word / supports */
+  1152→  --color-status-watch: #f1c21b;   /* owner palette: Carbon Yellow 30, verbatim — the Cautious word */
+  1153→  --color-status-context: #245E9F;
+  1154→  --color-status-stale: #46505C;
+  1155→  /* v3 UI-15 (2026-10-20): the state chips' own TEXT inks — darker siblings
+  1156→   * of the pinned state hues so every chip word reads ≥4.5:1 on its pill
+  1157→   * (the pinned hues stay verbatim on meters/icons/instruments). Measured:
+  1158→   * normal #0E6027 7.71:1 (white) · attention #B91C1C 6.47:1 · watch
+  1159→   * #7A5D00 6.19:1 · context #245E9F 6.63:1 · muted #46505C 8.20:1. */
+  1160→  --color-chip-ink-normal: #0E6027;    /* Carbon Green 60 — Green 50's darker sibling */
+  1161→  --color-chip-ink-attention: #B91C1C; /* Red 60's darker sibling (4.31:1 on its tint before) */
+  1162→  --color-chip-ink-watch: #7A5D00;     /* bronze — the amber hue as readable text ink */
+  1163→  --color-chip-ink-context: #245E9F;
+  1164→  --color-chip-ink-muted: #46505C;
+  1165→  /* 2026-10-27 owner round ("write the positive indexes with more clear
+  1166→   * and bright green please a triangle showing up for green, and do the
+  1167→   * same for red, down and brighter red"): the SIGNED-RETURN vocabulary —
+  1168→   * vivid, higher-chroma siblings of the calm status hues, reserved for
+  1169→   * index/price return VALUES (tiles, movers, the table's return columns,
+  1170→   * the verdict's breadth counts). The status hues above keep every state
+  1171→   * word/chip/meter (calm by design); these are the loud numbers. The
+  1172→   * light-mode pair is tuned to the BRIGHTEST vivid hues that still clear
+  1173→   * 4.5:1 on white — #00873A ≈ 4.7:1 and #E51527 ≈ 4.7:1 — because the
+  1174→   * smallest surface (the table's caption-size columns) is normal-size
+  1175→   * text; every value also carries its sign AND a triangle (never colour
+  1176→   * alone, §6.8). Dark mode takes the properly bright pair. */
+  1177→  --color-return-up: #00873A;   /* vivid kelly green — clearer and more saturated than Green 50 */
+  1178→  --color-return-down: #E51527; /* vivid scarlet — brighter and more saturated than Carbon Red 60 */
+  1179→  /* Editorial handoff tokens (2026-10-19, docs/insights/
+  1180→   * economic-indicators-editorial-spec.md §4): kept through the v3 merge for
+  1181→   * the world-indices/market-logo surfaces that still consume --ei-* names;
+  1182→   * the v3 hero itself speaks the neutral ink ramp (UI-14). #0F2D4A on
+  1183→   * #FFFFFF = 14.3:1, on #F8FAFB = 13.6:1 — AA/AAA safe. */
+  1184→  --ei-navy: #0F2D4A;
+  1185→  /* Spacing scale */
+  1186→  --space-1: 0.25rem;
+  1187→  --space-2: 0.5rem;
+  1188→  --space-3: 0.75rem;
+  1189→  --space-4: 1rem;
+  1190→  --space-5: 1.5rem;
+  1191→  /* Radii */
+  1192→  --radius-sm: 0.5rem;
+  1193→  --radius-md: 0.75rem;
+  1194→  --radius-lg: 1.125rem;
+  1195→  /* Type roles (G3: verdict > number > label > caption; caption floor ~12.5px)
+  1196→   * R20: the number role must compute ≥ 1.4× the 16px label role on tiles and
+  1197→   * prices — 1.45rem = 23.2px → ratio 1.45 (was 1.3rem = 20.8px → 1.30). */
+  1198→  --type-verdict: 1.6rem;
+  1199→  --type-verdict-leading: 2rem;
+  1200→  --type-number: 1.45rem;
+  1201→  --type-label: 0.875rem;
+  1202→  --type-caption: 0.78rem;
+  1203→  /* Gold balance consolidation P2b (GB-S4, 2026-11-03 —
+  1204→   * docs/specs/gold-balance-consolidation/05-VISUAL-DESIGN-SPEC.md §5,
+  1205→   * the owner-approved reference prototype reference/balance-reference.html):
+  1206→   * the assay-office tokens, SCOPED to the balance visual
+  1207→   * ([data-balance-visual] — the legacy balance never reads them). The
+  1208→   * brass family derives from --color-accent-gold; -text is the
+  1209→   * prototype's own readable brass ink for the eyebrow (4.9:1 on white).
+  1210→   * Contrast, measured (see the gb-s4 evidence): the pan captions use
+  1211→   * the site's chip text-ink pair (--color-chip-ink-normal #0E6027
+  1212→   * 7.0:1 / --color-chip-ink-attention #B91C1C 5.9:1 on the 9%-tinted
+  1213→   * pan — the 05 §5 required 4.5:1 for the 12px captions); the verdict
+  1214→   * word rides the status pair at hero size (large-text AA, 3:1). */
+  1215→  --bal-brass-hi: #fbe3a0;
+  1216→  --bal-brass-mid: #eab544;
+  1217→  --bal-brass-lo: #b27a1d;
+  1218→  --bal-brass-ink: #5b3d08;
+  1219→  --bal-brass-text: #8a5a0a;
+  1220→  --bal-stone-hi: #eef2f6;
+  1221→  --bal-stone-lo: #c7d0da;
+  1222→  --bal-recess: #f3f5f8;
+  1223→  --bal-glow: rgba(243, 177, 63, 0.16);
+  1224→}
+  1225→
+  1226→.dark {
+  1227→  --color-text-primary: #E8EDF4;     /* = currena-dark dark */
+  1228→  --color-text-secondary: #A9B5C5;   /* 7.7:1 on #1A222E cards */
+  1229→  --color-text-tertiary: #A2AEBC;    /* 7.1:1 on #1A222E cards — meta only */
+  1230→  --color-surface: #1A222E;
+  1231→  --color-surface-raised: #202A38;
+  1232→  --color-surface-alert-tint: rgba(250, 77, 86, 0.07);
+  1233→  --color-border: rgba(232, 237, 244, 0.16);
+  1234→  --color-accent-brand: #6FAEEC;
+  1235→  --color-accent-gold: #F3B13F;
+  1236→  --color-accent-gold-ink: #2A1F04;
+  1237→  --color-accent-gold-deep: #E8B54A;
+  1238→  --color-status-alert: #fa4d56;   /* Carbon Red 50 — Red 60's own dark-surface sibling (Carbon pairs 60/50 across themes); #da1e28 verbatim is 3.2:1 on #1A222E, this holds 4.8:1 */
+  1239→  --color-status-stressed: #ff832b; /* Carbon Orange 40 verbatim — 6.5:1 on #1A222E */
+  1240→  --color-status-normal: #24a148;  /* Carbon Green 50 verbatim — 4.8:1 on #1A222E */
+  1241→  --color-status-watch: #f1c21b;   /* Carbon Yellow 30 verbatim — 9.5:1 on #1A222E */
+  1242→  --color-status-context: #6FAEEC;
+  1243→  --color-status-stale: #9AA8BC;
+  1244→  /* v3 UI-15: the chips' text inks in dark theme keep the passing status
+  1245→   * tokens (measured vs the #1A222E card surface: normal 4.77:1 ·
+  1246→   * attention 4.77:1 · watch 9.5:1 · context/muted ≥7:1 — U-03 dark). */
+  1247→  --color-chip-ink-normal: #24a148;
+  1248→  --color-chip-ink-attention: #fa4d56;
+  1249→  --color-chip-ink-watch: #f1c21b;
+  1250→  --color-chip-ink-context: #6FAEEC;
+  1251→  --color-chip-ink-muted: #9AA8BC;
+  1252→  /* 2026-10-27 return vocabulary, dark surfaces: brighter AND lighter so
+  1253→   * they pop on the #1A222E cards — #30D96B ≈ 9:1, #FF5963 ≈ 5.6:1
+  1254→   * (the light-mode pair would sink on the dark card). */
+  1255→  --color-return-up: #30D96B;
+  1256→  --color-return-down: #FF5963;
+  1257→  /* Editorial navy inverts with the theme (the G4 ramp's own rule): on the
+  1258→   * #1A222E card the deep navy would be invisible, so the light ink
+  1259→   * speaks (13.1:1 on #1A222E). Kept through the v3 merge for --ei-* consumers. */
+  1260→  --ei-navy: #E8EDF4;
+  1261→  /* GB-S4 (05 §5): the assay-office tokens, dark theme — brass lowered in
+  1262→   * lightness, stone inverted, recess darkened, glow weaker. Dark captions
+  1263→   * keep the site's dark chip inks (#24a148 / #fa4d56, 4.4:1+ on the
+  1264→   * tinted #1A222E pan — measured in the gb-s4 evidence). */
+  1265→  --bal-brass-hi: #f3d488;
+  1266→  --bal-brass-mid: #d9a43e;
+  1267→  --bal-brass-lo: #8f5f14;
+  1268→  --bal-brass-ink: #2a1c04;
+  1269→  --bal-brass-text: #e8bd63;
+  1270→  --bal-stone-hi: #46546a;
+  1271→  --bal-stone-lo: #2b3646;
+  1272→  --bal-recess: #141b25;
+  1273→  --bal-glow: rgba(243, 177, 63, 0.10);
+  1274→}
+  1275→
+  1276→/* Type-role utilities (G3) — the four sizes the page is allowed to speak in. */
+  1277→.type-verdict {
+  1278→  font-size: var(--type-verdict);
+  1279→  line-height: var(--type-verdict-leading);
+  1280→  font-weight: 800;
+  1281→  letter-spacing: -0.01em;
+  1282→}
+  1283→.type-number {
+  1284→  font-size: var(--type-number);
+  1285→  line-height: 1.35;
+  1286→  font-weight: 800;
+  1287→  font-variant-numeric: tabular-nums;
+  1288→}
+  1289→.type-label {
+  1290→  font-size: var(--type-label);
+  1291→  font-weight: 600;
+  1292→}
+  1293→.type-caption {
+  1294→  font-size: var(--type-caption);
+  1295→  font-weight: 500;
+  1296→}
+  1297→/* Owner-audit type roles (R29): headings stop screaming. R30: section
+  1298→ * titles step UP to 19/700 — the roast: "section headings are the same
+  1299→ * size as card titles" (cards speak at 14). In-card questions stay at
+  1300→ * 15/600, kickers tiny tertiary uppercases. 800 stays with NUMBERS. */
+  1301→.type-section {
+  1302→  font-size: 1.1875rem;   /* 19px */
+  1303→  line-height: 1.4;
+  1304→  font-weight: 700;
+  1305→  letter-spacing: -0.01em;
+  1306→}
+  1307→.type-question {
+  1308→  font-size: 0.9375rem;   /* 15px */
+  1309→  line-height: 1.45;
+  1310→  font-weight: 600;
+  1311→}
+  1312→.type-kicker {
+  1313→  font-size: 0.72rem;
+  1314→  font-weight: 600;
+  1315→  text-transform: uppercase;
+  1316→}
+  1317→/* Persian (Arabic script) joins letters — never letter-space it. */
+  1318→html:not(:lang(fa)) .type-kicker {
+  1319→  letter-spacing: 0.05em;
+  1320→}
+  1321→.text-secondary-ink {
+  1322→  color: var(--color-text-secondary);
+  1323→}
+  1324→
+  1325→/* =================================================================== *
+  1326→ * Gold balance — the visual redesign (GB-S4 / P2b, 2026-11-03).
+  1327→ *
+  1328→ * docs/specs/gold-balance-consolidation/05-VISUAL-DESIGN-SPEC.md §4–§10,
+  1329→ * implemented from the owner-approved prototype
+  1330→ * (docs/specs/gold-balance-consolidation/reference/balance-reference.html):
+  1331→ * the assay-office balance — brass beam + dial, bowl pans hung from the
+  1332→ * beam ends, lane WEIGHTS with segmented rims, the verdict as the hero,
+  1333→ * the recessed "Not leaning" tray and the inline ledger. Everything is
+  1334→ * scoped to [data-balance-visual] (the lane view behind ?balance=lanes);
+  1335→ * the legacy balance (and the byte-stable default view) never matches.
+  1336→ * Logical properties only (RTL mirrors with the document); the stage
+  1337→ * geometry itself is computed in BalanceScale.tsx and set inline — this
+  1338→ * block carries the look, not the mechanics. No element here animates on
+  1339→ * its own: the ONE animated value (the beam angle) drives the stage per
+  1340→ * frame; only the weight hover/press (140ms transform) and the chevron
+  1341→ * (200ms) move, and prefers-reduced-motion silences them.
+  1342→ * =================================================================== */
+  1343→[data-balance-visual] {
+  1344→  position: relative;
+  1345→  isolation: isolate;
+  1346→}
+  1347→/* The warm radial glow at the top of the card (05 §4.1) — one quiet
+  1348→ * atmosphere layer behind the heading, never a box. */
+  1349→.bal-glow {
+  1350→  position: absolute;
+  1351→  inset-block-start: 0;
+  1352→  inset-inline: 0;
+  1353→  block-size: 280px;
+  1354→  background: radial-gradient(120% 60% at 50% -10%, var(--bal-glow), transparent 60%);
+  1355→  pointer-events: none;
+  1356→}
+  1357→/* 4.1 the head: eyebrow → title → subtitle, centred, ≤640px. */
+  1358→.bal-head {
+  1359→  position: relative;
+  1360→  max-width: 640px;
+  1361→  margin-inline: auto;
+  1362→  text-align: center;
+  1363→}
+  1364→.bal-eyebrow {
+  1365→  margin: 0 0 8px;
+  1366→  font-size: 11px;
+  1367→  font-weight: 500;
+  1368→  letter-spacing: 0.14em;
+  1369→  text-transform: uppercase;
+  1370→  color: var(--bal-brass-text);
+  1371→}
+  1372→/* Persian never letter-spaces or uppercases (the .type-kicker rule). */
+  1373→:lang(fa) .bal-eyebrow,
+  1374→:lang(fa) .bal-verdict-eyebrow {
+  1375→  letter-spacing: 0;
+  1376→  text-transform: none;
+  1377→}
+  1378→.bal-title {
+  1379→  margin: 0;
+  1380→  font-size: 28px;
+  1381→  line-height: 1.2;
+  1382→  font-weight: 600;
+  1383→  letter-spacing: -0.01em;
+  1384→  text-wrap: balance;
+  1385→  color: var(--color-text-primary);
+  1386→}
+  1387→[data-balance-visual][data-size="m"] .bal-title { font-size: 24px; }
+  1388→[data-balance-visual][data-size="s"] .bal-title { font-size: 20px; }
+  1389→.bal-sub {
+  1390→  margin: 10px auto 0;
+  1391→  font-size: 14px;
+  1392→  line-height: 1.55;
+  1393→  color: var(--color-text-secondary);
+  1394→  text-wrap: pretty;
+  1395→  max-width: 52ch;
+  1396→}
+  1397→[data-balance-visual][data-size="s"] .bal-sub { font-size: 13px; }
+  1398→
+  1399→/* 4.2 the stage: the svg mechanical layer sits behind the pans (absolute
+  1400→ * DOM). Its height/width are set inline by the component from the
+  1401→ * measured width + the worst case (never from the data). */
+  1402→.bal-stage {
+  1403→  position: relative;
+  1404→  width: 100%;
+  1405→  max-width: 720px;
+  1406→  margin: 20px auto 0;
+  1407→}
+  1408→[data-balance-visual][data-size="s"] .bal-stage { margin-top: 10px; }
+  1409→.bal-stage svg.bal-mech {
+  1410→  position: absolute;
+  1411→  inset: 0;
+  1412→  width: 100%;
+  1413→  height: 100%;
+  1414→  overflow: visible;
+  1415→  pointer-events: none;
+  1416→}
+  1417→/* The pans: shallow bowls — side tint, hairline ring, a brass rim along
+  1418→ * the bottom (05 §4.2). Position/size/translation are inline. */
+  1419→.bal-pan {
+  1420→  position: absolute;
+  1421→  display: flex;
+  1422→  flex-direction: column;
+  1423→  align-items: center;
+  1424→  gap: 8px;
+  1425→  padding: 12px 6px 24px;
+  1426→  border-radius: 14px 14px 34px 34px / 14px 14px 26px 26px;
+  1427→  background: linear-gradient(
+  1428→    180deg,
+  1429→    color-mix(in srgb, var(--bal-tint) 9%, transparent),
+  1430→    color-mix(in srgb, var(--bal-tint) 3%, transparent)
+  1431→  );
+  1432→  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bal-tint) 20%, transparent);
+  1433→  will-change: transform;
+  1434→}
+  1435→.bal-pan::after {
+  1436→  content: "";
+  1437→  position: absolute;
+  1438→  inset-inline: 5%;
+  1439→  inset-block-end: 0;
+  1440→  block-size: 8px;
+  1441→  border-radius: 999px;
+  1442→  background: linear-gradient(180deg, var(--bal-brass-hi), var(--bal-brass-mid) 45%, var(--bal-brass-lo));
+  1443→  box-shadow: 0 5px 8px -3px rgba(91, 61, 8, 0.4);
+  1444→}
+  1445→.bal-pan-for { --bal-tint: var(--color-status-normal); }
+  1446→.bal-pan-against { --bal-tint: var(--color-status-alert); }
+  1447→/* The pan caption: icon + the side label inside the top of the pan, in
+  1448→ * the side's readable text ink (the chip-ink pair — the pinned status
+  1449→ * hues are for meters/icons; text needs 4.5:1, 05 §5). */
+  1450→.bal-pan-cap {
+  1451→  display: flex;
+  1452→  align-items: center;
+  1453→  justify-content: center;
+  1454→  gap: 6px;
+  1455→  min-block-size: 30px;
+  1456→  padding-inline: 4px;
+  1457→  font-size: 12px;
+  1458→  font-weight: 600;
+  1459→  line-height: 1.25;
+  1460→  text-align: center;
+  1461→  color: var(--bal-cap-ink);
+  1462→}
+  1463→[data-balance-visual][data-size="s"] .bal-pan-cap { font-size: 11px; gap: 4px; }
+  1464→.bal-pan-cap svg { width: 14px; height: 14px; flex: none; }
+  1465→.bal-pan-for .bal-pan-cap { --bal-cap-ink: var(--color-chip-ink-normal); }
+  1466→.bal-pan-against .bal-pan-cap { --bal-cap-ink: var(--color-chip-ink-attention); }
+  1467→/* 05 §5's anticipated fix: on the 9%-tinted pans the dark chip inks land
+  1468→ * at 4.28:1 / 4.35:1 (measured) — a hair under the 4.5:1 the 12px
+  1469→ * captions need — so the balance's dark captions wear the reference
+  1470→ * prototype's own dark side hues instead (#4bc27d 6.36:1 / #f07078
+  1471→ * 5.07:1 on the tinted pans; the ratios recorded in the gb-s4
+  1472→ * evidence). Scoped to [data-balance-visual]; the app's chip inks
+  1473→ * elsewhere are untouched. */
+  1474→.dark [data-balance-visual] .bal-pan-for .bal-pan-cap { --bal-cap-ink: #4bc27d; }
+  1475→.dark [data-balance-visual] .bal-pan-against .bal-pan-cap { --bal-cap-ink: #f07078; }
+  1476→/* GB-S4 union polish (the parallel variant's VLM pass + tint measurement,
+  1477→   applied to the merged build): the segments are decorative (the counts
+  1478→   live in words) but must stay LEGIBLE — the site's pinned Green 50
+  1479→   reads faint against #1A222E at a 3-4.2px stroke, so the dark theme's
+  1480→   rim segments take the reference prototype's own darker-theme side
+  1481→   hues (its --side-for / --side-against), matching the dark caption
+  1482→   ink family above (light mode keeps the site's status hues verbatim). */
+  1483→.dark [data-balance-visual] [data-bal-seg='supports'] { stroke: #4bc27d; }
+  1484→.dark [data-balance-visual] [data-bal-seg='pressures'] { stroke: #f07078; }
+  1485→.bal-pan-empty {
+  1486→  margin: auto;
+  1487→  padding: 0 8px;
+  1488→  font-size: 12px;
+  1489→  line-height: 1.5;
+  1490→  color: var(--color-text-tertiary);
+  1491→  text-align: center;
+  1492→  text-wrap: balance;
+  1493→}
+  1494→[data-balance-visual][data-size="s"] .bal-pan-empty { font-size: 11px; }
+  1495→/* The weights wrap and centre inside a pan (10px rows, 8px columns). */
+  1496→.bal-weights {
+  1497→  display: flex;
+  1498→  flex-wrap: wrap;
+  1499→  justify-content: center;
+  1500→  gap: 10px 8px;
+  1501→  width: 100%;
+  1502→}
+  1503→
+  1504→/* 4.3 the lane weight (signals/BalanceWeight.tsx renders the markup). */
+  1505→.bal-weight {
+  1506→  display: flex;
+  1507→  flex-direction: column;
+  1508→  align-items: center;
+  1509→  gap: 6px;
+  1510→  padding: 2px 0 0;
+  1511→  background: none;
+  1512→  border: 0;
+  1513→  cursor: pointer;
+  1514→  border-radius: 14px;
+  1515→  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+  1516→  font: inherit;
+  1517→  color: inherit;
+  1518→}
+  1519→.bal-weight:hover { transform: translateY(-1px); }
+  1520→.bal-weight:active { transform: scale(0.97); }
+  1521→.bal-weight:focus-visible,
+  1522→.bal-row-btn:focus-visible {
+  1523→  outline: 2px solid var(--bal-brass-mid);
+  1524→  outline-offset: 3px;
+  1525→}
+  1526→.bal-weight-label {
+  1527→  font-size: 12px;
+  1528→  font-weight: 500;
+  1529→  line-height: 1.2;
+  1530→  text-align: center;
+  1531→  color: var(--color-text-primary);
+  1532→  text-wrap: balance;
+  1533→  overflow-wrap: anywhere;
+  1534→}
+  1535→[data-balance-visual][data-size="s"] .bal-weight-label { font-size: 11px; }
+  1536→.bal-disc {
+  1537→  position: relative;
+  1538→  flex: none;
+  1539→}
+  1540→.bal-disc svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  1541→.bal-disc .bal-disc-face { filter: drop-shadow(0 4px 5px rgba(91, 61, 8, 0.3)); }
+  1542→.dark .bal-disc .bal-disc-face { filter: none; }
+  1543→.bal-badge-split {
+  1544→  position: absolute;
+  1545→  inset-block-start: -7px;
+  1546→  inset-inline-end: -12px;
+  1547→  padding: 3px 7px;
+  1548→  font-size: 10px;
+  1549→  font-weight: 600;
+  1550→  line-height: 1;
+  1551→  border-radius: 999px;
+  1552→  background: var(--color-surface);
+  1553→  color: var(--color-text-primary);
+  1554→  box-shadow: 0 0 0 1px var(--color-border), 0 2px 4px rgba(0, 0, 0, 0.12);
+  1555→  white-space: nowrap;
+  1556→}
+  1557→
+  1558→/* 4.4 the verdict block — the hero. */
+  1559→.bal-verdict {
+  1560→  position: relative;
+  1561→  margin: 22px auto 0;
+  1562→  text-align: center;
+  1563→}
+  1564→[data-balance-visual][data-size="s"] .bal-verdict { margin-top: 14px; }
+  1565→.bal-verdict-eyebrow {
+  1566→  font-size: 11px;
+  1567→  font-weight: 500;
+  1568→  letter-spacing: 0.14em;
+  1569→  text-transform: uppercase;
+  1570→  color: var(--color-text-tertiary);
+  1571→}
+  1572→.bal-verdict-word {
+  1573→  margin: 4px 0 0;
+  1574→  font-size: 44px;
+  1575→  line-height: 1.1;
+  1576→  font-weight: 600;
+  1577→  letter-spacing: -0.02em;
+  1578→  text-wrap: balance;
+  1579→  color: var(--color-text-primary);
+  1580→}
+  1581→[data-balance-visual][data-size="m"] .bal-verdict-word { font-size: 38px; }
+  1582→[data-balance-visual][data-size="s"] .bal-verdict-word { font-size: 30px; }
+  1583→.bal-verdict-word[data-side="for"] { color: var(--color-status-normal); }
+  1584→.bal-verdict-word[data-side="against"] { color: var(--color-status-alert); }
+  1585→.bal-lanes-bar {
+  1586→  display: inline-grid;
+  1587→  grid-auto-flow: column;
+  1588→  gap: 6px;
+  1589→  margin-top: 14px;
+  1590→}
+  1591→.bal-lanes-bar i {
+  1592→  width: 44px;
+  1593→  height: 6px;
+  1594→  border-radius: 999px;
+  1595→  background: var(--color-border);
+  1596→}
+  1597→[data-balance-visual][data-size="s"] .bal-lanes-bar i { width: 30px; }
+  1598→.bal-lanes-bar i[data-side="for"] { background: var(--color-status-normal); }
+  1599→.bal-lanes-bar i[data-side="against"] { background: var(--color-status-alert); }
+  1600→.bal-lanes-bar i[data-side="neutral"] { background: var(--bal-stone-lo); }
+  1601→.dark .bal-lanes-bar i[data-side="neutral"] { background: #5a6a82; }
+  1602→.bal-verdict-counts {
+  1603→  margin: 10px 0 0;
+  1604→  font-size: 13px;
+  1605→  color: var(--color-text-secondary);
+  1606→  font-variant-numeric: tabular-nums;
+  1607→}
+  1608→.bal-verdict-note {
+  1609→  margin: 6px auto 0;
+  1610→  max-width: 46ch;
+  1611→  font-size: 12.5px;
+  1612→  line-height: 1.5;
+  1613→  color: var(--color-text-tertiary);
+  1614→  text-wrap: balance;
+  1615→}
+  1616→/* The context pill (01 §6): recessed, never green or red. */
+  1617→.bal-context {
+  1618→  display: inline-block;
+  1619→  max-width: 100%;
+  1620→  margin-top: 14px;
+  1621→  padding: 7px 14px;
+  1622→  border-radius: 18px;
+  1623→  background: var(--bal-recess);
+  1624→  font-size: 12.5px;
+  1625→  line-height: 1.5;
+  1626→  color: var(--color-text-secondary);
+  1627→  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-border) 50%, transparent);
+  1628→  text-wrap: balance;
+  1629→}
+  1630→
+  1631→/* 4.5 the tray: a recessed well for the not-leaning lanes. */
+  1632→.bal-tray {
+  1633→  position: relative;
+  1634→  margin: 28px auto 0;
+  1635→  max-width: 760px;
+  1636→  padding: 14px 18px 18px;
+  1637→  border-radius: 20px;
+  1638→  background: var(--bal-recess);
+  1639→  box-shadow:
+  1640→    inset 0 1px 3px rgba(0, 0, 0, 0.06),
+  1641→    inset 0 0 0 1px color-mix(in srgb, var(--color-border) 50%, transparent);
+  1642→}
+  1643→[data-balance-visual][data-size="s"] .bal-tray {
+  1644→  margin-top: 20px;
+  1645→  padding: 12px 10px 14px;
+  1646→  border-radius: 18px;
+  1647→}
+  1648→.bal-tray-head {
+  1649→  display: flex;
+  1650→  flex-wrap: wrap;
+  1651→  justify-content: space-between;
+  1652→  gap: 2px 12px;
+  1653→  align-items: baseline;
+  1654→  margin-block-end: 12px;
+  1655→}
+  1656→.bal-tray-title { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); }
+  1657→.bal-tray-note { font-size: 12px; color: var(--color-text-tertiary); }
+  1658→.bal-tray .bal-weights { gap: 12px 18px; }
+  1659→[data-balance-visual][data-size="s"] .bal-tray .bal-weights { gap: 12px 8px; }
+  1660→.bal-tray-empty {
+  1661→  margin: 4px 0;
+  1662→  font-size: 13px;
+  1663→  color: var(--color-text-tertiary);
+  1664→  text-align: center;
+  1665→}
+  1666→
+  1667→/* 4.6 the ledger: four expandable rows, one per lane. */
+  1668→.bal-ledger {
+  1669→  position: relative;
+  1670→  list-style: none;
+  1671→  margin: 28px auto 0;
+  1672→  padding: 0;
+  1673→  max-width: 760px;
+  1674→  display: grid;
+  1675→  gap: 2px;
+  1676→}
+  1677→[data-balance-visual][data-size="s"] .bal-ledger { margin-top: 20px; }
+  1678→.bal-row { border-radius: 18px; }
+  1679→.bal-row[data-open="true"] {
+  1680→  background: var(--bal-recess);
+  1681→  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-border) 50%, transparent);
+  1682→}
+  1683→.bal-row-btn {
+  1684→  width: 100%;
+  1685→  display: grid;
+  1686→  grid-template-columns: auto 1fr auto auto;
+  1687→  align-items: center;
+  1688→  gap: 14px;
+  1689→  padding: 12px 14px;
+  1690→  min-block-size: 64px;
+  1691→  background: none;
+  1692→  border: 0;
+  1693→  cursor: pointer;
+  1694→  text-align: start;
+  1695→  border-radius: 18px;
+  1696→  font: inherit;
+  1697→  color: inherit;
+  1698→}
+  1699→.bal-row-btn:hover { background: color-mix(in srgb, var(--bal-recess) 70%, transparent); }
+  1700→.bal-row-name {
+  1701→  display: block;
+  1702→  font-size: 15px;
+  1703→  font-weight: 600;
+  1704→  line-height: 1.25;
+  1705→  color: var(--color-text-primary);
+  1706→}
+  1707→.bal-row-state {
+  1708→  display: block;
+  1709→  font-size: 13px;
+  1710→  line-height: 1.4;
+  1711→  color: var(--color-text-secondary);
+  1712→}
+  1713→.bal-row-state[data-side="for"] { color: var(--color-chip-ink-normal); }
+  1714→.bal-row-state[data-side="against"] { color: var(--color-chip-ink-attention); }
+  1715→/* The same 05 §5 dark fix for the ledger's state words (the same
+  1716→ * 12.5-13px size class on the recessed row surface). */
+  1717→.dark [data-balance-visual] .bal-row-state[data-side="for"] { color: #4bc27d; }
+  1718→.dark [data-balance-visual] .bal-row-state[data-side="against"] { color: #f07078; }
+  1719→.bal-row-tally {
+  1720→  font-size: 12.5px;
+  1721→  color: var(--color-text-tertiary);
+  1722→  font-variant-numeric: tabular-nums;
+  1723→  white-space: nowrap;
+  1724→}
+  1725→.bal-chev {
+  1726→  width: 18px;
+  1727→  height: 18px;
+  1728→  color: var(--color-text-tertiary);
+  1729→  transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  1730→}
+  1731→.bal-row[data-open="true"] .bal-chev { transform: rotate(180deg); }
+  1732→/* <560px: the tally moves under the state text, the chevron stays on the
+  1733→ * inline end (05 §9). */
+  1734→[data-balance-visual][data-size="s"] .bal-row-btn {
+  1735→  grid-template-columns: auto 1fr auto;
+  1736→  gap: 10px;
+  1737→  padding: 10px;
+  1738→}
+  1739→[data-balance-visual][data-size="s"] .bal-row-tally {
+  1740→  grid-column: 2;
+  1741→  grid-row: 2;
+  1742→  white-space: normal;
+  1743→  margin-block-start: -6px;
+  1744→}
+  1745→[data-balance-visual][data-size="s"] .bal-row-btn .bal-chev {
+  1746→  grid-column: 3;
+  1747→  grid-row: 1;
+  1748→}
+  1749→/* The open row's inline expansion: the intro sentence, the lane note and
+  1750→ * the member list (the same content contract as the shared panel). */
+  1751→.bal-members {
+  1752→  padding: 2px 18px 16px;
+  1753→  display: grid;
+  1754→  gap: 7px;
+  1755→}
+  1756→[data-balance-visual][data-size="s"] .bal-members { padding: 2px 12px 14px; }
+  1757→.bal-members[hidden] { display: none; }
+  1758→.bal-members-intro {
+  1759→  margin: 0;
+  1760→  font-size: 13px;
+  1761→  line-height: 1.5;
+  1762→  color: var(--color-text-secondary);
+  1763→  text-wrap: pretty;
+  1764→}
+  1765→.bal-members-note {
+  1766→  margin: 0;
+  1767→  font-size: 12.5px;
+  1768→  font-weight: 600;
+  1769→  color: var(--color-text-secondary);
+  1770→}
+  1771→/* The member groups inside an open row (the shared panel's content
+  1772→ * contract, 03 §3, in the ledger look): dot, name, evidence on the end
+  1773→ * side; steady collapses to one muted sentence; unread listed hollow. */
+  1774→.bal-m-group {
+  1775→  display: block;
+  1776→  font-size: 12.5px;
+  1777→  font-weight: 600;
+  1778→  color: var(--color-text-secondary);
+  1779→}
+  1780→.bal-m-list {
+  1781→  margin: 2px 0 0;
+  1782→  padding: 0;
+  1783→  list-style: none;
+  1784→  display: grid;
+  1785→  gap: 7px;
+  1786→}
+  1787→.bal-m {
+  1788→  display: grid;
+  1789→  grid-template-columns: 10px 1fr auto;
+  1790→  gap: 4px 10px;
+  1791→  align-items: baseline;
+  1792→  font-size: 13px;
+  1793→  line-height: 1.5;
+  1794→}
+  1795→[data-balance-visual][data-size="s"] .bal-m { grid-template-columns: 10px 1fr; }
+  1796→[data-balance-visual][data-size="s"] .bal-m .bal-m-ev { grid-column: 2; margin-block-start: -4px; }
+  1797→.bal-m-dot {
+  1798→  width: 8px;
+  1799→  height: 8px;
+  1800→  border-radius: 50%;
+  1801→  display: inline-block;
+  1802→  justify-self: center;
+  1803→}
+  1804→.bal-m-dot[data-i="supports"] { background: var(--color-status-normal); }
+  1805→.bal-m-dot[data-i="pressures"] { background: var(--color-status-alert); }
+  1806→.bal-m-dot[data-i="unread"] { box-shadow: inset 0 0 0 1.5px var(--color-text-tertiary); }
+  1807→.bal-m-name { font-weight: 600; color: var(--color-text-primary); }
+  1808→.bal-m-ev {
+  1809→  color: var(--color-text-tertiary);
+  1810→  font-size: 12.5px;
+  1811→  display: inline-flex;
+  1812→  flex-wrap: wrap;
+  1813→  align-items: baseline;
+  1814→  gap: 4px;
+  1815→  justify-content: flex-end;
+  1816→  text-align: end;
+  1817→}
+  1818→[data-balance-visual][data-size="s"] .bal-m-ev { justify-content: flex-start; text-align: start; }
+  1819→.bal-m-val { font-variant-numeric: tabular-nums; font-weight: 600; }
+  1820→.bal-m-link {
+  1821→  color: var(--color-status-context);
+  1822→  text-decoration: underline;
+  1823→  text-decoration-color: color-mix(in srgb, var(--color-accent-brand) 40%, transparent);
+  1824→  text-underline-offset: 2px;
+  1825→}
+  1826→.bal-steady {
+  1827→  margin: 4px 0 0;
+  1828→  font-size: 12.5px;
+  1829→  line-height: 1.6;
+  1830→  color: var(--color-text-tertiary);
+  1831→  text-wrap: pretty;
+  1832→}
+  1833→
+  1834→/* 4.1 item 8 — the footnote (the measured note + the backtest link). */
+  1835→.bal-foot {
+  1836→  position: relative;
+  1837→  max-width: 640px;
+  1838→  margin: 28px auto 0;
+  1839→  text-align: center;
+  1840→  font-size: 12.5px;
+  1841→  line-height: 1.6;
+  1842→  color: var(--color-text-tertiary);
+  1843→  text-wrap: pretty;
+  1844→}
+  1845→.bal-foot a {
+  1846→  color: var(--color-text-secondary);
+  1847→  text-decoration: underline;
+  1848→  text-decoration-color: var(--bal-brass-mid);
+  1849→  text-underline-offset: 3px;
+  1850→}
+  1851→.dark .bal-foot a { color: var(--color-text-tertiary); }
+  1852→
+  1853→/* 05 §7 motion: only the weight hover/press and the chevron move on
+  1854→ * their own; reduced motion silences them (the beam's own rAF tween
+  1855→ * already jumps under the media query inside BalanceScale.tsx). */
+  1856→@media (prefers-reduced-motion: reduce) {
+  1857→  .bal-weight, .bal-chev { transition: none; }
+  1858→  .bal-weight:hover { transform: none; }
+  1859→}
+  1860→
+  1861→/* Sticky section nav (P1): pins below the app header, blurs like it. */
+  1862→.insights-sticky-nav {
+  1863→  position: sticky;
+  1864→  top: calc(64px + env(safe-area-inset-top, 0px));
+  1865→  z-index: 40;
+  1866→  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  1867→  backdrop-filter: blur(10px);
+  1868→  -webkit-backdrop-filter: blur(10px);
+  1869→  border-block-end: 1px solid var(--color-border);
+  1870→}
+  1871→@media (max-width: 767px) {
+  1872→  .insights-sticky-nav {
+  1873→    top: calc(56px + env(safe-area-inset-top, 0px));
+  1874→  }
+  1875→}
+  1876→/* 2026-10-29 owner round: the sticky nav grew — the pills WRAP (44px
+  1877→ * targets) and the top-movers strip rides under them — so every insights
+  1878→ * anchor target must clear a taller bar (~230px below the viewport top)
+  1879→ * when a jump-nav pill, a deep link or a card focus scrolls to it. The
+  1880→ * scope is the insights page only; scroll-mt-24 stays the default
+  1881→ * elsewhere. */
+  1882→.insights-page .scroll-mt-24 {
+  1883→  scroll-margin-top: 15rem;
+  1884→}
+  1885→
+  1886→/* Verdict meter (H1): four segments + a marker on the current step.
+  1887→ * R30: segment inks mirror the FOUR-STEP word scale exactly (the word
+  1888→ * and its meter share one hue — never colour alone).
+  1889→ * Round 36 → 42 (owner): the meters went one neutral ink (sm first, then
+  1890→ * every size). Round 43 (owner): "Revert colors back to the situation
+  1891→ * grades" — the decree is REVERSED at every size: a filled step wears its
+  1892→ * step's own ink again (green / yellow / orange / red, the owner-pinned
+  1893→ * Carbon palette), the word beside it still carries the meaning. Unfilled
+  1894→ * steps stay the border grey.
+  1895→ * Round 44 (owner, "color grading"): the rainbow meter is retired — the
+  1896→ * meter now grades in ONE hue, the CURRENT step's. The highest filled
+  1897→ * segment wears the full step ink; the segments BEFORE it wear
+  1898→ * progressively WHITER tints of the same hue (the owner's ramp:
+  1899→ * [palest] → [pale] → … → [full]). Stable stays pure green; a raised
+  1900→ * step repaints the whole meter in its own colour family — yellow turns
+  1901→ * everything yellow, orange everything orange, red everything red.
+  1902→ * Unfilled steps stay the border grey; data-step (set by VerdictMeter
+  1903→ * and the per-question header meter) carries the current step here. */
+  1904→.verdict-meter {
+  1905→  display: flex;
+  1906→  gap: 3px;
+  1907→  direction: ltr; /* analytical axis — low→high reads LTR even in fa (G9 family) */
+  1908→}
+  1909→.verdict-meter-seg {
+  1910→  flex: 1;
+  1911→  height: 8px;
+  1912→  border-radius: 999px;
+  1913→  background: var(--color-border);
+  1914→}
+  1915→/* Round 44 (owner), RESTORED by the real spec (2026-10-17,
+  1916→ * economic-indicators-ui-spec.md §6 "Applying severity"): the meter is the
+  1917→ * severity scale the app already calculates — its filled segments and their
+  1918→ * color must match the existing severity logic (hue graded pale→full toward
+  1919→ * the current step). The session-1 neutral ramp is retired: a neutral
+  1920→ * meter no longer speaks the existing severity classification. */
+  1921→/* Stable (step 1) — pure green, nothing before it to tint. */
+  1922→.verdict-meter-seg.on-1 { background: var(--color-status-normal); }
+  1923→/* Cautious (step 2) — the yellow family: [whiter yellow] [yellow]. */
+  1924→.verdict-meter[data-step='2'] .verdict-meter-seg.on-1 {
+  1925→  background: color-mix(in srgb, var(--color-status-watch) 55%, white);
+  1926→}
+  1927→.verdict-meter[data-step='2'] .verdict-meter-seg.on-2 {
+  1928→  background: var(--color-status-watch);
+  1929→}
+  1930→/* Stressed (step 3) — the orange family: [paler] [pale] [orange]. */
+  1931→.verdict-meter[data-step='3'] .verdict-meter-seg.on-1 {
+  1932→  background: color-mix(in srgb, var(--color-status-stressed) 40%, white);
+  1933→}
+  1934→.verdict-meter[data-step='3'] .verdict-meter-seg.on-2 {
+  1935→  background: color-mix(in srgb, var(--color-status-stressed) 70%, white);
+  1936→}
+  1937→.verdict-meter[data-step='3'] .verdict-meter-seg.on-3 {
+  1938→  background: var(--color-status-stressed);
+  1939→}
+  1940→/* Critical (step 4) — the red family: every grade a different tint of red. */
+  1941→.verdict-meter[data-step='4'] .verdict-meter-seg.on-1 {
+  1942→  background: color-mix(in srgb, var(--color-status-alert) 30%, white);
+  1943→}
+  1944→.verdict-meter[data-step='4'] .verdict-meter-seg.on-2 {
+  1945→  background: color-mix(in srgb, var(--color-status-alert) 55%, white);
+  1946→}
+  1947→.verdict-meter[data-step='4'] .verdict-meter-seg.on-3 {
+  1948→  background: color-mix(in srgb, var(--color-status-alert) 78%, white);
+  1949→}
+  1950→.verdict-meter[data-step='4'] .verdict-meter-seg.on-4 {
+  1951→  background: var(--color-status-alert);
+  1952→}
+  1953→/* The hero's meter is the page's status instrument — bigger there.
+  1954→ * The compact one rides each per-gauge hero row (fixed 44px track).
+  1955→ * UI-fidelity round (2026-10-19, brief §10): the lg segments keep the
+  1956→ * base PILL radius (the 4px rectangle read as a hard progress bar in the
+  1957→ * reference comparison — the approved meters are soft gauge lights), and
+  1958→ * every meter size now speaks the same rounded segment language. */
+  1959→.verdict-meter-lg { flex: 1 1 auto; max-width: 150px; min-width: 90px; }
+  1960→.verdict-meter-lg .verdict-meter-seg { height: 12px; border-radius: 999px; }
+  1961→.verdict-meter-sm { width: 52px; }
+  1962→.verdict-meter-sm .verdict-meter-seg { height: 6px; }
+  1963→@media (prefers-reduced-motion: reduce) {
+  1964→  .verdict-meter-seg { transition: none; }
+  1965→}
+  1966→
+  1967→/* ------------------------------------------------------------------ *
+  1968→ * v3 UI_SPEC §4/UI-15 (2026-10-20): chip TEXT inks + the state chips.
+  1969→ *
+  1970→ * The owner-pinned state hues (Carbon Green 50 #24a148 · Yellow 30
+  1971→ * #f1c21b · Orange 40 #ff832b · Red 60 #da1e28, light theme) stay
+  1972→ * VERBATIM for the meters, the icons and the verdict instruments. But as
+  1973→ * chip TEXT on their own tinted pills they measure (WCAG, vs the card
+  1974→ * surface — the number the U-03 harness reports — and vs the real tint):
+  1975→ *   Normal   #24a148: 3.35:1 white / 2.91:1 tint  →  #0E6027: 7.71:1 / 6.70:1
+  1976→ *   Unusual  #f1c21b: 1.68:1 white / 1.52:1 tint  →  retired from cards;
+  1977→ *     the Delayed chip now uses the bronze watch ink
+  1978→ *     #7A5D00: 6.19:1 white / 5.87:1 tint
+  1979→ *   Attention #da1e28: 4.99:1 white but 4.31:1 on its coral tint
+  1980→ *     →  #B91C1C: 6.47:1 / 5.57:1
+  1981→ *   Context  #245E9F: 6.63:1 / 6.23:1 (kept, now its own token)
+  1982→ *   Muted    #46505C: 8.20:1 / 6.80:1 (kept, now its own token)
+  1983→ * The brand palette is untouched; only the chips' own word/icon ink gets
+  1984→ * the darker sibling of its hue. Dark theme keeps the passing tokens.
+  1985→ * ------------------------------------------------------------------ */
+  1986→.chip-danger {
+  1987→  background: color-mix(in srgb, var(--color-currena-warning) 15%, transparent);
+  1988→  color: var(--color-chip-ink-attention);
+  1989→}
+  1990→.chip-success {
+  1991→  background: color-mix(in srgb, var(--color-currena-success) 15%, transparent);
+  1992→  color: var(--color-chip-ink-normal);
+  1993→}
+  1994→.chip-info {
+  1995→  background: color-mix(in srgb, var(--color-currena-blue) 10%, transparent);
+  1996→  color: var(--color-chip-ink-context);
+  1997→}
+  1998→.chip-muted {
+  1999→  background: color-mix(in srgb, var(--color-currena-muted) 15%, transparent);
+  2000→  color: var(--color-chip-ink-muted);
+
+[showing lines 1-2000 of 2860; use offset=2001 with limit to continue reading]
