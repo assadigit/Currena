@@ -298,6 +298,38 @@ regeneration (`pnpm placement:generate`).
   answers exist; (2) the §19.6 retirement timing answer.** See the
   roadmap's progress board for the current position.
 
+  The Session 29 SLOT (2026-11-12, BD-S29) then ran the fifth reserve
+  session — the first-check green-rows CONFIRMATION + the EIA-trio
+  wire-honesty heal + the buffer health pass: the session opened ~1 h
+  after the S28 close and ~4.5 h BEFORE the 2026-11-12 04:10–04:40
+  evidence window (the blob still the S26 evidence run), so it landed
+  the green rows EARLY via the sanctioned dispatch in the fresh
+  post-midnight KV slice (GHA insights-ingest run 92, 00:01:44Z,
+  success in 2m36s, all writes landed): **the blob refreshed to
+  00:02:45.793Z with failedSources EMPTY — all three ecb rows GREEN in
+  the observable state for the first time** (the readings exactly the
+  publisher-true trio) — the BD-S28 residual confirmed, no new decision
+  needed. The fresh rung surfaced a NEW finding: the EIA weekly trio
+  past the 12-day wire-guard grace at the day boundary (T-04 red, age
+  13) — the provider's own release delay (the 11/11 release slipped to
+  11/12 per its own LeafHandler footer; the values EXACT against the
+  page), healed on the wire via the DESIGNED rung2-run --eia landing
+  lever (the honest [stale] re-marking, ~10 KV writes; the pd-s17
+  freshness arm back to its designed pass; the trio self-heals at the
+  Saturday 11-14 gate; the RISK_REGISTER eia row carries the posture).
+  The buffer health pass ALL GREEN (the full gates 9/9 in 2m 35s — the
+  suite 15,270 — + the D-9 standing audit exit 0 + the live pd-*
+  backtests ALL ELEVEN ALL CHECKS GREEN, 705 checks/0 red + the S20
+  data audit 20/20, both EIA sample members EXACT). NO deploy
+  (production verified unchanged: currena-api `9861a927` +
+  currena-markets `8f63c8fa`).
+
+  **The owner's levers (unchanged): (1) arrange the investor's review of
+  spec §19 (the seven questions) — Phase K's remaining input; the
+  investor round re-opens at the next free slot the moment the answers
+  exist; (2) the §19.6 retirement timing answer.** See the
+  roadmap's progress board for the current position.
+
 ## The one rule that trumps everything
 
 `AGENT-RULES.md` (docs/; the rules are consolidated into AGENTS.md §14). Short sessions. Continuous commits.

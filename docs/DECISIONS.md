@@ -3194,3 +3194,130 @@
   posture governs (honest rows, held-true values, the next rung retries)
   — the maintenance item stays closed unless the persistent multi-day
   stale-past-maxAge shape ever returns.
+
+## 2026-11-12 — BD-S29: the fifth reserve session (the Session 29 slot) runs the first-check green-rows CONFIRMATION — the observable state has caught up with the closed verdict (all three ecb rows GREEN in the served blob, landed early via the sanctioned fresh-post-midnight dispatch), PLUS the new EIA-trio finding (the provider's own release delay pushed the three weekly cards past the wire-guard grace at the 2026-11-12 day boundary — Rule-5-verified against the provider's own page, healed on the wire via the designed rung2-run --eia landing lever, the honest stale-marking); the buffer health pass ALL GREEN (four legs); NO deploy
+
+- **Event:** the Session 29 slot — the fifth reserve session. The owner's
+  kickoff supplied NO investor §19 answers and NO §19.6 sign-off, so per
+  the kickoff's own rule the slot ran the reserve branch: the FIRST CHECK
+  (the BD-S28 residual — the green-rows confirmation, a formality) + the
+  buffer health pass. The retirement execution stayed untouched (behind
+  the recorded §19.6 sign-off, per the S24 checklist's Gate 0). The
+  parallel-session rule verified at open (23:42 UTC on 2026-11-11):
+  origin/main at HEAD `bca4208` = the S28 close; no S29 records existed —
+  the slot is this session's to deliver.
+- **The session opened EARLY in the evidence window (the S28 shape
+  again).** The kickoff's premise ("the 04:10–04:40 Worker rungs and the
+  delayed ~12:00 GHA belt-and-braces should have landed the green ecb
+  rows by now") was NOT yet true at open — the session started ~1 h
+  after the S28 close (23:42 UTC on 2026-11-11), ~4.5 h BEFORE the
+  2026-11-12 morning rungs. The early read: the live status blob still
+  the S26 evidence run (generatedAt **14:15:19.239Z**, the two honest
+  ecb failed rows, 50/52 green, T-01…T-14 green); production verified
+  UNCHANGED (currena-api **`9861a927`**, the newest of 362 versions ·
+  currena-markets **`8f63c8fa`**, the newest); the GHA history
+  confirming NO insights-ingest run since run 91 (22:07:46Z, cancelled
+  by the 15-minute timeout after the KV-cap refusals).
+- **The green rows landed EARLY via the sanctioned dispatch (the
+  BD-S26/S28-precedent path, now in the fresh post-midnight KV slice).**
+  The workflow's own header documents the budget arithmetic ("1,000/day,
+  account-wide … 04:20 lands inside the fresh post-midnight slice with
+  ~750 writes of headroom") — so at 00:01:44 UTC on 2026-11-12 (the new
+  quota day) the session dispatched the GHA insights-ingest workflow
+  (workflow_dispatch, dry_run=false, run **92**, id 43124225627). The
+  run completed **success in 2m36s** (00:01:43→00:04:19) — no
+  retry-ladder burn, the writes all LANDED. The confirmation read: the
+  blob refreshed to generatedAt **2026-11-12T00:02:45.793Z** with
+  **failedSources EMPTY** — all three ecb rows green in the observable
+  state for the first time (`FM/D.U2.EUR.4F.KR.DFR.LEV` ·
+  `YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y (decade window)` ·
+  `HICP/M.U2.N.000000.4D0.ANR (full history)`, all ok/kind=fetched) —
+  the served readings exactly the publisher-true values (ecb-dfr 2.5 @
+  2026-11-11 status normal · euro-aaa-10y 3.3308865271 @ 2026-11-10 ·
+  euro-hicp 4.0 @ 2026-10-01). **THE FIRST-CHECK CONFIRMATION IS DONE**
+  per the kickoff's own expected branch ("green ecb rows — note the
+  one-line confirmation … no new decision needed"); the 04:10–04:40
+  Worker rungs re-confirm on schedule. The BD-S25 maintenance item stays
+  CLOSED; no card ever went past its maxAge window.
+- **The NEW finding the fresh rung surfaced — the EIA trio past the
+  wire-guard grace (T-04 red), a provider-schedule hiccup, Rule-5
+  verified:** the run-92 blob's validation flagged **T-04 Freshness**
+  (the only red of T-01…T-14): `eia-crude-stocks` · `us-spr` ·
+  `us-crude-production`, all "status context at age 13 days (max 12) —
+  must carry a stale tag". Root cause, verified against the provider's
+  own page (the LeafHandler weekly route, live from this venue, 200 in
+  1.65 s): the EIA's **last weekly release was 11/04** (data through the
+  week ending **10/30** — the served values EXACT: 691,944 · 282,184 ·
+  14,003) and the provider's own footer reads "**Next Release Date:
+  11/12/2026**" — the 11/11 release slipped to TODAY. The Saturday
+  11-07 rungs therefore correctly fetched the same 10-30 tail (runs 82/
+  83/84 all success), and the trio's age crossed the 12-day grace at the
+  2026-11-12 day boundary — the same crossing the 04:10 morning rung
+  would have shown regardless of the dispatch. The carried-forward
+  reading kept its run-90-era 'context' status (the scoring only
+  re-marks the ids a rung re-fetches), which is exactly the wire-lag
+  T-04 exists to guard; the user view stayed honest throughout (every
+  card shows its asOf + the client-side `freshnessAsOfLineOf` safety
+  net renders the "Data as of" line on the visitor's clock).
+- **The heal — the DESIGNED landing lever, not a code change:** the
+  session ran the production rung-2 phase via its manual runner
+  (`pnpm --filter @currena/insights rung2-run --eia` — the documented
+  post-deploy landing lever, the S25 imf-cpi/S6 cofer precedent, the
+  same venues/parsers the Worker rungs run), 00:12:25 UTC: all three
+  EIA pages fetched ✅, the readings re-computed with the current clock
+  → the trio flipped to the engine's honest **[stale]** status (values
+  unchanged, publisher-true), the snapshot + public projection + status
+  patched and written (~10 KV writes, the fresh slice). The wire is now
+  honest end-to-end: the pd-s17 freshness arm passes with "3 card(s)
+  beyond grace — 3 honestly carrying the engine's stale status", and
+  the next full collect (the 04:10 rung) re-validates T-04 against the
+  patched snapshot. The status blob's validationSummary keeps run 92's
+  T-04 row until that re-validation (the summary only re-computes on a
+  full collect — the rung-2 phase appends rows, it does not re-run the
+  suite; recorded honestly). **The self-heal path:** the provider's
+  11/12 release (its own footer, ~15:30 UTC today) covers the week
+  ending 11/06, and the Saturday 11-14 rung-2 gate lands it → the trio
+  returns to fresh/context at age ~8. No code change, no deploy, no
+  owner decision needed (the RISK_REGISTER note records the posture).
+- **The buffer health pass (ALL GREEN, four legs):** (1) the full
+  `pnpm gates` 9/9 in 2m35s — the suite **15,270** = the S26/S27/S28
+  close count exactly (records-only tree; secret scan 8 patterns/1027
+  files · typecheck 6/6 · lint 0/0 · copy:audit clean · narrator in
+  sync 193×2+56×2 + eval 50 · layer1 11,969/11,969 · build + budgets
+  held, entry 272.88/82.55); (2) the D-9 standing audit exit 0 — the
+  condition MET (every indicator one lane + one home; registry ↔
+  engine ↔ placement reconciled); (3) the live pd-* backtests ALL
+  ELEVEN ALL CHECKS GREEN against production — 705 checks/0 red: pd-s4
+  Global 84/84 (incl. the raw-KV stateHash arm; the narrator
+  one-state-behind note honest — the 00:12 patch landed after the 23:50
+  narration, the next :50 rung re-narrates) · pd-s5 Gold 150/150 ·
+  pd-s7 World Markets 57/57 (the fresh 23:30 markets board, 9 present
+  readings — the honest live variance vs the S28-era 56) · pd-s8 zooms
+  9/9 · pd-s9 USA 115/115 · pd-s10 USA 163/163 incl. the TIC sub-gate
+  48/48 · pd-s12 Europe 8/8 · pd-s14 Asia 14/14 · pd-s16 Australia
+  28/28 (7 beyond-grace, all honestly stale) · pd-s17 Commodities
+  24/24 (the EIA trio beyond-grace + honestly stale — the re-scored
+  pass) · pd-s18 Currencies 53/53 (14 cards + the rules gate 16 + the
+  board gate 23); (4) the S20 data audit 20/20 GREEN (seed 20261112,
+  the frozen sample — both EIA members in the sample EXACT: us-spr
+  282,184 · us-crude-production 14,003 vs the live LeafHandler page
+  from this venue). No session action touched indicators, definitions,
+  placement or §A (the D-9 re-run is belt-and-braces, the standing
+  rule).
+- **NO deploy** — zero code changed; production currena-api `9861a927`
+  + currena-markets `8f63c8fa` verified unchanged at open (the newest
+  versions, nothing newer). The session's KV writes: the run-92 ingest
+  chain (the fresh slice) + the rung-2 phase patch (~10 keys) + one
+  scope-test write/delete pair — all inside the new quota day.
+- **Records:** BD-S29 (this entry) · the RISK_REGISTER EIA note (the
+  provider-schedule posture, no licence change) · the CHANGELOG S29
+  entry · the roadmap's Session 29 SLOT record + progress board +
+  current position (Session 29/30 · 1 remaining) · the page-division
+  README program state · the strategy-log §8 row 33 · HANDOFF.md fully
+  rewritten.
+- **Revisit:** the standing branches hold — the investor round the
+  moment the owner supplies the §19 answers; the retirement execution
+  ONLY behind the recorded §19.6 sign-off; the EIA trio self-heals at
+  the Saturday 11-14 gate (a fresh context reading expected; only a
+  multi-week provider stall — the trio stale past ~2026-11-28 with the
+  Saturday gates all failing — would raise a new provider question).

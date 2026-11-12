@@ -5,6 +5,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## [2026-11-12] page-division S29 (the fifth reserve session — the first-check green-rows CONFIRMATION + the EIA-trio wire-honesty heal + the buffer health pass): **THE OBSERVABLE STATE HAS CAUGHT UP WITH THE CLOSED VERDICT — the session opened ~1 h after the S28 close, ~4.5 h BEFORE the 04:10–04:40 evidence window (the blob still the S26 evidence run), so it landed the green rows EARLY via the sanctioned dispatch in the fresh post-midnight KV slice (GHA insights-ingest run 92, 00:01:44Z, success in 2m36s, all writes landed): failedSources EMPTY, all three ecb rows GREEN in the served blob for the first time (DFR · AAA · HICP, the values exactly the publisher-true trio — the one-line confirmation, no new decision needed). The fresh rung surfaced a NEW finding: the EIA weekly trio (eia-crude-stocks · us-spr · us-crude-production) past the 12-day wire-guard grace at the 2026-11-12 day boundary (T-04 red, age 13) — a provider-schedule hiccup Rule-5-verified against the provider's own page (the last release 11/04, the next release 11/12 per its own footer; the Saturday 11-07 rungs had correctly fetched the 10-30 tail; the values EXACT), healed on the wire via the DESIGNED rung2-run --eia landing lever (the production phase, the honest [stale] re-marking, ~10 KV writes) — the pd-s17 freshness arm back to its designed pass (beyond-grace + honestly stale); the trio self-heals to fresh/context at the Saturday 11-14 gate. The buffer health pass ALL GREEN: the full gates 9/9 in 2m 35s (the suite 15,270 = the S26/S27/S28 close count exactly, records-only tree) · the D-9 standing audit exit 0 · the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production (705 checks/0 red) · the S20 data audit 20/20 (both EIA sample members EXACT). NO deploy — zero code changed (production currena-api `9861a927` + currena-markets `8f63c8fa`, both verified unchanged). Progress: Session 29/30 · 1 remaining.**
+
+- **The session shape:** one slot, one session, no interruption. The
+  owner's kickoff supplied NO investor §19 answers and NO §19.6
+  sign-off → the reserve branch (the retirement execution untouched
+  behind Gate 0). The first check at open (~23:42 UTC on 2026-11-11)
+  read the blob still the S26 evidence run — the kickoff's premise not
+  yet true (the S28-shape early read) — so the session landed the
+  confirmation itself via the sanctioned path rather than waiting ~4.5 h
+  for the morning rungs.
+- **The dispatch arithmetic (the fresh post-midnight slice):** the
+  workflow's own header documents the budget (1,000 KV writes/day
+  account-wide; the 04:20 scheduled run lands ~750 of headroom) — the
+  00:01:44 UTC dispatch ran in the brand-new quota day: run 92
+  (id 43124225627, dry_run=false, main ≡ production) completed
+  **success in 2m36s**, no retry ladder, all writes landed. The blob
+  refreshed to 00:02:45.793Z: failedSources EMPTY — the ecb rows
+  `FM/D.U2.EUR.4F.KR.DFR.LEV` · `YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y
+  (decade window)` · `HICP/M.U2.N.000000.4D0.ANR (full history)` all
+  green; the served readings ecb-dfr 2.5 @ 2026-11-11 (normal) ·
+  euro-aaa-10y 3.3308865271 @ 2026-11-10 · euro-hicp 4.0 @ 2026-10-01.
+  The BD-S25 maintenance item stays CLOSED; the 04:10–04:40 Worker
+  rungs re-confirm on schedule (the ecb roulette remains per-request —
+  an honest failed row on any rung is the documented RISK_REGISTER
+  shape, not a reopening).
+- **The EIA trio finding + the heal:** the run-92 validation flagged
+  T-04 Freshness (the only red): the three weekly EIA cards "status
+  context at age 13 days (max 12)". Rule-5 verification against the
+  provider's own LeafHandler page (live, 200 in 1.65 s): the last
+  release 11/04 (data through 10/30 — the served values EXACT: 691,944
+  · 282,184 · 14,003) and "Next Release Date: 11/12/2026" — the 11/11
+  release slipped to today; the Saturday 11-07 rungs (82/83/84, all
+  success) had correctly fetched the provider's own latest. The
+  carried-forward reading kept its 'context' status (the scoring only
+  re-marks re-fetched ids) — exactly the wire-lag T-04 guards; the user
+  view stayed honest (the asOf dates + the client-side
+  freshnessAsOfLineOf safety net). The heal: `rung2-run --eia`
+  (00:12:25 UTC — the documented landing lever, the production rung-2
+  phase through the REST store, the S25 imf-cpi/S6 cofer precedent):
+  all three pages fetched ✅, the readings re-scored with the current
+  clock → the honest **[stale]** status (values unchanged), the
+  snapshot + public + status patched. The status summary's T-04 row
+  stays red until the 04:10 full collect re-validates against the
+  patched snapshot (the rung-2 phase appends rows; it does not re-run
+  the suite — recorded honestly). The self-heal: the 11/12 release
+  (~15:30 UTC) covers the week ending 11/06; the Saturday 11-14 gate
+  lands it → the trio returns to fresh/context at age ~8. The
+  RISK_REGISTER eia row carries the posture note.
+- **The records:** BD-S29 (DECISIONS) + the RISK_REGISTER EIA note +
+  this entry + the roadmap's Session 29 SLOT record + the progress
+  board's Reserve row + the current-position note (Session 29/30 · 1
+  remaining) + the page-division README program state + the
+  strategy-log §8 row 33 + HANDOFF.md fully rewritten. Zero code, zero
+  deploy; the session's KV writes all inside the new quota day (the
+  run-92 chain + the ~10-key rung-2 patch + one scope-test pair).
+
 ## [2026-11-11] page-division S28 (the fourth reserve session — the ecb first-check ROUND 4 + the buffer health pass): **THE MAINTENANCE ITEM IS CLOSED — the session opened ~1.5 h after the S27 close, BEFORE the round-4 evidence window (the 04:10–04:40 rungs ~6 h out), with the blob still the S26 evidence run (14:15:19Z, the two honest ecb failed rows); NEW evidence at open (the :13 prices write landed at 21:13:18Z — the write budget alive an hour past the S27 close) prompted the session to dispatch the sanctioned belt-and-braces rung (GHA insights-ingest run 91, 22:07:46Z): the rung ran the NEW CODE CLEAN — ALL THREE ecb legs fetched green in one rung for the first time (DFR · AAA · HICP; 66 ✅ rows, ZERO failed source rows; collect 46.43 s; T-01…T-14 validation green; the readings exactly the served publisher-true values — the third same-day independent verification, all exact) — while its KV writes were ALL refused by the daily cap (the DIRECT 429-10048 evidence with the retry ladder, resolving S27's indistinguishability: the designed no-update branch, the blob untouched, the morning rungs own the observable heal). The buffer health pass ALL GREEN: the full gates 9/9 in 2m 37s (the suite 15,270 = the S26/S27 close count exactly, records-only tree) · the D-9 standing audit 18/18 · the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against production · the S20 data audit 20/20. NO deploy — zero code changed (production currena-api `9861a927` + currena-markets `8f63c8fa`, both verified unchanged); the escalation lever retires to RISK_REGISTER's standing posture. Progress: Session 28/30 · 2 remaining.**
 
 - **The session shape:** one slot, one session, no interruption. The
