@@ -57,12 +57,20 @@
   30/30 · 0 remaining); the program stays complete.** The first
   post-program owner round (S31, the World Markets briefing) is
   DELIVERED + DEPLOYED (BD-S31).
-- **DEPLOYED LIVE:** currena-api — the S31 deploy (the rebuilt SPA
-  assets riding the API worker; the worker code itself unchanged since
-  the S25 fix) + currena-markets `8f63c8fa` (untouched). The live
-  /world-markets page renders the briefing (verified post-deploy in
-  this session's record). Production ≡ HEAD after this session's
-  records commits.
+- **DEPLOYED LIVE:** currena-api — the S31 deploy, version
+  `502708df-08db-430f-86d5-a141a73c85d4` (the rebuilt SPA assets
+  riding the API worker; the worker code itself unchanged since the
+  S25 fix) + currena-markets `8f63c8fa` (untouched). **The live
+  verify (https://currena.ir/world-markets, post-deploy):** the
+  briefing renders over the live feeds — the breadth "today
+  performance · Indices up 7 · Indices down 0 · Flat 9 · A move
+  within ±1% reads as flat", the movers TAIEX +3.6% (Correction
+  −11.2%) / Hang Seng −1.0% (Correction −13.1%), all 16 tiles, the
+  Hang Seng detail panel expanding with the 52-week chart (Nov 2025 →
+  Nov 2026) + the levels — zero console errors, and the standing
+  pd-s7 live backtest re-run against production: **ALL CHECKS GREEN —
+  57 checks · 57 green · 0 red.** Production ≡ HEAD after this
+  session's records commits.
 - **The ecb posture (BD-S29, carried):** the served blob shows
   failedSources EMPTY — all three ecb rows green. The BD-S25
   maintenance item stays CLOSED; the per-request ECB roulette remains

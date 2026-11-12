@@ -2208,7 +2208,10 @@ retirement gate (they live in the insights corpus whose import into
 the lean chunk the S7 architecture deliberately avoids — BD-S31).
 
 **Deployed:** the rebuilt SPA (the World Markets chunk) through the
-`currena-api` worker; the live verify in HANDOFF.md.
+`currena-api` worker — version `502708df-08db-430f-86d5-a141a73c85d4`;
+the live verify (the briefing rendering over the live feeds, the tile
+expansion, zero console errors, and the standing pd-s7 backtest re-run
+ALL GREEN 57/57) in HANDOFF.md.
 
 ---
 
