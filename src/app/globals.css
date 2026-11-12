@@ -140,9 +140,9 @@
   --color-text-primary: #2c2622;
   --color-text-secondary: #5c544c;
   --color-text-tertiary: #8a7f74;
-  --color-return-up: #2e9e5b;
-  --color-return-down: #c0392b;
-  --currena-success: #2e9e5b;
+  --color-return-up: #16a34a;
+  --color-return-down: #dc2626;
+  --currena-success: #16a34a;
   --currena-warning: #e8a33d;
   --currena-accent: #4a90e2;
   --currena-muted: #6b7280;
@@ -164,9 +164,9 @@
   --color-text-primary: #f5f1ea;
   --color-text-secondary: #c4b8a9;
   --color-text-tertiary: #9a8d7e;
-  --color-return-up: #3ec371;
-  --color-return-down: #e85a4a;
-  --currena-success: #3ec371;
+  --color-return-up: #22c55e;
+  --color-return-down: #ef4444;
+  --currena-success: #22c55e;
   --currena-warning: #f0b856;
   --currena-accent: #6aa8e8;
   --color-status-alert: #e85a4a;

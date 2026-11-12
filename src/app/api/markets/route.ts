@@ -61,6 +61,7 @@ export function GET() {
       name: meta.name,
       shortName: meta.shortName,
       country: meta.country,
+      shortCountry: meta.shortCountry,
       region: meta.region,
       level: raw.level,
       high52w,

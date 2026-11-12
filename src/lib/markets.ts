@@ -24,29 +24,31 @@ export interface IndexMeta {
   /** Short label for narrow treemap tiles (spec §3). */
   shortName: string;
   country: string;
+  /** Short country form for narrow treemap tiles. */
+  shortCountry: string;
   region: RegionId;
 }
 
 export const INDICES: readonly IndexMeta[] = [
   // Americas (5)
-  { symbol: 'sp500', name: 'S&P 500', shortName: 'S&P 500', country: 'United States', region: 'americas' },
-  { symbol: 'ndx', name: 'Nasdaq 100', shortName: 'Nasdaq 100', country: 'United States', region: 'americas' },
-  { symbol: 'dow', name: 'Dow Jones', shortName: 'Dow Jones', country: 'United States', region: 'americas' },
-  { symbol: 'tsx', name: 'S&P/TSX Composite', shortName: 'S&P/TSX', country: 'Canada', region: 'americas' },
-  { symbol: 'ibov', name: 'Ibovespa', shortName: 'Ibovespa', country: 'Brazil', region: 'americas' },
+  { symbol: 'sp500', name: 'S&P 500', shortName: 'S&P 500', country: 'United States', shortCountry: 'USA', region: 'americas' },
+  { symbol: 'ndx', name: 'Nasdaq 100', shortName: 'Nasdaq 100', country: 'United States', shortCountry: 'USA', region: 'americas' },
+  { symbol: 'dow', name: 'Dow Jones', shortName: 'Dow Jones', country: 'United States', shortCountry: 'USA', region: 'americas' },
+  { symbol: 'tsx', name: 'S&P/TSX Composite', shortName: 'S&P/TSX', country: 'Canada', shortCountry: 'Canada', region: 'americas' },
+  { symbol: 'ibov', name: 'Ibovespa', shortName: 'Ibovespa', country: 'Brazil', shortCountry: 'Brazil', region: 'americas' },
   // Asia-Pacific (7)
-  { symbol: 'ssec', name: 'Shanghai Composite', shortName: 'Shanghai', country: 'China', region: 'asia' },
-  { symbol: 'n225', name: 'Nikkei 225', shortName: 'Nikkei 225', country: 'Japan', region: 'asia' },
-  { symbol: 'hsi', name: 'Hang Seng', shortName: 'Hang Seng', country: 'Hong Kong', region: 'asia' },
-  { symbol: 'nifty50', name: 'Nifty 50', shortName: 'Nifty 50', country: 'India', region: 'asia' },
-  { symbol: 'taiex', name: 'TAIEX', shortName: 'TAIEX', country: 'Taiwan', region: 'asia' },
-  { symbol: 'kospi', name: 'KOSPI', shortName: 'KOSPI', country: 'South Korea', region: 'asia' },
-  { symbol: 'asx200', name: 'ASX 200', shortName: 'ASX 200', country: 'Australia', region: 'asia' },
+  { symbol: 'ssec', name: 'Shanghai Composite', shortName: 'Shanghai', country: 'China', shortCountry: 'China', region: 'asia' },
+  { symbol: 'n225', name: 'Nikkei 225', shortName: 'Nikkei 225', country: 'Japan', shortCountry: 'Japan', region: 'asia' },
+  { symbol: 'hsi', name: 'Hang Seng', shortName: 'Hang Seng', country: 'Hong Kong', shortCountry: 'Hong Kong', region: 'asia' },
+  { symbol: 'nifty50', name: 'Nifty 50', shortName: 'Nifty 50', country: 'India', shortCountry: 'India', region: 'asia' },
+  { symbol: 'taiex', name: 'TAIEX', shortName: 'TAIEX', country: 'Taiwan', shortCountry: 'Taiwan', region: 'asia' },
+  { symbol: 'kospi', name: 'KOSPI', shortName: 'KOSPI', country: 'South Korea', shortCountry: 'S. Korea', region: 'asia' },
+  { symbol: 'asx200', name: 'ASX 200', shortName: 'ASX 200', country: 'Australia', shortCountry: 'Australia', region: 'asia' },
   // Europe (4)
-  { symbol: 'stoxx50', name: 'Euro Stoxx 50', shortName: 'Stoxx 50', country: 'Eurozone', region: 'europe' },
-  { symbol: 'ftse', name: 'FTSE 100', shortName: 'FTSE 100', country: 'United Kingdom', region: 'europe' },
-  { symbol: 'cac', name: 'CAC 40', shortName: 'CAC 40', country: 'France', region: 'europe' },
-  { symbol: 'dax', name: 'DAX', shortName: 'DAX', country: 'Germany', region: 'europe' },
+  { symbol: 'stoxx50', name: 'Euro Stoxx 50', shortName: 'Stoxx 50', country: 'Eurozone', shortCountry: 'Eurozone', region: 'europe' },
+  { symbol: 'ftse', name: 'FTSE 100', shortName: 'FTSE 100', country: 'United Kingdom', shortCountry: 'UK', region: 'europe' },
+  { symbol: 'cac', name: 'CAC 40', shortName: 'CAC 40', country: 'France', shortCountry: 'France', region: 'europe' },
+  { symbol: 'dax', name: 'DAX', shortName: 'DAX', country: 'Germany', shortCountry: 'Germany', region: 'europe' },
 ];
 
 /** Region display order (TE treemap order, biggest cap first). The treemap

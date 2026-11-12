@@ -21,6 +21,9 @@ export interface EnrichedIndex {
   /** Short label for narrow treemap tiles. */
   shortName: string;
   country: string;
+  /** Short country form for narrow treemap tiles (e.g. "USA" for "United
+   *  States"). The full country rides the tooltip, aria and the modal. */
+  shortCountry: string;
   region: 'americas' | 'asia' | 'europe';
   /** Last close / index level. */
   level: number;
