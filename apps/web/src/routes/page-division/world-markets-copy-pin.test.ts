@@ -177,6 +177,46 @@ function pinRiskWords(pd: Pd, corpus: Copy, locale: 'en' | 'fa'): void {
   expect(pd.statusUnavailable, locale).toBe(corpus.status.unavailable);
 }
 
+/** Pin the briefing layer's restored editorial vocabulary (the
+ * 2026-11-12 owner round: the breadth headline, the movers, the tiles
+ * and the detail panel) against the corpus's own markets block. The pd
+ * key names differ from the corpus's on four words (the corpus's own
+ * names were kept where they existed; the page's names speak the pd
+ * block's flat shape) — the WORDS must not. */
+function pinBriefingWords(pd: Pd, corpus: Copy, locale: 'en' | 'fa'): void {
+  const pdAny = pd as unknown as Record<string, string>;
+  const cm = corpus.markets as unknown as Record<string, string>;
+  const keys: Array<[string, string]> = [
+    ['briefingHeading', 'sectionLabel'],
+    ['breadthPeriod', 'breadthPeriod'],
+    ['breadthUp', 'breadthUp'],
+    ['breadthDown', 'breadthDown'],
+    ['breadthFlat', 'breadthFlat'],
+    ['flatBandNote', 'flatBandNote'],
+    ['coverageNote', 'coverageNote'],
+    ['moverGain', 'moverGain'],
+    ['moverLoss', 'moverLoss'],
+    ['moverPeriodLabel', 'moverPeriodLabel'],
+    ['moversNone', 'moversNone'],
+    ['thFromHigh', 'thFromHigh'],
+    ['atHighTag', 'atHighTag'],
+    ['tileTagBelow', 'tileTagBelow'],
+    ['oldDataLine', 'oldData'],
+    ['noReadingAria', 'noReadingAria'],
+    ['valueAria', 'heatmapValueAria'],
+    ['asOfLine', 'asOf'],
+    ['lastCloseLabel', 'lastCloseLabel'],
+    ['high52wLabel', 'high52wLabel'],
+    ['low52wLabel', 'low52wLabel'],
+    ['chartAria', 'chartAria'],
+  ];
+  for (const [pdKey, corpusKey] of keys) {
+    expect(pdAny[pdKey], `${locale} ${pdKey}`).toBe(cm[corpusKey]);
+  }
+  // The chart's honest no-data word — the corpus's own ui.na.
+  expect(pdAny.naWord, `${locale} naWord`).toBe(corpus.ui.na);
+}
+
 describe('the World Markets page speaks the insights corpus’s words (en)', () => {
   const pd = en.pd.worldMarkets;
   const corpus = insightsCopyEn;
@@ -195,6 +235,10 @@ describe('the World Markets page speaks the insights corpus’s words (en)', () 
 
   it('the 9 risk-card names + the unit + position + band + status words ↔ the corpus', () => {
     pinRiskWords(pd, corpus, 'en');
+  });
+
+  it('the briefing layer (breadth + movers + tiles + detail) ↔ copy.markets', () => {
+    pinBriefingWords(pd, corpus, 'en');
   });
 });
 
@@ -216,5 +260,9 @@ describe('the World Markets page speaks the insights corpus’s words (fa)', () 
 
   it('the 9 risk-card names + the unit + position + band + status words ↔ the corpus', () => {
     pinRiskWords(pd, corpus, 'fa');
+  });
+
+  it('the briefing layer (breadth + movers + tiles + detail) ↔ copy.markets', () => {
+    pinBriefingWords(pd, corpus, 'fa');
   });
 });

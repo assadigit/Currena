@@ -36,6 +36,7 @@ import { MARKETS } from '@currena/insights/markets/definitions';
 import { summarizeMarkets } from '@currena/insights/markets';
 import { WorldMarketsPage } from './WorldMarketsPage';
 import { worldMarketsRows, worldMarketsStatus } from './world-markets-tiles';
+import { marketBreadth, topMovers } from '../../components/insights/world-markets/briefing';
 import { clearProjectionCacheForTests } from '../../lib/page-division';
 
 /* ------------------------------------------------------------------ *
@@ -237,6 +238,128 @@ describe('WorldMarketsPage', () => {
 
     // 16 unique row ids — every registry market seated exactly once.
     expect(new Set(Array.from(document.querySelectorAll('[data-wm-row]')).map((el) => el.getAttribute('data-wm-row')))).toHaveLength(16);
+  });
+
+  it('renders the briefing: the breadth headline + the two movers + the regional tile explorer (the legacy editorial layer)', async () => {
+    stubFeeds();
+    render(<WorldMarketsPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-wm-briefing]')).not.toBeNull();
+    });
+
+    // The engines' own derivations over the same fixture — never
+    // hand-counted (the characterization pins the PIPE, the engine
+    // provides the numbers).
+    const board = boardFixture();
+    const breadth = marketBreadth(board.markets, 'today');
+    const movers = topMovers(board.markets, 'today');
+
+    // The breadth headline: the period label + the three cells carrying
+    // the engine's counts + the proportional bar + the stated flat band.
+    const block = document.querySelector('[data-markets-breadth-block]')!;
+    expect(block.textContent).toContain('today performance');
+    for (const kind of ['up', 'down', 'flat'] as const) {
+      const cell = block.querySelector(`[data-breadth-kind="${kind}"]`)!;
+      expect(cell.textContent, kind).toContain(String(breadth[kind]));
+    }
+    expect(document.querySelector('[data-markets-flat-band-note]')!.textContent).toContain('±1%');
+    expect(document.querySelector('[data-markets-breadth-bar]')!.children).toHaveLength(3);
+
+    // The two featured movers: the fixture's chg1d is a uniform +0.5, so
+    // the true extrema tie and keep the first registry row (n225) — the
+    // honest tie rule, never a fake winner.
+    const gain = document.querySelector('[data-markets-biggest="gain"]')!;
+    const fall = document.querySelector('[data-markets-biggest="fall"]')!;
+    expect(gain.textContent).toContain('Biggest gain');
+    expect(fall.textContent).toContain('Biggest fall');
+    expect(gain.textContent).toContain(movers.gainer!.id === 'n225' ? 'Nikkei 225' : movers.gainer!.id);
+    expect(gain.textContent).toContain('+0.5%');
+    expect(fall.textContent).toContain('+0.5%');
+    expect(gain.textContent).toContain('Selected period: today');
+
+    // The tile explorer: three groups in registry order · Asia 7 ·
+    // Europe 4 · Americas 5 — 16 tile buttons, every one an honest
+    // expandable button with its 52-week tag.
+    const groups = Array.from(document.querySelectorAll('[data-wm-briefing] [data-markets-region]'));
+    expect(groups.map((g) => g.getAttribute('data-markets-region'))).toEqual(['asia', 'europe', 'americas']);
+    expect(document.querySelectorAll('[data-wm-briefing] [data-markets-tile]')).toHaveLength(16);
+    const hsi = document.querySelector<HTMLButtonElement>('[data-markets-tile="hsi"]')!;
+    expect(hsi.id).toBe('insights-market-tile-hsi');
+    expect(hsi.getAttribute('aria-expanded')).toBe('false');
+    expect(hsi.textContent).toContain('Hang Seng');
+    expect(hsi.textContent).toContain('Hong Kong');
+    // The status ring hierarchy: the fixture's i%8 spread makes n225 the
+    // bear row (ring /40) and asx200 the correction row (ring /30), while
+    // hsi (near its high) keeps the plain border ring — the legacy
+    // warning-tone discipline carried over verbatim.
+    expect(document.querySelector('[data-markets-tile="n225"]')!.className).toContain('ring-currena-warning/40');
+    expect(document.querySelector('[data-markets-tile="asx200"]')!.className).toContain('ring-currena-warning/30');
+    expect(hsi.className).toContain('ring-[var(--color-border)]');
+    // Every tile carries its 52-week distance (F5) — kospi's −7% reads
+    // the corpus's own tag words.
+    expect(document.querySelector('[data-markets-tile="kospi"]')!.textContent).toContain('7% below 52-week high');
+  });
+
+  it('the tile explorer expands the detail panel (one open at a time, the 52-week chart + the levels)', async () => {
+    stubFeeds();
+    Element.prototype.scrollIntoView = vi.fn();
+    render(<WorldMarketsPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-markets-tile="n225"]')).not.toBeNull();
+    });
+
+    const tile = document.querySelector<HTMLButtonElement>('[data-markets-tile="n225"]')!;
+    fireEvent.click(tile);
+    await waitFor(() => {
+      expect(document.querySelector('#insights-market-detail-n225')).not.toBeNull();
+    });
+    expect(tile.getAttribute('aria-expanded')).toBe('true');
+
+    // The panel's anatomy: the REUSED 52-week chart + the stored levels
+    // (last close · 52-week high · 52-week low · from-high · as-of).
+    const panel = document.querySelector('#insights-market-detail-n225')!;
+    expect(panel.querySelector('[role="img"]')).not.toBeNull();
+    expect(panel.textContent).toContain('Last close');
+    expect(panel.textContent).toContain('52-week high');
+    expect(panel.textContent).toContain('From 52-week high');
+    expect(panel.textContent).toContain('as of');
+
+    // One panel at a time (§6.3): opening hsi closes n225.
+    fireEvent.click(document.querySelector<HTMLButtonElement>('[data-markets-tile="hsi"]')!);
+    await waitFor(() => {
+      expect(document.querySelector('#insights-market-detail-hsi')).not.toBeNull();
+    });
+    expect(document.querySelector('#insights-market-detail-n225')).toBeNull();
+
+    // Toggling the open tile closes it entirely.
+    fireEvent.click(document.querySelector<HTMLButtonElement>('[data-markets-tile="hsi"]')!);
+    await waitFor(() => {
+      expect(document.querySelector('#insights-market-detail-hsi')).toBeNull();
+    });
+  });
+
+  it('the map\'s period switch drives the briefing (the ONE lens discipline)', async () => {
+    stubFeeds();
+    render(<WorldMarketsPage />);
+    await waitFor(() => {
+      expect(document.querySelector('.wm')).not.toBeNull();
+      expect(document.querySelector('[data-markets-breadth-block]')).not.toBeNull();
+    });
+
+    // The briefing starts on today (the fixture's uniform +0.5% chg1d
+    // is inside the ±1% band → all flat, the honest banded count).
+    expect(document.querySelector('[data-markets-breadth-block]')!.textContent).toContain('today performance');
+
+    // The map's "1 week" radio re-lenses the WHOLE briefing — the
+    // 2026-10-21 unification discipline, now the page's own.
+    fireEvent.click(screen.getByRole('radio', { name: '1 week' }));
+    await waitFor(() => {
+      expect(document.querySelector('[data-markets-breadth-block]')!.textContent).toContain('this week performance');
+    });
+    // The movers speak the weekly reading (+0.4 in the fixture) and the
+    // period caption follows.
+    expect(document.querySelector('[data-markets-biggest="gain"]')!.textContent).toContain('+0.4%');
+    expect(document.querySelector('[data-markets-biggest="gain"]')!.textContent).toContain('Selected period: this week');
   });
 
   it('renders the world risk & liquidity cards: the 9 placement homes with the §21 trio', async () => {

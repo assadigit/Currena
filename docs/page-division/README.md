@@ -342,6 +342,20 @@ regeneration (`pnpm placement:generate`).
   `9861a927` + `8f63c8fa`). The legacy retirement execution NEVER ran
   — Gate 0 (the recorded §19.6 sign-off) holds.
 
+  **The first post-program owner round (S31, 2026-11-12, BD-S31):
+  the World Markets briefing restored on /world-markets + DEPLOYED.**
+  The owner asked for the legacy section's editorial layer the S7
+  refactor had omitted (the breadth headline + the two movers + the
+  regional tile explorer with its detail panels — "I worked hard on
+  their UI/UX"): shipped as the corpus-pinned WorldMarketsBriefing
+  section (the SAME pure helpers, never a second arithmetic; the
+  REUSED MarketsChart/MarketLogo drawings), the map's period switch
+  promoted to the page's ONE controlled lens, the WM chunk budget
+  30/8 → 40/9 (gzip-quiet +0.30 kB), the gates 9/9 (the suite 15,275,
+  +5 arms) + the EN/FA/RTL/mobile browser pass green — deployed
+  through currena-api with the live verify green. The full record: the
+  roadmap's "Owner rounds (post-program)" section + BD-S31.
+
   **The owner's levers (the program is finished — these re-open work
   at the next free slot): (1) arrange the external investor's review
   of spec §19 (the seven questions) — the investor round re-opens the

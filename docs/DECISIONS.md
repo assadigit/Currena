@@ -3428,3 +3428,84 @@
   a re-execution. **Credential rotation:** the program's development
   work is ended — the owner should revoke or rotate every credential
   supplied across the sessions (they were used, never stored).
+
+## 2026-11-12 — BD-S31: the owner-requested World Markets briefing round — the legacy section's editorial layer (the breadth headline, the two featured movers, and the regional tile explorer with its detail panels) restored on the standalone /world-markets page after the S7 refactor omitted it; the restoration rides the copy-adapter pattern (corpus-pinned pd keys, never a corpus import), the SAME pure helpers the legacy section reads (never a second arithmetic), and the map's period switch promoted to the page's ONE controlled lens
+
+- **The request:** the owner (2026-11-12, post-program): the refactored
+  standalone `/world-markets` page omitted the legacy section's
+  "pulse of world markets" editorial layer — the breadth headline
+  (up/down/flat counts over a proportional bar), the two featured
+  movers («Biggest gain» / «Biggest fall»), and the regional tile
+  explorer (the 16 index tiles with their 52-week positioning) —
+  components the owner "worked hard on their UI/UX". The ask: restore
+  them on the new page, byte-faithful to the legacy anatomy, and
+  deploy.
+- **What shipped (apps/web, the lazy World Markets chunk only):**
+  - **`WorldMarketsBriefing.tsx`** — the new section between the hero
+    and the region grids: the R9-06 breadth headline (the three
+    large-number cells + the aria-hidden proportional bar + the stated
+    ±1% flat band + the honest coverage note, the legacy
+    `data-markets-breadth-*` attributes kept), the §3.4 movers pair
+    (the 96/112 wordmarks, the signed hero number in the bright return
+    inks with the crisp triangle, the separate 52-week-distance line
+    with its status chip, the unambiguous period caption), and the
+    §3.5 tile explorer (three labelled groups east→west, the quiet
+    expandable button-tiles with the warning-ring hierarchy
+    [correction /30 · bear /40 · plain otherwise], the every-tile
+    52-week tag, the delayed/old honesty tags, the §9 sr sentence)
+    expanding a board-true detail panel under its group (the identity
+    row + the REUSED MarketsChart 52-week drawing + the levels dl) —
+    one panel open at a time (§6.3).
+  - **The ONE period lens:** the page owns the `MarketsView`; the
+    hero's map switch becomes CONTROLLED through the legacy
+    PERIOD_OF_VIEW/VIEW_OF_PERIOD bridge (the 2026-10-21 unification
+    round's own discipline — the map's segmented switch drives the
+    hero, the briefing and nothing else owns a second switch).
+  - **D-48 (never a second arithmetic):** every number flows through
+    the SAME pure helpers the legacy section reads — marketBreadth ·
+    topMovers · periodValueOf (briefing.ts), viewValue · signOf ·
+    returnToneClass · DirTriangle · statusToneOf · statusWordKeyOf ·
+    isOld · tradingDaysBehind (shared.tsx) — plus the REUSED
+    MarketsChart and MarketLogo modules (MarketsChart's copy prop
+    narrowed to a lean MarketsChartCopy contract, the WorldMapCopy
+    pattern: the legacy caller passes the full corpus, structurally
+    satisfied, zero change there).
+  - **The copy:** 24 new `pd.worldMarkets.*` keys × 2 locales; 23 of
+    24 pinned byte-for-byte to the insights corpus (the markets block
+    + ui.na) by a NEW arm of world-markets-copy-pin.test.ts
+    (pinBriefingWords, both locales); briefingAria is fresh glue. All
+    24 fa strings queued unreviewed in the Persian copy manifest (the
+    S7 queue precedent) — the audit exits clean.
+- **The conscious scope cut (the lean detail panel):** the legacy
+  MarketDetail's what/why/you editorial lines + the Layer1Block do NOT
+  ride the restored panel — they live in the insights corpus (48 long
+  strings × 2 locales) whose import into the lean World Markets chunk
+  the S7 architecture deliberately avoids; the panel answers with the
+  board's own stored fields (identity + the 52-week chart + last
+  close/high/low/from-high + as-of). The full editorial panel stays on
+  the legacy /insights page until its retirement (the S24 checklist's
+  details-panel port recommendation rides the §19.6 gate as before).
+- **The budget bump:** the World Markets lazy chunk 30/8 → 40/9 kB
+  (measured 38.25/8.30 — +8.25 raw but only +0.30 gz): the briefing
+  module + the reused chart/logo modules + the pinned copy. Justified
+  in CHANGELOG §2026-11-12 (S31); gzip-quiet for users (~0.3 kB).
+- **The verification:** the full `pnpm gates` 9/9 ALL GREEN (the suite
+  15,275 — +5: three new page characterization arms [the briefing, the
+  detail-panel expand/one-open discipline, the map-switch lens] + the
+  two new copy-pin arms); the browser pass (agent-browser over the
+  built dist + the live feeds, EN + FA/RTL + 390px mobile): the
+  breadth 7/0/9 over the ±1% band, the movers TAIEX +3.6% / Hang Seng
+  −1.0% (Correction −13.1%), the tiles' ring hierarchy and the DAX
+  at-its-high green pill, the expanded panel's chart + levels, RTL
+  mirroring and mobile stacking all verified visually; zero console
+  errors.
+- **Who decided:** the owner (the request + the UI/UX preservation
+  mandate); the implementation shape (the copy-adapter port, the lean
+  panel, the budget bump) by the agent per the standing conventions.
+- **Records:** this entry · the CHANGELOG S31 entry · the roadmap's
+  post-program S31 record + the progress-board row · the strategy-log
+  §8 row 35 · HANDOFF.md rewritten.
+- **Revisit:** the §19.6 retirement gate (if the legacy page retires,
+  decide then whether the what/why/you editorial lines join the
+  standalone panel); the queued fa strings ride the standing Persian
+  copy review queue.

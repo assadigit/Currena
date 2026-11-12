@@ -1008,7 +1008,16 @@ const BUDGETS = [
   // copy. The entry chunk gains only the lazy wiring (269.00/81.45 →
   // 269.32/81.55 vs 296/89.5). Ceiling 30/8 per the tight convention
   // (~3.5 kB raw / ~1.5 kB gz headroom).
-  { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 30_000, gz: 8_000, label: 'World Markets page lazy chunk (page-division S7)' },
+  // S31 bump (2026-11-12, 30/8 → 40/9): the briefing round — the legacy
+  // section's editorial layer restored on the standalone page (the
+  // breadth headline + the two movers + the regional tile explorer with
+  // its detail panels). Measured 38.25/8.30 (+8.25 raw / +0.30 gz over
+  // the old ceiling): the growth is WorldMarketsBriefing.tsx + the
+  // REUSED MarketsChart/MarketLogo modules (byte-identical drawings, the
+  // D-48 reuse rule — never a rebuild) + the corpus-pinned briefing
+  // copy. Gzip-quiet: users download ~0.3 kB more, the owner's
+  // hard-worked UI returns. Justified in CHANGELOG §2026-11-12 (S31).
+  { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 40_000, gz: 9_000, label: 'World Markets page lazy chunk (page-division S7)' },
   // Page-division S8 (2026-11-08): the REGION routes — /usa,
   // /europe, /asia-pacific, /australia — each carrying its D-44
   // index/map section (the REUSED WorldMap in region-zoom mode) above

@@ -26,6 +26,16 @@ function epochDayToDate(day: number): Date {
   return new Date(day * 86_400_000);
 }
 
+/** The narrow copy contract the chart reads (the WorldMapCopy pattern,
+ * 2026-11-12): the legacy /insights detail panel passes the full insights
+ * corpus (structurally satisfied — zero change there), and the
+ * /world-markets briefing passes its corpus-pinned pd keys, so the SAME
+ * drawing never needs the corpus module in its chunk. */
+export interface MarketsChartCopy {
+  markets: Pick<InsightsCopy['markets'], 'chartAria' | 'high52wLabel' | 'low52wLabel' | 'lastCloseLabel'>;
+  ui: Pick<InsightsCopy['ui'], 'na'>;
+}
+
 export function MarketsChart({
   weekly,
   close,
@@ -39,7 +49,7 @@ export function MarketsChart({
   close: number;
   high52w: number;
   low52w: number;
-  copy: InsightsCopy;
+  copy: MarketsChartCopy;
   numberLocale: 'en-US' | 'fa-IR';
 }) {
   const geometry = useMemo(() => {

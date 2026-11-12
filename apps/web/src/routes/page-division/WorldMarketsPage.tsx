@@ -33,6 +33,10 @@ import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../l
 import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
 import { WorldMarketsHero } from './WorldMarketsHero';
 import type { WorldMarketsBoardState } from './WorldMarketsHero';
+import { WorldMarketsBriefing } from './WorldMarketsBriefing';
+import { PERIOD_OF_VIEW, VIEW_OF_PERIOD } from './WorldMarketsBriefing';
+import type { MarketsView } from '../../components/insights/world-markets/shared';
+import type { MapPeriod } from '../../components/insights/world-markets/world-map-config';
 import { WorldMarketsGrids } from './WorldMarketsGrids';
 import { WorldRiskCards } from './WorldRiskCards';
 import { worldMarketsStatus, worldRiskCards } from './world-markets-tiles';
@@ -138,6 +142,14 @@ export function WorldMarketsPage(): React.JSX.Element {
     document.getElementById(`wm-row-${id}`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, []);
 
+  /* ---------------- the ONE period lens (the 2026-11-12 briefing
+   * round: the legacy section's 2026-10-21 unification discipline — the
+   * page owns the MarketsView, the map's segmented switch drives it
+   * through the controlled period bridge, and the briefing (breadth +
+   * movers + tiles) follows the same lens) ---------------- */
+  const [view, setView] = useState<MarketsView>('today');
+  const onMapPeriodChange = useCallback((p: MapPeriod) => setView(VIEW_OF_PERIOD[p]), []);
+
   // The grids' honest-age clock (the client-side R6 reads it; one
   // viewer-clock sample per mount — the map's own discipline).
   const [todayIso] = useState(() => new Date().toISOString().slice(0, 10));
@@ -225,8 +237,18 @@ export function WorldMarketsPage(): React.JSX.Element {
       ) : null}
 
       {/* Spec §6 item 1 — the hero: the REUSED world map + the status
-          summary (the S7 gates' "map dots interactive" live here). */}
-      <WorldMarketsHero status={status} boardState={boardState} onOpenMarket={onOpenMarket} />
+          summary (the S7 gates' "map dots interactive" live here). The
+          map's period switch is CONTROLLED — it drives the briefing's
+          lens too (one period control for the whole page). */}
+      <WorldMarketsHero status={status} boardState={boardState} onOpenMarket={onOpenMarket} period={PERIOD_OF_VIEW[view]} onPeriodChange={onMapPeriodChange} />
+
+      {/* The briefing (the 2026-11-12 owner round): the legacy section's
+          editorial layer — the breadth headline, the two featured movers
+          and the regional tile explorer with its detail panels — restored
+          on the standalone page, following the same lens. */}
+      {boardState.kind === 'ready' ? (
+        <WorldMarketsBriefing snapshot={boardState.snapshot} view={view} todayIso={todayIso} />
+      ) : null}
 
       {/* Spec §6 item 2 — the region grids (16 indexes with the full
           metrics; the S7 gates' "16 indexes render with full metrics"). */}

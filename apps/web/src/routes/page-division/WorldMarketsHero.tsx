@@ -32,6 +32,7 @@ import { useI18n } from '../../lib/locale';
 import type { TranslationKey } from '../../lib/locale';
 import { WorldMap } from '../../components/insights/world-markets/WorldMap';
 import { formatRelativeShort } from '../../components/insights/world-markets/shared';
+import type { MapPeriod } from '../../components/insights/world-markets/world-map-config';
 import type { WorldMarketsStatusModel } from './world-markets-tiles';
 import { WM_VERDICT_WORD } from './world-markets-tiles';
 // S8: the copy adapter + the entry list moved to world-map-copy.ts (the
@@ -88,12 +89,22 @@ export function WorldMarketsHero({
   status,
   boardState,
   onOpenMarket,
+  period,
+  onPeriodChange,
 }: {
   /** The status summary — null while the board is not ready. */
   status: WorldMarketsStatusModel | null;
   boardState: WorldMarketsBoardState;
   /** Opens a market's row in the region grids (the map callout click). */
   onOpenMarket: (id: MarketId) => void;
+  /** The selected period lens, CONTROLLED (the 2026-11-12 briefing round:
+   * the page owns the lens so the map's segmented switch stays the ONE
+   * period control driving the hero, the briefing (breadth + movers +
+   * tiles) and the region grids' lens vocabulary together — the legacy
+   * section's own 2026-10-21 unification discipline). Absent → the map
+   * keeps its own session state (the standalone usage). */
+  period?: MapPeriod;
+  onPeriodChange?: (p: MapPeriod) => void;
 }): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const mapCopy = useWorldMapCopy(t);
@@ -160,9 +171,9 @@ export function WorldMarketsHero({
       )}
 
       {/* ---- The world map — the REUSED module (D-43), fed the pinned
-       * adapter words. Uncontrolled period (the map's own session state,
-       * the standalone usage); a callout click opens the region-grid
-       * row (the page's answer to the legacy detail panel). ---- */}
+       * adapter words. Controlled period since the briefing round (the
+       * page owns the lens — see the props); a callout click opens the
+       * region-grid row (the page's answer to the legacy detail panel). ---- */}
       <WorldMap
         snapshot={boardState.kind === 'ready' ? boardState.snapshot : undefined}
         fromCache={boardState.kind === 'ready' && boardState.fromCache === true}
@@ -171,6 +182,8 @@ export function WorldMarketsHero({
         locale={locale}
         numberLocale={numberLocale}
         onOpenMarket={onOpenMarket}
+        period={period}
+        onPeriodChange={onPeriodChange}
       />
     </section>
   );

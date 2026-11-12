@@ -1049,6 +1049,37 @@ export const en = {
       statusCheckPending: "Can't tell right now",
       statusUnavailable: "Can't tell right now",
       valueUnavailable: 'Cannot read yet',
+      /* ---- The briefing (2026-11-12 owner round: the legacy section's
+       * editorial layer — the breadth headline, the two movers and the
+       * regional tile explorer — restored on the standalone page). Every
+       * word is the corpus's own, pinned byte-for-byte by
+       * world-markets-copy-pin.test.ts (copy.markets + copy.ui.na); the
+       * fresh section glue (the aria) is queued unreviewed in the Persian
+       * copy manifest. ---- */
+      briefingAria: 'World stock indices — the briefing',
+      briefingHeading: 'World stock indices',
+      breadthPeriod: '{period} performance',
+      breadthUp: 'Indices up',
+      breadthDown: 'Indices down',
+      breadthFlat: 'Flat',
+      flatBandNote: 'A move within ±1% reads as flat.',
+      coverageNote: '{count} of {total} indices carry this period.',
+      moverGain: 'Biggest gain',
+      moverLoss: 'Biggest fall',
+      moverPeriodLabel: 'Selected period: {period}',
+      moversNone: 'No data for this period yet.',
+      thFromHigh: 'From 52-week high',
+      atHighTag: 'At its 52-week high',
+      tileTagBelow: '{x}% below 52-week high',
+      oldDataLine: 'Old data · {date}',
+      noReadingAria: 'no data for this period',
+      valueAria: '{name}, {country}: {value} over {period}',
+      asOfLine: 'as of {date}',
+      lastCloseLabel: 'Last close',
+      high52wLabel: '52-week high',
+      low52wLabel: '52-week low',
+      chartAria: 'Closing values over the last 52 weeks',
+      naWord: 'n/a',
     },
     usa: {
       title: 'USA',

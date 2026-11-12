@@ -2142,6 +2142,76 @@ the shipped tree (15,267) and with the fix (15,268).
 
 ---
 
+## Owner rounds (post-program)
+
+The 30-session program closed at S30 (above). What follows are the
+owner-requested rounds that arrive after the close — each one recorded
+here with its own delivery record, per the standing session protocol.
+
+### S31 (2026-11-12) — the World Markets briefing round: the legacy section's editorial layer restored on /world-markets · DEPLOYED
+
+**The owner's request (post-program):** the S7 refactor's standalone
+`/world-markets` page omitted the legacy section's "pulse of world
+markets" editorial layer — the breadth headline, the two featured
+movers and the regional tile explorer — components the owner "worked
+hard on their UI/UX". The ask: restore them, byte-faithful, and
+deploy.
+
+**What shipped (BD-S31, the full record in DECISIONS):**
+
+- **`WorldMarketsBriefing.tsx`** — the new section between the hero
+  and the region grids: the R9-06 breadth headline (up/down/flat
+  counts over the proportional bar, the stated ±1% flat band, the
+  honest coverage note — the legacy `data-markets-breadth-*`
+  attributes kept), the §3.4 movers pair (the 96/112 wordmarks, the
+  bright-ink signed hero numbers with the crisp triangles, the
+  separate 52-week-distance lines with their status chips, the period
+  captions), and the §3.5 tile explorer (three labelled groups
+  east→west — Asia-Pacific 7 · Europe 4 · Americas 5 — the quiet
+  expandable button-tiles with the warning-ring hierarchy
+  [correction /30 · bear /40 · plain otherwise], the every-tile
+  52-week tag, the delayed/old honesty tags, the §9 sr sentences)
+  expanding a board-true detail panel under its group (the identity
+  row + the REUSED MarketsChart 52-week drawing + the levels dl) —
+  one panel open at a time (§6.3).
+- **The ONE period lens:** the page owns the `MarketsView`; the hero's
+  map switch becomes CONTROLLED through the legacy
+  PERIOD_OF_VIEW/VIEW_OF_PERIOD bridge (the 2026-10-21 unification
+  round's own discipline — one switch drives the hero, the breadth,
+  the movers and the tiles).
+- **D-48:** every number through the SAME pure helpers the legacy
+  section reads (marketBreadth · topMovers · briefing.ts/shared.tsx —
+  never a second arithmetic); the REUSED MarketsChart + MarketLogo
+  modules (the chart's copy prop narrowed to the lean
+  MarketsChartCopy contract — the WorldMapCopy pattern).
+- **The copy:** 24 new `pd.worldMarkets.*` keys × 2 locales; 23/24
+  pinned byte-for-byte to the corpus by the new pinBriefingWords arm
+  (both locales); all 24 fa strings queued unreviewed in the Persian
+  copy manifest (the S7 precedent) — the audit clean.
+- **The budget:** the World Markets lazy chunk 30/8 → 40/9 kB
+  (measured 38.25/8.30 — gzip-quiet at +0.30 kB; justified in
+  CHANGELOG §2026-11-12).
+
+**The verification:** the full `pnpm gates` 9/9 ALL GREEN (the suite
+15,275 — +5 new arms: the briefing characterization, the
+detail-panel one-open discipline, the map-switch lens, and the
+two-locale copy pins); the browser pass over the built dist + the
+live feeds (EN + FA/RTL + 390px mobile, zero console errors): the
+breadth 7/0/9 over the ±1% band, the movers TAIEX +3.6% / Hang Seng
+−1.0% (Correction −13.1%), the tiles' ring hierarchy with the DAX
+at-its-high green pill, the expanded panel's 52-week chart + levels,
+the RTL mirroring and the mobile stacking — all verified visually.
+
+**The conscious scope cut:** the legacy detail panel's what/why/you
+editorial lines + the Layer1Block stay on /insights until the §19.6
+retirement gate (they live in the insights corpus whose import into
+the lean chunk the S7 architecture deliberately avoids — BD-S31).
+
+**Deployed:** the rebuilt SPA (the World Markets chunk) through the
+`currena-api` worker; the live verify in HANDOFF.md.
+
+---
+
 ## Progress board (update every session)
 
 | Phase | Sessions | Status |
@@ -2158,9 +2228,12 @@ the shipped tree (15,267) and with the fix (15,268).
 | J Integration | S19–S21 | ✅ S19 2026-11-12 (deployed `74777037`, the navigation/mobile/SEO polish — the breadcrumbs + the per-page meta/OG + the language-toggle polish + the sticky-footer verification + the two S1-noted hero items; the markets worker untouched — Phase J OPEN) · ✅ S20 2026-11-12 (NO deploy — the full-site regression + verdict backtest + data audit ALL GREEN: the 11 live pd-* backtests 715 checks · the N=20 source spot-check 20/20 · the 40-leg browser pass · the performance check · the placement reconciliation · the gates 15,099) · ✅ S21 2026-11-12 (deployed `5593fd43` — the spec-vs-implementation audit: the full §4–§14 diff vs the live site · four deviations FIXED [the NZX50 mirror card on /asia-pacific + the Global cached-header BD-S5a clause + the stale placement notes + the stale comments] · AF-6/AF-7 recorded · the placement reconciled · the gates 15,102 · the 11 backtests 715 green · the data audit re-run green after the PortWatch maintenance window — **PHASE J CLOSED**) |
 | K Investor + final | S22–S24 | ⏸ S22 2026-11-12 (the WAITING-slot close — the investor review not yet arranged; BD-S22: no D-49+, the AF-1…AF-7 findings parked for the v2 pass; the gates re-run green on the records-only tree) · ⏸ S23 DEFERRED (blocked on the investor — the Session 23 slot ran the pulled-forward S25 fill session) · ✅ S24 2026-11-12 (NO deploy — the D-9 audit ALL GREEN via pnpm s24:d9-audit [187 ids, one lane + one home each] + the doc-side drift reconciled doc-only + the retirement checklist landed spec-grade [06-LEGACY-RETIREMENT-S24.md]; execution gated on the owner's §19.6 sign-off) |
 | Reserve | S25–S30 | ✅ S25 DELIVERED in the Session 23 slot 2026-11-12 (BD-S22/BD-S23a/BD-S23-parallel — the §15 Asia CPI fill session: the IMF SDMX 3.0 CPI dataflow source, the three fills landed + deployed currena-api `2c61c187` + `33ff60c0` [the KV-seed patch fix] + the KV seed, /asia-pacific's 14 cards live, the registry 187, AF-8, the gates green) · ✅ the Session 25 SLOT 2026-11-12 (BD-S25 — the first reserve session: the ecb provider-timeout maintenance — the ECB HICP leg's six-day rung timeouts diagnosed [the ECB gateway's ~30.2 s 504 roulette on ANY request from Worker egress], the stable full-history request + the 45 s patient single attempt + the two pins, deployed `9861a927`, the rung-level proof rides the 20:10/04:10 rungs) · ✅ the Session 26 SLOT 2026-11-11 (BD-S26 — the second reserve session: the ecb FIRST-CHECK follow-through — the pre-fix status read + the post-fix belt-and-braces run dispatched [run 43036550865: DFR ❌ 504 · AAA ✅ · HICP ❌ 504, the designed honest shape; the held/fresh values verified EXACTLY against the publisher; the roulette now measured at all three venues incl. the sandbox]; the verdict PENDING, riding the 20:10 sweep + the 04:10 rung; NO deploy — the evidence + the records are the deliverable) · ✅ the Session 27 SLOT 2026-11-11 (BD-S27 — the third reserve session: the ecb first-check ROUND 3 + the buffer health pass: the gates 9/9 [suite 15,270, the S26 count exactly] + the D-9 audit 18/18 + the 11 live backtests ALL GREEN while the sweep approached, then the 20:16 UTC sweep read: the blob UNCHANGED — the designed no-update branch [the post-~19:00 KV write cap], the verdict PENDING riding tomorrow's 04:10–04:40 rungs, NO escalation trigger [no card past its maxAge]; plus the M2a strategy-log §8 back-fill; NO deploy — production verified unchanged 9861a927 + 8f63c8fa) · ✅ the Session 28 SLOT 2026-11-11 (BD-S28 — the fourth reserve session: the ecb first-check ROUND 4 + the buffer health pass: the early read found the blob still the S26 evidence run with the evidence window ~6 h out, so the session dispatched the sanctioned belt-and-braces rung [GHA run 91, 22:07:46Z]: the collect ran the NEW CODE CLEAN — ALL THREE ecb legs green in one rung for the first time [DFR · AAA · HICP, values exact, T-01…T-14 green, ZERO failed source rows] — while its writes were all refused by the daily cap [the direct 429-10048 + retry-ladder evidence, resolving S27's indistinguishability]; THE VERDICT: the BD-S25 maintenance item CLOSED, the observable green rows riding the 04:10–04:40 fresh-window rungs; the health pass ALL GREEN [gates 9/9, suite 15,270 · D-9 18/18 · the 11 backtests · the S20 audit 20/20]; NO deploy — production verified unchanged 9861a927 + 8f63c8fa) · ✅ the Session 29 SLOT 2026-11-12 (BD-S29 — the fifth reserve session: the first-check green-rows CONFIRMATION landed EARLY via the sanctioned fresh-post-midnight dispatch [GHA run 92, 00:01:44Z, success in 2m36s, all writes landed: failedSources EMPTY, all three ecb rows GREEN in the observable state for the first time, the values exactly the publisher-true trio] + the NEW EIA-trio finding [the provider's own release delay — the 11/11 release slipped to 11/12 per its own page — pushed the three weekly cards past the 12-day wire grace at the day boundary, T-04 red; Rule-5 verified, the values EXACT, healed on the wire via the designed rung2-run --eia landing lever → the honest stale-marking, the pd-s17 freshness arm back to its designed pass; the trio self-heals at the Saturday 11-14 gate] + the buffer health pass ALL GREEN [gates 9/9, suite 15,270 · D-9 exit 0 · the 11 backtests 705 checks/0 red · the S20 audit 20/20, both EIA sample members EXACT]; NO deploy — production verified unchanged 9861a927 + 8f63c8fa) · ✅ the Session 30 SLOT 2026-11-12 (BD-S30 — the FINAL slot: the program close-out. NO §19 answers, NO §19.6 sign-off in the kickoff → the last buffer branch: the buffer health pass ALL GREEN four legs [the gates 9/9 in 2m37s, the suite 15,270 · the D-9 audit exit 0 · the 11 backtests ALL ELEVEN ALL CHECKS GREEN, 705/0 red — the narrator stateHash IDENTICAL, the S29 one-state-behind note healed by the 00:50 rung; the EIA trio beyond-grace + honestly stale, the S29 re-score holding · the S20 audit 20/20, both EIA members EXACT] + the close-out records [the counter reaches 30/30 · 0 remaining — the program complete; the project finishes, the remaining levers stay with the owner]; the two optional observation reads [the 04:10 T-04 re-validation; the Saturday 11-14 EIA landing] fell outside the session window — recorded as expected outcomes, no decisions pending; NO deploy — production verified unchanged 9861a927 + 8f63c8fa; the retirement execution NEVER ran — Gate 0 holds) |
+| Owner rounds (post-program) | S31+ | ✅ S31 2026-11-12 (the World Markets briefing round — BD-S31: the legacy section's editorial layer [the breadth headline + the two movers + the regional tile explorer with its detail panels] restored on /world-markets, corpus-pinned, the map's switch promoted to the page's ONE controlled lens; the gates 9/9 [suite 15,275, +5 arms]; the EN/FA/mobile browser pass green; the WM chunk budget 30/8 → 40/9; DEPLOYED through currena-api) |
 
-**Current position: Session 30/30 delivered — THE PROGRAM COMPLETE
-2026-11-12 · 0 remaining (BD-S30).** The owner's kickoff supplied no
+**Current position: the program complete (30/30, BD-S30) + the first
+post-program owner round delivered — S31 (2026-11-12, BD-S31): the
+World Markets briefing restored on /world-markets and deployed.** The
+S30 close-out record follows, unchanged: The owner's kickoff supplied no
 investor §19 answers and no §19.6 sign-off, so the FINAL slot ran the
 last buffer branch per its own standing rule: the buffer health pass
 + the program close-out records. One slot, one session: opened ~01:45

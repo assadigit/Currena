@@ -980,6 +980,35 @@ export const fa: Dictionary = {
       statusCheckPending: 'فعلاً نمی‌توان گفت',
       statusUnavailable: 'فعلاً نمی‌توان گفت',
       valueUnavailable: 'هنوز نمی‌توان نتیجه‌گیری کرد',
+      /* ---- گزارش briefing (جلسهٔ مالک ۲۰۲۶-۱۱-۱۲: بازگرداندن لایهٔ
+       * تحلیلی بخش قدیم — شمارندهٔ گستره، دو کارت بیشترین رشد/افت و
+       * کاشی‌های منطقه‌ای — روی صفحهٔ مستقل). همهٔ واژه‌ها عیناً از
+       * پیکرهٔ فارسی سنجاق شده‌اند (world-markets-copy-pin.test.ts)؛
+       * فقط چسب تازهٔ بخش (aria) در صف بازبینی پیکرهٔ فارسی است. ---- */
+      briefingAria: 'شاخص‌های بورسی جهان — گزارش',
+      briefingHeading: 'شاخص‌های بورسی جهان',
+      breadthPeriod: 'عملکرد {period}',
+      breadthUp: 'شاخص‌های مثبت',
+      breadthDown: 'شاخص‌های منفی',
+      breadthFlat: 'بدون تغییر',
+      flatBandNote: 'تغییر در محدودهٔ ۱ درصد، «ثابت» خوانده می‌شود.',
+      coverageNote: '{count} شاخص از {total} شاخص دادهٔ این بازه را دارند.',
+      moverGain: 'بیشترین رشد',
+      moverLoss: 'بیشترین افت',
+      moverPeriodLabel: 'بازهٔ انتخاب‌شده: {period}',
+      moversNone: 'داده‌های این بازه هنوز در دسترس نیست.',
+      thFromHigh: 'فاصله از اوج یک‌ساله',
+      atHighTag: 'در سقف یک‌ساله',
+      tileTagBelow: '{x}٪ پایین‌تر از سقف یک‌ساله',
+      oldDataLine: 'داده‌های قدیمی، مربوط به {date}',
+      noReadingAria: 'این بازه داده ندارد',
+      valueAria: '{name}، {country}: {value} در بازهٔ {period}',
+      asOfLine: 'تاریخ داده‌ها: {date}',
+      lastCloseLabel: 'آخرین قیمت پایانی',
+      high52wLabel: 'بالاترین مقدار در یک سال گذشته',
+      low52wLabel: 'پایین‌ترین مقدار در یک سال گذشته',
+      chartAria: 'قیمت‌های پایانی بازار در ۵۲ هفتهٔ گذشته',
+      naWord: 'داده‌ای در دسترس نیست',
     },
     usa: {
       title: 'آمریکا',
