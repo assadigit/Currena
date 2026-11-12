@@ -292,11 +292,12 @@ export function changeFill(pct: number | null, view: MarketsView): string {
 const rgb = (c: readonly [number, number, number]): string => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
 
 /** The label set's font sizes for a tile: the base scales with the tile's
- * geometric mean side (TE's 10–35px ladder), the name shrinks to fit
- * narrow tiles. Returns null when the tile is too small for labels (the
- * tooltip still carries everything). `country` is the optional third line
- * — the index's country — shrink-to-fit to the tile width, only present
- * when the tile is tall enough for a third line. */
+ * geometric mean side, the name shrinks to fit narrow tiles. Returns null
+ * when the tile is too small for labels (the tooltip still carries
+ * everything). `country` is the optional third line — the index's country
+ * — shrink-to-fit to the tile width, only present when the 3-line stack
+ * actually fits the tile height (adaptive: bigger fonts drop the country
+ * line on shorter tiles rather than overflowing). */
 export function tileLabelSizes(
   w: number,
   h: number,
@@ -304,17 +305,23 @@ export function tileLabelSizes(
   country: string,
 ): { name: number; pct: number; country: number | null } | null {
   if (w < LABEL_MIN_W || h < LABEL_MIN_H) return null;
-  const base = Math.min(Math.max(Math.sqrt(w * h) / 210, 1), 3.5) * 10;
+  // The base ladder: bigger than TE's (the owner round "write the index
+  // names BIGGER, with bigger percentages") — /150 growth (was /210) and a
+  // 4.5 cap (was 3.5), so the largest tiles reach ~45px and mid tiles
+  // grow ~40%. The pct rides 90% of the base (was 85%) for bigger numbers.
+  const base = Math.min(Math.max(Math.sqrt(w * h) / 150, 1), 4.5) * 10;
   const nameSize = Math.min(base, (w - NAME_PAD) / (name.length * NAME_WIDTH_FACTOR));
   if (nameSize < 7) return null; // no honest label fits — tooltip only
-  const pct = base >= 14 ? base * 0.85 : base;
+  const pct = base >= 14 ? base * 0.9 : base;
   // The country line: a smaller secondary label, shrink-to-fit the tile
-  // width, shown only on tiles tall enough for a third line (h >= 50) and
-  // where the country fits at a readable size (>= 7px).
+  // width, shown only on tiles tall enough for a third line (h >= 50) AND
+  // where the full 3-line stack (name + country + pct + 2 gaps) fits the
+  // tile height — so bigger fonts never overflow a shorter tile.
   const countryBase = Math.round(nameSize * 0.72);
   const countryFit = (w - NAME_PAD) / (country.length * NAME_WIDTH_FACTOR);
   const countrySize = Math.min(countryBase, countryFit);
-  const countryLine = countrySize >= 7 && h >= 50 ? countrySize : null;
+  const threeLineBlock = nameSize + countrySize + pct + 2 * 3;
+  const countryLine = countrySize >= 7 && h >= 50 && threeLineBlock <= h ? countrySize : null;
   return { name: nameSize, pct, country: countryLine };
 }
 
@@ -559,12 +566,22 @@ function TreemapTile({
   const cc = FLAG_CODE[entry.id];
   const sizes = tileLabelSizes(tile.w, tile.h, drawnName, drawnCountry);
   // The flag badge: shown above the name on tiles large enough for the full
-  // stack (name + country + pct). Sized proportional to the name text, the
-  // standard 4:3 flag aspect. The flag image's (x,y) is its top-left corner
-  // (unlike <text> whose y is the baseline) — handled below.
-  const flagW = cc && sizes !== null ? Math.min(Math.max(sizes.name * 1.4, 12), 30) : 0;
+  // 4-line stack (flag + name + country + pct). Sized proportional to the
+  // name text (capped 36px so the biggest tiles don't overshoot), the
+  // standard 4:3 flag aspect. Adaptive: only shown when the whole stack
+  // fits the tile height, so bigger fonts never overflow a shorter tile.
+  const flagW = cc && sizes !== null ? Math.min(Math.max(sizes.name * 1.5, 14), 36) : 0;
   const flagH = Math.round(flagW * 0.75);
-  const showFlag = cc !== undefined && sizes !== null && sizes.country !== null && tile.h >= 76 && tile.w >= 60;
+  const flagBlock =
+    sizes !== null && sizes.country !== null
+      ? flagH + 3 + sizes.name + sizes.country + sizes.pct + 3 * 3
+      : Number.POSITIVE_INFINITY;
+  const showFlag =
+    cc !== undefined &&
+    sizes !== null &&
+    sizes.country !== null &&
+    tile.w >= 60 &&
+    flagBlock <= tile.h;
   // The label baselines: a centered stack of [flag], name, country, pct.
   // Explicit y (not dy) so the lines keep even spacing whatever their
   // per-line font sizes. When the flag shows, it sits at the top of the

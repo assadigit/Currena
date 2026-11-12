@@ -240,13 +240,13 @@ describe('tileLabelSizes — hide, shrink, scale', () => {
   it('a name that cannot honestly fit at 7px+ hides entirely', () => {
     expect(tileLabelSizes(44, 60, 'NASDAQ 100', 'USA')).toBeNull();
   });
-  it('the pct size follows the base at 85% once the base reaches 14px', () => {
+  it('the pct size follows the base at 90% once the base reaches 14px', () => {
     const big = tileLabelSizes(400, 300, 'DAX', 'Germany');
     const small = tileLabelSizes(60, 60, 'DAX', 'Germany');
-    // A wide tile: the name keeps the full base, the pct steps down to 85%.
+    // A wide tile: the name keeps the full base, the pct steps down to 90%.
     expect(big).not.toBeNull();
     expect(small).not.toBeNull();
-    if (big) expect(big.pct).toBeCloseTo(big.name * 0.85, 1);
+    if (big) expect(big.pct).toBeCloseTo(big.name * 0.9, 1);
     if (small && small.name < 14) expect(small.pct).toBeCloseTo(small.name, 5);
   });
   it('shows the country line on tall tiles, hides it on short ones', () => {
