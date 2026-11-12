@@ -15,7 +15,7 @@
 
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { TrendingUp, TrendingDown, Activity, Globe2 } from 'lucide-react';
 import type { EnrichedIndex, MarketsSnapshot, PeriodDef } from './types';
 import {
@@ -30,60 +30,36 @@ import {
 } from '@/lib/markets';
 import { fmtPct, fmtLevel, fmtCap } from '@/lib/format';
 import { MarketsTreemap } from './markets-treemap';
-import { MarketTile, IndexDetailPanel } from './market-tile';
+import { MarketTile } from './market-tile';
 import { IndexDetailModal } from './index-detail-modal';
 
 export function WorldMarkets({ snapshot, loading }: { snapshot: MarketsSnapshot | null; loading: boolean }): React.JSX.Element {
   const [period, setPeriod] = useState<PeriodDef>('today');
-  // The grid tiles' inline expandable panel (one open at a time).
-  const [expanded, setExpanded] = useState<string | null>(null);
-  // The treemap tiles' detail modal. `modalSymbol` controls the open flag +
-  // the amber selection ring; `modalEntry` holds the entry to render and
-  // PERSISTS across the close transition so Radix can play its exit animation
-  // and restore focus to the treemap tile (cleared lazily when a new tile
-  // opens or the period changes).
+  // The detail modal — the ONE detail surface. Clicking a treemap tile, a
+  // region-grid tile OR a mover card opens this modal (one open at a time).
+  // `modalSymbol` controls the open flag + the amber selection ring on every
+  // surface; `modalEntry` holds the entry to render and PERSISTS across the
+  // close transition so Radix can play its exit animation and restore focus
+  // to the trigger (cleared when a new tile opens or the period changes).
   const [modalSymbol, setModalSymbol] = useState<string | null>(null);
   const [modalEntry, setModalEntry] = useState<EnrichedIndex | null>(null);
-  const detailRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
 
   const items = useMemo(() => snapshot?.markets ?? [], [snapshot]);
   const breadth = useMemo(() => marketBreadth(items, period), [items, period]);
   const movers = useMemo(() => topMovers(items, period), [items, period]);
 
-  // Changing the period resets both the inline panel and the modal: the
-  // highlighted lens moves, so a stale open detail would mislead. Done in the
-  // handler (not an effect) — the idiomatic React state-adjust pattern.
+  // Changing the period closes the modal: the highlighted lens moves, so a
+  // stale open detail would mislead. Done in the handler (not an effect) —
+  // the idiomatic React state-adjust pattern.
   const handlePeriodChange = useCallback((next: PeriodDef) => {
     setPeriod(next);
-    setExpanded(null);
     setModalSymbol(null);
     setModalEntry(null);
   }, []);
 
-  // The grid tiles' toggle: clicking a grid tile opens/closes its inline
-  // IndexDetailPanel below the region grid; re-clicking closes it.
+  // The single select handler: every tile (treemap, grid, mover) opens the
+  // SAME detail modal, with the amber selection ring on the opened tile.
   const handleSelect = useCallback(
-    (symbol: string) => {
-      setExpanded((cur) => {
-        const next = cur === symbol ? null : symbol;
-        if (next !== null) {
-          // Defer the scroll so the panel mounts before we look it up.
-          setTimeout(() => {
-            const el = detailRefs.current.get(next);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          }, 150);
-        }
-        return next;
-      });
-    },
-    [],
-  );
-
-  // The treemap tiles' handler: clicking a treemap tile opens the detail
-  // MODAL (the index's full profile), with the amber selection ring on the
-  // opened tile. Separate from the grid's inline panel so each surface keeps
-  // its own interaction model.
-  const handleTreemapSelect = useCallback(
     (symbol: string) => {
       const entry = items.find((m) => m.symbol === symbol);
       if (!entry) return;
@@ -127,8 +103,8 @@ export function WorldMarkets({ snapshot, loading }: { snapshot: MarketsSnapshot 
           {/* 2. Summary grid: breadth + biggest movers (movers open the modal) */}
           <section aria-label="Market summary" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <BreadthCard breadth={breadth} period={period} belowHigh={belowHighCount(items)} asOfDisplay={asOfDisplay} />
-            <MoverCard kind="gainer" entry={movers.gainer} period={period} onSelect={handleTreemapSelect} />
-            <MoverCard kind="decliner" entry={movers.decliner} period={period} onSelect={handleTreemapSelect} />
+            <MoverCard kind="gainer" entry={movers.gainer} period={period} onSelect={handleSelect} />
+            <MoverCard kind="decliner" entry={movers.decliner} period={period} onSelect={handleSelect} />
           </section>
 
           {/* 3. The treemap — clicking a tile opens the detail modal */}
@@ -137,7 +113,7 @@ export function WorldMarkets({ snapshot, loading }: { snapshot: MarketsSnapshot 
             period={period}
             asOfDisplay={asOfDisplay}
             selected={modalSymbol}
-            onSelect={handleTreemapSelect}
+            onSelect={handleSelect}
           />
 
           {/* 4. Region tile grids (Americas · Asia-Pacific · Europe) */}
@@ -152,10 +128,8 @@ export function WorldMarkets({ snapshot, loading }: { snapshot: MarketsSnapshot 
                   shortLabel={region.shortLabel}
                   items={regionItems}
                   period={period}
-                  expanded={expanded}
+                  selected={modalSymbol}
                   onSelect={handleSelect}
-                  detailRefs={detailRefs}
-                  asOfDisplay={asOfDisplay}
                 />
               );
             })}
@@ -163,7 +137,7 @@ export function WorldMarkets({ snapshot, loading }: { snapshot: MarketsSnapshot 
         </>
       )}
 
-      {/* The treemap-tile detail modal (Esc / backdrop / close-button to dismiss). */}
+      {/* The detail modal — opened by any tile (Esc / backdrop / close-button to dismiss). */}
       <IndexDetailModal
         entry={modalEntry}
         period={period}
@@ -346,23 +320,18 @@ function RegionGrid({
   shortLabel,
   items,
   period,
-  expanded,
+  selected,
   onSelect,
-  detailRefs,
-  asOfDisplay,
 }: {
   label: string;
   shortLabel: string;
   items: readonly EnrichedIndex[];
   period: PeriodDef;
-  expanded: string | null;
+  selected: string | null;
   onSelect: (symbol: string) => void;
-  detailRefs: React.MutableRefObject<Map<string, HTMLDivElement | null>>;
-  asOfDisplay: string;
 }): React.JSX.Element {
   const count = items.length;
   const up = items.filter((m) => bandedArrow(periodValueOf(m, period)) === 'up').length;
-  const openEntry = expanded ? items.find((m) => m.symbol === expanded) : null;
 
   return (
     <section aria-label={`${label} indices`} data-region-grid={shortLabel.toLowerCase()}>
@@ -381,22 +350,11 @@ function RegionGrid({
             key={entry.symbol}
             entry={entry}
             period={period}
-            selected={expanded === entry.symbol}
+            selected={selected === entry.symbol}
             onSelect={onSelect}
           />
         ))}
       </div>
-
-      {openEntry ? (
-        <div
-          ref={(el) => {
-            detailRefs.current.set(openEntry.symbol, el);
-          }}
-          className="mt-3"
-        >
-          <IndexDetailPanel entry={openEntry} period={period} asOfDisplay={asOfDisplay} />
-        </div>
-      ) : null}
     </section>
   );
 }

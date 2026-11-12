@@ -73,8 +73,8 @@ export function MarketTile({
     <button
       type="button"
       onClick={() => onSelect(entry.symbol)}
+      aria-haspopup="dialog"
       aria-expanded={selected}
-      aria-controls={`insights-market-detail-${entry.symbol}`}
       aria-label={`${entry.name}, ${entry.country}: ${pct === null ? 'no reading' : fmtPct(pct)} over ${periodWord}, ${kind === 'nearHigh' ? 'near its high' : kind}, select for detail`}
       data-market-tile={entry.symbol}
       className={[
