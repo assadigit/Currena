@@ -28,6 +28,31 @@
 > recorded as expected outcomes only, no decisions pending on either.
 > The plan: the four-leg health pass, then the close-out records, then
 > the final report (Session 30/30 · 0 remaining).
+>
+> **M1 — the buffer health pass, ALL GREEN (four legs, 01:50–01:52 UTC):**
+> (1) the full `pnpm gates` 9/9 in 2m37s — the suite **15,270** = the
+> S26/S27/S28/S29 close count exactly (records-only tree; secret scan 8
+> patterns/1027 files · typecheck 6/6 · lint 0/0 · copy:audit clean ·
+> narrator in sync 193×2+56×2 + eval 50 · layer1 11,969/11,969 · build +
+> budgets held, entry 272.88/82.55); (2) the D-9 standing audit exit 0 —
+> the condition MET (belt-and-braces; nothing this session touched
+> indicators/definitions/placement/§A — the standing rule re-run anyway);
+> (3) the live pd-* backtests ALL ELEVEN ALL CHECKS GREEN against
+> production — 705 checks/0 red, the S29 count exactly: pd-s4 Global
+> 84/84 incl. the raw-KV stateHash arm (the narrator artefact 00:50:18Z
+> post-dates the patched 00:12:25Z snapshot — stateHash identical, the
+> S29 one-state-behind note healed by the :50 rung) · pd-s5 Gold 150/150
+> · pd-s7 World Markets 57/57 (the fresh 23:30 board, 9 present readings)
+> · pd-s8 zooms 9/9 · pd-s9 USA 115/115 · pd-s10 USA 163/163 incl. the
+> TIC sub-gate 48/48 · pd-s12 Europe 8/8 · pd-s14 Asia 14/14 · pd-s16
+> Australia 28/28 (7 beyond-grace, all honestly stale) · pd-s17
+> Commodities 24/24 (the EIA trio beyond-grace + honestly stale — the
+> S29 re-score holds) · pd-s18 Currencies 53/53 (14 cards + rules 16 +
+> board 23); (4) the S20 data audit 20/20 GREEN (seed 20261112, the
+> frozen sample — both EIA members EXACT against the live LeafHandler
+> page: us-crude-production 14,003 · us-spr 282,184; platinum on the
+> live-price arm's designed difference). Zero KV writes this session —
+> all four legs are read-only/local.
 
 > **SESSION 29/30 (2026-11-11 → 2026-11-12) — the fifth reserve session
 > (the buffer slot): the first-check green-rows CONFIRMATION (the
