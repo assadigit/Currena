@@ -101,6 +101,17 @@ const SHORT_NAME: Partial<Record<MarketId, string>> = {
   tsx: 'S&P/TSX',
 };
 
+/** Short country forms for the treemap's third label line (the full
+ *  localized country rides the tooltip, the aria and the detail modal).
+ *  Only the long names need shortening; short countries pass through. */
+const SHORT_COUNTRY: Partial<Record<MarketId, string>> = {
+  sp500: 'USA',
+  ndx: 'USA',
+  dow: 'USA',
+  ftse: 'UK',
+  kospi: 'S. Korea',
+};
+
 /** Where the colour saturates, per lens (|change| in percent). The
  * daily moves of a single session live in a much narrower band than a
  * year's — a fixed ±3 clamp would read every yearly tile as a saturated
@@ -115,12 +126,13 @@ export const CLAMP_PCT: Record<MarketsView, number> = {
   '5y': 20,
 };
 
-/** The diverging ramp's anchors, in Currena's own return inks (the
- * page's --color-return-down/up hues, deep enough for white label ink):
- * down #c0392b · neutral warm gray · up #2e9e5b. */
-const NEUTRAL_RGB: readonly [number, number, number] = [72, 68, 62];
-const UP_RGB: readonly [number, number, number] = [46, 158, 91];
-const DOWN_RGB: readonly [number, number, number] = [192, 57, 43];
+/** The diverging ramp's anchors — conventional financial green/red (the
+ * universal "up = green, down = red" convention), deep enough for white
+ * label ink with the black text shadow. Down #dc2626 · neutral gray ·
+ * up #16a34a. The legend gradient uses the same hues. */
+const NEUTRAL_RGB: readonly [number, number, number] = [75, 75, 75];
+const UP_RGB: readonly [number, number, number] = [22, 163, 74];
+const DOWN_RGB: readonly [number, number, number] = [220, 38, 38];
 
 /** The dark canvas's own tones (the treemap is a DARK drawing inside the
  * light card treatment — the TE contrast, in the page's warm-dark ink
@@ -256,16 +268,31 @@ export function changeFill(pct: number | null, view: MarketsView): string {
 
 const rgb = (c: readonly [number, number, number]): string => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
 
-/** The label pair's font sizes for a tile: the base scales with the
- * tile's geometric mean side (TE's 10–35px ladder), the name shrinks to
- * fit narrow tiles. Returns null when the tile is too small for labels
- * (the tooltip still carries everything). */
-export function tileLabelSizes(w: number, h: number, name: string): { name: number; pct: number } | null {
+/** The label set's font sizes for a tile: the base scales with the tile's
+ * geometric mean side (TE's 10–35px ladder), the name shrinks to fit
+ * narrow tiles. Returns null when the tile is too small for labels (the
+ * tooltip still carries everything). `country` is the optional third line
+ * — the index's country — shrink-to-fit to the tile width, only present
+ * when the tile is tall enough for a third line. */
+export function tileLabelSizes(
+  w: number,
+  h: number,
+  name: string,
+  country: string,
+): { name: number; pct: number; country: number | null } | null {
   if (w < LABEL_MIN_W || h < LABEL_MIN_H) return null;
   const base = Math.min(Math.max(Math.sqrt(w * h) / 210, 1), 3.5) * 10;
   const nameSize = Math.min(base, (w - NAME_PAD) / (name.length * NAME_WIDTH_FACTOR));
   if (nameSize < 7) return null; // no honest label fits — tooltip only
-  return { name: nameSize, pct: base >= 14 ? base * 0.85 : base };
+  const pct = base >= 14 ? base * 0.85 : base;
+  // The country line: a smaller secondary label, shrink-to-fit the tile
+  // width, shown only on tiles tall enough for a third line (h >= 50) and
+  // where the country fits at a readable size (>= 7px).
+  const countryBase = Math.round(nameSize * 0.72);
+  const countryFit = (w - NAME_PAD) / (country.length * NAME_WIDTH_FACTOR);
+  const countrySize = Math.min(countryBase, countryFit);
+  const countryLine = countrySize >= 7 && h >= 50 ? countrySize : null;
+  return { name: nameSize, pct, country: countryLine };
 }
 
 /* ------------------------------------------------------------------ *
@@ -405,7 +432,7 @@ export function MarketsTreemap({
           </bdi>
           <span
             className="h-2.5 w-28 rounded-full ring-1 ring-[var(--color-border)] sm:w-40"
-            style={{ background: 'linear-gradient(to right, #c0392b, rgb(72,68,62), #2e9e5b)' }}
+            style={{ background: 'linear-gradient(to right, #dc2626, rgb(75,75,75), #16a34a)' }}
           />
           <bdi className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
             +{clampX}%
@@ -505,7 +532,31 @@ function TreemapTile({
   const country = t(`pd.worldMarkets.entries.${entry.id}.country`);
   const capT = MARKET_CAP_T[entry.id] ?? CAP_FALLBACK_T;
   const drawnName = SHORT_NAME[entry.id] ?? entry.id.toUpperCase();
-  const sizes = tileLabelSizes(tile.w, tile.h, drawnName);
+  const drawnCountry = SHORT_COUNTRY[entry.id] ?? country;
+  const sizes = tileLabelSizes(tile.w, tile.h, drawnName, drawnCountry);
+  // The label baselines: a centered stack of the name, the optional country
+  // line, and the signed pct. Explicit y (not dy) so the three lines keep
+  // even spacing whatever their per-line font sizes.
+  const centerY = tile.y + tile.h / 2;
+  const cx = tile.x + tile.w / 2;
+  const gap = 3;
+  let nameY = centerY;
+  let countryY: number | null = null;
+  let pctY = centerY;
+  if (sizes !== null) {
+    if (sizes.country !== null) {
+      const blockH = sizes.name + sizes.country + sizes.pct + 2 * gap;
+      const top = centerY - blockH / 2;
+      nameY = top + sizes.name;
+      countryY = nameY + gap + sizes.country;
+      pctY = countryY + gap + sizes.pct;
+    } else {
+      const blockH = sizes.name + sizes.pct + gap;
+      const top = centerY - blockH / 2;
+      nameY = top + sizes.name;
+      pctY = nameY + gap + sizes.pct;
+    }
+  }
   const periodWord = t(PERIOD_WORD_KEY[view]);
   const srValue = pct === null ? t('pd.worldMarkets.noReadingAria') : signedPct(pct, numberLocale, locale);
 
@@ -560,9 +611,8 @@ function TreemapTile({
       {sizes !== null ? (
         <g pointerEvents="none">
           <text
-            x={tile.x + tile.w / 2}
-            y={tile.y + tile.h / 2}
-            dy="-0.4em"
+            x={cx}
+            y={nameY}
             textAnchor="middle"
             fontSize={sizes.name}
             fontWeight={700}
@@ -571,10 +621,22 @@ function TreemapTile({
           >
             {drawnName}
           </text>
+          {countryY !== null && sizes.country !== null ? (
+            <text
+              x={cx}
+              y={countryY}
+              textAnchor="middle"
+              fontSize={sizes.country}
+              fontWeight={600}
+              fill="rgba(255,255,255,.82)"
+              style={{ textShadow: 'rgba(0,0,0,.85) 1px 1px 1px' }}
+            >
+              {drawnCountry}
+            </text>
+          ) : null}
           <text
-            x={tile.x + tile.w / 2}
-            y={tile.y + tile.h / 2}
-            dy="0.6em"
+            x={cx}
+            y={pctY}
             textAnchor="middle"
             fontSize={sizes.pct}
             fontWeight={700}

@@ -192,9 +192,9 @@ describe('buildModel — the region bands and the leaf tiles', () => {
  * ------------------------------------------------------------------ */
 
 describe('changeFill — the per-period clamped ramp', () => {
-  it('zero and missing keep the neutral warm gray (never a fabricated 0)', () => {
-    expect(changeFill(0, 'today')).toBe('rgb(72, 68, 62)');
-    expect(changeFill(null, 'today')).toBe('rgb(72, 68, 62)');
+  it('zero and missing keep the neutral gray (never a fabricated 0)', () => {
+    expect(changeFill(0, 'today')).toBe('rgb(75, 75, 75)');
+    expect(changeFill(null, 'today')).toBe('rgb(75, 75, 75)');
   });
   it('the saturation bounds move with the lens (±3 today · ±15 on the year)', () => {
     expect(CLAMP_PCT.today).toBe(3);
@@ -205,14 +205,14 @@ describe('changeFill — the per-period clamped ramp', () => {
     expect(CLAMP_PCT['5y']).toBe(20);
   });
   it('the clamp saturates exactly at the bound', () => {
-    expect(changeFill(-3, 'today')).toBe('rgb(192, 57, 43)');
-    expect(changeFill(-6, 'today')).toBe('rgb(192, 57, 43)'); // clamped beyond
-    expect(changeFill(3, 'today')).toBe('rgb(46, 158, 91)');
-    expect(changeFill(15, '1y')).toBe('rgb(46, 158, 91)');
+    expect(changeFill(-3, 'today')).toBe('rgb(220, 38, 38)');
+    expect(changeFill(-6, 'today')).toBe('rgb(220, 38, 38)'); // clamped beyond
+    expect(changeFill(3, 'today')).toBe('rgb(22, 163, 74)');
+    expect(changeFill(15, '1y')).toBe('rgb(22, 163, 74)');
   });
   it('half the bound is the exact midpoint of the ramp', () => {
-    expect(changeFill(-1.5, 'today')).toBe('rgb(132, 63, 53)');
-    expect(changeFill(1.5, 'today')).toBe('rgb(59, 113, 77)');
+    expect(changeFill(-1.5, 'today')).toBe('rgb(148, 57, 57)');
+    expect(changeFill(1.5, 'today')).toBe('rgb(49, 119, 75)');
   });
   it('a yearly reading inside the daily clamp stays quieter (the wider lens)', () => {
     // +3% on the daily lens saturates; on the year lens it is t = 0.2.
@@ -226,28 +226,34 @@ describe('changeFill — the per-period clamped ramp', () => {
 
 describe('tileLabelSizes — hide, shrink, scale', () => {
   it('hides labels below 44×40 (the tooltip keeps the content)', () => {
-    expect(tileLabelSizes(43, 40, 'DAX')).toBeNull();
-    expect(tileLabelSizes(44, 39, 'DAX')).toBeNull();
-    expect(tileLabelSizes(44, 40, 'DAX')).not.toBeNull();
+    expect(tileLabelSizes(43, 40, 'DAX', 'Germany')).toBeNull();
+    expect(tileLabelSizes(44, 39, 'DAX', 'Germany')).toBeNull();
+    expect(tileLabelSizes(44, 40, 'DAX', 'Germany')).not.toBeNull();
   });
   it('shrinks the name to fit narrow tiles, never overflows', () => {
-    const wide = tileLabelSizes(300, 200, 'NASDAQ 100');
-    const narrow = tileLabelSizes(60, 200, 'NASDAQ 100');
+    const wide = tileLabelSizes(300, 200, 'NASDAQ 100', 'USA');
+    const narrow = tileLabelSizes(60, 200, 'NASDAQ 100', 'USA');
     expect(wide).not.toBeNull();
     expect(narrow).not.toBeNull();
     if (wide && narrow) expect(narrow.name).toBeLessThan(wide.name);
   });
   it('a name that cannot honestly fit at 7px+ hides entirely', () => {
-    expect(tileLabelSizes(44, 60, 'NASDAQ 100')).toBeNull();
+    expect(tileLabelSizes(44, 60, 'NASDAQ 100', 'USA')).toBeNull();
   });
   it('the pct size follows the base at 85% once the base reaches 14px', () => {
-    const big = tileLabelSizes(400, 300, 'DAX');
-    const small = tileLabelSizes(60, 60, 'DAX');
+    const big = tileLabelSizes(400, 300, 'DAX', 'Germany');
+    const small = tileLabelSizes(60, 60, 'DAX', 'Germany');
     // A wide tile: the name keeps the full base, the pct steps down to 85%.
     expect(big).not.toBeNull();
     expect(small).not.toBeNull();
     if (big) expect(big.pct).toBeCloseTo(big.name * 0.85, 1);
     if (small && small.name < 14) expect(small.pct).toBeCloseTo(small.name, 5);
+  });
+  it('shows the country line on tall tiles, hides it on short ones', () => {
+    const tall = tileLabelSizes(300, 200, 'S&P 500', 'USA');
+    const short = tileLabelSizes(60, 45, 'DAX', 'Germany');
+    if (tall) expect(tall.country).not.toBeNull();
+    if (short) expect(short.country).toBeNull();
   });
 });
 

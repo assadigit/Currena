@@ -54,6 +54,7 @@ import { MarketsChart } from '../../components/insights/MarketsChart';
 import type { MarketsChartCopy } from '../../components/insights/MarketsChart';
 import { MarketLogo } from '../../components/insights/world-markets/MarketLogo';
 import { MarketsTreemap } from '../../components/insights/world-markets/MarketsTreemap';
+import { Modal } from '../../components/Modal';
 import { formatAsOf } from '../../components/insights/HistoryChart';
 import { marketBreadth, topMovers, periodValueOf } from '../../components/insights/world-markets/briefing';
 import type { MarketBreadth } from '../../components/insights/world-markets/briefing';
@@ -537,7 +538,12 @@ export function WorldMarketsBriefing({
   todayIso: string;
 }): React.JSX.Element {
   const { t, numberLocale } = useI18n();
+  // The briefing explorer tiles' inline panel (one open at a time).
   const [openId, setOpenId] = useState<MarketId | null>(null);
+  // The treemap tiles' detail modal — separate from the inline panel so each
+  // surface keeps its own interaction model (the treemap opens a modal, the
+  // explorer tiles open the inline panel below their group).
+  const [modalId, setModalId] = useState<MarketId | null>(null);
   const periodWord = t(PERIOD_WORD_KEY[view]);
 
   const onToggleTile = useCallback((id: MarketId) => {
@@ -554,6 +560,17 @@ export function WorldMarketsBriefing({
       return next;
     });
   }, []);
+
+  // The treemap handler: clicking a treemap tile opens the detail MODAL (the
+  // index's full profile), with the amber selection ring on the opened tile.
+  // Closes any open inline panel first so the two surfaces never show the
+  // same entry twice (duplicate-id guard).
+  const onOpenTileModal = useCallback((id: MarketId) => {
+    setOpenId(null);
+    setModalId(id);
+  }, []);
+  const onCloseTileModal = useCallback(() => setModalId(null), []);
+  const modalEntry = modalId !== null ? snapshot.markets.find((m) => m.id === modalId) ?? null : null;
 
   const breadth = useMemo(() => marketBreadth(snapshot.markets, view), [snapshot, view]);
   const movers = useMemo(() => topMovers(snapshot.markets, view), [snapshot, view]);
@@ -602,13 +619,13 @@ export function WorldMarketsBriefing({
         {t('pd.worldMarkets.localCurrencyNote')}
       </p>
 
-      {/* The market heat map (the 2026-11-12 treemap round): the TE-style
-       * treemap between the movers and the regional explorer — tile size
-       * ≈ market cap, colour ≈ the selected period's return, the tiles
-       * opening the SAME detail panel the explorer's tiles open (the
-       * shared openId — one panel at a time, never two entry points
-       * diverging). */}
-      <MarketsTreemap snapshot={snapshot} view={view} openId={openId} onToggle={onToggleTile} />
+      {/* The market heat map: the TE-style treemap between the movers and the
+       * regional explorer — tile size ≈ market cap, colour ≈ the selected
+       * period's return (conventional green = up, red = down), each tile
+       * carrying its country. Clicking a tile opens the detail MODAL (the
+       * amber ring marks the opened tile; Esc / backdrop / close-button
+       * dismiss). */}
+      <MarketsTreemap snapshot={snapshot} view={view} openId={modalId} onToggle={onOpenTileModal} />
 
       {/* The regional tile explorer (§3.5): three labelled groups, the
        * world waking up east to west (§6.3) — DOM order = trading-day
@@ -647,6 +664,15 @@ export function WorldMarketsBriefing({
           );
         })}
       </div>
+
+      {/* The treemap-tile detail modal (Esc / backdrop / close-button to
+       * dismiss). Hosts the same BriefingDetail anatomy the inline panel
+       * uses, in a focus-trapped dialog. */}
+      {modalEntry !== null ? (
+        <Modal title={t(`pd.worldMarkets.entries.${modalEntry.id}.name`)} onClose={onCloseTileModal}>
+          <BriefingDetail entry={modalEntry} />
+        </Modal>
+      ) : null}
     </section>
   );
 }
