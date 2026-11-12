@@ -6,6 +6,29 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **SESSION 30/30 (2026-11-12) — the FINAL slot: the program close-out.**
+> The owner's kickoff supplied NO investor §19 answers and NO §19.6
+> sign-off, so per the kickoff's own rule the slot runs the final buffer
+> branch: the buffer health pass (the gates + the D-9 audit + the 11 live
+> backtests + the S20 data audit) + the program close-out records (the
+> counter reaches 30/30; the project finishes; the remaining levers stay
+> with the owner). The retirement execution stays untouched behind Gate 0.
+> The session opened ~01:45 UTC on 2026-11-12 — ~1.5 h after the S29 close
+> (00:18:40Z). The first check (the observable state at open): the live
+> status blob is the S29-patched state (generatedAt 00:12:25.662Z — the
+> rung2 --eia patch; failedSources EMPTY; T-01…T-14 with T-04 the only
+> red, exactly the S29-recorded honest carry — the rung-2 phase appends
+> rows, the 04:10 full collect re-validates; staleCount 12, the honest
+> stale-marked set); production verified unchanged currena-api `9861a927`
+> (the newest of 362, created 12:21:25Z) + currena-markets `8f63c8fa` (the
+> newest, created 2026-11-10T00:11Z); no insights-ingest run since run 92
+> (the GHA history confirms). The two OPTIONAL observation reads (the
+> 04:10 UTC rung's T-04 re-validation; the Saturday 11-14 rung-2 gate
+> landing the 11/12 EIA release) fall OUTSIDE this session's window —
+> recorded as expected outcomes only, no decisions pending on either.
+> The plan: the four-leg health pass, then the close-out records, then
+> the final report (Session 30/30 · 0 remaining).
+
 > **SESSION 29/30 (2026-11-11 → 2026-11-12) — the fifth reserve session
 > (the buffer slot): the first-check green-rows CONFIRMATION (the
 > BD-S28 residual) + the EIA-trio wire-honesty heal + the buffer health
