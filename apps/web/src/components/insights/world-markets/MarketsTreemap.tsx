@@ -112,6 +112,29 @@ const SHORT_COUNTRY: Partial<Record<MarketId, string>> = {
   kospi: 'S. Korea',
 };
 
+/** The ISO 3166-1 alpha-2 country code for each market's flag (served from
+ *  flagcdn.com as small PNGs — reliable, no sprite-injection timing). The
+ *  Euro Stoxx 50 uses `eu` (the EU flag, the honest "no single country"
+ *  answer for the Eurozone index). Matches the MAP_INDICES `cc` codes. */
+const FLAG_CODE: Partial<Record<MarketId, string>> = {
+  sp500: 'us',
+  ndx: 'us',
+  dow: 'us',
+  tsx: 'ca',
+  ibov: 'br',
+  ssec: 'cn',
+  n225: 'jp',
+  hsi: 'hk',
+  nifty50: 'in',
+  taiex: 'tw',
+  kospi: 'kr',
+  asx200: 'au',
+  stoxx50: 'eu',
+  ftse: 'gb',
+  cac: 'fr',
+  dax: 'de',
+};
+
 /** Where the colour saturates, per lens (|change| in percent). The
  * daily moves of a single session live in a much narrower band than a
  * year's — a fixed ±3 clamp would read every yearly tile as a saturated
@@ -533,27 +556,40 @@ function TreemapTile({
   const capT = MARKET_CAP_T[entry.id] ?? CAP_FALLBACK_T;
   const drawnName = SHORT_NAME[entry.id] ?? entry.id.toUpperCase();
   const drawnCountry = SHORT_COUNTRY[entry.id] ?? country;
+  const cc = FLAG_CODE[entry.id];
   const sizes = tileLabelSizes(tile.w, tile.h, drawnName, drawnCountry);
-  // The label baselines: a centered stack of the name, the optional country
-  // line, and the signed pct. Explicit y (not dy) so the three lines keep
-  // even spacing whatever their per-line font sizes.
+  // The flag badge: shown above the name on tiles large enough for the full
+  // stack (name + country + pct). Sized proportional to the name text, the
+  // standard 4:3 flag aspect. The flag image's (x,y) is its top-left corner
+  // (unlike <text> whose y is the baseline) — handled below.
+  const flagW = cc && sizes !== null ? Math.min(Math.max(sizes.name * 1.4, 12), 30) : 0;
+  const flagH = Math.round(flagW * 0.75);
+  const showFlag = cc !== undefined && sizes !== null && sizes.country !== null && tile.h >= 76 && tile.w >= 60;
+  // The label baselines: a centered stack of [flag], name, country, pct.
+  // Explicit y (not dy) so the lines keep even spacing whatever their
+  // per-line font sizes. When the flag shows, it sits at the top of the
+  // block and the text lines shift down by flagH + gap.
   const centerY = tile.y + tile.h / 2;
   const cx = tile.x + tile.w / 2;
   const gap = 3;
+  let flagY = centerY;
   let nameY = centerY;
   let countryY: number | null = null;
   let pctY = centerY;
   if (sizes !== null) {
+    const flagH2 = showFlag ? flagH + gap : 0;
     if (sizes.country !== null) {
-      const blockH = sizes.name + sizes.country + sizes.pct + 2 * gap;
+      const blockH = flagH2 + sizes.name + sizes.country + sizes.pct + 2 * gap;
       const top = centerY - blockH / 2;
-      nameY = top + sizes.name;
+      flagY = top;
+      nameY = top + flagH2 + sizes.name;
       countryY = nameY + gap + sizes.country;
       pctY = countryY + gap + sizes.pct;
     } else {
-      const blockH = sizes.name + sizes.pct + gap;
+      const blockH = flagH2 + sizes.name + sizes.pct + gap;
       const top = centerY - blockH / 2;
-      nameY = top + sizes.name;
+      flagY = top;
+      nameY = top + flagH2 + sizes.name;
       pctY = nameY + gap + sizes.pct;
     }
   }
@@ -610,6 +646,17 @@ function TreemapTile({
       ) : null}
       {sizes !== null ? (
         <g pointerEvents="none">
+          {showFlag && cc !== undefined ? (
+            <image
+              href={`https://flagcdn.com/w80/${cc}.png`}
+              x={cx - flagW / 2}
+              y={flagY}
+              width={flagW}
+              height={flagH}
+              preserveAspectRatio="xMidYMid meet"
+              opacity={0.96}
+            />
+          ) : null}
           <text
             x={cx}
             y={nameY}
