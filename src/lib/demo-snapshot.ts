@@ -1,27 +1,17 @@
 /**
- * GET /api/markets — the 16-world-indices snapshot (illustrative demo data).
- *
- * Returns a MarketsSnapshot: asOf + asOfDisplay + 16 EnrichedIndex rows,
- * one per world index, each carrying the five return lenses (today/week/
- * month/quarter/year), the level, the 52-week high/low, the from-high
- * distance and the market-cap weight.
- *
- * v1 scope (spec §13): live EODHD data is out of scope — the values below
- * are plausible late-cycle demo figures so the treemap, the breadth and the
- * movers all read authentically. The card's footer labels them as such.
+ * demo-snapshot — the 16-world-indices snapshot builder (illustrative demo
+ * data), extracted so BOTH the /api/markets route and the client page can
+ * read it. Pure: data in, data out — no server-only imports, so it runs
+ * client-side too (enabling a static export deploy).
  */
 
-import { NextResponse } from 'next/server';
 import { INDICES, MARKET_CAP_T, CAP_FALLBACK_T } from '@/lib/markets';
-import type { EnrichedIndex, MarketsSnapshot } from '@/components/markets/types';
+import type { EnrichedIndex, MarketsSnapshot, ChangeMap } from '@/components/markets/types';
 import { fmtDate } from '@/lib/format';
 
-export const dynamic = 'force-static';
-
 /** The as-of date for the demo snapshot. Stable so SSR and the client agree. */
-const AS_OF_ISO = '2026-11-12';
+export const AS_OF_ISO = '2026-11-12';
 
-/** One raw demo row: level + 52w band + the five period changes. */
 interface RawRow {
   level: number;
   high52w: number;
@@ -30,8 +20,7 @@ interface RawRow {
 }
 
 /** The 16 demo rows — plausible late-2026 levels with a realistic spread of
- *  gains and losses across every lens (so the treemap's diverging ramp, the
- *  breadth counts and the mover cards all carry honest variety). */
+ *  gains and losses across every lens. */
 const RAW: Record<string, RawRow> = {
   sp500: { level: 6049.38, high52w: 6128.18, low52w: 4835.65, changes: { today: 0.42, week: 1.85, month: 3.21, quarter: 5.42, year: 14.18 } },
   ndx: { level: 21658.74, high52w: 22157.52, low52w: 15982.31, changes: { today: 0.68, week: 2.34, month: 4.12, quarter: 6.81, year: 19.42 } },
@@ -51,11 +40,13 @@ const RAW: Record<string, RawRow> = {
   dax: { level: 19842.31, high52w: 20618.74, low52w: 16824.46, changes: { today: 0.46, week: 1.32, month: 2.94, quarter: 5.84, year: 12.42 } },
 };
 
-export function GET() {
+/** Build the full 16-index snapshot (pure). */
+export function buildDemoSnapshot(): MarketsSnapshot {
   const markets: EnrichedIndex[] = INDICES.map((meta) => {
     const raw = RAW[meta.symbol];
     const high52w = raw.high52w;
     const fromHigh = (raw.level / high52w - 1) * 100;
+    const changes: ChangeMap = raw.changes;
     return {
       symbol: meta.symbol,
       name: meta.name,
@@ -67,20 +58,14 @@ export function GET() {
       high52w,
       low52w: raw.low52w,
       fromHigh,
-      changes: raw.changes,
+      changes,
       capT: MARKET_CAP_T[meta.symbol] ?? CAP_FALLBACK_T,
     };
   });
 
-  const snapshot: MarketsSnapshot = {
+  return {
     asOf: AS_OF_ISO,
     asOfDisplay: fmtDate(AS_OF_ISO),
     markets,
   };
-
-  return NextResponse.json(snapshot, {
-    headers: {
-      'Cache-Control': 'public, max-age=300, s-maxage=300',
-    },
-  });
 }
