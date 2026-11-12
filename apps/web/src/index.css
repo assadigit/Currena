@@ -2469,6 +2469,24 @@ html[dir='rtl'] .insights-panel {
   border-radius: var(--radius-sm);
 }
 
+/* The treemap's tile hovers (the 2026-11-12 treemap round): the fill
+ * itself brightens — a filter on the tile <rect> keeps the gutters and
+ * the label shadows untouched (SVG filter shorthand is absent from the
+ * Tailwind cut, so the pair lives here). Keyboard focus keeps the
+ * shared brand ring above. */
+[data-treemap-tile] > .treemap-tile-rect {
+  transition: fill 0.3s, filter 0.15s;
+}
+[data-treemap-tile]:hover > .treemap-tile-rect,
+[data-treemap-tile]:focus-visible > .treemap-tile-rect {
+  filter: brightness(1.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-treemap-tile] > .treemap-tile-rect {
+    transition: none;
+  }
+}
+
 /* Grayscale redesign, HERO-SCOPED (owner scope note 2026-10-18) — RETIRED
  * by the editorial handoff (2026-10-19, economic-indicators-editorial-
  * spec.md §4): the approved direction restores the restrained severity

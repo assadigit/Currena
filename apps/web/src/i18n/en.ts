@@ -1080,6 +1080,25 @@ export const en = {
       low52wLabel: '52-week low',
       chartAria: 'Closing values over the last 52 weeks',
       naWord: 'n/a',
+      /* ---- The treemap (the 2026-11-12 treemap round: the TE-style
+       * market heat map — tile size ≈ market cap, colour ≈ the selected
+       * period's return). Fresh glue copy; the period words, the status
+       * words and the entry names it borrows are the section's own
+       * pinned keys. All fa strings queued in the Persian copy manifest
+       * (the S7/S31 precedent). ---- */
+      treemap: {
+        heading: 'Market heat map',
+        subtitle: 'Tile size ≈ market capitalization · colour ≈ {period} performance',
+        legendAria: 'Colour scale: red at −{down}% through neutral at zero to green at +{up}% for the selected period.',
+        canvasAria:
+          'World markets heat map: {count} indices across 3 regions, tile size roughly market capitalization and colour the selected period performance',
+        tileAria:
+          '{name}, {country}: {value} over {period}, tile sized by roughly ${cap} trillion market cap, as of {date}',
+        tileTooltip:
+          '{name} ({country})\nLevel: {level}\n{period} change: {change}\nFrom 52-week high: {fromHigh} — {status}\nMarket cap: ≈ ${cap}T',
+        footerNote:
+          '{count} indices · colours saturate at ±{clamp}% for the selected period · select a tile for detail · illustrative demo market-cap data',
+      },
     },
     usa: {
       title: 'USA',

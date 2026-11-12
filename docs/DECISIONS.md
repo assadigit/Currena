@@ -11,6 +11,65 @@
 > A–K, rounds 1–3), and the per-session delivery records in
 > `docs/page-division/01-SESSION-ROADMAP.md`.
 
+## 2026-11-12 — BD-TM1 (the treemap round): the TE-style market heat map joins /world-markets — tile size from an ILLUSTRATIVE cap table (no stored cap field exists), colour from the SAME period lens the briefing reads, and the tiles opening the SAME detail panel; the squarified layout is a zero-dependency pure function; the World Markets chunk budget bumps 40/9 → 50/11 kB
+
+- **The request:** the owner's treemap spec (2026-11-12, the session
+  kickoff): a tradingeconomics-style market heat map on
+  /world-markets — the 16 world indices as a two-level squarified
+  treemap, tile area ∝ market capitalization, tile colour ∝ the
+  selected period's return, following the page's existing period
+  selector and detail-panel behaviour.
+- **Decision 1 — the cap table is demo data, labelled as such:** the
+  stored contract carries NO market-cap field (MarketEntry has
+  returns/levels/52-week fields only), so the tile weights ride a
+  local table of approx constituent caps (sp500 55T · ndx 44T · dow
+  19T · … · ibov 1.1T) with the footer's plain "illustrative demo
+  market-cap data" (Rule 5 — an estimate is labelled an estimate,
+  never presented as measured). Options considered: (a) live EODHD
+  fundamentals per constituent (a new provider surface + per-index
+  aggregation — out of the spec's own v1 scope), (b) no treemap until
+  caps join the contract (the spec says ship v1 with the table), (c)
+  the labelled demo table (chosen). Revisit when a fundamentals
+  endpoint joins the ingest.
+- **Decision 2 — one lens, one panel:** the colour reads
+  periodValueOf (the SAME helper the breadth/movers/tiles read —
+  D-48, never a second arithmetic) with a per-lens saturation clamp
+  (±3 today · ±5 1w · ±8 1m · ±12 3m · ±15 1y · ±20 5y) so longer
+  horizons do not read as wall-to-wall saturated extremes; a missing
+  lens reading keeps the neutral warm gray + the honest dash. Tiles
+  are real buttons that toggle the briefing's SHARED openId — the
+  treemap and the explorer tiles can never disagree on which panel is
+  open (one panel at a time, the §6.3 discipline).
+- **Decision 3 — zero dependencies, deterministic geometry:** the
+  squarified layout (Bruls et al. 2000, greedy worst-aspect-ratio) is
+  a local pure function (two passes: regions by summed cap, leaves per
+  region under a 20px header band) — same snapshot, same pixels, no
+  library, SSR-safe. TE's measured proportions hold: Americas ≈ 72%
+  of the canvas, Asia-Pacific ≈ 20%, Europe ≈ 8%; the region order is
+  TE's (biggest first), NOT the grids' east-to-west order.
+- **The budget bump:** the World Markets lazy chunk 40/9 → 50/11 kB
+  (measured 46.41/10.78): MarketsTreemap.tsx + the formatAsOf import
+  + 7 treemap copy strings × 2 locales. Justified in CHANGELOG
+  §2026-11-12 (treemap).
+- **The copy:** 7 fresh `pd.worldMarkets.treemap.*` keys × 2 locales;
+  the period/status/entry words it borrows are the section's own
+  pinned keys; the 7 fa strings queued unreviewed in the Persian copy
+  manifest (the S7/S31 precedent — 7996 entries, audit clean).
+- **The verification:** 27 new unit tests (the squarify geometry:
+  coverage/containment/no-overlap/determinism; the region proportions;
+  the per-lens clamp; the label rules; the cap-table ordering) + the
+  full web suite 13,230 green + lint 0 + typecheck 0 + the browser
+  pass over the built dist + live feeds (EN + FA/RTL + 390px mobile):
+  16 tiles with labels, the click → shared panel + amber ring, the
+  period switch re-clamping the legend ±3 → ±5 and recolouring all 16
+  tiles, the horizontal pan inside the card on mobile with no body
+  overflow, zero console errors.
+- **Who decided:** the owner (the session spec) + the agent (the
+  adaptation decisions above). **Revisit:** when live caps join the
+  contract (the footer's demo label goes), and at the v2 wishlist
+  (log-scale toggle, region drill-down — the spec's §13 out-of-scope
+  list).
+
 ## 2026-11-08 — BD-S4a: the Global ribbon's day change rides the live-prices contract (`change1d`)
 
 - **Decision:** D-22's "day change" is implemented as an optional,

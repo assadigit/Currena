@@ -6,57 +6,64 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **S31 (2026-11-12) — the first post-program OWNER ROUND: the World
-> Markets briefing restored on /world-markets + DEPLOYED (BD-S31).**
-> The owner asked for the legacy section's editorial layer the S7
-> refactor had omitted — "the pulse of world markets" components: the
-> market-breadth headline (up/down/flat counts over the proportional
-> bar, the stated ±1% flat band), the two featured movers (Biggest
-> gain / Biggest fall with the 52-week-distance status chips) and the
-> regional tile explorer (the 16 index tiles with the warning-ring
-> hierarchy and the expandable detail panels) — "I worked hard on
-> their UI/UX, so make sure they are present in this new page."
+> **TM1 (2026-11-12, after S31) — the TREEMAP round: the TE-style
+> market heat map on /world-markets (BD-TM1).** The owner's spec: a
+> tradingeconomics-style treemap for the 16 world indices — tile size
+> ≈ market cap, colour ≈ the selected period's return, integrated with
+> the page's existing period selector and detail panels.
 >
-> **What shipped:** `WorldMarketsBriefing.tsx` (the new section between
-> the hero and the region grids), wired so the map's period switch is
-> now the page's ONE CONTROLLED lens (the page owns the MarketsView;
-> the hero passes the controlled period — the 2026-10-21 unification
-> discipline). Every number flows through the SAME pure helpers the
-> legacy section reads (marketBreadth · topMovers · briefing.ts /
-> shared.tsx — never a second arithmetic); the detail panel reuses the
-> MarketsChart and MarketLogo drawings (the chart's copy prop narrowed
-> to a lean MarketsChartCopy contract — the WorldMapCopy pattern; the
-> legacy caller unchanged). 24 new `pd.worldMarkets.*` keys × 2
-> locales — 23/24 pinned byte-for-byte to the insights corpus by a NEW
-> copy-pin arm (both locales), all 24 fa strings queued unreviewed in
-> the Persian copy manifest (the S7 precedent; audit clean). The
-> World Markets lazy-chunk budget bumped 30/8 → 40/9 kB (measured
-> 38.25/8.30 — gzip-quiet at +0.30 kB, justified in CHANGELOG).
+> **What shipped:** `MarketsTreemap.tsx` (the new card inside
+> `WorldMarketsBriefing`, between the movers row and the regional tile
+> explorer): a two-level squarified treemap (a zero-dependency local
+> pure function — Bruls et al.; regions by summed cap, leaves under a
+> 20px header band; TE's proportions: Americas ≈ 72% · Asia-Pacific ≈
+> 20% · Europe ≈ 8%), the 16 tiles coloured through the SAME
+> periodValueOf lens the breadth/movers/tiles read (per-lens clamp ±3
+> today → ±20 on 5y; a missing lens keeps the neutral gray + the
+> honest dash), white bold labels with the TE text-shadow anatomy
+> (hidden under 44×40 — the native tooltip remains), tiles as real
+> buttons that toggle the briefing's SHARED detail panel (one open at
+> a time; the amber ring; Enter/Space; aria-expanded/aria-controls).
+> The cap table is ILLUSTRATIVE DEMO DATA, labelled in the footer
+> (BD-TM1: no cap field in the stored contract; revisit when a
+> fundamentals endpoint joins the ingest). 7 new
+> `pd.worldMarkets.treemap.*` keys × 2 locales; the 7 fa strings
+> queued in the Persian copy manifest (7,996 entries; audit clean).
+> The WM chunk budget bumped 40/9 → 50/11 kB (measured 46.41/10.78).
 >
-> **The verification:** the full `pnpm gates` 9/9 ALL GREEN (the suite
-> 15,275 — +5 new arms: the briefing characterization, the
-> detail-panel one-open discipline, the map-switch lens, the two-locale
-> copy pins); the browser pass over the built dist + the live feeds
-> (EN + FA/RTL + 390px mobile, zero console errors): the breadth 7/0/9
-> over the ±1% band, the movers TAIEX +3.6% / Hang Seng −1.0%
-> (Correction −13.1%), the tiles' ring hierarchy with the DAX
-> at-its-high green pill, the expanded panel's 52-week chart + levels,
-> the RTL mirroring and the mobile stacking — all verified visually.
-> The conscious scope cut: the legacy detail panel's what/why/you
-> editorial lines + the Layer1Block stay on /insights until the §19.6
-> retirement gate (BD-S31 records the reasoning).
+> **The verification:** 27 new unit tests (squarify geometry:
+> coverage/containment/no-overlap/determinism; region proportions;
+> per-lens clamp; label rules; cap ordering) + the web suite 13,230
+> green + lint 0 + typecheck 0 + the browser pass over the built dist
+> + live feeds (EN + FA/RTL + 390px mobile): all 16 tiles labelled,
+> tooltip/aria per spec, click → shared panel + smooth scroll, the
+> period switch recolouring all 16 tiles with the legend re-clamping
+> ±3% → ±5%, mobile pans horizontally inside the card with no body
+> overflow, zero console errors.
 >
-> **Deployed + verified live:** the rebuilt SPA through the
-> `currena-api` worker (the live version id in the Current state
-> below); the live /world-markets browser verify green after the
-> deploy. The markets worker is untouched.
+> **NOT yet deployed** — the commit/push of this round precedes the
+> deploy (the standing approval covers it; the next session either
+> deploys or the deploy follows in this one, see the session record).
+> Production is still the S31 build (`502708df…`, the briefing live
+> without the treemap).
 
-## Current state (after the S31 owner round)
+## Current state (after the TM1 treemap round)
 
 - **Program:** page-division — **all 30 sessions delivered (Session
   30/30 · 0 remaining); the program stays complete.** The first
   post-program owner round (S31, the World Markets briefing) is
-  DELIVERED + DEPLOYED (BD-S31).
+  DELIVERED + DEPLOYED (BD-S31); the SECOND owner round (TM1, the
+  treemap) is DONE IN CODE, pushed, NOT yet deployed (BD-TM1).
+- **The TM1 code state (this round):** the treemap card lives in
+  `WorldMarketsBriefing.tsx` between the movers and the regional
+  explorer; `MarketsTreemap.tsx` + its 27-test suite are new; the
+  dictionaries, index.css hover pair, the copy manifest (7 queued fa
+  strings) and the WM budget row (40/9 → 50/11, measured 46.41/10.78)
+  carry the round. The spec: `docs/specs/world-markets-treemap.md`.
+  Screenshots: `docs/assets/world-markets-treemap-*-2026-11-12.png`.
+  **The next deploy ships it** (the standing approval covers the
+  deploy; verify https://currena.ir/world-markets shows the heat map
+  card after it).
 - **DEPLOYED LIVE:** currena-api — the S31 deploy, version
   `502708df-08db-430f-86d5-a141a73c85d4` (the rebuilt SPA assets
   riding the API worker; the worker code itself unchanged since the
@@ -69,8 +76,9 @@
   Hang Seng detail panel expanding with the 52-week chart (Nov 2025 →
   Nov 2026) + the levels — zero console errors, and the standing
   pd-s7 live backtest re-run against production: **ALL CHECKS GREEN —
-  57 checks · 57 green · 0 red.** Production ≡ HEAD after this
-  session's records commits.
+  57 checks · 57 green · 0 red.** After the TM1 round: production is
+  the S31 build — HEAD carries the treemap commit(s) ahead of it
+  (deploy pending).
 - **The ecb posture (BD-S29, carried):** the served blob shows
   failedSources EMPTY — all three ecb rows green. The BD-S25
   maintenance item stays CLOSED; the per-request ECB roulette remains
@@ -233,3 +241,11 @@ whichever lever arrives:
   never reaches the page. The map's period switch is the ONE lens
   (controlled); the tiles expand one detail panel at a time; the
   section's words are corpus-pinned in both locales.
+- **The /world-markets treemap (TM1):** tile size ≈ the ILLUSTRATIVE
+  cap table (BD-TM1 — labelled demo data in the footer; swap for live
+  caps when a fundamentals endpoint joins the ingest); tile colour ≈
+  the period return through the SAME periodValueOf lens with the
+  per-lens clamp (±3 today → ±20 5y); the treemap's tiles and the
+  explorer tiles share the ONE openId panel state. The squarify
+  routine is a pure function with its own 27-test suite — extend
+  those tests, never the drawing, when changing the geometry.

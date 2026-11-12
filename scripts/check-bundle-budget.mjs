@@ -1017,7 +1017,16 @@ const BUDGETS = [
   // D-48 reuse rule — never a rebuild) + the corpus-pinned briefing
   // copy. Gzip-quiet: users download ~0.3 kB more, the owner's
   // hard-worked UI returns. Justified in CHANGELOG §2026-11-12 (S31).
-  { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 40_000, gz: 9_000, label: 'World Markets page lazy chunk (page-division S7)' },
+  // Treemap bump (2026-11-12, 40/9 → 50/11): the market heat map round —
+  // the TE-style treemap (docs/specs/world-markets-treemap.md) between
+  // the movers and the regional explorer. Measured 46.41/10.78 (+6.16
+  // raw / +1.78 gz over the old ceiling): the growth is
+  // MarketsTreemap.tsx (the two-level squarified layout + the diverging
+  // ramp + the label engine — zero new dependencies) + the formatAsOf
+  // import joining the chunk + 7 treemap copy strings × 2 locales.
+  // Gzip is mostly the copy pair and the squarify routine, both highly
+  // compressible. Justified in CHANGELOG §2026-11-12 (treemap).
+  { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 50_000, gz: 11_000, label: 'World Markets page lazy chunk (page-division S7)' },
   // Page-division S8 (2026-11-08): the REGION routes — /usa,
   // /europe, /asia-pacific, /australia — each carrying its D-44
   // index/map section (the REUSED WorldMap in region-zoom mode) above

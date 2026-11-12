@@ -53,6 +53,7 @@ import type { TranslationKey } from '../../lib/locale';
 import { MarketsChart } from '../../components/insights/MarketsChart';
 import type { MarketsChartCopy } from '../../components/insights/MarketsChart';
 import { MarketLogo } from '../../components/insights/world-markets/MarketLogo';
+import { MarketsTreemap } from '../../components/insights/world-markets/MarketsTreemap';
 import { formatAsOf } from '../../components/insights/HistoryChart';
 import { marketBreadth, topMovers, periodValueOf } from '../../components/insights/world-markets/briefing';
 import type { MarketBreadth } from '../../components/insights/world-markets/briefing';
@@ -600,6 +601,14 @@ export function WorldMarketsBriefing({
       <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-local-currency-note>
         {t('pd.worldMarkets.localCurrencyNote')}
       </p>
+
+      {/* The market heat map (the 2026-11-12 treemap round): the TE-style
+       * treemap between the movers and the regional explorer — tile size
+       * ≈ market cap, colour ≈ the selected period's return, the tiles
+       * opening the SAME detail panel the explorer's tiles open (the
+       * shared openId — one panel at a time, never two entry points
+       * diverging). */}
+      <MarketsTreemap snapshot={snapshot} view={view} openId={openId} onToggle={onToggleTile} />
 
       {/* The regional tile explorer (§3.5): three labelled groups, the
        * world waking up east to west (§6.3) — DOM order = trading-day
