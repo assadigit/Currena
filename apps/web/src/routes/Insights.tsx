@@ -570,22 +570,14 @@ export function Insights() {
            * the insights snapshot, not the fx feed, so they ride every
            * section state); the standalone lane group is retired
            * (LANE_GROUP_ORDER). The gauge computation is untouched. */}
-          {fxFeedEnabled && (
-            <WorldCurrencies state={fxState} copy={copy} locale={locale} numberLocale={numberLocale}
-              dollarStrength={
-                <DollarStrengthCards
-                  snapshot={state.snapshot}
-                  copy={copy}
-                  numberLocale={numberLocale}
-                  onOpenDetails={openDetails}
-                  pinned={pinned}
-                  renderableIds={sectionIds}
-                />
-              }
-              narrativeUnit={narrativeDoc?.sections['world-currencies']}
-              narrativeVisible={narrativeVisible}
-            />
-          )}
+          {/* TM12: the WorldCurrencies section (the FX pairs table, the
+           * dollar-strength cards, the pattern cards, the plain-words panel,
+           * the verdict line, the narrative) was CUT from /insights — every
+           * currency item now lives on the dedicated /currencies page (the
+           * 14 registry cards, the 11-pair board, the 7 rule lights). The FX
+           * feed stays (the hero's fxAlert + the section indicator + the CSV
+           * download still read it); the hero's "jump to currencies" now
+           * navigates to /currencies. */}
 
           {/* R11: "What it means for my money" — 2026-10-29 owner round
            * ("because it's related to Aussie living, relocate it to the

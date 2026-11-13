@@ -149,8 +149,11 @@ export function useWorldCurrenciesSection(copy: InsightsCopy, enabled = true) {
     return { signal: summary.signal, patterns: names };
   }, [fxState, copy]);
 
+  // TM12: the WorldCurrencies section was removed from /insights (every
+  // currency item moved to the dedicated /currencies page). The jump now
+  // navigates to /currencies instead of scrolling to the retired anchor.
   const jumpToFxCurrencies = useCallback(() => {
-    document.getElementById('insights-fx')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    navigate('/currencies');
   }, []);
 
   // The world-currencies pairs export (spec §9.3 item 6: the CSV goes in
