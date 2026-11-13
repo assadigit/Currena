@@ -163,17 +163,35 @@ export const USA_LANE_MOVED_IDS: readonly IndicatorId[] = [
 ];
 
 /**
+ * TM15 (the Europe migration): every Eurozone-related indicator has
+ *  moved to the /europe page. The 8 ids whose placement home is /europe
+ *  (6 EU-members + 2 non-EU-UK) are hidden from the /insights lane so no
+ *  Europe card renders here — they live on /europe as tier cards (2
+ *  sections: EU + UK). The readings still ride the full snapshot so the
+ *  hero verdicts, gauge counts and calendar targets keep working. (euro-hicp
+ *  was already in US_GLOBAL_REACH_IDS — the Set deduplicates.)
+ */
+export const EUROPE_LANE_MOVED_IDS: readonly IndicatorId[] = [
+  // eu-members
+  'ecb-dfr', 'euro-hicp', 'euro-aaa-10y', 'bund-10y', 'btp-bund-spread', 'oecd-cli-de',
+  // non-eu-uk
+  'gilt-10y', 'boe-rate',
+];
+
+/**
  * R9-04 + R9-07: ids rendered in a special container instead of their
  * lane group — the QuestionGroup filter skips them so no card renders
  * twice. (Companion-ONLY ids are separate — they always ride a parent.)
  * TM7: the 39 AU ids moved to /australia.
  * TM10: the 72 USA ids moved to /usa.
+ * TM15: the 8 Europe ids moved to /europe.
  */
 export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   ...DOLLAR_STRENGTH_IDS,
   ...US_GLOBAL_REACH_IDS,
   ...AUSTRALIA_LANE_MOVED_IDS,
   ...USA_LANE_MOVED_IDS,
+  ...EUROPE_LANE_MOVED_IDS,
   'nyfed-custody',
 ]);
 
