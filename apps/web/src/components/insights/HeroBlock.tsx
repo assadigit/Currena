@@ -66,10 +66,9 @@ function CarouselControls({
 }: {
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
-  /** The card labels in DOM order: [Global, Australia]. The Australia
-   *  verdict stays as the hero's editorial summary (the gauge verdict, not
-   *  individual cards — those moved to /australia in TM7). */
-  labels: readonly [string, string];
+  /** The card labels in DOM order (Global only — the Australia verdict
+   *  moved to /australia in TM7). */
+  labels: readonly string[];
   active: number;
   onGo: (index: number) => void;
 }) {
@@ -174,9 +173,9 @@ export function HeroBlock({
   // Safari/Firefox) both resolve to the same visible card.
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [activeCard, setActiveCard] = useState(0);
-  const labels = useMemo<readonly [string, string]>(
-    () => [copy.sections.global, copy.sections.australia],
-    [copy.sections.global, copy.sections.australia],
+  const labels = useMemo<readonly string[]>(
+    () => [copy.sections.global],
+    [copy.sections.global],
   );
 
   const onTrackScroll = useCallback(() => {
@@ -263,42 +262,42 @@ export function HeroBlock({
        * together. Prev/next are real buttons so keyboard/touch users without
        * swipe gestures still change cards; the words are direction-neutral
        * ("Previous"/"Next") whose meaning follows the reading direction. */}
-      <div onKeyDown={onCarouselKey} className="mb-2.5 md:hidden">
-        <CarouselControls
-          copy={copy}
-          numberLocale={numberLocale}
-          labels={labels}
-          active={activeCard}
-          onGo={goToCard}
-        />
-        <div className="mt-1 flex items-center justify-center gap-2" data-carousel-buttons>
-          <button
-            type="button"
-            onClick={() => goToCard(Math.max(0, activeCard - 1))}
-            disabled={activeCard === 0}
-            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
-          >
-            {/* Mirrors with the reading flow (RTL = visually points the
-             * other way) — the shared flow glyph, flipped. */}
-            <FlowChevron className="rotate-180" />
-            {copy.ui.prevCard}
-          </button>
-          <button
-            type="button"
-            onClick={() => goToCard(Math.min(labels.length - 1, activeCard + 1))}
-            disabled={activeCard === labels.length - 1}
-            className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
-          >
-            {copy.ui.nextCard}
-            <FlowChevron />
-          </button>
+      {labels.length > 1 ? (
+        <div onKeyDown={onCarouselKey} className="mb-2.5 md:hidden">
+          <CarouselControls
+            copy={copy}
+            numberLocale={numberLocale}
+            labels={labels}
+            active={activeCard}
+            onGo={goToCard}
+          />
+          <div className="mt-1 flex items-center justify-center gap-2" data-carousel-buttons>
+            <button
+              type="button"
+              onClick={() => goToCard(Math.max(0, activeCard - 1))}
+              disabled={activeCard === 0}
+              className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
+            >
+              <FlowChevron className="rotate-180" />
+              {copy.ui.prevCard}
+            </button>
+            <button
+              type="button"
+              onClick={() => goToCard(Math.min(labels.length - 1, activeCard + 1))}
+              disabled={activeCard === labels.length - 1}
+              className="insights-focusable inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full bg-currena-muted/15 px-4 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:bg-currena-muted/25 disabled:cursor-default disabled:opacity-40"
+            >
+              {copy.ui.nextCard}
+              <FlowChevron />
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div
         ref={trackRef}
         onScroll={onTrackScroll}
-        className="insights-hero-grid grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-2 lg:gap-6"
+        className="insights-hero-grid grid grid-cols-1 gap-4 md:gap-5 lg:gap-6"
         data-region-track
         aria-label={copy.ui.carouselLabel}
       >
@@ -307,7 +306,7 @@ export function HeroBlock({
          * stock markets are a global question (§5.3). role=group + the
          * "n of m" label lets screen readers announce the carousel position
          * (spec §10) without duplicating the card's own heading. */}
-        <div data-region-card="global" role="group" aria-label={interpolate(copy.ui.cardPosition, { card: labels[0], n: num(1, numberLocale), m: num(2, numberLocale) })}>
+        <div data-region-card="global" role="group" aria-label={interpolate(copy.ui.cardPosition, { card: labels[0] ?? copy.sections.global, n: num(1, numberLocale), m: num(labels.length, numberLocale) })}>
           <VerdictBlock
             section="global"
             sectionLabel={copy.sections.global}
@@ -321,17 +320,6 @@ export function HeroBlock({
             fxAlert={fxAlert}
             onJumpFx={onJumpFx}
             sectionIndicators={sectionIndicators}
-          />
-        </div>
-        <div data-region-card="australia" role="group" aria-label={interpolate(copy.ui.cardPosition, { card: labels[1], n: num(2, numberLocale), m: num(2, numberLocale) })}>
-          <VerdictBlock
-            section="australia"
-            sectionLabel={copy.sections.australia}
-            readings={readings}
-            copy={copy}
-            numberLocale={numberLocale}
-            onJumpSection={onJumpSection}
-            onFocusCard={onFocusCard}
           />
         </div>
       </div>

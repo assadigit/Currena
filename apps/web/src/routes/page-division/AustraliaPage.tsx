@@ -57,6 +57,7 @@ import { useAustraliaBoardCopy } from './australia-board-copy';
 import { AustralianMarkets } from '../../components/insights/AustralianMarkets';
 import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
 import { MoneyPanel } from '../../components/insights/MoneyPanel';
+import { VerdictBlock } from '../../components/insights/VerdictMeter';
 import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
 import { navigate } from '../../router';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
@@ -263,6 +264,28 @@ export function AustraliaPage(): React.JSX.Element {
         ) : null}
       </header>
 
+      {/* The Australia verdict card (TM7: moved from the /insights hero — the
+          attention list, the 5 AU gauges behind the verdict, and the signals
+          panel now live HERE, on the Australia page, not on /insights). Reads
+          the projection's own AU readings; a tap on a flagged indicator or the
+          "View section" affordance scrolls to the gauge sections below. */}
+      {readings !== undefined ? (
+        <div className="mb-2.5 sm:mb-4" data-australia-verdict>
+          <VerdictBlock
+            section="australia"
+            sectionLabel={copy.sections.australia}
+            readings={readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onJumpSection={() => {
+              const el = document.getElementById('australia-tier-cards');
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            onFocusCard={() => navigate('/insights')}
+          />
+        </div>
+      ) : null}
+
       {/* The absent-note honesty line (public mode's licence-hidden ids —
           the Australia projection's own honest report). */}
       {projection !== null && projection.absentIds.length > 0 ? (
@@ -284,7 +307,11 @@ export function AustraliaPage(): React.JSX.Element {
           D-37) — 28 cards with the §21 trio, the verdict lines, and the
           moved-out seat chips. Only when the projection has spoken
           (fresh or cached). */}
-      {readings !== undefined ? <AustraliaTierCards readings={readings} /> : null}
+      {readings !== undefined ? (
+        <div id="australia-tier-cards" className="scroll-mt-24">
+          <AustraliaTierCards readings={readings} />
+        </div>
+      ) : null}
 
       {/* The "What it means for my money" panel (TM7: moved from /insights'
           Australia section slot — it's an AU-household-costs panel by content,

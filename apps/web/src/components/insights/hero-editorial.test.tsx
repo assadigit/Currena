@@ -133,80 +133,60 @@ describe('editorial hero §10 — the Global-first swipe carousel', () => {
     cleanup();
   });
 
-  it('the track DOM order is Global → Australia — the carousel opens on Global (D7)', () => {
+  it('the track DOM carries Global only — the carousel opens on Global (D7, single card)', () => {
     renderHero(insightsCopyEn, 'en-US');
     const cards = regionCards();
-    expect(cards).toHaveLength(2);
+    expect(cards).toHaveLength(1);
     expect(cards[0]!.getAttribute('data-region-card')).toBe('global');
-    expect(cards[1]!.getAttribute('data-region-card')).toBe('australia');
+    // TM7: the Australia verdict card moved to /australia — no [data-region-card="australia"] in the hero.
+    expect(document.querySelector('[data-region-card="australia"]')).toBeNull();
   });
 
   it('each card is a labelled group ("{card} card, {n} of {m}")', () => {
     renderHero(insightsCopyEn, 'en-US');
     const cards = regionCards();
     expect(cards[0]!.getAttribute('role')).toBe('group');
-    expect(cards[0]!.getAttribute('aria-label')).toBe('Global card, 1 of 2');
-    expect(cards[1]!.getAttribute('aria-label')).toBe('Australia card, 2 of 2');
+    // TM7: single card → "1 of 1" (was "1 of 2" when the Australia card lived in the hero).
+    expect(cards[0]!.getAttribute('aria-label')).toBe('Global card, 1 of 1');
   });
 
-  it('the track exposes the carousel label; the cue names the OTHER card', () => {
+  it('the track exposes the carousel label; with a single card no swipe cue renders', () => {
     renderHero(insightsCopyEn, 'en-US');
     expect(trackOf().getAttribute('aria-label')).toBe(insightsCopyEn.ui.carouselLabel);
-    // Global active → the cue points at Australia (spec's example cue).
-    expect(screen.getByText('Swipe to view Australia', { exact: false })).toBeTruthy();
+    // TM7: single card → the CarouselControls (cue + dots + buttons) are
+    // gated behind labels.length > 1, so none of them render.
+    expect(document.querySelector('[data-region-carousel]')).toBeNull();
+    expect(screen.queryByText('Swipe to view', { exact: false })).toBeNull();
   });
 
-  it('two position dots; the active one carries aria-current', () => {
+  it('with a single card no position dots render', () => {
     renderHero(insightsCopyEn, 'en-US');
+    // TM7: the CarouselControls (incl. the [data-carousel-dot] buttons) are
+    // gated behind labels.length > 1, so none render when there's one card.
     const dotButtons = Array.from(document.querySelectorAll('[data-carousel-dot]')) as HTMLButtonElement[];
-    expect(dotButtons).toHaveLength(2);
-    expect(dotButtons[0]!.getAttribute('aria-current')).toBe('true');
-    expect(dotButtons[1]!.getAttribute('aria-current')).toBe('false');
-    // the dots' accessible names are the "n of m" positions
-    expect(dotButtons[0]!.getAttribute('aria-label')).toBe('Global card, 1 of 2');
-    expect(dotButtons[1]!.getAttribute('aria-label')).toBe('Australia card, 2 of 2');
+    expect(dotButtons).toHaveLength(0);
   });
 
-  it('Previous is disabled on Global; Next scrolls to Australia and flips the furniture', () => {
-    const scrollTo = vi.fn();
-    // jsdom has no Element.scrollTo — the click path needs one.
-    Object.defineProperty(window.HTMLElement.prototype, 'scrollTo', {
-      configurable: true,
-      writable: true,
-      value: scrollTo,
-    });
-    try {
-      renderHero(insightsCopyEn, 'en-US');
-      const prev = screen.getByRole('button', { name: new RegExp(`^${insightsCopyEn.ui.prevCard}$`) });
-      const next = screen.getByRole('button', { name: new RegExp(`^${insightsCopyEn.ui.nextCard}$`) });
-      expect(prev.hasAttribute('disabled')).toBe(true);
-      expect(next.hasAttribute('disabled')).toBe(false);
-
-      fireEvent.click(next);
-      expect(scrollTo).toHaveBeenCalledTimes(1);
-      const dots = Array.from(document.querySelectorAll('[data-carousel-dot]')) as HTMLButtonElement[];
-      expect(dots[0]!.getAttribute('aria-current')).toBe('false');
-      expect(dots[1]!.getAttribute('aria-current')).toBe('true');
-      // On Australia the cue points BACK at Global.
-      expect(screen.getByText('Swipe to view Global', { exact: false })).toBeTruthy();
-      expect(prev.hasAttribute('disabled')).toBe(false);
-      expect(next.hasAttribute('disabled')).toBe(true);
-
-      fireEvent.click(prev);
-      const dots2 = Array.from(document.querySelectorAll('[data-carousel-dot]')) as HTMLButtonElement[];
-      expect(dots2[0]!.getAttribute('aria-current')).toBe('true');
-    } finally {
-      Reflect.deleteProperty(window.HTMLElement.prototype, 'scrollTo');
-    }
+  it('with a single card the Previous/Next buttons do not render', () => {
+    renderHero(insightsCopyEn, 'en-US');
+    // TM7: the [data-carousel-buttons] wrapper (Prev/Next) is gated behind
+    // labels.length > 1, so neither button renders when there's one card.
+    expect(document.querySelector('[data-carousel-buttons]')).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: new RegExp(`^${insightsCopyEn.ui.prevCard}$`) }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: new RegExp(`^${insightsCopyEn.ui.nextCard}$`) }),
+    ).toBeNull();
   });
 
-  it('fa: the cue and the dot labels speak Persian (RTL locale)', () => {
+  it('fa: with a single card the carousel controls do not render (RTL locale)', () => {
     renderHero(insightsCopyFa, 'fa-IR');
     expect(trackOf().getAttribute('aria-label')).toBe(insightsCopyFa.ui.carouselLabel);
-    expect(screen.getByText('برای دیدن استرالیا بکشید', { exact: false })).toBeTruthy();
-    const dotButtons = Array.from(document.querySelectorAll('[data-carousel-dot]')) as HTMLButtonElement[];
-    expect(dotButtons[0]!.getAttribute('aria-label')).toBe('کارت جهانی، ۱ از ۲');
-    expect(dotButtons[1]!.getAttribute('aria-label')).toBe('کارت استرالیا، ۲ از ۲');
+    // TM7: single card → the cue, dots, and buttons are all hidden.
+    expect(document.querySelector('[data-region-carousel]')).toBeNull();
+    expect(document.querySelector('[data-carousel-buttons]')).toBeNull();
+    expect(document.querySelectorAll('[data-carousel-dot]')).toHaveLength(0);
   });
 });
 
@@ -236,22 +216,22 @@ describe('editorial hero §7/§4/§8 — art band, severity pill, flagged rows',
     cleanup();
   });
 
-  it('each region card carries ONE decorative art layer (Sydney/map), aria-hidden', () => {
+  it('the Global card carries ONE decorative art layer (the map), aria-hidden', () => {
     renderHero(insightsCopyEn, 'en-US');
-    const auArt = document.querySelector('[data-hero-art="australia"]');
     const globalArt = document.querySelector('[data-hero-art="global"]');
-    expect(auArt).not.toBeNull();
     expect(globalArt).not.toBeNull();
-    expect(auArt!.getAttribute('aria-hidden')).toBe('true');
     expect(globalArt!.getAttribute('aria-hidden')).toBe('true');
-    // exactly one art layer per card
-    expect(document.querySelectorAll('[data-hero-art]')).toHaveLength(2);
+    // TM7: the Australia card moved to /australia — exactly one art layer
+    // remains in the hero (the Sydney art layer lives on /australia now).
+    expect(document.querySelectorAll('[data-hero-art]')).toHaveLength(1);
+    expect(document.querySelector('[data-hero-art="australia"]')).toBeNull();
   });
 
   it('the verdict word rides the tinted pill and the four-step meter stays beside it', () => {
     renderHero(insightsCopyEn, 'en-US');
     const pills = Array.from(document.querySelectorAll('[data-verdict-pill]')) as HTMLElement[];
-    expect(pills).toHaveLength(2);
+    // TM7: single Global card → one pill (was 2 with the Australia card).
+    expect(pills).toHaveLength(1);
     for (const pill of pills) {
       const step = Number(pill.getAttribute('data-step'));
       expect(step).toBeGreaterThanOrEqual(1);
@@ -259,10 +239,10 @@ describe('editorial hero §7/§4/§8 — art band, severity pill, flagged rows',
       // the pill text is the verdict word (Critical/Stressed/Cautious/Stable)
       expect(pill.textContent).toMatch(/^(Critical|Stressed|Cautious|Stable)$/);
     }
-    // the hero-size meters ride beside their pills (the per-gauge rows carry
-    // their own compact meters further down each card)
+    // the hero-size meter rides beside its pill (the per-gauge rows carry
+    // their own compact meters further down the card)
     const meters = Array.from(document.querySelectorAll('.verdict-meter-lg'));
-    expect(meters).toHaveLength(2);
+    expect(meters).toHaveLength(1);
     for (const m of meters) expect(m.getAttribute('role')).toBe('img');
   });
 
@@ -366,7 +346,8 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
   it('without feeds GLOBAL keeps the word-choice rule behind the low-key toggle that reveals the real panel', () => {
     renderHero(insightsCopyEn, 'en-US');
     const cards = regionCards();
-    expect(cards).toHaveLength(2);
+    // TM7: single Global card (was 2 with the Australia card).
+    expect(cards).toHaveLength(1);
     const card = cards[0]!;
     // collapsed by default: the quiet pill carries the panel label, and
     // no panel exists in the DOM yet
@@ -389,85 +370,11 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(rule!.textContent).toBe(insightsCopyEn.ui.verdictRule);
   });
 
-  it('round 4 → 2026-10-21c: AUSTRALIA closes with the SAME signals box — one bullet per area, worst first, raised ones NAMING their flagged indicators with live values; the click drills into the first flagged card', () => {
-    const onJumpSection = vi.fn();
-    const onFocusCard = vi.fn();
+  it('Global with raised signals carries the signals panel OPEN (never toggled)', () => {
     render(
       <HeroBlock
         readings={READINGS}
-          copy={insightsCopyEn}
-        numberLocale="en-US"
-        onJumpSection={onJumpSection}
-        onFocusCard={onFocusCard}
-      />,
-    );
-    const au = regionCards()[1]!;
-    // the signals box replaced the rule toggle on a readable Australia
-    expect(au.querySelector('[data-ei-rule-toggle]')).toBeNull();
-    const panel = au.querySelector('[data-ei-panel]') as HTMLElement | null;
-    expect(panel).not.toBeNull();
-    expect(panel!.getAttribute('data-ei-panel-kind')).toBe('signals');
-    expect(panel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
-      insightsCopyEn.ui.australiaSignalsTitle,
-    );
-    // one bullet per gauge, worst first (the fixture: inflation step 4
-    // with 3 flagged, households step 3 with 2, trade step 0)
-    const rows = Array.from(panel!.querySelectorAll('[data-ei-area-step]')) as HTMLElement[];
-    expect(rows.map((r) => r.getAttribute('data-ei-area-step'))).toEqual(['4', '3', '0', '0', '0']); // + the two S5-M5.2 shadow lanes (step 0, context-only)
-    const raised = rows.filter((r) => r.tagName === 'BUTTON');
-    expect(raised).toHaveLength(2);
-    expect(raised[0]!.getAttribute('data-ei-area-signal')).toBe('raised');
-    expect(raised[0]!.textContent).toContain(insightsCopyEn.groupShort['au-inflation-rates']);
-    expect(raised[0]!.textContent).toContain(insightsCopyEn.label.alarmed);
-    // 2026-10-21c: the bullet NAMES the flagged indicators with their
-    // live values (not the n-of-m counts the lane headers repeat) —
-    // the first two flagged members plus an "and 1 more" tail.
-    expect(raised[0]!.textContent).toContain(insightsCopyEn.indicators['au-cpi'].name);
-    expect(raised[0]!.textContent).toContain(insightsCopyEn.indicators['au-trimmed-mean'].name);
-    expect(raised[0]!.textContent).toContain('4.4%');
-    expect(raised[0]!.textContent).toContain('and 1 more');
-    expect(raised[1]!.textContent).toContain(insightsCopyEn.groupShort['au-households']);
-    expect(raised[1]!.textContent).toContain(insightsCopyEn.label.stressed);
-    expect(raised[1]!.textContent).toContain(insightsCopyEn.indicators['au-home-loan'].name);
-    expect(raised[1]!.textContent).toContain(insightsCopyEn.indicators['au-wage-growth'].name);
-    // clicking a raised bullet drills into the area's first flagged
-    // card (additional data one tap away)
-    fireEvent.click(raised[0]!);
-    expect(onFocusCard).toHaveBeenCalledWith('au-cpi', expect.anything());
-    // the unreadable area sits in the quiet ink, never a button
-    const quiet = rows.filter((r) => r.tagName === 'SPAN');
-    expect(quiet).toHaveLength(3); // the unreadable trade lane + the two S5-M5.2 shadow lanes (all step 0, quiet ink)
-    expect(quiet[0]!.getAttribute('data-ei-area-signal')).toBe('no-reading');
-    expect(quiet[0]!.textContent).toContain(insightsCopyEn.groupShort['au-trade-currency']);
-    expect(quiet[0]!.textContent).toContain(insightsCopyEn.ui.gaugeNoReading);
-  });
-
-  it('round 4: AUSTRALIA with NO readable gauge falls back to the rule toggle', () => {
-    const globalOnly = READINGS.filter((r) => !r.id.startsWith('au-'));
-    render(
-      <HeroBlock
-        readings={globalOnly}
-          copy={insightsCopyEn}
-        numberLocale="en-US"
-        onJumpSection={noop}
-        onFocusCard={noop}
-      />,
-    );
-    const au = regionCards()[1]!;
-    expect(au.querySelector('[data-ei-panel]')).toBeNull();
-    const toggle = au.querySelector('[data-ei-rule-toggle]') as HTMLElement | null;
-    expect(toggle).not.toBeNull();
-    expect(toggle!.getAttribute('aria-controls')).toBe('ei-rule-panel-australia');
-    fireEvent.click(toggle!);
-    const panel = au.querySelector('[data-ei-panel]') as HTMLElement | null;
-    expect(panel!.getAttribute('data-ei-panel-kind')).toBe('rule');
-  });
-
-  it('Global with raised signals carries the signals panel OPEN (never toggled); Australia carries its own signals box beside it', () => {
-    render(
-      <HeroBlock
-        readings={READINGS}
-          copy={insightsCopyEn}
+        copy={insightsCopyEn}
         numberLocale="en-US"
         onJumpSection={noop}
         onFocusCard={noop}
@@ -476,6 +383,8 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
       />,
     );
     const cards = regionCards();
+    // TM7: single Global card (was 2 with the Australia card).
+    expect(cards).toHaveLength(1);
     // the signals panel is the emphasized, always-open module — no toggle
     expect(cards[0]!.querySelector('[data-ei-rule-toggle]')).toBeNull();
     const globalPanel = cards[0]!.querySelector('[data-ei-panel]') as HTMLElement | null;
@@ -489,36 +398,9 @@ describe('fidelity round §7 — the closing panels (round 3: rule behind a low-
     expect(globalPanel!.querySelector('[data-attention-bullets]')).not.toBeNull();
     // the raised market signal bullet rides with its numbers
     expect(globalPanel!.textContent).toContain('4');
-    // Australia: the SAME box with its OWN scope (the world signals stay
-    // Global-scope) — the areas, not the rule toggle
-    expect(cards[1]!.querySelector('[data-ei-rule-toggle]')).toBeNull();
-    const auPanel = cards[1]!.querySelector('[data-ei-panel]') as HTMLElement | null;
-    expect(auPanel!.getAttribute('data-ei-panel-kind')).toBe('signals');
-    expect(auPanel!.querySelector('[data-ei-panel-heading]')!.textContent).toContain(
-      insightsCopyEn.ui.australiaSignalsTitle,
-    );
-    expect(auPanel!.querySelectorAll('[data-ei-area-step]')).toHaveLength(5); // + the two S5-M5.2 shadow lanes
-  });
-
-  it('fa: the Australia signals box speaks Persian (heading, state words, fa digits, named indicators)', () => {
-    renderHero(insightsCopyFa, 'fa-IR');
-    const au = regionCards()[1]!;
-    const panel = au.querySelector('[data-ei-panel]') as HTMLElement | null;
-    expect(panel!.getAttribute('data-ei-panel-kind')).toBe('signals');
-    const heading = panel!.querySelector('[data-ei-panel-heading]')!;
-    expect(heading.textContent).toContain(insightsCopyFa.ui.australiaSignalsTitle);
-    const raised = Array.from(panel!.querySelectorAll('button[data-ei-area-step]')) as HTMLElement[];
-    expect(raised).toHaveLength(2);
-    expect(raised[0]!.textContent).toContain(insightsCopyFa.groupShort['au-inflation-rates']);
-    expect(raised[0]!.textContent).toContain(insightsCopyFa.label.alarmed);
-    // R22 + 2026-10-21c: the named indicator and its value render in
-    // Persian (fa digits through num()/formatIndicatorValue), and the
-    // "and {n} more" tail speaks Persian too.
-    expect(raised[0]!.textContent).toContain(insightsCopyFa.indicators['au-cpi'].name);
-    expect(raised[0]!.textContent).toContain('۴٫۴٪');
-    expect(raised[0]!.textContent).toContain('و ۱ شاخص دیگر');
-    expect(raised[0]!.textContent).not.toContain('3 of 3');
-    expect(raised[0]!.textContent).not.toContain('4.4%');
+    // TM7: the Australia signals box moved to /australia — only the
+    // Global signals panel renders in the hero now.
+    expect(document.querySelector('[data-region-card="australia"]')).toBeNull();
   });
 
   it('fa: the rule fallback (Global without feeds) still speaks Persian', () => {
@@ -595,27 +477,6 @@ describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
     expect(document.querySelector('[data-stale-badge]')).toBeNull();
   });
 
-  it('stale members → the Australia card carries the badge with n and total', () => {
-    render(
-      <HeroBlock
-        readings={withRbaStale}
-        copy={insightsCopyEn}
-        numberLocale="en-US"
-        onJumpSection={noop}
-        onFocusCard={noop}
-      />,
-    );
-    const cards = regionCards();
-    const auCard = within(cards[1]! as HTMLElement);
-    const badge = auCard.getByText('readings out of date', { exact: false });
-    // The AU gauges have 26 members total (16 voters + the 7 S5-M5.2 shadow members + the 3 S6-M6.1 NZ-link members); the three RBA readings are stale.
-    expect(badge.textContent).toContain('3');
-    expect(badge.textContent).toContain('26');
-    // Global has no stale members in this fixture → its card carries none.
-    const globalCard = within(cards[0]! as HTMLElement);
-    expect(globalCard.queryByText('readings out of date', { exact: false })).toBeNull();
-  });
-
   it('the badge counts only STALE members — unavailable readings never trigger it', () => {
     const withUnavailable = READINGS.map((r) =>
       r.id === 'au-10y' ? { ...r, status: 'unavailable' as const, value: null, asOf: null } : r,
@@ -632,19 +493,4 @@ describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
     expect(document.querySelector('[data-stale-badge]')).toBeNull();
   });
 
-  it('fa: the badge speaks Persian with fa-IR digits', () => {
-    render(
-      <HeroBlock
-        readings={withRbaStale}
-        copy={insightsCopyFa}
-        numberLocale="fa-IR"
-        onJumpSection={noop}
-        onFocusCard={noop}
-      />,
-    );
-    const cards = regionCards();
-    const auCard = within(cards[1]! as HTMLElement);
-    // «۳ مورد از ۲۳ قرائت قدیمی است» — the fa copy with Persian digits.
-    expect(auCard.getByText('قرائت قدیمی است', { exact: false }).textContent).toContain('۲۶');
-  });
 });
