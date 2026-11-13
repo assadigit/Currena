@@ -26,6 +26,10 @@ import type { PageProjection } from '@currena/core';
 import { useI18n } from '../../lib/locale';
 import { interpolate } from '../../i18n';
 import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../lib/page-division';
+import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
+import type { InsightsSnapshot } from '@currena/core';
+import { Signals } from '../../components/insights/Signals';
+import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
@@ -39,6 +43,27 @@ type ProjectionState =
 
 export function GoldPage(): React.JSX.Element {
   const { t, locale } = useI18n();
+  // TM13: the Signals section (the gold + silver verdict strip with the
+  // price-trend chart + range buttons) moved from /insights. The Signals
+  // component reads the full insights snapshot's readings (the gold-balance
+  // conditions + the signal evaluations). Boot from the last-good cache
+  // (instant), refresh in background — the same M-17 discipline.
+  const { copy, numberLocale } = useInsightsCopy();
+  const [insightsSnapshot, setInsightsSnapshot] = useState<InsightsSnapshot | null>(() => {
+    try {
+      return readCachedSnapshot();
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchInsightsSnapshot(controller.signal).then((s) => {
+      if (controller.signal.aborted || s === null) return;
+      setInsightsSnapshot(s);
+    });
+    return () => controller.abort();
+  }, []);
 
   /* ---------------- the projection (the S2 contract) ---------------- */
   const [state, setState] = useState<ProjectionState>(() => {
@@ -177,6 +202,22 @@ export function GoldPage(): React.JSX.Element {
 
       {/* D-26 item 1 — the hero. */}
       {hero !== null ? <GoldHero hero={hero} pricesAsOf={projection?.pricesAsOf} /> : null}
+
+      {/* TM13: the Signals section (the gold + silver verdict strip with the
+          price-trend chart + range buttons) — moved from /insights. Shows
+          the gold verdict card (the outlook sentence, the 3m/1y/5y/10y
+          trend chart, the delta) + the silver verdict card. Renders
+          nothing when the insights snapshot isn't loaded yet. */}
+      {insightsSnapshot !== null ? (
+        <div className="mt-3 sm:mt-5" data-gold-signals>
+          <Signals
+            readings={insightsSnapshot.readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            expandToken={0}
+          />
+        </div>
+      ) : null}
 
       {/* D-26 item 2 — the 37 seats, grouped by the five lanes. */}
       <div className="mt-3 sm:mt-5">

@@ -594,22 +594,9 @@ export function Insights() {
             expandToken={togetherToken}
           />
 
-          {/* S1–S3 + R26: "What the signals say" — the merged card, collapsed
-           * default. GB-S6 (P5): the consolidated lane balance is THE
-           * gold card for every visitor. OI-3/GB-S7 (2026-11-04, the
-           * owner's recorded approval): the goldSummary wire field
-           * retired with the cleanup — the snapshot no longer carries it
-           * at all (the UI never read it since the flip — AC-9 held). */}
-          {SIGNALS_ENABLED ? (
-            <section id="insights-signals-wrap" className="scroll-mt-24">
-              <Signals
-                readings={state.snapshot.readings}
-                copy={copy}
-                numberLocale={numberLocale}
-                expandToken={signalsToken}
-              />
-            </section>
-          ) : null}
+          {/* TM13: the Signals section (the gold + silver verdict strip with
+           * the price-trend chart + range buttons) was moved to /gold.
+           * It no longer renders on /insights. */}
 
           {/* L1–L4 + R7 → round 33 (owner): both dedicated sections render
            * stacked — Global first (D7), then Australia — each wearing its
