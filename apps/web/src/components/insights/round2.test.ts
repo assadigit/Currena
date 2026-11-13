@@ -29,6 +29,7 @@ import {
   AUSTRALIA_LANE_MOVED_IDS,
   USA_LANE_MOVED_IDS,
   EUROPE_LANE_MOVED_IDS,
+  ASIA_GOLD_RESERVE_LANE_MOVED_IDS,
   HIDDEN_FROM_LANE_IDS,
   SUBHEADING_SECTIONS,
   attentionTiles,
@@ -835,16 +836,17 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
     // gap-closure S2-M2.4: nyfed-custody is the third one-surface case — a
     // context reading owned by the "Who holds US government debt" section's
     // slot (rendered below the TicSection), never by its lane group.
-    expect(HIDDEN_FROM_LANE_IDS.size).toBe(new Set([...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, 'nyfed-custody' as const]).size);
-    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, 'nyfed-custody' as const]) {
+    expect(HIDDEN_FROM_LANE_IDS.size).toBe(new Set([...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS, 'nyfed-custody' as const]).size);
+    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS, 'nyfed-custody' as const]) {
       expect(HIDDEN_FROM_LANE_IDS.has(id)).toBe(true);
     }
     // No lane-only reading accidentally joined the hidden set.
     expect(HIDDEN_FROM_LANE_IDS.has('gold-silver')).toBe(false);
-    // au-cpi IS hidden (TM7); fed-target IS hidden (TM10); ecb-dfr IS hidden (TM15 — moved to /europe).
+    // au-cpi IS hidden (TM7); fed-target IS hidden (TM10); ecb-dfr IS hidden (TM15); jgb-10y IS hidden (TM16).
     expect(HIDDEN_FROM_LANE_IDS.has('au-cpi')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('fed-target')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('ecb-dfr')).toBe(true);
+    expect(HIDDEN_FROM_LANE_IDS.has('jgb-10y')).toBe(true);
   });
 
   it('R9-04 + R9-07: every hidden id is a REAL definition whose section is global (no phantom ids)', () => {

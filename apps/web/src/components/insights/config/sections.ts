@@ -179,12 +179,31 @@ export const EUROPE_LANE_MOVED_IDS: readonly IndicatorId[] = [
 ];
 
 /**
+ * TM16 (the Asia + Gold + Reserve migration): the remaining indicators
+ *  whose placement homes are /asia-pacific, /gold, or /currencies are
+ *  hidden from the /insights lane. 5 Asia ids (jgb-10y, boj-rate,
+ *  china-pmi, oecd-cli-cn, china-cpi), 2 Gold ids (cftc-gold-positioning,
+ *  cftc-gold-gross-long), and 1 reserve-share id (usd-reserve-share, the
+ *  dollar's share of world reserves — placement home /currencies, read by
+ *  the USA page's dedollar tile). They live on their dedicated pages now.
+ */
+export const ASIA_GOLD_RESERVE_LANE_MOVED_IDS: readonly IndicatorId[] = [
+  // Asia-Pacific (Japan + China)
+  'jgb-10y', 'boj-rate', 'china-pmi', 'oecd-cli-cn', 'china-cpi',
+  // Gold (CFTC positioning)
+  'cftc-gold-positioning', 'cftc-gold-gross-long',
+  // Dollar reserve share (placement home /currencies, read by /usa)
+  'usd-reserve-share',
+];
+
+/**
  * R9-04 + R9-07: ids rendered in a special container instead of their
  * lane group — the QuestionGroup filter skips them so no card renders
  * twice. (Companion-ONLY ids are separate — they always ride a parent.)
  * TM7: the 39 AU ids moved to /australia.
  * TM10: the 72 USA ids moved to /usa.
  * TM15: the 8 Europe ids moved to /europe.
+ * TM16: the 8 Asia/Gold/Reserve ids moved to /asia-pacific, /gold, /currencies.
  */
 export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   ...DOLLAR_STRENGTH_IDS,
@@ -192,6 +211,7 @@ export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorI
   ...AUSTRALIA_LANE_MOVED_IDS,
   ...USA_LANE_MOVED_IDS,
   ...EUROPE_LANE_MOVED_IDS,
+  ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS,
   'nyfed-custody',
 ]);
 
