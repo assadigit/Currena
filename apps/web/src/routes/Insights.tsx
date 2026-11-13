@@ -57,7 +57,6 @@ import { NextUpStrip } from '../components/insights/NextUpStrip';
 import { PricesBoard } from '../components/insights/PricesBoard';
 import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
-import { WorldMarkets } from '../components/insights/WorldMarkets';
 import { AustralianMarkets } from '../components/insights/AustralianMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
 import { WorldCurrencies } from '../components/insights/WorldCurrencies';
@@ -554,24 +553,13 @@ export function Insights() {
             onFocusCard={focusCard}
           />
 
-          {/* World stock markets (insights-world-markets-spec.md §6.2):
-           * right after the commodity prices — both answer "what is moving";
-           * never above the verdict or alerts. Self-contained feed: its own
-           * loading/empty states, never an error surface for the page.
-           * PUBLIC MODE: rides the generated overrides file — the markets
-           * board is PUBLIC since the 2026-10-18b owner directive (the
-           * owner's own EODHD key backs it); the fx twin below stays
-           * licence-hidden. */}
-          {marketsFeedEnabled && (
-            <WorldMarkets
-              state={marketsState}
-              copy={copy}
-              locale={locale}
-              numberLocale={numberLocale}
-              narrativeUnit={narrativeDoc?.sections['world-markets']}
-              narrativeVisible={narrativeVisible}
-            />
-          )}
+          {/* World stock markets: REMOVED from /insights (TM9) — every world
+           * index (S&P 500, Nikkei, DAX, … the full 16) now lives on the
+           * dedicated /world-markets page (the treemap + the regional grid
+           * tiles + the briefing). The markets FEED stays (the hero's
+           * marketsAlert + the section indicators + the CSV download still
+           * read it); only the display section is gone. The hero's
+           * "jump to markets" navigates to /world-markets. */}
 
           {/* R10-3 (2026-10-28) — the global companies table behind a
            * feature flag (OFF by default). The owner's R9-09 directive

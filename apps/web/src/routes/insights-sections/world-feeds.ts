@@ -23,6 +23,7 @@ import { fetchFxSnapshot, readCachedFx } from '../../lib/fx';
 import { fetchNarrativeDoc, readCachedNarrative } from '../../lib/narrative';
 import type { NarrativeDoc } from '../../lib/narrative';
 import { fetchTicSnapshot, readCachedTic } from '../../lib/tic';
+import { navigate } from '../../router';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
 import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
@@ -84,8 +85,11 @@ export function useWorldMarketsSection(copy: InsightsCopy, enabled = true) {
     };
   }, [marketsState]);
 
+  // TM9: the world-markets section was removed from /insights (every index
+  // moved to the dedicated /world-markets page). The jump now navigates to
+  // /world-markets instead of scrolling to the retired section anchor.
   const jumpToMarkets = useCallback(() => {
-    document.getElementById('insights-markets')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    navigate('/world-markets');
   }, []);
 
   // The world-markets table export (spec §6.4: the table's CSV lives in the
