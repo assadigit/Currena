@@ -131,18 +131,49 @@ export const AUSTRALIA_LANE_MOVED_IDS: readonly IndicatorId[] = [
 ];
 
 /**
+ * TM10 (the USA migration): every USA-related indicator has moved to the
+ * /usa page. The 72 ids whose placement home is /usa (all have registry
+ * section 'global' but belong to the USA thematic tiers) are hidden from
+ * the /insights lane so no USA card renders here — they live on /usa as
+ * tier cards (5 tiers). The readings still ride the full snapshot so the
+ * hero verdicts, gauge counts and calendar targets that read USA ids keep
+ * working. (8 of these were already in US_GLOBAL_REACH_IDS + nyfed-custody
+ * was already listed — the Set deduplicates.)
+ */
+export const USA_LANE_MOVED_IDS: readonly IndicatorId[] = [
+  // tier-1-world-watches
+  'fed-target', 'fed-expectations', 'us-cpi-yoy', 'us-pce-core-yoy', 'us-nfp', 'us-unemployment', 'us10y',
+  // tier-2-rates-fed
+  'yield-curve-10y2y', 'yield-curve-10y3m', 'real-yield-10y', 'real-yield-5y', 'real-curve-10y5y',
+  'us30y', 'us-2y', 'sofr', 'mortgage-30y', 'nyfed-custody',
+  'us-deficit-monthly', 'us-deficit-12m', 'treasury-auction-10y', 'treasury-auction-10y-indirect',
+  'treasury-auction-30y', 'treasury-auction-30y-indirect', 'rstar-us', 'debt-to-gdp', 'govt-interest-revenue',
+  // tier-3-inflation
+  'us-cpi-core-yoy', 'median-cpi', 'sticky-cpi', 'us-wages', 't5yie',
+  'breakeven-5y5y', 'breakeven-10y', 'breakeven-tilt', 'cpi-nowcast', 'cpi-surprise',
+  'michigan-5y-expectations', 'michigan-1y-expectations',
+  // tier-4-labor-growth
+  'initial-jobless-claims', 'continuing-claims', 'job-openings', 'sahm-rule', 'recession-probability',
+  'michigan-sentiment', 'oecd-cli-us', 'philly-fed', 'empire-state', 'cfnai',
+  'gdpnow', 'us-gdp-growth', 'retail-sales', 'housing-permits', 'epu-us', 'tpu-us', 'm2-us',
+  // tier-5-liquidity-stress-valuation
+  'walcl', 'tga', 'reverse-repo', 'bank-reserves', 'repo-stress', 'net-liquidity',
+  'stress-stlfsi', 'nfci', 'vix', 'bank-stress', 'ebp', 'ofr-fsi',
+  'sloos-ci-tightening', 'term-premium-10y', 'shiller-cape', 'shiller-ecy', 'sp500-breadth-ratio',
+];
+
+/**
  * R9-04 + R9-07: ids rendered in a special container instead of their
  * lane group — the QuestionGroup filter skips them so no card renders
  * twice. (Companion-ONLY ids are separate — they always ride a parent.)
- * gap-closure S2-M2.4: nyfed-custody renders inside the "Who holds US
- * government debt" section (the ticSlot composition in Insights.tsx),
- * not in the borrowing-costs lane — one reading, one surface.
- * TM7: the 39 AU ids are hidden too — they've moved to /australia.
+ * TM7: the 39 AU ids moved to /australia.
+ * TM10: the 72 USA ids moved to /usa.
  */
 export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   ...DOLLAR_STRENGTH_IDS,
   ...US_GLOBAL_REACH_IDS,
   ...AUSTRALIA_LANE_MOVED_IDS,
+  ...USA_LANE_MOVED_IDS,
   'nyfed-custody',
 ]);
 

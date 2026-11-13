@@ -667,29 +667,6 @@ export function Insights() {
             narrativeBySection={narrativeDoc?.sections}
             narrativeVisible={narrativeVisible}
             locale={locale}
-            ticSlot={
-              <>
-                <TicSection
-                  state={ticState}
-                  copy={copy}
-                  locale={locale}
-                  numberLocale={numberLocale}
-                />
-                {/* gap-closure S2-M2.4: the weekly custody card (FRED
-                 * WSEFINTL1) — the standard indicator card that closes the
-                 * TIC section: weekly and current beside the ~6–7-week-lag
-                 * country table, no country split (the card's own copy says
-                 * so). One row, the lane's own anatomy. */}
-                <TicCustodyCard
-                  reading={custodyReading}
-                  copy={copy}
-                  numberLocale={numberLocale}
-                  onOpenDetails={openDetails}
-                  pinned={pinned.has('nyfed-custody')}
-                  peers={dailyPeers}
-                />
-              </>
-            }
             australiaSlot={
               <>
                 {/* gap-closure S5-M5.4: the Australian markets board sits at

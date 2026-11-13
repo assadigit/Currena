@@ -23,7 +23,6 @@ import {
   type StatusFilter,
 } from '../../components/insights/config';
 import { num, QuestionGroup } from './QuestionGroup';
-import { UsGlobalReachGroup } from './UsGlobalReachGroup';
 import { NarrativeBlock } from '../../components/insights/NarrativeBlock';
 import { InTheNews } from '../../components/insights/InTheNews';
 import type { NarrativeUnit } from '../../lib/narrative';
@@ -253,25 +252,16 @@ export function SectionLane({
                     searchActive={searchActive}
                     subheading={SUBHEADING_SECTIONS.has(sec)}
                   />
-                  {/* gap-closure S2-M2.4: the foreign-holders section sits
-                   * directly after the borrowing-costs gauge group — the
-                   * spec's placement (the owner's top-priority feature). */}
-                  {sec === 'global' && group === 'borrowing-costs' && ticSlot !== undefined ? ticSlot : null}
+                  {/* TM10: the ticSlot (TicSection "Who holds US government
+                   * debt" + TicCustodyCard) was CUT from /insights — the /usa
+                   * page already shows both via UsaTicSection ("Who finances
+                   * America", same drawing, own feed). */}
                 </Fragment>
               ))}
-              {/* R9-07: the US-global-reach container — the nine US-based
-               * indicators that move world markets, with their generated
-               * analytical brief — closes the Global section. */}
-              {sec === 'global' ? (
-                <UsGlobalReachGroup
-                  snapshot={snapshot}
-                  copy={copy}
-                  numberLocale={numberLocale}
-                  onOpenDetails={openDetails}
-                  pinned={pinned}
-                  renderableIds={sectionIds}
-                />
-              ) : null}
+              {/* TM10: the UsGlobalReachGroup (the 9 US-based indicators that
+               * move world markets + the analytical brief) was CUT from
+               * /insights — the 8 USA ids live on /usa, euro-hicp lives on
+               * /europe. The container is retired. */}
               {/* 2026-10-29 owner round: the AUSTRALIA section's closing
                * slot — the "what it means for my money" panel (Australian
                * household costs) lives INSIDE its region's container now. */}
