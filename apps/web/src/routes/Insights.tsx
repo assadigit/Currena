@@ -456,20 +456,11 @@ export function Insights() {
            * card (R4) returns here and the raised world-section bullets +
            * section indicators ride the Global card again. The v3 data
            * layer (readings, state words, delayed tier) feeds it unchanged. */}
-          <div id="insights-hero" className="scroll-mt-24">
-            <HeroBlock
-              readings={state.snapshot.readings}
-              copy={copy}
-              numberLocale={numberLocale}
-              onJumpSection={jumpToSection}
-              onFocusCard={focusCard}
-              marketsAlert={marketsAlert}
-              onJumpMarkets={jumpToMarkets}
-              fxAlert={fxAlert}
-              onJumpFx={jumpToFxCurrencies}
-              sectionIndicators={sectionIndicators}
-            />
-          </div>
+          {/* TM14: the hero (HeroBlock — the Global verdict card + the
+           * biggest-move card) was removed from /insights. The verdict
+           * gauges live on / (GlobalPage's GlobalBoard); the biggest move
+           * + the top movers live on / too. The /insights page now starts
+           * with the narrative (if visible) + the JumpNav + the lane. */}
 
           {/* Layer-2 narrator (M5, spec §11): the overall plain-language
            * narrative, anchored to the page's existing top verdict(s). The
@@ -505,26 +496,11 @@ export function Insights() {
            * pills grew and WRAP, and the TOP-5 CHANGES strip rides inside
            * the sticky bar under them (the page's fastest "what is moving"
            * answer, never scrolled away). */}
-          <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate}>
-            <TopMoversStrip
-              readings={state.snapshot.readings}
-              copy={copy}
-              numberLocale={numberLocale}
-              onFocusCard={focusCard}
-            />
-          </JumpNav>
+          <JumpNav targets={jumpTargets} copy={copy} onWillNavigate={onWillNavigate} />
 
-          {/* R10: the prices strip — four identical tiles. Gold Program
-           * S2.1: the gold panels MOVED to the signals card (under the
-           * balance — the owner's placement directive); the strip is the
-           * four price tiles again. */}
-          <PricesBoard
-            readings={state.snapshot.readings}
-            copy={copy}
-            locale={locale}
-            numberLocale={numberLocale}
-            onFocusCard={focusCard}
-          />
+          {/* TM14: the PricesBoard (gold/silver/oil/bitcoin price cards) was
+           * removed from /insights — every commodity price card now lives on
+           * /commodities (the PriceTile template with the timeframe selector). */}
 
           {/* World stock markets: REMOVED from /insights (TM9) — every world
            * index (S&P 500, Nikkei, DAX, … the full 16) now lives on the
@@ -655,13 +631,10 @@ export function Insights() {
            * provider, from the audit sidecar), the tappable stale/unavailable
            * card list, the rule-version line and the contact line; the
            * listed cards open via the route's focusCard. */}
-          <AboutTheData
-            copy={copy}
-            expandToken={aboutToken}
-            snapshot={state.snapshot}
-            numberLocale={numberLocale}
-            onFocusCard={focusCard}
-          />
+          {/* TM14: the AboutTheData section (the sources table, the update
+           * schedule, the warning-levels explanation, the disclaimer) was
+           * removed from /insights. The sources are saved in a GitHub
+           * document (docs/SOURCES.md). */}
         </div>
       ) : null}
 

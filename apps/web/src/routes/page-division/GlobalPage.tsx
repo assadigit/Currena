@@ -38,6 +38,8 @@ import type { InsightsSnapshot, CalendarEvent, IndicatorId } from '@currena/core
 import { homePageOfIndicator } from '@currena/insights/page-division';
 import type { MarketsSnapshot, FxSnapshot } from '@currena/core';
 import { GlobalBoard, NarratorLine, RegionChips } from './GlobalBoard';
+import { BiggestMoveCard } from '../../components/insights/HeroBlock';
+import { TopMoversStrip } from '../../components/insights/TopMoversStrip';
 import { NextUpStrip } from '../../components/insights/NextUpStrip';
 import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
 import { navigate } from '../../router';
@@ -189,10 +191,15 @@ export function GlobalPage(): React.JSX.Element {
   });
   useEffect(() => {
     const controller = new AbortController();
-    void fetchInsightsSnapshot(controller.signal).then((s) => {
-      if (controller.signal.aborted || s === null) return;
-      setSnapshot(s);
-    });
+    void fetchInsightsSnapshot(controller.signal)
+      .then((s) => {
+        if (controller.signal.aborted) return;
+        setSnapshot(s);
+      })
+      .catch(() => {
+        /* honest absence — the calendar/biggest-move/top-movers don't
+         * render until a snapshot arrives; a failed fetch stays null */
+      });
     return () => controller.abort();
   }, []);
   const calendar: readonly CalendarEvent[] = snapshot?.calendar ?? [];
@@ -372,6 +379,28 @@ export function GlobalPage(): React.JSX.Element {
       <div className="mt-1.5 sm:mt-3.5 lg:mt-4">
         <NarratorLine doc={narrative} preview={narrativePreview} />
       </div>
+
+      {/* TM14: the biggest current move + the top movers strip — moved from
+          /insights hero. The biggest move shows the indicator with the
+          largest 30-day change; the top movers show the top 5. Both read
+          the full insights snapshot's readings. A tap navigates to the
+          indicator's placement home. */}
+      {snapshot !== null ? (
+        <div className="mt-1.5 sm:mt-3.5 lg:mt-4">
+          <BiggestMoveCard
+            readings={snapshot.readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onFocusCard={onFocusEventCard}
+          />
+          <TopMoversStrip
+            readings={snapshot.readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onFocusCard={onFocusEventCard}
+          />
+        </div>
+      ) : null}
 
       {/* TM11: the upcoming-events calendar (رویدادهای پیش رو) — moved from
           /insights. Shows the next 5 economic events (Fed meetings, CPI

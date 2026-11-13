@@ -372,3 +372,57 @@ export function HeroBlock({
     </section>
   );
 }
+
+/**
+ * BiggestMoveCard — the "biggest current move" card (R4), extracted from
+ * the hero so the GlobalPage can render it standalone. Shows the indicator
+ * with the largest 30-day change (|z| ≥ 2), its signed change, and the
+ * reason line. TM14: moved from /insights hero to / (GlobalPage).
+ */
+export function BiggestMoveCard({
+  readings,
+  copy,
+  numberLocale,
+  onFocusCard,
+}: {
+  readings: readonly IndicatorReading[];
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+  onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
+}): React.JSX.Element | null {
+  const mover = useMemo(() => bigMovers(readings, 1)[0] ?? null, [readings]);
+  const moverEntry = mover ? copy.indicators[mover.id] : null;
+  const moverReading = mover ? readings.find((r) => r.id === mover.id) : null;
+  const moverChange =
+    mover && moverReading
+      ? formatChangeParts(mover.change30d, mover.changeKind, numberLocale, copy.units)
+      : null;
+  const moverTone = mover ? changeToneClass(mover.change30d) : '';
+  if (!mover || !moverReading || !moverEntry || !moverChange) return null;
+  return (
+    <div className="mt-3 rounded-[var(--radius-lg)] bg-[var(--color-surface)] px-4 py-3 ring-1 ring-[var(--color-border)]" data-biggest-move>
+      <p className="m-0 mb-1 flex items-center gap-1.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-tertiary)]">
+        <TrendingUp aria-hidden="true" size={16} strokeWidth={1.8} className="shrink-0 text-[var(--color-text-secondary)]" />
+        {copy.ui.bigMoverTitle}
+      </p>
+      <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+        <button
+          type="button"
+          onClick={() => onFocusCard(mover.id)}
+          className="insights-focusable -ms-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 py-0.5 font-bold text-[var(--color-text-primary)] underline decoration-[var(--color-border)] underline-offset-4 transition-colors hover:decoration-[var(--color-text-secondary)]"
+        >
+          {moverEntry.name}
+        </button>
+        <bdi dir="ltr" className={`type-number shrink-0 font-bold tabular-nums ${moverTone || 'text-[var(--color-text-primary)]'}`}>
+          {moverChange.value}
+        </bdi>
+        {moverChange.unit !== null ? (
+          <span className="shrink-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">{moverChange.unit}</span>
+        ) : null}
+        <span className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{copy.ui.days30}</span>
+        <span>{copy.ui.bigMoverReason}</span>
+        <span className="sr-only">{consequenceLine(moverReading, moverEntry, false, bandWordsOf(copy))}</span>
+      </p>
+    </div>
+  );
+}
