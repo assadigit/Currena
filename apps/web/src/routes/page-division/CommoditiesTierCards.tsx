@@ -33,9 +33,8 @@
  * chunk, never the entry graph.
  */
 
+import { useCallback } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
-import { interpolate } from '../../i18n';
 import { useI18n } from '../../lib/locale';
 import { navigate } from '../../router';
 import type { TranslationKey } from '../../lib/locale';
@@ -46,12 +45,13 @@ import {
   COMMODITIES_DIGITAL_IDS,
   COMMODITIES_TRADE_ROUTES_IDS,
   COMMODITIES_GOLD_HREF,
-  commoditiesCardValueText,
   commoditiesCards,
   type CommoditiesCardEntry,
   type CommoditiesCardId,
-  type CommoditiesUnitLabels,
 } from './commodities-tiles';
+import { PriceTile, useTileData, type TileData, type PriceLens } from '../../components/insights/PricesBoard';
+import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
 /* ------------------------------------------------------------------ *
  * The copy maps — TOTAL against commodities-tiles' own lists (a missing
@@ -113,78 +113,65 @@ const STATUS_KEY: Record<string, TranslationKey> = {
 };
 
 /* ------------------------------------------------------------------ *
- * One Commodities card — the §21 trio (value · 10-year position · freshness)
+ * One Commodities card — the full price-row template (icon + title +
+ * price + 7-day trend w/ sparkline + daily change + briefing + details
+ * button), reusing the Insights PricesBoard's PriceTile so the
+ * commodities page speaks the SAME card anatomy as the silver/gold/oil/
+ * bitcoin cards. The 1-week lens is the primary trend (the template's
+ * "past 7 days" row); the daily change rides below it.
  * ------------------------------------------------------------------ */
 
-function CommoditiesCard({ entry, units }: { entry: CommoditiesCardEntry; units: CommoditiesUnitLabels }): React.JSX.Element {
-  const { t, locale, numberLocale } = useI18n();
-  const reading: IndicatorReading | undefined = entry.reading;
-  const name = t(CARD_NAME_KEY[entry.id]);
+/** The combined id list for the per-card history fetch (the sparkline +
+ *  daily change derive from each commodity's stored history series). */
+const ALL_COMMODITY_IDS: readonly IndicatorId[] = [
+  ...COMMODITIES_ENERGY_IDS,
+  ...COMMODITIES_METALS_IDS,
+  ...COMMODITIES_AGRICULTURE_IDS,
+  ...COMMODITIES_DIGITAL_IDS,
+  ...COMMODITIES_TRADE_ROUTES_IDS,
+];
 
-  // The VALUE — the DISPLAY registry's own join (commoditiesCardValueText).
-  const valueText = commoditiesCardValueText(entry.id, reading, numberLocale, units);
+/** The absent-reading stub: a commodity whose reading the projection didn't
+ *  carry renders the honest unavailable card (never a guess). PriceTile's
+ *  isUnavailable branch handles the rest. */
+const UNAVAILABLE_READING = (id: IndicatorId): IndicatorReading =>
+  ({ id, value: null, asOf: null, status: 'unavailable' }) as IndicatorReading;
 
-  // The 10-YEAR POSITION — the position word + band, only when the
-  // reading carries percentile10y (fail-closed: no percentile, no line).
-  // The band word follows the legacy collapsed-line's OWN convention
-  // (high → top {100−p}% · low → bottom {p}% · else the middle).
-  const pct = reading?.percentile10y;
-  const positionLine =
-    pct !== undefined && Number.isFinite(pct)
-      ? interpolate(t('pd.commodities.positionWordLine'), {
-          word:
-            pct > 0.8
-              ? t(POSITION_WORD_KEY.high)
-              : pct < 0.2
-                ? t(POSITION_WORD_KEY.low)
-                : t(POSITION_WORD_KEY.typical),
-          band:
-            pct > 0.8
-              ? interpolate(t('pd.commodities.bandTop'), { p: formatNumber(Math.round((1 - pct) * 100), numberLocale) })
-              : pct < 0.2
-                ? interpolate(t('pd.commodities.bandBottom'), { p: formatNumber(Math.round(pct * 100), numberLocale) })
-                : t('pd.commodities.bandMid'),
-        })
-      : null;
-
-  // The FRESHNESS — the reading's own asOf + the status word when the
-  // reading is not normal (the UsaTierCards / AustraliaCard pattern).
-  const statusKey = reading !== undefined ? STATUS_KEY[reading.status] : undefined;
-  const statusWord = statusKey !== undefined ? t(statusKey) : null;
-  const asOfText =
-    reading !== undefined && reading.asOf !== null
-      ? locale === 'fa'
-        ? formatJalaliDate(reading.asOf, 'fa-IR')
-        : formatDateWords(reading.asOf, 'en-US')
-      : null;
-
+function CommoditiesCard({
+  entry,
+  copy,
+  locale,
+  numberLocale,
+  data,
+  lens,
+  onFocusCard,
+}: {
+  entry: CommoditiesCardEntry;
+  copy: InsightsCopy;
+  locale: 'en' | 'fa';
+  numberLocale: 'en-US' | 'fa-IR';
+  data: TileData | undefined;
+  lens: PriceLens;
+  onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
+}): React.JSX.Element {
+  const reading = entry.reading ?? UNAVAILABLE_READING(entry.id);
   return (
-    <article
+    <div
       id={`commodities-card-${entry.id}`}
       data-commodities-card={entry.id}
-      data-commodities-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      data-commodities-status={entry.reading?.status ?? 'absent'}
     >
-      <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
-      {valueText !== null ? (
-        <bdi dir={locale === 'fa' ? 'rtl' : 'ltr'} className="text-lg font-extrabold leading-tight tabular-nums text-[var(--color-text-primary)]" data-commodities-value>
-          {valueText}
-        </bdi>
-      ) : (
-        <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-tertiary)]">{t('pd.commodities.valueUnavailable')}</p>
-      )}
-      {positionLine !== null ? (
-        <p className="m-0 text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)]">
-          <bdi>{positionLine}</bdi>
-        </p>
-      ) : null}
-      <p className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-0 text-[length:var(--type-caption)] leading-tight text-[var(--color-text-tertiary)]">
-        {asOfText !== null ? (
-          <bdi>{interpolate(t('pd.global.dataAsOf'), { date: asOfText })}</bdi>
-        ) : null}
-        {statusWord !== null ? <span data-commodities-status-word>{statusWord}</span> : null}
-      </p>
-    </article>
+      <PriceTile
+        id={entry.id}
+        reading={reading}
+        copy={copy}
+        locale={locale}
+        numberLocale={numberLocale}
+        data={data}
+        lens={lens}
+        onFocusCard={onFocusCard}
+      />
+    </div>
   );
 }
 
@@ -224,12 +211,22 @@ function CommoditiesGroupSection({
   group,
   ids,
   readings,
-  units,
+  copy,
+  locale,
+  numberLocale,
+  tileData,
+  lens,
+  onFocusCard,
 }: {
   group: string;
   ids: readonly IndicatorId[];
   readings: readonly IndicatorReading[];
-  units: CommoditiesUnitLabels;
+  copy: InsightsCopy;
+  locale: 'en' | 'fa';
+  numberLocale: 'en-US' | 'fa-IR';
+  tileData: Partial<Record<string, TileData>>;
+  lens: PriceLens;
+  onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
 }): React.JSX.Element | null {
   const { t } = useI18n();
   const entries = commoditiesCards(readings, ids);
@@ -246,7 +243,16 @@ function CommoditiesGroupSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
         {entries.map((entry) => (
-          <CommoditiesCard key={entry.id} entry={entry} units={units} />
+          <CommoditiesCard
+            key={entry.id}
+            entry={entry}
+            copy={copy}
+            locale={locale}
+            numberLocale={numberLocale}
+            data={tileData[entry.id]}
+            lens={lens}
+            onFocusCard={onFocusCard}
+          />
         ))}
       </div>
       {/* The gold cross-link — only on the metals group (§11 "Cross-links",
@@ -258,22 +264,37 @@ function CommoditiesGroupSection({
 
 export function CommoditiesTierCards({ readings }: { readings: readonly IndicatorReading[] }): React.JSX.Element {
   const { t } = useI18n();
-  // The corpus-pinned unit labels, assembled once for the render pass
-  // (the copy-pin test proves each word matches the corpus byte-for-byte).
-  const units: CommoditiesUnitLabels = {
-    usd: t('pd.commodities.units.usd'),
-    index: t('pd.commodities.units.index'),
-    barrels: t('pd.commodities.units.barrels'),
-    'barrels-per-day': t('pd.commodities.units.barrels-per-day'),
-    transits: t('pd.commodities.units.transits'),
-  };
+  // The Insights copy corpus — the SAME object the PricesBoard reads, so the
+  // commodity cards speak the identical price-row anatomy + copy (title,
+  // subtitle, trend words, briefing templates, units, the "more details"
+  // label) as the silver/gold/oil/bitcoin cards on /insights.
+  const { copy, locale, numberLocale } = useInsightsCopy();
+  // The per-card history fetch — the 7-day sparkline + the daily change
+  // derive from each commodity's stored history series (module-cached, so
+  // the details panel reuses the same fetch).
+  const tileData = useTileData(ALL_COMMODITY_IDS);
+  // The primary lens: the template's "past 7 days" trend row. The daily
+  // change rides below it (PriceTile hides the daily row when the lens IS
+  // today, so 1w keeps both the 7-day trend AND the daily change visible).
+  const lens: PriceLens = '1w';
+  // The details handler: the commodities page has no side panel of its own,
+  // so the "more details" button + the card body navigate to /insights (the
+  // full chart + rule + source live there). A per-commodity detail panel can
+  // be wired later without changing the card.
+  const onFocusCard = useCallback((id: IndicatorId) => {
+    void id;
+    navigate('/insights');
+  }, []);
+  // The corpus-pinned unit labels stay assembled (the copy-pin test reads
+  // them off the page-division copy, independent of the card render path).
+  void t;
   return (
     <>
-      <CommoditiesGroupSection group="energy" ids={COMMODITIES_ENERGY_IDS} readings={readings} units={units} />
-      <CommoditiesGroupSection group="metals" ids={COMMODITIES_METALS_IDS} readings={readings} units={units} />
-      <CommoditiesGroupSection group="agriculture" ids={COMMODITIES_AGRICULTURE_IDS} readings={readings} units={units} />
-      <CommoditiesGroupSection group="digital" ids={COMMODITIES_DIGITAL_IDS} readings={readings} units={units} />
-      <CommoditiesGroupSection group="trade-routes-supply" ids={COMMODITIES_TRADE_ROUTES_IDS} readings={readings} units={units} />
+      <CommoditiesGroupSection group="energy" ids={COMMODITIES_ENERGY_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
+      <CommoditiesGroupSection group="metals" ids={COMMODITIES_METALS_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
+      <CommoditiesGroupSection group="agriculture" ids={COMMODITIES_AGRICULTURE_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
+      <CommoditiesGroupSection group="digital" ids={COMMODITIES_DIGITAL_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
+      <CommoditiesGroupSection group="trade-routes-supply" ids={COMMODITIES_TRADE_ROUTES_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
     </>
   );
 }

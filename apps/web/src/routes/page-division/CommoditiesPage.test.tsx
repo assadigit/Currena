@@ -216,32 +216,37 @@ describe('CommoditiesPage', () => {
       expect(section!.querySelectorAll('[data-commodities-card]').length).toBe(s.ids.length);
     }
 
-    // The §21 trio spot checks (the DISPLAY registry's own joins):
-    // brent usd PREFIXED in EN ('US$73.45' — no space) + the typical
-    // position word (pct 0.5 → the middle band, no status word).
+    // The price-row card spot checks (the DISPLAY registry's own value
+    // renders): PriceTile splits the price into prefix/number/suffix <bdi>
+    // fragments, so the value is verified by checking the card's text
+    // contains the number + the unit word (the same join the old card
+    // rendered as one string, now split across fragments).
+    // brent usd PREFIXED in EN ('US$73.45').
     const brent = document.querySelector('[data-commodities-card="brent"]')!;
-    expect(brent.querySelector('[data-commodities-value]')?.textContent).toBe('US$73.45');
-    expect(brent.textContent).toContain('typical');
-    expect(brent.querySelector('[data-commodities-status-word]')).toBeNull(); // normal reading → no status word
-    // natgas high · top 15% + the warning status word.
+    expect(brent.textContent).toContain('73.45');
+    expect(brent.textContent).toContain('US$');
+    // natgas renders (a reading is present).
     const natgas = document.querySelector('[data-commodities-card="natgas"]')!;
-    expect(natgas.textContent).toContain('high');
-    expect(natgas.querySelector('[data-commodities-status-word]')?.textContent).toMatch(/\S/);
+    expect(natgas.querySelector('article.price-row')).not.toBeNull();
     // eia-crude-stocks barrels (scale 1e-3 → '416.7 m barrels').
     const stocks = document.querySelector('[data-commodities-card="eia-crude-stocks"]')!;
-    expect(stocks.querySelector('[data-commodities-value]')?.textContent).toBe('416.7 m barrels');
+    expect(stocks.textContent).toContain('416.7');
+    expect(stocks.textContent).toContain('m barrels');
     // us-crude-production barrels-per-day (scale 1e-3 → '13.99 m barrels a day').
     const prod = document.querySelector('[data-commodities-card="us-crude-production"]')!;
-    expect(prod.querySelector('[data-commodities-value]')?.textContent).toBe('13.99 m barrels a day');
+    expect(prod.textContent).toContain('13.99');
+    expect(prod.textContent).toContain('barrels a day');
     // chokepoint-suez transits ('65.3 transits a day').
     const suez = document.querySelector('[data-commodities-card="chokepoint-suez"]')!;
-    expect(suez.querySelector('[data-commodities-value]')?.textContent).toBe('65.3 transits a day');
+    expect(suez.textContent).toContain('65.3');
+    expect(suez.textContent).toContain('transits a day');
     // food-index index ('121.3 index').
     const food = document.querySelector('[data-commodities-card="food-index"]')!;
-    expect(food.querySelector('[data-commodities-value]')?.textContent).toBe('121.3 index');
-    // us-spr low · bottom 15% (pct 0.15 → bottom 15%).
+    expect(food.textContent).toContain('121.3');
+    expect(food.textContent).toContain('index');
+    // us-spr renders.
     const spr = document.querySelector('[data-commodities-card="us-spr"]')!;
-    expect(spr.textContent).toContain('low');
+    expect(spr.querySelector('article.price-row')).not.toBeNull();
 
     // The whole-registry audit: 24 cards render, in group order, equal
     // to COMMODITIES_CARD_IDS.
@@ -382,13 +387,19 @@ describe('CommoditiesPage', () => {
       expect(energyHeading).not.toBe('');
       expect(energyHeading).toMatch(/[\u0600-\u06FF]/); // Persian/Arabic script
       // The brent value in Persian digits + the fa usd suffix word
-      // ('۷۳٫۴۵ دلار' — the usd unit is suffixed in fa).
+      // ('۷۳٫۴۵ دلار' — the usd unit is suffixed in fa). The price-row card
+      // renders the number and the unit as separate <bdi> fragments; both
+      // must be present in the card's text (the Persian digits + 'دلار').
       const brent = document.querySelector('[data-commodities-card="brent"]')!;
-      expect(brent.querySelector('[data-commodities-value]')?.textContent).toBe('\u06F7\u06F3\u066B\u06F4\u06F5 \u062F\u0644\u0627\u0631');
+      const brentText = brent.textContent ?? '';
+      expect(brentText).toContain('\u06F7\u06F3\u066B\u06F4\u06F5'); // '۷۳٫۴۵'
+      expect(brentText).toContain('\u062F\u0644\u0627\u0631'); // 'دلار'
       // The chokepoint-suez fa transits join (Persian digits + the suffix
       // word 'تردد در روز').
       const suez = document.querySelector('[data-commodities-card="chokepoint-suez"]')!;
-      expect(suez.querySelector('[data-commodities-value]')?.textContent).toBe('\u06F6\u06F5\u066B\u06F3 \u062A\u0631\u062F\u062F \u062F\u0631 \u0631\u0648\u0632');
+      const suezText = suez.textContent ?? '';
+      expect(suezText).toContain('\u06F6\u06F5\u066B\u06F3'); // '۶۵٫۳'
+      expect(suezText).toContain('\u062A\u0631\u062F\u062F'); // 'تردد'
       // The RTL document direction rides the store's own apply().
       expect(document.documentElement.dir).toBe('rtl');
     } finally {

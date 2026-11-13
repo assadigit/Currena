@@ -200,7 +200,7 @@ function PriceIconBox({ id }: { id: IndicatorId }) {
  * window (the 2026-10-21 switch computes 1w/1m/1y from the SAME stored
  * history — the Today lens reads price-stats' c1, no window needed;
  * the 2026-10-27 round adds the 3m/5y windows from the same series). */
-interface TileData {
+export interface TileData {
   stats: TileStats;
   trends: { '1w': TrendWindow | null; '1m': TrendWindow | null; '3m': TrendWindow | null; '1y': TrendWindow | null; '5y': TrendWindow | null };
 }
@@ -211,7 +211,7 @@ interface TileData {
  * value is computed from the stored history ALONE; a failed fetch is an
  * honest absence — "—" rows, no trend story, no fact bullets.
  */
-function useTileData(ids: readonly IndicatorId[]): Partial<Record<string, TileData>> {
+export function useTileData(ids: readonly IndicatorId[]): Partial<Record<string, TileData>> {
   const [derived, setDerived] = useState<Partial<Record<string, TileData>>>({});
   const needed = ids.join(',');
   useEffect(() => {
@@ -249,7 +249,7 @@ function useTileData(ids: readonly IndicatorId[]): Partial<Record<string, TileDa
  * The tile
  * ------------------------------------------------------------------ */
 
-function PriceTile({
+export function PriceTile({
   id,
   reading,
   copy,

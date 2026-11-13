@@ -63,6 +63,32 @@ const INDICATOR_ICONS: Readonly<Record<string, string>> = {
   // deposit rate wears the savings jar (the savings subject).
   vix: 'stock-exchange-index',
   'au-deposit-rate': 'savings-jar',
+  // Commodities page (TM5): every commodity card carries an icon. The 5
+  // with dedicated artwork keep it; the other 19 reuse the closest semantic
+  // neighbour (oil for every crude stream, fuel-price for the gas/coal
+  // chain, silver for platinum, copper for iron ore, bills-shop-prices for
+  // the agriculture trio, bitcoin for the crypto index, global-finance for
+  // the trade-route chokepoints + the GSCPI).
+  wti: 'oil',
+  natgas: 'fuel-price',
+  'gas-europe': 'fuel-price',
+  'lng-japan': 'fuel-price',
+  'coal-aus': 'fuel-price',
+  'eia-crude-stocks': 'oil',
+  'us-spr': 'oil',
+  'us-crude-production': 'oil',
+  platinum: 'silver',
+  'iron-ore': 'copper',
+  'food-index': 'bills-shop-prices',
+  wheat: 'bills-shop-prices',
+  maize: 'bills-shop-prices',
+  'crypto-fng': 'bitcoin',
+  'chokepoint-suez': 'global-finance',
+  'chokepoint-panama': 'global-finance',
+  'chokepoint-bab-el-mandeb': 'global-finance',
+  'chokepoint-malacca': 'global-finance',
+  'chokepoint-taiwan': 'global-finance',
+  gscpi: 'global-finance',
 };
 
 /** The money-panel life areas (jobs has no artwork — the stroke briefcase
