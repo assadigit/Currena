@@ -33,8 +33,14 @@ import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
 import { fetchFxSnapshot, readCachedFx } from '../../lib/fx';
 import { fetchNarrativeDoc, readCachedNarrative } from '../../lib/narrative';
 import type { NarrativeDoc } from '../../lib/narrative';
+import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
+import type { InsightsSnapshot, CalendarEvent, IndicatorId } from '@currena/core';
+import { homePageOfIndicator } from '@currena/insights/page-division';
 import type { MarketsSnapshot, FxSnapshot } from '@currena/core';
 import { GlobalBoard, NarratorLine, RegionChips } from './GlobalBoard';
+import { NextUpStrip } from '../../components/insights/NextUpStrip';
+import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import { navigate } from '../../router';
 import type { InsightsLoadStateLike } from './global-page-states';
 import { globalDedollarTile, globalFxTile, globalGaugeTiles, globalGoldTile, globalMarketsTile, globalRibbon } from './global-tiles';
 
@@ -167,6 +173,53 @@ export function GlobalPage(): React.JSX.Element {
     } catch {
       return false;
     }
+  }, []);
+
+  /* ---------------- the calendar (TM11: moved from /insights) ---------------- */
+  // The upcoming-events strip reads the calendar from the full insights
+  // snapshot (the page projection carries readings, not calendar). Boot
+  // from the last-good cache (instant), refresh in background — the same
+  // M-17 keep-last-good discipline as every other feed on this page.
+  const [snapshot, setSnapshot] = useState<InsightsSnapshot | null>(() => {
+    try {
+      return readCachedSnapshot();
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchInsightsSnapshot(controller.signal).then((s) => {
+      if (controller.signal.aborted || s === null) return;
+      setSnapshot(s);
+    });
+    return () => controller.abort();
+  }, []);
+  const calendar: readonly CalendarEvent[] = snapshot?.calendar ?? [];
+  const { copy, numberLocale } = useInsightsCopy();
+
+  // H6: the calendar's event-kind → indicator mapping (links events to the
+  // indicators they move). Moved verbatim from Insights.tsx (TM11).
+  const eventTargets: Readonly<Record<string, IndicatorId | undefined>> = {
+    rba: 'rba-cash-rate',
+    'abs-cpi': 'au-cpi',
+    'abs-jobs': 'au-unemployment',
+    'abs-hsi': 'au-household-spending',
+    'abs-trade': 'au-trade-balance',
+    'abs-approvals': 'au-building-approvals',
+    'abs-gdp': 'au-gdp-growth',
+    'abs-population': 'au-population-growth',
+    fed: 'fed-target',
+    ecb: 'ecb-dfr',
+    'us-cpi': 'us-cpi-yoy',
+    'us-jobs': 'us-unemployment',
+  };
+
+  // A tap on an event navigates to the target indicator's placement home
+  // (fed-target → /usa, au-cpi → /australia, ecb-dfr → /europe, …).
+  const onFocusEventCard = useCallback((id: IndicatorId) => {
+    const home = homePageOfIndicator(id);
+    if (home !== undefined) navigate(home);
   }, []);
 
   /* ---------------- the verdict derivations (pure, engine-side) ---------------- */
@@ -319,6 +372,24 @@ export function GlobalPage(): React.JSX.Element {
       <div className="mt-1.5 sm:mt-3.5 lg:mt-4">
         <NarratorLine doc={narrative} preview={narrativePreview} />
       </div>
+
+      {/* TM11: the upcoming-events calendar (رویدادهای پیش رو) — moved from
+          /insights. Shows the next 5 economic events (Fed meetings, CPI
+          releases, …) with relative days + time-zone label. A tap navigates
+          to the event's target indicator page. Renders nothing when the
+          calendar is empty (no data yet). */}
+      {calendar.length > 0 ? (
+        <div className="mt-1.5 sm:mt-3.5 lg:mt-4">
+          <NextUpStrip
+            events={calendar}
+            copy={copy}
+            locale={locale}
+            numberLocale={numberLocale}
+            onFocusCard={onFocusEventCard}
+            eventTargets={eventTargets}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

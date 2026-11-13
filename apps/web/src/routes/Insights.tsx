@@ -53,7 +53,6 @@ import { HeroBlock } from '../components/insights/HeroBlock';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
 import { TopMoversStrip } from '../components/insights/TopMoversStrip';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
-import { NextUpStrip } from '../components/insights/NextUpStrip';
 import { PricesBoard } from '../components/insights/PricesBoard';
 import { Signals } from '../components/insights/Signals';
 import { Together } from '../components/insights/Together';
@@ -95,32 +94,6 @@ import {
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
 import { NarrativeBlock } from '../components/insights/NarrativeBlock';
 import { InTheNews } from '../components/insights/InTheNews';
-
-/**
- * The calendar's event-kind → indicator mapping (H6: link events to the
- * indicators they move). Calendar ids are dated (fomc-2026-10, …) — the
- * event KIND is the stable join key.
- */
-const EVENT_TARGETS: Readonly<Record<string, IndicatorId | undefined>> = {
-  rba: 'rba-cash-rate',
-  'abs-cpi': 'au-cpi',
-  // Step-2 add-list §D: the two new jobs kinds link to their cards
-  // (abs-cpi keeps no us-cpi target — the CPI events target the CPI cards).
-  'abs-jobs': 'au-unemployment',
-  // gap-closure S5-M5.5: the new ABS release kinds link to their M5.2 cards
-  // (the calendar's next-up strip opens the matching indicator's detail).
-  'abs-hsi': 'au-household-spending',
-  'abs-trade': 'au-trade-balance',
-  'abs-approvals': 'au-building-approvals',
-  'abs-gdp': 'au-gdp-growth',
-  'abs-population': 'au-population-growth',
-  fed: 'fed-target',
-  // Fix spec C-07 (2026-10-14): the ECB decision links to the euro policy
-  // rate card.
-  ecb: 'ecb-dfr',
-  'us-cpi': 'us-cpi-yoy',
-  'us-jobs': 'us-unemployment',
-};
 
 export function Insights() {
   const { t, locale } = useI18n();
@@ -693,15 +666,8 @@ export function Insights() {
             }
           />
 
-          {/* R16: the calendar — once, below the indicators, before About. */}
-          <NextUpStrip
-            events={state.snapshot.calendar}
-            copy={copy}
-            locale={locale}
-            numberLocale={numberLocale}
-            onFocusCard={focusCard}
-            eventTargets={EVENT_TARGETS}
-          />
+          {/* TM11: the upcoming-events calendar (رویدادهای پیش رو) was moved
+           * to the Global landing page (/). It no longer renders here. */}
 
           {/* R25: "About this data" — quiet and collapsible. Fix spec A-08:
            * the run status (snapshot time + time zone, failed sources, stale
