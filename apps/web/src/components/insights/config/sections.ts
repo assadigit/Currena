@@ -15,9 +15,11 @@ import { DEFINITIONS, GAUGES } from '@currena/insights';
  * Section / group layout (the I15 question-group restructure)
  * ------------------------------------------------------------------ */
 
-/** Page order: Global BEFORE Australia everywhere (round-2 decision D7/R1 —
- * the old Australia-first hero + swap setting retired). */
-export const SECTION_ORDER: readonly InsightsSection[] = ['global', 'australia'];
+/** Page order: Global only on /insights now — every Australian indicator has
+ *  moved to the /australia page (the TM7 migration). The AU section, its
+ *  five groups, the Australia hero verdict, the AustralianMarkets board and
+ *  the MoneyPanel are all cut from /insights and live on /australia. */
+export const SECTION_ORDER: readonly InsightsSection[] = ['global'];
 
 /** Group order within each section (the gauge/lane order, GAUGES-first). */
 export const GROUP_ORDER: Readonly<Record<InsightsSection, readonly IndicatorGroupId[]>> = {
@@ -101,16 +103,46 @@ export const US_GLOBAL_REACH_IDS: readonly IndicatorId[] = [
 ];
 
 /**
+ * TM7 (the Australia migration): every Australian-relevant indicator has
+ * moved to the /australia page. The 38 ids whose registry section is
+ * 'australia' + gpr-australia (global section, AU placement home) are
+ * hidden from the /insights lane so no AU card renders here — they live
+ * on /australia as home cards (28) or seat-chip links (11). The readings
+ * still ride the full snapshot so the hero verdicts, gauge counts and
+ * calendar targets that read AU ids keep working.
+ */
+export const AUSTRALIA_LANE_MOVED_IDS: readonly IndicatorId[] = [
+  // au-inflation-rates
+  'au-cpi', 'au-trimmed-mean', 'rba-expectations', 'au-10y', 'au-us-10y-gap', 'au-petrol-yoy',
+  // au-households
+  'rba-cash-rate', 'au-home-loan', 'au-deposit-rate', 'au-wage-growth', 'au-rent-yoy',
+  'au-unemployment', 'au-home-values', 'au-household-debt-arrears', 'au-housing-finance',
+  'au-saving-ratio', 'au-job-vacancies',
+  // au-trade-currency
+  'audusd', 'rba-fed-gap', 'audjpy', 'terms-of-trade', 'iron-ore',
+  'china-property-investment', 'china-steel-output', 'gold-aud', 'coal-aus', 'lng-japan',
+  // au-activity
+  'au-gdp-growth', 'au-household-spending', 'au-building-approvals', 'au-population-growth',
+  'au-nom', 'au-participation', 'au-underemployment',
+  // au-external
+  'au-trade-balance', 'audnzd', 'nz-short-rate', 'nz-10y',
+  // global section, AU placement home (AF-4)
+  'gpr-australia',
+];
+
+/**
  * R9-04 + R9-07: ids rendered in a special container instead of their
  * lane group — the QuestionGroup filter skips them so no card renders
  * twice. (Companion-ONLY ids are separate — they always ride a parent.)
  * gap-closure S2-M2.4: nyfed-custody renders inside the "Who holds US
  * government debt" section (the ticSlot composition in Insights.tsx),
  * not in the borrowing-costs lane — one reading, one surface.
+ * TM7: the 39 AU ids are hidden too — they've moved to /australia.
  */
 export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   ...DOLLAR_STRENGTH_IDS,
   ...US_GLOBAL_REACH_IDS,
+  ...AUSTRALIA_LANE_MOVED_IDS,
   'nyfed-custody',
 ]);
 

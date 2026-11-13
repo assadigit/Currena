@@ -26,6 +26,7 @@ import {
   LANE_GROUP_ORDER,
   DOLLAR_STRENGTH_IDS,
   US_GLOBAL_REACH_IDS,
+  AUSTRALIA_LANE_MOVED_IDS,
   HIDDEN_FROM_LANE_IDS,
   SUBHEADING_SECTIONS,
   attentionTiles,
@@ -832,14 +833,15 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
     // gap-closure S2-M2.4: nyfed-custody is the third one-surface case — a
     // context reading owned by the "Who holds US government debt" section's
     // slot (rendered below the TicSection), never by its lane group.
-    expect(HIDDEN_FROM_LANE_IDS.size).toBe(DOLLAR_STRENGTH_IDS.length + US_GLOBAL_REACH_IDS.length + 1);
-    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, 'nyfed-custody' as const]) {
+    expect(HIDDEN_FROM_LANE_IDS.size).toBe(DOLLAR_STRENGTH_IDS.length + US_GLOBAL_REACH_IDS.length + AUSTRALIA_LANE_MOVED_IDS.length + 1);
+    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, 'nyfed-custody' as const]) {
       expect(HIDDEN_FROM_LANE_IDS.has(id)).toBe(true);
     }
     // No lane-only reading accidentally joined the hidden set.
     expect(HIDDEN_FROM_LANE_IDS.has('vix')).toBe(false);
     expect(HIDDEN_FROM_LANE_IDS.has('gold-silver')).toBe(false);
-    expect(HIDDEN_FROM_LANE_IDS.has('au-cpi')).toBe(false);
+    // au-cpi IS hidden now (TM7 — moved to /australia).
+    expect(HIDDEN_FROM_LANE_IDS.has('au-cpi')).toBe(true);
   });
 
   it('R9-04 + R9-07: every hidden id is a REAL definition whose section is global (no phantom ids)', () => {

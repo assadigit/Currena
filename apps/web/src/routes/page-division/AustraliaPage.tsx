@@ -56,6 +56,9 @@ import { AustraliaTierCards } from './AustraliaTierCards';
 import { useAustraliaBoardCopy } from './australia-board-copy';
 import { AustralianMarkets } from '../../components/insights/AustralianMarkets';
 import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
+import { MoneyPanel } from '../../components/insights/MoneyPanel';
+import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import { navigate } from '../../router';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
@@ -100,6 +103,9 @@ function useAuMarketsBoard(): AuMarketsLoadState {
 
 export function AustraliaPage(): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
+  // The Insights copy corpus — the MoneyPanel (moved from /insights in TM7)
+  // reads its area labels + the AU indicator names from the same corpus.
+  const { copy } = useInsightsCopy();
   const boardCopy = useAustraliaBoardCopy(t);
   const boardState = useAuMarketsBoard();
 
@@ -279,6 +285,20 @@ export function AustraliaPage(): React.JSX.Element {
           moved-out seat chips. Only when the projection has spoken
           (fresh or cached). */}
       {readings !== undefined ? <AustraliaTierCards readings={readings} /> : null}
+
+      {/* The "What it means for my money" panel (TM7: moved from /insights'
+          Australia section slot — it's an AU-household-costs panel by content,
+          so it lives here now). The panel reads the same AU readings the
+          projection carries; a tap navigates to /insights for the full detail
+          (the Australia page has no side panel of its own). */}
+      {readings !== undefined ? (
+        <MoneyPanel
+          readings={readings}
+          copy={copy}
+          numberLocale={numberLocale}
+          onFocusCard={() => navigate('/insights')}
+        />
+      ) : null}
     </div>
   );
 }

@@ -66,7 +66,9 @@ function CarouselControls({
 }: {
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
-  /** The card labels in DOM order: [Global, Australia]. */
+  /** The card labels in DOM order: [Global, Australia]. The Australia
+   *  verdict stays as the hero's editorial summary (the gauge verdict, not
+   *  individual cards — those moved to /australia in TM7). */
   labels: readonly [string, string];
   active: number;
   onGo: (index: number) => void;
