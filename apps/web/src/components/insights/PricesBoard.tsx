@@ -668,7 +668,7 @@ export function PricesBoard({
  * map's switch already speaks).
  * ------------------------------------------------------------------ */
 
-function PricePeriodSwitch({
+export function PricePeriodSwitch({
   lens,
   copy,
   onChange,

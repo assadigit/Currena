@@ -33,7 +33,7 @@
  * chunk, never the entry graph.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { useI18n } from '../../lib/locale';
 import { navigate } from '../../router';
@@ -49,7 +49,7 @@ import {
   type CommoditiesCardEntry,
   type CommoditiesCardId,
 } from './commodities-tiles';
-import { PriceTile, useTileData, type TileData, type PriceLens } from '../../components/insights/PricesBoard';
+import { PriceTile, useTileData, type TileData, type PriceLens, PricePeriodSwitch } from '../../components/insights/PricesBoard';
 import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
 import type { InsightsCopy } from '../../i18n/insights-copy-en';
 
@@ -273,10 +273,12 @@ export function CommoditiesTierCards({ readings }: { readings: readonly Indicato
   // derive from each commodity's stored history series (module-cached, so
   // the details panel reuses the same fetch).
   const tileData = useTileData(ALL_COMMODITY_IDS);
-  // The primary lens: the template's "past 7 days" trend row. The daily
-  // change rides below it (PriceTile hides the daily row when the lens IS
-  // today, so 1w keeps both the 7-day trend AND the daily change visible).
-  const lens: PriceLens = '1w';
+  // The period lens — session-only state (never stored, never fetched; the
+  // windows are all client-derived from the SAME stored history). The user
+  // picks the timeframe via the PricePeriodSwitch (Today · 1 week · 1 month
+  // · 3 months · 1 year · 5 years) and every card re-measures. Default 1w
+  // (the card's classic primary story).
+  const [lens, setLens] = useState<PriceLens>('1w');
   // The details handler: the commodities page has no side panel of its own,
   // so the "more details" button + the card body navigate to /insights (the
   // full chart + rule + source live there). A per-commodity detail panel can
@@ -290,6 +292,11 @@ export function CommoditiesTierCards({ readings }: { readings: readonly Indicato
   void t;
   return (
     <>
+      {/* The period switch — the SAME pill radiogroup the Insights prices
+       * board uses (Today · 1 week · 1 month · 3 months · 1 year · 5 years),
+       * centred above the commodity groups. Every card re-measures its
+       * trend row + sparkline + briefing against the selected window. */}
+      <PricePeriodSwitch lens={lens} copy={copy} onChange={setLens} />
       <CommoditiesGroupSection group="energy" ids={COMMODITIES_ENERGY_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
       <CommoditiesGroupSection group="metals" ids={COMMODITIES_METALS_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
       <CommoditiesGroupSection group="agriculture" ids={COMMODITIES_AGRICULTURE_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
