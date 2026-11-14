@@ -1927,6 +1927,14 @@ export const en = {
       statusUnavailable: "Can't tell right now",
       valueUnavailable: 'Cannot read yet',
     },
+    /** TM21: the Economic Linkages page — the dedicated home for the
+     *  macroeconomic connection cards (all the "Together" connections
+     *  in one place). */
+    economicLinkages: {
+      title: 'Economic Linkages',
+      purpose: 'How indicators move together — the analytical connections between rates, commodities, currencies and growth across every region.',
+      loading: 'Loading the economic linkages…',
+    },
   },
 
   /** Page-division S1 (D-46): the legacy /insights page’s deprecation

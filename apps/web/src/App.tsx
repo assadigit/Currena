@@ -112,6 +112,10 @@ const CommoditiesPage = lazy(() => import('./routes/page-division/CommoditiesPag
 // The In-build chip stays (the S18 build session — the chip retires at
 // the S18 gates pass, the S16/S17 one-session trajectory).
 const CurrenciesPage = lazy(() => import('./routes/page-division/CurrenciesPage').then((m) => ({ default: m.CurrenciesPage })));
+// TM21: the Economic Linkages route — the dedicated page for the
+// macroeconomic connection cards (all the "Together" connections in one
+// place). Its own lazy chunk (the page-division pattern).
+const EconomicLinkagesPage = lazy(() => import('./routes/page-division/EconomicLinkagesPage').then((m) => ({ default: m.EconomicLinkagesPage })));
 
 /** No destination route shares the placeholder chunk anymore (S8: the
  *  four region pages left the set; S9: /usa + S12: /europe + S14:
@@ -276,6 +280,7 @@ export function App() {
             {route === '/australia' ? <AustraliaPage /> : null}
             {route === '/commodities' ? <CommoditiesPage /> : null}
             {route === '/currencies' ? <CurrenciesPage /> : null}
+            {route === '/economic-linkages' ? <EconomicLinkagesPage /> : null}
             {route === '/converter' ? <Converter /> : null}
             {DESTINATION_ROUTES.has(route) ? <PagePlaceholder /> : null}
             {route === '/calculator' ? <Calculator /> : null}

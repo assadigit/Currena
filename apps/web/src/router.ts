@@ -40,6 +40,7 @@ export const ROUTES = [
   '/europe',
   '/asia-pacific',
   '/australia',
+  '/economic-linkages',
   // Legacy all-in-one page (D-46) — deprecation banner, retirement at D-9 conditions.
   '/insights',
   // The converter tools (the app's founding surface; `/` was the converter

@@ -616,7 +616,7 @@ export function RegionChips({
   const { t } = useI18n();
   // The 7 chip destinations in the spec §4 row order (Gold excepted — it
   // is tile ①). DESTINATIONS carries the routes + title keys.
-  const chips = DESTINATIONS.filter((d) => d.route !== '/gold').sort((a, b) => {
+  const chips = DESTINATIONS.filter((d) => d.route !== '/gold' && d.route !== '/economic-linkages').sort((a, b) => {
     const order = ['/usa', '/europe', '/asia-pacific', '/australia', '/world-markets', '/commodities', '/currencies'];
     return order.indexOf(a.route) - order.indexOf(b.route);
   });

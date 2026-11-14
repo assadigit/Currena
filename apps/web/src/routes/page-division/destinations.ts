@@ -19,7 +19,7 @@ import type { RoutePath } from '../../router';
 
 export interface DestinationSpec {
   /** The clean top-level slug (D-46). */
-  route: Extract<RoutePath, '/gold' | '/world-markets' | '/currencies' | '/commodities' | '/usa' | '/europe' | '/asia-pacific' | '/australia'>;
+  route: Extract<RoutePath, '/gold' | '/world-markets' | '/currencies' | '/commodities' | '/usa' | '/europe' | '/asia-pacific' | '/australia' | '/economic-linkages'>;
   /** Page name — nav label + placeholder heading. */
   titleKey: TranslationKey;
   /** One-line purpose (spec §4–§12 "Purpose"). */
@@ -101,6 +101,14 @@ export const DESTINATIONS: readonly DestinationSpec[] = [
     summaryKey: 'pd.currencies.summary',
     buildSessions: 'S18',
     decisions: 'D-18 · D-32 · D-41 · D-42',
+  },
+  {
+    route: '/economic-linkages',
+    titleKey: 'pd.economicLinkages.title',
+    purposeKey: 'pd.economicLinkages.purpose',
+    summaryKey: 'pd.economicLinkages.title',
+    buildSessions: 'TM21',
+    decisions: 'TM21',
   },
 ];
 
