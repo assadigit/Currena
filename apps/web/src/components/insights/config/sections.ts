@@ -204,6 +204,11 @@ export const ASIA_GOLD_RESERVE_LANE_MOVED_IDS: readonly IndicatorId[] = [
   'gold-oil-ratio',
   // TM17: Asia-Pacific (Japan inflation)
   'japan-cpi',
+  // TM18: Asia-Pacific (Korea + India inflation)
+  'korea-cpi', 'india-cpi',
+  // TM18: Commodities trade routes & supply (chokepoints + GSCPI)
+  'chokepoint-suez', 'chokepoint-panama', 'chokepoint-bab-el-mandeb',
+  'chokepoint-malacca', 'chokepoint-taiwan', 'gscpi',
 ];
 
 /**
