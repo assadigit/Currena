@@ -23,6 +23,7 @@ import { interpolate } from '../../i18n';
 import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
 import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
 import { Together } from '../../components/insights/Together';
+import { GLOBAL_CONNECTION_IDS } from '../../components/insights/connection-groups';
 import { homePageOfIndicator } from '@currena/insights/page-division';
 import { navigate } from '../../router';
 import type { IndicatorId } from '@currena/core';
@@ -93,7 +94,10 @@ export function EconomicLinkagesPage(): React.JSX.Element {
         ) : null}
       </header>
 
-      {/* The connection cards — all macroeconomic linkages in one place. */}
+      {/* The connection cards — only the GLOBAL macroeconomic linkages
+          (real yields → gold, dollar → gold → oil, copper → China PMI,
+          oil → geopolitical chokepoints). AU-specific and USA-domestic
+          connections live on their respective pages. */}
       {snapshot !== null ? (
         <Together
           readings={snapshot.readings}
@@ -101,6 +105,7 @@ export function EconomicLinkagesPage(): React.JSX.Element {
           numberLocale={numberLocale}
           onFocusCard={onFocusCard}
           expandToken={0}
+          onlyIds={GLOBAL_CONNECTION_IDS}
         />
       ) : (
         <div className="flex flex-col items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-10 text-center ring-1 ring-[var(--color-border)]">

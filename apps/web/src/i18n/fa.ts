@@ -65,6 +65,7 @@ export const fa: Dictionary = {
     europe: 'اروپا',
     asiaPacific: 'آسیا و اقیانوسیه',
     australia: 'استرالیا',
+    economicLinkages: 'پیوندها',
     tools: 'ابزارها',
     legacyBadge: 'نسخهٔ پیشین',
     converter: 'مبدل ارز',

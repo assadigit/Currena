@@ -58,7 +58,11 @@ import { AustralianMarkets } from '../../components/insights/AustralianMarkets';
 import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
 import { MoneyPanel } from '../../components/insights/MoneyPanel';
 import { VerdictBlock } from '../../components/insights/VerdictMeter';
+import { Together } from '../../components/insights/Together';
+import { AU_CONNECTION_IDS } from '../../components/insights/connection-groups';
 import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
+import type { InsightsSnapshot } from '@currena/core';
 import { navigate } from '../../router';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
@@ -109,6 +113,28 @@ export function AustraliaPage(): React.JSX.Element {
   const { copy } = useInsightsCopy();
   const boardCopy = useAustraliaBoardCopy(t);
   const boardState = useAuMarketsBoard();
+
+  /* TM22: the AU-specific connection cards (iron ore → terms of trade →
+   * AUD, China demand → iron ore, RBA rate → home loan → household debt,
+   * energy exports → terms of trade → AUD). Reads the full insights
+   * snapshot (connections reference ids outside the AU projection). */
+  const [insightsSnapshot, setInsightsSnapshot] = useState<InsightsSnapshot | null>(() => {
+    try {
+      return readCachedSnapshot();
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchInsightsSnapshot(controller.signal)
+      .then((s) => {
+        if (controller.signal.aborted) return;
+        setInsightsSnapshot(s);
+      })
+      .catch(() => { /* honest absence */ });
+    return () => controller.abort();
+  }, []);
 
   /* ---------------- the projection (the S2 contract) ---------------- */
   const [state, setState] = useState<ProjectionState>(() => {
@@ -313,8 +339,22 @@ export function AustraliaPage(): React.JSX.Element {
         </div>
       ) : null}
 
-      {/* TM20: the Together connection cards were moved to the dedicated
-          /economic-linkages page (TM21). They no longer render here. */}
+      {/* TM22: the AU-specific connection cards (iron ore → terms of trade
+          → AUD, China demand → iron ore, RBA rate → home loan → household
+          debt, energy exports → terms of trade → AUD). Reads the full
+          insights snapshot; only the AU_CONNECTION_IDS filter renders. */}
+      {insightsSnapshot !== null ? (
+        <div className="mt-3 sm:mt-5" data-australia-together>
+          <Together
+            readings={insightsSnapshot.readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onFocusCard={() => navigate('/insights')}
+            expandToken={0}
+            onlyIds={AU_CONNECTION_IDS}
+          />
+        </div>
+      ) : null}
 
       {/* The "What it means for my money" panel (TM7: moved from /insights'
           Australia section slot — it's an AU-household-costs panel by content,

@@ -46,12 +46,14 @@ const MARKET_LINKS: readonly { path: RoutePath; labelKey: TranslationKey }[] = [
   { path: '/commodities', labelKey: 'nav.commodities' },
 ];
 
-/** The Regions ▾ group (D-45): the four region destinations. */
+/** The Regions ▾ group (D-45): the four region destinations + Economic
+ *  Linkages (TM22). */
 const REGION_LINKS: readonly NavLink[] = [
   { path: '/usa', emoji: '🇺🇸', labelKey: 'nav.usa' },
   { path: '/europe', emoji: '🇪🇺', labelKey: 'nav.europe' },
   { path: '/asia-pacific', emoji: '🌏', labelKey: 'nav.asiaPacific' },
   { path: '/australia', emoji: '🇦🇺', labelKey: 'nav.australia' },
+  { path: '/economic-linkages', emoji: '🔗', labelKey: 'nav.economicLinkages' },
 ];
 
 /** The Tools ▾ group: the converter (its new home, S1) + the utility routes. */

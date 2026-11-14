@@ -77,6 +77,7 @@ export function Together({
   numberLocale,
   onFocusCard,
   expandToken,
+  onlyIds,
 }: {
   readings: readonly IndicatorReading[];
   copy: InsightsCopy;
@@ -84,8 +85,16 @@ export function Together({
   onFocusCard: (id: IndicatorId, opener?: HTMLElement | null) => void;
   /** Bumped by the route when a pill/hash/hero link targets this section. */
   expandToken: number;
+  /** TM22: optional filter — only render connections whose ids are in this
+   *  set. Used by /australia (AU-only), /usa (USA-domestic-only), and
+   *  /economic-linkages (global-only). When absent, all connections render. */
+  onlyIds?: ReadonlySet<string>;
 }) {
-  const connections = useMemo(() => evaluateConnections(readings), [readings]);
+  const allConnections = useMemo(() => evaluateConnections(readings), [readings]);
+  const connections = useMemo(
+    () => (onlyIds !== undefined ? allConnections.filter((c) => onlyIds.has(c.connection)) : allConnections),
+    [allConnections, onlyIds],
+  );
   const [open, setOpen] = useState<boolean>(() => {
     try {
       return window.localStorage.getItem(STORAGE_KEY) === 'open';

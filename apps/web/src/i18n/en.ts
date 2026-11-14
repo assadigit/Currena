@@ -69,6 +69,7 @@ export const en = {
     europe: 'Europe',
     asiaPacific: 'Asia & Pacific',
     australia: 'Australia',
+    economicLinkages: 'Linkages',
     tools: 'Tools',
     legacyBadge: 'legacy',
     converter: 'Converter',

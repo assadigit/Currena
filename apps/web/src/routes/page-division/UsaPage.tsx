@@ -43,6 +43,12 @@ import { UsaVerdictStrip } from './UsaVerdictStrip';
 import { UsaTierCards } from './UsaTierCards';
 import { UsaTicSection } from './UsaTicSection';
 import { usaGaugeVerdicts } from './usa-tiles';
+import { Together } from '../../components/insights/Together';
+import { USA_CONNECTION_IDS } from '../../components/insights/connection-groups';
+import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
+import type { InsightsSnapshot } from '@currena/core';
+import { navigate } from '../../router';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
@@ -52,6 +58,27 @@ type ProjectionState =
 
 export function UsaPage(): React.JSX.Element {
   const { t, locale } = useI18n();
+  const { copy, numberLocale } = useInsightsCopy();
+
+  /* TM22: the USA-domestic connection cards (oil → breakevens → yields,
+   * supply pressure → US CPI). Reads the full insights snapshot. */
+  const [insightsSnapshot, setInsightsSnapshot] = useState<InsightsSnapshot | null>(() => {
+    try {
+      return readCachedSnapshot();
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchInsightsSnapshot(controller.signal)
+      .then((s) => {
+        if (controller.signal.aborted) return;
+        setInsightsSnapshot(s);
+      })
+      .catch(() => { /* honest absence */ });
+    return () => controller.abort();
+  }, []);
 
   /* ---------------- the projection (the S2 contract) ---------------- */
   const [state, setState] = useState<ProjectionState>(() => {
@@ -234,6 +261,22 @@ export function UsaPage(): React.JSX.Element {
           projection (a slow or dead projection never takes the board
           away — each feed governs its own surface). */}
       <UsaTicSection />
+
+      {/* TM22: the USA-domestic connection cards (oil → breakevens → US
+          10y yields, supply pressure → US CPI). Only the connections with
+          domestic USA impact; global ones stay on /economic-linkages. */}
+      {insightsSnapshot !== null ? (
+        <div className="mt-3 sm:mt-5" data-usa-together>
+          <Together
+            readings={insightsSnapshot.readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onFocusCard={() => navigate('/insights')}
+            expandToken={0}
+            onlyIds={USA_CONNECTION_IDS}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
