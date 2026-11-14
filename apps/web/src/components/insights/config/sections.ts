@@ -213,6 +213,25 @@ export const ASIA_GOLD_RESERVE_LANE_MOVED_IDS: readonly IndicatorId[] = [
   'wti', 'natgas', 'wheat', 'maize', 'copper-usd',
   // TM19: Gold (gold-to-equities ratio)
   'gold-equities-ratio',
+  // TM23: remaining — food-index → /commodities, platinum → /commodities,
+  // gpr-index/threats/acts → /commodities, copper-gold → /gold,
+  // us-spr + us-crude-production → /commodities
+  'food-index', 'platinum', 'gpr-index', 'gpr-threats', 'gpr-acts',
+  'copper-gold', 'us-spr', 'us-crude-production',
+  // TM23b: the last 3 — gpr-daily → /commodities, gpr-china → /asia-pacific,
+  // gpr-taiwan → /asia-pacific
+  'gpr-daily', 'gpr-china', 'gpr-taiwan',
+  // TM23c: the last remaining — gpr-russia/ukraine/israel/saudi +
+  // global-liquidity → /commodities
+  'gpr-russia', 'gpr-ukraine', 'gpr-israel', 'gpr-saudi', 'global-liquidity',
+  // TM23d: the final 3 — crypto-fng → /commodities, gold-silver → /gold,
+  // shanghai-gold-premium → /gold
+  'crypto-fng', 'gold-silver', 'shanghai-gold-premium',
+  // TM23e: the final 3 gold ids — real-gold-price, gold-platinum,
+  // sge-gold-withdrawals → /gold
+  'real-gold-price', 'gold-platinum', 'sge-gold-withdrawals',
+  // TM23f: swiss-gold-flow → /gold (the last one)
+  'swiss-gold-flow',
 ];
 
 /**

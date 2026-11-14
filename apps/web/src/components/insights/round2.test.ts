@@ -841,7 +841,8 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
       expect(HIDDEN_FROM_LANE_IDS.has(id)).toBe(true);
     }
     // No lane-only reading accidentally joined the hidden set.
-    expect(HIDDEN_FROM_LANE_IDS.has('gold-silver')).toBe(false);
+    // (gold-silver IS now hidden — TM23d: moved to /gold)
+    expect(HIDDEN_FROM_LANE_IDS.has('gold-btc')).toBe(false);
     // au-cpi IS hidden (TM7); fed-target IS hidden (TM10); ecb-dfr IS hidden (TM15); jgb-10y IS hidden (TM16); gas-europe IS hidden (TM17); chokepoint-suez IS hidden (TM18); wti IS hidden (TM19).
     expect(HIDDEN_FROM_LANE_IDS.has('au-cpi')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('fed-target')).toBe(true);
@@ -850,6 +851,7 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
     expect(HIDDEN_FROM_LANE_IDS.has('gas-europe')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('chokepoint-suez')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('wti')).toBe(true);
+    expect(HIDDEN_FROM_LANE_IDS.has('food-index')).toBe(true);
   });
 
   it('R9-04 + R9-07: every hidden id is a REAL definition whose section is global (no phantom ids)', () => {

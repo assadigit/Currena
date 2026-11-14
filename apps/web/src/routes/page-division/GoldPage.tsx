@@ -33,6 +33,7 @@ import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
+import { GoldPositions } from './GoldPositions';
 import { goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
@@ -229,6 +230,11 @@ export function GoldPage(): React.JSX.Element {
       <div className="mt-3 sm:mt-5">
         {contextEntries.length > 0 ? <GoldContext entries={contextEntries} /> : null}
       </div>
+
+      {/* TM23: the Gold Positions section — the CFTC trader positioning
+          cards with a visual bar showing where the current positioning
+          stands in its 0–100 range. */}
+      {readings !== undefined ? <GoldPositions readings={readings} /> : null}
     </div>
   );
 }

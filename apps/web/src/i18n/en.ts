@@ -1715,6 +1715,8 @@ export const en = {
         label: 'Gold and its ratios (gold/silver, gold/platinum, gold/oil) live on the Gold page',
         text: 'See gold',
       },
+      positionsTitle: 'Gold Positions',
+      positionsPurpose: 'How traders are positioned in the gold futures market — the CFTC Commitments of Traders report shows whether speculators are net long or net short, and where the current positioning sits in its historical range.',
       cardNames: {
         brent: 'Oil price (Brent)',
         wti: 'Oil price (WTI)',
