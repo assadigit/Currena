@@ -842,11 +842,12 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
     }
     // No lane-only reading accidentally joined the hidden set.
     expect(HIDDEN_FROM_LANE_IDS.has('gold-silver')).toBe(false);
-    // au-cpi IS hidden (TM7); fed-target IS hidden (TM10); ecb-dfr IS hidden (TM15); jgb-10y IS hidden (TM16).
+    // au-cpi IS hidden (TM7); fed-target IS hidden (TM10); ecb-dfr IS hidden (TM15); jgb-10y IS hidden (TM16); gas-europe IS hidden (TM17).
     expect(HIDDEN_FROM_LANE_IDS.has('au-cpi')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('fed-target')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('ecb-dfr')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('jgb-10y')).toBe(true);
+    expect(HIDDEN_FROM_LANE_IDS.has('gas-europe')).toBe(true);
   });
 
   it('R9-04 + R9-07: every hidden id is a REAL definition whose section is global (no phantom ids)', () => {

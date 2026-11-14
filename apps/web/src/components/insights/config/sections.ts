@@ -186,14 +186,24 @@ export const EUROPE_LANE_MOVED_IDS: readonly IndicatorId[] = [
  *  cftc-gold-gross-long), and 1 reserve-share id (usd-reserve-share, the
  *  dollar's share of world reserves — placement home /currencies, read by
  *  the USA page's dedollar tile). They live on their dedicated pages now.
+ *
+ * TM17 (the Commodities + Gold-ratio + Asia-CPI migration): 4 more ids
+ *  cut from /insights — gas-europe + eia-crude-stocks → /commodities,
+ *  gold-oil-ratio → /gold, japan-cpi → /asia-pacific.
  */
 export const ASIA_GOLD_RESERVE_LANE_MOVED_IDS: readonly IndicatorId[] = [
-  // Asia-Pacific (Japan + China)
+  // TM16: Asia-Pacific (Japan + China)
   'jgb-10y', 'boj-rate', 'china-pmi', 'oecd-cli-cn', 'china-cpi',
-  // Gold (CFTC positioning)
+  // TM16: Gold (CFTC positioning)
   'cftc-gold-positioning', 'cftc-gold-gross-long',
-  // Dollar reserve share (placement home /currencies, read by /usa)
+  // TM16: Dollar reserve share (placement home /currencies, read by /usa)
   'usd-reserve-share',
+  // TM17: Commodities (energy — European gas + US crude stocks)
+  'gas-europe', 'eia-crude-stocks',
+  // TM17: Gold (gold-to-oil ratio)
+  'gold-oil-ratio',
+  // TM17: Asia-Pacific (Japan inflation)
+  'japan-cpi',
 ];
 
 /**
