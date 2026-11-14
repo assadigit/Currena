@@ -209,6 +209,10 @@ export const ASIA_GOLD_RESERVE_LANE_MOVED_IDS: readonly IndicatorId[] = [
   // TM18: Commodities trade routes & supply (chokepoints + GSCPI)
   'chokepoint-suez', 'chokepoint-panama', 'chokepoint-bab-el-mandeb',
   'chokepoint-malacca', 'chokepoint-taiwan', 'gscpi',
+  // TM19: Commodities (energy + metals + agriculture)
+  'wti', 'natgas', 'wheat', 'maize', 'copper-usd',
+  // TM19: Gold (gold-to-equities ratio)
+  'gold-equities-ratio',
 ];
 
 /**
