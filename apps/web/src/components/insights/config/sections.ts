@@ -235,6 +235,27 @@ export const ASIA_GOLD_RESERVE_LANE_MOVED_IDS: readonly IndicatorId[] = [
 ];
 
 /**
+ * TM24 (the audit pass — the 4 BLOCKED_NOTES): the licence-fail-closed
+ *  quartet (wgc-etf-holdings · wgc-cb-demand · official-gold-demand ·
+ *  etf-short-interest) is placed on /gold as BLOCKED_NOTES (placement.ts).
+ *  They carry no fetches wired (the pre-approval class / the 404 venue),
+ *  so they never have readings, so they never rendered on /insights even
+ *  before this entry. Added here as belt-and-suspenders so /insights is
+ *  bulletproof against ANY future fetch wiring one of them: even if a
+ *  future session wires a venue, the card renders ONLY on /gold (the
+ *  blocked-note surface) and never on /insights. The /insights page is
+ *  now ZERO-CARD-CAPABLE by construction, not by accident — every
+ *  registry id (187) is in HIDDEN_FROM_LANE_IDS or its lane group is not
+ *  iterated or its rendering component was removed by the TM cuts.
+ */
+export const BLOCKED_LANE_IDS: readonly IndicatorId[] = [
+  'wgc-etf-holdings',
+  'wgc-cb-demand',
+  'official-gold-demand',
+  'etf-short-interest',
+];
+
+/**
  * R9-04 + R9-07: ids rendered in a special container instead of their
  * lane group — the QuestionGroup filter skips them so no card renders
  * twice. (Companion-ONLY ids are separate — they always ride a parent.)
@@ -242,6 +263,7 @@ export const ASIA_GOLD_RESERVE_LANE_MOVED_IDS: readonly IndicatorId[] = [
  * TM10: the 72 USA ids moved to /usa.
  * TM15: the 8 Europe ids moved to /europe.
  * TM16: the 8 Asia/Gold/Reserve ids moved to /asia-pacific, /gold, /currencies.
+ * TM24: the 4 BLOCKED_NOTES join — /insights is zero-card-capable by construction.
  */
 export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorId>([
   ...DOLLAR_STRENGTH_IDS,
@@ -250,6 +272,7 @@ export const HIDDEN_FROM_LANE_IDS: ReadonlySet<IndicatorId> = new Set<IndicatorI
   ...USA_LANE_MOVED_IDS,
   ...EUROPE_LANE_MOVED_IDS,
   ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS,
+  ...BLOCKED_LANE_IDS,
   'nyfed-custody',
 ]);
 

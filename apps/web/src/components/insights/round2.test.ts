@@ -30,6 +30,7 @@ import {
   USA_LANE_MOVED_IDS,
   EUROPE_LANE_MOVED_IDS,
   ASIA_GOLD_RESERVE_LANE_MOVED_IDS,
+  BLOCKED_LANE_IDS,
   HIDDEN_FROM_LANE_IDS,
   SUBHEADING_SECTIONS,
   attentionTiles,
@@ -832,12 +833,17 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
     );
   });
 
-  it('the hidden-from-lane set is exactly the two special containers\' members + the TIC custody card — one reading, one surface', () => {
+  it('the hidden-from-lane set is exactly the two special containers\' members + the TIC custody card + the 4 BLOCKED_NOTES — one reading, one surface, zero cards on /insights', () => {
     // gap-closure S2-M2.4: nyfed-custody is the third one-surface case — a
     // context reading owned by the "Who holds US government debt" section's
     // slot (rendered below the TicSection), never by its lane group.
-    expect(HIDDEN_FROM_LANE_IDS.size).toBe(new Set([...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS, 'nyfed-custody' as const]).size);
-    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS, 'nyfed-custody' as const]) {
+    // TM24: the 4 BLOCKED_NOTES (wgc-etf-holdings · wgc-cb-demand ·
+    // official-gold-demand · etf-short-interest) join — they are placed on
+    // /gold as blocked notes (placement.ts), never on /insights, even if a
+    // future fetch wires one of them. Belt-and-suspenders: /insights is
+    // zero-card-capable by construction.
+    expect(HIDDEN_FROM_LANE_IDS.size).toBe(new Set([...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS, ...BLOCKED_LANE_IDS, 'nyfed-custody' as const]).size);
+    for (const id of [...DOLLAR_STRENGTH_IDS, ...US_GLOBAL_REACH_IDS, ...AUSTRALIA_LANE_MOVED_IDS, ...USA_LANE_MOVED_IDS, ...EUROPE_LANE_MOVED_IDS, ...ASIA_GOLD_RESERVE_LANE_MOVED_IDS, ...BLOCKED_LANE_IDS, 'nyfed-custody' as const]) {
       expect(HIDDEN_FROM_LANE_IDS.has(id)).toBe(true);
     }
     // No lane-only reading accidentally joined the hidden set.
@@ -852,6 +858,11 @@ describe('R9 lane presentation (special containers, unchanged gauges)', () => {
     expect(HIDDEN_FROM_LANE_IDS.has('chokepoint-suez')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('wti')).toBe(true);
     expect(HIDDEN_FROM_LANE_IDS.has('food-index')).toBe(true);
+    // TM24: the 4 BLOCKED_NOTES are now hidden too — /insights is zero-card-capable.
+    expect(HIDDEN_FROM_LANE_IDS.has('wgc-etf-holdings')).toBe(true);
+    expect(HIDDEN_FROM_LANE_IDS.has('wgc-cb-demand')).toBe(true);
+    expect(HIDDEN_FROM_LANE_IDS.has('official-gold-demand')).toBe(true);
+    expect(HIDDEN_FROM_LANE_IDS.has('etf-short-interest')).toBe(true);
   });
 
   it('R9-04 + R9-07: every hidden id is a REAL definition whose section is global (no phantom ids)', () => {
