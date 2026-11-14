@@ -6,6 +6,62 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
+> **M0 (2026-11-14) — the MODULARIZATION AUDIT: the Phase-0 audit + plan
+> for the semantic modularization program (NO code moved).** The owner's
+> `MODULARIZATION-PROMPT.md` (repo root) kicked off a new program:
+> restructure the codebase so everything for one domain lives in one
+> folder. This session was AUDIT + PLAN ONLY — zero code moves, gates
+> untouched, nothing deployed. The deliverable:
+> **`docs/modularization/MODULARIZATION-AUDIT.md`** — the full file
+> inventory (all 640 `.ts`/`.tsx` files across the six audited trees,
+> each with target folder + reason + primary importers, built from a
+> complete static import graph of 2,572 edges), the overlapping-items
+> map (the prompt's 16 known overlaps verified + 18 new ones found),
+> the proposed folder structure (10 domain features + shared +
+> features-tools + infrastructure on the web side; 9 domains + shared
+> on the engine side), the 8-phase migration plan (P1 skeleton → P2
+> shared layer → P3 one domain per commit, biggest first → P4 legacy
+> isolation → P5 tools → P6 config pass → P7 docs), 16 risks with
+> concrete mitigations, and the per-phase estimate (~610 files, ~2,100
+> import rewrites, ~28–32h across 16 sessions M1–M16).
+>
+> **The headline findings:** the engine boundary is cleanly one-way
+> (zero engine→web imports) so the 15-entry exports map is the only
+> engine-coupling surface; the legacy /insights page is a super-consumer
+> of every domain (domain-owns + legacy-borrows keeps §19.6 retirement
+> a one-folder delete); four skeleton deviations need the owner's eye
+> (audit §3.1 — gold-score stays engine-shared per the prompt's own
+> constraint; prices/ is engine-shared not commodities; PricesBoard is
+> web-shared not global; the flat card system is legacy-only, not
+> shared); three dead/dangling files (MovesNextStrip, UsGlobalReachGroup,
+> us-global-reach.ts) are flagged for an owner delete-or-keep decision;
+> the migration risk concentrates in the path-referencing machinery
+> (exports map, gates.mjs layer1 path, the Persian-copy manifest, the
+> narrator-vocab/selfcheck GHA imports, 22 depth-sensitive data/*.json
+> imports, the pd-* backtest scripts, build-world-map's geoOutPath).
+>
+> **The next session (M1) executes Phase 1** (the folder skeleton +
+> READMEs + eslint/tsconfig glob extension) per the audit's plan —
+> after the owner reviews the plan and answers the §3.1 deviations.
+
+## Current state (after the M0 modularization audit)
+
+- **Program:** modularization — **Phase 0 (the audit + the plan)
+  DELIVERED**; Phases 1–7 (M1–M16) pending owner review of
+  `docs/modularization/MODULARIZATION-AUDIT.md`. NO code was moved in
+  M0; the working tree is exactly the audit doc + this bookkeeping.
+- **The modularization program's authority chain:** the prompt
+  (`MODULARIZATION-PROMPT.md`) → the audit + plan
+  (`docs/modularization/MODULARIZATION-AUDIT.md`) → one phase per
+  session, `pnpm gates` green at every commit, every move revertible.
+- **Owner decisions pending (blocking nothing):** (a) the four §3.1
+  skeleton deviations; (b) delete-vs-keep for the three dead files;
+  (c) the optional usa-backtest-core harness extraction (audit N1 —
+  explicitly NOT in this program).
+- **Production is unchanged** — the S31 build stays live (see the TM1
+  note below: the treemap commit remains deploy-pending; nothing in
+  M0 affects it).
+
 > **TM1 (2026-11-12, after S31) — the TREEMAP round: the TE-style
 > market heat map on /world-markets (BD-TM1).** The owner's spec: a
 > tradingeconomics-style treemap for the 16 world indices — tile size

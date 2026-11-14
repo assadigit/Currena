@@ -11,6 +11,62 @@
 > A–K, rounds 1–3), and the per-session delivery records in
 > `docs/page-division/01-SESSION-ROADMAP.md`.
 
+## 2026-11-14 — BD-M0 (modularization Phase 0): the audit + the plan — four evidence-based deviations from the prompt's skeleton recorded for owner review; the constraint-locked files stay shared; NO code moved
+
+- **The request:** the owner's `MODULARIZATION-PROMPT.md` — audit the
+  codebase and orchestrate the semantic-modularization plan (Phase 0:
+  the audit + the plan, no code moves; the owner reviews the plan
+  first).
+- **Decision 1 — the audit is evidence-based, not skeleton-based:** the
+  file inventory (all 640 files) was built from a complete static
+  import graph (2,572 edges) + dynamic-import cross-check + adapter
+  census against the placement table, so every target assignment cites
+  who actually imports the file. The prompt's skeleton was treated as
+  a starting hypothesis to refine, exactly as it asked.
+- **Decision 2 — constraint beats skeleton where they conflict:**
+  `gold-score.ts` stays in the engine **shared** folder (the prompt's
+  constraint: the 37 GOLD_LANE_VOTERS span usa/europe/gold/currencies/
+  commodities), overriding the skeleton's `domains/gold/` listing.
+  Likewise `definitions.ts`, `gauges.ts`, `connections.ts` stay shared,
+  and `page-division/` never moves.
+- **Decision 3 — four deviations from the skeleton, recorded with
+  evidence, owner decides (audit §3.1):** (a) `gold-score.ts` (above);
+  (b) engine `prices/` → engine shared, not commodities (serves the
+  gold-usd hero overlay + commodities live cards + the global ribbon);
+  (c) web `PricesBoard.tsx` + the price cluster → web shared, not
+  global (importers: CommoditiesTierCards + legacy; GlobalPage never
+  imports it); (d) the flat card system (AlertCard/CompactRow/CardMeta/
+  PositionBar/DetailsPanel/NarrativeBlock/InTheNews/AboutTheData/
+  JumpNav/ToolsMenu/DataExport*) → `features/insights-legacy/`, not
+  shared (every one is legacy-only today — shared placement would leave
+  dead shared code after the §19.6 retirement).
+- **Decision 4 — the domain-owns + legacy-borrows pattern is the
+  migration invariant:** every domain component keeps its legacy
+  importer edge until Phase 4 collects the legacy tree, so the §19.6
+  retirement remains a one-folder delete at every intermediate commit.
+- **Decision 5 — no renames, ever, in this program:** the bundle-budget
+  gate matches route-module basenames (`GoldPage-*.js` …) and the
+  pd-* backtest scripts import the tiles by path; moves only, names
+  frozen. (The `usa-backtest-core` universal-harness observation N1 is
+  recorded as an optional future refactor — explicitly NOT in this
+  program.)
+- **Decision 6 — three dead/dangling files flagged for the owner,
+  not silently deleted:** `MovesNextStrip.tsx` (0 refs),
+  `UsGlobalReachGroup.tsx` (0 refs), `config/us-global-reach.ts`
+  (dangling). Options: a `chore(M0-pre)` delete commit before M1, or
+  move-as-is into insights-legacy. Recorded per Agent Rule 5.
+- **Decision 7 — the non-moving trees:** apps/api (already
+  route-split + DI), packages/core (13 clean modules behind one
+  barrel), packages/scraper, apps/markets are verified LEAVE-ALONE;
+  their only exposure is the insights exports map + two wrangler main
+  paths + two depth-sensitive data/ JSON imports.
+- **Who decided:** the agent (evidence-driven, per the prompt's
+  audit-only mandate); the owner reviews the plan + the four §3.1
+  deviations before M1 executes Phase 1.
+- **When to revisit:** at the owner's plan review (before M1); the
+  deviations D1–D10 are listed in the audit doc §3.1 for a single-pass
+  A/B sign-off.
+
 ## 2026-11-12 — BD-TM1 (the treemap round): the TE-style market heat map joins /world-markets — tile size from an ILLUSTRATIVE cap table (no stored cap field exists), colour from the SAME period lens the briefing reads, and the tiles opening the SAME detail panel; the squarified layout is a zero-dependency pure function; the World Markets chunk budget bumps 40/9 → 50/11 kB
 
 - **The request:** the owner's treemap spec (2026-11-12, the session
