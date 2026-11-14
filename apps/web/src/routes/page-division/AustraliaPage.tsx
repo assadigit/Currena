@@ -58,7 +58,10 @@ import { AustralianMarkets } from '../../components/insights/AustralianMarkets';
 import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
 import { MoneyPanel } from '../../components/insights/MoneyPanel';
 import { VerdictBlock } from '../../components/insights/VerdictMeter';
+import { Together } from '../../components/insights/Together';
 import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
+import type { InsightsSnapshot } from '@currena/core';
 import { navigate } from '../../router';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
@@ -109,6 +112,32 @@ export function AustraliaPage(): React.JSX.Element {
   const { copy } = useInsightsCopy();
   const boardCopy = useAustraliaBoardCopy(t);
   const boardState = useAuMarketsBoard();
+
+  /* TM20: the Together connection cards (RBA rate → home loan → household
+   * debt; iron ore → terms of trade → AUD; energy exports → terms of trade
+   * → AUD) moved from /insights. Reads the full insights snapshot (the
+   * connections reference ids outside the AU projection — iron-ore,
+   * coal-aus, lng-japan, dollar-basket). Boot from cache, refresh async. */
+  const [insightsSnapshot, setInsightsSnapshot] = useState<InsightsSnapshot | null>(() => {
+    try {
+      return readCachedSnapshot();
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetchInsightsSnapshot(controller.signal)
+      .then((s) => {
+        if (controller.signal.aborted) return;
+        setInsightsSnapshot(s);
+      })
+      .catch(() => {
+        /* honest absence — the connection cards don't render until a
+         * snapshot arrives; a failed fetch stays null */
+      });
+    return () => controller.abort();
+  }, []);
 
   /* ---------------- the projection (the S2 contract) ---------------- */
   const [state, setState] = useState<ProjectionState>(() => {
@@ -310,6 +339,23 @@ export function AustraliaPage(): React.JSX.Element {
       {readings !== undefined ? (
         <div id="australia-tier-cards" className="scroll-mt-24">
           <AustraliaTierCards readings={readings} />
+        </div>
+      ) : null}
+
+      {/* TM20: the "Together" connection cards — moved from /insights.
+          Shows the analytical connections between AU indicators (RBA rate
+          → home loan → household debt; iron ore → terms of trade → AUD;
+          energy exports → terms of trade → AUD). Reads the full insights
+          snapshot (connections reference ids outside the AU projection). */}
+      {insightsSnapshot !== null ? (
+        <div className="mt-3 sm:mt-5" data-australia-together>
+          <Together
+            readings={insightsSnapshot.readings}
+            copy={copy}
+            numberLocale={numberLocale}
+            onFocusCard={() => navigate('/insights')}
+            expandToken={0}
+          />
         </div>
       ) : null}
 

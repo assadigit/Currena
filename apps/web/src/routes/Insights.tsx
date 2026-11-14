@@ -561,14 +561,10 @@ export function Insights() {
            * section (SectionLane's australiaSlot) with its new AU-scope
            * notice; its old standalone spot here is retired. */}
 
-          {/* T1 + R7b: the "Together" connection cards — collapsed default. */}
-          <Together
-            readings={state.snapshot.readings}
-            copy={copy}
-            numberLocale={numberLocale}
-            onFocusCard={focusCard}
-            expandToken={togetherToken}
-          />
+          {/* TM20: the "Together" connection cards (RBA rate → home loan →
+           * household debt; iron ore → terms of trade → AUD; energy exports
+           * → terms of trade → AUD) were moved to /australia. They no
+           * longer render on /insights. */}
 
           {/* TM13: the Signals section (the gold + silver verdict strip with
            * the price-trend chart + range buttons) was moved to /gold.
