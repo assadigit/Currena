@@ -11,6 +11,84 @@
 > A–K, rounds 1–3), and the per-session delivery records in
 > `docs/page-division/01-SESSION-ROADMAP.md`.
 
+## 2026-11-15 — BD-M3 (modularization Phase 3.1, usa): the domain moved in ONE commit (web + engine together, unlike M2's two-commit split); the R8 fixture-depth near-miss fixed by COMPUTING depths in the codemod rather than editing counts; the pre-phase deploy correctly SKIPPED (production already == origin/main); the sandbox `skills/` folder handled as environment noise, never committed
+
+- **The request:** the owner's M3 prompt (verbatim in the prior
+  HANDOFF) — execute Phase 3.1 (the ~34-file usa domain move with the
+  `./tic` exports entry + the pd-s4/s9/s10 script imports updated in
+  the same commit; codemod rewrites; no renames; tests with subjects;
+  gates 9/9 suite 15,298) and, with the sedanama-ir token supplied,
+  re-check the deploy-lock first: if production is at `0592c24f`
+  @ 100% (the M2 close), no deploy before the phase — only after,
+  if gates are green.
+- **Decision 1 — ONE commit for both halves, not M2's two-commit
+  split:** the audit prescribes "web + engine moves together per
+  domain" for Phase 3 because a domain's web files import its engine
+  board through relative edges that only exist inside one commit
+  (usa-backtest-core → `@currena/insights/tic` is package-level, but
+  the pd-s9/s10 scripts + the 5 sibling backtest-cores re-anchor in
+  the same diff as the move they follow). M2 could split because the
+  web/engine shared layers share zero relative edges; the usa domain
+  does not have that property. Options considered: (a) two commits
+  along the M2 line — rejected: the web half alone would reference
+  engine files mid-move; (b) one commit — chosen (commit `d200d537`,
+  53 files changed, 390 insertions, 83 deletions). Decided by: the
+  agent (the audit's own rule). Revisit: none — M4+ domain sessions
+  follow the same one-commit pattern.
+- **Decision 2 — the R8 fixture-depth near-miss, fixed at the cause
+  by COMPUTING the depth:** the codemod's manual-edits table was
+  first written with hand-counted up-levels (+1 from the old
+  `src/adapters` depth), and the full suite caught it: the moved test
+  files resolved `../../..` to `src/fixtures` instead of the package
+  root — `src/domains/usa/adapters` is TWO levels deeper than
+  `src/adapters`, so 4 up-levels are needed, not 3. The fix rewrote
+  the table to render `join(here, …)` argument lists from
+  `path.relative(fileDir, packageRoot)` — the exact mechanical rule
+  risk R8 prescribes ("never hand-count ../"). The dry run cannot
+  catch this class (paths only fail at runtime); the suite is the
+  net, and the grep checklist now says COMPUTE, not count. Options
+  considered: hand-fixing the 4 files and leaving the codemod —
+  rejected: the codemod is the persisted artifact the M4+ sessions
+  will copy; the bug would recur. Decided by: the agent. Revisit:
+  none — the M4+ codemods inherit the computed-depth form.
+- **Decision 3 — the pre-phase deploy SKIPPED per the prompt's own
+  condition, and the post-phase deploy gated on green gates:** the
+  deploy-lock check (the account verified as sedanama-ir: currena-api
+  + currena-markets + the currena.ir zone) showed production at
+  `0592c24f` @ 100% — the M2 close, byte-identical to origin/main —
+  so the prompt's rule fired: no pre-phase deploy, only the
+  post-phase one after 9/9 green. This is the first session where
+  the records and production agreed BEFORE the phase (the M1/M2
+  sessions each found drift); the deploy-lock discipline is what
+  makes that verifiable rather than assumed. Options considered:
+  (a) deploy anyway before the phase — rejected: zero delta to ship,
+  pure risk; (b) follow the condition — chosen. Decided by: the
+  owner (the prompt) + the agent (the check). Revisit: none.
+- **Decision 4 — the sandbox `skills/` folder is environment noise,
+  handled by parking, not by repo changes:** this session's sandbox
+  injected a `skills/` folder (untracked, not in the Currena repo)
+  whose 479 lint errors (all inside it — `no-undef` on browser/node
+  globals, `no-explicit-any`) trip the lint gate. Parking it outside
+  the repo root during each gates run restores the true 0-error
+  state; it is never committed and the repo's eslint config is NOT
+  extended to ignore it (that would be a repo change made for
+  sandbox noise — the R12 scope stays probe-verified as-is). The
+  baseline record notes this so the M4+ sessions recognize it.
+  Options considered: (a) add `skills/**` to eslint ignores —
+  rejected: modifies the repo for a non-repo artifact and weakens
+  the scope proof; (b) park outside during runs — chosen. Decided
+  by: the agent. Revisit: if a future sandbox's `skills/` folder
+  becomes load-bearing for a task, revisit then.
+- **What was verified:** baseline 9/9 (2m 41s) + post-move 9/9
+  (2m 45s), suite EXACTLY 15,298 at both runs; typecheck 6/6
+  packages; exports-map consumers (apps/api 11 subpaths, apps/markets
+  3) needed zero edits — R4; bundle-budget rows byte-identical
+  (no renames) — R5; registry + placement + D-9 regenerated with
+  ZERO drift (byte-identical outputs, D-9 CONDITION MET); the
+  manifest zero-reference check (no re-triage); the `?raw`/fs-URL
+  pre-gates grep clean on the moved set; the deploy-lock bracket
+  (before + after the phase).
+
 ## 2026-11-15 — BD-M2 (modularization Phase 2): the shared layer moved in TWO independently-green commits (web, then engine) rather than one; the Persian-copy manifest re-triaged by re-sourcing 7,773 entries (path keys only, text untouched); the registry's `generatedFrom`/`textTemplates` path-metadata drift recorded and regenerated; plus the session's straggler fixes (user-visible ruleVersion path, the ?raw codemod gap) and the two production deploys that bracket the phase
 
 - **The request:** the owner's M2 prompt (verbatim in the prior
