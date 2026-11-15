@@ -18,7 +18,7 @@
 import type { InsightsSourceReport, IndicatorId } from '@currena/core';
 import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
-import { ABS_SERIES, fetchAbsSeries } from '../../adapters/abs';
+import { ABS_SERIES, fetchAbsSeries } from '../../domains/australia/adapters/abs';
 import { fetchBitstampCloses } from '../../adapters/bitstamp';
 import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from '../../adapters/eia';
 import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from '../../adapters/ecb';
@@ -36,7 +36,7 @@ import { fetchCryptoFng } from '../../adapters/fng';
 import { fetchFrankfurterSeries } from '../../adapters/frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
-import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from '../../adapters/rba';
+import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from '../../domains/australia/adapters/rba';
 import { fetchTreasuryCurves, treasuryT10y2y } from '../../domains/usa/adapters/treasury';
 import { fetchYahooQuote } from './yahoo';
 import { fetchBrentFrontMonthQuote } from '../prices/brent-front-month';

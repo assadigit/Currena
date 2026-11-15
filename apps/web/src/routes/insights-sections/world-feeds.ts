@@ -18,14 +18,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchMarketsSnapshot, readCachedMarkets } from '../../shared/lib/markets';
-import { fetchAuMarketsSnapshot, readCachedAuMarkets } from '../../lib/markets-au';
+import { fetchAuMarketsSnapshot, readCachedAuMarkets } from '../../features/australia/markets-au';
 import { fetchFxSnapshot, readCachedFx } from '../../shared/lib/fx';
 import { fetchNarrativeDoc, readCachedNarrative } from '../../shared/lib/narrative';
 import type { NarrativeDoc } from '../../shared/lib/narrative';
 import { fetchTicSnapshot, readCachedTic } from '../../features/usa/tic';
 import { navigate } from '../../router';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
-import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
+import type { AuMarketsLoadState } from '../../features/australia/AustralianMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
 import type { TicLoadState } from '../../features/usa/TicSection';
 import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../../shared/components/VerdictMeter';

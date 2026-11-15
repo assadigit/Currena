@@ -94,7 +94,7 @@ const AsiaPage = lazy(() => import('./routes/page-division/AsiaPage').then((m) =
 // RegionPage serves no route anymore (all four region routes have their
 // own pages) — the shared RegionIndexSection (the S8 zoom section) rides
 // its own shared chunk every region page loads.
-const AustraliaPage = lazy(() => import('./routes/page-division/AustraliaPage').then((m) => ({ default: m.AustraliaPage })));
+const AustraliaPage = lazy(() => import('./features/australia/AustraliaPage').then((m) => ({ default: m.AustraliaPage })));
 // Page-division S17 (2026-11-11): the Commodities route leaves the
 // placeholder set — its own lazy chunk (the UsaPage/EuropePage/AsiaPage/
 // AustraliaPage pattern): the four commodity groups (Energy · Metals ·

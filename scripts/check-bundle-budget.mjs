@@ -1088,16 +1088,33 @@ const BUDGETS = [
   // Ceiling 26/7 per the tight convention (~3.2 kB raw / ~1.1 kB gz
   // headroom).
   { pattern: /^AustraliaPage-[\w-]+\.js$/, raw: 26_000, gz: 7_000, label: 'Australia page lazy chunk (page-division S16)' },
-  // Page-division S16 (2026-11-10): the shared AU Markets board drawing —
-  // the legacy "The Australian market up close" section, extracted to its
-  // own chunk the moment /australia's board section imported it (Vite's
-  // shared-chunk split; the S10 tic treatment). Measured 12.33/3.49: the
-  // section drawing + the au-markets briefing/shared helpers + the
-  // markets-au definitions, every word fed through the caller's copy
-  // contract (the legacy corpus on /insights, the pinned pd.australia
-  // adapter on /australia — one drawing, one vocabulary, D-48). Ceiling
-  // 15/4.5 per the tight convention (~2.7 kB raw / ~1.0 kB gz headroom).
-  { pattern: /^markets-au-[\w-]+\.js$/, raw: 15_000, gz: 4_500, label: 'shared AU Markets board chunk (page-division S16 — the reused drawing)' },
+  // Page-division S16 (2026-11-10; repointed M5 2026-11-15): the shared AU
+  // Markets board drawing. PRE-M5 this was the dedicated `markets-au-*`
+  // chunk (measured 12.33/3.49: the section drawing + the au-markets
+  // briefing/shared helpers + the markets-au definitions — one drawing,
+  // one vocabulary, D-48). The M5 modularization (Phase 3.3) moved the AU
+  // Markets board modules (the markets-au client + AustralianMarkets +
+  // au-markets/*) into features/australia/ FLAT (the M3 usa + M4
+  // world-markets convention); the co-location under the common
+  // features/australia/ prefix caused Rollup to reorganize the shared
+  // chunks — the AustralianMarkets component absorbed into the
+  // AustraliaPage route chunk (its primary importer), and the markets-au
+  // client + au-markets/shared helpers stayed shared across /australia +
+  // /asia-pacific (the N11 AsiaNzx50Card edge) + /insights, now ONE shared
+  // chunk Rollup names `shared-*` (after the co-located au-markets/shared.ts
+  // module, basename "shared"). Measured 1.78/0.81 post-merger. The 15/4.5
+  // ceiling is RETAINED (the merger shrank the chunk, so the old ceiling
+  // holds with ample headroom — no bump; the gate's bump rule is for
+  // GROWTH). NOTE: there are now TWO `shared-*` chunks (this merged AU
+  // board one + the pre-existing world-markets shared.tsx hub, unchanged
+  // by M5); the gate's Array.find picks the first alphabetical, which is
+  // the AU board chunk in this build — both are well under the ceiling.
+  // Phase 6 (M15 — the config + chunking verification pass) may pin the AU
+  // board chunk name via manualChunks OR add a dedicated world-markets
+  // shared budget entry to bound both explicitly (the audit defers
+  // chunking config to Phase 6). Zero runtime delta (same code, same
+  // bytes, just a different chunk filename).
+  { pattern: /^shared-[\w-]+\.js$/, raw: 15_000, gz: 4_500, label: 'shared AU Markets board chunk (page-division S16 — the M5 co-location merged markets-au-* + AustralianMarkets-* into one shared-* chunk)' },
   // Page-division S17 (2026-11-11): the Commodities route — the four
   // commodity groups (Energy · Metals · Agriculture · Digital) + the
   // Trade routes & supply group (D-38/D-39) — 24 cards with the §21 trio

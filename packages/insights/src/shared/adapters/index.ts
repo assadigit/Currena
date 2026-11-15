@@ -18,7 +18,7 @@ export {
   frankfurterTimeseriesUrl,
   FRANKFURTER_BASE,
 } from '../../adapters/frankfurter';
-export { ABS_SERIES, absDataUrl, fetchAbsSeries, ABS_DATA_BASE } from '../../adapters/abs';
+export { ABS_SERIES, absDataUrl, fetchAbsSeries, ABS_DATA_BASE } from '../../domains/australia/adapters/abs';
 export {
   WB_COMMODITY_MARKETS_PAGE,
   WB_MONTHLY_SHEET_NAME,
@@ -57,8 +57,8 @@ export type { YahooQuote, YahooQuoteOptions } from './yahoo';
 export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from '../../adapters/ecb';
 export { bitstampOhlcUrl, fetchBitstampCloses } from '../../adapters/bitstamp';
 export type { BitstampWindow } from '../../adapters/bitstamp';
-export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from '../../adapters/rba';
-export type { RbaTableKey, RbaTableSpec } from '../../adapters/rba';
+export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from '../../domains/australia/adapters/rba';
+export type { RbaTableKey, RbaTableSpec } from '../../domains/australia/adapters/rba';
 export {
   TREASURY_BASE,
   TREASURY_CURVE_NOMINAL,

@@ -26,7 +26,7 @@ import {
   usDeficit12mSeries,
 } from './rung4';
 import { RUNG2_IDS } from './rung2';
-import { ABS_AU_IDS } from '../../adapters/abs-au';
+import { ABS_AU_IDS } from '../../domains/australia/adapters/abs-au';
 import { PORTWATCH_IDS } from '../../adapters/portwatch';
 import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsRung4Phase } from '../ingest/run';
 import type { InsightsStore } from '../store';

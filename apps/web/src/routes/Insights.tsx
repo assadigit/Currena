@@ -49,8 +49,8 @@ import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../shared/lib/insights';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
-import { MoneyPanel } from '../components/insights/MoneyPanel';
-import { AustralianMarkets } from '../components/insights/AustralianMarkets';
+import { MoneyPanel } from '../features/australia/MoneyPanel';
+import { AustralianMarkets } from '../features/australia/AustralianMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
 import { useInsightsCopy } from '../shared/hooks/useInsightsCopy';
 import {

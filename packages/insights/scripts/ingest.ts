@@ -41,7 +41,7 @@ import { collectRung4Sources } from '../src/shared/adapters/rung4';
 import { collectCreditSources } from '../src/domains/usa/adapters/credit';
 import { collectTreasuryAuctions } from '../src/domains/usa/adapters/auctions';
 import { collectPortwatch } from '../src/adapters/portwatch';
-import { collectAbsAuMacro } from '../src/adapters/abs-au';
+import { collectAbsAuMacro } from '../src/domains/australia/adapters/abs-au';
 import type { IndicatorId } from '@currena/core';
 import type { SeriesPoint } from '../src/shared/series';
 

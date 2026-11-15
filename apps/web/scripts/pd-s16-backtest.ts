@@ -50,7 +50,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { InsightsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { pageGroupIds } from '@currena/insights/page-division';
-import { auditUsaFreshness, backtestAustraliaPage, AUSTRALIA_BACKTEST_CARD_IDS, type FreshnessRegistryEntry } from '../src/routes/page-division/australia-backtest-core';
+import { auditUsaFreshness, backtestAustraliaPage, AUSTRALIA_BACKTEST_CARD_IDS, type FreshnessRegistryEntry } from '../src/features/australia/australia-backtest-core';
 import {
   AUSTRALIA_CARD_IDS,
   AUSTRALIA_INFLATION_RATES_IDS,
@@ -60,7 +60,7 @@ import {
   AUSTRALIA_EXTERNAL_IDS,
   AUSTRALIA_WORLD_RISK_IDS,
   AUSTRALIA_MOVED_OUT_IDS,
-} from '../src/routes/page-division/australia-tiles';
+} from '../src/features/australia/australia-tiles';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

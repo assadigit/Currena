@@ -4,11 +4,11 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { fetchRbaSeries, parseRbaCashRateHtml, RBA_TABLES, rbaTableUrl } from './rba';
-import { FormatChangedError } from '../shared/adapters/fetch-policy';
-import { parseRbaTableCsv } from '../shared/parsers';
+import { FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import { parseRbaTableCsv } from '../../../shared/parsers';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const FIXTURES = join(HERE, '..', '..', 'fixtures');
+const FIXTURES = join(HERE, '..', '..', '..', '..', 'fixtures');
 
 /**
  * Fixtures are the REAL RBA CSV bytes fetched from the ingestion venue

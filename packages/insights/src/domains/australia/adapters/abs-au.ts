@@ -47,12 +47,12 @@
  */
 
 import type { IndicatorId, InsightsSourceReport } from '@currena/core';
-import { classifySourceError, insightsFetch } from '../shared/adapters/fetch-policy';
-import { providerFetchEnabled } from '../shared/sources';
-import { yoyPctSeries, type SeriesPoint } from '../shared/series';
-import { parseAbsSdmxCsv } from '../shared/parsers';
+import { classifySourceError, insightsFetch } from '../../../shared/adapters/fetch-policy';
+import { providerFetchEnabled } from '../../../shared/sources';
+import { yoyPctSeries, type SeriesPoint } from '../../../shared/series';
+import { parseAbsSdmxCsv } from '../../../shared/parsers';
 import { ABS_DATA_BASE } from './abs';
-import type { FetchDeps } from '../shared/adapters/types';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 /** The raw ABS series keys the S5 family consumes (verified M5.1). */
 export const ABS_AU_SERIES = {

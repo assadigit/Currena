@@ -43,8 +43,8 @@ import { formatDateWords, formatJalaliDate, formatNumber } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
-import { fetchAuMarketsSnapshot, readCachedAuMarkets } from '../../lib/markets-au';
-import { auFmtClose, auReturnToneClass, auSignedPct } from '../../components/insights/au-markets/shared';
+import { fetchAuMarketsSnapshot, readCachedAuMarkets } from '../../features/australia/markets-au';
+import { auFmtClose, auReturnToneClass, auSignedPct } from '../../features/australia/au-markets/shared';
 
 /** The card's load state — the M-17 keep-flagged discipline. */
 type NzxState =

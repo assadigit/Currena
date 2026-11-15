@@ -17,12 +17,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { collectAbsAuMacro, ABS_AU_IDS, ABS_AU_SERIES } from './abs-au';
-import { parseAbsSdmxCsv } from '../shared/parsers';
-import { yoyPctSeries } from '../shared/series';
-import { DEFINITIONS } from '../shared/definitions';
+import { parseAbsSdmxCsv } from '../../../shared/parsers';
+import { yoyPctSeries } from '../../../shared/series';
+import { DEFINITIONS } from '../../../shared/definitions';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures', 's5');
+const fixtures = join(here, '..', '..', '..', '..', 'fixtures', 's5');
 
 /** The 2026-11-02 captures (verbatim provider bodies). */
 const fixtureText = (name: string): string => readFileSync(join(fixtures, name), 'utf8');

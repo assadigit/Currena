@@ -24,7 +24,7 @@
 
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
-import type { AuMarketsBoardCopy } from '../../components/insights/AustralianMarkets';
+import type { AuMarketsBoardCopy } from './AustralianMarkets';
 
 /** The corpus marketsAu keys the drawing's own contract names (camelCase,
  *  the corpus's own names). */

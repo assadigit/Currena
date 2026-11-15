@@ -24,7 +24,7 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { IconImg, moneyAreaIconUrl } from '../icons/currena';
+import { IconImg, moneyAreaIconUrl } from '../../components/icons/currena';
 import {
   formatIndicatorValue,
   moneyAreaDirection,

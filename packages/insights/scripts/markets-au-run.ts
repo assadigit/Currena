@@ -25,9 +25,9 @@
  *   pnpm --filter @currena/insights markets-au-run
  */
 
-import { auDefaultFetcher } from '../src/markets-au/job';
-import { runAuMarketsUpdate, formatAuRunReport } from '../src/markets-au/run';
-import { RestAuMarketsStore } from '../src/markets-au/store';
+import { auDefaultFetcher } from '../src/domains/australia/markets-au/job';
+import { runAuMarketsUpdate, formatAuRunReport } from '../src/domains/australia/markets-au/run';
+import { RestAuMarketsStore } from '../src/domains/australia/markets-au/store';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
