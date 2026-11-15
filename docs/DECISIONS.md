@@ -11,6 +11,92 @@
 > A–K, rounds 1–3), and the per-session delivery records in
 > `docs/page-division/01-SESSION-ROADMAP.md`.
 
+## 2026-11-15 — BD-BR (the baseline-repair session): the five repairs executed per the recipe with two judgment calls recorded — the dead-import chunk-topology consolidation (4 budget rows re-documented, not growth) and the GoldPositions copy placement (4 new pd.gold keys; the TM23 pd.commodities pair left queued untouched)
+
+- **The request:** the owner's BASELINE-REPAIR session prompt — restore
+  the 9-gate green baseline by landing the five pre-attributed repairs
+  from HANDOFF §"The red baseline — the five repairs", fix causes
+  never rules, then the bookkeeping; no deploy, no skeleton.
+- **Decision 1 — the bundle-budget rows (the session's one finding
+  beyond the recipe):** the recipe expected two rows over (GoldPage
+  35.01/9.14 vs 34/9 · WorldMarketsPage 52.83/13.06 vs 50/11), but the
+  lint repair (removing the 26 dead vars) restructured the chunk
+  graph: the TM cuts had removed the RENDERs from Insights.tsx while
+  leaving the IMPORTs, so the Signals/tic/PricesBoard/narrative module
+  trees stayed in shared chunks that /insights visitors downloaded as
+  dead weight (~70 kB raw). With the imports gone, the bundler merged
+  each tree into its sole consumer: GoldPage 35.01 → 70.42 (Signals),
+  UsaPage 24.99 → 45.41 (the tic drawing — "shared" in name only since
+  TM10), CommoditiesPage 8.33 → 20.04 (the PriceTile tree), GlobalPage
+  31.83 → 35.41 (narrative; ceiling held). Byte accounting across the
+  whole build: every route's download is the same bytes or fewer, the
+  total bundle SHRANK 3,660 bytes. Options considered: (a) side-effect
+  imports pinning the dead graph to preserve the old chunk layout —
+  rejected: keeps dead download weight and contradicts "the imports
+  are pure dead code — mechanical removal"; (b) a manualChunks config
+  pass re-splitting shared trees — rejected: out of the session's
+  constraints (a build-config intervention, and it would re-introduce
+  the dead downloads); (c) re-document the budgets to the consolidated
+  topology — chosen. Disposition: GoldPage 34/9 → 72/18.5 ·
+  WorldMarketsPage 50/11 → 54/13.5 (the original TM2–TM4 growth, the
+  recipe's row) · UsaPage 26/7 → 47/12 · CommoditiesPage 16/5 → 21/6.5
+  · GlobalPage HELD at 36/11 (35.41 measured, note added) · the shared
+  tic row kept at 24/7 (now its 0.70 kB shell; the ceiling guards any
+  future second consumer). **These bumps are re-documentation of a
+  redistribution, NOT growth** — future sessions reading "budgets
+  held" compare against the post-BR numbers. Decided by: the agent (the
+  owner's default per the recipe: "documented bump if unsure; flag it
+  for the owner either way"). Revisit: if the owner prefers the old
+  per-route lean ceilings, a manualChunks pass in a dedicated session
+  could re-split the trees (accepting dead downloads for /insights
+  until §19.6 retires it).
+- **Decision 2 — the GoldPositions copy placement:** the 4 hardcoded
+  fa strings moved into the dictionary byte-identically (house rule 5,
+  rendered text unchanged in both locales) as FOUR NEW
+  `pd.gold.positions*` keys (positionsTitle · positionsPurpose ·
+  positionsCardTraderPositioning · positionsCardGrossLong) — the
+  section renders on /gold, so its copy lives in the pd.gold
+  namespace. Notable: byte-identical fa values already existed in the
+  dictionary for 3 of the 4 strings (pd.commodities.positionsTitle for
+  the title; pd.gold.cardNames['cftc-gold-positioning'/'cftc-gold-gross-
+  long'] for the card names) — but the EN counterparts differ from the
+  component's rendered words, so wiring to them would have changed
+  rendered EN text (behavioral; forbidden). Options considered:
+  (a) wire to the existing keys — rejected: changes the rendered EN
+  card names; (b) overwrite the existing values with the component's
+  text — rejected: rewords dictionary copy and destroys TM23's text
+  without review; (c) four new byte-identical keys, TM23's
+  pd.commodities.positions* pair left untouched and queued — chosen.
+  All 10 untriaged strings (the 6 TM21–TM23 keys + the 4 new ones)
+  triaged needs-review (1,258 queued, the S7/S31 precedent). The
+  fa purpose string contains an em dash (moved byte-identically per
+  the recipe; the fa no-em-dash rule rides the owner's queued review).
+  Decided by: the agent. Revisit: the owner's fa review round may unify
+  the duplicated values (title + card names) and reword the purpose —
+  then the redundant keys retire in the same edit.
+- **Decision 3 — the two side-effect-bearing dead-var removals:** the
+  recipe said "mechanical removal only — nothing behavioral; if a
+  removal turns out to touch live logic, stop and re-check the git
+  blame first." The blame was checked for both hook calls:
+  `useTicSection(ticFeedEnabled)` (its fetch result fed nothing since
+  TM10 cut every consumer; /usa fetches via its own S10 loader) —
+  removal chosen, completing the TM10 cut and stopping a dead
+  `GET /api/insights/tic` on every /insights visit;
+  `useWorldSectionIndicators` — pure useMemo derivation, removed with
+  no behavioral surface. Decided by: the agent per the recipe's own
+  blame-first rule.
+- **Also recorded:** the GoldPage.test S6 selector scoping (the
+  stub-routing fix rendered the Signals section, whose BalanceScale
+  drawing shares the hero's data-balance-* attributes; the test's
+  assertions were scoped to the hero's [data-balance-classic]
+  container — same assertions, precise target, no weakening: every
+  count/aria/pan/tray/beam check still runs against the hero's
+  drawing).
+- **Gates at close:** 9/9 GREEN, suite exactly 15,298 (core 195 ·
+  scraper 67 · insights 1383 · markets 13 · api 414 · web 13,226),
+  zero unhandled errors. No deploy (the TM1–TM4 treemap stays parked
+  for the M1 re-run per BD-M1's sequencing).
+
 ## 2026-11-15 — BD-M1 (modularization Phase 1, blocked): the baseline-gates STOP — Phase 1 not started on a red baseline; the TM-series gate drift diagnosed and the repair session ordered; the §3.1 deviations recorded as owner-approved
 
 - **The request:** the owner's M1 session prompt — execute

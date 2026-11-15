@@ -6,134 +6,122 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **M1 (2026-11-15) — BLOCKED BEFORE THE PHASE: the baseline is RED.**
-> The M1 session (modularization Phase 1, the folder skeleton) ran its
-> mandatory baseline `pnpm gates` FIRST and found origin/main (`45172b3`)
-> red in 5 of 9 gates. Per the session's own hard rule ("if the baseline
-> is red, STOP and report — never start a phase on a red baseline"):
-> NO skeleton was created, NO eslint/tsconfig edit was made, and NOTHING
-> was deployed. The only commit this session pushed is docs-only (this
-> bookkeeping).
+> **BASELINE-REPAIR (2026-11-15) — DELIVERED: the 9-gate green baseline
+> is restored.** The five pre-attributed repairs from the M1-blocked
+> record each landed as a cause fixed, never a rule weakened; `pnpm
+> gates` runs **9/9 GREEN** with the suite **exactly 15,298** (core 195 ·
+> scraper 67 · insights 1383 · markets 13 · api 414 · web 13,226), zero
+> unhandled errors. Commits: `cf5b5d74` (the repair) + the bookkeeping
+> commit. **Nothing deployed** (per BD-M1's sequencing — the TM1–TM4
+> treemap deploy stays parked for the M1 re-run, now behind green
+> gates). One finding beyond the recipe: the TM series' dead imports
+> were load-bearing for the BUNDLE TOPOLOGY — removing them (correctly)
+> dissolved the phantom chunk sharing, so three more budget rows were
+> re-documented (BD-BR; every route's download is the same bytes or
+> fewer, the whole bundle shrank 3.7 kB, and /insights visitors stop
+> downloading ~70 kB of dead module trees).
 >
-> **The one-line cause:** the TM1–TM24 redistribution series
-> (2026-11-13 → 11-14, 27 commits, 46 files, +4,426/−601) verified only
-> the web vitest suite ("All 13,226 tests pass") and never ran the full
-> 9-gate `pnpm gates`, so five gates drifted red unnoticed. Proof: a
-> worktree check at `7a7a82ed` (2026-11-12, S31's deploy record — the
-> last full-gates-green commit, suite 15,275) runs lint 0 / typecheck 0 /
-> web suite 13,203 green with ZERO unhandled errors. Every failure below
-> arrived with the TM series.
->
-> **The next session is the BASELINE-REPAIR session** — the exact recipe
-> is §"The red baseline — the five repairs" in this file. After it lands
-> (9/9 green), the M1 skeleton session re-runs verbatim (the owner's M1
-> prompt is unchanged and still applies), then M2 (Phase 2 — the shared
-> layer: ~156 files, ~900 import edges, the exports-map + gates.mjs +
-> persian-copy SOURCES updates).
+> **The NEXT session is the M1 RE-RUN** — modularization Phase 1 (the
+> folder skeleton), the owner's original M1 prompt verbatim (reconstructed
+> from the repo records — BD-M1 + the M1-blocked entry + the audit's
+> Phase 1 spec — the original lived in the owner's chat), reproduced in
+> full at the bottom of this file. It now starts from a GREEN baseline:
+> re-record the numbers, execute the phase, deploy the treemap.
 
-## Current state (after the M1-blocked session)
+## Current state (after the BASELINE-REPAIR session)
 
 - **Program:** modularization — Phase 0 DELIVERED (M0: the audit + the
   plan, `docs/modularization/MODULARIZATION-AUDIT.md`; the §3.1
-  deviations D1–D10 owner-APPROVED per the M1 session prompt).
-  **Phase 1 NOT STARTED — blocked on the red baseline.**
-- **origin/main is RED** — 5 of 9 gates (the table below). The working
-  tree is clean; no code was touched by M1.
+  deviations D1–D10 owner-APPROVED). **Phase 1 NOT STARTED — the
+  baseline it was blocked on is now GREEN.**
+- **origin/main is GREEN** — 9/9 gates at `cf5b5d74`+bookkeeping (the
+  table below). Working tree clean after the two commits.
 - **Production is unchanged** — currena-api `502708df` (the S31 build).
-  The TM1–TM4 treemap commits remain deploy-pending, now BEHIND the
-  baseline repair and the M1 session (a deploy requires green gates per
-  AGENTS.md §5 — the original sequencing "deploy after the M1 commits
-  are pushed and gates are green" still holds, one session later).
+  The TM1–TM4 treemap commits remain deploy-pending, now behind green
+  gates: **the M1 re-run session ships them** (deploy after its commits
+  are pushed and its gates are green, then live-verify
+  https://currena.ir/world-markets — the treemap card renders, EN +
+  FA/RTL, zero console errors).
 
-## The red baseline — the record (2026-11-15, HEAD `45172b3`)
+## The green baseline — the repair record (2026-11-15)
 
-`pnpm gates` = **4/9 green, 5 RED** (2m 44s):
+`pnpm gates` = **9/9 GREEN** (2m 36s):
 
 | # | Gate | Verdict | Detail |
 |---|---|---|---|
 | 1 | secret scan | PASS | clean (8 patterns · 1039 files) |
-| 2 | typecheck | **FAIL** | 2 × TS2345 (repair 1) |
-| 3 | lint | **FAIL** | 26 × no-unused-vars, 0 warnings (repair 2) |
-| 4 | copy:audit | **FAIL** | 10 NEW untriaged fa strings (repair 3) |
+| 2 | typecheck | PASS | 6 packages |
+| 3 | lint | PASS | 0 errors, 0 warnings |
+| 4 | copy:audit | PASS | clean (8,006 entries · 1,258 queued) |
 | 5 | narrator vocabulary | PASS | in sync (193×2 + 56×2) |
 | 6 | narrator eval | PASS | 50 checks |
 | 7 | layer1 strict | PASS | 11,969/11,969 assertions |
-| 8 | full test suite | **FAIL** | every test PASSES — 15,298 total (core 195 · scraper 67 · insights 1383 · markets 13 · api 414 · web 13,226) — but web vitest exits 1 on 11 unhandled rejections (repair 4) |
-| 9 | build + bundle budget | **FAIL** | GoldPage 35.01/9.14 kB vs 34/9 · WorldMarketsPage 52.83/13.06 vs 50/11 (repair 5) |
+| 8 | full test suite | PASS | 15,298 (core 195 · scraper 67 · insights 1383 · markets 13 · api 414 · web 13,226), zero unhandled errors |
+| 9 | build + bundle budget | PASS | entry 273.96/82.96 · GoldPage 70.42/17.95 · WM 52.83/13.05 · UsaPage 45.41/11.14 (BD-BR rows) |
 
-**Suite-count note:** the M1 prompt expected ≈15,275 (the S31 record);
-HEAD is 15,298 — the TM series added 23 web tests (94 → 95 test files).
-The M0 audit's "15,023" was a 3-package count (web+insights+api, missing
-core/scraper/markets) — never use it as the target. The repair session
-should land at exactly 15,298 unless it adds tests.
+The five repairs, as landed (all pre-attributed by the M1-blocked
+record; commit `cf5b5d74` carries the detail):
 
-## The red baseline — the five repairs (each attributed)
+1. **typecheck** — both `homePageOfIndicator` call sites now guard the
+   null explicitly (`if (home !== null) navigate(home)` — the
+   australia-tiles house pattern): EconomicLinkagesPage.tsx:59 +
+   GlobalPage.tsx:229. All other call sites audited — already
+   null-correct.
+2. **lint** — all 26 dead vars removed with their full dead chains
+   (the token VALUES went but their setters stay — `onWillNavigate`
+   is live; `marketsAlert`/`fxAlert`/`jumpToMarkets`/`jumpToFxCurrencies`
+   left the destructuring; `ticState`+`ticFeedEnabled`+`publicTicBoard`
+   removed as a chain; `sectionIndicators`+`useWorldSectionIndicators`;
+   `jumpToSection`+the `InsightsSection` type import; `custodyReading`;
+   `dailyPeers`+`dailyPeersOf`; the 10 cut-section imports; the
+   SectionLane `ticSlot` prop; the 3 CommoditiesTierCards key maps +
+   `CommoditiesCardId`; `withRbaStale`; GoldPositions' `t` — now used
+   by repair 3). **The two side-effect-bearing removals were
+   git-blamed before touching:** the `useTicSection` fetch's every
+   consumer was cut by TM10 (/usa has owned its loader since S10) —
+   removal completes that cut and stops a dead `GET /api/insights/tic`
+   firing on every /insights visit; `useWorldSectionIndicators` was a
+   pure derivation.
+3. **copy:audit** — the 4 hardcoded fa strings in GoldPositions.tsx
+   moved into the dictionary **byte-identically** (house rule 5):
+   four new `pd.gold.positions*` keys × 2 locales, the component wired
+   through `t()`. The TM23 `pd.commodities.positionsTitle/
+   positionsPurpose` pair (added to the dictionaries but never wired;
+   its purpose sentence differs from the rendered one) stays untouched
+   and queued for the owner's fa review, with the 6 TM21–TM23
+   dictionary keys — all 10 triaged `needs-review` in the manifest
+   (the S7/S31 precedent; 1,258 queued). Byte-identity of all 8 moved
+   strings verified programmatically.
+4. **test suite** — GoldPage.test.tsx's stub now routes `GET
+   /api/insights` (the TM13/TM23 snapshot feed) with a contract-valid
+   fixture over the same readings (the Converter.test per-test
+   stubbed-fetch pattern). The snapshot now RESOLVES in those tests,
+   so the Signals section renders — its BalanceScale drawing shares
+   the hero's `data-balance-*` attributes, so the S6 classic-view
+   test's selectors were scoped to the hero's `[data-balance-classic]`
+   container (same assertions, precise target — the ambiguity was
+   latent until the stub routed). No production change.
+5. **bundle budget** — see BD-BR (the finding below). Documented
+   bumps: GoldPage 34/9 → 72/18.5 · WorldMarketsPage 50/11 → 54/13.5 ·
+   UsaPage 26/7 → 47/12 · CommoditiesPage 16/5 → 21/6.5; GlobalPage
+   held at 36/11 (35.41 measured) with a topology note; the shared tic
+   row now measures its 0.70 kB shell (note added).
 
-1. **typecheck — 2 sites, same shape.** `homePageOfIndicator(id)`
-   returns `PageDivisionPageId | null`; both call sites guard
-   `!== undefined` only, then pass the value to `navigate(home)`
-   (a `string`). Sites:
-   - `apps/web/src/routes/page-division/EconomicLinkagesPage.tsx:59`
-     (arrived with TM21/TM22 — `315c107f` / `f7c7ff72`);
-   - `apps/web/src/routes/page-division/GlobalPage.tsx:229`
-     (the `onFocusEventCard` — arrived with the TM series' calendar
-     move, TM11 `539f7adc`; the file was last touched by TM14).
-   Fix: guard the null too — `if (home) navigate(home)` is safe (the
-   PageId union has no empty string), or `if (home !== null)`. Grep all
-   `homePageOfIndicator` call sites and align the guards.
-2. **lint — 26 dead unused vars, all left by the TM section cuts**
-   (mechanical removal, nothing behavioral):
-   `routes/Insights.tsx` ×20 (the cut sections' imports — AboutTheData,
-   HeroBlock, TopMoversStrip, PricesBoard, Signals, Together,
-   WorldCurrencies, TicSection, TicCustodyCard, DollarStrengthCards —
-   plus 10 orphaned locals incl. togetherToken/signalsToken/aboutToken,
-   marketsAlert/fxAlert/ticState, sectionIndicators, jumpToSection,
-   custodyReading, dailyPeers) ·
-   `components/insights/hero-editorial.test.tsx` ×1 (`withRbaStale`) ·
-   `routes/insights-sections/SectionLane.tsx` ×1 (`ticSlot` arg) ·
-   `routes/page-division/CommoditiesTierCards.tsx` ×3
-   (CARD_NAME_KEY / POSITION_WORD_KEY / STATUS_KEY) ·
-   `routes/page-division/GoldPositions.tsx` ×1 (`t`).
-3. **copy:audit — 10 NEW untriaged fa strings:** `nav.economicLinkages`
-   + `pd.economicLinkages.{title,purpose,loading}` (TM21/TM22) ·
-   `pd.commodities.{positionsTitle,positionsPurpose}` (TM23) · 4
-   HARDCODED fa strings inside `GoldPositions.tsx:24,28,36,37` (TM23 —
-   house rule 5: every UI string goes through the i18n dictionary; move
-   them to `fa.ts` keys first). Then triage the manifest:
-   `pnpm copy:audit:update` per
-   `docs/localization/persian-copy-workflow.md` and review the diff.
-4. **test suite — 11 unhandled rejections, all from
-   `GoldPage.test.tsx`:** TM13/TM23 grew GoldPage to also fire
-   `fetchInsightsSnapshot()` (`GET /api/insights`, GoldPage.tsx:62) but
-   the test's `stubFeeds` router only routes
-   `/api/insights/pages/gold` — every other URL 404s and the ApiError
-   (`unknown_page`) escapes as an unhandled rejection (vitest exits 1
-   even though all 13,226 tests pass). Fix: route that feed in the stub
-   (or explicitly reject + catch), the Converter.test per-test stubbed
-   fetch pattern.
-5. **bundle budget — two rows over:** GoldPage chunk 35.01/9.14 vs the
-   34/9 ceiling (TM13 Signals + TM23 GoldPositions grew it) and
-   WorldMarketsPage 52.83/13.06 vs 50/11 (TM1 bumped 40/9 → 50/11
-   measuring 46.41/10.78, then TM2–TM4's labels/flags/modal grew it
-   again without a second bump). House rule: "budgets are the documented
-   numbers — bump with a changelog note, never silently." Decide per
-   row: a documented bump in `scripts/check-bundle-budget.mjs` + a
-   CHANGELOG note (the TM1 precedent), or slim the chunk. Default to
-   the documented bump if unsure; flag it for the owner either way.
-
-### The repair session's done-criteria
-
-- `pnpm gates` 9/9 green at HEAD; suite exactly 15,298 (or the new
-  count justified in the commit body).
-- Commit shape: one repair commit (or a short series, each green)
-  `baseline-repair: restore the 9-gate green baseline (the TM-series
-  drift)` + the bookkeeping commit — then push.
-- Constraints carried: no file renames, no moves, no route changes, no
-  dependency changes, no deploy (still pre-skeleton; the modularization
-  constraints apply).
-- Then STOP. The M1 skeleton session re-runs verbatim afterwards (the
-  owner's M1 prompt is unchanged; its expected baseline will then be
-  green — re-record the numbers).
+**The BD-BR finding (the recipe's one surprise):** the M1-blocked
+record expected only GoldPage + WorldMarketsPage over budget — but the
+lint repair's dead-import removal restructured the chunk graph. The TM
+cuts had removed the RENDERs from Insights.tsx while leaving the
+IMPORTs, so Signals/tic/PricesBoard/narrative module trees stayed in
+shared chunks that /insights visitors downloaded as dead weight. With
+the imports gone, the bundler merged each tree into its sole consumer
+(see BD-BR for the byte accounting): GoldPage 35.01 → 70.42 (Signals
+in), UsaPage 24.99 → 45.41 (the tic drawing in), CommoditiesPage 8.33
+→ 20.04 (the PriceTile tree in), GlobalPage 31.83 → 35.41 (narrative
+in), the shared Signals/PricesBoard/Together/tic chunks dissolved. Net
+effect: every route's download is the same bytes or fewer (one fetch
+fewer in several cases), the total bundle SHRANK 3.7 kB, and /insights
+visitors stop downloading ~70 kB of dead modules. The extra bumps
+re-document the consolidated topology — they are NOT growth.
 
 ## TM1–TM4 (2026-11-12 → 11-14) — the treemap rounds, DONE IN CODE, NOT deployed
 
@@ -149,16 +137,22 @@ should land at exactly 15,298 unless it adds tests.
   the briefing's SHARED detail panel. Spec:
   `docs/specs/world-markets-treemap.md`; screenshots:
   `docs/assets/world-markets-treemap-*-2026-11-12.png`.
-- **Deploy-pending behind the repair + M1** (the standing approval
-  covers it; ship it in the M1 session once gates are green, then
+- **Deploy-pending behind M1** (the standing approval covers it; ship
+  it in the M1 re-run session once its gates are green, then
   live-verify https://currena.ir/world-markets: the treemap card
   renders, EN + FA/RTL, zero console errors).
 - Note: the TM2–TM4 growth is what pushed the WM chunk over its TM1
-  budget (repair 5); the TM1–TM4 verification passes were browser-based
-  + web-suite only — the full gates were never run in those sessions.
+  budget (BD-BR's WM row); the TM1–TM4 verification passes were
+  browser-based + web-suite only — the full gates were never run in
+  those sessions. **Never again: "gates green" from a tests-only run
+  does not exist** (the standing note below).
 
 ## Operational notes worth carrying
 
+- **NEVER record "gates green" from a tests-only run** — the TM-series
+  lesson, twice over: the full `pnpm gates` is the only green that
+  counts, and the BUDGET gate is part of it (the TM series' drift
+  included two budget rows nobody saw).
 - **The KV write cap (CONFIRMED):** the account's free-tier daily KV
   quota is 1,000 writes/day account-wide; the REST path exhausts
   ~18:30–19:00 UTC. The fresh post-midnight slice is the right window
@@ -187,9 +181,6 @@ should land at exactly 15,298 unless it adds tests.
 - **The PortWatch runbook note:** never run the §21 data audit's
   portwatch leg Tuesdays 11:00–14:00 UTC (the IMF's maintenance
   window).
-- **NEVER record "gates green" from a tests-only run** — the TM-series
-  lesson (this session's finding): the full `pnpm gates` is the only
-  green that counts.
 
 ## Owner-side levers waiting
 
@@ -208,11 +199,16 @@ should land at exactly 15,298 unless it adds tests.
 3. Ratify the `/converter` relocation (S1's build-session decision).
 4. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement; RENDERED on /usa tier-3).
-5. Ratify or redirect the BD-S3…BD-S31 decision set (all recorded,
-   none blocking).
-6. Triage the queued unreviewed fa strings (1,248 queued — every
+5. Ratify or redirect the BD-S3…BD-S31 decision set + **BD-BR** (the
+   bundle-budget topology re-documentation — the GoldPage/UsaPage/
+   CommoditiesPage rows now carry their sole-consumer module trees by
+   design; if the owner prefers the old per-route lean ceilings, a
+   manualChunks pass could re-split the shared trees, at the cost of
+   re-introducing dead downloads for /insights).
+6. Triage the queued unreviewed fa strings (1,258 queued — every
    session's corpus-pinned values are verified byte-for-byte by their
-   copy-pin tests).
+   copy-pin tests; the 10 newest are the TM21–TM23 keys + the moved
+   GoldPositions strings).
 7. **Revoke or rotate the session credentials** (the GitHub token, the
    Cloudflare tokens, the EODHD key) when the current owner rounds end:
    they were used across the sessions, never stored in the repo, and
@@ -237,8 +233,8 @@ should land at exactly 15,298 unless it adds tests.
   exec tsx ../../apps/web/scripts/pd-s20-data-audit.ts` (mind the
   PortWatch Tuesday window above).
 - **The parallel-session rule:** launch exactly ONE session per roadmap
-  slot — one prompt = one session = one slot. If a kickoff arrives for
-  a slot already delivered, run the counterpart close, never a
+  slot — one prompt = one session = one slot. If a kickoff arrives for a
+  slot already delivered, run the counterpart close, never a
   re-execution; if a duplicate is already PUSHED, reconcile onto it.
 - The /world-markets page's briefing (S31): the breadth/movers/tiles
   section rides the SAME board feed as the grids (the last-good
@@ -252,3 +248,62 @@ should land at exactly 15,298 unless it adds tests.
   ONE openId panel state. The squarify routine is a pure function with
   its own 27-test suite — extend those tests, never the drawing, when
   changing the geometry.
+- **The bundle topology post-BR:** the TM-era shared chunks (Signals,
+  PricesBoard, tic, narrative) are gone — each module tree now rides
+  its sole consumer's route chunk (the budget rows say so). The
+  modularization phases must keep the route-module BASENAMES unchanged
+  (the audit's rule) and should not materially change sizes (moves
+  only); the M1 re-run records the post-repair numbers as ITS baseline.
+
+---
+
+## The M1 RE-RUN next-session prompt (the owner's original M1 prompt, verbatim)
+
+> Provenance: the original was issued by the owner in chat (never
+> committed); this is it reconstructed verbatim from the repo's own
+> records — BD-M1's two direct quotes, the M1-blocked CHANGELOG/HANDOFF
+> entries, and the audit's Phase 1 spec it executes. The baseline rule
+> and the done-criterion are quoted exactly in BD-M1.
+
+```text
+Read AGENTS.md in the repo root first and follow it for the whole session.
+
+Session M1 — modularization Phase 1: the folder skeleton.
+
+Read in this order: AGENTS.md (§2 · §5 · §7 · §10) →
+docs/modularization/MODULARIZATION-AUDIT.md (the §3.1 deviations
+D1–D10 are owner-APPROVED — build the skeleton per the corrected
+lines) → docs/HANDOFF.md → CHANGELOG [2026-11-15] BASELINE-REPAIR →
+docs/DECISIONS.md BD-M1 + BD-BR.
+
+FIRST, before touching anything: run `pnpm gates` once and record the
+numbers (the baseline is now GREEN — 9/9, suite 15,298; re-record what
+you measure). If the baseline is red, STOP and report — never start a
+phase on a red baseline.
+
+The phase (audit §"Phase 1 — the folder skeleton", zero code moves):
+- Create the skeleton folders:
+  apps/web/src/{features/<10 domains>,shared/{components,config,hooks,
+  lib,i18n,ui},features-tools/<9 tools>,infrastructure} and
+  packages/insights/src/{domains/<9 domains>,shared/{adapters,prices,
+  ingest}} — per the audit's proposed tree (the D1–D10 corrections
+  apply).
+- One README.md per folder: a single paragraph stating the folder's
+  scope (borrow the reason column of the audit's inventory).
+- The lint/tsconfig scope pass: eslint.config.mjs globs + the
+  per-package tsconfig.json include arrays extended to the new roots
+  (audit risk R12) — landing it here makes every later diff clean.
+- NO file moves, NO renames, NO route changes, NO dependency changes
+  (Phase 2+ does the moving).
+
+After the skeleton commits are pushed and the gates are green: deploy
+the parked TM1–TM4 treemap (the standing approval; the re-sequenced
+original M1 plan), then live-verify https://currena.ir/world-markets —
+the treemap card renders, EN + FA/RTL, zero console errors.
+
+Done-criteria: baseline gates recorded; final gates 9/9, suite count
+identical; every commit green. Bookkeeping per AGENTS.md §10 (HANDOFF
+rewrite + CHANGELOG + DECISIONS) and the M2 pointer (Phase 2 — the
+shared layer: ~156 files, ~900 import edges, the exports-map +
+gates.mjs + persian-copy SOURCES updates).
+```
