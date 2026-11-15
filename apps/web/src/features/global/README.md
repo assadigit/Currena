@@ -1,0 +1,3 @@
+# features/global/
+
+The `/` landing domain — sixteen files when Phase 3 (M12) lands them: `GlobalPage`, `GlobalBoard`, `WorldRiskCards`, `global-tiles` (the gauge tiles + ribbon + dedollar + fx + markets rows), `global-backtest-core`, `global-page-states`, their tests (copy-pin, tiles, backtest, hero-editorial), `HeroBlock` (the verdict hero), `TopMoversStrip`, `NextUpStrip` (the upcoming-events calendar strip) and `ics` (the calendar .ics export). Cross-domain edges by design: the tiles read the shared markets/fx clients, the currencies rules and the world-markets verdict-core (the mirror pattern); PricesBoard is NOT here (D3 — GlobalPage renders its own ribbon via global-tiles).

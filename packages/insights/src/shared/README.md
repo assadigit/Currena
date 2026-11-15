@@ -1,0 +1,3 @@
+# shared/ (engine)
+
+The cross-domain engine — everything two or more domains consume: the four constraint-locked tables (`definitions.ts` — the 187-id registry, `gauges.ts` — the thematic + AU gauges, `gold-score.ts` — the 37 lane voters, D1, and `connections.ts` — the 10 connection cards), the plumbing (`scoring`, `freshness`, `validation`, `validation-step3`, `sources`, `licences`, `parsers`, `series`, `store`, `ruleVersion`), the `prices/` live-price job (D2), the `ingest/` rung orchestration and the `adapters/` cross-domain + infrastructure set. The root `index.ts` barrel re-exports from here after the moves (57 importers stay alive); `page-division/` (the placement authority) and `narrator/` never move. Created empty in M1; the files arrive in Phase 2.

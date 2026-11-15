@@ -1,0 +1,3 @@
+# features/currencies/
+
+The `/currencies` domain — twenty files when Phase 3 (M7) lands them: `CurrenciesPage`, `CurrenciesTierCards`, `CurrenciesPairBoard` (the 11-pair board), `CurrenciesRuleLights`, `currencies-tiles`, `currencies-backtest-core` and their tests (copy-pin, tiles, backtest), plus `world-currencies/display.ts` (the currency display helpers — domain-owned, the legacy subtree borrows) and `lib/fx-presentation/*` (the FX format/headline/pairs/plain/sentences/rules builders). Documented cross-domain edge (overlap N8): global's tiles and backtests import `fx-presentation/rules` from here — the mirror pattern.

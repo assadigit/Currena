@@ -1,0 +1,3 @@
+# domains/gold/
+
+The gold domain's engine: `gold-balance.ts` (the 5-condition presentation model), `gold-backtest-core.ts`, `gold-lane-calibration` (test), `breakeven-tilt.ts`, `real-yield-fill.ts`, `gf-p0-proposed.ts` (the frozen + proposed move maps) and `signals.ts` (the gold+silver checklists — the shared `validation.ts` reads it, the documented shared→gold edge, overlap N16), plus the `adapters/` subfolder (cftc, sge, sge-monthly, bazg — the Swiss customs gold-flow CSV, deviation D6 — and gold-equities). Boundary note (D1): `gold-score.ts` is NOT here — its 37 lane voters span five domains, so it stays in engine `shared/`.

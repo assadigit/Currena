@@ -1,0 +1,3 @@
+# shared/lib/
+
+The cross-domain clients and stores: the snapshot clients (`api`, `insights`, `markets` — GlobalPage + WorldMarketsPage + the region pages, `fx` — currencies + global, `narrative`, `page-division` — all nine destination pages), the rate stores (`snapshot-store`, `rate-history`, `live-rate`), and the tool-shared helpers (`alerts`, `display`, `download`, `id`, `locale` — 88 importers, `xlsx-writer`, `registry-sync` — the data/indicators.json ↔ engine ↔ web-config pin). Single-domain clients live in their feature folders instead: `tic` → usa, `markets-au` → australia, `fx-presentation` → currencies, `history` → the history tool, `recent-pairs` → converter, `settle-storage`/`photo-store` → settle. Created empty in M1; the files arrive in Phase 2.

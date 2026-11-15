@@ -1,0 +1,3 @@
+# shared/config/
+
+The insights display config — the barrel (`index.ts`, 42 importers across every domain) and its parts: `display.ts` (the tile display config; also read by the registry generator and pinned by `registry-sync`), `bands`, `labels`, `movers`, `sections`, `signals`, `hero`, `money`, `history-config` and their co-located tests. `companies.ts` and `us-global-reach.ts` are legacy-only (D4) and go to `features/insights-legacy/` instead. The daily GHA workflows and the registry/placement generators read these paths — they update in the same commit as the Phase 2 move. Created empty in M1; the files arrive in Phase 2.

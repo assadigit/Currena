@@ -1,0 +1,3 @@
+# domains/
+
+The engine's per-domain homes — one folder per domain (gold, commodities, usa, europe, asia-pacific, australia, currencies, world-markets, companies): each domain's board jobs (`tic/`, `fx/`, `markets/`, `markets-au/`), its single-domain adapters and its domain-specific engines land here in Phase 3 (M3–M12). The constraint-locked cross-domain tables (`definitions`, `gauges`, `gold-score`, `connections`), the cross-domain adapters and the prices/ingest plumbing stay in `shared/` — a table spans multiple domains only when its member census says so (deviations D1/D9/D10). The root `index.ts` barrel, `page-division/` (the placement authority — never moves) and `narrator/` stay at the `src` root beside this tree.

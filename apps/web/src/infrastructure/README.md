@@ -1,0 +1,3 @@
+# infrastructure/
+
+The app shell — the sixteen files that mount, route and frame every surface: `App.tsx` (route mounting, providers, boot effects), `router.ts` + the ROUTES table, `Header`, `Footer`, `ErrorBoundary`, `PageBreadcrumbs` (all nine destination pages), `InstallButton` (the PWA install surface), `Modal.tsx` (the generic overlay), the `icons/` brand set (`currena.tsx`, 14 consumers, + `FlowChevron.tsx`), and the shell-only libs (`route-meta.ts`, `theme.ts`, `use-alert-evaluation.ts` — App/Header consumers only, which is why they are infrastructure rather than `shared/lib`). `main.tsx` and `globals.d.ts` stay at the `src` root (index.html references `/src/main.tsx`). Created empty in M1; the files move here in a later phase of the modularization program.

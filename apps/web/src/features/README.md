@@ -1,0 +1,3 @@
+# features/
+
+The domain features — one folder per destination domain (the audit's ten: `gold`, `commodities`, `usa`, `europe`, `asia-pacific`, `australia`, `currencies`, `world-markets`, `economic-linkages`, `global`) plus `insights-legacy`, the §19.6 retirement container. The pattern is domain-owns + legacy-borrows: each domain's page, hero, tier cards, tiles, backtest harness, copy and drawings live in its own folder, while other pages and the legacy `/insights` read them via imports — the same mirror relationship the engine's placement table already declares for the data side. Created empty in M1; the domain files arrive in Phase 3 (per-domain sessions M3–M12) and the legacy files in Phase 4.
