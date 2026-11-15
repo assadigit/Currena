@@ -19,8 +19,8 @@ import type { InsightsSourceReport, IndicatorId } from '@currena/core';
 import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from '../../domains/australia/adapters/abs';
-import { fetchBitstampCloses } from '../../adapters/bitstamp';
-import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from '../../adapters/eia';
+import { fetchBitstampCloses } from '../../domains/commodities/adapters/bitstamp';
+import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from '../../domains/commodities/adapters/eia';
 import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from '../../adapters/ecb';
 import { fetchBoeBankRateDecisions } from '../../adapters/boe';
 import {
@@ -32,7 +32,7 @@ import {
   latestPmiRelease,
   parseNbsPressIndex,
 } from '../../adapters/nbs';
-import { fetchCryptoFng } from '../../adapters/fng';
+import { fetchCryptoFng } from '../../domains/commodities/adapters/fng';
 import { fetchFrankfurterSeries } from '../../adapters/frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';

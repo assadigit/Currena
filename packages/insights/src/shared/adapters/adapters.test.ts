@@ -7,7 +7,7 @@ import { FRED_BULK_ALL_IDS, FRED_BULK_GROUPS, fetchFredSeries, FRED_SERIES, fred
 import { fetchFrankfurterSeries, frankfurterTimeseriesUrl } from '../../adapters/frankfurter';
 import { absDataUrl, ABS_SERIES, fetchAbsSeries } from '../../domains/australia/adapters/abs';
 import { fetchGoldApiSpot, goldApiPriceUrl } from './goldapi';
-import { bitstampOhlcUrl, fetchBitstampCloses } from '../../adapters/bitstamp';
+import { bitstampOhlcUrl, fetchBitstampCloses } from '../../domains/commodities/adapters/bitstamp';
 import { parseManualSeries } from './manual';
 import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY, ecbHicpUrl, ECB_PORTAL_TIMEOUT_MS } from '../../adapters/ecb';
 import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from '../../domains/australia/adapters/rba';

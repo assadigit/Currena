@@ -55,8 +55,8 @@ export {
 } from './yahoo';
 export type { YahooQuote, YahooQuoteOptions } from './yahoo';
 export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from '../../adapters/ecb';
-export { bitstampOhlcUrl, fetchBitstampCloses } from '../../adapters/bitstamp';
-export type { BitstampWindow } from '../../adapters/bitstamp';
+export { bitstampOhlcUrl, fetchBitstampCloses } from '../../domains/commodities/adapters/bitstamp';
+export type { BitstampWindow } from '../../domains/commodities/adapters/bitstamp';
 export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from '../../domains/australia/adapters/rba';
 export type { RbaTableKey, RbaTableSpec } from '../../domains/australia/adapters/rba';
 export {
@@ -79,12 +79,12 @@ export {
   fetchEiaWti,
   fetchEiaBrent,
   fetchEiaHenryHub,
-} from '../../adapters/eia';
-export type { EiaSpot } from '../../adapters/eia';
+} from '../../domains/commodities/adapters/eia';
+export type { EiaSpot } from '../../domains/commodities/adapters/eia';
 export { readXlsWorkbook, excelSerialToIso } from './biff';
 export type { BiffSheet, BiffWorkbook } from './biff';
 export { ManualSeriesFileSchema, parseManualSeries } from './manual';
-export { fetchCryptoFng, FNG_URL } from '../../adapters/fng';
+export { fetchCryptoFng, FNG_URL } from '../../domains/commodities/adapters/fng';
 export type { ManualSeriesFile } from './manual';
 export { buildIndicatorSeries, computeHighestSinceYear, computePeaks, READING_SOURCES, mergeSeries } from './derived';
 export type { SeriesInputs } from './derived';
@@ -126,10 +126,10 @@ export type { ReleaseScheduleEntry, SnapshotBuildInputs, PolicyDecision, Context
 export { fetchGprExportAll, parseGprExportAll, GPR_URL } from './monthly-indexes';
 export type { GprExportSeries } from './monthly-indexes';
 export { fetchEbpCsv, parseEbpCsv, EBP_CSV_URL } from '../../domains/usa/adapters/credit';
-export { collectPortwatch, ma7Series, portwatchQueryUrl } from '../../adapters/portwatch';
+export { collectPortwatch, ma7Series, portwatchQueryUrl } from '../../domains/commodities/adapters/portwatch';
 export { collectTreasuryAuctions, selectAuctionFamily, auctionsUrl, AUCTIONS_URL } from '../../domains/usa/adapters/auctions';
 export type { AuctionsCollectResult, AuctionFamilySeries } from '../../domains/usa/adapters/auctions';
-export { fetchEiaSprLevel, fetchEiaCrudeProduction, EIA_SPR_URL, EIA_CRUDE_PRODUCTION_URL } from '../../adapters/eia-stocks';
+export { fetchEiaSprLevel, fetchEiaCrudeProduction, EIA_SPR_URL, EIA_CRUDE_PRODUCTION_URL } from '../../domains/commodities/adapters/eia-stocks';
 export { fetchBazgGoldImports, parseBazgGoldImports, BAZG_GOLD_IMPORTS_URL } from '../../adapters/bazg';
 export {
   fetchSgeMonthlyWithdrawal,

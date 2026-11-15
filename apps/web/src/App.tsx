@@ -102,7 +102,7 @@ const AustraliaPage = lazy(() => import('./features/australia/AustraliaPage').th
 // render as 24 cards with the §21 trio, plus the gold cross-link to
 // /gold (D-19/D-27). The In-build chip stays (the S17 build session —
 // the chip retires at the S17 gates pass, the S13/S15/S16 trajectory).
-const CommoditiesPage = lazy(() => import('./routes/page-division/CommoditiesPage').then((m) => ({ default: m.CommoditiesPage })));
+const CommoditiesPage = lazy(() => import('./features/commodities/CommoditiesPage').then((m) => ({ default: m.CommoditiesPage })));
 // Page-division S18 (2026-11-11): the Currencies route leaves the
 // placeholder set — its own lazy chunk (the CommoditiesPage pattern):
 // the 7 rule lights hero (D-41) + the 11-pair board (D-42, AUDNZD the

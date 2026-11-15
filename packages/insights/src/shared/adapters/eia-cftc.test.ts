@@ -18,7 +18,7 @@ import {
   EIA_CRUDE_PRODUCTION_SPEC,
   parseEiaCrudeStocksHtml,
   parseEiaWeeklySeriesHtml,
-} from '../../adapters/eia-stocks';
+} from '../../domains/commodities/adapters/eia-stocks';
 import { CFTC_DEAFUT_URL, CFTC_GOLD_MARKET, cftcArchiveUrl, parseCftcGoldArchiveAnnual, parseCftcGoldPositioning } from '../../adapters/cftc';
 
 const here = dirname(fileURLToPath(import.meta.url));

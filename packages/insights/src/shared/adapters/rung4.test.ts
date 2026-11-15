@@ -27,7 +27,7 @@ import {
 } from './rung4';
 import { RUNG2_IDS } from './rung2';
 import { ABS_AU_IDS } from '../../domains/australia/adapters/abs-au';
-import { PORTWATCH_IDS } from '../../adapters/portwatch';
+import { PORTWATCH_IDS } from '../../domains/commodities/adapters/portwatch';
 import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsRung4Phase } from '../ingest/run';
 import type { InsightsStore } from '../store';
 import type { SeriesPoint } from '../series';

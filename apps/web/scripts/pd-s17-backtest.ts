@@ -46,14 +46,14 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { InsightsSnapshotSchema, PageProjectionSchema } from '@currena/core';
-import { auditUsaFreshness, backtestCommoditiesPage, COMMODITIES_BACKTEST_CARD_IDS, type FreshnessRegistryEntry } from '../src/routes/page-division/commodities-backtest-core';
+import { auditUsaFreshness, backtestCommoditiesPage, COMMODITIES_BACKTEST_CARD_IDS, type FreshnessRegistryEntry } from '../src/features/commodities/commodities-backtest-core';
 import {
   COMMODITIES_ENERGY_IDS,
   COMMODITIES_METALS_IDS,
   COMMODITIES_AGRICULTURE_IDS,
   COMMODITIES_DIGITAL_IDS,
   COMMODITIES_TRADE_ROUTES_IDS,
-} from '../src/routes/page-division/commodities-tiles';
+} from '../src/features/commodities/commodities-tiles';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

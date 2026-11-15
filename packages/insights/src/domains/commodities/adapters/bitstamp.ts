@@ -8,9 +8,9 @@
  */
 
 import { z } from 'zod';
-import { insightsFetch } from '../shared/adapters/fetch-policy';
-import { assertAscending, type SeriesPoint } from '../shared/series';
-import { AdapterError, type FetchDeps } from '../shared/adapters/types';
+import { insightsFetch } from '../../../shared/adapters/fetch-policy';
+import { assertAscending, type SeriesPoint } from '../../../shared/series';
+import { AdapterError, type FetchDeps } from '../../../shared/adapters/types';
 
 const BITSTAMP_OHLC_BASE = 'https://www.bitstamp.net/api/v2/ohlc';
 

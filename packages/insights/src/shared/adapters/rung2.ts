@@ -32,7 +32,7 @@ import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
 import type { SeriesPoint } from '../series';
 import { fetchMofJgb10y } from '../../adapters/mof';
-import { fetchEiaCrudeStocks, fetchEiaSprLevel, fetchEiaCrudeProduction } from '../../adapters/eia-stocks';
+import { fetchEiaCrudeStocks, fetchEiaSprLevel, fetchEiaCrudeProduction } from '../../domains/commodities/adapters/eia-stocks';
 import { fetchCftcGoldPositioning } from '../../adapters/cftc';
 import { fetchOecdCli, fetchOecdNzShortRate } from './oecd';
 import { fetchFredSeries, FRED_SERIES } from './fred';

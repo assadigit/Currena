@@ -34,12 +34,12 @@ import {
   priorFourWeekMean,
   yearAgoMa7,
 } from './portwatch';
-import { DEFINITIONS } from '../shared/definitions';
-import { computeReading } from '../shared/scoring';
-import type { SeriesPoint } from '../shared/series';
+import { DEFINITIONS } from '../../../shared/definitions';
+import { computeReading } from '../../../shared/scoring';
+import type { SeriesPoint } from '../../../shared/series';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', '..', 'fixtures');
 
 /** The 2026-11-01 captures (verbatim provider bodies). */
 const page1 = readFileSync(join(fixtures, 's4', 'portwatch-query-page1-2026-11-01.json'), 'utf8');
@@ -430,9 +430,9 @@ describe('the rung3 registration shape (PORTWATCH_IDS)', () => {
 
 import { vi, afterEach } from 'vitest';
 import type { IndicatorHistory, IndicatorId, InsightsStatus } from '@currena/core';
-import { buildInsightsSnapshot } from '../shared/adapters/snapshot';
-import { CARRY_FORWARD_IDS, runInsightsPortwatchPhase } from '../shared/ingest/run';
-import type { InsightsStore } from '../shared/store';
+import { buildInsightsSnapshot } from '../../../shared/adapters/snapshot';
+import { CARRY_FORWARD_IDS, runInsightsPortwatchPhase } from '../../../shared/ingest/run';
+import type { InsightsStore } from '../../../shared/store';
 
 afterEach(() => {
   vi.restoreAllMocks();

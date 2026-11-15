@@ -100,7 +100,7 @@ import {
   PORTWATCH_IDS,
   PORTWATCH_KV_KEY,
   PORTWATCH_WINDOW_DAYS,
-} from '../../adapters/portwatch';
+} from '../../domains/commodities/adapters/portwatch';
 import { collectAbsAuMacro, ABS_AU_IDS } from '../../domains/australia/adapters/abs-au';
 import { classifySourceError } from '../adapters/fetch-policy';
 import type { ReadingSourceOverride } from '../adapters/collect';

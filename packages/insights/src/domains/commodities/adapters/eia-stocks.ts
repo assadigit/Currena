@@ -22,9 +22,9 @@
  * gains its second use).
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import { assertAscending, type SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import { assertAscending, type SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 /** The keyless website route (no EIA v2 API key — see the module header). */
 export const EIA_CRUDE_STOCKS_URL =

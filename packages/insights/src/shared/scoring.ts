@@ -21,7 +21,7 @@ import type {
   WarningRuleAtom,
 } from '@currena/core';
 import { IndicatorDefinitionSchema } from '@currena/core';
-import { buildChokepointCompare } from '../adapters/portwatch';
+import { buildChokepointCompare } from '../domains/commodities/adapters/portwatch';
 import {
   addDays,
   daysBetween,

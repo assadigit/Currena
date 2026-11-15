@@ -19,10 +19,10 @@
  * Cross-validated: EIA 2026-10-20 WTI 107.89 == FRED DCOILWTICO 2026-10-20.
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import { excelSerialToIso, readXlsWorkbook } from '../shared/adapters/biff';
-import { assertAscending, type SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import { excelSerialToIso, readXlsWorkbook } from '../../../shared/adapters/biff';
+import { assertAscending, type SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const EIA_WTI_URL = 'https://www.eia.gov/dnav/pet/hist_xls/RWTCd.xls';
 export const EIA_BRENT_URL = 'https://www.eia.gov/dnav/pet/hist_xls/RBRTEd.xls';
