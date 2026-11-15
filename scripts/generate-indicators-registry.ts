@@ -14,21 +14,21 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 // @ts-expect-error — outside this package's tsconfig rootDirs; tsx resolves it.
-import { DEFINITIONS } from '../packages/insights/src/definitions';
+import { DEFINITIONS } from '../packages/insights/src/shared/definitions';
 // @ts-expect-error — same.
-import { READING_SOURCES } from '../packages/insights/src/adapters/derived';
+import { READING_SOURCES } from '../packages/insights/src/shared/adapters/derived';
 // @ts-expect-error — same.
-import { GAUGES, isShadowGauge } from '../packages/insights/src/gauges';
+import { GAUGES, isShadowGauge } from '../packages/insights/src/shared/gauges';
 // @ts-expect-error — same.
-import { RULE_VERSION } from '../packages/insights/src/ruleVersion';
+import { RULE_VERSION } from '../packages/insights/src/shared/ruleVersion';
 // @ts-expect-error — same.
-import { staleAfterDaysFor, GRACE_DAYS } from '../packages/insights/src/scoring';
+import { staleAfterDaysFor, GRACE_DAYS } from '../packages/insights/src/shared/scoring';
 // @ts-expect-error — same.
 import { DISPLAY } from '../apps/web/src/shared/config/display';
 // @ts-expect-error — same (Step 3 §8 licence block, 2026-10-16).
-import { licenceForProvider, fredLicenceForSeries, type FredCopyrightRecord, type SourceLicence } from '../packages/insights/src/licences';
+import { licenceForProvider, fredLicenceForSeries, type FredCopyrightRecord, type SourceLicence } from '../packages/insights/src/shared/licences';
 // @ts-expect-error — same (Step 3 §8 v3 source-risk block, 2026-10-20).
-import { riskSummaryForLegs, upstreamLegsFor, riskRowForLeg, UPSTREAM_LEGS } from '../packages/insights/src/sources';
+import { riskSummaryForLegs, upstreamLegsFor, riskRowForLeg, UPSTREAM_LEGS } from '../packages/insights/src/shared/sources';
 // @ts-expect-error — the EN copy is the §8 what-it-is text source of record (2026-10-20).
 import { insightsCopyEn } from '../apps/web/src/shared/i18n/insights-copy-en';
 
@@ -71,7 +71,7 @@ const LAYER2_IDS = new Set<string>([
 /**
  * Defect E-01 / LR-02 (2026-10-16): the card ids whose VALUE (history or
  * live point) comes partly from another provider, with the full leg list.
- * THE SHARED MAP now lives in packages/insights/src/sources.ts (moved there
+ * THE SHARED MAP now lives in packages/insights/src/shared/sources.ts (moved there
  * 2026-10-20 so the engine's kill switch + level walk and this generator
  * cannot drift). UPSTREAM_LEGS is re-exported here for the local walk below.
  */
@@ -99,7 +99,7 @@ function licenceOfLeg(leg: string): SourceLicence {
  * The Layer 2 plain-arithmetic definitions (Step 3 §4). Each line states
  * the inputs and the SAME-DATE rule — these are the definitions the cards'
  * "How is this calculated?" shows; they mirror the composition already
- * implemented in packages/insights/src/adapters/derived.ts.
+ * implemented in packages/insights/src/shared/adapters/derived.ts.
  */
 const LAYER2_DEFINITIONS: Readonly<Record<string, string>> = {
   'yield-curve-10y2y': 'The published T10Y2Y series: the US 10-year Treasury yield minus the 2-year Treasury yield, same date.',
@@ -393,7 +393,7 @@ const registry = {
   version: RULE_VERSION,
   graceDayDefaults: GRACE_DAYS,
   generatedFrom:
-    'packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/shared/config/display.ts + src/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)',
+    'packages/insights/src/shared/definitions.ts + src/shared/adapters/derived.ts (READING_SOURCES) + src/shared/gauges.ts + src/shared/ruleVersion.ts + apps/web/src/shared/config/display.ts + src/shared/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)',
   textTemplates:
     'apps/web/src/shared/i18n/insights-copy-en.ts (and insights-copy-fa.ts): every card sentence is produced from a status-keyed template (highRising / highEasing / typical / low / jumping, oneLiner fallback) interpolated with the live value — fix spec A-02.',
   indicators,

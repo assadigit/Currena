@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { DEFINITIONS } from '../definitions';
+import { DEFINITIONS } from '../shared/definitions';
 import {
   AUCTIONS_FIELDS,
   AUCTIONS_PAGE_SIZE,

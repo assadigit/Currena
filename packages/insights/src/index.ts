@@ -41,8 +41,8 @@ export {
   pointAtOrBefore,
   sliceBetween,
   yoyPctSeries,
-} from './series';
-export type { SeriesPoint } from './series';
+} from './shared/series';
+export type { SeriesPoint } from './shared/series';
 
 export {
   parseAbsPeriodCsv,
@@ -52,10 +52,10 @@ export {
   parseFrankfurterTimeseries,
   parseFredCsv,
   parseWorldBankMonthlyCsv,
-} from './parsers';
-export type { RbaParseOptions } from './parsers';
+} from './shared/parsers';
+export type { RbaParseOptions } from './shared/parsers';
 
-export { DEFINITIONS } from './definitions';
+export { DEFINITIONS } from './shared/definitions';
 
 export {
   BASKET_CURRENCIES,
@@ -73,8 +73,8 @@ export {
   sectionVerdictStep,
   summarizeByGauges,
   summarizeSectionByGauges,
-} from './gauges';
-export type { GaugeDef, GaugeReading } from './gauges';
+} from './shared/gauges';
+export type { GaugeDef, GaugeReading } from './shared/gauges';
 
 export {
   GRACE_DAYS,
@@ -91,8 +91,8 @@ export {
   moveScoreOf,
   percentileOf,
   staleAfterDaysFor,
-} from './scoring';
-export type { AuxSeries, ReadingSource, RuleVerdict } from './scoring';
+} from './shared/scoring';
+export type { AuxSeries, ReadingSource, RuleVerdict } from './shared/scoring';
 
 export {
   CONNECTIONS,
@@ -101,7 +101,7 @@ export {
   evaluateConnection,
   evaluateConnections,
   PASS_THROUGH_WINDOW_DAYS,
-} from './connections';
+} from './shared/connections';
 export type {
   ConnectionDef,
   ConnectionId,
@@ -112,7 +112,7 @@ export type {
   LegEval,
   LegLevel,
   SignalLegEval,
-} from './connections';
+} from './shared/connections';
 
 export { evaluateSignal, evaluateSignals, LEAN_STRONG } from './signals';
 export type {
@@ -142,7 +142,7 @@ export {
   goldTailwindScore,
   modelVsReality,
   modelVsRealityExplainerKey,
-} from './gold-score';
+} from './shared/gold-score';
 export type {
   GoldLane,
   GoldLaneVoter,
@@ -157,7 +157,7 @@ export type {
   GoldVoterImpact,
   ModelVsRealityChip,
   ModelVsRealityReading,
-} from './gold-score';
+} from './shared/gold-score';
 
 // The gold balance consolidation (docs/specs/gold-balance-consolidation/):
 // the P1 pure engine — 21 frozen voters → 4 lane votes → one balance
@@ -194,8 +194,8 @@ export type { RealYieldFillResult } from './real-yield-fill';
 export { BREAKEVEN_TILT_DEADBAND_PT, breakevenTiltLean } from './breakeven-tilt';
 export type { BreakevenTiltLean } from './breakeven-tilt';
 
-export { RULE_VERSION, RULE_CHANGELOG } from './ruleVersion';
-export type { RuleChangeLogEntry } from './ruleVersion';
+export { RULE_VERSION, RULE_CHANGELOG } from './shared/ruleVersion';
+export type { RuleChangeLogEntry } from './shared/ruleVersion';
 
 // Layer-2 prep P1 (docs/insights/layer2/INSIGHTS-L2-PREP-SPEC.md §3) —
 // per-reading data freshness for the narrator and the page honesty line.
@@ -208,8 +208,8 @@ export {
   freshnessOf,
   freshnessOfReading,
   freshnessStaleDaysFor,
-} from './freshness';
-export type { Freshness, FreshnessInfo } from './freshness';
+} from './shared/freshness';
+export type { Freshness, FreshnessInfo } from './shared/freshness';
 
 // R10-3 (2026-10-28) — the global companies table behind a feature flag.
 // The config + the adapter STUB ship with the flag OFF; the UI renders

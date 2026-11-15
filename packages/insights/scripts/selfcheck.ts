@@ -39,16 +39,16 @@ import {
   parseManualSeries,
   parsePolicyDecisions,
   parseReleaseSchedule,
-} from '../src/adapters/index';
-import { runValidationSuite } from '../src/validation';
-import type { RegressionEpisode } from '../src/validation';
+} from '../src/shared/adapters/index';
+import { runValidationSuite } from '../src/shared/validation';
+import type { RegressionEpisode } from '../src/shared/validation';
 import {
   checkE10M2Unit,
   checkE24PeakColumnsInExport,
   t17AttributionPresent,
   t19NoAdviceWording,
-} from '../src/validation-step3';
-import { SOURCE_LICENCES } from '../src/licences';
+} from '../src/shared/validation-step3';
+import { SOURCE_LICENCES } from '../src/shared/licences';
 import { DEFINITIONS, RULE_VERSION } from '../src/index';
 import { buildInsightsMarkdown, type FullExportInput } from '../../../apps/web/src/components/insights/full-export';
 import { DISPLAY } from '../../../apps/web/src/shared/config/display';

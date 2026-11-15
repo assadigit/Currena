@@ -44,9 +44,9 @@ import { fileURLToPath } from 'node:url';
 import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@currena/core';
 
 import { DEFINITIONS, computeReading } from '../src/index';
-import { GOLD_LANE_VOTERS, type GoldLaneVoter } from '../src/gold-score';
+import { GOLD_LANE_VOTERS, type GoldLaneVoter } from '../src/shared/gold-score';
 import { realYieldScoringSeries } from '../src/real-yield-fill';
-import { fromEpochDay, type SeriesPoint } from '../src/series';
+import { fromEpochDay, type SeriesPoint } from '../src/shared/series';
 import {
   GOLD_BACKTEST_HORIZONS,
   HARNESS_GOLD_LANES_MIN1,

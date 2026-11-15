@@ -461,7 +461,7 @@ describe('projectSnapshotToPublic (2026-10-19 public projection)', () => {
   it('LR-02 regression: with the GENERATED overrides file, no hidden id survives and the boards are declared', async () => {
     const { readFileSync } = await import('node:fs');
     const overrides = JSON.parse(
-      readFileSync(new URL('../../../../data/site-mode-overrides.json', import.meta.url), 'utf8'),
+      readFileSync(new URL('../../../../../data/site-mode-overrides.json', import.meta.url), 'utf8'),
     ) as { hiddenIndicatorIds: string[]; hiddenBoards: string[] };
     const full52 = buildInsightsSnapshot({ series: {}, calendar: [], now: NOW });
     const pub = projectSnapshotToPublic(full52, new Set(overrides.hiddenIndicatorIds));

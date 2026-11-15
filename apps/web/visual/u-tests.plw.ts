@@ -879,7 +879,7 @@ test('UI-49 About rework: source table + card lists + rule version + contact', a
   // (d) Rule version + the PLAIN repository path (no invented hosted URL).
   const ruleLine = about.locator('[data-about-rule-version]');
   await expect(ruleLine).toContainText('Rule version 2');
-  await expect(ruleLine).toContainText('packages/insights/src/ruleVersion.ts');
+  await expect(ruleLine).toContainText('packages/insights/src/shared/ruleVersion.ts');
 
   // (f) M-7: the contact line names the owner's public contact surface.
   await expect(about.locator('[data-about-contact]')).toContainText('https://github.com/assadigit/Currena');

@@ -34,7 +34,7 @@ import { FormatChangedError } from './fetch-policy';
 import { readXlsWorkbook } from './biff';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', 'fixtures');
 const cliCsv = readFileSync(join(fixtures, 'oecd-cli.csv'), 'utf8');
 const gprBuf = readFileSync(join(fixtures, 'gpr-export.xls')).buffer;
 const epuBuf = readFileSync(join(fixtures, 'epu-main-news-index.xlsx')).buffer;

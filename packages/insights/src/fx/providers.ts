@@ -16,9 +16,9 @@
  */
 
 import type { FxCurrency } from '@currena/core';
-import type { SeriesPoint } from '../series';
-import { insightsFetch } from '../adapters/fetch-policy';
-import { providerFetchEnabled } from '../sources';
+import type { SeriesPoint } from '../shared/series';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
+import { providerFetchEnabled } from '../shared/sources';
 import {
   FRANKFURTER_BASE_URL,
   FX_BASKET_CURRENCIES,

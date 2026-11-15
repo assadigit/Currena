@@ -9,10 +9,10 @@
  * class Green: free reuse with attribution (data spec §1 row 5).
  */
 
-import { insightsFetch } from './fetch-policy';
-import { parseEcbDfrCsv, parseEcbMonthlyCsv } from '../parsers';
-import type { SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
+import { parseEcbDfrCsv, parseEcbMonthlyCsv } from '../shared/parsers';
+import type { SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 export const ECB_DATA_BASE = 'https://data-api.ecb.europa.eu/service/data';
 

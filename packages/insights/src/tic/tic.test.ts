@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { TicSnapshotSchema } from '@currena/core';
-import { BlockedError } from '../adapters/fetch-policy';
+import { BlockedError } from '../shared/adapters/fetch-policy';
 import {
   buildTicSnapshot,
   TIC_CUSTODY_HUBS,

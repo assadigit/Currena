@@ -35,7 +35,7 @@ import {
 import type { FxSnapshot, IndicatorHistory, IndicatorId, InsightsSnapshot, MarketsSnapshot } from '@currena/core';
 import { FX_KV_KEY } from './definitions';
 import { fxContentEqual } from './compute';
-import { insightsHistoryKey } from '../store';
+import { insightsHistoryKey } from '../shared/store';
 import { CLOUDFLARE_API_BASE } from '../markets/store';
 
 /** Read half — what the serve path implements. */

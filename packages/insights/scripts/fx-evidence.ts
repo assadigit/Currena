@@ -34,7 +34,7 @@ import {
 } from '../src/fx/compute';
 import { fetchFrankfurterQuotes } from '../src/fx/providers';
 import { FX_PAIRS, FX_STALE_DAYS } from '../src/fx/definitions';
-import { pointAtOrBefore, daysBetween, addDays, type SeriesPoint } from '../src/series';
+import { pointAtOrBefore, daysBetween, addDays, type SeriesPoint } from '../src/shared/series';
 
 const repoRoot = new URL('../../../', import.meta.url);
 const outPath = new URL('./docs/specs/insights-world-currencies-evidence.md', repoRoot);

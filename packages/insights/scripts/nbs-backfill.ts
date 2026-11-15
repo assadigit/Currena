@@ -35,8 +35,8 @@ import {
   parseNbsRealEstateRelease,
   type NbsReleaseLink,
 } from '../src/adapters/nbs';
-import { buildHistoryFile, historyToSeries } from '../src/adapters/snapshot';
-import type { SeriesPoint } from '../src/series';
+import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';
+import type { SeriesPoint } from '../src/shared/series';
 
 const args = process.argv.slice(2);
 const write = args.includes('--write');

@@ -9,8 +9,8 @@
     "per-change": null,
     "manual": 45
   },
-  "generatedFrom": "packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/components/insights/config/display.ts + src/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)",
-  "textTemplates": "apps/web/src/i18n/insights-copy-en.ts (and insights-copy-fa.ts): every card sentence is produced from a status-keyed template (highRising / highEasing / typical / low / jumping, oneLiner fallback) interpolated with the live value — fix spec A-02.",
+  "generatedFrom": "packages/insights/src/shared/definitions.ts + src/shared/adapters/derived.ts (READING_SOURCES) + src/shared/gauges.ts + src/shared/ruleVersion.ts + apps/web/src/shared/config/display.ts + src/shared/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)",
+  "textTemplates": "apps/web/src/shared/i18n/insights-copy-en.ts (and insights-copy-fa.ts): every card sentence is produced from a status-keyed template (highRising / highEasing / typical / low / jumping, oneLiner fallback) interpolated with the live value — fix spec A-02.",
   "indicators": [
     {
       "id": "yield-curve-10y2y",

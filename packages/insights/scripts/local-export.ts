@@ -32,11 +32,11 @@ import type {
   FxSnapshot,
 } from '@currena/core';
 
-import { runInsightsUpdate, writeAllHistoriesInline } from '../src/ingest/run';
-import { HIDDEN_PUBLIC_IDS } from '../src/ingest/data';
-import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/adapters/rung2';
-import type { InsightsStore } from '../src/store';
-import type { SeriesPoint } from '../src/series';
+import { runInsightsUpdate, writeAllHistoriesInline } from '../src/shared/ingest/run';
+import { HIDDEN_PUBLIC_IDS } from '../src/shared/ingest/data';
+import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/shared/adapters/rung2';
+import type { InsightsStore } from '../src/shared/store';
+import type { SeriesPoint } from '../src/shared/series';
 import type { IndicatorId as Id } from '@currena/core';
 
 import { runMarketsUpdate } from '../src/markets/run';
@@ -47,10 +47,10 @@ import { runFxUpdate } from '../src/fx/run';
 import { defaultFxFetchers } from '../src/fx/job';
 import type { FxReader, FxWriter, FxCrossReader } from '../src/fx/store';
 
-import { runPricesUpdate } from '../src/prices/job';
-import { defaultPricesFetchers } from '../src/prices/job';
-import { mergeLivePricesIntoSnapshot } from '../src/prices/merge';
-import type { PricesReader, PricesWriter } from '../src/prices/store';
+import { runPricesUpdate } from '../src/shared/prices/job';
+import { defaultPricesFetchers } from '../src/shared/prices/job';
+import { mergeLivePricesIntoSnapshot } from '../src/shared/prices/merge';
+import type { PricesReader, PricesWriter } from '../src/shared/prices/store';
 import type { LivePricesSnapshot } from '@currena/core';
 
 const OUT_DIR = new URL('../../../data/local-preview/', import.meta.url).pathname;

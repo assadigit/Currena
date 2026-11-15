@@ -333,7 +333,7 @@ describe('E-24 peak columns in export', () => {
 
 describe('baseline fixture run (frozen evidence companion)', () => {
   it('the defect checks fail against the parsed 15 Oct export', () => {
-    const fixturePath = resolve(__dirname, '../../../tests/fixtures/insights-baseline-2026-10-15.json');
+    const fixturePath = resolve(__dirname, '../../../../tests/fixtures/insights-baseline-2026-10-15.json');
     const fixture = JSON.parse(readFileSync(fixturePath, 'utf8'));
     // the registry's daily cadences + the defect file's daily classification
     // of the RBA F2 yield family (E-06) — same list the recorded run used.

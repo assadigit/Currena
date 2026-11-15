@@ -15,8 +15,8 @@
  * 'format-changed', anything else → 'failed' (classifySourceError).
  */
 
-import { classifySourceError } from '../adapters/fetch-policy';
-import { insightsFetch } from '../adapters/fetch-policy';
+import { classifySourceError } from '../shared/adapters/fetch-policy';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
 import { buildTicSnapshot, TIC_TABLE3_URL, TIC_TABLE5_URL } from './model';
 import { parseTicTable3, parseTicTable5 } from './parse';
 import type { TicStore } from './store';

@@ -23,13 +23,13 @@
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
 import { DEFINITIONS, computeReading } from '../src/index';
-import { summarizeByGauges } from '../src/gauges';
+import { summarizeByGauges } from '../src/shared/gauges';
 import {
   buildIndicatorSeries,
   collectAllSources,
   READING_SOURCES,
   type SeriesInputs,
-} from '../src/adapters/index';
+} from '../src/shared/adapters/index';
 
 const now = new Date();
 const nowIso = now.toISOString();

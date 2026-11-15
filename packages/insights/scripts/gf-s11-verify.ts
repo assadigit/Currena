@@ -9,20 +9,20 @@
  * Usage: pnpm --filter @currena/insights exec tsx scripts/gf-s11-verify.ts
  */
 import { fetchClevelandNowcasts, nowcastSeriesOf } from '../src/adapters/cleveland';
-import { fetchFredSeries, FRED_SERIES } from '../src/adapters/fred';
+import { fetchFredSeries, FRED_SERIES } from '../src/shared/adapters/fred';
 import { fetchEcbEurosystemAssets } from '../src/adapters/ecb';
 import { fetchBazgGoldImports } from '../src/adapters/bazg';
 import { fetchSgeMonthlyWithdrawal } from '../src/adapters/sge-monthly';
 import { fetchGoldEquitiesRatio } from '../src/adapters/gold-equities';
 import { fetchHlwRstar } from '../src/adapters/rstar';
-import { fetchYahooQuote } from '../src/adapters/yahoo';
+import { fetchYahooQuote } from '../src/shared/adapters/yahoo';
 import { fetchFrankfurterSeries } from '../src/adapters/frankfurter';
 import {
   cpiSurpriseSeries,
   globalLiquiditySeries,
   realGoldPriceSeries,
-} from '../src/adapters/derived';
-import type { SeriesPoint } from '../src/series';
+} from '../src/shared/adapters/derived';
+import type { SeriesPoint } from '../src/shared/series';
 
 const DECADE_START = '2016-11-01';
 

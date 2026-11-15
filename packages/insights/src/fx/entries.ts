@@ -5,8 +5,8 @@
  */
 
 import type { FxDollarMeasure, FxPairEntry, FxPairId } from '@currena/core';
-import type { SeriesPoint } from '../series';
-import { daysBetween } from '../series';
+import type { SeriesPoint } from '../shared/series';
+import { daysBetween } from '../shared/series';
 import { computeBasketValue } from '../basket';
 import { BIG_MOVE_PERCENTILE, FX_MIN_POINTS, FX_STALE_DAYS } from './definitions';
 import { round5 } from './maths';

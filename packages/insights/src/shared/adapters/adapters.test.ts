@@ -4,17 +4,17 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { FRED_BULK_ALL_IDS, FRED_BULK_GROUPS, fetchFredSeries, FRED_SERIES, fredSeriesUrl } from './fred';
-import { fetchFrankfurterSeries, frankfurterTimeseriesUrl } from './frankfurter';
-import { absDataUrl, ABS_SERIES, fetchAbsSeries } from './abs';
+import { fetchFrankfurterSeries, frankfurterTimeseriesUrl } from '../../adapters/frankfurter';
+import { absDataUrl, ABS_SERIES, fetchAbsSeries } from '../../adapters/abs';
 import { fetchGoldApiSpot, goldApiPriceUrl } from './goldapi';
-import { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
+import { bitstampOhlcUrl, fetchBitstampCloses } from '../../adapters/bitstamp';
 import { parseManualSeries } from './manual';
-import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY, ecbHicpUrl, ECB_PORTAL_TIMEOUT_MS } from './ecb';
-import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from './rba';
+import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY, ecbHicpUrl, ECB_PORTAL_TIMEOUT_MS } from '../../adapters/ecb';
+import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from '../../adapters/rba';
 import { computeHighestSinceYear } from './derived';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const FIXTURES = join(HERE, '..', '..', 'fixtures');
+const FIXTURES = join(HERE, '..', '..', '..', 'fixtures');
 
 function fixtureText(name: string): string {
   return readFileSync(join(FIXTURES, name), 'utf-8');

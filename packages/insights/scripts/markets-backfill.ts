@@ -37,7 +37,7 @@ import { defaultFetchers } from '../src/markets/job';
 import { runMarketsJob } from '../src/markets/job';
 import type { MarketJobFetchers } from '../src/markets/job';
 import { buildMarketsSnapshot, marketsContentEqual } from '../src/markets/compute';
-import { checkE05IdenticalMoves } from '../src/validation-step3';
+import { checkE05IdenticalMoves } from '../src/shared/validation-step3';
 import { InMemoryMarketsStore, RestMarketsStore } from '../src/markets/store';
 
 const args = process.argv.slice(2);

@@ -18,9 +18,9 @@
  * politeness), the same-date inner join, 4dp.
  */
 
-import type { SeriesPoint } from '../series';
-import { combineSeries } from '../series';
-import { fetchYahooQuote } from './yahoo';
+import type { SeriesPoint } from '../shared/series';
+import { combineSeries } from '../shared/series';
+import { fetchYahooQuote } from '../shared/adapters/yahoo';
 
 /** The gold ETF (SPDR Gold Shares). */
 export const GOLD_EQUITIES_GLD_SYMBOL = 'GLD';

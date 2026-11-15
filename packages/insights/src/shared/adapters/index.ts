@@ -17,8 +17,8 @@ export {
   fetchFrankfurterSeries,
   frankfurterTimeseriesUrl,
   FRANKFURTER_BASE,
-} from './frankfurter';
-export { ABS_SERIES, absDataUrl, fetchAbsSeries, ABS_DATA_BASE } from './abs';
+} from '../../adapters/frankfurter';
+export { ABS_SERIES, absDataUrl, fetchAbsSeries, ABS_DATA_BASE } from '../../adapters/abs';
 export {
   WB_COMMODITY_MARKETS_PAGE,
   WB_MONTHLY_SHEET_NAME,
@@ -29,7 +29,7 @@ export {
 export { GOLDAPI_SYMBOLS, fetchGoldApiSpot, goldApiPriceUrl, GOLDAPI_BASE } from './goldapi';
 // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive +
 // the SGE daily report + the shared Shanghai-premium derivation.
-export { fetchUomExpectedPrice5y10y, parseUomExpectedPrice5y10y, UOM_SIE_ARCHIVE_URL, UOM_START_YEAR } from './uom';
+export { fetchUomExpectedPrice5y10y, parseUomExpectedPrice5y10y, UOM_SIE_ARCHIVE_URL, UOM_START_YEAR } from '../../adapters/uom';
 export {
   fetchSgeAu9999,
   fetchSgeAu9999Recent,
@@ -37,7 +37,7 @@ export {
   sgeSeriesOf,
   SGE_DAILY_URL,
   SGE_AU9999,
-} from './sge';
+} from '../../adapters/sge';
 export { shanghaiPremiumSeries, GRAMS_PER_TROY_OUNCE } from './derived';
 // GF-S11 (2026-11-07): the P4 derivation functions (the venue-drift
 // discipline — the Worker phases and the Node inline build share them).
@@ -54,11 +54,11 @@ export {
   parseYahooQuoteResponse,
 } from './yahoo';
 export type { YahooQuote, YahooQuoteOptions } from './yahoo';
-export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from './ecb';
-export { bitstampOhlcUrl, fetchBitstampCloses } from './bitstamp';
-export type { BitstampWindow } from './bitstamp';
-export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from './rba';
-export type { RbaTableKey, RbaTableSpec } from './rba';
+export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from '../../adapters/ecb';
+export { bitstampOhlcUrl, fetchBitstampCloses } from '../../adapters/bitstamp';
+export type { BitstampWindow } from '../../adapters/bitstamp';
+export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from '../../adapters/rba';
+export type { RbaTableKey, RbaTableSpec } from '../../adapters/rba';
 export {
   TREASURY_BASE,
   TREASURY_CURVE_NOMINAL,
@@ -68,8 +68,8 @@ export {
   parseTreasuryCurveCsv,
   fetchTreasuryCurves,
   treasuryT10y2y,
-} from './treasury';
-export type { TreasuryCurves, TreasuryFetchOptions } from './treasury';
+} from '../../adapters/treasury';
+export type { TreasuryCurves, TreasuryFetchOptions } from '../../adapters/treasury';
 export {
   EIA_WTI_URL,
   EIA_BRENT_URL,
@@ -79,12 +79,12 @@ export {
   fetchEiaWti,
   fetchEiaBrent,
   fetchEiaHenryHub,
-} from './eia';
-export type { EiaSpot } from './eia';
+} from '../../adapters/eia';
+export type { EiaSpot } from '../../adapters/eia';
 export { readXlsWorkbook, excelSerialToIso } from './biff';
 export type { BiffSheet, BiffWorkbook } from './biff';
 export { ManualSeriesFileSchema, parseManualSeries } from './manual';
-export { fetchCryptoFng, FNG_URL } from './fng';
+export { fetchCryptoFng, FNG_URL } from '../../adapters/fng';
 export type { ManualSeriesFile } from './manual';
 export { buildIndicatorSeries, computeHighestSinceYear, computePeaks, READING_SOURCES, mergeSeries } from './derived';
 export type { SeriesInputs } from './derived';
@@ -125,20 +125,20 @@ export type { ReleaseScheduleEntry, SnapshotBuildInputs, PolicyDecision, Context
  * ------------------------------------------------------------------ */
 export { fetchGprExportAll, parseGprExportAll, GPR_URL } from './monthly-indexes';
 export type { GprExportSeries } from './monthly-indexes';
-export { fetchEbpCsv, parseEbpCsv, EBP_CSV_URL } from './credit';
-export { collectPortwatch, ma7Series, portwatchQueryUrl } from './portwatch';
-export { collectTreasuryAuctions, selectAuctionFamily, auctionsUrl, AUCTIONS_URL } from './auctions';
-export type { AuctionsCollectResult, AuctionFamilySeries } from './auctions';
-export { fetchEiaSprLevel, fetchEiaCrudeProduction, EIA_SPR_URL, EIA_CRUDE_PRODUCTION_URL } from './eia-stocks';
-export { fetchBazgGoldImports, parseBazgGoldImports, BAZG_GOLD_IMPORTS_URL } from './bazg';
+export { fetchEbpCsv, parseEbpCsv, EBP_CSV_URL } from '../../adapters/credit';
+export { collectPortwatch, ma7Series, portwatchQueryUrl } from '../../adapters/portwatch';
+export { collectTreasuryAuctions, selectAuctionFamily, auctionsUrl, AUCTIONS_URL } from '../../adapters/auctions';
+export type { AuctionsCollectResult, AuctionFamilySeries } from '../../adapters/auctions';
+export { fetchEiaSprLevel, fetchEiaCrudeProduction, EIA_SPR_URL, EIA_CRUDE_PRODUCTION_URL } from '../../adapters/eia-stocks';
+export { fetchBazgGoldImports, parseBazgGoldImports, BAZG_GOLD_IMPORTS_URL } from '../../adapters/bazg';
 export {
   fetchSgeMonthlyWithdrawal,
   parseSgeMonthlyReportIndex,
   parseSgeWithdrawal,
   extractPdfText,
   SGE_MONTHLY_REPORT_URL,
-} from './sge-monthly';
-export type { SgeMonthlyReportLink, SgeWithdrawalReading } from './sge-monthly';
-export { fetchMofJgb10y, parseMofJgbCsv, MOF_JGBCME_URL } from './mof';
+} from '../../adapters/sge-monthly';
+export type { SgeMonthlyReportLink, SgeWithdrawalReading } from '../../adapters/sge-monthly';
+export { fetchMofJgb10y, parseMofJgbCsv, MOF_JGBCME_URL } from '../../adapters/mof';
 export { insightsFetch, CURRENA_UA } from './fetch-policy';
 export { combineSeries } from '../series';

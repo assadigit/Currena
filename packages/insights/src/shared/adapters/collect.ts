@@ -18,11 +18,11 @@
 import type { InsightsSourceReport, IndicatorId } from '@currena/core';
 import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
-import { ABS_SERIES, fetchAbsSeries } from './abs';
-import { fetchBitstampCloses } from './bitstamp';
-import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from './eia';
-import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from './ecb';
-import { fetchBoeBankRateDecisions } from './boe';
+import { ABS_SERIES, fetchAbsSeries } from '../../adapters/abs';
+import { fetchBitstampCloses } from '../../adapters/bitstamp';
+import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from '../../adapters/eia';
+import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from '../../adapters/ecb';
+import { fetchBoeBankRateDecisions } from '../../adapters/boe';
 import {
   NBS_PRESS_INDEX_URL,
   fetchNbsCpiRelease,
@@ -31,13 +31,13 @@ import {
   latestCpiRelease,
   latestPmiRelease,
   parseNbsPressIndex,
-} from './nbs';
-import { fetchCryptoFng } from './fng';
-import { fetchFrankfurterSeries } from './frankfurter';
+} from '../../adapters/nbs';
+import { fetchCryptoFng } from '../../adapters/fng';
+import { fetchFrankfurterSeries } from '../../adapters/frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
-import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from './rba';
-import { fetchTreasuryCurves, treasuryT10y2y } from './treasury';
+import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from '../../adapters/rba';
+import { fetchTreasuryCurves, treasuryT10y2y } from '../../adapters/treasury';
 import { fetchYahooQuote } from './yahoo';
 import { fetchBrentFrontMonthQuote } from '../prices/brent-front-month';
 import { fetchWorldBankMonthly } from './worldbank';

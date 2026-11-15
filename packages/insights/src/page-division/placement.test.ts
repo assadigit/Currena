@@ -13,8 +13,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { IndicatorIdSchema } from '@currena/core';
-import { GAUGES } from '../gauges';
-import { GOLD_LANE_VOTERS } from '../gold-score';
+import { GAUGES } from '../shared/gauges';
+import { GOLD_LANE_VOTERS } from '../shared/gold-score';
 import {
   AU_GAUGE_MEMBER_IDS,
   BLOCKED_NOTES,

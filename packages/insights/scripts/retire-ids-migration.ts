@@ -28,9 +28,9 @@ import { readFileSync } from 'node:fs';
 
 import { InsightsSnapshotSchema } from '@currena/core';
 
-import { summarizeByGauges } from '../src/gauges';
-import { projectSnapshotToPublic } from '../src/adapters/index';
-import { RestInsightsStore, INSIGHTS_ARCHIVE_PREFIX, INSIGHTS_ARCHIVE_PUBLIC_PREFIX } from '../src/store';
+import { summarizeByGauges } from '../src/shared/gauges';
+import { projectSnapshotToPublic } from '../src/shared/adapters/index';
+import { RestInsightsStore, INSIGHTS_ARCHIVE_PREFIX, INSIGHTS_ARCHIVE_PUBLIC_PREFIX } from '../src/shared/store';
 import type { IndicatorReading, InsightsSnapshot } from '@currena/core';
 
 function fail(message: string): never {

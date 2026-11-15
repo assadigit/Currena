@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { IndicatorIdSchema } from '@currena/core';
 
-const dataRoot = new URL('../../../data/', import.meta.url);
+const dataRoot = new URL('../../../../data/', import.meta.url);
 
 describe('data/site-mode-overrides.json (the generated public-mode hidden set)', () => {
   const overrides = JSON.parse(readFileSync(new URL('site-mode-overrides.json', dataRoot), 'utf8')) as {

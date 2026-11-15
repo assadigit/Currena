@@ -44,10 +44,10 @@
  */
 
 import { fetchCftcGoldArchiveYear } from '../src/adapters/cftc';
-import { buildHistoryFile, historyToSeries } from '../src/adapters/snapshot';
-import { mergeSeries } from '../src/adapters/derived';
-import type { SeriesPoint } from '../src/series';
-import { RestInsightsStore } from '../src/store';
+import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';
+import { mergeSeries } from '../src/shared/adapters/derived';
+import type { SeriesPoint } from '../src/shared/series';
+import { RestInsightsStore } from '../src/shared/store';
 import type { IndicatorId } from '@currena/core';
 
 const args = process.argv.slice(2);

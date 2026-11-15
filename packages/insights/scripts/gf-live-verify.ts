@@ -12,7 +12,7 @@
  */
 
 import { goldBalance, GOLD_LANE_STRONG } from '../src/gold-balance';
-import { GOLD_LANE_VOTERS, GOLD_LANES } from '../src/gold-score';
+import { GOLD_LANE_VOTERS, GOLD_LANES } from '../src/shared/gold-score';
 
 const url = process.argv[2] ?? 'https://currena.ir/api/insights';
 

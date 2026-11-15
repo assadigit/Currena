@@ -31,7 +31,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { FxRuleState, FxSummary, InsightsSnapshot } from '@currena/core';
-import { summarizeByGauges } from '../src/gauges';
+import { summarizeByGauges } from '../src/shared/gauges';
 import { buildNarrationState, type NarrationFxState, type NarrationSnapshot } from '../src/narrator/state';
 
 const HERE = dirname(fileURLToPath(import.meta.url));

@@ -44,9 +44,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { goldBalance, GOLD_LANE_MIN_FIRING, GOLD_LANE_STRONG } from '../src/gold-balance';
-import { GOLD_LANES, GOLD_LANE_VOTERS } from '../src/gold-score';
-import { SOURCE_LICENCES } from '../src/licences';
-import { SOURCE_RISK_REGISTER } from '../src/sources';
+import { GOLD_LANES, GOLD_LANE_VOTERS } from '../src/shared/gold-score';
+import { SOURCE_LICENCES } from '../src/shared/licences';
+import { SOURCE_RISK_REGISTER } from '../src/shared/sources';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REGISTRY_PATH = join(HERE, '..', '..', '..', 'data', 'indicators.json');

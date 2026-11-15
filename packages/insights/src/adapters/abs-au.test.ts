@@ -17,9 +17,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { collectAbsAuMacro, ABS_AU_IDS, ABS_AU_SERIES } from './abs-au';
-import { parseAbsSdmxCsv } from '../parsers';
-import { yoyPctSeries } from '../series';
-import { DEFINITIONS } from '../definitions';
+import { parseAbsSdmxCsv } from '../shared/parsers';
+import { yoyPctSeries } from '../shared/series';
+import { DEFINITIONS } from '../shared/definitions';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtures = join(here, '..', '..', 'fixtures', 's5');

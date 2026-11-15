@@ -38,12 +38,12 @@
  *   pnpm --filter @currena/insights rung2-run --nbs
  */
 
-import { runInsightsRung2Phase } from '../src/ingest/run';
-import { RestInsightsStore } from '../src/store';
-import { HIDDEN_PUBLIC_IDS } from '../src/ingest/data';
-import { RUNG2_IDS, rung2FetchPlanFor } from '../src/adapters/rung2';
-import type { InsightsStore } from '../src/store';
-import type { Rung2FetchPlan } from '../src/adapters/rung2';
+import { runInsightsRung2Phase } from '../src/shared/ingest/run';
+import { RestInsightsStore } from '../src/shared/store';
+import { HIDDEN_PUBLIC_IDS } from '../src/shared/ingest/data';
+import { RUNG2_IDS, rung2FetchPlanFor } from '../src/shared/adapters/rung2';
+import type { InsightsStore } from '../src/shared/store';
+import type { Rung2FetchPlan } from '../src/shared/adapters/rung2';
 
 const args = process.argv.slice(2);
 

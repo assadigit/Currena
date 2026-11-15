@@ -10,7 +10,7 @@ import { readXlsxSheet } from './xlsx';
 import type { SeriesPoint } from '../series';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const FIXTURES = join(HERE, '..', '..', 'fixtures');
+const FIXTURES = join(HERE, '..', '..', '..', 'fixtures');
 
 describe('findPinkSheetMonthlyUrl', () => {
   it('extracts the single monthly workbook link from a page', () => {

@@ -26,7 +26,7 @@ import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
 import { DEFINITIONS, computeReading } from './index';
-import { GOLD_LANE_VOTERS, goldTailwindScore } from './gold-score';
+import { GOLD_LANE_VOTERS, goldTailwindScore } from './shared/gold-score';
 import {
   HARNESS_GOLD_VOTERS_21,
   HARNESS_GOLD_VOTERS_20,
@@ -40,7 +40,7 @@ import {
   seriesUpTo,
   signAgreement,
 } from './gold-backtest-core';
-import type { SeriesPoint } from './series';
+import type { SeriesPoint } from './shared/series';
 import { GF_VOTERS_P1_DEMOTE } from './gf-p0-proposed';
 
 const NOW = '2026-10-30T04:10:00.000Z';

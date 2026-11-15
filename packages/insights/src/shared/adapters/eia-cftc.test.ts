@@ -18,11 +18,11 @@ import {
   EIA_CRUDE_PRODUCTION_SPEC,
   parseEiaCrudeStocksHtml,
   parseEiaWeeklySeriesHtml,
-} from './eia-stocks';
-import { CFTC_DEAFUT_URL, CFTC_GOLD_MARKET, cftcArchiveUrl, parseCftcGoldArchiveAnnual, parseCftcGoldPositioning } from './cftc';
+} from '../../adapters/eia-stocks';
+import { CFTC_DEAFUT_URL, CFTC_GOLD_MARKET, cftcArchiveUrl, parseCftcGoldArchiveAnnual, parseCftcGoldPositioning } from '../../adapters/cftc';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', 'fixtures');
 const stocksHtml = readFileSync(join(fixtures, 'eia-crude-stocks.html'), 'utf8');
 const deafut = readFileSync(join(fixtures, 'cftc-deafut.txt'), 'utf8');
 // gap-closure S4-M4.4 (2026-11-01): the M4.1 captures — the SPR level page

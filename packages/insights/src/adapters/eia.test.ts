@@ -9,8 +9,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parseEiaSpotXls, EIA_WTI_URL, EIA_BRENT_URL, EIA_NATGAS_URL } from './eia';
-import { excelSerialToIso, readXlsWorkbook } from './biff';
-import { FormatChangedError } from './fetch-policy';
+import { excelSerialToIso, readXlsWorkbook } from '../shared/adapters/biff';
+import { FormatChangedError } from '../shared/adapters/fetch-policy';
 
 const FIXTURE = readFileSync(join(__dirname, '../../fixtures/eia-wti-mini.xls'));
 const FIXTURE_BUF = FIXTURE.buffer.slice(

@@ -35,8 +35,8 @@
  */
 
 import type { BoardAttachmentId, IndicatorId, PageDivisionPageId } from '@currena/core';
-import { GAUGES } from '../gauges';
-import { GOLD_LANE_VOTERS } from '../gold-score';
+import { GAUGES } from '../shared/gauges';
+import { GOLD_LANE_VOTERS } from '../shared/gold-score';
 
 /* ------------------------------------------------------------------ *
  * Types

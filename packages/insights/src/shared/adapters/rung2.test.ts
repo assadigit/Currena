@@ -20,7 +20,7 @@ import type { InsightsStore } from '../store';
 import type { SeriesPoint } from '../series';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', 'fixtures');
 const mofCurrentCsv = readFileSync(join(fixtures, 'mof-jgbcme-current.csv'), 'utf8');
 // 2026-10-26 gap-audit build, A-8..A-10: the monthly trio's captures.
 const cliCsv = readFileSync(join(fixtures, 'oecd-cli.csv'), 'utf8');

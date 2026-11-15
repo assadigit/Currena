@@ -33,7 +33,7 @@ const TREASURY_REAL = [
 /** The mini EIA workbook bytes (eia.test.ts pins the parse) — one per series. */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-const FIXTURE_DIR = join(__dirname, '../../fixtures');
+const FIXTURE_DIR = join(__dirname, '../../../fixtures');
 const EIA_FIXTURES: Record<string, Buffer> = {
   wti: readFileSync(join(FIXTURE_DIR, 'eia-wti-mini.xls')),
   brent: readFileSync(join(FIXTURE_DIR, 'eia-brent-mini.xls')),

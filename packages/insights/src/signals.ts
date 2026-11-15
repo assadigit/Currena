@@ -29,7 +29,7 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { evalLeg } from './connections';
+import { evalLeg } from './shared/connections';
 
 export type SignalMetal = 'gold' | 'silver';
 

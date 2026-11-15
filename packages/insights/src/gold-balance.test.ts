@@ -36,7 +36,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-import { GOLD_LANE_VOTERS, GOLD_LANES, goldTailwindScore } from './gold-score';
+import { GOLD_LANE_VOTERS, GOLD_LANES, goldTailwindScore } from './shared/gold-score';
 import { HARNESS_GOLD_LANES_MIN2, laneBalanceOverVoters } from './gold-backtest-core';
 import { GOLD_LANE_MIN_FIRING, GOLD_LANE_STRONG, goldBalance } from './gold-balance';
 

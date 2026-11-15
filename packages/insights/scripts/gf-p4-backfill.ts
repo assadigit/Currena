@@ -44,10 +44,10 @@
  */
 
 import { fetchSgeAu9999, SGE_AU9999, type SgeAu9999Point } from '../src/adapters/sge';
-import { shanghaiPremiumSeries, mergeSeries } from '../src/adapters/derived';
-import { buildHistoryFile, historyToSeries } from '../src/adapters/snapshot';
-import { RestInsightsStore } from '../src/store';
-import type { SeriesPoint } from '../src/series';
+import { shanghaiPremiumSeries, mergeSeries } from '../src/shared/adapters/derived';
+import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';
+import { RestInsightsStore } from '../src/shared/store';
+import type { SeriesPoint } from '../src/shared/series';
 import type { IndicatorId } from '@currena/core';
 
 const args = process.argv.slice(2);

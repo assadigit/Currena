@@ -26,15 +26,15 @@
  */
 
 import type { IndicatorReading } from '@currena/core';
-import type { GoldLane, GoldLaneVoter, GoldSubGaugeWord, GoldTailwindLabel, GoldTailwindReading, GoldVoter } from './gold-score';
+import type { GoldLane, GoldLaneVoter, GoldSubGaugeWord, GoldTailwindLabel, GoldTailwindReading, GoldVoter } from './shared/gold-score';
 import {
   GOLD_LANES,
   GOLD_STRONG_MIN_FIRING,
   GOLD_STRONG_SHARE,
   GOLD_REALITY_SPEED_PCT,
-} from './gold-score';
-import { evalLeg } from './connections';
-import type { SeriesPoint } from './series';
+} from './shared/gold-score';
+import { evalLeg } from './shared/connections';
+import type { SeriesPoint } from './shared/series';
 
 /* ------------------------------------------------------------------ *
  * The voter tables the harness re-runs (B4, post-promotion)

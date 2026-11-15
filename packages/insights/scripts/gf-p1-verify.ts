@@ -47,9 +47,9 @@ import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@curren
 
 import { DEFINITIONS, computeReading } from '../src/index';
 import { goldBalance } from '../src/gold-balance';
-import { GOLD_LANE_VOTERS } from '../src/gold-score';
+import { GOLD_LANE_VOTERS } from '../src/shared/gold-score';
 import { realYieldScoringSeries } from '../src/real-yield-fill';
-import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/series';
+import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/shared/series';
 import { seriesUpTo } from '../src/gold-backtest-core';
 import { GF_MOVE_P1_PROPOSED, GF_VOTERS_P1_DEMOTE, gfCalibrationStats, gfLaneBalance, gfMoveMapWith, gfNetScore, GF_LANES_4, type GfLaneBalance } from '../src/gf-p0-proposed';
 

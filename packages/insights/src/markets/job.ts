@@ -24,7 +24,7 @@
  */
 
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
-import { fromEpochDay, epochDay } from '../series';
+import { fromEpochDay, epochDay } from '../shared/series';
 import { ProviderError, fetchEodhdSeries, fetchYahooSeries } from './providers';
 import type { MarketSeries } from './providers';
 import type { EodhdFetchOptions, YahooFetchOptions } from './providers';

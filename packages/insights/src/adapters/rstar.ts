@@ -21,10 +21,10 @@
  * derivative works from the Content."
  */
 
-import { insightsFetch, FormatChangedError } from './fetch-policy';
-import { readXlsxSheet, type XlsxCell } from './xlsx';
-import type { SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
+import { readXlsxSheet, type XlsxCell } from '../shared/adapters/xlsx';
+import type { SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 export const NYFED_HLW_URL =
   'https://www.newyorkfed.org/medialibrary/media/research/economists/williams/data/Holston_Laubach_Williams_current_estimates.xlsx';

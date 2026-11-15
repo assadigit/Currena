@@ -10,7 +10,7 @@
  *   2. Unknown providers fail visible, never invented: the raw token shows
  *      with no link and no attribution.
  *   3. THE MIRROR: ABOUT_PROVIDER_META quotes the risk register
- *      (packages/insights/src/sources.ts SOURCE_RISK_REGISTER), which the
+ *      (packages/insights/src/shared/sources.ts SOURCE_RISK_REGISTER), which the
  *      web package cannot import (its quoted terms corpus is not for the
  *      bundle). This test re-reads that file as TEXT and fails the moment
  *      the register and the mirror drift — the register stays the source
@@ -164,7 +164,7 @@ describe('ABOUT_PROVIDER_META — the risk-register mirror', () => {
   // stays out of the bundle); the mirror must track it. Read the file as
   // TEXT from the repo and assert every mirrored string still appears.
   const registerSrc = readFileSync(
-    new URL('../../../../../packages/insights/src/sources.ts', import.meta.url),
+    new URL('../../../../../packages/insights/src/shared/sources.ts', import.meta.url),
     'utf8',
   );
 

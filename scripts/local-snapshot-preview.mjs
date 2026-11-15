@@ -11,9 +11,9 @@ import { writeFileSync } from 'node:fs';
 
 const REPO = '/home/z/my-project/Currena';
 
-const { runInsightsUpdate } = await import(`${REPO}/packages/insights/src/ingest/run.ts`);
-const { HIDDEN_PUBLIC_IDS } = await import(`${REPO}/packages/insights/src/ingest/data.ts`);
-const { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } = await import(`${REPO}/packages/insights/src/adapters/rung2.ts`);
+const { runInsightsUpdate } = await import(`${REPO}/packages/insights/src/shared/ingest/run.ts`);
+const { HIDDEN_PUBLIC_IDS } = await import(`${REPO}/packages/insights/src/shared/ingest/data.ts`);
+const { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } = await import(`${REPO}/packages/insights/src/shared/adapters/rung2.ts`);
 
 // The inline rung-2 collection — the same bootstrap plan the selfcheck runs.
 const rung2Plan = rung2FetchPlanFor(new Date(), new Set(RUNG2_IDS));

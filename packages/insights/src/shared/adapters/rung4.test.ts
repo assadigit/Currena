@@ -26,14 +26,14 @@ import {
   usDeficit12mSeries,
 } from './rung4';
 import { RUNG2_IDS } from './rung2';
-import { ABS_AU_IDS } from './abs-au';
-import { PORTWATCH_IDS } from './portwatch';
+import { ABS_AU_IDS } from '../../adapters/abs-au';
+import { PORTWATCH_IDS } from '../../adapters/portwatch';
 import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsRung4Phase } from '../ingest/run';
 import type { InsightsStore } from '../store';
 import type { SeriesPoint } from '../series';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', 'fixtures');
 
 /** The M3.1 ZIP captures (binary — served through an injectable fetch). */
 const liquidityZip = new Uint8Array(readFileSync(join(fixtures, 's3', 'fred-s3-liquidity-group-2026-11-01.zip')));

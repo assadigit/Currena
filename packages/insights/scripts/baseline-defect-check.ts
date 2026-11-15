@@ -11,8 +11,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DEFINITIONS } from '../src/definitions';
-import { runDefectChecksOnBaseline, t19NoAdviceWording, type Step3CheckResult } from '../src/validation-step3';
+import { DEFINITIONS } from '../src/shared/definitions';
+import { runDefectChecksOnBaseline, t19NoAdviceWording, type Step3CheckResult } from '../src/shared/validation-step3';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..', '..', '..');

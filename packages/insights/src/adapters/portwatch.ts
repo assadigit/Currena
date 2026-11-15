@@ -50,9 +50,9 @@
  */
 
 import type { IndicatorId, InsightsSourceReport } from '@currena/core';
-import { classifySourceError, insightsFetch } from './fetch-policy';
-import { epochDay, fromEpochDay, type SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import { classifySourceError, insightsFetch } from '../shared/adapters/fetch-policy';
+import { epochDay, fromEpochDay, type SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 /**
  * The provider's OWN intermittent error — an HTTP 200 body of

@@ -25,16 +25,16 @@ import type { RegressionEpisode } from '../validation';
 
 // JSON modules outside the package root: every tool in the chain resolves
 // them (wrangler/esbuild, tsx, vitest) and resolveJsonModule covers tsc.
-import calendarRaw from '../../../../data/insights-calendar.json';
-import chinaPmiRaw from '../../../../data/manual/china-pmi.json';
-import chinaCpiRaw from '../../../../data/manual/china-cpi.json';
-import shillerRaw from '../../../../data/shiller/shiller-cape.json';
-import policyDecisionsRaw from '../../../../data/policy-decisions.json';
-import releaseScheduleRaw from '../../../../data/insights-release-schedule.json';
-import contextNotesRaw from '../../../../data/insights-context-notes.json';
-import indicatorAuditRaw from '../../../../data/indicator-audit.json';
-import siteModeOverridesRaw from '../../../../data/site-mode-overrides.json';
-import regressionEpisodesRaw from '../../fixtures/regression-episodes.json';
+import calendarRaw from '../../../../../data/insights-calendar.json';
+import chinaPmiRaw from '../../../../../data/manual/china-pmi.json';
+import chinaCpiRaw from '../../../../../data/manual/china-cpi.json';
+import shillerRaw from '../../../../../data/shiller/shiller-cape.json';
+import policyDecisionsRaw from '../../../../../data/policy-decisions.json';
+import releaseScheduleRaw from '../../../../../data/insights-release-schedule.json';
+import contextNotesRaw from '../../../../../data/insights-context-notes.json';
+import indicatorAuditRaw from '../../../../../data/indicator-audit.json';
+import siteModeOverridesRaw from '../../../../../data/site-mode-overrides.json';
+import regressionEpisodesRaw from '../../../fixtures/regression-episodes.json';
 
 /** The calendar (release dates feed the NextUpStrip + T-03 date checks). */
 export const CALENDAR: readonly CalendarEvent[] = z.array(CalendarEventSchema).parse(calendarRaw);

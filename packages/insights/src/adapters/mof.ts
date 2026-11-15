@@ -25,9 +25,9 @@
  * Attribution class: "Source: Ministry of Finance, Japan".
  */
 
-import { insightsFetch, FormatChangedError } from './fetch-policy';
-import { addDays, assertAscending, type SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
+import { addDays, assertAscending, type SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 /** The current-month daily file (verified final URL after the 2026-10-26 redirect probe). */
 export const MOF_JGBCME_URL = 'https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv';

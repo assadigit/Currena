@@ -36,9 +36,9 @@
  */
 
 import type { InsightsSourceReport } from '@currena/core';
-import { classifySourceError, insightsFetch } from './fetch-policy';
-import type { SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import { classifySourceError, insightsFetch } from '../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 /** The FiscalData auctions_query endpoint (M3.1-verified — never invented). */
 export const AUCTIONS_URL =

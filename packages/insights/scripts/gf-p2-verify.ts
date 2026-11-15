@@ -54,9 +54,9 @@ import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@curren
 
 import { DEFINITIONS, computeReading } from '../src/index';
 import { goldBalance, GOLD_LANE_STRONG } from '../src/gold-balance';
-import { GOLD_LANE_VOTERS, GOLD_LANES } from '../src/gold-score';
+import { GOLD_LANE_VOTERS, GOLD_LANES } from '../src/shared/gold-score';
 import { realYieldScoringSeries } from '../src/real-yield-fill';
-import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/series';
+import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/shared/series';
 import { seriesUpTo } from '../src/gold-backtest-core';
 import {
   GF_F2_PROXY_ID,

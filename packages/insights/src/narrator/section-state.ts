@@ -32,10 +32,10 @@ import type { MarketsSnapshot, MarketEntry, FxSnapshot, TicSnapshot } from '@cur
 import { buildNarrationState, type NarrationAlert, type NarrationExcluded, type NarrationItem } from './state';
 import { getNarratorSectionLabels, type NarratorLang } from './vocabulary';
 import { marketDefinition } from '../markets/definitions';
-import { DEFINITIONS } from '../definitions';
+import { DEFINITIONS } from '../shared/definitions';
 import { FX_STALE_DAYS } from '../fx/definitions';
 import { ticHolderDerived, ticTopMovers } from '../tic';
-import { daysBetween } from '../series';
+import { daysBetween } from '../shared/series';
 import { sha256Hex } from './hash';
 
 /* ------------------------------------------------------------------ *

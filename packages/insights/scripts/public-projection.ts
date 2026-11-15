@@ -24,8 +24,8 @@
 import { readFileSync } from 'node:fs';
 import { z } from 'zod';
 
-import { projectSnapshotToPublic } from '../src/adapters/index';
-import { RestInsightsStore } from '../src/store';
+import { projectSnapshotToPublic } from '../src/shared/adapters/index';
+import { RestInsightsStore } from '../src/shared/store';
 
 function fail(message: string): never {
   console.error(`\n[public-projection] FATAL: ${message}`);

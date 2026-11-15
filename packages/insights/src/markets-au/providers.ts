@@ -18,9 +18,9 @@
  */
 
 import type { AuMarketId, AuMarketSource } from '@currena/core';
-import type { SeriesPoint } from '../series';
-import { insightsFetch } from '../adapters/fetch-policy';
-import { providerFetchEnabled } from '../sources';
+import type { SeriesPoint } from '../shared/series';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
+import { providerFetchEnabled } from '../shared/sources';
 import { YAHOO_BASE_URL, YAHOO_USER_AGENT, auMarketDefinition } from './definitions';
 
 /** One provider's answer for one AU market: ascending daily closes. */

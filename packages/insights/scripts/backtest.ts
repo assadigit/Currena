@@ -30,7 +30,7 @@ import {
   yoyPctSeries,
   type SeriesPoint,
 } from '../src/index';
-import { summarizeByGauges } from '../src/gauges';
+import { summarizeByGauges } from '../src/shared/gauges';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURES = join(HERE, '..', 'fixtures');

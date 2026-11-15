@@ -19,7 +19,7 @@
  */
 
 import type { TicHolder, TicSnapshot, TicMonthlyValue } from '@currena/core';
-import { FormatChangedError } from '../adapters/fetch-policy';
+import { FormatChangedError } from '../shared/adapters/fetch-policy';
 import type { TicTable3, TicTable3Row, TicTable5 } from './parse';
 
 /** The two verified source URLs (VERIFIED-SOURCES.md; the dead mfh.txt/

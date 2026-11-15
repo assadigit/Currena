@@ -33,8 +33,8 @@
  * cofer-sdmx-2026-11-02.json — the provider's own full response).
  */
 
-import type { SeriesPoint } from '../series';
-import { insightsFetch } from './fetch-policy';
+import type { SeriesPoint } from '../shared/series';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
 
 /** Thrown with the provider's own context so the report row stays honest. */
 export class CoferError extends Error {

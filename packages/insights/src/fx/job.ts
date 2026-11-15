@@ -19,8 +19,8 @@
  */
 
 import type { FxPairEntry, FxPairId, FxSnapshot, FxSource, IndicatorReading } from '@currena/core';
-import type { SeriesPoint } from '../series';
-import { daysBetween, fromEpochDay } from '../series';
+import type { SeriesPoint } from '../shared/series';
+import { daysBetween, fromEpochDay } from '../shared/series';
 import { computeBasketValue } from '../basket';
 import { decodeWeeklySeries } from '../markets/definitions';
 import type { FxQuotes, FxQuoteSet } from './providers';

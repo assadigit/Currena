@@ -31,11 +31,11 @@ import {
   parseManualSeries,
   parsePolicyDecisions,
   parseReleaseSchedule,
-} from '../src/adapters/index';
-import { buildInsightsSnapshot } from '../src/adapters/snapshot';
-import { runValidationSuite } from '../src/validation';
+} from '../src/shared/adapters/index';
+import { buildInsightsSnapshot } from '../src/shared/adapters/snapshot';
+import { runValidationSuite } from '../src/shared/validation';
 import type { IndicatorId } from '@currena/core';
-import type { SeriesPoint } from '../src/series';
+import type { SeriesPoint } from '../src/shared/series';
 
 const nowIso = new Date().toISOString();
 const repoRoot = new URL('../../../', import.meta.url);

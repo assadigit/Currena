@@ -57,12 +57,12 @@
 
 import { fetchCftcGoldArchiveYear } from '../src/adapters/cftc';
 import { fetchMofJgb10y } from '../src/adapters/mof';
-import { fetchFredSeries } from '../src/adapters/fred';
-import { fetchYahooQuote } from '../src/adapters/yahoo';
-import { buildHistoryFile, historyToSeries } from '../src/adapters/snapshot';
-import { mergeSeries } from '../src/adapters/derived';
-import { combineSeries, type SeriesPoint } from '../src/series';
-import { RestInsightsStore } from '../src/store';
+import { fetchFredSeries } from '../src/shared/adapters/fred';
+import { fetchYahooQuote } from '../src/shared/adapters/yahoo';
+import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';
+import { mergeSeries } from '../src/shared/adapters/derived';
+import { combineSeries, type SeriesPoint } from '../src/shared/series';
+import { RestInsightsStore } from '../src/shared/store';
 import type { IndicatorId } from '@currena/core';
 
 const args = process.argv.slice(2);

@@ -42,9 +42,9 @@ import { fileURLToPath } from 'node:url';
 
 import { fetchEbpCsv } from '../src/adapters/credit';
 import { fetchMofJgb10y } from '../src/adapters/mof';
-import { insightsFetch } from '../src/adapters/fetch-policy';
-import { readZipTextEntries } from '../src/adapters/zip';
-import type { SeriesPoint } from '../src/series';
+import { insightsFetch } from '../src/shared/adapters/fetch-policy';
+import { readZipTextEntries } from '../src/shared/adapters/zip';
+import type { SeriesPoint } from '../src/shared/series';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT_CANDIDATES = join(HERE, '..', 'fixtures', 'gf-p0-candidates.json');

@@ -36,7 +36,7 @@
  */
 
 import { z } from 'zod';
-import { insightsFetch } from '../adapters/fetch-policy';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
 import { EODHD_BASE_URL } from '../markets/definitions';
 import { companyByTicker } from './definitions';
 import type { CompanyDefinition } from './definitions';

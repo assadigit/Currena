@@ -19,7 +19,7 @@
  */
 
 import type { AuMarketEntry, AuMarketId, AuMarketsSnapshot } from '@currena/core';
-import { fromEpochDay, epochDay } from '../series';
+import { fromEpochDay, epochDay } from '../shared/series';
 import { AuProviderError, fetchAuYahooSeries } from './providers';
 import type { AuMarketSeries, AuYahooFetchOptions } from './providers';
 import type { AuMarketResolution } from './compute';

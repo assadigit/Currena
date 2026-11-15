@@ -26,7 +26,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import * as XLSX from 'xlsx';
-import { insightsFetch, contentHash, FormatChangedError } from '../src/adapters/fetch-policy';
+import { insightsFetch, contentHash, FormatChangedError } from '../src/shared/adapters/fetch-policy';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(here, '..', '..', '..', 'data', 'shiller');

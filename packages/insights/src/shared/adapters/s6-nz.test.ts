@@ -24,7 +24,7 @@ import type { SeriesPoint } from '../series';
 import { FormatChangedError } from './fetch-policy';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', 'fixtures');
 const nzShortRateCsv = readFileSync(join(fixtures, 's6', 'oecd-nz-short-rate-2026-11-02.csv'), 'utf8');
 const nz10yCsv = readFileSync(join(fixtures, 's6', 'fred-nz-10y-2026-11-02.csv'), 'utf8');
 
@@ -111,7 +111,7 @@ describe('the collect wiring (S6-M6.1: the NZD leg must REACH the derivation)', 
   // proves the wire between them.
   it('collect.ts hands every FRANKFURTER_INSIGHTS_CURRENCIES leg into the fx input', async () => {
     const { readFileSync } = await import('node:fs');
-    const { FRANKFURTER_INSIGHTS_CURRENCIES } = await import('./frankfurter');
+    const { FRANKFURTER_INSIGHTS_CURRENCIES } = await import('../../adapters/frankfurter');
     const source = readFileSync(new URL('./collect.ts', import.meta.url), 'utf8');
     const fxBlock = /fx: \{[^}]*\},/s.exec(source)?.[0] ?? '';
     expect(fxBlock.length).toBeGreaterThan(0);

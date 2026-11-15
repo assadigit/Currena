@@ -24,10 +24,10 @@
  * T-03 never applies (policy rates are not trading-day series).
  */
 
-import { insightsFetch, FormatChangedError } from './fetch-policy';
-import type { SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
-import { assertAscending } from '../series';
+import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
+import { assertAscending } from '../shared/series';
 
 /** The BoE's published Bank Rate history page (HTML, decision table inside). */
 export const BOE_BANK_RATE_URL = 'https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp';

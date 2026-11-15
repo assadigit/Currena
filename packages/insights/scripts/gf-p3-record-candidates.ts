@@ -42,8 +42,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fetchFredSeries } from '../src/adapters/fred';
-import type { SeriesPoint } from '../src/series';
+import { fetchFredSeries } from '../src/shared/adapters/fred';
+import type { SeriesPoint } from '../src/shared/series';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = join(HERE, '..', 'fixtures', 'gf-p0-candidates.json');

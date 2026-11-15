@@ -35,7 +35,7 @@ import type {
   AuMarketsSummary,
 } from '@currena/core';
 import { AuMarketsSnapshotSchema } from '@currena/core';
-import { addDays, daysBetween, pointAtOrBefore } from '../series';
+import { addDays, daysBetween, pointAtOrBefore } from '../shared/series';
 import type { AuMarketSeries } from './providers';
 // The pure helpers (trendOf, yearAgoAnchor, fiveYearAgoAnchor, weeklySeries,
 // statusOf) are REUSED from the world board — none depend on MarketId. They

@@ -36,11 +36,11 @@ import type {
   InsightsSnapshot,
   SummaryLine,
 } from '@currena/core';
-import { DEFINITIONS } from '../definitions';
-import { GAUGES } from '../gauges';
-import { freshnessOf } from '../freshness';
-import { cadenceUsesPreviousRelease } from '../scoring';
-import type { FreshnessInfo } from '../freshness';
+import { DEFINITIONS } from '../shared/definitions';
+import { GAUGES } from '../shared/gauges';
+import { freshnessOf } from '../shared/freshness';
+import { cadenceUsesPreviousRelease } from '../shared/scoring';
+import type { FreshnessInfo } from '../shared/freshness';
 
 /* ------------------------------------------------------------------ *
  * Input — the existing computed page state

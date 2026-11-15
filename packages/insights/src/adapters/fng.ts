@@ -13,10 +13,10 @@
  * seconds) — the SeriesPoint date is that UTC day, never the fetch instant.
  */
 
-import { insightsFetch } from './fetch-policy';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
 import { z } from 'zod';
-import type { SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import type { SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 export const FNG_URL = 'https://api.alternative.me/fng/';
 

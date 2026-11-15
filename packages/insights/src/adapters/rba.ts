@@ -29,10 +29,10 @@
  *    Series ID like F6.
  */
 
-import { insightsFetch, FormatChangedError } from './fetch-policy';
-import { parseRbaTableCsv } from '../parsers';
-import type { SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
+import { parseRbaTableCsv } from '../shared/parsers';
+import type { SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 export const RBA_CSV_BASE = 'https://www.rba.gov.au/statistics/tables/csv';
 
@@ -111,7 +111,7 @@ export async function fetchRbaTableText(
 /** Parse ONE series out of an already-downloaded RBA table CSV. */
 export function parseRbaSeriesFromText(text: string, key: RbaTableKey): SeriesPoint[] {
   const spec: RbaTableSpec = RBA_TABLES[key];
-  const opts: import('../parsers').RbaParseOptions =
+  const opts: import('../shared/parsers').RbaParseOptions =
     spec.seriesId !== undefined
       ? { tablePrefix: spec.prefix, seriesId: spec.seriesId }
       : { tablePrefix: spec.prefix, seriesTitle: spec.series };

@@ -58,7 +58,7 @@ import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@curren
 import { DEFINITIONS, computeReading } from '../src/index';
 import { GF_VOTERS_FROZEN_21 } from '../src/gf-p0-proposed';
 import { realYieldScoringSeries } from '../src/real-yield-fill';
-import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/series';
+import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/shared/series';
 import { seriesUpTo } from '../src/gold-backtest-core';
 import {
   GF_F2_PROXY_ID,

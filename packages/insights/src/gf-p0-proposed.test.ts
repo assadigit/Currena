@@ -26,8 +26,8 @@ import { describe, expect, it } from 'vitest';
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-import { evalLeg, SIGNAL_LEG_MOVE } from './connections';
-import { GOLD_LANE_VOTERS, GOLD_LANES, goldTailwindScore } from './gold-score';
+import { evalLeg, SIGNAL_LEG_MOVE } from './shared/connections';
+import { GOLD_LANE_VOTERS, GOLD_LANES, goldTailwindScore } from './shared/gold-score';
 import {
   laneBalanceOverVoters,
   laneCalibrationStats,

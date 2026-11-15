@@ -19,7 +19,7 @@ import type { MarketJobFetchers, MarketJobReport } from './job';
 import { retryRunOptions, runMarketsJob } from './job';
 import { buildMarketsSnapshot } from './compute';
 import { marketsContentEqual } from './compute';
-import { checkE05IdenticalMoves } from '../validation-step3';
+import { checkE05IdenticalMoves } from '../shared/validation-step3';
 import type { MarketsReader, MarketsWriter } from './store';
 
 export interface RunMarketsUpdateDeps {

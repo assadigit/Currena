@@ -396,7 +396,7 @@ describe('runValidationSuite — the Part D tests', () => {
   // history (COVID 2020, inflation 2022) — replays clean in CI, so a rule
   // change that flips any recorded status fails the build, not the page.
   it('T-14 replays the saved episodes file (fixtures/regression-episodes.json)', () => {
-    const raw: unknown = JSON.parse(readFileSync(new URL('../fixtures/regression-episodes.json', import.meta.url), 'utf8'));
+    const raw: unknown = JSON.parse(readFileSync(new URL('../../fixtures/regression-episodes.json', import.meta.url), 'utf8'));
     const file = raw as { episodes: readonly RegressionEpisode[] };
     expect(file.episodes.length).toBeGreaterThanOrEqual(2);
     expect(file.episodes.reduce((n, e) => n + e.cases.length, 0)).toBeGreaterThanOrEqual(10);

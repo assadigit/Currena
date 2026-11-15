@@ -23,13 +23,13 @@ import {
   buildIndicatorSeries,
   collectAllSources,
   parseManualSeries,
-} from '../src/adapters/index';
-import { READING_SOURCES } from '../src/adapters/derived';
-import { computeReading } from '../src/scoring';
-import { DEFINITIONS } from '../src/definitions';
+} from '../src/shared/adapters/index';
+import { READING_SOURCES } from '../src/shared/adapters/derived';
+import { computeReading } from '../src/shared/scoring';
+import { DEFINITIONS } from '../src/shared/definitions';
 import type { IndicatorId } from '@currena/core';
-import type { RegressionEpisode } from '../src/validation';
-import type { SeriesPoint } from '../src/series';
+import type { RegressionEpisode } from '../src/shared/validation';
+import type { SeriesPoint } from '../src/shared/series';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outPath = join(here, '..', 'fixtures', 'regression-episodes.json');

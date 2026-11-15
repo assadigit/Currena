@@ -36,7 +36,7 @@ import { fileURLToPath } from 'node:url';
 
 import { InsightsSnapshotSchema } from '@currena/core';
 
-import { GOLD_LANE_VOTERS } from '../src/gold-score';
+import { GOLD_LANE_VOTERS } from '../src/shared/gold-score';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(HERE, '..', 'fixtures', 'gold-backtest-corpus.json');

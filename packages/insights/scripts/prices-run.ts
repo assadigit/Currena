@@ -24,9 +24,9 @@
  *   pnpm --filter @currena/insights prices-run
  */
 
-import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '../src/prices/job';
-import { RestPricesStore } from '../src/prices/store';
-import type { PricesReader, PricesWriter } from '../src/prices/store';
+import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '../src/shared/prices/job';
+import { RestPricesStore } from '../src/shared/prices/store';
+import type { PricesReader, PricesWriter } from '../src/shared/prices/store';
 
 const dryRun = process.argv.includes('--dry-run');
 

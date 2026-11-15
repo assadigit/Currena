@@ -11,10 +11,10 @@
  * "NoRecordsFound" — that is an upstream/key change and must fail loudly.
  */
 
-import { insightsFetch } from './fetch-policy';
-import { parseAbsSdmxCsv } from '../parsers';
-import type { SeriesPoint } from '../series';
-import type { FetchDeps } from './types';
+import { insightsFetch } from '../shared/adapters/fetch-policy';
+import { parseAbsSdmxCsv } from '../shared/parsers';
+import type { SeriesPoint } from '../shared/series';
+import type { FetchDeps } from '../shared/adapters/types';
 
 export const ABS_DATA_BASE = 'https://data.api.abs.gov.au/rest/data';
 

@@ -70,7 +70,7 @@ const DATA_CONTACT_URL = 'https://github.com/assadigit/Currena';
  * a real file in the repository this page ships from; no hosted URL is
  * invented for it.
  */
-const RULE_CHANGELOG_PATH = 'packages/insights/src/ruleVersion.ts';
+const RULE_CHANGELOG_PATH = 'packages/insights/src/shared/ruleVersion.ts';
 
 const STORAGE_KEY = 'currena.insights.about-open.v1';
 
