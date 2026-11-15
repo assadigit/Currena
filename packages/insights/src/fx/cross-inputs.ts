@@ -6,7 +6,7 @@
 import type { FxChg, FxPairId, MarketEntry } from '@currena/core';
 import type { SeriesPoint } from '../shared/series';
 import { addMonths, daysBetween, fromEpochDay, pointAtOrBefore } from '../shared/series';
-import { decodeWeeklySeries } from '../markets/definitions';
+import { decodeWeeklySeries } from '../domains/world-markets/markets/definitions';
 import { FX_STALE_DAYS } from './definitions';
 import { pctChange, round2 } from './maths';
 

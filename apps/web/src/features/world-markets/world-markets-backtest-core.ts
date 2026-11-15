@@ -30,8 +30,8 @@
 import type { IndicatorReading, MarketsSnapshot } from '@currena/core';
 import { summarizeMarkets } from '@currena/insights/markets';
 import { BEAR_PCT, CORRECTION_PCT, MARKETS, MARKET_GROUP_ORDER } from '@currena/insights/markets/definitions';
-import { statusWordKeyOf, trendOf } from '../../components/insights/world-markets/shared';
-import { marketsInCorrectionCount, marketsVerdictStep } from '../../components/insights/world-markets/verdict-core';
+import { statusWordKeyOf, trendOf } from './shared';
+import { marketsInCorrectionCount, marketsVerdictStep } from './verdict-core';
 import { WORLD_RISK_IDS, worldMarketsRegionGrids, worldMarketsRows, worldMarketsStatus, worldRiskCards } from './world-markets-tiles';
 
 /** One comparison's verdict — `ok` false is a RED finding (§21: zero tolerance). */

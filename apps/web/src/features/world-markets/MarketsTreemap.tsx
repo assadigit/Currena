@@ -33,12 +33,12 @@
 import { useCallback, useMemo } from 'react';
 import type { MarketEntry, MarketGroupId, MarketId } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../../shared/i18n';
-import { useI18n } from '../../../shared/lib/locale';
-import type { TranslationKey } from '../../../shared/lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import { periodValueOf } from './briefing';
 import { signedPct, statusWordKeyOf, type MarketsView, type StockStateWordKey } from './shared';
-import { formatAsOf } from '../../../shared/components/HistoryChart';
+import { formatAsOf } from '../../shared/components/HistoryChart';
 /* ------------------------------------------------------------------ *
  * The constants (viewBox units; TE-measured proportions)
  * ------------------------------------------------------------------ */

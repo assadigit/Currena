@@ -30,9 +30,9 @@ import { ATTENTION_COUNT, UNUSUAL_COUNT } from '@currena/insights/markets/defini
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
-import { WorldMap } from '../../components/insights/world-markets/WorldMap';
-import { formatRelativeShort } from '../../components/insights/world-markets/shared';
-import type { MapPeriod } from '../../components/insights/world-markets/world-map-config';
+import { WorldMap } from './WorldMap';
+import { formatRelativeShort } from './shared';
+import type { MapPeriod } from './world-map-config';
 import type { WorldMarketsStatusModel } from './world-markets-tiles';
 import { WM_VERDICT_WORD } from './world-markets-tiles';
 // S8: the copy adapter + the entry list moved to world-map-copy.ts (the

@@ -22,7 +22,7 @@ import type { FxPairEntry, FxPairId, FxSnapshot, FxSource, IndicatorReading } fr
 import type { SeriesPoint } from '../shared/series';
 import { daysBetween, fromEpochDay } from '../shared/series';
 import { computeBasketValue } from '../basket';
-import { decodeWeeklySeries } from '../markets/definitions';
+import { decodeWeeklySeries } from '../domains/world-markets/markets/definitions';
 import type { FxQuotes, FxQuoteSet } from './providers';
 import type { FrankfurterFetchOptions, YahooFxFetchOptions } from './providers';
 import { fetchFrankfurterQuotes, fetchYahooQuotes } from './providers';

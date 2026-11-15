@@ -12,7 +12,7 @@
  *     No fills/strokes/classes — styling happens in the app. Fetched at
  *     runtime as a static Worker asset (spec B3).
  *
- *   src/components/insights/world-markets/world-map-geo.json
+ *   src/features/world-markets/world-map-geo.json
  *     viewBox height + the SIXTEEN dot positions as percentages of the map
  *     box (2026-10-20g owner round: every index the app carries joins the
  *     map) plus the twelve covered countries' label anchors (the projected
@@ -45,7 +45,7 @@ const require = createRequire(import.meta.url);
 
 const webRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const svgOutPath = join(webRoot, 'public', 'assets', 'map', 'world-map.svg');
-const geoOutPath = join(webRoot, 'src', 'components', 'insights', 'world-markets', 'world-map-geo.json');
+const geoOutPath = join(webRoot, 'src', 'features', 'world-markets', 'world-map-geo.json');
 const flagsOutPath = join(webRoot, 'public', 'assets', 'map', 'world-flags.svg');
 
 // --- config -----------------------------------------------------------------

@@ -30,8 +30,8 @@ import type {
   MarketGroupId,
 } from '@currena/core';
 import { MarketsSnapshotSchema } from '@currena/core';
-import { addDays, daysBetween, epochDay, pointAtOrBefore } from '../shared/series';
-import type { SeriesPoint } from '../shared/series';
+import { addDays, daysBetween, epochDay, pointAtOrBefore } from '../../../shared/series';
+import type { SeriesPoint } from '../../../shared/series';
 import type { MarketSeries } from './providers';
 import {
   ATTENTION_COUNT,

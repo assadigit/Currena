@@ -46,16 +46,16 @@ import { pageHomeIds } from '@currena/insights/page-division';
 import {
   marketsInCorrectionCount,
   marketsVerdictStep,
-} from '../../components/insights/world-markets/verdict-core';
-import type { MarketsVerdictStep } from '../../components/insights/world-markets/verdict-core';
+} from './verdict-core';
+import type { MarketsVerdictStep } from './verdict-core';
 import {
   isOld,
   statusToneOf,
   statusWordKeyOf,
   tradingDaysBehind,
   trendOf,
-} from '../../components/insights/world-markets/shared';
-import type { StockStateWordKey } from '../../components/insights/world-markets/shared';
+} from './shared';
+import type { StockStateWordKey } from './shared';
 
 /* The §5.3 signal's count thresholds, re-exported for DISPLAY (the page's
  * rule line names them; the signal itself always arrives computed inside

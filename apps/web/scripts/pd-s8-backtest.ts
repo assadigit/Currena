@@ -33,8 +33,8 @@
  */
 
 import { MarketsSnapshotSchema } from '@currena/core';
-import { REGION_ZOOMS } from '../src/components/insights/world-markets/world-map-config';
-import type { MapRegionId } from '../src/components/insights/world-markets/world-map-config';
+import { REGION_ZOOMS } from '../src/features/world-markets/world-map-config';
+import type { MapRegionId } from '../src/features/world-markets/world-map-config';
 import { backtestRegionZoomsVsEngine } from '../src/shared/components/region-zoom-backtest-core';
 
 const BASE = (() => {

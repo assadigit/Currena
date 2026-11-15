@@ -47,7 +47,7 @@ import {
   fiveYearAgoAnchor,
   weeklySeries,
   statusOf,
-} from '../markets/compute';
+} from '../domains/world-markets/markets/compute';
 export { trendOf, yearAgoAnchor, fiveYearAgoAnchor, weeklySeries, statusOf };
 
 import {

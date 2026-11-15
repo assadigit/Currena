@@ -14,9 +14,9 @@
  */
 
 import type { MarketId } from '@currena/core';
-import type { SeriesPoint } from '../shared/series';
-import { insightsFetch } from '../shared/adapters/fetch-policy';
-import { providerFetchEnabled } from '../shared/sources';
+import type { SeriesPoint } from '../../../shared/series';
+import { insightsFetch } from '../../../shared/adapters/fetch-policy';
+import { providerFetchEnabled } from '../../../shared/sources';
 import {
   EODHD_BASE_URL,
   HISTORY_WINDOW_DAYS,

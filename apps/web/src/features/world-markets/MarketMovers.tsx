@@ -17,8 +17,8 @@
  */
 
 import type { MarketEntry } from '@currena/core';
-import { interpolate } from '../../../shared/i18n';
-import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { MarketLogo } from './MarketLogo';
 import { topMovers, periodValueOf } from './briefing';
 import {

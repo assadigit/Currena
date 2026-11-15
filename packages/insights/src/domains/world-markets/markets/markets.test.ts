@@ -29,7 +29,7 @@ import {
   weeklySeries,
 } from './compute';
 import type { MarketResolution } from './compute';
-import { addDays, epochDay, pointAtOrBefore } from '../shared/series';
+import { addDays, epochDay, pointAtOrBefore } from '../../../shared/series';
 import { lastExpectedCloseDate, marketsNeedingData, retryRunOptions, runMarketsJob } from './job';
 import { runMarketsUpdate } from './run';
 import type { MarketJobFetchers } from './job';
@@ -40,7 +40,7 @@ import { decodeWeeklySeries, MIN_CLOSES, MARKET_IDS } from './definitions';
  * Synthetic series helpers
  * ------------------------------------------------------------------ */
 
-const FIXTURES = new URL('./../../fixtures/markets-test/', import.meta.url);
+const FIXTURES = new URL('./../../../../fixtures/markets-test/', import.meta.url);
 
 /** Deterministic daily series: `days` trading days ending at `endDate`. */
 function series(

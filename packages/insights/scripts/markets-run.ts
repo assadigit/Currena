@@ -23,13 +23,13 @@
  */
 
 import { readFileSync, existsSync } from 'node:fs';
-import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from '../src/markets/providers';
-import { defaultFetchers } from '../src/markets/job';
-import type { MarketJobFetchers } from '../src/markets/job';
-import { runMarketsUpdate, formatRunReport } from '../src/markets/run';
-import { RestMarketsStore } from '../src/markets/store';
-import type { MarketsReader, MarketsWriter } from '../src/markets/store';
-import { MARKETS } from '../src/markets/definitions';
+import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from '../src/domains/world-markets/markets/providers';
+import { defaultFetchers } from '../src/domains/world-markets/markets/job';
+import type { MarketJobFetchers } from '../src/domains/world-markets/markets/job';
+import { runMarketsUpdate, formatRunReport } from '../src/domains/world-markets/markets/run';
+import { RestMarketsStore } from '../src/domains/world-markets/markets/store';
+import type { MarketsReader, MarketsWriter } from '../src/domains/world-markets/markets/store';
+import { MARKETS } from '../src/domains/world-markets/markets/definitions';
 import type { MarketId } from '@currena/core';
 
 const args = process.argv.slice(2);

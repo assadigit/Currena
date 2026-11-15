@@ -18,7 +18,7 @@
  */
 import { writeFileSync } from 'node:fs';
 // @ts-expect-error — outside this package's tsconfig rootDirs; tsx resolves it.
-import { summarizeMarkets } from '../packages/insights/src/markets/compute';
+import { summarizeMarkets } from '../packages/insights/src/domains/world-markets/markets/compute';
 // @ts-expect-error — same.
 import { runFxJob } from '../packages/insights/src/fx/job';
 // @ts-expect-error — same.

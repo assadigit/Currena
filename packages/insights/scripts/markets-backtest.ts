@@ -21,10 +21,10 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import type { MarketEntry, MarketId, MarketStatus, MarketsSummary } from '@currena/core';
-import type { MarketSeries } from '../src/markets/providers';
-import { parseEodhdEodResponse, parseYahooChartResponse } from '../src/markets/providers';
-import { buildEntry, summarizeMarkets } from '../src/markets/compute';
-import { MARKETS, MARKET_IDS } from '../src/markets/definitions';
+import type { MarketSeries } from '../src/domains/world-markets/markets/providers';
+import { parseEodhdEodResponse, parseYahooChartResponse } from '../src/domains/world-markets/markets/providers';
+import { buildEntry, summarizeMarkets } from '../src/domains/world-markets/markets/compute';
+import { MARKETS, MARKET_IDS } from '../src/domains/world-markets/markets/definitions';
 
 const cacheDir = new URL('./../fixtures/markets-live/', import.meta.url);
 const outPath = new URL('./docs/specs/insights-world-markets-backtest.md', new URL('../../../', import.meta.url));

@@ -21,9 +21,9 @@
  *   pnpm --filter @currena/insights markets-backfill-chg5y
  */
 
-import { RestMarketsStore } from '../src/markets/store';
-import { fetchYahooSeries } from '../src/markets/providers';
-import { attachChg5y } from '../src/markets/compute';
+import { RestMarketsStore } from '../src/domains/world-markets/markets/store';
+import { fetchYahooSeries } from '../src/domains/world-markets/markets/providers';
+import { attachChg5y } from '../src/domains/world-markets/markets/compute';
 import type { MarketEntry } from '@currena/core';
 
 const apiToken = process.env.CLOUDFLARE_API_TOKEN;

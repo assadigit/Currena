@@ -49,7 +49,7 @@ import {
   auViewValue,
 } from './au-markets/shared';
 import type { AuMarketsView } from './au-markets/shared';
-import { formatDateShort } from './world-markets/shared';
+import { formatDateShort } from '../../features/world-markets/shared';
 
 export type { AuMarketsLoadState } from './au-markets/shared';
 

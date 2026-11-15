@@ -14,7 +14,7 @@
 
 import type { MarketId } from '@currena/core';
 import { useI18n } from '../../shared/lib/locale';
-import type { WorldMapCopy } from '../../components/insights/world-markets/WorldMap';
+import type { WorldMapCopy } from './WorldMap';
 
 /* ------------------------------------------------------------------ *
  * The key maps — the pd.worldMarkets keys shaped into the map's copy

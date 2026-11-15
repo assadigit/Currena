@@ -23,7 +23,7 @@ import type { MarketsSnapshot } from '@currena/core';
 import { MarketsSnapshotSchema } from '@currena/core';
 import { MARKETS, summarizeMarkets } from '@currena/insights/markets';
 import { backtestRegionZoomsVsEngine, engineZoomRows, stableStringify } from './region-zoom-backtest-core';
-import { REGION_ZOOMS } from '../../components/insights/world-markets/world-map-config';
+import { REGION_ZOOMS } from '../../features/world-markets/world-map-config';
 
 /** A full 16-row synthetic board. The biggest 1D/1W moves ride rows
  * OUTSIDE the Europe zoom (ibov −6.6% · n225 +5.5%) so a subset-scale

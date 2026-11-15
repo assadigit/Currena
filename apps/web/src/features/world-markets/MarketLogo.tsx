@@ -26,7 +26,7 @@
 
 import { useState, type CSSProperties } from 'react';
 import type { MarketId } from '@currena/core';
-import { marketLogoUrl } from '../../icons/currena';
+import { marketLogoUrl } from '../../components/icons/currena';
 
 /** The initials chip when the artwork cannot load — up to 3 leading
  * characters of the Latin name, Latin-direction, decorative like the img

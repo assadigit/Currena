@@ -253,7 +253,7 @@ describe('marketsTakeaway — the verdict reason line', () => {
 
 describe('S1-M1.6 #2 — the correction count and the up-count speak one rule', () => {
   it('marketsInCorrectionCount reads the RAW ≥10% rule — a buffered status never pads the sentence', async () => {
-    const { marketsInCorrectionCount } = await import('./world-markets/MarketsVerdict');
+    const { marketsInCorrectionCount } = await import('../../features/world-markets/MarketsVerdict');
     const markets = [
       entry({ id: 'sp500', fromHigh: -12.5, status: 'correction' }), // counts (raw ≥10%)
       entry({ id: 'ndx', fromHigh: -22, status: 'bear' }), // counts (bear IS ≥10% below)
@@ -263,7 +263,7 @@ describe('S1-M1.6 #2 — the correction count and the up-count speak one rule', 
     // The audit's case: the sentence said 7 while six cards showed ≥10%.
     expect(marketsInCorrectionCount(markets)).toBe(2);
     // And the below-high line (the same rule) agrees by construction.
-    const { belowHighCount } = await import('./world-markets/briefing');
+    const { belowHighCount } = await import('../../features/world-markets/briefing');
     expect(belowHighCount(markets)).toBe(2);
   });
 

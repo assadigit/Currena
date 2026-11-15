@@ -23,7 +23,7 @@
 import type { AuMarketGroupId, AuMarketId } from '@currena/core';
 import {
   WEEKLY_EPOCH_BASE_DAY,
-} from '../markets/definitions';
+} from '../domains/world-markets/markets/definitions';
 
 /* ------------------------------------------------------------------ *
  * CONFIG BLOCK — reused from the world board (the same thresholds, the
@@ -57,7 +57,7 @@ export {
   WEEKLY_EPOCH_BASE_DAY,
   YAHOO_BASE_URL,
   YAHOO_USER_AGENT,
-} from '../markets/definitions';
+} from '../domains/world-markets/markets/definitions';
 
 /** The one KV key the whole AU section is stored under (the spec §4 rule 1). */
 export const MARKETS_AU_KV_KEY = 'insights:markets-au:v1';

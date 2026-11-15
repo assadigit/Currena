@@ -33,8 +33,8 @@ import { evaluateSignal } from '@currena/insights';
 import { BEAR_PCT } from '@currena/insights/markets/definitions';
 import { THEMATIC_GAUGE_IDS } from '@currena/insights/page-division';
 import { goldOutlookOf, type OutlookState } from '../../shared/components/outlook-core';
-import { marketsInCorrectionCount, marketsVerdictStep } from '../../components/insights/world-markets/verdict-core';
-import type { MarketsVerdictStep } from '../../components/insights/world-markets/verdict-core';
+import { marketsInCorrectionCount, marketsVerdictStep } from '../../features/world-markets/verdict-core';
+import type { MarketsVerdictStep } from '../../features/world-markets/verdict-core';
 import { fxRuleView } from '../../lib/fx-presentation/rules';
 
 /* ------------------------------------------------------------------ *

@@ -31,7 +31,7 @@
 import type { MarketsSnapshot, MarketEntry, FxSnapshot, TicSnapshot } from '@currena/core';
 import { buildNarrationState, type NarrationAlert, type NarrationExcluded, type NarrationItem } from './state';
 import { getNarratorSectionLabels, type NarratorLang } from './vocabulary';
-import { marketDefinition } from '../markets/definitions';
+import { marketDefinition } from '../domains/world-markets/markets/definitions';
 import { DEFINITIONS } from '../shared/definitions';
 import { FX_STALE_DAYS } from '../fx/definitions';
 import { ticHolderDerived, ticTopMovers } from '../domains/usa/tic';

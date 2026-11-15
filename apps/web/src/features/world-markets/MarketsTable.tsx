@@ -27,8 +27,8 @@
  */
 
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
-import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
-import { formatAsOf } from '../../../shared/components/HistoryChart';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { formatAsOf } from '../../shared/components/HistoryChart';
 import {
   DirTriangle,
   fmtClose,

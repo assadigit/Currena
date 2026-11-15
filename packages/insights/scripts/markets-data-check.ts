@@ -17,10 +17,10 @@
  */
 
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from '../src/markets/providers';
-import type { MarketSeries } from '../src/markets/providers';
-import { MARKETS } from '../src/markets/definitions';
-import { EODHD_BASE_URL, HISTORY_WINDOW_DAYS, YAHOO_BASE_URL, YAHOO_USER_AGENT } from '../src/markets/definitions';
+import { parseEodhdEodResponse, parseYahooChartResponse, ProviderError } from '../src/domains/world-markets/markets/providers';
+import type { MarketSeries } from '../src/domains/world-markets/markets/providers';
+import { MARKETS } from '../src/domains/world-markets/markets/definitions';
+import { EODHD_BASE_URL, HISTORY_WINDOW_DAYS, YAHOO_BASE_URL, YAHOO_USER_AGENT } from '../src/domains/world-markets/markets/definitions';
 import type { MarketId } from '@currena/core';
 
 const repoRoot = new URL('../../../', import.meta.url);

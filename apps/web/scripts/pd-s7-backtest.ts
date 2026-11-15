@@ -46,7 +46,7 @@
 
 import type { InsightsSnapshot } from '@currena/core';
 import { InsightsSnapshotSchema, MarketsSnapshotSchema, PageProjectionSchema } from '@currena/core';
-import { backtestWorldMarketsPage } from '../src/routes/page-division/world-markets-backtest-core';
+import { backtestWorldMarketsPage } from '../src/features/world-markets/world-markets-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

@@ -30,8 +30,8 @@ import type { MarketsSnapshot } from '@currena/core';
 import { MARKETS, summarizeMarkets } from '@currena/insights/markets';
 import { WorldMap } from './WorldMap';
 import type { WorldMapCopy } from './WorldMap';
-import { insightsCopyEn } from '../../../shared/i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../shared/i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import { REGION_ZOOMS } from './world-map-config';
 
 /* The corpus satisfies the narrow copy contract structurally (the S7

@@ -62,7 +62,7 @@ const GoldPage = lazy(() => import('./routes/page-division/GoldPage').then((m) =
 // route (the WorldMap module + the pure derivations ride the chunk; the
 // entry graph stays untouched).
 const WorldMarketsPage = lazy(() =>
-  import('./routes/page-division/WorldMarketsPage').then((m) => ({ default: m.WorldMarketsPage })),
+  import('./features/world-markets/WorldMarketsPage').then((m) => ({ default: m.WorldMarketsPage })),
 );
 // Page-division S9 (2026-11-09): the USA route leaves the region set —
 // its own lazy chunk (the S5 GoldPage pattern): the D-30 verdict strip

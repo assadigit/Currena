@@ -9,8 +9,8 @@
 import type { MarketEntry, MarketsSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { STALE_DAYS } from '@currena/insights/markets/definitions';
-import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
-import { IconImg, DIRECTION_DOWN_URL, DIRECTION_UP_URL } from '../../icons/currena';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { IconImg, DIRECTION_DOWN_URL, DIRECTION_UP_URL } from '../../components/icons/currena';
 
 /** The page-level feed state (owned by Insights.tsx, passed down). */
 export type MarketsLoadState =
@@ -238,8 +238,8 @@ export function fmtClose(close: number, numberLocale: 'en-US' | 'fa-IR'): string
 // Defect E-22: the L2-01 stock-state words + tones live in config/labels.ts
 // (pure, shared with the full-export + CSV builders) — re-exported here for
 // the section's components.
-export { STATUS_TONE, statusToneOf, statusWordKeyOf } from '../../../shared/config/labels';
-export type { StockStateWordKey } from '../../../shared/config/labels';
+export { STATUS_TONE, statusToneOf, statusWordKeyOf } from '../../shared/config/labels';
+export type { StockStateWordKey } from '../../shared/config/labels';
 
 /** Step-1 F2: the trend WORD key for trendOf's result (chg3m-sourced). */
 export const TREND_WORD_OF: Record<'up' | 'flat' | 'down', 'trendUp' | 'trendFlat' | 'trendDown'> = {

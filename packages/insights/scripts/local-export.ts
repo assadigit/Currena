@@ -39,9 +39,9 @@ import type { InsightsStore } from '../src/shared/store';
 import type { SeriesPoint } from '../src/shared/series';
 import type { IndicatorId as Id } from '@currena/core';
 
-import { runMarketsUpdate } from '../src/markets/run';
-import { defaultFetchers as defaultMarketsFetchers } from '../src/markets/job';
-import type { MarketsReader, MarketsWriter } from '../src/markets/store';
+import { runMarketsUpdate } from '../src/domains/world-markets/markets/run';
+import { defaultFetchers as defaultMarketsFetchers } from '../src/domains/world-markets/markets/job';
+import type { MarketsReader, MarketsWriter } from '../src/domains/world-markets/markets/store';
 
 import { runFxUpdate } from '../src/fx/run';
 import { defaultFxFetchers } from '../src/fx/job';

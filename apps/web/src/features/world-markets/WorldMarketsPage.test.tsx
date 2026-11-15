@@ -36,7 +36,7 @@ import { MARKETS } from '@currena/insights/markets/definitions';
 import { summarizeMarkets } from '@currena/insights/markets';
 import { WorldMarketsPage } from './WorldMarketsPage';
 import { worldMarketsRows, worldMarketsStatus } from './world-markets-tiles';
-import { marketBreadth, topMovers } from '../../components/insights/world-markets/briefing';
+import { marketBreadth, topMovers } from './briefing';
 import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 
 /* ------------------------------------------------------------------ *

@@ -33,12 +33,12 @@
  *   pnpm --filter @currena/insights markets-backfill --dry-run
  */
 
-import { defaultFetchers } from '../src/markets/job';
-import { runMarketsJob } from '../src/markets/job';
-import type { MarketJobFetchers } from '../src/markets/job';
-import { buildMarketsSnapshot, marketsContentEqual } from '../src/markets/compute';
+import { defaultFetchers } from '../src/domains/world-markets/markets/job';
+import { runMarketsJob } from '../src/domains/world-markets/markets/job';
+import type { MarketJobFetchers } from '../src/domains/world-markets/markets/job';
+import { buildMarketsSnapshot, marketsContentEqual } from '../src/domains/world-markets/markets/compute';
 import { checkE05IdenticalMoves } from '../src/shared/validation-step3';
-import { InMemoryMarketsStore, RestMarketsStore } from '../src/markets/store';
+import { InMemoryMarketsStore, RestMarketsStore } from '../src/domains/world-markets/markets/store';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');

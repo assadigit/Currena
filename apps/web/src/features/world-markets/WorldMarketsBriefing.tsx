@@ -50,14 +50,14 @@ import { MARKETS, MARKET_GROUP_ORDER, decodeWeeklySeries } from '@currena/insigh
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
-import { MarketsChart } from '../../components/insights/MarketsChart';
-import type { MarketsChartCopy } from '../../components/insights/MarketsChart';
-import { MarketLogo } from '../../components/insights/world-markets/MarketLogo';
-import { MarketsTreemap } from '../../components/insights/world-markets/MarketsTreemap';
+import { MarketsChart } from './MarketsChart';
+import type { MarketsChartCopy } from './MarketsChart';
+import { MarketLogo } from './MarketLogo';
+import { MarketsTreemap } from './MarketsTreemap';
 import { Modal } from '../../components/Modal';
 import { formatAsOf } from '../../shared/components/HistoryChart';
-import { marketBreadth, topMovers, periodValueOf } from '../../components/insights/world-markets/briefing';
-import type { MarketBreadth } from '../../components/insights/world-markets/briefing';
+import { marketBreadth, topMovers, periodValueOf } from './briefing';
+import type { MarketBreadth } from './briefing';
 import {
   DirTriangle,
   NO_READING,
@@ -72,9 +72,9 @@ import {
   viewValue,
   isOld,
   type MarketsView,
-} from '../../components/insights/world-markets/shared';
-import type { StockStateWordKey } from '../../components/insights/world-markets/shared';
-import type { MapPeriod } from '../../components/insights/world-markets/world-map-config';
+} from './shared';
+import type { StockStateWordKey } from './shared';
+import type { MapPeriod } from './world-map-config';
 
 /* ------------------------------------------------------------------ *
  * The lens bridge — the legacy section's own closed-set lookup tables

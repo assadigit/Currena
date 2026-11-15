@@ -35,10 +35,10 @@ import { WorldMarketsHero } from './WorldMarketsHero';
 import type { WorldMarketsBoardState } from './WorldMarketsHero';
 import { WorldMarketsBriefing } from './WorldMarketsBriefing';
 import { PERIOD_OF_VIEW, VIEW_OF_PERIOD } from './WorldMarketsBriefing';
-import type { MarketsView } from '../../components/insights/world-markets/shared';
-import type { MapPeriod } from '../../components/insights/world-markets/world-map-config';
+import type { MarketsView } from './shared';
+import type { MapPeriod } from './world-map-config';
 import { WorldMarketsGrids } from './WorldMarketsGrids';
-import { WorldRiskCards } from './WorldRiskCards';
+import { WorldRiskCards } from '../../routes/page-division/WorldRiskCards';
 import { worldMarketsStatus, worldRiskCards } from './world-markets-tiles';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 

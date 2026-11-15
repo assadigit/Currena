@@ -14,7 +14,7 @@
  */
 
 import type { FxPairId, FxRuleId, FxCurrency } from '@currena/core';
-import { WEEKLY_EPOCH_BASE_DAY } from '../markets/definitions';
+import { WEEKLY_EPOCH_BASE_DAY } from '../domains/world-markets/markets/definitions';
 
 // Re-exported for the compute module (the engine's rate maps key on it).
 export type { FxCurrency } from '@currena/core';

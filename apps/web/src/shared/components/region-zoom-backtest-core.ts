@@ -30,11 +30,11 @@
 
 import type { MarketEntry, MarketId, MarketsSnapshot } from '@currena/core';
 import { MARKETS } from '@currena/insights/markets/definitions';
-import { MAP_INDICES, MAP_PERIODS, REGION_ZOOMS, mapScaleOf, mapWeightOf } from '../../components/insights/world-markets/world-map-config';
-import type { MapPeriod, MapRegionId } from '../../components/insights/world-markets/world-map-config';
-import { deriveWorldMapRows } from '../../components/insights/world-markets/world-map-rows';
-import type { MapRow } from '../../components/insights/world-markets/world-map-rows';
-import { isOld } from '../../components/insights/world-markets/shared';
+import { MAP_INDICES, MAP_PERIODS, REGION_ZOOMS, mapScaleOf, mapWeightOf } from '../../features/world-markets/world-map-config';
+import type { MapPeriod, MapRegionId } from '../../features/world-markets/world-map-config';
+import { deriveWorldMapRows } from '../../features/world-markets/world-map-rows';
+import type { MapRow } from '../../features/world-markets/world-map-rows';
+import { isOld } from '../../features/world-markets/shared';
 
 /** One zoomed index's expected reading — the ENGINE side's shape. */
 export interface ZoomExpectedRow {

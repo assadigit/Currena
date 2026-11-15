@@ -29,7 +29,7 @@
 import type { NarrativeUnit } from '../../shared/lib/narrative';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { interpolate } from '../../shared/i18n';
-import { formatRelativeShort } from './world-markets/shared';
+import { formatRelativeShort } from '../../features/world-markets/shared';
 
 type Locale = 'en' | 'fa';
 
