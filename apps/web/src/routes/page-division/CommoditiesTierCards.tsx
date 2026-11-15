@@ -47,7 +47,6 @@ import {
   COMMODITIES_GOLD_HREF,
   commoditiesCards,
   type CommoditiesCardEntry,
-  type CommoditiesCardId,
 } from './commodities-tiles';
 import { PriceTile, useTileData, type TileData, type PriceLens, PricePeriodSwitch } from '../../components/insights/PricesBoard';
 import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
@@ -58,35 +57,6 @@ import type { InsightsCopy } from '../../i18n/insights-copy-en';
  * key is a typecheck error, never a runtime undefined).
  * ------------------------------------------------------------------ */
 
-/** The card-name keys — 24 literal keys (the copy-pin test proves each
- *  matches the insights corpus byte-for-byte, both locales). */
-const CARD_NAME_KEY: Readonly<Record<CommoditiesCardId, TranslationKey>> = {
-  brent: 'pd.commodities.cardNames.brent',
-  wti: 'pd.commodities.cardNames.wti',
-  natgas: 'pd.commodities.cardNames.natgas',
-  'gas-europe': 'pd.commodities.cardNames.gas-europe',
-  'lng-japan': 'pd.commodities.cardNames.lng-japan',
-  'coal-aus': 'pd.commodities.cardNames.coal-aus',
-  'eia-crude-stocks': 'pd.commodities.cardNames.eia-crude-stocks',
-  'us-spr': 'pd.commodities.cardNames.us-spr',
-  'us-crude-production': 'pd.commodities.cardNames.us-crude-production',
-  'silver-usd': 'pd.commodities.cardNames.silver-usd',
-  platinum: 'pd.commodities.cardNames.platinum',
-  'copper-usd': 'pd.commodities.cardNames.copper-usd',
-  'iron-ore': 'pd.commodities.cardNames.iron-ore',
-  'food-index': 'pd.commodities.cardNames.food-index',
-  wheat: 'pd.commodities.cardNames.wheat',
-  maize: 'pd.commodities.cardNames.maize',
-  'btc-usd': 'pd.commodities.cardNames.btc-usd',
-  'crypto-fng': 'pd.commodities.cardNames.crypto-fng',
-  'chokepoint-suez': 'pd.commodities.cardNames.chokepoint-suez',
-  'chokepoint-panama': 'pd.commodities.cardNames.chokepoint-panama',
-  'chokepoint-bab-el-mandeb': 'pd.commodities.cardNames.chokepoint-bab-el-mandeb',
-  'chokepoint-malacca': 'pd.commodities.cardNames.chokepoint-malacca',
-  'chokepoint-taiwan': 'pd.commodities.cardNames.chokepoint-taiwan',
-  gscpi: 'pd.commodities.cardNames.gscpi',
-};
-
 /** The group heading + intro keys (the page's own fresh copy — 5 groups). */
 const GROUP_KEY: Readonly<Record<string, { title: TranslationKey; intro: TranslationKey }>> = {
   energy: { title: 'pd.commodities.groups.energy.title', intro: 'pd.commodities.groups.energy.intro' },
@@ -94,22 +64,6 @@ const GROUP_KEY: Readonly<Record<string, { title: TranslationKey; intro: Transla
   agriculture: { title: 'pd.commodities.groups.agriculture.title', intro: 'pd.commodities.groups.agriculture.intro' },
   digital: { title: 'pd.commodities.groups.digital.title', intro: 'pd.commodities.groups.digital.intro' },
   'trade-routes-supply': { title: 'pd.commodities.groups.trade-routes-supply.title', intro: 'pd.commodities.groups.trade-routes-supply.intro' },
-};
-
-/** The position word keys (the corpus's own, pinned). */
-const POSITION_WORD_KEY: Readonly<Record<'low' | 'typical' | 'high', TranslationKey>> = {
-  low: 'pd.commodities.positionLow',
-  typical: 'pd.commodities.positionTypical',
-  high: 'pd.commodities.positionHigh',
-};
-
-/** The status word keys (the corpus's own, pinned; 'context' has no key —
- *  a context reading is normal for a context-only id and speaks nothing). */
-const STATUS_KEY: Record<string, TranslationKey> = {
-  warning: 'pd.commodities.statusWarning',
-  stale: 'pd.commodities.statusStale',
-  'check-pending': 'pd.commodities.statusCheckPending',
-  unavailable: 'pd.commodities.statusUnavailable',
 };
 
 /* ------------------------------------------------------------------ *

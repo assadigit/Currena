@@ -56,7 +56,7 @@ export function EconomicLinkagesPage(): React.JSX.Element {
 
   const onFocusCard = useCallback((id: IndicatorId) => {
     const home = homePageOfIndicator(id);
-    if (home !== undefined) navigate(home);
+    if (home !== null) navigate(home);
   }, []);
 
   const dataAsOf = useMemo(() => {

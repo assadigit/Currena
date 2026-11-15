@@ -463,15 +463,6 @@ describe('fidelity round §7 — the bottom information strip', () => {
 describe('S1-M1.4 — the out-of-date badge on the hero verdict cards', () => {
   afterEach(cleanup);
 
-  /** The base fixture plus the RBA trio all stale (au-10y is flipped in
-   * place; rba-expectations and au-us-10y-gap are added as stale readings
-   * — the fixture never carried them). */
-  const withRbaStale: IndicatorReading[] = [
-    ...READINGS.map((r) => (r.id === 'au-10y' ? { ...r, status: 'stale' as const } : r)),
-    reading('rba-expectations', { status: 'stale', percentile10y: 0.6 }),
-    reading('au-us-10y-gap', { status: 'stale', percentile10y: 0.55 }),
-  ];
-
   it('no stale members → no badge anywhere (the calm default)', () => {
     renderHero(insightsCopyEn, 'en-US');
     expect(document.querySelector('[data-stale-badge]')).toBeNull();

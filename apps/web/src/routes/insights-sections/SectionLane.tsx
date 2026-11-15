@@ -99,7 +99,6 @@ export function SectionLane({
   narrativeBySection,
   narrativeVisible = false,
   locale,
-  ticSlot,
   australiaSlot,
 }: {
   snapshot: InsightsSnapshot;
@@ -134,11 +133,6 @@ export function SectionLane({
    * unit's EN or FA text. The Insights route owns this; the lane never
    * reads the URL or i18n store itself. */
   locale?: 'en' | 'fa';
-  /** gap-closure S2-M2.4: the "Who holds US government debt" section —
-   * rendered INSIDE the GLOBAL mother container, directly after the
-   * borrowing-costs gauge group (the owner's top-priority feature; the
-   * australiaSlot pattern). undefined → nothing renders. */
-  ticSlot?: ReactNode;
   /** 2026-10-29 owner round (the money panel is Australian-household
    * data): a slot rendered at the END of the AUSTRALIA section, inside
    * its mother container — the "what it means for my money" panel moved

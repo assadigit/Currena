@@ -226,7 +226,7 @@ export function GlobalPage(): React.JSX.Element {
   // (fed-target → /usa, au-cpi → /australia, ecb-dfr → /europe, …).
   const onFocusEventCard = useCallback((id: IndicatorId) => {
     const home = homePageOfIndicator(id);
-    if (home !== undefined) navigate(home);
+    if (home !== null) navigate(home);
   }, []);
 
   /* ---------------- the verdict derivations (pure, engine-side) ---------------- */

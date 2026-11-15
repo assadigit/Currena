@@ -872,6 +872,16 @@ export const en = {
         'Measured sign agreements with gold’s next move (mature base): {d5} at 5 days · {d20} at 20 · {d60} at 60 trading days — all below a coin flip.',
       min2Note: 'A lane votes only when at least 2 of its voters fire (MIN2) — the calibration passed its pre-registered criteria twice.',
       noEdge: 'A descriptive conditions meter — no forecasting edge is claimed or implied.',
+      /* ---- The Gold Positions section (TM23): the four strings its
+       * component shipped hardcoded now ride the dictionary,
+       * byte-identical, per house rule 5 (baseline-repair 2026-11-15).
+       * The TM23 pd.commodities.positionsTitle/positionsPurpose pair
+       * (added but never wired) stays queued in the copy manifest for
+       * the owner's fa review. */
+      positionsTitle: 'Gold Positions',
+      positionsPurpose: 'How traders are positioned in the gold futures market — the CFTC Commitments of Traders report.',
+      positionsCardTraderPositioning: 'Gold trader positioning',
+      positionsCardGrossLong: 'Gold gross long positioning',
     },
     worldMarkets: {
       title: 'World Markets',

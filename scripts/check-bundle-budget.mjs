@@ -978,6 +978,13 @@ const BUDGETS = [
   // SHARED global-tiles-* chunk both route chunks load (the same sharing
   // that shrank WorldMarketsPage in S8: the derivation's bytes are paid
   // once, not per route). The ceiling holds; no bump needed.
+  // Baseline-repair note (2026-11-15): measured 31.83 → 35.41 under the
+  // repair — the narrative modules previously shared with the /insights
+  // route (their import there was one of the TM cuts' dead leftovers)
+  // merged into this chunk, their sole consumer. Ceiling 36/11 HOLDS
+  // (the same bytes the / visitor already downloaded via route +
+  // shared before); no bump, recorded here so the next session's
+  // "budgets held" check reads the topology change correctly.
   { pattern: /^GlobalPage-[\w-]+\.js$/, raw: 36_000, gz: 11_000, label: 'Global page lazy chunk (page-division S3)' },
   // Page-division S5 (2026-11-08): the Gold conditions-meter route — the
   // 37-voter meter (D-26…D-29). Measured 26.32/6.92 at first build (the
@@ -996,7 +1003,20 @@ const BUDGETS = [
   // UNTOUCHED at 1569.16/362.08, byte-stable through the extraction).
   // Measured 31.23/8.06 — ~2.8 kB raw headroom under 34, gz ~0.9 under
   // 9. The entry chunk is untouched at 269.00/81.45.
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 34_000, gz: 9_000, label: 'Gold page lazy chunk (page-division S5)' },
+  // Baseline-repair bump (2026-11-15, 34/9 → 72/18.5): TWO stacked
+  // causes. (1) The TM13/TM23 gold-page growth that shipped without a
+  // gates run — the Signals section (the gold + silver verdict strip
+  // with the per-metal trend charts, moved from /insights) and the Gold
+  // Positions section (the two CFTC positioning cards with the visual
+  // range bars) — measured 35.01/9.14 at the M1-blocked baseline.
+  // (2) The baseline-repair's dead-import removal (the 20 lint-dead
+  // vars in Insights.tsx) dissolved the shared Signals chunk into this
+  // chunk — its sole consumer since TM13 — landing 70.42/17.95: the
+  // same bytes the /gold visitor already downloaded (route + shared
+  // before), now one chunk; /insights visitors stop downloading the
+  // dead tree entirely (net bundle −3.7 kB). Justified in CHANGELOG
+  // §2026-11-15 (baseline-repair, BD-BR).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 72_000, gz: 18_500, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree
@@ -1026,7 +1046,14 @@ const BUDGETS = [
   // import joining the chunk + 7 treemap copy strings × 2 locales.
   // Gzip is mostly the copy pair and the squarify routine, both highly
   // compressible. Justified in CHANGELOG §2026-11-12 (treemap).
-  { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 50_000, gz: 11_000, label: 'World Markets page lazy chunk (page-division S7)' },
+  // Baseline-repair bump (2026-11-15, 50/11 → 54/13.5): the TM2–TM4
+  // treemap polish that shipped without a second gates run — the
+  // per-tile country labels, the green/red return ramp, the click-to-
+  // modal detail panel and the bigger names + percentages grew the
+  // chunk past TM1's own bump (measured 52.83/13.06, +2.83 raw /
+  // +2.06 gz over the 50/11 ceiling). Justified in CHANGELOG
+  // §2026-11-15 (baseline-repair, BD-BR).
+  { pattern: /^WorldMarketsPage-[\w-]+\.js$/, raw: 54_000, gz: 13_500, label: 'World Markets page lazy chunk (page-division S7)' },
   // Page-division S8 (2026-11-08): the REGION routes — /usa,
   // /europe, /asia-pacific, /australia — each carrying its D-44
   // index/map section (the REUSED WorldMap in region-zoom mode) above
@@ -1081,7 +1108,16 @@ const BUDGETS = [
   // leanest page-division chunk). Ceiling 16/5 per the tight convention
   // (~2 kB raw / ~1 kB gz headroom over Europe's 14/5 — Commodities has
   // 24 cards vs Europe's 8, but no zoom section).
-  { pattern: /^CommoditiesPage-[\w-]+\.js$/, raw: 16_000, gz: 5_000, label: 'Commodities page lazy chunk (page-division S17)' },
+  // Baseline-repair bump (2026-11-15, 16/5 → 21/6.5): the TM cuts left
+  // Insights.tsx importing PricesBoard without rendering it (TM14), so
+  // the PricesBoard/PriceTile module tree lived in a chunk /insights
+  // visitors downloaded as dead weight. The baseline-repair's
+  // dead-import removal dissolved that shared chunk — the PriceTile
+  // template this page (and /gold) reuses now rides the page's own
+  // chunk (measured 20.04/5.84, ≈ the bytes the /commodities visitor
+  // already downloaded via route + shared before). Justified in
+  // CHANGELOG §2026-11-15 (baseline-repair, BD-BR).
+  { pattern: /^CommoditiesPage-[\w-]+\.js$/, raw: 21_000, gz: 6_500, label: 'Commodities page lazy chunk (page-division S17)' },
   // Page-division S18 (2026-11-11): the Currencies route — the 7 rule
   // lights hero (D-41) + the 11-pair board (D-42, AUDNZD the 11th pair)
   // + the two registry-card sections (D-32/D-42: 7 pair-context + 7
@@ -1111,7 +1147,16 @@ const BUDGETS = [
   // tic chunk both /usa and /insights load (see the row below — the
   // drawing's bytes are paid once, BD-S10a). Ceiling 26/7 per the tight
   // convention (~1.5 kB raw / ~0.6 kB gz headroom).
-  { pattern: /^UsaPage-[\w-]+\.js$/, raw: 26_000, gz: 7_000, label: 'USA page lazy chunk (page-division S9+S10)' },
+  // Baseline-repair bump (2026-11-15, 26/7 → 47/12): the TM10 cut
+  // removed /insights' TicSection render but left its import — the
+  // "shared" tic chunk (21.23 kB) had exactly ONE consumer (/usa) all
+  // along, and /insights visitors kept downloading the dead drawing.
+  // The baseline-repair's dead-import removal let the bundler merge it
+  // into this chunk (measured 45.41/11.14 ≈ the old 24.99 + 21.23
+  // combined — the same bytes the /usa visitor already downloaded, now
+  // one fetch; the shared tic row below shrank to its 0.70 kB shell).
+  // Justified in CHANGELOG §2026-11-15 (baseline-repair, BD-BR).
+  { pattern: /^UsaPage-[\w-]+\.js$/, raw: 47_000, gz: 12_000, label: 'USA page lazy chunk (page-division S9+S10)' },
   // Page-division S12 (2026-11-09): the Europe route — the EU section + the
   // non-EU United Kingdom section listed apart (D-33), the 8 placed cards
   // through the pure europe-tiles (pinned output-for-output against
@@ -1162,6 +1207,12 @@ const BUDGETS = [
   // Insights chunk itself SHRANK 1553.17→1532.14 raw through the same
   // split. Ceiling 24/7 per the tight convention (~2.8 kB raw / ~1.4 kB
   // gz headroom).
+  // Baseline-repair note (2026-11-15): the drawing itself MOVED INTO the
+  // UsaPage chunk — its sole consumer since TM10 cut /insights' render
+  // (the baseline-repair's dead-import removal dissolved the phantom
+  // sharing; see the UsaPage row). This row now measures only the tiny
+  // shared tic shell (0.70/0.41); the ceiling stays as the guard for
+  // any future second consumer re-splitting the drawing out.
   { pattern: /^tic-[\w-]+\.js$/, raw: 24_000, gz: 7_000, label: 'shared TIC section chunk (page-division S10 — the reused tier-6 drawing)' },
 ];
 

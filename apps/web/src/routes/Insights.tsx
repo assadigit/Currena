@@ -36,7 +36,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { IndicatorId, InsightsSection } from '@currena/core';
+import type { IndicatorId } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
 // The generated public-mode hidden set (2026-10-18b): the SAME file the API
 // worker and the T-15 build gate consume — bundling it here keeps the web's
@@ -47,26 +47,15 @@ import siteModeOverrides from '../../../../data/site-mode-overrides.json';
 import { useI18n } from '../lib/locale';
 import { routeQuery } from '../router';
 import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
-import { AboutTheData } from '../components/insights/AboutTheData';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
-import { HeroBlock } from '../components/insights/HeroBlock';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
-import { TopMoversStrip } from '../components/insights/TopMoversStrip';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
-import { PricesBoard } from '../components/insights/PricesBoard';
-import { Signals } from '../components/insights/Signals';
-import { Together } from '../components/insights/Together';
 import { AustralianMarkets } from '../components/insights/AustralianMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
-import { WorldCurrencies } from '../components/insights/WorldCurrencies';
-import { TicSection } from '../components/insights/TicSection';
-import { TicCustodyCard } from '../components/insights/TicCustodyCard';
-import { DollarStrengthCards } from '../components/insights/world-currencies/DollarStrength';
 import { useInsightsCopy } from '../components/insights/useInsightsCopy';
 import {
   PINNED_STORAGE_KEY,
   SIGNALS_ENABLED,
-  dailyPeersOf,
   definitionFor,
   formatPinnedStorage,
   parsePinnedIds,
@@ -86,10 +75,8 @@ import {
   useAuMarketsSection,
   useNarrative,
   useNarrativePreview,
-  useTicSection,
   useWorldCurrenciesSection,
   useWorldMarketsSection,
-  useWorldSectionIndicators,
 } from './insights-sections/world-feeds';
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
 import { NarrativeBlock } from '../components/insights/NarrativeBlock';
@@ -112,9 +99,9 @@ export function Insights() {
   });
   // R7b/R25: the collapsible sections — the route bumps their tokens when a
   // pill/hash/hero link targets them (R19: selecting a pill expands).
-  const [togetherToken, setTogetherToken] = useState(0);
-  const [signalsToken, setSignalsToken] = useState(0);
-  const [aboutToken, setAboutToken] = useState(0);
+  const [, setTogetherToken] = useState(0);
+  const [, setSignalsToken] = useState(0);
+  const [, setAboutToken] = useState(0);
   // R7: ids explicitly opened (deep link, tile click) stay visible even when
   // their group is collapsed.
   const [revealIds, setRevealIds] = useState<ReadonlySet<IndicatorId>>(new Set());
@@ -176,23 +163,16 @@ export function Insights() {
   // of the two.
   const publicMarketsBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('markets');
   const publicFxBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('fx');
-  const publicTicBoard = !(siteModeOverrides.hiddenBoards as readonly string[]).includes('tic');
   const isPublicProjection = state.kind === 'ready' && state.snapshot.displayMode === 'public';
   const marketsFeedEnabled = !isPublicProjection || publicMarketsBoard;
   const fxFeedEnabled = !isPublicProjection || publicFxBoard;
-  // gap-closure S2-M2.4: the foreign-holders section's feed gate (the L0
-  // public-domain board serves public from day one; the hiddenBoards
-  // entry is the per-source kill switch the generator arms).
-  const ticFeedEnabled = !isPublicProjection || publicTicBoard;
-  const { marketsState, marketsAlert, jumpToMarkets, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
-  const { fxState, fxAlert, jumpToFxCurrencies, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
-  const ticState = useTicSection(ticFeedEnabled);
+  const { marketsState, downloadMarketsCsv } = useWorldMarketsSection(copy, marketsFeedEnabled);
+  const { fxState, downloadFxCsv } = useWorldCurrenciesSection(copy, fxFeedEnabled);
   // gap-closure S5-M5.4: the Australian markets board rides the same
   // marketsFeedEnabled gate (the world board is public on the owner's own
   // EODHD key; the AU board is Yahoo-only, no licence concern, so it serves
   // public mode exactly like private mode).
   const auMarketsState = useAuMarketsSection(marketsFeedEnabled);
-  const sectionIndicators = useWorldSectionIndicators(marketsState, fxState, copy, jumpToMarkets, jumpToFxCurrencies);
 
   // Layer-2 narrator (M5, spec §11): the narrative document feed + the
   // staged-rollout visibility gate. The hook fetches the doc unconditionally
@@ -305,18 +285,6 @@ export function Insights() {
     }
   }, []);
 
-  const jumpToSection = useCallback((section: InsightsSection) => {
-    // Round 33: BOTH dedicated sections render stacked mid-page — a jump
-    // SCROLLS to the region's own heading (the old click only flipped the
-    // lane switch, which read as a dead click — owner round 33). The
-    // section anchors are static now: insights-section-global / -australia.
-    const el = document.getElementById(`insights-section-${section}`);
-    if (el) {
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    }
-  }, []);
-
   // I10: items rendering inside the lanes — visible under the filter and
   // not pinned (pinned items render in the watchlist strip).
   const sectionIds = useMemo<ReadonlySet<IndicatorId> | null>(() => {
@@ -335,24 +303,6 @@ export function Insights() {
     if (state.kind !== 'ready') return [];
     return state.snapshot.readings.filter((r) => pinned.has(r.id) && (visibleIds === null || visibleIds.has(r.id)));
   }, [state, pinned, visibleIds]);
-
-  // gap-closure S2-M2.4 (the spec's weekly custody card): the FRED
-  // WSEFINTL1 reading that closes the "Who holds US government debt"
-  // section — the timely weekly companion to the monthly TIC country
-  // table. Renders as a standard CompactRow (with its 10-year position
-  // bar, ALWAYS_POSITION_IDS) directly below the TicSection inside the
-  // same ticSlot; absent while the snapshot loads or the series is held
-  // (the one-surface rule — HIDDEN_FROM_LANE_IDS keeps it out of the
-  // borrowing-costs lane); honours the search filter like every card.
-  const custodyReading = useMemo<IndicatorReading | null>(() => {
-    if (state.kind !== 'ready') return null;
-    if (visibleIds !== null && !visibleIds.has('nyfed-custody')) return null;
-    return state.snapshot.readings.find((r) => r.id === 'nyfed-custody') ?? null;
-  }, [state, visibleIds]);
-  const dailyPeers = useMemo(() => {
-    if (state.kind !== 'ready') return undefined;
-    return dailyPeersOf(state.snapshot.readings);
-  }, [state]);
 
   // P1/R19: the sticky section nav — the Signals pill joins the row (the
   // built page had the section but no pill) and every pill expands its

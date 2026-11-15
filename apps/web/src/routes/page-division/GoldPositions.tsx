@@ -5,12 +5,20 @@
 
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { useI18n } from '../../lib/locale';
+import { useI18n, type TranslationKey } from '../../lib/locale';
 
 const POSITION_IDS = ['cftc-gold-positioning', 'cftc-gold-gross-long'] as const;
 
+/** The per-card name keys (house rule 5 — every UI string through the
+ *  i18n dictionary; baseline-repair 2026-11-15 moved TM23's hardcoded
+ *  strings here byte-identically). */
+const POSITION_NAME_KEY: Record<string, TranslationKey> = {
+  'cftc-gold-positioning': 'pd.gold.positionsCardTraderPositioning',
+  'cftc-gold-gross-long': 'pd.gold.positionsCardGrossLong',
+};
+
 export function GoldPositions({ readings }: { readings: readonly IndicatorReading[] }): React.JSX.Element | null {
-  const { t, locale, numberLocale } = useI18n();
+  const { t, numberLocale } = useI18n();
   const byId = new Map(readings.map((r) => [r.id, r] as const));
 
   const cards = POSITION_IDS.map((id) => byId.get(id)).filter(
@@ -21,22 +29,17 @@ export function GoldPositions({ readings }: { readings: readonly IndicatorReadin
   return (
     <section className="mt-3 sm:mt-5" data-gold-positions>
       <h2 className="m-0 mb-1 text-base font-extrabold leading-tight text-currena-dark sm:text-lg lg:text-xl">
-        {locale === 'fa' ? 'پوزیشن طلا' : 'Gold Positions'}
+        {t('pd.gold.positionsTitle')}
       </h2>
       <p className="m-0 mb-3 max-w-prose text-[length:var(--type-label)] leading-snug text-currena-muted">
-        {locale === 'fa'
-          ? 'معامله‌گران در بازار آتی طلا چطور پوزیشن گرفته‌اند — گزارش CFTC نشان می‌دهد سفته‌بازان خالص خرید هستند یا خالص فروش.'
-          : 'How traders are positioned in the gold futures market — the CFTC Commitments of Traders report.'}
+        {t('pd.gold.positionsPurpose')}
       </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {cards.map((reading) => {
           const value = reading.value as number;
           const pct = Math.min(Math.max(value, 0), 100);
-          const nameMap: Record<string, string> = {
-            'cftc-gold-positioning': locale === 'fa' ? 'پوزیشن معامله‌گران طلا' : 'Gold trader positioning',
-            'cftc-gold-gross-long': locale === 'fa' ? 'پوزیشن خرید معامله‌گران طلا' : 'Gold gross long positioning',
-          };
-          const name = nameMap[reading.id] ?? reading.id;
+          const nameKey = POSITION_NAME_KEY[reading.id];
+          const name = nameKey !== undefined ? t(nameKey) : reading.id;
           const change30d = reading.change30d;
           const tone = change30d !== undefined && change30d < 0 ? 'text-[var(--color-return-down)]' : 'text-[var(--color-return-up)]';
           return (

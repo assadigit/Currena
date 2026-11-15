@@ -34,7 +34,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { IndicatorReading, PageProjection } from '@currena/core';
+import type { IndicatorReading, InsightsSnapshot, PageProjection } from '@currena/core';
 import { PageProjectionSchema } from '@currena/core';
 import { goldBalance } from '@currena/insights';
 import { GOLD_VOTER_IDS } from '@currena/insights/page-division';
@@ -130,17 +130,41 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+/** GET /api/insights — the full snapshot the TM13 Signals section (and
+ * the TM23 GoldPositions section) reads on mount. Built over the SAME
+ * readings as the gold projection fixture (the signals' gold-balance
+ * inputs), with the minimal contract-valid envelope (the
+ * insights.test.ts SNAPSHOT pattern). Baseline-repair 2026-11-15: the
+ * stub must route this feed or the ApiError escapes as an unhandled
+ * rejection (vitest exits 1 despite green tests). */
+function snapshotFixture(): InsightsSnapshot {
+  const projection = projectionFixture();
+  return {
+    generatedAt: projection.generatedAt,
+    pricesAsOf: projection.pricesAsOf,
+    summary: {
+      global: { section: 'global', label: 'cautious', warningCount: 0, votingCount: 2, excludedCount: 0 },
+      australia: { section: 'australia', label: 'relaxed', warningCount: 0, votingCount: 2, excludedCount: 0 },
+    },
+    readings: projection.readings,
+    changedThisWeek: [],
+    calendar: [],
+  };
+}
+
 function notFound(): Response {
   return jsonResponse({ error: { code: 'unknown_page', message: 'not found' } }, 404);
 }
 
-/** Route the stubbed fetch by URL — the Gold projection feed. */
+/** Route the stubbed fetch by URL — the Gold projection feed + the
+ * snapshot feed (TM13/TM23: GoldPage fires both on mount). */
 function stubFeeds(overrides: { projection?: () => Response } = {}): void {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes('/api/insights/pages/gold')) return (overrides.projection ?? (() => jsonResponse(projectionFixture())))();
+      if (url === '/api/insights') return jsonResponse(snapshotFixture());
       return notFound();
     }),
   );
@@ -167,7 +191,10 @@ describe('GoldPage', () => {
   });
 
   it('renders the honest loading line before the projection arrives', () => {
-    vi.stubGlobal('fetch', vi.fn(async () => notFound()));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => (String(input) === '/api/insights' ? jsonResponse(snapshotFixture()) : notFound())),
+    );
     const { container } = render(<GoldPage />);
     expect(container.textContent).toContain('Reading the gold meter');
   });
@@ -264,7 +291,10 @@ describe('GoldPage', () => {
 
     // One WEIGHT per lane (5), each on the pan its side belongs to, its
     // accessible name the laneChipAria composition (lane + side + tally —
-    // the corpus's own words, gold-copy-pin's pins).
+    // the corpus's own words, gold-copy-pin's pins). Scoped to the hero's
+    // [data-balance-classic] drawing: the TM13 Signals section renders
+    // the SAME shared BalanceScale drawing below (the snapshot stub now
+    // routes, so it renders — the baseline-repair fix surfaced this).
     const LANE_NAME: Record<string, string> = {
       'borrowing-costs': 'Borrowing costs',
       dollar: 'Dollar',
@@ -278,17 +308,17 @@ describe('GoldPage', () => {
       neutral: 'Sitting neutral',
       unread: 'Cannot read',
     };
-    const weights = document.querySelectorAll('[data-balance-weight]');
+    const weights = document.querySelectorAll('[data-balance-classic] [data-balance-weight]');
     expect(weights.length).toBe(balance.lanes.length);
     for (const lane of balance.lanes) {
-      const weight = document.querySelector(`[data-balance-weight="${lane.lane}"]`) as HTMLElement;
+      const weight = document.querySelector(`[data-balance-classic] [data-balance-weight="${lane.lane}"]`) as HTMLElement;
       expect(weight, `weight ${lane.lane}`).not.toBeNull();
       expect(weight.getAttribute('aria-label')).toContain(`${LANE_NAME[lane.lane]}: ${SIDE_WORD[lane.split ? 'neutral' : lane.side]}.`);
     }
     // The pans: the for pan holds the for lanes, the against pan the
     // against lanes (the fixture: 4 for · 1 against).
-    const forPan = document.querySelector('[data-balance-pan="for"]')!;
-    const againstPan = document.querySelector('[data-balance-pan="against"]')!;
+    const forPan = document.querySelector('[data-balance-classic] [data-balance-pan="for"]')!;
+    const againstPan = document.querySelector('[data-balance-classic] [data-balance-pan="against"]')!;
     expect(forPan.querySelectorAll('[data-balance-weight]').length).toBe(balance.counts.for);
     expect(againstPan.querySelectorAll('[data-balance-weight]').length).toBe(balance.counts.against);
     expect(forPan.textContent).toContain('Factors supporting gold’s price');
@@ -296,11 +326,11 @@ describe('GoldPage', () => {
 
     // The tray speaks its empty state (every lane sits on a pan in this
     // fixture) — the not-leaning well is part of the previous shape.
-    expect(document.querySelector('[data-balance-tray="not-leaning"]')?.textContent).toContain('Every driver is on a pan.');
+    expect(document.querySelector('[data-balance-classic] [data-balance-tray="not-leaning"]')?.textContent).toContain('Every driver is on a pan.');
 
     // The beam swings on the engine\u2019s own tilt (balanceTilt over the
     // same counts — one math with the legacy card\u2019s beam).
-    const beam = document.querySelector('[data-balance-beam]') as HTMLElement;
+    const beam = document.querySelector('[data-balance-classic] [data-balance-beam]') as HTMLElement;
     expect(beam).not.toBeNull();
     const counts = { ...balance.counts, total: balance.lanes.length, net: balance.net, readable: balance.readable };
     const expectedTilt = balanceTilt(counts, 320);
@@ -435,10 +465,15 @@ describe('GoldPage', () => {
     vi.unstubAllGlobals();
     // A fresh page load (the module promise cache resets with the page).
     clearProjectionCacheForTests();
-    // Second visit: the feed dies, the cached projection paints — labelled.
+    // Second visit: the projection feed dies, the cached projection
+    // paints — labelled. The snapshot feed stays alive (the M-17 ladder
+    // is the projection's own; the snapshot fetch must never escape
+    // unhandled — the baseline-repair fix).
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => jsonResponse({ error: { code: 'store_empty', message: 'empty' } }, 503)),
+      vi.fn(async (input: RequestInfo | URL) =>
+        String(input) === '/api/insights' ? jsonResponse(snapshotFixture()) : jsonResponse({ error: { code: 'store_empty', message: 'empty' } }, 503),
+      ),
     );
     render(<GoldPage />);
     // The seats stay on screen (the cached copy), and the fromCache
