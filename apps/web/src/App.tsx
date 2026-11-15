@@ -69,7 +69,7 @@ const WorldMarketsPage = lazy(() =>
 // + the D-29 tier-1/tier-2 cards render above the SAME S8 zoom section
 // (RegionIndexSection, shared with the region chunk), with the honest
 // still-building record below (tiers 3–6 + the TIC board are S10's).
-const UsaPage = lazy(() => import('./routes/page-division/UsaPage').then((m) => ({ default: m.UsaPage })));
+const UsaPage = lazy(() => import('./features/usa/UsaPage').then((m) => ({ default: m.UsaPage })));
 // Page-division S12 (2026-11-09): the Europe route leaves the region set
 // — its own lazy chunk (the UsaPage pattern): the EU section + the non-EU
 // UK section (D-33) render above the SAME S8 zoom section (the STOXX50E ·

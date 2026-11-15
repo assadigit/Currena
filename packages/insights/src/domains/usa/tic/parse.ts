@@ -14,7 +14,7 @@
  * POSITIVE "net U.S. sales" number means foreigners NET BOUGHT.
  */
 
-import { FormatChangedError } from '../shared/adapters/fetch-policy';
+import { FormatChangedError } from '../../../shared/adapters/fetch-policy';
 
 /** `YYYY-MM` as the tables publish it. */
 export type TicYm = string;

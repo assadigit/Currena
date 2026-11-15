@@ -30,9 +30,9 @@
  * the tail exactly like every other daily Yahoo-derived series.
  */
 
-import type { SeriesPoint } from '../shared/series';
-import { combineSeries } from '../shared/series';
-import { fetchYahooQuote } from '../shared/adapters/yahoo';
+import type { SeriesPoint } from '../../../shared/series';
+import { combineSeries } from '../../../shared/series';
+import { fetchYahooQuote } from '../../../shared/adapters/yahoo';
 
 /** Equal-weight S&P 500 ETF (Invesco S&P 500 Equal Weight). */
 export const BREADTH_RSP_SYMBOL = 'RSP';

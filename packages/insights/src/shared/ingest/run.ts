@@ -91,7 +91,7 @@ import {
 import { providerFetchEnabled, SANITY_RANGES, withinSanityRange } from '../sources';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS, type Rung2FetchPlan } from '../adapters/rung2';
 import { collectRung4Sources, deriveRung4IndicatorSeries, RUNG4_IDS } from '../adapters/rung4';
-import { fetchEbpCsv, fetchOfrFsiCsv } from '../../adapters/credit';
+import { fetchEbpCsv, fetchOfrFsiCsv } from '../../domains/usa/adapters/credit';
 import {
   collectPortwatchRows,
   derivePortwatchIndicatorSeries,

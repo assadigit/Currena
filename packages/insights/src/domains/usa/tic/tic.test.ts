@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { TicSnapshotSchema } from '@currena/core';
-import { BlockedError } from '../shared/adapters/fetch-policy';
+import { BlockedError } from '../../../shared/adapters/fetch-policy';
 import {
   buildTicSnapshot,
   TIC_CUSTODY_HUBS,
@@ -36,7 +36,7 @@ import { InMemoryTicStore, parseStoredTic } from './store';
 import { runTicIngest, TIC_TIMEOUT_MS, TIC_TABLE3_URL, TIC_TABLE5_URL } from './job';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const FIXTURES = join(HERE, '..', '..', 'fixtures', 'tic');
+const FIXTURES = join(HERE, '..', '..', '..', '..', 'fixtures', 'tic');
 
 const TABLE5 = readFileSync(join(FIXTURES, 'slt_table5-2026-10-31.txt'), 'utf-8');
 const TABLE3 = readFileSync(join(FIXTURES, 'slt_table3-2026-10-31.txt'), 'utf-8');

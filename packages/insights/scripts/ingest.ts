@@ -38,8 +38,8 @@ import { runInsightsUpdate, writeAllHistoriesInline } from '../src/shared/ingest
 import { HIDDEN_PUBLIC_IDS } from '../src/shared/ingest/data';
 import { collectRung2Sources, rung2FetchPlanFor, RUNG2_IDS } from '../src/shared/adapters/rung2';
 import { collectRung4Sources } from '../src/shared/adapters/rung4';
-import { collectCreditSources } from '../src/adapters/credit';
-import { collectTreasuryAuctions } from '../src/adapters/auctions';
+import { collectCreditSources } from '../src/domains/usa/adapters/credit';
+import { collectTreasuryAuctions } from '../src/domains/usa/adapters/auctions';
 import { collectPortwatch } from '../src/adapters/portwatch';
 import { collectAbsAuMacro } from '../src/adapters/abs-au';
 import type { IndicatorId } from '@currena/core';

@@ -40,7 +40,7 @@ import { writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fetchEbpCsv } from '../src/adapters/credit';
+import { fetchEbpCsv } from '../src/domains/usa/adapters/credit';
 import { fetchMofJgb10y } from '../src/adapters/mof';
 import { insightsFetch } from '../src/shared/adapters/fetch-policy';
 import { readZipTextEntries } from '../src/shared/adapters/zip';

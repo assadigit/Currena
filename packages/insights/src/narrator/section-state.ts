@@ -34,7 +34,7 @@ import { getNarratorSectionLabels, type NarratorLang } from './vocabulary';
 import { marketDefinition } from '../markets/definitions';
 import { DEFINITIONS } from '../shared/definitions';
 import { FX_STALE_DAYS } from '../fx/definitions';
-import { ticHolderDerived, ticTopMovers } from '../tic';
+import { ticHolderDerived, ticTopMovers } from '../domains/usa/tic';
 import { daysBetween } from '../shared/series';
 import { sha256Hex } from './hash';
 

@@ -12,7 +12,7 @@ import {
   treasuryT10y2y,
   type TreasuryCurves,
 } from './treasury';
-import { FormatChangedError } from '../shared/adapters/fetch-policy';
+import { FormatChangedError } from '../../../shared/adapters/fetch-policy';
 
 /** The live 2026 nominal header (venue-verified 2026-10-22). */
 const NOMINAL_CSV = [

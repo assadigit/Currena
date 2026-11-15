@@ -29,7 +29,7 @@ export {
 export { GOLDAPI_SYMBOLS, fetchGoldApiSpot, goldApiPriceUrl, GOLDAPI_BASE } from './goldapi';
 // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive +
 // the SGE daily report + the shared Shanghai-premium derivation.
-export { fetchUomExpectedPrice5y10y, parseUomExpectedPrice5y10y, UOM_SIE_ARCHIVE_URL, UOM_START_YEAR } from '../../adapters/uom';
+export { fetchUomExpectedPrice5y10y, parseUomExpectedPrice5y10y, UOM_SIE_ARCHIVE_URL, UOM_START_YEAR } from '../../domains/usa/adapters/uom';
 export {
   fetchSgeAu9999,
   fetchSgeAu9999Recent,
@@ -68,8 +68,8 @@ export {
   parseTreasuryCurveCsv,
   fetchTreasuryCurves,
   treasuryT10y2y,
-} from '../../adapters/treasury';
-export type { TreasuryCurves, TreasuryFetchOptions } from '../../adapters/treasury';
+} from '../../domains/usa/adapters/treasury';
+export type { TreasuryCurves, TreasuryFetchOptions } from '../../domains/usa/adapters/treasury';
 export {
   EIA_WTI_URL,
   EIA_BRENT_URL,
@@ -125,10 +125,10 @@ export type { ReleaseScheduleEntry, SnapshotBuildInputs, PolicyDecision, Context
  * ------------------------------------------------------------------ */
 export { fetchGprExportAll, parseGprExportAll, GPR_URL } from './monthly-indexes';
 export type { GprExportSeries } from './monthly-indexes';
-export { fetchEbpCsv, parseEbpCsv, EBP_CSV_URL } from '../../adapters/credit';
+export { fetchEbpCsv, parseEbpCsv, EBP_CSV_URL } from '../../domains/usa/adapters/credit';
 export { collectPortwatch, ma7Series, portwatchQueryUrl } from '../../adapters/portwatch';
-export { collectTreasuryAuctions, selectAuctionFamily, auctionsUrl, AUCTIONS_URL } from '../../adapters/auctions';
-export type { AuctionsCollectResult, AuctionFamilySeries } from '../../adapters/auctions';
+export { collectTreasuryAuctions, selectAuctionFamily, auctionsUrl, AUCTIONS_URL } from '../../domains/usa/adapters/auctions';
+export type { AuctionsCollectResult, AuctionFamilySeries } from '../../domains/usa/adapters/auctions';
 export { fetchEiaSprLevel, fetchEiaCrudeProduction, EIA_SPR_URL, EIA_CRUDE_PRODUCTION_URL } from '../../adapters/eia-stocks';
 export { fetchBazgGoldImports, parseBazgGoldImports, BAZG_GOLD_IMPORTS_URL } from '../../adapters/bazg';
 export {

@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { DEFINITIONS } from '../shared/definitions';
+import { DEFINITIONS } from '../../../shared/definitions';
 import {
   AUCTIONS_FIELDS,
   AUCTIONS_PAGE_SIZE,
@@ -22,7 +22,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = readFileSync(
-  join(here, '..', '..', 'fixtures', 's3', 'treasury-auctions-full-2026-11-01.json'),
+  join(here, '..', '..', '..', '..', 'fixtures', 's3', 'treasury-auctions-full-2026-11-01.json'),
   'utf8',
 );
 

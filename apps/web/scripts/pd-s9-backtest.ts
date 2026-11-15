@@ -41,8 +41,8 @@
 
 import { InsightsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { pageGroupIds } from '@currena/insights/page-division';
-import { backtestUsaPage } from '../src/routes/page-division/usa-backtest-core';
-import { USA_BACKTEST_CARD_IDS } from '../src/routes/page-division/usa-backtest-core';
+import { backtestUsaPage } from '../src/features/usa/usa-backtest-core';
+import { USA_BACKTEST_CARD_IDS } from '../src/features/usa/usa-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

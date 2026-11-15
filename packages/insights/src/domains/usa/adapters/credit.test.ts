@@ -12,9 +12,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { InsightsSnapshot, IndicatorHistory, IndicatorId, InsightsStatus } from '@currena/core';
-import { buildInsightsSnapshot } from '../shared/adapters/snapshot';
-import { DEFINITIONS } from '../shared/definitions';
-import { fredDecadeFrom } from '../shared/adapters/fred';
+import { buildInsightsSnapshot } from '../../../shared/adapters/snapshot';
+import { DEFINITIONS } from '../../../shared/definitions';
+import { fredDecadeFrom } from '../../../shared/adapters/fred';
 import {
   EBP_CSV_URL,
   OFR_FSI_CSV_URL,
@@ -24,13 +24,13 @@ import {
   fetchOfrFsiCsv,
   collectCreditSources,
 } from './credit';
-import { RUNG4_IDS } from '../shared/adapters/rung4';
-import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsCreditPhase } from '../shared/ingest/run';
-import type { InsightsStore } from '../shared/store';
-import type { SeriesPoint } from '../shared/series';
+import { RUNG4_IDS } from '../../../shared/adapters/rung4';
+import { CARRY_FORWARD_IDS, historyPhaseIds, runInsightsCreditPhase } from '../../../shared/ingest/run';
+import type { InsightsStore } from '../../../shared/store';
+import type { SeriesPoint } from '../../../shared/series';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', '..', 'fixtures');
 
 /** The M3.1 captures (served through an injectable fetch, verbatim bodies). */
 const ebpCsv = readFileSync(join(fixtures, 's3', 'ebp-2026-11-01.csv'), 'utf8');

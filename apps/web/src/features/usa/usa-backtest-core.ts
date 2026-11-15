@@ -49,7 +49,7 @@ import type { IndicatorId, IndicatorReading, TicHolder, TicSnapshot } from '@cur
 import { GAUGES, gaugeReading, labelForVerdictStep } from '@currena/insights';
 import { TIC_CUSTODY_HUBS, ticHolderDerived, ticIsStale } from '@currena/insights/tic';
 import { THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS } from '@currena/insights/page-division';
-import { globalGaugeTiles, type GlobalGaugeTile } from './global-tiles';
+import { globalGaugeTiles, type GlobalGaugeTile } from '../../routes/page-division/global-tiles';
 import { USA_CARD_IDS, usaGaugeVerdicts } from './usa-tiles';
 
 /** One comparison's verdict — `ok` false is a RED finding (§21: zero tolerance). */

@@ -62,7 +62,7 @@ import type { FxSnapshot, IndicatorId, IndicatorReading } from '@currena/core';
 import { summarizeFxRules } from '@currena/insights/fx';
 import { BIG_MOVE_PERCENTILE, FX_PAIR_IDS, FX_STALE_DAYS } from '@currena/insights/fx/definitions';
 import { fxRuleView } from '../../lib/fx-presentation/rules';
-import { stableStringify, auditUsaFreshness, type UsaBacktestCheck, type FreshnessRegistryEntry } from './usa-backtest-core';
+import { stableStringify, auditUsaFreshness, type UsaBacktestCheck, type FreshnessRegistryEntry } from '../../features/usa/usa-backtest-core';
 import { CURRENCIES_CARD_IDS } from './currencies-tiles';
 import { currenciesRuleHeadlineKey } from './currencies-tiles';
 

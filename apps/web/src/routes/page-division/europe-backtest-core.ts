@@ -40,7 +40,7 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { stableStringify, auditUsaFreshness, type UsaBacktestCheck, type FreshnessRegistryEntry } from './usa-backtest-core';
+import { stableStringify, auditUsaFreshness, type UsaBacktestCheck, type FreshnessRegistryEntry } from '../../features/usa/usa-backtest-core';
 import { EUROPE_CARD_IDS } from './europe-tiles';
 
 // Re-exports for the live script + the offline suite (the S9/S10 pattern:

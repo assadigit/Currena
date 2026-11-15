@@ -43,7 +43,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fetchUomExpectedPrice5y10y } from '../src/adapters/uom';
+import { fetchUomExpectedPrice5y10y } from '../src/domains/usa/adapters/uom';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = join(HERE, '..', 'fixtures', 'gf-p0-candidates.json');

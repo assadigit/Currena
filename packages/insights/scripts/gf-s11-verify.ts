@@ -8,13 +8,13 @@
  *
  * Usage: pnpm --filter @currena/insights exec tsx scripts/gf-s11-verify.ts
  */
-import { fetchClevelandNowcasts, nowcastSeriesOf } from '../src/adapters/cleveland';
+import { fetchClevelandNowcasts, nowcastSeriesOf } from '../src/domains/usa/adapters/cleveland';
 import { fetchFredSeries, FRED_SERIES } from '../src/shared/adapters/fred';
 import { fetchEcbEurosystemAssets } from '../src/adapters/ecb';
 import { fetchBazgGoldImports } from '../src/adapters/bazg';
 import { fetchSgeMonthlyWithdrawal } from '../src/adapters/sge-monthly';
 import { fetchGoldEquitiesRatio } from '../src/adapters/gold-equities';
-import { fetchHlwRstar } from '../src/adapters/rstar';
+import { fetchHlwRstar } from '../src/domains/usa/adapters/rstar';
 import { fetchYahooQuote } from '../src/shared/adapters/yahoo';
 import { fetchFrankfurterSeries } from '../src/adapters/frankfurter';
 import {

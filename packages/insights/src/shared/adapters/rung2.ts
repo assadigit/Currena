@@ -56,11 +56,11 @@ import {
 // family's fetchers — the IMF COFER adapter + the S&P 500 breadth pair.
 import { fetchCoferUsdShare } from '../../adapters/cofer';
 import { fetchImfCpiYoy, imfCpiLabel } from '../../adapters/imf-cpi';
-import { fetchSp500BreadthRatio } from '../../adapters/sp500-breadth';
+import { fetchSp500BreadthRatio } from '../../domains/usa/adapters/sp500-breadth';
 // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive
 // (the I4 5–10y household anchor) + the SGE Au99.99 daily close (the F6
 // Shanghai premium derivation's SGE leg).
-import { fetchUomExpectedPrice5y10y } from '../../adapters/uom';
+import { fetchUomExpectedPrice5y10y } from '../../domains/usa/adapters/uom';
 import { fetchSgeAu9999Recent, sgeSeriesOf } from '../../adapters/sge';
 // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
 // accumulator's feeds (the Cleveland Fed nowcasting page + the SA CPI
@@ -68,12 +68,12 @@ import { fetchSgeAu9999Recent, sgeSeriesOf } from '../../adapters/sge';
 // + the BoJ JPNASSETS), the F15 SGE monthly withdrawals (the Data
 // Highlights PDF), the F16 BAZG gold imports, the R11 HLW r-star workbook
 // and the X5 GLD/SPY pair.
-import { fetchClevelandNowcasts, nowcastSeriesOf } from '../../adapters/cleveland';
+import { fetchClevelandNowcasts, nowcastSeriesOf } from '../../domains/usa/adapters/cleveland';
 import { fetchEcbEurosystemAssets } from '../../adapters/ecb';
 import { fetchBazgGoldImports } from '../../adapters/bazg';
 import { fetchSgeMonthlyWithdrawal } from '../../adapters/sge-monthly';
 import { fetchGoldEquitiesRatio } from '../../adapters/gold-equities';
-import { fetchHlwRstar } from '../../adapters/rstar';
+import { fetchHlwRstar } from '../../domains/usa/adapters/rstar';
 
 /**
  * The ids this phase owns (grows with each gap-audit addition). The main

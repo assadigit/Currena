@@ -19,7 +19,7 @@
 
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
-import type { TicSectionCopy } from '../../components/insights/TicSection';
+import type { TicSectionCopy } from './TicSection';
 
 /** The 37 corpus tic keys (camelCase, the corpus's own names). */
 const TIC_KEY = {

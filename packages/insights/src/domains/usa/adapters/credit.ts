@@ -23,10 +23,10 @@
  */
 
 import type { InsightsSourceReport } from '@currena/core';
-import { classifySourceError, insightsFetch } from '../shared/adapters/fetch-policy';
-import { fredDecadeFrom } from '../shared/adapters/fred';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { classifySourceError, insightsFetch } from '../../../shared/adapters/fetch-policy';
+import { fredDecadeFrom } from '../../../shared/adapters/fred';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 /** The Fed Board's EBP file (M3.1-verified URL — never an invented one). */
 export const EBP_CSV_URL = 'https://www.federalreserve.gov/econres/notes/feds-notes/ebp_csv.csv';

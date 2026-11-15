@@ -44,9 +44,9 @@
  * the owner records acceptance — the SGE-pre-(e) standing.
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const CLEVELAND_NOWCAST_URL = 'https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting';
 

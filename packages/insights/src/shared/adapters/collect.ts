@@ -37,7 +37,7 @@ import { fetchFrankfurterSeries } from '../../adapters/frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from '../../adapters/rba';
-import { fetchTreasuryCurves, treasuryT10y2y } from '../../adapters/treasury';
+import { fetchTreasuryCurves, treasuryT10y2y } from '../../domains/usa/adapters/treasury';
 import { fetchYahooQuote } from './yahoo';
 import { fetchBrentFrontMonthQuote } from '../prices/brent-front-month';
 import { fetchWorldBankMonthly } from './worldbank';

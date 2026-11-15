@@ -23,10 +23,10 @@
  * never invented.
  */
 
-import { insightsFetch } from '../shared/adapters/fetch-policy';
-import { FormatChangedError } from '../shared/adapters/fetch-policy';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch } from '../../../shared/adapters/fetch-policy';
+import { FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const UOM_SIE_ARCHIVE_URL = 'https://data.sca.isr.umich.edu/data-archive/mine.php';
 

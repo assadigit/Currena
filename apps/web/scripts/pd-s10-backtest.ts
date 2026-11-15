@@ -54,7 +54,7 @@ import { dirname, resolve } from 'node:path';
 import { InsightsSnapshotSchema, PageProjectionSchema, TicSnapshotSchema } from '@currena/core';
 import type { TicSnapshot } from '@currena/core';
 import { pageGroupIds } from '@currena/insights/page-division';
-import { auditUsaFreshness, backtestUsaPage, backtestUsaTicBoard, USA_BACKTEST_CARD_IDS, TIC_EXPECTED_HOLDERS, type FreshnessRegistryEntry } from '../src/routes/page-division/usa-backtest-core';
+import { auditUsaFreshness, backtestUsaPage, backtestUsaTicBoard, USA_BACKTEST_CARD_IDS, TIC_EXPECTED_HOLDERS, type FreshnessRegistryEntry } from '../src/features/usa/usa-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

@@ -24,9 +24,9 @@
  * An /all-years variant does not exist (403/404 — probed).
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const TREASURY_BASE =
   'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv';

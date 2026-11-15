@@ -33,8 +33,8 @@
 import { useEffect, useState } from 'react';
 import type { TicSnapshot } from '@currena/core';
 import { useI18n } from '../../shared/lib/locale';
-import { fetchTicSnapshot, readCachedTic } from '../../lib/tic';
-import { TicSection, type TicLoadState } from '../../components/insights/TicSection';
+import { fetchTicSnapshot, readCachedTic } from './tic';
+import { TicSection, type TicLoadState } from './TicSection';
 import { useUsaTicCopy } from './usa-tic-copy';
 
 /** The board's load state — the markets/fx discipline (the useTicSection

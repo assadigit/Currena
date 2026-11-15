@@ -18,11 +18,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deriveBreadthRatio, fetchSp500BreadthRatio, BREADTH_RSP_SYMBOL, BREADTH_SPY_SYMBOL, BREADTH_RANGE } from './sp500-breadth';
-import { parseYahooQuoteResponse } from '../shared/adapters/yahoo';
-import type { SeriesPoint } from '../shared/series';
+import { parseYahooQuoteResponse } from '../../../shared/adapters/yahoo';
+import type { SeriesPoint } from '../../../shared/series';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', '..', 'fixtures');
 const rspJson = JSON.parse(readFileSync(join(fixtures, 's6', 'yahoo-rsp-10y-2026-11-02.json'), 'utf8')) as unknown;
 const spyJson = JSON.parse(readFileSync(join(fixtures, 's6', 'yahoo-spy-10y-2026-11-02.json'), 'utf8')) as unknown;
 

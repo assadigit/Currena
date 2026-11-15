@@ -16,7 +16,7 @@
     "./markets-au/definitions": "./src/markets-au/definitions.ts",
     "./fx": "./src/fx/index.ts",
     "./fx/definitions": "./src/fx/definitions.ts",
-    "./tic": "./src/tic/index.ts",
+    "./tic": "./src/domains/usa/tic/index.ts",
     "./prices": "./src/shared/prices/index.ts",
     "./ingest": "./src/shared/ingest/index.ts",
     "./page-division": "./src/page-division/index.ts",
