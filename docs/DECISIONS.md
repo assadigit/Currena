@@ -11,6 +11,108 @@
 > A–K, rounds 1–3), and the per-session delivery records in
 > `docs/page-division/01-SESSION-ROADMAP.md`.
 
+## 2026-11-15 — BD-M1-r (modularization Phase 1, the re-run): the skeleton delivered per the audit's corrected tree — four records: the 44-README scope (parents included), the R12 scope pass landed as probe-verified documentation rather than config extension, the tree-vs-inventory MarketsChart discrepancy resolved in favor of the inventory, and the deploy half's two findings (the treemap ALREADY LIVE on production from an unrecorded TM-era deploy; the session's Cloudflare credentials belong to the SportSignal account)
+
+- **The request:** the owner's M1 re-run prompt (reconstructed verbatim
+  in the prior HANDOFF) — execute Phase 1 (the folder skeleton + one
+  scope README per folder + the lint/tsconfig scope pass; zero code
+  moves) from the restored green baseline, then deploy the parked
+  TM1–TM4 treemap and live-verify currena.ir/world-markets.
+- **Decision 1 — the 44-README skeleton (parents included):** the
+  prompt's brace list names the leaf folders; the audit's proposed
+  tree shows them under five parent roots (web features/, shared/,
+  features-tools/; engine domains/, shared/). Created: all 39 leaves
+  PLUS the 5 parents, each with a one-paragraph scope README —
+  git cannot track empty folders, so the READMEs ARE the folders, and
+  parent-root READMEs carry the phasing (which lands in Phase 2 vs
+  3/4/5) that prevents the empty tree from looking accidental.
+  Features/ holds 11 children (the 10 domains + insights-legacy, the
+  §19.6 retirement container per the tree); features-tools/ holds 9;
+  engine domains/ holds 9 (companies included — the flag-flip future
+  home); engine shared/ holds 3. The D1–D10 corrections are stated IN
+  the READMEs of the folders they affect (gold-score NOT in
+  domains/gold; prices/ + goldapi NOT in commodities; the PricesBoard
+  cluster NOT in global; the flat card system IN insights-legacy;
+  ResultPopup IN converter; fred/monthly-indexes shared). Decided by:
+  the agent (the prompt's "per the audit's proposed tree" + "One
+  README.md per folder" read literally; the audit's own "31 READMEs"
+  estimate was a pre-finalization sketch no clean folder combination
+  reproduces). Revisit: none needed — Phase 2+ fills the folders.
+- **Decision 2 — the R12 scope pass = verification + documentation,
+  not config extension:** the audit's R12 assumed the eslint globs and
+  tsconfig `include: ["src"]` "don't cover sibling roots" — they do:
+  both are recursive. Options considered: (a) extend the globs/includes
+  with the new roots anyway — rejected: pure redundancy, no functional
+  delta, and enumerated lists can go stale when later roots appear;
+  (b) skip and note — rejected: the phase's purpose (later diffs
+  clean) deserves durable evidence; (c) probe-verify then document —
+  chosen: violation-bearing `__scope_probe__.ts` files in six
+  representative new roots (web features/gold, shared/lib,
+  features-tools/converter, infrastructure; engine domains/gold,
+  shared/adapters) produced exactly 6 lint errors via `pnpm lint`
+  (every root seen by eslint) and all six files appeared in
+  `tsc --listFiles` for their packages; probes removed; the verified
+  coverage recorded in `eslint.config.mjs` comments (the recursive
+  patterns are load-bearing for Phase 2+); tsconfigs left untouched
+  (JSONC comments avoided for strict-JSON tooling compatibility; the
+  record lives here + the commit message). Decided by: the agent.
+  Revisit: if any future session narrows a glob, the probe procedure
+  (in the commit message of `84084058`) re-verifies in one minute.
+- **Decision 3 — MarketsChart: the inventory wins over the tree:** the
+  audit's Deliverable-3 tree lists MarketsChart under
+  `shared/components/`, but its Deliverable-1 inventory row (the
+  evidence layer — importer census: MarketTile + WorldMarketsBriefing,
+  both world-markets) targets `features/world-markets`. The M1
+  READMEs follow the inventory (MarketsChart named in
+  features/world-markets, absent from shared/components); the M4
+  world-markets move session places it accordingly. Recorded so M4
+  does not re-litigate. Decided by: the agent (the audit's own
+  authority order: the importer census is the shared-vs-domain
+  driver). Revisit: M4 executes the placement.
+- **Decision 4 — the treemap is ALREADY LIVE on production (the
+  records were stale):** the mandated live-verify found the TM1–TM4
+  treemap serving on currena.ir/world-markets (16 tiles, 3 region
+  bands, click-to-panel, EN + FA/RTL + 390 px, zero console errors —
+  the M1 prompt's acceptance criteria MET by the live site). The live
+  asset list proves WHICH build: entry `index-CDhxMjxO.js` references
+  the SHARED `PricesBoard-CzUQum7t.js` / `Signals-B2jU8sKO.js` /
+  `AustralianMarkets-BWN4A41B.js` chunks that the BASELINE-REPAIR
+  dissolved (the post-BR topology merges each into its sole
+  consumer's route chunk) — production runs the TM-era bundle, i.e.
+  a deploy happened after the TM series that NO session recorded
+  (the TM, M1-blocked and BR records all say "not deployed").
+  Consequences: (a) the "deploy the parked treemap" instruction is
+  MOOT — the next deploy is a normal full build (it includes the
+  treemap); (b) production lacks the BR bundle cleanup (/insights
+  visitors still download ~70 kB of dead modules) and everything
+  since; (c) the HANDOFF's standing "verify the live build identity,
+  not the records" operational note is added. Decided by: the agent
+  (measurement over records — owner rule 5). Revisit: the owner may
+  want to know WHO deployed (check the Cloudflare dashboard's
+  deployment history on the Currena account when convenient).
+- **Decision 5 — no deploy against the wrong account; the credential
+  finding recorded:** the kickoff's Cloudflare block (the SportSignal
+  account, id a796fd…39c1, two cfut_ tokens) holds
+  only the sportsignal.ir zone and the ucl-notifier + uefa-image-relay
+  workers — the currena-api worker "does not exist" on it (API 10007)
+  and there is no currena.ir zone; the Currena production rides the
+  sedanama-ir account (DEPLOY.md topology). The GitHub token IS
+  Currena's (clone + push verified). Options considered: (a) attempt
+  anything on the reachable account — rejected: it is a different
+  project's infrastructure (out of scope, and AGENTS §5's
+  stop-and-ask list covers touching other systems); (b) declare the
+  deploy impossible and stop — rejected: the session's OTHER mandate
+  (the live-verify) was executable against production as-is, and the
+  local dist (the exact tree that would deploy) was browser-verified
+  first so the deploy is one command away; (c) record everything,
+  verify everything verifiable, ask the owner for the Currena token —
+  chosen. Decided by: the agent. Revisit: the owner supplies the
+  token (or asks for a manual path) — lever #1 in HANDOFF.
+- **Gates at close:** 9/9 GREEN ×3 runs this session (baseline /
+  skeleton / pushed-tree close), suite 15,298 at every run, budgets
+  byte-identical to the BD-BR rows. Commits `c5726ace` + `84084058`
+  + this bookkeeping, all pushed.
+
 ## 2026-11-15 — BD-BR (the baseline-repair session): the five repairs executed per the recipe with two judgment calls recorded — the dead-import chunk-topology consolidation (4 budget rows re-documented, not growth) and the GoldPositions copy placement (4 new pd.gold keys; the TM23 pd.commodities pair left queued untouched)
 
 - **The request:** the owner's BASELINE-REPAIR session prompt — restore
