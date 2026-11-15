@@ -45,15 +45,15 @@ import { useId, useMemo, useState } from 'react';
 import type { TicHolder, TicSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { ticHolderDerived, ticIsStale, ticTopMovers } from '@currena/insights/tic';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
 /** The section's OWN copy contract (S10, the USA-tier-6 reuse): only the
  *  `tic` block — the legacy Insights page passes the full corpus (it has
  *  .tic), the /usa page passes the lean pd.usa.tic adapter (every word
  *  pinned byte-for-byte to the corpus by usa-copy-pin.test.ts). */
 export type TicSectionCopy = Pick<InsightsCopy, 'tic'>;
-import { Skeleton } from '../ui';
+import { Skeleton } from '../../shared/ui/ui';
 
 /** The section's own load state (the markets/fx discipline). */
 export type TicLoadState =

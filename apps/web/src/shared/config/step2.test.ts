@@ -19,7 +19,7 @@ import {
   moneyAreaRow,
   nextEventDate,
   policyLastChangeOf,
-} from './config';
+} from '.';
 
 const reading = (over: Partial<IndicatorReading>): IndicatorReading =>
   ({

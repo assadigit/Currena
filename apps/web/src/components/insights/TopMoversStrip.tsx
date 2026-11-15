@@ -21,8 +21,8 @@
 
 import { useMemo } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { definitionFor, formatChange, changeToneClass } from './config';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { definitionFor, formatChange, changeToneClass } from '../../shared/config';
 
 export interface MoverRow {
   id: IndicatorId;

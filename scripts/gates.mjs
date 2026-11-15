@@ -97,7 +97,7 @@ const GATES = [
   {
     id: 'layer1-strict',
     label: 'layer1 strict validator',
-    cmd: 'pnpm --filter @currena/web exec vitest run src/components/insights/layer1/layer1.test.ts',
+    cmd: 'pnpm --filter @currena/web exec vitest run src/shared/components/layer1/layer1.test.ts',
     env: { LAYER1_STRICT: '1' },
     parse: (out) => {
       const m = out.match(/Tests\s+(\d[\d,]*) passed \((\d[\d,]*)\)/);

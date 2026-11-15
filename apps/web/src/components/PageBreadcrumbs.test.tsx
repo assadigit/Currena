@@ -76,7 +76,7 @@ describe('PageBreadcrumbs', () => {
   });
 
   it('the fa/RTL rendering: the Persian crumbs + the rtl document direction', async () => {
-    const { useI18n } = await import('../lib/locale');
+    const { useI18n } = await import('../shared/lib/locale');
     function SetLocale({ locale }: { locale: 'en' | 'fa' }): React.JSX.Element | null {
       const { setLocale } = useI18n();
       useEffect(() => {
@@ -101,7 +101,7 @@ describe('PageBreadcrumbs', () => {
     } finally {
       unmount();
       cleanup();
-      const { useI18n: useI18n2 } = await import('../lib/locale');
+      const { useI18n: useI18n2 } = await import('../shared/lib/locale');
       const Probe = (): React.JSX.Element | null => {
         const { setLocale } = useI18n2();
         useEffect(() => {

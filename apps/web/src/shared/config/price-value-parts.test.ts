@@ -13,9 +13,9 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
-import { priceValueParts } from './config';
+import { insightsCopyEn } from '../i18n/insights-copy-en';
+import { insightsCopyFa } from '../i18n/insights-copy-fa';
+import { priceValueParts } from '.';
 
 const en = insightsCopyEn.units;
 const fa = insightsCopyFa.units;

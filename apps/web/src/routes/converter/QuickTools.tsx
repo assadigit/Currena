@@ -8,7 +8,7 @@
  * code moved verbatim).
  */
 
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 import { TOOLS } from './shared';
 

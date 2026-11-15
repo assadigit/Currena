@@ -21,14 +21,14 @@ import { registerSW } from 'virtual:pwa-register';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { Toast } from './components/ui';
+import { Toast } from './shared/ui/ui';
 import { LiveRates } from './routes/LiveRates';
 import { useRoute } from './router';
-import { useI18n } from './lib/locale';
+import { useI18n } from './shared/lib/locale';
 import { routeMetaFor, setCanonical, setMetaTag } from './lib/route-meta';
-import { snapshotStore } from './lib/snapshot-store';
-import { hydrateServerHistory } from './lib/rate-history';
-import { alertsStore } from './lib/alerts';
+import { snapshotStore } from './shared/lib/snapshot-store';
+import { hydrateServerHistory } from './shared/lib/rate-history';
+import { alertsStore } from './shared/lib/alerts';
 import { useAlertEvaluation } from './lib/use-alert-evaluation';
 
 const Calculator = lazy(() => import('./routes/Calculator').then((m) => ({ default: m.Calculator })));
@@ -47,7 +47,7 @@ const Insights = lazy(() => import('./routes/Insights').then((m) => ({ default: 
 // skeleton for the eight destinations is one shared lazy chunk.
 const Converter = lazy(() => import('./routes/Converter').then((m) => ({ default: m.Converter })));
 const PagePlaceholder = lazy(() =>
-  import('./routes/page-division/PagePlaceholder').then((m) => ({ default: m.PagePlaceholder })),
+  import('./shared/components/PagePlaceholder').then((m) => ({ default: m.PagePlaceholder })),
 );
 // Page-division S3 (2026-11-08): the Global world scan — the D-21 verdict
 // board. Lazy like the Insights route (the engine modules + the board

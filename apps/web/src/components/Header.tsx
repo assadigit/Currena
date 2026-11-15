@@ -23,11 +23,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { navigate, useRoute } from '../router';
 import { useTheme } from '../lib/theme';
-import { useI18n } from '../lib/locale';
+import { useI18n } from '../shared/lib/locale';
 import { InstallButton } from './InstallButton';
-import { HEADER_ICON_BUTTON_CLASS } from './ui';
-import { useDialogFocus } from './useDialogFocus';
-import type { TranslationKey } from '../lib/locale';
+import { HEADER_ICON_BUTTON_CLASS } from '../shared/ui/ui';
+import { useDialogFocus } from '../shared/hooks/useDialogFocus';
+import type { TranslationKey } from '../shared/lib/locale';
 import type { RoutePath } from '../router';
 
 /** One nav link — REAL anchor semantics (audit WS-3 #6). */

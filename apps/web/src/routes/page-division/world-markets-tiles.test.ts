@@ -27,7 +27,7 @@ import { describe, expect, it } from 'vitest';
 import type { IndicatorReading, MarketId, MarketsSnapshot } from '@currena/core';
 import { MARKETS, MARKET_GROUP_ORDER } from '@currena/insights/markets/definitions';
 import { pageHomeIds } from '@currena/insights/page-division';
-import { DISPLAY } from '../../components/insights/config/display';
+import { DISPLAY } from '../../shared/config/display';
 import {
   WM_VERDICT_WORD,
   WORLD_RISK_DISPLAY,

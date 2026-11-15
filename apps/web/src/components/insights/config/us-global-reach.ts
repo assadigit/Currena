@@ -18,10 +18,10 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
-import { interpolate } from '../../../i18n';
-import { formatIndicatorValue } from './display';
-import { US_GLOBAL_REACH_IDS } from './sections';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
+import { formatIndicatorValue } from '../../../shared/config/display';
+import { US_GLOBAL_REACH_IDS } from '../../../shared/config/sections';
 
 /** The three analytical legs (R9-07): costs, inflation, stress/liquidity. */
 export type UsGlobalLegBand = 'high' | 'mid' | 'low';

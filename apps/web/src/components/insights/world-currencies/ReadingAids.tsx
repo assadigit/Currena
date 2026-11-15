@@ -8,9 +8,9 @@
 
 import { useMemo, useState } from 'react';
 import type { FxSnapshot } from '@currena/core';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { fxPlainWords } from '../../../lib/fx-presentation';
-import { GlossaryTip } from './GlossaryTip';
+import { GlossaryTip } from '../../../shared/components/GlossaryTip';
 
 /* ------------------------------------------------------------------ *
  * v1.3 — "How to read this section" (CR §4.5): a small button next to the

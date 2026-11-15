@@ -32,7 +32,7 @@
 
 import { useEffect, useState } from 'react';
 import type { TicSnapshot } from '@currena/core';
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 import { fetchTicSnapshot, readCachedTic } from '../../lib/tic';
 import { TicSection, type TicLoadState } from '../../components/insights/TicSection';
 import { useUsaTicCopy } from './usa-tic-copy';

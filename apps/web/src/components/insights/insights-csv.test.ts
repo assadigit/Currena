@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import type { IndicatorReading, InsightsSnapshot } from '@currena/core';
 import { buildInsightsCsv, insightsCsvFilename, insightsCsvHeaders } from './insights-csv';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
 
 function reading(overrides: Partial<IndicatorReading> & Pick<IndicatorReading, 'id'>): IndicatorReading {
   return {

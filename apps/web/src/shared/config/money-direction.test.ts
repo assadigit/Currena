@@ -23,13 +23,13 @@
 
 import { describe, expect, it } from 'vitest';
 import type { IndicatorReading } from '@currena/core';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
+import { insightsCopyEn } from '../i18n/insights-copy-en';
 import {
   moneyAreaDirection,
   moneyDirectionToneClass,
   moneyDriverVote,
   MONEY_DRIVER_KIND,
-} from './config';
+} from '.';
 
 function reading(partial: Partial<IndicatorReading> & { id: IndicatorReading['id'] }): IndicatorReading {
   return {

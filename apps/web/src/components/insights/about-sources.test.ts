@@ -25,9 +25,9 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import type { IndicatorId } from '@currena/core';
 import { ABOUT_PROVIDER_META, aboutEnabledState, aboutSidecarEntriesOf, aboutSourceRows, type AboutSourceSidecarEntry } from './about-sources';
-import { definitionFor } from './config';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { definitionFor } from '../../shared/config';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import auditJson from '../../../../../data/indicator-audit.json';
 
 /** The real sidecar's per-indicator entries (the About table's row source). */

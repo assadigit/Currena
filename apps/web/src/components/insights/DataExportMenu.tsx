@@ -23,7 +23,7 @@
 
 import { Suspense, lazy, useEffect, useRef } from 'react';
 import { Download } from 'lucide-react';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import type { ExportFormat } from './full-export';
 
 const DataExportPanel = lazy(() => import('./DataExportPanel'));

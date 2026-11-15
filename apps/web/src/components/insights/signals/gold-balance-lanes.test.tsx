@@ -69,10 +69,10 @@ import { BalanceScale, balanceVisualFrame, balanceVisualMetrics, balanceVisualSi
 import { balanceRimSegments } from './BalanceWeight';
 import { goldOutlookOf, outlookOf } from './verdict';
 import { Signals } from '../Signals';
-import { PricesBoard } from '../PricesBoard';
-import { formatChange } from '../config';
-import { insightsCopyEn } from '../../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
+import { PricesBoard } from '../../../shared/components/PricesBoard';
+import { formatChange } from '../../../shared/config';
+import { insightsCopyEn } from '../../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../../shared/i18n/insights-copy-fa';
 
 const copy = insightsCopyEn;
 const copyFa = insightsCopyFa;

@@ -90,16 +90,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { Coins, PanelLeft, PanelRight } from 'lucide-react';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { fetchIndicatorHistory } from '../../lib/insights';
-import { IconImg, indicatorIconUrl } from '../icons/currena';
+import { interpolate } from '../i18n';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
+import { fetchIndicatorHistory } from '../lib/insights';
+import { IconImg, indicatorIconUrl } from '../../components/icons/currena';
 import {
   PRICE_ROWS,
   definitionFor,
   formatChange,
   priceValueParts,
-} from './config';
+} from '../config';
 import { formatAsOf } from './HistoryChart';
 import { ChangeValue } from './PriceDetails';
 import { deriveTileStats, type TileStats } from './price-stats';

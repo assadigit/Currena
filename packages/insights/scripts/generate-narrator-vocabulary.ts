@@ -5,7 +5,7 @@
  * the hand-written text and WITHOUT touching the web app.
  *
  * How: the web dictionaries stay the ONE hand-edited source of truth
- * (apps/web/src/i18n/insights-copy-{en,fa}.ts — unchanged, exactly as
+ * (apps/web/src/shared/i18n/insights-copy-{en,fa}.ts — unchanged, exactly as
  * today). This script GENERATES a compact, deterministic JSON snapshot
  * of their `layer1` objects (indicators + glossary + ui, both languages)
  * into packages/insights/src/narrator/vocabulary.generated.json, which
@@ -27,13 +27,13 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 // The single source of truth (TS imports across the workspace tree — the
 // same cross-tree pattern apps/web/visual already uses):
-import { insightsCopyEn } from '../../../apps/web/src/i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../apps/web/src/i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../../apps/web/src/shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../../apps/web/src/shared/i18n/insights-copy-fa';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = resolve(HERE, '../src/narrator/vocabulary.generated.json');
-const EN_REL = 'apps/web/src/i18n/insights-copy-en.ts';
-const FA_REL = 'apps/web/src/i18n/insights-copy-fa.ts';
+const EN_REL = 'apps/web/src/shared/i18n/insights-copy-en.ts';
+const FA_REL = 'apps/web/src/shared/i18n/insights-copy-fa.ts';
 const REPO_ROOT = resolve(HERE, '../../..');
 
 const sha256 = (text: string): string => createHash('sha256').update(text, 'utf8').digest('hex');

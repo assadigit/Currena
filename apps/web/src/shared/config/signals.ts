@@ -7,8 +7,8 @@
 
 import type { IndicatorId } from '@currena/core';
 import type { ConnectionReading, ConnectionState, LegEval } from '@currena/insights';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import { interpolate } from '../i18n';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
 
 /* ------------------------------------------------------------------ *
  * I17 (v2): the "Together" connection cards + the signals cards

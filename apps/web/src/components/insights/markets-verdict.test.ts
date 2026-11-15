@@ -18,8 +18,8 @@
 import { describe, expect, it } from 'vitest';
 import type { MarketEntry, MarketsSummary } from '@currena/core';
 import { marketsVerdictStep, marketsTakeaway } from './WorldMarkets';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 
 const entry = (fields: Partial<MarketEntry>): MarketEntry => ({
   id: 'sp500',

@@ -21,8 +21,8 @@
 
 import type { MarketEntry, MarketId } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { heatToneOf, heatmapScale, periodValueOf } from './briefing';
 import { bandedArrow, periodWord, percentGlyph, signedPct, type MarketsView } from './shared';
 

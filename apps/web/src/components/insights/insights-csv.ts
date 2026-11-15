@@ -26,9 +26,9 @@
 import { formatNumber } from '@currena/core';
 import type { InsightsSnapshot, IndicatorReading } from '@currena/core';
 import { csvEscapeField, csvNeutralizeFormula } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { DISPLAY, type UnitToken } from './config';
-import { tierOf } from './config/movers';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { DISPLAY, type UnitToken } from '../../shared/config';
+import { tierOf } from '../../shared/config/movers';
 
 /** All-ASCII number rendering for CSV cells (machine-readable). */
 function csvNumber(value: number, maximumFractionDigits = 6): string {

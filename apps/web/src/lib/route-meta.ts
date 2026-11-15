@@ -20,7 +20,7 @@
  * out of scope by the repo's own SPA-only rule (AGENTS.md §14 rule 4).
  */
 
-import type { TranslationKey } from './locale';
+import type { TranslationKey } from '../shared/lib/locale';
 import type { RoutePath } from '../router';
 
 export interface RouteMeta {

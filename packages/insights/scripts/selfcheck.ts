@@ -51,9 +51,9 @@ import {
 import { SOURCE_LICENCES } from '../src/licences';
 import { DEFINITIONS, RULE_VERSION } from '../src/index';
 import { buildInsightsMarkdown, type FullExportInput } from '../../../apps/web/src/components/insights/full-export';
-import { DISPLAY } from '../../../apps/web/src/components/insights/config/display';
-import { insightsCopyEn } from '../../../apps/web/src/i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../apps/web/src/i18n/insights-copy-fa';
+import { DISPLAY } from '../../../apps/web/src/shared/config/display';
+import { insightsCopyEn } from '../../../apps/web/src/shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../../apps/web/src/shared/i18n/insights-copy-fa';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..', '..', '..');
@@ -147,8 +147,8 @@ try {
 // T-07's corpus: the two copy dictionaries from the repo (the ingest's own scan).
 const copyTexts: string[] = [];
 for (const dictPath of [
-  resolve(REPO, 'apps/web/src/i18n/insights-copy-en.ts'),
-  resolve(REPO, 'apps/web/src/i18n/insights-copy-fa.ts'),
+  resolve(REPO, 'apps/web/src/shared/i18n/insights-copy-en.ts'),
+  resolve(REPO, 'apps/web/src/shared/i18n/insights-copy-fa.ts'),
 ]) {
   try {
     const raw = readFileSync(dictPath, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');

@@ -24,9 +24,9 @@ import { describe, expect, it } from 'vitest';
 import type { FxPairId, IndicatorId, IndicatorReading } from '@currena/core';
 import { FX_PAIR_IDS } from '@currena/insights/fx/definitions';
 import { pageGroupIds, pageHomeIds } from '@currena/insights/page-division';
-import { DISPLAY, formatReadingValue, type UnitLabels } from '../../components/insights/config/display';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { DISPLAY, formatReadingValue, type UnitLabels } from '../../shared/config/display';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import {
   CURRENCIES_BOARD_PAIR_IDS,
   CURRENCIES_CARD_DISPLAY,

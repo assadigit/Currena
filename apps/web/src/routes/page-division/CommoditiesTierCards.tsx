@@ -35,9 +35,9 @@
 
 import { useCallback, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
-import type { TranslationKey } from '../../lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import {
   COMMODITIES_ENERGY_IDS,
   COMMODITIES_METALS_IDS,
@@ -48,9 +48,9 @@ import {
   commoditiesCards,
   type CommoditiesCardEntry,
 } from './commodities-tiles';
-import { PriceTile, useTileData, type TileData, type PriceLens, PricePeriodSwitch } from '../../components/insights/PricesBoard';
-import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { PriceTile, useTileData, type TileData, type PriceLens, PricePeriodSwitch } from '../../shared/components/PricesBoard';
+import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
 /* ------------------------------------------------------------------ *
  * The copy maps — TOTAL against commodities-tiles' own lists (a missing

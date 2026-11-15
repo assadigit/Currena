@@ -12,7 +12,7 @@
  * respects the iOS home-indicator inset on viewport-fit=cover devices).
  */
 
-import { useI18n } from '../lib/locale';
+import { useI18n } from '../shared/lib/locale';
 import { navigate } from '../router';
 
 /** SessionStorage key staging the About section to scroll to. */

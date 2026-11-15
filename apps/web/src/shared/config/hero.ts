@@ -23,7 +23,7 @@
 import type { CalendarEvent, IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
 import { GAUGES } from '@currena/insights';
 import type { GaugeReading } from '@currena/insights';
-import { interpolate } from '../../../i18n';
+import { interpolate } from '../i18n';
 import { warningZone } from './bands';
 import { tierOf } from './movers';
 import { definitionFor } from './sections';

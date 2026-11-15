@@ -27,8 +27,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { MarketEntry, MarketId } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import geo from './world-map-geo.json';
 import {
   DEFAULT_PERIOD,

@@ -8,8 +8,8 @@
  */
 
 import { formatRelative } from '@currena/core';
-import { Button, Card } from '../../components/ui';
-import { useI18n } from '../../lib/locale';
+import { Button, Card } from '../../shared/ui/ui';
+import { useI18n } from '../../shared/lib/locale';
 import type { ConvertFailure } from './shared';
 import { RetryCountdown } from './RetryCountdown';
 

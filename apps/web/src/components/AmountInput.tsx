@@ -37,8 +37,8 @@
 
 import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { parseAmount, thousandSeparateInput } from '@currena/core';
-import { useCodeLabel } from '../lib/display';
-import { useI18n } from '../lib/locale';
+import { useCodeLabel } from '../shared/lib/display';
+import { useI18n } from '../shared/lib/locale';
 
 interface AmountInputProps {
   id: string;

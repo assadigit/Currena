@@ -43,8 +43,8 @@ import {
   signedTiltDeg,
   type BalanceDriver,
 } from './BalanceScale';
-import { insightsCopyEn } from '../../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../../shared/i18n/insights-copy-fa';
 
 const copy = insightsCopyEn;
 const copyFa = insightsCopyFa;

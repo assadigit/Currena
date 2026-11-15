@@ -12,9 +12,9 @@ import { useMemo, useState } from 'react';
 import type { CalendarEvent, IndicatorId } from '@currena/core';
 import { formatJalaliDate, formatDateWords, formatNumber } from '@currena/core';
 import { CalendarDays } from 'lucide-react';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { downloadBlob } from '../../lib/download';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { downloadBlob } from '../../shared/lib/download';
 import { buildInsightsIcs } from './ics';
 
 const KIND_CLASS: Record<CalendarEvent['kind'], string> = {

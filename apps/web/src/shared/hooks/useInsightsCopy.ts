@@ -7,10 +7,10 @@
  * Intl formatters alongside the dictionary.
  */
 
-import { useI18n } from '../../lib/locale';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { useI18n } from '../lib/locale';
+import { insightsCopyEn } from '../i18n/insights-copy-en';
+import { insightsCopyFa } from '../i18n/insights-copy-fa';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
 
 interface InsightsCopyApi {
   copy: InsightsCopy;

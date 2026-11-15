@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { Layer1Entry, Layer1GlossaryEntry } from '../../../i18n/insights-copy-en';
+import type { Layer1Entry, Layer1GlossaryEntry } from '../../i18n/insights-copy-en';
 import {
   getIndicatorCopy,
   getGlossary,

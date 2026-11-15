@@ -25,8 +25,8 @@ import {
   R6_EURCHF_M1_WARN,
   R6_EUROSTOXX_M1_WARN,
 } from '@currena/insights/fx/definitions';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { interpolate } from '../../i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
 import { abs1, threshold1 } from './format';
 import { fxClosestToWarning, fxRuleCopyKey } from './rules';
 

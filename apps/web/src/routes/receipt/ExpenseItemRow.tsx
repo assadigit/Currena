@@ -13,7 +13,7 @@
 
 import { thousandSeparateInput } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 import { CATEGORY_IDS, inputClass, type CategoryId, type ItemDraft } from './shared';
 
 export function ExpenseItemRow({

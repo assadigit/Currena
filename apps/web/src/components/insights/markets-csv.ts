@@ -14,8 +14,8 @@ import { formatNumber } from '@currena/core';
 import { csvEscapeField, csvNeutralizeFormula } from '@currena/core';
 import type { MarketsSnapshot, MarketEntry } from '@currena/core';
 import { TREND_BAND_PCT } from '@currena/insights/markets/definitions';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { statusWordKeyOf } from './config/labels';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { statusWordKeyOf } from '../../shared/config/labels';
 
 function csvNumber(value: number, maximumFractionDigits = 2): string {
   return formatNumber(value, 'en-US', { maximumFractionDigits });

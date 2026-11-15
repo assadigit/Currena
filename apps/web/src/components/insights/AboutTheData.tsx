@@ -43,9 +43,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ExternalLink } from 'lucide-react';
 import type { InsightsSnapshot, InsightsStatus, IndicatorId } from '@currena/core';
 import { InsightsStatusSchema, formatNumber } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { interpolate } from '../../i18n';
-import { definitionFor } from './config';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import { definitionFor } from '../../shared/config';
 import {
   aboutEnabledState,
   aboutSidecarEntriesOf,

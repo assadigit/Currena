@@ -17,19 +17,19 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
+import { fetchMarketsSnapshot, readCachedMarkets } from '../../shared/lib/markets';
 import { fetchAuMarketsSnapshot, readCachedAuMarkets } from '../../lib/markets-au';
-import { fetchFxSnapshot, readCachedFx } from '../../lib/fx';
-import { fetchNarrativeDoc, readCachedNarrative } from '../../lib/narrative';
-import type { NarrativeDoc } from '../../lib/narrative';
+import { fetchFxSnapshot, readCachedFx } from '../../shared/lib/fx';
+import { fetchNarrativeDoc, readCachedNarrative } from '../../shared/lib/narrative';
+import type { NarrativeDoc } from '../../shared/lib/narrative';
 import { fetchTicSnapshot, readCachedTic } from '../../lib/tic';
 import { navigate } from '../../router';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
 import type { AuMarketsLoadState } from '../../components/insights/AustralianMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
 import type { TicLoadState } from '../../components/insights/TicSection';
-import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../../components/insights/VerdictMeter';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { FxAlert, MarketsAlert, SectionIndicatorState } from '../../shared/components/VerdictMeter';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
 export function useWorldMarketsSection(copy: InsightsCopy, enabled = true) {
   // World stock markets (insights-world-markets-spec.md): an independent
@@ -98,7 +98,7 @@ export function useWorldMarketsSection(copy: InsightsCopy, enabled = true) {
     if (marketsState.kind !== 'ready') return;
     void import('../../components/insights/markets-csv').then(({ buildMarketsCsv, marketsCsvFilename }) => {
       const csv = buildMarketsCsv(marketsState.snapshot, copy);
-      void import('../../lib/download').then(({ downloadBlob }) => {
+      void import('../../shared/lib/download').then(({ downloadBlob }) => {
         downloadBlob(
           new Blob([csv], { type: 'text/csv;charset=utf-8' }),
           marketsCsvFilename(marketsState.snapshot.generatedAt),
@@ -162,7 +162,7 @@ export function useWorldCurrenciesSection(copy: InsightsCopy, enabled = true) {
     if (fxState.kind !== 'ready') return;
     void import('../../components/insights/fx-csv').then(({ buildFxCsv, fxCsvFilename }) => {
       const csv = buildFxCsv(fxState.snapshot, copy);
-      void import('../../lib/download').then(({ downloadBlob }) => {
+      void import('../../shared/lib/download').then(({ downloadBlob }) => {
         downloadBlob(
           new Blob([csv], { type: 'text/csv;charset=utf-8' }),
           fxCsvFilename(fxState.snapshot.generatedAt),

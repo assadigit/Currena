@@ -14,7 +14,7 @@
  * break the page (same discipline as the theme/pin stores).
  */
 
-import type { ChartRange } from './config';
+import type { ChartRange } from '../config';
 
 const STORAGE_KEY = 'currena:insights:chart-range';
 const RANGES: readonly string[] = ['10y', '5y', '1y'];

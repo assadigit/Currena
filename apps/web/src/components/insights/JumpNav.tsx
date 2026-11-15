@@ -17,7 +17,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
 export interface JumpTarget {
   id: string;

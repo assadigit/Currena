@@ -111,9 +111,9 @@ function stubApi(plan: FetchPlan = {}): void {
 /** Fresh module graph per test — the snapshot store is a singleton. */
 async function loadConverter(): Promise<{
   Converter: typeof import('./Converter')['Converter'];
-  snapshotStore: typeof import('../lib/snapshot-store')['snapshotStore'];
+  snapshotStore: typeof import('../shared/lib/snapshot-store')['snapshotStore'];
 }> {
-  const { snapshotStore } = await import('../lib/snapshot-store');
+  const { snapshotStore } = await import('../shared/lib/snapshot-store');
   const { Converter } = await import('./Converter');
   return { Converter, snapshotStore };
 }

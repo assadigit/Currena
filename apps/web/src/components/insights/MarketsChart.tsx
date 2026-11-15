@@ -17,7 +17,7 @@
 
 import { useMemo } from 'react';
 import { formatNumber } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
 const PLOT_W = 320;
 const PLOT_H = 96;

@@ -47,7 +47,7 @@ import { DEFINITIONS, GAUGES, GOLD_LANE_VOTERS, isShadowGauge } from '../package
 // @ts-expect-error — same.
 import { homePageOfIndicator, reconcilePlacement } from '../packages/insights/src/page-division';
 // @ts-expect-error — same.
-import { HIDDEN_FROM_LANE_IDS, COMPANION_ONLY_IDS, COMPANIONS } from '../apps/web/src/components/insights/config';
+import { HIDDEN_FROM_LANE_IDS, COMPANION_ONLY_IDS, COMPANIONS } from '../apps/web/src/shared/config';
 
 interface RegistryIndicator {
   id: string;

@@ -46,7 +46,7 @@ import { FxSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { pageReadingIds } from '@currena/insights/page-division';
 import { CurrenciesPage } from './CurrenciesPage';
 import { CURRENCIES_BOARD_PAIR_IDS, CURRENCIES_CARD_IDS, CURRENCIES_DOLLAR_STANDING_IDS, CURRENCIES_PAIR_CARD_IDS } from './currencies-tiles';
-import { clearProjectionCacheForTests } from '../../lib/page-division';
+import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)
@@ -453,7 +453,7 @@ describe('CurrenciesPage', () => {
   it('the fa/RTL rendering: the Persian title + the Persian section headings + the Persian card value joins', async () => {
     // The fa locale rides the app's own locale store (the I18nApi's
     // setter — the same door the language switch uses).
-    const { useI18n } = await import('../../lib/locale');
+    const { useI18n } = await import('../../shared/lib/locale');
     function SetLocale({ locale }: { locale: 'en' | 'fa' }): React.JSX.Element | null {
       const { setLocale } = useI18n();
       useEffect(() => {
@@ -498,7 +498,7 @@ describe('CurrenciesPage', () => {
     } finally {
       unmount();
       cleanup();
-      const { useI18n: useI18n2 } = await import('../../lib/locale');
+      const { useI18n: useI18n2 } = await import('../../shared/lib/locale');
       const Probe = (): React.JSX.Element | null => {
         const { setLocale } = useI18n2();
         useEffect(() => {

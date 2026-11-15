@@ -41,7 +41,7 @@ import { GOLD_VOTER_IDS } from '@currena/insights/page-division';
 import { balanceTilt } from '../../components/insights/signals/BalanceScale';
 import { GoldPage } from './GoldPage';
 import { GOLD_CONTEXT_IDS } from './gold-tiles';
-import { clearProjectionCacheForTests } from '../../lib/page-division';
+import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)

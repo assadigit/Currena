@@ -32,15 +32,15 @@ import { useId, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { formatNumber, formatDateWords, formatJalaliDate } from '@currena/core';
 import type { IndicatorId } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { interpolate } from '../../i18n';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
+import { interpolate } from '../i18n';
 import {
   sampleHistoryRows,
   epochDayToIso,
   sliceHistoryToRange,
   rangeIsPlottable,
   type ChartRange,
-} from './config';
+} from '../config';
 import { readChartRange, writeChartRange } from './chart-range';
 
 const WIDTH = 640;

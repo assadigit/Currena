@@ -8,8 +8,8 @@
 
 import { useRef } from 'react';
 import type { ReactNode } from 'react';
-import { useI18n } from '../lib/locale';
-import { useDialogFocus } from './useDialogFocus';
+import { useI18n } from '../shared/lib/locale';
+import { useDialogFocus } from '../shared/hooks/useDialogFocus';
 
 function Modal({
   title,

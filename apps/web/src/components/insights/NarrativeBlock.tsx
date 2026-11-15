@@ -26,9 +26,9 @@
  * once via lib/narrative.ts and passes the relevant unit down.
  */
 
-import type { NarrativeUnit } from '../../lib/narrative';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { interpolate } from '../../i18n';
+import type { NarrativeUnit } from '../../shared/lib/narrative';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
 import { formatRelativeShort } from './world-markets/shared';
 
 type Locale = 'en' | 'fa';

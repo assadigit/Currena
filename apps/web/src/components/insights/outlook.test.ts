@@ -30,8 +30,8 @@ import {
   type SignalReading,
 } from '@currena/insights';
 import { RANGE_SPEED_PCT, goldOutlookOf, outlookOf } from './signals/verdict';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 
 const KEYS: SignalConditionKey[] = ['real-yield', 'expectations', 'stress', 'dollar', 'footing', 'industrial'];
 

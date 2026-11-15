@@ -27,15 +27,15 @@ import {
   sourceForPair,
 } from '@currena/core';
 import type { AlertDirection, CurrencyCode } from '@currena/core';
-import { CurrencySelect } from './CurrencySelect';
+import { CurrencySelect } from '../shared/components/CurrencySelect';
 import { parseInputAmount } from './AmountInput';
-import { Button, Card } from './ui';
-import { alertsStore, useAlerts } from '../lib/alerts';
-import { liveRateView, rateDecimals } from '../lib/live-rate';
-import { useSnapshotStore } from '../lib/snapshot-store';
-import { useI18n } from '../lib/locale';
-import { useRovingKeys } from './use-roving-keys';
-import type { TranslationKey } from '../lib/locale';
+import { Button, Card } from '../shared/ui/ui';
+import { alertsStore, useAlerts } from '../shared/lib/alerts';
+import { liveRateView, rateDecimals } from '../shared/lib/live-rate';
+import { useSnapshotStore } from '../shared/lib/snapshot-store';
+import { useI18n } from '../shared/lib/locale';
+import { useRovingKeys } from '../shared/hooks/use-roving-keys';
+import type { TranslationKey } from '../shared/lib/locale';
 
 interface AlertsDialogProps {
   /** The converter's current pair — pre-fills the create form. */

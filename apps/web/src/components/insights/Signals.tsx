@@ -38,9 +38,9 @@ import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { evaluateSignal, goldBalance, type SignalReading } from '@currena/insights';
 import { Activity, ChevronDown } from 'lucide-react';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { SIGNALS_ENABLED } from './config';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { SIGNALS_ENABLED } from '../../shared/config';
 import {
   balanceVerdictCountsParts,
   balanceVerdictWordOf,

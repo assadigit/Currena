@@ -128,10 +128,10 @@
 import { useState } from 'react';
 import type { IndicatorReading, InsightsSection, IndicatorId } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { IconImg, indicatorIconUrl, sectionIconUrl, stateIconUrl } from '../icons/currena';
-import { FlowChevron } from '../icons/FlowChevron';
+import { interpolate } from '../i18n';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
+import { IconImg, indicatorIconUrl, sectionIconUrl, stateIconUrl } from '../../components/icons/currena';
+import { FlowChevron } from '../../components/icons/FlowChevron';
 import { GAUGES, gaugesForSection, labelForVerdictStep, sectionVerdictStep } from '@currena/insights';
 import {
   attentionTiles,
@@ -140,8 +140,8 @@ import {
   formatRuleText,
   indicatorValueParts,
   stepToneClass,
-} from './config';
-import { GlossaryTip } from './world-currencies/GlossaryTip';
+} from '../config';
+import { GlossaryTip } from './GlossaryTip';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });

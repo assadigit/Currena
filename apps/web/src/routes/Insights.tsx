@@ -44,22 +44,22 @@ import type { IndicatorReading } from '@currena/core';
 // The markets board rides the owner directive and is NOT in hiddenBoards;
 // the fx board is.
 import siteModeOverrides from '../../../../data/site-mode-overrides.json';
-import { useI18n } from '../lib/locale';
+import { useI18n } from '../shared/lib/locale';
 import { routeQuery } from '../router';
-import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../lib/insights';
+import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../shared/lib/insights';
 import { DetailsPanel } from '../components/insights/DetailsPanel';
 import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
 import { MoneyPanel } from '../components/insights/MoneyPanel';
 import { AustralianMarkets } from '../components/insights/AustralianMarkets';
 import { CompaniesTable } from '../components/insights/CompaniesTable';
-import { useInsightsCopy } from '../components/insights/useInsightsCopy';
+import { useInsightsCopy } from '../shared/hooks/useInsightsCopy';
 import {
   PINNED_STORAGE_KEY,
   SIGNALS_ENABLED,
   definitionFor,
   formatPinnedStorage,
   parsePinnedIds,
-} from '../components/insights/config';
+} from '../shared/config';
 import { InsightsHeader } from './insights-sections/InsightsHeader';
 import { DeprecationBanner } from './insights-sections/DeprecationBanner';
 import {

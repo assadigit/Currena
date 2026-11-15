@@ -32,9 +32,9 @@
 import type { FxRuleState } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { fxRuleView } from '../../lib/fx-presentation/rules';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import { currenciesRuleHeadlineKey } from './currencies-tiles';
 
 /** The rule-id → copy-light key (R1…R7 in spec order). */

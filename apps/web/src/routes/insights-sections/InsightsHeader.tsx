@@ -27,16 +27,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { formatJalaliDate, formatDateWords, formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import type { Locale } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { Locale } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { ToolsMenu, type OwnerSignInResult } from '../../components/insights/ToolsMenu';
 import { DataExportMenu } from '../../components/insights/DataExportMenu';
 import type { ExportFormat } from '../../components/insights/full-export';
 import type { MarketsLoadState } from '../../components/insights/WorldMarkets';
 import type { FxLoadState } from '../../components/insights/WorldCurrencies';
-import { statusCounts, type StatusFilter } from '../../components/insights/config';
-import type { I18nApi } from '../../lib/locale';
+import { statusCounts, type StatusFilter } from '../../shared/config';
+import type { I18nApi } from '../../shared/lib/locale';
 import type { LoadState } from './InsightsStatusBlocks';
 import { dataHealthOf, type DataHealth, type DataHealthKind } from './data-health';
 
@@ -287,7 +287,7 @@ export function InsightsHeader({
     if (state.kind !== 'ready') return;
     void import('../../components/insights/insights-csv').then(({ buildInsightsCsv, insightsCsvFilename }) => {
       const csv = buildInsightsCsv(state.snapshot, copy);
-      void import('../../lib/download').then(({ downloadBlob }) => {
+      void import('../../shared/lib/download').then(({ downloadBlob }) => {
         downloadBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), insightsCsvFilename(state.snapshot.generatedAt));
       });
     });
@@ -295,7 +295,7 @@ export function InsightsHeader({
 
   const downloadIcs = useCallback(() => {
     if (state.kind !== 'ready') return;
-    void Promise.all([import('../../components/insights/ics'), import('../../lib/download')]).then(
+    void Promise.all([import('../../components/insights/ics'), import('../../shared/lib/download')]).then(
       ([{ buildInsightsIcs }, { downloadBlob }]) => {
         const ics = buildInsightsIcs(state.snapshot.calendar, locale);
         downloadBlob(new Blob([ics], { type: 'text/calendar;charset=utf-8' }), 'currena-insights-calendar.ics');
@@ -323,7 +323,7 @@ export function InsightsHeader({
           },
           format,
         );
-        const { downloadBlob } = await import('../../lib/download');
+        const { downloadBlob } = await import('../../shared/lib/download');
         downloadBlob(file.blob, insightsExportFilename(state.snapshot.generatedAt, file.ext));
       })
         .catch((err: unknown) => {

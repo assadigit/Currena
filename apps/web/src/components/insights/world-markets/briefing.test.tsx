@@ -18,8 +18,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import type { MarketEntry, MarketsSnapshot } from '@currena/core';
 import { WorldMarkets } from '../WorldMarkets';
-import { insightsCopyEn } from '../../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../../shared/i18n/insights-copy-fa';
 
 /* ------------------------------------------------------------------ *
  * Deterministic clock — freeze to 2026-10-17T12:00:00Z so the fixture's

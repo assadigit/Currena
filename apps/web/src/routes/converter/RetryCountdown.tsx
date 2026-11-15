@@ -9,7 +9,7 @@
 
 import { useEffect, useState } from 'react';
 import { formatNumber } from '@currena/core';
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 
 export function RetryCountdown({ targetMs }: { targetMs: number }) {
   const { t, numberLocale } = useI18n();

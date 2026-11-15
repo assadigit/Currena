@@ -23,11 +23,11 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import type { TicSnapshot } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
 import { TicSnapshotSchema } from '@currena/core';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import { TicSection, type TicLoadState } from './TicSection';
 import { TicCustodyCard } from './TicCustodyCard';
-import { ALWAYS_POSITION_IDS, HIDDEN_FROM_LANE_IDS } from './config/sections';
+import { ALWAYS_POSITION_IDS, HIDDEN_FROM_LANE_IDS } from '../../shared/config/sections';
 
 /** The fresh "now" (the fixture's dataMonth 2026-08 is 61 days old). */
 const FRESH_NOW = () => new Date('2026-10-31T12:00:00Z');

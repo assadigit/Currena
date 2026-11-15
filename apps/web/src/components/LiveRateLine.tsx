@@ -28,13 +28,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatNumber, formatRelative } from '@currena/core';
 import type { CurrencyCode, Snapshot, SnapshotSource } from '@currena/core';
 import { RateDeltaChip } from './RateDeltaChip';
-import { Sparkline } from './Sparkline';
-import { SourceBadge } from './ui';
-import { useCodeLabel } from '../lib/display';
-import { useI18n } from '../lib/locale';
-import type { TranslationKey } from '../lib/locale';
-import { bucketMean, liveRateView, rateDecimals, rateShareText, TREND_BUCKETS } from '../lib/live-rate';
-import { seriesForPair, trendOf, useRateHistory } from '../lib/rate-history';
+import { Sparkline } from '../shared/components/Sparkline';
+import { SourceBadge } from '../shared/ui/ui';
+import { useCodeLabel } from '../shared/lib/display';
+import { useI18n } from '../shared/lib/locale';
+import type { TranslationKey } from '../shared/lib/locale';
+import { bucketMean, liveRateView, rateDecimals, rateShareText, TREND_BUCKETS } from '../shared/lib/live-rate';
+import { seriesForPair, trendOf, useRateHistory } from '../shared/lib/rate-history';
 
 // R10-5: a stable empty-array reference so the rawSeries useMemo returns
 // the SAME reference on every render when historySource is null (the

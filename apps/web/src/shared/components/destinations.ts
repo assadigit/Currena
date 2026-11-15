@@ -14,7 +14,7 @@
  * tickers, not translated copy).
  */
 
-import type { TranslationKey } from '../../lib/locale';
+import type { TranslationKey } from '../lib/locale';
 import type { RoutePath } from '../../router';
 
 export interface DestinationSpec {

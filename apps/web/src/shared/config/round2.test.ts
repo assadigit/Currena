@@ -59,16 +59,16 @@ import {
   heroStaleInputs,
   dailyPeersOf,
   tradingDaysBehind,
-} from './config';
+} from '.';
 import { evaluateConnections } from '@currena/insights';
-import { insightsCopyEn, type InsightsCopy } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
-import signalsSrc from './Signals.tsx?raw';
-import signalsIconsSrc from './signals/icons.tsx?raw';
-import signalsVerdictSrc from './signals/verdict.tsx?raw';
-import signalsBalanceSrc from './signals/BalanceScale.tsx?raw';
-import signalsCardSrc from './signals/MergedCard.tsx?raw';
-import connectionCardSrc from './ConnectionCard.tsx?raw';
+import { insightsCopyEn, type InsightsCopy } from '../i18n/insights-copy-en';
+import { insightsCopyFa } from '../i18n/insights-copy-fa';
+import signalsSrc from '../../components/insights/Signals.tsx?raw';
+import signalsIconsSrc from '../../components/insights/signals/icons.tsx?raw';
+import signalsVerdictSrc from '../../components/insights/signals/verdict.tsx?raw';
+import signalsBalanceSrc from '../../components/insights/signals/BalanceScale.tsx?raw';
+import signalsCardSrc from '../../components/insights/signals/MergedCard.tsx?raw';
+import connectionCardSrc from '../../components/insights/ConnectionCard.tsx?raw';
 
 /* ------------------------------------------------------------------ *
  * Fixtures

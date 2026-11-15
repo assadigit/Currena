@@ -6,7 +6,7 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
 import { MOVE_SCORE_THRESHOLD, WORD_TONE_CLASS, bandPositionOf } from './bands';
 import { tierOf } from './movers';
 import { definitionFor } from './sections';

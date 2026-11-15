@@ -12,11 +12,11 @@
 import { formatNumber, thousandSeparateInput } from '@currena/core';
 import type { CurrencyCode, Snapshot } from '@currena/core';
 import { AmountInput } from '../../components/AmountInput';
-import { CurrencySelect } from '../../components/CurrencySelect';
+import { CurrencySelect } from '../../shared/components/CurrencySelect';
 import { LiveRateLine } from '../../components/LiveRateLine';
-import { Button, Card } from '../../components/ui';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { Button, Card } from '../../shared/ui/ui';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import { QUICK_AMOUNTS_INTL, QUICK_AMOUNTS_IRR } from './shared';
 
 export function ConvertForm(props: {

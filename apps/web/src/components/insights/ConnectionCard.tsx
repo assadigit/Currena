@@ -32,9 +32,9 @@ import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatDateWords, formatNumber } from '@currena/core';
 import { CONNECTIONS, type ConnectionReading, type LegEval } from '@currena/insights';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { connectionSummaryInfo, formatChange, formatIndicatorValue } from './config';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { connectionSummaryInfo, formatChange, formatIndicatorValue } from '../../shared/config';
 
 type MoveKind = 'up' | 'down' | 'flat' | 'level';
 

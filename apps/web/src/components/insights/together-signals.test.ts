@@ -15,7 +15,7 @@ import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import type { ConnectionReading, LegEval, SignalConditionKey } from '@currena/insights';
 import { CONNECTIONS, evaluateConnections } from '@currena/insights';
-import { legPhrase, SIGNALS_ENABLED, connectionSummaryInfo } from './config';
+import { legPhrase, SIGNALS_ENABLED, connectionSummaryInfo } from '../../shared/config';
 // v3 merge (2026-10-19): the balance law lives in BalanceScale — the owner's
 // iterated v7 ratio law (net/total × 8°, 2° floor, level when sparse per
 // UI-40) superseding the retired 12° helper, which is deleted with its
@@ -29,8 +29,8 @@ import {
   signedTiltDeg,
   type BalanceDriver,
 } from './signals/BalanceScale';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 
 const leg = (fields: Partial<LegEval>): LegEval => ({
   id: 'gold-usd',

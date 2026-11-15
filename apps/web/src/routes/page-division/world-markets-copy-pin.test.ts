@@ -28,10 +28,10 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { en } from '../../i18n/en';
-import { fa } from '../../i18n/fa';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { en } from '../../shared/i18n/en';
+import { fa } from '../../shared/i18n/fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import { MARKETS } from '@currena/insights/markets/definitions';
 import { WORLD_RISK_IDS } from './world-markets-tiles';
 import { WM_ENTRY_IDS } from './WorldMarketsHero';

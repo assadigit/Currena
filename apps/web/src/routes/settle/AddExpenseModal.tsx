@@ -9,9 +9,9 @@
 
 import type { RefObject } from 'react';
 import type { CurrencyCode } from '@currena/core';
-import { Button } from '../../components/ui';
-import { useCodeLabel } from '../../lib/display';
-import { useI18n } from '../../lib/locale';
+import { Button } from '../../shared/ui/ui';
+import { useCodeLabel } from '../../shared/lib/display';
+import { useI18n } from '../../shared/lib/locale';
 import type { SettleGroup } from '../../lib/settle-storage';
 import { Modal } from './Modal';
 import { EXPENSE_CURRENCIES, inputClass } from './shared';

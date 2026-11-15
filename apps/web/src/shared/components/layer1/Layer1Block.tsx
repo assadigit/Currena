@@ -22,7 +22,7 @@
  * Zero KV operations, zero external calls (spec §5 + G10).
  */
 
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../i18n/insights-copy-en';
 import { getIndicatorCopy, getGlossary, getLayer1Ui } from './index';
 import type { Layer1Lang } from './index';
 

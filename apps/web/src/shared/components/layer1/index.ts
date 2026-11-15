@@ -19,16 +19,16 @@
  * Zero KV operations, zero external calls (spec §5 + G10).
  */
 
-import { insightsCopyEn } from '../../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../i18n/insights-copy-en';
+import { insightsCopyFa } from '../../i18n/insights-copy-fa';
 import type {
   Layer1Entry,
   Layer1GlossaryEntry,
   Layer1Ui,
-} from '../../../i18n/insights-copy-en';
+} from '../../i18n/insights-copy-en';
 
 export type Layer1Lang = 'en' | 'fa';
-export type { Layer1Entry, Layer1Connection, Layer1GlossaryEntry, Layer1Ui } from '../../../i18n/insights-copy-en';
+export type { Layer1Entry, Layer1Connection, Layer1GlossaryEntry, Layer1Ui } from '../../i18n/insights-copy-en';
 
 /** The Layer-1 entry for one indicator id, or undefined if not yet written. */
 export function getIndicatorCopy(id: string, lang: Layer1Lang): Layer1Entry | undefined {

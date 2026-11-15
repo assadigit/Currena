@@ -43,11 +43,11 @@ import type { KeyboardEvent } from 'react';
 import type { IndicatorId, IndicatorReading, InsightsSection } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { TrendingUp } from 'lucide-react';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { FlowChevron } from '../icons/FlowChevron';
-import { bandWordsOf, bigMovers, changeToneClass, consequenceLine, formatChangeParts } from './config';
-import { VerdictBlock, type MarketsAlert, type FxAlert, type SectionIndicatorState } from './VerdictMeter';
+import { bandWordsOf, bigMovers, changeToneClass, consequenceLine, formatChangeParts } from '../../shared/config';
+import { VerdictBlock, type MarketsAlert, type FxAlert, type SectionIndicatorState } from '../../shared/components/VerdictMeter';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });

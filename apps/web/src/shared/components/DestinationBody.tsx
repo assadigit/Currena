@@ -11,9 +11,9 @@
  * fail-closed display discipline.
  */
 
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../lib/locale';
 import { navigate } from '../../router';
-import { Button, Card } from '../../components/ui';
+import { Button, Card } from '../ui/ui';
 import type { DestinationSpec } from './destinations';
 
 export function DestinationBody({ spec }: { spec: DestinationSpec }): React.JSX.Element {

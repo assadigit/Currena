@@ -32,9 +32,9 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import {
   CURRENCIES_DOLLAR_STANDING_IDS,
   CURRENCIES_PAIR_CARD_IDS,

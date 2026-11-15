@@ -49,8 +49,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { formatNumber } from '@currena/core';
 import type { IndicatorId } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
+import { ApiError, fetchIndicatorHistory } from '../lib/insights';
 
 export type TrendRange = 'quarter' | '1y' | '5y' | '10y';
 

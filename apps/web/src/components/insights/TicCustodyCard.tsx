@@ -19,9 +19,9 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { CompactRow } from './CompactRow';
-import type { DailyPeers } from './config';
+import type { DailyPeers } from '../../shared/config';
 
 /** The locale pair the card renders with (the section module's own shape). */
 type NumberLocale = 'en-US' | 'fa-IR';

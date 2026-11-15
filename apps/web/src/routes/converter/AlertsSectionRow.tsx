@@ -8,7 +8,7 @@
  */
 
 import { formatNumber } from '@currena/core';
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 
 export function AlertsSectionRow(props: {
   alertsLength: number;

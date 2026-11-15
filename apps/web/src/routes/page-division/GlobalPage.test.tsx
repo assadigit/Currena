@@ -25,7 +25,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import type { FxSnapshot, IndicatorReading, MarketsSnapshot, PageProjection } from '@currena/core';
 import { FxSnapshotSchema, MarketsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { GlobalPage } from './GlobalPage';
-import { clearProjectionCacheForTests } from '../../lib/page-division';
+import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)

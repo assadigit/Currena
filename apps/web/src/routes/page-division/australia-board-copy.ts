@@ -22,8 +22,8 @@
  * Pure (no platform imports) so it rides the lean Australia chunk.
  */
 
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import type { AuMarketsBoardCopy } from '../../components/insights/AustralianMarkets';
 
 /** The corpus marketsAu keys the drawing's own contract names (camelCase,

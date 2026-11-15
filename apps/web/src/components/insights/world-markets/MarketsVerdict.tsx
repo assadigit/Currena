@@ -17,12 +17,12 @@
 import type { MarketsSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { SHOCK_DAY_COUNT, SHOCK_DAY_FALL } from '@currena/insights/markets/definitions';
-import { VerdictMeter } from '../VerdictMeter';
-import { SectionVerdictLine } from '../SectionVerdictLine';
-import { stepToneClass } from '../config';
+import { VerdictMeter } from '../../../shared/components/VerdictMeter';
+import { SectionVerdictLine } from '../../../shared/components/SectionVerdictLine';
+import { stepToneClass } from '../../../shared/config';
 import { IconImg, stateIconUrl } from '../../icons/currena';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { belowHighCount, marketBreadth } from './briefing';
 import { periodWord, type MarketsView } from './shared';
 

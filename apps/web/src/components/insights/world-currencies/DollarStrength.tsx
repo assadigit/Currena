@@ -25,8 +25,8 @@
 import { useMemo } from 'react';
 import type { IndicatorId, IndicatorReading, InsightsSnapshot } from '@currena/core';
 import { gaugesForSection } from '@currena/insights';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { AlertCard } from '../AlertCard';
 import { CompactRow } from '../CompactRow';
 import {
@@ -37,7 +37,7 @@ import {
   stepToneClass,
   tierIsCard,
   tierOf,
-} from '../config';
+} from '../../../shared/config';
 import { num } from '../../../routes/insights-sections/QuestionGroup';
 
 export function DollarStrengthCards({

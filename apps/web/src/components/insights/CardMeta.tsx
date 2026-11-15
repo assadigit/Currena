@@ -35,9 +35,9 @@ import { Fragment } from 'react';
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { freshnessOf } from '@currena/insights';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { formatAsOf } from './HistoryChart';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { formatAsOf } from '../../shared/components/HistoryChart';
 import {
   changeScaleOf,
   changeWindowLabel,
@@ -45,7 +45,7 @@ import {
   definitionFor,
   formatChange,
   formatUtcHm,
-} from './config';
+} from '../../shared/config';
 
 /* ------------------------------------------------------------------ *
  * UI-20 item 3 — the change line: direction arrow, size, period label.

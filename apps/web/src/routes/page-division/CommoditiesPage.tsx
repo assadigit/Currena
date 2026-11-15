@@ -36,10 +36,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatDateWords, formatJalaliDate } from '@currena/core';
 import type { PageProjection } from '@currena/core';
-import { useI18n } from '../../lib/locale';
-import { interpolate } from '../../i18n';
-import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../lib/page-division';
-import { destinationFor } from './destinations';
+import { useI18n } from '../../shared/lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../shared/lib/page-division';
+import { destinationFor } from '../../shared/components/destinations';
 import { CommoditiesTierCards } from './CommoditiesTierCards';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 

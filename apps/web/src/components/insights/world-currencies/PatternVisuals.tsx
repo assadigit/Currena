@@ -7,8 +7,8 @@
 
 import { formatNumber } from '@currena/core';
 import type { FxRuleState } from '@currena/core';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
-import { interpolate } from '../../../i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
 import { fxChartLineLabel } from '../../../lib/fx-presentation';
 
 /* ------------------------------------------------------------------ *

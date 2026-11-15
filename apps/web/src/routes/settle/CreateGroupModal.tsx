@@ -6,8 +6,8 @@
  * moved verbatim; the shell owns the state and the create action).
  */
 
-import { Button } from '../../components/ui';
-import { useI18n } from '../../lib/locale';
+import { Button } from '../../shared/ui/ui';
+import { useI18n } from '../../shared/lib/locale';
 import { Modal } from './Modal';
 import { EMOJIS, inputClass } from './shared';
 

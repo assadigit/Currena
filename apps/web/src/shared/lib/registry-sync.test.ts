@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFINITIONS, GAUGES, RULE_VERSION, staleAfterDaysFor } from '@currena/insights';
-import { DISPLAY } from '../components/insights/config/display';
+import { DISPLAY } from '../config/display';
 
 interface RegistryEntry {
   id: string;
@@ -53,7 +53,7 @@ interface RegistryEntry {
 }
 
 const here = dirname(fileURLToPath(import.meta.url));
-const registryPath = join(here, '..', '..', '..', '..', 'data', 'indicators.json');
+const registryPath = join(here, '..', '..', '..', '..', '..', 'data', 'indicators.json');
 const registry = JSON.parse(readFileSync(registryPath, 'utf8')) as { version: number; indicators: RegistryEntry[] };
 
 describe('data/indicators.json — the single indicator registry (A-01)', () => {

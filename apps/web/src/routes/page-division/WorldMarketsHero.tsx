@@ -27,9 +27,9 @@
 import type { MarketId, MarketsSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { ATTENTION_COUNT, UNUSUAL_COUNT } from '@currena/insights/markets/definitions';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import { WorldMap } from '../../components/insights/world-markets/WorldMap';
 import { formatRelativeShort } from '../../components/insights/world-markets/shared';
 import type { MapPeriod } from '../../components/insights/world-markets/world-map-config';

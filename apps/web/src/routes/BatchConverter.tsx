@@ -28,14 +28,14 @@ import {
   sourceForPair,
 } from '@currena/core';
 import type { CurrencyCode, SnapshotSource, Source } from '@currena/core';
-import { CurrencySelect } from '../components/CurrencySelect';
-import { Button, Card, LoaderDots, Toast } from '../components/ui';
-import { useCodeLabel } from '../lib/display';
-import { downloadBlob } from '../lib/download';
-import { uniqueId } from '../lib/id';
-import { useI18n } from '../lib/locale';
-import { useRovingKeys } from '../components/use-roving-keys';
-import { snapshotStore } from '../lib/snapshot-store';
+import { CurrencySelect } from '../shared/components/CurrencySelect';
+import { Button, Card, LoaderDots, Toast } from '../shared/ui/ui';
+import { useCodeLabel } from '../shared/lib/display';
+import { downloadBlob } from '../shared/lib/download';
+import { uniqueId } from '../shared/lib/id';
+import { useI18n } from '../shared/lib/locale';
+import { useRovingKeys } from '../shared/hooks/use-roving-keys';
+import { snapshotStore } from '../shared/lib/snapshot-store';
 
 /** The 11 currencies the legacy batch page offered (captured markup order). */
 const BATCH_CURRENCIES: readonly CurrencyCode[] = [

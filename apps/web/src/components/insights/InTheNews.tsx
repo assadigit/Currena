@@ -19,8 +19,8 @@
  * Zero KV operations, zero external calls. The parent owns the fetch.
  */
 
-import type { NarrativeUnit } from '../../lib/narrative';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { NarrativeUnit } from '../../shared/lib/narrative';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
 type Locale = 'en' | 'fa';
 

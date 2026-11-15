@@ -40,8 +40,8 @@
 import { useEffect, useState } from 'react';
 import type { AuMarketEntry } from '@currena/core';
 import { formatDateWords, formatJalaliDate, formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 import { fetchAuMarketsSnapshot, readCachedAuMarkets } from '../../lib/markets-au';
 import { auFmtClose, auReturnToneClass, auSignedPct } from '../../components/insights/au-markets/shared';

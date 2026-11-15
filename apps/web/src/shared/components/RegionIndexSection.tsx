@@ -25,15 +25,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { MarketId, MarketsSnapshot } from '@currena/core';
-import { useI18n } from '../../lib/locale';
-import { interpolate } from '../../i18n';
+import { useI18n } from '../lib/locale';
+import { interpolate } from '../i18n';
 import { navigate } from '../../router';
-import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
+import { fetchMarketsSnapshot, readCachedMarkets } from '../lib/markets';
 import { WorldMap } from '../../components/insights/world-markets/WorldMap';
 import type { MapRegionId } from '../../components/insights/world-markets/world-map-config';
 import { formatRelativeShort } from '../../components/insights/world-markets/shared';
-import type { TranslationKey } from '../../lib/locale';
-import { useWorldMapCopy } from './world-map-copy';
+import type { TranslationKey } from '../lib/locale';
+import { useWorldMapCopy } from '../../routes/page-division/world-map-copy';
 
 /** The section heading per region (fresh words, queued unreviewed in the
  * Persian manifest — every word INSIDE the map is corpus-pinned). */

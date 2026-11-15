@@ -35,7 +35,7 @@
 import { useMemo } from 'react';
 import type { AuMarketEntry, AuMarketGroupId, AuMarketId } from '@currena/core';
 import { AU_MARKETS, AU_MARKET_GROUP_ORDER, auMarketDefinition } from '@currena/insights/markets-au/definitions';
-import { interpolate } from '../../i18n';
+import { interpolate } from '../../shared/i18n';
 import { navigate } from '../../router';
 import { auGroupBreadth, auLeadingGroup, auLaggingGroup } from './au-markets/briefing';
 import type { AuMarketsLoadState } from './au-markets/shared';

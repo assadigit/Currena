@@ -34,9 +34,9 @@
  */
 
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import type { GoldBalanceLane, GoldBalanceMember } from '@currena/insights';
 import { BalanceGradients } from '../../components/insights/signals/BalanceWeight';
 import {

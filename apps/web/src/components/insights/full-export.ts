@@ -53,15 +53,15 @@ import { evaluateConnections, evaluateSignals } from '@currena/insights';
 import type { ConnectionReading } from '@currena/insights';
 import { FX_GROUP_ORDER, FX_PAIRS } from '@currena/insights/fx/definitions';
 import { TREND_BAND_PCT } from '@currena/insights/markets/definitions';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import type { XlsxSheet } from '../../lib/xlsx-writer';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import type { XlsxSheet } from '../../shared/lib/xlsx-writer';
 import { fxTrendOf } from '../../lib/fx-presentation';
-import { DISPLAY } from './config/display';
-import { positionBand } from './config/bands';
-import { statusWordKeyOf } from './config/labels';
-import { tierOf } from './config/movers';
-import { PRICE_ROWS, TOGETHER_CARD_ORDER } from './config';
-import { SIGNALS_ENABLED, legPhrase } from './config/signals';
+import { DISPLAY } from '../../shared/config/display';
+import { positionBand } from '../../shared/config/bands';
+import { statusWordKeyOf } from '../../shared/config/labels';
+import { tierOf } from '../../shared/config/movers';
+import { PRICE_ROWS, TOGETHER_CARD_ORDER } from '../../shared/config';
+import { SIGNALS_ENABLED, legPhrase } from '../../shared/config/signals';
 import auditJson from '../../../../../data/indicator-audit.json';
 
 /** Defect E-23 (+v3 2026-10-20): the per-indicator licence + rule + risk facts (generated sidecar). */
@@ -896,7 +896,7 @@ export async function buildInsightsExportFile(input: FullExportInput, format: Ex
     case 'csv':
       return { blob: new Blob([buildInsightsFullCsv(input)], { type: 'text/csv;charset=utf-8' }), ext: 'csv' };
     case 'xlsx': {
-      const { buildXlsxBlob } = await import('../../lib/xlsx-writer');
+      const { buildXlsxBlob } = await import('../../shared/lib/xlsx-writer');
       return {
         blob: buildXlsxBlob(buildInsightsXlsxSheets(input), { rtl: input.locale === 'fa' }),
         ext: 'xlsx',

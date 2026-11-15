@@ -22,8 +22,8 @@
 
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 import type { InsightsLoadStateLike } from './global-page-states';
 import {
@@ -37,8 +37,8 @@ import {
   type GlobalMarketsTile,
   type GlobalRibbonEntry,
 } from './global-tiles';
-import { DESTINATIONS } from './destinations';
-import type { NarrativeDoc } from '../../lib/narrative';
+import { DESTINATIONS } from '../../shared/components/destinations';
+import type { NarrativeDoc } from '../../shared/lib/narrative';
 import { formatRelativeShort } from '../../components/insights/world-markets/shared';
 
 /* ------------------------------------------------------------------ *

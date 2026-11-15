@@ -7,8 +7,8 @@
 
 import type { FxPairId, FxRuleId, FxSnapshot } from '@currena/core';
 import { FX_BIG_MOVE_M1_PCT } from '@currena/insights/fx/definitions';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { interpolate } from '../../i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
 import { abs1 } from './format';
 import { PAIR_CURRENCIES } from './pairs';
 import { fxClosestToWarning, fxRuleCopyKey } from './rules';

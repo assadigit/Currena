@@ -32,7 +32,7 @@ import type { GoldBalanceLane, GoldBalanceMember, GoldBalanceReading } from '@cu
 import { BLOCKED_NOTES, GOLD_VOTER_IDS, homePageOfIndicator, pageHomeIds } from '@currena/insights/page-division';
 import type { BlockedNote } from '@currena/insights/page-division';
 import type { PageDivisionPageId } from '@currena/core';
-import { goldOutlookOf, type OutlookState } from '../../components/insights/signals/outlook-core';
+import { goldOutlookOf, type OutlookState } from '../../shared/components/outlook-core';
 import {
   balanceTilt,
   balanceVerdictOf,

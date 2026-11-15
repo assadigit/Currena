@@ -23,13 +23,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatDateWords, formatJalaliDate } from '@currena/core';
 import type { PageProjection } from '@currena/core';
-import { useI18n } from '../../lib/locale';
-import { interpolate } from '../../i18n';
-import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../lib/page-division';
-import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
+import { useI18n } from '../../shared/lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../shared/lib/page-division';
+import { fetchInsightsSnapshot, readCachedSnapshot } from '../../shared/lib/insights';
 import type { InsightsSnapshot } from '@currena/core';
 import { Signals } from '../../components/insights/Signals';
-import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';

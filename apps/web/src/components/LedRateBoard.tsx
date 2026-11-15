@@ -89,9 +89,9 @@ import { memo, useEffect, useMemo, useState } from 'react';
 import { convert } from '@currena/core';
 import type { CurrencyCode, Snapshot } from '@currena/core';
 import { LedClock, LedDate, LedStatus, LedValueCell } from './led/LedParts';
-import { useI18n } from '../lib/locale';
-import { isConfirmedStale, useSnapshotStore } from '../lib/snapshot-store';
-import type { TranslationKey } from '../lib/locale';
+import { useI18n } from '../shared/lib/locale';
+import { isConfirmedStale, useSnapshotStore } from '../shared/lib/snapshot-store';
+import type { TranslationKey } from '../shared/lib/locale';
 
 /** Board currencies — owner-priority five first, then the legacy rest
  *  (order shared with the LiveRates detail cards below the board). */

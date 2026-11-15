@@ -15,10 +15,10 @@
  * of the last ten years were lower than this", not a bare number.
  */
 
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import { positionBand, bandToneClass, type PositionBand } from './config';
+import { interpolate } from '../../shared/i18n';
+import { positionBand, bandToneClass, type PositionBand } from '../../shared/config';
 
 export function PositionBar({
   percentile,

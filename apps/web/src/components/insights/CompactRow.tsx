@@ -19,13 +19,13 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
-import { StatusChip } from './StatusChip';
+import { StatusChip } from '../../shared/components/StatusChip';
 import { CardMetaRow, ChangeText, faceReasonOf } from './CardMeta';
 import { PositionBar } from './PositionBar';
-import { formatAsOf } from './HistoryChart';
+import { formatAsOf } from '../../shared/components/HistoryChart';
 import {
   ALWAYS_POSITION_IDS,
   bandWordsOf,
@@ -42,7 +42,7 @@ import {
   attentionLineOf,
   type DailyPeers,
   type IndicatorTier,
-} from './config';
+} from '../../shared/config';
 
 export function CompactRow({
   reading,

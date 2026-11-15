@@ -14,20 +14,20 @@
 import type { CSSProperties } from 'react';
 import type { SignalReading } from '@currena/insights';
 import { Coins } from 'lucide-react';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../icons/currena';
-import { formatIndicatorValue } from '../config';
-import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from '../TrendChart';
+import { formatIndicatorValue } from '../../../shared/config';
+import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from '../../../shared/components/TrendChart';
 
 /* S3 extraction (2026-11-08): the seven-state outlook classifier moved
  * VERBATIM to ./outlook-core (pure, lean-chunk importable — the Global
  * page's Gold Balance tile needs it without this file's view imports).
  * Re-exported here so every existing import (Signals, the tests) keeps
  * working unchanged. */
-import { outlookOf, type OutlookState } from './outlook-core';
-export { RANGE_SPEED_PCT, goldOutlookOf, outlookOf } from './outlook-core';
-export type { OutlookState } from './outlook-core';
+import { outlookOf, type OutlookState } from '../../../shared/components/outlook-core';
+export { RANGE_SPEED_PCT, goldOutlookOf, outlookOf } from '../../../shared/components/outlook-core';
+export type { OutlookState } from '../../../shared/components/outlook-core';
 
 /* ------------------------------------------------------------------ *
  * The gold/silver OUTLOOK (2026-10-21 owner directive, "Gold Market

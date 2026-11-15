@@ -20,14 +20,14 @@
 import { useMemo } from 'react';
 import type { CalendarEvent, IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatDateWords, formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import {
   bigMovers,
   changeScaleOf,
   definitionFor,
   formatChange,
-} from './config';
+} from '../../shared/config';
 
 function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });

@@ -16,7 +16,7 @@
  * section's verdict box wears it when a pattern is live).
  */
 
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
 
 /** The page's three severity tiers (the chips' own wording lives in copy). */
 type SectionChip = 'normal' | 'attention' | 'unusual' | null;

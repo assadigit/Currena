@@ -30,10 +30,10 @@ export const MANIFEST_PATH = path.join(REPO_ROOT, 'docs', 'localization', 'persi
 
 /** Repository-relative canonical sources of Persian copy. */
 export const SOURCES = {
-  insights: 'apps/web/src/i18n/insights-copy-fa.ts',
-  app: 'apps/web/src/i18n/fa.ts',
-  insightsEn: 'apps/web/src/i18n/insights-copy-en.ts',
-  appEn: 'apps/web/src/i18n/en.ts',
+  insights: 'apps/web/src/shared/i18n/insights-copy-fa.ts',
+  app: 'apps/web/src/shared/i18n/fa.ts',
+  insightsEn: 'apps/web/src/shared/i18n/insights-copy-en.ts',
+  appEn: 'apps/web/src/shared/i18n/en.ts',
   calendar: 'data/insights-calendar.json',
 };
 

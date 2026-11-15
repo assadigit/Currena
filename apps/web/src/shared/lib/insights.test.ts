@@ -33,11 +33,11 @@ import {
   sliceHistoryToRange,
   statusCounts,
   warningZone,
-} from '../components/insights/config';
+} from '../config';
 import { insightsCopyEn } from '../i18n/insights-copy-en';
 import { insightsCopyFa } from '../i18n/insights-copy-fa';
 import { containsForbiddenWords } from '@currena/insights/validation';
-import { definitionFor } from '../components/insights/config';
+import { definitionFor } from '../config';
 import type { InsightsSnapshot, IndicatorReading } from '@currena/core';
 
 /* ------------------------------------------------------------------ *

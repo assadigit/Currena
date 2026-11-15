@@ -40,9 +40,9 @@ import type { ReactNode } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatDate, formatJalaliDate, formatNumber } from '@currena/core';
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { fetchIndicatorHistory } from '../../lib/insights';
+import { interpolate } from '../i18n';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
+import { fetchIndicatorHistory } from '../lib/insights';
 import { formatAsOf } from './HistoryChart';
 import {
   changeToneClass,
@@ -51,7 +51,7 @@ import {
   formatIndicatorValue,
   indicatorValueParts,
   positionBand,
-} from './config';
+} from '../config';
 import { deriveTileStats, type TileStats } from './price-stats';
 import { cleanPriceSeries, window7d, type TrendWindow } from './price-trend';
 

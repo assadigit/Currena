@@ -63,8 +63,8 @@ if (status !== 'processed' && !note) {
 // current live values for the requested ids
 const state = collectState();
 const liveOf = new Map();
-for (const [id, text] of state.insights) liveOf.set(id, { source: 'apps/web/src/i18n/insights-copy-fa.ts', text });
-for (const [id, text] of state.app) liveOf.set(id, { source: 'apps/web/src/i18n/fa.ts', text });
+for (const [id, text] of state.insights) liveOf.set(id, { source: 'apps/web/src/shared/i18n/insights-copy-fa.ts', text });
+for (const [id, text] of state.app) liveOf.set(id, { source: 'apps/web/src/shared/i18n/fa.ts', text });
 for (const [id, text] of state.calendar) liveOf.set(id, { source: 'data/insights-calendar.json', text });
 // audit-report ids for sweep hits carry their own source/line info
 if (reportPath && fs.existsSync(reportPath)) {

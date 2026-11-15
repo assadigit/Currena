@@ -14,7 +14,7 @@
  * private · ready) because it is about the page, not the data.
  */
 
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 
 export function DeprecationBanner(): React.JSX.Element {

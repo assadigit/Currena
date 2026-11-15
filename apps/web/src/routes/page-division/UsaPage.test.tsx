@@ -51,7 +51,7 @@ import { summarizeMarkets } from '@currena/insights/markets';
 import { MARKETS } from '@currena/insights/markets/definitions';
 import { UsaPage } from './UsaPage';
 import { USA_TIER1_IDS, USA_TIER2_IDS, USA_TIER3_IDS, USA_TIER4_IDS, USA_TIER5_IDS } from './usa-tiles';
-import { clearProjectionCacheForTests } from '../../lib/page-division';
+import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)
@@ -538,7 +538,7 @@ describe('UsaPage', () => {
   it('the fa/RTL rendering: the Persian strip title + the Persian card words + the Persian value joins', async () => {
     // The fa locale rides the app's own locale store (the I18nApi's
     // setter — the same door the language switch uses).
-    const { useI18n } = await import('../../lib/locale');
+    const { useI18n } = await import('../../shared/lib/locale');
     function SetLocale({ locale }: { locale: 'en' | 'fa' }): React.JSX.Element | null {
       const { setLocale } = useI18n();
       useEffect(() => {
@@ -582,7 +582,7 @@ describe('UsaPage', () => {
     } finally {
       unmount();
       cleanup();
-      const { useI18n: useI18n2 } = await import('../../lib/locale');
+      const { useI18n: useI18n2 } = await import('../../shared/lib/locale');
       const Probe = (): React.JSX.Element | null => {
         const { setLocale } = useI18n2();
         useEffect(() => {

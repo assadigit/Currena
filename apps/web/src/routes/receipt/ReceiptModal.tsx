@@ -13,9 +13,9 @@
 
 import type { RefObject } from 'react';
 import { formatJalaliDate, formatNumber } from '@currena/core';
-import { Button } from '../../components/ui';
-import { useCodeLabel } from '../../lib/display';
-import { useI18n } from '../../lib/locale';
+import { Button } from '../../shared/ui/ui';
+import { useCodeLabel } from '../../shared/lib/display';
+import { useI18n } from '../../shared/lib/locale';
 import { dateToIso, type GeneratedReceipt } from './shared';
 
 export function ReceiptModal(props: {

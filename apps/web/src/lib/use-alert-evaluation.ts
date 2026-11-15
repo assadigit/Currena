@@ -23,11 +23,11 @@
 import { useEffect, useState } from 'react';
 import { crossesAlert, formatNumber, sourceForPair } from '@currena/core';
 import type { RateAlert } from '@currena/core';
-import { alertsStore, useAlerts } from './alerts';
-import { liveRateView } from './live-rate';
-import { snapshotStore } from './snapshot-store';
-import { useI18n } from './locale';
-import type { TranslationKey } from './locale';
+import { alertsStore, useAlerts } from '../shared/lib/alerts';
+import { liveRateView } from '../shared/lib/live-rate';
+import { snapshotStore } from '../shared/lib/snapshot-store';
+import { useI18n } from '../shared/lib/locale';
+import type { TranslationKey } from '../shared/lib/locale';
 
 /** How long a fired toast stays up (Splitter uses 4s; alerts deserve more). */
 const TOAST_MS = 6000;

@@ -16,8 +16,8 @@ import {
   buildInsightsTxt,
   insightsExportFilename,
 } from './full-export';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 
 function reading(overrides: Partial<IndicatorReading> & Pick<IndicatorReading, 'id'>): IndicatorReading {
   return {

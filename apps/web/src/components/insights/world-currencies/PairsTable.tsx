@@ -12,13 +12,13 @@ import type { ReactElement } from 'react';
 import { formatNumber } from '@currena/core';
 import type { FxPairEntry, FxPairId, FxSnapshot } from '@currena/core';
 import { decodeWeeklySeries } from '@currena/insights/markets/definitions';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
-import { interpolate } from '../../../i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
 import { fxMoneyLine, fxPairRows, fxRuleCopyKey, fxTrendOf } from '../../../lib/fx-presentation';
-import { formatAsOf } from '../HistoryChart';
-import { GlossaryTip } from './GlossaryTip';
+import { formatAsOf } from '../../../shared/components/HistoryChart';
+import { GlossaryTip } from '../../../shared/components/GlossaryTip';
 import { isOld, signedPct } from './display';
-import { Layer1Block } from '../layer1/Layer1Block';
+import { Layer1Block } from '../../../shared/components/layer1/Layer1Block';
 
 /* ------------------------------------------------------------------ *
  * The pairs table (§9.3 item 6) + the pair detail panel (§9.4)

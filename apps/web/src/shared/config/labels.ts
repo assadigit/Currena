@@ -6,7 +6,7 @@
 import { formatNumber, formatDateWords } from '@currena/core';
 import type { IndicatorId, MarketEntry, WarningRule, WarningRuleAtom } from '@currena/core';
 import { cadenceUsesPreviousRelease } from '@currena/insights';
-import { interpolate } from '../../../i18n';
+import { interpolate } from '../i18n';
 import { DISPLAY } from './display';
 import type { UnitLabels, UnitToken } from './display';
 import { definitionFor } from './sections';

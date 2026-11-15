@@ -7,7 +7,7 @@
 import { useState } from 'react';
 import type { FxPairEntry, FxPairId, FxRuleState, FxSnapshot } from '@currena/core';
 import { fxRuleHasPatternCheck } from '@currena/insights/fx/definitions';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import {
   fxChangeLine,
   fxHeadlineVerdict,
@@ -18,7 +18,7 @@ import {
 } from '../../../lib/fx-presentation';
 import { signedPct } from './display';
 import { Dots13, RebasedChart } from './PatternVisuals';
-import { Layer1Block } from '../layer1/Layer1Block';
+import { Layer1Block } from '../../../shared/components/layer1/Layer1Block';
 
 /* ------------------------------------------------------------------ *
  * One pattern card (§9.3 item 3): Level 1 row → Level 2 opened → Level 3

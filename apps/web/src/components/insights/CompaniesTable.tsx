@@ -31,7 +31,7 @@
 import { COMPANIES, COMPANIES_COUNT, COMPANY_EXCHANGE_LABELS } from '@currena/insights';
 import type { CompanyDefinition } from '@currena/insights';
 import { formatNumber } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { COMPANIES_TABLE_ENABLED } from './config/companies';
 
 export function CompaniesTable({

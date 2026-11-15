@@ -39,15 +39,15 @@ import {
   sourceForPair,
 } from '@currena/core';
 import type { CurrencyCode, SnapshotSource } from '@currena/core';
-import { CurrencySelect } from '../components/CurrencySelect';
-import { Button, Card, LoaderDots, Switch, Toast } from '../components/ui';
-import { useDialogFocus } from '../components/useDialogFocus';
-import { useCodeLabel } from '../lib/display';
-import { downloadBlob } from '../lib/download';
-import { uniqueId } from '../lib/id';
-import { useI18n } from '../lib/locale';
-import type { TranslationKey } from '../lib/locale';
-import { snapshotStore, useSnapshotStore } from '../lib/snapshot-store';
+import { CurrencySelect } from '../shared/components/CurrencySelect';
+import { Button, Card, LoaderDots, Switch, Toast } from '../shared/ui/ui';
+import { useDialogFocus } from '../shared/hooks/useDialogFocus';
+import { useCodeLabel } from '../shared/lib/display';
+import { downloadBlob } from '../shared/lib/download';
+import { uniqueId } from '../shared/lib/id';
+import { useI18n } from '../shared/lib/locale';
+import type { TranslationKey } from '../shared/lib/locale';
+import { snapshotStore, useSnapshotStore } from '../shared/lib/snapshot-store';
 import { ExpenseItemRow } from './receipt/ExpenseItemRow';
 import { OptionsPanel } from './receipt/OptionsPanel';
 import { ReceiptModal } from './receipt/ReceiptModal';
@@ -316,7 +316,7 @@ export function Receipt() {
       // BACKLOG #27: headers/sheet name go through the dictionary (fa users
       // get Persian headers); cell NUMBERS stay raw numbers — a spreadsheet
       // is a data artifact, and the writer types them as numbers.
-      const { buildXlsxBlob } = await import('../lib/xlsx-writer');
+      const { buildXlsxBlob } = await import('../shared/lib/xlsx-writer');
       const data: (string | number | null)[][] = [
         [t('receipt.excelHeading')],
         [t('common.date'), receipt.date],

@@ -13,7 +13,7 @@
  */
 
 import type { MarketId } from '@currena/core';
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 import type { WorldMapCopy } from '../../components/insights/world-markets/WorldMap';
 
 /* ------------------------------------------------------------------ *

@@ -14,10 +14,10 @@
  */
 
 import { useEffect } from 'react';
-import { Button, Card } from '../components/ui';
+import { Button, Card } from '../shared/ui/ui';
 import { navigate } from '../router';
-import { useI18n } from '../lib/locale';
-import type { TranslationKey } from '../lib/locale';
+import { useI18n } from '../shared/lib/locale';
+import type { TranslationKey } from '../shared/lib/locale';
 import { ABOUT_SCROLL_TARGET } from '../components/Footer';
 
 /** The 5 legacy feature bullets with their emoji (captured about.html). */

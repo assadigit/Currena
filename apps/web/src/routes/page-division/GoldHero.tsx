@@ -33,8 +33,8 @@
 import { useState } from 'react';
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
 import type { GoldHeroModel } from './gold-tiles';
 import { GOLD_DISPLAY, goldHeroCounts, goldHeroTilt, goldHeroVerdict, goldHeroVerdictState } from './gold-tiles';
 import { GoldBalanceClassic } from './GoldBalanceClassic';

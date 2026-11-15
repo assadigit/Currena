@@ -11,11 +11,11 @@
  */
 
 import type { Transfer } from '@currena/core';
-import { Button } from '../../components/ui';
-import { useCodeLabel } from '../../lib/display';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
-import { useRovingKeys } from '../../components/use-roving-keys';
+import { Button } from '../../shared/ui/ui';
+import { useCodeLabel } from '../../shared/lib/display';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
+import { useRovingKeys } from '../../shared/hooks/use-roving-keys';
 import type { SettleGroup } from '../../lib/settle-storage';
 import { ExpensePhoto } from './ExpensePhoto';
 import { fmt2 } from './shared';

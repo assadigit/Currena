@@ -26,8 +26,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { formatNumber } from '@currena/core';
 import { CalendarDays, Download, KeyRound, Search, Wrench } from 'lucide-react';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import type { StatusFilter } from './config';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import type { StatusFilter } from '../../shared/config';
 import { clampPanelToViewport } from '../../lib/clamp-panel';
 
 /** v3 UI-51: POST /api/insights/owner/session's outcomes, mapped to the

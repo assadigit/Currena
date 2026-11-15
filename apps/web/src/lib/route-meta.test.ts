@@ -19,7 +19,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ROUTES } from '../router';
-import { getDictionary } from '../i18n';
+import { getDictionary } from '../shared/i18n';
 import { routeMetaFor, setCanonical, setMetaTag } from './route-meta';
 
 /** The S1 title switch, restated here as the regression pin. */

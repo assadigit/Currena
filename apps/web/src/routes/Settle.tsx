@@ -43,9 +43,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { computeBalances, parseAmount, settleDebts } from '@currena/core';
-import { uniqueId } from '../lib/id';
+import { uniqueId } from '../shared/lib/id';
 import type { CurrencyCode, Transfer } from '@currena/core';
-import { Button, Card, Toast } from '../components/ui';
+import { Button, Card, Toast } from '../shared/ui/ui';
 import {
   persistSettleGroups,
   readSettleGroups,
@@ -53,7 +53,7 @@ import {
 } from '../lib/settle-storage';
 import type { SettleGroup, SettleExpense } from '../lib/settle-storage';
 import { deletePhotos, putPhoto } from '../lib/photo-store';
-import { useI18n } from '../lib/locale';
+import { useI18n } from '../shared/lib/locale';
 import { AddExpenseModal } from './settle/AddExpenseModal';
 import { CreateGroupModal } from './settle/CreateGroupModal';
 import { GroupCard } from './settle/GroupCard';

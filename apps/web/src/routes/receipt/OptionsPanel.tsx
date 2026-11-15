@@ -9,8 +9,8 @@
  */
 
 import { thousandSeparateInput } from '@currena/core';
-import { Switch } from '../../components/ui';
-import { useI18n } from '../../lib/locale';
+import { Switch } from '../../shared/ui/ui';
+import { useI18n } from '../../shared/lib/locale';
 import { inputClass, todayStr } from './shared';
 
 export function OptionsPanel(props: {

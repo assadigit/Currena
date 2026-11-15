@@ -27,8 +27,8 @@
  */
 
 import type { IndicatorReading } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import type { IndicatorTier } from './config';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
+import type { IndicatorTier } from '../config';
 
 /** The copy.status key whose word this chip renders (v3 six-word table). */
 export type ChipWordKey =

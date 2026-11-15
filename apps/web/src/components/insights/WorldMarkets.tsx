@@ -43,10 +43,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { MarketEntry, MarketId } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { MARKETS, MARKET_GROUP_ORDER } from '@currena/insights/markets/definitions';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { IconImg, MARKETS_SECTION_ICON_URL } from '../icons/currena';
-import { Skeleton } from '../ui';
+import { Skeleton } from '../../shared/ui/ui';
 import { MarketDetail, MarketTile } from './world-markets/MarketTile';
 import { MarketsVerdictBox } from './world-markets/MarketsVerdict';
 import { MarketsTable } from './world-markets/MarketsTable';
@@ -58,7 +58,7 @@ import { formatDateShort, formatRelativeShort, isOld, type MarketsLoadState, typ
 import { allMarketsClosed } from './world-markets/session';
 import { NarrativeBlock } from './NarrativeBlock';
 import { InTheNews } from './InTheNews';
-import type { NarrativeUnit } from '../../lib/narrative';
+import type { NarrativeUnit } from '../../shared/lib/narrative';
 
 // Stable external surface (the pre-split importers keep working):
 export type { MarketsLoadState } from './world-markets/shared';

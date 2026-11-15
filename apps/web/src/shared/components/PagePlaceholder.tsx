@@ -18,9 +18,9 @@
  * RegionPage) — zero copy or behavior change here.
  */
 
-import { useI18n } from '../../lib/locale';
+import { useI18n } from '../lib/locale';
 import { useRoute } from '../../router';
-import { Card } from '../../components/ui';
+import { Card } from '../ui/ui';
 import { destinationFor } from './destinations';
 import { DestinationBody } from './DestinationBody';
 

@@ -18,9 +18,9 @@
 import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { pageGroupIds, pageHomeIds, PAGE_PLACEMENTS_BY_PAGE } from '@currena/insights/page-division';
-import { DISPLAY, formatReadingValue, type UnitLabels } from '../../components/insights/config/display';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { DISPLAY, formatReadingValue, type UnitLabels } from '../../shared/config/display';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import {
   EUROPE_CARD_DISPLAY,
   EUROPE_CARD_IDS,

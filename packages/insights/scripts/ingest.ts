@@ -86,7 +86,7 @@ if (!dryRun && store === undefined) {
 // (the Worker omits it — the CI corpus tests cover the templates there).
 const repoRoot = new URL('../../../', import.meta.url);
 const copyTexts: string[] = [];
-for (const dictPath of ['apps/web/src/i18n/insights-copy-en.ts', 'apps/web/src/i18n/insights-copy-fa.ts']) {
+for (const dictPath of ['apps/web/src/shared/i18n/insights-copy-en.ts', 'apps/web/src/shared/i18n/insights-copy-fa.ts']) {
   try {
     const raw = readFileSync(new URL(dictPath, repoRoot), 'utf8');
     const stripped = raw

@@ -30,9 +30,9 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { formatJalaliDate } from '@currena/core';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import type { InsightsSnapshot } from '@currena/core';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
-import { DetailsPanel } from './DetailsPanel';
+import { insightsCopyEn } from '../i18n/insights-copy-en';
+import { insightsCopyFa } from '../i18n/insights-copy-fa';
+import { DetailsPanel } from '../../components/insights/DetailsPanel';
 import { PricesBoard } from './PricesBoard';
 
 /* ------------------------------------------------------------------ *

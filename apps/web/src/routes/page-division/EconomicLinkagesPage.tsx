@@ -18,10 +18,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatDateWords, formatJalaliDate } from '@currena/core';
 import type { InsightsSnapshot } from '@currena/core';
-import { useI18n } from '../../lib/locale';
-import { interpolate } from '../../i18n';
-import { fetchInsightsSnapshot, readCachedSnapshot } from '../../lib/insights';
-import { useInsightsCopy } from '../../components/insights/useInsightsCopy';
+import { useI18n } from '../../shared/lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { fetchInsightsSnapshot, readCachedSnapshot } from '../../shared/lib/insights';
+import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { Together } from '../../components/insights/Together';
 import { GLOBAL_CONNECTION_IDS } from '../../components/insights/connection-groups';
 import { homePageOfIndicator } from '@currena/insights/page-division';

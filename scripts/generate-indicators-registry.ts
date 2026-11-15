@@ -24,13 +24,13 @@ import { RULE_VERSION } from '../packages/insights/src/ruleVersion';
 // @ts-expect-error — same.
 import { staleAfterDaysFor, GRACE_DAYS } from '../packages/insights/src/scoring';
 // @ts-expect-error — same.
-import { DISPLAY } from '../apps/web/src/components/insights/config/display';
+import { DISPLAY } from '../apps/web/src/shared/config/display';
 // @ts-expect-error — same (Step 3 §8 licence block, 2026-10-16).
 import { licenceForProvider, fredLicenceForSeries, type FredCopyrightRecord, type SourceLicence } from '../packages/insights/src/licences';
 // @ts-expect-error — same (Step 3 §8 v3 source-risk block, 2026-10-20).
 import { riskSummaryForLegs, upstreamLegsFor, riskRowForLeg, UPSTREAM_LEGS } from '../packages/insights/src/sources';
 // @ts-expect-error — the EN copy is the §8 what-it-is text source of record (2026-10-20).
-import { insightsCopyEn } from '../apps/web/src/i18n/insights-copy-en';
+import { insightsCopyEn } from '../apps/web/src/shared/i18n/insights-copy-en';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outPath = join(here, '..', 'data', 'indicators.json');
@@ -393,9 +393,9 @@ const registry = {
   version: RULE_VERSION,
   graceDayDefaults: GRACE_DAYS,
   generatedFrom:
-    'packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/components/insights/config/display.ts + src/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)',
+    'packages/insights/src/definitions.ts + src/adapters/derived.ts (READING_SOURCES) + src/gauges.ts + src/ruleVersion.ts + apps/web/src/shared/config/display.ts + src/licences.ts (Step 3 §8 licence block, T-16 scan data/fred-copyright.json)',
   textTemplates:
-    'apps/web/src/i18n/insights-copy-en.ts (and insights-copy-fa.ts): every card sentence is produced from a status-keyed template (highRising / highEasing / typical / low / jumping, oneLiner fallback) interpolated with the live value — fix spec A-02.',
+    'apps/web/src/shared/i18n/insights-copy-en.ts (and insights-copy-fa.ts): every card sentence is produced from a status-keyed template (highRising / highEasing / typical / low / jumping, oneLiner fallback) interpolated with the live value — fix spec A-02.',
   indicators,
 };
 

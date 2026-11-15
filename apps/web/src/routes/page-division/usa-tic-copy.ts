@@ -17,8 +17,8 @@
  * Pure (no platform imports) so it rides the lean USA chunk.
  */
 
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import type { TicSectionCopy } from '../../components/insights/TicSection';
 
 /** The 37 corpus tic keys (camelCase, the corpus's own names). */

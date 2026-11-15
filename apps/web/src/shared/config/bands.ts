@@ -6,8 +6,8 @@
 
 import type { IndicatorReading, WarningRule } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../../i18n';
-import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../../../i18n/insights-copy-en';
+import { interpolate } from '../i18n';
+import type { IndicatorCopyEntry, ConsequenceLines, InsightsCopy } from '../i18n/insights-copy-en';
 import { formatRuleText } from './labels';
 import { formatIndicatorValue } from './display';
 import { definitionFor } from './sections';

@@ -10,11 +10,11 @@ import type { MarketEntry, MarketId } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { decodeWeeklySeries } from '@currena/insights/markets/definitions';
 import { MarketsChart } from '../MarketsChart';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
-import { formatAsOf } from '../HistoryChart';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { formatAsOf } from '../../../shared/components/HistoryChart';
 import { MarketLogo } from './MarketLogo';
-import { Layer1Block } from '../layer1/Layer1Block';
+import { Layer1Block } from '../../../shared/components/layer1/Layer1Block';
 
 import {
   DirTriangle,

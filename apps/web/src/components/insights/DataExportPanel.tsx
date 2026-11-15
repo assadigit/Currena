@@ -20,7 +20,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { FileSpreadsheet, FileText, Server, Table2 } from 'lucide-react';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import type { ExportFormat } from './full-export';
 import { clampPanelToViewport } from '../../lib/clamp-panel';
 
@@ -69,7 +69,7 @@ export default function DataExportPanel({
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const blob = await res.blob();
-        const { downloadBlob } = await import('../../lib/download');
+        const { downloadBlob } = await import('../../shared/lib/download');
         const filename =
           filenameFromDisposition(res.headers.get('Content-Disposition')) ?? `currena-insights-export-${new Date().toISOString().slice(0, 10)}.md`;
         downloadBlob(blob, filename);

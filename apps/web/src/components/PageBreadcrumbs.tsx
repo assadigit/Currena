@@ -26,9 +26,9 @@
  * page's own heading block, so it renders in the ready + cached states.
  */
 
-import { useI18n } from '../lib/locale';
+import { useI18n } from '../shared/lib/locale';
 import { navigate } from '../router';
-import type { TranslationKey } from '../lib/locale';
+import type { TranslationKey } from '../shared/lib/locale';
 
 export function PageBreadcrumbs({ pageKey }: { pageKey: TranslationKey }): React.JSX.Element {
   const { t } = useI18n();

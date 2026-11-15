@@ -22,8 +22,8 @@
 import type { CSSProperties } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { IconImg, moneyAreaIconUrl } from '../icons/currena';
 import {
   formatIndicatorValue,
@@ -31,8 +31,8 @@ import {
   moneyDirectionToneClass,
   moneyPanel,
   type MoneyAreaId,
-  type MoneyDirection, definitionFor } from './config';
-import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from './TrendChart';
+  type MoneyDirection, definitionFor } from '../../shared/config';
+import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from '../../shared/components/TrendChart';
 
 /** The area icons — rendered INSIDE a large tinted box. Owner follow-up
  * 11 Oct: "increase the icon size, something visible like 64×64" → round

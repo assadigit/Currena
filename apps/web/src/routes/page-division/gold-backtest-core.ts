@@ -35,7 +35,7 @@ import {
   gfLaneBalance,
   gfMoveMapWith,
 } from '@currena/insights/gf-p0-proposed';
-import { goldOutlookOf } from '../../components/insights/signals/outlook-core';
+import { goldOutlookOf } from '../../shared/components/outlook-core';
 import { GOLD_CONTEXT_IDS, goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
 import { balanceTilt, balanceVerdictOf } from '../../components/insights/signals/BalanceScale';
 

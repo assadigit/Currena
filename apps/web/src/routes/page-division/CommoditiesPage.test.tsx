@@ -48,7 +48,7 @@ import {
   COMMODITIES_TRADE_ROUTES_IDS,
   COMMODITIES_GOLD_HREF,
 } from './commodities-tiles';
-import { clearProjectionCacheForTests } from '../../lib/page-division';
+import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)
@@ -356,7 +356,7 @@ describe('CommoditiesPage', () => {
   it('the fa/RTL rendering: the Persian title + the Persian group heading + the Persian card value joins', async () => {
     // The fa locale rides the app's own locale store (the I18nApi's
     // setter — the same door the language switch uses).
-    const { useI18n } = await import('../../lib/locale');
+    const { useI18n } = await import('../../shared/lib/locale');
     function SetLocale({ locale }: { locale: 'en' | 'fa' }): React.JSX.Element | null {
       const { setLocale } = useI18n();
       useEffect(() => {
@@ -405,7 +405,7 @@ describe('CommoditiesPage', () => {
     } finally {
       unmount();
       cleanup();
-      const { useI18n: useI18n2 } = await import('../../lib/locale');
+      const { useI18n: useI18n2 } = await import('../../shared/lib/locale');
       const Probe = (): React.JSX.Element | null => {
         const { setLocale } = useI18n2();
         useEffect(() => {

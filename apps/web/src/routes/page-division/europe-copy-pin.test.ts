@@ -18,10 +18,10 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { en } from '../../i18n/en';
-import { fa } from '../../i18n/fa';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { en } from '../../shared/i18n/en';
+import { fa } from '../../shared/i18n/fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import { EUROPE_CARD_IDS } from './europe-tiles';
 
 type Pd = typeof en.pd.europe;

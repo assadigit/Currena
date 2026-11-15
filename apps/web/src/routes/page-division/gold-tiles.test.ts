@@ -27,7 +27,7 @@ import { describe, expect, it } from 'vitest';
 import type { IndicatorReading } from '@currena/core';
 import { goldBalance } from '@currena/insights';
 import { GOLD_VOTER_IDS, homePageOfIndicator, pageHomeIds } from '@currena/insights/page-division';
-import { DISPLAY } from '../../components/insights/config';
+import { DISPLAY } from '../../shared/config';
 import { balanceTilt, balanceVerdictOf, type BalanceCounts } from '../../components/insights/signals/BalanceScale';
 import {
   GOLD_BLOCKED_NOTES,

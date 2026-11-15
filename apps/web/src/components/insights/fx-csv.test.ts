@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { FxPairEntry, FxSnapshot } from '@currena/core';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
 import { buildFxCsv, fxCsvFilename, fxCsvHeaders } from './fx-csv';
 
 function pairOf(id: FxPairEntry['id'], m1: number): FxPairEntry {

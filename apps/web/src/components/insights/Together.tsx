@@ -22,10 +22,10 @@ import { formatNumber } from '@currena/core';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { evaluateConnections, type ConnectionReading } from '@currena/insights';
 import { ChevronDown } from 'lucide-react';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { ConnectionCard } from './ConnectionCard';
-import { TOGETHER_CARD_ORDER, connectionSummaryInfo, togetherSummary } from './config';
+import { TOGETHER_CARD_ORDER, connectionSummaryInfo, togetherSummary } from '../../shared/config';
 
 const STORAGE_KEY = 'currena.insights.together-open.v1';
 

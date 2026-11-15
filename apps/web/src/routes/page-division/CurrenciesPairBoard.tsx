@@ -32,9 +32,9 @@ import { useMemo } from 'react';
 import type { FxPairEntry, FxPairId, FxSnapshot } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { decodeWeeklySeries } from '@currena/insights/markets/definitions';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import { signedPct } from '../../components/insights/world-currencies/display';
 import { CURRENCIES_BOARD_PAIR_IDS } from './currencies-tiles';
 

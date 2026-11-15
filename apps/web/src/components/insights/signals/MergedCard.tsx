@@ -34,10 +34,10 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import type { SignalConditionReading, SignalReading } from '@currena/insights';
 import { breakevenTiltLean, goldBalance, type GoldBalanceLane, type GoldBalanceMember } from '@currena/insights';
-import { interpolate } from '../../../i18n';
-import type { InsightsCopy } from '../../../i18n/insights-copy-en';
-import { formatChange, formatIndicatorValue, mergeSignals } from '../config';
-import { chipWordKeyOf } from '../StatusChip';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { formatChange, formatIndicatorValue, mergeSignals } from '../../../shared/config';
+import { chipWordKeyOf } from '../../../shared/components/StatusChip';
 import {
   BalanceScale,
   balanceVerdictCountsParts,

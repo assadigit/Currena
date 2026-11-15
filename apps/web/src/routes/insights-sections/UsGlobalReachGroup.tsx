@@ -29,7 +29,7 @@
 
 import { useMemo } from 'react';
 import type { IndicatorId, IndicatorReading, InsightsSnapshot } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { AlertCard } from '../../components/insights/AlertCard';
 import { CompactRow } from '../../components/insights/CompactRow';
 import {
@@ -38,7 +38,7 @@ import {
   dailyPeersOf,
   tierIsCard,
   tierOf,
-} from '../../components/insights/config';
+} from '../../shared/config';
 import { usGlobalBrief } from '../../components/insights/config/us-global-reach';
 
 export function UsGlobalReachGroup({

@@ -37,7 +37,7 @@ import { summarizeMarkets } from '@currena/insights/markets';
 import { WorldMarketsPage } from './WorldMarketsPage';
 import { worldMarketsRows, worldMarketsStatus } from './world-markets-tiles';
 import { marketBreadth, topMovers } from '../../components/insights/world-markets/briefing';
-import { clearProjectionCacheForTests } from '../../lib/page-division';
+import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)

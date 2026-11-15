@@ -27,8 +27,8 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { useI18n } from '../lib/locale';
-import { HEADER_ICON_BUTTON_CLASS } from './ui';
+import { useI18n } from '../shared/lib/locale';
+import { HEADER_ICON_BUTTON_CLASS } from '../shared/ui/ui';
 
 /** Chrome's non-standard install-prompt event (not in lib.dom). */
 interface BeforeInstallPromptEvent extends Event {

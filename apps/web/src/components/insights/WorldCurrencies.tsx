@@ -34,11 +34,11 @@ import { useCallback, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { formatNumber } from '@currena/core';
 import type { FxPairId, FxRuleState, FxSnapshot } from '@currena/core';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { interpolate } from '../../i18n';
-import { Skeleton } from '../ui';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import { Skeleton } from '../../shared/ui/ui';
 import { fxHeadline, fxMeasureKey, fxPatternOrder } from '../../lib/fx-presentation';
-import { SectionVerdictLine } from './SectionVerdictLine';
+import { SectionVerdictLine } from '../../shared/components/SectionVerdictLine';
 import { DollarRow } from './world-currencies/DollarRow';
 import { HowToRead, PlainWords } from './world-currencies/ReadingAids';
 import { PairDetail, PairsTable } from './world-currencies/PairsTable';
@@ -47,7 +47,7 @@ import { QuietArea } from './world-currencies/QuietArea';
 import { formatDateShort, isOld } from './world-currencies/display';
 import { NarrativeBlock } from './NarrativeBlock';
 import { InTheNews } from './InTheNews';
-import type { NarrativeUnit } from '../../lib/narrative';
+import type { NarrativeUnit } from '../../shared/lib/narrative';
 
 /** The page-level feed state (owned by Insights.tsx, passed down). */
 export type FxLoadState =

@@ -19,9 +19,9 @@
 import type { MarketId, MarketsSnapshot, MarketGroupId } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { MARKET_GROUP_ORDER } from '@currena/insights/markets/definitions';
-import { interpolate } from '../../i18n';
-import { useI18n } from '../../lib/locale';
-import type { TranslationKey } from '../../lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import { DirTriangle, NO_READING, returnToneClass, signOf, signedPct } from '../../components/insights/world-markets/shared';
 import type { WorldMarketsRegionModel, WorldMarketsRowModel } from './world-markets-tiles';
 import { worldMarketsRegionGrids } from './world-markets-tiles';

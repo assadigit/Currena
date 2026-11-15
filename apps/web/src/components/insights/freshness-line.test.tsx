@@ -20,8 +20,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
 import type { IndicatorReading } from '@currena/core';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import { CardMetaRow, freshnessAsOfLineOf } from './CardMeta';
 
 const NOW = '2026-10-28T04:10:00.000Z';

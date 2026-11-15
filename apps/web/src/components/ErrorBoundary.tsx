@@ -5,8 +5,8 @@
  */
 
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Button, Card } from './ui';
-import { useI18n } from '../lib/locale';
+import { Button, Card } from '../shared/ui/ui';
+import { useI18n } from '../shared/lib/locale';
 import { navigate } from '../router';
 
 interface Props {

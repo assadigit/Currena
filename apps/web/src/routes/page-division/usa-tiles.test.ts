@@ -23,9 +23,9 @@ import { describe, expect, it } from 'vitest';
 import type { IndicatorReading } from '@currena/core';
 import { GAUGES, gaugeReading, labelForVerdictStep } from '@currena/insights';
 import { THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS, pageGroupIds, pageHomeIds, PAGE_PLACEMENTS_BY_PAGE } from '@currena/insights/page-division';
-import { DISPLAY, formatReadingValue, type UnitLabels } from '../../components/insights/config/display';
-import { insightsCopyEn } from '../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../i18n/insights-copy-fa';
+import { DISPLAY, formatReadingValue, type UnitLabels } from '../../shared/config/display';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import { globalGaugeTiles } from './global-tiles';
 import {
   USA_CARD_DISPLAY,

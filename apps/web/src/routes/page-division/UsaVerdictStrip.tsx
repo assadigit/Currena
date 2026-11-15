@@ -24,11 +24,11 @@
  * chunk, never the entry graph.
  */
 
-import { useI18n } from '../../lib/locale';
-import { interpolate } from '../../i18n';
+import { useI18n } from '../../shared/lib/locale';
+import { interpolate } from '../../shared/i18n';
 import { navigate } from '../../router';
 import { formatNumber } from '@currena/core';
-import type { TranslationKey } from '../../lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
 import type { UsaGaugeVerdict } from './usa-tiles';
 
 /* Local mirrors of the shared verdict vocabulary (cited, never forked —

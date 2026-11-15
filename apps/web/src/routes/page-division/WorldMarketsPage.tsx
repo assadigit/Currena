@@ -27,10 +27,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatDateWords, formatJalaliDate } from '@currena/core';
 import type { MarketId, PageProjection } from '@currena/core';
-import { useI18n } from '../../lib/locale';
-import { interpolate } from '../../i18n';
-import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../lib/page-division';
-import { fetchMarketsSnapshot, readCachedMarkets } from '../../lib/markets';
+import { useI18n } from '../../shared/lib/locale';
+import { interpolate } from '../../shared/i18n';
+import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../shared/lib/page-division';
+import { fetchMarketsSnapshot, readCachedMarkets } from '../../shared/lib/markets';
 import { WorldMarketsHero } from './WorldMarketsHero';
 import type { WorldMarketsBoardState } from './WorldMarketsHero';
 import { WorldMarketsBriefing } from './WorldMarketsBriefing';

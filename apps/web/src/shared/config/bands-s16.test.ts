@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import type { IndicatorReading } from '@currena/core';
 import { attentionLineOf } from './bands';
-import { insightsCopyEn } from '../../../i18n/insights-copy-en';
+import { insightsCopyEn } from '../i18n/insights-copy-en';
 
 const reading = (fields: Partial<IndicatorReading>): IndicatorReading =>
   ({

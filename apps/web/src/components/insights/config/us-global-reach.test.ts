@@ -13,10 +13,10 @@
 
 import { describe, expect, it } from 'vitest';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { insightsCopyEn } from '../../../i18n/insights-copy-en';
-import { insightsCopyFa } from '../../../i18n/insights-copy-fa';
-import { formatIndicatorValue } from './display';
-import { US_GLOBAL_REACH_IDS } from './sections';
+import { insightsCopyEn } from '../../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../../shared/i18n/insights-copy-fa';
+import { formatIndicatorValue } from '../../../shared/config/display';
+import { US_GLOBAL_REACH_IDS } from '../../../shared/config/sections';
 import { usCostsBand, usGlobalBrief, usGlobalBriefLegs, usInflationBand, usStressBand } from './us-global-reach';
 
 const copy = insightsCopyEn;

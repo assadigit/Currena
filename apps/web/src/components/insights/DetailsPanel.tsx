@@ -15,16 +15,16 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
-import { ApiError, fetchIndicatorHistory } from '../../lib/insights';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
+import { ApiError, fetchIndicatorHistory } from '../../shared/lib/insights';
 import { Star, X } from 'lucide-react';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
-import { HistoryChart, formatAsOf } from './HistoryChart';
-import { PRICE_ROWS, definitionFor, formatRuleText, formatUtcHm } from './config';
-import { PriceDetailsSections } from './PriceDetails';
+import { HistoryChart, formatAsOf } from '../../shared/components/HistoryChart';
+import { PRICE_ROWS, definitionFor, formatRuleText, formatUtcHm } from '../../shared/config';
+import { PriceDetailsSections } from '../../shared/components/PriceDetails';
 import { staleAfterDaysFor, RULE_CHANGELOG, RULE_VERSION } from '@currena/insights';
-import { getIndicatorCopy, getGlossary, getLayer1Ui } from './layer1';
+import { getIndicatorCopy, getGlossary, getLayer1Ui } from '../../shared/components/layer1';
 
 function Section({ title, body, emphasis }: { title: string; body: string; emphasis?: boolean }) {
   return (

@@ -5,7 +5,7 @@
 
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { useI18n, type TranslationKey } from '../../lib/locale';
+import { useI18n, type TranslationKey } from '../../shared/lib/locale';
 
 const POSITION_IDS = ['cftc-gold-positioning', 'cftc-gold-gross-long'] as const;
 

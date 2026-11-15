@@ -24,8 +24,8 @@
  */
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { IconImg, indicatorIconUrl } from '../icons/currena';
 import {
   ALWAYS_POSITION_IDS,
@@ -43,12 +43,12 @@ import {
   tierOf,
   type DailyPeers,
   type IndicatorTier,
-} from './config';
+} from '../../shared/config';
 import { CardMetaRow, ChangeText, faceReasonOf } from './CardMeta';
 import { PositionBar } from './PositionBar';
-import { StatusChip } from './StatusChip';
-import { formatAsOf } from './HistoryChart';
-import { getIndicatorCopy } from './layer1';
+import { StatusChip } from '../../shared/components/StatusChip';
+import { formatAsOf } from '../../shared/components/HistoryChart';
+import { getIndicatorCopy } from '../../shared/components/layer1';
 import type { IndicatorReading as Reading } from '@currena/core';
 
 export function AlertCard({

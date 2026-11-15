@@ -9,8 +9,8 @@
 import type { IndicatorGroupId, IndicatorId, InsightsSnapshot } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
 import { Search } from 'lucide-react';
-import { interpolate } from '../../i18n';
-import type { InsightsCopy } from '../../i18n/insights-copy-en';
+import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { CompactRow } from '../../components/insights/CompactRow';
 import { IconImg, sectionIconUrl } from '../../components/icons/currena';
 import {
@@ -21,11 +21,11 @@ import {
   dailyPeersOf,
   type DailyPeers,
   type StatusFilter,
-} from '../../components/insights/config';
+} from '../../shared/config';
 import { num, QuestionGroup } from './QuestionGroup';
 import { NarrativeBlock } from '../../components/insights/NarrativeBlock';
 import { InTheNews } from '../../components/insights/InTheNews';
-import type { NarrativeUnit } from '../../lib/narrative';
+import type { NarrativeUnit } from '../../shared/lib/narrative';
 import { Fragment } from 'react';
 import type { ReactNode } from 'react';
 
