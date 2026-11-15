@@ -1,3 +1,13 @@
+/* eslint-disable no-undef, @typescript-eslint/no-require-imports --
+ * This is a CommonJS node script (run via `node scripts/m3-live-verify.cjs`
+ * after a deploy); require/console/process are the correct globals here.
+ * The repo's eslint config grants globals.node to the scripts mjs glob but
+ * not the cjs glob (the M1 R12 scope pass covered the modularization
+ * skeleton roots, not cjs node scripts); rather than extend the scope for
+ * one file, this file-level disable is the minimal isolated fix (BD-M4 D0:
+ * the M3 bookkeeping commit 7447a3e7 landed m3-live-verify.cjs AFTER the
+ * M3 gates runs, so its 5 node-globals lint errors were never caught and
+ * origin/main lint went red). */
 /* M3 post-deploy live verify — the /usa leg + the legacy /insights leg
  * (world-feeds borrows TicSection across the new tree) + FA/RTL + mobile.
  * Zero console errors required on every leg. */
