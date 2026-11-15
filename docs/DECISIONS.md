@@ -11,6 +11,65 @@
 > A–K, rounds 1–3), and the per-session delivery records in
 > `docs/page-division/01-SESSION-ROADMAP.md`.
 
+## 2026-11-15 — BD-M1 (modularization Phase 1, blocked): the baseline-gates STOP — Phase 1 not started on a red baseline; the TM-series gate drift diagnosed and the repair session ordered; the §3.1 deviations recorded as owner-approved
+
+- **The request:** the owner's M1 session prompt — execute
+  modularization Phase 1 (the folder skeleton + one scope README per
+  folder + the lint/tsconfig scope pass; zero code moves), with the
+  audit's §3.1 deviations D1–D10 pre-approved, plus the standing TM1
+  treemap deploy after green gates.
+- **Decision 1 — the STOP is honored, not overridden:** the session
+  prompt's own rule ("run pnpm gates once before touching anything…
+  If the baseline is red, STOP and report — never start a phase on a
+  red baseline") is the operative instruction, and AGENTS.md §5
+  ("Before every deploy: the build and tests pass") extends the same
+  block to the TM1 deploy. The baseline at HEAD `45172b3` is red in
+  5 of 9 gates, so: no skeleton folders, no READMEs, no
+  eslint/tsconfig edits, no deploy. Only this docs commit. Options
+  considered: (a) fix the five failures inside M1 and proceed —
+  rejected: the session's scope is deliberately minimal so later
+  modularization diffs stay clean, and mixing unrelated code fixes
+  into the skeleton commit would contaminate every future revert
+  boundary; (b) proceed with the skeleton anyway (folders can't break
+  gates) — rejected: it would burn the phase's "baseline gates
+  recorded; final gates 9/9, suite count identical" done-criterion on
+  a false green and normalize starting phases on red baselines;
+  (c) STOP, diagnose fully, hand the repair to a dedicated session —
+  chosen.
+- **Decision 2 — the diagnosis is attributed, not just observed:** a
+  worktree at `7a7a82ed` (2026-11-12, S31's deploy record — the last
+  full-gates-green commit) proves lint 0 / typecheck 0 / web suite
+  13,203 green with zero unhandled errors; every one of the five
+  failures arrived with the TM1–TM24 redistribution series
+  (2026-11-13 → 11-14, 27 commits, 46 files), whose commit messages
+  record tests-only verification ("All 13,226 tests pass") and never
+  the full `pnpm gates`. The five repairs, each with file:line and
+  its introducing commit, are recorded in HANDOFF §"The red baseline
+  — the five repairs".
+- **Decision 3 — the repair precedes the skeleton, as one dedicated
+  session:** the next session is the BASELINE-REPAIR session (five
+  mechanical repairs + the two budget bumps-or-slims + full gates
+  9/9 + push), and the M1 skeleton session re-runs verbatim after it
+  (the owner's M1 prompt is unchanged). The repair carries the same
+  constraints as the program: no renames, no moves, no route changes,
+  no dependency changes, no deploy.
+- **Decision 4 — the TM1 deploy stays parked behind green gates:** it
+  is not cancelled, only re-sequenced to the first session that has
+  green gates (the M1 re-run, immediately after its commits are
+  pushed — the original sequencing, one session later). Deploying the
+  TM1–TM4 treemap from a red-gates tree would violate AGENTS.md §5
+  and ship an unverified-budget build.
+- **Decision 5 — the D1–D10 skeleton deviations are recorded as
+  owner-approved:** the M1 session prompt states the owner approved
+  the audit's §3.1 deviations exactly as recommended (gold-score
+  engine-shared; prices/ engine-shared; PricesBoard web-shared; the
+  flat card system legacy-only; ResultPopup → converter;
+  bazg.ts = swiss-gold-flow; no layout.tsx exists; the real hooks
+  list; fred.ts stays shared; monthly-indexes serves GPR + GSCPI).
+  The skeleton created by the M1 re-run follows them verbatim.
+- **Revisit:** none needed — the M1 prompt governs the re-run. The
+  repair session's done-criteria live in HANDOFF.
+
 ## 2026-11-14 — BD-M0 (modularization Phase 0): the audit + the plan — four evidence-based deviations from the prompt's skeleton recorded for owner review; the constraint-locked files stay shared; NO code moved
 
 - **The request:** the owner's `MODULARIZATION-PROMPT.md` — audit the

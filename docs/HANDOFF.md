@@ -6,260 +6,217 @@
 > this file is the short "where we are right now" the next session reads
 > first, and it never replaces those records.
 
-> **M0 (2026-11-14) — the MODULARIZATION AUDIT: the Phase-0 audit + plan
-> for the semantic modularization program (NO code moved).** The owner's
-> `MODULARIZATION-PROMPT.md` (repo root) kicked off a new program:
-> restructure the codebase so everything for one domain lives in one
-> folder. This session was AUDIT + PLAN ONLY — zero code moves, gates
-> untouched, nothing deployed. The deliverable:
-> **`docs/modularization/MODULARIZATION-AUDIT.md`** — the full file
-> inventory (all 640 `.ts`/`.tsx` files across the six audited trees,
-> each with target folder + reason + primary importers, built from a
-> complete static import graph of 2,572 edges), the overlapping-items
-> map (the prompt's 16 known overlaps verified + 18 new ones found),
-> the proposed folder structure (10 domain features + shared +
-> features-tools + infrastructure on the web side; 9 domains + shared
-> on the engine side), the 8-phase migration plan (P1 skeleton → P2
-> shared layer → P3 one domain per commit, biggest first → P4 legacy
-> isolation → P5 tools → P6 config pass → P7 docs), 16 risks with
-> concrete mitigations, and the per-phase estimate (~610 files, ~2,100
-> import rewrites, ~28–32h across 16 sessions M1–M16).
+> **M1 (2026-11-15) — BLOCKED BEFORE THE PHASE: the baseline is RED.**
+> The M1 session (modularization Phase 1, the folder skeleton) ran its
+> mandatory baseline `pnpm gates` FIRST and found origin/main (`45172b3`)
+> red in 5 of 9 gates. Per the session's own hard rule ("if the baseline
+> is red, STOP and report — never start a phase on a red baseline"):
+> NO skeleton was created, NO eslint/tsconfig edit was made, and NOTHING
+> was deployed. The only commit this session pushed is docs-only (this
+> bookkeeping).
 >
-> **The headline findings:** the engine boundary is cleanly one-way
-> (zero engine→web imports) so the 15-entry exports map is the only
-> engine-coupling surface; the legacy /insights page is a super-consumer
-> of every domain (domain-owns + legacy-borrows keeps §19.6 retirement
-> a one-folder delete); four skeleton deviations need the owner's eye
-> (audit §3.1 — gold-score stays engine-shared per the prompt's own
-> constraint; prices/ is engine-shared not commodities; PricesBoard is
-> web-shared not global; the flat card system is legacy-only, not
-> shared); three dead/dangling files (MovesNextStrip, UsGlobalReachGroup,
-> us-global-reach.ts) are flagged for an owner delete-or-keep decision;
-> the migration risk concentrates in the path-referencing machinery
-> (exports map, gates.mjs layer1 path, the Persian-copy manifest, the
-> narrator-vocab/selfcheck GHA imports, 22 depth-sensitive data/*.json
-> imports, the pd-* backtest scripts, build-world-map's geoOutPath).
+> **The one-line cause:** the TM1–TM24 redistribution series
+> (2026-11-13 → 11-14, 27 commits, 46 files, +4,426/−601) verified only
+> the web vitest suite ("All 13,226 tests pass") and never ran the full
+> 9-gate `pnpm gates`, so five gates drifted red unnoticed. Proof: a
+> worktree check at `7a7a82ed` (2026-11-12, S31's deploy record — the
+> last full-gates-green commit, suite 15,275) runs lint 0 / typecheck 0 /
+> web suite 13,203 green with ZERO unhandled errors. Every failure below
+> arrived with the TM series.
 >
-> **The next session (M1) executes Phase 1** (the folder skeleton +
-> READMEs + eslint/tsconfig glob extension) per the audit's plan —
-> after the owner reviews the plan and answers the §3.1 deviations.
+> **The next session is the BASELINE-REPAIR session** — the exact recipe
+> is §"The red baseline — the five repairs" in this file. After it lands
+> (9/9 green), the M1 skeleton session re-runs verbatim (the owner's M1
+> prompt is unchanged and still applies), then M2 (Phase 2 — the shared
+> layer: ~156 files, ~900 import edges, the exports-map + gates.mjs +
+> persian-copy SOURCES updates).
 
-## Current state (after the M0 modularization audit)
+## Current state (after the M1-blocked session)
 
-- **Program:** modularization — **Phase 0 (the audit + the plan)
-  DELIVERED**; Phases 1–7 (M1–M16) pending owner review of
-  `docs/modularization/MODULARIZATION-AUDIT.md`. NO code was moved in
-  M0; the working tree is exactly the audit doc + this bookkeeping.
-- **The modularization program's authority chain:** the prompt
-  (`MODULARIZATION-PROMPT.md`) → the audit + plan
-  (`docs/modularization/MODULARIZATION-AUDIT.md`) → one phase per
-  session, `pnpm gates` green at every commit, every move revertible.
-- **Owner decisions pending (blocking nothing):** (a) the four §3.1
-  skeleton deviations; (b) delete-vs-keep for the three dead files;
-  (c) the optional usa-backtest-core harness extraction (audit N1 —
-  explicitly NOT in this program).
-- **Production is unchanged** — the S31 build stays live (see the TM1
-  note below: the treemap commit remains deploy-pending; nothing in
-  M0 affects it).
+- **Program:** modularization — Phase 0 DELIVERED (M0: the audit + the
+  plan, `docs/modularization/MODULARIZATION-AUDIT.md`; the §3.1
+  deviations D1–D10 owner-APPROVED per the M1 session prompt).
+  **Phase 1 NOT STARTED — blocked on the red baseline.**
+- **origin/main is RED** — 5 of 9 gates (the table below). The working
+  tree is clean; no code was touched by M1.
+- **Production is unchanged** — currena-api `502708df` (the S31 build).
+  The TM1–TM4 treemap commits remain deploy-pending, now BEHIND the
+  baseline repair and the M1 session (a deploy requires green gates per
+  AGENTS.md §5 — the original sequencing "deploy after the M1 commits
+  are pushed and gates are green" still holds, one session later).
 
-> **TM1 (2026-11-12, after S31) — the TREEMAP round: the TE-style
-> market heat map on /world-markets (BD-TM1).** The owner's spec: a
-> tradingeconomics-style treemap for the 16 world indices — tile size
-> ≈ market cap, colour ≈ the selected period's return, integrated with
-> the page's existing period selector and detail panels.
->
-> **What shipped:** `MarketsTreemap.tsx` (the new card inside
-> `WorldMarketsBriefing`, between the movers row and the regional tile
-> explorer): a two-level squarified treemap (a zero-dependency local
-> pure function — Bruls et al.; regions by summed cap, leaves under a
-> 20px header band; TE's proportions: Americas ≈ 72% · Asia-Pacific ≈
-> 20% · Europe ≈ 8%), the 16 tiles coloured through the SAME
-> periodValueOf lens the breadth/movers/tiles read (per-lens clamp ±3
-> today → ±20 on 5y; a missing lens keeps the neutral gray + the
-> honest dash), white bold labels with the TE text-shadow anatomy
-> (hidden under 44×40 — the native tooltip remains), tiles as real
-> buttons that toggle the briefing's SHARED detail panel (one open at
-> a time; the amber ring; Enter/Space; aria-expanded/aria-controls).
-> The cap table is ILLUSTRATIVE DEMO DATA, labelled in the footer
-> (BD-TM1: no cap field in the stored contract; revisit when a
-> fundamentals endpoint joins the ingest). 7 new
-> `pd.worldMarkets.treemap.*` keys × 2 locales; the 7 fa strings
-> queued in the Persian copy manifest (7,996 entries; audit clean).
-> The WM chunk budget bumped 40/9 → 50/11 kB (measured 46.41/10.78).
->
-> **The verification:** 27 new unit tests (squarify geometry:
-> coverage/containment/no-overlap/determinism; region proportions;
-> per-lens clamp; label rules; cap ordering) + the web suite 13,230
-> green + lint 0 + typecheck 0 + the browser pass over the built dist
-> + live feeds (EN + FA/RTL + 390px mobile): all 16 tiles labelled,
-> tooltip/aria per spec, click → shared panel + smooth scroll, the
-> period switch recolouring all 16 tiles with the legend re-clamping
-> ±3% → ±5%, mobile pans horizontally inside the card with no body
-> overflow, zero console errors.
->
-> **NOT yet deployed** — the commit/push of this round precedes the
-> deploy (the standing approval covers it; the next session either
-> deploys or the deploy follows in this one, see the session record).
-> Production is still the S31 build (`502708df…`, the briefing live
-> without the treemap).
+## The red baseline — the record (2026-11-15, HEAD `45172b3`)
 
-## Current state (after the TM1 treemap round)
+`pnpm gates` = **4/9 green, 5 RED** (2m 44s):
 
-- **Program:** page-division — **all 30 sessions delivered (Session
-  30/30 · 0 remaining); the program stays complete.** The first
-  post-program owner round (S31, the World Markets briefing) is
-  DELIVERED + DEPLOYED (BD-S31); the SECOND owner round (TM1, the
-  treemap) is DONE IN CODE, pushed, NOT yet deployed (BD-TM1).
-- **The TM1 code state (this round):** the treemap card lives in
-  `WorldMarketsBriefing.tsx` between the movers and the regional
-  explorer; `MarketsTreemap.tsx` + its 27-test suite are new; the
-  dictionaries, index.css hover pair, the copy manifest (7 queued fa
-  strings) and the WM budget row (40/9 → 50/11, measured 46.41/10.78)
-  carry the round. The spec: `docs/specs/world-markets-treemap.md`.
-  Screenshots: `docs/assets/world-markets-treemap-*-2026-11-12.png`.
-  **The next deploy ships it** (the standing approval covers the
-  deploy; verify https://currena.ir/world-markets shows the heat map
-  card after it).
-- **DEPLOYED LIVE:** currena-api — the S31 deploy, version
-  `502708df-08db-430f-86d5-a141a73c85d4` (the rebuilt SPA assets
-  riding the API worker; the worker code itself unchanged since the
-  S25 fix) + currena-markets `8f63c8fa` (untouched). **The live
-  verify (https://currena.ir/world-markets, post-deploy):** the
-  briefing renders over the live feeds — the breadth "today
-  performance · Indices up 7 · Indices down 0 · Flat 9 · A move
-  within ±1% reads as flat", the movers TAIEX +3.6% (Correction
-  −11.2%) / Hang Seng −1.0% (Correction −13.1%), all 16 tiles, the
-  Hang Seng detail panel expanding with the 52-week chart (Nov 2025 →
-  Nov 2026) + the levels — zero console errors, and the standing
-  pd-s7 live backtest re-run against production: **ALL CHECKS GREEN —
-  57 checks · 57 green · 0 red.** After the TM1 round: production is
-  the S31 build — HEAD carries the treemap commit(s) ahead of it
-  (deploy pending).
-- **The ecb posture (BD-S29, carried):** the served blob shows
-  failedSources EMPTY — all three ecb rows green. The BD-S25
-  maintenance item stays CLOSED; the per-request ECB roulette remains
-  REAL (a failed row on any rung is the documented RISK_REGISTER
-  honest shape: the cards hold last-good, the next rung retries).
-- **The EIA trio posture (BD-S29, carried — self-healing at the
-  Saturday 11-14 gate):** the provider's own release delay left the
-  trio honestly [stale]-marked (values unchanged and EXACT); the
-  11/12 release covers the week ending 11/06 — the Saturday 11-14
-  rung-2 gate lands it → the trio returns to fresh/context at age ~8.
-- **The S31 surfaces (what changed where):** BD-S31 (DECISIONS) · the
-  CHANGELOG S31 entry · the roadmap's "Owner rounds (post-program)"
-  section (the S31 delivery record + the progress-board row + the
-  current-position note) · the strategy-log §8 row 35 · this file ·
-  the code: apps/web (WorldMarketsBriefing.tsx + WorldMarketsPage.tsx
-  + WorldMarketsHero.tsx + MarketsChart.tsx [the copy-contract
-  narrowing] + the two dictionaries + the pin test + the page
-  characterization suite) + scripts/check-bundle-budget.mjs (the WM
-  chunk bump) + docs/localization/persian-copy-manifest.json (the 24
-  queued fa strings).
-- **The S31 gates:** the full `pnpm gates` 9/9 (suite 15,275 — web
-  13,203, +5 new arms; secret scan 8 patterns/1027 files clean;
-  budgets held, entry 272.91/82.56, the WM chunk 38.25/8.30 under the
-  new 40/9 ceiling).
+| # | Gate | Verdict | Detail |
+|---|---|---|---|
+| 1 | secret scan | PASS | clean (8 patterns · 1039 files) |
+| 2 | typecheck | **FAIL** | 2 × TS2345 (repair 1) |
+| 3 | lint | **FAIL** | 26 × no-unused-vars, 0 warnings (repair 2) |
+| 4 | copy:audit | **FAIL** | 10 NEW untriaged fa strings (repair 3) |
+| 5 | narrator vocabulary | PASS | in sync (193×2 + 56×2) |
+| 6 | narrator eval | PASS | 50 checks |
+| 7 | layer1 strict | PASS | 11,969/11,969 assertions |
+| 8 | full test suite | **FAIL** | every test PASSES — 15,298 total (core 195 · scraper 67 · insights 1383 · markets 13 · api 414 · web 13,226) — but web vitest exits 1 on 11 unhandled rejections (repair 4) |
+| 9 | build + bundle budget | **FAIL** | GoldPage 35.01/9.14 kB vs 34/9 · WorldMarketsPage 52.83/13.06 vs 50/11 (repair 5) |
 
-## The program is finished — what a future session looks like
+**Suite-count note:** the M1 prompt expected ≈15,275 (the S31 record);
+HEAD is 15,298 — the TM series added 23 web tests (94 → 95 test files).
+The M0 audit's "15,023" was a 3-package count (web+insights+api, missing
+core/scraper/markets) — never use it as the target. The repair session
+should land at exactly 15,298 unless it adds tests.
 
-The 30-session roadmap stays complete (30/30 · 0 remaining). The S31
-round shows the post-program shape: the owner's direct requests run
-as owner rounds, recorded per the standing session protocol (DECISIONS
-+ CHANGELOG + the roadmap's owner-rounds section + the strategy-log §8
-+ this file). Any future session starts the same way every session
-does — read `AGENTS.md` first, then this file, then the roadmap's
-progress board + current-position note. The standing branches for
-whichever lever arrives:
+## The red baseline — the five repairs (each attributed)
 
-- **If the owner supplies the investor's §19 answers:** run the
-  INVESTOR ROUND (collect → D-49+ in the strategy log §5 Round 4 →
-  the spec v2 entries — the AF-1…AF-8 findings ride that pass, never
-  silent edits); S23's deferred feedback-build scope follows it. The
-  §19.6 answer also opens (or delays) the retirement execution —
-  record it as Gate 0 in DECISIONS.md and schedule the execution per
-  the checklist's §7.
-- **If the owner supplies the §19.6 sign-off (directly):** the
-  retirement execution may run per `06-LEGACY-RETIREMENT-S24.md` §7
-  (the checklist) — ONLY behind the recorded sign-off. The S31 scope
-  cut joins that gate: decide then whether the what/why/you editorial
-  lines join the standalone /world-markets detail panel (BD-S31).
-- **If a kickoff arrives for a slot already delivered:** run the
-  counterpart close, never a re-execution; if a duplicate is already
-  pushed, reconcile onto it.
-- **Routine observations need no session:** the standing schedule owns
-  them (the 04:10–04:40 Worker rungs; the Saturday rung-2 gates; the
-  :13/:50 hourly rungs). No decisions pending; only the recorded
-  RISK_REGISTER escalation shapes (a multi-week EIA stall past
-  ~2026-11-28; a persistent multi-day ecb stale-past-maxAge) would
-  re-open a question.
+1. **typecheck — 2 sites, same shape.** `homePageOfIndicator(id)`
+   returns `PageDivisionPageId | null`; both call sites guard
+   `!== undefined` only, then pass the value to `navigate(home)`
+   (a `string`). Sites:
+   - `apps/web/src/routes/page-division/EconomicLinkagesPage.tsx:59`
+     (arrived with TM21/TM22 — `315c107f` / `f7c7ff72`);
+   - `apps/web/src/routes/page-division/GlobalPage.tsx:229`
+     (the `onFocusEventCard` — arrived with the TM series' calendar
+     move, TM11 `539f7adc`; the file was last touched by TM14).
+   Fix: guard the null too — `if (home) navigate(home)` is safe (the
+   PageId union has no empty string), or `if (home !== null)`. Grep all
+   `homePageOfIndicator` call sites and align the guards.
+2. **lint — 26 dead unused vars, all left by the TM section cuts**
+   (mechanical removal, nothing behavioral):
+   `routes/Insights.tsx` ×20 (the cut sections' imports — AboutTheData,
+   HeroBlock, TopMoversStrip, PricesBoard, Signals, Together,
+   WorldCurrencies, TicSection, TicCustodyCard, DollarStrengthCards —
+   plus 10 orphaned locals incl. togetherToken/signalsToken/aboutToken,
+   marketsAlert/fxAlert/ticState, sectionIndicators, jumpToSection,
+   custodyReading, dailyPeers) ·
+   `components/insights/hero-editorial.test.tsx` ×1 (`withRbaStale`) ·
+   `routes/insights-sections/SectionLane.tsx` ×1 (`ticSlot` arg) ·
+   `routes/page-division/CommoditiesTierCards.tsx` ×3
+   (CARD_NAME_KEY / POSITION_WORD_KEY / STATUS_KEY) ·
+   `routes/page-division/GoldPositions.tsx` ×1 (`t`).
+3. **copy:audit — 10 NEW untriaged fa strings:** `nav.economicLinkages`
+   + `pd.economicLinkages.{title,purpose,loading}` (TM21/TM22) ·
+   `pd.commodities.{positionsTitle,positionsPurpose}` (TM23) · 4
+   HARDCODED fa strings inside `GoldPositions.tsx:24,28,36,37` (TM23 —
+   house rule 5: every UI string goes through the i18n dictionary; move
+   them to `fa.ts` keys first). Then triage the manifest:
+   `pnpm copy:audit:update` per
+   `docs/localization/persian-copy-workflow.md` and review the diff.
+4. **test suite — 11 unhandled rejections, all from
+   `GoldPage.test.tsx`:** TM13/TM23 grew GoldPage to also fire
+   `fetchInsightsSnapshot()` (`GET /api/insights`, GoldPage.tsx:62) but
+   the test's `stubFeeds` router only routes
+   `/api/insights/pages/gold` — every other URL 404s and the ApiError
+   (`unknown_page`) escapes as an unhandled rejection (vitest exits 1
+   even though all 13,226 tests pass). Fix: route that feed in the stub
+   (or explicitly reject + catch), the Converter.test per-test stubbed
+   fetch pattern.
+5. **bundle budget — two rows over:** GoldPage chunk 35.01/9.14 vs the
+   34/9 ceiling (TM13 Signals + TM23 GoldPositions grew it) and
+   WorldMarketsPage 52.83/13.06 vs 50/11 (TM1 bumped 40/9 → 50/11
+   measuring 46.41/10.78, then TM2–TM4's labels/flags/modal grew it
+   again without a second bump). House rule: "budgets are the documented
+   numbers — bump with a changelog note, never silently." Decide per
+   row: a documented bump in `scripts/check-bundle-budget.mjs` + a
+   CHANGELOG note (the TM1 precedent), or slim the chunk. Default to
+   the documented bump if unsure; flag it for the owner either way.
 
-### Operational notes worth carrying
+### The repair session's done-criteria
 
-- **The KV write cap (the fresh post-midnight slice, CONFIRMED):** the
-  account's free-tier daily KV quota is 1,000 writes/day
-  account-wide; the REST path exhausts ~18:30–19:00 UTC. The fresh
-  post-midnight slice is the right window for MANUAL KV seeding (a
-  GHA ingest dispatch, rung2-run, fx-run, markets-au-run) when
-  something must land outside the 04:10–04:40 rungs; a post-~18:30
-  dispatch just costs one refused run (the designed no-update branch).
+- `pnpm gates` 9/9 green at HEAD; suite exactly 15,298 (or the new
+  count justified in the commit body).
+- Commit shape: one repair commit (or a short series, each green)
+  `baseline-repair: restore the 9-gate green baseline (the TM-series
+  drift)` + the bookkeeping commit — then push.
+- Constraints carried: no file renames, no moves, no route changes, no
+  dependency changes, no deploy (still pre-skeleton; the modularization
+  constraints apply).
+- Then STOP. The M1 skeleton session re-runs verbatim afterwards (the
+  owner's M1 prompt is unchanged; its expected baseline will then be
+  green — re-record the numbers).
+
+## TM1–TM4 (2026-11-12 → 11-14) — the treemap rounds, DONE IN CODE, NOT deployed
+
+- The TE-style market heat map on /world-markets: `MarketsTreemap.tsx`
+  inside `WorldMarketsBriefing` (TM1, BD-TM1) then TM2 (per-tile country
+  labels, green/red ramp, click-to-modal), TM3 (country flag badges),
+  TM4 (bigger names + percentages). Squarified two-level layout
+  (Bruls et al., zero-dependency pure function, 27-test geometry
+  suite); tile size ≈ the ILLUSTRATIVE cap table (labelled demo data,
+  BD-TM1 — swap for live caps when a fundamentals endpoint joins the
+  ingest); colour ≈ the selected period's return through the SAME
+  periodValueOf lens (per-lens clamp ±3 today → ±20 5y); tiles toggle
+  the briefing's SHARED detail panel. Spec:
+  `docs/specs/world-markets-treemap.md`; screenshots:
+  `docs/assets/world-markets-treemap-*-2026-11-12.png`.
+- **Deploy-pending behind the repair + M1** (the standing approval
+  covers it; ship it in the M1 session once gates are green, then
+  live-verify https://currena.ir/world-markets: the treemap card
+  renders, EN + FA/RTL, zero console errors).
+- Note: the TM2–TM4 growth is what pushed the WM chunk over its TM1
+  budget (repair 5); the TM1–TM4 verification passes were browser-based
+  + web-suite only — the full gates were never run in those sessions.
+
+## Operational notes worth carrying
+
+- **The KV write cap (CONFIRMED):** the account's free-tier daily KV
+  quota is 1,000 writes/day account-wide; the REST path exhausts
+  ~18:30–19:00 UTC. The fresh post-midnight slice is the right window
+  for MANUAL KV seeding (a GHA ingest dispatch, rung2-run, fx-run,
+  markets-au-run) when something must land outside the 04:10–04:40
+  rungs.
 - **The GHA belt-and-braces schedule delay:** GitHub's scheduler queue
   has delayed the 04:20 UTC scheduled `insights-ingest` run by ~7–9 h
-  (the runs land 11:22–13:00 UTC) — still inside the fresh KV slice;
-  the Worker's own 04:10–04:40 rungs run on time and remain the
-  primary venue. A `workflow_dispatch` runs immediately.
-- **The ECB portal posture (post-CLOSE):** the provider-side roulette
-  (the gateway's ~30.2 s HTTP 504, per-request) remains REAL — a
-  failed row (timeout OR 504) on any ecb leg is an expected honest
-  shape on bad windows; the 45 s patient single attempt absorbs the
-  slow-200s and the cards hold last-good meanwhile.
-- **The EIA weekly-release schedule note (BD-S29):** the EIA's weekly
-  petroleum releases can slip a day (11/11 → 11/12 observed); the
-  designed heal path: the `rung2-run --eia` lever re-marks staleness;
-  the next Saturday gate lands the slipped release.
-- **The observability telemetry query API** (the Workers logs): answers
-  success but projects ZERO rows for the query shapes tried in S27 —
-  do not plan on Worker-log reads; the KV blob + the GHA history are
-  the evidence surface.
+  (the runs land 11:22–13:00 UTC) — still inside the fresh KV slice; a
+  `workflow_dispatch` runs immediately.
+- **The ECB portal posture:** the per-request roulette (~30.2 s HTTP
+  504) remains REAL — a failed row is the documented honest shape; the
+  45 s patient single attempt absorbs the slow-200s, cards hold
+  last-good.
+- **The EIA weekly-release schedule note:** EIA weekly petroleum
+  releases can slip a day; the heal path is the `rung2-run --eia`
+  lever + the next Saturday gate.
+- **The observability telemetry query API** (Workers logs) projects
+  ZERO rows — do not plan on Worker-log reads; the KV blob + the GHA
+  history are the evidence surface.
 - **The fresh-card bootstrap is FIXED** (`patchInsightsSnapshot` ADDS
-  readings for ids the stored snapshot lacks — the regression test
-  pins it).
+  readings for ids the stored snapshot lacks — pinned by test).
 - **The D-9 audit is a standing gate:** `pnpm s24:d9-audit` (18 checks
   incl. the §A ↔ registry pin) — re-run it in any session that touches
-  indicators, definitions, placement or §A; it exits non-zero on drift.
-- **The PortWatch runbook note (BD-S21e):** never run the §21 data
-  audit's portwatch leg Tuesdays 11:00–14:00 UTC (the IMF's scheduled
-  maintenance window).
+  indicators, definitions, placement or §A.
+- **The PortWatch runbook note:** never run the §21 data audit's
+  portwatch leg Tuesdays 11:00–14:00 UTC (the IMF's maintenance
+  window).
+- **NEVER record "gates green" from a tests-only run** — the TM-series
+  lesson (this session's finding): the full `pnpm gates` is the only
+  green that counts.
 
 ## Owner-side levers waiting
 
 1. **Arrange the external investor's review of the spec (§19 — the
-   seven questions): Phase K's remaining input and THE top lever.** The
-   investor round re-opens at the next free slot the moment the answers
-   exist (→ D-49+ in the strategy log §5 Round 4 → the spec v2 entries,
-   with AF-1…AF-8 riding that pass); S23's deferred feedback-build
-   scope follows it.
+   seven questions):** THE top lever; re-opens the investor round
+   (→ D-49+ in the strategy log §5 Round 4 → the spec v2 entries, with
+   AF-1…AF-8 riding that pass); S23's deferred feedback-build scope
+   follows it.
 2. **The §19.6 retirement timing answer** (directly, or via the
    investor round): retire the legacy /insights now that the D-9 audit
-   is green, or after a burn-in period of parallel running? Gate 0 of
+   is green, or after a burn-in period? Gate 0 of
    `06-LEGACY-RETIREMENT-S24.md` §7 — the execution session runs only
-   behind the recorded sign-off. The A/B redirect decision (the
-   card-aware option B recommended), the details-panel port
-   recommendation, and the S31 what/why/you scope cut ride the same
-   gate.
+   behind the recorded sign-off. The A/B redirect decision, the
+   details-panel port recommendation, and the S31 what/why/you scope
+   cut ride the same gate.
 3. Ratify the `/converter` relocation (S1's build-session decision).
 4. Ratify AF-3: `michigan-1y-expectations` → USA tier-3 (S2's audit
    finding — the 184th id's placement; RENDERED on /usa tier-3).
-5. Ratify or redirect the BD-S3…BD-S31 decision set (the latest:
-   **BD-S31** — the World Markets briefing restoration: the
-   corpus-pinned port, the lean detail panel, the ONE controlled lens,
-   the 40/9 budget bump; all recorded, none blocking).
-6. Triage the queued unreviewed fa strings (every session's
-   corpus-pinned values are verified byte-for-byte by their copy-pin
-   tests — S31 queued 24 more, 23/24 corpus-pinned).
+5. Ratify or redirect the BD-S3…BD-S31 decision set (all recorded,
+   none blocking).
+6. Triage the queued unreviewed fa strings (1,248 queued — every
+   session's corpus-pinned values are verified byte-for-byte by their
+   copy-pin tests).
 7. **Revoke or rotate the session credentials** (the GitHub token, the
-   Cloudflare tokens, the EODHD key) when the current owner rounds
-   end: they were used across the sessions, never stored in the repo,
-   and should be retired per `AGENTS.md` §7.
+   Cloudflare tokens, the EODHD key) when the current owner rounds end:
+   they were used across the sessions, never stored in the repo, and
+   should be retired per `AGENTS.md` §7.
 
 ## Known state worth knowing
 
@@ -267,41 +224,31 @@ whichever lever arrives:
   BD-S19c): JS-executing readers get the per-route tags; non-JS
   crawlers see the static whole-product defaults in index.html.
 - The strategy log's §8 session table (docs/page-division/
-  03-STRATEGY-LOG.md) covers all 30 program sessions (row 34) + the
-  first post-program owner round (row 35, S31).
+  03-STRATEGY-LOG.md) covers all 30 program sessions + S31 (row 35).
 - The per-page live backtests (the S20 toolkit): pd-s4 (Global 84) ·
-  pd-s5 (Gold 150) · pd-s7 (World Markets 57 — the count scales with
-  the served board's present readings) · pd-s8 (zooms 9) ·
+  pd-s5 (Gold 150) · pd-s7 (World Markets 57) · pd-s8 (zooms 9) ·
   pd-s9/s10 (USA 115/163 incl. the TIC sub-gate) · pd-s12 (Europe 8) ·
   pd-s14 (Asia 14) · pd-s16 (Australia 28) · pd-s17 (Commodities 24) ·
-  pd-s18 (Currencies 53 incl. the rules + board gates) — all
-  re-runnable against production from apps/web/scripts/ (pass
-  `--base https://currena.ir`; the pd-s4 stateHash arm needs
-  CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in env).
+  pd-s18 (Currencies 53) — all re-runnable against production from
+  apps/web/scripts/ (pass `--base https://currena.ir`; the pd-s4
+  stateHash arm needs CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID in
+  env).
 - The S20 data-audit tool is re-runnable: `pnpm --filter @currena/web
   exec tsx ../../apps/web/scripts/pd-s20-data-audit.ts` (mind the
   PortWatch Tuesday window above).
-- **The parallel-session rule (hardened through BD-S18-parallel-3,
-  BD-S21-parallel, BD-S23-parallel, and the S27 interruption):**
-  launch exactly ONE session per roadmap slot — one prompt = one
-  session = one slot. If a kickoff arrives for a slot already delivered
-  (origin/main carries its records), run the counterpart close, never a
-  re-execution; if a duplicate is already PUSHED, reconcile onto it (the
-  pushed implementation governs), archive the local duplicate,
-  independently re-verify, and finish the slot's remaining milestones.
-  The S27 shape (an interrupted session continued to completion, its
-  earlier commits kept, nothing duplicated) is the worked precedent.
-- **The /world-markets page's briefing (S31):** the breadth/movers/
-  tiles section rides the SAME board feed as the grids (the last-good
-  localStorage pattern + the fail-closed ladder) — a provider outage
-  never reaches the page. The map's period switch is the ONE lens
-  (controlled); the tiles expand one detail panel at a time; the
-  section's words are corpus-pinned in both locales.
-- **The /world-markets treemap (TM1):** tile size ≈ the ILLUSTRATIVE
-  cap table (BD-TM1 — labelled demo data in the footer; swap for live
-  caps when a fundamentals endpoint joins the ingest); tile colour ≈
+- **The parallel-session rule:** launch exactly ONE session per roadmap
+  slot — one prompt = one session = one slot. If a kickoff arrives for
+  a slot already delivered, run the counterpart close, never a
+  re-execution; if a duplicate is already PUSHED, reconcile onto it.
+- The /world-markets page's briefing (S31): the breadth/movers/tiles
+  section rides the SAME board feed as the grids (the last-good
+  localStorage pattern + the fail-closed ladder); the map's period
+  switch is the ONE lens (controlled); the section's words are
+  corpus-pinned in both locales.
+- The /world-markets treemap (TM1–TM4): tile size ≈ the ILLUSTRATIVE
+  cap table (BD-TM1 — labelled demo data in the footer); tile colour ≈
   the period return through the SAME periodValueOf lens with the
-  per-lens clamp (±3 today → ±20 5y); the treemap's tiles and the
-  explorer tiles share the ONE openId panel state. The squarify
-  routine is a pure function with its own 27-test suite — extend
-  those tests, never the drawing, when changing the geometry.
+  per-lens clamp; the treemap's tiles and the explorer tiles share the
+  ONE openId panel state. The squarify routine is a pure function with
+  its own 27-test suite — extend those tests, never the drawing, when
+  changing the geometry.
