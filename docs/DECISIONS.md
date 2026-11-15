@@ -11,6 +11,98 @@
 > A–K, rounds 1–3), and the per-session delivery records in
 > `docs/page-division/01-SESSION-ROADMAP.md`.
 
+## 2026-11-15 — BD-M2 (modularization Phase 2): the shared layer moved in TWO independently-green commits (web, then engine) rather than one; the Persian-copy manifest re-triaged by re-sourcing 7,773 entries (path keys only, text untouched); the registry's `generatedFrom`/`textTemplates` path-metadata drift recorded and regenerated; plus the session's straggler fixes (user-visible ruleVersion path, the ?raw codemod gap) and the two production deploys that bracket the phase
+
+- **The request:** the owner's M2 prompt (verbatim in the prior
+  HANDOFF) — execute Phase 2 (the ~156-file shared-layer move with the
+  exports-map + path-machinery updates in the same commits; codemod
+  import rewrites; no renames; tests move with subjects; gates 9/9
+  suite 15,298) and, since the kickoff DID carry the sedanama-ir
+  Cloudflare token, first push the current green build to production
+  and live-verify the post-BR chunk topology.
+- **Decision 1 — two commits (web half, then engine half), not one:**
+  the audit allows "ONE commit (or a short series, each green)". The
+  web and engine halves have ZERO relative import edges between them
+  (web imports the engine only through the exports map, whose entry
+  NAMES never change; the engine never imports web), so each half is
+  independently green: commit `17764fd` (81 web files, 616 spec
+  rewrites + the web machinery) and commit `73e7fe6` (75 engine
+  files, 347 rewrites + the exports map + the engine machinery).
+  Options considered: (a) one atomic commit — rejected: a ~500-file
+  diff is unreviewable and un-bisectable; (b) the two-commit split —
+  chosen: each diff is reviewable, each revert is a half-phase
+  rollback, and the split boundary is exactly the audit's own
+  web/engine boundary. Decided by: the agent. Revisit: none — the
+  Phase 3 domain sessions follow the same per-side pattern when a
+  domain has both web + engine files (the audit already prescribes
+  "web + engine moves together per domain" as ONE commit there,
+  because domain moves DO share relative edges across the boundary).
+- **Decision 2 — the manifest re-triage is a path re-key, not a
+  re-fingerprint:** the Persian-copy manifest is path-keyed
+  (8,006 entries; dictionary entries matched by id + source, sweep
+  entries by source + sha256). The move re-pointed 7,773 entries
+  (7,769 dictionary sources → `shared/i18n/*`, 2 `hardcoded.*` ids
+  re-keyed to the new path, 2 technical sources) with text, sha256,
+  round and reference untouched — proven by the clean `copy:audit`
+  (every fingerprint still matches) and the reviewed diff (the
+  expected REMOVED+NEW pairs the audit predicted, ~1h of review
+  compressed to minutes because the pairs are mechanical). Never
+  silently absorbed: the diff and the counts are recorded here + in
+  CHANGELOG. Options considered: (a) run `copy:audit:update --ids …`
+  per entry — rejected: the tool is for copy TRIAGE decisions, not
+  path moves, and 7,773 ids is not a reviewable invocation; (b) the
+  scripted re-key using the repo's own `loadManifest`/`saveManifest`
+  serialization — chosen. Decided by: the agent. Revisit: none.
+- **Decision 3 — the registry's path-metadata drift is regenerated,
+  not preserved:** `data/indicators.json` carries two human-readable
+  metadata strings (`generatedFrom`, `textTemplates`) that name the
+  source files of the registry; both moved. The generator's strings
+  were updated and the registry regenerated — the drift is EXACTLY
+  those two strings (indicator-audit.json + site-mode-overrides.json
+  byte-identical; PLACEMENT.generated.md byte-identical). Leaving
+  stale paths in generated metadata would mislead the next reader;
+  absorbing it silently would violate the phase rule — so it is
+  recorded here. Decided by: the agent. Revisit: none.
+- **Decision 4 — the codemod's two blind spots, fixed at the cause
+  and recorded as standing method:** the full suite (not the dry run)
+  surfaced two specifier forms the import-statement codemod cannot
+  see: (a) Vite `?raw` query imports (`from './Signals.tsx?raw'` —
+  the query suffix defeats file resolution; 6 specs in round2.test.ts,
+  re-anchored by hand) and (b) non-import path strings
+  (`readFileSync(new URL(…))`, `join(here, '..', …)`, resolve/join
+  with counted `..` — 13 sites across the two halves + 2
+  cross-package stragglers: about-sources.test.ts's sources.ts read
+  and AboutTheData's USER-VISIBLE RULE_CHANGELOG_PATH). All fixed in
+  the same commits as their moves; the method note (grep for `?raw`
+  + fs/URL path strings per moved file BEFORE the gates run) is now
+  in HANDOFF's operational notes for the Phase 3+ sessions. Options
+  considered: extending the codemod to parse queries and string
+  contexts — rejected for this phase (over-engineering for 21 sites;
+  the suite is the net); the grep checklist carries the lesson
+  forward. Decided by: the agent. Revisit: if a later phase finds
+  more than a handful of `?raw` imports, extend the codemod then.
+- **Decision 5 — production deployed twice (before + after the
+  phase), each behind its own deploy-lock check:** the pre-phase
+  deploy (`dcb19350` @ 100%) delivered the BR cleanup + M1 tree the
+  M1 session could not (the owner's token was verified as the
+  sedanama-ir account FIRST — workers + zones against DEPLOY.md — the
+  M1 lesson institutionalized); the post-phase deploy (`0592c24f` @
+  100%) ships the exact origin/main tree. The post-M2 bundle is
+  BYTE-IDENTICAL to the pre-M2 one (the entry chunk's sha256 matches
+  the local build and the prior deploy) — the definitive proof that
+  the phase changed zero runtime output, which is also why deploying
+  twice in one session carries no behavioral risk. Options
+  considered: (a) pre-phase deploy only (the prompt's letter) —
+  rejected: it would leave production one commit behind main and
+  re-create the records-vs-production drift the M1 session
+  diagnosed; (b) both deploys — chosen. Live-verified after each:
+  /api/health, /api/insights (183 readings), the post-BR chunk
+  topology (no shared Signals/PricesBoard chunks in the entry's
+  import graph), and after the second: the browser legs (/insights,
+  /world-markets incl. the treemap, /gold, FA/RTL, 390 px mobile)
+  with zero console errors. Decided by: the agent (standing approval
+  §5; both builds green). Revisit: none.
+
 ## 2026-11-15 — BD-M1-r (modularization Phase 1, the re-run): the skeleton delivered per the audit's corrected tree — four records: the 44-README scope (parents included), the R12 scope pass landed as probe-verified documentation rather than config extension, the tree-vs-inventory MarketsChart discrepancy resolved in favor of the inventory, and the deploy half's two findings (the treemap ALREADY LIVE on production from an unrecorded TM-era deploy; the session's Cloudflare credentials belong to the SportSignal account)
 
 - **The request:** the owner's M1 re-run prompt (reconstructed verbatim
