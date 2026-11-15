@@ -39,6 +39,12 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
 
   // The browser SPA.
+  // (M1 2026-11-15, audit risk R12 — probe-verified: the modularization
+  //  skeleton roots — features/, shared/, features-tools/, infrastructure/ —
+  //  sit under src/ and are covered by this RECURSIVE glob; the per-package
+  //  tsconfig "include": ["src"] is equally recursive, so no scope extension
+  //  was required. Keep these patterns recursive: the Phase 2+ file moves
+  //  rely on lint + typecheck staying in scope with zero further edits.)
   {
     files: ['apps/web/src/**/*.{ts,tsx}'],
     languageOptions: {
@@ -73,6 +79,8 @@ export default tseslint.config(
   },
 
   // The Workers + shared packages (Node tooling + Workers runtime globals).
+  // (M1 2026-11-15, audit R12 — probe-verified: packages/insights/src/domains/
+  //  + src/shared/ are covered by this recursive packages/*/src/** pattern.)
   {
     files: ['apps/api/src/**/*.ts', 'apps/markets/src/**/*.ts', 'packages/*/src/**/*.ts', 'scripts/**/*.mjs'],
     languageOptions: {
