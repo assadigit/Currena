@@ -26,7 +26,7 @@ import { THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS, pageGroupIds, pageHomeId
 import { DISPLAY, formatReadingValue, type UnitLabels } from '../../shared/config/display';
 import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
 import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
-import { globalGaugeTiles } from '../../routes/page-division/global-tiles';
+import { globalGaugeTiles } from '../global/global-tiles';
 import {
   USA_CARD_DISPLAY,
   USA_CARD_IDS,

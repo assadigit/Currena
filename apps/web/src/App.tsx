@@ -52,7 +52,7 @@ const PagePlaceholder = lazy(() =>
 // Page-division S3 (2026-11-08): the Global world scan — the D-21 verdict
 // board. Lazy like the Insights route (the engine modules + the board
 // clients ride the chunk; the entry graph stays the money page's own).
-const GlobalPage = lazy(() => import('./routes/page-division/GlobalPage').then((m) => ({ default: m.GlobalPage })));
+const GlobalPage = lazy(() => import('./features/global/GlobalPage').then((m) => ({ default: m.GlobalPage })));
 // Page-division S5 (2026-11-08): the Gold page — the 37-voter conditions
 // meter (D-26…D-29). Lazy like the Global route (the engine modules ride
 // the chunk; the entry graph stays untouched).

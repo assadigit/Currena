@@ -38,9 +38,9 @@ import type { InsightsSnapshot, CalendarEvent, IndicatorId } from '@currena/core
 import { homePageOfIndicator } from '@currena/insights/page-division';
 import type { MarketsSnapshot, FxSnapshot } from '@currena/core';
 import { GlobalBoard, NarratorLine, RegionChips } from './GlobalBoard';
-import { BiggestMoveCard } from '../../components/insights/HeroBlock';
-import { TopMoversStrip } from '../../components/insights/TopMoversStrip';
-import { NextUpStrip } from '../../components/insights/NextUpStrip';
+import { BiggestMoveCard } from './HeroBlock';
+import { TopMoversStrip } from './TopMoversStrip';
+import { NextUpStrip } from './NextUpStrip';
 import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { navigate } from '../../router';
 import type { InsightsLoadStateLike } from './global-page-states';

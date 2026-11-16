@@ -295,7 +295,7 @@ export function InsightsHeader({
 
   const downloadIcs = useCallback(() => {
     if (state.kind !== 'ready') return;
-    void Promise.all([import('../../components/insights/ics'), import('../../shared/lib/download')]).then(
+    void Promise.all([import('../../features/global/ics'), import('../../shared/lib/download')]).then(
       ([{ buildInsightsIcs }, { downloadBlob }]) => {
         const ics = buildInsightsIcs(state.snapshot.calendar, locale);
         downloadBlob(new Blob([ics], { type: 'text/calendar;charset=utf-8' }), 'currena-insights-calendar.ics');

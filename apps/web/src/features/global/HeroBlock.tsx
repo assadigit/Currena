@@ -45,7 +45,7 @@ import { formatNumber } from '@currena/core';
 import { TrendingUp } from 'lucide-react';
 import { interpolate } from '../../shared/i18n';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { FlowChevron } from '../icons/FlowChevron';
+import { FlowChevron } from '../../components/icons/FlowChevron';
 import { bandWordsOf, bigMovers, changeToneClass, consequenceLine, formatChangeParts } from '../../shared/config';
 import { VerdictBlock, type MarketsAlert, type FxAlert, type SectionIndicatorState } from '../../shared/components/VerdictMeter';
 

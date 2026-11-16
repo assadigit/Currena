@@ -33,9 +33,9 @@ import { evaluateSignal } from '@currena/insights';
 import { BEAR_PCT } from '@currena/insights/markets/definitions';
 import { THEMATIC_GAUGE_IDS } from '@currena/insights/page-division';
 import { goldOutlookOf, type OutlookState } from '../../shared/components/outlook-core';
-import { marketsInCorrectionCount, marketsVerdictStep } from '../../features/world-markets/verdict-core';
-import type { MarketsVerdictStep } from '../../features/world-markets/verdict-core';
-import { fxRuleView } from '../../features/currencies/fx-presentation/rules';
+import { marketsInCorrectionCount, marketsVerdictStep } from '../world-markets/verdict-core';
+import type { MarketsVerdictStep } from '../world-markets/verdict-core';
+import { fxRuleView } from '../currencies/fx-presentation/rules';
 
 /* ------------------------------------------------------------------ *
  * Tiles ②–⑥ — the five thematic gauge verdicts (D-21)

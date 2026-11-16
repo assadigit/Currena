@@ -39,7 +39,7 @@ import {
 } from './global-tiles';
 import { DESTINATIONS } from '../../shared/components/destinations';
 import type { NarrativeDoc } from '../../shared/lib/narrative';
-import { formatRelativeShort } from '../../features/world-markets/shared';
+import { formatRelativeShort } from '../world-markets/shared';
 
 /* ------------------------------------------------------------------ *
  * Local mirrors of the shared verdict vocabulary (cited, never forked):

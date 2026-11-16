@@ -50,7 +50,7 @@
 import type { FxSnapshot, InsightsSnapshot, MarketsSnapshot, TicSnapshot } from '@currena/core';
 import { FxSnapshotSchema, InsightsSnapshotSchema, MarketsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { buildOverallNarrationState, stateHashOf } from '@currena/insights/narrator';
-import { backtestGlobalTiles } from '../src/routes/page-division/global-backtest-core';
+import { backtestGlobalTiles } from '../src/features/global/global-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

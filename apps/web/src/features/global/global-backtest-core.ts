@@ -41,8 +41,8 @@ import { summarizeFxRules } from '@currena/insights/fx';
 import { GOLD_VOTER_IDS, THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS } from '@currena/insights/page-division';
 import { BEAR_PCT, CORRECTION_PCT } from '@currena/insights/markets/definitions';
 import { goldOutlookOf } from '../../shared/components/outlook-core';
-import { marketsVerdictStep } from '../../features/world-markets/verdict-core';
-import { fxRuleView } from '../../features/currencies/fx-presentation/rules';
+import { marketsVerdictStep } from '../world-markets/verdict-core';
+import { fxRuleView } from '../currencies/fx-presentation/rules';
 import {
   GLOBAL_RIBBON_IDS,
   globalDedollarTile,

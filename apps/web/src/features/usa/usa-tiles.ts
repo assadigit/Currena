@@ -35,8 +35,8 @@
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { pageGroupIds } from '@currena/insights/page-division';
-import { globalGaugeTiles } from '../../routes/page-division/global-tiles';
-import type { GlobalGaugeTile } from '../../routes/page-division/global-tiles';
+import { globalGaugeTiles } from '../global/global-tiles';
+import type { GlobalGaugeTile } from '../global/global-tiles';
 
 /* ------------------------------------------------------------------ *
  * The D-30 verdict strip — the SAME five computed verdicts as Global

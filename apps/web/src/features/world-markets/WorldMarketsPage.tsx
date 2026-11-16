@@ -38,7 +38,7 @@ import { PERIOD_OF_VIEW, VIEW_OF_PERIOD } from './WorldMarketsBriefing';
 import type { MarketsView } from './shared';
 import type { MapPeriod } from './world-map-config';
 import { WorldMarketsGrids } from './WorldMarketsGrids';
-import { WorldRiskCards } from '../../routes/page-division/WorldRiskCards';
+import { WorldRiskCards } from '../global/WorldRiskCards';
 import { worldMarketsStatus, worldRiskCards } from './world-markets-tiles';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
