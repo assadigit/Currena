@@ -41,7 +41,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { fetchEbpCsv } from '../src/domains/usa/adapters/credit';
-import { fetchMofJgb10y } from '../src/adapters/mof';
+import { fetchMofJgb10y } from '../src/domains/asia-pacific/adapters/mof';
 import { insightsFetch } from '../src/shared/adapters/fetch-policy';
 import { readZipTextEntries } from '../src/shared/adapters/zip';
 import type { SeriesPoint } from '../src/shared/series';

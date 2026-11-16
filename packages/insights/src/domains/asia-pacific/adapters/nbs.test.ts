@@ -32,7 +32,7 @@ import {
   parseNbsRealEstateRelease,
 } from './nbs';
 
-const FIXTURES = join(__dirname, '..', '..', 'fixtures');
+const FIXTURES = join(__dirname, '..', '..', '..', '..', 'fixtures');
 const fixture = (name: string): string => readFileSync(join(FIXTURES, name), 'utf-8');
 
 describe('nbs adapter — the press-release index scan', () => {

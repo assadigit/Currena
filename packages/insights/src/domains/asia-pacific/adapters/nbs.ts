@@ -40,10 +40,10 @@
  * ~41 days).
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
-import { assertAscending } from '../shared/series';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
+import { assertAscending } from '../../../shared/series';
 
 /** The NBS English press-release index (15 releases per page, newest first). */
 export const NBS_PRESS_INDEX_URL = 'https://www.stats.gov.cn/english/PressRelease/';

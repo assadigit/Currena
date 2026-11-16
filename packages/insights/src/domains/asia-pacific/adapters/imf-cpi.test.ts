@@ -31,7 +31,7 @@ import {
 } from './imf-cpi';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', '..', 'fixtures');
 
 const captures: Record<ImfCpiCountry, unknown> = {
   JPN: JSON.parse(readFileSync(join(fixtures, 's25', 'imf-cpi-jpn-2026-11-12.json'), 'utf8')) as unknown,

@@ -83,7 +83,7 @@ const EuropePage = lazy(() => import('./routes/page-division/EuropePage').then((
 // /currencies + /gold (§9). The In-build chip stays (the §15 FRED-only
 // CPI fills are verified-pending-ingest, Rule 5 — BD-S14a; the chip
 // retires at the S15 gates pass, the Europe S12→S13 trajectory).
-const AsiaPage = lazy(() => import('./routes/page-division/AsiaPage').then((m) => ({ default: m.AsiaPage })));
+const AsiaPage = lazy(() => import('./features/asia-pacific/AsiaPage').then((m) => ({ default: m.AsiaPage })));
 // Page-division S16 (2026-11-10): the Australia route leaves the region
 // set — its own lazy chunk (the UsaPage/EuropePage/AsiaPage pattern): the
 // AU Markets board (the REUSED AustralianMarkets drawing through the lean

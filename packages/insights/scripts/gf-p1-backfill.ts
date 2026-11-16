@@ -56,7 +56,7 @@
  */
 
 import { fetchCftcGoldArchiveYear } from '../src/domains/gold/adapters/cftc';
-import { fetchMofJgb10y } from '../src/adapters/mof';
+import { fetchMofJgb10y } from '../src/domains/asia-pacific/adapters/mof';
 import { fetchFredSeries } from '../src/shared/adapters/fred';
 import { fetchYahooQuote } from '../src/shared/adapters/yahoo';
 import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';

@@ -31,7 +31,7 @@ import type { IndicatorId, InsightsSourceReport } from '@currena/core';
 import { classifySourceError, contentHash } from './fetch-policy';
 import { providerFetchEnabled } from '../sources';
 import type { SeriesPoint } from '../series';
-import { fetchMofJgb10y } from '../../adapters/mof';
+import { fetchMofJgb10y } from '../../domains/asia-pacific/adapters/mof';
 import { fetchEiaCrudeStocks, fetchEiaSprLevel, fetchEiaCrudeProduction } from '../../domains/commodities/adapters/eia-stocks';
 import { fetchCftcGoldPositioning } from '../../domains/gold/adapters/cftc';
 import { fetchOecdCli, fetchOecdNzShortRate } from './oecd';
@@ -51,11 +51,11 @@ import {
   latestRealEstateRelease,
   NBS_PRESS_INDEX_URL,
   parseNbsPressIndex,
-} from '../../adapters/nbs';
+} from '../../domains/asia-pacific/adapters/nbs';
 // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
 // family's fetchers — the IMF COFER adapter + the S&P 500 breadth pair.
 import { fetchCoferUsdShare } from '../../domains/currencies/adapters/cofer';
-import { fetchImfCpiYoy, imfCpiLabel } from '../../adapters/imf-cpi';
+import { fetchImfCpiYoy, imfCpiLabel } from '../../domains/asia-pacific/adapters/imf-cpi';
 import { fetchSp500BreadthRatio } from '../../domains/usa/adapters/sp500-breadth';
 // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive
 // (the I4 5–10y household anchor) + the SGE Au99.99 daily close (the F6

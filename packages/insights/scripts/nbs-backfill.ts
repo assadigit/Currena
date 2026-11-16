@@ -34,7 +34,7 @@ import {
   parseNbsIndustrialProductionRelease,
   parseNbsRealEstateRelease,
   type NbsReleaseLink,
-} from '../src/adapters/nbs';
+} from '../src/domains/asia-pacific/adapters/nbs';
 import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';
 import type { SeriesPoint } from '../src/shared/series';
 

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { fetchMofJgb10y, mergeMofSeries, MOF_JGBCME_URL, MOF_JGBCME_ALL_URL, parseMofJgbCsv } from './mof';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(harness(), '..', '..', 'fixtures');
+const fixtures = join(harness(), '..', '..', '..', '..', 'fixtures');
 
 function harness(): string {
   return here;

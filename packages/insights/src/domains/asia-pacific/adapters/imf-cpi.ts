@@ -35,8 +35,8 @@
  * trimmed to the trailing decade).
  */
 
-import type { SeriesPoint } from '../shared/series';
-import { insightsFetch } from '../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import { insightsFetch } from '../../../shared/adapters/fetch-policy';
 
 /** Thrown with the provider's own context so the report row stays honest. */
 export class ImfCpiError extends Error {

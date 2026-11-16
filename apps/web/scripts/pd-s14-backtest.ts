@@ -50,7 +50,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { InsightsSnapshotSchema, PageProjectionSchema } from '@currena/core';
 import { pageGroupIds } from '@currena/insights/page-division';
-import { auditUsaFreshness, backtestAsiaPage, ASIA_BACKTEST_CARD_IDS, type FreshnessRegistryEntry } from '../src/routes/page-division/asia-backtest-core';
+import { auditUsaFreshness, backtestAsiaPage, ASIA_BACKTEST_CARD_IDS, type FreshnessRegistryEntry } from '../src/features/asia-pacific/asia-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

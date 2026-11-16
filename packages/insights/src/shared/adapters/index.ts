@@ -139,6 +139,6 @@ export {
   SGE_MONTHLY_REPORT_URL,
 } from '../../domains/gold/adapters/sge-monthly';
 export type { SgeMonthlyReportLink, SgeWithdrawalReading } from '../../domains/gold/adapters/sge-monthly';
-export { fetchMofJgb10y, parseMofJgbCsv, MOF_JGBCME_URL } from '../../adapters/mof';
+export { fetchMofJgb10y, parseMofJgbCsv, MOF_JGBCME_URL } from '../../domains/asia-pacific/adapters/mof';
 export { insightsFetch, CURRENA_UA } from './fetch-policy';
 export { combineSeries } from '../series';

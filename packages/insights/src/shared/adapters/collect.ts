@@ -31,7 +31,7 @@ import {
   latestCpiRelease,
   latestPmiRelease,
   parseNbsPressIndex,
-} from '../../adapters/nbs';
+} from '../../domains/asia-pacific/adapters/nbs';
 import { fetchCryptoFng } from '../../domains/commodities/adapters/fng';
 import { fetchFrankfurterSeries } from '../../domains/currencies/adapters/frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
