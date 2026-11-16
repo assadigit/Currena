@@ -134,7 +134,7 @@ Always, in this order:
 
 1. Update `docs/HANDOFF.md`, `CHANGELOG.md`, `docs/DECISIONS.md`. Commit and push.
 2. Give the **TLDR report** (below), in plain language.
-3. If the work is not finished or continues later, give a **next-session prompt** in one copy-paste block. **It always starts with:** "Read AGENTS.md in the repo root first and follow it for the whole session." It must stand alone: which other files to read next (HANDOFF, the spec, the audit), the objective, the milestones, done-criteria, known problems, and any standing limits (such as "do not deploy").
+3. **Next-session prompt — automatic at every close-out while the plan is multi-session** (owner's standing instruction, 2026-11-16): if ANY sessions remain on the plan — including when this session's own scope is fully done — ALWAYS generate the **next-session prompt** yourself and give it in one copy-paste block. Never wait for the owner to ask. Only write "nothing needed — the plan is complete" when nothing at all remains. **It always starts with:** "Read AGENTS.md in the repo root first and follow it for the whole session." It must stand alone: which other files to read next (HANDOFF, the spec, the audit), the objective, the milestones, done-criteria, known problems, and any standing limits (such as "do not deploy"). When the authoritative prompt lives at the bottom of `docs/HANDOFF.md` (the phase-plan pattern), output that same prompt verbatim in your reply.
 4. Add short reminders when relevant: unfinished or missing specs, obsolete specs to archive, suggested additions to `AGENTS.md`.
 
 **TLDR report format**

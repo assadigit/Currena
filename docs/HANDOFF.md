@@ -44,11 +44,14 @@
 > `../src/routes/page-division/europe-backtest-core` — the audit's P3.8
 > row notation says pd-s15, which is WRONG: NO pd-s15 exists in
 > apps/web/scripts/ at all)**, prompt at the bottom of this file.
-> **STEP 0 adjustment (M9-specific): verify origin/main has the M9 move
-> commit `5463d45f` + the M9 bookkeeping commit (this docs commit) on
-> top of it (`git log --oneline -2 origin/main`), AND production ==
-> origin/main HEAD (the deploy-lock: expect currena-api `8f779769` @
-> 100%).**
+> **STEP 0 adjustment (updated after the M9 close): verify origin/main
+> has the M9 move commit `5463d45f`, then the M9 bookkeeping commit
+> `ad96ddfa`, then EXACTLY ONE docs-only process commit on top (the
+> 2026-11-16 AGENTS.md §10 next-session-prompt rule — `git log
+> --oneline -3 origin/main`; confirm via `git show --stat HEAD` that
+> the top commit touches ONLY docs), AND production is the M9 deploy:
+> currena-api `8f779769` @ 100% (the deploy-lock; docs-only commits do
+> NOT change deployed code).**
 
 ## Current state (after the M9 session)
 
@@ -409,9 +412,15 @@ FIRST, before touching anything:
    session that delivers but cannot push leaves production AHEAD of
    origin/main and silently breaks the deploy-lock. If the token is
    invalid: STOP, tell the owner, do NOT start.
-2. Verify origin/main has the M9 move commit 5463d45f + the M9
-   bookkeeping commit on top of it, AND production == origin/main HEAD
-   (the deploy-lock: expect currena-api 8f779769 @ 100%).
+2. Verify origin/main has the M9 move commit 5463d45f, then the M9
+   bookkeeping commit ad96ddfa, then EXACTLY ONE docs-only process
+   commit on top of it (the 2026-11-16 AGENTS.md §10 item-3 rule —
+   `git log --oneline -3 origin/main`; `git show --stat HEAD` must
+   show a DOCS-ONLY change: AGENTS.md + CHANGELOG.md + docs/HANDOFF.md
+   + docs/DECISIONS.md, no code), AND production is the M9 deploy:
+   currena-api 8f779769 @ 100% (the deploy-lock; docs-only commits do
+   NOT change deployed code). ANY code commit beyond ad96ddfa, or ANY
+   production version newer than 8f779769: STOP and report.
 3. Run `pnpm gates` once and record the numbers (the M9 close: 9/9,
    suite 15,298, IDENTICAL to the M7′ + M8 + M9 closes — ZERO delta).
    If the baseline is red, STOP and report — never start a phase on a
