@@ -68,7 +68,7 @@ import signalsIconsSrc from '../../features/gold/signals/icons.tsx?raw';
 import signalsVerdictSrc from '../../features/gold/signals/verdict.tsx?raw';
 import signalsBalanceSrc from '../../features/gold/signals/BalanceScale.tsx?raw';
 import signalsCardSrc from '../../features/gold/signals/MergedCard.tsx?raw';
-import connectionCardSrc from '../../components/insights/ConnectionCard.tsx?raw';
+import connectionCardSrc from '../../features/economic-linkages/ConnectionCard.tsx?raw';
 
 /* ------------------------------------------------------------------ *
  * Fixtures

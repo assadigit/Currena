@@ -115,7 +115,7 @@ const CurrenciesPage = lazy(() => import('./features/currencies/CurrenciesPage')
 // TM21: the Economic Linkages route — the dedicated page for the
 // macroeconomic connection cards (all the "Together" connections in one
 // place). Its own lazy chunk (the page-division pattern).
-const EconomicLinkagesPage = lazy(() => import('./routes/page-division/EconomicLinkagesPage').then((m) => ({ default: m.EconomicLinkagesPage })));
+const EconomicLinkagesPage = lazy(() => import('./features/economic-linkages/EconomicLinkagesPage').then((m) => ({ default: m.EconomicLinkagesPage })));
 
 /** No destination route shares the placeholder chunk anymore (S8: the
  *  four region pages left the set; S9: /usa + S12: /europe + S14:
