@@ -28,7 +28,7 @@ import { interpolate } from '../../shared/i18n';
 import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../shared/lib/page-division';
 import { fetchInsightsSnapshot, readCachedSnapshot } from '../../shared/lib/insights';
 import type { InsightsSnapshot } from '@currena/core';
-import { Signals } from '../../components/insights/Signals';
+import { Signals } from './Signals';
 import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldSeats } from './GoldSeats';

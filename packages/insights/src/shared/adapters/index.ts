@@ -37,7 +37,7 @@ export {
   sgeSeriesOf,
   SGE_DAILY_URL,
   SGE_AU9999,
-} from '../../adapters/sge';
+} from '../../domains/gold/adapters/sge';
 export { shanghaiPremiumSeries, GRAMS_PER_TROY_OUNCE } from './derived';
 // GF-S11 (2026-11-07): the P4 derivation functions (the venue-drift
 // discipline — the Worker phases and the Node inline build share them).
@@ -130,15 +130,15 @@ export { collectPortwatch, ma7Series, portwatchQueryUrl } from '../../domains/co
 export { collectTreasuryAuctions, selectAuctionFamily, auctionsUrl, AUCTIONS_URL } from '../../domains/usa/adapters/auctions';
 export type { AuctionsCollectResult, AuctionFamilySeries } from '../../domains/usa/adapters/auctions';
 export { fetchEiaSprLevel, fetchEiaCrudeProduction, EIA_SPR_URL, EIA_CRUDE_PRODUCTION_URL } from '../../domains/commodities/adapters/eia-stocks';
-export { fetchBazgGoldImports, parseBazgGoldImports, BAZG_GOLD_IMPORTS_URL } from '../../adapters/bazg';
+export { fetchBazgGoldImports, parseBazgGoldImports, BAZG_GOLD_IMPORTS_URL } from '../../domains/gold/adapters/bazg';
 export {
   fetchSgeMonthlyWithdrawal,
   parseSgeMonthlyReportIndex,
   parseSgeWithdrawal,
   extractPdfText,
   SGE_MONTHLY_REPORT_URL,
-} from '../../adapters/sge-monthly';
-export type { SgeMonthlyReportLink, SgeWithdrawalReading } from '../../adapters/sge-monthly';
+} from '../../domains/gold/adapters/sge-monthly';
+export type { SgeMonthlyReportLink, SgeWithdrawalReading } from '../../domains/gold/adapters/sge-monthly';
 export { fetchMofJgb10y, parseMofJgbCsv, MOF_JGBCME_URL } from '../../adapters/mof';
 export { insightsFetch, CURRENA_UA } from './fetch-policy';
 export { combineSeries } from '../series';

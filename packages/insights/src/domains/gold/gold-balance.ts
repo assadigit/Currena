@@ -49,8 +49,8 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-import { evalLeg } from './shared/connections';
-import { GOLD_LANES, GOLD_LANE_VOTERS, type GoldLane } from './shared/gold-score';
+import { evalLeg } from '../../shared/connections';
+import { GOLD_LANES, GOLD_LANE_VOTERS, type GoldLane } from '../../shared/gold-score';
 
 /* ------------------------------------------------------------------ *
  * The vocabulary (02 §2)

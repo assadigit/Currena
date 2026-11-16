@@ -43,7 +43,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { goldBalance, GOLD_LANE_MIN_FIRING, GOLD_LANE_STRONG } from '../src/gold-balance';
+import { goldBalance, GOLD_LANE_MIN_FIRING, GOLD_LANE_STRONG } from '../src/domains/gold/gold-balance';
 import { GOLD_LANES, GOLD_LANE_VOTERS } from '../src/shared/gold-score';
 import { SOURCE_LICENCES } from '../src/shared/licences';
 import { SOURCE_RISK_REGISTER } from '../src/shared/sources';

@@ -33,9 +33,9 @@
  * Pure, platform-free (AGENTS.md rule 2). Tested in real-yield-fill.test.ts.
  */
 
-import type { SeriesPoint } from './shared/series';
-import { addDays, epochDay } from './shared/series';
-import { PERCENTILE_WINDOW_DAYS } from './shared/scoring';
+import type { SeriesPoint } from '../../shared/series';
+import { addDays, epochDay } from '../../shared/series';
+import { PERCENTILE_WINDOW_DAYS } from '../../shared/scoring';
 
 /** The pair's first observation date on FRED — the fill never reaches past it. */
 export const REAL_YIELD_FILL_NOT_BEFORE = '2003-01-02';

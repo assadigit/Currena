@@ -55,7 +55,7 @@
  *   pnpm --filter @currena/insights gf-p1-backfill --write
  */
 
-import { fetchCftcGoldArchiveYear } from '../src/adapters/cftc';
+import { fetchCftcGoldArchiveYear } from '../src/domains/gold/adapters/cftc';
 import { fetchMofJgb10y } from '../src/adapters/mof';
 import { fetchFredSeries } from '../src/shared/adapters/fred';
 import { fetchYahooQuote } from '../src/shared/adapters/yahoo';

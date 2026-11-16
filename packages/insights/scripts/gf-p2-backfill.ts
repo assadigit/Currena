@@ -43,7 +43,7 @@
  *   pnpm --filter @currena/insights gf-p2-backfill --write
  */
 
-import { fetchCftcGoldArchiveYear } from '../src/adapters/cftc';
+import { fetchCftcGoldArchiveYear } from '../src/domains/gold/adapters/cftc';
 import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';
 import { mergeSeries } from '../src/shared/adapters/derived';
 import type { SeriesPoint } from '../src/shared/series';

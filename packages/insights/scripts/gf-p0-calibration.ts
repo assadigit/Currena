@@ -56,10 +56,10 @@ import { fileURLToPath } from 'node:url';
 import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@currena/core';
 
 import { DEFINITIONS, computeReading } from '../src/index';
-import { GF_VOTERS_FROZEN_21 } from '../src/gf-p0-proposed';
-import { realYieldScoringSeries } from '../src/real-yield-fill';
+import { GF_VOTERS_FROZEN_21 } from '../src/domains/gold/gf-p0-proposed';
+import { realYieldScoringSeries } from '../src/domains/gold/real-yield-fill';
 import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/shared/series';
-import { seriesUpTo } from '../src/gold-backtest-core';
+import { seriesUpTo } from '../src/domains/gold/gold-backtest-core';
 import {
   GF_F2_PROXY_ID,
   GF_MOVE_FROZEN_BASE,
@@ -80,7 +80,7 @@ import {
   type GfLaneBalance,
   type GfScenario,
   type GfVoter,
-} from '../src/gf-p0-proposed';
+} from '../src/domains/gold/gf-p0-proposed';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORPUS_PATH = join(HERE, '..', 'fixtures', 'gold-backtest-corpus.json');

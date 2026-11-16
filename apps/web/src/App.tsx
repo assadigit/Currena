@@ -56,7 +56,7 @@ const GlobalPage = lazy(() => import('./routes/page-division/GlobalPage').then((
 // Page-division S5 (2026-11-08): the Gold page — the 37-voter conditions
 // meter (D-26…D-29). Lazy like the Global route (the engine modules ride
 // the chunk; the entry graph stays untouched).
-const GoldPage = lazy(() => import('./routes/page-division/GoldPage').then((m) => ({ default: m.GoldPage })));
+const GoldPage = lazy(() => import('./features/gold/GoldPage').then((m) => ({ default: m.GoldPage })));
 // Page-division S7 (2026-11-08): the World Markets page — the D-43 map
 // hero + the region grids + the world risk cards. Lazy like the Gold
 // route (the WorldMap module + the pure derivations ride the chunk; the

@@ -39,7 +39,7 @@ import {
   SGE_MONTHLY_REPORT_URL,
   type SgeMonthlyReportLink,
 } from './sge-monthly';
-import { FormatChangedError } from '../shared/adapters/fetch-policy';
+import { FormatChangedError } from '../../../shared/adapters/fetch-policy';
 
 /* ------------------------------------------------------------------ *
  * The synthetic venue-shaped PDF.                                     *

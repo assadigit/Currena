@@ -22,9 +22,9 @@
  * Attribution: "Source: U.S. Commodity Futures Trading Commission".
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import { readZipTextEntries } from '../shared/adapters/zip';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import { readZipTextEntries } from '../../../shared/adapters/zip';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const CFTC_DEAFUT_URL = 'https://www.cftc.gov/dea/newcot/deafut.txt';
 

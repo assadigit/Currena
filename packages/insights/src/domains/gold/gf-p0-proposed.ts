@@ -74,9 +74,9 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-import type { LegDirection, LegLevel } from './shared/connections';
-import { GOLD_LANES } from './shared/gold-score';
-import type { GoldLane, GoldLaneVoter } from './shared/gold-score';
+import type { LegDirection, LegLevel } from '../../shared/connections';
+import { GOLD_LANES } from '../../shared/gold-score';
+import type { GoldLane, GoldLaneVoter } from '../../shared/gold-score';
 import type { GoldLaneSide, HarnessLaneBalance } from './gold-backtest-core';
 import {
   LANE_CALIB_FULLTIP_MAX_SHARE,

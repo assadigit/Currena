@@ -8,7 +8,7 @@
  *
  * Usage: pnpm --filter @currena/insights exec tsx scripts/gf-s10-live-verify.ts
  */
-import { goldBalance } from '../src/gold-balance';
+import { goldBalance } from '../src/domains/gold/gold-balance';
 import type { IndicatorReading } from '@currena/core';
 
 interface SnapshotShape {

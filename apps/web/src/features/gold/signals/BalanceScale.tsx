@@ -157,7 +157,7 @@ import { formatNumber } from '@currena/core';
 import type { SignalConditionState } from '@currena/insights';
 import { interpolate } from '../../../shared/i18n';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
-import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg } from '../../icons/currena';
+import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg } from '../../../components/icons/currena';
 import { BalanceGradients, BalanceWeight, BalanceWeightDisc } from './BalanceWeight';
 
 /** One balance driver — the spec's four states (§4). `neutral` (read,

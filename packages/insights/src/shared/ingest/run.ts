@@ -107,7 +107,7 @@ import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
 import type { KVLike } from './kv-store';
 import { combineSeries, epochDay, fromEpochDay, type SeriesPoint } from '../series';
-import { REAL_YIELD_FILL_CAP, realYieldScoringSeries } from '../../real-yield-fill';
+import { REAL_YIELD_FILL_CAP, realYieldScoringSeries } from '../../domains/gold/real-yield-fill';
 
 /**
  * The live-priced rows whose value series accumulate one observation per

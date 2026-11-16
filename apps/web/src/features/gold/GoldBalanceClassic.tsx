@@ -38,7 +38,7 @@ import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import type { GoldBalanceLane, GoldBalanceMember } from '@currena/insights';
-import { BalanceGradients } from '../../components/insights/signals/BalanceWeight';
+import { BalanceGradients } from './signals/BalanceWeight';
 import {
   BalanceStage,
   BalanceTray,
@@ -46,7 +46,7 @@ import {
   useBalanceVisualRootWidth,
   type BalanceDriver,
   type BalanceStageCopy,
-} from '../../components/insights/signals/BalanceScale';
+} from './signals/BalanceScale';
 import { LANE_INTRO_KEY, LANE_TITLE_KEY, VOTER_NAME_KEY, EVIDENCE_KEY } from './GoldSeats';
 import type { GoldHeroModel, GoldHeroVerdictState } from './gold-tiles';
 import { goldHeroCounts, goldHeroTilt, goldHeroVerdictState } from './gold-tiles';

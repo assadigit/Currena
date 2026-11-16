@@ -18,7 +18,7 @@ import {
   REAL_YIELD_FILL_NOT_BEFORE,
   realYieldScoringSeries,
 } from './real-yield-fill';
-import type { SeriesPoint } from './shared/series';
+import type { SeriesPoint } from '../../shared/series';
 
 const NOW = '2026-10-30T04:10:00.000Z';
 const END = '2026-10-28'; // the pure series' last published DFII10 day

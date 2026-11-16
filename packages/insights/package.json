@@ -20,7 +20,7 @@
     "./prices": "./src/shared/prices/index.ts",
     "./ingest": "./src/shared/ingest/index.ts",
     "./page-division": "./src/page-division/index.ts",
-    "./gf-p0-proposed": "./src/gf-p0-proposed.ts"
+    "./gf-p0-proposed": "./src/domains/gold/gf-p0-proposed.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",

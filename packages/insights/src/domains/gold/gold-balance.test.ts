@@ -36,7 +36,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-import { GOLD_LANE_VOTERS, GOLD_LANES, goldTailwindScore } from './shared/gold-score';
+import { GOLD_LANE_VOTERS, GOLD_LANES, goldTailwindScore } from '../../shared/gold-score';
 import { HARNESS_GOLD_LANES_MIN2, laneBalanceOverVoters } from './gold-backtest-core';
 import { GOLD_LANE_MIN_FIRING, GOLD_LANE_STRONG, goldBalance } from './gold-balance';
 
@@ -480,7 +480,7 @@ describe('goldBalance — the D-18 input-presence rule', () => {
 /** The corpus's recorded 2026-10-31 archive, as the page-shaped readings. */
 function fixtureReadings(): IndicatorReading[] {
   const corpus = JSON.parse(
-    readFileSync(new URL('../fixtures/gold-backtest-corpus.json', import.meta.url), 'utf8'),
+    readFileSync(new URL('../../../fixtures/gold-backtest-corpus.json', import.meta.url), 'utf8'),
   ) as { archives: Record<string, { generatedAt: string; readings: unknown[] }> };
   const archive = corpus.archives['2026-10-31']!;
   return archive.readings.map((raw) => {

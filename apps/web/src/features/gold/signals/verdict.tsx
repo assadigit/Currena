@@ -16,7 +16,7 @@ import type { SignalReading } from '@currena/insights';
 import { Coins } from 'lucide-react';
 import { interpolate } from '../../../shared/i18n';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
-import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../icons/currena';
+import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../../components/icons/currena';
 import { formatIndicatorValue } from '../../../shared/config';
 import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from '../../../shared/components/TrendChart';
 

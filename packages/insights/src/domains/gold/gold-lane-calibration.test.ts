@@ -30,7 +30,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 
-import { GOLD_LANE_VOTERS, goldTailwindScore } from './shared/gold-score';
+import { GOLD_LANE_VOTERS, goldTailwindScore } from '../../shared/gold-score';
 import {
   HARNESS_GOLD_LANES_MIN1,
   HARNESS_GOLD_LANES_MIN2,

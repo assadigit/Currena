@@ -25,9 +25,9 @@
  * dependencies. Every structural surprise throws loudly (F-16).
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const SGE_MONTHLY_REPORT_URL = 'https://en.sge.com.cn/data_MonthlyReport';
 

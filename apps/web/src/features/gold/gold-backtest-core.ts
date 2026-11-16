@@ -37,7 +37,7 @@ import {
 } from '@currena/insights/gf-p0-proposed';
 import { goldOutlookOf } from '../../shared/components/outlook-core';
 import { GOLD_CONTEXT_IDS, goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
-import { balanceTilt, balanceVerdictOf } from '../../components/insights/signals/BalanceScale';
+import { balanceTilt, balanceVerdictOf } from './signals/BalanceScale';
 
 /** One comparison's verdict — `ok` false is a RED finding (§21: zero tolerance). */
 export interface BacktestCheck {

@@ -13,9 +13,9 @@
 import { describe, expect, it } from 'vitest';
 import type { IndicatorReading } from '@currena/core';
 import { BREAKEVEN_TILT_DEADBAND_PT, breakevenTiltLean } from './breakeven-tilt';
-import { GOLD_LANE_VOTERS } from './shared/gold-score';
-import { buildIndicatorSeries } from './shared/adapters/derived';
-import type { SeriesPoint } from './shared/series';
+import { GOLD_LANE_VOTERS } from '../../shared/gold-score';
+import { buildIndicatorSeries } from '../../shared/adapters/derived';
+import type { SeriesPoint } from '../../shared/series';
 
 function pts(spec: Record<string, number>): SeriesPoint[] {
   return Object.entries(spec).map(([date, value]) => ({ date, value }));

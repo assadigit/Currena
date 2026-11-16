@@ -39,7 +39,7 @@
 
 import type { InsightsSnapshot } from '@currena/core';
 import { InsightsSnapshotSchema, PageProjectionSchema } from '@currena/core';
-import { backtestGoldPage } from '../src/routes/page-division/gold-backtest-core';
+import { backtestGoldPage } from '../src/features/gold/gold-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

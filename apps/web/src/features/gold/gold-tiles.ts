@@ -39,7 +39,7 @@ import {
   type BalanceCounts,
   type BalanceTilt,
   type BalanceVerdict,
-} from '../../components/insights/signals/BalanceScale';
+} from './signals/BalanceScale';
 
 /* ------------------------------------------------------------------ *
  * The hero (D-26 item 1): live gold price + the Balance Scale verdict

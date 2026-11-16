@@ -63,11 +63,11 @@ import {
 import { evaluateConnections } from '@currena/insights';
 import { insightsCopyEn, type InsightsCopy } from '../i18n/insights-copy-en';
 import { insightsCopyFa } from '../i18n/insights-copy-fa';
-import signalsSrc from '../../components/insights/Signals.tsx?raw';
-import signalsIconsSrc from '../../components/insights/signals/icons.tsx?raw';
-import signalsVerdictSrc from '../../components/insights/signals/verdict.tsx?raw';
-import signalsBalanceSrc from '../../components/insights/signals/BalanceScale.tsx?raw';
-import signalsCardSrc from '../../components/insights/signals/MergedCard.tsx?raw';
+import signalsSrc from '../../features/gold/Signals.tsx?raw';
+import signalsIconsSrc from '../../features/gold/signals/icons.tsx?raw';
+import signalsVerdictSrc from '../../features/gold/signals/verdict.tsx?raw';
+import signalsBalanceSrc from '../../features/gold/signals/BalanceScale.tsx?raw';
+import signalsCardSrc from '../../features/gold/signals/MergedCard.tsx?raw';
 import connectionCardSrc from '../../components/insights/ConnectionCard.tsx?raw';
 
 /* ------------------------------------------------------------------ *

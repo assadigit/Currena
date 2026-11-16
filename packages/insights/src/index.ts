@@ -114,7 +114,7 @@ export type {
   SignalLegEval,
 } from './shared/connections';
 
-export { evaluateSignal, evaluateSignals, LEAN_STRONG } from './signals';
+export { evaluateSignal, evaluateSignals, LEAN_STRONG } from './domains/gold/signals';
 export type {
   SignalConditionKey,
   SignalConditionReading,
@@ -122,7 +122,7 @@ export type {
   SignalLean,
   SignalMetal,
   SignalReading,
-} from './signals';
+} from './domains/gold/signals';
 
 // The Gold Program (docs/insights/GOLD_SCORE_SPEC.md): the directional
 // re-cut of the gauge voters for gold — S1's pure engine, frozen (D-GB-9).
@@ -171,13 +171,13 @@ export {
   GOLD_LANE_MIN_FIRING,
   GOLD_LANE_STRONG,
   goldBalance,
-} from './gold-balance';
+} from './domains/gold/gold-balance';
 export type {
   GoldBalanceLane,
   GoldBalanceMember,
   GoldBalanceReading,
   GoldBalanceSide,
-} from './gold-balance';
+} from './domains/gold/gold-balance';
 
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
@@ -189,10 +189,10 @@ export {
   REAL_YIELD_FILL_CAP,
   REAL_YIELD_FILL_NOT_BEFORE,
   realYieldScoringSeries,
-} from './real-yield-fill';
-export type { RealYieldFillResult } from './real-yield-fill';
-export { BREAKEVEN_TILT_DEADBAND_PT, breakevenTiltLean } from './breakeven-tilt';
-export type { BreakevenTiltLean } from './breakeven-tilt';
+} from './domains/gold/real-yield-fill';
+export type { RealYieldFillResult } from './domains/gold/real-yield-fill';
+export { BREAKEVEN_TILT_DEADBAND_PT, breakevenTiltLean } from './domains/gold/breakeven-tilt';
+export type { BreakevenTiltLean } from './domains/gold/breakeven-tilt';
 
 export { RULE_VERSION, RULE_CHANGELOG } from './shared/ruleVersion';
 export type { RuleChangeLogEntry } from './shared/ruleVersion';

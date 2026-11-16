@@ -25,7 +25,7 @@ import { DEFINITIONS } from './definitions';
 import { GAUGES } from './gauges';
 import { staleAfterDaysFor, computeReading } from './scoring';
 import { CONNECTIONS, evaluateConnection } from './connections';
-import { evaluateSignals } from '../signals';
+import { evaluateSignals } from '../domains/gold/signals';
 import { daysBetween, pointAtOrBefore, type SeriesPoint } from './series';
 import { READING_SOURCES } from './adapters/derived';
 

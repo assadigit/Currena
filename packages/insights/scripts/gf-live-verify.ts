@@ -11,7 +11,7 @@
  * (default: the production public snapshot on currena.ir)
  */
 
-import { goldBalance, GOLD_LANE_STRONG } from '../src/gold-balance';
+import { goldBalance, GOLD_LANE_STRONG } from '../src/domains/gold/gold-balance';
 import { GOLD_LANE_VOTERS, GOLD_LANES } from '../src/shared/gold-score';
 
 const url = process.argv[2] ?? 'https://currena.ir/api/insights';

@@ -54,11 +54,11 @@ import { fileURLToPath } from 'node:url';
 import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@currena/core';
 
 import { DEFINITIONS, computeReading } from '../src/index';
-import { goldBalance, GOLD_LANE_STRONG } from '../src/gold-balance';
+import { goldBalance, GOLD_LANE_STRONG } from '../src/domains/gold/gold-balance';
 import { GOLD_LANE_VOTERS, GOLD_LANES } from '../src/shared/gold-score';
-import { realYieldScoringSeries } from '../src/real-yield-fill';
+import { realYieldScoringSeries } from '../src/domains/gold/real-yield-fill';
 import { combineSeries, fromEpochDay, type SeriesPoint } from '../src/shared/series';
-import { seriesUpTo } from '../src/gold-backtest-core';
+import { seriesUpTo } from '../src/domains/gold/gold-backtest-core';
 import {
   GF_F2_PROXY_ID,
   GF_LANES_5,
@@ -70,7 +70,7 @@ import {
   gfMoveMapWith,
   gfNetScore,
   type GfLaneBalance,
-} from '../src/gf-p0-proposed';
+} from '../src/domains/gold/gf-p0-proposed';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORPUS_PATH = join(HERE, '..', 'fixtures', 'gold-backtest-corpus.json');
@@ -340,7 +340,7 @@ checkCommitted('POST-P4-5LANE (MIN1)|mature', matureMin1, COMMITTED['POST-P4-5LA
 import {
   GF_VOTERS_REALCURVE_PLUS,
   GF_VOTERS_REALCURVE_MINUS,
-} from '../src/gf-p0-proposed';
+} from '../src/domains/gold/gf-p0-proposed';
 
 function twinStats(voters: typeof GF_VOTERS_REALCURVE_PLUS, minFiring: number) {
   const balances = windows.map((w) => {

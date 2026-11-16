@@ -28,7 +28,7 @@ import {
   BALANCE_LH_PX,
   signedTiltDeg,
   type BalanceDriver,
-} from './signals/BalanceScale';
+} from '../../features/gold/signals/BalanceScale';
 import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
 import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 

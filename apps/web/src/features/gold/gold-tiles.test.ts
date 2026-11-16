@@ -28,7 +28,7 @@ import type { IndicatorReading } from '@currena/core';
 import { goldBalance } from '@currena/insights';
 import { GOLD_VOTER_IDS, homePageOfIndicator, pageHomeIds } from '@currena/insights/page-division';
 import { DISPLAY } from '../../shared/config';
-import { balanceTilt, balanceVerdictOf, type BalanceCounts } from '../../components/insights/signals/BalanceScale';
+import { balanceTilt, balanceVerdictOf, type BalanceCounts } from './signals/BalanceScale';
 import {
   GOLD_BLOCKED_NOTES,
   GOLD_CONTEXT_IDS,

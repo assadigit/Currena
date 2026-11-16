@@ -33,7 +33,7 @@ import { providerFetchEnabled } from '../sources';
 import type { SeriesPoint } from '../series';
 import { fetchMofJgb10y } from '../../adapters/mof';
 import { fetchEiaCrudeStocks, fetchEiaSprLevel, fetchEiaCrudeProduction } from '../../domains/commodities/adapters/eia-stocks';
-import { fetchCftcGoldPositioning } from '../../adapters/cftc';
+import { fetchCftcGoldPositioning } from '../../domains/gold/adapters/cftc';
 import { fetchOecdCli, fetchOecdNzShortRate } from './oecd';
 import { fetchFredSeries, FRED_SERIES } from './fred';
 import {
@@ -61,7 +61,7 @@ import { fetchSp500BreadthRatio } from '../../domains/usa/adapters/sp500-breadth
 // (the I4 5–10y household anchor) + the SGE Au99.99 daily close (the F6
 // Shanghai premium derivation's SGE leg).
 import { fetchUomExpectedPrice5y10y } from '../../domains/usa/adapters/uom';
-import { fetchSgeAu9999Recent, sgeSeriesOf } from '../../adapters/sge';
+import { fetchSgeAu9999Recent, sgeSeriesOf } from '../../domains/gold/adapters/sge';
 // GF-S11 (2026-11-07, the round-2 answers' execution + P4): the I9
 // accumulator's feeds (the Cleveland Fed nowcasting page + the SA CPI
 // index), the I11 global-liquidity legs (the ECB Eurosystem total assets
@@ -70,9 +70,9 @@ import { fetchSgeAu9999Recent, sgeSeriesOf } from '../../adapters/sge';
 // and the X5 GLD/SPY pair.
 import { fetchClevelandNowcasts, nowcastSeriesOf } from '../../domains/usa/adapters/cleveland';
 import { fetchEcbEurosystemAssets } from '../../adapters/ecb';
-import { fetchBazgGoldImports } from '../../adapters/bazg';
-import { fetchSgeMonthlyWithdrawal } from '../../adapters/sge-monthly';
-import { fetchGoldEquitiesRatio } from '../../adapters/gold-equities';
+import { fetchBazgGoldImports } from '../../domains/gold/adapters/bazg';
+import { fetchSgeMonthlyWithdrawal } from '../../domains/gold/adapters/sge-monthly';
+import { fetchGoldEquitiesRatio } from '../../domains/gold/adapters/gold-equities';
 import { fetchHlwRstar } from '../../domains/usa/adapters/rstar';
 
 /**

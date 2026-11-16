@@ -26,9 +26,9 @@
  * without a parseable quantity is skipped, never guessed.
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const BAZG_GOLD_IMPORTS_URL =
   'https://ocean.bazg.admin.ch/open-data-reports/TN8_controlCode_Gold_IMP_en_v1/TN8_controlCode_Gold_IMP_en_v1.csv';

@@ -43,7 +43,7 @@
  *   pnpm --filter @currena/insights gf-p4-backfill --write
  */
 
-import { fetchSgeAu9999, SGE_AU9999, type SgeAu9999Point } from '../src/adapters/sge';
+import { fetchSgeAu9999, SGE_AU9999, type SgeAu9999Point } from '../src/domains/gold/adapters/sge';
 import { shanghaiPremiumSeries, mergeSeries } from '../src/shared/adapters/derived';
 import { buildHistoryFile, historyToSeries } from '../src/shared/adapters/snapshot';
 import { RestInsightsStore } from '../src/shared/store';

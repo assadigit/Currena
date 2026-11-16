@@ -19,7 +19,7 @@ import {
   parseEiaCrudeStocksHtml,
   parseEiaWeeklySeriesHtml,
 } from '../../domains/commodities/adapters/eia-stocks';
-import { CFTC_DEAFUT_URL, CFTC_GOLD_MARKET, cftcArchiveUrl, parseCftcGoldArchiveAnnual, parseCftcGoldPositioning } from '../../adapters/cftc';
+import { CFTC_DEAFUT_URL, CFTC_GOLD_MARKET, cftcArchiveUrl, parseCftcGoldArchiveAnnual, parseCftcGoldPositioning } from '../../domains/gold/adapters/cftc';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtures = join(here, '..', '..', '..', 'fixtures');

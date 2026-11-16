@@ -20,9 +20,9 @@
  * acceptance (the agent never edits ownerAccepts).
  */
 
-import { insightsFetch, FormatChangedError } from '../shared/adapters/fetch-policy';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch, FormatChangedError } from '../../../shared/adapters/fetch-policy';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const SGE_DAILY_URL = 'https://www.sge.com.cn/sjzx/quotation_daily_new';
 

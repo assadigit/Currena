@@ -45,7 +45,7 @@ import type { IndicatorDefinition, IndicatorId, IndicatorReading } from '@curren
 
 import { DEFINITIONS, computeReading } from '../src/index';
 import { GOLD_LANE_VOTERS, type GoldLaneVoter } from '../src/shared/gold-score';
-import { realYieldScoringSeries } from '../src/real-yield-fill';
+import { realYieldScoringSeries } from '../src/domains/gold/real-yield-fill';
 import { fromEpochDay, type SeriesPoint } from '../src/shared/series';
 import {
   GOLD_BACKTEST_HORIZONS,
@@ -63,7 +63,7 @@ import {
   signAgreement,
   type GoldBacktestHorizon,
   type HarnessLaneBalance,
-} from '../src/gold-backtest-core';
+} from '../src/domains/gold/gold-backtest-core';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CORPUS_PATH = join(HERE, '..', 'fixtures', 'gold-backtest-corpus.json');

@@ -38,7 +38,7 @@ import type { IndicatorReading, InsightsSnapshot, PageProjection } from '@curren
 import { PageProjectionSchema } from '@currena/core';
 import { goldBalance } from '@currena/insights';
 import { GOLD_VOTER_IDS } from '@currena/insights/page-division';
-import { balanceTilt } from '../../components/insights/signals/BalanceScale';
+import { balanceTilt } from './signals/BalanceScale';
 import { GoldPage } from './GoldPage';
 import { GOLD_CONTEXT_IDS } from './gold-tiles';
 import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
