@@ -19,10 +19,10 @@
  */
 
 import type { FxPairEntry, FxPairId, FxSnapshot, FxSource, IndicatorReading } from '@currena/core';
-import type { SeriesPoint } from '../shared/series';
-import { daysBetween, fromEpochDay } from '../shared/series';
+import type { SeriesPoint } from '../../../shared/series';
+import { daysBetween, fromEpochDay } from '../../../shared/series';
 import { computeBasketValue } from '../basket';
-import { decodeWeeklySeries } from '../domains/world-markets/markets/definitions';
+import { decodeWeeklySeries } from '../../world-markets/markets/definitions';
 import type { FxQuotes, FxQuoteSet } from './providers';
 import type { FrankfurterFetchOptions, YahooFxFetchOptions } from './providers';
 import { fetchFrankfurterQuotes, fetchYahooQuotes } from './providers';

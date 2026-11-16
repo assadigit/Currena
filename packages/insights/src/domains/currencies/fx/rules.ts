@@ -6,7 +6,7 @@
  */
 
 import type { FxLeg, FxPatternCheck, FxRuleId, FxRuleState } from '@currena/core';
-import type { SeriesPoint } from '../shared/series';
+import type { SeriesPoint } from '../../../shared/series';
 import {
   FX_CHART_POINTS,
   FX_PAIR_IDS,

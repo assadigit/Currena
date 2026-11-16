@@ -55,7 +55,7 @@ import { FX_GROUP_ORDER, FX_PAIRS } from '@currena/insights/fx/definitions';
 import { TREND_BAND_PCT } from '@currena/insights/markets/definitions';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import type { XlsxSheet } from '../../shared/lib/xlsx-writer';
-import { fxTrendOf } from '../../lib/fx-presentation';
+import { fxTrendOf } from '../../features/currencies/fx-presentation';
 import { DISPLAY } from '../../shared/config/display';
 import { positionBand } from '../../shared/config/bands';
 import { statusWordKeyOf } from '../../shared/config/labels';

@@ -34,7 +34,7 @@
 import type { IndicatorId } from '@currena/core';
 import { combineSeries, yoyPctSeries, addDays, type SeriesPoint } from '../series';
 import { boeBankRateDailySeries } from '../../adapters/boe';
-import { BASKET_CURRENCIES, computeBasketValue } from '../../basket';
+import { BASKET_CURRENCIES, computeBasketValue } from '../../domains/currencies/basket';
 import { PERCENTILE_WINDOW_DAYS } from '../scoring';
 import type { Rung2SeriesInputs } from './rung2-inputs';
 import type { Rung4SeriesInputs } from './rung4-inputs';

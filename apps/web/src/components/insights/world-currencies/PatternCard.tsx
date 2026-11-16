@@ -15,8 +15,8 @@ import {
   fxRulePairIds,
   fxRuleView,
   fxSentence,
-} from '../../../lib/fx-presentation';
-import { signedPct } from './display';
+} from '../../../features/currencies/fx-presentation';
+import { signedPct } from '../../../features/currencies/display';
 import { Dots13, RebasedChart } from './PatternVisuals';
 import { Layer1Block } from '../../../shared/components/layer1/Layer1Block';
 

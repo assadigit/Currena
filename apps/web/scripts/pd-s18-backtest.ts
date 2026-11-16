@@ -63,7 +63,7 @@ import {
   backtestCurrenciesRules,
   CURRENCIES_BACKTEST_CARD_IDS,
   type FreshnessRegistryEntry,
-} from '../src/routes/page-division/currencies-backtest-core';
+} from '../src/features/currencies/currencies-backtest-core';
 
 const BASE = (() => {
   const i = process.argv.indexOf('--base');

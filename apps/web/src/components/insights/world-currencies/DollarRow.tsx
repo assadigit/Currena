@@ -6,9 +6,9 @@
 
 import type { FxSnapshot } from '@currena/core';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
-import { fxDollarMeaning } from '../../../lib/fx-presentation';
+import { fxDollarMeaning } from '../../../features/currencies/fx-presentation';
 import { GlossaryTip } from '../../../shared/components/GlossaryTip';
-import { signedPct } from './display';
+import { signedPct } from '../../../features/currencies/display';
 
 /* ------------------------------------------------------------------ *
  * Dollar at a glance (§9.3 item 5) — one slim row

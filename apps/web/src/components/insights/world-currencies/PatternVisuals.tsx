@@ -9,7 +9,7 @@ import { formatNumber } from '@currena/core';
 import type { FxRuleState } from '@currena/core';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { interpolate } from '../../../shared/i18n';
-import { fxChartLineLabel } from '../../../lib/fx-presentation';
+import { fxChartLineLabel } from '../../../features/currencies/fx-presentation';
 
 /* ------------------------------------------------------------------ *
  * The 13 dots (§9.3 Level 2 item 3) — time runs left to right, always

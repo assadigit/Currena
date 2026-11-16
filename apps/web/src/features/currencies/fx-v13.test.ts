@@ -21,8 +21,8 @@ import {
   summarizeFxRules,
 } from '@currena/insights/fx';
 import { fxRuleHasPatternCheck } from '@currena/insights/fx/definitions';
-import { insightsCopyEn } from '../shared/i18n/insights-copy-en';
-import { insightsCopyFa } from '../shared/i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import {
   fxChangeLine,
   fxChartLineLabel,

@@ -5,10 +5,10 @@
  * with the latest business day (probe 2026-10-06).
  */
 
-import { insightsFetch } from '../shared/adapters/fetch-policy';
-import { parseFrankfurterTimeseries } from '../shared/parsers';
-import type { SeriesPoint } from '../shared/series';
-import type { FetchDeps } from '../shared/adapters/types';
+import { insightsFetch } from '../../../shared/adapters/fetch-policy';
+import { parseFrankfurterTimeseries } from '../../../shared/parsers';
+import type { SeriesPoint } from '../../../shared/series';
+import type { FetchDeps } from '../../../shared/adapters/types';
 
 export const FRANKFURTER_BASE = 'https://api.frankfurter.dev/v1';
 

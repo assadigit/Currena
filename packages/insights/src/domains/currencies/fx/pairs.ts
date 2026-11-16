@@ -4,8 +4,8 @@
  */
 
 import type { FxChg, FxPairId } from '@currena/core';
-import type { SeriesPoint } from '../shared/series';
-import { addMonths, epochDay, pointAtOrBefore } from '../shared/series';
+import type { SeriesPoint } from '../../../shared/series';
+import { addMonths, epochDay, pointAtOrBefore } from '../../../shared/series';
 import { fxPairDefinition } from './definitions';
 import type { FxCurrency } from './definitions';
 import type { FxQuoteSet } from './providers';

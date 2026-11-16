@@ -17,7 +17,7 @@ export {
   fetchFrankfurterSeries,
   frankfurterTimeseriesUrl,
   FRANKFURTER_BASE,
-} from '../../adapters/frankfurter';
+} from '../../domains/currencies/adapters/frankfurter';
 export { ABS_SERIES, absDataUrl, fetchAbsSeries, ABS_DATA_BASE } from '../../domains/australia/adapters/abs';
 export {
   WB_COMMODITY_MARKETS_PAGE,

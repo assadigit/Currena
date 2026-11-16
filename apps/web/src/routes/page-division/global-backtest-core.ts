@@ -42,7 +42,7 @@ import { GOLD_VOTER_IDS, THEMATIC_GAUGE_IDS, THEMATIC_GAUGE_MEMBER_IDS } from '@
 import { BEAR_PCT, CORRECTION_PCT } from '@currena/insights/markets/definitions';
 import { goldOutlookOf } from '../../shared/components/outlook-core';
 import { marketsVerdictStep } from '../../features/world-markets/verdict-core';
-import { fxRuleView } from '../../lib/fx-presentation/rules';
+import { fxRuleView } from '../../features/currencies/fx-presentation/rules';
 import {
   GLOBAL_RIBBON_IDS,
   globalDedollarTile,

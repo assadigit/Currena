@@ -16,7 +16,7 @@ import type {
 import { FxSnapshotSchema } from '@currena/core';
 import { FX_STALE_DAYS, FX_WEEKLY_POINTS, VERDICT_ATTENTION_COUNT, VERDICT_UNUSUAL_COUNT } from './definitions';
 import { round2 } from './maths';
-import { daysBetween } from '../shared/series';
+import { daysBetween } from '../../../shared/series';
 
 export function summarizeFxRules(rules: readonly FxRuleState[]): FxSummary {
   const counted = rules.filter((r) => r.outcome === 'warning' && r.counted);

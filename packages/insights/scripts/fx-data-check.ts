@@ -14,9 +14,9 @@
  */
 
 import { writeFileSync } from 'node:fs';
-import { fetchFrankfurterQuotes, fetchYahooQuotes, type FxQuoteSet } from '../src/fx/providers';
-import { FX_QUOTE_CURRENCIES } from '../src/fx/providers';
-import { FX_PAIRS, FX_HISTORY_DAYS } from '../src/fx/definitions';
+import { fetchFrankfurterQuotes, fetchYahooQuotes, type FxQuoteSet } from '../src/domains/currencies/fx/providers';
+import { FX_QUOTE_CURRENCIES } from '../src/domains/currencies/fx/providers';
+import { FX_PAIRS, FX_HISTORY_DAYS } from '../src/domains/currencies/fx/definitions';
 import type { FxPairId } from '@currena/core';
 
 const repoRoot = new URL('../../../', import.meta.url);

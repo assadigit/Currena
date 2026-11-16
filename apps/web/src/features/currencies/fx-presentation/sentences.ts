@@ -9,8 +9,8 @@
  */
 
 import type { FxRuleState } from '@currena/core';
-import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
 import { abs1 } from './format';
 
 export interface FxSentence {

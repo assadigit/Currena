@@ -31,9 +31,9 @@ import {
   changesOf,
   pairSeriesFromQuotes,
   type FxRuleInputs,
-} from '../src/fx/compute';
-import { fetchFrankfurterQuotes } from '../src/fx/providers';
-import { FX_PAIRS, FX_STALE_DAYS } from '../src/fx/definitions';
+} from '../src/domains/currencies/fx/compute';
+import { fetchFrankfurterQuotes } from '../src/domains/currencies/fx/providers';
+import { FX_PAIRS, FX_STALE_DAYS } from '../src/domains/currencies/fx/definitions';
 import { pointAtOrBefore, daysBetween, addDays, type SeriesPoint } from '../src/shared/series';
 
 const repoRoot = new URL('../../../', import.meta.url);

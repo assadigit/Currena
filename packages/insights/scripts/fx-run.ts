@@ -20,10 +20,10 @@
  *   pnpm --filter @currena/insights fx-run
  */
 
-import { defaultFxFetchers } from '../src/fx/job';
-import { runFxUpdate, formatFxRunReport } from '../src/fx/run';
-import { RestFxStore } from '../src/fx/store';
-import type { FxCrossReader, FxReader, FxWriter } from '../src/fx/store';
+import { defaultFxFetchers } from '../src/domains/currencies/fx/job';
+import { runFxUpdate, formatFxRunReport } from '../src/domains/currencies/fx/run';
+import { RestFxStore } from '../src/domains/currencies/fx/store';
+import type { FxCrossReader, FxReader, FxWriter } from '../src/domains/currencies/fx/store';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');

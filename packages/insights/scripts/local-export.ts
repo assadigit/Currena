@@ -43,9 +43,9 @@ import { runMarketsUpdate } from '../src/domains/world-markets/markets/run';
 import { defaultFetchers as defaultMarketsFetchers } from '../src/domains/world-markets/markets/job';
 import type { MarketsReader, MarketsWriter } from '../src/domains/world-markets/markets/store';
 
-import { runFxUpdate } from '../src/fx/run';
-import { defaultFxFetchers } from '../src/fx/job';
-import type { FxReader, FxWriter, FxCrossReader } from '../src/fx/store';
+import { runFxUpdate } from '../src/domains/currencies/fx/run';
+import { defaultFxFetchers } from '../src/domains/currencies/fx/job';
+import type { FxReader, FxWriter, FxCrossReader } from '../src/domains/currencies/fx/store';
 
 import { runPricesUpdate } from '../src/shared/prices/job';
 import { defaultPricesFetchers } from '../src/shared/prices/job';

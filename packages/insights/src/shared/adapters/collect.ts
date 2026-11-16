@@ -33,7 +33,7 @@ import {
   parseNbsPressIndex,
 } from '../../adapters/nbs';
 import { fetchCryptoFng } from '../../domains/commodities/adapters/fng';
-import { fetchFrankfurterSeries } from '../../adapters/frankfurter';
+import { fetchFrankfurterSeries } from '../../domains/currencies/adapters/frankfurter';
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from '../../domains/australia/adapters/rba';

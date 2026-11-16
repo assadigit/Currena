@@ -111,7 +111,7 @@ describe('the collect wiring (S6-M6.1: the NZD leg must REACH the derivation)', 
   // proves the wire between them.
   it('collect.ts hands every FRANKFURTER_INSIGHTS_CURRENCIES leg into the fx input', async () => {
     const { readFileSync } = await import('node:fs');
-    const { FRANKFURTER_INSIGHTS_CURRENCIES } = await import('../../adapters/frankfurter');
+    const { FRANKFURTER_INSIGHTS_CURRENCIES } = await import('../../domains/currencies/adapters/frankfurter');
     const source = readFileSync(new URL('./collect.ts', import.meta.url), 'utf8');
     const fxBlock = /fx: \{[^}]*\},/s.exec(source)?.[0] ?? '';
     expect(fxBlock.length).toBeGreaterThan(0);

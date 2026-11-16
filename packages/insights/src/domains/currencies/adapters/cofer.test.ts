@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { parseCoferUsdShare, fetchCoferUsdShare, COFER_DATA_URL } from './cofer';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const fixtures = join(here, '..', '..', 'fixtures');
+const fixtures = join(here, '..', '..', '..', '..', 'fixtures');
 const coferJson = JSON.parse(readFileSync(join(fixtures, 's6', 'cofer-sdmx-2026-11-02.json'), 'utf8')) as unknown;
 
 function mutate(fn: (root: unknown) => void): unknown {

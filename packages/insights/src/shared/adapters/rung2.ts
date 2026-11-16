@@ -54,7 +54,7 @@ import {
 } from '../../adapters/nbs';
 // gap-closure S6-M6.3 (2026-11-02): the de-dollarization/concentration
 // family's fetchers — the IMF COFER adapter + the S&P 500 breadth pair.
-import { fetchCoferUsdShare } from '../../adapters/cofer';
+import { fetchCoferUsdShare } from '../../domains/currencies/adapters/cofer';
 import { fetchImfCpiYoy, imfCpiLabel } from '../../adapters/imf-cpi';
 import { fetchSp500BreadthRatio } from '../../domains/usa/adapters/sp500-breadth';
 // GF-S10 (2026-11-06, the remaining P3 sources): the UoM SIE archive

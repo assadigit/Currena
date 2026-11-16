@@ -12,8 +12,8 @@ import type { FxPairEntry, FxPairId, FxRuleState } from '@currena/core';
 import type { FxCurrency } from '@currena/core';
 import { FX_GROUP_ORDER, FX_PAIRS } from '@currena/insights/fx/definitions';
 import type { FxGroupId } from '@currena/insights/fx/definitions';
-import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { interpolate } from '../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { interpolate } from '../../../shared/i18n';
 import { fxSignedPct, whole0 } from './format';
 
 /** {first, second} currency codes of a pair (presentation's own map; NZD

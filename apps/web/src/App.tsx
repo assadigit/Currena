@@ -111,7 +111,7 @@ const CommoditiesPage = lazy(() => import('./features/commodities/CommoditiesPag
 // wiring (GET /api/insights/fx, the markets/fx last-good discipline).
 // The In-build chip stays (the S18 build session — the chip retires at
 // the S18 gates pass, the S16/S17 one-session trajectory).
-const CurrenciesPage = lazy(() => import('./routes/page-division/CurrenciesPage').then((m) => ({ default: m.CurrenciesPage })));
+const CurrenciesPage = lazy(() => import('./features/currencies/CurrenciesPage').then((m) => ({ default: m.CurrenciesPage })));
 // TM21: the Economic Linkages route — the dedicated page for the
 // macroeconomic connection cards (all the "Together" connections in one
 // place). Its own lazy chunk (the page-division pattern).

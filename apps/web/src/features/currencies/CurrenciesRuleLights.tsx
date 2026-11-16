@@ -31,7 +31,7 @@
 
 import type { FxRuleState } from '@currena/core';
 import { formatNumber } from '@currena/core';
-import { fxRuleView } from '../../lib/fx-presentation/rules';
+import { fxRuleView } from './fx-presentation/rules';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';

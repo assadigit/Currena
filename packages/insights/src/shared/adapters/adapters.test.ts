@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { FRED_BULK_ALL_IDS, FRED_BULK_GROUPS, fetchFredSeries, FRED_SERIES, fredSeriesUrl } from './fred';
-import { fetchFrankfurterSeries, frankfurterTimeseriesUrl } from '../../adapters/frankfurter';
+import { fetchFrankfurterSeries, frankfurterTimeseriesUrl } from '../../domains/currencies/adapters/frankfurter';
 import { absDataUrl, ABS_SERIES, fetchAbsSeries } from '../../domains/australia/adapters/abs';
 import { fetchGoldApiSpot, goldApiPriceUrl } from './goldapi';
 import { bitstampOhlcUrl, fetchBitstampCloses } from '../../domains/commodities/adapters/bitstamp';

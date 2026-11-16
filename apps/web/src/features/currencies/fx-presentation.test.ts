@@ -13,8 +13,8 @@
 
 import { describe, expect, it } from 'vitest';
 import type { FxPairEntry, FxRuleState, FxSnapshot } from '@currena/core';
-import { insightsCopyEn } from '../shared/i18n/insights-copy-en';
-import { insightsCopyFa } from '../shared/i18n/insights-copy-fa';
+import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import {
   fxClosestToWarning,
   fxHeadline,
@@ -26,7 +26,7 @@ import {
   fxSentence,
   fxTrendOf,
 } from './fx-presentation';
-import type { InsightsCopy } from '../shared/i18n/insights-copy-en';
+import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
 const en = insightsCopyEn;
 const fa = insightsCopyFa;

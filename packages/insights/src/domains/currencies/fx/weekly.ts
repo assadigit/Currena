@@ -4,8 +4,8 @@
  */
 
 import type { FxPatternCheck } from '@currena/core';
-import type { SeriesPoint } from '../shared/series';
-import { epochDay } from '../shared/series';
+import type { SeriesPoint } from '../../../shared/series';
+import { epochDay } from '../../../shared/series';
 import {
   FX_WEEKLY_POINTS,
   PATTERN_HOLDING_MIN,

@@ -16,7 +16,7 @@ import { fetchSgeMonthlyWithdrawal } from '../src/adapters/sge-monthly';
 import { fetchGoldEquitiesRatio } from '../src/adapters/gold-equities';
 import { fetchHlwRstar } from '../src/domains/usa/adapters/rstar';
 import { fetchYahooQuote } from '../src/shared/adapters/yahoo';
-import { fetchFrankfurterSeries } from '../src/adapters/frankfurter';
+import { fetchFrankfurterSeries } from '../src/domains/currencies/adapters/frankfurter';
 import {
   cpiSurpriseSeries,
   globalLiquiditySeries,

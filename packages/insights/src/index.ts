@@ -62,7 +62,7 @@ export {
   BASKET_SCALING_CONSTANT,
   BASKET_WEIGHTS,
   computeBasketValue,
-} from './basket';
+} from './domains/currencies/basket';
 
 export {
   GAUGES,

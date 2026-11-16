@@ -18,7 +18,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { FxPairId, FxRuleState, FxSnapshot } from '@currena/core';
 import { FxSnapshotSchema } from '@currena/core';
-import type { SeriesPoint } from '../shared/series';
+import type { SeriesPoint } from '../../../shared/series';
 import {
   buildDollarMeasure,
   changesOf,
