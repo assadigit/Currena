@@ -54,7 +54,7 @@ export {
   parseYahooQuoteResponse,
 } from './yahoo';
 export type { YahooQuote, YahooQuoteOptions } from './yahoo';
-export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from '../../adapters/ecb';
+export { ECB_DFR_SERIES_KEY, ecbDfrUrl, fetchEcbDfrSeries, ECB_DATA_BASE } from '../../domains/europe/adapters/ecb';
 export { bitstampOhlcUrl, fetchBitstampCloses } from '../../domains/commodities/adapters/bitstamp';
 export type { BitstampWindow } from '../../domains/commodities/adapters/bitstamp';
 export { RBA_TABLES, fetchRbaSeries, rbaTableUrl, RBA_CSV_BASE } from '../../domains/australia/adapters/rba';

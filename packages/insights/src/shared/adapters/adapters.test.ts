@@ -9,7 +9,7 @@ import { absDataUrl, ABS_SERIES, fetchAbsSeries } from '../../domains/australia/
 import { fetchGoldApiSpot, goldApiPriceUrl } from './goldapi';
 import { bitstampOhlcUrl, fetchBitstampCloses } from '../../domains/commodities/adapters/bitstamp';
 import { parseManualSeries } from './manual';
-import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY, ecbHicpUrl, ECB_PORTAL_TIMEOUT_MS } from '../../adapters/ecb';
+import { fetchEcbDfrSeries, ECB_DFR_SERIES_KEY, ecbHicpUrl, ECB_PORTAL_TIMEOUT_MS } from '../../domains/europe/adapters/ecb';
 import { fetchRbaSeries, RBA_TABLES, rbaTableUrl } from '../../domains/australia/adapters/rba';
 import { computeHighestSinceYear } from './derived';
 

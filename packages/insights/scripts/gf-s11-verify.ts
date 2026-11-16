@@ -10,7 +10,7 @@
  */
 import { fetchClevelandNowcasts, nowcastSeriesOf } from '../src/domains/usa/adapters/cleveland';
 import { fetchFredSeries, FRED_SERIES } from '../src/shared/adapters/fred';
-import { fetchEcbEurosystemAssets } from '../src/adapters/ecb';
+import { fetchEcbEurosystemAssets } from '../src/domains/europe/adapters/ecb';
 import { fetchBazgGoldImports } from '../src/domains/gold/adapters/bazg';
 import { fetchSgeMonthlyWithdrawal } from '../src/domains/gold/adapters/sge-monthly';
 import { fetchGoldEquitiesRatio } from '../src/domains/gold/adapters/gold-equities';

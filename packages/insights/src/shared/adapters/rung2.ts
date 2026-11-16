@@ -69,7 +69,7 @@ import { fetchSgeAu9999Recent, sgeSeriesOf } from '../../domains/gold/adapters/s
 // Highlights PDF), the F16 BAZG gold imports, the R11 HLW r-star workbook
 // and the X5 GLD/SPY pair.
 import { fetchClevelandNowcasts, nowcastSeriesOf } from '../../domains/usa/adapters/cleveland';
-import { fetchEcbEurosystemAssets } from '../../adapters/ecb';
+import { fetchEcbEurosystemAssets } from '../../domains/europe/adapters/ecb';
 import { fetchBazgGoldImports } from '../../domains/gold/adapters/bazg';
 import { fetchSgeMonthlyWithdrawal } from '../../domains/gold/adapters/sge-monthly';
 import { fetchGoldEquitiesRatio } from '../../domains/gold/adapters/gold-equities';

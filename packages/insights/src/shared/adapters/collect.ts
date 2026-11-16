@@ -21,8 +21,8 @@ import { providerFetchEnabled } from '../sources';
 import { ABS_SERIES, fetchAbsSeries } from '../../domains/australia/adapters/abs';
 import { fetchBitstampCloses } from '../../domains/commodities/adapters/bitstamp';
 import { fetchEiaBrent, fetchEiaHenryHub, fetchEiaWti } from '../../domains/commodities/adapters/eia';
-import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from '../../adapters/ecb';
-import { fetchBoeBankRateDecisions } from '../../adapters/boe';
+import { fetchEcbAaa10ySeries, fetchEcbDfrSeries, fetchEcbHicpSeries } from '../../domains/europe/adapters/ecb';
+import { fetchBoeBankRateDecisions } from '../../domains/europe/adapters/boe';
 import {
   NBS_PRESS_INDEX_URL,
   fetchNbsCpiRelease,

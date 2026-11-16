@@ -74,7 +74,7 @@ const UsaPage = lazy(() => import('./features/usa/UsaPage').then((m) => ({ defau
 // — its own lazy chunk (the UsaPage pattern): the EU section + the non-EU
 // UK section (D-33) render above the SAME S8 zoom section (the STOXX50E ·
 // DAX · CAC · FTSE zoom), plus the cross-links to /currencies (§8 item 4).
-const EuropePage = lazy(() => import('./routes/page-division/EuropePage').then((m) => ({ default: m.EuropePage })));
+const EuropePage = lazy(() => import('./features/europe/EuropePage').then((m) => ({ default: m.EuropePage })));
 // Page-division S14 (2026-11-09): the Asia & Pacific route leaves the
 // region set — its own lazy chunk (the UsaPage/EuropePage pattern): the
 // five sub-regions (D-35: China · Japan · Korea/Taiwan/HK · India ·
