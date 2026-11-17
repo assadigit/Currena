@@ -2,7 +2,7 @@
 
 ## Current state (after the §19.6 retirement session)
 
-**The legacy all-in-one `/insights` page is RETIRED (option B — the card-aware redirect). The code is committed + pushed to origin/main at `ecc64a05`. Gates 9/9 GREEN ×2 (the production-change two-run discipline). The D-9 condition is MET (all 187 cards still have homes — the engine is untouched). The deploy is PENDING the §21 portwatch window (Tuesday 11:00–14:00 UTC — the session opened at 11:32 UTC, INSIDE the window; the deploy is scheduled AFTER 14:00 UTC today).**
+**The legacy all-in-one `/insights` page is RETIRED (option B — the card-aware redirect) AND DEPLOYED + LIVE-VERIFIED. Production is now currena-api Version ID `c0858d06` (created 2026-11-17T14:09:09Z @ 100% — the §19.6 retirement deploy, the first production deploy since the M14 deploy `3ffcdd6b` which it supersedes). The code is committed + pushed to origin/main at `21f2209e` (the retirement commit `ecc64a05` + the bookkeeping `21f2209e`). Gates 9/9 GREEN ×2 (the production-change two-run discipline). The D-9 condition is MET (all 187 cards still have homes — the engine is untouched). The deploy respected the §21 portwatch window (executed 14:06–14:09 UTC, outside Tuesday 11:00–14:00 UTC) and the deploy-lock was re-checked FIRST (D-43: production was still `3ffcdd6b` before the deploy).**
 
 This is the FIRST PRODUCTION code change since the M14 deploy `3ffcdd6b` — the modularization program (M1–M16, COMPLETE) was docs-only/moves; this retires the one folder it prepared for deletion. The retirement is the post-modularization successor the M16 HANDOFF flagged as "a FUTURE owner decision (Gate 0 = the owner's recorded sign-off)." GATE 0 was satisfied by the owner's explicit instruction in the session kickoff ("Deploy: YES" + "SHIP the option-B card-aware redirect" = the §19.6 timing answer "retire now"), recorded in BD-S32 Decision 1 (docs/DECISIONS.md).
 
@@ -11,8 +11,8 @@ This is the FIRST PRODUCTION code change since the M14 deploy `3ffcdd6b` — the
 - **Gates:** 9/9 GREEN ×2 (run 1 on the clean tree with all edits applied uncommitted: 2m 37s; commit `ecc64a05` landed; run 2 on the clean tree with `git status` empty: 2m 37s — IDENTICAL). secret scan (1044 files — 48 fewer, the deleted legacy files) · typecheck (6 packages) · lint (0/0) · copy:audit (clean — 18 orphaned manifest entries pruned) · narrator vocabulary (193×2 + 56×2 — UNCHANGED) · narrator eval (50) · layer1 strict (11969/11969) · **full test suite 15,165** (core 195 · scraper 67 · insights 1383 · markets 13 · api 414 · web 13093) · build + bundle budget (entry 270.67/82.03 — SHRANK from 273.95/82.94; 10 destination-page chunks within budget — 3 re-baselined, 2 retired).
 - **Suite delta from the M16 close:** **15,284 → 15,165 = -119 tests** (NEGATIVE — the legacy /insights-only test files retired with their modules, exactly as spec §7.6 predicted; the M7′→M16 IDENTICAL-delta streak BREAKS intentionally — recorded in BD-S32 Decision 6).
 - **D-9 audit:** MET (every one of the 187 indicators verified categorized — one lane + one home each; the engine + placement table UNTOUCHED by the retirement).
-- **Production:** currena-api Version ID `3ffcdd6b` (the M14 deploy, created 2026-11-17T02:42:47Z, @ 100% — UNCHANGED). Deploy-lock re-checked FIRST at session open (D-43 holds — no deploy newer than the M14 deploy). The retirement commit `ecc64a05` changes production code (the SPA bundle) → deploy IS required → scheduled AFTER 14:00 UTC (outside the §21 portwatch window).
-- **origin/main HEAD:** `ecc64a05` (the retirement commit — 68 files: 47 deleted + 21 modified, pushed + verified — local HEAD == origin/main == `ecc64a05`).
+- **Production:** currena-api Version ID **`c0858d06`** (`c0858d06-eda9-4b82-bc8d-400422b174b8`, created 2026-11-17T14:09:09.851485Z, @ 100%, source wrangler) — the §19.6 retirement deploy. It SUPERSEDES the M14 deploy `3ffcdd6b` (created 2026-11-17T02:42:47Z). Deploy-lock re-checked FIRST before deploying (D-43: production was still `3ffcdd6b` @ 100%). The deploy ran 14:06–14:09 UTC Tuesday — OUTSIDE the §21 portwatch window (11:00–14:00 UTC). Wrangler FIRST attempt clean (no 10013 retry needed): 56 assets uploaded (92 already uploaded — the content-hashed unchanged assets skipped), Worker Startup Time 48 ms.
+- **Live-verify matrix (all GREEN):** `/` 200 (4768 B, the SPA shell) · `/insights` 200 → **redirects to `/`** (the boot guard rewrote the URL; title "Global - Currena"; verified in a headless browser) · **`/insights?card=us10y` → redirects to `/usa`** (the option-B card-aware redirect; title "USA - Currena"; verified live) · `/gold` 200 · `/world-markets` 200 · `/api/insights` 200 (89809 B, 183 readings, keys: calendar/changedThisWeek/displayMode/generatedAt/pricesAsOf/readings/ruleVersion/summary) · `/api/insights/pages/global` 200 (24606 B). The served entry hash `index-yC_ybchK.js` MATCHES the dist build (production serves the retirement build). Zero console errors on `/`. Mobile viewport (390×844) renders the header + menu (no legacy pill — the retirement cleanup visible).
 
 ## The §19.6 session record (what was done)
 
@@ -54,7 +54,7 @@ This is the FIRST PRODUCTION code change since the M14 deploy `3ffcdd6b` — the
 
 ## Owner-side levers waiting
 
-- **The deploy (PENDING the §21 portwatch window).** The code is on origin/main at `ecc64a05`; the deploy is scheduled after 14:00 UTC today (outside the Tuesday 11:00–14:00 UTC portwatch window). The deploy command: `pnpm --filter @currena/api run deploy` (the `run` required under pnpm 10). After the deploy: live-verify (`/`, `/insights` → the redirect, `/gold`, `/world-markets`, `/api/insights`, `/api/insights/pages/*`) + the post-deploy smoke per docs/DEPLOY.md. Rollback: one `npx wrangler rollback` + the git revert.
+- **DEPLOYED — the deploy lever is CLOSED.** currena-api Version ID `c0858d06` @ 100% (created 2026-11-17T14:09:09Z). Production == the SPA built from origin/main HEAD `21f2209e`. Rollback recipe (per docs/DEPLOY.md): `npx wrangler rollback` (one command, from apps/api) + `git revert ecc64a05` — the retirement is display-layer, nothing else moved.
 - **The external investor's review of spec §19** (the seven questions) — re-opens the page-division spec v2 work (the AF-1…AF-8 findings ride that pass).
 - **The R-5 details-panel port** — the spec's recommendation; the burn-in period (if adopted) measures whether readers used the detail panels. The `/api/insights/:id/history` endpoint stays for the port.
 - **triage the queued unreviewed fa strings** (the copy:audit queue — 1240 entries, does not fail the audit).
@@ -66,15 +66,8 @@ This is the FIRST PRODUCTION code change since the M14 deploy `3ffcdd6b` — the
 - **The Persian-copy manifest:** 7988 entries (was 8006 — 18 orphaned entries pruned). Rewritten in the original compact single-line-entry format. copy:audit GREEN.
 - **The narrator vocabulary:** 193×2 + 56×2 (UNCHANGED — the usGlobalReach block was not part of the vocabulary).
 
-## The next-session pointer — the deploy + live-verify
+## The next-session pointer — the retirement is COMPLETE
 
-**The §19.6 retirement code is SHIPPED to origin/main (`ecc64a05`), gates 9/9 GREEN ×2, suite 15,165 (delta -119), D-9 MET. The deploy is PENDING the §21 portwatch window.** If this session cannot deploy (the window closes at 14:00 UTC today), the next session deploys:
+**The §19.6 legacy `/insights` retirement is DONE AND VERIFIED LIVE: code shipped (`ecc64a05` + `21f2209e` on origin/main), gates 9/9 GREEN ×2, suite 15,165 (delta -119), D-9 MET, deployed (`c0858d06` @ 100%), live-verified (the option-B redirect matrix + zero console errors + mobile). Production == origin/main HEAD. Nothing remains for the §19.6 plan.**
 
-1. Re-check the deploy-lock FIRST (D-43): confirm production is STILL `3ffcdd6b` before deploying. If a newer deploy exists, STOP and report.
-2. Confirm the time is OUTSIDE the §21 portwatch window (NOT Tuesday 11:00–14:00 UTC).
-3. Deploy: `pnpm --filter @currena/api run deploy` (the `run` required under pnpm 10; CLOUDFLARE env vars set). If wrangler fails with error 10013, retry.
-4. Live-verify: `/` (Global) · `/insights` (→ the redirect to `/`) · `/insights?card=us10y` (→ the redirect to `/usa`) · `/gold` · `/world-markets` · `/api/insights` · `/api/insights/pages/*` — zero console errors, mobile + RTL.
-5. Post-deploy smoke per docs/DEPLOY.md. Rollback: `npx wrangler rollback` + `git revert ecc64a05`.
-6. Update this HANDOFF with the deploy result + the live-verify matrix. Confirm production == origin/main HEAD.
-
-The standing limits in AGENTS.md §11 (the §21 portwatch window, the D-43 deploy-lock re-check, the wrangler 10013 retry rule) carry forward.
+The standing owner-side levers (the investor's §19 review, the R-5 details-panel port, the fa-string triage, the credential rotation) re-open work at the owner's discretion, each behind its own Gate 0. The standing limits in AGENTS.md §11 (the §21 portwatch window, the D-43 deploy-lock re-check, the wrangler 10013 retry rule) carry forward to any future session that deploys or moves files.
