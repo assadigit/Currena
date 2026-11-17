@@ -12,6 +12,36 @@ Splits Currena's single all-in-one Insights page into **10 destinations**
 Commodities & Energy · Currency Pairs · legacy `/insights`), per the owner's
 **48 recorded decisions** collected over three strategy rounds.
 
+## Where things live
+
+The page-division program has two halves, and the modularization program
+(M1–M16) treated them differently:
+
+- **The engine half — `packages/insights/src/page-division/` — STAYED PUT.**
+  It is the engine-pages authority (`homePageOfIndicator` /
+  `pageHomeIds` / `pageReadingIds`; the 13/13 placement test gate), the
+  `@currena/insights/page-division` exports-map entry, and the import target
+  of `scripts/generate-placement-table.ts`. The audit's R1 risk explicitly
+  locks it: the folder NEVER moves (Phase 2 excluded it); `PLACEMENT.generated.md`
+  is pinned byte-for-byte by `doc.test.ts`, so any drift fails gates. It is
+  still at `packages/insights/src/page-division/` today.
+- **The web half — the `routes/page-division/` files — MOVED at M12.**
+  Every web page-division source file (GlobalPage, the region pages, the
+  tiles/backtest/copy-pin cores, HeroBlock, TopMoversStrip, NextUpStrip, ics,
+  …) moved out of `apps/web/src/routes/page-division/` into
+  `apps/web/src/features/global/` (and the per-domain `features/<domain>/`
+  homes) across the M3–M14 moves, with the global page-division files landing
+  at M12. The `routes/` folder no longer exists under `apps/web/src/`. The
+  web page-division source lives under `features/` now; this doc set
+  (`docs/page-division/`) is the program's planning + record, not a source
+  folder.
+
+The post-modularization folder layout is summarized in
+[`README.md`](../../README.md#where-things-live) (repo root) and walked
+file-by-file in
+[`docs/modularization/MODULARIZATION-AUDIT.md`](../modularization/MODULARIZATION-AUDIT.md)
+(Deliverable 1 — the file inventory).
+
 ## Reading order
 
 | # | File | What it is | Status |

@@ -1,6 +1,8 @@
 /**
- * world-currencies/DollarStrength — R9-04 (2026-10-27 owner round:
+ * features/insights-legacy/world-currencies/DollarStrength — R9-04 (2026-10-27 owner round:
  * "merge 'Is the dollar strong?' into the currencies section").
+ * (Lives in features/insights-legacy/ since the M13 Phase-4 move; the
+ * world-currencies/ subfolder was preserved.)
  *
  * The dollar-strength question group's six indicator cards (dollar-basket,
  * usdjpy, us-japan-10y-gap + context: eur-usd, usdtry, usdcny) render

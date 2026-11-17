@@ -154,9 +154,52 @@ Next session: <prompt below / nothing needed>
 
 ## 11. Project facts (maintained by the agent)
 
-On the first session in a repo, fill this section from your audit and keep it correct. Keep it short and factual: tech stack, hosting, default branch and deploy method, commands to run, test and deploy, database and backup commands, key folders, and any standing limits from the owner.
+Filled at M16 (the modularization documentation pass) from the post-modularization state. Keep it short and factual: tech stack, hosting, default branch and deploy method, commands to run, test and deploy, database and backup commands, key folders, and any standing limits from the owner.
 
-(Not yet filled in.)
+**Tech stack.** TypeScript 5 monorepo — pnpm@10.34.5 (Node ≥ 20). Hono API on Cloudflare Workers + a Vite React SPA (PWA; standalone, never server-rendered; Capacitor wrap later). Pure packages: `@currena/core` (zod schemas, conversion math, formatting — the money-tool cores), `@currena/insights` (the engine: definitions/gauges/scoring/adapters/narrator/page-division), `@currena/scraper` (TGJU + Frankfurter + the RateStore port). Persian/Farsi + RTL are first-class.
+
+**Hosting.** Cloudflare Workers — two scripts: `currena-api` (Hono; serves `/api/*`, the zero-JS noindexed `/admin` ops console with per-source status + manual refresh via `REFRESH_SECRET`, AND the built SPA via Workers static assets with SPA fallback — one deploy, no CORS) and `currena-markets` (the source scrapers' twin: the fx engine + the daily snapshot crons `30 23 * * 1-5` + `30 1 * * 2-6` UTC + the EODHD stock ingestion; scheduled-only — a page request can never reach a provider). Site: https://currena.ir. The legacy Django app stays live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutover.
+
+**Default branch:** `main`. **Deploy method:** `pnpm --filter @currena/api run deploy` (the `run` is required under pnpm 10). See `docs/DEPLOY.md` for the deploy-lock check, the post-deploy smoke, and the rollback recipe.
+
+**Commands.**
+```
+pnpm install
+pnpm gates                  # ALL gates in one command (secret scan · typecheck · lint ·
+                            # copy:audit · narrator vocabulary · narrator eval · layer1 strict ·
+                            # full test suite · build + bundle budget) — run before deploying; CI is red (owner-side)
+pnpm -r typecheck
+pnpm lint                   # eslint flat config; 0 errors in CI
+pnpm -r test                # vitest — never hits live sites
+pnpm --parallel dev         # api: wrangler dev (:8787) · web: vite (:5173)
+pnpm --filter @currena/web build          # SPA dist → served by the Worker
+pnpm --filter @currena/api run deploy     # wrangler deploy (needs CLOUDFLARE_API_TOKEN)
+pnpm registry:generate · pnpm placement:generate · pnpm s24:d9-audit   # the regeneration trio
+```
+
+**Database.** Cloudflare KV — the shared `RATES` KV namespace holds every rate + insights snapshot, accessed through the `RateStore` interface (the engine's `store.ts`). No SQL, no separate backup tool — KV is the source of truth; the daily crons + the last-good discipline are the durability model. Manual keys are written via the KV REST API for post-deploy landings.
+
+**Key folders (post-modularization — the M1–M16 program COMPLETE).**
+- `apps/api/src/` — the API worker: `index.ts` (composition root only) + `routes/` (rates/ops/admin/internal/insights) + shared HTTP plumbing (`http.ts`, `security.ts`, `default-service.ts`, `cron.ts`, `rates-service.ts`). LEAVE ALONE (route-split, DI-composed).
+- `apps/markets/src/` — the markets worker (scheduled-only crons: `index.ts` + `crons.ts`). LEAVE ALONE.
+- `apps/web/src/` — the SPA:
+  - `features/` — **11 domain homes**: `insights-legacy`, `global`, `gold`, `world-markets`, `australia`, `commodities`, `currencies`, `usa`, `europe`, `asia-pacific`, `economic-linkages`.
+  - `features-tools/` — **9 tool domains**: `about`, `batch`, `calculator`, `converter`, `history`, `live-rates`, `receipt`, `settle`, `splitter`.
+  - `shared/` — the shared layer: `components/` · `config/` · `hooks/` · `i18n/` · `lib/` · `ui/`.
+  - `infrastructure/` — the 16 infrastructure files (the M1 skeleton root).
+  - `App.tsx`, `main.tsx`, `router.ts`, `components/{Header,Footer,ErrorBoundary}.tsx`, `lib/` — src-root (no move).
+- `packages/insights/src/` — the engine: `shared/` (the cross-domain tables `definitions`/`gauges`/`gold-score`/`connections`/`scoring`/`validation` + the `adapters/` (13 modules) + `ingest/` + `prices/` + `store.ts`), `domains/` (**9**: asia-pacific, australia, commodities, companies, currencies, europe, gold, usa, world-markets), `page-division/` (stays — the engine-pages authority, 13/13 test gate), `narrator/` (stays), root `index.ts` barrel.
+- `packages/core/src/` — the money-tool cores + zod schemas (calc/batch/split/settle/format/math/currencies/alerts/schemas/meta). LEAVE ALONE.
+- `packages/scraper/src/` — TGJU + Frankfurter + the RateStore port. LEAVE ALONE.
+- `docs/` — `HANDOFF.md`, `DECISIONS.md`, `DEPLOY.md`, `INDICATORS_AND_DATA_SOURCES.md`, `THIRD_PARTY_NOTICES.md`, `specs/`, `audits/`, `modularization/`, `page-division/`, `insights/`, `localization/`, `archive/`, `assets/`.
+- `legacy/` (gitignored) — the Django backup, the ONLY source of truth for features.
+
+**Standing limits (carry forward every session).**
+- **The §21 portwatch window:** never run the portwatch leg Tuesdays 11:00–14:00 UTC — the IMF PortWatch provider's maintenance window returns stale/empty readings (recorded in `docs/page-division/01-SESSION-ROADMAP.md`).
+- **The deploy-lock re-check FIRST (D-43):** before every deploy, confirm via the Cloudflare deployments API that the active production version is the expected one. If a newer deploy exists, STOP and report — an unattended mid-session deploy once drifted production (the D-43 lesson, walked in every `docs/DEPLOY.md` session record).
+- **The wrangler 10013 retry rule:** if `wrangler deploy` fails with error 10013 (a transient Cloudflare deploy failure), retry the deploy. Every M12–M14 first attempt was clean; the rule is held in reserve.
+- **The `run` is required under pnpm 10:** `pnpm --filter @currena/api run deploy`, not `pnpm --filter @currena/api deploy`.
+- **No renames, ever, when moving files (R5):** the bundle-budget gate matches route-module chunk basenames (`GoldPage-*.js` …) — moves only, names frozen. The modularization program is COMPLETE at M16, but the constraint carries forward for any future move.
 
 ## 12. First-time setup of a repo (do this automatically)
 
