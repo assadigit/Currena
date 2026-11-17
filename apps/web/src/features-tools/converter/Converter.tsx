@@ -51,32 +51,32 @@ import {
   sourceForPair,
 } from '@currena/core';
 import type { ConversionResult, CurrencyCode } from '@currena/core';
-import { parseInputAmount } from '../components/AmountInput';
-import { LedGoldBoard } from '../components/LedGoldBoard';
-import { LedRateBoard } from '../components/LedRateBoard';
-import { ResultPopup } from '../components/ResultPopup';
-import type { ConversionView } from '../components/ResultPopup';
-import { LoaderDots, OfflineBanner, StaleBanner } from '../shared/ui/ui';
-import { ApiError, fetchMeta } from '../shared/lib/api';
-import { alertsStore, useAlerts } from '../shared/lib/alerts';
-import { saveHistoryEntry } from '../lib/history';
-import { useI18n } from '../shared/lib/locale';
-import { addRecentPair, readRecentPairs } from '../lib/recent-pairs';
-import type { RecentPair } from '../lib/recent-pairs';
-import { routeQuery } from '../router';
-import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../shared/lib/snapshot-store';
-import { AlertsSectionRow } from './converter/AlertsSectionRow';
-import { ConvertForm } from './converter/ConvertForm';
-import { FailureCard } from './converter/FailureCard';
-import { PairChips } from './converter/PairChips';
-import { QuickTools } from './converter/QuickTools';
-import { MIN_FETCHING_MS, sleep, type ConvertFailure } from './converter/shared';
+import { parseInputAmount } from './AmountInput';
+import { LedGoldBoard } from '../live-rates/LedGoldBoard';
+import { LedRateBoard } from '../live-rates/LedRateBoard';
+import { ResultPopup } from './ResultPopup';
+import type { ConversionView } from './ResultPopup';
+import { LoaderDots, OfflineBanner, StaleBanner } from '../../shared/ui/ui';
+import { ApiError, fetchMeta } from '../../shared/lib/api';
+import { alertsStore, useAlerts } from '../../shared/lib/alerts';
+import { saveHistoryEntry } from '../history/history';
+import { useI18n } from '../../shared/lib/locale';
+import { addRecentPair, readRecentPairs } from './recent-pairs';
+import type { RecentPair } from './recent-pairs';
+import { routeQuery } from '../../router';
+import { isConfirmedStale, snapshotStore, useSnapshotStore } from '../../shared/lib/snapshot-store';
+import { AlertsSectionRow } from './AlertsSectionRow';
+import { ConvertForm } from './ConvertForm';
+import { FailureCard } from './FailureCard';
+import { PairChips } from './PairChips';
+import { QuickTools } from './QuickTools';
+import { MIN_FETCHING_MS, sleep, type ConvertFailure } from './shared';
 
 // I14 — the alerts dialog is LAZY (bundle budget: the money page's entry
 // chunk carries the section row + badge + evaluation engine; the dialog's
 // form + list only download when the user actually opens it — same rule
 // as the seven tool routes in App.tsx).
-const AlertsDialog = lazy(() => import('../components/AlertsDialog').then((m) => ({ default: m.AlertsDialog })));
+const AlertsDialog = lazy(() => import('./AlertsDialog').then((m) => ({ default: m.AlertsDialog })));
 
 type Phase = 'idle' | 'fetching' | 'result';
 

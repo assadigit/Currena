@@ -11,9 +11,9 @@
 
 import { formatNumber, thousandSeparateInput } from '@currena/core';
 import type { CurrencyCode, Snapshot } from '@currena/core';
-import { AmountInput } from '../../components/AmountInput';
+import { AmountInput } from './AmountInput';
 import { CurrencySelect } from '../../shared/components/CurrencySelect';
-import { LiveRateLine } from '../../components/LiveRateLine';
+import { LiveRateLine } from './LiveRateLine';
 import { Button, Card } from '../../shared/ui/ui';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';

@@ -16,7 +16,7 @@ import { useCodeLabel } from '../../shared/lib/display';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { useRovingKeys } from '../../shared/hooks/use-roving-keys';
-import type { SettleGroup } from '../../lib/settle-storage';
+import type { SettleGroup } from './settle-storage';
 import { ExpensePhoto } from './ExpensePhoto';
 import { fmt2 } from './shared';
 

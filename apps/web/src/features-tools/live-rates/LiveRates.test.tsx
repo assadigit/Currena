@@ -105,9 +105,9 @@ function stubApi(plan: FetchPlan = {}): void {
 /** Fresh module graph per test — the snapshot store is a singleton. */
 async function loadLiveRates(): Promise<{
   LiveRates: typeof import('./LiveRates')['LiveRates'];
-  snapshotStore: typeof import('../shared/lib/snapshot-store')['snapshotStore'];
+  snapshotStore: typeof import('../../shared/lib/snapshot-store')['snapshotStore'];
 }> {
-  const { snapshotStore } = await import('../shared/lib/snapshot-store');
+  const { snapshotStore } = await import('../../shared/lib/snapshot-store');
   const { LiveRates } = await import('./LiveRates');
   return { LiveRates, snapshotStore };
 }

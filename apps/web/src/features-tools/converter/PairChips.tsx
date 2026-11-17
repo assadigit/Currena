@@ -8,7 +8,7 @@
 
 import { useCodeLabel } from '../../shared/lib/display';
 import { useI18n } from '../../shared/lib/locale';
-import type { RecentPair } from '../../lib/recent-pairs';
+import type { RecentPair } from './recent-pairs';
 import { POPULAR_PAIRS } from './shared';
 
 export function PairChips(props: {

@@ -8,7 +8,7 @@
  */
 
 import { formatNumber } from '@currena/core';
-import { useI18n } from '../shared/lib/locale';
+import { useI18n } from '../../shared/lib/locale';
 
 interface RateDelta {
   /** Current rate (units of `to` per 1 `from`). */

@@ -15,7 +15,7 @@ import { computeBalances } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { Card, Button } from '../../shared/ui/ui';
 import { useI18n } from '../../shared/lib/locale';
-import type { SettleGroup } from '../../lib/settle-storage';
+import type { SettleGroup } from './settle-storage';
 import { fmt2 } from './shared';
 
 export function GroupCard({

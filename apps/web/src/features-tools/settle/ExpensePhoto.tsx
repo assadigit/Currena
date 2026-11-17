@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { getPhoto } from '../../lib/photo-store';
+import { getPhoto } from './photo-store';
 
 function ExpensePhoto({ expenseId, alt }: { expenseId: string; alt: string }) {
   const [url, setUrl] = useState<string | null>(null);

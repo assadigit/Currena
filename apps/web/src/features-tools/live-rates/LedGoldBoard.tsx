@@ -49,9 +49,9 @@
 import { memo, useEffect, useMemo, useState } from 'react';
 import type { GoldId, GoldQuote, Snapshot } from '@currena/core';
 import { LedClock, LedDate, LedStatus, LedValueCell } from './led/LedParts';
-import { useI18n } from '../shared/lib/locale';
-import { isConfirmedStale, useSnapshotStore } from '../shared/lib/snapshot-store';
-import type { TranslationKey } from '../shared/lib/locale';
+import { useI18n } from '../../shared/lib/locale';
+import { isConfirmedStale, useSnapshotStore } from '../../shared/lib/snapshot-store';
+import type { TranslationKey } from '../../shared/lib/locale';
 
 /** Board items in DISPLAY order — the global ounce first, then the Tehran
  *  market in the owner's pasted order. Mirrors TGJU's own طلا و سکه table. */

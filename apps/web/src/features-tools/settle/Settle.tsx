@@ -43,22 +43,22 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { computeBalances, parseAmount, settleDebts } from '@currena/core';
-import { uniqueId } from '../shared/lib/id';
+import { uniqueId } from '../../shared/lib/id';
 import type { CurrencyCode, Transfer } from '@currena/core';
-import { Button, Card, Toast } from '../shared/ui/ui';
+import { Button, Card, Toast } from '../../shared/ui/ui';
 import {
   persistSettleGroups,
   readSettleGroups,
   subscribeSettleGroups,
-} from '../lib/settle-storage';
-import type { SettleGroup, SettleExpense } from '../lib/settle-storage';
-import { deletePhotos, putPhoto } from '../lib/photo-store';
-import { useI18n } from '../shared/lib/locale';
-import { AddExpenseModal } from './settle/AddExpenseModal';
-import { CreateGroupModal } from './settle/CreateGroupModal';
-import { GroupCard } from './settle/GroupCard';
-import { GroupDetail } from './settle/GroupDetail';
-import { groupCurrency } from './settle/shared';
+} from './settle-storage';
+import type { SettleGroup, SettleExpense } from './settle-storage';
+import { deletePhotos, putPhoto } from './photo-store';
+import { useI18n } from '../../shared/lib/locale';
+import { AddExpenseModal } from './AddExpenseModal';
+import { CreateGroupModal } from './CreateGroupModal';
+import { GroupCard } from './GroupCard';
+import { GroupDetail } from './GroupDetail';
+import { groupCurrency } from './shared';
 
 export function Settle() {
   const { t, numberLocale } = useI18n();

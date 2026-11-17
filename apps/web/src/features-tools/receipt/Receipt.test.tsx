@@ -107,9 +107,9 @@ function stubApi(): void {
 /** Fresh module graph per test — the snapshot store is a singleton. */
 async function loadReceipt(): Promise<{
   Receipt: typeof import('./Receipt')['Receipt'];
-  snapshotStore: typeof import('../shared/lib/snapshot-store')['snapshotStore'];
+  snapshotStore: typeof import('../../shared/lib/snapshot-store')['snapshotStore'];
 }> {
-  const { snapshotStore } = await import('../shared/lib/snapshot-store');
+  const { snapshotStore } = await import('../../shared/lib/snapshot-store');
   const { Receipt } = await import('./Receipt');
   return { Receipt, snapshotStore };
 }

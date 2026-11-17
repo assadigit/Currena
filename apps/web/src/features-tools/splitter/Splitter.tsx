@@ -16,11 +16,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { convert, formatNumber, parseAmount, sourceForPair, splitEvenly, thousandSeparateInput } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
-import { CurrencySelect } from '../shared/components/CurrencySelect';
-import { Button, Card, Switch, Toast } from '../shared/ui/ui';
-import { useCodeLabel } from '../shared/lib/display';
-import { useI18n } from '../shared/lib/locale';
-import { snapshotStore, useSnapshotStore } from '../shared/lib/snapshot-store';
+import { CurrencySelect } from '../../shared/components/CurrencySelect';
+import { Button, Card, Switch, Toast } from '../../shared/ui/ui';
+import { useCodeLabel } from '../../shared/lib/display';
+import { useI18n } from '../../shared/lib/locale';
+import { snapshotStore, useSnapshotStore } from '../../shared/lib/snapshot-store';
 
 interface SplitResult {
   total: number;

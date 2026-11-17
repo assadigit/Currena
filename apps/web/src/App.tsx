@@ -22,7 +22,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast } from './shared/ui/ui';
-import { LiveRates } from './routes/LiveRates';
+import { LiveRates } from './features-tools/live-rates/LiveRates';
 import { useRoute } from './router';
 import { useI18n } from './shared/lib/locale';
 import { routeMetaFor, setCanonical, setMetaTag } from './lib/route-meta';
@@ -31,21 +31,21 @@ import { hydrateServerHistory } from './shared/lib/rate-history';
 import { alertsStore } from './shared/lib/alerts';
 import { useAlertEvaluation } from './lib/use-alert-evaluation';
 
-const Calculator = lazy(() => import('./routes/Calculator').then((m) => ({ default: m.Calculator })));
-const History = lazy(() => import('./routes/History').then((m) => ({ default: m.History })));
+const Calculator = lazy(() => import('./features-tools/calculator/Calculator').then((m) => ({ default: m.Calculator })));
+const History = lazy(() => import('./features-tools/history/History').then((m) => ({ default: m.History })));
 const BatchConverter = lazy(() =>
-  import('./routes/BatchConverter').then((m) => ({ default: m.BatchConverter })),
+  import('./features-tools/batch/BatchConverter').then((m) => ({ default: m.BatchConverter })),
 );
-const Splitter = lazy(() => import('./routes/Splitter').then((m) => ({ default: m.Splitter })));
-const Settle = lazy(() => import('./routes/Settle').then((m) => ({ default: m.Settle })));
-const Receipt = lazy(() => import('./routes/Receipt').then((m) => ({ default: m.Receipt })));
-const About = lazy(() => import('./routes/About').then((m) => ({ default: m.About })));
+const Splitter = lazy(() => import('./features-tools/splitter/Splitter').then((m) => ({ default: m.Splitter })));
+const Settle = lazy(() => import('./features-tools/settle/Settle').then((m) => ({ default: m.Settle })));
+const Receipt = lazy(() => import('./features-tools/receipt/Receipt').then((m) => ({ default: m.Receipt })));
+const About = lazy(() => import('./features-tools/about/About').then((m) => ({ default: m.About })));
 const Insights = lazy(() => import('./features/insights-legacy/Insights').then((m) => ({ default: m.Insights })));
 // Page-division S1 (D-46): the Converter — the app's founding tool, eager
 // in the entry chunk until now — becomes a lazy tool route at /converter so
 // the Global page (D-20: the landing page) owns `/`. The placeholder
 // skeleton for the eight destinations is one shared lazy chunk.
-const Converter = lazy(() => import('./routes/Converter').then((m) => ({ default: m.Converter })));
+const Converter = lazy(() => import('./features-tools/converter/Converter').then((m) => ({ default: m.Converter })));
 const PagePlaceholder = lazy(() =>
   import('./shared/components/PagePlaceholder').then((m) => ({ default: m.PagePlaceholder })),
 );

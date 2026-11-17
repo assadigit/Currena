@@ -11,16 +11,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Source } from '@currena/core';
 import { formatDate, formatJalaliDate, formatNumber, formatRelative } from '@currena/core';
-import { useCodeLabel } from '../shared/lib/display';
-import { useI18n } from '../shared/lib/locale';
-import type { TranslationKey } from '../shared/lib/locale';
-import { bucketMean, TREND_BUCKETS } from '../shared/lib/live-rate';
-import { seriesForPair, trendOf, useRateHistory } from '../shared/lib/rate-history';
+import { useCodeLabel } from '../../shared/lib/display';
+import { useI18n } from '../../shared/lib/locale';
+import type { TranslationKey } from '../../shared/lib/locale';
+import { bucketMean, TREND_BUCKETS } from '../../shared/lib/live-rate';
+import { seriesForPair, trendOf, useRateHistory } from '../../shared/lib/rate-history';
 import { Odometer } from './Odometer';
 import { RateDeltaChip } from './RateDeltaChip';
-import { Sparkline } from '../shared/components/Sparkline';
-import { Button, LiveIndicator, SourceBadge } from '../shared/ui/ui';
-import { useDialogFocus } from '../shared/hooks/useDialogFocus';
+import { Sparkline } from '../../shared/components/Sparkline';
+import { Button, LiveIndicator, SourceBadge } from '../../shared/ui/ui';
+import { useDialogFocus } from '../../shared/hooks/useDialogFocus';
 
 /** Everything the popup renders — produced by the converter's state machine. */
 export interface ConversionView {

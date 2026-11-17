@@ -9,7 +9,7 @@
 
 import { formatNumber } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
-import type { SettleGroup } from '../../lib/settle-storage';
+import type { SettleGroup } from './settle-storage';
 
 /**
  * The group's dominant expense currency. Settlement records are denominated

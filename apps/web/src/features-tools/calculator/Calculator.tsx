@@ -18,11 +18,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalcError, evaluateExpression, formatNumber, parseAmount, sourceForPair } from '@currena/core';
 import type { CurrencyCode } from '@currena/core';
-import { CurrencySelect } from '../shared/components/CurrencySelect';
-import { Card } from '../shared/ui/ui';
-import { useCodeLabel } from '../shared/lib/display';
-import { useI18n } from '../shared/lib/locale';
-import { snapshotStore, useSnapshotStore } from '../shared/lib/snapshot-store';
+import { CurrencySelect } from '../../shared/components/CurrencySelect';
+import { Card } from '../../shared/ui/ui';
+import { useCodeLabel } from '../../shared/lib/display';
+import { useI18n } from '../../shared/lib/locale';
+import { snapshotStore, useSnapshotStore } from '../../shared/lib/snapshot-store';
 
 /** The 13 currencies the legacy calculator offered (captured markup). */
 const CALC_CURRENCIES: readonly CurrencyCode[] = [

@@ -8,7 +8,7 @@
 
 import type { RoutePath } from '../../router';
 import type { TranslationKey } from '../../shared/lib/locale';
-import type { RecentPair } from '../../lib/recent-pairs';
+import type { RecentPair } from './recent-pairs';
 
 /** Mission §8: the fetching state is shown for at least 700ms. */
 export const MIN_FETCHING_MS = 700;

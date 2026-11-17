@@ -12,7 +12,7 @@ import type { CurrencyCode } from '@currena/core';
 import { Button } from '../../shared/ui/ui';
 import { useCodeLabel } from '../../shared/lib/display';
 import { useI18n } from '../../shared/lib/locale';
-import type { SettleGroup } from '../../lib/settle-storage';
+import type { SettleGroup } from './settle-storage';
 import { Modal } from './Modal';
 import { EXPENSE_CURRENCIES, inputClass } from './shared';
 

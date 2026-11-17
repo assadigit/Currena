@@ -12,7 +12,7 @@ import { formatNumber } from '@currena/core';
 import type { Transfer } from '@currena/core';
 import { Button, Card } from '../../shared/ui/ui';
 import { useI18n } from '../../shared/lib/locale';
-import type { SettleGroup } from '../../lib/settle-storage';
+import type { SettleGroup } from './settle-storage';
 import { fmt2 } from './shared';
 import { GroupTabs } from './GroupTabs';
 

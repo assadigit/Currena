@@ -20,13 +20,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Source } from '@currena/core';
 import { formatDate, formatNumber, formatRelative } from '@currena/core';
-import { Button, Card, SourceBadge, Toast } from '../shared/ui/ui';
-import { getDictionary } from '../shared/i18n';
-import { useCodeLabel } from '../shared/lib/display';
-import { downloadHistoryCsv, historyEntryId, readHistory, removeHistoryEntry, HISTORY_KEY } from '../lib/history';
-import type { HistoryEntry } from '../lib/history';
-import { useI18n } from '../shared/lib/locale';
-import { navigate } from '../router';
+import { Button, Card, SourceBadge, Toast } from '../../shared/ui/ui';
+import { getDictionary } from '../../shared/i18n';
+import { useCodeLabel } from '../../shared/lib/display';
+import { downloadHistoryCsv, historyEntryId, readHistory, removeHistoryEntry, HISTORY_KEY } from './history';
+import type { HistoryEntry } from './history';
+import { useI18n } from '../../shared/lib/locale';
+import { navigate } from '../../router';
 
 const SOURCE_VALUES: readonly Source[] = ['tgju', 'frankfurter', 'manual', 'local'];
 
