@@ -107,6 +107,13 @@ deploys, and verifies live per AGENTS.md §9. The two hard gates hold:
 #01 before the interactive chart and the TA band (S2 §5c); Bridge-1
 before Bridge-2.
 
+*(S9 update, 2026-11-17 — the CP-C checkpoint: the gate had NOT lifted
+at S9's start, so S9 ran as the checkpoint session (the default path);
+the nine implementation sessions therefore run as **S10–S18**, with an
+optional short S9b addendum recording the owner's D1–D12 answers before
+them. The sequence's content is unchanged; the CP-C record is
+`s9/CP-C-RECORD.md`.)*
+
 ## 3. Session rules (this program)
 
 1. Every session: read `AGENTS.md` first, then this plan, then the
