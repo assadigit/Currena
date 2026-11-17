@@ -37,6 +37,18 @@ answered → every §1 status stands, the defaults bind, and the lock
 remains pending the owner's answers alone. The full addendum is at the
 end of §1; the session's own record is `s9b/SUMMARY.md`.
 
+**S9c addendum (2026-11-17, ~18:00 UTC — the answer-recording session;
+THE LOCK IS COMPLETE):** the owner answered in this session's kickoff
+reply — quoted verbatim: "All as recomended. I approve." — every
+recommendation accepted, zero exceptions, zero overrides. The twelve
+decisions are LOCKED (the table in §1's S9c addendum); CP-B's residuals
+(D1–D4) closed in the same sitting; CP-A's scope lock (D4, carried since
+S5) formally closed with it. Zero overrides → zero folds — `s8/01`
+stands as written, no row edited. The reply carries no GO — the Phase-D
+gate stays closed on the owner's lift alone (§3). The next session is
+the first implementation session (P1-a = S10), contingent on the GO.
+The session's record is `s9c/SUMMARY.md`.
+
 ---
 
 ## 1. The twelve answers (D1–D12)
@@ -94,6 +106,44 @@ still partial — none arrived): the next prompt is **S9c**, the second
 answer-recording attempt (exactly the twelve remaining items listed,
 the answers to arrive with its kickoff), in `s9b/SUMMARY.md`.
 
+**S9c addendum — THE RECORDED ANSWERS (2026-11-17, ~18:00 UTC; the
+lock COMPLETE).** The owner's kickoff reply, verbatim: "All as
+recomended. I approve." — the answer sheet's fastest path taken
+exactly as designed ("All as recommended" plus exceptions by number:
+zero exceptions). The other two channels, re-checked: the repo carries
+no commit after the S9b summary (branch HEAD `f3f34036`, local and
+remote identical); PR #48 remains at zero comments / zero reviews,
+head sha `f3f34036` (GitHub API, read-only). Each decision is therefore
+LOCKED as follows:
+
+| # | The locked decision (owner: "All as recommended" — 2026-11-17) |
+|---|---|
+| **D1** | **A — LOCKED:** the F4/F1/FAQ/F15 drafts approved as reference wording for the Phase-D manifest rounds (the structure and honest-limits content bind; the rounds polish) |
+| **D2** | **A — LOCKED:** the pre-registered windows confirmed as registered — Friday weekly closes, 52-week rolling Pearson, levels, trailing-10y display, both series named on the face (S7-D7) |
+| **D3** | **A — LOCKED:** the nine episode records 1971→2024-26 confirmed; the Iran-market episode = a Bridge-2 follow-up, not a launch blocker (S7-D6) |
+| **D4** | **A — LOCKED:** the CP-A scope lock confirmed — the S5-D1 tiers (F1–F27: Core 9 / Supporting 9 / Advanced 4 / Excluded 5); **CP-A formally closed** (carried since S5) |
+| **D5** | **A — LOCKED:** the COT display stays legacy non-commercial share-of-OI, named at point of use per C1/C7 (no voter-table change; the backtest lineage untouched) |
+| **D6** | **A — LOCKED:** #01 fixed by relabel-now (the chip and readout state the true window; the stale comment cleared); the widening rides F7/R18 where the window becomes a user control |
+| **D7** | **A — LOCKED:** the F12 API surface is minimal — a date-parameterized, readings-only projection |
+| **D8** | **B — LOCKED:** the first implementation session (P1-a = S10) performs the two build-time reads, the pre-committed fallback bands standing — the reply carries no read outcomes, so the reads ride the session (§4 unchanged, default B) |
+| **D9** | **A — LOCKED:** the WGC authorisation letter TO BE SENT — the owner's own parallel action (info@gold.org; non-blocking; removes residual terms exposure at zero cost) |
+| **D10** | **A — LOCKED:** Treasury-direct adopted (Treasury primary, FRED fallback/cross-check; R07 at P1-b) |
+| **D11** | **A — LOCKED:** the S8 deferred verdicts + the P1 split confirmed as proposed (the gap chart and the premiums workbook P4-conditional; Bridge-2 at P3 with both deferred components; P1 = three small sessions) |
+| **D12** | **A — LOCKED:** P1–P4 locked as proposed — 33 queued rows R01–R33 + the Excluded 5; 9 sessions (S10–S18); zero new paid feeds; every data path verified live. **The CP-C lock is COMPLETE** |
+
+Notes recorded with the answers: (1) zero overrides → zero folds —
+`s8/01-RECOMMENDATION-TABLE.md` stands as written, no row edited (the
+done-criterion "every override folded" is satisfied vacuously and
+stated, not skipped); (2) the reply carries no build-time-read
+outcomes → §4's two reads stay at default B and ride the P1-a session;
+(3) the reply carries no GO → the Phase-D gate stays closed on the
+owner's lift alone (§3) — the design's distinction held: the answer
+sheet and the gate's one-word GO can come in one reply, and this reply
+gave the sheet, not the word; (4) CP-B's residuals D1–D4 closed by the
+same answers — **CP-B and CP-C locked in one sitting**, exactly as the
+S8 prompt designed; (5) D9 is the owner's own parallel action — the
+letter is recorded as to-be-sent by the owner, gating nothing.
+
 ---
 
 ## 2. The locked P1–P4 queue (the implementation queue of record)
@@ -106,6 +156,12 @@ at this session's close, so **no fold was needed and no row was edited.**
 
 *(S9b re-check, 2026-11-17 ~12:30 UTC: still no override — zero answers
 found in any channel; the queue stands as written, no row edited.)*
+
+*(S9c, 2026-11-17 ~18:00 UTC: D12 answered A — **the formal lock is
+GIVEN**; qualification 1 below ("pending in form") is resolved. The
+queue of record is FORMALLY LOCKED as written: R01–R33 across P1–P4,
+the Excluded 5 not queued, every default posture now the recorded owner
+decision.)*
 
 Two honest qualifications, recorded:
 
@@ -170,6 +226,18 @@ COMPLETE, and the owner lifting the research-only constraint.**
   `21f2209e` — both conditions' statuses stand exactly as written above;
   the §19.6 deploy question remains owned by `main`'s HANDOFF.)*
 
+  *(S9c, 2026-11-17 ~18:00 UTC: condition 2 still NOT SATISFIED — the
+  owner's reply approves the twelve decisions (the lock) but carries no
+  GO; the gate stays closed on the owner's lift alone. One state change
+  on `main` since S9's check: the §19.6 retirement's deploy FIRED after
+  its portwatch window and was live-verified — `47b9a348` ("deploy(§19.6):
+  retirement deployed + live-verified — currena-api c0858d06 @ 100%"),
+  resolving the question S9 left "not observable from git alone". The
+  P1-a citation targets re-verified intact at the new HEAD read-only
+  (the three named files + the 24-file gold feature tree all present).
+  The mechanical precondition stands satisfied; the gate's one
+  remaining condition is the owner's GO.)*
+
 **Consequences, recorded:**
 
 1. **The modularization-closeout window is now OPEN on `main`** — the
@@ -222,6 +290,12 @@ gate lifted). Everything below is standing-ready; nothing blocks.*
     *(S9b re-check, 2026-11-17 ~12:30 UTC: no owner outcomes received in
     any channel — both reads stay at default B; the pre-flight stands as
     written.)*
+    *(S9c, 2026-11-17 ~18:00 UTC: the owner reported no read outcomes in
+    the answer reply — both reads ride THIS checklist as written
+    (default B, now the locked D8 answer). One pre-flight item RESOLVED:
+    the §19.6 deploy-coordination note in the gates/deploy item below
+    is moot — the retirement deployed + live-verified on `main`
+    (`47b9a348`); P1-a's deploy carries only its own change.)*
 - [ ] **Branch + base:** a fresh feature branch off `main` (the
   post-§19.6 tree), named **`gold-elevation/p1a-credibility-floor`**
   (the repo's feature-branch discipline — the `gold-balance/*` pattern).
