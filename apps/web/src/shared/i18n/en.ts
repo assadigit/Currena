@@ -874,6 +874,12 @@ export const en = {
       positionsPurpose: 'How traders are positioned in the gold futures market — the CFTC Commitments of Traders report.',
       positionsCardTraderPositioning: 'Gold trader positioning',
       positionsCardGrossLong: 'Gold gross long positioning',
+      /* GPE R03 (wave 0, GPE-S2-09 MED): the change line's window word —
+       * the section speaks the WEEKLY CFTC report, so an unlabeled
+       * '−8.8 pts' parses as week-over-week; the value is the 30-day
+       * change. C1's series/window-named-at-point-of-use rule, honored
+       * on an existing surface. */
+      positionsChangeWindow: '30-day change',
     },
     worldMarkets: {
       title: 'World Markets',
