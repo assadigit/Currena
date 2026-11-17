@@ -26,6 +26,17 @@ twelve with their standing defaults, explicitly, and the CP-C lock completes
 the moment the owner's answers arrive (one sitting; any override folds as
 a one-line edit to `s8/01`, named via its dependency graph §7).
 
+**S9b addendum (2026-11-17, ~12:30 UTC — the answer-recording session):**
+S9b convened to record the owner's answers (the S1b pattern) and found
+**none waiting in any channel** — the re-check, three ways: the kickoff
+message carried the S9b prompt verbatim with no answers appended; the
+repo carries no commit after the S9 summary (branch HEAD `aa4ea6c1`,
+local and remote identical); PR #48 remains at zero comments and zero
+reviews, head sha `aa4ea6c1` (GitHub API, read-only). Zero of twelve
+answered → every §1 status stands, the defaults bind, and the lock
+remains pending the owner's answers alone. The full addendum is at the
+end of §1; the session's own record is `s9b/SUMMARY.md`.
+
 ---
 
 ## 1. The twelve answers (D1–D12)
@@ -55,6 +66,34 @@ anything else folds in without re-planning (`s8/03` §1).*
 CP-B's residuals (D1–D4) close in the same sitting, exactly as the S8
 prompt designed.
 
+**S9b addendum — the answer-recording re-check (2026-11-17, ~12:30 UTC,
+per the S9b prompt's M1):** the session's objective was to record the
+owner's D1–D12 answers and complete the CP-C lock; **the answers had not
+arrived**, and the record says so honestly — the kickoff's
+twelve-decision list is the prompt's own context text ("as S9 left
+them", the recommendations marked), not the owner's choices, and no
+owner answer text was appended to it. The three channels, re-checked:
+(1) the kickoff message — the S9b prompt verbatim (no "All as
+recommended", no per-decision choice, no GO, no build-time-read
+outcome; credentials aside, nothing owner-authored beyond the prompt
+itself); (2) the repo — no commit after the S9 summary `aa4ea6c1`
+(branch HEAD; local and remote identical after fetch); (3) PR #48 —
+open, zero comments, zero reviews, head sha `aa4ea6c1` (GitHub API,
+read-only, ~12:2x UTC). **Zero of twelve answered: every row above
+remains NOT ANSWERED, its standing default the binding plan until
+overridden (`s8/03` §3).** Consequences, recorded: no override
+received → no fold → `s8/01` stands as written (no row edited); the
+lock remains pending the owner's answers alone (§2's
+locked-in-substance state unchanged); CP-B's residuals (D1–D4) remain
+open and close with the same answers when they arrive; the two
+build-time reads received no owner outcomes (§4 stays at default B);
+`main` is unchanged since §3's gate check (HEAD `21f2209e` at 12:30
+UTC), so the gate record stands — the Phase-D gate stays closed on the
+owner's lift alone. The session ended per its M3 branch 3 (the answers
+still partial — none arrived): the next prompt is **S9c**, the second
+answer-recording attempt (exactly the twelve remaining items listed,
+the answers to arrive with its kickoff), in `s9b/SUMMARY.md`.
+
 ---
 
 ## 2. The locked P1–P4 queue (the implementation queue of record)
@@ -64,6 +103,9 @@ R01–R33 queued across P1–P4 (P1-a: R01–R06 · P1-b: R07–R17 · P2: R18�
 P3: R22–R30 · P4: R31–R33) + R34–R38 (the Excluded 5) not queued — with
 every `[default]` posture binding per §1 above.** No override was received
 at this session's close, so **no fold was needed and no row was edited.**
+
+*(S9b re-check, 2026-11-17 ~12:30 UTC: still no override — zero answers
+found in any channel; the queue stands as written, no row edited.)*
 
 Two honest qualifications, recorded:
 
@@ -124,6 +166,10 @@ COMPLETE, and the owner lifting the research-only constraint.**
   repo, or PR #48. **The Phase-D gate therefore remains CLOSED — on the
   owner's lift alone; its mechanical precondition is done.**
 
+  *(S9b re-check, 2026-11-17 ~12:30 UTC: `main`'s HEAD unchanged at
+  `21f2209e` — both conditions' statuses stand exactly as written above;
+  the §19.6 deploy question remains owned by `main`'s HANDOFF.)*
+
 **Consequences, recorded:**
 
 1. **The modularization-closeout window is now OPEN on `main`** — the
@@ -173,6 +219,9 @@ gate lifted). Everything below is standing-ready; nothing blocks.*
   - **The owner has not done the reads** (verified: no indication at this
     session's close). If the owner does them before the session, the
     answers go in the kickoff and the checkboxes close at session start.
+    *(S9b re-check, 2026-11-17 ~12:30 UTC: no owner outcomes received in
+    any channel — both reads stay at default B; the pre-flight stands as
+    written.)*
 - [ ] **Branch + base:** a fresh feature branch off `main` (the
   post-§19.6 tree), named **`gold-elevation/p1a-credibility-floor`**
   (the repo's feature-branch discipline — the `gold-balance/*` pattern).
