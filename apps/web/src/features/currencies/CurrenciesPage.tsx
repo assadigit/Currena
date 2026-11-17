@@ -55,6 +55,7 @@ import { destinationFor } from '../../shared/components/destinations';
 import { CurrenciesRuleLights } from './CurrenciesRuleLights';
 import { CurrenciesPairBoard } from './CurrenciesPairBoard';
 import { CurrenciesTierCards } from './CurrenciesTierCards';
+import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
@@ -115,6 +116,9 @@ export function CurrenciesPage(): React.JSX.Element {
   const projection: PageProjection | null =
     state.kind === 'ready' ? state.projection : state.kind === 'loading' || state.kind === 'error' ? state.cached : null;
   const readings = projection?.readings;
+  // The R-5 details-panel wiring (docs/page-division/07): the cards' click
+  // opens the ported panel over the page's own readings.
+  const { openCard, panel } = useIndicatorDetailsPanel(readings);
   // The M-17 label: the cached copy paints exactly when it renders — the
   // boot paint from localStorage while loading, and the outage path that
   // kept the last good copy when a refresh failed.
@@ -293,7 +297,11 @@ export function CurrenciesPage(): React.JSX.Element {
 
       {/* The two registry-card sections (D-32/D-42) — only when the
           projection has spoken (fresh or cached). */}
-      {readings !== undefined ? <CurrenciesTierCards readings={readings} /> : null}
+      {readings !== undefined ? <CurrenciesTierCards readings={readings} onOpenDetails={openCard} /> : null}
+
+      {/* The R-5 details panel (docs/page-division/07) — rendered once at
+          the page root; the cards' stretched opener targets it. */}
+      {panel}
     </div>
   );
 }

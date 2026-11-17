@@ -33,7 +33,7 @@
  * chunk, never the entry graph.
  */
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
@@ -49,6 +49,7 @@ import {
   type CommoditiesCardEntry,
 } from './commodities-tiles';
 import { PriceTile, useTileData, type TileData, type PriceLens, PricePeriodSwitch } from '../../shared/components/PricesBoard';
+import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 
@@ -233,14 +234,12 @@ export function CommoditiesTierCards({ readings }: { readings: readonly Indicato
   // · 3 months · 1 year · 5 years) and every card re-measures. Default 1w
   // (the card's classic primary story).
   const [lens, setLens] = useState<PriceLens>('1w');
-  // The details handler: the commodities page has no side panel of its own.
-  // §19.6 (2026-11-17): the legacy /insights detail panel was RETIRED — the
-  // "more details" button now navigates to Global (the world scan) until a
-  // per-page detail surface is built (R-5 accepted loss, recorded in BD-S32).
-  const onFocusCard = useCallback((id: IndicatorId) => {
-    void id;
-    navigate('/');
-  }, []);
+  // The R-5 details-panel wiring (docs/page-division/07, BD-S33): the
+  // §19.6 stopgap ("more details" navigates to Global) is REPLACED by the
+  // ported per-page detail surface — the tile face + the «جزئیات بیشتر»
+  // button open the panel over the page's own readings (the legacy
+  // 2026-10-26c behaviour, restored on the commodities home).
+  const { openCard, panel } = useIndicatorDetailsPanel(readings);
   // The corpus-pinned unit labels stay assembled (the copy-pin test reads
   // them off the page-division copy, independent of the card render path).
   void t;
@@ -251,11 +250,14 @@ export function CommoditiesTierCards({ readings }: { readings: readonly Indicato
        * centred above the commodity groups. Every card re-measures its
        * trend row + sparkline + briefing against the selected window. */}
       <PricePeriodSwitch lens={lens} copy={copy} onChange={setLens} />
-      <CommoditiesGroupSection group="energy" ids={COMMODITIES_ENERGY_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
-      <CommoditiesGroupSection group="metals" ids={COMMODITIES_METALS_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
-      <CommoditiesGroupSection group="agriculture" ids={COMMODITIES_AGRICULTURE_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
-      <CommoditiesGroupSection group="digital" ids={COMMODITIES_DIGITAL_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
-      <CommoditiesGroupSection group="trade-routes-supply" ids={COMMODITIES_TRADE_ROUTES_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={onFocusCard} />
+      <CommoditiesGroupSection group="energy" ids={COMMODITIES_ENERGY_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={openCard} />
+      <CommoditiesGroupSection group="metals" ids={COMMODITIES_METALS_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={openCard} />
+      <CommoditiesGroupSection group="agriculture" ids={COMMODITIES_AGRICULTURE_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={openCard} />
+      <CommoditiesGroupSection group="digital" ids={COMMODITIES_DIGITAL_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={openCard} />
+      <CommoditiesGroupSection group="trade-routes-supply" ids={COMMODITIES_TRADE_ROUTES_IDS} readings={readings} copy={copy} locale={locale} numberLocale={numberLocale} tileData={tileData} lens={lens} onFocusCard={openCard} />
+      {/* The R-5 details panel — rendered once; the tile face + the
+       * «more details» button target it. */}
+      {panel}
     </>
   );
 }

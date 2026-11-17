@@ -52,6 +52,7 @@ import { MARKETS } from '@currena/insights/markets/definitions';
 import { UsaPage } from './UsaPage';
 import { USA_TIER1_IDS, USA_TIER2_IDS, USA_TIER3_IDS, USA_TIER4_IDS, USA_TIER5_IDS } from './usa-tiles';
 import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
+import { clearHistoryCacheForTests } from '../../shared/lib/insights';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)
@@ -592,5 +593,65 @@ describe('UsaPage', () => {
       };
       render(<Probe />);
     }
+  });
+
+  /* ---------------------------------------------------------------- *
+   * The R-5 details-panel port (docs/page-division/07, BD-S33): the
+   * tier cards' stretched opener + the ported panel.
+   * ---------------------------------------------------------------- */
+
+  it('the R-5 port: a tier card click opens the details panel (the F5 dialog over the corpus copy); an absent card stays non-interactive', async () => {
+    clearHistoryCacheForTests();
+    atRoute('/usa');
+    // The feeds + a history payload for the clicked card (the chart
+    // block reads the SAME module-cached endpoint the legacy panel read).
+    stubFeeds();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/usa')) return jsonResponse(usaProjectionFixture());
+        if (url.includes('/api/insights/markets')) return jsonResponse(boardFixture());
+        if (url.includes('/api/insights/tic')) return jsonResponse(ticFixture());
+        if (url.includes('/api/insights/fed-target/history')) {
+          return jsonResponse({ v: 1, id: 'fed-target', points: [[19000, 4.5], [19600, 4.1], [20100, 3.875]] });
+        }
+        if (url.includes('/assets/map/')) return new Response('not found', { status: 404 });
+        return notFound();
+      }),
+    );
+    render(<UsaPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-usa-card="fed-target"]')).not.toBeNull();
+    });
+
+    // A card WITH a reading carries the stretched opener (aria-haspopup
+    // dialog, named "Details: <corpus name>").
+    const fed = document.querySelector('[data-usa-card="fed-target"]')!;
+    const opener = fed.querySelector('button[aria-haspopup="dialog"]') as HTMLButtonElement;
+    expect(opener).not.toBeNull();
+    expect(opener.getAttribute('aria-label')).toBe('Details: The US central bank’s policy rate');
+
+    // The click opens the panel: the dialog role + the corpus name + the
+    // F5 section titles + the close control.
+    fireEvent.click(opener);
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    expect(dialog.textContent).toContain('The US central bank’s policy rate');
+    expect(dialog.textContent).toContain('What it means for you');
+    expect(dialog.textContent).toContain('What it is');
+
+    // Escape closes + focus returns to the opener (the F5 discipline).
+    fireEvent.keyDown(dialog, { key: 'Escape' });
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+    expect(document.activeElement).toBe(opener);
+
+    // An absent reading (rstar-us — the licence-gap fixture) stays the
+    // honest non-interactive unavailable card (D-R5-3: no reading, no
+    // panel — never a dead control).
+    const absent = document.querySelector('[data-usa-card="rstar-us"]')!;
+    expect(absent.querySelector('button[aria-haspopup="dialog"]')).toBeNull();
   });
 });

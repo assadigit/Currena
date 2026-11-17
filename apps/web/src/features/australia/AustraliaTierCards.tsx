@@ -44,6 +44,7 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
+import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
@@ -170,7 +171,16 @@ const STATUS_KEY: Record<string, TranslationKey> = {
  * One Australia card
  * ------------------------------------------------------------------ */
 
-function AustraliaCard({ entry, units }: { entry: AustraliaCardEntry; units: AustraliaUnitLabels }): React.JSX.Element {
+function AustraliaCard({
+  entry,
+  units,
+  onOpenDetails,
+}: {
+  entry: AustraliaCardEntry;
+  units: AustraliaUnitLabels;
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const reading: IndicatorReading | undefined = entry.reading;
   const name = t(CARD_NAME_KEY[entry.id]);
@@ -218,7 +228,7 @@ function AustraliaCard({ entry, units }: { entry: AustraliaCardEntry; units: Aus
       id={`australia-card-${entry.id}`}
       data-australia-card={entry.id}
       data-australia-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueText !== null ? (
@@ -239,6 +249,10 @@ function AustraliaCard({ entry, units }: { entry: AustraliaCardEntry; units: Aus
         ) : null}
         {statusWord !== null ? <span data-australia-status-word>{statusWord}</span> : null}
       </p>
+      {/* The R-5 details-panel opener — the stretched tap zone over the
+       * whole card (only when a reading exists; an absent id stays the
+       * honest non-interactive unavailable card, D-R5-3). */}
+      {reading !== undefined ? <CardDetailsOpener id={entry.id} onOpenDetails={onOpenDetails} /> : null}
     </article>
   );
 }
@@ -294,12 +308,14 @@ function AustraliaGaugeSection({
   readings,
   units,
   dataSection,
+  onOpenDetails,
 }: {
   gauge: AustraliaGaugeVerdict;
   ids: readonly AustraliaCardId[];
   readings: readonly IndicatorReading[];
   units: AustraliaUnitLabels;
   dataSection: string;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
 }): React.JSX.Element {
   const { t, numberLocale } = useI18n();
   const entries = australiaCards(readings, ids);
@@ -362,7 +378,7 @@ function AustraliaGaugeSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
         {entries.map((entry) => (
-          <AustraliaCard key={entry.id} entry={entry} units={units} />
+          <AustraliaCard key={entry.id} entry={entry} units={units} onOpenDetails={onOpenDetails} />
         ))}
       </div>
       {seats.length > 0 ? (
@@ -388,10 +404,12 @@ function AustraliaWorldRiskSection({
   ids,
   readings,
   units,
+  onOpenDetails,
 }: {
   ids: readonly AustraliaCardId[];
   readings: readonly IndicatorReading[];
   units: AustraliaUnitLabels;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
 }): React.JSX.Element {
   const { t } = useI18n();
   const entries = australiaCards(readings, ids);
@@ -403,14 +421,21 @@ function AustraliaWorldRiskSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
         {entries.map((entry) => (
-          <AustraliaCard key={entry.id} entry={entry} units={units} />
+          <AustraliaCard key={entry.id} entry={entry} units={units} onOpenDetails={onOpenDetails} />
         ))}
       </div>
     </section>
   );
 }
 
-export function AustraliaTierCards({ readings }: { readings: readonly IndicatorReading[] }): React.JSX.Element {
+export function AustraliaTierCards({
+  readings,
+  onOpenDetails,
+}: {
+  readings: readonly IndicatorReading[];
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t } = useI18n();
   // The engine's own gauge verdicts over the projection (the SAME pure
   // gaugeReading the legacy AU section reads — the 5 mirrors included, so
@@ -444,6 +469,7 @@ export function AustraliaTierCards({ readings }: { readings: readonly IndicatorR
         readings={readings}
         units={units}
         dataSection="inflation-rates"
+        onOpenDetails={onOpenDetails}
       />
       <AustraliaGaugeSection
         gauge={verdictOf('au-households')}
@@ -451,6 +477,7 @@ export function AustraliaTierCards({ readings }: { readings: readonly IndicatorR
         readings={readings}
         units={units}
         dataSection="households"
+        onOpenDetails={onOpenDetails}
       />
       <AustraliaGaugeSection
         gauge={verdictOf('au-trade-currency')}
@@ -458,6 +485,7 @@ export function AustraliaTierCards({ readings }: { readings: readonly IndicatorR
         readings={readings}
         units={units}
         dataSection="trade-currency"
+        onOpenDetails={onOpenDetails}
       />
       <AustraliaGaugeSection
         gauge={verdictOf('au-external')}
@@ -465,6 +493,7 @@ export function AustraliaTierCards({ readings }: { readings: readonly IndicatorR
         readings={readings}
         units={units}
         dataSection="external"
+        onOpenDetails={onOpenDetails}
       />
       <AustraliaGaugeSection
         gauge={verdictOf('au-activity')}
@@ -472,8 +501,9 @@ export function AustraliaTierCards({ readings }: { readings: readonly IndicatorR
         readings={readings}
         units={units}
         dataSection="activity"
+        onOpenDetails={onOpenDetails}
       />
-      <AustraliaWorldRiskSection ids={AUSTRALIA_WORLD_RISK_IDS as readonly AustraliaCardId[]} readings={readings} units={units} />
+      <AustraliaWorldRiskSection ids={AUSTRALIA_WORLD_RISK_IDS as readonly AustraliaCardId[]} readings={readings} units={units} onOpenDetails={onOpenDetails} />
     </>
   );
 }

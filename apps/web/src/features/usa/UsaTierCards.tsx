@@ -20,11 +20,12 @@
  * chunk, never the entry graph.
  */
 
-import type { IndicatorReading } from '@currena/core';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
+import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
 import {
   USA_TIER1_IDS,
   USA_TIER2_IDS,
@@ -146,7 +147,16 @@ const STATUS_KEY: Record<string, TranslationKey> = {
  * One tier card
  * ------------------------------------------------------------------ */
 
-function TierCard({ entry, units }: { entry: UsaCardEntry; units: UsaUnitLabels }): React.JSX.Element {
+function TierCard({
+  entry,
+  units,
+  onOpenDetails,
+}: {
+  entry: UsaCardEntry;
+  units: UsaUnitLabels;
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const reading: IndicatorReading | undefined = entry.reading;
   const name = t(CARD_NAME_KEY[entry.id]);
@@ -193,7 +203,7 @@ function TierCard({ entry, units }: { entry: UsaCardEntry; units: UsaUnitLabels 
       id={`usa-card-${entry.id}`}
       data-usa-card={entry.id}
       data-usa-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueText !== null ? (
@@ -214,6 +224,10 @@ function TierCard({ entry, units }: { entry: UsaCardEntry; units: UsaUnitLabels 
         ) : null}
         {statusWord !== null ? <span data-usa-status-word>{statusWord}</span> : null}
       </p>
+      {/* The R-5 details-panel opener — the stretched tap zone over the
+       * whole card (only when a reading exists; an absent id stays the
+       * honest non-interactive unavailable card, D-R5-3). */}
+      {reading !== undefined ? <CardDetailsOpener id={entry.id} onOpenDetails={onOpenDetails} /> : null}
     </article>
   );
 }
@@ -229,6 +243,7 @@ function TierSection({
   readings,
   units,
   dataTier,
+  onOpenDetails,
 }: {
   titleKey: TranslationKey;
   introKey: TranslationKey;
@@ -236,6 +251,7 @@ function TierSection({
   readings: readonly IndicatorReading[];
   units: UsaUnitLabels;
   dataTier: string;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
 }): React.JSX.Element {
   const { t } = useI18n();
   const entries = usaCards(readings, ids);
@@ -247,14 +263,21 @@ function TierSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-4 lg:gap-3">
         {entries.map((entry) => (
-          <TierCard key={entry.id} entry={entry} units={units} />
+          <TierCard key={entry.id} entry={entry} units={units} onOpenDetails={onOpenDetails} />
         ))}
       </div>
     </section>
   );
 }
 
-export function UsaTierCards({ readings }: { readings: readonly IndicatorReading[] }): React.JSX.Element {
+export function UsaTierCards({
+  readings,
+  onOpenDetails,
+}: {
+  readings: readonly IndicatorReading[];
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t } = useI18n();
   // The corpus-pinned unit labels, assembled once for the render pass
   // (the copy-pin test proves each word matches the corpus byte-for-byte).
@@ -279,6 +302,7 @@ export function UsaTierCards({ readings }: { readings: readonly IndicatorReading
         readings={readings}
         units={units}
         dataTier="tier-1"
+        onOpenDetails={onOpenDetails}
       />
       <TierSection
         titleKey="pd.usa.tier2.title"
@@ -287,6 +311,7 @@ export function UsaTierCards({ readings }: { readings: readonly IndicatorReading
         readings={readings}
         units={units}
         dataTier="tier-2"
+        onOpenDetails={onOpenDetails}
       />
       <TierSection
         titleKey="pd.usa.tier3.title"
@@ -295,6 +320,7 @@ export function UsaTierCards({ readings }: { readings: readonly IndicatorReading
         readings={readings}
         units={units}
         dataTier="tier-3"
+        onOpenDetails={onOpenDetails}
       />
       <TierSection
         titleKey="pd.usa.tier4.title"
@@ -303,6 +329,7 @@ export function UsaTierCards({ readings }: { readings: readonly IndicatorReading
         readings={readings}
         units={units}
         dataTier="tier-4"
+        onOpenDetails={onOpenDetails}
       />
       <TierSection
         titleKey="pd.usa.tier5.title"
@@ -311,6 +338,7 @@ export function UsaTierCards({ readings }: { readings: readonly IndicatorReading
         readings={readings}
         units={units}
         dataTier="tier-5"
+        onOpenDetails={onOpenDetails}
       />
     </>
   );

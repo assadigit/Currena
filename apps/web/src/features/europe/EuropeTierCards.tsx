@@ -22,11 +22,12 @@
  * chunk, never the entry graph.
  */
 
-import type { IndicatorReading } from '@currena/core';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
+import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
 import {
   EUROPE_EU_IDS,
   EUROPE_UK_IDS,
@@ -75,7 +76,16 @@ const STATUS_KEY: Record<string, TranslationKey> = {
  * One Europe card
  * ------------------------------------------------------------------ */
 
-function EuropeCard({ entry, units }: { entry: EuropeCardEntry; units: EuropeUnitLabels }): React.JSX.Element {
+function EuropeCard({
+  entry,
+  units,
+  onOpenDetails,
+}: {
+  entry: EuropeCardEntry;
+  units: EuropeUnitLabels;
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const reading: IndicatorReading | undefined = entry.reading;
   const name = t(CARD_NAME_KEY[entry.id]);
@@ -122,7 +132,7 @@ function EuropeCard({ entry, units }: { entry: EuropeCardEntry; units: EuropeUni
       id={`europe-card-${entry.id}`}
       data-europe-card={entry.id}
       data-europe-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueText !== null ? (
@@ -143,6 +153,10 @@ function EuropeCard({ entry, units }: { entry: EuropeCardEntry; units: EuropeUni
         ) : null}
         {statusWord !== null ? <span data-europe-status-word>{statusWord}</span> : null}
       </p>
+      {/* The R-5 details-panel opener — the stretched tap zone over the
+       * whole card (only when a reading exists; an absent id stays the
+       * honest non-interactive unavailable card, D-R5-3). */}
+      {reading !== undefined ? <CardDetailsOpener id={entry.id} onOpenDetails={onOpenDetails} /> : null}
     </article>
   );
 }
@@ -158,6 +172,7 @@ function EuropeSection({
   readings,
   units,
   dataSection,
+  onOpenDetails,
 }: {
   titleKey: TranslationKey;
   introKey: TranslationKey;
@@ -165,6 +180,7 @@ function EuropeSection({
   readings: readonly IndicatorReading[];
   units: EuropeUnitLabels;
   dataSection: string;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
 }): React.JSX.Element {
   const { t } = useI18n();
   const entries = europeCards(readings, ids);
@@ -176,14 +192,21 @@ function EuropeSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
         {entries.map((entry) => (
-          <EuropeCard key={entry.id} entry={entry} units={units} />
+          <EuropeCard key={entry.id} entry={entry} units={units} onOpenDetails={onOpenDetails} />
         ))}
       </div>
     </section>
   );
 }
 
-export function EuropeTierCards({ readings }: { readings: readonly IndicatorReading[] }): React.JSX.Element {
+export function EuropeTierCards({
+  readings,
+  onOpenDetails,
+}: {
+  readings: readonly IndicatorReading[];
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t } = useI18n();
   // The corpus-pinned unit labels, assembled once for the render pass
   // (the copy-pin test proves each word matches the corpus byte-for-byte).
@@ -201,6 +224,7 @@ export function EuropeTierCards({ readings }: { readings: readonly IndicatorRead
         readings={readings}
         units={units}
         dataSection="eu"
+        onOpenDetails={onOpenDetails}
       />
       <EuropeSection
         titleKey="pd.europe.uk.title"
@@ -209,6 +233,7 @@ export function EuropeTierCards({ readings }: { readings: readonly IndicatorRead
         readings={readings}
         units={units}
         dataSection="uk"
+        onOpenDetails={onOpenDetails}
       />
     </>
   );

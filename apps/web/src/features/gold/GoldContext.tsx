@@ -18,8 +18,9 @@
  * own line — "gold-usd is the hero card").
  */
 
-import type { IndicatorReading } from '@currena/core';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
+import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
@@ -89,7 +90,14 @@ const GOLD_BACKTEST_URL =
  * One context card
  * ------------------------------------------------------------------ */
 
-function ContextCard({ entry }: { entry: GoldContextEntry }): React.JSX.Element {
+function ContextCard({
+  entry,
+  onOpenDetails,
+}: {
+  entry: GoldContextEntry;
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const reading: IndicatorReading | undefined = entry.reading;
   const name = t(CARD_NAME_KEY[entry.id]);
@@ -151,7 +159,7 @@ function ContextCard({ entry }: { entry: GoldContextEntry }): React.JSX.Element 
       id={`gold-card-${entry.id}`}
       data-context-card={entry.id}
       data-context-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueJoin !== null ? (
@@ -174,6 +182,10 @@ function ContextCard({ entry }: { entry: GoldContextEntry }): React.JSX.Element 
         ) : null}
         {statusWord !== null ? <span data-context-status-word>{statusWord}</span> : null}
       </p>
+      {/* The R-5 details-panel opener — the stretched tap zone over the
+       * whole card (only when a reading exists; an absent id stays the
+       * honest non-interactive unavailable card, D-R5-3). */}
+      {reading !== undefined ? <CardDetailsOpener id={entry.id} onOpenDetails={onOpenDetails} /> : null}
     </article>
   );
 }
@@ -182,20 +194,35 @@ function ContextCard({ entry }: { entry: GoldContextEntry }): React.JSX.Element 
  * The two context groups + the blocked notes + the honest record
  * ------------------------------------------------------------------ */
 
-function ContextGroup({ title, entries }: { title: string; entries: readonly GoldContextEntry[] }): React.JSX.Element {
+function ContextGroup({
+  title,
+  entries,
+  onOpenDetails,
+}: {
+  title: string;
+  entries: readonly GoldContextEntry[];
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   return (
     <section className="flex min-w-0 flex-col gap-2">
       <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">{title}</h3>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 lg:gap-2.5">
         {entries.map((entry) => (
-          <ContextCard key={entry.id} entry={entry} />
+          <ContextCard key={entry.id} entry={entry} onOpenDetails={onOpenDetails} />
         ))}
       </div>
     </section>
   );
 }
 
-export function GoldContext({ entries }: { entries: readonly GoldContextEntry[] }): React.JSX.Element {
+export function GoldContext({
+  entries,
+  onOpenDetails,
+}: {
+  entries: readonly GoldContextEntry[];
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, numberLocale } = useI18n();
   // The two D-27 groups in placement order — gold-usd (the hero)
   // excepted from the ratios group; the flows & positioning five
@@ -208,8 +235,8 @@ export function GoldContext({ entries }: { entries: readonly GoldContextEntry[] 
 
   return (
     <section id="gold-context" aria-label={t('pd.gold.contextAria')} data-gold-context className="flex flex-col gap-3.5 scroll-mt-24">
-      <ContextGroup title={t('pd.gold.ratiosTitle')} entries={ratios} />
-      <ContextGroup title={t('pd.gold.flowsTitle')} entries={flows} />
+      <ContextGroup title={t('pd.gold.ratiosTitle')} entries={ratios} onOpenDetails={onOpenDetails} />
+      <ContextGroup title={t('pd.gold.flowsTitle')} entries={flows} onOpenDetails={onOpenDetails} />
 
       {/* ---- The blocked quartet (§16): honest notes, never cards. ---- */}
       <section aria-label={t('pd.gold.blockedTitle')} data-gold-blocked className="flex flex-col gap-1.5">

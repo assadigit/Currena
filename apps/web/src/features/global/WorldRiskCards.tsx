@@ -14,8 +14,9 @@
  * never a guess.
  */
 
-import type { IndicatorReading } from '@currena/core';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
+import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
@@ -57,7 +58,14 @@ const STATUS_KEY: Record<string, TranslationKey> = {
  * One risk card
  * ------------------------------------------------------------------ */
 
-function RiskCard({ entry }: { entry: WorldRiskEntry }): React.JSX.Element {
+function RiskCard({
+  entry,
+  onOpenDetails,
+}: {
+  entry: WorldRiskEntry;
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const reading: IndicatorReading | undefined = entry.reading;
   const name = t(CARD_NAME_KEY[entry.id]);
@@ -121,7 +129,7 @@ function RiskCard({ entry }: { entry: WorldRiskEntry }): React.JSX.Element {
       id={`wm-risk-${entry.id}`}
       data-risk-card={entry.id}
       data-risk-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueJoin !== null ? (
@@ -142,6 +150,10 @@ function RiskCard({ entry }: { entry: WorldRiskEntry }): React.JSX.Element {
         ) : null}
         {statusWord !== null ? <span data-risk-status-word>{statusWord}</span> : null}
       </p>
+      {/* The R-5 details-panel opener — the stretched tap zone over the
+       * whole card (only when a reading exists; an absent id stays the
+       * honest non-interactive unavailable card, D-R5-3). */}
+      {reading !== undefined ? <CardDetailsOpener id={entry.id} onOpenDetails={onOpenDetails} /> : null}
     </article>
   );
 }
@@ -150,7 +162,14 @@ function RiskCard({ entry }: { entry: WorldRiskEntry }): React.JSX.Element {
  * The section
  * ------------------------------------------------------------------ */
 
-export function WorldRiskCards({ entries }: { entries: readonly WorldRiskEntry[] }): React.JSX.Element {
+export function WorldRiskCards({
+  entries,
+  onOpenDetails,
+}: {
+  entries: readonly WorldRiskEntry[];
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t } = useI18n();
   return (
     <section id="wm-risk" aria-label={t('pd.worldMarkets.riskAria')} data-wm-risk className="flex flex-col gap-2.5 scroll-mt-24">
@@ -164,7 +183,7 @@ export function WorldRiskCards({ entries }: { entries: readonly WorldRiskEntry[]
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 lg:gap-2.5">
         {entries.map((entry) => (
-          <RiskCard key={entry.id} entry={entry} />
+          <RiskCard key={entry.id} entry={entry} onOpenDetails={onOpenDetails} />
         ))}
       </div>
     </section>

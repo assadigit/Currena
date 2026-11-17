@@ -45,6 +45,7 @@ import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../s
 import { destinationFor } from '../../shared/components/destinations';
 import { RegionIndexSection } from '../../shared/components/RegionIndexSection';
 import { EuropeTierCards } from './EuropeTierCards';
+import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
 type ProjectionState =
@@ -106,6 +107,9 @@ export function EuropePage(): React.JSX.Element {
   const projection: PageProjection | null =
     state.kind === 'ready' ? state.projection : state.kind === 'loading' || state.kind === 'error' ? state.cached : null;
   const readings = projection?.readings;
+  // The R-5 details-panel wiring (docs/page-division/07): the cards' click
+  // opens the ported panel over the page's own readings.
+  const { openCard, panel } = useIndicatorDetailsPanel(readings);
   // The M-17 label: the cached copy paints exactly when it renders — the
   // boot paint from localStorage while loading, and the outage path that
   // kept the last good copy when a refresh failed (the BD-S5a sentence
@@ -234,7 +238,7 @@ export function EuropePage(): React.JSX.Element {
       {/* The EU section + the non-EU UK section (D-33: listed apart),
           each card with the §21 trio — only when the projection has
           spoken (fresh or cached). */}
-      {readings !== undefined ? <EuropeTierCards readings={readings} /> : null}
+      {readings !== undefined ? <EuropeTierCards readings={readings} onOpenDetails={openCard} /> : null}
 
       {/* The cross-links strip (§8 item 4): eur-usd · usdchf · usdtry →
           /currencies. Their detail cards live on the Currency Pairs
@@ -262,6 +266,10 @@ export function EuropePage(): React.JSX.Element {
           ))}
         </div>
       </section>
+
+      {/* The R-5 details panel (docs/page-division/07) — rendered once at
+          the page root; the cards' stretched opener targets it. */}
+      {panel}
     </div>
   );
 }

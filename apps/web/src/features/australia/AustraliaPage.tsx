@@ -53,6 +53,7 @@ import { fetchAuMarketsSnapshot, readCachedAuMarkets } from './markets-au';
 import { destinationFor } from '../../shared/components/destinations';
 import { RegionIndexSection } from '../../shared/components/RegionIndexSection';
 import { AustraliaTierCards } from './AustraliaTierCards';
+import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { useAustraliaBoardCopy } from './australia-board-copy';
 import { AustralianMarkets } from './AustralianMarkets';
 import type { AuMarketsLoadState } from './AustralianMarkets';
@@ -179,6 +180,9 @@ export function AustraliaPage(): React.JSX.Element {
   const projection: PageProjection | null =
     state.kind === 'ready' ? state.projection : state.kind === 'loading' || state.kind === 'error' ? state.cached : null;
   const readings = projection?.readings;
+  // The R-5 details-panel wiring (docs/page-division/07): the cards' click
+  // opens the ported panel over the page's own readings.
+  const { openCard, panel } = useIndicatorDetailsPanel(readings);
   // The M-17 label: the cached copy paints exactly when it renders — the
   // boot paint from localStorage while loading, and the outage path that
   // kept the last good copy when a refresh failed (the BD-S5a sentence
@@ -335,7 +339,7 @@ export function AustraliaPage(): React.JSX.Element {
           (fresh or cached). */}
       {readings !== undefined ? (
         <div id="australia-tier-cards" className="scroll-mt-24">
-          <AustraliaTierCards readings={readings} />
+          <AustraliaTierCards readings={readings} onOpenDetails={openCard} />
         </div>
       ) : null}
 
@@ -369,6 +373,10 @@ export function AustraliaPage(): React.JSX.Element {
           onFocusCard={() => navigate('/')}
         />
       ) : null}
+
+      {/* The R-5 details panel (docs/page-division/07) — rendered once at
+          the page root; the cards' stretched opener targets it. */}
+      {panel}
     </div>
   );
 }

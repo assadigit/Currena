@@ -39,6 +39,7 @@ import { interpolate } from '../../shared/i18n';
 import { ApiError, fetchPageProjection, readCachedPageProjection } from '../../shared/lib/page-division';
 import { destinationFor } from '../../shared/components/destinations';
 import { RegionIndexSection } from '../../shared/components/RegionIndexSection';
+import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { UsaVerdictStrip } from './UsaVerdictStrip';
 import { UsaTierCards } from './UsaTierCards';
 import { UsaTicSection } from './UsaTicSection';
@@ -131,6 +132,10 @@ export function UsaPage(): React.JSX.Element {
 
   /* ---------------- the derivations (pure, engine-side) ---------------- */
   const verdicts = useMemo(() => (readings !== undefined ? usaGaugeVerdicts(readings) : []), [readings]);
+
+  // The R-5 details-panel wiring (docs/page-division/07): the tier cards'
+  // click opens the ported panel over the page's own readings.
+  const { openCard, panel } = useIndicatorDetailsPanel(readings);
 
   /* ---------------- the data-as-of line (the H4/R12 pattern) ---------------- */
   const dataAsOf = useMemo(() => {
@@ -252,7 +257,7 @@ export function UsaPage(): React.JSX.Element {
       {readings !== undefined ? (
         <>
           <UsaVerdictStrip verdicts={verdicts} />
-          <UsaTierCards readings={readings} />
+          <UsaTierCards readings={readings} onOpenDetails={openCard} />
         </>
       ) : null}
 
@@ -277,6 +282,10 @@ export function UsaPage(): React.JSX.Element {
           />
         </div>
       ) : null}
+
+      {/* The R-5 details panel (docs/page-division/07) — rendered once at
+          the page root; the tier cards' stretched opener targets it. */}
+      {panel}
     </div>
   );
 }

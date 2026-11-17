@@ -39,6 +39,7 @@ import type { MarketsView } from './shared';
 import type { MapPeriod } from './world-map-config';
 import { WorldMarketsGrids } from './WorldMarketsGrids';
 import { WorldRiskCards } from '../global/WorldRiskCards';
+import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { worldMarketsStatus, worldRiskCards } from './world-markets-tiles';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
@@ -125,6 +126,9 @@ export function WorldMarketsPage(): React.JSX.Element {
   const projection: PageProjection | null =
     state.kind === 'ready' ? state.projection : state.kind === 'loading' || state.kind === 'error' ? state.cached : null;
   const readings = projection?.readings;
+  // The R-5 details-panel wiring (docs/page-division/07): the risk cards'
+  // click opens the ported panel over the page's own readings.
+  const { openCard, panel } = useIndicatorDetailsPanel(readings);
   // The M-17 label: the cached copy paints exactly when it renders — the
   // boot paint from localStorage while loading, and the outage path that
   // kept the last good copy when a refresh failed.
@@ -259,8 +263,12 @@ export function WorldMarketsPage(): React.JSX.Element {
       {/* Spec §6 item 3 — the world risk & liquidity cards (the 9
           placement homes). */}
       <div className="mt-3 sm:mt-5">
-        {riskEntries.length > 0 ? <WorldRiskCards entries={riskEntries} /> : null}
+        {riskEntries.length > 0 ? <WorldRiskCards entries={riskEntries} onOpenDetails={openCard} /> : null}
       </div>
+
+      {/* The R-5 details panel (docs/page-division/07) — rendered once at
+          the page root; the risk cards' stretched opener targets it. */}
+      {panel}
     </div>
   );
 }

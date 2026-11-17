@@ -36,11 +36,12 @@
  * chunk, never the entry graph.
  */
 
-import type { IndicatorReading } from '@currena/core';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
+import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
 import {
   ASIA_CHINA_IDS,
   ASIA_JAPAN_IDS,
@@ -103,7 +104,16 @@ const STATUS_KEY: Record<string, TranslationKey> = {
  * One Asia card
  * ------------------------------------------------------------------ */
 
-function AsiaCard({ entry, units }: { entry: AsiaCardEntry; units: AsiaUnitLabels }): React.JSX.Element {
+function AsiaCard({
+  entry,
+  units,
+  onOpenDetails,
+}: {
+  entry: AsiaCardEntry;
+  units: AsiaUnitLabels;
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const reading: IndicatorReading | undefined = entry.reading;
   const name = t(CARD_NAME_KEY[entry.id]);
@@ -151,7 +161,7 @@ function AsiaCard({ entry, units }: { entry: AsiaCardEntry; units: AsiaUnitLabel
       id={`asia-card-${entry.id}`}
       data-asia-card={entry.id}
       data-asia-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueText !== null ? (
@@ -172,6 +182,10 @@ function AsiaCard({ entry, units }: { entry: AsiaCardEntry; units: AsiaUnitLabel
         ) : null}
         {statusWord !== null ? <span data-asia-status-word>{statusWord}</span> : null}
       </p>
+      {/* The R-5 details-panel opener — the stretched tap zone over the
+       * whole card (only when a reading exists; an absent id stays the
+       * honest non-interactive unavailable card, D-R5-3). */}
+      {reading !== undefined ? <CardDetailsOpener id={entry.id} onOpenDetails={onOpenDetails} /> : null}
     </article>
   );
 }
@@ -188,6 +202,7 @@ function AsiaSection({
   units,
   dataSection,
   children,
+  onOpenDetails,
 }: {
   titleKey: TranslationKey;
   introKey: TranslationKey;
@@ -199,6 +214,7 @@ function AsiaSection({
    * section's NZX50 mirror card, S21 — a board-row display, not a
    * registry card). */
   children?: React.ReactNode;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
 }): React.JSX.Element {
   const { t } = useI18n();
   const entries = asiaCards(readings, ids);
@@ -210,7 +226,7 @@ function AsiaSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
         {entries.map((entry) => (
-          <AsiaCard key={entry.id} entry={entry} units={units} />
+          <AsiaCard key={entry.id} entry={entry} units={units} onOpenDetails={onOpenDetails} />
         ))}
         {children}
       </div>
@@ -233,6 +249,7 @@ function AsiaIndexNoteSection({
   readings,
   units,
   dataSection,
+  onOpenDetails,
 }: {
   titleKey: TranslationKey;
   introKey: TranslationKey;
@@ -241,6 +258,7 @@ function AsiaIndexNoteSection({
   readings: readonly IndicatorReading[];
   units: AsiaUnitLabels;
   dataSection: string;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
 }): React.JSX.Element {
   const { t } = useI18n();
   const entries = asiaCards(readings, ids);
@@ -252,7 +270,7 @@ function AsiaIndexNoteSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
         {entries.map((entry) => (
-          <AsiaCard key={entry.id} entry={entry} units={units} />
+          <AsiaCard key={entry.id} entry={entry} units={units} onOpenDetails={onOpenDetails} />
         ))}
       </div>
       {/* The honest index note — these markets ride the zoom map above;
@@ -264,7 +282,14 @@ function AsiaIndexNoteSection({
   );
 }
 
-export function AsiaTierCards({ readings }: { readings: readonly IndicatorReading[] }): React.JSX.Element {
+export function AsiaTierCards({
+  readings,
+  onOpenDetails,
+}: {
+  readings: readonly IndicatorReading[];
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t } = useI18n();
   // The corpus-pinned unit labels, assembled once for the render pass
   // (the copy-pin test proves each word matches the corpus byte-for-byte).
@@ -283,6 +308,7 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
         readings={readings}
         units={units}
         dataSection="china"
+        onOpenDetails={onOpenDetails}
       />
       <AsiaSection
         titleKey="pd.asiaPacific.japan.title"
@@ -291,6 +317,7 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
         readings={readings}
         units={units}
         dataSection="japan"
+        onOpenDetails={onOpenDetails}
       />
       <AsiaIndexNoteSection
         titleKey="pd.asiaPacific.koreaTaiwanHk.title"
@@ -300,6 +327,7 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
         readings={readings}
         units={units}
         dataSection="korea-taiwan-hk"
+        onOpenDetails={onOpenDetails}
       />
       <AsiaIndexNoteSection
         titleKey="pd.asiaPacific.india.title"
@@ -309,6 +337,7 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
         readings={readings}
         units={units}
         dataSection="india"
+        onOpenDetails={onOpenDetails}
       />
       <AsiaSection
         titleKey="pd.asiaPacific.pacificNz.title"
@@ -317,6 +346,7 @@ export function AsiaTierCards({ readings }: { readings: readonly IndicatorReadin
         readings={readings}
         units={units}
         dataSection="pacific-nz"
+        onOpenDetails={onOpenDetails}
       >
         {/* S21 (BD-S21b): the §9 item 5 NZX50 leg — the AU board's own
             row mirrored here (one board, one vocabulary), linking to its

@@ -1217,8 +1217,15 @@ const BUDGETS = [
   // honest index notes, now as index-note sections). Measured
   // 16.20/4.07; the raw ceiling re-based 16.0 → 16.5 kB (the growth IS
   // the three new cards — intended, justified in the CHANGELOG; the gz
+  // side stays far under 6.0). — R-5 port (2026-11-17, BD-S33): the five
+  // card sections' stretched CardDetailsOpener wiring (the details-panel
+  // tap zone on every §21-trio card; the panel + chart ride the SHARED
+  // chunks every destination page already loads). Measured 16.53/4.16 —
+  // the raw ceiling re-based 16.5 → 16.75 kB (+0.03 kB, the opener
+  // button + the onOpenDetails plumbing through AsiaSection/
+  // AsiaIndexNoteSection; intended, justified in the CHANGELOG; the gz
   // side stays far under 6.0).
-  { pattern: /^AsiaPage-[\w-]+\.js$/, raw: 16_500, gz: 6_000, label: 'Asia & Pacific page lazy chunk (page-division S14)' },
+  { pattern: /^AsiaPage-[\w-]+\.js$/, raw: 16_750, gz: 6_000, label: 'Asia & Pacific page lazy chunk (page-division S14)' },
   // Page-division S10 (2026-11-09): the shared TIC drawing — the legacy
   // "Who holds US government debt" section, extracted to its own chunk
   // the moment /usa's tier-6 board imported it (Vite's shared-chunk

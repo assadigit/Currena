@@ -32,6 +32,7 @@
 
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatJalaliDate, formatNumber, formatDateWords } from '@currena/core';
+import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
@@ -99,7 +100,16 @@ const STATUS_KEY: Record<string, TranslationKey> = {
  * One Currencies card — the §21 trio (value · 10-year position · freshness)
  * ------------------------------------------------------------------ */
 
-function CurrenciesCard({ entry, units }: { entry: CurrenciesCardEntry; units: CurrenciesUnitLabels }): React.JSX.Element {
+function CurrenciesCard({
+  entry,
+  units,
+  onOpenDetails,
+}: {
+  entry: CurrenciesCardEntry;
+  units: CurrenciesUnitLabels;
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const reading: IndicatorReading | undefined = entry.reading;
   const name = t(
@@ -148,7 +158,7 @@ function CurrenciesCard({ entry, units }: { entry: CurrenciesCardEntry; units: C
       id={`currencies-card-${entry.id}`}
       data-currencies-card={entry.id}
       data-currencies-status={reading?.status ?? 'absent'}
-      className="flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueText !== null ? (
@@ -169,6 +179,10 @@ function CurrenciesCard({ entry, units }: { entry: CurrenciesCardEntry; units: C
         ) : null}
         {statusWord !== null ? <span data-currencies-status-word>{statusWord}</span> : null}
       </p>
+      {/* The R-5 details-panel opener — the stretched tap zone over the
+       * whole card (only when a reading exists; an absent id stays the
+       * honest non-interactive unavailable card, D-R5-3). */}
+      {reading !== undefined ? <CardDetailsOpener id={entry.id} onOpenDetails={onOpenDetails} /> : null}
     </article>
   );
 }
@@ -182,11 +196,13 @@ function CurrenciesCardSection({
   ids,
   readings,
   units,
+  onOpenDetails,
 }: {
   group: string;
   ids: readonly IndicatorId[];
   readings: readonly IndicatorReading[];
   units: CurrenciesUnitLabels;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
 }): React.JSX.Element | null {
   const { t } = useI18n();
   const entries = currenciesCards(readings, ids);
@@ -203,14 +219,21 @@ function CurrenciesCardSection({
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-2.5 lg:grid-cols-3 lg:gap-3">
         {entries.map((entry) => (
-          <CurrenciesCard key={entry.id} entry={entry} units={units} />
+          <CurrenciesCard key={entry.id} entry={entry} units={units} onOpenDetails={onOpenDetails} />
         ))}
       </div>
     </section>
   );
 }
 
-export function CurrenciesTierCards({ readings }: { readings: readonly IndicatorReading[] }): React.JSX.Element {
+export function CurrenciesTierCards({
+  readings,
+  onOpenDetails,
+}: {
+  readings: readonly IndicatorReading[];
+  /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
   const { t } = useI18n();
   // The corpus-pinned unit labels, assembled once for the render pass
   // (the copy-pin test proves each word matches the corpus byte-for-byte).
@@ -229,8 +252,8 @@ export function CurrenciesTierCards({ readings }: { readings: readonly Indicator
   };
   return (
     <>
-      <CurrenciesCardSection group="pairs" ids={CURRENCIES_PAIR_CARD_IDS} readings={readings} units={units} />
-      <CurrenciesCardSection group="dollar-standing" ids={CURRENCIES_DOLLAR_STANDING_IDS} readings={readings} units={units} />
+      <CurrenciesCardSection group="pairs" ids={CURRENCIES_PAIR_CARD_IDS} readings={readings} units={units} onOpenDetails={onOpenDetails} />
+      <CurrenciesCardSection group="dollar-standing" ids={CURRENCIES_DOLLAR_STANDING_IDS} readings={readings} units={units} onOpenDetails={onOpenDetails} />
     </>
   );
 }

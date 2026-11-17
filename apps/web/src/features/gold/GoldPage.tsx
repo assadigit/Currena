@@ -33,6 +33,7 @@ import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
+import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { GoldPositions } from './GoldPositions';
 import { goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
@@ -109,6 +110,9 @@ export function GoldPage(): React.JSX.Element {
   const projection: PageProjection | null =
     state.kind === 'ready' ? state.projection : state.kind === 'loading' || state.kind === 'error' ? state.cached : null;
   const readings = projection?.readings;
+  // The R-5 details-panel wiring (docs/page-division/07): the context
+  // cards' click opens the ported panel over the page's own readings.
+  const { openCard, panel } = useIndicatorDetailsPanel(readings);
   // The M-17 label: the cached copy paints exactly when it renders — the
   // boot paint from localStorage while loading, and the outage path that
   // kept the last good copy when a refresh failed (the GlobalPage S4
@@ -228,13 +232,17 @@ export function GoldPage(): React.JSX.Element {
       {/* D-27 + §16 + D-29 — the context cards, the blocked notes, the
           honest-record footnote. */}
       <div className="mt-3 sm:mt-5">
-        {contextEntries.length > 0 ? <GoldContext entries={contextEntries} /> : null}
+        {contextEntries.length > 0 ? <GoldContext entries={contextEntries} onOpenDetails={openCard} /> : null}
       </div>
 
       {/* TM23: the Gold Positions section — the CFTC trader positioning
           cards with a visual bar showing where the current positioning
           stands in its 0–100 range. */}
       {readings !== undefined ? <GoldPositions readings={readings} /> : null}
+
+      {/* The R-5 details panel (docs/page-division/07) — rendered once at
+          the page root; the context cards' stretched opener targets it. */}
+      {panel}
     </div>
   );
 }

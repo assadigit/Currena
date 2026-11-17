@@ -49,6 +49,7 @@ import {
   COMMODITIES_GOLD_HREF,
 } from './commodities-tiles';
 import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
+import { clearHistoryCacheForTests } from '../../shared/lib/insights';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)
@@ -415,5 +416,63 @@ describe('CommoditiesPage', () => {
       };
       render(<Probe />);
     }
+  });
+
+  /* ---------------------------------------------------------------- *
+   * The R-5 details-panel port (docs/page-division/07, BD-S33): the
+   * §19.6 navigate-to-Global stopgap on the «more details» button is
+   * REPLACED by the ported per-page panel (the legacy 2026-10-26c
+   * behaviour, restored on the commodities home).
+   * ---------------------------------------------------------------- */
+
+  it('the R-5 port: the «More details» button opens the ported panel (no more navigate-to-Global stopgap) with the price-row sections', async () => {
+    clearHistoryCacheForTests();
+    atRoute('/commodities');
+    // The projection + the brent history (the tile sparkline, the price
+    // sections and the panel chart all read the SAME module-cached fetch).
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/commodities')) return jsonResponse(commoditiesProjectionFixture());
+        if (url.includes('/api/insights/brent/history')) {
+          const points: [number, number][] = [];
+          for (let d = 0; d < 400; d += 1) points.push([Math.floor(Date.now() / 86_400_000) - 400 + d, 80 + (d % 30)]);
+          return jsonResponse({ v: 1, id: 'brent', points });
+        }
+        return notFound();
+      }),
+    );
+    render(<CommoditiesPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-commodities-card="brent"]')).not.toBeNull();
+    });
+
+    // The tile's «More details» button — the SAME PriceTile affordance
+    // that opened the legacy panel.
+    const brent = document.querySelector('[data-commodities-card="brent"]')!;
+    const moreDetails = [...brent.querySelectorAll('button')].find(
+      (b) => b.textContent?.includes('More details'),
+    ) as HTMLButtonElement;
+    expect(moreDetails).not.toBeNull();
+
+    // The click opens the ported panel: the dialog + the VERIFIED price-row
+    // title (2026-10-26c — priceCardTitles wins over the registry name) +
+    // the F5 sections (the owner directive restored).
+    fireEvent.click(moreDetails);
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    expect(dialog.textContent).toContain('Brent crude oil');
+    expect(dialog.textContent).toContain('The world oil price'); // the Layer-1 plainName
+    expect(dialog.textContent).toContain('What it means for you');
+    expect(dialog.textContent).toContain('What it is');
+
+    // The close button closes (the labelled X — the sr-only span names it).
+    fireEvent.click(
+      [...dialog.querySelectorAll('button')].find((b) => b.textContent?.trim() === 'Close details')!,
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
   });
 });

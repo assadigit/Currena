@@ -1,0 +1,554 @@
+/**
+ * IndicatorDetailsPanel — the per-page details surface (the R-5 port,
+ * docs/page-division/07-R5-DETAILS-PANEL-PORT.md).
+ *
+ * The port of the retired legacy /insights DetailsPanel (Block F5:
+ * "Replace the in-grid accordion with a side panel on wide screens and a
+ * bottom sheet on phones" — 2026-10-26c), landed behind the destination
+ * pages' §21-trio cards after the §19.6 retirement. Section order (life
+ * effects first): what it means for you → why it matters → what usually
+ * follows → what it cannot tell you → the technical definition. A large
+ * chart with readable axis labels (caption size), the chart-data table
+ * toggle (SR path), the linked source + as-of date at the bottom.
+ *
+ * The R-5 adaptation (BD-S33): the watchlist pin is GONE (R-7's accepted
+ * loss — the pinned strip retired with the legacy page); everything else
+ * is the F5 panel verbatim. The history rides the SAME endpoint the
+ * legacy panel read (`GET /api/insights/:id/history`, the module-cached
+ * `fetchIndicatorHistory` — one network request, three consumers: the
+ * card sparkline, the panel sections, the chart).
+ *
+ * Focus discipline (F5 note, unchanged): focus TRAPS inside the panel;
+ * Escape closes; focus RETURNS to the control that opened it. Body
+ * scroll locks while open.
+ */
+
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import type { IndicatorId, IndicatorReading } from '@currena/core';
+import { formatNumber } from '@currena/core';
+import { interpolate } from '../i18n';
+import type { InsightsCopy } from '../i18n/insights-copy-en';
+import { ApiError, fetchIndicatorHistory } from '../lib/insights';
+import { X } from 'lucide-react';
+import { IconImg, indicatorIconUrl } from '../../components/icons/currena';
+import { HistoryChart, formatAsOf } from './HistoryChart';
+import { PRICE_ROWS, definitionFor, formatRuleText, formatUtcHm } from '../config';
+import { PriceDetailsSections } from './PriceDetails';
+import { staleAfterDaysFor, RULE_CHANGELOG, RULE_VERSION } from '@currena/insights';
+import { getIndicatorCopy, getGlossary, getLayer1Ui } from './layer1';
+import { useInsightsCopy } from '../hooks/useInsightsCopy';
+
+/**
+ * CardDetailsOpener — the stretched-button overlay that makes a whole
+ * §21-trio card the details-panel tap zone (the R-5 port, D-R5-6).
+ *
+ * The card keeps its own DOM untouched — the h4 heading (the page's
+ * outline), the bdi value, the position/freshness lines — and this
+ * transparent real <button> covers the card (position: absolute;
+ * inset: 0; the article needs `relative`), carrying the accessible
+ * name ("Details: <corpus name>") + aria-haspopup="dialog". The whole
+ * card is the tap zone (the legacy UI-53 rule); the card's heading
+ * semantics and every characterization query stay byte-identical.
+ *
+ * Renders as the LAST child of the card article, only when the card
+ * carries a reading (D-R5-3 — an absent reading stays the honest
+ * non-interactive unavailable card).
+ */
+export function CardDetailsOpener({
+  id,
+  onOpenDetails,
+}: {
+  id: IndicatorId;
+  onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+}): React.JSX.Element {
+  const { copy } = useInsightsCopy();
+  const name = copy.indicators[id]?.name ?? id;
+  return (
+    <button
+      type="button"
+      onClick={(e) => onOpenDetails(id, e.currentTarget)}
+      aria-haspopup="dialog"
+      aria-label={`${copy.ui.detailsButton}: ${name}`}
+      className="insights-focusable absolute inset-0 z-10 cursor-pointer rounded-[var(--radius-md)] bg-transparent transition-shadow hover:ring-1 hover:ring-currena-blue/40"
+    />
+  );
+}
+
+function Section({ title, body, emphasis }: { title: string; body: string; emphasis?: boolean }) {
+  return (
+    <div>
+      <h4 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+        {title}
+      </h4>
+      <p className={`mt-1 mb-0 text-[length:var(--type-label)] leading-relaxed ${emphasis ? 'font-bold text-[var(--color-text-primary)]' : 'text-[var(--color-text-primary)]/90'}`}>
+        {body}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Layer 1 — the plain-language block for the expanded panel
+ * (docs/insights/layer1/PLAIN-LANGUAGE-SPEC.md §6 + DECISIONS D-05/D-06).
+ * A new grouped block placed AFTER the approved F5 sections (whatItIs is
+ * last) and BEFORE the chart. Contains, in spec order: ifRising, ifFalling,
+ * connections, australiaAngle (if present), and the glossary-term list.
+ * When the reading carries a 30-day direction, the matching ifRising/
+ * ifFalling line is emphasised (D-06, CSS only — no new wording). Renders
+ * nothing when no Layer-1 copy exists for the id (graceful roll-out).
+ */
+function Layer1Block({
+  reading,
+  copy,
+  locale,
+}: {
+  reading: IndicatorReading;
+  copy: InsightsCopy;
+  locale: 'en' | 'fa';
+}) {
+  const l1 = getIndicatorCopy(reading.id, locale);
+  const ui = getLayer1Ui(locale);
+  const glossary = getGlossary(locale);
+  if (!l1) return null;
+  const dir = reading.change30d;
+  const rising = dir !== undefined && dir > 0;
+  const falling = dir !== undefined && dir < 0;
+  const bothNull = l1.ifRising === null && l1.ifFalling === null;
+  return (
+    <div className="mt-4 flex flex-col gap-4 border-t border-[var(--color-border)] pt-4" data-layer1-block>
+      {l1.ifRising !== null ? (
+        <Section title={ui.ifRising} body={l1.ifRising} emphasis={rising} />
+      ) : null}
+      {l1.ifFalling !== null ? (
+        <Section title={ui.ifFalling} body={l1.ifFalling} emphasis={falling} />
+      ) : null}
+      {bothNull && l1.skipReason !== undefined ? (
+        <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+          {l1.skipReason}
+        </p>
+      ) : null}
+      {bothNull ? (
+        <p className="m-0 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]">{ui.noDirection}</p>
+      ) : null}
+      {l1.connections.length > 0 ? (
+        <div>
+          <h4 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+            {ui.connections}
+          </h4>
+          <ul className="m-0 mt-1 list-none p-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+            {l1.connections.map((c, i) => {
+              const name =
+                getIndicatorCopy(c.with, locale)?.plainName ??
+                (copy.indicators[c.with as keyof typeof copy.indicators]?.name) ??
+                c.with;
+              return (
+                <li key={i} className="mb-1">
+                  <span className="font-semibold">{name}</span>
+                  <span aria-hidden="true"> — </span>
+                  <span>{c.text}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+      {l1.australiaAngle !== undefined ? (
+        <Section title={ui.australiaAngle} body={l1.australiaAngle} />
+      ) : null}
+      {l1.glossaryTerms.length > 0 ? (
+        <div>
+          <h4 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-status-context)]">
+            {ui.plainWords}
+          </h4>
+          <dl className="m-0 mt-1 grid gap-1.5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-primary)]/90">
+            {l1.glossaryTerms.map((termId) => {
+              const g = glossary[termId];
+              if (!g) return null;
+              return (
+                <div key={termId}>
+                  <dt className="font-semibold">{g.term}</dt>
+                  <dd className="m-0 ms-0 text-[var(--color-text-secondary)]">
+                    {g.plain}
+                    {g.example !== undefined ? (
+                      <span className="mt-0.5 block text-[length:var(--type-caption)] italic text-[var(--color-text-tertiary)]">
+                        {g.example}
+                      </span>
+                    ) : null}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Step-2 add-list §A (the card spec): every card's facts, shown on the
+ * panel — how often the source updates, how old the data may get before the
+ * card wears its "stale" tag, when this reading was fetched, and whether
+ * the indicator is scored (votes toward its area verdict) or context only.
+ */
+function CardFacts({
+  reading,
+  copy,
+  numberLocale,
+}: {
+  reading: IndicatorReading;
+  copy: InsightsCopy;
+  numberLocale: 'en-US' | 'fa-IR';
+}) {
+  const def = definitionFor(reading.id);
+  const cadence = copy.ui.cadence[def.cadence];
+  const staleAfter = staleAfterDaysFor(def);
+  const staleText =
+    staleAfter === null
+      ? copy.ui.staleNever
+      : interpolate(copy.ui.staleAfterLine, {
+          n: formatNumber(staleAfter, numberLocale, { maximumFractionDigits: 0 }),
+        });
+  return (
+    <p className="m-0 mb-4 flex flex-wrap gap-x-2 gap-y-1 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+      <span>
+        <span className="font-semibold">{copy.ui.updatesLabel}:</span> {cadence}
+      </span>
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span>{staleText}</span>
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span>
+        {/* v3 UI-22 (2026-10-20): the fetched line now speaks the UTC TIME
+         * too — the same clock every card face's meta row speaks
+         * ("Fetched: {date} · {time} UTC", RULES §6). */}
+        <bdi>
+          {interpolate(copy.ui.fetchedAtUtc, {
+            date: formatAsOf(reading.updatedAt.slice(0, 10), numberLocale === 'fa-IR' ? 'fa' : 'en'),
+            time: formatUtcHm(reading.updatedAt, numberLocale),
+          })}
+        </bdi>
+      </span>
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span className={def.rule.kind === 'info' ? '' : 'font-semibold'}>
+        {def.rule.kind === 'info' ? copy.ui.contextOnlyFact : copy.ui.scoredFact}
+      </span>
+      {/* Fix spec A-07 (2026-10-14): the scoring-rule version, visible in
+       * "How is this calculated?" — every threshold change is dated. */}
+      <span aria-hidden="true" className="opacity-50">·</span>
+      <span>
+        {interpolate(copy.ui.ruleVersionLine, {
+          v: formatNumber(RULE_VERSION, numberLocale, { maximumFractionDigits: 0 }),
+          date: formatAsOf(RULE_CHANGELOG[RULE_CHANGELOG.length - 1]!.date, numberLocale === 'fa-IR' ? 'fa' : 'en'),
+        })}
+      </span>
+    </p>
+  );
+}
+
+/** The panel's chart block — fetches on panel mount (module-cached fetch). */
+function PanelHistory({
+  id,
+  copy,
+  locale,
+  numberLocale,
+}: {
+  id: IndicatorId;
+  copy: InsightsCopy;
+  locale: 'en' | 'fa';
+  numberLocale: 'en-US' | 'fa-IR';
+}) {
+  const [state, setState] = useState<
+    { kind: 'loading' } | { kind: 'ready'; points: [number, number][] } | { kind: 'error' } | { kind: 'none' }
+  >({ kind: 'loading' });
+
+  useEffect(() => {
+    let cancelled = false;
+    // R10-5: reset-to-loading on id change (the async fetch replaces it).
+    // The documented "adjust state when a prop changes" pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset-to-loading on id change (React docs: adjusting state when a prop changes)
+    setState({ kind: 'loading' });
+    fetchIndicatorHistory(id)
+      .then((history) => {
+        if (cancelled) return;
+        setState(history && history.points.length > 0 ? { kind: 'ready', points: history.points } : { kind: 'none' });
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.code === 'history_not_found') {
+          setState({ kind: 'none' });
+          return;
+        }
+        setState({ kind: 'error' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (state.kind === 'loading') {
+    return <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.historyLoading}</p>;
+  }
+  if (state.kind === 'error') {
+    return <p className="m-0 text-[length:var(--type-label)] text-[var(--color-status-alert)]">{copy.ui.historyError}</p>;
+  }
+  if (state.kind === 'none') {
+    return <p className="m-0 text-[length:var(--type-label)] text-[var(--color-text-secondary)]">{copy.ui.noHistory}</p>;
+  }
+  return <HistoryChart id={id} points={state.points} copy={copy} locale={locale} numberLocale={numberLocale} />;
+}
+
+export function IndicatorDetailsPanel({
+  reading,
+  readings,
+  copy,
+  locale,
+  numberLocale,
+  onClose,
+  returnFocusTo,
+}: {
+  reading: IndicatorReading;
+  /** The page's readings — the price sections' companion lines read other
+   * assets (gold's A$ line, Bitcoin's metal ratios). Companions the page
+   * projection does not carry simply do not render (D-R5-4). */
+  readings: readonly IndicatorReading[];
+  copy: InsightsCopy;
+  locale: 'en' | 'fa';
+  numberLocale: 'en-US' | 'fa-IR';
+  onClose: () => void;
+  /** The element that opened the panel — focus returns here on close. */
+  returnFocusTo: HTMLElement | null;
+}) {
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const headingId = useId();
+  const entry = copy.indicators[reading.id];
+  const indicatorDef = definitionFor(reading.id);
+
+  // 2026-10-26c: the four asset cards' «جزئیات بیشتر» sections render
+  // INSIDE this side panel (owner directive) — the same sections that
+  // used to expand inline in the tile, unchanged in content.
+  const isPriceRow = PRICE_ROWS.includes(reading.id);
+  const byId = useMemo(
+    () => new Map(readings.map((r) => [r.id as string, r])),
+    [readings],
+  );
+
+  // Focus trap + Escape (F5).
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      const list = [...focusables].filter((el) => el.offsetParent !== null || el === document.activeElement);
+      if (list.length === 0) return;
+      const first = list[0]!;
+      const last = list[list.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    },
+    [onClose],
+  );
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    // Opening: focus the heading (announced by role=dialog).
+    const focusTarget = panel?.querySelector<HTMLElement>('[data-panel-heading]');
+    focusTarget?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden'; // scroll lock while open
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      // F5: focus returns to the control that opened the panel.
+      if (returnFocusTo && document.contains(returnFocusTo)) {
+        returnFocusTo.focus({ preventScroll: true });
+      }
+    };
+  }, [returnFocusTo]);
+
+  return (
+    <>
+      <div className="insights-panel-scrim" onClick={onClose} aria-hidden="true" />
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        onKeyDown={onKeyDown}
+        className="insights-panel"
+      >
+        {/* Header: the plain name + technical tag + close. */}
+        <header className="flex items-start justify-between gap-3 border-block-end border-[var(--color-border)] p-4">
+          <div className="min-w-0">
+            <h3
+              id={headingId}
+              data-panel-heading=""
+              tabIndex={-1}
+              className="type-section m-0 flex items-center gap-2 leading-snug text-[var(--color-text-primary)] outline-none"
+            >
+              {/* Round 29 (owner): the panel's subject mark grows to 32/44px
+               * — it identifies the card at a glance and deserves real size. */}
+              {indicatorIconUrl(reading.id) !== null ? <IconImg src={indicatorIconUrl(reading.id)!} size={32} desktopSize={44} /> : null}
+              <span>
+                {/* 2026-10-26c: the four asset cards' panels carry the SAME
+                 * verified title the card face uses (2026-10-25b) — the
+                 * registry's legacy "(ounce)" suffix would contradict the
+                 * card's measurement-basis subtitle one screen apart. */}
+                {isPriceRow ? (copy.ui.priceCardTitles[reading.id] ?? entry.name) : entry.name}
+              {entry.ticker ? (
+                <span lang="en" dir="ltr" className="ms-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                  {entry.ticker}
+                </span>
+              ) : null}
+              {/* Layer 1 (D-03): the short friendly label beside the official
+               * name, shown only when Layer-1 copy exists for this id. */}
+              {getIndicatorCopy(reading.id, locale)?.plainName ? (
+                <span className="ms-1.5 text-[length:var(--type-caption)] text-[var(--color-text-tertiary)]" data-layer1-plainname>
+                  {getIndicatorCopy(reading.id, locale)!.plainName}
+                </span>
+              ) : null}
+              </span>
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="insights-focusable inline-flex min-h-[44px] shrink-0 cursor-pointer items-center gap-1 rounded-full border border-[var(--color-border)] px-3 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-status-alert)]/50 hover:text-[var(--color-status-alert)]"
+          >
+            <X aria-hidden size={17} strokeWidth={2} />
+            <span className="sr-only">{copy.ui.panelClose}</span>
+          </button>
+        </header>
+
+        {/* Scrollable body. */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {/* The rule, in plain language (01 spec: every threshold shown). */}
+          <p className="m-0 mb-4 rounded-[var(--radius-md)] bg-currena-soft/70 px-3 py-2.5 text-[length:var(--type-label)] font-medium text-[var(--color-text-primary)] dark:bg-white/[0.05]">
+            <span className="font-bold">{copy.ui.ruleTitle}: </span>
+            <span>{formatRuleText(indicatorDef.rule, reading.id, copy.rule, copy.units, numberLocale)}</span>
+          </p>
+
+          {/* Step-2 §A: the card-spec facts (updates · stale age · fetched ·
+           * scored/context). */}
+          <CardFacts reading={reading} copy={copy} numberLocale={numberLocale} />
+
+          {/* 2026-10-26c: the asset cards' five detail sections (A–E) —
+           * تغییرات قیمت … منبع داده و زمان به‌روزرسانی — ride the panel
+           * for the four price rows, directly under the facts. */}
+          {isPriceRow ? (
+            <div className="mb-4">
+              <PriceDetailsSections
+                id={reading.id}
+                reading={reading}
+                copy={copy}
+                locale={locale}
+                numberLocale={numberLocale}
+                byId={byId}
+              />
+            </div>
+          ) : null}
+
+          {/* Step-2 §B5: the VIX card's interim-presentation note (the
+           * calm/nervous words are a Step-3 deliverable computed from the
+           * stored history — stated, never faked). */}
+          {reading.id === 'vix' ? (
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+              {copy.ui.vixNote}
+            </p>
+          ) : null}
+
+          {reading.status === 'stale' && reading.asOf ? (
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-alert)]">
+              <bdi>{interpolate(copy.ui.staleSince, { date: formatAsOf(reading.asOf, locale) })}</bdi>
+            </p>
+          ) : null}
+          {reading.status === 'no-history' ? (
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+              {copy.ui.noHistoryStatus}
+            </p>
+          ) : null}
+          {/* Fix spec A-03/A-04: why the reading sits in check-pending — the
+           * validation test that flagged it, in plain words. */}
+          {reading.status === 'check-pending' && reading.flag ? (
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+              <bdi>{interpolate(copy.ui.checkPendingLine, { reason: reading.flag.reason })}</bdi>
+            </p>
+          ) : null}
+          {/* Fix spec A-06: a dated, expiring human-written context note (off
+           * by default — only shows when one exists and has not expired). */}
+          {reading.note ? (
+            <p className="m-0 mb-4 rounded-[var(--radius-sm)] bg-currena-soft/70 px-3 py-2 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
+              <bdi>{reading.note.text}</bdi>
+              <span className="mt-1 block opacity-80">
+                {formatAsOf(reading.note.authored, locale)} — {formatAsOf(reading.note.expires, locale)}
+              </span>
+            </p>
+          ) : null}
+          {indicatorDef.rule.kind === 'info' ? (
+            <p className="m-0 mb-4 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)]">
+              {copy.ui.infoOnly}
+            </p>
+          ) : null}
+
+          {/* F5 order — life effects FIRST. */}
+          <div className="flex flex-col gap-4">
+            <Section title={copy.ui.forYou} body={entry.forYou} />
+            <Section title={copy.ui.whyItMatters} body={entry.whyItMatters} />
+            <Section title={copy.ui.tendedToMean} body={entry.tendedToMean} />
+            <Section title={copy.ui.cantTell} body={entry.cantTell} />
+            <Section title={copy.ui.whatItIs} body={entry.whatItIs} />
+          </div>
+
+          {/* Layer 1 — the plain-language block (D-05): ifRising / ifFalling /
+           * connections / australiaAngle / glossary terms. Renders nothing
+           * when no Layer-1 copy exists for this id (graceful roll-out). */}
+          <Layer1Block reading={reading} copy={copy} locale={locale} />
+
+          {/* The large chart (labels ≥ caption size — the HistoryChart
+           * renders its ticks at caption size). v3 UI-17 (2026-10-20): the
+           * chart renders for UNAVAILABLE readings too — the last good
+           * value lives HERE (the face hides it); a source with no stored
+           * history degrades honestly to the "no stored history" line. */}
+          <div className="mt-4">
+            <PanelHistory id={reading.id} copy={copy} locale={locale} numberLocale={numberLocale} />
+          </div>
+        </div>
+
+        {/* Footer: source + as-of (the R-5 port: the watchlist pin is gone —
+         * R-7's accepted loss; the footer keeps the source + as-of). */}
+        <footer className="flex flex-wrap items-center gap-2 border-block-start border-[var(--color-border)] p-4">
+          {reading.sourceUrl ? (
+            <a
+              href={reading.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="insights-focusable inline-flex items-center gap-1 rounded-full bg-currena-blue/10 px-3 py-1.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-status-context)] transition-colors hover:bg-currena-blue/20"
+            >
+              {reading.sourceName}
+              <span aria-hidden="true">↗</span>
+              <span className="sr-only">{copy.ui.viewSource}</span>
+            </a>
+          ) : (
+            <span className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">{reading.sourceName}</span>
+          )}
+          {reading.asOf ? (
+            <bdi className="text-[length:var(--type-caption)] text-[var(--color-text-secondary)]">
+              {interpolate(copy.ui.updatedOn, { date: formatAsOf(reading.asOf, locale) })}
+            </bdi>
+          ) : null}
+        </footer>
+      </div>
+    </>
+  );
+}
