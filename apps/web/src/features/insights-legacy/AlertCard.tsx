@@ -26,7 +26,7 @@
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { IconImg, indicatorIconUrl } from '../icons/currena';
+import { IconImg, indicatorIconUrl } from '../../components/icons/currena';
 import {
   ALWAYS_POSITION_IDS,
   bandWordsOf,

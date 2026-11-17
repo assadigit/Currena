@@ -32,7 +32,7 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import type { InsightsSnapshot } from '@currena/core';
 import { insightsCopyEn } from '../i18n/insights-copy-en';
 import { insightsCopyFa } from '../i18n/insights-copy-fa';
-import { DetailsPanel } from '../../components/insights/DetailsPanel';
+import { DetailsPanel } from '../../features/insights-legacy/DetailsPanel';
 import { PricesBoard } from './PricesBoard';
 
 /* ------------------------------------------------------------------ *

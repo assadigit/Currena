@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FileSpreadsheet, FileText, Server, Table2 } from 'lucide-react';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import type { ExportFormat } from './full-export';
-import { clampPanelToViewport } from '../../lib/clamp-panel';
+import { clampPanelToViewport } from './clamp-panel';
 
 const FORMAT_ITEMS: readonly { format: ExportFormat; key: 'exportFormatMd' | 'exportFormatTxt' | 'exportFormatCsv' | 'exportFormatXlsx' }[] = [
   { format: 'md', key: 'exportFormatMd' },

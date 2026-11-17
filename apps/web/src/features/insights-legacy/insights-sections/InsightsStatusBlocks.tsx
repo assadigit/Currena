@@ -10,11 +10,11 @@ import { useEffect, useState } from 'react';
 import type { InsightsSnapshot } from '@currena/core';
 import { formatRelative } from '@currena/core';
 import { TriangleAlert } from 'lucide-react';
-import { interpolate } from '../../shared/i18n';
-import type { Locale } from '../../shared/i18n';
-import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { Skeleton } from '../../shared/ui/ui';
-import { Button } from '../../shared/ui/ui';
+import { interpolate } from '../../../shared/i18n';
+import type { Locale } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { Skeleton } from '../../../shared/ui/ui';
+import { Button } from '../../../shared/ui/ui';
 
 export type LoadState =
   | { kind: 'loading' }

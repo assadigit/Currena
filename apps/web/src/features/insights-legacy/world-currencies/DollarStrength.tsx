@@ -38,7 +38,7 @@ import {
   tierIsCard,
   tierOf,
 } from '../../../shared/config';
-import { num } from '../../../routes/insights-sections/QuestionGroup';
+import { num } from '../insights-sections/QuestionGroup';
 
 export function DollarStrengthCards({
   snapshot,

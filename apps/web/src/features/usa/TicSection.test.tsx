@@ -26,7 +26,7 @@ import { TicSnapshotSchema } from '@currena/core';
 import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
 import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 import { TicSection, type TicLoadState } from './TicSection';
-import { TicCustodyCard } from '../../components/insights/TicCustodyCard';
+import { TicCustodyCard } from '../insights-legacy/TicCustodyCard';
 import { ALWAYS_POSITION_IDS, HIDDEN_FROM_LANE_IDS } from '../../shared/config/sections';
 
 /** The fresh "now" (the fixture's dataMonth 2026-08 is 61 days old). */

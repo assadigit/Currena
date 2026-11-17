@@ -9,8 +9,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { IndicatorId } from '@currena/core';
-import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { filterVisibleIds, type StatusFilter } from '../../shared/config';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { filterVisibleIds, type StatusFilter } from '../../../shared/config';
 import type { LoadState } from './InsightsStatusBlocks';
 
 export function useInsightsToolsNav({

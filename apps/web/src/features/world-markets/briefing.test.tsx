@@ -17,7 +17,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import type { MarketEntry, MarketsSnapshot } from '@currena/core';
-import { WorldMarkets } from '../../components/insights/WorldMarkets';
+import { WorldMarkets } from '../insights-legacy/WorldMarkets';
 import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
 import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
 

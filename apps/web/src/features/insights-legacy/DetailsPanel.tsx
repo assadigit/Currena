@@ -19,7 +19,7 @@ import { interpolate } from '../../shared/i18n';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
 import { ApiError, fetchIndicatorHistory } from '../../shared/lib/insights';
 import { Star, X } from 'lucide-react';
-import { IconImg, indicatorIconUrl } from '../icons/currena';
+import { IconImg, indicatorIconUrl } from '../../components/icons/currena';
 import { HistoryChart, formatAsOf } from '../../shared/components/HistoryChart';
 import { PRICE_ROWS, definitionFor, formatRuleText, formatUtcHm } from '../../shared/config';
 import { PriceDetailsSections } from '../../shared/components/PriceDetails';

@@ -9,7 +9,7 @@
 import { useMemo, useState } from 'react';
 import type { FxSnapshot } from '@currena/core';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
-import { fxPlainWords } from '../../../features/currencies/fx-presentation';
+import { fxPlainWords } from '../../currencies/fx-presentation';
 import { GlossaryTip } from '../../../shared/components/GlossaryTip';
 
 /* ------------------------------------------------------------------ *

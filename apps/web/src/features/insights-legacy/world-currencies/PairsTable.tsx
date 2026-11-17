@@ -14,10 +14,10 @@ import type { FxPairEntry, FxPairId, FxSnapshot } from '@currena/core';
 import { decodeWeeklySeries } from '@currena/insights/markets/definitions';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { interpolate } from '../../../shared/i18n';
-import { fxMoneyLine, fxPairRows, fxRuleCopyKey, fxTrendOf } from '../../../features/currencies/fx-presentation';
+import { fxMoneyLine, fxPairRows, fxRuleCopyKey, fxTrendOf } from '../../currencies/fx-presentation';
 import { formatAsOf } from '../../../shared/components/HistoryChart';
 import { GlossaryTip } from '../../../shared/components/GlossaryTip';
-import { isOld, signedPct } from '../../../features/currencies/display';
+import { isOld, signedPct } from '../../currencies/display';
 import { Layer1Block } from '../../../shared/components/layer1/Layer1Block';
 
 /* ------------------------------------------------------------------ *

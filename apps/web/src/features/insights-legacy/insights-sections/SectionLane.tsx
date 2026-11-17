@@ -9,10 +9,10 @@
 import type { IndicatorGroupId, IndicatorId, InsightsSnapshot } from '@currena/core';
 import type { IndicatorReading } from '@currena/core';
 import { Search } from 'lucide-react';
-import { interpolate } from '../../shared/i18n';
-import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { CompactRow } from '../../components/insights/CompactRow';
-import { IconImg, sectionIconUrl } from '../../components/icons/currena';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { CompactRow } from '../CompactRow';
+import { IconImg, sectionIconUrl } from '../../../components/icons/currena';
 import {
   LANE_GROUP_ORDER,
   SECTION_ORDER,
@@ -21,11 +21,11 @@ import {
   dailyPeersOf,
   type DailyPeers,
   type StatusFilter,
-} from '../../shared/config';
+} from '../../../shared/config';
 import { num, QuestionGroup } from './QuestionGroup';
-import { NarrativeBlock } from '../../components/insights/NarrativeBlock';
-import { InTheNews } from '../../components/insights/InTheNews';
-import type { NarrativeUnit } from '../../shared/lib/narrative';
+import { NarrativeBlock } from '../NarrativeBlock';
+import { InTheNews } from '../InTheNews';
+import type { NarrativeUnit } from '../../../shared/lib/narrative';
 import { Fragment } from 'react';
 import type { ReactNode } from 'react';
 

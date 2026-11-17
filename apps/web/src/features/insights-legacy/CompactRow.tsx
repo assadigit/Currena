@@ -21,7 +21,7 @@
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { IconImg, indicatorIconUrl } from '../icons/currena';
+import { IconImg, indicatorIconUrl } from '../../components/icons/currena';
 import { StatusChip } from '../../shared/components/StatusChip';
 import { CardMetaRow, ChangeText, faceReasonOf } from './CardMeta';
 import { PositionBar } from './PositionBar';

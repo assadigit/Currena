@@ -16,7 +16,7 @@ import { formatNumber, csvEscapeField, csvNeutralizeFormula } from '@currena/cor
 import type { FxSnapshot, FxPairEntry } from '@currena/core';
 import { FX_GROUP_ORDER, FX_PAIRS } from '@currena/insights/fx/definitions';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { fxTrendOf } from '../../features/currencies/fx-presentation';
+import { fxTrendOf } from '../currencies/fx-presentation';
 
 function csvNumber(value: number, maximumFractionDigits = 2): string {
   return formatNumber(value, 'en-US', { maximumFractionDigits });

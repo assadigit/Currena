@@ -43,23 +43,23 @@ import type { IndicatorReading } from '@currena/core';
 // section gating and the API's route gating driven by one source of truth.
 // The markets board rides the owner directive and is NOT in hiddenBoards;
 // the fx board is.
-import siteModeOverrides from '../../../../data/site-mode-overrides.json';
-import { useI18n } from '../shared/lib/locale';
-import { routeQuery } from '../router';
-import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../shared/lib/insights';
-import { DetailsPanel } from '../components/insights/DetailsPanel';
-import { JumpNav, type JumpTarget } from '../components/insights/JumpNav';
-import { MoneyPanel } from '../features/australia/MoneyPanel';
-import { AustralianMarkets } from '../features/australia/AustralianMarkets';
-import { CompaniesTable } from '../components/insights/CompaniesTable';
-import { useInsightsCopy } from '../shared/hooks/useInsightsCopy';
+import siteModeOverrides from '../../../../../data/site-mode-overrides.json';
+import { useI18n } from '../../shared/lib/locale';
+import { routeQuery } from '../../router';
+import { ApiError, fetchInsightsSnapshot, readCachedSnapshot } from '../../shared/lib/insights';
+import { DetailsPanel } from './DetailsPanel';
+import { JumpNav, type JumpTarget } from './JumpNav';
+import { MoneyPanel } from '../australia/MoneyPanel';
+import { AustralianMarkets } from '../australia/AustralianMarkets';
+import { CompaniesTable } from './CompaniesTable';
+import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import {
   PINNED_STORAGE_KEY,
   SIGNALS_ENABLED,
   definitionFor,
   formatPinnedStorage,
   parsePinnedIds,
-} from '../shared/config';
+} from '../../shared/config';
 import { InsightsHeader } from './insights-sections/InsightsHeader';
 import { DeprecationBanner } from './insights-sections/DeprecationBanner';
 import {
@@ -79,8 +79,8 @@ import {
   useWorldMarketsSection,
 } from './insights-sections/world-feeds';
 import { useInsightsToolsNav } from './insights-sections/useInsightsToolsNav';
-import { NarrativeBlock } from '../components/insights/NarrativeBlock';
-import { InTheNews } from '../components/insights/InTheNews';
+import { NarrativeBlock } from './NarrativeBlock';
+import { InTheNews } from './InTheNews';
 
 export function Insights() {
   const { t, locale } = useI18n();

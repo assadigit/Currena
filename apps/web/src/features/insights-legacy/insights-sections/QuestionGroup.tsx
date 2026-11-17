@@ -10,10 +10,10 @@ import type { IndicatorGroupId, IndicatorId, InsightsSection, InsightsSnapshot }
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { gaugesForSection, GAUGES, isShadowGauge } from '@currena/insights';
-import { interpolate } from '../../shared/i18n';
-import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { AlertCard } from '../../components/insights/AlertCard';
-import { CompactRow } from '../../components/insights/CompactRow';
+import { interpolate } from '../../../shared/i18n';
+import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
+import { AlertCard } from '../AlertCard';
+import { CompactRow } from '../CompactRow';
 import {
   COMPANION_ONLY_IDS,
   HIDDEN_FROM_LANE_IDS,
@@ -26,7 +26,7 @@ import {
   stepToneClass,
   tierIsCard,
   tierOf,
-} from '../../shared/config';
+} from '../../../shared/config';
 
 export function num(n: number, numberLocale: 'en-US' | 'fa-IR'): string {
   return formatNumber(n, numberLocale, { maximumFractionDigits: 0 });

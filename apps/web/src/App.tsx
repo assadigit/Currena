@@ -40,7 +40,7 @@ const Splitter = lazy(() => import('./routes/Splitter').then((m) => ({ default: 
 const Settle = lazy(() => import('./routes/Settle').then((m) => ({ default: m.Settle })));
 const Receipt = lazy(() => import('./routes/Receipt').then((m) => ({ default: m.Receipt })));
 const About = lazy(() => import('./routes/About').then((m) => ({ default: m.About })));
-const Insights = lazy(() => import('./routes/Insights').then((m) => ({ default: m.Insights })));
+const Insights = lazy(() => import('./features/insights-legacy/Insights').then((m) => ({ default: m.Insights })));
 // Page-division S1 (D-46): the Converter — the app's founding tool, eager
 // in the entry chunk until now — becomes a lazy tool route at /converter so
 // the Global page (D-20: the landing page) owns `/`. The placeholder

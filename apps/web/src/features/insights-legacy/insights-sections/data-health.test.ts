@@ -18,10 +18,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { dataHealthOf } from './data-health';
-import { TZ_LABEL } from '../../features/global/NextUpStrip';
-import { insightsCopyEn } from '../../shared/i18n/insights-copy-en';
-import { insightsCopyFa } from '../../shared/i18n/insights-copy-fa';
-import calendarJson from '../../../../../data/insights-calendar.json';
+import { TZ_LABEL } from '../../global/NextUpStrip';
+import { insightsCopyEn } from '../../../shared/i18n/insights-copy-en';
+import { insightsCopyFa } from '../../../shared/i18n/insights-copy-fa';
+import calendarJson from '../../../../../../data/insights-calendar.json';
 
 const reading = (status: string): { status: string } => ({ status });
 

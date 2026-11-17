@@ -45,24 +45,24 @@ import { formatNumber } from '@currena/core';
 import { MARKETS, MARKET_GROUP_ORDER } from '@currena/insights/markets/definitions';
 import { interpolate } from '../../shared/i18n';
 import type { InsightsCopy } from '../../shared/i18n/insights-copy-en';
-import { IconImg, MARKETS_SECTION_ICON_URL } from '../icons/currena';
+import { IconImg, MARKETS_SECTION_ICON_URL } from '../../components/icons/currena';
 import { Skeleton } from '../../shared/ui/ui';
-import { MarketDetail, MarketTile } from '../../features/world-markets/MarketTile';
-import { MarketsVerdictBox } from '../../features/world-markets/MarketsVerdict';
-import { MarketsTable } from '../../features/world-markets/MarketsTable';
-import { MarketMovers } from '../../features/world-markets/MarketMovers';
-import { MarketsHeatmap } from '../../features/world-markets/MarketsHeatmap';
-import { WorldMap } from '../../features/world-markets/WorldMap';
-import type { MapPeriod } from '../../features/world-markets/world-map-config';
-import { formatDateShort, formatRelativeShort, isOld, type MarketsLoadState, type MarketsView } from '../../features/world-markets/shared';
-import { allMarketsClosed } from '../../features/world-markets/session';
+import { MarketDetail, MarketTile } from '../world-markets/MarketTile';
+import { MarketsVerdictBox } from '../world-markets/MarketsVerdict';
+import { MarketsTable } from '../world-markets/MarketsTable';
+import { MarketMovers } from '../world-markets/MarketMovers';
+import { MarketsHeatmap } from '../world-markets/MarketsHeatmap';
+import { WorldMap } from '../world-markets/WorldMap';
+import type { MapPeriod } from '../world-markets/world-map-config';
+import { formatDateShort, formatRelativeShort, isOld, type MarketsLoadState, type MarketsView } from '../world-markets/shared';
+import { allMarketsClosed } from '../world-markets/session';
 import { NarrativeBlock } from './NarrativeBlock';
 import { InTheNews } from './InTheNews';
 import type { NarrativeUnit } from '../../shared/lib/narrative';
 
 // Stable external surface (the pre-split importers keep working):
-export type { MarketsLoadState } from '../../features/world-markets/shared';
-export { marketsVerdictStep, marketsTakeaway } from '../../features/world-markets/MarketsVerdict';
+export type { MarketsLoadState } from '../world-markets/shared';
+export { marketsVerdictStep, marketsTakeaway } from '../world-markets/MarketsVerdict';
 
 /** The explorer's presentation: the readable list (default, mobile's only
  * mode) or the desktop performance map (§3.6). */

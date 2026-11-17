@@ -16,7 +16,7 @@ import {
   fxQuietRules,
   fxQuietView,
   type FxQuietView,
-} from '../../../features/currencies/fx-presentation';
+} from '../../currencies/fx-presentation';
 
 /* ------------------------------------------------------------------ *
  * The quiet area (§9.3 item 4 + CR §4.4): the "Nearest to sounding the

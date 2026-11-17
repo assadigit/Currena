@@ -50,7 +50,7 @@ import {
 } from '../src/shared/validation-step3';
 import { SOURCE_LICENCES } from '../src/shared/licences';
 import { DEFINITIONS, RULE_VERSION } from '../src/index';
-import { buildInsightsMarkdown, type FullExportInput } from '../../../apps/web/src/components/insights/full-export';
+import { buildInsightsMarkdown, type FullExportInput } from '../../../apps/web/src/features/insights-legacy/full-export';
 import { DISPLAY } from '../../../apps/web/src/shared/config/display';
 import { insightsCopyEn } from '../../../apps/web/src/shared/i18n/insights-copy-en';
 import { insightsCopyFa } from '../../../apps/web/src/shared/i18n/insights-copy-fa';
