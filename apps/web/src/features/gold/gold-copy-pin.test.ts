@@ -150,12 +150,19 @@ describe('the Gold page speaks the insights corpus’s verdict words (en)', () =
     expect(Object.keys(names)).toHaveLength(GOLD_CONTEXT_IDS.length);
   });
 
-  it('the unit words ↔ copy.units', () => {
+  it('the unit words ↔ copy.units (R02: tonnes deliberately diverges)', () => {
     expect(pdEn.unitUsd).toBe(corpusEn.units.usd);
     expect(pdEn.unitAud).toBe(corpusEn.units.aud);
     expect(pdEn.unitPercent).toBe(corpusEn.units.percent);
     expect(pdEn.unitRatio).toBe(corpusEn.units.ratio);
-    expect(pdEn.unitTonnes).toBe(corpusEn.units.tonnes);
+    /* GPE R02 (wave 0, GPE-S2-02 HIGH): the SGE-withdrawals + Swiss-flow
+     * values are plain tonnes (92, 228), so the gold page's unit word
+     * DIVERGES from the corpus's units.tonnes — that key is
+     * China-steel vocabulary ('m tonnes', values in millions). The
+     * correct word is pinned DIRECTLY (a regression to 'm tonnes' would
+     * reintroduce the 10^6 unit error). */
+    expect(pdEn.unitTonnes).toBe('tonnes');
+    expect(pdEn.unitTonnes).not.toBe(corpusEn.units.tonnes);
   });
 
   it('the position + band words ↔ copy.ui.position* / signals.band*', () => {
@@ -281,12 +288,18 @@ describe('the Gold page speaks the insights corpus’s verdict words (fa)', () =
     expect(Object.keys(names)).toHaveLength(GOLD_CONTEXT_IDS.length);
   });
 
-  it('the unit words ↔ copy.units', () => {
+  it('the unit words ↔ copy.units (R02: tonnes deliberately diverges)', () => {
     expect(pdFa.unitUsd).toBe(corpusFa.units.usd);
     expect(pdFa.unitAud).toBe(corpusFa.units.aud);
     expect(pdFa.unitPercent).toBe(corpusFa.units.percent);
     expect(pdFa.unitRatio).toBe(corpusFa.units.ratio);
-    expect(pdFa.unitTonnes).toBe(corpusFa.units.tonnes);
+    /* GPE R02 (موج صفر، GPE-S2-02): مقادیر شانگهای/سوئیس «تن» ساده است؛
+     * کلید units.tonnes پیکره («میلیون تن») واژگان فولاد چین است و
+     * نانوشته‌های طلا عمداً از آن جدا می‌شود — بازگشت به «میلیون تن»
+     * همان خطای ۱۰^۶ واحد را برمی‌گرداند، پس واژهٔ درست مستقیم پین
+     * می‌شود. */
+    expect(pdFa.unitTonnes).toBe('تن');
+    expect(pdFa.unitTonnes).not.toBe(corpusFa.units.tonnes);
   });
 
   it('the position + band words ↔ copy.ui.position* / signals.band*', () => {

@@ -830,7 +830,12 @@ export const en = {
       unitAud: 'A$',
       unitPercent: '%',
       unitRatio: 'ratio',
-      unitTonnes: 'm tonnes',
+      /* GPE R02 (wave 0, GPE-S2-02 HIGH): the SGE-withdrawals + Swiss-flow
+       * cards' values are plain TONNES (92, 228) — this pair deliberately
+       * DIVERGES from the insights corpus's units.tonnes ('m tonnes'),
+       * which is China-steel vocabulary (values genuinely in millions of
+       * tonnes). The gold page's copy-pin test pins the divergence. */
+      unitTonnes: 'tonnes',
       positionLow: 'low',
       positionTypical: 'typical',
       positionHigh: 'high',
