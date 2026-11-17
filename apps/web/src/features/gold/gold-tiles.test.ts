@@ -40,6 +40,7 @@ import {
   goldHeroVerdict,
   goldSeatLanes,
   goldSeats,
+  seatUnreadWhy,
   type GoldContextId,
   type GoldVoterId,
 } from './gold-tiles';
@@ -264,5 +265,51 @@ describe('goldContextCards — the D-27 list + display configs', () => {
       'etf-short-interest',
     ]);
     expect(GOLD_BLOCKED_NOTES.every((n) => n.page === 'gold')).toBe(true);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * GPE R04 (F16a) — the why-unread cause classes
+ * ------------------------------------------------------------------ */
+
+describe('seatUnreadWhy — the four cause classes (GPE R04)', () => {
+  const dark = { id: 'us-cpi-yoy' as GoldVoterId, impact: 'unread' as const };
+
+  it('a readable reading under a dark seat is the rule-driven class (the D-18 derivation)', () => {
+    // The US−Japan gap's own case: value fresh, no percentile history.
+    expect(seatUnreadWhy(dark, reading('us-cpi-yoy', { status: 'normal', value: 2.259 }))).toEqual({
+      cause: 'rule-driven',
+    });
+    // warning counts as readable too (gold-balance's own readable()).
+    expect(seatUnreadWhy(dark, reading('us-cpi-yoy', { status: 'warning' }))).toEqual({ cause: 'rule-driven' });
+  });
+
+  it('a stale CPI seat maps to the upstream-gap class (the Oct-2025 base gap)', () => {
+    expect(seatUnreadWhy(dark, reading('us-cpi-yoy', { status: 'stale', asOf: '2026-09-01' }))).toEqual({
+      cause: 'upstream-gap',
+    });
+  });
+
+  it('the UoM family maps to upstream-stopped, carrying the last published month', () => {
+    const seat = { id: 'michigan-sentiment' as GoldVoterId, impact: 'unread' as const };
+    expect(seatUnreadWhy(seat, reading('michigan-sentiment', { status: 'stale', asOf: '2026-09-01' }))).toEqual({
+      cause: 'upstream-stopped',
+      month: '2026-09-01',
+    });
+    // Without an asOf there is nothing honest to date — no line.
+    expect(seatUnreadWhy(seat, undefined)).toBeNull();
+  });
+
+  it('the CFTC pair + gpr-daily map to pipeline-lag (the two operational P0s)', () => {
+    for (const id of ['cftc-gold-positioning', 'cftc-gold-gross-long', 'gpr-daily'] as const) {
+      expect(seatUnreadWhy({ id, impact: 'unread' }, reading(id, { status: 'stale' }))).toEqual({
+        cause: 'pipeline-lag',
+      });
+    }
+  });
+
+  it('readable seats never carry a why-line; unmapped dark ids fail closed', () => {
+    expect(seatUnreadWhy({ id: 'us10y', impact: 'supports' as const }, reading('us10y'))).toBeNull();
+    expect(seatUnreadWhy({ id: 'us10y', impact: 'unread' as const }, reading('us10y', { status: 'stale' }))).toBeNull();
   });
 });

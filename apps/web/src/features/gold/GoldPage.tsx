@@ -224,9 +224,11 @@ export function GoldPage(): React.JSX.Element {
         </div>
       ) : null}
 
-      {/* D-26 item 2 — the 37 seats, grouped by the five lanes. */}
+      {/* D-26 item 2 — the 37 seats, grouped by the five lanes. GPE R04:
+          the projection's readings ride along so every dark seat can
+          state WHY it is dark (the cause-class why-lines). */}
       <div className="mt-3 sm:mt-5">
-        {seatLanes.length > 0 ? <GoldSeats lanes={seatLanes} /> : null}
+        {seatLanes.length > 0 ? <GoldSeats lanes={seatLanes} readings={readings} /> : null}
       </div>
 
       {/* D-27 + §16 + D-29 — the context cards, the blocked notes, the

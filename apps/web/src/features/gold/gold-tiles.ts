@@ -127,6 +127,91 @@ export function goldHeroTilt(hero: Pick<GoldHeroModel, 'balance'>): BalanceTilt 
  * The 37 seats grouped by the five lanes (D-26 item 2)
  * ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ *
+ * GPE R04 (F16a, wave 0) — the why-unread cause classes. The S2 §3
+ * decomposition (2026-11-17): a dark seat is dark for one of four
+ * knowable reasons, and the page now SAYS which one (one muted status
+ * line per dark seat — the FAQ-Q6 pattern, rendered by GoldSeats.tsx
+ * from the projection's own reading metadata where it can be derived,
+ * else from the curated map below). The classes:
+ *   upstream-stopped — the source itself stopped publishing (the UoM
+ *     family ends Sep 2026 on FRED; nothing Currena can fetch lights
+ *     the seat until the source resumes — the line states the last
+ *     published month, derived from the reading's own asOf).
+ *   upstream-gap — the current value is published but the PRIOR-YEAR
+ *     BASE month is missing upstream (the US CPI's Oct-2025 shutdown
+ *     gap; R05's adjacent-months policy lights the seat when it can —
+ *     this line speaks only while the seat stays dark).
+ *   pipeline-lag — the data is published upstream and the next ingest
+ *     will carry it (the CFTC Saturday gate + the GPR re-fetch, the
+ *     two operational P0s open on main OUTSIDE GPE — honest for as
+ *     long as they persist; the closeout window's small ops session
+ *     retires the line by lighting the seats).
+ *   rule-driven — the reading is fresh but the evaluator had no input
+ *     to evaluate (the D-18 input-presence rule: neither a qualifying
+ *     move nor a decade percentile — e.g. the US−Japan 10y gap, value
+ *     current, no decile history for the seat yet). Fully derivable
+ *     from the projection: readable reading + dark seat ⇒ the rule.
+ * ------------------------------------------------------------------ */
+
+/** The four cause classes (GPE R04 / F16a). */
+export type SeatUnreadCause = 'upstream-stopped' | 'upstream-gap' | 'pipeline-lag' | 'rule-driven';
+
+/** A dark seat's why-line: the cause class + the upstream-stopped
+ * class's last-published month (the reading's asOf, formatted by the
+ * renderer in the page's locale — Jalali in fa). */
+export interface SeatUnreadWhy {
+  cause: SeatUnreadCause;
+  month?: string;
+}
+
+/** The curated cause map for DARK seats whose reading is stale or
+ * missing — the causes are pipeline knowledge the wire format does not
+ * carry (the S2 §3 table's evidence). Ids absent from the map render no
+ * why-line (fail-closed: no line, never a guess). When a seat lights,
+ * its line stops rendering by construction. */
+const SEAT_STALE_CAUSE: Readonly<Partial<Record<GoldVoterId, SeatUnreadCause>>> = {
+  // The UoM family: FRED MICH / UMCSENT end Sep 2026 (source stopped).
+  'michigan-sentiment': 'upstream-stopped',
+  'michigan-1y-expectations': 'upstream-stopped',
+  'michigan-5y-expectations': 'upstream-stopped',
+  // The CPI: the Oct-2025 base month is empty on FRED (shutdown gap).
+  'us-cpi-yoy': 'upstream-gap',
+  // The two operational P0s (S2-D4, outside GPE): CFTC's Saturday gate
+  // and the GPR re-fetch — data sits upstream, the ingest lags.
+  'cftc-gold-positioning': 'pipeline-lag',
+  'cftc-gold-gross-long': 'pipeline-lag',
+  'gpr-daily': 'pipeline-lag',
+};
+
+/** The reading statuses the balance treats as readable (gold-balance.ts's
+ * own readable() — mirrored, pinned by the gold-balance engine tests). */
+const READABLE_STATUSES: ReadonlySet<string> = new Set(['normal', 'warning', 'context', 'no-history']);
+
+/** GPE R04: the why-line for a DARK seat. The rule-driven class is
+ * DERIVED from the projection's own reading (a readable reading under a
+ * dark seat can only be the D-18 input-presence branch); the stale
+ * classes come from the curated map. Null for readable seats and for
+ * dark seats with no knowable cause. */
+export function seatUnreadWhy(
+  seat: Pick<GoldSeat, 'id' | 'impact'>,
+  reading: IndicatorReading | undefined,
+): SeatUnreadWhy | null {
+  if (seat.impact !== 'unread') return null;
+  if (reading !== undefined && READABLE_STATUSES.has(reading.status)) {
+    // Readable reading + dark seat ⇒ the evaluator had no input (D-18).
+    return { cause: 'rule-driven' };
+  }
+  const cause = SEAT_STALE_CAUSE[seat.id];
+  if (cause === undefined) return null;
+  // The upstream-stopped line names its last published month — without
+  // one there is nothing honest to date, so no line (fail-closed).
+  if (cause === 'upstream-stopped') {
+    return reading?.asOf != null ? { cause, month: reading.asOf } : null;
+  }
+  return { cause };
+}
+
 /** The gold meter's 37 voter ids as a literal union — keeps the name +
  *  copy maps TOTAL (a missing key is a typecheck error, never a runtime
  *  undefined). gold-tiles.test.ts pins this list against the engine's

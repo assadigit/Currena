@@ -86,7 +86,7 @@ describe('TrendPanel (R01: the chip + the delta read the true window)', () => {
   beforeEach(() => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async (input: RequestInfo | URL) => historyResponse(series(1900))),
+      vi.fn(async () => historyResponse(series(1900))),
     );
   });
 

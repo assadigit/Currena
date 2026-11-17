@@ -486,3 +486,57 @@ describe('GoldPage', () => {
     });
   });
 });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R04 (F16a) — the why-unread lines: one muted status line per
+   * dark seat, its cause class derived from the projection's reading
+   * metadata (the S2 §3 decomposition).
+   * ---------------------------------------------------------------- */
+  it('dark seats state WHY: the four cause classes render under the lean word', async () => {
+    // The 16–17 Nov cluster, shaped exactly as the S2 §3 table found it:
+    // UoM stopped (stale @ Sep 2026), CPI's base-month gap (stale),
+    // CFTC/GPR pipeline lags (stale), US−Japan rule-driven (fresh
+    // value, no decile history — the D-18 branch).
+    const projection = projectionFixture();
+    const patch: Record<string, Partial<IndicatorReading>> = {
+      'michigan-sentiment': { status: 'stale', asOf: '2026-09-01', value: 48.1 },
+      'michigan-1y-expectations': { status: 'stale', asOf: '2026-09-01', value: 4.6 },
+      'michigan-5y-expectations': { status: 'stale', asOf: '2026-09-01', value: 3.4 },
+      'us-cpi-yoy': { status: 'stale', asOf: '2026-09-01', value: 3.7377 },
+      'cftc-gold-positioning': { status: 'stale', value: 44.9804 },
+      'cftc-gold-gross-long': { status: 'stale', value: 55.2473 },
+      'gpr-daily': { status: 'stale', value: 158.845 },
+      'us-japan-10y-gap': { status: 'normal', value: 2.259, percentile10y: undefined, change30d: undefined },
+    };
+    projection.readings = projection.readings.map((r) =>
+      patch[r.id] !== undefined ? ({ ...r, ...patch[r.id] } as IndicatorReading) : r,
+    );
+    stubFeeds({ projection: () => jsonResponse(projection) });
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+
+    // The four cause classes render, each under its dark seat.
+    const whyLine = (seatId: string): string | null =>
+      document.querySelector(`[data-seat="${seatId}"] [data-seat-why]`)?.textContent ?? null;
+    // upstream-stopped: the UoM family, with the last published month.
+    expect(document.querySelector('[data-seat="michigan-sentiment"] [data-seat-why]')?.getAttribute('data-seat-why')).toBe('upstream-stopped');
+    expect(whyLine('michigan-sentiment')).toContain('source stopped publishing');
+    expect(whyLine('michigan-sentiment')).toContain('Sep 2026');
+    // upstream-gap: the CPI seat.
+    expect(document.querySelector('[data-seat="us-cpi-yoy"] [data-seat-why]')?.getAttribute('data-seat-why')).toBe('upstream-gap');
+    expect(whyLine('us-cpi-yoy')).toContain('year-ago base month');
+    // pipeline-lag: the CFTC pair + GPR.
+    for (const id of ['cftc-gold-positioning', 'cftc-gold-gross-long', 'gpr-daily']) {
+      expect(document.querySelector(`[data-seat="${id}"] [data-seat-why]`)?.getAttribute('data-seat-why')).toBe('pipeline-lag');
+    }
+    expect(whyLine('gpr-daily')).toContain('next ingest');
+    // rule-driven: the US−Japan gap (fresh value, no decile history).
+    expect(document.querySelector('[data-seat="us-japan-10y-gap"] [data-seat-why]')?.getAttribute('data-seat-why')).toBe('rule-driven');
+    expect(whyLine('us-japan-10y-gap')).toContain('no decile history');
+
+    // Readable seats never carry a why-line.
+    expect(document.querySelector('[data-seat="real-yield-10y"] [data-seat-why]')).toBeNull();
+    expect(document.querySelector('[data-seat="us30y"] [data-seat-why]')).toBeNull();
+  });

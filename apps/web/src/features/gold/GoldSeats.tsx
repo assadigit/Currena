@@ -19,14 +19,16 @@
  * render with their honest word — never a guess (Agent Rule 5).
  */
 
+import { useMemo } from 'react';
 import type { PageDivisionPageId } from '@currena/core';
 import type { GoldLane } from '@currena/insights';
+import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 import type { TranslationKey } from '../../shared/lib/locale';
-import type { GoldSeat, GoldSeatLane, GoldVoterId } from './gold-tiles';
+import { seatUnreadWhy, type GoldSeat, type GoldSeatLane, type GoldVoterId, type SeatUnreadCause } from './gold-tiles';
 
 /* The lane copy keys — five lanes, the corpus's own names + intros.
  * S6: exported for the hero's classic balance view (the same lane
@@ -76,6 +78,33 @@ const SEAT_LEAN_TONE: Record<GoldSeat['impact'], string> = {
   steady: 'text-[var(--color-text-secondary)]',
   unread: 'text-[var(--color-text-tertiary)]',
 };
+
+/* GPE R04 (F16a): the why-unread lines' copy keys — one per cause class
+ * (the S2 §3 decomposition). The upstream-stopped line's {month} is the
+ * reading's own asOf, formatted in the page's calendar (Jalali in fa). */
+const SEAT_WHY_KEY: Readonly<Record<SeatUnreadCause, TranslationKey>> = {
+  'upstream-stopped': 'pd.gold.seatWhyUpstreamStopped',
+  'upstream-gap': 'pd.gold.seatWhyUpstreamGap',
+  'pipeline-lag': 'pd.gold.seatWhyPipelineLag',
+  'rule-driven': 'pd.gold.seatWhyRuleDriven',
+};
+
+/** The dark seat's why-line text — the cause class's sentence, the
+ * upstream-stopped month formatted in the page's own calendar. */
+function seatWhyText(
+  cause: SeatUnreadCause,
+  month: string | undefined,
+  t: ReturnType<typeof useI18n>['t'],
+  numberLocale: 'en-US' | 'fa-IR',
+): string {
+  if (month === undefined) return t(SEAT_WHY_KEY[cause]);
+  const monthText = new Intl.DateTimeFormat(numberLocale, {
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${month}T00:00:00Z`));
+  return interpolate(t(SEAT_WHY_KEY[cause]), { month: monthText });
+}
 
 const EVIDENCE_KEY: Readonly<Record<'rising' | 'falling' | 'high' | 'low', TranslationKey>> = {
   rising: 'pd.gold.evidenceRising',
@@ -158,15 +187,34 @@ function seatHref(seat: GoldSeat): string | null {
  * One seat chip
  * ------------------------------------------------------------------ */
 
-function SeatChip({ seat }: { seat: GoldSeat }): React.JSX.Element {
-  const { t } = useI18n();
+function SeatChip({
+  seat,
+  reading,
+}: {
+  seat: GoldSeat;
+  /** The seat's own reading from the page projection — the why-line's
+   * status metadata (GPE R04). Undefined when the id is absent. */
+  reading: IndicatorReading | undefined;
+}): React.JSX.Element {
+  const { t, numberLocale } = useI18n();
   const name = t(VOTER_NAME_KEY[seat.id]);
   const leanWord = t(SEAT_LEAN_KEY[seat.impact]);
   const evidenceWord = seat.evidence !== null ? t(EVIDENCE_KEY[seat.evidence]) : null;
   const href = seatHref(seat);
+  /* GPE R04 (F16a): the dark seat's why-line — one muted status line
+   * naming the cause class (upstream-stopped / upstream-gap /
+   * pipeline-lag / rule-driven), derived from the projection's own
+   * reading metadata where possible. Only a dark seat carries one. */
+  const why = seatUnreadWhy(seat, reading);
+  const whyWord = why !== null ? seatWhyText(why.cause, why.month, t, numberLocale) : null;
   // The chip's accessible name carries the WHOLE reading: the voter, its
   // lean and its evidence — screen readers never meet a bare name.
-  const aria = evidenceWord !== null ? `${name} — ${leanWord} · ${evidenceWord}` : `${name} — ${leanWord}`;
+  const aria =
+    evidenceWord !== null
+      ? `${name} — ${leanWord} · ${evidenceWord}`
+      : whyWord !== null
+        ? `${name} — ${leanWord} · ${whyWord}`
+        : `${name} — ${leanWord}`;
   const inner = (
     <>
       <span className="text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</span>
@@ -177,6 +225,13 @@ function SeatChip({ seat }: { seat: GoldSeat }): React.JSX.Element {
       <span className={`flex flex-col gap-0.5 text-[length:var(--type-caption)] font-semibold leading-tight ${SEAT_LEAN_TONE[seat.impact]}`}>
         <span>{leanWord}</span>
         {evidenceWord !== null ? <span className="text-[var(--color-text-tertiary)]">{evidenceWord}</span> : null}
+        {/* GPE R04: the why-unread line — the muted cause sentence under
+         * the dark seat's lean word (never under a readable seat). */}
+        {whyWord !== null ? (
+          <span className="font-normal text-[var(--color-text-tertiary)]" data-seat-why={why!.cause}>
+            {whyWord}
+          </span>
+        ) : null}
       </span>
     </>
   );
@@ -221,7 +276,15 @@ function SeatChip({ seat }: { seat: GoldSeat }): React.JSX.Element {
  * One lane card
  * ------------------------------------------------------------------ */
 
-function LaneCard({ lane }: { lane: GoldSeatLane }): React.JSX.Element {
+function LaneCard({
+  lane,
+  readingsById,
+}: {
+  lane: GoldSeatLane;
+  /** The projection's readings by id — the why-lines' status metadata
+   * (GPE R04), threaded from the page. */
+  readingsById: ReadonlyMap<string, IndicatorReading>;
+}): React.JSX.Element {
   const { t, numberLocale } = useI18n();
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
   const title = t(LANE_TITLE_KEY[lane.lane]);
@@ -272,7 +335,7 @@ function LaneCard({ lane }: { lane: GoldSeatLane }): React.JSX.Element {
       </header>
       <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
         {lane.seats.map((seat) => (
-          <SeatChip key={seat.id} seat={seat} />
+          <SeatChip key={seat.id} seat={seat} reading={readingsById.get(seat.id)} />
         ))}
       </ul>
     </section>
@@ -283,8 +346,21 @@ function LaneCard({ lane }: { lane: GoldSeatLane }): React.JSX.Element {
  * The five lanes
  * ------------------------------------------------------------------ */
 
-export function GoldSeats({ lanes }: { lanes: readonly GoldSeatLane[] }): React.JSX.Element {
+export function GoldSeats({
+  lanes,
+  readings,
+}: {
+  lanes: readonly GoldSeatLane[];
+  /** The page projection's readings — the dark seats' why-lines read
+   * each seat's own status metadata (GPE R04/F16a: the cause class is
+   * derived from the reading where possible, else the curated map). */
+  readings?: readonly IndicatorReading[];
+}): React.JSX.Element {
   const { t } = useI18n();
+  const readingsById = useMemo(
+    () => new Map((readings ?? []).map((r) => [r.id as string, r])),
+    [readings],
+  );
   return (
     <section aria-label={t('pd.gold.seatsAria')} data-gold-seats className="flex flex-col gap-2.5 sm:gap-3">
       <h2 className="m-0 text-base font-extrabold text-[var(--color-text-primary)] sm:text-lg">{t('pd.gold.lanesTitle')}</h2>
@@ -293,7 +369,7 @@ export function GoldSeats({ lanes }: { lanes: readonly GoldSeatLane[] }): React.
        * cards — every seat chip always visible, nothing collapsed). */}
       <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2 lg:gap-3">
         {lanes.map((lane) => (
-          <LaneCard key={lane.lane} lane={lane} />
+          <LaneCard key={lane.lane} lane={lane} readingsById={readingsById} />
         ))}
       </div>
     </section>

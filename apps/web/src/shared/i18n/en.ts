@@ -741,6 +741,16 @@ export const en = {
       seatPressures: 'Pressures gold',
       seatSteady: 'Not leaning',
       seatUnread: 'Couldn’t be read',
+      /* GPE R04 (F16a, wave 0): the why-unread lines — one muted status
+       * line per dark seat, its cause class from the S2 §3 decomposition
+       * (upstream-stopped / upstream-gap / pipeline-lag / rule-driven).
+       * The {month} is the reading's own asOf, formatted in the page's
+       * locale (Jalali in fa). Rendered ONLY under a dark seat; the
+       * moment a seat lights, its line stops rendering. */
+      seatWhyUpstreamStopped: 'source stopped publishing — last data {month}',
+      seatWhyUpstreamGap: 'upstream did not publish the year-ago base month (publication gap)',
+      seatWhyPipelineLag: 'data published upstream — the next ingest will carry it',
+      seatWhyRuleDriven: 'value is current; no decile history for this seat yet',
       evidenceRising: 'rising',
       evidenceFalling: 'falling',
       evidenceHigh: 'high in its decade',
