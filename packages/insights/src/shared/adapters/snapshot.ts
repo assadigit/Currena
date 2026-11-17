@@ -296,6 +296,18 @@ export interface SnapshotBuildInputs {
    * the honest unavailable path, unchanged.
    */
   carryForwardIds?: ReadonlySet<string>;
+  /**
+   * GPE R05 (S4-D1, the CPI shutdown-gap policy): per-id sets of YoY
+   * observation dates that used the ADJACENT-MONTHS-AVERAGE base (the
+   * prior-year base month missing upstream — the Oct-2025 US shutdown
+   * gap on FRED). Each matching reading is stamped
+   * `yoyBaseMethod: 'adjacent-months-average'` so every surface can
+   * label the disclosed method at point of use (C1's S4-D1 extension).
+   * Auto-expiring by construction: the set is recomputed from the pure
+   * levels each run, so the moment the base month exists again the
+   * standard rule resumes and the stamp stops.
+   */
+  gapBaseDates?: Partial<Record<IndicatorId, ReadonlySet<string>>>;
 }
 
 /* ------------------------------------------------------------------ *
@@ -516,6 +528,14 @@ export function buildInsightsSnapshot(inputs: SnapshotBuildInputs): InsightsSnap
           reading.periodStart = q.start;
           reading.periodEnd = q.end;
         }
+      }
+
+      // ---- GPE R05 (S4-D1): the CPI shutdown-gap policy flag. The gap
+      // set rides the deterministic base (stamped before the cache
+      // point, so the final build's replay carries it too). ----
+      const gapDates = inputs.gapBaseDates?.[def.id];
+      if (gapDates !== undefined && reading.asOf !== null && gapDates.has(reading.asOf)) {
+        reading.yoyBaseMethod = 'adjacent-months-average';
       }
 
       // ---- Defect E-08: an expired manual entry wears the stale tag. ----

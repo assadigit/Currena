@@ -106,7 +106,7 @@ import { classifySourceError } from '../adapters/fetch-policy';
 import type { ReadingSourceOverride } from '../adapters/collect';
 import { computeReading, type ReadingSource } from '../scoring';
 import type { KVLike } from './kv-store';
-import { combineSeries, epochDay, fromEpochDay, type SeriesPoint } from '../series';
+import { combineSeries, epochDay, fromEpochDay, yoyPctSeriesGapAware, type SeriesPoint } from '../series';
 import { REAL_YIELD_FILL_CAP, realYieldScoringSeries } from '../../domains/gold/real-yield-fill';
 
 /**
@@ -603,6 +603,20 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
   // (the double percentile pass was what pushed the 04:10 rung past the
   // free plan's CPU budget; the runs died between peaks and the first
   // write, leaving status frozen at the last good run).
+  // GPE R05 (S4-D1, the CPI shutdown-gap policy): the CPI pair's gap-base
+  // dates — which YoY points used the adjacent-months-average base (the
+  // pure levels walk, the SAME function the derive step ran) — so the
+  // snapshot stamps yoyBaseMethod on exactly the gap-derived readings
+  // (auto-expiring: the set is recomputed from the levels every run, so
+  // a backfilled base month returns the standard rule and the stamp
+  // stops).
+  const gapBaseDates: Partial<Record<IndicatorId, ReadonlySet<string>>> = {};
+  if (inputs.fred.CPIAUCNS !== undefined) {
+    gapBaseDates['us-cpi-yoy'] = yoyPctSeriesGapAware(inputs.fred.CPIAUCNS).gapBaseDates;
+  }
+  if (inputs.fred.CPILFENS !== undefined) {
+    gapBaseDates['us-cpi-core-yoy'] = yoyPctSeriesGapAware(inputs.fred.CPILFENS).gapBaseDates;
+  }
   const baseReadingCache = new Map<string, IndicatorReading>();
   const draft = buildInsightsSnapshot({
     series: scoringSeries,
@@ -617,6 +631,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     manualExpires,
     disabledReadings,
     sourceOutcomes,
+    gapBaseDates,
     ...(readingSourceOverrides !== undefined && Object.keys(readingSourceOverrides).length > 0
       ? { sourceOverrides: readingSourceOverrides }
       : {}),
@@ -652,6 +667,7 @@ export async function runInsightsUpdate(opts: IngestRunOptions): Promise<IngestR
     disabledReadings,
     sourceOutcomes,
     flags: outcome.flags,
+    gapBaseDates,
     ...(readingSourceOverrides !== undefined && Object.keys(readingSourceOverrides).length > 0
       ? { sourceOverrides: readingSourceOverrides }
       : {}),

@@ -29,6 +29,7 @@ import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { seatUnreadWhy, type GoldSeat, type GoldSeatLane, type GoldVoterId, type SeatUnreadCause } from './gold-tiles';
+import { yoyGapBaseLabel } from '../../shared/lib/yoy-gap';
 
 /* The lane copy keys — five lanes, the corpus's own names + intros.
  * S6: exported for the hero's classic balance view (the same lane
@@ -207,6 +208,12 @@ function SeatChip({
    * reading metadata where possible. Only a dark seat carries one. */
   const why = seatUnreadWhy(seat, reading);
   const whyWord = why !== null ? seatWhyText(why.cause, why.month, t, numberLocale) : null;
+  /* GPE R05 (S4-D1): a LIT CPI seat computed against the
+   * adjacent-months-average base carries its method label at point of
+   * use — «مبنا: میانگین دو ماه مجاور (شکست انتشار مهر ۱۴۰۴)» — the
+   * disclosure that lights the seat honestly (pairs with R04: the
+   * upstream-gap why-line spoke while it was dark). */
+  const methodWord = reading !== undefined ? yoyGapBaseLabel(reading, t, numberLocale) : null;
   // The chip's accessible name carries the WHOLE reading: the voter, its
   // lean and its evidence — screen readers never meet a bare name.
   const aria =
@@ -214,7 +221,9 @@ function SeatChip({
       ? `${name} — ${leanWord} · ${evidenceWord}`
       : whyWord !== null
         ? `${name} — ${leanWord} · ${whyWord}`
-        : `${name} — ${leanWord}`;
+        : methodWord !== null
+          ? `${name} — ${leanWord} · ${methodWord}`
+          : `${name} — ${leanWord}`;
   const inner = (
     <>
       <span className="text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</span>
@@ -230,6 +239,14 @@ function SeatChip({
         {whyWord !== null ? (
           <span className="font-normal text-[var(--color-text-tertiary)]" data-seat-why={why!.cause}>
             {whyWord}
+          </span>
+        ) : null}
+        {/* GPE R05: the gap-base method label — the lit CPI seat's
+         * disclosed method, only when the reading used the
+         * adjacent-months-average base. */}
+        {methodWord !== null ? (
+          <span className="font-normal text-[var(--color-text-tertiary)]" data-seat-method="adjacent-months-average">
+            {methodWord}
           </span>
         ) : null}
       </span>

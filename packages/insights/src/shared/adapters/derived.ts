@@ -32,7 +32,7 @@
  */
 
 import type { IndicatorId } from '@currena/core';
-import { combineSeries, yoyPctSeries, addDays, type SeriesPoint } from '../series';
+import { combineSeries, yoyPctSeries, yoyPctSeriesGapAware, addDays, type SeriesPoint } from '../series';
 import { boeBankRateDailySeries } from '../../domains/europe/adapters/boe';
 import { BASKET_CURRENCIES, computeBasketValue } from '../../domains/currencies/basket';
 import { PERCENTILE_WINDOW_DAYS } from '../scoring';
@@ -642,8 +642,15 @@ export function buildIndicatorSeries(inputs: SeriesInputs): Partial<Record<Indic
   put('boe-rate', boe === undefined ? undefined : boeBankRateDaily(boe.bankRateDecisions));
 
   /* ---------------- Global — Are prices heating up? ---------------- */
-  if (fred.CPIAUCNS) put('us-cpi-yoy', yoyPctSeries(fred.CPIAUCNS));
-  if (fred.CPILFENS) put('us-cpi-core-yoy', yoyPctSeries(fred.CPILFENS));
+  // GPE R05 (S4-D1, the CPI shutdown-gap policy): the CPI family's YoY
+  // is GAP-AWARE — when a month's prior-year base is missing upstream
+  // (the Oct-2025 US shutdown gap on FRED), the base becomes the average
+  // of the two adjacent published months (the disclosed, reproducible
+  // method). The stored LEVELS stay pure; the ingest's run wrapper reads
+  // the same function's gapBaseDates to stamp yoyBaseMethod on exactly
+  // the gap-derived readings (auto-expiring when the base returns).
+  if (fred.CPIAUCNS) put('us-cpi-yoy', yoyPctSeriesGapAware(fred.CPIAUCNS).series);
+  if (fred.CPILFENS) put('us-cpi-core-yoy', yoyPctSeriesGapAware(fred.CPILFENS).series);
   // M4 Wave 1 (OD-8/D-42): the Fed's preferred gauge — core PCE YoY from
   // the PCEPILFE index, the same derived 12-month % change as CPI.
   if (fred.PCEPILFE) put('us-pce-core-yoy', yoyPctSeries(fred.PCEPILFE));

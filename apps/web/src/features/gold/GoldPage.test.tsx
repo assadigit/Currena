@@ -485,7 +485,6 @@ describe('GoldPage', () => {
       expect(document.body.textContent).toContain('Showing the last good copy');
     });
   });
-});
 
   /* ---------------------------------------------------------------- *
    * GPE R04 (F16a) — the why-unread lines: one muted status line per
@@ -540,3 +539,33 @@ describe('GoldPage', () => {
     expect(document.querySelector('[data-seat="real-yield-10y"] [data-seat-why]')).toBeNull();
     expect(document.querySelector('[data-seat="us30y"] [data-seat-why]')).toBeNull();
   });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R05 (S4-D1) — the CPI seat lights with its method label: a
+   * gap-derived reading (adjacent-months-average base) renders the
+   * point-of-use disclosure on the LIT seat (the R04 pairing — the
+   * upstream-gap why-line spoke while the seat was dark).
+   * ---------------------------------------------------------------- */
+  it('a gap-based CPI seat renders the adjacent-months-average method label (GPE R05)', async () => {
+    const projection = projectionFixture();
+    projection.readings = projection.readings.map((r) =>
+      r.id === 'us-cpi-yoy'
+        ? ({ ...r, value: 4.02, status: 'warning', asOf: '2026-10-01', percentile10y: 0.9, yoyBaseMethod: 'adjacent-months-average' } as IndicatorReading)
+        : r,
+    );
+    stubFeeds({ projection: () => jsonResponse(projection) });
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    const seat = document.querySelector('[data-seat="us-cpi-yoy"]');
+    // The seat is LIT (warning + percentile → readable, fires the lane).
+    expect(seat?.getAttribute('data-seat-impact')).not.toBe('unread');
+    // The method label renders — the S4-D1 sentence with the base month.
+    const method = seat?.querySelector('[data-seat-method="adjacent-months-average"]');
+    expect(method?.textContent).toContain('base: adjacent-months average');
+    expect(method?.textContent).toContain('Oct 2025 publication gap');
+    // No why-line on a lit seat.
+    expect(seat?.querySelector('[data-seat-why]')).toBeNull();
+  });
+});

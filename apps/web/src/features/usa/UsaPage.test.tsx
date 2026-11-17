@@ -654,4 +654,34 @@ describe('UsaPage', () => {
     const absent = document.querySelector('[data-usa-card="rstar-us"]')!;
     expect(absent.querySelector('button[aria-haspopup="dialog"]')).toBeNull();
   });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R05 (S4-D1) — the CPI shutdown-gap method label at point of
+   * use: a gap-derived reading states its base method on the card.
+   * ---------------------------------------------------------------- */
+  it('a gap-based CPI reading states its adjacent-months-average base (GPE R05)', async () => {
+    const projection = usaProjectionFixture();
+    projection.readings = projection.readings.map((r) =>
+      r.id === 'us-cpi-yoy'
+        ? ({ ...r, value: 4.02, status: 'warning', asOf: '2026-10-01', yoyBaseMethod: 'adjacent-months-average' } as IndicatorReading)
+        : r,
+    );
+    stubFeeds({ projection: () => jsonResponse(projection) });
+    render(<UsaPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-usa-card="us-cpi-yoy"] [data-usa-value]')?.textContent).toBe('4%'.replace('4%', '4.0%'));
+    });
+    const note = document.querySelector('[data-usa-card="us-cpi-yoy"] [data-usa-gap-base-note]');
+    expect(note?.textContent).toContain('base: adjacent-months average');
+    expect(note?.textContent).toContain('Oct 2025 publication gap');
+  });
+
+  it('a standard-base CPI reading carries no gap note (the flag auto-expires)', async () => {
+    stubFeeds();
+    render(<UsaPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-usa-card="us-cpi-yoy"] [data-usa-value]')?.textContent).toBe('3.7%');
+    });
+    expect(document.querySelector('[data-usa-card="us-cpi-yoy"] [data-usa-gap-base-note]')).toBeNull();
+  });
 });

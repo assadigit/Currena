@@ -592,6 +592,16 @@ export const en = {
       dataAsOf: 'Data as of {date}',
       pricesAsOf: 'Live prices as of {time}',
       absentLine: '{n} of this page’s readings are not published in this mode.',
+      /* GPE R05 (S4-D1, the CPI shutdown-gap policy): the point-of-use
+       * method label for a YoY reading whose prior-year base month was
+       * missing upstream — the value is computed against the average of
+       * the two adjacent published months (the disclosed, reproducible
+       * method; the flag auto-expires when the base month returns).
+       * {month} is the missing BASE month (the observation month minus
+       * one year), formatted in the page's calendar. Rendered wherever
+       * the reading's value shows (the gold meter's CPI seat + the USA
+       * CPI card). */
+      yoyGapBaseLabel: 'base: adjacent-months average ({month} publication gap)',
       /* Tile titles (D-21's own names, spec §4). */
       tileGoldBalance: 'Gold Balance',
       tileBorrowingCosts: 'Borrowing Costs',

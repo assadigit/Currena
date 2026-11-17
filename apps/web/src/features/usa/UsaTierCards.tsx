@@ -26,6 +26,7 @@ import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel';
+import { yoyGapBaseLabel } from '../../shared/lib/yoy-gap';
 import {
   USA_TIER1_IDS,
   USA_TIER2_IDS,
@@ -198,6 +199,13 @@ function TierCard({
         : formatDateWords(reading.asOf, 'en-US')
       : null;
 
+  // GPE R05 (S4-D1): a YoY reading computed against the
+  // adjacent-months-average base (the CPI shutdown-gap policy) states
+  // its method AT POINT OF USE — the same shared label the gold meter's
+  // CPI seat renders, so the disclosure can never drift between the
+  // two surfaces. Null for every standard-base reading.
+  const gapBaseNote = reading !== undefined ? yoyGapBaseLabel(reading, t, numberLocale) : null;
+
   return (
     <article
       id={`usa-card-${entry.id}`}
@@ -216,6 +224,11 @@ function TierCard({
       {positionLine !== null ? (
         <p className="m-0 text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)]">
           <bdi>{positionLine}</bdi>
+        </p>
+      ) : null}
+      {gapBaseNote !== null ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-tight text-[var(--color-text-tertiary)]" data-usa-gap-base-note>
+          <bdi>{gapBaseNote}</bdi>
         </p>
       ) : null}
       <p className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-0 text-[length:var(--type-caption)] leading-tight text-[var(--color-text-tertiary)]">

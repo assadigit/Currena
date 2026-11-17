@@ -1061,6 +1061,20 @@ export const IndicatorReadingSchema = z
      */
     nextReleaseToday: z.boolean().optional(),
     /**
+     * GPE R05 (S4-D1, the CPI shutdown-gap policy): set when this YoY
+     * reading's year-ago base month is missing upstream (e.g. the
+     * Oct-2025 US shutdown gap on FRED) and the value was computed
+     * against the AVERAGE OF THE TWO ADJACENT PUBLISHED MONTHS instead —
+     * the disclosed, publicly-reproducible method. The stored LEVELS
+     * stay pure (no gap-filled level is ever stored); the flag rides
+     * only the derived YoY points whose base was gapped, so it
+     * AUTO-EXPIRES: the moment the base month exists again the standard
+     * rule resumes and this field is absent. Renderers label it at point
+     * of use (C1's S4-D1 extension): "base: adjacent-months average
+     * ({base month} publication gap)".
+     */
+    yoyBaseMethod: z.literal('adjacent-months-average').optional(),
+    /**
      * Step-1 audit item A1: the Fed target range's bounds (DFEDTARL/DFEDTARU).
      * `value` carries the lower bound; rangeHigh the upper. Other
      * indicators leave both absent.

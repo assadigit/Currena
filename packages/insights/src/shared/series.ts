@@ -186,3 +186,83 @@ export function yoyPctSeries(series: readonly SeriesPoint[]): SeriesPoint[] {
   assertAscending(out);
   return out;
 }
+
+/**
+ * GPE R05 (S4-D1, the CPI shutdown-gap policy): the GAP-AWARE YoY walk.
+ * Identical to yoyPctSeries wherever every month's prior-year base
+ * exists; when a month's base point is MISSING (the 2025 US government
+ * shutdown left Oct-2025 empty on FRED, so Oct-2026's standard YoY has
+ * no base), the base becomes the AVERAGE OF THE TWO ADJACENT PUBLISHED
+ * MONTHS — the nearest point on each side of the target date, each
+ * within ADJACENT_MONTH_MAX_DAYS — the disclosed, publicly-reproducible
+ * method (the S3 cross-check: 4.02% headline / 2.77% core, exact). The
+ * returned gapBaseDates records WHICH output dates used a gap base, so
+ * the snapshot build stamps `yoyBaseMethod` on exactly those readings
+ * (auto-expiring: the moment the base month exists again upstream, the
+ * standard rule resumes, the date leaves the set, and the flag stops
+ * being stamped). Stored LEVELS stay pure — no gap-filled level is ever
+ * synthesized. A gap month whose adjacent months are also missing (or
+ * non-positive) fails closed exactly like yoyPctSeries.
+ */
+export const ADJACENT_MONTH_MAX_DAYS = 60;
+
+export interface GapAwareYoy {
+  series: SeriesPoint[];
+  /** The output dates whose YoY used an adjacent-months-average base. */
+  gapBaseDates: ReadonlySet<string>;
+}
+
+export function yoyPctSeriesGapAware(series: readonly SeriesPoint[]): GapAwareYoy {
+  assertAscending(series);
+  const out: SeriesPoint[] = [];
+  const gapBaseDates = new Set<string>();
+  for (let i = 0; i < series.length; i++) {
+    const cur = series[i]!;
+    const target = epochDay(cur.date) - 365;
+    // The standard base — yoyPctSeries's own ±15-day window, verbatim.
+    let then: SeriesPoint | undefined;
+    for (let k = i - 1; k >= 0; k--) {
+      const cand = series[k]!;
+      const d = epochDay(cand.date);
+      if (d >= target - 15 && d <= target + 15) then = cand;
+      if (d < target - 15) break;
+    }
+    if (then !== undefined) {
+      if (then.value > 0) {
+        out.push({ date: cur.date, value: ((cur.value - then.value) / then.value) * 100 });
+      }
+      continue;
+    }
+    // The gap base: the nearest published point on EACH side of the
+    // empty target window (Sep-2025 + Nov-2025 for the Oct-2025 gap).
+    let before: SeriesPoint | undefined;
+    for (let k = i - 1; k >= 0; k--) {
+      if (epochDay(series[k]!.date) < target - 15) {
+        before = series[k]!;
+        break;
+      }
+    }
+    let after: SeriesPoint | undefined;
+    for (let k = 0; k < series.length; k++) {
+      if (epochDay(series[k]!.date) > target + 15) {
+        after = series[k]!;
+        break;
+      }
+    }
+    if (
+      before !== undefined &&
+      after !== undefined &&
+      target - epochDay(before.date) <= ADJACENT_MONTH_MAX_DAYS &&
+      epochDay(after.date) - target <= ADJACENT_MONTH_MAX_DAYS
+    ) {
+      const base = (before.value + after.value) / 2;
+      if (base > 0) {
+        out.push({ date: cur.date, value: ((cur.value - base) / base) * 100 });
+        gapBaseDates.add(cur.date);
+      }
+    }
+    // Else: fail closed — no base, no point (yoyPctSeries's discipline).
+  }
+  assertAscending(out);
+  return { series: out, gapBaseDates };
+}

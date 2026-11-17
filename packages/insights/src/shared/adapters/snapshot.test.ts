@@ -474,3 +474,52 @@ describe('projectSnapshotToPublic (2026-10-19 public projection)', () => {
     expect(overrides.hiddenBoards).toEqual([]);
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * GPE R05 (S4-D1) — the CPI shutdown-gap policy stamp.
+ * ------------------------------------------------------------------ */
+
+describe('buildInsightsSnapshot — the yoyBaseMethod stamp (GPE R05)', () => {
+  /** A us-cpi-yoy-shaped series whose LATEST point is the gap-derived
+   * Oct-2026 observation (asOf 2026-10-01). */
+  const cpiYoySeries: SeriesPoint[] = [
+    { date: '2026-08-01', value: 3.6 },
+    { date: '2026-09-01', value: 3.7377 },
+    { date: '2026-10-01', value: 4.02 },
+  ];
+
+  it('a gap-derived observation is stamped yoyBaseMethod; a standard one is not', () => {
+    const stamped = buildInsightsSnapshot({
+      series: { 'us-cpi-yoy': cpiYoySeries },
+      calendar: [],
+      now: NOW,
+      gapBaseDates: { 'us-cpi-yoy': new Set(['2026-10-01']) },
+    });
+    const reading = stamped.readings.find((r) => r.id === 'us-cpi-yoy')!;
+    expect(reading.asOf).toBe('2026-10-01');
+    expect(reading.value).toBe(4.02);
+    expect(reading.yoyBaseMethod).toBe('adjacent-months-average');
+    // The stamp is contract-valid (the schema carries it).
+    expect(() => InsightsSnapshotSchema.parse(stamped)).not.toThrow();
+  });
+
+  it('no gap set → no stamp (the standard rule; the flag auto-expires)', () => {
+    const plain = buildInsightsSnapshot({
+      series: { 'us-cpi-yoy': cpiYoySeries },
+      calendar: [],
+      now: NOW,
+    });
+    const reading = plain.readings.find((r) => r.id === 'us-cpi-yoy')!;
+    expect(reading.yoyBaseMethod).toBeUndefined();
+  });
+
+  it('a gap set whose dates do not match the reading leaves it unstamped', () => {
+    const other = buildInsightsSnapshot({
+      series: { 'us-cpi-yoy': cpiYoySeries },
+      calendar: [],
+      now: NOW,
+      gapBaseDates: { 'us-cpi-yoy': new Set(['2027-10-01']) },
+    });
+    expect(other.readings.find((r) => r.id === 'us-cpi-yoy')!.yoyBaseMethod).toBeUndefined();
+  });
+});
