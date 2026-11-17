@@ -8,8 +8,14 @@
  * Usage: cd packages/insights && ./node_modules/.bin/tsx ../../scripts/local-snapshot-preview.mjs
  */
 import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-const REPO = '/home/z/my-project/Currena';
+// Resolve the repo root from this script's own location (scripts/ lives one
+// level under the repo root). The earlier hardcoded `/home/z/my-project/Currena`
+// absolute path only worked on the original author's machine — every other
+// clone (and the post-modularization sandbox at /home/z/Currena) broke on the
+// dynamic imports below. M15 Phase 6 opportunistic fix (dev-only, no deploy).
+const REPO = resolve(import.meta.dirname, '..');
 
 const { runInsightsUpdate } = await import(`${REPO}/packages/insights/src/shared/ingest/run.ts`);
 const { HIDDEN_PUBLIC_IDS } = await import(`${REPO}/packages/insights/src/shared/ingest/data.ts`);
