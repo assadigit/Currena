@@ -18,7 +18,7 @@ import { interpolate } from '../../../shared/i18n';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../../components/icons/currena';
 import { formatIndicatorValue } from '../../../shared/config';
-import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from '../../../shared/components/TrendChart';
+import { TrendPanel, trendTickFormatter } from '../../../shared/components/TrendChart';
 
 /* S3 extraction (2026-11-08): the seven-state outlook classifier moved
  * VERBATIM to ./outlook-core (pure, lean-chunk importable — the Global
@@ -179,9 +179,14 @@ export type StripRange = 'quarter' | '1y' | '5y' | '10y';
  * 2026-10-20 (owner sketch): the chart is THE body of the chip — a tall
  * plot (h-40 mobile / h-52 desktop, vs the old h-20) so the TREND, not
  * the price, is the emphasis. Same day (owner): "Add 10 year View of the
- * gold and silver price as well" — the chips offer the full decade; the
- * history feed already carries the complete 10-year daily series for
- * both metals, so the window is always plottable in practice. */
+ * gold and silver price as well" — the chips offer the full decade.
+ * GPE R01 (wave 0, D6-A relabel-now, fixing this comment's stale claim —
+ * the GPE-S2-30 twin of the mislabeled chip): the PUBLIC history
+ * endpoint bounds the L2 ids (gold-usd, silver-usd) at
+ * PUBLIC_HISTORY_WINDOW_DAYS = 1900 days (~5.2 calendar years), so the
+ * decade chip renders the span the feed actually carries and its word
+ * states that true span (trendRangeWord — "5.2 years" today; "10
+ * years" again once F7/R18 widens the window into a user control). */
 export function MetalTrendChart({
   metal,
   copy,
@@ -202,10 +207,10 @@ export function MetalTrendChart({
       numberLocale={numberLocale}
       plotHeightClass={plotHeightClass}
       ranges={['quarter', '1y', '5y', '10y']}
-      ariaLabelFor={(range: StripRange) =>
+      ariaLabelFor={(range: StripRange, word: string) =>
         interpolate(copy.ui.stripChartAria, {
           metal: s.metals[metal],
-          range: copy.ui[TREND_RANGE_COPY_KEY[range]],
+          range: word,
         })
       }
       formatValue={(v) => formatIndicatorValue(id, v, numberLocale, copy.units)}

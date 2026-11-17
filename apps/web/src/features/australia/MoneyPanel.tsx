@@ -32,7 +32,7 @@ import {
   moneyPanel,
   type MoneyAreaId,
   type MoneyDirection, definitionFor } from '../../shared/config';
-import { TREND_RANGE_COPY_KEY, TrendPanel, trendTickFormatter } from '../../shared/components/TrendChart';
+import { TrendPanel, trendTickFormatter } from '../../shared/components/TrendChart';
 
 /** The area icons — rendered INSIDE a large tinted box. Owner follow-up
  * 11 Oct: "increase the icon size, something visible like 64×64" → round
@@ -147,10 +147,10 @@ function MoneyTrend({
        * be annual" — the money rows' charts open on the 1-year window
        * (the metals' Estimation charts keep their quarter default). */
       defaultRange="1y"
-      ariaLabelFor={(range) =>
+      ariaLabelFor={(range, word) =>
         interpolate(copy.ui.trendChartAria, {
           name: copy.indicators[id].name,
-          range: copy.ui[TREND_RANGE_COPY_KEY[range]],
+          range: word,
         })
       }
       formatValue={(v) => formatIndicatorValue(id, v, numberLocale, copy.units)}

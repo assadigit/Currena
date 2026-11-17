@@ -50,16 +50,22 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { formatNumber } from '@currena/core';
 import type { IndicatorId } from '@currena/core';
 import type { InsightsCopy } from '../i18n/insights-copy-en';
+import { interpolate } from '../i18n';
 import { ApiError, fetchIndicatorHistory } from '../lib/insights';
 
 export type TrendRange = 'quarter' | '1y' | '5y' | '10y';
 
 /** The full ordered chip list a caller may offer. 2026-10-20 (owner):
  * "Add 10 year View of the gold and silver price as well" — the metals'
- * Estimation-chip charts grow the decade; the feed's history endpoint
- * already serves the full 10-year daily series, so the chip is gated by
- * the same plottability rule as its siblings. Exported as the canonical
- * order (test seam, the way chart-range.ts exposes CHART_RANGE_VALUES). */
+ * Estimation-chip charts grow the decade. GPE R01 (wave 0, the
+ * D6-A relabel-now fix): in PUBLIC mode the history endpoint bounds the
+ * L2 ids (gold-usd, silver-usd — the two series that opt into this
+ * range) at PUBLIC_HISTORY_WINDOW_DAYS = 1900 days (~5.2 years), so the
+ * decade chip renders whatever the feed CARRIES and its word states that
+ * true span (trendRangeWord below) — never a "10 years" label over a
+ * 5.2-year window. The chip is still gated by the same plottability
+ * rule as its siblings. Exported as the canonical order (test seam, the
+ * way chart-range.ts exposes CHART_RANGE_VALUES). */
 export const TREND_RANGES: readonly TrendRange[] = ['quarter', '1y', '5y', '10y'];
 
 /** The chips EVERY caller shows unless it opts into more — the money
@@ -103,6 +109,33 @@ function trendPlottable(
   range: TrendRange,
 ): boolean {
   return trendSeries(points, range).length >= 2;
+}
+
+/** GPE R01 (wave 0, D6-A relabel-now): the word a range chip — and the
+ * window delta beside it — states. The first three ranges name their
+ * nominal window (the requested span always fits inside the feed); the
+ * DECADE range names the span the loaded series ACTUALLY carries,
+ * because the public history endpoint bounds the L2 ids (gold-usd,
+ * silver-usd) at PUBLIC_HISTORY_WINDOW_DAYS = 1900 days (~5.2 calendar
+ * years) in public mode (apps/api/src/routes/insights.ts). The word is
+ * computed from the data, so it reads the true horizon in every mode
+ * and self-corrects when F7/R18 widens the window or makes it a user
+ * control. Falls back to the dictionary word when the span cannot be
+ * measured (never a guess). */
+export function trendRangeWord(
+  range: TrendRange,
+  points: readonly [number, number][],
+  numberLocale: 'en-US' | 'fa-IR',
+  ui: InsightsCopy['ui'],
+): string {
+  if (range !== '10y') return ui[TREND_RANGE_COPY_KEY[range]];
+  const series = trendSeries(points, range);
+  if (series.length < 2) return ui[TREND_RANGE_COPY_KEY[range]];
+  const spanDays = series[series.length - 1]![0] - series[0]![0];
+  const years = Math.round((spanDays / 365.25) * 10) / 10;
+  return interpolate(ui.rangeWindowYears, {
+    years: formatNumber(years, numberLocale, { minimumFractionDigits: 0, maximumFractionDigits: 1 }),
+  });
 }
 
 /* Plot geometry — one coordinate space, stretched to the caller's box. */
@@ -193,7 +226,11 @@ export function TrendPanel({
   id: IndicatorId;
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
-  ariaLabelFor: (range: TrendRange) => string;
+  /** Builds the plot's accessible label; receives the range AND the word
+   * the panel renders for it (GPE R01: the decade range's word is the
+   * computed true span, so the aria can never name a window the chart
+   * does not show). */
+  ariaLabelFor: (range: TrendRange, word: string) => string;
   /** Tooltip value, units included (formatIndicatorValue at the caller). */
   formatValue: (value: number) => string;
   /** Y tick value, compact — no unit room on the axis. */
@@ -337,7 +374,7 @@ export function TrendPanel({
     return Math.round(t * (series.length - 1));
   };
 
-  const ariaLabel = ariaLabelFor(range);
+  const ariaLabel = ariaLabelFor(range, trendRangeWord(range, clean, numberLocale, copy.ui));
 
   return (
     /* dir="ltr" on the ROOT — in RTL pages the whole block (Y labels,
@@ -496,7 +533,7 @@ export function TrendPanel({
                     : 'bg-transparent text-currena-muted hover:text-currena-dark dark:hover:text-currena-dark'
                 }`}
               >
-                {ui[TREND_RANGE_COPY_KEY[r]]}
+                {trendRangeWord(r, clean, numberLocale, copy.ui)}
               </button>
             );
           })}
@@ -514,7 +551,7 @@ export function TrendPanel({
               {deltaText}
               {kind === 'points' ? '' : '%'}
             </bdi>{' '}
-            <span className="opacity-80">{ui[TREND_RANGE_COPY_KEY[range]]}</span>
+            <span className="opacity-80">{trendRangeWord(range, clean, numberLocale, copy.ui)}</span>
           </span>
         ) : null}
       </span>

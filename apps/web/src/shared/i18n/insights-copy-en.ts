@@ -7387,6 +7387,13 @@ export const insightsCopyEn = {
     // quarter window joins the reader-facing zooms; the chips sit under
     // the chart that fills the chip's white space.
     rangeQuarter: 'Quarter',
+    // GPE R01 (wave 0, D6-A relabel-now): the decade chip's word is
+    // COMPUTED from the span the feed actually carries (the public history
+    // endpoint bounds the L2 ids — gold-usd/silver-usd — at 1,900 days,
+    // ~5.2 years), so the chip and the delta readout state the true
+    // window ("5.2 years"), never the requested 10. When F7/R18 widens
+    // the window, the same word self-corrects.
+    rangeWindowYears: '{years} years',
     // Step-1 audit item C11: the delta's VISIBLE window word — "−5.5% over
     // the past quarter" is clearly a measured, past change ("−5.5%
     // Quarter" read like a forecast).
