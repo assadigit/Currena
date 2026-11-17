@@ -1,91 +1,94 @@
 # HANDOFF — Currena current state & next steps
 
-## Current state (after the M14 session)
+## Current state (after the M15 session)
 
-**Modularization Phase 5 (founding tools — the 9 tool routes + converter/settle/receipt children + tool components + tool libs) DELIVERED and deployed live.** The 49 LIVE web files moved into `apps/web/src/features-tools/<9 domains>/` in ONE commit: `modularization(M14)` `d15555bb` (51 files changed, pushed and verified). The move spans THREE source folders (routes/{9 top-level tool routes + converter/7 + settle/8 + receipt/5} + components/{6 converter + 2 live-rates top-level + led/LedParts} + lib/{recent-pairs + recent-pairs.test + history + history.test + photo-store + settle-storage + settle-storage.test}), PRESERVED subfolder structure per the M13 convention (the `led/` subfolder kept within live-rates; the `routes/converter|settle|receipt` subfolders map 1:1 onto their same-named domains and FLATTEN into the domain root — the subfolder name IS the domain name, no nesting). **NO engine move — all 49 are web files** (the audit's Deliverable 1 features-tools rows: 49, verified against the tree at M14 start, all 49 present). NO renames (R5), ZERO co-located __snapshots__ (R6), NO pd-s script (the tools are user-facing routes, not §20 toolkit destinations). 130 import specifiers re-anchored by the persisted codemod `scripts/m14-tools-codemod.mjs` (path.relative, the M2→M13 method) + 13 manual edits (App.tsx 8 lazy tool routes — variant #1; **LiveRates:25 is EAGER** — regex-caught, NOT a manual edit; Converter.tsx:79 AlertsDialog + Receipt.tsx:319 xlsx-writer — variant #3, the chunk-merger sites; 3 test files × snapshot-store global+expectCount=2 — variant #3). **ZERO Persian-copy manifest re-keys** (the M11+M12+M13 NON-zero pattern BREAKS for M14 — collectState().sweep = 206 hits across 20 source files, ZERO tool-file hits; the fa chars in LED boards/AmountInput/tests are ALL comments; matches the M9-asia ZERO precedent). **The chunk-merger watch closed with a FOURTH outcome shape** — the entry chunk (index) re-hashed FIRST (the 8 App.tsx lazy dynamic import() spec strings re-anchor — the M13 THIRD-outcome mechanism), then the re-hash CASCADED to ALL 8 tool route chunks + the AlertsDialog chunk, because each tool chunk cross-references the entry by filename (`from"./index-<hash>.js"`); the `history` lib chunk stayed BYTE-IDENTICAL (no entry reference); the LiveRates eager import re-anchor did NOT change entry bytes (static specs don't survive bundling); build DETERMINISTIC (full-substitution rebasing test: two builds on the same post-move source produced identical hashes). **Production is CURRENT** — currena-api deployed at 2026-11-17T02:42:47Z (Version ID `3ffcdd6b`, the M14 build); live-verified: / 200, /converter 200, /live-rates 200, /api/insights/pages/global 200, the post-move chunks served (/assets/Converter-CJdZYPV-.js 200 + /assets/index-B6C4rXg4.js 200).
+**Modularization Phase 6 (config + chunking verification pass — NO moves) DELIVERED.** The M14 modularization state is VERIFIED STABLE: every config the moves relied on still resolves, the bundle-budget gate (12 basename patterns) is green, the dist topology is byte-identical to the M14 close (93 assets, 80 .js chunks, ZERO delta), the build is deterministic (two rebuilds produce identical hashes), and production == the M14 deploy (`3ffcdd6b`, unchanged — the M15 commit is dev-only). The ONE opportunistic fix landed: `scripts/local-snapshot-preview.mjs:12`'s hardcoded nonexistent absolute path `/home/z/my-project/Currena` replaced with `resolve(import.meta.dirname, '..')` (repo-relative resolution; Node ≥ 20.11 provides `import.meta.dirname` natively). The fix is dev-only (the script is a manual Step-4 real-data verification feed — NOT imported by any production code in apps/api, apps/web, apps/markets, or packages/*, and NOT wired into any package.json script or CI workflow), so NO deploy was required and NONE was performed.
 
-**Phase 3 CLOSED at M12; Phase 4 (insights-legacy) DELIVERED at M13; Phase 5 (founding tools) DELIVERED at M14.** M15 (Phase 6: config + chunking verification pass) is next. Progress: modularization M14/16 · 2 remaining (Phase 6 config/chunking pass, Phase 7 documentation).
+**Phase 3 CLOSED at M12; Phase 4 (insights-legacy) DELIVERED at M13; Phase 5 (founding tools) DELIVERED at M14; Phase 6 (config + chunking verification) DELIVERED at M15.** M16 (Phase 7: the documentation pass) is next. Progress: modularization M15/16 · 1 remaining.
 
-## The green baseline — the M14 close record (2026-11-17)
+## The green baseline — the M15 close record (2026-11-17)
 
-- **Gates:** 9/9 GREEN, 2m 38s. secret scan (1092 files) · typecheck (6 packages) · lint (0/0) · copy:audit (clean) · narrator vocabulary (193×2 + 56×2) · narrator eval (50 checks) · layer1 strict (11969/11969) · **full test suite 15,284** (core 195 · scraper 67 · insights 1383 · markets 13 · api 414 · web 13212) · build + bundle budget (entry 273.95/82.94 + 12 Insights lazy chunks within budget).
-- **Suite delta from the move:** ZERO (15,284 → 15,284, IDENTICAL to the M13 baseline — the M7′→M13 streak EXTENDED through M14).
-- **Chunk count:** 93 (stable from the M13 close).
-- **Deploy:** currena-api Version ID `3ffcdd6b` (created 2026-11-17T02:42:47Z; 21 files uploaded, 144 already uploaded; no 10013 retry needed).
-- **origin/main HEAD:** `d15555bb` (the M14 move commit) — production == origin/main HEAD.
+- **Gates:** 9/9 GREEN ×2 runs (2m 37s with the fix applied; 2m 39s on the clean tree). secret scan (1092 files) · typecheck (6 packages) · lint (0/0) · copy:audit (clean) · narrator vocabulary (193×2 + 56×2) · narrator eval (50 checks) · layer1 strict (11969/11969) · **full test suite 15,284** (core 195 · scraper 67 · insights 1383 · markets 13 · api 414 · web 13212) · build + bundle budget (entry 273.95/82.94 + 12 Insights lazy chunks within budget).
+- **Suite delta from the M14 close:** ZERO (15,284 → 15,284, IDENTICAL to the M14 baseline — the M7′→M14 streak EXTENDED through M15).
+- **Chunk count:** 93 assets (80 .js + 13 non-js: 4 woff2 + 4 woff + 1 markets + 1 map + 1 icons + 1 css + 1 artwork) — STABLE from the M14 close (ZERO delta).
+- **Build determinism:** VERIFIED — two rebuilds from the same post-M15 source produce identical chunk hashes (the M13+M14 determinism finding EXTENDS through M15).
+- **Production:** currena-api Version ID `3ffcdd6b` (created 2026-11-17T02:42:47Z, @ 100% — the M14 deploy, UNCHANGED). Deploy-lock re-checked FIRST (D-43 holds — no deploy newer than the M14 deploy). The M15 commit `52e2f7a2` touches ONLY `scripts/local-snapshot-preview.mjs` (dev-only — NOT in the web dist, NOT in the API/markets worker bundles) → production code UNCHANGED → NO deploy needed (the done-criteria's "IF any production code changed" clause NOT triggered).
+- **origin/main HEAD:** `52e2f7a2` (the M15 fix commit). Production == the M14 deploy (the last commit that changed production code is `d15555bb`, the M14 move; the two subsequent commits `14105a9a` docs-only + `52e2f7a2` dev-only-scripts change NO deployed code).
 
-## The M14 session record (what was done)
+## The M15 session record (what was done)
 
-1. **Environment setup** (the M13 sandbox had only a Next.js scaffold at /home/z/my-project): cloned assadigit/Currena to /home/z/Currena (token in the URL — the M12 env-var-prefix lesson); installed pnpm@10.34.5 (matching the packageManager pin); `pnpm install` (580 packages).
-2. **Token verified** (HTTP 200 on api.github.com/user — the stranded-M7 lesson; login assadigit, 4999 rate-limit remaining).
-3. **origin/main verified:** `73dd3be9` (M13 move) + `3fdf95c6` (M13 bookkeeping, docs-only — CHANGELOG + HANDOFF + DECISIONS, no AGENTS.md, no code; `git show --stat HEAD` confirmed). Production verified = M13 deploy `0ac92086` (2026-11-17T01:21:17Z) via the Cloudflare deployments API. Deploy-lock held (no newer deploy).
-4. **Baseline gates:** `pnpm gates` 9/9 GREEN, suite 15,284 — the post-chore-M0-pre baseline (the M13 close). NO red baseline.
-5. **File inventory verified (49/49):** about(1)/batch(1)/calculator(1)/splitter(1)/history(3)/converter(17)/live-rates(5)/receipt(7)/settle(13). Each present under apps/web/src/{routes,components,lib}. The audit's Phase 5 row + Deliverable 1's 49 features-tools rows AGREE with the tree.
-6. **Pre-move grep set (the BD-M7 three-variant discipline + R8 + ?raw):**
-   - ?raw / fs-path (R8): strict re-grep for `?raw`, `new URL(spec, import.meta.url)`, `__dirname`, `readFileSync(join())`, `fileURLToPath` on all 49 moved files = **0 real constructs** (the earlier "here/there" hits were comment prose).
-   - Dynamic import() 3 variants: **variant #1** (App.tsx consumer lazy) = 8 sites (Calculator:34, History:35, BatchConverter:37, Splitter:39, Settle:40, Receipt:41, About:42, Converter:48) + **LiveRates:25 EAGER** (static, regex-caught); **variant #3** (inside moved files) = Converter.tsx:79 AlertsDialog + Receipt.tsx:319 xlsx-writer + 3 test files × snapshot-store×2 (LiveRates.test:108+:110, Receipt.test:110+:112, Converter.test:114+:116); the Settle.test.tsx `./Settle` same-dir occurrences are NO-OPs; ResultPopup.tsx:190 html2canvas + Receipt.tsx:218/286 html2canvas/jspdf = PACKAGE specifiers (untouched).
-   - pd-s scripts: NONE (grep apps/web/scripts/ = empty).
-   - Exports map: NONE for tools (packages/insights 16 entries all engine paths; root package.json no exports).
-   - __snapshots__ (R6): NONE co-located with the 7 tool .test files.
-7. **Persian-copy manifest (BD-M5 D5): ZERO re-keys** — verified definitively: (a) the manifest's 8006 entries' source fields NEVER point at tool files (sources are fa.ts 1492 + insights-copy-fa.ts 6277 + calendar 36 + already-moved domain files + Header.tsx); (b) collectState().sweep = 206 hits across 20 source files — ZERO tool-file hits (the fa chars in LED boards/AmountInput/tests are ALL comments; tests excluded by /.test./). copy:audit stays clean — NO edit. The M11+M12+M13 NON-zero pattern BREAKS for M14; matches the M9-asia ZERO precedent.
-8. **Codemod written + dry-run + applied:** `scripts/m14-tools-codemod.mjs` (the m{NN}-{domain}-codemod.mjs convention; the M13 pattern + global+expectCount). Dry-run reviewed (49 moves, 130 static edges, 13 manual edits). Applied: 49 git mv (R/RM, history preserved) + 130 static re-anchors + 13 manual edits. Broken-path grep after apply = CLEAN (zero stale old-path references).
-9. **Post-move gates:** `pnpm gates` 9/9 GREEN, suite 15,284 IDENTICAL (ZERO delta). copy:audit clean. registry:generate (187 indicators) + placement:generate (PLACEMENT.generated.md 40507 chars stable) + s24:d9-audit (D-9 CONDITION MET) — ZERO generated-doc drift (tools are user-facing routes, not engine/§20).
-10. **Chunk-merger watch:** baseline dist topology recorded (tool chunks About/BatchConverter/Calculator/Converter/History/Receipt/Settle/Splitter basename-keyed + entry index-CknRFHfU.js; NO LiveRates chunk — it's eager, in the entry; 93 assets). Post-move: entry re-hashed (index-CknRFHfU → index-B6C4rXg4) FIRST (8 lazy specs re-anchor), cascaded to ALL 8 tool route chunks + AlertsDialog chunk (each cross-references the entry via `from"./index-<hash>.js"`); `history` lib chunk BYTE-IDENTICAL. Build DETERMINISTIC (rebasing test: identical hashes across 2 builds).
-11. **Empty source subdirs removed:** routes/converter, routes/settle, routes/receipt, components/led (git doesn't track empty dirs).
-12. **Commit + push:** `d15555bb` (51 files: 49 renames + App.tsx + codemod). Pushed to origin/main (`3fdf95c6..d15555bb`) — verified (local HEAD == origin/main).
-13. **Deploy:** deploy-lock re-checked FIRST (production still M13 `0ac92086`, unchanged; D-43). UTC 02:42 Tuesday — OUTSIDE the §21 portwatch window (11:00–14:00 UTC). Web dist rebuilt. `pnpm --filter @currena/api run deploy` (the `run` required under pnpm 10; CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN env vars) FIRST attempt clean (no 10013 retry) → currena-api Version ID `3ffcdd6b` (2026-11-17T02:42:47Z). Live-verified: / 200 + /converter 200 + /live-rates 200 + /api/insights/pages/global 200 + post-move chunks served. Production == origin/main HEAD.
+1. **Environment setup** (the M14 sandbox pattern): the repo was re-cloned to `/home/z/Currena` (the sandbox's `/home/z/Currena` from M14 was not retained between sessions); pnpm@10.34.5 installed via `npm install -g pnpm@10.34.5` (matching the packageManager pin); `pnpm install` (580 packages, 7.9s). No `skills/` folder injected INSIDE the repo root (BD-M3 D4 satisfied — the skills/ folder lives at `/home/z/my-project/skills` in the Next.js scaffold dir, OUTSIDE the Currena repo).
+2. **Token verified** (HTTP 200 on api.github.com/user — the stranded-M7 lesson; login `assadigit`, the owner's account). Token passed in the URL for `git clone` (the M12 env-var-prefix lesson).
+3. **origin/main verified:** `14105a9a` (M14 bookkeeping, docs-only — CHANGELOG + HANDOFF + DECISIONS, no AGENTS.md, no code; `git show --stat HEAD` confirmed: only CHANGELOG.md + docs/DECISIONS.md + docs/HANDOFF.md) + `d15555bb` (M14 move, HEAD~1). Local == origin/main == `14105a9a`.
+4. **Production verified == M14 deploy:** currena-api latest deployment `450da21b` carries version_id `3ffcdd6b-f2ea-4ef5-9957-7c1d939e9df5` @ 100%, created 2026-11-17T02:42:47.143249Z (exactly the M14 deploy timestamp). No deploy newer than this (deploy-lock holds, D-43).
+5. **Baseline gates:** `pnpm gates` 9/9 GREEN, suite 15,284 — the M14 close numbers EXACTLY (2m 40s). NO red baseline.
+6. **Phase 6 verification inventory (the audit's Phase 6 row — all items VERIFIED, no moves):**
+   - **vite.config.ts manualChunks** (line 201): `manualChunks: undefined` CONFIRMED. Chunking rides the route-level lazy imports (the M14 chunk-merger cascade mechanism — the entry↔chunk cross-reference graph is emergent under `manualChunks=undefined`; each tool route chunk cross-references the entry via `from"./index-<hash>.js"`). App.tsx dynamic import paths CONFIRMED correct: 8 lazy tool routes (Calculator:34, History:35, BatchConverter:37, Splitter:39, Settle:40, Receipt:41, About:42, Converter:48 — all `./features-tools/<domain>/`) + LiveRates EAGER (:25, static `import { LiveRates } from './features-tools/live-rates/LiveRates'`) + 10 other domain lazy routes (insights-legacy, global, gold, world-markets, usa, europe, asia-pacific, australia, commodities, currencies, economic-linkages) + PagePlaceholder fallback (:50). All correct.
+   - **bundle-budget regexes** (`scripts/check-bundle-budget.mjs`): 13 lines = 1 entry budget + **12 basename patterns** (Insights + GlobalPage + GoldPage + WorldMarketsPage + AustraliaPage + shared + CommoditiesPage + CurrenciesPage + UsaPage + EuropePage + AsiaPage + tic). Green because nothing was renamed in any phase (R5 — gate 8 doubles as the rename detector: vite names chunks after the source basename, no renames → chunk basenames stable). The tool chunks (Converter-*.js, LiveRates-*.js — LiveRates is eager, in the entry, no separate chunk — About/BatchConverter/Calculator/Converter/History/Receipt/Settle/Splitter + AlertsDialog) exist in dist and match the M14 hashes. The entry + all 12 Insights lazy chunks within budget.
+   - **index.html** (line 65): `<script type="module" src="/src/main.tsx"></script>` — main.tsx never moved. CONFIRMED.
+   - **PWA manifest/shortcuts** (vite.config.ts): shortcuts use hash-router URLs (`/#/live-rates`, `/#/calculator`) — unaffected by the moves (the SPA router picks the route up on boot). CONFIRMED.
+   - **eslint globs** (`eslint.config.mjs:49`): `apps/web/src/**/*.{ts,tsx}` RECURSIVE — covers features/, shared/, features-tools/, infrastructure/ under src/ (the M1 probe-verified finding recorded in the config comment at lines 42-47). No scope extension required. CONFIRMED.
+   - **tsconfig includes:** apps/web `["src", "scripts"]` RECURSIVE (line confirmed); packages/insights `["src"]` RECURSIVE. Both cover the moved files at their new paths. CONFIRMED.
+   - **gates.mjs layer1 path** (line 100): `src/shared/components/layer1/layer1.test.ts` — file EXISTS at that path (the M2 update when layer1 moved). CONFIRMED.
+   - **persian-copy SOURCES/SWEEP_ROOTS** (`scripts/lib/persian-copy.mjs`): SOURCES point at the MOVED i18n paths (`apps/web/src/shared/i18n/insights-copy-fa.ts`, `apps/web/src/shared/i18n/fa.ts`, `insights-copy-en.ts`, `en.ts` — the Phase 2 update). SWEEP_ROOTS includes `apps/web/src` (RECURSIVE via `listSourceFiles` which recurses into subdirectories — sweeps ALL moved files at their new paths under features/, features-tools/, shared/, etc.; tests excluded by `/.test./` filter). CONFIRMED.
+   - **exports map** (`packages/insights/package.json`): 16 entries, ALL resolve (every target path exists), ALL point at engine paths under `packages/insights/src/` (., ./validation, ./adapters, ./store, ./narrator, ./markets, ./markets/definitions, ./markets-au, ./markets-au/definitions, ./fx, ./fx/definitions, ./tic, ./prices, ./ingest, ./page-division, ./gf-p0-proposed). NONE for tools/shared (all 49 M14-moved files are web files). Final-reviewed. CONFIRMED.
+   - **two wrangler `main` paths:** apps/api/wrangler.jsonc `main: "src/index.ts"` + apps/markets/wrangler.jsonc `main: "src/index.ts"` (both relative to the app root; both entry files exist). Apps untouched. CONFIRMED.
+7. **Opportunistic fix landed:** `scripts/local-snapshot-preview.mjs:12` — the hardcoded `const REPO = '/home/z/my-project/Currena'` (nonexistent — the repo is at `/home/z/Currena`) replaced with `const REPO = resolve(import.meta.dirname, '..')` (the script lives under `scripts/`, one level below the repo root). Added `import { resolve } from 'node:path'`. Verified: `node --check` parses clean; REPO resolves to `/home/z/Currena` (the actual clone path); all three dynamic import targets (run.ts, data.ts, rung2.ts) exist at the resolved path. Dev-only — NOT imported by any production code (apps/api, apps/web, apps/markets, packages/* — verified by grep) and NOT wired into any package.json script or CI workflow.
+8. **Final dist topology RECORDED as the post-modularization baseline:** 93 assets (80 .js + 13 non-js). Entry `index-B6C4rXg4.js` (matches the M14 production hash EXACTLY — live-verified: `curl https://currena.ir/` returns the same entry filename). Tool chunks: About-Cxq-T2D3, AlertsDialog-5VHXfKm6, BatchConverter-Dnf4d04l, Calculator-CsAUekSc, Converter-CJdZYPV-, History-5C4DpTr-, Receipt-B3K6UgZl, Settle-BF0f4-BM, Splitter-BZDH9EKY (all basename-keyed, hashes match M14). Insights-Bg3BG4Nj, the 10 page-route chunks, the shared/tic chunks — all present. sw.js 10433 bytes (matches the M13 record). Build DETERMINISTIC (two rebuilds → identical hashes). ZERO chunk changes vs M14 (the verification confirms the M14 state is stable).
+9. **Regeneration trio (drift check):** `pnpm registry:generate` (187 indicators — matches the M14 record) + `pnpm placement:generate` (PLACEMENT.generated.md 40507 chars stable — matches M14) + `pnpm s24:d9-audit` (D-9 CONDITION MET). `data/indicators.json` sha256 IDENTICAL pre/post regeneration (ZERO drift). `git status` showed ONLY the local-snapshot-preview.mjs fix (no generated-doc drift).
+10. **Gates ×2:** run 1 (with the fix applied, uncommitted) 9/9 GREEN, suite 15,284, 2m 37s; commit `52e2f7a2` landed; run 2 (clean tree, git status empty) 9/9 GREEN, suite 15,284, 2m 39s. Both green.
+11. **Deploy decision:** the M15 commit is dev-only (touches ONLY `scripts/local-snapshot-preview.mjs`, which is NOT in the web dist, NOT in the API worker bundle, NOT in the markets worker bundle). Production code UNCHANGED → NO deploy needed. Deploy-lock re-checked FIRST (D-43 holds: production still `3ffcdd6b`, no newer deploy). Live-verified production: / 200 (4835 bytes) + /converter 200 + /live-rates 200 + /api/insights/pages/global 200 (24491 bytes) + /assets/Converter-CJdZYPV-.js 200 + /assets/index-B6C4rXg4.js 200 — all serving the M14 deploy's hashes.
+12. **Commit + push:** `52e2f7a2` (1 file: scripts/local-snapshot-preview.mjs, 7 insertions 1 deletion). Pushed to origin/main (`14105a9a..52e2f7a2`) — verified (local HEAD == origin/main == `52e2f7a2`).
 
-## Where the founding-tools domain now lives (the Phase 5 map)
+## Where the modularization state now stands (the Phase 6 verification map)
 
-`apps/web/src/features-tools/` — 9 tool domains, 49 files:
+The post-modularization state (after M2–M14, verified stable at M15):
 
-- **about/** (1): About.tsx ← routes/About.tsx
-- **batch/** (1): BatchConverter.tsx ← routes/BatchConverter.tsx
-- **calculator/** (1): Calculator.tsx ← routes/Calculator.tsx
-- **splitter/** (1): Splitter.tsx ← routes/Splitter.tsx
-- **history/** (3): history.ts + history.test.ts ← lib/; History.tsx ← routes/
-- **converter/** (17): AlertsDialog/AmountInput/LiveRateLine/Odometer/RateDeltaChip/ResultPopup ← components/; recent-pairs + recent-pairs.test ← lib/; Converter + Converter.test ← routes/; AlertsSectionRow/ConvertForm/FailureCard/PairChips/QuickTools/RetryCountdown/shared ← routes/converter/ (FLATTENED — the converter/ subfolder maps 1:1 onto the converter domain)
-- **live-rates/** (5): LedGoldBoard/LedRateBoard ← components/; **led/LedParts.tsx** ← components/led/ (PRESERVED led/ subfolder — the M13 convention); LiveRates + LiveRates.test ← routes/
-- **receipt/** (7): Receipt + Receipt.test ← routes/; ExpenseItemRow/OptionsPanel/ReceiptModal/SummaryPanel/shared ← routes/receipt/ (FLATTENED)
-- **settle/** (13): photo-store/settle-storage/settle-storage.test ← lib/; Settle + Settle.test ← routes/; AddExpenseModal/CreateGroupModal/ExpensePhoto/GroupCard/GroupDetail/GroupTabs/Modal/shared ← routes/settle/ (FLATTENED)
+- **apps/web/src/** — the modularization skeleton roots (M1) + the 11 domain moves (M3–M14):
+  - `features/` — 11 domains: insights-legacy (M13, 46 files), global (M12, 16), gold (M8, 41), world-markets (M7, 39), australia (M9, 25), commodities (M10, 15), currencies (M11, 39), usa (M3, 34), europe (M6, 11), asia-pacific (M5, 15), economic-linkages (M4, 5).
+  - `features-tools/` — 9 tool domains (M14, 49 files): about/batch/calculator/splitter/history/converter/live-rates/receipt/settle.
+  - `shared/` — the shared layer (M2, 81 web files): components/, config/, hooks/, lib/, i18n/, ui/.
+  - `infrastructure/` — the 16 infrastructure files (M2).
+  - `router/`, `lib/`, `components/Header.tsx`, `components/Footer.tsx`, `components/ErrorBoundary.tsx` — src-root (no move, 2 files per the audit).
+- **packages/insights/src/** — the engine: `shared/` (75, M2), `domains/` (80, M3–M11), `page-division/` (7, stays), `narrator/` (23, stays), root `index.ts` barrel (1, stays).
+- **apps/api/src/** — LEAVE ALONE (52 files, route-split, DI-composed).
+- **apps/markets/src/** — LEAVE ALONE (4 files, scheduled-only cron).
+- **packages/core/src/** — LEAVE ALONE (23 files, the money-tool cores + zod schemas).
+- **packages/scraper/src/** — LEAVE ALONE (11 files, TGJU + Frankfurter + RateStore port).
 
-App.tsx lazy/eager wiring: 8 lazy tool routes (Calculator:34, History:35, BatchConverter:37, Splitter:39, Settle:40, Receipt:41, About:42, Converter:48) + LiveRates EAGER (:25). All point at `./features-tools/<domain>/`.
+## Operational notes worth carrying (M15 additions in bold)
 
-## Operational notes worth carrying (M14 additions in bold)
-
-- **The chunk-merger FOURTH outcome shape (entry-primary cascade).** The M13 THIRD-outcome lesson (dynamic import() spec strings survive bundling) EXTENDS: when the ENTRY ITSELF contains dynamic import() specs that re-anchor (App.tsx lazy routes), the entry re-hashes as the PRIMARY cause, and the cascade flows OUTWARD to every chunk that cross-references the entry by filename (`from"./index-<hash>.js"`). This is the reverse direction of M13's page→entry cascade. Future phases moving lazy-loaded routes: grep App.tsx for dynamic import() pointing at moved files — if ANY, expect the entry + all cross-referencing chunks to re-hash.
-- **ZERO Persian-copy re-keys is possible for tool routes.** The M11+M12+M13 NON-zero pattern was driven by inline fa literals in the moved files (ics calendar-name, BalanceScale, QuietArea `٪`). The tools route fa through the i18n dictionary — ZERO direct manifest entries. The fa chars in LED boards/AmountInput/tests are ALL comments (the AST sweep never visits comments; tests excluded by /.test./). So copy:audit stays clean with NO re-key. The M9-asia ZERO precedent holds. LESSON: the "expect NON-zero" prompt guidance is a default, not a guarantee — every phase re-verifies via collectState().sweep.
-- **LiveRates is EAGER, not lazy.** App.tsx:25 `import { LiveRates } from './routes/LiveRates'` is a static import (with `from`) — the IMPORT_RE regex catches it (NOT a manual edit). The 8 lazy tool routes ARE dynamic import() calls (the regex gap — `import(` has no whitespace). The M14 prompt's caution was VERIFIED.
-- **The `global`+`expectCount` mechanism (M13 Decision 4) reused.** The 3 test files each have `import('../shared/lib/snapshot-store')` twice (typeof type-position + await value-position) — global replace with expectCount=2 catches both with a count assertion. Pre-verified NO static `from` exists (the global replace cannot double-apply).
-- **PRESERVED led/ keeps the LedGoldBoard→LedParts relative path invariant.** Both move into features-tools/live-rates/ (boards at root, LedParts at led/) → `./led/LedParts` stays `./led/LedParts`. The converter/settle/receipt subfolders FLATTEN (the subfolder name IS the domain name — `features-tools/converter/converter/X` would be absurd).
-- The 4 empty source subdirs (routes/converter, routes/settle, routes/receipt, components/led) were removed after git mv (git doesn't track empty dirs).
+- **The Phase 6 verification confirms the M14 state is STABLE.** No moves this phase → ZERO chunk changes (93 assets, 80 .js, byte-identical to M14). The build is deterministic (two rebuilds → identical hashes). The config inventory (vite manualChunks, bundle-budget regexes, index.html, PWA shortcuts, eslint globs, tsconfig includes, gates.mjs layer1 path, persian-copy SOURCES/SWEEP_ROOTS, the 16-entry exports map, the two wrangler main paths) — ALL verified, ALL resolve. The M2–M14 moves left NO dangling config references.
+- **The local-snapshot-preview.mjs fix pattern: `resolve(import.meta.dirname, '..')`.** When a script needs the repo root, resolve it from the script's own location (Node ≥ 20.11 provides `import.meta.dirname` natively). NEVER hardcode an absolute clone path — it breaks on every other machine. The script lives under `scripts/` (one level below root), so `resolve(import.meta.dirname, '..')` gives the repo root. This is the dev-tooling analog of the M2→M14 codemod's `path.relative` method for production code.
+- **Dev-only fixes need NO deploy.** The done-criteria's "production == origin/main HEAD after the post-phase deploy IF any production code changed" clause has a truthful opposite: when the commit touches ONLY files outside the deployed bundles (scripts/, docs/, configs not read at runtime), production code is UNCHANGED and NO deploy is needed. Verify by: (a) grep for the changed file as an import target across apps/api, apps/web, apps/markets, packages/*; (b) confirm the file is not in the web dist (vite only bundles files reachable from main.tsx + index.html); (c) confirm the file is not in the worker bundles (wrangler only bundles files reachable from the `main` entry). For `scripts/local-snapshot-preview.mjs`: all three checks confirmed dev-only.
+- **The chunk-merger cascade mechanism (M14's FOURTH outcome shape) is the stable post-modularization property.** Under `manualChunks=undefined`, the entry↔chunk cross-reference graph is emergent: each lazy-loaded route chunk imports shared modules (locale/router/ui) from the entry, so the entry's filename is embedded in every cross-referencing chunk (`from"./index-<hash>.js"`). When the entry re-hashes (because its own dynamic import() specs re-anchor, as in M14), the cascade flows OUTWARD to every cross-referencing chunk. This is now the RECORDED BASELINE — no moves this phase, so the cascade did NOT fire. Future phases (none planned — M16 is docs-only) would re-trigger it only if a move changes the entry's dynamic import() specs.
 
 ## Owner-side levers waiting
 
-- **None blocking.** The modularization Phase 5 is DELIVERED + deployed. Phase 6 (M15) is a verification pass (no moves, no owner decision needed) + the opportunistic `local-snapshot-preview.mjs:12` fix (pre-existing, dev-only — a hardcoded nonexistent absolute path).
+- **None blocking.** The modularization Phase 6 is DELIVERED. Phase 7 (M16) is the documentation pass (docs-only, no code moves, no deploy needed) — the LAST modularization session.
 - The §19.6 retirement (delete features/insights-legacy/ + remove the App.tsx:43 lazy route + the selfcheck.ts:53 import + the cross-domain consumer edges + the orphaned usGlobalReach dictionary templates) remains a FUTURE owner decision (post-modularization).
 
 ## Known state worth knowing
 
-- **The exports map** (packages/insights/package.json): 16 entries, ALL engine paths (., ./validation, ./adapters, ./store, ./narrator, ./markets, ./markets/definitions, ./markets-au, ./markets-au/definitions, ./fx, ./fx/definitions, ./tic, ./prices, ./ingest, ./page-division, ./gf-p0-proposed). NONE for tools (all 49 M14 moved files are web files). Final review at Phase 6.
-- **vite.config.ts:** `manualChunks: undefined` (chunking rides the route-level lazy imports; the entry↔chunk cross-reference graph is emergent — the M14 chunk-merger cascade mechanism). Phase 6 verifies this + the bundle-budget regexes (12 basename patterns).
-- **The chunk-merger cascade mechanism** (entry cross-reference via `from"./index-<hash>.js"`): discovered at M14. Each tool route chunk imports shared modules (locale/router/ui) from the entry, so the entry's filename is embedded in every cross-referencing chunk. When the entry re-hashes, all of them re-hash. This is a Phase 6 verification item (the emergent cross-reference graph under manualChunks=undefined).
-- **Persian-copy manifest:** 8006 entries, sources are the dictionaries (fa.ts 1492 + insights-copy-fa.ts 6277) + calendar (36) + a handful of hardcoded-literal source files (Header, BalanceScale, QuietArea, ics, ConnectionCard, Together, PriceDetails, bands, movers, display, format, shared.ts ×3). The tool route/component files are NEVER sources (they route fa through the dictionary). collectState().sweep = 206 hits across 20 source files.
-- **The codemods** (scripts/m{NN}-*-codemod.mjs): m3 through m14 persisted, each the bidirectional path.relative re-anchoring method + the manual-edits mechanism (global+expectCount for repeated dynamic import() specs). The latest is `scripts/m14-tools-codemod.mjs`.
+- **The exports map** (packages/insights/package.json): 16 entries, ALL engine paths, ALL resolve (final-reviewed at M15). NONE for tools/shared.
+- **vite.config.ts:** `manualChunks: undefined` (chunking rides the route-level lazy imports; the entry↔chunk cross-reference graph is emergent — the M14 chunk-merger cascade mechanism). Verified stable at M15.
+- **The dist topology baseline (post-modularization, recorded at M15):** 93 assets (80 .js + 13 non-js). Entry `index-B6C4rXg4.js` (273.95 kB raw / 82.94 kB gz). 12 Insights lazy chunks within budget. Tool chunks basename-keyed (Converter-CJdZYPV-, About-Cxq-T2D3, BatchConverter-Dnf4d04l, Calculator-CsAUekSc, History-5C4DpTr-, Receipt-B3K6UgZl, Settle-BF0f4-BM, Splitter-BZDH9EKY, AlertsDialog-5VHXfKm6). sw.js 10433 bytes. Build deterministic.
+- **The codemods** (scripts/m{NN}-*-codemod.mjs): m3 through m14 persisted. The latest is `scripts/m14-tools-codemod.mjs`. No new codemod at M15 (no moves).
+- **Persian-copy manifest:** 8006 entries, sources are the dictionaries (fa.ts 1492 + insights-copy-fa.ts 6277) + calendar (36) + a handful of hardcoded-literal source files. collectState().sweep = 206 hits across 20 source files (UNCHANGED from M14 — no moves this phase).
 
-## The M15 next-session prompt (modularization Phase 6 — config + chunking verification pass)
+## The M16 next-session prompt (modularization Phase 7 — the documentation pass)
 
 ```text
 Read AGENTS.md in the repo root first and follow it for the whole session.
 
-Session M15 — modularization Phase 6: the config + chunking verification
-pass (NO moves — a verification + opportunistic-fix session, the audit's
-Phase 6 row).
+Session M16 — modularization Phase 7: the documentation pass (NO moves
+— a docs-only session, the audit's Phase 7 row, the LAST modularization
+session).
 
-Read in this order: AGENTS.md (§2 · §5 · §7 · §10) →
-docs/modularization/MODULARIZATION-AUDIT.md (§"Phase 6" + Deliverable 1's
-final-state expectation) → docs/HANDOFF.md (the M14 version — this file) →
-CHANGELOG [2026-11-17] M14 → docs/DECISIONS.md BD-M14.
+Read in this order: AGENTS.md (§2 · §5 · §7 · §8 · §10 · §11) →
+docs/modularization/MODULARIZATION-AUDIT.md (§"Phase 7" + Deliverable 1's
+final-state expectation) → docs/HANDOFF.md (the M15 version — this file) →
+CHANGELOG [2026-11-17] M15 → docs/DECISIONS.md BD-M15.
 
 FIRST, before touching anything:
 1. Verify the GitHub token works (HTTP 200 on
@@ -93,74 +96,71 @@ FIRST, before touching anything:
    the token is invalid: STOP, tell the owner, do NOT start. Pass the
    token in the URL (https://$GH_TOKEN@github.com/…) OR export it FIRST
    in the parent shell — the M12 env-var-prefix lesson.
-2. Verify origin/main has the M14 move commit d15555bb, then the M14
-   bookkeeping commit (docs-only — CHANGELOG.md + docs/HANDOFF.md +
-   docs/DECISIONS.md, no AGENTS.md, no code; `git log --oneline -2
-   origin/main`; confirm via `git show --stat HEAD`), AND production
-   is the M14 deploy: currena-api Version ID 3ffcdd6b (created
-   2026-11-17T02:42:47Z; the deploy-lock; docs-only commits do NOT
-   change deployed code). ANY code commit beyond the bookkeeping, or
-   ANY production version newer than the M14 deploy: STOP and report.
-3. Run `pnpm gates` once and record the numbers (the M14 close: 9/9,
-   suite 15,284; the M14 move was zero-delta from 15,284). If the
-   baseline is red, STOP and report. ENVIRONMENT NOTE (M14): the repo
-   was cloned to /home/z/Currena (the sandbox had only a Next.js
-   scaffold at /home/z/my-project); pnpm@10.34.5 installed. If a
+2. Verify origin/main has the M15 fix commit 52e2f7a2 (dev-only —
+   scripts/local-snapshot-preview.mjs, 1 file, NOT in any production
+   bundle), then the M15 bookkeeping commit (docs-only — CHANGELOG.md +
+   docs/HANDOFF.md + docs/DECISIONS.md, no AGENTS.md, no code; `git log
+   --oneline -2 origin/main`; confirm via `git show --stat HEAD`), AND
+   production is STILL the M14 deploy: currena-api Version ID 3ffcdd6b
+   (created 2026-11-17T02:42:47Z; the deploy-lock; the M15 commit is
+   dev-only — it does NOT change deployed code, so NO deploy was
+   performed and production stays at the M14 deploy). ANY code commit
+   beyond the bookkeeping that touches production code, or ANY
+   production version newer than the M14 deploy: STOP and report.
+3. Run `pnpm gates` once and record the numbers (the M15 close: 9/9,
+   suite 15,284; ZERO delta from M14). If the baseline is red, STOP and
+   report. ENVIRONMENT NOTE (M15): the repo was re-cloned to
+   /home/z/Currena (the M14 clone was not retained between sessions);
+   pnpm@10.34.5 installed via `npm install -g pnpm@10.34.5`. If a
    skills/ folder is injected INSIDE the repo root, park it outside
    during gates runs (BD-M3 D4), never commit it.
 
-The phase (audit §"Phase 6" — config + chunking verification, NO moves):
-- VERIFY `vite.config.ts` manualChunks (currently `undefined` — chunking
-  rides the route-level lazy imports; the M14 chunk-merger cascade
-  mechanism — the entry↔chunk cross-reference graph is emergent under
-  manualChunks=undefined; each tool route chunk cross-references the
-  entry via `from"./index-<hash>.js"`, so the entry's re-hash ripples
-  outward). Confirm the dynamic import paths in App.tsx are correct
-  (already done per M14 — the 8 lazy tool routes + LiveRates eager).
-- VERIFY the bundle-budget regexes (12 basename patterns — green
-  because nothing was renamed in any phase; gate 8 doubles as the rename
-  detector). Confirm the tool chunks (Converter-*.js, LiveRates-*.js
-  etc.) + the entry + the Insights lazy chunks all match.
-- VERIFY `index.html` (`/src/main.tsx` — main.tsx never moved).
-- VERIFY the PWA manifest/shortcuts (hash-router URLs, unaffected by the
-  moves).
-- VERIFY (update if not already landed in earlier phases): eslint globs,
-  tsconfig includes, gates.mjs layer1 path, persian-copy SOURCES/
-  SWEEP_ROOTS, exports-map target paths (final review — the 16 entries
-  all point at engine paths, NONE for tools/shared; confirm every target
-  path resolves), the two wrangler `main` paths (unchanged — apps
-  untouched).
-- FIX opportunistically (pre-existing, dev-only): `scripts/local-
-  snapshot-preview.mjs:12` hardcodes a nonexistent absolute path
-  `/home/z/my-project/Currena` — update to the correct repo-relative
-  resolution (or remove if unused). This is a dev-tooling fix, NOT a
-  production code change.
-- The chunk-merger cascade mechanism (M14's FOURTH outcome shape — entry
-  re-hashes as primary cause via its own dynamic import() specs, then
-  cascades OUTWARD to cross-referencing chunks): RECORD the final
-  dist topology (all 93 chunks) as the post-modularization baseline.
-  The build is deterministic (M13+M14 verified). No moves this phase →
-  expect ZERO chunk changes (the verification confirms the M14 state is
-  stable).
+The phase (audit §"Phase 7" — the documentation pass, NO moves, NO code):
+- UPDATE AGENTS.md §11 "Project facts" (currently "(Not yet filled in.)")
+  — fill from the post-modularization state: the tech stack, the
+  folder layout (the features/ 11 domains + features-tools/ 9 domains +
+  shared/ + infrastructure/ + the engine shared/ + domains/ + the
+  apps/api + apps/markets + packages/core + packages/scraper layout),
+  hosting (Cloudflare Workers — currena-api + currena-markets), default
+  branch (main), deploy method (`pnpm --filter @currena/api run deploy`
+  — the `run` required under pnpm 10), commands to run/test/deploy
+  (pnpm gates, pnpm -r typecheck, pnpm lint, pnpm -r test, pnpm
+  --parallel dev), database (RATES KV via the RateStore interface),
+  key folders, and standing limits (the §21 portwatch window — never
+  run Tuesdays 11:00–14:00 UTC; the deploy-lock re-check FIRST — D-43;
+  the wrangler 10013 retry rule).
+- UPDATE README.md — the "where things live" section reflecting the
+  post-modularization folder layout (the features/ + features-tools/ +
+  shared/ + infrastructure/ skeleton + the engine shared/ + domains/).
+- UPDATE docs/page-division/README.md — the "where things live" section
+  (the engine's page-division/ stayed put; the web page-division files
+  moved to features/global/ at M12).
+- FILE-HEADER "lives here" comments — a LIGHT pass: the moved files
+  already say what each file is; add the folder-scope line ONLY where
+  the header names a stale path (the M2 HANDOFF flagged two pure-comment
+  path references left for Phase 7: UsGlobalReachGroup + DollarStrength
+  — verify both still apply after M13 dissolved the components→routes
+  inversion; the M13 CHANGELOG noted both are now siblings under
+  features/insights-legacy/). Do NOT mass-add headers — only fix stale
+  path references in existing headers.
+- UPDATE docs/HANDOFF.md (rewrite for M16), CHANGELOG.md (the M16
+  entry), docs/DECISIONS.md (BD-M16 — record the D1–D10 skeleton
+  deviations + the N-map if not already recorded, + the documentation
+  decisions made this session).
 
-Gates: full run ×2 (clean tree, then `git status` empty) + pnpm
-registry:generate + pnpm placement:generate + pnpm s24:d9-audit
-(regenerated docs reviewed — drift recorded, never silently absorbed).
+Gates: full run ×1 (docs-only session — one green run suffices; the docs
+changes touch no code, no tests, no build). No deploy (docs-only —
+production code UNCHANGED, the M14 deploy 3ffcdd6b stays current).
 
-Done-criteria: baseline gates recorded; final gates 9/9, suite count
-identical to the M14 baseline (15,284); every commit green + PUSHED
-(verify the push!); the exports map final-reviewed + every target path
-resolves; the local-snapshot-preview.mjs:12 fix landed (if it doesn't
-break anything); production == origin/main HEAD after the post-phase
-deploy IF any production code changed (the local-snapshot-preview.mjs
-fix is dev-only — it may NOT need a deploy; verify); deploy-lock re-check
-FIRST — D-43; never run the §21 portwatch leg Tuesdays 11:00–14:00 UTC;
-if wrangler deploy fails on assets-upload-session with code 10013,
-RETRY once before investigating — the M9 note; environment note: `pnpm
---filter @currena/api run deploy` — the `run` is required under pnpm 10).
-Bookkeeping per AGENTS.md §10 (HANDOFF rewrite + CHANGELOG + DECISIONS)
-and the M16 pointer (Phase 7: the documentation pass — AGENTS.md §11
-project facts + README + docs/page-division/README.md "where things
-live" + file-header "lives here" comments). Progress after M15:
-modularization M15/16 · 1 remaining.
+Done-criteria: AGENTS.md §11 filled; README + docs/page-division/README.md
+"where things live" sections updated; file-header stale-path comments
+fixed (the UsGlobalReachGroup + DollarStrength flagged sites, if still
+applicable); gates 9/9, suite count identical to the M15 baseline
+(15,284); every commit green + PUSHED (verify the push!); NO deploy
+needed (docs-only); bookkeeping per AGENTS.md §10 (HANDOFF rewrite +
+CHANGELOG + DECISIONS) with the "modularization COMPLETE" pointer (the
+16-session program M1–M16 done; progress: modularization M16/16 · 0
+remaining). The §21 portwatch window note (never run Tuesdays 11:00–14:00
+UTC) + the deploy-lock re-check FIRST (D-43) + the wrangler 10013 retry
+rule carry forward as standing limits — but NO deploy this session.
 ```
