@@ -275,28 +275,8 @@ export function Header() {
               );
             })}
             <NavDropdown label={t('nav.regions')} items={REGION_LINKS} active={REGION_PATHS.has(route)} />
-            {/* The legacy all-in-one page — subdued, badged, still first
-                class: every destination's content lives here until its
-                build session (D-9/D-46). */}
-            <li>
-              <a
-                href="/insights"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/insights');
-                }}
-                aria-current={route === '/insights' ? 'page' : undefined}
-                title={t('nav.legacyBadge')}
-                className={`${PILL_BASE} ${
-                  route === '/insights' ? PILL_ACTIVE : 'text-currena-muted/80 hover:bg-black/5 hover:text-currena-dark dark:hover:bg-white/5'
-                }`}
-              >
-                {t('nav.insights')}
-                <span className="ms-1 hidden rounded-full bg-currena-soft px-1.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-wide text-currena-muted xl:inline">
-                  {t('nav.legacyBadge')}
-                </span>
-              </a>
-            </li>
+            {/* §19.6 (2026-11-17): the legacy /insights nav pill was RETIRED
+                with the legacy page. */}
             <NavDropdown label={t('nav.tools')} items={TOOL_LINKS} active={TOOL_PATHS.has(route)} />
           </ul>
         </nav>
@@ -385,35 +365,6 @@ export function Header() {
         <ul className="list-none p-0">{DRAWER_MARKET_LINKS.map((l) => (
           <li key={l.path}>{drawerRow(l)}</li>
         ))}</ul>
-
-        {/* Legacy group — the all-in-one page, complete until retirement
-            (D-9/D-46). */}
-        <p className="mb-2 mt-4 px-3.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-currena-muted">
-          {t('nav.legacyBadge')}
-        </p>
-        <ul className="list-none p-0">
-          <li>
-            <a
-              href="/insights"
-              onClick={(e) => {
-                e.preventDefault();
-                setMenuOpen(false);
-                navigate('/insights');
-              }}
-              aria-current={route === '/insights' ? 'page' : undefined}
-              className="mb-2 flex min-h-[48px] w-full items-center gap-3 rounded-xl px-3.5 py-3 text-[0.95rem] font-medium no-underline transition-all duration-300 ${
-                route === '/insights'
-                  ? 'bg-currena-blue text-white'
-                  : 'bg-currena-soft text-currena-dark hover:bg-currena-blue hover:text-white'
-              }"
-            >
-              <span className="text-xl" aria-hidden="true">
-                📈
-              </span>
-              {t('nav.insights')}
-            </a>
-          </li>
-        </ul>
 
         {/* Tools group — the converter + the utility routes. */}
         <p className="mb-2 mt-4 px-3.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-currena-muted">

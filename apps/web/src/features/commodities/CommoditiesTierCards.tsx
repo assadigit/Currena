@@ -233,13 +233,13 @@ export function CommoditiesTierCards({ readings }: { readings: readonly Indicato
   // · 3 months · 1 year · 5 years) and every card re-measures. Default 1w
   // (the card's classic primary story).
   const [lens, setLens] = useState<PriceLens>('1w');
-  // The details handler: the commodities page has no side panel of its own,
-  // so the "more details" button + the card body navigate to /insights (the
-  // full chart + rule + source live there). A per-commodity detail panel can
-  // be wired later without changing the card.
+  // The details handler: the commodities page has no side panel of its own.
+  // §19.6 (2026-11-17): the legacy /insights detail panel was RETIRED — the
+  // "more details" button now navigates to Global (the world scan) until a
+  // per-page detail surface is built (R-5 accepted loss, recorded in BD-S32).
   const onFocusCard = useCallback((id: IndicatorId) => {
     void id;
-    navigate('/insights');
+    navigate('/');
   }, []);
   // The corpus-pinned unit labels stay assembled (the copy-pin test reads
   // them off the page-division copy, independent of the card render path).

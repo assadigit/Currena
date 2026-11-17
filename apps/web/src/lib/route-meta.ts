@@ -44,7 +44,7 @@ const ROUTE_META: Record<RoutePath, RouteMeta> = {
   '/asia-pacific': { titleKey: 'pd.asiaPacific.title', descriptionKey: 'pd.asiaPacific.purpose', path: '/asia-pacific' },
   '/australia': { titleKey: 'pd.australia.title', descriptionKey: 'pd.australia.purpose', path: '/australia' },
   '/economic-linkages': { titleKey: 'pd.economicLinkages.title', descriptionKey: 'pd.economicLinkages.purpose', path: '/economic-linkages' },
-  '/insights': { titleKey: 'insights.title', descriptionKey: null, path: '/insights' },
+  // §19.6 (2026-11-17): the legacy /insights route was RETIRED — no meta row.
   '/converter': { titleKey: 'converter.title', descriptionKey: null, path: '/converter' },
   '/live-rates': { titleKey: 'liveRates.title', descriptionKey: null, path: '/live-rates' },
   '/calculator': { titleKey: 'calculator.title', descriptionKey: null, path: '/calculator' },

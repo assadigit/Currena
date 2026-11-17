@@ -9,11 +9,12 @@
  * precaches every emitted chunk, so offline loading is unaffected.
  *
  * Page-division S1 (2026-11-07, D-20/D-46): `/` is now the Global
- * world-scan placeholder (the landing page) and the converter — the eager
- * entry-chunk route until now — is a lazy tool route at `/converter`; the
- * eight market destinations share one lazy placeholder chunk until their
- * build sessions (roadmap S3–S18). Zero content loss anywhere: the legacy
- * /insights page is untouched below its deprecation banner.
+ * world-scan (the landing page) and the converter — the eager entry-chunk
+ * route until now — is a lazy tool route at `/converter`; the nine market
+ * destinations each render their own lazy page chunk (roadmap S3–S18).
+ * The legacy all-in-one /insights page was RETIRED at §19.6 (2026-11-17) —
+ * a stale bookmark redirects to Global (or the card's domain home) in
+ * the router's boot guard.
  */
 
 import { lazy, Suspense, useEffect } from 'react';
@@ -40,7 +41,9 @@ const Splitter = lazy(() => import('./features-tools/splitter/Splitter').then((m
 const Settle = lazy(() => import('./features-tools/settle/Settle').then((m) => ({ default: m.Settle })));
 const Receipt = lazy(() => import('./features-tools/receipt/Receipt').then((m) => ({ default: m.Receipt })));
 const About = lazy(() => import('./features-tools/about/About').then((m) => ({ default: m.About })));
-const Insights = lazy(() => import('./features/insights-legacy/Insights').then((m) => ({ default: m.Insights })));
+// §19.6 (2026-11-17): the legacy /insights lazy route was RETIRED — the
+// folder deleted, the route gone, a card-aware boot redirect handles stale
+// bookmarks in router.ts.
 // Page-division S1 (D-46): the Converter — the app's founding tool, eager
 // in the entry chunk until now — becomes a lazy tool route at /converter so
 // the Global page (D-20: the landing page) owns `/`. The placeholder
@@ -290,7 +293,6 @@ export function App() {
             {route === '/settle' ? <Settle /> : null}
             {route === '/batch' ? <BatchConverter /> : null}
             {route === '/about' ? <About /> : null}
-            {route === '/insights' ? <Insights /> : null}
           </Suspense>
         </ErrorBoundary>
       </main>

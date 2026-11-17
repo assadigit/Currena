@@ -33,7 +33,6 @@ export const en = {
     receiptGenerator: 'Receipt Generator',
     calculator: 'Calculator',
     liveRates: 'Live Rates',
-    insights: 'Insights',
     expenseSplitter: 'Expense Splitter',
     splitSettle: 'Split & Settle',
     batchConverter: 'Batch Converter',
@@ -71,7 +70,6 @@ export const en = {
     australia: 'Australia',
     economicLinkages: 'Linkages',
     tools: 'Tools',
-    legacyBadge: 'legacy',
     converter: 'Converter',
     marketsGroup: 'Markets',
   },
@@ -558,14 +556,6 @@ export const en = {
     retryingIn: 'Retrying in {seconds}s',
   },
 
-  /** Insights page: only the route title lives here; the full copy corpus
-   * (30 indicators × 6 fields, both locales) is code-split with the lazy
-   * /insights route chunk in i18n/insights-copy-en.ts / -fa.ts so the entry
-   * bundle does not regress (roadmap Phase I4 perf constraint). */
-  insights: {
-    title: 'Insights',
-  },
-
   /** Page-division S1 (2026-11-07): the destination placeholders' copy —
    * titles, purposes, membership summaries and the migration bridge. The
    * per-page content itself arrives with each page's build session
@@ -576,9 +566,6 @@ export const en = {
     buildsIn: 'Planned — builds in roadmap sessions {sessions}.',
     decisionsLabel: 'Decision record',
     whatLivesHere: 'What will live here',
-    todayOnInsights:
-      'Until then, this content lives — complete and unchanged — on the legacy Insights page.',
-    openInsights: 'Open the legacy Insights page',
     backToGlobal: 'Back to the Global scan',
     unknownRoute: 'This destination is not part of the current program.',
     global: {
@@ -1948,15 +1935,6 @@ export const en = {
       purpose: 'How indicators move together — the analytical connections between rates, commodities, currencies and growth across every region.',
       loading: 'Loading the economic linkages…',
     },
-  },
-
-  /** Page-division S1 (D-46): the legacy /insights page’s deprecation
-   * banner — what is happening, the promise (unchanged until verified),
-   * and the link to the new Global landing page. */
-  deprecation: {
-    title: 'This page is being reorganised',
-    text: 'Currena’s market coverage is moving to dedicated destinations — Global, Gold, World Markets, USA, Europe, Asia & Pacific, Australia, Commodities & Energy and Currency Pairs. This all-in-one page stays here, unchanged, until every indicator is verified in its new home.',
-    cta: 'Open the new Global page',
   },
 
   footer: {

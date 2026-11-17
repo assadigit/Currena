@@ -17,16 +17,15 @@
  *
  * Routes (page-division S1, 2026-11-07 — docs/page-division/02-…-SPEC.md
  * §18, D-46): the 10 market destinations own the clean top-level slugs —
- * `/` is the Global world-scan placeholder (D-20: Global becomes the
- * landing page) — while the currency Converter, the app's founding tool,
- * moves to `/converter` (display-layer only: the page itself is unchanged,
- * zero content loss; build-session decision recorded in the roadmap S1
- * entry, flagged for owner ratification). The legacy all-in-one Insights
- * page stays at `/insights` with a deprecation banner until retirement
- * (D-9/D-46). The eight remaining destinations are placeholder routes
- * until their build sessions (roadmap S3–S18).
- */
+ * `/` is the Global world-scan (D-20: Global is the landing page) — while the
+ * currency Converter, the app's founding tool, lives at `/converter`. The
+ * legacy all-in-one Insights page was RETIRED at §19.6 (2026-11-17): the
+ * `/insights` route is gone, and a card-aware boot redirect (option B)
+ * sends stale bookmarks to Global — or, when a `?card=<id>` deep link is
+ * present, to that indicator's own domain home via the engine's placement
+ * table (loaded lazily so the entry chunk stays the money page). */
 
+import type { IndicatorId } from '@currena/core';
 import { useSyncExternalStore } from 'react';
 
 export const ROUTES = [
@@ -41,8 +40,8 @@ export const ROUTES = [
   '/asia-pacific',
   '/australia',
   '/economic-linkages',
-  // Legacy all-in-one page (D-46) — deprecation banner, retirement at D-9 conditions.
-  '/insights',
+  // §19.6 (2026-11-17): the legacy all-in-one /insights route was RETIRED —
+  // stale bookmarks land on Global (or the card's domain home) via ensureBooted.
   // The converter tools (the app's founding surface; `/` was the converter
   // until the page-division program made Global the landing page — D-20).
   '/converter',
@@ -108,8 +107,35 @@ let booted = false;
 function ensureBooted(): void {
   if (booted) return;
   booted = true;
-  const { path } = parseRouteAndQuery(window.location.pathname);
-  if (path === '/' && window.location.pathname !== '/') {
+  const pathname = window.location.pathname;
+  // §19.6 (2026-11-17) — the legacy all-in-one /insights page was RETIRED.
+  // Option B card-aware redirect: a stale /insights bookmark lands on Global
+  // (no `?card=`) or the card's own domain home (`?card=<id>`, resolved through
+  // the engine's placement table `homePageOfIndicator`). The placement module
+  // rides the GlobalPage lazy chunk — a dynamic import keeps the entry chunk
+  // (the money page) free of engine code; a brief Global render precedes the
+  // redirect for these deprecated deep-links (the trade-off recorded in BD-S32).
+  if (pathname === '/insights' || pathname === '/insights/') {
+    const card = new URLSearchParams(window.location.search).get('card');
+    if (card) {
+      void import('@currena/insights/page-division')
+        .then(({ homePageOfIndicator }) => {
+          const home = homePageOfIndicator(card as IndicatorId);
+          const target = home && home !== 'global' ? `/${home}` : '/';
+          history.replaceState(null, '', target);
+          notify();
+        })
+        .catch(() => {
+          history.replaceState(null, '', '/');
+          notify();
+        });
+      return;
+    }
+    history.replaceState(null, '', '/');
+    return;
+  }
+  const { path } = parseRouteAndQuery(pathname);
+  if (path === '/' && pathname !== '/') {
     history.replaceState(null, '', '/');
   }
 }

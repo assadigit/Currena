@@ -36,17 +36,13 @@ export function DestinationBody({ spec }: { spec: DestinationSpec }): React.JSX.
         </p>
       </Card>
 
-      {/* Where the content lives today + the way back to the world scan */}
+      {/* §19.6 (2026-11-17): the "where content lives today" Card (the
+       * legacy /insights bridge) was RETIRED with the legacy page. The way
+       * back to Global stays via the Header's Home link + this button. */}
       <Card className="mb-4">
-        <p className="mb-4 text-sm leading-relaxed text-currena-dark">{t('pd.todayOnInsights')}</p>
-        <div className="flex flex-wrap gap-3">
-          <Button variant="cta" className="px-5 py-2.5 text-sm" onClick={() => navigate('/insights')}>
-            {t('pd.openInsights')}
-          </Button>
-          <Button variant="secondary" className="px-5 py-2.5 text-sm" onClick={() => navigate('/')}>
-            {t('pd.backToGlobal')}
-          </Button>
-        </div>
+        <Button variant="secondary" className="px-5 py-2.5 text-sm" onClick={() => navigate('/')}>
+          {t('pd.backToGlobal')}
+        </Button>
       </Card>
 
       {/* Quiet cross-reference to the program docs (repo-internal, not a

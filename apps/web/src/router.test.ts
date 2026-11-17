@@ -10,7 +10,7 @@ import { isRoutePath, parseRouteAndQuery, ROUTES } from './router';
 describe('parseRouteAndQuery', () => {
   it('parses bare routes', () => {
     expect(parseRouteAndQuery('/live-rates').path).toBe('/live-rates');
-    expect(parseRouteAndQuery('/insights').path).toBe('/insights');
+    expect(parseRouteAndQuery('/insights').path).toBe('/');  // §19.6: retired route normalizes to Global
   });
 
   it('parses the page-division destination slugs (D-46, S1)', () => {
@@ -32,33 +32,33 @@ describe('parseRouteAndQuery', () => {
   });
 
   it('carries the query of a share link through (I7 #50)', () => {
-    const { path, params } = parseRouteAndQuery('/insights?card=us10y');
-    expect(path).toBe('/insights');
+    const { path, params } = parseRouteAndQuery('/gold?card=us10y');
+    expect(path).toBe('/gold');
     expect(params.get('card')).toBe('us10y');
   });
 
   it('parses multi-param and empty queries', () => {
-    const { params } = parseRouteAndQuery('/insights?card=gold-usd&lang=fa');
+    const { params } = parseRouteAndQuery('/gold?card=gold-usd&lang=fa');
     expect(params.get('card')).toBe('gold-usd');
     expect(params.get('lang')).toBe('fa');
-    expect(parseRouteAndQuery('/insights?').params.get('card')).toBeNull();
-    expect(parseRouteAndQuery('/insights').params.get('card')).toBeNull();
+    expect(parseRouteAndQuery('/gold?').params.get('card')).toBeNull();
+    expect(parseRouteAndQuery('/gold').params.get('card')).toBeNull();
   });
 
   it('only the FIRST ? splits route from query (a ? inside a value stays data)', () => {
-    const { path, params } = parseRouteAndQuery('/insights?card=a?b');
-    expect(path).toBe('/insights');
+    const { path, params } = parseRouteAndQuery('/gold?card=a?b');
+    expect(path).toBe('/gold');
     expect(params.get('card')).toBe('a?b');
   });
 
   it('trailing slashes are tolerated', () => {
-    expect(parseRouteAndQuery('/insights/').path).toBe('/insights');
+    expect(parseRouteAndQuery('/insights/').path).toBe('/');  // §19.6: retired route normalizes
     expect(parseRouteAndQuery('/live-rates/?x=1').params.get('x')).toBe('1');
   });
 
   it('a leading # (stray hash from a stale bookmark) is stripped', () => {
-    expect(parseRouteAndQuery('#/insights').path).toBe('/insights');
-    expect(parseRouteAndQuery('#/insights?card=us10y').params.get('card')).toBe('us10y');
+    expect(parseRouteAndQuery('#/gold').path).toBe('/gold');
+    expect(parseRouteAndQuery('#/gold?card=us10y').params.get('card')).toBe('us10y');
     expect(parseRouteAndQuery('#/nope').path).toBe('/');
   });
 

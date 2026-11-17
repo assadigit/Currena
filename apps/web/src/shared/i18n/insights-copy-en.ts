@@ -8926,43 +8926,6 @@ export const insightsCopyEn = {
     alarmed: 'Critical',
   },
 
-  /**
-   * R9-07 (2026-10-27 owner round — "special container for US-based
-   * indicators that affect global markets"): the dedicated container's
-   * heading, its static analytical frame, and the three-sentence brief's
-   * FIXED template table. The WORDS are chosen and the VALUES
-   * interpolated from the live readings at render time
-   * (config/us-global-reach.ts) — the same discipline as the
-   * consequence-line machinery, so the brief can never contradict the
-   * cards it sits beside.
-   */
-  usGlobalReach: {
-    heading: 'US indicators with global reach',
-    intro:
-      'These United States numbers move the world: they steer borrowing costs, currencies and risk appetite far beyond the US border.',
-    /** The borrowing-costs sentence (bands: high / mid / low — the most
-     * binding of the three yields' 10-year percentiles, any
-     * needs-attention status counting as high). */
-    briefCostsHigh:
-      'US borrowing costs sit high in their ten-year range (10-year at {us10y}, 30-year at {us30y}, real yield at {real}), which tends to tighten financial conditions worldwide, pressure emerging-market currencies and weigh on risk assets.',
-    briefCostsMid:
-      'US borrowing costs sit mid-range for the decade (10-year at {us10y}, 30-year at {us30y}, real yield at {real}), a broadly neutral setting for global credit and asset prices.',
-    briefCostsLow:
-      'US borrowing costs sit low in their ten-year range (10-year at {us10y}, 30-year at {us30y}, real yield at {real}), which tends to ease financial conditions worldwide and support risk assets.',
-    /** The inflation sentence (any needs-attention inflation reading =
-     * above; otherwise near). */
-    briefInflationAbove:
-      "Inflation is still above the central banks' goals (US CPI at {cpi}, core PCE at {pce}, euro-area HICP at {hicp}), keeping the Fed and the ECB restrictive for longer and holding global rates up.",
-    briefInflationNear:
-      "Inflation is close to the central banks' goals (US CPI at {cpi}, core PCE at {pce}, euro-area HICP at {hicp}), leaving room for the Fed and the ECB to ease and for global rates to fall.",
-    /** The stress/liquidity sentence (any needs-attention stress reading
-     * = strained; otherwise calm). */
-    briefStressStrained:
-      'US money markets show strain (STLFSI at {stlfsi}, NFCI at {nfci}, Fed balance sheet {walcl}), a combination that usually tightens credit worldwide and softens world exchanges.',
-    briefStressCalm:
-      'US money markets are calm (STLFSI at {stlfsi}, NFCI at {nfci}, Fed balance sheet {walcl}), supporting credit and risk appetite worldwide.',
-  },
-
   units: {
     none: '',
     percent: '%',

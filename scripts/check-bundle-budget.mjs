@@ -5,8 +5,11 @@
  * Fails CI when a protected chunk grows past its budget. The budgets are the
  * documented numbers (docs/insights/05-ux-audit-I6.md, NEXT_SESSION_PROMPT
  * §Phase B): the entry chunk is the money page (converter) and must not
- * regress; the Insights route is lazy and its growth must be conscious —
- * bump the budget HERE, with a changelog justification, never silently.
+ * regress; the destination-page lazy chunks' growth must be conscious — bump
+ * the budget HERE, with a changelog justification, never silently. §19.6
+ * (2026-11-17): the legacy /insights lazy chunk was RETIRED (the 12-chunk
+ * set left the build with the deleted folder); the destination-page chunks
+ * re-bucketed shared modules and were re-baselined this session.
  *
  * Sizes are decimal kB (matching vite's own reporting): 289 kB = 289,000
  * bytes. Gzip via node zlib (same class as the CDN's gzip).
@@ -958,13 +961,6 @@ const BUDGETS = [
   // definitions + the display config. Measured 1569.21/363.53 — the raw
   // ceiling re-bases to 1572 (the multiple-of-4 headroom ≈2.8 kB; the gz
   // stays under its 365 ceiling at 363.53).
-  // GF-S11 (2026-11-07): 1572→1620 raw / 365→377 gz — ELEVEN new gold-meter
-  // indicators (the I9 accumulator pair + the nine P4 context cards) each
-  // carry the full IndicatorCopyEntry shape × 2 locales (121 new strings,
-  // round-82) + the definitions + the display config + the registry rows.
-  // Measured 1612.14/373.58 — the raw ceiling re-bases to 1620 (the
-  // multiple-of-4 headroom ≈7.9 kB; the gz to 377, headroom ≈3.4 kB).
-  { pattern: /^Insights-[\w-]+\.js$/, raw: 1620_000, gz: 377_000, label: 'Insights lazy chunk' },
   // Page-division S3 (2026-11-08): the Global world-scan route — the
   // D-21 verdict board. Measured 31.89/9.41 at first build (the pure
   // engine modules — gauges, gold-balance, gold-score, connections,
@@ -985,7 +981,11 @@ const BUDGETS = [
   // (the same bytes the / visitor already downloaded via route +
   // shared before); no bump, recorded here so the next session's
   // "budgets held" check reads the topology change correctly.
-  { pattern: /^GlobalPage-[\w-]+\.js$/, raw: 36_000, gz: 11_000, label: 'Global page lazy chunk (page-division S3)' },
+  // §19.6 (2026-11-17): the legacy /insights lazy chunks left the build (12
+  // chunks deleted with the folder); the page-division module the option-B
+  // redirect dynamically imports now rides its own chunk — GlobalPage grew
+  // ~2 kB as shared modules re-bucketed. Bumped 36→39 raw (gz stays under 11).
+  { pattern: /^GlobalPage-[\w-]+\.js$/, raw: 39_000, gz: 11_000, label: 'Global page lazy chunk (page-division S3)' },
   // Page-division S5 (2026-11-08): the Gold conditions-meter route — the
   // 37-voter meter (D-26…D-29). Measured 26.32/6.92 at first build (the
   // BalanceScale's pure tilt/verdict helpers + the lean gold-tiles views
@@ -1087,7 +1087,10 @@ const BUDGETS = [
   // the SHARED RegionIndexSection chunk every region route loads.
   // Ceiling 26/7 per the tight convention (~3.2 kB raw / ~1.1 kB gz
   // headroom).
-  { pattern: /^AustraliaPage-[\w-]+\.js$/, raw: 26_000, gz: 7_000, label: 'Australia page lazy chunk (page-division S16)' },
+  // §19.6 (2026-11-17): the legacy /insights lazy chunks left the build;
+  // shared modules previously split with the Insights chunk re-bucketed into
+  // the destination page chunks. Bumped 26→41 raw / 7→11 gz.
+  { pattern: /^AustraliaPage-[\w-]+\.js$/, raw: 41_000, gz: 11_000, label: 'Australia page lazy chunk (page-division S16)' },
   // Page-division S16 (2026-11-10; repointed M5 2026-11-15): the shared AU
   // Markets board drawing. PRE-M5 this was the dedicated `markets-au-*`
   // chunk (measured 12.33/3.49: the section drawing + the au-markets
@@ -1134,7 +1137,9 @@ const BUDGETS = [
   // chunk (measured 20.04/5.84, ≈ the bytes the /commodities visitor
   // already downloaded via route + shared before). Justified in
   // CHANGELOG §2026-11-15 (baseline-repair, BD-BR).
-  { pattern: /^CommoditiesPage-[\w-]+\.js$/, raw: 21_000, gz: 6_500, label: 'Commodities page lazy chunk (page-division S17)' },
+  // §19.6 (2026-11-17): the legacy /insights lazy chunks left the build;
+  // shared modules re-bucketed. Bumped 21→24 raw / 6.5→8 gz.
+  { pattern: /^CommoditiesPage-[\w-]+\.js$/, raw: 24_000, gz: 8_000, label: 'Commodities page lazy chunk (page-division S17)' },
   // Page-division S18 (2026-11-11): the Currencies route — the 7 rule
   // lights hero (D-41) + the 11-pair board (D-42, AUDNZD the 11th pair)
   // + the two registry-card sections (D-32/D-42: 7 pair-context + 7
@@ -1230,7 +1235,10 @@ const BUDGETS = [
   // sharing; see the UsaPage row). This row now measures only the tiny
   // shared tic shell (0.70/0.41); the ceiling stays as the guard for
   // any future second consumer re-splitting the drawing out.
-  { pattern: /^tic-[\w-]+\.js$/, raw: 24_000, gz: 7_000, label: 'shared TIC section chunk (page-division S10 — the reused tier-6 drawing)' },
+  // §19.6 (2026-11-17): the shared tic-*.js chunk was RETIRED — TicSection's
+  // only remaining consumer is UsaPage (the legacy /insights was the other);
+  // the module merged into the UsaPage chunk (within its 47 kB budget).
+  // { pattern: /^tic-[\w-]+\.js$/, raw: 24_000, gz: 7_000, label: 'shared TIC section chunk (page-division S10 — the reused tier-6 drawing)' },
 ];
 
 function main() {

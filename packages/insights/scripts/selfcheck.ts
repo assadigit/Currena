@@ -6,21 +6,21 @@
  * Builds the CURRENT snapshot from live sources (the ingest pipeline, no KV
  * writes), runs every validation test (T-01…T-14 engine suite + the Step 3
  * T-15…T-19 checks that are runnable server-side + the defect-derived
- * E-checks against the freshly generated export), and writes:
+ * E-checks against the fresh snapshot), and writes:
  *
- *   docs/insights/exports/currena-insights-full-<UTC date>.md   the full export
- *   docs/insights/SELF_AUDIT.md                                  the audit table
+ *   docs/insights/SELF_AUDIT.md   the audit table
  *
  * Exit code 1 when any test failed — the scheduled GitHub Action surfaces
  * that as a red run (it publishes nothing).
  *
- * Scope note (recorded in the audit doc): the world-markets and world-
- * currencies boards are served by their own Worker's KV keys; this check
- * rebuilds the INDICATOR snapshot, so the export's markets/fx sections are
- * omitted here. The page's own export carries them.
+ * §19.6 (2026-11-17): the full-export markdown artefact was RETIRED with the
+ * legacy /insights page (the buildInsightsMarkdown builder lived in the
+ * deleted features/insights-legacy/full-export.ts); SELF_AUDIT.md is now the
+ * one artefact. The /api/insights/export endpoint keeps its OWN copy
+ * (apps/api/src/insights-export.ts — read, never imported).
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -44,20 +44,23 @@ import { runValidationSuite } from '../src/shared/validation';
 import type { RegressionEpisode } from '../src/shared/validation';
 import {
   checkE10M2Unit,
-  checkE24PeakColumnsInExport,
   t17AttributionPresent,
   t19NoAdviceWording,
 } from '../src/shared/validation-step3';
 import { SOURCE_LICENCES } from '../src/shared/licences';
 import { DEFINITIONS, RULE_VERSION } from '../src/index';
-import { buildInsightsMarkdown, type FullExportInput } from '../../../apps/web/src/features/insights-legacy/full-export';
+// §19.6 (2026-11-17): the full-export cross-tree edge (buildInsightsMarkdown
+// from the legacy features/insights-legacy/full-export.ts) was RETIRED with
+// the legacy page — the self-check no longer writes the full-export markdown;
+// the SELF_AUDIT.md table is the one artefact. The /api/insights/export
+// endpoint keeps its OWN copy (apps/api/src/insights-export.ts — read, never
+// imported) and is unaffected.
 import { DISPLAY } from '../../../apps/web/src/shared/config/display';
 import { insightsCopyEn } from '../../../apps/web/src/shared/i18n/insights-copy-en';
 import { insightsCopyFa } from '../../../apps/web/src/shared/i18n/insights-copy-fa';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '..', '..', '..');
-const EXPORTS_DIR = resolve(REPO, 'docs', 'insights', 'exports');
 const AUDIT_PATH = resolve(REPO, 'docs', 'insights', 'SELF_AUDIT.md');
 
 function loadJsonFile(path: string): unknown | undefined {
@@ -70,7 +73,6 @@ function loadJsonFile(path: string): unknown | undefined {
 }
 
 const nowIso = new Date().toISOString();
-const nowDay = nowIso.slice(0, 10);
 console.log(`# Insights self-check — ${nowIso}\n`);
 
 /* ---------------- 1. Build the current snapshot (no KV writes) ---------------- */
@@ -198,23 +200,7 @@ const snapshot: InsightsSnapshot = buildInsightsSnapshot({
   now: nowIso,
 });
 
-/* ---------------- 3. The full export (the E-23/E-24 columns included) ---------------- */
-
-mkdirSync(EXPORTS_DIR, { recursive: true });
-const exportInput: FullExportInput = {
-  snapshot,
-  copy: insightsCopyEn,
-  locale: 'en',
-  title: 'Currena Insights — self-check export',
-  markets: null,
-  fx: null,
-};
-const markdown = buildInsightsMarkdown(exportInput);
-const exportPath = resolve(EXPORTS_DIR, `currena-insights-full-${nowDay}.md`);
-writeFileSync(exportPath, markdown);
-console.log(`[selfcheck] wrote ${exportPath} (${markdown.length} bytes)`);
-
-/* ---------------- 4. The Step 3 + defect checks over the fresh artefacts ---------------- */
+/* ---------------- 3. The Step 3 + defect checks over the fresh snapshot ---------------- */
 
 interface CheckRow {
   id: string;
@@ -251,11 +237,11 @@ for (const [locale, dict] of [
 const t19 = t19NoAdviceWording(indicatorTexts);
 rows.push({ id: t19.id, name: t19.name, ok: t19.ok, failures: t19.failures, notes: ['scope: the generated indicator sentences of both dictionaries'] });
 
-// The defect checks that read the FRESH export (the audit sidecar + rows).
+// The defect checks over the FRESH snapshot (the audit sidecar + rows).
 const byId = new Map(snapshot.readings.map((r) => [r.id as string, r]));
 
-// E-10: the export's indicator cells carry the DISPLAYED value (the same
-// scale full-export.ts applies) — feed the check the exported numbers.
+// E-10: the snapshot's indicator cells carry the DISPLAYED value (the same
+// scale the display config applies) — feed the check the snapshot numbers.
 const indicatorRows = [...byId.values()].map((r) => ({
   id: r.id,
   value: r.value === null ? null : r.value * (DISPLAY[r.id]?.scale ?? 1),
@@ -267,30 +253,20 @@ const indicatorRows = [...byId.values()].map((r) => ({
 const e10 = checkE10M2Unit(indicatorRows);
 rows.push({
   id: 'E-10',
-  name: 'Money-supply scale: the export cell carries the DISPLAYED value (23.3 trillion)',
+  name: 'Money-supply scale: the snapshot cell carries the DISPLAYED value (23.3 trillion)',
   ok: e10.length === 0,
   failures: e10,
-  notes: ['the display scale is applied at export (full-export.ts exportValue); registry-sync pins the unit token'],
+  notes: ['the display scale is applied from shared/config/display.ts; registry-sync pins the unit token'],
 });
 
-// E-24: the fresh export's price table carries the peak columns.
-const pricesSection = /## Prices\n([\s\S]*?)\n## /.exec(markdown)?.[1] ?? '';
-const headerLine = pricesSection.split('\n').find((l) => l.includes('Peak')) ?? '';
-const e24 = checkE24PeakColumnsInExport(
-  [{ Indicator: 'gold-usd', Peak: 'x', 'Peak date': 'x', 'Peak basis': 'x', 'Below peak %': 'x' }],
-  headerLine.split('|').map((h) => h.trim()).filter(Boolean),
-);
-rows.push({ id: 'E-24', name: 'The export price table carries the peak columns', ok: e24.length === 0, failures: e24, notes: [] });
-
-// E-18: the export's trend words are recomputed from chg3m — the markets
-// board lives in its own worker here, so the check reads the RULE wiring
-// (the export recomputes; the unit tests pin it) and records a note.
+// E-18: the trend words are recomputed from chg3m — the markets board lives
+// in its own worker here, so the check reads the RULE wiring + records a note.
 rows.push({
   id: 'E-18',
   name: 'Trend labels reproducible from the stated 3-month rule',
   ok: true,
   failures: [],
-  notes: ['the export + CSV recompute from chg3m (markets/compute.ts trendOf); pinned by markets + full-export tests'],
+  notes: ['the CSV recomputes from chg3m (markets/compute.ts trendOf); pinned by markets tests'],
 });
 
 /* ---------------- 4b. v3 (2026-10-20): the full unit-suite results ----------------
@@ -378,7 +354,7 @@ const failed = rows.filter((r) => !r.ok);
 const lines: string[] = [
   '# SELF_AUDIT.md — the automatic self-check',
   '',
-  `Generated: ${nowIso} · rule version ${RULE_VERSION} · export: \`docs/insights/exports/currena-insights-full-${nowDay}.md\``,
+  `Generated: ${nowIso} · rule version ${RULE_VERSION}`,
   '',
   `Result: **${failed.length === 0 ? 'ALL TESTS PASS' : `${failed.length} TEST(S) FAILED`}** (${rows.filter((r) => r.ok).length} of ${rows.length} pass)`,
   '',
@@ -417,9 +393,9 @@ lines.push(
   '',
   '## Scope notes',
   '',
-  '- The world-markets and world-currencies boards are served by their own Worker; this self-check rebuilds the INDICATOR snapshot, so the export here omits those sections (the page\'s own export carries them).',
+  '- The world-markets and world-currencies boards are served by their own Worker; this self-check rebuilds the INDICATOR snapshot only (the markets/fx boards are out of scope here).',
   '- The T-16 FRED copyright scan and the licence register are pinned by their own tests (validation-step3.test.ts); their records live in data/fred-copyright.json + LICENCES.md.',
-  '- This file and the dated export are EVIDENCE — the scheduled GitHub Action writes neither to KV nor to the repo; a failing run is a red run.',
+  '- This file is EVIDENCE — the scheduled GitHub Action writes neither to KV nor to the repo; a failing run is a red run.',
   '',
 );
 writeFileSync(AUDIT_PATH, lines.join('\n'));

@@ -27,7 +27,7 @@ const S1_TITLE_KEYS: Record<string, string> = {
   '/': 'pd.global.title',
   '/converter': 'converter.title',
   '/live-rates': 'liveRates.title',
-  '/insights': 'insights.title',
+  // §19.6 (2026-11-17): the /insights route was RETIRED — no title key.
   '/gold': 'pd.gold.title',
   '/world-markets': 'pd.worldMarkets.title',
   '/currencies': 'pd.currencies.title',

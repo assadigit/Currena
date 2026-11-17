@@ -307,7 +307,7 @@ export function AustraliaPage(): React.JSX.Element {
               const el = document.getElementById('australia-tier-cards');
               if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }}
-            onFocusCard={() => navigate('/insights')}
+            onFocusCard={() => navigate('/')}
           />
         </div>
       ) : null}
@@ -349,7 +349,7 @@ export function AustraliaPage(): React.JSX.Element {
             readings={insightsSnapshot.readings}
             copy={copy}
             numberLocale={numberLocale}
-            onFocusCard={() => navigate('/insights')}
+            onFocusCard={() => navigate('/')}
             expandToken={0}
             onlyIds={AU_CONNECTION_IDS}
           />
@@ -358,15 +358,15 @@ export function AustraliaPage(): React.JSX.Element {
 
       {/* The "What it means for my money" panel (TM7: moved from /insights'
           Australia section slot — it's an AU-household-costs panel by content,
-          so it lives here now). The panel reads the same AU readings the
-          projection carries; a tap navigates to /insights for the full detail
-          (the Australia page has no side panel of its own). */}
+          so it lives here now). §19.6 (2026-11-17): the detail panel that the
+          tap opened on /insights was RETIRED — the tap now navigates to Global
+          (R-5 accepted loss, recorded in BD-S32). */}
       {readings !== undefined ? (
         <MoneyPanel
           readings={readings}
           copy={copy}
           numberLocale={numberLocale}
-          onFocusCard={() => navigate('/insights')}
+          onFocusCard={() => navigate('/')}
         />
       ) : null}
     </div>

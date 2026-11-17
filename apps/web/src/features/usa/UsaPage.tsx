@@ -271,7 +271,7 @@ export function UsaPage(): React.JSX.Element {
             readings={insightsSnapshot.readings}
             copy={copy}
             numberLocale={numberLocale}
-            onFocusCard={() => navigate('/insights')}
+            onFocusCard={() => navigate('/')}
             expandToken={0}
             onlyIds={USA_CONNECTION_IDS}
           />
