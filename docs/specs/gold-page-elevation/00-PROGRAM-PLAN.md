@@ -71,7 +71,16 @@ table (licence level, cost, update cadence, cache strategy) and the
 owner-decision list. *Input ready: the F1–F21 master draft with tiers
 (`s1/14`) and the three decided spec-preps (`s1/11`–`s1/13`).*
 
-**Checkpoint CP-C:** owner locks priorities → implementation queue.
+**Status (S8, 2026-11-17): DONE.** The roadmap of record is
+`s8/01-RECOMMENDATION-TABLE.md` (33 queued rows R01–R33 across P1–P4 +
+the Excluded 5 for completeness; the S5-D2 wave fold with one recorded
+break — F2b slips drop-dependent; the s7/01 §9 deferred items decided),
+`s8/02-DATA-SOURCE-MAP.md` (22 sources; the two gated rows with fallback
+bands; zero-new-paid-feeds re-verified), and
+`s8/03-CPC-BRIEF-AND-DECISIONS.md` (the twelve owner decisions D1–D12 +
+the one-screen CP-C brief).
+
+**Checkpoint CP-C:** owner locks priorities (D12) → implementation queue.
 
 ### Phase D — Implementation (S9+) — GATED
 
@@ -81,10 +90,22 @@ follow the repo's normal feature-branch discipline (one branch per
 session, small verified steps), each ending with the standard TLDR +
 next-session prompt.
 
-Anticipated sequence (to be finalized in S8): S9 P1 essentials → S10 P2
-high-value → S11 P3 differentiation → S12 P4 advanced + measurement.
-Every implementation session ships, deploys, and verifies live per
-AGENTS.md §9.
+Finalized sequence (S8, `s8/01` §8 — supersedes the earlier 4-session
+sketch; 9 small sessions per the owner's short-sessions rule):
+**S9** P1-a the credibility floor (#01/#02/#09 + riders + the why-lines
++ the CPI gap policy) → **S10** P1-b the explanation band (F1, F5,
+Treasury-direct, F15, F13, the anchor/consistency infrastructure) →
+**S11** P1-b the prizes (Bridge-1, CB-demand Tier-1 + the first WGC
+drop, the affordances, the #21 de-dup) → **S12** P2 the interactive
+chart → **S13** P2 the TA band + the education on-ramp + the one-liners
+→ **S14–S16** P3 the Supporting tier (the correlation companion, ETF
+flows, LBMA cards, the Episode Explorer, the currency grid, the COT
+bands, the Fed-probabilities card, the calendar strip, Bridge-2) →
+**S17** P4 the Advanced tier (the time machine, the forecast
+retrospective, the calculator). Every implementation session ships,
+deploys, and verifies live per AGENTS.md §9. The two hard gates hold:
+#01 before the interactive chart and the TA band (S2 §5c); Bridge-1
+before Bridge-2.
 
 ## 3. Session rules (this program)
 
