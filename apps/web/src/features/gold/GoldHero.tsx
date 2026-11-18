@@ -38,6 +38,7 @@ import { useI18n } from '../../shared/lib/locale';
 import type { GoldHeroModel } from './gold-tiles';
 import { GOLD_DISPLAY, goldHeroCounts, goldHeroTilt, goldHeroVerdict, goldHeroVerdictState } from './gold-tiles';
 import { GoldBalanceClassic } from './GoldBalanceClassic';
+import { comexMarketState } from './market-state';
 
 /* S6 (BD-S6a): the hero's balance-view alternation — the previous brass
  * balance shape (the classic view, rendered smaller) ↔ the S5 minimal
@@ -242,6 +243,15 @@ export function GoldHero({
         : `${new Intl.DateTimeFormat('en-AU', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(pricesAsOf))} UTC`
       : null;
 
+  /* GPE R16 / F16b: the market open/closed pill — Zone B's status
+   * affordance, INLINE after the as-of. The reference market is the
+   * one the live price actually reads (COMEX gold futures — the
+   * gold-usd reading's own source), and the static schedule carries
+   * its hours (NO new fetch — the row's own design). The market + its
+   * timezone render at point of use (the GPE-S3-10 lesson). Renders
+   * only when a price exists (the feed state names the market). */
+  const marketState = price !== undefined ? comexMarketState(new Date()) : null;
+
   const positionLine =
     hero.position !== null
       ? interpolate(t('pd.gold.heroPositionLine'), { band: bandWord(hero.position.percentile, t, numberLocale) })
@@ -299,7 +309,7 @@ export function GoldHero({
             </p>
           ) : null}
           {pricesText !== null ? (
-            <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]" data-prices-as-of={pricesCached ? 'cached' : 'fresh'}>
+            <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]" data-prices-as-of={pricesCached ? 'cached' : 'fresh'}>
               <bdi>
                 {/* GPE R06/#23 (GPE-S2-23): during an outage the projection
                  * is the cached last-good copy — the live-prices line then
@@ -308,6 +318,25 @@ export function GoldHero({
                  * path renders the plain as-of sentence (the common case). */}
                 {interpolate(t(pricesCached ? 'pd.global.pricesAsOfLastSuccessful' : 'pd.global.pricesAsOf'), { time: pricesText })}
               </bdi>
+              {/* GPE R16 / F16b: the market-state pill, inline after the
+               * as-of — a status affordance, not a link (s6/03 zone B). */}
+              {marketState !== null ? (
+                <span
+                  className="inline-flex items-baseline gap-1 rounded-full bg-[var(--color-surface)] px-2 py-0.5 ring-1 ring-[var(--color-border)]"
+                  data-market-pill={marketState.open ? 'open' : 'closed'}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`inline-block size-1.5 rounded-full ${marketState.open ? 'bg-[var(--color-status-normal)]' : 'bg-[var(--color-text-tertiary)]'}`}
+                  />
+                  <bdi className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                    {interpolate(t('pd.gold.marketPillLabel'), {
+                      state: t(marketState.open ? 'pd.gold.marketPillOpen' : 'pd.gold.marketPillClosed'),
+                      tz: marketState.tzLabel,
+                    })}
+                  </bdi>
+                </span>
+              ) : null}
             </p>
           ) : null}
         </div>
@@ -335,7 +364,7 @@ export function GoldHero({
               />
               <label
                 htmlFor="gold-balance-view-classic"
-                className="min-h-[32px] cursor-pointer rounded-full px-3 py-1 text-[length:var(--type-caption)] font-semibold leading-normal text-[var(--color-text-secondary)] ring-2 ring-transparent motion-safe:transition-colors peer-checked:bg-[var(--color-accent-gold)]/15 peer-checked:font-bold peer-checked:text-[var(--color-text-primary)] peer-focus-visible:ring-[var(--color-accent-gold)]"
+                className="flex min-h-[44px] cursor-pointer items-center rounded-full px-3 py-1 text-[length:var(--type-caption)] font-semibold leading-normal text-[var(--color-text-secondary)] ring-2 ring-transparent motion-safe:transition-colors peer-checked:bg-[var(--color-accent-gold)]/15 peer-checked:font-bold peer-checked:text-[var(--color-text-primary)] peer-focus-visible:ring-[var(--color-accent-gold)]"
               >
                 {t('pd.gold.heroViewClassic')}
               </label>
@@ -349,7 +378,7 @@ export function GoldHero({
               />
               <label
                 htmlFor="gold-balance-view-minimal"
-                className="min-h-[32px] cursor-pointer rounded-full px-3 py-1 text-[length:var(--type-caption)] font-semibold leading-normal text-[var(--color-text-secondary)] ring-2 ring-transparent motion-safe:transition-colors peer-checked:bg-[var(--color-accent-gold)]/15 peer-checked:font-bold peer-checked:text-[var(--color-text-primary)] peer-focus-visible:ring-[var(--color-accent-gold)]"
+                className="flex min-h-[44px] cursor-pointer items-center rounded-full px-3 py-1 text-[length:var(--type-caption)] font-semibold leading-normal text-[var(--color-text-secondary)] ring-2 ring-transparent motion-safe:transition-colors peer-checked:bg-[var(--color-accent-gold)]/15 peer-checked:font-bold peer-checked:text-[var(--color-text-primary)] peer-focus-visible:ring-[var(--color-accent-gold)]"
               >
                 {t('pd.gold.heroViewMinimal')}
               </label>

@@ -609,11 +609,14 @@ export interface BalanceStageCopy {
 }
 
 /** The weight's row wiring when the caller keeps openable rows (the
- * legacy ledger); the Gold page's classic view passes none — its
- * weights scroll to the lane cards instead. */
+ * legacy ledger); the Gold page's classic view passes its own — its
+ * weights scroll to the lane cards instead. GPE R16 / #17: the tooltip
+ * names the destination (the name-match rule — the reader knows where
+ * the press lands). */
 export interface BalanceStageWeightAria {
   expanded?: boolean;
   controls?: string;
+  tooltip?: string;
 }
 
 /** GB-S3 (03 §5), the lane chip's accessible name — "{lane}: {side}.
@@ -938,6 +941,7 @@ export function BalanceStage({
                     onOpen={() => onWeightOpen?.(d.key)}
                     ariaExpanded={weightAriaOf?.(d.key)?.expanded}
                     ariaControls={weightAriaOf?.(d.key)?.controls}
+                    tooltip={weightAriaOf?.(d.key)?.tooltip}
                     widthPx={vm.weightW}
                     discPx={vm.discPx}
                     testKey={d.key}
@@ -999,6 +1003,7 @@ export function BalanceTray({
               onOpen={() => onWeightOpen?.(d.key)}
               ariaExpanded={weightAriaOf?.(d.key)?.expanded}
               ariaControls={weightAriaOf?.(d.key)?.controls}
+              tooltip={weightAriaOf?.(d.key)?.tooltip}
               widthPx={s ? 72 : 92}
               discPx={s ? 42 : 46}
               testKey={d.key}

@@ -527,7 +527,7 @@ export function TrendPanel({
                   setRange(r);
                   setHover(null); // the window changed — a stale index lies
                 }}
-                className={`inline-flex min-h-[28px] cursor-pointer items-center rounded-full px-2.5 text-[length:var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
+                className={`inline-flex min-h-[44px] cursor-pointer items-center rounded-full px-3 text-[length:var(--type-caption)] font-bold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-currena-blue disabled:cursor-not-allowed disabled:opacity-40 ${
                   active
                     ? 'bg-white text-currena-blue-deep shadow-sm ring-1 ring-black/[0.06] dark:bg-[#243040] dark:text-currena-blue dark:ring-white/[0.1]'
                     : 'bg-transparent text-currena-muted hover:text-currena-dark dark:hover:text-currena-dark'

@@ -244,6 +244,7 @@ export function BalanceWeight({
   onOpen,
   ariaExpanded,
   ariaControls,
+  tooltip,
   widthPx,
   discPx,
   testKey,
@@ -262,6 +263,9 @@ export function BalanceWeight({
   onOpen: () => void;
   ariaExpanded?: boolean | undefined;
   ariaControls?: string | undefined;
+  /** GPE R16 / #17: the destination tooltip (the name-match rule —
+   * names where the press lands). */
+  tooltip?: string | undefined;
   /** The button's column width (the stage/tray metrics set it). */
   widthPx: number;
   /** The disc's diameter. */
@@ -277,6 +281,7 @@ export function BalanceWeight({
       aria-label={ariaLabel}
       aria-expanded={ariaExpanded}
       aria-controls={ariaControls}
+      title={tooltip}
       onClick={onOpen}
       style={{ width: widthPx, minHeight: 44 }}
     >

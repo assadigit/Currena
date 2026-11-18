@@ -223,10 +223,15 @@ function ContextGroup({
 export function GoldContext({
   entries,
   onOpenDetails,
+  zoneK,
 }: {
   entries: readonly GoldContextEntry[];
   /** The R-5 details-panel opener (the page's useIndicatorDetailsPanel). */
   onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+  /** GPE R14 — Zone K (the central-bank demand section), rendered between
+   *  the flows cards and the licence wall (s6/01 §2b slot A); the trust
+   *  band (wall + honest record) stays contiguous behind it. */
+  zoneK?: React.ReactNode;
 }): React.JSX.Element {
   const { t, numberLocale } = useI18n();
   // The two D-27 groups in placement order — gold-usd (the hero)
@@ -242,6 +247,11 @@ export function GoldContext({
     <section id="gold-context" aria-label={t('pd.gold.contextAria')} data-gold-context className="flex flex-col gap-3.5 scroll-mt-24">
       <ContextGroup title={t('pd.gold.ratiosTitle')} entries={ratios} onOpenDetails={onOpenDetails} />
       <ContextGroup title={t('pd.gold.flowsTitle')} entries={flows} onOpenDetails={onOpenDetails} />
+
+      {/* GPE R14 — Zone K: the central-bank demand section, directly after
+       *  the FLOWS cards (positioning → demand, the natural hand-off) and
+       *  BEFORE the wall — nothing ever inserts between wall + record. */}
+      {zoneK !== null && zoneK !== undefined ? zoneK : null}
 
       {/* ---- The blocked quartet (§16): honest notes, never cards. ----
        * GPE R09 / F13: the sharpened wall — each item's copy carries WHY it

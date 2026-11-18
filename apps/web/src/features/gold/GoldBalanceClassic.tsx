@@ -160,6 +160,17 @@ export function GoldBalanceClassic({ hero }: { hero: GoldHeroModel }): React.JSX
     }
   };
 
+  /* GPE R16 / #17 (GPE-S2-17): the hero's lane weights announce their
+   * affordance — aria-expanded + aria-controls pointing at the lane card
+   * the press reveals (the card is always expanded on this page; the pair
+   * states the relationship), plus the destination tooltip naming the
+   * lane (the name-match rule). The tray's weights carry the same wiring
+   * (one rule, both placements). */
+  const heroWeightAriaOf = (key: string): { expanded: boolean; controls: string; tooltip: string } => {
+    const driver = drivers.find((d) => d.key === key);
+    return { expanded: true, controls: `lane-${key}`, tooltip: driver?.label ?? key };
+  };
+
   return (
     <div
       ref={rootEl}
@@ -179,8 +190,9 @@ export function GoldBalanceClassic({ hero }: { hero: GoldHeroModel }): React.JSX
         stageAria={stageAria}
         gaugeAria={gaugeAria}
         onWeightOpen={openLaneFromWeight}
+        weightAriaOf={heroWeightAriaOf}
       />
-      <BalanceTray drivers={drivers} copy={stageCopy} rootWidth={rootWidth} onWeightOpen={openLaneFromWeight} />
+      <BalanceTray drivers={drivers} copy={stageCopy} rootWidth={rootWidth} onWeightOpen={openLaneFromWeight} weightAriaOf={heroWeightAriaOf} />
     </div>
   );
 }

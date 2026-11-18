@@ -33,7 +33,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { useEffect } from 'react';
 import type { IndicatorReading, InsightsSnapshot, PageProjection } from '@currena/core';
 import { PageProjectionSchema } from '@currena/core';
@@ -43,7 +43,20 @@ import { balanceTilt } from './signals/BalanceScale';
 import { GoldPage } from './GoldPage';
 import { GOLD_CONTEXT_IDS } from './gold-tiles';
 import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
+import { clearHistoryCacheForTests } from '../../shared/lib/insights';
+import { snapshotStore } from '../../shared/lib/snapshot-store';
 import { useI18n } from '../../shared/lib/locale';
+
+/* GPE R17: the lane intros (the EN dictionary's own strings — the chrome
+ * the #21 de-dup drops from the seats lane cards; the Signals ledger
+ * rows and the hero's classic stage keep rendering them). */
+const INTROS: Readonly<Record<string, string>> = {
+  'borrowing-costs': 'The cost of borrowing dollars: yields, curves and rate expectations.',
+  dollar: 'The US dollar against major currencies and the yen.',
+  stress: 'Stress in financial markets, from money markets to volatility.',
+  inflation: 'Inflation and inflation expectations in the US and Europe.',
+  flows: 'Speculative positioning and flows into gold.',
+};
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)
@@ -171,16 +184,112 @@ function LocaleProbe({ locale }: { locale: 'en' | 'fa' }): null {
 
 /** Route the stubbed fetch by URL — the Gold projection feed + the
  * snapshot feed (TM13/TM23: GoldPage fires both on mount). */
-function stubFeeds(overrides: { projection?: () => Response } = {}): void {
+function stubFeeds(overrides: { projection?: () => Response; goldCb?: () => Response } = {}): void {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.includes('/api/insights/pages/gold')) return (overrides.projection ?? (() => jsonResponse(projectionFixture())))();
       if (url === '/api/insights') return jsonResponse(snapshotFixture());
+      // GPE R14: the CB tracker's one-key endpoint (the /tic twin).
+      if (url === '/api/insights/gold-cb') return (overrides.goldCb ?? (() => notFound()))();
+      // GPE R13: the SHARED snapshot plane (the App-boot store the bridge
+      // reads — served as the RatesResponse the endpoint returns).
+      if (url.includes('/api/rates?source=tgju')) return jsonResponse({ snapshot: tgjuSnapshotFixture(), stale: false, servedFrom: 'cache' });
+      if (url.includes('/api/rates?source=frankfurter')) return jsonResponse({ snapshot: frankfurterSnapshotFixture(), stale: false, servedFrom: 'cache' });
       return notFound();
     }),
   );
+}
+
+/* GPE R13: the SHARED TGJU snapshot fixture — the session's own live
+ * capture of 2026-11-18 ~16:55 UTC (the coin-premium engine's frozen
+ * scenario: the ounce 3,744.68 USD, the free dollar 266,330 toman, the
+ * Tehran quotes; TGJU's own per-symbol marketAt stamps included). */
+function tgjuSnapshotFixture(): Record<string, unknown> {
+  return {
+    base: 'IRR',
+    source: 'tgju',
+    fetchedAt: new Date().toISOString(),
+    rates: [
+      { code: 'IRR', name: 'Iranian Rial', symbol: '﷼', rate: 1, unit: 'TOMAN' },
+      { code: 'USD', name: 'US Dollar', symbol: '$', rate: 1 / 266_330 },
+    ],
+    gold: [
+      { id: 'gold-ounce', unit: 'USD', price: 3744.68, marketAt: '2026-11-18T20:25:27+03:30' },
+      { id: 'gold-18k', unit: 'TOMAN', price: 24_459_600, marketAt: '2026-11-18T19:59:58+03:30' },
+      { id: 'gold-24k', unit: 'TOMAN', price: 32_612_400, marketAt: '2026-11-18T19:59:58+03:30' },
+      { id: 'gold-used', unit: 'TOMAN', price: 24_133_439, marketAt: '2026-11-18T19:59:58+03:30' },
+      { id: 'coin-emami', unit: 'TOMAN', price: 250_740_000, marketAt: '2026-11-18T19:59:57+03:30' },
+      { id: 'coin-bahar', unit: 'TOMAN', price: 240_745_000, marketAt: '2026-11-18T19:59:50+03:30' },
+      { id: 'coin-half', unit: 'TOMAN', price: 132_260_000, marketAt: '2026-11-18T15:55:05+03:30' },
+      { id: 'coin-quarter', unit: 'TOMAN', price: 70_920_000, marketAt: '2026-11-18T17:42:42+03:30' },
+      { id: 'coin-gram', unit: 'TOMAN', price: 36_000_000, marketAt: '2026-11-18T11:07:14+03:30' },
+      { id: 'gold-mesghal', unit: 'TOMAN', price: 105_954_000, marketAt: '2026-11-18T19:59:56+03:30' },
+    ],
+  };
+}
+
+/** The minimal valid frankfurter answer (the boot's other refresh leg). */
+function frankfurterSnapshotFixture(): Record<string, unknown> {
+  return {
+    base: 'USD',
+    source: 'frankfurter',
+    fetchedAt: new Date().toISOString(),
+    rates: [{ code: 'EUR', name: 'Euro', symbol: '€', rate: 0.9 }],
+  };
+}
+
+/* GPE R14: the CB tracker's snapshot fixture — the session's own derived
+ * numbers (the s12 record): the last rolling point 396.7 t @ 2026-10,
+ * the POL/CHN/UZB cast with the IRFCL value legs for the first two. */
+function cbSnapshotFixture(): Record<string, unknown> {
+  // The real display shape: monthly from 2006-01 (the 20-year window),
+  // the selling era negative, the 2009 wave, the 2015 catch-up peak, the
+  // reported-world plateau — ending at the derived 396.7 t @ 2026-10.
+  const series: Array<{ month: string; tonnes: number }> = [];
+  const shape = (monthIdx: number): number => {
+    const year = 2006 + Math.floor(monthIdx / 12);
+    if (year <= 2007) return -450 + monthIdx * 4; // the selling era
+    if (year <= 2009) return 40 + (monthIdx - 24) * 22; // the post-GFC wave
+    if (year <= 2014) return 380 + 40 * Math.sin(monthIdx / 9); // elevated
+    if (year === 2015) return 600 + (monthIdx - 108) * 25; // the catch-up step
+    if (year <= 2018) return 850 - (monthIdx - 120) * 6; // easing
+    if (year <= 2021) return 480 + 30 * Math.sin(monthIdx / 7); // re-acceleration
+    if (year <= 2025) return 380 + 20 * Math.sin(monthIdx / 5); // the plateau
+    return 396.735; // the derived end
+  };
+  for (let i = 0; i <= 249; i++) {
+    const y = 2006 + Math.floor(i / 12);
+    const m = (i % 12) + 1;
+    series.push({ month: `${y}-${String(m).padStart(2, '0')}`, tonnes: Number(shape(i).toFixed(1)) });
+  }
+  series[series.length - 1] = { month: '2026-10', tonnes: 396.735 };
+  return {
+    v: 1,
+    asOf: '2026-10',
+    fetchedAt: '2026-11-01T04:30:00Z',
+    series,
+    buyers: [
+      { code: 'POL', latestMonth: '2026-10', latestDelta: 17.107, sum12m: 159.088, tonnes: 690, holdingsMonth: '2026-10', goldUsd: 90_676_462_000, totalUsd: 295_437_566_000, valuePeriod: '2026-09' },
+      { code: 'CHN', latestMonth: '2026-10', latestDelta: 25.816, sum12m: 130.946, tonnes: 2435.4, holdingsMonth: '2026-10', goldUsd: 323_517_000_000, totalUsd: 3_789_425_000_000, valuePeriod: '2026-09' },
+      { code: 'UZB', latestMonth: '2026-07', latestDelta: -0.933, sum12m: 60.03, tonnes: 430.8, holdingsMonth: '2026-07' },
+    ],
+    reportedWorld: { tonnes: 33_070, reporters: 87, month: '2026-10' },
+    sourceUrls: [
+      'https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/IL/13.0.1/*.RGV_REVS.FTO.*',
+      'https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/IRFCL/12.0.0/*.IRFCLDT1_IRFCL56V_FTO.*',
+    ],
+  };
+}
+
+/** A minimal plottable gold history ([epochDay, value] pairs, ascending). */
+function historyPointsFixture(): Array<[number, number]> {
+  const points: Array<[number, number]> = [];
+  for (let i = 0; i < 400; i++) {
+    points.push([20000 + i * 7, 3000 + Math.sin(i / 24) * 400 + i]);
+  }
+  return points;
 }
 
 beforeEach(() => {
@@ -286,15 +395,22 @@ describe('GoldPage', () => {
     }
 
     // The one-projection consistency (s7/03 §2.4, binding): every family
-    // line's tally is BYTE-IDENTICAL to the seats section's lane card
-    // tally — the same keys over the same numbers (one truth).
+    // line's tally is BYTE-IDENTICAL to the same-keys rendering over the
+    // same lane counts. GPE R17: the seats lane cards no longer render the
+    // tally (the #21 de-dup — the Signals ledger rows keep it), so the
+    // comparator is the tally string the seats section ITSELF composes
+    // (the same interpolate keys over the same lane model, built here —
+    // the copy-pin test pins those keys to the corpus byte-for-byte).
+    const balanceModel = goldBalance(projectionFixture().readings);
     for (const family of families) {
       const lane = family.getAttribute('data-narrative-family')!;
-      const laneCard = document.querySelector(`#lane-${lane}`)!;
-      const laneTally = laneCard.querySelector('header p bdi')?.textContent ?? '';
-      expect(laneTally.length).toBeGreaterThan(3);
+      const model = balanceModel.lanes.find((l) => l.lane === lane)!;
+      const expected =
+        model.firing > 0
+          ? `${model.firing} of ${model.readable} drivers firing`
+          : 'No driver firing';
       const familyText = family.querySelector('p')?.textContent ?? '';
-      expect(familyText.startsWith(laneTally), `${lane}: the family tally is the lane card's own`).toBe(true);
+      expect(familyText.startsWith(expected), `${lane}: the family tally is the section's own key over the same counts`).toBe(true);
     }
 
     // The movers — raw deltas of the seats that moved, the window named
@@ -499,7 +615,7 @@ describe('GoldPage', () => {
     expect(us30y?.textContent).not.toContain('rising');
   });
 
-  it('renders the five lanes with their side words + tallies', async () => {
+  it('renders the five lanes with their side words (GPE R17: the tally + intro chrome is GONE — the #21 de-dup)', async () => {
     stubFeeds();
     render(<GoldPage />);
     await waitFor(() => {
@@ -510,9 +626,17 @@ describe('GoldPage', () => {
       const card = document.querySelector(`[data-lane="${lane.lane}"]`);
       expect(card).not.toBeNull();
       expect(card!.getAttribute('data-lane-side')).toBe(lane.split ? 'split' : lane.side);
-      // The tally line: firing count over readable.
-      if (!lane.split && lane.side !== 'unread') {
-        expect(card!.textContent).toContain(`${lane.firing} of ${lane.readable} drivers firing`);
+      // GPE R17 / S6-D5 (the space donor): the lane card keeps the header
+      // + the verdict state word + the seats list — the tally line and the
+      // lane intro (byte-identical to the Signals ledger rows' chrome) NO
+      // LONGER render here. The hero's and the Signals renderings keep
+      // theirs (the balance is said twice with full grammar).
+      if (!lane.split && lane.side !== 'unread' && lane.firing > 0) {
+        expect(card!.textContent).not.toContain(`${lane.firing} of ${lane.readable} drivers firing`);
+      }
+      const intro = INTROS[lane.lane as keyof typeof INTROS] ?? '';
+      if (intro !== '') {
+        expect(card!.querySelector('header')?.textContent).not.toContain(intro);
       }
     }
     // The seat counts per lane (D-26: 7 · 7 · 11 · 10 · 2).
@@ -555,6 +679,219 @@ describe('GoldPage', () => {
     expect(hrefs).toHaveLength(37);
     for (const href of hrefs) {
       expect(href, 'every seat href carries a card-level #hash').toContain('#');
+    }
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R13 / F3a — the Iran bridge (Zone F)
+   * ---------------------------------------------------------------- */
+
+  it('GPE R13: the bridge fail-closes without a snapshot (the honest unavailable line, never a guess)', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-iran-bridge]')).not.toBeNull();
+    });
+    const bridge = document.querySelector('[data-gold-iran-bridge]')!;
+    expect(bridge.textContent).toContain('The Tehran board could not be read yet.');
+    expect(bridge.querySelectorAll('[data-bridge-row]').length).toBe(0);
+  });
+
+  it('GPE R13 / F3a: the Iran bridge — the board + the حباب grammar + the four-move interpretation (the 2026-11-18 frozen snapshot)', async () => {
+    // The SHARED data plane: seed the App-boot snapshot store (the same
+    // store /live-rates reads — s6/03 rule 4; one fixture, both
+    // presentations). The values are the session's own live capture
+    // (the coin-premium engine's frozen scenario).
+    window.localStorage.setItem('currena:snapshot:tgju', JSON.stringify(tgjuSnapshotFixture()));
+    snapshotStore.boot();
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-iran-bridge]')).not.toBeNull();
+    });
+    const bridge = document.querySelector('[data-gold-iran-bridge]')!;
+    expect(bridge.id).toBe('gold-zone-f'); // R10's zone-level anchor
+
+    // Zone F sits between the explanation band (D) and the Signals
+    // section (s6/01 §2a slot A — the page's second chapter).
+    const zoneD = document.querySelector('[data-gold-zone-d-band]')!;
+    const zoneF = document.querySelector('[data-gold-zone-f-band]')!;
+    const signals = document.querySelector('[data-gold-signals]')!;
+    expect(zoneD.compareDocumentPosition(zoneF) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(zoneF.compareDocumentPosition(signals) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    // The board: the coin family + geram18/24 + mesghal, in order (the
+    // ounce does NOT join — it stays implied in the parity line).
+    const rows = [...bridge.querySelectorAll('[data-bridge-row]')];
+    expect(rows.map((r) => r.getAttribute('data-bridge-row'))).toEqual([
+      'coin-emami', 'coin-bahar', 'coin-half', 'coin-quarter', 'coin-gram', 'gold-18k', 'gold-24k', 'gold-mesghal',
+    ]);
+
+    // C2 rule 2/3: the Emami row carries its premium (the frozen
+    // arithmetic: intrinsic 234.79M vs market 250.74M → +6.8%) and its
+    // per-row as-of stamp (TGJU's own marketAt, converted Gregorian in en).
+    const emami = bridge.querySelector('[data-bridge-row="coin-emami"]')!;
+    expect(emami.textContent).toContain('+6.8% premium');
+    expect(emami.textContent).toContain('Nov 18, 2026');
+
+    // The parity behind one tap: the named toman-per-ounce intermediate
+    // (C1) + both legs of the decomposition (the reader reproduces it).
+    fireEvent.click(within(emami as HTMLElement).getByText('Show the parity'));
+    const parity = emami.querySelector('[data-bridge-parity]')!;
+    expect(parity.textContent).toContain('3,744.68');
+    expect(parity.textContent).toContain('266,330');
+    expect(parity.textContent).toContain('997,320,624');
+    expect(parity.textContent).toContain('234.8M toman');
+    expect(parity.textContent).toContain('250.7M toman');
+
+    // C2 rule 1: the method block — the formula + the constants table +
+    // the gerami BAND + the آبشده convention + the CBI variant note.
+    fireEvent.click(within(bridge as HTMLElement).getByText('How it is computed'));
+    const method = bridge.querySelector('[data-bridge-method]')!;
+    expect(method.textContent).toContain('intrinsic = global ounce × free-market dollar × pure-gold content');
+    expect(method.querySelectorAll('[data-bridge-constant]').length).toBe(8);
+    expect(method.textContent).toContain('0.90–0.92 g pure');
+    expect(method.textContent).toContain('آبشده');
+    expect(method.textContent).toContain('8.136 g × 0.900');
+
+    // The four moves (s7/01 §8, binding order) + the Chain-2 close at
+    // the dollar lane anchor (name-matched).
+    fireEvent.click(within(bridge as HTMLElement).getByText('What this board means'));
+    const interp = bridge.querySelector('[data-bridge-interpretation]')!;
+    const moves = [...interp.querySelectorAll('p')];
+    expect(moves.length).toBe(4);
+    expect(moves[0]!.textContent).toContain('global gold × the free-market dollar');
+    expect(moves[1]!.textContent).toContain('market-structure reading');
+    expect(moves[2]!.textContent).toContain('2026-11-17');
+    const dollarLink = moves[3]!.querySelector('a[href="#lane-dollar"]');
+    expect(dollarLink?.textContent).toBe('Dollar');
+
+    // C6's TGJU row: the source link + the revision caveat.
+    expect(bridge.querySelector('a[href="https://www.tgju.org/"]')?.textContent).toBe('Source: TGJU');
+    expect(bridge.textContent).toContain('may be revised');
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R14 / F2a — the central-bank demand section (Zone K)
+   * ---------------------------------------------------------------- */
+
+  it('GPE R14 / F2a: the CB-demand section — the chart + the buyers + the honest exceptions + the mirror cross-link (display-only)', async () => {
+    stubFeeds({ goldCb: () => jsonResponse(cbSnapshotFixture()) });
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-cb-demand] [data-cb-chart]')).not.toBeNull();
+    });
+    const zoneK = document.querySelector('[data-gold-cb-demand]')!;
+    expect(zoneK.id).toBe('gold-zone-k'); // R10's zone-level anchor
+
+    // Zone K sits between the FLOWS cards and the licence wall (s6/01
+    // §2b slot A); the trust band stays contiguous behind it.
+    const flows = [...zoneK.parentElement!.children].findIndex((el) => el === zoneK);
+    expect(flows).toBeGreaterThan(0);
+    const wall = document.getElementById('gold-blocked')!;
+    expect(zoneK.compareDocumentPosition(wall) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    // The chart: the rolling line + the three dated episodes + the
+    // current pace (the reported-world label rides the caption).
+    const chart = zoneK.querySelector('[data-cb-chart]')!;
+    expect(chart.querySelector('[data-cb-line]')).not.toBeNull();
+    expect(chart.querySelectorAll('[data-cb-episode]').length).toBe(3);
+    expect(chart.querySelector('[data-cb-current-pace]')?.textContent).toContain('397');
+    expect(chart.textContent).toContain('the reported world');
+
+    // The buyers table: the fixture's cast with the share column (the
+    // S12-D1 method at the fixture's own gold price 4,072.1 → POL 30.6%);
+    // UZB carries no value legs → the honest dash.
+    // The desktop table carries the cast (the mobile stacked list renders
+    // the same top-5 rows, CSS-hidden above sm — both in the DOM).
+    const buyers = [...zoneK.querySelectorAll('[data-cb-buyers-table] [data-cb-buyer]')];
+    expect(buyers.map((b) => b.getAttribute('data-cb-buyer'))).toEqual(['POL', 'CHN', 'UZB']);
+    const pol = zoneK.querySelector('[data-cb-buyer="POL"]')!;
+    expect(pol.textContent).toContain('Poland');
+    expect(pol.textContent).toContain('+159.1');
+    expect(pol.querySelector('[data-cb-share]')?.textContent).toBe('30.6%');
+    const uzb = zoneK.querySelector('[data-cb-buyer="UZB"]')!;
+    expect(uzb.querySelector('[data-cb-share]')?.textContent).toBe('—');
+
+    // The honest exceptions (s7/01 §6): the standing caveat, the
+    // reported-world line, the revision + China notes, the governance
+    // sentence, the WGC cross-reference.
+    expect(zoneK.querySelector('[data-cb-caveat]')?.textContent).toContain('explains quarters, not weeks');
+    expect(zoneK.textContent).toContain('not the whole world');
+    expect(zoneK.textContent).toContain('Monthly data is revised');
+    expect(zoneK.textContent).toContain('China reports irregularly');
+    expect(zoneK.querySelector('[data-cb-method] a[href="https://gold.org/goldhub/data"]')).not.toBeNull();
+    expect(zoneK.textContent).toContain('does not vote in the meter above');
+
+    // The mirror-framing cross-link (s6/01 §2b): the usd-reserve-share
+    // seat's own card-level anchor + its own name (R10's contract).
+    const mirror = zoneK.querySelector('a[href="/currencies#currencies-card-usd-reserve-share"]');
+    expect(mirror?.textContent).toBe('USD share of world FX reserves');
+  });
+
+  it('GPE R14: the CB section fail-closes when the rung has not landed (the calm unavailable line)', async () => {
+    stubFeeds({ goldCb: () => jsonResponse({ error: 'gold_cb_not_ready' }, 503) });
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-cb-demand] [data-cb-unavailable]')).not.toBeNull();
+    });
+    const zoneK = document.querySelector('[data-gold-cb-demand]')!;
+    expect(zoneK.querySelector('[data-cb-unavailable]')?.textContent).toContain('could not be read yet');
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R16 / F16b — the market-state pill (Zone B)
+   * ---------------------------------------------------------------- */
+
+  it('GPE R16 / F16b: the market-state pill renders inline after the as-of — the market + timezone NAMED (GPE-S3-10)', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-hero]')).not.toBeNull();
+    });
+    const pill = document.querySelector('[data-market-pill]');
+    expect(pill).not.toBeNull();
+    // The pill sits INSIDE the as-of line (Zone B, inline after it).
+    expect(pill!.closest('[data-prices-as-of]')).not.toBeNull();
+    // The reference market + its timezone, at point of use — and one of
+    // the two honest states (the schedule itself is unit-pinned).
+    expect(pill!.textContent).toContain('COMEX gold futures, New York');
+    expect(pill!.textContent).toMatch(/UTC−[45]/);
+    expect(pill!.textContent).toMatch(/Market (open|closed)/);
+    expect(['open', 'closed']).toContain(pill!.getAttribute('data-market-pill'));
+  });
+
+  it('GPE R16 / #19: the view radio labels and the chart range chips meet the 44px touch-target floor', async () => {
+    stubFeeds();
+    // The trend chips render once the chart's history leg answers; the
+    // history fetch is MODULE-CACHED, so the earlier tests' notFound
+    // answers must clear first (the test seam).
+    clearHistoryCacheForTests();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/gold')) return jsonResponse(projectionFixture());
+        if (url === '/api/insights') return jsonResponse(snapshotFixture());
+        if (url.includes('/history')) {
+          return jsonResponse({ v: 1, id: 'gold-usd', points: historyPointsFixture() });
+        }
+        return notFound();
+      }),
+    );
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-hero]')).not.toBeNull();
+    });
+    for (const id of ['gold-balance-view-classic', 'gold-balance-view-minimal']) {
+      const label = document.querySelector(`label[for="${id}"]`)!;
+      expect(label.className).toContain('min-h-[44px]');
+    }
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-trend-range] button').length).toBeGreaterThan(0);
+    });
+    for (const chip of document.querySelectorAll('[data-trend-range] button')) {
+      expect(chip.className).toContain('min-h-[44px]');
     }
   });
 

@@ -33,6 +33,8 @@ import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldNarrative } from './narrative/GoldNarrative';
 import { GoldYieldDecomposition } from './GoldYieldDecomposition';
+import { GoldIranBridge } from './GoldIranBridge';
+import { GoldCbDemand } from './GoldCbDemand';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
@@ -231,6 +233,16 @@ export function GoldPage(): React.JSX.Element {
         </div>
       ) : null}
 
+      {/* GPE R13 / F3a — Zone F, THE IRAN BRIDGE (s6/01 §2a slot A:
+          between the Signals section and the 37 seats — the page's second
+          chapter, after the global verdict completes). The data plane is
+          SHARED with LedGoldBoard (the App-boot snapshot store — zero new
+          fetches); the #gold-zone-f anchor rides R10's contract. HARD
+          GATE satisfied: Bridge-1 lands before Bridge-2/R30 (P3). */}
+      <div className="mt-3 sm:mt-5" data-gold-zone-f-band>
+        <GoldIranBridge />
+      </div>
+
       {/* TM13: the Signals section (the gold + silver verdict strip with the
           price-trend chart + range buttons) — moved from /insights. Shows
           the gold verdict card (the outlook sentence, the 3m/1y/5y/10y
@@ -273,9 +285,18 @@ export function GoldPage(): React.JSX.Element {
       </div>
 
       {/* D-27 + §16 + D-29 — the context cards, the blocked notes, the
-          honest-record footnote. */}
+          honest-record footnote. GPE R14: Zone K (the central-bank demand
+          section) rides INSIDE this block via the zoneK slot — between
+          the flows cards and the licence wall (s6/01 §2b slot A), so the
+          trust band (wall + honest record) stays contiguous behind it. */}
       <div className="mt-3 sm:mt-5">
-        {contextEntries.length > 0 ? <GoldContext entries={contextEntries} onOpenDetails={openCard} /> : null}
+        {contextEntries.length > 0 ? (
+          <GoldContext
+            entries={contextEntries}
+            onOpenDetails={openCard}
+            zoneK={readings !== undefined ? <GoldCbDemand price={hero?.price} /> : null}
+          />
+        ) : null}
       </div>
 
       {/* TM23: the Gold Positions section — the CFTC trader positioning

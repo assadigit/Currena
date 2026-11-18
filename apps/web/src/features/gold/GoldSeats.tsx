@@ -308,19 +308,15 @@ function LaneCard({
   const { t, numberLocale } = useI18n();
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
   const title = t(LANE_TITLE_KEY[lane.lane]);
-  const intro = t(LANE_INTRO_KEY[lane.lane]);
 
-  // The lane's tally line (03 §2): the split contest when contested, else
-  // the firing count over readable — "No driver firing" when readable but
-  // quiet; an unread lane carries no tally at all.
-  const tally =
-    lane.split === true
-      ? interpolate(t('pd.gold.laneSplit'), { supports: num(lane.supports), pressures: num(lane.pressures) })
-      : lane.side === 'unread'
-        ? null
-        : lane.firing === 0
-          ? t('pd.gold.laneTallyNone')
-          : interpolate(t('pd.gold.laneTally'), { firing: num(lane.firing), readable: num(lane.readable) });
+  /* GPE R17 / #21 (S6-D5, the space donor): the third balance rendering's
+   * duplicated chrome is GONE — the lane INTRO sentence and the TALLY
+   * line drop (byte-identical to the Signals section's expandable ledger
+   * rows, where they keep rendering); what stays is exactly the keep-list:
+   * the lane header + the verdict state word + the seats list (s6/01 §4
+   * rule 5). The hero's and the Signals renderings keep theirs — the
+   * balance is said twice with full grammar, and this section reads as
+   * the meter's evidence. */
 
   // The lane's state word: for/against/neutral/unread — split reads its
   // own word with the contest counts (the OI-2 disclosure).
@@ -343,15 +339,11 @@ function LaneCard({
           {title}
           <span className="ms-1.5 font-semibold text-[var(--color-text-tertiary)]">· {num(lane.seats.length)}</span>
         </h3>
-        <p className="m-0 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
+        <p className="m-0">
           <span className={`text-[length:var(--type-caption)] font-bold ${stateTone}`} data-lane-state>
             {stateWord}
           </span>
-          {tally !== null ? (
-            <bdi className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{tally}</bdi>
-          ) : null}
         </p>
-        {intro !== null ? <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">{intro}</p> : null}
       </header>
       <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
         {lane.seats.map((seat) => (
