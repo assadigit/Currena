@@ -243,3 +243,25 @@ The consolidated lane balance behind `?balance=lanes`
   panel sentences): the status chip always uses غیرعادی.
 - **دادهٔ تازه** vs **دادهٔ به‌روز**: round 2 settled on «دادهٔ به‌روز» for
   the together panel; do not mix in new copy without a reason.
+
+## The gold page's Iran bridge + CB demand (GPE rounds 85)
+
+- **حباب** — THE coin premium over melt. The bridge's owned word
+  (round 85): the EN side renders the gloss "premium (over melt)";
+  a negative premium renders «حباب منفی» (a discount), never a
+  minus-prefixed حباب.
+- **دلار آزاد** — the free-market dollar (the TGJU price_dollar_rl
+  leg). Established; the bridge's parity line reuses it verbatim.
+- **انس جهانی** — the global (troy) ounce. The parity line's first leg.
+- **آب‌شده** — the melted-gold convention (the mesghal quote's bazaar
+  standard: ۴٫۶۰۸۳ گرم × عیار حدود ۰٫۷۰۵). Keep the ezafe-free
+  compound «طلای آب‌شده».
+- **مثقال** — the mesghal unit itself; the board row's name.
+- **ارزش ذاتی** — intrinsic value (the melt value). Pairs with
+  «قیمت بازار» (the market price) in the decomposition template.
+- **چرخش خریدار** — the buyer rotation (the CB section's owned term
+  for the 2022 episode; the EN gloss rides the annotation).
+- **دنیای گزارش‌شده** — the reported world (the IMF tracker's honest
+  label: the sum over reporters, never claimed as the whole world).
+- **قرارداد آتی طلا در کمکس** — COMEX gold futures (the market pill's
+  named reference market; کمکس is the venue's Persian-rendered name).
