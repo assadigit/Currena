@@ -878,12 +878,23 @@ export const en = {
       statusUnavailable: "Can't tell right now",
       statusContext: 'Context',
       valueUnavailable: 'Cannot read yet',
-      /* The blocked quartet (§16 — honest notes, never cards). */
+      /* The blocked quartet (§16 — honest notes, never cards). GPE R09 /
+       * F13 (2026-11-18, s6/01 Zone L): each item states WHY it is absent
+       * AND what the owner's lever is (C7 rule 5 — the honest wall explains,
+       * never apologizes), plus the ONE link-out (#22, GPE-S2-22): the
+       * public data-sources document carries the licence ladder + every
+       * source's terms. The WGC CB line retires as Tier-2 lands (D7). */
       blockedTitle: 'Not published — blocked by licence or venue',
-      blockedWgcEtf: 'World gold ETF holdings — the WGC licence class needs prior written authorisation (the draft is the owner’s lever).',
-      blockedWgcCb: 'Central-bank gold demand — the same WGC authorisation gate.',
-      blockedOfficial: 'Official gold demand (PBoC/CBR) — the venue’s English page moved; the re-find is pending.',
-      blockedEtfShort: 'Gold ETF short interest — no licence-clean venue exists.',
+      blockedWgcEtf:
+        'World gold ETF holdings — the WGC licence class requires prior written authorisation before display. The owner’s lever: the authorisation letter to the World Gold Council (info@gold.org), drafted and ready to send.',
+      blockedWgcCb: 'Central-bank gold demand — the same WGC authorisation gate; the same letter is the owner’s lever.',
+      blockedOfficial:
+        'Official gold demand (PBoC/CBR) — the publishers’ own English pages moved, and nothing is shown until the new addresses are verified (fail-closed). The owner’s lever: the venue re-find, on the list.',
+      blockedEtfShort:
+        'Gold ETF short interest — no licence-clean venue exists today; unlocking it would take a new venue or negotiated terms.',
+      blockedLearnMore:
+        'Why every number on this page is safe to show: the licence ladder and each source’s terms, in the public data-sources document.',
+      absentWhyLink: 'see why',
       /* The honest-record footnote (D-29). The measured note + link word
        * are the corpus's own, pinned; the sign-agreement line carries the
        * backtest's measured numbers (05-GOLD-INDICATORS §10). */

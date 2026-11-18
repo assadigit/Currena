@@ -86,6 +86,11 @@ const BLOCKED_KEY: Readonly<Record<BlockedNoteId, TranslationKey>> = {
 const GOLD_BACKTEST_URL =
   'https://github.com/assadigit/Currena/blob/main/docs/insights/BACKTEST-GOLD-LANES.md';
 
+/* GPE R09 / F13 (GPE-S2-22): the licence wall's ONE link-out — the licence
+ * facts live repo-side in docs/SOURCES.md; the public GitHub view is the
+ * outbound path (the GOLD_BACKTEST_URL pattern). */
+const GOLD_SOURCES_URL = 'https://github.com/assadigit/Currena/blob/main/docs/SOURCES.md';
+
 /* ------------------------------------------------------------------ *
  * One context card
  * ------------------------------------------------------------------ */
@@ -238,8 +243,12 @@ export function GoldContext({
       <ContextGroup title={t('pd.gold.ratiosTitle')} entries={ratios} onOpenDetails={onOpenDetails} />
       <ContextGroup title={t('pd.gold.flowsTitle')} entries={flows} onOpenDetails={onOpenDetails} />
 
-      {/* ---- The blocked quartet (§16): honest notes, never cards. ---- */}
-      <section aria-label={t('pd.gold.blockedTitle')} data-gold-blocked className="flex flex-col gap-1.5">
+      {/* ---- The blocked quartet (§16): honest notes, never cards. ----
+       * GPE R09 / F13: the sharpened wall — each item's copy carries WHY it
+       * is absent + the owner's lever (C7 rule 5), and the ONE link-out
+       * (#22) points at the public data-sources document. The id
+       * `gold-blocked` is the absent-note's in-page target (s6/01 Zone A). */}
+      <section id="gold-blocked" aria-label={t('pd.gold.blockedTitle')} data-gold-blocked className="flex flex-col gap-1.5 scroll-mt-24">
         <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
           {t('pd.gold.blockedTitle')}
         </h3>
@@ -254,6 +263,19 @@ export function GoldContext({
             </li>
           ))}
         </ul>
+        {/* The ONE link-out (#22): the licence ladder + every source's terms,
+         * in the public data-sources document — the wall explains itself all
+         * the way down (GPE R09 / F13). */}
+        <p className="m-0 px-2.5 text-[length:var(--type-caption)] leading-relaxed">
+          <a
+            href={GOLD_SOURCES_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="insights-focusable font-semibold text-currena-blue underline-offset-2 hover:underline"
+          >
+            {t('pd.gold.blockedLearnMore')}
+          </a>
+        </p>
       </section>
 
       {/* ---- The honest-record footnote (D-29). ---- */}

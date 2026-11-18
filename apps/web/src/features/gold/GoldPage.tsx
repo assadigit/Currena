@@ -201,10 +201,16 @@ export function GoldPage(): React.JSX.Element {
           rides here, and the §16 notes below spell each one out).
           GPE R06/#15 (GPE-S2-15): the count renders through formatNumber
           so the FA locale renders Persian digits (۴, not the raw Western
-          "4" interpolate would stringify). */}
+          "4" interpolate would stringify).
+          GPE R09 / F13 (s6/01 Zone A): the line gains its link to the
+          sharpened wall — one tap from "N readings couldn't be shown" to
+          WHY each is blocked and what the owner's lever is (#gold-blocked). */}
       {projection !== null && projection.absentIds.length > 0 ? (
         <p className="m-0 mb-2.5 text-[10.5px] text-currena-muted sm:mb-3 sm:text-[length:var(--type-caption)]" data-absent-note>
-          <bdi>{interpolate(t('pd.global.absentLine'), { n: formatNumber(projection.absentIds.length, numberLocale, { maximumFractionDigits: 0 }) })}</bdi>
+          <bdi>{interpolate(t('pd.global.absentLine'), { n: formatNumber(projection.absentIds.length, numberLocale, { maximumFractionDigits: 0 }) })}</bdi>{' '}
+          <a href="#gold-blocked" className="insights-focusable font-semibold text-currena-blue underline-offset-2 hover:underline">
+            {t('pd.gold.absentWhyLink')}
+          </a>
         </p>
       ) : null}
 

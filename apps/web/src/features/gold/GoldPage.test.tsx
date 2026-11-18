@@ -447,6 +447,21 @@ describe('GoldPage', () => {
     expect(document.querySelectorAll('[data-blocked-note]').length).toBe(4);
     expect(document.querySelector('[data-blocked-note="wgc-etf-holdings"]')?.textContent).toContain('WGC');
 
+    // GPE R09 / F13 — the SHARPENED wall: every item states its WHY *and*
+    // the owner's lever (C7 rule 5), the wall carries its ONE link-out
+    // (#22, GPE-S2-22 — the public data-sources document), and the
+    // absent-note links to the wall (s6/01 Zone A).
+    expect(document.querySelector('[data-blocked-note="wgc-etf-holdings"]')?.textContent).toContain("owner’s lever");
+    expect(document.querySelector('[data-blocked-note="wgc-etf-holdings"]')?.textContent).toContain('info@gold.org');
+    expect(document.querySelector('[data-blocked-note="wgc-cb-demand"]')?.textContent).toContain("owner’s lever");
+    expect(document.querySelector('[data-blocked-note="official-gold-demand"]')?.textContent).toContain('fail-closed');
+    expect(document.querySelector('[data-blocked-note="etf-short-interest"]')?.textContent).toContain('no licence-clean venue');
+    const wall = document.querySelector('[data-gold-blocked]');
+    expect(wall?.querySelector('a[href*="SOURCES.md"]')).toBeTruthy(); // the ONE link-out
+    expect(document.getElementById('gold-blocked')).toBeTruthy(); // the absent-note's target
+    const absent = document.querySelector('[data-absent-note]');
+    expect(absent?.querySelector('a[href="#gold-blocked"]')?.textContent).toBe('see why');
+
     // The honest-record footnote.
     const honest = document.querySelector('[data-gold-honest-record]');
     expect(honest?.textContent).toContain('no positive association');
