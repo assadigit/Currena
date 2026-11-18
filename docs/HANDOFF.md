@@ -1,6 +1,18 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S11 — GPE P1-b, the explanation band; DONE AND VERIFIED LIVE)
+## This session (S12 — GPE P1-c, the prizes; IN PROGRESS)
+
+**Goal:** rows R13 (Bridge-1 the Iran bridge) · R14 (the IMF CB-demand
+Tier-1 tracker) · R16 (the affordances + the market-state pill) · R17
+(the #21 de-dup) — **R15 slipped to P2** (the M1(b) drop check: no WGC
+GDT file, no owner notice; the fold record §0.2 rule). Branch
+`gold-elevation/p1c-prizes` off the S11 close `aae44dda`. M1 landed:
+citation re-verification + the three build-time checks recorded
+(docs/specs/gold-page-elevation/s12/M1-CITATION-AND-CHECKS.md — the
+R07 Treasury rung fires 04:10 UTC Nov 19, AFTER this session's start:
+the flip verification rides S13's M1, honestly recorded).
+
+## Previous session (S11 — GPE P1-b, the explanation band; DONE AND VERIFIED LIVE)
 
 **Outcome:** all six rows R07–R12 landed, tested, deployed, and
 live-verified. Production is currena-api `23ce6b06` @ 100% (created
