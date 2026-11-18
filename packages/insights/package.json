@@ -18,6 +18,7 @@
     "./fx/definitions": "./src/domains/currencies/fx/definitions.ts",
     "./tic": "./src/domains/usa/tic/index.ts",
     "./cb-demand": "./src/domains/gold/cb-demand.ts",
+    "./xau-ohlc": "./src/domains/gold/xau-ohlc.ts",
     "./prices": "./src/shared/prices/index.ts",
     "./ingest": "./src/shared/ingest/index.ts",
     "./page-division": "./src/page-division/index.ts",

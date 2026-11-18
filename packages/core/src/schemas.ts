@@ -2342,6 +2342,61 @@ export const GoldCbSnapshotSchema = z
 export type GoldCbSnapshot = z.infer<typeof GoldCbSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * XAUUSD daily OHLC (GPE R18 / F7 + R19 / F8, 2026-11-18) — the
+ * interactive chart's + the TA band's one-key series, EODHD
+ * XAUUSD.FOREX daily bars (the owner plan; L2 attribution — the series
+ * named at point of use per C1/C5). Served at GET /api/insights/gold-ohlc
+ * from `insights:gold-xau:v1`; display-only (no meter membership — the
+ * C5 rule 4 governance record).
+ *
+ * The free-tier depth posture (S13-D1): the stored series begins at
+ * whatever depth the plan served at first collect (~1 year on the free
+ * key — the 2026-11-18 probe: 361 rows) and grows forward by the daily
+ * rung appends; the decile grammar discloses the basis window from the
+ * series itself, never a fixed "decade" claim the data cannot support.
+ * ------------------------------------------------------------------ */
+
+/** One daily OHLC bar of the XAUUSD spot series. */
+export const GoldXauCandleSchema = z.object({
+  /** The bar's date, YYYY-MM-DD (UTC). */
+  date: z.iso.date(),
+  open: z.number().finite().positive(),
+  high: z.number().finite().positive(),
+  low: z.number().finite().positive(),
+  close: z.number().finite().positive(),
+});
+export type GoldXauCandle = z.infer<typeof GoldXauCandleSchema>;
+
+/** The value of `insights:gold-xau:v1`, verbatim over the wire. */
+export const GoldXauOhlcSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The latest FINAL bar's date (today's partial bar never stores — S13-D3). */
+    asOf: z.iso.date(),
+    /** When the rung wrote this snapshot (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The daily bars, ascending by date (final bars only; revisions win on merge). */
+    series: z.array(GoldXauCandleSchema).min(2),
+    /** The provider URL the series names at point of use (C1/C6). */
+    sourceUrl: z.string().url(),
+  })
+  .refine(
+    (s) => {
+      const dates = s.series.map((c) => c.date);
+      return dates.every((d, i) => i === 0 || d > dates[i - 1]!);
+    },
+    { message: 'gold-xau series dates must be strictly ascending' },
+  )
+  .refine((s) => s.series[s.series.length - 1]!.date === s.asOf, {
+    message: 'gold-xau asOf must be the last bar of the series',
+  })
+  .refine(
+    (s) => s.series.every((c) => c.high >= c.low && c.high >= c.open && c.high >= c.close && c.low <= c.open && c.low <= c.close),
+    { message: 'gold-xau bars must be internally ordered (high the max, low the min)' },
+  );
+export type GoldXauOhlcSnapshot = z.infer<typeof GoldXauOhlcSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)
  *
  * The Prices board's four assets (Brent, gold, silver, Bitcoin) plus their

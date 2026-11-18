@@ -202,6 +202,34 @@ export type {
 export { yieldDecomposition } from './domains/gold/yield-decomposition';
 export type { YieldDecomposition, YieldLeg, YieldLegId } from './domains/gold/yield-decomposition';
 
+// GPE R19 / F8 (docs/specs/gold-page-elevation s1/13 §2–§3 · s6/02 C5 ·
+// s6/03 zone H): the minimal TA band's pure computation — SMA
+// 20/50/100/200, the distance-from-200DMA decile (the meter's own
+// percentile grammar over the stored basis — S13-D1's honest window),
+// the dated 50/200 cross events (whipsaws included), and the classic
+// daily/weekly pivots. Display-only — nothing here joins the voter
+// table (C5 rule 4). The input is the R18 OHLC leg's snapshot
+// (GET /api/insights/gold-ohlc).
+export {
+  TA_DECILE_MIN_BASE,
+  TA_WINDOWS,
+  classicDailyPivots,
+  classicWeeklyPivots,
+  crossEvents,
+  distanceFromSma200,
+  previousWeekBars,
+  smaRows,
+  smaSeries,
+} from './domains/gold/ta-levels';
+export type {
+  TaCross,
+  TaDistance,
+  TaPivotSet,
+  TaSmaPoint,
+  TaSmaRow,
+  TaWindow,
+} from './domains/gold/ta-levels';
+
 // GPE R13 / F3a (docs/specs/gold-page-elevation s1/11 §5 · s6/02 C2 ·
 // s7/01 §8): the Iran bridge's pure premium engine — the documented,
 // reproducible حباب (coin premium over melt) over ONE coherent TGJU

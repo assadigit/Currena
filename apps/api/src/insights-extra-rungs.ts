@@ -26,6 +26,7 @@
 import type { Bindings } from './index';
 import { runTicIngest, KvTicStore } from '@currena/insights/tic';
 import { runGoldCbIngest, KvGoldCbStore, goldCbDayGate } from '@currena/insights/cb-demand';
+import { runGoldXauIngest, KvGoldXauStore } from '@currena/insights/xau-ohlc';
 import {
   runInsightsRung4Phase,
   runInsightsCreditPhase,
@@ -329,11 +330,38 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
     },
   },
   {
+    // GPE R18 / F7 (2026-11-18): the XAUUSD daily OHLC leg — the
+    // interactive chart's + the TA band's series, EODHD XAUUSD.FOREX
+    // (the owner plan). Rides RUNG4 (the S13-D1 venue record: the
+    // markets worker's crons are budget-tight on worst-case days and the
+    // account's 5-cron limit is full; this registry is the designed
+    // extension point, and the rung4 arithmetic fits with margin —
+    // 1 + 24 (fred-s3) + 10 (frb-ebp Saturdays) + 10 (ofr-fsi) + 4 =
+    // 49 ≤ 50 on the all-gates day; the rung filter separates it from
+    // rung3's refusal order, so gold-cb stays the registry's LAST entry
+    // exactly as the S12-D3 record requires). DAILY gate: the one-time
+    // bootstrap seeds ~1 year (the free tier's ceiling — the s13 M1 §4a
+    // probe), the daily append lands yesterday's final bar (S13-D3 drops
+    // today's partial), and the trailing 3-day re-fetch lets a genuine
+    // revision win; the 10:10/20:10 sweeps heal a failed day within
+    // hours. Budget 4: the fetch + the idempotence read + the
+    // write-if-changed + headroom. The token rides the worker's
+    // EODHD_API_TOKEN secret (re-armed for this leg at the S13 deploy —
+    // the eth-usd retirement left the binding in place).
+    id: 'gold-xau',
+    rung: 4,
+    gate: dailyGate(),
+    budget: 4,
+    run: async (env: Bindings) =>
+      (await runGoldXauIngest(new KvGoldXauStore(env.RATES), { apiToken: env.EODHD_API_TOKEN ?? '' })).outcome,
+  },
+  {
     // GPE R14 / F2a Tier-1 (2026-11-18): the IMF central-bank gold tracker —
     // the IL + IRFCL SDMX dataflows (4 fetches, ~8 MB total monthly: the IL
     // wildcard query is 4.83 MB and the venue ignores startPeriod — the
-    // s12 M1 §5 record). Rides RUNG3 (rung4 sits at 45/50 on all-gates
-    // days) and sits LAST in the registry: the rung3 all-gates day is
+    // s12 M1 §5 record). Rides RUNG3 (rung4 sits at 49/50 on all-gates
+    // days after R18's gold-xau) and sits LAST in the registry: the rung3
+    // all-gates day is
     // 1 status + 4 (tic) + 18 (portwatch) + 22 (abs) + 8 = 53 > 50, and a
     // refusal must fall on THIS monthly source (it re-fires on its own
     // day-1..5 gate tomorrow — self-healing by design), never on a daily

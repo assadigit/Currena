@@ -89,8 +89,8 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ticReleaseAwareGate(new Date('2026-11-28T04:30:00Z'))).toBe(true); // Saturday again
   });
 
-  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, the M3.3 credit pair, the S4 PortWatch chokepoints, the S5 Australian macro family, and the GPE gold-cb tracker (S4-M4.3 registered portwatch; S5-M5.2 registered abs-au-macro; GPE R14 registered gold-cb, LAST in the registry — a budget refusal must fall on the monthly source)', () => {
-    expect(EXTRA_SOURCES).toHaveLength(7); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3) + portwatch (S4-M4.3) + abs-au-macro (S5-M5.2) + gold-cb (GPE R14)
+  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, the M3.3 credit pair, the S4 PortWatch chokepoints, the S5 Australian macro family, and the GPE gold-cb + gold-xau pair (S4-M4.3 registered portwatch; S5-M5.2 registered abs-au-macro; GPE R14 registered gold-cb LAST in the registry — a budget refusal must fall on the monthly source; GPE R18 registered gold-xau on rung4 — the S13-D1 venue record)', () => {
+    expect(EXTRA_SOURCES).toHaveLength(8); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3) + portwatch (S4-M4.3) + abs-au-macro (S5-M5.2) + gold-cb (GPE R14) + gold-xau (GPE R18)
     const tic = EXTRA_SOURCES.find((s) => s.id === 'tic-slt')!;
     expect(tic.rung).toBe(3);
     expect(tic.gate).toBe(ticReleaseAwareGate);
@@ -132,6 +132,18 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ofr.rung).toBe(4);
     expect(ofr.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
     expect(ofr.budget).toBe(10);
+    // GPE R18 (2026-11-18): the XAUUSD daily OHLC leg on rung4 — the
+    // S13-D1 venue record (the api worker's own EODHD_API_TOKEN secret,
+    // the free-tier ~1y bootstrap + the daily appends + the trailing
+    // revision-tolerant re-fetch; the partial-today guard drops same-day
+    // bars). DAILY gate (the sweeps heal a failed day within hours);
+    // budget 4 (the fetch + the idempotence read + the write-if-changed +
+    // headroom).
+    const goldXau = EXTRA_SOURCES.find((s) => s.id === 'gold-xau')!;
+    expect(goldXau.rung).toBe(4);
+    expect(goldXau.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
+    expect(goldXau.gate(new Date('2026-11-02T04:35:00Z'))).toBe(true); // every day
+    expect(goldXau.budget).toBe(4);
     // gap-closure S4-M4.3 (2026-11-01): the IMF PortWatch chokepoints on
     // RUNG3 (rung4 carries 45/50 on all-gates days — the session plan's
     // explicit routing; rung3 has its own 50 budget with only the TIC's
@@ -145,7 +157,8 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(portwatch.gate(new Date('2026-11-02T04:30:00Z'))).toBe(true); // every day
     expect(portwatch.budget).toBe(18);
     // The whole rung4 registry stays inside the 50-subrequest ceiling even
-    // on the day every gate fires (1 status + 24 + 10 + 10 = 45 ≤ 50).
+    // on the day every gate fires (1 status + 24 + 10 + 10 + 4 = 49 ≤ 50 —
+    // GPE R18's gold-xau fits with margin, the S13-D1 record).
     const total = EXTRA_SOURCES.filter((s) => s.rung === 4).reduce((sum, s) => sum + s.budget, 0) + 1;
     expect(total).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING);
     // GPE R14 (2026-11-18): the rung3 registry's DECLARED total now exceeds
@@ -184,7 +197,7 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
 
 describe('runExtraRung — rung4 now carries the S3 FRED source (S3-M3.2 registered fred-s3)', () => {
   it('a rung whose registry list is EMPTY still runs, writes its status record, and costs 1 subrequest (the S1-M1.7 proof, via the override)', async () => {
-    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(3); // fred-s3 + frb-ebp + ofr-fsi (S3-M3.3)
+    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(4); // fred-s3 + frb-ebp + ofr-fsi (S3-M3.3) + gold-xau (GPE R18)
     const kv = mockKv();
     const status = await runExtraRung(ENV, 4, { kv, now: new Date(at(4, 35)), sources: [] });
     expect(status.rows).toEqual([]);

@@ -31,6 +31,7 @@ import type { InsightsReader } from '@currena/insights/store';
 import { KvInsightsReader, KvMarketsReader, KvAuMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
 import { KvTicStore } from '@currena/insights/tic';
 import { KvGoldCbStore } from '@currena/insights/cb-demand';
+import { KvGoldXauStore } from '@currena/insights/xau-ohlc';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
@@ -49,12 +50,11 @@ export type Bindings = {
   /** Workers KV namespace (snapshot/status/lock keys — see adapters/kv-store.ts). */
   RATES: KVNamespace;
   /**
-   * 2026-10-21 data-integrity round: the owner's EODHD key — RETIRED from
-   * the insights ingest with the eth-usd card (2026-10-21c owner round:
-   * a second crypto price is not a market-stress indicator). The secret
-   * may still be set on the worker; nothing reads it here anymore. The
-   * currena-markets worker keeps its own EODHD_API_TOKEN for the
-   * world-markets board.
+   * The owner's EODHD key. First set for the eth-usd card (RETIRED with
+   * that card, 2026-10-21c owner round) — re-armed by GPE R18 (2026-11-18):
+   * the rung4 gold-xau source reads it for the XAUUSD.FOREX daily OHLC
+   * leg (the interactive chart + the TA band). The currena-markets worker
+   * keeps its own EODHD_API_TOKEN for the world-markets board.
    */
   EODHD_API_TOKEN?: string;
   /** Shared secret for POST /internal/refresh (wrangler secret / .dev.vars). */
@@ -164,6 +164,8 @@ export interface AppDeps {
   makeTicReader?: (env: Bindings) => import('@currena/insights/tic').TicReader;
   /** GPE R14: the CB tracker's store (route tests inject the fake). */
   makeGoldCbReader?: (env: Bindings) => import('@currena/insights/cb-demand').GoldCbReader;
+  /** GPE R18: the XAUUSD OHLC series' store (route tests inject the fake). */
+  makeGoldXauReader?: (env: Bindings) => import('@currena/insights/xau-ohlc').GoldXauReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
   /**
@@ -281,6 +283,15 @@ export function createApp(deps: AppDeps = {}) {
     return goldCbReader;
   };
 
+  // GPE R18 (2026-11-18): the XAUUSD daily OHLC series' serve path — the
+  // ONE key (KvGoldXauStore, the gold-cb twin — same lazy-singleton
+  // pattern).
+  let goldXauReader: import('@currena/insights/xau-ohlc').GoldXauReader | undefined;
+  const getGoldXauReader = (env: Bindings): import('@currena/insights/xau-ohlc').GoldXauReader => {
+    goldXauReader ??= deps.makeGoldXauReader ? deps.makeGoldXauReader(env) : new KvGoldXauStore(env.RATES);
+    return goldXauReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -323,6 +334,7 @@ export function createApp(deps: AppDeps = {}) {
       getFxReader,
       getTicReader,
       getGoldCbReader,
+      getGoldXauReader,
       getPricesReader,
       getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests

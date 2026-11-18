@@ -1,4 +1,4 @@
-import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHistory, IndicatorId, LivePriceEntry, LivePricesSnapshot } from '@currena/core';
+import type { IndicatorReading, InsightsSnapshot, InsightsStatus, IndicatorHistory, IndicatorId, LivePriceEntry, LivePricesSnapshot, GoldXauOhlcSnapshot } from '@currena/core';
 import { InMemoryInsightsStore } from '@currena/insights/store';
 import { InMemoryPricesStore } from '@currena/insights/prices';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -938,6 +938,89 @@ describe('GET /api/insights/tic', () => {
     expect(res.status).toBe(200);
     expect(res.headers.get('cache-control')).toBe('private, no-store');
     expect(await res.json()).toEqual(ticSnapshot);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * GPE R18 — GET /api/insights/gold-ohlc (the XAUUSD daily series; the
+ * gold-cb/tic twin: one KV read, ETag + public edge cache, the calm
+ * not-ready 503, the poisoned-key degradation, the literal path
+ * winning over /:id/history).
+ * ------------------------------------------------------------------ */
+
+/** A contract-valid XAUUSD OHLC snapshot (3 final bars). */
+const goldXauSnapshot: GoldXauOhlcSnapshot = {
+  v: 1,
+  asOf: '2026-11-17',
+  fetchedAt: '2026-11-18T04:35:00.000Z',
+  series: [
+    { date: '2025-11-18', open: 4012.09, high: 4081.09, low: 3999.63, close: 4081.01 },
+    { date: '2026-11-16', open: 3848.87, high: 3849.44, low: 3785.65, close: 3792.59 },
+    { date: '2026-11-17', open: 3848.87, high: 3849.44, low: 3785.65, close: 3792.59 },
+  ],
+  sourceUrl: 'https://eodhd.com/api/eod/XAUUSD.FOREX',
+};
+
+describe('GET /api/insights/gold-ohlc (GPE R18)', () => {
+  let stored: GoldXauOhlcSnapshot | undefined;
+
+  function makeApp(reader?: { getGoldXau(): Promise<GoldXauOhlcSnapshot | undefined> }) {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldXauReader: () => reader ?? {
+        getGoldXau: async () => stored,
+      },
+    });
+  }
+
+  beforeEach(() => {
+    stored = undefined;
+  });
+
+  it('serves the stored series verbatim with ETag + the public cache stamp (PUBLIC mode)', async () => {
+    stored = goldXauSnapshot;
+    const res = await makeApp().request('/api/insights/gold-ohlc', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('etag')).toBe('"insights-gold-ohlc:2026-11-17:3:2026-11-18T04:35:00.000Z"');
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('x-robots-tag')).toBe('noindex');
+    expect(await res.json()).toEqual(goldXauSnapshot);
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    stored = goldXauSnapshot;
+    const res = await makeApp().request(
+      '/api/insights/gold-ohlc',
+      { headers: { 'if-none-match': '"insights-gold-ohlc:2026-11-17:3:2026-11-18T04:35:00.000Z"' } },
+      env,
+    );
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 gold_ohlc_not_ready (calm) when KV is empty', async () => {
+    const res = await makeApp().request('/api/insights/gold-ohlc', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('gold_ohlc_not_ready');
+    expect(body.error.message).toContain('scheduled job has not completed');
+  });
+
+  it('a POISONED stored value degrades calmly to the not-ready 503 (the validation failure path)', async () => {
+    const app = createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldXauReader: () => ({ getGoldXau: async () => undefined }),
+    });
+    const res = await app.request('/api/insights/gold-ohlc', undefined, env);
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_ohlc_not_ready');
+  });
+
+  it('the LITERAL path wins over the parameterised /:id/history route (registered before it)', async () => {
+    stored = goldXauSnapshot;
+    const res = await makeApp().request('/api/insights/gold-ohlc', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as GoldXauOhlcSnapshot;
+    expect(body.v).toBe(1); // the one-key snapshot, never a per-id history shape
   });
 });
 
