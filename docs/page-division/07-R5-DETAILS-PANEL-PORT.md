@@ -179,22 +179,30 @@ the shared layer, minus the watchlist pin (R-7 stays an accepted loss).
    click-through matrix (desktop + mobile + fa/RTL), record
    (CHANGELOG + DECISIONS BD-S33 + HANDOFF + this doc's §6).
 
-## 6. Done criteria
+## 6. Done criteria — ALL MET (the execution record, 2026-11-18)
 
-- [ ] A card click on each of the eight pages opens the panel for that
-      indicator (verified live on `/usa`, `/commodities` at minimum;
-      the rest verified by the characterization suites).
-- [ ] The panel renders the five F5 sections, the Layer-1 block (for
-      ids that have Layer-1 copy), the 10-year chart, the facts line,
-      and the source footer — in BOTH locales.
-- [ ] Escape closes the panel and focus returns to the opener; body
-      scroll locks while open (the F5 discipline).
-- [ ] The Commodities «more details» button opens the panel (the
-      navigate stub is gone).
-- [ ] Absent-reading cards remain non-interactive (fail-closed).
-- [ ] `pnpm gates` 9/9 GREEN ×2; the suite delta is positive-only
-      (new tests, none deleted).
-- [ ] Deployed + live-verified; the records landed (CHANGELOG,
-      DECISIONS, HANDOFF).
-- [ ] Rollback: `npx wrangler rollback` from apps/api + `git revert`
-      (the port is display-layer; no engine, API, or data change).
+- [x] A card click on each of the eight pages opens the panel for that
+      indicator (verified live on `/usa`, `/commodities`, `/gold`,
+      `/world-markets`; the rest verified by the characterization suites +
+      the identical wiring pattern).
+- [x] The panel renders the five F5 sections, the Layer-1 block (for
+      ids that have Layer-1 copy — the inventory is complete, 193×2), the
+      10-year chart, the facts line, and the source footer — in BOTH
+      locales (live-verified en + fa/RTL; the Persian panel pinned by
+      test).
+- [x] Escape closes the panel and focus returns to the opener; body
+      scroll locks while open (the F5 discipline — live-verified +
+      pinned by test).
+- [x] The Commodities «more details» button opens the panel (the
+      navigate stub is gone — live-verified + pinned by test).
+- [x] Absent-reading cards remain non-interactive (fail-closed —
+      pinned by the UsaPage wiring test: the absent rstar-us card
+      carries no opener).
+- [x] `pnpm gates` 9/9 GREEN ×2 (2m 43s / 2m 46s); the suite delta is
+      positive-only (+19: 17 panel + 2 wiring tests; none deleted —
+      suite 15,165 → 15,184).
+- [x] Deployed + live-verified (currena-api `6ae72ba7` @ 100%; the
+      records landed — CHANGELOG + BD-S33 + the HANDOFF rewrite).
+- [x] Rollback verified available: `npx wrangler rollback` from apps/api
+      + `git revert f66efa44` (the port is display-layer; no engine, API,
+      or data change).
