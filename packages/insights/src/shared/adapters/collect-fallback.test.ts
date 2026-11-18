@@ -1,25 +1,29 @@
 /**
  * collect-fallback.test.ts — the 2026-10-22 reliability round's FALLBACK
- * wiring, as seen from the collect layer. Global fetch stubbed (rule 7):
- * FRED's bulk groups answer with the malformed body class the Worker venue
- * observed live (a 200 that is not the expected CSV — 'unexpected header'),
- * and the fallbacks (Treasury CSVs, EIA workbooks) answer locally. The
- * assertions pin the owner round's terms: the API stays PRIMARY (no
- * fallback fetch on a healthy run), fills happen ONLY on group failure,
- * attribution overrides name the actual source, and the stored-history
- * merge keeps the decade window.
+ * wiring + the GPE R07 Treasury-primary overlay, as seen from the collect
+ * layer. Global fetch stubbed (rule 7): FRED's bulk groups answer either
+ * the healthy shape or the malformed body class the Worker venue observed
+ * live (a 200 that is not the expected CSV — 'unexpected header'), and the
+ * Treasury CSVs + EIA workbooks answer locally. The assertions pin the
+ * terms: since R07 the Treasury curves fetch EVERY run (the yield family's
+ * PRIMARY — 2 subrequests), the overlay extends each yield slot STRICTLY
+ * PAST FRED's last date with honest attribution overrides, a material
+ * cross-check disagreement fails the Treasury tail closed to FRED's
+ * mirror, the EIA fallbacks still fire only on group failure, and the
+ * stored-history merge keeps the percentile base on FRED-failure days.
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { collectAllSources } from './collect';
 
-/** The live Treasury nominal header (treasury.test.ts pins the parse). */
+/** The live Treasury nominal header (treasury.test.ts pins the parse).
+ * GPE R07: "3 Mo" joins the required set (the T10Y3M leg). */
 const TREASURY_NOMINAL = [
-  'Date,"1 Mo","2 Mo","1 Yr","2 Yr","3 Yr","5 Yr","7 Yr","10 Yr","20 Yr","30 Yr"',
-  '10/21/2026,4.09,4.16,4.52,4.81,4.89,4.95,5.03,5.13,5.47,5.42',
-  '10/20/2026,4.09,4.15,4.51,4.81,4.89,4.95,5.03,5.12,5.47,5.41',
-  '10/19/2026,4.08,4.15,4.51,4.80,4.88,4.94,5.02,5.15,5.48,5.44',
-  '10/16/2026,4.06,4.13,4.50,4.79,4.87,4.93,5.01,5.11,5.46,5.43',
+  'Date,"1 Mo","2 Mo","3 Mo","1 Yr","2 Yr","3 Yr","5 Yr","7 Yr","10 Yr","20 Yr","30 Yr"',
+  '10/21/2026,4.09,4.16,4.25,4.52,4.81,4.89,4.95,5.03,5.13,5.47,5.42',
+  '10/20/2026,4.09,4.15,4.24,4.51,4.81,4.89,4.95,5.03,5.12,5.47,5.41',
+  '10/19/2026,4.08,4.15,4.24,4.51,4.80,4.88,4.94,5.02,5.15,5.48,5.44',
+  '10/16/2026,4.06,4.13,4.23,4.50,4.79,4.87,4.93,5.01,5.11,5.46,5.43',
 ].join('\n');
 
 const TREASURY_REAL = [
@@ -51,9 +55,12 @@ interface Stub {
  *    malformed-body class (NOT a CSV header, NOT an HTML bot-check page —
  *    exactly the live 'unexpected header' failure of 2026-10-22);
  *  - the healthy-path FRED stub answers a valid wide CSV per group;
+ *  - `fredSeriesValues`: per-series rows for the cross-check scenarios
+ *    (date,value pairs — a series present here answers with ITS rows so a
+ *    common date with the Treasury fixture exists);
  *  - Treasury + EIA URLs answer their real payload shapes.
  */
-function stubFetch(opts: { fredMalformed?: boolean } = {}): Stub {
+function stubFetch(opts: { fredMalformed?: boolean; fredSeriesValues?: Record<string, Array<[string, string]>> } = {}): Stub {
   const calls = new Map<string, number>();
   const original = globalThis.fetch;
   const impl = (async (input: RequestInfo | URL) => {
@@ -71,8 +78,18 @@ function stubFetch(opts: { fredMalformed?: boolean } = {}): Stub {
       const idParam = new URL(url).searchParams.get('id') ?? 'T10Y2Y';
       const ids = idParam.split(',').filter(Boolean);
       const header = ['observation_date', ...ids].join(',');
-      const row = ['2026-10-05', ...ids.map(() => '0.37')].join(',');
-      return new Response(`${header}\n${row}\n`, { status: 200, headers: { 'content-type': 'text/csv' } });
+      const rowsFor = (id: string): string[] => {
+        const custom = opts.fredSeriesValues?.[id];
+        if (custom !== undefined) return custom.map(([date, value]) => `${date},${value}`);
+        return ['2026-10-05,0.37'];
+      };
+      const rowCount = Math.max(...ids.map((id) => rowsFor(id).length));
+      // The date column rides the FIRST id's rows (the cross-check scenarios
+      // give every custom-answered id in a group the same dates).
+      const dateFor = (i: number): string => rowsFor(ids[0]!)[i]?.split(',')[0] ?? '';
+      const valueCells = (i: number) => ids.map((id) => rowsFor(id)[i]?.split(',')[1] ?? '').join(',');
+      const body = [header, ...Array.from({ length: rowCount }, (_, i) => `${dateFor(i)},${valueCells(i)}`)].join('\n');
+      return new Response(`${body}\n`, { status: 200, headers: { 'content-type': 'text/csv' } });
     }
     if (url.includes('home.treasury.gov')) {
       const isReal = url.includes('real_yield_curve');
@@ -126,19 +143,46 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('the 2026-10-22 reliability round: FRED fallback fills', () => {
-  it('a HEALTHY run never fetches the fallbacks (the API stays the primary)', async () => {
+describe('the 2026-10-22 reliability round + the GPE R07 Treasury-primary overlay', () => {
+  it('a HEALTHY run fetches the Treasury primary (2 CSVs) and overlays the fresher tail — never the EIA fallback', async () => {
     const s = stubFetch();
     try {
       const result = await collectAllSources({ bitstampCandles: 2 });
+      // R07: the Treasury curves fetch EVERY run now (nominal + real).
+      const treasuryCalls = [...s.calls.keys()].filter((u) => u.includes('treasury.gov'));
+      expect(treasuryCalls).toHaveLength(2);
+      // The EIA fallbacks still fire ONLY on group failure (unchanged).
       for (const [url] of s.calls) {
-        expect(url, 'no fallback fetch on a healthy run').not.toContain('treasury.gov');
-        expect(url).not.toContain('eia.gov');
+        expect(url, 'no EIA fallback fetch on a healthy run').not.toContain('eia.gov');
       }
       const fredRows = result.reports.filter((r) => r.source === 'fred');
       expect(fredRows.length).toBe(7); // the seven bulk groups (Session-3 D-4: the trio split adds DFII10's own cosd group)
       for (const row of fredRows) expect(row.ok, row.detail).toBe(true);
-      expect(Object.keys(result.readingSourceOverrides)).toHaveLength(0);
+      // The stub's FRED answers carry 2026-10-05 while the Treasury fixture
+      // runs to 2026-10-21 — strictly past → the overlay extends every yield
+      // slot and the honest attribution overrides fire (the fresher tail is
+      // Treasury's, so the reading lines name the actual venue).
+      const fred = result.inputs.fred;
+      expect(fred.DGS10!.at(-1)).toEqual({ date: '2026-10-21', value: 5.13 });
+      expect(fred.DGS10!.find((p) => p.date === '2026-10-05')!.value).toBe(0.37); // FRED's basis kept verbatim
+      expect(fred.DFII10!.at(-1)).toEqual({ date: '2026-10-21', value: 2.76 });
+      expect(fred.DFII5!.at(-1)).toEqual({ date: '2026-10-21', value: 2.55 });
+      expect(fred.DGS2!.at(-1)).toEqual({ date: '2026-10-21', value: 4.81 });
+      expect(fred.T10Y2Y!.at(-1)).toEqual({ date: '2026-10-21', value: 0.32 });
+      expect(fred.T10Y3M!.at(-1)).toEqual({ date: '2026-10-21', value: 0.88 }); // 5.13 − 4.25
+      expect(result.readingSourceOverrides.us10y?.name).toContain('U.S. Department of the Treasury');
+      expect(result.readingSourceOverrides.us30y).toBeDefined();
+      expect(result.readingSourceOverrides['us-2y']).toBeDefined();
+      expect(result.readingSourceOverrides['real-yield-10y']?.name).toContain('real yield curve');
+      expect(result.readingSourceOverrides['real-yield-5y']?.name).toContain('real yield curve');
+      expect(result.readingSourceOverrides['real-curve-10y5y']).toBeDefined();
+      expect(result.readingSourceOverrides['yield-curve-10y2y']?.name).toContain('10 Yr − 2 Yr');
+      expect(result.readingSourceOverrides['yield-curve-10y3m']?.name).toContain('10 Yr − 3 Mo');
+      // The healthy-run summary row (the swap is visible to ops daily).
+      const treasuryRows = result.reports.filter((r) => r.source === 'treasury');
+      expect(treasuryRows.length).toBe(2); // the fetch row + the overlay summary row
+      expect(treasuryRows[0]!.ok).toBe(true);
+      expect(treasuryRows[1]!.detail).toContain('R07');
     } finally {
       s.restore();
     }
@@ -204,10 +248,76 @@ describe('the 2026-10-22 reliability round: FRED fallback fills', () => {
       // ALSO failed here — no DFEDTARL/U, so no override for it.
       expect(result.readingSourceOverrides['fed-expectations']).toBeUndefined();
 
-      // The report carries the fallback's own row.
-      const treasuryRow = result.reports.find((r) => r.source === 'treasury');
-      expect(treasuryRow?.ok).toBe(true);
-      expect(treasuryRow?.detail).toContain('FRED fallback');
+      // The report carries the primary fetch row + the summary row.
+      const treasuryRows = result.reports.filter((r) => r.source === 'treasury');
+      expect(treasuryRows[0]!.ok).toBe(true);
+      expect(treasuryRows[0]!.detail).toContain('PRIMARY');
+      expect(treasuryRows[1]!.detail).toContain('R07');
+    } finally {
+      s.restore();
+    }
+  }, 30_000);
+
+  it('GPE R07 cross-check PASS on a common date — the overlay extends, both venues agree', async () => {
+    // FRED's group 1 answers the 10/19–10/20 rows the Treasury fixture
+    // also carries (5.15/5.12 — the exact same numbers); Treasury runs one
+    // day fresher (10/21). The common date (10/20) cross-checks clean and
+    // the fresher tail overlays.
+    const s = stubFetch({
+      fredSeriesValues: {
+        DGS10: [
+          ['2026-10-19', '5.15'],
+          ['2026-10-20', '5.12'],
+        ],
+        DGS30: [
+          ['2026-10-19', '5.44'],
+          ['2026-10-20', '5.41'],
+        ],
+      },
+    });
+    try {
+      const result = await collectAllSources({ bitstampCandles: 2 });
+      const fred = result.inputs.fred;
+      expect(fred.DGS10!.length).toBe(3); // 10/19 + 10/20 (FRED, verbatim) + 10/21 (Treasury tail)
+      expect(fred.DGS10!.at(-1)).toEqual({ date: '2026-10-21', value: 5.13 });
+      expect(fred.DGS10!.find((p) => p.date === '2026-10-20')!.value).toBe(5.12); // FRED's own point untouched
+      expect(result.readingSourceOverrides.us10y?.name).toContain('U.S. Department of the Treasury');
+      // No disagreement rows.
+      const badRows = result.reports.filter((r) => r.source === 'treasury' && r.ok === false);
+      expect(badRows).toHaveLength(0);
+    } finally {
+      s.restore();
+    }
+  }, 30_000);
+
+  it('GPE R07 cross-check DISAGREEMENT — the Treasury tail fails closed to FRED\'s mirror, loudly', async () => {
+    // FRED's group 1 answers 10/20 = 4.50 while the Treasury fixture carries
+    // 5.12 — far outside the ±0.011 band. The Treasury tail must NOT overlay
+    // DGS10 (FRED's mirror stands), no us10y override fires, and a loud
+    // report row records the disagreement.
+    const s = stubFetch({
+      fredSeriesValues: {
+        DGS10: [
+          ['2026-10-19', '4.55'],
+          ['2026-10-20', '4.50'],
+        ],
+        DGS30: [
+          ['2026-10-19', '5.44'],
+          ['2026-10-20', '5.41'],
+        ],
+      },
+    });
+    try {
+      const result = await collectAllSources({ bitstampCandles: 2 });
+      const fred = result.inputs.fred;
+      expect(fred.DGS10!.at(-1)).toEqual({ date: '2026-10-20', value: 4.5 }); // FRED's mirror stands
+      expect(result.readingSourceOverrides.us10y).toBeUndefined(); // no override — the number is FRED's
+      expect(result.readingSourceOverrides['us-japan-10y-gap']).toBeUndefined();
+      const disagreement = result.reports.find((r) => r.source === 'treasury' && r.ok === false);
+      expect(disagreement).toBeDefined();
+      expect(disagreement!.kind).toBe('format-changed');
+      expect(disagreement!.detail).toContain('DISAGREEMENT');
+      expect(disagreement!.detail).toContain('DGS10');
     } finally {
       s.restore();
     }

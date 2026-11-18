@@ -37,7 +37,7 @@ import { fetchFrankfurterSeries } from '../../domains/currencies/adapters/frankf
 import { FRED_BULK_GROUPS, FRED_BULK_ALL_IDS, fetchFredSeriesBulk, fredGroupFrom } from './fred';
 import { fetchGoldApiSpot } from './goldapi';
 import { fetchRbaCashRateDecisions, fetchRbaTableText, parseRbaSeriesFromText, type RbaTableKey } from '../../domains/australia/adapters/rba';
-import { fetchTreasuryCurves, treasuryT10y2y } from '../../domains/usa/adapters/treasury';
+import { fetchTreasuryCurves, treasuryT10y2y, treasuryT10y3m } from '../../domains/usa/adapters/treasury';
 import { fetchYahooQuote } from './yahoo';
 import { fetchBrentFrontMonthQuote } from '../prices/brent-front-month';
 import { fetchWorldBankMonthly } from './worldbank';
@@ -183,15 +183,6 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
    * parse while FRED itself served healthy bodies to other venues within
    * the hour. The fallbacks:
    *
-   *   the US yield family (DGS10/DGS30/DFII10/DGS2/T10Y2Y slots absent) →
-   *     the US Treasury's OWN daily par + real yield-curve CSVs — the same
-   *     numbers FRED republishes (DGS2/10/30 = "2/10/30 Yr", DFII10 ≈ the
-   *     real curve's "10 YR"), a day FRESHER in practice. T10Y2Y recomputes
-   *     as 10Y−2Y (FRED's own formula). Two subrequests (nominal + real;
-   *     the real curve only when the DFII10 slot is empty). Current-year
-   *     CSVs; the caller's stored-history merge keeps the 10-year
-   *     percentile base.
-   *
    *   the EIA energy spots (all three absent) → the U.S. Energy Information
    *     Administration's own daily-spot .xls workbooks — WTI, Henry Hub and
    *     Brent, each the FULL history from the primary source (public
@@ -202,6 +193,12 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
    * T10YIE, the BEA/BLS monthlies, the OECD family) hold their last good
    * values flagged stale — fail-closed honesty, and the intra-day sweep
    * rungs (apps/api insights-ingest-cron) re-attempt the primary.
+   *
+   * The US yield family's Treasury leg was PROMOTED out of this block by
+   * GPE R07 (2026-11-18, S11 — D10 locked): Treasury-direct is now the
+   * PRIMARY for the yield family (the block below), with FRED retained as
+   * the history basis + the fallback + the cross-check. The EIA block
+   * below keeps its original fallback-only terms.
    */
   const overrides: Partial<Record<IndicatorId, ReadingSourceOverride>> = {};
   const readStoredHistory = async (id: string): Promise<SeriesPoint[] | undefined> => {
@@ -213,82 +210,185 @@ export async function collectAllSources(opts: CollectOptions = {}): Promise<Coll
     }
   };
 
-  if (fred.DGS10 === undefined || fred.DFII10 === undefined || fred.T10Y2Y === undefined) {
-    // Content-based triggers (the trio split made ordinals fragile): the
-    // nominal pair's group failed (DGS10 absent), DFII10's own group failed
-    // (DFII10 absent), or the daily decade group failed (T10Y2Y absent).
-    const needReal = fred.DFII10 === undefined; // DFII10's own group failed
-    const treasury = await fetchLogged(
-      'treasury',
-      `daily yield curves (${needReal ? 'nominal + real' : 'nominal'}) — FRED fallback`,
-      () => fetchTreasuryCurves(needReal ? { real: true } : {}),
-    );
-    if (treasury !== undefined) {
-      const TREASURY_SRC: ReadingSourceOverride = {
-        name: 'U.S. Department of the Treasury (daily par yield curve)',
-        url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve',
-      };
-      // Fill ONLY the slots whose group failed — a successful group's data
-      // is the primary's and is never overridden.
-      const fillTreasury = async (
-        slot: 'DGS10' | 'DGS30' | 'DFII10' | 'DGS2',
-        fetched: SeriesPoint[] | undefined,
-        storedId: string | undefined,
-        override: IndicatorId,
-        source: ReadingSourceOverride,
-      ) => {
-        if (fetched === undefined || fred[slot] !== undefined) return;
+  /* ---------------- GPE R07 (S11, 2026-11-18): the Treasury-direct
+   * PRIMARY for the daily US yield family ----------------
+   *
+   * The freshness gap this closes (measured at this session's M1,
+   * 2026-11-18 ~12:2x UTC): Treasury's daily curve CSVs serve the
+   * same-day print (2026-11-17) while FRED's mirror answers 2026-11-16
+   * for the no-cosd/cosd groups that carry DGS10/DGS30/DFII10/DFII5 —
+   * the answer-lag the Gold S3 record documented 10-for-10 archived
+   * days. The values cross-check EXACTLY on the common date (the same
+   * numbers FRED republishes — Treasury is the primary publisher).
+   *
+   * The D10-locked posture — Treasury primary, FRED fallback/cross-check
+   * — is wired as:
+   *
+   *   (a) PRIMARY: the two Treasury CSVs (nominal + real) fetch EVERY
+   *       rung (+2 subrequests; the 04:10 budget moves ~43 → ~45 of 50).
+   *   (b) BASIS: FRED's bulk groups keep fetching verbatim — the
+   *       full-history/decade windows stay the percentile + highest-since
+   *       basis, bit-identical to the pre-R07 behavior on the FRED-covered
+   *       range (the overlay discipline below never touches a date FRED
+   *       already covers — the brent gap-fill's extend-strictly-past
+   *       pattern, so the stored histories never churn).
+   *   (c) OVERLAY: for each yield slot, Treasury's points extend the
+   *       series STRICTLY PAST FRED's last date. When Treasury is fresher
+   *       (the normal day), the reading's value + asOf are Treasury's and
+   *       the reading-level source override names the actual venue.
+   *   (d) CROSS-CHECK: when both venues carry a common date, the latest
+   *       common date's values must agree — direct levels within 0.011
+   *       (1bp + float), the computed curve spreads within 0.021 (the
+   *       2-decimal legs' rounding: Treasury 5.12−4.83 = 0.29 vs FRED's
+   *       0.30). A material disagreement fails the Treasury tail CLOSED
+   *       for that slot — FRED's verified mirror stands for the day and a
+   *       loud report row records the disagreement (never a silent pick).
+   *   (e) FALLBACK: when a FRED group failed (the slot absent) OR the
+   *       Treasury fetch failed, the surviving venue serves the slot —
+   *       the 2026-10-22 fallback behavior, preserved verbatim (the
+   *       stored-history merge keeps the percentile base on FRED-failure
+   *       days; a Treasury failure day is just the pre-R07 healthy day).
+   */
+  const treasury = await fetchLogged(
+    'treasury',
+    'daily yield curves (nominal + real) — PRIMARY for the US yield family (GPE R07)',
+    () => fetchTreasuryCurves({ real: true }),
+  );
+  if (treasury !== undefined) {
+    const TREASURY_SRC: ReadingSourceOverride = {
+      name: 'U.S. Department of the Treasury (daily par yield curve)',
+      url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve',
+    };
+    const TREASURY_REAL_SRC: ReadingSourceOverride = {
+      name: 'U.S. Department of the Treasury (daily real yield curve)',
+      url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_real_yield_curve',
+    };
+
+    /** The latest common date both series carry (the cross-check point). */
+    const latestCommonDate = (a: SeriesPoint[], b: SeriesPoint[]): string | undefined => {
+      const bDates = new Set(b.map((p) => p.date));
+      for (let i = a.length - 1; i >= 0; i -= 1) {
+        if (bDates.has(a[i]!.date)) return a[i]!.date;
+      }
+      return undefined;
+    };
+    const valueAt = (series: SeriesPoint[], date: string): number | undefined =>
+      series.find((p) => p.date === date)?.value;
+
+    /**
+     * One yield slot's R07 processing. `leg` is the Treasury series for
+     * the slot (fetched or computed from the legs); `tolerance` is the
+     * cross-check band in percentage points; `storedId` is the KV history
+     * key that keeps the percentile base when the FRED group failed (the
+     * 2026-10-22 fallback semantics); `readingOverrides` are applied when
+     * the Treasury leg contributed the slot's freshest point — the reading
+     * line names the venue the displayed number actually came from.
+     */
+    const overlayYieldSlot = async (
+      slot: 'DGS10' | 'DGS30' | 'DGS2' | 'DGS3MO' | 'DFII10' | 'DFII5' | 'T10Y2Y' | 'T10Y3M',
+      leg: SeriesPoint[] | undefined,
+      tolerance: number,
+      storedId: string | undefined,
+      readingOverrides: Readonly<Record<string, ReadingSourceOverride>>,
+    ): Promise<boolean> => {
+      if (leg === undefined || leg.length === 0) return false;
+      const fredSeries = fred[slot];
+      if (fredSeries === undefined || fredSeries.length === 0) {
+        // (e) FALLBACK: the FRED group failed — the Treasury leg stands
+        // alone, merged with the stored history so the percentile base
+        // survives (the 2026-10-22 fillTreasury semantics).
         const stored = storedId !== undefined ? await readStoredHistory(storedId) : undefined;
-        fred[slot] = stored !== undefined ? mergeSeries(stored, fetched) : fetched;
-        overrides[override] = source;
+        fred[slot] = stored !== undefined ? mergeSeries(stored, leg) : leg;
+        for (const [id, src] of Object.entries(readingOverrides)) overrides[id as IndicatorId] = src;
+        return true;
+      }
+      // (d) CROSS-CHECK on the latest common date.
+      const common = latestCommonDate(fredSeries, leg);
+      if (common !== undefined) {
+        const a = valueAt(fredSeries, common);
+        const b = valueAt(leg, common);
+        if (a !== undefined && b !== undefined && Math.abs(a - b) > tolerance) {
+          report(
+            'treasury',
+            false,
+            `cross-check DISAGREEMENT on ${slot} at ${common}: Treasury ${b} vs FRED ${a} (band ±${tolerance}) — the Treasury tail is dropped for this slot today; FRED's mirror stands (fail-closed)`,
+            'format-changed',
+          );
+          return false;
+        }
+      }
+      // (c) OVERLAY: extend STRICTLY past FRED's last date — FRED stays
+      // authoritative on every overlapping date (the brent gap-fill
+      // pattern), so the basis, percentiles and stored histories are
+      // untouched; only the fresher tail is Treasury's.
+      const cutoff = fredSeries[fredSeries.length - 1]!.date;
+      const fresh = leg.filter((p) => p.date > cutoff);
+      if (fresh.length === 0) return false; // FRED is at least as fresh — no override, no overlay
+      fred[slot] = mergeSeries(fredSeries, fresh);
+      for (const [id, src] of Object.entries(readingOverrides)) overrides[id as IndicatorId] = src;
+      return true;
+    };
+
+    const us10yExtended = await overlayYieldSlot('DGS10', treasury.dgs10, 0.011, 'us10y', {
+      us10y: TREASURY_SRC,
+      // The derived-gap legs — the honest mixed-legs attribution (the
+      // 2026-10-22 fallback's own pattern, now on the primary path).
+      'us-japan-10y-gap': {
+        name: 'U.S. Treasury (10 Yr) − Japan Ministry of Finance (jgbcme 10Y)',
+        url: TREASURY_SRC.url,
+      },
+      'au-us-10y-gap': { name: 'RBA F2 − U.S. Treasury (10 Yr)', url: 'https://www.rba.gov.au/statistics/tables/' },
+    });
+    const us30yExtended = await overlayYieldSlot('DGS30', treasury.dgs30, 0.011, 'us30y', { us30y: TREASURY_SRC });
+    // DGS2: no stored raw-2y history exists (fed-expectations' stored key
+    // is the DERIVED gap) — the storedId stays undefined on purpose. The
+    // fed-expectations override only applies when its FRED policy-rate
+    // legs answered (the derived reading cannot build without them — the
+    // 2026-10-22 guard, kept).
+    const dgs2Overrides: Record<string, ReadingSourceOverride> = { 'us-2y': TREASURY_SRC };
+    if (fred.DFEDTARL !== undefined && fred.DFEDTARU !== undefined) {
+      dgs2Overrides['fed-expectations'] = {
+        name: 'U.S. Treasury (2 Yr par yield) − FRED (DFEDTAR midpoint)',
+        url: TREASURY_SRC.url,
       };
-      await fillTreasury('DGS10', treasury.dgs10, 'us10y', 'us10y', TREASURY_SRC);
-      await fillTreasury('DGS30', treasury.dgs30, 'us30y', 'us30y', TREASURY_SRC);
-      await fillTreasury(
-        'DFII10',
-        treasury.real10y,
-        'real-yield-10y',
-        'real-yield-10y',
-        {
-          name: 'U.S. Department of the Treasury (daily real yield curve)',
-          url: 'https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_real_yield_curve',
-        },
-      );
-      // DGS2: no stored raw-2y history exists (fed-expectations' stored key
-      // is the DERIVED gap) — the current-year fill stands alone; the
-      // reading's percentile is not rendered for this card.
-      if (fred.DGS2 === undefined && treasury.dgs2.length > 0) {
-        fred.DGS2 = treasury.dgs2;
-        if (fred.DFEDTARL !== undefined && fred.DFEDTARU !== undefined) {
-          overrides['fed-expectations'] = {
-            name: 'U.S. Treasury (2 Yr par yield) − FRED (DFEDTAR midpoint)',
-            url: TREASURY_SRC.url,
-          };
-        }
-      }
-      // T10Y2Y: recompute from the Treasury legs (FRED's own formula),
-      // merged with the stored curve history so the 10y percentile base
-      // survives.
-      if (fred.T10Y2Y === undefined) {
-        const computed = treasuryT10y2y(treasury);
-        if (computed.length > 0) {
-          const stored = await readStoredHistory('yield-curve-10y2y');
-          fred.T10Y2Y = stored !== undefined ? mergeSeries(stored, computed) : computed;
-          overrides['yield-curve-10y2y'] = {
-            name: 'U.S. Department of the Treasury (10 Yr − 2 Yr par yields)',
-            url: TREASURY_SRC.url,
-          };
-        }
-      }
-      // The AU−US gap's US leg: honest mixed-legs attribution when the
-      // Treasury filled DGS10 and the RBA leg exists.
-      if (overrides.us10y !== undefined) {
-        overrides['au-us-10y-gap'] = {
-          name: 'RBA F2 − U.S. Treasury (10 Yr)',
-          url: 'https://www.rba.gov.au/statistics/tables/',
-        };
-      }
     }
+    const dgs2Extended = await overlayYieldSlot('DGS2', treasury.dgs2, 0.011, undefined, dgs2Overrides);
+    const dfii10Extended = await overlayYieldSlot('DFII10', treasury.real10y, 0.011, 'real-yield-10y', {
+      'real-yield-10y': TREASURY_REAL_SRC,
+    });
+    const dfii5Extended = await overlayYieldSlot('DFII5', treasury.real5y, 0.011, 'real-yield-5y', {
+      'real-yield-5y': TREASURY_REAL_SRC,
+    });
+    // The derived real curve (DFII10 − DFII5): the override names the
+    // Treasury real curve only when BOTH legs are Treasury-fed.
+    if (dfii10Extended && dfii5Extended) {
+      overrides['real-curve-10y5y'] = { ...TREASURY_REAL_SRC, name: 'U.S. Department of the Treasury (10 YR − 5 YR real yields)' };
+    }
+    // The curve spreads: recomputed from the Treasury legs at FRED's own
+    // formula (T10Y2Y = 10Y−2Y; T10Y3M = 10Y−3MO), with the wider 0.021
+    // band — the 2-decimal legs round ±1bp against FRED's own spread
+    // print (measured 2026-11-18: 5.12−4.83 = 0.29 vs FRED T10Y2Y 0.30).
+    // (The 3-month LEG itself needs no slot — FRED serves T10Y3M as its
+    // own series; only the computed spread rides the overlay.)
+    const t10y2yExtended = await overlayYieldSlot('T10Y2Y', treasuryT10y2y(treasury), 0.021, 'yield-curve-10y2y', {
+      'yield-curve-10y2y': {
+        name: 'U.S. Department of the Treasury (10 Yr − 2 Yr par yields)',
+        url: TREASURY_SRC.url,
+      },
+    });
+    const t10y3mExtended = await overlayYieldSlot('T10Y3M', treasuryT10y3m(treasury), 0.021, 'yield-curve-10y3m', {
+      'yield-curve-10y3m': {
+        name: 'U.S. Department of the Treasury (10 Yr − 3 Mo par yields)',
+        url: TREASURY_SRC.url,
+      },
+    });
+    // A healthy-run summary row (the /admin freshness table's own row —
+    // the swap is visible to ops every day, not only on failures).
+    report(
+      'treasury',
+      true,
+      `yield-family primary overlay: us10y${us10yExtended ? '+tail' : ''} · us30y${us30yExtended ? '+tail' : ''} · us-2y${dgs2Extended ? '+tail' : ''} · dfii10${dfii10Extended ? '+tail' : ''} · dfii5${dfii5Extended ? '+tail' : ''} · t10y2y${t10y2yExtended ? '+tail' : ''} · t10y3m${t10y3mExtended ? '+tail' : ''} — cross-checked against FRED on the common date (R07)`,
+    );
   }
 
   if (fred.DCOILBRENTEU === undefined && fred.DCOILWTICO === undefined && fred.DHHNGSP === undefined) {

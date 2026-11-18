@@ -162,7 +162,8 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     id: 'us-treasury',
     provider: 'treasury',
     label: 'U.S. Department of the Treasury (daily par + real yield curves)',
-    usedFor: 'FRED-fallback fills for DGS2/DGS10/DGS30/DFII10/T10Y2Y (the daily US yield family) — 2026-10-22 reliability round',
+    usedFor:
+      'PRIMARY for the daily US yield family (GPE R07, 2026-11-18 — D10 locked): DGS2/DGS3MO/DGS10/DGS30 + DFII10/DFII5 + the computed T10Y2Y/T10Y3M — Treasury-direct serves the same-day print while FRED\'s mirror lags (measured 2026-11-18: Treasury 11-17 vs FRED 11-16); FRED stays the history basis + the fallback + the cross-check leg (collect.ts overlays Treasury strictly past FRED\'s last date)',
     method: 'M2',
     runtime: 'worker',
     level: 'L0',
@@ -170,12 +171,12 @@ export const SOURCE_RISK_REGISTER: Record<string, SourceRiskEntry> = {
     override: false,
     enabled: true,
     termsLines:
-      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The daily yield-curve CSVs are the PRIMARY source of the series FRED republishes (DGS*/DFII10); values cross-checked 2026-10-22 (Treasury 10/21 5.13 vs FRED 10/20 5.12 — same par-yield basis).',
+      'US federal government works carry no copyright (17 U.S.C. § 105) — public domain. The daily yield-curve CSVs are the PRIMARY source of the series FRED republishes (DGS*/DFII*); values cross-checked 2026-10-22 (Treasury 10/21 5.13 vs FRED 10/20 5.12 — same par-yield basis) and 2026-11-18 (Treasury 11/16 5.12/5.46/4.83/2.92/2.68 == FRED exactly).',
     termsReadOn: '2026-10-22',
     attribution: 'Source: U.S. Department of the Treasury',
     termsUrl: 'https://home.treasury.gov/',
     notes:
-      'FALLBACK-ONLY (owner round terms): fetched only when a FRED bulk group failed; FRED stays the primary. Venue-verified 2026-10-22 from Cloudflare egress: HTTP 200, 18–21 s latency (45 s timeout).',
+      'PRIMARY since GPE R07 (was FALLBACK-ONLY, the 2026-10-22 reliability round): fetched every rung (2 subrequests — nominal + real current-year CSVs, ~45 s timeout; the 04:10 budget ~43 → ~45 of 50). The cross-check band: 0.011 direct levels / 0.021 computed spreads; a material disagreement fails the Treasury tail closed to FRED\'s mirror for the day (a loud report row, never a silent pick). Venue-verified 2026-10-22 + 2026-11-18 from Cloudflare egress: HTTP 200, 18–21 s latency.',
   },
   'us-tic': {
     id: 'us-tic',

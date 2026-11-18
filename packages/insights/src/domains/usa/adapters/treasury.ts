@@ -1,26 +1,29 @@
 /**
- * Treasury.gov adapter — the 2026-10-22 reliability round's FRED fallback
- * for the daily US yield family. FRED's fredgraph.csv edge intermittently
- * serves malformed bodies from the Cloudflare egress (venue-verified
- * 2026-10-22: all five bulk groups failed an 'unexpected header' parse
- * while FRED itself was healthy from other venues) — when that happens,
- * the US Treasury's OWN daily yield-curve CSV answers with the same par
- * yields FRED republishes (DGS2/DGS10/DGS30 = Treasury "2 Yr"/"10 Yr"/
- * "30 Yr"; DFII10 ≈ the daily REAL curve's "10 YR"), one day FRESHER in
- * practice (venue-probe 2026-10-22: Treasury carried 10/21 while FRED's
- * DGS10 ended 10/20).
+ * Treasury.gov adapter — the GPE R07 PRIMARY for the daily US yield
+ * family (2026-11-18, S11; supersedes the 2026-10-22 FALLBACK-ONLY
+ * posture, which this adapter was born as). Treasury's own daily
+ * yield-curve CSVs serve the same-day print while FRED's mirror lags
+ * (measured at S11's M1: Treasury 2026-11-17 vs FRED 2026-11-16 on
+ * DGS10/DGS30/DFII10/DFII5 — the no-cosd/cosd answer-lag the Gold S3
+ * record documented 10-for-10); the values cross-check EXACTLY on the
+ * common date (5.12/5.46/4.83/2.92/2.68 — the same numbers FRED
+ * republishes). D10 locked: Treasury primary, FRED fallback/cross-check
+ * — collect.ts wires the overlay, the cross-check and the fallback.
  *
- * FALLBACK-ONLY (owner round terms): FRED stays the PRIMARY; these fetches
- * run only when a FRED bulk group failed — collect.ts wires the trigger.
+ * The tenor columns: DGS2/DGS3MO/DGS10/DGS30 = Treasury "2 Yr"/"3 Mo"/
+ * "10 Yr"/"30 Yr"; DFII10/DFII5 = the daily REAL curve's "10 YR"/"5 YR".
+ * The curve spreads T10Y2Y/T10Y3M recompute from the legs at FRED's
+ * own 2-decimal formula (FRED's T10Y2Y is exactly DGS10 − DGS2).
  *
  * Licence: works of the US federal government — public domain
  * (17 U.S.C. § 105); attribution "U.S. Department of the Treasury".
  *
- * Venue facts (2026-10-22 probe): the endpoint answers in 18–21 s from
- * Cloudflare egress (well over the fetch-policy default timeout) — a 45 s
- * timeout like the RBA tables. Only the CURRENT year's CSV is fetched per
- * curve type (a ~16 KB document); the decade percentile window survives
- * via the caller's merge with the stored KV history (collect.ts).
+ * Venue facts (probed 2026-10-22 + 2026-11-18): the endpoint answers in
+ * 18–21 s from Cloudflare egress (well over the fetch-policy default
+ * timeout) — a 45 s timeout like the RBA tables. Only the CURRENT
+ * year's CSV is fetched per curve type (a ~18 KB document); the decade
+ * percentile window survives via the caller's merge with the stored KV
+ * history + FRED's own bulk-group basis (collect.ts).
  * An /all-years variant does not exist (403/404 — probed).
  */
 
@@ -39,9 +42,11 @@ export const TREASURY_CURVE_REAL = 'daily_treasury_real_yield_curve';
 /** Treasury answers take ~20 s from the Worker venue — the RBA-style window. */
 export const TREASURY_TIMEOUT_MS = 45_000;
 
-/** The tenor columns this adapter reads (case-insensitive identity by NAME). */
-const NOMINAL_COLUMNS = { dgs2: '2 Yr', dgs10: '10 Yr', dgs30: '30 Yr' } as const;
-const REAL_COLUMNS = { dfii10: '10 YR' } as const;
+/** The tenor columns this adapter reads (case-insensitive identity by NAME).
+ * GPE R07: "3 Mo" joins the nominal set (the T10Y3M leg) and "5 YR"
+ * joins the real set (DFII5 — the belly beside the long end). */
+const NOMINAL_COLUMNS = { dgs2: '2 Yr', dgs3mo: '3 Mo', dgs10: '10 Yr', dgs30: '30 Yr' } as const;
+const REAL_COLUMNS = { dfii10: '10 YR', dfii5: '5 YR' } as const;
 
 /** URL of one curve type's current-year CSV (descending rows, MM/DD/YYYY). */
 export function treasuryCurveUrl(curve: string, year: number): string {
@@ -107,16 +112,22 @@ export function parseTreasuryCurveCsv(
 export interface TreasuryCurves {
   /** Nominal 2-year par yield (FRED DGS2's own source). */
   dgs2: SeriesPoint[];
+  /** Nominal 3-month par yield (FRED DGS3MO's own source; the T10Y3M leg). */
+  dgs3mo: SeriesPoint[];
   /** Nominal 10-year par yield (FRED DGS10's own source). */
   dgs10: SeriesPoint[];
   /** Nominal 30-year par yield (FRED DGS30's own source). */
   dgs30: SeriesPoint[];
+  /** Real 5-year yield (≈ FRED DFII5); present only when `real` requested. */
+  real5y?: SeriesPoint[];
   /** Real 10-year yield (≈ FRED DFII10); present only when `real` requested. */
   real10y?: SeriesPoint[];
 }
 
 export interface TreasuryFetchOptions extends FetchDeps {
-  /** Fetch the real curve too (only needed when the DFII10 group failed). */
+  /** Fetch the real curve too (the R07 primary path always requests it —
+   * DFII10/DFII5 are primary-fed legs; the option stays for the callers
+   * that only need the nominal curve). */
   real?: boolean;
   /** Clock for the current-year URL (tests). */
   now?: Date;
@@ -134,12 +145,14 @@ export async function fetchTreasuryCurves(opts: TreasuryFetchOptions = {}): Prom
   const nominal = parseTreasuryCurveCsv(await nominalRes.text(), NOMINAL_COLUMNS);
   const out: TreasuryCurves = {
     dgs2: nominal.dgs2!,
+    dgs3mo: nominal.dgs3mo!,
     dgs10: nominal.dgs10!,
     dgs30: nominal.dgs30!,
   };
   if (real === true) {
     const realRes = await insightsFetch(treasuryCurveUrl(TREASURY_CURVE_REAL, year), {}, { ...deps, timeoutMs: deps.timeoutMs ?? TREASURY_TIMEOUT_MS });
     const parsed = parseTreasuryCurveCsv(await realRes.text(), REAL_COLUMNS);
+    out.real5y = parsed.dfii5!;
     out.real10y = parsed.dfii10!;
   }
   return out;
@@ -147,13 +160,29 @@ export async function fetchTreasuryCurves(opts: TreasuryFetchOptions = {}): Prom
 
 /**
  * T10Y2Y from Treasury legs: FRED's T10Y2Y is exactly DGS10 − DGS2, so the
- * fallback recomputes it at FRED's 2-decimal presentation. Points exist only
+ * spread recomputes at FRED's 2-decimal presentation. Points exist only
  * where BOTH legs are quoted that day.
  */
 export function treasuryT10y2y(curves: TreasuryCurves): SeriesPoint[] {
   const tenByDate = new Map(curves.dgs10.map((p) => [p.date, p.value]));
   const out: SeriesPoint[] = [];
   for (const p of curves.dgs2) {
+    const ten = tenByDate.get(p.date);
+    if (ten === undefined) continue;
+    out.push({ date: p.date, value: Math.round((ten - p.value) * 100) / 100 });
+  }
+  return out;
+}
+
+/**
+ * GPE R07: T10Y3M from Treasury legs — FRED's T10Y3M is exactly DGS10 −
+ * DGS3MO at the same 2-decimal presentation (the treasuryT10y2y formula
+ * on the 3-month leg). Points exist only where BOTH legs are quoted.
+ */
+export function treasuryT10y3m(curves: TreasuryCurves): SeriesPoint[] {
+  const tenByDate = new Map(curves.dgs10.map((p) => [p.date, p.value]));
+  const out: SeriesPoint[] = [];
+  for (const p of curves.dgs3mo) {
     const ten = tenByDate.get(p.date);
     if (ten === undefined) continue;
     out.push({ date: p.date, value: Math.round((ten - p.value) * 100) / 100 });

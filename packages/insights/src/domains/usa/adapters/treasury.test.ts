@@ -1,6 +1,7 @@
 /**
- * treasury.test.ts — the 2026-10-22 reliability round's FRED-fallback
- * adapter (pure parses + URL shape; no network — AGENTS.md rule 7).
+ * treasury.test.ts — the GPE R07 Treasury-primary adapter (pure parses +
+ * URL shape + the curve-spread math; no network — AGENTS.md rule 7). Born
+ * in the 2026-10-22 reliability round as the FRED-fallback adapter.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -10,6 +11,7 @@ import {
   parseTreasuryCurveCsv,
   treasuryCurveUrl,
   treasuryT10y2y,
+  treasuryT10y3m,
   type TreasuryCurves,
 } from './treasury';
 import { FormatChangedError } from '../../../shared/adapters/fetch-policy';
@@ -40,19 +42,21 @@ describe('treasuryCurveUrl', () => {
 
 describe('parseTreasuryCurveCsv', () => {
   it('reads the named tenors out of the live nominal header, newest-first input → ascending output', () => {
-    const parsed = parseTreasuryCurveCsv(NOMINAL_CSV, { dgs2: '2 Yr', dgs10: '10 Yr', dgs30: '30 Yr' });
+    const parsed = parseTreasuryCurveCsv(NOMINAL_CSV, { dgs2: '2 Yr', dgs3mo: '3 Mo', dgs10: '10 Yr', dgs30: '30 Yr' });
     expect(parsed.dgs10).toEqual([
       { date: '2026-10-19', value: 5.15 },
       { date: '2026-10-20', value: 5.12 },
       { date: '2026-10-21', value: 5.13 },
     ]);
     expect(parsed.dgs2!.at(-1)).toEqual({ date: '2026-10-21', value: 4.81 });
+    expect(parsed.dgs3mo!.at(-1)).toEqual({ date: '2026-10-21', value: 4.25 });
     expect(parsed.dgs30!.at(-1)).toEqual({ date: '2026-10-21', value: 5.42 });
   });
 
   it('reads the real curve (10 YR — the DFII10 basis, cross-checked live: 2.76 on 2026-10-21)', () => {
-    const parsed = parseTreasuryCurveCsv(REAL_CSV, { dfii10: '10 YR' });
+    const parsed = parseTreasuryCurveCsv(REAL_CSV, { dfii10: '10 YR', dfii5: '5 YR' });
     expect(parsed.dfii10!.at(-1)).toEqual({ date: '2026-10-21', value: 2.76 });
+    expect(parsed.dfii5!.at(-1)).toEqual({ date: '2026-10-21', value: 2.55 });
   });
 
   it('tolerates the 2016 column set (no "1.5 Month"/"4 Mo" — identity is by NAME)', () => {
@@ -60,8 +64,9 @@ describe('parseTreasuryCurveCsv', () => {
       'Date,"1 Mo","3 Mo","6 Mo","1 Yr","2 Yr","3 Yr","5 Yr","7 Yr","10 Yr","20 Yr","30 Yr"',
       '12/30/2016,0.44,0.51,0.62,0.83,1.20,1.47,1.93,2.25,2.49,3.05,3.06',
     ].join('\n');
-    const parsed = parseTreasuryCurveCsv(csv2016, { dgs2: '2 Yr', dgs10: '10 Yr', dgs30: '30 Yr' });
+    const parsed = parseTreasuryCurveCsv(csv2016, { dgs2: '2 Yr', dgs3mo: '3 Mo', dgs10: '10 Yr', dgs30: '30 Yr' });
     expect(parsed.dgs10).toEqual([{ date: '2016-12-30', value: 2.49 }]);
+    expect(parsed.dgs3mo).toEqual([{ date: '2016-12-30', value: 0.51 }]);
   });
 
   it('skips rows where a tenor is blank (missing quotes that day)', () => {
@@ -97,6 +102,7 @@ describe('treasuryT10y2y', () => {
         { date: '2026-10-20', value: 4.81 },
         { date: '2026-10-21', value: 4.81 },
       ],
+      dgs3mo: [],
       dgs10: [
         { date: '2026-10-20', value: 5.13 },
         { date: '2026-10-21', value: 5.13 },
@@ -113,6 +119,7 @@ describe('treasuryT10y2y', () => {
   it('drops days where only one leg is quoted', () => {
     const curves: TreasuryCurves = {
       dgs2: [{ date: '2026-10-21', value: 4.81 }],
+      dgs3mo: [],
       dgs10: [
         { date: '2026-10-20', value: 5.13 },
         { date: '2026-10-21', value: 5.13 },
@@ -120,5 +127,36 @@ describe('treasuryT10y2y', () => {
       dgs30: [],
     };
     expect(treasuryT10y2y(curves)).toEqual([{ date: '2026-10-21', value: 0.32 }]);
+  });
+});
+
+describe('treasuryT10y3m (GPE R07)', () => {
+  it('recomputes T10Y3M as 10Y − 3MO at the same 2-dp presentation (live 2026-11-16: 5.12 − 4.34 = 0.78)', () => {
+    const curves: TreasuryCurves = {
+      dgs2: [],
+      dgs3mo: [
+        { date: '2026-11-16', value: 4.34 },
+        { date: '2026-11-17', value: 4.33 },
+      ],
+      dgs10: [
+        { date: '2026-11-16', value: 5.12 },
+        { date: '2026-11-17', value: 5.1 },
+      ],
+      dgs30: [],
+    };
+    expect(treasuryT10y3m(curves)).toEqual([
+      { date: '2026-11-16', value: 0.78 },
+      { date: '2026-11-17', value: 0.77 },
+    ]);
+  });
+
+  it('drops days where only one leg is quoted', () => {
+    const curves: TreasuryCurves = {
+      dgs2: [],
+      dgs3mo: [{ date: '2026-11-17', value: 4.33 }],
+      dgs10: [{ date: '2026-11-16', value: 5.12 }],
+      dgs30: [],
+    };
+    expect(treasuryT10y3m(curves)).toEqual([]);
   });
 });
