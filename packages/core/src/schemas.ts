@@ -129,6 +129,7 @@ export const GoldIdSchema = z.enum([
   'coin-half', // نیم سکه — ajax `nim`
   'coin-quarter', // ربع سکه — ajax `rob`
   'coin-gram', // سکه گرمی — ajax `gerami`
+  'gold-mesghal', // مثقال — ajax `mesghal` (GPE R13, 2026-11-18): the melt-gold weight unit the bridge board renders; NOT on the LED board (one data plane, two presentations — s6/03 rule 4)
 ]);
 export type GoldId = z.infer<typeof GoldIdSchema>;
 
@@ -161,6 +162,18 @@ export const GoldQuoteSchema = z.object({
    * shows a dash, never a guess.
    */
   changePct: z.number().finite().optional(),
+  /**
+   * TGJU's OWN timestamp for this quote (ajax `ts`), normalized: a full
+   * "YYYY-MM-DD HH:MM:SS" print (Tehran local, UTC+03:30 — no DST since
+   * 2022) becomes an ISO 8601 datetime with the offset; a date-only
+   * "YYYY-MM-DD" print (TGJU's closed-market day stamp, e.g. «۲۶ شهریور»)
+   * stays a plain ISO date. GPE R13 (2026-11-18): the bridge board's
+   * per-row as-of stamps read it (C2 rule 3 — the Tehran market day per
+   * row, Jalali in fa); optional because legacy snapshots and the
+   * profile-page fallback path carry no per-symbol timestamp (the
+   * renderer falls back to the snapshot's own fetchedAt).
+   */
+  marketAt: z.string().optional(),
 });
 export type GoldQuote = z.infer<typeof GoldQuoteSchema>;
 
@@ -2242,6 +2255,91 @@ export const TicSnapshotSchema = z
     { message: 'holder months must be strictly ascending' },
   );
 export type TicSnapshot = z.infer<typeof TicSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * Central-bank gold demand (GPE R14 / F2a Tier-1, 2026-11-18) — the
+ * IMF IL/IRFCL tracker's one-key snapshot, the TIC twin. Served at
+ * GET /api/insights/gold-cb from `insights:gold-cb:v1`; display-only
+ * (no meter membership — the s6/01 §2b governance record).
+ * ------------------------------------------------------------------ */
+
+/** A "YYYY-MM" data month. */
+const CbYmSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'YYYY-MM');
+
+/** One top buyer (sorted by the trailing-12-month sum, descending). */
+export const GoldCbBuyerSchema = z.object({
+  /** The IMF reporter code (ISO-3-like, e.g. 'POL'). */
+  code: z.string().min(2).max(3),
+  /** The country's latest month with a matched-pair change, YYYY-MM. */
+  latestMonth: CbYmSchema,
+  /** The latest month's net change, tonnes (signed). */
+  latestDelta: z.number().finite(),
+  /** The trailing-12-month net sum, tonnes (signed). */
+  sum12m: z.number().finite(),
+  /** Current reported holdings, tonnes. */
+  tonnes: z.number().finite().nonnegative(),
+  /** The holdings observation's own month, YYYY-MM. */
+  holdingsMonth: CbYmSchema,
+  /** Reported gold value, USD (some reporters value at book — the share
+   *  computation re-values at market; absent when IRFCL carries none). */
+  goldUsd: z.number().finite().nonnegative().optional(),
+  /** Reported total official reserve assets, USD (absent when unknown). */
+  totalUsd: z.number().finite().positive().optional(),
+  /** The value observation's own period, "YYYY-Qn" or "YYYY-MM" (the
+   *  venue prints both shapes — absent when unknown). */
+  valuePeriod: z.string().regex(/^\d{4}-(Q[1-4]|0[1-9]|1[0-2])$/).optional(),
+});
+export type GoldCbBuyer = z.infer<typeof GoldCbBuyerSchema>;
+
+/** One point of the rolling-12-month reported-world net-purchases series. */
+export const GoldCbPointSchema = z.object({
+  month: CbYmSchema,
+  /** The rolling sum, tonnes (signed — the selling era prints negative). */
+  tonnes: z.number().finite(),
+});
+export type GoldCbPoint = z.infer<typeof GoldCbPointSchema>;
+
+/** The value of `insights:gold-cb:v1`, verbatim over the wire. */
+export const GoldCbSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The latest month any matched-pair change exists (the data month). */
+    asOf: CbYmSchema,
+    /** When the rung wrote this snapshot (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The rolling-12-month reported-world series, monthly, ascending —
+     *  the sum of every reporter's month-over-month change (matched pairs
+     *  only: a country counts in a month only when both it and the prior
+     *  month are reported; aggregates, the BIS banking book and
+     *  scale-broken rows excluded — the honest reported world, never
+     *  claimed as the whole world). */
+    series: z.array(GoldCbPointSchema).min(24),
+    /** The top buyers by the trailing-12-month sum (at most 10). */
+    buyers: z.array(GoldCbBuyerSchema).min(1).max(10),
+    /** The reported-world stock: the sum of every reporter's latest
+     *  holdings within the trailing 3 months (a stock, not a flow). */
+    reportedWorld: z.object({
+      tonnes: z.number().finite().nonnegative(),
+      reporters: z.number().int().nonnegative(),
+      month: CbYmSchema,
+    }),
+    /** The two dataflow URLs (the About panel / method block). */
+    sourceUrls: z.array(z.string().url()).min(2),
+  })
+  .refine((s) => new Set(s.buyers.map((b) => b.code)).size === s.buyers.length, {
+    message: 'cb buyers must contain each code at most once',
+  })
+  .refine(
+    (s) => {
+      const months = s.series.map((p) => p.month);
+      return months.every((m, i) => i === 0 || m > months[i - 1]!);
+    },
+    { message: 'cb series months must be strictly ascending' },
+  )
+  .refine((s) => s.series.every((p) => p.month <= s.asOf), {
+    message: 'cb series cannot extend past the data month',
+  });
+export type GoldCbSnapshot = z.infer<typeof GoldCbSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)

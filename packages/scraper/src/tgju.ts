@@ -65,6 +65,13 @@ const TGJU_GOLD_SYMBOLS: readonly { id: GoldId; slug: string; unit: GoldUnit }[]
   { id: 'coin-half', slug: 'nim', unit: 'TOMAN' }, // نیم سکه
   { id: 'coin-quarter', slug: 'rob', unit: 'TOMAN' }, // ربع سکه
   { id: 'coin-gram', slug: 'gerami', unit: 'TOMAN' }, // سکه گرمی
+  // GPE R13 (2026-11-18): مثقال — the melt-gold weight unit the /gold
+  // bridge board renders (s6/01 §2a's locked board: the coin family +
+  // geram18/24 + mesghal). Verified live 2026-11-18 (p 1,059,540,000
+  // Rial, the آبشده arithmetic reconciling at 3.248 g-equivalent).
+  // The LED board's own 9-row display list does NOT include it — one
+  // shared snapshot plane, two presentations (s6/03 rule 4).
+  { id: 'gold-mesghal', slug: 'mesghal', unit: 'TOMAN' }, // مثقال
 ]);
 
 export function tgjuProfilePageUrl(slug: string): string {
@@ -161,6 +168,15 @@ function tomanDayStats(
  * Per-symbol gold view of the ajax payload. Parsed SEPARATELY from the FX
  * record schema (which zod-strips d/dp anyway): a gold oddity must never
  * shape (or break) the currency ladder's payload validation.
+ *
+ * GPE R13 (2026-11-18): `ts` — TGJU's OWN per-symbol timestamp — joins the
+ * parse as the optional `marketAt` (the bridge board's per-row as-of
+ * stamps, C2 rule 3). Two observed print shapes, both live-verified
+ * 2026-11-18: "YYYY-MM-DD HH:MM:SS" (Tehran local — the open-market rows)
+ * and "YYYY-MM-DD" (the closed-market day stamp). Normalized here so the
+ * stored snapshot carries ISO only; absent/odd prints degrade to NO
+ * marketAt (the renderer falls back to the snapshot's fetchedAt — a
+ * missing stamp is never a guessed one).
  */
 const TgjuGoldEntrySchema = z.object({
   p: z.string(),
@@ -168,7 +184,24 @@ const TgjuGoldEntrySchema = z.object({
   l: z.string().optional(),
   /** Change percent vs previous close, NUMBER in the payload (0.05 = +0.05%). */
   dp: z.number().optional(),
+  /** TGJU's own quote timestamp ("2026-11-18 20:25:27" Tehran, or date-only). */
+  ts: z.string().optional(),
 });
+
+/** Tehran's fixed offset (UTC+03:30 — no DST since 2022). */
+const TEHRAN_OFFSET = '+03:30';
+
+/** Normalize a TGJU `ts` print into ISO: "YYYY-MM-DD HH:MM:SS" →
+ * "YYYY-MM-DDTHH:MM:SS+03:30"; "YYYY-MM-DD" stays a plain ISO date;
+ * anything else → undefined (fail-closed, never a guess). */
+export function normalizeTgjuMarketAt(raw: string | undefined): string | undefined {
+  if (raw === undefined) return undefined;
+  const trimmed = raw.trim();
+  const full = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/.exec(trimmed);
+  if (full !== null) return `${full[1]}T${full[2]}${TEHRAN_OFFSET}`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+  return undefined;
+}
 
 /** Day-stat pair parsed in TGJU's PRINT unit (Rial for the Tehran items —
  *  the Rial→Toman conversion is applied by the caller together with the
@@ -220,6 +253,9 @@ export function parseTgjuGold(payload: unknown): GoldQuote[] {
       // stay integers (a stray sub-10 Rial value divides honestly).
       const scale = unit === 'TOMAN' ? rialToToman : (n: number) => n;
       const stats = goldDayStats(parsed.data, id);
+      // GPE R13: TGJU's own per-symbol timestamp, ISO-normalized (absent
+      // on odd prints — the renderer falls back, never guesses).
+      const marketAt = normalizeTgjuMarketAt(parsed.data.ts);
       quotes.push({
         id,
         unit,
@@ -227,6 +263,7 @@ export function parseTgjuGold(payload: unknown): GoldQuote[] {
         ...(stats.dayHigh !== undefined ? { dayHigh: scale(stats.dayHigh) } : {}),
         ...(stats.dayLow !== undefined ? { dayLow: scale(stats.dayLow) } : {}),
         ...(parsed.data.dp !== undefined && Number.isFinite(parsed.data.dp) ? { changePct: parsed.data.dp } : {}),
+        ...(marketAt !== undefined ? { marketAt } : {}),
       });
     } catch (err) {
       console.warn(`[tgju] gold symbol '${slug}' (${id}) price failed to parse — item shows dashes: ${err instanceof Error ? err.message : String(err)}`);

@@ -59,6 +59,7 @@ import type { AuMarketsReader } from '@currena/insights/markets-au';
 import { reStaleFxSnapshot } from '@currena/insights/fx';
 import type { FxReader } from '@currena/insights/fx';
 import type { TicReader } from '@currena/insights/tic';
+import type { GoldCbReader } from '@currena/insights/cb-demand';
 import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
@@ -127,6 +128,8 @@ interface InsightsRouteDeps {
   getFxReader: (env: Bindings) => FxReader;
   /** TIC store construction (route tests inject the in-memory fake). */
   getTicReader: (env: Bindings) => TicReader;
+  /** GPE R14: the central-bank gold tracker's store (the tic twin). */
+  getGoldCbReader: (env: Bindings) => GoldCbReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
   /**
@@ -624,6 +627,66 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
     if (typeof caches !== 'undefined') {
       // Best-effort warm of the Worker's edge cache; the response is
       // already on its way to the client.
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // GPE R14 / F2a Tier-1 (2026-11-18): the central-bank gold tracker — the
+  // ONE-key snapshot (insights:gold-cb:v1), the /tic twin. Registered
+  // BEFORE /:id/history so the literal path wins over the parameterised
+  // one. IMF L1 keyless data (the COFER venue posture) — no licence
+  // reason to hide; the per-source kill switch still applies if a future
+  // owner directive arms it. Staleness is data-carried (asOf month, the
+  // card derives it) — nothing to re-stale at serve time.
+  app.get('/gold-cb', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-cb')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: import('@currena/core').GoldCbSnapshot | undefined;
+    try {
+      snapshot = await deps.getGoldCbReader(c.env).getGoldCb();
+    } catch (err) {
+      console.warn('[insights] gold-cb read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_cb_unavailable',
+        'Central-bank demand data is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the key has never been written
+      // (fresh deploy, or the rung3 gold-cb step has not landed yet).
+      return errorResponse(
+        c,
+        503,
+        'gold_cb_not_ready',
+        'No central-bank demand snapshot stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-gold-cb:${snapshot.asOf}:${snapshot.fetchedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
+    if (typeof caches !== 'undefined') {
       try {
         await caches.default.put(c.req.raw, response.clone());
       } catch {

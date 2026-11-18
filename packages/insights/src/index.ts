@@ -202,6 +202,20 @@ export type {
 export { yieldDecomposition } from './domains/gold/yield-decomposition';
 export type { YieldDecomposition, YieldLeg, YieldLegId } from './domains/gold/yield-decomposition';
 
+// GPE R13 / F3a (docs/specs/gold-page-elevation s1/11 §5 · s6/02 C2 ·
+// s7/01 §8): the Iran bridge's pure premium engine — the documented,
+// reproducible حباب (coin premium over melt) over ONE coherent TGJU
+// snapshot, with the CBI-primary constants table (the gerami band, the
+// mesghal آبشده convention). The frozen 2026-11-18 live scenario is
+// pinned by coin-premium.test.ts.
+export {
+  COIN_SPECS,
+  GERAMI_BAND,
+  TROY_OZ_GRAMS,
+  coinPremium,
+} from './domains/gold/coin-premium';
+export type { BridgeCoinId, CoinPremium, CoinPremiumRow, CoinSpec } from './domains/gold/coin-premium';
+
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
 // real-yield-10y scoring input (decision D-6: fills never reach the stored

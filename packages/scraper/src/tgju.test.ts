@@ -6,6 +6,7 @@ import profileHtml from '../fixtures/tgju-profile.html?raw';
 import { ScraperError } from './errors';
 import {
   buildTgjuSnapshot,
+  normalizeTgjuMarketAt,
   normalizeTgjuNumber,
   parseTgjuAjax,
   parseTgjuGold,
@@ -195,14 +196,14 @@ describe('parseTgjuAjax (fixture: real 2026-09-16 capture)', () => {
   });
 });
 
-describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () => {
-  it('GOLDEN: all 9 items, display order, Tehran items converted Rial→Toman (÷10)', () => {
+describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture + the 2026-11-18 mesghal row)', () => {
+  it('GOLDEN: all 10 items, display order, Tehran items converted Rial→Toman (÷10)', () => {
     const snapshot = parseTgjuAjax(ajaxFixture);
     const gold = snapshot.gold;
     expect(gold).toBeDefined();
     expect(gold?.map((g) => g.id)).toEqual([
       'gold-ounce', 'gold-18k', 'gold-24k', 'gold-used',
-      'coin-emami', 'coin-bahar', 'coin-half', 'coin-quarter', 'coin-gram',
+      'coin-emami', 'coin-bahar', 'coin-half', 'coin-quarter', 'coin-gram', 'gold-mesghal',
     ]);
     // The ounce the owner linked (tgju.org/profile/ons): USD with 2 decimals.
     const ounce = gold?.[0];
@@ -227,6 +228,32 @@ describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () 
     expect(gold?.find((g) => g.id === 'coin-half')?.price).toBe(119_000_000);
     expect(gold?.find((g) => g.id === 'coin-quarter')?.price).toBe(63_000_000);
     expect(gold?.find((g) => g.id === 'coin-gram')?.price).toBe(33_000_000);
+    // GPE R13: مثقال joins the shared snapshot plane (the bridge board's
+    // melt-gold row — live-verified 2026-11-18: 1,059,540,000 Rial).
+    expect(gold?.find((g) => g.id === 'gold-mesghal')?.price).toBe(105_954_000);
+    expect(gold?.find((g) => g.id === 'gold-mesghal')?.unit).toBe('TOMAN');
+  });
+
+  it('GPE R13: TGJU\'s own `ts` timestamp normalizes to ISO marketAt (both print shapes)', () => {
+    // The fixture's Tehran rows carry a full "YYYY-MM-DD HH:MM:SS" print
+    // (Tehran local) and the ounce carries the datetime shape; the
+    // closed-market rows print date-only.
+    const snapshot = parseTgjuAjax(ajaxFixture);
+    const gold = snapshot.gold ?? [];
+    // geram18's fixture ts is date-only ("2026-09-26") → a plain ISO date.
+    expect(gold.find((g) => g.id === 'gold-18k')?.marketAt).toBe('2026-09-26');
+    // mesghal's fixture ts is a full datetime → ISO with Tehran's +03:30.
+    expect(gold.find((g) => g.id === 'gold-mesghal')?.marketAt).toBe('2026-09-26T19:59:56+03:30');
+    // The ounce's "2026-09-27 00:51:21" → offset datetime.
+    expect(gold.find((g) => g.id === 'gold-ounce')?.marketAt).toBe('2026-09-27T00:51:21+03:30');
+  });
+
+  it('normalizeTgjuMarketAt: an odd print degrades to undefined — never a guess', () => {
+    expect(normalizeTgjuMarketAt(undefined)).toBeUndefined();
+    expect(normalizeTgjuMarketAt('2026-11-18 20:25:27')).toBe('2026-11-18T20:25:27+03:30');
+    expect(normalizeTgjuMarketAt('2026-11-18')).toBe('2026-11-18');
+    expect(normalizeTgjuMarketAt('۲۵ آبان')).toBeUndefined();
+    expect(normalizeTgjuMarketAt('2026-11-18 20:25')).toBeUndefined();
   });
 
   it('gold never leaks into the FX ladder: rates stay currency-only and untouched', () => {
@@ -240,7 +267,7 @@ describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () 
     delete payload.current.sekeb;
     const snapshot = parseTgjuAjax(payload);
     expect(snapshot.gold?.some((g) => g.id === 'coin-bahar')).toBe(false);
-    expect(snapshot.gold?.length).toBe(8);
+    expect(snapshot.gold?.length).toBe(9);
     expect(getRate(snapshot, 'USD').rate).toBe(1 / 230_500);
   });
 
@@ -285,7 +312,7 @@ describe('parseTgjuGold / snapshot.gold (fixture: real 2026-09-27 capture)', () 
 
   it('a legacy payload with NO gold symbols yields gold: [] (board shows dashes, snapshot valid)', () => {
     const payload = JSON.parse(JSON.stringify(ajaxFixture)) as { current: Record<string, unknown> };
-    for (const slug of ['ons', 'geram18', 'geram24', 'gold_mini_size', 'sekee', 'sekeb', 'nim', 'rob', 'gerami']) {
+    for (const slug of ['ons', 'geram18', 'geram24', 'gold_mini_size', 'sekee', 'sekeb', 'nim', 'rob', 'gerami', 'mesghal']) {
       delete payload.current[slug];
     }
     const snapshot = parseTgjuAjax(payload);

@@ -30,6 +30,7 @@ import type { MarketsReader } from '@currena/insights/markets';
 import type { InsightsReader } from '@currena/insights/store';
 import { KvInsightsReader, KvMarketsReader, KvAuMarketsReader, KvFxReader, KvPricesReader } from './adapters/insights-store';
 import { KvTicStore } from '@currena/insights/tic';
+import { KvGoldCbStore } from '@currena/insights/cb-demand';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
@@ -161,6 +162,8 @@ export interface AppDeps {
   makeFxReader?: (env: Bindings) => import('@currena/insights/fx').FxReader;
   /** Override the TIC store (route tests inject the in-memory fake). */
   makeTicReader?: (env: Bindings) => import('@currena/insights/tic').TicReader;
+  /** GPE R14: the CB tracker's store (route tests inject the fake). */
+  makeGoldCbReader?: (env: Bindings) => import('@currena/insights/cb-demand').GoldCbReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
   /**
@@ -270,6 +273,14 @@ export function createApp(deps: AppDeps = {}) {
     return ticReader;
   };
 
+  // GPE R14 (2026-11-18): the central-bank gold tracker's serve path — the
+  // ONE key (KvGoldCbReader, the tic twin — same lazy-singleton pattern).
+  let goldCbReader: import('@currena/insights/cb-demand').GoldCbReader | undefined;
+  const getGoldCbReader = (env: Bindings): import('@currena/insights/cb-demand').GoldCbReader => {
+    goldCbReader ??= deps.makeGoldCbReader ? deps.makeGoldCbReader(env) : new KvGoldCbStore(env.RATES);
+    return goldCbReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -311,6 +322,7 @@ export function createApp(deps: AppDeps = {}) {
       getAuMarketsReader,
       getFxReader,
       getTicReader,
+      getGoldCbReader,
       getPricesReader,
       getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests

@@ -25,6 +25,7 @@
 
 import type { Bindings } from './index';
 import { runTicIngest, KvTicStore } from '@currena/insights/tic';
+import { runGoldCbIngest, KvGoldCbStore, goldCbDayGate } from '@currena/insights/cb-demand';
 import {
   runInsightsRung4Phase,
   runInsightsCreditPhase,
@@ -326,6 +327,27 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
           : { note: 'nothing to patch (no series parsed or no snapshot)' }),
       };
     },
+  },
+  {
+    // GPE R14 / F2a Tier-1 (2026-11-18): the IMF central-bank gold tracker —
+    // the IL + IRFCL SDMX dataflows (4 fetches, ~8 MB total monthly: the IL
+    // wildcard query is 4.83 MB and the venue ignores startPeriod — the
+    // s12 M1 §5 record). Rides RUNG3 (rung4 sits at 45/50 on all-gates
+    // days) and sits LAST in the registry: the rung3 all-gates day is
+    // 1 status + 4 (tic) + 18 (portwatch) + 22 (abs) + 8 = 53 > 50, and a
+    // refusal must fall on THIS monthly source (it re-fires on its own
+    // day-1..5 gate tomorrow — self-healing by design), never on a daily
+    // one. The collision only exists when the 1st-5th meets a Saturday
+    // with tic's release window closed; the sweeps also heal failures
+    // within hours (gate bypassed). Declared budget 8: 4 fetches + the
+    // idempotence read + the write + headroom. DAY 1-5 gate + month-skip
+    // idempotence (the S12-D3 record): one real collect per month, cheap
+    // re-checks the days after.
+    id: 'gold-cb',
+    rung: 3,
+    gate: goldCbDayGate,
+    budget: 8,
+    run: async (env: Bindings) => (await runGoldCbIngest(new KvGoldCbStore(env.RATES))).outcome,
   },
 ];
 
