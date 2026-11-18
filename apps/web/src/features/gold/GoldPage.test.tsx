@@ -34,6 +34,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { useEffect } from 'react';
 import type { IndicatorReading, InsightsSnapshot, PageProjection } from '@currena/core';
 import { PageProjectionSchema } from '@currena/core';
 import { goldBalance } from '@currena/insights';
@@ -42,6 +43,7 @@ import { balanceTilt } from './signals/BalanceScale';
 import { GoldPage } from './GoldPage';
 import { GOLD_CONTEXT_IDS } from './gold-tiles';
 import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
+import { useI18n } from '../../shared/lib/locale';
 
 /* ------------------------------------------------------------------ *
  * Fixtures — contract-valid payloads (sanity-parsed inside the tests)
@@ -154,6 +156,17 @@ function snapshotFixture(): InsightsSnapshot {
 
 function notFound(): Response {
   return jsonResponse({ error: { code: 'unknown_page', message: 'not found' } }, 404);
+}
+
+/** A locale probe — flips the app's locale store (module-level, no provider)
+ * through the public API so a test can assert FA rendering. Every store
+ * subscriber (GoldPage included) re-renders on the change. */
+function LocaleProbe({ locale }: { locale: 'en' | 'fa' }): null {
+  const { setLocale } = useI18n();
+  useEffect(() => {
+    setLocale(locale);
+  }, [locale, setLocale]);
+  return null;
 }
 
 /** Route the stubbed fetch by URL — the Gold projection feed + the
@@ -567,5 +580,137 @@ describe('GoldPage', () => {
     expect(method?.textContent).toContain('Oct 2025 publication gap');
     // No why-line on a lit seat.
     expect(seat?.querySelector('[data-seat-why]')).toBeNull();
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R06 — the LOW riders (wave 0 batch): #15 the FA absent-count
+   * Persian digit, #23 the live-prices "last successful" qualifier,
+   * #24 the cold-load skeleton, + the F17 silver keep-small footer note.
+   * ---------------------------------------------------------------- */
+  it('#15: the absent-count renders Persian digits in FA (GPE-S2-15)', async () => {
+    stubFeeds();
+    render(
+      <>
+        <LocaleProbe locale="fa" />
+        <GoldPage />
+      </>,
+    );
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    // The absent note renders the count through formatNumber — in FA the
+    // digit is Persian (۴), not the raw Western "4" interpolate would
+    // stringify. The fixture carries 4 absent ids.
+    const note = document.querySelector('[data-absent-note]');
+    expect(note).not.toBeNull();
+    expect(note?.textContent).toContain('۴');
+    expect(note?.textContent).not.toMatch(/(?<![\u06F0-\u06F9])4(?![\u06F0-\u06F9])/);
+  });
+
+  it('#15 (EN): the absent-count renders Western digits in EN (the parity)', async () => {
+    stubFeeds();
+    render(
+      <>
+        <LocaleProbe locale="en" />
+        <GoldPage />
+      </>,
+    );
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    const note = document.querySelector('[data-absent-note]');
+    expect(note?.textContent).toContain('4');
+  });
+
+  it('#23: a cached (outage) projection qualifies the live-prices line with "last successful" (GPE-S2-23)', async () => {
+    // First visit: a good projection lands in localStorage.
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    // The fresh path: the live-prices line carries the plain as-of sentence.
+    expect(document.querySelector('[data-prices-as-of]')?.getAttribute('data-prices-as-of')).toBe('fresh');
+    expect(document.querySelector('[data-prices-as-of]')?.textContent).toContain('Live prices as of');
+    expect(document.querySelector('[data-prices-as-of]')?.textContent).not.toContain('last successful');
+    cleanup();
+    vi.unstubAllGlobals();
+    clearProjectionCacheForTests();
+    // Second visit: the projection feed dies, the cached copy paints —
+    // labelled. The live-prices line now qualifies its timestamp.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) =>
+        String(input) === '/api/insights' ? jsonResponse(snapshotFixture()) : jsonResponse({ error: { code: 'store_empty', message: 'empty' } }, 503),
+      ),
+    );
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Showing the last good copy');
+    });
+    // The cached path: the line carries the "last successful" qualifier.
+    const pricesLine = document.querySelector('[data-prices-as-of]');
+    expect(pricesLine?.getAttribute('data-prices-as-of')).toBe('cached');
+    expect(pricesLine?.textContent).toContain('last successful');
+  });
+
+  it('#24: the cold-load skeleton reserves the Signals section slot before the snapshot arrives (GPE-S2-24)', async () => {
+    // The snapshot feed is delayed — GoldPage renders the projection
+    // (seats) while insightsSnapshot is still null. The skeleton reserves
+    // the Signals section's slot so the seats don't pop in above it.
+    let releaseSnapshot!: () => void;
+    const snapshotPromise = new Promise<Response>((resolve) => {
+      releaseSnapshot = () => resolve(jsonResponse(snapshotFixture()));
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes('/api/insights/pages/gold')) return jsonResponse(projectionFixture());
+        if (url === '/api/insights') return snapshotPromise;
+        return notFound();
+      }),
+    );
+    render(<GoldPage />);
+    // The seats arrive (the projection feed resolved); the skeleton is
+    // on screen because the snapshot has not.
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    const skeleton = document.querySelector('[data-gold-signals-skeleton]');
+    expect(skeleton).not.toBeNull();
+    expect(skeleton?.getAttribute('role')).toBe('status');
+    // The skeleton carries the Signals section's heading + the loading
+    // line (the copy corpus's signals.title + pd.gold.loadingLine) so the
+    // slot is recognizably the signals section, not a generic loader.
+    expect(skeleton?.textContent).toContain('What the signals say');
+    expect(skeleton?.querySelector('.loader-dot')).not.toBeNull();
+    // The signals block itself has not rendered yet.
+    expect(document.querySelector('[data-gold-signals]')).toBeNull();
+    // Release the snapshot: the skeleton is replaced by the real section.
+    releaseSnapshot();
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-signals]')).not.toBeNull();
+    });
+    expect(document.querySelector('[data-gold-signals-skeleton]')).toBeNull();
+  });
+
+  it('F17: the silver card carries the keep-small footer note (S5-D3 made visible)', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    // The Signals section renders the verdict strip; the silver chip
+    // carries the keep-small note (the gold chip does not).
+    const silverNote = document.querySelector('[data-verdict-metal="silver"] [data-silver-keep-small-note]');
+    const goldNote = document.querySelector('[data-verdict-metal="gold"] [data-silver-keep-small-note]');
+    expect(silverNote).not.toBeNull();
+    expect(goldNote).toBeNull();
+    // The note states the deliberate choice.
+    expect(silverNote?.textContent).toContain('deliberate');
   });
 });

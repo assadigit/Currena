@@ -327,6 +327,18 @@ export function VerdictStrip({
             >
               <MetalTrendChart metal={reading.metal} copy={copy} numberLocale={numberLocale} />
             </div>
+            {/* GPE R06 / F17 (S5-D3 keep-small closure, made visible): the
+             * silver card carries a one-line footer stating the deliberate
+             * choice — silver's depth is a documented positioning decision
+             * (the ratio cards verify exact; a silver conditions strip
+             * returns only on measured demand), not an oversight. The note
+             * rides the silver chip's own footer so the keep-small closure
+             * is "documented, not missing" on the live page. */}
+            {reading.metal === 'silver' ? (
+              <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-tertiary)]" data-silver-keep-small-note>
+                {copy.ui.silverKeepSmallNote}
+              </p>
+            ) : null}
           </li>
         ))}
       </ul>

@@ -177,10 +177,17 @@ function BeamGlyph({ angleDeg, heavy }: { angleDeg: number; heavy: 'for' | 'agai
 export function GoldHero({
   hero,
   pricesAsOf,
+  pricesCached = false,
 }: {
   hero: GoldHeroModel;
   /** The projection's pricesAsOf stamp (the hourly live-prices clock). */
   pricesAsOf: string | undefined;
+  /** GPE R06/#23 (GPE-S2-23): true when the projection rendering is the
+   *  cached (last-good) copy — the live-prices line then qualifies its
+   *  timestamp with "(last successful)" so a reader never reads a stale
+   *  clock as "current" during an outage. Defaults false (the fresh path
+   *  is the common case). */
+  pricesCached?: boolean;
 }): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   const num = (n: number, decimals = 0): string => formatNumber(n, numberLocale, { maximumFractionDigits: decimals });
@@ -267,7 +274,12 @@ export function GoldHero({
               {change !== undefined ? (
                 <bdi dir="ltr" className={`text-[length:var(--type-label)] font-bold tabular-nums ${changeTone}`}>
                   {signedPct(change, numberLocale)}
-                  <span className="ms-0.5 font-semibold text-[var(--color-text-tertiary)]" aria-hidden="true">
+                  {/* GPE R06/#27 (GPE-S2-27): the window tag sits a clear
+                   * glyph-width away from the percent (was ms-0.5 — the
+                   * "+0.36%1d" run read as one cramped token). The ms-1.5
+                   * gap + the leading thin separator make the two a pair,
+                   * not a jam. */}
+                  <span className="ms-1.5 font-semibold text-[var(--color-text-tertiary)]" aria-hidden="true">
                     {interpolate(t('pd.global.ribbonWindowTag'), { days: num(changeDays) })}
                   </span>
                   <span className="sr-only">
@@ -287,8 +299,15 @@ export function GoldHero({
             </p>
           ) : null}
           {pricesText !== null ? (
-            <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]">
-              <bdi>{interpolate(t('pd.global.pricesAsOf'), { time: pricesText })}</bdi>
+            <p className="m-0 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-tertiary)]" data-prices-as-of={pricesCached ? 'cached' : 'fresh'}>
+              <bdi>
+                {/* GPE R06/#23 (GPE-S2-23): during an outage the projection
+                 * is the cached last-good copy — the live-prices line then
+                 * qualifies its timestamp with "(last successful)" so a
+                 * reader never reads a stale clock as "current". The fresh
+                 * path renders the plain as-of sentence (the common case). */}
+                {interpolate(t(pricesCached ? 'pd.global.pricesAsOfLastSuccessful' : 'pd.global.pricesAsOf'), { time: pricesText })}
+              </bdi>
             </p>
           ) : null}
         </div>

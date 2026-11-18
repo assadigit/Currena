@@ -21,7 +21,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { formatDateWords, formatJalaliDate } from '@currena/core';
+import { formatDateWords, formatJalaliDate, formatNumber } from '@currena/core';
 import type { PageProjection } from '@currena/core';
 import { useI18n } from '../../shared/lib/locale';
 import { interpolate } from '../../shared/i18n';
@@ -198,21 +198,27 @@ export function GoldPage(): React.JSX.Element {
 
       {/* The absent-note honesty line (public mode's licence-hidden ids —
           the Gold projection's own honest report; the blocked quartet
-          rides here, and the §16 notes below spell each one out). */}
+          rides here, and the §16 notes below spell each one out).
+          GPE R06/#15 (GPE-S2-15): the count renders through formatNumber
+          so the FA locale renders Persian digits (۴, not the raw Western
+          "4" interpolate would stringify). */}
       {projection !== null && projection.absentIds.length > 0 ? (
         <p className="m-0 mb-2.5 text-[10.5px] text-currena-muted sm:mb-3 sm:text-[length:var(--type-caption)]" data-absent-note>
-          <bdi>{interpolate(t('pd.global.absentLine'), { n: projection.absentIds.length })}</bdi>
+          <bdi>{interpolate(t('pd.global.absentLine'), { n: formatNumber(projection.absentIds.length, numberLocale, { maximumFractionDigits: 0 }) })}</bdi>
         </p>
       ) : null}
 
       {/* D-26 item 1 — the hero. */}
-      {hero !== null ? <GoldHero hero={hero} pricesAsOf={projection?.pricesAsOf} /> : null}
+      {hero !== null ? <GoldHero hero={hero} pricesAsOf={projection?.pricesAsOf} pricesCached={fromCache} /> : null}
 
       {/* TM13: the Signals section (the gold + silver verdict strip with the
           price-trend chart + range buttons) — moved from /insights. Shows
           the gold verdict card (the outlook sentence, the 3m/1y/5y/10y
-          trend chart, the delta) + the silver verdict card. Renders
-          nothing when the insights snapshot isn't loaded yet. */}
+          trend chart, the delta) + the silver verdict card.
+          GPE R06/#24 (GPE-S2-24): a cold-load skeleton reserves the
+          section's slot while the second fetch (/api/insights) is in
+          flight — the seats below no longer pop in above the signals
+          block on a slow connection (the layout-jump the audit caught). */}
       {insightsSnapshot !== null ? (
         <div className="mt-3 sm:mt-5" data-gold-signals>
           <Signals
@@ -222,7 +228,22 @@ export function GoldPage(): React.JSX.Element {
             expandToken={0}
           />
         </div>
-      ) : null}
+      ) : (
+        <section
+          className="mt-3 sm:mt-5"
+          data-gold-signals-skeleton
+          aria-label={copy.signals.title}
+          role="status"
+        >
+          <h2 className="type-section m-0">{copy.signals.title}</h2>
+          <p className="m-0 mt-1 text-[length:var(--type-label)] text-currena-muted">{t('pd.gold.loadingLine')}</p>
+          <span className="mt-3 flex justify-start gap-2.5" aria-hidden="true">
+            <span className="loader-dot" />
+            <span className="loader-dot" />
+            <span className="loader-dot" />
+          </span>
+        </section>
+      )}
 
       {/* D-26 item 2 — the 37 seats, grouped by the five lanes. GPE R04:
           the projection's readings ride along so every dark seat can

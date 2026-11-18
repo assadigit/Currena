@@ -591,6 +591,12 @@ export const en = {
       boardCached: 'Last good copy · {time}',
       dataAsOf: 'Data as of {date}',
       pricesAsOf: 'Live prices as of {time}',
+      /* GPE R06/#23 (GPE-S2-23): the cached-outage qualifier — when the
+       * projection rendering is the last-good copy (a live-prices refresh
+       * is failing), the live-prices line states the timestamp is the
+       * "last successful" read, never reading a stale clock as "current".
+       * {time} is the same formatted UTC HH:MM the fresh line carries. */
+      pricesAsOfLastSuccessful: 'Live prices (last successful) as of {time}',
       absentLine: '{n} of this page’s readings are not published in this mode.',
       /* GPE R05 (S4-D1, the CPI shutdown-gap policy): the point-of-use
        * method label for a YoY reading whose prior-year base month was

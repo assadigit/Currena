@@ -7406,6 +7406,15 @@ export const insightsCopyEn = {
     // by the indicator's own name.
     trendChartAria: 'Price history for {name}, the last {range}',
     chartRangeLabel: 'Chart time range',
+    // GPE R06 / F17 (S5-D3 keep-small closure, made visible on the
+    // silver card's footer): silver's depth is a deliberate positioning
+    // choice — the ratio cards verify exact, and a silver conditions
+    // strip returns only on measured demand. The note rides the silver
+    // chip so the keep-small closure is "documented, not missing".
+    // (T-07: no " will " / " should " / forecast wording — phrased as
+    // a recorded decision, not a prediction.)
+    silverKeepSmallNote:
+      'Silver’s depth is a deliberate choice: the ratio cards stay exact, and a dedicated silver conditions strip returns only on measured reader demand.',
     chartTable: 'Chart data',
     chartColDate: 'Date',
     chartColValue: 'Value',

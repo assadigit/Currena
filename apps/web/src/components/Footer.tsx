@@ -45,9 +45,17 @@ export function Footer() {
       <nav aria-label={t('nav.about')} className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
         {/* REAL links (audit WS-3 #6): href semantics for AT; the click
             stages About's scroll target and routes the path router's
-            navigate() — exactly once, no reload. */}
+            navigate() — exactly once, no reload.
+            GPE R06/#26 (GPE-S2-26): the Privacy/Terms hrefs now carry
+            their #section hash (the in-page anchor the staged scroll
+            targets) — the link names its own destination for AT, for
+            "open in new tab", and for the browser's native hash
+            handling, instead of the bare /about that hid which section
+            the trust row pointed at. The stageAboutSection mechanism
+            still drives the post-mount scroll; the hash makes the link
+            honest about where it goes. */}
         <a
-          href="/about"
+          href="/about#privacy"
           onClick={(e) => {
             e.preventDefault();
             stageAboutSection('privacy');
@@ -59,7 +67,7 @@ export function Footer() {
         </a>
         <span aria-hidden="true">·</span>
         <a
-          href="/about"
+          href="/about#terms"
           onClick={(e) => {
             e.preventDefault();
             stageAboutSection('terms');
