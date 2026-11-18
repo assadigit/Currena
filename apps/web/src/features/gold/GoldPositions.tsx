@@ -62,7 +62,7 @@ export function GoldPositions({ readings }: { readings: readonly IndicatorReadin
   if (cards.length === 0) return null;
 
   return (
-    <section className="mt-3 sm:mt-5" data-gold-positions>
+    <section id="gold-positions" className="mt-3 scroll-mt-24 sm:mt-5" data-gold-positions>
       <h2 className="m-0 mb-1 text-base font-extrabold leading-tight text-currena-dark sm:text-lg lg:text-xl">
         {t('pd.gold.positionsTitle')}
       </h2>

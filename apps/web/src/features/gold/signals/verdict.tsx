@@ -19,6 +19,7 @@ import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../../components/icons/currena';
 import { formatIndicatorValue } from '../../../shared/config';
 import { TrendPanel, trendTickFormatter } from '../../../shared/components/TrendChart';
+import { GoldPriceChart } from './GoldPriceChart';
 
 /* S3 extraction (2026-11-08): the seven-state outlook classifier moved
  * VERBATIM to ./outlook-core (pure, lean-chunk importable — the Global
@@ -180,13 +181,17 @@ export type StripRange = 'quarter' | '1y' | '5y' | '10y';
  * plot (h-40 mobile / h-52 desktop, vs the old h-20) so the TREND, not
  * the price, is the emphasis. Same day (owner): "Add 10 year View of the
  * gold and silver price as well" — the chips offer the full decade.
- * GPE R01 (wave 0, D6-A relabel-now, fixing this comment's stale claim —
- * the GPE-S2-30 twin of the mislabeled chip): the PUBLIC history
- * endpoint bounds the L2 ids (gold-usd, silver-usd) at
- * PUBLIC_HISTORY_WINDOW_DAYS = 1900 days (~5.2 calendar years), so the
- * decade chip renders the span the feed actually carries and its word
- * states that true span (trendRangeWord — "5.2 years" today; "10
- * years" again once F7/R18 widens the window into a user control). */
+ * GPE R01 (wave 0, D6-A relabel-now): the PUBLIC history endpoint bounds
+ * the L2 ids (gold-usd, silver-usd) at PUBLIC_HISTORY_WINDOW_DAYS =
+ * 1900 days (~5.2 calendar years), so the decade chip renders the span
+ * the feed actually carries and its word states that true span
+ * (trendRangeWord — "5.2 years" today).
+ * GPE R18 / F7 (2026-11-18, S13-D2): the GOLD chip's chart is now the
+ * interactive GoldPriceChart over the EODHD XAUUSD OHLC leg (pan/zoom/log
+ * + the DMA overlays + the window as a user control — the #01 widening
+ * dissolved by construction there); THIS panel is the SILVER chip's
+ * chart (OI-4, unchanged — its decade word keeps the honest
+ * computed-span discipline above over the bounded silver-usd series). */
 export function MetalTrendChart({
   metal,
   copy,
@@ -325,12 +330,21 @@ export function VerdictStrip({
                 {verdict !== null ? s.verdictStates[verdict][reading.metal] : s.verdictNone}
               </span>
             </span>
-            {/* THE TREND — the big chart fills the rest of the chip. */}
+            {/* THE TREND — the big chart fills the rest of the chip.
+             * GPE R18 / F7 (S13-D2): the GOLD chip renders the interactive
+             * chart (the EODHD XAUUSD OHLC leg — pan/zoom/log + the D8
+             * 50/200 DMA overlays + the unit-aware header + the window as a
+             * user control, the #01 widening dissolved by construction);
+             * silver keeps its TrendPanel (OI-4, unchanged). */}
             <div
               data-verdict-chart={reading.metal}
               className="flex min-w-0 flex-1 flex-col justify-center gap-1.5"
             >
-              <MetalTrendChart metal={reading.metal} copy={copy} numberLocale={numberLocale} />
+              {reading.metal === 'gold' ? (
+                <GoldPriceChart copy={copy} numberLocale={numberLocale} />
+              ) : (
+                <MetalTrendChart metal={reading.metal} copy={copy} numberLocale={numberLocale} />
+              )}
             </div>
             {/* GPE R06 / F17 (S5-D3 keep-small closure, made visible): the
              * silver card carries a one-line footer stating the deliberate

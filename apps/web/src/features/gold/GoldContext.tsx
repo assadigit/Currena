@@ -70,6 +70,28 @@ const STATUS_KEY: Record<string, TranslationKey> = {
   unavailable: 'pd.gold.statusUnavailable',
 };
 
+/* GPE R21 / F4b (2026-11-18): the one-liner key per context card — the
+ * plain meaning sentence under each card's value (the s7/02 §2.1–§2.2
+ * drafts, complete against the 13 non-hero card ids). gold-usd needs no
+ * one-liner (the hero price — its meaning is the as-of line + the
+ * market-state pill, Zone B); the map stays total for the rest. */
+const CARD_MEANING_KEY: Readonly<Record<GoldContextId, TranslationKey | null>> = {
+  'gold-usd': null, // the hero — no one-liner needed (s7/02 §2's own note)
+  'gold-silver': 'pd.gold.meaningGoldSilver',
+  'gold-btc': 'pd.gold.meaningGoldBtc',
+  'gold-aud': 'pd.gold.meaningGoldAud',
+  'gold-oil-ratio': 'pd.gold.meaningGoldOilRatio',
+  'gold-platinum': 'pd.gold.meaningGoldPlatinum',
+  'real-gold-price': 'pd.gold.meaningRealGoldPrice',
+  'copper-gold': 'pd.gold.meaningCopperGold',
+  'gold-equities-ratio': 'pd.gold.meaningGoldEquitiesRatio',
+  'cftc-gold-positioning': 'pd.gold.meaningCftcPositioning',
+  'cftc-gold-gross-long': 'pd.gold.meaningCftcGrossLong',
+  'sge-gold-withdrawals': 'pd.gold.meaningSgeWithdrawals',
+  'swiss-gold-flow': 'pd.gold.meaningSwissFlow',
+  'shanghai-gold-premium': 'pd.gold.meaningShanghaiPremium',
+};
+
 /** The blocked-note copy keys, keyed by the placement table's own ids
  *  (BLOCKED_NOTES drives the list; the copy map stays total — the cast
  *  rides the placement's own quartet, pinned by gold-tiles.test.ts). */
@@ -174,6 +196,15 @@ function ContextCard({
       ) : (
         <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-tertiary)]">{t('pd.gold.valueUnavailable')}</p>
       )}
+      {/* GPE R21 / F4b: the one-liner — one plain meaning sentence under
+       * the card's value («نسبت ۸۲ یعنی چه» answered, the #12 fix). No
+       * number restated, no forecast; the series/convention notes ride
+       * their existing places per C1. */}
+      {CARD_MEANING_KEY[entry.id] !== null ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]" data-card-meaning>
+          <bdi>{t(CARD_MEANING_KEY[entry.id]!)}</bdi>
+        </p>
+      ) : null}
       {positionLine !== null ? (
         <p className="m-0 text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)]">
           <bdi>{positionLine}</bdi>
@@ -241,12 +272,47 @@ export function GoldContext({
   const withoutHero = entries.filter((e) => e.id !== 'gold-usd');
   const ratios = withoutHero.slice(0, 8);
   const flows = withoutHero.slice(8);
+  // GPE R21 / Chain 7 (s7/01 §7): the physical subgroup inside Zone J —
+  // the three physical cards (SGE withdrawals, the Swiss flow, the
+  // Shanghai premium) under their own «بازار فیزیکی» mini-header with ONE
+  // shared sensor-not-verdict reading line; the COT positioning pair
+  // stays above them (Chain 6's fuel-not-driver, F14's wave-3 riders).
+  const PHYSICAL_IDS: ReadonlySet<string> = new Set(['sge-gold-withdrawals', 'swiss-gold-flow', 'shanghai-gold-premium']);
+  const physical = flows.filter((e) => PHYSICAL_IDS.has(e.id));
+  const positioning = flows.filter((e) => !PHYSICAL_IDS.has(e.id));
   const pct = (v: number): string => formatNumber(v, numberLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
   return (
     <section id="gold-context" aria-label={t('pd.gold.contextAria')} data-gold-context className="flex flex-col gap-3.5 scroll-mt-24">
       <ContextGroup title={t('pd.gold.ratiosTitle')} entries={ratios} onOpenDetails={onOpenDetails} />
-      <ContextGroup title={t('pd.gold.flowsTitle')} entries={flows} onOpenDetails={onOpenDetails} />
+
+      {/* Zone J — FLOWS & POSITIONING, now with the Chain-7 physical
+       * subgroup (one coherent edit, S7-D1): the positioning pair, then
+       * the physical mini-header + the shared reading line + the three
+       * physical cards grouped under it. */}
+      <section className="flex min-w-0 flex-col gap-2" data-flows-group>
+        <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">{t('pd.gold.flowsTitle')}</h3>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 lg:gap-2.5">
+          {positioning.map((entry) => (
+            <ContextCard key={entry.id} entry={entry} onOpenDetails={onOpenDetails} />
+          ))}
+        </div>
+        <div className="flex min-w-0 flex-col gap-2 rounded-[var(--radius-md)] bg-currena-soft/40 p-2.5 ring-1 ring-[var(--color-border)]/60" data-physical-group>
+          <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
+            {t('pd.gold.physicalHeader')}
+          </h4>
+          {/* The ONE shared reading line (s7/01 §7: renders once under the
+           * mini-header, not per card) — the sensor-not-verdict framing. */}
+          <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]" data-physical-line>
+            <bdi>{t('pd.gold.physicalLine')}</bdi>
+          </p>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 lg:gap-2.5">
+            {physical.map((entry) => (
+              <ContextCard key={entry.id} entry={entry} onOpenDetails={onOpenDetails} />
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* GPE R14 — Zone K: the central-bank demand section, directly after
        *  the FLOWS cards (positioning → demand, the natural hand-off) and
@@ -289,7 +355,7 @@ export function GoldContext({
       </section>
 
       {/* ---- The honest-record footnote (D-29). ---- */}
-      <footer data-gold-honest-record className="flex flex-col gap-1.5 rounded-[var(--radius-md)] bg-currena-soft/50 p-3 ring-1 ring-[var(--color-border)]/60 sm:p-3.5">
+      <footer id="gold-honest-record" data-gold-honest-record className="flex flex-col gap-1.5 rounded-[var(--radius-md)] bg-currena-soft/50 p-3 ring-1 ring-[var(--color-border)]/60 scroll-mt-24 sm:p-3.5">
         <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">{t('pd.gold.honestTitle')}</h3>
         <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
           <bdi>{t('pd.gold.measuredNote')}</bdi>{' '}

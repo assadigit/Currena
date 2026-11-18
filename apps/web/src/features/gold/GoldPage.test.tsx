@@ -44,6 +44,7 @@ import { GoldPage } from './GoldPage';
 import { GOLD_CONTEXT_IDS } from './gold-tiles';
 import { clearProjectionCacheForTests } from '../../shared/lib/page-division';
 import { clearHistoryCacheForTests } from '../../shared/lib/insights';
+import { clearGoldXauCacheForTests } from './gold-xau';
 import { snapshotStore } from '../../shared/lib/snapshot-store';
 import { useI18n } from '../../shared/lib/locale';
 
@@ -183,8 +184,9 @@ function LocaleProbe({ locale }: { locale: 'en' | 'fa' }): null {
 }
 
 /** Route the stubbed fetch by URL — the Gold projection feed + the
- * snapshot feed (TM13/TM23: GoldPage fires both on mount). */
-function stubFeeds(overrides: { projection?: () => Response; goldCb?: () => Response } = {}): void {
+ * snapshot feed (TM13/TM23: GoldPage fires both on mount) + the R18 OHLC
+ * leg (the chart + the TA band's shared feed). */
+function stubFeeds(overrides: { projection?: () => Response; goldCb?: () => Response; goldOhlc?: () => Response } = {}): void {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
@@ -193,6 +195,16 @@ function stubFeeds(overrides: { projection?: () => Response; goldCb?: () => Resp
       if (url === '/api/insights') return jsonResponse(snapshotFixture());
       // GPE R14: the CB tracker's one-key endpoint (the /tic twin).
       if (url === '/api/insights/gold-cb') return (overrides.goldCb ?? (() => notFound()))();
+      // GPE R18: the XAUUSD OHLC leg's one-key endpoint (the chart + the
+      // TA band — the module-cached shared feed).
+      if (url === '/api/insights/gold-ohlc') return (overrides.goldOhlc ?? (() => jsonResponse(ohlcFixture(300))))();
+      // The per-id /history payloads (the silver chart's TrendPanel — the
+      // id the fetch layer's check demands; GPE R18 made silver the sole
+      // /history consumer on this page).
+      if (url.includes('/history')) {
+        const id = url.split('/api/insights/')[1]?.split('/history')[0];
+        return jsonResponse({ v: 1, id, points: historyPointsFixture() });
+      }
       // GPE R13: the SHARED snapshot plane (the App-boot store the bridge
       // reads — served as the RatesResponse the endpoint returns).
       if (url.includes('/api/rates?source=tgju')) return jsonResponse({ snapshot: tgjuSnapshotFixture(), stale: false, servedFrom: 'cache' });
@@ -292,8 +304,54 @@ function historyPointsFixture(): Array<[number, number]> {
   return points;
 }
 
+/* GPE R18 / F7 + R19 / F8: the XAUUSD OHLC fixture — n weekday-dated
+ * final bars ending 2026-11-17 (the s13 M1 probe's honest last-bar date),
+ * a two-frequency wave (a slow cycle + a fast ripple) so the SMA200
+ * window, the distance decile AND at least one 50/200 cross all exist
+ * at n=300. The closes anchor near the live probe's 3,792.59. */
+function ohlcFixture(n: number): Record<string, unknown> {
+  const series: Array<Record<string, unknown>> = [];
+  const endDate = Date.parse('2026-11-17T00:00:00Z');
+  // The bars, chronologically: bar i's close walks from the base minus the
+  // trend (the LAST bar lands exactly on the probe's 3,792.59).
+  const closes: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const back = n - 1 - i; // bars from the end
+    closes.push(3792.59 - 150 * Math.sin(back / 25) - 60 * Math.sin(back / 6.5) + back * 0.15);
+  }
+  let ms = endDate;
+  const dates: string[] = [];
+  for (let i = 0; i < n; ) {
+    const weekday = new Date(ms).getUTCDay();
+    if (weekday !== 6 && weekday !== 0) {
+      dates.push(new Date(ms).toISOString().slice(0, 10));
+      i += 1;
+    }
+    ms -= 86_400_000;
+  }
+  dates.reverse();
+  for (let i = 0; i < n; i++) {
+    const close = closes[i]!;
+    series.push({
+      date: dates[i],
+      open: close - 6,
+      high: close + 14,
+      low: close - 17,
+      close,
+    });
+  }
+  return {
+    v: 1,
+    asOf: '2026-11-17',
+    fetchedAt: '2026-11-18T04:35:00.000Z',
+    series,
+    sourceUrl: 'https://eodhd.com/api/eod/XAUUSD.FOREX',
+  };
+}
+
 beforeEach(() => {
   clearProjectionCacheForTests();
+  clearGoldXauCacheForTests();
   window.localStorage.clear();
 });
 
@@ -861,20 +919,25 @@ describe('GoldPage', () => {
     expect(['open', 'closed']).toContain(pill!.getAttribute('data-market-pill'));
   });
 
-  it('GPE R16 / #19: the view radio labels and the chart range chips meet the 44px touch-target floor', async () => {
+  it('GPE R16 / #19 + GPE R18: the view radio labels and BOTH charts\' range chips meet the 44px touch-target floor', async () => {
     stubFeeds();
     // The trend chips render once the chart's history leg answers; the
     // history fetch is MODULE-CACHED, so the earlier tests' notFound
     // answers must clear first (the test seam).
     clearHistoryCacheForTests();
+    clearGoldXauCacheForTests();
     vi.stubGlobal(
       'fetch',
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
         if (url.includes('/api/insights/pages/gold')) return jsonResponse(projectionFixture());
         if (url === '/api/insights') return jsonResponse(snapshotFixture());
+        if (url.includes('/api/insights/gold-ohlc')) return jsonResponse(ohlcFixture(300));
         if (url.includes('/history')) {
-          return jsonResponse({ v: 1, id: 'gold-usd', points: historyPointsFixture() });
+          // The per-id payload the fetch layer's id check demands
+          // (GPE R18: the silver chart is the /history consumer now).
+          const id = url.split('/api/insights/')[1]?.split('/history')[0];
+          return jsonResponse({ v: 1, id, points: historyPointsFixture() });
         }
         return notFound();
       }),
@@ -887,12 +950,275 @@ describe('GoldPage', () => {
       const label = document.querySelector(`label[for="${id}"]`)!;
       expect(label.className).toContain('min-h-[44px]');
     }
+    // GPE R18 / F7: the GOLD chip's interactive chart rides the OHLC leg —
+    // its own range chips + toggles must meet the same 44px floor.
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-trend-range] button').length).toBeGreaterThan(0);
+      expect(document.querySelectorAll('[data-gold-price-chart] [data-chart-range] button').length).toBeGreaterThan(0);
     });
-    for (const chip of document.querySelectorAll('[data-trend-range] button')) {
+    for (const chip of document.querySelectorAll('[data-gold-price-chart] button')) {
       expect(chip.className).toContain('min-h-[44px]');
     }
+    // Silver's TrendPanel keeps its own chips (OI-4) — the same floor.
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-verdict-chart="silver"] [data-trend-range] button').length).toBeGreaterThan(0);
+    });
+    for (const chip of document.querySelectorAll('[data-verdict-chart="silver"] [data-trend-range] button')) {
+      expect(chip.className).toContain('min-h-[44px]');
+    }
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R18 / F7 — the interactive price chart (Zone E, the gold chip)
+   * ---------------------------------------------------------------- */
+
+  it('GPE R18 / F7: the interactive chart replaces the gold chip\'s fixed-range panel — the unit-aware header (the series named per C1) + the pan/zoom/log controls + the D8 DMA toggles + the window as a user control', async () => {
+    stubFeeds();
+    clearHistoryCacheForTests();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-price-chart] [data-chart-plot]')).not.toBeNull();
+    });
+    const chart = document.querySelector('[data-gold-price-chart]')!;
+    // The #01 dissolution by construction (S13-D2): the GOLD chip renders
+    // the OHLC chart; the fixed-range TrendPanel is SILVER's now (its own
+    // history fetch resolves async — wait for it).
+    expect(document.querySelector('[data-verdict-chart="gold"] [data-trend-range]')).toBeNull();
+    await waitFor(() => {
+      expect(document.querySelector('[data-verdict-chart="silver"] [data-trend-range]')).not.toBeNull();
+    });
+    // The unit-aware header: the series named at point of use (C1) + the
+    // as-of (the fixture's last final bar) + the provider link.
+    expect(chart.querySelector('a[href="https://eodhd.com/api/eod/XAUUSD.FOREX"]')?.textContent).toContain('XAUUSD');
+    expect(chart.textContent).toContain('as of');
+    // The unit toggle: oz + gram; the gram conversion disclosed (C1) once
+    // gram is selected (the toggle below proves it).
+    expect(chart.querySelector('[data-chart-unit] button[aria-pressed="true"]')?.textContent).toBe('Ounce');
+    const gramButton = [...chart.querySelectorAll('[data-chart-unit] button')].find((b) => b.textContent === 'Gram')!;
+    fireEvent.click(gramButton);
+    await waitFor(() => {
+      expect(chart.textContent).toContain('1 troy oz = 31.1035 g');
+    });
+    // The log toggle + the D8 overlay toggles (both ON by default — the
+    // mandate; the fixture's 300 bars carry both averages).
+    const logToggle = chart.querySelector('[data-chart-toggle-log]')!;
+    expect(logToggle.getAttribute('aria-pressed')).toBe('false');
+    const sma50 = chart.querySelector('[data-chart-toggle-sma50]')!;
+    const sma200 = chart.querySelector('[data-chart-toggle-sma200]')!;
+    expect(sma50.getAttribute('aria-pressed')).toBe('true');
+    expect(sma200.getAttribute('aria-pressed')).toBe('true');
+    expect(sma50.textContent).toContain('50-day');
+    expect(sma200.textContent).toContain('200-day');
+    // The window as a USER CONTROL: the three chips; the ALL chip states
+    // the honest stored span (the #01 grammar — computed from the data).
+    const chips = [...chart.querySelectorAll('[data-chart-range] button')];
+    expect(chips.map((c) => c.getAttribute('data-chart-range-chip'))).toEqual(['quarter', '1y', 'all']);
+    const allChip = chips.find((c) => c.getAttribute('data-chart-range-chip') === 'all')!;
+    expect(allChip.textContent).toContain('All');
+    fireEvent.click(allChip);
+    await waitFor(() => {
+      expect(allChip.getAttribute('aria-pressed')).toBe('true');
+    });
+    // The window delta: a signed percent + the span word computed from the
+    // VISIBLE window (never a fixed label over another span).
+    const delta = chart.querySelector('[data-chart-delta]')!;
+    expect(delta.textContent).toMatch(/[+−−-]\d/);
+    expect(delta.textContent).toMatch(/(months|years)/);
+    // The plot + the inspector affordance are keyboard-reachable (the
+    // TrendPanel accessibility pattern).
+    expect(chart.querySelector('[data-chart-plot][tabindex="0"]')).not.toBeNull();
+    // The pan/zoom hint (the #17 lesson applied forward).
+    expect(chart.textContent).toContain('Drag to pan');
+  });
+
+  it('GPE R18: the chart fail-closes when the rung has not landed (the calm no-history line, never a guess)', async () => {
+    stubFeeds({ goldOhlc: () => notFound() });
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-price-chart="none"]')).not.toBeNull();
+    });
+    expect(document.querySelector('[data-gold-price-chart="none"]')?.textContent).toContain('No chart history');
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R19 / F8 — the minimal TA band (Zone H)
+   * ---------------------------------------------------------------- */
+
+  it('GPE R19 / F8: the TA band renders Zone H (between the seats and the ratios) — the SMA rows + the distance decile (its basis named) + the dated crosses + the classic daily/weekly pivots', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-ta-levels] [data-ta-distance]')).not.toBeNull();
+    });
+    const band = document.querySelector('[data-gold-ta-levels]')!;
+    // The band's default open state follows the viewport (desktop expanded,
+    // the 390 rule collapsed — the distance sentence ALWAYS visible); the
+    // test environment may render either, so the toggle opens only if the
+    // tables are hidden.
+    if (band.querySelector('[data-ta-sma-rows]') === null) {
+      fireEvent.click(band.querySelector('[data-ta-toggle]')!);
+    }
+    await waitFor(() => {
+      expect(band.querySelector('[data-ta-sma-rows]')).not.toBeNull();
+    });
+    // Zone H sits between the seats (G) and the ratios (I): the band is
+    // placed after the seats section and before the context section.
+    const seats = document.getElementById('gold-seats')!;
+    const context = document.getElementById('gold-context')!;
+    expect(seats.compareDocumentPosition(band) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(band.compareDocumentPosition(context) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // The honesty labels ride the copy (C5 rules 1 + the display-only note).
+    expect(band.textContent).toContain('Descriptive reference');
+    // The SMA rows: the four standard windows (the fixture's 300 bars
+    // carry them all) + the series note named at the table header (C1).
+    expect(band.querySelector('[data-ta-series-note]')?.textContent).toContain('XAUUSD');
+    expect(band.querySelector('[data-ta-series-note]')?.textContent).toContain('EODHD');
+    const smaRowIds = [...band.querySelectorAll('[data-ta-sma]')].map((el) => el.getAttribute('data-ta-sma'));
+    expect(smaRowIds).toEqual(['20', '50', '100', '200']);
+    // The distance-decile sentence — the ALWAYS-visible takeaway, its
+    // basis window named (S13-D1: the honest word computed from the
+    // stored span, never a "decade" the data cannot support).
+    const distance = band.querySelector('[data-ta-distance]')!;
+    expect(distance.textContent).toMatch(/(above|below)/);
+    expect(distance.textContent).toContain('percentile');
+    expect(distance.textContent).toContain('stored');
+    expect(distance.textContent).toMatch(/(months|years)/);
+    // The sentence cross-links the chart anchor (the s2 §5c split).
+    expect(distance.querySelector('a[href="#insights-signals"]')).not.toBeNull();
+    // The dated cross events (the fixture's two-frequency wave carries
+    // at least one), each with the honest followed-by figure.
+    const crosses = [...band.querySelectorAll('[data-ta-cross]')];
+    expect(crosses.length).toBeGreaterThan(0);
+    expect(['golden', 'death']).toContain(crosses[0]!.getAttribute('data-ta-cross'));
+    expect(crosses[0]!.textContent).toMatch(/(then|edge)/);
+    // The classic pivots: daily + weekly tables, S1-S3 + R1-R3 rows with
+    // right-aligned values; the "from the session of {date}" disclosure.
+    expect(band.querySelectorAll('[data-ta-pivot-set]').length).toBe(2);
+    const first = band.querySelector('[data-ta-pivot-set]')!;
+    expect(first.textContent).toContain('Support');
+    expect(first.textContent).toContain('Resistance');
+    expect(first.textContent).toContain('from the session of');
+    // The TGJU vocabulary on the section titles («سطوح پیوت» grammar, C5).
+    expect(band.textContent).toContain('pivots');
+  });
+
+  it('GPE R19: the TA band fail-closes without the OHLC leg (the calm unavailable line)', async () => {
+    stubFeeds({ goldOhlc: () => notFound() });
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-ta-levels="none"]')).not.toBeNull();
+    });
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R20 / F4a — the education on-ramp (Zone D's third element)
+   * ---------------------------------------------------------------- */
+
+  it('GPE R20 / F4a: the education on-ramp renders collapsed in Zone D; opened, the five drivers each close LIVE at their lane (the counts byte-match the engine) + the two notes + the six-question FAQ', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-onramp]')).not.toBeNull();
+    });
+    const onRamp = document.querySelector('[data-gold-onramp]')!;
+    // The collapsed accordion is Zone D's desktop default (s6/01 zone D):
+    // the title + subtitle visible, the drivers behind one tap.
+    expect(onRamp.querySelector('[data-onramp-driver="1"]')).toBeNull();
+    fireEvent.click(onRamp.querySelector('[data-onramp-toggle]')!);
+    await waitFor(() => {
+      expect(onRamp.querySelector('[data-onramp-driver="1"]')).not.toBeNull();
+    });
+
+    // The five drivers, one row each; driver 4 display-only (no lane).
+    const driverRows = [...onRamp.querySelectorAll('[data-onramp-driver]')];
+    expect(driverRows.map((el) => el.getAttribute('data-onramp-driver'))).toEqual(['1', '2', '3', '4', '5']);
+
+    // The LIVE closes (s7/02 §1.6 — the one-projection rule): the count of
+    // each driver's family byte-matches the SAME engine the hero reads.
+    const projection = PageProjectionSchema.parse(projectionFixture());
+    const balance = goldBalance(projection.readings);
+    const laneMembers = (lane: string): number =>
+      balance.lanes.find((l) => l.lane === lane)?.members.length ?? 0;
+    const d1 = onRamp.querySelector('[data-onramp-driver="1"]')!;
+    expect(d1.textContent).toContain(`${laneMembers('borrowing-costs')} of the 37 factors`);
+    const d2 = onRamp.querySelector('[data-onramp-driver="2"]')!;
+    expect(d2.textContent).toContain(`${laneMembers('inflation')} of the 37 factors`);
+    const d3 = onRamp.querySelector('[data-onramp-driver="3"]')!;
+    expect(d3.textContent).toContain(`${laneMembers('dollar')} of the 37 factors`);
+    const d5 = onRamp.querySelector('[data-onramp-driver="5"]')!;
+    expect(d5.textContent).toContain(`${laneMembers('stress')} of the 37 factors`);
+    // The lane word renders the engine's own state vocabulary (the same
+    // word the seats' lane cards render).
+    const d1Lane = balance.lanes.find((l) => l.lane === 'borrowing-costs')!;
+    const d1Word = d1Lane.split === true ? 'Split' : d1Lane.side === 'for' ? 'Leans for gold' : d1Lane.side === 'against' ? 'Leans against gold' : d1Lane.side === 'neutral' ? 'Not leaning' : "Couldn’t be read";
+    expect(d1.textContent).toContain(d1Word);
+    // Driver 4 closes display-only (the governance asymmetry taught).
+    const d4 = onRamp.querySelector('[data-onramp-driver="4"]')!;
+    expect(d4.textContent).toContain('does not vote on (yet)');
+    expect(d4.querySelector('a[href="#gold-zone-k"]')).not.toBeNull();
+
+    // The driver closes land on CARD-LEVEL anchors (the #18 pattern — the
+    // name-match rule: the destination card's OWN title).
+    expect(d1.querySelector('a[href="/usa#usa-card-real-yield-10y"]')?.textContent).toBe('US 10-year interest after inflation');
+    expect(d1.querySelector('a[href="/usa#usa-card-fed-expectations"]')?.textContent).toBe('What markets expect from the Fed');
+    expect(d2.querySelector('a[href="/usa#usa-card-us-cpi-yoy"]')).not.toBeNull();
+    expect(d3.querySelector('a[href="/currencies#currencies-card-dollar-basket"]')).not.toBeNull();
+    // The currency-grid bracket degrades to the one non-USD price card
+    // that exists today (s7/02 §1.3's own note, until R26).
+    expect(d3.querySelector('a[href="#gold-card-gold-aud"]')).not.toBeNull();
+    // The ETF-flows card rides R23 — never a dead link today.
+    expect(d5.querySelector('a[href*="etf" i]')).toBeNull();
+
+    // The two closing notes: fuel-not-driver + the governance asymmetry.
+    expect(onRamp.querySelector('[data-onramp-note="fuel"]')?.textContent).toContain('fuel gauge');
+    expect(onRamp.querySelector('[data-onramp-note="fuel"] a[href="#gold-positions"]')).not.toBeNull();
+    expect(onRamp.querySelector('[data-onramp-note="governance"]')?.textContent).toContain('not the same five');
+
+    // The FAQ tail: the six questions, each closing at its anchor.
+    const faq = [...onRamp.querySelectorAll('[data-onramp-faq]')];
+    expect(faq.map((el) => el.getAttribute('data-onramp-faq'))).toEqual(['1', '2', '3', '4', '5', '6']);
+    expect(faq[3]!.querySelector('a[href="#gold-honest-record"]')).not.toBeNull(); // Q4 → the honest record
+    expect(faq[4]!.querySelector('a[href="#gold-zone-f"]')).not.toBeNull(); // Q5 → the bridge
+    expect(faq[5]!.querySelector('a[href="#gold-seats"]')).not.toBeNull(); // Q6 → the seats
+  });
+
+  /* ---------------------------------------------------------------- *
+   * GPE R21 / F4b — the one-liners + the Chain-7 physical grouping
+   * ---------------------------------------------------------------- */
+
+  it('GPE R21 / F4b: every context card gains its plain meaning sentence; the five flows cards group with the «physical market» mini-header + the ONE shared reading line', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-context-card]').length).toBe(13);
+    });
+    // The 13 non-hero cards each carry a one-liner (the hero needs none —
+    // its meaning is the as-of line + the market pill, Zone B).
+    const cardsWithMeaning = [...document.querySelectorAll('[data-context-card]')].filter(
+      (card) => card.querySelector('[data-card-meaning]') !== null,
+    );
+    expect(cardsWithMeaning.length).toBe(13);
+    const silver = document.querySelector('[data-context-card="gold-silver"]')!;
+    expect(silver.querySelector('[data-card-meaning]')?.textContent).toContain('ounces of silver');
+    const shanghai = document.querySelector('[data-context-card="shanghai-gold-premium"]')!;
+    expect(shanghai.querySelector('[data-card-meaning]')?.textContent).toContain('sensor');
+
+    // The Chain-7 physical grouping (s7/01 §7): the three physical cards
+    // under the mini-header + ONE shared reading line; the COT pair stays
+    // above the subgroup (Chain 6's fuel-not-driver).
+    const physical = document.querySelector('[data-physical-group]')!;
+    expect(physical.querySelector('h4')?.textContent).toBe('The physical market');
+    expect(physical.querySelectorAll('[data-context-card]').length).toBe(3);
+    const physicalIds = [...physical.querySelectorAll('[data-context-card]')].map((c) => c.getAttribute('data-context-card'));
+    expect(physicalIds).toEqual(['sge-gold-withdrawals', 'swiss-gold-flow', 'shanghai-gold-premium']);
+    const sharedLine = document.querySelector('[data-physical-line]')!;
+    expect(sharedLine.textContent).toContain('marginal bid');
+    // The ONE shared line renders once (not per card).
+    expect(document.querySelectorAll('[data-physical-line]').length).toBe(1);
+    // The COT positioning pair renders OUTSIDE the physical subgroup.
+    const flows = document.querySelector('[data-flows-group]')!;
+    const cftc = flows.querySelector('[data-context-card="cftc-gold-positioning"]')!;
+    expect(cftc.closest('[data-physical-group]')).toBeNull();
+    expect(flows.querySelectorAll(':scope > div > [data-context-card]').length).toBe(2);
   });
 
   it('renders the context cards with values, the blocked quartet as notes, and the honest record', async () => {

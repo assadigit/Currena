@@ -33,8 +33,10 @@ import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldNarrative } from './narrative/GoldNarrative';
 import { GoldYieldDecomposition } from './GoldYieldDecomposition';
+import { GoldOnRamp } from './GoldOnRamp';
 import { GoldIranBridge } from './GoldIranBridge';
 import { GoldCbDemand } from './GoldCbDemand';
+import { GoldTaLevels } from './GoldTaLevels';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
@@ -225,11 +227,18 @@ export function GoldPage(): React.JSX.Element {
           narrative + F5 the yield-decomposition card (side by side from
           lg, stacked at 390 — s6/03 zone D). Both derive from the SAME
           projection as the hero (one truth, s7/03 §2.4); the band carries
-          the #gold-zone-d anchor (R10's contract). */}
+          the #gold-zone-d anchor (R10's contract).
+          GPE R20 / F4a (2026-11-18): the education on-ramp — the band's
+          third element (collapsed accordion per s6/01 zone D), the five
+          drivers each closing at its lane anchor, the two notes, the FAQ
+          tail (s7/02's approved reference wording). */}
       {readings !== undefined ? (
-        <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:mt-4 lg:grid-cols-2 lg:gap-3" data-gold-zone-d-band>
-          <GoldNarrative readings={readings} />
-          <GoldYieldDecomposition readings={readings} />
+        <div id="gold-zone-d" className="mt-2.5 flex flex-col gap-2.5 sm:mt-4 sm:gap-3" data-gold-zone-d-band>
+          <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2 lg:gap-3">
+            <GoldNarrative readings={readings} />
+            <GoldYieldDecomposition readings={readings} />
+          </div>
+          <GoldOnRamp readings={readings} />
         </div>
       ) : null}
 
@@ -283,6 +292,15 @@ export function GoldPage(): React.JSX.Element {
       <div className="mt-3 sm:mt-5">
         {seatLanes.length > 0 ? <GoldSeats lanes={seatLanes} readings={readings} /> : null}
       </div>
+
+      {/* GPE R19 / F8 (2026-11-18) — Zone H, the minimal TA band
+          (s6/01 §2c slot B: a "REFERENCE LEVELS" band immediately before
+          the RATIOS block — the s2 §5c split: the overlay rides the F7
+          chart in Zone E, the tables render here; the two renderings
+          cross-link). Reads the SAME module-cached OHLC leg as the chart
+          (one fetch, two surfaces). HARD GATE satisfied: R01 fixed at
+          S10. */}
+      <GoldTaLevels />
 
       {/* D-27 + §16 + D-29 — the context cards, the blocked notes, the
           honest-record footnote. GPE R14: Zone K (the central-bank demand

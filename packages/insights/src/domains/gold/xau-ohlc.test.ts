@@ -154,14 +154,6 @@ function makeStore(): { store: GoldXauStore; kv: FakeKv } {
   }, kv };
 }
 
-function eodFetchOptions(rows: () => Array<Record<string, unknown>>): EodhdXauFetchOptions {
-  return {
-    apiToken: 'test-token',
-    fetchImpl: async () => jsonResponse(rows()),
-    todayUtc: TODAY,
-  };
-}
-
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 }

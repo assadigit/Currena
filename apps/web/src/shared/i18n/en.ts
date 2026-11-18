@@ -904,6 +904,141 @@ export const en = {
       marketPillOpen: 'Market open',
       marketPillClosed: 'Market closed',
       marketPillLabel: '{state} · COMEX gold futures, New York ({tz})',
+      /* GPE R18 / F7 (2026-11-18): the interactive price chart — the
+       * copy rides the same vocabulary as the TA band (C5's TGJU words:
+       * «میانگین متحرک») and reuses the ui corpus's range/words wherever
+       * one exists (chartRangeLabel · rangeQuarter · range1y ·
+       * rangeWindowYears — C7 rule 1, no parallel copy). The honest-span
+       * discipline (the #01 fix's grammar): the All chip and the window
+       * delta name the span the loaded series ACTUALLY carries, computed
+       * from the data. */
+      chartSeriesLine: 'XAUUSD daily OHLC (spot) · EODHD',
+      chartUnitLabel: 'Price unit',
+      chartUnitOz: 'Ounce',
+      chartUnitGram: 'Gram',
+      chartUnitOzShort: 'per oz',
+      chartUnitGramShort: 'per g',
+      chartGramNote: '1 troy oz = 31.1035 g',
+      chartLog: 'Log',
+      chartSma50: '50-day average',
+      chartSma200: '200-day average',
+      chartRangeAll: 'All',
+      chartSpanMonths: '{n} months',
+      chartSpanYears: '{years} years',
+      chartAria: 'XAUUSD daily closes, interactive chart: {span} ending {date}',
+      chartPanHint: 'Drag to pan · pinch or scroll to zoom',
+      /* GPE R19 / F8 (2026-11-18): the minimal TA band — the C5 honesty
+       * rules ride the copy itself (descriptive reference; dated events
+       * with whipsaws; the decile grammar over the stored basis — S13-D1
+       * names the window, never a "decade" the data cannot support; the
+       * TGJU vocabulary «سطوح پیوت» / «حمایت» / «مقاومت»; the
+       * classic-only guard is structural — nothing else computes). */
+      taTitle: 'Reference levels',
+      taSubtitle: 'Descriptive reference, not a guarantee — and never a trading signal.',
+      taSeriesNote: 'SMA 20/50/100/200 of XAUUSD daily closes, EODHD',
+      taSmaTitle: 'The four standard moving averages',
+      taSmaOneLiner: 'The average close of the last N days — the trend’s reference line, named for its window; a descriptive reference, not a guarantee.',
+      taSmaRow: '{n}-day average',
+      taSmaNone: 'The stored window is still shorter than the 20-bar average — no level yet.',
+      taDistance: '{pct} {dir} the 200-day average of XAUUSD daily closes — {decile} percentile of the stored {window}',
+      taDistanceNoDecile: '{pct} {dir} the 200-day average of XAUUSD daily closes — the stored window is still too short for a percentile (it grows with every day)',
+      taDirAbove: 'above',
+      taDirBelow: 'below',
+      taDecile: '{n}th percentile',
+      taChartLink: 'See the chart',
+      taCrossTitle: 'The 50/200 crossovers — dated events',
+      taCrossOneLiner: 'The day the 50-day crossed the 200-day — a dated event with what followed, whipsaws included.',
+      taCrossGolden: 'Golden cross (50 above 200)',
+      taCrossDeath: 'Death cross (50 below 200)',
+      taCrossFollow: 'then {v} over the next 20 sessions',
+      taCrossTruncated: 'at the window’s edge',
+      taCrossNone: 'No 50/200 crossover in the stored window yet.',
+      taPivotsDailyTitle: 'Classic daily pivots',
+      taPivotsWeeklyTitle: 'Classic weekly pivots',
+      taPivotOneLinerDaily: 'Yesterday’s high, low and close turned into today’s reference levels — levels the market watched, not promises.',
+      taPivotOneLinerWeekly: 'The same arithmetic on last week’s session — the swing trader’s reference grid.',
+      taPivotSupport: 'Support',
+      taPivotResistance: 'Resistance',
+      taPivotFrom: 'from the session of {date}',
+      taPivotNone: 'Not enough stored bars for this table yet.',
+      taShow: 'Show the tables',
+      taHide: 'Hide the tables',
+      taUnavailable: 'The reference levels could not be read yet.',
+      /* GPE R20 / F4a (2026-11-18): the education on-ramp — the five
+       * drivers (Kitco’s five, the S7-D2 taxonomy), each a three-move
+       * paragraph closing LIVE at its lane (the {count} and {laneWord}
+       * render from the projection — never hand-copied into the
+       * dictionary; a consistency test pins them to the hero’s own
+       * numbers); the two closing notes (fuel-not-driver; the governance
+       * asymmetry taught); the six-question FAQ as the on-ramp’s tail
+       * (the S7 format decision). The s7/02 approved drafts are the
+       * reference wording (D1 locked: the structure and honest-limits
+       * content bind; the rounds polish). */
+      onRampTitle: 'What moves gold',
+      onRampSubtitle: 'Five drivers, honestly — each measured on this page by its own gauge.',
+      onRampShow: 'Read: what moves gold',
+      onRampHide: 'Hide: what moves gold',
+      onRampSeeCards: 'The measuring cards:',
+      driverName1: 'Real interest rates and the Fed',
+      driverBody1:
+        'Gold pays no yield, so its strongest headwind is a high real (inflation-adjusted) interest rate and its strongest tailwind is a falling one. But the market trades the expectation, not the level: a rate rise that is fully priced in is a non-event, and a dovish surprise inside a hiking cycle can lift gold. Since 2022 the old rule has visibly weakened — real yields rose sharply while gold rose too, because the marginal buyer changed (see Central banks below). Measured today by the borrowing-costs family — {count} of the 37 factors, currently {laneWord}.',
+      driverName2: 'Inflation and currency debasement',
+      driverBody2:
+        'Gold’s reputation as an inflation hedge is earned over decades, not weeks: over long horizons it tracks purchasing power; over a few quarters what matters most is how the Fed responds to inflation, which is why real rates (above) are the better day-to-day guide. The cleanest single summary is the gap between today’s inflation and the inflation the market expects (breakevens): when the gap closes through hawkish policy, that pressures gold; when it closes through lost credibility, that supports it. Watch the gap over months, not one month — single months are noise. Measured today by the inflation family — {count} of the 37 factors, currently {laneWord}.',
+      driverName3: 'The U.S. dollar',
+      driverBody3:
+        'Gold is priced in dollars, so a stronger dollar tends to weigh on the gold price and a weaker one tends to lift it — even when nothing about gold itself has changed. The rule has two famous breaks: in market stress the dollar and gold are bid together (the same flight-to-safety trade), and in de-dollarization episodes both rise (reserve diversification). Gold can also sit at all-time highs in euros or yen while consolidating in dollars — check the price in another currency before calling a gold move global. Measured today by the dollar family — {count} of the 37 factors, currently {laneWord}.',
+      driverName4: 'Central banks',
+      driverBody4:
+        'Central banks are among the largest holders of gold, and after the 2022 freezing of Russia’s reserves their buying roughly doubled — a comparatively price-insensitive demand that raised gold’s floor and weakened the old real-rates rule. The honest limits: this buying is slow, lumpy and reported with delay and revisions; it explains a floor rising over quarters, not support in every drawdown — and a rising gold share of reserves can be price arithmetic, not new buying. This is the one driver our 37-factor meter deliberately does not vote on (yet): meter membership is a governed, backtested decision, so the demand story lives in its own data section.',
+      driverName5: 'Safe-haven and investment demand',
+      driverBody5:
+        'In periods of market stress, geopolitical risk or currency uncertainty, investors move into gold — and flows into and out of gold-backed ETFs make that demand visible daily. Two channels hide inside “safe haven”: the headline premium (a war or shock bid that often fades within days or weeks when the consequences don’t materialize) and the structural shift (sanctions and reserve freezes change official-sector behavior for years). Don’t conflate them. Measured today by the stress family — {count} of the 37 factors, currently {laneWord}.',
+      noteFuelTitle: 'Positioning is fuel, not a driver',
+      noteFuelBody:
+        'One thing this page deliberately does not teach as a driver: crowded positioning. Futures speculators’ books are the market’s fuel gauge — at extremes they mark fragile, crowded trades (in either direction); in the middle of the range they carry little information. The flows family measures it with a deliberately short horizon (days to weeks).',
+      noteGovTitle: 'Why five drivers here and five lanes in the meter — and not the same five',
+      noteGovBody:
+        'Because the meter only votes on relations that measured stable enough to backtest: growth was excluded (its members’ gold relation was unstable), trend lives in the reference-levels band (not a vote), and central-bank demand is presented, not voted (its own section below). Every exclusion is a recorded decision, not a gap — the honest record at the bottom of the page lists them.',
+      faqTitle: 'Common questions',
+      faqQ1: 'Is gold a good inflation hedge?',
+      faqA1:
+        'Over decades, yes — gold tracks purchasing power in the long run. Over a few quarters it depends on how the Fed responds to inflation, which is why real rates (driver 1) are the better day-to-day guide. The cleanest summary is the gap between today’s inflation and the inflation the market expects (breakevens).',
+      faqQ2: 'Yields went up and gold went up too — why?',
+      faqA2:
+        'Look at which piece of the yield moved: real-yield-driven rises are the classic headwind, but term-premium-driven rises have historically supported gold instead (the decomposition card above names the three configurations). And look at who was buying — the post-2022 central-bank bid lifted gold even as real yields rose (the demand section below).',
+      faqQ3: 'Gold is at a record in euros but not in dollars — which is real?',
+      faqA3:
+        'Both are real: gold is priced in dollars, so a stronger dollar can mask a global rise — driver 3’s rule and its two famous breaks. Check the price in another currency before calling a move “global” — the gold-in-Australian-dollars card on this page is the one non-USD price card today (the full currency grid is a planned wave).',
+      faqQ4: 'Does the 37-factor meter predict the price?',
+      faqA4:
+        'No. It describes conditions, and the page’s own published backtest measured that the lean showed no positive association with the next 5 to 60 trading days — if anything, readings against gold came before larger rises. The honest record at the bottom of the page carries the full measured result.',
+      faqQ5: 'What is the coin’s حباب, and why does every site show a different number?',
+      faqA5:
+        'The حباب (premium) is the coin’s market price over its melt value — global gold × the free-market dollar × pure-gold content. Rival numbers publish undocumented (three different numbers within one hour, documented on this page); this page’s number is reproducible from the stated formula — that is the whole claim. See the Iran bridge below.',
+      faqQ6: 'Why do some factors say “couldn’t be read”?',
+      faqA6:
+        'A dark seat is dark for one of four knowable reasons: the source stopped publishing, the year-ago base month was not published (a publication gap), the data is published but the pipeline has not landed it yet, or the reading is fresh but the evaluator had no input to evaluate. Each dark seat states which one it is — the page never shows a guess.',
+      /* GPE R21 / F4b (2026-11-18): the one-liners set — one plain meaning
+       * sentence under every context card’s value (the s7/02 §2 drafts,
+       * complete against the 13 non-hero card ids), plus the Chain-7
+       * physical grouping: the «بازار فیزیکی» mini-header + ONE shared
+       * sensor-not-verdict reading line under the three physical cards. */
+      meaningGoldSilver: 'How many ounces of silver one ounce of gold buys — when the ratio is high, silver is cheap relative to gold.',
+      meaningGoldBtc: 'The ounce-to-bitcoin exchange rate — the two debasement hedges priced against each other.',
+      meaningGoldAud: 'Gold priced in Australian dollars — how the metal reads for a commodity-currency holder.',
+      meaningGoldOilRatio: 'How many barrels of oil one ounce of gold buys — gold’s energy purchasing power.',
+      meaningGoldPlatinum: 'Gold against its industrial precious sibling — the monetary metal’s rarity premium made visible.',
+      meaningRealGoldPrice: 'Today’s gold price in inflation-adjusted dollars — the long-horizon value gauge (what an ounce has been worth across decades).',
+      meaningCopperGold: 'Gold against copper — the monetary metal versus the industrial cycle in one number.',
+      meaningGoldEquitiesRatio: 'Gold against the S&P 500 — the defensive-versus-risk balance over the long cycle.',
+      meaningCftcPositioning: 'What gold futures speculators hold net long — the crowd gauge. Extremes mark fragile trades; the middle of the range tells you little.',
+      meaningCftcGrossLong: 'The gross long share of open interest — how one-sided the speculative book is.',
+      meaningSgeWithdrawals: 'How much gold left Shanghai vaults for delivery — China’s physical demand pulse.',
+      meaningSwissFlow: 'Switzerland’s gold imports and exports — where the world’s refining hub is sending the metal.',
+      meaningShanghaiPremium: 'The Shanghai-over-London price gap — the market’s own sensor for where the physical buyer is.',
+      physicalHeader: 'The physical market',
+      physicalLine: 'Persistent premiums mark phases when physical (mainly Asian) demand is the marginal bid; discounts mark Western-investment-led phases.',
       /* GPE R14: the buyers-table country names (the current cast's IMF
        * codes; an unmapped code renders the code itself — fail-closed). */
       cbCountries: {
