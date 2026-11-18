@@ -195,6 +195,13 @@ export type {
   NarrativePriceFact,
 } from './domains/gold/narrative';
 
+// GPE R12 / F5 (s7/01 §4, Chain 3): the yield-decomposition card's pure
+// math — nominal 10y · real 10y · the derived breakeven · the ACM term
+// premium, with the exact sum (real + breakeven = nominal) and the
+// model-provenance disclosure on the term-premium leg.
+export { yieldDecomposition } from './domains/gold/yield-decomposition';
+export type { YieldDecomposition, YieldLeg, YieldLegId } from './domains/gold/yield-decomposition';
+
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
 // real-yield-10y scoring input (decision D-6: fills never reach the stored

@@ -790,6 +790,37 @@ export const en = {
       narrativeDeltaPts: '{v} pts',
       narrativeDeltaPct: '{v}%',
       narrativeCaveat: 'The meter explains conditions, not the price move',
+      /* GPE R12 / F5 (2026-11-18, s7/01 §4 Chain 3 + s7/02 §2.4's approved
+       * leg glosses): the yield-decomposition card. The exact relation
+       * rendered is real + breakeven = nominal (the breakeven derived);
+       * the term premium is the ACM model's estimate — its provenance +
+       * revision disclosure ride the leg (Idea 5's risk note, binding).
+       * The three named configurations + the funding-stress exception
+       * are the card's static education copy (dated examples, no live
+       * verdict). The moved line + the delta units REUSE the narrative's
+       * own keys (C7: no parallel copy). */
+      yieldTitle: 'The 10-year yield, decomposed',
+      yieldIdentity: 'real {real} + breakeven {be} = nominal {nominal} (the breakeven is derived: nominal − real)',
+      yieldMovedTitle: 'Which piece moved this month',
+      yieldLegNominal: 'Nominal 10-year',
+      yieldLegReal: 'Real 10-year',
+      yieldLegBreakeven: 'Breakeven',
+      yieldLegPremium: 'Term premium',
+      yieldGlossNominal: 'The Treasury’s plain interest rate — the headline number.',
+      yieldGlossReal: 'The nominal rate minus expected inflation — what a saver actually earns; gold’s classic rival.',
+      yieldGlossBreakeven: 'The inflation the market prices into the gap — expected inflation, read off the yield curve.',
+      yieldGlossPremium:
+        'The extra yield lenders demand for holding long — the fear-and-supply compensation; when this piece lifts the yield, history has supported, not hurt, gold.',
+      yieldAsOf: 'as of {date}',
+      yieldPremiumNote: 'The term premium is a model estimate (Kim–Wright/ACM, via FRED) — revised over time, not a market quote.',
+      yieldConfigTitle: 'The three configurations',
+      yieldConfigReal: 'Real-driven rises are the classic gold headwind — gold pays no interest, so a higher real return on bonds weakens its case.',
+      yieldConfigBreakeven: 'Breakeven-driven rises are neutral-to-positive for gold — the inflation-hedge channel.',
+      yieldConfigPremium:
+        'Term-premium-driven rises are the debasement configuration — historically supportive of gold: the answer to “yields are 5%, why is gold not collapsing?”.',
+      yieldException:
+        'The exception: inside funding stress, a term-premium spike can first hit gold through margin and liquidity spirals (the 2022 gilt episode’s analog) before the hedge bid dominates.',
+      yieldSeats: 'Live seats:',
       evidenceRising: 'rising',
       evidenceFalling: 'falling',
       evidenceHigh: 'high in its decade',

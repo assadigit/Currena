@@ -315,6 +315,58 @@ describe('GoldPage', () => {
     expect(document.getElementById('gold-zone-d')).toBeTruthy();
   });
 
+  it('GPE R12 / F5: the yield-decomposition card — the four-leg stack + the exact identity + the moved line + the configurations + the exception + the seats', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-yield]')).not.toBeNull();
+    });
+    const card = document.querySelector('[data-gold-yield]')!;
+
+    // The four legs in fixed order, each with its value right-aligned +
+    // its one-line gloss (s7/02 §2.4) + its as-of inline (C1).
+    const legs = [...card.querySelectorAll('[data-yield-leg]')];
+    expect(legs.map((l) => l.getAttribute('data-yield-leg'))).toEqual([
+      'nominal-10y',
+      'real-10y',
+      'breakeven-10y',
+      'term-premium-10y',
+    ]);
+    expect(card.textContent).toContain('The 10-year yield, decomposed');
+    expect(card.textContent).toContain("gold’s classic rival"); // the real leg's gloss
+    expect(card.textContent).toContain('expected inflation, read off the yield curve'); // the breakeven gloss
+    expect(card.textContent).toContain('as of'); // the as-of inline
+
+    // The EXACT identity: real + breakeven = nominal (the fixture's values
+    // 1 − 1 = 0.00; the derived breakeven carries the method note).
+    const identity = card.querySelector('[data-yield-identity]');
+    expect(identity).toBeTruthy();
+    expect(identity!.textContent).toContain('=');
+    expect(legs[2]!.textContent).toContain('derived'); // hmm — the method rides the source line, not the label
+
+    // "Which piece moved this month" — the window named (C1/C7).
+    const moved = card.querySelector('[data-yield-moved]');
+    expect(moved).toBeTruthy();
+    expect(moved!.textContent).toContain('Which piece moved this month');
+    expect(moved!.textContent).toContain('over the past 30 days');
+
+    // The three named configurations + the funding-stress exception
+    // (s7/01 §4 items 3–4 — the static education block).
+    expect(card.textContent).toContain('The three configurations');
+    expect(card.textContent).toContain('classic gold headwind');
+    expect(card.textContent).toContain('debasement configuration');
+    expect(card.textContent).toContain('why is gold not collapsing');
+    expect(card.textContent).toContain('2022 gilt');
+
+    // The model-provenance disclosure (Idea 5's binding note).
+    expect(card.querySelector('[data-yield-premium-note]')?.textContent).toContain('model estimate');
+
+    // The chain's live seats — card-level links to the voters (R10's
+    // anchor contract, the name-match rule).
+    expect(card.querySelector('a[href="/usa#usa-card-term-premium-10y"]')).toBeTruthy();
+    expect(card.querySelector('a[href="/usa#usa-card-us-deficit-12m"]')).toBeTruthy();
+  });
+
   it('S6: the hero\u2019s balance view ALTERNATES — the classic previous shape is the default, the minimal glyph one radio away, the choice persisted', async () => {
     stubFeeds();
     render(<GoldPage />);

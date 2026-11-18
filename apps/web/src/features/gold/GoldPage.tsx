@@ -32,6 +32,7 @@ import { Signals } from './Signals';
 import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { GoldHero } from './GoldHero';
 import { GoldNarrative } from './narrative/GoldNarrative';
+import { GoldYieldDecomposition } from './GoldYieldDecomposition';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
@@ -218,14 +219,15 @@ export function GoldPage(): React.JSX.Element {
       {/* D-26 item 1 — the hero. */}
       {hero !== null ? <GoldHero hero={hero} pricesAsOf={projection?.pricesAsOf} pricesCached={fromCache} /> : null}
 
-      {/* GPE R11 / F1 — Zone D, the explanation band's FIRST element: the
-          daily narrative ("Why gold moved") — the price fact + the five
-          family sentences + the standing caveat. Derived from the SAME
+      {/* GPE R11 / R12 — Zone D, the explanation band: F1 the daily
+          narrative + F5 the yield-decomposition card (side by side from
+          lg, stacked at 390 — s6/03 zone D). Both derive from the SAME
           projection as the hero (one truth, s7/03 §2.4); the band carries
           the #gold-zone-d anchor (R10's contract). */}
       {readings !== undefined ? (
-        <div className="mt-2.5 sm:mt-4">
+        <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:mt-4 lg:grid-cols-2 lg:gap-3" data-gold-zone-d-band>
           <GoldNarrative readings={readings} />
+          <GoldYieldDecomposition readings={readings} />
         </div>
       ) : null}
 
