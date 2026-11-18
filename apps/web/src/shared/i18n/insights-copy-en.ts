@@ -9334,43 +9334,47 @@ export const insightsCopyEn = {
     // export column — first letter capitalized. fa is unaffected (طلا/نقره
     // carry no case).
     metals: { gold: 'Gold', silver: 'Silver' },
-    // 2026-10-21 (owner, "Gold Market Outlook — Complete State List"): the
-    // strip speaks SEVEN outlook states, each with its own authored
-    // sentence — the old verdictUp/Down/Flat words are retired because EN
-    // ("Works against") and the fa sentence had drifted into saying
-    // different things. "Signs point to…" keeps the page's
-    // conditions-not-forecasts contract. The gold sentences are the
-    // owner's verbatim; silver mirrors them.
-    verdictTitle: 'Outlook',
+    // GPE R08 / F15 (2026-11-18, s6/02 §C3 — the four binding clauses): the
+    // outlook sentences re-scoped from price claims to CONDITIONS claims —
+    // the market's word (bullish/bearish) survives, the noun moves from
+    // "gold prices" to "conditions", and the escalation intensifiers
+    // ("potential significant") are banned; strength is expressed by the
+    // existing strong/moderate ladder (goldOutlookOf's L/A ≥ 3 strong rule)
+    // alone. The prior sentences were the owner's 2026-10-21 verbatim; the
+    // C3 rewrite supersedes them under the locked D1-A approval.
+    verdictTitle: 'Conditions outlook',
+    // GPE R08 / F15 (C3 clause 2): the no-forecast line co-renders with the
+    // title — the same visual unit, never paragraphs away (GPE-S2-11).
+    verdictCaveat: 'this describes current conditions, not a forecast',
     verdictNone: 'Cannot read yet',
     verdictStates: {
       'strong-bullish': {
-        gold: 'Signs point to a potential significant rise in gold prices.',
-        silver: 'Signs point to a potential significant rise in silver prices.',
+        gold: 'Conditions lean strongly in gold’s favour.',
+        silver: 'Conditions lean strongly in silver’s favour.',
       },
       bullish: {
-        gold: 'Signs point to a potential rise in gold prices.',
-        silver: 'Signs point to a potential rise in silver prices.',
+        gold: 'Conditions lean in gold’s favour.',
+        silver: 'Conditions lean in silver’s favour.',
       },
       neutral: {
-        gold: 'Signs point to a neutral outlook for gold prices.',
-        silver: 'Signs point to a neutral outlook for silver prices.',
+        gold: 'Conditions are neutral for gold.',
+        silver: 'Conditions are neutral for silver.',
       },
       'range-bound': {
-        gold: 'Signs point to gold prices trading within a defined range.',
-        silver: 'Signs point to silver prices trading within a defined range.',
+        gold: 'Conditions are consistent with gold trading within a defined range.',
+        silver: 'Conditions are consistent with silver trading within a defined range.',
       },
       bearish: {
-        gold: 'Signs point to a potential decline in gold prices.',
-        silver: 'Signs point to a potential decline in silver prices.',
+        gold: 'Conditions lean against gold.',
+        silver: 'Conditions lean against silver.',
       },
       'strong-bearish': {
-        gold: 'Signs point to a potential significant decline in gold prices.',
-        silver: 'Signs point to a potential significant decline in silver prices.',
+        gold: 'Conditions lean strongly against gold.',
+        silver: 'Conditions lean strongly against silver.',
       },
       mixed: {
-        gold: 'Market signals for gold prices are mixed.',
-        silver: 'Market signals for silver prices are mixed.',
+        gold: 'Conditions are mixed for gold.',
+        silver: 'Conditions are mixed for silver.',
       },
     },
     // The collapsed summary line carries the short state names; the full
@@ -9574,8 +9578,9 @@ export const insightsCopyEn = {
     collapsedFooting: 'price in the {band} of the last 10 years',
     // Round 24: the collapsed line gets its takeaway. 2026-10-21 (owner):
     // the takeaway names the seven-state outlook (the strip holds the
-    // full sentences).
-    collapsedVerdict: 'Outlook: {verdict}',
+    // full sentences). GPE R08 / F15 (2026-11-18, C3 clause 1): the noun
+    // re-scopes to conditions — the line never reads "Outlook" bare.
+    collapsedVerdict: 'Conditions outlook: {verdict}',
     bandTop: 'top {p}%',
     bandBottom: 'bottom {p}%',
     bandMid: 'the middle',

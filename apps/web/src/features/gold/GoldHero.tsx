@@ -384,7 +384,12 @@ export function GoldHero({
               </div>
             </div>
           )}
-          <p className="m-0 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+          {/* GPE R08 / F15 (s6/02 §C3): the outlook line — the word
+           * (re-scoped to CONDITIONS), the lane counts (clause 3 — the
+           * word is visibly arithmetic on conditions) and the inline
+           * no-forecast caveat (clause 2) all co-render in THIS one visual
+           * unit, never paragraphs apart (the GPE-S2-11 distance finding). */}
+          <p className="m-0 flex flex-wrap items-baseline gap-x-3 gap-y-0.5" data-hero-outlook-line>
             <span className="sr-only">{t('pd.global.goldOutlookLabel')}: </span>
             {hero.outlook !== null ? (
               <span className={`text-[length:var(--type-label)] font-bold leading-tight ${OUTLOOK_TONE[hero.outlook] ?? 'text-[var(--color-text-primary)]'}`} data-hero-outlook={hero.outlook}>
@@ -394,6 +399,7 @@ export function GoldHero({
               <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-tertiary)]">{t('pd.global.cannotRead')}</span>
             )}
             <bdi className="text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">{countsParts}</bdi>
+            <bdi className="text-[length:var(--type-caption)] font-normal text-[var(--color-text-tertiary)]">{t('pd.global.outlookCaveat')}</bdi>
           </p>
           {contextLine !== null ? (
             <p className="m-0 rounded-[var(--radius-sm)] bg-[var(--color-surface)]/70 px-2.5 py-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]" data-balance-context-line>

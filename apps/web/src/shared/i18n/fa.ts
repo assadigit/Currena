@@ -609,7 +609,11 @@ export const fa: Dictionary = {
       gaugeWhySome: '{warnings} از {voters} رأی‌دهنده نیازمند توجه‌اند',
       gaugeWhyNone: 'هیچ رأی‌دهنده‌ای نیازمند توجه نیست',
       gaugeWhyUnread: 'رأی‌دهنده‌های قابل‌خواندن کافی نیست',
-      goldOutlookLabel: 'چشم‌انداز طلا',
+      /* GPE R08 / F15 (2026-11-18، بندهای ۱ و ۲ از s6/02 §C3): اسم چشم‌انداز
+       * به «شرایط» بازتعریف می‌شود و جملهٔ «توصیف است، نه پیش‌بینی» درجاً،
+       * کنار واژهٔ چشم‌انداز می‌نشیند (نه چند پاراگراف پایین‌تر). */
+      goldOutlookLabel: 'چشم‌انداز شرایط',
+      outlookCaveat: 'این توصیف شرایط فعلی است، نه پیش‌بینی',
       goldCounts: '{for} موافق · {against} مخالف',
       goldUnread: ' · {n} خوانده‌نشده',
       outlookStrongBullish: 'صعودی قوی',

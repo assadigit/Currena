@@ -1470,8 +1470,9 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
     expect(goldLine).toContain('Leaning for gold');
     expect(goldLine).toContain('1 for · 0 against · 3 not leaning');
     // The outlook chip still rides the line's end (AC-3: same engine) —
-    // the fixture reads bullish now (L1 A0, price moving).
-    expect(goldLine).toContain('Outlook: Bullish');
+    // the fixture reads bullish now (L1 A0, price moving). GPE R08 / F15:
+    // the collapsed template re-scopes to the conditions grammar (C3 §1).
+    expect(goldLine).toContain('Conditions outlook: Bullish');
   });
 
   it('the card header speaks the same lane prose for gold; silver keeps the legacy sentence (one key, two models by metal)', () => {

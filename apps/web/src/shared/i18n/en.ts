@@ -629,8 +629,13 @@ export const en = {
       gaugeWhySome: '{warnings} of {voters} voters need attention',
       gaugeWhyNone: 'No voter needs attention',
       gaugeWhyUnread: 'Not enough readable voters',
-      /* The Gold Balance tile (D-21): outlook state + the meter's counts. */
-      goldOutlookLabel: 'Gold outlook',
+      /* The Gold Balance tile (D-21): outlook state + the meter's counts.
+       * GPE R08 / F15 (2026-11-18, s6/02 §C3 clause 1): the label re-scopes
+       * to CONDITIONS — the line never reads "Gold outlook" (the market's
+       * word survives on the state names); clause 2 adds the inline
+       * no-forecast caveat beside the outlook word. */
+      goldOutlookLabel: 'Conditions outlook',
+      outlookCaveat: 'this describes current conditions, not a forecast',
       goldCounts: '{for} for · {against} against',
       goldUnread: ' · {n} unread',
       /* The 7-state outlook names (pinned to insights signals.verdictStateNames). */

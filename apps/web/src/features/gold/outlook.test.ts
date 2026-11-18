@@ -156,31 +156,33 @@ describe('outlookOf — the owner\'s seven-state classification', () => {
   });
 });
 
-describe('outlook copy — the owner\'s verbatim sentences, both locales', () => {
+describe('outlook copy — the GPE R08/F15 conditions grammar, both locales (s6/02 §C3)', () => {
   const en = insightsCopyEn.signals;
   const fa = insightsCopyFa.signals;
 
-  /** The owner's table, gold column, exactly as written (the bug report's fix). */
-  const OWNER_GOLD_EN = {
-    'strong-bullish': 'Signs point to a potential significant rise in gold prices.',
-    bullish: 'Signs point to a potential rise in gold prices.',
-    neutral: 'Signs point to a neutral outlook for gold prices.',
-    'range-bound': 'Signs point to gold prices trading within a defined range.',
-    bearish: 'Signs point to a potential decline in gold prices.',
-    'strong-bearish': 'Signs point to a potential significant decline in gold prices.',
-    mixed: 'Market signals for gold prices are mixed.',
+  /** The C3-rewritten gold sentences (2026-11-18, D1-A locked): the noun
+   * is CONDITIONS (never "gold prices"), no intensifiers, strength via
+   * the strong/moderate ladder alone. */
+  const GOLD_EN = {
+    'strong-bullish': 'Conditions lean strongly in gold’s favour.',
+    bullish: 'Conditions lean in gold’s favour.',
+    neutral: 'Conditions are neutral for gold.',
+    'range-bound': 'Conditions are consistent with gold trading within a defined range.',
+    bearish: 'Conditions lean against gold.',
+    'strong-bearish': 'Conditions lean strongly against gold.',
+    mixed: 'Conditions are mixed for gold.',
   } as const;
-  const OWNER_GOLD_FA = {
-    'strong-bullish': 'نشانه‌ها حاکی از احتمال رشد قابل‌توجه قیمت طلاست.',
-    bullish: 'نشانه‌ها حاکی از احتمال رشد قیمت طلاست.',
-    neutral: 'نشانه‌ها حاکی از چشم‌اندازی خنثی برای قیمت طلاست.',
-    'range-bound': 'نشانه‌ها حاکی از نوسان قیمت طلا در محدوده‌ای مشخص است.',
-    bearish: 'نشانه‌ها حاکی از احتمال افت قیمت طلاست.',
-    'strong-bearish': 'نشانه‌ها حاکی از احتمال افت قابل‌توجه قیمت طلاست.',
-    mixed: 'نشانه‌های بازار درباره جهت حرکت قیمت طلا یکدست نیستند.',
+  const GOLD_FA = {
+    'strong-bullish': 'شرایط به‌وضوح به نفع طلا متمایل است.',
+    bullish: 'شرایط به نفع طلا متمایل است.',
+    neutral: 'شرایط برای طلا بی‌طرف است.',
+    'range-bound': 'شرایط با نوسان طلا در بازه‌ای مشخص سازگار است.',
+    bearish: 'شرایط به زیان طلا متمایل است.',
+    'strong-bearish': 'شرایط به‌وضوح به زیان طلا متمایل است.',
+    mixed: 'شرایط برای طلا یکدست نیست.',
   } as const;
 
-  const STATES = Object.keys(OWNER_GOLD_EN) as (keyof typeof OWNER_GOLD_EN)[];
+  const STATES = Object.keys(GOLD_EN) as (keyof typeof GOLD_EN)[];
 
   it('every state carries gold + silver sentences in BOTH locales', () => {
     for (const state of STATES) {
@@ -193,26 +195,40 @@ describe('outlook copy — the owner\'s verbatim sentences, both locales', () =>
     expect(sorted(Object.keys(en.verdictStateNames))).toEqual(sorted(Object.keys(fa.verdictStateNames)));
   });
 
-  it('the gold sentences are the owner\'s exact strings (EN + fa)', () => {
+  it('the gold sentences are the C3 conditions grammar, exactly (EN + fa)', () => {
     for (const state of STATES) {
-      expect(en.verdictStates[state].gold).toBe(OWNER_GOLD_EN[state]);
-      expect(fa.verdictStates[state].gold).toBe(OWNER_GOLD_FA[state]);
+      expect(en.verdictStates[state].gold).toBe(GOLD_EN[state]);
+      expect(fa.verdictStates[state].gold).toBe(GOLD_FA[state]);
+    }
+  });
+
+  it('C3 clause 1 + 4: the noun is conditions, never a price claim; no intensifiers', () => {
+    for (const state of STATES) {
+      for (const metal of ['gold', 'silver'] as const) {
+        expect(en.verdictStates[state][metal], `${state}/${metal}`).not.toContain('prices');
+        expect(en.verdictStates[state][metal], `${state}/${metal}`).not.toContain('potential');
+        expect(en.verdictStates[state][metal], `${state}/${metal}`).not.toContain('significant');
+      }
     }
   });
 
   it('the silver sentences mirror the gold structure', () => {
     for (const state of STATES) {
-      expect(en.verdictStates[state].silver).toContain('silver prices');
+      expect(en.verdictStates[state].silver).toContain('silver');
       expect(fa.verdictStates[state].silver).toContain('نقره');
       expect(fa.verdictStates[state].silver).not.toContain('طلا');
     }
   });
 
-  it('the strip heading and collapsed template speak the outlook', () => {
-    expect(en.verdictTitle).toBe('Outlook');
-    expect(fa.verdictTitle).toBe('چشم‌انداز');
-    expect(en.collapsedVerdict).toBe('Outlook: {verdict}');
-    expect(fa.collapsedVerdict).toBe('چشم‌انداز: {verdict}');
+  it('the strip heading, the caveat and the collapsed template speak the conditions grammar', () => {
+    // Clause 1: the title re-scopes — never bare "Outlook".
+    expect(en.verdictTitle).toBe('Conditions outlook');
+    expect(fa.verdictTitle).toBe('چشم‌انداز شرایط');
+    // Clause 2: the no-forecast line co-renders with the title.
+    expect(en.verdictCaveat).toBe('this describes current conditions, not a forecast');
+    expect(fa.verdictCaveat).toBe('این توصیف شرایط فعلی است، نه پیش‌بینی');
+    expect(en.collapsedVerdict).toBe('Conditions outlook: {verdict}');
+    expect(fa.collapsedVerdict).toBe('چشم‌انداز شرایط: {verdict}');
   });
 
   it('the retired mismatched words are gone', () => {

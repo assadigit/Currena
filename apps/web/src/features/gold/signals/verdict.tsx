@@ -276,8 +276,13 @@ export function VerdictStrip({
       className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[0_10px_34px_rgba(168,126,28,0.15)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
       data-signal-verdict
     >
-      <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]">
+      {/* GPE R08 / F15 (C3 clause 2): the title re-scopes to CONDITIONS and
+       * the no-forecast caveat co-renders in the same title row — the
+       * sentence below it is a conditions claim, and the reader meets the
+       * honesty clause at the same glance (never paragraphs away). */}
+      <h4 className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-[length:var(--type-label)] font-bold text-[var(--color-text-secondary)]" data-verdict-title>
         {s.verdictTitle}
+        <span className="font-normal text-[var(--color-text-tertiary)]">{s.verdictCaveat}</span>
       </h4>
       <ul className="m-0 flex list-none flex-col gap-2 p-0 sm:flex-row">
         {rows.map(({ reading, verdict, price }) => (
