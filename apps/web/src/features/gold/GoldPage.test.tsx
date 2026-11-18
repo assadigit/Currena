@@ -408,22 +408,39 @@ describe('GoldPage', () => {
     expect(document.querySelectorAll('[data-lane="flows"] [data-seat]').length).toBe(2);
   });
 
-  it('the seat home links ride the placement table (gold-silver → the in-page anchor, dollar voters → /currencies)', async () => {
+  it('GPE R10: the seat links are CARD-LEVEL (the placement table + the anchor contract — GPE-S2-18)', async () => {
     stubFeeds();
     render(<GoldPage />);
     await waitFor(() => {
       expect(document.querySelectorAll('[data-seat]').length).toBe(37);
     });
+    // The gold page's own seats link their context cards in-page.
     const goldSilver = document.querySelector('a[data-seat="gold-silver"]');
-    expect(goldSilver?.getAttribute('href')).toBe('#gold-context');
+    expect(goldSilver?.getAttribute('href')).toBe('#gold-card-gold-silver');
+    // The cross-page seats link the destination card's OWN anchor.
     const dollarBasket = document.querySelector('a[data-seat="dollar-basket"]');
-    expect(dollarBasket?.getAttribute('href')).toBe('/currencies');
+    expect(dollarBasket?.getAttribute('href')).toBe('/currencies#currencies-card-dollar-basket');
     const fedTarget = document.querySelector('a[data-seat="fed-target"]');
-    expect(fedTarget?.getAttribute('href')).toBe('/usa');
+    expect(fedTarget?.getAttribute('href')).toBe('/usa#usa-card-fed-target');
     const ecbDfr = document.querySelector('a[data-seat="ecb-dfr"]');
-    expect(ecbDfr?.getAttribute('href')).toBe('/europe');
+    expect(ecbDfr?.getAttribute('href')).toBe('/europe#europe-card-ecb-dfr');
     const gprDaily = document.querySelector('a[data-seat="gpr-daily"]');
-    expect(gprDaily?.getAttribute('href')).toBe('/world-markets');
+    expect(gprDaily?.getAttribute('href')).toBe('/world-markets#wm-risk-gpr-daily');
+    // The GPE-S2-18 name-match: the tooltip + accessible name carry the
+    // DESTINATION CARD'S OWN TITLE (the same key the card renders).
+    const destTitle = dollarBasket?.getAttribute('title') ?? '';
+    expect(destTitle.length).toBeGreaterThan(3); // a real title, not a stub
+    expect(dollarBasket?.getAttribute('aria-label')).toContain(destTitle);
+    // The lane cards carry the contract's canonical lane anchors (s7/03 §1.2).
+    for (const lane of ['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows']) {
+      expect(document.getElementById(`lane-${lane}`), `#lane-${lane}`).toBeTruthy();
+    }
+    // Every one of the 37 seats links a card-level anchor (never a bare page).
+    const hrefs = [...document.querySelectorAll('a[data-seat][data-seat-home]')].map((a) => a.getAttribute('href') ?? '');
+    expect(hrefs).toHaveLength(37);
+    for (const href of hrefs) {
+      expect(href, 'every seat href carries a card-level #hash').toContain('#');
+    }
   });
 
   it('renders the context cards with values, the blocked quartet as notes, and the honest record', async () => {

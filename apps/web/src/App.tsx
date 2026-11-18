@@ -27,6 +27,7 @@ import { LiveRates } from './features-tools/live-rates/LiveRates';
 import { useRoute } from './router';
 import { useI18n } from './shared/lib/locale';
 import { routeMetaFor, setCanonical, setMetaTag } from './lib/route-meta';
+import { consumeStagedAnchorScroll } from './shared/lib/anchor-scroll';
 import { snapshotStore } from './shared/lib/snapshot-store';
 import { hydrateServerHistory } from './shared/lib/rate-history';
 import { alertsStore } from './shared/lib/alerts';
@@ -207,6 +208,15 @@ export function App() {
     void hydrateServerHistory();
     alertsStore.getState(); // boot the alerts store (hydration + storage listener)
   }, []);
+
+  // GPE R10 (INF-3): consume a staged card-level anchor on each route
+  // commit — the seat links' cross-page `#hash` hrefs (GPE-S2-18) route
+  // via navigate() and stage the anchor here; this scrolls to the
+  // destination card once it is laid out (the Footer→About pattern,
+  // generalized to every destination page; bounded, fail-soft).
+  useEffect(() => {
+    consumeStagedAnchorScroll();
+  }, [route]);
 
   useEffect(() => {
     // S19 (2026-11-12): the per-route <head> pass. The S1 title wiring

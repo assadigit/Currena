@@ -20,7 +20,6 @@
  */
 
 import { useMemo } from 'react';
-import type { PageDivisionPageId } from '@currena/core';
 import type { GoldLane } from '@currena/insights';
 import type { IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
@@ -28,8 +27,9 @@ import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 import type { TranslationKey } from '../../shared/lib/locale';
-import { seatUnreadWhy, type GoldSeat, type GoldSeatLane, type GoldVoterId, type SeatUnreadCause } from './gold-tiles';
+import { GOLD_SEAT_DEST_NAME_KEY, seatAnchorHref, seatUnreadWhy, type GoldSeat, type GoldSeatLane, type GoldVoterId, type SeatUnreadCause } from './gold-tiles';
 import { yoyGapBaseLabel } from '../../shared/lib/yoy-gap';
+import { stageAnchorScroll } from '../../shared/lib/anchor-scroll';
 
 /* The lane copy keys — five lanes, the corpus's own names + intros.
  * S6: exported for the hero's classic balance view (the same lane
@@ -51,19 +51,6 @@ const LANE_INTRO_KEY: Readonly<Record<GoldLane, TranslationKey>> = {
 };
 
 export { LANE_INTRO_KEY };
-
-/** The route path of a page id — the destinations' own slugs (D-46). */
-const PAGE_ROUTE: Record<PageDivisionPageId, string> = {
-  global: '/',
-  gold: '/gold',
-  'world-markets': '/world-markets',
-  usa: '/usa',
-  europe: '/europe',
-  'asia-pacific': '/asia-pacific',
-  australia: '/australia',
-  commodities: '/commodities',
-  currencies: '/currencies',
-};
 
 /* The seat lean words + tones — the balance's own vocabulary. */
 const SEAT_LEAN_KEY: Record<GoldSeat['impact'], TranslationKey> = {
@@ -178,10 +165,13 @@ export const VOTER_NAME_KEY: Readonly<Record<GoldVoterId, TranslationKey>> = {
  *  anchor when the seat's home card lives on THIS page (gold-silver ·
  *  the CFTC pair — the placement's own gold group). Fail-closed: an
  *  unplaced id renders no link. */
+/* GPE R10 (INF-3, s7/03 §1.2): the seat link is CARD-LEVEL — the pure
+ * builder in gold-tiles.ts composes the destination route + the card's
+ * own stable anchor (`/usa#usa-card-real-yield-10y`; the gold page's own
+ * context seats link in-page `#gold-card-gold-silver`). GPE-S2-18: the
+ * reader lands ON the card, never at the top of a long page. */
 function seatHref(seat: GoldSeat): string | null {
-  if (seat.homePage === null) return null;
-  if (seat.homePage === 'gold') return '#gold-context';
-  return PAGE_ROUTE[seat.homePage];
+  return seatAnchorHref(seat);
 }
 
 /* ------------------------------------------------------------------ *
@@ -202,6 +192,10 @@ function SeatChip({
   const leanWord = t(SEAT_LEAN_KEY[seat.impact]);
   const evidenceWord = seat.evidence !== null ? t(EVIDENCE_KEY[seat.evidence]) : null;
   const href = seatHref(seat);
+  /* GPE R10 (the GPE-S2-18 name-match): the destination card's OWN title
+   * (the same key the card renders) rides the tooltip + the accessible
+   * name — the reader knows exactly which card the anchor opens. */
+  const destName = t(GOLD_SEAT_DEST_NAME_KEY[seat.id]);
   /* GPE R04 (F16a): the dark seat's why-line — one muted status line
    * naming the cause class (upstream-stopped / upstream-gap /
    * pipeline-lag / rule-driven), derived from the projection's own
@@ -274,12 +268,18 @@ function SeatChip({
         data-seat={seat.id}
         data-seat-impact={seat.impact}
         data-seat-home={seat.homePage}
-        aria-label={`${aria}. ${t('pd.gold.seatLink')}`}
-        title={t('pd.gold.seatLink')}
+        aria-label={`${aria}. ${destName}`}
+        title={destName}
         onClick={(e) => {
           if (href.startsWith('#')) return; // the in-page anchor scrolls natively.
           e.preventDefault();
-          navigate(href);
+          // GPE R10: the cross-page card anchor — the real href keeps the
+          // #hash (AT, new-tab, honest link semantics); the router takes
+          // the ROUTE and the staged anchor scrolls to the card once it
+          // lays out (the Footer→About pattern, generalized).
+          const hashAt = href.indexOf('#');
+          if (hashAt !== -1) stageAnchorScroll(href.slice(hashAt + 1));
+          navigate(href.slice(0, hashAt === -1 ? undefined : hashAt));
         }}
         className="insights-focusable flex min-h-[44px] cursor-pointer flex-col justify-center gap-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 no-underline ring-1 ring-[var(--color-border)] motion-safe:transition-shadow hover:shadow-[0_2px_10px_rgba(15,23,42,0.08)]"
       >
@@ -329,7 +329,7 @@ function LaneCard({
 
   return (
     <section
-      id={`gold-lane-${lane.lane}`}
+      id={`lane-${lane.lane}`}
       aria-labelledby={`gold-lane-${lane.lane}-title`}
       data-lane={lane.lane}
       data-lane-side={lane.split === true ? 'split' : lane.side}

@@ -28,9 +28,9 @@
  * EXACTLY the words the legacy card speaks, in both locales.
  *
  * Pressing a lane weight scrolls to that lane's seat card below
- * (GoldSeats' #gold-lane-{lane}) — the on-page equivalent of the legacy
- * ledger row: the same "open this lane's membership" intent, answered
- * by the seats section this page already renders.
+ * (GoldSeats' #lane-{lane}, the GPE R10 anchor contract) — the on-page
+ * equivalent of the legacy ledger row: the same "open this lane's
+ * membership" intent, answered by the seats section this page renders.
  */
 
 import { formatNumber } from '@currena/core';
@@ -146,9 +146,12 @@ export function GoldBalanceClassic({ hero }: { hero: GoldHeroModel }): React.JSX
   };
 
   /** Pressing a weight scrolls to its lane's seat card (the page's own
-   * answer to the legacy ledger row). Reduced motion scrolls instantly. */
+   * answer to the legacy ledger row). Reduced motion scrolls instantly.
+   * GPE R10: the scroll targets the contract's canonical lane anchor
+   * (`lane-{lane}`, s7/03 §1.2) — renamed from `gold-lane-{lane}` with the
+   * same commit that made the ids the education layer's closes. */
   const openLaneFromWeight = (key: string): void => {
-    const el = document.getElementById(`gold-lane-${key}`);
+    const el = document.getElementById(`lane-${key}`);
     if (el === null) return;
     const reduced =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

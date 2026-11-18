@@ -32,6 +32,7 @@ import type { GoldBalanceLane, GoldBalanceMember, GoldBalanceReading } from '@cu
 import { BLOCKED_NOTES, GOLD_VOTER_IDS, homePageOfIndicator, pageHomeIds } from '@currena/insights/page-division';
 import type { BlockedNote } from '@currena/insights/page-division';
 import type { PageDivisionPageId } from '@currena/core';
+import type { TranslationKey } from '../../shared/lib/locale';
 import { goldOutlookOf, type OutlookState } from '../../shared/components/outlook-core';
 import {
   balanceTilt,
@@ -241,6 +242,121 @@ export interface GoldSeat {
    *  renders without a link, fail-closed). */
   homePage: PageDivisionPageId | null;
 }
+
+/* ------------------------------------------------------------------ *
+ * GPE R10 (INF-3, 2026-11-18) — the ANCHOR-ID CONTRACT's builder
+ * (s7/03 §1.2, binding for Phase D). Every seat link is CARD-LEVEL:
+ * the destination pages' own stable card anchors (the #18 pattern,
+ * verified present: `usa-card-real-yield-10y`, `currencies-card-
+ * dollar-basket`, `wm-risk-gpr-daily` …) — the reader lands ON the
+ * card, not at the top of a long page (GPE-S2-18). The name-match
+ * rule (GPE-S2-18's second finding): every seat carries its
+ * destination card's OWN title key, so the link's tooltip + accessible
+ * name say exactly what the reader will land on. The builder is PURE
+ * (the homePage pattern, extended) — never string-concatenated in
+ * components; ids only, no behavioural side effects (s7/03 rule 3).
+ * ------------------------------------------------------------------ */
+
+/** The destination pages' routes (moved from GoldSeats — the builder's
+ *  own data, shared with the seat renderer). */
+export const PAGE_ROUTE: Readonly<Record<PageDivisionPageId, string>> = {
+  global: '/',
+  gold: '/gold',
+  'world-markets': '/world-markets',
+  usa: '/usa',
+  europe: '/europe',
+  'asia-pacific': '/asia-pacific',
+  australia: '/australia',
+  commodities: '/commodities',
+  currencies: '/currencies',
+};
+
+/** The card-level anchor PREFIX each destination page's cards render
+ * (verified in the page components: UsaTierCards `usa-card-${id}`,
+ * CurrenciesTierCards `currencies-card-${id}`, EuropeTierCards
+ * `europe-card-${id}`, AsiaTierCards `asia-card-${id}`,
+ * AustraliaTierCards `australia-card-${id}`, CommoditiesTierCards
+ * `commodities-card-${id}`, WorldRiskCards `wm-risk-${id}`, and this
+ * page's own context cards `gold-card-${id}` — R10). The Global page
+ * renders tiles, not anchored cards — its seats (none today) would link
+ * the bare route; an anchor is never invented (s7/03 rule 3). */
+const PAGE_CARD_ANCHOR_PREFIX: Readonly<Record<PageDivisionPageId, string>> = {
+  global: '',
+  gold: 'gold-card',
+  'world-markets': 'wm-risk',
+  usa: 'usa-card',
+  europe: 'europe-card',
+  'asia-pacific': 'asia-card',
+  australia: 'australia-card',
+  commodities: 'commodities-card',
+  currencies: 'currencies-card',
+};
+
+/** The seat's CARD-LEVEL href: the destination route + the card's own
+ *  stable anchor (`/usa#usa-card-real-yield-10y`); the gold page's own
+ *  context seats link in-page (`#gold-card-gold-silver` — the native
+ *  browser hash scroll, no staging). Null when the seat has no home
+ *  (the chip renders without a link — fail-closed). */
+export function seatAnchorHref(seat: Pick<GoldSeat, 'id' | 'homePage'>): string | null {
+  if (seat.homePage === null) return null;
+  if (seat.homePage === 'gold') return `#gold-card-${seat.id}`;
+  const route = PAGE_ROUTE[seat.homePage];
+  const prefix = PAGE_CARD_ANCHOR_PREFIX[seat.homePage];
+  if (prefix === '') return route; // no card anchors on that page — never invent one
+  return `${route}#${prefix}-${seat.id}`;
+}
+
+/** Each voter's DESTINATION CARD TITLE key — the destination page's own
+ *  name key (no parallel copy: the same keys the cards render, so the
+ *  tooltip can never drift from the card it names). The GPE-S2-18
+ *  name-match: "Real yields" (the chip) tells the reader WHAT; the
+ *  tooltip's "US 10-year interest after inflation" (the card's title)
+ *  tells them WHERE they land — both from one map, both locales. */
+export const GOLD_SEAT_DEST_NAME_KEY: Readonly<Record<GoldVoterId, TranslationKey>> = {
+  // /usa — the 25 US seats (UsaTierCards' own pd.usa.cardNames).
+  'real-yield-10y': 'pd.usa.cardNames.real-yield-10y',
+  us10y: 'pd.usa.cardNames.us10y',
+  us30y: 'pd.usa.cardNames.us30y',
+  'fed-target': 'pd.usa.cardNames.fed-target',
+  'fed-expectations': 'pd.usa.cardNames.fed-expectations',
+  'real-yield-5y': 'pd.usa.cardNames.real-yield-5y',
+  'nyfed-custody': 'pd.usa.cardNames.nyfed-custody',
+  'stress-stlfsi': 'pd.usa.cardNames.stress-stlfsi',
+  nfci: 'pd.usa.cardNames.nfci',
+  vix: 'pd.usa.cardNames.vix',
+  'term-premium-10y': 'pd.usa.cardNames.term-premium-10y',
+  ebp: 'pd.usa.cardNames.ebp',
+  'michigan-sentiment': 'pd.usa.cardNames.michigan-sentiment',
+  'epu-us': 'pd.usa.cardNames.epu-us',
+  'sp500-breadth-ratio': 'pd.usa.cardNames.sp500-breadth-ratio',
+  'bank-stress': 'pd.usa.cardNames.bank-stress',
+  'us-cpi-yoy': 'pd.usa.cardNames.us-cpi-yoy',
+  'us-pce-core-yoy': 'pd.usa.cardNames.us-pce-core-yoy',
+  'breakeven-5y5y': 'pd.usa.cardNames.breakeven-5y5y',
+  'breakeven-tilt': 'pd.usa.cardNames.breakeven-tilt',
+  t5yie: 'pd.usa.cardNames.t5yie',
+  'michigan-1y-expectations': 'pd.usa.cardNames.michigan-1y-expectations',
+  'm2-us': 'pd.usa.cardNames.m2-us',
+  'us-deficit-12m': 'pd.usa.cardNames.us-deficit-12m',
+  'michigan-5y-expectations': 'pd.usa.cardNames.michigan-5y-expectations',
+  // /currencies — the 6 dollar seats (CurrenciesTierCards' own keys; usdjpy
+  // is a pair card, the rest standing cards).
+  'dollar-basket': 'pd.currencies.standingCardNames.dollar-basket',
+  usdjpy: 'pd.currencies.pairCardNames.usdjpy',
+  'us-japan-10y-gap': 'pd.currencies.standingCardNames.us-japan-10y-gap',
+  'usd-reserve-share': 'pd.currencies.standingCardNames.usd-reserve-share',
+  'dollar-broad': 'pd.currencies.standingCardNames.dollar-broad',
+  'dollar-eme': 'pd.currencies.standingCardNames.dollar-eme',
+  // /europe — the 2 euro seats (EuropeTierCards' own keys).
+  'ecb-dfr': 'pd.europe.cardNames.ecb-dfr',
+  'euro-hicp': 'pd.europe.cardNames.euro-hicp',
+  // /world-markets — the 1 geopolitics seat (WorldRiskCards' own keys).
+  'gpr-daily': 'pd.worldMarkets.cardNames.gpr-daily',
+  // /gold — this page's own 3 context seats (GoldContext's own keys).
+  'gold-silver': 'pd.gold.cardNames.gold-silver',
+  'cftc-gold-positioning': 'pd.gold.cardNames.cftc-gold-positioning',
+  'cftc-gold-gross-long': 'pd.gold.cardNames.cftc-gold-gross-long',
+};
 
 /** One lane's seats view: the engine's lane vote + its seats in table order. */
 export interface GoldSeatLane {
