@@ -94,12 +94,14 @@ export interface CbValueObs {
   usd: number;
 }
 
-/** A month normalized to "YYYY-MM" or null. The venue prints BOTH
- *  "2026-M09" (the SDMX M-format, the IL/IRFCL volume legs) and
- *  "2021-01" (plain, some IRFCL value legs) — live-verified 2026-11-18;
- *  anything else fails closed. */
+/** A month normalized to "YYYY-MM" or null. The venue prints THREE
+ *  month shapes (live-verified 2026-11-18): "2026-M09" (the SDMX
+ *  M-format, the IL/IRFCL volume legs), "2021-01" (plain, some IRFCL
+ *  value legs) and "2001-08-07" (a FULL DATE — the IRFCL value legs'
+ *  daily prints, normalized to their month); anything else fails
+ *  closed. */
 export function normalizeCbMonth(period: string): string | null {
-  const m = /^(\d{4})-M?(0[1-9]|1[0-2])$/.exec(period);
+  const m = /^(\d{4})-M?(0[1-9]|1[0-2])(?:-\d{2})?$/.exec(period);
   return m === null ? null : `${m[1]}-${m[2]}`;
 }
 

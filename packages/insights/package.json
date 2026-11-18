@@ -38,6 +38,7 @@
     "markets-backfill-chg5y": "tsx scripts/markets-backfill-chg5y.ts",
     "markets-backfill": "tsx scripts/markets-backfill.ts",
     "fx-run": "tsx scripts/fx-run.ts",
+    "gold-cb-run": "tsx scripts/gold-cb-run.ts",
     "markets-backtest": "tsx scripts/markets-backtest.ts",
     "prices-run": "tsx scripts/prices-run.ts",
     "fx-data-check": "tsx scripts/fx-data-check.ts",

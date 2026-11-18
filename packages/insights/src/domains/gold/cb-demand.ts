@@ -304,6 +304,64 @@ export class KvGoldCbStore implements GoldCbStore {
 }
 
 /* ------------------------------------------------------------------ *
+ * The REST adapter (the manual runner's landing lever — the
+ * RestAuMarketsStore twin: writes through the Cloudflare KV REST API
+ * so a fresh deploy can land the section's data without waiting for
+ * the next month's rung, exactly the markets-au "Path B" pattern).
+ * ------------------------------------------------------------------ */
+
+export interface RestGoldCbOptions {
+  apiToken: string;
+  accountId: string;
+  namespaceId: string;
+  /** Injectable for tests. */
+  fetchImpl?: typeof fetch;
+}
+
+const CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4';
+
+export class RestGoldCbStore implements GoldCbStore {
+  private readonly fetchImpl: typeof fetch;
+
+  constructor(private readonly opts: RestGoldCbOptions) {
+    this.fetchImpl = opts.fetchImpl ?? ((input, init) => fetch(input, init));
+  }
+
+  private url(): string {
+    return (
+      `${CLOUDFLARE_API_BASE}/accounts/${this.opts.accountId}` +
+      `/storage/kv/namespaces/${this.opts.namespaceId}/values/${encodeURIComponent(GOLD_CB_KV_KEY)}`
+    );
+  }
+
+  async getGoldCb(): Promise<GoldCbSnapshot | undefined> {
+    const response = await this.fetchImpl(this.url(), {
+      headers: { Authorization: `Bearer ${this.opts.apiToken}` },
+    });
+    if (response.status === 404) return undefined;
+    if (!response.ok) {
+      throw new ImfReservesError(`KV REST read failed: HTTP ${response.status}`);
+    }
+    return parseStoredGoldCb(await response.text());
+  }
+
+  async writeGoldCb(snapshot: GoldCbSnapshot): Promise<void> {
+    const response = await this.fetchImpl(this.url(), {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${this.opts.apiToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(snapshot),
+    });
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      throw new ImfReservesError(`KV REST write failed: HTTP ${response.status}: ${body.slice(0, 160)}`);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * The job (the rung3 body)
  * ------------------------------------------------------------------ */
 
