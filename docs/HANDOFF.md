@@ -1,62 +1,62 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S11 — GPE P1-b, the explanation band; IN FLIGHT)
+## This session (S11 — GPE P1-b, the explanation band; DONE AND VERIFIED LIVE)
 
-**Goal:** land rows R07–R12 exactly (s8/01 §2), each tested, on the branch
-`gold-elevation/p1b-explanation-band`, then one Persian-copy manifest round,
-gates green, deploy per `docs/DEPLOY.md`, live-verify per AGENTS.md §9
-(desktop + mobile + RTL both locales), and close per AGENTS.md §10 with the
-S11 summary + the S12 next-session prompt.
+**Outcome:** all six rows R07–R12 landed, tested, deployed, and
+live-verified. Production is currena-api `23ce6b06` @ 100% (created
+2026-11-18T14:31:20Z). The branch `gold-elevation/p1b-explanation-band`
+(HEAD `6a3d55de`, 10 commits: M1 docs + R07–R12 + the manifest round +
+the budget bump) is pushed. Gates 9/9 GREEN (suite 15,247, +28
+positive-only). The Persian-copy manifest round 84 landed the wave's 57
+fa strings (7997 → 8032 entries; copy:audit clean). The session summary
++ the S12 next-session prompt are
+docs/specs/gold-page-elevation/s11/SUMMARY.md.
 
-**Milestones:** M1 the R07 Treasury-direct read re-check (FRED's venue
-state at build time; FRED UP → R07 ships, FRED DOWN → R07 defers) · M2 the
-six rows R07–R12 (R07 the Treasury-primary yield swap · R08 the F15 outlook
-wording per C3's four clauses · R09 the F13 sharpened licence wall · R10
-the anchor/consistency infrastructure · R11 the F1 daily narrative · R12
-the F5 yield-decomposition card) · M3 the manifest round 84 + gates +
-deploy + live-verify + the close.
+**The honest R07 note:** the Treasury-primary collect code is DEPLOYED
+and verified in the Worker bundle, but the live KV snapshot predates
+the deploy (generated 13:12 UTC) — the readings still carry FRED
+provenance (as-of Nov 16). The first Treasury-primary rung fires
+**04:10 UTC Nov 19**; the 10:10/20:10 sweeps correctly skip (healthy
+status, under the 10-hour stale threshold). **The S12 M1 verifies the
+flip** (S11-D4).
 
-**Branch base (the S10 close):** off `gold-elevation/p1a-credibility-floor`
-at `ec57261e` (the S10 bookkeeping tip; production `f0844e59` @ 100% is
-built from it — the prompt's "main at the S10 close" is this tree, since
-git `main` still sits at the R-5 close `19131b0` and the P1-a rows R01–R06
-live on the p1a branch). **Scope guard: EXACTLY R07–R12** — no R13+ rows,
-no drive-by refactors, no roadmap edits. **Deploy note:** today is
-Wednesday 2026-11-18 — the §21 portwatch window (Tuesday 11:00–14:00 UTC)
-is clear.
+**Program counter: Session 11/18 · 7 remaining (S12–S18).** Next: S12 =
+P1-c the prizes (R13 Bridge-1 the Iran bridge · R14 the IMF CB-demand
+tracker · R15 the GDT stack (drop-dependent) · R16 the affordances +
+market pill · R17 the #21 de-dup — the S12 prompt is in s11/SUMMARY.md's
+next-session section).
 
-## Current state (after the GPE S10 P1-a credibility-floor session)
+## Current state (after the GPE S11 P1-b explanation-band session)
 
-**The Gold Page Elevation (GPE) S10 P1-a credibility floor is DELIVERED,
+**The Gold Page Elevation (GPE) S11 P1-b explanation band is DELIVERED,
 DEPLOYED + LIVE-VERIFIED. Production is now currena-api Version ID
-`f0844e59` (created 2026-11-18T11:37:29Z @ 100% — the S10 P1-a deploy,
-superseding the R-5 port `6ae72ba7`). The code is committed + pushed to
-origin at the branch `gold-elevation/p1a-credibility-floor` (HEAD
-`71ca786`, off main `19131b0` — the post-R-5 tree). Gates 9/9 GREEN
-(suite 15,219 — delta +35 from the R-5 baseline 15,184, positive-only).
-The session summary is docs/specs/gold-page-elevation/s10/SUMMARY.md;
-the program plan is docs/specs/gold-page-elevation/00-PROGRAM-PLAN.md.**
+`23ce6b06` (created 2026-11-18T14:31:20Z @ 100%, superseding the S10
+P1-a deploy `f0844e59`). The code is committed + pushed to origin at the
+branch `gold-elevation/p1b-explanation-band` (HEAD `6a3d55de`, off the
+p1a tip `ec57261e`). Gates 9/9 GREEN (suite 15,247 — delta +28 from the
+S10 close, positive-only). The session summary is
+docs/specs/gold-page-elevation/s11/SUMMARY.md; the program plan is
+docs/specs/gold-page-elevation/00-PROGRAM-PLAN.md.**
 
-The six wave-0 rows R01–R06 shipped: the flagship gold/silver price chart
-states its true ~5.2-year window (R01, D6-A relabel-now — the "10 years"
-chip that rendered a 5.2-year window fixed); the FA SGE/Swiss «میلیون
-تن» → «تن» unit error fixed (R02); the Gold Positions 30-day change label
-+ the ±100 bar clamp semantics fixed (R03); every dark meter seat states
-WHY it's dark — the four cause classes upstream-stopped/upstream-gap/
-pipeline-lag/rule-driven (R04, F16a); the CPI shutdown-gap policy per
-S4-D1 lights the seat with the adjacent-months-average base label (R05,
-INF-2); the five LOW riders #15/#23/#24/#26/#27 + the F17 silver
-keep-small footer note (R06). The two build-time reads (D8 locked: B)
-resolved to their pre-committed fallback bands (the Kalshi 429/Vercel
-checkpoint + the CBI F5-WAF block are environment states — the bands
-cost P1-a nothing; R28 at P3 + R13 at P1-b re-attempt). The Persian-copy
-manifest round 83 landed the 10 fa strings; copy:audit clean.
-
-**Program counter: Session 10/18 · 8 remaining (S11–S18).** Next: S11 =
-P1-b the explanation band (R07 Treasury-direct, R08 F15 wording, R09 F13
-licence wall, R10 anchor/consistency infrastructure, R11 F1 narrative,
-R12 F5 yield card — the S11 prompt is in s10/SUMMARY.md's next-session
-section).
+The six wave-1 rows shipped: the US yield family reads Treasury-direct
+as PRIMARY with FRED as basis/fallback/cross-check (R07 — the deployed
+swap; the first Treasury-primary rung fires 04:10 UTC Nov 19); the
+outlook line speaks the conditions grammar ("Conditions outlook" + the
+inline "this describes current conditions, not a forecast" — the 14
+forecast-ish verdict sentences re-worded, both locales) (R08); the
+licence wall states each blocked item's why + the owner's lever + the
+one link-out to the public data-sources document (R09); every seat link
+is a card-level #hash anchor with the name-match rule (R10); the F1
+daily narrative "Why gold moved" renders the price fact + the five
+driver families' states + raw deltas + the standing caveat (R11); the
+F5 yield-decomposition card renders the four legs, the exact identity
+(real + breakeven = nominal, the breakeven derived on matching as-ofs),
+the moved block, the three named configurations + the 2022-gilt
+exception, the Kim–Wright/ACM provenance, and the chain's two live
+seats (R12). The Persian-copy manifest round 84 landed the 57 fa
+strings; copy:audit clean. The GoldPage chunk budget bumped 82.5/21 →
+89.5/22.5 (R12's binding education block, measured 88.41/21.91 — the
+S11-D3 record; ~1.1 kB raw headroom for P1-c).
 
 ## The green baseline — the S10 P1-a record (2026-11-18)
 
@@ -134,12 +134,25 @@ section).
 ## Known state worth knowing
 
 - **The Layer-1 inventory is COMPLETE** (193×2 entries ≥ the 187 registry ids) — every panel the port can open carries Layer-1 copy; the graceful-absence branch (`if (!l1) return null`) is defensive only (BD-S33 D9).
-- **The dist topology (post-R-5):** entry 270.48/81.94 (UNCHANGED budget); 10 destination-page chunks within budget (AsiaPage re-baselined 16.5→16.75 raw). Build deterministic (both gates runs produced identical hashes).
-- **The Persian-copy manifest: 7988 entries (UNCHANGED this session — zero new copy keys in the R-5 port).**
+- **The dist topology (post-S11):** entry 271.12/82.12 (within the 296/89.5 budget); 10 destination-page chunks within budget (the GoldPage ceiling 89.5/22.5 per S11-D3, measured 88.41/21.91). Build deterministic.
+- **The Persian-copy manifest: 8032 entries (round 84, the S11 wave — 57 fa strings; copy:audit clean).**
 - **The narrator vocabulary: 193×2 + 56×2 (UNCHANGED).**
 
-## The next-session pointer — the R-5 port is COMPLETE
+## The next-session pointer — GPE S11 P1-b is COMPLETE; S12 P1-c next
 
-**The R-5 details-panel port is DONE AND VERIFIED LIVE: spec + code shipped (`1a072a55` + `f66efa44` on origin/main), gates 9/9 GREEN ×2, suite 15,184 (+19), deployed (`6ae72ba7` @ 100%), live-verified (the click-through matrix + zero console errors + mobile + RTL + the §19.6 redirect regression). Production == origin/main HEAD. Nothing remains for the R-5 plan.**
+**The GPE S11 explanation band is DONE AND VERIFIED LIVE: the six rows
+R07–R12 shipped (`81cd8803`…`6a3d55de` on
+`gold-elevation/p1b-explanation-band`), gates 9/9 GREEN, suite 15,247
+(+28), manifest round 84 (57 fa strings, clean), deployed (`23ce6b06`
+@ 100%), live-verified (EN + fa/RTL desktop + mobile 390 + the
+anchor click-through + zero console errors). The S12 P1-c prompt (the
+prizes: R13–R17) is at the bottom of
+docs/specs/gold-page-elevation/s11/SUMMARY.md.**
 
-The standing owner-side levers (the burn-in measurement → the R-7 watchlist decision, the investor's §19 review, the fa-string triage, the credential rotation) re-open work at the owner's discretion, each behind its own Gate 0. The standing limits in AGENTS.md §11 (the §21 portwatch window, the D-43 deploy-lock re-check, the wrangler 10013 retry rule) carry forward to any future session that deploys or moves files.
+The standing owner-side levers (the WGC GDT data drop → R15's
+drop-calendar answer; the WGC authorisation letter (D9); the two
+operational P0s (CFTC + GPR); the fa-string triage queue; the
+credential rotation) re-open work at the owner's discretion. The
+standing limits in AGENTS.md §11 (the §21 portwatch window, the D-43
+deploy-lock re-check, the wrangler 10013 retry rule) carry forward to
+any future session that deploys or moves files.
