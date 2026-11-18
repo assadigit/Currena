@@ -1081,7 +1081,36 @@ const BUDGETS = [
   // measured fit + ~0.9 kB raw headroom; P2's F7 interactive chart
   // (R18) ships its own measured bump when it lands. Justified in
   // CHANGELOG §2026-11-18 (GPE S12).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 116_000, gz: 27_500, label: 'Gold page lazy chunk (page-division S5)' },
+  // GPE S13 (2026-11-18, 116/27.5 → 152/34.5): the WAVE-2 ROWS land —
+  // the four P2 surfaces, all riding this same chunk exactly as the
+  // S12-D6 record planned ("F7's module ships its own measured bump"):
+  //   · R18 the interactive price chart (GoldPriceChart — the pointer-
+  //     drag pan + wheel/pinch zoom + log-scale machinery, the
+  //     unit-aware header + the oz/gram toggle, the 50/200 DMA overlay
+  //     paths + toggles, the window-as-user-control chips + the
+  //     computed-span delta words, the hover/keyboard inspector; the
+  //     shared gold-xau module-cached fetch layer with its last-good
+  //     localStorage paint).
+  //   · R19 the TA band (GoldTaLevels — the SMA rows, the distance-
+  //     decile sentence, the dated cross events list, the classic
+  //     daily/weekly pivot tables, the 390 collapse; the pure
+  //     ta-levels engine rides @currena/insights).
+  //   · R20 the education on-ramp (GoldOnRamp — the five-driver
+  //     accordion with its LIVE lane closes, the two notes, the
+  //     six-question FAQ tail).
+  //   · R21 the one-liners + the Chain-7 physical grouping (the
+  //     context cards' meaning sentences + the physical-market
+  //     sub-block; the ~100 new copy keys ×2 locales live in the
+  //     SHARED locale chunk, not here).
+  // Measured 150.67/34.33 — over the 116/27.5 ceiling by 34.67 kB raw
+  // / 6.83 kB gz. Verified NOT duplication (each new module's markers
+  // appear exactly once in the built chunk; the dictionaries, the
+  // snapshot store and the insights engine each stay in their own
+  // chunks — inspected in the built output). The bump to 152/34.5
+  // gives the measured fit + ~1.3 kB raw headroom. The GB-S6 byte
+  // snapshot re-pinned (the conscious S13-D2 chart swap in the gold
+  // chip). Justified in CHANGELOG §2026-11-18 (GPE S13).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 152_000, gz: 34_500, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree

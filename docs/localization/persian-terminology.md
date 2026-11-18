@@ -265,3 +265,30 @@ The consolidated lane balance behind `?balance=lanes`
   label: the sum over reporters, never claimed as the whole world).
 - **قرارداد آتی طلا در کمکس** — COMEX gold futures (the market pill's
   named reference market; کمکس is the venue's Persian-rendered name).
+
+## The gold page's chart + TA band + on-ramp (GPE round 86)
+
+- **تلاقی** — the 50/200 crossover. Round 86's choice over the
+  incumbent's Latin loan «کراس»; «تلاقی طلایی» (golden) and «تلاقی
+  نزولی» (death) keep the pair's direction words honest (طلایی is the
+  market's own golden-cross word).
+- **سطوح مرجع** — "reference levels", the TA zone's name (the C5
+  draft word). Never «حمایت/مقاومت تضمینی» — the honesty clause rides
+  the subtitle («توصیف است، نه تضمین»).
+- **سطوح پیوت** — the pivot levels. TGJU's own phrase, kept verbatim
+  (the C5 vocabulary rule: meet the reader where TGJU put them);
+  «پیوت‌های کلاسیک روزانه/هفتگی» for the classic-only guard.
+- **بازار فیزیکی** — the physical market (the Chain-7 mini-header
+  grouping the SGE/Swiss/Shanghai cards).
+- **حسگر، نه حکم** — the sensor-not-verdict framing family (the shared
+  physical reading line + the Shanghai premium's one-liner).
+- **میانگین متحرک ساده** — the SMA (TGJU's «میانگین متحرک» kept whole
+  with ساده added for the honest "simple" qualifier); the row label is
+  «میانگین {n} روزه».
+- **صدک … از بازهٔ ذخیره‌شده** — the decile grammar over the STORED
+  basis (round 86's S13-D1 posture): the basis window is named («{n}
+  ماه» / «{years} سال»), never a «دهه» claim the free-tier data
+  cannot support.
+- **جلسه** — the trading session (the cross events' «۲۰ جلسهٔ بعدی»
+  and the pivots' «از جلسهٔ {date}») — the page's established session
+  vocabulary, reused for the TA family.
