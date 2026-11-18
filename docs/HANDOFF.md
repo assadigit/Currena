@@ -1,12 +1,72 @@
 # HANDOFF — Currena current state & next steps
 
-## Current state (after the R-5 details-panel port session)
+## Current state (after the GPE S10 P1-a credibility-floor session)
 
-**The R-5 details-panel port is DELIVERED, DEPLOYED + LIVE-VERIFIED. Production is now currena-api Version ID `6ae72ba7` (created 2026-11-18T00:03:29Z @ 100% — the R-5 port deploy, superseding the §19.6 deploy `c0858d06`). The code is committed + pushed to origin/main at `f66efa44` (the spec `1a072a55` + the port `f66efa44`). Gates 9/9 GREEN ×2 (the production-change two-run discipline; suite 15,184 — delta +19 from the §19.6 baseline 15,165, positive-only). The spec is docs/page-division/07-R5-DETAILS-PANEL-PORT.md; the decision record is BD-S33.**
+**The Gold Page Elevation (GPE) S10 P1-a credibility floor is DELIVERED,
+DEPLOYED + LIVE-VERIFIED. Production is now currena-api Version ID
+`f0844e59` (created 2026-11-18T11:37:29Z @ 100% — the S10 P1-a deploy,
+superseding the R-5 port `6ae72ba7`). The code is committed + pushed to
+origin at the branch `gold-elevation/p1a-credibility-floor` (HEAD
+`71ca786`, off main `19131b0` — the post-R-5 tree). Gates 9/9 GREEN
+(suite 15,219 — delta +35 from the R-5 baseline 15,184, positive-only).
+The session summary is docs/specs/gold-page-elevation/s10/SUMMARY.md;
+the program plan is docs/specs/gold-page-elevation/00-PROGRAM-PLAN.md.**
 
-Every §21-trio card on its home page is now clickable and opens the ported details panel — the retirement spec's RECOMMENDATION ("the §19.6 burn-in exists partly to measure whether readers used it") executed as the post-retirement successor. The §19.6 accepted loss R-5 (the largest gap — all 187 cards lost their detail view, history charts and Layer-1 explanations) is CLOSED.
+The six wave-0 rows R01–R06 shipped: the flagship gold/silver price chart
+states its true ~5.2-year window (R01, D6-A relabel-now — the "10 years"
+chip that rendered a 5.2-year window fixed); the FA SGE/Swiss «میلیون
+تن» → «تن» unit error fixed (R02); the Gold Positions 30-day change label
++ the ±100 bar clamp semantics fixed (R03); every dark meter seat states
+WHY it's dark — the four cause classes upstream-stopped/upstream-gap/
+pipeline-lag/rule-driven (R04, F16a); the CPI shutdown-gap policy per
+S4-D1 lights the seat with the adjacent-months-average base label (R05,
+INF-2); the five LOW riders #15/#23/#24/#26/#27 + the F17 silver
+keep-small footer note (R06). The two build-time reads (D8 locked: B)
+resolved to their pre-committed fallback bands (the Kalshi 429/Vercel
+checkpoint + the CBI F5-WAF block are environment states — the bands
+cost P1-a nothing; R28 at P3 + R13 at P1-b re-attempt). The Persian-copy
+manifest round 83 landed the 10 fa strings; copy:audit clean.
 
-## The green baseline — the R-5 port record (2026-11-18)
+**Program counter: Session 10/18 · 8 remaining (S11–S18).** Next: S11 =
+P1-b the explanation band (R07 Treasury-direct, R08 F15 wording, R09 F13
+licence wall, R10 anchor/consistency infrastructure, R11 F1 narrative,
+R12 F5 yield card — the S11 prompt is in s10/SUMMARY.md's next-session
+section).
+
+## The green baseline — the S10 P1-a record (2026-11-18)
+
+- **Gates:** 9/9 GREEN (2m 50s). secret scan (clean — 8 patterns · 1053
+  files) · typecheck (6 packages) · lint (0/0) · copy:audit (clean —
+  manifest round 83, 7988 → 7997 entries) · narrator vocabulary (in
+  sync, 193×2 + 56×2 — regenerated after the insights-copy change) ·
+  narrator eval (50) · layer1 strict (11969/11969) · **full test suite
+  15,219** (core 195 · scraper 67 · insights 1391 · markets 13 · api 414
+  · web 13139) · build + bundle budget (entry 270.52/81.97; GoldPage
+  73.85/19.11 under the new 75/19.5 ceiling — budget bumped 72/18.5 →
+  75/19.5 with justification inline).
+- **Suite delta:** **15,184 → 15,219 = +35** (positive-only: the R01–R06
+  characterization tests — TrendChart, GoldPositions, GoldPage,
+  GoldSeats, yoy-gap, series; nothing deleted).
+- **Production:** currena-api Version ID **`f0844e59`** @ 100% (created
+  2026-11-18T11:37:29Z). Deploy-lock re-checked FIRST (D-43: production
+  was still `6ae72ba7` @ 100% — no drift). Wrangler FIRST attempt clean
+  (no 10013 retry). The §21 portwatch window clear (Wednesday). The
+  served entry hash `index-sQcXoEPe.js` MATCHES the dist build.
+- **Live-verify matrix (all GREEN):** EN desktop — R01 the chart chip
+  "5.2 years" (not "10 years"), R02 SGE "92 tonnes" / Swiss "228 tonnes",
+  R03 "30-day change", R04 the 5 dark seats' why-lines, R06 #15 absent-
+  count "4...", #26 footer `/about#privacy` + `/about#terms`, #27 hero
+  spacing, F17 silver note · **fa/RTL desktop** — R02 «۹۲ تن» / «۲۲۸ تن»,
+  R03 «تغییر ۳۰ روزه», R04 the FA why-lines («منبع داده انتشار را متوقف
+  کرده (آخرین داده: شهریور ۱۴۰۵)» etc.), R06 #15 «۴ از داده‌های...»
+  (Persian digit), F17 «عمقِ نقره یک انتخابِ آگاهانه است...», dir="rtl" ·
+  **mobile 390×844** — R01 chip "5.2 years", R04 5 why-lines render, the
+  layout holds · **R06 #23 fresh path** — data-prices-as-of="fresh" (the
+  cached "last successful" qualifier is the outage-only case, verified
+  via the test) · **zero console errors** on every surface exercised.
+
+## The prior R-5 port record (2026-11-18, earlier — superseded by S10)
+
 
 - **Gates:** 9/9 GREEN ×2 (run 1 on the working tree with all edits applied uncommitted: 2m 43s; commit `f66efa44` landed; run 2 on the clean tree with `git status` empty: 2m 46s — IDENTICAL results). secret scan · typecheck (6 packages) · lint (0/0) · copy:audit (clean — zero new copy keys) · narrator vocabulary (193×2 + 56×2 — UNCHANGED) · narrator eval (50) · layer1 strict (11969/11969) · **full test suite 15,184** (core 195 · scraper 67 · insights 1383 · markets 13 · api 414 · web 13,112) · build + bundle budget (entry 270.48/81.94 UNCHANGED; 10 destination-page chunks within budget; AsiaPage raw re-baselined 16.5→16.75 — +0.03 kB of opener plumbing, justified in scripts/check-bundle-budget.mjs).
 - **Suite delta:** **15,165 → 15,184 = +19** (positive-only: 17 panel characterization tests + the UsaPage wiring test + the CommoditiesPage wiring test; nothing deleted). All 13,093 pre-existing web tests passed UNCHANGED before the new tests landed — the stretched-opener pattern is transparent to every characterization query.
