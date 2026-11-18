@@ -1,16 +1,36 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S12 — GPE P1-c, the prizes; IN PROGRESS)
+## This session (S12 — GPE P1-c, the prizes; DONE AND VERIFIED LIVE)
 
-**Goal:** rows R13 (Bridge-1 the Iran bridge) · R14 (the IMF CB-demand
-Tier-1 tracker) · R16 (the affordances + the market-state pill) · R17
-(the #21 de-dup) — **R15 slipped to P2** (the M1(b) drop check: no WGC
-GDT file, no owner notice; the fold record §0.2 rule). Branch
-`gold-elevation/p1c-prizes` off the S11 close `aae44dda`. M1 landed:
-citation re-verification + the three build-time checks recorded
-(docs/specs/gold-page-elevation/s12/M1-CITATION-AND-CHECKS.md — the
-R07 Treasury rung fires 04:10 UTC Nov 19, AFTER this session's start:
-the flip verification rides S13's M1, honestly recorded).
+**Outcome:** the rows R13 (Bridge-1 the Iran bridge) · R14 (the IMF
+CB-demand Tier-1 tracker) · R16 (the affordances + the market-state
+pill) · R17 (the #21 de-dup) landed, tested, deployed, and
+live-verified. **R15 slipped to P2** (the M1(b) drop check: no WGC GDT
+file, no owner notice — the fold record §0.2 rule; the wall's WGC CB
+line stays until Tier-2 lands). Production is currena-api `49ae8ce7`
+@ 100% (created 2026-11-18T18:51:04Z) **+ the gold-cb KV seed** (the
+`gold-cb-run` landing lever: asOf 2026-10 · 250 rolling points · the
+10 buyers · reported world 35,003 t / 103 reporters —
+`GET /api/insights/gold-cb` serves it). The branch
+`gold-elevation/p1c-prizes` is pushed with the session's commits (the
+M1 docs · the R13/R14 engines · the four rows · the manifest round 85
+· the budget bump · the deploy/seed/verification · the close). Gates
+9/9 GREEN (suite 15,290, +43). The Persian-copy manifest round 85
+landed the session's 98 fa strings (8,032 → 8,130 entries; copy:audit
+clean). The session summary + the S13 next-session prompt are
+docs/specs/gold-page-elevation/s12/SUMMARY.md.
+
+**The honest R07 carry (S12-D4):** the first Treasury-primary rung
+fires **04:10 UTC Nov 19** — at this session's close the live readings
+still carry FRED provenance (verified via the API; the status blob
+healthy). **S13's M1 verifies the flip.** This session's deploy carries
+the same R07 code — nothing here blocks or alters it.
+
+**Program counter: Session 12/18 · 6 remaining (S13–S18).** Next: S13 =
+P2 the interactive chart (R18 F7 the interactive chart · R19 F8 the
+minimal TA band · R20 F4a the education on-ramp · R21 F4b the
+one-liners; **+ R15 the GDT stack if the owner's drop arrives** — the
+S13 prompt is in s12/SUMMARY.md's next-session section).
 
 ## Previous session (S11 — GPE P1-b, the explanation band; DONE AND VERIFIED LIVE)
 
