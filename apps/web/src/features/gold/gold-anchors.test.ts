@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { GOLD_SEAT_DEST_NAME_KEY, PAGE_ROUTE, seatAnchorHref, type GoldVoterId } from './gold-tiles';
 import { homePageOfIndicator, GOLD_VOTER_IDS } from '@currena/insights/page-division';
+import type { PageDivisionPageId } from '@currena/core';
 import { en } from '../../shared/i18n/en';
 import { fa } from '../../shared/i18n/fa';
 
@@ -47,7 +48,7 @@ describe('GPE R10 — the anchor-id contract (s7/03 §1.2)', () => {
       } else {
         const prefix = PREFIX[home as string];
         expect(prefix, `${home} has a verified card-anchor prefix`).toBeTruthy();
-        expect(href).toBe(`${PAGE_ROUTE[home as string]}#${prefix}-${id}`);
+        expect(href).toBe(`${PAGE_ROUTE[home as PageDivisionPageId]}#${prefix}-${id}`);
       }
     }
   });

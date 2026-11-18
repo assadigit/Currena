@@ -103,7 +103,10 @@ const EVIDENCE_KEY: Readonly<Record<'rising' | 'falling' | 'high' | 'low', Trans
 
 export { EVIDENCE_KEY };
 
-const LANE_STATE_KEY: Readonly<Record<GoldSeatLane['side'], TranslationKey>> = {
+/* GPE R11: exported for the daily narrative (Zone D) — the family lines
+ * render the seats section's OWN state words, byte-identical (the
+ * one-projection consistency rule, s7/03 §2.4). */
+export const LANE_STATE_KEY: Readonly<Record<GoldSeatLane['side'], TranslationKey>> = {
   for: 'pd.gold.laneStateFor',
   against: 'pd.gold.laneStateAgainst',
   neutral: 'pd.gold.laneStateNeutral',

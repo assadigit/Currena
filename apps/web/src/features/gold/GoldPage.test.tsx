@@ -252,6 +252,69 @@ describe('GoldPage', () => {
     expect(hero.textContent).toContain('−3.42%');
   });
 
+  it('GPE R11 / F1: the daily narrative — the price fact (TE pattern, C1-named) + the five families (byte-identical counts) + the standing caveat', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-narrative]')).not.toBeNull();
+    });
+    const band = document.querySelector('[data-gold-narrative]')!;
+
+    // The arc item 1 — the price fact: the move + the context windows,
+    // each window NAMED (C1), the series + as-of the reading's own.
+    expect(band.textContent).toContain('Why gold moved');
+    expect(band.textContent).toContain('Gold moved');
+    expect(band.textContent).toContain('−3.42%'); // the fixture's 30-day move
+    expect(band.textContent).toContain('over the past 30 days'); // the window named at point of use
+    expect(band.textContent).toContain('fixture'); // the series named (the reading's own sourceName)
+    expect(band.textContent).toContain('as of'); // the date-stamp
+    expect(band.querySelector('a[href="#insights-signals"]')).toBeTruthy(); // the price sentence links the chart
+
+    // The arc item 2 — the five family lines, lane order, each linking
+    // its lane card (R10's anchors).
+    const families = [...band.querySelectorAll('[data-narrative-family]')];
+    expect(families.map((f) => f.getAttribute('data-narrative-family'))).toEqual([
+      'borrowing-costs',
+      'dollar',
+      'stress',
+      'inflation',
+      'flows',
+    ]);
+    for (const family of families) {
+      const lane = family.getAttribute('data-narrative-family')!;
+      expect(family.querySelector(`a[href="#lane-${lane}"]`), `the ${lane} line links its lane card`).toBeTruthy();
+    }
+
+    // The one-projection consistency (s7/03 §2.4, binding): every family
+    // line's tally is BYTE-IDENTICAL to the seats section's lane card
+    // tally — the same keys over the same numbers (one truth).
+    for (const family of families) {
+      const lane = family.getAttribute('data-narrative-family')!;
+      const laneCard = document.querySelector(`#lane-${lane}`)!;
+      const laneTally = laneCard.querySelector('header p bdi')?.textContent ?? '';
+      expect(laneTally.length).toBeGreaterThan(3);
+      const familyText = family.querySelector('p')?.textContent ?? '';
+      expect(familyText.startsWith(laneTally), `${lane}: the family tally is the lane card's own`).toBe(true);
+    }
+
+    // The movers — raw deltas of the seats that moved, the window named
+    // (the fixture's dollar seats each carry a −2.0% 30-day change).
+    const dollarLine = families.find((f) => f.getAttribute('data-narrative-family') === 'dollar')!;
+    expect(dollarLine.textContent).toContain('−2.0%');
+    expect(dollarLine.textContent).toContain('over the past 30 days');
+
+    // The no-fake-GRAM rule (s7/03 §2.2): co-movement, never causation,
+    // never attribution shares.
+    expect(band.textContent).not.toContain('because');
+    expect(band.textContent).not.toMatch(/% of the (move|price)/);
+
+    // The arc item 4 — the caveat, standing and adjacent.
+    expect(band.querySelector('[data-narrative-caveat]')?.textContent).toContain('conditions, not the price move');
+
+    // The band carries the zone anchor (R10's contract).
+    expect(document.getElementById('gold-zone-d')).toBeTruthy();
+  });
+
   it('S6: the hero\u2019s balance view ALTERNATES — the classic previous shape is the default, the minimal glyph one radio away, the choice persisted', async () => {
     stubFeeds();
     render(<GoldPage />);

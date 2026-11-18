@@ -732,6 +732,23 @@ export const fa: Dictionary = {
       seatWhyUpstreamGap: 'ماهِ مبنای سال گذشته بالادست منتشر نشد (شکست انتشار)',
       seatWhyPipelineLag: 'داده در منبع منتشر شده است؛ تازه‌سازی بعدی آن را می‌آورد',
       seatWhyRuleDriven: 'مقدار به‌روز است؛ تاریخچهٔ ده‌ساله برای این کرسی هنوز موجود نیست',
+      /* GPE R11 / F1 (۲۰۲۶-۱۱-۱۸، بندهای الزامی s7/03 §2): رونوشتِ روزانه.
+       * واقعیتِ قیمت با الگوی TE (حرکت + پنجره‌های زمینه، نام سری و
+       * تاریخ در نقطهٔ استفاده طبق C1)؛ سطر خانواده‌ها کلیدهای خودِ بخش
+       * عوامل را بازمی‌خواند (شمارش هم‌بایت، قاعدهٔ یک برآیند §2.4)؛
+       * جملهٔ هشدار همیشه و درجا کنار روایت است (بند ۲ از C7)؛ بدون
+       * خط تیرهٔ بلند (بند ۱ از C7). */
+      narrativeTitle: 'چرا طلا حرکت کرد',
+      narrativePriceFact: 'قیمت طلا {windows} تغییر کرده است ({series}، به‌روزرسانی {date}).',
+      narrativePriceJoin: '{a} و {b}',
+      narrativeWindow1d: '{v} در روز گذشته',
+      narrativeWindow30d: '{v} در ۳۰ روز گذشته',
+      narrativeWindow90d: '{v} در ۹۰ روز گذشته',
+      narrativePriceMissing: 'قیمت لحظه‌ای طلا هنوز خوانده نشده است.',
+      narrativeMover: '{name} {delta} در ۳۰ روز گذشته',
+      narrativeDeltaPts: '{v} واحد',
+      narrativeDeltaPct: '{v}٪',
+      narrativeCaveat: 'برآیند، شرایط را توصیف می‌کند، نه حرکت قیمت را',
       evidenceRising: 'رو به افزایش',
       evidenceFalling: 'رو به کاهش',
       evidenceHigh: 'در بالای دامنهٔ ده‌ساله',

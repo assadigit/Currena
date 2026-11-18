@@ -1026,7 +1026,18 @@ const BUDGETS = [
   // 1.85 kB raw / 0.61 kB gz. The bump to 75/19.5 gives ~1.15 kB raw
   // headroom for the P1-b/P1-c gold-page work (the explanation band +
   // the prizes — R07–R17). Justified in CHANGELOG §2026-11-18 (GPE S10).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 75_000, gz: 19_500, label: 'Gold page lazy chunk (page-division S5)' },
+  //
+  // GPE S11 (2026-11-18, R07–R12): the explanation band lands — the F1
+  // daily narrative (the pure engine in packages/insights
+  // domains/gold/narrative.ts + the Zone D component + its copy keys),
+  // the R10 anchor builder + the destination-name map in gold-tiles, the
+  // R08 outlook re-scope on the hero + the strip, and the R09 sharpened
+  // licence wall + its link-out. Measured 81.71/20.72 — over the 75/19.5
+  // ceiling by 6.71 kB raw / 1.22 kB gz. The bump to 82.5/21 gives the
+  // measured fit + ~0.8 kB raw headroom for R13–R17 (P1-c: the bridge +
+  // the CB-demand section — their components ride this same chunk).
+  // Justified in CHANGELOG §2026-11-18 (GPE S11).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 82_500, gz: 21_000, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree

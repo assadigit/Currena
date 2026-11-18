@@ -772,6 +772,24 @@ export const en = {
       seatWhyUpstreamGap: 'upstream did not publish the year-ago base month (publication gap)',
       seatWhyPipelineLag: 'data published upstream — the next ingest will carry it',
       seatWhyRuleDriven: 'value is current; no decile history for this seat yet',
+      /* GPE R11 / F1 (2026-11-18, s7/03 §2 — the binding rules): the daily
+       * narrative's copy. The price fact is the TE pattern (the move +
+       * context windows, series + as-of named — C1); the family lines
+       * reuse the seats' OWN lane keys (byte-identical counts — the
+       * one-projection rule §2.4); the caveat is standing and adjacent
+       * (C7 rule 2); "coincided with", never "because" — the component
+       * composes co-movement, never causation. */
+      narrativeTitle: 'Why gold moved',
+      narrativePriceFact: 'Gold moved {windows} ({series}, as of {date}).',
+      narrativePriceJoin: '{a} and {b}',
+      narrativeWindow1d: '{v} over the past day',
+      narrativeWindow30d: '{v} over the past 30 days',
+      narrativeWindow90d: '{v} over the past 90 days',
+      narrativePriceMissing: 'The live gold price could not be read yet.',
+      narrativeMover: '{name} {delta} over the past 30 days',
+      narrativeDeltaPts: '{v} pts',
+      narrativeDeltaPct: '{v}%',
+      narrativeCaveat: 'The meter explains conditions, not the price move',
       evidenceRising: 'rising',
       evidenceFalling: 'falling',
       evidenceHigh: 'high in its decade',

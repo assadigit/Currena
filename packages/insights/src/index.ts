@@ -179,6 +179,22 @@ export type {
   GoldBalanceSide,
 } from './domains/gold/gold-balance';
 
+// GPE R11 / F1 (docs/specs/gold-page-elevation s7/03 §2): the daily
+// narrative's pure engine — "Why gold moved", the driver-family story over
+// the SAME balance the hero reads (one projection, one truth; the grammar
+// pinned by narrative.test.ts).
+export {
+  NARRATIVE_GRAMMAR_VERSION,
+  NARRATIVE_MAX_MOVERS,
+  goldNarrative,
+} from './domains/gold/narrative';
+export type {
+  GoldNarrative,
+  NarrativeFamily,
+  NarrativeMover,
+  NarrativePriceFact,
+} from './domains/gold/narrative';
+
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
 // real-yield-10y scoring input (decision D-6: fills never reach the stored

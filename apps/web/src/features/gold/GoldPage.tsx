@@ -31,6 +31,7 @@ import type { InsightsSnapshot } from '@currena/core';
 import { Signals } from './Signals';
 import { useInsightsCopy } from '../../shared/hooks/useInsightsCopy';
 import { GoldHero } from './GoldHero';
+import { GoldNarrative } from './narrative/GoldNarrative';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
@@ -216,6 +217,17 @@ export function GoldPage(): React.JSX.Element {
 
       {/* D-26 item 1 — the hero. */}
       {hero !== null ? <GoldHero hero={hero} pricesAsOf={projection?.pricesAsOf} pricesCached={fromCache} /> : null}
+
+      {/* GPE R11 / F1 — Zone D, the explanation band's FIRST element: the
+          daily narrative ("Why gold moved") — the price fact + the five
+          family sentences + the standing caveat. Derived from the SAME
+          projection as the hero (one truth, s7/03 §2.4); the band carries
+          the #gold-zone-d anchor (R10's contract). */}
+      {readings !== undefined ? (
+        <div className="mt-2.5 sm:mt-4">
+          <GoldNarrative readings={readings} />
+        </div>
+      ) : null}
 
       {/* TM13: the Signals section (the gold + silver verdict strip with the
           price-trend chart + range buttons) — moved from /insights. Shows
