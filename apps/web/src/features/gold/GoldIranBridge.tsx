@@ -39,7 +39,7 @@
 import { useMemo, useState } from 'react';
 import type { GoldQuote } from '@currena/core';
 import { formatDateWords, formatJalaliDate, formatNumber } from '@currena/core';
-import { COIN_SPECS, GERAMI_BAND, TROY_OZ_GRAMS, coinPremium, type CoinPremiumRow } from '@currena/insights';
+import { COIN_SPECS, GERAMI_BAND, coinPremium, type CoinPremiumRow } from '@currena/insights';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import { isConfirmedStale, useSnapshotStore } from '../../shared/lib/snapshot-store';
@@ -158,7 +158,7 @@ function BridgeRow({
 /** The method block (C2 rule 1): the formula + the constants table +
  * the gerami band + the آبشده convention + the CBI variant note. */
 function BridgeMethod(): React.JSX.Element {
-  const { t, locale, numberLocale } = useI18n();
+  const { t, locale } = useI18n();
   const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-1.5">
@@ -253,10 +253,10 @@ function BridgeInterpretation(): React.JSX.Element {
 }
 
 export function GoldIranBridge(): React.JSX.Element | null {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const state = useSnapshotStore();
   const snapshot = state.tgju.snapshot;
-  const gold = snapshot?.gold ?? [];
+  const gold = useMemo(() => snapshot?.gold ?? [], [snapshot]);
 
   /* The free-market dollar leg, off the SAME snapshot's rates (the USD
    * entry's rate is units-per-IRR → toman per USD is its inverse). */

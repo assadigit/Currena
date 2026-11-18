@@ -1055,7 +1055,33 @@ const BUDGETS = [
   // same chunk; a further measured bump at that session if needed —
   // each bump documented, never silent). Justified in CHANGELOG
   // §2026-11-18 (GPE S11).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 89_500, gz: 22_500, label: 'Gold page lazy chunk (page-division S5)' },
+  //
+  // GPE S12 (2026-11-18, 89.5/22.5 → 116/27.5): the PRIZES land — the
+  // P1-c wave's two full sections + the affordance set, all riding this
+  // same chunk exactly as the S11 record planned ("a further measured
+  // bump at that session if needed — each bump documented, never
+  // silent"):
+  //   · R13 the Iran bridge (GoldIranBridge — the 8-row board, the
+  //     per-row parity expanders, the method block with the constants
+  //     table, the four-move interpretation, the shared-snapshot-store
+  //     read; the pure coinPremium engine rides @currena/insights).
+  //   · R14 the CB-demand tracker (GoldCbDemand — the hand-rolled SVG
+  //     rolling chart with its geometry/model code, the buyers table +
+  //     the mobile stacked list, the S12-D1 share computation, the
+  //     mirror cross-link; the gold-cb fetch layer the tic.ts twin).
+  //   · R16 the market pill (market-state.ts — the COMEX schedule +
+  //     the US DST rule) + the hero weights' affordance wiring.
+  //   · R17's de-dup REMOVED chrome (the lane intro + tally leave the
+  //     seats section — a small credit, already netted in the measure).
+  // Measured 115.12/27.46 — over the 89.5/22.5 ceiling by 25.62 kB raw
+  // / 4.96 kB gz. Verified NOT duplication (the snapshot store, the
+  // insights engine and the locale dictionaries each live in their own
+  // chunks — inspected in the built output; the growth is the two
+  // sections' component logic). The bump to 116/27.5 gives the
+  // measured fit + ~0.9 kB raw headroom; P2's F7 interactive chart
+  // (R18) ships its own measured bump when it lands. Justified in
+  // CHANGELOG §2026-11-18 (GPE S12).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 116_000, gz: 27_500, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree
