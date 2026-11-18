@@ -1,5 +1,30 @@
 # HANDOFF — Currena current state & next steps
 
+## This session (S11 — GPE P1-b, the explanation band; IN FLIGHT)
+
+**Goal:** land rows R07–R12 exactly (s8/01 §2), each tested, on the branch
+`gold-elevation/p1b-explanation-band`, then one Persian-copy manifest round,
+gates green, deploy per `docs/DEPLOY.md`, live-verify per AGENTS.md §9
+(desktop + mobile + RTL both locales), and close per AGENTS.md §10 with the
+S11 summary + the S12 next-session prompt.
+
+**Milestones:** M1 the R07 Treasury-direct read re-check (FRED's venue
+state at build time; FRED UP → R07 ships, FRED DOWN → R07 defers) · M2 the
+six rows R07–R12 (R07 the Treasury-primary yield swap · R08 the F15 outlook
+wording per C3's four clauses · R09 the F13 sharpened licence wall · R10
+the anchor/consistency infrastructure · R11 the F1 daily narrative · R12
+the F5 yield-decomposition card) · M3 the manifest round 84 + gates +
+deploy + live-verify + the close.
+
+**Branch base (the S10 close):** off `gold-elevation/p1a-credibility-floor`
+at `ec57261e` (the S10 bookkeeping tip; production `f0844e59` @ 100% is
+built from it — the prompt's "main at the S10 close" is this tree, since
+git `main` still sits at the R-5 close `19131b0` and the P1-a rows R01–R06
+live on the p1a branch). **Scope guard: EXACTLY R07–R12** — no R13+ rows,
+no drive-by refactors, no roadmap edits. **Deploy note:** today is
+Wednesday 2026-11-18 — the §21 portwatch window (Tuesday 11:00–14:00 UTC)
+is clear.
+
 ## Current state (after the GPE S10 P1-a credibility-floor session)
 
 **The Gold Page Elevation (GPE) S10 P1-a credibility floor is DELIVERED,
