@@ -1016,7 +1016,17 @@ const BUDGETS = [
   // before), now one chunk; /insights visitors stop downloading the
   // dead tree entirely (net bundle −3.7 kB). Justified in CHANGELOG
   // §2026-11-15 (baseline-repair, BD-BR).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 72_000, gz: 18_500, label: 'Gold page lazy chunk (page-division S5)' },
+  // GPE S10 P1-a (2026-11-18, 72/18.5 → 75/19.5): the wave-0 credibility-
+  // floor rows R04 + R06 added the why-unread cause-class lines (one
+  // muted status line per dark meter seat, rendered by GoldSeats from
+  // the projection's status metadata — gold-tiles.ts gained the
+  // cause-class derivation), the cold-load skeleton for the Signals
+  // section (#24), and the F17 silver keep-small footer note on the
+  // verdict strip. Measured 73.85/19.11 — over the 72/18.5 ceiling by
+  // 1.85 kB raw / 0.61 kB gz. The bump to 75/19.5 gives ~1.15 kB raw
+  // headroom for the P1-b/P1-c gold-page work (the explanation band +
+  // the prizes — R07–R17). Justified in CHANGELOG §2026-11-18 (GPE S10).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 75_000, gz: 19_500, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree
