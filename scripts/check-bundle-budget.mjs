@@ -1037,7 +1037,25 @@ const BUDGETS = [
   // measured fit + ~0.8 kB raw headroom for R13–R17 (P1-c: the bridge +
   // the CB-demand section — their components ride this same chunk).
   // Justified in CHANGELOG §2026-11-18 (GPE S11).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 82_500, gz: 21_000, label: 'Gold page lazy chunk (page-division S5)' },
+  //
+  // GPE S11 R12 (2026-11-18, 82.5/21 → 89.5/22.5): the F5
+  // yield-decomposition card — the second Zone-D element (the pure
+  // engine packages/insights domains/gold/yield-decomposition.ts + the
+  // GoldYieldDecomposition component + the 19 copy keys ×2 locales: the
+  // four leg rows with their s7/02 §2.4 glosses, the identity line, the
+  // moved block, the three named configurations + the 2022-gilt
+  // exception, the Kim–Wright/ACM provenance note, the live-seats
+  // links) — the explanation band's mandated content, s7/01 §4 item
+  // 1–4 verbatim; the copy is binding, not trimmable. Measured
+  // 88.41/21.91 — over the 82.5/21 ceiling by 5.91 kB raw / 0.91 kB gz
+  // (R11's ~0.8 kB headroom intended for P1-c was consumed by R12's
+  // education block — the rows land in one wave; the ceilings track the
+  // wave). The bump to 89.5/22.5 gives the measured fit + ~1.1 kB raw
+  // headroom for R13–R17 (P1-c's bridge + demand sections ride this
+  // same chunk; a further measured bump at that session if needed —
+  // each bump documented, never silent). Justified in CHANGELOG
+  // §2026-11-18 (GPE S11).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 89_500, gz: 22_500, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree
