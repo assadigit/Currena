@@ -194,6 +194,14 @@ pnpm registry:generate · pnpm placement:generate · pnpm s24:d9-audit   # the r
 - `docs/` — `HANDOFF.md`, `DECISIONS.md`, `DEPLOY.md`, `INDICATORS_AND_DATA_SOURCES.md`, `THIRD_PARTY_NOTICES.md`, `specs/`, `audits/`, `modularization/`, `page-division/`, `insights/`, `localization/`, `archive/`, `assets/`.
 - `legacy/` (gitignored) — the Django backup, the ONLY source of truth for features.
 
+**The Gold Page Elevation program (GPE) — COMPLETE (S18, 2026-11-19).** Eight implementation sessions (S10–S17) delivered, deployed, and live-verified the `s8/01` recommendation table's waves (P1 the credibility floor + the explanation band + the prizes → P2 the chart/TA + education → P3 the Supporting tier → P4 the Advanced tier) — 31 of the 33 queued rows shipped; production ended at `65f7c0bb` @ 100%; the GoldPage chunk budget stands at 240/50 (raw/gz kB). The program's closeout record set is `docs/specs/gold-page-elevation/s18/` (the research-branch reconciliation + the closure record with the 18-session ledger + the standing owner-side levers); the pre-S10 research specs live only on `origin/docs/gold-page-elevation` (read with `git show origin/docs/gold-page-elevation:<path>`). The gold system's own deep reference stays `docs/insights/GOLD_SYSTEM_COMPLETE_REFERENCE.md`.
+
+**The gold page's post-program map (the render order, top to bottom).** The header (title + the data-as-of line + the absent-note line linking `#gold-blocked`) → the hero (Zone B/C: the live Yahoo price + the Balance Scale verdict + the outlook + the counts + the market-state pill + the collapsed **time machine**) → the explanation band (Zone D: the **daily narrative** + the **yield-decomposition card** side by side, the collapsed **education on-ramp**, the **expectations row** [probabilities + calendar]) → the Iran bridge band (Zone F: **Bridge-1** the board + parity + حباب, then **Bridge-2** the premium history + deciles + the attribution strip, same band) → the Signals section (the **interactive chart** with the window as a user control) → the 37-seat five-lane meter (Zone G) → the **minimal TA band** (Zone H) → the context block (Zone J/I: the COT band chips + the multi-currency grid + the Zone K demand plumbing [the CB tracker + the London vault/clearing cards + the correlation companion + the drop-gated demand stack] + the honest-record footer with the **forecast retrospective**) → the positions section → the history tail (Zone O: the **Episode Explorer** + the **if-you'd-bought calculator**). Every GPE surface is bilingual, progressive-disclosure (collapsed by default incl. 390), and honesty-first (named windows, named venues, honest waiting states).
+
+**The gold-family rung registry (all on the currena-api's one `* * * * *` minute trigger — no new triggers were ever added):** `:13` hourly the Yahoo live prices · `:23`/`:53` the Polymarket expectations refresh · `04:47` the meter archive row · `04:49` the if-bought running points · `20:33` (00:03 Tehran) the premium day row; the ingest side: `04:10` the main collect (the gold projections + the gold-api legs) · `04:25`/`04:40` the history rungs · `04:30` rung3 the CB tracker (day 1–5 gate + month-skip idempotence) · `04:35` rung4 the OHLC append + the crosses + LBMA (arrears rhythms: vault T+2.5 wk, clearing month−2).
+
+**The gold-family KV key inventory:** `insights:gold-cb:v1` (the IMF tracker) · `insights:gold-xau:v1` (the OHLC series) · `insights:gold-xau-crosses:v1` (the grid) · `insights:gold-lbma:v1` (vault + clearing) · `insights:gold-expectations:v1` (the probabilities) · `insights:gold-premium-history:v1` (the حباب history) · `insights:gold-meter-history:v1:<YYYY>` (the year-sharded archive) · `insights:gold-ifbought:v1` (the calculator) · `insights:gold-episodes:v1` (the Explorer's drop-gated plane — written when the prices workbook lands). The standing owner-side levers (the WGC drops first: save the dated file at `data/wgc/…` and tell the next session) are listed in `docs/specs/gold-page-elevation/s18/02-PROGRAM-CLOSURE-RECORD.md` §3.
+
 **Standing limits (carry forward every session).**
 - **The §21 portwatch window:** never run the portwatch leg Tuesdays 11:00–14:00 UTC — the IMF PortWatch provider's maintenance window returns stale/empty readings (recorded in `docs/page-division/01-SESSION-ROADMAP.md`).
 - **The deploy-lock re-check FIRST (D-43):** before every deploy, confirm via the Cloudflare deployments API that the active production version is the expected one. If a newer deploy exists, STOP and report — an unattended mid-session deploy once drifted production (the D-43 lesson, walked in every `docs/DEPLOY.md` session record).
@@ -1145,9 +1153,15 @@ not the fx feed).
 | `audcny` | chinaLink | cross |
 
 **The dollar basket** (`dollar-basket` indicator above): a Currena-
-computed DXY-style weighted basket of 7 currencies (EUR, JPY, GBP, CAD,
-SEK, CHF, AUD weights — see `packages/insights/src/basket.ts`). Renders
-as a voting card in the dollar-strength group.
+computed DXY-style weighted basket of SIX currencies (EUR 0.576 · JPY
+0.136 · GBP 0.119 · CAD 0.091 · SEK 0.042 · CHF 0.036 — the DXY
+recipe, no AUD; see `packages/insights/src/domains/currencies/basket.ts`).
+Renders as a voting card in the dollar-strength group. *(GPE-S2-28
+reconciled 2026-11-19 at the GPE program close: this section's earlier
+"7 currencies (incl. AUD)" wording + the pre-modularization
+`src/basket.ts` path were the S2 audit's recorded drift — the code's
+`BASKET_WEIGHTS` and the live card title "The dollar vs six big
+currencies" were always six.)*
 
 **FX patterns** (`FX_RULES` — the "How things connect" relationship
 cards):
@@ -1189,6 +1203,18 @@ refreshed hourly by the currena-api's own `:13` cron rung. These are
 the SAME indicators listed in §A above (the prices-board + market-
 stress groups); the hourly refresh keeps their `asOf` current between
 the daily ingest rungs.
+
+*(GPE-S2-29 reconciled 2026-11-19 at the GPE program close — the S2
+audit's drift item, reserved for the end-of-program window: the LIVE
+prices the board and the gold hero render come from the **Yahoo
+minute-board** — Brent `BZ=F`, gold `GC=F` (COMEX gold futures),
+silver `SI=F`, Bitcoin `BTC-USD`; each asset's own `sourceName` is
+named at point of use per `shared/prices/definitions.ts` (e.g.
+"Yahoo Finance: COMEX gold futures (GC=F)" — the gold hero's
+market-state pill names the same reference market). **gold-api
+remains the ingest source for its own legs** — the gold-silver ratio
+(XAU÷XAG), platinum (XPT), copper (HG), and the accumulated XAU/XAG
+history legs in §A's registry rows.)*
 
 #### G. The Treasury TIC composite dataset (gap-closure S2, 2026-10-31)
 
