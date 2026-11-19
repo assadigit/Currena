@@ -1299,6 +1299,26 @@ export const en = {
       prBandMid: 'mid-range of',
       prMethod: 'Daily capture: each night around 00:03 Tehran time, the day’s last snapshot becomes one row; the historical stretch is reconstructed from TGJU’s own daily closes of the four legs (ounce, free dollar, Emami, Bahar) with the premium COMPUTED from those closes — never scraped as a claim. The melt formula prints on the bridge card above.',
       prUnavailable: 'The premium history could not be read yet.',
+      /* GPE R31 / F12 (2026-11-19, S17): the TIME MACHINE — Zone C's
+       * collapsed Advanced control over the readings archive (s6/01
+       * zone 4 · s7/03 §3.4 the meter-era boundary, binding: 2016+,
+       * never a pre-era verdict). The verdict + counts + lane words
+       * REUSE the hero's own corpus-pinned keys (heroVerdict* ·
+       * heroCount* · laneState* — never a parallel vocabulary). */
+      tmTitle: 'The time machine',
+      tmSubtitle: 'Any past day’s meter reading, under the then-current voter table — the only historical-meter surface.',
+      tmEraNote: 'The meter’s era begins November 2016 — the stored series’ own window — and no earlier meter state exists or is ever synthesized. The reading shown is the balance as the meter would have read it that day, under the voter table current AT that date; no live meter existed before late October 2026, so earlier days ride the published backtest’s own frozen table.',
+      tmPickLabel: 'Pick a day',
+      tmLoading: 'Reading the archive…',
+      tmAsOfExact: 'The meter as of {date}',
+      tmAsOfBefore: 'The meter as of {row} — the last reading day on or before {picked}',
+      tmVersionLine: 'Under the {version} voter table ({seats} seats)',
+      tmProvenanceBackfill: 'Reconstructed from the stored series — the published backtest’s own machinery, no lookahead.',
+      tmProvenanceLive: 'The day’s own snapshot — the page’s plane, captured live.',
+      tmNoRow: 'No stored reading for {date} yet — the honest gap, never a guess.',
+      tmUnavailable: 'The archive could not be read for {date} — please try again shortly.',
+      /* GPE R23 / F32 (the R32 row's cards) — reserved for the
+       * retrospective + calculator keys below. */
       /* GPE R14: the buyers-table country names (the current cast's IMF
        * codes; an unmapped code renders the code itself — fail-closed). */
       cbCountries: {

@@ -38,6 +38,7 @@ import { useI18n } from '../../shared/lib/locale';
 import type { GoldHeroModel } from './gold-tiles';
 import { GOLD_DISPLAY, goldHeroCounts, goldHeroTilt, goldHeroVerdict, goldHeroVerdictState } from './gold-tiles';
 import { GoldBalanceClassic } from './GoldBalanceClassic';
+import { GoldTimeMachine } from './GoldTimeMachine';
 import { comexMarketState } from './market-state';
 
 /* S6 (BD-S6a): the hero's balance-view alternation — the previous brass
@@ -437,6 +438,15 @@ export function GoldHero({
           ) : null}
         </div>
       </div>
+
+      {/* GPE R31 / F12 (2026-11-19, S17) — Zone C's collapsed Advanced
+       * control: the TIME MACHINE over the readings archive (s6/01 zone 4
+       * — the collapsed affordance row under the hero grid; any past
+       * day's readings/beam/lane counts under the then-current versioned
+       * voter table, the 2016+ meter-era boundary NEVER crossed, the
+       * ONLY historical-meter surface — s7/03 §3.4). Collapsed on
+       * desktop AND 390; the daily reader pays nothing until the tap. */}
+      <GoldTimeMachine />
     </section>
   );
 }
