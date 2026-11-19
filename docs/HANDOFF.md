@@ -1,6 +1,28 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S13 — GPE P2, the interactive chart + the TA band; DONE AND VERIFIED LIVE)
+## This session (S14 — GPE P3, the Supporting tier's first session; IN FLIGHT)
+
+**Goal:** the rows R22 (F11 the correlation companion — the mandated
+Zone K design) · R24 (F22 the London vault + clearing cards) · R26 (F10
+the multi-currency gold grid) · R27 (F14 the COT percentile bands +
+crowd gauge) land, tested, deployed, and live-verified — **plus R15 the
+GDT demand stack ONLY if the owner's WGC drop arrived** (it had NOT at
+the M1(b) check — `data/wgc/` absent, no owner notice; R15 stays
+pending). Branch `gold-elevation/p3-supporting` (off the S13 close
+`6d8622a9` — production `3b8a8c6a` is built from it). Milestones:
+M1 the two build-time checks + the citation re-verification → M2 the
+four rows (backend legs + the components + the pure engines + tests) →
+M3 the ONE Persian-copy manifest round + `pnpm gates` green + deploy
+per docs/DEPLOY.md + live verification (desktop + mobile + RTL both
+locales) + the S14 close (summary + the S15 prompt + the TLDR).
+
+**M1's honest clock note:** the R07 Treasury-rung carry — the rung
+fires **04:10 UTC Nov 19** and the session started **03:11 UTC**, ~59
+minutes BEFORE it; the live reads at the start still carry FRED
+provenance (recorded in `s14/M1-CITATION-AND-CHECKS.md`); the re-check
+rides this session's close, when the clock has passed.
+
+## Previous session (S13 — GPE P2, the interactive chart + the TA band; DONE AND VERIFIED LIVE)
 
 **Outcome:** the rows R18 (F7 the interactive price chart) · R19 (F8 the
 minimal TA band) · R20 (F4a the education on-ramp) · R21 (F4b the
