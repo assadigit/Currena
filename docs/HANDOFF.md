@@ -1,6 +1,91 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S16 — GPE P3, the Supporting tier's third + FINAL session; DONE AND VERIFIED LIVE — P3 COMPLETE)
+## This session (S17 — GPE P4, the Advanced tier — the LAST feature wave; DONE AND VERIFIED LIVE — P4 COMPLETE, every feature wave done)
+
+**Outcome:** ALL THREE of the tier's rows landed, tested, deployed,
+and live-verified — **R31 (F12 the time machine**, the collapsed Zone
+C Advanced affordance inside the hero: the era-boundary note taught
+with the Jalali month, the date picker bounded by the era + today, the
+reconstructed verdict word + counts + five lane chips in the hero's
+own corpus vocabulary, the as-of mapping line, the versioned-table
+line, the two provenance honesty lines; the data plane: the dated
+four-entry voter-table registry [the S4-frozen 20-seat era basis ·
+the S6 21 · the GF-P2 32 · the current GF-S10 37 — the intra-day
+versions never selected], the backtest's own reconstruction
+machinery, the D7-locked compact row, the YEAR-sharded one-read store,
+the 04:47 UTC rung, the /gold-meter date-parameterized READINGS-ONLY
+projection with the era-boundary + future + malformed rejections ·
+the meter-era boundary 2016+ NEVER crossed) · **R32 (F23 the
+forecast-accuracy retrospective**, the collapsed Zone M companion
+inside the honest-record footer: the LBMA analyst-survey vs actual
+2010–2026 — the series EXTRACTED LIVE from the publisher's own
+performance page after the "already extracted" hand-off claim was
+found stale; every recorded aggregate reproduces exactly [10/16
+under-forecast · mean −2.11% · mean-abs 8.13% · 2025 −20.24% · 2024
+−13.71%]; the static typed module, NO KV/NO route, the bundle carries
+17 pairs; the miss convention disclosed at point of use, the pending
+row never scored early, the pairing note beside the no-edge backtest,
+the dated attribution link) · **R33 (F26 the "if you'd bought"
+calculator**, the collapsed Zone O card beside the Episode Explorer:
+gold vs S&P vs BTC vs silver, the lump multiple + the $100/month
+monthly DCA at month-end closes, the decile among same-length windows
+with the R19 min-base 30 posture and the honest waiting line at the
+121-month window, every window named at point of use, the method line
++ the first-year November note + the disclaimers + the named S&P
+venue; the ONE-key store + the 04:49 UTC rung [the four running
+points from the page's own planes, KV reads zero fetches] + the
+/gold-ifbought route + the backfill runner [the stage for
+gold/silver/btc + the markets board's own keyless Yahoo provider for
+the S&P leg, recorded]). **The year-grouping verification fix** (found
+live at the EN desktop pass, the S13-D4 precedent): years render
+UNGROUPED (2016/۲۰۱۶, never 2,026/۲٬۰۲۶) through formatNumber's
+useGrouping:false while the locale digits still apply — the $
+amounts keep their grouping. **R15/R23 + the prices workbook stayed
+pending** (no WGC drop — the seventh consecutive session for R15; the
+fold rule). Production is currena-api **`65f7c0bb` @ 100%** (two
+deploys, honestly recorded: the first `c1efe3be` at 19:01:49Z — the
+D-43 deploy-lock re-checked FIRST, `ea45d06c` still active, no drift;
+the year-fix redeploy at 19:06:14Z; the served GoldPage chunk
+byte-verified identical to the fixed tree) **+ the two KV seeds**
+(the year-sharded `insights:gold-meter-history:v1:<YYYY>` backfill
+serving the full 2016-11→now era under the then-current versioned
+voter tables + `insights:gold-ifbought:v1`: the 120-month four-asset
+backfill 2016-11 → 2026-10 + the current running points [gold
+3,726.25 · silver 45.16 · btc 63,378.22 · sp500 7,218.42]). The
+branch `gold-elevation/p4-advanced` is pushed with the session's
+eight commits (the M1 docs `3ec96e60` · the R31 backend `9e091db5` ·
+the R31 frontend `c66ecbde` · the R32 `631a91fe` · the R33 `ca715b5f`
+· the manifest round 90 + budget `268e8c50` · the lint pass `25168264`
+· the year-fix commit `26529924`) + the close. Gates 9/9 GREEN
+(re-run by the closing leg on the fixed tree, 3m 07s; suite **15,599**,
++89). The Persian-copy manifest round 90 landed the session's 44 fa
+entries (8,439 → **8,483** entries; copy:audit clean; the terminology
+additions: ماشین زمان · جدول رأی‌دهی · بازسازی از سری‌های ذخیره‌شده ·
+حتی اجماع هم خطا می‌کند · گذشته‌نگری · اگر خریده بودید · پایانیِ ماه ·
+پنجرهٔ هم‌طول · خرید ماهانه). The GoldPage budget bumped 218/46 →
+**240/50** (measured 237.59/49.31, verified not duplication — the
+justification inline in check-bundle-budget.mjs). The live-verify
+matrix: EN desktop ×3 surfaces + fa RTL ×3 (the retrospective's
+17-row table with ungrouped Persian-digit years + the time machine at
+۱۳۹۸/۱۲/۲۶ under s4-frozen-20 + the calculator at both window shapes)
++ fa mobile 390 (no overflow, all three collapsed by default, the
+touch targets ≥44px, the tap-expand working) — zero console errors;
+the 9-route sibling smoke all 200; the three meter boundary probes
+(the nine screenshots: s17/verify-*.png). The session ran in two legs
+(one context interruption, honestly recorded): the closing leg
+re-verified the production state (the deployments-API lineage + the
+served-chunk byte-compare) before committing the fix. The session
+summary + the S18 closeout prompt are
+docs/specs/gold-page-elevation/s17/SUMMARY.md.
+
+**Program counter: Session 17/18 · 1 remaining (S18 = the program
+closeout — the research-branch reconciliation + the DECISIONS/AGENTS.md
+reconciliation [the GPE-S2-28/29 drift items] + the final sweep + the
+program-plan closure record; NO new features; the S18 prompt is in
+s17/SUMMARY.md's next-session section — if the WGC drop has arrived,
+the closeout session extends per the fold record rule FIRST).**
+
+## Previous session (S16 — GPE P3, the Supporting tier's third + FINAL session; DONE AND VERIFIED LIVE — P3 COMPLETE)
 
 **Outcome:** the row **R30 (F3b Bridge-2 — the حباب premium HISTORY)**
 landed, tested, deployed, and live-verified: the one-time TGJU
