@@ -70,9 +70,11 @@ export function GoldIfBought(): React.JSX.Element {
 
   const money = (v: number): string => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+  // Years render UNGROUPED (2026, never "2,026") — the locale digits still apply.
+  const year = (y: number): string => formatNumber(y, numberLocale, { useGrouping: false, maximumFractionDigits: 0 });
   const monthText = (ym: string): string => {
     const [y, m] = ym.split('-');
-    if (locale === 'fa') return `${num(Number(m))}/${num(Number(y))}`;
+    if (locale === 'fa') return `${num(Number(m))}/${year(Number(y))}`;
     return `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][Number(m) - 1]} ${y}`;
   };
 
@@ -143,7 +145,7 @@ export function GoldIfBought(): React.JSX.Element {
                 >
                   {years.map((y) => (
                     <option key={y} value={y}>
-                      {num(y)}
+                      {year(y)}
                       {y === years[0] ? ` (${t('pd.gold.ibFirstYearNote')})` : ''}
                     </option>
                   ))}

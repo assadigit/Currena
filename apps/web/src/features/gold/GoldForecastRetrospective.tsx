@@ -52,6 +52,8 @@ export function GoldForecastRetrospective(): React.JSX.Element {
   const money = (v: number): string =>
     formatNumber(v, numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+  // Years render UNGROUPED (2026, never "2,026") — the locale digits still apply.
+  const year = (y: number): string => formatNumber(y, numberLocale, { useGrouping: false, maximumFractionDigits: 0 });
 
   return (
     <div data-gold-forecast-retrospective className="flex min-w-0 flex-col gap-1.5">
@@ -105,7 +107,7 @@ export function GoldForecastRetrospective(): React.JSX.Element {
             <tbody>
               {retro.scored.map((row) => (
                 <tr key={row.year} data-fr-year={row.year} data-fr-under={row.missPct < 0 ? 'true' : 'false'} className="border-t border-[var(--color-border)]/40">
-                  <td className="py-0.5 text-start font-semibold tabular-nums text-[var(--color-text-primary)]">{num(row.year)}</td>
+                  <td className="py-0.5 text-start font-semibold tabular-nums text-[var(--color-text-primary)]">{year(row.year)}</td>
                   <td dir="ltr" className="py-0.5 text-end tabular-nums text-[var(--color-text-secondary)]">${money(row.forecast)}</td>
                   <td dir="ltr" className="py-0.5 text-end tabular-nums text-[var(--color-text-secondary)]">${money(row.actual)}</td>
                   <td
@@ -118,7 +120,7 @@ export function GoldForecastRetrospective(): React.JSX.Element {
               ))}
               {retro.pending !== null ? (
                 <tr data-fr-pending className="border-t border-dashed border-[var(--color-border)]/60">
-                  <td className="py-0.5 text-start font-semibold tabular-nums text-[var(--color-text-primary)]">{num(retro.pending.year)}</td>
+                  <td className="py-0.5 text-start font-semibold tabular-nums text-[var(--color-text-primary)]">{year(retro.pending.year)}</td>
                   <td dir="ltr" className="py-0.5 text-end tabular-nums text-[var(--color-text-secondary)]">${money(retro.pending.forecast)}</td>
                   <td className="py-0.5 text-end text-[var(--color-text-tertiary)]">{t('pd.gold.frPendingCell')}</td>
                   <td className="py-0.5 text-end text-[var(--color-text-tertiary)]">—</td>
