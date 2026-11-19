@@ -316,3 +316,23 @@ The consolidated lane balance behind `?balance=lanes`
 - **نسبت به دههٔ خودش** — "vs its decade" (the COT band chip's frame;
   the COT series genuinely carries the decade, so the word is earned
   there — unlike the crosses, where the stored-window word applies).
+
+## The gold page's expectations + episodes (GPE round 88)
+
+- **واحد پایه** — the basis point (bp). The expectations strip's five
+  move words' own unit (the Fed-rate grammar: «افزایش ۲۵ واحد پایه»,
+  «کاهش ۵۰ واحد پایه یا بیشتر», «بدون تغییر»); Persian digits
+  throughout.
+- **احتمال ضمن بازار** / **احتمالات ضمن بازار** — the
+  market-implied probability / probabilities. The strip's wording for
+  what Polymarket's prices are: the traders' own expectations,
+  refreshed every 30 minutes — never a «پیش‌بینی» word (the
+  disclaimer binds: «این انتظار معامله‌گرهاست، نه پیش‌بینی ما»).
+- **رخداد** — the episode (the Episode Explorer's records; «نه رخداد
+  از پایان برتون‌ودز تا امروز»). Deliberately distinct from
+  **رویداد** — the calendar event (`calNextTitle` «رویدادهای بعدی»);
+  the pair is context-locked, never unified.
+- **میانگین ماهانه** — the monthly average (the WGC price workbook's
+  spine, the path-extremes line's unit: «دلار بر انس، میانگین
+  ماهانه»; the 1978 start named at point of use, never a daily claim
+  the workbook cannot support).
