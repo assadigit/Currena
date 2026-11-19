@@ -355,7 +355,7 @@ export async function runGoldXauCrossesIngest(
   const now = deps.now ?? new Date();
   const stored = await store.getGoldCrosses();
   const goldXau = await deps.goldXau.getGoldXau();
-  let reads = 2; // the crosses read + the gold-xau read
+  const reads = 2; // the crosses read + the gold-xau read
   if (goldXau === undefined || goldXau.series.length < 2) {
     return {
       outcome: { ok: true, note: 'waiting on the gold-xau series (the derived crosses need it)' },

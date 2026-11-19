@@ -24,7 +24,8 @@ import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
-import { GOLD_BLOCKED_NOTES, GOLD_DISPLAY, type GoldContextEntry, type GoldContextId, type GoldUnitToken } from './gold-tiles';
+import { COT_BAND_IDS, GOLD_BLOCKED_NOTES, GOLD_DISPLAY, cotBandOf, type GoldContextEntry, type GoldContextId, type GoldUnitToken } from './gold-tiles';
+import { GoldCurrencyGrid } from './GoldCurrencyGrid';
 
 /** The context-card name keys — 14 literal keys (the copy-pin test proves
  *  each matches the indicators corpus byte-for-byte). */
@@ -181,6 +182,27 @@ function ContextCard({
         : formatDateWords(reading.asOf, 'en-US')
       : null;
 
+  /* GPE R27 / F14 (2026-11-19): the COT percentile band + the crowd
+   * gauge — the Zone J positioning pair gains the compact band chip and
+   * the crowd-gauge flag (s7/01 §7 Chain 6, binding: position + band,
+   * NEVER direction; the days–weeks horizon label always renders with
+   * the flag). The chip REPLACES the generic position line on these two
+   * cards (the same position+band information, the Chain-6 framing);
+   * fail-closed without percentile10y. The D5-locked convention is
+   * named at point of use per C1/C7. */
+  const isCot = (COT_BAND_IDS as readonly string[]).includes(entry.id);
+  const cotBand = isCot ? cotBandOf(reading?.percentile10y) : null;
+  const cotBandWord =
+    cotBand !== null
+      ? cotBand === 'high'
+        ? interpolate(t('pd.gold.cotChipTop'), { p: formatNumber(Math.round((1 - pct!) * 100), numberLocale) })
+        : cotBand === 'low'
+          ? interpolate(t('pd.gold.cotChipBottom'), { p: formatNumber(Math.round(pct! * 100), numberLocale) })
+          : t('pd.gold.cotChipMid')
+      : null;
+  const cotGaugeKey =
+    cotBand === 'high' ? 'pd.gold.cotCrowdHigh' : cotBand === 'low' ? 'pd.gold.cotCrowdLow' : cotBand === 'mid' ? 'pd.gold.cotCrowdMid' : null;
+
   return (
     <article
       id={`gold-card-${entry.id}`}
@@ -205,9 +227,34 @@ function ContextCard({
           <bdi>{t(CARD_MEANING_KEY[entry.id]!)}</bdi>
         </p>
       ) : null}
-      {positionLine !== null ? (
+      {positionLine !== null && !isCot ? (
         <p className="m-0 text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)]">
           <bdi>{positionLine}</bdi>
+        </p>
+      ) : null}
+      {/* GPE R27 / F14: the compact band chip (the 10-year percentile as
+       * a badge — no new rows at 390, the chip rides the card). */}
+      {cotBand !== null && cotBandWord !== null ? (
+        <p
+          className="m-0 inline-flex w-fit items-center rounded-[var(--radius-sm)] bg-currena-soft/70 px-2 py-0.5 text-[length:var(--type-caption)] font-semibold leading-tight text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]/70"
+          data-cot-band={cotBand}
+        >
+          <bdi>{interpolate(t('pd.gold.cotBandChip'), { band: cotBandWord })}</bdi>
+        </p>
+      ) : null}
+      {/* GPE R27 / F14: the crowd-gauge flag — the mandated treatment
+       * (extremes = vulnerability in EITHER direction; mid-range carries
+       * little information; the days–weeks horizon rides every line). */}
+      {cotGaugeKey !== null ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]" data-cot-gauge={cotBand}>
+          <bdi>{t(cotGaugeKey)}</bdi>
+        </p>
+      ) : null}
+      {/* The D5-locked convention, named at point of use (C1/C7): the
+       * positioning pair's own series definition, on the card itself. */}
+      {isCot ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-tertiary)]" data-cot-convention={entry.id}>
+          <bdi>{t(entry.id === 'cftc-gold-positioning' ? 'pd.gold.cotConventionNet' : 'pd.gold.cotConventionGross')}</bdi>
         </p>
       ) : null}
       <p className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-0 text-[length:var(--type-caption)] leading-tight text-[var(--color-text-tertiary)]">
@@ -234,10 +281,15 @@ function ContextGroup({
   title,
   entries,
   onOpenDetails,
+  after,
 }: {
   title: string;
   entries: readonly GoldContextEntry[];
   onOpenDetails: (id: IndicatorId, opener: HTMLElement | null) => void;
+  /** GPE R26 / F10 (2026-11-19): the ratios group's compact sub-card —
+   * rendered inside the section, after the cards grid (s6/01 zone I:
+   * 390 = one row expanding to the stacked grid). */
+  after?: React.ReactNode;
 }): React.JSX.Element {
   return (
     <section className="flex min-w-0 flex-col gap-2">
@@ -247,6 +299,7 @@ function ContextGroup({
           <ContextCard key={entry.id} entry={entry} onOpenDetails={onOpenDetails} />
         ))}
       </div>
+      {after !== null && after !== undefined ? after : null}
     </section>
   );
 }
@@ -284,7 +337,10 @@ export function GoldContext({
 
   return (
     <section id="gold-context" aria-label={t('pd.gold.contextAria')} data-gold-context className="flex flex-col gap-3.5 scroll-mt-24">
-      <ContextGroup title={t('pd.gold.ratiosTitle')} entries={ratios} onOpenDetails={onOpenDetails} />
+      {/* GPE R26 / F10: the multi-currency gold grid — Zone I's compact
+       * sub-card under the ratios (the same ounce through five
+       * numeraires; self-fetching, display-only). */}
+      <ContextGroup title={t('pd.gold.ratiosTitle')} entries={ratios} onOpenDetails={onOpenDetails} after={<GoldCurrencyGrid />} />
 
       {/* Zone J — FLOWS & POSITIONING, now with the Chain-7 physical
        * subgroup (one coherent edit, S7-D1): the positioning pair, then

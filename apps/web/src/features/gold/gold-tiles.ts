@@ -419,6 +419,31 @@ export function goldContextCards(readings: readonly IndicatorReading[]): readonl
 export const GOLD_BLOCKED_NOTES: readonly BlockedNote[] = BLOCKED_NOTES;
 
 /* ------------------------------------------------------------------ *
+ * GPE R27 / F14 (2026-11-19): the COT percentile band's derivation —
+ * the 10-year percentile the readings already carry, binned into the
+ * crowd-gauge's three bands (s7/01 §7 Chain 6: position + band, never
+ * direction; the days–weeks horizon label always renders with the flag;
+ * the D5-locked convention named at point of use — zero new data).
+ * ------------------------------------------------------------------ */
+
+/** The COT cards that carry the band chip (Zone J's positioning pair). */
+export const COT_BAND_IDS: readonly ['cftc-gold-positioning', 'cftc-gold-gross-long'] = [
+  'cftc-gold-positioning',
+  'cftc-gold-gross-long',
+];
+
+/** The crowd-gauge band over the reading's own 10-year percentile
+ *  (0..1): 'high' above 0.8, 'low' below 0.2, 'mid' between — the same
+ *  band edges the position word uses (the trio line's own convention);
+ *  null when the reading carries no percentile (fail-closed, no chip). */
+export function cotBandOf(pct: number | undefined): 'high' | 'low' | 'mid' | null {
+  if (pct === undefined || !Number.isFinite(pct)) return null;
+  if (pct > 0.8) return 'high';
+  if (pct < 0.2) return 'low';
+  return 'mid';
+}
+
+/* ------------------------------------------------------------------ *
  * The context cards' display configs — the DISPLAY registry's own
  * values for the 14 gold ids, restated here so the lean Gold chunk does
  * not pull the config module chain (the S3 GlobalBoard pattern). The

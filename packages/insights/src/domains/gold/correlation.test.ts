@@ -12,7 +12,6 @@ import {
   CORRELATION_DISPLAY_DAYS,
   CORRELATION_STALE_AFTER_DAYS,
   CORRELATION_WINDOW_WEEKS,
-  ROTATION_DATE,
   correlationPanel,
   fridayCloses,
   fridayOf,

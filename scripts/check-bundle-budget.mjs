@@ -1110,7 +1110,17 @@ const BUDGETS = [
   // gives the measured fit + ~1.3 kB raw headroom. The GB-S6 byte
   // snapshot re-pinned (the conscious S13-D2 chart swap in the gold
   // chip). Justified in CHANGELOG §2026-11-18 (GPE S13).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 152_000, gz: 34_500, label: 'Gold page lazy chunk (page-division S5)' },
+  // GPE S14 (2026-11-19): the wave-3 Supporting rows land on the same
+  // chunk — R22's correlation companion (the dual-axis SVG + the strip),
+  // R24's London vault + clearing riders, R26's five-currency grid,
+  // R27's COT chips (in-place), plus the 54 new fa/en dictionary
+  // strings. Measured 177.57/39.31 — over the 152/34.5 ceiling by
+  // 25.57 kB raw / 4.81 kB gz. Verified NOT duplication (the three new
+  // components + the two clients each appear once in the built chunk;
+  // the engine functions stay in the insights chunk). The bump to
+  // 179/40 gives the measured fit + ~1.4 kB raw headroom. Justified in
+  // CHANGELOG §2026-11-19 (GPE S14).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 179_000, gz: 40_000, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree

@@ -57,7 +57,6 @@ const GOLD_XAU: GoldXauOhlcSnapshot = {
 /** An EODHD EOD-row fetchImpl keyed by symbol → {date, close} rows. */
 function eodhdFetchOver(
   map: Record<string, Array<{ date: string; close: number }>>,
-  todayUtc = '2026-11-19',
 ): typeof fetch {
   return (async (input: RequestInfo | URL) => {
     const url = new URL(String(input));
@@ -301,9 +300,9 @@ describe('runGoldXauCrossesIngest (the rung body)', () => {
     const legs: Record<string, Array<{ date: string; close: number }>> = {
       'XAUEUR.FOREX': dates.map((d, i) => ({ date: d, close: 3_400 + i })),
       'XAUAUD.FOREX': dates.map((d, i) => ({ date: d, close: 5_500 + i })),
-      'USDJPY.FOREX': dates.map((d, i) => ({ date: d, close: 150 })),
-      'GBPUSD.FOREX': dates.map((d, i) => ({ date: d, close: 1.3 })),
-      'USDCNY.FOREX': dates.map((d, i) => ({ date: d, close: 6.7 })),
+      'USDJPY.FOREX': dates.map((d) => ({ date: d, close: 150 })),
+      'GBPUSD.FOREX': dates.map((d) => ({ date: d, close: 1.3 })),
+      'USDCNY.FOREX': dates.map((d) => ({ date: d, close: 6.7 })),
     };
     const store = new KvGoldCrossesStore(kv);
     await runGoldXauCrossesIngest(store, {

@@ -209,7 +209,7 @@ export async function runGoldLbmaIngest(store: GoldLbmaStore, deps: GoldLbmaJobD
 
   let vaultRows: readonly GoldLbmaVaultRow[] | null = null;
   let clearingRows: readonly GoldLbmaClearingRow[] | null = null;
-  let waiting: string[] = [];
+  const waiting: string[] = [];
 
   try {
     try {

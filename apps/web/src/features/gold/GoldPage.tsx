@@ -36,6 +36,8 @@ import { GoldYieldDecomposition } from './GoldYieldDecomposition';
 import { GoldOnRamp } from './GoldOnRamp';
 import { GoldIranBridge } from './GoldIranBridge';
 import { GoldCbDemand } from './GoldCbDemand';
+import { GoldLondonVault } from './GoldLondonVault';
+import { GoldCorrelation } from './GoldCorrelation';
 import { GoldTaLevels } from './GoldTaLevels';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
@@ -306,13 +308,26 @@ export function GoldPage(): React.JSX.Element {
           honest-record footnote. GPE R14: Zone K (the central-bank demand
           section) rides INSIDE this block via the zoneK slot — between
           the flows cards and the licence wall (s6/01 §2b slot A), so the
-          trust band (wall + honest record) stays contiguous behind it. */}
+          trust band (wall + honest record) stays contiguous behind it.
+          GPE R24 + R22 (2026-11-19): the zone's own content order per
+          s7/01 §6 — the tracker (R14), then the F22 riders (the London
+          vault + clearing plumbing), then the F11 companion chart CLOSES
+          the zone (the crossover lesson beside the data that explains
+          it). */}
       <div className="mt-3 sm:mt-5">
         {contextEntries.length > 0 ? (
           <GoldContext
             entries={contextEntries}
             onOpenDetails={openCard}
-            zoneK={readings !== undefined ? <GoldCbDemand price={hero?.price} /> : null}
+            zoneK={
+              readings !== undefined ? (
+                <>
+                  <GoldCbDemand price={hero?.price} />
+                  <GoldLondonVault />
+                  <GoldCorrelation />
+                </>
+              ) : null
+            }
           />
         ) : null}
       </div>

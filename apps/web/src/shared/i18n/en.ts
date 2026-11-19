@@ -1009,7 +1009,7 @@ export const en = {
         'Look at which piece of the yield moved: real-yield-driven rises are the classic headwind, but term-premium-driven rises have historically supported gold instead (the decomposition card above names the three configurations). And look at who was buying — the post-2022 central-bank bid lifted gold even as real yields rose (the demand section below).',
       faqQ3: 'Gold is at a record in euros but not in dollars — which is real?',
       faqA3:
-        'Both are real: gold is priced in dollars, so a stronger dollar can mask a global rise — driver 3’s rule and its two famous breaks. Check the price in another currency before calling a move “global” — the gold-in-Australian-dollars card on this page is the one non-USD price card today (the full currency grid is a planned wave).',
+        'Both are real: gold is priced in dollars, so a stronger dollar can mask a global rise — driver 3’s rule and its two famous breaks. Check the price in another currency before calling a move “global” — the five-currency grid below the ratios reads the same ounce through five numeraires.',
       faqQ4: 'Does the 37-factor meter predict the price?',
       faqA4:
         'No. It describes conditions, and the page’s own published backtest measured that the lean showed no positive association with the next 5 to 60 trading days — if anything, readings against gold came before larger rises. The honest record at the bottom of the page carries the full measured result.',
@@ -1039,6 +1039,78 @@ export const en = {
       meaningShanghaiPremium: 'The Shanghai-over-London price gap — the market’s own sensor for where the physical buyer is.',
       physicalHeader: 'The physical market',
       physicalLine: 'Persistent premiums mark phases when physical (mainly Asian) demand is the marginal bid; discounts mark Western-investment-led phases.',
+      /* GPE R22 / F11 (2026-11-19): the correlation companion — the
+       * mandated Zone K design (s7/01 §3 in full): the dual-axis chart +
+       * the 52-week rolling strip + the dated 2022 annotation + the
+       * methodology footer with the pre-registered windows printed
+       * verbatim (S7-D7, the anti-GPE-S3-05 clause). The scatter stays
+       * rejected; fail-closed when either series is stale. */
+      corrTitle: 'Gold and real yields — the relationship that changed',
+      corrSubtitle: 'The old inverse rule, its 2022 break, and the rolling correlation that shows both — no single number hides the convention.',
+      corrGoldLabel: 'Gold — XAUUSD daily closes (left)',
+      corrYieldLabel: '10-year real yield % (right)',
+      corrStripTitle: '52-week rolling correlation (levels)',
+      corrStripNone: 'The stored window carries {n} weekly Friday closes so far — the first 52-week correlation point needs 52. It computes itself as the series grows.',
+      corrRotationLabel: '2022: the buyer rotated',
+      corrRotationLine: 'February 2022 — the reserve freeze dated the rotation; the demand tracker above tells who stepped in.',
+      corrMethodSeries: 'Gold = XAUUSD daily closes (EODHD) · real yield = 10-year TIPS yield (Treasury / FRED DFII10)',
+      corrMethodWindow: 'weekly Friday closes · 52-week rolling Pearson · levels · display window: {window}',
+      corrCaveat: 'Correlation is one factor, not a forecast formula — and a different sampling day moves the number. That is exactly why the windows are pre-registered and printed on this panel.',
+      corrStale: 'One of the two series is stale — gold {goldAge} days old, the real yield {yieldAge} days old. The panel waits rather than guessing.',
+      corrNotEnough: 'The two series share too few common days so far — the panel waits for the data.',
+      corrUnavailable: 'The correlation panel could not be read yet.',
+      /* GPE R24 / F22 (2026-11-19): the London vault + clearing cards —
+       * Zone K riders, collapsed headers with the top-line at 390;
+       * "Source: LBMA" + the four-field disclosure block (C6). */
+      lbmaVaultTitle: 'London vault stock',
+      lbmaVaultTopline: 'London vaults hold {tonnes} t of gold',
+      lbmaVaultSilver: 'plus {tonnes} t of silver',
+      lbmaVaultMom: '{pct} vs the previous month',
+      lbmaClearingTitle: 'London clearing volumes',
+      lbmaClearingTopline: '{moz} M oz of gold cleared in {month}',
+      lbmaClearingRow: '{moz} M oz · ${bn} bn · {transfers} transfers',
+      lbmaClearingContext: 'On average, more than 20 million ounces of gold is cleared daily in the London market — the net transfers settled between the four LBMA market-maker banks that own London Precious Metals Clearing (LPMCL).',
+      lbmaMethodTitle: 'Method',
+      lbmaMethodVault: 'Source: LBMA (London vault holdings) — monthly, one month in arrears. Holdings on the last day of the month, all physical forms within the M25 including the Bank of England’s gold (the Bank holds no silver); the full 124-month series from July 2016.',
+      lbmaMethodClearing: 'Source: LBMA (clearing statistics) — the net volume of gold and silver transferred between LPMCL’s member banks, monthly; the full 360-month series from October 1996.',
+      lbmaAsOf: 'data through {month}',
+      lbmaShow: 'Show the details',
+      lbmaHide: 'Hide the details',
+      lbmaUnavailable: 'The London vault data could not be read yet.',
+      /* GPE R26 / F10 (2026-11-19): the multi-currency gold grid — Zone I
+       * compact sub-card; EUR/AUD native + JPY/GBP/CNY derived (the
+       * S14-D1 record, every leg named per C1); each cross's own decile
+       * over its STORED basis (the S13-D1 honest window, named per row)
+       * + the KGX validation sentence. */
+      gridTitle: 'Gold in five currencies',
+      gridSubtitle: 'The same ounce through five numeraires — the dollar story made visible.',
+      gridFormula: 'EUR and AUD are the provider’s own XAU crosses; JPY, GBP and CNY derive exactly as XAUUSD × USDJPY, XAUUSD ÷ GBPUSD and XAUUSD × USDCNY (EODHD daily closes).',
+      gridBasisNote: 'The position is each cross’s own stored window ({window} today) — it widens as the stored series does.',
+      gridPositionLine: '{band} of its stored window',
+      gridBandTop: 'top {p}%',
+      gridBandBottom: 'bottom {p}%',
+      gridBandMid: 'mid-range',
+      gridChange30d: '30 days',
+      gridKgxTitle: 'The validation sentence',
+      gridKgxGenuine: 'Gold rose in USD and in {ups} of {known} crosses over the last 30 days — genuine demand, not just a dollar move.',
+      gridKgxDollar: 'Gold rose in USD but fell in {downs} of {known} crosses over the last 30 days — the dollar story, not a global bid.',
+      gridKgxWeak: 'Gold fell in USD but rose in {ups} of {known} crosses over the last 30 days — the dollar weakening, not a global retreat.',
+      gridKgxMixed: 'Gold’s 30-day moves split across currencies ({ups} of {known} up) — no single story; read the rows.',
+      gridKgxNone: 'The 30-day windows need more stored data.',
+      gridUnavailable: 'The currency grid could not be read yet.',
+      /* GPE R27 / F14 (2026-11-19): the COT percentile band chips + the
+       * crowd-gauge flag on the Zone J cards — position + band, never
+       * direction; the days–weeks horizon label always renders; the
+       * D5-locked convention named at point of use. */
+      cotBandChip: 'vs its decade: {band}',
+      cotChipTop: 'top {p}%',
+      cotChipBottom: 'bottom {p}%',
+      cotChipMid: 'mid-range',
+      cotCrowdHigh: 'Statistically high vs the past decade — a crowded book. Extremes mark vulnerability in either direction (days–weeks horizon).',
+      cotCrowdLow: 'Statistically low vs the past decade — a crowded book on the other side. Extremes mark vulnerability in either direction (days–weeks horizon).',
+      cotCrowdMid: 'Mid-range vs the past decade — the fuel gauge carries little information here; it matters at the extremes (days–weeks horizon).',
+      cotConventionNet: 'non-commercial net longs as a share of open interest — the CFTC weekly CoT report',
+      cotConventionGross: 'gross longs as a share of open interest — the CFTC weekly CoT report',
       /* GPE R14: the buyers-table country names (the current cast's IMF
        * codes; an unmapped code renders the code itself — fail-closed). */
       cbCountries: {

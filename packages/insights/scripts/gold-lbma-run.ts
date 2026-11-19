@@ -36,7 +36,7 @@ import {
 } from '../src/domains/gold/lbma';
 import { fetchLbmaVault, LbmaVaultNotPublished } from '../src/domains/gold/adapters/lbma-vault';
 import { fetchLbmaClearing } from '../src/domains/gold/adapters/lbma-clearing';
-import type { GoldLbmaVaultRow, GoldLbmaClearingRow, GoldLbmaSnapshot } from '@currena/core';
+import type { GoldLbmaSnapshot } from '@currena/core';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
