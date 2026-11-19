@@ -1,6 +1,68 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S15 — GPE P3, the Supporting tier's second session; DONE AND VERIFIED LIVE)
+## This session (S16 — GPE P3, the Supporting tier's third + FINAL session; DONE AND VERIFIED LIVE — P3 COMPLETE)
+
+**Outcome:** the row **R30 (F3b Bridge-2 — the حباب premium HISTORY)**
+landed, tested, deployed, and live-verified: the one-time TGJU
+profile-history backfill (the s4/03 §1e verified route, re-verified
+live + extended to the `/history` full-list pages: 30 daily rows per
+leg, BOTH calendars per row — the Gregorian column authoritative, no
+calendar conversion anywhere; the four legs [sekee · sekeb · ons ·
+price_dollar_rl] inner-joined on common days — 24 at launch, Tehran
+Mon–Thu; the premium COMPUTED from the legs' own closes, never
+scraped as a claim; the reconstructed series reconciles the s1/11 §5
+probe values EXACTLY) + the forward accumulation (the 20:33 UTC =
+00:03 Tehran daily rung — the PRICES_CRON_MINUTE pattern, NO new cron
+trigger; the day's last snapshot over the same `coinPremium()`
+computation the bridge board renders; write-if-changed; a missing or
+>24 h-old snapshot writes nothing) + the premium DECILES (the R19
+posture — min base 30, the current point excluded, the basis window
+named; the honest sub-30 waiting line at launch) + the day-move
+attribution strip (the EXACT identity arithmetic Δln(coin) =
+Δln(ounce) + Δln(USD/IRR) + Δln(1+premium), the formula printed
+VERBATIM at point of use — «تفکیک حسابی است، نه برآورد آماری
+(رگرسیون)» — NEVER GRAM-style regression, the s7/01 §8 binding copy)
++ the honesty line («بازسازی‌شده از تاریخچهٔ منبع» vs «محاسبهٔ زنده از
+اسنپ‌شات‌های خودمان» — rendered on the chart's own boundary marker
+«آغاز محاسبهٔ زنده») — all on the Zone F extension below the bridge
+board (`GoldPremiumHistory.tsx`, the same band, s1/11 §8's phase 2).
+**The CBI gerami pin was attempted** (the WAF block re-verified; a
+third-party corroboration at ~0.909 g pure recorded as corroboration
+only — not the CBI primary): **the 0.90–0.92 g band stands** (S16-D5).
+**R15/R23 + the prices workbook stayed pending** (no WGC drop — the
+sixth consecutive session for R15; the fold rule). Production is
+currena-api **`ea45d06c` @ 100%** (the D-43 deploy-lock re-checked
+FIRST — `83359c39` still active, no drift; first attempt clean) **+
+the gold-premium KV seed** (`insights:gold-premium-history:v1`: the
+24-day backfill 2026-10-15 → 2026-11-18 + the live 2026-11-19 row —
+the backfill→live boundary exact; the Emami premium 7.33% at the
+backfill close → 6.78% live at the seed). The branch
+`gold-elevation/p3-bridge2` is pushed with the session's five commits
+(the M1 docs `1283afa1` · the backend `f848446c` · the frontend
+`8fb812ff` · the manifest + budget + gates `ac05da94` + the close).
+Gates 9/9 GREEN (suite **15,510**, +48: the insights 25 engine + the
+scraper 9 parser + the api 8 route/cron + the web 6 component tests).
+The Persian-copy manifest round 89 landed the session's 22 fa entries
+(8,417 → **8,439** entries; copy:audit clean; the terminology
+additions: نوار تفکیک حرکت روز · اتحادِ دقیق · مِلت · خط صداقت). The
+GoldPage budget bumped 210/45.5 → **218/46** (measured 216.67/45.35,
+verified not duplication — the component + client each once; the pure
+engines ride the shared insights chunk). The live-verify matrix:
+13/13 PASS across EN desktop + fa RTL + mobile 390, zero console
+errors (the four screenshots: s16/verify-*.png). **P3 IS COMPLETE**
+— every queued P3 row (R22–R30) delivered + deployed + live-verified
+across S14–S16. The session summary + the S17 next-session prompt are
+docs/specs/gold-page-elevation/s16/SUMMARY.md.
+
+**Program counter: Session 16/18 · 2 remaining (S17–S18).** Next:
+S17 = P4 the Advanced tier (R31 the time machine + R32 the
+forecast-accuracy retrospective + R33 the "if you'd bought" calculator
+— ALL THREE, the last feature wave; the S17 prompt is in
+s16/SUMMARY.md's next-session section); S18 = the program closeout
+(the research-branch reconciliation + the AGENTS.md drift items +
+the final sweep).
+
+## Previous session (S15 — GPE P3, the Supporting tier's second session; DONE AND VERIFIED LIVE)
 
 **Outcome:** the rows R28 (F24 the Fed-probabilities card — **the
 Kalshi leg DELIBERATELY DROPPED on the Developer-Agreement wording
