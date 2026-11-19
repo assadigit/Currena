@@ -19,6 +19,7 @@ import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@cur
 import { KvPricesStore } from '@currena/insights/prices';
 import type { PricesJobFetchers } from '@currena/insights/prices';
 import { runGoldExpectationsIngest, KvGoldExpectationsStore } from '@currena/insights/expectations';
+import { runGoldPremiumHistoryIngest, KvGoldPremiumStore } from '@currena/insights/premium-history';
 import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
 import { runScheduledNarrator, NARRATOR_CRON_MINUTE } from './narrator-cron';
 import {
@@ -65,6 +66,41 @@ export const PRICES_CRON_MINUTE = 13;
  * only logs — a rung failure can never mark the cron invocation failed.
  */
 export const EXPECTATIONS_CRON_MINUTES: readonly [number, number] = [23, 53];
+
+/**
+ * GPE R30 / F3b (2026-11-19, the S16-D2 record): Bridge-2's premium-history
+ * forward accumulation — ONE row per Tehran day, the day's last snapshot.
+ * Fires at 20:33 UTC = 00:03 Tehran (UTC+3:30, no DST): the Tehran day
+ * that just ended gets its close row, computed from the SAME ladder
+ * snapshot the bridge board reads (the fresh-window ladder — no extra
+ * scrape when the cache is warm; the store lock makes concurrent ladder
+ * calls safe). Write-if-changed; a missing or >24 h-old snapshot writes
+ * NOTHING (the last-good discipline — an honest gap, never a stale quote
+ * under today's date). 20:33 is clear of every other rung (:13 prices,
+ * :23/:53 expectations, :15-mod Frankfurter, :40 watchdog, :50 narrator,
+ * the 04:xx ingest rungs) — the PRICES_CRON_MINUTE pattern, NO new cron
+ * trigger (the account's free 5-cron limit stays full).
+ */
+export const PREMIUM_HISTORY_CRON = { hour: 20, minute: 33 } as const;
+
+/** The daily premium-history rung (exported for tests; the cron calls it). */
+export async function runScheduledGoldPremiumHistory(env: Bindings): Promise<void> {
+  const service = makeDefaultService(env);
+  const store = new KvGoldPremiumStore(env.RATES);
+  const result = await runGoldPremiumHistoryIngest(store, {
+    getSnapshot: async () => {
+      // The ladder's own read — honors the fresh window (cache hit → zero
+      // scrapes) and returns the coherent snapshot the board serves.
+      const response = await service.getRates('tgju');
+      return response.snapshot;
+    },
+  });
+  if (result.outcome.ok) {
+    console.log(`[cron] gold-premium-history ok — ${result.outcome.note ?? 'done'}`);
+  } else {
+    console.warn(`[cron] gold-premium-history failed (${result.outcome.kind}): ${result.outcome.note}`);
+  }
+}
 
 /** The 30-minute expectations refresh (exported for tests; the cron calls it). */
 export async function runScheduledGoldExpectationsRefresh(env: Bindings): Promise<void> {
@@ -150,6 +186,18 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
       ? [
           runScheduledGoldExpectationsRefresh(env).catch((err: unknown) => {
             console.warn('[cron] gold-expectations refresh failed:', err instanceof Error ? err.message : err);
+          }),
+        ]
+      : []),
+    // GPE R30 / F3b: the daily premium-history rung (20:33 UTC = 00:03
+    // Tehran — the S16-D2 record) — fault-isolated the same way: the job's
+    // own failure branch writes nothing and only logs, and this catch is
+    // belt-and-braces so a snapshot hiccup can never mark the cron
+    // invocation failed.
+    ...(date.getUTCHours() === PREMIUM_HISTORY_CRON.hour && minute === PREMIUM_HISTORY_CRON.minute
+      ? [
+          runScheduledGoldPremiumHistory(env).catch((err: unknown) => {
+            console.warn('[cron] gold-premium-history rung failed:', err instanceof Error ? err.message : err);
           }),
         ]
       : []),

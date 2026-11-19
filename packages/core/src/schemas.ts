@@ -2706,6 +2706,123 @@ export const GoldEpisodesSnapshotSchema = z
 export type GoldEpisodesSnapshot = z.infer<typeof GoldEpisodesSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * The Iran bridge's premium history (GPE R30 / F3b, 2026-11-19) —
+ * Bridge-2's one-key series: the حباب (coin premium over melt) HISTORY
+ * the page's statistical identity gets applied to — the premium DECILES
+ * nobody in the Persian ecosystem publishes on a documented, reproducible
+ * basis (the s4/03 §1c finding: TGJU prints حباب values with NO formula;
+ * Currena's premium states its intrinsic arithmetic and reconciles
+ * visibly).
+ *
+ * ONE KV key (`insights:gold-premium-history:v1`), ONE row per Tehran
+ * day, TWO provenances with the honesty line rendered at point of use:
+ *   - 'backfill' — "reconstructed from source history": the one-time
+ *     TGJU profile-history parse (the four /history pages — sekee,
+ *     sekeb, ons, price_dollar_rl — each row's four legs being TGJU's
+ *     OWN daily closes; the premium is COMPUTED from the three legs,
+ *     never scraped as a claim, s1/11 §6). Only days where ALL FOUR
+ *     legs carry a row compute (the inner join — 24 common days at
+ *     launch, Tehran Mon–Thu, the two markets' overlap).
+ *   - 'live' — "computed live from our snapshots": the forward
+ *     accumulation beside the R13 snapshot plane (the day's last
+ *     snapshot, the 00:03 Tehran rung + the REST-twin runner; a live
+ *     row overwrites a backfill row on date collision, never the
+ *     reverse).
+ *
+ * The attribution strip (Δln(coin) = Δln(ounce) + Δln(USD/IRR) +
+ * Δln(1+premium) — the EXACT identity arithmetic, s7/01 §8's binding
+ * copy: never GRAM-style regression) computes at read time over two
+ * observations: the live snapshot (the bridge board's own plane) vs the
+ * last stored day — every factor's legs are carried per day for exactly
+ * this.
+ * ------------------------------------------------------------------ */
+
+/** The instruments a premium-history day can carry (the bridge board's own 8 — COIN_SPECS). */
+export const GoldPremiumCoinIdSchema = z.enum([
+  'coin-emami',
+  'coin-bahar',
+  'coin-half',
+  'coin-quarter',
+  'coin-gram',
+  'gold-18k',
+  'gold-24k',
+  'gold-mesghal',
+]);
+export type GoldPremiumCoinId = z.infer<typeof GoldPremiumCoinIdSchema>;
+
+/** One instrument's computed parity + premium for one day (the C2 grammar's own fields). */
+export const GoldPremiumCoinRowSchema = z.object({
+  id: GoldPremiumCoinIdSchema,
+  /** The market quote, TOMAN (the day's close: TGJU's own for backfill rows, the snapshot's for live rows). */
+  marketToman: z.number().finite().positive(),
+  /** Intrinsic (melt) value, TOMAN — tomanPerOunce × pureGrams ÷ 31.1034768. */
+  intrinsicToman: z.number().finite().positive(),
+  /** market − intrinsic, TOMAN (negative = below melt — the Bahar prints it honestly). */
+  premiumToman: z.number().finite(),
+  /** premium ÷ intrinsic × 100, percent (negative allowed). */
+  premiumPct: z.number().finite(),
+});
+export type GoldPremiumCoinRow = z.infer<typeof GoldPremiumCoinRowSchema>;
+
+/** One Tehran day of the premium history. */
+export const GoldPremiumDaySchema = z.object({
+  /** The Tehran calendar day (ISO date) the row belongs to. */
+  date: z.iso.date(),
+  /** How the row was produced — the honesty line renders it. */
+  source: z.enum(['backfill', 'live']),
+  /** When the observation was made (the snapshot's fetchedAt for live rows; the parse time for backfill rows). */
+  fetchedAt: z.iso.datetime(),
+  /** The ounce leg's value, USD (TGJU `ons`). */
+  ounceUsd: z.number().finite().positive(),
+  /** The free-market dollar leg, TOMAN per USD (TGJU `price_dollar_rl` ÷ 10). */
+  dollarToman: z.number().finite().positive(),
+  /** ounceUsd × dollarToman — the computed intermediate the parity line names. */
+  tomanPerOunce: z.number().finite().positive(),
+  /** Per-instrument rows; at least one (a day with no computable coin is not stored). */
+  coins: z.array(GoldPremiumCoinRowSchema).min(1),
+});
+export type GoldPremiumDay = z.infer<typeof GoldPremiumDaySchema>;
+
+/** The backfill's own record — the honesty line + the revision caveat's anchor. */
+export const GoldPremiumBackfillInfoSchema = z.object({
+  /** The first reconstructed day. */
+  from: z.iso.date(),
+  /** The last reconstructed day (the newest row the pages served at parse time). */
+  to: z.iso.date(),
+  /** How many days the four legs' inner join produced. */
+  days: z.number().int().positive(),
+  /** The profile-history pages the legs descend from (attribution). */
+  sourceUrl: z.string().url(),
+  /** When the pages were parsed. */
+  fetchedAt: z.iso.datetime(),
+});
+export type GoldPremiumBackfillInfo = z.infer<typeof GoldPremiumBackfillInfoSchema>;
+
+/** The value of `insights:gold-premium-history:v1`, verbatim over the wire. */
+export const GoldPremiumHistorySnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The newest day the series carries. */
+    asOf: z.iso.date(),
+    /** When the store was last written (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The one-time backfill's own record (absent only in the brief window before the backfill ever ran). */
+    backfill: GoldPremiumBackfillInfoSchema.optional(),
+    /** The days, ascending by date, unique. */
+    days: z.array(GoldPremiumDaySchema).min(2),
+  })
+  .refine((s) => s.days.every((d, i) => i === 0 || d.date > s.days[i - 1]!.date), {
+    message: 'premium-history days must be strictly ascending and unique',
+  })
+  .refine((s) => s.days[s.days.length - 1]!.date === s.asOf, {
+    message: 'the premium-history asOf must be the newest day',
+  })
+  .refine((s) => s.backfill === undefined || (s.backfill.from <= s.backfill.to && s.backfill.to <= s.asOf), {
+    message: 'the backfill window cannot run past the series',
+  });
+export type GoldPremiumHistorySnapshot = z.infer<typeof GoldPremiumHistorySnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)
  *
  * The Prices board's four assets (Brent, gold, silver, Bitcoin) plus their

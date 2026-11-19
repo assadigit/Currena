@@ -1455,3 +1455,104 @@ describe('GET /api/insights/gold-episodes (GPE R25)', () => {
     expect(body.v).toBe(1);
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * GPE R30 — GET /api/insights/gold-premium (the Iran bridge's premium
+ * history; the same twin: one KV read, ETag + the public edge cache,
+ * the calm not-ready 503, the reader-failure 503). The two provenances
+ * ride the payload (backfill vs live — the honesty line renders them).
+ * ------------------------------------------------------------------ */
+
+/** A contract-valid premium-history snapshot (the backfill + one live day). */
+const goldPremiumSnapshot: import('@currena/core').GoldPremiumHistorySnapshot = {
+  v: 1,
+  asOf: '2026-11-19',
+  fetchedAt: '2026-11-19T20:33:05.000Z',
+  backfill: {
+    from: '2026-10-15',
+    to: '2026-11-18',
+    days: 24,
+    sourceUrl: 'https://www.tgju.org/profile/sekee/history',
+    fetchedAt: '2026-11-19T16:30:00.000Z',
+  },
+  days: [
+    {
+      date: '2026-10-15',
+      source: 'backfill',
+      fetchedAt: '2026-11-19T16:30:00.000Z',
+      ounceUsd: 4021.9,
+      dollarToman: 263_810,
+      tomanPerOunce: 4021.9 * 263_810,
+      coins: [
+        { id: 'coin-emami', marketToman: 251_010_000, intrinsicToman: 249_593_000, premiumToman: 1_417_000, premiumPct: 0.57 },
+        { id: 'coin-bahar', marketToman: 242_460_000, intrinsicToman: 249_593_000, premiumToman: -7_133_000, premiumPct: -2.86 },
+      ],
+    },
+    {
+      date: '2026-11-19',
+      source: 'live',
+      fetchedAt: '2026-11-19T20:32:00.000Z',
+      ounceUsd: 3696.72,
+      dollarToman: 266_330,
+      tomanPerOunce: 3696.72 * 266_330,
+      coins: [
+        { id: 'coin-emami', marketToman: 250_740_000, intrinsicToman: 231_783_000, premiumToman: 18_957_000, premiumPct: 8.18 },
+        { id: 'coin-bahar', marketToman: 240_750_000, intrinsicToman: 231_783_000, premiumToman: 8_967_000, premiumPct: 3.87 },
+      ],
+    },
+  ],
+};
+
+describe('GET /api/insights/gold-premium (GPE R30)', () => {
+  function makeApp(reader?: { getGoldPremiumHistory(): Promise<import('@currena/core').GoldPremiumHistorySnapshot | undefined> }) {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldPremiumReader: () => reader ?? { getGoldPremiumHistory: async () => undefined },
+    });
+  }
+
+  it('serves the stored snapshot verbatim with ETag + the public cache stamp', async () => {
+    const app = makeApp({ getGoldPremiumHistory: async () => goldPremiumSnapshot });
+    const res = await app.request('/api/insights/gold-premium', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('x-robots-tag')).toBe('noindex');
+    expect(await res.json()).toEqual(goldPremiumSnapshot);
+    expect(res.headers.get('etag')).toBe('"insights-gold-premium:2026-11-19:2:2026-11-19T20:33:05.000Z"');
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const app = makeApp({ getGoldPremiumHistory: async () => goldPremiumSnapshot });
+    const res0 = await app.request('/api/insights/gold-premium', undefined, env);
+    const etag = res0.headers.get('etag') ?? '';
+    const res = await app.request('/api/insights/gold-premium', { headers: { 'if-none-match': etag } }, env);
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 gold_premium_not_ready (calm) when KV is empty — the honest pre-rung state', async () => {
+    const res = await makeApp().request('/api/insights/gold-premium', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('gold_premium_not_ready');
+    expect(body.error.message).toContain('scheduled job has not completed');
+  });
+
+  it('a reader rejection surfaces as the calm 503 gold_premium_unavailable (never a raw 500)', async () => {
+    const app = makeApp({
+      getGoldPremiumHistory: async () => {
+        throw new Error('KV read failed');
+      },
+    });
+    const res = await app.request('/api/insights/gold-premium', undefined, env);
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_premium_unavailable');
+  });
+
+  it('the LITERAL path wins over the parameterised /:id/history route (registered before it)', async () => {
+    const app = makeApp({ getGoldPremiumHistory: async () => goldPremiumSnapshot });
+    const res = await app.request('/api/insights/gold-premium', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as import('@currena/core').GoldPremiumHistorySnapshot;
+    expect(body.backfill?.days).toBe(24); // the one-key history, never a per-id shape
+  });
+});

@@ -41,3 +41,4 @@ Notes:
   is marked not-backtested pending the Phase I2 venue re-probe.
 - `gold-btc` / `silver-btc` (info-only, never vote) have no fixtures: their
   live sources (gold-api.com, Bitstamp) are I2 adapter work.
+| `s16/tgju-history-legs-2026-11-19.json` | The four TGJU profile-history legs (sekee · sekeb · ons · price_dollar_rl), 30 daily rows each — a VERBATIM EXTRACTION of `packages/scraper/fixtures/tgju-history-*.html` through the production `parseTgjuProfileHistory` (recorded 2026-11-19; the S16 M1 probe captures) | 2026-11-19 | parsed rows only (the extraction the premium-history engine tests consume) |

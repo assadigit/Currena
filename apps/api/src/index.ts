@@ -35,6 +35,7 @@ import { KvGoldXauStore } from '@currena/insights/xau-ohlc';
 import { KvGoldCrossesStore } from '@currena/insights/xau-crosses';
 import { KvGoldLbmaStore } from '@currena/insights/lbma';
 import { KvGoldExpectationsStore } from '@currena/insights/expectations';
+import { KvGoldPremiumStore } from '@currena/insights/premium-history';
 import { KvGoldEpisodesStore } from '@currena/insights/episodes';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
@@ -178,6 +179,8 @@ export interface AppDeps {
   makeGoldExpectationsReader?: (env: Bindings) => import('@currena/insights/expectations').GoldExpectationsReader;
   /** GPE R25: the Episode Explorer's data-plane store (route tests inject the fake). */
   makeGoldEpisodesReader?: (env: Bindings) => import('@currena/insights/episodes').GoldEpisodesReader;
+  /** GPE R30: the premium-history store (route tests inject the fake). */
+  makeGoldPremiumReader?: (env: Bindings) => import('@currena/insights/premium-history').GoldPremiumReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
   /**
@@ -350,6 +353,19 @@ export function createApp(deps: AppDeps = {}) {
     return goldEpisodesReader;
   };
 
+  // GPE R30 (2026-11-19): the Iran bridge's premium history serve path —
+  // the ONE key (KvGoldPremiumStore, the same twin; the 20:33 UTC rung
+  // + the gold-premium-run runner write it — the S16-D2 record).
+  let goldPremiumReader: import('@currena/insights/premium-history').GoldPremiumReader | undefined;
+  const getGoldPremiumReader = (
+    env: Bindings,
+  ): import('@currena/insights/premium-history').GoldPremiumReader => {
+    goldPremiumReader ??= deps.makeGoldPremiumReader
+      ? deps.makeGoldPremiumReader(env)
+      : new KvGoldPremiumStore(env.RATES);
+    return goldPremiumReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -397,6 +413,7 @@ export function createApp(deps: AppDeps = {}) {
       getGoldLbmaReader,
       getGoldExpectationsReader,
       getGoldEpisodesReader,
+      getGoldPremiumReader,
       getPricesReader,
       getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests

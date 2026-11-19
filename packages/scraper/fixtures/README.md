@@ -11,3 +11,5 @@ Real upstream captures, TRIMMED for size — tests never hit live sites (AGENTS.
 Provenance: `/home/z/legacy-capture/upstream-samples/` (probe captures of 2026-09-16).
 Unit fact: TGJU `p` values are **RIAL**-denominated with thousands commas; the
 normalizer divides by 10 → **TOMAN** (legacy parity: 1 USD = 230,500 Toman).
+
+| `tgju-history-{sekee,sekeb,ons,price_dollar_rl}.html` | `https://www.tgju.org/profile/<slug>/history` (688 KB each) | 2026-11-19 (GPE S16 M1 probe, ~15:3x UTC) | the `<div id="stocks-table-data">` history-table block only — the 30 daily rows verbatim (8 columns: open/low/high/close/Δ/Δ%/میلادی/شمسی); values in the symbol's own unit (Rial for the Tehran items, USD for `ons`) |

@@ -309,6 +309,32 @@ export {
 } from './domains/gold/episodes';
 export type { EpisodeSeriesView } from './domains/gold/episodes';
 
+// GPE R30 / F3b (docs/specs/gold-page-elevation s8/01 R30 · s7/01 §8 the
+// identity arithmetic's binding copy · the s16 M1 §6 records S16-D1..D5):
+// Bridge-2's PURE derivations — the per-coin premium series over the
+// stored days, the premium deciles (the page's statistical identity
+// applied to حباب: min base 30, the current point excluded, the basis
+// window named — the R19 posture), and the exact identity-arithmetic
+// attribution strip (Δln(coin) = Δln(ounce) + Δln(USD/IRR) +
+// Δln(1+premium) — never GRAM-style regression, disclosed at point of
+// use; fails closed on any non-zero residual). The store/job/runner
+// halves live behind the "@currena/insights/premium-history" subpath —
+// the SPA-facing root export stays platform-free.
+export {
+  PREMIUM_DECILE_MIN_BASE,
+  attributionLegsOfDay,
+  attributionLegsOfPremium,
+  attributionStrip,
+  premiumDeciles,
+  premiumSeries,
+} from './domains/gold/premium-history';
+export type {
+  AttributionLegs,
+  AttributionStrip,
+  PremiumDeciles,
+  PremiumSeriesPoint,
+} from './domains/gold/premium-history';
+
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
 // real-yield-10y scoring input (decision D-6: fills never reach the stored

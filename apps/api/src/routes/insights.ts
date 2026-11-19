@@ -65,6 +65,7 @@ import type { GoldCrossesReader } from '@currena/insights/xau-crosses';
 import type { GoldLbmaReader } from '@currena/insights/lbma';
 import type { GoldExpectationsReader } from '@currena/insights/expectations';
 import type { GoldEpisodesReader } from '@currena/insights/episodes';
+import type { GoldPremiumReader } from '@currena/insights/premium-history';
 import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
@@ -147,6 +148,9 @@ interface InsightsRouteDeps {
   /** GPE R25: the Episode Explorer's data plane (the WGC workbook
    *  spine + the comparison legs — the drop-gated key). */
   getGoldEpisodesReader: (env: Bindings) => GoldEpisodesReader;
+  /** GPE R30: the Iran bridge's premium history (the backfill + the
+   *  forward accumulation — the 20:33 UTC rung's key). */
+  getGoldPremiumReader: (env: Bindings) => GoldPremiumReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
   /**
@@ -994,6 +998,71 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       );
     }
     const etag = `"insights-gold-episodes:${snapshot.asOf}:${snapshot.spine.rows.length}:${snapshot.legs.map((l) => l.rows.length).join(':')}:${snapshot.fetchedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
+    if (typeof caches !== 'undefined') {
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // GPE R30 / F3b (2026-11-19): the Iran bridge's premium history — the
+  // ONE-key snapshot (insights:gold-premium-history:v1), the same literal-
+  // path twin. The حباب premium HISTORY with its two provenances (the
+  // one-time TGJU profile-history backfill + the daily forward accumulation
+  // beside the R13 snapshot plane — the 20:33 UTC = 00:03 Tehran rung), the
+  // honesty line rendering "reconstructed from source history" vs
+  // "computed live from our snapshots" at point of use. TGJU data (L2-
+  // owner-accepted — the bridge board's own posture, attribution + the
+  // revision caveat); no licence reason to hide — the per-source kill
+  // switch still applies if a future owner directive arms it. Staleness is
+  // data-carried (the series' own asOf day + the fetchedAt stamp).
+  app.get('/gold-premium', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-premium')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: import('@currena/core').GoldPremiumHistorySnapshot | undefined;
+    try {
+      snapshot = await deps.getGoldPremiumReader(c.env).getGoldPremiumHistory();
+    } catch (err) {
+      console.warn('[insights] gold-premium read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_premium_unavailable',
+        'The coin premium history is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the key has never been written
+      // (fresh deploy, or the backfill runner + the 20:33 rung have not
+      // landed their first write).
+      return errorResponse(
+        c,
+        503,
+        'gold_premium_not_ready',
+        'No coin premium history stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-gold-premium:${snapshot.asOf}:${snapshot.days.length}:${snapshot.fetchedAt}"`;
     if (c.req.header('if-none-match') === etag) {
       return c.body(null, 304, {
         'Cache-Control': 'public, max-age=300, s-maxage=300',

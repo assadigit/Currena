@@ -54,6 +54,15 @@ export {
 export type { TgjuScrapeOptions } from './tgju';
 
 export {
+  TGJU_PREMIUM_BACKFILL_SLUGS,
+  TGJU_PROFILE_HISTORY_SUFFIX,
+  fetchTgjuProfileHistory,
+  parseTgjuProfileHistory,
+  tgjuProfileHistoryUrl,
+} from './tgju-history';
+export type { TgjuBackfillSlug, TgjuHistoryFetchOptions, TgjuHistoryRow } from './tgju-history';
+
+export {
   FRANKFURTER_LATEST_URL,
   buildFrankfurterSnapshot,
   currencyDisplayName,

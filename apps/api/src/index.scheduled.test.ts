@@ -23,6 +23,8 @@ const KvPricesStore = vi.hoisted(() => class {});
 const runIngestWatchdog = vi.hoisted(() => vi.fn(async () => 'fresh' as const));
 const runGoldExpectationsIngest = vi.hoisted(() => vi.fn());
 const KvGoldExpectationsStore = vi.hoisted(() => class {});
+const runGoldPremiumHistoryIngest = vi.hoisted(() => vi.fn());
+const KvGoldPremiumStore = vi.hoisted(() => class {});
 
 vi.mock('@currena/scraper', () => ({
   scrapeTgju,
@@ -44,6 +46,10 @@ vi.mock('./ingest-watchdog', () => ({
 vi.mock('@currena/insights/expectations', () => ({
   runGoldExpectationsIngest,
   KvGoldExpectationsStore,
+}));
+vi.mock('@currena/insights/premium-history', () => ({
+  runGoldPremiumHistoryIngest,
+  KvGoldPremiumStore,
 }));
 
 const api = await import('./index');
@@ -93,6 +99,10 @@ function makeKv(): { kv: KVNamespace; map: Map<string, string> } {
 const eventAtMinute = (minute: number): ScheduledController =>
   ({ cron: '* * * * *', scheduledTime: Date.UTC(2026, 9, 14, 10, minute) }) as unknown as ScheduledController;
 
+/** A scheduled event at an arbitrary UTC hour + minute (2026-10-14). */
+const eventAtUtc = (hour: number, minute: number): ScheduledController =>
+  ({ cron: '* * * * *', scheduledTime: Date.UTC(2026, 9, 14, hour, minute) }) as unknown as ScheduledController;
+
 let map: Map<string, string>;
 let kv: KVNamespace;
 const waitUntil = vi.fn();
@@ -108,6 +118,11 @@ beforeEach(() => {
   runPricesUpdate.mockResolvedValue({ wroteSnapshot: false, report: {} });
   runIngestWatchdog.mockReset();
   runIngestWatchdog.mockResolvedValue('fresh');
+  runGoldPremiumHistoryIngest.mockReset();
+  runGoldPremiumHistoryIngest.mockResolvedValue({
+    outcome: { ok: true, note: '2026-10-13 upserted (2 coins · 25 days)' },
+    kv: { reads: 1, writes: 1 },
+  });
 });
 
 afterEach(() => {
@@ -252,6 +267,40 @@ describe('the minute-cron wrapper (keep-warm backbone, audit C-4)', () => {
 
     expect(map.has('snapshot:tgju')).toBe(true); // the ladder's work survived
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('gold-expectations failed (failed)'));
+    warn.mockRestore();
+  });
+
+  it('the 20:33 UTC rung appends the premium-history day row (GPE R30 — 00:03 Tehran, the day close)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T20:33:05.000Z'));
+
+    await worker.scheduled(eventAtUtc(20, 33), { RATES: kv }, ctx);
+
+    expect(runGoldPremiumHistoryIngest).toHaveBeenCalledTimes(1);
+    expect(runGoldPremiumHistoryIngest).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ getSnapshot: expect.any(Function) }));
+  });
+
+  it('an off-premium minute (20:32) never runs the rung', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T20:32:05.000Z'));
+
+    await worker.scheduled(eventAtUtc(20, 32), { RATES: kv }, ctx);
+
+    expect(runGoldPremiumHistoryIngest).not.toHaveBeenCalled();
+  });
+
+  it('a premium-rung failure never marks the whole invocation failed (the fault isolation)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T20:33:05.000Z'));
+    runGoldPremiumHistoryIngest.mockResolvedValue({
+      outcome: { ok: false, kind: 'blocked' as const, note: 'no tgju snapshot in KV — nothing written (last-good holds)' },
+      kv: { reads: 1, writes: 0 },
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await expect(
+      worker.scheduled(eventAtUtc(20, 33), { RATES: kv }, ctx),
+    ).resolves.toBeUndefined();
+
+    expect(map.has('snapshot:tgju')).toBe(true); // the ladder's work survived
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('gold-premium-history failed (blocked)'));
     warn.mockRestore();
   });
 });
