@@ -1128,7 +1128,17 @@ const BUDGETS = [
   // exactly once in the chunk; the pure engines stay in the insights
   // chunk; the episodes' editorial strings ride the dictionaries'
   // shared gzip context). Justified in CHANGELOG (GPE-S15).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 218_000, gz: 46_000, label: 'Gold page lazy chunk (page-division S5)' },
+  // GPE-S17 bump (2026-11-19): the P4 Advanced tier's THREE cards (R31
+  // GoldTimeMachine + its gold-meter client; R32 GoldForecastRetrospective
+  // + the lbma-forecast static series co-located by rollup (used only
+  // here); R33 GoldIfBought + its gold-ifbought client) measured
+  // 237.59/49.31 — verified NOT duplication (each new component +
+  // client appears exactly ONCE in the chunk; the meter/ifbought fetch
+  // clients once; the shared engines stay in the insights chunk). The
+  // bump to 240/50 gives the measured fit + ~2.4 kB raw headroom
+  // (the last feature wave — the next GoldPage growth is a new program).
+  // Justified in CHANGELOG (GPE-S17).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 240_000, gz: 50_000, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree

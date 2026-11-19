@@ -353,3 +353,37 @@ The consolidated lane balance behind `?balance=lanes`
 - **خط صداقت** — the honesty line (the provenance pair, one sentence:
   «بازسازی‌شده از تاریخچهٔ منبع» vs «محاسبهٔ زنده از اسنپ‌شات‌های
   خودمان» — the s1/11 §6 wording pair rendered verbatim on the card).
+
+## The gold page's Advanced tier (GPE round 90)
+
+- **ماشین زمان** — the time machine (R31's Zone C control; the meter's
+  historical surface. The era-boundary note carries the anti-synthesis
+  rule in its own words: «هیچ قرائتِ پیش از آن وجود ندارد یا ساخته
+  نمی‌شود»).
+- **جدول رأی‌دهی** — the voter table (the versioned registry's own
+  object: «زیر جدول رأی‌دهی {version} ({seats} کرسی)» — the seats are
+  named at point of use, the table version rides every row).
+- **بازسازی از سری‌های ذخیره‌شده** — reconstructed from the stored
+  series (the backfill provenance; the live twin is «اسنپ‌شاتِ خودِ آن
+  روز» — the two-row honesty story rendered at point of use, the R30
+  «خط صداقت» discipline carried forward).
+- **حتی اجماع هم خطا می‌کند** — even the consensus misses (R32's
+  headline; the honesty device's own framing — «اجماع» is the
+  analysts' consensus, the word the financial press uses, never
+  «پیش‌بینی ما»).
+- **گذشته‌نگری** — the retrospective (R32's own noun; «گذشته‌نگریِ
+  دقتِ پیش‌بینی» — the forecast-accuracy retrospective, a
+  deliberately learned compound for the honest-record zone's register).
+- **اگر خریده بودید** — if you'd bought (R33's title; the
+  subjunctive past the SA precedent's own grammar maps to, one
+  sentence: «اگر خریده بودید»).
+- **پایانیِ ماه** — the month-end close (the calculator's series unit;
+  «پایانی‌های ماه {from} تا {to}» — the month-ends named on every
+  result row, never a bare "monthly").
+- **پنجرهٔ هم‌طول** — the same-length window (the decile framing's
+  basis: «صدکِ {d} از {n} پنجرهٔ هم‌طول» — the R19 posture's own
+  object, min base 30, the waiting line «صدک از {min} پنجرهٔ هم‌طول
+  روشن می‌شود»).
+- **خرید ماهانه** — the DCA (the SA convention named plainly:
+  «{amount} دلار در هر پایانیِ ماه» — no transliterated "DCA" in
+  fa copy; the Latin ticker rides only the EN sentence).
