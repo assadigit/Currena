@@ -37,6 +37,7 @@ import { GoldOnRamp } from './GoldOnRamp';
 import { GoldExpectations } from './GoldExpectations';
 import { GoldEpisodes } from './GoldEpisodes';
 import { GoldIranBridge } from './GoldIranBridge';
+import { GoldPremiumHistory } from './GoldPremiumHistory';
 import { GoldCbDemand } from './GoldCbDemand';
 import { GoldLondonVault } from './GoldLondonVault';
 import { GoldCorrelation } from './GoldCorrelation';
@@ -258,9 +259,15 @@ export function GoldPage(): React.JSX.Element {
           chapter, after the global verdict completes). The data plane is
           SHARED with LedGoldBoard (the App-boot snapshot store — zero new
           fetches); the #gold-zone-f anchor rides R10's contract. HARD
-          GATE satisfied: Bridge-1 lands before Bridge-2/R30 (P3). */}
-      <div className="mt-3 sm:mt-5" data-gold-zone-f-band>
+          GATE satisfied: Bridge-1 lands before Bridge-2/R30 (P3).
+          GPE R30 / F3b — Bridge-2 EXTENDS the same zone (s1/11 §8's
+          phase 2: the same zone, later wave, without moving it): the
+          premium-history card rides below the bridge board — the
+          strip's live side reads the SAME snapshot store; the history
+          side reads the ONE-key /gold-premium route (one fetch). */}
+      <div className="mt-3 flex flex-col gap-2.5 sm:mt-5 sm:gap-3" data-gold-zone-f-band>
         <GoldIranBridge />
+        <GoldPremiumHistory />
       </div>
 
       {/* TM13: the Signals section (the gold + silver verdict strip with the

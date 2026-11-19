@@ -1273,6 +1273,32 @@ export const en = {
       cotCrowdMid: 'Mid-range vs the past decade — the fuel gauge carries little information here; it matters at the extremes (days–weeks horizon).',
       cotConventionNet: 'non-commercial net longs as a share of open interest — the CFTC weekly CoT report',
       cotConventionGross: 'gross longs as a share of open interest — the CFTC weekly CoT report',
+      /* GPE R30 / F3b (2026-11-19): the premium history — the Zone F
+       * extension (s1/11 §8 phase 2: the same zone, later wave). The
+       * day-move strip: EXACT identity arithmetic (Δln(coin) = Δln(ounce)
+       * + Δln(USD/IRR) + Δln(1+premium)) — never GRAM-style regression;
+       * the s7/01 §8 binding copy printed at point of use. The deciles
+       * ride the R19 posture (min base 30, the current point excluded,
+       * the window named). The honesty line: "reconstructed from source
+       * history" vs "computed live from our snapshots". */
+      prTitle: 'The premium’s history (حباب)',
+      prSubtitle: 'The coin premium is no longer just a live number — its series, its statistical place, and its day-move decomposition live here.',
+      prStripLine: 'Today vs {date}: the Emami coin {coin} — ounce {ounce}, dollar {dollar}, premium {premium}.',
+      prStripMethod: 'An exact identity: Δln(coin) = Δln(ounce) + Δln(USD/IRR) + Δln(1+premium) — the three factors MULTIPLY into the coin’s move, they do not add. This is identity arithmetic, not a regression estimate.',
+      prStripWaiting: 'The day-move strip needs two observations — the live snapshot and the last stored day before today; it waits until both exist.',
+      prChartTitle: 'The Emami and Bahar premium chart',
+      prMeltLabel: 'melt',
+      prBoundaryLabel: 'live compute begins',
+      prHonestyLine: 'The honesty line: {from} to {to} ({n} days) is reconstructed from TGJU’s own daily closes; from then on, computed live from our own snapshots.',
+      prDecileTitle: 'The premium’s place in its own window',
+      prDecileLine: '{coin}: {pct} — {band} its {from} → {to} window ({n} days, today excluded).',
+      prDecileWaiting: '{coin}: the statistical basis is {n} days; the decile lights at 30 and sharpens as the series grows.',
+      prDecileBand: 'The Emami band over the same window: min {min} · p10 {p10} · median {median} · p90 {p90} · max {max}.',
+      prBandTop: 'top {p}% of',
+      prBandBottom: 'bottom {p}% of',
+      prBandMid: 'mid-range of',
+      prMethod: 'Daily capture: each night around 00:03 Tehran time, the day’s last snapshot becomes one row; the historical stretch is reconstructed from TGJU’s own daily closes of the four legs (ounce, free dollar, Emami, Bahar) with the premium COMPUTED from those closes — never scraped as a claim. The melt formula prints on the bridge card above.',
+      prUnavailable: 'The premium history could not be read yet.',
       /* GPE R14: the buyers-table country names (the current cast's IMF
        * codes; an unmapped code renders the code itself — fail-closed). */
       cbCountries: {

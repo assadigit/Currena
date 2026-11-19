@@ -327,6 +327,7 @@ export {
   attributionStrip,
   premiumDeciles,
   premiumSeries,
+  tehranDayOfCapture,
 } from './domains/gold/premium-history';
 export type {
   AttributionLegs,
