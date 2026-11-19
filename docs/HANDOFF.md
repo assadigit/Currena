@@ -1,26 +1,52 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S14 — GPE P3, the Supporting tier's first session; IN FLIGHT)
+## This session (S14 — GPE P3, the Supporting tier's first session; DONE AND VERIFIED LIVE)
 
-**Goal:** the rows R22 (F11 the correlation companion — the mandated
-Zone K design) · R24 (F22 the London vault + clearing cards) · R26 (F10
-the multi-currency gold grid) · R27 (F14 the COT percentile bands +
-crowd gauge) land, tested, deployed, and live-verified — **plus R15 the
-GDT demand stack ONLY if the owner's WGC drop arrived** (it had NOT at
-the M1(b) check — `data/wgc/` absent, no owner notice; R15 stays
-pending). Branch `gold-elevation/p3-supporting` (off the S13 close
-`6d8622a9` — production `3b8a8c6a` is built from it). Milestones:
-M1 the two build-time checks + the citation re-verification → M2 the
-four rows (backend legs + the components + the pure engines + tests) →
-M3 the ONE Persian-copy manifest round + `pnpm gates` green + deploy
-per docs/DEPLOY.md + live verification (desktop + mobile + RTL both
-locales) + the S14 close (summary + the S15 prompt + the TLDR).
+**Outcome:** the rows R22 (F11 the correlation companion — the four
+mandated layers, the pre-registered windows printed) · R24 (F22 the
+London vault + clearing cards — LBMA's own 9,850 t figure matched) ·
+R26 (F10 the five-currency grid — EUR/AUD native + JPY/GBP/CNY derived,
+the KGX validation sentence) · R27 (F14 the COT band chips + the crowd
+gauge) landed, tested, deployed, and live-verified. **R15 stayed
+pending** (no WGC GDT drop — the fold record §0.2 rule, the third
+consecutive session; the wall's WGC CB line stays). **The R07 Treasury
+flip finally verified live mid-session**: the 04:10:18Z Nov 19 rung
+fired while the session deployed — the yield family now reads "U.S.
+Department of the Treasury" primary with the freshest as-of (us10y 5.07
+· us30y 5.41 · real-yield-10y 2.88 @ 2026-11-18), closing the carry
+that ran S11 → S12 → S13. Production is currena-api **`61180d7f` @
+100%** (created 2026-11-19T04:08Z, first attempt clean; the deploy-lock
+checked first — `3b8a8c6a` was still active, no drift) **+ the two KV
+seeds** (`insights:gold-crosses:v1`: EUR 362 native · JPY 267 · GBP 263
+· CNY 261 derived · AUD 308 native, asOf 2026-11-18;
+`insights:gold-lbma:v1`: vault 124 rows → 2026-10, clearing 360 rows →
+2026-09). The branch `gold-elevation/p3-supporting` is pushed with the
+session's four commits (the M1 docs `52489933` · the backend
+`77bcc2bc` · the frontend + manifest + budget `70895a5e` · the close).
+Gates 9/9 GREEN (suite **15,375**, +48; the M2 commit's 10 lint errors
+cleared by the closing leg). The Persian-copy manifest round 87 landed
+the session's 54 new fa strings + the faqA3 re-pin (8,223 → **8,277**
+entries; copy:audit clean). The GoldPage budget bumped 152/34.5 →
+**179/40** (measured 177.57/39.31, verified not duplication). The
+session ran in two legs (one context interruption — the first leg
+landed M1 + the entire backend + the drafted frontend; the closing leg
+finished, wired, gated, deployed, seeded, verified, closed). The
+session summary + the S15 next-session prompt are
+docs/specs/gold-page-elevation/s14/SUMMARY.md.
 
-**M1's honest clock note:** the R07 Treasury-rung carry — the rung
-fires **04:10 UTC Nov 19** and the session started **03:11 UTC**, ~59
-minutes BEFORE it; the live reads at the start still carry FRED
-provenance (recorded in `s14/M1-CITATION-AND-CHECKS.md`); the re-check
-rides this session's close, when the clock has passed.
+**The honest live context the surfaces report:** gold sits at the
+BOTTOM of its 1-year stored window in every numeraire (XAUUSD
+3,793–5,513 over the year, closing 2026-11-18 at the minimum, −6.46%
+over 30 days) — the grid's five rows read «bottom 0–1%», the KGX
+renders the honest mixed «0 of 5 up» (S14-D5), the correlation strip
+carries its first 2 rolling points (the self-widening state).
+
+**Program counter: Session 14/18 · 4 remaining (S15–S18).** Next: S15 =
+P3's second session (R28 the Fed-probabilities card — the Kalshi
+developer-agreement wording read is the FIRST task · R29 the calendar
+strip · R25 the Episode Explorer; R30 Bridge-2 is S16's; R15/R23 stay
+drop-conditional — the S15 prompt is in s14/SUMMARY.md's next-session
+section).
 
 ## Previous session (S13 — GPE P2, the interactive chart + the TA band; DONE AND VERIFIED LIVE)
 

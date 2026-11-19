@@ -292,3 +292,27 @@ The consolidated lane balance behind `?balance=lanes`
 - **جلسه** — the trading session (the cross events' «۲۰ جلسهٔ بعدی»
   and the pivots' «از جلسهٔ {date}») — the page's established session
   vocabulary, reused for the TA family.
+
+## The gold page's Supporting tier (GPE round 87)
+
+- **چرخش خریدار** — the 2022 buyer rotation. The mandated R22
+  annotation vocabulary (s7/01 §3), carried from the approved drafts:
+  «۲۰۲۲: خریدار چرخید» the dated label, «فوریهٔ ۲۰۲۲» the freeze date.
+- **خزانهٔ لندن** / **تسویهٔ لندن** — the London vault stock / the
+  clearing volumes. LBMA's own institutional concepts translated
+  plainly (the rider cards' names); «موجودی خزانهٔ لندن» the stock's
+  full form.
+- **جملهٔ اعتبارسنجی** — the KGX validation sentence (the currency
+  grid's verdict line). «اعتبارسنجی» keeps the verification sense; the
+  sentence states counts and directs to the rows, never a signal word.
+- **کتاب معاملاتی شلوغ** — the crowded book (the crowd-gauge flag's
+  phrase; the futures market's own metaphor, kept literal). Rides with
+  **افق روزها تا هفته‌ها** — the days–weeks horizon, structurally
+  inside every crowd line (the Chain-6 "always renders" mandate).
+- **پنجرهٔ ذخیره‌شده** — the stored window (the crosses' decile basis,
+  round 87 carrying round 86's S13-D1 posture forward: the window
+  named per row, never a «دهه» claim the ~1-year free-tier data
+  cannot support).
+- **نسبت به دههٔ خودش** — "vs its decade" (the COT band chip's frame;
+  the COT series genuinely carries the decade, so the word is earned
+  there — unlike the crosses, where the stored-window word applies).
