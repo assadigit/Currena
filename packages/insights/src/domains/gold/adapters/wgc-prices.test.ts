@@ -103,12 +103,6 @@ describe('parseWgcPricesCells (the handcrafted documented shape)', () => {
 
   it('the USD column is located by its own header — a differently-lettered layout parses identically', () => {
     // 'Date' in B, 'USD' in E — the discovery is label-driven, never fixed.
-    const base = workbookCells().map((c) => {
-      if (c.col === 'A' && c.row > 0 && /^[0-9]/.test(c.value) === false && c.value !== 'Month') {
-        return { ...c, col: 'B' };
-      }
-      return c;
-    }).filter((c) => c.col !== 'A' || c.row === 1);
     const relabeled: XlsxCell[] = [];
     const colMap: Record<string, string> = { A: 'B', B: 'E', C: 'F' };
     for (const c of workbookCells()) {

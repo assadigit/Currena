@@ -201,7 +201,6 @@ describe('the REST adapter (the manual runner\'s landing lever)', () => {
     const snapshot = buildGoldExpectationsSnapshot(dec, NOW);
     const seen: Array<{ method?: string; body?: string }> = [];
     const fetchImpl = (async (input: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(input);
       seen.push({ method: init?.method, body: typeof init?.body === 'string' ? init.body : undefined });
       if (init?.method === 'PUT') return new Response('{}', { status: 200 });
       return new Response(JSON.stringify(snapshot), { status: 200 });

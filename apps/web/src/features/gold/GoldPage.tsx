@@ -34,6 +34,8 @@ import { GoldHero } from './GoldHero';
 import { GoldNarrative } from './narrative/GoldNarrative';
 import { GoldYieldDecomposition } from './GoldYieldDecomposition';
 import { GoldOnRamp } from './GoldOnRamp';
+import { GoldExpectations } from './GoldExpectations';
+import { GoldEpisodes } from './GoldEpisodes';
 import { GoldIranBridge } from './GoldIranBridge';
 import { GoldCbDemand } from './GoldCbDemand';
 import { GoldLondonVault } from './GoldLondonVault';
@@ -241,6 +243,13 @@ export function GoldPage(): React.JSX.Element {
             <GoldYieldDecomposition readings={readings} />
           </div>
           <GoldOnRamp readings={readings} />
+          {/* GPE R28 / R29 (2026-11-19): the expectations strip — the
+              band's fourth element (s6/03 zone D "F24/F25 = ONE row").
+              THE KALSHI LEG DOES NOT SHIP (S15-D1 — the wording read);
+              the card renders Polymarket + the calendar. The calendar
+              rides the SAME insights snapshot the Signals section reads
+              (ZERO new fetches — R29's own constraint). */}
+          <GoldExpectations calendar={insightsSnapshot?.calendar} />
         </div>
       ) : null}
 
@@ -336,6 +345,16 @@ export function GoldPage(): React.JSX.Element {
           cards with a visual bar showing where the current positioning
           stands in its 0–100 range. */}
       {readings !== undefined ? <GoldPositions readings={readings} /> : null}
+
+      {/* GPE R25 / F6 (2026-11-19) — Zone O, the history tail (s6/01
+          zone 16: the history & research band AFTER the positions; F26
+          the calculator is P4's, NOT this session's). The Episode
+          Explorer: the nine records' editorial content renders from the
+          static module + the dictionaries; the price path + the
+          comparison rider are DROP-GATED (the WGC prices workbook —
+          S15-D4) and render the honest waiting state until the
+          gold-episodes-run runner writes the key. */}
+      <GoldEpisodes />
 
       {/* The R-5 details panel (docs/page-division/07) — rendered once at
           the page root; the context cards' stretched opener targets it. */}
