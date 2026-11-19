@@ -1,36 +1,64 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S12 — GPE P1-c, the prizes; DONE AND VERIFIED LIVE)
+## This session (S13 — GPE P2, the interactive chart + the TA band; DONE AND VERIFIED LIVE)
+
+**Outcome:** the rows R18 (F7 the interactive price chart) · R19 (F8 the
+minimal TA band) · R20 (F4a the education on-ramp) · R21 (F4b the
+one-liners + the Chain-7 physical grouping) landed, tested, deployed,
+and live-verified. **R15 stayed pending** (no WGC GDT drop — the fold
+record §0.2 rule; the wall's WGC CB line stays). Production is
+currena-api `3b8a8c6a` @ 100% (created 2026-11-19T01:04:39Z) **+ the
+gold-xau KV seed** (the `gold-xau-run` landing lever: 360 final bars
+2025-11-19 → 2026-11-18, last close 3,792.59 —
+`GET /api/insights/gold-ohlc` serves it). The branch
+`gold-elevation/p2-chart-ta` is pushed with the session's eight commits
+(the M1 docs · the R18 backend · the four rows · the manifest round 86
+· the budget bump · the pivot fix · the deploy/seed/verification · the
+close). Gates 9/9 GREEN (suite 15,327, +37; re-run after the fix).
+The Persian-copy manifest round 86 landed the session's 93 fa strings
+(8,130 → 8,223 entries; copy:audit clean). The session summary + the
+S14 next-session prompt are
+docs/specs/gold-page-elevation/s13/SUMMARY.md.
+
+**The session's honest shape:** one context interruption — the first
+leg (Nov 18 21:18–22:17 UTC) landed M1 + M2 + the manifest/gates +
+the deploy (`62d38fa8`) + the secret + the KV seed, then died before
+the deploy commit/verification/close; the second leg (Nov 19 00:46 →)
+verified rather than assumed (the D-43 read, the byte-identical chunk,
+the route, gates re-run), **found one real defect at the live
+verification — the R19 daily-pivot basis was one session stale — fixed
+it (`a012d544`), re-gated, redeployed (`3b8a8c6a`), re-verified, and
+closed.**
+
+**The honest R07 carry (one more session):** the first
+Treasury-primary rung fires **04:10 UTC Nov 19** — at this session's
+close re-check (01:09 UTC) the live readings still carried FRED
+provenance (us10y 5.12 @ 2026-11-16 "FRED (DGS10)"; the status blob
+healthy). **S14's M1 verifies the flip** — the clock has now passed it.
+
+**Program counter: Session 13/18 · 5 remaining (S14–S18).** Next: S14 =
+P3 the Supporting tier's first session (R22 F11 the correlation
+companion · R24 F22 the London vault + clearing cards · R26 F10 the
+multi-currency gold grid · R27 F14 the COT percentile bands; **+ R15 the
+GDT stack if the owner's drop arrives** — the S14 prompt is in
+s13/SUMMARY.md's next-session section).
+
+## Previous session (S12 — GPE P1-c, the prizes; DONE AND VERIFIED LIVE)
 
 **Outcome:** the rows R13 (Bridge-1 the Iran bridge) · R14 (the IMF
 CB-demand Tier-1 tracker) · R16 (the affordances + the market-state
 pill) · R17 (the #21 de-dup) landed, tested, deployed, and
 live-verified. **R15 slipped to P2** (the M1(b) drop check: no WGC GDT
 file, no owner notice — the fold record §0.2 rule; the wall's WGC CB
-line stays until Tier-2 lands). Production is currena-api `49ae8ce7`
-@ 100% (created 2026-11-18T18:51:04Z) **+ the gold-cb KV seed** (the
-`gold-cb-run` landing lever: asOf 2026-10 · 250 rolling points · the
-10 buyers · reported world 35,003 t / 103 reporters —
-`GET /api/insights/gold-cb` serves it). The branch
-`gold-elevation/p1c-prizes` is pushed with the session's commits (the
-M1 docs · the R13/R14 engines · the four rows · the manifest round 85
-· the budget bump · the deploy/seed/verification · the close). Gates
-9/9 GREEN (suite 15,290, +43). The Persian-copy manifest round 85
+line stays until Tier-2 lands). Production was currena-api `49ae8ce7`
+@ 100% (created 2026-11-18T18:51:04Z) + the gold-cb KV seed (asOf
+2026-10 · 250 rolling points · the 10 buyers · reported world 35,003 t
+/ 103 reporters — `GET /api/insights/gold-cb` serves it). The branch
+`gold-elevation/p1c-prizes` is pushed with the session's commits.
+Gates 9/9 GREEN (suite 15,290, +43). The Persian-copy manifest round 85
 landed the session's 98 fa strings (8,032 → 8,130 entries; copy:audit
 clean). The session summary + the S13 next-session prompt are
 docs/specs/gold-page-elevation/s12/SUMMARY.md.
-
-**The honest R07 carry (S12-D4):** the first Treasury-primary rung
-fires **04:10 UTC Nov 19** — at this session's close the live readings
-still carry FRED provenance (verified via the API; the status blob
-healthy). **S13's M1 verifies the flip.** This session's deploy carries
-the same R07 code — nothing here blocks or alters it.
-
-**Program counter: Session 12/18 · 6 remaining (S13–S18).** Next: S13 =
-P2 the interactive chart (R18 F7 the interactive chart · R19 F8 the
-minimal TA band · R20 F4a the education on-ramp · R21 F4b the
-one-liners; **+ R15 the GDT stack if the owner's drop arrives** — the
-S13 prompt is in s12/SUMMARY.md's next-session section).
 
 ## Previous session (S11 — GPE P1-b, the explanation band; DONE AND VERIFIED LIVE)
 
