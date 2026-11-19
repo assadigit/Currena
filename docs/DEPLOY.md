@@ -5884,3 +5884,72 @@ prompts to weave values/connections into ONE cohesive paragraph.
   (the overall summary, top of the page, is real AI with actual numbers). The
   remaining 2 sections + a prompt-tuning pass to push more sections past V2/V10
   are the next iteration.
+
+## Session record — 2026-11-19 the post-GPE ops sitting: the program merged to main + the live site re-anchored under the owner's fresh credentials (the code-identical redeploy)
+
+**Context.** S18 closed the Gold Page Elevation program as
+bookkeeping-only — production stayed S17's `65f7c0bb` and GitHub `main`
+still sat at the pre-program `19131b00`. The owner then supplied fresh
+session credentials (a GitHub token · a Cloudflare Workers deploy token
++ the account ID · an EODHD API key · a second Workers-AI-scoped token)
+with one instruction: **push, deploy, and merge to the live site.** This
+sitting is pure ops on the closed program's tree (`a3a8641d` —
+docs-only over S17's code, so the redeploy is code-identical by
+construction). No GPE record was reopened; the session record lives here
+(the deploy ledger's own home).
+
+- **Git (the merge).** The two GPE branches verified already on origin
+  (`gold-elevation/s18-closeout` = `a3a8641d`; `gold-elevation/p4-advanced`
+  = `0dc85eac`). **`main` fast-forwarded `19131b00` → `a3a8641d` — the
+  61-commit, 18-session program — and pushed.** GitHub `main` now equals
+  the production tree for the first time in the program's life. The
+  research branch stays the never-rewritten historical record (PR #48
+  open, untouched).
+- **Gates re-run FIRST** (the runbook rule — green before every deploy):
+  9/9 GREEN, 3m 0s; the full suite 15,599 IDENTICAL to the S18 close
+  (the zero-delta proof re-held); the GoldPage budget 237.70/49.35 under
+  the 240/50 ceiling; the secret scan clean — the credentials were
+  env-only, never in any file.
+- **The deploy-lock check ran FIRST** (D-43): the active version was
+  still S17's `65f7c0bb` @ 100% — no parallel deploy. `pnpm --filter
+  @currena/web build` + `wrangler deploy` → **currena-api `77c6262a`**
+  (`77c6262a-96d5-46c0-81d7-152319808786`, 2026-11-19T23:31:55Z, first
+  attempt clean; the bindings intact: RATES KV `4627ac33…` + AI +
+  ASSETS + SITE_MODE=public + the narrator vars + the minute cron).
+  The platform itself reported **"No updated asset files to upload"**
+  (157 assets read) — the fresh dist is byte-identical to S17's live
+  assets, exactly what a docs-only + merge redeploy must produce.
+- **Secrets (the credential rotation + the EODHD key).**
+  `EODHD_API_TOKEN` re-put on BOTH workers with the owner-supplied key
+  (`printf '%s' | wrangler secret put`, the 2026-10 idempotent
+  precedent): currena-api first, then currena-markets. The secret-put
+  created the now-active version **`f4926c9d` @ 100%** (23:32:05Z).
+  currena-api's full secret set re-verified intact: ADMIN_VIEW_SECRET ·
+  EODHD_API_TOKEN · GH_INGEST_DISPATCH_TOKEN · INSIGHTS_PASSWORD ·
+  REFRESH_SECRET; currena-markets carries its single EODHD_API_TOKEN.
+  The EODHD key's plan level could not be probed from this sandbox
+  (`eodhd-api.com` is DNS-blocked here) — the adapters fetch from the
+  Worker's own network, and the S13-D1 self-widening rule applies: a
+  deeper entitlement deepens the stored OHLC/crosses bases automatically
+  at the trailing re-fetch rungs, so no action rides on the answer. The
+  owner's second token (Workers-AI-scoped) has NO runtime consumer by
+  design — D-41's narrator path authenticates via the `ai` binding, no
+  token stored anywhere — so it was deliberately not wired anywhere.
+- **currena-markets**: code-unchanged → NOT deployed (the standing
+  code-unchanged convention); only its secret re-put.
+- **Live verification (all GREEN).** `/api/health` 200 (kv ok) · the
+  gold-family data planes 200 ×8 — gold-ohlc [S13 seed] · gold-cb
+  [S12] · gold-crosses + gold-lbma [S14] · gold-expectations [S15,
+  fetchedAt 23:23 today — the :23/:53 rung firing on the new version] ·
+  gold-premium [S16, the 20:33 rung fresh] · gold-ifbought [S17, 19:02]
+  · gold-meter [S17] — · `gold-episodes` 503 `gold_episodes_not_ready` =
+  the DESIGNED WGC-workbook waiting state (the standing owner lever,
+  never a defect) · the workers.dev twin 200 · the served `index.html`
+  AND the entry script `index-DiozkNmz.js` byte-verified IDENTICAL to
+  the fresh dist (sha256 match) — the rendered gold page is S17's
+  live-verified build, unchanged.
+- **Records**: the CHANGELOG dated entry + the HANDOFF known-state
+  refresh (production `f4926c9d`) + this record. No DECISIONS addition —
+  nothing non-obvious was decided; the sitting executed the owner's
+  instruction under the standing §5 approval. Credentials used, not
+  stored (AGENTS.md §7).

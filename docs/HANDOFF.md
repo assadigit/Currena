@@ -1,6 +1,40 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S18 — GPE THE PROGRAM CLOSEOUT — THE PROGRAM COMPLETE; bookkeeping-only: NO new features, NO deploys)
+## This session (2026-11-19 post-program OPS — push + merge + deploy; NO code changes, NO new features)
+
+**Outcome:** the owner supplied fresh session credentials (a GitHub
+token · a Cloudflare Workers deploy token + the account ID · an EODHD
+API key · a second Workers-AI-scoped token) and asked for the one
+thing the program's close left open on the repo side: **push, deploy,
+and merge to the live site.** Done, in the standing-approval lane
+(AGENTS.md §5), on the closed program's tree (`a3a8641d` —
+code-identical to S17's production by construction): the GPE branches
+verified already on origin; **`main` fast-forwarded `19131b00` →
+`a3a8641d` (61 commits — the whole 18-session program) and pushed** —
+GitHub `main` now equals the production tree for the first time in the
+program's life (the research branch lineage + PR #48 untouched);
+gates re-run FIRST (9/9 GREEN, 3m 0s; the full suite 15,599 IDENTICAL
+— the zero-delta proof re-held); the D-43 deploy-lock re-checked
+(`65f7c0bb` @ 100%, no drift); currena-api redeployed **`77c6262a`**
+(23:31:55Z, the bindings intact, the platform reporting ZERO changed
+assets — the dist byte-identical to S17's live build);
+`EODHD_API_TOKEN` re-put on BOTH workers (the owner-supplied key —
+the credential-rotation lever exercised) → the now-active version
+**`f4926c9d` @ 100%** (the secret-put's version). currena-markets
+code-unchanged → NOT deployed (its secret re-put only). **Live-verify
+all GREEN:** health 200 · the eight gold-family data planes 200 with
+today's fetchedAt stamps (the minute-cron gold rungs firing on the new
+version) · `gold-episodes` 503 = the designed WGC-workbook waiting
+state · the served entry chunk `index-DiozkNmz.js` byte-verified
+identical to the dist. The Workers-AI token: NO runtime consumer by
+design (D-41 — the narrator rides the `ai` binding, no token stored
+anywhere); deliberately not wired. The record: docs/DEPLOY.md (the
+2026-11-19 ops record) + the CHANGELOG entry + the known-state line
+below. Credentials used, not stored (AGENTS.md §7). **The GPE program
+stays COMPLETE and closed — this sitting changed no code and reopens
+nothing; the standing owner-side levers are unchanged.**
+
+## Previous session (S18 — GPE THE PROGRAM CLOSEOUT — THE PROGRAM COMPLETE; bookkeeping-only: NO new features, NO deploys)
 
 **Outcome:** the program's ninth and final session closed the Gold Page
 Elevation program per its own bookkeeping rules, in three milestones,
@@ -488,20 +522,20 @@ S11-D3 record; ~1.1 kB raw headroom for P1-c).
 
 - **The WGC GDT quarterly drop → unlocks R15 (the CB-demand Tier-2 demand stack) + R23 (the ETF flows card)** — save the dated XLSX at `data/wgc/<…>` and tell the next session; the adapter path ships drop-ready; the wall's WGC CB line retires as it lands.
 - **The WGC prices workbook drop → unlocks R25's drop-gated halves** (the Episode Explorer's price paths + the comparison rider) — save the dated file at `data/wgc/prices/<date>-<file-as-published>.xlsx`; ONE `gold-episodes-run` command lights the paths (the S15-shipped machinery).
-- **The EODHD plan upgrade** — deepens the crosses' + the OHLC stored bases.
+- **The EODHD plan upgrade** — deepens the crosses' + the OHLC stored bases. A fresh owner-supplied key was set on BOTH workers at the 2026-11-19 ops sitting (`EODHD_API_TOKEN` re-put, idempotent); its plan level could not be probed from the sandbox, and the S13-D1 self-widening rule means a deeper entitlement deepens the stored bases automatically at the trailing re-fetch rungs — no session work rides on it.
 - **The Kalshi written authorization** — re-opens R28's Kalshi leg (the card honestly renders the Polymarket leg alone until then).
 - **The CBI gerami pin** — the owner's browser on a cbi.ir /coin/ press-release page tightens one constant; the 0.90–0.92 g pure band renders honestly until then.
 - **The WGC authorisation letter (info@gold.org)** — the owner's own parallel action (D9, non-blocking).
 - **The two operational P0s** (CFTC Saturday gate + GPR re-fetch) — open on main, outside GPE; the small ops session remains the recommendation.
 - **The fa-string triage queue** (copy:audit's unreviewed entries — the manifest carries them; the audit does not fail).
-- **The credential rotation** — the session credentials were used again this session (used, never stored); rotate when convenient.
+- **The credential rotation** — exercised at the 2026-11-19 ops sitting (the owner supplied fresh GitHub + Cloudflare + EODHD + Workers-AI credentials; used env-only/secret-put, never stored, never printed — rotate the chat-exposed ones again when convenient).
 
 ## Known state worth knowing
 
 - **The Persian-copy manifest: 8,483 entries (round 90, the S17 wave — the last GPE round; copy:audit clean).**
 - **The dist topology (post-S17, unchanged at S18 — docs-only):** entry 271.13/82.13 (within the 296/89.5 budget); the GoldPage lazy chunk 237.70/49.35 under the 240/50 ceiling (the program's final budget). Build deterministic.
 - **The narrator vocabulary: 193×2 + 56×2 (UNCHANGED).**
-- **Production: currena-api `65f7c0bb` @ 100% (S17's close, untouched by the S18 bookkeeping session).**
+- **Production: currena-api `f4926c9d` @ 100%** (the 2026-11-19 post-program ops redeploy: `77c6262a` at 23:31:55Z — the code-identical redeploy of the merged `a3a8641d` tree, zero changed assets — then the `EODHD_API_TOKEN` re-put's version at 23:32:05Z; the S17 code it carries is live-verified as at S17's close `65f7c0bb`; rollback `65f7c0bb` remains).
 
 ## The next-session pointer — THE GPE PROGRAM IS COMPLETE (nothing needed — the plan is complete)
 
