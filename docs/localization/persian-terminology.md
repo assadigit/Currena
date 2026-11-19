@@ -336,3 +336,20 @@ The consolidated lane balance behind `?balance=lanes`
   spine, the path-extremes line's unit: «دلار بر انس، میانگین
   ماهانه»; the 1978 start named at point of use, never a daily claim
   the workbook cannot support).
+
+## The gold page's premium history (GPE round 89)
+
+- **نوار تفکیک حرکت روز** — the day-move decomposition strip (R30's
+  headline block; the exact-identity framing — «تفکیک حسابی است، نه
+  برآورد آماری (رگرسیون)» is the never-regression clause, binding
+  copy per s7/01 §8).
+- **اتحادِ دقیق** — the exact identity (the Δln arithmetic family:
+  Δln(سکه) = Δln(انس) + Δln(دلار) + Δln(۱+حباب); the three factors
+  MULTIPLY into the coin's move, never add — the anti-sum misreading
+  guard rides the same sentence).
+- **مِلت** — melt (the 0% premium reference line; the melt-value word
+  the bridge's «ارزش ذاتی» already points at — the gold trade's own
+  Persian).
+- **خط صداقت** — the honesty line (the provenance pair, one sentence:
+  «بازسازی‌شده از تاریخچهٔ منبع» vs «محاسبهٔ زنده از اسنپ‌شات‌های
+  خودمان» — the s1/11 §6 wording pair rendered verbatim on the card).

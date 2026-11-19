@@ -228,7 +228,6 @@ export function GoldPremiumHistory(): React.JSX.Element | null {
 
   const stored = premiumState.snapshot;
   const chart = buildChartModel(emami, bahar);
-  const windowWord = `${dateText(emami[0]!.date)} → ${dateText(stored.asOf)}`;
 
   return (
     <section

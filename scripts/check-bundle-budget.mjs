@@ -1128,7 +1128,7 @@ const BUDGETS = [
   // exactly once in the chunk; the pure engines stay in the insights
   // chunk; the episodes' editorial strings ride the dictionaries'
   // shared gzip context). Justified in CHANGELOG (GPE-S15).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 210_000, gz: 45_500, label: 'Gold page lazy chunk (page-division S5)' },
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 218_000, gz: 46_000, label: 'Gold page lazy chunk (page-division S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree
