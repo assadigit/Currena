@@ -1,6 +1,55 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S17 — GPE P4, the Advanced tier — the LAST feature wave; DONE AND VERIFIED LIVE — P4 COMPLETE, every feature wave done)
+## This session (S18 — GPE THE PROGRAM CLOSEOUT — THE PROGRAM COMPLETE; bookkeeping-only: NO new features, NO deploys)
+
+**Outcome:** the program's ninth and final session closed the Gold Page
+Elevation program per its own bookkeeping rules, in three milestones,
+all committed + pushed on the branch `gold-elevation/s18-closeout`
+(off the S17 close `0dc85eac` — the branch tip carrying the S17
+bookkeeping; `26529924` is its code parent, the tree production
+`65f7c0bb` was built from — the one-line branch-base note recorded in
+s18/01 §0). **M1 the research-branch reconciliation**
+(`docs/specs/gold-page-elevation/s18/01-RESEARCH-BRANCH-RECONCILIATION.md`):
+the program plan's D2 close-out — the read-only row-by-row disposition
+of the full recommendation table (**31 of 33 queued rows DELIVERED +
+deployed + live-verified; R15/R23 pending on the owner-side WGC fold
+[never a defect]; R28's Kalshi leg deliberately dropped per the
+pre-committed wording read; the Excluded 5 held**) + the ten divergences
+each with its recorded reason (the Kalshi drop · the WGC fold · the P3
+regrouping · the +1 session numbering · the D2-rule form after the
+gate lift · GPE-S2-28/29 → AGENTS.md this session · GPE-S2-30 verified
+fixed with R01 · the D1-locked-A wording rounds · R01's mode-A
+absorption) + the WGC drop re-check (data/wgc/ absent on every branch,
+no owner notice — the fold stands as the program's standing owner-side
+lever). **M2 the DECISIONS + AGENTS.md reconciliation + the final sweep**:
+the DECISIONS set verified COMPLETE (BD-S34…S41 against every SUMMARY's
+own decision list — S10's in prose form predating the literal-ID
+convention; the fold/drop decisions all recorded; the one addition
+BD-S42 this session) · the two AGENTS.md drift items GPE-S2-28/29
+reconciled INTO the facts (§C the dollar basket = SIX currencies, the
+DXY recipe, no AUD, + the true post-modularization module path · §F
+the live prices = the Yahoo minute-board [BZ=F · GC=F COMEX · SI=F ·
+BTC-USD] with sourceName at point of use, gold-api = the ratio/
+platinum/copper + accumulated-history legs) · GPE-S2-30 verified fixed
+· the §11 project-facts refreshed to the post-program state (the GPE
+COMPLETE block + the gold page's render-order zone map + the
+gold-family rung registry + the gold-family KV key inventory + the
+GoldPage budget 240/50) · `s18/02-PROGRAM-CLOSURE-RECORD.md` written
+(the 18-session ledger — every sitting one line · the standing
+owner-side levers in one place · the program-closure statement).
+**M3 the close:** this HANDOFF rewrite + the CHANGELOG S18 entry +
+BD-S42 + the S18 summary + the program-closure TLDR. **Gates 9/9 GREEN
+re-run on the exact S18 tree (3m 05s): the full suite 15,599 IDENTICAL
+to S17's close (ZERO delta — the docs-only proof, the M16 precedent) ·
+the GoldPage budget 237.70/49.35 under the 240/50 ceiling · copy:audit
+clean · secret scan clean · lint 0/0.** NO deploy (bookkeeping-only —
+production stays S17's `65f7c0bb` @ 100%, untouched; the deploy-lock
+was not re-checked because no deploy ran, per the docs-only M16
+precedent). **The program counter: Session 18/18 · 0 remaining — THE
+PLAN IS COMPLETE.** Nothing needed next; the standing owner-side
+levers (below + s18/02 §3) are the open menu for any future session.
+
+## Previous session (S17 — GPE P4, the Advanced tier — the LAST feature wave; DONE AND VERIFIED LIVE — P4 COMPLETE, every feature wave done)
 
 **Outcome:** ALL THREE of the tier's rows landed, tested, deployed,
 and live-verified — **R31 (F12 the time machine**, the collapsed Zone
@@ -435,36 +484,34 @@ S11-D3 record; ~1.1 kB raw headroom for P1-c).
 - **The `/api/insights/:id/history` endpoint** now has a page consumer again (the panel's chart + the tile sparklines + the price sections — one module-cached fetch, three consumers). No API change shipped.
 - **The standing limits carry forward (AGENTS.md §11):** the §21 portwatch window (never run Tuesdays 11:00–14:00 UTC) + the deploy-lock re-check FIRST (D-43) + the wrangler 10013 retry rule + the `run`-required-under-pnpm-10 rule + the R5 no-renames constraint.
 
-## Owner-side levers waiting
+## Owner-side levers waiting (the GPE program's bequest — the full list is docs/specs/gold-page-elevation/s18/02-PROGRAM-CLOSURE-RECORD.md §3)
 
-- **DEPLOYED — the R-5 port lever is CLOSED.** currena-api Version ID `6ae72ba7` @ 100%. Production == the SPA built from origin/main HEAD `f66efa44`. Rollback recipe: `npx wrangler rollback` (one command, from apps/api) + `git revert f66efa44` — the port is display-layer, nothing else moved.
-- **The burn-in measurement** — the R-5 port exists partly to measure whether readers use the detail panels (the retirement spec's framing). After a few weeks of analytics, the owner can decide whether the watchlist (R-7) is worth porting as the natural companion (BD-S33 D7's revisit).
-- **The external investor's review of spec §19** (the seven questions) — re-opens the page-division spec v2 work (the AF-1…AF-8 findings ride that pass).
-- **triage the queued unreviewed fa strings** (the copy:audit queue — 1240 entries, does not fail the audit).
-- **revoke or rotate the session credentials** now that the R-5 work has shipped (they were used, never stored).
+- **The WGC GDT quarterly drop → unlocks R15 (the CB-demand Tier-2 demand stack) + R23 (the ETF flows card)** — save the dated XLSX at `data/wgc/<…>` and tell the next session; the adapter path ships drop-ready; the wall's WGC CB line retires as it lands.
+- **The WGC prices workbook drop → unlocks R25's drop-gated halves** (the Episode Explorer's price paths + the comparison rider) — save the dated file at `data/wgc/prices/<date>-<file-as-published>.xlsx`; ONE `gold-episodes-run` command lights the paths (the S15-shipped machinery).
+- **The EODHD plan upgrade** — deepens the crosses' + the OHLC stored bases.
+- **The Kalshi written authorization** — re-opens R28's Kalshi leg (the card honestly renders the Polymarket leg alone until then).
+- **The CBI gerami pin** — the owner's browser on a cbi.ir /coin/ press-release page tightens one constant; the 0.90–0.92 g pure band renders honestly until then.
+- **The WGC authorisation letter (info@gold.org)** — the owner's own parallel action (D9, non-blocking).
+- **The two operational P0s** (CFTC Saturday gate + GPR re-fetch) — open on main, outside GPE; the small ops session remains the recommendation.
+- **The fa-string triage queue** (copy:audit's unreviewed entries — the manifest carries them; the audit does not fail).
+- **The credential rotation** — the session credentials were used again this session (used, never stored); rotate when convenient.
 
 ## Known state worth knowing
 
-- **The Layer-1 inventory is COMPLETE** (193×2 entries ≥ the 187 registry ids) — every panel the port can open carries Layer-1 copy; the graceful-absence branch (`if (!l1) return null`) is defensive only (BD-S33 D9).
-- **The dist topology (post-S11):** entry 271.12/82.12 (within the 296/89.5 budget); 10 destination-page chunks within budget (the GoldPage ceiling 89.5/22.5 per S11-D3, measured 88.41/21.91). Build deterministic.
-- **The Persian-copy manifest: 8032 entries (round 84, the S11 wave — 57 fa strings; copy:audit clean).**
+- **The Persian-copy manifest: 8,483 entries (round 90, the S17 wave — the last GPE round; copy:audit clean).**
+- **The dist topology (post-S17, unchanged at S18 — docs-only):** entry 271.13/82.13 (within the 296/89.5 budget); the GoldPage lazy chunk 237.70/49.35 under the 240/50 ceiling (the program's final budget). Build deterministic.
 - **The narrator vocabulary: 193×2 + 56×2 (UNCHANGED).**
+- **Production: currena-api `65f7c0bb` @ 100% (S17's close, untouched by the S18 bookkeeping session).**
 
-## The next-session pointer — GPE S11 P1-b is COMPLETE; S12 P1-c next
+## The next-session pointer — THE GPE PROGRAM IS COMPLETE (nothing needed — the plan is complete)
 
-**The GPE S11 explanation band is DONE AND VERIFIED LIVE: the six rows
-R07–R12 shipped (`81cd8803`…`6a3d55de` on
-`gold-elevation/p1b-explanation-band`), gates 9/9 GREEN, suite 15,247
-(+28), manifest round 84 (57 fa strings, clean), deployed (`23ce6b06`
-@ 100%), live-verified (EN + fa/RTL desktop + mobile 390 + the
-anchor click-through + zero console errors). The S12 P1-c prompt (the
-prizes: R13–R17) is at the bottom of
-docs/specs/gold-page-elevation/s11/SUMMARY.md.**
-
-The standing owner-side levers (the WGC GDT data drop → R15's
-drop-calendar answer; the WGC authorisation letter (D9); the two
-operational P0s (CFTC + GPR); the fa-string triage queue; the
-credential rotation) re-open work at the owner's discretion. The
-standing limits in AGENTS.md §11 (the §21 portwatch window, the D-43
-deploy-lock re-check, the wrangler 10013 retry rule) carry forward to
-any future session that deploys or moves files.
+**The 18-session Gold Page Elevation program is closed.** Every
+feature wave delivered + deployed + live-verified (31 of the 33
+queued rows; the two remaining rows are owner-drop-gated by the plan's
+own fold rule); the research record stands as the never-rewritten
+historical record (PR #48 open); the shared bookkeeping carried every
+session; the AGENTS.md facts are at the post-program state. **No
+next-session prompt exists because none is needed — the plan is
+complete.** Whenever the owner wants to open any of the standing
+levers above (the WGC drops first), a fresh session starts from this
+HANDOFF + AGENTS.md + `docs/specs/gold-page-elevation/s18/`.
