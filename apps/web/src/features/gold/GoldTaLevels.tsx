@@ -81,7 +81,14 @@ export function GoldTaLevels(): React.JSX.Element | null {
   const distance = useMemo(() => (series !== null ? distanceFromSma200(series) : null), [series]);
   const crosses = useMemo(() => (series !== null ? crossEvents(series) : []), [series]);
   const dailyPivots = useMemo(() => (series !== null ? classicDailyPivots(series) : null), [series]);
-  const weeklyPivots = useMemo(() => (series !== null ? classicWeeklyPivots(series) : null), [series]);
+  // The weekly basis is relative to NOW (the render instant): on the
+  // Monday-morning posture (the current week has no stored bar yet), the
+  // last bar's own week is the previous COMPLETED week — not the week
+  // before it.
+  const weeklyPivots = useMemo(
+    () => (series !== null ? classicWeeklyPivots(series, Date.now()) : null),
+    [series],
+  );
 
   if (state.kind === 'loading') {
     return (

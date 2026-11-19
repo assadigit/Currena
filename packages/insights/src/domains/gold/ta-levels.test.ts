@@ -150,12 +150,12 @@ describe('the dated 50/200 cross events (C5 rule 2 — events, never signals)', 
 });
 
 describe('the classic pivots (s1/13 §3 — the standard formulas)', () => {
-  it('daily: the previous bar\'s arithmetic, pinned by hand', () => {
+  it('daily: the LAST final bar\'s arithmetic, pinned by hand', () => {
     const series = synthSeries(10, '2026-11-10', () => 100); // uniform: H=102, L=97, C=100
-    // Overwrite the second-to-last bar with a hand-checkable one.
-    series[8] = { date: '2026-11-18', open: 3900, high: 4000, low: 3800, close: 3950 };
+    // Overwrite the LAST bar with a hand-checkable one.
+    series[9] = { date: '2026-11-19', open: 3900, high: 4000, low: 3800, close: 3950 };
     const pivots = classicDailyPivots(series)!;
-    expect(pivots.date).toBe('2026-11-18');
+    expect(pivots.date).toBe('2026-11-19');
     expect(pivots.pp).toBeCloseTo((4000 + 3800 + 3950) / 3, 6); // 3916.666…
     expect(pivots.r1).toBeCloseTo(2 * pivots.pp - 3800, 6);
     expect(pivots.s1).toBeCloseTo(2 * pivots.pp - 4000, 6);
@@ -163,13 +163,16 @@ describe('the classic pivots (s1/13 §3 — the standard formulas)', () => {
     expect(pivots.s2).toBeCloseTo(pivots.pp - (4000 - 3800), 6);
     expect(pivots.r3).toBeCloseTo(4000 + 2 * (pivots.pp - 3800), 6);
     expect(pivots.s3).toBeCloseTo(3800 - 2 * (4000 - pivots.pp), 6);
-    // The arithmetic reads the PREVIOUS bar (series[8]), not the last.
+    // The arithmetic reads the LAST stored bar — the S13-D3 invariant:
+    // today's partial bar is never stored, so the last bar IS the previous
+    // completed session ("yesterday") for every visitor.
     expect(pivots.close).toBe(3950);
   });
 
-  it('weekly: the previous ISO week\'s aggregate OHLC', () => {
+  it('weekly: the previous completed week relative to now — mid-week posture', () => {
     // Build two explicit weeks: the last bar sits in the week of Mon 2026-11-23;
-    // the previous week (Mon 2026-11-16) carries five bars.
+    // the previous week (Mon 2026-11-16) carries five bars. The visit instant
+    // sits in the same week as the last bar (the Tue–Fri posture).
     const series: GoldXauCandle[] = [
       { date: '2026-11-16', open: 1, high: 3910, low: 3880, close: 3900 }, // Mon
       { date: '2026-11-17', open: 1, high: 3930, low: 3890, close: 3920 },
@@ -178,15 +181,48 @@ describe('the classic pivots (s1/13 §3 — the standard formulas)', () => {
       { date: '2026-11-20', open: 1, high: 3960, low: 3920, close: 3955 }, // Fri
       { date: '2026-11-23', open: 1, high: 3970, low: 3940, close: 3960 }, // the current week's Mon
     ];
-    const prev = previousWeekBars(series);
+    const now = Date.parse('2026-11-25T12:00:00Z'); // Wed of the last bar's week
+    const prev = previousWeekBars(series, now);
     expect(prev?.map((c) => c.date)).toEqual(['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20']);
-    const pivots = classicWeeklyPivots(series)!;
+    const pivots = classicWeeklyPivots(series, now)!;
     // The aggregate: H=3960 (Fri), L=3880 (Mon), C=3955 (Fri's close).
     expect(pivots.high).toBe(3960);
     expect(pivots.low).toBe(3880);
     expect(pivots.close).toBe(3955);
     expect(pivots.pp).toBeCloseTo((3960 + 3880 + 3955) / 3, 6);
     expect(pivots.date).toBe('2026-11-16');
+  });
+
+  it('weekly: the Monday-morning posture — the last bar\'s OWN week is the previous completed week', () => {
+    // The current week (Mon 2026-11-23) has NO stored bar yet; the last
+    // stored bar is Fri 2026-11-20 of the week that just completed. The
+    // previous completed week relative to the Monday visit is the week of
+    // Mon 2026-11-16 — NOT the week before it.
+    const series: GoldXauCandle[] = [
+      { date: '2026-11-09', open: 1, high: 3900, low: 3870, close: 3890 }, // Mon of the week before
+      { date: '2026-11-10', open: 1, high: 3920, low: 3880, close: 3910 },
+      { date: '2026-11-11', open: 1, high: 3940, low: 3890, close: 3930 },
+      { date: '2026-11-12', open: 1, high: 3930, low: 3900, close: 3920 },
+      { date: '2026-11-13', open: 1, high: 3950, low: 3910, close: 3940 }, // Fri
+      { date: '2026-11-16', open: 1, high: 3910, low: 3880, close: 3900 }, // Mon — the just-completed week
+      { date: '2026-11-17', open: 1, high: 3930, low: 3890, close: 3920 },
+      { date: '2026-11-18', open: 1, high: 3950, low: 3900, close: 3940 },
+      { date: '2026-11-19', open: 1, high: 3940, low: 3910, close: 3930 },
+      { date: '2026-11-20', open: 1, high: 3960, low: 3920, close: 3955 }, // Fri — the LAST stored bar
+    ];
+    const monday = Date.parse('2026-11-23T10:00:00Z'); // the Monday-morning visit
+    const prev = previousWeekBars(series, monday);
+    expect(prev?.map((c) => c.date)).toEqual(['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20']);
+    const pivots = classicWeeklyPivots(series, monday)!;
+    // The aggregate of the JUST-completed week: H=3960, L=3880, C=3955.
+    expect(pivots.high).toBe(3960);
+    expect(pivots.low).toBe(3880);
+    expect(pivots.close).toBe(3955);
+    expect(pivots.date).toBe('2026-11-16');
+    // Without the now instant (the series' own timeline), the OLD basis
+    // (the week before the last bar's) still applies deterministically.
+    const timeless = classicWeeklyPivots(series)!;
+    expect(timeless.date).toBe('2026-11-09');
   });
 
   it('fail-closed: a series too short carries no pivots', () => {

@@ -236,10 +236,15 @@ function classicPivotArithmetic(bar: { date: string; high: number; low: number; 
   };
 }
 
-/** Yesterday's classic pivots (the previous bar's OHLC). */
+/** The previous session's classic pivots — the LAST final bar's OHLC.
+ * The basis invariant (S13-D3): the ingest only ever stores bars dated
+ * ≤ yesterday UTC (today's partial forex bar is dropped), so the last
+ * stored bar IS the most recent completed session — "yesterday" to the
+ * visitor whenever the rung is current. The dated disclosure carries
+ * the honest session when the rung lags. */
 export function classicDailyPivots(series: readonly GoldXauCandle[]): TaPivotSet | null {
   if (series.length < 2) return null;
-  return classicPivotArithmetic(series[series.length - 2]!);
+  return classicPivotArithmetic(series[series.length - 1]!);
 }
 
 /** The Monday a date's ISO week starts on (UTC). */
@@ -251,15 +256,36 @@ function isoWeekStart(dateStr: string): number {
   return ms + shift * 86_400_000;
 }
 
+/** The Monday of the ISO week containing an instant (UTC). */
+function isoWeekStartOfMs(ms: number): number {
+  const d = new Date(ms);
+  const day = d.getUTCDay(); // 0=Sun … 6=Sat
+  const shift = day === 0 ? -6 : 1 - day; // back to this week's Monday
+  return ms - (ms % 86_400_000) + shift * 86_400_000;
+}
+
 /**
- * The bars of the PREVIOUS completed ISO week (the week before the last
- * bar's week), aggregated — the classic weekly pivots' input. Null when
- * the stored window carries none of that week (fail-closed).
+ * The bars of the PREVIOUS completed ISO week relative to `nowMs` —
+ * the classic weekly pivots' input. Null when the stored window carries
+ * none of that week (fail-closed).
+ *
+ * The basis rule (the daily twin's invariant, applied to weeks): when
+ * the last stored bar already sits in the current week (the rung has
+ * landed Monday's bar, or the visit falls on the weekend), the previous
+ * completed week is the one before the last bar's; when the last stored
+ * bar is from a week that has already ENDED (the Monday-morning posture —
+ * the current week has no stored bar yet), the last bar's own week IS the
+ * previous completed week. A future-dated last bar (test fixtures only)
+ * keeps the series' own timeline: the week before the last bar's week.
  */
-export function previousWeekBars(series: readonly GoldXauCandle[]): GoldXauCandle[] | null {
+export function previousWeekBars(series: readonly GoldXauCandle[], nowMs?: number): GoldXauCandle[] | null {
   if (series.length === 0) return null;
   const lastWeekStart = isoWeekStart(series[series.length - 1]!.date);
-  const prevWeekStart = lastWeekStart - 7 * 86_400_000;
+  const currentWeekStart = nowMs === undefined ? null : isoWeekStartOfMs(nowMs);
+  const prevWeekStart =
+    currentWeekStart !== null && lastWeekStart < currentWeekStart
+      ? lastWeekStart // the last bar's week already completed → it IS the previous week
+      : lastWeekStart - 7 * 86_400_000; // the last bar's week is current (or future) → the one before it
   const prevWeekEnd = prevWeekStart + 6 * 86_400_000;
   const bars = series.filter((c) => {
     const ms = Date.parse(`${c.date}T00:00:00Z`);
@@ -269,9 +295,14 @@ export function previousWeekBars(series: readonly GoldXauCandle[]): GoldXauCandl
   return bars;
 }
 
-/** The previous week's classic pivots (the aggregate OHLC of that week). */
-export function classicWeeklyPivots(series: readonly GoldXauCandle[]): TaPivotSet | null {
-  const bars = previousWeekBars(series);
+/**
+ * The previous completed week's classic pivots (the aggregate OHLC of
+ * that week), relative to `nowMs`. The caller owns the clock (the
+ * component passes its render instant; tests pass fixed instants) —
+ * deterministic for every given now.
+ */
+export function classicWeeklyPivots(series: readonly GoldXauCandle[], nowMs?: number): TaPivotSet | null {
+  const bars = previousWeekBars(series, nowMs);
   if (bars === null) return null;
   const high = Math.max(...bars.map((b) => b.high));
   const low = Math.min(...bars.map((b) => b.low));
