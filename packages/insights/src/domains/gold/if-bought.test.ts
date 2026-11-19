@@ -27,7 +27,7 @@ const NOW = '2026-11-19T04:49:00.000Z';
 
 /** A linear monthly series: ym `2016-11` + i, close from + i·step. */
 function linearSeries(fromYm: string, months: number, base: number, step: number, currentClose?: number): GoldIfBoughtAssetSeries {
-  const [y0, m0] = fromYm.split('-').map(Number);
+  const [y0 = 0, m0 = 1] = fromYm.split('-').map(Number);
   const monthly: GoldIfBoughtMonth[] = [];
   for (let i = 0; i < months; i++) {
     const y = y0 + Math.floor((m0 - 1 + i) / 12);
@@ -35,7 +35,7 @@ function linearSeries(fromYm: string, months: number, base: number, step: number
     monthly.push({ ym: `${y}-${String(m).padStart(2, '0')}`, close: base + i * step });
   }
   // The running month sits AFTER the last anchor.
-  const [y1, m1] = monthly[monthly.length - 1]!.ym.split('-').map(Number);
+  const [y1 = 0, m1 = 1] = monthly[monthly.length - 1]!.ym.split('-').map(Number);
   const nextY = y1 + Math.floor(m1 / 12);
   const nextM = (m1 % 12) + 1;
   return {
@@ -214,12 +214,8 @@ describe('runGoldIfBoughtRefresh — the 04:49 rung', () => {
   });
 
   it('a missing key writes nothing (the backfill runner owns the first write)', async () => {
-    let reads = 0;
     const store: GoldIfBoughtStore = {
-      getGoldIfBought: async () => {
-        reads++;
-        return undefined;
-      },
+      getGoldIfBought: async () => undefined,
       writeGoldIfBought: async () => {
         throw new Error('never');
       },

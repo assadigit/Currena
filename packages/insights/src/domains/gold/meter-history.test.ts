@@ -16,7 +16,7 @@ import type { GoldMeterTableRow, GoldMeterYearDoc, IndicatorId, IndicatorReading
 import { GOLD_METER_ERA_START, GoldMeterYearDocSchema } from '@currena/core';
 import { DEFINITIONS } from '../../index';
 import { GOLD_LANE_VOTERS } from '../../shared/gold-score';
-import { GOLD_LANE_MIN_FIRING, goldBalance } from './gold-balance';
+import { goldBalance } from './gold-balance';
 import {
   GOLD_METER_TABLE_VERSIONS,
   GOLD_METER_MAX_SNAPSHOT_AGE_MS,

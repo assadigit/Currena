@@ -27,14 +27,14 @@ import { useI18n } from '../../shared/lib/locale';
 
 /** A linear monthly series helper. */
 function linearAsset(fromYm: string, months: number, base: number, step: number, currentClose: number): GoldIfBoughtSnapshot['assets']['gold'] {
-  const [y0, m0] = fromYm.split('-').map(Number);
+  const [y0 = 0, m0 = 1] = fromYm.split('-').map(Number);
   const monthly = [];
   for (let i = 0; i < months; i++) {
     const y = y0 + Math.floor((m0 - 1 + i) / 12);
     const m = ((m0 - 1 + i) % 12) + 1;
     monthly.push({ ym: `${y}-${String(m).padStart(2, '0')}`, close: base + i * step });
   }
-  const [y1, m1] = monthly[monthly.length - 1]!.ym.split('-').map(Number);
+  const [y1 = 0, m1 = 1] = monthly[monthly.length - 1]!.ym.split('-').map(Number);
   const nextY = y1 + Math.floor(m1 / 12);
   const nextM = (m1 % 12) + 1;
   return { monthly, current: { ym: `${nextY}-${String(nextM).padStart(2, '0')}`, close: currentClose, updatedAt: '2026-11-19T04:49:00.000Z' } };

@@ -45,7 +45,6 @@
  */
 
 import type {
-  GoldIfBoughtAssetId,
   GoldIfBoughtAssetSeries,
   GoldIfBoughtBackfillInfo,
   GoldIfBoughtMonth,
@@ -256,8 +255,8 @@ export function refreshAssetSeries(
   updatedAt: string,
 ): { asset: GoldIfBoughtAssetSeries; changed: boolean } {
   if (close === null) return { asset, changed: false }; // no fresh input — the stored point holds (honest)
-  let monthly = [...asset.monthly];
-  let current = { ym, close, updatedAt };
+  const monthly = [...asset.monthly];
+  const current = { ym, close, updatedAt };
   if (ym > asset.current.ym) {
     // The month turned: freeze the prior running point as the new
     // anchor (it was the prior month's last close — the rung's own
