@@ -21,6 +21,8 @@ const formatPricesReport = vi.hoisted(() => vi.fn(() => 'prices report'));
 const defaultPricesFetchers = vi.hoisted(() => vi.fn(() => ({ fetchBrent: () => {} })));
 const KvPricesStore = vi.hoisted(() => class {});
 const runIngestWatchdog = vi.hoisted(() => vi.fn(async () => 'fresh' as const));
+const runGoldExpectationsIngest = vi.hoisted(() => vi.fn());
+const KvGoldExpectationsStore = vi.hoisted(() => class {});
 
 vi.mock('@currena/scraper', () => ({
   scrapeTgju,
@@ -38,6 +40,10 @@ vi.mock('./ingest-watchdog', () => ({
   WATCHDOG_MINUTE: 40,
   STALE_AFTER_HOURS: 26,
   NUDGE_EVERY_HOURS: 6,
+}));
+vi.mock('@currena/insights/expectations', () => ({
+  runGoldExpectationsIngest,
+  KvGoldExpectationsStore,
 }));
 
 const api = await import('./index');
@@ -205,5 +211,47 @@ describe('the minute-cron wrapper (keep-warm backbone, audit C-4)', () => {
     await worker.scheduled(eventAtMinute(41), { RATES: kv }, ctx);
 
     expect(runIngestWatchdog).not.toHaveBeenCalled();
+  });
+
+  it('the :23/:53 rung refreshes the gold expectations (GPE R28 — the 30-minute card refresh)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T10:23:05.000Z'));
+    runGoldExpectationsIngest.mockResolvedValue({
+      outcome: { ok: true, note: 'fed-decision-in-december refreshed (5 markets)' },
+      kv: { reads: 1, writes: 1 },
+    });
+
+    await worker.scheduled(eventAtMinute(23), { RATES: kv }, ctx);
+
+    expect(runGoldExpectationsIngest).toHaveBeenCalledTimes(1);
+    expect(runGoldExpectationsIngest).toHaveBeenCalledWith(expect.anything());
+
+    // The :53 twin fires too (the 30-minute cadence — both minutes).
+    await worker.scheduled(eventAtMinute(53), { RATES: kv }, ctx);
+    expect(runGoldExpectationsIngest).toHaveBeenCalledTimes(2);
+  });
+
+  it('an off-expectations minute (e.g. :31) never runs the rung', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T10:31:05.000Z'));
+
+    await worker.scheduled(eventAtMinute(31), { RATES: kv }, ctx);
+
+    expect(runGoldExpectationsIngest).not.toHaveBeenCalled();
+  });
+
+  it('an expectations-rung failure never marks the whole invocation failed (the fault isolation)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T10:23:05.000Z'));
+    runGoldExpectationsIngest.mockResolvedValue({
+      outcome: { ok: false, kind: 'failed' as const, note: 'gamma events HTTP 503' },
+      kv: { reads: 1, writes: 0 },
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await expect(
+      worker.scheduled(eventAtMinute(23), { RATES: kv }, ctx),
+    ).resolves.toBeUndefined();
+
+    expect(map.has('snapshot:tgju')).toBe(true); // the ladder's work survived
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('gold-expectations failed (failed)'));
+    warn.mockRestore();
   });
 });

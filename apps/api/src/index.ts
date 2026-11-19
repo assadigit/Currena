@@ -34,6 +34,8 @@ import { KvGoldCbStore } from '@currena/insights/cb-demand';
 import { KvGoldXauStore } from '@currena/insights/xau-ohlc';
 import { KvGoldCrossesStore } from '@currena/insights/xau-crosses';
 import { KvGoldLbmaStore } from '@currena/insights/lbma';
+import { KvGoldExpectationsStore } from '@currena/insights/expectations';
+import { KvGoldEpisodesStore } from '@currena/insights/episodes';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
@@ -172,6 +174,10 @@ export interface AppDeps {
   makeGoldCrossesReader?: (env: Bindings) => import('@currena/insights/xau-crosses').GoldCrossesReader;
   /** GPE R24: the LBMA vault + clearing store (route tests inject the fake). */
   makeGoldLbmaReader?: (env: Bindings) => import('@currena/insights/lbma').GoldLbmaReader;
+  /** GPE R28: the Fed-meeting expectations store (route tests inject the fake). */
+  makeGoldExpectationsReader?: (env: Bindings) => import('@currena/insights/expectations').GoldExpectationsReader;
+  /** GPE R25: the Episode Explorer's data-plane store (route tests inject the fake). */
+  makeGoldEpisodesReader?: (env: Bindings) => import('@currena/insights/episodes').GoldEpisodesReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
   /**
@@ -318,6 +324,32 @@ export function createApp(deps: AppDeps = {}) {
     return goldLbmaReader;
   };
 
+  // GPE R28 (2026-11-19): the Fed-meeting expectations serve path — the
+  // ONE key (KvGoldExpectationsStore, the same twin; the :23/:53 cron
+  // minutes write it — the S15-D2 record).
+  let goldExpectationsReader: import('@currena/insights/expectations').GoldExpectationsReader | undefined;
+  const getGoldExpectationsReader = (
+    env: Bindings,
+  ): import('@currena/insights/expectations').GoldExpectationsReader => {
+    goldExpectationsReader ??= deps.makeGoldExpectationsReader
+      ? deps.makeGoldExpectationsReader(env)
+      : new KvGoldExpectationsStore(env.RATES);
+    return goldExpectationsReader;
+  };
+
+  // GPE R25 (2026-11-19): the Episode Explorer's serve path — the ONE
+  // drop-gated key (KvGoldEpisodesStore, the same twin; the runner
+  // writes it the day the WGC workbook drop lands — the S15-D4 record).
+  let goldEpisodesReader: import('@currena/insights/episodes').GoldEpisodesReader | undefined;
+  const getGoldEpisodesReader = (
+    env: Bindings,
+  ): import('@currena/insights/episodes').GoldEpisodesReader => {
+    goldEpisodesReader ??= deps.makeGoldEpisodesReader
+      ? deps.makeGoldEpisodesReader(env)
+      : new KvGoldEpisodesStore(env.RATES);
+    return goldEpisodesReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -363,6 +395,8 @@ export function createApp(deps: AppDeps = {}) {
       getGoldXauReader,
       getGoldCrossesReader,
       getGoldLbmaReader,
+      getGoldExpectationsReader,
+      getGoldEpisodesReader,
       getPricesReader,
       getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests

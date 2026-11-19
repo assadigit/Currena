@@ -2557,6 +2557,155 @@ export const GoldXauCrossesSnapshotSchema = z
 export type GoldXauCrossesSnapshot = z.infer<typeof GoldXauCrossesSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * Fed-meeting market expectations (GPE R28 / F24, 2026-11-19) — the
+ * market-implied probabilities card, Zone D's expectations strip.
+ *
+ * THE KALSHI LEG DOES NOT SHIP (the S15 wording read —
+ * docs/specs/gold-page-elevation/s15/M1-CITATION-AND-CHECKS.md §1:
+ * the Developer Agreement v1.1 §3 + §3.1 expressly limit API use to
+ * facilitating one's own trading and prohibit collecting/caching/
+ * storing data for any other purpose or sharing it with third
+ * parties; a public display card sits squarely inside both). The
+ * card therefore renders the POLYMARKET leg alone, honestly named
+ * as ONE venue — display-only, attributed, linked, carrying the
+ * honest trader-expectations disclaimer; no key'd endpoints, no bulk
+ * redistribution (the s4/04 §3 ToS reading posture).
+ *
+ * ONE KV key (`insights:gold-expectations:v1`) written by the
+ * :23/:53 minute-cron rung (the 30-minute card refresh — the
+ * PRICES_CRON_MINUTE pattern, no new cron trigger); served at GET
+ * /api/insights/gold-expectations. The event-close → next-market
+ * roll rides the adapter's discovery rule (tag_slug=fomc, unclosed
+ * fed-decision events, nearest endDate). The meeting DATE joins
+ * client-side with the in-repo calendar feed (S15-D3) — the wire
+ * carries only what the venue itself states.
+ * ------------------------------------------------------------------ */
+
+/** The Fed-move taxonomy the venue's five outcome markets map onto
+ *  (the "50+" legs carry the venue's own inclusive wording). */
+export const FedMoveIdSchema = z.enum(['hike50plus', 'hike25', 'hold', 'cut25', 'cut50plus']);
+export type FedMoveId = z.infer<typeof FedMoveIdSchema>;
+
+/** One outcome market's implied probability (display-only). */
+export const FedOutcomeMarketSchema = z.object({
+  /** The normalized move this market settles (the parse's mapping). */
+  move: FedMoveIdSchema,
+  /** The venue's own question text (renderable, never rewritten). */
+  question: z.string().min(1),
+  /** The venue's own market slug (the per-row link target). */
+  slug: z.string().min(1),
+  /** The implied probability of "Yes" as the venue publishes it (outcomePrices[0]), 0..1. */
+  yesPrice: z.number().finite().min(0).max(1),
+  /** The market's own 24h volume where the venue publishes it (display rounding is client-side). */
+  volume24hr: z.number().finite().nonnegative().optional(),
+});
+export type FedOutcomeMarket = z.infer<typeof FedOutcomeMarketSchema>;
+
+/** The value of `insights:gold-expectations:v1`, verbatim over the wire. */
+export const GoldExpectationsSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** When the rung wrote this snapshot (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The one venue the card names (the Kalshi drop is recorded in the M1 doc). */
+    source: z.literal('polymarket'),
+    /** The event the probabilities belong to. */
+    event: z.object({
+      /** The venue's own event slug. */
+      slug: z.string().min(1),
+      /** The venue's own event title, verbatim. */
+      title: z.string().min(1),
+      /** The market's close timestamp (the venue's own honest field — the meeting happens before it). */
+      endDate: z.iso.datetime(),
+      /** The public event page (the attribution link). */
+      url: z.string().url(),
+    }),
+    /** The outcome markets (the venue serves five for a live fed-decision event). */
+    markets: z.array(FedOutcomeMarketSchema).min(1).max(8),
+  })
+  .refine((s) => new Set(s.markets.map((m) => m.move)).size === s.markets.length, {
+    message: 'each fed move appears at most once',
+  });
+export type GoldExpectationsSnapshot = z.infer<typeof GoldExpectationsSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * The gold Episode Explorer's data plane (GPE R25 / F6, 2026-11-19) —
+ * the WGC prices-workbook spine + the asset-comparison legs.
+ *
+ * THE SPINE IS DROP-GATED (the s4/01 §5 data-drop pattern): the
+ * owner drops the workbook at data/wgc/<date>-<file-as-published>.xlsx
+ * (login-walled at the publisher — a human is the authenticator);
+ * the gold-episodes-run runner parses it deterministically
+ * (fail-closed on shape) and writes this ONE KV key through the KV
+ * REST API. Until the drop lands the key stays absent and the card
+ * renders the honest waiting state — NO interim spine is invented
+ * (S15-D4: the stored 5.2-year gold-usd history was weighed and
+ * rejected — a 5-year window would misrepresent episodes whose
+ * periods run decades).
+ *
+ * The comparison legs (S15-D6): silver + BTC from the stored
+ * insights histories (2021-09→), S&P from the markets board's
+ * stored series resampled monthly — each leg OPTIONAL on the wire,
+ * each leg's coverage named at point of use, every window the leg's
+ * depth cannot support renders the honest not-enough-history state.
+ * ------------------------------------------------------------------ */
+
+/** A monthly observation (the workbook's own monthly-average axis). */
+export const EpisodePointSchema = z.object({
+  /** 'YYYY-MM'. */
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
+  /** The monthly value in the leg's own unit. */
+  value: z.number().finite().positive(),
+});
+export type EpisodePoint = z.infer<typeof EpisodePointSchema>;
+
+/** One comparison leg (named for what it is, per C1). */
+export const EpisodeLegSchema = z.object({
+  id: z.enum(['sp500', 'silver', 'btc']),
+  /** The C1 point-of-use series name, e.g. 'Silver (troy ounce, USD) — the stored insights history'. */
+  seriesNamed: z.string().min(1),
+  /** Monthly values, ascending by month. */
+  rows: z.array(EpisodePointSchema).min(2),
+});
+export type EpisodeLeg = z.infer<typeof EpisodeLegSchema>;
+
+/** The value of `insights:gold-episodes:v1`, verbatim over the wire. */
+export const GoldEpisodesSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The workbook's newest month. */
+    asOf: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
+    /** When the runner wrote this snapshot (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The gold monthly-average spine (US$/oz, monthly averages since 1978 — the WGC workbook's own axis). */
+    spine: z.object({
+      rows: z.array(EpisodePointSchema).min(60),
+      /** The Goldhub dataset page the workbook descends from (attribution). */
+      sourceUrl: z.string().url(),
+      /** The file as published (the drop's own name — the audit trail). */
+      fileName: z.string().min(1),
+    }),
+    /** The comparison legs, each optional (a leg that could not be assembled is absent, never faked). */
+    legs: z.array(EpisodeLegSchema).max(3),
+  })
+  .refine(
+    (s) => s.spine.rows.every((p, i) => i === 0 || p.month > s.spine.rows[i - 1]!.month),
+    { message: 'episode spine months must be strictly ascending' },
+  )
+  .refine((s) => s.spine.rows[s.spine.rows.length - 1]!.month === s.asOf, {
+    message: 'the episodes asOf must be the spine\'s newest month',
+  })
+  .refine((s) => new Set(s.legs.map((l) => l.id)).size === s.legs.length, {
+    message: 'each comparison leg appears at most once',
+  })
+  .refine(
+    (s) =>
+      s.legs.every((l) => l.rows.every((p, i) => i === 0 || p.month > l.rows[i - 1]!.month)),
+    { message: 'leg months must be strictly ascending' },
+  );
+export type GoldEpisodesSnapshot = z.infer<typeof GoldEpisodesSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)
  *
  * The Prices board's four assets (Brent, gold, silver, Bitcoin) plus their

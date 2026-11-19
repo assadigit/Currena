@@ -63,6 +63,8 @@ import type { GoldCbReader } from '@currena/insights/cb-demand';
 import type { GoldXauReader } from '@currena/insights/xau-ohlc';
 import type { GoldCrossesReader } from '@currena/insights/xau-crosses';
 import type { GoldLbmaReader } from '@currena/insights/lbma';
+import type { GoldExpectationsReader } from '@currena/insights/expectations';
+import type { GoldEpisodesReader } from '@currena/insights/episodes';
 import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
@@ -139,6 +141,12 @@ interface InsightsRouteDeps {
   getGoldCrossesReader: (env: Bindings) => GoldCrossesReader;
   /** GPE R24: the LBMA vault + clearing store (the same twin). */
   getGoldLbmaReader: (env: Bindings) => GoldLbmaReader;
+  /** GPE R28: the Fed-meeting expectations store (the same twin; the
+   *  Polymarket leg — the Kalshi drop is recorded in the s15 M1 §1). */
+  getGoldExpectationsReader: (env: Bindings) => GoldExpectationsReader;
+  /** GPE R25: the Episode Explorer's data plane (the WGC workbook
+   *  spine + the comparison legs — the drop-gated key). */
+  getGoldEpisodesReader: (env: Bindings) => GoldEpisodesReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
   /**
@@ -863,6 +871,129 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       );
     }
     const etag = `"insights-gold-lbma:${snapshot.asOf}:${snapshot.vault.rows.length}:${snapshot.clearing.rows.length}:${snapshot.fetchedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
+    if (typeof caches !== 'undefined') {
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // GPE R28 / F24 (2026-11-19): the Fed-meeting market-implied
+  // expectations — the ONE-key snapshot (insights:gold-expectations:v1),
+  // the same literal-path twin. THE POLYMARKET LEG ALONE (S15-D1: the
+  // Kalshi Developer Agreement wording read dropped that leg — the
+  // display-only + attributed + linked posture the ToS reading
+  // records); no licence reason to hide — the per-source kill switch
+  // still applies if a future owner directive arms it. Staleness is
+  // data-carried (the snapshot's own fetchedAt — the card labels it);
+  // the 30-min refresh rides the :23/:53 cron minutes.
+  app.get('/gold-expectations', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-expectations')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: import('@currena/core').GoldExpectationsSnapshot | undefined;
+    try {
+      snapshot = await deps.getGoldExpectationsReader(c.env).getGoldExpectations();
+    } catch (err) {
+      console.warn('[insights] gold-expectations read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_expectations_unavailable',
+        'Market expectations are temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the key has never been written
+      // (fresh deploy, or the :23/:53 rung has not landed its first write).
+      return errorResponse(
+        c,
+        503,
+        'gold_expectations_not_ready',
+        'No market expectations stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-gold-expectations:${snapshot.event.slug}:${snapshot.markets.map((m) => m.yesPrice).join(':')}:${snapshot.fetchedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
+    if (typeof caches !== 'undefined') {
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // GPE R25 / F6 (2026-11-19): the gold Episode Explorer's data plane —
+  // the ONE-key snapshot (insights:gold-episodes:v1), the same twin.
+  // THE SPINE IS DROP-GATED (the WGC prices workbook, S15-D4): until the
+  // owner's drop lands and the gold-episodes-run runner writes the key,
+  // this route serves the calm not-ready 503 and the card renders its
+  // honest waiting state — never an interim series. Free WGC data
+  // ("Source: World Gold Council" + the Goldhub link per C6);
+  // staleness is data-carried (the workbook's own asOf month).
+  app.get('/gold-episodes', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-episodes')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: import('@currena/core').GoldEpisodesSnapshot | undefined;
+    try {
+      snapshot = await deps.getGoldEpisodesReader(c.env).getGoldEpisodes();
+    } catch (err) {
+      console.warn('[insights] gold-episodes read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_episodes_unavailable',
+        'The gold episode history is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the workbook drop has not
+      // landed yet (the owner-side data-drop calendar owns it).
+      return errorResponse(
+        c,
+        503,
+        'gold_episodes_not_ready',
+        'No episode history stored yet — the prices workbook has not been ingested.',
+      );
+    }
+    const etag = `"insights-gold-episodes:${snapshot.asOf}:${snapshot.spine.rows.length}:${snapshot.legs.map((l) => l.rows.length).join(':')}:${snapshot.fetchedAt}"`;
     if (c.req.header('if-none-match') === etag) {
       return c.body(null, 304, {
         'Cache-Control': 'public, max-age=300, s-maxage=300',

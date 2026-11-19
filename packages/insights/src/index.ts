@@ -286,6 +286,29 @@ export {
 } from './domains/gold/xau-crosses';
 export type { CrossLegDef, CrossStats, KgxKind } from './domains/gold/xau-crosses';
 
+// GPE R25 / F6 (docs/specs/gold-page-elevation s8/01 R25 · s7/03 §3 · the
+// S15-D4/D6 records): the Episode Explorer's PURE derivations — the
+// month arithmetic over the workbook's own monthly-average axis, the
+// 1/5/10/20y window returns + the since-episode returns per comparison
+// leg (each window named at point of use; a window a leg's depth
+// cannot support is null, never guessed), and the per-episode price-
+// path slices + extremes. The SPINE ITSELF is drop-gated (the WGC
+// prices workbook; the store/job halves live behind the
+// "@currena/insights/episodes" subpath) — until the drop lands the
+// card renders the honest waiting state, never an interim series.
+export {
+  EPISODE_WINDOW_YEARS,
+  episodePath,
+  episodeSeriesViews,
+  goldSeriesView,
+  monthAdd,
+  monthDiff,
+  pathExtremes,
+  sinceReturn,
+  windowReturn,
+} from './domains/gold/episodes';
+export type { EpisodeSeriesView } from './domains/gold/episodes';
+
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
 // real-yield-10y scoring input (decision D-6: fills never reach the stored

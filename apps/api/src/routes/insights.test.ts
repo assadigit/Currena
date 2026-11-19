@@ -1284,3 +1284,174 @@ describe('KvInsightsReader — mode-aware keys (2026-10-19)', () => {
     expect(await reader.getPublicSnapshot()).toBeUndefined();
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * GPE R28 — GET /api/insights/gold-expectations (the Fed-meeting
+ * market-implied probabilities; the gold-lbma/tic twin: one KV read,
+ * ETag + public edge cache, the calm not-ready 503, the reader-failure
+ * 503). THE POLYMARKET LEG ALONE (S15-D1 — the Kalshi Developer
+ * Agreement wording read dropped that leg).
+ * ------------------------------------------------------------------ */
+
+/** A contract-valid expectations snapshot (the wire's own shape). */
+const goldExpectationsSnapshot: import('@currena/core').GoldExpectationsSnapshot = {
+  v: 1,
+  fetchedAt: '2026-11-19T05:23:00.000Z',
+  source: 'polymarket',
+  event: {
+    slug: 'fed-decision-in-december-20260729232808632',
+    title: 'Fed Decision in December?',
+    endDate: '2026-12-10T04:59:00Z',
+    url: 'https://polymarket.com/event/fed-decision-in-december-20260729232808632',
+  },
+  markets: [
+    { move: 'hike50plus', question: 'Will the Fed increase interest rates by 50+ bps after the December 2026 meeting?', slug: 'm1', yesPrice: 0.0625 },
+    { move: 'hike25', question: 'Will the Fed increase interest rates by 25 bps after the December 2026 meeting?', slug: 'm2', yesPrice: 0.915 },
+    { move: 'hold', question: 'Will there be no change in Fed interest rates after the December 2026 meeting?', slug: 'm3', yesPrice: 0.0225 },
+    { move: 'cut25', question: 'Will the Fed decrease interest rates by 25 bps after the December 2026 meeting?', slug: 'm4', yesPrice: 0.0035 },
+    { move: 'cut50plus', question: 'Will the Fed decrease interest rates by 50+ bps after the December 2026 meeting?', slug: 'm5', yesPrice: 0.0015 },
+  ],
+};
+
+describe('GET /api/insights/gold-expectations (GPE R28)', () => {
+  function makeApp(reader?: { getGoldExpectations(): Promise<import('@currena/core').GoldExpectationsSnapshot | undefined> }) {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldExpectationsReader: () => reader ?? { getGoldExpectations: async () => undefined },
+    });
+  }
+
+  it('serves the stored snapshot verbatim with ETag + the public cache stamp', async () => {
+    const app = makeApp({ getGoldExpectations: async () => goldExpectationsSnapshot });
+    const res = await app.request('/api/insights/gold-expectations', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('x-robots-tag')).toBe('noindex');
+    expect(await res.json()).toEqual(goldExpectationsSnapshot);
+    expect(res.headers.get('etag')).toBe(
+      '"insights-gold-expectations:fed-decision-in-december-20260729232808632:' +
+        goldExpectationsSnapshot.markets.map((m) => m.yesPrice).join(':') +
+        ':2026-11-19T05:23:00.000Z"',
+    );
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const app = makeApp({ getGoldExpectations: async () => goldExpectationsSnapshot });
+    const etag = await res0etag(app);
+    const res = await app.request('/api/insights/gold-expectations', { headers: { 'if-none-match': etag } }, env);
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 gold_expectations_not_ready (calm) when KV is empty — the honest pre-rung state', async () => {
+    const res = await makeApp().request('/api/insights/gold-expectations', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('gold_expectations_not_ready');
+    expect(body.error.message).toContain('scheduled job has not completed');
+  });
+
+  it('a reader rejection surfaces as the calm 503 gold_expectations_unavailable (never a raw 500)', async () => {
+    const app = makeApp({
+      getGoldExpectations: async () => {
+        throw new Error('KV read failed');
+      },
+    });
+    const res = await app.request('/api/insights/gold-expectations', undefined, env);
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_expectations_unavailable');
+  });
+
+  it('the LITERAL path wins over the parameterised /:id/history route (registered before it)', async () => {
+    const app = makeApp({ getGoldExpectations: async () => goldExpectationsSnapshot });
+    const res = await app.request('/api/insights/gold-expectations', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as import('@currena/core').GoldExpectationsSnapshot;
+    expect(body.source).toBe('polymarket'); // the one-key snapshot, never a per-id history shape
+  });
+
+  /** The ETag the route stamps (computed once for the 304 test). */
+  async function res0etag(app: ReturnType<typeof createApp>): Promise<string> {
+    const res = await app.request('/api/insights/gold-expectations', undefined, env);
+    return res.headers.get('etag') ?? '';
+  }
+});
+
+/* ------------------------------------------------------------------ *
+ * GPE R25 — GET /api/insights/gold-episodes (the Episode Explorer's
+ * DROP-GATED data plane; the same twin: one KV read, ETag + the public
+ * edge cache, the calm not-ready 503 that names the workbook drop, the
+ * reader-failure 503).
+ * ------------------------------------------------------------------ */
+
+/** A contract-valid episodes snapshot (the wire's own shape). */
+/** The spine's monthly rows (2021-09 → 2026-10, 62 months — schema-valid). */
+const episodeSpineRows: import('@currena/core').EpisodePoint[] = Array.from({ length: 62 }, (_, i) => {
+  const total = 2021 * 12 + 8 + i; // 2021-09 + i months
+  const y = Math.floor(total / 12);
+  const m = (total % 12) + 1;
+  return { month: `${y}-${String(m).padStart(2, '0')}`, value: 1700 + i * 12 };
+});
+
+const goldEpisodesSnapshot: import('@currena/core').GoldEpisodesSnapshot = {
+  v: 1,
+  asOf: '2026-10',
+  fetchedAt: '2026-11-19T06:00:00.000Z',
+  spine: {
+    rows: episodeSpineRows,
+    sourceUrl: 'https://www.gold.org/goldhub/data/gold-prices',
+    fileName: 'Gold_price_averages_in_a_range_of_currencies_since_1978.xlsx',
+  },
+  legs: [{ id: 'silver', seriesNamed: 'Silver (troy ounce, US$) — the stored insights history', rows: [{ month: '2026-09', value: 45 }, { month: '2026-10', value: 46 }] }],
+};
+
+describe('GET /api/insights/gold-episodes (GPE R25)', () => {
+  function makeApp(reader?: { getGoldEpisodes(): Promise<import('@currena/core').GoldEpisodesSnapshot | undefined> }) {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldEpisodesReader: () => reader ?? { getGoldEpisodes: async () => undefined },
+    });
+  }
+
+  it('serves the stored snapshot verbatim with ETag + the public cache stamp', async () => {
+    const app = makeApp({ getGoldEpisodes: async () => goldEpisodesSnapshot });
+    const res = await app.request('/api/insights/gold-episodes', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(await res.json()).toEqual(goldEpisodesSnapshot);
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const app = makeApp({ getGoldEpisodes: async () => goldEpisodesSnapshot });
+    const first = await app.request('/api/insights/gold-episodes', undefined, env);
+    const etag = first.headers.get('etag') ?? '';
+    const res = await app.request('/api/insights/gold-episodes', { headers: { 'if-none-match': etag } }, env);
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 gold_episodes_not_ready (calm) when the workbook drop has not landed', async () => {
+    const res = await makeApp().request('/api/insights/gold-episodes', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('gold_episodes_not_ready');
+    expect(body.error.message).toContain('prices workbook');
+  });
+
+  it('a reader rejection surfaces as the calm 503 gold_episodes_unavailable (never a raw 500)', async () => {
+    const app = makeApp({
+      getGoldEpisodes: async () => {
+        throw new Error('KV read failed');
+      },
+    });
+    const res = await app.request('/api/insights/gold-episodes', undefined, env);
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_episodes_unavailable');
+  });
+
+  it('the LITERAL path wins over the parameterised /:id/history route (registered before it)', async () => {
+    const app = makeApp({ getGoldEpisodes: async () => goldEpisodesSnapshot });
+    const res = await app.request('/api/insights/gold-episodes', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as import('@currena/core').GoldEpisodesSnapshot;
+    expect(body.v).toBe(1);
+  });
+});

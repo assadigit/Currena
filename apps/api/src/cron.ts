@@ -18,6 +18,7 @@
 import { runPricesUpdate, formatPricesReport, defaultPricesFetchers } from '@currena/insights/prices';
 import { KvPricesStore } from '@currena/insights/prices';
 import type { PricesJobFetchers } from '@currena/insights/prices';
+import { runGoldExpectationsIngest, KvGoldExpectationsStore } from '@currena/insights/expectations';
 import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
 import { runScheduledNarrator, NARRATOR_CRON_MINUTE } from './narrator-cron';
 import {
@@ -39,15 +40,42 @@ const FRANKFURTER_CRON_MOD_MIN = 15;
 /**
  * The minute (UTC) on which the cron refreshes the Insights live prices
  * (2026-10-12, the stale-oil fix): ONE hourly rung that fetches Yahoo
- * quotes for the Prices board (Brent BZ=F, gold GC=F, silver SI=F, Bitcoin
- * BTC-USD) and writes them to the insights:prices-live:v1 KV key —
- * write-only-if-changed, so a quiet market costs ZERO writes. GET
+ * quotes for the Prices board (Brent BZ=F, gold GC=F, silver SI=F,
+ * Bitcoin BTC-USD) and writes them to the insights:prices-live:v1 KV key
+ * — write-only-if-changed, so a quiet market costs ZERO writes. GET
  * /api/insights merges the quotes over the daily EOD snapshot at serve
  * time. Per-asset refresh intervals (volatility scaling) live in
  * @currena/insights/prices definitions — oil at 60 min is 24× the owner's
  * "at least once a day" bar. :13 avoids the Frankfurter quarter-hours.
  */
 export const PRICES_CRON_MINUTE = 13;
+
+/**
+ * GPE R28 / F24 (2026-11-19, the S15-D2 record): the Fed-meeting
+ * market-expectations refresh — the Polymarket gamma discovery fetch
+ * (ONE keyless request; the Kalshi leg is DROPPED per the Developer
+ * Agreement wording read — the s15 M1 §1 record) that keeps the gold
+ * page's Zone D expectations card on its 30-minute refresh. Fires on
+ * the :23 and :53 minutes — clear of every other rung (:13 prices,
+ * :15-mod Frankfurter, :40 watchdog, :50 narrator, the 04:10/25/30/
+ * 35/40 ingest rungs); NO new cron trigger (the account's free 5-cron
+ * limit is full — the PRICES_CRON_MINUTE pattern). Write-if-changed: a
+ * genuinely quiet half-hour costs ZERO KV writes; a fetch failure keeps
+ * the stored snapshot (the last-good discipline inside the job) and
+ * only logs — a rung failure can never mark the cron invocation failed.
+ */
+export const EXPECTATIONS_CRON_MINUTES: readonly [number, number] = [23, 53];
+
+/** The 30-minute expectations refresh (exported for tests; the cron calls it). */
+export async function runScheduledGoldExpectationsRefresh(env: Bindings): Promise<void> {
+  const store = new KvGoldExpectationsStore(env.RATES);
+  const result = await runGoldExpectationsIngest(store);
+  if (result.outcome.ok) {
+    console.log(`[cron] gold-expectations ok — ${result.outcome.note ?? 'done'}`);
+  } else {
+    console.warn(`[cron] gold-expectations failed (${result.outcome.kind}): ${result.outcome.note}`);
+  }
+}
 
 /** The hourly live-prices refresh (exported for tests; the cron calls it). */
 export async function runScheduledPricesRefresh(
@@ -110,6 +138,18 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
       ? [
           runScheduledPricesRefresh(env).catch((err: unknown) => {
             console.warn('[cron] prices refresh failed:', err instanceof Error ? err.message : err);
+          }),
+        ]
+      : []),
+    // GPE R28 / F24: the 30-minute gold-expectations rung (:23 + :53 —
+    // the S15-D2 record) — fault-isolated the same way: the job's own
+    // failure branch keeps the stored snapshot and only logs, and this
+    // catch is belt-and-braces so a venue hiccup can never mark the
+    // cron invocation failed.
+    ...(EXPECTATIONS_CRON_MINUTES.includes(minute)
+      ? [
+          runScheduledGoldExpectationsRefresh(env).catch((err: unknown) => {
+            console.warn('[cron] gold-expectations refresh failed:', err instanceof Error ? err.message : err);
           }),
         ]
       : []),
