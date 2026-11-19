@@ -32,6 +32,8 @@ import { KvInsightsReader, KvMarketsReader, KvAuMarketsReader, KvFxReader, KvPri
 import { KvTicStore } from '@currena/insights/tic';
 import { KvGoldCbStore } from '@currena/insights/cb-demand';
 import { KvGoldXauStore } from '@currena/insights/xau-ohlc';
+import { KvGoldCrossesStore } from '@currena/insights/xau-crosses';
+import { KvGoldLbmaStore } from '@currena/insights/lbma';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
 import { createInsightsRoutes } from './routes/insights';
@@ -166,6 +168,10 @@ export interface AppDeps {
   makeGoldCbReader?: (env: Bindings) => import('@currena/insights/cb-demand').GoldCbReader;
   /** GPE R18: the XAUUSD OHLC series' store (route tests inject the fake). */
   makeGoldXauReader?: (env: Bindings) => import('@currena/insights/xau-ohlc').GoldXauReader;
+  /** GPE R26: the XAU crosses series' store (route tests inject the fake). */
+  makeGoldCrossesReader?: (env: Bindings) => import('@currena/insights/xau-crosses').GoldCrossesReader;
+  /** GPE R24: the LBMA vault + clearing store (route tests inject the fake). */
+  makeGoldLbmaReader?: (env: Bindings) => import('@currena/insights/lbma').GoldLbmaReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
   /**
@@ -292,6 +298,26 @@ export function createApp(deps: AppDeps = {}) {
     return goldXauReader;
   };
 
+  // GPE R26 (2026-11-19): the XAU crosses series' serve path — the ONE
+  // key (KvGoldCrossesStore, the same twin).
+  let goldCrossesReader: import('@currena/insights/xau-crosses').GoldCrossesReader | undefined;
+  const getGoldCrossesReader = (
+    env: Bindings,
+  ): import('@currena/insights/xau-crosses').GoldCrossesReader => {
+    goldCrossesReader ??= deps.makeGoldCrossesReader
+      ? deps.makeGoldCrossesReader(env)
+      : new KvGoldCrossesStore(env.RATES);
+    return goldCrossesReader;
+  };
+
+  // GPE R24 (2026-11-19): the LBMA vault + clearing serve path — the ONE
+  // key (KvGoldLbmaStore, the same twin).
+  let goldLbmaReader: import('@currena/insights/lbma').GoldLbmaReader | undefined;
+  const getGoldLbmaReader = (env: Bindings): import('@currena/insights/lbma').GoldLbmaReader => {
+    goldLbmaReader ??= deps.makeGoldLbmaReader ? deps.makeGoldLbmaReader(env) : new KvGoldLbmaStore(env.RATES);
+    return goldLbmaReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -335,6 +361,8 @@ export function createApp(deps: AppDeps = {}) {
       getTicReader,
       getGoldCbReader,
       getGoldXauReader,
+      getGoldCrossesReader,
+      getGoldLbmaReader,
       getPricesReader,
       getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests

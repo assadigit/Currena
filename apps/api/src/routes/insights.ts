@@ -61,6 +61,8 @@ import type { FxReader } from '@currena/insights/fx';
 import type { TicReader } from '@currena/insights/tic';
 import type { GoldCbReader } from '@currena/insights/cb-demand';
 import type { GoldXauReader } from '@currena/insights/xau-ohlc';
+import type { GoldCrossesReader } from '@currena/insights/xau-crosses';
+import type { GoldLbmaReader } from '@currena/insights/lbma';
 import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
@@ -133,6 +135,10 @@ interface InsightsRouteDeps {
   getGoldCbReader: (env: Bindings) => GoldCbReader;
   /** GPE R18: the XAUUSD daily OHLC series' store (the gold-cb twin). */
   getGoldXauReader: (env: Bindings) => GoldXauReader;
+  /** GPE R26: the XAU crosses series' store (the gold-xau twin). */
+  getGoldCrossesReader: (env: Bindings) => GoldCrossesReader;
+  /** GPE R24: the LBMA vault + clearing store (the same twin). */
+  getGoldLbmaReader: (env: Bindings) => GoldLbmaReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
   /**
@@ -738,6 +744,125 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       );
     }
     const etag = `"insights-gold-ohlc:${snapshot.asOf}:${snapshot.series.length}:${snapshot.fetchedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
+    if (typeof caches !== 'undefined') {
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // GPE R26 / F10 (2026-11-19): the XAU crosses series — the ONE-key
+  // snapshot (insights:gold-xau-crosses:v1), the gold-ohlc twin. EODHD
+  // on the owner plan (L2 — every leg named at point of use per C1/C6,
+  // the derived three's formulas carried in the payload itself); no
+  // licence reason to hide — the per-source kill switch still applies
+  // if a future owner directive arms it. Staleness is data-carried (the
+  // snapshot's own asOf + fetchedAt — the grid labels its window).
+  app.get('/gold-crosses', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-xau-crosses')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: import('@currena/core').GoldXauCrossesSnapshot | undefined;
+    try {
+      snapshot = await deps.getGoldCrossesReader(c.env).getGoldCrosses();
+    } catch (err) {
+      console.warn('[insights] gold-crosses read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_crosses_unavailable',
+        'Currency gold prices are temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the key has never been written
+      // (fresh deploy, or the rung4 gold-xau-crosses step has not landed).
+      return errorResponse(
+        c,
+        503,
+        'gold_crosses_not_ready',
+        'No currency gold prices stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-gold-crosses:${snapshot.asOf}:${snapshot.crosses.map((x) => x.series.length).join(':')}:${snapshot.fetchedAt}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
+    if (typeof caches !== 'undefined') {
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
+  });
+
+  // GPE R24 / F22 (2026-11-19): the LBMA London vault + clearing
+  // families — the ONE-key snapshot (insights:gold-lbma:v1), the same
+  // twin. Free LBMA data ("Source: LBMA" + link + the four-field
+  // disclosure block per C6 — L1-attribution posture); no licence
+  // reason to hide. Staleness is data-carried (the families' own asOf
+  // months — the cards label them).
+  app.get('/gold-lbma', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-lbma')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: import('@currena/core').GoldLbmaSnapshot | undefined;
+    try {
+      snapshot = await deps.getGoldLbmaReader(c.env).getGoldLbma();
+    } catch (err) {
+      console.warn('[insights] gold-lbma read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_lbma_unavailable',
+        'London vault data is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the key has never been written
+      // (fresh deploy, or the rung3 gold-lbma step has not landed).
+      return errorResponse(
+        c,
+        503,
+        'gold_lbma_not_ready',
+        'No London vault data stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-gold-lbma:${snapshot.asOf}:${snapshot.vault.rows.length}:${snapshot.clearing.rows.length}:${snapshot.fetchedAt}"`;
     if (c.req.header('if-none-match') === etag) {
       return c.body(null, 304, {
         'Cache-Control': 'public, max-age=300, s-maxage=300',

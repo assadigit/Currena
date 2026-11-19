@@ -89,8 +89,8 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(ticReleaseAwareGate(new Date('2026-11-28T04:30:00Z'))).toBe(true); // Saturday again
   });
 
-  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, the M3.3 credit pair, the S4 PortWatch chokepoints, the S5 Australian macro family, and the GPE gold-cb + gold-xau pair (S4-M4.3 registered portwatch; S5-M5.2 registered abs-au-macro; GPE R14 registered gold-cb LAST in the registry — a budget refusal must fall on the monthly source; GPE R18 registered gold-xau on rung4 — the S13-D1 venue record)', () => {
-    expect(EXTRA_SOURCES).toHaveLength(8); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3) + portwatch (S4-M4.3) + abs-au-macro (S5-M5.2) + gold-cb (GPE R14) + gold-xau (GPE R18)
+  it('the registry carries the verified TIC source on rung3, the S3 FRED groups, the M3.3 credit pair, the S4 PortWatch chokepoints, the S5 Australian macro family, and the GPE gold-cb + gold-xau + gold-xau-crosses + gold-lbma set (S4-M4.3 registered portwatch; S5-M5.2 registered abs-au-macro; GPE R14 registered gold-cb LAST in the registry — a budget refusal must fall on the monthly source; GPE R18 registered gold-xau on rung4 — the S13-D1 venue record; GPE R26/R24 registered gold-xau-crosses on rung4 weekdays + gold-lbma on rung3 days 8–27 — the S14-D3 arithmetic)', () => {
+    expect(EXTRA_SOURCES).toHaveLength(10); // tic-slt (S2-M2.2) + fred-s3 (S3-M3.2) + frb-ebp/ofr-fsi (S3-M3.3) + portwatch (S4-M4.3) + abs-au-macro (S5-M5.2) + gold-cb (GPE R14) + gold-xau (GPE R18) + gold-xau-crosses (GPE R26) + gold-lbma (GPE R24)
     const tic = EXTRA_SOURCES.find((s) => s.id === 'tic-slt')!;
     expect(tic.rung).toBe(3);
     expect(tic.gate).toBe(ticReleaseAwareGate);
@@ -144,6 +144,31 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(goldXau.gate(new Date('2026-11-01T04:35:00Z'))).toBe(true); // daily
     expect(goldXau.gate(new Date('2026-11-02T04:35:00Z'))).toBe(true); // every day
     expect(goldXau.budget).toBe(4);
+    // GPE R26 (2026-11-19): the XAU crosses leg on rung4 — WEEKDAYS ONLY
+    // (the forex week wraps Friday 22:00 UTC; Sat/Sun carry no new bars
+    // and the trailing 3-day re-fetch self-heals the weekend on Monday —
+    // the S14-D3 record). Budget 8: 5 leg fetches + the stored-crosses
+    // read + the gold-xau key read + the write.
+    const crosses = EXTRA_SOURCES.find((s) => s.id === 'gold-xau-crosses')!;
+    expect(crosses.rung).toBe(4);
+    expect(crosses.budget).toBe(8);
+    expect(crosses.gate(new Date('2026-11-19T04:35:00Z'))).toBe(true); // Thursday
+    expect(crosses.gate(new Date('2026-11-20T04:35:00Z'))).toBe(true); // Friday
+    expect(crosses.gate(new Date('2026-11-21T04:35:00Z'))).toBe(false); // Saturday
+    expect(crosses.gate(new Date('2026-11-22T04:35:00Z'))).toBe(false); // Sunday
+    // GPE R24 (2026-11-19): the LBMA vault + clearing workbooks on rung3 —
+    // the days-8–27 publication window (both rhythms land inside it; a
+    // not-yet-published month costs 2 fetches and zero writes — the
+    // S14-D2/S14-D3 records). Budget 4, exact (2 fetches + the read +
+    // the write). Registry position: BEFORE gold-cb (the LAST-slot
+    // refusal victim unchanged).
+    const lbma = EXTRA_SOURCES.find((s) => s.id === 'gold-lbma')!;
+    expect(lbma.rung).toBe(3);
+    expect(lbma.budget).toBe(4);
+    expect(lbma.gate(new Date('2026-11-08T04:30:00Z'))).toBe(true);
+    expect(lbma.gate(new Date('2026-11-27T04:30:00Z'))).toBe(true);
+    expect(lbma.gate(new Date('2026-11-07T04:30:00Z'))).toBe(false);
+    expect(lbma.gate(new Date('2026-11-28T04:30:00Z'))).toBe(false);
     // gap-closure S4-M4.3 (2026-11-01): the IMF PortWatch chokepoints on
     // RUNG3 (rung4 carries 45/50 on all-gates days — the session plan's
     // explicit routing; rung3 has its own 50 budget with only the TIC's
@@ -157,24 +182,36 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(portwatch.gate(new Date('2026-11-02T04:30:00Z'))).toBe(true); // every day
     expect(portwatch.budget).toBe(18);
     // The whole rung4 registry stays inside the 50-subrequest ceiling even
-    // on the day every gate fires (1 status + 24 + 10 + 10 + 4 = 49 ≤ 50 —
-    // GPE R18's gold-xau fits with margin, the S13-D1 record).
+    // on the day every gate fires: Saturday 1 + 24 + 10 + 4 = 49 (the
+    // crosses' weekday gate is closed); a WEEKDAY 1 + 24 + 10 + 4 + 8 = 47
+    // (GPE R26's crosses fit with margin — the S14-D3 record).
     const total = EXTRA_SOURCES.filter((s) => s.rung === 4).reduce((sum, s) => sum + s.budget, 0) + 1;
-    expect(total).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING);
+    expect(total).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING + 10); // the weekday-sum headroom: Saturday's due-sum is the binding case below
+    const dueOnDay4 = (now: Date): number =>
+      EXTRA_SOURCES.filter((s) => s.rung === 4 && s.gate(now)).reduce((sum, s) => sum + s.budget, 0) + 1;
+    expect(dueOnDay4(new Date('2026-11-21T04:35:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // Saturday (frb-ebp fires, crosses closed)
+    expect(dueOnDay4(new Date('2026-11-19T04:35:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // a weekday (crosses fire, frb-ebp closed)
     // GPE R14 (2026-11-18): the rung3 registry's DECLARED total now exceeds
     // the ceiling on paper (1 status + tic 4 + portwatch 18 + abs 22 +
-    // gold-cb 8 = 53) — the honest budget arithmetic is the DUE-day sum,
-    // because the rung only runs (and only counts) the day-gated sources:
+    // gold-lbma 4 + gold-cb 8 = 57) — the honest budget arithmetic is the
+    // DUE-day sum, because the rung only runs (and only counts) the
+    // day-gated sources:
     //   a NON-Saturday inside the 1st-5st: 1 + 18 + 22 + 8 = 49 ≤ 50 ✓
-    //   any day outside the 1st-5st: 1 + 18 + 22 (+4 on tic Saturdays) ≤ 45 ✓
-    //   the rare Saturday-1st: 53 > 50 → the LAST registry source (gold-cb,
+    //   a weekday in the 8th-27th: 1 + 18 + 22 + 4 = 45 ≤ 50 ✓
+    //   a weekday in the 15th-25th (tic + lbma both open): 1 + 4 + 18 + 22 + 4 = 49 ≤ 50 ✓
+    //   a Saturday in the 8th-27th (tic + lbma open): 1 + 4 + 18 + 22 + 4 = 49 ≤ 50 ✓
+    //   the rare Saturday-1st (lbma closed, tic + gold-cb open):
+    //   1 + 4 + 18 + 22 + 8 = 53 > 50 → the LAST registry source (gold-cb,
     //   the monthly one) is REFUSED that day and re-fires on its own gate
-    //   tomorrow — recorded in the registry comment, self-healing by design.
+    //   tomorrow — recorded in the registry comment, self-healing by design
+    //   (the S12-D3 victim is UNCHANGED by R24 — the S14-D3 record).
     const dueOnDay = (now: Date): number =>
       EXTRA_SOURCES.filter((s) => s.rung === 3 && s.gate(now)).reduce((sum, s) => sum + s.budget, 0) + 1;
     expect(dueOnDay(new Date('2026-12-02T04:30:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // Wed the 2nd
-    expect(dueOnDay(new Date('2026-12-08T04:30:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // outside the gate
-    expect(dueOnDay(new Date('2026-11-21T04:30:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // a normal Saturday (no gold-cb, tic fires)
+    expect(dueOnDay(new Date('2026-12-08T04:30:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // a weekday in the lbma window
+    expect(dueOnDay(new Date('2026-11-21T04:30:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // a Saturday in the lbma window (tic fires too)
+    expect(dueOnDay(new Date('2026-11-18T04:30:00Z'))).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING); // a weekday in tic's window + lbma's
+    expect(dueOnDay(new Date('2026-12-05T04:30:00Z'))).toBeGreaterThan(EXTRA_RUNG_SUBREQUEST_CEILING); // the Saturday-1st collision: gold-cb must be the victim
     // gap-closure S5-M5.2 (2026-11-02): the Australian macro family on
     // rung3 — daily gate (the ABS revises; the cheap re-check keeps the
     // readings fresh; the sweeps heal a failed day within hours), budget
@@ -186,18 +223,18 @@ describe('the TIC release-aware gate (S2-M2.2)', () => {
     expect(absAu.gate(new Date('2026-11-03T04:30:00Z'))).toBe(true); // every day
     expect(absAu.budget).toBe(22);
     // The rung3 registry total on the pre-GPE all-gates day (tic Saturday,
-    // no gold-cb gate): 1 status + 4 + 18 + 22 = 45 <= 50 — unchanged by R14
-    // (gold-cb's day-1..5 gate never meets a normal tic Saturday except on
-    // the 1st-5th, where the refusal order protects the daily sources).
+    // no gold-cb gate, lbma outside its window): 1 status + 4 + 18 + 22 = 45
+    // <= 50 — and with lbma inside its window on the same Saturday:
+    // 1 + 4 + 18 + 22 + 4 = 49 <= 50 (unchanged victims, the S14-D3 record).
     expect(
       EXTRA_SOURCES.filter((s) => s.rung === 3 && s.id !== 'gold-cb').reduce((sum, s) => sum + s.budget, 0) + 1,
-    ).toBeLessThanOrEqual(50);
+    ).toBeLessThanOrEqual(EXTRA_RUNG_SUBREQUEST_CEILING + 4); // 49 with lbma's window open, 45 without — both honest due-day sums
   });
 });
 
 describe('runExtraRung — rung4 now carries the S3 FRED source (S3-M3.2 registered fred-s3)', () => {
   it('a rung whose registry list is EMPTY still runs, writes its status record, and costs 1 subrequest (the S1-M1.7 proof, via the override)', async () => {
-    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(4); // fred-s3 + frb-ebp + ofr-fsi (S3-M3.3) + gold-xau (GPE R18)
+    expect(EXTRA_SOURCES.filter((s) => s.rung === 4)).toHaveLength(5); // fred-s3 + frb-ebp + ofr-fsi (S3-M3.3) + gold-xau (GPE R18) + gold-xau-crosses (GPE R26)
     const kv = mockKv();
     const status = await runExtraRung(ENV, 4, { kv, now: new Date(at(4, 35)), sources: [] });
     expect(status.rows).toEqual([]);

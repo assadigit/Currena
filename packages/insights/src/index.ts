@@ -244,6 +244,48 @@ export {
 } from './domains/gold/coin-premium';
 export type { BridgeCoinId, CoinPremium, CoinPremiumRow, CoinSpec } from './domains/gold/coin-premium';
 
+// GPE R22 / F11 (docs/specs/gold-page-elevation s7/01 §3 in full ·
+// s7/03 §4.2 the pre-registered-window registry · s8/01 R22): the
+// correlation companion's PURE computation — the Friday-close sampling,
+// the 52-week rolling Pearson over levels, the trailing-10y display
+// cap, and the fail-closed staleness rules. The scatter stays rejected
+// (s7/01 §3); display-only — nothing here joins the voter table. The
+// inputs are the R18 OHLC leg + the existing real-yield-10y history.
+export {
+  CORRELATION_DISPLAY_DAYS,
+  CORRELATION_STALE_AFTER_DAYS,
+  CORRELATION_WINDOW_WEEKS,
+  ROTATION_DATE,
+  correlationPanel,
+  fridayCloses,
+  fridayOf,
+  pearson,
+  rollingCorrelation,
+} from './domains/gold/correlation';
+export type {
+  CorrelationDailyPoint,
+  CorrelationPanel,
+  CorrelationStaleness,
+  CorrelationStripPoint,
+  FridayClose,
+} from './domains/gold/correlation';
+
+// GPE R26 / F10 (docs/specs/gold-page-elevation s8/01 R26 · the S14-D1
+// native+derived record): the multi-currency gold grid's PURE
+// derivations — each cross's 30-day change + decile over its own stored
+// basis (the S13-D1 honest window), and the KGX validation sentence's
+// verdict inputs (genuine demand vs the dollar story). The fetch/
+// store/job halves live behind the "@currena/insights/xau-crosses"
+// subpath — the SPA-facing root export stays platform-free.
+export {
+  CROSS_DECILE_MIN_BASE,
+  CROSS_LEGS,
+  GOLD_CROSS_IDS,
+  crossStats,
+  kgxVerdict,
+} from './domains/gold/xau-crosses';
+export type { CrossLegDef, CrossStats, KgxKind } from './domains/gold/xau-crosses';
+
 // Session 3 (docs/insights/GOLD_FRED_GAPFILL_SPEC.md): the FRED gap-fillers.
 // real-yield-fill.ts — the bounded DGS10 − T10YIE cross-fill for the
 // real-yield-10y scoring input (decision D-6: fills never reach the stored

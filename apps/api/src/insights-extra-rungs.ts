@@ -27,6 +27,8 @@ import type { Bindings } from './index';
 import { runTicIngest, KvTicStore } from '@currena/insights/tic';
 import { runGoldCbIngest, KvGoldCbStore, goldCbDayGate } from '@currena/insights/cb-demand';
 import { runGoldXauIngest, KvGoldXauStore } from '@currena/insights/xau-ohlc';
+import { runGoldXauCrossesIngest, KvGoldCrossesStore } from '@currena/insights/xau-crosses';
+import { runGoldLbmaIngest, KvGoldLbmaStore } from '@currena/insights/lbma';
 import {
   runInsightsRung4Phase,
   runInsightsCreditPhase,
@@ -356,18 +358,64 @@ export const EXTRA_SOURCES: readonly ExtraSourceDef[] = [
       (await runGoldXauIngest(new KvGoldXauStore(env.RATES), { apiToken: env.EODHD_API_TOKEN ?? '' })).outcome,
   },
   {
+    // GPE R26 / F10 (2026-11-19): the XAU crosses leg — the multi-
+    // currency gold grid's five series (XAUEUR + XAUAUD native;
+    // XAUJPY/XAUGBP/XAUCNY derived over the gold-xau series + the
+    // USDJPY/GBPUSD/USDCNY legs — the S14-D1 record). Rides RUNG4 on
+    // WEEKDAYS ONLY (Mon–Fri UTC — the forex week wraps Friday 22:00
+    // UTC; Sat/Sun carry no new bars, and the trailing 3-day re-fetch
+    // self-heals the weekend on Monday). Declared budget 8: 5 fetches +
+    // the stored-crosses read + the gold-xau key read + the write. The
+    // rung4 arithmetic with it: weekday 1 + 24 (fred-s3) + 10 (ofr-fsi)
+    // + 4 (gold-xau) + 8 = 47 ≤ 50; Saturday unchanged at 49/50 (this
+    // gate closed). The sweeps heal a failed weekday within hours.
+    id: 'gold-xau-crosses',
+    rung: 4,
+    gate: weekdayGateClosed(),
+    budget: 8,
+    run: async (env: Bindings) =>
+      (
+        await runGoldXauCrossesIngest(new KvGoldCrossesStore(env.RATES), {
+          apiToken: env.EODHD_API_TOKEN ?? '',
+          goldXau: new KvGoldXauStore(env.RATES),
+        })
+      ).outcome,
+  },
+  {
+    // GPE R24 / F22 (2026-11-19): the LBMA London vault + clearing
+    // workbooks — the two free monthly XLSX files from cdn.lbma.org.uk
+    // (the s14 M1 §4b probe: the vault rhythm ~T+2.5wk, the clearing
+    // ~one month deeper in arrears; each file IS the full 124/360-month
+    // history, so the first 200 bootstraps everything — S14-D2). Rides
+    // RUNG3, days 8–27 of the month (the publication window both
+    // rhythms land inside). Declared budget 4 (exact, deterministic:
+    // the 2 workbook fetches + the idempotence read + the write).
+    // Registry position: BEFORE gold-cb — the S12-D3 record keeps
+    // gold-cb LAST (its days-1–5 Saturday refusal victim unchanged).
+    // The rung3 arithmetic with it: weekday days 15–25
+    // 1 + 4 (tic) + 18 (portwatch) + 22 (abs) + 4 = 49 ≤ 50; weekday
+    // days 8–14 45 ≤ 50; a not-yet-published month costs 2 fetches and
+    // zero writes (the calm waiting answer).
+    id: 'gold-lbma',
+    rung: 3,
+    gate: lbmaWindowGate,
+    budget: 4,
+    run: async (env: Bindings) => (await runGoldLbmaIngest(new KvGoldLbmaStore(env.RATES), {})).outcome,
+  },
+  {
     // GPE R14 / F2a Tier-1 (2026-11-18): the IMF central-bank gold tracker —
     // the IL + IRFCL SDMX dataflows (4 fetches, ~8 MB total monthly: the IL
     // wildcard query is 4.83 MB and the venue ignores startPeriod — the
     // s12 M1 §5 record). Rides RUNG3 (rung4 sits at 49/50 on all-gates
     // days after R18's gold-xau) and sits LAST in the registry: the rung3
     // all-gates day is
-    // 1 status + 4 (tic) + 18 (portwatch) + 22 (abs) + 8 = 53 > 50, and a
-    // refusal must fall on THIS monthly source (it re-fires on its own
-    // day-1..5 gate tomorrow — self-healing by design), never on a daily
-    // one. The collision only exists when the 1st-5th meets a Saturday
-    // with tic's release window closed; the sweeps also heal failures
-    // within hours (gate bypassed). Declared budget 8: 4 fetches + the
+    // 1 status + 4 (tic) + 18 (portwatch) + 22 (abs) + 4 (lbma) + 8 = 57 > 50
+    // on a day-1–5 weekday when the lbma window is closed (days 1–5), so
+    // the historical collision arithmetic still falls on gold-cb exactly
+    // as the S12-D3 design records (a days-1–5 Saturday with tic open:
+    // 1 + 4 + 18 + 22 + 8 = 53 > 50 → gold-cb refused, self-healing on
+    // its own day-1..5 gate tomorrow; the sweeps also heal failures
+    // within hours, gate bypassed). Declared budget 8: 4 fetches + the
     // idempotence read + the write + headroom. DAY 1-5 gate + month-skip
     // idempotence (the S12-D3 record): one real collect per month, cheap
     // re-checks the days after.
@@ -396,6 +444,25 @@ export function weekdayGate(weekday: number): (now: Date) => boolean {
 /** Always true (a daily source). */
 export function dailyGate(): (now: Date) => boolean {
   return () => true;
+}
+
+/** GPE R26 (S14-D3): the forex week's trading days — Mon–Fri UTC only
+ *  (the week wraps Friday 22:00 UTC; Sat/Sun carry no new bars and the
+ *  trailing re-fetch self-heals the weekend on Monday). */
+export function weekdayGateClosed(): (now: Date) => boolean {
+  return (now: Date) => {
+    const day = now.getUTCDay();
+    return day !== 6 && day !== 0;
+  };
+}
+
+/** GPE R24 (S14-D2/S14-D3): the LBMA publication window — days 8–27 of
+ *  the month, any weekday rhythm (the vault lands ~day 10–17, the
+ *  clearing ~day 5–15 of the FOLLOWING month; both inside the window;
+ *  write-if-changed makes the quiet days cheap re-checks). */
+export function lbmaWindowGate(now: Date): boolean {
+  const day = now.getUTCDate();
+  return day >= 8 && day <= 27;
 }
 
 /* ------------------------------------------------------------------ *

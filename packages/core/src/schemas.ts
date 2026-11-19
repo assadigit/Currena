@@ -2397,6 +2397,166 @@ export const GoldXauOhlcSnapshotSchema = z
 export type GoldXauOhlcSnapshot = z.infer<typeof GoldXauOhlcSnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * LBMA London vault + clearing (GPE R24 / F22, 2026-11-19) — the two
+ * free monthly workbooks from cdn.lbma.org.uk ("Source: LBMA" + link +
+ * the four-field disclosure block per C6; display-only, no meter
+ * membership). ONE KV key (`insights:gold-lbma:v1`) carries both
+ * families; served at GET /api/insights/gold-lbma.
+ *
+ * The vault workbook (LBMA-London-Vault-Holdings-Data-<Month>.xlsx):
+ * 124 monthly rows 2016-07 → present, gold + silver in troy ounces
+ * '000s, one month in arrears. The clearing workbook
+ * (LBMA-Clearing-Data-<Month>.xlsx): 360 monthly rows 1996-11 →
+ * present, the LPMCL net transferred volumes (ounces in millions,
+ * value in $bn, transfers), ~one month deeper in arrears than the
+ * vault (measured live 2026-11-19 — s14 M1 §4b). Both files are
+ * newest-first in the wild; the wire shape is ASCENDING by month
+ * (the parser normalizes, the schema enforces).
+ * ------------------------------------------------------------------ */
+
+/** A YYYY-MM month, strictly shaped (the LBMA families' own axis). */
+export const LbmaYmSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
+export type LbmaYm = z.infer<typeof LbmaYmSchema>;
+
+/** One month of the London vault holdings (gold + silver, koz). */
+export const GoldLbmaVaultRowSchema = z.object({
+  month: LbmaYmSchema,
+  /** Gold held, thousand troy ounces. */
+  goldKoz: z.number().finite().nonnegative(),
+  /** Silver held, thousand troy ounces. */
+  silverKoz: z.number().finite().nonnegative(),
+});
+export type GoldLbmaVaultRow = z.infer<typeof GoldLbmaVaultRowSchema>;
+
+/** One month of the LPMCL clearing statistics. */
+export const GoldLbmaClearingRowSchema = z.object({
+  month: LbmaYmSchema,
+  /** Net gold transferred, million troy ounces. */
+  goldMoz: z.number().finite().nonnegative(),
+  /** Gold transfer value, US$ billions. */
+  goldValueBn: z.number().finite().nonnegative(),
+  /** Gold transfers count (the workbook prints decimals on some months —
+   *  2024-12 carries 5,970.8 — the raw value stores, display rounds). */
+  goldTransfers: z.number().finite().nonnegative(),
+  /** Net silver transferred, million troy ounces. */
+  silverMoz: z.number().finite().nonnegative(),
+  /** Silver transfer value, US$ billions. */
+  silverValueBn: z.number().finite().nonnegative(),
+  /** Silver transfers count. */
+  silverTransfers: z.number().finite().nonnegative(),
+});
+export type GoldLbmaClearingRow = z.infer<typeof GoldLbmaClearingRowSchema>;
+
+/** The value of `insights:gold-lbma:v1`, verbatim over the wire. */
+export const GoldLbmaSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The newest month any family carries (typically the vault's). */
+    asOf: LbmaYmSchema,
+    /** When the rung wrote this snapshot (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The vault holdings family (124+ monthly rows, ascending). */
+    vault: z.object({
+      asOf: LbmaYmSchema,
+      rows: z.array(GoldLbmaVaultRowSchema).min(24),
+      sourceUrl: z.string().url(),
+    }),
+    /** The clearing volumes family (360+ monthly rows, ascending). */
+    clearing: z.object({
+      asOf: LbmaYmSchema,
+      rows: z.array(GoldLbmaClearingRowSchema).min(120),
+      sourceUrl: z.string().url(),
+    }),
+  })
+  .refine((s) => s.vault.asOf >= s.clearing.asOf, {
+    message: 'the vault family should not run behind the clearing family (measured rhythms say otherwise — re-check the parse)',
+  })
+  .refine((s) => s.asOf === s.vault.asOf || s.asOf === s.clearing.asOf, {
+    message: 'the snapshot asOf must be one of the families\' own months',
+  });
+export type GoldLbmaSnapshot = z.infer<typeof GoldLbmaSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
+ * XAU crosses (GPE R26 / F10, 2026-11-19) — the multi-currency gold
+ * grid's one-key series: gold in EUR/JPY/GBP/CNY/AUD, daily EODHD
+ * closes. TWO NATIVE crosses (XAUEUR, XAUAUD — the only XAU crosses
+ * the provider's FOREX exchange carries, verified live s14 M1 §4a)
+ * and THREE DERIVED crosses (XAUJPY = XAUUSD × USDJPY, XAUGBP =
+ * XAUUSD ÷ GBPUSD, XAUCNY = XAUUSD × USDCNY — the FX_PAIRS
+ * cross-derivation grammar, inner-joined on common dates, the
+ * formula named at point of use per C1; the XAUUSD leg is the SAME
+ * stored series the chart reads — one series, never two).
+ *
+ * The free-tier depth posture (S13-D1, inherited): each series spans
+ * whatever depth the plan served at first collect (~1 year) and
+ * grows forward; the decile grammar discloses the basis window from
+ * the series itself. Display-only — no meter membership.
+ * ------------------------------------------------------------------ */
+
+/** The five grid currencies (the s8/01 R26 set). */
+export const GoldCrossIdSchema = z.enum(['eur', 'jpy', 'gbp', 'cny', 'aud']);
+export type GoldCrossId = z.infer<typeof GoldCrossIdSchema>;
+
+/** One daily close of a cross. */
+export const GoldCrossPointSchema = z.object({
+  date: z.iso.date(),
+  close: z.number().finite().positive(),
+});
+export type GoldCrossPoint = z.infer<typeof GoldCrossPointSchema>;
+
+/** One cross's stored series + its provenance (native vs derived). */
+export const GoldCrossSchema = z.object({
+  id: GoldCrossIdSchema,
+  /** native = the provider's own XAU<CCY> cross; derived = exact arithmetic over the EODHD legs. */
+  kind: z.enum(['native', 'derived']),
+  /** The C1 point-of-use name, e.g. 'XAUEUR.FOREX' or 'XAUUSD.FOREX × USDJPY.FOREX'. */
+  formula: z.string().min(1),
+  /** The daily closes, ascending by date (final bars only — S13-D3). */
+  series: z.array(GoldCrossPointSchema).min(2),
+});
+export type GoldCross = z.infer<typeof GoldCrossSchema>;
+
+/** The value of `insights:gold-xau-crosses:v1`, verbatim over the wire. */
+export const GoldXauCrossesSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The newest date any cross carries (every cross inner-joins to a common window). */
+    asOf: z.iso.date(),
+    /** When the rung wrote this snapshot (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The five crosses, GOLD_CROSS_IDS order (see the engine). */
+    crosses: z.array(GoldCrossSchema).min(5).max(5),
+    /** The three FX legs the derived crosses were computed over (stored so
+     *  the next run's trailing re-fetch MERGES instead of truncating — and
+     *  so the card can name every leg it rests on, per C1). */
+    fxLegs: z
+      .array(
+        z.object({
+          symbol: z.string().min(1),
+          series: z.array(GoldCrossPointSchema).min(2),
+        }),
+      )
+      .min(3)
+      .max(3),
+    /** The provider URLs the grid names at point of use (C1/C6). */
+    sourceUrls: z.array(z.string().url()).min(1),
+  })
+  .refine((s) => new Set(s.crosses.map((c) => c.id)).size === s.crosses.length, {
+    message: 'each cross id appears at most once',
+  })
+  .refine(
+    (s) =>
+      s.crosses.every((c) =>
+        c.series.every((p, i) => i === 0 || p.date > c.series[i - 1]!.date),
+      ),
+    { message: 'cross series dates must be strictly ascending' },
+  )
+  .refine((s) => s.crosses.every((c) => c.series[c.series.length - 1]!.date <= s.asOf), {
+    message: 'cross series cannot extend past the snapshot asOf',
+  });
+export type GoldXauCrossesSnapshot = z.infer<typeof GoldXauCrossesSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)
  *
  * The Prices board's four assets (Brent, gold, silver, Bitcoin) plus their
