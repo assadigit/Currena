@@ -28,7 +28,8 @@
     "./prices": "./src/shared/prices/index.ts",
     "./ingest": "./src/shared/ingest/index.ts",
     "./page-division": "./src/page-division/index.ts",
-    "./gf-p0-proposed": "./src/domains/gold/gf-p0-proposed.ts"
+    "./gf-p0-proposed": "./src/domains/gold/gf-p0-proposed.ts",
+    "./if-bought": "./src/domains/gold/if-bought.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
@@ -76,7 +77,8 @@
     "gf-live-verify": "tsx scripts/gf-live-verify.ts",
     "gf-p4-record-candidates": "tsx scripts/gf-p4-record-candidates.ts",
     "gf-p4-verify": "tsx scripts/gf-p4-verify.ts",
-    "gf-p4-backfill": "tsx scripts/gf-p4-backfill.ts"
+    "gf-p4-backfill": "tsx scripts/gf-p4-backfill.ts",
+    "gold-ifbought-run": "tsx scripts/gold-ifbought-run.ts"
   },
   "dependencies": {
     "@currena/core": "workspace:*",

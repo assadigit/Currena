@@ -36,6 +36,7 @@ import { GoldYieldDecomposition } from './GoldYieldDecomposition';
 import { GoldOnRamp } from './GoldOnRamp';
 import { GoldExpectations } from './GoldExpectations';
 import { GoldEpisodes } from './GoldEpisodes';
+import { GoldIfBought } from './GoldIfBought';
 import { GoldIranBridge } from './GoldIranBridge';
 import { GoldPremiumHistory } from './GoldPremiumHistory';
 import { GoldCbDemand } from './GoldCbDemand';
@@ -360,8 +361,14 @@ export function GoldPage(): React.JSX.Element {
           static module + the dictionaries; the price path + the
           comparison rider are DROP-GATED (the WGC prices workbook —
           S15-D4) and render the honest waiting state until the
-          gold-episodes-run runner writes the key. */}
+          gold-episodes-run runner writes the key.
+          GPE R33 / F26 (2026-11-19, S17) — the "if you'd bought"
+          calculator joins the SAME zone (the s6/01 zone 16 placement:
+          both Zone O surfaces behind progressive disclosure — collapsed
+          cards, one tap each). */}
       <GoldEpisodes />
+
+      <GoldIfBought />
 
       {/* The R-5 details panel (docs/page-division/07) — rendered once at
           the page root; the context cards' stretched opener targets it. */}

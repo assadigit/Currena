@@ -27,6 +27,8 @@ const runGoldPremiumHistoryIngest = vi.hoisted(() => vi.fn());
 const KvGoldPremiumStore = vi.hoisted(() => class {});
 const runGoldMeterHistoryIngest = vi.hoisted(() => vi.fn());
 const KvGoldMeterStore = vi.hoisted(() => class {});
+const runGoldIfBoughtRefresh = vi.hoisted(() => vi.fn());
+const KvGoldIfBoughtStore = vi.hoisted(() => class {});
 
 vi.mock('@currena/scraper', () => ({
   scrapeTgju,
@@ -56,6 +58,10 @@ vi.mock('@currena/insights/premium-history', () => ({
 vi.mock('@currena/insights/meter-history', () => ({
   runGoldMeterHistoryIngest,
   KvGoldMeterStore,
+}));
+vi.mock('@currena/insights/if-bought', () => ({
+  runGoldIfBoughtRefresh,
+  KvGoldIfBoughtStore,
 }));
 
 const api = await import('./index');
@@ -329,6 +335,43 @@ describe('the minute-cron wrapper (keep-warm backbone, audit C-4)', () => {
     await worker.scheduled(eventAtUtc(4, 48), { RATES: kv }, ctx);
 
     expect(runGoldMeterHistoryIngest).not.toHaveBeenCalled();
+  });
+
+  /* GPE R33 — the 04:49 UTC if-bought rung (the calculator's daily
+   * refresh — the running points + the month-turn anchor). */
+
+  it('the 04:49 UTC rung refreshes the if-bought running points (GPE R33)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T04:49:05.000Z'));
+
+    await worker.scheduled(eventAtUtc(4, 49), { RATES: kv }, ctx);
+
+    expect(runGoldIfBoughtRefresh).toHaveBeenCalledTimes(1);
+    expect(runGoldIfBoughtRefresh).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ getPublicSnapshot: expect.any(Function), getMarketsSnapshot: expect.any(Function) }));
+  });
+
+  it('an off-ifbought minute (04:48) never runs the rung', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T04:48:05.000Z'));
+
+    await worker.scheduled(eventAtUtc(4, 48), { RATES: kv }, ctx);
+
+    expect(runGoldIfBoughtRefresh).not.toHaveBeenCalled();
+  });
+
+  it('an ifbought-rung failure never marks the whole invocation failed (the fault isolation)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T04:49:05.000Z'));
+    runGoldIfBoughtRefresh.mockResolvedValue({
+      outcome: { ok: false, kind: 'blocked' as const, note: 'no if-bought key in KV — nothing written (the backfill runner owns the first write)' },
+      kv: { reads: 1, writes: 0 },
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await expect(
+      worker.scheduled(eventAtUtc(4, 49), { RATES: kv }, ctx),
+    ).resolves.toBeUndefined();
+
+    expect(map.has('snapshot:tgju')).toBe(true); // the ladder's work survived
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('gold-ifbought failed (blocked)'));
+    warn.mockRestore();
   });
 
   it('a meter-rung failure never marks the whole invocation failed (the fault isolation)', async () => {

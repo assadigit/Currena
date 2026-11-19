@@ -21,9 +21,10 @@ import type { PricesJobFetchers } from '@currena/insights/prices';
 import { runGoldExpectationsIngest, KvGoldExpectationsStore } from '@currena/insights/expectations';
 import { runGoldPremiumHistoryIngest, KvGoldPremiumStore } from '@currena/insights/premium-history';
 import { runGoldMeterHistoryIngest, KvGoldMeterStore } from '@currena/insights/meter-history';
+import { runGoldIfBoughtRefresh, KvGoldIfBoughtStore } from '@currena/insights/if-bought';
 import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
 import { runScheduledNarrator, NARRATOR_CRON_MINUTE } from './narrator-cron';
-import { KvInsightsReader } from './adapters/insights-store';
+import { KvInsightsReader, KvMarketsReader } from './adapters/insights-store';
 import {
   insightsIngestRung,
   runScheduledInsightsIngest,
@@ -147,6 +148,34 @@ export async function runScheduledGoldMeterHistory(env: Bindings, now?: Date): P
   }
 }
 
+/**
+ * GPE R33 / F26 (2026-11-19, the S17-D5 record): the if-bought
+ * calculator's daily refresh — the four running points off the page's
+ * own planes (the public projection's readings + the markets board's
+ * stored close — KV reads, ZERO fetches); the month-turn freezes the
+ * prior running point as the new month-end anchor. Fires 04:49 UTC —
+ * clear of every other rung (incl. the 04:47 meter twin; the
+ * PRICES_CRON_MINUTE pattern, NO new cron trigger). Write-if-changed;
+ * a missing key or stale projection writes nothing (the last-good
+ * discipline).
+ */
+export const GOLD_IF_BOUGHT_CRON = { hour: 4, minute: 49 } as const;
+
+/** The daily if-bought rung (exported for tests; the cron calls it). */
+export async function runScheduledGoldIfBought(env: Bindings, now?: Date): Promise<void> {
+  const store = new KvGoldIfBoughtStore(env.RATES);
+  const result = await runGoldIfBoughtRefresh(store, {
+    getPublicSnapshot: async () => new KvInsightsReader(env.RATES).getPublicSnapshot(),
+    getMarketsSnapshot: async () => new KvMarketsReader(env.RATES).getMarkets(),
+    ...(now !== undefined ? { now } : {}),
+  });
+  if (result.outcome.ok) {
+    console.log(`[cron] gold-ifbought ok — ${result.outcome.note ?? 'done'}`);
+  } else {
+    console.warn(`[cron] gold-ifbought failed (${result.outcome.kind}): ${result.outcome.note}`);
+  }
+}
+
 /** The hourly live-prices refresh (exported for tests; the cron calls it). */
 export async function runScheduledPricesRefresh(
   env: Bindings,
@@ -243,6 +272,15 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
       ? [
           runScheduledGoldMeterHistory(env).catch((err: unknown) => {
             console.warn('[cron] gold-meter-history rung failed:', err instanceof Error ? err.message : err);
+          }),
+        ]
+      : []),
+    // GPE R33 / F26: the daily if-bought rung (04:49 UTC — the S17-D5
+    // record) — fault-isolated the same way.
+    ...(date.getUTCHours() === GOLD_IF_BOUGHT_CRON.hour && minute === GOLD_IF_BOUGHT_CRON.minute
+      ? [
+          runScheduledGoldIfBought(env).catch((err: unknown) => {
+            console.warn('[cron] gold-ifbought rung failed:', err instanceof Error ? err.message : err);
           }),
         ]
       : []),

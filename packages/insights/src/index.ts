@@ -417,3 +417,20 @@ export {
   forecastRetrospective,
 } from './domains/gold/lbma-forecast';
 export type { LbmaForecastRetrospective, LbmaForecastScoredYear, LbmaForecastYear } from './domains/gold/lbma-forecast';
+
+// GPE R33 / F26 (docs/specs/gold-page-elevation s8/01 R33 · s5/02 F26 ·
+// s1/07 §4 the SA precedent · the s17 M1 §5 + S17-D5 records): the
+// "if you'd bought" calculator's PURE compute — the lump multiple, the
+// MONTHLY DCA ($100 at each month-end close, the SA convention), and
+// the decile of the window's lump return among all same-length windows
+// (the R19 posture: min base 30, the basis named, the honest waiting
+// line). Every window named at point of use. The store/job halves live
+// behind the "@currena/insights/if-bought" subpath — the SPA-facing
+// root export stays platform-free.
+export {
+  IF_BOUGHT_DECILE_MIN_BASE,
+  IF_BOUGHT_DCA_MONTHLY,
+  ifBoughtResult,
+  windowCloses,
+} from './domains/gold/if-bought';
+export type { IfBoughtResult } from './domains/gold/if-bought';

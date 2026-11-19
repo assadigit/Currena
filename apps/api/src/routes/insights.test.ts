@@ -1704,3 +1704,85 @@ describe('GET /api/insights/gold-meter (GPE R31)', () => {
     expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_meter_unavailable');
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * GPE R33 — GET /api/insights/gold-ifbought (the calculator's one-key
+ * series; the s17 M1 §5 + S17-D5 records).
+ * ------------------------------------------------------------------ */
+
+const ifBoughtSnapshot: import('@currena/core').GoldIfBoughtSnapshot = {
+  v: 1,
+  asOf: '2026-11-19',
+  fetchedAt: '2026-11-19T04:49:00.000Z',
+  backfill: {
+    from: '2016-11',
+    to: '2026-10',
+    months: 121,
+    sp500Source: 'https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=10y&interval=1d',
+    fetchedAt: '2026-11-19T04:49:00.000Z',
+  },
+  assets: {
+    gold: {
+      monthly: [{ ym: '2026-09', close: 2600 }, { ym: '2026-10', close: 3800 }],
+      current: { ym: '2026-11', close: 3900, updatedAt: '2026-11-19T04:49:00.000Z' },
+    },
+    silver: {
+      monthly: [{ ym: '2026-09', close: 44 }, { ym: '2026-10', close: 44.5 }],
+      current: { ym: '2026-11', close: 45, updatedAt: '2026-11-19T04:49:00.000Z' },
+    },
+    btc: {
+      monthly: [{ ym: '2026-09', close: 60_000 }, { ym: '2026-10', close: 87_000 }],
+      current: { ym: '2026-11', close: 87_500, updatedAt: '2026-11-19T04:49:00.000Z' },
+    },
+    sp500: {
+      monthly: [{ ym: '2026-09', close: 5600 }, { ym: '2026-10', close: 5800 }],
+      current: { ym: '2026-11', close: 5900, updatedAt: '2026-11-19T04:49:00.000Z' },
+    },
+  },
+};
+
+describe('GET /api/insights/gold-ifbought (GPE R33)', () => {
+  function makeApp(reader?: { getGoldIfBought(): Promise<import('@currena/core').GoldIfBoughtSnapshot | undefined> }) {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldIfBoughtReader: () => reader ?? { getGoldIfBought: async () => undefined },
+    });
+  }
+
+  it('serves the stored series verbatim with ETag + the public cache stamp', async () => {
+    const app = makeApp({ getGoldIfBought: async () => ifBoughtSnapshot });
+    const res = await app.request('/api/insights/gold-ifbought', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    expect(res.headers.get('x-robots-tag')).toBe('noindex');
+    expect(await res.json()).toEqual(ifBoughtSnapshot);
+    expect(res.headers.get('etag')).toBe(`"insights-gold-ifbought:${ifBoughtSnapshot.asOf}:${ifBoughtSnapshot.fetchedAt}:2`);
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const app = makeApp({ getGoldIfBought: async () => ifBoughtSnapshot });
+    const res0 = await app.request('/api/insights/gold-ifbought', undefined, env);
+    const etag = res0.headers.get('etag') ?? '';
+    const res = await app.request('/api/insights/gold-ifbought', { headers: { 'if-none-match': etag } }, env);
+    expect(res.status).toBe(304);
+  });
+
+  it('answers 503 gold_ifbought_not_ready (calm) when KV is empty — the pre-backfill state', async () => {
+    const res = await makeApp().request('/api/insights/gold-ifbought', undefined, env);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('gold_ifbought_not_ready');
+    expect(body.error.message).toContain('scheduled job has not completed');
+  });
+
+  it('a reader rejection surfaces as the calm 503 gold_ifbought_unavailable (never a raw 500)', async () => {
+    const app = makeApp({
+      getGoldIfBought: async () => {
+        throw new Error('KV read failed');
+      },
+    });
+    const res = await app.request('/api/insights/gold-ifbought', undefined, env);
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_ifbought_unavailable');
+  });
+});

@@ -1335,6 +1335,30 @@ export const en = {
       frPairNote: 'Currena’s meter claims no forecasting edge — its own measured no-edge record sits above this card. This card exists to show what the professionals’ published consensus actually did, never to imply ours predicts better.',
       frSourceLine: 'Source: LBMA forecast survey — the performance page’s own chart data, extracted {date}.',
       frSourceLink: 'LBMA’s survey pages',
+      /* GPE R33 / F26 (2026-11-19, S17): the "if you'd bought"
+       * calculator — Zone O's collapsed Advanced card (s6/01 zone 16 ·
+       * s6/03 zone O "year picker + stacked result rows at 390" ·
+       * s1/07 §4 the SA precedent). Every window named at point of use;
+       * the decile framing where the history supports it (the R19
+       * posture); past returns are no guarantee of future results. */
+      ibTitle: 'If you’d bought',
+      ibSubtitle: 'Gold vs S&P vs Bitcoin vs silver, lump + $100-a-month, since the year you pick.',
+      ibLoading: 'Reading the series…',
+      ibWaiting: 'The month-end series arrives with the calculator’s one-time backfill — nothing is drawn here until it lands.',
+      ibMethod: 'Lump: one purchase at the first month-end close. DCA: ${amount} at every month-end close, marked at the running month’s close. Both compute from our own stored month-end series — every window is named on its result row.',
+      ibPickLabel: 'Since',
+      ibFirstYearNote: 'from November',
+      ibWindowLine: '{from} → {to} · {n} months',
+      ibDcaLine: 'DCA: {invested} → {value} ({pct})',
+      ibDecileLine: 'This window’s return: decile {d} of {n} same-length windows.',
+      ibDecileWaiting: 'The decile lights at {min} same-length windows — this window has {n}.',
+      ibNoWindow: 'No month-end close at or after this year yet — never a guess.',
+      ibDisclaimer: 'Past returns are no guarantee of future results. This is a descriptive tool, not advice.',
+      ibSourcesLine: 'Month-end closes {from} → {to}: gold, silver, Bitcoin from our own daily series; S&P 500 from the world board’s own Yahoo venue.',
+      ibAssetGold: 'Gold',
+      ibAssetSp500: 'S&P 500',
+      ibAssetBtc: 'Bitcoin',
+      ibAssetSilver: 'Silver',
       /* GPE R14: the buyers-table country names (the current cast's IMF
        * codes; an unmapped code renders the code itself — fail-closed). */
       cbCountries: {

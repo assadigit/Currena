@@ -68,6 +68,7 @@ import type { GoldEpisodesReader } from '@currena/insights/episodes';
 import type { GoldPremiumReader } from '@currena/insights/premium-history';
 import type { GoldMeterReader } from '@currena/insights/meter-history';
 import { GOLD_METER_ERA_START, goldMeterMeta } from '@currena/insights/meter-history';
+import type { GoldIfBoughtReader } from '@currena/insights/if-bought';
 import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
@@ -156,6 +157,9 @@ interface InsightsRouteDeps {
   /** GPE R31: the gold meter's time machine (the year-sharded history —
    *  the backfill + the 04:47 UTC rung's forward rows). */
   getGoldMeterReader: (env: Bindings) => GoldMeterReader;
+  /** GPE R33: the if-bought calculator's series (the backfill + the
+   *  04:49 UTC rung's daily refresh). */
+  getGoldIfBoughtReader: (env: Bindings) => GoldIfBoughtReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
   /**
@@ -1203,6 +1207,70 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       ETag: etag,
       'X-Robots-Tag': 'noindex',
     });
+  });
+
+  // GPE R33 / F26 (2026-11-19, S17): the "if you'd bought" calculator's
+  // ONE-key series (insights:gold-ifbought:v1, the gold-lbma literal-path
+  // twin) — per-asset month-end closes since 2016-11 (the backfill: the
+  // stage blob for gold/silver/btc + the markets board's own Yahoo venue
+  // for the S&P leg) + the CURRENT running point refreshed daily by the
+  // 04:49 UTC rung from the page's own planes (the public projection +
+  // the markets board — KV reads, zero fetches). The SPA computes lump +
+  // monthly DCA + the decile framing client-side through the pure
+  // engine. Staleness is data-carried (the asOf day + the fetchedAt
+  // stamp); no licence reason to hide (gold-api/TGJU/Yahoo — the prices
+  // board's own families); the per-source kill switch still applies.
+  app.get('/gold-ifbought', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-ifbought')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    if (typeof caches !== 'undefined') {
+      const edgeCached = await caches.default.match(c.req.raw);
+      if (edgeCached !== undefined) return edgeCached;
+    }
+    let snapshot: import('@currena/core').GoldIfBoughtSnapshot | undefined;
+    try {
+      snapshot = await deps.getGoldIfBoughtReader(c.env).getGoldIfBought();
+    } catch (err) {
+      console.warn('[insights] gold-ifbought read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_ifbought_unavailable',
+        'The if-bought series is temporarily unavailable — please retry shortly.',
+      );
+    }
+    if (!snapshot) {
+      // The calm "being prepared" answer: the key has never been written
+      // (the backfill runner has not landed its first write).
+      return errorResponse(
+        c,
+        503,
+        'gold_ifbought_not_ready',
+        'No if-bought series stored yet — the scheduled job has not completed.',
+      );
+    }
+    const etag = `"insights-gold-ifbought:${snapshot.asOf}:${snapshot.fetchedAt}:${snapshot.assets.gold.monthly.length}`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, {
+        'Cache-Control': 'public, max-age=300, s-maxage=300',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    const response = c.json(snapshot, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
+    if (typeof caches !== 'undefined') {
+      try {
+        await caches.default.put(c.req.raw, response.clone());
+      } catch {
+        /* cache warm failures never fail the request */
+      }
+    }
+    return response;
   });
 
   app.get('/status', async (c) => {
