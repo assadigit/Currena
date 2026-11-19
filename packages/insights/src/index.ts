@@ -398,3 +398,22 @@ export type {
   CompanyReading,
   CompanySeriesPoint,
 } from './companies/adapter';
+
+// GPE R32 / F23 (docs/specs/gold-page-elevation s8/01 R32 · s4/02 §1d
+// the live extraction · s6/01 zone 14 the collapsed companion inside
+// the honest-record zone · the s17 M1 §3 + S17-D4 records): the
+// forecast-accuracy retrospective's static series + PURE compute — the
+// LBMA analyst-survey vs actual 2010–2026 (the professionals' own
+// published consensus record: 10 of 16 years under-forecast, mean miss
+// −2.11%, mean-abs 8.13%, 2025 −20.24%), the honesty device that pairs
+// with the published no-edge backtest. Static data + one function; the
+// annual upkeep is one dated appended row (the gold-episodes-records
+// precedent).
+export {
+  LBMA_2026_MIDYEAR_REVISION,
+  LBMA_FORECAST_EXTRACTED_AT,
+  LBMA_FORECAST_SERIES,
+  LBMA_FORECAST_SOURCE_URL,
+  forecastRetrospective,
+} from './domains/gold/lbma-forecast';
+export type { LbmaForecastRetrospective, LbmaForecastScoredYear, LbmaForecastYear } from './domains/gold/lbma-forecast';

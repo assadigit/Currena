@@ -26,6 +26,7 @@ import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { COT_BAND_IDS, GOLD_BLOCKED_NOTES, GOLD_DISPLAY, cotBandOf, type GoldContextEntry, type GoldContextId, type GoldUnitToken } from './gold-tiles';
 import { GoldCurrencyGrid } from './GoldCurrencyGrid';
+import { GoldForecastRetrospective } from './GoldForecastRetrospective';
 
 /** The context-card name keys — 14 literal keys (the copy-pin test proves
  *  each matches the indicators corpus byte-for-byte). */
@@ -436,6 +437,14 @@ export function GoldContext({
         <p className="m-0 text-[length:var(--type-caption)] font-semibold leading-relaxed text-[var(--color-text-secondary)]">
           <bdi>{t('pd.gold.noEdge')}</bdi>
         </p>
+        {/* GPE R32 / F23 (2026-11-19, S17) — the forecast-accuracy
+            retrospective: the COLLAPSED COMPANION inside this zone
+            (s6/01 zone 14 — trust-band contiguity preserved, S6-D2).
+            LBMA's own analyst-survey record (the professionals'
+            published consensus missed by mean −2.1% / mean-abs 8.1%
+            over 2010–2025) BESIDE our own no-edge record — the honesty
+            device SA cannot copy (O8). */}
+        <GoldForecastRetrospective />
       </footer>
     </section>
   );

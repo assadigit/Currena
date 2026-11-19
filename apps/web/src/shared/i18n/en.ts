@@ -1317,8 +1317,24 @@ export const en = {
       tmProvenanceLive: 'The day’s own snapshot — the page’s plane, captured live.',
       tmNoRow: 'No stored reading for {date} yet — the honest gap, never a guess.',
       tmUnavailable: 'The archive could not be read for {date} — please try again shortly.',
-      /* GPE R23 / F32 (the R32 row's cards) — reserved for the
-       * retrospective + calculator keys below. */
+      /* GPE R32 / F23 (2026-11-19, S17): the forecast-accuracy
+       * retrospective — Zone M's collapsed companion inside the
+       * honest-record zone (s6/01 zone 14 · s4/02 §1d the extraction ·
+       * the s17 M1 §3 record: every aggregate reproduces exactly). */
+      frTitle: 'Even the consensus misses',
+      frSubtitle: 'LBMA’s analyst survey under-forecast gold in {under} of {n} years — mean absolute miss {abs}.',
+      frHeadline: 'The professionals’ published consensus missed gold’s actual average in {under} of {n} years (2010–2025): the mean miss is {mean}, the mean absolute miss {abs}. The numbers are LBMA’s own.',
+      fr2025Line: '2025 — the biggest miss of the record: {miss} (consensus {forecast} vs actual {actual}).',
+      frColYear: 'Year',
+      frColForecast: 'Forecast',
+      frColActual: 'Actual',
+      frColMiss: 'Miss',
+      frPendingCell: 'in progress',
+      frMissConvention: 'Miss = (forecast − actual) ÷ actual. Negative = the consensus under-forecast the actual average price.',
+      frPendingLine: '2026 in progress: the January consensus says ${forecast}; LBMA’s own July pulse revised the whole-year figure to ${revision} — both recorded with their own contexts, never reconciled.',
+      frPairNote: 'Currena’s meter claims no forecasting edge — its own measured no-edge record sits above this card. This card exists to show what the professionals’ published consensus actually did, never to imply ours predicts better.',
+      frSourceLine: 'Source: LBMA forecast survey — the performance page’s own chart data, extracted {date}.',
+      frSourceLink: 'LBMA’s survey pages',
       /* GPE R14: the buyers-table country names (the current cast's IMF
        * codes; an unmapped code renders the code itself — fail-closed). */
       cbCountries: {
