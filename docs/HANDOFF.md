@@ -1,6 +1,63 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (S14 — GPE P3, the Supporting tier's first session; DONE AND VERIFIED LIVE)
+## This session (S15 — GPE P3, the Supporting tier's second session; DONE AND VERIFIED LIVE)
+
+**Outcome:** the rows R28 (F24 the Fed-probabilities card — **the
+Kalshi leg DELIBERATELY DROPPED on the Developer-Agreement wording
+read's verdict** [s15 M1 §1: the agreement's own §3/§3.1 prohibit
+non-own-trading use, collecting/caching/storing, and third-party
+sharing; the pre-committed worst case fired exactly as the roadmap
+recorded it] — the card renders the POLYMARKET leg alone, honestly
+named as ONE venue with the traders'-not-ours disclaimer, the
+30-minute :23/:53 cron refresh, the rolling discovery rule, the
+gold-expectations-run seed runner) · R29 (F25 the calendar strip —
+the next Fed/CPI events off the SAME insights snapshot's calendar
+field, zero new fetches, the zone named at point of use, Jalali
+dates for fa) · R25 (F6 the Episode Explorer — the nine-record
+launch list 1971→2024-26 as the typed static module with every
+EN/FA editorial string riding the dictionaries, the hasData
+honesty flags, the 2016+ meter-era boundary, the out-bound-only
+links, and the DROP-GATED price path + comparison rider rendering
+the honest waiting states until the WGC prices-workbook drop
+lands — the adapter/runner/route/engine all ship READY: the day
+the drop lands at data/wgc/prices/, one `gold-episodes-run` command
+lights the paths) landed, tested, deployed, and live-verified.
+**R15/R23 stayed pending** (no WGC drop — the fifth consecutive
+session for R15; the fold rule; the wall's WGC CB line stays).
+Production is currena-api **`83359c39` @ 100%** (created
+2026-11-19T06:10:56Z, first attempt clean; the D-43 deploy-lock
+re-checked FIRST — `61180d7f` was still active, no drift) **+ the
+gold-expectations KV seed** (the December Fed event: +25 bp 91.5% ·
++50+ 6.3% · unchanged 2.4% — the :23 rung refreshed it live minutes
+after the seed, the honest as-of label carrying the move). The
+branch `gold-elevation/p3-expectations` is pushed with the
+session's four commits (the M1 docs `75f7a55f` · the backend
+`023e2e92` · the three surfaces `f0ac6b96` · the manifest round +
+budget `9f7a8cc7`) + the close commit. Gates 9/9 GREEN (suite
+**15,462**, +87: the insights 56 + the api 14 + the web 18 new
+tests). The Persian-copy manifest round 88 landed the session's 140
+fa strings (8,277 → **8,417** entries; copy:audit clean; the
+terminology additions: واحد پایه · احتمال ضمن بازار · رخداد ·
+میانگین ماهانه). The GoldPage budget bumped 179/40 → **210/45.5**
+(measured 207.17/44.12, verified not duplication). The live-verify
+matrix: 13/13 PASS across EN desktop + fa RTL + mobile 390, zero
+console errors (the seven screenshots: s15/verify-*.png). One
+environment incident, honestly recorded: the sandbox's direct tool
+channel wedged mid-session — the remaining work ran through
+delegated subagent shells with every step still verified. The
+session summary + the S16 next-session prompt are
+docs/specs/gold-page-elevation/s15/SUMMARY.md.
+
+**Program counter: Session 15/18 · 3 remaining (S16–S18).** Next:
+S16 = P3's third session (R30 Bridge-2 — the حباب premium history +
+deciles + the day-move attribution strip + the TGJU profile-history
+backfill + the CBI gerami pin attempt; **if the WGC prices workbook
+has arrived, run the gold-episodes-run runner to light the
+Explorer's paths** — the S15-shipped machinery; R15/R23 stay
+drop-conditional — the S16 prompt is in s15/SUMMARY.md's
+next-session section).
+
+## Previous session (S14 — GPE P3, the Supporting tier's first session; DONE AND VERIFIED LIVE)
 
 **Outcome:** the rows R22 (F11 the correlation companion — the four
 mandated layers, the pre-registered windows printed) · R24 (F22 the
