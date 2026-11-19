@@ -2823,6 +2823,225 @@ export const GoldPremiumHistorySnapshotSchema = z
 export type GoldPremiumHistorySnapshot = z.infer<typeof GoldPremiumHistorySnapshotSchema>;
 
 /* ------------------------------------------------------------------ *
+ * GPE R31 / F12 (2026-11-19, S17) — the gold METER's time machine: the
+ * date-parameterized, readings-only projection of the consolidated
+ * balance over the meter era (2016+, the anti-synthesis boundary of
+ * s7/03 §3.4 — never a pre-2016 verdict; the only historical-meter
+ * surface).
+ *
+ * YEAR-SHARDED KV keys (`insights:gold-meter-history:v1:<YYYY>`, the
+ * S17-D1 record): one read per request preserved while the era's
+ * ~2,500 compact rows never form one ~1 MB blob the free-plan CPU
+ * budget would have to parse per request. Each row is COMPACT by the
+ * D7-locked minimal sizing — the readings/beam/lane counts, NO
+ * per-voter member lists (the historical view mirrors the hero's own
+ * lane-chip surface).
+ *
+ * TWO provenances per row, the honesty line rendered at point of use:
+ *   - 'backfill' — reconstructed from the stored series (the ingest
+ *     stage blob + the per-id history fallbacks) at a frozen clock
+ *     with NO LOOKAHEAD (seriesUpTo, the backtest's own machinery);
+ *     under the THEN-CURRENT versioned voter table (the dated
+ *     registry, S17-D2 — the era basis is the published backtest's
+ *     own S4-frozen 20-seat table).
+ *   - 'live' — the 04:47 UTC rung's forward row from the public
+ *     projection's own readings (the page's own plane; a live row
+ *     overwrites a backfill row on date collision, never the reverse
+ *     — the S16-D2 rule).
+ * ------------------------------------------------------------------ */
+
+/** The meter-era boundary (s7/03 §3.4, binding): no meter state exists before 2016-11. */
+export const GOLD_METER_ERA_START = '2016-11-01';
+
+/** How a meter-history row was produced — the honesty line renders it. */
+export const GoldMeterRowSourceSchema = z.enum(['backfill', 'live']);
+export type GoldMeterRowSource = z.infer<typeof GoldMeterRowSourceSchema>;
+
+/** One lane's side + tallies in a meter-history row (the harness lane vote's own fields). */
+export const GoldMeterLaneRowSchema = z.object({
+  /** The lane id (GOLD_LANES order — five since GF-P2). */
+  lane: z.enum(['borrowing-costs', 'dollar', 'stress', 'inflation', 'flows']),
+  /** The lane's side that day. */
+  side: z.enum(['for', 'against', 'neutral', 'unread']),
+  /** true when side is 'neutral' because supports === pressures > 0 (the mixed chip). */
+  split: z.boolean(),
+  /** Voters readable that day (not missing/stale/check-pending/unavailable). */
+  readable: z.number().int().min(0),
+  /** supports + pressures. */
+  firing: z.number().int().min(0),
+  supports: z.number().int().min(0),
+  pressures: z.number().int().min(0),
+});
+export type GoldMeterLaneRow = z.infer<typeof GoldMeterLaneRowSchema>;
+
+/** One day's compact meter reading — the readings/beam/lane counts. */
+export const GoldMeterTableRowSchema = z.object({
+  /** The day the row belongs to (ISO date). */
+  date: z.iso.date(),
+  /** How the row was produced — the honesty line renders it. */
+  source: GoldMeterRowSourceSchema,
+  /** The versioned voter table the row was computed under (the registry's own id). */
+  tableVersion: z.string().min(1),
+  /** The balance's verdict state that day. */
+  state: z.enum(['tipped-for', 'tipped-against', 'level', 'none']),
+  /** The beam angle in degrees (|net| ÷ (for+against) × 10, clamped [3,10]; 0 when level). */
+  beamAngle: z.number().min(0).max(10),
+  /** |net| === for + against — the one-sided, full 10-degree tip. */
+  fullyTipped: z.boolean(),
+  /** lanesFor − lanesAgainst. */
+  net: z.number().int(),
+  /** for + against + neutral lane counts. */
+  readable: z.number().int().min(0),
+  /** The lane counts, the hero's own vocabulary. */
+  counts: z.object({
+    for: z.number().int().min(0),
+    against: z.number().int().min(0),
+    neutral: z.number().int().min(0),
+    unread: z.number().int().min(0),
+  }),
+  /** The five lane votes, GOLD_LANES order (the pre-flows tables read the flows lane honestly unread). */
+  lanes: z.array(GoldMeterLaneRowSchema).length(5),
+});
+export type GoldMeterTableRow = z.infer<typeof GoldMeterTableRowSchema>;
+
+/** The value of `insights:gold-meter-history:v1:<YYYY>`, verbatim over the wire. */
+export const GoldMeterYearDocSchema = z
+  .object({
+    v: z.literal(1),
+    /** The calendar year the shard covers. */
+    year: z.number().int().min(2016),
+    /** When the shard was last written (ISO 8601 UTC). */
+    fetchedAt: z.iso.datetime(),
+    /** The rows, ascending by date, unique. */
+    rows: z.array(GoldMeterTableRowSchema).min(1),
+  })
+  .refine((s) => s.rows.every((r) => r.date.slice(0, 4) === String(s.year)), {
+    message: 'every meter-history row must belong to its shard year',
+  })
+  .refine((s) => s.rows.every((r, i) => i === 0 || r.date > s.rows[i - 1]!.date), {
+    message: 'meter-history rows must be strictly ascending and unique',
+  });
+export type GoldMeterYearDoc = z.infer<typeof GoldMeterYearDocSchema>;
+
+/** One registry entry in the time machine's meta (the dated voter-table lineage). */
+export const GoldMeterTableVersionInfoSchema = z.object({
+  /** The registry id (the row's own tableVersion). */
+  id: z.string().min(1),
+  /** The first day (inclusive) the version is the then-current table. */
+  effectiveFrom: z.iso.date(),
+  /** How many voter seats the table carries. */
+  seats: z.number().int().min(1),
+});
+export type GoldMeterTableVersionInfo = z.infer<typeof GoldMeterTableVersionInfoSchema>;
+
+/** GET /api/insights/gold-meter — the meta document (no date requested). */
+export const GoldMeterMetaSchema = z.object({
+  v: z.literal(1),
+  /** The meter-era boundary — never a pre-2016 verdict (s7/03 §3.4). */
+  eraStart: z.iso.date(),
+  /** The dated voter-table registry (S17-D2), effective-ordered. */
+  tableVersions: z.array(GoldMeterTableVersionInfoSchema).min(1),
+});
+export type GoldMeterMeta = z.infer<typeof GoldMeterMetaSchema>;
+
+/** GET /api/insights/gold-meter?date=… — the day's reading (the latest row ≤ date). */
+export const GoldMeterResponseSchema = z.object({
+  v: z.literal(1),
+  /** The requested day (ISO date). */
+  requestedDate: z.iso.date(),
+  /** The latest row on or before the requested day — null when no stored
+   * reading exists that early (the honest gap, never a guess). */
+  row: GoldMeterTableRowSchema.nullable(),
+  /** The meta (the era boundary + the registry), so the card teaches itself. */
+  meta: GoldMeterMetaSchema,
+});
+export type GoldMeterResponse = z.infer<typeof GoldMeterResponseSchema>;
+
+/* ------------------------------------------------------------------ *
+ * GPE R33 / F26 (2026-11-19, S17) — the "if you'd bought" calculator's
+ * ONE-key series (`insights:gold-ifbought:v1`, the gold-lbma pattern):
+ * per-asset month-end closes since 2016-11 (gold/silver/btc backfilled
+ * from the ingest stage blob; the S&P 500 leg from the markets board's
+ * own keyless Yahoo provider — recorded, S17-D5) plus the CURRENT
+ * running point refreshed daily by the 04:49 UTC rung from the page's
+ * own planes (the public projection's readings + the markets board's
+ * own stored close — KV reads, zero fetches).
+ * ------------------------------------------------------------------ */
+
+/** The calculator's four assets (the R33 row's own set). */
+export const GoldIfBoughtAssetIdSchema = z.enum(['gold', 'silver', 'btc', 'sp500']);
+export type GoldIfBoughtAssetId = z.infer<typeof GoldIfBoughtAssetIdSchema>;
+
+/** One month-end close: {ym: 'YYYY-MM', close}. */
+export const GoldIfBoughtMonthSchema = z.object({
+  ym: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'YYYY-MM'),
+  close: z.number().finite().positive(),
+});
+export type GoldIfBoughtMonth = z.infer<typeof GoldIfBoughtMonthSchema>;
+
+/** One asset's series: the complete-month anchors + the running month's provisional point. */
+export const GoldIfBoughtAssetSeriesSchema = z
+  .object({
+    /** The month-end anchors, ascending, unique by ym, at least the first. */
+    monthly: z.array(GoldIfBoughtMonthSchema).min(1),
+    /** The running month's provisional close (the rung's daily refresh; the
+     * month-turn freezes it as the new anchor). */
+    current: z.object({
+      /** The ym of the running month. */
+      ym: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'YYYY-MM'),
+      /** The day's close (the asset's own plane). */
+      close: z.number().finite().positive(),
+      /** When the point was last refreshed (ISO 8601 UTC). */
+      updatedAt: z.iso.datetime(),
+    }),
+  })
+  .refine((s) => s.monthly.every((m, i) => i === 0 || m.ym > s.monthly[i - 1]!.ym), {
+    message: 'if-bought monthly anchors must be strictly ascending and unique',
+  })
+  .refine((s) => s.current.ym > s.monthly[s.monthly.length - 1]!.ym, {
+    message: 'the running month must sit after the last anchor',
+  });
+export type GoldIfBoughtAssetSeries = z.infer<typeof GoldIfBoughtAssetSeriesSchema>;
+
+/** The backfill's own record (attribution + the S&P leg's venue). */
+export const GoldIfBoughtBackfillInfoSchema = z.object({
+  /** The first anchor month. */
+  from: z.string().regex(/^\d{4}-\d{2}$/),
+  /** The last complete anchor month. */
+  to: z.string().regex(/^\d{4}-\d{2}$/),
+  /** How many anchor months each leg carries. */
+  months: z.number().int().min(1),
+  /** The S&P leg's venue (the markets board's own Yahoo provider). */
+  sp500Source: z.string().url(),
+  /** When the backfill ran. */
+  fetchedAt: z.iso.datetime(),
+});
+export type GoldIfBoughtBackfillInfo = z.infer<typeof GoldIfBoughtBackfillInfoSchema>;
+
+/** The value of `insights:gold-ifbought:v1`, verbatim over the wire. */
+export const GoldIfBoughtSnapshotSchema = z
+  .object({
+    v: z.literal(1),
+    /** The running point's own date (the freshest day the series speaks). */
+    asOf: z.iso.date(),
+    /** When the store was last written. */
+    fetchedAt: z.iso.datetime(),
+    /** The one-time backfill's own record. */
+    backfill: GoldIfBoughtBackfillInfoSchema,
+    /** The four assets' series. */
+    assets: z.object({
+      gold: GoldIfBoughtAssetSeriesSchema,
+      silver: GoldIfBoughtAssetSeriesSchema,
+      btc: GoldIfBoughtAssetSeriesSchema,
+      sp500: GoldIfBoughtAssetSeriesSchema,
+    }),
+  })
+  .refine((s) => s.asOf.slice(0, 7) === [...Object.values(s.assets)].at(-1)!.current.ym, {
+    message: 'the if-bought asOf month must agree with an asset running month',
+  });
+export type GoldIfBoughtSnapshot = z.infer<typeof GoldIfBoughtSnapshotSchema>;
+
+/* ------------------------------------------------------------------ *
  * Live prices (the volatility-scaled refresh — 2026-10-12)
  *
  * The Prices board's four assets (Brent, gold, silver, Bitcoin) plus their

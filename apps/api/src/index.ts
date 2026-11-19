@@ -36,6 +36,7 @@ import { KvGoldCrossesStore } from '@currena/insights/xau-crosses';
 import { KvGoldLbmaStore } from '@currena/insights/lbma';
 import { KvGoldExpectationsStore } from '@currena/insights/expectations';
 import { KvGoldPremiumStore } from '@currena/insights/premium-history';
+import { KvGoldMeterStore } from '@currena/insights/meter-history';
 import { KvGoldEpisodesStore } from '@currena/insights/episodes';
 import { resolveAccessModeForRequest, type AccessMode } from './access-mode';
 import { KvAccessModeStore, type AccessModeKvStore } from './adapters/access-mode-store';
@@ -181,6 +182,8 @@ export interface AppDeps {
   makeGoldEpisodesReader?: (env: Bindings) => import('@currena/insights/episodes').GoldEpisodesReader;
   /** GPE R30: the premium-history store (route tests inject the fake). */
   makeGoldPremiumReader?: (env: Bindings) => import('@currena/insights/premium-history').GoldPremiumReader;
+  /** GPE R31: the meter-history store (route tests inject the fake). */
+  makeGoldMeterReader?: (env: Bindings) => import('@currena/insights/meter-history').GoldMeterReader;
   /** Override the live-prices store (route tests inject the in-memory fake). */
   makePricesReader?: (env: Bindings) => import('@currena/insights/prices').PricesReader;
   /**
@@ -366,6 +369,19 @@ export function createApp(deps: AppDeps = {}) {
     return goldPremiumReader;
   };
 
+  // GPE R31 (2026-11-19): the gold meter's time machine serve path — the
+  // YEAR-sharded keys (KvGoldMeterStore, the same twin; the 04:47 UTC rung
+  // + the gold-meter-run runner write them — the S17-D1/D3 records).
+  let goldMeterReader: import('@currena/insights/meter-history').GoldMeterReader | undefined;
+  const getGoldMeterReader = (
+    env: Bindings,
+  ): import('@currena/insights/meter-history').GoldMeterReader => {
+    goldMeterReader ??= deps.makeGoldMeterReader
+      ? deps.makeGoldMeterReader(env)
+      : new KvGoldMeterStore(env.RATES);
+    return goldMeterReader;
+  };
+
   const app = new Hono<{ Bindings: Bindings }>();
 
   // Security headers on every Worker-answered response (SWOT hardening
@@ -414,6 +430,7 @@ export function createApp(deps: AppDeps = {}) {
       getGoldExpectationsReader,
       getGoldEpisodesReader,
       getGoldPremiumReader,
+      getGoldMeterReader,
       getPricesReader,
       getAccessModeKv,
       // A-8: the serve-time staleness re-evaluation needs a clock; tests

@@ -25,6 +25,8 @@ const runGoldExpectationsIngest = vi.hoisted(() => vi.fn());
 const KvGoldExpectationsStore = vi.hoisted(() => class {});
 const runGoldPremiumHistoryIngest = vi.hoisted(() => vi.fn());
 const KvGoldPremiumStore = vi.hoisted(() => class {});
+const runGoldMeterHistoryIngest = vi.hoisted(() => vi.fn());
+const KvGoldMeterStore = vi.hoisted(() => class {});
 
 vi.mock('@currena/scraper', () => ({
   scrapeTgju,
@@ -50,6 +52,10 @@ vi.mock('@currena/insights/expectations', () => ({
 vi.mock('@currena/insights/premium-history', () => ({
   runGoldPremiumHistoryIngest,
   KvGoldPremiumStore,
+}));
+vi.mock('@currena/insights/meter-history', () => ({
+  runGoldMeterHistoryIngest,
+  KvGoldMeterStore,
 }));
 
 const api = await import('./index');
@@ -301,6 +307,44 @@ describe('the minute-cron wrapper (keep-warm backbone, audit C-4)', () => {
 
     expect(map.has('snapshot:tgju')).toBe(true); // the ladder's work survived
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('gold-premium-history failed (blocked)'));
+    warn.mockRestore();
+  });
+
+
+  /* GPE R31 — the 04:47 UTC meter-history rung (the time machine's
+   * forward accumulation). */
+
+  it('the 04:47 UTC rung writes the meter-history live row (GPE R31 — the daily forward accumulation)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T04:47:05.000Z'));
+
+    await worker.scheduled(eventAtUtc(4, 47), { RATES: kv }, ctx);
+
+    expect(runGoldMeterHistoryIngest).toHaveBeenCalledTimes(1);
+    expect(runGoldMeterHistoryIngest).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ getPublicSnapshot: expect.any(Function) }));
+  });
+
+  it('an off-meter minute (04:48) never runs the rung', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T04:48:05.000Z'));
+
+    await worker.scheduled(eventAtUtc(4, 48), { RATES: kv }, ctx);
+
+    expect(runGoldMeterHistoryIngest).not.toHaveBeenCalled();
+  });
+
+  it('a meter-rung failure never marks the whole invocation failed (the fault isolation)', async () => {
+    scrapeTgju.mockResolvedValue(tgjuSnapshot('2026-10-14T04:47:05.000Z'));
+    runGoldMeterHistoryIngest.mockResolvedValue({
+      outcome: { ok: false, kind: 'blocked' as const, note: 'public projection too old — nothing written (last-good holds)' },
+      kv: { reads: 1, writes: 0 },
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await expect(
+      worker.scheduled(eventAtUtc(4, 47), { RATES: kv }, ctx),
+    ).resolves.toBeUndefined();
+
+    expect(map.has('snapshot:tgju')).toBe(true); // the ladder's work survived
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('gold-meter-history failed (blocked)'));
     warn.mockRestore();
   });
 });

@@ -1556,3 +1556,151 @@ describe('GET /api/insights/gold-premium (GPE R30)', () => {
     expect(body.backfill?.days).toBe(24); // the one-key history, never a per-id shape
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * GPE R31 — GET /api/insights/gold-meter (the time machine's
+ * date-parameterized, readings-only projection; the s17 M1 §6 records).
+ * ------------------------------------------------------------------ */
+
+/** A schema-valid meter row for the route fixtures. */
+const meterRow = (date: string, source: 'backfill' | 'live', net: number): import('@currena/core').GoldMeterTableRow => ({
+  date,
+  source,
+  tableVersion: 'gf-s10-37',
+  state: net > 0 ? 'tipped-for' : 'tipped-against',
+  beamAngle: 6,
+  fullyTipped: false,
+  net,
+  readable: 4,
+  counts: { for: net > 0 ? 1 : 0, against: net < 0 ? 1 : 0, neutral: 3, unread: 1 },
+  lanes: [
+    { lane: 'borrowing-costs', side: 'neutral', split: false, readable: 1, firing: 0, supports: 0, pressures: 0 },
+    { lane: 'dollar', side: 'neutral', split: false, readable: 1, firing: 0, supports: 0, pressures: 0 },
+    { lane: 'stress', side: net > 0 ? 'for' : 'against', split: false, readable: 1, firing: 1, supports: net > 0 ? 1 : 0, pressures: net < 0 ? 1 : 0 },
+    { lane: 'inflation', side: 'neutral', split: false, readable: 1, firing: 0, supports: 0, pressures: 0 },
+    { lane: 'flows', side: 'unread', split: false, readable: 0, firing: 0, supports: 0, pressures: 0 },
+  ],
+});
+
+const meterYear2026: import('@currena/core').GoldMeterYearDoc = {
+  v: 1,
+  year: 2026,
+  fetchedAt: '2026-11-19T04:47:00.000Z',
+  rows: [meterRow('2026-11-14', 'backfill', 1), meterRow('2026-11-18', 'live', -1), meterRow('2026-11-19', 'live', -1)],
+};
+
+describe('GET /api/insights/gold-meter (GPE R31)', () => {
+  const PINNED_NOW = () => new Date('2026-11-19T12:00:00.000Z');
+
+  function makeApp(reader?: { getYear(year: number): Promise<import('@currena/core').GoldMeterYearDoc | undefined> }) {
+    return createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldMeterReader: () => reader ?? { getYear: async () => undefined },
+      now: PINNED_NOW,
+    });
+  }
+
+  it('serves the meta document (no date) — the era boundary + the dated registry, no KV read', async () => {
+    const res = await makeApp().request('/api/insights/gold-meter', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=3600, s-maxage=3600');
+    expect(res.headers.get('x-robots-tag')).toBe('noindex');
+    const meta = (await res.json()) as import('@currena/core').GoldMeterMeta;
+    expect(meta.eraStart).toBe('2016-11-01');
+    expect(meta.tableVersions.map((v) => [v.id, v.effectiveFrom, v.seats])).toEqual([
+      ['s4-frozen-20', '2016-11-01', 20],
+      ['s6-21', '2026-10-31', 21],
+      ['gf-p2-32', '2026-11-05', 32],
+      ['gf-s10-37', '2026-11-06', 37],
+    ]);
+  });
+
+  it('serves the requested day\'s row (the exact grid day) with the meta + ETag', async () => {
+    const app = makeApp({ getYear: async (y) => (y === 2026 ? meterYear2026 : undefined) });
+    const res = await app.request('/api/insights/gold-meter?date=2026-11-18', undefined, env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get('cache-control')).toBe('public, max-age=300, s-maxage=300');
+    const body = (await res.json()) as import('@currena/core').GoldMeterResponse;
+    expect(body.requestedDate).toBe('2026-11-18');
+    expect(body.row?.date).toBe('2026-11-18');
+    expect(body.row?.source).toBe('live');
+    expect(body.row?.tableVersion).toBe('gf-s10-37');
+    expect(body.meta.eraStart).toBe('2016-11-01');
+    expect(res.headers.get('etag')).toBe('"insights-gold-meter:2026-11-18:2026-11-18:live:gf-s10-37"');
+  });
+
+  it('maps an between-grid-day request to the LATEST stored row on or before it (the honest as-of semantics)', async () => {
+    const app = makeApp({ getYear: async (y) => (y === 2026 ? meterYear2026 : undefined) });
+    // 2026-11-16 (a Monday between the stored 11-14 and 11-18) → the 11-14 row.
+    const res = await app.request('/api/insights/gold-meter?date=2026-11-16', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as import('@currena/core').GoldMeterResponse;
+    expect(body.requestedDate).toBe('2026-11-16');
+    expect(body.row?.date).toBe('2026-11-14');
+    expect(body.row?.source).toBe('backfill');
+  });
+
+  it('answers 304 on a matching If-None-Match', async () => {
+    const app = makeApp({ getYear: async (y) => (y === 2026 ? meterYear2026 : undefined) });
+    const res0 = await app.request('/api/insights/gold-meter?date=2026-11-19', undefined, env);
+    const etag = res0.headers.get('etag') ?? '';
+    const res = await app.request('/api/insights/gold-meter?date=2026-11-19', { headers: { 'if-none-match': etag } }, env);
+    expect(res.status).toBe(304);
+  });
+
+  it('REJECTS a pre-era date with the boundary error (s7/03 §3.4 — never a pre-2016 verdict)', async () => {
+    const res = await makeApp().request('/api/insights/gold-meter?date=2016-10-31', undefined, env);
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { error: { code: string; message: string } };
+    expect(body.error.code).toBe('gold_meter_era_boundary');
+    expect(body.error.message).toContain('2016-11-01');
+  });
+
+  it('rejects a future date (the pinned clock) with the honest error', async () => {
+    const res = await makeApp().request('/api/insights/gold-meter?date=2026-11-20', undefined, env);
+    expect(res.status).toBe(400);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_meter_future');
+  });
+
+  it('rejects a malformed date with invalid_meter_date', async () => {
+    const res = await makeApp().request('/api/insights/gold-meter?date=not-a-date', undefined, env);
+    expect(res.status).toBe(400);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('invalid_meter_date');
+  });
+
+  it('a day with no stored row that early answers row:null — the honest gap, never a guess', async () => {
+    const app = makeApp({ getYear: async (y) => (y === 2016 ? { ...meterYear2026, year: 2016, rows: [meterRow('2016-11-18', 'backfill', 1)] } : undefined) });
+    // 2016-11-03 is inside the era but before the first stored row; 2016
+    // IS the era's first year so there is no prior shard to fall back to.
+    const res = await app.request('/api/insights/gold-meter?date=2016-11-03', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as import('@currena/core').GoldMeterResponse;
+    expect(body.row).toBeNull();
+    expect(body.meta.eraStart).toBe('2016-11-01');
+  });
+
+  it('a young-year request with no rows yet falls back to the PRIOR year\'s shard (the latest row ≤ date)', async () => {
+    const app = createApp({
+      makeInsightsReader: () => new InMemoryInsightsStore(),
+      makeGoldMeterReader: () => ({ getYear: async (y) => (y === 2026 ? meterYear2026 : undefined) }),
+      // Pinned a week LATER — 2027-01-05 is then a valid past date.
+      now: () => new Date('2027-01-10T12:00:00.000Z'),
+    });
+    // January 2027: the 2027 shard is absent → the 2026 shard's last row.
+    const res = await app.request('/api/insights/gold-meter?date=2027-01-05', undefined, env);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as import('@currena/core').GoldMeterResponse;
+    expect(body.row?.date).toBe('2026-11-19');
+  });
+
+  it('a reader rejection surfaces as the calm 503 gold_meter_unavailable (never a raw 500)', async () => {
+    const app = makeApp({
+      getYear: async () => {
+        throw new Error('KV read failed');
+      },
+    });
+    const res = await app.request('/api/insights/gold-meter?date=2026-11-18', undefined, env);
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: { code: string } }).error.code).toBe('gold_meter_unavailable');
+  });
+});

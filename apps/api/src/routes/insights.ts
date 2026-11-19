@@ -66,6 +66,8 @@ import type { GoldLbmaReader } from '@currena/insights/lbma';
 import type { GoldExpectationsReader } from '@currena/insights/expectations';
 import type { GoldEpisodesReader } from '@currena/insights/episodes';
 import type { GoldPremiumReader } from '@currena/insights/premium-history';
+import type { GoldMeterReader } from '@currena/insights/meter-history';
+import { GOLD_METER_ERA_START, goldMeterMeta } from '@currena/insights/meter-history';
 import type { TicSnapshot } from '@currena/core';
 import { mergeLivePricesIntoSnapshot } from '@currena/insights/prices';
 import type { PricesReader } from '@currena/insights/prices';
@@ -151,6 +153,9 @@ interface InsightsRouteDeps {
   /** GPE R30: the Iran bridge's premium history (the backfill + the
    *  forward accumulation — the 20:33 UTC rung's key). */
   getGoldPremiumReader: (env: Bindings) => GoldPremiumReader;
+  /** GPE R31: the gold meter's time machine (the year-sharded history —
+   *  the backfill + the 04:47 UTC rung's forward rows). */
+  getGoldMeterReader: (env: Bindings) => GoldMeterReader;
   /** Live-prices store construction (route tests inject the in-memory fake). */
   getPricesReader: (env: Bindings) => PricesReader;
   /**
@@ -177,6 +182,25 @@ const PUBLIC_HISTORY_WINDOW_DAYS = 1900;
 
 /** M-5: the mode-set body contract. */
 const ModeSetBodySchema = z.object({ mode: z.enum(['public', 'private']) });
+
+/** GPE R31: the latest stored meter row on or before `date` inside a shard
+ *  (the rows are strictly ascending — a binary search; null when the shard
+ *  is absent or carries nothing that early). Pure over the stored doc. */
+function latestRowAtOrBefore(
+  shard: import('@currena/core').GoldMeterYearDoc | undefined,
+  date: string,
+): import('@currena/core').GoldMeterTableRow | null {
+  if (shard === undefined) return null;
+  const rows = shard.rows;
+  let lo = 0;
+  let hi = rows.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (rows[mid]!.date <= date) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo > 0 ? rows[lo - 1]! : null;
+}
 
 /** M-2: the TRIMMED public status document (zod-parsed subset — the route
  * layer's own projection schema; the full document is packages/core's). */
@@ -1083,6 +1107,102 @@ export function createInsightsRoutes(deps: InsightsRouteDeps): Hono<{ Bindings: 
       }
     }
     return response;
+  });
+
+  // GPE R31 / F12 (2026-11-19, S17): the gold meter's TIME MACHINE — the
+  // date-parameterized, readings-only projection (the D7-locked minimal
+  // sizing) over the meter era. YEAR-sharded keys (S17-D1 — one read per
+  // request), the dated voter-table registry (S17-D2), two provenances
+  // with the honesty line rendered at point of use (backfill: the
+  // backtest's own reconstruction from the stored series; live: the
+  // 04:47 UTC rung's forward rows from the public projection — the
+  // page's own plane). THE METER-ERA BOUNDARY (s7/03 §3.4, binding): a
+  // pre-2016-11 request is REJECTED — never a pre-meter verdict; a
+  // future date is rejected the same honest way; a date with no stored
+  // row (yet) answers row:null — the honest gap, never a guess. The
+  // served row is the LATEST stored day on or before the requested date
+  // (the readings cannot change between grid days — the reconstruction's
+  // own seriesUpTo semantics). No licence reason to hide (the underlying
+  // series are the public indicator histories — the same families the
+  // published backtest measured); the per-source kill switch still
+  // applies if a future owner directive arms it.
+  app.get('/gold-meter', async (c) => {
+    if ((await accessModeOf(c)) === 'public' && HIDDEN_BOARDS.has('gold-meter')) {
+      return errorResponse(c, 404, 'hidden_site_mode', 'This section is not published on the public site.');
+    }
+    const meta = goldMeterMeta();
+    const raw = c.req.query('date');
+    if (raw === undefined) {
+      // The meta document — the era boundary + the dated registry. No KV
+      // read; the constants ARE the record. Edge-cached for an hour (the
+      // registry only changes with a governance-gated table change).
+      const etag = `"insights-gold-meter-meta:${meta.eraStart}:${meta.tableVersions.length}:${meta.tableVersions[meta.tableVersions.length - 1]?.id ?? ''}"`;
+      if (c.req.header('if-none-match') === etag) {
+        return c.body(null, 304, { 'Cache-Control': 'public, max-age=3600, s-maxage=3600', ETag: etag, 'X-Robots-Tag': 'noindex' });
+      }
+      return c.json(meta, 200, {
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        ETag: etag,
+        'X-Robots-Tag': 'noindex',
+      });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(raw) || Number.isNaN(Date.parse(`${raw}T00:00:00Z`))) {
+      return errorResponse(c, 400, 'invalid_meter_date', 'The date must be a calendar day in YYYY-MM-DD form.');
+    }
+    const now = deps.now !== undefined ? deps.now() : new Date();
+    const today = now.toISOString().slice(0, 10);
+    if (raw < GOLD_METER_ERA_START) {
+      // s7/03 §3.4 — the anti-synthesis rule, enforced at the boundary:
+      // the meter's era starts 2016-11 and NO surface ever renders a
+      // pre-era verdict.
+      return errorResponse(
+        c,
+        400,
+        'gold_meter_era_boundary',
+        `The gold meter's record begins ${GOLD_METER_ERA_START} — no earlier meter state exists or is ever synthesized.`,
+      );
+    }
+    if (raw > today) {
+      return errorResponse(c, 400, 'gold_meter_future', 'The time machine cannot read a future day.');
+    }
+    const reader = deps.getGoldMeterReader(c.env);
+    const year = Number(raw.slice(0, 4));
+    let shard: import('@currena/core').GoldMeterYearDoc | undefined;
+    try {
+      shard = await reader.getYear(year);
+    } catch (err) {
+      console.warn('[insights] gold-meter read failed:', err instanceof Error ? err.message : err);
+      return errorResponse(
+        c,
+        503,
+        'gold_meter_unavailable',
+        'The gold meter history is temporarily unavailable — please retry shortly.',
+      );
+    }
+    // The latest stored row on or before the requested day. A young-year
+    // request before any row exists that year falls back to the PRIOR
+    // year's shard (one extra read, only in that window) so the state the
+    // reader asked for — "as of that day" — is found where it lives.
+    let row = latestRowAtOrBefore(shard, raw);
+    if (row === null && year > Number(GOLD_METER_ERA_START.slice(0, 4))) {
+      try {
+        shard = await reader.getYear(year - 1);
+        row = latestRowAtOrBefore(shard, raw);
+      } catch (err) {
+        console.warn('[insights] gold-meter prior-year read failed:', err instanceof Error ? err.message : err);
+        row = null;
+      }
+    }
+    const body: import('@currena/core').GoldMeterResponse = { v: 1, requestedDate: raw, row: row ?? null, meta };
+    const etag = `"insights-gold-meter:${raw}:${row !== null ? `${row.date}:${row.source}:${row.tableVersion}` : 'none'}"`;
+    if (c.req.header('if-none-match') === etag) {
+      return c.body(null, 304, { 'Cache-Control': 'public, max-age=300, s-maxage=300', ETag: etag, 'X-Robots-Tag': 'noindex' });
+    }
+    return c.json(body, 200, {
+      'Cache-Control': 'public, max-age=300, s-maxage=300',
+      ETag: etag,
+      'X-Robots-Tag': 'noindex',
+    });
   });
 
   app.get('/status', async (c) => {

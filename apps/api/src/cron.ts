@@ -20,8 +20,10 @@ import { KvPricesStore } from '@currena/insights/prices';
 import type { PricesJobFetchers } from '@currena/insights/prices';
 import { runGoldExpectationsIngest, KvGoldExpectationsStore } from '@currena/insights/expectations';
 import { runGoldPremiumHistoryIngest, KvGoldPremiumStore } from '@currena/insights/premium-history';
+import { runGoldMeterHistoryIngest, KvGoldMeterStore } from '@currena/insights/meter-history';
 import { runIngestWatchdog, WATCHDOG_MINUTE } from './ingest-watchdog';
 import { runScheduledNarrator, NARRATOR_CRON_MINUTE } from './narrator-cron';
+import { KvInsightsReader } from './adapters/insights-store';
 import {
   insightsIngestRung,
   runScheduledInsightsIngest,
@@ -113,6 +115,38 @@ export async function runScheduledGoldExpectationsRefresh(env: Bindings): Promis
   }
 }
 
+/**
+ * GPE R31 / F12 (2026-11-19, the S17-D3 record): the gold meter's TIME
+ * MACHINE forward accumulation — ONE live row per day, computed from the
+ * PUBLIC PROJECTION's own readings (the page's own plane; the rung fires
+ * 04:47 UTC, after the 04:10 snapshot + the 04:25/27 history rungs, clear
+ * of every other rung: :13 prices · :23/:53 expectations · :15-mod
+ * Frankfurter · :40 watchdog · :50 narrator · the 04:xx ingest family ·
+ * 10:10/20:10 sweeps · 20:33 premium — the PRICES_CRON_MINUTE pattern, NO
+ * new cron trigger). Write-if-changed; a missing or >24 h-old projection
+ * writes NOTHING (the last-good discipline — an honest gap, never a stale
+ * reading under today's date). A live row overwrites a backfill row on
+ * date collision, never the reverse (the S16-D2 rule).
+ */
+export const GOLD_METER_CRON = { hour: 4, minute: 47 } as const;
+
+/** The daily meter-history rung (exported for tests; the cron calls it). */
+export async function runScheduledGoldMeterHistory(env: Bindings, now?: Date): Promise<void> {
+  const store = new KvGoldMeterStore(env.RATES);
+  const result = await runGoldMeterHistoryIngest(store, {
+    // The public projection — the page's own plane. ONE KV read through
+    // the insights reader family (the /api/insights serve path's own
+    // source); the rung's row is byte-consistent with the page's balance.
+    getPublicSnapshot: async () => new KvInsightsReader(env.RATES).getPublicSnapshot(),
+    ...(now !== undefined ? { now } : {}),
+  });
+  if (result.outcome.ok) {
+    console.log(`[cron] gold-meter-history ok — ${result.outcome.note ?? 'done'}`);
+  } else {
+    console.warn(`[cron] gold-meter-history failed (${result.outcome.kind}): ${result.outcome.note}`);
+  }
+}
+
 /** The hourly live-prices refresh (exported for tests; the cron calls it). */
 export async function runScheduledPricesRefresh(
   env: Bindings,
@@ -198,6 +232,17 @@ export async function runScheduled(env: Bindings, scheduledTimeMs: number): Prom
       ? [
           runScheduledGoldPremiumHistory(env).catch((err: unknown) => {
             console.warn('[cron] gold-premium-history rung failed:', err instanceof Error ? err.message : err);
+          }),
+        ]
+      : []),
+    // GPE R31 / F12: the daily meter-history rung (04:47 UTC — the S17-D3
+    // record) — fault-isolated the same way: the job's own failure branch
+    // writes nothing and only logs, and this catch is belt-and-braces so a
+    // projection hiccup can never mark the cron invocation failed.
+    ...(date.getUTCHours() === GOLD_METER_CRON.hour && minute === GOLD_METER_CRON.minute
+      ? [
+          runScheduledGoldMeterHistory(env).catch((err: unknown) => {
+            console.warn('[cron] gold-meter-history rung failed:', err instanceof Error ? err.message : err);
           }),
         ]
       : []),
