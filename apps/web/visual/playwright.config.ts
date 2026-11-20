@@ -87,6 +87,17 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
     {
+      // GUX-S7 (docs/gold-redesign/15-session-7-implementation-report.md):
+      // the session's surfaces — the five-state briefing word (Q1-B) +
+      // the bridge's regional chrome + the on-ramp's LaneBar closes +
+      // the time machine's lane grammar + the expectations' probability
+      // bars + the /global tile. The evidence lands in
+      // docs/gold-redesign/baseline-screenshots/s7/.
+      name: 'gux-s7',
+      testMatch: /gux-s7-screenshots\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // gold-balance GB-S3 (docs/specs/gold-balance-consolidation/): the
       // ?balance=lanes preview + the default view, EN/fa × 360/1280, on the
       // fixture snapshot overlaid with the recorded 2026-10-31 corpus

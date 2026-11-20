@@ -124,8 +124,21 @@ const server = http.createServer((req, res) => {
     /* GUX-S5 M6 (the S5 screenshot set): the gold page's own feeds — the
      * S2 projection + the R18 OHLC leg (the hero spark, the interactive
      * chart, and the TA band's shared module-cached fetch). */
+    // GUX-S7: the Global page's own projection (the gold fixture's
+    // pattern — the same snapshot corpus, the page field switched).
+    if (pathname === '/api/insights/pages/global') {
+      const gold = readFixture('gold-projection.json');
+      sendJson(res, 200, { ...gold, page: 'global' }, { etag: '"fixture-global-projection"' });
+      return;
+    }
     if (pathname === '/api/insights/pages/gold') {
       sendJson(res, 200, readFixture('gold-projection.json'), { etag: '"fixture-gold-projection"' });
+      return;
+    }
+    // GUX-S7: the expectations key (the GoldExpectations.test snapshot
+    // shape — the same synthetic corpus the component tests render).
+    if (pathname === '/api/insights/gold-expectations') {
+      sendJson(res, 200, readFixture('gold-expectations.json'), { etag: '"fixture-gold-expectations"' });
       return;
     }
     if (pathname === '/api/insights/gold-ohlc') {

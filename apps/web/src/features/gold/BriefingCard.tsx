@@ -33,6 +33,7 @@ import { briefingEvidenceOf, briefingNarrowLaneOf, briefingReasonsOf } from './g
 import { goldBrief } from './content/gold-content';
 import { LANE_BAR_LABEL_KEY } from './LaneBar';
 import { AsOfChip } from './AsOfChip';
+import { FIVE_STATE_KEY, FIVE_STATE_TONE, fiveStateOf } from '../../shared/components/outlook-five-state';
 
 const HEADLINE_KEY: Readonly<Record<GoldHeroVerdictState, TranslationKey>> = {
   for: 'pd.gold.briefHeadlineFor',
@@ -41,16 +42,6 @@ const HEADLINE_KEY: Readonly<Record<GoldHeroVerdictState, TranslationKey>> = {
   none: 'pd.gold.briefHeadlineSparse',
   'not-enough': 'pd.gold.briefHeadlineSparse',
 };
-
-const OUTLOOK_WORD_KEY = {
-  'strong-bullish': 'pd.global.outlookStrongBullish',
-  bullish: 'pd.global.outlookBullish',
-  neutral: 'pd.global.outlookNeutral',
-  'range-bound': 'pd.global.outlookRangeBound',
-  bearish: 'pd.global.outlookBearish',
-  'strong-bearish': 'pd.global.outlookStrongBearish',
-  mixed: 'pd.global.outlookMixed',
-} as const;
 
 const EVIDENCE_KEY: Readonly<Record<'aligned' | 'mixed' | 'limited', TranslationKey>> = {
   aligned: 'pd.gold.briefEvidenceAligned',
@@ -115,13 +106,18 @@ export function BriefingCard({
         </h2>
       </header>
 
-      {/* The summary spine — Q1's container: the shipped 7-state line
-       * (the same engine, GB-S5) renders inside until the owner
-       * decides its fate; the caveat rides it, always. */}
+      {/* The summary spine — Q1 ANSWERED (the owner's B, 2026-11-20):
+       * the five-state CONDITIONS word (08 §8.1's reviewed drafts, the
+       * 7→5 fold in outlook-five-state.ts) replaces the shipped 7-state
+       * market vocabulary — the line reads as what conditions do to
+       * gold, never as a market forecast. The classifier itself is
+       * untouched (GB-S5: the same engine feeds the fold); the counts
+       * and the caveat ride it, always. The Q2 slot still renders
+       * NOTHING (closed until a validated method exists). */}
       {hero.outlook !== null ? (
         <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]" data-briefing-summary>
-          <span className="font-semibold text-[var(--color-text-primary)]" data-briefing-outlook={hero.outlook}>
-            {t(OUTLOOK_WORD_KEY[hero.outlook])}
+          <span className={`font-semibold ${FIVE_STATE_TONE[fiveStateOf(hero.outlook)]}`} data-briefing-outlook={hero.outlook} data-briefing-five-state={fiveStateOf(hero.outlook)}>
+            {t(FIVE_STATE_KEY[fiveStateOf(hero.outlook)])}
           </span>
           {countsParts.length > 0 ? <span className="tabular-nums"> · {countsParts.join(' · ')}</span> : null}
           {' '}

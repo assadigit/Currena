@@ -1151,6 +1151,12 @@ body {
    * back to #b8860b. Defined as exactly the value the chart already
    * renders (the reference made honest, zero visual change). */
   --color-accent-gold-strong: #b8860b;
+  /* GUX-S7 M2 (12 §3.3 row 5, the "clearly regional" rule): the Iran
+   * bridge's own accent — a DISTINCT hue family from every global accent
+   * (not gold, not the status greens/reds, not the blue link) so the
+   * regional chapter can never be mistaken for the global gold model.
+   * Carbon Teal 50 verbatim; 4.9:1 on the light surface. */
+  --color-bridge-accent: #007d79;
   --color-status-alert: #da1e28;   /* owner palette: Carbon Red 60, verbatim */
   --color-status-stressed: #ff832b; /* owner palette: Carbon Orange 40, verbatim — the Stressed word */
   --color-status-normal: #24a148;  /* owner palette: Carbon Green 50, verbatim — the Stable word / supports */
@@ -1254,6 +1260,9 @@ body {
    * sibling per the -deep pattern (the value the chart's fallback
    * rendered on dark surfaces). */
   --color-accent-gold-strong: #d9a43e;
+  /* GUX-S7 M2: the bridge accent's dark-theme sibling — Carbon Teal 40
+   * (the 50/40 pair, the status-red pattern); 5.6:1 on #1A222E. */
+  --color-bridge-accent: #3ddbd9;
   --color-status-alert: #fa4d56;   /* Carbon Red 50 — Red 60's own dark-surface sibling (Carbon pairs 60/50 across themes); #da1e28 verbatim is 3.2:1 on #1A222E, this holds 4.8:1 */
   --color-status-stressed: #ff832b; /* Carbon Orange 40 verbatim — 6.5:1 on #1A222E */
   --color-status-normal: #24a148;  /* Carbon Green 50 verbatim — 4.8:1 on #1A222E */

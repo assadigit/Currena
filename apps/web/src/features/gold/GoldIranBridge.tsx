@@ -278,7 +278,11 @@ export function GoldIranBridge(): React.JSX.Element | null {
   // section still renders its frame; nothing is faked).
   if (snapshot === null) {
     return (
-      <section id="gold-zone-f" aria-labelledby="gold-zone-f-title" data-gold-iran-bridge className="flex flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:p-3.5">
+      <section id="gold-zone-f" aria-labelledby="gold-zone-f-title" data-gold-iran-bridge data-bridge-regional className="flex flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-2 ring-[var(--color-bridge-accent)] sm:p-3.5">
+        <p className="m-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-[var(--color-bridge-accent)]/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-bridge-accent)]" data-bridge-region-chip>
+          <span aria-hidden="true">◈</span>
+          {t('pd.gold.bridgeRegionChip')}
+        </p>
         <h3 id="gold-zone-f-title" className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">{t('pd.gold.bridgeTitle')}</h3>
         <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-tertiary)]">{t('pd.gold.bridgeUnavailable')}</p>
       </section>
@@ -295,9 +299,19 @@ export function GoldIranBridge(): React.JSX.Element | null {
       id="gold-zone-f"
       aria-labelledby="gold-zone-f-title"
       data-gold-iran-bridge
-      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-3.5"
+      data-bridge-regional
+      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-2 ring-[var(--color-bridge-accent)] shadow-[var(--shadow-card)] sm:p-3.5"
     >
       <header className="flex min-w-0 flex-col gap-0.5">
+        {/* GUX-S7 M2 (12 §3.3 row 5, the "clearly regional" rule): the
+         * REGIONAL chapter chip — a distinct accent from every global
+         * section (the --color-bridge-accent ring + the chip), the
+         * Toman/IRR label named at the chapter head so the regional
+         * market can never be mistaken for the global gold model. */}
+        <p className="m-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-[var(--color-bridge-accent)]/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-bridge-accent)]" data-bridge-region-chip>
+          <span aria-hidden="true">◈</span>
+          {t('pd.gold.bridgeRegionChip')}
+        </p>
         <h3 id="gold-zone-f-title" className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
           {t('pd.gold.bridgeTitle')}
         </h3>

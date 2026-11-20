@@ -180,7 +180,7 @@ describe('gold-briefing derivations', () => {
  * ------------------------------------------------------------------ */
 
 describe('BriefingCard — the single focal element', () => {
-  it('renders the structure: kicker, headline, the Q1 container (7-state + counts + caveat), reasons, what-could-change, evidence footer', () => {
+  it('renders the structure: kicker, headline, the Q1-ANSWERED container (the five-state word + counts + caveat), reasons, what-could-change, evidence footer', () => {
     const { container } = renderAt(
       'en',
       <BriefingCard hero={heroOf(mixedLanes())} verdictState="against" asOf="Nov 19" />,
@@ -193,10 +193,14 @@ describe('BriefingCard — the single focal element', () => {
     // Kicker + headline (present tense, type-verdict).
     expect(card?.querySelector('[data-briefing-headline]')?.textContent).toBe('Gold: conditions lean against it');
     expect(card?.querySelector('[data-briefing-headline]')?.className).toContain('type-verdict');
-    // The Q1 container: the shipped 7-state line + counts + caveat inside.
+    // The Q1-ANSWERED container (the owner's B, 2026-11-20): the
+    // five-state CONDITIONS word renders (the classifier's bearish folds
+    // to moderately-pressure); the 7-state market word does NOT; the
+    // counts + the caveat ride it, always.
     const summary = card?.querySelector('[data-briefing-summary]');
     expect(summary).not.toBeNull();
-    expect(card?.querySelector('[data-briefing-outlook="bearish"]')?.textContent).toBe('Bearish');
+    expect(card?.querySelector('[data-briefing-outlook="bearish"]')?.textContent).toBe('Conditions moderately pressure gold');
+    expect(card?.querySelector('[data-briefing-outlook="bearish"]')?.getAttribute('data-briefing-five-state')).toBe('moderately-pressure');
     expect(summary?.textContent).toContain('this describes current conditions, not a forecast');
     // The reasons (S5-D2): 3 rows, state words in impact inks, the 09 defaultCopy.
     const rows = card?.querySelectorAll('[data-brief-reason]') ?? [];
@@ -210,14 +214,17 @@ describe('BriefingCard — the single focal element', () => {
     expect(card?.querySelector('[data-asof-chip]')?.textContent).toBe('as of Nov 19');
   });
 
-  it('the owner gates: NO horizon chip, NO scenario row, NO five-state word (Q1/Q2 render nothing)', () => {
+  it('the Q2 gate holds: NO horizon chip, NO scenario row (Q1 answered B — the five-state word now renders)', () => {
     const { container } = renderAt('en', <BriefingCard hero={heroOf(mixedLanes())} verdictState="against" />);
     const html = container.innerHTML;
     expect(html).not.toContain('horizon');
     expect(html).not.toContain('scenario');
-    // The five-state drafts never render (the 7-state word does).
-    expect(html).not.toContain('moderately pressure');
-    expect(html).not.toContain('strongly support');
+    // The five-state word DOES render now (Q1's answer); the old 7-state
+    // MARKET vocabulary never does (the fold replaced it).
+    expect(html).toContain('moderately pressure');
+    expect(html).not.toContain('>Bearish<');
+    expect(html).not.toContain('>Bullish<');
+    expect(html).not.toContain('>Range-bound<');
   });
 
   it('the honest fallback line when nothing fires; the sparse headline', () => {
@@ -246,7 +253,7 @@ describe('BriefingCard — the single focal element', () => {
     const { container } = renderAt('fa', <BriefingCard hero={heroOf(mixedLanes())} verdictState="against" asOf="۱۹ نوامبر" />);
     const card = container.querySelector('[data-briefing-card]');
     expect(card?.querySelector('[data-briefing-headline]')?.textContent).toBe('طلا: شرایط علیه آن می‌چربد');
-    expect(card?.querySelector('[data-briefing-outlook="bearish"]')?.textContent).toBe('نزولی');
+    expect(card?.querySelector('[data-briefing-outlook="bearish"]')?.textContent).toBe('شرایط در حد متوسط بر طلا فشار می‌آورد');
     expect(card?.textContent).toContain('شواهد: مختلط');
     expect(card?.querySelector('[data-asof-chip]')?.textContent).toBe('تا ۱۹ نوامبر');
   });

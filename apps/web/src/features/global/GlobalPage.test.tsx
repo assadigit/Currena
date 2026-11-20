@@ -234,9 +234,10 @@ describe('GlobalPage', () => {
     });
 
     // Tile ① — the Gold Balance: the firing borrowing-costs lane (2
-    // tailwind voters) + gold's own −2.5% speed → Bullish, with the
-    // for/against counts.
-    expect(screen.getAllByText('Bullish').length).toBeGreaterThan(0);
+    // tailwind voters) + gold's own −2.5% speed → the classifier's
+    // Bullish, presented as the five-state CONDITIONS word (the owner's
+    // Q1 answer B: 'moderately support'), with the for/against counts.
+    expect(screen.getAllByText('Conditions moderately support gold').length).toBeGreaterThan(0);
     expect(document.querySelector('[data-tile="gold-balance"]')?.textContent).toContain('1 for · 0 against');
 
     // Tiles ②–⑥ — the five gauge verdicts: borrowing-costs is Cautious

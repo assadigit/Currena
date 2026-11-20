@@ -1786,4 +1786,128 @@ describe('GoldPage', () => {
     // The position word line survives (the words stay the statement).
     expect(document.querySelector('[data-context-card="gold-silver"]')?.textContent).toContain('typical');
   });
+
+  /* ---------------------------------------------------------------- *
+   * GUX-S7 M2 — the bridge's regional chrome (12 §3.3 row 5)
+   * ---------------------------------------------------------------- */
+
+  it('GUX-S7 M2: the Iran bridge wears the regional chapter chrome — the accent ring + the Toman/IRR chip (the wrapper chrome is structural: both frames render the same section element + chip, pinned by the GPE R13 fail-closed test beside it)', async () => {
+    // The loaded frame (the frozen-scenario seeding): the chip + the ring
+    // ride the full board.
+    window.localStorage.setItem('currena:snapshot:tgju', JSON.stringify(tgjuSnapshotFixture()));
+    snapshotStore.boot();
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-iran-bridge]')).not.toBeNull();
+    });
+    const bridge = document.querySelector('[data-gold-iran-bridge]')!;
+    // The "clearly regional" rule: the section's ring carries the bridge
+    // accent token (distinct from every global section's border ring).
+    expect(bridge.className).toContain('ring-2 ring-[var(--color-bridge-accent)]');
+    expect(bridge.hasAttribute('data-bridge-regional')).toBe(true);
+    // The chapter chip renders at the head, naming the market + unit.
+    const chip = bridge.querySelector('[data-bridge-region-chip]')!;
+    expect(chip.textContent).toContain('Tehran');
+    expect(chip.textContent).toContain('Toman');
+    // The board's own frame is untouched: the rows still render (the
+    // chrome is additive, the C2 grammar unchanged).
+    expect(bridge.querySelectorAll('[data-bridge-row]').length).toBe(8);
+
+  });
+
+
+  /* ---------------------------------------------------------------- *
+   * GUX-S7 M3 — the on-ramp's LaneBar closes + the time machine's
+   * lane grammar (12 §3.3 rows 3 + 8 — one renderer, all surfaces)
+   * ---------------------------------------------------------------- */
+
+  it('GUX-S7 M3: the on-ramp drivers close with the LaneBar (drivers 1-3, the lane rows); driver 4 keeps its display-only close', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    const onRamp = document.querySelector('[data-gold-onramp]')!;
+    // The education accordion opens (the round-27 discipline: collapsed default).
+    fireEvent.click(onRamp.querySelector('[data-onramp-toggle]') as HTMLButtonElement);
+    await waitFor(() => {
+      expect(onRamp.querySelector('[data-onramp-driver="1"]')).not.toBeNull();
+    });
+    // The lane-backed drivers (1: borrowing-costs · 2: dollar · 3: stress)
+    // each carry a LaneBar close; driver 4 (positioning, display-only)
+    // carries none; driver 5 (flows) carries one.
+    for (const n of ['1', '2', '3', '5']) {
+      const driver = onRamp.querySelector(`[data-onramp-driver="${n}"]`)!;
+      expect(driver.querySelector('[data-lanebar]'), `driver ${n} LaneBar close`).not.toBeNull();
+    }
+    const d4 = onRamp.querySelector('[data-onramp-driver="4"]')!;
+    expect(d4.querySelector('[data-lanebar]')).toBeNull();
+  });
+
+  it('GUX-S7 M3: the time machine renders the five lanes in the SAME LaneBar grammar (one system across time)', async () => {
+    // stubFeeds + the meter endpoint: the machine's one fetch needs a
+    // row (the GoldTimeMachine.test fixture shape, verbatim).
+    stubFeeds();
+    const baseFetch = globalThis.fetch;
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input).includes('/api/insights/gold-meter')) {
+        return jsonResponse({
+          v: 1,
+          requestedDate: '2026-11-10',
+          row: {
+            date: '2026-11-10',
+            source: 'live',
+            tableVersion: 'gf-s10-37',
+            state: 'tipped-for',
+            beamAngle: 4,
+            fullyTipped: false,
+            net: 2,
+            readable: 5,
+            counts: { for: 2, against: 0, neutral: 2, unread: 1 },
+            lanes: [
+              { lane: 'borrowing-costs', side: 'for', split: false, readable: 2, firing: 1, supports: 1, pressures: 0 },
+              { lane: 'dollar', side: 'for', split: false, readable: 2, firing: 1, supports: 1, pressures: 0 },
+              { lane: 'stress', side: 'neutral', split: false, readable: 1, firing: 0, supports: 0, pressures: 0 },
+              { lane: 'inflation', side: 'neutral', split: false, readable: 1, firing: 0, supports: 0, pressures: 0 },
+              { lane: 'flows', side: 'unread', split: false, readable: 0, firing: 0, supports: 0, pressures: 0 },
+            ],
+          },
+          meta: { v: 1, eraStart: '2016-11-01', tableVersions: [{ id: 'gf-s10-37', effectiveFrom: '2016-11-01', seats: 37 }] },
+        });
+      }
+      return baseFetch(input);
+    }));
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-time-machine]')).not.toBeNull();
+    });
+    // Open the machine and pick a day (the frozen archive answers).
+    fireEvent.click(document.querySelector('[data-gold-time-machine] > button') as HTMLButtonElement);
+    await waitFor(() => {
+      expect(document.querySelector('[data-tm-body]')).not.toBeNull();
+    });
+    const input = document.querySelector('[data-tm-date-input]') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '2026-11-10' } });
+    await new Promise((r) => setTimeout(r, 300));
+    console.log('TM DEBUG', JSON.stringify({
+      body: document.querySelector('[data-tm-body]') !== null,
+      loading: document.querySelector('[data-tm-loading]')?.textContent ?? null,
+      unavailable: document.querySelector('[data-tm-unavailable]')?.textContent ?? null,
+      noRow: document.querySelector('[data-tm-no-row]')?.textContent ?? null,
+      row: document.querySelector('[data-tm-row]') !== null,
+      inputValue: (document.querySelector('[data-tm-date-input]') as HTMLInputElement | null)?.value ?? null,
+    }));
+    await waitFor(() => {
+      expect(document.querySelector('[data-tm-row]')).not.toBeNull();
+    }, { timeout: 4000 });
+    // The five lanes render as LaneBar rows (the same renderer + attrs).
+    const lanes = [...document.querySelectorAll('[data-tm-lane]')];
+    expect(lanes.length).toBe(5);
+    expect(lanes[0]!.querySelector('[data-lanebar]')).not.toBeNull();
+    // The lane ids in the engine's own order.
+    expect(lanes.map((l) => l.getAttribute('data-tm-lane'))).toEqual([
+      'borrowing-costs', 'dollar', 'stress', 'inflation', 'flows',
+    ]);
+  });
 });

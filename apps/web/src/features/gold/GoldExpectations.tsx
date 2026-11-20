@@ -213,13 +213,40 @@ export function GoldExpectations({ calendar }: { calendar?: readonly CalendarEve
               return (
                 <li
                   key={m.slug}
-                  className={`flex min-w-0 items-baseline justify-between gap-2 rounded-[var(--radius-sm)] px-1.5 py-1 ${isLeading ? 'bg-currena-blue/10' : ''}`}
+                  data-expect-row={m.slug}
+                  data-expect-leading={isLeading ? 'true' : undefined}
+                  className={`flex min-w-0 flex-col gap-0.5 rounded-[var(--radius-sm)] px-1.5 py-1 ${isLeading ? 'bg-currena-blue/10' : ''}`}
                 >
-                  <span className="min-w-0 truncate text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
-                    <bdi>{t(MOVE_KEY[m.move] as never)}</bdi>
+                  <span className="flex min-w-0 items-baseline justify-between gap-2">
+                    <span className="min-w-0 truncate text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]">
+                      <bdi>{t(MOVE_KEY[m.move] as never)}</bdi>
+                    </span>
+                    <span className="shrink-0 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
+                      <bdi dir="ltr">{num(m.yesPrice * 100)}%</bdi>
+                    </span>
                   </span>
-                  <span className="shrink-0 text-[length:var(--type-caption)] font-bold text-[var(--color-text-primary)]">
-                    <bdi dir="ltr">{num(m.yesPrice * 100)}%</bdi>
+                  {/* GUX-S7 M4 (12 §3.3 row 4): the ProbabilityRow — the
+                   * venue's own implied probability as a thin 0-100 bar,
+                   * neutral analytical ink (a probability is not a
+                   * support/pressure — never a market hue). The text
+                   * beside it stays the statement; the bar is the
+                   * at-a-glance reading. Fail-closed: no clamping tricks
+                   * — an out-of-domain reading renders past the end,
+                   * the % text always tells the truth. */}
+                  <span
+                    dir="ltr"
+                    role="img"
+                    aria-label={`${t(MOVE_KEY[m.move] as never)}: ${num(m.yesPrice * 100)}%`}
+                    data-expect-prob-row
+                    data-expect-prob-pct={m.yesPrice * 100}
+                    className="relative block h-1 w-full rounded-full bg-[var(--color-border)]/60"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="absolute inset-y-0 start-0 rounded-full bg-[var(--color-text-secondary)]"
+                      style={{ width: `${Math.min(Math.max(m.yesPrice * 100, 0), 100)}%` }}
+                      data-expect-prob-fill
+                    />
                   </span>
                 </li>
               );

@@ -829,6 +829,9 @@ export const en = {
        * in fa; the interpretation paragraph's four moves render in the
        * binding order. */
       bridgeTitle: 'The Iran bridge',
+      /* GUX-S7 M2 (12 §3.3 row 5): the regional chapter chip — the
+       * "clearly regional" rule, named at the chapter head. */
+      bridgeRegionChip: 'Regional market · Tehran · Toman (IRR)',
       bridgeSubtitle: 'Tehran coin prices decomposed into global gold, the free-market dollar, and the local premium (حباب).',
       bridgeHeadPrice: 'Market price',
       bridgeHeadPremium: 'Premium (حباب)',
@@ -1436,6 +1439,15 @@ export const en = {
        * forecast); the summary spine is Q1's container — the shipped
        * 7-state outlook line renders inside until the owner answers;
        * the horizon chip and scenario row render NOTHING until Q2. */
+      /* GUX-S7 M1 (the owner's Q1 answer B, 2026-11-20): the five-state
+       * CONDITIONS word — 08 §8.1's reviewed drafts, verbatim. The shared
+       * 7-to-5 fold lives in outlook-five-state.ts (both the gold page's
+       * BriefingCard and the /global Gold Balance tile render these keys). */
+      fiveStateStronglySupport: 'Conditions strongly support gold',
+      fiveStateModeratelySupport: 'Conditions moderately support gold',
+      fiveStateMixedOrUnclear: 'Conditions are mixed or unclear',
+      fiveStateModeratelyPressure: 'Conditions moderately pressure gold',
+      fiveStateStronglyPressure: 'Conditions strongly pressure gold',
       briefKicker: 'BRIEFING',
       briefHeadlineFor: 'Gold: conditions lean with it',
       briefHeadlineAgainst: 'Gold: conditions lean against it',

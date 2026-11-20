@@ -32,15 +32,7 @@ import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { cachedGoldMeterRow, fetchGoldMeterRow } from './gold-meter';
-import { LANE_TITLE_KEY } from './GoldSeats';
-
-/** The lane side word keys — the seats' own corpus-pinned vocabulary. */
-const LANE_STATE_KEY: Record<string, TranslationKey> = {
-  for: 'pd.gold.laneStateFor',
-  against: 'pd.gold.laneStateAgainst',
-  neutral: 'pd.gold.laneStateNeutral',
-  unread: 'pd.gold.laneStateUnread',
-};
+import { LaneBar, type LaneBarData } from './LaneBar';
 
 /** The whole-balance verdict word keys — the hero's own. */
 const VERDICT_KEY: Record<string, TranslationKey> = {
@@ -185,24 +177,29 @@ export function GoldTimeMachine(): React.JSX.Element {
                 </bdi>
               </p>
 
-              {/* The five lane chips — the seats' own corpus vocabulary. */}
-              <ul className="m-0 flex list-none flex-wrap gap-1 p-0" data-tm-lanes>
-                {row.lanes.map((lane) => (
-                  <li
-                    key={lane.lane}
-                    data-tm-lane={lane.lane}
-                    data-tm-lane-side={lane.side}
-                    className="inline-flex items-baseline gap-1 rounded-[var(--radius-sm)] bg-[var(--color-surface)]/80 px-1.5 py-0.5 text-[length:var(--type-caption)] ring-1 ring-[var(--color-border)]/50"
-                  >
-                    <bdi className="font-bold text-[var(--color-text-primary)]">{t(LANE_TITLE_KEY[lane.lane])}</bdi>
-                    <bdi className="text-[var(--color-text-secondary)]">
-                      {interpolate(
-                        t(lane.split ? 'pd.gold.laneStateSplit' : LANE_STATE_KEY[lane.side]!),
-                        lane.split ? { supports: num(lane.supports), pressures: num(lane.pressures) } : {},
-                      )}
-                    </bdi>
-                  </li>
-                ))}
+              {/* GUX-S7 M3 (12 §3.3 row 8): the five lanes render as
+               * compact LaneBar rows — the SAME lane grammar the live
+               * page wears (one system across time; the picked day and
+               * today can be read with the same eye). The wire's own
+               * counts feed the bars; steady = readable − firing (the
+               * wire's own complement, never re-derived). */}
+              <ul className="m-0 flex list-none flex-col gap-1 p-0" data-tm-lanes>
+                {row.lanes.map((lane) => {
+                  const bar: LaneBarData = {
+                    lane: lane.lane,
+                    side: lane.side,
+                    split: lane.split,
+                    supports: lane.supports,
+                    pressures: lane.pressures,
+                    steady: Math.max(lane.readable - lane.firing, 0),
+                    unread: 0,
+                  };
+                  return (
+                    <li key={lane.lane} data-tm-lane={lane.lane} data-tm-lane-side={lane.side}>
+                      <LaneBar data={bar} />
+                    </li>
+                  );
+                })}
               </ul>
 
               {/* The versioned table + the provenance — the honesty lines
