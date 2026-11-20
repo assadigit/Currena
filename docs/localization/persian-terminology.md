@@ -387,3 +387,51 @@ The consolidated lane balance behind `?balance=lanes`
 - **خرید ماهانه** — the DCA (the SA convention named plainly:
   «{amount} دلار در هر پایانیِ ماه» — no transliterated "DCA" in
   fa copy; the Latin ticker rides only the EN sentence).
+
+## Gold UX Redesign S3 — the content-system additions (2026-11-2x, round pending Session 5)
+
+> Recorded now so the manifest round at Session 5's integration has its
+> reference (the strings enter `apps/web/src` dictionaries only then —
+> `docs/gold-redesign/08-indicator-content-schema.md` §6.3 is the contract).
+> No em dashes in any of these; Persian digits in static text.
+
+**The five driver-group labels** (S3-D4; the engine lane ids stay frozen):
+
+| English | Persian | Notes |
+| --- | --- | --- |
+| Interest rates & borrowing costs | نرخ بهره و هزینهٔ استقراض | The `borrowing-costs` lane; adds the plain "interest rates" anchor to the shipped «هزینهٔ استقراض» |
+| The US dollar | دلار آمریکا | The `dollar` lane (unchanged family) |
+| Market stress & uncertainty | تنش و عدم قطعیت بازار | The `stress` lane; names the uncertainty channel the lane measures |
+| Inflation & inflation expectations | تورم و انتظارات تورمی | The `inflation` lane (unchanged family) |
+| Trader positioning & flows | پوزیشن معامله‌گران و جریان‌ها | The `flows` lane; «پوزیشن» stays per the shipped corpus |
+
+**The outlook-condition drafts** (S3-D7; owner-review wording over the
+master plan §2.1 locked semantics — five states, not the shipped seven-word
+outlook family):
+
+| English | Persian |
+| --- | --- |
+| Conditions strongly support gold | شرایط به‌شدت از طلا حمایت می‌کند |
+| Conditions moderately support gold | شرایط در حد متوسط از طلا حمایت می‌کند |
+| Conditions are mixed or unclear | شرایط مختلط یا نامشخص است |
+| Conditions moderately pressure gold | شرایط در حد متوسط بر طلا فشار می‌آورد |
+| Conditions strongly pressure gold | شرایط به‌شدت بر طلا فشار می‌آورد |
+
+**Evidence consistency** (S3-D7): Evidence is broadly aligned → «شواهد عمدتاً
+هم‌جهت‌اند» · Evidence is mixed → «شواهد مختلط‌اند» · Evidence is limited →
+«شواهد محدودند».
+
+**Horizon labels** (S3-D7): over the next 1–2 weeks → «در ۱ تا ۲ هفتهٔ پیش
+رو» · 1–3 months → «در ۱ تا ۳ ماه پیش رو» · 6–12 months → «در ۶ تا ۱۲ ماه
+پیش رو». (Publish-only-what-a-method-supports governs whether any of these
+ever render; none is validated today.)
+
+**Explanation-register anchors** (the records' recurring phrasings, pinned so
+the manifest round polishes consistently): «معمولاً بر طلا فشار می‌آورد»
+(typically pressures gold) · «معمولاً از طلا حمایت می‌کند» (typically
+supports) · «هزینهٔ فرصت» (opportunity cost, spelled out as the
+give-up-a-guaranteed-return idea in the records) · «دارایی امن» (safe haven;
+the established corpus term, kept) · «سوخت‌سنج بازار» (the market's fuel
+gauge; the on-ramp's positioning framing, reused) · «در دامنهٔ ده‌ساله» /
+«بالای دامنهٔ ده‌ساله» / «پایین دامنهٔ ده‌ساله» (the decade-range position
+family, matching the shipped `evidenceHigh/Low` words).
