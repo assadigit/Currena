@@ -226,6 +226,18 @@ body {
   .chip-scroller::after { display: none; }
 }
 
+/* GUX-S8 (the docking fix): the gold sections' anchor scroll margin —
+ * the fixed global header (64px mobile / 80px ≥lg) + the docked section
+ * nav (56px) + 4px breathing, per breakpoint. One class, every gold
+ * anchor (the S5–S7 `scroll-mt-24` was calibrated to a nav that hid
+ * under the header the moment it stuck — the S8 audit's find); the
+ * GoldSectionNav's spy line reads the same numbers (one contract, both
+ * places). */
+.gold-anchor-mt { scroll-margin-top: 124px; }
+@media (min-width: 1024px) {
+  .gold-anchor-mt { scroll-margin-top: 140px; }
+}
+
 /* GUX-S8 M1 (the mobile-first pass): the gold section nav's chip track —
  * ONE nowrap row (the shipped chip-scroller pattern) whose edges fade
  * softly while more chips sit that way. Unlike .chip-scroller's fixed

@@ -278,7 +278,7 @@ export function GoldIranBridge(): React.JSX.Element | null {
   // section still renders its frame; nothing is faked).
   if (snapshot === null) {
     return (
-      <section id="gold-zone-f" aria-labelledby="gold-zone-f-title" data-gold-iran-bridge data-bridge-regional className="flex scroll-mt-24 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-2 ring-[var(--color-bridge-accent)] sm:p-3.5">
+      <section id="gold-zone-f" aria-labelledby="gold-zone-f-title" data-gold-iran-bridge data-bridge-regional className="flex gold-anchor-mt flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-2 ring-[var(--color-bridge-accent)] sm:p-3.5">
         <p className="m-0 inline-flex w-fit items-center gap-1.5 rounded-full bg-[var(--color-bridge-accent)]/15 px-2 py-0.5 text-[length:var(--type-caption)] font-bold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-bridge-accent)]" data-bridge-region-chip>
           <span aria-hidden="true">◈</span>
           {t('pd.gold.bridgeRegionChip')}
@@ -300,7 +300,7 @@ export function GoldIranBridge(): React.JSX.Element | null {
       aria-labelledby="gold-zone-f-title"
       data-gold-iran-bridge
       data-bridge-regional
-      className="flex scroll-mt-24 flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-2 ring-[var(--color-bridge-accent)] shadow-[var(--shadow-card)] sm:p-3.5"
+      className="flex gold-anchor-mt flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-2 ring-[var(--color-bridge-accent)] shadow-[var(--shadow-card)] sm:p-3.5"
     >
       <header className="flex min-w-0 flex-col gap-0.5">
         {/* GUX-S7 M2 (12 §3.3 row 5, the "clearly regional" rule): the

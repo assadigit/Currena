@@ -332,7 +332,7 @@ export function GoldRelationships(): React.JSX.Element {
   );
 
   return (
-    <section id="gold-relationships" aria-label={t('pd.gold.relAria')} data-gold-relationships className="mt-3 flex min-w-0 scroll-mt-24 flex-col gap-2.5 sm:mt-5">
+    <section id="gold-relationships" aria-label={t('pd.gold.relAria')} data-gold-relationships className="mt-3 flex min-w-0 gold-anchor-mt flex-col gap-2.5 sm:mt-5">
       <h2 className="m-0 text-base font-extrabold text-[var(--color-text-primary)] sm:text-lg">{t('pd.gold.relTitle')}</h2>
       <p className="m-0 max-w-prose text-[length:var(--type-label)] leading-snug text-[var(--color-text-secondary)]">{t('pd.gold.relIntro')}</p>
 

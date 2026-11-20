@@ -238,7 +238,7 @@ export function GoldPage(): React.JSX.Element {
       <GoldSectionNav />
 
       {readings !== undefined ? (
-        <div id="gold-zone-d" className="mt-2.5 flex flex-col gap-2.5 scroll-mt-24 sm:mt-4 sm:gap-3" data-gold-zone-d-band>
+        <div id="gold-zone-d" className="mt-2.5 flex flex-col gap-2.5 gold-anchor-mt sm:mt-4 sm:gap-3" data-gold-zone-d-band>
           <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2 lg:gap-3">
             <GoldNarrative readings={readings} />
             <GoldYieldDecomposition readings={readings} />

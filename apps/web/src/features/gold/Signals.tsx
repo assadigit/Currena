@@ -177,7 +177,7 @@ export function Signals({
   };
 
   return (
-    <section id="insights-signals" aria-labelledby="insights-signals-title" className="scroll-mt-24">
+    <section id="insights-signals" aria-labelledby="insights-signals-title" className="gold-anchor-mt">
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id="insights-signals-title" className="type-section m-0">
           <span className="inline-flex items-center gap-1.5">

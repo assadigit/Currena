@@ -407,7 +407,7 @@ export function GoldSeats({
   };
 
   return (
-    <section id="gold-seats" aria-label={t('pd.gold.seatsAria')} data-gold-seats className="flex flex-col gap-2.5 scroll-mt-24 sm:gap-3">
+    <section id="gold-seats" aria-label={t('pd.gold.seatsAria')} data-gold-seats className="flex flex-col gap-2.5 gold-anchor-mt sm:gap-3">
       <h2 className="m-0 text-base font-extrabold text-[var(--color-text-primary)] sm:text-lg">{t('pd.gold.lanesTitle')}</h2>
       {/* The five lane blocks: 1-col mobile, 2-col ≥ lg (the stress and
        * inflation lanes' cards wrap inside their own blocks — the

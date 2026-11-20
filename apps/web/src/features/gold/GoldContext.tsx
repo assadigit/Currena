@@ -336,7 +336,7 @@ export function GoldContext({
   const pct = (v: number): string => formatNumber(v, numberLocale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
   return (
-    <section id="gold-context" aria-label={t('pd.gold.contextAria')} data-gold-context className="flex flex-col gap-3.5 scroll-mt-24">
+    <section id="gold-context" aria-label={t('pd.gold.contextAria')} data-gold-context className="flex flex-col gap-3.5 gold-anchor-mt">
       {/* GPE R26 / F10: the multi-currency gold grid — Zone I's compact
        * sub-card under the ratios (the same ounce through five
        * numeraires; self-fetching, display-only). */}
@@ -377,7 +377,7 @@ export function GoldContext({
       {zoneK !== null && zoneK !== undefined ? zoneK : null}
 
       {/* ---- The honest-record footnote (D-29). ---- */}
-      <footer id="gold-honest-record" data-gold-honest-record className="flex flex-col gap-1.5 rounded-[var(--radius-md)] bg-currena-soft/50 p-3 ring-1 ring-[var(--color-border)]/60 scroll-mt-24 sm:p-3.5">
+      <footer id="gold-honest-record" data-gold-honest-record className="flex flex-col gap-1.5 rounded-[var(--radius-md)] bg-currena-soft/50 p-3 ring-1 ring-[var(--color-border)]/60 gold-anchor-mt sm:p-3.5">
         <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">{t('pd.gold.honestTitle')}</h3>
         <p className="m-0 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]">
           <bdi>{t('pd.gold.measuredNote')}</bdi>{' '}

@@ -7,8 +7,8 @@
  *
  * THE S8 MOBILE REBUILD (this session's remediation, 11 §12 item 5 +
  * master plan §7.1): the wrapping chip rows (132px tall in en at 390px
- * — a sixth of the viewport, and taller than the sections' own
- * scroll-mt-24 so the anchor jumps LANDED UNDER the bar) become ONE
+ * — a sixth of the viewport, and taller than the sections' own anchor
+ * margin so the anchor jumps LANDED UNDER the bar) become ONE
  * horizontally-scrollable row — the shipped chip-scroller pattern
  * (GlobalBoard's .ln row): nowrap chips that scroll inside the track,
  * never wrap; 44px touch targets (the 36px chips were under the floor);
@@ -17,6 +17,16 @@
  * never carries meaning); the ACTIVE chip centers itself in the track
  * (physical-pixel scrollBy — RTL-safe) so the reading position stays
  * visible without any page scroll.
+ *
+ * THE S8 DOCKING FIX (the audit's find): the nav now sticks UNDER the
+ * FIXED global header (top-16 / lg:top-20 — 11 §12 item 5's own words:
+ * "the mobile section index docks under the global header, never
+ * covering focused controls"). The S5–S7 shipped `sticky top-0` slid
+ * the whole bar UNDER the header's z-1000 the moment it stuck — the
+ * nav was INVISIBLE while stuck (verified: the S6 explorer captures
+ * show no chips; the S8 probe measured navTop 0 < headerBottom 64).
+ * The sections' anchor margin (index.css .gold-anchor-mt) and the spy
+ * line below both account for header + nav heights.
  *
  * THE S8-TIER SPY (GUX-S6 M5, unchanged): the IntersectionObserver over
  * the section anchors — the last section whose top has passed the spy
@@ -51,10 +61,14 @@ const SECTIONS: ReadonlyArray<{ id: string; key: TranslationKey }> = [
 ];
 
 /** The scroll-spy line: a section is "current" when its top has passed
- *  96px below the viewport top (the nav's own height + breathing room);
- *  the LAST such section wins (the reading position). The 96px matches
- *  the sections' scroll-mt-24 (the anchor-jump contract). */
-const SPY_LINE_PX = 96;
+ *  the docked nav's own bottom edge — the fixed header (64px mobile /
+ *  80px ≥lg) + the nav (56px) + 4px breathing = 124px mobile, 140px
+ *  ≥lg. The LAST such section wins (the reading position). The same
+ *  numbers ride the sections' .gold-anchor-mt (the anchor-jump
+ *  contract — one source of truth per breakpoint, both places). */
+function spyLinePx(): number {
+  return typeof window !== 'undefined' && window.innerWidth >= 1024 ? 140 : 124;
+}
 
 export function GoldSectionNav(): React.JSX.Element | null {
   const { t } = useI18n();
@@ -104,11 +118,12 @@ export function GoldSectionNav(): React.JSX.Element | null {
     /** The plain rule, computed once: the last section whose top has
      *  passed the spy line. Shared by the observer path and the
      *  scroll-listener fallback. */
+    const spyLine = spyLinePx();
     const computeCurrent = (): string | null => {
       let current: string | null = null;
       for (const { id } of SECTIONS) {
         const el = document.getElementById(id);
-        if (el !== null && el.getBoundingClientRect().top <= SPY_LINE_PX) current = id;
+        if (el !== null && el.getBoundingClientRect().top <= spyLine) current = id;
       }
       // The hero (before the first section) highlights nothing.
       return current;
@@ -125,7 +140,7 @@ export function GoldSectionNav(): React.JSX.Element | null {
         // The observed band: from the top of the viewport down past the
         // spy line — a section top entering OR leaving this band is
         // exactly a crossing of the line.
-        { rootMargin: `0px 0px -${window.innerHeight - SPY_LINE_PX}px 0px`, threshold: 0 },
+        { rootMargin: `0px 0px -${window.innerHeight - spyLine}px 0px`, threshold: 0 },
       );
       for (const { id } of SECTIONS) {
         const el = document.getElementById(id);
@@ -160,7 +175,7 @@ export function GoldSectionNav(): React.JSX.Element | null {
     <nav
       aria-label={t('pd.gold.navAria')}
       data-gold-section-nav
-      className="sticky top-0 z-40 -mx-2 border-block-end border-[var(--color-border)]/70 bg-[var(--color-surface)]/92 px-2 py-1.5 backdrop-blur-sm"
+      className="sticky top-16 z-40 -mx-2 border-block-end border-[var(--color-border)]/70 bg-[var(--color-surface)]/92 px-2 py-1.5 backdrop-blur-sm lg:top-20"
     >
       {/* The S8 chip-scroller track: ONE row, nowrap, hidden scrollbars,
        * the JS-toggled direction-aware fades (index.css's
