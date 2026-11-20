@@ -1,5 +1,23 @@
 # HANDOFF — Currena current state & next steps
 
+## This session (2026-11-20 — GUX Session 6 COMPLETE: the relationship explorer + the context re-scope + the fa deep-content gap closed + the S5-pending deploy executed; merged to main and deployed)
+
+**What the owner asked for (this session's prompt):** Session 6 of 9 (the gold UX redesign) — the relationship explorer (M1) · the context cards' re-scope (M2) · the Q1/Q2 owner gates presented and HELD (M3) · the fa deep-content gap (M4) · the sticky nav's S8-tier upgrade if time allows (M5) · the close (M6) — with the DEPLOY.md 2026-11-2x-c record checked FIRST (the token now carries the scripts scope: the S5 blocker cleared, `/workers/scripts` answers; production was still `4454212a` @ 100%, no drift).
+
+**M1 the relationship explorer (12 §5.1–5.4 over 10 §5):** 10 §3's 25 R-records as the typed module `gold-relationships.ts` (M 14 · C 10 · X 1 · K 0; R-26 blocked-for-data — legend-only, never a canvas edge; both locales' one-liners as the FULL edge text) + the section `GoldRelationships.tsx` (list-first everywhere, the class chips always visible, the X pennant never fine print, the honesty footer, the class filters, the desktop canvas behind a toggle — gold hub, M solid / C dashed / K heaviest) + **the budget play**: the first build measured 260.38/61.58 (OVER both ceilings) — per S5-D1's standing rule the pre-authorized GoldTail pattern extended (the explorer rides its own near-viewport sibling chunk 21.52/7.54) and **GoldPage landed at 223.43/50.05 under 240/55.50, no ceiling ask**. The nav's seventh chip (Relationships).
+
+**M2 the context re-scope (12 §3.1):** `ContextBandMark` — the 11 RatioCards' 10-year position bands at context strength (neutral ink, never an impact hue; fail-closed); the COT pair keeps the Chain-6 chips; gold-usd stays the hero only (F-06's dedup pinned by test).
+
+**M3 the Q1/Q2 gates — PRESENTED, HELD (nothing renders; the BriefingCard pins 12/12):** **Q1** — keep the shipped 7-state presentation or adopt 08 §8.1's five-state drafts («شرایط به‌شدت از طلا حمایت می‌کند» … «فشار قوی بر طلا»), the honest caveat either way; the classifier itself is protected (GB-S5). **Q2** — no horizon chip / scenario row until a validated method exists and the owner approves it; the §8.4 bans hold (no probabilities, no price targets, no confidence numbers, no drawn price paths). **The owner's answers are the next session's first input.**
+
+**M4 the fa deep-content gap (S5-D3's declared item, closed):** the blocked quartet's 12 EN-carried fields (whatItWouldShow/blockedReason/ownerLever) now fa-authored in 09's voice; the content pins updated (the fields left the locale-neutral set — they are locale content now).
+
+**M5 the nav's S8-tier spy:** the IntersectionObserver upgrade (the plain rule unchanged, the no-observer fallback kept verbatim for jsdom/old browsers).
+
+**M6 the close:** **10/10 gates GREEN (3m 9s)** — the suite **15,650** (+11 positive-only over the S5 close), lint 0/0, copy:audit clean (**round 92**, the manifest 9,259: the 25 chrome keys + 25 record one-liners + 12 re-authored fields), every budget held. The 20-screenshot set (`docs/gold-redesign/baseline-screenshots/s6/` + the README). The report `docs/gold-redesign/14-session-6-implementation-report.md`, S6-D1..D6. **The S5-pending deploy executed** per the 2026-11-2x-c runbook (the D-43 re-check FIRST — `4454212a` no drift; the build + deploy + the live verification; the record in `docs/DEPLOY.md`).
+
+**The program counter: Session 6/9 complete · 3 remaining.** The Q1/Q2 answers are the standing owner asks.
+
 ## This session (2026-11-2x — THREE sittings in one conversation: (A) the S4 close-out ops + integration — DONE AND VERIFIED LIVE; (B) Session 5 opened — M1/M2/M3a done, the Q4 stop recorded; (C) Session 5 COMPLETED — the owner's Q4 answer A executed, M3b/M4/M5/M6 all done, merged to main and deployed)
 
 **What the owner asked for (this session's prompt):** "Please first push commit deploy merge and everything of this session 4, then we go to session 5" — with fresh credentials (a GitHub token · a Cloudflare Workers deploy token + the account ID · an EODHD API key · a second Workers-AI-scoped token). **Milestones:** M1 the credential verification + the gates re-run on the S4 tree · M2 the push of the S4 branch + `main` · M3 the PL-1 integration merge (the §15.4 discipline, executed the day it was written) · M4 the deploy + the live verification (the D-43 lock re-check first) · M5 the records (this block, DEPLOY.md, S4-D15, the CHANGELOG entry, the BD-S47 status note).
