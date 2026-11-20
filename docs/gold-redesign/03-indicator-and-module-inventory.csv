@@ -1,0 +1,69 @@
+id,kind,role,lane_or_section,source,source_ref,cadence,stale_after_days,rule_or_unit,renders_on_gold_surfaces,notes
+gold-usd,indicator,context-home (hero price),hero (ratios group),gold-api,XAU spot (live Yahoo GC=F hourly overlay),daily,2,USD per troy ounce (0 dp),hero; signals gold chip + footing; narrative price fact; upstream of 7 derived ratios + if-bought running point,"hero exception: excepted from the ratios grid (GoldContext L315)"
+gold-silver,indicator,voter + context-home,stress lane + ratios,derived,"XAU ÷ XAG (gold-api legs; history World Bank)",daily,2,ratio (1 dp),seats; context card,"level-only rule: ratio percentile"
+gold-btc,indicator,context-home,ratios,derived,XAU ÷ BTC,daily,4 (grace),ratio (4 dp),context card,
+gold-aud,indicator,context-home,ratios,derived,"XAU × Frankfurter USD→AUD",daily,4 (grace),AUD (0 dp),context card,"also mirrors on the Australia page seat"
+gold-oil-ratio,indicator,context-home,ratios,derived,gold-usd ÷ brent (barrels/oz),daily,3,ratio (1 dp),context card,
+gold-platinum,indicator,context-home,ratios,derived,gold ÷ platinum same-date closes,daily,5,ratio (2 dp),context card,
+real-gold-price,indicator,context-home,ratios,derived,gold month close ÷ CPIAUCNS × 100 (1982-84 $),monthly,75,USD (0 dp),context card,
+copper-gold,indicator,context-home,ratios (growth-health registry group),derived,World Bank copper ÷ gold,monthly,60,ratio (2 dp),context card,"also a USA mirror"
+gold-equities-ratio,indicator,context-home,ratios,derived,Yahoo GLD ÷ SPY,daily,5,ratio (4 dp),context card,
+cftc-gold-positioning,indicator,voter + context-home,flows lane + flows&positioning cards + positions section,cftc,"COT futures-only GOLD - COMEX (deafut.txt)",weekly,12,net % of OI (1 dp),"seats; context card; GoldPositions bar","DUP-1: four presentations (see 04 matrix)"
+cftc-gold-gross-long,indicator,voter + context-home,flows lane + flows&positioning cards + positions section,cftc,same COT row,weekly,12,NonComm Long ÷ OI % (1 dp),"seats; context card; GoldPositions bar",DUP-1: four presentations
+sge-gold-withdrawals,indicator,context-home,physical subgroup,sge,monthly Data Highlights (tonnes),monthly,75,tonnes (0 dp),context card,
+swiss-gold-flow,indicator,context-home,physical subgroup,bazg,BAZG open data gold imports 7108 (tonnes),monthly,75,tonnes (0 dp),context card,
+shanghai-gold-premium,indicator,context-home (never a voter §16),physical subgroup,derived,"SGE Au99.99 CNY/g vs XAU×USDCNY÷31.1034768",daily,5,percent (2 dp),context card,
+real-yield-10y,indicator,voter,borrowing-costs,fred,FRED:DFII10,daily,4,"change 0.1pt + level percentile, points","seats; yield-decomp real leg; signals condition; correlation yield axis","DUP-3: four surfaces"
+us10y,indicator,voter,borrowing-costs,fred,FRED:DGS10,daily,4,"change 0.15pt + level, points",seats; yield-decomp nominal leg,
+us30y,indicator,voter,borrowing-costs,fred,FRED:DGS30,daily,4,level-only points,seats,
+fed-target,indicator,voter,borrowing-costs,fred,"DFEDTARL+DFEDTARU midpoint",daily,5,change 0.25pt (one FOMC step) + level,seats,
+fed-expectations,indicator,voter,borrowing-costs,derived,DGS2 − policy midpoint,daily,4,change 0.13pt + level,seats,"UNREAD today (upstream-stopped why-line class)"
+ecb-dfr,indicator,voter,borrowing-costs,ecb,ECB Data Portal FM/D.U2…DFR.LEV,daily,7,level-only points,seats,
+real-yield-5y,indicator,voter,borrowing-costs,fred,FRED:DFII5 (GF-P3),daily,4,change 0.1pt + level,seats,
+dollar-basket,indicator,voter,dollar,derived,"Frankfurter 6-currency DXY-weight basket (EUR/JPY/GBP/CAD/SEK/CHF)",daily,4,change 1.0pt + level,seats; signals dollar condition,
+usdjpy,indicator,voter,dollar,frankfurter,USD→JPY,daily,4,change 1.38% + level,seats,
+us-japan-10y-gap,indicator,voter,dollar,derived,FRED:DGS10 − MOF jgbcme 10y,daily,5,level-only points,seats,"UNREAD today"
+usd-reserve-share,indicator,voter,dollar,imf,COFER USD share,quarterly,200,level-only points,seats,"also feeds Global dedollar tile"
+nyfed-custody,indicator,voter,dollar,fred,WSEFINTL1 (Wednesday custody),weekly,21,level-only pct,seats,"renders inside /global TIC section on Global; HIDDEN_FROM_LANE_IDS there"
+dollar-broad,indicator,voter,dollar,fred,DTWEXBGS (GF-P3),daily,10,change 1.0pt + level,seats,
+dollar-eme,indicator,voter,dollar,fred,DTWEXEMEGS (GF-P3),daily,10,change 1.0pt + level,seats,
+stress-stlfsi,indicator,voter,stress,fred,STLFSI4,weekly,14,level-only points,seats; signals stress condition,
+nfci,indicator,voter,stress,fred,NFCI,weekly,14,level-only points,seats; signals stress condition,
+vix,indicator,voter,stress,fred,VIXCLS,daily,4,level-only points,seats,
+term-premium-10y,indicator,voter,stress,fred,THREEFYTP10 (Kim–Wright),daily,14,change 0.07pt + level,seats; yield-decomp premium leg,
+ebp,indicator,voter,stress,frb,FEDS Notes excess bond premium,monthly,75,level-only points,seats,
+michigan-sentiment,indicator,voter,stress (polarity −1),fred,UMCSENT,monthly,75,level-only points,seats,"UNREAD today (UoM upstream-stopped)"
+gpr-daily,indicator,voter,stress,gpr,Caldara–Iacoviello GPRD_MA7,daily,12,level-only points,seats,"why-line class: pipeline-lag"
+epu-us,indicator,voter,stress,epu,Baker–Bloom–Davis,monthly,75,level-only points,seats,
+sp500-breadth-ratio,indicator,voter,stress (polarity −1),yahoo,RSP ÷ SPY closes,daily,4,level-only pct,seats,
+bank-stress,indicator,voter,stress,fred,DPCREDIT discount-window primary (GF-P3),weekly,14,change 0.1pt + level,seats,
+us-cpi-yoy,indicator,voter,inflation,fred,CPIAUCNS 12-mo %,monthly,75,level-only points,seats,"why-line class: upstream-gap (adjacent-months method label when lit)"
+us-pce-core-yoy,indicator,voter,inflation,fred,PCEPILFE 12-mo %,monthly,95,level-only points,seats,
+euro-hicp,indicator,voter,inflation,ecb,HICP/M.U2.N.000000.4D0.ANR,monthly,60,level-only points,seats,
+breakeven-5y5y,indicator,voter,inflation,fred,T5YIFR,daily,4,change 0.1pt + level,seats; signals expectations condition,
+breakeven-tilt,indicator,voter,inflation,derived,T5YIFR − T5YIE,daily,5,level-only by design (D-5),seats,
+t5yie,indicator,voter,inflation,fred,T5YIE,daily,5,change 0.1pt + level,seats,
+michigan-1y-expectations,indicator,voter,inflation,fred,MICH,monthly,75,level-only points,seats,"UNREAD today (UoM upstream-stopped)"
+m2-us,indicator,voter,inflation,fred,M2SL,monthly,90,"level-only, percentileBasis: yoy",seats,
+us-deficit-12m,indicator,voter,inflation,derived,MTSDS133FMS rolling 12-mo sum,monthly,75,level-only pct,seats; yield-decomp link-out,
+michigan-5y-expectations,indicator,voter,inflation,uom,UoM SIE Table 33 (GF-S10),monthly,75,level-only points,seats,"UNREAD today (UoM upstream-stopped)"
+wgc-etf-holdings,indicator,ABSENT (licence),publication-notes disclosure only,wgc,WGC L3 licence,monthly,45,—,publication notes (blocked note),absent quartet
+wgc-cb-demand,indicator,ABSENT (licence),publication-notes disclosure only,wgc,WGC L3 licence,quarterly,100,—,publication notes (blocked note),absent quartet
+official-gold-demand,indicator,ABSENT (source dead),publication-notes disclosure only,pboc,PBoC URL 404,monthly,45,—,publication notes (blocked note),absent quartet
+etf-short-interest,indicator,ABSENT (no licence-clean venue),publication-notes disclosure only,fund-pages,—,monthly,75,—,publication notes (blocked note),absent quartet
+GoldNarrative,module,explanation band,Zone D (first element),pure engine goldNarrative() over projection,packages/insights domains/gold/narrative.ts,per render (projection cadence),—,"one-sentence price fact + five family lines + caveat",always visible,"no KV, no stored prose; the Layer-2 narrator serves the Global page only"
+GoldYieldDecomposition,module,explanation band,Zone D (second element),pure engine yieldDecomposition() over projection,domains/gold/yield-decomposition.ts,per render,—,"us10y + real-yield-10y + derived breakeven + term-premium-10y; identity line",always visible,breakeven derived same-asOf only
+GoldOnRamp,module,education,Zone D (third),static copy + goldBalance lane states,i18n dictionaries (s7/02 wording),static,—,five driver rows + notes + FAQ,collapsed by default,
+GoldExpectations,module,market expectations,Zone D (fourth),KV insights:gold-expectations:v1 (Polymarket) + snapshot calendar,GET /api/insights/gold-expectations; crons :23/:53,30 min,—,"probability rows + event + calendar strip",collapsed to one row by default,Kalshi leg intentionally not shipped (S15-D1)
+GoldIranBridge,module,regional bridge (Bridge-1),Zone F,App-boot TGJU snapshot (useSnapshotStore) + client coinPremium,GET /api/rates?source=tgju,App boot (300s TTL),—,"coin board + per-row parity + method + interpretation",board visible; parity/method/interpretation collapsed,
+GoldPremiumHistory,module,regional bridge (Bridge-2),Zone F below bridge,KV insights:gold-premium-history:v1 (TGJU backfill + 20:33 daily),GET /api/insights/gold-premium,daily rung,—,"attribution strip + premium chart + deciles",strip visible; chart/deciles collapsed <640px,
+Signals,module,verdict strip (gold+silver),after Zone F,GET /api/insights (second fetch) + silver history,evaluateSignal + goldBalance engines,on load (M-17),—,"VerdictStrip + second full BalanceScale + footing",open by default; show/hide,DUP-2 core duplication
+GoldTimeMachine,module,advanced historical meter,Zone C (inside hero; collapsed),KV insights:gold-meter-history:v1:<YYYY> (04:47 live rung),GET /api/insights/gold-meter?date=,on date pick,—,"picked day verdict + lane counts + provenance",collapsed by default,no localStorage (per-date session Map)
+GoldTaLevels,module,technical reference,Zone H,shared OHLC (KV insights:gold-xau:v1; EODHD XAUUSD.FOREX),GET /api/insights/gold-ohlc (module-cached; shared with chart),daily rung 04:30/04:35,—,"SMA rows + crosses + daily/weekly pivots + 200DMA distance",takeaway visible; tables collapsed <640px,
+GoldCbDemand,module,institutional demand,Zone K (first),KV insights:gold-cb:v1 (IMF SDMX; rung3 day 1–5 gate),GET /api/insights/gold-cb,daily rung,—,"rolling-12m chart + buyers table + method",visible; method in details,
+GoldLondonVault,module,institutional demand,Zone K (second),KV insights:gold-lbma:v1 (free LBMA; vault T+2.5wk clearing month−2),GET /api/insights/gold-lbma,rung3,—,"vault stock + clearing rider cards",collapsed ×2 by default,
+GoldCorrelation,module,relationships companion,Zone K (closes),shared OHLC + real-yield-10y history,GET /api/insights/real-yield-10y/history (in-file fetch),on load,—,"dual-axis gold vs real yield + 52-week rolling correlation",collapsed <640px,
+GoldForecastRetrospective,module,honest record companion,inside #gold-honest-record,static module LBMA_FORECAST_SERIES (lbma-forecast.ts),static (annual appended row),static,—,"headline stats + 17-row table + miss convention",collapsed by default,zero fetches
+GoldEpisodes,module,history explorer,Zone O (first),static gold-episodes-records.ts + drop-gated KV insights:gold-episodes:v1,GET /api/insights/gold-episodes (503 until WGC drop),waiting on owner data drop,—,"nine records editorial + gated price path + comparison",collapsed band + per-record,
+GoldIfBought,module,investment calculator,Zone O (second),KV insights:gold-ifbought:v1 (04:49 rung; month-end closes 2016-11+),GET /api/insights/gold-ifbought,daily rung,—,"year picker + 4 assets × (lump + DCA + decile)",collapsed by default,
+GoldPublicationNotes,module,publication disclosure,page tail (collapsed),projection absentIds + static GOLD_BLOCKED_NOTES,projection + static,projection,—,"absent-count line + §16 licence wall",collapsed by default,#gold-blocked anchor kept (BD-S43)
