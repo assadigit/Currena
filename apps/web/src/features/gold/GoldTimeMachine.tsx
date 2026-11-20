@@ -32,17 +32,7 @@ import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { cachedGoldMeterRow, fetchGoldMeterRow } from './gold-meter';
-import { LANE_TITLE_KEY } from './GoldSeats';
-import { LaneBar } from './LaneBar';
-import type { LaneBarData } from './LaneBar';
-
-/** The lane side word keys — the seats' own corpus-pinned vocabulary. */
-const LANE_STATE_KEY: Record<string, TranslationKey> = {
-  for: 'pd.gold.laneStateFor',
-  against: 'pd.gold.laneStateAgainst',
-  neutral: 'pd.gold.laneStateNeutral',
-  unread: 'pd.gold.laneStateUnread',
-};
+import { LaneBar, type LaneBarData } from './LaneBar';
 
 /** The whole-balance verdict word keys — the hero's own. */
 const VERDICT_KEY: Record<string, TranslationKey> = {
