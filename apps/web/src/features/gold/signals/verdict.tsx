@@ -278,7 +278,12 @@ export function VerdictStrip({
    * kept by structure). */
   return (
     <div
-      className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-gradient-to-b from-[var(--color-accent-gold)]/[0.16] via-[var(--color-accent-gold)]/[0.07] to-transparent p-3.5 shadow-[var(--shadow-focal)] ring-2 ring-[var(--color-accent-gold)]/45 sm:p-4 dark:shadow-[0_14px_44px_rgba(0,0,0,0.45)]"
+      /* GUX-S5 M5 (11 §3.1/§5.4): the FOCAL recipe retires here — the
+       * gold gradient field + the ring-2 + --shadow-focal belong to
+       * exactly ONE element per page, the hero's BriefingCard. The
+       * strip keeps its full anatomy (artwork · name · price · the
+       * outlook sentence · the charts) in the standard card recipe. */
+      className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-3.5 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-4"
       data-signal-verdict
     >
       {/* GPE R08 / F15 (C3 clause 2): the title re-scopes to CONDITIONS and

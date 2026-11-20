@@ -42,6 +42,7 @@ import { GoldLondonVault } from './GoldLondonVault';
 import { GoldCorrelation } from './GoldCorrelation';
 import { GoldTaLevels } from './GoldTaLevels';
 import { GoldSeats } from './GoldSeats';
+import { GoldSectionNav } from './GoldSectionNav';
 import { GoldContext } from './GoldContext';
 import { GoldTail } from './GoldTail';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
@@ -229,6 +230,12 @@ export function GoldPage(): React.JSX.Element {
           third element (collapsed accordion per s6/01 zone D), the five
           drivers each closing at its lane anchor, the two notes, the FAQ
           tail (s7/02's approved reference wording). */}
+      {/* GUX-S5 M5: the sticky section nav — the master plan's
+          "sticky section navigation foundation" (the F-03 fix). The
+          chips carry the page's OWN anchors (R10's contract, native
+          scroll); the spy is the foundation tier (see GoldSectionNav). */}
+      <GoldSectionNav />
+
       {readings !== undefined ? (
         <div id="gold-zone-d" className="mt-2.5 flex flex-col gap-2.5 sm:mt-4 sm:gap-3" data-gold-zone-d-band>
           <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2 lg:gap-3">

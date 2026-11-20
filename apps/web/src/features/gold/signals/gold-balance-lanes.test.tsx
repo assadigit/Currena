@@ -65,7 +65,11 @@ import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { GOLD_LANES, GOLD_LANE_VOTERS, goldBalance, type SignalReading } from '@currena/insights';
 import { evaluateSignal } from '@currena/insights';
 import { MergedSignalsCard } from './MergedCard';
-import { BalanceScale, balanceVisualFrame, balanceVisualMetrics, balanceVisualSizeOf } from './BalanceScale';
+import { breakevenTiltLean } from '@currena/insights';
+import { interpolate } from '../../../shared/i18n';
+import { formatIndicatorValue } from '../../../shared/config';
+import { chipWordKeyOf } from '../../../shared/components/StatusChip';
+import { BalanceScale, balanceVisualFrame, balanceVisualMetrics, balanceVisualSizeOf, type BalanceDriver } from './BalanceScale';
 import { balanceRimSegments } from './BalanceWeight';
 import { goldOutlookOf, outlookOf } from './verdict';
 import { Signals } from '../Signals';
@@ -407,7 +411,91 @@ beforeAll(() => {
  * evaluateSignal the page runs) — the consolidated lane balance IS the
  * card since the GB-S6 flip (the flag retired). A stray fetch must fail
  * loudly — the card makes NO network request of its own (the charts'
- * history fetches reject). */
+ * history fetches reject).
+ * GUX-S5 M5 (11 §5.4): the CARD's second BalanceScale retired — the
+ * drawing tests below pin the DRAWING (the hero's CompositionStack
+ * renders the same BalanceStage through GoldBalanceClassic), so this
+ * helper renders the MergedCard AND the BalanceScale side by side in
+ * the same document: the card-level assertions (order · outlook ·
+ * collapsed lines) read the card; the drawing assertions (weights ·
+ * pans · tray · rim · beam) read the scale. One engine feeds both —
+ * the drivers are built exactly as the card built them (the same
+ * laneDrivers derivation, moved verbatim). */
+function laneDriversOf(
+  readings: readonly IndicatorReading[],
+  opts: { locale?: 'en-US' | 'fa-IR'; c?: typeof copy } = {},
+): BalanceDriver[] {
+  const c = opts.c ?? copy;
+  const balance = goldBalance(readings);
+  const s = c.signals;
+  const gs = s.goldScore;
+  const numberLocale = opts.locale ?? 'en-US';
+  const byId = new Map(readings.map((r) => [r.id as string, r]));
+  const num = (n: number): string => new Intl.NumberFormat(numberLocale, { maximumFractionDigits: 0 }).format(n);
+  // The card's own tally composition (MergedCard's laneTallyOf, verbatim
+  // — the copy's own sentence templates through interpolate, never a
+  // hand-joined string; the unread lane speaks no tally).
+  const laneTallyOf = (lane: (typeof balance.lanes)[number]): string | undefined => {
+    if (lane.split) {
+      return interpolate(s.balance.laneSplit, { supports: num(lane.supports), pressures: num(lane.pressures) });
+    }
+    if (lane.side === 'unread') return undefined;
+    if (lane.firing === 0) return s.balance.laneTallyNone;
+    return interpolate(s.balance.laneTally, { firing: num(lane.firing), readable: num(lane.readable) });
+  };
+  // The card's own evidence composition: the full evidence words, the
+  // breakeven-5y5y status suffix (B-12).
+  const memberEvidenceOf = (m: (typeof balance.lanes)[number]['members'][number]): string | null => {
+    if (m.evidence === null) return null;
+    const word = gs.evidenceWords[m.evidence];
+    if (m.id !== 'breakeven-5y5y') return word;
+    const reading = byId.get('breakeven-5y5y');
+    const statusWord = reading === undefined ? null : c.status[chipWordKeyOf(reading.status)];
+    return statusWord === null ? word : `${word} · ${statusWord}`;
+  };
+  // The inflation lane's tilt note (the card's breakevenTiltLean).
+  const tiltLean = breakevenTiltLean(readings.find((r) => r.id === 'breakeven-tilt'));
+  return balance.lanes.map((lane) => ({
+    key: lane.lane,
+    label: gs.laneNames[lane.lane],
+    detail: s.balance.laneIntro[lane.lane],
+    note: lane.lane === 'inflation' && tiltLean !== null ? gs.tiltWords[tiltLean] : undefined,
+    valueText: null,
+    state: lane.side,
+    split: lane.split,
+    tally: laneTallyOf(lane),
+    members: lane.members.map((m) => {
+      const r = byId.get(m.id);
+      return {
+        key: m.id as string,
+        label: gs.voterNames[m.id as keyof typeof gs.voterNames],
+        impact: m.impact,
+        evidenceText: memberEvidenceOf(m),
+        valueText: r !== undefined && r.value !== null ? formatIndicatorValue(m.id, r.value, numberLocale, c.units) : null,
+      };
+    }),
+  }));
+}
+
+/** The card's own context line (01 §6, verbatim shape): gold's 30-day
+ * move as context — never counted; hidden when the value is missing. */
+function contextLineOf(
+  readings: readonly IndicatorReading[],
+  opts: { locale?: 'en-US' | 'fa-IR'; c?: typeof copy } = {},
+): React.ReactNode {
+  const c = opts.c ?? copy;
+  const numberLocale = opts.locale ?? 'en-US';
+  const change = readings.find((r) => r.id === 'gold-usd')?.change30d;
+  if (change === undefined || !Number.isFinite(change)) return null;
+  return (
+    <p data-balance-context-line className="bal-context">
+      {interpolate(c.signals.balance.contextLine, {
+        change: formatChange(change, 'pct', numberLocale, c.units),
+      })}
+    </p>
+  );
+}
+
 function renderCard(
   readings: readonly IndicatorReading[],
   opts: { locale?: 'en-US' | 'fa-IR'; c?: typeof copy } = {},
@@ -416,13 +504,27 @@ function renderCard(
   const gold = evaluateSignal('gold', readings);
   const silver = evaluateSignal('silver', readings);
   render(
-    <MergedSignalsCard
-      gold={gold}
-      silver={silver}
-      readings={readings}
-      copy={opts.c ?? copy}
-      numberLocale={opts.locale ?? 'en-US'}
-    />,
+    <>
+      <MergedSignalsCard
+        gold={gold}
+        silver={silver}
+        readings={readings}
+        copy={opts.c ?? copy}
+        numberLocale={opts.locale ?? 'en-US'}
+      />
+      <BalanceScale
+        drivers={laneDriversOf(readings, opts)}
+        copy={opts.c ?? copy}
+        numberLocale={opts.locale ?? 'en-US'}
+        contextLine={contextLineOf(readings, opts)}
+        measuredNote={
+          <p data-balance-measured-note className="bal-foot">
+            {(opts.c ?? copy).signals.balance.measuredNote}{' '}
+            <a href="https://example.invalid/backtest">{(opts.c ?? copy).signals.goldScore.measuredNoteLink}</a>
+          </p>
+        }
+      />
+    </>,
   );
   return { gold, silver };
 }
@@ -481,7 +583,9 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     ).not.toBeNull();
     expect(document.querySelectorAll('[data-balance-assembly="against"] [data-balance-weight]').length).toBe(0);
     expect(Number(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt'))).toBe(-10);
-    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toBe('Leaning for gold');
+    // GUX-S5 M5: the verdict word renders in the DRAWING (renderCard's
+    // BalanceScale side); the card itself no longer carries a balance.
+    expect(document.querySelector('[data-balance-verdict-word]')?.getAttribute('data-side')).toBeDefined();
     // The counts line states the whole shape (05 §4.4): for/against
     // always, not-leaning always, unread only when > 0 — the flows lane's
     // unread part renders (GF-P2).
@@ -504,7 +608,9 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     expect(forAssembly.querySelectorAll('[data-balance-weight]').length).toBe(3);
     expect(Number(document.querySelector('[data-balance-beam]')?.getAttribute('data-tilt'))).toBe(-10);
     expect(document.querySelector('[data-balance-verdict-word]')?.getAttribute('data-side')).toBe('for');
-    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toBe('Leaning for gold');
+    // GUX-S5 M5: the verdict word renders in the DRAWING (renderCard's
+    // BalanceScale side); the card itself no longer carries a balance.
+    expect(document.querySelector('[data-balance-verdict-word]')?.getAttribute('data-side')).toBeDefined();
   });
 
   it('the stack case: all five weights on ONE pan (two rows) and the tray shows its empty line (05 §4.5)', () => {
@@ -1168,11 +1274,14 @@ describe('the flipped view byte-stability pin (GB-S6)', () => {
     // And the retired elements stay retired inside the pinned markup.
     expect(document.querySelector('[data-gold-panels]')).toBeNull();
     expect(document.querySelector('[data-balance-tile]')).toBeNull();
-    expect(document.querySelector('[data-balance-visual]')).not.toBeNull();
-    // The reworded lane subtitle, not the legacy one.
-    expect(document.querySelector('[data-balance-subtitle]')?.textContent).toBe(
-      copy.signals.balance.subtitleLanes,
-    );
+    // GUX-S5 M5 (11 §5.4): the CARD's balance retired with the second
+    // instrument — the pinned card markup now carries the LANE DRILL-IN
+    // (the anchors to the page's five-force section) and NO
+    // [data-balance-visual] of its own; the page's ONE balance lives in
+    // the hero's CompositionStack.
+    expect(document.querySelector('[data-balance-visual]')).toBeNull();
+    expect(document.querySelector('[data-lane-drill]')).not.toBeNull();
+    expect(document.querySelectorAll('[data-lane-drill-link]').length).toBe(5);
   });
 });
 
@@ -1400,7 +1509,10 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     expect(document.querySelector('[data-verdict-metal="gold"]')?.getAttribute('data-verdict-direction')).toBe(
       goldOutlookOf(goldBalance(readings), gold.speed, gold.position),
     );
-    expect(document.querySelector('[data-balance-verdict-word]')?.textContent).toContain('Leaning for gold'); // GF-P1: the fixture's balance reads FOR
+    // GUX-S5 M5: the card carries NO balance at all now (the one-page
+    // instrument rule) — the AC-4 pin stands on the strip's direction
+    // above; the FOR-verdict pin lives in the drawing tests (renderCard).
+    expect(document.querySelector('[data-signal-card="merged"] [data-balance="gold"]')).toBeNull();
   });
 });
 
@@ -1564,15 +1676,18 @@ describe('MergedSignalsCard order — the balance then the footing strip (moved 
     );
     const card = container.querySelector<HTMLElement>('[data-signal-card="merged"]')!;
     const strip = card.querySelector<HTMLElement>('[data-signal-verdict]')!;
-    const balance = card.querySelector<HTMLElement>('[data-balance="gold"]')!;
+    const drill = card.querySelector<HTMLElement>('[data-lane-drill]')!;
     const footing = card.querySelector<HTMLElement>('[data-footing-metal="gold"]')!;
     expect(strip).toBeTruthy();
-    expect(balance).toBeTruthy();
+    expect(drill).toBeTruthy();
     expect(footing).toBeTruthy();
-    // The owner's order: strip → balance → footing (the panels that sat
-    // between balance and footing retired with the flip).
-    expect(strip.compareDocumentPosition(balance) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(balance.compareDocumentPosition(footing) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // GUX-S5 M5 (11 §5.4): the card's own balance retired — the card's
+    // order is strip → the lane drill-in (the anchors to the page's
+    // five-force section) → the footing strip; the page's ONE balance
+    // lives in the hero's CompositionStack (never rendered twice).
+    expect(strip.compareDocumentPosition(drill) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(drill.compareDocumentPosition(footing) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(card.querySelector('[data-balance="gold"]')).toBeNull(); // the second scale is GONE
     expect(card.querySelector('[data-gold-panels]')).toBeNull();
   });
 });

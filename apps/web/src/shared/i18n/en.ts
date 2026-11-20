@@ -1489,6 +1489,15 @@ export const en = {
       markYoyBasis: 'The band is over the year-over-year series',
       markStepped: 'A stepped policy-rate series',
       markZoneAria: 'The shaded zone is the 20th–80th percentile of the last 10 years',
+      /* GUX-S5 M5 (the master plan's sticky-nav foundation, F-03): the
+       * section chips — the page's own anchor names, short. */
+      navAria: 'Gold page sections',
+      navBriefing: 'The briefing',
+      navBridge: 'Iran bridge',
+      navSignals: 'Signals',
+      navLanes: 'Five forces',
+      navRatios: 'Ratios & context',
+      navHistory: 'History & notes',
       /* The lane names + one-sentence intros (the corpus's own, pinned). */
       laneBorrowingCosts: 'Interest rates & borrowing costs',
       laneDollar: 'The US dollar',

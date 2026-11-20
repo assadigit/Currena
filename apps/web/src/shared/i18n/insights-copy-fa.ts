@@ -2718,6 +2718,7 @@ export const insightsCopyFa: InsightsCopy = {
       // goldModelVsReality — با پنل‌ها بازنشسته شد (03 §6.4؛
       // balance.measuredNote یادداشت سنجش خودِ نمای لاین است).
       measuredNoteLink: 'گزارش کامل این سنجش',
+      laneDrillLabel: 'پنج نیرو در همین صفحه',
     },
   },
 

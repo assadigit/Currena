@@ -9708,6 +9708,7 @@ export const insightsCopyEn = {
       // signals.goldModelVsReality — retired with the panels (03 §6.4;
       // balance.measuredNote is the lane view's own note).
       measuredNoteLink: 'Read the full backtest',
+      laneDrillLabel: 'The five forces on this page',
     },
   },
 

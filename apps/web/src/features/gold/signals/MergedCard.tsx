@@ -33,18 +33,11 @@ import { useMemo } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
 import { formatNumber } from '@currena/core';
 import type { SignalConditionReading, SignalReading } from '@currena/insights';
-import { breakevenTiltLean, goldBalance, type GoldBalanceLane, type GoldBalanceMember } from '@currena/insights';
+import { goldBalance } from '@currena/insights';
 import { interpolate } from '../../../shared/i18n';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { formatChange, formatIndicatorValue, mergeSignals } from '../../../shared/config';
-import { chipWordKeyOf } from '../../../shared/components/StatusChip';
-import {
-  BalanceScale,
-  balanceVerdictCountsParts,
-  balanceVerdictWordOf,
-  type BalanceCounts,
-  type BalanceDriver,
-} from './BalanceScale';
+import { balanceVerdictCountsParts, balanceVerdictWordOf, type BalanceCounts } from './BalanceScale';
 import { ConditionIcon, LeanIcon, stateToneClass } from './icons';
 import { MetalIcon, VerdictStrip, goldOutlookOf } from './verdict';
 
@@ -122,11 +115,7 @@ export function MergedSignalsCard({
   /* Session 3 (G2) reuse: the inflation lane's context phrase — the
    * breakeven tilt reading's own lean (pure selection in the insights
    * package; the card never chooses copy). Absent/stale → no phrase. */
-  const tiltLean = useMemo(
-    () => breakevenTiltLean(readings.find((r) => r.id === 'breakeven-tilt')),
-    [readings],
-  );
-  const laneCount = (v: number): string => formatNumber(v, numberLocale, { maximumFractionDigits: 0 });
+
 
   /** The gold prose helper (GB-S6, the collapsed-corner decision): the
    * balance counts as a BalanceCounts shape for the shared rule helpers
@@ -167,79 +156,6 @@ export function MergedSignalsCard({
    * contradict the prose beside it; silver keeps its own lean. */
   const goldHeaderLean: 'mostly-supportive' | 'mostly-unsupportive' | 'mixed' =
     balance.net > 0 ? 'mostly-supportive' : balance.net < 0 ? 'mostly-unsupportive' : 'mixed';
-
-  /** The chip's second line (03 §2): the split contest, the honest "No
-   * driver firing" (only when the lane is readable — an absent read is
-   * never worded as an absent signal), else the firing count. An
-   * unread lane carries no tally; the tray's own word speaks. */
-  const laneTallyOf = (lane: GoldBalanceLane): string | undefined => {
-    if (lane.split) {
-      return interpolate(s.balance.laneSplit, {
-        supports: laneCount(lane.supports),
-        pressures: laneCount(lane.pressures),
-      });
-    }
-    if (lane.side === 'unread') return undefined;
-    if (lane.firing === 0) return s.balance.laneTallyNone;
-    return interpolate(s.balance.laneTally, { firing: laneCount(lane.firing), readable: laneCount(lane.readable) });
-  };
-
-  /** The member row's evidence phrase (03 §3 item 2): the evaluator's
-   * own word for WHY it leaned. B-12 (02 §4.2): the breakeven-5y5y line
-   * carries the indicator card's own status word beside the lean
-   * phrase, so the member list can never say "elevated" beside a card
-   * reading Normal (the evidence vocabulary has no such word — pinned
-   * by test). */
-  const memberEvidenceOf = (m: GoldBalanceMember): string | null => {
-    if (m.evidence === null) return null;
-    const word = gs.evidenceWords[m.evidence];
-    if (m.id !== 'breakeven-5y5y') return word;
-    const reading = byId.get('breakeven-5y5y');
-    const statusWord = reading === undefined ? null : copy.status[chipWordKeyOf(reading.status)];
-    return statusWord === null ? word : `${word} · ${statusWord}`;
-  };
-
-  /** The member's current value, display-formatted (the same helper as
-   * today's chips) — null when unread or missing. */
-  const memberValueOf = (m: GoldBalanceMember): string | null => {
-    const r = byId.get(m.id);
-    return r !== undefined && r.value !== null ? formatIndicatorValue(m.id, r.value, numberLocale, copy.units) : null;
-  };
-
-  /** The four lane drivers (03 §2–§3): key/label/intro from the copy, the
-   * side from the engine, every voter of the lane in table order. */
-  const laneDrivers: BalanceDriver[] = balance.lanes.map((lane) => ({
-    key: lane.lane,
-    label: gs.laneNames[lane.lane],
-    detail: s.balance.laneIntro[lane.lane],
-    note: lane.lane === 'inflation' && tiltLean !== null ? gs.tiltWords[tiltLean] : undefined,
-    valueText: null,
-    state: lane.side,
-    split: lane.split,
-    tally: laneTallyOf(lane),
-    members: lane.members.map((m) => ({
-      key: m.id as string,
-      label: gs.voterNames[m.id as keyof typeof gs.voterNames],
-      impact: m.impact,
-      evidenceText: memberEvidenceOf(m),
-      valueText: memberValueOf(m),
-    })),
-  }));
-
-  /* 01 §6: the context line — gold's own 30-day move, shown for context,
-   * never counted in the balance or the Outlook (it replaced the
-   * model-vs-reality chip at the consolidation). Hidden when missing.
-   * GB-S4: the verdict block's recessed pill (05 §4.4 — never green or
-   * red). */
-  const goldChange30d = byId.get('gold-usd')?.change30d;
-  const contextLine =
-    goldChange30d !== undefined && Number.isFinite(goldChange30d) ? (
-      <p data-balance-context-line className="bal-context">
-        {interpolate(s.balance.contextLine, {
-          change: formatChange(goldChange30d, 'pct', numberLocale, copy.units),
-        })}
-      </p>
-    ) : null;
 
   /* 01 §8.2: the measured note + the backtest link — visible without a
    * tap, no edge claimed. GB-S4: the balance's FOOTNOTE (05 §4.1 item 8). */
@@ -392,29 +308,31 @@ export function MergedSignalsCard({
         numberLocale={numberLocale}
       />
 
-      {/* UI-45 (2026-10-19 v3 merge; 2026-10-21c owner round): GOLD's
-       * balance. Silver's own balance is RETIRED (the owner's directive):
-       * silver keeps its analysis card above and its footing row below.
-       * Gold's assessment also carries the C12 banner.
-       *
-       * GB-S3 (the consolidation): the LANE drivers. GB-S4 (P2b,
-       * 05-VISUAL-DESIGN-SPEC.md): the VISUAL REDESIGN (the brass stage,
-       * the lane weights, the verdict hero, the tray, the inline ledger)
-       * — since the GB-S6 flip THE balance for every visitor (the
-       * `visual` prop and the legacy branch retired with the flag). */}
-      <BalanceScale
-        drivers={laneDrivers}
-        copy={copy}
-        numberLocale={numberLocale}
-        banner={c12Banner}
-        subtitle={s.balance.subtitleLanes}
-        contextLine={contextLine}
-        measuredNote={measuredNote}
-      />
-      {/* 2026-10-21c owner round: <BalanceScale metal="silver" …> is RETIRED
-       * here (the owner: "I dont need balance scale of Silver, remove that
-       * section entirely"). Silver keeps its analysis card (VerdictStrip,
-       * above) and its footing row (below); only gold carries a balance. */}
+      {/* GUX-S5 M5 (11 §5.4 — the DUP-2 dedup ledger, executed): the
+       * SECOND full BalanceScale RETIRES as a balance — the hero's
+       * CompositionStack is the page's ONE instrument (②; the
+       * one-full-instrument-per-page rule). What survives here: the
+       * C12 interaction banner (this card's own finding) + the measured
+       * note + the LANE drill-in — five plain links to the lanes'
+       * #lane-{lane} cards (the reader who wants the balance follows
+       * the anchor; the balance itself never renders twice). */}
+      {c12Banner}
+      {measuredNote}
+      <nav aria-label={gs.laneDrillLabel} data-lane-drill className="flex flex-wrap gap-x-3 gap-y-1">
+        {balance.lanes.map((lane) => (
+          <a
+            key={lane.lane}
+            href={`#lane-${lane.lane}`}
+            className="insights-focusable rounded text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
+            data-lane-drill-link={lane.lane}
+          >
+            {gs.laneNames[lane.lane]} ↗
+          </a>
+        ))}
+      </nav>
+      {/* 2026-10-21c owner round: <BalanceScale metal="silver" …> retired
+       * earlier; GUX-S5 M5 retires the GOLD instance the same way — one
+       * instrument per page, the CompositionStack's. */}
 
       {/* Price footing strip (owner spec §9): the SAME content that used
        * to sit beside the driver groups, now below the trays, separated
