@@ -37,6 +37,7 @@ import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { LANE_STATE_KEY, LANE_TITLE_KEY } from './GoldSeats';
+import { LaneBar, laneBarDataOf } from './LaneBar';
 
 /** One measuring-cards link: the label key + the href (card-level, the
  * #18 pattern; in-page anchors for this page's own surfaces). */
@@ -172,6 +173,13 @@ export function GoldOnRamp({ readings }: { readings: readonly IndicatorReading[]
         <p className="m-0 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
           <bdi>{body}</bdi>
         </p>
+        {/* GUX-S7 M3 (12 §3.3 row 3): the driver's CLOSE renders the
+         * LaneBar — the same lane renderer the CompositionStack and the
+         * five-force overview wear (one system, every surface; the
+         * education card and the live meter can never disagree because
+         * they read the same goldBalance lanes). Driver 4 (positioning)
+         * keeps its display-only close — no bar for a non-lane. */}
+        {lane !== undefined ? <LaneBar data={laneBarDataOf(lane)} /> : null}
         {driver.links.length > 0 ? (
           <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[length:var(--type-caption)]">
             <span className="font-semibold text-[var(--color-text-tertiary)]">{t('pd.gold.onRampSeeCards')}</span>
