@@ -1138,7 +1138,24 @@ const BUDGETS = [
   // bump to 240/50 gives the measured fit + ~2.4 kB raw headroom
   // (the last feature wave — the next GoldPage growth is a new program).
   // Justified in CHANGELOG (GPE-S17).
-  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 240_000, gz: 50_000, label: 'Gold page lazy chunk (page-division S5)' },
+  // GUX-S5 bump (2026-11-2x, the owner's Q4 answer A — S5-D6/S5-D7):
+  // the GUX program's own feature wave. The hero rebuild (M3b) measured
+  // 239.50/54.92: raw FITS 240, gz over 50 by 4.92 — the briefing
+  // components + BOTH eager brief-content locales (+ the fa strings'
+  // poor gzip) consumed the Zone O tail split's return (209.13/44.91
+  // after f4188a4c). The owner chose the one-line gz bump over further
+  // splits or lazy fa content (options B/C declined; the raw ceiling
+  // STAYS 240 — the discipline holds, the script still enforces).
+  // Verified NOT duplication (one BriefingCard, one CompositionStack,
+  // one LaneBar, one content module in the chunk). The tail + deep
+  // content chunks get their own tight ceilings below (measured).
+  { pattern: /^GoldPage-[\w-]+\.js$/, raw: 240_000, gz: 55_500, label: 'Gold page lazy chunk (page-division S5)' },
+  // GUX-S5 M3b-0 (f4188a4c): the Zone O tail's own chunk — the Episode
+  // Explorer + the if-you'd-bought calculator + the publication-notes
+  // disclosure, behind the near-viewport GoldTail boundary. Measured
+  // 31.81/6.60 at the split; tight ceiling 34/8 (the sections' bytes
+  // moved here verbatim — any growth is a new tail feature).
+  { pattern: /^gold-tail-content-[\w-]+\.js$/, raw: 34_000, gz: 8_000, label: 'Gold page Zone O tail chunk (GUX-S5)' },
   // Page-division S7 (2026-11-08): the World Markets route — the D-43
   // map hero + the region grids + the 9 world-risk cards. Measured
   // 26.53/6.49 at first build: the REUSED WorldMap module tree
