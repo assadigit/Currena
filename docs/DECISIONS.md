@@ -4456,3 +4456,14 @@
 
 **Who decided:** the owner (the session's Q4 question, answered in-session).
 **When to revisit:** the GUX program's close (Session 9's budget review) or any future GoldPage growth proposal — the headroom is ~1.0 kB raw / ~0.4 kB gz, deliberately tight.
+
+## BD-S50 — 2026-11-20 — GUX Session 6: the relationship explorer rides its own near-viewport chunk (the S5-D1 ladder's option (b) extended); the ceilings untouched
+
+**Decision:** The M1 build measured the explorer inside GoldPage at 260.38 raw / 61.58 gz — over BOTH ceilings (240/55.50). Per the S5-D1 standing rule the session did not touch the budget script: the pre-authorized tail-split pattern (S4-D10 option (b), executed for the Zone O tail at S5-D5) extended to the explorer — `gold-relationships-boundary.tsx` (the GoldTail contract verbatim). Measured after: GoldPage 223.43/50.05 (both ceilings held, ~16.6 kB raw headroom); the explorer's own chunk 21.52/7.54, loaded near-viewport (600px rootMargin; the `#gold-relationships` anchor mounts immediately; no-observer environments mount eagerly).
+
+**Options considered:** (a) raise the ceilings — NOT taken (the standing rule forbids it without the owner; the S5 gz bump BD-S49 was the one-time cost of the centerpiece, not a precedent for growth) · (b) the boundary split — chosen: pure code organization inside §9.3's routine-refactoring authority, the GoldPage basename freeze preserved · (c) trim the explorer's content — rejected (10 §3's one-liners are the content of record; the copy rule is 12 §5's own contract).
+
+**Reason:** The budget discipline is the program's guardrail; the explorer is secondary-tier content (the master plan's own "advanced" section) whose bytes belong behind a lazy boundary, exactly like the Zone O tail before it.
+
+**Who decided:** the session (inside S5-D1 standing rule 2's pre-authorized ladder; the same authority S5-D5 exercised).
+**When to revisit:** the program's close (Session 9's budget review); any future GoldPage growth proposal.
