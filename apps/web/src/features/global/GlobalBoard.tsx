@@ -38,6 +38,7 @@ import {
   type GlobalRibbonEntry,
 } from './global-tiles';
 import { DESTINATIONS } from '../../shared/components/destinations';
+import { FIVE_STATE_KEY, FIVE_STATE_TONE, fiveStateOf } from '../../shared/components/outlook-five-state';
 import type { NarrativeDoc } from '../../shared/lib/narrative';
 import { formatRelativeShort } from '../world-markets/shared';
 
@@ -104,29 +105,12 @@ function TileLink({
 }
 
 /* ------------------------------------------------------------------ *
- * Tile ① — Gold Balance (D-21): compact 7-state outlook + the
- * 37-voter meter's for/against counts. Links to /gold.
+ * Tile ① — Gold Balance (D-21): the five-state CONDITIONS word (the
+ * owner's Q1 answer B, GUX-S7 M1: the shared 7→5 fold in
+ * outlook-five-state.ts — 08 §8.1's vocabulary) + the 37-voter meter's
+ * for/against counts. Links to /gold. The classifier behind it is the
+ * SAME 7-state engine (GB-S5, untouched); only the word folds.
  * ------------------------------------------------------------------ */
-
-const OUTLOOK_WORD_KEY = {
-  'strong-bullish': 'pd.global.outlookStrongBullish',
-  bullish: 'pd.global.outlookBullish',
-  neutral: 'pd.global.outlookNeutral',
-  'range-bound': 'pd.global.outlookRangeBound',
-  bearish: 'pd.global.outlookBearish',
-  'strong-bearish': 'pd.global.outlookStrongBearish',
-  mixed: 'pd.global.outlookMixed',
-} as const;
-
-/** The outlook word's ink: the bullish family wears the normal (green)
- *  ink, the bearish family the alert red, the calm states the neutral —
- *  verdict.tsx's own verdictTone mapping, restated for the lean chunk. */
-const OUTLOOK_TONE: Record<string, string> = {
-  'strong-bullish': 'text-[var(--color-status-normal)]',
-  bullish: 'text-[var(--color-status-normal)]',
-  'strong-bearish': 'text-[var(--color-status-alert)]',
-  bearish: 'text-[var(--color-status-alert)]',
-};
 
 export function GoldBalanceTile({ tile }: { tile: GlobalGoldTile }): React.JSX.Element {
   const { t, numberLocale } = useI18n();
@@ -137,8 +121,8 @@ export function GoldBalanceTile({ tile }: { tile: GlobalGoldTile }): React.JSX.E
       <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
         <span className="sr-only">{t('pd.global.goldOutlookLabel')}: </span>
         {tile.outlook !== null ? (
-          <span className={`type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight ${OUTLOOK_TONE[tile.outlook] ?? ''}`}>
-            {t(OUTLOOK_WORD_KEY[tile.outlook])}
+          <span className={`type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight ${FIVE_STATE_TONE[fiveStateOf(tile.outlook)]}`}>
+            {t(FIVE_STATE_KEY[fiveStateOf(tile.outlook)])}
           </span>
         ) : (
           <span className="type-verdict text-[0.95rem] font-bold sm:text-[1.15rem] lg:text-[1.45rem] leading-tight text-[var(--color-text-tertiary)]">
