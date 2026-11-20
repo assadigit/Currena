@@ -5953,3 +5953,47 @@ construction). No GPE record was reopened; the session record lives here
   nothing non-obvious was decided; the sitting executed the owner's
   instruction under the standing §5 approval. Credentials used, not
   stored (AGENTS.md §7).
+
+## 2026-11-20 — the BD-S43 UX ops deploy (the gold page's licence bookkeeping to the footer, hidden by default)
+
+- **Tree**: `33ea08a5` on `main` (pushed). The one commit: the owner-directed
+  relocation — the §16 licence wall (the blocked quartet + the ONE
+  `SOURCES.md` link-out) + the header's absent-count line moved
+  byte-for-byte unchanged into `GoldPublicationNotes.tsx`, the page-tail
+  disclosure, COLLAPSED BY DEFAULT (the house progressive-disclosure
+  pattern); the `#gold-blocked` anchor survives on the disclosure's root.
+  BD-S43 carries the three decisions (DECISIONS.md).
+- **Gates first**: 9/9 GREEN (2m 59s — secret scan clean · typecheck · lint
+  0/0 · copy:audit clean [the new `pd.gold.pubNotesSummary` FA string
+  queued unreviewed] · narrator vocabulary + eval · layer1 11,969/11,969 ·
+  the suite 15,599 [the GoldPage tests rebased to the new contract] ·
+  build + budgets: GoldPage 238.90/49.57 under 240/50 · entry 271.13/82.12
+  under 296/89.5).
+- **The deploy-lock check ran first** (the D-43 lesson; the deployments-list
+  read endpoint denies this token's scopes, so the version history served
+  the same answer): the newest version was `f4926c9d` (2026-11-19T23:32:05Z,
+  the recorded secret-put state) — no drift since the 2026-11-19 ops record.
+- **Deploy**: `pnpm --filter @currena/web build` + `pnpm --filter
+  @currena/api exec wrangler deploy` → currena-api **`5c34a14b`**
+  (2026-11-20, the bindings intact: RATES KV + AI + ASSETS +
+  SITE_MODE=public + the NARRATOR_* vars + the minute cron; the workers.dev
+  twin live). No secret changes this sitting — the secrets untouched.
+- **Post-deploy smoke**: `/api/health` 200 · the gold projection
+  `/api/insights/pages/gold` 200 · the gold-family planes 200 (gold-ohlc ·
+  gold-cb · gold-lbma · gold-expectations · gold-premium · gold-ifbought ·
+  gold-meter) · `gold-episodes` 503 = the DESIGNED WGC-workbook waiting
+  state (the standing owner lever, never a defect).
+- **Live browser verification (the golden path)**: the served entry script
+  `index-BqnATyD-.js` = the fresh dist (the live build is THIS tree) · EN
+  desktop: the wall ABSENT from the flow, the header's "not published" line
+  ABSENT, the publication-notes disclosure at the page tail (after the
+  if-you'd-bought calculator), COLLAPSED (`aria-expanded="false"`, the body
+  out of the DOM), ONE tap opens it: the four blocked notes + the
+  `SOURCES.md` link-out + the absent-count line all inside, byte-for-byte
+  the recorded copy · FA/RTL: the Persian label, the Persian quartet, the
+  absent count «۴ …» with the Persian digit (GPE R06/#15 held) · mobile
+  390: the collapsed disclosure renders, no horizontal scroll, zero
+  console errors, zero page errors.
+- **Records**: the CHANGELOG dated entry + the HANDOFF session block +
+  BD-S43 in DECISIONS + this record. Credentials used, not stored
+  (AGENTS.md §7).

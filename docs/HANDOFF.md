@@ -52,9 +52,12 @@ EN desktop/mobile + FA RTL; the disclosure present, collapsed, opening
 on one tap with the full quartet inside). Credentials used, not
 stored (AGENTS.md §7).
 
-**Known state (post-deploy):** see the DEPLOY record for the active
-version id; the GoldPage budget line above; the WGC fold still the
-standing owner-side lever (data/wgc/ absent, no owner notice).
+**Known state (post-deploy):** production = currena-api **`5c34a14b`**
+(2026-11-20, deployed from `33ea08a5`; the served entry
+`index-BqnATyD-.js` byte-matches this tree's dist; the full record in
+`docs/DEPLOY.md`); the GoldPage budget 238.90/49.57 under 240/50; the
+WGC fold still the standing owner-side lever (data/wgc/ absent, no
+owner notice).
 
 **Next:** nothing needed — the GPE program stays COMPLETE and closed;
 this sitting's owner request is fully delivered. The standing
