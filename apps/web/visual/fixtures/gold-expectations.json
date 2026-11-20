@@ -1,0 +1,43 @@
+{
+ "v": 1,
+ "fetchedAt": "2026-11-19T05:23:00.000Z",
+ "source": "polymarket",
+ "event": {
+  "slug": "fed-decision-in-december-20260729232808632",
+  "title": "Fed Decision in December?",
+  "endDate": "2026-12-10T04:59:00Z",
+  "url": "https://polymarket.com/event/fed-decision-in-december-20260729232808632"
+ },
+ "markets": [
+  {
+   "move": "hike50plus",
+   "question": "Will the Fed increase interest rates by 50+ bps after the December 2026 meeting?",
+   "slug": "m1",
+   "yesPrice": 0.0625
+  },
+  {
+   "move": "hike25",
+   "question": "Will the Fed increase interest rates by 25 bps after the December 2026 meeting?",
+   "slug": "m2",
+   "yesPrice": 0.915
+  },
+  {
+   "move": "hold",
+   "question": "Will there be no change in Fed interest rates after the December 2026 meeting?",
+   "slug": "m3",
+   "yesPrice": 0.0225
+  },
+  {
+   "move": "cut25",
+   "question": "Will the Fed decrease interest rates by 25 bps after the December 2026 meeting?",
+   "slug": "m4",
+   "yesPrice": 0.0035
+  },
+  {
+   "move": "cut50plus",
+   "question": "Will the Fed decrease interest rates by 50+ bps after the December 2026 meeting?",
+   "slug": "m5",
+   "yesPrice": 0.0015
+  }
+ ]
+}
