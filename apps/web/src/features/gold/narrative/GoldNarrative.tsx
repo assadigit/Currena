@@ -85,12 +85,15 @@ export function GoldNarrative({ readings }: { readings: readonly IndicatorReadin
       : null;
   return (
     <section
-      id="gold-zone-d"
-      aria-labelledby="gold-zone-d-title"
+      /* GUX-S5 M3b (F-07's fix): the duplicate id RETIRES here — the
+       * Zone D band wrapper in GoldPage owns the #gold-zone-d anchor
+       * (R10's contract; the audit's live-DOM evidence had it ×2). The
+       * aria-labelledby keeps its own distinct id. */
+      aria-labelledby="gold-narrative-title"
       data-gold-narrative
       className="flex flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:p-3.5"
     >
-      <h3 id="gold-zone-d-title" className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
+      <h3 id="gold-narrative-title" className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
         {t('pd.gold.narrativeTitle')}
       </h3>
 

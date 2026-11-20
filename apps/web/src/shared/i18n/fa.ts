@@ -1378,6 +1378,11 @@ export const fa: Dictionary = {
       stackInspectInstrument: 'دیدن تراز کامل',
       stackLedgerLink: 'بررسی هر ۳۷ عامل',
       seatLink: 'نمایش کارت شاخص',
+      /* GUX-S5 M3b (۱۲ §۳.۱ ردیف ۴.۱): اسپارک سری زمانی قیمت در هدر — نام سری طبق C1، بازهٔ واقعی خودش، تغییر علامت‌دار با رنگ بازده؛ خطوط صادقانهٔ انتظار/عدم دسترسی. */
+      sparkSeriesName: 'انس جهانی طلا · کلوزهای روزانه',
+      sparkWindowLabel: '{n} کندل · {from} → {to}',
+      sparkAria: 'قیمت لحظه‌ای طلا در {n} کلوز روزانهٔ اخیر (حدود {months} ماه): {change} از {from} تا {to}.',
+      sparkUnavailable: 'نمودار قیمت هنوز قابل خواندن نیست.',
       laneBorrowingCosts: 'نرخ بهره و هزینهٔ استقراض',
       laneDollar: 'دلار آمریکا',
       laneStress: 'تنش و عدم قطعیت بازار',

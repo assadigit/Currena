@@ -79,6 +79,7 @@ export function GoldTail({ absentCount }: { absentCount: number }): React.JSX.El
     if (mounted) return undefined;
     if (typeof IntersectionObserver === 'undefined') {
       // jsdom/old browsers: eager mount, zero behavior change.
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the no-observer fallback is the boundary's own trigger (the Signals expand-on-token precedent)
       setMounted(true);
       return undefined;
     }

@@ -207,8 +207,18 @@ export function GoldPage(): React.JSX.Element {
         ) : null}
       </header>
 
-      {/* D-26 item 1 — the hero. */}
-      {hero !== null ? <GoldHero hero={hero} pricesAsOf={projection?.pricesAsOf} pricesCached={fromCache} /> : null}
+      {/* D-26 item 1 — the hero, REBUILT (GUX-S5 M3b): the price block +
+          the BriefingCard (the focal element) + the CompositionStack. The
+          reason rows open the M4 record popover (the same details panel
+          the context cards use — one canonical record presentation). */}
+      {hero !== null ? (
+        <GoldHero
+          hero={hero}
+          pricesAsOf={projection?.pricesAsOf}
+          pricesCached={fromCache}
+          onOpenRecord={(id) => openCard(id)}
+        />
+      ) : null}
 
       {/* GPE R11 / R12 — Zone D, the explanation band: F1 the daily
           narrative + F5 the yield-decomposition card (side by side from

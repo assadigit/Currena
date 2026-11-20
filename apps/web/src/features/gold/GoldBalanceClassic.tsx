@@ -180,7 +180,10 @@ export function GoldBalanceClassic({ hero }: { hero: GoldHeroModel }): React.JSX
       data-size={balanceVisualSizeOf(rootWidth)}
       className="relative mx-auto flex w-full max-w-[480px] flex-col"
     >
-      <BalanceGradients />
+      {/* GUX-S5 M3b (F-07): this view's discs carry their OWN gradient
+         * scope — the hero stack and the Signals card can render at the
+         * same time and their gradient ids must never collide. */}
+      <BalanceGradients idScope="gold-hero-stack" />
       <div className="bal-glow" aria-hidden="true" />
       <BalanceStage
         drivers={drivers}
@@ -189,6 +192,7 @@ export function GoldBalanceClassic({ hero }: { hero: GoldHeroModel }): React.JSX
         rootWidth={rootWidth}
         stageAria={stageAria}
         gaugeAria={gaugeAria}
+        beamIdScope="gold-hero-stack"
         onWeightOpen={openLaneFromWeight}
         weightAriaOf={heroWeightAriaOf}
       />

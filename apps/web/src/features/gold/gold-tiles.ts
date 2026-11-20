@@ -115,6 +115,23 @@ export function goldHeroVerdictState(hero: Pick<GoldHeroModel, 'balance'>): Gold
   return balanceVerdictOf(counts);
 }
 
+/** GUX-S5 M3b: the verdict state's dictionary key — ONE map so the
+ *  hero and the CompositionStack compose the SAME word (the stack's ①
+ *  says the verdict once; this helper guarantees the once-rendered word
+ *  is the engine's own, never a second vocabulary). */
+export function goldHeroVerdictWordKey(state: GoldHeroVerdictState): import('../../shared/lib/locale').TranslationKey {
+  return VERDICT_WORD_KEY[state];
+}
+
+/** The verdict word map (the hero's own, corpus-pinned words). */
+const VERDICT_WORD_KEY: Record<GoldHeroVerdictState, import('../../shared/lib/locale').TranslationKey> = {
+  for: 'pd.gold.heroVerdictFor',
+  balanced: 'pd.gold.heroVerdictBalanced',
+  against: 'pd.gold.heroVerdictAgainst',
+  none: 'pd.gold.heroVerdictNone',
+  'not-enough': 'pd.gold.heroNotEnough',
+};
+
 /** The hero's beam tilt — the SAME presentation scale the legacy drawing
  *  swings on (|net| ÷ (for+against) × 10°, floor 3°, level at net 0). */
 export function goldHeroTilt(hero: Pick<GoldHeroModel, 'balance'>): BalanceTilt {

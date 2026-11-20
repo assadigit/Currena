@@ -1454,6 +1454,13 @@ export const en = {
       stackInspectInstrument: 'Inspect the instrument',
       stackLedgerLink: 'Inspect all 37 voters',
       seatLink: 'Open indicator',
+      /* GUX-S5 M3b (12 §3.1 row 4.1): the hero price block's HouseTimeSeries
+       * spark — the series named per C1, the window's own true span, the
+       * signed change in return ink; the honest waiting/unavailable lines. */
+      sparkSeriesName: 'XAUUSD spot · daily closes',
+      sparkWindowLabel: '{n} bars · {from} → {to}',
+      sparkAria: 'Gold spot price over the last {n} daily closes (~{months} months): {change} from {from} to {to}.',
+      sparkUnavailable: 'The price chart could not be read yet.',
       /* The lane names + one-sentence intros (the corpus's own, pinned). */
       laneBorrowingCosts: 'Interest rates & borrowing costs',
       laneDollar: 'The US dollar',

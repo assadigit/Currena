@@ -33,7 +33,7 @@ import type { TranslationKey } from '../../shared/lib/locale';
 import type { GoldHeroModel, GoldHeroVerdictState } from './gold-tiles';
 import { goldHeroTilt } from './gold-tiles';
 import { GoldBalanceClassic } from './GoldBalanceClassic';
-import { BeamGlyph } from './GoldHero';
+import { BeamGlyph } from './BeamGlyph';
 import { LaneBar, laneBarDataOf } from './LaneBar';
 
 const VERDICT_WORD_KEY: Readonly<Record<GoldHeroVerdictState, TranslationKey>> = {

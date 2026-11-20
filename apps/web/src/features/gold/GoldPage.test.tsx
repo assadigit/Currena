@@ -405,13 +405,26 @@ describe('GoldPage', () => {
     expect(hero.textContent).toContain('7d');
     // The 10-year position line (percentile 0.906 → top 9%).
     expect(hero.textContent).toContain('top 9%');
-    // The hourly live-prices stamp.
-    expect(hero.textContent).toContain('Live prices as of');
+    // GUX-S5 M3b (11 §6.4): the ONE AsOfChip — the hourly live-prices stamp
+    // as the chip's time word (the three old timestamp formats retired).
+    const chip = hero.querySelector('[data-asof-chip="hero-prices"]')!;
+    expect(chip.textContent).toContain('as of');
+    expect(chip.textContent).toContain('UTC');
+    // The market pill rides the same row (GPE R16, unchanged).
+    expect(hero.querySelector('[data-market-pill]')).not.toBeNull();
 
-    // The balance verdict word + the outlook + the counts line.
-    expect(document.querySelector('[data-hero-verdict]')?.getAttribute('data-hero-verdict')).toBe(
-      balance.net > 0 ? 'for' : balance.net < 0 ? 'against' : 'balanced',
+    // GUX-S5 M3b: the briefing shape — the BriefingCard (the focal
+    // element) + the CompositionStack carry the verdict/outlook/counts
+    // ONCE each; the hero block itself no longer repeats them.
+    expect(hero.querySelector('[data-briefing-card]')).not.toBeNull();
+    expect(hero.querySelector('[data-composition-stack]')).not.toBeNull();
+    expect(hero.querySelector('[data-hero-balance-view]')).toBeNull(); // the radio RETIRED
+    // The stack's ① says the verdict ONCE, from the engine's own state.
+    expect(hero.querySelector('[data-stack-verdict]')?.getAttribute('data-stack-verdict')).toBe(
+      balance.readable === 0 ? 'none' : balance.readable < 3 ? 'not-enough' : balance.net > 0 ? 'for' : balance.net < 3 ? 'balanced' : 'against',
     );
+    // The BriefingCard's Q1 container carries the 7-state outlook + counts.
+    expect(hero.querySelector('[data-briefing-outlook]')).not.toBeNull();
     const countsText = `${balance.counts.for} for · ${balance.counts.against} against`;
     expect(hero.textContent).toContain(countsText);
     // gold's own 30-day move — the context line, never counted.
@@ -541,43 +554,42 @@ describe('GoldPage', () => {
     expect(card.querySelector('a[href="/usa#usa-card-us-deficit-12m"]')).toBeTruthy();
   });
 
-  it('S6: the hero\u2019s balance view ALTERNATES — the classic previous shape is the default, the minimal glyph one radio away, the choice persisted', async () => {
+  it('GUX-S5 M3b: the hero is the BRIEFING shape — the BriefingCard + the CompositionStack, the view radio RETIRED, the brass instrument the stack\'s own ②', async () => {
     stubFeeds();
     render(<GoldPage />);
     await waitFor(() => {
       expect(document.querySelector('[data-gold-hero]')).not.toBeNull();
     });
 
-    // The DEFAULT is the classic view (BD-S6a): the previous shape — the
-    // brass stage + weights + tray through the extracted drawing — and
-    // NO minimal glyph.
-    expect(document.querySelector('[data-hero-balance-view]')?.getAttribute('data-hero-balance-view')).toBe('classic');
-    expect(document.querySelector('[data-balance-classic]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-stage]')).not.toBeNull();
-    expect(document.querySelector('[data-hero-beam]')).toBeNull();
+    // The view radio (BD-S6a's classic↔minimal alternation) is GONE —
+    // the CompositionStack IS the balance view now: brass ≥lg, the
+    // BeamGlyph + brass-on-tap below. No radio, no persisted key.
+    expect(document.querySelector('[data-hero-balance-view]')).toBeNull();
+    expect(document.querySelectorAll('input[name="gold-balance-view"]').length).toBe(0);
 
-    // The radio group: two real options, the group labelled.
-    const group = document.querySelector('[data-hero-balance-view]')!;
-    expect(group.querySelector('legend')?.textContent).toBe('Balance view');
-    const radios = group.querySelectorAll('input[type="radio"]');
-    expect(radios.length).toBe(2);
-    expect((radios[0] as HTMLInputElement).checked).toBe(true);
-    expect((radios[1] as HTMLInputElement).checked).toBe(false);
+    // The BriefingCard — the page's single focal element (the gold
+    // field + ring-2 + --shadow-focal; the Q1/Q2 gates held: no
+    // horizon chip, no scenario row — pinned in BriefingCard.test).
+    const card = document.querySelector('[data-briefing-card]')!;
+    expect(card.className).toContain('shadow-[var(--shadow-focal)]');
 
-    // Toggle to the minimal view: the glyph appears, the stage leaves,
-    // and the choice persists to localStorage.
-    fireEvent.click(radios[1]!);
-    await waitFor(() => {
-      expect(document.querySelector('[data-hero-balance-view]')?.getAttribute('data-hero-balance-view')).toBe('minimal');
-    });
-    expect(document.querySelector('[data-hero-beam]')).not.toBeNull();
-    expect(document.querySelector('[data-balance-classic]')).toBeNull();
-    expect(window.localStorage.getItem('currena:pd:gold:balance-view')).toBe('minimal');
-
-    // The engine\u2019s own lines stay in BOTH views: the verdict word +
-    // the outlook + the counts ride the hero block either way.
-    expect(document.querySelector('[data-hero-verdict]')?.getAttribute('data-hero-verdict')).toBe('for');
-    expect(document.querySelector('[data-hero-outlook]')).not.toBeNull();
+    // The CompositionStack's ①–⑤: the verdict ONCE, the instrument,
+    // the five LaneBars, the ledger anchor, the caveat.
+    const stack = document.querySelector('[data-composition-stack]')!;
+    expect(stack.querySelectorAll('[data-stack-verdict]').length).toBe(1);
+    expect(stack.querySelector('[data-stack-ledger-link]')?.getAttribute('href')).toBe('#gold-seats');
+    expect(stack.querySelectorAll('[data-lanebar]').length).toBe(5);
+    expect(stack.textContent).toContain('not a forecast');
+    // The verdict word renders exactly ONCE in the whole hero block —
+    // the F-01/DUP-2 fix (the hero never repeats the stack's ①).
+    const verdictState = document.querySelector('[data-stack-verdict]')?.getAttribute('data-stack-verdict');
+    const heroBlock = document.querySelector('[data-gold-hero]')!;
+    if (verdictState === 'for') {
+      expect(heroBlock.textContent).toContain('Leaning for gold');
+      // said once by the stack's ① (the briefing headline is its own
+      // sentence — the editorial identity, never the same words).
+      expect(heroBlock.textContent).not.toContain('Leaning for gold. ');
+    }
   });
 
   it('S6: the classic view renders the engine\u2019s own lane sides + weights + beam tilt through the SAME drawing the legacy card renders', async () => {
@@ -847,6 +859,11 @@ describe('GoldPage', () => {
     // page-tail disclosure (BD-S43) — still AFTER zone K in document order.
     const flows = [...zoneK.parentElement!.children].findIndex((el) => el === zoneK);
     expect(flows).toBeGreaterThan(0);
+    // GUX-S5 M3b: the wall rides the lazy tail — waitFor its mount before
+    // the document-order assertion (still AFTER zone K).
+    await waitFor(() => {
+      expect(document.getElementById('gold-blocked')).not.toBeNull();
+    });
     const wall = document.getElementById('gold-blocked')!;
     expect(zoneK.compareDocumentPosition(wall) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
@@ -947,9 +964,16 @@ describe('GoldPage', () => {
     await waitFor(() => {
       expect(document.querySelector('[data-gold-hero]')).not.toBeNull();
     });
-    for (const id of ['gold-balance-view-classic', 'gold-balance-view-minimal']) {
-      const label = document.querySelector(`label[for="${id}"]`)!;
-      expect(label.className).toContain('min-h-[44px]');
+    // GUX-S5 M3b: the view radio RETIRED (the stack is the balance view);
+    // the stack's own affordances carry the 44px floor — the brass-on-tap
+    // button below lg and the BriefingCard's reason rows.
+    const heroBlock = document.querySelector('[data-gold-hero]')!;
+    const inspect = heroBlock.querySelector('[data-stack-inspect-instrument]');
+    if (inspect !== null) {
+      expect(inspect.className).toContain('min-h-[44px]');
+    }
+    for (const row of heroBlock.querySelectorAll('[data-brief-reason]')) {
+      expect(row.className).toContain('min-h-[44px]');
     }
     // GPE R18 / F7: the GOLD chip's interactive chart rides the OHLC leg —
     // its own range chips + toggles must meet the same 44px floor.
@@ -1486,10 +1510,13 @@ describe('GoldPage', () => {
     await waitFor(() => {
       expect(document.querySelectorAll('[data-seat]').length).toBe(37);
     });
-    // The fresh path: the live-prices line carries the plain as-of sentence.
+    // The fresh path: the AsOfChip carries the plain as-of word (the ONE
+    // freshness grammar — GUX-S5 M3b; the old "Live prices as of"
+    // sentence retired with the three hero timestamp formats).
     expect(document.querySelector('[data-prices-as-of]')?.getAttribute('data-prices-as-of')).toBe('fresh');
-    expect(document.querySelector('[data-prices-as-of]')?.textContent).toContain('Live prices as of');
-    expect(document.querySelector('[data-prices-as-of]')?.textContent).not.toContain('last successful');
+    const freshChip = document.querySelector('[data-asof-chip="hero-prices"]');
+    expect(freshChip?.textContent).toContain('as of');
+    expect(freshChip?.textContent).not.toContain('last successful');
     cleanup();
     vi.unstubAllGlobals();
     clearProjectionCacheForTests();
@@ -1508,10 +1535,10 @@ describe('GoldPage', () => {
     await waitFor(() => {
       expect(document.body.textContent).toContain('Showing the last good copy');
     });
-    // The cached path: the line carries the "last successful" qualifier.
-    const pricesLine = document.querySelector('[data-prices-as-of]');
-    expect(pricesLine?.getAttribute('data-prices-as-of')).toBe('cached');
-    expect(pricesLine?.textContent).toContain('last successful');
+    // The cached path: the chip carries the "last successful" qualifier
+    // (the AsOfChip's cache word — the same honesty, the ONE grammar).
+    const cachedChip = document.querySelector('[data-asof-chip="hero-prices"]');
+    expect(cachedChip?.textContent).toContain('last successful');
   });
 
   it('#24: the cold-load skeleton reserves the Signals section slot before the snapshot arrives (GPE-S2-24)', async () => {

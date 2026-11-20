@@ -158,7 +158,7 @@ import type { SignalConditionState } from '@currena/insights';
 import { interpolate } from '../../../shared/i18n';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg } from '../../../components/icons/currena';
-import { BalanceGradients, BalanceWeight, BalanceWeightDisc } from './BalanceWeight';
+import { BalanceGradients, BalanceWeight, BalanceWeightDisc, useBalanceGradientId } from './BalanceWeight';
 
 /** One balance driver — the spec's four states (§4). `neutral` (read,
  * no effect) and `unread` (could not be read) are DIFFERENT states. */
@@ -647,6 +647,7 @@ export function BalanceStage({
   rootWidth,
   stageAria,
   gaugeAria,
+  beamIdScope = 'signals',
   onWeightOpen,
   weightAriaOf,
 }: {
@@ -659,10 +660,24 @@ export function BalanceStage({
   stageAria: string;
   /** The gauge's text equivalent — the caller composes it (angle + verdict). */
   gaugeAria: string;
+  /** GUX-S5 M3b (F-07): the beam gradient's id scope — unique per
+   * simultaneous stage instance, deterministic across renders. */
+  beamIdScope?: string;
   onWeightOpen?: (key: string) => void;
   weightAriaOf?: (key: string) => BalanceStageWeightAria | undefined;
 }): React.JSX.Element | null {
   const rtl = numberLocale === 'fa-IR';
+  /* GUX-S5 M3b (F-07): the hub's brass-face gradient rides the shared
+   * scope hook — called at the top (rules of hooks: the stage's early
+   * returns must not skip it). */
+  const hubFaceId = useBalanceGradientId('brass');
+  /* GUX-S5 M3b (F-07's fix): the beam gradient's id is PER-STAGE — the
+   * stage svg defines and references its own def, so two simultaneous
+   * balance instances (the hero stack + the Signals card) can never
+   * collide on bal-beam-brass. The id is the caller's STABLE scope
+   * (deterministic across renders — the GB-S6 byte-stability pin
+   * demands it; useId would churn every mount). */
+  const beamGradId = `bal-beam-brass-${beamIdScope}`;
   /* Model-level reads (pure — the parent computes the same counts for
    * its verdict block; ONE helper, called twice, never two maths). */
   const counts = balanceCounts(drivers);
@@ -830,7 +845,7 @@ export function BalanceStage({
         aria-hidden={gaugeAvailable ? undefined : true}
       >
         <defs>
-          <linearGradient id="bal-beam-brass" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={beamGradId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--bal-brass-hi)" />
             <stop offset="50%" stopColor="var(--bal-brass-mid)" />
             <stop offset="100%" stopColor="var(--bal-brass-lo)" />
@@ -841,10 +856,10 @@ export function BalanceStage({
         <ellipse cx={r2(vCx)} cy={r2(vm.stageH - 16)} rx={s ? 50 : 68} ry={7} fill="rgba(91,61,8,.18)" />
         <path
           d={`M ${r2(vCx - 5)} ${r2(vm.pivotY + 10)} L ${r2(vCx + 5)} ${r2(vm.pivotY + 10)} L ${r2(vCx + 9)} ${r2(vm.stageH - 26)} L ${r2(vCx - 9)} ${r2(vm.stageH - 26)} Z`}
-          fill="url(#bal-beam-brass)"
+          fill={`url(#${beamGradId})`}
           opacity={0.95}
         />
-        <rect x={r2(vCx - (s ? 44 : 58))} y={r2(vm.stageH - 26)} width={s ? 88 : 116} height={12} rx={6} fill="url(#bal-beam-brass)" />
+        <rect x={r2(vCx - (s ? 44 : 58))} y={r2(vm.stageH - 26)} width={s ? 88 : 116} height={12} rx={6} fill={`url(#${beamGradId})`} />
         {/* The dial: 11 ticks (centre longer) over a ±35° arc. */}
         {dialTicks.map((t) => (
           <line
@@ -869,7 +884,7 @@ export function BalanceStage({
          * The one and only transform in the drawing. */}
         <g data-balance-beam data-tilt={String(targetDeg)} transform={`rotate(${r2(vf.beamDeg)} ${r2(vCx)} ${r2(vm.pivotY)})`}>
           <g transform={`translate(${r2(vCx)} ${r2(vm.pivotY)})`}>
-            <path data-balance-beam-bar d={beamPath} fill="url(#bal-beam-brass)" stroke="var(--bal-brass-lo)" strokeWidth={0.6} />
+            <path data-balance-beam-bar d={beamPath} fill={`url(#${beamGradId})`} stroke="var(--bal-brass-lo)" strokeWidth={0.6} />
             <path
               d={`M ${r2(-vm.L / 2 + 6)} ${r2(-1.6 * bh)} L ${r2(vm.L / 2 - 6)} ${r2(-1.6 * bh)}`}
               fill="none"
@@ -897,7 +912,7 @@ export function BalanceStage({
         ) : null}
         {/* The brass hub caps it: the hub, its dark centre, the
          * specular dot. */}
-        <circle cx={r2(vCx)} cy={r2(vm.pivotY)} r={vm.hubR} fill="url(#bal-face-brass)" stroke="var(--bal-brass-lo)" strokeWidth={1} />
+        <circle cx={r2(vCx)} cy={r2(vm.pivotY)} r={vm.hubR} fill={`url(#${hubFaceId})`} stroke="var(--bal-brass-lo)" strokeWidth={1} />
         <circle cx={r2(vCx)} cy={r2(vm.pivotY)} r={s ? 3.6 : 4.4} fill="var(--color-text-primary)" />
         <circle cx={r2(vCx - 1.2)} cy={r2(vm.pivotY - 1.4)} r={1.2} fill="rgba(255,255,255,.7)" />
       </svg>

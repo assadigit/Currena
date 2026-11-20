@@ -32,7 +32,55 @@
  * only inside it.
  */
 
-import type { ReactNode } from 'react';
+import { createContext, useContext, type ReactNode } from 'react';
+
+/**
+ * GUX-S5 M3b (F-07's fix): the balance gradients' PER-INSTANCE id scope.
+ * The ids were document-global literals (bal-face-brass ×2 in the S1
+ * live DOM — two BalanceScale-family instances rendered at once). Each
+ * visual root now stamps its own suffix: BalanceGradients defines
+ * `${prefix}-bal-face-brass` and every disc in the SAME subtree
+ * references it through this context. The default ('') keeps the
+ * historical ids verbatim for single-instance renderers (the pinned
+ * gold-balance-lanes test's expectations stay byte-identical); the two
+ * simultaneous /gold instances (the hero's classic stage + the Signals
+ * card) pass their own scopes. 'bal' in the id body is reserved — a
+ * caller's prefix may not start with it (fail-loud at dev time via the
+ * runtime guard below, never a silent collision).
+ */
+const BalanceGradientScope = createContext<string>('');
+
+export function useBalanceGradientId(face: 'brass' | 'stone'): string {
+  const scope = useContext(BalanceGradientScope);
+  return scope === '' ? `bal-face-${face}` : `${scope}-bal-face-${face}`;
+}
+
+/**
+ * The SVG gradients the discs reference — rendered ONCE at each visual
+ * balance's root (a 0×0 svg). GUX-S5 M3b: the ids carry the caller's
+ * `idScope` suffix so two simultaneous balance instances can never
+ * collide (F-07); the unsuffixed form stays the default (one instance,
+ * the historical ids).
+ */
+export function BalanceGradients({ idScope = '' }: { idScope?: string }): React.JSX.Element {
+  return (
+    <BalanceGradientScope.Provider value={idScope}>
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id={`${idScope === '' ? '' : idScope + '-'}bal-face-brass`} cx="35%" cy="28%" r="85%">
+            <stop offset="0%" stopColor="var(--bal-brass-hi)" />
+            <stop offset="55%" stopColor="var(--bal-brass-mid)" />
+            <stop offset="100%" stopColor="var(--bal-brass-lo)" />
+          </radialGradient>
+          <radialGradient id={`${idScope === '' ? '' : idScope + '-'}bal-face-stone`} cx="35%" cy="28%" r="85%">
+            <stop offset="0%" stopColor="var(--bal-stone-hi)" />
+            <stop offset="100%" stopColor="var(--bal-stone-lo)" />
+          </radialGradient>
+        </defs>
+      </svg>
+    </BalanceGradientScope.Provider>
+  );
+}
 
 /** The rim segment vocabulary — the engine's member impacts. */
 export type BalanceWeightImpact = 'supports' | 'pressures' | 'steady' | 'unread';
@@ -138,29 +186,6 @@ const LANE_ICONS: Record<string, ReactNode> = {
 };
 
 /**
- * The SVG gradients the discs reference — rendered ONCE at the visual
- * balance's root (a 0×0 svg; ids are document-global, so they are
- * namespaced bal-* and only the visual balance uses them).
- */
-export function BalanceGradients(): React.JSX.Element {
-  return (
-    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
-      <defs>
-        <radialGradient id="bal-face-brass" cx="35%" cy="28%" r="85%">
-          <stop offset="0%" stopColor="var(--bal-brass-hi)" />
-          <stop offset="55%" stopColor="var(--bal-brass-mid)" />
-          <stop offset="100%" stopColor="var(--bal-brass-lo)" />
-        </radialGradient>
-        <radialGradient id="bal-face-stone" cx="35%" cy="28%" r="85%">
-          <stop offset="0%" stopColor="var(--bal-stone-hi)" />
-          <stop offset="100%" stopColor="var(--bal-stone-lo)" />
-        </radialGradient>
-      </defs>
-    </svg>
-  );
-}
-
-/**
  * The DISC itself — the segmented rim around a brass (or stone) face with
  * the lane icon engraved. Decorative by contract (aria-hidden): the
  * accessible name and the ledger carry the counts. Rendered inside the
@@ -185,6 +210,7 @@ export function BalanceWeightDisc({
 }): React.JSX.Element {
   const segments = balanceRimSegments(members);
   const icon = LANE_ICONS[laneKey];
+  const faceId = useBalanceGradientId(stone ? 'stone' : 'brass');
   return (
     <svg
       viewBox="0 0 60 60"
@@ -207,7 +233,7 @@ export function BalanceWeightDisc({
         ))}
       </g>
       <g className="bal-disc-face">
-        <circle cx={DISC_CX} cy={DISC_CY} r="20" fill={stone ? 'url(#bal-face-stone)' : 'url(#bal-face-brass)'} />
+        <circle cx={DISC_CX} cy={DISC_CY} r="20" fill={`url(#${faceId})`} />
         <circle cx={DISC_CX} cy={DISC_CY} r="19.4" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth=".8" />
         <circle cx={DISC_CX} cy={DISC_CY} r="15.6" fill="none" stroke="rgba(0,0,0,.14)" strokeWidth=".7" />
       </g>
