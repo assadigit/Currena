@@ -6074,3 +6074,16 @@ session 4.**
 - **Records**: the CHANGELOG dated entry + the HANDOFF sitting block +
   S4-D15 in the program decision log + this record. Credentials used,
   not stored (AGENTS.md §7).
+
+
+## Session record — 2026-11-2x-c GUX-S5 the close: the merge to main DONE + the deploy BLOCKED by credential scope (the honest record)
+
+**The merge (done):** `origin/main` fast-forwarded `d0a5f4e0` → **`d3554b9f`** (the S5 close: 11 commits — the budget bump, M3b-0 the tail split, M3b the hero, M4 the five-force overview, M5 the dedup + sticky nav, M6 the close). GitHub main == the production TREE for the second time in the program's life; production still serves the S4-close build (`4454212a` @ 100% per the 2026-11-20b record) until the deploy below unblocks.
+
+**The gates (done, pre-merge on the branch):** 10/10 GREEN, 4m 46s — the suite 15,639 (+40 positive-only over the S4 close's 15,599), lint 0/0, copy:audit clean (9,209), the narrator vocabulary regenerated (the laneDrillLabel drift the gate caught), every bundle budget held (GoldPage 238.96/55.14 under 240/55,500; the tail 31.81/6.60 under 34/8).
+
+**The deploy (BLOCKED — credential scope, not code):** the D-43 re-check was attempted FIRST per the discipline: `wrangler deployments list` / `versions list` / the raw `/workers/scripts` and `/workers/services` reads all answer **Authentication error [code: 10000]** with the session's "Cloudflare Workers API" token (`cfut_dGmEj…`), although `/user/tokens/verify` reports it ACTIVE — the token lacks the Workers-scripts read/deploy scopes (the account resolves correctly: `Sedanama.ir@gmail.com's Account` / `5f123468027e4b2094167df1d2f2e852`). The second ("AI WORKERS") token is **Invalid** at verify (the S4-rounds finding again — it has no runtime consumer regardless). `wrangler deploy` itself fails the same 10000 on `/workers/services/currena-api`. **No deploy, no EODHD re-put, no live verification were possible from this sandbox with these credentials.**
+
+**What the owner needs to supply (one item):** a Cloudflare API token with the **Workers Scripts:Edit** permission (the "Edit Cloudflare Workers" template) scoped to the account — the S4-close sitting's deploy token had exactly this and deployed `58aaaf89` cleanly. With it, the remaining runbook is: the D-43 re-check (`wrangler deployments list` — expect `4454212a` or newer @ 100%) → `pnpm --filter @currena/web build && pnpm --filter @currena/api exec wrangler deploy` (the SPA rides the assets binding; expect the new GoldPage/tail/deep chunks to upload) → the EODHD re-put on both workers (the standing rotation lever, `printf '%s' | wrangler secret put`) → the live verification (`/api/health` · `/api/insights/pages/gold` · the gold-family planes · the served entry/gold-chunk hashes vs the fresh dist) → this record's completion note appended.
+
+**The evidence set (done):** the 28 screenshots (`docs/gold-redesign/baseline-screenshots/s5/` + the README), the implementation report (13), S5-D1..D8, BD-S49. Credentials used for the GitHub push + the verification probes, never stored (AGENTS.md §7).
