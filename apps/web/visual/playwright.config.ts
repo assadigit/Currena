@@ -77,6 +77,16 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
     {
+      // GUX-S6 (docs/gold-redesign/14-session-6-implementation-report.md):
+      // the session's new surfaces — the relationship explorer (the list,
+      // the canvas, a filter) + the re-scoped context cards' bands — over
+      // the S5 fixture set. The evidence lands in
+      // docs/gold-redesign/baseline-screenshots/s6/.
+      name: 'gux-s6',
+      testMatch: /gux-s6-screenshots\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // gold-balance GB-S3 (docs/specs/gold-balance-consolidation/): the
       // ?balance=lanes preview + the default view, EN/fa × 360/1280, on the
       // fixture snapshot overlaid with the recorded 2026-10-31 corpus

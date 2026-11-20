@@ -47,6 +47,7 @@ import { GoldContext } from './GoldContext';
 import { GoldTail } from './GoldTail';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { GoldPositions } from './GoldPositions';
+import { GoldRelationshipsBoundary } from './gold-relationships-boundary';
 import { goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
 import { PageBreadcrumbs } from '../../components/PageBreadcrumbs';
 
@@ -351,6 +352,14 @@ export function GoldPage(): React.JSX.Element {
           cards with a visual bar showing where the current positioning
           stands in its 0–100 range. */}
       {readings !== undefined ? <GoldPositions readings={readings} /> : null}
+
+      {/* GUX-S6 M1 — the relationship explorer (12 §5.1–5.4 over 10
+          §5's record contract): the advanced map of how gold's forces
+          connect — list-first everywhere (the canvas a desktop opt-in),
+          the M/C/X/K classes always visible, the blocked edge
+          legend-only, the honesty footer. NO edge draws history (the
+          charting rule; the correlation companion keeps R-01's windows). */}
+      <GoldRelationshipsBoundary />
 
       {/* GPE R25 / F6 (2026-11-19) — Zone O, the history tail (s6/01
           zone 16). GUX-S5 M3b (the S4-D10 budget play): the three tail

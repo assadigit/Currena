@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## 2026-11-20 — GUX Session 6 (the gold UX redesign): the relationship explorer + the context re-scope + the fa deep-content gap closed; the S5-pending deploy executed
+
+**Branch `feat/gold-redesign-s6-explorer` → `main`.** The four build milestones, all verified:
+
+- **M1 the relationship explorer** (12 §5.1–5.4 over 10 §5's contract): 10 §3's 25 R-records as the typed module (M 14 · C 10 · X 1 · K 0; R-26 blocked-for-data, legend-only) + the list-first section (the class chips always visible, the X pennant never fine print, the honesty footer, the class filters) + the desktop canvas behind a toggle (gold hub, M solid / C dashed / K heaviest) behind its own near-viewport lazy chunk (the GoldTail pattern — the budget play that held the ceiling without an owner ask: GoldPage 223.43/50.05 under 240/55.50). The nav's seventh chip.
+- **M2 the context re-scope** (12 §3.1): the 11 RatioCards' 10-year position bands at context strength (neutral ink — a context reading never votes); the COT pair keeps the Chain-6 chips; gold-usd stays the hero only (F-06 pinned).
+- **M3 the Q1/Q2 gates**: presented, still HELD — nothing renders (the BriefingCard pins 12/12). The questions ride the HANDOFF + the reply.
+- **M4 the fa deep-content gap** (S5-D3's declared item): the blocked quartet's 12 EN-carried fields now fa-authored (09's voice; round 92).
+- **M5 the nav's S8-tier spy**: the IntersectionObserver upgrade (the plain rule unchanged, the no-observer fallback kept).
+- **M6 the close**: 10/10 gates GREEN (3m 9s; the suite 15,650, +11); the 20-screenshot set (`docs/gold-redesign/baseline-screenshots/s6/`); the report (`14-session-6-implementation-report.md`); S6-D1..D6; **the S5-pending deploy executed** (the token now carries the scripts scope — the 2026-11-2x-c blocker cleared; the D-43 re-check first, `4454212a` no drift; the record in `docs/DEPLOY.md`).
+
 ## 2026-11-2x — Gold UX Redesign S5 COMPLETE (the owner's Q4 answer A executed; M3b/M4/M5/M6; merged + deployed)
 
 - **The budget decision (BD-S49, S5-D7):** the owner chose A — the GoldPage gz ceiling 50,000 → 55,500 (the raw ceiling STAYS 240,000); the M4/M5 milestones then held to the raised ceilings WITHOUT further relief.

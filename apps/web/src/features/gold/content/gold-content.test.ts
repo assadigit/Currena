@@ -170,8 +170,26 @@ describe('the gold content module (S5 M1 — 09’s transcription)', () => {
     for (const id of GOLD_RECORD_IDS) {
       const en = deepEn[id] as unknown as Record<string, unknown>;
       const fa = deepFa[id] as unknown as Record<string, unknown>;
-      for (const field of ['unit', 'referencePeriod', 'source', 'firingRule', 'whatItWouldShow', 'blockedReason', 'ownerLever']) {
+      // GUX-S6 M4 (S5-D3's declared gap closed): the blocked quartet's
+      // whatItWouldShow/blockedReason/ownerLever are now fa-AUTHORED (they
+      // were the EN-sourced verbatim carry S5 shipped) — they left the
+      // locale-neutral sync set; the measurement values stay synced.
+      const isBlocked = (GOLD_BLOCKED_RECORD_IDS as readonly string[]).includes(id);
+      const syncFields = isBlocked
+        ? ['unit', 'referencePeriod', 'source', 'firingRule']
+        : ['unit', 'referencePeriod', 'source', 'firingRule', 'whatItWouldShow', 'blockedReason', 'ownerLever'];
+      for (const field of syncFields) {
         expect(fa[field], `${id}.${field} locale-neutral sync`).toBe(en[field]);
+      }
+      // The blocked fields exist on BOTH locales (the shapes pin above)
+      // and the fa side now carries Persian text, never the EN carry.
+      if (isBlocked) {
+        expect(fa.whatItWouldShow, `${id} whatItWouldShow fa-authored`).not.toBe(en.whatItWouldShow);
+        expect(fa.blockedReason, `${id} blockedReason fa-authored`).not.toBe(en.blockedReason);
+        expect(fa.ownerLever, `${id} ownerLever fa-authored`).not.toBe(en.ownerLever);
+        for (const field of ['whatItWouldShow', 'blockedReason', 'ownerLever']) {
+          expect((fa[field] as string).length, `${id}.${field} fa non-empty`).toBeGreaterThan(10);
+        }
       }
       expect(fa.relations, `${id} relations sync`).toEqual(en.relations);
     }
