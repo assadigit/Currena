@@ -5997,3 +5997,80 @@ construction). No GPE record was reopened; the session record lives here
 - **Records**: the CHANGELOG dated entry + the HANDOFF session block +
   BD-S43 in DECISIONS + this record. Credentials used, not stored
   (AGENTS.md §7).
+
+## Session record — 2026-11-20b the S4 close-out ops + integration sitting: the blocked S4 push recovered under fresh credentials + the PL-1 parallel-lane line MERGED (§15.4's first integration) + the code-identical redeploy + the EODHD rotation
+
+**Context.** S4 (the gold visual system) closed complete-in-docs but with
+its origin push BLOCKED by an invalid GitHub token (S4-D14): `origin/main`
+sat at the S3 close `921821fb` while the S4 commits lived on the local
+branch + merged local `main` + the recovery bundle. The owner then supplied
+fresh session credentials (a GitHub token · a Cloudflare Workers deploy
+token + the account ID · an EODHD API key · a second Workers-AI-scoped
+token) with one instruction: **push, deploy, merge and everything of this
+session 4.**
+
+- **Credential verification (first).** The new GitHub token VALID
+  (`GET /user` → 200, login `assadigit`; the S4-D14 blocker cleared). The
+  Workers deploy token VALID (`tokens/verify` → active) with the
+  scripts-list/version-history reads working. The second token
+  (Workers-AI-scoped) INVALID (401) — and design-unneeded anyway (D-41:
+  the narrator rides the `ai` binding, no token stored anywhere);
+  recorded, not wired. The EODHD key consumed by the secret re-put below
+  (its plan level not probeable from this sandbox; the S13-D1
+  self-widening rule applies at the trailing re-fetch rungs).
+- **Gates re-run FIRST** (the runbook rule — green before every deploy):
+  on the S4 tree 9/9 GREEN, 3m 4s (the suite 15,599 IDENTICAL — the
+  docs-only zero-delta proof; the GoldPage budget 238.90/49.57 under
+  240/50; the secret scan clean — the credentials env-only, never in any
+  file).
+- **The discovery.** The S4 branch pushed clean — but the `main` push was
+  REJECTED: `origin/main` had moved past the S3 close. The owner-directed
+  **PL-1 parallel-lane protocol** (`9121ee22`, BD-S48) had landed from a
+  parallel checkout two minutes after S4's close — the very disruption
+  class the protocol answers; its records still read the gold program at
+  3/9 because S4 had never reached origin.
+- **The integration (AGENTS.md §15.4, executed the day it was written).**
+  `main` reset to `origin/main` (the S4 commits safe on the pushed
+  branch), the branch merged `--no-ff` — **merge, never rebase-rewrite**.
+  The three root-bookkeeping conflicts (HANDOFF · CHANGELOG · DECISIONS)
+  consolidated keeping BOTH sessions' records (the sitting's integration
+  block on top, then PL-1, then S4, then S3; BD-S48 then BD-S47; the
+  PL-1 then S4 CHANGELOG entries; the S5 prompt kept at the bottom); all
+  S4 deliverables (11 · 12 · visual-references · DECISION_LOG
+  S4-D1..D14) auto-merged clean. **Gates re-run on the merged tree: 10/10
+  GREEN, 3m 1s** (the count is now 10 — PL-1's lane-territory check is
+  gate 2, `n/a` on `main`; the suite 15,599 IDENTICAL again; the budget
+  unchanged). `main` pushed: `9121ee22..01928d71` — **`origin/main` now
+  carries the S4 + PL-1 integrated tree** (the S4-D14 recovery complete).
+- **The deploy-lock check ran FIRST** (D-43): the newest `currena-api`
+  version was still `5c34a14b` (2026-11-20T00:24:55Z, the BD-S43 deploy)
+  — no drift, no parallel deploy.
+- **Deploy** (the owner's explicit instruction this sitting, over §15.4's
+  docs-only default; the 2026-11-19 precedent): `pnpm --filter
+  @currena/web build` + `pnpm --filter @currena/api run deploy` →
+  currena-api **`58aaaf89`** (2026-11-20T05:45:22Z, first attempt clean;
+  the bindings intact: RATES KV + AI + ASSETS + SITE_MODE=public + the
+  NARRATOR_* vars + the minute cron; the workers.dev twin live). The
+  platform itself reported **"No updated asset files to upload"** (157
+  assets read) — the code-identical re-anchor, exactly what a
+  docs(S4)+scripts/docs(PL-1) tree must produce.
+- **Secrets (the EODHD rotation).** `EODHD_API_TOKEN` re-put on BOTH
+  workers with the owner-supplied key (`printf '%s' | wrangler secret
+  put`): currena-api first (→ the now-active version **`4454212a` @
+  05:45:32Z**), then currena-markets (→ **`4ba79366`**; code-unchanged →
+  NOT deployed, its secret re-put only — the standing convention).
+  currena-api's full secret set re-verified intact: ADMIN_VIEW_SECRET ·
+  EODHD_API_TOKEN · GH_INGEST_DISPATCH_TOKEN · INSIGHTS_PASSWORD ·
+  REFRESH_SECRET; currena-markets carries its single EODHD_API_TOKEN.
+- **Live verification (all GREEN).** `/api/health` 200 · the gold
+  projection `/api/insights/pages/gold` 200 · the gold-family planes 200
+  ×8 (gold-ohlc · gold-cb · gold-crosses · gold-lbma · gold-expectations
+  · gold-premium · gold-ifbought · gold-meter) · `gold-episodes` 503
+  `gold_episodes_not_ready` = the DESIGNED WGC-workbook waiting state
+  (the standing owner lever, never a defect) · the workers.dev twin 200 ·
+  the served `index.html` + the entry script `index-BqnATyD-.js` + the
+  CSS `index-BYs2IdzG.css` all byte-verified IDENTICAL to the fresh dist
+  — the rendered site IS this tree's build.
+- **Records**: the CHANGELOG dated entry + the HANDOFF sitting block +
+  S4-D15 in the program decision log + this record. Credentials used,
+  not stored (AGENTS.md §7).
