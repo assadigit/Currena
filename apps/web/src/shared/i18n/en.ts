@@ -829,6 +829,9 @@ export const en = {
        * in fa; the interpretation paragraph's four moves render in the
        * binding order. */
       bridgeTitle: 'The Iran bridge',
+      /* GUX-S7 M2 (12 §3.3 row 5): the regional chapter chip — the
+       * "clearly regional" rule, named at the chapter head. */
+      bridgeRegionChip: 'Regional market · Tehran · Toman (IRR)',
       bridgeSubtitle: 'Tehran coin prices decomposed into global gold, the free-market dollar, and the local premium (حباب).',
       bridgeHeadPrice: 'Market price',
       bridgeHeadPremium: 'Premium (حباب)',

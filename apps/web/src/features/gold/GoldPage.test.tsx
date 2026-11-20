@@ -1786,4 +1786,34 @@ describe('GoldPage', () => {
     // The position word line survives (the words stay the statement).
     expect(document.querySelector('[data-context-card="gold-silver"]')?.textContent).toContain('typical');
   });
+
+  /* ---------------------------------------------------------------- *
+   * GUX-S7 M2 — the bridge's regional chrome (12 §3.3 row 5)
+   * ---------------------------------------------------------------- */
+
+  it('GUX-S7 M2: the Iran bridge wears the regional chapter chrome — the accent ring + the Toman/IRR chip (the wrapper chrome is structural: both frames render the same section element + chip, pinned by the GPE R13 fail-closed test beside it)', async () => {
+    // The loaded frame (the frozen-scenario seeding): the chip + the ring
+    // ride the full board.
+    window.localStorage.setItem('currena:snapshot:tgju', JSON.stringify(tgjuSnapshotFixture()));
+    snapshotStore.boot();
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-iran-bridge]')).not.toBeNull();
+    });
+    const bridge = document.querySelector('[data-gold-iran-bridge]')!;
+    // The "clearly regional" rule: the section's ring carries the bridge
+    // accent token (distinct from every global section's border ring).
+    expect(bridge.className).toContain('ring-2 ring-[var(--color-bridge-accent)]');
+    expect(bridge.hasAttribute('data-bridge-regional')).toBe(true);
+    // The chapter chip renders at the head, naming the market + unit.
+    const chip = bridge.querySelector('[data-bridge-region-chip]')!;
+    expect(chip.textContent).toContain('Tehran');
+    expect(chip.textContent).toContain('Toman');
+    // The board's own frame is untouched: the rows still render (the
+    // chrome is additive, the C2 grammar unchanged).
+    expect(bridge.querySelectorAll('[data-bridge-row]').length).toBe(8);
+
+  });
+
 });
