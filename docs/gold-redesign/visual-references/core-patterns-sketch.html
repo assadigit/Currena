@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gold Redesign S4 — Core Pattern Sketches (visual references)</title>
+<!--
+  Session 4 visual references — the core patterns of the /gold redesign visual system.
+  Spec: docs/gold-redesign/11-visual-design-principles.md + 12-visualization-mapping.md.
+  This file is a DESIGN SKETCH, not production code: it renders the patterns with the
+  shipped token values (index.css) so Sessions 5-7 can implement against a shared picture.
+  All data shown is ILLUSTRATIVE placeholder (roughly the S1 capture state: "Leaning
+  against gold", 1 for / 3 against, price ~3599) — never a live reading.
+-->
+<style>
+  :root{
+    /* The shipped token values (apps/web/src/index.css) — light theme */
+    --color-text-primary:#2C3E50; --color-text-secondary:#47525D; --color-text-tertiary:#4F5A66;
+    --color-surface:#FFFFFF; --color-surface-raised:#FFFFFF; --color-border:rgba(44,62,80,0.14);
+    --color-status-normal:#24a148; --color-status-watch:#f1c21b; --color-status-alert:#da1e28;
+    --chip-ink-normal:#0E6027; --chip-ink-attention:#B91C1C; --chip-ink-watch:#7A5D00;
+    --color-return-up:#00873A; --color-return-down:#E51527;
+    --color-accent-gold:#F3B13F; --color-accent-gold-deep:#A87E1C; --color-accent-gold-ink:#2A1F04;
+    --bal-brass-hi:#fbe3a0; --bal-brass-mid:#eab544; --bal-brass-lo:#b27a1d; --bal-brass-ink:#5b3d08;
+    --bal-stone-hi:#eef2f6; --bal-stone-lo:#c7d0da; --bal-recess:#f3f5f8;
+    --shadow-card:0 2px 10px rgba(15,23,42,0.05); --shadow-focal:0 10px 34px rgba(168,126,28,0.15);
+    --type-verdict:1.6rem; --type-number:1.45rem; --type-label:0.875rem; --type-caption:0.78rem;
+    --radius-md:0.75rem; --radius-lg:1.125rem;
+  }
+  .dark{
+    --color-text-primary:#E8EDF4; --color-text-secondary:#A9B5C5; --color-text-tertiary:#A2AEBC;
+    --color-surface:#1A222E; --color-surface-raised:#202A38; --color-border:rgba(232,237,244,0.16);
+    --color-status-alert:#fa4d56; --chip-ink-normal:#24a148; --chip-ink-attention:#fa4d56;
+    --chip-ink-watch:#f1c21b; --color-return-up:#30D96B; --color-return-down:#FF5963;
+    --color-accent-gold-deep:#E8B54A;
+    --bal-brass-hi:#f3d488; --bal-brass-mid:#d9a43e; --bal-brass-lo:#8f5f14; --bal-brass-ink:#2a1c04;
+    --bal-stone-hi:#46546a; --bal-stone-lo:#2b3646; --bal-recess:#141b25;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#F8FAFB;color:var(--color-text-primary);
+    font-family:ui-sans-serif,system-ui,"Segoe UI",sans-serif;font-size:14px;line-height:1.45}
+  .sheet{max-width:1080px;margin:0 auto;padding:24px 20px 80px}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--color-text-secondary);font-size:12.5px;margin-bottom:22px;max-width:72ch}
+  h2{font-size:15px;margin:34px 0 4px;letter-spacing:.01em}
+  .note{color:var(--color-text-tertiary);font-size:12px;margin:0 0 12px;max-width:80ch}
+  .panel{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-card);padding:18px;margin-bottom:8px}
+  .panel.darkwrap{background:#10151D;padding:18px;border-radius:var(--radius-lg)}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+  .card{background:var(--color-surface-raised);border:1px solid var(--color-border);border-radius:var(--radius-md);
+    padding:12px;min-width:250px;flex:1}
+  .type-label{font-size:var(--type-label);font-weight:600}
+  .type-caption{font-size:var(--type-caption);font-weight:500;color:var(--color-text-tertiary)}
+  .type-number{font-size:var(--type-number);font-weight:800;font-variant-numeric:tabular-nums}
+  .type-verdict{font-size:var(--type-verdict);font-weight:800;letter-spacing:-.01em}
+  .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-tertiary);font-weight:700}
+  .state{font-size:12px;font-weight:700}
+  .state.for{color:var(--chip-ink-normal)} .state.against{color:var(--chip-ink-attention)}
+  .state.steady{color:var(--color-text-secondary)} .state.unread{color:var(--color-text-tertiary)}
+  .state.split{color:var(--chip-ink-watch)}
+  .band{position:relative;height:34px;margin:8px 0 2px}
+  .band .track{position:absolute;left:0;right:0;top:15px;height:6px;border-radius:3px;background:var(--bal-stone-lo);opacity:.55}
+  .band .zone{position:absolute;top:15px;height:6px;border-radius:3px;background:var(--color-text-secondary);opacity:.16}
+  .band .dot{position:absolute;top:8px;width:16px;height:16px;border-radius:50%;background:var(--color-surface);
+    border:3px solid var(--color-status-normal);transform:translateX(-8px)}
+  .band .dot.against{border-color:var(--color-status-alert)}
+  .band .dot.steady{border-color:var(--color-text-secondary)}
+  .band .dot.unread{border-style:dotted;border-color:var(--color-text-tertiary)}
+  .band .endlab{position:absolute;top:24px;font-size:11px;color:var(--color-text-tertiary);font-variant-numeric:tabular-nums}
+  .valline{display:flex;justify-content:space-between;align-items:baseline;margin-top:22px}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
+  .chip.for{background:color-mix(in srgb,var(--color-status-normal) 14%,transparent);color:var(--chip-ink-normal)}
+  .chip.against{background:color-mix(in srgb,var(--color-status-alert) 10%,transparent);color:var(--chip-ink-attention)}
+  .chip.stone{background:color-mix(in srgb,var(--color-text-secondary) 12%,transparent);color:var(--color-text-secondary)}
+  .chip.gold{background:color-mix(in srgb,var(--color-accent-gold) 22%,transparent);color:var(--color-accent-gold-ink)}
+  .dark .chip.gold{color:var(--color-accent-gold-deep)}
+  .chip.muted{background:color-mix(in srgb,var(--color-text-tertiary) 12%,transparent);color:var(--color-text-tertiary)}
+  .asof{font-size:11.5px;color:var(--color-text-tertiary)}
+  .lanebar{display:grid;grid-template-columns:minmax(150px,1fr) 92px minmax(120px,1.4fr) 150px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--color-border)}
+  .lanebar:last-child{border-bottom:none}
+  .pill{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--bal-stone-lo);opacity:.9}
+  .pill .s-for{background:var(--color-status-normal)} .pill .s-against{background:var(--color-status-alert)}
+  .pill .s-steady{background:var(--bal-stone-lo)}
+  .pill .s-unread{background:repeating-linear-gradient(90deg,var(--color-text-tertiary) 0 3px,transparent 3px 6px)}
+  .fa{font-family:"Vazirmatn",ui-sans-serif,system-ui,sans-serif;direction:rtl;text-align:right}
+  .divbar{position:relative;height:26px;margin:8px 0 4px}
+  .divbar .track{position:absolute;left:0;right:0;top:10px;height:6px;border-radius:3px;background:var(--bal-stone-lo);opacity:.5}
+  .divbar .zero{position:absolute;top:4px;width:2px;height:18px;background:var(--color-text-secondary)}
+  .divbar .fill{position:absolute;top:10px;height:6px;background:var(--color-text-secondary)}
+  .divbar .mk{position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:var(--color-surface);border:3px solid var(--color-text-primary);transform:translateX(-8px)}
+  .domlab{display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-tertiary);font-variant-numeric:tabular-nums}
+  .compbar{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--color-border)}
+  .compbar div{height:100%}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--color-text-secondary);margin-top:8px}
+  .legend .k{display:inline-flex;align-items:center;gap:5px}
+  .sw{width:14px;height:8px;border-radius:2px;display:inline-block}
+  .btn{display:inline-block;padding:7px 14px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-surface-raised);color:var(--color-text-primary);font-weight:600;font-size:12.5px;cursor:pointer}
+  .focal{background:linear-gradient(to bottom,rgba(243,177,63,.14),rgba(243,177,63,.06) 60%,transparent);
+    box-shadow:var(--shadow-focal);outline:2px solid rgba(243,177,63,.4);outline-offset:-2px}
+  .recess{background:var(--bal-recess);border:1px solid var(--color-border);border-radius:8px;padding:10px 12px}
+  .gate{border:1.5px dashed var(--color-accent-gold-deep);border-radius:8px;padding:6px 10px;font-size:11.5px;color:var(--color-text-secondary)}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .foot{margin-top:40px;padding-top:12px;border-top:1px solid var(--color-border);color:var(--color-text-tertiary);font-size:11.5px}
+  .sheetref{color:var(--color-accent-gold-deep);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<h1>Gold UX Redesign — Session 4 core pattern sketches</h1>
+<div class="sub">Visual references for <b>11-visual-design-principles.md</b> + <b>12-visualization-mapping.md</b>. All values are the shipped token set (index.css); all data is illustrative placeholder (≈ the S1 capture state: verdict "Leaning against gold", 1 for · 3 against · 1 not-leaning, price ≈ $3,599). Sketch = design intent, not production markup.</div>
+
+<!-- ══════════ 1. THE STATE / COLOR SEMANTICS ══════════ -->
+<h2>1 · The five gold-impact states — the semantic map (§11.4)</h2>
+<p class="note">Colors encode relationship-to-gold through the engine's polarity, never the indicator's own direction, never generic sentiment. Direction and impact are separate channels (§11.4.3). Every state = hue + word + glyph; unread is dotted (data-quality, never neutral); blocked is recessed with a lock glyph and never a data-shaped mark.</p>
+<div class="panel">
+  <div class="grid2">
+    <div class="card">
+      <div class="type-label">Supports</div>
+      <div style="margin:8px 0"><span class="chip for">▲ supports gold · از طلا حمایت می‌کند</span></div>
+      <div class="type-caption">status-normal #24a148 · chip-ink #0E6027 (≥4.5:1 on its tint) · filled ▲ glyph</div>
+    </div>
+    <div class="card">
+      <div class="type-label">Pressures</div>
+      <div style="margin:8px 0"><span class="chip against">▼ pressures gold · بر طلا فشار می‌آورد</span></div>
+      <div class="type-caption">status-alert #da1e28 light / #fa4d56 dark · filled ▼ glyph</div>
+    </div>
+    <div class="card">
+      <div class="type-label">Steady / mixed-neutral</div>
+      <div style="margin:8px 0"><span class="chip stone">— steady · بی‌طرف</span> <span class="chip stone" style="background:color-mix(in srgb,var(--color-status-watch) 16%,transparent);color:var(--chip-ink-watch)">split (2·3)</span></div>
+      <div class="type-caption">No hue (stone/secondary); lane "split" keeps the amber word + both counts. Distinct from unread by wording + fill.</div>
+    </div>
+    <div class="card">
+      <div class="type-label">Unread (data quality)</div>
+      <div style="margin:8px 0"><span class="chip muted" style="border:1.5px dotted var(--color-text-tertiary)">◌ unread — upstream stopped (Oct 2026)</span></div>
+      <div class="type-caption">Tertiary ink + dotted rim on every mark; the why-line cause is mandatory (upstream-stopped / gap / pipeline-lag / rule-driven). Never disguised as steady.</div>
+    </div>
+    <div class="card">
+      <div class="type-label">Blocked (licence / source)</div>
+      <div class="recess" style="margin-top:8px"><span class="type-caption">🔒 World gold ETF holdings — blocked by licence (WGC L3). Would show the investment-demand stock. Owner lever: the WGC authorization letter.</span></div>
+      <div class="type-caption" style="margin-top:6px">Recessed well + lock + reason word; the publication-notes disclosure is its home; never a fake neutral, never an empty chart.</div>
+    </div>
+    <div class="card">
+      <div class="type-label">The two-channel rule (direction ≠ impact)</div>
+      <div style="margin:8px 0"><span class="type-number" style="font-size:18px;color:var(--color-return-up)">▲ +0.42pt</span> <span class="type-caption">30-day move (return ink, signed)</span></div>
+      <div><span class="state against">▼ pressures gold</span> <span class="type-caption">impact state (status ink, through polarity)</span></div>
+      <div class="type-caption" style="margin-top:6px">A rising value can support (VIX) or pressure (US10Y) — the card shows both channels, each in its own ink.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ 2. THE COMPOSITION STACK ══════════ -->
+<h2>2 · The Composition Stack — the balance + its five lanes as ONE system (§11.5)</h2>
+<p class="note">The verdict is said ONCE (①); the instrument shows the sum (②); the five LaneBars are the addends (③); the ledger is the drill-in (④); the not-a-forecast caveat always rides (⑤). Lanes explain the composition — they never re-verdict. One full instrument per page; compact tiers use BeamGlyph; text tiers use the word.</p>
+<div class="panel">
+  <!-- 1 verdict -->
+  <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+    <div><span class="kicker">Current conditions · شرایط فعلی</span>
+      <div class="type-verdict" style="color:var(--chip-ink-attention)">Leaning against gold</div>
+    </div>
+    <div class="type-caption">1 lane for · 3 against · 1 not leaning · 1 unread</div>
+  </div>
+  <!-- 2 instrument (sketch of the brass beam at ~7deg against) -->
+  <div style="display:flex;justify-content:center;padding:14px 0 6px">
+    <svg width="440" height="150" viewBox="0 0 440 150" role="img" aria-label="Beam tilted 7 degrees against gold: three lanes pressuring, one supporting">
+      <defs>
+        <radialGradient id="brass" cx="35%" cy="28%" r="80%">
+          <stop offset="0%" stop-color="#fbe3a0"/><stop offset="55%" stop-color="#eab544"/><stop offset="100%" stop-color="#b27a1d"/>
+        </radialGradient>
+      </defs>
+      <!-- dial -->
+      <g stroke="rgba(71,82,93,.35)" fill="none">
+        <path d="M 190 38 A 34 34 0 0 1 250 38"/>
+        <g stroke="#47525D" stroke-width="1.6">
+          <line x1="196" y1="41" x2="199" y2="45"/><line x1="220" y1="34" x2="220" y2="40"/>
+          <line x1="244" y1="41" x2="241" y2="45"/><line x1="205" y1="36" x2="207" y2="41"/>
+          <line x1="235" y1="36" x2="233" y2="41"/>
+        </g>
+      </g>
+      <!-- column + foot -->
+      <rect x="216" y="44" width="8" height="86" rx="3" fill="url(#brass)" stroke="#b27a1d"/>
+      <ellipse cx="220" cy="132" rx="34" ry="6" fill="#c7d0da" opacity=".8"/>
+      <!-- beam group rotated -7deg (against heavy) -->
+      <g transform="rotate(-7 220 52)">
+        <path d="M 90 49 Q 220 42 350 55 L 350 59 Q 220 50 90 54 Z" fill="url(#brass)" stroke="#b27a1d" stroke-width="1"/>
+        <circle cx="90" cy="53" r="7" fill="none" stroke="#24a148" stroke-width="3"/>
+        <circle cx="350" cy="56" r="7" fill="none" stroke="#da1e28" stroke-width="3"/>
+      </g>
+      <!-- needle (3x magnified) -->
+      <line x1="220" y1="52" x2="220" y2="26" stroke="#2C3E50" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="220" cy="52" r="9" fill="url(#brass)" stroke="#5b3d08"/>
+      <circle cx="217" cy="49" r="1.6" fill="#fff" opacity=".8"/>
+      <!-- hangers + pans (pans hang plumb) -->
+      <line x1="83" y1="58" x2="58" y2="96" stroke="#b27a1d" stroke-width="1.4"/>
+      <line x1="97" y1="57" x2="122" y2="96" stroke="#b27a1d" stroke-width="1.4"/>
+      <line x1="343" y1="60" x2="318" y2="98" stroke="#b27a1d" stroke-width="1.4"/>
+      <line x1="357" y1="61" x2="382" y2="98" stroke="#b27a1d" stroke-width="1.4"/>
+      <path d="M 44 96 h 92 a 8 8 0 0 1 -14 18 h -64 a 8 8 0 0 1 -14 -18 z" fill="rgba(36,161,72,.08)" stroke="rgba(36,161,72,.35)"/>
+      <path d="M 304 98 h 92 a 8 8 0 0 1 -14 18 h -64 a 8 8 0 0 1 -14 -18 z" fill="rgba(218,30,40,.07)" stroke="rgba(218,30,40,.35)"/>
+      <text x="90" y="128" text-anchor="middle" font-size="11" font-weight="700" fill="#0E6027">FOR · حمایت</text>
+      <text x="350" y="130" text-anchor="middle" font-size="11" font-weight="700" fill="#B91C1C">AGAINST · فشار</text>
+      <text x="220" y="148" text-anchor="middle" font-size="10.5" fill="#4F5A66">tilt = net ÷ (for+against), clamped 3–10° · reads the same engine as the verdict word</text>
+    </svg>
+  </div>
+  <!-- 3 the five lane bars -->
+  <div style="margin-top:10px">
+    <div class="lanebar">
+      <div class="type-label">Interest rates & borrowing costs <span class="type-caption">· نرخ بهره و هزینهٔ استقراض</span></div>
+      <div class="state against type-label">tight</div>
+      <div class="pill"><span class="s-against" style="width:42%"></span><span class="s-for" style="width:15%"></span><span class="s-steady" style="width:43%"></span></div>
+      <div class="type-caption">0 for · 3 against · 4 steady</div>
+    </div>
+    <div class="lanebar">
+      <div class="type-label">The US dollar <span class="type-caption">· دلار آمریکا</span></div>
+      <div class="state against type-label">strong</div>
+      <div class="pill"><span class="s-against" style="width:30%"></span><span class="s-steady" style="width:70%"></span></div>
+      <div class="type-caption">0 for · 2 against · 5 steady</div>
+    </div>
+    <div class="lanebar">
+      <div class="type-label">Market stress & uncertainty <span class="type-caption">· تنش و عدم قطعیت بازار</span></div>
+      <div class="state split type-label">split (2·1)</div>
+      <div class="pill"><span class="s-for" style="width:18%"></span><span class="s-against" style="width:9%"></span><span class="s-steady" style="width:73%"></span></div>
+      <div class="type-caption">2 for · 1 against · 7 steady · 1 unread</div>
+    </div>
+    <div class="lanebar">
+      <div class="type-label">Inflation & inflation expectations <span class="type-caption">· تورم و انتظارات تورمی</span></div>
+      <div class="state steady type-label">not leaning</div>
+      <div class="pill"><span class="s-steady" style="width:70%"></span><span class="s-unread" style="width:30%"></span></div>
+      <div class="type-caption">firing under minimum (2) · 7 steady · 3 unread</div>
+    </div>
+    <div class="lanebar">
+      <div class="type-label">Trader positioning & flows <span class="type-caption">· پوزیشن معامله‌گران و جریان‌ها</span></div>
+      <div class="state steady type-label">calm</div>
+      <div class="pill"><span class="s-steady" style="width:100%"></span></div>
+      <div class="type-caption">0 for · 0 against · 2 steady</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px">
+    <button class="btn">Inspect the 37 voters · بررسی ۳۷ رأی‌دهنده <span class="type-caption">(the ledger — lane rows expand)</span></button>
+    <div class="asof">⑤ This describes current conditions, not a forecast · این توصیف شرایط فعلی است، نه پیش‌بینی — measured over 37 voters · as of Nov 19</div>
+  </div>
+</div>
+
+<!-- ══════════ 3. THE BRIEFING CARD ══════════ -->
+<h2>3 · The BriefingCard — the outlook container, distinct identity (§11.10)</h2>
+<p class="note">Editorial and typographic — NO instrument, NO gauge, NO dial (the deliberate contrast with the balance's instrument identity). Focal treatment: the page's single gold-field moment. Reason rows anchor to indicator records, never duplicate cards. Horizon + scenario slots are Q1/Q2-gated and render nothing until the owner approves a method.</p>
+<div class="row">
+  <div class="panel focal" style="flex:2;min-width:320px">
+    <div class="kicker">Briefing · مرور بازار <span class="gate" style="margin-inline-start:8px">Q2: horizon chip — renders only when a validated method exists</span></div>
+    <div class="type-verdict" style="margin:6px 0 2px">Gold: conditions lean against it</div>
+    <div class="type-caption" style="color:var(--color-text-secondary);font-size:13px">Three of five forces pressure gold today; the stress bid is the main offset. <span class="state against" style="font-weight:700">Conditions moderately pressure gold</span><span class="type-caption"> · «شرایط در حد متوسط بر طلا فشار می‌آورد» — the five-state word (08 §8.1), Q1-gated replacement of the 7-state line.</span></div>
+    <div style="margin:12px 0 8px;display:grid;gap:6px">
+      <div class="type-label" style="font-weight:600">▸ Real yields sit high in their decade <span class="type-caption">— anchored to record 3.1</span></div>
+      <div class="type-label" style="font-weight:600">▸ The dollar is strong-for-its-decade <span class="type-caption">— anchored to record 3.8</span></div>
+      <div class="type-label" style="font-weight:600">▸ Stress is elevated but not extreme <span class="type-caption">— anchored to record 3.15</span></div>
+    </div>
+    <div style="font-style:italic;color:var(--color-text-secondary);font-size:13px">What could change this: a dovish Fed surprise would hit both headwinds at once.</div>
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-top:12px" class="asof">
+      <span>Evidence: broadly aligned · «شواهد عمدتاً هم‌جهت‌اند» (08 §8.2)</span><span>as of Nov 19 · narrative reviewed daily, data on source cadence</span>
+    </div>
+  </div>
+  <div class="panel" style="flex:1;min-width:250px">
+    <div class="sheetref">Scenario row — Q2-gated sketch</div>
+    <div class="gate" style="margin-top:8px">
+      <div class="type-label" style="margin-bottom:6px">Renders ONLY if a horizon method is approved. Text-first, three conditional paths:</div>
+      <div class="type-caption">▲ Upside — if stress escalates further, the haven bid deepens (trigger: STLFSI &gt; band top)</div>
+      <div class="type-caption" style="margin-top:4px">► Sideways — if yields sit still, the two sides cancel</div>
+      <div class="type-caption" style="margin-top:4px">▼ Downside — if the dollar extends, pressure compounds</div>
+      <div class="type-caption" style="margin-top:8px">Banned in every scenario: probabilities · target prices · drawn price paths · confidence numbers (master plan §8.4)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ 4. THE CLOSED CARD (default tier) ══════════ -->
+<h2>4 · The closed indicator card — default tier (§11.7.3)</h2>
+<p class="note">Anatomy slot map: label + state word → the mark → band word + evidence word → defaultCopy line → AsOfChip. Complete without opening anything; the whole card is the opener (popover ≥ lg / bottom sheet &lt; lg). Unread card keeps the anatomy with honest contents (dotted mark + why-line).</p>
+<div class="grid2">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+      <div class="type-label">Real yields (inflation-adjusted) <span class="type-caption">· بازده واقعی ۱۰ساله</span></div>
+      <div class="state against">pressures ▼</div>
+    </div>
+    <div class="band">
+      <div class="track" style="left:0;right:0"></div>
+      <div class="zone" style="left:20%;right:20%"></div>
+      <div class="dot against" style="left:78%"></div>
+      <span class="endlab" style="left:0">−0.1%</span><span class="endlab" style="right:0">2.4%</span>
+    </div>
+    <div class="valline"><span class="type-number" style="font-size:19px">1.87<span class="type-caption"> pp</span></span><span class="type-caption">top fifth of its decade · <span style="color:var(--color-return-down)">▼ −0.12pt / 30d</span></span></div>
+    <div class="type-caption" style="color:var(--color-text-secondary);margin-top:6px">What 10-year US government bonds really earn after expected inflation — gold's classic rival when high.</div>
+    <div class="asof" style="margin-top:8px">as of Nov 19 · FRED DFII10 · ⓘ expanded + technical</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+      <div class="type-label">US financial stress index <span class="type-caption">· شاخص تنش مالی</span></div>
+      <div class="state for">supports ▲</div>
+    </div>
+    <!-- SignedDivergingBar: zero = average -->
+    <div class="divbar" dir="ltr">
+      <div class="track"></div>
+      <div class="zero" style="left:44%"></div>
+      <div class="fill" style="left:44%;width:26%;background:var(--color-status-normal);opacity:.45"></div>
+      <div class="mk" style="left:70%"></div>
+    </div>
+    <div class="domlab" dir="ltr"><span>−1.6 (decade min)</span><span>0 = average</span><span>+1.2</span></div>
+    <div class="valline"><span class="type-number" style="font-size:19px">+0.48<span class="type-caption"> pts</span></span><span class="type-caption">above its historical average · <span style="color:var(--color-return-up)">▲ +0.06 / 30d</span></span></div>
+    <div class="type-caption" style="color:var(--color-text-secondary);margin-top:6px">Stress in US money markets above its usual level — historically a tailwind for gold's haven role.</div>
+    <div class="asof" style="margin-top:8px">weekly · as of Nov 14 · FRED STLFSI4</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+      <div class="type-label">Where markets see the Fed next <span class="type-caption">· انتظارات بازار</span></div>
+      <div class="state unread">unread ◌</div>
+    </div>
+    <div class="band">
+      <div class="track"></div><div class="zone" style="left:20%;right:20%"></div>
+      <div class="dot unread" style="left:50%"></div>
+      <span class="endlab" style="left:0">−1.0</span><span class="endlab" style="right:0">+0.6</span>
+    </div>
+    <div class="valline"><span class="type-number" style="font-size:19px;color:var(--color-text-tertiary)">—</span><span class="type-caption">upstream stopped — no reading since Oct 2026</span></div>
+    <div class="type-caption" style="color:var(--color-text-secondary);margin-top:6px">What short-term rates imply about the Fed's next moves. The feed stopped; the card shows why, never a guess.</div>
+    <div class="asof" style="margin-top:8px">stale since Oct 12 · cause: upstream-stopped</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+      <div class="type-label">Stock market breadth <span class="type-caption">· گسترهٔ بازار سهام</span></div>
+      <div class="state for">supports ▲</div>
+    </div>
+    <div class="band">
+      <div class="track"></div><div class="zone" style="left:20%;right:20%"></div>
+      <div class="dot" style="left:16%"></div>
+      <span class="endlab" style="left:0">58%</span><span class="endlab" style="right:0">92%</span>
+    </div>
+    <div class="valline"><span class="type-number" style="font-size:19px">63<span class="type-caption"> %</span></span><span class="type-caption">bottom fifth of its decade — <b>inverted seat</b>: falling breadth is the gold-positive side</span></div>
+    <div class="type-caption" style="color:var(--color-text-secondary);margin-top:6px">How many S&amp;P 500 members keep up with the index. Thin participation marks defensive markets.</div>
+    <div class="asof" style="margin-top:8px">daily · as of Nov 19 · derived RSP/SPY</div>
+  </div>
+</div>
+
+<!-- ══════════ 5. POPOVER / BOTTOM SHEET ══════════ -->
+<h2>5 · The expanded tier — desktop popover / mobile bottom sheet (§11.7.2)</h2>
+<p class="note">The same component, responsive: inline-end sheet ≥ lg (mirrors to the correct side in RTL — the shipped .insights-panel behavior), bottom sheet &lt; lg. Focus trap · Escape · focus return · body scroll lock (all shipped). Content = 09's expanded tier, then the technical disclosure inside.</p>
+<div class="row">
+  <div class="panel" style="flex:1.1;min-width:300px;position:relative">
+    <div class="kicker">Desktop popover — expanded tier of record 3.17 (VIX)</div>
+    <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+      <div class="type-label" style="font-size:16px">The stock market's fear gauge</div><div class="state for">supports ▲</div>
+    </div>
+    <div class="type-caption">VIX — شاخص ترس بازار سهام</div>
+    <div class="band" style="margin-top:12px">
+      <div class="track"></div><div class="zone" style="left:20%;right:20%"></div><div class="dot" style="left:71%"></div>
+      <span class="endlab" style="left:0">9</span><span class="endlab" style="right:0">53</span>
+    </div>
+    <div class="valline"><span class="type-number" style="font-size:20px">17.4</span><span class="type-caption">upper third of its decade</span></div>
+    <div class="type-caption" style="color:var(--color-text-secondary);margin-top:10px"><b>Why it matters:</b> when equity fear rises, money often runs to gold's haven bid — and the first hours of a true panic can sell gold for cash.</div>
+    <div class="type-caption" style="color:var(--color-text-secondary);margin-top:6px"><b>When it rises:</b> typically supports gold (polarity +1). <b>When it falls:</b> calm markets take the bid away.</div>
+    <div class="type-caption" style="color:var(--color-text-secondary);margin-top:6px"><b>Analogy:</b> fire insurance — the price of cover rises when everyone smells smoke.</div>
+    <div class="type-caption" style="margin-top:6px"><b>Relationships:</b> <span style="color:var(--color-accent-gold-deep);font-weight:700">R-05</span> stress ↔ gold · <span style="color:var(--color-accent-gold-deep);font-weight:700">R-22</span> the stress-dollar joint bid</div>
+    <details style="margin-top:10px">
+      <summary class="type-caption" style="cursor:pointer">Technical — CBOE Volatility Index, FRED VIXCLS · level-only seat (decade band) · rolling 10-year window through Nov 19 (2,607 obs) · known limitation: equity fear can be absorbed by the dollar instead (R-22)</summary>
+    </details>
+  </div>
+  <div class="panel" style="flex:1;min-width:250px">
+    <div class="kicker">Mobile bottom sheet — same content, docked</div>
+    <div style="border:1.5px dashed var(--color-border);border-radius:14px 14px 0 0;padding:26px 14px 14px;margin-top:8px;background:var(--bal-recess)">
+      <div style="width:44px;height:5px;border-radius:3px;background:var(--bal-stone-lo);margin:0 auto 12px"></div>
+      <div style="text-align:center" class="type-caption">88dvh cap · drag affordance · the sheet's content = the popover's content, stacked</div>
+      <div style="text-align:center;margin-top:10px" class="type-label">Real yields (inflation-adjusted)</div>
+      <div class="band" style="max-width:260px;margin:12px auto 0">
+        <div class="track"></div><div class="zone" style="left:20%;right:20%"></div><div class="dot against" style="left:78%"></div>
+      </div>
+      <div class="type-caption" style="text-align:center;margin-top:20px">1.87 pp · pressures ▼ · as of Nov 19</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ 6. THE RANGE BAND FAMILY ══════════ -->
+<h2>6 · The RangeBand family — position in its own decade (§11.6.1, §12.1.1)</h2>
+<p class="note">The canonical mark for level/index/ratio/percent readings. Track = 10y min–max with end labels; soft zone = 20th–80th percentile; dot = today, hued by impact-through-polarity (never by position); band word rides as a label; the basis disclosure is mandatory (technical tier full, expanded simplified). Magnitude axes stay LTR in both locales (the analytical-axis rule); the fa variant localizes labels and digits only.</p>
+<div class="grid2">
+  <div class="card">
+    <div class="type-label">Band + trail — a 30-day seat (record 3.1)</div>
+    <div class="band">
+      <div class="track"></div><div class="zone" style="left:20%;right:20%"></div>
+      <svg style="position:absolute;inset:0" width="100%" height="34" viewBox="0 0 300 34" preserveAspectRatio="none">
+        <line x1="252" y1="18" x2="234" y2="18" stroke="#da1e28" stroke-width="2" stroke-dasharray="3 2"/>
+      </svg>
+      <div class="dot against" style="left:78%"></div>
+      <span class="endlab" style="left:0">−0.1</span><span class="endlab" style="right:0">2.4</span>
+    </div>
+    <div class="type-caption">the dashed trail = the 30-day move that fired the seat (−0.12pt ≥ 0.10pt threshold)</div>
+  </div>
+  <div class="card">
+    <div class="type-label">RangeBandYoY — the CPI family (record 3.26)</div>
+    <div class="band">
+      <div class="track"></div><div class="zone" style="left:20%;right:20%"></div><div class="dot" style="left:55%"></div>
+      <span class="endlab" style="left:0">0.1%</span><span class="endlab" style="right:0">9.1%</span>
+    </div>
+    <div class="type-caption">the band is over the <b>YoY series</b>, disclosed: "rolling 10-year window on the year-over-year basis" (the m2/CPI exception, 08 §3.2)</div>
+  </div>
+  <div class="card">
+    <div class="type-label">BandStepped — the policy-rate family (record 3.4)</div>
+    <svg width="100%" height="46" viewBox="0 0 300 46">
+      <line x1="6" y1="38" x2="294" y2="38" stroke="#c7d0da" stroke-width="5" stroke-linecap="round"/>
+      <g stroke="#47525D" stroke-width="4">
+        <line x1="18" y1="38" x2="60" y2="38"/><line x1="60" y1="38" x2="60" y2="26"/>
+        <line x1="60" y1="26" x2="120" y2="26"/><line x1="120" y1="26" x2="120" y2="14"/>
+        <line x1="120" y1="14" x2="180" y2="14"/><line x1="180" y1="14" x2="180" y2="30"/>
+        <line x1="180" y1="30" x2="250" y2="30"/><line x1="250" y1="30" x2="250" y2="20"/>
+        <line x1="250" y1="20" x2="292" y2="20"/>
+      </g>
+      <circle cx="292" cy="20" r="6" fill="#fff" stroke="#da1e28" stroke-width="3"/>
+      <text x="6" y="45" font-size="10" fill="#4F5A66">0.0</text><text x="282" y="45" font-size="10" fill="#4F5A66">5.5</text>
+    </svg>
+    <div class="type-caption">plateaus render as steps; the position word says whether the plateau is high/low for the decade — level-only seats show no trail</div>
+  </div>
+  <div class="card">
+    <div class="type-label" dir="rtl" style="font-family:Vazirmatn,system-ui">نوار دامنهٔ ده‌ساله — فارسی (fa variant)</div>
+    <div class="band" dir="ltr">
+      <div class="track"></div><div class="zone" style="left:20%;right:20%"></div><div class="dot against" style="left:78%"></div>
+      <span class="endlab" style="left:0">−۰٫۱٪</span><span class="endlab" style="right:0">۲٫۴٪</span>
+    </div>
+    <div class="type-caption fa" dir="rtl">نشانگر نزدیک لبهٔ بالا یعنی «بالای دامنهٔ ده‌ساله»، نه «بد» — محور مقدار چپ‌به‌راست می‌ماند؛ برچسب‌ها و ارقام فارسی می‌شوند؛ ترتیب چیدمان آیتم‌ها در جهت خوانش آینه می‌شود</div>
+  </div>
+</div>
+
+<!-- ══════════ 7. CFTC TWO-TRACK ══════════ -->
+<h2>7 · CFTC positioning — the two-track discipline (§12.4.5)</h2>
+<p class="note">Net (−100..+100) and gross (0–100) NEVER share a geometry without labels. Net: centre-zero tick, fill grows from the centre, UNCLAMPED by design (an anomaly renders past the end — a clamp would lie). Gross: origin-anchored share, complement neutral. Definitions verbatim from the records at the technical tier. Canonical home: the Gold Positions section (F-05 dedup: the seats + context cards anchor here).</p>
+<div class="grid2">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+      <div class="type-label">Trader positioning in gold — net</div><div class="state against">pressures ▼</div>
+    </div>
+    <div class="divbar" dir="ltr">
+      <div class="track"></div>
+      <div class="zero" style="left:50%"></div>
+      <div class="fill" style="left:50%;width:36%;background:var(--color-status-alert);opacity:.5"></div>
+      <div class="mk" style="left:86%"></div>
+    </div>
+    <div class="domlab" dir="ltr"><span>−100 (net short)</span><span>0</span><span>+100 (net long)</span></div>
+    <div class="valline"><span class="type-number" style="font-size:19px">+72<span class="type-caption"> % of OI</span></span><span class="type-caption">crowded long — fragile (polarity −1) · <span style="color:var(--color-return-down)">▼ −4pts / 30d</span></span></div>
+    <div class="type-caption" style="margin-top:6px;color:var(--color-text-secondary)">Net non-commercial positioning as a share of open interest — the market's fuel gauge: extremes mark fragile crowds, the middle says little.</div>
+    <div class="asof" style="margin-top:6px">weekly · 3-day lag · as of Nov 15 · CFTC COT futures-only</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+      <div class="type-label">Gross long positioning</div><div class="state against">pressures ▼</div>
+    </div>
+    <div class="divbar" dir="ltr">
+      <div class="track" style="border-radius:3px"></div>
+      <div class="fill" style="left:0;width:64%;background:var(--color-text-secondary);opacity:.5;border-radius:3px 0 0 3px"></div>
+      <div class="mk" style="left:64%"></div>
+    </div>
+    <div class="domlab" dir="ltr"><span>0</span><span>100 (all OI long)</span></div>
+    <div class="valline"><span class="type-number" style="font-size:19px">64<span class="type-caption"> % of OI</span></span><span class="type-caption">gross longs — no zero-centre, no negative side (a different question)</span></div>
+    <div class="type-caption" style="margin-top:6px;color:var(--color-text-secondary)">The upside crowd on its own — the mirror measure that the net number folds away.</div>
+    <div class="asof" style="margin-top:6px">weekly · 3-day lag · as of Nov 15 · CFTC COT</div>
+  </div>
+</div>
+
+<!-- ══════════ 8. YIELD DECOMPOSITION ══════════ -->
+<h2>8 · Yield decomposition — the StackedComposition (§12.4.2)</h2>
+<p class="note">An additive identity only: nominal = real + breakeven, same-asOf printed, totals reconcile by construction (a mismatched set shows the honest "cannot decompose" state). Components wear NEUTRAL inks — the decomposition is arithmetic, not votes; impact lives on the three records' own cards. The 30-day line names which piece moved.</p>
+<div class="panel">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px">
+    <div class="type-label">What the 10-year yield is made of · تفکیک بازده ۱۰ساله</div>
+    <div class="type-caption">same as-of Nov 19 · nominal 4.42% = real 1.87% + breakeven 2.55%</div>
+  </div>
+  <div class="compbar" style="margin-top:10px" dir="ltr">
+    <div style="width:42%;background:rgba(71,82,93,.32)" title="real"></div>
+    <div style="width:58%;background:rgba(243,177,63,.5)" title="breakeven"></div>
+  </div>
+  <div class="legend" dir="ltr">
+    <span class="k"><span class="sw" style="background:rgba(71,82,93,.32)"></span> real 1.87% → record 3.1</span>
+    <span class="k"><span class="sw" style="background:rgba(243,177,63,.5)"></span> breakeven 2.55% → record 3.31</span>
+    <span class="k"><span class="sw" style="background:transparent;border:1.5px dashed var(--color-accent-gold-deep)"></span> term premium 0.31% → record 3.19 (model estimate, separate identity)</span>
+  </div>
+  <div class="type-caption" style="margin-top:10px;color:var(--color-text-secondary)"><b>Which piece moved (30 days):</b> the yield fell 0.09pt — the <i>real</i> leg fell 0.12pt while breakeven rose 0.03pt: an easing-cost story, not an inflation story. The meaning of a yield move depends on which leg drives it (R-03).</div>
+</div>
+
+<!-- ══════════ 9. FLOWS VS STOCKS + CORRELATION ══════════ -->
+<h2>9 · Flows vs stocks — and the rolling-correlation strip (§12.4.3/§12.4.4)</h2>
+<div class="row">
+  <div class="card" style="min-width:280px">
+    <div class="type-label">FlowColumn — Shanghai withdrawals (4.9, monthly)</div>
+    <svg width="100%" height="110" viewBox="0 0 300 110">
+      <line x1="10" y1="14" x2="290" y2="14" stroke="#c7d0da" stroke-dasharray="4 3"/>
+      <line x1="10" y1="48" x2="290" y2="48" stroke="#c7d0da" stroke-dasharray="4 3"/>
+      <line x1="10" y1="88" x2="290" y2="88" stroke="#c7d0da"/>
+      <rect x="10" y="14" width="280" height="34" fill="rgba(71,82,93,.10)"/>
+      <!-- trailing 12 months -->
+      <g fill="rgba(71,82,93,.45)">
+        <rect x="18" y="60" width="10" height="28"/><rect x="34" y="55" width="10" height="33"/><rect x="50" y="62" width="10" height="26"/>
+        <rect x="66" y="50" width="10" height="38"/><rect x="82" y="58" width="10" height="30"/><rect x="98" y="52" width="10" height="36"/>
+        <rect x="114" y="64" width="10" height="24"/><rect x="130" y="56" width="10" height="32"/><rect x="146" y="48" width="10" height="40"/>
+        <rect x="162" y="60" width="10" height="28"/><rect x="178" y="54" width="10" height="34"/>
+      </g>
+      <!-- current month column against its decade range -->
+      <rect x="248" y="30" width="16" height="52" fill="rgba(243,177,63,.75)" stroke="#A87E1C"/>
+      <text x="256" y="24" text-anchor="middle" font-size="10.5" font-weight="700" fill="#4F5A66">118 t</text>
+      <text x="14" y="10" font-size="9.5" fill="#4F5A66">decade max 210 t</text>
+      <text x="14" y="44" font-size="9.5" fill="#4F5A66">20–80th pct zone</text>
+      <text x="14" y="102" font-size="9.5" fill="#4F5A66">decade min 62 t</text>
+      <text x="256" y="102" text-anchor="middle" font-size="9.5" fill="#4F5A66">this month</text>
+    </svg>
+    <div class="type-caption">A FLOW: how much moved this period — never rendered as a level line. Proxy caveat rides the mark; volume ≠ price (R-27).</div>
+  </div>
+  <div class="card" style="min-width:280px">
+    <div class="type-label">LevelSpark — London vault stock (module 11)</div>
+    <svg width="100%" height="110" viewBox="0 0 300 110">
+      <polyline points="10,72 40,68 70,74 100,66 130,60 160,63 190,55 220,58 250,50 290,54" fill="none" stroke="#A87E1C" stroke-width="2"/>
+      <circle cx="290" cy="54" r="4" fill="#A87E1C"/>
+      <text x="290" y="42" text-anchor="end" font-size="11" font-weight="700" fill="#4F5A66">8,576 t</text>
+      <text x="10" y="100" font-size="9.5" fill="#4F5A66">124-month path (normalized) — a STOCK: how much exists</text>
+    </svg>
+    <div class="type-caption">Neutral tone always (direction belongs to the signed delta beside it); vault T+2.5wk lag in the AsOfChip; koz→t tonnes conversion in technical.</div>
+  </div>
+</div>
+<div class="panel" style="margin-top:8px">
+  <div class="type-label">CorrelationStrip — gold vs real-yield-10y, 52-week rolling (module 12, kept as shipped)</div>
+  <svg width="100%" height="96" viewBox="0 0 800 96" style="display:block" dir="ltr">
+    <line x1="10" y1="16" x2="790" y2="16" stroke="#c7d0da"/><line x1="10" y1="52" x2="790" y2="52" stroke="#47525D" stroke-dasharray="5 4"/><line x1="10" y1="88" x2="790" y2="88" stroke="#c7d0da"/>
+    <text x="792" y="19" font-size="10" fill="#4F5A66">+1</text><text x="792" y="55" font-size="10" fill="#4F5A66">0</text><text x="792" y="91" font-size="10" fill="#4F5A66">−1</text>
+    <polyline points="10,58 80,60 150,56 220,62 290,70 360,74 430,78 500,80 560,82 600,84 640,83 700,81 790,79" fill="none" stroke="#b8860b" stroke-width="2.2"/>
+    <line x1="520" y1="12" x2="520" y2="90" stroke="#4F5A66" stroke-dasharray="3 3"/>
+    <text x="524" y="24" font-size="10" fill="#4F5A66">2022 buyer rotation</text>
+    <circle cx="790" cy="79" r="3.6" fill="#b8860b"/>
+  </svg>
+  <div class="type-caption">The r-line over −1/0/+1, window named verbatim, the 2022 rotation dated. Guards (printed on the surface): "correlation is one factor, not a forecast formula — a different sampling day moves the number" · correlation ≠ causation (dashed-edge discipline in the explorer). Charting rule: no other relationship gets history until coverage is verified.</div>
+</div>
+
+<!-- ══════════ 10. PRICE MAP ══════════ -->
+<h2>10 · PriceMap — technical reference levels (§12.4.6)</h2>
+<p class="note">The default replaces the wall-of-tables: a vertical price ladder with the SMA family as labeled rules (200-day heaviest), pivots dashed, the current price marked with distance labels; the takeaway sentence first; tables move into the technical disclosure. Locked guard: "reference levels, not predictions" — no support/resistance language.</p>
+<div class="row">
+  <div class="card" style="min-width:280px">
+    <div class="type-caption" style="margin-bottom:6px"><b>Takeaway:</b> price sits 2.1% above its 200-day average — a constructive reference, not a prediction.</div>
+    <svg width="100%" height="190" viewBox="0 0 320 190" dir="ltr">
+      <line x1="60" y1="20" x2="60" y2="176" stroke="#c7d0da"/>
+      <!-- levels -->
+      <line x1="60" y1="28" x2="300" y2="28" stroke="rgba(71,82,93,.5)" stroke-width="1.4"/>
+      <text x="8" y="31" font-size="10.5" fill="#4F5A66">SMA20 3,676</text>
+      <line x1="60" y1="62" x2="300" y2="62" stroke="rgba(71,82,93,.5)" stroke-width="1.4"/>
+      <text x="8" y="65" font-size="10.5" fill="#4F5A66">SMA50 3,548</text>
+      <line x1="60" y1="96" x2="300" y2="96" stroke="#47525D" stroke-width="1.8"/>
+      <text x="8" y="99" font-size="10.5" font-weight="700" fill="#47525D">SMA100 3,402</text>
+      <line x1="60" y1="130" x2="300" y2="130" stroke="#2C3E50" stroke-width="2.4"/>
+      <text x="8" y="133" font-size="10.5" font-weight="700" fill="#2C3E50">SMA200 3,525</text>
+      <line x1="60" y1="158" x2="300" y2="158" stroke="#4F5A66" stroke-dasharray="4 3"/>
+      <text x="8" y="161" font-size="10.5" fill="#4F5A66">R1 pivot 3,712</text>
+      <!-- current price marker -->
+      <circle cx="230" cy="48" r="7" fill="#fff" stroke="#A87E1C" stroke-width="3.5"/>
+      <text x="230" y="38" text-anchor="middle" font-size="11" font-weight="800" fill="#2C3E50">3,599</text>
+      <text x="242" y="52" font-size="9.5" fill="#4F5A66">+2.1% vs SMA200</text>
+      <text x="60" y="186" font-size="9.5" fill="#4F5A66">crosses dated inline: 50/200 golden cross — Aug 12</text>
+    </svg>
+  </div>
+  <div class="card" style="min-width:240px">
+    <div class="type-label">ProbabilityRow — market expectations (module 4)</div>
+    <div style="margin-top:10px">
+      <div style="display:flex;justify-content:space-between" class="type-caption"><span>Fed cuts by Dec 18 meeting</span><span>72%</span></div>
+      <div class="divbar" style="height:18px"><div class="track" style="top:6px;height:6px"></div><div class="fill" style="left:0;width:72%;top:6px;height:6px;background:var(--color-accent-gold)"></div></div>
+    </div>
+    <div class="type-caption" style="margin-top:10px;color:var(--color-text-secondary)">Market-implied expectation (Polymarket traders' prices, not ours) — an <b>event</b> probability, never a gold-move probability. As of Nov 19 · venue + date named.</div>
+    <div class="recess" style="margin-top:12px">
+      <div class="type-label" style="font-size:12.5px">AsOfChip — the one freshness grammar (§11.6.4)</div>
+      <div class="type-caption" style="margin-top:6px">as of Nov 19, 14:03 UTC · fresh</div>
+      <div class="type-caption">as of Nov 15 · 3-day lag (CFTC weekly)</div>
+      <div class="type-caption">stale — showing the last successful copy (cached)</div>
+      <div class="type-caption">waiting — the price path lights when the dataset lands</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ 11. RELATIONSHIP EXPLORER ══════════ -->
+<h2>11 · The relationship explorer — class grammar (§12.5)</h2>
+<p class="note">Radial hub on desktop (gold at center, the five lane clusters + market-structure nodes around), list-first on mobile. Class is ALWAYS visible: M solid · C dashed · X solid + flag pennant · K heaviest + evidence tag. Blocked edges (ETF flows) live in the legend only. The honesty footer carries the meter's own no-edge record — the map is conventional thinking, never a proven system.</p>
+<div class="panel">
+  <svg width="100%" height="330" viewBox="0 0 860 330" dir="ltr" role="img" aria-label="Relationship map sketch: gold at center, five lane clusters, class-coded edges">
+    <!-- edges first -->
+    <!-- M solid: borrowing-costs -> gold -->
+    <line x1="180" y1="70" x2="410" y2="150" stroke="#24a148" stroke-width="2" opacity=".75"/>
+    <!-- M solid: dollar -> gold -->
+    <line x1="150" y1="200" x2="405" y2="168" stroke="#24a148" stroke-width="2" opacity=".75"/>
+    <!-- M + X flag: stress -> gold -->
+    <line x1="300" y1="285" x2="420" y2="185" stroke="#24a148" stroke-width="2" opacity=".75"/>
+    <g><line x1="358" y1="236" x2="366" y2="228" stroke="#f1c21b" stroke-width="2"/><text x="368" y="226" font-size="9.5" fill="#7A5D00" font-weight="700">X</text></g>
+    <!-- C dashed: BTC -> gold -->
+    <line x1="700" y1="70" x2="460" y2="152" stroke="#47525D" stroke-width="2" stroke-dasharray="5 4" opacity=".8"/>
+    <!-- C dashed: commodities -> gold -->
+    <line x1="730" y1="220" x2="462" y2="172" stroke="#47525D" stroke-width="2" stroke-dasharray="5 4" opacity=".8"/>
+    <!-- K heaviest: CB demand -> gold -->
+    <line x1="640" y1="290" x2="452" y2="182" stroke="#da1e28" stroke-width="3.6" opacity=".65"/>
+    <g><rect x="536" y="232" width="14" height="14" rx="3" fill="none" stroke="#da1e28" stroke-width="1.6"/><text x="554" y="243" font-size="9.5" fill="#B91C1C">K evidence</text></g>
+    <!-- X record edge: the stress-dollar joint bid (stress <-> dollar) -->
+    <path d="M 210 230 Q 160 150 165 205" fill="none" stroke="#f1c21b" stroke-width="2"/>
+    <text x="120" y="150" font-size="9.5" fill="#7A5D00" font-weight="700">X break pattern</text>
+    <!-- gold hub -->
+    <circle cx="430" cy="165" r="30" fill="rgba(243,177,63,.25)" stroke="#A87E1C" stroke-width="2.5"/>
+    <text x="430" y="169" text-anchor="middle" font-size="15" font-weight="800" fill="#2A1F04">GOLD</text>
+    <!-- lane nodes -->
+    <g font-size="11.5" font-weight="700">
+      <circle cx="170" cy="62" r="21" fill="rgba(36,161,72,.12)" stroke="#24a148"/><text x="170" y="66" text-anchor="middle" fill="#0E6027">rates</text>
+      <circle cx="140" cy="204" r="21" fill="rgba(36,161,72,.12)" stroke="#24a148"/><text x="140" y="208" text-anchor="middle" fill="#0E6027">dollar</text>
+      <circle cx="296" cy="290" r="21" fill="rgba(36,161,72,.12)" stroke="#24a148"/><text x="296" y="294" text-anchor="middle" fill="#0E6027">stress</text>
+      <circle cx="560" cy="288" r="21" fill="rgba(36,161,72,.12)" stroke="#24a148"/><text x="560" y="292" text-anchor="middle" fill="#0E6027">inflation</text>
+      <circle cx="706" cy="66" r="21" fill="rgba(36,161,72,.12)" stroke="#24a148"/><text x="706" y="70" text-anchor="middle" fill="#0E6027">flows</text>
+    </g>
+    <!-- structure nodes -->
+    <g font-size="11" font-weight="700" fill="#47525D">
+      <circle cx="802" cy="130" r="16" fill="rgba(71,82,93,.10)" stroke="#47525D"/><text x="802" y="134" text-anchor="middle">BTC</text>
+      <circle cx="756" cy="238" r="16" fill="rgba(71,82,93,.10)" stroke="#47525D"/><text x="756" y="242" text-anchor="middle">oil/pt</text>
+      <circle cx="620" cy="300" r="16" fill="rgba(218,30,40,.08)" stroke="#da1e28"/><text x="620" y="304" text-anchor="middle">CB dem</text>
+      <circle cx="560" cy="40" r="16" fill="rgba(71,82,93,.10)" stroke="#47525D"/><text x="560" y="44" text-anchor="middle">equities</text>
+    </g>
+  </svg>
+  <div class="legend">
+    <span class="k"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#24a148" stroke-width="2.4"/></svg> M mechanism (R-01, R-02, R-05…)</span>
+    <span class="k"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#47525D" stroke-width="2.4" stroke-dasharray="5 4"/></svg> C correlation (R-19, R-20…)</span>
+    <span class="k"><svg width="26" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="#24a148" stroke-width="2.4"/><path d="M 13 0 L 16 5 L 13 10" fill="none" stroke="#f1c21b" stroke-width="2"/></svg> X conditional — pennant, never fine print (R-01's 2022 break, R-22…)</span>
+    <span class="k"><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="#da1e28" stroke-width="3.6"/></svg> K causal-with-evidence — names its evidence (R-09 post-2022 shift)</span>
+    <span class="k"><span class="sw" style="background:repeating-linear-gradient(45deg,var(--bal-stone-lo) 0 3px,transparent 3px 6px)"></span> blocked — legend only (R-26 ETF flows: explained conceptually, no data under licence)</span>
+  </div>
+  <div class="recess" style="margin-top:10px"><span class="type-caption"><b>Honesty footer (standing):</b> the 37-voter meter's own measured record — no directional edge; sign-agreements 46.8 / 42.2 / 32.7% at 5 / 20 / 60 trading days. This map explains the conventional thinking the meter encodes, not a proven system.</span></div>
+</div>
+
+<!-- ══════════ 12. DARK THEME ══════════ -->
+<h2>12 · Dark theme — first-class render (§11.4.4)</h2>
+<p class="note">The same patterns in the shipped dark token set (status hues keep light values except alert → #fa4d56; brass has its tuned dark ramp; no new hex anywhere). One card of each family shown.</p>
+<div class="panel darkwrap dark">
+  <div class="grid2">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+        <div class="type-label">Real yields (inflation-adjusted)</div><div class="state against">pressures ▼</div>
+      </div>
+      <div class="band"><div class="track"></div><div class="zone" style="left:20%;right:20%"></div><div class="dot against" style="left:78%"></div><span class="endlab" style="left:0">−0.1%</span><span class="endlab" style="right:0">2.4%</span></div>
+      <div class="valline"><span class="type-number" style="font-size:19px">1.87<span class="type-caption"> pp</span></span><span class="type-caption">top fifth of its decade</span></div>
+    </div>
+    <div class="card">
+      <div class="type-label">LaneBar — dark</div>
+      <div style="margin-top:10px">
+        <div class="lanebar" style="border-color:rgba(232,237,244,.16)">
+          <div class="type-label">Market stress & uncertainty</div><div class="state split type-label">split (2·1)</div>
+          <div class="pill"><span class="s-for" style="width:18%"></span><span class="s-against" style="width:9%"></span><span class="s-steady" style="width:73%"></span></div>
+          <div class="type-caption">2 · 1 · 7 · 1</div>
+        </div>
+        <div class="lanebar" style="border-color:rgba(232,237,244,.16)">
+          <div class="type-label">Trader positioning & flows</div><div class="state steady type-label">calm</div>
+          <div class="pill"><span class="s-steady" style="width:100%"></span></div>
+          <div class="type-caption">0 · 0 · 2</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="type-label">BeamGlyph — compact fidelity (dark)</div>
+      <svg width="150" height="52" viewBox="0 0 150 52" style="margin-top:8px" role="img" aria-label="Beam tilted 7 degrees against gold">
+        <g transform="rotate(-7 75 20)"><line x1="30" y1="20" x2="120" y2="20" stroke="#A9B5C5" stroke-width="3" stroke-linecap="round"/><circle cx="30" cy="20" r="2.6" fill="#24a148"/><circle cx="120" cy="20" r="2.6" fill="#fa4d56"/></g>
+        <circle cx="75" cy="20" r="3.4" fill="#A9B5C5"/>
+        <line x1="75" y1="20" x2="75" y2="40" stroke="#A9B5C5" stroke-width="2"/>
+        <line x1="45" y1="26" x2="42" y2="44" stroke="#A9B5C5" stroke-width="1.4"/><line x1="105" y1="26" x2="108" y2="44" stroke="#A9B5C5" stroke-width="1.4"/>
+      </svg>
+      <div class="type-caption">Monochrome beam — the compact tier for inline contexts (narrative lines, TM, section intros); same tilt math as the brass stage; one full instrument per page, glyphs unlimited.</div>
+    </div>
+    <div class="card">
+      <div class="type-label">Brass weights — dark ramp</div>
+      <svg width="120" height="72" viewBox="0 0 120 72" style="margin-top:6px">
+        <circle cx="36" cy="36" r="26" fill="none" stroke="#24a148" stroke-width="4.2" stroke-dasharray="110 63"/>
+        <circle cx="36" cy="36" r="17" fill="#d9a43e"/><circle cx="36" cy="36" r="17" fill="none" stroke="#8f5f14"/>
+        <circle cx="88" cy="36" r="26" fill="none" stroke="#46546a" stroke-width="3" stroke-dasharray="1.4 3.2"/>
+        <circle cx="88" cy="36" r="17" fill="#46546a"/><circle cx="88" cy="36" r="17" fill="none" stroke="#2b3646"/>
+      </svg>
+      <div class="type-caption">Segmented rims: firing members green/red arcs; steady stone; unread dotted — counts always in words (aria), the rim is decorative.</div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  Session 4 visual references · docs/gold-redesign/visual-references/ · illustrative data only (≈ S1 capture state) · token values from apps/web/src/index.css · spec: 11-visual-design-principles.md + 12-visualization-mapping.md · PNG captures of this sheet ride alongside (desktop 1280 / mobile 390 / dark / fa panels).
+</div>
+</div>
+</body>
+</html>
