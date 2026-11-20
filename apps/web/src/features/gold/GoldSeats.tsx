@@ -296,7 +296,7 @@ function SeatCard({
             if (hashAt !== -1) stageAnchorScroll(href.slice(hashAt + 1));
             navigate(href.slice(0, hashAt === -1 ? undefined : hashAt));
           }}
-          className="insights-focusable relative z-10 self-start rounded text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
+          className="insights-focusable relative z-10 self-start rounded py-1 text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
         >
           {t('pd.gold.seatLink')} ↗
         </a>

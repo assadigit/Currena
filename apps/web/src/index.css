@@ -203,6 +203,45 @@ body {
   .chip-scroller::after { display: none; }
 }
 
+/* GUX-S8 M1 (the mobile-first pass): the gold section nav's chip track —
+ * ONE nowrap row (the shipped chip-scroller pattern) whose edges fade
+ * softly while more chips sit that way. Unlike .chip-scroller's fixed
+ * light-bg gradient, these fades are (a) toggled by the component's own
+ * scroll state (data-fade-start/data-fade-end — never shown when the
+ * row fits or the edge is reached), and (b) blended to the nav's own
+ * translucent surface so both themes and the backdrop-blur stay honest.
+ * Purely decorative — the chips' own accessible names never depend on
+ * it. Direction-aware: LTR fades the inline-end (right), RTL the left. */
+.gold-nav-track { position: relative; }
+.gold-nav-track::before,
+.gold-nav-track::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 1;
+}
+[dir='ltr'] .gold-nav-track::before,
+[dir='rtl'] .gold-nav-track::after {
+  left: 0;
+  background: linear-gradient(to right, var(--color-surface), transparent);
+}
+[dir='ltr'] .gold-nav-track::after,
+[dir='rtl'] .gold-nav-track::before {
+  right: 0;
+  background: linear-gradient(to left, var(--color-surface), transparent);
+}
+.gold-nav-track[data-fade-start='true']::before { opacity: 1; }
+.gold-nav-track[data-fade-end='true']::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .gold-nav-track::before,
+  .gold-nav-track::after { transition: none; }
+}
+
 /* Skeleton shimmer — light uses dark-on-white, dark uses light-on-navy */
 @keyframes currena-shimmer {
   from { background-position: 200% 0; }

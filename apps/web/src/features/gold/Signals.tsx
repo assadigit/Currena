@@ -191,7 +191,7 @@ export function Signals({
             aria-expanded={open}
             aria-controls="insights-signals-body"
             onClick={() => setOpen(!open)}
-            className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+            className="insights-focusable inline-flex min-h-[44px] min-w-[44px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
           >
             <span aria-hidden="true">
               <ChevronDown

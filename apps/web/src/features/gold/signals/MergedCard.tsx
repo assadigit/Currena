@@ -323,7 +323,7 @@ export function MergedSignalsCard({
           <a
             key={lane.lane}
             href={`#lane-${lane.lane}`}
-            className="insights-focusable rounded text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
+            className="insights-focusable rounded py-1 text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
             data-lane-drill-link={lane.lane}
           >
             {gs.laneNames[lane.lane]} ↗

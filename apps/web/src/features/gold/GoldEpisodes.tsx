@@ -72,7 +72,7 @@ export function GoldEpisodes(): React.JSX.Element {
       id="gold-zone-o"
       aria-label={t('pd.gold.epTitle')}
       data-gold-zone-o-band
-      className="flex min-w-0 flex-col gap-1.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)]/70 px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
+      className="flex min-w-0 scroll-mt-24 flex-col gap-1.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)]/70 px-2.5 py-2 ring-1 ring-[var(--color-border)]/60"
     >
       <h3 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">{t('pd.gold.epTitle')}</h3>
       {/* The takeaway line — the 390 always-visible row. */}
