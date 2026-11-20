@@ -1600,4 +1600,140 @@ describe('GoldPage', () => {
     // The note states the deliberate choice.
     expect(silverNote?.textContent).toContain('deliberate');
   });
+
+  /* ---------------------------------------------------------------- *
+   * GUX-S6 M1 — the relationship explorer (12 §5.1-§5.4)
+   * ---------------------------------------------------------------- */
+
+  it('GUX-S6 M1: the relationship explorer renders after GoldPositions — list-first, classes always visible, the X pennant never fine print, R-26 legend-only, the honesty footer', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+
+    // The section exists with its anchor, after the positions section
+    // (the near-viewport lazy boundary resolves asynchronously — the
+    // GoldTail rebases' own waitFor pattern).
+    await waitFor(() => {
+      expect(document.querySelector('#gold-relationships')).not.toBeNull();
+    });
+    const explorer = document.querySelector('#gold-relationships')!;
+    await waitFor(() => {
+      expect(document.querySelector('#gold-positions')).not.toBeNull();
+    });
+    const positions = document.querySelector('#gold-positions')!;
+    expect(positions.compareDocumentPosition(explorer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    // §5.1 LIST-FIRST: the rows render without any toggle — every
+    // record findable without the canvas (the accessibility guarantee).
+    const rows = [...explorer.querySelectorAll('[data-rel-row]')];
+    expect(rows.length).toBe(25);
+    expect(rows[0]!.getAttribute('data-rel-row')).toBe('R-01');
+    // The canvas is NOT rendered by default (the desktop opt-in).
+    expect(explorer.querySelector('[data-rel-canvas]')).toBeNull();
+
+    // §5.2 the class chips: every row carries its visible class chip.
+    for (const row of rows) {
+      expect(row.querySelector('[data-rel-class-chip]')).not.toBeNull();
+    }
+    const classCounts = { M: 0, C: 0, X: 0, K: 0 } as Record<string, number>;
+    for (const row of rows) classCounts[row.getAttribute('data-rel-class')!]! += 1;
+    expect(classCounts['M']).toBe(14);
+    expect(classCounts['C']).toBe(10);
+    expect(classCounts['X']).toBe(1);
+    expect(classCounts['K']).toBe(0);
+
+    // The X-flags render as REAL tokens on the row (never fine print):
+    // R-01 (an M record) flags; a flagless record does not.
+    const r01 = explorer.querySelector('[data-rel-row="R-01"]')!;
+    expect(r01.querySelector('[data-rel-x-pennant]')).not.toBeNull();
+    const r03 = explorer.querySelector('[data-rel-row="R-03"]')!;
+    expect(r03.querySelector('[data-rel-x-pennant]')).toBeNull();
+
+    // The one-liners render as the rows' FULL text (10 §5's copy rule).
+    expect(r01.querySelector('[data-rel-oneliner]')?.textContent).toContain('classic rival');
+    // The concept labels resolve to the page's own vocabulary (not raw ids).
+    expect(r01.querySelector('[data-rel-a]')?.textContent).toContain('Real yields');
+
+    // §5.2 the blocked edge is LEGEND-ONLY: R-26 renders as a muted
+    // legend row and as a list row, but never as a canvas edge (the
+    // canvas asserts this below); the legend names it.
+    const legend = explorer.querySelector('[data-rel-legend]')!;
+    expect(legend.querySelector('[data-rel-legend-blocked]')?.textContent).toContain('ETF flows');
+
+    // §5.3 the honesty footer: the meter's own measured record.
+    const honesty = explorer.querySelector('[data-rel-honesty]')!;
+    expect(honesty.textContent).toContain('no directional edge');
+    expect(honesty.textContent).toContain('46.8');
+
+    // The filter chips: pressing C narrows the list to the C records.
+    const filterC = explorer.querySelector('[data-rel-filter="C"]') as HTMLButtonElement;
+    fireEvent.click(filterC);
+    await waitFor(() => {
+      expect(explorer.querySelectorAll('[data-rel-row]').length).toBe(10);
+    });
+    // And back to all.
+    fireEvent.click(explorer.querySelector('[data-rel-filter="all"]') as HTMLButtonElement);
+    await waitFor(() => {
+      expect(explorer.querySelectorAll('[data-rel-row]').length).toBe(25);
+    });
+  });
+
+  it('GUX-S6 M1: the desktop canvas toggle opens the map view — gold hub + the class-grammar edges; the blocked edge never draws', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBe(37);
+    });
+    await waitFor(() => {
+      expect(document.querySelector('#gold-relationships')).not.toBeNull();
+    });
+    const explorer = document.querySelector('#gold-relationships')!;
+    await waitFor(() => {
+      expect(explorer.querySelector('[data-rel-canvas-toggle]')).not.toBeNull();
+    });
+    const toggle = explorer.querySelector('[data-rel-canvas-toggle]') as HTMLButtonElement;
+    // The toggle exists (desktop markup renders in jsdom; the CSS hides
+    // it below lg — the list-first rule is a layout contract).
+    expect(toggle).not.toBeNull();
+    fireEvent.click(toggle);
+    const canvas = explorer.querySelector('[data-rel-canvas]')!;
+    expect(canvas).not.toBeNull();
+    // The edges: every unblocked record draws exactly one edge.
+    const edges = [...canvas.querySelectorAll('[data-rel-edge]')];
+    expect(edges.length).toBe(24);
+    // The class grammar: the C edges are dashed, the M solid.
+    const cEdge = canvas.querySelector('[data-rel-edge="R-06"] line') as SVGLineElement;
+    expect(cEdge.getAttribute('stroke-dasharray')).toBe('4 3');
+    const mEdge = canvas.querySelector('[data-rel-edge="R-03"] line') as SVGLineElement;
+    expect(mEdge.getAttribute('stroke-dasharray')).toBeNull();
+    // The X pennant renders at the edge midpoint (R-01 flags).
+    expect(canvas.querySelector('[data-rel-edge="R-01"]')).not.toBeNull();
+    // The blocked record R-26 NEVER draws.
+    expect(canvas.querySelector('[data-rel-edge="R-26"]')).toBeNull();
+    // The gold hub node wears the accent gold.
+    expect(canvas.querySelector('[data-rel-node="gold"]')).not.toBeNull();
+  });
+
+  it('GUX-S6 M1: the section nav carries the Relationships chip between Ratios and History', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelector('#gold-relationships')).not.toBeNull();
+    });
+    const chips = [...document.querySelectorAll('[data-nav-chip]')].map((c) => c.getAttribute('data-nav-chip'));
+    expect(chips).toEqual([
+      'gold-zone-d',
+      'gold-zone-f',
+      'insights-signals',
+      'gold-seats',
+      'gold-context',
+      'gold-relationships',
+      'gold-zone-o',
+    ]);
+    // The chip's href is the real anchor.
+    const relChip = document.querySelector('a[data-nav-chip="gold-relationships"]') as HTMLAnchorElement;
+    expect(relChip.getAttribute('href')).toBe('#gold-relationships');
+  });
 });

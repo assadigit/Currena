@@ -1498,6 +1498,37 @@ export const en = {
       navLanes: 'Five forces',
       navRatios: 'Ratios & context',
       navHistory: 'History & notes',
+      /* GUX-S6 M1 (the relationship explorer, 12 §5 over 10 §5): the
+       * section's chrome words only — the one-liners themselves are the
+       * record module's own content (gold-relationships.ts, 10 §3's
+       * authored copy), never dictionary strings. */
+      navRelations: 'Relationships',
+      relAria: 'How gold’s forces connect',
+      relTitle: 'How the forces connect',
+      relIntro:
+        'The conventional relationships this page’s meter encodes — what tends to move with gold, through which channel, and under which conditions. Each connection states its own evidence class: a mechanism is not a proven cause, and an observed pattern is not a law.',
+      relFilterAria: 'Filter by evidence class',
+      relFilterAll: 'All',
+      relClassM: 'M · mechanism',
+      relClassC: 'C · correlation',
+      relClassX: 'X · conditional',
+      relClassK: 'K · documented',
+      relConditionsApply: 'conditions apply',
+      relCanvasToggle: 'Show the map view',
+      relCanvasAria: 'The relationship map — gold at the centre, its forces around it. The list below carries every connection in full.',
+      relCanvasNote: 'The map is a reading aid; every connection’s full text lives in the list.',
+      relLegendTitle: 'Reading the connections',
+      relLegendM: 'M · mechanism — a solid line: an economically reasoned channel (“the channel works through…”), not a law.',
+      relLegendC: 'C · correlation — a dashed line: a historically documented association, never a cause.',
+      relLegendX: 'X · conditional — a flagged line: the direction or strength depends on the regime; the break episodes are named in the record.',
+      relLegendK: 'K · documented — the heaviest line: a causal statement with the evidence named inline.',
+      relLegendBlocked: 'ETF flows ↔ gold — explained conceptually; no data under licence (never drawn as a charted connection).',
+      relHonestyNote:
+        'These are the conventional relationships the meter encodes — measured against gold’s actual moves, the 37-voter table showed no directional edge (sign agreements 46.8% at 5 days · 42.2% at 20 · 32.7% at 60 trading days — all below a coin flip).',
+      relNodeGold: 'Gold',
+      relNodeInflation: 'Inflation & expectations',
+      relNodeCbDemand: 'Central-bank demand',
+      relNodeEtfFlows: 'ETF flows',
       /* The lane names + one-sentence intros (the corpus's own, pinned). */
       laneBorrowingCosts: 'Interest rates & borrowing costs',
       laneDollar: 'The US dollar',

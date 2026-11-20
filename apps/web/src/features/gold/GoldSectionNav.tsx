@@ -34,6 +34,8 @@ const SECTIONS: ReadonlyArray<{ id: string; key: TranslationKey }> = [
   { id: 'insights-signals', key: 'pd.gold.navSignals' },
   { id: 'gold-seats', key: 'pd.gold.navLanes' },
   { id: 'gold-context', key: 'pd.gold.navRatios' },
+  // GUX-S6 M1: the relationship explorer's own chip (12 §5's surface).
+  { id: 'gold-relationships', key: 'pd.gold.navRelations' },
   { id: 'gold-zone-o', key: 'pd.gold.navHistory' },
 ];
 
