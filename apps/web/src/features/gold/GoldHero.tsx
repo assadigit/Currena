@@ -122,7 +122,7 @@ function bandWord(percentile: number, t: ReturnType<typeof useI18n>['t'], number
  * verdict word beside it carries the meaning (geometry never alone).
  * ------------------------------------------------------------------ */
 
-function BeamGlyph({ angleDeg, heavy }: { angleDeg: number; heavy: 'for' | 'against' | null }): React.JSX.Element {
+export function BeamGlyph({ angleDeg, heavy }: { angleDeg: number; heavy: 'for' | 'against' | null }): React.JSX.Element {
   const { t, locale, numberLocale } = useI18n();
   // The visual rotation: the heavy side's end dips. The for pan sits at
   // the beam's start side (left in LTR); in RTL the whole drawing mirrors

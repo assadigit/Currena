@@ -105,3 +105,21 @@ strong/stress · elevated/calm · hot/cool · calm/elevated) with
 «آرامش» pinned from 11 §5.3's own example; the rest follow the
 corpus's established register (تازه‌سازی، تأخیر، در انتظار). The
 terminology additions are mirrored in persian-terminology.md.
+
+## M3 addendum — the BriefingCard + CompositionStack vocabulary (16 entries)
+
+The same round's third wave (GUX-S5 M3, the hero components): the
+briefing kicker («مرور بازار» — 11 §10.2's own word), the four
+present-tense headlines («طلا: شرایط به نفع آن می‌چربد / علیه آن
+می‌چربد / مختلط است / دادهٔ کافی برای قضاوت نیست» — the against form
+pinned from 11 §10.2's example), the reasons title («چرا»), the
+what-could-change pair («چه چیزی می‌تواند این را تغییر دهد» + the
+narrow-lane line «یک جابه‌جایی کوچک در {lane} می‌تواند این تراز را
+عوض کند» + the fallback «تصویر با رسیدن داده‌های تازه جابه‌جا
+می‌شود»), the three evidence words («شواهد: عمدتاً هم‌جهت / مختلط /
+محدود» — 08 §8.2's drafts over the locked §2.1 semantics), the
+conditions header pair («شرایط» + «چه چیزی امروز از طلا حمایت می‌کند
+و چه چیزی بر آن فشار می‌آورد»), and the two stack affordances
+(«دیدن تراز کامل» + «بررسی هر ۳۷ عامل»). The headline time stance is
+present-tense conditions, never a forecast; the Q1 five-state word and
+the Q2 horizon/scenario slots render NOTHING (S4-D11's gates).

@@ -167,8 +167,8 @@ describe('LaneBar — the one lane-summary renderer', () => {
 
   it('laneBarDataOf normalizes the engine lane (member impacts → steady/unread counts)', () => {
     const engineLane = {
-      lane: 'flows' as const,
-      side: 'for' as const,
+      lane: 'flows',
+      side: 'for',
       split: false,
       readable: 2,
       firing: 1,
@@ -178,7 +178,7 @@ describe('LaneBar — the one lane-summary renderer', () => {
         { id: 'cftc-gold-positioning', impact: 'supports', evidence: 'falling' },
         { id: 'cftc-gold-gross-long', impact: 'steady', evidence: null },
       ],
-    };
+    } as unknown as import('@currena/insights').GoldBalanceLane;
     expect(laneBarDataOf(engineLane)).toEqual({
       lane: 'flows',
       side: 'for',

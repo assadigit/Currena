@@ -1431,6 +1431,28 @@ export const en = {
       asOfChipStale: 'stale',
       asOfChipWaiting: 'waiting',
       asOfChipCache: 'last successful',
+      /* GUX-S5 M3 (11 §10, 08 §8.4): the BriefingCard's own vocabulary.
+       * The headline is the PRESENT-TENSE conditions statement (never a
+       * forecast); the summary spine is Q1's container — the shipped
+       * 7-state outlook line renders inside until the owner answers;
+       * the horizon chip and scenario row render NOTHING until Q2. */
+      briefKicker: 'BRIEFING',
+      briefHeadlineFor: 'Gold: conditions lean with it',
+      briefHeadlineAgainst: 'Gold: conditions lean against it',
+      briefHeadlineMixed: 'Gold: conditions are mixed',
+      briefHeadlineSparse: 'Gold: not enough readings to say',
+      briefReasonsTitle: 'Why',
+      briefChangeTitle: 'What could change this',
+      briefChangeNarrow: 'A small shift in {lane} could move this balance',
+      briefChangeFallback: 'The picture will move as fresh readings arrive',
+      briefEvidenceAligned: 'Evidence: broadly aligned',
+      briefEvidenceMixed: 'Evidence: mixed',
+      briefEvidenceLimited: 'Evidence: limited',
+      /* GUX-S5 M3 (11 §5.1): the CompositionStack's conditions header. */
+      conditionsHeading: 'Conditions',
+      conditionsSubheading: 'What supports and what pressures gold today',
+      stackInspectInstrument: 'Inspect the instrument',
+      stackLedgerLink: 'Inspect all 37 voters',
       seatLink: 'Open indicator',
       /* The lane names + one-sentence intros (the corpus's own, pinned). */
       laneBorrowingCosts: 'Interest rates & borrowing costs',
