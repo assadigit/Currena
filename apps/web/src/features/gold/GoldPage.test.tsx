@@ -1245,7 +1245,12 @@ describe('GoldPage', () => {
     // publication-notes disclosure, COLLAPSED BY DEFAULT (the house
     // progressive-disclosure pattern). Closed: no blocked note in the DOM,
     // no absent note above the hero, the toggle carries aria-expanded=false.
-    expect(document.querySelector('[data-gold-publication-notes]')).not.toBeNull();
+    // GUX-S5 M3b: the tail sections ride the near-viewport lazy boundary
+    // (GoldTail) — the boundary keeps their DOM, order, ids and anchors
+    // VERBATIM; the assertions below prove the shape survived the split.
+    await waitFor(() => {
+      expect(document.querySelector('[data-gold-publication-notes]')).not.toBeNull();
+    });
     expect(document.querySelector('[data-blocked-note]')).toBeNull();
     expect(document.querySelector('[data-absent-note]')).toBeNull();
     const toggle = document.querySelector('[data-gold-publication-notes] [data-pubnotes-toggle]')!;
@@ -1439,6 +1444,13 @@ describe('GoldPage', () => {
     // disclosure — OPEN IT, then the count renders through formatNumber:
     // in FA the digit is Persian (۴), not the raw Western "4" interpolate
     // would stringify. The fixture carries 4 absent ids.
+    // GUX-S5 M3b: the tail rides the near-viewport lazy boundary — jsdom
+    // has no IntersectionObserver so it mounts eagerly, but the lazy
+    // chunk still resolves a tick later (waitFor the toggle, never a
+    // synchronous query).
+    await waitFor(() => {
+      expect(document.querySelector('[data-pubnotes-toggle]')).not.toBeNull();
+    });
     fireEvent.click(document.querySelector('[data-pubnotes-toggle]')!);
     const note = document.querySelector('[data-absent-note]');
     expect(note).not.toBeNull();
@@ -1457,7 +1469,11 @@ describe('GoldPage', () => {
     await waitFor(() => {
       expect(document.querySelectorAll('[data-seat]').length).toBe(37);
     });
-    // BD-S43: the same disclosure, opened — the EN parity.
+    // BD-S43: the same disclosure, opened — the EN parity. (GUX-S5 M3b:
+    // the lazy tail — waitFor the toggle first.)
+    await waitFor(() => {
+      expect(document.querySelector('[data-pubnotes-toggle]')).not.toBeNull();
+    });
     fireEvent.click(document.querySelector('[data-pubnotes-toggle]')!);
     const note = document.querySelector('[data-absent-note]');
     expect(note?.textContent).toContain('4');

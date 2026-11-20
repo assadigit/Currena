@@ -35,8 +35,6 @@ import { GoldNarrative } from './narrative/GoldNarrative';
 import { GoldYieldDecomposition } from './GoldYieldDecomposition';
 import { GoldOnRamp } from './GoldOnRamp';
 import { GoldExpectations } from './GoldExpectations';
-import { GoldEpisodes } from './GoldEpisodes';
-import { GoldIfBought } from './GoldIfBought';
 import { GoldIranBridge } from './GoldIranBridge';
 import { GoldPremiumHistory } from './GoldPremiumHistory';
 import { GoldCbDemand } from './GoldCbDemand';
@@ -45,7 +43,7 @@ import { GoldCorrelation } from './GoldCorrelation';
 import { GoldTaLevels } from './GoldTaLevels';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
-import { GoldPublicationNotes } from './GoldPublicationNotes';
+import { GoldTail } from './GoldTail';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { GoldPositions } from './GoldPositions';
 import { goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
@@ -338,30 +336,17 @@ export function GoldPage(): React.JSX.Element {
       {readings !== undefined ? <GoldPositions readings={readings} /> : null}
 
       {/* GPE R25 / F6 (2026-11-19) — Zone O, the history tail (s6/01
-          zone 16: the history & research band AFTER the positions; F26
-          the calculator is P4's, NOT this session's). The Episode
-          Explorer: the nine records' editorial content renders from the
-          static module + the dictionaries; the price path + the
-          comparison rider are DROP-GATED (the WGC prices workbook —
-          S15-D4) and render the honest waiting state until the
-          gold-episodes-run runner writes the key.
-          GPE R33 / F26 (2026-11-19, S17) — the "if you'd bought"
-          calculator joins the SAME zone (the s6/01 zone 16 placement:
-          both Zone O surfaces behind progressive disclosure — collapsed
-          cards, one tap each). */}
-      <GoldEpisodes />
-
-      <GoldIfBought />
-
-      {/* BD-S43 (2026-11-20, the owner-directed relocation) — the
-          publication-notes disclosure: the §16 licence wall (the blocked
-          quartet + the ONE sources link-out) + the projection's absent-
-          count line, formerly the page header's note, now ride the PAGE
-          TAIL — the footer position, COLLAPSED BY DEFAULT. A normal user
-          reads the page without licence/venue bookkeeping; one tap opens
-          the same honest record (the copy unchanged). The root keeps the
-          #gold-blocked anchor so any legacy link still lands here. */}
-      <GoldPublicationNotes absentCount={projection?.absentIds.length ?? 0} />
+          zone 16). GUX-S5 M3b (the S4-D10 budget play): the three tail
+          sections (the Episode Explorer + the if-you'd-bought calculator
+          + the publication-notes disclosure) now render through the
+          NEAR-VIEWPORT lazy boundary (GoldTail) — their bytes moved to
+          the tail's own chunk so the briefing components fit the
+          240/50 ceiling. The sections' own DOM, order, ids and
+          collapsed-by-default shapes are UNCHANGED (gold-tail-content
+          renders them verbatim); the boundary is invisible to the
+          reader (600px prefetch, the anchor contract never hostage —
+          GoldTail.tsx). */}
+      <GoldTail absentCount={projection?.absentIds.length ?? 0} />
 
       {/* The R-5 details panel (docs/page-division/07) — rendered once at
           the page root; the context cards' stretched opener targets it. */}
