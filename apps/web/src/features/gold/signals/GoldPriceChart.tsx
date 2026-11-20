@@ -484,7 +484,7 @@ export function GoldPriceChart({
           >
             <svg viewBox={`0 0 ${PLOT_W} ${PLOT_H}`} className="absolute inset-0 h-full w-full" preserveAspectRatio="none" aria-hidden="true" focusable="false">
               {/* The close line (the brand-gold ink — the chart IS the gold price). */}
-              <path d={line} fill="none" stroke="var(--color-accent-gold-strong, #b8860b)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+              <path d={line} fill="none" stroke="var(--color-accent-gold-strong)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
               {/* The D8 overlays: the 50-day (context ink) + the 200-day
                * (the muted reference ink) — dashed so the price stays the
                * subject; never drawn where the window lacks history. */}
@@ -494,7 +494,7 @@ export function GoldPriceChart({
               {dma200On ? (
                 <path d={overlayPath(sma200)} fill="none" stroke="var(--color-text-tertiary, #94a3b8)" strokeWidth="1.5" strokeDasharray="2 4" vectorEffect="non-scaling-stroke" />
               ) : null}
-              <circle cx={xOf(toIdx).toFixed(1)} cy={yOf(lastVal).toFixed(1)} r="3.5" fill="var(--color-accent-gold-strong, #b8860b)" stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
+              <circle cx={xOf(toIdx).toFixed(1)} cy={yOf(lastVal).toFixed(1)} r="3.5" fill="var(--color-accent-gold-strong)" stroke="rgba(0,0,0,0.25)" strokeWidth="1" />
             </svg>
             {hoverIdx !== null && hoverBar !== null ? (
               <>

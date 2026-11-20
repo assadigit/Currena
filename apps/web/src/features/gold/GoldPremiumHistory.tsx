@@ -235,7 +235,7 @@ export function GoldPremiumHistory(): React.JSX.Element | null {
       data-gold-premium
       data-premium-days={stored.days.length}
       data-premium-asof={stored.asOf}
-      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
+      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-3.5"
     >
       {header}
 

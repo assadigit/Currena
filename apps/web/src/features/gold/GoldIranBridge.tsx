@@ -295,7 +295,7 @@ export function GoldIranBridge(): React.JSX.Element | null {
       id="gold-zone-f"
       aria-labelledby="gold-zone-f-title"
       data-gold-iran-bridge
-      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
+      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-3.5"
     >
       <header className="flex min-w-0 flex-col gap-0.5">
         <h3 id="gold-zone-f-title" className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">

@@ -89,3 +89,19 @@ labels, the explanation-register anchors «معمولاً بر طلا فشار �
 «معمولاً از طلا حمایت می‌کند» / «از نظر تاریخی», and the records'
 recurring vocabulary). The five-group label table there is exactly what
 this round shipped.
+
+## M2 addendum — the LaneBar condition words + the AsOfChip freshness vocabulary (17 entries)
+
+The same round's second wave (GUX-S5 M2, the primitives): the ten
+per-lane condition words + the compact split word (11 §5.3 — the
+LaneBar's state vocabulary: «آرامش / فشرده» borrowing · «تحت فشار /
+قوی» dollar · «تشدید / آرام» stress · «داغ / خنک» inflation · «آرام /
+شلوغ» flows · «مختلط ({supports}·{pressures})» split) and the six
+AsOfChip freshness words (11 §6.4 — «تا {time}» · «تازه» · «با تأخیر»
+· «کهنه» · «در انتظار» · «آخرین تازه‌سازی موفق», the cache phrase
+reusing the shipped pricesAsOfLastSuccessful wording verbatim). The
+condition words are authored per 08 §5.1's five pairs (relief/tight ·
+strong/stress · elevated/calm · hot/cool · calm/elevated) with
+«آرامش» pinned from 11 §5.3's own example; the rest follow the
+corpus's established register (تازه‌سازی، تأخیر، در انتظار). The
+terminology additions are mirrored in persian-terminology.md.

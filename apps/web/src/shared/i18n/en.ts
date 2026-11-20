@@ -1402,6 +1402,35 @@ export const en = {
       laneStateNeutral: 'Not leaning',
       laneStateUnread: 'Couldn’t be read',
       laneStateSplit: 'Split: {supports} for, {pressures} against',
+      /* GUX-S5 M2 (11 §5.3): the LaneBar's per-lane condition words — the
+       * lane's OWN state in its natural vocabulary (relief/tight ·
+       * stress/strong · elevated/calm · hot/cool · calm/elevated per the
+       * S4 spec's five pairs), rendered in the lane's IMPACT ink (the
+       * two-channel rule at lane level: the word names the condition,
+       * the ink carries the relationship to gold). Neutral/unread keep
+       * the relational words above (a lane firing under minimum has no
+       * condition to name — honest over natural). */
+      laneCondBorrowingCostsFor: 'Relief',
+      laneCondBorrowingCostsAgainst: 'Tight',
+      laneCondDollarFor: 'Stress',
+      laneCondDollarAgainst: 'Strong',
+      laneCondStressFor: 'Elevated',
+      laneCondStressAgainst: 'Calm',
+      laneCondInflationFor: 'Hot',
+      laneCondInflationAgainst: 'Cool',
+      laneCondFlowsFor: 'Calm',
+      laneCondFlowsAgainst: 'Elevated',
+      laneCondSplit: 'Split ({supports}·{pressures})',
+      /* GUX-S5 M2 (11 §6.4, S4-D7): the ONE AsOfChip freshness grammar —
+       * a suffix word, no icons, no new colors (data-quality never
+       * borrows market-signal hues); the cache qualifier keeps the
+       * shipped pricesAsOfLastSuccessful wording. */
+      asOfChipTime: 'as of {time}',
+      asOfChipFresh: 'fresh',
+      asOfChipDelayed: 'delayed',
+      asOfChipStale: 'stale',
+      asOfChipWaiting: 'waiting',
+      asOfChipCache: 'last successful',
       seatLink: 'Open indicator',
       /* The lane names + one-sentence intros (the corpus's own, pinned). */
       laneBorrowingCosts: 'Interest rates & borrowing costs',

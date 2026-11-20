@@ -435,3 +435,16 @@ the established corpus term, kept) · «سوخت‌سنج بازار» (the mark
 gauge; the on-ramp's positioning framing, reused) · «در دامنهٔ ده‌ساله» /
 «بالای دامنهٔ ده‌ساله» / «پایین دامنهٔ ده‌ساله» (the decade-range position
 family, matching the shipped `evidenceHigh/Low` words).
+
+**The lane condition words** (GUX-S5 M2, 11 §5.3 — the LaneBar's state
+vocabulary, the lane's OWN condition with the impact carried by ink):
+relief → «آرامش» · tight → «فشرده» (borrowing costs) · stress → «تحت
+فشار» · strong → «قوی» (the dollar) · elevated → «تشدید» / «شلوغ» ·
+calm → «آرام» (stress uses «تشدید/آرام»; flows uses «شلوغ/آرام» —
+شلوغ matches the lane intro's own «شرط‌بندی‌های شلوغ») · hot → «داغ» ·
+cool → «خنک» (inflation) · split → «مختلط ({supports}·{pressures})».
+
+**The freshness vocabulary** (GUX-S5 M2, 11 §6.4 — the AsOfChip): as of
+{time} → «تا {time}» · fresh → «تازه» · delayed → «با تأخیر» · stale →
+«کهنه» · waiting → «در انتظار» · last successful → «آخرین تازه‌سازی
+موفق» (the shipped pricesAsOfLastSuccessful wording, verbatim).

@@ -195,7 +195,7 @@ export function GoldOnRamp({ readings }: { readings: readonly IndicatorReading[]
       id="gold-onramp"
       aria-labelledby="gold-onramp-title"
       data-gold-onramp
-      className="flex flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
+      className="flex flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-3.5"
     >
       <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <div className="flex min-w-0 flex-col gap-0.5">

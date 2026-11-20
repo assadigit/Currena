@@ -254,7 +254,7 @@ export function GoldCorrelation(): React.JSX.Element | null {
       aria-label={t('pd.gold.corrTitle')}
       data-gold-correlation
       data-corr-window-days={Math.round(dayOf(panel.window!.to) - dayOf(panel.window!.from))}
-      className="mt-0 flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3.5"
+      className="mt-0 flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-3.5"
     >
       {header}
 

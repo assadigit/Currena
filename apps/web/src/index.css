@@ -1146,6 +1146,11 @@ body {
   --color-accent-gold: #F3B13F;
   --color-accent-gold-ink: #2A1F04;
   --color-accent-gold-deep: #A87E1C;
+  /* GUX-S5 M2 (S4-D2's cleanup list): the strong gold sibling — referenced
+   * by GoldPriceChart since GPE R18 but never defined, silently falling
+   * back to #b8860b. Defined as exactly the value the chart already
+   * renders (the reference made honest, zero visual change). */
+  --color-accent-gold-strong: #b8860b;
   --color-status-alert: #da1e28;   /* owner palette: Carbon Red 60, verbatim */
   --color-status-stressed: #ff832b; /* owner palette: Carbon Orange 40, verbatim — the Stressed word */
   --color-status-normal: #24a148;  /* owner palette: Carbon Green 50, verbatim — the Stable word / supports */
@@ -1192,6 +1197,16 @@ body {
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1.125rem;
+  /* GUX-S5 M2 (S4-D2's named consolidations): the two elevation shadows
+   * promoted to tokens — the card shadow was inlined ~8× as an arbitrary
+   * Tailwind value across the gold cards; the focal shadow is the
+   * gold-field elevation the hero and the merged signals card hand-tuned.
+   * The shipped values promoted verbatim (zero visual change); theme-
+   * agnostic by construction (both themes already rendered these exact
+   * rgbas). The seat-chip hover variant (…,0.08) stays inline — a hover
+   * affordance, not a surface token. */
+  --shadow-card: 0 2px 10px rgba(15, 23, 42, 0.05);
+  --shadow-focal: 0 10px 34px rgba(168, 126, 28, 0.15);
   /* Type roles (G3: verdict > number > label > caption; caption floor ~12.5px)
    * R20: the number role must compute ≥ 1.4× the 16px label role on tiles and
    * prices — 1.45rem = 23.2px → ratio 1.45 (was 1.3rem = 20.8px → 1.30). */
@@ -1235,6 +1250,10 @@ body {
   --color-accent-gold: #F3B13F;
   --color-accent-gold-ink: #2A1F04;
   --color-accent-gold-deep: #E8B54A;
+  /* GUX-S5 M2: the strong gold sibling's dark-theme value — the brighter
+   * sibling per the -deep pattern (the value the chart's fallback
+   * rendered on dark surfaces). */
+  --color-accent-gold-strong: #d9a43e;
   --color-status-alert: #fa4d56;   /* Carbon Red 50 — Red 60's own dark-surface sibling (Carbon pairs 60/50 across themes); #da1e28 verbatim is 3.2:1 on #1A222E, this holds 4.8:1 */
   --color-status-stressed: #ff832b; /* Carbon Orange 40 verbatim — 6.5:1 on #1A222E */
   --color-status-normal: #24a148;  /* Carbon Green 50 verbatim — 4.8:1 on #1A222E */
@@ -1599,6 +1618,38 @@ html:not(:lang(fa)) .type-kicker {
 .bal-lanes-bar i[data-side="against"] { background: var(--color-status-alert); }
 .bal-lanes-bar i[data-side="neutral"] { background: var(--bal-stone-lo); }
 .dark .bal-lanes-bar i[data-side="neutral"] { background: #5a6a82; }
+
+/* GUX-S5 M2 (11 §5.3): the LaneBar pill — the shipped .bal-lanes-bar
+ * upgraded from 44×6 fixed cells to a full-width 8px proportional
+ * strip. The stacking order follows the READING DIRECTION (plain DOM
+ * order in a logical flex row — RTL mirrors for free, so "for" always
+ * starts at the reading origin). The unread segment carries the dotted
+ * data-quality marker (the fourth state's grammar — never a market
+ * hue); a zero-readable lane renders the whole strip dotted. */
+.lanebar-pill {
+  display: flex;
+  width: 100%;
+  height: 8px;
+  gap: 2px;
+  border-radius: 999px;
+  overflow: hidden;
+  /* NO direction override: the pill inherits the page direction so the
+   * segment stacking order FOLLOWS the reading direction — "for" (the
+   * first DOM child) starts at the reading origin in both locales
+   * (left in en, right in fa/RTL — 11 §5.3's mirror rule). */
+}
+.lanebar-seg { height: 100%; }
+.lanebar-seg-for { background: var(--color-status-normal); }
+.lanebar-seg-against { background: var(--color-status-alert); }
+.lanebar-seg-steady { background: var(--bal-stone-lo); }
+.dark .lanebar-seg-steady { background: #5a6a82; }
+.lanebar-seg-unread {
+  background: repeating-linear-gradient(90deg, transparent 0 3px, var(--color-text-tertiary) 3px 5px);
+}
+.lanebar-seg-dotted {
+  background: repeating-linear-gradient(90deg, transparent 0 3px, var(--color-text-tertiary) 3px 5px);
+  border-radius: 999px;
+}
 .bal-verdict-counts {
   margin: 10px 0 0;
   font-size: 13px;

@@ -198,7 +198,7 @@ function ContextCard({
       id={`gold-card-${entry.id}`}
       data-context-card={entry.id}
       data-context-status={reading?.status ?? 'absent'}
-      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.05)] sm:p-3"
+      className="relative flex min-w-0 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-2.5 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-3"
     >
       <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
       {valueJoin !== null ? (
