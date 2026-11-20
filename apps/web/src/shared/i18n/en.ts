@@ -929,6 +929,7 @@ export const en = {
       chartSpanMonths: '{n} months',
       chartSpanYears: '{years} years',
       chartAria: 'XAUUSD daily closes, interactive chart: {span} ending {date}',
+      chartPointReadout: 'Selected point: {value} {unit}, {date}',
       chartPanHint: 'Drag to pan · pinch or scroll to zoom',
       /* GPE R19 / F8 (2026-11-18): the minimal TA band — the C5 honesty
        * rules ride the copy itself (descriptive reference; dated events
@@ -1067,6 +1068,7 @@ export const en = {
        * "Source: LBMA" + the four-field disclosure block (C6). */
       lbmaVaultTitle: 'London vault stock',
       lbmaVaultTopline: 'London vaults hold {tonnes} t of gold',
+      lbmaVaultSparkAria: 'Gold stock over {n} months: {tonnes} t as of {month}.',
       lbmaVaultSilver: 'plus {tonnes} t of silver',
       lbmaVaultMom: '{pct} vs the previous month',
       lbmaClearingTitle: 'London clearing volumes',
@@ -1290,6 +1292,8 @@ export const en = {
       prStripMethod: 'An exact identity: Δln(coin) = Δln(ounce) + Δln(USD/IRR) + Δln(1+premium) — the three factors MULTIPLY into the coin’s move, they do not add. This is identity arithmetic, not a regression estimate.',
       prStripWaiting: 'The day-move strip needs two observations — the live snapshot and the last stored day before today; it waits until both exist.',
       prChartTitle: 'The Emami and Bahar premium chart',
+      prChartAria: 'Both coins’ premium over melt, {from} to {to}. Latest: Emami {emami}, Bahar {bahar}.',
+      prChartAriaOne: 'Premium over melt, {from} to {to}. Latest: {emami}.',
       prMeltLabel: 'melt',
       prBoundaryLabel: 'live compute begins',
       prHonestyLine: 'The honesty line: {from} to {to} ({n} days) is reconstructed from TGJU’s own daily closes; from then on, computed live from our own snapshots.',

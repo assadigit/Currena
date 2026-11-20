@@ -283,10 +283,26 @@ export function GoldPremiumHistory(): React.JSX.Element | null {
            * the backfill/live boundary (the honesty line on the chart). */}
           <figure className="m-0 flex min-w-0 flex-col gap-1" data-premium-chart>
             <div dir="ltr" className="w-full overflow-hidden">
+              {/* GUX-S8 M3 (11 §8 item E): the accessible name carries the
+               *   READING — both coins' latest premium + the window's own
+               *   span — not just the chart's title. */}
               <svg
                 viewBox={`0 0 ${CHART_W} ${CHART_H}`}
                 role="img"
-                aria-label={t('pd.gold.prTitle')}
+                aria-label={
+                  bahar.length > 0
+                    ? interpolate(t('pd.gold.prChartAria'), {
+                        emami: pctText(emami[emami.length - 1]!.premiumPct),
+                        bahar: pctText(bahar[bahar.length - 1]!.premiumPct),
+                        from: dateText(emami[0]!.date),
+                        to: dateText(stored.asOf),
+                      })
+                    : interpolate(t('pd.gold.prChartAriaOne'), {
+                        emami: pctText(emami[emami.length - 1]!.premiumPct),
+                        from: dateText(emami[0]!.date),
+                        to: dateText(stored.asOf),
+                      })
+                }
                 className="h-auto w-full"
                 data-premium-points={emami.length}
               >
