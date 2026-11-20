@@ -1,6 +1,67 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (2026-11-19 post-program OPS — push + merge + deploy; NO code changes, NO new features)
+## This session (2026-11-20 post-GPE UX OPS — BD-S43, the owner-directed gold-page relocation: the licence bookkeeping to the footer, hidden by default)
+
+**Outcome:** the owner reviewed the live `/gold` (currena.ir) and asked
+for (1) a verification pass against the gold program and (2) the
+relocation of the licence/venue bookkeeping a normal user shouldn't
+see — their examples: the "Not published — blocked by licence or
+venue" wall and the "World gold ETF holdings — the WGC licence class…"
+note — **"positioned in the footer and hidden by default."** Both done,
+on `main`, with the full deploy discipline.
+
+**The verification:** the 18-session GPE program stands COMPLETE and
+live (31 of 33 rows delivered; production re-anchored on `f4926c9d` =
+the code-identical `a3a8641d` tree at the 2026-11-19 ops sitting);
+nothing regressed — the page renders the hero, the explanation band,
+the Iran bridge, the Signals chart, the 37-seat meter, the TA band, the
+context cards + Zone K, the positions, and the Zone O history tail over
+today's live data; the standing owner-side levers are unchanged (the
+WGC drops [R15/R23 + the prices workbook] · the EODHD plan · the Kalshi
+authorisation · the CBI gerami pin · the credential rotation —
+`docs/specs/gold-page-elevation/s18/02-PROGRAM-CLOSURE-RECORD.md` §3).
+
+**The change (BD-S43, `docs/DECISIONS.md`):** the §16 licence wall —
+the four blocked-quartet honest notes (WGC ETF holdings · WGC CB demand
+· the PBoC/CBR official demand · the ETF short interest) + the ONE
+`SOURCES.md` link-out — and the page header's absent-count line moved
+BYTE-FOR-BYTE UNCHANGED out of the main reading flow into the page
+TAIL: the new `GoldPublicationNotes.tsx` disclosure (the house
+progressive-disclosure pattern), COLLAPSED BY DEFAULT — one neutral
+summary line ("Publication notes — why some readings are not shown" ·
+FA «یادداشت‌های انتشار: چرا برخی داده‌ها نمایش داده نمی‌شود»), one
+tap opens the whole honest record (the same copy, the same
+`GOLD_BLOCKED_NOTES` table, the same Persian-digit absent count). The
+historical `#gold-blocked` anchor survives on the disclosure's root.
+The hero, the context cards, Zone K, and the honest-record footnote
+are untouched. AGENTS.md §11's zone map refreshed to the new render
+order.
+
+**Gates 9/9 GREEN** (2m 59s: secret scan · typecheck · lint 0/0 ·
+copy:audit clean [the new FA string queued unreviewed in the manifest]
+· narrator vocabulary + eval · layer1 11,969/11,969 · the suite 15,599
+[the GoldPage tests rebased to the new contract — collapsed-by-default
++ the one-tap-open walk + the anchor identity + the footer position]
+· build + budgets: GoldPage **238.90/49.57 under 240/50** · entry
+271.13/82.12 under 296/89.5).
+
+**The deploy + live verification:** see this session's record in
+`docs/DEPLOY.md` (the version ids, the bindings, the post-deploy
+smoke, and the browser verification: the wall absent from the flow at
+EN desktop/mobile + FA RTL; the disclosure present, collapsed, opening
+on one tap with the full quartet inside). Credentials used, not
+stored (AGENTS.md §7).
+
+**Known state (post-deploy):** see the DEPLOY record for the active
+version id; the GoldPage budget line above; the WGC fold still the
+standing owner-side lever (data/wgc/ absent, no owner notice).
+
+**Next:** nothing needed — the GPE program stays COMPLETE and closed;
+this sitting's owner request is fully delivered. The standing
+owner-side levers remain the only open items, and they are owner-side
+by design.
+
+## Previous session (2026-11-19 post-program OPS — push + merge + deploy; NO code changes, NO new features)
 
 **Outcome:** the owner supplied fresh session credentials (a GitHub
 token · a Cloudflare Workers deploy token + the account ID · an EODHD

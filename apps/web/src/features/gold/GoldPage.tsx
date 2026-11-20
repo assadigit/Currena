@@ -5,8 +5,8 @@
  * The S1 placeholder is superseded: the page renders the hero (the live
  * gold price + the Balance Scale verdict + the 7-state outlook + the
  * for/against/neutral/unread counts), the 37 seats grouped by the five
- * lanes, the D-27 context cards, the four blocked ids as honest notes
- * (§16), and the honest-record footnote — every verdict re-derived
+ * lanes, the D-27 context cards, and the honest-record footnote — every
+ * verdict re-derived
  * CLIENT-SIDE through the same pure engines (gold-tiles.ts →
  * gold-balance.ts / outlook-core / evaluateSignal / the BalanceScale's
  * own tilt + verdict helpers), never a second arithmetic (D-48). Data
@@ -21,7 +21,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { formatDateWords, formatJalaliDate, formatNumber } from '@currena/core';
+import { formatDateWords, formatJalaliDate } from '@currena/core';
 import type { PageProjection } from '@currena/core';
 import { useI18n } from '../../shared/lib/locale';
 import { interpolate } from '../../shared/i18n';
@@ -45,6 +45,7 @@ import { GoldCorrelation } from './GoldCorrelation';
 import { GoldTaLevels } from './GoldTaLevels';
 import { GoldSeats } from './GoldSeats';
 import { GoldContext } from './GoldContext';
+import { GoldPublicationNotes } from './GoldPublicationNotes';
 import { useIndicatorDetailsPanel } from '../../shared/hooks/useIndicatorDetails';
 import { GoldPositions } from './GoldPositions';
 import { goldContextCards, goldHero, goldSeatLanes } from './gold-tiles';
@@ -208,24 +209,6 @@ export function GoldPage(): React.JSX.Element {
         ) : null}
       </header>
 
-      {/* The absent-note honesty line (public mode's licence-hidden ids —
-          the Gold projection's own honest report; the blocked quartet
-          rides here, and the §16 notes below spell each one out).
-          GPE R06/#15 (GPE-S2-15): the count renders through formatNumber
-          so the FA locale renders Persian digits (۴, not the raw Western
-          "4" interpolate would stringify).
-          GPE R09 / F13 (s6/01 Zone A): the line gains its link to the
-          sharpened wall — one tap from "N readings couldn't be shown" to
-          WHY each is blocked and what the owner's lever is (#gold-blocked). */}
-      {projection !== null && projection.absentIds.length > 0 ? (
-        <p className="m-0 mb-2.5 text-[10.5px] text-currena-muted sm:mb-3 sm:text-[length:var(--type-caption)]" data-absent-note>
-          <bdi>{interpolate(t('pd.global.absentLine'), { n: formatNumber(projection.absentIds.length, numberLocale, { maximumFractionDigits: 0 }) })}</bdi>{' '}
-          <a href="#gold-blocked" className="insights-focusable font-semibold text-currena-blue underline-offset-2 hover:underline">
-            {t('pd.gold.absentWhyLink')}
-          </a>
-        </p>
-      ) : null}
-
       {/* D-26 item 1 — the hero. */}
       {hero !== null ? <GoldHero hero={hero} pricesAsOf={projection?.pricesAsOf} pricesCached={fromCache} /> : null}
 
@@ -369,6 +352,16 @@ export function GoldPage(): React.JSX.Element {
       <GoldEpisodes />
 
       <GoldIfBought />
+
+      {/* BD-S43 (2026-11-20, the owner-directed relocation) — the
+          publication-notes disclosure: the §16 licence wall (the blocked
+          quartet + the ONE sources link-out) + the projection's absent-
+          count line, formerly the page header's note, now ride the PAGE
+          TAIL — the footer position, COLLAPSED BY DEFAULT. A normal user
+          reads the page without licence/venue bookkeeping; one tap opens
+          the same honest record (the copy unchanged). The root keeps the
+          #gold-blocked anchor so any legacy link still lands here. */}
+      <GoldPublicationNotes absentCount={projection?.absentIds.length ?? 0} />
 
       {/* The R-5 details panel (docs/page-division/07) — rendered once at
           the page root; the context cards' stretched opener targets it. */}

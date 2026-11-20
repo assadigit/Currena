@@ -1,9 +1,14 @@
 /**
  * GoldContext — the Gold page's context cards (D-27: the eight ratio
- * cards + the five flows & positioning cards), the four BLOCKED ids as
- * honest notes only (spec §16 — never cards), and the honest-record
+ * cards + the five flows & positioning cards) and the honest-record
  * footnote (D-29: the measured sign-agreement record, MIN2, the
  * descriptive-conditions-meter / no-forecasting-edge sentence).
+ *
+ * The four BLOCKED ids and the absent-count line no longer ride this
+ * block: BD-S43 (2026-11-20, the owner-directed relocation) moved the §16
+ * licence wall whole into GoldPublicationNotes — the footer-positioned,
+ * collapsed-by-default disclosure at the page tail (the same honest copy,
+ * one tap away).
  *
  * Every card renders the §21 per-page trio: the VALUE (the DISPLAY
  * registry's own decimals + unit, restated in gold-tiles' lean mirror
@@ -11,8 +16,8 @@
  * percentile10y exists — fail-closed), and the FRESHNESS (the reading's
  * own asOf date + the status word when the reading is not normal). An
  * absent reading (public mode's licence-hidden quartet never reaches
- * here — the blocked notes are static) renders the honest unavailable
- * word, never a guess.
+ * here — the blocked notes live in the footer disclosure) renders the
+ * honest unavailable word, never a guess.
  *
  * gold-usd does NOT repeat here: it is the hero (the placement note's
  * own line — "gold-usd is the hero card").
@@ -24,7 +29,7 @@ import { CardDetailsOpener } from '../../shared/components/IndicatorDetailsPanel
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
-import { COT_BAND_IDS, GOLD_BLOCKED_NOTES, GOLD_DISPLAY, cotBandOf, type GoldContextEntry, type GoldContextId, type GoldUnitToken } from './gold-tiles';
+import { COT_BAND_IDS, GOLD_DISPLAY, cotBandOf, type GoldContextEntry, type GoldContextId, type GoldUnitToken } from './gold-tiles';
 import { GoldCurrencyGrid } from './GoldCurrencyGrid';
 import { GoldForecastRetrospective } from './GoldForecastRetrospective';
 
@@ -94,26 +99,10 @@ const CARD_MEANING_KEY: Readonly<Record<GoldContextId, TranslationKey | null>> =
   'shanghai-gold-premium': 'pd.gold.meaningShanghaiPremium',
 };
 
-/** The blocked-note copy keys, keyed by the placement table's own ids
- *  (BLOCKED_NOTES drives the list; the copy map stays total — the cast
- *  rides the placement's own quartet, pinned by gold-tiles.test.ts). */
-type BlockedNoteId = 'wgc-etf-holdings' | 'wgc-cb-demand' | 'official-gold-demand' | 'etf-short-interest';
-const BLOCKED_KEY: Readonly<Record<BlockedNoteId, TranslationKey>> = {
-  'wgc-etf-holdings': 'pd.gold.blockedWgcEtf',
-  'wgc-cb-demand': 'pd.gold.blockedWgcCb',
-  'official-gold-demand': 'pd.gold.blockedOfficial',
-  'etf-short-interest': 'pd.gold.blockedEtfShort',
-};
-
 /** The honest-record link — the lane balance's own measured record
  *  (MergedCard's GOLD_BALANCE_BACKTEST_URL, the same document). */
 const GOLD_BACKTEST_URL =
   'https://github.com/assadigit/Currena/blob/main/docs/insights/BACKTEST-GOLD-LANES.md';
-
-/* GPE R09 / F13 (GPE-S2-22): the licence wall's ONE link-out — the licence
- * facts live repo-side in docs/SOURCES.md; the public GitHub view is the
- * outbound path (the GOLD_BACKTEST_URL pattern). */
-const GOLD_SOURCES_URL = 'https://github.com/assadigit/Currena/blob/main/docs/SOURCES.md';
 
 /* ------------------------------------------------------------------ *
  * One context card
@@ -275,7 +264,7 @@ function ContextCard({
 }
 
 /* ------------------------------------------------------------------ *
- * The two context groups + the blocked notes + the honest record
+ * The two context groups + the honest record
  * ------------------------------------------------------------------ */
 
 function ContextGroup({
@@ -372,44 +361,10 @@ export function GoldContext({
       </section>
 
       {/* GPE R14 — Zone K: the central-bank demand section, directly after
-       *  the FLOWS cards (positioning → demand, the natural hand-off) and
-       *  BEFORE the wall — nothing ever inserts between wall + record. */}
+       *  the FLOWS cards (positioning → demand, the natural hand-off); the
+       *  honest record closes the block (the licence wall moved to the
+       *  page-tail disclosure, BD-S43). */}
       {zoneK !== null && zoneK !== undefined ? zoneK : null}
-
-      {/* ---- The blocked quartet (§16): honest notes, never cards. ----
-       * GPE R09 / F13: the sharpened wall — each item's copy carries WHY it
-       * is absent + the owner's lever (C7 rule 5), and the ONE link-out
-       * (#22) points at the public data-sources document. The id
-       * `gold-blocked` is the absent-note's in-page target (s6/01 Zone A). */}
-      <section id="gold-blocked" aria-label={t('pd.gold.blockedTitle')} data-gold-blocked className="flex flex-col gap-1.5 scroll-mt-24">
-        <h3 className="m-0 text-[length:var(--type-label)] font-bold uppercase tracking-wide text-[var(--color-text-tertiary)]">
-          {t('pd.gold.blockedTitle')}
-        </h3>
-        <ul className="m-0 flex list-none flex-col gap-1 p-0">
-          {GOLD_BLOCKED_NOTES.map((note) => (
-            <li
-              key={note.id}
-              data-blocked-note={note.id}
-              className="rounded-[var(--radius-sm)] border border-dashed border-[var(--color-border)] px-2.5 py-1.5 text-[length:var(--type-caption)] leading-relaxed text-[var(--color-text-secondary)]"
-            >
-              <bdi>{t(BLOCKED_KEY[note.id as BlockedNoteId])}</bdi>
-            </li>
-          ))}
-        </ul>
-        {/* The ONE link-out (#22): the licence ladder + every source's terms,
-         * in the public data-sources document — the wall explains itself all
-         * the way down (GPE R09 / F13). */}
-        <p className="m-0 px-2.5 text-[length:var(--type-caption)] leading-relaxed">
-          <a
-            href={GOLD_SOURCES_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="insights-focusable font-semibold text-currena-blue underline-offset-2 hover:underline"
-          >
-            {t('pd.gold.blockedLearnMore')}
-          </a>
-        </p>
-      </section>
 
       {/* ---- The honest-record footnote (D-29). ---- */}
       <footer id="gold-honest-record" data-gold-honest-record className="flex flex-col gap-1.5 rounded-[var(--radius-md)] bg-currena-soft/50 p-3 ring-1 ring-[var(--color-border)]/60 scroll-mt-24 sm:p-3.5">

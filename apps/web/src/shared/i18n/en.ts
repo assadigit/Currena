@@ -1502,6 +1502,12 @@ export const en = {
        * never apologizes), plus the ONE link-out (#22, GPE-S2-22): the
        * public data-sources document carries the licence ladder + every
        * source's terms. The WGC CB line retires as Tier-2 lands (D7). */
+      /* BD-S43 (2026-11-20, the owner-directed relocation): the footer-
+       * positioned publication-notes disclosure's own summary label — the
+       * one line a normal user sees at the page tail (collapsed); the
+       * blocked quartet + the absent-count line + the link-out ride inside,
+       * one tap away. */
+      pubNotesSummary: 'Publication notes — why some readings are not shown',
       blockedTitle: 'Not published — blocked by licence or venue',
       blockedWgcEtf:
         'World gold ETF holdings — the WGC licence class requires prior written authorisation before display. The owner’s lever: the authorisation letter to the World Gold Council (info@gold.org), drafted and ready to send.',

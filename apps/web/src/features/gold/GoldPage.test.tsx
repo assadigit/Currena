@@ -842,8 +842,9 @@ describe('GoldPage', () => {
     const zoneK = document.querySelector('[data-gold-cb-demand]')!;
     expect(zoneK.id).toBe('gold-zone-k'); // R10's zone-level anchor
 
-    // Zone K sits between the FLOWS cards and the licence wall (s6/01
-    // §2b slot A); the trust band stays contiguous behind it.
+    // Zone K sits between the FLOWS cards and the honest record (s6/01
+    // §2b slot A); the licence wall's #gold-blocked anchor now rides the
+    // page-tail disclosure (BD-S43) — still AFTER zone K in document order.
     const flows = [...zoneK.parentElement!.children].findIndex((el) => el === zoneK);
     expect(flows).toBeGreaterThan(0);
     const wall = document.getElementById('gold-blocked')!;
@@ -1221,7 +1222,7 @@ describe('GoldPage', () => {
     expect(flows.querySelectorAll(':scope > div > [data-context-card]').length).toBe(2);
   });
 
-  it('renders the context cards with values, the blocked quartet as notes, and the honest record', async () => {
+  it('renders the context cards with values, the footer-positioned publication-notes disclosure (collapsed), and the honest record', async () => {
     stubFeeds();
     render(<GoldPage />);
     await waitFor(() => {
@@ -1238,6 +1239,30 @@ describe('GoldPage', () => {
     const sge = document.querySelector('[data-context-card="sge-gold-withdrawals"]');
     expect(sge?.textContent).toContain('92');
 
+    // BD-S43 (the owner-directed relocation, 2026-11-20): the licence wall
+    // (the blocked quartet + the absent-count line) NO LONGER rides the
+    // main flow or the page header — it lives at the PAGE TAIL as the
+    // publication-notes disclosure, COLLAPSED BY DEFAULT (the house
+    // progressive-disclosure pattern). Closed: no blocked note in the DOM,
+    // no absent note above the hero, the toggle carries aria-expanded=false.
+    expect(document.querySelector('[data-gold-publication-notes]')).not.toBeNull();
+    expect(document.querySelector('[data-blocked-note]')).toBeNull();
+    expect(document.querySelector('[data-absent-note]')).toBeNull();
+    const toggle = document.querySelector('[data-gold-publication-notes] [data-pubnotes-toggle]')!;
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    // The disclosure is the page's LAST in-flow section — after the
+    // if-you'd-bought calculator (the footer position).
+    const disclosure = document.querySelector('[data-gold-publication-notes]')!;
+    const ifBought = document.querySelector('[data-gold-ifbought]')!;
+    expect(ifBought.compareDocumentPosition(disclosure) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // The anchor contract survives: the historical #gold-blocked target.
+    expect(document.getElementById('gold-blocked')).toBe(disclosure);
+
+    // ONE tap opens the honest record — everything the wall ever carried,
+    // byte-for-byte the same copy.
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
     // The blocked quartet as honest NOTES (never cards).
     expect(document.querySelectorAll('[data-blocked-note]').length).toBe(4);
     expect(document.querySelector('[data-blocked-note="wgc-etf-holdings"]')?.textContent).toContain('WGC');
@@ -1245,7 +1270,9 @@ describe('GoldPage', () => {
     // GPE R09 / F13 — the SHARPENED wall: every item states its WHY *and*
     // the owner's lever (C7 rule 5), the wall carries its ONE link-out
     // (#22, GPE-S2-22 — the public data-sources document), and the
-    // absent-note links to the wall (s6/01 Zone A).
+    // absent-count line (the old Zone A header note) rides INSIDE the
+    // disclosure (the count through formatNumber — Persian digits in FA,
+    // GPE-S2-15; the fixture carries 4 absent ids).
     expect(document.querySelector('[data-blocked-note="wgc-etf-holdings"]')?.textContent).toContain("owner’s lever");
     expect(document.querySelector('[data-blocked-note="wgc-etf-holdings"]')?.textContent).toContain('info@gold.org');
     expect(document.querySelector('[data-blocked-note="wgc-cb-demand"]')?.textContent).toContain("owner’s lever");
@@ -1253,9 +1280,9 @@ describe('GoldPage', () => {
     expect(document.querySelector('[data-blocked-note="etf-short-interest"]')?.textContent).toContain('no licence-clean venue');
     const wall = document.querySelector('[data-gold-blocked]');
     expect(wall?.querySelector('a[href*="SOURCES.md"]')).toBeTruthy(); // the ONE link-out
-    expect(document.getElementById('gold-blocked')).toBeTruthy(); // the absent-note's target
     const absent = document.querySelector('[data-absent-note]');
-    expect(absent?.querySelector('a[href="#gold-blocked"]')?.textContent).toBe('see why');
+    expect(absent?.textContent).toContain('4');
+    expect(absent?.textContent).not.toContain('see why'); // the old in-page link retired with the header note
 
     // The honest-record footnote.
     const honest = document.querySelector('[data-gold-honest-record]');
@@ -1408,9 +1435,11 @@ describe('GoldPage', () => {
     await waitFor(() => {
       expect(document.querySelectorAll('[data-seat]').length).toBe(37);
     });
-    // The absent note renders the count through formatNumber — in FA the
-    // digit is Persian (۴), not the raw Western "4" interpolate would
-    // stringify. The fixture carries 4 absent ids.
+    // BD-S43: the absent note now rides the page-tail publication-notes
+    // disclosure — OPEN IT, then the count renders through formatNumber:
+    // in FA the digit is Persian (۴), not the raw Western "4" interpolate
+    // would stringify. The fixture carries 4 absent ids.
+    fireEvent.click(document.querySelector('[data-pubnotes-toggle]')!);
     const note = document.querySelector('[data-absent-note]');
     expect(note).not.toBeNull();
     expect(note?.textContent).toContain('۴');
@@ -1428,6 +1457,8 @@ describe('GoldPage', () => {
     await waitFor(() => {
       expect(document.querySelectorAll('[data-seat]').length).toBe(37);
     });
+    // BD-S43: the same disclosure, opened — the EN parity.
+    fireEvent.click(document.querySelector('[data-pubnotes-toggle]')!);
     const note = document.querySelector('[data-absent-note]');
     expect(note?.textContent).toContain('4');
   });
