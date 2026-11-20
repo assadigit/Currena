@@ -7,23 +7,27 @@
  * docs/DEPLOY.md's "Repairing CI" note for the owner-side fix).
  *
  * The gates, in order (spec §7.1 + the Layer-1 discipline + M2's secret
- * scan):
+ * scan + PL-1's lane territory):
  *   0. secret scan       — the AIza/GitHub/AWS/EODHD/generic-credential
  *                          patterns over every tracked text file (D-33:
  *                          a leaked key fails the build FIRST, before
  *                          anything else runs)
- *   1. typecheck        — pnpm -r run typecheck
- *   2. lint             — pnpm lint (0 errors, 0 warnings)
- *   3. copy:audit       — the Persian copy manifest audit (✓ clean)
- *   4. narrator vocab   — the generated Worker vocabulary drift check (P3)
- *   5. narrator eval    — the offline eval harness (M3: fixtures ×
+ *   1. lane territory    — the parallel-lane map check (AGENTS.md §15,
+ *                          PL-1): n/a on main/any non-lane branch; on a
+ *                          lane/* branch it fails the moment the diff
+ *                          leaves its lane map
+ *   2. typecheck        — pnpm -r run typecheck
+ *   3. lint             — pnpm lint (0 errors, 0 warnings)
+ *   4. copy:audit       — the Persian copy manifest audit (✓ clean)
+ *   5. narrator vocab   — the generated Worker vocabulary drift check (P3)
+ *   6. narrator eval    — the offline eval harness (M3: fixtures ×
  *                         templates × mocked model outputs, incl. the
  *                         deliberately bad ones)
- *   6. layer1 strict    — LAYER1_STRICT=1 vitest on layer1.test.ts
+ *   7. layer1 strict    — LAYER1_STRICT=1 vitest on layer1.test.ts
  *                         (the 7,809-assertion validator — its count must
  *                         not change silently)
- *   7. full suite       — pnpm -r run test (every package, never live)
- *   8. build + budget   — pnpm -r run build + check-bundle-budget.mjs
+ *   8. full suite       — pnpm -r run test (every package, never live)
+ *   9. build + budget   — pnpm -r run build + check-bundle-budget.mjs
  *
  * Every step runs even when an earlier one fails (the summary shows the
  * complete picture; the exit code is non-zero on ANY failure).
@@ -46,6 +50,19 @@ const GATES = [
       if (!clean) return null;
       const m = out.match(/(\d+) patterns over ([\d,]+) tracked text files/);
       return m !== null ? `clean (${m[1]} patterns · ${m[2]} files)` : 'clean';
+    },
+  },
+  {
+    // PL-1 (AGENTS.md §15): the parallel-lane territorial integrity gate.
+    // n/a (exit 0, no enforcement) on main or any non-lane branch — the
+    // normal single-session flow is untouched; on a lane/* branch it fails
+    // the run the moment the session's diff leaves its lane map.
+    id: 'lane-check',
+    label: 'lane territory',
+    cmd: 'node scripts/lane-check.mjs --gate',
+    parse: (out) => {
+      const m = out.match(/^lane territory: (.+)$/m);
+      return m !== null ? m[1] : null;
     },
   },
   {

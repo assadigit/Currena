@@ -34,6 +34,7 @@ These rules apply to every session in this repository, for every agent.
 4. **Spec hunt:** compare the specs with the real code. List features that are specified but missing or half-built. Mention the important ones briefly at the start and again in the final report. Do not silently build them.
 5. **Obsolete specs:** if a spec no longer matches reality, tell the owner and offer to archive it (move to `docs/archive/` with a one-line "obsolete because…" note at the top). Never delete specs.
 6. Write this session's goal and milestones at the top of `docs/HANDOFF.md` before you start coding.
+7. **Parallel lane sessions (§15):** if the owner started you as a lane session, your pickup point is your lane's latest record in `docs/sessions/` (not the root `HANDOFF.md`, which is read-only for lanes), and §15.3 replaces this list's items 2, 3 and 6 for your session.
 
 ## 3. Planning new features and big changes
 
@@ -59,7 +60,7 @@ These rules apply to every session in this repository, for every agent.
 
 ## 5. Git, deploys and the safety limits
 
-**Standing approval.** The owner pre-approves committing, pushing, deploying and releasing. Do these automatically **unless the owner has said not to** (in this session or in `docs/HANDOFF.md`). A "don't deploy / don't push" instruction lasts until the owner lifts it. Record it in the handoff so the next session respects it too.
+**Standing approval.** The owner pre-approves committing, pushing, deploying and releasing. Do these automatically **unless the owner has said not to** (in this session or in `docs/HANDOFF.md`). A "don't deploy / don't push" instruction lasts until the owner lifts it. Record it in the handoff so the next session respects it too. **Lane sessions (§15) are the exception: they never deploy and never push `main` — the integration session owns every deploy and every merge to `main`.**
 
 **Before every deploy:** the build and tests pass, every spec item you claim is verified, the staged changes contain no secrets, a database backup exists if data or schema changes (section 6), and you know how to roll back.
 **After every deploy:** check the live result yourself (open the page, call the endpoint, look at it). If it is broken, roll back first, then investigate.
@@ -103,10 +104,11 @@ README.md          what the project is, how to run it
 AGENTS.md          these rules
 CHANGELOG.md       what changed, per session (newest first)
 docs/
-  HANDOFF.md       current state and next steps (rewrite each session)
+  HANDOFF.md       current state and next steps (rewrite each session; integration-only during parallel lane waves — §15)
   DECISIONS.md     decision history (add only, never rewrite)
   specs/           active specs
   audits/          audit reports
+  sessions/        parallel-lane session records + the ACTIVE-LANES registry (§15; a lane's own record lives here, never in the root files)
   archive/         obsolete specs and old material
   assets/          screenshots, reference files, mockups (descriptive names + date)
 ```
@@ -136,6 +138,7 @@ Always, in this order:
 2. Give the **TLDR report** (below), in plain language.
 3. **Next-session prompt — automatic at every close-out while the plan is multi-session** (owner's standing instruction, 2026-11-16): if ANY sessions remain on the plan — including when this session's own scope is fully done — ALWAYS generate the **next-session prompt** yourself and give it in one copy-paste block. Never wait for the owner to ask. Only write "nothing needed — the plan is complete" when nothing at all remains. **It always starts with:** "Read AGENTS.md in the repo root first and follow it for the whole session." It must stand alone: which other files to read next (HANDOFF, the spec, the audit), the objective, the milestones, done-criteria, known problems, and any standing limits (such as "do not deploy"). When the authoritative prompt lives at the bottom of `docs/HANDOFF.md` (the phase-plan pattern), output that same prompt verbatim in your reply.
 4. Add short reminders when relevant: unfinished or missing specs, obsolete specs to archive, suggested additions to `AGENTS.md`.
+5. **Lane sessions close out differently (§15.3):** update your lane record in `docs/sessions/` and push your lane branch — the root `HANDOFF.md` / `CHANGELOG.md` / `docs/DECISIONS.md` updates happen at integration, not in the lane. The TLDR report and your lane's next-session prompt are still owed to the owner in your reply.
 
 **TLDR report format**
 
@@ -1327,3 +1330,63 @@ never written to disk inside this repository.
 
 *These rules are the owner's voice in the repo. Breaking them = the session
 doesn't count.*
+
+---
+
+## 15. Parallel lane protocol — running agents concurrently on different pages
+
+The repo is modular by page: every folder under `apps/web/src/features/<domain>/` and `apps/web/src/features-tools/<tool>/` is an independent territory (plus the `apps/api` / `apps/markets` workers and the `packages/*` engines). When the owner asks for concurrent work on different pages, run it as **lanes**: one agent, one lane, one git worktree — **never two agents in the same checkout, never two agents in one lane**. The default remains the normal single-session flow (§2–§10); lanes exist for the waves the owner explicitly starts in parallel (recorded in `docs/DECISIONS.md` as BD-S48).
+
+### 15.1 Hard setup (every lane, no exceptions)
+
+1. Make a fresh worktree from a current `main` (in the main checkout):
+   `git fetch origin && git worktree add ../currena-<lane> -b lane/<lane>-<topic> origin/main`
+2. `pnpm install` inside the new worktree; give your dev server its own port.
+3. Register the lane in `docs/sessions/ACTIVE-LANES.md` (one table row: lane · branch · worktree · date · scope).
+4. Branches are named `lane/<lane>-<topic>`. A lane session pushes its own branch only — never `main`.
+5. If `main` has moved since your branch was cut, rebase onto `origin/main` before starting new milestones.
+6. Never enter another lane's worktree. Never reset, revert, overwrite or force-push another agent's branch (see also §14's parallel-agent safety).
+
+### 15.2 The lane map (territories)
+
+- **Page/tool lanes** — one per folder in `apps/web/src/features/` and `apps/web/src/features-tools/` (`scripts/lane-check.mjs` auto-discovers them; today: global · gold · world-markets · usa · europe · asia-pacific · australia · commodities · currencies · economic-linkages · converter · live-rates · calculator · history · receipt · splitter · settle · batch · about). A page lane owns its `features[-tools]/<name>/` tree **plus** its program docs `docs/<name>-*/` (e.g. the gold lane owns `docs/gold-redesign/`).
+- **engine lane** — `packages/` only. Engine changes fan out to every page: run engine sessions serially, not concurrently with page lanes that consume the changed APIs. The financial-model protections (§14, gold master plan §9.3) apply unchanged.
+- **backend lane** — `apps/api/` + `apps/markets/`. API **contract** changes (`contract.test.ts` surface) go through an integration session, not a backend lane.
+- **integration** — owns everything; the only session that merges to `main`, pushes `main`, or deploys.
+
+**The shared surface — integration only, no exceptions for lanes:** `apps/web/src/shared/` (except the wiring list below), `apps/web/src/components/`, `apps/web/src/lib/` (except route-meta), `apps/web/src/infrastructure/`, `packages/` (for page lanes), `apps/api/` + `apps/markets/` (for page lanes), `scripts/`, `tests/`, `data/`, `apps/web` config files, every root file, and the root bookkeeping (`docs/HANDOFF.md`, `CHANGELOG.md`, `docs/DECISIONS.md`, `AGENTS.md`, `README.md`). Another lane's territory is equally off-limits — always.
+
+**Wiring — a lane MAY touch, MUST declare:** `apps/web/src/App.tsx`, `apps/web/src/router.ts` (+ `router.test.ts`), `apps/web/src/lib/route-meta.ts` (+ test), `apps/web/src/shared/i18n/en.ts` + `fa.ts`, `docs/localization/persian-copy-manifest.json` (via `pnpm copy:audit:update`), and **new** files under `apps/web/visual/` (append-only — the existing visual harness files are integration). These are small append-style edits (route rows, lazy imports, i18n keys) that git almost always auto-merges; every wiring file you touch must be listed in your session record so integration knows where to look.
+
+### 15.3 What a lane session does — and does not do
+
+A lane session:
+- builds only inside its territory (§15.2), appending wiring where needed;
+- writes its session record to `docs/sessions/<YYYY-MM-DD>-<lane>-<n>.md` — goal, milestones, what changed, decisions with IDs, **the wiring files touched**, gates run, the lane's next step (program folders keep their own `DECISION_LOG.md` as before);
+- commits and pushes its lane branch at every milestone (§14 rule 2);
+- runs `node scripts/lane-check.mjs` before finishing — it is also **gate 2 of `pnpm gates`** and fails the run the moment your diff leaves the lane map. If it fails: stop, move the change back inside your lane, or hand the piece to an integration session.
+
+A lane session does **not**: touch the root bookkeeping or `AGENTS.md`; file root-level strays (§8's filing applies only *inside* your territory and `docs/sessions/`); pick up another lane's unfinished work (your handoff is your lane's latest record); deploy (§5's standing approval is suspended for lanes — integration owns deploys); or merge to `main`. For a lane session, §15.3 overrides §2's HANDOFF write, §8's root tidy-up and §10's close-out; the TLDR report and your lane's next-session prompt are still owed to the owner in your reply.
+
+### 15.4 The integration session (serial, one at a time)
+
+Run between parallel waves (the owner, or the owner's single agent, executes it):
+
+1. Read `docs/sessions/ACTIVE-LANES.md`; confirm each lane's branch is pushed and its record complete. Two branches claiming one lane = stop and ask the owner.
+2. Merge the lane branches into `main` **one at a time** (merge, never rebase-rewrite; resolve the rare wiring conflict by keeping both sides), re-running `pnpm gates` after every merge.
+3. Re-run `pnpm copy:audit:update` if any lane touched Persian copy; the full gates must be green on the merged tree before proceeding (§14 rule 4).
+4. Consolidate the bookkeeping: rewrite `docs/HANDOFF.md` from the lanes' records, add their `CHANGELOG.md` entries, promote their decisions into `docs/DECISIONS.md` (BD-Sxx), and remove the merged rows from ACTIVE-LANES.md.
+5. Deploy only if runtime code changed — with the full §5 discipline and the standing deploy-lock re-check. Docs-only waves deploy nothing.
+6. Close per §10 (TLDR + next-session prompts).
+
+### 15.5 The two ready prompts
+
+**Lane start** — paste ABOVE the session prompt (e.g. the gold S4 prompt at the bottom of `docs/HANDOFF.md`):
+
+> Read AGENTS.md in the repo root first and follow it for the whole session — you are running as a PARALLEL LANE SESSION under AGENTS.md §15. Your lane is `<lane>`. Set up your worktree exactly per §15.1, register in `docs/sessions/ACTIVE-LANES.md`, work only inside your lane map (§15.2), keep your session bookkeeping in `docs/sessions/` (§15.3), and run `node scripts/lane-check.mjs` (also gate 2 of `pnpm gates`) before finishing. Do not deploy; do not merge to or push `main`. Then execute the session prompt that follows below.
+
+**Integration** — run after the parallel wave:
+
+> Read AGENTS.md in the repo root first and follow it for the whole session — you are the INTEGRATION SESSION (AGENTS.md §15.4). The active lanes are listed in `docs/sessions/ACTIVE-LANES.md`. Merge each lane branch into `main` one at a time, gates green after every merge, consolidate the root bookkeeping from the lanes' session records, close their ACTIVE-LANES rows, and deploy only if runtime code changed (full §5 discipline). Close per §10.
+
+Two agents never work the same lane at the same time; two programs never share one page without an integration session between them.
