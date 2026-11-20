@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## 2026-11-20 — GUX Session 7 (the gold UX redesign): the owner's Q1 answered (the five-state word) + the lower-page S4 patterns; merged to main and deployed
+
+**Branch `feat/gold-redesign-s7` → `main`.** The milestones, all verified:
+
+- **M1 Q1-B executed**: the five-state CONDITIONS word (08 §8.1's reviewed drafts) replaces the 7-state market vocabulary at BOTH surfaces (the BriefingCard + the /global Gold Balance tile) through ONE pure fold (`outlook-five-state.ts`, shared/components); the classifier untouched (GB-S5, a parity pin); the counts + caveat ride it; **Q2 stays closed** (the owner's standing answer; the §8.4 bans hold; pinned).
+- **M2 the bridge's regional chrome** (12 §3.3 row 5): the `--color-bridge-accent` ring (Carbon Teal 50/40, both themes) + the "Regional market · Tehran · Toman (IRR)" chapter chip, on both frames — the regional market can never be mistaken for the global gold model.
+- **M3 the one LaneBar everywhere**: the on-ramp's driver closes (1/2/3/5) + the time machine's five lane rows render the SAME lane grammar as the hero and the five-force overview (one renderer, all surfaces).
+- **M4 the ProbabilityRow set** (12 §3.3 row 4): the expectations' outcome rows gain the neutral-ink probability bars (the venue's own implied numbers; the framing locked).
+- **M5/M6 the close**: 10/10 gates GREEN (3m 20s; the suite 15,658, +8); the 22-screenshot set + two new fixture-server routes; the report (`15-session-7-implementation-report.md`); S7-D1..D5; the deploy with the D-43 re-check (the record in `docs/DEPLOY.md`).
+
+**The program counter: Session 7/9 complete · 2 remaining.** Q2 remains closed by design; Q3 (silver's home) is S8's to decide.
+
 ## 2026-11-20 — GUX Session 6 (the gold UX redesign): the relationship explorer + the context re-scope + the fa deep-content gap closed; the S5-pending deploy executed
 
 **Branch `feat/gold-redesign-s6-explorer` → `main`.** The four build milestones, all verified:
