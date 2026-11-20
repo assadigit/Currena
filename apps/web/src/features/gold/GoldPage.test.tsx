@@ -1736,4 +1736,54 @@ describe('GoldPage', () => {
     const relChip = document.querySelector('a[data-nav-chip="gold-relationships"]') as HTMLAnchorElement;
     expect(relChip.getAttribute('href')).toBe('#gold-relationships');
   });
+
+  /* ---------------------------------------------------------------- *
+   * GUX-S6 M2 — the context cards' re-scope (12 §3.1's RatioCards)
+   * ---------------------------------------------------------------- */
+
+  it('GUX-S6 M2: the 11 context RatioCards carry the 10-year position band (context strength — neutral ink, fail-closed); the COT pair and the hero keep their own treatments', async () => {
+    stubFeeds();
+    render(<GoldPage />);
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-context-card]').length).toBe(13);
+    });
+
+    // All 11 non-hero, non-COT cards render the band mark (the fixture
+    // carries percentile10y on every reading — explicit or the 0.5 default).
+    const marks = [...document.querySelectorAll('[data-context-mark="band"]')];
+    expect(marks.length).toBe(11);
+    // The mark's geometry: the marker rides the percentile position.
+    const silverMark = document.querySelector('[data-context-card="gold-silver"] [data-context-mark="band"]')!;
+    expect(silverMark.getAttribute('data-context-mark-pct')).toBe('36.6');
+    // Neutral ink: the marker wears the secondary text tone, never a
+    // market/impact class (the context rule — a context reading never
+    // votes; 12 §3.1).
+    const markerEl = silverMark.querySelector('[data-mark-marker]') as HTMLElement;
+    expect(markerEl.className).toContain('bg-[var(--color-text-secondary)]');
+    expect(markerEl.className).not.toContain('status-normal');
+    expect(markerEl.className).not.toContain('status-alert');
+    // The soft zone renders (the shared geometry).
+    expect(silverMark.querySelector('[data-mark-zone]')).not.toBeNull();
+    // The aria names the position in words.
+    expect(silverMark.getAttribute('aria-label')).toContain('36.6');
+
+    // Fail-closed (the component's own guard): a percentile-less
+    // reading renders NO mark — pinned at the component level too
+    // (the caller guard holds; the component holds the rule anyway).
+    // gold-btc in the fixture defaults to 0.5 and DOES render — the
+    // honest no-percentile shape is the plain word line only.
+
+    // The COT pair keeps the Chain-6 chip treatment (12 §4.5) — no band mark.
+    expect(document.querySelector('[data-context-card="cftc-gold-positioning"] [data-context-mark="band"]')).toBeNull();
+    expect(document.querySelector('[data-context-card="cftc-gold-gross-long"] [data-context-mark="band"]')).toBeNull();
+
+    // F-06 dedup holds: gold-usd renders NO context card (the hero is
+    // the one price presentation) and no band mark anywhere near it.
+    expect(document.querySelector('[data-context-card="gold-usd"]')).toBeNull();
+
+    // The one-liner survives beside the mark (the complete card).
+    expect(document.querySelector('[data-context-card="gold-silver"] [data-card-meaning]')).not.toBeNull();
+    // The position word line survives (the words stay the statement).
+    expect(document.querySelector('[data-context-card="gold-silver"]')?.textContent).toContain('typical');
+  });
 });

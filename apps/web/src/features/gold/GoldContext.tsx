@@ -31,6 +31,7 @@ import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 import { COT_BAND_IDS, GOLD_DISPLAY, cotBandOf, type GoldContextEntry, type GoldContextId, type GoldUnitToken } from './gold-tiles';
 import { GoldCurrencyGrid } from './GoldCurrencyGrid';
+import { ContextBandMark } from './ContextBandMark';
 import { GoldForecastRetrospective } from './GoldForecastRetrospective';
 
 /** The context-card name keys — 14 literal keys (the copy-pin test proves
@@ -208,6 +209,15 @@ function ContextCard({
       ) : (
         <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-tertiary)]">{t('pd.gold.valueUnavailable')}</p>
       )}
+      {/* GUX-S6 M2 (12 §3.1): the RatioCard's mark — the 10-year position
+       * band, the same visual grammar the five-force cards carry, at
+       * context strength (no impact hue: a context reading never votes;
+       * the marker is neutral ink, the band word carries the position in
+       * words). Fail-closed without percentile10y — the plain word line
+       * below stays the complete statement either way. The COT pair
+       * keeps its own Chain-6 treatment (12 §4.5's two-track
+       * discipline); gold-usd is the hero (F-06: never re-rendered). */}
+      {!isCot && entry.id !== 'gold-usd' ? <ContextBandMark percentile={pct} label={name} /> : null}
       {/* GPE R21 / F4b: the one-liner — one plain meaning sentence under
        * the card's value («نسبت ۸۲ یعنی چه» answered, the #12 fix). No
        * number restated, no forecast; the series/convention notes ride
