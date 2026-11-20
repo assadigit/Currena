@@ -1,26 +1,24 @@
 /**
- * GoldSectionNav — the sticky in-page navigation, FOUNDATION tier
- * (GUX-S5 M5, the master plan §10 Session 5 "sticky section navigation
- * foundation" + the F-03 fix): one sticky chip row of plain section
- * links (Briefing · Lanes · Signals · Bridge · Ratios · History) with
- * the current section's chip highlighted.
+ * GoldSectionNav — the sticky in-page navigation (GUX-S5 M5's
+ * foundation, upgraded to the S8 tier at GUX-S6 M5): one sticky chip
+ * row of plain section links (Briefing · Lanes · Signals · Bridge ·
+ * Ratios · Relationships · History) with the current section's chip
+ * highlighted.
  *
- * FOUNDATION means (deliberately small): the sections and their anchors
- * are the page's OWN (every href is a real #hash — the R10 anchor
- * contract, native scroll on click); the highlight follows a plain
- * scroll listener over getBoundingClientRect (throttled by rAF) — NO
- * IntersectionObserver edge cases, NO scroll-spy heuristics beyond
- * "the last section whose top passed the line". S8 (the interaction
- * session) may upgrade the spy; the links and anchors are stable.
+ * THE S8-TIER SPY (this session's upgrade, still deliberately small):
+ * the foundation tier's scroll listener + getBoundingClientRect sweep
+ * is replaced by an IntersectionObserver over the section anchors —
+ * the last section whose top has passed the spy line still wins (the
+ * same plain rule, no heuristics added), but the work now happens on
+ * observer callbacks instead of every scroll frame. The rAF throttle
+ * and the scroll listener REMAIN as the no-observer fallback (jsdom,
+ * old browsers — the boundary components' own discipline), so the
+ * behavior is identical everywhere and the jsdom pins still hold.
  *
- * The honesty rules: the nav NEVER renders on the hero (it sticks only
- * after the reader passes it — sticky top-0, the page's own flow); a
- * section whose anchor is absent (the skeleton or an outage band)
- * simply does not appear in the row; reduced-motion keeps the native
- * instant jump (no smooth-scroll override).
- *
- * jsdom-safe: no matchMedia, no IntersectionObserver — a plain scroll
- * listener added in an effect and removed on unmount.
+ * The honesty rules (unchanged): the nav NEVER renders on the hero (it
+ * sticks only after the reader passes it); a section whose anchor is
+ * absent (the skeleton or an outage band) simply does not appear in
+ * the row; reduced-motion keeps the native instant jump.
  */
 
 import { useEffect, useState } from 'react';
@@ -49,18 +47,51 @@ export function GoldSectionNav(): React.JSX.Element | null {
   const [active, setActive] = useState<string | null>(null);
 
   useEffect(() => {
+    /** The plain rule, computed once: the last section whose top has
+     *  passed the spy line. Shared by the observer path and the
+     *  scroll-listener fallback. */
+    const computeCurrent = (): string | null => {
+      let current: string | null = null;
+      for (const { id } of SECTIONS) {
+        const el = document.getElementById(id);
+        if (el !== null && el.getBoundingClientRect().top <= SPY_LINE_PX) current = id;
+      }
+      // The hero (before the first section) highlights nothing.
+      return current;
+    };
+
+    // The S8 tier: observe the section anchors with a spy-line root
+    // margin — the callback recomputes the same plain rule only when a
+    // section top actually crosses the line (no per-frame work).
+    if (typeof IntersectionObserver !== 'undefined') {
+      const observer = new IntersectionObserver(
+        () => {
+          setActive(computeCurrent());
+        },
+        // The observed band: from the top of the viewport down past the
+        // spy line — a section top entering OR leaving this band is
+        // exactly a crossing of the line.
+        { rootMargin: `0px 0px -${window.innerHeight - SPY_LINE_PX}px 0px`, threshold: 0 },
+      );
+      for (const { id } of SECTIONS) {
+        const el = document.getElementById(id);
+        if (el !== null) observer.observe(el);
+      }
+      // Set the initial state (the observer fires on observe, but the
+      // first paint should not depend on it).
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the initial spy position is the observer path's own trigger (the foundation tier's onScroll() call did the same)
+      setActive(computeCurrent());
+      return () => observer.disconnect();
+    }
+
+    // The no-observer fallback (jsdom, old browsers): the foundation
+    // tier verbatim — a rAF-throttled scroll listener.
     let raf = 0;
     const onScroll = (): void => {
       if (raf !== 0) return;
       raf = window.requestAnimationFrame(() => {
         raf = 0;
-        let current: string | null = null;
-        for (const { id } of SECTIONS) {
-          const el = document.getElementById(id);
-          if (el !== null && el.getBoundingClientRect().top <= SPY_LINE_PX) current = id;
-        }
-        // The hero (before the first section) highlights nothing.
-        setActive(current);
+        setActive(computeCurrent());
       });
     };
     onScroll();
