@@ -1,6 +1,22 @@
 # HANDOFF — Currena current state & next steps
 
-## This session (2026-11-20 post-GPE UX OPS — BD-S43, the owner-directed gold-page relocation: the licence bookkeeping to the footer, hidden by default)
+## This session (2026-11-20 — Gold UX Redesign S1, the current-state audit: the nine-session Gold UX redesign program OPENS, read-only, docs-only)
+
+**The program:** the owner's master spec `CURRENA_GOLD_UX_STRATEGY_AND_PHASED_PLAN.md` (repo root, v2 — the locked product direction after three clarification rounds) defines a nine-session redesign of `/gold` toward the weather-briefing model: outlook-first hero, conditions ≠ outlook, five-lane overview + dynamic highlights, bilingual explanation system, visual system, then staged implementation (S5 primary briefing · S6 global context · S7 advanced/historical/regional · S8 mobile/a11y · S9 final verification). **The master spec is the product source of truth — session reports record implementation decisions only, never rewrite product decisions.**
+
+**What S1 did (read-only, nothing deployed):** the evidence baseline. Live production verified BYTE-IDENTICAL to `main` @ `884f2696` (three served assets `cmp`-clean against a fresh build; deploy `62bdfc10` = version `5c34a14b` per BD-S43; D-43 lock re-checked read-only). 31 baseline screenshots (en/fa × desktop-1440/mobile-390, dark pair, six expanded states; zero console/page errors everywhere), live DOM audits, and a full source audit of the 13,320-line gold feature + engine. Deliverables (all under `docs/gold-redesign/`): `01-current-state-audit.md` (findings F-01…F-14 with severity/evidence/impact/recommendation) · `02-section-and-component-map.md` (the 22-block render map, data planes, navigation reality, bundle budget) · `03-indicator-and-module-inventory.csv` (48 readings + 4 absent + 14 context homes + 37 voters + 16 modules) · `04-duplicate-and-overlap-matrix.md` (DUP-1…DUP-8, every row evidence-backed) · `baseline-screenshots/` (+README) · the program `DECISION_LOG.md` (S1-D1…S1-D8). BD-S44 in `docs/DECISIONS.md` is the decision record.
+
+**The evidence in one breath:** the page is feature-complete and honest but long (26 sections; ~13,000 px desktop / ~25,000 px mobile), flat in hierarchy, and repetitive at the summary level — the balance verdict renders at summary strength SIX ways (hero scale · hero outlook line · the Signals section's SECOND full BalanceScale · narrative families · collapsed-signals line · on-ramp closes); CFTC ×4, price ×3, real-yield ×4 surfaces; 37 always-visible seat chips (17 steady today); NO in-page navigation; the 7-state "Conditions outlook" is the same `goldBalance()` re-worded (GB-S5) with the honest "not a forecast" caveat — a genuine forward-looking outlook does NOT exist yet and must be designed fresh in Session 2 (never by relabelling the balance). Live state at capture: "Leaning against gold" / outlook "Bearish"; 1 for · 3 against · 1 neutral lanes; price US$3,599 −3.83% 1d. Engineering health is good: zero console errors, no 390 px overflow, dark mode correct, DCL ~110 ms; the one hard constraint is the GoldPage budget headroom (~1.1 kB raw of 240,000/50,000).
+
+**Owner-approval gates carried forward (nothing needs pre-approval to START Session 2 — it is strategy-only):** (1) the outlook method + horizons + the "Conditions outlook: Bearish" wording — design in S2, approve before implementation; (2) silver's home on /gold (S2, owner decision — a shipped feature); (3) the GoldPage budget strategy — grow-with-justification vs split (S4/S5 explicit decision). No protected model surface (membership, polarity, thresholds, scoring, balance math, percentile windows, providers, rungs) was touched.
+
+**Standing limits (unchanged):** the WGC drops + PBoC revival remain owner-side levers (`docs/specs/gold-page-elevation/s18/02-PROGRAM-CLOSURE-RECORD.md` §3); the Kalshi leg stays dropped (S15-D1); the §21 portwatch window; the D-43 deploy-lock re-check before every deploy; R5 no-rename; the Persian copy manifest gates every fa string.
+
+**Known state (post-S1):** production = currena-api `5c34a14b` @ 100% (unchanged — docs-only session); `main` = the audit docs (merged fast-forward from `docs/gold-redesign-s1-audit`); the GoldPage budget 238.90 raw / 49.57 gz under 240/50; the copy manifest at round 90 (8,483 entries — untouched this session).
+
+**Next session (the program's S2 — Product hierarchy, visitor journey and information architecture; strategy only, NO implementation):** convert the owner's locked decisions + the S1 evidence into `05-product-principles-and-visitor-journey.md`, `06-final-information-architecture.md`, `07-canonical-placement-and-deduplication-plan.md`, and the updated decision log. Read `CURRENA_GOLD_UX_STRATEGY_AND_PHASED_PLAN.md` in full + `AGENTS.md` + `docs/gold-redesign/DECISION_LOG.md` + all four S1 deliverables BEFORE designing. The full copy-paste S2 prompt is at the bottom of this file.
+
+## Previous session (2026-11-20 post-GPE UX OPS — BD-S43, the owner-directed gold-page relocation: the licence bookkeeping to the footer, hidden by default)
 
 **Outcome:** the owner reviewed the live `/gold` (currena.ir) and asked
 for (1) a verification pass against the gold program and (2) the
@@ -601,15 +617,35 @@ S11-D3 record; ~1.1 kB raw headroom for P1-c).
 - **The narrator vocabulary: 193×2 + 56×2 (UNCHANGED).**
 - **Production: currena-api `f4926c9d` @ 100%** (the 2026-11-19 post-program ops redeploy: `77c6262a` at 23:31:55Z — the code-identical redeploy of the merged `a3a8641d` tree, zero changed assets — then the `EODHD_API_TOKEN` re-put's version at 23:32:05Z; the S17 code it carries is live-verified as at S17's close `65f7c0bb`; rollback `65f7c0bb` remains).
 
-## The next-session pointer — THE GPE PROGRAM IS COMPLETE (nothing needed — the plan is complete)
+## The next-session pointer — THE GOLD UX REDESIGN PROGRAM, SESSION 2 OF 9 (the copy-paste prompt)
 
-**The 18-session Gold Page Elevation program is closed.** Every
-feature wave delivered + deployed + live-verified (31 of the 33
-queued rows; the two remaining rows are owner-drop-gated by the plan's
-own fold rule); the research record stands as the never-rewritten
-historical record (PR #48 open); the shared bookkeeping carried every
-session; the AGENTS.md facts are at the post-program state. **No
-next-session prompt exists because none is needed — the plan is
-complete.** Whenever the owner wants to open any of the standing
-levers above (the WGC drops first), a fresh session starts from this
-HANDOFF + AGENTS.md + `docs/specs/gold-page-elevation/s18/`.
+**The GPE program is closed; the NEW nine-session Gold UX redesign program (`CURRENA_GOLD_UX_STRATEGY_AND_PHASED_PLAN.md`) is open — Session 1 of 9 is complete (this session), 8 remain.** The standing prompt pattern resumes. Copy-paste the block below to start Session 2.
+
+---
+
+Read AGENTS.md in the repo root first and follow it for the whole session. Then read, in this order: `CURRENA_GOLD_UX_STRATEGY_AND_PHASED_PLAN.md` (the master product spec — read it IN FULL; it is the source of truth and its owner decisions are locked), `docs/HANDOFF.md` (this file), `docs/gold-redesign/DECISION_LOG.md`, and all four Session-1 deliverables: `docs/gold-redesign/01-current-state-audit.md`, `02-section-and-component-map.md`, `03-indicator-and-module-inventory.csv`, `04-duplicate-and-overlap-matrix.md` (skim `baseline-screenshots/README.md` for the visual evidence index).
+
+You are executing **Session 2 of 9 — Product hierarchy, visitor journey and information architecture** of the Gold UX redesign program. Mode: strategy and architecture ONLY — do NOT implement the page, do NOT change any component code, do NOT change financial-model logic, data sources, ingestion, provider requests, or production behavior. Documentation deliverables only.
+
+Your objective: convert the owner's locked decisions (master plan §2–§2.2) and the Session-1 evidence into the final section hierarchy and content-placement rules for `/gold`.
+
+Tasks (master plan §10, Session 2):
+1. Define the first-15-second experience and the 3–5-minute experience.
+2. Define the outlook-first hero and the strict separation of spot-price movement, the current-conditions balance, and the forward-looking outlook. CRITICAL from S1: the existing 7-state "Conditions outlook" is the same `goldBalance()` re-worded (GB-S5) — a genuine forward-looking methodology does not exist; design the briefing's outlook construct fresh (headline + one summary sentence + 2–3 evidence-backed reasons + "what could change this"), horizon-labelled, and propose the method + horizons (candidates 1–2 weeks / 1–3 months / 6–12 months, publish only what a documented method supports). The fate of the "Conditions outlook: Bearish" wording is an OWNER-APPROVAL item — present options, do not decide unilaterally.
+3. Specify the briefing editorial template and the separately-labelled current-conditions balance.
+4. Confirm audience-facing labels and presentation for the five groups (engine lane ids: borrowing-costs, dollar, stress, inflation, flows).
+5. Define the dynamic-highlight rules: up to five featured indicators, group summaries always visible, selection from the three evidence dimensions using EXISTING fields only (contribution/polarity from the engine, unusualness vs the indicator-appropriate historical reference, narrative relevance) — no new composite score; each highlight states why it matters now; no duplicate canonical presentation.
+6. Establish the canonical home for every unique indicator and module (use the S1 inventory — 48 readings, 4 absent, 14 context homes, 37 voters, 16 modules).
+7. Produce the final duplicate-resolution matrix resolving DUP-1…DUP-8 from `04-duplicate-and-overlap-matrix.md` (CFTC ×4, the six balance-verdict renderings, real-yield ×4, price ×3, the four lane-state overviews, silver's scope, TA tables vs chart, timestamp grammar) — every existing feature gets an explicit decision: primary, secondary, advanced, regional, relocated, or removed, WITH rationale. Removing silver's full card (a shipped feature) is an owner decision — present it as a question.
+8. Place institutional demand, market expectations (Polymarket + Fed calendar), asset comparisons, technical context, Gold Episodes, the if-bought calculator, and the compact expandable Iran Bridge in the hierarchy (the Iran Bridge STAYS on /gold as a bottom regional chapter — locked).
+9. Design the desktop sticky section navigation and the mobile-specific section index (none exists today — S1 F-03).
+10. Define which sections are visible by default, collapsed, summarized, or linked.
+11. Identify any feature that should become a separate route (document the trade-off; do not create routes).
+
+Deliverables: `docs/gold-redesign/05-product-principles-and-visitor-journey.md`, `docs/gold-redesign/06-final-information-architecture.md`, `docs/gold-redesign/07-canonical-placement-and-deduplication-plan.md`, and an updated `docs/gold-redesign/DECISION_LOG.md` (add S2-Dxx entries; never rewrite S1's or the master spec's decisions). Also update `docs/HANDOFF.md`, `CHANGELOG.md`, and `docs/DECISIONS.md` per the repo convention (BD-S45), commit at meaningful milestones to a branch (`docs/gold-redesign-s2-architecture`), push, and merge to `main` fast-forward (docs-only; no deploy — CI runs gates only).
+
+Preserve absolutely: the five-lane model and all 37 voters, all financial calculations, thresholds, polarity, percentile windows, data sources, KV rungs, the blocked-quartet honesty, the Iran Bridge, the bilingual discipline, and the S1 evidence. Any proposal that would require a financial-model change must be documented and flagged for owner approval BEFORE implementation (none is expected in S2 — it is strategy).
+
+Acceptance criteria (master plan §10, Session 2): one clear main briefing, not multiple competing heroes; the five-force overview and five detail groups coherently related; the dynamic-highlight mechanism explainable with no duplicate UI; global and Iranian regional analysis clearly separated; every existing feature has an explicit placement decision with rationale; no financial indicators deleted from the model because a UI presentation is redundant.
+
+Close the session with: the TLDR report, the updated decision log, the completion report in the assignment's 8-section format, and the complete copy-paste prompt for Session 3 (Indicator taxonomy and bilingual explanation system) referencing this session's actual deliverables. Execute ONLY Session 2; do not begin Session 3.
