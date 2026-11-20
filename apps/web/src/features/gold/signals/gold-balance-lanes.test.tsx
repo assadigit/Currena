@@ -552,7 +552,7 @@ describe('the split lane (04 §4.3 item 2)', () => {
     expect(weight.querySelector('[data-balance-split-badge]')?.textContent).toBe('Split');
     // The single most important disclosure: contested, not empty — the
     // accessible name carries the badge word + the contest.
-    expect(weight.getAttribute('aria-label')).toBe('Borrowing costs: Sitting neutral. Split, 2 for, 2 against.');
+    expect(weight.getAttribute('aria-label')).toBe('Interest rates & borrowing costs: Sitting neutral. Split, 2 for, 2 against.');
     // The ledger row's state text names the contest (05 §4.6).
     expect(document.querySelector('[data-balance-row="borrowing-costs"] .bal-row-state')?.textContent).toBe(
       'Split: 2 for, 2 against',
@@ -581,7 +581,7 @@ describe('the ledger member lists (04 §4.3 item 3, 05 §4.6)', () => {
     expect(members.hidden).toBe(false);
     expect(row.getAttribute('data-open')).toBe('true');
     // The lane's intro sentence (laneIntro) opens the expansion.
-    expect(members.textContent).toContain('The cost of borrowing dollars');
+    expect(members.textContent).toContain('What cash pays to hold');
     // Grouped (GF-P1: the fed-expectations threshold (J) moved its fixture
     // seat into Supports — three falling readings): real-yield-10y,
     // us10y AND fed-expectations under Supports gold; us30y alone under

@@ -388,7 +388,7 @@ The consolidated lane balance behind `?balance=lanes`
   «{amount} دلار در هر پایانیِ ماه» — no transliterated "DCA" in
   fa copy; the Latin ticker rides only the EN sentence).
 
-## Gold UX Redesign S3 — the content-system additions (2026-11-2x, round pending Session 5)
+## Gold UX Redesign S3 — the content-system additions (2026-11-2x, triaged in round 91 at S5 M1)
 
 > Recorded now so the manifest round at Session 5's integration has its
 > reference (the strings enter `apps/web/src` dictionaries only then —

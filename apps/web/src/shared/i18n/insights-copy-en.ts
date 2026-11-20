@@ -9477,18 +9477,20 @@ export const insightsCopyEn = {
       // vocabulary anywhere (01 §8.3).
       measuredNote:
         'Measured against gold’s actual moves over 2016 to 2026: the lean of these drivers showed no positive association with the next 5 to 60 days. If anything, readings against gold came before larger rises. It describes conditions, not direction.',
-      // One sentence per lane (03 §3 item 1, 03 §6.2): what the lane
-      // measures, 12 words or fewer, descriptive only.
+      // One sentence per lane: the S3-D4 finals (08 §5.1, the GUX
+      // redesign's five-group label system) replaced the original
+      // 12-word 03 §6.2 intros at S5 M1 — cautious-voiced, descriptive
+      // only, byte-identical in pd.gold (the gold-copy pin).
       laneIntro: {
-        'borrowing-costs': 'The cost of borrowing dollars: yields, curves and rate expectations.',
-        dollar: 'The US dollar against major currencies and the yen.',
-        stress: 'Stress in financial markets, from money markets to volatility.',
-        inflation: 'Inflation and inflation expectations in the US and Europe.',
+        'borrowing-costs': 'What cash pays to hold — when interest beats inflation by a wide margin, gold has a tough rival.',
+        dollar: 'Gold is priced in dollars — a stronger dollar usually makes gold more expensive everywhere else.',
+        stress: 'When money is frightened, it often runs to gold; calm markets take that bid away.',
+        inflation: 'Gold is bought as an inflation hedge — the hotter prices and expectations run, the stronger the case people make for it.',
         // GF-P2 (the owner's recorded answer B, OI-GA-2's ADD scenario —
-        // 2026-11-05): the fifth lane's intro, 12 words or fewer,
-        // descriptive only. The lane holds the CFTC positioning pair today;
-        // the WGC/official flows join as their phases land (P3+/P4).
-        flows: 'Speculative positioning and flows into gold.',
+        // 2026-11-05): the fifth lane's intro (the S3-D4 final wording,
+        // 08 §5.1, since S5 M1). The lane holds the CFTC positioning pair
+        // today; the WGC/official flows join as their phases land (P3+/P4).
+        flows: 'What futures traders are doing with gold right now — very crowded bets can be fragile.',
       },
       // Gold balance consolidation P2b (GB-S4, 2026-11-03 —
       // 05-VISUAL-DESIGN-SPEC §4.1/§4.4/§4.5/§4.6 + §11's key list): the
@@ -9616,14 +9618,14 @@ export const insightsCopyEn = {
     // fingerprints did not churn.
     goldScore: {
       laneNames: {
-        'borrowing-costs': 'Borrowing costs',
-        dollar: 'Dollar',
-        stress: 'Market stress',
-        inflation: 'Inflation',
+        'borrowing-costs': 'Interest rates & borrowing costs',
+        dollar: 'The US dollar',
+        stress: 'Market stress & uncertainty',
+        inflation: 'Inflation & inflation expectations',
         // GF-P2 (the owner's recorded answer B — 2026-11-05): the fifth
         // lane's name (OI-GA-2's ADD scenario, D-14's repair — the F-family
         // gets its own lane).
-        flows: 'Flows & demand',
+        flows: 'Trader positioning & flows',
       },
       // Session 3 (G2): the inflation lane's context phrase, fed by the
       // breakeven-tilt reading (breakevenTiltLean — pure, the panel never

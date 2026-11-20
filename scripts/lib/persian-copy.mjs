@@ -35,6 +35,13 @@ export const SOURCES = {
   insightsEn: 'apps/web/src/shared/i18n/insights-copy-en.ts',
   appEn: 'apps/web/src/shared/i18n/en.ts',
   calendar: 'data/insights-calendar.json',
+  /* The gold indicator content module (S5 M1): the fa halves are fa copy
+   * slots under the same manifest discipline; the en halves exist for the
+   * two translation-parity pairs. */
+  goldBriefFa: 'apps/web/src/features/gold/content/gold-content-brief-fa.ts',
+  goldBriefEn: 'apps/web/src/features/gold/content/gold-content-brief-en.ts',
+  goldDeepFa: 'apps/web/src/features/gold/content/gold-content-deep-fa.ts',
+  goldDeepEn: 'apps/web/src/features/gold/content/gold-content-deep-en.ts',
 };
 
 /** Source roots the hardcoded-Persian sweep walks (code only, never tests). */
@@ -265,6 +272,10 @@ export function collectState() {
     insightsEn: extractDictionary(SOURCES.insightsEn),
     appEn: extractDictionary(SOURCES.appEn),
     calendar: extractCalendar(),
+    goldBriefFa: extractDictionary(SOURCES.goldBriefFa),
+    goldBriefEn: extractDictionary(SOURCES.goldBriefEn),
+    goldDeepFa: extractDictionary(SOURCES.goldDeepFa),
+    goldDeepEn: extractDictionary(SOURCES.goldDeepEn),
     sweep: sweepPersianLiterals(),
   };
 }
@@ -300,7 +311,17 @@ export function audit(manifest, state) {
 
   // --- dictionaries + calendar: match by id -------------------------
   const dictOf = (source) =>
-    source === SOURCES.insights ? state.insights : source === SOURCES.app ? state.app : source === SOURCES.calendar ? state.calendar : null;
+    source === SOURCES.insights
+      ? state.insights
+      : source === SOURCES.app
+        ? state.app
+        : source === SOURCES.calendar
+          ? state.calendar
+          : source === SOURCES.goldBriefFa
+            ? state.goldBriefFa
+            : source === SOURCES.goldDeepFa
+              ? state.goldDeepFa
+              : null;
 
   for (const e of manifest.entries) {
     if (e.kind === 'mirror' || e.id.startsWith('hardcoded.')) continue; // matched via the sweep below
@@ -321,7 +342,13 @@ export function audit(manifest, state) {
 
   // new dictionary keys / calendar events (any script: they are fa copy slots)
   const coveredIds = new Set(manifest.entries.filter((e) => e.kind !== 'mirror' && !e.id.startsWith('hardcoded.')).map((e) => e.id));
-  for (const [source, live] of [[SOURCES.insights, state.insights], [SOURCES.app, state.app], [SOURCES.calendar, state.calendar]]) {
+  for (const [source, live] of [
+    [SOURCES.insights, state.insights],
+    [SOURCES.app, state.app],
+    [SOURCES.calendar, state.calendar],
+    [SOURCES.goldBriefFa, state.goldBriefFa],
+    [SOURCES.goldDeepFa, state.goldDeepFa],
+  ]) {
     for (const [id, text] of live) {
       if (!coveredIds.has(id)) result.new.push({ id, source, text, foundAs: source === SOURCES.calendar ? 'calendar-titleFa' : 'dictionary-key' });
     }
@@ -376,6 +403,8 @@ export function audit(manifest, state) {
   for (const [enMap, faMap, label] of [
     [state.appEn, state.app, SOURCES.app],
     [state.insightsEn, state.insights, SOURCES.insights],
+    [state.goldBriefEn, state.goldBriefFa, SOURCES.goldBriefFa],
+    [state.goldDeepEn, state.goldDeepFa, SOURCES.goldDeepFa],
   ]) {
     for (const k of enMap.keys()) if (!faMap.has(k)) result.missingTranslations.push({ id: k, source: label, problem: 'key exists in en but not fa' });
     for (const k of faMap.keys()) if (!enMap.has(k)) result.missingTranslations.push({ id: k, source: label, problem: 'key exists in fa but not en' });

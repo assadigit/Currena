@@ -48,15 +48,15 @@ import { clearGoldXauCacheForTests } from './gold-xau';
 import { snapshotStore } from '../../shared/lib/snapshot-store';
 import { useI18n } from '../../shared/lib/locale';
 
-/* GPE R17: the lane intros (the EN dictionary's own strings — the chrome
- * the #21 de-dup drops from the seats lane cards; the Signals ledger
- * rows and the hero's classic stage keep rendering them). */
+/* GPE R17: the lane intros — the S3-D4 finals since S5 M1 (08 §5.1, the
+ * GUX redesign's five-group label system; byte-identical in the corpus
+ * and pd.gold, pinned by gold-copy-pin). */
 const INTROS: Readonly<Record<string, string>> = {
-  'borrowing-costs': 'The cost of borrowing dollars: yields, curves and rate expectations.',
-  dollar: 'The US dollar against major currencies and the yen.',
-  stress: 'Stress in financial markets, from money markets to volatility.',
-  inflation: 'Inflation and inflation expectations in the US and Europe.',
-  flows: 'Speculative positioning and flows into gold.',
+  'borrowing-costs': 'What cash pays to hold — when interest beats inflation by a wide margin, gold has a tough rival.',
+  dollar: 'Gold is priced in dollars — a stronger dollar usually makes gold more expensive everywhere else.',
+  stress: 'When money is frightened, it often runs to gold; calm markets take that bid away.',
+  inflation: 'Gold is bought as an inflation hedge — the hotter prices and expectations run, the stronger the case people make for it.',
+  flows: 'What futures traders are doing with gold right now — very crowded bets can be fragile.',
 };
 
 /* ------------------------------------------------------------------ *
@@ -598,11 +598,11 @@ describe('GoldPage', () => {
     // the SAME shared BalanceScale drawing below (the snapshot stub now
     // routes, so it renders — the baseline-repair fix surfaced this).
     const LANE_NAME: Record<string, string> = {
-      'borrowing-costs': 'Borrowing costs',
-      dollar: 'Dollar',
-      stress: 'Market stress',
-      inflation: 'Inflation',
-      flows: 'Flows & demand',
+      'borrowing-costs': 'Interest rates & borrowing costs',
+      dollar: 'The US dollar',
+      stress: 'Market stress & uncertainty',
+      inflation: 'Inflation & inflation expectations',
+      flows: 'Trader positioning & flows',
     };
     const SIDE_WORD: Record<string, string> = {
       for: 'Supports',
@@ -822,7 +822,7 @@ describe('GoldPage', () => {
     expect(moves[1]!.textContent).toContain('market-structure reading');
     expect(moves[2]!.textContent).toContain('2026-11-17');
     const dollarLink = moves[3]!.querySelector('a[href="#lane-dollar"]');
-    expect(dollarLink?.textContent).toBe('Dollar');
+    expect(dollarLink?.textContent).toBe('The US dollar');
 
     // C6's TGJU row: the source link + the revision caveat.
     expect(bridge.querySelector('a[href="https://www.tgju.org/"]')?.textContent).toBe('Source: TGJU');
