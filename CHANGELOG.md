@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## 2026-11-2x — Gold UX Redesign S5 COMPLETE (the owner's Q4 answer A executed; M3b/M4/M5/M6; merged + deployed)
+
+- **The budget decision (BD-S49, S5-D7):** the owner chose A — the GoldPage gz ceiling 50,000 → 55,500 (the raw ceiling STAYS 240,000); the M4/M5 milestones then held to the raised ceilings WITHOUT further relief.
+- **M4 the five-force overview (`086d55e3`):** the LaneBar summaries + the closed member cards (the 11 §7.3 anatomy) with the SeatMark marks (12 §2's map) + the GoldRecordSheet (09's expanded + technical tiers over the lazy deep chunks); the record sheet's chrome on its own lazy chunk.
+- **M5 the dedup (`a4d6f5c1`, 11 §5.4):** the Signals card's second BalanceScale RETIRED (the lane drill-in in its place — the page's ONE instrument is the hero's CompositionStack); the VerdictStrip's focal recipe retired; the sticky-nav foundation (GoldSectionNav, F-03's fix). **The budgets LAND: 238.96/55.14 — both ceilings held.**
+- **M6 the close:** 10/10 gates GREEN (4m 46s; the suite 15,639 — +40 positive-only; the narrator vocabulary regenerated after the gate caught the laneDrillLabel drift) · 28 screenshots (en/fa × desktop/mobile × light/dark over the fixture server; the structural probes confirm the RTL mirror) · the implementation report (13) · S5-D5..D8 · BD-S49 · the merge + the deploy (the D-43 re-check first; the record in DEPLOY.md).
+
 ## 2026-11-2x — Gold UX Redesign S5 (the second sitting: M3b-0 the Zone O tail split + M3b the hero rebuild; the session STOPPED at the Q4 gate)
 
 - **M3b-0 the tail split (`f4188a4c`):** the Episode Explorer + the if-you'd-bought calculator + the publication-notes disclosure moved behind `GoldTail`'s near-viewport lazy boundary — GoldPage 238.78/49.51 → 209.13/44.91 kB (the tail chunk 31.81/6.60); the sections' DOM, order, ids and collapsed-by-default shapes VERBATIM.

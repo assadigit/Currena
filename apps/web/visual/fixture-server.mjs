@@ -7,6 +7,10 @@
  *   (a) the BUILT SPA from apps/web/dist — or a clear 500 error page when
  *       dist/index.html is missing (run `pnpm --filter @currena/web build`),
  *   (b) GET /api/insights               → visual/fixtures/snapshot.json,
+ *       GET /api/insights/pages/gold   → visual/fixtures/gold-projection.json
+ *                                        (GUX-S5: the gold page's S2 projection),
+ *       GET /api/insights/gold-ohlc    → visual/fixtures/gold-ohlc.json
+ *                                        (GUX-S5: the R18 XAUUSD daily bars),
  *   (c) GET /api/insights/:id/history   → visual/fixtures/history-<id>.json
  *       (missing id → 404 history_not_found, like production),
  *   (d) GET /api/insights/status        → visual/fixtures/status.json,
@@ -115,6 +119,17 @@ const server = http.createServer((req, res) => {
   if (pathname.startsWith('/api/')) {
     if (pathname === '/api/insights') {
       sendJson(res, 200, readFixture('snapshot.json'), { etag: '"fixture-insights"' });
+      return;
+    }
+    /* GUX-S5 M6 (the S5 screenshot set): the gold page's own feeds — the
+     * S2 projection + the R18 OHLC leg (the hero spark, the interactive
+     * chart, and the TA band's shared module-cached fetch). */
+    if (pathname === '/api/insights/pages/gold') {
+      sendJson(res, 200, readFixture('gold-projection.json'), { etag: '"fixture-gold-projection"' });
+      return;
+    }
+    if (pathname === '/api/insights/gold-ohlc') {
+      sendJson(res, 200, readFixture('gold-ohlc.json'), { etag: '"fixture-gold-ohlc"' });
       return;
     }
     if (pathname === '/api/insights/status') {

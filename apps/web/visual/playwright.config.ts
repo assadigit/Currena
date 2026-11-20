@@ -67,6 +67,16 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
     {
+      // GUX-S5 (docs/gold-redesign/13-session-5-implementation-report.md):
+      // the redesigned /gold page over the S5 fixture set (the gold
+      // projection + the OHLC leg) — en/fa × desktop/mobile × light/dark,
+      // the hero + the five-force section + the record sheet + the full
+      // page. The evidence lands in docs/gold-redesign/baseline-screenshots/s5/.
+      name: 'gux-s5',
+      testMatch: /gux-s5-screenshots\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // gold-balance GB-S3 (docs/specs/gold-balance-consolidation/): the
       // ?balance=lanes preview + the default view, EN/fa × 360/1280, on the
       // fixture snapshot overlaid with the recorded 2026-10-31 corpus

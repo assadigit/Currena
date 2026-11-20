@@ -37,7 +37,7 @@ import type { GoldBalanceLane, GoldLane, GoldBalanceReading } from '@currena/ins
 import { BriefingCard } from './BriefingCard';
 import { CompositionStack } from './CompositionStack';
 import { briefingEvidenceOf, briefingNarrowLaneOf, briefingReasonsOf } from './gold-briefing';
-import type { GoldHeroModel, GoldHeroVerdictState } from './gold-tiles';
+import type { GoldHeroModel } from './gold-tiles';
 import { useI18n } from '../../shared/lib/locale';
 
 afterEach(cleanup);
@@ -71,7 +71,7 @@ function lane(
   const supports = members.filter((m) => m.impact === 'supports').length;
   const pressures = members.filter((m) => m.impact === 'pressures').length;
   const steady = members.filter((m) => m.impact === 'steady').length;
-  const unread = members.filter((m) => m.impact === 'unread').length;
+
   return {
     lane: id,
     side,

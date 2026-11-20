@@ -29,20 +29,11 @@
 
 import { useState } from 'react';
 import { useI18n } from '../../shared/lib/locale';
-import type { TranslationKey } from '../../shared/lib/locale';
 import type { GoldHeroModel, GoldHeroVerdictState } from './gold-tiles';
 import { goldHeroTilt } from './gold-tiles';
 import { GoldBalanceClassic } from './GoldBalanceClassic';
 import { BeamGlyph } from './BeamGlyph';
 import { LaneBar, laneBarDataOf } from './LaneBar';
-
-const VERDICT_WORD_KEY: Readonly<Record<GoldHeroVerdictState, TranslationKey>> = {
-  for: 'pd.gold.heroVerdictFor',
-  balanced: 'pd.gold.heroVerdictBalanced',
-  against: 'pd.gold.heroVerdictAgainst',
-  none: 'pd.gold.heroVerdictNone',
-  'not-enough': 'pd.gold.heroNotEnough',
-};
 
 const VERDICT_TONE: Readonly<Record<string, string>> = {
   for: 'text-[var(--color-status-normal)]',
