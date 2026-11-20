@@ -104,10 +104,10 @@ export default defineConfig({
       // running), the token rule, the overflow sanctity, the touch
       // floors, the LABEL contract (expanded), the inspector readout,
       // the sheet's two geometries, the color-not-alone structure, and
-      // reduced motion. The screenshot captures ride their own project
-      // (gux-s8-screenshots.plw.ts, matched by this same entry).
+      // reduced motion. The screenshot captures and the honest-states
+      // evidence ride their own files (matched by this same entry).
       name: 'gux-s8',
-      testMatch: /gux-s8-(checks|screenshots)\.plw\.ts$/,
+      testMatch: /gux-s8-(checks|screenshots|states)\.plw\.ts$/,
       use: { browserName: 'chromium' },
     },
     {
