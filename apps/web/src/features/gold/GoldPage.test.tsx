@@ -723,18 +723,21 @@ describe('GoldPage', () => {
     await waitFor(() => {
       expect(document.querySelectorAll('[data-seat]').length).toBe(37);
     });
-    // The gold page's own seats link their context cards in-page.
-    const goldSilver = document.querySelector('a[data-seat="gold-silver"]');
-    expect(goldSilver?.getAttribute('href')).toBe('#gold-card-gold-silver');
+    // GUX-S5 M4: the seat link is now its own footnote row on the card
+    // (the CARD is the record-sheet opener; the link keeps the SAME
+    // href/title/name-match contract — the selector follows the link's
+    // own data-seat-home attribute).
+    const goldSilver = document.querySelector('a[data-seat-home][href="#gold-card-gold-silver"]');
+    expect(goldSilver).not.toBeNull();
     // The cross-page seats link the destination card's OWN anchor.
-    const dollarBasket = document.querySelector('a[data-seat="dollar-basket"]');
-    expect(dollarBasket?.getAttribute('href')).toBe('/currencies#currencies-card-dollar-basket');
-    const fedTarget = document.querySelector('a[data-seat="fed-target"]');
-    expect(fedTarget?.getAttribute('href')).toBe('/usa#usa-card-fed-target');
-    const ecbDfr = document.querySelector('a[data-seat="ecb-dfr"]');
-    expect(ecbDfr?.getAttribute('href')).toBe('/europe#europe-card-ecb-dfr');
-    const gprDaily = document.querySelector('a[data-seat="gpr-daily"]');
-    expect(gprDaily?.getAttribute('href')).toBe('/world-markets#wm-risk-gpr-daily');
+    const dollarBasket = document.querySelector('a[data-seat-home][href="/currencies#currencies-card-dollar-basket"]');
+    expect(dollarBasket).not.toBeNull();
+    const fedTarget = document.querySelector('a[data-seat-home][href="/usa#usa-card-fed-target"]');
+    expect(fedTarget).not.toBeNull();
+    const ecbDfr = document.querySelector('a[data-seat-home][href="/europe#europe-card-ecb-dfr"]');
+    expect(ecbDfr).not.toBeNull();
+    const gprDaily = document.querySelector('a[data-seat-home][href="/world-markets#wm-risk-gpr-daily"]');
+    expect(gprDaily).not.toBeNull();
     // The GPE-S2-18 name-match: the tooltip + accessible name carry the
     // DESTINATION CARD'S OWN TITLE (the same key the card renders).
     const destTitle = dollarBasket?.getAttribute('title') ?? '';
@@ -745,7 +748,7 @@ describe('GoldPage', () => {
       expect(document.getElementById(`lane-${lane}`), `#lane-${lane}`).toBeTruthy();
     }
     // Every one of the 37 seats links a card-level anchor (never a bare page).
-    const hrefs = [...document.querySelectorAll('a[data-seat][data-seat-home]')].map((a) => a.getAttribute('href') ?? '');
+    const hrefs = [...document.querySelectorAll('a[data-seat-home]')].map((a) => a.getAttribute('href') ?? '');
     expect(hrefs).toHaveLength(37);
     for (const href of hrefs) {
       expect(href, 'every seat href carries a card-level #hash').toContain('#');

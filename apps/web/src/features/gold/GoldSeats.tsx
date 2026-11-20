@@ -1,35 +1,58 @@
 /**
- * GoldSeats — the 37 voter seats grouped by the five lanes (page-division
- * S5, 2026-11-08 — spec §5 item 2 / D-26: borrowing-costs 7 · dollar 7 ·
- * stress 11 · inflation 10 · flows 2).
+ * GoldSeats — the five-force overview, REBUILT (GUX-S5 M4, 11 §5.3/§7
+ * + 12 §2 + the F-04 fix): each lane renders as ONE LaneBar summary
+ * (the M2 primitive — the ONE lane renderer, everywhere) above its
+ * CLOSED member cards (the 11 §7.3 anatomy: plainLabel · state word in
+ * impact ink · the mark · the 09 defaultCopy · the AsOfChip — complete
+ * without opening anything), every card opening the GoldRecordSheet
+ * (the 09 expanded + technical tiers, the lazy deep content).
  *
- * Every seat chip carries the engine's own line: the voter's name, its
- * lean (supports / pressures / not-leaning / couldn't-be-read — the
- * gold-balance vocabulary, corpus-pinned), and the evaluator's evidence
- * word (rising / falling / high in its decade / low in its decade) when
- * the seat fires. Each chip is a REAL link to the seat's home card
- * (03-STRATEGY-LOG §7 wrap-up note 4) — the home page derived from the
- * placement table (gold-tiles' homePage), never hand-copied; a seat whose
- * home card lives on THIS page (gold-silver · the CFTC pair) links to the
- * context card's in-page anchor.
+ * WHAT THIS REPLACES (the F-04 fix executed): the always-visible
+ * 37-chip wall — mostly-steady chips the visitor had to interpret to
+ * find the conclusion. The lane SUMMARY now answers "how does this
+ * force lean" at a glance (the LaneBar's state word + stacked pill +
+ * tally); the member cards carry the honest per-seat detail at the
+ * default tier (the mark + the 09 record's own plain words), one tap
+ * from the full record.
  *
- * The lane cards state the engine's own lane vote (side word + tally +
- * the one-sentence lane intro), the MIN2 crowd minimum speaking through
- * the tally line ("{firing} of {readable} drivers firing"). Unread seats
- * render with their honest word — never a guess (Agent Rule 5).
+ * WHAT SURVIVES VERBATIM: the R10 anchor contract (`lane-{lane}` ids +
+ * `#gold-seats` + the CompositionStack's ledger link target); the
+ * GPE-S2-18 name-match rule on every seat link; the GPE R04 why-lines
+ * under dark seats; the R05 adjacent-months method label; the R17 keep
+ * (no lane intro/tally chrome — the LaneBar carries the summary now);
+ * the corpus-pinned vocabulary (the copy-pin test still pins every
+ * word). The seat links keep their card-level cross-page behavior; the
+ * CARD (not the link) is the record-sheet opener (11 §7.2).
  */
 
-import { useMemo } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 import type { GoldLane } from '@currena/insights';
 import type { IndicatorReading } from '@currena/core';
-import { formatNumber } from '@currena/core';
+import { formatDateWords, formatJalaliDate } from '@currena/core';
 import { interpolate } from '../../shared/i18n';
 import { useI18n } from '../../shared/lib/locale';
 import { navigate } from '../../router';
 import type { TranslationKey } from '../../shared/lib/locale';
-import { GOLD_SEAT_DEST_NAME_KEY, seatAnchorHref, seatUnreadWhy, type GoldSeat, type GoldSeatLane, type GoldVoterId, type SeatUnreadCause } from './gold-tiles';
+import {
+  GOLD_SEAT_DEST_NAME_KEY,
+  seatAnchorHref,
+  seatUnreadWhy,
+  type GoldSeat,
+  type GoldSeatLane,
+  type GoldVoterId,
+  type SeatUnreadCause,
+} from './gold-tiles';
 import { yoyGapBaseLabel } from '../../shared/lib/yoy-gap';
 import { stageAnchorScroll } from '../../shared/lib/anchor-scroll';
+import { LaneBar, laneBarDataOfSeatLane } from './LaneBar';
+import { SeatMark } from './SeatMark';
+/* GUX-S5 M4 (the raw-budget split): the sheet's chrome rides its OWN
+ * lazy chunk — the opener's first click pays for it together with the
+ * deep content (one load, one wait); the 37 closed cards stay eager. */
+const GoldRecordSheet = lazy(() => import('./GoldRecordSheet').then((m) => ({ default: m.GoldRecordSheet })));
+import type { GoldRecordSheetState } from './GoldRecordSheet';
+import { goldBrief } from './content/gold-content';
+import { AsOfChip, type AsOfState } from './AsOfChip';
 
 /* The lane copy keys — five lanes, the corpus's own names + intros.
  * S6: exported for the hero's classic balance view (the same lane
@@ -113,13 +136,6 @@ export const LANE_STATE_KEY: Readonly<Record<GoldSeatLane['side'], TranslationKe
   unread: 'pd.gold.laneStateUnread',
 };
 
-const LANE_STATE_TONE: Record<string, string> = {
-  for: 'text-[var(--color-status-normal)]',
-  against: 'text-[var(--color-status-alert)]',
-  neutral: 'text-[var(--color-text-secondary)]',
-  unread: 'text-[var(--color-text-tertiary)]',
-};
-
 /** The voter-name dictionary key for a seat id (37 literal keys — the
  *  copy-pin test iterates GOLD_VOTER_IDS and proves every key exists and
  *  matches the corpus). S6: exported for the hero's classic balance view
@@ -164,192 +180,189 @@ export const VOTER_NAME_KEY: Readonly<Record<GoldVoterId, TranslationKey>> = {
   'cftc-gold-gross-long': 'pd.gold.voterNames.cftc-gold-gross-long',
 };
 
-/** The seat chip's link: the home page's route, or the in-page context
- *  anchor when the seat's home card lives on THIS page (gold-silver ·
- *  the CFTC pair — the placement's own gold group). Fail-closed: an
- *  unplaced id renders no link. */
-/* GPE R10 (INF-3, s7/03 §1.2): the seat link is CARD-LEVEL — the pure
- * builder in gold-tiles.ts composes the destination route + the card's
- * own stable anchor (`/usa#usa-card-real-yield-10y`; the gold page's own
- * context seats link in-page `#gold-card-gold-silver`). GPE-S2-18: the
- * reader lands ON the card, never at the top of a long page. */
-function seatHref(seat: GoldSeat): string | null {
-  return seatAnchorHref(seat);
+/** The reading's freshness state for the AsOfChip (11 §6.4's four-state
+ *  word, derived from the reading's own status + asOf — a word, never
+ *  an icon or a new color). */
+function asOfStateOf(reading: IndicatorReading | undefined): AsOfState | undefined {
+  if (reading === undefined || reading.asOf === null) return 'waiting';
+  if (reading.status === 'stale' || reading.status === 'unavailable') return 'stale';
+  if (reading.status === 'warning' || reading.status === 'check-pending') return 'delayed';
+  return 'fresh';
 }
 
 /* ------------------------------------------------------------------ *
- * One seat chip
+ * One closed member card (11 §7.3) — the default tier, complete
+ * without opening anything; the whole card opens the record sheet.
  * ------------------------------------------------------------------ */
 
-function SeatChip({
+function SeatCard({
   seat,
   reading,
+  onOpenRecord,
 }: {
   seat: GoldSeat;
-  /** The seat's own reading from the page projection — the why-line's
-   * status metadata (GPE R04). Undefined when the id is absent. */
   reading: IndicatorReading | undefined;
+  /** Opens the GoldRecordSheet (the 09 expanded + technical tiers). */
+  onOpenRecord: (id: GoldVoterId, opener: HTMLElement) => void;
 }): React.JSX.Element {
-  const { t, numberLocale } = useI18n();
+  const { t, locale } = useI18n();
   const name = t(VOTER_NAME_KEY[seat.id]);
   const leanWord = t(SEAT_LEAN_KEY[seat.impact]);
   const evidenceWord = seat.evidence !== null ? t(EVIDENCE_KEY[seat.evidence]) : null;
-  const href = seatHref(seat);
-  /* GPE R10 (the GPE-S2-18 name-match): the destination card's OWN title
-   * (the same key the card renders) rides the tooltip + the accessible
-   * name — the reader knows exactly which card the anchor opens. */
+  const brief = goldBrief(locale)[seat.id];
+  const href = seatAnchorHref(seat);
   const destName = t(GOLD_SEAT_DEST_NAME_KEY[seat.id]);
-  /* GPE R04 (F16a): the dark seat's why-line — one muted status line
-   * naming the cause class (upstream-stopped / upstream-gap /
-   * pipeline-lag / rule-driven), derived from the projection's own
-   * reading metadata where possible. Only a dark seat carries one. */
   const why = seatUnreadWhy(seat, reading);
-  const whyWord = why !== null ? seatWhyText(why.cause, why.month, t, numberLocale) : null;
-  /* GPE R05 (S4-D1): a LIT CPI seat computed against the
-   * adjacent-months-average base carries its method label at point of
-   * use — «مبنا: میانگین دو ماه مجاور (شکست انتشار مهر ۱۴۰۴)» — the
-   * disclosure that lights the seat honestly (pairs with R04: the
-   * upstream-gap why-line spoke while it was dark). */
-  const methodWord = reading !== undefined ? yoyGapBaseLabel(reading, t, numberLocale) : null;
-  // The chip's accessible name carries the WHOLE reading: the voter, its
-  // lean and its evidence — screen readers never meet a bare name.
-  const aria =
-    evidenceWord !== null
-      ? `${name} — ${leanWord} · ${evidenceWord}`
-      : whyWord !== null
-        ? `${name} — ${leanWord} · ${whyWord}`
-        : methodWord !== null
-          ? `${name} — ${leanWord} · ${methodWord}`
-          : `${name} — ${leanWord}`;
-  const inner = (
-    <>
-      <span className="text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</span>
-      {/* The lean + evidence words wrap COMPLETE — the S5 VLM pass caught
-       * the first build's truncate clipping them mid-word ("Supports go… ·
-       * high in it…"); a seat chip states its whole reading, never a
-       * clipped fragment (D-26: name · lean · evidence word). */}
-      <span className={`flex flex-col gap-0.5 text-[length:var(--type-caption)] font-semibold leading-tight ${SEAT_LEAN_TONE[seat.impact]}`}>
-        <span>{leanWord}</span>
-        {evidenceWord !== null ? <span className="text-[var(--color-text-tertiary)]">{evidenceWord}</span> : null}
-        {/* GPE R04: the why-unread line — the muted cause sentence under
-         * the dark seat's lean word (never under a readable seat). */}
-        {whyWord !== null ? (
-          <span className="font-normal text-[var(--color-text-tertiary)]" data-seat-why={why!.cause}>
-            {whyWord}
-          </span>
-        ) : null}
-        {/* GPE R05: the gap-base method label — the lit CPI seat's
-         * disclosed method, only when the reading used the
-         * adjacent-months-average base. */}
-        {methodWord !== null ? (
-          <span className="font-normal text-[var(--color-text-tertiary)]" data-seat-method="adjacent-months-average">
-            {methodWord}
-          </span>
-        ) : null}
-      </span>
-    </>
-  );
-  // A real link (the house pattern — REAL hrefs, the path-router's
-  // navigate() takes over in-app); a seat with no home renders the same
-  // chip without a link (fail-closed, never a dead anchor).
-  if (href === null) {
-    return (
-      <li
-        data-seat={seat.id}
-        data-seat-impact={seat.impact}
-        className="flex min-h-[44px] min-w-[156px] flex-1 flex-col justify-center gap-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]"
-        aria-label={aria}
-      >
-        {inner}
-      </li>
-    );
-  }
+  const monthLocale = numberLocaleOf();
+  const whyWord = why !== null ? seatWhyText(why.cause, why.month, t, monthLocale) : null;
+  const methodWord = reading !== undefined ? yoyGapBaseLabel(reading, t, monthLocale) : null;
+
+  // The AsOfChip's time — the reading's own asOf, the page's calendar.
+  const asOfText =
+    reading?.asOf != null
+      ? locale === 'fa'
+        ? formatJalaliDate(reading.asOf, 'fa-IR')
+        : formatDateWords(reading.asOf, 'en-US')
+      : undefined;
+
+  // The mark model (12 §2's kind map reads the seat id inside SeatMark).
+  const mark = {
+    impact: seat.impact,
+    percentile: reading?.percentile10y,
+    value: reading?.value ?? null,
+    change30d: reading?.change30d,
+    label: name,
+  };
+
   return (
-    <li className="min-w-[156px] flex-1">
-      <a
-        href={href}
-        data-seat={seat.id}
-        data-seat-impact={seat.impact}
-        data-seat-home={seat.homePage}
-        aria-label={`${aria}. ${destName}`}
-        title={destName}
-        onClick={(e) => {
-          if (href.startsWith('#')) return; // the in-page anchor scrolls natively.
-          e.preventDefault();
-          // GPE R10: the cross-page card anchor — the real href keeps the
-          // #hash (AT, new-tab, honest link semantics); the router takes
-          // the ROUTE and the staged anchor scrolls to the card once it
-          // lays out (the Footer→About pattern, generalized).
-          const hashAt = href.indexOf('#');
-          if (hashAt !== -1) stageAnchorScroll(href.slice(hashAt + 1));
-          navigate(href.slice(0, hashAt === -1 ? undefined : hashAt));
-        }}
-        className="insights-focusable flex min-h-[44px] cursor-pointer flex-col justify-center gap-0.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 no-underline ring-1 ring-[var(--color-border)] motion-safe:transition-shadow hover:shadow-[0_2px_10px_rgba(15,23,42,0.08)]"
-      >
-        {inner}
-      </a>
-    </li>
+    <article
+      data-seat={seat.id}
+      data-seat-impact={seat.impact}
+      className="relative flex min-w-0 flex-col gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)]"
+    >
+      {/* The label row: the plainLabel + the state word in its impact ink
+       * (the two-channel rule — the word names the lean, the ink the
+       * relationship to gold; geometry never carries meaning alone). */}
+      <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+        <h4 className="m-0 min-w-0 text-[length:var(--type-label)] font-bold leading-tight text-[var(--color-text-primary)]">{name}</h4>
+        <span className={`text-[length:var(--type-caption)] font-bold ${SEAT_LEAN_TONE[seat.impact]}`} data-seat-lean>
+          {leanWord}
+          {evidenceWord !== null ? <span className="ms-1 font-semibold text-[var(--color-text-tertiary)]">· {evidenceWord}</span> : null}
+        </span>
+      </div>
+
+      {/* The mark (12 §2's per-seat form). */}
+      <SeatMark id={seat.id} model={mark} />
+
+      {/* The evidence word line + the 09 defaultCopy — the closed card's
+       * complete explanation, never a teaser. */}
+      {evidenceWord !== null ? (
+        <p className="m-0 text-[length:var(--type-caption)] font-semibold leading-snug text-[var(--color-text-secondary)]" data-seat-evidence>
+          {evidenceWord}
+        </p>
+      ) : null}
+      {whyWord !== null ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-tertiary)]" data-seat-why={why!.cause}>
+          {whyWord}
+        </p>
+      ) : null}
+      {methodWord !== null ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-tertiary)]" data-seat-method="adjacent-months-average">
+          {methodWord}
+        </p>
+      ) : null}
+      {brief !== undefined ? (
+        <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-secondary)]" data-seat-copy>
+          {brief.defaultCopy}
+        </p>
+      ) : null}
+
+      {/* The freshness grammar (ONE chip per card — 11 §6.4). */}
+      <AsOfChip asOf={asOfText} state={asOfStateOf(reading)} data-asof-chip={`seat-${seat.id}`} />
+
+      {/* The R10 seat link — its own footnote row, ABOVE the sheet
+       * opener in z-order (both affordances stay reachable; the link
+       * keeps the cross-page card-anchor behavior, 11 §7.2). */}
+      {href !== null ? (
+        <a
+          href={href}
+          data-seat-home={seat.homePage}
+          aria-label={`${t('pd.gold.seatLink')}: ${destName}`}
+          title={destName}
+          onClick={(e) => {
+            if (href.startsWith('#')) return;
+            e.preventDefault();
+            const hashAt = href.indexOf('#');
+            if (hashAt !== -1) stageAnchorScroll(href.slice(hashAt + 1));
+            navigate(href.slice(0, hashAt === -1 ? undefined : hashAt));
+          }}
+          className="insights-focusable relative z-10 self-start rounded text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
+        >
+          {t('pd.gold.seatLink')} ↗
+        </a>
+      ) : null}
+
+      {/* The sheet opener — the whole card (the shipped stretched-button
+       * pattern, 11 §7.2). */}
+      <button
+        type="button"
+        onClick={(e) => onOpenRecord(seat.id, e.currentTarget)}
+        aria-haspopup="dialog"
+        aria-label={`${t('pd.gold.sheetOpenLabel')}: ${name}`}
+        className="insights-focusable absolute inset-0 z-0 cursor-pointer rounded-[var(--radius-md)] bg-transparent transition-shadow hover:ring-1 hover:ring-currena-blue/40"
+        data-seat-open
+      />
+    </article>
   );
 }
 
+/** The why-line's month format follows the APP locale (Jalali months in
+ *  fa) — read from the document's own lang attribute (the app store sets
+ *  it; jsdom-safe, no matchMedia). */
+function numberLocaleOf(): 'en-US' | 'fa-IR' {
+  return document.documentElement.getAttribute('lang') === 'fa' ? 'fa-IR' : 'en-US';
+}
+
 /* ------------------------------------------------------------------ *
- * One lane card
+ * One lane: the LaneBar summary + the member cards
  * ------------------------------------------------------------------ */
 
-function LaneCard({
+function LaneBlock({
   lane,
   readingsById,
+  onOpenRecord,
 }: {
   lane: GoldSeatLane;
-  /** The projection's readings by id — the why-lines' status metadata
-   * (GPE R04), threaded from the page. */
   readingsById: ReadonlyMap<string, IndicatorReading>;
+  onOpenRecord: (id: GoldVoterId, opener: HTMLElement) => void;
 }): React.JSX.Element {
-  const { t, numberLocale } = useI18n();
-  const num = (n: number): string => formatNumber(n, numberLocale, { maximumFractionDigits: 0 });
+  const { t } = useI18n();
   const title = t(LANE_TITLE_KEY[lane.lane]);
-
-  /* GPE R17 / #21 (S6-D5, the space donor): the third balance rendering's
-   * duplicated chrome is GONE — the lane INTRO sentence and the TALLY
-   * line drop (byte-identical to the Signals section's expandable ledger
-   * rows, where they keep rendering); what stays is exactly the keep-list:
-   * the lane header + the verdict state word + the seats list (s6/01 §4
-   * rule 5). The hero's and the Signals renderings keep theirs — the
-   * balance is said twice with full grammar, and this section reads as
-   * the meter's evidence. */
-
-  // The lane's state word: for/against/neutral/unread — split reads its
-  // own word with the contest counts (the OI-2 disclosure).
-  const stateWord =
-    lane.split === true
-      ? interpolate(t('pd.gold.laneStateSplit'), { supports: num(lane.supports), pressures: num(lane.pressures) })
-      : t(LANE_STATE_KEY[lane.side]);
-  const stateTone = lane.split === true ? 'text-[var(--color-status-watch)]' : LANE_STATE_TONE[lane.side] ?? '';
-
+  const summary = laneBarDataOfSeatLane(lane);
   return (
     <section
       id={`lane-${lane.lane}`}
       aria-labelledby={`gold-lane-${lane.lane}-title`}
       data-lane={lane.lane}
       data-lane-side={lane.split === true ? 'split' : lane.side}
-      className="flex min-w-0 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-3.5"
+      className="flex min-w-0 flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)]/60 p-3 ring-1 ring-[var(--color-border)] sm:p-3.5"
     >
-      <header className="flex min-w-0 flex-col gap-0.5">
+      <header className="flex min-w-0 flex-col gap-1.5">
         <h3 id={`gold-lane-${lane.lane}-title`} className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
           {title}
-          <span className="ms-1.5 font-semibold text-[var(--color-text-tertiary)]">· {num(lane.seats.length)}</span>
         </h3>
-        <p className="m-0">
-          <span className={`text-[length:var(--type-caption)] font-bold ${stateTone}`} data-lane-state>
-            {stateWord}
-          </span>
-        </p>
+        {/* The ONE lane renderer (11 §5.3): the LaneBar carries the
+         * summary — the lane's own condition word, the stacked pill,
+         * the tally. The R17 keep holds: no intro, no tally chrome —
+         * the LaneBar IS the summary now. */}
+        <LaneBar data={summary} />
       </header>
-      <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
+      {/* The member cards: 1-col mobile, 2-col ≥ sm inside the lane. */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {lane.seats.map((seat) => (
-          <SeatChip key={seat.id} seat={seat} reading={readingsById.get(seat.id)} />
+          <SeatCard key={seat.id} seat={seat} reading={readingsById.get(seat.id)} onOpenRecord={onOpenRecord} />
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
@@ -368,22 +381,50 @@ export function GoldSeats({
    * derived from the reading where possible, else the curated map). */
   readings?: readonly IndicatorReading[];
 }): React.JSX.Element {
-  const { t } = useI18n();
+  const { t, locale, numberLocale } = useI18n();
+  const [sheet, setSheet] = useState<GoldRecordSheetState | null>(null);
   const readingsById = useMemo(
     () => new Map((readings ?? []).map((r) => [r.id as string, r])),
     [readings],
   );
+
+  const openRecord = (id: GoldVoterId, opener: HTMLElement): void => {
+    const seat = lanes.flatMap((l) => [...l.seats]).find((s) => s.id === id);
+    if (seat === undefined) return; // fail-closed — only seated voters open
+    const reading = readingsById.get(id);
+    setSheet({
+      id,
+      opener,
+      reading,
+      mark: {
+        impact: seat.impact,
+        percentile: reading?.percentile10y,
+        value: reading?.value ?? null,
+        change30d: reading?.change30d,
+        label: t(VOTER_NAME_KEY[seat.id]),
+      },
+    });
+  };
+
   return (
-    <section id="gold-seats" aria-label={t('pd.gold.seatsAria')} data-gold-seats className="flex flex-col gap-2.5 sm:gap-3 scroll-mt-24">
+    <section id="gold-seats" aria-label={t('pd.gold.seatsAria')} data-gold-seats className="flex flex-col gap-2.5 scroll-mt-24 sm:gap-3">
       <h2 className="m-0 text-base font-extrabold text-[var(--color-text-primary)] sm:text-lg">{t('pd.gold.lanesTitle')}</h2>
-      {/* The five lane cards: 1-col on mobile, 2-col from lg (the stress
-       * lane's 11 chips and the inflation lane's 10 wrap inside their own
-       * cards — every seat chip always visible, nothing collapsed). */}
+      {/* The five lane blocks: 1-col mobile, 2-col ≥ lg (the stress and
+       * inflation lanes' cards wrap inside their own blocks — the
+       * LaneBar summaries first, the F-04 fix's glance-then-detail). */}
       <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-2 lg:gap-3">
         {lanes.map((lane) => (
-          <LaneCard key={lane.lane} lane={lane} readingsById={readingsById} />
+          <LaneBlock key={lane.lane} lane={lane} readingsById={readingsById} onOpenRecord={openRecord} />
         ))}
       </div>
+      {sheet !== null ? (
+        <Suspense fallback={null}>
+          <GoldRecordSheet state={sheet} onClose={() => setSheet(null)} />
+        </Suspense>
+      ) : null}
+      {/* The locale pin for the why-line month format (the helper reads
+       * documentElement.lang — keep it honest with the store). */}
+      <span hidden data-gold-seats-locale={locale} data-gold-seats-number-locale={numberLocale} />
     </section>
   );
 }
