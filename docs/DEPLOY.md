@@ -6099,3 +6099,13 @@ session 4.**
 **The live verification (all GREEN):** `/api/health` 200 · `/api/insights/pages/gold` 200 · `/api/rates` 200 · `gold-cb` 200 · `gold-episodes` 503 (the designed WGC-workbook waiting state) · the served entry `index-bf4v3n6F.js` byte-matches the fresh dist · **the served explorer chunk `GoldRelationships-E0PhavB5.js` byte-verified identical** (cmp clean) — the S6 surfaces are live. Rollback: `4454212a` (the S4-close build) remains a version away.
 
 **The tree:** `origin/main` = `cfb8d946` (the S6 merge; 8 commits — M1 the explorer + the boundary, M2 the context bands, M3 the decision records, M4 the fa gap, M5 the nav spy, M6 the close + the bookkeeping). Credentials used for the GitHub push + the deploy + the verification probes, never stored (AGENTS.md §7).
+
+## Session record — 2026-11-2x-e GUX-S7 the deploy: the owner's Q1 answer live + the lower-page patterns live
+
+**The D-43 re-check (FIRST):** production was still **`dc5bc04e` @ 100%** (the S6-close secret-put version) — no drift.
+
+**The deploy:** `pnpm --filter @currena/web build` → `wrangler deploy` (first attempt clean) → currena-api **`38daf0bb`** (21:5x UTC). **The EODHD re-put on BOTH workers** (the standing rotation lever): currena-api now active **`f7ea508d` @ 100%** (the secret-put's version); currena-markets secret-only (code unchanged, not deployed).
+
+**The live verification (all GREEN):** `/api/health` 200 · `/api/insights/pages/gold` 200 · `/api/rates` 200 · the served entry `index-BlOQAGa3.js` matches the fresh dist · **the served `GoldPage-CdXbdA3z.js` byte-verified identical** (cmp clean, resolved through the entry's own chunk map — the S7 surfaces are live: the five-state word, the bridge chrome, the LaneBar closes, the probability bars). Rollback: `dc5bc04e` remains a version away.
+
+**The tree:** `origin/main` = `5a7c3a05` (the S7 merge). Credentials used for the GitHub push + the deploy + the verification probes, never stored (AGENTS.md §7).
