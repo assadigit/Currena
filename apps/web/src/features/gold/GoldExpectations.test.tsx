@@ -186,4 +186,39 @@ describe('GoldExpectations (the component)', () => {
     const detail = document.querySelector('[data-expect-detail]')!;
     expect(detail.querySelector('[data-expect-mismatch]')?.textContent).toContain('differ');
   });
+
+  /* ---------------------------------------------------------------- *
+   * GUX-S7 M4 — the ProbabilityRow set (12 §3.3 row 4)
+   * ---------------------------------------------------------------- */
+
+  it('GUX-S7 M4: every outcome row carries the probability bar — neutral ink, the fill = the venue\u2019s own implied probability, the leading row emphasized', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify(snapshot), { status: 200, headers: { 'content-type': 'application/json' } })),
+    );
+    renderWithLocale(<GoldExpectations calendar={calendar} />);
+    await waitFor(() => expect(document.querySelector('[data-expect-topline]')).not.toBeNull());
+    await fireEvent.click(screen.getByRole('button', { name: /show the market/i }));
+    const rows = [...document.querySelectorAll('[data-expect-row]')];
+    expect(rows.length).toBe(5);
+    for (const row of rows) {
+      const bar = row.querySelector('[data-expect-prob-row]')!;
+      expect(bar).not.toBeNull();
+      // Neutral analytical ink — never a market hue.
+      const fill = bar.querySelector('[data-expect-prob-fill]') as HTMLElement;
+      expect(fill.className).toContain('bg-[var(--color-text-secondary)]');
+      expect(fill.className).not.toContain('status-normal');
+      expect(fill.className).not.toContain('status-alert');
+      // The aria names the row in words.
+      expect(bar.getAttribute('aria-label')).toContain('%');
+    }
+    // The leading row is emphasized (the venue's own leader — hike25 at 91.5%).
+    const leading = document.querySelector('[data-expect-leading]')!;
+    expect(leading.getAttribute('data-expect-row')).toBe('m2');
+    // The fill width tracks the implied probability.
+    const pct = Number(leading.querySelector('[data-expect-prob-row]')!.getAttribute('data-expect-prob-pct'));
+    expect(pct).toBeCloseTo(91.5, 5);
+    const fillWidth = (leading.querySelector('[data-expect-prob-fill]') as HTMLElement).style.width;
+    expect(fillWidth).toBe('91.5%');
+  });
 });
