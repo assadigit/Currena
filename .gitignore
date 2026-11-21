@@ -65,3 +65,8 @@ packages/insights/fixtures/markets-live/
 # JSON served by the sandbox Next.js preview host's currena-data service.
 # Regenerable provider data, never committed (same rule as markets-live).
 data/local-preview/
+
+# --- the sandbox agent-skills folder (2026-11-21, GIE-S1): local tooling
+# documentation only — never part of the Currena repo; the lint gate must
+# not sweep it. (The session-sandbox copies its skills here; untracked.)
+skills/
