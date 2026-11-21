@@ -1,42 +1,39 @@
 /**
- * signals/MergedCard — the ONE merged gold-and-silver card, carrying the
- * GOLD balance visual (v3 UI_SPEC §9/UI-45 × the owner's v7 BalanceScale
- * machinery, 2026-10-19 v3 merge).
+ * signals/MergedCard — the ONE gold conditions card, carrying the
+ * measured note + the interactive chart + the price footing (v3
+ * UI_SPEC §9/UI-45 × the owner's v7 BalanceScale machinery, 2026-10-19
+ * v3 merge; the history rides the file’s own block comments below).
  *
- * History: R26 merged the two metals' cards into one (shared conditions
- * listed once + per-metal footing rows); round 23's VerdictStrip (the
- * estimation chips) stayed as the card's answer-first block and the
- * 2026-10-20 owner sketch redrew it as the per-metal analysis cards with
- * prices. The balance visual then lived through the owner's seven
- * wireframe iterations (v1 spec → the v7 "rotate the beam only, visualize
- * weight" addendum — pans hung from the beam, SVG mechanical layer,
- * needle + three-tick arc gauge; all of that machinery is KEPT verbatim).
- * The v3 UI_SPEC §9 owner decision gave gold and silver each their OWN
- * balance (UI-45) — the 2026-10-21c owner round RETIRES THE SILVER
- * BALANCE entirely ("I dont need balance scale of Silver, remove that
- * section entirely"): gold keeps its balance; silver keeps its analysis
- * card (VerdictStrip) and its footing row — the silver-only industrial
- * condition no longer needs a pan, so it does not render here at all.
- * The honesty rules hold on the gold balance (UI-40: readable < 3 →
- * level beam + the not-enough line, implemented inside BalanceScale);
- * the readable-count line always states the evidence (UI-39.5); the
- * price-footing strip stays below as the owner's own v1-spec structure
- * (footing is never a driver).
+ * GUX-S10 (Q3-A, the owner's 2026-11-2x answer — the ratio-only home):
+ * the card is GOLD-ONLY. The R26 merged gold-and-silver structure
+ * (mergeSignals: the shared four global conditions listed once + the
+ * per-metal footing rows + the silver-only industrial condition)
+ * RETIRED from /gold — silver lives in the seats it already owns
+ * honestly (the gold-silver ratio seat, the if-you'd-bought row, the
+ * London vault's silver row), and the OI-4-protected silver sentence
+ * is consciously ended on this page (the owner's recorded call). The
+ * surviving anatomy is the option's own enumeration — the chart (the
+ * interactive GoldPriceChart over the OHLC leg) + the measured note +
+ * the price footing (gold's row) — plus the card’s own gold furniture:
+ * the lane-model lean line, the C12 interaction banner and the five
+ * lane drill links. The honesty rules hold on the gold surfaces
+ * (UI-40/UI-39.5 ride the hero's instrument now — the second
+ * BalanceScale retired at S5-M5; the measured note and the no-forecast
+ * caveat stay visible without a tap).
  *
  * The Step-1 audit item C12 interaction note (gold near its decade high
- * while real yields sit high) stays inside gold's balance as its banner:
+ * while real yields sit high) stays inside the card as its banner:
  * the one named combination the separate condition lines cannot say by
  * construction.
  */
 
 import { useMemo } from 'react';
 import type { IndicatorId, IndicatorReading } from '@currena/core';
-import { formatNumber } from '@currena/core';
 import type { SignalConditionReading, SignalReading } from '@currena/insights';
 import { goldBalance } from '@currena/insights';
 import { interpolate } from '../../../shared/i18n';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
-import { formatChange, formatIndicatorValue, mergeSignals } from '../../../shared/config';
+import { formatChange, formatIndicatorValue } from '../../../shared/config';
 import { balanceVerdictCountsParts, balanceVerdictWordOf, type BalanceCounts } from './BalanceScale';
 import { ConditionIcon, LeanIcon, stateToneClass } from './icons';
 import { MetalIcon, VerdictStrip, goldOutlookOf } from './verdict';
@@ -69,19 +66,16 @@ const GOLD_BALANCE_BACKTEST_URL =
 
 export function MergedSignalsCard({
   gold,
-  silver,
   readings,
   copy,
   numberLocale,
 }: {
   gold: SignalReading;
-  silver: SignalReading;
   readings: readonly IndicatorReading[];
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
 }) {
   const s = copy.signals;
-  const merged = mergeSignals(gold, silver);
   const byId = new Map(readings.map((r) => [r.id as string, r]));
 
   /** The metal's current price, display-formatted — the VerdictStrip's
@@ -110,12 +104,9 @@ export function MergedSignalsCard({
    * (D-GB-6). The range evidence is UNCHANGED: the gold reading's own
    * speed/position, the exact inputs outlookOf reads today. Since the
    * GB-S6 flip this is THE derivation (the flag-off legacy path
-   * retired); outlookOf stays for silver ONLY (OI-4). */
+   * retired). GUX-S10 (Q3-A): /gold renders no outlook for silver at
+   * all — outlookOf stays exported for the engine-parity pins only. */
   const goldOutlook = goldOutlookOf(balance, gold.speed, gold.position);
-  /* Session 3 (G2) reuse: the inflation lane's context phrase — the
-   * breakeven tilt reading's own lean (pure selection in the insights
-   * package; the card never chooses copy). Absent/stale → no phrase. */
-
 
   /** The gold prose helper (GB-S6, the collapsed-corner decision): the
    * balance counts as a BalanceCounts shape for the shared rule helpers
@@ -128,32 +119,23 @@ export function MergedSignalsCard({
     readable: balance.readable,
   };
 
-  /** The metal's summary prose for the card header. Silver keeps the
-   * legacy per-condition sentence (its own model is unchanged, OI-4);
-   * gold's line joins the lane model with the flip — the legacy
-   * sentence counted FOOTING among 5 conditions, the circularity
-   * D-GB-5 removed, and would have contradicted the card's own counts
-   * line on the same card. */
-  const metalLeanLine = (reading: SignalReading): string => {
-    if (reading.metal !== 'gold') {
-      const leanWord = reading.lean !== null ? s.lean[reading.lean] : s.notEnoughData;
-      return interpolate(s.metalLean, {
-        metal: s.metals[reading.metal],
-        lean: leanWord,
-        met: formatNumber(reading.metCount, numberLocale, { maximumFractionDigits: 0 }),
-        total: formatNumber(reading.conditions.length, numberLocale, { maximumFractionDigits: 0 }),
-      });
-    }
-    return interpolate(s.metalLeanLanes, {
-      metal: s.metals.gold,
-      lean: balanceVerdictWordOf(laneCounts, copy),
-      counts: balanceVerdictCountsParts(laneCounts, copy, numberLocale).join(' · '),
-    });
-  };
+  /** The gold header prose (GB-S6, the collapsed-corner decision): the
+   * balance counts as a BalanceCounts shape for the shared rule helpers
+   * — the verdict word + the counts parts the card itself renders, so
+   * the summary prose can never drift from the card (one engine).
+   * GUX-S10 (Q3-A): the card's ONLY lean line — the silver legacy
+   * per-condition sentence retired with the silver sub-analysis
+   * (the OI-4-protected sentence is consciously ended on this page). */
+  const goldLeanLine = interpolate(s.metalLeanLanes, {
+    metal: s.metals.gold,
+    lean: balanceVerdictWordOf(laneCounts, copy),
+    counts: balanceVerdictCountsParts(laneCounts, copy, numberLocale).join(' · '),
+  });
 
   /** Gold's header lean icon rides the balance verdict (net for → up,
    * against → down, level/unreadable → flat) so the icon can never
-   * contradict the prose beside it; silver keeps its own lean. */
+   * contradict the prose beside it. GUX-S10 (Q3-A): the header's ONLY
+   * icon — silver's own-lean icon retired with its line. */
   const goldHeaderLean: 'mostly-supportive' | 'mostly-unsupportive' | 'mixed' =
     balance.net > 0 ? 'mostly-supportive' : balance.net < 0 ? 'mostly-unsupportive' : 'mixed';
 
@@ -178,7 +160,18 @@ export function MergedSignalsCard({
     return percentile > 0.8 ? copy.ui.positionHigh : percentile < 0.2 ? copy.ui.positionLow : copy.ui.positionTypical;
   };
 
-  const footingRow = (metal: 'gold' | 'silver', state: string, priceId: IndicatorId) => {
+  /** The gold footing row (owner spec §9): the price's own position in
+   * its 10-year range + its 30-day speed — context ONLY, never a driver
+   * (never counted in the balance's total/net/readable). GUX-S10
+   * (Q3-A): the strip's ONLY row — silver's footing row retired with
+   * the rest of its sub-analysis; silver's price surfaces live in the
+   * if-you'd-bought row and the London vault's silver row. */
+  const goldFootingState =
+    gold.conditions.find((c) => c.key === 'footing')?.state ?? 'unknown';
+
+  const footingRow = (state: string) => {
+    const priceId: IndicatorId = 'gold-usd';
+    const metal = 'gold';
     const reading = byId.get(priceId);
     const speed =
       reading !== undefined && reading.change30d !== undefined && Number.isFinite(reading.change30d)
@@ -200,7 +193,7 @@ export function MergedSignalsCard({
       >
         <span className="flex flex-wrap items-baseline gap-x-2">
           <span className="inline-flex shrink-0 items-center gap-1.5">
-            <MetalIcon metal={metal} size={24} desktopSize={30} />
+            <MetalIcon size={24} desktopSize={30} />
             <span className={`inline-flex shrink-0 items-center gap-1 ${stateToneClass(state as SignalConditionReading['state'])}`}>
               <ConditionIcon state={state as SignalConditionReading['state']} />
               <span className="text-[length:var(--type-label)] font-bold">
@@ -209,7 +202,7 @@ export function MergedSignalsCard({
             </span>
           </span>
           <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
-            {s.metals[metal]}
+            {s.metals.gold}
           </span>
           {valueText !== null ? (
             <bdi dir="ltr" className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
@@ -268,42 +261,30 @@ export function MergedSignalsCard({
         <h3 className="type-question m-0 text-[var(--color-text-primary)]">
           {s.mergedTitle}
         </h3>
-        <span className="ms-auto flex flex-col items-end gap-0.5">
-          {[gold, silver].map((reading) => (
-            <span
-              key={reading.metal}
-              className="inline-flex items-center gap-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
-              data-signal-metal={reading.metal}
-            >
-              <MetalIcon metal={reading.metal} size={18} desktopSize={22} />
-              {/* GB-S6: gold's header icon rides the balance verdict (the
-               * prose joined the lane model — the collapsed-corner
-               * decision); silver keeps its own lean. */}
-              {reading.metal === 'gold' ? (
-                <LeanIcon lean={goldHeaderLean} />
-              ) : reading.lean !== null ? (
-                <LeanIcon lean={reading.lean} />
-              ) : null}
-              {metalLeanLine(reading)}
-            </span>
-          ))}
+        <span
+          className="ms-auto inline-flex items-center gap-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
+          data-signal-metal="gold"
+        >
+          <MetalIcon size={18} desktopSize={22} />
+          {/* GB-S6: the header icon rides the balance verdict (the prose
+           * joined the lane model — the collapsed-corner decision).
+           * GUX-S10 (Q3-A): the header's ONLY line. */}
+          <LeanIcon lean={goldHeaderLean} />
+          {goldLeanLine}
         </span>
       </header>
 
-      {/* Round 23 (owner): the stated estimation — one direction chip per
-       * metal, derived from the conditions below. Answer first.
-       * 2026-10-20 (owner sketch): the chips redraw as analysis cards —
-       * header (artwork box · name + verdict · lighter price) over a BIG
-       * trend chart, one anatomy for mobile and desktop.
+      {/* Round 23 (owner): the stated estimation — the card's answer-first
+       * block. 2026-10-20 (owner sketch): the chips redraw as analysis
+       * cards — header (artwork box · name + verdict · lighter price)
+       * over a BIG trend chart, one anatomy for mobile and desktop.
        * GB-S5 (P3, 01 §5.2): the GOLD leg derives from the consolidated
        * balance (goldOutlookOf — AC-3) — since the GB-S6 flip THE
-       * derivation for every visitor; silver keeps its own conditions
-       * (OI-4). */}
+       * derivation for every visitor. GUX-S10 (Q3-A): the strip's ONLY
+       * leg — silver's own conditions (OI-4) retired from /gold. */}
       <VerdictStrip
-        gold={gold}
-        silver={silver}
         goldOutlook={goldOutlook}
-        prices={{ gold: priceTextOf('gold-usd'), silver: priceTextOf('silver-usd') }}
+        price={priceTextOf('gold-usd')}
         copy={copy}
         numberLocale={numberLocale}
       />
@@ -334,16 +315,18 @@ export function MergedSignalsCard({
        * earlier; GUX-S5 M5 retires the GOLD instance the same way — one
        * instrument per page, the CompositionStack's. */}
 
-      {/* Price footing strip (owner spec §9): the SAME content that used
-       * to sit beside the driver groups, now below the trays, separated
-       * by a clear gap and a divider line. Footing is NOT a driver — it
-       * is never counted in the balance's total/net/readable. */}
+      {/* Price footing strip (owner spec §9): the gold price's own
+       * position + speed, below the chart, separated by a clear gap and
+       * a divider line. Footing is NOT a driver — it is never counted
+       * in the balance's total/net/readable. GUX-S10 (Q3-A): gold's row
+       * only (silver's seats live elsewhere — the if-you'd-bought row
+       * + the London vault's silver row). */}
       <div className="flex flex-col gap-2 border-t border-[var(--color-border)] pt-3">
         <h4 className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-tertiary)]">
           {s.footingTitle}
         </h4>
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-          {merged.footing.map((f) => footingRow(f.metal, f.state, f.priceId))}
+          {footingRow(goldFootingState)}
         </ul>
       </div>
 

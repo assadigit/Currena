@@ -31,7 +31,9 @@
  *   history-config.ts — chart range zoom, pinned watchlist, epoch-day
  *                       history rows
  *   signals.ts        — SIGNALS_ENABLED, leg phrases, StatusTone, the
- *                       collapsed Together/Signals summaries, mergeSignals
+ *                       collapsed Together/Signals summaries (mergeSignals
+ *                       retired at GUX-S10/Q3-A with the silver
+ *                       sub-analysis)
  *   hero.ts           — the hero reason line, attention tiles, per-group
  *                       visibility
  *   money.ts          — the money area map, driver votes, policy-rate
@@ -139,7 +141,6 @@ export {
   legPhrase,
   togetherSummary,
   TOGETHER_CARD_ORDER,
-  mergeSignals,
   // v3 UI_SPEC §8 (2026-10-20, PH6-B): the card face + collapsed chips
   // share this one neutral-summary selector.
   connectionSummaryInfo,

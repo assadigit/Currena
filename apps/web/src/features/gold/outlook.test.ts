@@ -184,12 +184,16 @@ describe('outlook copy — the GPE R08/F15 conditions grammar, both locales (s6/
 
   const STATES = Object.keys(GOLD_EN) as (keyof typeof GOLD_EN)[];
 
-  it('every state carries gold + silver sentences in BOTH locales', () => {
+  /* GUX-S10 (Q3-A, round 95): the verdict sentences narrowed to gold —
+   * silver's sub-objects retired from both dictionaries with the
+   * silver sub-analysis (the OI-4 sentence consciously ended on /gold).
+   * The parity now pins the gold-only shape. */
+  it('every state carries the gold sentence in BOTH locales (Q3-A: the silver sub-objects retired, round 95)', () => {
     for (const state of STATES) {
-      for (const metal of ['gold', 'silver'] as const) {
-        expect(en.verdictStates[state][metal], `${state}/${metal}/en`).toBeTruthy();
-        expect(fa.verdictStates[state][metal], `${state}/${metal}/fa`).toBeTruthy();
-      }
+      expect(en.verdictStates[state].gold, `${state}/en`).toBeTruthy();
+      expect(fa.verdictStates[state].gold, `${state}/fa`).toBeTruthy();
+      expect(sorted(Object.keys(en.verdictStates[state]))).toEqual(['gold']);
+      expect(sorted(Object.keys(fa.verdictStates[state]))).toEqual(['gold']);
     }
     expect(sorted(Object.keys(en.verdictStates))).toEqual(sorted(Object.keys(fa.verdictStates)));
     expect(sorted(Object.keys(en.verdictStateNames))).toEqual(sorted(Object.keys(fa.verdictStateNames)));
@@ -204,20 +208,32 @@ describe('outlook copy — the GPE R08/F15 conditions grammar, both locales (s6/
 
   it('C3 clause 1 + 4: the noun is conditions, never a price claim; no intensifiers', () => {
     for (const state of STATES) {
-      for (const metal of ['gold', 'silver'] as const) {
-        expect(en.verdictStates[state][metal], `${state}/${metal}`).not.toContain('prices');
-        expect(en.verdictStates[state][metal], `${state}/${metal}`).not.toContain('potential');
-        expect(en.verdictStates[state][metal], `${state}/${metal}`).not.toContain('significant');
-      }
+      expect(en.verdictStates[state].gold, state).not.toContain('prices');
+      expect(en.verdictStates[state].gold, state).not.toContain('potential');
+      expect(en.verdictStates[state].gold, state).not.toContain('significant');
     }
   });
 
-  it('the silver sentences mirror the gold structure', () => {
-    for (const state of STATES) {
-      expect(en.verdictStates[state].silver).toContain('silver');
-      expect(fa.verdictStates[state].silver).toContain('نقره');
-      expect(fa.verdictStates[state].silver).not.toContain('طلا');
+  it('Q3-A (round 95): the silver copy retired — no silver key survives; the ratio seat keeps its own name', () => {
+    // The silver sub-objects retired with the silver sub-analysis: the
+    // per-metal lean sentence, the lean words, the metals map's silver
+    // entry, the silver-only condition, the silverOnly leftover and the
+    // keep-small note are all GONE from both dictionaries. The one
+    // legitimate survivor is the gold-silver RATIO seat's own voter name
+    // (silver's canonical seat inside the gold model — the stress lane's
+    // voter), which is gold-model copy, never a silver sentence.
+    for (const c of [en, fa] as const) {
+      expect(c).not.toHaveProperty('metalLean');
+      expect(c).not.toHaveProperty('lean');
+      expect(c).not.toHaveProperty('mergedSubtitle');
+      expect(c).not.toHaveProperty('silverOnly');
+      expect(c.conditions).not.toHaveProperty('industrial');
     }
+    expect(en.metals).toEqual({ gold: 'Gold' });
+    expect(fa.metals).toEqual({ gold: 'طلا' });
+    // The ratio seat's name survives — silver's canonical seat.
+    expect(en.goldScore.voterNames['gold-silver']).toBe('Gold/silver ratio');
+    expect(fa.goldScore.voterNames['gold-silver']).toContain('طلا');
   });
 
   it('the strip heading, the caveat and the collapsed template speak the conditions grammar', () => {
@@ -251,10 +267,11 @@ function sorted(xs: readonly string[]): string[] {
  * goldOutlookOf — the consolidated gold Outlook (GB-S5, P3: 01 §5.2;
  * since the GB-S6 flip THE gold derivation for every visitor). The
  * table test 04 §4.2 mandates: every branch over (L, A, unread, speed,
- * band), plus the footing-decoupling pin (AC-7). outlookOf above now
- * serves SILVER ONLY (the flag-off gold legacy path retired with the
- * flip); OI-4 — silver's own footing circularity — is a recorded
- * follow-up.
+ * band), plus the footing-decoupling pin (AC-7). GUX-S10 (Q3-A, the
+ * owner's 2026-11-2x answer): outlookOf now serves NO /gold surface —
+ * the silver sentence it derived is consciously ended on this page and
+ * the classifier stays exported as the engine-parity module (its
+ * pure-function table tests below are that parity pin).
  * ------------------------------------------------------------------ */
 
 type Band = 'low' | 'typical' | 'high';

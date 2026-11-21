@@ -99,7 +99,7 @@ describe('I17 copy parity (en ↔ fa)', () => {
     const en = insightsCopyEn.signals;
     const fa = insightsCopyFa.signals;
     expect(sorted(Object.keys(fa.conditions))).toEqual(sorted(Object.keys(en.conditions)));
-    expect(fa.conditions.industrial!.tag).toBeTypeOf('string');
+    // GUX-S10 (Q3-A, round 95): the industrial condition block retired with the silver sub-analysis — the parity above already proves both locales carry the same surviving condition keys.
     expect(sorted(tokens(fa.conditionsMet))).toEqual(sorted(tokens(en.conditionsMet)));
     // 2026-10-17e (owner spec): the grouped driver list became the balance
     // visual — the side labels are the balance's pan labels now; the count

@@ -1,24 +1,29 @@
 /**
- * signals/verdict — the metals' stated outlook. Round 23's mechanical
+ * signals/verdict — the gold stated outlook. Round 23's mechanical
  * tally (supportive minus against; the sign is the direction), the
- * verdict icons/artwork and the Estimation chip strip with its per-metal
- * price-history charts (rounds 26–34) — and, since 2026-10-21, the
+ * verdict icons/artwork and the Estimation chip strip with the gold
+ * price-history chart (rounds 26–34) — and, since 2026-10-21, the
  * owner's SEVEN-STATE "Gold Market Outlook" classification
  * (`outlookOf` + the exact bilingual sentences) replacing the old
  * up/down/flat words that had drifted apart between locales.
  * (Phase: WS-4 module split of the former Signals.tsx monolith; the
  * shell and the merged card import these so the collapsed line and the
  * strip can never drift apart on tally semantics.)
+ *
+ * GUX-S10 (Q3-A, the owner's 2026-11-2x answer — the ratio-only home):
+ * this strip is GOLD-ONLY. Silver's analysis card (its verdict sentence
+ * + its TrendPanel chart + its keep-small note) RETIRED from /gold —
+ * silver lives in the seats it already owns honestly (the gold-silver
+ * ratio seat, the if-you'd-bought row, the London vault's silver row);
+ * the OI-4-protected sentence is consciously ended on this page. The
+ * silver classifier (`outlookOf`) stays exported for the engine-parity
+ * pins; no UI surface on /gold calls it anymore.
  */
 
 import type { CSSProperties } from 'react';
-import type { SignalReading } from '@currena/insights';
 import { Coins } from 'lucide-react';
-import { interpolate } from '../../../shared/i18n';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../../components/icons/currena';
-import { formatIndicatorValue } from '../../../shared/config';
-import { TrendPanel, trendTickFormatter } from '../../../shared/components/TrendChart';
 import { GoldPriceChart } from './GoldPriceChart';
 
 /* S3 extraction (2026-11-08): the seven-state outlook classifier moved
@@ -26,7 +31,7 @@ import { GoldPriceChart } from './GoldPriceChart';
  * page's Gold Balance tile needs it without this file's view imports).
  * Re-exported here so every existing import (Signals, the tests) keeps
  * working unchanged. */
-import { outlookOf, type OutlookState } from '../../../shared/components/outlook-core';
+import type { OutlookState } from '../../../shared/components/outlook-core';
 export { RANGE_SPEED_PCT, goldOutlookOf, outlookOf } from '../../../shared/components/outlook-core';
 export type { OutlookState } from '../../../shared/components/outlook-core';
 
@@ -100,39 +105,34 @@ export function VerdictIcon({
   );
 }
 
-/** The metal's own artwork beside its name (round 28) — gold bar, silver
- * bar; unmapped metals (none today) fall back to no icon. Round 29
- * (owner): 28/36 defaults; round 31: the verdict strip calls it at the
- * price tiles' scale — 96px mobile / 128×128 desktop — the artwork IS
- * the verdict chip's face.
+/** The metal's own artwork beside its name (round 28) — the gold bar;
+ * GUX-S10 (Q3-A): gold-only. Round 29 (owner): 28/36 defaults; round 31:
+ * the verdict strip calls it at the price tiles' scale — 96px mobile /
+ * 128×128 desktop — the artwork IS the verdict chip's face.
  * 2026-10-20 (owner sketch): the chip header puts the artwork in a SMALL
  * tinted corner box (56/64px) — the chart, not the artwork, owns the
- * chip now. The tint follows the price tiles' language: gold wears the
- * brand-gold box, silver the quiet context tint. */
+ * chip now. The gold chip wears the brand-gold box. */
 export function MetalIcon({
-  metal,
   size = 28,
   desktopSize = 36,
 }: {
-  metal: 'gold' | 'silver';
   size?: number;
   desktopSize?: number;
 }) {
-  const icon = indicatorIconUrl(metal === 'gold' ? 'gold-usd' : 'silver-usd');
+  const icon = indicatorIconUrl('gold-usd');
   return icon !== null ? <IconImg src={icon} size={size} desktopSize={desktopSize} /> : null;
 }
 
 /** The chip header's boxed artwork (2026-10-20 owner sketch) — the same
- * tinted-box language as the prices board's PriceIconBox, miniaturised. */
-export function MetalIconBox({ metal }: { metal: 'gold' | 'silver' }) {
-  const isGold = metal === 'gold';
-  const icon = indicatorIconUrl(metal === 'gold' ? 'gold-usd' : 'silver-usd');
+ * tinted-box language as the prices board's PriceIconBox, miniaturised.
+ * GUX-S10 (Q3-A): gold-only — the quiet silver tint variant retired
+ * with the silver card. */
+export function MetalIconBox() {
+  const icon = indicatorIconUrl('gold-usd');
   return (
     <span
       aria-hidden="true"
-      className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] sm:h-16 sm:w-16 ${
-        isGold ? 'bg-[var(--color-accent-gold)]/25' : 'bg-currena-soft/70'
-      }`}
+      className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-[var(--radius-md)] ring-1 ring-[var(--color-border)] bg-[var(--color-accent-gold)]/25 sm:h-16 sm:w-16"
     >
       {icon !== null ? (
         <IconImg src={icon} size={40} desktopSize={48} />
@@ -163,100 +163,48 @@ export const verdictTone: Record<OutlookState, string> = {
 };
 
 /* ---------------------------------------------------------------- *
- * Round 33 (owner): the Estimation chip's white space is the metal's
+ * Round 33 (owner): the Estimation chip's white space was the metal's
  * own price history — clickable range chips (Quarter · One year · Five
  * years · — since 2026-10-20's owner request — Ten years) + a signed
  * window delta. Round 34 (owner): the charts grew real X/Y axes and a
  * hover inspector, and they moved into the SHARED TrendPanel
  * (TrendChart.tsx) — the exact structure the money panel's mini charts
- * now wear, so both sections stay aligned by construction. Data rides
- * the same module-cached /api/insights/:id/history fetch the details
- * panel uses, so opening a card later never re-downloads.
+ * now wear, so both sections stay aligned by construction.
+ * GPE R18 / F7 (2026-11-18, S13-D2): the GOLD chip's chart became the
+ * interactive GoldPriceChart over the EODHD XAUUSD OHLC leg (pan/zoom/
+ * log + the DMA overlays + the window as a user control — the #01
+ * widening dissolved by construction there).
+ * GUX-S10 (Q3-A, the ratio-only home): the SILVER chip — and with it
+ * the MetalTrendChart wrapper (the TrendPanel over the bounded
+ * silver-usd series) — RETIRED from /gold entirely. Silver's price
+ * history surface is the if-you'd-bought row's own legs, and the
+ * ratio seat carries its canonical read.
  * ---------------------------------------------------------------- */
 
-export type StripRange = 'quarter' | '1y' | '5y' | '10y';
-
-/** The per-metal trend chart inside an Estimation chip (round 33/34).
- * 2026-10-20 (owner sketch): the chart is THE body of the chip — a tall
- * plot (h-40 mobile / h-52 desktop, vs the old h-20) so the TREND, not
- * the price, is the emphasis. Same day (owner): "Add 10 year View of the
- * gold and silver price as well" — the chips offer the full decade.
- * GPE R01 (wave 0, D6-A relabel-now): the PUBLIC history endpoint bounds
- * the L2 ids (gold-usd, silver-usd) at PUBLIC_HISTORY_WINDOW_DAYS =
- * 1900 days (~5.2 calendar years), so the decade chip renders the span
- * the feed actually carries and its word states that true span
- * (trendRangeWord — "5.2 years" today).
- * GPE R18 / F7 (2026-11-18, S13-D2): the GOLD chip's chart is now the
- * interactive GoldPriceChart over the EODHD XAUUSD OHLC leg (pan/zoom/log
- * + the DMA overlays + the window as a user control — the #01 widening
- * dissolved by construction there); THIS panel is the SILVER chip's
- * chart (OI-4, unchanged — its decade word keeps the honest
- * computed-span discipline above over the bounded silver-usd series). */
-export function MetalTrendChart({
-  metal,
-  copy,
-  numberLocale,
-  plotHeightClass = 'h-40 sm:h-52',
-}: {
-  metal: 'gold' | 'silver';
-  copy: InsightsCopy;
-  numberLocale: 'en-US' | 'fa-IR';
-  plotHeightClass?: string;
-}) {
-  const s = copy.signals;
-  const id = metal === 'gold' ? 'gold-usd' : 'silver-usd';
-  return (
-    <TrendPanel
-      id={id}
-      copy={copy}
-      numberLocale={numberLocale}
-      plotHeightClass={plotHeightClass}
-      ranges={['quarter', '1y', '5y', '10y']}
-      ariaLabelFor={(range: StripRange, word: string) =>
-        interpolate(copy.ui.stripChartAria, {
-          metal: s.metals[metal],
-          range: word,
-        })
-      }
-      formatValue={(v) => formatIndicatorValue(id, v, numberLocale, copy.units)}
-      formatTickValue={trendTickFormatter(numberLocale)}
-      rangeGroupData={{ 'data-verdict-chart-range': metal }}
-      deltaData={{ 'data-verdict-chart-delta': metal }}
-      plotData={{ 'data-verdict-plot': metal }}
-    />
-  );
-}
-
 export function VerdictStrip({
-  gold,
-  silver,
   goldOutlook,
-  prices,
+  price,
   copy,
   numberLocale,
 }: {
-  gold: SignalReading;
-  silver: SignalReading;
   /** GB-S5 (P3, 01 §5.2 + AC-3): the gold Outlook derived from the SAME
    * goldBalance() result that drives the lane balance. Since the GB-S6
    * flip this is THE gold derivation (the flag-off outlookOf(gold)
-   * legacy path retired with the flag); a passed `null` IS a verdict
-   * (all four lanes unread → verdictNone). Silver's leg always reads
-   * outlookOf (OI-4). */
+   * legacy path retired with the flag). GUX-S10 (Q3-A): gold is the
+   * strip's ONLY leg — silver's outlookOf sentence retired from /gold,
+   * consciously ending the OI-4-protected sentence on this page. A null
+   * value still renders (the honest `verdictNone` line beside the chart
+   * — never silence: the one-metal strip never hides). */
   goldOutlook: OutlookState | null;
-  /** Each metal's current price, display-formatted (2026-10-20 owner
+  /** Gold's current price, display-formatted (2026-10-20 owner
    * sketch): the header carries it in a LIGHTER ink — the price already
    * leads the prices board above; here the TREND is the emphasis. */
-  prices: { gold: string | null; silver: string | null };
+  price: string | null;
   copy: InsightsCopy;
   numberLocale: 'en-US' | 'fa-IR';
 }) {
   const s = copy.signals;
-  const rows = [
-    { reading: gold, verdict: goldOutlook, price: prices.gold },
-    { reading: silver, verdict: outlookOf(silver), price: prices.silver },
-  ];
-  if (rows.every((r) => r.verdict === null)) return null;
+  const verdict = goldOutlook;
   /* Round 31 (owner): the strip is THE answer of the whole card — "it's
    * the verdict and estimation of the whole section" — so it carries the
    * app's focal-section recipe (a brand-gold gradient field, 2px gold
@@ -265,24 +213,16 @@ export function VerdictStrip({
    *   [ boxed artwork (start corner) · name · price (lighter)           ]
    *   [ the OUTLOOK sentence — its own full-width line (2026-10-21)     ]
    *   [ THE TREND — one BIG chart filling the rest of the chip           ]
-   *   [ range chips · window delta                                       ]
-   * ONE anatomy for mobile AND desktop (the old artwork-column-vs-chart
-   * side split is gone — "do the same for mobile view"). The price rides
-   * in the muted ink (it already leads the prices board; the trend is
-   * the emphasis), the artwork shrinks into a small tinted box, and the
-   * chart grows to h-40/h-52. 2026-10-21: the verdict WORD became the
-   * outlook's full sentence and moved to its own line under the header
-   * (a sentence cannot live beside the artwork and the price at 375px);
-   * the sentence keeps a floored two-line slot so the two desktop chips'
-   * charts start on the same baseline (the round-34 alignment rule,
-   * kept by structure). */
+   * ONE anatomy for mobile AND desktop. GUX-S10 (Q3-A): ONE card —
+   * the gold card; the two-chip side-by-side layout was itself a
+   * two-metal artifact and retires with the silver chip. */
   return (
     <div
       /* GUX-S5 M5 (11 §3.1/§5.4): the FOCAL recipe retires here — the
        * gold gradient field + the ring-2 + --shadow-focal belong to
        * exactly ONE element per page, the hero's BriefingCard. The
        * strip keeps its full anatomy (artwork · name · price · the
-       * outlook sentence · the charts) in the standard card recipe. */
+       * outlook sentence · the chart) in the standard card recipe. */
       className="flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-3.5 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] sm:p-4"
       data-signal-verdict
     >
@@ -294,78 +234,52 @@ export function VerdictStrip({
         {s.verdictTitle}
         <span className="font-normal text-[var(--color-text-tertiary)]">{s.verdictCaveat}</span>
       </h4>
-      <ul className="m-0 flex list-none flex-col gap-2 p-0 sm:flex-row">
-        {rows.map(({ reading, verdict, price }) => (
-          <li
-            key={reading.metal}
-            data-verdict-metal={reading.metal}
-            data-verdict-direction={verdict ?? 'none'}
-            className="flex min-w-0 flex-1 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
-          >
-            {/* Header: boxed artwork · name · price (lighter).
-             * 2026-10-17 owner: the metal's name is the card's TITLE —
-             * much larger than a caption («نقره» / "Silver" at 20px bold),
-             * the price stays the lighter, quieter end of the row. */}
-            <div className="flex items-center gap-3">
-              <MetalIconBox metal={reading.metal} />
-              <span className="min-w-0 flex-1 text-xl font-bold leading-snug text-[var(--color-text-primary)]">
-                {s.metals[reading.metal]}
-              </span>
-              {price !== null ? (
-                <bdi className="shrink-0 whitespace-nowrap text-[length:var(--type-label)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-                  {price}
-                </bdi>
-              ) : null}
-            </div>
-            {/* The outlook sentence rides its OWN full-width line between
-             * the header and the chart (2026-10-21 owner state list): a
-             * sentence cannot live in the header's narrow column next to
-             * the artwork and the price — there it wrapped into a 4-6-line
-             * staircase at 375px. Here it wraps at most twice at any
-             * width, and the floored slot keeps the two desktop chips'
-             * charts on one baseline (the round-34 alignment rule).
-             * Colour never rides alone: the zigzag icon leads it. */}
-            <span
-              className={`inline-flex min-h-[2.5em] items-center gap-1.5 ${
-                verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
-              }`}
-            >
-              <VerdictIcon verdict={verdict} />
-              <span className="text-[length:var(--type-label)] font-bold leading-tight">
-                {verdict !== null ? s.verdictStates[verdict][reading.metal] : s.verdictNone}
-              </span>
-            </span>
-            {/* THE TREND — the big chart fills the rest of the chip.
-             * GPE R18 / F7 (S13-D2): the GOLD chip renders the interactive
-             * chart (the EODHD XAUUSD OHLC leg — pan/zoom/log + the D8
-             * 50/200 DMA overlays + the unit-aware header + the window as a
-             * user control, the #01 widening dissolved by construction);
-             * silver keeps its TrendPanel (OI-4, unchanged). */}
-            <div
-              data-verdict-chart={reading.metal}
-              className="flex min-w-0 flex-1 flex-col justify-center gap-1.5"
-            >
-              {reading.metal === 'gold' ? (
-                <GoldPriceChart copy={copy} numberLocale={numberLocale} />
-              ) : (
-                <MetalTrendChart metal={reading.metal} copy={copy} numberLocale={numberLocale} />
-              )}
-            </div>
-            {/* GPE R06 / F17 (S5-D3 keep-small closure, made visible): the
-             * silver card carries a one-line footer stating the deliberate
-             * choice — silver's depth is a documented positioning decision
-             * (the ratio cards verify exact; a silver conditions strip
-             * returns only on measured demand), not an oversight. The note
-             * rides the silver chip's own footer so the keep-small closure
-             * is "documented, not missing" on the live page. */}
-            {reading.metal === 'silver' ? (
-              <p className="m-0 text-[length:var(--type-caption)] leading-snug text-[var(--color-text-tertiary)]" data-silver-keep-small-note>
-                {copy.ui.silverKeepSmallNote}
-              </p>
-            ) : null}
-          </li>
-        ))}
-      </ul>
+      <div
+        data-verdict-metal="gold"
+        data-verdict-direction={verdict ?? 'none'}
+        className="flex min-w-0 flex-col gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)]"
+      >
+        {/* Header: boxed artwork · name · price (lighter).
+         * 2026-10-17 owner: the metal's name is the card's TITLE —
+         * much larger than a caption ("Gold" at 20px bold), the price
+         * stays the lighter, quieter end of the row. */}
+        <div className="flex items-center gap-3">
+          <MetalIconBox />
+          <span className="min-w-0 flex-1 text-xl font-bold leading-snug text-[var(--color-text-primary)]">
+            {s.metals.gold}
+          </span>
+          {price !== null ? (
+            <bdi className="shrink-0 whitespace-nowrap text-[length:var(--type-label)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
+              {price}
+            </bdi>
+          ) : null}
+        </div>
+        {/* The outlook sentence rides its OWN full-width line between
+         * the header and the chart (2026-10-21 owner state list): a
+         * sentence cannot live in the header's narrow column next to
+         * the artwork and the price — there it wrapped into a 4-6-line
+         * staircase at 375px. Here it wraps at most twice at any
+         * width. Colour never rides alone: the zigzag icon leads it. */}
+        <span
+          className={`inline-flex min-h-[2.5em] items-center gap-1.5 ${
+            verdict !== null ? verdictTone[verdict] : 'text-[var(--color-status-stale)]'
+          }`}
+        >
+          <VerdictIcon verdict={verdict} />
+          <span className="text-[length:var(--type-label)] font-bold leading-tight">
+            {verdict !== null ? s.verdictStates[verdict].gold : s.verdictNone}
+          </span>
+        </span>
+        {/* THE TREND — the big chart fills the rest of the chip.
+         * GPE R18 / F7 (S13-D2): the interactive chart over the EODHD
+         * XAUUSD OHLC leg — pan/zoom/log + the D8 50/200 DMA overlays +
+         * the unit-aware header + the window as a user control. GUX-S10
+         * (Q3-A): the ONLY chart — the silver TrendPanel retired with
+         * the silver card. */}
+        <div data-verdict-chart="gold" className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
+          <GoldPriceChart copy={copy} numberLocale={numberLocale} />
+        </div>
+      </div>
     </div>
   );
 }

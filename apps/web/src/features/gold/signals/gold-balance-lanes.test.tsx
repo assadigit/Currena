@@ -71,7 +71,7 @@ import { formatIndicatorValue } from '../../../shared/config';
 import { chipWordKeyOf } from '../../../shared/components/StatusChip';
 import { BalanceScale, balanceVisualFrame, balanceVisualMetrics, balanceVisualSizeOf, type BalanceDriver } from './BalanceScale';
 import { balanceRimSegments } from './BalanceWeight';
-import { goldOutlookOf, outlookOf } from './verdict';
+import { goldOutlookOf } from './verdict';
 import { Signals } from '../Signals';
 import { PricesBoard } from '../../../shared/components/PricesBoard';
 import { formatChange } from '../../../shared/config';
@@ -499,15 +499,13 @@ function contextLineOf(
 function renderCard(
   readings: readonly IndicatorReading[],
   opts: { locale?: 'en-US' | 'fa-IR'; c?: typeof copy } = {},
-): { gold: SignalReading; silver: SignalReading } {
+): { gold: SignalReading } {
   vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
   const gold = evaluateSignal('gold', readings);
-  const silver = evaluateSignal('silver', readings);
   render(
     <>
       <MergedSignalsCard
         gold={gold}
-        silver={silver}
         readings={readings}
         copy={opts.c ?? copy}
         numberLocale={opts.locale ?? 'en-US'}
@@ -526,7 +524,7 @@ function renderCard(
       />
     </>,
   );
-  return { gold, silver };
+  return { gold };
 }
 
 const cardEl = (): HTMLElement => document.querySelector('[data-signal-card="merged"]') as HTMLElement;
@@ -632,8 +630,13 @@ describe('the lane view — weight placement (04 §4.3 item 1, 05 §4.2-§4.5)',
     expect(document.querySelector('#insights-gold-tailwind')).toBeNull();
     expect(document.querySelector('#insights-gold-model-vs-reality')).toBeNull();
     expect(document.querySelector('[data-gold-label]')).toBeNull();
-    // The C12 banner mechanism and the footing strip stay (the spec keeps them).
-    expect(document.querySelectorAll('[data-footing-metal]').length).toBe(2);
+    // The C12 banner mechanism and the footing strip stay (the spec keeps
+    // them) — GUX-S10 (Q3-A): the footing strip is GOLD'S ROW ONLY
+    // (silver's footing row retired with its sub-analysis; its price
+    // surfaces live in the if-you'd-bought row + the vault row).
+    expect(document.querySelectorAll('[data-footing-metal]').length).toBe(1);
+    expect(document.querySelector('[data-footing-metal="gold"]')).not.toBeNull();
+    expect(document.querySelector('[data-footing-metal="silver"]')).toBeNull();
   });
 });
 
@@ -1240,14 +1243,15 @@ describe('the flipped view byte-stability pin (GB-S6)', () => {
   it('the flipped view is pinned byte-for-byte (the snapshot — any change to the default view must be conscious)', () => {
     // Determinism guard: two independent renders must produce identical markup
     // before the snapshot is allowed to speak.
+    // GUX-S10 (Q3-A): the pinned markup is the GOLD-ONLY card — the
+    // conscious change this snapshot re-pins (round 95; the silver
+    // sub-analysis retired from /gold by the owner's recorded answer).
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
     const readings = fixtureReadings();
     const gold = evaluateSignal('gold', readings);
-    const silver = evaluateSignal('silver', readings);
     const first = render(
       <MergedSignalsCard
         gold={gold}
-        silver={silver}
         readings={readings}
         copy={copy}
         numberLocale="en-US"
@@ -1258,7 +1262,6 @@ describe('the flipped view byte-stability pin (GB-S6)', () => {
     const second = render(
       <MergedSignalsCard
         gold={gold}
-        silver={silver}
         readings={readings}
         copy={copy}
         numberLocale="en-US"
@@ -1396,14 +1399,18 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     }
   });
 
-  it('silver\'s leg is UNTOUCHED: the silver chip still reads outlookOf(silver) under the flag (OI-4)', () => {
+  it('Q3-A (round 95): silver\'s leg is ABSENT — the strip renders the gold chip only; no silver verdict, no silver chart, no keep-small note', () => {
     for (const [name, make] of BATTERY.slice(0, 5)) {
       cleanup();
-      const { silver } = renderCard(make());
-      expect(document.querySelector('[data-verdict-metal="silver"]')?.getAttribute('data-verdict-direction'), name).toBe(
-        outlookOf(silver),
-      );
+      renderCard(make());
+      expect(document.querySelector('[data-verdict-metal="silver"]'), name).toBeNull();
+      expect(document.querySelector('[data-verdict-chart="silver"]'), name).toBeNull();
+      expect(document.querySelector('[data-silver-keep-small-note]'), name).toBeNull();
+      expect(document.querySelector('[data-verdict-metal="gold"]'), name).not.toBeNull();
+      expect(document.querySelector('[data-verdict-chart="gold"]'), name).not.toBeNull();
     }
+    // The OI-4 sentence is consciously ended on this page: the strip never
+    // calls outlookOf — gold's verdict derives from goldOutlookOf only.
   });
 
   it('the footing decoupling in the DOM (AC-7): gold change30d of -9% and +9% leave BOTH the balance and the Outlook unchanged', () => {
@@ -1447,17 +1454,19 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     expect(snapshotOf().direction).toBe('bullish');
   });
 
-  it('all four lanes unread: the gold chip carries the honest none (verdictNone); with both metals unread the whole strip hides', () => {
+  it('all lanes unread: the GOLD-ONLY strip stays up and the gold chip carries the honest none (verdictNone) — never silence (the Q3-A one-metal rule)', () => {
     renderCard(ALL_UNREAD);
-    // Both metals read nothing → the strip's own both-null rule hides it.
-    expect(document.querySelector('[data-signal-verdict]')).toBeNull();
-    // Silver readable → the strip renders and the GOLD chip states it
-    // could not be read (the OLD path said Bearish here, from footing).
-    cleanup();
-    renderCard([...ALL_UNREAD, reading('silver-usd', { value: 55, percentile10y: 0.5, change30d: 3 })]);
+    // GUX-S10 (Q3-A): the strip never hides — its chart is the section's
+    // enumerated content; the unread state renders the honest verdictNone
+    // sentence instead (the old both-null rule was the two-metal
+    // artifact).
+    expect(document.querySelector('[data-signal-verdict]')).not.toBeNull();
     const goldChip = document.querySelector('[data-verdict-metal="gold"]') as HTMLElement;
     expect(goldChip.getAttribute('data-verdict-direction')).toBe('none');
     expect(goldChip.textContent).toContain(copy.signals.verdictNone);
+    // The footing strip renders gold's row only.
+    expect(document.querySelector('[data-footing-metal="gold"]')).not.toBeNull();
+    expect(document.querySelector('[data-footing-metal="silver"]')).toBeNull();
   });
 
   it('the owner\'s EXISTING outlook sentences ship (OI-1 unanswered — the states change, the wording does not)', () => {
@@ -1485,7 +1494,6 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
     const readings = fixtureReadings();
     const gold = evaluateSignal('gold', readings);
-    const silver = evaluateSignal('silver', readings);
     // A doctored gold reading: EVERY legacy condition reads against (the
     // bespoke stress/expectations/footing states at their most bearish —
     // the old path would say strong-bearish from this). The lane view
@@ -1500,7 +1508,6 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
     render(
       <MergedSignalsCard
         gold={doctored}
-        silver={silver}
         readings={readings}
         copy={copy}
         numberLocale="en-US"
@@ -1524,9 +1531,10 @@ describe('the gold Outlook derived from the balance (GB-S5, 01 §5.2)', () => {
  * legacy sentence ("Gold: mixed, 2 of 5 conditions met") counted
  * FOOTING among 5 conditions (the circularity D-GB-5 removed) and
  * would have contradicted the card's own counts line on the same
- * page; silver's prose keeps the legacy per-condition sentence (its
- * own model is unchanged, OI-4). The same sentence rides the merged
- * card's header (MergedCard metalLeanLine) — one key (metalLeanLanes),
+ * page. GUX-S10 (Q3-A, round 95): the section's ONLY line — silver's
+ * collapsed takeaway + per-condition prose retired with its
+ * sub-analysis (the OI-4 sentence consciously ended on this page).
+ * The same sentence rides the card's header — one key (metalLeanLanes),
  * one rule home (balanceVerdictWordOf + balanceVerdictCountsParts).
  * ------------------------------------------------------------------ */
 describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
@@ -1552,8 +1560,9 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
   it('the collapsed gold line reads the LANE state (bearish: 1 for · 2 against), not the old mixed (which footing dragged up)', () => {
     const { verdictOf } = renderSignals();
     expect(verdictOf('gold')).toBe('bearish');
-    // Silver's collapsed takeaway keeps its own legacy derivation (OI-4).
-    expect(verdictOf('silver')).toBe(outlookOf(evaluateSignal('silver', DIRECTIONAL)));
+    // Q3-A (round 95): the silver collapsed takeaway is GONE with the
+    // silver sub-analysis — the summary carries the gold line only.
+    expect(document.querySelector('li[data-signal-metal="silver"]')).toBeNull();
   });
 
   it('THE CORNER DECISION: the collapsed gold PROSE speaks the lane model — the verdict word + the counts line, the same words the card renders', () => {
@@ -1571,9 +1580,9 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
     expect(goldLine).not.toContain('of 5 conditions met');
     // The footing band sentence still rides the line (context only).
     expect(goldLine).toContain('price in the');
-    // Silver's prose keeps the legacy per-condition sentence (OI-4).
-    const silverLine = lineOf('silver') ?? '';
-    expect(silverLine).toContain('of 6 conditions met');
+    // Q3-A (round 95): the silver per-condition prose is GONE from the
+    // section — the collapsed summary carries the gold line only.
+    expect(document.querySelector('li[data-signal-metal="silver"]')).toBeNull();
   });
 
   it('the collapsed gold PROSE on the recorded fixture: "Leaning for gold, 1 for · 0 against · 3 not leaning · 1 unread" (GF-P2 restates GF-P1\'s recorded flip)', () => {
@@ -1587,14 +1596,13 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
     expect(goldLine).toContain('Conditions outlook: Bullish');
   });
 
-  it('the card header speaks the same lane prose for gold; silver keeps the legacy sentence (one key, two models by metal)', () => {
+  it('the card header speaks the same lane prose for gold — the header\'s ONLY line (Q3-A: the silver legacy sentence retired)', () => {
     renderCard(fixtureReadings());
     const goldHeader = document.querySelector('[data-signal-card="merged"] [data-signal-metal="gold"]')?.textContent ?? '';
-    const silverHeader = document.querySelector('[data-signal-card="merged"] [data-signal-metal="silver"]')?.textContent ?? '';
     expect(goldHeader).toContain('Leaning for gold');
     expect(goldHeader).toContain('1 for · 0 against · 3 not leaning');
     expect(goldHeader).not.toContain('of 5 conditions met');
-    expect(silverHeader).toContain('of 6 conditions met');
+    expect(document.querySelector('[data-signal-card="merged"] [data-signal-metal="silver"]')).toBeNull();
   });
 
   it('fa: the collapsed gold prose renders the Persian verdict word + Persian counts with Persian digits', () => {
@@ -1606,9 +1614,9 @@ describe('the collapsed gold takeaway + prose (GB-S5/GB-S6, AC-3)', () => {
     expect(goldLine).toContain('۱ موافق · ۰ مخالف · ۳ بدون گرایش · ۱ ناخوانده');
     // The legacy Persian count clause is gone from the gold line.
     expect(goldLine).not.toContain('از ۵ شرط');
-    // Silver keeps its own Persian sentence.
-    const silverLine = lineOf('silver') ?? '';
-    expect(silverLine).toContain('از ۶ شرط');
+    // Q3-A (round 95): the silver Persian sentence is GONE with the
+    // sub-analysis.
+    expect(document.querySelector('li[data-signal-metal="silver"]')).toBeNull();
   });
 });
 
@@ -1670,9 +1678,8 @@ describe('MergedSignalsCard order — the balance then the footing strip (moved 
     vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('no network in tests'))));
     const readings = fixtureReadings();
     const gold = evaluateSignal('gold', readings);
-    const silver = evaluateSignal('silver', readings);
     const { container } = render(
-      <MergedSignalsCard gold={gold} silver={silver} readings={readings} copy={copy} numberLocale="en-US" />,
+      <MergedSignalsCard gold={gold} readings={readings} copy={copy} numberLocale="en-US" />,
     );
     const card = container.querySelector<HTMLElement>('[data-signal-card="merged"]')!;
     const strip = card.querySelector<HTMLElement>('[data-signal-verdict]')!;

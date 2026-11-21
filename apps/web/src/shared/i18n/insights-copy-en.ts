@@ -7406,15 +7406,13 @@ export const insightsCopyEn = {
     // by the indicator's own name.
     trendChartAria: 'Price history for {name}, the last {range}',
     chartRangeLabel: 'Chart time range',
-    // GPE R06 / F17 (S5-D3 keep-small closure, made visible on the
-    // silver card's footer): silver's depth is a deliberate positioning
-    // choice — the ratio cards verify exact, and a silver conditions
-    // strip returns only on measured demand. The note rides the silver
-    // chip so the keep-small closure is "documented, not missing".
-    // (T-07: no " will " / " should " / forecast wording — phrased as
-    // a recorded decision, not a prediction.)
-    silverKeepSmallNote:
-      'Silver’s depth is a deliberate choice: the ratio cards stay exact, and a dedicated silver conditions strip returns only on measured reader demand.',
+    // GUX-S10 (Q3-A, round 95): `silverKeepSmallNote` RETIRED — the note
+    // rode the silver chip's own footer (the GPE R06 / F17 keep-small
+    // closure, T-07's no-forecast wording), and the silver chip retired
+    // from /gold with the whole silver sub-analysis (the owner's
+    // recorded answer; the philosophy is now the decision record's own
+    // words: silver lives in the ratio seat, and a dedicated silver
+    // conditions strip returns only on measured reader demand).
     chartTable: 'Chart data',
     chartColDate: 'Date',
     chartColValue: 'Value',
@@ -9308,32 +9306,30 @@ export const insightsCopyEn = {
   signals: {
     title: 'What the signals say',
     subtitle:
-      'The conditions that usually surround each metal, in plain words: conditions, not forecasts, and not advice.',
-    // R26: one merged gold-and-silver card. Step-1 audit item G1: the card
-    // is named for its CONDITIONS, never an estimation.
-    mergedTitle: 'Conditions for gold and silver',
-    mergedSubtitle: 'The two precious metals share most of their drivers: shared conditions are listed once.',
+      'The conditions that usually surround gold, in plain words: conditions, not forecasts, and not advice.',
+    // GUX-S10 (Q3-A, the ratio-only home): the card is GOLD-ONLY — the
+    // title re-scopes from the two-metals merged card to gold; silver
+    // lives in the seats it already owns honestly (the gold-silver ratio
+    // seat, the if-you'd-bought row, the London vault's silver row).
+    mergedTitle: 'Conditions for gold',
+    // GUX-S10 (Q3-A): the merged card's own subtitle — already unused
+    // since the S5 structure change, and it described the two-metals
+    // merged card this change retires — retired with it (round 95).
     conditionsMet: '{met} of {total} conditions met',
-    metalLean: '{metal}: {lean}, {met} of {total} conditions met',
     // GB-S6 (the collapsed-corner decision): gold's summary prose — the
     // balance verdict word + the lane counts line, the same words the
-    // card renders (silver keeps `metalLean`; its own model is unchanged,
-    // OI-4). The shape mirrors the legacy sibling's (a colon, the lean,
-    // a comma); the counts parts join with ' · ' exactly as the verdict
-    // block renders them. Persian digits through the locale formatter.
-    // FA triaged through round-78
+    // card renders. GUX-S10 (Q3-A): the ONLY lean line — the legacy
+    // per-metal `metalLean` sentence (silver's, OI-4-protected) retired
+    // from /gold with the silver sub-analysis, consciously ending the
+    // OI-4 sentence on this page. The shape mirrors the legacy sibling's
+    // (a colon, the lean, a comma); the counts parts join with ' · '
+    // exactly as the verdict block renders them. Persian digits through
+    // the locale formatter. FA triaged through round-78
     // (docs/localization/persian-copy-round-78-gold-balance-flip.md).
     metalLeanLanes: '{metal}: {lean}, {counts}',
-    lean: {
-      'mostly-supportive': 'mostly supportive',
-      mixed: 'mixed',
-      'mostly-unsupportive': 'mostly unsupportive',
-    },
-    // 2026-10-17 (owner, "comply with capital letters — write Silver"):
-    // the metal's name is a TITLE everywhere it leads a card, a row or an
-    // export column — first letter capitalized. fa is unaffected (طلا/نقره
-    // carry no case).
-    metals: { gold: 'Gold', silver: 'Silver' },
+    // GUX-S10 (Q3-A, round 95): the `lean` words + the metals map
+    // narrowed to gold — silver's copy retired with its sub-analysis.
+    metals: { gold: 'Gold' },
     // GPE R08 / F15 (2026-11-18, s6/02 §C3 — the four binding clauses): the
     // outlook sentences re-scoped from price claims to CONDITIONS claims —
     // the market's word (bullish/bearish) survives, the noun moves from
@@ -9342,6 +9338,10 @@ export const insightsCopyEn = {
     // existing strong/moderate ladder (goldOutlookOf's L/A ≥ 3 strong rule)
     // alone. The prior sentences were the owner's 2026-10-21 verbatim; the
     // C3 rewrite supersedes them under the locked D1-A approval.
+    // GUX-S10 (Q3-A, round 95): the sentences narrowed to gold — the
+    // silver sub-objects retired with the silver sub-analysis (the
+    // strip's only leg is gold; silver's seats read the ratio, the
+    // if-you'd-bought row and the vault row).
     verdictTitle: 'Conditions outlook',
     // GPE R08 / F15 (C3 clause 2): the no-forecast line co-renders with the
     // title — the same visual unit, never paragraphs away (GPE-S2-11).
@@ -9350,31 +9350,24 @@ export const insightsCopyEn = {
     verdictStates: {
       'strong-bullish': {
         gold: 'Conditions lean strongly in gold’s favour.',
-        silver: 'Conditions lean strongly in silver’s favour.',
       },
       bullish: {
         gold: 'Conditions lean in gold’s favour.',
-        silver: 'Conditions lean in silver’s favour.',
       },
       neutral: {
         gold: 'Conditions are neutral for gold.',
-        silver: 'Conditions are neutral for silver.',
       },
       'range-bound': {
         gold: 'Conditions are consistent with gold trading within a defined range.',
-        silver: 'Conditions are consistent with silver trading within a defined range.',
       },
       bearish: {
         gold: 'Conditions lean against gold.',
-        silver: 'Conditions lean against silver.',
       },
       'strong-bearish': {
         gold: 'Conditions lean strongly against gold.',
-        silver: 'Conditions lean strongly against silver.',
       },
       mixed: {
         gold: 'Conditions are mixed for gold.',
-        silver: 'Conditions are mixed for silver.',
       },
     },
     // The collapsed summary line carries the short state names; the full
@@ -9528,7 +9521,10 @@ export const insightsCopyEn = {
     },
     // 2026-10-21c owner round: the balanceSilver copy variants are RETIRED
     // with silver's balance (the merged card renders gold's balance only).
-    silverOnly: 'Silver only',
+    // GUX-S10 (Q3-A, round 95): `silverOnly` — the last leftover of that
+    // retirement, dead since 2026-10-21c — retired now with the whole
+    // silver sub-analysis (the ratio seat, the if-you'd-bought row and
+    // the vault row are silver's homes; the /gold copy speaks gold only).
     footingTitle: 'Price footing',
     footingRow: '{metal}: {state}',
     footingPosition: '{band} of the last 10 years',
@@ -9565,12 +9561,11 @@ export const insightsCopyEn = {
         name: 'Price footing',
         how: 'A price holding or rising in its 10-year range is firm footing; a falling one is not.',
       },
-      industrial: {
-        name: 'Industrial demand',
-        how: 'Busy Chinese factories and a firm copper-to-gold ratio usually support industrial demand for silver.',
-        // S2 note: the industrial condition is always tagged "mixed".
-        tag: 'mixed',
-      },
+      // GUX-S10 (Q3-A, round 95): the `industrial` condition block (the
+      // silver-only condition — S2's always-tagged-mixed row) retired with
+      // the silver sub-analysis; the conditions checklist itself stopped
+      // rendering before this session and only `footing.how` survives
+      // (the gold footing row).
     },
     // R26: the 30-day speed rides the footing row only when the data exists.
     speedLabel: '30-day speed',

@@ -1229,7 +1229,18 @@ const BUDGETS = [
   // §19.6 (2026-11-17): the legacy /insights lazy chunks left the build;
   // shared modules previously split with the Insights chunk re-bucketed into
   // the destination page chunks. Bumped 26→41 raw / 7→11 gz.
-  { pattern: /^AustraliaPage-[\w-]+\.js$/, raw: 41_000, gz: 11_000, label: 'Australia page lazy chunk (page-division S16)' },
+  // GUX-S10 (2026-11-2x, Q3-A — the ratio-only home): the silver chart's
+  // retirement removed the GOLD feature's TrendPanel import, leaving the AU
+  // route as the shared TrendChart module's ONLY dynamic consumer — rollup
+  // re-bucketed the module from its own TrendChart-*.js shared chunk
+  // (8.41 kB, gone from the build) into AustraliaPage (40.66 → 49.07 raw /
+  // 10.18 → 12.66 gz). The AU page's OWN code is byte-identical (verified:
+  // the entire +8.41 kB is the shared TrendPanel module, not AU growth; no
+  // duplication — the shared chunk vanished; the total dist SHRANK 5,963
+  // bytes; and /gold visitors now save the TrendChart fetch they never
+  // needed post-Q3-A). Bumped 41→50 raw / 11→13 gz per the §19.6
+  // re-bucketing convention.
+  { pattern: /^AustraliaPage-[\w-]+\.js$/, raw: 50_000, gz: 13_000, label: 'Australia page lazy chunk (page-division S16)' },
   // Page-division S16 (2026-11-10; repointed M5 2026-11-15): the shared AU
   // Markets board drawing. PRE-M5 this was the dedicated `markets-au-*`
   // chunk (measured 12.33/3.49: the section drawing + the au-markets

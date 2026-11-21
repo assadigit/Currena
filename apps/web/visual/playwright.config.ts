@@ -111,6 +111,18 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
     {
+      // GUX-S10 (docs/gold-redesign/18-q3-a-ratio-only-home-report.md):
+      // the Q3-A execution's evidence — the gold-only Signals section
+      // (the option's enumeration verified: the chart + the measured
+      // note + the gold footing row; every silver surface of the section
+      // absent) + silver's three surviving seats (the ratio seat, the
+      // if-you'd-bought row, the London vault's silver row). The
+      // evidence lands in docs/gold-redesign/baseline-screenshots/s10/.
+      name: 'gux-s10',
+      testMatch: /gux-s10-screenshots\.plw\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // gold-balance GB-S3 (docs/specs/gold-balance-consolidation/): the
       // ?balance=lanes preview + the default view, EN/fa × 360/1280, on the
       // fixture snapshot overlaid with the recorded 2026-10-31 corpus
