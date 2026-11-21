@@ -1,0 +1,133 @@
+{
+  "seats": {
+    "total": 37,
+    "lanes": {
+      "borrowing-costs": [
+        "real-yield-10y",
+        "us10y",
+        "us30y",
+        "fed-target",
+        "fed-expectations",
+        "ecb-dfr",
+        "real-yield-5y"
+      ],
+      "dollar": [
+        "dollar-basket",
+        "usdjpy",
+        "us-japan-10y-gap",
+        "usd-reserve-share",
+        "nyfed-custody",
+        "dollar-broad",
+        "dollar-eme"
+      ],
+      "stress": [
+        "stress-stlfsi",
+        "nfci",
+        "vix",
+        "gold-silver",
+        "term-premium-10y",
+        "ebp",
+        "michigan-sentiment",
+        "gpr-daily",
+        "epu-us",
+        "sp500-breadth-ratio",
+        "bank-stress"
+      ],
+      "inflation": [
+        "us-cpi-yoy",
+        "us-pce-core-yoy",
+        "euro-hicp",
+        "breakeven-5y5y",
+        "breakeven-tilt",
+        "t5yie",
+        "michigan-1y-expectations",
+        "m2-us",
+        "us-deficit-12m",
+        "michigan-5y-expectations"
+      ],
+      "flows": [
+        "cftc-gold-positioning",
+        "cftc-gold-gross-long"
+      ]
+    },
+    "seatDuplicates": [],
+    "byLaneCounts": {
+      "borrowing-costs": 7,
+      "dollar": 7,
+      "stress": 11,
+      "inflation": 10,
+      "flows": 2
+    }
+  },
+  "contextCards": {
+    "total": 13,
+    "ids": [
+      "gold-silver",
+      "gold-btc",
+      "gold-aud",
+      "gold-oil-ratio",
+      "gold-platinum",
+      "real-gold-price",
+      "copper-gold",
+      "gold-equities-ratio",
+      "cftc-gold-positioning",
+      "cftc-gold-gross-long",
+      "sge-gold-withdrawals",
+      "swiss-gold-flow",
+      "shanghai-gold-premium"
+    ],
+    "goldUsdContextCard": 0
+  },
+  "positionCards": {
+    "total": 1,
+    "ids": [
+      "cftc-gold-positioning"
+    ]
+  },
+  "instruments": {
+    "balanceAssemblies": 2,
+    "balanceScaleRoots": 0,
+    "lanebarHomes": {
+      "composition-stack": 5,
+      "five-force-overview": 5
+    }
+  },
+  "duplicateFamilies": {
+    "cftc-gold-positioning": [
+      "briefing-reason",
+      "seat",
+      "context-card",
+      "positions-bar"
+    ],
+    "cftc-gold-gross-long": [
+      "seat",
+      "context-card"
+    ],
+    "real-yield-10y": {
+      "seat": [
+        "seat"
+      ],
+      "yieldDecompositionLeg": [
+        "real-10y"
+      ],
+      "correlationYieldAxis": null
+    },
+    "gold-usd": {
+      "surfaces": [
+        "hero",
+        "signals-chip+footing",
+        "narrative-price-fact"
+      ],
+      "contextCards": 0
+    }
+  },
+  "dup5": {
+    "narrativeFamilies": 5,
+    "onrampCloses": 0,
+    "narrativeLanebars": 0
+  },
+  "nav": {
+    "chips": 7,
+    "resolved": 7
+  }
+}
