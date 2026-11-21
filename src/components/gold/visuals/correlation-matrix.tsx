@@ -28,7 +28,7 @@ export function CorrelationMatrixVisual({ data }: CorrelationMatrixVisualProps) 
   const n = data.assets.length;
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto overflow-y-hidden">
       <div className="min-w-[520px]">
         {/* Column headers */}
         <div
@@ -74,11 +74,7 @@ export function CorrelationMatrixVisual({ data }: CorrelationMatrixVisualProps) 
                     aria-label={`Correlation of ${rowAsset} with ${data.assets[j]}: ${v.toFixed(2)}`}
                     title={`${rowAsset} vs ${data.assets[j]}: ${v.toFixed(2)}`}
                     className={`flex aspect-square items-center justify-center rounded-md text-[11px] font-semibold tabular transition-transform hover:scale-[1.04] ${
-                      diagonal
-                        ? "text-muted-foreground/60"
-                        : v >= 0
-                          ? "text-foreground"
-                          : "text-foreground"
+                      diagonal ? "text-muted-foreground/60" : "text-foreground"
                     }`}
                     style={cellStyle(v, diagonal)}
                   >
@@ -89,25 +85,26 @@ export function CorrelationMatrixVisual({ data }: CorrelationMatrixVisualProps) 
             </div>
           ))}
         </div>
-
-        {/* Diverging legend */}
-        <div className="mt-4 flex items-center gap-3 text-[10px] uppercase tracking-wide text-muted-foreground">
-          <span>Inverse -1</span>
-          <span
-            aria-hidden="true"
-            className="h-2.5 flex-1 rounded-full"
-            style={{
-              background:
-                "linear-gradient(to right, var(--bear), var(--background), var(--gold))",
-            }}
-          />
-          <span>Aligned +1</span>
-        </div>
-        <p className="mt-1.5 text-[10px] text-muted-foreground">
-          Pearson correlation of daily returns · trailing {data.window} trading
-          days
-        </p>
       </div>
+
+      {/* Diverging legend */}
+      <div className="mt-4 flex items-center gap-3 text-[10px] uppercase tracking-wide text-muted-foreground">
+        <span>Inverse -1</span>
+        <span
+          aria-hidden="true"
+          className="h-2.5 flex-1 rounded-full"
+          style={{
+            background:
+              "linear-gradient(to right, var(--bear), var(--background), var(--gold))",
+          }}
+        />
+        <span>Aligned +1</span>
+      </div>
+      <p className="mt-1.5 text-[10px] text-muted-foreground">
+        Pearson correlation of daily returns · trailing {data.window} trading days ·{" "}
+        <span className="sm:hidden">swipe horizontally to see all 7 assets</span>
+        <span className="hidden sm:inline">scroll horizontally if clipped</span>
+      </p>
     </div>
   );
 }
