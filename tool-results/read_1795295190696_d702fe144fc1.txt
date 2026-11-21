@@ -1,0 +1,402 @@
+    20→    20→
+    21→    21→## 1. Communication
+    22→    22→
+    23→    23→- **Language:** talk to the owner in English only, whatever language they write in. Product content (UI text, copy, translations) follows what the spec says, for example Farsi/RTL. Never translate or rewrite it unasked.
+    24→    24→- **Plain language.** Explain what you did, why, and what it means for the project or business. Avoid jargon. If a technical word is unavoidable, explain it in one short phrase.
+    25→    25→- **Don't guess.** If something is unclear, ask. If a cheap, reversible choice is not worth interrupting for, pick the recommended option, write it in `docs/DECISIONS.md`, and tell the owner.
+    26→    26→- **How to ask:** multiple choice, A/B/C/D. Mark your recommended option and give the reason in one sentence. Ask at most 3 questions at a time, ideally before work starts, and only things that change the outcome or are costly to undo.
+    27→    27→- **Honesty:** never say "done", "fixed" or "working" unless you ran it in this session. Say exactly what you tested and what you could not test.
+    28→    28→
+    29→    29→## 2. Starting a session
+    30→    30→
+    31→    31→1. Read, in this order: this file, `README.md`, `docs/HANDOFF.md`, `CHANGELOG.md`, `docs/DECISIONS.md`, relevant files in `docs/specs/`, then `git log` (recent) and `git status`.
+    32→    32→2. **Pick up where the last session stopped.** Look for unfinished work, half-done migrations and leftover TODOs. Never restart from scratch.
+    33→    33→3. Leave uncommitted changes that are not yours untouched. Tell the owner about them.
+    34→    34→4. **Spec hunt:** compare the specs with the real code. List features that are specified but missing or half-built. Mention the important ones briefly at the start and again in the final report. Do not silently build them.
+    35→    35→5. **Obsolete specs:** if a spec no longer matches reality, tell the owner and offer to archive it (move to `docs/archive/` with a one-line "obsolete because…" note at the top). Never delete specs.
+    36→    36→6. Write this session's goal and milestones at the top of `docs/HANDOFF.md` before you start coding.
+    37→    37→7. **Parallel lane sessions (§15):** if the owner started you as a lane session, your pickup point is your lane's latest record in `docs/sessions/` (not the root `HANDOFF.md`, which is read-only for lanes), and §15.3 replaces this list's items 2, 3 and 6 for your session.
+    38→    38→
+    39→    39→## 3. Planning new features and big changes
+    40→    40→
+    41→    41→**Small, clear tasks:** just do them. **New features, or anything needing planning:**
+    42→    42→
+    43→    43→1. **Audit** the existing code and specs that the feature touches. Save it as `docs/audits/<date>-<topic>.md`.
+    44→    44→2. **Ask clarifying questions** (format in section 1).
+    45→    45→3. **Write the spec** in `docs/specs/<topic>.md`: goal, scope, out of scope, decisions, step-by-step plan, and a checklist of done-criteria. **The first line of every spec and audit is:** `> Agents: read AGENTS.md in the repo root first, and follow it for this whole task.` Commit and push audit and spec.
+    46→    46→4. **Stop and give the owner a start prompt** for a *new* session. **The prompt's first sentence is:** "Read AGENTS.md in the repo root first and follow it for the whole session." Then it tells the next agent to read the audit and spec before building. Do not start building in the planning session unless the owner says to.
+    47→    47→
+    48→    48→**Keep sessions small.** A session has one clear objective and at most about 3 milestones that can be finished and verified in one sitting. If the work is bigger, split it into numbered sessions (S1, S2, S3…), each with its objective, deliverables, done-criteria and dependencies. Do not bloat a session. A very big change is always split. Say so rather than trying to squeeze it in.
+    49→    49→
+    50→    50→## 4. Building
+    51→    51→
+    52→    52→- **Milestones and sub-milestones.** After each verified sub-milestone: commit with a clear message, then push. If the session dies, nothing is lost. Every commit must leave the project in a working state.
+    53→    53→- **Small verified steps.** Change, check, then continue. Do not pile up unverified edits.
+    54→    54→- **Stay in scope.** Make the smallest change that fully solves the request. Report unrelated problems instead of fixing them. No drive-by refactors, mass renames or surprise dependency upgrades.
+    55→    55→- **No giant files ("god-modules").** One file, one responsibility. Roughly: over ~400 lines, consider splitting; over ~800 lines, split or justify in `DECISIONS.md`. Put new code in a new, well-named module instead of enlarging an oversized file. Group files in sensible folders.
+    56→    56→- **Reuse before creating.** Search for an existing helper or pattern first. Add a new dependency only when clearly needed, and say why.
+    57→    57→- **Never invent** functions, packages, flags, file paths or results. Check they exist in the installed version.
+    58→    58→- **Never weaken tests, linters or checks to get green.** Fix the cause. If a check is genuinely wrong, explain and ask.
+    59→    59→- **Debugging:** reproduce first, find the root cause, fix it, add a regression check. After about 3 failed attempts at the same approach, stop, change strategy or ask. Never loop endlessly and never work around a permission block.
+    60→    60→
+    61→    61→## 5. Git, deploys and the safety limits
+    62→    62→
+    63→    63→**Standing approval.** The owner pre-approves committing, pushing, deploying and releasing. Do these automatically **unless the owner has said not to** (in this session or in `docs/HANDOFF.md`). A "don't deploy / don't push" instruction lasts until the owner lifts it. Record it in the handoff so the next session respects it too. **Lane sessions (§15) are the exception: they never deploy and never push `main` — the integration session owns every deploy and every merge to `main`.**
+    64→    64→
+    65→    65→**Before every deploy:** the build and tests pass, every spec item you claim is verified, the staged changes contain no secrets, a database backup exists if data or schema changes (section 6), and you know how to roll back.
+    66→    66→**After every deploy:** check the live result yourself (open the page, call the endpoint, look at it). If it is broken, roll back first, then investigate.
+    67→    67→
+    68→    68→**Stop and ask first. Standing approval does NOT cover:**
+    69→    69→- force-pushing, rewriting published git history, skipping hooks;
+    70→    70→- deleting or overwriting data or files you did not create (database rows or tables, KV keys, uploads, the owner's files);
+    71→    71→- anything that reaches real customers or money: sending emails/messages, charging or refunding, changing prices, editing live orders;
+    72→    72→- changing DNS, domains, permissions, billing, or access for other people;
+    73→    73→- using real production data for testing or experiments;
+    74→    74→- any action that cannot be undone and is not covered by a verified backup.
+    75→    75→
+    76→    76→Show the exact action and target before asking. Confirm which environment (test vs live) you are in before any risky step.
+    77→    77→
+    78→    78→## 6. Database safety (D1, KV, SQL, any stored data)
+    79→    79→
+    80→    80→Before **any** change to a database or store (schema change, migration, bulk write, bulk delete, cleanup script):
+    81→    81→
+    82→    82→1. Make a **fresh backup right now**. Yesterday's backup does not count.
+    83→    83→2. Name it with a timestamp. Check that it is not empty and is readable (size, row/key counts).
+    84→    84→3. **Do not commit backups containing real customer or personal data.** Keep them in a git-ignored folder (for example `backups/`) or the project's private storage. Note the backup name and location in `docs/HANDOFF.md`.
+    85→    85→4. Write down in `docs/` how to restore it, and make sure the restore actually works for this store.
+    86→    86→5. Try bulk changes on a sample or a copy first. Prefer additive, reversible migrations.
+    87→    87→6. Never run tests against the live database.
+    88→    88→
+    89→    89→## 7. Secrets and credentials
+    90→    90→
+    91→    91→- When the owner gives credentials, accept and use them for the task. They are temporary and will be revoked when development ends.
+    92→    92→- **Never** put credentials in any tracked file, commit message, log, screenshot, report, `DECISIONS.md` or `CHANGELOG.md`. Keep them in environment variables, a git-ignored `.env`, or the platform's secret store (for example `wrangler secret`).
+    93→    93→- Make sure `.gitignore` covers `.env` and other secret files **before** first use.
+    94→    94→- Scan the staged changes for keys, tokens and passwords **before every commit**. If something slipped in: stop, remove it, and if it was already pushed, tell the owner immediately and ask them to rotate it.
+    95→    95→- Screenshots and uploaded files can contain secrets or personal data (customer names, emails). Check before committing. Redact or keep them out of git.
+    96→    96→- In reports, say "credentials used, not stored". Never print them. When the development work ends, remind the owner to revoke or rotate them.
+    97→    97→
+    98→    98→## 8. Keeping the repo tidy and documented
+    99→    99→
+   100→   100→The owner often drops screenshots, files and specs in the repo root. **Filing them is your job.**
+   101→   101→
+   102→   102→```
+   103→   103→README.md          what the project is, how to run it
+   104→   104→AGENTS.md          these rules
+   105→   105→CHANGELOG.md       what changed, per session (newest first)
+   106→   106→docs/
+   107→   107→  HANDOFF.md       current state and next steps (rewrite each session; integration-only during parallel lane waves — §15)
+   108→   108→  DECISIONS.md     decision history (add only, never rewrite)
+   109→   109→  specs/           active specs
+   110→   110→  audits/          audit reports
+   111→   111→  sessions/        parallel-lane session records + the ACTIVE-LANES registry (§15; a lane's own record lives here, never in the root files)
+   112→   112→  archive/         obsolete specs and old material
+   113→   113→  assets/          screenshots, reference files, mockups (descriptive names + date)
+   114→   114→```
+   115→   115→
+   116→   116→- Move stray files into the right place with `git mv`, give them a descriptive name, fix any references, and mention it in the report. Never delete the owner's files. Never move files that tools need at the root (configs, lockfiles).
+   117→   117→- **Decision log:** record every non-obvious decision (made by the owner or by you) in `docs/DECISIONS.md`: date, decision, options considered, reason, who decided, and when to revisit. We must be able to find out later why something was done.
+   118→   118→- Update docs and the changelog in the same change as the code. Remove debug prints and temp files before you finish.
+   119→   119→- **Improving these rules:** if the owner asks for something that would help all projects, suggest adding it to `AGENTS.md` with the proposed wording. Add it only after they agree. Keep this file short; merge overlapping rules instead of piling on.
+   120→   120→
+   121→   121→## 9. Definition of done
+   122→   122→
+   123→   123→Work is **done** only when all of this is true:
+   124→   124→
+   125→   125→- Every item in the spec checklist was checked one by one, and nothing is missing.
+   126→   126→- It was built, tests/linters pass, and you exercised the real behaviour. For anything visual, look at it on desktop and mobile (and in RTL if the project uses it).
+   127→   127→- It is committed, pushed, and deployed or released (unless the owner said not to), and verified live.
+   128→   128→
+   129→   129→Use only these status words, and be strict:
+   130→   130→**Done and verified live** · **Done in code, not deployed (reason)** · **Partly done (what is missing)** · **Not done** · **Not verified (why)**.
+   131→   131→Never write "implemented" or "finished" for anything weaker.
+   132→   132→
+   133→   133→## 10. Ending a session
+   134→   134→
+   135→   135→Always, in this order:
+   136→   136→
+   137→   137→1. Update `docs/HANDOFF.md`, `CHANGELOG.md`, `docs/DECISIONS.md`. Commit and push.
+   138→   138→2. Give the **TLDR report** (below), in plain language.
+   139→   139→3. **Next-session prompt — automatic at every close-out while the plan is multi-session** (owner's standing instruction, 2026-11-16): if ANY sessions remain on the plan — including when this session's own scope is fully done — ALWAYS generate the **next-session prompt** yourself and give it in one copy-paste block. Never wait for the owner to ask. Only write "nothing needed — the plan is complete" when nothing at all remains. **It always starts with:** "Read AGENTS.md in the repo root first and follow it for the whole session." It must stand alone: which other files to read next (HANDOFF, the spec, the audit), the objective, the milestones, done-criteria, known problems, and any standing limits (such as "do not deploy"). When the authoritative prompt lives at the bottom of `docs/HANDOFF.md` (the phase-plan pattern), output that same prompt verbatim in your reply.
+   140→   140→4. Add short reminders when relevant: unfinished or missing specs, obsolete specs to archive, suggested additions to `AGENTS.md`.
+   141→   141→5. **Lane sessions close out differently (§15.3):** update your lane record in `docs/sessions/` and push your lane branch — the root `HANDOFF.md` / `CHANGELOG.md` / `docs/DECISIONS.md` updates happen at integration, not in the lane. The TLDR report and your lane's next-session prompt are still owed to the owner in your reply.
+   142→   142→
+   143→   143→**TLDR report format**
+   144→   144→
+   145→   145→```
+   146→   146→## TLDR
+   147→   147→Status: Done and verified live / Partly done / Blocked
+   148→   148→Goal of this session: <one sentence>
+   149→   149→Milestones: ✅ M1 <name> · ✅ M2 <name> · ⬜ M3 <name>
+   150→   150→What changed (plain words): <2-4 bullets about what the owner will notice>
+   151→   151→Where it is now: <pushed to branch X / live at URL / not deployed because…>
+   152→   152→What I checked: <what I tested, and what I could not test>
+   153→   153→Decisions made: <short list, details are in DECISIONS.md>
+   154→   154→Needs your attention: <questions in A/B/C/D form, reminders>
+   155→   155→Next session: <prompt below / nothing needed>
+   156→   156→```
+   157→   157→
+   158→   158→## 11. Project facts (maintained by the agent)
+   159→   159→
+   160→   160→Filled at M16 (the modularization documentation pass) from the post-modularization state. Keep it short and factual: tech stack, hosting, default branch and deploy method, commands to run, test and deploy, database and backup commands, key folders, and any standing limits from the owner.
+   161→   161→
+   162→   162→**Tech stack.** TypeScript 5 monorepo — pnpm@10.34.5 (Node ≥ 20). Hono API on Cloudflare Workers + a Vite React SPA (PWA; standalone, never server-rendered; Capacitor wrap later). Pure packages: `@currena/core` (zod schemas, conversion math, formatting — the money-tool cores), `@currena/insights` (the engine: definitions/gauges/scoring/adapters/narrator/page-division), `@currena/scraper` (TGJU + Frankfurter + the RateStore port). Persian/Farsi + RTL are first-class.
+   163→   163→
+   164→   164→**Hosting.** Cloudflare Workers — two scripts: `currena-api` (Hono; serves `/api/*`, the zero-JS noindexed `/admin` ops console with per-source status + manual refresh via `REFRESH_SECRET`, AND the built SPA via Workers static assets with SPA fallback — one deploy, no CORS) and `currena-markets` (the source scrapers' twin: the fx engine + the daily snapshot crons `30 23 * * 1-5` + `30 1 * * 2-6` UTC + the EODHD stock ingestion; scheduled-only — a page request can never reach a provider). Site: https://currena.ir. The legacy Django app stays live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutover.
+   165→   165→
+   166→   166→**Default branch:** `main`. **Deploy method:** `pnpm --filter @currena/api run deploy` (the `run` is required under pnpm 10). See `docs/DEPLOY.md` for the deploy-lock check, the post-deploy smoke, and the rollback recipe.
+   167→   167→
+   168→   168→**Commands.**
+   169→   169→```
+   170→   170→pnpm install
+   171→   171→pnpm gates                  # ALL gates in one command (secret scan · typecheck · lint ·
+   172→   172→                            # copy:audit · narrator vocabulary · narrator eval · layer1 strict ·
+   173→   173→                            # full test suite · build + bundle budget) — run before deploying; CI is red (owner-side)
+   174→   174→pnpm -r typecheck
+   175→   175→pnpm lint                   # eslint flat config; 0 errors in CI
+   176→   176→pnpm -r test                # vitest — never hits live sites
+   177→   177→pnpm --parallel dev         # api: wrangler dev (:8787) · web: vite (:5173)
+   178→   178→pnpm --filter @currena/web build          # SPA dist → served by the Worker
+   179→   179→pnpm --filter @currena/api run deploy     # wrangler deploy (needs CLOUDFLARE_API_TOKEN)
+   180→   180→pnpm registry:generate · pnpm placement:generate · pnpm s24:d9-audit   # the regeneration trio
+   181→   181→```
+   182→   182→
+   183→   183→**Database.** Cloudflare KV — the shared `RATES` KV namespace holds every rate + insights snapshot, accessed through the `RateStore` interface (the engine's `store.ts`). No SQL, no separate backup tool — KV is the source of truth; the daily crons + the last-good discipline are the durability model. Manual keys are written via the KV REST API for post-deploy landings.
+   184→   184→
+   185→   185→**Key folders (post-modularization — the M1–M16 program COMPLETE).**
+   186→   186→- `apps/api/src/` — the API worker: `index.ts` (composition root only) + `routes/` (rates/ops/admin/internal/insights) + shared HTTP plumbing (`http.ts`, `security.ts`, `default-service.ts`, `cron.ts`, `rates-service.ts`). LEAVE ALONE (route-split, DI-composed).
+   187→   187→- `apps/markets/src/` — the markets worker (scheduled-only crons: `index.ts` + `crons.ts`). LEAVE ALONE.
+   188→   188→- `apps/web/src/` — the SPA:
+   189→   189→  - `features/` — **11 domain homes**: `insights-legacy`, `global`, `gold`, `world-markets`, `australia`, `commodities`, `currencies`, `usa`, `europe`, `asia-pacific`, `economic-linkages`.
+   190→   190→  - `features-tools/` — **9 tool domains**: `about`, `batch`, `calculator`, `converter`, `history`, `live-rates`, `receipt`, `settle`, `splitter`.
+   191→   191→  - `shared/` — the shared layer: `components/` · `config/` · `hooks/` · `i18n/` · `lib/` · `ui/`.
+   192→   192→  - `infrastructure/` — the 16 infrastructure files (the M1 skeleton root).
+   193→   193→  - `App.tsx`, `main.tsx`, `router.ts`, `components/{Header,Footer,ErrorBoundary}.tsx`, `lib/` — src-root (no move).
+   194→   194→- `packages/insights/src/` — the engine: `shared/` (the cross-domain tables `definitions`/`gauges`/`gold-score`/`connections`/`scoring`/`validation` + the `adapters/` (13 modules) + `ingest/` + `prices/` + `store.ts`), `domains/` (**9**: asia-pacific, australia, commodities, companies, currencies, europe, gold, usa, world-markets), `page-division/` (stays — the engine-pages authority, 13/13 test gate), `narrator/` (stays), root `index.ts` barrel.
+   195→   195→- `packages/core/src/` — the money-tool cores + zod schemas (calc/batch/split/settle/format/math/currencies/alerts/schemas/meta). LEAVE ALONE.
+   196→   196→- `packages/scraper/src/` — TGJU + Frankfurter + the RateStore port. LEAVE ALONE.
+   197→   197→- `docs/` — `HANDOFF.md`, `DECISIONS.md`, `DEPLOY.md`, `INDICATORS_AND_DATA_SOURCES.md`, `THIRD_PARTY_NOTICES.md`, `specs/`, `audits/`, `modularization/`, `page-division/`, `insights/`, `localization/`, `archive/`, `assets/`.
+   198→   198→- `legacy/` (gitignored) — the Django backup, the ONLY source of truth for features.
+   199→   199→
+   200→   200→**The Gold Page Elevation program (GPE) — COMPLETE (S18, 2026-11-19).** Eight implementation sessions (S10–S17) delivered, deployed, and live-verified the `s8/01` recommendation table's waves (P1 the credibility floor + the explanation band + the prizes → P2 the chart/TA + education → P3 the Supporting tier → P4 the Advanced tier) — 31 of the 33 queued rows shipped; production ended at `65f7c0bb` @ 100%; the GoldPage chunk budget stands at 240/50 (raw/gz kB). The program's closeout record set is `docs/specs/gold-page-elevation/s18/` (the research-branch reconciliation + the closure record with the 18-session ledger + the standing owner-side levers); the pre-S10 research specs live only on `origin/docs/gold-page-elevation` (read with `git show origin/docs/gold-page-elevation:<path>`). The gold system's own deep reference stays `docs/insights/GOLD_SYSTEM_COMPLETE_REFERENCE.md`.
+   201→   201→
+   202→   202→**The gold page's post-program map (the render order, top to bottom).** The header (title + the data-as-of line) → the hero (Zone B/C: the live Yahoo price + the Balance Scale verdict + the outlook + the counts + the market-state pill + the collapsed **time machine**) → the explanation band (Zone D: the **daily narrative** + the **yield-decomposition card** side by side, the collapsed **education on-ramp**, the **expectations row** [probabilities + calendar]) → the Iran bridge band (Zone F: **Bridge-1** the board + parity + حباب, then **Bridge-2** the premium history + deciles + the attribution strip, same band) → the Signals section (the **interactive chart** with the window as a user control) → the 37-seat five-lane meter (Zone G) → the **minimal TA band** (Zone H) → the context block (Zone J/I: the COT band chips + the multi-currency grid + the Zone K demand plumbing [the CB tracker + the London vault/clearing cards + the correlation companion + the drop-gated demand stack] + the honest-record footer with the **forecast retrospective**) → the positions section → **the relationship explorer** (GUX-S6, 2026-11-20: the 25-record conventional-relationships map — list-first, M/C/X/K classes always visible, the blocked edge legend-only, the honesty footer; its own near-viewport chunk) → the history tail (Zone O: the **Episode Explorer** + the **if-you'd-bought calculator**) → the **publication-notes disclosure** (BD-S43, 2026-11-20, owner-directed: the §16 licence wall — the blocked quartet + the ONE sources link-out — and the projection's absent-count line, formerly the page header's note, at the page tail, COLLAPSED BY DEFAULT under `#gold-blocked` — the same honest copy, one tap away). Every GPE surface is bilingual, progressive-disclosure (collapsed by default incl. 390), and honesty-first (named windows, named venues, honest waiting states).
+   203→   203→
+   204→   204→**The gold-family rung registry (all on the currena-api's one `* * * * *` minute trigger — no new triggers were ever added):** `:13` hourly the Yahoo live prices · `:23`/`:53` the Polymarket expectations refresh · `04:47` the meter archive row · `04:49` the if-bought running points · `20:33` (00:03 Tehran) the premium day row; the ingest side: `04:10` the main collect (the gold projections + the gold-api legs) · `04:25`/`04:40` the history rungs · `04:30` rung3 the CB tracker (day 1–5 gate + month-skip idempotence) · `04:35` rung4 the OHLC append + the crosses + LBMA (arrears rhythms: vault T+2.5 wk, clearing month−2).
+   205→   205→
+   206→   206→**The gold-family KV key inventory:** `insights:gold-cb:v1` (the IMF tracker) · `insights:gold-xau:v1` (the OHLC series) · `insights:gold-xau-crosses:v1` (the grid) · `insights:gold-lbma:v1` (vault + clearing) · `insights:gold-expectations:v1` (the probabilities) · `insights:gold-premium-history:v1` (the حباب history) · `insights:gold-meter-history:v1:<YYYY>` (the year-sharded archive) · `insights:gold-ifbought:v1` (the calculator) · `insights:gold-episodes:v1` (the Explorer's drop-gated plane — written when the prices workbook lands). The standing owner-side levers (the WGC drops first: save the dated file at `data/wgc/…` and tell the next session) are listed in `docs/specs/gold-page-elevation/s18/02-PROGRAM-CLOSURE-RECORD.md` §3.
+   207→   207→
+   208→   208→**Standing limits (carry forward every session).**
+   209→   209→- **The §21 portwatch window:** never run the portwatch leg Tuesdays 11:00–14:00 UTC — the IMF PortWatch provider's maintenance window returns stale/empty readings (recorded in `docs/page-division/01-SESSION-ROADMAP.md`).
+   210→   210→- **The deploy-lock re-check FIRST (D-43):** before every deploy, confirm via the Cloudflare deployments API that the active production version is the expected one. If a newer deploy exists, STOP and report — an unattended mid-session deploy once drifted production (the D-43 lesson, walked in every `docs/DEPLOY.md` session record).
+   211→   211→- **The wrangler 10013 retry rule:** if `wrangler deploy` fails with error 10013 (a transient Cloudflare deploy failure), retry the deploy. Every M12–M14 first attempt was clean; the rule is held in reserve.
+   212→   212→- **The `run` is required under pnpm 10:** `pnpm --filter @currena/api run deploy`, not `pnpm --filter @currena/api deploy`.
+   213→   213→- **No renames, ever, when moving files (R5):** the bundle-budget gate matches route-module chunk basenames (`GoldPage-*.js` …) — moves only, names frozen. The modularization program is COMPLETE at M16, but the constraint carries forward for any future move.
+   214→   214→
+   215→   215→## 12. First-time setup of a repo (do this automatically)
+   216→   216→
+   217→   217→Run this at the start of the first session in a repo, or whenever the folder layout from section 8 is missing. Do not ask for permission. The standing approval in section 5 applies: commit and push after each step.
+   218→   218→
+   219→   219→1. **Audit the repo.** Understand what it is, how it is built, how it is deployed, and what state it is in.
+   220→   220→2. **Create the folder layout from section 8:** `docs/HANDOFF.md`, `docs/DECISIONS.md`, `docs/specs/`, `docs/audits/`, `docs/archive/`, `docs/assets/`, and `CHANGELOG.md`.
+   221→   221→3. **File stray files.** Move screenshots, specs and other loose files from the repo root into the right folders with `git mv`. Fix any references to them. Never delete the owner's files, and never move files that tools need at the root.
+   222→   222→4. **Fill in section 11 "Project facts"** from what you found.
+   223→   223→5. **Protect secrets.** Make sure `.gitignore` covers `.env`, `backups/` and other secret files. Check that no secret is already committed. If one is, tell the owner right away and ask them to rotate it.
+   224→   224→6. **List unfinished and obsolete specs** in `docs/HANDOFF.md`. Compare every spec with the real code, and list what is missing, half-built or outdated.
+   225→   225→7. **Commit and push** each step as you go.
+   226→   226→8. **End with the TLDR report** from section 10.
+   227→   227→
+   228→   228→## 13. Root tidy-up procedure (standing instruction)
+   229→   229→
+   230→   230→The owner uploads files into the root of repositories without organizing them. When the root needs tidying, follow this procedure end to end, yourself, from start to finish.
+   231→   231→
+   232→   232→### CONFIGURATION (edit only if the owner wants something different)
+   233→   233→
+   234→   234→- **REPOS_TO_TIDY:** the current repository. If given access to several repositories, do them one by one, each on its own.
+   235→   235→- **WORK_ON_BRANCH:** create a new branch called `chore/tidy-root` in each repo. Never work directly on `main` or `master`.
+   236→   236→- **OPEN_PULL_REQUEST:** yes (if you can). If not, just push the branch.
+   237→   237→- **FILES_ALLOWED_AT_ROOT_EXTRA:** none (add any file names here that the owner wants to keep at root).
+   238→   238→- **DELETE_FILES:** never. Move or archive only.
+   239→   239→- **CREATE_NEW_FOLDERS:** only when truly necessary (see STEP 3).
+   240→   240→- **ASK_ME_QUESTIONS:** no. Decide on your own using the rules below. If something is truly risky, leave it where it is and list it in the final report.
+   241→   241→
+   242→   242→### YOUR JOB
+   243→   243→
+   244→   244→Tidy up the root of the repository so that only the important files remain there, and every other file lives in a sensible folder that fits that project's own structure. Important files such as AGENTS.md must be easy to see at the root.
+   245→   245→
+   246→   246→### STEP 1: UNDERSTAND THE PROJECT FIRST
+   247→   247→
+   248→   248→Before moving anything:
+   249→   249→
+   250→   250→- List every file and folder in the whole repository, not just the root.
+   251→   251→- Read README, `package.json` / `pyproject.toml` / `requirements.txt` / `go.mod` / `wrangler.toml` / `composer.json` / any build or deploy config, and any CI files (`.github/workflows`).
+   252→   252→- Work out what kind of project it is (WordPress plugin, Python tool, Cloudflare Worker, desktop app, web app, Go app, etc.).
+   253→   253→- Write down (for yourself) a map of every folder that already exists and what it is used for. You will use this map in STEP 3.
+   254→   254→
+   255→   255→### STEP 2: WHAT MUST STAY AT ROOT
+   256→   256→
+   257→   257→Keep these at root (only the ones that exist):
+   258→   258→
+   259→   259→- AGENTS.md and any other agent rules file (per the READ THIS FIRST section, AGENTS.md is the only agent-instruction file — never create another)
+   260→   260→- README, LICENSE, CHANGELOG, CONTRIBUTING, SECURITY
+   261→   261→- `.gitignore`, `.gitattributes`, `.editorconfig`, `.env.example`
+   262→   262→- Dependency and build files that tools require at root: `package.json`, `package-lock.json`, `pyproject.toml`, `requirements.txt`, `go.mod`, `go.sum`, `composer.json`, `Makefile`, `Dockerfile`, `docker-compose.yml`, `wrangler.toml`, vite/webpack/tsconfig/eslint/prettier configs, and the main plugin file of a WordPress plugin
+   263→   263→- Hidden config folders: `.github`, `.vscode`, `.claude` and similar
+   264→   264→- The main source folders (src, app, lib, etc.)
+   265→   265→- Anything listed in FILES_ALLOWED_AT_ROOT_EXTRA
+   266→   266→
+   267→   267→AGENTS.md must be the most visible thing: make sure it sits at root and is not buried or duplicated. If there are several copies or variants, keep the newest one at root and move the others into the project's existing archive folder (or, if none exists, see STEP 3).
+   268→   268→
+   269→   269→### STEP 3: WHERE THINGS GO (REUSE FIRST, CREATE LAST)
+   270→   270→
+   271→   271→This is the most important rule for choosing folders:
+   272→   272→
+   273→   273→**RULE A. Use the project's existing structure first.** For every file that leaves the root, look at the folder map from STEP 1 and put the file into the existing folder that already serves that purpose, even if the folder name is different from what you would have chosen. Examples:
+   274→   274→
+   275→   275→- If specs and documents already live in a folder called `spec`, put new spec and document files there. Do NOT create `docs` or `documents-and-specs` next to it.
+   276→   276→- If images already live in `img`, `images`, `static` or `public`, use that. Do NOT create `assets`.
+   277→   277→- If scripts already live in `tools` or `bin`, use that. Do NOT create `scripts`.
+   278→   278→- If there is already an `old`, `backup` or `archive` folder, use it. Do NOT create `docs/archive`.
+   279→   279→
+   280→   280→**RULE B. Never create overlapping or duplicate folders.** Before creating any folder, check if an existing folder, under any name, already covers the same kind of content. If one does, use it. Never end up with two folders that mean the same thing (for example `docs` and `documentation`, or `scripts` and `tools` doing the same job).
+   281→   281→
+   282→   282→**RULE C. Create a new folder only if all of these are true:**
+   283→   283→1. No existing folder covers that kind of file.
+   284→   284→2. There are enough files of that kind to justify a folder (a single stray file can go into the closest existing folder instead).
+   285→   285→3. The new folder name follows the naming style the project already uses (lowercase or capitalized, singular or plural, etc.).
+   286→   286→
+   287→   287→**RULE D. Keep it flat.** Do not create sub-folders unless the files truly need them. One level is the default. Do not add nested folders such as `docs/archive/old` just for neatness.
+   288→   288→
+   289→   289→**RULE E. If no structure exists at all** (a brand-new messy repo), use the normal convention for that project type, and keep it as small as possible. Common choices: `docs`, `scripts`, `assets`, `data`, `tests`, `config`, `archive`. Create only the ones you actually need.
+   290→   290→
+   291→   291→**RULE F. When unsure where a file belongs**, put it in the closest existing folder, or the existing archive folder, and mention it in the report. Never leave a file at root just because you are unsure.
+   292→   292→
+   293→   293→### STEP 4: DO NOT BREAK ANYTHING
+   294→   294→
+   295→   295→This matters more than tidiness. For every file you move:
+   296→   296→
+   297→   297→- Use `git mv` so history is kept.
+   298→   298→- Search the whole repo for references to that file (imports, require, includes, paths in scripts, README links, CI workflows, Dockerfile, config files, WordPress include/require paths) and update them so everything still works.
+   299→   299→- Never move a file that a tool or platform requires at a fixed location (for example `wrangler.toml`, the WordPress main plugin file, workflow files, `package.json`). When in doubt, leave it.
+   300→   300→- Never touch, print, or move secrets (`.env`, keys, tokens). If a secret is committed in the repo, do not copy it anywhere. Add it to the final report as a warning.
+   301→   301→- Never delete anything.
+   302→   302→- Never rewrite file contents except to fix paths after a move.
+   303→   303→- Do not rename or reorganize folders that already exist. Only add files into them.
+   304→   304→
+   305→   305→### STEP 5: CHECK YOUR WORK
+   306→   306→
+   307→   307→After moving:
+   308→   308→
+   309→   309→- Run the project's build, tests, or at least a syntax/import check (for example: `npm run build`, `python -m py_compile`, `go build`, `php -l`).
+   310→   310→- Check that no broken paths remain by searching for the old file names.
+   311→   311→- Check that the root now contains only the allowed items from STEP 2.
+   312→   312→- Check that you did not create any folder that overlaps with an existing one. If you did, merge it into the existing folder.
+   313→   313→- If a check fails, fix it or undo that specific move.
+   314→   314→
+   315→   315→### STEP 6: COMMIT AND REPORT
+   316→   316→
+   317→   317→- Make small, clear commits (for example `chore: move loose specs into spec/`, `chore: move old backups into archive/`).
+   318→   318→- Push the branch and open a pull request if possible.
+   319→   319→- Finish with a short plain-language report (no technical jargon):
+   320→   320→  1. What the root looked like before and after (two short lists)
+   321→   321→  2. Where each moved file went and why (one line each)
+   322→   322→  3. Any new folder you created and why none of the existing folders could be used (if you created none, say so)
+   323→   323→  4. Any path references you updated
+   324→   324→  5. Anything you left alone and why
+   325→   325→  6. Any warnings (committed secrets, duplicate files, broken things you could not fix)
+   326→   326→
+   327→   327→Start when the owner asks for a tidy-up, and do not stop until every repository's root is clean and verified.
+   328→   328→
+   329→   329→---
+   330→   330→
+   331→   331→## 14. Project-specific rules for this repository (preserved from the previous `AGENTS.md`)
+   332→   332→
+   333→   333→> This section is the repo's own rules file, kept in force after the universal rules above were
+   334→   334→> adopted on 2026-11-08. It records decisions, operating constraints and knowledge specific to this
+   335→   335→> project. **Where a rule in this section conflicts with the general rules above, this section
+   336→   336→> wins for this repo** — it reflects what the owner and past sessions already decided for this
+   337→   337→> project. The universal rules apply to everything this section does not override.
+   338→   338→
+   339→   339→Operating manual for humans and AI agents working in this repo. Read before touching anything.
+   340→   340→
+   341→   341→### What this is
+   342→   342→
+   343→   343→Currena is a currency converter focused on Iranian open-market rates (Toman) plus
+   344→   344→international pairs. It is a parallel rebuild of a production Django app that stays
+   345→   345→live at https://aliassadi1993.pythonanywhere.com/ until an explicit human cutover.
+   346→   346→
+   347→   347→- **apps/api** — Hono on Cloudflare Workers. Serves `/api/*`, the zero-JS
+   348→   348→  `/admin` ops console (Phase 6: per-source status + manual refresh via
+   349→   349→  REFRESH_SECRET; noindexed), AND the built SPA via Workers static assets
+   350→   350→  (SPA fallback). One deploy, no CORS. `run_worker_first` pins `/admin*`,
+   351→   351→  `/api/*`, `/internal/*` to the Worker (navigation requests to non-asset
+   352→   352→  paths would otherwise be served the SPA shell by the platform).
+   353→   353→  Structure since the 2026-10-15 QA split: `src/index.ts` is the
+   354→   354→  composition root only; the routes live in `src/routes/`
+   355→   355→  (rates/ops/admin/internal/insights), shared HTTP plumbing in
+   356→   356→  `src/http.ts`, the rate limiter + secret compare in `src/security.ts`,
+   357→   357→  the default service + snapshot memo in `src/default-service.ts`, and
+   358→   358→  the ever-green cron body in `src/cron.ts`.
+   359→   359→- **apps/markets** — the markets worker (currena-markets): source scrapers'
+   360→   360→  twin of the fx engine + the daily snapshot crons `30 23 * * 1-5` +
+   361→   361→  `30 1 * * 2-6` UTC (main + retry) writing `insights:markets:v1` /
+   362→   362→  `insights:fx:v1` into the shared RATES KV; carries the EODHD stock
+   363→   363→  ingestion. Scheduled-only surface — a page request can never reach a
+   364→   364→  provider.
+   365→   365→- **apps/web** — Vite + React + TS + Tailwind PWA (standalone SPA, never
+   366→   366→  server-rendered; will be wrapped in Capacitor later).
+   367→   367→- **packages/core** — zod schemas, conversion math, formatting. Pure. Tested.
+   368→   368→- **packages/scraper** — source modules + normalizers. Tested against fixtures.
+   369→   369→- **docs/** — `DEPLOY.md` (the deploy runbook), `INDICATORS_AND_DATA_SOURCES.md`
+   370→   370→  (the consolidated reference), `THIRD_PARTY_NOTICES.md`, `README.md`.
+   371→   371→- **docs/insights/** — the Insights doc set (AGENT_RUNBOOK, RULES, RISK_REGISTER,
+   372→   372→  LICENCES, SCRAPING_SPEC, UI_SPEC, MAINTENANCE, OWNER_SETUP, GLOSSARY,
+   373→   373→  BACKTEST, SELF_AUDIT, the numbered specs 01–09, + the round reports R9/R10).
+   374→   374→  `docs/insights/layer1/` is the Layer-1 (plain-language copy) doc set;
+   375→   375→  `docs/insights/layer2/` is the Layer-2 prep set (the prep spec, DECISIONS
+   376→   376→  D-20+, AU-DATA-OPTIONS, NARRATION-STATE — the narrator's contracts).
+   377→   377→- **docs/gap-closure/** — the 6-session gap-closure program (specs S1–S6, operating rules, `PROGRESS.md`, session kickoff prompts). Read `docs/gap-closure/README.md` before starting any session of that program; its `00-OPERATING-RULES.md` overrides older rules for that program only.
+   378→   378→- **docs/specs/** — the governing feature specs (world currencies, world markets,
+   379→   379→  the world-markets map spec) + `traceability.md` (the requirement → code → test map).
+   380→   380→- **docs/localization/** — Persian copy workflow, terminology, and the manifest.
+   381→   381→- **legacy/** — (gitignored) Django backup — the ONLY source of truth for features.
+   382→   382→- **legacy-captures/** — (gitignored) raw captures from the live site (Phase 1 evidence).
+   383→   383→
+   384→   384→### Commands
+   385→   385→
+   386→   386→Package manager is **pnpm** (Node ≥ 20).
+   387→   387→
+   388→   388→    pnpm install
+   389→   389→    pnpm gates                                   # ALL gates in one command (typecheck, lint,
+   390→   390→                                                 # copy:audit, narrator-vocabulary drift, the strict
+   391→   391→                                                 # Layer-1 validator, full suite, build + budget) —
+   392→   392→                                                 # run this before deploying; CI is red (owner-side)
+   393→   393→    pnpm -r typecheck
+   394→   394→    pnpm lint                                     # eslint (flat config; 0 errors in CI)
+   395→   395→    pnpm -r test                                  # vitest — never hits live sites
+   396→   396→    pnpm --parallel dev                           # api: wrangler dev (:8787) · web: vite (:5173)
+   397→   397→    pnpm --filter @currena/web build              # SPA dist → served by the Worker
+   398→   398→    pnpm --filter @currena/api deploy             # wrangler deploy (needs CLOUDFLARE_API_TOKEN)
+   399→   399→
+   400→   400→### Non-negotiable engineering rules
+   401→   401→
+   402→   402→1. **TypeScript strict everywhere.**
+   403→   403→2. **Provider portability**: business logic imports NOTHING platform-specific.
+   404→   404→   Web-standard APIs only (`fetch`, `Request/Response`, `URL`, `crypto`) outside
+   405→   405→   `apps/api/src/adapters/`. All KV/storage access goes through the `RateStore`
+   406→   406→   interface so a KV→D1 migration is a swap.
+   407→   407→3. **Contracts live in `packages/core/src/schemas.ts`** as zod schemas
+   408→   408→   (Rate, Snapshot, RatesResponse, RatesError, SourceConfig). Import, never
+   409→   409→   redefine. Everything crossing a trust boundary — including scraper output —
+   410→   410→   is zod-validated; an upstream layout change must fail loudly, never render garbage.
+   411→   411→4. **SPA-only frontend.** All data via the JSON API. Hono RPC types (`hc<AppType>`)
+   412→   412→   give the web app an end-to-end typed client.
+   413→   413→5. **RTL/LTR is native from day one**: `dir` on `<html>` from locale; CSS logical
+   414→   414→   properties only (`ms-/me-/ps-/pe-`, never `ml-/mr-`); every UI string through
+   415→   415→   the i18n dictionary (`apps/web/src/i18n/`); numbers formatted only at render
+   416→   416→   via `Intl.NumberFormat('fa-IR' | 'en-US')`. Internal numbers are canonical —
+   417→   417→   never store formatted/display digits. Currency display names use the
+   418→   418→   **international common name** (ISO 4217 / CLDR en — e.g. "UAE Dirham"; Gate 1
+   419→   419→   decision 2026-09-16); the fa locale renders proper Persian names from the
+
+[showing lines 20-419 of 1393; use offset=420 with limit to continue reading]
