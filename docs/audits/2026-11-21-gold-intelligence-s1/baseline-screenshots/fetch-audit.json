@@ -1,0 +1,67 @@
+{
+  "origin": "https://currena.ir",
+  "route": "/gold",
+  "capturedAt": "2026-11-21T13:25:37.433Z",
+  "requests": [
+    "https://currena.ir/gold",
+    "https://currena.ir/cdn-cgi/rum?",
+    "https://currena.ir/api/rates?source=tgju",
+    "https://currena.ir/api/rates?source=frankfurter",
+    "https://currena.ir/api/history?source=tgju",
+    "https://currena.ir/api/history?source=frankfurter",
+    "https://currena.ir/api/insights",
+    "https://currena.ir/api/insights/pages/gold",
+    "https://currena.ir/api/insights/gold-ohlc",
+    "https://currena.ir/api/insights/gold-expectations",
+    "https://currena.ir/api/insights/gold-premium",
+    "https://currena.ir/api/insights/gold-crosses",
+    "https://currena.ir/api/insights/gold-cb",
+    "https://currena.ir/api/insights/gold-lbma",
+    "https://currena.ir/api/insights/real-yield-10y/history",
+    "https://currena.ir/api/insights/gold-episodes",
+    "https://currena.ir/api/insights/gold-ifbought"
+  ],
+  "liveState": {
+    "headline": "Gold: conditions lean against it",
+    "outlook": "bearish",
+    "outlookFiveState": "moderately-pressure",
+    "stackVerdict": "against",
+    "laneBars": [
+      "borrowing-costs:against",
+      "dollar:against",
+      "stress:for",
+      "inflation:against",
+      "flows:neutral",
+      "borrowing-costs:against",
+      "dollar:against",
+      "stress:for",
+      "inflation:against",
+      "flows:neutral"
+    ],
+    "heroPriceSnippet": "Gold price (ounce)US$3,539−8.94%7d over the past 7 daysXAUUSD spot · daily closes−23.9%90 bars · Aug 2026 → Nov 2026top 12% of the last 10 yearsGold over the last 30 days: −12.84%. Shown for context, not counted in the balance.as of 01:13 pm UTCMarket closed · COMEX gold futures, New York (UTC−5)BRIEFINGGold: conditions lean against itConditions moderately pressure gold · 1 for · 3 against · 1 not",
+    "heroAsOf": "as of 01:13 pm UTC",
+    "census": {
+      "seats": 37,
+      "laneSections": 5,
+      "contextCards": 13,
+      "positionCards": 2,
+      "collapsed": 23,
+      "navChips": 7,
+      "h2s": [
+        "Gold price (ounce)",
+        "Gold: conditions lean against it",
+        "What the signals say",
+        "The 37 seats, by lane",
+        "Gold Positions",
+        "How the forces connect"
+      ]
+    },
+    "title": "Gold - Currena",
+    "pageHeightPx": 17331,
+    "firstViewport": "Gold price (ounce)US$3,539−8.94%7d over the past 7 daysXAUUSD spot · daily closes−23.9%90 bars · Aug 2026 → Nov 2026top 12% of the last 10 yearsGold over the last 30 days: −12.84%. Shown for context, not counted in the balance.as of 01:13 pm UTCMarket closed · COMEX gold futures, New York (UTC−5)BRIEFINGGold: conditions lean against itConditions moderately pressure gold · 1 for · 3 against · 1 not leaning (this describes current conditions, not a forecast)WhyPressures goldReal yields (inflation-adjusted) — What a 10-year US government bond really earns after expected inflation. High real yield"
+  },
+  "consoleErrors": [
+    "[console] Failed to load resource: the server responded with a status of 503 ()"
+  ],
+  "pageErrors": []
+}
