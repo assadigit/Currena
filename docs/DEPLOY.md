@@ -6127,3 +6127,15 @@ session 4.**
 **The production state, verified live this session (read-only):** currena-api's active deployment set is the S8 close's own pair — the `2f101b25` deploy (created 2026-11-21T00:19:10Z) + its EODHD secret-put (00:19:18Z), i.e. exactly the 2026-11-2x-f record's end state; NO drift since (the deployments list read this session). **The served runtime byte-verified IDENTICAL to the fresh local build of `origin/main` `6ce80570` (the S9 merge — docs-only, runtime-identical to the S8 close `45f89c19`):** the entry `index-CIk9GXGr.js` · the CSS `index-BOp1eEbr.css` · the GoldPage chunk `GoldPage-DSykvmFj.js` — all three `cmp`-clean. The live page passed the 34-capture matrix + the keyboard walk this session (the S9 report §1). Rollback `f7ea508d` remains a version away.
 
 **The D-43 discipline stands:** any future session that changes runtime code re-checks the deploy lock FIRST (the standing §11 rule), then follows this file's runbook verbatim.
+
+## Session record — 2026-11-2x-h GUX-S10 the Q3-A deploy: the ratio-only home live
+
+**The D-43 re-check (FIRST):** production was still the S8 close's pair — **`2f101b25` @ 100%** (deployment 2026-11-21T00:19:09Z) plus its EODHD secret-put twin (`1f2fb58e`, Secret Change 00:19:18Z) — no drift; cleared to deploy.
+
+**The merge + the pushes:** `feat/gold-redesign-s10-q3a` merged to `main` as **`707ef28f`** (the two session commits `019da74f` + `16ccf099`); `origin/main` = `707ef28f` and the branch pushed (one-shot token URLs — never persisted).
+
+**The deploy:** the fresh `pnpm --filter @currena/web build` on the merged main → `wrangler deploy` (clean, no 10013) → currena-api **`c8e70bae`**. **The EODHD re-put on BOTH workers** (the standing rotation lever, stdin only): currena-api now active the secret-put's version **`41c8a56f` @ 100%** (03:20:42Z); currena-markets secret-only (**`9c525932`** @ 03:20:46Z — code unchanged, not deployed).
+
+**The live verification (all GREEN):** `/api/health` 200 · `/api/insights/pages/gold` 200 · the gold-family planes **200 × 8** (ohlc · cb · crosses · lbma · expectations · premium · ifbought · meter) · `gold-episodes` **503** = the DESIGNED WGC-workbook waiting state · the workers.dev twin 200 · the served entry `index-Dk-QJO9M.js`, the CSS `index-DqoA_iWG.css` and the GoldPage chunk **`GoldPage-Cef859tD.js`** all **byte-verified IDENTICAL** to the fresh dist · the live GoldPage chunk carries the gold-only contract (the `data-verdict-metal` marker present; `silverKeepSmallNote`/`MetalTrendChart` **GONE — count 0**; the old `GoldPage-DSykvmFj.js` retired from the build). **The Q3-A page is live: the Signals section renders gold-only — the chart + the measured note + the gold price footing — and silver lives in its three seats (the ratio card, the if-you'd-bought row, the London vault's silver row).** Rollback: `41c8a56f` → `c8e70bae` → `2f101b25` remain a `wrangler rollback` away.
+
+**The tree:** `origin/main` = `707ef28f`. Credentials used for the GitHub push + the deploy + the verification probes, never stored (AGENTS.md §7).
