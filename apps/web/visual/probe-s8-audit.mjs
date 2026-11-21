@@ -19,7 +19,7 @@
  * Output: a structured JSON report on stdout (the remediation list's input).
  */
 
-/* global console, setTimeout, URL, window, document, getComputedStyle */
+/* global console, setTimeout, URL, window, document, getComputedStyle, Element */
 import { chromium } from '@playwright/test';
 
 const { spawn } = await import('node:child_process');

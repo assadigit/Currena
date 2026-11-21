@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 as a private monorepo, releases are tracked by date and Workers version rather
 than a semver tag.
 
+## 2026-11-2x — GUX Session 8 (the gold UX redesign): the mobile-first refinement, interactions and accessibility; merged to main and deployed
+
+**Branch `feat/gold-redesign-s8` → `main`.** The milestones, all verified:
+
+- **M0 the baseline audit** (`probe-s8-audit.mjs`, the nine-pass matrix) — three defects the earlier sessions' evidence had hidden: **the S5–S7 "dark" screenshots were LIGHT** (the harness's inert `currena:theme` key vs the app's LEGACY `theme`), **the sticky nav was invisible while stuck since S5** (under the fixed header's z-1000), and the partial-data crash (fixed in M5).
+- **M1 mobile 390 as a deliberate layout**: the section nav rebuilt as the ONE-row chip-scroller (the en 3-row 132px wrap → 56px; 44px chips; direction-aware fades; the active chip centered, RTL-safe); the touch floor on the primary controls (44px) with the documented secondary (24px) and inline (2.5.8 exemption) policy; the five-force patterns at 390 verified.
+- **M2 RTL/LTR + light/dark**: no horizontal overflow at 390/360/1440 en+fa both themes, held at every milestone; the sticky chrome never obscures content or focus.
+- **M3 the interaction contract**: the chart inspector's polite live-region readout (the keyboard crosshair now SPEAKS its point — 11 §8 E); the premium + vault charts' accessible names upgraded to full readings (4 keys, both locales, copy round 94 — the manifest 9,269); the sheet's two geometries verified with the focus discipline.
+- **M4 the contrast matrix AS A CHECK** (`gux-s8-checks.plw.ts`, 13 validations): both themes × both locales with the hex/rgb/color(srgb)/oklab parser + THE TOKEN RULE + the overflow sanctity + the touch floors + the LABEL census + reduced motion — plus the GLOBAL reduced-motion guard in index.css. The measured matrix passes everywhere (the dark floor 4.77:1).
+- **M5 the honest states** (`gux-s8-states.plw.ts`, 7 forced-state tests + captures): loading, error (+the working retry), stale/cached, unavailable, insufficient-history, partial-data, discoverability — **and the real bug: the narrative's `windows.reduce` crashed the whole route on a projection with the price reading absent; fixed + the regression pin**.
+- **M6 the close**: the docking fix (the nav sticks UNDER the fixed header per 11 §12's own spec, the anchor margin recalibrated — `.gold-anchor-mt` 124/140px, jumps clear by 4px); the 38-capture evidence set (the FIRST genuinely dark pairs of the program); **Q3 PRESENTED (silver's canonical home — A the ratio-only home RECOMMENDED, B keep-but-secondary, C a dedicated home; the gated implementation HELD)**; the report `16-responsive-accessibility-report.md`; S8-D1..D7; **10/10 gates GREEN**; GoldPage 225.97/50.70 under 240/55.50 all session (~14.0 kB raw headroom); the deploy with the D-43 re-check (the record in `docs/DEPLOY.md`).
+
+**The program counter: Session 8/9 complete · 1 remaining.** Q3's answer is S9's first input; Q2 stays closed by design.
+
 ## 2026-11-20 — GUX Session 7 (the gold UX redesign): the owner's Q1 answered (the five-state word) + the lower-page S4 patterns; merged to main and deployed
 
 **Branch `feat/gold-redesign-s7` → `main`.** The milestones, all verified:
