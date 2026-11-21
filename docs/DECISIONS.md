@@ -4467,3 +4467,14 @@
 
 **Who decided:** the session (inside S5-D1 standing rule 2's pre-authorized ladder; the same authority S5-D5 exercised).
 **When to revisit:** the program's close (Session 9's budget review); any future GoldPage growth proposal.
+
+## BD-S51 — 2026-11-2x — GUX Session 9 (the FINAL session): the program COMPLETE; the BD-S49/S50 revisit clauses discharged — the ceilings stand; Q3 still-open; the docs-only no-deploy posture
+
+**Decision:** The Gold UX Redesign program closed at Session 9/9 with the full verification pass (`docs/gold-redesign/17-final-qa-and-regression-report.md` — the completion record). The budget review BD-S49 ("revisit at the program's close or any growth proposal") and BD-S50 (the same clause) both came due and were discharged: **the ceilings stand at 240,000 raw / 55,500 gz (BD-S49's numbers), the close measured 225.97/50.70 — ~14.0 kB raw headroom, no ceiling ask all session, and no growth proposal exists**; the tail-chunk budgets (34/8) and the entry budgets (296/89.5) unchanged. The model-unchanged proof (the engine/workers/core/scraper/registry byte-unchanged over the whole program range — the one generated-vocabulary fingerprint pair aside) is recorded at S9-D2. **Q3 (silver's canonical home) presented with recommendation A — no answer arrived inside the session: STILL-OPEN**, nothing renders differently (S9-D3); the gated change executes in its own conscious session when the owner answers. **Session 9 deployed NOTHING** (docs + the visual harness only — §15.4's docs-only rule; production stays `2f101b25` @ 100%, byte-verified equal to the verified tree); any future runtime session owes the D-43 re-check FIRST.
+
+**Options considered:** a final deploy re-anchor (rejected — no runtime change exists to deploy; the S4/PL-1 precedent) · executing Q3's recommendation A unilaterally (rejected — the master plan's own gate; the Q1/Q2 hold pattern) · raising any ceiling (moot — nothing grew).
+
+**Reason:** The program's own protections held to the end; the completion record needed only evidence and records, and the discipline (the ceilings, the gates, the D-43 posture) transfers forward unchanged to whatever the owner starts next.
+
+**Who decided:** the session (inside the master plan's Session 9 scope + AGENTS.md §5/§15.4's standing rules).
+**When to revisit:** any future GoldPage growth proposal (BD-S49's clause carries forward), and whenever the owner answers Q3 (the one open product decision the program leaves standing).
