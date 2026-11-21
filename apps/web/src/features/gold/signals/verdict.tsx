@@ -21,7 +21,6 @@
  */
 
 import type { CSSProperties } from 'react';
-import type { SignalReading } from '@currena/insights';
 import { Coins } from 'lucide-react';
 import type { InsightsCopy } from '../../../shared/i18n/insights-copy-en';
 import { DIRECTION_DOWN_URL, DIRECTION_UP_URL, IconImg, indicatorIconUrl } from '../../../components/icons/currena';
@@ -114,11 +113,9 @@ export function VerdictIcon({
  * tinted corner box (56/64px) — the chart, not the artwork, owns the
  * chip now. The gold chip wears the brand-gold box. */
 export function MetalIcon({
-  metal,
   size = 28,
   desktopSize = 36,
 }: {
-  metal: 'gold';
   size?: number;
   desktopSize?: number;
 }) {
@@ -130,7 +127,7 @@ export function MetalIcon({
  * tinted-box language as the prices board's PriceIconBox, miniaturised.
  * GUX-S10 (Q3-A): gold-only — the quiet silver tint variant retired
  * with the silver card. */
-export function MetalIconBox({ metal }: { metal: 'gold' }) {
+export function MetalIconBox() {
   const icon = indicatorIconUrl('gold-usd');
   return (
     <span
@@ -185,13 +182,11 @@ export const verdictTone: Record<OutlookState, string> = {
  * ---------------------------------------------------------------- */
 
 export function VerdictStrip({
-  gold,
   goldOutlook,
   price,
   copy,
   numberLocale,
 }: {
-  gold: SignalReading;
   /** GB-S5 (P3, 01 §5.2 + AC-3): the gold Outlook derived from the SAME
    * goldBalance() result that drives the lane balance. Since the GB-S6
    * flip this is THE gold derivation (the flag-off outlookOf(gold)
@@ -249,7 +244,7 @@ export function VerdictStrip({
          * much larger than a caption ("Gold" at 20px bold), the price
          * stays the lighter, quieter end of the row. */}
         <div className="flex items-center gap-3">
-          <MetalIconBox metal="gold" />
+          <MetalIconBox />
           <span className="min-w-0 flex-1 text-xl font-bold leading-snug text-[var(--color-text-primary)]">
             {s.metals.gold}
           </span>

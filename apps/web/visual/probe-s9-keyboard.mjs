@@ -20,7 +20,7 @@
  */
 
 /* Node globals for `pnpm lint` (the probe-s8-audit.mjs precedent). */
-/* global console, setTimeout, URL, window, document */
+/* global console, getComputedStyle, window, document */
 import { chromium } from '@playwright/test';
 
 const browser = await chromium.launch();
@@ -124,7 +124,7 @@ for (let n = 0; n < 80; n += 1) {
 // The Escape discipline on the record sheet: open a seat, Escape must
 // close it and return focus to the opener (the S8 suite pins the
 // component; this proves it live).
-let sheetEscape = 'not-exercised';
+let sheetEscape;
 try {
   await page.locator('#gold-seats').scrollIntoViewIfNeeded();
   await page.waitForTimeout(600);

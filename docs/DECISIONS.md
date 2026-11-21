@@ -4478,3 +4478,14 @@
 
 **Who decided:** the session (inside the master plan's Session 9 scope + AGENTS.md §5/§15.4's standing rules).
 **When to revisit:** any future GoldPage growth proposal (BD-S49's clause carries forward), and whenever the owner answers Q3 (the one open product decision the program leaves standing).
+
+## BD-S52 — 2026-11-2x — GUX Session 10: the Q3-A execution (the ratio-only home) — the program's one deferred gate discharged; the Signals section gold-only; deployed
+
+**Decision:** The owner answered the program's one standing question — Q3, silver's canonical home — with **A, the ratio-only home** (the message quoting the recorded recommendation's own rationale). The gated change executed as its own conscious, tested session: the Signals section became gold-only (the chart + the measured note + the gold price footing — the option's own enumeration), silver's whole sub-analysis retired from /gold (the OI-4-protected sentence consciously ended on the page), and silver lives in the three seats it already owned honestly: the gold-silver ratio seat (the frozen voter table), the if-you'd-bought row, the London vault's silver row. Full gates 10/10 (the suite 15,658); copy round 95 (18 silver keys retired, both dictionaries; the manifest 9,251); the model byte-unchanged (the generated vocabulary's fingerprint pair aside); GoldPage 223.66/50.13 under 240,000/55,500 — the change SHRANK the gold chunk; the AU ceiling bumped 41→50 raw / 11→13 gz (rollup's TrendChart re-bucketing, verified not AU growth — the §19.6 convention); the s10 evidence 12/12; deployed with the D-43 re-check first.
+
+**Options considered:** A the ratio-only home (chosen — the recorded recommendation: the product hierarchy has no silver-briefing slot on /gold, and the keep-small note already declared the philosophy) · B keep the merged card visually secondary (rejected by the answer) · C not now (rejected by the answer).
+
+**Reason:** The owner's recorded answer; the program's own hold-then-execute discipline (the Q1-B pattern) delivered it inside one verified session with every protection intact.
+
+**Who decided:** the owner (the Q3 answer); the session executed it (inside the program's recorded gate + AGENTS.md §4/§5).
+**When to revisit:** any future silver-surface proposal (the measured-reader-demand clause the round-95 record carries); any GoldPage growth proposal (BD-S49's clause carries forward).

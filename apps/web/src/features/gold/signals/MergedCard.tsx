@@ -193,7 +193,7 @@ export function MergedSignalsCard({
       >
         <span className="flex flex-wrap items-baseline gap-x-2">
           <span className="inline-flex shrink-0 items-center gap-1.5">
-            <MetalIcon metal={metal} size={24} desktopSize={30} />
+            <MetalIcon size={24} desktopSize={30} />
             <span className={`inline-flex shrink-0 items-center gap-1 ${stateToneClass(state as SignalConditionReading['state'])}`}>
               <ConditionIcon state={state as SignalConditionReading['state']} />
               <span className="text-[length:var(--type-label)] font-bold">
@@ -202,7 +202,7 @@ export function MergedSignalsCard({
             </span>
           </span>
           <span className="text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">
-            {s.metals[metal]}
+            {s.metals.gold}
           </span>
           {valueText !== null ? (
             <bdi dir="ltr" className="text-[length:var(--type-caption)] font-semibold tabular-nums text-[var(--color-text-secondary)]">
@@ -265,7 +265,7 @@ export function MergedSignalsCard({
           className="ms-auto inline-flex items-center gap-1 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)]"
           data-signal-metal="gold"
         >
-          <MetalIcon metal="gold" size={18} desktopSize={22} />
+          <MetalIcon size={18} desktopSize={22} />
           {/* GB-S6: the header icon rides the balance verdict (the prose
            * joined the lane model — the collapsed-corner decision).
            * GUX-S10 (Q3-A): the header's ONLY line. */}
@@ -283,7 +283,6 @@ export function MergedSignalsCard({
        * derivation for every visitor. GUX-S10 (Q3-A): the strip's ONLY
        * leg — silver's own conditions (OI-4) retired from /gold. */}
       <VerdictStrip
-        gold={gold}
         goldOutlook={goldOutlook}
         price={priceTextOf('gold-usd')}
         copy={copy}

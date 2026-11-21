@@ -5,7 +5,6 @@
  * see ./index.ts). Pure, platform-free.
  */
 
-import type { IndicatorId } from '@currena/core';
 import type { ConnectionReading, ConnectionState, LegEval } from '@currena/insights';
 import { interpolate } from '../i18n';
 import type { InsightsCopy } from '../i18n/insights-copy-en';
