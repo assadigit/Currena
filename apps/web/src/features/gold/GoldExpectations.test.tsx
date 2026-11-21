@@ -93,8 +93,16 @@ describe('GoldExpectations (the component)', () => {
   beforeEach(() => {
     clearGoldExpectationsCacheForTests();
     window.localStorage.clear();
+    // GUX-S8 (the gates re-run): freeze the clock to the snapshot's own
+    // session date — the calendar strip's "in N days" counts the days to
+    // the fixture's fixed 2026-12-09/10 events from TODAY, so the
+    // un-frozen assertion was a time bomb ("in 20 days" only true on
+    // 2026-11-19; the S8 gates re-run read "in 18"). The zoom-component
+    // suite's own pattern (the repo's clock-freeze discipline).
+    vi.setSystemTime(new Date('2026-11-19T12:00:00Z'));
   });
   afterEach(() => {
+    vi.useRealTimers();
     cleanup();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();

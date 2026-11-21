@@ -880,6 +880,7 @@ export const fa: Dictionary = {
       chartSpanMonths: '{n} ماه',
       chartSpanYears: '{years} سال',
       chartAria: 'قیمت روزانهٔ XAUUSD، نمودار تعاملی: {span} تا {date}',
+      chartPointReadout: 'نقطهٔ برگزیده: {value} {unit}، {date}',
       chartPanHint: 'برای جابه‌جایی بکشید · برای بزرگ‌نمایی پینچ کنید یا اسکرول کنید',
       /* GPE R19 / F8 (۲۰۲۶-۱۱-۱۸): نوار تکنیکال مینیمال — قواعد صداقت C5
        * در خود متن رشته‌ها نشسته‌اند (توصیف نه تضمین؛ رویدادهای تاریخ‌دار
@@ -1011,6 +1012,7 @@ export const fa: Dictionary = {
        * «منبع: LBMA» + بلوک افشای چهارفیلدی (C6). */
       lbmaVaultTitle: 'موجودی خزانهٔ لندن',
       lbmaVaultTopline: 'خزانه‌های لندن {tonnes} تن طلا دارند',
+      lbmaVaultSparkAria: 'موجودی طلا در {n} ماه: {tonnes} تن تا {month}.',
       lbmaVaultSilver: 'به‌علاوهٔ {tonnes} تن نقره',
       lbmaVaultMom: '{pct} نسبت به ماه قبل',
       lbmaClearingTitle: 'حجم تسویهٔ لندن',
@@ -1230,6 +1232,8 @@ export const fa: Dictionary = {
       prStripMethod: 'اتحادِ دقیق: Δln(سکه) = Δln(انس) + Δln(دلار) + Δln(۱+حباب)؛ سه عامل در حرکت سکه ضرب می‌شوند، نه جمع. تفکیک حسابی است، نه برآورد آماری (رگرسیون).',
       prStripWaiting: 'نوار تفکیک حرکت روز به دو نقطهٔ داده نیاز دارد: اسنپ‌شات زنده و روز پایانی ذخیره‌شدهٔ قبل از امروز؛ تا آن موقع منتظر می‌ماند.',
       prChartTitle: 'نمودار حباب امامی و بهار',
+      prChartAria: 'حباب هر دو سکه بر ارزش ذوب، از {from} تا {to}. آخرین: امامی {emami}، بهار {bahar}.',
+      prChartAriaOne: 'حباب بر ارزش ذوب، از {from} تا {to}. آخرین: {emami}.',
       prMeltLabel: 'مِلت',
       prBoundaryLabel: 'آغاز محاسبهٔ زنده',
       prHonestyLine: 'خط صداقت: {from} تا {to} ({n} روز) از تاریخچهٔ پایانی روزانهٔ خود TGJU بازسازی شده؛ از آن به بعد، محاسبهٔ زنده از اسنپ‌شات‌های خودمان.',

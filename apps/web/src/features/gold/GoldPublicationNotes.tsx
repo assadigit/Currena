@@ -60,7 +60,7 @@ export function GoldPublicationNotes({ absentCount }: { absentCount: number }): 
       aria-label={t('pd.gold.pubNotesSummary')}
       data-gold-blocked
       data-gold-publication-notes
-      className="flex min-w-0 flex-col gap-1.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)]/70 px-2.5 py-2 ring-1 ring-[var(--color-border)]/60 scroll-mt-24"
+      className="flex min-w-0 flex-col gap-1.5 rounded-[var(--radius-sm)] bg-[var(--color-surface)]/70 px-2.5 py-2 ring-1 ring-[var(--color-border)]/60 gold-anchor-mt"
     >
       <button
         type="button"

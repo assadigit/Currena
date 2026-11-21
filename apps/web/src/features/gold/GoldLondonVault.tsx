@@ -169,9 +169,20 @@ export function GoldLondonVault(): React.JSX.Element | null {
             </bdi>
           </p>
         ) : null}
-        {/* The 124-month stock, made visible (a compact sparkline). */}
+        {/* The 124-month stock, made visible (a compact sparkline).
+         * GUX-S8 M3 (11 §8 item E): the accessible name carries the
+         * reading — the stock level + the month — not just the title. */}
         <div dir="ltr" className="w-full overflow-hidden" data-lbma-spark>
-          <svg viewBox="0 0 200 34" role="img" aria-label={t('pd.gold.lbmaVaultTitle')} className="h-auto w-full">
+          <svg
+            viewBox="0 0 200 34"
+            role="img"
+            aria-label={interpolate(t('pd.gold.lbmaVaultSparkAria'), {
+              n: num(model.vault.rows.length),
+              tonnes: num(model.goldTonnes),
+              month: monthText(model.vault.asOf),
+            })}
+            className="h-auto w-full"
+          >
             <path d={vaultSparkPath(model.vault.rows)} fill="none" stroke="var(--color-accent-gold)" strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" />
           </svg>
         </div>

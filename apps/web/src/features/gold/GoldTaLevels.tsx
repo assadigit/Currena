@@ -92,7 +92,7 @@ export function GoldTaLevels(): React.JSX.Element | null {
 
   if (state.kind === 'loading') {
     return (
-      <section aria-label={t('pd.gold.taTitle')} data-gold-ta-levels="loading" className="mt-3 scroll-mt-24 sm:mt-5" role="status">
+      <section aria-label={t('pd.gold.taTitle')} data-gold-ta-levels="loading" className="mt-3 gold-anchor-mt sm:mt-5" role="status">
         <h3 className="type-section m-0">{t('pd.gold.taTitle')}</h3>
         <p className="m-0 mt-1 text-[length:var(--type-label)] text-currena-muted">{t('pd.gold.loadingLine')}</p>
       </section>
@@ -101,7 +101,7 @@ export function GoldTaLevels(): React.JSX.Element | null {
   if (series === null || series.length < 2) {
     // The honest absent state (the rung has not landed / nothing stored).
     return (
-      <section aria-label={t('pd.gold.taTitle')} data-gold-ta-levels="none" className="mt-3 scroll-mt-24 sm:mt-5">
+      <section aria-label={t('pd.gold.taTitle')} data-gold-ta-levels="none" className="mt-3 gold-anchor-mt sm:mt-5">
         <h3 className="type-section m-0">{t('pd.gold.taTitle')}</h3>
         <p className="m-0 mt-1 text-[length:var(--type-label)] text-currena-muted">{t('pd.gold.taUnavailable')}</p>
       </section>
@@ -184,7 +184,7 @@ export function GoldTaLevels(): React.JSX.Element | null {
       id="gold-ta"
       aria-labelledby="gold-ta-title"
       data-gold-ta-levels
-      className="mt-3 scroll-mt-24 sm:mt-5"
+      className="mt-3 gold-anchor-mt sm:mt-5"
     >
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h3 id="gold-ta-title" className="type-section m-0">{t('pd.gold.taTitle')}</h3>

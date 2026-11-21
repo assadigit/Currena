@@ -1,27 +1,50 @@
 /**
  * GoldSectionNav — the sticky in-page navigation (GUX-S5 M5's
- * foundation, upgraded to the S8 tier at GUX-S6 M5): one sticky chip
- * row of plain section links (Briefing · Lanes · Signals · Bridge ·
- * Ratios · Relationships · History) with the current section's chip
- * highlighted.
+ * foundation, upgraded to the S8 tier at GUX-S6 M5, REBUILT for the
+ * mobile-first pass at GUX-S8 M1): one sticky row of plain section
+ * links (Briefing · Lanes · Signals · Bridge · Ratios · Relationships ·
+ * History) with the current section's chip highlighted.
  *
- * THE S8-TIER SPY (this session's upgrade, still deliberately small):
- * the foundation tier's scroll listener + getBoundingClientRect sweep
- * is replaced by an IntersectionObserver over the section anchors —
- * the last section whose top has passed the spy line still wins (the
- * same plain rule, no heuristics added), but the work now happens on
- * observer callbacks instead of every scroll frame. The rAF throttle
- * and the scroll listener REMAIN as the no-observer fallback (jsdom,
- * old browsers — the boundary components' own discipline), so the
- * behavior is identical everywhere and the jsdom pins still hold.
+ * THE S8 MOBILE REBUILD (this session's remediation, 11 §12 item 5 +
+ * master plan §7.1): the wrapping chip rows (132px tall in en at 390px
+ * — a sixth of the viewport, and taller than the sections' own anchor
+ * margin so the anchor jumps LANDED UNDER the bar) become ONE
+ * horizontally-scrollable row — the shipped chip-scroller pattern
+ * (GlobalBoard's .ln row): nowrap chips that scroll inside the track,
+ * never wrap; 44px touch targets (the 36px chips were under the floor);
+ * a direction-aware soft fade that appears only while more chips sit
+ * that way (JS-toggled data attributes — the fade is decorative and
+ * never carries meaning); the ACTIVE chip centers itself in the track
+ * (physical-pixel scrollBy — RTL-safe) so the reading position stays
+ * visible without any page scroll.
+ *
+ * THE S8 DOCKING FIX (the audit's find): the nav now sticks UNDER the
+ * FIXED global header (top-16 / lg:top-20 — 11 §12 item 5's own words:
+ * "the mobile section index docks under the global header, never
+ * covering focused controls"). The S5–S7 shipped `sticky top-0` slid
+ * the whole bar UNDER the header's z-1000 the moment it stuck — the
+ * nav was INVISIBLE while stuck (verified: the S6 explorer captures
+ * show no chips; the S8 probe measured navTop 0 < headerBottom 64).
+ * The sections' anchor margin (index.css .gold-anchor-mt) and the spy
+ * line below both account for header + nav heights.
+ *
+ * THE S8-TIER SPY (GUX-S6 M5, unchanged): the IntersectionObserver over
+ * the section anchors — the last section whose top has passed the spy
+ * line still wins (the same plain rule, no heuristics added), but the
+ * work happens on observer callbacks instead of every scroll frame. The
+ * rAF throttle and the scroll listener REMAIN as the no-observer
+ * fallback (jsdom, old browsers — the boundary components' own
+ * discipline), so the behavior is identical everywhere and the jsdom
+ * pins still hold.
  *
  * The honesty rules (unchanged): the nav NEVER renders on the hero (it
  * sticks only after the reader passes it); a section whose anchor is
- * absent (the skeleton or an outage band) simply does not appear in
- * the row; reduced-motion keeps the native instant jump.
+ * absent (the skeleton or an outage band) simply does not appear in the
+ * row; reduced-motion keeps the native instant jump and the chip
+ * centering snaps instead of gliding.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../../shared/lib/locale';
 import type { TranslationKey } from '../../shared/lib/locale';
 
@@ -38,23 +61,69 @@ const SECTIONS: ReadonlyArray<{ id: string; key: TranslationKey }> = [
 ];
 
 /** The scroll-spy line: a section is "current" when its top has passed
- *  96px below the viewport top (the nav's own height + breathing room);
- *  the LAST such section wins (the reading position). */
-const SPY_LINE_PX = 96;
+ *  the docked nav's own bottom edge — the fixed header (64px mobile /
+ *  80px ≥lg) + the nav (56px) + 4px breathing = 124px mobile, 140px
+ *  ≥lg. The LAST such section wins (the reading position). The same
+ *  numbers ride the sections' .gold-anchor-mt (the anchor-jump
+ *  contract — one source of truth per breakpoint, both places). */
+function spyLinePx(): number {
+  return typeof window !== 'undefined' && window.innerWidth >= 1024 ? 140 : 124;
+}
 
 export function GoldSectionNav(): React.JSX.Element | null {
   const { t } = useI18n();
   const [active, setActive] = useState<string | null>(null);
+  const trackRef = useRef<HTMLUListElement | null>(null);
+
+  /** The scroller's own state: which edges still have chips beyond them
+   *  (the fades), and the active chip's centering. Physical pixels
+   *  throughout — scrollBy/scrollLeft deltas are direction-agnostic, so
+   *  the one code path serves LTR and RTL. */
+  useEffect(() => {
+    const track = trackRef.current;
+    if (track === null) return;
+    // jsdom-safe (the boundary components' own discipline: no matchMedia
+    // there): absent matchMedia degrades to the smooth centering — the
+    // CSS reduced-motion guards own the visual stillness regardless.
+    const reduced = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+
+    const syncFades = (): void => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      const at = Math.abs(track.scrollLeft);
+      track.dataset.fadeStart = at > 4 ? 'true' : 'false';
+      track.dataset.fadeEnd = at < maxScroll - 4 ? 'true' : 'false';
+    };
+
+    const centerActive = (): void => {
+      const chip = track.querySelector<HTMLAnchorElement>(`[data-nav-chip="${active ?? ''}"]`);
+      if (chip === null) return;
+      const trackRect = track.getBoundingClientRect();
+      const chipRect = chip.getBoundingClientRect();
+      const delta = chipRect.left + chipRect.width / 2 - (trackRect.left + trackRect.width / 2);
+      if (Math.abs(delta) < 2) return;
+      track.scrollBy({ left: delta, behavior: (reduced?.matches ?? false) ? 'auto' : 'smooth' });
+    };
+
+    syncFades();
+    centerActive();
+    track.addEventListener('scroll', syncFades, { passive: true });
+    window.addEventListener('resize', syncFades);
+    return () => {
+      track.removeEventListener('scroll', syncFades);
+      window.removeEventListener('resize', syncFades);
+    };
+  }, [active]);
 
   useEffect(() => {
     /** The plain rule, computed once: the last section whose top has
      *  passed the spy line. Shared by the observer path and the
      *  scroll-listener fallback. */
+    const spyLine = spyLinePx();
     const computeCurrent = (): string | null => {
       let current: string | null = null;
       for (const { id } of SECTIONS) {
         const el = document.getElementById(id);
-        if (el !== null && el.getBoundingClientRect().top <= SPY_LINE_PX) current = id;
+        if (el !== null && el.getBoundingClientRect().top <= spyLine) current = id;
       }
       // The hero (before the first section) highlights nothing.
       return current;
@@ -71,7 +140,7 @@ export function GoldSectionNav(): React.JSX.Element | null {
         // The observed band: from the top of the viewport down past the
         // spy line — a section top entering OR leaving this band is
         // exactly a crossing of the line.
-        { rootMargin: `0px 0px -${window.innerHeight - SPY_LINE_PX}px 0px`, threshold: 0 },
+        { rootMargin: `0px 0px -${window.innerHeight - spyLine}px 0px`, threshold: 0 },
       );
       for (const { id } of SECTIONS) {
         const el = document.getElementById(id);
@@ -106,19 +175,27 @@ export function GoldSectionNav(): React.JSX.Element | null {
     <nav
       aria-label={t('pd.gold.navAria')}
       data-gold-section-nav
-      className="sticky top-0 z-40 -mx-2 border-block-end border-[var(--color-border)]/70 bg-[var(--color-surface)]/92 px-2 py-1.5 backdrop-blur-sm"
+      className="sticky top-16 z-40 -mx-2 border-block-end border-[var(--color-border)]/70 bg-[var(--color-surface)]/92 px-2 py-1.5 backdrop-blur-sm lg:top-20"
     >
-      <ul className="m-0 flex list-none flex-wrap items-center gap-1.5 overflow-x-auto p-0">
+      {/* The S8 chip-scroller track: ONE row, nowrap, hidden scrollbars,
+       * the JS-toggled direction-aware fades (index.css's
+       * .gold-nav-track). Keyboard focus keeps the browser's native
+       * horizontal bring-into-view; touch scrolls the track itself. */}
+      <ul
+        ref={trackRef}
+        data-chip-scroller
+        className="gold-nav-track m-0 flex list-none flex-nowrap items-center gap-1.5 overflow-x-auto p-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         {SECTIONS.map(({ id, key }) => {
           const isActive = active === id;
           return (
-            <li key={id}>
+            <li key={id} className="shrink-0">
               <a
                 href={`#${id}`}
                 aria-current={isActive ? 'true' : undefined}
                 data-nav-chip={id}
                 data-nav-active={isActive ? 'true' : undefined}
-                className={`insights-focusable inline-flex min-h-[36px] items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-[length:var(--type-caption)] font-semibold no-underline ring-1 transition-colors ${
+                className={`insights-focusable inline-flex min-h-[44px] items-center whitespace-nowrap rounded-full px-2.5 text-[length:var(--type-caption)] font-semibold no-underline ring-1 transition-colors ${
                   isActive
                     ? 'bg-[var(--color-accent-gold)]/15 text-[var(--color-text-primary)] ring-[var(--color-accent-gold)]/45'
                     : 'bg-transparent text-[var(--color-text-secondary)] ring-[var(--color-border)] hover:text-[var(--color-text-primary)]'

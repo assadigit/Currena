@@ -502,6 +502,40 @@ describe('GoldPage', () => {
     expect(document.getElementById('gold-zone-d')).toBeTruthy();
   });
 
+  // GUX-S8 M5 — the partial-data regression pin (the honest-states pass):
+  // a projection whose PRICE reading is absent (a dead source, honestly
+  // declared in absentIds) must render the page WITHOUT the price fact —
+  // never crash the route. Found live: the narrative's windows reduce
+  // had no initial value, so an empty windows array threw "Reduce of
+  // empty array" and the WHOLE route fell to the error boundary.
+  it('GUX-S8 M5: the partial projection (the price reading absent) renders honestly — no crash, no price fact, the why-lines ride the dark seats', async () => {
+    const partial = projectionFixture();
+    const withoutPrice = partial.readings.filter((r) => r.id !== 'gold-usd');
+    stubFeeds({
+      projection: () =>
+        jsonResponse({
+          ...partial,
+          readings: withoutPrice,
+          absentIds: [...partial.absentIds, 'gold-usd'],
+        }),
+    });
+    render(<GoldPage />);
+    // The page renders — the briefing + the narrative + the seats all
+    // live (the pre-fix behavior was the route error boundary).
+    await waitFor(() => {
+      expect(document.querySelector('[data-briefing-card]')).not.toBeNull();
+    });
+    expect(document.querySelector('[data-gold-narrative]')).not.toBeNull();
+    await waitFor(() => {
+      expect(document.querySelectorAll('[data-seat]').length).toBeGreaterThan(0);
+    });
+    // The narrative's price fact is simply ABSENT (the honest
+    // degradation) — the family lines still render.
+    const band = document.querySelector('[data-gold-narrative]')!;
+    expect(band.textContent).not.toContain('Gold moved');
+    expect(band.querySelectorAll('[data-narrative-family]').length).toBe(5);
+  });
+
   it('GPE R12 / F5: the yield-decomposition card — the four-leg stack + the exact identity + the moved line + the configurations + the exception + the seats', async () => {
     stubFeeds();
     render(<GoldPage />);

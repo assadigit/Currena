@@ -527,6 +527,21 @@ export function GoldPriceChart({
               </>
             ) : null}
           </div>
+          {/* GUX-S8 M3 (11 §8 item E — the keyboard inspector's readout): the
+           *   visually-hidden live region that speaks the hovered point's
+           *   value + unit + full date. The tooltip above stays aria-hidden
+           *   (the live region is the ONE announcement — no double speech);
+           *   the region itself is persistent so every arrow/Home/End move
+           *   fires a polite announcement, and Escape clears it. */}
+          <p role="status" aria-live="polite" data-chart-inspector-readout className="m-0 sr-only">
+            {hoverIdx !== null && hoverBar !== null
+              ? interpolate(t('pd.gold.chartPointReadout'), {
+                  value: fmtValue(hoverBar.close),
+                  unit: t(unit === 'oz' ? 'pd.gold.chartUnitOzShort' : 'pd.gold.chartUnitGramShort'),
+                  date: fullDate.format(Date.parse(`${hoverBar.date}T00:00:00Z`)),
+                })
+              : ''}
+          </p>
           {/* X tick labels — HTML, never stretched-glyph SVG text. */}
           <div aria-hidden="true" className="relative mt-1 h-4 select-none text-[length:var(--type-caption)] leading-none tabular-nums text-[var(--color-text-tertiary)]">
             {xTicks.map(({ i, anchor }) => (

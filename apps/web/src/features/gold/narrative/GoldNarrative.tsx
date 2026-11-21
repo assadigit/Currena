@@ -72,8 +72,16 @@ export function GoldNarrative({ readings }: { readings: readonly IndicatorReadin
   if (price?.change90d !== null && price?.change90d !== undefined) {
     windows.push(interpolate(t('pd.gold.narrativeWindow90d'), { v: signedPct(price.change90d, numberLocale) }));
   }
-  const windowsText = windows.reduce((acc, w) =>
-    acc === '' ? w : interpolate(t('pd.gold.narrativePriceJoin'), { a: acc, b: w }),
+  // GUX-S8 M5 (the partial-data crash fix): the initial value '' is the
+  // honest-degradation contract — a projection whose price reading (or
+  // its change windows) is absent makes `windows` EMPTY, and reduce
+  // without an initial value threw "Reduce of empty array", taking the
+  // WHOLE route down to the error boundary instead of rendering the
+  // page without the price fact. With '' the sentence simply renders
+  // null below (the narrative's own honest path).
+  const windowsText = windows.reduce(
+    (acc, w) => (acc === '' ? w : interpolate(t('pd.gold.narrativePriceJoin'), { a: acc, b: w })),
+    '',
   );
   const priceSentence =
     price !== null && windowsText !== '' && price.asOf !== null

@@ -296,7 +296,7 @@ function SeatCard({
             if (hashAt !== -1) stageAnchorScroll(href.slice(hashAt + 1));
             navigate(href.slice(0, hashAt === -1 ? undefined : hashAt));
           }}
-          className="insights-focusable relative z-10 self-start rounded text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
+          className="insights-focusable relative z-10 self-start rounded py-1 text-[length:var(--type-caption)] font-semibold text-currena-blue underline-offset-2 hover:underline"
         >
           {t('pd.gold.seatLink')} ↗
         </a>
@@ -407,7 +407,7 @@ export function GoldSeats({
   };
 
   return (
-    <section id="gold-seats" aria-label={t('pd.gold.seatsAria')} data-gold-seats className="flex flex-col gap-2.5 scroll-mt-24 sm:gap-3">
+    <section id="gold-seats" aria-label={t('pd.gold.seatsAria')} data-gold-seats className="flex flex-col gap-2.5 gold-anchor-mt sm:gap-3">
       <h2 className="m-0 text-base font-extrabold text-[var(--color-text-primary)] sm:text-lg">{t('pd.gold.lanesTitle')}</h2>
       {/* The five lane blocks: 1-col mobile, 2-col ≥ lg (the stress and
        * inflation lanes' cards wrap inside their own blocks — the

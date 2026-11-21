@@ -177,7 +177,7 @@ export function Signals({
   };
 
   return (
-    <section id="insights-signals" aria-labelledby="insights-signals-title" className="scroll-mt-24">
+    <section id="insights-signals" aria-labelledby="insights-signals-title" className="gold-anchor-mt">
       <header className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id="insights-signals-title" className="type-section m-0">
           <span className="inline-flex items-center gap-1.5">
@@ -191,7 +191,7 @@ export function Signals({
             aria-expanded={open}
             aria-controls="insights-signals-body"
             onClick={() => setOpen(!open)}
-            className="insights-focusable inline-flex min-h-[24px] min-w-[24px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
+            className="insights-focusable inline-flex min-h-[44px] min-w-[44px] cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-[length:var(--type-caption)] font-bold text-[var(--color-status-context)] underline decoration-[var(--color-accent-brand)]/40 underline-offset-2 transition-colors hover:decoration-[var(--color-accent-brand)]"
           >
             <span aria-hidden="true">
               <ChevronDown

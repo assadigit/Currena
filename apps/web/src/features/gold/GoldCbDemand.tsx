@@ -339,7 +339,7 @@ export function GoldCbDemand({ price }: { price: IndicatorReading | undefined })
       id="gold-zone-k"
       aria-labelledby="gold-zone-k-title"
       data-gold-cb-demand
-      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] scroll-mt-24 sm:p-3.5"
+      className="flex flex-col gap-2.5 rounded-[var(--radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] shadow-[var(--shadow-card)] gold-anchor-mt sm:p-3.5"
     >
       <header className="flex min-w-0 flex-col gap-0.5">
         <h3 id="gold-zone-k-title" className="m-0 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)]">

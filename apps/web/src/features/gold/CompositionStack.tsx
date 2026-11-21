@@ -121,11 +121,13 @@ export function CompositionStack({
         ))}
       </div>
 
-      {/* ④ the ledger affordance */}
+      {/* ④ the ledger affordance — a ≥44px touch target (11 §12 item 6:
+       *  the ledger rows/anchors keep the touch contract; the S8 audit
+       *  found the bare inline link at 23px). */}
       <a
         href="#gold-seats"
         data-stack-ledger-link
-        className="insights-focusable self-start rounded-full px-1 py-0.5 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] underline decoration-dotted underline-offset-4"
+        className="insights-focusable inline-flex min-h-[44px] items-center self-start rounded-full px-3 text-[length:var(--type-caption)] font-semibold text-[var(--color-text-secondary)] underline decoration-dotted underline-offset-4"
       >
         {t('pd.gold.stackLedgerLink')}
       </a>
