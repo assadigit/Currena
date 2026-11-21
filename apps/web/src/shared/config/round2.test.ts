@@ -12,7 +12,7 @@
  *   R13 units coverage — every DISPLAY row renders a unit in both locales
  *   R14 code-pattern scan — no source codes/series ids in names or tags
  *   R18 counts consistency — hero-side counts equal the group sums
- *   R26 mergeSignals — no duplicated condition keys, silver-only split
+ *   R26 Signals glyph guard — no check/cross glyphs in the module tree
  *   R27 evidence discipline — no visible "to verify" placeholder
  *   R28 sentence-versus-number guard — band words computed from live values
  */
@@ -44,7 +44,6 @@ import {
   groupVisibility,
   heroReason,
   heroReasonIsConsistent,
-  mergeSignals,
   moneyPanel,
   MONEY_AREAS,
   statusCounts,
@@ -457,29 +456,13 @@ describe('R18 counts (hero-side totals equal the group sums)', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * R26 — the merged signals card
+ * R26 — the signals module tree's glyph guard (the mergeSignals tests
+ * retired with the helper itself at GUX-S10/Q3-A — the merged
+ * gold-and-silver structure left /gold with the silver sub-analysis).
  * ------------------------------------------------------------------ */
 
-describe('R26 mergeSignals (shared listed once, silver-only split)', () => {
-  const conditionsOf = (metal: 'gold' | 'silver') =>
-    ['real-yield', 'expectations', 'stress', 'dollar', 'footing', ...(metal === 'silver' ? ['industrial'] : [])].map(
-      (key) => ({ key, state: 'supportive' }),
-    );
-
-  it('shared conditions appear once; footing is per-metal; industrial is silver-only', () => {
-    const merged = mergeSignals(
-      { conditions: conditionsOf('gold'), priceId: 'gold-usd' },
-      { conditions: conditionsOf('silver'), priceId: 'silver-usd' },
-    );
-    const keys = merged.shared.map((c) => c.key);
-    expect(new Set(keys).size).toBe(keys.length); // no duplicates
-    expect(keys).not.toContain('footing');
-    expect(keys).not.toContain('industrial');
-    expect(merged.footing.map((f) => f.metal)).toEqual(['gold', 'silver']);
-    expect(merged.silverOnly.map((c) => c.key)).toEqual(['industrial']);
-  });
-
-  it('no check or cross glyph anywhere in the Signals markup source', () => {
+describe('R26 no check or cross glyph anywhere in the Signals markup source', () => {
+  it('the signals/ module tree stays glyph-clean', () => {
     // The WS-4 split moved the markup into the signals/ module tree —
     // the guard now covers the whole tree (same intent, wider surface).
     expect(signalsSrc).not.toMatch(/[✓✔✗✘]/);

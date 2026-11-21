@@ -198,9 +198,12 @@ function stubFeeds(overrides: { projection?: () => Response; goldCb?: () => Resp
       // GPE R18: the XAUUSD OHLC leg's one-key endpoint (the chart + the
       // TA band — the module-cached shared feed).
       if (url === '/api/insights/gold-ohlc') return (overrides.goldOhlc ?? (() => jsonResponse(ohlcFixture(300))))();
-      // The per-id /history payloads (the silver chart's TrendPanel — the
-      // id the fetch layer's check demands; GPE R18 made silver the sole
-      // /history consumer on this page).
+      // The per-id /history payloads — GPE R18 made silver the sole
+      // /history consumer on this page; GUX-S10 (Q3-A) retired the silver
+      // TrendPanel with the silver sub-analysis, so NO /history consumer
+      // remains on /gold — the stub stays only as the defensive answer for
+      // any /history fetch the page's future might make (it cannot 404 a
+      // test into a false green).
       if (url.includes('/history')) {
         const id = url.split('/api/insights/')[1]?.split('/history')[0];
         return jsonResponse({ v: 1, id, points: historyPointsFixture() });
@@ -1021,12 +1024,14 @@ describe('GoldPage', () => {
       expect(chip.className).toContain('min-h-[44px]');
     }
     // Silver's TrendPanel keeps its own chips (OI-4) — the same floor.
+    // GUX-S10 (Q3-A): the silver chip is GONE — the floor pin flips to
+    // the ABSENCE (no silver chart on /gold); the gold chart's own
+    // buttons were pinned above.
     await waitFor(() => {
-      expect(document.querySelectorAll('[data-verdict-chart="silver"] [data-trend-range] button').length).toBeGreaterThan(0);
+      expect(document.querySelectorAll('[data-gold-price-chart] [data-chart-range] button').length).toBeGreaterThan(0);
     });
-    for (const chip of document.querySelectorAll('[data-verdict-chart="silver"] [data-trend-range] button')) {
-      expect(chip.className).toContain('min-h-[44px]');
-    }
+    expect(document.querySelectorAll('[data-verdict-chart="silver"]')).toHaveLength(0);
+    expect(document.querySelectorAll('[data-verdict-chart="silver"] [data-trend-range] button').length).toBe(0);
   });
 
   /* ---------------------------------------------------------------- *
@@ -1042,12 +1047,12 @@ describe('GoldPage', () => {
     });
     const chart = document.querySelector('[data-gold-price-chart]')!;
     // The #01 dissolution by construction (S13-D2): the GOLD chip renders
-    // the OHLC chart; the fixed-range TrendPanel is SILVER's now (its own
-    // history fetch resolves async — wait for it).
+    // the OHLC chart — GUX-S10 (Q3-A): it is the section's ONLY chart (the
+    // silver fixed-range TrendPanel retired with the silver sub-analysis;
+    // no /history consumer remains on /gold).
     expect(document.querySelector('[data-verdict-chart="gold"] [data-trend-range]')).toBeNull();
-    await waitFor(() => {
-      expect(document.querySelector('[data-verdict-chart="silver"] [data-trend-range]')).not.toBeNull();
-    });
+    expect(document.querySelector('[data-verdict-chart="silver"]')).toBeNull();
+    expect(document.querySelector('[data-gold-price-chart] [data-chart-plot]')).not.toBeNull();
     // The unit-aware header: the series named at point of use (C1) + the
     // as-of (the fixture's last final bar) + the provider link.
     expect(chart.querySelector('a[href="https://eodhd.com/api/eod/XAUUSD.FOREX"]')?.textContent).toContain('XAUUSD');
@@ -1619,20 +1624,19 @@ describe('GoldPage', () => {
     expect(document.querySelector('[data-gold-signals-skeleton]')).toBeNull();
   });
 
-  it('F17: the silver card carries the keep-small footer note (S5-D3 made visible)', async () => {
+  it('F17 → GUX-S10 (Q3-A): the keep-small note RETIRED with the silver card — the strip speaks gold only (round 95)', async () => {
     stubFeeds();
     render(<GoldPage />);
     await waitFor(() => {
       expect(document.querySelectorAll('[data-seat]').length).toBe(37);
     });
-    // The Signals section renders the verdict strip; the silver chip
-    // carries the keep-small note (the gold chip does not).
-    const silverNote = document.querySelector('[data-verdict-metal="silver"] [data-silver-keep-small-note]');
-    const goldNote = document.querySelector('[data-verdict-metal="gold"] [data-silver-keep-small-note]');
-    expect(silverNote).not.toBeNull();
-    expect(goldNote).toBeNull();
-    // The note states the deliberate choice.
-    expect(silverNote?.textContent).toContain('deliberate');
+    // The Signals section renders the gold-only verdict strip; the
+    // keep-small note rode the silver chip's footer and retired with it —
+    // its philosophy (a silver strip returns only on measured reader
+    // demand) is now the decision record's own words, not page copy.
+    expect(document.querySelector('[data-verdict-metal="silver"]')).toBeNull();
+    expect(document.querySelector('[data-silver-keep-small-note]')).toBeNull();
+    expect(document.querySelector('[data-verdict-metal="gold"]')).not.toBeNull();
   });
 
   /* ---------------------------------------------------------------- *
