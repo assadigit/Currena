@@ -6119,3 +6119,11 @@ session 4.**
 **The tree:** `origin/main` = `45f89c19` (the S8 merge). Credentials used for the GitHub push + the deploy + the verification probes, never stored (AGENTS.md §7).
 
 
+
+## Session record — 2026-11-2x-g GUX-S9 (the FINAL session): NO DEPLOY — the docs-only verification session; production verified untouched and byte-identical
+
+**No deploy ran and none was owed:** Session 9 (the program's close) changed no runtime code — the session's delta is the verification harness (`apps/web/visual/gux-s9-*` + the two probes) + the evidence + the records. Per AGENTS.md §15.4's own rule (docs-only waves deploy nothing), production was not touched.
+
+**The production state, verified live this session (read-only):** currena-api's active deployment set is the S8 close's own pair — the `2f101b25` deploy (created 2026-11-21T00:19:10Z) + its EODHD secret-put (00:19:18Z), i.e. exactly the 2026-11-2x-f record's end state; NO drift since (the deployments list read this session). **The served runtime byte-verified IDENTICAL to the fresh local build of `origin/main` `6ce80570` (the S9 merge — docs-only, runtime-identical to the S8 close `45f89c19`):** the entry `index-CIk9GXGr.js` · the CSS `index-BOp1eEbr.css` · the GoldPage chunk `GoldPage-DSykvmFj.js` — all three `cmp`-clean. The live page passed the 34-capture matrix + the keyboard walk this session (the S9 report §1). Rollback `f7ea508d` remains a version away.
+
+**The D-43 discipline stands:** any future session that changes runtime code re-checks the deploy lock FIRST (the standing §11 rule), then follows this file's runbook verbatim.
