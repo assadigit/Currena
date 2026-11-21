@@ -1,0 +1,487 @@
+{
+  "focusableCount": 198,
+  "firstEightyTabStops": [
+    {
+      "tag": "button",
+      "name": "Skip to main content",
+      "surface": "other",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Home",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Global",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Gold",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "World Markets",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Currencies",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Commodities",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Regions▾",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Tools▾",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Switch to Farsi",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Toggle theme",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Home",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Pressures goldReal yields (inflation-adjusted) — What a 10-y",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Pressures goldThe dollar against six big currencies — The US",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Pressures goldUS financial stress index — A single number fo",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Market stress & uncertainty: Supports. 4 of 10 drivers firing.",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Interest rates & borrowing costs: Works against. 5 of 7 drivers firing.",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "The US dollar: Works against. 5 of 6 drivers firing.",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Inflation & inflation expectations: Works against. 2 of 8 drivers firing.",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Trader positioning & flows: Sitting neutral. No driver firing.",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Inspect all 37 voters",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "The time machineAny past day’s meter reading, under the then",
+      "surface": "hero",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "The briefing",
+      "surface": "section-nav",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Iran bridge",
+      "surface": "section-nav",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Signals",
+      "surface": "section-nav",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Five forces",
+      "surface": "section-nav",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Ratios & context",
+      "surface": "section-nav",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Relationships",
+      "surface": "section-nav",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "History & notes",
+      "surface": "section-nav",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Gold moved −3.98% over the past day and −14.72% over the pas",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Interest rates & borrowing costs",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "The US dollar",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Market stress & uncertainty",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Inflation & inflation expectations",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Trader positioning & flows",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "10-year term premium",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "US 12-month deficit",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Read: what moves gold",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the market’s expectation",
+      "surface": "zone-d",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show the parity",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "How it is computed",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "What this board means",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Source: TGJU",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "The Emami and Bahar premium chart",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Source: TGJU",
+      "surface": "zone-f",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Show fewer",
+      "surface": "site-header",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "XAUUSD daily OHLC (spot) · EODHD",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Ounce",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Gram",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Log",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "50-day average",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "200-day average",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "div",
+      "name": "XAUUSD daily closes, interactive chart: 1 years ending Nov 19, 2026",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Quarter",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "1 year",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "All · 1 years",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "div",
+      "name": "Price history for Silver, the last Quarter",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Quarter",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "1 year",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "5 years",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "5.2 years",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Read the full backtest",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Interest rates & borrowing costs ↗",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "The US dollar ↗",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Market stress & uncertainty ↗",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Inflation & inflation expectations ↗",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Trader positioning & flows ↗",
+      "surface": "signals",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Open indicator: US 10-year interest after inflation",
+      "surface": "seats",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Open the record: Real yields",
+      "surface": "seats",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Open indicator: What the US government pays to borrow for 10 years",
+      "surface": "seats",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Open the record: US 10-year yield",
+      "surface": "seats",
+      "ringVisible": true
+    },
+    {
+      "tag": "a",
+      "name": "Open indicator: US 30-year Treasury yield",
+      "surface": "seats",
+      "ringVisible": true
+    },
+    {
+      "tag": "button",
+      "name": "Open the record: US 30-year yield",
+      "surface": "seats",
+      "ringVisible": true
+    }
+  ],
+  "ringInvisibleStops": 0,
+  "sheetEscape": "escape-closed-focus-returned"
+}
