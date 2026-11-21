@@ -31,6 +31,10 @@ export default tseslint.config(
       'apps/web/public/**',
       'legacy/**',
       'legacy-captures/**',
+      // the local agent-skills sandbox folder (2026-11-21, GIE-S1): the
+      // session sandbox copies its tooling docs/scripts here — foreign to
+      // this repo's lint rules and gitignored (same class as legacy/).
+      'skills/**',
     ],
   },
 
