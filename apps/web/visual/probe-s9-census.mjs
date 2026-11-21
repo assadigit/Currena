@@ -30,7 +30,12 @@
  * Output: a structured JSON census on stdout.
  */
 
-/* global console, setTimeout */
+/* Node globals for `pnpm lint` (no eslint languageOptions block covers this
+ * directory; the shared flat config maps globals per-path — the
+ * probe-s8-audit.mjs precedent). The window/document uses live inside
+ * page.evaluate callbacks (the BROWSER context) — eslint's .mjs parsing
+ * still sees them, so they are declared here too. */
+/* global console, setTimeout, URL, window, document */
 import { chromium } from '@playwright/test';
 
 const { spawn } = await import('node:child_process');
