@@ -22,7 +22,12 @@ session arc:
   track-record band over the cached DeskDay archive (bias history
   sparkline + scenario-vs-realized strip) and a "then vs now" line on
   date navigation, all read back from what the desk already persists.
-- **S12 — next session.**
+- **S12 — Calibration layer (done, live):** the desk's honesty is
+  measurable — a rolling scorecard band over the cached archive
+  (bias-direction hit rate, base-case accuracy, probability
+  calibration), every number stating its sample size and its era,
+  served read-only by `/api/desk/calibration`.
+- **S13 — next session.**
 
 ## Architecture (the one page a session must know)
 
@@ -52,11 +57,27 @@ src/lib/gold/continuity.ts S11 Continuity: the desk archive — read-only
                             scenario-vs-realized and then-vs-now math.
                             Modelled-era days are labelled and never mixed
                             into realized math; no scraping, no rebuilds
+src/lib/gold/calibration.ts S12 Calibration: the desk scorecard —
+                            read-only grading of the cached archive
+                            against the observation store. Bias-direction
+                            hit rate (stance sign vs the next observed
+                            move; flat/neutral days excluded and counted),
+                            base-case accuracy (|realized − base target|
+                            percent, graded to-date against the latest
+                            close), and probability calibration (the
+                            highest-probability scenario vs how often it
+                            proved closest, in fixed stated-probability
+                            bands). Every score states its n; realized
+                            math pools live-era days only
 src/app/api/desk/route.ts  GET ?date=&force=&source=auto|modelled (cache-first,
                            stamps on the latest available trading day) ·
                            POST {date} (regenerate: re-pull + rebuild)
 src/app/api/desk/continuity/route.ts  S11: GET ?date=&from=&to= — the
                            track-record archive (read-only)
+src/app/api/desk/calibration/route.ts  S12: GET ?date= — the scorecard
+                           (read-only; never triggers a build — the
+                           deterministic engine stays reachable via
+                           /api/desk?source=modelled)
 db/custom.db (Prisma)      DeskDay rows (briefing/visuals JSON + dataMode +
                            provenanceJson) · Observation rows (one per
                            dataset-date) · SourceSync rows (per-dataset source
@@ -66,6 +87,7 @@ src/components/gold/        header · market-strip (with the "data as of"
                             provenance line) · section-nav · briefing-card ·
                             bias-meter · footer (full provenance note) ·
                             track-record + then-vs-now (the S11 band) ·
+                            calibration (the S12 scorecard band) ·
                             visuals/* (the eight V-cards)
 ```
 
@@ -84,6 +106,26 @@ realized comparisons are drawn only for live/mixed desk days with
 observed closes beyond them; modelled-era days (pre-S10 rows and
 fallback builds) are labelled and kept for the record, never silently
 mixed with the live-era record.
+
+## The S12 calibration surfaces (how the desk is scored)
+
+The scorecard band sits under the S11 track record: three compact score
+cards — bias-direction hit rate (the sign of the desk's stance versus
+gold's next observed move; flat repeats and neutral stances are excluded
+and counted, never folded into the rate), base-case accuracy (|realized
+close − base target| in percent, graded to-date against the latest
+observed close because the targets carry a 90-day horizon), and
+probability calibration (the day's highest-probability scenario is its
+favourite — a tied top means no favourite — and the check asks how often
+favourites at each stated level won). Stated-probability bands render
+with their zero samples when empty, a per-day grade table states every
+day's era and exclusions, and the current reading names the anchor close
+and the record composition. Realized math pools live-era desk days
+only; modelled-era days stay in the record, labelled, never graded.
+Below roughly ten resolved days the band refuses to call its numbers a
+verdict. Served by `/api/desk/calibration` from what the desk already
+caches — no new scraping, no rebuilds, and the route never triggers a
+build.
 
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 
@@ -135,6 +177,16 @@ Rules that bind every session:
    continuity number states whether it comes from live or modelled desk
    days. The S8/S9/S10 payload contracts and visual bindings render
    unchanged apart from the new Continuity elements.
+10. **Measurable honesty (S12):** the scorecard grades only what the desk
+   published (bias sign, base-case target, stated probabilities)
+   against the live observation store, and every calibration number
+   states its sample size and its era — live desk days only for
+   realized math, modelled days labelled and never pooled. Flat,
+   neutral, in-flight and tied-favourite days are excluded and counted,
+   never silently folded into a rate. Small samples stay small on the
+   surface: below roughly ten resolved days the scorecard is a
+   descriptive record, not a verdict. The deterministic engine stays
+   reachable via `GET /api/desk?source=modelled`.
 
 ## The session close-out protocol (what every session ends with)
 

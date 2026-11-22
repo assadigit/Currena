@@ -383,3 +383,153 @@ export interface ContinuityPayload {
   thenVsNow: ThenVsNow | null;
   pair: DeskPairComparison | null;
 }
+
+/* ------------------------------------------------------------------ */
+/* S12 — Calibration layer: scorecard contracts                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * One cached desk day as the scorecard sees it: its published calls with
+ * the per-day grades. Realized grades exist only for live-era days with
+ * observed evidence; every other day carries an honest exclusion note.
+ */
+export interface CalibrationDayRow {
+  date: string;
+  dataMode: DataMode;
+  /** The published aggregate bias score, -100..100. */
+  bias: number;
+  /** The published spot (an observed close on live-era days). */
+  spot: number;
+  /**
+   * Gold's next observed close after the desk day versus the published
+   * spot, percent. Live-era days with an observed close on the day itself
+   * and a next observation only; null otherwise (see exclusion).
+   */
+  nextMovePct: number | null;
+  /** Why no next-move grade is drawn for this day. */
+  nextMoveExclusion?: string;
+  /** "hit" = bias sign matched the next move; "miss" = it did not; "flat" = the next move was a flat repeat; "excluded" = era/neutral rule. */
+  biasOutcome: "hit" | "miss" | "flat" | "excluded";
+  /** The base case's published target and its implied move off the day's spot, percent. */
+  baseTarget: number;
+  baseTargetPct: number;
+  /** |realized close versus the base target|, percent — resolved days only (graded to-date, not at the 90-day horizon). */
+  baseErrorPct: number | null;
+  /** The scenario whose target the realized close sits nearest to — resolved days only. */
+  closest: Scenario["id"] | null;
+  /** The stated probability of the scenario that proved closest — resolved days only. */
+  closestProb: number | null;
+  /** The day's highest-probability scenario; null when the top probability is tied. */
+  favoured: { id: Scenario["id"]; probability: number } | null;
+  /** Whether the favoured scenario proved closest — resolved days with a favourite only. */
+  favouredWon: boolean | null;
+}
+
+/** Bias-direction hit rate: the desk's stance sign versus gold's next observed move. */
+export interface BiasDirectionScore {
+  /** Live-era days graded (hits + misses; flat and excluded days are counted separately, never inside the rate). */
+  sample: number;
+  hits: number;
+  /** Next moves that repeated the desk day's close (a flat grade — excluded from the rate, stated). */
+  flat: number;
+  /** Days with a zero bias (a neutral stance — excluded from the rate, stated). */
+  neutralBias: number;
+  /** hits / sample; null when sample is 0. */
+  hitRate: number | null;
+  /** Mean published bias across the graded days. */
+  meanBias: number | null;
+  /** The recent rolling window (last 10 graded days), when the archive has more than 10. */
+  recent?: {
+    windowDays: number;
+    sample: number;
+    hits: number;
+    hitRate: number | null;
+  };
+}
+
+/** Scenario-target accuracy: how close the published base case landed versus realized. */
+export interface ScenarioAccuracyScore {
+  /** Resolved live-era days graded. */
+  sample: number;
+  /** Mean |realized close versus the base target|, percent. */
+  meanAbsErrorPct: number | null;
+  /** Median of the same. */
+  medianAbsErrorPct: number | null;
+  /** Best and worst misses in the window, percent. */
+  minAbsErrorPct: number | null;
+  maxAbsErrorPct: number | null;
+  /** The recent rolling window (last 10 resolved days), when the archive has more than 10. */
+  recent?: {
+    windowDays: number;
+    sample: number;
+    meanAbsErrorPct: number | null;
+  };
+}
+
+/** One probability band of the calibration check. */
+export interface CalibrationBucket {
+  /** The band label, e.g. "favourite stated < 40%". */
+  label: string;
+  /** Days whose favourite fell in this band. */
+  sample: number;
+  /** Days in the band whose favourite proved closest. */
+  wins: number;
+  /** wins / sample; null when sample is 0. */
+  winRate: number | null;
+  /** Mean stated probability across the band's days. */
+  meanStated: number | null;
+}
+
+/** Probability calibration: when the desk favoured a side, how often that side won. */
+export interface ProbabilityCalibrationScore {
+  /** Resolved live-era days with a single favourite (ties counted separately). */
+  sample: number;
+  favouredWins: number;
+  /** favouredWins / sample; null when sample is 0. */
+  favouredWinRate: number | null;
+  /** Days whose top probability was tied (no favourite — excluded from the rate, stated). */
+  ties: number;
+  /** Mean stated probability of the favoured scenario across graded days. */
+  meanFavouredProb: number | null;
+  /** Mean stated probability of the scenario that proved closest — a coarse calibration gap. */
+  meanWinnerProb: number | null;
+  /** Stated-probability bands, fixed structure (empty bands show their zero sample). */
+  buckets: CalibrationBucket[];
+}
+
+/** How the cached record splits — every score above pools only the live-era rows. */
+export interface CalibrationRecordComposition {
+  /** Total cached desk days. */
+  cachedDays: number;
+  liveDays: number;
+  mixedDays: number;
+  /** Modelled-era days: in the record, labelled, never in realized math. */
+  modelledDays: number;
+  /** Cached days whose narrative was model-written vs deterministic template. */
+  llmDays: number;
+  templateDays: number;
+  /** Live-era days without realized evidence yet — calls still in flight. */
+  inFlight: number;
+  /** Earliest and latest live-era desk day, when any exist. */
+  liveFrom: string | null;
+  liveTo: string | null;
+}
+
+/** The S12 Calibration payload served by /api/desk/calibration. */
+export interface CalibrationPayload {
+  /** The date the caller is viewing (may be a non-trading day). */
+  viewedDate: string;
+  /** The cached desk day the view stamps onto. */
+  effectiveDeskDate: string | null;
+  /** The realized anchor every comparison is graded against: the latest observed gold close. */
+  anchor: { asOf: string; close: number } | null;
+  /** Gold observation coverage behind the realized path. */
+  coverage: { from: string; to: string; observations: number } | null;
+  /** The cached-record split — states what each score pools. */
+  record: CalibrationRecordComposition;
+  biasDirection: BiasDirectionScore;
+  scenarioAccuracy: ScenarioAccuracyScore;
+  probabilityCalibration: ProbabilityCalibrationScore;
+  /** Per-day grades, ascending by date (every day states its era and its exclusions). */
+  days: CalibrationDayRow[];
+}

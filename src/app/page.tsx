@@ -17,6 +17,8 @@ import { DeskFooter } from "@/components/gold/footer";
 import { VisualSlot } from "@/components/gold/visuals/visual-slot";
 import { TrackRecordBand } from "@/components/gold/track-record";
 import { ThenVsNowLine } from "@/components/gold/then-vs-now";
+import { CalibrationBand } from "@/components/gold/calibration";
+import type { CalibrationPayload } from "@/lib/gold/types";
 
 /** Ordinal labels for the eight S9 supporting visuals. */
 const VISUAL_INDEX: Record<string, string> = {
@@ -67,6 +69,17 @@ async function fetchContinuity(date: string): Promise<ContinuityPayload> {
     throw new Error(`The continuity API responded with ${res.status}`);
   }
   return res.json() as Promise<ContinuityPayload>;
+}
+
+/** S12 Calibration: the desk scorecard for the viewed date (read-only). */
+async function fetchCalibration(date: string): Promise<CalibrationPayload> {
+  const res = await fetch(`/api/desk/calibration?date=${date}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(`The calibration API responded with ${res.status}`);
+  }
+  return res.json() as Promise<CalibrationPayload>;
 }
 
 /** Loading skeleton mirroring the desk structure. */
@@ -127,6 +140,14 @@ export default function Page() {
     enabled: date !== "",
   });
 
+  // S12 Calibration — the scorecard over the cached archive; a failure
+  // here never blocks the desk itself.
+  const { data: calibration } = useQuery({
+    queryKey: ["calibration", date],
+    queryFn: () => fetchCalibration(date),
+    enabled: date !== "",
+  });
+
   const [isRegenerating, setIsRegenerating] = React.useState(false);
 
   const regenerate = React.useCallback(async () => {
@@ -143,6 +164,7 @@ export default function Page() {
       }
       await queryClient.invalidateQueries({ queryKey: ["desk", date] });
       await queryClient.invalidateQueries({ queryKey: ["continuity", date] });
+      await queryClient.invalidateQueries({ queryKey: ["calibration", date] });
       toast({
         title: "Briefing regenerated",
         description:
@@ -250,6 +272,16 @@ export default function Page() {
                   <TrackRecordBand
                     continuity={continuity}
                     deskDate={continuity.effectiveDeskDate}
+                  />
+                </div>
+              ) : null}
+
+              {/* S12 Calibration — the scorecard band under the track record */}
+              {calibration && calibration.record.cachedDays > 0 ? (
+                <div className="mt-6">
+                  <CalibrationBand
+                    calibration={calibration}
+                    deskDate={calibration.effectiveDeskDate}
                   />
                 </div>
               ) : null}
