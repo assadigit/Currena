@@ -1,0 +1,297 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-bull: var(--bull);
+  --color-bear: var(--bear);
+  --color-flat: var(--flat);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Warm neutral canvas with a gold primary — no blue/indigo anywhere. */
+  --background: oklch(0.987 0.003 84);
+  --foreground: oklch(0.216 0.006 56);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.216 0.006 56);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.216 0.006 56);
+  --primary: oklch(0.55 0.115 68);
+  --primary-foreground: oklch(0.99 0.004 84);
+  --secondary: oklch(0.962 0.005 80);
+  --secondary-foreground: oklch(0.3 0.008 56);
+  --muted: oklch(0.962 0.005 80);
+  --muted-foreground: oklch(0.552 0.01 62);
+  --accent: oklch(0.955 0.02 84);
+  --accent-foreground: oklch(0.38 0.06 62);
+  --destructive: oklch(0.577 0.19 32);
+  --border: oklch(0.917 0.005 76);
+  --input: oklch(0.917 0.005 76);
+  --ring: oklch(0.62 0.1 72);
+
+  /* Chart palette: gold lead, warm neutrals, muted terracotta/sage support. */
+  --chart-1: oklch(0.62 0.11 75);
+  --chart-2: oklch(0.68 0.012 70);
+  --chart-3: oklch(0.6 0.105 45);
+  --chart-4: oklch(0.62 0.045 140);
+  --chart-5: oklch(0.8 0.085 90);
+
+  /* Market semantics. */
+  --gold: oklch(0.55 0.115 68);
+  --gold-soft: oklch(0.88 0.045 88);
+  --bull: oklch(0.52 0.09 150);
+  --bear: oklch(0.55 0.13 35);
+  --flat: oklch(0.68 0.012 70);
+
+  --sidebar: oklch(0.985 0.003 84);
+  --sidebar-foreground: oklch(0.216 0.006 56);
+  --sidebar-primary: oklch(0.55 0.115 68);
+  --sidebar-primary-foreground: oklch(0.99 0.004 84);
+  --sidebar-accent: oklch(0.955 0.02 84);
+  --sidebar-accent-foreground: oklch(0.38 0.06 62);
+  --sidebar-border: oklch(0.917 0.005 76);
+  --sidebar-ring: oklch(0.62 0.1 72);
+}
+
+.dark {
+  --background: oklch(0.147 0.004 70);
+  --foreground: oklch(0.955 0.004 84);
+  --card: oklch(0.192 0.005 70);
+  --card-foreground: oklch(0.955 0.004 84);
+  --popover: oklch(0.192 0.005 70);
+  --popover-foreground: oklch(0.955 0.004 84);
+  --primary: oklch(0.76 0.115 82);
+  --primary-foreground: oklch(0.216 0.006 56);
+  --secondary: oklch(0.258 0.006 70);
+  --secondary-foreground: oklch(0.955 0.004 84);
+  --muted: oklch(0.258 0.006 70);
+  --muted-foreground: oklch(0.712 0.012 76);
+  --accent: oklch(0.28 0.03 76);
+  --accent-foreground: oklch(0.92 0.05 84);
+  --destructive: oklch(0.665 0.16 32);
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.62 0.1 72);
+
+  --chart-1: oklch(0.76 0.11 82);
+  --chart-2: oklch(0.66 0.012 70);
+  --chart-3: oklch(0.68 0.12 45);
+  --chart-4: oklch(0.66 0.045 140);
+  --chart-5: oklch(0.85 0.08 90);
+
+  --gold: oklch(0.76 0.115 82);
+  --gold-soft: oklch(0.32 0.05 76);
+  --bull: oklch(0.68 0.1 150);
+  --bear: oklch(0.66 0.13 35);
+  --flat: oklch(0.66 0.012 70);
+
+  --sidebar: oklch(0.192 0.005 70);
+  --sidebar-foreground: oklch(0.955 0.004 84);
+  --sidebar-primary: oklch(0.76 0.115 82);
+  --sidebar-primary-foreground: oklch(0.216 0.006 56);
+  --sidebar-accent: oklch(0.28 0.03 76);
+  --sidebar-accent-foreground: oklch(0.92 0.05 84);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.62 0.1 72);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* Numbers align in strict columns across the desk. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Slim, unobtrusive scrollbars for dense data areas. */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .scroll-slim::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+  }
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Smooth in-page navigation with breathing room under the sticky nav. */
+  html {
+    scroll-behavior: smooth;
+  }
+  section[id] {
+    scroll-margin-top: 4.5rem;
+  }
+
+  /* Brief highlight ring when jumping to a supporting visual. */
+  .visual-flash {
+    animation: visual-flash 1.6s ease-out 2;
+  }
+  @keyframes visual-flash {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    35% {
+      box-shadow: 0 0 0 3px var(--gold);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* S14 Digest — the print/export sheet.                                */
+/*                                                                     */
+/* The sheet is the same digest payload rendered as a self-contained   */
+/* document. On screen it never shows (display: none). The band's      */
+/* export button adds body.digest-printing around window.print(), so   */
+/* only the sheet reaches the paper; a normal print of the page is     */
+/* untouched. Explicit ink-on-white styling — it prints identically    */
+/* from light or dark mode, with no theme tokens.                      */
+/* ------------------------------------------------------------------ */
+
+.digest-print-sheet {
+  display: none;
+  max-width: 170mm;
+  margin: 0 auto;
+  padding: 6mm 2mm;
+  color: #1c1917;
+  background: #ffffff;
+  font-size: 10.5pt;
+  line-height: 1.55;
+}
+
+@media print {
+  body.digest-printing > *:not(.digest-print-sheet) {
+    display: none !important;
+  }
+  body.digest-printing .digest-print-sheet {
+    display: block !important;
+  }
+  .digest-print-sheet .sheet-section,
+  .digest-print-sheet .sheet-header,
+  .digest-print-sheet .sheet-footer {
+    break-inside: avoid;
+  }
+}
+
+.digest-print-sheet .sheet-header {
+  border-bottom: 2px solid #1c1917;
+  padding-bottom: 3mm;
+  margin-bottom: 4mm;
+}
+.digest-print-sheet .sheet-header h1 {
+  font-size: 15pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.digest-print-sheet .sheet-meta {
+  font-size: 9pt;
+  color: #57534e;
+  margin: 1mm 0 0;
+}
+.digest-print-sheet .sheet-tagline {
+  font-size: 9pt;
+  font-style: italic;
+  color: #57534e;
+  margin: 1mm 0 0;
+}
+.digest-print-sheet .sheet-section {
+  margin-bottom: 4mm;
+}
+.digest-print-sheet .sheet-section h2 {
+  font-size: 8.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #78716c;
+  border-bottom: 1px solid #d6d3d1;
+  padding-bottom: 0.8mm;
+  margin: 0 0 1.6mm;
+}
+.digest-print-sheet p {
+  margin: 0 0 1.6mm;
+}
+.digest-print-sheet .sheet-lead {
+  font-size: 12pt;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.digest-print-sheet .sheet-scenarios {
+  font-weight: 500;
+}
+.digest-print-sheet .sheet-trigger {
+  border-left: 2.5px solid #a8a29e;
+  padding-left: 2.5mm;
+}
+.digest-print-sheet .sheet-trigger-label {
+  font-weight: 700;
+}
+.digest-print-sheet .sheet-chip {
+  font-size: 8.5pt;
+  color: #57534e;
+}
+.digest-print-sheet .sheet-fine {
+  font-size: 8.5pt;
+  color: #57534e;
+}
+.digest-print-sheet .sheet-footer {
+  border-top: 1px solid #d6d3d1;
+  padding-top: 2.5mm;
+  margin-top: 2mm;
+}
+.digest-print-sheet .sheet-footer p {
+  font-size: 8.5pt;
+  color: #57534e;
+  margin: 0 0 1mm;
+}

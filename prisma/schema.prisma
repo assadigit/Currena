@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/**
+ * One row per desk date. The S8 briefing payload and the S9 visuals
+ * payload are stored as serialised JSON text (SQLite has no list/array
+ * primitives, and the payloads are read as whole documents anyway).
+ *
+ * S10 adds provenance columns: `dataMode` records how the market series
+ * were served ("live" | "mixed" | "modelled") and `provenanceJson` holds
+ * the per-dataset live-vs-modelled record. Rows written before S10 have
+ * dataMode "modelled" and a null provenanceJson — they are treated as
+ * cache misses and rebuilt grounded.
+ */
+model DeskDay {
+  id              String   @id @default(cuid())
+  date            String   @unique
+  briefingJson    String
+  visualsJson     String
+  narrativeSource String   @default("template")
+  dataMode        String   @default("modelled")
+  provenanceJson  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/**
+ * S10 Roots layer — one observation row per dataset per trading day
+ * (no list-typed primitives: each symbol-date is its own row).
+ */
+model Observation {
+  id        String   @id @default(cuid())
+  dataset   String // gold | dxy | spx | realYield | silver | oil | dxy:<pair>
+  date      String // YYYY-MM-DD trading day
+  close     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([dataset, date])
+  @@index([dataset])
+}
+
+/**
+ * S10 Roots layer — the EODHD source registry state: which dataset is
+ * served by which symbol, whether the last sync succeeded, and the
+ * latest observation date seen. One row per logical dataset.
+ */
+model SourceSync {
+  id        String   @id @default(cuid())
+  dataset   String   @unique
+  symbol    String // the EODHD symbol (or formula description) that served it
+  status    String   @default("live") // live | unavailable | error
+  asOf      String? // latest observation date in the store
+  syncedAt  DateTime @updatedAt
+  note      String?
+}
+
+/**
+ * S13 Watch layer — one owner-defined watch rule. Rules are evaluated
+ * server-side at read time over what the desk already persists (the
+ * DeskDay cache, the Observation store and the S12 calibration record);
+ * nothing here adds a second polling or network surface.
+ *
+ * `kind` selects the engine's rule family:
+ *   price-level   — gold's latest observed close crossing `level`
+ *                   (direction: above | below | cross)
+ *   bias-flip     — the published stance changing sign, or crossing
+ *                   `level` (direction: sign | above | below)
+ *   scenario-band — the latest base-case target, or its implied move,
+ *                   crossing `level` (basis: target | implied-move)
+ *   calibration   — a rolling scorecard threshold: `metric` selects
+ *                   base-miss | direction-hit-rate, `direction` selects
+ *                   above | below
+ *
+ * Scalar columns only (SQLite has no list primitives); `direction` and
+ * the metric selectors carry the family-specific semantics so one row
+ * fully describes one rule.
+ */
+model WatchRule {
+  id        String   @id @default(cuid())
+  kind      String // price-level | bias-flip | scenario-band | calibration
+  label     String // owner-facing name shown in the watch band
+  level     Float // the threshold the rule watches (USD, bias points, or percent)
+  direction String // above | below | cross | sign | target | implied-move (per kind)
+  metric    String   @default("base-miss") // calibration rules only: base-miss | direction-hit-rate
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kind])
+}
