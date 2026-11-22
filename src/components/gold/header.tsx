@@ -110,6 +110,13 @@ export function DeskHeader({
             <span className="h-1.5 w-1.5 rounded-full bg-bull" />
             S10 Roots · live
           </Badge>
+          <Badge
+            variant="outline"
+            className="gap-1.5 border-chart-4/50 bg-chart-4/5 font-normal text-chart-4"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-chart-4" />
+            S11 Continuity · live
+          </Badge>
         </div>
 
         <div className="ml-auto flex items-center gap-2">

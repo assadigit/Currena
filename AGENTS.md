@@ -18,7 +18,11 @@ session arc:
 - **S10 — Roots layer (done, live):** the desk is grounded in real market
   data via the owner-supplied EODHD API, with honest provenance and a
   fail-closed synthetic fallback — the desk never goes dark.
-- **S11 — next session.**
+- **S11 — Continuity layer (done, live):** the desk has memory — a
+  track-record band over the cached DeskDay archive (bias history
+  sparkline + scenario-vs-realized strip) and a "then vs now" line on
+  date navigation, all read back from what the desk already persists.
+- **S12 — next session.**
 
 ## Architecture (the one page a session must know)
 
@@ -41,9 +45,18 @@ src/lib/gold/grounded.ts   S10 Roots: grounding resolution (grounded vs
 src/lib/gold/builder.ts    facts → BriefingPayload + VisualsPayload (S8 + S9)
 src/lib/gold/narrative.ts  z-ai-web-dev-sdk strategist model rewrites the six
                             sections; deterministic template fallback
+src/lib/gold/continuity.ts S11 Continuity: the desk archive — read-only
+                            queries over cached DeskDay rows (bias, scenario
+                            calls, narrative highlights, dataMode) plus the
+                            Observation store (realized gold closes); the
+                            scenario-vs-realized and then-vs-now math.
+                            Modelled-era days are labelled and never mixed
+                            into realized math; no scraping, no rebuilds
 src/app/api/desk/route.ts  GET ?date=&force=&source=auto|modelled (cache-first,
                            stamps on the latest available trading day) ·
                            POST {date} (regenerate: re-pull + rebuild)
+src/app/api/desk/continuity/route.ts  S11: GET ?date=&from=&to= — the
+                           track-record archive (read-only)
 db/custom.db (Prisma)      DeskDay rows (briefing/visuals JSON + dataMode +
                            provenanceJson) · Observation rows (one per
                            dataset-date) · SourceSync rows (per-dataset source
@@ -52,8 +65,25 @@ src/app/page.tsx            the desk page — sections paired with their visuals
 src/components/gold/        header · market-strip (with the "data as of"
                             provenance line) · section-nav · briefing-card ·
                             bias-meter · footer (full provenance note) ·
+                            track-record + then-vs-now (the S11 band) ·
                             visuals/* (the eight V-cards)
 ```
+
+## The S11 continuity surfaces (what the desk remembers)
+
+The track-record band sits under the briefing masthead: a bias-history
+sparkline across every cached desk day (modelled days dotted in, the
+viewed day outlined) and a scenario-vs-realized strip — each past desk
+day's bull/base/bear probability-target chips against gold's actually
+observed close since. The "then vs now" line rides with date
+navigation: on a cached day it states what the desk said then, what
+gold did since (live-era days only), and what the desk believes on its
+latest day. Both are served by `/api/desk/continuity` from what the
+desk already persists — no new scraping. Every number states its era:
+realized comparisons are drawn only for live/mixed desk days with
+observed closes beyond them; modelled-era days (pre-S10 rows and
+fallback builds) are labelled and kept for the record, never silently
+mixed with the live-era record.
 
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 
@@ -99,6 +129,12 @@ Rules that bind every session:
    recorded in provenance. The engine stays reachable directly via
    `GET /api/desk?source=modelled`. Desk rows built before S10 (null
    provenance) are cache misses and rebuild grounded.
+9. **Honest track record (S11):** the archive reads only what the desk
+   already persists (DeskDay cache + Observation store). Modelled-era
+   desk days are labelled and never enter realized-outcome math; every
+   continuity number states whether it comes from live or modelled desk
+   days. The S8/S9/S10 payload contracts and visual bindings render
+   unchanged apart from the new Continuity elements.
 
 ## The session close-out protocol (what every session ends with)
 

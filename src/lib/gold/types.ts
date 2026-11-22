@@ -275,3 +275,111 @@ export interface DeskProvenance {
   /** Dataset-by-dataset record. */
   datasets: DatasetProvenance[];
 }
+
+/* ------------------------------------------------------------------ */
+/* S11 — Continuity layer: track-record contracts                       */
+/* ------------------------------------------------------------------ */
+
+/** One published scenario call read back from the DeskDay cache. */
+export interface ArchiveScenarioCall {
+  id: Scenario["id"];
+  /** Probability in percent, as published that day. */
+  probability: number;
+  /** Spot target in USD per ounce, as published that day. */
+  target: number;
+}
+
+/**
+ * The realized-outcome comparison for a live-era archived call:
+ * the desk's published targets versus what gold actually printed.
+ * Present only for live/mixed desk days with observed closes beyond
+ * the desk day — modelled-era calls are never silently mixed in.
+ */
+export interface ArchiveRealized {
+  /** The latest observed gold trading day this call is compared against. */
+  asOf: string;
+  realizedClose: number;
+  /** Realized move since the desk day's own published spot, percent. */
+  realizedPct: number;
+  /** Each published target versus the realized close. */
+  scenarioDeltas: {
+    id: Scenario["id"];
+    probability: number;
+    target: number;
+    /** The target's implied move versus the desk day's spot, percent. */
+    targetPct: number;
+    /** Realized close versus the target, percent (negative = target sits above spot). */
+    realizedVsTargetPct: number;
+  }[];
+  /** Which scenario the realized close currently sits closest to. */
+  closest: Scenario["id"];
+}
+
+/** One archived desk call — what the desk said that day. */
+export interface ArchiveDayCall {
+  date: string;
+  dataMode: DataMode;
+  narrativeSource: "llm" | "template";
+  /** The published aggregate bias score, -100..100. */
+  bias: number;
+  /** The published spot (a real observed close on live-era days). */
+  spot: number;
+  /** The exec-section headline the desk led with that day. */
+  headline: string;
+  scenarios: ArchiveScenarioCall[];
+  realized?: ArchiveRealized;
+}
+
+/** "Then vs now" — the viewed cached day against the desk's latest belief. */
+export interface ThenVsNow {
+  then: {
+    date: string;
+    dataMode: DataMode;
+    bias: number;
+    spot: number;
+    headline: string;
+    scenarios: ArchiveScenarioCall[];
+  };
+  /** Realized move since the viewed day's published spot — live-era days only. */
+  realizedSince: { asOf: string; close: number; pct: number } | null;
+  /** Why no realized comparison is drawn (modelled-era or not-yet-observed days). */
+  realizedNote?: string;
+  /** The latest cached desk day — what the desk believes today. */
+  now: {
+    date: string;
+    dataMode: DataMode;
+    bias: number;
+    spot: number;
+    headline: string;
+  };
+}
+
+/** Explicit two-date archive comparison (?from=&to=). */
+export interface DeskPairComparison {
+  from: ArchiveDayCall;
+  to: ArchiveDayCall;
+  /** Realized gold closes on both dates, from the live observation store. */
+  realizedBetween: {
+    fromClose: number;
+    toClose: number;
+    /** The move between the two dates, percent (live observations only). */
+    pct: number;
+  } | null;
+  note?: string;
+}
+
+/** The S11 Continuity payload served by /api/desk/continuity. */
+export interface ContinuityPayload {
+  /** The date the caller is viewing (may be a non-trading day). */
+  viewedDate: string;
+  /** The cached desk day the view stamps onto (latest cache row at or before the view). */
+  effectiveDeskDate: string | null;
+  /** Cached desk calls, ascending by date. */
+  archive: ArchiveDayCall[];
+  /** Gold observation coverage behind the realized path. */
+  realizedCoverage: { from: string; to: string; observations: number } | null;
+  /** The latest observed gold close — the "now" anchor for every comparison. */
+  realizedNow: { asOf: string; close: number } | null;
+  thenVsNow: ThenVsNow | null;
+  pair: DeskPairComparison | null;
+}

@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { RefreshCw, TriangleAlert } from "lucide-react";
-import type { DeskResponse, SectionId } from "@/lib/gold/types";
+import type { ContinuityPayload, DeskResponse, SectionId } from "@/lib/gold/types";
 import { fmtDayLabel } from "@/lib/gold/format";
 import { DeskHeader } from "@/components/gold/header";
 import { MarketStrip } from "@/components/gold/market-strip";
@@ -15,6 +15,8 @@ import { SectionNav } from "@/components/gold/section-nav";
 import { BriefingCard } from "@/components/gold/briefing-card";
 import { DeskFooter } from "@/components/gold/footer";
 import { VisualSlot } from "@/components/gold/visuals/visual-slot";
+import { TrackRecordBand } from "@/components/gold/track-record";
+import { ThenVsNowLine } from "@/components/gold/then-vs-now";
 
 /** Ordinal labels for the eight S9 supporting visuals. */
 const VISUAL_INDEX: Record<string, string> = {
@@ -54,6 +56,17 @@ async function fetchDesk(date: string): Promise<DeskResponse> {
     throw new Error(`The desk API responded with ${res.status}`);
   }
   return res.json() as Promise<DeskResponse>;
+}
+
+/** S11 Continuity: the desk archive for the viewed date (read-only). */
+async function fetchContinuity(date: string): Promise<ContinuityPayload> {
+  const res = await fetch(`/api/desk/continuity?date=${date}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(`The continuity API responded with ${res.status}`);
+  }
+  return res.json() as Promise<ContinuityPayload>;
 }
 
 /** Loading skeleton mirroring the desk structure. */
@@ -106,6 +119,14 @@ export default function Page() {
     enabled: date !== "",
   });
 
+  // S11 Continuity — rides along with date navigation; a failure here
+  // never blocks the desk itself.
+  const { data: continuity } = useQuery({
+    queryKey: ["continuity", date],
+    queryFn: () => fetchContinuity(date),
+    enabled: date !== "",
+  });
+
   const [isRegenerating, setIsRegenerating] = React.useState(false);
 
   const regenerate = React.useCallback(async () => {
@@ -121,6 +142,7 @@ export default function Page() {
         throw new Error(`Regeneration failed (${res.status})`);
       }
       await queryClient.invalidateQueries({ queryKey: ["desk", date] });
+      await queryClient.invalidateQueries({ queryKey: ["continuity", date] });
       toast({
         title: "Briefing regenerated",
         description:
@@ -200,6 +222,13 @@ export default function Page() {
           </div>
           <SectionNav sections={briefing.sections} />
 
+          {/* S11 Continuity — the then-vs-now reminder under date navigation */}
+          {continuity ? (
+            <div className="mx-auto w-full max-w-7xl px-4 pt-2 sm:px-6 lg:px-8">
+              <ThenVsNowLine continuity={continuity} />
+            </div>
+          ) : null}
+
           <main className="flex-1">
             <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
               {/* Briefing masthead */}
@@ -214,6 +243,16 @@ export default function Page() {
                   reading guide and a data-driven current reading.
                 </p>
               </div>
+
+              {/* S11 Continuity — the track-record band under the masthead */}
+              {continuity && continuity.archive.length > 0 ? (
+                <div className="mt-8">
+                  <TrackRecordBand
+                    continuity={continuity}
+                    deskDate={continuity.effectiveDeskDate}
+                  />
+                </div>
+              ) : null}
 
               {/* Sections: S8 narrative paired with S9 visuals */}
               <div className="mt-10 space-y-12">
@@ -261,3 +300,4 @@ export default function Page() {
     </div>
   );
 }
+
