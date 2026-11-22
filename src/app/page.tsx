@@ -18,7 +18,8 @@ import { VisualSlot } from "@/components/gold/visuals/visual-slot";
 import { TrackRecordBand } from "@/components/gold/track-record";
 import { ThenVsNowLine } from "@/components/gold/then-vs-now";
 import { CalibrationBand } from "@/components/gold/calibration";
-import type { CalibrationPayload } from "@/lib/gold/types";
+import { WatchBand } from "@/components/gold/watch-band";
+import type { CalibrationPayload, WatchPayload } from "@/lib/gold/types";
 
 /** Ordinal labels for the eight S9 supporting visuals. */
 const VISUAL_INDEX: Record<string, string> = {
@@ -80,6 +81,17 @@ async function fetchCalibration(date: string): Promise<CalibrationPayload> {
     throw new Error(`The calibration API responded with ${res.status}`);
   }
   return res.json() as Promise<CalibrationPayload>;
+}
+
+/** S13 Watch: the owner's rules, evaluated against the persisted record. */
+async function fetchWatch(date: string): Promise<WatchPayload> {
+  const res = await fetch(`/api/desk/watch?date=${date}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(`The watch API responded with ${res.status}`);
+  }
+  return res.json() as Promise<WatchPayload>;
 }
 
 /** Loading skeleton mirroring the desk structure. */
@@ -148,6 +160,15 @@ export default function Page() {
     enabled: date !== "",
   });
 
+  // S13 Watch — the owner's rules, re-checked on every desk load; a
+  // failure here never blocks the desk itself. Rule CRUD invalidates
+  // this query so the band re-evaluates against the same record.
+  const { data: watch, refetch: refetchWatch } = useQuery({
+    queryKey: ["watch", date],
+    queryFn: () => fetchWatch(date),
+    enabled: date !== "",
+  });
+
   const [isRegenerating, setIsRegenerating] = React.useState(false);
 
   const regenerate = React.useCallback(async () => {
@@ -165,6 +186,7 @@ export default function Page() {
       await queryClient.invalidateQueries({ queryKey: ["desk", date] });
       await queryClient.invalidateQueries({ queryKey: ["continuity", date] });
       await queryClient.invalidateQueries({ queryKey: ["calibration", date] });
+      await queryClient.invalidateQueries({ queryKey: ["watch", date] });
       toast({
         title: "Briefing regenerated",
         description:
@@ -282,6 +304,17 @@ export default function Page() {
                   <CalibrationBand
                     calibration={calibration}
                     deskDate={calibration.effectiveDeskDate}
+                  />
+                </div>
+              ) : null}
+
+              {/* S13 Watch — the owner's pinned questions under the scorecard */}
+              {watch ? (
+                <div className="mt-6">
+                  <WatchBand
+                    watch={watch}
+                    onRulesChanged={() => void refetchWatch()}
+                    toast={toast}
                   />
                 </div>
               ) : null}

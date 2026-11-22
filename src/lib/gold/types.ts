@@ -533,3 +533,96 @@ export interface CalibrationPayload {
   /** Per-day grades, ascending by date (every day states its era and its exclusions). */
   days: CalibrationDayRow[];
 }
+
+/* ------------------------------------------------------------------ */
+/* S13 — Watch layer: rule + evaluation contracts                       */
+/* ------------------------------------------------------------------ */
+
+/** The four owner-configurable rule families the watch engine evaluates. */
+export type WatchRuleKind =
+  | "price-level" // gold's latest observed close crossing a level
+  | "bias-flip" // the published stance changing sign or crossing a level
+  | "scenario-band" // the latest base-case target / implied move crossing a level
+  | "calibration"; // a rolling scorecard threshold breach
+
+/** Per-kind selector semantics (validated server-side; see watch.ts). */
+export type WatchDirection =
+  | "above" // the watched value is at or past the level from below
+  | "below" // the watched value is at or past the level from above
+  | "cross" // price-level only: any crossing of the level, either side
+  | "sign" // bias-flip only: the stance changed sign between consecutive desk days
+  | "target" // scenario-band only: watch the base target's USD level
+  | "implied-move"; // scenario-band only: watch the base target's implied % move
+
+/** The calibration metrics a rule can threshold. */
+export type WatchCalibrationMetric =
+  | "base-miss" // rolling mean |realized − base target|, percent
+  | "direction-hit-rate"; // rolling bias-direction hit rate, percent
+
+/** A watch rule as persisted (scalar columns only — no list primitives). */
+export interface WatchRuleRecord {
+  id: string;
+  kind: WatchRuleKind;
+  label: string;
+  /** USD (price/scenario target), bias points, or percent — per kind. */
+  level: number;
+  direction: WatchDirection;
+  /** Calibration rules only: which scorecard metric is thresholded. */
+  metric: WatchCalibrationMetric;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Why a rule cannot be evaluated yet — stated, never silently dropped. */
+export interface WatchEvaluationGap {
+  /** Machine-readable gap code. */
+  code:
+    | "no-observations" // the observation store has no gold closes
+    | "no-live-desk-day" // no live-era cached desk day to read a stance/target from
+    | "no-graded-days" // no resolved live days for a calibration metric
+    | "no-prior-close" // a crossing rule needs a previous close to cross from
+    | "no-prior-desk-day" // a sign-flip rule needs a previous desk day
+    | "invalid"; // the stored rule failed validation (shown with its reason)
+  /** Human sentence explaining the gap. */
+  note: string;
+}
+
+/** The evaluated state of one rule against the persisted record. */
+export interface WatchEvaluation {
+  /** The rule as persisted. */
+  rule: WatchRuleRecord;
+  /** "triggered" = the condition holds on the latest evidence; "quiet" = it does not. */
+  state: "triggered" | "quiet";
+  /** The observation behind the state — the fact, the date it last held, its era, its sample. */
+  statement: string;
+  /** The latest value the rule watched (USD / bias points / percent). */
+  watchedValue: number | null;
+  /** The date the watched value was observed or published. */
+  watchedDate: string | null;
+  /** The previous value, when the rule is about a change (crossings and flips). */
+  previousValue: number | null;
+  /** The era of the evidence: live desk days only for anything touching realized prices. */
+  era: "live" | "modelled" | "none";
+  /** The sample size behind a rate (calibration rules); null for point observations. */
+  sample: number | null;
+  /** Why no state could be drawn, when it could not. */
+  gap: WatchEvaluationGap | null;
+  /** When this evaluation was computed (ISO timestamp). */
+  evaluatedAt: string;
+}
+
+/** The S13 Watch payload served by /api/desk/watch. */
+export interface WatchPayload {
+  /** The date the caller is viewing (may be a non-trading day). */
+  viewedDate: string;
+  /** The cached desk day the view stamps onto. */
+  effectiveDeskDate: string | null;
+  /** Every rule (active and inactive) with its evaluation — inactive rules state they are paused. */
+  rules: WatchEvaluation[];
+  /** The latest observed gold close — the anchor for price rules. */
+  anchor: { asOf: string; close: number } | null;
+  /** The era note for the whole band: realized math pools live desk days only. */
+  liveDays: number;
+  modelledDays: number;
+}

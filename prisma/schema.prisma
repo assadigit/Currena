@@ -60,3 +60,38 @@ model SourceSync {
   syncedAt  DateTime @updatedAt
   note      String?
 }
+
+/**
+ * S13 Watch layer — one owner-defined watch rule. Rules are evaluated
+ * server-side at read time over what the desk already persists (the
+ * DeskDay cache, the Observation store and the S12 calibration record);
+ * nothing here adds a second polling or network surface.
+ *
+ * `kind` selects the engine's rule family:
+ *   price-level   — gold's latest observed close crossing `level`
+ *                   (direction: above | below | cross)
+ *   bias-flip     — the published stance changing sign, or crossing
+ *                   `level` (direction: sign | above | below)
+ *   scenario-band — the latest base-case target, or its implied move,
+ *                   crossing `level` (basis: target | implied-move)
+ *   calibration   — a rolling scorecard threshold: `metric` selects
+ *                   base-miss | direction-hit-rate, `direction` selects
+ *                   above | below
+ *
+ * Scalar columns only (SQLite has no list primitives); `direction` and
+ * the metric selectors carry the family-specific semantics so one row
+ * fully describes one rule.
+ */
+model WatchRule {
+  id        String   @id @default(cuid())
+  kind      String // price-level | bias-flip | scenario-band | calibration
+  label     String // owner-facing name shown in the watch band
+  level     Float // the threshold the rule watches (USD, bias points, or percent)
+  direction String // above | below | cross | sign | target | implied-move (per kind)
+  metric    String   @default("base-miss") // calibration rules only: base-miss | direction-hit-rate
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kind])
+}

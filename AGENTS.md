@@ -27,7 +27,15 @@ session arc:
   (bias-direction hit rate, base-case accuracy, probability
   calibration), every number stating its sample size and its era,
   served read-only by `/api/desk/calibration`.
-- **S13 — next session.**
+- **S13 — Watch layer (done, live):** the owner pins the desk to the
+  questions they actually care about — owner-defined watch rules
+  (price-level breaks, bias flips, scenario-band breaches, calibration
+  thresholds), evaluated server-side at read time over what the desk
+  already persists. Rules live in SQLite (`WatchRule`), CRUD rides
+  `/api/desk/watch` with toast feedback, the watch band re-checks on
+  every desk load, and the once-per-day EODHD sync stays the only
+  network surface. Every watch is an observation, never advice.
+- **S14 — next session.**
 
 ## Architecture (the one page a session must know)
 
@@ -69,6 +77,16 @@ src/lib/gold/calibration.ts S12 Calibration: the desk scorecard —
                             proved closest, in fixed stated-probability
                             bands). Every score states its n; realized
                             math pools live-era days only
+src/lib/gold/watch.ts       S13 Watch: the rule engine — owner-defined
+                            rules (price-level breaks, bias flips,
+                            scenario-band breaches, calibration
+                            thresholds) evaluated at read time over the
+                            same stores S11/S12 read (DeskDay cache,
+                            observation store, S12 scorecard). Every
+                            trigger states the fact, its date, its era
+                            and its sample; gaps (no observations, no
+                            live desk day, no graded days) are stated,
+                            never faked quiet. Zero new network
 src/app/api/desk/route.ts  GET ?date=&force=&source=auto|modelled (cache-first,
                            stamps on the latest available trading day) ·
                            POST {date} (regenerate: re-pull + rebuild)
@@ -78,17 +96,23 @@ src/app/api/desk/calibration/route.ts  S12: GET ?date= — the scorecard
                            (read-only; never triggers a build — the
                            deterministic engine stays reachable via
                            /api/desk?source=modelled)
+src/app/api/desk/watch/route.ts  S13: GET ?date= (evaluate every rule,
+                           read-only) · POST/PATCH/DELETE (rule CRUD;
+                           validation mirrors the engine so a persisted
+                           rule is always evaluable)
 db/custom.db (Prisma)      DeskDay rows (briefing/visuals JSON + dataMode +
                            provenanceJson) · Observation rows (one per
                            dataset-date) · SourceSync rows (per-dataset source
-                           registry state)
+                           registry state) · WatchRule rows (S13: one per
+                           owner rule — scalar columns only)
 src/app/page.tsx            the desk page — sections paired with their visuals
 src/components/gold/        header · market-strip (with the "data as of"
-                            provenance line) · section-nav · briefing-card ·
-                            bias-meter · footer (full provenance note) ·
-                            track-record + then-vs-now (the S11 band) ·
-                            calibration (the S12 scorecard band) ·
-                            visuals/* (the eight V-cards)
+                           provenance line) · section-nav · briefing-card ·
+                           bias-meter · footer (full provenance note) ·
+                           track-record + then-vs-now (the S11 band) ·
+                           calibration (the S12 scorecard band) ·
+                           watch-band (the S13 rules + rule editor) ·
+                           visuals/* (the eight V-cards)
 ```
 
 ## The S11 continuity surfaces (what the desk remembers)
@@ -126,6 +150,30 @@ Below roughly ten resolved days the band refuses to call its numbers a
 verdict. Served by `/api/desk/calibration` from what the desk already
 caches — no new scraping, no rebuilds, and the route never triggers a
 build.
+
+## The S13 watch surfaces (the owner's pinned questions)
+
+The watch band sits under the S12 scorecard: one row per owner rule,
+triggered rows first, each stating the fact, the date it last held, its
+era (live desk days only for anything touching realized prices;
+modelled-era evidence is labelled and never pooled), and its sample
+size where a rate is involved. Four rule families are evaluated
+server-side at read time: price-level breaks (gold's latest observed
+close crossing an owner-set level, judged against the two latest
+observed trading days), bias flips (the published stance changing sign
+or crossing a threshold, read back from the desk cache), scenario-band
+breaches (the latest base-case target or its implied move crossing a
+level), and calibration threshold breaches (the rolling mean base-case
+miss or the direction hit rate versus a threshold — the exact S12
+scorecard numbers, sample size stated). Rules persist in SQLite via
+Prisma (one row per rule, scalar columns only); CRUD is API-route-
+reachable (`/api/desk/watch` POST/PATCH/DELETE) with toast feedback and
+validation that mirrors the engine, so a persisted rule is always
+evaluable. The band re-checks on every desk load and adds no polling —
+the once-per-day EODHD sync stays the only network surface. Every watch
+is an observation, never advice; there is no push/notification
+infrastructure (in-desk surfaces only), and the deterministic engine
+stays reachable via `GET /api/desk?source=modelled`.
 
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 
@@ -187,6 +235,19 @@ Rules that bind every session:
    surface: below roughly ten resolved days the scorecard is a
    descriptive record, not a verdict. The deterministic engine stays
    reachable via `GET /api/desk?source=modelled`.
+11. **Owner-pinned watches (S13):** watch rules are observations, never
+   advice — every trigger states the fact, the date it last held, its
+   era and its sample size where a rate is involved. Realized-price
+   evidence pools live-era desk days only; modelled-era data may inform
+   the record but is labelled and never pooled. Rules that cannot be
+   evaluated yet state their gap honestly instead of rendering a fake
+   quiet state. Evaluation adds no polling or network surface: the
+   watch band re-checks on every desk load over the persisted record,
+   the once-per-day EODHD sync stays the only network call, and no
+   push/notification infrastructure exists (in-desk surfaces only).
+   The deterministic engine stays reachable via
+   `GET /api/desk?source=modelled`. The S8–S12 payload contracts and
+   visual bindings render unchanged apart from the new Watch elements.
 
 ## The session close-out protocol (what every session ends with)
 

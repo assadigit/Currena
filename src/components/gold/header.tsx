@@ -124,6 +124,13 @@ export function DeskHeader({
             <span className="h-1.5 w-1.5 rounded-full bg-gold" />
             S12 Calibration · live
           </Badge>
+          <Badge
+            variant="outline"
+            className="gap-1.5 border-chart-5/60 bg-chart-5/10 font-normal text-foreground"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-chart-5" />
+            S13 Watch · live
+          </Badge>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
