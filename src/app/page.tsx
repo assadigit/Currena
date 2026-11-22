@@ -7,8 +7,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { RefreshCw, TriangleAlert } from "lucide-react";
-import type { ContinuityPayload, DeskResponse, SectionId } from "@/lib/gold/types";
+import type {
+  ContinuityPayload,
+  DeskResponse,
+  SectionId,
+} from "@/lib/gold/types";
 import { fmtDayLabel } from "@/lib/gold/format";
+import { deskBasePath } from "@/lib/utils";
 import { DeskHeader } from "@/components/gold/header";
 import { MarketStrip } from "@/components/gold/market-strip";
 import { SectionNav } from "@/components/gold/section-nav";
@@ -59,7 +64,9 @@ function shiftISO(iso: string, days: number): string {
 }
 
 async function fetchDesk(date: string): Promise<DeskResponse> {
-  const res = await fetch(`/api/desk?date=${date}`, { cache: "no-store" });
+  const res = await fetch(`${deskBasePath}/api/desk?date=${date}`, {
+    cache: "no-store",
+  });
   if (!res.ok) {
     throw new Error(`The desk API responded with ${res.status}`);
   }
@@ -68,7 +75,7 @@ async function fetchDesk(date: string): Promise<DeskResponse> {
 
 /** S11 Continuity: the desk archive for the viewed date (read-only). */
 async function fetchContinuity(date: string): Promise<ContinuityPayload> {
-  const res = await fetch(`/api/desk/continuity?date=${date}`, {
+  const res = await fetch(`${deskBasePath}/api/desk/continuity?date=${date}`, {
     cache: "no-store",
   });
   if (!res.ok) {
@@ -79,7 +86,7 @@ async function fetchContinuity(date: string): Promise<ContinuityPayload> {
 
 /** S12 Calibration: the desk scorecard for the viewed date (read-only). */
 async function fetchCalibration(date: string): Promise<CalibrationPayload> {
-  const res = await fetch(`/api/desk/calibration?date=${date}`, {
+  const res = await fetch(`${deskBasePath}/api/desk/calibration?date=${date}`, {
     cache: "no-store",
   });
   if (!res.ok) {
@@ -90,7 +97,7 @@ async function fetchCalibration(date: string): Promise<CalibrationPayload> {
 
 /** S13 Watch: the owner's rules, evaluated against the persisted record. */
 async function fetchWatch(date: string): Promise<WatchPayload> {
-  const res = await fetch(`/api/desk/watch?date=${date}`, {
+  const res = await fetch(`${deskBasePath}/api/desk/watch?date=${date}`, {
     cache: "no-store",
   });
   if (!res.ok) {
@@ -101,7 +108,7 @@ async function fetchWatch(date: string): Promise<WatchPayload> {
 
 /** S14 Digest: the whole day in one glance, assembled from the record. */
 async function fetchDigest(date: string): Promise<DigestPayload> {
-  const res = await fetch(`/api/desk/digest?date=${date}`, {
+  const res = await fetch(`${deskBasePath}/api/desk/digest?date=${date}`, {
     cache: "no-store",
   });
   if (!res.ok) {
@@ -200,7 +207,7 @@ export default function Page() {
     if (!date) return;
     setIsRegenerating(true);
     try {
-      const res = await fetch("/api/desk", {
+      const res = await fetch(`${deskBasePath}/api/desk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date }),

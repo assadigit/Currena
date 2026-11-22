@@ -589,6 +589,73 @@ was then executed verbatim against the live account:
   cycle above is the same code path the UI buttons drive, and the UI CRUD
   was browser-verified on local workerd.
 
+### The currena.ir/gold routing (2026-11-22, later the same day)
+
+The owner's clarification after the first remote deploy — "We supposed to
+upgrade currena.ir/gold" — set the deployment's real target: the desk
+belongs at **currena.ir/gold**, the Currena site's gold page, not on a
+standalone workers.dev URL. ("AURUM Desk" is the programme record's
+internal codename for this gold desk; the page itself is the Currena
+gold-page upgrade.) What was found on the account, what changed, and what
+was verified:
+
+**The site's architecture (as found):** the `currena.ir` zone lives on
+the same account; the whole site — the Currena Currency Converter — is
+served by the owner's existing `currena-api` worker through a Workers
+**custom domain** on `currena.ir` (no Pages projects; no pre-existing
+zone routes). Before this change, `currena.ir/gold` simply fell through
+to the converter shell.
+
+**The change (two pieces, both recorded in the repo):**
+
+- **Path-prefix build** — the worker build now runs with
+  `NEXT_PUBLIC_BASE_PATH=/gold`: `next.config.ts` picks it up as Next.js
+  `basePath` (every route, asset link and RSC fetch moves under `/gold`),
+  and the seven client-side `fetch()` call sites (six in
+  `src/app/page.tsx`, three in `src/components/gold/watch-band.tsx`)
+  carry the new `deskBasePath` constant from `src/lib/utils.ts` — raw
+  fetch paths are not rewritten by basePath the way next/link URLs are.
+  The sandbox dev server leaves the env var unset and still serves the
+  desk at `/` — one code path, two mount points.
+- **Zone routing** — two zone workers routes,
+  `currena.ir/gold` (exact) and `currena.ir/gold/*` (subpaths), were
+  created on the zone, bound to `currena-gold-desk`; they are also
+  recorded declaratively in `wrangler.jsonc` (validated with
+  `wrangler deploy --dry-run`). Empirically, the zone routes take
+  precedence on exactly the paths they match — everything else on
+  currena.ir continues to flow to `currena-api` untouched.
+
+**Verified live at https://currena.ir/gold:**
+
+- The page (200, full HTML), the API under the prefix
+  (`/gold/api/desk` 200, `narrativeSource: "llm"`, byte-identical to
+  both the workers.dev deployment and the sandbox dev server), and the
+  assets (`/gold/_next/…` 200) all serve; the trailing slash
+  `/gold/` 308-normalises to `/gold`; the invalid date 400s.
+- **Route precision**: `currena.ir/goldsmith` still serves the
+  converter (the patterns claim only `/gold` and `/gold/*`); `currena.ir/`
+  still serves the Currency Converter, unchanged (re-checked in the
+  browser after routing).
+- **The write path through the routed URL**: the watch CRUD cycle
+  (create 201 → read-back 200 → delete → net-zero, the five original
+  rules intact) over `https://currena.ir/gold/api/desk/watch`.
+- **The browser golden path** at `https://currena.ir/gold` (zero console
+  and zero page errors): the full surface stack renders; the digest guide
+  toggles; **Print digest** fired `window.print()` with
+  `body.digest-printing` active; date navigation walked back to Thu 19
+  Nov (then-vs-now line renders verbatim) and returned to today; dark
+  mode light → dark → light; 375px mobile with no horizontal overflow and
+  the footer pushed down naturally.
+- The workers.dev mirror now serves the desk at
+  `/gold` (its root 404s, as expected with basePath) — kept enabled as a
+  preview; the canonical URL is **https://currena.ir/gold**.
+
+**Honest note:** the old gold-page URL space under `/gold/*` is now the
+desk's own namespace — any pre-existing converter sub-paths under
+`/gold/` (none were found: the converter served its shell at `/gold`
+itself) would now meet the desk's 404 instead. The converter's own pages
+outside `/gold` are untouched.
+
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 
 | Series | Source | Mode |

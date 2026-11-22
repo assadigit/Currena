@@ -27,7 +27,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, deskBasePath } from "@/lib/utils";
 import type {
   WatchCalibrationMetric,
   WatchDirection,
@@ -513,7 +513,7 @@ export function WatchBand({ watch, onRulesChanged, toast }: WatchBandProps) {
     async (ev: WatchEvaluation) => {
       setBusyId(ev.rule.id);
       const activating = !ev.rule.active;
-      const result = await api("/api/desk/watch", {
+      const result = await api(`${deskBasePath}/api/desk/watch`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: ev.rule.id, active: activating }),
@@ -541,9 +541,12 @@ export function WatchBand({ watch, onRulesChanged, toast }: WatchBandProps) {
   const deleteRule = React.useCallback(
     async (ev: WatchEvaluation) => {
       setBusyId(ev.rule.id);
-      const result = await api(`/api/desk/watch?id=${encodeURIComponent(ev.rule.id)}`, {
-        method: "DELETE",
-      });
+      const result = await api(
+        `${deskBasePath}/api/desk/watch?id=${encodeURIComponent(ev.rule.id)}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (result.ok) {
         toast({
           title: "Watch rule deleted",
@@ -565,7 +568,7 @@ export function WatchBand({ watch, onRulesChanged, toast }: WatchBandProps) {
   const createRule = React.useCallback(
     async (draft: DraftRule) => {
       setCreating(true);
-      const result = await api("/api/desk/watch", {
+      const result = await api(`${deskBasePath}/api/desk/watch`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

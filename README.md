@@ -2,9 +2,10 @@
 
 The finished 15-session GIE sandbox programme: a standalone Next.js 16 daily
 gold-market intelligence desk — complete (Session 15/15 · 0 remaining) —
-deployed live per the owner's instruction on the **Currena Cloudflare Worker**:
+deployed per the owner's instruction as the upgrade of the Currena site's
+gold page, live at:
 
-**https://currena-gold-desk.sedanama-ir.workers.dev**
+**https://currena.ir/gold**
 
 ## What this branch carries
 
@@ -27,25 +28,27 @@ deployed live per the owner's instruction on the **Currena Cloudflare Worker**:
   sandbox **Preview Panel** ("Open in New Tab"). The archive lives in SQLite
   at `db/custom.db` — never rebuilt except through the desk's own
   regenerate path.
-- **Cloudflare Worker (the deployment):** live at
-  **https://currena-gold-desk.sedanama-ir.workers.dev** (deployed 2026-11-22 —
-  the runbook in `AGENTS.md`'s deployment addendum, executed against the
-  owner's account: D1 database `aurum-desk` seeded from the archive,
-  `EODHD_TOKEN` attached as a Worker secret, the account's existing
-  `currena-api` worker left untouched). `bun run worker:build` produces
-  `.open-next/worker.js` (wrangler.jsonc: worker `currena-gold-desk`, D1
-  binding `DB` → database `aurum-desk`). Verified locally on workerd
-  (`bun run worker:preview`, port 8788, seeded local D1): every route, the
-  full regenerate cycle (EODHD live through workerd), watch CRUD,
-  read-after-write, dark mode, 375px mobile, the print sheet as PDF, and
-  zero page errors on reload.
+- **Cloudflare Worker (the deployment):** live at **https://currena.ir/gold**
+  — the upgrade of the Currena site's gold page. Zone routes
+  (`currena.ir/gold` and `currena.ir/gold/*`, recorded in `wrangler.jsonc`)
+  claim exactly the `/gold` paths for the `currena-gold-desk` worker; the
+  rest of currena.ir — the Currency Converter served by the owner's
+  `currena-api` worker through its custom domain — is untouched. The worker
+  build runs with `NEXT_PUBLIC_BASE_PATH=/gold` (Next.js basePath — every
+  route, asset and RSC fetch under `/gold`; the sandbox dev server serves
+  the same code at `/`). A workers.dev mirror of the desk serves at
+  `currena-gold-desk.sedanama-ir.workers.dev/gold` as a preview. D1 database
+  `aurum-desk` seeded from the archive, `EODHD_TOKEN` attached as a Worker
+  secret. Verified against the live URL: every route, the force flag,
+  byte-identical archive responses, the watch write path through the routed
+  URL, and the browser golden path with zero console errors. The full
+  record is in `AGENTS.md`'s deployment addendum.
 
-Deployed live on 2026-11-22 and verified against the live URL (the full
-record is in `AGENTS.md`'s deployment addendum): every route, the
-`source=modelled` force flag, byte-identical archive responses, the watch
-write path on the remote D1, and the browser golden path with zero console
-errors. Credentials were used env-only — never stored or printed, per the
-repo's credential rule.
+Deployed live on 2026-11-22 — first to the account's workers.dev subdomain,
+then, per the owner's clarification ("we supposed to upgrade
+currena.ir/gold"), routed onto the Currena site at currena.ir/gold the
+same day and re-verified there end to end. Credentials were used env-only
+— never stored or printed, per the repo's credential rule.
 
 Honest differences on the Worker (both fail-closed by design):
 
