@@ -19,7 +19,12 @@ import { TrackRecordBand } from "@/components/gold/track-record";
 import { ThenVsNowLine } from "@/components/gold/then-vs-now";
 import { CalibrationBand } from "@/components/gold/calibration";
 import { WatchBand } from "@/components/gold/watch-band";
-import type { CalibrationPayload, WatchPayload } from "@/lib/gold/types";
+import { DigestBand, DigestPrintSheet } from "@/components/gold/digest";
+import type {
+  CalibrationPayload,
+  DigestPayload,
+  WatchPayload,
+} from "@/lib/gold/types";
 
 /** Ordinal labels for the eight S9 supporting visuals. */
 const VISUAL_INDEX: Record<string, string> = {
@@ -92,6 +97,17 @@ async function fetchWatch(date: string): Promise<WatchPayload> {
     throw new Error(`The watch API responded with ${res.status}`);
   }
   return res.json() as Promise<WatchPayload>;
+}
+
+/** S14 Digest: the whole day in one glance, assembled from the record. */
+async function fetchDigest(date: string): Promise<DigestPayload> {
+  const res = await fetch(`/api/desk/digest?date=${date}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(`The digest API responded with ${res.status}`);
+  }
+  return res.json() as Promise<DigestPayload>;
 }
 
 /** Loading skeleton mirroring the desk structure. */
@@ -169,6 +185,15 @@ export default function Page() {
     enabled: date !== "",
   });
 
+  // S14 Digest — the morning read, assembled server-side from the
+  // cached archive + watch + scorecard + continuity; a failure here
+  // never blocks the desk itself.
+  const { data: digest } = useQuery({
+    queryKey: ["digest", date],
+    queryFn: () => fetchDigest(date),
+    enabled: date !== "",
+  });
+
   const [isRegenerating, setIsRegenerating] = React.useState(false);
 
   const regenerate = React.useCallback(async () => {
@@ -187,6 +212,7 @@ export default function Page() {
       await queryClient.invalidateQueries({ queryKey: ["continuity", date] });
       await queryClient.invalidateQueries({ queryKey: ["calibration", date] });
       await queryClient.invalidateQueries({ queryKey: ["watch", date] });
+      await queryClient.invalidateQueries({ queryKey: ["digest", date] });
       toast({
         title: "Briefing regenerated",
         description:
@@ -220,7 +246,8 @@ export default function Page() {
   const provenance = data?.provenance;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <React.Fragment>
+      <div className="flex min-h-screen flex-col bg-background">
       <DeskHeader
         date={briefing?.date ?? (date || "—")}
         onPrevDay={() => setDate((d) => (d ? shiftISO(d, -1) : d))}
@@ -257,7 +284,15 @@ export default function Page() {
         </main>
       ) : (
         <React.Fragment>
-          <div className="mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* S14 Digest — the whole day in one glance at the top of the desk */}
+          {digest ? (
+            <div className="mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+              <DigestBand digest={digest} />
+            </div>
+          ) : null}
+          <div
+            className={`mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 ${digest ? "mt-4" : "mt-6"}`}
+          >
             <MarketStrip
               briefing={briefing}
               visuals={visuals}
@@ -362,7 +397,13 @@ export default function Page() {
       )}
 
       <DeskFooter provenance={provenance} />
-    </div>
+      </div>
+
+      {/* S14 Digest — the export sheet. Hidden on screen; the digest
+          band's print button isolates it via body.digest-printing. A
+          top-level sibling so print CSS can hide the rest of the page. */}
+      {digest ? <DigestPrintSheet digest={digest} /> : null}
+    </React.Fragment>
   );
 }
 

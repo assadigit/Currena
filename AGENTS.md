@@ -35,7 +35,20 @@ session arc:
   `/api/desk/watch` with toast feedback, the watch band re-checks on
   every desk load, and the once-per-day EODHD sync stays the only
   network surface. Every watch is an observation, never advice.
-- **S14 — next session.**
+- **S14 — Digest layer (done, live):** the whole day in one glance — a
+  compact digest band at the top of the desk that ties the latest
+  briefing headline and market snapshot, the fired S13 watch triggers
+  (quoted verbatim, with their eras and samples), the S12 scorecard
+  verdicts (each stating its n) and the S11 live-era memory into a
+  single honest morning read. Assembled server-side from what the
+  desk already persists (`/api/desk/digest`, read-only, zero new
+  network), and exportable as a self-contained print-friendly sheet
+  (the Print digest button isolates the same payload via print CSS —
+  no new fetches, no images, no new dependencies). Every number
+  states whether it comes from live or modelled desk days and its
+  sample size where a rate is involved; the digest is an observation,
+  never advice.
+- **S15 — next session (the programme close-out).**
 
 ## Architecture (the one page a session must know)
 
@@ -87,6 +100,19 @@ src/lib/gold/watch.ts       S13 Watch: the rule engine — owner-defined
                             and its sample; gaps (no observations, no
                             live desk day, no graded days) are stated,
                             never faked quiet. Zero new network
+src/lib/gold/digest.ts       S14 Digest: the morning read — server-side
+                            assembly of the whole day in one glance
+                            from the layers the desk already has: the
+                            viewed desk day's own briefing headline +
+                            snapshot + scenario calls + provenance
+                            (cached DeskDay row), the fired S13 watch
+                            triggers (quoted verbatim with eras and
+                            samples), the three S12 scorecard verdicts
+                            (each with its n and the sub-ten verdict
+                            cap), and the S11 archive compressed into a
+                            live-era then-vs-now memory. Read-only,
+                            cache-first, zero new network; never
+                            triggers a build
 src/app/api/desk/route.ts  GET ?date=&force=&source=auto|modelled (cache-first,
                            stamps on the latest available trading day) ·
                            POST {date} (regenerate: re-pull + rebuild)
@@ -100,18 +126,25 @@ src/app/api/desk/watch/route.ts  S13: GET ?date= (evaluate every rule,
                            read-only) · POST/PATCH/DELETE (rule CRUD;
                            validation mirrors the engine so a persisted
                            rule is always evaluable)
+src/app/api/desk/digest/route.ts  S14: GET ?date= — the morning read
+                           (read-only; assembles from the cache + the
+                           S13/S12/S11 builders; never triggers a build,
+                           never calls the network)
 db/custom.db (Prisma)      DeskDay rows (briefing/visuals JSON + dataMode +
                            provenanceJson) · Observation rows (one per
                            dataset-date) · SourceSync rows (per-dataset source
                            registry state) · WatchRule rows (S13: one per
                            owner rule — scalar columns only)
-src/app/page.tsx            the desk page — sections paired with their visuals
+src/app/page.tsx            the desk page — the digest band on top, then
+                           sections paired with their visuals
 src/components/gold/        header · market-strip (with the "data as of"
                            provenance line) · section-nav · briefing-card ·
                            bias-meter · footer (full provenance note) ·
                            track-record + then-vs-now (the S11 band) ·
                            calibration (the S12 scorecard band) ·
                            watch-band (the S13 rules + rule editor) ·
+                           digest (the S14 morning-read band + the print
+                           sheet — one payload, two renditions) ·
                            visuals/* (the eight V-cards)
 ```
 
@@ -174,6 +207,33 @@ the once-per-day EODHD sync stays the only network surface. Every watch
 is an observation, never advice; there is no push/notification
 infrastructure (in-desk surfaces only), and the deterministic engine
 stays reachable via `GET /api/desk?source=modelled`.
+
+## The S14 digest surfaces (the morning read)
+
+The digest band sits at the very top of the desk, above the market
+strip: one card that answers "what happened and what do I care about"
+before anything else renders. It carries an insight-first title (fired
+watches first, else the day's own exec headline), a one-glance numbers
+line (spot, day change, bias, base case), and four labelled rows: **The
+day** (the viewed desk day's own lead with its era, narrative source,
+as-of stamp, live-series count and honest stamp note), **Watches** (the
+fired S13 triggers quoted verbatim with their era/n/as-of chips, quiet
+and paused rules summarised by count), **Scorecard** (the three S12
+verdicts, each stating its n, with the sub-ten "descriptive record, not
+a verdict" cap and the live-era-only note), and **Memory** (the S11
+live era compressed: first live desk day → latest, realized move,
+stance shift, base-target drift, with modelled days counted, labelled,
+never pooled). A current-reading block names the anchor close and the
+record composition; the collapsible guide explains every honesty rule.
+**Print digest** exports the same payload as a self-contained
+print-friendly sheet: the button adds `body.digest-printing` around
+`window.print()` and print CSS isolates the sheet (a plain, theme-free
+ink-on-white document) — no new fetch, no images, and a normal Ctrl+P
+still prints the page as-is. Served read-only by `/api/desk/digest`
+from the cache + the S11/S12/S13 builders; it adds no polling and never
+triggers a build — the once-per-day EODHD sync stays the only network
+surface, and the deterministic engine stays reachable via
+`GET /api/desk?source=modelled`.
 
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 
@@ -248,6 +308,22 @@ Rules that bind every session:
    The deterministic engine stays reachable via
    `GET /api/desk?source=modelled`. The S8–S12 payload contracts and
    visual bindings render unchanged apart from the new Watch elements.
+12. **The honest digest (S14):** the digest is an observation, never
+   advice — it ties what the desk said, what its rules found, how it
+   has scored and what it remembers into one morning read. It is
+   assembled server-side, read-only, from what the desk already
+   persists (the briefing cache, the S13 evaluation, the S12 scorecard
+   and the S11 archive); it adds no polling and no network surface,
+   and it never triggers a build (a desk with no cached day states
+   its gap honestly). Fired triggers are quoted verbatim; every
+   number states whether it comes from live or modelled desk days and
+   its sample size where a rate is involved (the verdict cap below
+   ten resolved days is enforced server-side). When an older day is
+   viewed, the day and scenario rows show that day's own calls while
+   the watch, scorecard and memory rows honestly read the whole
+   rolling record. The export view renders the same payload — no
+   second data path. The S8–S13 payload contracts and visual
+   bindings render unchanged apart from the new Digest elements.
 
 ## The session close-out protocol (what every session ends with)
 

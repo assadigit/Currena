@@ -626,3 +626,166 @@ export interface WatchPayload {
   liveDays: number;
   modelledDays: number;
 }
+
+/* ------------------------------------------------------------------ */
+/* S14 — Digest layer: the morning-read contracts                       */
+/* ------------------------------------------------------------------ */
+
+/** The day's scenario calls as the digest compresses them. */
+export interface DigestScenario {
+  id: Scenario["id"];
+  label: string;
+  /** Probability in percent, as published. */
+  probability: number;
+  /** Spot target in USD per ounce, as published. */
+  target: number;
+  /** The target's implied move off the day's own spot, percent. */
+  impliedPct: number;
+}
+
+/**
+ * The briefing tie-in: the latest cached desk day at or before the view —
+ * its own headline, snapshot and provenance, read back from the cache.
+ */
+export interface DigestHeadline {
+  /** The cached desk day the digest stamps onto. */
+  date: string;
+  /** The exec-section headline the desk led with that day. */
+  headline: string;
+  spot: number;
+  /** The day's own published change (abs USD / percent). */
+  changeAbs: number;
+  changePct: number;
+  /** The published aggregate bias, -100..100. */
+  bias: number;
+  dataMode: DataMode;
+  narrativeSource: "llm" | "template";
+  /** The provenance asOf stamp (the data day behind the row), when it carries one. */
+  asOf: string | null;
+  /** Honest note when the view stamped onto an earlier trading day. */
+  stampNote: string | null;
+  /** How many of the row's provenance datasets were live / live-proxy. */
+  liveSeries: number;
+  /** Total provenance datasets recorded on the row. */
+  totalSeries: number;
+  /** Why the desk fell back to the deterministic engine, when it did. */
+  fallbackReason: string | null;
+}
+
+/** One fired watch trigger, quoted verbatim from the S13 evaluation. */
+export interface DigestTrigger {
+  id: string;
+  label: string;
+  kind: WatchRuleKind;
+  /** The verbatim S13 statement — the fact, its dates, its era, its sample. */
+  statement: string;
+  era: "live" | "modelled" | "none";
+  /** The sample size behind a rate, when the rule thresholds one. */
+  sample: number | null;
+  /** The date the watched value last held. */
+  watchedDate: string | null;
+}
+
+/** The watch digest: what fired, what stayed quiet, what is paused. */
+export interface DigestWatch {
+  totalRules: number;
+  activeCount: number;
+  triggeredCount: number;
+  pausedCount: number;
+  /** Fired triggers, verbatim, in the watch band's triggered-first order. */
+  triggers: DigestTrigger[];
+  /** Labels of the active-but-quiet rules (one-line quiet summary). */
+  quietLabels: string[];
+}
+
+/** The scorecard digest: the three S12 verdicts with their samples. */
+export interface DigestScorecard {
+  /** Bias-direction: hits/sample across graded live-era days. */
+  direction: {
+    hits: number;
+    sample: number;
+    /** hits / sample; null when sample is 0. */
+    hitRate: number | null;
+    /** Flat repeats — excluded from the rate, counted. */
+    flat: number;
+    /** Neutral-stance days — excluded from the rate, counted. */
+    neutralBias: number;
+  };
+  /** Base-case accuracy: |latest observed close − base target|, percent, graded to-date. */
+  baseMiss: {
+    meanPct: number | null;
+    medianPct: number | null;
+    sample: number;
+  };
+  /** Probability calibration: the favoured scenario versus how often it proved closest. */
+  probability: {
+    wins: number;
+    sample: number;
+    /** wins / sample; null when sample is 0. */
+    winRate: number | null;
+    /** Tied-top days (no favourite) — excluded from the rate, counted. */
+    ties: number;
+  };
+  /** Resolved live-era days behind the base-case grade (the verdict-cap driver). */
+  resolvedDays: number;
+  /** True below ten resolved days: the numbers are the record, not a verdict. */
+  verdictCap: boolean;
+  /** The cached-record composition every score states. */
+  record: CalibrationRecordComposition;
+}
+
+/** The memory digest: the live era compressed (the S11 record, honest eras). */
+export interface DigestMemory {
+  /** The first live-era cached desk day — where honest realized memory begins. */
+  from:
+    | {
+        date: string;
+        bias: number;
+        spot: number;
+        /** The day's published base-case target, USD. */
+        baseTarget: number;
+      }
+    | null;
+  /** The latest cached desk day — the desk's current belief (its era stated). */
+  to:
+    | {
+        date: string;
+        bias: number;
+        spot: number;
+        baseTarget: number;
+        dataMode: DataMode;
+      }
+    | null;
+  /** Latest observed close vs the first live day's spot, percent — live evidence only. */
+  realizedPct: number | null;
+  realizedClose: number | null;
+  realizedAsOf: string | null;
+  /** Live-era cached days pooled into the memory. */
+  liveDays: number;
+  /** Modelled-era days in the record — counted, labelled, never pooled. */
+  modelledDays: number;
+  /** Total cached desk days in the archive. */
+  archiveDays: number;
+}
+
+/** The S14 Digest payload served by /api/desk/digest. */
+export interface DigestPayload {
+  /** The date the caller is viewing (may be a non-trading day). */
+  viewedDate: string;
+  /** The cached desk day the view stamps onto. */
+  effectiveDeskDate: string | null;
+  /** When this digest was assembled (ISO timestamp). */
+  generatedAt: string;
+  /** The viewed desk day's own lead — null before the first cached desk day. */
+  headline: DigestHeadline | null;
+  /** The viewed desk day's scenario calls. */
+  scenarios: DigestScenario[];
+  /** The S13 watch, compressed (fired triggers verbatim). */
+  watch: DigestWatch;
+  /** The S12 scorecard, compressed (three verdicts, each with its n). */
+  scorecard: DigestScorecard;
+  /** The S11 archive, compressed (the live era, then vs now). */
+  memory: DigestMemory;
+  /** The latest observed gold close — the anchor behind every realized number. */
+  anchor: { asOf: string; close: number } | null;
+}
