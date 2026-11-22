@@ -1,0 +1,682 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-bull: var(--bull);
+  --color-bear: var(--bear);
+  --color-flat: var(--flat);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Warm neutral canvas with a gold primary — no blue/indigo anywhere. */
+  --background: oklch(0.987 0.003 84);
+  --foreground: oklch(0.216 0.006 56);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.216 0.006 56);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.216 0.006 56);
+  --primary: oklch(0.55 0.115 68);
+  --primary-foreground: oklch(0.99 0.004 84);
+  --secondary: oklch(0.962 0.005 80);
+  --secondary-foreground: oklch(0.3 0.008 56);
+  --muted: oklch(0.962 0.005 80);
+  --muted-foreground: oklch(0.552 0.01 62);
+  --accent: oklch(0.955 0.02 84);
+  --accent-foreground: oklch(0.38 0.06 62);
+  --destructive: oklch(0.577 0.19 32);
+  --border: oklch(0.917 0.005 76);
+  --input: oklch(0.917 0.005 76);
+  --ring: oklch(0.62 0.1 72);
+
+  /* Chart palette: gold lead, warm neutrals, muted terracotta/sage support. */
+  --chart-1: oklch(0.62 0.11 75);
+  --chart-2: oklch(0.68 0.012 70);
+  --chart-3: oklch(0.6 0.105 45);
+  --chart-4: oklch(0.62 0.045 140);
+  --chart-5: oklch(0.8 0.085 90);
+
+  /* Market semantics. */
+  --gold: oklch(0.55 0.115 68);
+  --gold-soft: oklch(0.88 0.045 88);
+  --bull: oklch(0.52 0.09 150);
+  --bear: oklch(0.55 0.13 35);
+  --flat: oklch(0.68 0.012 70);
+
+  --sidebar: oklch(0.985 0.003 84);
+  --sidebar-foreground: oklch(0.216 0.006 56);
+  --sidebar-primary: oklch(0.55 0.115 68);
+  --sidebar-primary-foreground: oklch(0.99 0.004 84);
+  --sidebar-accent: oklch(0.955 0.02 84);
+  --sidebar-accent-foreground: oklch(0.38 0.06 62);
+  --sidebar-border: oklch(0.917 0.005 76);
+  --sidebar-ring: oklch(0.62 0.1 72);
+}
+
+.dark {
+  --background: oklch(0.147 0.004 70);
+  --foreground: oklch(0.955 0.004 84);
+  --card: oklch(0.192 0.005 70);
+  --card-foreground: oklch(0.955 0.004 84);
+  --popover: oklch(0.192 0.005 70);
+  --popover-foreground: oklch(0.955 0.004 84);
+  --primary: oklch(0.76 0.115 82);
+  --primary-foreground: oklch(0.216 0.006 56);
+  --secondary: oklch(0.258 0.006 70);
+  --secondary-foreground: oklch(0.955 0.004 84);
+  --muted: oklch(0.258 0.006 70);
+  --muted-foreground: oklch(0.712 0.012 76);
+  --accent: oklch(0.28 0.03 76);
+  --accent-foreground: oklch(0.92 0.05 84);
+  --destructive: oklch(0.665 0.16 32);
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.62 0.1 72);
+
+  --chart-1: oklch(0.76 0.11 82);
+  --chart-2: oklch(0.66 0.012 70);
+  --chart-3: oklch(0.68 0.12 45);
+  --chart-4: oklch(0.66 0.045 140);
+  --chart-5: oklch(0.85 0.08 90);
+
+  --gold: oklch(0.76 0.115 82);
+  --gold-soft: oklch(0.32 0.05 76);
+  --bull: oklch(0.68 0.1 150);
+  --bear: oklch(0.66 0.13 35);
+  --flat: oklch(0.66 0.012 70);
+
+  --sidebar: oklch(0.192 0.005 70);
+  --sidebar-foreground: oklch(0.955 0.004 84);
+  --sidebar-primary: oklch(0.76 0.115 82);
+  --sidebar-primary-foreground: oklch(0.216 0.006 56);
+  --sidebar-accent: oklch(0.28 0.03 76);
+  --sidebar-accent-foreground: oklch(0.92 0.05 84);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.62 0.1 72);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* Numbers align in strict columns across the desk. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Slim, unobtrusive scrollbars for dense data areas. */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .scroll-slim::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+  }
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Smooth in-page navigation with breathing room under the sticky nav. */
+  html {
+    scroll-behavior: smooth;
+  }
+  section[id] {
+    scroll-margin-top: 4.5rem;
+  }
+
+  /* Brief highlight ring when jumping to a supporting visual. */
+  .visual-flash {
+    animation: visual-flash 1.6s ease-out 2;
+  }
+  @keyframes visual-flash {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+    35% {
+      box-shadow: 0 0 0 3px var(--gold);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* S14 Digest — the print/export sheet.                                */
+/*                                                                     */
+/* The sheet is the same digest payload rendered as a self-contained   */
+/* document. On screen it never shows (display: none). The band's      */
+/* export button adds body.digest-printing around window.print(), so   */
+/* only the sheet reaches the paper; a normal print of the page is     */
+/* untouched. Explicit ink-on-white styling — it prints identically    */
+/* from light or dark mode, with no theme tokens.                      */
+/* ------------------------------------------------------------------ */
+
+.digest-print-sheet {
+  display: none;
+  max-width: 170mm;
+  margin: 0 auto;
+  padding: 6mm 2mm;
+  color: #1c1917;
+  background: #ffffff;
+  font-size: 10.5pt;
+  line-height: 1.55;
+}
+
+@media print {
+  body.digest-printing > *:not(.digest-print-sheet) {
+    display: none !important;
+  }
+  body.digest-printing .digest-print-sheet {
+    display: block !important;
+  }
+  .digest-print-sheet .sheet-section,
+  .digest-print-sheet .sheet-header,
+  .digest-print-sheet .sheet-footer {
+    break-inside: avoid;
+  }
+}
+
+.digest-print-sheet .sheet-header {
+  border-bottom: 2px solid #1c1917;
+  padding-bottom: 3mm;
+  margin-bottom: 4mm;
+}
+.digest-print-sheet .sheet-header h1 {
+  font-size: 15pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.digest-print-sheet .sheet-meta {
+  font-size: 9pt;
+  color: #57534e;
+  margin: 1mm 0 0;
+}
+.digest-print-sheet .sheet-tagline {
+  font-size: 9pt;
+  font-style: italic;
+  color: #57534e;
+  margin: 1mm 0 0;
+}
+.digest-print-sheet .sheet-section {
+  margin-bottom: 4mm;
+}
+.digest-print-sheet .sheet-section h2 {
+  font-size: 8.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #78716c;
+  border-bottom: 1px solid #d6d3d1;
+  padding-bottom: 0.8mm;
+  margin: 0 0 1.6mm;
+}
+.digest-print-sheet p {
+  margin: 0 0 1.6mm;
+}
+.digest-print-sheet .sheet-lead {
+  font-size: 12pt;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.digest-print-sheet .sheet-scenarios {
+  font-weight: 500;
+}
+.digest-print-sheet .sheet-trigger {
+  border-left: 2.5px solid #a8a29e;
+  padding-left: 2.5mm;
+}
+.digest-print-sheet .sheet-trigger-label {
+  font-weight: 700;
+}
+.digest-print-sheet .sheet-chip {
+  font-size: 8.5pt;
+  color: #57534e;
+}
+.digest-print-sheet .sheet-fine {
+  font-size: 8.5pt;
+  color: #57534e;
+}
+.digest-print-sheet .sheet-footer {
+  border-top: 1px solid #d6d3d1;
+  padding-top: 2.5mm;
+  margin-top: 2mm;
+}
+.digest-print-sheet .sheet-footer p {
+  font-size: 8.5pt;
+  color: #57534e;
+  margin: 0 0 1mm;
+}
+
+/* =================================================================== */
+/* CURRENA DESIGN SYSTEM — the gold page's own layer                    */
+/*                                                                     */
+/* Ported from the Currena site (currena.ir/gold): the brand palette,  */
+/* the Insights ink ramp, the Carbon-pinned status hues, the type       */
+/* roles, and the brass assay-balance family. Class-based dark mode    */
+/* ("Currena Night") works by overriding the variables inside .dark.    */
+/* All names are plain custom properties consumed via                  */
+/* text-[var(--…)] / bg-[var(--…)] arbitrary values — they never       */
+/* collide with the shadcn utilities above.                            */
+/* =================================================================== */
+
+:root {
+  /* — The Currena brand palette (light) — */
+  --color-currena-soft: #e8f4f8;
+  --color-currena-blue: #4a90e2;
+  --color-currena-cyan: #7dd3c0;
+  --color-currena-coral: #f8a978;
+  --color-currena-dark: #2c3e50;
+  --color-currena-muted: #6b7280;
+  --color-currena-warning: #ff6b6b;
+  --color-currena-success: #4caf50;
+  --color-currena-bg-light: #f8fafb;
+  --color-currena-blue-deep: #245e9f;
+  --color-currena-success-deep: #256d29;
+  --color-currena-warning-deep: #b92e2e;
+  --color-currena-coral-deep: #9c5019;
+
+  /* — The Insights ink ramp (every ink ≥ 7:1 on white) — */
+  --color-text-primary: #2c3e50;
+  --color-text-secondary: #47525d;
+  --color-text-tertiary: #4f5a66;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-surface-alert-tint: rgba(218, 30, 40, 0.05);
+  --color-border: rgba(44, 62, 80, 0.14);
+
+  /* — Status inks (Carbon-pinned, the owner's palette) — */
+  --color-accent-brand: #4a90e2;
+  --color-accent-gold: #f3b13f;
+  --color-accent-gold-ink: #2a1f04;
+  --color-accent-gold-deep: #a87e1c;
+  --color-accent-gold-strong: #b8860b;
+  --color-bridge-accent: #007d79;
+  --color-status-alert: #da1e28;
+  --color-status-stressed: #ff832b;
+  --color-status-normal: #24a148;
+  --color-status-watch: #f1c21b;
+  --color-status-context: #245e9f;
+  --color-status-stale: #46505c;
+  --color-chip-ink-normal: #0e6027;
+  --color-chip-ink-attention: #b91c1c;
+  --color-chip-ink-watch: #7a5d00;
+  --color-chip-ink-context: #245e9f;
+  --color-chip-ink-muted: #46505c;
+  --color-return-up: #00873a;
+  --color-return-down: #e51527;
+
+  /* — Radii, shadows, type roles — */
+  --cr-radius-md: 0.75rem;
+  --cr-radius-lg: 1.125rem;
+  --cr-shadow-card: 0 2px 10px rgba(15, 23, 42, 0.05);
+  --cr-shadow-focal: 0 10px 34px rgba(168, 126, 28, 0.15);
+  --type-verdict: 1.6rem;
+  --type-verdict-leading: 2rem;
+  --type-number: 1.45rem;
+  --type-label: 0.875rem;
+  --type-caption: 0.78rem;
+
+  /* — The brass assay-balance family (scoped to [data-balance-visual]) — */
+  --bal-brass-hi: #fbe3a0;
+  --bal-brass-mid: #eab544;
+  --bal-brass-lo: #b27a1d;
+  --bal-brass-ink: #5b3d08;
+  --bal-brass-text: #8a5a0a;
+  --bal-stone-hi: #eef2f6;
+  --bal-stone-lo: #c7d0da;
+  --bal-recess: #f3f5f8;
+  --bal-glow: rgba(243, 177, 63, 0.16);
+}
+
+.dark {
+  /* — Currena Night — the brand ink inverts — */
+  --color-currena-soft: #232e40;
+  --color-currena-blue: #6faeec;
+  --color-currena-cyan: #8fdccb;
+  --color-currena-coral: #fbb48c;
+  --color-currena-dark: #e8edf4;
+  --color-currena-muted: #93a1b5;
+  --color-currena-warning: #ff8080;
+  --color-currena-success: #63c06c;
+  --color-currena-bg-light: #10151d;
+  --color-currena-blue-deep: #6faeec;
+  --color-currena-success-deep: #63c06c;
+  --color-currena-warning-deep: #ff8080;
+  --color-currena-coral-deep: #fbb48c;
+
+  --color-text-primary: #e8edf4;
+  --color-text-secondary: #a9b5c5;
+  --color-text-tertiary: #a2aebc;
+  --color-surface: #1a222e;
+  --color-surface-raised: #202a38;
+  --color-surface-alert-tint: rgba(250, 77, 86, 0.07);
+  --color-border: rgba(232, 237, 244, 0.16);
+  --color-accent-brand: #6faeec;
+  --color-accent-gold: #f3b13f;
+  --color-accent-gold-ink: #2a1f04;
+  --color-accent-gold-deep: #e8b54a;
+  --color-accent-gold-strong: #d9a43e;
+  --color-bridge-accent: #3ddbd9;
+  --color-status-alert: #fa4d56;
+  --color-status-stressed: #ff832b;
+  --color-status-normal: #24a148;
+  --color-status-watch: #f1c21b;
+  --color-status-context: #6faeec;
+  --color-status-stale: #9aa8bc;
+  --color-chip-ink-normal: #24a148;
+  --color-chip-ink-attention: #fa4d56;
+  --color-chip-ink-watch: #f1c21b;
+  --color-chip-ink-context: #6faeec;
+  --color-chip-ink-muted: #9aa8bc;
+  --color-return-up: #30d96b;
+  --color-return-down: #ff5963;
+
+  --bal-brass-hi: #f3d488;
+  --bal-brass-mid: #d9a43e;
+  --bal-brass-lo: #8f5f14;
+  --bal-brass-ink: #2a1c04;
+  --bal-brass-text: #e8bd63;
+  --bal-stone-hi: #46546a;
+  --bal-stone-lo: #2b3646;
+  --bal-recess: #141b25;
+  --bal-glow: rgba(243, 177, 63, 0.1);
+}
+
+/* — Farsi typography: Vazirmatn for :lang(fa) only — */
+:lang(fa) {
+  font-family: var(--font-vazirmatn), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* — Type-role utilities (the four sizes the page speaks in) — */
+.type-verdict {
+  font-size: var(--type-verdict);
+  line-height: var(--type-verdict-leading);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.type-number {
+  font-size: var(--type-number);
+  line-height: 1.35;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.type-label {
+  font-size: var(--type-label);
+  font-weight: 600;
+}
+.type-caption {
+  font-size: var(--type-caption);
+  font-weight: 500;
+}
+.type-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+:lang(fa) .type-kicker {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* — The loader dots (blue/cyan/coral bounce) — */
+@keyframes currena-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+.loader-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 9999px;
+  animation: currena-bounce 1.4s infinite ease-in-out both;
+}
+.loader-dot:nth-child(1) {
+  animation-delay: -0.32s;
+  background: #667eea;
+}
+.loader-dot:nth-child(2) {
+  animation-delay: -0.16s;
+  background: #7dd3c0;
+}
+.loader-dot:nth-child(3) {
+  background: #f8a978;
+}
+
+/* — The brief focal field (the cream briefing card) — */
+.gold-focal-field {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent-gold) 14%, var(--color-surface)),
+    color-mix(in srgb, var(--color-accent-gold) 5%, var(--color-surface)) 55%,
+    var(--color-surface)
+  );
+  box-shadow: var(--cr-shadow-focal);
+}
+
+/* — The brass assay balance — */
+[data-balance-visual] {
+  position: relative;
+  isolation: isolate;
+}
+.bal-glow {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 280px;
+  background: radial-gradient(120% 60% at 50% -10%, var(--bal-glow), transparent 60%);
+  pointer-events: none;
+}
+.bal-eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bal-brass-text);
+}
+:lang(fa) .bal-eyebrow {
+  letter-spacing: 0;
+  text-transform: none;
+}
+.bal-stage {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  margin: 12px auto 0;
+}
+.bal-stage svg.bal-mech {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.bal-pan {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px 22px;
+  border-radius: 14px 14px 34px 34px / 14px 14px 26px 26px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bal-tint) 9%, transparent),
+    color-mix(in srgb, var(--bal-tint) 3%, transparent)
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bal-tint) 20%, transparent);
+  will-change: transform;
+}
+.bal-pan::after {
+  content: "";
+  position: absolute;
+  inset-inline: 5%;
+  inset-block-end: 0;
+  block-size: 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--bal-brass-hi), var(--bal-brass-mid) 45%, var(--bal-brass-lo));
+  box-shadow: 0 5px 8px -3px rgba(91, 61, 8, 0.4);
+}
+.bal-pan-for {
+  --bal-tint: var(--color-status-normal);
+}
+.bal-pan-against {
+  --bal-tint: var(--color-status-alert);
+}
+.bal-pan-cap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 30px;
+  padding-inline: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--bal-cap-ink);
+}
+.bal-pan-for .bal-pan-cap {
+  --bal-cap-ink: var(--color-chip-ink-normal);
+}
+.bal-pan-against .bal-pan-cap {
+  --bal-cap-ink: var(--color-chip-ink-attention);
+}
+.bal-pan-empty {
+  margin: auto;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  text-wrap: balance;
+}
+.bal-weights {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 8px;
+  width: 100%;
+}
+.bal-tray {
+  margin: 12px auto 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--bal-stone-hi);
+  box-shadow: inset 0 0 0 1px var(--bal-stone-lo);
+  color: var(--color-text-secondary);
+}
+.bal-verdict-word[data-side="for"] {
+  color: var(--color-status-normal);
+}
+.bal-verdict-word[data-side="against"] {
+  color: var(--color-status-alert);
+}
+
+/* — Direction-aware soft fade for the chip scroller row — */
+.chip-scroller {
+  position: relative;
+}
+[dir="ltr"] .chip-scroller::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  pointer-events: none;
+  background: linear-gradient(to right, transparent, var(--color-currena-bg-light));
+}
+[dir="rtl"] .chip-scroller::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  pointer-events: none;
+  background: linear-gradient(to left, transparent, var(--color-currena-bg-light));
+}
+
+/* — Section anchor scroll margin (the fixed header + the docked nav) — */
+.gold-anchor-mt {
+  scroll-margin-top: 124px;
+}
+@media (min-width: 1024px) {
+  .gold-anchor-mt {
+    scroll-margin-top: 140px;
+  }
+}
+
+/* — The global reduced-motion guard — */
+@media (prefers-reduced-motion: reduce) {
+  .loader-dot {
+    animation: none;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "currena-gold-desk",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": [
+    // Node.js APIs for the Next.js server (OpenNext requires this)
+    "nodejs_compat",
+    // Populates process.env with vars and bindings at boot — this is how
+    // src/lib/db.ts sees the D1 binding as process.env.DB and how
+    // process.env.EODHD_TOKEN (a Worker secret) reaches the EODHD adapter.
+    "nodejs_compat_populate_process_env",
+    // All outbound fetches in this desk are to public APIs (EODHD)
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "currena-gold-desk"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "aurum-desk",
+      // Real UUID from the deploy run (wrangler d1 create aurum-desk,
+      // 2026-11-22) — local preview does not use it.
+      "database_id": "264617a4-5bfa-43af-8c9c-d4c95d257dc8"
+    }
+  ],
+  "workers_dev": true, // keep the workers.dev/gold mirror alive as a preview
+  "routes": [
+    // The Currena site lives at currena.ir (served by the owner's currena-api
+    // worker through its Workers custom domain); these zone routes claim
+    // exactly the /gold paths for this worker — the upgrade of currena.ir/gold.
+    // Zone routes take precedence on the paths they match; everything else on
+    // currena.ir continues to flow to currena-api untouched.
+    { "pattern": "currena.ir/gold", "custom_domain": false },
+    { "pattern": "currena.ir/gold/*", "custom_domain": false }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
