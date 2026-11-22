@@ -48,7 +48,13 @@ session arc:
   states whether it comes from live or modelled desk days and its
   sample size where a rate is involved; the digest is an observation,
   never advice.
-- **S15 — next session (the programme close-out).**
+- **S15 — Close-out (done, 2026-11-22): the programme complete.** A
+  full-stack verification walk over every shipped layer (the record is
+  the "S15 close-out record" section below), a check that every binding
+  rule still holds on the live build, and the final record state. No
+  new features, no schema changes, no new dependencies.
+
+**Programme counter: Session 15/15 · 0 remaining — the programme complete.**
 
 ## Architecture (the one page a session must know)
 
@@ -234,6 +240,134 @@ from the cache + the S11/S12/S13 builders; it adds no polling and never
 triggers a build — the once-per-day EODHD sync stays the only network
 surface, and the deterministic engine stays reachable via
 `GET /api/desk?source=modelled`.
+
+## The S15 close-out record (2026-11-22)
+
+The close-out proved the finished desk end to end on the live build
+(over the restored S14 tree, `feat/gie-s14-digest-layer` @ `4d87c9c`)
+and left the record in its final state. Everything below was exercised
+live in this session: agent-browser over the golden path plus
+API-level checks against the running server on port 3000. Zero
+console errors across the whole walk.
+
+**The verification walk (all exercised live):**
+
+- **The full surface stack renders**: the digest band on top → market
+  strip (with the "data as of" provenance line) → section nav →
+  then-vs-now line → track-record band → scorecard band → watch band →
+  the six briefing sections with their eight visuals → the footer; the
+  print sheet hidden on screen (`display: none`).
+- **The eight S9 visuals** each render their insight-first title,
+  current reading and collapsible how-to-read guide; the guide toggle
+  was exercised open → closed → open (the numbered list renders only
+  while open).
+- **Date navigation**: prev-day walked Sun 22 Nov → Sat 21 Nov → Fri 20
+  Nov → Thu 19 Nov (the weekend steps honestly re-stamp on Fri 20
+  Nov), then next-day back. The then-vs-now line reads the viewed day
+  ("on Thu 19 Nov the desk called bias -58 at $3,607 — gold has fallen
+  -1.94% to $3,537 since…"); the digest's day/scenario rows show the
+  viewed day's own calls while the watch/scorecard/memory rows read
+  the whole record.
+- **Regenerate + toast**: POST `/api/desk` re-pulled the EODHD
+  observation store once (all SourceSync rows re-stamped at a single
+  timestamp), rebuilt the 2026-11-20 desk day with a fresh strategist
+  narrative, and left the archive structurally intact (6 desk days:
+  4 live + 2 modelled; 5 watch rules). The "Briefing regenerated"
+  toast fired; the post-regenerate state was re-verified (cross-check
+  and watch states below).
+- **Watch-rule CRUD + toasts through the UI**: a rule added ("Watch
+  rule added" toast, rendered and evaluated honestly), deleted
+  ("Watch rule deleted"), and a real rule paused/resumed ("Watch rule
+  paused" / "Watch rule resumed") — the persisted record restored to
+  the 5 original active rules at the end. The same cycle was verified
+  at the API level (POST/PATCH/DELETE), and both 400 validation paths
+  (bad kind, bad level) reject.
+- **The digest + its print view**: the four labelled rows render with
+  the current-reading block and collapsible guide; **Print digest**
+  fired `window.print()` with `body.digest-printing` applied, and a
+  PDF rendered under print media contained ONLY the digest sheet
+  (title + the four rows; no briefing section, no chart axes leaked)
+  — the same payload, ink-on-white, no new fetch.
+- **Dark mode**: light → dark → light toggled; the root class flips
+  and the desk renders in both.
+- **Mobile 375px**: no horizontal overflow (scrollWidth = 375), the
+  digest renders its four rows, the footer is pushed down naturally
+  (footer bottom = scroll height).
+
+**The digest numbers cross-checked against the raw DB — twice.** An
+independent recomputation over the DeskDay / Observation / WatchRule
+rows matched the served digest exactly: **66/66 checks before the
+regenerate, 58/58 after** (the post-regenerate record quotes fewer
+triggered rules because the re-pulled closes moved two of them to
+quiet — honest re-evaluation, not drift). The re-grade reproduced the
+S12 math per day (including the flat repeat on 2026-11-20 → 2026-11-21
+and the modelled-era exclusions), the memory block recomputed from the
+raw rows (live era 2026-11-17 → 2026-11-20, realized −8.13% pre / −8.10%
+post against the anchor close), and the quoted watch statements are
+byte-verbatim from the watch evaluation.
+
+**Every binding rule, confirmed against the live build:**
+
+1. **Deterministic engine reachable via the force flag** — verified:
+   `GET /api/desk?source=modelled` serves a fresh modelled build
+   (dataMode "modelled", fallbackReason "forced via the
+   source=modelled flag — deterministic engine output"), never
+   cached, never written to the archive.
+2. **No secrets in any artifact** — verified: a scan over all 126
+   tracked files, the SQLite archive, and every served payload found
+   no token or key strings; the EODHD token is env-only
+   (`.env.local`, gitignored, never printed).
+3. **Once-per-day EODHD sync the only network surface** — verified:
+   every read route skipped the network on an already-synced day
+   (SourceSync rows unchanged through dozens of reads); the only
+   re-pull was the desk's own regenerate path; the
+   digest/continuity/calibration/watch routes never trigger a build.
+   Edge dates: weekends/holidays stamp on the latest trading day with
+   the honest stampNote; a pre-window date (2025-06-02) serves its
+   cached modelled-era row with its fallbackReason; invalid dates
+   return 400.
+4. **Payload contracts intact** — verified: the S8 briefing (six
+   sections, news tape, scenario set), the S9 visuals payload (the
+   eight visuals + the guides/insights/takeaways collections), the
+   S10 provenance (dataMode, asOf, stampNote, per-dataset
+   live/modelled lines) all serve the contracted shapes on every
+   route checked.
+5. **Sticky footer + 44px targets + dark mode** — verified with one
+   honest deviation: the footer pushes down naturally at desktop and
+   375px and the `min-h-screen flex-col` + `flex-1` mechanism is in
+   the code; primary touch targets meet 44px (Regenerate h-11, the
+   dark-mode toggle 44×44, Print digest 128×44); secondary controls
+   sit below it unchanged since S8 (date steppers 36px, collapsible
+   triggers 32px tall, "What is" info buttons 16px, "Show supporting
+   visual" buttons 28px) — recorded as a known deviation, NOT
+   redesigned in the close-out (fixing ~36 controls is a redesign,
+   out of the close-out's scope).
+
+**Honestly not verified (stated as such):**
+
+- The content-shorter-than-viewport sticky-footer branch was not seen
+  live: the desk always renders more than a viewport of content, and
+  the browser-level request abort did not intercept the local fetches
+  (the error state could not be forced). The mechanism is verified in
+  the code and the push behavior verified live.
+- No live EODHD outage was re-induced this session (the S10
+  fail-closed path was exercised in S10–S14). The modelled-era cached
+  row and the force-flag path serve honestly, but a fresh outage was
+  not simulated.
+- The print sheet was verified as a PDF rendered from print media
+  with the class active; no physical printer driver was involved
+  (it is a browser print path, as designed).
+
+**The final record state:** the archive DB (`db/custom.db`) holds 6
+desk days (4 live-era + 2 modelled, all `narrativeSource "llm"`),
+the full observation store (gold/silver/spx/realYield/oil/dxy + the
+six DXY component pairs, ~1 trailing year per symbol), the 5 owner
+watch rules (all active), and the SourceSync registry. The
+2026-11-20 desk day is the one regenerated during the close-out
+verification — through the desk's own regenerate path, so its numbers
+and two watch-rule states ("Gold reclaims $3,535", "Base case targets
+at least $3,590") honestly moved with the re-pulled closes. The
+desk's next sync fires on the next UTC day (or the next regenerate).
 
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 

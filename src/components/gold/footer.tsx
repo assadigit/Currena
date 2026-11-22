@@ -6,6 +6,7 @@
  * live (EODHD) and which are modelled by the deterministic engine.
  * S11: the session line names the Continuity layer.
  * S13: the session line names the Watch layer.
+ * S15: the session line closes the programme (the S14 digest included).
  */
 
 import type { DeskProvenance } from "@/lib/gold/types";
@@ -48,8 +49,8 @@ export function DeskFooter({ provenance }: DeskFooterProps) {
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <p>
           <span className="font-semibold text-foreground">AURUM Desk</span> ·
-          Gold Intelligence &amp; Visual Explanation · Session 13 of 15 —
-          Watch layer (S8 Briefing + S9 Visuals + S10 live data + S11 track record + S12 scorecard + S13 owner watch rules)
+          Gold Intelligence &amp; Visual Explanation · Session 15 of 15 —
+          programme complete (S8 Briefing + S9 Visuals + S10 live data + S11 track record + S12 scorecard + S13 owner watch rules + S14 digest)
         </p>
         <p className="max-w-xl leading-relaxed">
           {provenance
