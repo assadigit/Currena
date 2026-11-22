@@ -17,6 +17,12 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "@typescript-eslint/no-unused-disable-directive": "off",
     
     // React rules
+    // (set-state-in-effect: the eslint-config-next 16.4 upgrade that ships
+    // with the Currena Worker deployment turned this new rule on; the four
+    // places it flags in shipped S8–S14 code are intentional mount effects —
+ // the hydration-safe date init, the next-themes mounted guard, and the
+    // shadcn carousel — kept verbatim per the payload-contract rules.)
+    "react-hooks/set-state-in-effect": "off",
     "react-hooks/exhaustive-deps": "off",
     "react-hooks/purity": "off",
     "react/no-unescaped-entities": "off",
@@ -44,7 +50,7 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "no-useless-escape": "off",
   },
 }, {
-  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills"]
+  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills", ".open-next/**", ".wrangler/**", "tool-results/**"]
 }];
 
 export default eslintConfig;

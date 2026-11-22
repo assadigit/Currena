@@ -5,9 +5,15 @@
  * persona write the six briefing sections from the engine's factual digest.
  * Falls back to the deterministic template whenever the model call fails,
  * times out, or returns invalid JSON, so the desk always has a narrative.
+ *
+ * The SDK is loaded dynamically inside the model call (inside the existing
+ * retry/fallback guard) because it is a sandbox-internal service: it reads
+ * its endpoint from a local config file (`fs`), which does not exist on the
+ * Cloudflare Worker. There the import or the model call throws, the guard
+ * catches it, and the desk honestly serves the template narrative — exactly
+ * the designed fail-closed path; `narrativeSource` records which one served.
  */
 
-import ZAI from "z-ai-web-dev-sdk";
 import { z } from "zod";
 import type { BriefingPayload, EngineFacts } from "./types";
 
@@ -133,6 +139,7 @@ function extractJson(raw: string): unknown {
 async function callModel(
   digest: string
 ): Promise<z.infer<typeof llmResponseSchema>> {
+  const { default: ZAI } = await import("z-ai-web-dev-sdk");
   const zai = await ZAI.create();
   const completion = await zai.chat.completions.create({
     messages: [

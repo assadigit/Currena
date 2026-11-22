@@ -1,5 +1,14 @@
+/**
+ * `driverAdapters` (preview) is the Cloudflare Workers deployment seam: on a
+ * Worker the SQLite file engine cannot run, so the client is instead given a
+ * D1 driver adapter (see src/lib/db.ts). The sandbox dev server keeps the
+ * default engine path unchanged — the feature only *adds* the adapter
+ * option, and Prisma requires the normally-generated client (with engine)
+ * for the adapter path to be valid at all.
+ */
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {

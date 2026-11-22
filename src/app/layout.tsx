@@ -41,6 +41,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
+        {/* Worker-build seam: OpenNext's esbuild bundling (keep-names) leaves
+            a `__name(...)` helper call inside next-themes' pre-hydration
+            inline script, but the helper itself lives in the server bundle
+            and is undefined in the browser — the script dies before it can
+            apply the saved theme, leaving a flash of the wrong theme. The
+            identity no-op below is defined before that script so it runs to
+            completion. (A no-op everywhere else: the sandbox build has its
+            own `__name`.) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "window.__name = window.__name || ((f) => f);",
+          }}
+        />
         <Providers>{children}</Providers>
         <Toaster />
       </body>

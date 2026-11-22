@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "currena-gold-desk",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": [
+    // Node.js APIs for the Next.js server (OpenNext requires this)
+    "nodejs_compat",
+    // Populates process.env with vars and bindings at boot — this is how
+    // src/lib/db.ts sees the D1 binding as process.env.DB and how
+    // process.env.EODHD_TOKEN (a Worker secret) reaches the EODHD adapter.
+    "nodejs_compat_populate_process_env",
+    // All outbound fetches in this desk are to public APIs (EODHD)
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "currena-gold-desk"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "aurum-desk",
+      // Replaced with the real UUID by the deploy run
+      // (wrangler d1 create aurum-desk) — local preview does not use it.
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}
