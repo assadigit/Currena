@@ -300,14 +300,37 @@ const NEWS_TEMPLATES: {
 
 const NEWS_TIMES = ["08:15", "09:40", "10:25", "11:05", "12:30", "14:10", "15:45", "16:20"];
 
+/**
+ * S10 Roots layer — the data-source seam. When fresh real observations
+ * exist, the price/macro series are replaced wholesale by the override
+ * while every derivation (moving averages, RSI, vol, correlations,
+ * returns, scenarios) stays in the existing code paths below, so both
+ * layers (briefing + visuals) render byte-comparable from one facts
+ * object. Without an override the output is identical to the
+ * deterministic engine — the fail-closed fallback.
+ */
+export interface MarketOverride {
+  /** Real trading-day labels (ascending) the series align to. */
+  dates: string[];
+  gold?: number[];
+  dxy?: number[];
+  realYield?: number[];
+  spx?: number[];
+  silver?: number[];
+  oil?: number[];
+}
+
 /** Generate the complete deterministic market state for a desk date. */
-export function computeMarket(dateISO: string): EngineFacts {
+export function computeMarket(
+  dateISO: string,
+  override?: MarketOverride
+): EngineFacts {
   const rng = mulberry32(hashStr(`aurum-${dateISO}`));
   const gauss = gaussianMaker(rng);
   const pick = <T>(arr: T[]): T => arr[Math.floor(rng() * arr.length)];
   const between = (lo: number, hi: number) => lo + rng() * (hi - lo);
 
-  const dates = tradingDaysBefore(dateISO, TRADING_DAYS);
+  const dates = override?.dates ?? tradingDaysBefore(dateISO, TRADING_DAYS);
   const n = dates.length;
 
   /* ---- Macro driver paths ---------------------------------------- */
@@ -388,21 +411,35 @@ export function computeMarket(dateISO: string): EngineFacts {
     gold.push(goldL);
   }
 
+  /* ---- S10 seam: real observations replace generated series -------- */
+
+  // When the desk is grounded, live series from the observation store
+  // replace the generated ones here. Without an override each *Eff is
+  // the very array generated above, so the deterministic path is
+  // unchanged bit for bit.
+  const goldEff = override?.gold ?? gold;
+  const dxyEff = override?.dxy ?? dxy;
+  const ryEff = override?.realYield ?? realYield;
+  const spxEff = override?.spx ?? spx;
+  const oilEff = override?.oil ?? oil;
+
   /* ---- Silver: ratio walk around gold ----------------------------- */
 
   const silver: number[] = [];
   let ratio = between(0.011, 0.0135);
   for (let i = 0; i < n; i++) {
     ratio = clampNum(ratio + gauss() * 0.00008, 0.0095, 0.0155);
-    silver.push(gold[i] * ratio);
+    silver.push(goldEff[i] * ratio);
   }
+  const silverEff = override?.silver ?? silver;
 
   /* ---- Spec positioning: momentum-driven with percentile bands ---- */
 
   const netSpecs: number[] = [];
   for (let i = 0; i < n; i++) {
-    const ma50v = movingAverage(gold, 50, i);
-    const trend = Number.isNaN(ma50v) ? 0 : Math.tanh((gold[i] / ma50v - 1) * 8);
+    const ma50v = movingAverage(goldEff, 50, i);
+    const trend =
+      Number.isNaN(ma50v) ? 0 : Math.tanh((goldEff[i] / ma50v - 1) * 8);
     const target = 145 + 78 * trend;
     const prev = netSpecs.length ? netSpecs[netSpecs.length - 1] : target;
     const next = clampNum(prev + 0.35 * (target - prev) + gauss() * 3, -20, 240);
@@ -417,7 +454,7 @@ export function computeMarket(dateISO: string): EngineFacts {
   const etfFlowWeekly: number[] = [];
   for (let w = 0; w < weekEndIdxs.length; w++) {
     const i = weekEndIdxs[w];
-    const wkRet = i >= 5 ? (gold[i] / gold[i - 5] - 1) * 100 : 0;
+    const wkRet = i >= 5 ? (goldEff[i] / goldEff[i - 5] - 1) * 100 : 0;
     const seasonal = Math.sin((w / 13) * Math.PI * 2) * 2.2;
     const flow = clampNum(
       1.6 * Math.tanh(wkRet * 1.5) + seasonal + gauss() * 2.4,
@@ -431,7 +468,7 @@ export function computeMarket(dateISO: string): EngineFacts {
 
   const sentiment: number[] = [];
   for (let i = 0; i < n; i++) {
-    const ret = i === 0 ? 0 : (gold[i] / gold[i - 1] - 1) * 100;
+    const ret = i === 0 ? 0 : (goldEff[i] / goldEff[i - 1] - 1) * 100;
     sentiment.push(
       clampNum(ret * 11 + gauss() * 0.28, -1, 1)
     );
@@ -439,8 +476,8 @@ export function computeMarket(dateISO: string): EngineFacts {
 
   /* ---- Derived facts ------------------------------------------------ */
 
-  const spot = gold[n - 1];
-  const prev = gold[n - 2];
+  const spot = goldEff[n - 1];
+  const prev = goldEff[n - 2];
   const changePct = (spot / prev - 1) * 100;
   const changeAbs = spot - prev;
 
@@ -458,11 +495,11 @@ export function computeMarket(dateISO: string): EngineFacts {
       break;
     }
   }
-  const retYtd = (spot / gold[ytdStart] - 1) * 100;
+  const retYtd = (spot / goldEff[ytdStart] - 1) * 100;
 
-  const rsi14 = rsi(gold, 14);
+  const rsi14 = rsi(goldEff, 14);
 
-  const goldRets = pctReturns(gold);
+  const goldRets = pctReturns(goldEff);
   const volAt = (endIdx: number) =>
     std(goldRets.slice(endIdx - 19, endIdx + 1)) * Math.sqrt(252);
   const volSeries: { date: string; vol: number }[] = [];
@@ -490,10 +527,10 @@ export function computeMarket(dateISO: string): EngineFacts {
           ? "elevated"
           : "extreme";
 
-  const ma20 = movingAverage(gold, 20, n - 1);
-  const ma50 = movingAverage(gold, 50, n - 1);
-  const high52 = Math.max(...gold.slice(-250));
-  const low52 = Math.min(...gold.slice(-250));
+  const ma20 = movingAverage(goldEff, 20, n - 1);
+  const ma50 = movingAverage(goldEff, 50, n - 1);
+  const high52 = Math.max(...goldEff.slice(-250));
+  const low52 = Math.min(...goldEff.slice(-250));
   const distFromHigh = (spot / high52 - 1) * 100;
 
   /* ---- Positioning percentiles ------------------------------------- */
@@ -512,9 +549,9 @@ export function computeMarket(dateISO: string): EngineFacts {
 
   /* ---- Driver attribution (today's move decomposition) ------------- */
 
-  const dxyRetToday = (dxy[n - 1] / dxy[n - 2] - 1) * 100;
-  const ryChgToday = realYield[n - 1] - realYield[n - 2];
-  const spxRetToday = (spx[n - 1] / spx[n - 2] - 1) * 100;
+  const dxyRetToday = (dxyEff[n - 1] / dxyEff[n - 2] - 1) * 100;
+  const ryChgToday = ryEff[n - 1] - ryEff[n - 2];
+  const spxRetToday = (spxEff[n - 1] / spxEff[n - 2] - 1) * 100;
   const lastFlow = etfFlowWeekly[etfFlowWeekly.length - 1] ?? 0;
 
   const cDollar = BETA_DXY * dxyRetToday * 100; // bps
@@ -576,11 +613,11 @@ export function computeMarket(dateISO: string): EngineFacts {
   const seriesFor = (levels: number[]) => pctReturns(levels).slice(-120);
   const corrSeries = [
     goldR,
-    seriesFor(dxy),
-    pctReturns(realYield.map((v) => v * 100)).slice(-120), // scale invariant
-    seriesFor(spx),
-    seriesFor(silver),
-    seriesFor(oil),
+    seriesFor(dxyEff),
+    pctReturns(ryEff.map((v) => v * 100)).slice(-120), // scale invariant
+    seriesFor(spxEff),
+    seriesFor(silverEff),
+    seriesFor(oilEff),
     seriesFor(netSpecs),
   ];
   const matrix: number[][] = corrSeries.map((a) =>
@@ -595,7 +632,7 @@ export function computeMarket(dateISO: string): EngineFacts {
     while (events.length < 5 && cursor > n - 130) {
       const idx = cursor - Math.floor(rng() * 12);
       if (idx > n - 130 && idx < n - 8) {
-        const local = (gold[idx + 5] / gold[idx - 5] - 1) * 100;
+        const local = (goldEff[idx + 5] / goldEff[idx - 5] - 1) * 100;
         const tpl = pick(EVENT_LABELS);
         events.push({
           date: dates[idx],
@@ -691,12 +728,12 @@ export function computeMarket(dateISO: string): EngineFacts {
   const partial = {
     date: dateISO,
     dates,
-    gold,
-    dxy,
-    realYield,
-    spx,
-    silver,
-    oil,
+    gold: goldEff,
+    dxy: dxyEff,
+    realYield: ryEff,
+    spx: spxEff,
+    silver: silverEff,
+    oil: oilEff,
     netSpecs,
     etfFlowWeekly,
     sentiment,

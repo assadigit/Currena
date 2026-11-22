@@ -124,7 +124,7 @@ export default function Page() {
       toast({
         title: "Briefing regenerated",
         description:
-          "A fresh strategist narrative has been written for this date.",
+          "Live observations re-pulled; a fresh strategist narrative has been written for this date.",
       });
     } catch (e) {
       toast({
@@ -151,11 +151,12 @@ export default function Page() {
 
   const briefing = data?.briefing;
   const visuals = data?.visuals;
+  const provenance = data?.provenance;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <DeskHeader
-        date={date || "—"}
+        date={briefing?.date ?? (date || "—")}
         onPrevDay={() => setDate((d) => (d ? shiftISO(d, -1) : d))}
         onNextDay={() => setDate((d) => (d ? shiftISO(d, 1) : d))}
         canNextDay={Boolean(date && today && date < today)}
@@ -191,7 +192,11 @@ export default function Page() {
       ) : (
         <React.Fragment>
           <div className="mx-auto mt-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <MarketStrip briefing={briefing} visuals={visuals} />
+            <MarketStrip
+              briefing={briefing}
+              visuals={visuals}
+              provenance={provenance}
+            />
           </div>
           <SectionNav sections={briefing.sections} />
 
@@ -252,7 +257,7 @@ export default function Page() {
         </React.Fragment>
       )}
 
-      <DeskFooter />
+      <DeskFooter provenance={provenance} />
     </div>
   );
 }

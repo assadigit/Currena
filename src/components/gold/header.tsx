@@ -88,7 +88,7 @@ export function DeskHeader({
         <Separator orientation="vertical" className="hidden h-10 lg:block" />
 
         {/* Programme layer status */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge
             variant="outline"
             className="gap-1.5 border-primary/40 bg-primary/5 font-normal text-primary"
@@ -102,6 +102,13 @@ export function DeskHeader({
           >
             <span className="h-1.5 w-1.5 rounded-full bg-chart-4" />
             S9 Visuals · live
+          </Badge>
+          <Badge
+            variant="outline"
+            className="gap-1.5 border-bull/50 bg-bull/5 font-normal text-bull"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-bull" />
+            S10 Roots · live
           </Badge>
         </div>
 
@@ -148,7 +155,7 @@ export function DeskHeader({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Rebuild today&apos;s briefing narrative with the strategist model
+              Re-pull live market data and rebuild this day&apos;s briefing
             </TooltipContent>
           </Tooltip>
 

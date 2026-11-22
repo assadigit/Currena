@@ -9,16 +9,70 @@ import {
   TrendingUp,
   TrendingUp as TrendNeutral,
 } from "lucide-react";
-import type { BriefingPayload, VisualsPayload } from "@/lib/gold/types";
-import { deltaClass, fmtPct, fmtPrice } from "@/lib/gold/format";
+import type {
+  BriefingPayload,
+  DeskProvenance,
+  VisualsPayload,
+} from "@/lib/gold/types";
+import { deltaClass, fmtDayLabel, fmtPct, fmtPrice } from "@/lib/gold/format";
 
 interface MarketStripProps {
   briefing: BriefingPayload;
   visuals: VisualsPayload;
+  /** S10 Roots layer: how this desk's series were served. */
+  provenance?: DeskProvenance;
+}
+
+/** Compact mode label for the provenance line. */
+function provenanceModeText(p: DeskProvenance): string {
+  if (p.dataMode === "live") return "Live via EODHD";
+  if (p.dataMode === "mixed") {
+    const live = p.datasets.filter(
+      (d) => d.mode === "live" || d.mode === "live-proxy"
+    ).length;
+    return `Mixed — ${live}/6 market series live`;
+  }
+  return "Modelled — deterministic engine";
+}
+
+function provenanceDotClass(p: DeskProvenance): string {
+  if (p.dataMode === "live") return "bg-bull";
+  if (p.dataMode === "mixed") return "bg-gold";
+  return "bg-flat";
+}
+
+/** The exact live-versus-modelled enumeration (tooltip body). */
+function provenanceDetail(p: DeskProvenance): React.ReactNode {
+  const live = p.datasets.filter(
+    (d) => d.mode === "live" || d.mode === "live-proxy"
+  );
+  const modelled = p.datasets.filter((d) => d.mode === "modelled");
+  return (
+    <div className="space-y-1.5">
+      {live.length > 0 ? (
+        <p>
+          <span className="font-semibold text-foreground">Live (EODHD): </span>
+          {live.map((d) => `${d.label} — ${d.source}${d.note ? `: ${d.note}` : ""}`).join(" · ")}
+        </p>
+      ) : null}
+      {modelled.length > 0 ? (
+        <p>
+          <span className="font-semibold text-foreground">Modelled: </span>
+          {modelled.map((d) => `${d.label}${d.note ? ` — ${d.note}` : ""}`).join(" · ")}
+        </p>
+      ) : null}
+      {p.windowDays ? <p>Live window: {p.windowDays} trading days.</p> : null}
+      {p.fetchedAt ? (
+        <p>Observations pulled: {p.fetchedAt.slice(0, 16).replace("T", " ")} UTC.</p>
+      ) : null}
+      {p.stampNote ? <p>{p.stampNote}.</p> : null}
+      {p.fallbackReason ? <p>Fallback: {p.fallbackReason}.</p> : null}
+    </div>
+  );
 }
 
 /** The daily market snapshot row that anchors the briefing below it. */
-export function MarketStrip({ briefing, visuals }: MarketStripProps) {
+export function MarketStrip({ briefing, visuals, provenance }: MarketStripProps) {
   const last30 = React.useMemo(
     () => visuals.price.points.slice(-30),
     [visuals.price.points]
@@ -131,6 +185,45 @@ export function MarketStrip({ briefing, visuals }: MarketStripProps) {
             ))}
           </dl>
         </TooltipProvider>
+
+        {/* S10 provenance line — data as of, live vs modelled */}
+        {provenance ? (
+          <div
+            className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 border-t border-border/60 pt-3 text-[11px] leading-relaxed text-muted-foreground"
+            role="contentinfo"
+            aria-label="Data provenance"
+          >
+            <TooltipProvider delayDuration={150}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5 font-medium text-foreground/80 hover:text-foreground"
+                    aria-label="Data provenance — which series are live and which are modelled"
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${provenanceDotClass(provenance)}`}
+                      aria-hidden="true"
+                    />
+                    {provenanceModeText(provenance)}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-96 text-xs">
+                  {provenanceDetail(provenance)}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <span className="tabular-nums">
+              data as of {fmtDayLabel(provenance.asOf)}
+            </span>
+            {provenance.stampNote ? (
+              <span>· showing the latest available trading day</span>
+            ) : null}
+            {provenance.fallbackReason ? (
+              <span className="italic">· {provenance.fallbackReason}</span>
+            ) : null}
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );

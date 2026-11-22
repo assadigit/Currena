@@ -15,27 +15,68 @@ session arc:
   volatility regime · V5 positioning & flows · V6 sentiment timeline · V7
   scenario fan · V8 seasonality), each shipping an insight-first title, a
   data-driven current reading, and a collapsible how-to-read guide.
-- **S10 — Roots layer (next):** the live-data foundation — real market series
-  via the owner-supplied EODHD API, honest provenance, synthetic fallback.
+- **S10 — Roots layer (done, live):** the desk is grounded in real market
+  data via the owner-supplied EODHD API, with honest provenance and a
+  fail-closed synthetic fallback — the desk never goes dark.
+- **S11 — next session.**
 
 ## Architecture (the one page a session must know)
 
 ```
 src/lib/gold/engine.ts     deterministic market engine (seeded per date) → EngineFacts
+                           S10 seam: computeMarket(date, override?) — live series
+                           replace the generated ones wholesale; every derivation
+                           (MA/RSI/vol/correlations/returns/scenarios) stays in the
+                           same code paths, so the briefing and visuals render
+                           byte-comparable; without an override the output is
+                           bit-identical to the deterministic engine
+src/lib/gold/sources/eodhd.ts  S10 Roots: the EODHD adapter — symbol registry
+                           (recorded by live probe), thin client, once-per-day
+                           trailing-window sync, ICE DXY computed from component
+                           pairs, grounded-bundle builder (intersection grid,
+                           staleness + depth gates)
+src/lib/gold/grounded.ts   S10 Roots: grounding resolution (grounded vs
+                           fail-closed fallback with honest reason) + provenance
+                           assembly; builds through the same builder paths
 src/lib/gold/builder.ts    facts → BriefingPayload + VisualsPayload (S8 + S9)
 src/lib/gold/narrative.ts  z-ai-web-dev-sdk strategist model rewrites the six
                             sections; deterministic template fallback
-src/app/api/desk/route.ts  GET ?date= (cache-first) · POST {date} (regenerate)
-db/custom.db (Prisma)      DeskDay rows: briefingJson / visualsJson / narrativeSource
+src/app/api/desk/route.ts  GET ?date=&force=&source=auto|modelled (cache-first,
+                           stamps on the latest available trading day) ·
+                           POST {date} (regenerate: re-pull + rebuild)
+db/custom.db (Prisma)      DeskDay rows (briefing/visuals JSON + dataMode +
+                           provenanceJson) · Observation rows (one per
+                           dataset-date) · SourceSync rows (per-dataset source
+                           registry state)
 src/app/page.tsx            the desk page — sections paired with their visuals
-src/components/gold/        header · market-strip · section-nav · briefing-card ·
-                            bias-meter · footer · visuals/* (the eight V-cards)
+src/components/gold/        header · market-strip (with the "data as of"
+                            provenance line) · section-nav · briefing-card ·
+                            bias-meter · footer (full provenance note) ·
+                            visuals/* (the eight V-cards)
 ```
+
+## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
+
+| Series | Source | Mode |
+| --- | --- | --- |
+| Gold spot (XAU/USD) | `XAUUSD.FOREX` | live |
+| Silver spot (XAG/USD) | `XAGUSD.FOREX` | live |
+| US Dollar Index | ICE DXY formula from the six component FX pairs | live |
+| S&P 500 | `SPY.US` (index not on the plan; ETF closes, % moves) | live-proxy |
+| 10Y real yield | `^TNX.US` (no TIPS series on the plan; nominal proxy) | live-proxy |
+| WTI crude | `USO.US` (futures-roll proxy; correlations only) | live-proxy |
+| Net specs / ETF flows / news tape & sentiment | no EODHD source — modelled | modelled |
+
+History is capped at ~1 trailing year per symbol on this subscription, so the
+grounded window is ~250 trading days; dates with fewer than 200 live days
+(e.g. beyond the window) honestly fall back to the deterministic engine, and
+every provenance line states exactly which series are live versus modelled.
 
 Rules that bind every session:
 
-1. **The engine is deterministic per date** — the same date always produces the
-   same facts. Regeneration re-runs only the strategist narrative.
+1. **The engine is deterministic per date** — the same date (and data mode)
+   always produces the same facts. Regeneration re-pulls live observations,
+   rebuilds the facts, and re-runs the strategist narrative.
 2. **The narrative is model-written, template-fallback** — `narrativeSource`
    records which one served. The desk must never render without a narrative.
 3. **The LLM runs server-side only** (`z-ai-web-dev-sdk` in
@@ -45,13 +86,19 @@ Rules that bind every session:
    correlation matrix is hand-built CSS grid).
 5. **No secrets in the repo.** Session credentials (GitHub push token, EODHD
    key, Cloudflare tokens) arrive in chat at session start/close, are used
-   env-only or inline, and are never stored or printed.
+   env-only (`.env.local` is gitignored) or inline, and are never stored or
+   printed.
 6. **Stack discipline:** Next.js 16 App Router · TypeScript · Tailwind 4 ·
    shadcn/ui (New York) · Prisma/SQLite · TanStack Query · Recharts. Use the
    existing components; no new charting/UI dependency without cause.
 7. **Accessibility floor:** semantic landmarks, ARIA labels, 44px touch
    targets, the sticky-footer layout (`min-h-screen flex flex-col` +
    `mt-auto`), light/dark mode via next-themes.
+8. **Fail-closed data grounding (S10):** any EODHD failure, stale window or
+   shallow history falls back to the deterministic engine with the fallback
+   recorded in provenance. The engine stays reachable directly via
+   `GET /api/desk?source=modelled`. Desk rows built before S10 (null
+   provenance) are cache misses and rebuild grounded.
 
 ## The session close-out protocol (what every session ends with)
 

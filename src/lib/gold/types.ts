@@ -227,4 +227,51 @@ export interface BriefingPayload {
 export interface DeskResponse {
   briefing: BriefingPayload;
   visuals: VisualsPayload;
+  /** S10 Roots layer: how the desk's series were served. Always present on rows built by S10+. */
+  provenance?: DeskProvenance;
+}
+
+/* ------------------------------------------------------------------ */
+/* S10 — Roots layer: provenance contracts                              */
+/* ------------------------------------------------------------------ */
+
+/** How the desk's price/macro series were served for a given day. */
+export type DataMode = "live" | "mixed" | "modelled";
+
+/** How a single dataset was served. */
+export type DatasetMode = "live" | "live-proxy" | "modelled";
+
+/** Provenance entry for one dataset (a market series or a modelled input). */
+export interface DatasetProvenance {
+  /** Registry key, e.g. "gold" or "netSpecs". */
+  dataset: string;
+  /** Human label, e.g. "Gold spot (XAU/USD)". */
+  label: string;
+  mode: DatasetMode;
+  /** The EODHD symbol (or formula description) that served it, when live. */
+  source?: string;
+  /** Latest observation date actually used, when live. */
+  asOf?: string;
+  /** Honest note — proxies, derivations, or why there is no live source. */
+  note?: string;
+}
+
+/** The full provenance record stored alongside a desk day. */
+export interface DeskProvenance {
+  /** "live" = all six price/macro series grounded; "mixed" = some; "modelled" = synthetic fallback. */
+  dataMode: DataMode;
+  /** The stamped desk date — the latest available trading day with live data, or the requested date when modelled. */
+  asOf: string;
+  /** The date the caller asked for (may differ from asOf on non-trading days). */
+  requestedDate: string;
+  /** When the observation store was last pulled from EODHD (ISO timestamp). */
+  fetchedAt?: string;
+  /** Live trading-day depth of the window the engine consumed. */
+  windowDays?: number;
+  /** Why the desk fell back to the deterministic engine, when it did. */
+  fallbackReason?: string;
+  /** Why the desk is stamped on a different day than requested (non-trading days). */
+  stampNote?: string;
+  /** Dataset-by-dataset record. */
+  datasets: DatasetProvenance[];
 }

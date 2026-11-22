@@ -11,13 +11,52 @@ datasource db {
  * One row per desk date. The S8 briefing payload and the S9 visuals
  * payload are stored as serialised JSON text (SQLite has no list/array
  * primitives, and the payloads are read as whole documents anyway).
+ *
+ * S10 adds provenance columns: `dataMode` records how the market series
+ * were served ("live" | "mixed" | "modelled") and `provenanceJson` holds
+ * the per-dataset live-vs-modelled record. Rows written before S10 have
+ * dataMode "modelled" and a null provenanceJson — they are treated as
+ * cache misses and rebuilt grounded.
  */
 model DeskDay {
-  id             String   @id @default(cuid())
-  date           String   @unique
-  briefingJson   String
-  visualsJson    String
-  narrativeSource String  @default("template")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String   @id @default(cuid())
+  date            String   @unique
+  briefingJson    String
+  visualsJson     String
+  narrativeSource String   @default("template")
+  dataMode        String   @default("modelled")
+  provenanceJson  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/**
+ * S10 Roots layer — one observation row per dataset per trading day
+ * (no list-typed primitives: each symbol-date is its own row).
+ */
+model Observation {
+  id        String   @id @default(cuid())
+  dataset   String // gold | dxy | spx | realYield | silver | oil | dxy:<pair>
+  date      String // YYYY-MM-DD trading day
+  close     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([dataset, date])
+  @@index([dataset])
+}
+
+/**
+ * S10 Roots layer — the EODHD source registry state: which dataset is
+ * served by which symbol, whether the last sync succeeded, and the
+ * latest observation date seen. One row per logical dataset.
+ */
+model SourceSync {
+  id        String   @id @default(cuid())
+  dataset   String   @unique
+  symbol    String // the EODHD symbol (or formula description) that served it
+  status    String   @default("live") // live | unavailable | error
+  asOf      String? // latest observation date in the store
+  syncedAt  DateTime @updatedAt
+  note      String?
 }
