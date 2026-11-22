@@ -2,8 +2,9 @@
 
 The finished 15-session GIE sandbox programme: a standalone Next.js 16 daily
 gold-market intelligence desk — complete (Session 15/15 · 0 remaining) —
-ported per the owner's instruction to run on the **Currena Cloudflare
-Worker**.
+deployed live per the owner's instruction on the **Currena Cloudflare Worker**:
+
+**https://currena-gold-desk.sedanama-ir.workers.dev**
 
 ## What this branch carries
 
@@ -26,7 +27,12 @@ Worker**.
   sandbox **Preview Panel** ("Open in New Tab"). The archive lives in SQLite
   at `db/custom.db` — never rebuilt except through the desk's own
   regenerate path.
-- **Cloudflare Worker (the deployment):** `bun run worker:build` produces
+- **Cloudflare Worker (the deployment):** live at
+  **https://currena-gold-desk.sedanama-ir.workers.dev** (deployed 2026-11-22 —
+  the runbook in `AGENTS.md`'s deployment addendum, executed against the
+  owner's account: D1 database `aurum-desk` seeded from the archive,
+  `EODHD_TOKEN` attached as a Worker secret, the account's existing
+  `currena-api` worker left untouched). `bun run worker:build` produces
   `.open-next/worker.js` (wrangler.jsonc: worker `currena-gold-desk`, D1
   binding `DB` → database `aurum-desk`). Verified locally on workerd
   (`bun run worker:preview`, port 8788, seeded local D1): every route, the
@@ -34,9 +40,12 @@ Worker**.
   read-after-write, dark mode, 375px mobile, the print sheet as PDF, and
   zero page errors on reload.
 
-The remote deploy (the exact procedure is recorded in `AGENTS.md`'s
-deployment addendum) runs once the owner's Cloudflare token is supplied in
-chat — env-only, never stored or printed, per the repo's credential rule.
+Deployed live on 2026-11-22 and verified against the live URL (the full
+record is in `AGENTS.md`'s deployment addendum): every route, the
+`source=modelled` force flag, byte-identical archive responses, the watch
+write path on the remote D1, and the browser golden path with zero console
+errors. Credentials were used env-only — never stored or printed, per the
+repo's credential rule.
 
 Honest differences on the Worker (both fail-closed by design):
 

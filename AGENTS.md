@@ -491,11 +491,11 @@ counts exactly.
   close-out pattern), and the deployed D1 was seeded from that same state,
   so the record survives in two places: the S15 archive on `main` and the
   Worker's D1.
-- The **remote deploy itself** (d1 create → seed → secret → deploy) runs
-  as soon as the owner supplies the Cloudflare API token + account ID in
-  chat — env-only, never stored or printed, per binding rule 5. The
-  local-workerd verification above is the technical proof; the live URL is
-  recorded here after the deploy run.
+- The **remote deploy ran on 2026-11-22** — the owner supplied the
+  Cloudflare API token + account ID in chat (used env-only, never stored
+  or printed, per binding rule 5) and the procedure below was executed
+  verbatim against the live account; the live URL and the live
+  verification record are in "The remote deploy run" section below.
 
 **The deploy procedure (for the record; credentials env-only):**
 
@@ -507,6 +507,87 @@ wrangler d1 execute aurum-desk --remote --file=db/d1-dump.sql
 printf '%s' "$EODHD_TOKEN" | wrangler secret put EODHD_TOKEN   # value from .env.local, never printed
 bun run worker:deploy                                   # → currena-gold-desk.<account>.workers.dev
 ```
+
+### The remote deploy run (2026-11-22)
+
+The owner supplied the Cloudflare API token + account ID in chat (used
+env-only, never stored or printed, per binding rule 5). The procedure above
+was then executed verbatim against the live account:
+
+- **`wrangler d1 create aurum-desk`** → database
+  `264617a4-5bfa-43af-8c9c-d4c95d257dc8` (region APAC); the UUID was
+  patched into `wrangler.jsonc` by the deploy run, as the placeholder
+  comment documented.
+- **`bun run worker:dump`** → the seed regenerated from the unchanged
+  archive: 3474 rows (6 DeskDay / 3457 Observation / 6 SourceSync /
+  5 WatchRule) — the S15 record counts exactly.
+- **`wrangler d1 execute aurum-desk --remote`** → 3474 changes across the
+  4 tables; the archive seeded byte-exact.
+- **`wrangler secret put EODHD_TOKEN`** → attached from `.env.local`
+  through stdin, never printed; the name-only listing
+  (`wrangler secret list`) confirms it.
+- **`wrangler deploy`** → the verified `.open-next` bundle (built from
+  this exact tree at the port commit) deployed as worker
+  **`currena-gold-desk`** on the account's workers.dev subdomain:
+
+  **https://currena-gold-desk.sedanama-ir.workers.dev**
+
+  The account's existing `currena-api` worker (an unrelated live service)
+  was checked and left untouched.
+
+**Verified against the live URL:**
+
+- Every route 200: `/api/desk` (the cached archive row,
+  `narrativeSource: "llm"` — the LLM-written days render from D1),
+  `/api/desk/continuity`, `/api/desk/calibration`, `/api/desk/watch`,
+  `/api/desk/digest`; the invalid date 400s; the pre-window date
+  (2025-06-02) serves its cached modelled-era row.
+- **The force flag on the Worker**: `GET /api/desk?source=modelled`
+  serves dataMode "modelled" with fallbackReason "forced via the
+  source=modelled flag — deterministic engine output" — and the next
+  cached read is byte-identical (the forced build writes nothing, as
+  designed).
+- **The archive serves byte-for-byte**: the live
+  `/api/desk?date=2026-11-22` response is `cmp`-identical to the sandbox
+  dev server's — the D1 seed round-tripped the archive exactly.
+- **The write path on real remote D1** — a full watch-rule cycle: create
+  (201) → read-back (the new rule evaluates in the live watch band) →
+  PATCH pause → read-after-write (the DateTime bind shim holds on the
+  remote D1 — no P2023) → DELETE → net-zero (the five original rules
+  intact, the label set byte-identical to the pre-cycle state).
+- **The browser golden path** (agent-browser against the live URL, zero
+  console and zero page errors across the whole walk): the full surface
+  stack renders (digest band → market strip → section nav → then-vs-now →
+  track record → scorecard → watch band → the six briefing sections with
+  the eight visuals → the footer); the digest guide toggles open/closed;
+  **Print digest** fired `window.print()` with `body.digest-printing`
+  active at invocation (the class self-cleans after the print path); date
+  navigation stepped Sun 22 → Sat 21 → Fri 20 → Thu 19 (the weekend steps
+  re-stamp honestly; the Thu 19 Nov then-vs-now line reads "on Thu 19 Nov
+  the desk called bias -58 at $3,607 — gold has fallen -2.06% to $3,533
+  since…") and returned to today; dark mode light → dark → light; 375px
+  mobile with no horizontal overflow (scrollWidth 375), the four digest
+  rows rendered, and the footer pushed down naturally (footer bottom =
+  scroll height).
+- **No secrets in any artifact**: a scan over every live payload (the
+  desk, continuity, calibration, watch, digest, the modelled build and
+  the HTML page) found no token or key strings.
+
+**Honestly not fired on the live Worker:**
+
+- **POST /api/desk (regenerate)** was not fired against the live D1: it
+  would permanently replace the seeded LLM-written 2026-11-20 desk day
+  with a template-written one (the designed Worker fallback — the
+  strategist LLM is sandbox-internal). The write path is proven twice
+  over instead: the full regenerate cycle on local workerd (above) and
+  the watch CRUD write cycle on the live remote D1 (above). The
+  once-per-day EODHD sync fires on the next UTC day through the same
+  code, with the `EODHD_TOKEN` secret attached; if the account is on the
+  Workers free plan, that first sync may hit the CPU budget (the limit
+  note above).
+- Watch CRUD through the *UI* was not re-fired live — the API-level
+  cycle above is the same code path the UI buttons drive, and the UI CRUD
+  was browser-verified on local workerd.
 
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 

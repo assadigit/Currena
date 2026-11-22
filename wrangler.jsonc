@@ -27,9 +27,9 @@
     {
       "binding": "DB",
       "database_name": "aurum-desk",
-      // Replaced with the real UUID by the deploy run
-      // (wrangler d1 create aurum-desk) — local preview does not use it.
-      "database_id": "00000000-0000-0000-0000-000000000000"
+      // Real UUID from the deploy run (wrangler d1 create aurum-desk,
+      // 2026-11-22) — local preview does not use it.
+      "database_id": "264617a4-5bfa-43af-8c9c-d4c95d257dc8"
     }
   ],
   "observability": {
