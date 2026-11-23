@@ -1045,3 +1045,50 @@ naming 3,585.26 × 267,37X); EN ⇄ fa/RTL with Persian digits and dates
 (اسفند ۰۴ → آبان ۰۵, ۲۴۳٫۱۶ میلیون تومان, حباب +۷٫۷%); 375px with
 zero horizontal overflow; 16 nav chips; zero console and zero page
 errors; lint green.
+
+### The redeploy carrying batch F — the owner's refinements (2026-11-23, late)
+
+The owner reported the live page still showed the pre-F version ("I still
+see the old version") — the tree was right (batch F, `ad10feb`, already
+on main) but the Worker had last been deployed at 20:07, before batch F
+was pushed at 23:03. The gap was deployment, not code.
+
+**The run (credentials env-only, never stored or printed):**
+
+- `bun install` → `bunx prisma generate` → `NEXT_PUBLIC_BASE_PATH=/gold
+  bun run worker:build` → `bun run worker:deploy` (the account token +
+  account ID through the environment). The first attempt built without
+  the base-path env var — caught within minutes by the live checks
+  (`currena.ir/gold` 404; the workers.dev mirror answering at `/`
+  instead of `/gold`) and fixed by a clean rebuild
+  (`rm -rf .next .open-next` first) with the variable set; the canonical
+  URL never served the bad build to the owner for more than a few
+  minutes, and the second deploy (version
+  `c662f97d-b6a1-439d-814d-d2ec3879020c`) restored the full route set
+  (`currena.ir/gold`, `currena.ir/gold/*`, the workers.dev mirror).
+- **The D1 seed was not re-run** (the live store continues on its own);
+  **secrets untouched** (`EODHD_TOKEN` persists across versions).
+
+**Verified against the live canonical URL after the deploy:**
+
+- Every surface 200: `/gold`, `/gold/api/desk`, and the batch-F-only
+  route `/gold/api/gold/fx` (serving real FX month-ends — the decisive
+  old-vs-new marker; the pre-F worker had no such route).
+- **The batch F refinements, browser-verified on the live page:** the
+  toman row styled like every other currency row (VLM-confirmed: same
+  surface, same ring, only the live tag); the wealth calculator's unit
+  layer — thirteen units incl. the converter's twelve currencies, the
+  toman, and grams of gold — exercised end to end (Monthly buying ·
+  1,000,000 Iranian toman since Nov 2016 → invested "1 M toman × 121 =
+  121 M toman · from Nov 2016 → today", worth today "5.8 bn toman" on
+  its green ground (VLM-confirmed), gain "+5.6 bn toman (+4,655.1%)");
+  the head-to-head meta line a 11px whisper; the time machine opened and
+  read (its three how-it-works sentences; 2020-03-16 → the five-force
+  meter with counts and firing, the no-lookahead provenance); the vault
+  (`gold-vault`) ahead of the relationship map and the map
+  (`gold-relationships`) the page's last section; the map expanded —
+  six force families with the M/C/X/K evidence-class legend and their
+  documented records.
+- Zero console and zero page errors; 375px with no horizontal overflow;
+  route precision intact (`currena.ir/` and `/goldsmith` still serve the
+  converter untouched).
