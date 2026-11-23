@@ -47,7 +47,6 @@ import {
   Sparkline,
   MiniSpark,
   BrassBalance,
-  SeatsGrid,
   IfBoughtChart,
   SignedDelta,
   STATE_INK,
@@ -70,7 +69,7 @@ import {
   fetchIfBought,
   type PremiumPayload,
 } from "@/components/gold-page/record";
-import { IfBoughtBand } from "@/components/gold-page/ifbought";
+import { CalculatorBand } from "@/components/gold-page/calculator";
 import {
   ContextTable,
   CurrencyGridCard,
@@ -83,7 +82,6 @@ import {
   type CrossesPayload,
   type ProjectionReading,
 } from "@/components/gold-page/context-cards";
-import { TimeMachineBand } from "@/components/gold-page/timemachine";
 import { BridgeBoard, fetchRates, type RatesPayload } from "@/components/gold-page/bridge-board";
 import { CalendarBand } from "@/components/gold-page/calendar";
 import { CompareBand } from "@/components/gold-page/compare";
@@ -133,9 +131,14 @@ interface GoldPayload {
   oil: SeriesStat | null;
 }
 
-/* The price card's trend windows — 1D · 7D · 30D · 3M · 6M · 1Y · 5Y · YTD. */
+/* The price card's own windows, every one the API serves. */
 type TrendRange = "1D" | "7D" | "30D" | "3M" | "6M" | "1Y" | "5Y" | "YTD";
+/* the briefing table's own ladder — every window, one organized table */
 const TREND_RANGES: TrendRange[] = ["1D", "7D", "30D", "3M", "6M", "1Y", "5Y", "YTD"];
+/* The reader's priority ladder — five trend chips max (day · week ·
+   month · year · five years); the 3M/6M/YTD windows still live in the
+   briefing's own table and the compare band, just not as chips here. */
+const CHIP_RANGES: TrendRange[] = ["1D", "7D", "30D", "1Y", "5Y"];
 interface TrendPayload {
   range: TrendRange;
   asOf: string;
@@ -253,16 +256,15 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-balance", key: null, label: ["Balance", "ترازو"] },
   { id: "gold-calendar", key: null, label: ["Calendar", "تقویم"] },
   { id: "gold-compare", key: null, label: ["Compare", "مقایسه"] },
-  { id: "gold-lanes", key: null, label: ["Forces", "نیروها"] },
   { id: "gold-ta", key: null, label: ["Levels", "سطوح"] },
   { id: "gold-cb", key: null, label: ["Central banks", "بانک‌ها"] },
   { id: "gold-positions", key: null, label: ["Positions", "پوزیشن"] },
   { id: "gold-dashboard", key: null, label: ["Dashboard", "داشبورد"] },
   { id: "gold-bridge", key: null, label: ["Iran", "پل ایران"] },
   { id: "gold-history", key: null, label: ["History", "تاریخ"] },
-  { id: "gold-ifbought", key: null, label: ["If you'd bought", "اگر خریده بودید"] },
+  { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
-  { id: "gold-timemachine", key: null, label: ["Time machine", "ماشین زمان"] },
+  { id: "gold-vault", key: null, label: ["Plumbing", "لوله‌کشی"] },
 ];
 
 function SectionNav({ locale }: { locale: Locale }) {
@@ -350,7 +352,7 @@ function echoLine(
 
 function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; echo: string | null }) {
   const g = data.gold;
-  const [range, setRange] = React.useState<TrendRange>("3M");
+  const [range, setRange] = React.useState<TrendRange>("30D");
   const trend = useQuery({
     queryKey: ["currena-gold-trend", range],
     queryFn: () => fetchTrend(range),
@@ -394,9 +396,9 @@ function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en;
         </span>
       </div>
 
-      {/* the trend range — 1D · 30D · 3M · 6M · 1Y · 5Y */}
+      {/* the trend range — the five priority chips: day · week · month · year · five years */}
       <div role="tablist" aria-label={t.price.trendLabel} className="mt-3 flex flex-wrap gap-1.5">
-        {TREND_RANGES.map((r) => (
+        {CHIP_RANGES.map((r) => (
           <button
             key={r}
             type="button"
@@ -628,30 +630,6 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
             <DialogDescription className="m-0 type-label leading-relaxed text-[var(--color-text-secondary)]">
               {openContent.content[locale][1]}
             </DialogDescription>
-            <div className="flex flex-wrap gap-2">
-              <a
-                href="#gold-lanes"
-                onClick={() => {
-                  setOpenSeat(null);
-                  const trigger = lastTriggerRef.current;
-                  window.setTimeout(() => trigger?.focus(), 0);
-                }}
-                className="rounded-full bg-[var(--color-surface)] px-3 py-1.5 text-[12.5px] font-semibold text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)] transition-colors hover:bg-[var(--color-currena-soft)]"
-              >
-                {t.briefing.evidence}
-              </a>
-              <a
-                href="#gold-lanes"
-                onClick={() => {
-                  setOpenSeat(null);
-                  const trigger = lastTriggerRef.current;
-                  window.setTimeout(() => trigger?.focus(), 0);
-                }}
-                className="rounded-full px-3 py-1.5 text-[12.5px] font-semibold text-[var(--color-currena-blue-deep)] transition-colors hover:underline"
-              >
-                {t.briefing.howItWorks}
-              </a>
-            </div>
           </DialogContent>
         ) : null}
       </Dialog>
@@ -697,9 +675,10 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
         />
       </div>
 
-      {/* the two boxes — neutral containers; each force rides a red/green
-          chip (only the title carries the colour) with a bullet marker;
-          the counted record (موافق/مخالف/بی‌طرف) opens only on click */}
+      {/* the two boxes — neutral containers; the TITLE rides its own
+          red/green background wrapper (the contrast layer), each force
+          rides a red/green chip with a bullet marker; the counted record
+          (موافق/مخالف/بی‌طرف) opens only on click */}
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {([
           {
@@ -709,6 +688,7 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
             chip: "color-mix(in srgb, var(--color-return-down) 10%, transparent)",
             chipRing: "color-mix(in srgb, var(--color-return-down) 38%, transparent)",
             ink: "var(--color-return-down)",
+            glyph: "▼",
             label: locale === "en" ? "Open the counted record" : "باز کردن شمارش",
           },
           {
@@ -718,6 +698,7 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
             chip: "color-mix(in srgb, var(--color-return-up) 10%, transparent)",
             chipRing: "color-mix(in srgb, var(--color-return-up) 38%, transparent)",
             ink: "var(--color-return-up)",
+            glyph: "▲",
             label: locale === "en" ? "Open the counted record" : "باز کردن شمارش",
           },
         ]).map((b) => (
@@ -732,7 +713,17 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
             }}
             className="flex min-h-[44px] flex-col items-start gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3.5 text-start ring-1 ring-[var(--color-border)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-gold)] hover:bg-[var(--color-currena-soft)]"
           >
-            <span className="type-label font-extrabold text-[var(--color-text-primary)]">{b.title}</span>
+            <span
+              className="inline-flex min-h-[36px] items-center gap-2 self-start rounded-full px-3 py-1.5 type-label font-extrabold"
+              style={{
+                backgroundColor: `color-mix(in srgb, ${b.key === "against" ? "var(--color-return-down)" : "var(--color-return-up)"} 16%, transparent)`,
+                color: b.ink,
+                boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${b.key === "against" ? "var(--color-return-down)" : "var(--color-return-up)"} 45%, transparent)`,
+              }}
+            >
+              <span aria-hidden="true" className="text-[0.8em] leading-none">{b.glyph}</span>
+              {b.title}
+            </span>
             {b.lanes.length > 0 ? (
               <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
                 {b.lanes.map((l) => (
@@ -761,12 +752,8 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
       </div>
       <p className="m-0 mt-2 text-center type-caption text-[var(--color-text-tertiary)]">{t.balance.countHint}</p>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-border)] pt-3">
-        <a href="#gold-lanes" className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1.5 text-[13px] font-bold text-[var(--color-currena-blue-deep)]">
-          {locale === "en" ? "Inspect the 37 voters" : "۳۷ رأی‌دهنده را ببین"}
-          <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" />
-        </a>
-        <p className="m-0 max-w-[46ch] type-caption text-[var(--color-text-tertiary)]">{t.balance.honesty}</p>
+      <div className="mt-3 border-t border-[var(--color-border)] pt-3">
+        <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.balance.honesty}</p>
       </div>
 
       {/* the counted record — the modal (the موافق/مخالف/بی‌طرف numbers,
@@ -832,126 +819,6 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
                   </ul>
                 </div>
               ))}
-            </div>
-          </DialogContent>
-        ) : null}
-      </Dialog>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * The major forces — each lane's title and its lean, the voters and
- * the evidence behind a modal (nothing else; no bars, no tallies)
- * ------------------------------------------------------------------ */
-
-function SeatsBand({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; locale: Locale; balance: ReturnType<typeof balanceOf> }) {
-  /* the lane modal — one dialog, driven by the opened lane; the
-     reasons (the voters, their leans, their evidence words) and the
-     arguments (the lane's own intro sentence) live behind the click */
-  const [openLane, setOpenLane] = React.useState<LaneId | null>(null);
-  const lastTriggerRef = React.useRef<HTMLButtonElement | null>(null);
-  const leanWord = (side: "for" | "against" | "neutral" | "unread"): { word: string; ink: string } =>
-    side === "for"
-      ? { word: t.balance.verdictFor, ink: "var(--color-return-up)" }
-      : side === "against"
-        ? { word: t.balance.verdictAgainst, ink: "var(--color-return-down)" }
-        : { word: t.balance.verdictBalanced, ink: "var(--color-text-secondary)" };
-  const opened = openLane !== null ? balance.lanes.find((l) => l.lane === openLane) ?? null : null;
-  return (
-    <section id="gold-lanes" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.seats.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.seats.title}</h3>
-      <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.seats.subtitle}</p>
-
-      {/* the five rows — title and lean only; the rest opens on tap */}
-      <div className="mt-3 flex flex-col gap-1.5">
-        {balance.lanes.map((l) => {
-          const lean = leanWord(l.side);
-          return (
-            <button
-              key={l.lane}
-              type="button"
-              aria-haspopup="dialog"
-              aria-expanded={openLane === l.lane}
-              onClick={(e) => {
-                lastTriggerRef.current = e.currentTarget;
-                setOpenLane(l.lane);
-              }}
-              className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2.5 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-[var(--color-currena-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-gold)]"
-            >
-              <span className="type-label font-bold text-[var(--color-text-primary)]">{LANE_CONTENT[l.lane].label[lan(locale)]}</span>
-              <span className="flex shrink-0 items-center gap-1.5">
-                <span className="type-caption font-extrabold" style={{ color: lean.ink }}>
-                  {lean.word}
-                </span>
-                <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)] rtl:rotate-180" aria-hidden="true" />
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      <p className="m-0 mt-2 type-caption text-[var(--color-text-tertiary)]">{t.seats.tapHint}</p>
-
-      {/* the reasons modal — the lane's own voters, leans and evidence */}
-      <Dialog
-        open={openLane !== null}
-        onOpenChange={(o) => {
-          if (!o) {
-            setOpenLane(null);
-            const trigger = lastTriggerRef.current;
-            window.setTimeout(() => trigger?.focus(), 0);
-          }
-        }}
-      >
-        {opened !== null ? (
-          <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[480px]">
-            <DialogHeader className="text-start">
-              <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">
-                {LANE_CONTENT[opened.lane].label[lan(locale)]}
-              </DialogTitle>
-              <DialogDescription className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-                {LANE_CONTENT[opened.lane].intro[lan(locale)]}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex max-h-[62vh] flex-col gap-0.5 overflow-y-auto scroll-slim">
-              {opened.members.map((m) => {
-                const ink = STATE_INK[m.state];
-                const evidenceWord =
-                  m.evidence === "rising"
-                    ? t.seats.evidenceRising
-                    : m.evidence === "falling"
-                      ? t.seats.evidenceFalling
-                      : m.evidence === "high"
-                        ? t.seats.evidenceHigh
-                        : m.evidence === "low"
-                          ? t.seats.evidenceLow
-                          : null;
-                const why = !m.whyUnread
-                  ? null
-                  : m.whyUnread === "upstream-stopped"
-                    ? t.seats.whyUpstreamStopped
-                    : m.whyUnread === "upstream-gap"
-                      ? t.seats.whyUpstreamGap
-                      : m.whyUnread === "pipeline-lag"
-                        ? t.seats.whyPipelineLag
-                        : t.seats.whyRuleDriven;
-                return (
-                  <li key={m.id} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-md px-2 py-1 list-none">
-                    <span className="w-[1.1rem] shrink-0 text-center text-[11px] font-bold" style={{ color: ink.chip }} aria-hidden="true">
-                      {ink.glyph}
-                    </span>
-                    <span className="type-caption font-semibold text-[var(--color-text-primary)]">
-                      {VOTER_NAMES[m.id][lan(locale)]}
-                    </span>
-                    {evidenceWord ? <span className="type-caption italic text-[var(--color-text-tertiary)]">({evidenceWord})</span> : null}
-                    <span className="ms-auto type-caption font-bold" style={{ color: ink.ink }}>
-                      {m.state === "supports" ? t.seats.seatSupports : m.state === "pressures" ? t.seats.seatPressures : m.state === "steady" ? t.seats.seatSteady : t.seats.seatUnread}
-                    </span>
-                    {why ? <span className="w-full ps-[1.6rem] type-caption text-[var(--color-text-tertiary)]">— {why}</span> : null}
-                  </li>
-                );
-              })}
             </div>
           </DialogContent>
         ) : null}
@@ -1132,17 +999,23 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
       <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.bridge.title}</h3>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.bridge.subtitle}</p>
 
-      <div className="mt-3 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3">
-        {steps.map((s, i) => (
-          <div key={i} className="flex items-center gap-2.5">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold text-white" style={{ background: "var(--color-bridge-accent)" }}>
-              {locale === "en" ? i + 1 : ["۱", "۲", "۳", "۴", "۵"][i]}
-            </span>
-            <span className="type-caption font-semibold text-[var(--color-text-primary)]">{s}</span>
-            {i < steps.length - 1 ? null : null}
-          </div>
-        ))}
-      </div>
+      {/* the parity ladder — collapsed by default (the board's own numbers
+          name the formula at point of use); one tap opens the five steps */}
+      <details className="mt-3 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3">
+        <summary className="cursor-pointer type-caption font-bold text-[var(--color-bridge-accent)]">
+          {locale === "en" ? "How the Tehran price is built · the 5 steps" : "قیمت تهران چگونه ساخته می‌شود؟ · ۵ گام"}
+        </summary>
+        <div className="mt-2 flex flex-col gap-1.5">
+          {steps.map((s, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold text-white" style={{ background: "var(--color-bridge-accent)" }}>
+                {locale === "en" ? i + 1 : ["۱", "۲", "۳", "۴", "۵"][i]}
+              </span>
+              <span className="type-caption font-semibold text-[var(--color-text-primary)]">{s}</span>
+            </div>
+          ))}
+        </div>
+      </details>
 
       {/* the live Tehran board — every instrument's market price beside its computed حباب premium */}
       <BridgeBoard rates={rates} t={t.bridge} fmt={fmt} locale={locale} />
@@ -1383,9 +1256,6 @@ export default function GoldPage() {
             {/* the comparison — gold against the real yield, silver, Bitcoin and the S&P */}
             <CompareBand t={t.compare} locale={locale} fmt={fmt} />
 
-            {/* the 37 seats */}
-            <SeatsBand t={t} fmt={fmt} locale={locale} balance={balance} />
-
             {/* the reference levels — the previous page's Zone H (the 200-day average etc.) */}
             {ta.data ? <TaBand data={ta.data} t={t.ta} fmt={fmt} locale={locale} /> : null}
 
@@ -1414,14 +1284,23 @@ export default function GoldPage() {
             {/* the history tail */}
             <HistoryBand data={data} t={t} fmt={fmt} locale={locale} />
 
-            {/* the if-you'd-bought calculator — the previous page's Zone O card (gold vs S&P vs BTC vs silver, lump + DCA + decile) */}
-            <IfBoughtBand data={ifbought.data ?? null} t={t.ifBought} fmt={fmt} locale={locale} />
+            {/* the calculator — ONE tool at the page's foot: the what-if
+                windows, the wealth calculator, the assets head-to-head,
+                and any past day's meter behind a tap */}
+            <CalculatorBand
+              tm={t.timeMachine}
+              ib={t.ifBought}
+              calc={t.calculator}
+              locale={locale}
+              windowNames={t.price.windowNames}
+              verdictWords={{ verdictFor: t.balance.verdictFor, verdictAgainst: t.balance.verdictAgainst, verdictBalanced: t.balance.verdictBalanced, verdictNone: t.balance.verdictNoneWord }}
+              laneWord={t.balance.laneWord}
+              fmt={fmt}
+              data={ifbought.data ?? null}
+            />
 
             {/* the relationship map — the previous page's relationship explorer, list-first */}
             <RelationshipsBand t={t.relationships} locale={locale} />
-
-            {/* the time machine — at the page's foot: the what-if table, the wealth calculator, and any past day's meter on tap */}
-            <TimeMachineBand t={t.timeMachine} locale={locale} windowNames={t.price.windowNames} verdictWords={{ verdictFor: t.balance.verdictFor, verdictAgainst: t.balance.verdictAgainst, verdictBalanced: t.balance.verdictBalanced, verdictNone: t.balance.verdictNoneWord }} laneWord={t.balance.laneWord} fmt={fmt} />
 
             {/* the plumbing — the London vault and clearing, collapsed, at the page's foot */}
             {lbma.data ? <VaultBand data={lbma.data} t={t.vault} fmt={fmt} locale={locale} /> : null}

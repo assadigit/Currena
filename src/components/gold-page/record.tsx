@@ -784,6 +784,10 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
             <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.scaleLong}</span>
           </div>
           <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.verdictNote}</p>
+          {/* the reconciliation — the briefing counts positioning as
+              pressure while this band reads LONG: the note says why both
+              are true at once (the risk is the crowding, not the side) */}
+          <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.crowdingNote}</p>
         </div>
       ) : null}
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">

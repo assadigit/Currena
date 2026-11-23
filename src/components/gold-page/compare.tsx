@@ -31,7 +31,9 @@ type CmpT = {
   title: string;
   subtitle: string;
   windowLabel: string;
-  ranges: Record<"1Y" | "3Y" | "5Y", string>;
+  ranges: Record<"3M" | "6M" | "1Y" | "3Y" | "5Y", string>;
+  bestLine: string;
+  worstLine: string;
   assets: { gold: string; silver: string; btc: string; spx: string; realYield: string };
   toggleLabel: string;
   tableTitle: string;
@@ -54,8 +56,13 @@ const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }>
   { id: "spx", color: "var(--color-chip-ink-context)" },
 ];
 
-type WindowKey = "1Y" | "3Y" | "5Y";
-const WINDOW_YEARS: Record<WindowKey, number> = { "1Y": 1, "3Y": 3, "5Y": 5 };
+type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y";
+/* the window's own span, in months — 3 and 6 ride alongside the years */
+const WINDOW_MONTHS: Record<WindowKey, number> = { "3M": 3, "6M": 6, "1Y": 12, "3Y": 36, "5Y": 60 };
+/** The cutoff instant `months` back from the series' own last point. */
+function cutoffOf(lastDate: string, w: WindowKey): number {
+  return Date.parse(`${lastDate}T00:00:00Z`) - (WINDOW_MONTHS[w] * 365.25 / 12) * 86_400_000;
+}
 
 async function fetchCompareApi(): Promise<ComparePayload> {
   const res = await fetch(`${deskBasePath}/api/gold/compare`, { cache: "no-store" });
@@ -63,9 +70,9 @@ async function fetchCompareApi(): Promise<ComparePayload> {
   return res.json() as Promise<ComparePayload>;
 }
 
-/** Index a series to 100 at its start, sliced to the last `years` years. */
-function indexTo100(points: ReadonlyArray<{ d: string; v: number }>, years: number): Array<{ d: string; v: number }> | null {
-  const cutoff = Date.parse(`${points[points.length - 1]!.d}T00:00:00Z`) - years * 365.25 * 86_400_000;
+/** Index a series to 100 at its start, sliced to the window's own span. */
+function indexTo100(points: ReadonlyArray<{ d: string; v: number }>, w: WindowKey): Array<{ d: string; v: number }> | null {
+  const cutoff = cutoffOf(points[points.length - 1]!.d, w);
   const slice = points.filter((p) => Date.parse(`${p.d}T00:00:00Z`) >= cutoff);
   if (slice.length < 2) return null;
   const base = slice[0]!.v;
@@ -104,7 +111,7 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
       const leg = data.legs.find((l) => l.id === line.id);
       if (leg === undefined) continue;
       if (line.id === "realYield") {
-        const cutoff = Date.parse(`${leg.points[leg.points.length - 1]!.d}T00:00:00Z`) - WINDOW_YEARS[window] * 365.25 * 86_400_000;
+        const cutoff = cutoffOf(leg.points[leg.points.length - 1]!.d, window);
         const slice = leg.points.filter((p) => Date.parse(`${p.d}T00:00:00Z`) >= cutoff);
         if (slice.length < 2) continue;
         out.push({
@@ -118,7 +125,7 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
         });
         continue;
       }
-      const indexed = indexTo100(leg.points, WINDOW_YEARS[window]);
+      const indexed = indexTo100(leg.points, window);
       if (indexed === null) continue;
       out.push({ label: t.assets[line.id], color: line.color, points: indexed, dashed: line.dashed, lineWidth: 2.8 });
     }
@@ -132,7 +139,7 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
     return LINE_ORDER.map((line) => {
       const leg = data.legs.find((l) => l.id === line.id);
       if (leg === undefined) return null;
-      const cutoff = Date.parse(`${leg.points[leg.points.length - 1]!.d}T00:00:00Z`) - WINDOW_YEARS[window] * 365.25 * 86_400_000;
+      const cutoff = cutoffOf(leg.points[leg.points.length - 1]!.d, window);
       const slice = leg.points.filter((p) => Date.parse(`${p.d}T00:00:00Z`) >= cutoff);
       if (slice.length < 2) return null;
       if (line.id === "realYield") {
@@ -144,12 +151,15 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
     }).filter((r) => r !== null) as Array<{ line: (typeof LINE_ORDER)[number]; name: string; pct: number | null; start: number; end: number; deltaPp: number | null }>;
   }, [data, window, t.assets]);
   /* the window's best and the worst (the assets' own % change; the real
-     yield is a rate and never joins the contest) */
+     yield is a rate and never joins the contest) — named, with the
+     number, for the one-line summary above the scorecard */
   const extremes = React.useMemo(() => {
     const ranked = rows.filter((r) => r.pct !== null && r.line.id !== "realYield");
-    if (ranked.length < 2) return { best: null as string | null, worst: null as string | null };
+    if (ranked.length < 2) return { best: null as string | null, worst: null as string | null, bestId: null as string | null, worstId: null as string | null, bestPct: null as number | null, worstPct: null as number | null };
     const sorted = [...ranked].sort((a, b) => (a.pct ?? 0) - (b.pct ?? 0));
-    return { best: sorted[sorted.length - 1]!.line.id, worst: sorted[0]!.line.id };
+    const best = sorted[sorted.length - 1]!;
+    const worst = sorted[0]!;
+    return { best: best.name, worst: worst.name, bestId: best.line.id, worstId: worst.line.id, bestPct: best.pct, worstPct: worst.pct };
   }, [rows]);
 
   return (
@@ -160,7 +170,7 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
 
       {/* the window chips + the line toggles */}
       <div className="mt-3 flex flex-wrap items-center gap-1.5" role="group" aria-label={t.windowLabel}>
-        {(Object.keys(WINDOW_YEARS) as WindowKey[]).map((key) => (
+        {(Object.keys(WINDOW_MONTHS) as WindowKey[]).map((key) => (
           <button
             key={key}
             type="button"
@@ -227,6 +237,18 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
           {rows.length > 0 ? (
             <div className="mt-3">
               <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.tableTitle}</h4>
+              {/* THE one-line summary — the window's own best and worst,
+                  named, in green and red */}
+              {extremes.best !== null && extremes.worst !== null && extremes.bestPct !== null && extremes.worstPct !== null ? (
+                <p className="m-0 mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 type-caption font-bold">
+                  <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-return-up)]/12 px-2.5 py-1 text-[var(--color-return-up)]">
+                    {t.bestLine.replace("{name}", extremes.best).replace("{pct}", fmt.pct(extremes.bestPct, 1))}
+                  </span>
+                  <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-return-down)]/12 px-2.5 py-1 text-[var(--color-return-down)]">
+                    {t.worstLine.replace("{name}", extremes.worst).replace("{pct}", fmt.pct(extremes.worstPct, 1))}
+                  </span>
+                </p>
+              ) : null}
               <div className="mt-1.5 min-w-0 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
                 <table className="m-0 w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption">
                   <thead>
@@ -245,8 +267,8 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
                         isYield ? `${fmt.num(v, 2)}%` : money ? `$${fmt.num(v, 2)}` : fmt.num(v, 2);
                       /* the window's own extremes — the best and the worst
                          highlighted with their own backgrounds */
-                      const isBest = extremes.best === row.line.id;
-                      const isWorst = extremes.worst === row.line.id;
+                      const isBest = extremes.bestId === row.line.id;
+                      const isWorst = extremes.worstId === row.line.id;
                       return (
                         <tr
                           key={row.line.id}

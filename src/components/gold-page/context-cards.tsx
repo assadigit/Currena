@@ -210,7 +210,6 @@ type CcT = {
 type GridT = {
   title: string;
   subtitle: string;
-  formula: string;
   tomanName: string;
   tomanMillion: string;
   tomanNote: string;
@@ -475,7 +474,7 @@ export function CurrencyGridCard({
             </div>
           ) : null}
           <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
-            {t.formula} {t.basisNote.replace("{window}", `${fmt.num(rows?.[0]?.stats?.basis?.points ?? 0, 0)} ${locale === "en" ? "points" : "نقطه"}`)}
+            {t.basisNote.replace("{window}", `${fmt.num(rows?.[0]?.stats?.basis?.points ?? 0, 0)} ${locale === "en" ? "points" : "نقطه"}`)}
           </p>
         </div>
       ) : null}

@@ -332,14 +332,19 @@ const KIND_TO_LOCAL_ID: Record<string, string> = {
 
 /** The jurisdiction a merged entry rides (flag + country name). */
 const KIND_JURISDICTION: Record<string, { country: string; flagCode: string }> = {
-  abs: { country: "AU", flagCode: "AUS" },
-  rba: { country: "AU", flagCode: "AUS" },
   fed: { country: "US", flagCode: "USA" },
   us: { country: "US", flagCode: "USA" },
   ecb: { country: "EU", flagCode: "EURO" },
   boe: { country: "GB", flagCode: "GBR" },
   boj: { country: "JP", flagCode: "JPN" },
 };
+
+/* Domestic-only releases (ABS prints, RBA board minutes and the rest
+   of the Australian schedule) never join the global gold calendar: they
+   move the Aussie dollar's own home crowd, not the ounce. */
+const DOMESTIC_ONLY_KINDS: ReadonlyArray<string> = ["abs", "rba"];
+const isDomesticOnly = (kind: string): boolean =>
+  DOMESTIC_ONLY_KINDS.some((k) => kind === k || kind.startsWith(`${k}-`));
 
 /* ------------------------------------------------------------------ *
  * The band
@@ -368,6 +373,9 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
     const out = [...local];
     for (const c of extra) {
       if (typeof c.date !== "string" || !c.date) continue;
+      // domestic-only releases (the Australian home crowd) never ride the
+      // global gold calendar — irrelevant to the ounce
+      if (isDomesticOnly(c.kind ?? "")) continue;
       // dedupe against the locally computed schedule (same date + same event)
       const localId = KIND_TO_LOCAL_ID[c.kind ?? ""];
       if (localId !== undefined && out.some((e) => e.date === c.date && e.def.id === localId)) continue;

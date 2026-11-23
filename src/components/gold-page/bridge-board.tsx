@@ -107,8 +107,21 @@ export function BridgeBoard({
 
   return (
     <div className="mt-3 flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3 ring-1 ring-[var(--color-bridge-accent)]/30">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h4 className="m-0 type-label font-bold text-[var(--color-bridge-accent)]">{t.boardTitle}</h4>
+      {/* the board's own header — the Emami-style gold coin beside the
+          live title, the Tehran market's own emblem */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <span className="flex items-center gap-2">
+          <img
+            src={`${deskBasePath}/emami-coin.png`}
+            alt=""
+            width={30}
+            height={30}
+            className="h-[30px] w-[30px] shrink-0 rounded-full object-cover ring-1 ring-[var(--color-bridge-accent)]/40"
+            loading="lazy"
+            decoding="async"
+          />
+          <h4 className="m-0 type-label font-bold text-[var(--color-bridge-accent)]">{t.boardTitle}</h4>
+        </span>
         {snapshotTime !== null ? (
           <span className="type-caption text-[var(--color-text-tertiary)]">{t.boardSnapshotNote.replace("{time}", snapshotTime)}</span>
         ) : null}

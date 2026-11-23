@@ -499,10 +499,15 @@ export function LaneBar({ lane, reading, locale, fmt }: { lane: (typeof LANES)[n
 const DEG_OF_NET: Record<number, number> = { 0: 0, 1: 5, 2: 9, 3: 12, 4: 14, 5: 16 };
 
 /**
- * The assay-office drawing: tapered beam on a brass column, bowl pans
- * hung plumb, one segmented-rim disc weight per lane, the not-leaning
- * tray below. The beam settles to the tilt over 650 ms (guarded by
- * prefers-reduced-motion).
+ * The assay-office drawing, drawn honestly: a tapered brass beam on a
+ * column, each pan hung PLUMB from its own beam end by a full hanger
+ * line, the pans carrying their force names INSIDE the bowl, and the
+ * not-leaning tray below. The whole pan assembly is drawn at its REST
+ * position and then translated by exactly its beam end's displacement
+ * (CSS-transitioned over 650 ms, guarded by prefers-reduced-motion), so
+ * the hanger's top stays GLUED to the beam end, the bowl stays plumb,
+ * and nothing ever escapes the viewBox — a real balance: the pan
+ * holding more items sinks, the other rises.
  */
 export function BrassBalance({
   readings,
@@ -530,12 +535,15 @@ export function BrassBalance({
      is heavier, so the against pan on the right must go DOWN) */
   const tilt = (DEG_OF_NET[Math.abs(net)] ?? 10) * (net > 0 ? -1 : net < 0 ? 1 : 0);
 
+  /* the stage's own frame — everything fits inside, even at full tilt */
   const W = 380;
-  const H = 230;
+  const H = 248;
   const pivotX = 190;
   const pivotY = 54;
-  const arm = 118; // half-beam length
-  const hang = 58; // hanger length
+  const arm = 116; // half-beam length
+  const hang = 52; // hanger length (beam end → bowl rim)
+  const panW = 132;
+  const panH = 84;
 
   const [settled, setSettled] = React.useState(false);
   React.useEffect(() => {
@@ -544,58 +552,79 @@ export function BrassBalance({
   }, []);
 
   const rad = (settled ? tilt : 0) * (Math.PI / 180);
-  /* the beam's true ends under the tilt: the right end sinks by
-     arm·sin(rad), the left end rises by the same (opposite signs) */
-  const endL = { x: pivotX - arm * Math.cos(rad), y: pivotY - arm * Math.sin(rad) };
-  const endR = { x: pivotX + arm * Math.cos(rad), y: pivotY + arm * Math.sin(rad) };
-  const panW = 128;
-  const panH = 84;
-  const panL = { x: endL.x, y: endL.y + hang + panH / 2 - 6 };
-  const panR = { x: endR.x, y: endR.y + hang + panH / 2 - 6 };
+
+  /* each beam end's REST position (level beam) and its FINAL position
+     under the tilt — the pan assemblies ride the displacement */
+  const restL = { x: pivotX - arm, y: pivotY };
+  const restR = { x: pivotX + arm, y: pivotY };
+  const finL = { x: pivotX - arm * Math.cos(rad), y: pivotY - arm * Math.sin(rad) };
+  const finR = { x: pivotX + arm * Math.cos(rad), y: pivotY + arm * Math.sin(rad) };
 
   const beamStyle: React.CSSProperties = {
     transform: `rotate(${settled ? tilt : 0}deg)`,
     transformOrigin: `${pivotX}px ${pivotY}px`,
     transition: "transform 650ms cubic-bezier(0.23,1,0.32,1)",
   };
-  const panStyle = (pan: { x: number; y: number }): React.CSSProperties => ({
-    transform: `translateY(${settled ? pan.y - (pivotY + hang + panH / 2 - 6) : 0}px)`,
+  /* the pan assembly's own ride — EXACTLY the beam end's displacement,
+     so the hanger's top stays glued to the beam end (no detached lines,
+     no double transforms) and the bowl stays plumb beneath it */
+  const panStyle = (rest: { x: number; y: number }, fin: { x: number; y: number }): React.CSSProperties => ({
+    transform: `translate(${settled ? fin.x - rest.x : 0}px, ${settled ? fin.y - rest.y : 0}px)`,
     transition: "transform 650ms cubic-bezier(0.23,1,0.32,1)",
   });
 
-  /* the pans' own payload — the summarized force NAMES, never numbers:
-   * each pan lists the lane names it holds (small type, offset down a
-   * little so every name sits INSIDE the pan's bowl, never spilling) */
-  const panNames = (cx: number, cy: number, lanes: readonly LaneReading[], tone: "for" | "against") => (
-    <g>
-      {lanes.map((l, i) => (
-        <text
-          key={l.lane}
-          x={cx}
-          y={cy - panH / 2 + 18 + i * 11.5}
-          textAnchor="middle"
-          fontSize={9}
-          fontWeight={700}
-          fill={tone === "for" ? "var(--color-chip-ink-normal)" : "var(--color-chip-ink-attention)"}
-        >
-          {LANE_CONTENT[l.lane].short[locale === "en" ? 0 : 1]}
+  /* one pan assembly, drawn at its REST coordinates (cx, restY = the
+   * beam end's own column): the pan hangs from the beam end by TWO
+   * suspension lines (the classic V), the bowl carries its own side
+   * label as the bold first line INSIDE it, and the force names follow
+   * beneath — every name inside the bowl, never spilling past its walls */
+  const panAssembly = (
+    rest: { x: number; y: number },
+    fin: { x: number; y: number },
+    lanes: readonly LaneReading[],
+    tone: "for" | "against",
+    sideLabel: string,
+  ) => {
+    const cx = rest.x;
+    const topY = rest.y + hang; // the bowl's rim line
+    const botY = topY + panH;
+    return (
+      <g style={panStyle(rest, fin)}>
+        {/* the suspension — two lines from the beam end fanning to the
+            bowl's two rim corners (the classic V hanger, always full) */}
+        <line x1={cx} y1={rest.y} x2={cx - panW / 2 + 12} y2={topY} stroke="var(--bal-brass-lo)" strokeWidth={1.4} />
+        <line x1={cx} y1={rest.y} x2={cx + panW / 2 - 12} y2={topY} stroke="var(--bal-brass-lo)" strokeWidth={1.4} />
+        {/* the bowl */}
+        <path
+          d={`M${cx - panW / 2},${topY} L${cx + panW / 2},${topY} L${cx + panW / 2 - 14},${botY} Q${cx},${botY + 12} ${cx - panW / 2 + 14},${botY} Z`}
+          fill={tone === "for" ? "color-mix(in srgb, var(--color-status-normal) 8%, transparent)" : "color-mix(in srgb, var(--color-status-alert) 8%, transparent)"}
+          stroke={tone === "for" ? "var(--color-status-normal)" : "var(--color-status-alert)"}
+          strokeWidth={1.2}
+          opacity={0.95}
+        />
+        <rect x={cx - panW / 2 + 8} y={botY + 1} width={panW - 16} height={5} rx={2.5} fill="var(--bal-brass-mid)" />
+        {/* the pan's own side label — the bold first line INSIDE the bowl */}
+        <text x={cx} y={topY + 15} textAnchor="middle" fontSize={10.5} fontWeight={800} fill={tone === "for" ? "var(--color-chip-ink-normal)" : "var(--color-chip-ink-attention)"}>
+          {sideLabel}
         </text>
-      ))}
-    </g>
-  );
-
-  const panBowl = (cx: number, cy: number, tone: "for" | "against") => (
-    <g>
-      <path
-        d={`M${cx - panW / 2},${cy - panH / 2 + 8} L${cx + panW / 2},${cy - panH / 2 + 8} L${cx + panW / 2 - 14},${cy + panH / 2} Q${cx},${cy + panH / 2 + 12} ${cx - panW / 2 + 14},${cy + panH / 2} Z`}
-        fill={tone === "for" ? "color-mix(in srgb, var(--color-status-normal) 8%, transparent)" : "color-mix(in srgb, var(--color-status-alert) 8%, transparent)"}
-        stroke={tone === "for" ? "var(--color-status-normal)" : "var(--color-status-alert)"}
-        strokeWidth={1.2}
-        opacity={0.95}
-      />
-      <rect x={cx - panW / 2 + 8} y={cy + panH / 2 + 1} width={panW - 16} height={5} rx={2.5} fill="var(--bal-brass-mid)" />
-    </g>
-  );
+        {/* the summarized force NAMES — small type, every name INSIDE
+            the bowl beneath the label, never spilling past its walls */}
+        {lanes.map((l, i) => (
+          <text
+            key={l.lane}
+            x={cx}
+            y={topY + 30 + i * 11}
+            textAnchor="middle"
+            fontSize={9}
+            fontWeight={700}
+            fill={tone === "for" ? "var(--color-chip-ink-normal)" : "var(--color-chip-ink-attention)"}
+          >
+            {LANE_CONTENT[l.lane].short[locale === "en" ? 0 : 1]}
+          </text>
+        ))}
+      </g>
+    );
+  };
 
   const ariaSummary =
     locale === "en"
@@ -612,10 +641,6 @@ export function BrassBalance({
             <stop offset="0.5" stopColor="var(--bal-brass-hi)" />
             <stop offset="1" stopColor="var(--bal-brass-lo)" />
           </linearGradient>
-          <linearGradient id="balDiscFace" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="var(--bal-brass-hi)" />
-            <stop offset="1" stopColor="var(--bal-brass-mid)" />
-          </linearGradient>
           <linearGradient id="balColumnFace" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0" stopColor="var(--bal-brass-lo)" />
             <stop offset="0.45" stopColor="var(--bal-brass-hi)" />
@@ -624,42 +649,34 @@ export function BrassBalance({
         </defs>
 
         {/* the column + base */}
-        <rect x={pivotX - 5} y={pivotY} width={10} height={H - pivotY - 26} fill="url(#balColumnFace)" />
-        <path d={`M${pivotX - 30},${H - 14} L${pivotX + 30},${H - 14} L${pivotX + 20},${H - 26} L${pivotX - 20},${H - 26} Z`} fill="url(#balBeamFace)" />
+        <rect x={pivotX - 5} y={pivotY} width={10} height={H - 26 - pivotY} fill="url(#balColumnFace)" />
+        <path d={`M${pivotX - 30},${H - 8} L${pivotX + 30},${H - 8} L${pivotX + 20},${H - 22} L${pivotX - 20},${H - 22} Z`} fill="url(#balBeamFace)" />
 
-        {/* the dial under the pivot */}
-        <path d={`M${pivotX - 26},${pivotY + 16} A26,26 0 0 1 ${pivotX + 26},${pivotY + 16}`} fill="none" stroke="var(--bal-stone-lo)" strokeWidth={1} />
+        {/* the dial under the pivot — a proper arc with radiating ticks */}
+        <path d={`M${pivotX - 24},${pivotY + 2} A24,24 0 0 0 ${pivotX + 24},${pivotY + 2}`} fill="none" stroke="var(--bal-stone-lo)" strokeWidth={1} />
         {Array.from({ length: 9 }).map((_, i) => {
           const a = (-80 + i * 20) * (Math.PI / 180);
-          const x1 = pivotX + Math.sin(a) * 22;
-          const y1 = pivotY + 22 - Math.cos(a) * 0; // arc under pivot
-          const x2 = pivotX + Math.sin(a) * 26;
-          const y2 = pivotY + 26;
-          return <line key={i} x1={x1} y1={y1 + 4} x2={x2} y2={y2} stroke="var(--bal-stone-lo)" strokeWidth={1} />;
+          const x1 = pivotX + Math.sin(a) * 19;
+          const y1 = pivotY + 2 + Math.cos(a) * 19;
+          const x2 = pivotX + Math.sin(a) * 24;
+          const y2 = pivotY + 2 + Math.cos(a) * 24;
+          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--bal-stone-lo)" strokeWidth={1} />;
         })}
 
-        {/* the beam (animated to the tilt) */}
+        {/* the pans, hung plumb — each assembly rides its beam end */}
+        {panAssembly(restL, finL, forLanes, "for", sideLabels.noneFor)}
+        {panAssembly(restR, finR, againstLanes, "against", sideLabels.noneAgainst)}
+
+        {/* the beam (animated to the tilt), its pointer riding it —
+            drawn LAST so it rides over the pans' hangers at the pivot */}
         <g style={beamStyle}>
           <path d={`M${pivotX - arm},${pivotY - 4} L${pivotX + arm},${pivotY - 3} L${pivotX + arm},${pivotY + 4} L${pivotX - arm},${pivotY + 6} Z`} fill="url(#balBeamFace)" />
+          {/* the pointer — swings against the dial with the tilt */}
+          <path d={`M${pivotX - 2.2},${pivotY + 8} L${pivotX + 2.2},${pivotY + 8} L${pivotX},${pivotY + 22} Z`} fill="var(--bal-brass-lo)" />
           <circle cx={pivotX} cy={pivotY} r={7} fill="var(--bal-brass-mid)" stroke="var(--bal-brass-lo)" strokeWidth={1.5} />
-        </g>
-
-        {/* the pans, hung plumb */}
-        <g style={panStyle(panL)}>
-          <line x1={endL.x} y1={endL.y} x2={panL.x} y2={panL.y - panH / 2 + 8} stroke="var(--bal-brass-lo)" strokeWidth={1} />
-          {panBowl(panL.x, panL.y, "for")}
-          {panNames(panL.x, panL.y, forLanes, "for")}
-          <text x={panL.x} y={panL.y - panH / 2 - 4} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-chip-ink-normal)">
-            {sideLabels.noneFor}
-          </text>
-        </g>
-        <g style={panStyle(panR)}>
-          <line x1={endR.x} y1={endR.y} x2={panR.x} y2={panR.y - panH / 2 + 8} stroke="var(--bal-brass-lo)" strokeWidth={1} />
-          {panBowl(panR.x, panR.y, "against")}
-          {panNames(panR.x, panR.y, againstLanes, "against")}
-          <text x={panR.x} y={panR.y - panH / 2 - 4} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-chip-ink-attention)">
-            {sideLabels.noneAgainst}
-          </text>
+          {/* the beam's own end caps — the hanger's hang points */}
+          <circle cx={pivotX - arm} cy={pivotY} r={3} fill="var(--bal-brass-hi)" stroke="var(--bal-brass-lo)" strokeWidth={1} />
+          <circle cx={pivotX + arm} cy={pivotY} r={3} fill="var(--bal-brass-hi)" stroke="var(--bal-brass-lo)" strokeWidth={1} />
         </g>
       </svg>
 

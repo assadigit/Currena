@@ -268,7 +268,9 @@ export const UI = {
       subtitle:
         "The 10-year real yield, silver, Bitcoin and the S&P 500, each indexed to 100 at the window's start, with gold itself for reference. What holding each would have done, in one line each.",
       windowLabel: "Window",
-      ranges: { "1Y": "1 year", "3Y": "3 years", "5Y": "5 years" },
+      ranges: { "3M": "3 months", "6M": "6 months", "1Y": "1 year", "3Y": "3 years", "5Y": "5 years" },
+      bestLine: "Best gain: {name} {pct}",
+      worstLine: "lowest gain: {name} {pct}",
       assets: { gold: "Gold", silver: "Silver", btc: "Bitcoin", spx: "S&P 500", realYield: "10y real yield" },
       realYieldNote:
         "The real yield is a rate, not an asset, its line reads direction (indexed like the assets so one chart holds them all); the tooltip and the legend carry its actual % level.",
@@ -506,6 +508,8 @@ export const UI = {
       verdictShort: "SHORT · net short",
       verdictNeutral: "NO LEAN, in the middle",
       verdictNote: "The speculators' book, read short-to-long: today's side is marked on the scale.",
+      crowdingNote:
+        "Why the briefing counts positioning as pressure: speculators are long — the crowd's normal side in gold — but longs this crowded are the fragile configuration; the risk is the unwind, not the direction.",
       scaleShort: "Short",
       scaleLong: "Long",
       unavailable: "The positioning data could not be read yet.",
@@ -565,8 +569,6 @@ export const UI = {
       tomanName: "Iranian toman",
       tomanMillion: "M toman",
       tomanNote: "The toman row: the live free-market dollar (Tehran) × the global ounce.",
-      formula:
-        "EUR and AUD are the provider's own XAU crosses; JPY, GBP and CNY derive exactly as XAUUSD × USDJPY, XAUUSD ÷ GBPUSD and XAUUSD × USDCNY (EODHD daily closes).",
       basisNote: "The position is each cross's own stored window ({window} today), it widens as the stored series does.",
       positionLine: "{band} of its stored window",
       bandTop: "top {p}%",
@@ -615,6 +617,13 @@ export const UI = {
       calcProfit: "gain",
       calcLoss: "loss",
       calcUncovered: "The window could not be read yet.",
+    },
+    calculator: {
+      eyebrow: "The calculator",
+      title: "The gold calculator",
+      subtitle:
+        "Every what-if in one place: each window's return, the wealth calculator, the assets head-to-head — and any past day's meter behind a tap.",
+      advancedLabel: "Open the time machine · any past day",
     },
     forecastRetro: {
       title: "Gold forecasts vs reality",
@@ -757,7 +766,9 @@ export const UI = {
       title: "طلا در برابر جایگزین‌ها",
       subtitle: "بازده واقعی ۱۰ساله، نقره، بیت‌کوین و S&P 500؛ هر یک شاخص‌گذاری‌شده به ۱۰۰ در آغاز پنجره، با خودِ طلا برای مقایسه. نگه‌داشتن هر کدام چه کرده، هر کدام یک خط.",
       windowLabel: "پنجره",
-      ranges: { "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال" },
+      ranges: { "3M": "۳ ماه", "6M": "۶ ماه", "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال" },
+      bestLine: "بالاترین سود: {name} {pct}",
+      worstLine: "کمترین سود: {name} {pct}",
       assets: { gold: "طلا", silver: "نقره", btc: "بیت‌کوین", spx: "S&P 500", realYield: "بازده واقعی ۱۰ساله" },
       realYieldNote: "بازده واقعی «نرخ» است نه دارایی؛ خطش جهت را می‌خواند (مثل بقیه شاخص‌گذاری شده تا یک نمودار همه را نگه دارد)؛ تولتیپ و راهنما سطح واقعیِ درصدش را می‌گویند.",
       sourceNote: "منابع: اسپاتِ ذخیره‌شدهٔ میز + تاریخچهٔ کامکس (طلا) · یاهو (نقره، بیت‌کوین، S&P 500) · FRED DFII10 (بازده واقعی TIPS ۱۰ساله). قیمت پایانی روزانه، نمونه‌برداری هفتگی.",
@@ -989,6 +1000,8 @@ export const UI = {
       verdictShort: "شورت · خالص فروش",
       verdictNeutral: "بی‌تمایل · وسط راه",
       verdictNote: "دفتر سفته‌بازها از شورت تا لانگ خوانده می‌شود؛ سمتِ امروز روی خط نشانه می‌شود.",
+      crowdingNote:
+        "چرا مرور پوزیشن‌دهی را «فشار» می‌شمارد: سفته‌بازها لانگ‌اند — سمتِ همیشگیِ جمعیت در طلا — اما لانگِ این‌قدر شلوغ، پیکربندیِ شکننده است؛ ریسک، تخلیهٔ پوزیشن است، نه سمتِ آن.",
       scaleShort: "شورت",
       scaleLong: "لانگ",
       unavailable: "دادهٔ پوزیشن‌دهی هنوز خوانده نشد.",
@@ -1048,8 +1061,6 @@ export const UI = {
       tomanName: "تومان ایرانی",
       tomanMillion: "میلیون تومان",
       tomanNote: "ردیف تومان: دلار آزاد تهران × اونس جهانی، زنده.",
-      formula:
-        "یورو و دلار استرالیا کراس‌های خود ارائه‌دهنده‌اند؛ یِن، پوند و یوان دقیقاً به‌صورت XAUUSD × USDJPY و XAUUSD ÷ GBPUSD و XAUUSD × USDCNY مشتق می‌شوند (قیمت‌های پایانی روزانهٔ EODHD).",
       basisNote: "جایگاه، پنجرهٔ ذخیره‌شدهٔ خودِ هر کراس است (امروز {window}) و با رشد سری ذخیره‌شده پهن‌تر می‌شود.",
       positionLine: "{band} از پنجرهٔ ذخیره‌شده",
       bandTop: "{p}٪ بالایی",
@@ -1098,6 +1109,13 @@ export const UI = {
       calcProfit: "سود",
       calcLoss: "زیان",
       calcUncovered: "این پنجره هنوز خوانده نشد.",
+    },
+    calculator: {
+      eyebrow: "ماشین حساب",
+      title: "ماشین حساب طلا",
+      subtitle:
+        "همهٔ «اگر»ها در یک جا: بازدهی هر پنجره، ماشین‌حساب ثروت، مقایسهٔ دارایی‌ها — و مترِ هر روزِ گذشته، پشت یک لمس.",
+      advancedLabel: "باز کردن ماشین زمان · هر روزِ گذشته",
     },
     forecastRetro: {
       title: "پیش‌بینی رخدادهای طلا در مقابل واقعیت",
