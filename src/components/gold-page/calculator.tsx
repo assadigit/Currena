@@ -29,8 +29,13 @@ import { LANE_CONTENT } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta } from "@/components/gold-page/visuals";
 import {
+  CALC_UNITS,
+  calcAnswer,
   ifBoughtResult,
+  unitSeries,
   yearOptions,
+  type CalcUnit,
+  type FxPayload,
   type IfBoughtAssetSeries,
   type IfBoughtSnapshot,
 } from "@/lib/gold-page/ifbought";
@@ -40,9 +45,10 @@ const lan = (l: Locale) => (l === "en" ? 0 : 1);
 /** The meter-era bound — the wire contract's own constant. */
 const ERA_START = "2016-11-01";
 
-/* the what-if windows — 1 week / 1 month / 3 months / 6 months / 1 year /
-   5 years, the table's own rows (day and YTD never join it) */
-const IF_WINDOWS = ["7D", "30D", "3M", "6M", "1Y", "5Y"] as const;
+/* the what-if windows — 1 week / 1 month / 3 months / 6 months / since the
+   start of the Gregorian year / 1 year / 5 years, the table's own rows
+   (the day never joins it; YTD sits between 6 months and 1 year) */
+const IF_WINDOWS = ["7D", "30D", "3M", "6M", "YTD", "1Y", "5Y"] as const;
 type IfWindow = (typeof IF_WINDOWS)[number];
 
 /** The trend leg's own payload (from /api/gold/trend?range=all). */
@@ -66,6 +72,10 @@ async function fetchTrendAll(): Promise<TrendWindowPayload[]> {
 
 type TmT = {
   eraNote: string;
+  howTitle: string;
+  how1: string;
+  how2: string;
+  how3: string;
   pickLabel: string;
   loading: string;
   asOfExact: string;
@@ -101,6 +111,22 @@ type CalcT = {
   title: string;
   subtitle: string;
   advancedLabel: string;
+  modeOne: string;
+  modeDca: string;
+  modeOneNote: string;
+  modeDcaNote: string;
+  calcAssetLabel: string;
+  calcUnitLabel: string;
+  unitBasisNote: string;
+  calcSinceLabel: string;
+  calcAmountOne: string;
+  calcAmountDca: string;
+  calcInvestedWord: string;
+  calcWorthWord: string;
+  calcMonthsWord: string;
+  calcFromLine: string;
+  calcCostWord: string;
+  gramUnitWord: string;
 };
 
 /** The if-you'd-bought row's own copy (the compact subset). */
@@ -206,6 +232,37 @@ function monthText(ym: string, locale: Locale, fmt: Fmt): string {
 }
 
 /* ------------------------------------------------------------------ *
+ * The two-mode compute — the pure engine in the lib (calcAnswer):
+ * ONE lump purchase in the picked year, or the same amount every
+ * month since, over a month-end series priced in the picked unit —
+ * dollars, any of the converter's currencies (its own FX month-ends),
+ * the toman (TGJU's free-market dollar), or grams of metal.
+ * ------------------------------------------------------------------ */
+
+/** Each unit's own example default per mode (the owner's examples:
+ * $100 / $10-a-month, 1 g, 1M toman a month). */
+function unitDefault(u: CalcUnit, mode: "one" | "dca"): number {
+  if (u.kind === "gram") return 1;
+  if (u.id === "toman") return mode === "one" ? 100_000_000 : 1_000_000;
+  if (u.id === "usd") return mode === "one" ? 100 : 10;
+  return mode === "one" ? 100 : 50;
+}
+
+/** Money in one unit — the toman carries the site's own M/bn toman
+ *  convention; FA speaks the unit's word, EN its symbol. */
+function unitMoney(v: number, u: CalcUnit, locale: Locale, fmt: Fmt): string {
+  if (u.kind === "gram") return `${fmt.num(v, u.decimals)} ${u.symbol[lan(locale)]}`;
+  if (u.id === "toman") {
+    const abs = Math.abs(v);
+    if (abs >= 1e9) return `${fmt.num(v / 1e9, 1)} ${locale === "fa" ? "میلیارد تومان" : "bn toman"}`;
+    if (abs >= 1e6) return `${fmt.num(v / 1e6, 1)} ${locale === "fa" ? "میلیون تومان" : "M toman"}`;
+    return `${fmt.num(v, 0)} ${locale === "fa" ? "تومان" : "toman"}`;
+  }
+  if (locale === "fa") return `${fmt.num(v, u.decimals)} ${u.symbol[1]}`;
+  return `${u.symbol[0]}${fmt.num(v, u.decimals)}`;
+}
+
+/* ------------------------------------------------------------------ *
  * The assets head-to-head — one compact row per asset (the name, the
  * lump change, one bar, the window, the DCA line; nothing else)
  * ------------------------------------------------------------------ */
@@ -253,14 +310,15 @@ function AssetRow({
           style={{ width: `${barW}%` }}
         />
       </div>
-      {/* the window, NAMED at point of use · the DCA line, one caption row */}
-      <bdi className="type-caption text-[var(--color-text-tertiary)]">
+      {/* the window, NAMED at point of use · the DCA line, one caption row —
+          the meta stays small (the owner's own ask), a whisper, not a row */}
+      <bdi className="text-[11px] leading-snug text-[var(--color-text-tertiary)]">
         {ib.windowLine
           .replace("{from}", monthText(result.fromYm, locale, fmt))
           .replace("{to}", monthText(result.toYm, locale, fmt))
           .replace("{n}", fmt.num(result.months, 0))}
         {" · "}
-        <bdi dir="ltr" className="font-semibold tabular-nums text-[var(--color-text-secondary)]">
+        <bdi dir="ltr" className="text-[11px] font-semibold tabular-nums text-[var(--color-text-secondary)]">
           {ib.dcaLine
             .replace("{invested}", money(result.dcaInvested))
             .replace("{value}", money(result.dcaValue))
@@ -323,17 +381,66 @@ export function CalculatorBand({
     }).filter((r) => r !== null) as Array<{ window: IfWindow; startPrice: number; spot: number; chgPct: number | null }>;
   }, [trends.data]);
 
-  /* the wealth calculator — [x] dollars of gold bought since [window] */
+  /* [2] the two-mode wealth calculator — one purchase in the picked
+     year, or the same amount every month since; any of the four assets,
+     in any of the converter's units (USD, AUD, NZD… the toman) or in
+     grams of gold — the FX month-ends ride the desk's own /api/gold/fx
+     leg, fail-closed per currency */
+  const [mode, setMode] = React.useState<"one" | "dca">("one");
+  const [calcAsset, setCalcAsset] = React.useState<keyof IfBoughtSnapshot["assets"]>("gold");
+  const [unitId, setUnitId] = React.useState<string>("usd");
+  const [calcYear, setCalcYear] = React.useState<number | null>(null);
   const [amount, setAmount] = React.useState<number>(100);
-  const [since, setSince] = React.useState<IfWindow>("1Y");
-  const sinceRow = ifRows.find((r) => r.window === since) ?? null;
-  const worth = sinceRow !== null && amount > 0 ? (amount * sinceRow.spot) / sinceRow.startPrice : null;
-  const gain = worth !== null ? worth - amount : null;
+  const unit = CALC_UNITS.find((u) => u.id === unitId) ?? CALC_UNITS[0]!;
+  const unitKind: "ccy" | "gram" = unit.kind;
+  const switchMode = (m: "one" | "dca") => {
+    setMode(m);
+    setAmount(unitDefault(unit, m));
+  };
+  const switchUnit = (u: CalcUnit) => {
+    setUnitId(u.id);
+    setAmount(unitDefault(u, mode));
+  };
+  const switchAsset = (asset: keyof IfBoughtSnapshot["assets"]) => {
+    setCalcAsset(asset);
+    if (asset !== "gold" && unit.kind === "gram") {
+      // grams of S&P or Bitcoin are not a thing — back to dollars
+      const usd = CALC_UNITS[0]!;
+      setUnitId(usd.id);
+      setAmount(unitDefault(usd, mode));
+    }
+  };
+
+  /* the FX month-end leg — the converter's own currency set + the
+     toman on the site's own TGJU free-market basis */
+  const fx = useQuery({
+    queryKey: ["currena-gold-fx-monthends"],
+    queryFn: async (): Promise<FxPayload> => {
+      const res = await fetch(`${deskBasePath}/api/gold/fx`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`The fx API responded with ${res.status}`);
+      return res.json() as Promise<FxPayload>;
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+  const fxTable = fx.data?.perUsd;
+  const unitUsable = (u: CalcUnit): boolean =>
+    u.id === "usd" || u.kind === "gram" ? true : fxTable?.[u.id] !== undefined;
 
   /* the assets head-to-head — since the picked year (the honest default:
      the second-to-last year with a full window) */
   const [sinceYear, setSinceYear] = React.useState<number | null>(null);
   const years = React.useMemo(() => (data !== null ? yearOptions(data) : []), [data]);
+  const effectiveCalcYear = calcYear ?? years[0] ?? null;
+  const series = React.useMemo(() => {
+    if (data === null) return null;
+    return unitSeries(data.assets[calcAsset] as IfBoughtAssetSeries, unitId, fx.data ?? null);
+  }, [data, calcAsset, unitId, fx.data]);
+  /* the two-mode answer itself — plain arithmetic over ~121 closes,
+   * cheap enough to run every render, never memoized (the compiler's
+   * own bail-out on the derived unit kind was the honest signal) */
+  const calcResult =
+    effectiveCalcYear === null ? null : calcAnswer(series, effectiveCalcYear, amount, unitKind, mode);
   const effectiveSince = sinceYear ?? years[years.length - 2] ?? years[0] ?? null;
   const rows = React.useMemo(() => {
     if (data === null || effectiveSince === null) return [];
@@ -443,65 +550,165 @@ export function CalculatorBand({
           </table>
         </div>
 
-        {/* [2] the wealth calculator — bought [x] dollars of gold since
-            [1 week / 1 month / ...]: what it is worth now */}
-        <div className="flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
+        {/* [2] THE two-mode wealth calculator — buy once in the picked
+            year, or the same amount every month since: any of the four
+            assets, both answers in the desk's own plain words */}
+        <div className="flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
           <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{tm.calcTitle}</h4>
+
+          {/* the mode toggle — the two ways to buy */}
+          <div role="group" aria-label={locale === "en" ? "Purchase mode" : "حالت خرید"} className="flex flex-wrap gap-1.5">
+            {([["one", calc.modeOne, calc.modeOneNote], ["dca", calc.modeDca, calc.modeDcaNote]] as const).map(([m, label, note]) => (
+              <button
+                key={m}
+                type="button"
+                aria-pressed={mode === m}
+                title={note}
+                onClick={() => switchMode(m)}
+                className={`min-h-[36px] flex-1 basis-[46%] rounded-full px-3 py-1.5 text-[13px] font-extrabold transition-colors ${
+                  mode === m
+                    ? "bg-[var(--color-accent-gold)] text-[var(--color-accent-gold-ink)]"
+                    : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
+            {mode === "one" ? calc.modeOneNote : calc.modeDcaNote}
+          </p>
+
+          {/* the asset chips — gold · S&P · Bitcoin · silver */}
+          <div role="group" aria-label={calc.calcAssetLabel} className="flex flex-wrap gap-1.5">
+            {ASSET_ORDER.map((asset) => (
+              <button
+                key={asset}
+                type="button"
+                aria-pressed={calcAsset === asset}
+                onClick={() => switchAsset(asset)}
+                className={`min-h-[32px] rounded-full px-3 py-1 text-[12.5px] font-bold transition-colors ${
+                  calcAsset === asset
+                    ? "bg-[var(--color-currena-blue)] text-white"
+                    : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+                }`}
+              >
+                {ib.assets[asset as keyof IbT["assets"]]}
+              </button>
+            ))}
+          </div>
+
+          {/* the amount · the unit · the since-year — the unit is the
+              owner's own ask: dollars, any of the converter's currencies
+              (the toman included), or grams of gold */}
           <div className="flex flex-wrap items-end gap-2.5">
             <label className="flex flex-col gap-1">
-              <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{tm.calcAmountLabel}</span>
+              <span className="type-caption font-semibold text-[var(--color-text-secondary)]">
+                {mode === "one" ? calc.calcAmountOne : calc.calcAmountDca}
+              </span>
               <input
                 type="number"
                 min={0}
-                step={10}
+                step={unit.id === "toman" ? 100_000 : unit.kind === "gram" ? 0.5 : mode === "one" ? 10 : 5}
                 inputMode="decimal"
                 value={amount}
                 onChange={(e) => {
                   const v = Number(e.target.value);
                   setAmount(Number.isFinite(v) && v >= 0 ? v : 0);
                 }}
-                className="w-[7.5rem] min-h-[38px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 type-label tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
+                className="w-[9rem] min-h-[38px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 type-label tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
               />
             </label>
-            <div className="flex flex-col gap-1" role="group" aria-label={tm.colWindow}>
-              <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{tm.colWindow}</span>
-              <div className="flex flex-wrap gap-1.5">
-                {IF_WINDOWS.map((w) => (
-                  <button
-                    key={w}
-                    type="button"
-                    aria-pressed={since === w}
-                    disabled={ifRows.length > 0 && !ifRows.some((r) => r.window === w)}
-                    onClick={() => setSince(w)}
-                    className={`rounded-full px-2.5 py-1 text-[12px] font-bold transition-colors ${
-                      since === w
-                        ? "bg-[var(--color-accent-gold)] text-[var(--color-accent-gold-ink)]"
-                        : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
-                    }`}
-                  >
-                    {windowNames[w]}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          {worth !== null && gain !== null && sinceRow !== null ? (
-            <p className="m-0 text-[1.05rem] font-black leading-tight text-[var(--color-text-primary)]">
-              {tm.calcWorth}:{" "}
-              <bdi dir="ltr" className="tabular-nums">${fmt.num(worth, 0)}</bdi>{" "}
-              <span
-                className="type-label font-black"
-                style={{ color: gain >= 0 ? "var(--color-return-up)" : "var(--color-return-down)" }}
+            <label className="flex flex-col gap-1">
+              <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{calc.calcUnitLabel}</span>
+              <select
+                value={unitId}
+                onChange={(e) => {
+                  const next = CALC_UNITS.find((u) => u.id === e.currentTarget.value);
+                  if (next !== undefined) switchUnit(next);
+                }}
+                className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
+                aria-label={calc.calcUnitLabel}
               >
-                {gain >= 0 ? tm.calcProfit : tm.calcLoss}{" "}
-                <bdi dir="ltr" className="tabular-nums">
-                  {gain >= 0 ? "+" : "−"}${fmt.num(Math.abs(gain), 0)} ({gain >= 0 ? "+" : "−"}{fmt.num(Math.abs((sinceRow.spot / sinceRow.startPrice - 1) * 100), 1)}%)
-                </bdi>
-              </span>
-            </p>
-          ) : (
+                {CALC_UNITS.filter((u) => (u.kind === "gram" ? calcAsset === "gold" : true)).map((u) => (
+                  <option key={u.id} value={u.id} disabled={!unitUsable(u)}>
+                    {u.name[lan(locale)]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {data !== null && years.length > 0 ? (
+              <label className="flex flex-col gap-1">
+                <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{calc.calcSinceLabel}</span>
+                <select
+                  value={effectiveCalcYear ?? undefined}
+                  onChange={(e) => setCalcYear(Number(e.currentTarget.value))}
+                  className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold tabular-nums text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
+                  aria-label={calc.calcSinceLabel}
+                >
+                  {years.map((y) => (
+                    <option key={y} value={y}>
+                      {yearText(y, locale)}
+                      {y === years[0] ? ` (${ib.firstYearNote})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+          </div>
+          <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{calc.unitBasisNote}</p>
+
+          {/* THE answer — invested → worth today (on its own green ground
+              when it gained, red when it lost) → the plain gain/loss */}
+          {data === null ? (
+            <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{ib.waiting}</p>
+          ) : calcResult === null ? (
             <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{tm.calcUncovered}</p>
-          )}
+          ) : (() => {
+            const up = calcResult.worth >= calcResult.invested;
+            const gain = calcResult.worth - calcResult.invested;
+            const tone = up ? "var(--color-return-up)" : "var(--color-return-down)";
+            const gram = unit.kind === "gram";
+            const fromLine = calc.calcFromLine.replace("{from}", monthText(calcResult.fromYm, locale, fmt));
+            return (
+              <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
+                <p className="m-0 type-caption font-semibold text-[var(--color-text-secondary)]">
+                  {calc.calcInvestedWord}:{" "}
+                  <bdi dir={locale === "en" ? "ltr" : "rtl"} className="font-bold tabular-nums text-[var(--color-text-primary)]">
+                    {gram
+                      ? mode === "one"
+                        ? `${fmt.num(amount, 1)} ${calc.gramUnitWord} · ${calc.calcCostWord} ${fmt.usd(calcResult.invested)}`
+                        : `${fmt.num(amount, 1)} ${calc.gramUnitWord} × ${fmt.num(calcResult.months, 0)} = ${fmt.num(calcResult.grams ?? 0, 1)} ${calc.gramUnitWord} · ${calc.calcCostWord} ${fmt.usd(calcResult.invested)}`
+                      : mode === "one"
+                        ? unitMoney(amount, unit, locale, fmt)
+                        : `${unitMoney(amount, unit, locale, fmt)} × ${fmt.num(calcResult.months, 0)} = ${unitMoney(calcResult.invested, unit, locale, fmt)}`}
+                  </bdi>
+                  <span aria-hidden="true"> · </span>
+                  <span>{fromLine}</span>
+                </p>
+                <p
+                  className="m-0 inline-flex flex-wrap items-baseline gap-x-2 rounded-[var(--cr-radius-md)] px-3 py-2"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${tone} 15%, transparent)`,
+                    boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${tone} 45%, transparent)`,
+                  }}
+                >
+                  <span className="type-caption font-bold text-[var(--color-text-secondary)]">{calc.calcWorthWord}:</span>
+                  <bdi dir={locale === "en" ? "ltr" : "rtl"} className="text-[1.35rem] font-black leading-tight tabular-nums sm:text-[1.5rem]" style={{ color: tone }}>
+                    {gram
+                      ? `${fmt.num(calcResult.grams ?? 0, 1)} ${calc.gramUnitWord} ≈ ${fmt.usd(calcResult.worth)}`
+                      : unitMoney(calcResult.worth, unit, locale, fmt)}
+                  </bdi>
+                </p>
+                <p className="m-0 type-label font-black">
+                  <bdi dir={locale === "en" ? "ltr" : "rtl"} style={{ color: tone }}>
+                    {up ? tm.calcProfit : tm.calcLoss} {up ? "+" : "−"}
+                    {gram ? fmt.usd(Math.abs(gain)) : unitMoney(Math.abs(gain), unit, locale, fmt)} ({up ? "+" : "−"}{fmt.num(Math.abs(calcResult.pct), 1)}%)
+                  </bdi>
+                </p>
+              </div>
+            );
+          })()}
         </div>
 
         {/* [3] the assets head-to-head — gold vs S&P vs Bitcoin vs silver
@@ -582,6 +789,20 @@ export function CalculatorBand({
               />
             </div>
 
+            {/* the explainer — the owner's own ask: what the machine
+                actually does, three plain sentences, always visible */}
+            <div className="flex flex-col gap-1 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
+              <p className="m-0 type-label font-bold text-[var(--color-text-primary)]">{tm.howTitle}</p>
+              <ol className="m-0 flex list-none flex-col gap-1 p-0">
+                {([tm.how1, tm.how2, tm.how3] as const).map((line, i) => (
+                  <li key={i} className="flex gap-2 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+                    <span className="shrink-0 font-black text-[var(--color-accent-gold-deep)]">{fmt.num(i + 1, 0)}.</span>
+                    <bdi>{line}</bdi>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
             {query.kind === "loading" ? <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{tm.loading}</p> : null}
 
             {/* the day's own gold price — THE headline answer, big and bold */}
@@ -658,6 +879,27 @@ export function CalculatorBand({
                     {locale === "en" ? "not leaning" : "بی‌طرف"} {fmt.num(row.counts.neutral, 0)} ·{" "}
                     {locale === "en" ? "unread" : "ناخوانده"} {fmt.num(row.counts.unread, 0)}
                   </p>
+                  {(() => {
+                    /* the day's own count bar — for · against · neutral ·
+                       unread in one glance, hue paired with the words above */
+                    const total = Math.max(
+                      1,
+                      row.counts.for + row.counts.against + row.counts.neutral + row.counts.unread,
+                    );
+                    const segs = [
+                      { n: row.counts.for, cls: "bg-[var(--color-currena-success)]" },
+                      { n: row.counts.against, cls: "bg-[var(--color-status-alert)]" },
+                      { n: row.counts.neutral, cls: "bg-[var(--color-border)]" },
+                      { n: row.counts.unread, cls: "bg-[var(--color-border)]/40" },
+                    ];
+                    return (
+                      <div className="flex h-2 w-full overflow-hidden rounded-full" aria-hidden="true">
+                        {segs.map((s, i) => (
+                          <span key={i} className={s.cls} style={{ width: `${(s.n / total) * 100}%` }} />
+                        ))}
+                      </div>
+                    );
+                  })()}
                   <ul className="m-0 flex list-none flex-col gap-1 p-0">
                     {row.lanes.map((l) => {
                       const laneId = LANES_IN_ORDER.find((k) => k === l.lane) ?? null;
@@ -676,15 +918,29 @@ export function CalculatorBand({
                             ? "text-[var(--color-status-alert)]"
                             : "text-[var(--color-text-tertiary)]";
                       return (
-                        <li key={l.lane} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 type-caption">
-                          <span className="font-semibold text-[var(--color-text-primary)]">
-                            {laneId !== null ? LANE_CONTENT[laneId].label[lan(locale)] : l.lane}
+                        <li key={l.lane} className="flex flex-col gap-1 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2 py-1.5 ring-1 ring-[var(--color-border)]/50">
+                          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 type-caption">
+                            <span className="font-semibold text-[var(--color-text-primary)]">
+                              {laneId !== null ? LANE_CONTENT[laneId].label[lan(locale)] : l.lane}
+                            </span>
+                            <span className={`font-bold ${tone}`}>{word}</span>
+                            <span className="text-[var(--color-text-tertiary)]">
+                              {fmt.num(l.readable, 0)} {locale === "en" ? "readable" : "خوانا"}
+                              {l.firing > 0 ? ` · ${fmt.num(l.firing, 0)} ${locale === "en" ? "firing" : "شلیک‌کننده"}` : ""}
+                            </span>
                           </span>
-                          <span className={`font-bold ${tone}`}>{word}</span>
-                          <span className="text-[var(--color-text-tertiary)]">
-                            {fmt.num(l.readable, 0)} {locale === "en" ? "readable" : "خوانا"}
-                            {l.firing > 0 ? ` · ${fmt.num(l.firing, 0)} ${locale === "en" ? "firing" : "شلیک‌کننده"}` : ""}
-                          </span>
+                          {(() => {
+                            /* the lane's own balance — supports vs pressures,
+                               one mini bar; hue never alone, the counts above it */
+                            const fire = l.supports + l.pressures;
+                            if (fire <= 0) return null;
+                            return (
+                              <span className="flex h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border)]/30" aria-hidden="true">
+                                <span className="bg-[var(--color-currena-success)]/70" style={{ width: `${(l.supports / fire) * 100}%` }} />
+                                <span className="bg-[var(--color-status-alert)]/70" style={{ width: `${(l.pressures / fire) * 100}%` }} />
+                              </span>
+                            );
+                          })()}
                         </li>
                       );
                     })}

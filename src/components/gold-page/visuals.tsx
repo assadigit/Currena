@@ -160,6 +160,10 @@ export interface TraceChartProps {
   baseline?: number | null;
   /** Tooltip secondary line (e.g. the % from window start). */
   hoverNote?: ((series: TraceSeriesDef, v: number, first: number) => string | null) | null;
+  /** True to mark the first / last / highest / lowest points of the first
+   *  series with dots + price tags, and to widen the Y axis to five ticks
+   *  (the hero's single-line chart: the price points read without hovering). */
+  pricePoints?: boolean;
 }
 
 /**
@@ -179,6 +183,7 @@ export function TraceChart({
   ariaLabel,
   baseline = null,
   hoverNote = null,
+  pricePoints = false,
 }: TraceChartProps) {
   const [hoverT, setHoverT] = React.useState<number | null>(null);
   const traceRef = React.useRef<HTMLDivElement | null>(null);
@@ -236,12 +241,18 @@ export function TraceChart({
       const t = tMin + f * (tMax - tMin);
       return { t, x: xOf(t), label: fmt.monthShort(new Date(t).toISOString().slice(0, 10)) };
     });
-    // the y ticks: min / mid / max per axis, labelled right
-    const yTicks = [
-      { v: vMin, y: yOfLeft(vMin), label: yFormat(vMin) },
-      { v: (vMin + vMax) / 2, y: yOfLeft((vMin + vMax) / 2), label: yFormat((vMin + vMax) / 2) },
-      { v: vMax, y: yOfLeft(vMax), label: yFormat(vMax) },
-    ];
+    // the y ticks: five when the price points ride the chart (the hero),
+    // three otherwise — labelled on the right, always real prices
+    const yTicks = pricePoints
+      ? [0, 0.25, 0.5, 0.75, 1].map((f) => {
+          const v = vMin + f * (vMax - vMin);
+          return { v, y: yOfLeft(v), label: yFormat(v) };
+        })
+      : [
+          { v: vMin, y: yOfLeft(vMin), label: yFormat(vMin) },
+          { v: (vMin + vMax) / 2, y: yOfLeft((vMin + vMax) / 2), label: yFormat((vMin + vMax) / 2) },
+          { v: vMax, y: yOfLeft(vMax), label: yFormat(vMax) },
+        ];
     const rightTicks =
       hasRight && yFormatRight !== undefined
         ? [
@@ -250,8 +261,43 @@ export function TraceChart({
             { v: rMax, y: yOfRight(rMax), label: yFormatRight(rMax) },
           ]
         : [];
-    return { W, H, padL, padR, padT, padB, tMin, tMax, vMin, vMax, rMin, rMax, xOf, yOf, yOfLeft, yOfRight, pathOf, ticks, yTicks, rightTicks, hasRight };
-  }, [series, height, baseline, fmt, yFormat, yFormatRight]);
+    // the price-point markers: the first / last / highest / lowest point of
+    // the FIRST series, each with its own labelled dot. A min/max whose
+    // point sits visually ON the last reading is dropped (the last's own
+    // tag already tells that story — no double labels at the edge).
+    const markers: Array<{ d: string; v: number; kind: "first" | "last" | "max" | "min" }> = [];
+    if (pricePoints && series.length > 0 && series[0]!.points.length > 0) {
+      const pts = series[0]!.points.filter((p) => Number.isFinite(p.v) && Number.isFinite(Date.parse(`${p.d}T00:00:00Z`)));
+      if (pts.length > 0) {
+        let maxP = pts[0]!;
+        let minP = pts[0]!;
+        for (const p of pts) {
+          if (p.v > maxP.v) maxP = p;
+          if (p.v < minP.v) minP = p;
+        }
+        const first = pts[0]!;
+        const last = pts[pts.length - 1]!;
+        const tLast = Date.parse(`${last.d}T00:00:00Z`);
+        const xSpan = Math.max(1, tMax - tMin);
+        const ySpan = Math.max(1e-9, vMax - vMin);
+        const ridesTheLast = (p: { d: string; v: number }): boolean =>
+          Math.abs(Date.parse(`${p.d}T00:00:00Z`) - tLast) < 0.12 * xSpan && Math.abs(p.v - last.v) < 0.04 * ySpan;
+        const seen = new Set<string>();
+        for (const m of [
+          { d: first.d, v: first.v, kind: "first" as const },
+          { d: last.d, v: last.v, kind: "last" as const },
+          { d: maxP.d, v: maxP.v, kind: "max" as const },
+          { d: minP.d, v: minP.v, kind: "min" as const },
+        ]) {
+          if (seen.has(`${m.d}`) && m.kind !== "last") continue;
+          if ((m.kind === "max" || m.kind === "min") && ridesTheLast(m)) continue;
+          seen.add(m.d);
+          markers.push(m);
+        }
+      }
+    }
+    return { W, H, padL, padR, padT, padB, tMin, tMax, vMin, vMax, rMin, rMax, xOf, yOf, yOfLeft, yOfRight, pathOf, ticks, yTicks, rightTicks, hasRight, markers };
+  }, [series, height, baseline, fmt, yFormat, yFormatRight, pricePoints]);
 
   /* the pointer trace — the crosshair locks to the nearest date */
   const onPointer = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -359,6 +405,38 @@ export function TraceChart({
             </g>
           );
         })}
+        {/* the price-point markers: first / last / highest / lowest, each
+            with its own price tag — the hero's clear price points */}
+        {pricePoints && model.markers.length > 0 && series.length > 0 ? (
+          <g>
+            {model.markers.map((m) => {
+              const t = Date.parse(`${m.d}T00:00:00Z`);
+              const x = model.xOf(t);
+              const y = model.yOf(m.v, series[0]!.axis ?? "left");
+              const isMax = m.kind === "max";
+              const isMin = m.kind === "min";
+              const isLast = m.kind === "last";
+              /* the label rides where the chart itself is empty: above the
+                 point when there is headroom, below it when there is not —
+                 never into the date axis, never off the top edge */
+              const spaceAbove = y - model.padT > 26;
+              const spaceBelow = model.H - model.padB - y > 26;
+              const dy = spaceAbove ? -12 : spaceBelow ? 16 : -10;
+              const anchor: "start" | "middle" | "end" = m.kind === "first" ? "start" : isLast ? "end" : "middle";
+              const ink = isMax ? "var(--color-return-up)" : isMin ? "var(--color-return-down)" : "var(--color-text-primary)";
+              const glyph = isMax ? "▲ " : isMin ? "▼ " : "";
+              return (
+                <g key={`${m.kind}-${m.d}`}>
+                  <circle cx={x} cy={y} r={4.5} fill="var(--color-surface)" stroke={series[0]!.color} strokeWidth={2.5} />
+                  <text x={x} y={y + dy} textAnchor={anchor} fontSize={11} fontWeight={800} fill={ink} style={{ paintOrder: "stroke" }} stroke="var(--color-surface)" strokeWidth={3} strokeLinejoin="round">
+                    {glyph}
+                    {yFormat(m.v)}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        ) : null}
         {/* the hover trace: the crosshair + the focus dots */}
         {hovered !== null && hovered.date !== null ? (
           <g>

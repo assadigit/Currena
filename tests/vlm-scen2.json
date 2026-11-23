@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**1) Numbered scenario cards:** None are numbered. There are 5 collapsed accordion items (not expanded cards) under «فاکترهای تأثیرگذار بر قیمت طلا»:\n- علت قیمت طلا: بازده واقعی اسصاله (خالص از تورم) — note: typo \"اسصاله\" (should be اسهاله/اوراق)\n- علت قیمت طلا: قدرت دلار آمریکا\n- به نفع قیمت طلا: شخص تنش مالی آمریکا (سأانوپی) — garbled text\n- علت قیمت طلا: تورم مصرف‌کننده آمریکا\n- علت قیمت طلا: پوزیشن معامله‌گران طلا\n\n**2) Green 'طلا بالا' / red 'طلا پایین' rows:** No. All 5 items are collapsed (chevron ‹), so no internal green/red rows with text are visible. Only colored triangle markers (▼/▲) next to titles.\n\n**3) 'بازسنجی بعدی' dates:** Not visible — none of the accordion items are expanded, so no re-weigh dates appear. Cannot quote one.\n\n**4) 'بدون تاریخ تقویمی' card:** Not present/visible in the screenshot.\n\n**5) Layout defects:** No obvious RTL/layout defects; direction, alignment and spacing look correct. Only content issues: typos/garbled strings (\"اسصاله\", \"سأانوپی\") and the ×۲٫۷٪/ماه badge in the price table has misaligned text flow (\"ماه ۱۱/۲٪ ▼\" reversed reading).",
+        "reasoning_content": "Screenshot shows accordion items, not expanded cards. Answer based on visible content: 5 accordion items (not cards), no green/red rows visible, no dates visible, no 'بدون تاریخ تقویمی' visible, no layout defects—content below fold collapsed.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795470681,
+  "id": "20261124055113cf376427c891481e",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "20261124055113cf376427c891481e",
+  "usage": {
+    "completion_tokens": 404,
+    "completion_tokens_details": {
+      "reasoning_tokens": 53
+    },
+    "prompt_tokens": 2429,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2833
+  }
+}

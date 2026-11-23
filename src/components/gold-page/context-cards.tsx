@@ -213,6 +213,7 @@ type GridT = {
   tomanName: string;
   tomanMillion: string;
   tomanNote: string;
+  tomanLive: string;
   basisNote: string;
   positionLine: string;
   bandTop: string;
@@ -457,19 +458,23 @@ export function CurrencyGridCard({
               </div>
             );
           })}
-          {/* the Iranian toman — the live free-market dollar (Tehran) × the
-              global ounce; live-only, no stored window of its own */}
+          {/* the Iranian toman — the same row, the same surface, the
+              site's own live basis (free-market dollar × the global
+              ounce); live-only, so its third column carries the live
+              tag instead of a stored 30-day window */}
           {tomanPerOunce !== null && Number.isFinite(tomanPerOunce) && tomanPerOunce > 0 ? (
             <div
-              className="grid grid-cols-[minmax(84px,auto)_1fr_auto] items-baseline gap-x-3 gap-y-1 rounded-[var(--cr-radius-sm)] bg-[var(--color-bridge-accent)]/5 px-2.5 py-1.5 ring-1 ring-[var(--color-bridge-accent)]/30"
+              className="grid grid-cols-[minmax(84px,auto)_1fr_auto] items-baseline gap-x-3 gap-y-1 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]"
               aria-label={t.tomanName}
+              title={t.tomanNote}
             >
               <span className="type-caption font-bold text-[var(--color-text-primary)]">{t.tomanName}</span>
               <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
                 {fmt.num(tomanPerOunce / 1_000_000, 1)} {t.tomanMillion}
               </bdi>
-              <span className="type-caption text-[var(--color-text-tertiary)]">
-                {t.tomanNote}
+              <span className="inline-flex items-center gap-1 type-caption text-[var(--color-text-tertiary)]">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-currena-success)]" aria-hidden="true" />
+                {t.tomanLive}
               </span>
             </div>
           ) : null}

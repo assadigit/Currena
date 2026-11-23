@@ -304,3 +304,122 @@ export const CLASS_WORD: Readonly<Record<RelationshipClass, RelationshipClassWor
   X: 'conditional',
   K: 'documented',
 };
+
+/* ------------------------------------------------------------------ *
+ * The force families — the map's own reading level. The 25 records
+ * stay verbatim; the map groups them under the six families that own
+ * them, each family labelled with its one-line effect on the ounce.
+ * ------------------------------------------------------------------ */
+
+/** A readable name for each concept the records connect (EN/FA) — the
+ *  raw ids stay in the record's own data, the map speaks words. */
+export const CONCEPT_NAMES: Readonly<Record<string, readonly [string, string]>> = {
+  gold: ['gold', 'طلا'],
+  'real-yield-10y': ['real yields (10y)', 'بازدهٔ واقعی ۱۰ساله'],
+  'dollar-basket': ['the dollar', 'دلار'],
+  us10y: ['the 10-year yield', 'بازدهٔ ۱۰ساله'],
+  'term-premium-10y': ['the term premium', 'صرف سررسید'],
+  'stress-stlfsi': ['market stress', 'تنش بازار'],
+  'gold-silver': ['the gold/silver ratio', 'نسبت طلا/نقره'],
+  'gpr-daily': ['war & policy fear', 'ترس جنگ و سیاست'],
+  inflation: ['inflation', 'تورم'],
+  'wgc-cb-demand': ['central-bank buying', 'خرید بانک‌های مرکزی'],
+  'm2-us': ['money supply', 'حجم پول'],
+  'cftc-gold-positioning': ["speculators' positioning", 'پوزیشن سفته‌بازان'],
+  usdjpy: ['USD/JPY (the carry trade)', 'دلار/ین (معاملهٔ کَری)'],
+  'usd-reserve-share': ["the dollar's reserve share", 'سهم ذخیره‌ای دلار'],
+  'borrowing-costs': ['borrowing costs', 'هزینهٔ استقراض'],
+  'fed-expectations': ['Fed expectations', 'انتظارات فدرال رزرو'],
+  'gold-aud': ['gold in Australian dollars', 'طلا به دلار استرالیا'],
+  'gold-btc': ['gold/Bitcoin', 'طلا/بیت‌کوین'],
+  'gold-oil-ratio': ['the gold/oil ratio', 'نسبت طلا/نفت'],
+  'copper-gold': ['the copper/gold ratio', 'نسبت مس/طلا'],
+  'gold-equities-ratio': ['gold vs equities', 'طلا در برابر سهام'],
+  'michigan-1y-expectations': ['household inflation hopes', 'انتظارات تورمی خانوار'],
+  'wgc-etf-holdings': ['ETF holdings', 'دارایی ETFها'],
+  'shanghai-gold-premium': ['the Shanghai premium', 'صرف شانگهای'],
+};
+
+/** One force family — the records grouped under the family that owns
+ *  them, with its own one-line effect on the ounce. */
+export interface ForceFamily {
+  id: string;
+  icon: 'money' | 'dollar' | 'fear' | 'inflation' | 'buyers' | 'ratios';
+  records: readonly string[];
+  title: readonly [string, string];
+  effect: readonly [string, string];
+}
+
+/** The six families — the map's own structure (25 records, all placed). */
+export const FORCE_FAMILIES: readonly ForceFamily[] = [
+  {
+    id: 'cost-of-money',
+    icon: 'money',
+    records: ['R-01', 'R-03', 'R-04', 'R-15'],
+    title: ['The cost of money', 'هزینهٔ پول'],
+    effect: [
+      "High real yields are gold's classic rival — and the edge has weakened since 2022.",
+      'بازدهٔ واقعی بالاتر رقیب کلاسیک طلاست — و این برتری از ۲۰۲۲ ضعیف شده است.',
+    ],
+  },
+  {
+    id: 'the-dollar',
+    icon: 'dollar',
+    records: ['R-02', 'R-12', 'R-13', 'R-14'],
+    title: ['The dollar', 'دلار'],
+    effect: [
+      'Gold is priced in dollars — dollar strength usually leans against the ounce.',
+      'طلا به دلار قیمت می‌خورد؛ قدرت دلار معمولاً بر اونس فشار می‌آورد.',
+    ],
+  },
+  {
+    id: 'fear-and-stress',
+    icon: 'fear',
+    records: ['R-05', 'R-07', 'R-22'],
+    title: ['Fear & stress', 'ترس و تنش'],
+    effect: [
+      'Frightened money historically runs to gold — after the first liquidity phase passes.',
+      'پولِ ترسانده از نظر تاریخی به طلا پناه می‌برد — پس از گذر از فاز نخستِ نقدینگی.',
+    ],
+  },
+  {
+    id: 'inflation-and-money',
+    icon: 'inflation',
+    records: ['R-08', 'R-10', 'R-24', 'R-25'],
+    title: ['Inflation & money', 'تورم و پول'],
+    effect: [
+      "The decades-scale argument; quarter-to-quarter it rides the Fed's response.",
+      'استدلالِ دهه‌مقیاس؛ در افق فصلی به واکنش فدرال رزرو می‌رود.',
+    ],
+  },
+  {
+    id: 'the-buyers',
+    icon: 'buyers',
+    records: ['R-09', 'R-11', 'R-26', 'R-27'],
+    title: ['The buyers', 'خریداران'],
+    effect: [
+      "Who the marginal buyer is — central banks, speculators, ETFs, Shanghai's bid.",
+      'خریدارِ مرزی که کدام است — بانک‌های مرکزی، سفته‌بازان، ETFها، خرید شانگهای.',
+    ],
+  },
+  {
+    id: 'the-ratios',
+    icon: 'ratios',
+    records: ['R-06', 'R-16', 'R-19', 'R-20', 'R-21', 'R-23'],
+    title: ['The ratios', 'نسبت‌ها'],
+    effect: [
+      'Gold priced against its siblings — gauges that cancel the shared tide.',
+      'طلا در برابر هم‌خانواده‌هایش — سنجه‌هایی که جزر و مد مشترک را حذف می‌کنند.',
+    ],
+  },
+];
+
+/** Resolve one family's records (an unknown id is simply skipped,
+ *  honestly — the map never invents a link). */
+export function familyRecords(family: ForceFamily): readonly GoldRelationshipRecord[] {
+  const byId = new Map(GOLD_RELATIONSHIPS.map((r) => [r.id, r]));
+  return family.records.flatMap((id) => {
+    const r = byId.get(id);
+    return r !== undefined ? [r] : [];
+  });
+}

@@ -31,9 +31,11 @@ type CmpT = {
   title: string;
   subtitle: string;
   windowLabel: string;
-  ranges: Record<"3M" | "6M" | "1Y" | "3Y" | "5Y", string>;
+  ranges: Record<"3M" | "6M" | "YTD" | "1Y" | "3Y" | "5Y", string>;
   bestLine: string;
   worstLine: string;
+  bestLossLine: string;
+  worstLossLine: string;
   assets: { gold: string; silver: string; btc: string; spx: string; realYield: string };
   toggleLabel: string;
   tableTitle: string;
@@ -56,11 +58,20 @@ const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }>
   { id: "spx", color: "var(--color-chip-ink-context)" },
 ];
 
-type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y";
-/* the window's own span, in months — 3 and 6 ride alongside the years */
-const WINDOW_MONTHS: Record<WindowKey, number> = { "3M": 3, "6M": 6, "1Y": 12, "3Y": 36, "5Y": 60 };
-/** The cutoff instant `months` back from the series' own last point. */
+type WindowKey = "3M" | "6M" | "YTD" | "1Y" | "3Y" | "5Y";
+/* the chips' own order — the YTD (since the start of the Gregorian year)
+   sits between 6 months and 1 year, everywhere the windows are listed */
+const WINDOW_ORDER: ReadonlyArray<WindowKey> = ["3M", "6M", "YTD", "1Y", "3Y", "5Y"];
+/* the window's own span, in months — 3 and 6 ride alongside the years; the
+   YTD window cuts at the first day of the Gregorian year instead */
+const WINDOW_MONTHS: Record<Exclude<WindowKey, "YTD">, number> = { "3M": 3, "6M": 6, "1Y": 12, "3Y": 36, "5Y": 60 };
+/** The cutoff instant — `months` back from the series' own last point, or
+ *  the first day of the last point's Gregorian year for the YTD window. */
 function cutoffOf(lastDate: string, w: WindowKey): number {
+  if (w === "YTD") {
+    const year = Number(lastDate.slice(0, 4));
+    return Date.parse(`${year}-01-01T00:00:00Z`);
+  }
   return Date.parse(`${lastDate}T00:00:00Z`) - (WINDOW_MONTHS[w] * 365.25 / 12) * 86_400_000;
 }
 
@@ -170,7 +181,7 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
 
       {/* the window chips + the line toggles */}
       <div className="mt-3 flex flex-wrap items-center gap-1.5" role="group" aria-label={t.windowLabel}>
-        {(Object.keys(WINDOW_MONTHS) as WindowKey[]).map((key) => (
+        {WINDOW_ORDER.map((key) => (
           <button
             key={key}
             type="button"
@@ -238,15 +249,28 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
             <div className="mt-3">
               <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.tableTitle}</h4>
               {/* THE one-line summary — the window's own best and worst,
-                  named, in green and red */}
+                  named, loss-aware: a loss is called a loss (بیشترین ضرر),
+                  only a real gain is ever called a gain */}
               {extremes.best !== null && extremes.worst !== null && extremes.bestPct !== null && extremes.worstPct !== null ? (
                 <p className="m-0 mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 type-caption font-bold">
-                  <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-return-up)]/12 px-2.5 py-1 text-[var(--color-return-up)]">
-                    {t.bestLine.replace("{name}", extremes.best).replace("{pct}", fmt.pct(extremes.bestPct, 1))}
-                  </span>
-                  <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-return-down)]/12 px-2.5 py-1 text-[var(--color-return-down)]">
-                    {t.worstLine.replace("{name}", extremes.worst).replace("{pct}", fmt.pct(extremes.worstPct, 1))}
-                  </span>
+                  {extremes.bestPct >= 0 ? (
+                    <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-return-up)]/12 px-2.5 py-1 text-[var(--color-return-up)]">
+                      {t.bestLine.replace("{name}", extremes.best).replace("{pct}", fmt.pct(extremes.bestPct, 1))}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-return-down)]/10 px-2.5 py-1 text-[var(--color-text-secondary)] ring-1 ring-[var(--color-return-down)]/25">
+                      {t.bestLossLine.replace("{name}", extremes.best).replace("{pct}", fmt.pct(extremes.bestPct, 1))}
+                    </span>
+                  )}
+                  {extremes.worstPct < 0 ? (
+                    <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-return-down)]/12 px-2.5 py-1 text-[var(--color-return-down)]">
+                      {t.worstLossLine.replace("{name}", extremes.worst).replace("{pct}", fmt.pct(extremes.worstPct, 1))}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-baseline gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-2.5 py-1 text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
+                      {t.worstLine.replace("{name}", extremes.worst).replace("{pct}", fmt.pct(extremes.worstPct, 1))}
+                    </span>
+                  )}
                 </p>
               ) : null}
               <div className="mt-1.5 min-w-0 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">

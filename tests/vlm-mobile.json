@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**Mobile check (390px, Persian RTL):**\n\n**1) Chart readability — Yes, good.** The gold price chart is tall (~200px+), spans full card width, and price labels are visible on the y-axis (۶٫۱۱۰ etc.) with date labels on the x-axis. The peak callout (۳,۵۳۰+) is legible.\n\n**2) Overflow/clipping — Minor issues:**\n- The top-left language/theme toggle (\"EN\" + moon) appears slightly clipped at the screen edge (partial circle cut off at x=0).\n- The bottom card (\"طلا به قیمت حدود ۱۵ ماه پیش...\") is clipped mid-text — likely just screenshot cutoff rather than a layout bug.\n- The dark \"N\" floating button overlaps the red \"۱۲۷,۷٪\" value — potential touch/visibility conflict.\n\n**3) Overall layout quality — Good.** RTL flow is correct (content right-aligned, breadcrumbs and chips run properly). Category chips scroll horizontally (سطر partially cut — acceptable carousel pattern). Cards have consistent rounded corners, spacing is comfortable, typography is clear, and the price header (دلار ۳,۵۳۳ / ۹٪▼) is prominent and readable. One-persian-month change row fits fine.\n\n**Verdict:** Solid mobile layout; fix the clipped corner toggle and the floating button overlapping content.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795470853,
+  "id": "20261124055406ad2cd8deb8664da2",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "20261124055406ad2cd8deb8664da2",
+  "usage": {
+    "completion_tokens": 289,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 513,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 802
+  }
+}

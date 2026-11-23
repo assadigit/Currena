@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**Checklist results:**\n\n1. **Gold verdict box — ✅** Prominent cream/gold box: \"طلا الان ۶/۶٪ بالاتر از میانگین ۲۰۰ روزماش است — بازار در دورهٔ آرزان خودش نیست.\" with supporting note below.\n\n2. **3-part row — ✅** Nearest support ($3,484 / R1, روزانه), current price ($3,546), nearest resistance ($3,614 / S1, هفتگی) — all with prices.\n\n3. **Fibonacci card — ✅** \"سطح اصلی فیبوناچی\" with all 3 levels: 38.2% ($3,726), 50% ($3,426... wait, 50% shows $3,۴۲۶), 61.8% ($3,058) — each with price and percentage. ✅\n\n4. **Three numbered fact cards — ✅** Cards ۱، ۲، ۳ at the bottom of the section with fact text and numbered gold badges.\n\n5. **Visual quality — ✅ No defects.** RTL layout correct, no overlaps, no clipping, alignment consistent. Minor note: the 50% Fibonacci level value reads \"$3,۴۲۶\" (mixed numeral styles) but is legible.\n\n**Overall: all 5 checks pass.**",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795470774,
+  "id": "2026112405525070872cd2f3204256",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "2026112405525070872cd2f3204256",
+  "usage": {
+    "completion_tokens": 295,
+    "completion_tokens_details": {
+      "reasoning_tokens": 294
+    },
+    "prompt_tokens": 2425,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2720
+  }
+}

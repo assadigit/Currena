@@ -168,3 +168,132 @@ export function yearOptions(snapshot: IfBoughtSnapshot): number[] {
   for (let y = firstYear; y <= lastYear; y++) years.push(y);
   return years;
 }
+
+/* ------------------------------------------------------------------ *
+ * The wealth calculator's unit layer — the owner's own ask: the
+ * amount in ANY of the converter's currencies (the toman included,
+ * on this site's own TGJU free-market basis) or in grams of gold.
+ * Grams are metal: the weight accumulates; currencies are cash: the
+ * weight is bought at each month's own close in that unit.
+ * ------------------------------------------------------------------ */
+
+/** Troy ounces → grams. */
+export const GRAMS_PER_TROY_OUNCE = 31.1034768;
+
+/** One calculator unit — a currency (month-end FX per USD) or grams of gold. */
+export interface CalcUnit {
+  id: string;
+  kind: "ccy" | "gram";
+  /** [EN, FA] — the unit's own name. */
+  name: [string, string];
+  /** [EN prefix/suffix symbol, FA word] — money in this unit. */
+  symbol: [string, string];
+  /** Decimals for money display (JPY-style units carry none). */
+  decimals: number;
+}
+
+/** The units the calculator offers — the converter's own currency set,
+ *  the toman on the site's own basis, plus grams of gold. */
+export const CALC_UNITS: readonly CalcUnit[] = [
+  { id: "usd", kind: "ccy", name: ["US dollar", "دلار آمریکا"], symbol: ["$", "دلار"], decimals: 0 },
+  { id: "aud", kind: "ccy", name: ["Australian dollar", "دلار استرالیا"], symbol: ["A$", "دلار استرالیا"], decimals: 0 },
+  { id: "nzd", kind: "ccy", name: ["New Zealand dollar", "دلار نیوزیلند"], symbol: ["NZ$", "دلار نیوزیلند"], decimals: 0 },
+  { id: "eur", kind: "ccy", name: ["Euro", "یورو"], symbol: ["€", "یورو"], decimals: 0 },
+  { id: "gbp", kind: "ccy", name: ["British pound", "پوند انگلستان"], symbol: ["£", "پوند"], decimals: 0 },
+  { id: "cad", kind: "ccy", name: ["Canadian dollar", "دلار کانادا"], symbol: ["C$", "دلار کانادا"], decimals: 0 },
+  { id: "chf", kind: "ccy", name: ["Swiss franc", "فرانک سوئیس"], symbol: ["CHF ", "فرانک سوئیس"], decimals: 0 },
+  { id: "jpy", kind: "ccy", name: ["Japanese yen", "ین ژاپن"], symbol: ["¥", "ین"], decimals: 0 },
+  { id: "cny", kind: "ccy", name: ["Chinese yuan", "یوان چین"], symbol: ["CNY ", "یوان چین"], decimals: 0 },
+  { id: "aed", kind: "ccy", name: ["UAE dirham", "درهم امارات"], symbol: ["AED ", "درهم امارات"], decimals: 0 },
+  { id: "try", kind: "ccy", name: ["Turkish lira", "لیر ترکیه"], symbol: ["TRY ", "لیر ترکیه"], decimals: 0 },
+  { id: "toman", kind: "ccy", name: ["Iranian toman", "تومان (دلار آزاد تهران)"], symbol: ["", "تومان"], decimals: 0 },
+  { id: "gram", kind: "gram", name: ["grams of gold", "گرم طلا"], symbol: ["g", "گرم"], decimals: 1 },
+];
+
+/** The /api/gold/fx route's own payload — month-end closes per unit of
+ *  currency per 1 USD (the toman: TGJU's free-market dollar, in toman). */
+export interface FxPayload {
+  v: number;
+  fetchedAt: string;
+  perUsd: Record<string, Record<string, number>>;
+}
+
+/** The asset's full month-end series (anchors + the running point). */
+function allMonths(asset: IfBoughtAssetSeries): IfBoughtMonth[] {
+  return [...asset.monthly, { ym: asset.current.ym, close: asset.current.close }];
+}
+
+/** The asset's month-end closes priced in the picked unit — USD as-is,
+ *  grams at the per-gram price, any other currency at that month's own
+ *  FX close (months without their FX close drop out, honestly). Returns
+ *  null when the unit's FX table is not available at all. */
+export function unitSeries(
+  asset: IfBoughtAssetSeries,
+  unitId: string,
+  fx: FxPayload | null,
+): { ym: string; close: number }[] | null {
+  const all = allMonths(asset);
+  if (unitId === "usd") return all.map((m) => ({ ym: m.ym, close: m.close }));
+  if (unitId === "gram") return all.map((m) => ({ ym: m.ym, close: m.close / GRAMS_PER_TROY_OUNCE }));
+  const table = fx?.perUsd?.[unitId];
+  if (table === undefined) return null;
+  const merged = all.flatMap((m) => {
+    const rate = table[m.ym];
+    return Number.isFinite(rate) && rate > 0 ? [{ ym: m.ym, close: m.close * rate }] : [];
+  });
+  return merged.length > 0 ? merged : null;
+}
+
+/** The two-mode answer over one unit-priced month-end series: one
+ *  purchase, or the same amount every month since. For currency units
+ *  the amounts are cash (the weight is bought each month); for grams
+ *  the amounts are metal (the weight itself accumulates, its cost
+ *  summed at each month's own gram price). */
+export function calcAnswer(
+  series: { ym: string; close: number }[] | null,
+  sinceYear: number,
+  amount: number,
+  kind: "ccy" | "gram",
+  mode: "one" | "dca",
+): {
+  months: number;
+  fromYm: string;
+  /** Cash outlaid — in the unit (currency modes) or USD (gram modes). */
+  invested: number;
+  /** Worth today — in the unit (currency modes) or USD (gram modes). */
+  worth: number;
+  /** (worth ÷ invested − 1) × 100. */
+  pct: number;
+  /** Gram modes only: the metal weight accumulated. */
+  grams: number | null;
+} | null {
+  if (series === null || series.length === 0 || !Number.isFinite(amount) || amount <= 0) return null;
+  const closes = series.filter((m) => Number(m.ym.slice(0, 4)) >= sinceYear);
+  if (closes.length === 0) return null;
+  const base = closes[0]!.close;
+  const last = closes[closes.length - 1]!.close;
+  if (!Number.isFinite(base) || base <= 0 || !Number.isFinite(last) || last <= 0) return null;
+  const months = closes.length;
+  const fromYm = closes[0]!.ym;
+  if (kind === "gram") {
+    if (mode === "one") {
+      const invested = amount * base;
+      const worth = amount * last;
+      return { months, fromYm, invested, worth, pct: (worth / invested - 1) * 100, grams: amount };
+    }
+    let cost = 0;
+    for (const m of closes) cost += amount * m.close;
+    const grams = amount * months;
+    const worth = grams * last;
+    return { months, fromYm, invested: cost, worth, pct: (worth / cost - 1) * 100, grams };
+  }
+  if (mode === "one") {
+    const worth = amount * (last / base);
+    return { months, fromYm, invested: amount, worth, pct: (worth / amount - 1) * 100, grams: null };
+  }
+  let units = 0;
+  for (const m of closes) units += amount / m.close;
+  const invested = amount * months;
+  const worth = units * last;
+  return { months, fromYm, invested, worth, pct: (worth / invested - 1) * 100, grams: null };
+}

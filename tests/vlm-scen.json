@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**Analysis result: The described section is not present in this screenshot.**\n\n1) **Scenario cards:** None. There is no section titled «سناریوهای تغییر قیمت» visible. What appears instead are two related sections:\n- «رودelda طلا در هفته‌های اخیر» (recent gold performance table) — a data table, not cards.\n- «فاکتورهای تأثیرگذار بر قیمت طلا» — 5 accordion/factor rows: بازده واقعی اساله (خالص از تورم), قدرت دلار آمریکا, تنش‌های مالی آمریکا (سیناپوسی), تورم مصرف‌کننده آمریکا, یوزیشن معماران طلا. These are *factor* items, not scenario cards.\n\n2) **Up/down rows:** No. The only green/red color coding is the small triangular arrows on the performance table (e.g., ▲۰/۴٪ روز, ▼۹٪ هفته) and the factor-row markers. No card contains paired «طلا بالا» / «طلا پایین» rows with explanatory text.\n\n3) **Next-date line («بازسنجی بعدی» + date):** Not present. Nothing in the screenshot links any item to the economic calendar with a recheck date. Nothing to quote.\n\n4) **«بدون تاریخ تقویمی» marker:** Not visible anywhere in the screenshot.\n\n5) **Layout defects:** None obvious. RTL alignment, table stripes, accordion chevrons, and the scales illustration all render correctly. (Minor note: the topmost card row is slightly clipped by the sticky nav area, and the scales image is cut off at the bottom — likely just viewport cropping.)\n\n**Conclusion:** The screenshot appears to be of a *different* part of the page (gold overview + factors) than the 'سناریوهای تغییر قیمت' section described. If that section exists, it lies below the visible area — a full-page capture is needed to verify items 1–4.",
+        "reasoning_content": "The screenshot doesn't show a section titled 'سناریوهای تغییر قیمت' — no scenario cards with up/down rows visible. Accordion items are factors, not scenario cards. Answer honestly.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795470657,
+  "id": "202611240550480e98166ee1084073",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "202611240550480e98166ee1084073",
+  "usage": {
+    "completion_tokens": 461,
+    "completion_tokens_details": {
+      "reasoning_tokens": 39
+    },
+    "prompt_tokens": 2451,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2912
+  }
+}

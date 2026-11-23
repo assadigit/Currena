@@ -227,3 +227,56 @@ export function classicWeeklyPivots(series: readonly GoldXauCandle[], nowMs?: nu
   const close = bars[bars.length - 1]!.close;
   return classicPivotArithmetic({ date: bars[0]!.date, high, low, close });
 }
+
+/* ------------------------------------------------------------------ *
+ * The Fibonacci retracement — the three classic correction levels
+ * (38.2% · 50% · 61.8%) measured on the window's own swing
+ * ------------------------------------------------------------------ */
+
+export interface TaFibonacci {
+  /** The swing window the levels are measured on. */
+  window: { from: string; to: string; bars: number };
+  high: number;
+  highDate: string;
+  low: number;
+  lowDate: string;
+  /** "up" = the low came first (rise measured, corrections counted down
+   *  from the high); "down" = the high came first (fall measured,
+   *  corrections counted up from the low). */
+  direction: "up" | "down";
+  /** The three classic correction levels, shallow → deep. */
+  levels: ReadonlyArray<{ ratio: number; price: number }>;
+}
+
+/** The Fibonacci retracement over the last `lookbackBars` bars (default a
+ *  trading year): the swing high and low define the move, and the three
+ *  classic ratios carve where a correction commonly rests. Descriptive
+ *  reference only — the same C5 posture as every other level here. */
+export function fibonacciRetracement(series: readonly GoldXauCandle[], lookbackBars = 250): TaFibonacci | null {
+  if (series.length < 30) return null;
+  const window = series.slice(-lookbackBars);
+  let highIdx = 0;
+  let lowIdx = 0;
+  for (let i = 0; i < window.length; i += 1) {
+    if (window[i]!.high > window[highIdx]!.high) highIdx = i;
+    if (window[i]!.low < window[lowIdx]!.low) lowIdx = i;
+  }
+  const high = window[highIdx]!.high;
+  const low = window[lowIdx]!.low;
+  const span = high - low;
+  if (!Number.isFinite(span) || span <= 0) return null;
+  const direction: "up" | "down" = highIdx > lowIdx ? "up" : "down";
+  const levels = [0.382, 0.5, 0.618].map((ratio) => ({
+    ratio,
+    price: direction === "up" ? high - span * ratio : low + span * ratio,
+  }));
+  return {
+    window: { from: window[0]!.date, to: window[window.length - 1]!.date, bars: window.length },
+    high,
+    highDate: window[highIdx]!.date,
+    low,
+    lowDate: window[lowIdx]!.date,
+    direction,
+    levels,
+  };
+}

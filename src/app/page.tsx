@@ -84,6 +84,7 @@ import {
 } from "@/components/gold-page/context-cards";
 import { BridgeBoard, fetchRates, type RatesPayload } from "@/components/gold-page/bridge-board";
 import { CalendarBand } from "@/components/gold-page/calendar";
+import { ScenariosBand } from "@/components/gold-page/scenarios";
 import { CompareBand } from "@/components/gold-page/compare";
 import { dollarTomanOf } from "@/lib/gold-page/coin-premium";
 import { deskBasePath } from "@/lib/utils";
@@ -133,8 +134,9 @@ interface GoldPayload {
 
 /* The price card's own windows, every one the API serves. */
 type TrendRange = "1D" | "7D" | "30D" | "3M" | "6M" | "1Y" | "5Y" | "YTD";
-/* the briefing table's own ladder — every window, one organized table */
-const TREND_RANGES: TrendRange[] = ["1D", "7D", "30D", "3M", "6M", "1Y", "5Y", "YTD"];
+/* the briefing table's own ladder — every window, one organized table; the
+   YTD (since the start of the Gregorian year) sits between 6 months and 1 year */
+const TREND_RANGES: TrendRange[] = ["1D", "7D", "30D", "3M", "6M", "YTD", "1Y", "5Y"];
 /* The reader's priority ladder — five trend chips max (day · week ·
    month · year · five years); the 3M/6M/YTD windows still live in the
    briefing's own table and the compare band, just not as chips here. */
@@ -254,6 +256,7 @@ function Header({ t, locale, onToggleLang }: { t: typeof UI.en; locale: Locale; 
 const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | null; label: [string, string] }> = [
   { id: "gold-briefing", key: null, label: ["Briefing", "مرور"] },
   { id: "gold-balance", key: null, label: ["Balance", "ترازو"] },
+  { id: "gold-scenarios", key: null, label: ["Scenarios", "سناریوها"] },
   { id: "gold-calendar", key: null, label: ["Calendar", "تقویم"] },
   { id: "gold-compare", key: null, label: ["Compare", "مقایسه"] },
   { id: "gold-ta", key: null, label: ["Levels", "سطوح"] },
@@ -263,8 +266,8 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-bridge", key: null, label: ["Iran", "پل ایران"] },
   { id: "gold-history", key: null, label: ["History", "تاریخ"] },
   { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
-  { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
   { id: "gold-vault", key: null, label: ["Plumbing", "لوله‌کشی"] },
+  { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
 ];
 
 function SectionNav({ locale }: { locale: Locale }) {
@@ -425,13 +428,15 @@ function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en;
                 color: "var(--color-accent-gold-strong)",
                 points: trend.data.points,
                 fill: true,
+                lineWidth: 2.6,
               },
             ]}
-            height={110}
+            height={300}
             yFormat={(v) => `$${fmt.num(v, 0)}`}
             fmt={fmt}
             ariaLabel={`${t.price.series}, ${t.price.ranges[range]} trend`}
             hoverNote={(_s, v, first) => (first > 0 ? fmt.pct((v / first - 1) * 100) : null)}
+            pricePoints
           />
         ) : (
           <Sparkline
@@ -602,8 +607,6 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
         </div>
       </div>
 
-      <p className="m-0 mt-3 type-caption italic leading-relaxed text-[var(--color-text-secondary)]">{t.briefing.couldChange}</p>
-
       {/* the factor explanation modal */}
       <Dialog
         open={openSeat !== null}
@@ -619,7 +622,7 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
       >
         {openContent !== null ? (
           <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[440px]">
-            <DialogHeader className="text-start">
+            <DialogHeader className="text-start pe-11">
               <p className="type-caption m-0 font-bold" style={{ color: openContent.ink.ink }}>
                 {openContent.ink.glyph} {openContent.seatWord}
               </p>
@@ -627,7 +630,7 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
                 {openContent.content[locale][0]}
               </DialogTitle>
             </DialogHeader>
-            <DialogDescription className="m-0 type-label leading-relaxed text-[var(--color-text-secondary)]">
+            <DialogDescription className="m-0 type-label leading-relaxed text-[var(--color-text-secondary)] pe-11">
               {openContent.content[locale][1]}
             </DialogDescription>
           </DialogContent>
@@ -770,7 +773,7 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
       >
         {openBox !== null ? (
           <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[480px]">
-            <DialogHeader className="text-start">
+            <DialogHeader className="text-start pe-11">
               <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">
                 {openBox === "against" ? t.balance.sideAgainst : t.balance.sideFor}
               </DialogTitle>
@@ -778,7 +781,7 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
                 {locale === "en" ? "The counted record behind this side of the balance." : "رکورد شمارش‌شدهٔ پشت این سمتِ ترازو."}
               </DialogDescription>
             </DialogHeader>
-            <div className="flex max-h-[62vh] flex-col gap-3 overflow-y-auto scroll-slim">
+            <div className="flex max-h-[62vh] flex-col gap-3 overflow-y-auto scroll-slim pe-11">
               {(openBox === "against" ? balance.lanes.filter((l) => l.side === "against") : balance.lanes.filter((l) => l.side === "for")).map((l) => (
                 <div key={l.lane} className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
@@ -1097,15 +1100,12 @@ function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI
  * The takeaway + the footer
  * ------------------------------------------------------------------ */
 
-function Footer({ t, fmt, data }: { t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; data: GoldPayload | null }) {
+function Footer({ t }: { t: typeof UI.en }) {
   return (
     <footer className="mt-8 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
       <div className="mx-auto w-full max-w-[1080px] px-3 py-6 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-          <span className="type-caption text-[var(--color-text-tertiary)]">
-            {t.dataAsOf.replace("{date}", data ? fmt.dateWords(data.asOf) : "·")} · {t.footer.rights}
-          </span>
-          <span className="type-caption text-[var(--color-text-tertiary)]">{t.footer.langNote}</span>
+          <span className="type-caption text-[var(--color-text-tertiary)]">{t.footer.rights}</span>
         </div>
       </div>
     </footer>
@@ -1237,18 +1237,20 @@ export default function GoldPage() {
           </div>
         ) : (
           <>
-            {/* the hero: price block + the focal briefing card — the retracement echo rides once, at the foot of the price box */}
-            <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-12 lg:gap-3">
-              <div className="lg:col-span-5">
-                <PriceCard data={data} t={t} fmt={fmt} echo={echo} />
-              </div>
-              <div className="lg:col-span-7">
-                <BriefingCard t={t} fmt={fmt} balance={balance} locale={locale} />
-              </div>
+            {/* the hero: the price block full-width on top (the chart rides
+                the page's whole width — the 2–3× the owner asked for, PC
+                and mobile alike), the focal briefing card under it */}
+            <div className="flex flex-col gap-2.5 lg:gap-3">
+              <PriceCard data={data} t={t} fmt={fmt} echo={echo} />
+              <BriefingCard t={t} fmt={fmt} balance={balance} locale={locale} />
             </div>
 
             {/* the composition stack: the brass balance + the five lane bars */}
             <BalanceCard t={t} fmt={fmt} locale={locale} balance={balance} />
+
+            {/* the price-change scenarios — the notable, possible bends,
+                each dated from the economic calendar it links to */}
+            <ScenariosBand t={t.scenarios} locale={locale} fmt={fmt} />
 
             {/* the economic calendar — what's coming that can bend gold */}
             <CalendarBand t={t.calendar} locale={locale} fmt={fmt} />
@@ -1299,16 +1301,18 @@ export default function GoldPage() {
               data={ifbought.data ?? null}
             />
 
-            {/* the relationship map — the previous page's relationship explorer, list-first */}
-            <RelationshipsBand t={t.relationships} locale={locale} />
-
-            {/* the plumbing — the London vault and clearing, collapsed, at the page's foot */}
+            {/* the plumbing — the London vault and clearing, the page's
+                own institutional appendix; the map, the page's last word */}
             {lbma.data ? <VaultBand data={lbma.data} t={t.vault} fmt={fmt} locale={locale} /> : null}
+
+            {/* the relationship map — the forces, the page's closing
+                view: six force families feeding one hub */}
+            <RelationshipsBand t={t.relationships} locale={locale} />
           </>
         )}
       </main>
 
-      <Footer t={t} fmt={fmt} data={data ?? null} />
+      <Footer t={t} />
     </div>
   );
 }

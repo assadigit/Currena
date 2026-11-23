@@ -40,7 +40,6 @@ type CalT = {
   whyLabel: string;
   moreLabel: string;
   fewerLabel: string;
-  note: string;
   methodTitle: string;
   methodLine: string;
   unavailable: string;
@@ -50,7 +49,7 @@ type CalT = {
  * The schedule's own data (bilingual)
  * ------------------------------------------------------------------ */
 
-interface EventDef {
+export interface EventDef {
   id: string;
   country: string;
   flagCode: string;
@@ -262,15 +261,17 @@ const RULE_EVENTS: ReadonlyArray<{
   },
 ];
 
-interface UpcomingEvent {
+export interface UpcomingEvent {
   key: string;
   date: string;
   approximate: boolean;
   def: EventDef;
 }
 
-/** The next `n` events from `now` (the honest generator — fixed + rules). */
-function upcomingEvents(now: Date, n = 14): UpcomingEvent[] {
+/** The next `n` events from `now` (the honest generator — fixed + rules).
+ *  Exported so the scenarios band can read the very same schedule (one
+ *  calendar, one source of truth — the scenarios quote its live dates). */
+export function upcomingEvents(now: Date, n = 14): UpcomingEvent[] {
   const nowT = now.getTime();
   const pool: UpcomingEvent[] = [];
   for (const e of FIXED_EVENTS) {
@@ -495,7 +496,6 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
         </>
       )}
 
-      <p className="m-0 mt-2.5 type-caption italic text-[var(--color-text-tertiary)]">{t.note}</p>
       <details className="mt-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
         <summary className="cursor-pointer font-semibold text-[var(--color-currena-blue-deep)]">{t.methodTitle}</summary>
         <p className="m-0 pt-1.5">{t.methodLine}</p>

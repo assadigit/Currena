@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**1) Gauge/thermometer:** Yes — there's a sophisticated horizontal gauge. It's a rounded track with a red-to-white-to-green gradient, tick marks (including a prominent dark center zero line), end labels «لنگ・+100» (green, right) and «شورت・100-» (red, left), and a circular needle marker (green ring with dot) positioned at +40.0% on the green side. A green pill-shaped value bubble «+۴۰٫۰٪» sits above the needle.\n\n**2) Two cards below:** Yes — both \"پوزیشن معامله‌گران طلا\" (+40.0%) and \"پوزیشن خرید معامله‌گران طلا\" (51.0%) show horizontal fill bars with tick marks dividing segments, an end-cap dot at the fill edge, values displayed top-left, and caption lines beneath (scale 0–100, weekly changes in red).\n\n**3) Defects:** None apparent. The needle, bubble, labels, and RTL layout are all cleanly aligned; the value bubble slightly overlaps the track area by design, no clipping or misalignment visible.\n\n**Verdict:** Sophisticated — a proper gradient gauge with needle, tick marks, center zero, and labeled ends, plus gradient-filled mini-bars with dots — clearly not a plain simple bar.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795470789,
+  "id": "202611240553053bd8943be7f14a9d",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "202611240553053bd8943be7f14a9d",
+  "usage": {
+    "completion_tokens": 287,
+    "completion_tokens_details": {
+      "reasoning_tokens": 286
+    },
+    "prompt_tokens": 2435,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2722
+  }
+}

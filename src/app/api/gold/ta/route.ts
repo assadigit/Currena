@@ -5,6 +5,7 @@ import {
   classicWeeklyPivots,
   crossEvents,
   distanceFromSma200,
+  fibonacciRetracement,
   smaRows,
   type GoldXauCandle,
 } from "@/lib/gold-page/ta";
@@ -13,9 +14,10 @@ import {
  * GET /api/gold/ta — the reference-levels leg (the technical-analysis
  * band the previous gold page carried): the SMA 20/50/100/200 rows, the
  * distance-from-200DMA decile over the stored basis, the dated 50/200
- * cross events, and the classic daily/weekly pivots — computed
- * server-side over the currena-api OHLC leg (one fetch, cached 5 min,
- * fail-closed 503 with the honest line).
+ * cross events, the classic daily/weekly pivots, and the Fibonacci
+ * retracement's three correction levels — computed server-side over
+ * the currena-api OHLC leg (one fetch, cached 5 min, fail-closed 503
+ * with the honest line).
  */
 
 export const dynamic = "force-dynamic";
@@ -42,6 +44,7 @@ export async function GET() {
       crosses: crossEvents(series).slice(0, 6),
       dailyPivots: classicDailyPivots(series),
       weeklyPivots: classicWeeklyPivots(series, Date.now()),
+      fibonacci: fibonacciRetracement(series),
       last: {
         date: series[series.length - 1]!.date,
         close: series[series.length - 1]!.close,

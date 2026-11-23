@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**1) Five numbered cards:**\n1. تغییر میزان نرخ بهرهٔ فدرال رزرو\n2. انتشار تورم آمریکا (CPI)\n3. گزارش اشتغال آمریکا (NFP)\n4. سنجش تورم خود فدرال رزرو (PCE)\n5. جنگ تنش (جنگ، بانک، ترس نکول)\n\n**2) Yes.** Cards 1–4 each have a green «طلا بالا» row and red «طلا پایین» row with explanatory text (e.g., NFP بالا: «اشتغال ضعیف – نگزانی رکود و شروع‌بندی روی کاهش نرخ، با هم بالا می‌رود»). Card 5 also has both rows (طلا بالا / طلا پایین).\n\n**3) Yes**, cards show «پارسنجی بعدی» with dates:\n- Card 1: «۱۴۵۵ از ۲» (approx.)\n- Card 2: «۲۱ اثر ۱۴۵۵» (approx.)\n- Card 3: «۶ از ۱۴۵۵»\n- Card 4: «۶ از ۱۴۵۵»\n\nExample quote: «پارسنجی بعدی: ۶ از ۱۴۵۵» (NFP card).\n\n**4) Yes.** Card 5 (جنگ تنش) shows «بدون تاریخ تقویمی، بر علاقم می‌آید» instead of a next-review date.\n\n**5) Layout defects:**\n- Right column has 3 cards, left column has 2, leaving a large empty gap in the left column under card 4 (unbalanced grid).\n- The «بدون تاریخ تقویمی» line on card 5 uses a plain bullet/dot marker, inconsistent with the calendar-icon styling of the other cards' date rows.\n- Some date text appears slightly ambiguous/oddly formatted (e.g., \"۱۴۵۵\" year rendering).",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795470701,
+  "id": "2026112405513373ce260510974162",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "2026112405513373ce260510974162",
+  "usage": {
+    "completion_tokens": 425,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 2426,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2851
+  }
+}

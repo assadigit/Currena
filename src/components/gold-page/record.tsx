@@ -18,9 +18,9 @@
  */
 
 import * as React from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, DollarSign, Flame, Percent, Scale, ShieldAlert, Users } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
-import { GOLD_RELATIONSHIPS } from "@/lib/gold-page/relationships";
+import { CONCEPT_NAMES, FORCE_FAMILIES, GOLD_RELATIONSHIPS, familyRecords } from "@/lib/gold-page/relationships";
 import { CountryFlag } from "@/components/gold-page/flags";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
@@ -31,6 +31,16 @@ const lan = (l: Locale) => (l === "en" ? 0 : 1);
 /* ------------------------------------------------------------------ *
  * The payloads (from the desk's own /api/gold/* routes)
  * ------------------------------------------------------------------ */
+
+export interface TaFibonacci {
+  window: { from: string; to: string; bars: number };
+  high: number;
+  highDate: string;
+  low: number;
+  lowDate: string;
+  direction: "up" | "down";
+  levels: ReadonlyArray<{ ratio: number; price: number }>;
+}
 
 export interface TaPayload {
   asOf: string;
@@ -52,6 +62,7 @@ export interface TaPayload {
     date: string; high: number; low: number; close: number;
     pp: number; r1: number; r2: number; r3: number; s1: number; s2: number; s3: number;
   } | null;
+  fibonacci: TaFibonacci | null;
   last: { date: string; close: number };
   /** The raw daily closes (the TA leg's own OHLC series) — the signals
    *  chart's range windows read this same series (one leg, two surfaces). */
@@ -195,24 +206,50 @@ type AnyT = { [key: string]: any };
  * ------------------------------------------------------------------ */
 
 export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
-  /* collapsed by default — the four moving averages (20/50/100/200-day)
-     stay the summary; the tables open on demand */
+  /* the tables open on demand — the plain verdict, the nearest levels and
+     the Fibonacci correction levels stay the always-visible summary */
   const [open, setOpen] = React.useState(false);
   const dist = data.distance;
   const basisSpanDays = data.span.bars > 335
     ? t.spanYears.replace("{years}", fmt.num(Math.round((data.span.bars / 250) * 10) / 10, 1))
     : t.spanMonths.replace("{n}", fmt.num(Math.max(1, Math.round(data.span.bars / 20)), 0));
+
+  /* THE plain verdict — one sentence anyone can read: where the price
+     sits against its 200-day average, and what that plain means (the
+     expensive/cheap stretch) — jargon stays in the tables, never here */
   const distSentence = dist
-    ? (dist.decile !== null && dist.basis !== null
-        ? String(t.distanceDecile)
-            .replace("{pct}", fmt.pct(dist.pct, 1))
-            .replace("{dir}", dist.pct >= 0 ? t.distanceAbove : t.distanceBelow)
-            .replace("{decile}", fmt.num(dist.decile * 100, 0))
-            .replace("{window}", basisSpanDays)
-        : String(t.distanceNoDecile)
-            .replace("{pct}", fmt.pct(dist.pct, 1))
-            .replace("{dir}", dist.pct >= 0 ? t.distanceAbove : t.distanceBelow))
+    ? String(t.distancePlain)
+        .replace("{pct}", fmt.pct(Math.abs(dist.pct), 1).replace("+", ""))
+        .replace("{dir}", dist.pct >= 0 ? t.distanceAbove : t.distanceBelow)
+        .replace("{side}", dist.pct >= 0 ? t.verdictSideExpensive : t.verdictSideCheap)
     : null;
+  const decileLine =
+    dist && dist.decile !== null && dist.basis !== null
+      ? String(t.distanceDecile)
+          .replace("{pct}", fmt.num(dist.decile * 100, 0))
+          .replace("{window}", basisSpanDays)
+      : null;
+
+  /* the nearest levels — every reference line above/below the last close:
+     the daily & weekly pivots and the four moving averages, nearest first */
+  const lastClose = data.last.close;
+  const candidates: Array<{ value: number; tag: string; kind: "resistance" | "support" }> = [];
+  for (const [pv, srcTag] of [
+    [data.dailyPivots, t.pivotsDailyShort],
+    [data.weeklyPivots, t.pivotsWeeklyShort],
+  ] as Array<[TaPayload["dailyPivots"], string]>) {
+    if (pv === null) continue;
+    for (const [k, v] of [["R1", pv.r1], ["R2", pv.r2], ["R3", pv.r3], ["S1", pv.s1], ["S2", pv.s2], ["S3", pv.s3]] as Array<[string, number]>) {
+      candidates.push({ value: v, tag: `${k} · ${srcTag}`, kind: k.startsWith("R") ? "resistance" : "support" });
+    }
+  }
+  for (const row of data.sma) {
+    candidates.push({ value: row.value, tag: `MA${row.window}`, kind: row.value > lastClose ? "resistance" : "support" });
+  }
+  const nearestResistance = candidates.filter((c) => c.value > lastClose).sort((a, b) => a.value - b.value)[0] ?? null;
+  const nearestSupport = candidates.filter((c) => c.value < lastClose).sort((a, b) => b.value - a.value)[0] ?? null;
+  const fib = data.fibonacci;
+
   return (
     <section id="gold-ta" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -230,20 +267,97 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
       <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
-      {/* THE reference-level verdict — its own loud treatment (the gold
-          accent, not the quiet grey it used to wear) */}
+      {/* THE plain verdict — one readable sentence, its own loud gold box */}
       {distSentence ? (
-        <p
-          className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] px-3.5 py-2.5 text-[1.02rem] font-black leading-snug sm:text-[1.1rem]"
+        <div
+          className="mt-2.5 rounded-[var(--cr-radius-md)] px-3.5 py-3"
           style={{
             backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 16%, transparent)",
             boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 45%, transparent)",
-            color: "var(--color-accent-gold-deep)",
           }}
         >
-          <bdi>{distSentence}</bdi>
-        </p>
+          <p className="m-0 text-[1.02rem] font-black leading-snug text-[var(--color-accent-gold-deep)] sm:text-[1.1rem]">
+            <bdi>{distSentence}</bdi>
+          </p>
+          {decileLine !== null ? (
+            <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{decileLine}</p>
+          ) : null}
+        </div>
       ) : null}
+
+      {/* the nearest levels — the price sandwiched between its closest
+          reference lines: support below, resistance above, price between */}
+      {nearestSupport !== null || nearestResistance !== null ? (
+        <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {nearestSupport !== null ? (
+            <div className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2.5" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-up) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-up) 30%, transparent)" }}>
+              <span className="type-caption font-bold text-[var(--color-return-up)]">{t.nearestSupport}</span>
+              <span className="type-label font-extrabold text-[var(--color-text-primary)]">
+                <bdi dir="ltr">${fmt.num(nearestSupport.value, 0)}</bdi>
+                <span className="ms-1.5 type-caption font-semibold text-[var(--color-text-tertiary)]">({nearestSupport.tag})</span>
+              </span>
+            </div>
+          ) : null}
+          <div className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
+            <span className="type-caption font-bold text-[var(--color-text-primary)]">{t.priceNowWord}</span>
+            <span className="type-label font-extrabold text-[var(--color-accent-gold-deep)]">
+              <bdi dir="ltr">${fmt.num(lastClose, 0)}</bdi>
+            </span>
+          </div>
+          {nearestResistance !== null ? (
+            <div className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2.5" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-down) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 30%, transparent)" }}>
+              <span className="type-caption font-bold text-[var(--color-return-down)]">{t.nearestResistance}</span>
+              <span className="type-label font-extrabold text-[var(--color-text-primary)]">
+                <bdi dir="ltr">${fmt.num(nearestResistance.value, 0)}</bdi>
+                <span className="ms-1.5 type-caption font-semibold text-[var(--color-text-tertiary)]">({nearestResistance.tag})</span>
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* the Fibonacci correction levels — the three classic retracement
+          prices on the window\'s own swing, always visible */}
+      {fib !== null ? (
+        <div className="mt-2.5 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+            <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.fibTitle}</h4>
+            <span className="type-caption text-[var(--color-text-tertiary)]">
+              {t.fibSwing
+                .replace("{low}", `$${fmt.num(fib.low, 0)}`)
+                .replace("{lowDate}", fmt.dateWords(fib.lowDate))
+                .replace("{high}", `$${fmt.num(fib.high, 0)}`)
+                .replace("{highDate}", fmt.dateWords(fib.highDate))}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
+            {fib.levels.map((lv) => (
+              <div key={lv.ratio} className="flex flex-col gap-0.5 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] p-2 ring-1 ring-[var(--color-border)]">
+                <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.fibRatio.replace("{pct}", `${fmt.num(lv.ratio * 100, 1)}%`)}</span>
+                <span className="type-label font-extrabold text-[var(--color-text-primary)]">
+                  <bdi dir="ltr">${fmt.num(lv.price, 0)}</bdi>
+                </span>
+                <span className="type-caption text-[var(--color-text-tertiary)]">
+                  {lv.price > lastClose ? "▲" : lv.price < lastClose ? "▼" : "•"} {fmt.pct((lv.price / lastClose - 1) * 100, 1)}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.fibNote}</p>
+        </div>
+      ) : null}
+
+      {/* the three facts — plain-language reading keys for the whole band */}
+      <div className="mt-2.5 grid grid-cols-1 gap-2 lg:grid-cols-3">
+        {[t.factSma, t.factCross, t.factFib].map((fact, i) => (
+          <div key={i} className="flex items-start gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] p-2.5 ring-1 ring-[var(--color-accent-gold)]/25">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold text-[var(--color-accent-gold-ink)]" style={{ background: "var(--color-accent-gold)" }} aria-hidden="true">
+              {locale === "en" ? i + 1 : ["۱", "۲", "۳"][i]}
+            </span>
+            <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{fact}</p>
+          </div>
+        ))}
+      </div>
 
       {open ? (
         <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
@@ -763,25 +877,55 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
       <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
       <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
-      {verdictWord !== null ? (
-        <div className="mt-3 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
+      {verdictWord !== null && main !== null ? (
+        <div className="mt-3 flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-3 ring-1 ring-[var(--color-border)]">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <span className="type-caption font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">{t.verdictEyebrow}</span>
             <span className="text-[1.15rem] font-black leading-none tracking-tight sm:text-[1.3rem]" style={{ color: verdictTone }}>
               {verdictWord}
             </span>
           </div>
-          <div dir="ltr" className="relative mt-1 h-3.5 w-full rounded-full bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]" role="img" aria-label={`${t.verdictEyebrow}: ${verdictWord}`}>
-            <span className="absolute inset-y-0 left-1/2 w-px bg-[var(--color-border)]" aria-hidden="true" />
-            <span
-              className="absolute top-1/2 h-[13px] w-[13px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-surface)] shadow-sm"
-              style={{ left: `${verdictPos}%`, background: verdictTone }}
-              aria-hidden="true"
-            />
-          </div>
-          <div dir="ltr" className="flex justify-between">
-            <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.scaleShort}</span>
-            <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.scaleLong}</span>
+
+          {/* THE market thermometer — the full −100…+100 domain as a
+              gradient track with zone ticks, a zero spine, and a labelled
+              needle pinning today's reading (colour never alone: the words
+              ride with it) */}
+          <div dir="ltr" className="relative mt-2 flex flex-col gap-1 select-none" role="img" aria-label={`${t.verdictEyebrow}: ${verdictWord} (${fmt.num(main.value, 1)}%)`}>
+            {/* the value bubble riding above the needle */}
+            <div className="relative h-6">
+              <span
+                className="absolute bottom-0 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-black tabular-nums text-white shadow-sm"
+                style={{ left: `${verdictPos}%`, background: verdictTone }}
+              >
+                {main.value > 0 ? "+" : ""}{fmt.num(main.value, 1)}%
+              </span>
+            </div>
+            {/* the track itself — short-red through neutral through long-green */}
+            <div className="relative h-5 w-full rounded-full ring-1 ring-[var(--color-border)]" style={{ background: "linear-gradient(90deg, color-mix(in srgb, var(--color-return-down) 62%, var(--color-surface)) 0%, color-mix(in srgb, var(--color-return-down) 14%, var(--color-surface)) 34%, var(--color-surface) 50%, color-mix(in srgb, var(--color-return-up) 14%, var(--color-surface)) 66%, color-mix(in srgb, var(--color-return-up) 62%, var(--color-surface)) 100%)" }}>
+              {/* the ticks: −100 · −50 · 0 · +50 · +100 */}
+              {[0, 25, 50, 75, 100].map((p) => (
+                <span key={p} className="absolute inset-y-[3px] w-px" style={{ left: `${p}%`, background: "color-mix(in srgb, var(--color-text-secondary) 35%, transparent)" }} aria-hidden="true" />
+              ))}
+              {/* the zero spine — the domain's own centre, emphasised */}
+              <span className="absolute inset-y-0 left-1/2 w-[2px] -translate-x-1/2 rounded-full" style={{ background: "color-mix(in srgb, var(--color-text-secondary) 55%, transparent)" }} aria-hidden="true" />
+              {/* the needle — the reading's own pin */}
+              <span
+                className="absolute top-1/2 h-[22px] w-[22px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] shadow-[0_1px_4px_rgba(0,0,0,0.25)]"
+                style={{ left: `${verdictPos}%`, borderColor: verdictTone, background: "var(--color-surface)" }}
+                aria-hidden="true"
+              />
+              <span
+                className="absolute top-1/2 h-[10px] w-[10px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{ left: `${verdictPos}%`, background: verdictTone }}
+                aria-hidden="true"
+              />
+            </div>
+            {/* the scale words — the domain's ends and its middle */}
+            <div dir="ltr" className="flex items-baseline justify-between">
+              <span className="type-caption font-bold text-[var(--color-return-down)]">−100 · {t.scaleShort}</span>
+              <span className="type-caption font-semibold text-[var(--color-text-tertiary)]">0</span>
+              <span className="type-caption font-bold text-[var(--color-return-up)]">{t.scaleLong} · +100</span>
+            </div>
           </div>
           <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.verdictNote}</p>
           {/* the reconciliation — the briefing counts positioning as
@@ -801,10 +945,10 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
           const toneHigh = signed ? card.value > 20 : pct > 60;
           const toneLow = signed ? card.value < -20 : pct < 40;
           const fillTone = toneHigh
-            ? "bg-[var(--color-return-up)]"
+            ? "var(--color-return-up)"
             : toneLow
-              ? "bg-[var(--color-return-down)]"
-              : "bg-[var(--color-text-secondary)]";
+              ? "var(--color-return-down)"
+              : "var(--color-text-secondary)";
           return (
             <article key={card.id} className="flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
               <div className="flex items-baseline justify-between gap-2">
@@ -813,12 +957,30 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
                   {signed && card.value > 0 ? "+" : ""}{fmt.num(card.value, 1)}%
                 </bdi>
               </div>
-              <div className="relative h-3 w-full overflow-hidden rounded-full bg-[var(--color-border)]/30" role="img" aria-label={`${nameOf(card.id)}: ${fmt.num(card.value, 1)}%`}>
-                {signed ? <span aria-hidden="true" className="absolute inset-y-0 left-1/2 w-px bg-[var(--color-border)]" /> : null}
+              {/* the card's own gradient track — fill grows from zero (or
+                  the left end), with ticks and a bright end-cap */}
+              <div className="relative h-4 w-full overflow-hidden rounded-full ring-1 ring-[var(--color-border)]" style={{ background: "color-mix(in srgb, var(--color-border) 28%, var(--color-surface))" }} role="img" aria-label={`${nameOf(card.id)}: ${fmt.num(card.value, 1)}%`}>
+                {[0, 25, 50, 75, 100].map((p) => (
+                  <span key={p} className="absolute inset-y-[2px] w-px" style={{ left: `${p}%`, background: "color-mix(in srgb, var(--color-text-tertiary) 30%, transparent)" }} aria-hidden="true" />
+                ))}
+                {signed ? <span aria-hidden="true" className="absolute inset-y-0 left-1/2 w-[2px] bg-[var(--color-text-secondary)]/45" /> : null}
                 <span
                   aria-hidden="true"
-                  className={`absolute inset-y-0 ${fillTone}`}
-                  style={locale === "fa" ? { right: `${100 - (fillStart + fillWidth)}%`, width: `${fillWidth}%` } : { left: `${fillStart}%`, width: `${fillWidth}%` }}
+                  className="absolute inset-y-[2px] rounded-full"
+                  style={
+                    locale === "fa"
+                      ? { right: `${100 - (fillStart + fillWidth)}%`, width: `${Math.max(fillWidth, 0.5)}%`, background: `linear-gradient(90deg, color-mix(in srgb, ${fillTone} 55%, transparent), ${fillTone})` }
+                      : { left: `${fillStart}%`, width: `${Math.max(fillWidth, 0.5)}%`, background: `linear-gradient(90deg, color-mix(in srgb, ${fillTone} 55%, transparent), ${fillTone})` }
+                  }
+                />
+                {/* the fill's own end-cap dot — the reading's tip */}
+                <span
+                  aria-hidden="true"
+                  className="absolute top-1/2 h-[8px] w-[8px] -translate-x-1/2 -translate-y-1/2 rounded-full ring-1 ring-[var(--color-surface)]"
+                  style={{
+                    ...(locale === "fa" ? { right: `${100 - (fillStart + fillWidth)}%` } : { left: `${fillStart + fillWidth}%` }),
+                    background: fillTone,
+                  }}
                 />
               </div>
               <p className="m-0 flex flex-wrap items-baseline justify-between gap-x-2 type-caption text-[var(--color-text-tertiary)]">
@@ -906,7 +1068,13 @@ export function PremiumHistoryCard({ data, t, fmt, locale }: { data: PremiumPayl
 }
 
 /* ------------------------------------------------------------------ *
- * The relationship map — the 24 documented records, list-first
+ * The relationship map — the owner's own redesign: the 25 documented
+ * records read as SIX force families feeding one hub (gold). Every
+ * family card carries its one-line effect and its records (each with
+ * its evidence-class chip and its own words); a rail merges the
+ * families into the gold hub — a map, not a list. The evidence-class
+ * legend rides above; hue is never the sole carrier (the letter rides
+ * with it); blocked edges stay labelled, never charted.
  * ------------------------------------------------------------------ */
 
 const CLASS_INK: Record<string, string> = {
@@ -916,13 +1084,57 @@ const CLASS_INK: Record<string, string> = {
   K: "var(--color-return-up)",
 };
 
+const FAMILY_ICONS: Record<string, React.ComponentType<{ className?: string; "aria-hidden"?: true }>> = {
+  money: Percent,
+  dollar: DollarSign,
+  fear: ShieldAlert,
+  inflation: Flame,
+  buyers: Users,
+  ratios: Scale,
+};
+
+/** One record row inside its family — the class chip (letter + hue),
+ *  the concepts in words, the one-liner clamped to two lines. */
+function FamilyRecordRow({ r, t, locale }: { r: (typeof GOLD_RELATIONSHIPS)[number]; t: AnyT; locale: Locale }) {
+  const from = CONCEPT_NAMES[r.from]?.[lan(locale)] ?? r.from;
+  const to = CONCEPT_NAMES[r.to]?.[lan(locale)] ?? r.to;
+  const intoGold = r.to === "gold";
+  return (
+    <li className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2 py-1.5 ring-1 ring-[var(--color-border)]/50">
+      <span
+        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold text-white"
+        style={{ background: CLASS_INK[r.class] ?? "var(--color-currena-blue-deep)" }}
+        aria-label={r.class}
+        title={r.class === "M" ? t.legendM : r.class === "C" ? t.legendC : r.class === "X" ? t.legendX : t.legendK}
+      >
+        {r.class}
+      </span>
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5" dir={locale === "fa" ? "rtl" : "ltr"}>
+          <span className="type-caption font-bold text-[var(--color-text-primary)]">
+            {from}
+            {!intoGold ? <span aria-hidden="true"> → {to}</span> : null}
+          </span>
+          {r.xFlag ? (
+            <span className="text-[10.5px] italic text-[var(--color-text-tertiary)]">({t.xFlagNote})</span>
+          ) : null}
+          {r.blocked ? (
+            <span className="text-[10.5px] italic text-[var(--color-text-tertiary)]">{t.legendBlocked}</span>
+          ) : null}
+        </span>
+        <p className="m-0 line-clamp-2 text-[11.5px] leading-snug text-[var(--color-text-secondary)]" title={locale === "en" ? r.en : r.fa}>
+          {locale === "en" ? r.en : r.fa}
+        </p>
+      </div>
+    </li>
+  );
+}
+
 export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
-  const [filter, setFilter] = React.useState<string | null>(null);
   /* collapsed by default — the map is the deep reference layer; one tap
-     opens the full 24-record list */
+     opens the full family view */
   const [open, setOpen] = React.useState(false);
   const classes = ["M", "C", "X", "K"];
-  const shown = filter === null ? GOLD_RELATIONSHIPS : GOLD_RELATIONSHIPS.filter((r) => r.class === filter);
   return (
     <section id="gold-relationships" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -942,47 +1154,88 @@ export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
       </div>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
       {open ? (
-      <>
-      <div className="mt-2.5 flex flex-wrap gap-1.5">
-        <button
-          type="button"
-          onClick={() => setFilter(null)}
-          className={`rounded-full px-3 py-1 type-caption font-bold ring-1 ring-[var(--color-border)] transition-colors ${filter === null ? "bg-[var(--color-currena-blue)] text-white" : "bg-[var(--color-surface)] text-[var(--color-text-secondary)]"}`}
-        >
-          {locale === "en" ? `all ${GOLD_RELATIONSHIPS.length}` : `همه ${new Intl.NumberFormat("fa-IR").format(GOLD_RELATIONSHIPS.length)}`}
-        </button>
-        {classes.map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => setFilter(filter === c ? null : c)}
-            className={`rounded-full px-3 py-1 type-caption font-bold ring-1 ring-[var(--color-border)] transition-colors ${filter === c ? "text-white" : "bg-[var(--color-surface)] text-[var(--color-text-secondary)]"}`}
-            style={filter === c ? { background: CLASS_INK[c] } : undefined}
-          >
-            {c === "M" ? t.legendM : c === "C" ? t.legendC : c === "X" ? t.legendX : t.legendK}
-          </button>
-        ))}
-      </div>
-      <ul className="m-0 mt-3 flex max-h-96 list-none flex-col gap-1.5 overflow-y-auto p-0 scroll-slim">
-        {shown.map((r) => (
-          <li key={r.id} className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2 ring-1 ring-[var(--color-border)]">
-            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-              <span className="type-caption font-bold text-[var(--color-text-tertiary)]">{r.id}</span>
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-extrabold text-white" style={{ background: CLASS_INK[r.class] }} aria-label={r.class}>
-                {r.class}
-              </span>
-              <span className="type-caption font-bold text-[var(--color-text-primary)]" dir={locale === "fa" ? "rtl" : "ltr"}>
-                {r.from} → {r.to}
-              </span>
-              {r.xFlag ? <span className="type-caption italic text-[var(--color-text-tertiary)]">({t.xFlagNote})</span> : null}
-              {r.blocked ? <span className="ms-auto type-caption italic text-[var(--color-text-tertiary)]">{t.legendBlocked}</span> : null}
+        <>
+          {/* how to read it — one line, the legend beside it */}
+          <div className="mt-2.5 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
+            <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.howToRead}</p>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              {classes.map((c) => (
+                <span key={c} className="inline-flex items-center gap-1 type-caption text-[var(--color-text-secondary)]">
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-extrabold text-white" style={{ background: CLASS_INK[c] }} aria-hidden="true">
+                    {c}
+                  </span>
+                  {c === "M" ? t.legendM : c === "C" ? t.legendC : c === "X" ? t.legendX : t.legendK}
+                </span>
+              ))}
             </div>
-            <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{locale === "en" ? r.en : r.fa}</p>
-          </li>
-        ))}
-      </ul>
-      </>
+          </div>
+
+          {/* THE map — six family cards, one rail, one hub; the flow reads
+              in the page's own direction: families → rail → gold. The hub
+              centers vertically against the families (the tall side), the
+              rail spans the stack and points at it */}
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:gap-0">
+            {/* the families — each its own lane of pressure; two columns
+                on wide screens so the map never becomes a scroll */}
+            <div className="flex min-w-0 flex-1 flex-col gap-2 lg:grid lg:grid-cols-2 lg:content-start">
+              {FORCE_FAMILIES.map((family) => {
+                const records = familyRecords(family);
+                const Icon = FAMILY_ICONS[family.icon] ?? Percent;
+                return (
+                  <div key={family.id} className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
+                    <div className="flex flex-wrap items-start gap-2">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-currena-soft)] text-[var(--color-currena-blue-deep)]" aria-hidden="true">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <div className="flex min-w-0 flex-1 flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+                        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{family.title[lan(locale)]}</h4>
+                        <span className="type-caption text-[var(--color-text-tertiary)]">
+                          {fmtCount(records.length, locale)}
+                        </span>
+                      </div>
+                      <p className="m-0 hidden basis-full text-[11.5px] leading-snug text-[var(--color-text-tertiary)] sm:block">{family.effect[lan(locale)]}</p>
+                    </div>
+                    <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                      {records.map((r) => (
+                        <FamilyRecordRow key={r.id} r={r} t={t} locale={locale} />
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* the mobile connector — the same merge line, stacked */}
+            <div className="mx-auto hidden h-6 w-0.5 rounded-full bg-[var(--color-border)] max-sm:block sm:hidden" aria-hidden="true" />
+
+            {/* the rail — the families' merge line into the hub */}
+            <div className="relative hidden w-7 shrink-0 sm:block sm:self-stretch" aria-hidden="true">
+              <div className="absolute inset-y-3 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-[var(--color-border)]" />
+              <div className="absolute top-1/2 left-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] bg-[var(--color-accent-gold)]" />
+            </div>
+
+            {/* the hub — gold itself, the ounce's price, centered against
+                the families it receives */}
+            <div className="flex w-full flex-col items-center justify-center gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] px-3 py-3 ring-2 ring-[var(--color-accent-gold)]/40 sm:w-32 sm:self-center">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-gold)] text-[15px] font-black text-[var(--color-accent-gold-ink)]" aria-hidden="true">
+                Au
+              </span>
+              <span className="type-label font-extrabold text-[var(--color-text-primary)]">{t.hubWord}</span>
+              <span className="text-[11px] leading-snug text-[var(--color-text-tertiary)]">{t.hubNote}</span>
+            </div>
+          </div>
+        </>
       ) : null}
     </section>
   );
+}
+
+/** A small count in the locale's own digits ("4 links" style — the
+ *  number only here, the records sit right under it). */
+function fmtCount(n: number, locale: Locale): string {
+  try {
+    return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US").format(n);
+  } catch {
+    return String(n);
+  }
 }
