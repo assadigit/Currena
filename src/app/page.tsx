@@ -28,8 +28,10 @@ export default function Home() {
                 Currena Gold — Offline Snapshot
               </h1>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Captured 23 Nov 2026, 08:42 Tehran · single 1.4 MB HTML file ·
-                works with zero internet
+                Captured 23 Nov 2026, 17:51 Tehran · single 1.5 MB HTML file ·
+                works with zero internet · includes the reworked briefing +
+                price card (factor modals, the 1D–5Y trend selector, the
+                history echo)
               </p>
             </div>
           </div>
