@@ -631,10 +631,11 @@
   color: var(--color-status-alert);
 }
 
-/* — Direction-aware soft fade for the chip scroller row — */
-.chip-scroller {
-  position: relative;
-}
+/* — Direction-aware soft fade for the chip scroller row —
+   No `position: relative` here: unlayered CSS would beat Tailwind's
+   layered `sticky` utility, and the scroller must stay sticky (the
+   sticky element is itself positioned, so the ::after fade still
+   anchors to it). */
 [dir="ltr"] .chip-scroller::after {
   content: "";
   position: absolute;

@@ -78,10 +78,12 @@ interface SparkProps {
   endDot?: boolean;
   fill?: boolean;
   ariaLabel?: string;
+  /** Render at the passed pixel size instead of stretching to the container (MiniSpark). */
+  fixed?: boolean;
 }
 
-/** The neutral sparkline (never tinted by direction; direction rides the signed delta beside it). */
-export function Sparkline({ values, width = 300, height = 64, color = "var(--color-accent-gold-strong)", endDot = true, fill = false, ariaLabel }: SparkProps) {
+/** The neutral sparkline (never tinted by direction; direction rides the signed delta beside it). Fluid: fills its card's width, so no fixed pixel ever overflows a phone. */
+export function Sparkline({ values, width = 300, height = 64, color = "var(--color-accent-gold-strong)", endDot = true, fill = false, ariaLabel, fixed = false }: SparkProps) {
   const pts = React.useMemo(() => {
     const clean = values.filter((v) => Number.isFinite(v));
     if (clean.length < 2) return null;
@@ -94,14 +96,23 @@ export function Sparkline({ values, width = 300, height = 64, color = "var(--col
       return [x, y] as const;
     });
   }, [values, width, height]);
-  if (!pts) return <svg dir="ltr" width={width} height={height} aria-hidden="true" />;
+  if (!pts) return <svg dir="ltr" width={fixed ? width : undefined} height={height} aria-hidden="true" />;
   const d = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
   const areaD = `${d}L${pts[pts.length - 1][0].toFixed(1)},${height}L2,${height}Z`;
   const [ex, ey] = pts[pts.length - 1];
   return (
-    <svg dir="ltr" width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-label={ariaLabel} role={ariaLabel ? "img" : undefined} aria-hidden={ariaLabel ? undefined : "true"}>
+    <svg
+      dir="ltr"
+      viewBox={`0 0 ${width} ${height}`}
+      {...(fixed ? { width, height } : {})}
+      className={fixed ? "block" : "block h-auto w-full"}
+      preserveAspectRatio={fixed ? undefined : "xMidYMid meet"}
+      aria-label={ariaLabel}
+      role={ariaLabel ? "img" : undefined}
+      aria-hidden={ariaLabel ? undefined : "true"}
+    >
       {fill ? <path d={areaD} fill={color} opacity={0.12} /> : null}
-      <path d={d} fill="none" stroke={color} strokeWidth={1.8} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={d} fill="none" stroke={color} strokeWidth={1.8} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
       {endDot ? <circle cx={ex} cy={ey} r={3} fill={color} /> : null}
     </svg>
   );
@@ -109,7 +120,7 @@ export function Sparkline({ values, width = 300, height = 64, color = "var(--col
 
 /** A tiny inline spark for dashboard rows. */
 export function MiniSpark({ values, color = "var(--color-text-tertiary)" }: { values: readonly number[]; color?: string }) {
-  return <Sparkline values={values} width={64} height={18} color={color} endDot={false} />;
+  return <Sparkline values={values} width={64} height={18} color={color} endDot={false} fixed />;
 }
 
 /* ------------------------------------------------------------------ *
@@ -212,9 +223,9 @@ export function BrassBalance({
   const net = forLanes.length - againstLanes.length;
   const tilt = (DEG_OF_NET[Math.abs(net)] ?? 10) * (net > 0 ? 1 : net < 0 ? -1 : 0);
 
-  const W = 340;
+  const W = 380;
   const H = 230;
-  const pivotX = 170;
+  const pivotX = 190;
   const pivotY = 54;
   const arm = 118; // half-beam length
   const hang = 58; // hanger length
@@ -270,8 +281,13 @@ export function BrassBalance({
     </g>
   );
 
+  const ariaSummary =
+    locale === "en"
+      ? `The assay balance: ${forLanes.length} of the five lanes sit on the for-gold pan, ${againstLanes.length} on the against pan.`
+      : `ترازوی عیارسنجی: از پنج لاین، ${fmt.num(forLanes.length)} روی کفهٔ نفع طلا و ${fmt.num(againstLanes.length)} روی کفهٔ علیه آن نشسته‌اند.`;
+
   return (
-    <div data-balance-visual data-size="s" className="relative w-full" role="img" aria-label={`${sideLabels.againside ?? ""}`}>
+    <div data-balance-visual data-size="s" className="relative w-full" role="img" aria-label={ariaSummary}>
       <div className="bal-glow" />
       <svg dir="ltr" viewBox={`0 0 ${W} ${H}`} className="bal-stage mx-auto block h-auto w-full max-w-[420px]" aria-hidden="true">
         <defs>
@@ -318,7 +334,7 @@ export function BrassBalance({
           {panBowl(panL.x, panL.y, "for")}
           {forLanes.length > 0 ? (
             <g>
-              {forLanes.map((l, i) => disc(l.lane, l.lane, panL.x - 30 + i * 30, panL.y + 2, 12, "for"))}
+              {forLanes.map((l, i) => disc(l.lane, l.lane, panL.x - (forLanes.length - 1) * 15 + i * 30, panL.y + 2, 12, "for"))}
             </g>
           ) : null}
           <text x={panL.x} y={panL.y - panH / 2 - 4} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-chip-ink-normal)">
@@ -330,7 +346,7 @@ export function BrassBalance({
           {panBowl(panR.x, panR.y, "against")}
           {againstLanes.length > 0 ? (
             <g>
-              {againstLanes.map((l, i) => disc(l.lane, l.lane, panR.x - 30 + i * 30, panR.y + 2, 12, "against"))}
+              {againstLanes.map((l, i) => disc(l.lane, l.lane, panR.x - (againstLanes.length - 1) * 15 + i * 30, panR.y + 2, 12, "against"))}
             </g>
           ) : null}
           <text x={panR.x} y={panR.y - panH / 2 - 4} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-chip-ink-attention)">
@@ -341,7 +357,7 @@ export function BrassBalance({
 
       {/* the verdict + the not-leaning tray (HTML for real text) */}
       <p className="m-0 mt-2 text-center type-caption font-semibold" style={{ color: verdict === "against" ? "var(--color-chip-ink-attention)" : verdict === "for" ? "var(--color-chip-ink-normal)" : "var(--color-text-secondary)" }}>
-        {verdict === "against" ? sideLabels.against : verdict === "for" ? sideLabels.forWord : ""}
+        {verdict === "against" ? sideLabels.against : verdict === "for" ? sideLabels.for : ""}
       </p>
       {neutralLanes.length > 0 ? (
         <p className="bal-tray m-0 mx-auto mt-1 flex w-fit items-center gap-2 type-caption">

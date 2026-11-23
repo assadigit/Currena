@@ -11,6 +11,9 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH;
 const nextConfig: NextConfig = {
   output: "standalone",
   ...(basePath ? { basePath } : {}),
+  // The sandbox's Preview Panel proxies the dev server from its own host;
+  // allowing it keeps HMR + dev tooling working through the proxy.
+  allowedDevOrigins: ["*.space-z.ai"],
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,

@@ -53,6 +53,27 @@ import {
   SignedDelta,
   STATE_INK,
 } from "@/components/gold-page/visuals";
+import {
+  ExpectationsBand,
+  TaBand,
+  CentralBanksBand,
+  VaultBand,
+  CorrelationBand,
+  PositionsBand,
+  PremiumHistoryCard,
+  RelationshipsBand,
+  fetchTa,
+  fetchCb,
+  fetchLbma,
+  fetchPremium,
+  fetchPositions,
+  fetchExpectations,
+  fetchCorrelation,
+  fetchIfBought,
+  type PremiumPayload,
+} from "@/components/gold-page/record";
+import { IfBoughtBand } from "@/components/gold-page/ifbought";
+import { deskBasePath } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ *
  * The live payload's shape (from /api/gold)
@@ -90,7 +111,7 @@ interface GoldPayload {
 }
 
 async function fetchGold(): Promise<GoldPayload> {
-  const res = await fetch("/api/gold", { cache: "no-store" });
+  const res = await fetch(`${deskBasePath}/api/gold`, { cache: "no-store" });
   if (!res.ok) throw new Error(`The gold API responded with ${res.status}`);
   return res.json() as Promise<GoldPayload>;
 }
@@ -185,10 +206,15 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-forces", key: null, label: ["Forces", "نیروها"] },
   { id: "gold-signals", key: null, label: ["Signals", "سیگنال‌ها"] },
   { id: "gold-lanes", key: null, label: ["Lanes", "لاین‌ها"] },
+  { id: "gold-ta", key: null, label: ["Levels", "سطوح"] },
+  { id: "gold-cb", key: null, label: ["Central banks", "بانک‌ها"] },
+  { id: "gold-positions", key: null, label: ["Positions", "پوزیشن"] },
   { id: "gold-outlook", key: null, label: ["Outlook", "چشم‌انداز"] },
   { id: "gold-dashboard", key: null, label: ["Dashboard", "داشبورد"] },
   { id: "gold-bridge", key: null, label: ["Iran", "پل ایران"] },
   { id: "gold-history", key: null, label: ["History", "تاریخ"] },
+  { id: "gold-ifbought", key: null, label: ["If you'd bought", "اگر خریده بودید"] },
+  { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
 ];
 
 function SectionNav({ locale }: { locale: Locale }) {
@@ -208,7 +234,7 @@ function SectionNav({ locale }: { locale: Locale }) {
   return (
     <nav
       aria-label={locale === "en" ? "Sections" : "بخش‌ها"}
-      className="chip-scroller sticky top-16 z-30 -mx-3 mt-2 border-y border-[var(--color-border)] bg-[var(--color-currena-bg-light)]/92 px-3 backdrop-blur sm:-mx-6 sm:px-6 lg:top-20"
+      className="chip-scroller sticky top-16 z-30 mt-2 border-y border-[var(--color-border)] bg-[var(--color-currena-bg-light)]/92 px-3 backdrop-blur sm:px-6 lg:top-20"
     >
       <div className="mx-auto flex w-full max-w-[1080px] gap-1.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {NAV_SECTIONS.map((s) => (
@@ -859,7 +885,7 @@ function DashboardBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof 
  * The Iran bridge — the clearly regional chapter
  * ------------------------------------------------------------------ */
 
-function BridgeBand({ t, locale }: { t: typeof UI.en; locale: Locale }) {
+function BridgeBand({ t, locale, premium, fmt }: { t: typeof UI.en; locale: Locale; premium: PremiumPayload | null; fmt: ReturnType<typeof makeFmt> }) {
   const steps = [t.bridge.step1, t.bridge.step2, t.bridge.step3, t.bridge.step4, t.bridge.step5];
   return (
     <section id="gold-bridge" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-bridge-accent)]/30 sm:mt-5 sm:p-5">
@@ -883,6 +909,9 @@ function BridgeBand({ t, locale }: { t: typeof UI.en; locale: Locale }) {
           </div>
         ))}
       </div>
+
+      {/* the live premium history — the previous page's bridge companion */}
+      {premium ? <PremiumHistoryCard data={premium} t={t.bridge} fmt={fmt} locale={locale} /> : null}
 
       <details className="mt-3 rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
         <summary className="cursor-pointer px-3 py-2 type-caption font-bold text-[var(--color-bridge-accent)]">{t.bridge.methodTitle}</summary>
@@ -964,6 +993,11 @@ function Footer({ t, fmt, data }: { t: typeof UI.en; fmt: ReturnType<typeof make
       <div className="mx-auto w-full max-w-[1080px] px-3 py-6 sm:px-6 lg:px-8">
         <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.footer.honestTitle}</h2>
         <p className="m-0 mt-1.5 max-w-prose type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.footer.honestBody}</p>
+        {/* the publication notes — the previous page's tail disclosure */}
+        <details className="mt-3 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2">
+          <summary className="cursor-pointer type-caption font-bold text-[var(--color-currena-blue-deep)]">{t.footer.pubNotesTitle}</summary>
+          <p className="m-0 mt-1.5 max-w-prose type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.footer.pubNotesBody}</p>
+        </details>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-[var(--color-border)] pt-3">
           <span className="type-caption text-[var(--color-text-tertiary)]">{t.footer.method}</span>
           <span className="type-caption text-[var(--color-text-tertiary)]">
@@ -981,10 +1015,34 @@ function Footer({ t, fmt, data }: { t: typeof UI.en; fmt: ReturnType<typeof make
 
 export default function GoldPage() {
   const [locale, setLocale] = React.useState<Locale>("en");
+  // The reader's chosen language survives a reload (SSR still renders en/lt
+  // first so hydration matches; the stored locale applies right after mount).
+  React.useEffect(() => {
+    const saved = window.localStorage.getItem("currena-gold-locale");
+    if (saved === "fa" || saved === "en") setLocale(saved);
+  }, []);
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem("currena-gold-locale", locale);
+    } catch {
+      /* private mode — the toggle still works for the session */
+    }
+  }, [locale]);
   const t = UI[locale] as typeof UI.en;
   const fmt = React.useMemo(() => makeFmt(locale), [locale]);
   const balance = React.useMemo(() => balanceOf(), []);
   const { data, isLoading, isError } = useQuery({ queryKey: ["currena-gold"], queryFn: fetchGold });
+  /* the record legs — every section fail-closed: a leg that does not
+     arrive simply does not render its section (the honest line rides
+     inside the sections that partially arrive). */
+  const ta = useQuery({ queryKey: ["currena-gold-ta"], queryFn: fetchTa, retry: 1 });
+  const cb = useQuery({ queryKey: ["currena-gold-cb"], queryFn: fetchCb, retry: 1 });
+  const lbma = useQuery({ queryKey: ["currena-gold-lbma"], queryFn: fetchLbma, retry: 1 });
+  const premium = useQuery({ queryKey: ["currena-gold-premium"], queryFn: fetchPremium, retry: 1 });
+  const positions = useQuery({ queryKey: ["currena-gold-positions"], queryFn: fetchPositions, retry: 1 });
+  const expectations = useQuery({ queryKey: ["currena-gold-expectations"], queryFn: fetchExpectations, retry: 1 });
+  const correlation = useQuery({ queryKey: ["currena-gold-correlation"], queryFn: fetchCorrelation, retry: 1 });
+  const ifbought = useQuery({ queryKey: ["currena-gold-ifbought"], queryFn: fetchIfBought, retry: 1 });
 
   React.useEffect(() => {
     document.documentElement.lang = locale;
@@ -1046,6 +1104,9 @@ export default function GoldPage() {
             {/* zone D: the narrative + the real-yield card */}
             <NarrativeBand data={data} t={t} fmt={fmt} locale={locale} balance={balance} />
 
+            {/* the market expectations strip — the previous page's zone D fourth element */}
+            {expectations.data ? <ExpectationsBand data={expectations.data} t={t.expectations} fmt={fmt} locale={locale} /> : null}
+
             {/* the five forces: the spine + the explainer diagrams */}
             <ForcesBand data={data} t={t} fmt={fmt} locale={locale} balance={balance} />
 
@@ -1055,17 +1116,34 @@ export default function GoldPage() {
             {/* the 37 seats */}
             <SeatsBand t={t} fmt={fmt} locale={locale} balance={balance} />
 
+            {/* the reference levels — the previous page's Zone H (the 200-day average etc.) */}
+            {ta.data ? <TaBand data={ta.data} t={t.ta} fmt={fmt} locale={locale} /> : null}
+
+            {/* the central-bank demand + the London vault + the correlation — the previous page's Zone K */}
+            {cb.data ? <CentralBanksBand data={cb.data} t={t.centralBanks} fmt={fmt} locale={locale} spot={data.gold.spot} /> : null}
+            {lbma.data ? <VaultBand data={lbma.data} t={t.vault} fmt={fmt} locale={locale} /> : null}
+            {correlation.data ? <CorrelationBand data={correlation.data} t={t.correlation} fmt={fmt} locale={locale} /> : null}
+
+            {/* the trader positioning — the previous page's CFTC cards */}
+            {positions.data ? <PositionsBand data={positions.data} t={t.positions} fmt={fmt} locale={locale} /> : null}
+
             {/* the outlook */}
             <OutlookBand data={data} t={t} fmt={fmt} locale={locale} />
 
             {/* the dashboard */}
             <DashboardBand data={data} t={t} fmt={fmt} locale={locale} />
 
-            {/* the Iran bridge */}
-            <BridgeBand t={t} locale={locale} />
+            {/* the Iran bridge — now with the live premium history */}
+            <BridgeBand t={t} locale={locale} premium={premium.data ?? null} fmt={fmt} />
 
             {/* the history tail */}
             <HistoryBand data={data} t={t} fmt={fmt} locale={locale} />
+
+            {/* the if-you'd-bought calculator — the previous page's Zone O card (gold vs S&P vs BTC vs silver, lump + DCA + decile) */}
+            <IfBoughtBand data={ifbought.data ?? null} t={t.ifBought} fmt={fmt} locale={locale} />
+
+            {/* the relationship map — the previous page's relationship explorer, list-first */}
+            <RelationshipsBand t={t.relationships} locale={locale} />
 
             {/* the key takeaway */}
             <TakeawayBanner t={t} locale={locale} />
