@@ -12,13 +12,20 @@ gold page, live at:
 - The **S8–S14 layer stack** exactly as the programme shipped it (briefing,
   visuals, live grounding, memory, scorecard, watch rules, digest) — the
   contracts are in `AGENTS.md`
+- The **gold page visual explanation layer** — the desk's page rebuilt for
+  the average reader on Currena's own design tokens, bilingual EN + fa/RTL:
+  the see-saw for real yields, the ounce's foreign price tags for the
+  dollar, the traffic-light gauge for stress, the split bar for inflation,
+  the crowded room for positioning, the five-forces spine, the scenario
+  fan, the seats grid, the episodes timeline and the if-you'd-bought bars;
+  market series served live from the observation store through
+  `/api/gold`
 - The **Currena Worker deployment**: OpenNext for Cloudflare + Prisma over
   Cloudflare D1 — the same schema and the same queries; only the runtime
   seam changes (`src/lib/db.ts`: the engine client in the sandbox, the
   PrismaD1 driver adapter on the Worker)
 - The **archive seed**: `scripts/d1-dump.ts` — a strictly read-only,
-  SQLite-`quote()`-exact snapshot of `db/custom.db` (3474 rows matching the
-  S15 record counts)
+  SQLite-`quote()`-exact snapshot of `db/custom.db`
 - The deterministic engine stays reachable via
   `/api/desk?source=modelled` — on the Worker too
 
@@ -39,15 +46,13 @@ gold page, live at:
   the same code at `/`). A workers.dev mirror of the desk serves at
   `currena-gold-desk.sedanama-ir.workers.dev/gold` as a preview. D1 database
   `aurum-desk` seeded from the archive, `EODHD_TOKEN` attached as a Worker
-  secret. Verified against the live URL: every route, the force flag,
-  byte-identical archive responses, the watch write path through the routed
-  URL, and the browser golden path with zero console errors. The full
-  record is in `AGENTS.md`'s deployment addendum.
+  secret. The full record is in `AGENTS.md`'s deployment addendum.
 
-Deployed live on 2026-11-22 — first to the account's workers.dev subdomain,
-then, per the owner's clarification ("we supposed to upgrade
-currena.ir/gold"), routed onto the Currena site at currena.ir/gold the
-same day and re-verified there end to end. Credentials were used env-only
+First deployed live on 2026-11-22 (workers.dev, then routed onto
+currena.ir/gold the same day); re-deployed on 2026-11-23 carrying the
+gold page visual explanation layer, built from main. The live D1
+continued on its own since the first seed (as designed), so the deployed
+desk serves its own fresher observations. Credentials were used env-only
 — never stored or printed, per the repo's credential rule.
 
 Honest differences on the Worker (both fail-closed by design):
@@ -55,16 +60,16 @@ Honest differences on the Worker (both fail-closed by design):
 - New/regenerated desk days there carry **template-written narratives** (the
   strategist LLM is a sandbox-internal service; `narrativeSource` records
   which one served).
-- The Worker's D1 is **seeded once** from the archive and then continues on
-  its own; `db/custom.db` remains the desk of record in this repository.
+- The Worker's D1 is **seeded from the archive** and then continues on its
+  own; `db/custom.db` remains the desk of record in this repository.
 
 ## The record
 
 - `AGENTS.md` — the programme rulebook, the full S15 close-out record, and
   the Currena Worker deployment addendum.
 - One branch per session: `feat/gie-s9-supporting-visuals` through
-  `feat/gie-s15-closeout`, then `feat/gie-deploy-currena-worker` (this
-  branch).
+  `feat/gie-s15-closeout`, then `feat/gie-deploy-currena-worker` (the
+  deployment port).
 
 ## History note (important)
 

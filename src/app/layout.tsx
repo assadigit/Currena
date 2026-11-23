@@ -24,9 +24,9 @@ const vazirmatn = Vazirmatn({
 });
 
 export const metadata: Metadata = {
-  title: "Gold — Currena",
+  title: "Gold · Currena",
   description:
-    "THE gold card — the 37-voter conditions meter plus the complete gold picture: today's price, the balance of forces, and the five forces explained in plain language.",
+    "THE gold card: the 37-voter conditions meter plus the complete gold picture. Today's price, the balance of forces, and the five forces explained in plain language.",
   keywords: ["gold", "gold price", "market briefing", "XAUUSD", "Currena"],
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",

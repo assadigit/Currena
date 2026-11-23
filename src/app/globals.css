@@ -449,6 +449,14 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
+/* The hero spot price — the number the page is about (3× the type-number). */
+.type-number-hero {
+  font-size: clamp(2.2rem, 8vw, calc(var(--type-number) * 3));
+  line-height: 1.08;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
 .type-label {
   font-size: var(--type-label);
   font-weight: 600;

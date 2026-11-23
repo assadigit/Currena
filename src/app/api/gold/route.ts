@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { computeHistoryEcho, getLongSeries } from "@/lib/gold-page/trend";
 
 /**
  * GET /api/gold — the Currena gold page's live market leg.
@@ -96,6 +97,12 @@ export async function GET() {
     // previous system's own 10-year measurement, kept as the record).
     const pctileDecade = 0.12;
 
+    // The history echo — when the market last traded at today's level
+    // (read from the long anchored daily window; null when it cannot
+    // be answered honestly).
+    const long = await getLongSeries();
+    const historyEcho = computeHistoryEcho(long.points);
+
     const gold = {
       asOf,
       spot,
@@ -104,6 +111,7 @@ export async function GET() {
       chg90d: pct(90),
       pctileYear,
       pctileDecade,
+      historyEcho,
       bars: goldAll.slice(-90),
     };
 

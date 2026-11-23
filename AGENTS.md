@@ -656,6 +656,53 @@ desk's own namespace — any pre-existing converter sub-paths under
 itself) would now meet the desk's 404 instead. The converter's own pages
 outside `/gold` are untouched.
 
+### The redeploy carrying the visualized gold page (2026-11-23)
+
+The owner's instruction ("push commit merge in main and deploy to
+cloudflare") made the tree that matters be **main itself**: the gold page
+visual explanation layer (commit `53ad0c05`, already on main) plus the
+deployment infrastructure carried onto it (commit `95f9be3c`) — one tree,
+pushed to main, deployed. The port took exactly the deployment pieces
+from `feat/gie-deploy-currena-worker` and nothing else (the gold page
+tree is byte-identical to `53ad0c05` — `db/custom.db` verified identical
+to the archive the first deploy seeded, all row counts unchanged).
+
+**The run (credentials env-only, never stored or printed):**
+
+- The account and the worker were verified first: worker
+  `currena-gold-desk` and D1 `aurum-desk` present from the first deploy;
+  `EODHD_TOKEN` still attached (secrets persist across versions).
+- **The D1 seed was deliberately NOT re-run.** The live D1 had continued
+  on its own since the first seed exactly as designed (9 DeskDay /
+  3461 Observation / 6 SourceSync / 5 WatchRule vs the archive's 6 / 3457
+  / 6 / 5 — the Worker's own daily syncs fired after the seed). Re-seeding
+  would have rolled back live-collected data; `/api/gold` reads only the
+  Observation store, so the deployed page serves its fresher closes
+  (the live `pctileYear` honestly differs from the sandbox's — the
+  deployed store has four more observations).
+- `NEXT_PUBLIC_BASE_PATH=/gold` on both `worker:build` and
+  `worker:deploy` (the OpenNext CLI rebuilds on deploy — the env var
+  rides both), same zone routes from `wrangler.jsonc`.
+
+**Verified live at https://currena.ir/gold after the redeploy:**
+
+- The page (200, full HTML, zero console and zero page errors), the new
+  `/gold/api/gold` (200 on both the zone route and the workers.dev
+  mirror — spot 3532.83, series bars from the live observation store),
+  and `/gold/api/desk` (200, `narrativeSource: "template"` — the
+  fail-closed path; `?source=modelled` 200).
+- Route precision re-checked: `currena.ir/` still serves the Currency
+  Converter untouched; the workers.dev mirror root 404s (expected with
+  basePath) while `/gold` serves.
+- The browser golden path on the live URL: the visual explanation layer
+  renders (see-saw, price tags, gauge, split bar, crowd, spine, fan,
+  seats, episodes, if-you'd-bought); the EN ⇄ fa/RTL toggle flips the
+  document direction; dark mode applies; 375px mobile with no horizontal
+  overflow and the footer pushed down naturally.
+- The ported sandbox tree browser-verified the same way before the
+  push (the dual-runtime `db.ts` seam on its sandbox path, the
+  deskBasePath-prefixed fetch with the env var unset, lint green).
+
 ## The S10 data sources (recorded by live probe; EODHD plans gate symbols)
 
 | Series | Source | Mode |
@@ -764,3 +811,237 @@ Rules that bind every session:
 
 The desk is previewed through the sandbox **Preview Panel** (the "Open in New
 Tab" button), never via local URLs. The sandbox port is fixed at 3000.
+
+### The record sections restored (2026-11-23, after the redeploy)
+
+The owner's audit caught what the visualized rebuild had dropped: whole
+sections the previous gold page (the upstream Currena site, live at
+currena.ir/gold until 2026-11-22 21:06 UTC, tree `e45397b`) carried. The
+audit walked that tree's GoldPage section by section against the
+visualized page and found nine missing pieces — restored in commit
+`e8be422a`, all bilingual EN + fa/RTL on Currena's own tokens,
+display-only (nothing joins the 37-voter balance):
+
+- **The TA reference levels** (the owner's explicit miss): SMA
+  20/50/100/200, the distance-from-200DMA decile over the named stored
+  basis, the dated 50/200 crosses with the 20-session follow-through,
+  and the classic daily/weekly pivots — the engine ported verbatim
+  (`src/lib/gold-page/ta.ts`, the C5 honesty rules riding along).
+- **The central-bank demand tracker** (the owner's explicit miss): the
+  rolling-12m reported-world series with the three dated episode
+  annotations, the top-buyers table (latest month, 12-month net,
+  holdings, the live-priced gold share of reserves with the 6-quarter
+  vintage bound), the honest exceptions, the IMF method block.
+- The London vault + clearing cards, the gold/yield correlation
+  companion (the dual-axis chart + the 52-week rolling Pearson strip +
+  the 2022 rotation marker, the registered windows verbatim), the CFTC
+  positioning cards (each on its own bar domain), the
+  market-expectations strip (Polymarket + the gold-relevant calendar),
+  the live Iran-premium history inside the bridge chapter (the Emami
+  حباب day-by-day), the 24-record relationship map (ported byte-faithful),
+  and the publication-notes disclosure in the footer.
+
+**The data seam (the one architectural decision):** the upstream page
+fetched these legs browser-side from its own worker
+(currena.ir/api/insights/*). The desk page now serves at currena.ir/gold —
+same origin, but the browser-side fetch would be CORS-blocked on the
+workers.dev mirror and the sandbox preview, so every leg is fetched
+SERVER-SIDE by the desk's own routes
+(`src/app/api/gold/{ta,cb,lbma,premium,positions,expectations,correlation}`
+over `src/lib/gold-page/legs.ts`, memory-cached 5 min) and re-served to
+the page. Verified all seven live legs still answer on the account
+(gold-ohlc 363 bars, gold-cb through 2026-10, gold-lbma, gold-premium
+through 2026-11-22, the projection's CFTC readings, gold-expectations,
+the real-yield history) before building on them. Each section renders
+its honest unavailable line when its leg does not arrive — never a
+guess.
+
+**The honest limits, stated:** the TA decile's basis and the correlation
+display window are the STORED spans (the OHLC leg carries 363 bars —
+~1.5 years; the upstream's own S13-D1 posture, the span named at point
+of use and self-widening when the source plan does); the 50/200 crosses
+and the correlation rotation marker can therefore be absent or sparse —
+rendered honestly ("No 50/200 crossover in the stored window yet"), the
+exact fail-closed wording the upstream carried. The correlation strip
+over the current span is short (the honest render; it self-widens).
+
+**Deploy note (the mistake caught in the run):** `worker:deploy` alone
+re-uploads the EXISTING `.open-next` bundle — it does not rebuild. The
+first deploy attempt at 01:20 shipped the 00:24 bundle (the new routes
+404'd); the runbook's own two-step (`worker:build` THEN `worker:deploy`,
+both with `NEXT_PUBLIC_BASE_PATH=/gold`) was re-run and the new routes
+appeared (`/gold/api/gold/*` all 200 on both the zone route and the
+mirror). Recorded so the next session does not repeat it.
+
+**Verified live after the restore-build:** the page renders all twenty
+sections (the thirteen prior + the seven new bands + the
+premium-inside-bridge) with live data end to end — TA: SMA
+3,903/4,015/4,201/4,240 and −16.6% below the 200-day average at the 1st
+percentile of the stored 1.5 years; CB: Poland +159.1t 12-month net,
+Kazakhstan 74.7% share; vault 9,850 t; premium +9.28%; positions
+40.7/51.5; the Fed-December event; 25 relationship records — EN + fa/RTL
+(Persian digits and dates throughout), dark mode, 375px mobile with no
+horizontal overflow, zero console and zero page errors, lint green.
+
+### The if-you'd-bought calculator restored (2026-11-23, the second audit)
+
+The owner's second audit found the one piece the first restoration still
+missed: the **"If you bought Gold" calculator** (the upstream
+`GoldIfBought`, GPE R33 / F26 — the page's Zone O card, named by the
+owner explicitly). The first audit had restored nine record sections but
+left only a gold-only near-window bars chart in the history tail — the
+full calculator (gold vs S&P 500 vs Bitcoin vs silver since the year the
+reader picks) was absent. This session fetched the previous page from
+the repository (tree `e45397b`), walked it section by section again, and
+restored the calculator whole:
+
+- **The pure engine ported verbatim** (`src/lib/gold-page/ifbought.ts`,
+  from upstream `packages/insights/src/domains/gold/if-bought.ts`): the
+  lump multiple, the monthly DCA ($100 at each month-end close, the SA
+  convention, the running month included, the value marked at the
+  running month's close), and the decile of the window's lump return
+  among ALL same-length windows over the asset's own series — the R19
+  posture (min base 30, the basis named, the honest waiting line below
+  it). `windowCloses` rides along; `yearOptions` off the series' own
+  coverage.
+- **The data leg** (`GET /api/gold/ifbought`): the still-live currena-api
+  route `/api/insights/gold-ifbought` — per-asset month-end closes since
+  2016-11 (120 anchors + the current running point per asset) — fetched
+  SERVER-SIDE through the desk's own seam (`legs.ts`, memory-cached
+  5 min), fail-closed 503 with the honest line. The page computes
+  client-side through the pure engine — the route serves data, never
+  arithmetic (the upstream design, kept).
+- **The band** (`src/components/gold-page/ifbought.tsx`): the year picker
+  (years ungrouped — 2026, never "2,026"; the first-year note "from
+  November"), the four stacked result rows (asset name + the signed lump
+  percent + a one-glance bar on the same number + the window NAMED at
+  point of use + the DCA line + the decile line or its honest waiting
+  line), the method line first, then the disclaimer, the series-bases
+  line and the series' own stamp. The section stays ALIVE even when its
+  leg does not arrive — the header + the honest waiting line render
+  regardless, never a silent drop (the owner's rule for this band).
+  Anchored `#gold-ifbought`, one nav chip, one row in the sticky nav.
+- **The copy verbatim from the upstream dictionaries** (EN + fa, the
+  `pd.gold.ib*` keys): the fa window line "تا" + the fa DCA arrow "←",
+  the fa month convention "م/سال", Persian digits throughout.
+
+**Verified in the sandbox before the push:** the calculator renders
+live end to end — default year 2025 (gold +25.8%, S&P +18.8%, BTC −42%,
+silver +27.9%, each with its DCA and its decile over 99 same-length
+windows); the picker set to 2016 flips to the honest "Nov 2016 → Nov
+2026 · 121 months" window with the decile waiting line ("this window
+has 1") — the upstream's own honesty at the series edge; the DCA
+independently recomputed in Python off the raw payload ($12,100 →
+$23,593, +95.0% — byte-identical); EN ⇄ fa/RTL with Persian digits
+(+۲۰۲٫۳٪, ۱۲٬۱۰۰ دلار ← ۲۳٬۵۹۳ دلار); 375px with zero horizontal
+overflow and the 44px picker target; 17/17 sections, the footer intact,
+zero console errors, lint green.
+
+**Verified live after the calculator build (currena.ir/gold + the
+workers.dev mirror, both serving the new `/gold/api/gold/ifbought`
+route at 200):** the section renders with live data end to end — the
+default 2025 window (gold +25.8%, S&P +18.8%, BTC −42%, silver +27.9%,
+each with its DCA and its decile over 99 same-length windows), the
+picker set to 2020 flipping to the 83-month window with the deciles
+now lighting (39 same-length windows — above the 30 minimum), the
+2016 edge case rendering the honest "Nov 2016" window + the waiting
+line ("this window has 1") as verified in the sandbox; fa/RTL with
+Persian digits (+۱۲۳٫۶٪, ۸٬۳۰۰ دلار ← ۱۳٬۲۲۳ دلار, صدکِ ۵ از ۳۹) and
+the fa nav chip; 17/17 sections intact, 375px with zero horizontal
+overflow, zero console and zero page errors. The two-step deploy
+runbook followed (build then deploy, both with
+`NEXT_PUBLIC_BASE_PATH=/gold`).
+
+### The third audit: the remaining sections restored (2026-11-23)
+
+The owner's third audit ("compare current deployed version with 48-72
+hours ago; find the gaps and fill them") walked the reference tree
+again — `e45397b`, the upstream gold page live at currena.ir/gold until
+2026-11-22 21:06 UTC — section by section against the deployed page, and
+found FIVE more pieces the first two restorations had left behind. All
+restored this session, bilingual EN + fa/RTL on Currena's own tokens,
+display-only, fail-closed:
+
+- **The time machine** (GPE R31/F12, the owner's Zone C Advanced
+  control): the date-parameterized meter — pick any day 2016-11-01 →
+  today, get that day's beam, counts and lane readings under the
+  then-current versioned voter table, with the backfill/live
+  provenance line and the era-boundary note. Served by
+  `GET /api/gold/meter?date=…` over the still-live upstream
+  `/api/insights/gold-meter` leg (memory-cached 5 min server-side);
+  the picker's own min + the route's own rejection keep the era bound.
+- **The education on-ramp + the six-question FAQ** (GPE R20/F4a): the
+  five drivers (each closing with the LIVE lane count + lane word from
+  the same balance the hero reads), the two governance notes
+  (fuel-not-driver; why five here ≠ five in the meter), and the FAQ
+  tail — the copy verbatim from the upstream dictionaries, EN + fa.
+- **The context cards** (Zone J): the eight ratio cards (gold/silver,
+  gold/btc, gold/aud, gold/oil, gold/platinum, the real gold price,
+  gold/copper, gold/S&P — each with its own 10-year position band, the
+  plain meaning sentence, and 30/90-day changes) + the five-currency
+  gold grid (EUR/AUD native, JPY/GBP/CNY derived, each row's latest
+  close + 30-day change + decile over its own stored window, and the
+  KGX validation sentence) + the physical trio (SGE withdrawals, the
+  Swiss flow, the Shanghai premium under the «بازار فیزیکی» header) +
+  the forecast-accuracy retrospective (LBMA's analyst-survey record:
+  16 scored years + the pending 2026, the mean −2.1%/mean-abs 8.1%
+  aggregates, the 2025 −20.2% headline, the 17-row table one tap away,
+  beside Currena's own no-edge posture). Served by
+  `GET /api/gold/projection` + `GET /api/gold/crosses` over the
+  still-live upstream `/api/insights/pages/gold` (48 readings with
+  percentile10y/sd10y/fromPeak10y) + `/api/insights/gold-crosses`.
+- **The seven-state conditions outlook** on the signals gold card +
+  the chart's range chips: the upstream classifier (`goldOutlookOf`)
+  ported verbatim over the page's own balance + the gold's 30-day
+  speed + the projection's own 10-year position band; the verdict word
+  renders in the upstream's own seven states (Strong bullish … Mixed
+  signals, EN + fa). The chart gains the 90-day/1-year range chips over
+  the TA leg's own closes (the ta route now also serves the raw daily
+  closes — one leg, two surfaces, the honest stored span named).
+- **The live Tehran board** inside the Iran bridge: every instrument's
+  market price beside its computed حباب premium (Emami, Bahar, half,
+  quarter, gerami, 18K, 24K, mesghal — the coin-premium engine ported
+  verbatim: toman-per-ounce = ounce × free-dollar, intrinsic = × pure
+  content), the parity line naming the toman-per-ounce, the snapshot
+  time, and the source note. Served by `GET /api/gold/rates` over the
+  still-live upstream `/api/rates` snapshot; the premiums are computed
+  client-side through the pure engine — the route serves data, never
+  arithmetic (the upstream design, kept).
+
+**What was already covered and re-verified:** the TA reference levels,
+the central-bank tracker, the London vault, the correlation companion,
+the CFTC positions, the expectations strip, the Iran premium history,
+the relationship map, the if-you'd-bought calculator (the first two
+audits' restorations, all answering 200 on the account's legs before
+this build started); the episode timeline's static records (the
+upstream's nine-record list rides the page's own ten-episode content,
+and the upstream's own price-path leg honestly answers 503 not-ready).
+
+**The remaining honest deltas, stated:** the deep per-record sheets
+(the upstream's expanded + technical tiers behind a details panel) and
+the hero's 1d/7d movement toggle stay un-ported — the page's own
+briefing card and signals card carry the same information at reader
+level; porting the 52-record deep layer is its own sitting. The
+`fromCache` honesty label does not apply (the desk's legs are
+fail-closed, never stale-cached).
+
+**Verified in the sandbox before the push:** all twenty sections
+render (`#gold-briefing … #gold-relationships` including the four new
+`gold-timemachine`, `gold-onramp`, `gold-context`, and the board inside
+`gold-bridge`); the time machine exercised end to end (2026-11-18 →
+"Leaning for gold", the gf-s10-37 table, all five lanes with counts +
+firing, the backfill provenance line; 2026-11-23 → the live-source row
+with the honest "last reading day on or before" wording; a future date
+→ the honest unavailable line); the on-ramp's live closes (7/10/7/11
+of the 37 factors with the lane words) + the FAQ + both notes; the
+context cards (gold/silver 85.6 mid-range of its stored window, the
+five crosses with 30-day changes and deciles, the KGX mixed verdict,
+the physical trio, the LBMA table's 2010/2025 rows + the pending
+2026); the signals verdict ("Strong bearish" — four lanes against —
+with the range chips flipping the stored span Aug 26 → Nov 26 /
+Mar 26); the Tehran board (Emami 243.16M toman +7.7%, Bahar +2%,
+quarter +24.7%, 18K/24K +1.5%, mesghal +1.6% — the parity line
+naming 3,585.26 × 267,37X); EN ⇄ fa/RTL with Persian digits and dates
+(اسفند ۰۴ → آبان ۰۵, ۲۴۳٫۱۶ میلیون تومان, حباب +۷٫۷%); 375px with
+zero horizontal overflow; 16 nav chips; zero console and zero page
+errors; lint green.

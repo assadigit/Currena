@@ -46,6 +46,9 @@ export async function GET() {
         date: series[series.length - 1]!.date,
         close: series[series.length - 1]!.close,
       },
+      // The raw daily closes — the signals chart's range windows read
+      // this same series (one leg, two surfaces; the honest span named).
+      closes: series.map((c) => ({ date: c.date, close: c.close })),
     },
     { headers: { "cache-control": "no-store" } },
   );

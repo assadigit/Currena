@@ -52,7 +52,6 @@ prompt
 server.log
 # Skills directory
 /skills/
-
 # Cloudflare Worker deployment (Currena)
 .open-next/
 .wrangler/
@@ -60,3 +59,9 @@ server.log
 cloudflare-env.d.ts
 db/d1-dump.sql
 tool-results/
+# Sandbox-only offline snapshot artifacts (kept locally, never deployed
+# to the repo's tree — the live desk serves the page itself)
+public/currena-gold-offline.html
+scripts/build-offline-snapshot.ts
+scripts/build-offline-snapshot.v1.ts
+scripts/check-captures.ts

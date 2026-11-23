@@ -34,7 +34,7 @@ export function makeFmt(locale: Locale) {
   };
   const pct = (v: number | null | undefined, digits = 1): string =>
     v === null || v === undefined || !Number.isFinite(v)
-      ? "—"
+      ? "·"
       : `${v > 0 ? "+" : v < 0 ? "−" : ""}${num(Math.abs(v), digits)}%`;
   const usd = (v: number): string =>
     locale === "fa"
@@ -124,6 +124,310 @@ export function MiniSpark({ values, color = "var(--color-text-tertiary)" }: { va
 }
 
 /* ------------------------------------------------------------------ *
+ * TraceChart — the house line chart with real X/Y axes + a hover
+ * trace (the crosshair + the tooltip that follows the pointer).
+ * ------------------------------------------------------------------ */
+
+/** One traced line — its own points (own dates), its own color. */
+export interface TraceSeriesDef {
+  label: string;
+  /** A CSS var reference (the tokens only). */
+  color: string;
+  points: ReadonlyArray<{ d: string; v: number }>;
+  dashed?: boolean;
+  /** True to fill softly under this line (the hero's single line). */
+  fill?: boolean;
+  /** The drawn stroke width (default 2; the comparison chart rides wider). */
+  lineWidth?: number;
+  /** "left" (default) rides the primary axis; "right" rides its own
+   *  honest second scale (a rate beside indexed assets — the house
+   *  dual-axis convention the correlation band uses). */
+  axis?: "left" | "right";
+  /** The tooltip's own value format (defaults to the axis formatter). */
+  format?: (v: number) => string;
+}
+
+export interface TraceChartProps {
+  series: TraceSeriesDef[];
+  height?: number;
+  /** The left (primary) Y-axis + tooltip value formatter. */
+  yFormat: (v: number) => string;
+  /** The right (secondary) axis formatter — present only in dual-axis charts. */
+  yFormatRight?: (v: number) => string;
+  fmt: Fmt;
+  ariaLabel: string;
+  /** Draw a dashed reference line at this Y (e.g. the 100 index base). */
+  baseline?: number | null;
+  /** Tooltip secondary line (e.g. the % from window start). */
+  hoverNote?: ((series: TraceSeriesDef, v: number, first: number) => string | null) | null;
+}
+
+/**
+ * The multi-line chart with labelled axes and a pointer-driven trace:
+ * the crosshair locks to the nearest point in time, and the tooltip
+ * reads every line's value at that date. LTR root (the Persian
+ * financial-chart convention), tokens only, colour never alone — the
+ * legend pairs each line's colour with its name and the tooltip lists
+ * values by name.
+ */
+export function TraceChart({
+  series,
+  height = 200,
+  yFormat,
+  yFormatRight,
+  fmt,
+  ariaLabel,
+  baseline = null,
+  hoverNote = null,
+}: TraceChartProps) {
+  const [hoverT, setHoverT] = React.useState<number | null>(null);
+  const traceRef = React.useRef<HTMLDivElement | null>(null);
+
+  const model = React.useMemo(() => {
+    const W = 640;
+    const H = height;
+    const padL = 10;
+    const padR = yFormatRight !== undefined ? 92 : 64;
+    const padT = 14;
+    const padB = 26;
+    const hasRight = series.some((s) => s.axis === "right");
+    const times: number[] = [];
+    const leftValues: number[] = [];
+    const rightValues: number[] = [];
+    for (const s of series) {
+      for (const p of s.points) {
+        const t = Date.parse(`${p.d}T00:00:00Z`);
+        if (!Number.isFinite(t) || !Number.isFinite(p.v)) continue;
+        times.push(t);
+        (s.axis === "right" ? rightValues : leftValues).push(p.v);
+      }
+    }
+    if (times.length < 2) return null;
+    const tMin = Math.min(...times);
+    const tMax = Math.max(...times);
+    const domain = (values: number[], includeBaseline: boolean): [number, number] => {
+      let lo = Math.min(...values, ...(includeBaseline && baseline !== null ? [baseline] : []));
+      let hi = Math.max(...values, ...(includeBaseline && baseline !== null ? [baseline] : []));
+      if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi === lo) {
+        lo = Number.isFinite(lo) ? lo - 1 : 0;
+        hi = lo + 2;
+      }
+      const pad = (hi - lo) * 0.06;
+      return [lo - pad, hi + pad];
+    };
+    const [vMin, vMax] = domain(leftValues, true);
+    const [rMin, rMax] = hasRight ? domain(rightValues, false) : [vMin, vMax];
+    const xOf = (t: number) => padL + ((t - tMin) / Math.max(1, tMax - tMin)) * (W - padL - padR);
+    const yOfLeft = (v: number) => padT + (1 - (v - vMin) / (vMax - vMin)) * (H - padT - padB);
+    const yOfRight = (v: number) => padT + (1 - (v - rMin) / Math.max(1e-9, rMax - rMin)) * (H - padT - padB);
+    const yOf = (v: number, axis: "left" | "right") => (axis === "right" ? yOfRight(v) : yOfLeft(v));
+    const pathOf = (s: TraceSeriesDef): string => {
+      const axis = s.axis ?? "left";
+      let d = "";
+      for (const p of s.points) {
+        const t = Date.parse(`${p.d}T00:00:00Z`);
+        if (!Number.isFinite(t) || !Number.isFinite(p.v)) continue;
+        d += `${d === "" ? "M" : "L"}${xOf(t).toFixed(1)},${yOf(p.v, axis).toFixed(1)}`;
+      }
+      return d;
+    };
+    // the x ticks: quarter points, labelled with the house month-short
+    const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => {
+      const t = tMin + f * (tMax - tMin);
+      return { t, x: xOf(t), label: fmt.monthShort(new Date(t).toISOString().slice(0, 10)) };
+    });
+    // the y ticks: min / mid / max per axis, labelled right
+    const yTicks = [
+      { v: vMin, y: yOfLeft(vMin), label: yFormat(vMin) },
+      { v: (vMin + vMax) / 2, y: yOfLeft((vMin + vMax) / 2), label: yFormat((vMin + vMax) / 2) },
+      { v: vMax, y: yOfLeft(vMax), label: yFormat(vMax) },
+    ];
+    const rightTicks =
+      hasRight && yFormatRight !== undefined
+        ? [
+            { v: rMin, y: yOfRight(rMin), label: yFormatRight(rMin) },
+            { v: (rMin + rMax) / 2, y: yOfRight((rMin + rMax) / 2), label: yFormatRight((rMin + rMax) / 2) },
+            { v: rMax, y: yOfRight(rMax), label: yFormatRight(rMax) },
+          ]
+        : [];
+    return { W, H, padL, padR, padT, padB, tMin, tMax, vMin, vMax, rMin, rMax, xOf, yOf, yOfLeft, yOfRight, pathOf, ticks, yTicks, rightTicks, hasRight };
+  }, [series, height, baseline, fmt, yFormat, yFormatRight]);
+
+  /* the pointer trace — the crosshair locks to the nearest date */
+  const onPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (model === null || traceRef.current === null) return;
+    const rect = traceRef.current.getBoundingClientRect();
+    const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    setHoverT(model.tMin + frac * (model.tMax - model.tMin));
+  };
+
+  /* each series' nearest point at the hover time */
+  const hovered = React.useMemo(() => {
+    if (model === null || hoverT === null) return null;
+    const rows = series.map((s) => {
+      let best: { d: string; v: number } | null = null;
+      let bestDx = Infinity;
+      for (const p of s.points) {
+        const t = Date.parse(`${p.d}T00:00:00Z`);
+        if (!Number.isFinite(t)) continue;
+        const dx = Math.abs(t - hoverT);
+        if (dx < bestDx) {
+          bestDx = dx;
+          best = p;
+        }
+      }
+      return { s, p: best };
+    });
+    const date = rows.find((r) => r.p !== null)?.p?.d ?? null;
+    return { rows, date };
+  }, [series, hoverT, model]);
+
+  if (model === null) {
+    return <div dir="ltr" aria-hidden="true" style={{ height: `${height}px` }} />;
+  }
+
+  return (
+    <div
+      dir="ltr"
+      ref={traceRef}
+      className="relative w-full touch-pan-y select-none"
+      onPointerMove={onPointer}
+      onPointerLeave={() => setHoverT(null)}
+    >
+      <svg
+        viewBox={`0 0 ${model.W} ${model.H}`}
+        className="block h-auto w-full"
+        role="img"
+        aria-label={ariaLabel}
+      >
+        {/* the Y grid + axis labels (left = the primary index; right = the yield's own honest % scale) */}
+        {model.yTicks.map((tick, i) => (
+          <g key={i}>
+            <line x1={model.padL} y1={tick.y} x2={model.W - model.padR} y2={tick.y} stroke="var(--color-border)" strokeWidth={0.8} opacity={0.6} />
+            <text x={model.W - model.padR + 6} y={tick.y + 3.5} fontSize={10} fill="var(--color-text-tertiary)">
+              {tick.label}
+            </text>
+          </g>
+        ))}
+        {model.hasRight && model.rightTicks.length > 0 ? (
+          <g>
+            <line x1={model.W - 44} y1={model.padT} x2={model.W - 44} y2={model.H - model.padB} stroke="var(--color-border)" strokeWidth={0.8} opacity={0.6} />
+            {model.rightTicks.map((tick, i) => (
+              <text
+                key={i}
+                x={model.W - 40}
+                y={tick.y + 3.5}
+                fontSize={10}
+                fontWeight={700}
+                fill="var(--color-status-context)"
+              >
+                {tick.label}
+              </text>
+            ))}
+          </g>
+        ) : null}
+        {/* the X axis line + its date labels */}
+        <line x1={model.padL} y1={model.H - model.padB} x2={model.W - model.padR} y2={model.H - model.padB} stroke="var(--color-border)" strokeWidth={0.8} opacity={0.8} />
+        {model.ticks.map((tick, i) => (
+          <g key={i}>
+            <line x1={tick.x} y1={model.H - model.padB} x2={tick.x} y2={model.H - model.padB + 4} stroke="var(--color-text-tertiary)" strokeWidth={0.8} />
+            <text x={tick.x} y={model.H - model.padB + 14} fontSize={10} fill="var(--color-text-tertiary)" textAnchor={i === 0 ? "start" : i === 4 ? "end" : "middle"}>
+              {tick.label}
+            </text>
+          </g>
+        ))}
+        {/* the baseline (the 100 index, the flat reference) */}
+        {baseline !== null ? (
+          <line x1={model.padL} y1={model.yOf(baseline, "left")} x2={model.W - model.padR} y2={model.yOf(baseline, "left")} stroke="var(--color-text-tertiary)" strokeWidth={1} strokeDasharray="3 4" opacity={0.7} />
+        ) : null}
+        {/* the lines */}
+        {series.map((s) => {
+          const d = model.pathOf(s);
+          if (d === "") return null;
+          const areaD = s.fill
+            ? `${d}L${(model.W - model.padR).toFixed(1)},${(model.H - model.padB).toFixed(1)}L${model.padL.toFixed(1)},${(model.H - model.padB).toFixed(1)}Z`
+            : null;
+          const axis = s.axis ?? "left";
+          return (
+            <g key={s.label}>
+              {areaD ? <path d={areaD} fill={s.color} opacity={0.1} /> : null}
+              <path d={d} fill="none" stroke={s.color} strokeWidth={s.dashed ? (s.lineWidth ?? 1.4) : (s.lineWidth ?? 2)} strokeLinejoin="round" strokeLinecap="round" strokeDasharray={s.dashed ? "4 3" : undefined} />
+              {/* the end dot */}
+              {s.points.length > 0 ? (
+                <circle cx={model.xOf(Date.parse(`${s.points[s.points.length - 1]!.d}T00:00:00Z`))} cy={model.yOf(s.points[s.points.length - 1]!.v, axis)} r={3} fill={s.color} />
+              ) : null}
+            </g>
+          );
+        })}
+        {/* the hover trace: the crosshair + the focus dots */}
+        {hovered !== null && hovered.date !== null ? (
+          <g>
+            <line
+              x1={model.xOf(Date.parse(`${hovered.date}T00:00:00Z`))}
+              y1={model.padT}
+              x2={model.xOf(Date.parse(`${hovered.date}T00:00:00Z`))}
+              y2={model.H - model.padB}
+              stroke="var(--color-text-secondary)"
+              strokeWidth={0.8}
+              opacity={0.5}
+            />
+            {hovered.rows.map((r) =>
+              r.p !== null ? (
+                <circle
+                  key={r.s.label}
+                  cx={model.xOf(Date.parse(`${r.p.d}T00:00:00Z`))}
+                  cy={model.yOf(r.p.v, r.s.axis ?? "left")}
+                  r={3.6}
+                  fill="var(--color-surface)"
+                  stroke={r.s.color}
+                  strokeWidth={2}
+                />
+              ) : null,
+            )}
+          </g>
+        ) : null}
+      </svg>
+      {/* the tooltip (HTML — real bilingual text, never clipped by the viewBox) */}
+      {hovered !== null && hovered.date !== null ? (
+        <div
+          className="pointer-events-none absolute top-1 z-10 max-w-[240px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)]"
+          style={{
+            left: `${Math.min(72, Math.max(4, (model.xOf(Date.parse(`${hovered.date}T00:00:00Z`)) / model.W) * 100))}%`,
+          }}
+        >
+          <p className="m-0 type-caption font-bold text-[var(--color-text-primary)]">
+            {hovered.date.includes("T")
+              ? `${fmt.dateWords(hovered.date.slice(0, 10))} · ${hovered.date.slice(11, 16)}`
+              : fmt.dateWords(hovered.date)}
+          </p>
+          <ul className="m-0 mt-0.5 flex list-none flex-col gap-0.5 p-0">
+            {hovered.rows.map((r) => {
+              const first = r.s.points[0]?.v ?? null;
+              return (
+                <li key={r.s.label} className="flex items-baseline justify-between gap-2">
+                  <span className="flex items-center gap-1.5 type-caption text-[var(--color-text-secondary)]">
+                    <span aria-hidden="true" className="inline-block h-[3px] w-[12px] rounded-full" style={{ background: r.s.color }} />
+                    {r.s.label}
+                  </span>
+                  <span className="type-caption font-bold tabular-nums text-[var(--color-text-primary)]">
+                    {r.p === null
+                      ? "·"
+                      : (r.s.format ?? (r.s.axis === "right" && yFormatRight !== undefined ? yFormatRight : yFormat))(r.p.v)}
+                    {hoverNote != null && r.p !== null && first !== null && first !== 0
+                      ? ` · ${hoverNote(r.s, r.p.v, first) ?? ""}`
+                      : ""}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * The state vocabulary — colour never travels alone
  * ------------------------------------------------------------------ */
 
@@ -136,7 +440,7 @@ export const STATE_INK: Record<SeatState, { ink: string; chip: string; glyph: st
 
 /** The signed-return word (direction channel — loud hues + sign + triangle). */
 export function SignedDelta({ v, fmt, ariaHidden }: { v: number | null; fmt: Fmt; ariaHidden?: boolean }) {
-  if (v === null || !Number.isFinite(v)) return <bdi className="type-caption text-[var(--color-text-tertiary)]" aria-hidden={ariaHidden}>—</bdi>;
+  if (v === null || !Number.isFinite(v)) return <bdi className="type-caption text-[var(--color-text-tertiary)]" aria-hidden={ariaHidden}>·</bdi>;
   const down = v < 0;
   return (
     <bdi dir="ltr" className={`font-bold ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
@@ -192,7 +496,7 @@ export function LaneBar({ lane, reading, locale, fmt }: { lane: (typeof LANES)[n
  * The brass assay balance — the page's one full instrument
  * ------------------------------------------------------------------ */
 
-const DEG_OF_NET: Record<number, number> = { 0: 0, 1: 4, 2: 8, 3: 10, 4: 10, 5: 10 };
+const DEG_OF_NET: Record<number, number> = { 0: 0, 1: 5, 2: 9, 3: 12, 4: 14, 5: 16 };
 
 /**
  * The assay-office drawing: tapered beam on a brass column, bowl pans
@@ -211,7 +515,7 @@ export function BrassBalance({
 }: {
   readings: readonly LaneReading[];
   verdict: "for" | "against" | "balanced" | "none";
-  sideLabels: { for: string; against: string; noneFor: string; noneAgainst: string };
+  sideLabels: { for: string; against: string; balanced: string; noneFor: string; noneAgainst: string };
   locale: Locale;
   trayTitle: string;
   trayNote: string;
@@ -221,7 +525,10 @@ export function BrassBalance({
   const againstLanes = readings.filter((l) => l.side === "against");
   const neutralLanes = readings.filter((l) => l.side === "neutral" || l.side === "unread");
   const net = forLanes.length - againstLanes.length;
-  const tilt = (DEG_OF_NET[Math.abs(net)] ?? 10) * (net > 0 ? 1 : net < 0 ? -1 : 0);
+  /* a REAL balance: the pan holding more items sinks, the other rises
+     (the tilt's sign is the INVERSE of the net — net<0 means against
+     is heavier, so the against pan on the right must go DOWN) */
+  const tilt = (DEG_OF_NET[Math.abs(net)] ?? 10) * (net > 0 ? -1 : net < 0 ? 1 : 0);
 
   const W = 380;
   const H = 230;
@@ -237,7 +544,9 @@ export function BrassBalance({
   }, []);
 
   const rad = (settled ? tilt : 0) * (Math.PI / 180);
-  const endL = { x: pivotX - arm * Math.cos(rad), y: pivotY + arm * Math.sin(rad) };
+  /* the beam's true ends under the tilt: the right end sinks by
+     arm·sin(rad), the left end rises by the same (opposite signs) */
+  const endL = { x: pivotX - arm * Math.cos(rad), y: pivotY - arm * Math.sin(rad) };
   const endR = { x: pivotX + arm * Math.cos(rad), y: pivotY + arm * Math.sin(rad) };
   const panW = 128;
   const panH = 84;
@@ -254,19 +563,26 @@ export function BrassBalance({
     transition: "transform 650ms cubic-bezier(0.23,1,0.32,1)",
   });
 
-  const disc = (lane: (typeof LANES)[number], key: string, cx: number, cy: number, r: number, tone: "for" | "against") => {
-    const segs = 8;
-    const arc = 2 * Math.PI * r;
-    return (
-      <g key={key}>
-        <circle cx={cx} cy={cy} r={r} fill="url(#balDiscFace)" stroke={tone === "for" ? "var(--color-status-normal)" : "var(--color-status-alert)"} strokeWidth={2} />
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--bal-brass-ink)" strokeWidth={1} strokeDasharray={`${arc / segs / 2} ${arc / segs / 2}`} opacity={0.35} />
-        <text x={cx} y={cy + 3.5} textAnchor="middle" fontSize={9} fontWeight={700} fill="var(--bal-brass-ink)">
-          {fmt.num(LANES.indexOf(lane) + 1)}
+  /* the pans' own payload — the summarized force NAMES, never numbers:
+   * each pan lists the lane names it holds (small type, offset down a
+   * little so every name sits INSIDE the pan's bowl, never spilling) */
+  const panNames = (cx: number, cy: number, lanes: readonly LaneReading[], tone: "for" | "against") => (
+    <g>
+      {lanes.map((l, i) => (
+        <text
+          key={l.lane}
+          x={cx}
+          y={cy - panH / 2 + 18 + i * 11.5}
+          textAnchor="middle"
+          fontSize={9}
+          fontWeight={700}
+          fill={tone === "for" ? "var(--color-chip-ink-normal)" : "var(--color-chip-ink-attention)"}
+        >
+          {LANE_CONTENT[l.lane].short[locale === "en" ? 0 : 1]}
         </text>
-      </g>
-    );
-  };
+      ))}
+    </g>
+  );
 
   const panBowl = (cx: number, cy: number, tone: "for" | "against") => (
     <g>
@@ -283,8 +599,8 @@ export function BrassBalance({
 
   const ariaSummary =
     locale === "en"
-      ? `The assay balance: ${forLanes.length} of the five lanes sit on the for-gold pan, ${againstLanes.length} on the against pan.`
-      : `ترازوی عیارسنجی: از پنج لاین، ${fmt.num(forLanes.length)} روی کفهٔ نفع طلا و ${fmt.num(againstLanes.length)} روی کفهٔ علیه آن نشسته‌اند.`;
+      ? `The assay balance: ${forLanes.length} of the five forces sit on the for-gold pan, ${againstLanes.length} on the against pan.`
+      : `ترازوی عیارسنجی: از پنج عامل، ${fmt.num(forLanes.length)} روی کفهٔ نفع طلا و ${fmt.num(againstLanes.length)} روی کفهٔ علیه آن نشسته‌اند.`;
 
   return (
     <div data-balance-visual data-size="s" className="relative w-full" role="img" aria-label={ariaSummary}>
@@ -332,32 +648,35 @@ export function BrassBalance({
         <g style={panStyle(panL)}>
           <line x1={endL.x} y1={endL.y} x2={panL.x} y2={panL.y - panH / 2 + 8} stroke="var(--bal-brass-lo)" strokeWidth={1} />
           {panBowl(panL.x, panL.y, "for")}
-          {forLanes.length > 0 ? (
-            <g>
-              {forLanes.map((l, i) => disc(l.lane, l.lane, panL.x - (forLanes.length - 1) * 15 + i * 30, panL.y + 2, 12, "for"))}
-            </g>
-          ) : null}
+          {panNames(panL.x, panL.y, forLanes, "for")}
           <text x={panL.x} y={panL.y - panH / 2 - 4} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-chip-ink-normal)">
-            {locale === "en" ? "FOR" : "نفع"}
+            {sideLabels.noneFor}
           </text>
         </g>
         <g style={panStyle(panR)}>
           <line x1={endR.x} y1={endR.y} x2={panR.x} y2={panR.y - panH / 2 + 8} stroke="var(--bal-brass-lo)" strokeWidth={1} />
           {panBowl(panR.x, panR.y, "against")}
-          {againstLanes.length > 0 ? (
-            <g>
-              {againstLanes.map((l, i) => disc(l.lane, l.lane, panR.x - (againstLanes.length - 1) * 15 + i * 30, panR.y + 2, 12, "against"))}
-            </g>
-          ) : null}
+          {panNames(panR.x, panR.y, againstLanes, "against")}
           <text x={panR.x} y={panR.y - panH / 2 - 4} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-chip-ink-attention)">
-            {locale === "en" ? "AGAINST" : "ضد"}
+            {sideLabels.noneAgainst}
           </text>
         </g>
       </svg>
 
-      {/* the verdict + the not-leaning tray (HTML for real text) */}
-      <p className="m-0 mt-2 text-center type-caption font-semibold" style={{ color: verdict === "against" ? "var(--color-chip-ink-attention)" : verdict === "for" ? "var(--color-chip-ink-normal)" : "var(--color-text-secondary)" }}>
-        {verdict === "against" ? sideLabels.against : verdict === "for" ? sideLabels.for : ""}
+      {/* THE center verdict — big, bold, unmissable; the counted detail
+          (the موافق/مخالف tallies) lives behind the boxes' own modal */}
+      <p
+        className="m-0 mt-2 text-center text-[1.45rem] font-black leading-tight tracking-tight sm:text-[1.7rem]"
+        style={{
+          color:
+            verdict === "against"
+              ? "var(--color-chip-ink-attention)"
+              : verdict === "for"
+                ? "var(--color-chip-ink-normal)"
+                : "var(--color-text-secondary)",
+        }}
+      >
+        {verdict === "against" ? sideLabels.against : verdict === "for" ? sideLabels.for : sideLabels.balanced}
       </p>
       {neutralLanes.length > 0 ? (
         <p className="bal-tray m-0 mx-auto mt-1 flex w-fit items-center gap-2 type-caption">
@@ -617,39 +936,62 @@ export function ScenarioFan({ spot, locale, fmt, labels }: { spot: number; local
 }
 
 /* ------------------------------------------------------------------ *
- * The seats grid — 37 dials at a glance (the stadium view)
+ * The seats grid — the five lanes' own tally table: one row per lane,
+ * its lean word, its stacked proportion bar and its counted seats.
+ * (The 37 tiny dials the owner called noise are gone; the numbers
+ * stand in open columns instead.)
  * ------------------------------------------------------------------ */
 
 export function SeatsGrid({ readings, locale, fmt }: { readings: readonly LaneReading[]; locale: Locale; fmt: Fmt }) {
+  const head =
+    locale === "en"
+      ? { lane: "Lane", for: "▲ for", against: "▼ against", steady: "• steady", unread: "◌ unread", lean: "Lean" }
+      : { lane: "لاین", for: "▲ موافق", against: "▼ مخالف", steady: "• بی‌طرف", unread: "◌ ناخوانده", lean: "گرایش" };
   return (
-    <div className="flex flex-wrap items-start gap-x-6 gap-y-3">
-      {readings.map((r) => (
-        <div key={r.lane} className="flex min-w-[140px] flex-col gap-1">
-          <span className="type-caption font-semibold text-[var(--color-text-tertiary)]">
-            {LANE_CONTENT[r.lane].label[locale === "en" ? 0 : 1]}
-          </span>
-          <div className="flex flex-wrap gap-[5px]">
-            {r.members.map((m) => {
-              const ink = STATE_INK[m.state];
-              return (
-                <span
-                  key={m.id}
-                  title={undefined}
-                  className="flex h-[13px] w-[13px] items-center justify-center rounded-full text-[7px] font-bold"
-                  style={
-                    m.state === "unread"
-                      ? { border: "1.5px dotted var(--color-text-tertiary)" }
-                      : { background: ink.chip, color: "var(--color-surface)" }
-                  }
-                  aria-hidden="true"
-                >
-                  {m.state === "supports" ? "▲" : m.state === "pressures" ? "▼" : ""}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      ))}
+    <div className="min-w-0 overflow-x-auto">
+      <table className="m-0 w-full border-collapse type-caption">
+        <thead>
+          <tr className="text-[var(--color-text-tertiary)]">
+            <th scope="col" className="px-2 py-1 text-start font-bold">{head.lane}</th>
+            <th scope="col" className="px-1.5 py-1 text-end font-bold">{head.for}</th>
+            <th scope="col" className="px-1.5 py-1 text-end font-bold">{head.against}</th>
+            <th scope="col" className="px-1.5 py-1 text-end font-bold">{head.steady}</th>
+            <th scope="col" className="px-1.5 py-1 text-end font-bold">{head.unread}</th>
+            <th scope="col" className="px-2 py-1 text-end font-bold">{head.lean}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {readings.map((r) => {
+            const total = r.members.length || 1;
+            const word =
+              r.side === "for" ? (locale === "en" ? "for gold" : "به نفع طلا") : r.side === "against" ? (locale === "en" ? "against gold" : "علیه طلا") : locale === "en" ? "not leaning" : "بدون گرایش";
+            const sideInk =
+              r.side === "for" ? "var(--color-chip-ink-normal)" : r.side === "against" ? "var(--color-chip-ink-attention)" : "var(--color-text-secondary)";
+            return (
+              <tr key={r.lane} className="border-t border-[var(--color-border)]">
+                <th scope="row" className="px-2 py-1.5 text-start font-semibold">
+                  <span className="flex min-w-0 flex-col gap-1">
+                    <span className="font-bold text-[var(--color-text-primary)]">{LANE_CONTENT[r.lane].label[locale === "en" ? 0 : 1]}</span>
+                    <span className="flex h-1.5 w-full max-w-[220px] overflow-hidden rounded-full bg-[var(--color-border)]/60" aria-hidden="true">
+                      <span className="h-full bg-[var(--color-status-normal)]" style={{ width: `${(r.supports / total) * 100}%` }} />
+                      <span className="h-full bg-[var(--color-status-alert)]" style={{ width: `${(r.pressures / total) * 100}%` }} />
+                      <span className="h-full bg-[var(--color-text-tertiary)]/40" style={{ width: `${(r.steady / total) * 100}%` }} />
+                      <span className="h-full border border-dashed border-[var(--color-text-tertiary)]" style={{ width: `${(r.unread / total) * 100}%` }} />
+                    </span>
+                  </span>
+                </th>
+                <td className="px-1.5 py-1.5 text-end font-bold tabular-nums text-[var(--color-chip-ink-normal)]">{fmt.num(r.supports, 0)}</td>
+                <td className="px-1.5 py-1.5 text-end font-bold tabular-nums text-[var(--color-chip-ink-attention)]">{fmt.num(r.pressures, 0)}</td>
+                <td className="px-1.5 py-1.5 text-end font-bold tabular-nums text-[var(--color-text-secondary)]">{fmt.num(r.steady, 0)}</td>
+                <td className="px-1.5 py-1.5 text-end font-bold tabular-nums text-[var(--color-text-tertiary)]">{fmt.num(r.unread, 0)}</td>
+                <td className="px-2 py-1.5 text-end font-bold whitespace-nowrap" style={{ color: sideInk }}>
+                  {word}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

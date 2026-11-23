@@ -21,6 +21,7 @@ import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import { GOLD_RELATIONSHIPS } from "@/lib/gold-page/relationships";
+import { CountryFlag } from "@/components/gold-page/flags";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
 import type { IfBoughtSnapshot } from "@/lib/gold-page/ifbought";
@@ -52,6 +53,9 @@ export interface TaPayload {
     pp: number; r1: number; r2: number; r3: number; s1: number; s2: number; s3: number;
   } | null;
   last: { date: string; close: number };
+  /** The raw daily closes (the TA leg's own OHLC series) — the signals
+   *  chart's range windows read this same series (one leg, two surfaces). */
+  closes: Array<{ date: string; close: number }>;
 }
 
 export interface CbBuyer {
@@ -94,13 +98,6 @@ export interface PositionsPayload {
   cards: Array<{ id: string; value: number; change30d: number | null }>;
 }
 
-export interface ExpectationsPayload {
-  fetchedAt: string | null;
-  event: { slug?: string; title?: string; endDate?: string; url?: string } | null;
-  markets: Array<{ move: string; question: string; probPct: number | null }>;
-  calendar: Array<{ id: string; date: string; titleEn: string; titleFa: string; kind: string }>;
-}
-
 export interface CorrelationPayload {
   daily: Array<[string, number, number]>;
   strip: Array<{ friday: string; r: number }>;
@@ -125,7 +122,6 @@ export const fetchCb = () => leg<CbPayload>("/api/gold/cb");
 export const fetchLbma = () => leg<LbmaPayload>("/api/gold/lbma");
 export const fetchPremium = () => leg<PremiumPayload>("/api/gold/premium");
 export const fetchPositions = () => leg<PositionsPayload>("/api/gold/positions");
-export const fetchExpectations = () => leg<ExpectationsPayload>("/api/gold/expectations");
 export const fetchCorrelation = () => leg<CorrelationPayload>("/api/gold/correlation");
 export const fetchIfBought = () => leg<IfBoughtSnapshot>("/api/gold/ifbought");
 
@@ -175,6 +171,10 @@ const CB_COUNTRIES: Record<string, [string, string]> = {
   ARM: ["Armenia", "ارمنستان"],
   SGP: ["Singapore", "سنگاپور"],
   IRL: ["Ireland", "ایرلند"],
+  DEU: ["Germany", "آلمان"],
+  MNG: ["Mongolia", "مغولستان"],
+  TJK: ["Tajikistan", "تاجیکستان"],
+  LKA: ["Sri Lanka", "سری‌لانکا"],
 };
 
 /** The dated CB episodes (the data-true set from the upstream record). */
@@ -195,7 +195,9 @@ type AnyT = { [key: string]: any };
  * ------------------------------------------------------------------ */
 
 export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
-  const [open, setOpen] = React.useState(true);
+  /* collapsed by default — the four moving averages (20/50/100/200-day)
+     stay the summary; the tables open on demand */
+  const [open, setOpen] = React.useState(false);
   const dist = data.distance;
   const basisSpanDays = data.span.bars > 335
     ? t.spanYears.replace("{years}", fmt.num(Math.round((data.span.bars / 250) * 10) / 10, 1))
@@ -228,8 +230,17 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
       <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
+      {/* THE reference-level verdict — its own loud treatment (the gold
+          accent, not the quiet grey it used to wear) */}
       {distSentence ? (
-        <p className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2 type-label font-semibold text-[var(--color-text-primary)]">
+        <p
+          className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] px-3.5 py-2.5 text-[1.02rem] font-black leading-snug sm:text-[1.1rem]"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 16%, transparent)",
+            boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 45%, transparent)",
+            color: "var(--color-accent-gold-deep)",
+          }}
+        >
           <bdi>{distSentence}</bdi>
         </p>
       ) : null}
@@ -309,7 +320,7 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
         </div>
       ) : null}
 
-      <p className="m-0 mt-2 type-caption italic text-[var(--color-text-tertiary)]">{t.descriptive}</p>
+
     </section>
   );
 }
@@ -317,6 +328,19 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
 /* ------------------------------------------------------------------ *
  * The central-bank demand band — the tracker chart + the buyers table
  * ------------------------------------------------------------------ */
+
+/** The curated net sellers — the reported quarterly reductions that
+ *  mattered (IMF/WGC quarterly record through 2026-Q3; curated, dated,
+ *  none of them a live meter input). Sellers are rarer and smaller than
+ *  buyers — the world aggregate has been positive for years. */
+const CB_SELLERS: ReadonlyArray<{ code: string; net12m: number }> = [
+  { code: "DEU", net12m: -4.9 },
+  { code: "TUR", net12m: -3.4 },
+  { code: "MNG", net12m: -2.7 },
+  { code: "TJK", net12m: -2.1 },
+  { code: "LKA", net12m: -1.8 },
+];
+
 
 function buildCbModel(series: ReadonlyArray<{ month: string; tonnes: number }>) {
   const width = 640;
@@ -381,7 +405,7 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
           <span className="type-caption text-[var(--color-text-tertiary)]">{t.chartReportedWorld}</span>
         </figcaption>
         <div dir="ltr" className="w-full overflow-hidden">
-          <svg viewBox={`0 0 ${model.width} ${model.height}`} role="img" aria-label={`${t.chartTitle} — ${t.chartReportedWorld}`} className="h-auto w-full">
+          <svg viewBox={`0 0 ${model.width} ${model.height}`} role="img" aria-label={`${t.chartTitle} · ${t.chartReportedWorld}`} className="h-auto w-full">
             <line x1={4} y1={model.yZero} x2={model.width - 56} y2={model.yZero} stroke="var(--color-border)" strokeWidth={1} strokeDasharray="3 4" />
             <text x={model.width - 54} y={model.yZero + 3.5} fontSize={10} fill="var(--color-text-tertiary)">0</text>
             <path d={model.areaPath} fill="var(--color-accent-gold)" opacity={0.13} />
@@ -418,9 +442,18 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
         </p>
       </figure>
 
-      {/* the buyers table */}
-      <div className="mt-3 flex min-w-0 flex-col gap-1.5">
-        <h4 className="m-0 type-label font-bold text-[var(--color-text-secondary)]">{t.buyersTitle}</h4>
+      {/* the buyers — the light-green box (خریداران طلا) */}
+      <div
+        className="mt-3 flex min-w-0 flex-col gap-1.5 rounded-[var(--cr-radius-md)] p-3"
+        style={{
+          backgroundColor: "color-mix(in srgb, var(--color-return-up) 7%, transparent)",
+          boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-up) 26%, transparent)",
+        }}
+      >
+        <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5">
+          <h4 className="m-0 type-label font-extrabold text-[var(--color-return-up)]">{t.buyersTitle}</h4>
+          <span className="type-caption text-[var(--color-text-tertiary)]">{t.buyersAsOf}</span>
+        </div>
         <table className="m-0 hidden w-full border-collapse type-caption sm:table">
           <thead>
             <tr className="text-[var(--color-text-tertiary)]">
@@ -437,7 +470,12 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
               const share = buyerSharePct(b, spot, data.asOf);
               return (
                 <tr key={b.code}>
-                  <th scope="row" className="px-1.5 py-1.5 text-start font-semibold text-[var(--color-text-primary)]">{name}</th>
+                  <th scope="row" className="px-1.5 py-1.5 text-start font-semibold text-[var(--color-text-primary)]">
+                    <span className="flex items-center gap-2">
+                      <CountryFlag code={b.code} name={name} />
+                      <span>{name}</span>
+                    </span>
+                  </th>
                   <td className="px-1.5 py-1.5 text-end text-[var(--color-text-secondary)]">
                     <span>{monthLabel(b.latestMonth, locale)}</span>{" "}
                     <span className={b.latestDelta >= 0 ? "text-[var(--color-return-up)]" : "text-[var(--color-return-down)]"}>
@@ -447,9 +485,9 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
                   <td className="px-1.5 py-1.5 text-end font-bold text-[var(--color-text-primary)]">
                     {b.sum12m >= 0 ? "+" : "−"}{fmt.num(Math.abs(b.sum12m), 1)}
                   </td>
-                  <td className="px-1.5 py-1.5 text-end text-[var(--color-text-secondary)]">{fmt.num(b.tonnes, 0)}</td>
+                  <td className="px-1.5 py-1.5 text-end text-[var(--color-text-secondary)]">{t.tonnesShort.replace("{v}", fmt.num(b.tonnes, 0))}</td>
                   <td className="px-1.5 py-1.5 text-end font-semibold text-[var(--color-text-secondary)]">
-                    {share !== null ? `${fmt.num(share, 1)}%` : "—"}
+                    {share !== null ? `${fmt.num(share, 1)}%` : "·"}
                   </td>
                 </tr>
               );
@@ -463,7 +501,10 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
             return (
               <li key={b.code} className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
                 <div className="flex min-w-0 items-baseline justify-between gap-2.5">
-                  <span className="type-label font-bold text-[var(--color-text-primary)]">{name}</span>
+                  <span className="flex items-center gap-2 type-label font-bold text-[var(--color-text-primary)]">
+                    <CountryFlag code={b.code} name={name} />
+                    {name}
+                  </span>
                   <span className="type-caption font-bold text-[var(--color-text-secondary)]">
                     {b.sum12m >= 0 ? "+" : "−"}{fmt.num(Math.abs(b.sum12m), 1)}
                   </span>
@@ -480,10 +521,35 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
         <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.shareNote}</p>
       </div>
 
-      {/* the honest exceptions */}
-      <p className="m-0 mt-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 type-caption font-semibold leading-relaxed text-[var(--color-text-secondary)]">
-        <bdi>{t.caveat}</bdi>
-      </p>
+      {/* the sellers — the light-red box (فروشندگان طلا) */}
+      <div
+        className="mt-3 flex min-w-0 flex-col gap-1.5 rounded-[var(--cr-radius-md)] p-3"
+        style={{
+          backgroundColor: "color-mix(in srgb, var(--color-return-down) 7%, transparent)",
+          boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 26%, transparent)",
+        }}
+      >
+        <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5">
+          <h4 className="m-0 type-label font-extrabold text-[var(--color-return-down)]">{t.sellersTitle}</h4>
+          <span className="type-caption text-[var(--color-text-tertiary)]">{t.sellersAsOf}</span>
+        </div>
+        <ul className="m-0 flex list-none flex-col gap-1 p-0">
+          {CB_SELLERS.map((r) => {
+            const name = CB_COUNTRIES[r.code]?.[lan(locale)] ?? r.code;
+            return (
+              <li key={r.code} className="flex min-w-0 items-baseline gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
+                <CountryFlag code={r.code} name={name} />
+                <span className="type-caption font-bold text-[var(--color-text-primary)]">{name}</span>
+                <span className="ms-auto type-caption font-bold text-[var(--color-return-down)]">
+                  ▼ {t.tonnesShort.replace("{v}", fmt.num(Math.abs(r.net12m), 1))}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.sellersNote}</p>
+      </div>
+
       <p className="m-0 mt-1.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
         <bdi>{t.reportedWorldLine.replace("{tonnes}", num(data.reportedWorld.tonnes)).replace("{n}", num(data.reportedWorld.reporters))}</bdi>
       </p>
@@ -522,11 +588,27 @@ function vaultSparkPath(rows: ReadonlyArray<{ month: string; goldKoz: number }>)
 }
 
 export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
+  /* collapsed by default — institutional plumbing is noise for the daily
+     reader; one tap opens the whole section */
+  const [open, setOpen] = React.useState(false);
   return (
     <section id="gold-vault" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
+          <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+        </div>
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+        >
+          {open ? (locale === "en" ? "hide" : "بستن") : locale === "en" ? "show" : "نمایش"}
+        </button>
+      </div>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
+      {open ? (
       <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
         <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
           <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.vaultTitle}</h4>
@@ -541,7 +623,7 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
             </p>
           ) : null}
           <div dir="ltr" className="w-full overflow-hidden">
-            <svg viewBox="0 0 200 34" role="img" aria-label={`${t.vaultTopline} — ${monthLabel(data.vault.asOf, locale)}`} className="h-auto w-full">
+            <svg viewBox="0 0 200 34" role="img" aria-label={`${t.vaultTopline} · ${monthLabel(data.vault.asOf, locale)}`} className="h-auto w-full">
               <path d={vaultSparkPath(data.vault.months)} fill="none" stroke="var(--color-accent-gold)" strokeWidth={1.6} strokeLinejoin="round" strokeLinecap="round" />
             </svg>
           </div>
@@ -574,17 +656,17 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
           </details>
         </div>
       </div>
+      ) : null}
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ *
- * The correlation companion — the dual-axis chart + the rolling strip
+ * The correlation companion — the dual-axis chart (gold vs the real yield)
  * ------------------------------------------------------------------ */
 
 const CORR_W = 640;
 const CORR_H = 210;
-const CORR_STRIP_H = 96;
 
 export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
   const model = React.useMemo(() => {
@@ -603,12 +685,7 @@ export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPay
     const yYield = (v: number) => padT + (1 - (v - yMin) / Math.max(1e-9, yMax - yMin)) * (CORR_H - padT - padB);
     const goldPath = data.daily.map((p, i) => `${i === 0 ? "M" : "L"}${xOf(i).toFixed(1)},${yGold(p[1]!).toFixed(1)}`).join(" ");
     const yieldPath = data.daily.map((p, i) => `${i === 0 ? "M" : "L"}${xOf(i).toFixed(1)},${yYield(p[2]!).toFixed(1)}`).join(" ");
-    // the strip: r on [-1, 1]
-    const sxOf = (i: number) => padL + (i / Math.max(1, data.strip.length - 1)) * (CORR_W - padL - padR);
-    const syR = (r: number) => 10 + (1 - (r + 1) / 2) * (CORR_STRIP_H - 24);
-    const stripPath = data.strip.map((p, i) => `${i === 0 ? "M" : "L"}${sxOf(i).toFixed(1)},${syR(p.r).toFixed(1)}`).join(" ");
-    const yZeroStrip = syR(0);
-    return { goldPath, yieldPath, stripPath, sxOf, syR, yZeroStrip, gMin, gMax, yMin, yMax, xOf };
+    return { goldPath, yieldPath, gMin, gMax, yMin, yMax, xOf };
   }, [data]);
   const spanText = `${fmt.dateWords(data.span.from)} → ${fmt.dateWords(data.span.to)}`;
   return (
@@ -624,7 +701,7 @@ export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPay
           <span className="type-caption text-[var(--color-text-tertiary)]">{t.yieldAxis}</span>
         </figcaption>
         <div dir="ltr" className="w-full overflow-hidden">
-          <svg viewBox={`0 0 ${CORR_W} ${CORR_H}`} role="img" aria-label={`${t.title} — ${t.goldAxis} / ${t.yieldAxis}`} className="h-auto w-full">
+          <svg viewBox={`0 0 ${CORR_W} ${CORR_H}`} role="img" aria-label={`${t.title} · ${t.goldAxis} / ${t.yieldAxis}`} className="h-auto w-full">
             <path d={model.goldPath} fill="none" stroke="var(--color-accent-gold)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
             <path d={model.yieldPath} fill="none" stroke="var(--color-text-secondary)" strokeWidth={1.6} strokeDasharray="1 0" strokeLinejoin="round" strokeLinecap="round" />
             {data.rotation.inWindow ? (
@@ -647,26 +724,6 @@ export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPay
         <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.spanLine.replace("{span}", spanText)}</p>
       </figure>
 
-      {/* the 52-week rolling strip */}
-      {data.strip.length > 0 ? (
-        <figure className="m-0 mt-2.5 flex min-w-0 flex-col gap-1">
-          <figcaption className="type-label font-bold text-[var(--color-text-primary)]">{t.stripTitle}</figcaption>
-          <div dir="ltr" className="w-full overflow-hidden">
-            <svg viewBox={`0 0 ${CORR_W} ${CORR_STRIP_H}`} role="img" aria-label={t.stripTitle} className="h-auto w-full">
-              <rect x={8} y={model.syR(1)} width={CORR_W - 64} height={Math.max(0, model.syR(-1) - model.syR(1))} fill="var(--color-currena-bg-light)" />
-              <line x1={8} y1={model.yZeroStrip} x2={CORR_W - 56} y2={model.yZeroStrip} stroke="var(--color-border)" strokeWidth={1} strokeDasharray="3 4" />
-              <text x={CORR_W - 54} y={model.yZeroStrip + 3.5} fontSize={10} fill="var(--color-text-tertiary)">0</text>
-              <text x={CORR_W - 54} y={model.syR(1) + 8} fontSize={10} fill="var(--color-text-tertiary)">+1</text>
-              <text x={CORR_W - 54} y={model.syR(-1)} fontSize={10} fill="var(--color-text-tertiary)">−1</text>
-              <path d={model.stripPath} fill="none" stroke="var(--color-currena-blue)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-            </svg>
-          </div>
-        </figure>
-      ) : null}
-
-      <p className="m-0 mt-2 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-        <bdi>{t.rotationLine}</bdi>
-      </p>
       <details className="mt-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
         <summary className="cursor-pointer font-semibold text-[var(--color-currena-blue-deep)]">{t.methodTitle}</summary>
         <p className="m-0 pt-1.5">{t.methodLine}</p>
@@ -681,11 +738,54 @@ export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPay
 
 export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
   const nameOf = (id: string) => (id === "cftc-gold-positioning" ? t.cardTraderPositioning : t.cardGrossLong);
+  /* THE ultimate verdict — the main card read short-to-long: LONG, SHORT,
+     or no lean, stated big and bold with the scale marked where it sits */
+  const main = data.cards.find((c) => c.id === "cftc-gold-positioning") ?? null;
+  const verdictWord =
+    main === null
+      ? null
+      : main.value > 20
+        ? t.verdictLong
+        : main.value < -20
+          ? t.verdictShort
+          : t.verdictNeutral;
+  const verdictTone =
+    main === null
+      ? "var(--color-text-secondary)"
+      : main.value > 20
+        ? "var(--color-return-up)"
+        : main.value < -20
+          ? "var(--color-return-down)"
+          : "var(--color-text-secondary)";
+  const verdictPos = main === null ? 50 : Math.min(98, Math.max(2, ((main.value + 100) / 200) * 100));
   return (
     <section id="gold-positions" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
       <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
+      {verdictWord !== null ? (
+        <div className="mt-3 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <span className="type-caption font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">{t.verdictEyebrow}</span>
+            <span className="text-[1.15rem] font-black leading-none tracking-tight sm:text-[1.3rem]" style={{ color: verdictTone }}>
+              {verdictWord}
+            </span>
+          </div>
+          <div dir="ltr" className="relative mt-1 h-3.5 w-full rounded-full bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]" role="img" aria-label={`${t.verdictEyebrow}: ${verdictWord}`}>
+            <span className="absolute inset-y-0 left-1/2 w-px bg-[var(--color-border)]" aria-hidden="true" />
+            <span
+              className="absolute top-1/2 h-[13px] w-[13px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-surface)] shadow-sm"
+              style={{ left: `${verdictPos}%`, background: verdictTone }}
+              aria-hidden="true"
+            />
+          </div>
+          <div dir="ltr" className="flex justify-between">
+            <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.scaleShort}</span>
+            <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.scaleLong}</span>
+          </div>
+          <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.verdictNote}</p>
+        </div>
+      ) : null}
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {data.cards.map((card) => {
           const signed = card.id === "cftc-gold-positioning";
@@ -734,59 +834,6 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
 }
 
 /* ------------------------------------------------------------------ *
- * The expectations band — the market's own prices + the calendar
- * ------------------------------------------------------------------ */
-
-export function ExpectationsBand({ data, t, fmt, locale }: { data: ExpectationsPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
-  return (
-    <section id="gold-expectations" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
-      <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
-      <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
-        {/* the event the market is pricing */}
-        {data.event && data.event.title ? (
-          <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-            <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.eventLabel}</h4>
-            <p className="m-0 type-label font-semibold text-[var(--color-text-primary)]">{data.event.title}</p>
-            <ul className="m-0 flex list-none flex-col gap-1 p-0">
-              {data.markets.map((m) => (
-                <li key={m.move} className="flex flex-wrap items-baseline justify-between gap-x-2 rounded-md px-2 py-0.5">
-                  <span className="type-caption text-[var(--color-text-secondary)]">{m.question}</span>
-                  <span className="type-caption font-bold text-[var(--color-chip-ink-attention)]">
-                    {m.probPct !== null ? `${fmt.num(m.probPct, 0)}%` : "—"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {data.event.url ? (
-              <a href={data.event.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex w-fit items-center gap-1 type-caption font-bold text-[var(--color-currena-blue-deep)]">
-                {t.viewLabel} ↗
-              </a>
-            ) : null}
-            <p className="m-0 type-caption italic text-[var(--color-text-tertiary)]">{t.notOurView}</p>
-          </div>
-        ) : null}
-        {/* the gold-relevant calendar */}
-        {data.calendar.length > 0 ? (
-          <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-            <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.calendarTitle}</h4>
-            <ul className="m-0 flex list-none flex-col gap-1 p-0">
-              {data.calendar.map((c) => (
-                <li key={c.id} className="flex flex-wrap items-baseline gap-x-2 rounded-md px-2 py-0.5">
-                  <span className="type-caption font-bold text-[var(--color-accent-gold-deep)]">{fmt.dateWords(c.date)}</span>
-                  <span className="type-caption text-[var(--color-text-secondary)]">{locale === "en" ? c.titleEn : c.titleFa}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ *
  * The Iran-bridge premium card — the live حباب history
  * ------------------------------------------------------------------ */
 
@@ -813,16 +860,19 @@ export function PremiumHistoryCard({ data, t, fmt, locale }: { data: PremiumPayl
     return { w, h, path, areaPath, yZero, pts, yOf, xOf, yMax };
   }, [data]);
   const emami = data.latest.coins.find((c) => c.id === "coin-emami");
+  /* collapsed by default — the premium rides INSIDE the Iran bridge as a
+     sub-chapter, never an independent section; the summary line carries
+     the live Emami number, one tap opens the history and the method */
   return (
-    <div className="mt-3 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3 ring-1 ring-[var(--color-bridge-accent)]/30">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5">
-        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.premiumTitle}</h4>
+    <details className="mt-3 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3 ring-1 ring-[var(--color-bridge-accent)]/30">
+      <summary className="flex cursor-pointer flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5">
+        <span className="type-label font-extrabold text-[var(--color-text-primary)]">{t.premiumTitle}</span>
         {emami && emami.premiumPct !== null ? (
           <span className="type-caption font-bold text-[var(--color-bridge-accent)]">
             {t.premiumNow}: <bdi dir="ltr">{fmt.pct(emami.premiumPct, 2)}</bdi>
           </span>
         ) : null}
-      </div>
+      </summary>
       {model ? (
         <figure className="m-0 flex min-w-0 flex-col gap-1">
           <figcaption className="type-caption text-[var(--color-text-secondary)]">{t.premiumHistoryTitle}</figcaption>
@@ -847,7 +897,7 @@ export function PremiumHistoryCard({ data, t, fmt, locale }: { data: PremiumPayl
         <bdi>{t.premiumAsOf.replace("{date}", fmt.dateWords(data.asOf))}</bdi>
       </p>
       <p className="m-0 type-caption italic text-[var(--color-text-tertiary)]">{t.premiumNote}</p>
-    </div>
+    </details>
   );
 }
 
@@ -864,13 +914,31 @@ const CLASS_INK: Record<string, string> = {
 
 export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
   const [filter, setFilter] = React.useState<string | null>(null);
+  /* collapsed by default — the map is the deep reference layer; one tap
+     opens the full 24-record list */
+  const [open, setOpen] = React.useState(false);
   const classes = ["M", "C", "X", "K"];
   const shown = filter === null ? GOLD_RELATIONSHIPS : GOLD_RELATIONSHIPS.filter((r) => r.class === filter);
   return (
     <section id="gold-relationships" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <div>
+          <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
+          <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+        </div>
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+        >
+          <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "" : "-rotate-90 rtl:rotate-90"}`} aria-hidden="true" />
+          {open ? t.hideLabel : t.showLabel}
+        </button>
+      </div>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
+      {open ? (
+      <>
       <div className="mt-2.5 flex flex-wrap gap-1.5">
         <button
           type="button"
@@ -909,6 +977,8 @@ export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
           </li>
         ))}
       </ul>
+      </>
+      ) : null}
     </section>
   );
 }
