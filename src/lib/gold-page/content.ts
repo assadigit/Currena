@@ -714,6 +714,10 @@ export const UI = {
       subtitle: "نگارش ماهانهٔ شورای جهانی طلا",
       seriesLine: "Gold Market Commentary · the Highlights box, verbatim, once a month",
       issueLabel: "{month} in review",
+      // The fa layer's honest labels (spec §8); unused in EN rendering — the
+      // shared copy type keeps both bundles the same shape.
+      mtLabel: "Machine translation",
+      enOriginalLabel: "The English original, verbatim",
       publishedLabel: "Published {date}",
       fetchedLabel: "fetched {date}",
       source: "Source: World Gold Council",
@@ -1282,6 +1286,11 @@ export const UI = {
       subtitle: "World Gold Council · Gold Market Commentary",
       seriesLine: "نگارش ماهانهٔ «توضیح بازار طلا» · جعبهٔ هایلایت‌ها، واژه‌به‌واژه، ماهی یک بار",
       issueLabel: "مرور {month}",
+      // The honest label spec §8 mandates above the machine-translated
+      // Farsi — exactly those words, never softened — and the caption over
+      // the English original below it.
+      mtLabel: "ترجمهٔ ماشینی",
+      enOriginalLabel: "متن اصلی به انگلیسی — واژه‌به‌واژه",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
       source: "منبع: World Gold Council",

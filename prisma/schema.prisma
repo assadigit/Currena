@@ -139,6 +139,29 @@ model WgcCommentary {
 }
 
 /**
+ * The Persian translation side table (wgc-watch/ddl.sql, the 2026-11-25
+ * sitting — spec §8's deferred phase). One row per REVIEWED month, written
+ * by the watch worker's translation step once per monthly issue (keyed to
+ * the ENGLISH row's content_hash: the stored Farsi serves forever until
+ * the English content actually changes); strictly a READ model for the
+ * desk — this app never writes it. Columns map 1:1 to the D1. The ISO-TEXT
+ * translatedAt rides the db.ts read-side shim on the Worker (same rule as
+ * the parent table's timestamps); faJson (a JSON payload) passes the shim
+ * untouched, like highlightsJson. sourceModel is the engine identity —
+ * the route surfaces it so a translation can never be misattributed.
+ */
+model WgcCommentaryFa {
+  monthKey     String  @id @map("month_key")
+  faHeadline   String? @map("fa_headline") // the headline's Persian translation; NULL when the English headline is NULL
+  faJson       String  @map("fa_json") // [{"heading":…,"body":…}] Persian, the English order and shape
+  sourceModel  String  @map("source_model") // e.g. '@cf/meta/m2m100-1.2b' — the bake-off record's selected model
+  translatedAt String @map("translated_at") // ISO UTC — rides the read-side shim
+  contentHash  String  @map("content_hash") // the ENGLISH row's hash at translation time — the freshness key
+
+  @@map("wgc_commentary_fa")
+}
+
+/**
  * The watch worker's scrape log — the per-fire record the health
  * endpoint reads and this app reads only for the honest attempt count
  * of a waiting month (every fetch-404 / fetch-redirect-rejected /
@@ -147,7 +170,7 @@ model WgcCommentary {
 model WgcScrapeLog {
   ts       String @map("ts") // ISO UTC
   monthKey String @map("month_key")
-  event    String @map("event") // fetch-404 | fetch-redirect-rejected | fetch-error | stored | re-stored | structure-alert | missed | skip-month
+  event    String @map("event") // fetch-404 | fetch-redirect-rejected | fetch-error | stored | re-stored | structure-alert | missed | skip-month | translated | translate-failed
   detail   String?
 
   @@id([ts, monthKey]) // Prisma identity only — the DDL table carries no key of its own

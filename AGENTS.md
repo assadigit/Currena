@@ -1611,3 +1611,244 @@ of the original four. Still open, unchanged: the port branch
 the watch's first fire (Nov 25 09:30 UTC, stop-on-success on 2026-10)
 is observed by the 09:40 check; the December skip-month lines begin
 Dec 1.
+
+### The WGC Persian translation — spec §8's phase, implemented against a credentials wall (2026-11-24, the translation sitting)
+
+The sitting that green-lit the phase the spec deferred (§8): the monthly
+commentary translated to Farsi via Workers AI at capture time, stored
+beside the English in the desk's D1, rendered under the honest
+«ترجمهٔ ماشینی» label. The implementation is complete and proven
+end-to-end in the sandbox; every Cloudflare-account-facing step is
+blocked by the sitting's own credentials — stated first, plainly.
+
+**The credentials wall (the environmental fact this sitting turns on).**
+Both Cloudflare tokens supplied for this sitting are rejected by the
+real Cloudflare API on every surface: `/user/tokens/verify` answers
+code 1000 "Invalid API Token" (the Workers-API token and the
+Workers-AI token alike, in both the given prefixed form and unprefixed),
+`/accounts` answers 9109 "Invalid access token", and the
+account-scoped `/ai/models/search`, `/ai/run/{model}` and
+`/d1/database/{uuid}/query` (wrangler) all answer 10000
+"Authentication error" — while the account itself is alive and serving
+(the live currena.ir/gold, the wgc-watch health endpoint and its route
+all answered during this sitting), and the sitting's other credentials
+are genuinely live and were used (the GitHub token cloned and pushed
+this tree; the EODHD token verified against its own user endpoint).
+Consequences, each stated: **the live bake-off did not run; the remote
+D1 DDL apply did not run; neither worker was redeployed; the live
+forced translation run did not run.** The live account is therefore
+byte-identical to the e1af12d8 state — nothing was touched, nothing
+broken; the live card keeps today's English-verbatim rendering (the
+designed fallback) until the desk worker is redeployed with this code.
+
+**The model research — live, from the public catalog.** The
+account-level catalog API being unreachable, the catalog was fetched
+live from the public docs (developers.cloudflare.com/workers-ai/models,
+llms.txt + per-model pages + the raw JSON schemas): 74 models. The
+Translation task family holds exactly ONE model —
+`@cf/meta/m2m100-1.2b` (the other, indictrans2, is en→Indic only). The
+sitting's named chat families are all present: Qwen
+(qwen3-30b-a3b-fp8, 32k ctx, "groundbreaking multilingual support";
+qwen3.8-27b; qwq-32b), Llama 3.x (llama-3.1-8b-instruct-fp8,
+llama-3.2-1b/3b, llama-3.3-70b-instruct-fp8-fast) plus Llama 4 Scout,
+Gemma (gemma-4-26b-a4b-it, 256k ctx — Google's newest on the catalog),
+gpt-oss (20b and 120b), and more (deepseek v4 family,
+mistral-small-3.1). The m2m100 input schema was pulled verbatim
+(sync-input.json): `text`, `source_lang` (default "en"), `target_lang`
+required — language codes, "fa" for Persian (the page's usage example
+spells names; the runner resolves the accepted form live and records
+it in the log line).
+
+**The selection: `@cf/meta/m2m100-1.2b` — documented-capability based,
+the live bake-off pending.** The honest record of the judgment: no live
+run was possible, so the selection rests on what is documented. m2m100
+is the only model on the catalog served under the Translation task and
+the only one whose target-language contract includes Persian by
+construction (M2M100's 100-language set, fairseq-documented); it is a
+deterministic seq2seq translator — it cannot refuse, editorialize,
+hallucinate additions, or drift a JSON shape (the pipeline translates
+per-string and reassembles the `{"heading","body"}` shape itself, so
+the strict output contract is structural, not prompted). The chat
+families carry no documented Persian coverage at the serving level —
+Llama's official language lists exclude Persian outright (the
+Arabic-bleed failure mode the sitting names), Qwen3's multilingual
+claim is not enumerated for fa anywhere on the catalog — and each
+would need a prompted JSON contract whose refusal/drift/bleed risks
+only a live bake-off could clear. m2m100's weakness is fluency — the
+weakest of the shortlist — and the honest «ترجمهٔ ماشینی» label covers
+exactly that (imperfection, never garbage). **The live bake-off is
+delivered, not run**: `scripts/wgc-bakeoff.ts` takes the full real
+payload (the D1 row or the route), runs every candidate over REST
+(m2m100 per-string; each chat model under the strict-JSON contract,
+parsed defensively), prints each translation beside the English with
+two objective signals (Arabic-script contamination — ي/ك/tatweel;
+dropped or altered numbers) and appends the evidence to
+tests/wgc-bakeoff-*.json. One command, when a valid token exists:
+`WORKERS_AI_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… bun scripts/wgc-bakeoff.ts`
+— the selection re-opens then, and the swap is one constant
+(`TRANSLATION_MODEL` in wgc-watch/src/translate.ts) plus its runner.
+
+**What was built (the full implementation):**
+
+- **The DDL** (wgc-watch/ddl.sql, extended in place): the additive
+  side table `wgc_commentary_fa` (month_key PK, fa_headline, fa_json —
+  the same `{"heading","body"}` shape and order as the English,
+  source_model, translated_at, content_hash — the ENGLISH row's hash
+  at translation time, the freshness key) plus the scrape-log event
+  vocabulary extended with `translated | translate-failed` (the
+  documented two-value extension, the `fetch-error` precedent
+  followed). CREATE TABLE IF NOT EXISTS only; no existing table
+  touched; no seed re-run. **Applied twice — locally only** (the
+  sandbox archive and a scratch SQLite, both idempotence-proven); the
+  remote apply is the blocked step, one command when credentials
+  return:
+  `bunx wrangler d1 execute aurum-desk --remote --file wgc-watch/ddl.sql`
+  (run twice, same proof).
+- **The Prisma read model** `WgcCommentaryFa` (1:1 @map to the DDL,
+  ISO-TEXT translatedAt riding the db.ts read-side shim like the
+  parent table's timestamps; faJson passes untouched like
+  highlightsJson).
+- **The translation module** (wgc-watch/src/translate.ts, zero
+  dependencies like the rest of the worker): translateCommentary —
+  the freshness gate (a stored fa row with a matching hash is
+  up-to-date forever; a re-stored English re-opens it), the defensive
+  parse of the stored English segments, the per-string translation of
+  the headline and every segment, the identity/empty-output discipline
+  (an output equal to the source is a non-translation — no fake
+  translation is ever stored; any one string failing fails the whole
+  run — no half-translated rows), the INSERT OR REPLACE write, the
+  `translated` log line, and the never-throw failure path: any error
+  logs `translate-failed` with the model and reason and returns. The
+  runner resolves the serving's target-language form on the first
+  string ("fa" | "persian" | "farsi") and reuses the winner.
+- **The pipeline hook** (wgc-watch/src/pipeline.ts runFire): the
+  translation rides the EXISTING capture path — right after a
+  store/re-store, and as a pre-step under the stop-on-success exit
+  (the retry-on-next-fire discipline: an AI failure never fails the
+  capture, never re-fetches English, retries on the next fire inside
+  the same window). `env.AI` is optional — without it the fire runs
+  byte-identically to the old behavior (the harness's binding-less
+  calls are untouched). The step only ever touches the CURRENT target
+  month — no silent backfill of the 17 historical rows. The two cron
+  expressions are EXACTLY as they were (30 9 1-15 * * and
+  30 9 17-25/2 * *); no new trigger; the account's fifth slot stays
+  free; currena-markets untouched.
+- **The engine choice, documented**: the worker calls Workers AI
+  through the **[ai] binding** (wrangler.jsonc `"ai": {"binding":
+  "AI"}`) — the platform-native path, no secret surface to manage,
+  included on the free plan, the neuron budget irrelevant at one run
+  per monthly issue; the REST + WORKERS_AI_TOKEN path is what the
+  bake-off and forced-run scripts use outside the worker — the same
+  model, the same module (the scripts' REST adapter implements the
+  module's AiLike interface; one code path).
+- **The route** (src/app/api/gold/wgc-commentary/route.ts): the Farsi
+  rides the ok payload — and the lastKnownGood payloads — as an
+  ADDITIVE `fa` field, **always-include when fresh, absent otherwise**
+  (decided, not parameterized: the card is the Persian-first page, no
+  consumer needs to opt in, the flat §5 shape stays
+  backward-compatible). Fresh = the side row's content_hash equals
+  the English row's (a translation of pre-edit English is never served
+  after a re-store) and its JSON parses into the segment shape; the
+  fa layer fails closed to absent — a missing table, a stale hash or
+  a malformed payload never degrades the English response. The
+  payload carries the provenance: fa.sourceModel and fa.translatedAt.
+- **The card** (src/components/gold-page/wgc-card.tsx + the wgc copy
+  bundles, EN+fa): fa mode with a fresh translation renders the Farsi
+  segments as the PRIMARY RTL text under the honest «ترجمهٔ ماشینی»
+  pill — spec §8's non-negotiable, the exact words — with the
+  translated headline above and the English original still available
+  verbatim below (the existing dir="ltr" blockquote, now captioned
+  «متن اصلی به انگلیسی — واژه‌به‌واژه»). fa mode with NO stored Farsi
+  renders today's behavior exactly (English verbatim, no label, no
+  fake translation); EN mode always renders the English verbatim (the
+  fa layer is the Persian page's own). Persian digits and the Persian
+  calendar dates ride the card's existing conventions unchanged.
+- **The forced-run script** (scripts/wgc-translate-once.ts): the
+  deliberate exactly-one translation of an already-captured issue
+  through the PRODUCTION module (imported, never copied) — `--db`
+  writes a local archive directly, `--remote` reads the live D1
+  through wrangler and applies the writes as a statement tape (the
+  backfill's proven pattern), `--force` replaces an existing
+  translation deliberately. Idempotent without --force.
+
+**The sandbox verification (the end-to-end proof that was possible):**
+the module's contract proven against a scratch D1 (happy path — row +
+`translated` log; the freshness gate — a second run is up-to-date
+with zero further calls; the failure discipline — a failing engine
+logs `translate-failed` and stores nothing; the identity discipline —
+an engine returning the source unchanged fails, never stored; runFire
+without AI byte-identical to the old behavior; a re-stored English
+re-opens the gate and re-translates). The preview mirror re-synced
+(the fresh sandbox's template replaced by canonical main + this
+sitting's tree; bun install; prisma generate; the archive db landed
+at db/custom.db; .env.local env-only) and the DDL applied twice to
+it, idempotent. **The sandbox fa row for the preview walk was
+produced by the production module over a sandbox-LLM adapter — and
+the row's source_model says so unmistakably:
+"sandbox-test/zai-llm (NOT Workers AI — preview test data)" — never
+silently attributed; the live forced run later replaces the
+mechanism, not the claim.** The route verified live on the mirror:
+the fa field present (headline, 2 segments in order, sourceModel,
+translatedAt) with the flat §5 fields unchanged beside it; a
+historical month (?month=2025-03) answering without the field; the
+stale-hash guard proven by round-trip (corrupt the side row's hash →
+fa vanishes → restore → fa returns). The browser walk
+(agent-browser, zero console and zero page errors throughout): the
+fa card — «مرور اکتبر ۲۰۲۶», the «ترجمهٔ ماشینی» pill, the Persian
+headline and both segments RTL («مرور اکتبر» / «نگاه به آینده»),
+the captioned English original below, the Persian whisper line
+(«انتشار: ۱۴ آبان ۱۴۰۵ · بازخوانی: ۳ آذر ۱۴۰۵ · منبع: World Gold
+Council») — VLM-confirmed clean on desktop and mobile
+(tests/wgc-12/13 PNGs + the two VLM JSONs); the EN toggle renders
+today's exact English-only card; the fallback round-trip proven with
+the DB state confirmed at every step (row deleted → the fa card
+renders English verbatim with NO label, captured as
+tests/wgc-14-fa-fallback-en-verbatim.png → row restored → the fa
+card returns); 375px mobile with scrollWidth 375 (zero horizontal
+overflow) and the footer pushed down naturally. Lint green; tsc
+green for every touched file (the repo's pre-existing scripts/
+bun-types noise untouched).
+
+**Honestly NOT done — the whole Cloudflare-account-facing leg,
+blocked by the dead tokens, one command each when credentials
+return:**
+
+1. **The live bake-off** (Step 1's live run): the command is above;
+   the judgment re-opens the selection, and the swap is one constant.
+2. **The remote D1 DDL apply**: the command is above (run twice).
+3. **The wgc-watch deploy** (the [ai] binding attaches with it):
+   `cd wgc-watch && CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=…
+   bunx wrangler deploy` — the two cron expressions unchanged, the
+   fifth trigger slot untouched. The worker's translation step then
+   proves itself at the first capture with the binding.
+4. **The desk worker redeploy** (the route/card changes go live):
+   the two-step OpenNext runbook, NEXT_PUBLIC_BASE_PATH=/gold on BOTH
+   build and deploy — the encoded mistake avoided. Until it runs,
+   the live currena.ir/gold card keeps today's English-verbatim
+   rendering (the designed fallback), honestly.
+5. **The live forced run for 2026-10** (Step 5's deliberate
+   exactly-one run — the end-to-end proof on the live account):
+   `WORKERS_AI_TOKEN=… CLOUDFLARE_ACCOUNT_ID=…
+   CLOUDFLARE_API_TOKEN=… bun scripts/wgc-translate-once.ts --remote
+   --month 2026-10` (no --force needed — the remote D1 carries no fa
+   row; the freshness gate translates straight away), then the
+   sitting's own acceptance: the side-table row read back from D1
+   (`wrangler d1 execute aurum-desk --remote --command "SELECT *
+   FROM wgc_commentary_fa"`), the live route serving the fa fields,
+   the live card rendering the Persian under the label, browser walk
+   + VLM.
+
+**The honest calendar, unchanged:** the next REAL capture is the
+2026-12 issue (published early January 2027 inside the measured
+window); December's watch fires are skip-month wakes (the November
+target); the forced run on 2026-10 — once it runs live — is THE
+end-to-end proof; the 17 historical months stay English-fallback by
+default, no silent backfill; the Nov 25 09:40 UTC observation of the
+watch's first fire is armed exactly as it was (this sitting touched
+no schedule).
+
+The sitting's deliverable pushed to main: the DDL extension, the
+Prisma read model, the translate module, the pipeline hook, the
+wrangler [ai] binding, the route's fa field, the card's fa layer, the
+bake-off and forced-run scripts, the evidence PNGs/JSONs, this
+record, and the spec's §8 pointer + addendum.

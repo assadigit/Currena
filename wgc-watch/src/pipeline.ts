@@ -35,6 +35,7 @@ import {
   canonicalSegmentsJson,
   type WgcSegment,
 } from "./parser";
+import { translateCommentary, translateNote, type AiLike } from "./translate";
 
 /* ------------------------------------------------------------------ *
  * The calendar + URL contract
@@ -401,9 +402,18 @@ export interface FireResult {
  * 404 → attempts + a log line; a 200 → slug guard → parse → gates →
  * upsert or structure alarm; timeouts/5xx → attempts (logged honestly);
  * day 25 with nothing captured and no alert → the window closes missed.
+ *
+ * The Persian translation rides this same path (the 2026-11-25 sitting,
+ * spec §8's deferred phase): right after a store/re-store, and as a
+ * pre-step under stop-on-success (the retry-on-next-fire discipline —
+ * an AI failure never fails the capture and never re-fetches English).
+ * The step is a no-op without an AI binding (env.AI optional — the
+ * harness and any binding-less adapter run exactly the old behavior),
+ * and never touches months other than the current target — no silent
+ * backfill of the 17 historical rows.
  */
 export async function runFire(
-  env: { DB: D1Like },
+  env: { DB: D1Like; AI?: AiLike },
   now: Date,
   fetchImpl: FetchLike,
 ): Promise<FireResult> {
@@ -417,9 +427,19 @@ export async function runFire(
     return { action: "skip-month", target };
   }
 
-  // 2. Stop-on-success / the window already closed.
+  // 2. Stop-on-success / the window already closed. The translation
+  //    pre-step rides the stop-on-success exit: a stored translation
+  //    that is missing or stale (the English re-stored, or a prior
+  //    translate-failed) is refreshed here, without any English fetch.
   const row = await getRow(db, target);
-  if (row?.status === "ok") return { action: "stop-on-success", target };
+  if (row?.status === "ok") {
+    let detail: string | undefined;
+    if (env.AI) {
+      const note = translateNote(await translateCommentary(db, env.AI, target, now));
+      if (note) detail = note;
+    }
+    return { action: "stop-on-success", target, detail };
+  }
   if (row?.status === "missed") return { action: "window-closed", target };
 
   // 3. The hard bound.
@@ -456,6 +476,13 @@ export async function runFire(
         if (outcome.outcome === "stored" || outcome.outcome === "re-stored") {
           captured = true;
           detail = `${outcome.segments} segments, variant ${outcome.variant}, attempts ${outcome.attempts}`;
+          // The translation rides the capture path — one run, once per
+          // monthly issue (a re-store re-translates through the freshness
+          // gate inside). Never fails the capture.
+          if (env.AI) {
+            const note = translateNote(await translateCommentary(db, env.AI, target, now));
+            if (note) detail = `${detail}; ${note}`;
+          }
         } else if (outcome.outcome === "structure-alert") {
           alerted = true;
           detail = outcome.reason;

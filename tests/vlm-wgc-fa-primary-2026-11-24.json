@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**1) Machine-translation pill/badge:** Yes — a small pill labeled «ترجمهٔ ماشینی» appears above the translated content (a light blue rounded badge near the top, right side, under the headline/date).\n\n**2) Persian translated content:** Yes. The headline is «نگاهی هفتگی به بازار طلا» with translated segments «مرور اکتبر» and «نگاه به آینده» as headings, plus translated body paragraphs. The Persian is right-aligned, proper RTL, and reads as Persian (e.g., «طللا در اکتبر کاهش یافت...» — note one possible glyph oddity, but overall it's Persian, not Arabic).\n\n**3) English original below:** Yes — a caption «متن اصلی به انگلیسی — بازنمویزه» sits above an LTR-quoted block containing the headings 'October in review' and 'Looking ahead' with the original English paragraphs.\n\n**4) Visual defects:** Mostly clean RTL layout. Minor issues: possible glyph confusion in «طللا» (should be «طلا»), the page background at top shows slight banding/artifacts above the card, and there's a slight glow/border artifact around the header pill area — but no overlapping text, cut-off content, or horizontal overflow.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795526179,
+  "id": "20261124211611f858fbbd148d4496",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "20261124211611f858fbbd148d4496",
+  "usage": {
+    "completion_tokens": 272,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1910,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2182
+  }
+}

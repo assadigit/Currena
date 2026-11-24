@@ -22,10 +22,13 @@ import {
   type LogLine,
   type FetchLike,
 } from "./pipeline";
+import type { AiLike } from "./translate";
 
 /** The bindings (structural types — the worker carries zero dependencies). */
 interface Env {
   DB: D1Like;
+  /** The Workers AI binding (wrangler.jsonc "ai") — the translation step's engine. */
+  AI: AiLike;
 }
 
 /** What workerd passes the scheduled handler (structurally). */
@@ -38,7 +41,7 @@ const worker = {
   /** The cron fire — the pipeline owns every decision; this logs the outcome for observability. */
   async scheduled(controller: ScheduledControllerLike, env: Env, _ctx: unknown): Promise<void> {
     const now = new Date(controller.scheduledTime);
-    const result = await runFire({ DB: env.DB }, now, fetch as FetchLike);
+    const result = await runFire({ DB: env.DB, AI: env.AI }, now, fetch as FetchLike);
     console.log(`[wgc-watch] ${now.toISOString()} fire → ${JSON.stringify(result)}`);
   },
 

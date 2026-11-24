@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db, unwrapD1Text } from "@/lib/db";
-import type { WgcCommentary } from "@prisma/client";
+import type { WgcCommentary, WgcCommentaryFa } from "@prisma/client";
 
 /**
  * GET /api/gold/wgc-commentary — the World Gold Council's monthly Gold
@@ -21,6 +21,18 @@ import type { WgcCommentary } from "@prisma/client";
  *   structure_alert — the source's template changed; the last known good
  *                     stays served, the alert stated plainly
  *
+ * The Persian translation (spec §8, implemented 2026-11-25) rides the ok
+ * payload — and the lastKnownGood payloads — as an ADDITIVE `fa` field,
+ * always-include when a fresh one is stored, absent otherwise (decided,
+ * not parameterized: the card is the Persian-first page, no consumer
+ * needs to opt in, and the field is purely additive so the flat §5 shape
+ * stays backward-compatible). Fresh means the side row's content_hash
+ * matches the English row's — a translation of OLD English after a
+ * re-store is never served; a malformed fa payload never degrades the
+ * English response (the fa layer fails closed to absent). Months with no
+ * stored Farsi (the 17 pre-feature issues, an AI failure) simply answer
+ * without the field — the English serves verbatim, no fake translation.
+ *
  * The month key is the REVIEWED month "YYYY-MM" everywhere — never the
  * publication month (the issue reviewing October publishes in November).
  * D1 only: this route never fetches gold.org — the currena-wgc-watch
@@ -37,6 +49,16 @@ interface IssuePayload {
   sourceUrl: string;
   blockVariant: string;
   segments: { heading: string; body: string }[];
+  /** The stored Persian translation when one is fresh for this content — absent otherwise. */
+  fa?: FaPayload;
+}
+
+/** The Persian payload — provenance rides along (the honest label's back). */
+interface FaPayload {
+  headline: string | null;
+  segments: { heading: string; body: string }[];
+  sourceModel: string; // the engine recorded at translation time (the bake-off's selection)
+  translatedAt: string; // ISO UTC — when the translation was stored
 }
 
 /** The events that each represent one real fetch attempt by the watch worker. */
@@ -59,10 +81,63 @@ function issueOf(row: WgcCommentary): IssuePayload {
   };
 }
 
+/** A segment-shaped object (the defensive parse of the fa payload). */
+function isSegment(v: unknown): v is { heading: string; body: string } {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    typeof (v as { heading?: unknown }).heading === "string" &&
+    (v as { heading?: string }).heading !== "" &&
+    typeof (v as { body?: unknown }).body === "string" &&
+    (v as { body?: string }).body !== ""
+  );
+}
+
+/**
+ * The stored Persian translation of one issue, when one is FRESH for the
+ * row's content: the side row's content_hash must equal the English
+ * row's (a translation of pre-edit English is never served after a
+ * re-store), and its JSON must parse into the segment shape. Any miss —
+ * no row, a stale hash, a malformed payload — is absent, never an error
+ * in the English response: the fa layer fails closed.
+ */
+async function faOf(row: WgcCommentary): Promise<FaPayload | null> {
+  let faRow: WgcCommentaryFa | null = null;
+  try {
+    faRow = await db.wgcCommentaryFa.findUnique({ where: { monthKey: row.monthKey } });
+  } catch {
+    return null; // the side table is additive — its absence never degrades the English
+  }
+  if (!faRow) return null;
+  if (faRow.contentHash !== row.contentHash) return null; // stale against a re-stored English
+  let segments: { heading: string; body: string }[] | null = null;
+  try {
+    const parsed: unknown = JSON.parse(faRow.faJson);
+    if (Array.isArray(parsed) && parsed.length > 0 && parsed.every(isSegment)) {
+      segments = parsed;
+    }
+  } catch {
+    /* a malformed fa payload serves absent, never an error */
+  }
+  if (segments === null) return null;
+  return {
+    headline: unwrapD1Text(faRow.faHeadline),
+    segments,
+    sourceModel: faRow.sourceModel,
+    translatedAt: unwrapD1Text(faRow.translatedAt) ?? "",
+  };
+}
+
+/** The issue with its Persian payload when a fresh one is stored. */
+async function issueOfRow(row: WgcCommentary): Promise<IssuePayload> {
+  const fa = await faOf(row);
+  return fa === null ? issueOf(row) : { ...issueOf(row), fa };
+}
+
 /** The row's own content when it is real (a captured box), else null. */
-function ownContent(row: WgcCommentary): IssuePayload | null {
+async function ownContent(row: WgcCommentary): Promise<IssuePayload | null> {
   if (row.highlightsJson === "[]" || row.highlightsJson === "") return null;
-  return issueOf(row);
+  return await issueOfRow(row);
 }
 
 async function latestOkBefore(monthKey: string): Promise<IssuePayload | null> {
@@ -70,7 +145,7 @@ async function latestOkBefore(monthKey: string): Promise<IssuePayload | null> {
     where: { status: "ok", monthKey: { lt: monthKey } },
     orderBy: { monthKey: "desc" },
   });
-  return row ? issueOf(row) : null;
+  return row ? await issueOfRow(row) : null;
 }
 
 async function latestOkAny(): Promise<IssuePayload | null> {
@@ -78,7 +153,7 @@ async function latestOkAny(): Promise<IssuePayload | null> {
     where: { status: "ok" },
     orderBy: { monthKey: "desc" },
   });
-  return row ? issueOf(row) : null;
+  return row ? await issueOfRow(row) : null;
 }
 
 /** The previous calendar month (UTC) — the watch worker's own target rule. */
@@ -128,7 +203,7 @@ export async function GET(request: Request) {
       }
       const row = await db.wgcCommentary.findUnique({ where: { monthKey: monthParam } });
       if (row && row.status === "ok") {
-        return NextResponse.json({ status: "ok", ...issueOf(row) }, { headers: { "cache-control": "no-store" } });
+        return NextResponse.json({ status: "ok", ...await issueOfRow(row) }, { headers: { "cache-control": "no-store" } });
       }
       if (row && row.status === "missed") {
         return NextResponse.json(
@@ -149,7 +224,7 @@ export async function GET(request: Request) {
             month: monthParam,
             attempts: row.attempts,
             windowClosesDay: WINDOW_CLOSES_DAY,
-            lastKnownGood: ownContent(row) ?? (await latestOkBefore(monthParam)),
+            lastKnownGood: (await ownContent(row)) ?? (await latestOkBefore(monthParam)),
           },
           { headers: { "cache-control": "no-store" } },
         );
@@ -184,7 +259,7 @@ export async function GET(request: Request) {
     const row = await db.wgcCommentary.findUnique({ where: { monthKey: target } });
     if (!row) return pendingState(target, now);
     if (row.status === "ok") {
-      return NextResponse.json({ status: "ok", ...issueOf(row) }, { headers: { "cache-control": "no-store" } });
+      return NextResponse.json({ status: "ok", ...await issueOfRow(row) }, { headers: { "cache-control": "no-store" } });
     }
     if (row.status === "missed") {
       return NextResponse.json(
@@ -205,7 +280,7 @@ export async function GET(request: Request) {
         month: target,
         attempts: row.attempts,
         windowClosesDay: WINDOW_CLOSES_DAY,
-        lastKnownGood: ownContent(row) ?? (await latestOkBefore(target)),
+        lastKnownGood: (await ownContent(row)) ?? (await latestOkBefore(target)),
       },
       { headers: { "cache-control": "no-store" } },
     );

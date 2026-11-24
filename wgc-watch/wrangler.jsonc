@@ -10,6 +10,16 @@
 // month, plus grace days 17/19/21/23/25 — at most 20 fires per window,
 // zero requests for June/November targets (the series skips both).
 //
+// The Persian translation (the 2026-11-25 sitting, spec §8) rides the SAME
+// fires through the Workers AI binding below — no new cron trigger is
+// attached, the two expressions above stay exactly as they are, and the
+// account's fifth trigger slot stays free. The [ai] binding is the
+// platform-native engine (chosen over a REST token secret: no secret
+// surface to manage, the free plan includes it, and the neuron budget at
+// one call per monthly issue is irrelevant); the REST + token path is
+// what the bake-off and forced-run scripts use from outside the worker
+// (scripts/wgc-bakeoff.ts, scripts/wgc-translate-once.ts).
+//
 // Deploy (from this directory, credentials env-only):
 //   CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… bunx wrangler deploy
 {
@@ -20,6 +30,9 @@
   "workers_dev": true,
   "triggers": {
     "crons": ["30 9 1-15 * *", "30 9 17-25/2 * *"]
+  },
+  "ai": {
+    "binding": "AI"
   },
   "d1_databases": [
     {

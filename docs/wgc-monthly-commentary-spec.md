@@ -386,7 +386,13 @@ stated, not hidden.
 - **Persian translation of the two segments via Workers AI** (the account
   already carries the credentials), stored beside the English, rendered
   under an honest «ترجمهٔ ماشینی» label — a separate sitting, separate
-  acceptance, never silently.
+  acceptance, never silently. **[Implemented 2026-11-24 — the
+  translation sitting: the side table, the pipeline hook, the route's
+  additive fa field and the card's fa layer are built and
+  sandbox-proven; the Cloudflare-account-facing legs (the live bake-off,
+  the remote DDL apply, both deploys, the live forced run) are blocked
+  by that sitting's invalid tokens and carry their one-command
+  runbook in AGENTS.md — the sitting decides when they run.]**
 - The full article, the charts, the GRAM datasets — paywalled and out of
   scope (§1, §9).
 
@@ -435,3 +441,42 @@ come down. The desk's own copy around it stays ours.
 `docs/evidence/wgc-census-2026-11-24.json` (40 pages, 39 genuine issues,
 every segment verbatim). Proposed by the 2026-11-24 sitting; the AGENTS.md
 record of that sitting carries the summary.*
+
+---
+
+## Addendum — the Persian translation phase (2026-11-24, the translation sitting)
+
+The §8 phase, as built (AGENTS.md's dated section is the full record):
+
+- **Storage**: the additive side table `wgc_commentary_fa` (wgc-watch/ddl.sql,
+  CREATE TABLE IF NOT EXISTS) — month_key PK, fa_headline, fa_json (the same
+  `[{"heading","body"}]` shape and order as the English), source_model,
+  translated_at, and content_hash = the ENGLISH row's hash at translation
+  time (the freshness key: the stored Farsi serves forever until the English
+  actually changes — the AI is never called per-request, never twice for the
+  same content). The Prisma read model `WgcCommentaryFa` maps it 1:1.
+- **Model**: `@cf/meta/m2m100-1.2b` — the catalog's only Translation-task
+  model and the only one whose target-language contract includes Persian
+  by construction; deterministic per-string translation (the shape is
+  preserved structurally), with the honest «ترجمهٔ ماشینی» label covering
+  its fluency ceiling. Selected on documented capability — the LIVE bake-off
+  (scripts/wgc-bakeoff.ts, delivered ready) re-opens the selection when a
+  valid token exists; the swap is one constant.
+- **Pipeline**: the translation rides the existing capture path in
+  wgc-watch/src/pipeline.ts (after a store/re-store, plus a retry pre-step
+  under stop-on-success), through the [ai] binding — no new cron trigger,
+  the two expressions unchanged, the fifth slot free. Failure logs
+  `translate-failed` to wgc_scrape_log and retries on the next fire; an AI
+  failure never fails the capture. No backfill: only the current target
+  month is ever translated.
+- **Serving**: the route's ok (and lastKnownGood) payloads gain an additive
+  `fa` field — always-include when fresh, absent otherwise — carrying
+  headline, segments, sourceModel and translatedAt; the flat §5 shape stays
+  backward-compatible, the fa layer fails closed to absent.
+- **Card**: fa mode renders the Farsi as the primary RTL text under the
+  «ترجمهٔ ماشینی» label with the English original still verbatim below
+  (captioned); no stored Farsi → today's English-verbatim behavior, no
+  label, no fake translation; EN mode unchanged.
+- **Pending (the invalid-token wall)**: the live bake-off, the remote DDL
+  apply, both worker deploys, and the live forced run for 2026-10 — each
+  with its exact one-command runbook in AGENTS.md.

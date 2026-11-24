@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Yes to all five:\n\n1. **No horizontal overflow** — the card fits within the 375px viewport; Persian text wraps cleanly at the right edge with no visible clipping.\n2. **Yes** — the Persian translated text is right-aligned RTL, readable with proper line wrapping and punctuation (؟) positioned correctly.\n3. **Yes** — the small pill-shaped badge «ترجمهٔ ماشینی» is visible near the top of the card.\n4. **Yes** — the English block (\"October in review\", \"Looking ahead\") sits below the Persian sections and is left-aligned LTR as expected.\n5. **Yes** — the footer (انتشار: ۱۴ آبان ۱۴۰۴ ... منبع: Gold Council) is positioned below the card content, not overlapping it.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795526192,
+  "id": "20261124211628ff6e42971b70404f",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "20261124211628ff6e42971b70404f",
+  "usage": {
+    "completion_tokens": 167,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 529,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 696
+  }
+}
