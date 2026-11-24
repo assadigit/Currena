@@ -168,13 +168,16 @@ async function wranglerFile(path: string): Promise<string> {
 
 const restAi: AiLike = {
   async run(model: string, input: Record<string, unknown>): Promise<unknown> {
+    // 120s: the selected chat model's observed serving latency under
+    // free-plan queueing (the live bake-off's own envelope — one run
+    // crossed 60s, none crossed 120s).
     const res = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/${model}`,
       {
         method: "POST",
         headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
         body: JSON.stringify(input),
-        signal: AbortSignal.timeout(60_000),
+        signal: AbortSignal.timeout(120_000),
       },
     );
     const body = (await res.json().catch(() => null)) as

@@ -1,0 +1,622 @@
+{
+  "runs": [
+    {
+      "ranAt": "2026-11-24T14:06:39.186Z",
+      "source": "db:db/custom.db",
+      "month": "2026-10",
+      "english": {
+        "headline": "Gold Market Commentary: Where floor art thou?",
+        "segments": [
+          {
+            "heading": "October in review",
+            "body": "Gold fell in October, likely on asset rotation, de-grossing and Fed rate-path repricing."
+          },
+          {
+            "heading": "Looking ahead",
+            "body": "The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high. The conditions for gold to recover are much stronger. Our framework shows that we may be nearing an interim bottom."
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "id": "@cf/meta/m2m100-1.2b",
+          "family": "translation"
+        },
+        {
+          "id": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/qwen/qwen3.8-27b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/meta/llama-3.1-8b-instruct-fp8",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/meta/llama-4-scout-17b-16e-instruct",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/google/gemma-4-26b-a4b-it",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/openai/gpt-oss-20b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/openai/gpt-oss-120b",
+          "family": "chat"
+        }
+      ],
+      "verdicts": [
+        {
+          "model": "@cf/meta/m2m100-1.2b",
+          "family": "translation",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "بررسی بازار طلا: کجا می روید؟",
+            "segments": [
+              {
+                "heading": "اکتبر در بررسی",
+                "body": "طلا در ماه اکتبر کاهش یافت، احتمالا به دلیل رویداد دارایی ها، کاهش درآمد و بازسازی مسیر نرخ فدرال."
+              },
+              {
+                "heading": "نگاهی به جلو",
+                "body": "کاهش پس از سال 2011 یک متوازن ضعیف برای کاهش 25 درصد در حال حاضر از حداکثر ژانویه 2026 است. شرایط برای بازسازی طلا بسیار قوی تر است."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: AiError: Model has been deprecated: @cf/qwen/qwen3-30b-a3b-fp8 was deprecated on 2026-11-20. See the model catalog for alternatives: https://developers.cloudflare.com/workers-ai/models/ (1b97b796-509f-49c2-9b1a-2ec6d7bae3c5)"
+        },
+        {
+          "model": "@cf/qwen/qwen3.8-27b",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/meta/llama-3.1-8b-instruct-fp8",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: AiError: Model has been deprecated: @cf/meta/llama-3.1-8b-instruct-fp8 was deprecated on 2026-11-20. See the model catalog for alternatives: https://developers.cloudflare.com/workers-ai/models/ (d82a37fe-9e19-4109-b10b-4c2dcea31b6f)"
+        },
+        {
+          "model": "@cf/meta/llama-4-scout-17b-16e-instruct",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/openai/gpt-oss-20b",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/openai/gpt-oss-120b",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        }
+      ]
+    },
+    {
+      "ranAt": "2026-11-24T14:09:58.872Z",
+      "source": "db:db/custom.db",
+      "month": "2026-10",
+      "english": {
+        "headline": "Gold Market Commentary: Where floor art thou?",
+        "segments": [
+          {
+            "heading": "October in review",
+            "body": "Gold fell in October, likely on asset rotation, de-grossing and Fed rate-path repricing."
+          },
+          {
+            "heading": "Looking ahead",
+            "body": "The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high. The conditions for gold to recover are much stronger. Our framework shows that we may be nearing an interim bottom."
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "id": "@cf/meta/m2m100-1.2b",
+          "family": "translation"
+        },
+        {
+          "id": "@cf/qwen/qwen3.8-27b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/meta/llama-4-scout-17b-16e-instruct",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/google/gemma-4-26b-a4b-it",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/openai/gpt-oss-20b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/openai/gpt-oss-120b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/zai-org/glm-4.7-flash",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/zai-org/glm-5.3",
+          "family": "chat"
+        }
+      ],
+      "verdicts": [
+        {
+          "model": "@cf/meta/m2m100-1.2b",
+          "family": "translation",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "بررسی بازار طلا: کجا می روید؟",
+            "segments": [
+              {
+                "heading": "اکتبر در بررسی",
+                "body": "طلا در ماه اکتبر کاهش یافت، احتمالا به دلیل رویداد دارایی ها، کاهش درآمد و بازسازی مسیر نرخ فدرال."
+              },
+              {
+                "heading": "نگاهی به جلو",
+                "body": "کاهش پس از سال 2011 یک متوازن ضعیف برای کاهش 25 درصد در حال حاضر از حداکثر ژانویه 2026 است. شرایط برای بازسازی طلا بسیار قوی تر است."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/qwen/qwen3.8-27b",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "10"
+          ],
+          "output": {
+            "headline": "دیدگاه بازار طلا: کف کجاست؟",
+            "segments": [
+              {
+                "heading": "مرور October",
+                "body": "طلا در October افت کرد، احتمالاً به‌دلیل چرخش دارایی‌ها، کاهش مبالغ ناخالص و تجدید ارزیابی مسیر نرخ Fed."
+              },
+              {
+                "heading": "نگاه به آینده",
+                "body": "افت پس از 2011 برای افت فعلی 25% از بالاترین سطح January 2026 موازایی ضعیف است. شرایط برای ریکاوری طلا بسیار قوی‌تر هستند. چارچوب ما نشان می‌دهد که احتمالاً در حال نزدیک شدن به کف موقتی هستیم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "10"
+          ],
+          "output": {
+            "headline": "نظرات بازار طلا: کف کجاست؟",
+            "segments": [
+              {
+                "heading": "بررسی اکتبر",
+                "body": "طلا در اکتبر کاهش یافت، احتمالا به دلیل چرخش دارایی، کاهش خالص و بازقیمت‌گذاری مسیر نرخ فد."
+              },
+              {
+                "heading": "نگاه به آینده",
+                "body": "کاهشی پس از سال 2011 یک موازنه ضعیف برای کاهش فعلی 25% از اوج ژانویه 2026 است. شرایط برای بهبود طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به یک کف موقت نزدیک شویم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/meta/llama-4-scout-17b-16e-instruct",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "Gold Market Commentary: Where floor art thou?",
+            "segments": [
+              {
+                "heading": "October in review",
+                "body": "طلا در ماه اکتبر کاهش یافت، احتمالاً به دلیل چرخش دارایی، کاهش موقعیت‌های خرید و تغییر قیمت‌گذاری مسیر نرخ بهره فدرال رزرو."
+              },
+              {
+                "heading": "Looking ahead",
+                "body": "کاهش پس از سال 2011 موازی ضعیفی برای کاهش فعلی 25 درصدی از بالاترین سطح ژانویه 2026 است. شرایط برای بهبود طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به کف موقت نزدیک می‌شویم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "family": "chat",
+          "ok": false,
+          "error": "TimeoutError: The operation timed out."
+        },
+        {
+          "model": "@cf/openai/gpt-oss-20b",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/openai/gpt-oss-120b",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "گزارش بازار طلا: کجا هستی، زمین؟",
+            "segments": [
+              {
+                "heading": "بررسی اکتبر",
+                "body": "طلا در اکتبر سقوط کرد، احتمالاً به دلیل چرخش دارایی، کاهش حجم و بازبازاری مسیر نرخ‌های فدرال."
+              },
+              {
+                "heading": "نگاه به آینده",
+                "body": "روند سقوط پس از سال ۲۰۱۱ یک موازی ضعیف برای سقوط فعلی ۲۵ درصدی از بالاترین نقطه ژانویه ۲۰۲۶ است. شرایط برای بازیابی طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به نزدیک‌ترین نقطه پایینی رسیده‌ایم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: AiError: Model @cf/deepseek-ai/deepseek-v4.1-flash-1017 is not available on the Workers Free plan: Model @cf/deepseek-ai/deepseek-v4.1-flash-1017 is not available on the Workers Free plan. Upgrade to access this model: https://dash.c"
+        },
+        {
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "family": "chat",
+          "ok": false,
+          "error": "TimeoutError: The operation timed out."
+        },
+        {
+          "model": "@cf/zai-org/glm-5.3",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: AiError: Model @cf/zai-org/glm-5.3 is not available on the Workers Free plan: Model @cf/zai-org/glm-5.3 is not available on the Workers Free plan. Upgrade to access this model: https://dash.cloudflare.com/?to=/:account/workers/plans "
+        }
+      ]
+    },
+    {
+      "ranAt": "2026-11-24T14:14:20.122Z",
+      "source": "db:db/custom.db",
+      "month": "2026-10",
+      "english": {
+        "headline": "Gold Market Commentary: Where floor art thou?",
+        "segments": [
+          {
+            "heading": "October in review",
+            "body": "Gold fell in October, likely on asset rotation, de-grossing and Fed rate-path repricing."
+          },
+          {
+            "heading": "Looking ahead",
+            "body": "The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high. The conditions for gold to recover are much stronger. Our framework shows that we may be nearing an interim bottom."
+          }
+        ]
+      },
+      "candidates": [
+        {
+          "id": "@cf/meta/m2m100-1.2b",
+          "family": "translation"
+        },
+        {
+          "id": "@cf/qwen/qwen3.8-27b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/meta/llama-4-scout-17b-16e-instruct",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/google/gemma-4-26b-a4b-it",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/openai/gpt-oss-20b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/openai/gpt-oss-120b",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/zai-org/glm-4.7-flash",
+          "family": "chat"
+        },
+        {
+          "id": "@cf/zai-org/glm-5.3",
+          "family": "chat"
+        }
+      ],
+      "verdicts": [
+        {
+          "model": "@cf/meta/m2m100-1.2b",
+          "family": "translation",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "بررسی بازار طلا: کجا می روید؟",
+            "segments": [
+              {
+                "heading": "اکتبر در بررسی",
+                "body": "طلا در ماه اکتبر کاهش یافت، احتمالا به دلیل رویداد دارایی ها، کاهش درآمد و بازسازی مسیر نرخ فدرال."
+              },
+              {
+                "heading": "نگاهی به جلو",
+                "body": "کاهش پس از سال 2011 یک متوازن ضعیف برای کاهش 25 درصد در حال حاضر از حداکثر ژانویه 2026 است. شرایط برای بازسازی طلا بسیار قوی تر است."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/qwen/qwen3.8-27b",
+          "family": "chat",
+          "ok": false,
+          "error": "TimeoutError: The operation timed out."
+        },
+        {
+          "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "10"
+          ],
+          "output": {
+            "headline": "نظرات بازار طلا: کف کجاست؟",
+            "segments": [
+              {
+                "heading": "بررسی اکتبر",
+                "body": "طلا در اکتبر کاهش یافت، احتمالاً به دلیل چرخش دارایی، کاهش خالص و بازقیمت‌گذاری مسیر نرخ Fed."
+              },
+              {
+                "heading": "نگاه به آینده",
+                "body": "کاهشی پس از سال 2011 یک موازی ضعیف برای 25% کاهش قیمت از اوج ژانویه 2026 است. شرایط برای بهبود قیمت طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به یک کف موقت نزدیک می‌شویم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/meta/llama-4-scout-17b-16e-instruct",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "Gold Market Commentary: Where floor art thou?",
+            "segments": [
+              {
+                "heading": "October in review",
+                "body": "طلا در ماه اکتبر کاهش یافت، احتمالاً به دلیل چرخش دارایی، کاهش موقعیت‌های خرید و تغییر قیمت‌گذاری مسیر نرخ بهره فدرال رزرو."
+              },
+              {
+                "heading": "Looking ahead",
+                "body": "کاهش پس از سال 2011 موازی ضعیفی برای کاهش فعلی 25 درصدی از بالاترین سطح ژانویه 2026 است. شرایط برای بهبود طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به کف موقت نزدیک می‌شویم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "10"
+          ],
+          "output": {
+            "headline": "تحلیل بازار طلا: کف قیمت کجاست؟",
+            "segments": [
+              {
+                "heading": "مرور اکتبر",
+                "body": "قیمت طلا در اکتبر، احتمالاً به دلیل چرخش دارایی‌ها، کاهش حجم موقعیت‌ها و بازنگری در مسیر نرخ بهره Fed، کاهش یافت."
+              },
+              {
+                "heading": "نگاه به آینده",
+                "body": "رکود پس از سال 2011 شباهت کمی با کاهش فعلی 25% از اوج ژانویه 2026 دارد. شرایط برای بازیابی قیمت طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به یک کف موقتی نزدیک شویم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/openai/gpt-oss-20b",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "نظرات بازار طلا: کف در کجاست؟",
+            "segments": [
+              {
+                "heading": "نظرات اکتبر",
+                "body": "طلا در اکتبر سقوط کرد، احتمالاً به دلیل چرخش دارایی، حذف ناخالص و بازقیمت‌گذاری مسیر نرخ فدرال."
+              },
+              {
+                "heading": "نگاهی به آینده",
+                "body": "نقصی در مقایسه نوسان پس از 2011 با افت فعلی 25٪ از اوج ژانویه 2026 وجود دارد. شرایط برای بازگشت طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به سمت یک کف موقت نزدیک شویم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/openai/gpt-oss-120b",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "10"
+          ],
+          "output": {
+            "headline": "تحلیل بازار طلا: کجا است کف؟",
+            "segments": [
+              {
+                "heading": "مروری بر اکتبر",
+                "body": "قیمت طلا در اکتبر کاهش یافت، احتمالاً به دلیل چرخش دارایی‌ها، کاهش مقیاس و بازنگری مسیر نرخ‌های فدرال رزرو."
+              },
+              {
+                "heading": "نگاهی به آینده",
+                "body": "نزول پس از 2011 مقایسه ضعیفی برای کاهش 25% فعلی نسبت به اوج ژانویه 2026 است. شرایط برای بهبود طلا بسیار قوی‌تر هستند. چارچوب ما نشان می‌دهد که ممکن است به یک کف موقت نزدیک شده باشیم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/mistralai/mistral-small-3.1-24b-instruct",
+          "family": "chat",
+          "ok": true,
+          "shapeOk": true,
+          "arabicBleedChars": [],
+          "numbersLost": [
+            "-2011",
+            "25%",
+            "10"
+          ],
+          "output": {
+            "headline": "گزارش بازار طلا: کجا هستید، زمین؟",
+            "segments": [
+              {
+                "heading": "بررسی اکتبر",
+                "body": "طلا در اکتبر سقوط کرد، احتمالاً به دلیل چرخش دارایی، کاهش حجم و بازبازاری مسیر نرخ‌های فدرال."
+              },
+              {
+                "heading": "نظریه به جلو",
+                "body": "فشار پس از 2011 یک همتا ضعیف برای کاهش 25 درصدی فعلی از بالاترین نرخ ژانویه 2026 است. شرایط برای بازیابی طلا بسیار قوی‌تر است. چارچوب ما نشان می‌دهد که ممکن است به یک پایین‌ترین نقطه موقت نزدیک شده باشیم."
+              }
+            ]
+          }
+        },
+        {
+          "model": "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: AiError: Model @cf/deepseek-ai/deepseek-v4.1-flash-1017 is not available on the Workers Free plan: Model @cf/deepseek-ai/deepseek-v4.1-flash-1017 is not available on the Workers Free plan. Upgrade to access this model: https://dash.c"
+        },
+        {
+          "model": "@cf/zai-org/glm-4.7-flash",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: no response field in the result"
+        },
+        {
+          "model": "@cf/zai-org/glm-5.3",
+          "family": "chat",
+          "ok": false,
+          "error": "Error: AiError: Model @cf/zai-org/glm-5.3 is not available on the Workers Free plan: Model @cf/zai-org/glm-5.3 is not available on the Workers Free plan. Upgrade to access this model: https://dash.cloudflare.com/?to=/:account/workers/plans "
+        }
+      ]
+    }
+  ]
+}

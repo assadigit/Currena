@@ -1,0 +1,242 @@
+{
+  "ranAt": "2026-11-24T14:23:10.705Z",
+  "module": "wgc-watch/src/translate.ts",
+  "model": "@cf/google/gemma-4-26b-a4b-it",
+  "results": [
+    {
+      "check": "the happy path: translated, the ADAPTER's sourceModel attributed, 5 strings (1 headline + 2 segments × 2), 2 segments",
+      "pass": true,
+      "extra": {
+        "outcome": "translated",
+        "model": "sandbox-test/mock-chat (contract test)",
+        "strings": 5,
+        "segments": 2
+      }
+    },
+    {
+      "check": "the happy path: ONE chat call for the whole issue",
+      "pass": true,
+      "extra": {
+        "calls": 1
+      }
+    },
+    {
+      "check": "the call's envelope: system + user messages, max_tokens 2048, the selected model named",
+      "pass": true,
+      "extra": {
+        "envelope": {
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are a professional English-to-Persian (Farsi) translator for gold-market financial commentary. Translate the given content into fluent, natural Persian (Farsi) — never Arabic. Preserve every number, percentage, month and named entity (e.g. Fed, LBMA, WGC) exactly. Do not add, omit, or reinterpret any content. Do not explain. Output STRICT JSON only, no markdown fences: {\"headline\": <string|null>, \"segments\": [{\"heading\": <string>, \"body\": <string>}, …]} The segments array must match the input's order and count exactly."
+            },
+            {
+              "role": "user",
+              "content": "{\"headline\":\"Gold Market Commentary: Where floor art thou?\",\"segments\":[{\"heading\":\"October in review\",\"body\":\"Gold fell in October, likely on asset rotation, de-grossing and Fed rate-path repricing.\"},{\"heading\":\"Looking ahead\",\"body\":\"The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high.\"}]}"
+            }
+          ],
+          "max_tokens": 2048
+        }
+      }
+    },
+    {
+      "check": "the fa row: the adapter's declared sourceModel recorded (never silently attributed), the English row's hash keyed, the shape mirrored in order",
+      "pass": true,
+      "extra": {
+        "month_key": "2026-10",
+        "fa_headline": "فا:Gold Market Commentary: Where floor art thou?",
+        "fa_json": "[{\"heading\":\"فا:October in review\",\"body\":\"فا:Gold fell in October, likely on asset rotation, de-grossing and Fed rate-path repricing.\"},{\"heading\":\"فا:Looking ahead\",\"body\":\"فا:The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high.\"}]",
+        "source_model": "sandbox-test/mock-chat (contract test)",
+        "translated_at": "2026-11-24T10:00:00.000Z",
+        "content_hash": "17164b52dcdd016a6846d0b1f26728e3f5fcc0f94f6b6a9bc8658f60125eda22"
+      }
+    },
+    {
+      "check": "the log line: `translated`, the model named, the string count stated",
+      "pass": true,
+      "extra": {
+        "event": "translated",
+        "detail": "model sandbox-test/mock-chat (contract test) (chat contract, 5 strings), 2 segments"
+      }
+    },
+    {
+      "check": "the freshness gate: a hash-matching stored translation is up-to-date, zero further calls",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "up-to-date"
+        },
+        "calls": 1
+      }
+    },
+    {
+      "check": "the failing-engine discipline: outcome failed, the `translate-failed` log written, NO fa row stored",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "failed",
+          "reason": "model endpoint 500"
+        },
+        "row": null,
+        "log": {
+          "event": "translate-failed",
+          "detail": "model @cf/google/gemma-4-26b-a4b-it: model endpoint 500"
+        }
+      }
+    },
+    {
+      "check": "the untranslated-identity discipline: outcome failed, the `translate-failed` log written, NO fa row stored",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "failed",
+          "reason": "the headline came back untranslated — not a translation"
+        },
+        "row": null,
+        "log": {
+          "event": "translate-failed",
+          "detail": "model @cf/google/gemma-4-26b-a4b-it: the headline came back untranslated — not a translation"
+        }
+      }
+    },
+    {
+      "check": "the identity failure names the untranslated string honestly",
+      "pass": true,
+      "extra": {
+        "outcome": "failed",
+        "reason": "the headline came back untranslated — not a translation"
+      }
+    },
+    {
+      "check": "the shape-drift discipline: outcome failed, the `translate-failed` log written, NO fa row stored",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "failed",
+          "reason": "the segments shape drifted (got 3, want 2)"
+        },
+        "row": null,
+        "log": {
+          "event": "translate-failed",
+          "detail": "model @cf/google/gemma-4-26b-a4b-it: the segments shape drifted (got 3, want 2)"
+        }
+      }
+    },
+    {
+      "check": "the empty-channel discipline: outcome failed, the `translate-failed` log written, NO fa row stored",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "failed",
+          "reason": "the model returned no content (empty channel)"
+        },
+        "row": null,
+        "log": {
+          "event": "translate-failed",
+          "detail": "model @cf/google/gemma-4-26b-a4b-it: the model returned no content (empty channel)"
+        }
+      }
+    },
+    {
+      "check": "the dropped-headline discipline: outcome failed, the `translate-failed` log written, NO fa row stored",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "failed",
+          "reason": "the source headline was dropped (answered null)"
+        },
+        "row": null,
+        "log": {
+          "event": "translate-failed",
+          "detail": "model @cf/google/gemma-4-26b-a4b-it: the source headline was dropped (answered null)"
+        }
+      }
+    },
+    {
+      "check": "the added-headline discipline: outcome failed, the `translate-failed` log written, NO fa row stored",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "failed",
+          "reason": "a headline was added where the source had none"
+        },
+        "row": null,
+        "log": {
+          "event": "translate-failed",
+          "detail": "model @cf/google/gemma-4-26b-a4b-it: a headline was added where the source had none"
+        }
+      }
+    },
+    {
+      "check": "the added-headline failure names the invented headline honestly",
+      "pass": true,
+      "extra": {
+        "outcome": "failed",
+        "reason": "a headline was added where the source had none"
+      }
+    },
+    {
+      "check": "a month with no captured commentary is skipped, never translated",
+      "pass": true,
+      "extra": {
+        "outcome": "skipped",
+        "reason": "no captured commentary content for this month"
+      }
+    },
+    {
+      "check": "a legacy {response} envelope parses — the dual-shape extraction holds",
+      "pass": true,
+      "extra": {
+        "outcome": "translated",
+        "model": "@cf/google/gemma-4-26b-a4b-it",
+        "strings": 5,
+        "segments": 2
+      }
+    },
+    {
+      "check": "a re-stored English re-opens the gate: re-translated, the new hash keyed, 3 segments mirrored",
+      "pass": true,
+      "extra": {
+        "outcome": {
+          "outcome": "translated",
+          "model": "sandbox-test/mock-chat (re-store)",
+          "strings": 7,
+          "segments": 3
+        },
+        "row": {
+          "month_key": "2026-10",
+          "fa_headline": "فا:Gold Market Commentary: Where floor art thou?",
+          "fa_json": "[{\"heading\":\"فا:October in review\",\"body\":\"فا:Gold fell in October, likely on asset rotation, de-grossing and Fed rate-path repricing.\"},{\"heading\":\"فا:Looking ahead\",\"body\":\"فا:The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high.\"},{\"heading\":\"فا:A late addition\",\"body\":\"فا:WGC edited the box after publication.\"}]",
+          "source_model": "sandbox-test/mock-chat (re-store)",
+          "translated_at": "2026-11-24T11:00:00.000Z",
+          "content_hash": "daaadeaa314fb3738540c06f016773b2d27d2d9c14e4937d4b2e14b9f7ce647f"
+        }
+      }
+    },
+    {
+      "check": "the re-translation logs `translated` again (the refresh is observable)",
+      "pass": true,
+      "extra": {
+        "event": "translated",
+        "detail": "model sandbox-test/mock-chat (re-store) (chat contract, 7 strings), 3 segments"
+      }
+    },
+    {
+      "check": "runFire without env.AI: stop-on-success, no translation detail — the pre-translation behavior",
+      "pass": true,
+      "extra": {
+        "action": "stop-on-success",
+        "target": "2026-10"
+      }
+    },
+    {
+      "check": "runFire with a fresh translation: stop-on-success with NO extra detail (up-to-date is silence)",
+      "pass": true,
+      "extra": {
+        "action": "stop-on-success",
+        "target": "2026-10"
+      }
+    }
+  ],
+  "allPass": true
+}

@@ -9,10 +9,13 @@
 // The text source: the D1 row's bytes, read either from a local SQLite
 // archive (--db, the default db/custom.db carries the same rows the
 // remote D1 serves) or from the desk's own route (--route, the D1 read
-// side). The candidates are the free-plan catalog's live shortlist
-// (fetched from the public docs, 2026-11-24): the dedicated translation
-// model, and the chat families the sitting named — Qwen, Llama 3.x
-// instruct (+ Llama 4 Scout), Gemma, gpt-oss.
+// side). The candidates are the LIVE catalog's shortlist as served by the
+// account-scoped models/search API (2026-11-24, the second run: the first
+// run's catalog had deprecated qwen3-30b-a3b-fp8 and llama-3.1-8b on
+// 2026-11-20 — both now dropped — and the account catalog now also serves
+// the zai-org GLM family, which this run adds): the dedicated translation
+// model, and the chat families — Qwen, Llama 3.3 / Llama 4 Scout, Gemma,
+// gpt-oss, Mistral, DeepSeek, GLM.
 //
 // Each candidate runs over the FULL payload: m2m100 through its
 // per-string contract (the production runner of wgc-watch/src/translate.ts
@@ -67,14 +70,16 @@ interface Candidate {
 
 const DEFAULT_CANDIDATES: Candidate[] = [
   { id: "@cf/meta/m2m100-1.2b", family: "translation" },
-  { id: "@cf/qwen/qwen3-30b-a3b-fp8", family: "chat" },
   { id: "@cf/qwen/qwen3.8-27b", family: "chat" },
   { id: "@cf/meta/llama-3.3-70b-instruct-fp8-fast", family: "chat" },
-  { id: "@cf/meta/llama-3.1-8b-instruct-fp8", family: "chat" },
   { id: "@cf/meta/llama-4-scout-17b-16e-instruct", family: "chat" },
   { id: "@cf/google/gemma-4-26b-a4b-it", family: "chat" },
   { id: "@cf/openai/gpt-oss-20b", family: "chat" },
   { id: "@cf/openai/gpt-oss-120b", family: "chat" },
+  { id: "@cf/mistralai/mistral-small-3.1-24b-instruct", family: "chat" },
+  { id: "@cf/deepseek-ai/deepseek-v4.1-flash-1017", family: "chat" },
+  { id: "@cf/zai-org/glm-4.7-flash", family: "chat" },
+  { id: "@cf/zai-org/glm-5.3", family: "chat" },
 ];
 const candidates: Candidate[] = MODELS
   ? MODELS.split(",").map((id) => ({
@@ -131,7 +136,7 @@ async function restRun(model: string, input: Record<string, unknown>): Promise<u
       method: "POST",
       headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
       body: JSON.stringify(input),
-      signal: AbortSignal.timeout(60_000),
+      signal: AbortSignal.timeout(120_000),
     },
   );
   const body = (await res.json().catch(() => null)) as
@@ -195,6 +200,12 @@ const CHAT_SYSTEM = [
 ].join(" ");
 
 async function runChat(model: string, issue: Issue): Promise<{ headline: string | null; segments: { heading: string; body: string }[] }> {
+  // The uniform envelope every chat candidate runs under: the same strict
+  // contract, plus max_tokens 2048 — gpt-oss spends its default 256-token
+  // completion budget inside its reasoning channel and returns content
+  // null with finish_reason "length" (diagnosed live 2026-11-24); the
+  // raised budget is an envelope fix shared by every candidate, not a
+  // per-model prompt tune.
   const result = await restRun(model, {
     messages: [
       { role: "system", content: CHAT_SYSTEM },
@@ -203,10 +214,20 @@ async function runChat(model: string, issue: Issue): Promise<{ headline: string 
         content: JSON.stringify({ headline: issue.headline, segments: issue.segments }),
       },
     ],
+    max_tokens: 2048,
   });
   const r = typeof result === "object" && result !== null ? (result as Record<string, unknown>) : null;
-  const raw = r ? (r.response ?? r.text ?? r.result) : null;
-  if (typeof raw !== "string" || raw.trim() === "") throw new Error("no response field in the result");
+  // Both served shapes: the legacy {response: string} and the
+  // OpenAI-compatible {choices: [{message: {content: string}}]} — the newer
+  // families (qwen3.8, llama-3.3/4, gemma-4, gpt-oss, mistral, deepseek,
+  // glm) return the latter; some carry `reasoning` beside the content.
+  const rawLegacy = typeof r?.response === "string" ? r.response : null;
+  const rawChat =
+    r && Array.isArray(r.choices)
+      ? ((r.choices[0] as { message?: { content?: unknown } } | undefined)?.message?.content ?? null)
+      : null;
+  const raw = typeof rawChat === "string" ? rawChat : rawLegacy;
+  if (raw === null || raw.trim() === "") throw new Error("no response field in the result");
   // The defensive parse: strip fences/preamble, take the outermost object.
   const text = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
   const first = text.indexOf("{");

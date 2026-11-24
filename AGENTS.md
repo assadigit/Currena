@@ -1852,3 +1852,174 @@ Prisma read model, the translate module, the pipeline hook, the
 wrangler [ai] binding, the route's fa field, the card's fa layer, the
 bake-off and forced-run scripts, the evidence PNGs/JSONs, this
 record, and the spec's §8 pointer + addendum.
+
+### The live bake-off run, the model selected, the runner swapped (2026-11-24, the credentials sitting)
+
+The sitting that opened with the owner's fresh credentials ("Use this
+credentials and continue your work") and executed the previous sitting's
+deferred Step 1 — the live WGC translation bake-off — to its judgment, and
+carried the judgment into the production runner. The credentials wall moved
+but did not lift: each token stated first, plainly.
+
+**The token state (verified live at open):**
+
+- The **Workers AI token is VALID and AI-scoped** (`/user/tokens/verify`
+  answers active; the account-scoped `/ai/models/search` and `/ai/run/…`
+  answer; the m2m100 probe run translated live). Its scope is Workers AI
+  ONLY: `/d1/*` answers Authentication error, the workers-scripts list
+  answers an empty result, the cron-schedules read answers "No access to
+  the specified resource", the zones list is empty. Consequence: **every
+  step needing wrangler stayed blocked** — same list as before, one
+  command each when a valid Workers API token arrives.
+- The **Workers API token is INVALID** — `/user/tokens/verify` answers
+  code 1000 "Invalid API Token" in both the given prefixed and unprefixed
+  forms — the exact wall the previous sitting recorded for both of its
+  tokens. The account itself is alive and serving (currena.ir/gold 200,
+  the watch health endpoint answering) — the live account was untouched
+  by this sitting, byte-identical to the e1af12d8→cadee2a0 state.
+
+**The live bake-off — three runs over the FULL 2026-10 payload (headline
++ both segments), every candidate over REST under one strict JSON
+contract (evidence tests/wgc-bakeoff-2026-11-24.json, three runs
+recorded):**
+
+- **Run 1 (the sitting's own script, verbatim):** m2m100 translated —
+  garbled terminology («رویداد دارایی ها» for asset rotation, «متوازن
+  ضعیف» for a poor parallel, «کاهش درآمد» for de-grossing) and the final
+  sentence of "Looking ahead" DROPPED entirely. Two candidates
+  (qwen3-30b-a3b-fp8, llama-3.1-8b-instruct-fp8) answered deprecated
+  2026-11-20; six chat candidates failed "no response field" — diagnosed
+  within the sitting: the newer serving shape is the OpenAI-compatible
+  `chat.completion` (`choices[0].message.content`), not the legacy
+  `{response}`.
+- **Run 2 (the extraction fixed to read both served shapes; the candidate
+  list refreshed from the LIVE account-scoped catalog — the API the
+  previous sitting could not reach):** five full outputs, and two hard
+  account facts: **the account is on the Workers Free plan** (deepseek
+  v4.1 and glm-5.3 answered "not available on the Workers Free plan")
+  and the catalog now serves the **zai-org GLM family** (glm-5.3
+  paywalled; glm-4.7-flash free-plan). qwen3.8 bled English months into
+  the headings («مرور October»); llama-4-scout left the headline and both
+  headings in English.
+- **Run 3 (the uniform `max_tokens: 2048` envelope added — gpt-oss's
+  default 256-token completion budget vanishes into its reasoning
+  channel, `content: null`, finish_reason "length", diagnosed live
+  against the account's own serving):** eight of eleven candidates with
+  full outputs.
+
+**The judgment (the sitting's own criteria — fluent Persian, correct
+gold-market terminology, no English bleed-through, numbers preserved, no
+hallucinated additions): TRANSLATION_MODEL is now
+`@cf/google/gemma-4-26b-a4b-it`.** The strongest translation observed:
+«تحلیل بازار طلا: کف قیمت کجاست؟» (the headline's floor rendered as the
+market term), «مرور اکتبر» (the correct idiom for "October in review" —
+several others missed it), asset rotation → چرخش دارایی‌ها, interim
+bottom → کف موقتی, downturn → رکود, recovery → بازیابی قیمت طلا, every
+heading Persian (only the contract-preserved named entities such as Fed
+stay), numbers preserved, and COMPLETE — the sentence m2m100 dropped
+rendered in full. The incumbent m2m100 was the WEAKEST observed candidate
+— exactly the fluency weakness the original selection record predicted,
+plus a content loss it did not. Runner-up: gpt-oss-120b (needs the
+max_tokens envelope; its 20b sibling drifted a sentence's meaning).
+llama-3.3-70b: solid, consistent, weaker headline word («نظرات»).
+mistral-small-3.1: fluent but inconsistent run-to-run («نظریه به جلو»
+for Looking ahead on one run). One honest gap: **glm-4.7-flash serves on
+the free plan but its full-prompt behavior was never observed** — the
+account's **daily 10,000-neuron free allocation was exhausted by the
+bake-off itself** (the last attempts answered the explicit budget error);
+its exclusion from the selection is a credentials-budget fact, not a
+quality verdict — re-open with `--models @cf/zai-org/glm-4.7-flash`
+after the budget resets. The one monthly production call is comfortably
+within the daily allocation — the bake-off's eleven-candidate ×
+three-run walk was the heavy consumer, not the pipeline.
+
+**The selection carried into the production runner
+(wgc-watch/src/translate.ts, rewritten):**
+
+- **The chat contract, one call per issue:** the bake-off's own system
+  contract verbatim + the issue as the user JSON + `max_tokens: 2048`;
+  the dual-shape extraction (legacy `{response}` and chat.completion
+  `choices[0].message.content`); the defensive parse (fences/preamble
+  stripped, outermost object); the shape contract (exactly the input's
+  segment count, non-empty `{heading, body}` pairs).
+- **The disciplines, now per-string over the whole payload:** the
+  identity check (an untranslated string — the observed llama-4-scout
+  failure mode — fails the run, nothing stored), the mirror checks (a
+  dropped headline answered null, an invented headline where the source
+  had none, an empty content channel — the observed gpt-oss reasoning
+  mode — all fail closed), the freshness gate unchanged, the failure
+  discipline unchanged (log `translate-failed`, store nothing, retry on
+  the next fire). The outcome type's m2m-specific `targetLang` is gone;
+  the log line names the model, the contract and the string count.
+- **The outer surface unchanged:** translateCommentary's signature, the
+  pipeline's two hook sites, the DDL, the [ai] binding, the desk's route
+  and card — all byte-identical; only the engine and its runner moved.
+  scripts/wgc-translate-once.ts's REST envelope widened to 120s (the
+  selected model's observed serving latency under free-plan queueing).
+
+**The verification, all of it this sitting:**
+
+- **The committed contract test (tests/wgc-translate-contract.ts —
+  ALL 20 CHECKS PASS, evidence tests/wgc-translate-contract-2026-11-24.json):**
+  the previous sitting's ad-hoc module walk, made permanent: the happy
+  path (one call, the envelope verified on the recorded input, the shape
+  mirrored in order, the adapter's sourceModel attributed — never
+  silently), the freshness gate (zero further calls), and every failure
+  discipline (failing engine, untranslated identity, shape drift, empty
+  channel, dropped headline, invented headline — each: outcome failed,
+  `translate-failed` logged, NO row stored), the legacy envelope, the
+  re-store re-translation, and runFire with and without env.AI
+  (byte-identical pre-translation behavior). Zero network — the whole
+  suite runs in under a second.
+- **The module against the REAL API's budget error:** the forced run on
+  a throwaway archive copy with the neurons exhausted — `translate-failed`
+  logged with the honest reason ("you have used up your daily free
+  allocation of 10,000 neurons"), nothing stored, the English row safe.
+  The live failure surface is proven, not just the mock.
+- **The forced-run gate on the real archive:** `--db` without `--force`
+  answers up-to-date (zero AI calls, nothing mutated).
+- **The sandbox:** the route serves the fa field from the preview row
+  exactly as designed; the browser walk (agent-browser): the fa card in
+  fa/RTL mode — the title, the «ترجمهٔ ماشینی» label, the Persian
+  segments, the captioned English original («متن اصلی به انگلیسی»), the
+  whisper line (tests/wgc-15 PNG); 375px with scrollWidth 375 (zero
+  overflow, tests/wgc-16 PNG); zero console and zero page errors; lint
+  green over every touched file; `tsc` clean for every wgc-watch/src
+  file (the repo's pre-existing scripts/bun-types noise untouched).
+- **The live account, re-checked:** currena.ir/gold 200; the live
+  `/gold/api/gold/wgc-commentary` serving the English-verbatim fallback
+  exactly as designed (no fa field — the desk worker still carries the
+  pre-translation code); the watch health endpoint ok (target 2026-10,
+  row ok, both crons); currena.ir/ untouched.
+
+**Honestly NOT done — still the Workers-API-token wall, one command
+each when a valid token arrives (the runbook unchanged from the previous
+sitting, plus one new fact):**
+
+1. The remote D1 DDL apply: `bunx wrangler d1 execute aurum-desk
+   --remote --file wgc-watch/ddl.sql` (run twice).
+2. The wgc-watch deploy (the [ai] binding attaches): `cd wgc-watch &&
+   CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… bunx wrangler deploy`
+   — now carrying the gemma chat-contract runner.
+3. The desk worker redeploy (the fa route/card going live): the
+   two-step OpenNext runbook, NEXT_PUBLIC_BASE_PATH=/gold on BOTH.
+4. The live forced run for 2026-10: `WORKERS_AI_TOKEN=…
+   CLOUDFLARE_ACCOUNT_ID=… CLOUDFLARE_API_TOKEN=… bun
+   scripts/wgc-translate-once.ts --remote --month 2026-10` (no --force —
+   the remote D1 carries no fa row; the gate translates straight away).
+   The WORKERS_AI token for this run is the VALID one this sitting
+   verified — the moment a valid Workers API token arrives, this step
+   runs, and tomorrow's reset neuron allocation covers it (today's was
+   consumed by the bake-off).
+
+**The honest calendar, unchanged:** the next REAL capture is the 2026-12
+issue (published early January 2027 inside the measured window);
+December's watch fires are skip-month wakes; the forced run on 2026-10 is
+THE end-to-end proof when the token arrives; the 17 historical months
+stay English-fallback by default; the first live gemma capture happens on
+the watch worker only after step 2 deploys the [ai] binding.
+
+The sitting's deliverable pushed to main: the swapped translate module,
+the bake-off script's shape/envelope/catalog fixes, the forced-run
+envelope, the committed contract test, the bake-off/contract/forced-run
+evidence JSONs, the two browser PNGs, and this record.
