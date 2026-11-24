@@ -56,7 +56,6 @@ import {
   TaBand,
   CentralBanksBand,
   VaultBand,
-  CorrelationBand,
   PositionsBand,
   PremiumHistoryCard,
   RelationshipsBand,
@@ -263,11 +262,12 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-cb", key: null, label: ["Central banks", "بانک‌ها"] },
   { id: "gold-positions", key: null, label: ["Positions", "پوزیشن"] },
   { id: "gold-dashboard", key: null, label: ["Dashboard", "داشبورد"] },
-  { id: "gold-bridge", key: null, label: ["Iran", "پل ایران"] },
-  { id: "gold-history", key: null, label: ["History", "تاریخ"] },
+  { id: "gold-physical", key: null, label: ["Physical", "فیزیکی"] },
+  { id: "gold-bridge", key: null, label: ["Iran", "ایران"] },
   { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
   { id: "gold-vault", key: null, label: ["Plumbing", "لوله‌کشی"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
+  { id: "gold-history", key: null, label: ["History", "تاریخ"] },
 ];
 
 function SectionNav({ locale }: { locale: Locale }) {
@@ -862,9 +862,10 @@ function DashboardBand({
     { name: t.indicators.spx, stat: data.spx, unit: "" },
     { name: t.indicators.oil, stat: data.oil, unit: "$" },
   ].filter((r) => r.stat !== null) as Array<{ name: string; stat: SeriesStat; unit: string }>;
-  /* the merged context layer — every ratio, the five-currency grid, the
-     physical trio and the forecast retrospective now live HERE (the old
-     context-cards band is gone; nothing is lost) */
+  /* the merged context layer — the top ratios + the currency grid live
+     HERE; the rest of the ratios sit behind one expand (the owner's ask:
+     only the most important ones stay in the open); the physical market
+     has its own section now; the forecast retrospective stays */
   const byId = React.useMemo(() => {
     const m = new Map<string, ProjectionReading>();
     if (projection !== null) {
@@ -872,6 +873,13 @@ function DashboardBand({
     }
     return m;
   }, [projection]);
+  /* the top ratios — the classic trio the gold crowd actually watches */
+  const TOP_RATIO_SET = new Set(["gold-silver", "real-gold-price", "gold-oil-ratio"]);
+  const [allRatios, setAllRatios] = React.useState(false);
+  const shownRatios = React.useMemo(
+    () => (allRatios ? RATIO_IDS : RATIO_IDS.filter((c) => TOP_RATIO_SET.has(c.id))),
+    [allRatios],
+  );
   return (
     <section id="gold-dashboard" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.indicators.eyebrow}</h2>
@@ -902,28 +910,34 @@ function DashboardBand({
         ))}
       </div>
 
-      {/* the eight ratios — every reading the old context band carried */}
+      {/* the top ratios + the rest behind one expand (the owner's ask:
+          only the most important ones stay in the open) */}
       {projection !== null ? (
         <div className="mt-4 flex min-w-0 flex-col gap-2.5">
           <ContextTable
-            rows={RATIO_IDS.map((c) => ({ id: c.id, name: c.name, meaning: t.contextCards[c.meaning] as string, unit: c.unit }))}
+            rows={shownRatios.map((c) => ({ id: c.id, name: c.name, meaning: t.contextCards[c.meaning] as string, unit: c.unit }))}
             byId={byId}
             t={t.contextCards}
             fmt={fmt}
             locale={locale}
           />
-          {/* the six-currency grid — the ratios group's sub-card, open by default */}
+          <button
+            type="button"
+            aria-expanded={allRatios}
+            onClick={() => setAllRatios((o) => !o)}
+            className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+          >
+            {allRatios
+              ? locale === "en" ? "hide the other ratios" : "بستن بقیهٔ نسبت‌ها"
+              : locale === "en" ? `show the other ${RATIO_IDS.length - 3} ratios` : `بقیهٔ ${RATIO_IDS.length - 3} نسبت‌ها`}
+            <span aria-hidden="true" className={`text-[10px] transition-transform ${allRatios ? "rotate-180" : ""}`}>▾</span>
+          </button>
+          {/* the currency grid — the ratios group's sub-card, open by default */}
           <CurrencyGridCard crosses={crosses} usdChange30d={usdChange30d} tomanPerOunce={tomanPerOunce} t={t.currencyGrid} fmt={fmt} locale={locale} />
         </div>
       ) : (
         <p className="m-0 mt-4 type-caption text-[var(--color-text-tertiary)]">{t.contextCards.unavailable}</p>
       )}
-
-      {/* the physical market — collapsed by default, the verdict is the
-          whole visible layer; the trio's numbers open on demand */}
-      {projection !== null ? (
-        <PhysicalMarketGroup byId={byId} t={t} fmt={fmt} locale={locale} />
-      ) : null}
 
       {/* the forecast retrospective — the compact, retitled card */}
       <div className="mt-4">
@@ -934,12 +948,20 @@ function DashboardBand({
 }
 
 /* ------------------------------------------------------------------ *
- * The physical market group — the verdict line stays visible, the
- * trio's own numbers sit behind the expand (collapsed by default)
+ * The physical market — its own section now (the owner's ask): the
+ * bigger title + THE verdict in a loud box, like the technical
+ * analysis verdict; the trio's own numbers stay behind the expand
  * ------------------------------------------------------------------ */
 
-function PhysicalMarketGroup({ byId, t, fmt, locale }: { byId: Map<string, ProjectionReading>; t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; locale: Locale }) {
+function PhysicalBand({ t, fmt, locale, projection }: { t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; locale: Locale; projection: ProjectionPayload | null }) {
   const [open, setOpen] = React.useState(false);
+  const byId = React.useMemo(() => {
+    const m = new Map<string, ProjectionReading>();
+    if (projection !== null) {
+      for (const r of projection.readings) m.set(r.id, r);
+    }
+    return m;
+  }, [projection]);
   /* the verdict — the Shanghai premium is the market's own sensor for
      where the physical buyer is; it carries the whole one-line verdict */
   const premiumReading = byId.get("shanghai-gold-premium") ?? null;
@@ -955,11 +977,24 @@ function PhysicalMarketGroup({ byId, t, fmt, locale }: { byId: Map<string, Proje
             ? t.contextCards.physicalVerdictFlat
             : t.contextCards.physicalVerdictDiscount;
   return (
-    <div className="mt-4 flex min-w-0 flex-col gap-2">
-      <h4 className="m-0 type-label font-bold uppercase tracking-wide text-[var(--color-text-secondary)]">{t.contextCards.physicalHeader}</h4>
-      <p className="m-0 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] px-3 py-2 type-caption font-bold leading-relaxed text-[var(--color-text-primary)] ring-1 ring-[var(--color-accent-gold)]/40">
-        <bdi>{verdict}</bdi>
-      </p>
+    <section id="gold-physical" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
+      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.physical.eyebrow}</h2>
+      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.physical.title}</h3>
+      <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.physical.subtitle}</p>
+
+      {/* THE verdict — the TA verdict's own loud gold box, one readable sentence */}
+      <div
+        className="mt-2.5 rounded-[var(--cr-radius-md)] px-3.5 py-3"
+        style={{
+          backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 16%, transparent)",
+          boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 45%, transparent)",
+        }}
+      >
+        <p className="m-0 text-[1.02rem] font-black leading-snug text-[var(--color-accent-gold-deep)] sm:text-[1.1rem]">
+          <bdi>{verdict}</bdi>
+        </p>
+      </div>
+
       <button
         type="button"
         aria-expanded={open}
@@ -981,7 +1016,7 @@ function PhysicalMarketGroup({ byId, t, fmt, locale }: { byId: Map<string, Proje
           />
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }
 
@@ -1255,20 +1290,19 @@ export default function GoldPage() {
             {/* the economic calendar — what's coming that can bend gold */}
             <CalendarBand t={t.calendar} locale={locale} fmt={fmt} />
 
-            {/* the comparison — gold against the real yield, silver, Bitcoin and the S&P */}
-            <CompareBand t={t.compare} locale={locale} fmt={fmt} />
+            {/* the comparison — gold against the real yield, silver, Bitcoin and the S&P; the correlation lesson (the old standalone section) merged in here behind one tap */}
+            <CompareBand t={t.compare} locale={locale} fmt={fmt} correlation={correlation.data ?? null} corrT={t.correlation} />
 
             {/* the reference levels — the previous page's Zone H (the 200-day average etc.) */}
             {ta.data ? <TaBand data={ta.data} t={t.ta} fmt={fmt} locale={locale} /> : null}
 
-            {/* the central-bank demand + the correlation — the previous page's Zone K (the vault plumbing moved to the page's foot) */}
+            {/* the central-bank demand — the previous page's Zone K (the vault plumbing moved to the page's foot) */}
             {cb.data ? <CentralBanksBand data={cb.data} t={t.centralBanks} fmt={fmt} locale={locale} spot={data.gold.spot} /> : null}
-            {correlation.data ? <CorrelationBand data={correlation.data} t={t.correlation} fmt={fmt} locale={locale} /> : null}
 
             {/* the trader positioning — the previous page's CFTC cards */}
             {positions.data ? <PositionsBand data={positions.data} t={t.positions} fmt={fmt} locale={locale} /> : null}
 
-            {/* the dashboard — now carrying every ratio, the six-currency grid (with the Iranian toman), the physical verdict and the forecast retrospective (the old context band, merged) */}
+            {/* the dashboard — the key indicators, the top ratios, the currency grid (with the Iranian toman) and the forecast retrospective */}
             <DashboardBand
               data={data}
               t={t}
@@ -1280,11 +1314,12 @@ export default function GoldPage() {
               tomanPerOunce={tomanPerOunce}
             />
 
+            {/* the physical market — its own section now: the bigger title
+                and the market's own verdict in a loud box */}
+            <PhysicalBand t={t} fmt={fmt} locale={locale} projection={projection.data ?? null} />
+
             {/* the Iran bridge — now with the live Tehran board + the premium history */}
             <BridgeBand t={t} locale={locale} premium={premium.data ?? null} fmt={fmt} rates={rates.data ?? null} />
-
-            {/* the history tail */}
-            <HistoryBand data={data} t={t} fmt={fmt} locale={locale} />
 
             {/* the calculator — ONE tool at the page's foot: the what-if
                 windows, the wealth calculator, the assets head-to-head,
@@ -1308,6 +1343,10 @@ export default function GoldPage() {
             {/* the relationship map — the forces, the page's closing
                 view: six force families feeding one hub */}
             <RelationshipsBand t={t.relationships} locale={locale} />
+
+            {/* the history — the most important events of gold's history,
+                the page's very last section (the owner's ask) */}
+            <HistoryBand data={data} t={t} fmt={fmt} locale={locale} />
           </>
         )}
       </main>

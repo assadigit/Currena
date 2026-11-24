@@ -266,9 +266,9 @@ export const UI = {
       whyLabel: "Why it moves gold",
       moreLabel: "Later events ({n})",
       fewerLabel: "Show fewer",
-      methodTitle: "How the schedule is built",
+      methodTitle: "How the calendar is built",
       methodLine:
-        "Fed dates are the FOMC's own published calendar; the recurring US releases follow their standard slots (NFP, first Friday; CPI, mid-month; PCE, month-end; jobless claims, Thursdays; GDP, quarter-end) and are marked ≈ until the agency's exact date lands. Central-bank meeting dates for the ECB, BoE and BoJ are their own published calendars.",
+        "This calendar has two kinds of dates. The exact ones — the Fed's, ECB's, Bank of England's and Bank of Japan's meetings — come straight from those banks' own published calendars. The rest (jobs, CPI, PCE, GDP) are US releases that land in their usual week of the month; they carry an ≈ until the agency announces the exact day. Nothing here is a prediction — these are just the days the market re-weighs its odds.",
       unavailable: "The calendar is not available on this device.",
     },
     compare: {
@@ -277,7 +277,7 @@ export const UI = {
       subtitle:
         "The 10-year real yield, silver, Bitcoin and the S&P 500, each indexed to 100 at the window's start, with gold itself for reference. What holding each would have done, in one line each.",
       windowLabel: "Window",
-      ranges: { "3M": "3 months", "6M": "6 months", "YTD": "YTD (Jan 1)", "1Y": "1 year", "3Y": "3 years", "5Y": "5 years" },
+      ranges: { "3M": "3 months", "6M": "6 months", "1Y": "1 year", "3Y": "3 years", "5Y": "5 years" },
       bestLine: "Best gain: {name} {pct}",
       worstLine: "lowest gain: {name} {pct}",
       bestLossLine: "smallest loss: {name} {pct}",
@@ -337,7 +337,7 @@ export const UI = {
     bridge: {
       eyebrow: "Regional chapter",
       regionChip: "Regional market · Tehran",
-      title: "The Iran bridge",
+      title: "The gold market in Iran",
       subtitle:
         "Tehran gold prices decomposed into global gold, the free-market dollar, and the local premium (حباب)؛ the domestic market's own surcharge over parity.",
       parity: "the parity arithmetic",
@@ -374,7 +374,7 @@ export const UI = {
     },
     history: {
       eyebrow: "History",
-      title: "Gold's big episodes",
+      title: "Gold's most important events",
       subtitle: "The eras that taught the market gold's lessons, the force families named under each.",
       living: "the living record",
       showLabel: "Open the episodes",
@@ -390,13 +390,12 @@ export const UI = {
     ifBought: {
       eyebrow: "The calculator",
       title: "If you'd bought",
-      subtitle: "Gold vs S&P vs Bitcoin vs silver, lump + $100-a-month, since the year you pick.",
+      subtitle: "Gold vs S&P vs Bitcoin vs silver — what each would have done since the year you pick, in percent.",
       method:
-        "Lump: one purchase at the first month-end close. DCA: {amount} at every month-end close, marked at the running month's close. Both compute from the stored month-end series, every window is named on its result row.",
+        "Each asset is bought once, at the first month-end close of the picked year, and marked at today's close — the percent change between the two is the whole answer. Every window is named on its own result row.",
       pickLabel: "Since",
       firstYearNote: "from November",
       windowLine: "{from} → {to} · {n} months",
-      dcaLine: "DCA: {invested} → {value} ({pct})",
       lumpWord: "lump",
       decileLine: "This window's return: decile {d} of {n} same-length windows.",
       decileWaiting: "The decile lights at {min} same-length windows, this window has {n}.",
@@ -425,6 +424,7 @@ export const UI = {
       pivotsDailyShort: "daily",
       pivotsWeeklyShort: "weekly",
       fibTitle: "Fibonacci correction levels",
+      fibOpenLabel: "Fibonacci correction levels · open",
       fibSwing: "the swing: {low} ({lowDate}) → {high} ({highDate})",
       fibRatio: "{pct} correction",
       fibNote: "Where a correction commonly rests after the window's own swing — a reference the market watches, never a promise.",
@@ -511,6 +511,8 @@ export const UI = {
       title: "Gold and real yields, the relationship that changed",
       subtitle:
         "The old inverse rule, its 2022 break, and the rolling correlation that shows both, no single number hides the convention.",
+      lessonOpen: "The correlation lesson · gold and real yields",
+      lessonClose: "Close the correlation lesson",
       goldAxis: "Gold ($/oz)",
       yieldAxis: "Real yield 10y (%)",
       rotationLabel: "2022: the buyer rotated",
@@ -519,6 +521,12 @@ export const UI = {
         "Rolling correlation: 52-week Pearson over weekly Friday closes, levels (not returns). Display window: the stored span (self-widening). Gold = XAUUSD daily closes; real yield = the 10-year TIPS yield.",
       spanLine: "the stored span: {span}",
       unavailable: "The correlation data could not be read yet.",
+    },
+    physical: {
+      eyebrow: "Physical gold",
+      title: "The physical market",
+      subtitle:
+        "Where the world's physical gold actually moves, and whether the physical buyer is paying a premium for it — the market's own verdict, in one sentence.",
     },
     positions: {
       eyebrow: "Trader positioning",
@@ -596,7 +604,7 @@ export const UI = {
       meaningShanghaiPremium: "The Shanghai-over-London price gap, the market's own sensor for where the physical buyer is.",
     },
     currencyGrid: {
-      title: "Gold in six currencies",
+      title: "Gold against the currencies",
       subtitle: "The same ounce through five numeraires plus the Iranian toman, the dollar story made visible.",
       tomanName: "Iranian toman",
       tomanMillion: "M toman",
@@ -667,8 +675,6 @@ export const UI = {
       modeDcaNote: "The same amount, every month since the picked year — the running month included, marked at its own close.",
       calcAssetLabel: "Asset",
       calcUnitLabel: "Unit",
-      unitBasisNote:
-        "Non-dollar units mark each month at that month's own close: the crosses at their own FX month-ends, the toman at Tehran's free-market dollar (TGJU, this site's own basis). Grams buy metal: the gram weight accumulates, marked at the running gram price.",
       calcSinceLabel: "Since year",
       calcAmountOne: "Amount bought",
       calcAmountDca: "Monthly amount",
@@ -820,7 +826,8 @@ export const UI = {
       moreLabel: "رویدادهای بعدی ({n})",
       fewerLabel: "نمایش کمتر",
       methodTitle: "تقویم چگونه ساخته می‌شود",
-      methodLine: "تاریخ‌های فدرال رزرو تقویمِ خودِ FOMC است؛ انتشارهای دوره‌ای آمریکا در جایگاه استانداردشان (اشتغال غیرزراعی؛ جمعهٔ اول؛ CPI؛ میانهٔ ماه؛ PCE؛ پایان ماه؛ ادعای بیکاری؛ پنجشنبه‌ها؛ GDP؛ پایان فصل) و تا اعلام تاریخ دقیق با ≈ علامت‌گذاری می‌شوند. تاریخ‌های ECB، بانک انگلستان و بانک ژاپن تقویم‌های خودشان است.",
+      methodLine:
+        "این تقویم از دو جنس تاریخ ساخته می‌شود. تاریخ‌های دقیق — جلسات فدرال رزرو، بانک مرکزی اروپا، بانک انگلستان و بانک ژاپن — مستقیم از تقویم رسمی خودشان می‌آید. بقیه — اشتغال، تورم، PCE و رشد آمریکا — در هفتهٔ همیشگی ماه خودشان می‌آیند و کنارشان علامت ≈ می‌نشیند تا نهاد مربوط روز دقیق را اعلام کند. هیچ‌چیز پیش‌بینی نیست؛ این فقط روزهایی است که بازار شانس‌هایش را دوباره وزن می‌کند.",
       unavailable: "تقویم روی این دستگاه در دسترس نیست.",
     },
     compare: {
@@ -828,7 +835,7 @@ export const UI = {
       title: "طلا در برابر جایگزین‌ها",
       subtitle: "بازده واقعی ۱۰ساله، نقره، بیت‌کوین و S&P 500؛ هر یک شاخص‌گذاری‌شده به ۱۰۰ در آغاز پنجره، با خودِ طلا برای مقایسه. نگه‌داشتن هر کدام چه کرده، هر کدام یک خط.",
       windowLabel: "پنجره",
-      ranges: { "3M": "۳ ماه", "6M": "۶ ماه", "YTD": "ابتدای سال میلادی", "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال" },
+      ranges: { "3M": "۳ ماه", "6M": "۶ ماه", "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال" },
       bestLine: "بالاترین سود: {name} {pct}",
       worstLine: "کمترین سود: {name} {pct}",
       bestLossLine: "کمترین ضرر: {name} {pct}",
@@ -886,7 +893,7 @@ export const UI = {
     bridge: {
       eyebrow: "فصل منطقه‌ای",
       regionChip: "بازار منطقه‌ای · تهران",
-      title: "پل ایران",
+      title: "بازار طلا در ایران",
       subtitle:
         "قیمت طلا در تهران به طلاجهانی، دلارِ آزاد و حبابِ محلی تجزیه می‌شود؛ مابه‌التفاوت بازار داخلی بر سمتِ برابری.",
       parity: "حساب برابری",
@@ -923,7 +930,7 @@ export const UI = {
     },
     history: {
       eyebrow: "تاریخ",
-      title: "قسمت‌های بزرگ طلا",
+      title: "مهمترین رویدادهای تاریخ طلا",
       subtitle: "دوره‌هایی که درس‌های طلا را به بازار یاد دادند؛ خانوادهٔ نیروها زیر هر کدام.",
       living: "سابقهٔ زنده",
       showLabel: "باز کردن دوره‌ها",
@@ -939,13 +946,12 @@ export const UI = {
     ifBought: {
       eyebrow: "ماشین‌حساب",
       title: "اگر خریده بودید",
-      subtitle: "طلا در برابر S&P، بیت‌کوین و نقره؛ خرید یک‌جا و ماهانهٔ ۱۰۰ دلاری، از سالِ انتخابی شما.",
+      subtitle: "طلا در برابر S&P، بیت‌کوین و نقره؛ از سالِ انتخابی شما، هر کدام چه کرده — به درصد.",
       method:
-        "خرید یک‌جا: یک خرید در پایانیِ نخستین ماه. خرید ماهانه: {amount} دلار در هر پایانیِ ماه، به قیمت پایانیِ ماهِ جاری. هر دو از سری ماهانهٔ ذخیره‌شدهٔ خودمان محاسبه می‌شود؛ هر پنجره روی ردیف خودش نام‌گذاری می‌شود.",
+        "هر دارایی یک بار، در نخستین پایان‌ماهِ سالِ انتخابی خریده می‌شود و به قیمتِ امروز ارزش‌گذاری می‌شود؛ تغییر درصدیِ بین این دو، همان پاسخ است. هر پنجره روی ردیف خودش نام‌گذاری می‌شود.",
       pickLabel: "از سال",
       firstYearNote: "از نوامبر",
       windowLine: "{from} تا {to} · {n} ماه",
-      dcaLine: "خرید ماهانه: {invested} ← {value} ({pct})",
       lumpWord: "یک‌جا",
       decileLine: "بازدهٔ این پنجره: صدکِ {d} از {n} پنجرهٔ هم‌طول.",
       decileWaiting: "صدک از {min} پنجرهٔ هم‌طول روشن می‌شود؛ این پنجره {n} پنجره دارد.",
@@ -974,6 +980,7 @@ export const UI = {
       pivotsDailyShort: "روزانه",
       pivotsWeeklyShort: "هفتگی",
       fibTitle: "سطوح اصلاح فیبوناچی",
+      fibOpenLabel: "سطوح اصلاح فیبوناچی · باز کردن",
       fibSwing: "نوسان: {low} ({lowDate}) → {high} ({highDate})",
       fibRatio: "اصلاح {pct}",
       fibNote: "جایی که اصلاح معمولاً بعد از نوسانِ خودِ پنجره می‌ایستد — مرجعی که بازار تماشا می‌کند، نه وعده.",
@@ -1056,6 +1063,8 @@ export const UI = {
       eyebrow: "درسِ هم‌بستگی",
       title: "طلا و بازدهی واقعی؛ رابطه‌ای که عوض شد",
       subtitle: "قاعدهٔ معکوس قدیم، شکست ۲۰۲۲ و همبستگی غلتانی که هر دو را نشان می‌دهد؛ هیچ عدد واحدی قرارداد را پنهان نمی‌کند.",
+      lessonOpen: "درسِ هم‌بستگی · طلا و بازدهی واقعی",
+      lessonClose: "بستن درسِ هم‌بستگی",
       goldAxis: "طلا (دلار بر اونس)",
       yieldAxis: "بازدهی واقعی ۱۰ساله (٪)",
       rotationLabel: "۲۰۲۲: خریدار چرخید",
@@ -1064,6 +1073,11 @@ export const UI = {
         "همبستگی غلتان: پیرسون ۵۲هفته‌ای روی قیمت‌های پایانی جمعه‌ها، سطح‌ها (نه بازده). پنجرهٔ نمایش: بازهٔ ذخیره‌شده (خودش را گسترش می‌دهد). طلا = قیمت‌های پایانی روزانهٔ XAUUSD؛ بازدهی واقعی = بازدهی TIPS ۱۰ساله.",
       spanLine: "بازهٔ ذخیره‌شده: {span}",
       unavailable: "دادهٔ همبستگی هنوز خوانده نشد.",
+    },
+    physical: {
+      eyebrow: "طلای فیزیکی",
+      title: "بازار فیزیکی طلا",
+      subtitle: "طلای فیزیکی جهان کجا می‌رود و خریدارِ فیزیکی چند بالاتر از قیمت جهانی می‌پردازد؛ حکمِ خودِ بازار، در یک جمله.",
     },
     positions: {
       eyebrow: "پوزیشن معامله‌گران",
@@ -1140,7 +1154,7 @@ export const UI = {
       meaningShanghaiPremium: "شکاف قیمت شانگهای نسبت به لندن؛ حسگر خود بازار برای یافتن جای خریدار فیزیکی.",
     },
     currencyGrid: {
-      title: "طلا در شش ارز",
+      title: "طلا در مقابل ارزها",
       subtitle: "همان اونس با پنج پول، به‌علاوهٔ تومان ایرانی؛ ماجرای دلار، آشکار.",
       tomanName: "تومان ایرانی",
       tomanMillion: "میلیون تومان",
@@ -1211,8 +1225,6 @@ export const UI = {
       modeDcaNote: "هر ماه همان مبلغ، از سالِ انتخابی تا امروز — ماهِ جاری هم داخل است و به پایان‌ماه خودش ارزش‌گذاری می‌شود.",
       calcAssetLabel: "دارایی",
       calcUnitLabel: "واحد",
-      unitBasisNote:
-        "واحدهای غیردلاری هر ماه را به پایان‌ماه خودِ آن واحد ارزش‌گذاری می‌کنند: کراس‌ها به پایان‌ماهِ خودِ نرخ ارزی، و تومان به دلار آزاد تهران (TGJU؛ پایهٔ خودِ همین سایت). گرم، فلز می‌خرد: وزنِ گرم انباشته می‌شود و به قیمت گرمِ روز ارزش‌گذاری می‌شود.",
       calcSinceLabel: "از سال",
       calcAmountOne: "مبلغ خرید",
       calcAmountDca: "مبلغ ماهانه",

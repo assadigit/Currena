@@ -117,7 +117,6 @@ type CalcT = {
   modeDcaNote: string;
   calcAssetLabel: string;
   calcUnitLabel: string;
-  unitBasisNote: string;
   calcSinceLabel: string;
   calcAmountOne: string;
   calcAmountDca: string;
@@ -134,7 +133,6 @@ type IbT = {
   pickLabel: string;
   firstYearNote: string;
   windowLine: string;
-  dcaLine: string;
   noWindow: string;
   waiting: string;
   assets: { gold: string; sp500: string; btc: string; silver: string };
@@ -284,7 +282,6 @@ function AssetRow({
   locale: Locale;
   maxAbs: number;
 }) {
-  const money = (v: number): string => (locale === "fa" ? `${fmt.num(v, 0)} دلار` : `$${fmt.num(v, 0)}`);
   if (result === null) {
     return (
       <li className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-2 ring-1 ring-[var(--color-border)]/50">
@@ -310,20 +307,13 @@ function AssetRow({
           style={{ width: `${barW}%` }}
         />
       </div>
-      {/* the window, NAMED at point of use · the DCA line, one caption row —
-          the meta stays small (the owner's own ask), a whisper, not a row */}
+      {/* the window, NAMED at point of use — the percent + the window, no
+          DCA dollar defaults the reader never set (the owner's ask) */}
       <bdi className="text-[11px] leading-snug text-[var(--color-text-tertiary)]">
         {ib.windowLine
           .replace("{from}", monthText(result.fromYm, locale, fmt))
           .replace("{to}", monthText(result.toYm, locale, fmt))
           .replace("{n}", fmt.num(result.months, 0))}
-        {" · "}
-        <bdi dir="ltr" className="text-[11px] font-semibold tabular-nums text-[var(--color-text-secondary)]">
-          {ib.dcaLine
-            .replace("{invested}", money(result.dcaInvested))
-            .replace("{value}", money(result.dcaValue))
-            .replace("{pct}", fmt.pct(result.dcaPct, 1))}
-        </bdi>
       </bdi>
     </li>
   );
@@ -656,8 +646,6 @@ export function CalculatorBand({
               </label>
             ) : null}
           </div>
-          <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{calc.unitBasisNote}</p>
-
           {/* THE answer — invested → worth today (on its own green ground
               when it gained, red when it lost) → the plain gain/loss */}
           {data === null ? (

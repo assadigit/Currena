@@ -25,6 +25,13 @@ import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
 import { CountryFlag } from "@/components/gold-page/flags";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
@@ -404,6 +411,16 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
   const [open, setOpen] = React.useState(false);
   const VISIBLE = 3;
 
+  /* the why-modal — one dialog, driven by the opened event's key; the row
+     itself shows only the day and the days-until, the "why it moves gold"
+     explanation sits behind the ? tap (the owner's own ask) */
+  const [openWhy, setOpenWhy] = React.useState<string | null>(null);
+  const lastWhyTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const whyEvent = React.useMemo(
+    () => events.find((e) => e.key === openWhy) ?? null,
+    [events, openWhy],
+  );
+
   const daysWord = (days: number): string => {
     if (days === 0) return t.todayWord;
     if (days === 1) return t.tomorrowWord;
@@ -413,6 +430,7 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
   const renderItem = (e: UpcomingEvent) => {
     const days = now === null ? 0 : Math.max(0, Math.round((Date.parse(`${e.date}T00:00:00Z`) - now.getTime()) / 86_400_000));
     const soon = days <= 7;
+    const hasWhy = e.def.why[lan(locale)] !== "";
     return (
       <li
         key={e.key}
@@ -438,15 +456,25 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
               {e.def.impact === "high" ? t.impactHigh : t.impactMed}
             </span>
           ) : null}
+          {hasWhy ? (
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={openWhy === e.key}
+              aria-label={`${t.whyLabel}: ${e.def.name[lan(locale)]}`}
+              onClick={(ev) => {
+                lastWhyTriggerRef.current = ev.currentTarget;
+                setOpenWhy(e.key);
+              }}
+              className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[var(--color-currena-soft)] text-[12px] font-black text-[var(--color-currena-blue-deep)] transition-colors hover:bg-[var(--color-accent-gold)]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
+            >
+              ؟
+            </button>
+          ) : null}
         </span>
         <span className={`type-caption font-bold whitespace-nowrap ${soon ? "text-[var(--color-chip-ink-attention)]" : "text-[var(--color-text-tertiary)]"}`}>
           {daysWord(days)}
         </span>
-        {e.def.why[lan(locale)] !== "" ? (
-          <p className="col-span-3 m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-            <span className="font-bold text-[var(--color-text-tertiary)]">{t.whyLabel}:</span> {e.def.why[lan(locale)]}
-          </p>
-        ) : null}
       </li>
     );
   };
@@ -500,6 +528,34 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
         <summary className="cursor-pointer font-semibold text-[var(--color-currena-blue-deep)]">{t.methodTitle}</summary>
         <p className="m-0 pt-1.5">{t.methodLine}</p>
       </details>
+
+      {/* the why-modal — the event's own explanation, behind the ? tap */}
+      <Dialog
+        open={openWhy !== null}
+        onOpenChange={(o) => {
+          if (!o) {
+            setOpenWhy(null);
+            const trigger = lastWhyTriggerRef.current;
+            window.setTimeout(() => trigger?.focus(), 0);
+          }
+        }}
+      >
+        {whyEvent !== null ? (
+          <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[440px]">
+            <DialogHeader className="text-start pe-11">
+              <p className="type-caption m-0 font-bold text-[var(--color-accent-gold-deep)]">
+                {fmt.dateWords(whyEvent.date)} · {daysWord(Math.max(0, Math.round((Date.parse(`${whyEvent.date}T00:00:00Z`) - (now?.getTime() ?? 0)) / 86_400_000)))}
+              </p>
+              <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">
+                {whyEvent.def.name[lan(locale)]}
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className="m-0 type-label leading-relaxed text-[var(--color-text-secondary)] pe-11">
+              <span className="font-bold">{t.whyLabel}:</span> {whyEvent.def.why[lan(locale)]}
+            </DialogDescription>
+          </DialogContent>
+        ) : null}
+      </Dialog>
     </section>
   );
 }

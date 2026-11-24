@@ -18,13 +18,20 @@
  */
 
 import * as React from "react";
-import { ChevronDown, DollarSign, Flame, Percent, Scale, ShieldAlert, Users } from "lucide-react";
+import { ChevronDown, ChevronRight, DollarSign, Flame, Percent, Scale, ShieldAlert, Users } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import { CONCEPT_NAMES, FORCE_FAMILIES, GOLD_RELATIONSHIPS, familyRecords } from "@/lib/gold-page/relationships";
 import { CountryFlag } from "@/components/gold-page/flags";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
 import type { IfBoughtSnapshot } from "@/lib/gold-page/ifbought";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
@@ -206,9 +213,13 @@ type AnyT = { [key: string]: any };
  * ------------------------------------------------------------------ */
 
 export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
-  /* the tables open on demand — the plain verdict, the nearest levels and
-     the Fibonacci correction levels stay the always-visible summary */
+  /* the tables open on demand — the plain verdict and the nearest levels
+     stay the always-visible summary; the Fibonacci correction levels sit
+     behind their own modal (the owner's ask: only resistance and support
+     stay in the open) */
   const [open, setOpen] = React.useState(false);
+  const [fibOpen, setFibOpen] = React.useState(false);
+  const lastFibTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const dist = data.distance;
   const basisSpanDays = data.span.bars > 335
     ? t.spanYears.replace("{years}", fmt.num(Math.round((data.span.bars / 250) * 10) / 10, 1))
@@ -316,34 +327,27 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
         </div>
       ) : null}
 
-      {/* the Fibonacci correction levels — the three classic retracement
-          prices on the window\'s own swing, always visible */}
+      {/* the Fibonacci correction levels — behind their own modal now (the
+          owner's ask): a compact open-button where the block used to sit,
+          the three retracement prices + the swing + the note inside the
+          dialog. Only the verdict + the resistance/support sandwich stay
+          visible in the open */}
       {fib !== null ? (
-        <div className="mt-2.5 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
-            <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.fibTitle}</h4>
-            <span className="type-caption text-[var(--color-text-tertiary)]">
-              {t.fibSwing
-                .replace("{low}", `$${fmt.num(fib.low, 0)}`)
-                .replace("{lowDate}", fmt.dateWords(fib.lowDate))
-                .replace("{high}", `$${fmt.num(fib.high, 0)}`)
-                .replace("{highDate}", fmt.dateWords(fib.highDate))}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
-            {fib.levels.map((lv) => (
-              <div key={lv.ratio} className="flex flex-col gap-0.5 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] p-2 ring-1 ring-[var(--color-border)]">
-                <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.fibRatio.replace("{pct}", `${fmt.num(lv.ratio * 100, 1)}%`)}</span>
-                <span className="type-label font-extrabold text-[var(--color-text-primary)]">
-                  <bdi dir="ltr">${fmt.num(lv.price, 0)}</bdi>
-                </span>
-                <span className="type-caption text-[var(--color-text-tertiary)]">
-                  {lv.price > lastClose ? "▲" : lv.price < lastClose ? "▼" : "•"} {fmt.pct((lv.price / lastClose - 1) * 100, 1)}
-                </span>
-              </div>
-            ))}
-          </div>
-          <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.fibNote}</p>
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={fibOpen}
+            onClick={(e) => {
+              lastFibTriggerRef.current = e.currentTarget;
+              setFibOpen(true);
+            }}
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+          >
+            <Percent className="h-3.5 w-3.5" aria-hidden="true" />
+            {t.fibOpenLabel}
+            <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
+          </button>
         </div>
       ) : null}
 
@@ -434,7 +438,52 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
         </div>
       ) : null}
 
-
+      {/* the Fibonacci modal — the three classic retracement prices on the
+          window's own swing, the swing's own dates and the reading note,
+          all inside the dialog the open-button drives */}
+      <Dialog
+        open={fibOpen}
+        onOpenChange={(o) => {
+          if (!o) {
+            setFibOpen(false);
+            const trigger = lastFibTriggerRef.current;
+            window.setTimeout(() => trigger?.focus(), 0);
+          }
+        }}
+      >
+        {fib !== null ? (
+          <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[480px]">
+            <DialogHeader className="text-start pe-11">
+              <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">{t.fibTitle}</DialogTitle>
+              <p className="type-caption m-0 text-[var(--color-text-tertiary)]">
+                {t.fibSwing
+                  .replace("{low}", `$${fmt.num(fib.low, 0)}`)
+                  .replace("{lowDate}", fmt.dateWords(fib.lowDate))
+                  .replace("{high}", `$${fmt.num(fib.high, 0)}`)
+                  .replace("{highDate}", fmt.dateWords(fib.highDate))}
+              </p>
+            </DialogHeader>
+            <DialogDescription asChild className="m-0 pe-11">
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
+                  {fib.levels.map((lv) => (
+                    <div key={lv.ratio} className="flex flex-col gap-0.5 rounded-[var(--cr-radius-sm)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
+                      <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.fibRatio.replace("{pct}", `${fmt.num(lv.ratio * 100, 1)}%`)}</span>
+                      <span className="type-label font-extrabold text-[var(--color-text-primary)]">
+                        <bdi dir="ltr">${fmt.num(lv.price, 0)}</bdi>
+                      </span>
+                      <span className="type-caption text-[var(--color-text-tertiary)]">
+                        {lv.price > lastClose ? "▲" : lv.price < lastClose ? "▼" : "•"} {fmt.pct((lv.price / lastClose - 1) * 100, 1)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.fibNote}</p>
+              </div>
+            </DialogDescription>
+          </DialogContent>
+        ) : null}
+      </Dialog>
     </section>
   );
 }
@@ -782,7 +831,7 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
 const CORR_W = 640;
 const CORR_H = 210;
 
-export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
+export function CorrelationLeg({ data, t, fmt, locale }: { data: CorrelationPayload; t: AnyT; fmt: Fmt; locale: Locale }) {
   const model = React.useMemo(() => {
     const golds = data.daily.map((p) => p[1]!);
     const yields = data.daily.map((p) => p[2]!);
@@ -803,13 +852,9 @@ export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPay
   }, [data]);
   const spanText = `${fmt.dateWords(data.span.from)} → ${fmt.dateWords(data.span.to)}`;
   return (
-    <section id="gold-correlation" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
-      <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
-
+    <div className="flex min-w-0 flex-col gap-2">
       {/* the dual-axis chart (gold left, real yield right — NOT inverted) */}
-      <figure className="m-0 mt-3 flex min-w-0 flex-col gap-1">
+      <figure className="m-0 flex min-w-0 flex-col gap-1">
         <figcaption className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5">
           <span className="type-label font-bold text-[var(--color-text-primary)]">{t.goldAxis}</span>
           <span className="type-caption text-[var(--color-text-tertiary)]">{t.yieldAxis}</span>
@@ -838,11 +883,11 @@ export function CorrelationBand({ data, t, fmt, locale }: { data: CorrelationPay
         <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.spanLine.replace("{span}", spanText)}</p>
       </figure>
 
-      <details className="mt-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+      <details className="rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
         <summary className="cursor-pointer font-semibold text-[var(--color-currena-blue-deep)]">{t.methodTitle}</summary>
         <p className="m-0 pt-1.5">{t.methodLine}</p>
       </details>
-    </section>
+    </div>
   );
 }
 

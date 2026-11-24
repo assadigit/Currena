@@ -23,6 +23,7 @@ import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta, TraceChart, type TraceSeriesDef } from "@/components/gold-page/visuals";
 import type { ComparePayload } from "@/lib/gold-page/compare";
+import { CorrelationLeg, type CorrelationPayload } from "@/components/gold-page/record";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
@@ -31,7 +32,7 @@ type CmpT = {
   title: string;
   subtitle: string;
   windowLabel: string;
-  ranges: Record<"3M" | "6M" | "YTD" | "1Y" | "3Y" | "5Y", string>;
+  ranges: Record<"3M" | "6M" | "1Y" | "3Y" | "5Y", string>;
   bestLine: string;
   worstLine: string;
   bestLossLine: string;
@@ -49,6 +50,23 @@ type CmpT = {
 
 type LineId = "gold" | "silver" | "btc" | "spx" | "realYield";
 
+/* the correlation lesson's own copy — the leg merged in from the old
+   standalone section */
+type CorrT = {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  lessonOpen: string;
+  lessonClose: string;
+  goldAxis: string;
+  yieldAxis: string;
+  rotationLabel: string;
+  methodTitle: string;
+  methodLine: string;
+  spanLine: string;
+  unavailable: string;
+};
+
 /** The display order + the token colour of every line. */
 const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }> = [
   { id: "gold", color: "var(--color-accent-gold-strong)" },
@@ -58,20 +76,13 @@ const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }>
   { id: "spx", color: "var(--color-chip-ink-context)" },
 ];
 
-type WindowKey = "3M" | "6M" | "YTD" | "1Y" | "3Y" | "5Y";
-/* the chips' own order — the YTD (since the start of the Gregorian year)
-   sits between 6 months and 1 year, everywhere the windows are listed */
-const WINDOW_ORDER: ReadonlyArray<WindowKey> = ["3M", "6M", "YTD", "1Y", "3Y", "5Y"];
-/* the window's own span, in months — 3 and 6 ride alongside the years; the
-   YTD window cuts at the first day of the Gregorian year instead */
-const WINDOW_MONTHS: Record<Exclude<WindowKey, "YTD">, number> = { "3M": 3, "6M": 6, "1Y": 12, "3Y": 36, "5Y": 60 };
-/** The cutoff instant — `months` back from the series' own last point, or
- *  the first day of the last point's Gregorian year for the YTD window. */
+type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y";
+/* the chips' own order — months then years, everywhere the windows are listed */
+const WINDOW_ORDER: ReadonlyArray<WindowKey> = ["3M", "6M", "1Y", "3Y", "5Y"];
+/* the window's own span, in months — 3 and 6 ride alongside the years */
+const WINDOW_MONTHS: Record<WindowKey, number> = { "3M": 3, "6M": 6, "1Y": 12, "3Y": 36, "5Y": 60 };
+/** The cutoff instant — `months` back from the series' own last point. */
 function cutoffOf(lastDate: string, w: WindowKey): number {
-  if (w === "YTD") {
-    const year = Number(lastDate.slice(0, 4));
-    return Date.parse(`${year}-01-01T00:00:00Z`);
-  }
   return Date.parse(`${lastDate}T00:00:00Z`) - (WINDOW_MONTHS[w] * 365.25 / 12) * 86_400_000;
 }
 
@@ -91,8 +102,12 @@ function indexTo100(points: ReadonlyArray<{ d: string; v: number }>, w: WindowKe
   return slice.map((p) => ({ d: p.d, v: (p.v / base) * 100 }));
 }
 
-export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: Fmt }) {
+export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; locale: Locale; fmt: Fmt; correlation: CorrelationPayload | null; corrT: CorrT }) {
   const [window, setWindow] = React.useState<WindowKey>("5Y");
+  /* the correlation lesson — merged into the comparison band (its own
+     section is gone; the real-yield relationship belongs with the
+     alternatives), one tap away */
+  const [corrOpen, setCorrOpen] = React.useState(false);
   /* which lines ride the chart — every asset on by default, each one
      toggleable (gold against the S&P alone, or any subset) */
   const [enabled, setEnabled] = React.useState<Record<LineId, boolean>>({
@@ -347,6 +362,32 @@ export function CompareBand({ t, locale, fmt }: { t: CmpT; locale: Locale; fmt: 
           ) : null}
         </>
       )}
+
+      {/* the correlation lesson — the old standalone section, merged here:
+          gold's relationship with the real yield belongs with the
+          alternatives; the chart + its method sit behind one tap */}
+      {correlation !== null ? (
+        <div className="mt-3 border-t border-[var(--color-border)] pt-3">
+          <button
+            type="button"
+            aria-expanded={corrOpen}
+            onClick={() => setCorrOpen((o) => !o)}
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+          >
+            {corrOpen ? corrT.lessonClose : corrT.lessonOpen}
+            <span aria-hidden="true" className={`text-[10px] transition-transform ${corrOpen ? "rotate-180" : ""}`}>▾</span>
+          </button>
+          {corrOpen ? (
+            <div className="mt-3 flex flex-col gap-2">
+              <div>
+                <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{corrT.title}</h4>
+                <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{corrT.subtitle}</p>
+              </div>
+              <CorrelationLeg data={correlation} t={corrT} fmt={fmt} locale={locale} />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </section>
   );
 }

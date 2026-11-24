@@ -22,7 +22,6 @@
 import * as React from "react";
 import { PiggyBank } from "lucide-react";
 import {
-  IF_BOUGHT_DCA_MONTHLY,
   ifBoughtResult,
   yearOptions,
   type IfBoughtAssetSeries,
@@ -69,7 +68,6 @@ function AssetRow({
   locale: Locale;
   maxAbs: number;
 }) {
-  const money = (v: number): string => (locale === "fa" ? `${fmt.num(v, 0)} دلار` : `$${fmt.num(v, 0)}`);
   if (result === null) {
     return (
       <li className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2.5 ring-1 ring-[var(--color-border)]/50">
@@ -101,13 +99,6 @@ function AssetRow({
           .replace("{from}", monthText(result.fromYm, locale, fmt))
           .replace("{to}", monthText(result.toYm, locale, fmt))
           .replace("{n}", fmt.num(result.months, 0))}
-      </bdi>
-      {/* the DCA line — the SA convention, marked at the running close */}
-      <bdi dir="ltr" className="type-caption font-semibold tabular-nums text-[var(--color-text-secondary)]">
-        {t.dcaLine
-          .replace("{invested}", money(result.dcaInvested))
-          .replace("{value}", money(result.dcaValue))
-          .replace("{pct}", fmt.pct(result.dcaPct, 1))}
       </bdi>
       {/* the decile line — the honest waiting line under the min base */}
       <bdi className="type-caption leading-snug text-[var(--color-text-tertiary)]">
@@ -171,9 +162,9 @@ export function IfBoughtBand({
         </p>
       ) : (
         <>
-          {/* the method line first — the DCA convention + the window naming rule */}
+          {/* the method line — the buy-once convention + the window naming rule */}
           <p className="m-0 mt-2.5 max-w-prose type-caption leading-relaxed text-[var(--color-text-tertiary)]">
-            {t.method.replace("{amount}", fmt.num(IF_BOUGHT_DCA_MONTHLY, 0))}
+            {t.method}
           </p>
 
           {/* the year picker */}

@@ -128,6 +128,15 @@ export function MiniSpark({ values, color = "var(--color-text-tertiary)" }: { va
  * trace (the crosshair + the tooltip that follows the pointer).
  * ------------------------------------------------------------------ */
 
+/** Parse a chart point's own date stamp — the daily closes
+ *  ("YYYY-MM-DD") and the 1D COMEX session's intraday stamps
+ *  ("YYYY-MM-DDTHH:mm", UTC) both read honestly to epoch millis
+ *  (the intraday leg previously concatenated "T00:00:00Z" onto a
+ *  stamp that already carried a time — an invalid date, NaN, and
+ *  an empty 1D chart; one parser, every surface). */
+const pointTime = (d: string): number =>
+  Date.parse(d.length > 10 ? `${d}:00Z` : `${d}T00:00:00Z`);
+
 /** One traced line — its own points (own dates), its own color. */
 export interface TraceSeriesDef {
   label: string;
@@ -201,7 +210,7 @@ export function TraceChart({
     const rightValues: number[] = [];
     for (const s of series) {
       for (const p of s.points) {
-        const t = Date.parse(`${p.d}T00:00:00Z`);
+        const t = pointTime(p.d);
         if (!Number.isFinite(t) || !Number.isFinite(p.v)) continue;
         times.push(t);
         (s.axis === "right" ? rightValues : leftValues).push(p.v);
@@ -230,16 +239,24 @@ export function TraceChart({
       const axis = s.axis ?? "left";
       let d = "";
       for (const p of s.points) {
-        const t = Date.parse(`${p.d}T00:00:00Z`);
+        const t = pointTime(p.d);
         if (!Number.isFinite(t) || !Number.isFinite(p.v)) continue;
         d += `${d === "" ? "M" : "L"}${xOf(t).toFixed(1)},${yOf(p.v, axis).toFixed(1)}`;
       }
       return d;
     };
-    // the x ticks: quarter points, labelled with the house month-short
+    // the x ticks: quarter points, labelled with the house month-short —
+    // or, when the whole window spans under a day and a half (the 1D
+    // session), with its own UTC clock times, which are what a 1-day
+    // chart's axis actually means
+    const intradayWindow = tMax - tMin < 36 * 3_600_000;
     const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => {
       const t = tMin + f * (tMax - tMin);
-      return { t, x: xOf(t), label: fmt.monthShort(new Date(t).toISOString().slice(0, 10)) };
+      return {
+        t,
+        x: xOf(t),
+        label: intradayWindow ? new Date(t).toISOString().slice(11, 16) : fmt.monthShort(new Date(t).toISOString().slice(0, 10)),
+      };
     });
     // the y ticks: five when the price points ride the chart (the hero),
     // three otherwise — labelled on the right, always real prices
@@ -267,7 +284,7 @@ export function TraceChart({
     // tag already tells that story — no double labels at the edge).
     const markers: Array<{ d: string; v: number; kind: "first" | "last" | "max" | "min" }> = [];
     if (pricePoints && series.length > 0 && series[0]!.points.length > 0) {
-      const pts = series[0]!.points.filter((p) => Number.isFinite(p.v) && Number.isFinite(Date.parse(`${p.d}T00:00:00Z`)));
+      const pts = series[0]!.points.filter((p) => Number.isFinite(p.v) && Number.isFinite(pointTime(p.d)));
       if (pts.length > 0) {
         let maxP = pts[0]!;
         let minP = pts[0]!;
@@ -277,11 +294,11 @@ export function TraceChart({
         }
         const first = pts[0]!;
         const last = pts[pts.length - 1]!;
-        const tLast = Date.parse(`${last.d}T00:00:00Z`);
+        const tLast = pointTime(last.d);
         const xSpan = Math.max(1, tMax - tMin);
         const ySpan = Math.max(1e-9, vMax - vMin);
         const ridesTheLast = (p: { d: string; v: number }): boolean =>
-          Math.abs(Date.parse(`${p.d}T00:00:00Z`) - tLast) < 0.12 * xSpan && Math.abs(p.v - last.v) < 0.04 * ySpan;
+          Math.abs(pointTime(p.d) - tLast) < 0.12 * xSpan && Math.abs(p.v - last.v) < 0.04 * ySpan;
         const seen = new Set<string>();
         for (const m of [
           { d: first.d, v: first.v, kind: "first" as const },
@@ -314,7 +331,7 @@ export function TraceChart({
       let best: { d: string; v: number } | null = null;
       let bestDx = Infinity;
       for (const p of s.points) {
-        const t = Date.parse(`${p.d}T00:00:00Z`);
+        const t = pointTime(p.d);
         if (!Number.isFinite(t)) continue;
         const dx = Math.abs(t - hoverT);
         if (dx < bestDx) {
@@ -400,7 +417,7 @@ export function TraceChart({
               <path d={d} fill="none" stroke={s.color} strokeWidth={s.dashed ? (s.lineWidth ?? 1.4) : (s.lineWidth ?? 2)} strokeLinejoin="round" strokeLinecap="round" strokeDasharray={s.dashed ? "4 3" : undefined} />
               {/* the end dot */}
               {s.points.length > 0 ? (
-                <circle cx={model.xOf(Date.parse(`${s.points[s.points.length - 1]!.d}T00:00:00Z`))} cy={model.yOf(s.points[s.points.length - 1]!.v, axis)} r={3} fill={s.color} />
+                <circle cx={model.xOf(pointTime(s.points[s.points.length - 1]!.d))} cy={model.yOf(s.points[s.points.length - 1]!.v, axis)} r={3} fill={s.color} />
               ) : null}
             </g>
           );
@@ -410,7 +427,7 @@ export function TraceChart({
         {pricePoints && model.markers.length > 0 && series.length > 0 ? (
           <g>
             {model.markers.map((m) => {
-              const t = Date.parse(`${m.d}T00:00:00Z`);
+              const t = pointTime(m.d);
               const x = model.xOf(t);
               const y = model.yOf(m.v, series[0]!.axis ?? "left");
               const isMax = m.kind === "max";
@@ -441,9 +458,9 @@ export function TraceChart({
         {hovered !== null && hovered.date !== null ? (
           <g>
             <line
-              x1={model.xOf(Date.parse(`${hovered.date}T00:00:00Z`))}
+              x1={model.xOf(pointTime(hovered.date))}
               y1={model.padT}
-              x2={model.xOf(Date.parse(`${hovered.date}T00:00:00Z`))}
+              x2={model.xOf(pointTime(hovered.date))}
               y2={model.H - model.padB}
               stroke="var(--color-text-secondary)"
               strokeWidth={0.8}
@@ -453,7 +470,7 @@ export function TraceChart({
               r.p !== null ? (
                 <circle
                   key={r.s.label}
-                  cx={model.xOf(Date.parse(`${r.p.d}T00:00:00Z`))}
+                  cx={model.xOf(pointTime(r.p.d))}
                   cy={model.yOf(r.p.v, r.s.axis ?? "left")}
                   r={3.6}
                   fill="var(--color-surface)"
@@ -470,7 +487,7 @@ export function TraceChart({
         <div
           className="pointer-events-none absolute top-1 z-10 max-w-[240px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)]"
           style={{
-            left: `${Math.min(72, Math.max(4, (model.xOf(Date.parse(`${hovered.date}T00:00:00Z`)) / model.W) * 100))}%`,
+            left: `${Math.min(72, Math.max(4, (model.xOf(pointTime(hovered.date)) / model.W) * 100))}%`,
           }}
         >
           <p className="m-0 type-caption font-bold text-[var(--color-text-primary)]">

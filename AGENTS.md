@@ -1092,3 +1092,68 @@ was pushed at 23:03. The gap was deployment, not code.
 - Zero console and zero page errors; 375px with no horizontal overflow;
   route precision intact (`currena.ir/` and `/goldsmith` still serve the
   converter untouched).
+
+### The gold page, batch G: the owner's thirteen refinements (2026-11-24)
+
+The owner's thirteen-item pass, one tree, deployed the same hour. Every
+item browser-verified on the dev server (EN + fa/RTL) before the build
+and re-verified against the live canonical URL after the deploy:
+
+1. **The 1D chart was blank** — the house line chart parsed every point
+   stamp as `Date.parse(d + "T00:00:00Z")`, which is invalid for the 1D
+   window's intraday stamps ("YYYY-MM-DDTHH:mm"): every parse returned
+   NaN, the model collapsed, and the chart rendered an empty div. One
+   shared `pointTime()` parser now reads both the daily and the
+   intraday stamps honestly (12 call sites), and a sub-day x-span
+   labels its own axis in UTC clock times instead of month names.
+   Live: 37 intraday points, 05:00 → 23:52 axis.
+2. **The calendar's rows carry only the day + the days-until** — each
+   event's "why it moves gold" explanation sits behind a ؟ button and
+   a Radix dialog (the factor modal's own pattern, focus restored to
+   the pressed row on close). Live: "۵ آذر ۱۴۰۵ · ۲ روز بعد" +
+   "ادعای بیکاری" + the why, in the modal.
+3. **تقویم چگونه ساخته می‌شود rewritten in plain Persian (and EN)** —
+   two kinds of dates: the exact ones from the banks' own calendars,
+   the rest in their usual week with an ≈, never a prediction.
+4. **ابتدای سال میلادی removed from طلا در برابر جایگزین‌ها** — the
+   compare band's window chips ride 3M/6M/1Y/3Y/5Y only (the briefing
+   table and the calculator's what-if windows keep their own YTD rows,
+   which the owner asked for in an earlier batch).
+5. **The Fibonacci correction levels are behind their own modal** —
+   the TA band's open layer is the verdict + the nearest
+   support/resistance sandwich + the three reading facts; the three
+   retracement prices, the swing's own dates and the note open from a
+   "سطوح اصلاح فیبوناچی · باز کردن" pill.
+6. **درسِ هم‌بستگی merged into the comparison band** — the old
+   standalone gold-correlation section is gone (id `gold-correlation`
+   no longer exists); its dual-axis chart, its rotation marker and its
+   method details ride inside طلا در برابر جایگزین‌ها behind one
+   "درسِ هم‌بستگی · طلا و بازدهی واقعی" tap, where the real-yield
+   line already lived.
+7. **The ratios show the classic trio only** — طلا/نقره، طلا/نفت and
+   قیمت واقعی طلا in the open, the other five behind a
+   "بقیهٔ ۵ نسبت‌ها" expand.
+8. **طلا در شش ارز → طلا در مقابل ارزها** (EN: "Gold against the
+   currencies").
+9. **بازار فیزیکی is its own section** — `gold-physical`, the bigger
+   title + subtitle + THE verdict in the TA verdict's own loud gold
+   box; the trio's numbers still behind their expand. It sits between
+   the dashboard and the Iran chapter, and rides the section nav as
+   "Physical / فیزیکی".
+10. **پل ایران → بازار طلا در ایران** (EN: "The gold market in
+    Iran"; nav chip "ایران").
+11. **قسمت‌های بزرگ طلا → مهمترین رویدادهای تاریخ طلا** — and the
+    section moved to the page's very bottom, below the relationship
+    map (the nav's last chip).
+12. **The calculator's non-dollar-units note removed** (EN + fa).
+13. **The head-to-head shows percent only** — the "خرید ماهانه …"
+    DCA dollar meta (a default the reader never set) is gone from
+    every asset row in both the calculator's what-if windows and the
+    if-you'd-bought head-to-head; each row carries the asset, the
+    percent, the bar and its own named window.
+
+Deployed as worker version (the `NEXT_PUBLIC_BASE_PATH=/gold` build,
+D1 and secrets untouched — the documented procedure), and verified
+against https://currena.ir/gold: every route 200, zero console and
+zero page errors, 375px with no horizontal overflow, the fa/RTL walk
+confirming all thirteen items above.
