@@ -1,10 +1,9 @@
 # The Trading Economics daily gold briefing — the capture + translation spec
 
-**Status: proposed (2026-11-24, this sitting — the research and the plan;
-implementation is the NEXT session's work). The clarifying questions with
-the sitting's suggested defaults are in §11; the spec is written against
-those defaults, and the owner's answers at the implementing sitting adjust
-the plan before code is written.**
+**Status: DECIDED (2026-11-24 — the owner answered §11's six clarifying
+questions the same day, every answer confirming the suggested default the
+spec was written against, so the plan adjusts nothing). Implementation is
+the NEXT session's work, unblocked: re-run the probe first, then §12.**
 
 The owner's brief: tradingeconomics.com/commodity/gold carries a **daily
 briefing** — the gold page's own summary paragraph (the owner's pasted
@@ -420,14 +419,18 @@ stays ours.
 
 ## 11. The clarifying questions (asked before implementation)
 
-The owner's answers adjust the plan; the spec is written against the
-suggested defaults.
+The owner answered all six on 2026-11-24, the same day they were asked —
+every answer confirming the suggested default, so the plan adjusts nothing.
+Each answer is recorded under its question, verbatim.
 
 **Q1 — The capture scope.** The daily briefing = the top news-stream
 item (title + body + canonical URL + TE's own timestamp). Include
 anything else from the page (the Forecast card, the stats table)?
 *Suggestion: the briefing only — the owner's own brief named exactly
 this part, and the licensing discipline keeps the excerpt narrow.*
+
+**Owner's answer:** "Just the box of briefing + title." — the briefing
+only, confirmed.
 
 **Q2 — The cron slot trade-off.** The account's fifth and last free
 cron trigger goes to this worker (`0 5,16 * * *` — two fires a day on
@@ -436,10 +439,16 @@ anywhere in the account requires consolidation or the paid plan.
 Accept? *Suggestion: yes — the desk's automation roadmap is complete
 (markets, WGC, TE), and this is the last planned cron consumer.*
 
+**Owner's answer:** "Yes do it." — the fifth and last free cron slot goes
+to `currena-te-watch`, 5/5 stated plainly.
+
 **Q3 — The seed.** Seed with the current three stream items (immediate
 content + two days of history; three detail GETs + three translations)
 or the top item only? *Suggestion: all three — the cost is trivial and
 the card starts alive; history before the seed is honestly absent.*
+
+**Owner's answer:** "all three — the page starts alive, and history
+before the seed date is honestly stated as absent."
 
 **Q4 — The cadence.** Two fires/day (05:00 + 16:00 UTC) against the
 observed 1–2 publishes/day — or one fire (05:00) accepting a ~11-hour
@@ -447,10 +456,17 @@ staleness window for the second piece? *Suggestion: two — the same
 single trigger carries both times; the second piece is exactly the
 "recovery rally" style update the Persian reader wants same-day.*
 
+**Owner's answer:** "two — same single trigger carries both times; the
+intraday 'rally recovery' update is exactly what the Persian reader wants
+same-day."
+
 **Q5 — The card placement.** Under the desk's Market Brief, above the
 WGC monthly card (the today/this-month pair)? *Suggestion: yes — the
 daily voice sits with the desk's own daily voice, the monthly voice
 below it.*
+
+**Owner's answer:** "yes — the daily voices sit together, the monthly
+below."
 
 **Q6 — The bot-protection posture.** If TE starts challenging the
 Worker egress (403/interstitial): log `fetch-failed`, retry next fire,
@@ -458,6 +474,9 @@ the card keeps the last known good with its date and an honest line;
 no proxy, no headless-browser arms race. Accept? *Suggestion: yes —
 the probe proved today's path; the day it stops working is a stated
 fact on the page, never a silent gap.*
+
+**Owner's answer:** "Suggestion: accept — the probe proves today's path;
+the day it stops is a stated fact, never a silent gap."
 
 ## 12. Acceptance criteria for the implementing sitting
 
@@ -497,5 +516,7 @@ fact on the page, never a silent gap.*
 (the stream verbatim, the Worker-side probe results, the license fields,
 the cron inventory); the probe worker itself was deleted after the
 evidence was captured — the account's worker list is exactly as it was.
-Proposed by the 2026-11-24 sitting; AGENTS.md's record of that sitting
-carries the summary and the translation-sitting wrap-up beside it.*
+Proposed and decided by the 2026-11-24 sittings — the owner's six §11
+answers landed the same day, every one confirming the suggested default;
+AGENTS.md's records of both sittings carry the summary, the wrap-up
+verification, and the close-out beside it.*

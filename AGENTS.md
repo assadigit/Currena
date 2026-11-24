@@ -2136,3 +2136,60 @@ The sitting's deliverable pushed to main: this record, the TE spec
 the probe results, the license fields, the cron inventory). The
 deployed state (both workers, the D1) carries no new commit — the deploys
 ran origin/main's own tree as it stood.
+
+### The TE spec decided, the translation wrap-up verified from the live state, the dead cron re-armed (2026-11-24, the deciding sitting)
+
+The owner answered all six of the TE spec's §11 clarifying questions the
+same day they were asked — every answer confirming the suggested default
+the spec was written against (briefing-only scope; the fifth cron slot
+taken; the three-item seed; two fires on one trigger; the card under the
+Market Brief; the no-arms-race bot posture). The spec's status header now
+reads **DECIDED**, §11 carries the answers verbatim, and the plan adjusts
+nothing — the implementation sitting is unblocked, `docs/te-daily-briefing-spec.md`
+§12's runway is the work list.
+
+The sitting verified the translation wrap-up from the live state, not
+just the source (the owner's explicit ask — the same engine serves the
+TE briefing's Farsi):
+
+1. **The engine is complete and deployed**: `wgc-watch/src/translate.ts`
+   carries every discipline (the gemma chat contract, `max_tokens: 2048`,
+   both served response shapes read defensively, the per-string
+   identity/mirror checks, the hash-keyed freshness gate, the
+   fail-closed failure law), wired at both pipeline call sites (the
+   fire-top retry pre-step and the post-store step) in the deployed
+   worker v4b2ff333 with the `[ai]` binding attached; the desk route
+   serves the additive `fa` field fail-closed-to-absent.
+2. **The live D1 state isolates the blocker to the quota alone**:
+   `wgc_commentary_fa` is empty; the 17-issue English backfill stored
+   01:26 UTC Nov 24; the target month 2026-10 is `ok` with its content
+   hash waiting — no incomplete code, no missing wiring, no failed
+   translation. The day's 10,000 neurons died mid-bake-off before the
+   first live translation could run (quota still exhausted at 15:52 UTC;
+   resets 00:00 UTC Nov 25, 03:30 Tehran).
+3. **The TE path re-probed live**: the commodity page answered 200, no
+   challenge, the top stream item still 603757 with `h2#description`
+   present as the cross-check — the structure matches the census; §12.1's
+   probe-first gate is pre-verified (the implementing sitting still
+   re-runs it, as the gate demands).
+
+Two close-out findings, both fixed or stated:
+
+- **A fresh Workers-AI-scoped token pasted at close was INVALID** — the
+  token-verify endpoint answered code 1000 twice (the original handoff
+  token's failure mode again) while the keeper `cfut_dHC…` verified
+  active as the control. The keeper remains the only valid token; if a
+  dedicated AI token is wanted, it needs a careful re-paste.
+- **The armed 00:20 UTC forced-run job was dead on arrival** — its
+  epoch-millis schedule parsed as seconds (`next_run` year 58869, the
+  same defect the watch-observation job's re-arm documented). Deleted
+  and re-armed as one_time `2026-11-25 00:20:00` UTC, payload verbatim
+  (the glm-4.7-flash honest-gap check, then the forced 2026-10 run, the
+  fa-row read-back, the live-route fa verification). The watch's own
+  Nov 25 09:30 UTC fire is the natural backup under stop-on-success.
+
+The sitting's deliverable pushed to main: this record and the DECIDED
+spec edit. The next session opens with the §12 runway: first verify the
+2026-10 fa row landed (the forced run or the 09:30 fire), then re-run
+the TE probe, then build `currena-te-watch` — parser harness, clock
+walk, DDL twice, deploy, seed, live card.
