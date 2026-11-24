@@ -1,0 +1,460 @@
+{
+  "runs": [
+    {
+      "ranAt": "2026-11-24T01:18:42.998Z",
+      "store": "local:db/custom.db",
+      "dry": false,
+      "walk": {
+        "from": "2025-03",
+        "to": "2026-10",
+        "issues": 17
+      },
+      "outcomes": {
+        "stored": 17
+      },
+      "results": [
+        {
+          "month": "2025-03",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-04",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-05",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-07",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-08",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-09",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-10",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-12",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2026-01",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2026-02",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-p"
+        },
+        {
+          "month": "2026-03",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2026-04",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-p"
+        },
+        {
+          "month": "2026-05",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-br-p"
+        },
+        {
+          "month": "2026-07",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-p"
+        },
+        {
+          "month": "2026-08",
+          "outcome": "stored",
+          "note": "2 segments, variant h3+strong-p"
+        },
+        {
+          "month": "2026-09",
+          "outcome": "stored",
+          "note": "2 segments, variant h3+strong-p"
+        },
+        {
+          "month": "2026-10",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        }
+      ],
+      "applied": "local store written directly"
+    },
+    {
+      "ranAt": "2026-11-24T01:18:47.642Z",
+      "store": "local:db/custom.db",
+      "dry": false,
+      "walk": {
+        "from": "2025-03",
+        "to": "2026-10",
+        "issues": 17
+      },
+      "outcomes": {
+        "unchanged": 17
+      },
+      "results": [
+        {
+          "month": "2025-03",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-04",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-05",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-07",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-08",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-09",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-10",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-12",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-01",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-02",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-03",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-04",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-05",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-07",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-08",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-09",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-10",
+          "outcome": "unchanged"
+        }
+      ],
+      "applied": "local store written directly"
+    },
+    {
+      "ranAt": "2026-11-24T01:23:34.510Z",
+      "store": "local:db/custom.db",
+      "dry": false,
+      "walk": {
+        "from": "2025-03",
+        "to": "2026-10",
+        "issues": 17
+      },
+      "outcomes": {
+        "unchanged": 16,
+        "stored": 1
+      },
+      "results": [
+        {
+          "month": "2025-03",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-04",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-05",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-07",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-08",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-09",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-10",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-12",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-01",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-02",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-03",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-04",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-05",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-07",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-08",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-09",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-10",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        }
+      ],
+      "applied": "local store written directly"
+    },
+    {
+      "ranAt": "2026-11-24T01:26:35.649Z",
+      "store": "remote-d1",
+      "dry": false,
+      "walk": {
+        "from": "2025-03",
+        "to": "2026-10",
+        "issues": 17
+      },
+      "outcomes": {
+        "stored": 17
+      },
+      "results": [
+        {
+          "month": "2025-03",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-04",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-05",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-07",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-08",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-09",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-10",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2025-12",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2026-01",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2026-02",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-p"
+        },
+        {
+          "month": "2026-03",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        },
+        {
+          "month": "2026-04",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-p"
+        },
+        {
+          "month": "2026-05",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-br-p"
+        },
+        {
+          "month": "2026-07",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+strong-p"
+        },
+        {
+          "month": "2026-08",
+          "outcome": "stored",
+          "note": "2 segments, variant h3+strong-p"
+        },
+        {
+          "month": "2026-09",
+          "outcome": "stored",
+          "note": "2 segments, variant h3+strong-p"
+        },
+        {
+          "month": "2026-10",
+          "outcome": "stored",
+          "note": "2 segments, variant h2+h3-subheads"
+        }
+      ],
+      "applied": "34 statement(s) applied to the remote D1 via wrangler d1 execute --file"
+    },
+    {
+      "ranAt": "2026-11-24T01:26:46.441Z",
+      "store": "remote-d1",
+      "dry": false,
+      "walk": {
+        "from": "2025-03",
+        "to": "2026-10",
+        "issues": 17
+      },
+      "outcomes": {
+        "unchanged": 17
+      },
+      "results": [
+        {
+          "month": "2025-03",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-04",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-05",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-07",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-08",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-09",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-10",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2025-12",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-01",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-02",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-03",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-04",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-05",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-07",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-08",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-09",
+          "outcome": "unchanged"
+        },
+        {
+          "month": "2026-10",
+          "outcome": "unchanged"
+        }
+      ],
+      "applied": "0 statements — the remote state already matches; nothing applied"
+    }
+  ]
+}

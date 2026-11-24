@@ -709,6 +709,24 @@ export const UI = {
         "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights. The balance leans against: conditions, not a forecast.",
       explore: "Explore the five forces",
     },
+    wgc: {
+      title: "World Gold Council monthly commentary",
+      subtitle: "نگارش ماهانهٔ شورای جهانی طلا",
+      seriesLine: "Gold Market Commentary · the Highlights box, verbatim, once a month",
+      issueLabel: "{month} in review",
+      publishedLabel: "Published {date}",
+      fetchedLabel: "fetched {date}",
+      source: "Source: World Gold Council",
+      stateWaiting:
+        "The next issue is not published yet. The watch window: every day 1–15 plus 17, 19, 21, 23 and 25 of the following month, 09:30 UTC — {n} attempts so far.",
+      stateMissed: "The publication window closed with no new issue — a stated fact, not a silent gap.",
+      stateAlert:
+        "The source's page template changed and the highlights could not be read; the last known good is shown. A human must look.",
+      stateSkip: "The series publishes no June or November issue.",
+      preBox:
+        "The Highlights box was added to this series with the March 2025 issue; the 22 earlier issues (January 2023 – February 2025) carried none and are not backfilled.",
+      unavailable: "The monthly commentary did not arrive; nothing is shown rather than a guess.",
+    },
     footer: {
       rights: "Currena · gold intelligence",
     },
@@ -1258,6 +1276,24 @@ export const UI = {
       body:
         "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند. ترازو علیه می‌چرخد؛ شرایط، نه پیش‌بینی.",
       explore: "پنج نیرو را کاوش کن",
+    },
+    wgc: {
+      title: "نگارش ماهانهٔ شورای جهانی طلا",
+      subtitle: "World Gold Council · Gold Market Commentary",
+      seriesLine: "نگارش ماهانهٔ «توضیح بازار طلا» · جعبهٔ هایلایت‌ها، واژه‌به‌واژه، ماهی یک بار",
+      issueLabel: "مرور {month}",
+      publishedLabel: "انتشار: {date}",
+      fetchedLabel: "بازخوانی: {date}",
+      source: "منبع: World Gold Council",
+      stateWaiting:
+        "شمارهٔ بعدی هنوز منتشر نشده است. پنجرهٔ پایش: هر روزِ ۱ تا ۱۵ به‌علاوهٔ ۱۷، ۱۹، ۲۱، ۲۳ و ۲۵ ماهِ بعد، ساعت ۹:۳۰ به‌وقت جهانی (UTC) — تاکنون {n} تلاش.",
+      stateMissed: "پنجرهٔ انتشار این ماه بدون شمارهٔ جدید بسته شد — واقعیتی ثبت‌شده، نه خلأیی پنهان.",
+      stateAlert:
+        "قالب صفحهٔ منبع تغییر کرده و هایلایت‌ها خوانده نشد؛ آخرین نسخهٔ سالم نشان داده می‌شود. باید دستی بررسی شود.",
+      stateSkip: "این مجموعه در ژوئن و نوامبر شماره منتشر نمی‌کند.",
+      preBox:
+        "جعبهٔ «هایلایت‌ها» از شمارهٔ مارس ۲۰۲۵ به این مجموعه افزوده شده است؛ ۲۲ شمارهٔ پیش از آن (ژانویه ۲۰۲۳ تا فوریه ۲۰۲۵) هایلایت نداشتند و بازخوانی نشده‌اند.",
+      unavailable: "نگارش ماهانه نرسید؛ به‌جای حدس، هیچ‌چیز نشان داده نمی‌شود.",
     },
     footer: {
       rights: "Currena · هوش طلا",

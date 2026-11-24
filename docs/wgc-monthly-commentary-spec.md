@@ -1,8 +1,13 @@
 # The WGC monthly commentary — the Highlights spec
 
-**Status: proposed (2026-11-24). Nothing in this document is built, deployed,
-or wired into the desk yet — it is the owner-reviewed plan for the
-implementing sitting.**
+**Status: implemented (2026-11-24, the implementing sitting — this
+document's plan is built, deployed, and wired into the desk; the sitting
+record lives in AGENTS.md). One environmental exception, stated: the
+watch worker's cron triggers could not be attached — the account's
+Workers Free plan allows five cron triggers and the owner's live
+workers consume all five — the worker is deployed with its triggers
+declared and attaches them with one `bunx wrangler deploy` from
+`wgc-watch/` the moment a slot frees or the plan upgrades.**
 
 The owner's brief: the World Gold Council (WGC) publishes a monthly *Gold
 Market Commentary* at a predictable URL; scrape its **Highlights** box —

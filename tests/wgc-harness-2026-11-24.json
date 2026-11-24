@@ -1,0 +1,427 @@
+{
+  "harness": "tests/wgc-harness.ts",
+  "ranAt": "2026-11-24T01:11:52.687Z",
+  "probeRerun": {
+    "ranAt": "2026-11-24",
+    "command": "bun scripts/wgc-probe.ts /tmp/wgc-census-rerun.json",
+    "diff": "48/48 rows byte-identical against docs/evidence/wgc-census-2026-11-24.json — gold.org had not drifted; the census and the spec stand unchanged"
+  },
+  "productionParser": "wgc-watch/src/parser.ts (imported, not copied)",
+  "productionFire": "wgc-watch/src/pipeline.ts runFire/applyCapture (imported, not copied)",
+  "phaseA": {
+    "months": [
+      {
+        "monthKey": "2025-03",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": true
+      },
+      {
+        "monthKey": "2025-04",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2025-05",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2025-07",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": true
+      },
+      {
+        "monthKey": "2025-08",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2025-09",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2025-10",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2025-12",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-01",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-02",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+strong-p",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-03",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-04",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+strong-p",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-05",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+strong-br-p",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-07",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+strong-p",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-08",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h3+strong-p",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-09",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h3+strong-p",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      },
+      {
+        "monthKey": "2026-10",
+        "httpStatus": 200,
+        "slugGuard": true,
+        "variantSeen": "h2+h3-subheads",
+        "variantMatches": true,
+        "segmentsParsed": 2,
+        "segmentsByteIdentical": true,
+        "publishedAtMatches": true,
+        "gatesPass": true,
+        "headingsNonEmpty": true,
+        "bodiesAtLeast40": true,
+        "nestedDivInBlock": false,
+        "liBodiesInBlock": false
+      }
+    ],
+    "summary": {
+      "boxIssues": 17,
+      "segments": 34,
+      "variants": {
+        "h2+h3-subheads": 11,
+        "h2+strong-p": 3,
+        "h2+strong-br-p": 1,
+        "h3+strong-p": 2
+      }
+    }
+  },
+  "septemberSnippet": {
+    "monthKey": "2026-09",
+    "byteIdentical": true,
+    "ldCrossCheck": true
+  },
+  "phaseB": [
+    {
+      "case": "no-box-month-2023-02",
+      "outcome": "structure-alert",
+      "reason": "no Highlights box: no <h2|h3|h4> whose text is exactly “Highlights”",
+      "rowStatus": "structure_alert",
+      "storedHighlights": "[]",
+      "attemptsLogged": 0
+    },
+    {
+      "case": "redirect-june-2026",
+      "finalUrl": "https://www.gold.org/goldhub/research/gold-market-commentary-july-2026",
+      "slugGuardPassed": false,
+      "outcome": "redirect-rejected",
+      "rowCreated": false,
+      "attemptsLogged": 1
+    },
+    {
+      "case": "far-future-404-2027-05",
+      "target": "2027-05",
+      "action": "fetch-404",
+      "rowCreated": false,
+      "attemptsLogged": 1
+    },
+    {
+      "case": "not-yet-published-2026-12",
+      "ranAt": "2026-11-24T01:11:52.687Z",
+      "target": "2026-12",
+      "action": "fetch-404",
+      "rowCreated": false,
+      "attemptsLogged": 1
+    }
+  ],
+  "phaseC": [
+    {
+      "case": "days-1-to-7-then-stop-on-success",
+      "target": "2026-12",
+      "actions": [
+        "fetch-404",
+        "fetch-404",
+        "fetch-404",
+        "fetch-404",
+        "fetch-404",
+        "fetch-404",
+        "stored",
+        "stop-on-success",
+        "stop-on-success"
+      ],
+      "attempts": 7,
+      "status": "ok",
+      "fetchCalls": 7,
+      "storedSegments": 2,
+      "note": "the day-7 200 serves the live October 2026 page under the December URL (the mock's slug-guard pass) — the walk exercises the state machine"
+    },
+    {
+      "case": "unchanged-rerun-and-simulated-edit",
+      "target": "2026-12",
+      "unchangedOutcome": "unchanged",
+      "unchangedWritesNothing": true,
+      "editOutcome": "re-stored",
+      "editApplied": true,
+      "updatedAtAfterEdit": "2027-01-09T09:30:00.000Z",
+      "attemptsAfterEdit": 2,
+      "editedRerun": "unchanged",
+      "firstBodyAfterEdit": "Gold fell sharply in October, likely on asset rotation, de-grossing and Fed rate"
+    },
+    {
+      "case": "skip-months-zero-requests",
+      "june": {
+        "action": "skip-month",
+        "target": "2027-06"
+      },
+      "november": {
+        "action": "skip-month",
+        "target": "2026-11"
+      },
+      "fetchCalls": 0,
+      "logLines": [
+        {
+          "month_key": "2027-06",
+          "event": "skip-month"
+        },
+        {
+          "month_key": "2026-11",
+          "event": "skip-month"
+        }
+      ]
+    },
+    {
+      "case": "month-bound-20-and-window-close",
+      "target": "2027-01",
+      "fetchCallsAtBound": 20,
+      "fetchCallsAfter21st": 20,
+      "action21": "attempt-bound",
+      "action25": "missed",
+      "finalStatus": "missed",
+      "finalAttempts": 20,
+      "storedHighlights": "[]",
+      "missedLogLines": 1
+    },
+    {
+      "case": "natural-window-close-day-25",
+      "target": "2027-01",
+      "actions": [
+        "1:fetch-404",
+        "2:fetch-404",
+        "3:fetch-404",
+        "4:fetch-404",
+        "5:fetch-404",
+        "6:fetch-404",
+        "7:fetch-404",
+        "8:fetch-404",
+        "9:fetch-404",
+        "10:fetch-404",
+        "11:fetch-404",
+        "12:fetch-404",
+        "13:fetch-404",
+        "14:fetch-404",
+        "15:fetch-404",
+        "17:fetch-404",
+        "19:fetch-404",
+        "21:fetch-404",
+        "23:fetch-404",
+        "25:missed"
+      ],
+      "finalStatus": "missed",
+      "finalAttempts": 20,
+      "fetchCalls": 20
+    }
+  ],
+  "phaseD": {
+    "ddlAppliedTwice": true,
+    "tables": [
+      {
+        "name": "wgc_commentary"
+      },
+      {
+        "name": "wgc_scrape_log"
+      }
+    ]
+  },
+  "allPass": true
+}

@@ -82,6 +82,7 @@ import {
   type ProjectionReading,
 } from "@/components/gold-page/context-cards";
 import { BridgeBoard, fetchRates, type RatesPayload } from "@/components/gold-page/bridge-board";
+import { WgcCard } from "@/components/gold-page/wgc-card";
 import { CalendarBand } from "@/components/gold-page/calendar";
 import { ScenariosBand } from "@/components/gold-page/scenarios";
 import { CompareBand } from "@/components/gold-page/compare";
@@ -1278,6 +1279,11 @@ export default function GoldPage() {
             <div className="flex flex-col gap-2.5 lg:gap-3">
               <PriceCard data={data} t={t} fmt={fmt} echo={echo} />
               <BriefingCard t={t} fmt={fmt} balance={balance} locale={locale} />
+              {/* the WGC monthly commentary — the World Gold Council's own
+                  monthly one-glance directly under the Market Brief: the
+                  Highlights box verbatim in an LTR block, the honest
+                  waiting/missed/alert states riding the same card */}
+              <WgcCard t={t.wgc} locale={locale} fmt={fmt} />
             </div>
 
             {/* the composition stack: the brass balance + the five lane bars */}

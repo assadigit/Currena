@@ -1,0 +1,10 @@
+{
+  "name": "currena-wgc-watch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The WGC monthly commentary watch worker — scheduled fetch, slug guard, parse, gates, upsert into the desk's D1. Zero dependencies; wrangler resolves from the repository root.",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --test-scheduled"
+  }
+}

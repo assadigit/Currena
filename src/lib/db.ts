@@ -82,6 +82,44 @@ function normalizeD1Param(value: unknown): unknown {
   return value;
 }
 
+/**
+ * Read-side twin of the bind-parameter shim above — the D1 adapter's
+ * value-based column-type inference.
+ *
+ * D1 result sets carry no declared column types, so @prisma/adapter-d1
+ * (6.19.2) infers them from the VALUES (its `inferStringType`): any
+ * string that looks like an ISO datetime is reported to the engine as
+ * DateTime, and the engine then hands the model a parsed Date — a String
+ * field receiving one fails the read ("Error converting field … found
+ * incompatible value"). The wgc_commentary/wgc_scrape_log tables store
+ * their timestamps as verbatim ISO TEXT (the §4.6 DDL contract), so on
+ * the Worker those columns would never survive a typed read.
+ *
+ * The Worker path of this seam therefore prefixes ISO-datetime-looking
+ * string cells inside the adapter's `raw()` results with the sentinel
+ * below — the anchored inference regexes no longer match, the engine
+ * delivers the value as Text, and the reader restores the verbatim
+ * bytes with `unwrapD1Text`. The prefix applies only to strings matching
+ * the adapter's own two patterns (copied verbatim), so every other TEXT
+ * column of the archive — dates ("YYYY-MM-DD"), ids, JSON payloads,
+ * URLs — passes through untouched (the S8–S14 schema's DateTime columns
+ * store millis INTEGERs, not strings, and are unaffected). The sandbox
+ * engine path never sees any of this: the sentinel appears only in
+ * Worker reads, and unwrap is a no-op without it — one code path, two
+ * runtimes, like the bind shim.
+ */
+const D1_RAW_TEXT_PREFIX = "\u0000d1text:";
+const D1_ISO_DATETIME_LIKE =
+  /^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))$|^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$|^(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))$|^\d{4}-[0-1]\d-[0-3]\d [0-2]\d:[0-5]\d:[0-5]\d$/;
+
+/** Restore a verbatim string the read-side shim prefixed (a no-op elsewhere). */
+export function unwrapD1Text(value: string | null): string | null {
+  if (typeof value !== "string") return value;
+  return value.startsWith(D1_RAW_TEXT_PREFIX)
+    ? value.slice(D1_RAW_TEXT_PREFIX.length)
+    : value;
+}
+
 function wrapD1Statement<T extends object>(statement: T): T {
   return new Proxy(statement, {
     get(target, prop) {
@@ -92,6 +130,31 @@ function wrapD1Statement<T extends object>(statement: T): T {
         return (...args: unknown[]) => {
           const bound = bind.apply(target, args.map(normalizeD1Param));
           return wrapD1Statement(bound);
+        };
+      }
+      if (prop === "raw") {
+        const raw = Reflect.get(target, "raw", target) as (
+          opts?: unknown,
+        ) => Promise<unknown>;
+        return async (opts?: unknown) => {
+          const result = await raw.call(target, opts);
+          // the adapter consumes [columnNames, ...rows]; prefix the
+          // ISO-datetime string cells so they stay Text through inference
+          if (Array.isArray(result)) {
+            for (const row of result) {
+              if (!Array.isArray(row)) continue;
+              for (let i = 0; i < row.length; i++) {
+                const cell = row[i];
+                if (
+                  typeof cell === "string" &&
+                  D1_ISO_DATETIME_LIKE.test(cell)
+                ) {
+                  row[i] = D1_RAW_TEXT_PREFIX + cell;
+                }
+              }
+            }
+          }
+          return result;
         };
       }
       const value = Reflect.get(target, prop, target);

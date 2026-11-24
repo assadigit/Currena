@@ -104,3 +104,53 @@ model WatchRule {
 
   @@index([kind])
 }
+
+/**
+ * The WGC monthly commentary Highlights — one row per REVIEWED month
+ * ("YYYY-MM"; the issue that reviews month M publishes early in M+1;
+ * June and November have no issue). Written by the currena-wgc-watch
+ * Worker's scheduled fire and the one-off backfill
+ * (docs/wgc-monthly-commentary-spec.md §4.6); strictly a READ model for
+ * the desk — this app never writes it. Columns map 1:1 to the D1 DDL
+ * (wgc-watch/ddl.sql); no DateTime fields, so the D1 bind shim is
+ * never involved. `status` is ok | missed | structure_alert — the
+ * waiting state is the absence of a row (the route derives it from the
+ * scrape log's attempt count while the window is open). The ISO-TEXT
+ * timestamp columns (publishedAt/fetchedAt/lastAttemptAt/updatedAt and
+ * the log's ts) ride the db.ts read-side shim on the Worker (the D1
+ * adapter would otherwise infer DateTime from their values) — readers
+ * restore the verbatim bytes with unwrapD1Text.
+ */
+model WgcCommentary {
+  monthKey      String  @id @map("month_key")
+  sourceUrl     String  @map("source_url")
+  headline      String? @map("headline")
+  publishedAt   String? @map("published_at") // WGC's own JSON-LD datePublished, verbatim
+  fetchedAt     String  @map("fetched_at") // ISO UTC — when the watch worker captured it
+  highlightsJson String @map("highlights_json") // [{"heading":…,"body":…}] verbatim, in order
+  blockVariant  String  @map("block_variant")
+  contentHash   String  @map("content_hash")
+  status        String  @default("ok") @map("status") // ok | missed | structure_alert
+  attempts      Int     @default(0) @map("attempts")
+  lastAttemptAt String? @map("last_attempt_at")
+  updatedAt     String? @map("updated_at") // set only when a re-store followed a WGC edit
+
+  @@map("wgc_commentary")
+}
+
+/**
+ * The watch worker's scrape log — the per-fire record the health
+ * endpoint reads and this app reads only for the honest attempt count
+ * of a waiting month (every fetch-404 / fetch-redirect-rejected /
+ * fetch-error line is one real attempt). Read-only for the desk.
+ */
+model WgcScrapeLog {
+  ts       String @map("ts") // ISO UTC
+  monthKey String @map("month_key")
+  event    String @map("event") // fetch-404 | fetch-redirect-rejected | fetch-error | stored | re-stored | structure-alert | missed | skip-month
+  detail   String?
+
+  @@id([ts, monthKey]) // Prisma identity only — the DDL table carries no key of its own
+  @@index([monthKey])
+  @@map("wgc_scrape_log")
+}

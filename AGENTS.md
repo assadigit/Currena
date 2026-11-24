@@ -1222,3 +1222,171 @@ census (every segment verbatim) in
 
 **Status: proposed only — nothing built, deployed, or wired in this
 sitting.** The full document: `docs/wgc-monthly-commentary-spec.md`.
+
+### The WGC Highlights pipeline — implemented (2026-11-24, the implementing sitting)
+
+The sitting that implemented docs/wgc-monthly-commentary-spec.md in full.
+Everything below was exercised live unless stated otherwise; the evidence
+lives under tests/ (the harness JSON + the walk PNGs) and
+db/wgc-backfill-remote.sql (gitignored, the generated remote D1 statement
+tape).
+
+**The opening gate — the probe re-run (§10.1):** `bun scripts/wgc-probe.ts`
+re-fetched all 48 URLs and diffed byte-identical against
+docs/evidence/wgc-census-2026-11-24.json — gold.org had not drifted; the
+census and the spec stood unchanged and no spec update was needed.
+
+**What was built:**
+
+- **`wgc-watch/` — the `currena-wgc-watch` Worker** (zero npm dependencies,
+  plain TypeScript): `src/parser.ts` (the production Highlights parser —
+  the probe's validated tokenizing logic plus the spec §4.4 defensive
+  block re-cut), `src/pipeline.ts` (the month math, the canonical URL,
+  the slug guard, the storage gates, the sha256 content hash, the
+  `applyCapture` upsert shared by fire and backfill, and `runFire` — the
+  bounded-window state machine), `src/index.ts` (the scheduled handler +
+  the read-only health endpoint), `ddl.sql` (spec §4.6 verbatim), and
+  `wrangler.jsonc` (the two cron expressions, the shared aurum-desk D1
+  binding). One deviation from the spec's letter, forced by tooling:
+  the config is `wrangler.jsonc`, not `wrangler.toml` — wrangler 4.166's
+  plain `bunx wrangler deploy` from wgc-watch/ resolved the repository
+  root's wrangler.jsonc over the subdirectory's wrangler.toml (the
+  known mistake encoded in the runbook, now in config form too); the
+  JSONC form (the desk's own convention) resolves correctly.
+- **The D1 tables** (spec §4.6 verbatim, applied with
+  `wrangler d1 execute aurum-desk --remote --file wgc-watch/ddl.sql`
+  twice — no error, the idempotence proof): wgc_commentary +
+  wgc_scrape_log on the same aurum-desk, no existing table touched, no
+  seed re-run, secrets untouched.
+- **The backfill** (`scripts/wgc-backfill.ts`): the one-off idempotent
+  walk 2025-03 → 2026-10 (17 issues, June/November skipped with zero
+  requests), the same `applyCapture` as the fire; writes local SQLite
+  directly (`--db`) and the remote D1 through a recording scratch whose
+  statement tape is applied via `wrangler d1 execute --file`
+  (`--remote`). The runs: local stored 17; local re-run unchanged ×17
+  (zero writes); remote stored 17 (34 statements); remote re-run
+  "0 statements — the remote state already matches; nothing applied".
+  A bonus path proven in the sandbox: a structure_alert month re-stored
+  to ok through the backfill (16 unchanged + 1 stored). Evidence:
+  tests/wgc-backfill-2026-11-24.json (five recorded runs).
+- **The API route** `GET /gold/api/gold/wgc-commentary` (latest, or
+  `?month=YYYY-MM`): read-only, fail-closed, D1 only, the four honest
+  statuses (ok | waiting | missed | structure_alert) with the last known
+  good riding beside the non-ok states, the waiting attempt count read
+  from the scrape log, the derived window-close (day > 25 with no row →
+  missed), the honest 404s (pre-box months, skip months) and 400 (bad
+  month format). The desk's Prisma schema gained the WgcCommentary +
+  WgcScrapeLog read models (mapped 1:1 to the DDL columns).
+- **The card** (`src/components/gold-page/wgc-card.tsx` + the `wgc` copy
+  blocks in content.ts, EN + fa): placed directly under the Market
+  Brief; the fa title «نگارش ماهانهٔ شورای جهانی طلا» with the EN
+  subtitle (mirrored in EN); the two English segments VERBATIM inside a
+  `dir="ltr"` blockquote with the canonical `cite`; the 11px whisper
+  meta line (published date, fetched date, «منبع: World Gold Council» —
+  the anchor IS the gold.org link); the honest waiting/missed/
+  structure_alert/skip states riding the same card; the record-basis
+  note (the box exists only since the March 2025 issue; the 22 earlier
+  issues are not backfilled — stated, never hidden); Persian digits and
+  calendar dates in fa (۸ آبان ۱۴۰۵), the year never grouped.
+
+**A second seam normalization, documented inline (src/lib/db.ts):** the
+D1 adapter (@prisma/adapter-d1 6.19.2) infers column types from VALUES —
+D1 result sets carry no declared types — and any ISO-datetime-looking
+string is reported as DateTime, so the wgc tables' verbatim ISO-TEXT
+timestamps (the §4.6 contract) failed typed reads on the Worker
+("Error converting field publishedAt …"). The Worker path of the seam now
+prefixes exactly those string cells (the adapter's own two regexes,
+copied verbatim) with a sentinel inside the adapter's `raw()` results,
+and the route restores the verbatim bytes with `unwrapD1Text` — the
+read-side twin of the existing DateTime bind shim, one code path on
+both runtimes (the sandbox never sees the sentinel; unwrap is a no-op
+without it). Every other TEXT column of the archive (dates, ids, JSON,
+URLs) passes untouched; the S8–S14 DateTime columns store millis
+INTEGERs and are unaffected.
+
+**The harness (tests/wgc-harness.ts — ALL CHECKS PASS, evidence
+tests/wgc-harness-2026-11-24.json):** the production parser (imported,
+never copied) over all 17 box issues fetched live — 17 × 2 segments,
+byte-identical against the census (segments, variants, publication
+dates), every heading non-empty, every body ≥ 40 chars, the defensive
+block re-cut never firing (no nested div observed), and the owner's
+pasted September snippet reproduced byte-identically (2026-09) with the
+JSON-LD description cross-check; all five body styles exercised with
+their own witnesses (h2+h3+p; h2+h3+li 2025-03/2025-07; h2+strong-p
+2026-02/04/07; h2+strong+br + trailing note 2026-05; h3 box
+2026-08/09 — the spec's acceptance list names "2025-08 <h3>+<p>",
+which the census dates as h2+h3+<p>; 2026-08 is the h3-box issue);
+the negative paths live (2023-02 no box → structure alarm, nothing
+stored; June-2026 → the slug-guard rejection logged, no row; 2027-05
+far-future 404 and the 2026-12 not-yet-published control → waiting);
+the clock walk over the production `runFire` against a scratch SQLite
+D1 (days 1–7: six 404s then one 200 → attempts 7, status ok; days 8–9
+stop-on-success with zero further requests; June and November targets →
+skip-month with zero requests; the 21st fire attempt-bound at 20; the
+day-25 close → missed; the natural 20-fire window ending in one missed
+close; a simulated WGC edit → re-stored with updated_at bumped and a
+re-stored log line; the unchanged re-run → nothing written, no attempts
+bump, no log line). The harness also proves the DDL idempotent twice on
+its scratch database.
+
+**Browser-verified (agent-browser + VLM, evidence
+tests/wgc-01…09-*.png):** the card in EN and fa/RTL, the whisper line,
+the LTR block inside the RTL page, the four states exercised through
+the route by honest database manipulation (ok live; waiting by removing
+the October row; missed by a window-closed row; structure_alert by an
+alert row — each rendering its state line with the last known good
+beside it), dark mode, mobile 375px with zero horizontal overflow and
+the footer pushed down naturally, zero console and zero page errors
+across every walk. One rendering bug caught and fixed by the walk
+itself: the year formatted through Intl with a grouping separator
+("October 2,026") — the year now renders plain ("October 2026" /
+«اکتبر ۲۰۲۶»).
+
+**Deployed and live-verified:** the desk redeployed through the two-step
+runbook (NEXT_PUBLIC_BASE_PATH=/gold on BOTH build and deploy — the
+encoded mistake avoided), live version
+`cca13b4f-1c60-48a3-b0fd-5bffa9f4034d` (2026-11-24T01:38Z). Live at
+https://currena.ir/gold: the card renders end to end (EN + fa verified
+in the browser against the live URL, zero console errors, 375px
+clean), the new route serves the exact §5 shape byte-perfect
+(publishedAt verbatim), and the FULL route sweep stayed green — every
+/gold/api/gold/* and /gold/api/desk/* route 200, meter and daily
+keeping their honest parameter 400s, /gold/ still 308-normalising to
+/gold, currena.ir/ and /goldsmith still serving the converter
+untouched, the workers.dev mirror serving /gold and the new route. The
+watch worker answers its health endpoint
+(https://currena-wgc-watch.sedanama-ir.workers.dev) with the last three
+log lines, the current target month's row, and the cron schedule —
+reading the same D1 the desk reads.
+
+**Honestly NOT done — stated, never hidden:**
+
+- **The cron triggers could not be attached.** The account is on the
+  Workers Free plan, which allows five cron triggers per account, and
+  the owner's live workers consume all five (currena-api's every-minute
+  trigger + currena-markets' four daily triggers — the owner's
+  services, left untouched per the house law). The deploy uploaded
+  currena-wgc-watch but the trigger attachment failed (Cloudflare error
+  10072, "the Workers Free limit of 5 cron triggers per account"). The
+  worker is deployed with its triggers declared in wrangler.jsonc; the
+  moment a slot frees (or the plan upgrades), one `bunx wrangler deploy`
+  from wgc-watch/ attaches them with zero code change. Consequences,
+  stated plainly: the scheduled pipeline has NOT fired live yet, and
+  the acceptance item "the cron observed firing at least once
+  (health endpoint or scrape log)" is NOT MET — the fire logic itself
+  is proven end-to-end by the harness (every path: skip, bound,
+  stop-on-success, 404, redirect-rejected, stored, re-stored, missed,
+  structure-alert), and the first live capture of the 2026-12 issue
+  waits on the trigger slot. The calendar at deploy time: November's
+  fires target October (already backfilled — stop-on-success exits);
+  December's target November (a skip month); the first real live
+  capture is the 2026-12 issue, expected early January 2027 inside the
+  measured window, once the triggers attach.
+- One addition beyond the spec's event vocabulary, for honesty: the
+  spec's §4.3 names timeouts/5xx as "attempts++, next fire" but assigns
+  them no log event; mislabeling them fetch-404 or leaving them
+  uncounted would both be dishonest, so the pipeline logs them as
+  `fetch-error` (detail carries the cause) and the attempt counts and
+  the route's waiting counter include them. The DDL comment (verbatim
+  §4.6) lists the seven spec'd events; the eighth value is this
+  documented extension.
