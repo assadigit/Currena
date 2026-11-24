@@ -1567,3 +1567,47 @@ honest finding is below, plus what the sitting found and fixed.
   full pnpm gates there; the desk worker was NOT redeployed (this
   sitting changed no desk app code — main's app tree is identical to
   the deployed cca13b4f state).
+
+### The consolidation fires verified (2026-11-24, the scheduled check)
+
+The 09:10 UTC check (job 545524 — the one re-armed after the
+epoch-millis mis-parse) opened in a fresh sandbox (the tree re-cloned,
+HEAD 281b9877, the remote token-scrubbed) and pulled the morning
+telemetry for `currena-markets` from the observability query API (POST
+…/workers/observability/telemetry/query, window 06:00–10:00 UTC,
+filter $metadata.service = currena-markets). The consolidation fired
+exactly as the deployed patch prescribes — six covering-cron fires
+across hours 7–8, each carrying the covering expression
+`0,30,50 1,7,8,23 * * *`:
+
+- **07:00:33 UTC — the AU rung, alone.** `arkets-au] main: 19 written ·
+  0 held · 19 Yahoo calls · snapshot written`. No wake line, no error —
+  the invocation logged nothing else (the head matches the verified
+  format; the `· snapshot written` tail is the patch's own suffix).
+- **07:30:24 / 07:50:24 / 08:00:24 / 08:30:24 UTC — the four wakes,
+  bare.** Each logged exactly one line: `arkets] covering-cron wake at
+  07:30 UTC (day 2) — no job at this minute` (and the same at 07:50,
+  08:00, 08:30; day 2 = Tuesday — the wake line's D is the day-of-week
+  the dispatch guards on, not the day-of-year). No job lines, no
+  errors.
+- **08:50:25 UTC — the Asia retry, run.** `# markets run — retry
+  (yahoo-first) · 0 EODHD + 9 Yahoo calls` — n225, kospi, hsi, ssec,
+  taiex, nifty50 via yahoo; stoxx50, dax, cac HELD (F1: Europe is still
+  intraday at 08:50, today's close not final) — `→ written (unusual ·
+  n=8)`. The same invocation continued with the fx run and logged one
+  non-fatal line worth recording verbatim: `[fx-store]
+  insights:snapshot failed validation — ignoring stored value`, then
+  `# fx run — frankfurter · 1 Frankfurter + 0 Yahoo calls` (eleven held
+  pairs listed) `→ written (attention · counted=2 · pairs=11)` — the
+  fx run still wrote; the validation skip ignores a stored value, it
+  does not fail the invocation.
+
+All three acceptance criteria hold: the AU rung fired alone at 07:00;
+the four in-between minutes woke bare; the 08:50 retry ran. The
+consolidation is now observed live, end-to-end, from the deployed
+patch's own logs — the quota's single covering trigger does the work
+of the original four. Still open, unchanged: the port branch
+(feat/markets-cron-consolidation, 8e3aadbe) awaits the owner's merge;
+the watch's first fire (Nov 25 09:30 UTC, stop-on-success on 2026-10)
+is observed by the 09:40 check; the December skip-month lines begin
+Dec 1.
