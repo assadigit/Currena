@@ -161,17 +161,19 @@ export function ScenariosBand({ t, locale, fmt }: { t: ScenarioT; locale: Locale
                 <h4 className="m-0 type-label font-extrabold leading-snug text-[var(--color-text-primary)]">{s.name[lan(locale)]}</h4>
               </div>
 
-              {/* the two directions — up first, down second, never alone
-                  (colour rides with a word + an arrow) */}
+              {/* the two directions — up first, down second, never alone;
+                  the colour rides ONLY on the chip (طلا بالا / طلا پایین),
+                  the outcome sentence itself stays neutral (the owner's
+                  ask) */}
               <div className="flex flex-col gap-1.5">
-                <div className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] p-2" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-up) 8%, transparent)" }}>
+                <div className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] p-2">
                   <span className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 type-caption font-bold" style={{ color: "var(--color-return-up)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-up) 35%, transparent)" }}>
                     <TrendingUp className="h-3 w-3" aria-hidden="true" />
                     {t.upLabel}
                   </span>
                   <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{s.upCase[lan(locale)]}</p>
                 </div>
-                <div className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] p-2" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-down) 8%, transparent)" }}>
+                <div className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] p-2">
                   <span className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 type-caption font-bold" style={{ color: "var(--color-return-down)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 35%, transparent)" }}>
                     <TrendingDown className="h-3 w-3" aria-hidden="true" />
                     {t.downLabel}

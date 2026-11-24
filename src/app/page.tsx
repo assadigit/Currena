@@ -530,8 +530,10 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
       </div>
 
       {/* the trend table — every window's change in one organized table,
-          visible without a click: day · week · month · 3m · 6m · 1y · 5y · YTD,
-          each row carrying the price then, the price now, and the change */}
+          visible without a click: day · week · month · 3m · 6m · 1y · 5y · YTD.
+          The PERCENT is the number (big and bold — the owner's ask); the
+          then→now price path beside it whispers (small, muted, still
+          legible), and the rows breathe (the owner's ask). */}
       <div className="mt-3.5">
         <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{t.briefing.trendTitle}</h4>
         <p className="m-0 mt-0.5 type-caption text-[var(--color-text-tertiary)]">{t.briefing.trendNote}</p>
@@ -546,23 +548,24 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
                 TREND_RANGES.filter((r) => trends.data.some((w) => w.range === r)).map((r) => {
                   const w = trends.data.find((x) => x.range === r);
                   if (w === undefined) return null;
-                  /* the relative prices — the window's own start price → now */
+                  /* the relative prices — the window's own start price → now,
+                     whispering beside the percentage (never shouting) */
                   const startPrice = w.points.length >= 2 ? w.points[0]!.v : null;
                   const priceCell =
                     startPrice !== null ? (
-                      <bdi dir="ltr" className="tabular-nums text-[var(--color-text-secondary)]">
-                        ${fmt.num(startPrice, 0)} <span aria-hidden="true" className="text-[var(--color-text-tertiary)]">→</span> <b className="text-[var(--color-text-primary)]">${fmt.num(w.spot, 0)}</b>
+                      <bdi dir="ltr" className="text-[11px] font-normal tabular-nums text-[var(--color-text-tertiary)] opacity-75">
+                        ${fmt.num(startPrice, 0)} <span aria-hidden="true">→</span> ${fmt.num(w.spot, 0)}
                       </bdi>
                     ) : null;
                   return (
                     <tr key={r} className="border-t border-[var(--color-border)] first:border-t-0">
-                      <th scope="row" className="px-3 py-1.5 text-start font-bold text-[var(--color-text-primary)]">
+                      <th scope="row" className="px-3 py-2.5 text-start font-bold text-[var(--color-text-primary)]">
                         {t.price.windowNames[r]}
                       </th>
-                      <td className="px-3 py-1.5 text-end">
-                        <span className="flex flex-wrap items-baseline justify-end gap-x-2.5">
+                      <td className="px-3 py-2.5 text-end">
+                        <span className="flex flex-wrap items-baseline justify-end gap-x-2.5 gap-y-1">
                           {priceCell}
-                          <SignedDelta v={w.chgPct} fmt={fmt} />
+                          <SignedDelta v={w.chgPct} fmt={fmt} big />
                         </span>
                       </td>
                     </tr>
@@ -1179,6 +1182,15 @@ export default function GoldPage() {
      arrive simply does not render its section (the honest line rides
      inside the sections that partially arrive). */
   const ta = useQuery({ queryKey: ["currena-gold-ta"], queryFn: fetchTa, retry: 1 });
+  /* every trend window at once — the SAME query the briefing card runs
+     (one cache, one fetch); the Market Brief reads the YTD / 1Y windows
+     from it */
+  const trends = useQuery({
+    queryKey: ["currena-gold-trend-all"],
+    queryFn: fetchTrendAll,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
   const cb = useQuery({ queryKey: ["currena-gold-cb"], queryFn: fetchCb, retry: 1 });
   const lbma = useQuery({ queryKey: ["currena-gold-lbma"], queryFn: fetchLbma, retry: 1 });
   const premium = useQuery({ queryKey: ["currena-gold-premium"], queryFn: fetchPremium, retry: 1 });
@@ -1191,6 +1203,43 @@ export default function GoldPage() {
   const projection = useQuery({ queryKey: ["currena-gold-projection"], queryFn: fetchProjection, retry: 1 });
   const crosses = useQuery({ queryKey: ["currena-gold-crosses"], queryFn: fetchCrosses, retry: 1 });
   const rates = useQuery({ queryKey: ["currena-gold-rates"], queryFn: fetchRates, retry: 1 });
+
+  /* THE complete Market Brief — the owner's ask: the brief carries the
+     page's own verdicts, more of them. The conditions sentence and the
+     balance close stay the reviewed copy; the price-position line composes
+     live from the page's own readings — the history echo (where the price
+     has come back to, e.g. "about 15 months ago"), the 200-day distance
+     and the YTD / 1-year windows — each clause present only when its leg
+     actually arrived, never a guess. */
+  const priceLine = React.useMemo(() => {
+    const clauses: string[] = [];
+    const echoPayload = data?.gold.historyEcho ?? null;
+    if (echoPayload && echoPayload.mode === "return" && echoPayload.days !== undefined && echoPayload.days >= 1) {
+      clauses.push(t.takeaway.echo.replace("{n}", echoLookback(echoPayload.days, t, fmt)));
+    }
+    const sma = ta.data?.distance ?? null;
+    if (sma !== null && Number.isFinite(sma.pct)) {
+      const pctText = `${fmt.num(Math.abs(sma.pct), 1)}${locale === "fa" ? "٪" : "%"}`;
+      clauses.push((sma.pct >= 0 ? t.takeaway.smaAbove : t.takeaway.smaBelow).replace("{pct}", pctText));
+    }
+    /* the trend pair — one clause group: YTD and 1-year, joined with a
+       single "و"/"and" */
+    const pctWords = (v: number): string =>
+      locale === "fa"
+        ? `${fmt.num(Math.abs(v), 1)}٪ ${v < 0 ? "پایین‌تر" : "بالاتر"}`
+        : `${v < 0 ? "down" : "up"} ${fmt.num(Math.abs(v), 1)}%`;
+    const ytd = trends.data?.find((w) => w.range === "YTD")?.chgPct ?? null;
+    const yearPct = trends.data?.find((w) => w.range === "1Y")?.chgPct ?? null;
+    const trendGroup: string[] = [];
+    if (ytd !== null && ytd !== undefined && Number.isFinite(ytd)) trendGroup.push(t.takeaway.ytd.replace("{v}", pctWords(ytd)));
+    if (yearPct !== null && yearPct !== undefined && Number.isFinite(yearPct)) trendGroup.push(t.takeaway.year.replace("{v}", pctWords(yearPct)));
+    const endsOnTrend = trendGroup.length > 0;
+    if (trendGroup.length > 0) clauses.push(trendGroup.join(locale === "fa" ? " و " : " and "));
+    if (clauses.length === 0) return null;
+    const joined = clauses.join(locale === "fa" ? "؛ " : "; ");
+    /* fa wants the verb on the trailing fragment pair; EN reads fine as is */
+    return endsOnTrend && locale === "fa" ? `${joined} است.` : `${joined}.`;
+  }, [data, ta.data, trends.data, t, fmt, locale]);
 
   /* the Iranian-toman gold cross — the live free-market dollar (the
      Tehran snapshot) × the global ounce; rides the currency grid */
@@ -1252,7 +1301,14 @@ export default function GoldPage() {
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.takeaway.title}</h2>
-            <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.takeaway.body}</p>
+            <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+              {t.takeaway.body} <span className="font-bold text-[var(--color-text-primary)]">{t.takeaway.close}</span>
+            </p>
+            {priceLine !== null ? (
+              <p className="m-0 mt-1.5 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]" data-takeaway-price-line>
+                {priceLine}
+              </p>
+            ) : null}
           </div>
         </section>
 

@@ -219,6 +219,9 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
      stay in the open) */
   const [open, setOpen] = React.useState(false);
   const [fibOpen, setFibOpen] = React.useState(false);
+  /* the three plain-language concept facts — behind their own expandable
+     (the owner's ask: the reading keys hide until asked for) */
+  const [factsOpen, setFactsOpen] = React.useState(false);
   const lastFibTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const dist = data.distance;
   const basisSpanDays = data.span.bars > 335
@@ -351,16 +354,32 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
         </div>
       ) : null}
 
-      {/* the three facts — plain-language reading keys for the whole band */}
-      <div className="mt-2.5 grid grid-cols-1 gap-2 lg:grid-cols-3">
-        {[t.factSma, t.factCross, t.factFib].map((fact, i) => (
-          <div key={i} className="flex items-start gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] p-2.5 ring-1 ring-[var(--color-accent-gold)]/25">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold text-[var(--color-accent-gold-ink)]" style={{ background: "var(--color-accent-gold)" }} aria-hidden="true">
-              {locale === "en" ? i + 1 : ["۱", "۲", "۳"][i]}
-            </span>
-            <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{fact}</p>
+      {/* the three concept facts — the plain-language reading keys, behind
+          ONE expandable tap (the owner's ask: میانگین ۲۰۰ روزه…، تلاقی
+          طلایی…، فیبوناچی… hide until asked for) */}
+      <div className="mt-2.5">
+        <button
+          type="button"
+          aria-expanded={factsOpen}
+          aria-controls="gold-ta-facts"
+          onClick={() => setFactsOpen((o) => !o)}
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+        >
+          {factsOpen ? t.factsClose : t.factsOpen}
+          <ChevronDown className={`h-3.5 w-3.5 transition-transform ${factsOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+        </button>
+        {factsOpen ? (
+          <div id="gold-ta-facts" className="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-3">
+            {[t.factSma, t.factCross, t.factFib].map((fact, i) => (
+              <div key={i} className="flex items-start gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] p-2.5 ring-1 ring-[var(--color-accent-gold)]/25">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold text-[var(--color-accent-gold-ink)]" style={{ background: "var(--color-accent-gold)" }} aria-hidden="true">
+                  {locale === "en" ? i + 1 : ["۱", "۲", "۳"][i]}
+                </span>
+                <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{fact}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : null}
       </div>
 
       {open ? (

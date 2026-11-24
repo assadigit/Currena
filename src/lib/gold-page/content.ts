@@ -197,7 +197,7 @@ export const UI = {
       assessment: "Conditions moderately pressure gold",
       chipMonths: "Next 1–3 months",
       chipMonthsLean: "leans against gold",
-      whyTitle: "Factors affecting the gold price",
+      whyTitle: "Key factors at work right now",
       evidence: "Evidence",
       howItWorks: "How it works",
       factorButton: "Open the explanation, {name}",
@@ -257,7 +257,7 @@ export const UI = {
       eyebrow: "The calendar",
       title: "What's coming · the events that can bend gold",
       subtitle:
-        "The next releases that can change gold's path: the Fed's rate decisions, inflation, jobs and growth. Events marked ≈ sit near their usual slot, the agency fixes the exact date when it announces it.",
+        "The next releases that can change gold's path: {events}. Events marked ≈ sit near their usual slot, the agency fixes the exact date when it announces it.",
       impactHigh: "high impact",
       impactMed: "medium",
       daysAway: "in {n} days",
@@ -455,6 +455,8 @@ export const UI = {
       spanYears: "{years} years",
       showLabel: "Show the tables",
       hideLabel: "Hide the tables",
+      factsOpen: "Plain-language reading keys",
+      factsClose: "Hide the reading keys",
     },
     centralBanks: {
       eyebrow: "Central banks",
@@ -706,13 +708,19 @@ export const UI = {
     takeaway: {
       title: "Market Brief",
       body:
-        "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights. The balance leans against: conditions, not a forecast.",
-      explore: "Explore the five forces",
+        "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights.",
+      close: "The balance leans against: conditions, not a forecast.",
+      /* The price-position line, composed live from the page's own
+         verdicts: the history echo (where the price has come back to),
+         the 200-day distance, and the YTD / 1-year windows. */
+      echo: "The price has returned to where it traded about {n} ago",
+      smaBelow: "sits {pct} below its 200-day average",
+      smaAbove: "sits {pct} above its 200-day average",
+      ytd: "{v} year-to-date",
+      year: "{v} over the past year",
     },
     te: {
       title: "Trading Economics daily gold briefing",
-      subtitle: "خلاصهٔ روزانهٔ بازار طلا",
-      seriesLine: "The gold page's news-stream top item · the briefing box, verbatim, twice daily",
       // The fa layer's honest labels (TE spec §5); unused in EN rendering —
       // the shared copy type keeps both bundles the same shape.
       mtLabel: "Machine translation",
@@ -726,14 +734,10 @@ export const UI = {
         "Trading Economics has not been reachable for {n} fire(s) since {date} — no proxy, no arms race; the last captured briefing stays above, dated.",
       stateAlert:
         "The source's page template changed and the briefing could not be read; the last known good is shown. A human must look.",
-      coverageLine:
-        "The record begins {date} — the stream exposes only the latest three items; nothing earlier is backfilled.",
       unavailable: "The daily briefing did not arrive; nothing is shown rather than a guess.",
     },
     wgc: {
       title: "World Gold Council monthly commentary",
-      subtitle: "نگارش ماهانهٔ شورای جهانی طلا",
-      seriesLine: "Gold Market Commentary · the Highlights box, verbatim, once a month",
       issueLabel: "{month} in review",
       // The fa layer's honest labels (spec §8); unused in EN rendering — the
       // shared copy type keeps both bundles the same shape.
@@ -748,8 +752,6 @@ export const UI = {
       stateAlert:
         "The source's page template changed and the highlights could not be read; the last known good is shown. A human must look.",
       stateSkip: "The series publishes no June or November issue.",
-      preBox:
-        "The Highlights box was added to this series with the March 2025 issue; the 22 earlier issues (January 2023 – February 2025) carried none and are not backfilled.",
       unavailable: "The monthly commentary did not arrive; nothing is shown rather than a guess.",
     },
     footer: {
@@ -800,7 +802,7 @@ export const UI = {
       assessment: "شرایط به‌اندازهٔ متوسط بر طلا فشار می‌آورد",
       chipMonths: "۱ تا ۳ ماه آینده",
       chipMonthsLean: "علیه طلا می‌چرخد",
-      whyTitle: "فاکتورهای تاثیرگذار بر قیمت طلا",
+      whyTitle: "فاکتورهای شاخص تاثیرگذار کنونی",
       evidence: "شواهد",
       howItWorks: "چگونه کار می‌کند",
       factorButton: "گشودن توضیح؛ {name}",
@@ -859,7 +861,7 @@ export const UI = {
     calendar: {
       eyebrow: "تقویم",
       title: "چه چیزی در راه است · رویدادهایی که مسیر طلا را می‌چرخانند",
-      subtitle: "انتشارهای بعدی که می‌توانند مسیر طلا را عوض کنند: تصمیم نرخ فدرال رزرو، تورم، اشتغال و رشد. رویدادهای علامت‌گذاری‌شده با ≈ نزدیک جایگاه همیشگی‌شان‌اند؛ نهاد مربوطه تاریخ دقیق را هنگام اعلام می‌بندد.",
+      subtitle: "انتشارهای بعدی که می‌توانند مسیر طلا را عوض کنند: {events}. رویدادهای علامت‌گذاری‌شده با ≈ نزدیک جایگاه همیشگی‌شان‌اند؛ نهاد مربوطه تاریخ دقیق را هنگام اعلام می‌بندد.",
       impactHigh: "اثر زیاد",
       impactMed: "متوسط",
       daysAway: "{n} روز بعد",
@@ -1052,6 +1054,8 @@ export const UI = {
       spanYears: "{years} سال",
       showLabel: "نمایش جدول‌ها",
       hideLabel: "بستن جدول‌ها",
+      factsOpen: "مفاهیم پایه به زبان ساده",
+      factsClose: "بستن مفاهیم پایه",
     },
     centralBanks: {
       eyebrow: "بانک‌های مرکزی",
@@ -1299,13 +1303,19 @@ export const UI = {
     takeaway: {
       title: "مرور بازار",
       body:
-        "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند. ترازو علیه می‌چرخد؛ شرایط، نه پیش‌بینی.",
-      explore: "پنج نیرو را کاوش کن",
+        "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند.",
+      close: "ترازو علیه می‌چرخد؛ شرایط، نه پیش‌بینی.",
+      /* سطر جایگاه قیمت — از خودِ حکم‌های صفحه زنده ساخته می‌شود:
+         بازگشت به قیمتِ گذشته، فاصله از میانگین ۲۰۰ روزه و پنجره‌های
+         ابتدای سال و یک‌ساله. */
+      echo: "قیمت به حدود {n} پیشِ خودش بازگشته است",
+      smaBelow: "{pct} پایین‌تر از میانگین ۲۰۰ روزه‌اش ایستاده",
+      smaAbove: "{pct} بالاتر از میانگین ۲۰۰ روزه‌اش ایستاده",
+      ytd: "از ابتدای سال میلادی {v}",
+      year: "در یک سال گذشته {v}",
     },
     te: {
       title: "خلاصهٔ روزانهٔ بازار طلا",
-      subtitle: "Trading Economics · the daily gold briefing",
-      seriesLine: "خلاصهٔ خبری صفحهٔ طلا · متن اصلی، واژه‌به‌واژه، دو بار در روز",
       // The honest label spec §5 mandates above the machine-translated
       // Farsi — exactly those words, never softened — and the caption over
       // the English original below it.
@@ -1320,14 +1330,10 @@ export const UI = {
         "از {date} تاکنون ({n} بار) Trading Economics در دسترس نبوده — بدون پروکسی، بدون جنگ‌افزار؛ آخرین خلاصهٔ ثبت‌شده بالا می‌ماند، با تاریخ خودش.",
       stateAlert:
         "قالب صفحهٔ منبع تغییر کرده و خلاصه خوانده نشد؛ آخرین نسخهٔ سالم نشان داده می‌شود. باید دستی بررسی شود.",
-      coverageLine:
-        "سابقهٔ ثبت از {date} آغاز می‌شود — این جریان فقط سه خبر آخر را نشان می‌دهد؛ چیزی از پیش از آن بازخوانی نشده است.",
       unavailable: "خلاصهٔ روزانه نرسید؛ به‌جای حدس، هیچ‌چیز نشان داده نمی‌شود.",
     },
     wgc: {
       title: "نگارش ماهانهٔ شورای جهانی طلا",
-      subtitle: "World Gold Council · Gold Market Commentary",
-      seriesLine: "نگارش ماهانهٔ «توضیح بازار طلا» · جعبهٔ هایلایت‌ها، واژه‌به‌واژه، ماهی یک بار",
       issueLabel: "مرور {month}",
       // The honest label spec §8 mandates above the machine-translated
       // Farsi — exactly those words, never softened — and the caption over
@@ -1343,8 +1349,6 @@ export const UI = {
       stateAlert:
         "قالب صفحهٔ منبع تغییر کرده و هایلایت‌ها خوانده نشد؛ آخرین نسخهٔ سالم نشان داده می‌شود. باید دستی بررسی شود.",
       stateSkip: "این مجموعه در ژوئن و نوامبر شماره منتشر نمی‌کند.",
-      preBox:
-        "جعبهٔ «هایلایت‌ها» از شمارهٔ مارس ۲۰۲۵ به این مجموعه افزوده شده است؛ ۲۲ شمارهٔ پیش از آن (ژانویه ۲۰۲۳ تا فوریه ۲۰۲۵) هایلایت نداشتند و بازخوانی نشده‌اند.",
       unavailable: "نگارش ماهانه نرسید؛ به‌جای حدس، هیچ‌چیز نشان داده نمی‌شود.",
     },
     footer: {
@@ -1519,7 +1523,7 @@ export const LANE_CONTENT: Record<LaneId, { label: [string, string]; intro: [str
   },
   stress: {
     label: ["Market stress & uncertainty", "تنش و عدم قطعیت بازار"],
-    short: ["stress", "تنش"],
+    short: ["market stress", "تنش بازار"],
     intro: ["Fear and doubt, the safe-haven bid gold answers to.", "ترس و تردید؛ همان تقاضای پناهگاهی که طلا به آن پاسخ می‌دهد."],
   },
   inflation: {

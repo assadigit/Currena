@@ -2362,3 +2362,93 @@ fa translations (00:40 UTC job), the first real fire's observation
 translations), and the WGC fa row (its own 00:20 UTC job). Nothing
 else remains — the pipeline is complete, deployed, and verified to the
 quota line.
+
+### The owner's nine UI refinements, shipped end to end (2026-11-25, the polish sitting)
+
+The owner reviewed the live gold page and asked for nine refinements —
+all shipped, browser-verified in both locales, deployed, and pushed:
+
+1. **The Market Brief grew a live price-position line** — the owner's
+   ask: "more complete, it doesn't mention the 15-month retrace." The
+   takeaway's conditions sentence and balance close stay the reviewed
+   copy; beneath them a second line now composes LIVE from the page's
+   own verdicts — the history echo (the 15-month retraction, only in
+   its return mode), the 200-day distance (the TA leg's own reading)
+   and the YTD / 1-year windows (the SAME trend-all query the briefing
+   card runs — one cache, one fetch). Each clause present only when
+   its leg actually arrived; fail-closed to absent, never a guess.
+   fa composes with «؛» joiners and the trailing «است»; EN with
+   semicolons. Verified live text: «قیمت به حدود ۱۵ ماه پیشِ خودش
+   بازگشته است؛ ۱۴٫۷٪ پایین‌تر از میانگین ۲۰۰ روزه‌اش ایستاده؛ از
+   ابتدای سال میلادی ۱۸٫۸٪ پایین‌تر و در یک سال گذشته ۱۴٫۷٪
+   پایین‌تر است.»
+2. **The briefing trend table's hierarchy flipped** — the PERCENT is
+   now the number (SignedDelta grew a `big` variant: 15px extrabold),
+   the then→now price path whispers beside it (11px, tertiary ink,
+   75% opacity, no bold), and the rows breathe (py-2.5 + gap-y-1).
+3. **whyTitle renamed**: «فاکتورهای تاثیرگذار بر قیمت طلا» →
+   «فاکتورهای شاخص تاثیرگذار کنونی» (EN: "Key factors at work
+   right now").
+4. **The TE card's chrome de-bilingualized** — the owner's words:
+   one language, one title. «خلاصهٔ روزانهٔ بازار طلا» is now a real
+   h2 (1.25rem extrabold) in fa mode, the English title in EN mode;
+   the mirrored subtitle, the seriesLine («خلاصهٔ خبری صفحهٔ طلا…»)
+   and the coverage note («سابقهٔ ثبت از ۲ آذر…») are gone from both
+   bundles and both interfaces. The honest states and the meta line
+   (with the Trading Economics link) ride the card unchanged.
+5. **The WGC card, the same treatment** — «نگارش ماهانهٔ شورای جهانی
+   طلا» as the single-language h2; the subtitle, seriesLine and the
+   pre-box note («جعبهٔ هایلایت‌ها از شمارهٔ مارس ۲۰۲۵…») removed.
+   And the brass balance's stress pan now reads «تنش بازار» (the
+   short lane label, EN "market stress") — the owner's precision on
+   what "تنش" meant.
+6. **The scenarios' outcome rows lost their red/green washes** — the
+   tinted backgrounds are gone; the colour rides ONLY on the «طلا
+   بالا» / «طلا پایین» chips (verified: 0 tinted divs, 10 chips).
+7. **The calendar's description became 1:1** — the owner's ask: the
+   text must name exactly what the calendar lists. The subtitle is
+   now BUILT from the very same `events` array the rows render
+   (distinct kinds, joined «، … و …» / ", … and …"), the header chip
+   carries the same kinds compact (EventDef grew a `short` label),
+   and the merged expectations leg's entries join the same list.
+   Live fa: «ادعای بیکاری، گزارش اشتغال آمریکا (NFP)، شاخص PCE …،
+   تصمیم نرخ فدرال رزرو (FOMC)، تورم آمریکا (CPI)، … و رشد
+   اقتصادی آمریکا (برآورد اولیه).» — never a second hand-written
+   list that can drift.
+8. **The alternatives graph doubled** — TraceChart grew a
+   `responsive` mode: the canvas width follows the container
+   (clamped 320–640, ResizeObserver, SSR-safe default 640, pads
+   absolute so labels never leave the frame). On a 375px phone the
+   compare chart now renders 319×299 (was 319×115 — text, strokes
+   and height all ~2×), with height 300; on desktop 976×458, zero
+   overflow either way.
+9. **The TA concepts moved behind one expandable** — the three
+   plain-language facts (میانگین ۲۰۰ روزه…، تلاقی طلایی…، فیبوناچی…)
+   hide behind the «مفاهیم پایه به زبان ساده» toggle button
+   (aria-expanded + aria-controls, the house pattern), verified
+   open/close in the browser.
+
+The sitting's own honest findings, stated: the shell heredoc EATS
+Persian text (the known quirk — python scripts written through the
+file tools, never bash heredocs, for copy edits), and one edit
+ordering slip (a memo referencing `ta` before its declaration) was
+caught by the browser's ReferenceError and fixed before anything
+shipped. Lint clean; the dev log clean; the browser walk: zero page
+errors, zero console errors, fa + EN, 375px (351px cards, zero
+overflow), dark mode, desktop 1280 (976px chart, zero overflow).
+Four evidence PNGs recorded (owner-feedback-fa-mobile375,
+owner-feedback-fa-dark-top, final-fa-market-brief, final-fa-te-wgc,
+final-fa-compare).
+
+**Deployed** on the two-step OpenNext runbook
+(NEXT_PUBLIC_BASE_PATH=/gold on both, the dev server paused around
+the build and restarted after): currena-gold-desk version
+3c2d76ae-ca08-4afe-84c2-73aae7f1a1b5. Live checks green: currena.ir
+200, currena.ir/gold 200, the te-briefing and wgc-commentary routes
+200 with their real payloads; the served HTML carries the new copy
+(the old-only strings — "Explore the five forces", the te seriesLine,
+the wgc pre-box, the hand-written calendar list — all gone).
+
+The quota note stands as the owner stated it: the daily and monthly
+reports' Latin bodies are temporarily accepted while the AI workers
+quota resets; the fa layers ride their armed jobs exactly as before.

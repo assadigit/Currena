@@ -7,8 +7,9 @@
  * sit together) with the WGC monthly card following it.
  *
  * What it shows, honestly:
- *  - The bilingual chrome: the fa title «خلاصهٔ روزانهٔ بازار طلا» with
- *    the EN subtitle (mirrored in EN), on the house card patterns.
+ *  - The header: one language, one title — «خلاصهٔ روزانهٔ بازار طلا» in
+ *    fa (the h2 the owner asked for, never a second language beside it),
+ *    the English title in EN — on the house card patterns.
  *  - fa mode, when a fresh Persian translation is stored (§5): the
  *    Farsi renders as the PRIMARY RTL text under the honest
  *    «ترجمهٔ ماشینی» label — the non-negotiable — with the English
@@ -25,9 +26,6 @@
  *    the no-arms-race posture, the last known good stays served,
  *    dated), and structure_alert (the template changed; the last
  *    known good serves, a human must look).
- *  - The record-basis note: the coverage begins at the seed date —
- *    the stream exposes the latest three items only, nothing earlier
- *    is backfilled (§8/§9), stated, never hidden.
  *
  * Served by the desk's own read-only route /api/gold/te-briefing
  * (D1 only); fail-closed like every house leg.
@@ -94,8 +92,6 @@ async function fetchTe(): Promise<TeLatest> {
 
 export interface TeCardCopy {
   title: string;
-  subtitle: string;
-  seriesLine: string;
   /** The honest machine-translation label (§5's non-negotiable) — fa only. */
   mtLabel: string;
   /** The caption over the English original below the Farsi translation — fa only. */
@@ -106,7 +102,6 @@ export interface TeCardCopy {
   stateWaiting: string;
   stateFetchFailed: string;
   stateAlert: string;
-  coverageLine: string;
   unavailable: string;
 }
 
@@ -187,7 +182,6 @@ export function TeCard({
   /* the served briefing's own honest-state fields (the alert carries them inside lastKnownGood) */
   const flat = d?.status === "ok" ? d : (d?.lastKnownGood ?? null);
   const fetchFailed = flat?.fetchFailed ?? null;
-  const coverage = flat?.coverageSince ?? null;
 
   /* the Persian layer serves only the fa page, only when actually stored */
   const fa = locale === "fa" && briefing?.fa && briefing.fa.body !== "" ? briefing.fa : null;
@@ -196,7 +190,6 @@ export function TeCard({
   const fetched = dateWordsOf(briefing?.fetchedAt, fmt);
   const nextFire = fireWordsOf(d?.nextFireAt, locale);
   const failedSince = dateWordsOf(fetchFailed?.since, fmt);
-  const coverageWords = dateWordsOf(coverage, fmt);
 
   return (
     <section
@@ -204,16 +197,9 @@ export function TeCard({
       aria-label={t.title}
       className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-currena-bg-light)] p-4 ring-1 ring-[var(--color-border)] sm:p-5"
     >
-      {/* the bilingual header — the fa title with the EN subtitle (mirrored in EN) */}
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-        <h2 className="type-kicker m-0" style={{ color: "var(--bal-brass-text)" }}>
-          {t.title}
-        </h2>
-        <span dir={locale === "fa" ? "ltr" : "rtl"} className="type-caption text-[var(--color-text-tertiary)]">
-          {t.subtitle}
-        </span>
-      </div>
-      <p className="m-0 mt-0.5 type-caption text-[var(--color-text-tertiary)]">{t.seriesLine}</p>
+      {/* the header — one language, one title: the fa h2 in fa mode, the
+          EN h2 in EN mode, never both (the owner's ask) */}
+      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
 
       {/* the honest states — riding the same card, each a stated fact */}
       {q.isError ? (
@@ -314,11 +300,6 @@ export function TeCard({
           </p>
         </>
       ) : null}
-
-      {/* the record-basis note — the coverage floor stated, never hidden */}
-      <p className="m-0 mt-2.5 border-t border-[var(--color-border)] pt-2 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">
-        {t.coverageLine.replace("{date}", coverageWords ?? "—")}
-      </p>
     </section>
   );
 }

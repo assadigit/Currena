@@ -173,6 +173,13 @@ export interface TraceChartProps {
    *  series with dots + price tags, and to widen the Y axis to five ticks
    *  (the hero's single-line chart: the price points read without hovering). */
   pricePoints?: boolean;
+  /** True to draw the canvas 1:1 on narrow screens: the viewBox width
+   *  follows the container (clamped 320–640), so on a phone the whole
+   *  graph renders ~2× its squeezed size — text, strokes and height —
+   *  instead of a 0.5-scale miniature (the owner's "100% bigger" ask
+   *  for the alternatives chart). Wide screens keep the house 640-unit
+   *  canvas exactly as before. */
+  responsive?: boolean;
 }
 
 /**
@@ -193,12 +200,27 @@ export function TraceChart({
   baseline = null,
   hoverNote = null,
   pricePoints = false,
+  responsive = false,
 }: TraceChartProps) {
   const [hoverT, setHoverT] = React.useState<number | null>(null);
   const traceRef = React.useRef<HTMLDivElement | null>(null);
+  /* the responsive canvas width — measured from the container after
+     mount (SSR renders the default 640, the observer corrects it; the
+     pads stay absolute so the labels never leave the frame) */
+  const [boxW, setBoxW] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    if (!responsive) return;
+    const el = traceRef.current;
+    if (el === null) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) setBoxW(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [responsive]);
+  const W = responsive ? Math.max(320, Math.min(640, Math.round(boxW ?? 640))) : 640;
 
   const model = React.useMemo(() => {
-    const W = 640;
     const H = height;
     const padL = 10;
     const padR = yFormatRight !== undefined ? 92 : 64;
@@ -314,7 +336,7 @@ export function TraceChart({
       }
     }
     return { W, H, padL, padR, padT, padB, tMin, tMax, vMin, vMax, rMin, rMax, xOf, yOf, yOfLeft, yOfRight, pathOf, ticks, yTicks, rightTicks, hasRight, markers };
-  }, [series, height, baseline, fmt, yFormat, yFormatRight, pricePoints]);
+  }, [series, height, baseline, fmt, yFormat, yFormatRight, pricePoints, W]);
 
   /* the pointer trace — the crosshair locks to the nearest date */
   const onPointer = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -533,12 +555,14 @@ export const STATE_INK: Record<SeatState, { ink: string; chip: string; glyph: st
   unread: { ink: "var(--color-text-tertiary)", chip: "var(--color-text-tertiary)", glyph: "◌" },
 };
 
-/** The signed-return word (direction channel — loud hues + sign + triangle). */
-export function SignedDelta({ v, fmt, ariaHidden }: { v: number | null; fmt: Fmt; ariaHidden?: boolean }) {
+/** The signed-return word (direction channel — loud hues + sign + triangle);
+ *  `big` renders the briefing table's own emphasis size (the owner's ask:
+ *  the percentage is the number, everything else whispers). */
+export function SignedDelta({ v, fmt, ariaHidden, big }: { v: number | null; fmt: Fmt; ariaHidden?: boolean; big?: boolean }) {
   if (v === null || !Number.isFinite(v)) return <bdi className="type-caption text-[var(--color-text-tertiary)]" aria-hidden={ariaHidden}>·</bdi>;
   const down = v < 0;
   return (
-    <bdi dir="ltr" className={`font-bold ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
+    <bdi dir="ltr" className={`${big ? "text-[15px] font-extrabold" : "type-caption font-bold"} ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
       {down ? "▼" : "▲"} {fmt.pct(Math.abs(v)).replace("+", "")}
     </bdi>
   );

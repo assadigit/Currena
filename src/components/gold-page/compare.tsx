@@ -247,7 +247,8 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
           <div className="mt-2.5">
             <TraceChart
               series={series}
-              height={230}
+              height={300}
+              responsive
               baseline={100}
               yFormat={(v) => fmt.num(v, 0)}
               yFormatRight={(v) => `${fmt.num(v, 1)}%`}

@@ -35,6 +35,15 @@ import {
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
+/** The 1:1 list joiner — «الف، ب و ج» in fa, "a, b and c" in EN. */
+function joinList(items: readonly string[], locale: Locale): string {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0]!;
+  const last = items[items.length - 1]!;
+  const rest = items.slice(0, -1);
+  return locale === "fa" ? `${rest.join("، ")} و ${last}` : `${rest.join(", ")} and ${last}`;
+}
+
 type CalT = {
   eyebrow: string;
   title: string;
@@ -61,6 +70,8 @@ export interface EventDef {
   country: string;
   flagCode: string;
   name: [string, string];
+  /** The chip's own compact label (the header pill's kind list). */
+  short: [string, string];
   why: [string, string];
   impact: "high" | "med" | null;
 }
@@ -83,6 +94,7 @@ const FOMC_DEF: EventDef = {
   country: "US",
   flagCode: "USA",
   name: ["Fed rate decision (FOMC)", "تصمیم نرخ فدرال رزرو (FOMC)"],
+  short: ["Fed", "فدرال رزرو"],
   why: [
     "Sets the cost of the dollar, the single biggest scheduled re-weighing of gold's zero-yield rival: cash.",
     "هزینهٔ دلار را تعیین می‌کند؛ بزرگ‌ترین بازسنجی زمان‌بندی‌شدهٔ رقیب بدون‌بازدهی طلا، یعنی پول نقد.",
@@ -97,6 +109,7 @@ const FIXED_EVENTS: ReadonlyArray<{ date: string; def: EventDef }> = [
     country: "EU",
     flagCode: "EURO",
     name: ["ECB rate decision", "تصمیم نرخ بانک مرکزی اروپا"] as [string, string],
+    short: ["ECB", "بانک مرکزی اروپا"] as [string, string],
     why: [
       "The euro side of the dollar: a dovish ECB weakens the dollar's rival and lifts gold's wind.",
       "سمت یوروییِ دلار؛ بانک مرکزی اروپای انبساطی، رقیب دلار را ضعیف و باد طلا را قوی می‌کند.",
@@ -108,6 +121,7 @@ const FIXED_EVENTS: ReadonlyArray<{ date: string; def: EventDef }> = [
     country: "GB",
     flagCode: "GBR",
     name: ["Bank of England rate decision", "تصمیم نرخ بانک انگلستان"] as [string, string],
+    short: ["BoE", "بانک انگلستان"] as [string, string],
     why: [
       "Sterling's own rate path: a sideshow for gold, but it moves the dollar crosses.",
       "مسیر نرخ پوند؛ برای طلا برنامهٔ فرعی است، اما کراس‌های دلار را تکان می‌دهد.",
@@ -119,6 +133,7 @@ const FIXED_EVENTS: ReadonlyArray<{ date: string; def: EventDef }> = [
     country: "JP",
     flagCode: "JPN",
     name: ["Bank of Japan rate decision", "تصمیم نرخ بانک ژاپن"] as [string, string],
+    short: ["BoJ", "بانک ژاپن"] as [string, string],
     why: [
       "The low-rate anchor of the world: a BoJ normalisation moves every yield, gold's included.",
       "لنگر کم‌نرخِ جهان؛ نرمال‌سازی بانک ژاپن همهٔ بازدهی‌ها را تکان می‌دهد، از جمله بازدهیِ رقیب طلا.",
@@ -143,6 +158,7 @@ const RULE_EVENTS: ReadonlyArray<{
       country: "US",
       flagCode: "USA",
       name: ["US jobs report (NFP)", "گزارش اشتغال آمریکا (NFP)"] as [string, string],
+      short: ["jobs", "اشتغال"] as [string, string],
       why: [
         "The Fed's other mandate: strong jobs keep policy tight; a shock number moves gold within seconds.",
         "مأموریت دیگر فدرال رزرو؛ اشتغال قوی سیاست را سخت نگه می‌دارد و عدد شوکی طلا را در چند ثانیه تکان می‌دهد.",
@@ -168,6 +184,7 @@ const RULE_EVENTS: ReadonlyArray<{
       country: "US",
       flagCode: "USA",
       name: ["US CPI (inflation)", "تورم آمریکا (CPI)"] as [string, string],
+      short: ["CPI", "تورم"] as [string, string],
       why: [
         "Hot prints push the Fed path higher, real yields up and gold down; soft prints do the reverse.",
         "اعداد داغ مسیر فدرال رزرو را بالا می‌برند؛ بازدهی واقعی بالا، طلا پایین و اعداد ملایم برعکس.",
@@ -188,6 +205,7 @@ const RULE_EVENTS: ReadonlyArray<{
       country: "US",
       flagCode: "USA",
       name: ["US PCE (the Fed's gauge)", "شاخص PCE (سنجهٔ خود فدرال رزرو)"] as [string, string],
+      short: ["PCE", "PCE"] as [string, string],
       why: [
         "The inflation measure the FOMC actually targets, the one that dates the pivot.",
         "سنجهٔ تورمی که FOMC واقعاً هدف می‌گیرد؛ همان که تاریخِ چرخش را می‌نهد.",
@@ -208,6 +226,7 @@ const RULE_EVENTS: ReadonlyArray<{
       country: "US",
       flagCode: "USA",
       name: ["Jobless claims", "ادعای بیکاری"] as [string, string],
+      short: ["claims", "ادعای بیکاری"] as [string, string],
       why: [
         "The weekly pulse of the labour market: small alone, but it nudges the odds.",
         "نبض هفتگی بازار کار؛ به‌تنهایی کوچک، اما شانس‌ها را کمی تکان می‌دهد.",
@@ -229,6 +248,7 @@ const RULE_EVENTS: ReadonlyArray<{
       country: "US",
       flagCode: "USA",
       name: ["US GDP (advance)", "رشد اقتصادی آمریکا (برآورد اولیه)"] as [string, string],
+      short: ["GDP", "رشد"] as [string, string],
       why: [
         "Growth sets the rate path's ceiling: strong growth keeps the Fed patient.",
         "رشد سقف مسیر نرخ را می‌سازد؛ رشد قوی فدرال رزرو را صبور نگه می‌دارد.",
@@ -254,6 +274,7 @@ const RULE_EVENTS: ReadonlyArray<{
       country: "US",
       flagCode: "USA",
       name: ["Flash PMI", "شاخص PMI (سریع)"] as [string, string],
+      short: ["PMI", "PMI"] as [string, string],
       why: [
         "The month's first growth read: risk appetite's early dial.",
         "اولین قرائت رشدِ ماه؛ عقربهٔ زودهنگامِ اشتها به ریسک.",
@@ -398,6 +419,7 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
           country: juris?.country ?? "",
           flagCode: juris?.flagCode ?? "",
           name: [c.titleEn || c.id, c.titleFa || c.titleEn || c.id],
+          short: [c.titleEn || c.id, c.titleFa || c.titleEn || c.id],
           why: ["", ""],
           impact: null,
         },
@@ -406,6 +428,31 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
     out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.key < b.key ? -1 : 1));
     return out;
   }, [now, merged.data]);
+
+  /* THE 1:1 description — the owner's ask: the subtitle names exactly the
+     event kinds the calendar below actually lists (built from the very
+     same `events` array, never a second hand-written list), and the header
+     chip carries the same kinds, compact */
+  const distinctKinds = React.useMemo(() => {
+    const seen = new Set<string>();
+    const out: UpcomingEvent[] = [];
+    for (const e of events) {
+      if (seen.has(e.def.id)) continue;
+      seen.add(e.def.id);
+      out.push(e);
+    }
+    return out;
+  }, [events]);
+  const kindNames = React.useMemo(() => distinctKinds.map((e) => e.def.name[lan(locale)]), [distinctKinds, locale]);
+  const subtitleText = t.subtitle.replace("{events}", events.length === 0 ? "…" : joinList(kindNames, locale));
+  const chipShorts = React.useMemo(
+    () =>
+      distinctKinds
+        .map((e) => e.def.short[lan(locale)])
+        .filter((s) => s.length <= 16)
+        .slice(0, 4),
+    [distinctKinds, locale],
+  );
 
   /* the three next events show at once; the rest ride the expandable */
   const [open, setOpen] = React.useState(false);
@@ -488,10 +535,10 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-2.5 py-1 type-caption font-bold text-[var(--color-currena-blue-deep)]">
           <Landmark className="h-3.5 w-3.5" aria-hidden="true" />
-          {locale === "en" ? "Fed · CPI · jobs · PCE" : "فدرال رزرو · تورم · اشتغال · PCE"}
+          {chipShorts.length > 0 ? chipShorts.join(" · ") : "…"}
         </span>
       </div>
-      <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
+      <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{subtitleText}</p>
 
       {now === null ? (
         <p className="m-0 mt-3 type-caption text-[var(--color-text-tertiary)]" aria-live="polite">
