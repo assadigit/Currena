@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1. **Yes** — the Persian title «نگارش ماهانهٔ شورای جهانی طلا» appears at the top right of the card, with a subtitle line and date «مرور اکتبر ۲۰۲۶» below it.\n\n2. **Yes** — a bordered blockquote contains \"October in review\" and \"Looking ahead\" headings with English body text, correctly rendered left-to-right (LTR) despite the RTL page context.\n\n3. **Yes** — a small meta line at the bottom right of the card reads «انتشار ۱۴ آبان ۱۴۰۵ · بازخوانی: ۳ آبان ۱۴۰۵ · منبع: World Gold Council», with \"World Gold Council\" as a linked attribution.\n\n4. **No visual defects** — no overlapping, cut-off, or broken elements; spacing, alignment, and the RTL/LTR mixing all look clean.",
+        "reasoning_content": "Answer each.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795487782,
+  "id": "20261124103614df73867197b542a1",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "20261124103614df73867197b542a1",
+  "usage": {
+    "completion_tokens": 196,
+    "completion_tokens_details": {
+      "reasoning_tokens": 3
+    },
+    "prompt_tokens": 1099,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1295
+  }
+}

@@ -1451,3 +1451,119 @@ partial and the dispatch would not recognize the covering expression).
 Port the time-based dispatch and the single covering cron into the
 source repo — the deployed patch (kept at the rollback path above) is
 the reference implementation.
+
+### The follow-up sitting: the checks re-armed, the rollback kit restored, the source port landed (2026-11-24, 02:15–03:00 UTC)
+
+The sitting opened to verify the two scheduled observations — and the
+clock settled it first: **02:14 UTC, before both checks** (09:10 UTC
+today, 09:40 UTC Nov 25) and before the fires they observe (the patch
+itself is only ~25 minutes old at open — the consolidation ran 01:50Z,
+the commit 01:53:48Z). Neither observation could have landed; the
+honest finding is below, plus what the sitting found and fixed.
+
+- **The scheduled checks were mis-armed — deleted and re-armed.** The
+  two one_time jobs carried epoch-millisecond expressions
+  (1795511400000 / 1795599600000 = 2026-11-24 09:10Z / 2026-11-25
+  09:40Z) that the scheduler parsed as SECONDS: their computed
+  next_run read year 58867/58870 — they would never have fired, and
+  both acceptance observations would have silently never happened.
+  Both deleted and re-armed as jobs 545524/545525 with unambiguous
+  Shanghai-local datetime strings (17:10 / 17:40 +08:00 = 09:10 /
+  09:40 UTC; the service rejects tz="UTC" strings as "already past" —
+  it parses in its server timezone), payloads updated with the
+  deployed patch's VERIFIED log formats (read out of the live bundle:
+  the AU success head `arkets-au] main: N written · M held · X Yahoo
+  calls`; the wake `arkets] covering-cron wake at HH:MM UTC (day D) —
+  no job at this minute` — the leading `[m` was eaten when the
+  original source's template strings were written, cosmetic and known)
+  and the housekeeping notes for the re-cloned tree.
+- **The fresh-sandbox recovery.** This sandbox booted clean:
+  /home/z/currena re-cloned from GitHub (HEAD 90af2645 confirmed, the
+  remote token-scrubbed), /tmp/markets-inspect/obs-query.json
+  recreated (the query body the checks reference, no credentials).
+- **The live state, verified now:** the account runs 4 of 5 triggers
+  (markets the single covering expression, attached 01:50:39Z;
+  wgc-watch both schedules, 01:50:59Z; api its minute cron; desk none).
+  The markets version history pins the patch as version #38
+  (437c5eae, 01:50:06Z, source api) and the pre-patch original as
+  version #37 (9c525932, the Nov 21 secret re-put over the Nov 10
+  code upload — script etag 07ec277b…, scheduled-only handlers,
+  EODHD_API_TOKEN + RATES 4627ac33 bindings, compatibility 2026-09-01).
+  The observability logs (the query API proven working, 6.2M rows
+  read) show the last pre-patch fires under the ORIGINAL dispatch —
+  23:30:41Z Nov 23 `# markets run — main (eodhd-first) · 16 EODHD +
+  16 Yahoo calls` (Monday's main) and 01:30:30Z Nov 24 `# markets run
+  — retry (yahoo-first) · 0 EODHD + 9 Yahoo calls` — and ZERO
+  post-patch fires (correct: the covering expression's next fire is
+  07:00 UTC today). The wgc-watch health endpoint answers: targetMonth
+  2026-10, the row ok (the backfill's capture), both crons, the
+  window line, the last three log lines.
+- **The rollback kit restored — with an honest change.** The original
+  kit's byte-exact bundle copy died with the sandbox reset; the
+  restored /home/z/markets-rollback-2026-11-24/ carries the re-fetched
+  patched index.js (sha256 50ce5778…), the version #37 metadata, the
+  current settings, the record + equivalence test, and a README whose
+  procedure is now VERSION-PINNED: redeploy version 9c525932 via the
+  gradual-deployments API, then PUT the four original schedules as a
+  bare array. The deploy-from-version mechanism was PROVEN live this
+  sitting (deployment b147b475 created from the current version #38 —
+  a content-identical no-op — with the schedules verified untouched
+  after; a better rollback than the lost file: no 1 MB re-upload, the
+  original stays server-side).
+- **The monorepo was never a separate repository — and the source port
+  is done.** The consolidation record's "owner's monorepo, not this
+  repository" was wrong in one letter: the owner's monorepo lives in
+  THIS repository, on the upstream branch chain (insights-rebuild →
+  gold-elevation/s18-closeout → feat/gold-redesign-s10-q3a →
+  docs/gold-intelligence-s1-filing, the newest tip, 2026-11-21T13:16Z,
+  the GIE-S1 filing). The markets worker source is **apps/markets**
+  (packages/insights is the engine library it imports — the deployed
+  wrangler config there names currena-markets and the live RATES KV
+  id exactly), byte-identical across every tip since 2026-11-02
+  (tree a2630c0e). **The port: branch `feat/markets-cron-consolidation`
+  (off the filing tip), commit 8e3aadbe, pushed** — apps/markets/
+  src/index.ts now carries the time-based dispatch (the deployed
+  reference transcribed: Mon–Fri 23:30 main · Tue–Sat 01:30 retry ·
+  Tue–Sat 08:50 the Asia retry · Mon–Fri 07:00 the ALONE AU rung;
+  every other minute a one-line covering-cron wake — audit A-7's
+  spirit kept), crons.ts gains COVERING_CRON with the four originals
+  kept as the documented semantics, wrangler.jsonc declares the single
+  covering expression, the scheduled tests are rewritten for the
+  windows with day-of-week guards (12 tests; the AU-alone path gains
+  coverage it never had) and the audit C-8 config test reads the ONE
+  cron back out of the config. **Verified on the branch: typecheck
+  clean, 19/19 markets tests, eslint 0 problems over the changed
+  files, `wrangler deploy --dry-run` green (bundle 1,060.75 KiB, RATES
+  binding intact). NOT deployed — the live worker already carries the
+  patch; the next deploy from the merged source keeps the
+  consolidation.** Records on the branch:
+  docs/specs/markets-cron-consolidation-port.md, the CHANGELOG entry,
+  BD-MKT-1 in docs/DECISIONS.md.
+- **The preview mirror re-synced and walked.** The fresh sandbox's
+  my-project was the stock template (the whole gold tree absent); it
+  now mirrors canonical main (src/prisma/public/scripts/configs/
+  db/AGENTS.md; bun install; prisma generate; .env.local carrying the
+  EODHD token env-only). One bug caught in the sync: the archive db
+  landed at the wrong path and the routes 500'd on the template's
+  User/Post db — fixed (db/custom.db), then every route green
+  (/api/gold, /api/gold/wgc-commentary serving the October row
+  byte-perfect, the full leg sweep). Browser walk: the WGC card in EN
+  and fa/RTL — the title «نگارش ماهانهٔ شورای جهانی طلا», the
+  dir="ltr" blockquote with both segments verbatim and the canonical
+  cite, the whisper line «انتشار ۱۴ آبان ۱۴۰۵ · بازخوانی: ۳ آبان
+  ۱۴۰۵ · منبع: World Gold Council», the record-basis note —
+  VLM-confirmed clean (tests/wgc-10/11 PNGs + the VLM json), 375px
+  with zero horizontal overflow, the footer pushed down naturally
+  (footerBottom = viewport 812 at the page end), zero console and
+  zero page errors, lint green, dev.log clean.
+- **Honestly not done / not yet observable — stated:** the first
+  post-patch markets fires (07:00 AU, the 07:30–08:30 wakes, the
+  08:50 Asia retry, all UTC today) — the re-armed 09:10 check
+  observes them; the watch's first fire (Nov 25 09:30 UTC,
+  stop-on-success on 2026-10) — the 09:40 check observes it; the
+  December skip-month lines start Dec 1 (a later sitting verifies
+  them as the ongoing liveness evidence); the port branch is NOT
+  merged — the owner's integration session merges it and runs the
+  full pnpm gates there; the desk worker was NOT redeployed (this
+  sitting changed no desk app code — main's app tree is identical to
+  the deployed cca13b4f state).
