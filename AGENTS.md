@@ -2023,3 +2023,116 @@ The sitting's deliverable pushed to main: the swapped translate module,
 the bake-off script's shape/envelope/catalog fixes, the forced-run
 envelope, the committed contract test, the bake-off/contract/forced-run
 evidence JSONs, the two browser PNGs, and this record.
+
+### The token wall falls, the translation deploys, the TE spec proposed (2026-11-24, the deploy sitting)
+
+The sitting opened with the owner's fresh token trials — three invalid
+or mis-permissioned strings tested and rejected in open (one dead, one
+IP-filtered against the sandbox egress, two Workers-scoped rolls of the
+same permission record) — and then the valid, fully-permissioned token
+(`cfut_dHC…`: the Workers scripts, D1 read/write, the zone, and the
+Workers AI permission; the AI leg itself quota-exhausted for the day
+— the free plan's 10,000 neurons spent by the previous sitting's
+eleven-candidate bake-off — resetting 00:00 UTC). The sitting's two
+duties: close the translation sitting's every Cloudflare-account-facing
+runbook that the quota does not gate, and propose the Trading Economics
+daily-briefing spec the owner briefed.
+
+**The credentials wall, closed to the quota line.** Every step the
+previous sittings recorded as pending, run this sitting, in order:
+
+1. **The remote D1 DDL apply** — `bunx wrangler d1 execute aurum-desk
+   --remote --file wgc-watch/ddl.sql`, run twice: the first applied
+   (rows_written 3 — the three tables), the second wrote zero — the
+   idempotence proof. The read-back confirmed the three `wgc_*` tables
+   in the live `aurum-desk`, `wgc_commentary_fa` empty (awaiting the
+   first translation).
+2. **The wgc-watch deploy** — `bunx wrangler deploy` from `wgc-watch/`:
+   version 4b2ff333, the **[ai] binding attached** (env.AI beside
+   env.DB, wrangler's own binding table), both cron expressions
+   unchanged and re-confirmed attached, the workers.dev URL live, the
+   health endpoint answering (target 2026-10, row ok). The worker now
+   carries the gemma chat-contract runner live.
+3. **The desk worker redeploy** — the two-step OpenNext runbook,
+   NEXT_PUBLIC_BASE_PATH=/gold on BOTH (`worker:build` then
+   `worker:deploy`; the dev server paused around the build, restarted
+   and re-verified after): version 1ca70956. Live checks: currena.ir
+   200 untouched, currena.ir/gold 200, the live
+   `/gold/api/gold/wgc-commentary` serving the English row exactly as
+   designed — the fa field absent until the first live translation
+   lands (the designed fallback, now one quota-reset away).
+4. **The live forced run for 2026-10** — quota-gated, NOT run this
+   sitting: **armed as scheduled job 546599 at 2026-11-25 00:20 UTC**
+   (20 minutes after the reset), carrying the exact runbook — the
+   glm-4.7-flash honest-gap bake-off first, then the forced run, the
+   fa-row read-back, the live-route fa verification, and the honest
+   report. The watch's own Nov 25 09:30 UTC fire runs the translation
+   pre-step as the natural backup (stop-on-success + retry-pre-step:
+   an already-translated row answers up-to-date, zero AI calls).
+
+The translation work is therefore wrapped to the quota line: every
+deployable, verifiable leg is live; the one remaining leg is scheduled,
+idempotent, and self-observing. Nothing incomplete remains except the
+quota itself.
+
+**The sandbox re-sync, stated**: this fresh sandbox carried the latest
+tree (verified byte-identical to origin/main over the whole source —
+src, wgc-watch/src, scripts, docs, prisma, public) minus the three
+root deploy files (README.md, open-next.config.ts, wrangler.jsonc),
+restored from origin/main before the desk deploy; the local git
+metadata is the sandbox's own snapshot lineage, not the repo's — the
+tree comparison against a fresh clone of origin/main is the ground
+truth, recorded here so the next sitting does not re-derive it.
+
+**The Trading Economics daily-briefing spec** (the owner's new brief,
+this sitting's second duty — `docs/te-daily-briefing-spec.md`,
+Status: proposed; implementation next session). The research, all of
+it live:
+
+- **The briefing identified precisely**: the gold page's top
+  News Stream item — the owner's pasted `h2#description` body is
+  **byte-identical** to the top item's `comment more` body (939 chars
+  today, full text, no truncation despite the class name), and the
+  pasted title is the item's own `<a>` heading; the item's detail page
+  (`/commodity/gold/news/{id}`) carries the authoritative Article
+  JSON-LD (headline, datePublished, author). One source of truth, two
+  cross-checks.
+- **The Worker-side fetch proven** — the feasibility question this
+  source turns on (TE sits behind Cloudflare's own edge): a one-off
+  probe worker (`currena-te-probe`, read-only, no bindings, deleted
+  after the evidence) fetched the page from the Workers egress twice —
+  **200, the full 443 KB page, the briefing present, no challenge,
+  ~210–275 ms HKG**. The evidence JSON records both invocations; the
+  account's worker list is exactly as it was.
+- **The cadence measured**: the stream exposes exactly the latest three
+  items — two published Nov 23 (01:53, 14:46 UTC), one Nov 24 (02:17
+  UTC): **1–2 briefings/day**, an Asia-morning piece and an intraday
+  second piece. The design: one cron trigger (the account's **last
+  free slot** — 4/5 used today: api's every-minute, markets' covering
+  trigger, wgc-watch's two) firing twice daily `0 5,16 * * *`, each
+  fire one page GET plus one detail GET per genuinely new item.
+- **The license read**: the page's own Dataset JSON-LD declares
+  `isAccessibleForFree: true` and **CC BY 4.0** — recorded as a
+  favorable signal; the discipline stays the WGC one (a verbatim
+  excerpt, visible attribution, the canonical link; comes down if TE
+  objects).
+- **The pipeline**: a sibling minimal worker `currena-te-watch`
+  (zero-deps, the same aurum-desk D1 + [ai] bindings, a health
+  endpoint, `te-watch/` in this repo), three additive D1 tables
+  (`te_briefing`, `te_briefing_fa`, `te_scrape_log`), a read-only
+  `/gold/api/gold/te-briefing` route, and a card on the Persian page
+  under the Market Brief — **the same gemma engine and the same
+  disciplines** (the freshness gate, the identity/mirror checks, the
+  fail-closed failure law, the «ترجمهٔ ماشینی» label) in a sibling
+  module with the TE-shaped strict contract `{"headline","body"}`.
+- **The clarifying questions asked in open with suggested defaults**
+  (spec §11): the capture scope, the cron-slot trade-off (5/5 full
+  after this), the seed depth, the cadence, the card placement, the
+  bot-protection posture.
+
+The sitting's deliverable pushed to main: this record, the TE spec
+(`docs/te-daily-briefing-spec.md`), and its evidence
+(`docs/evidence/te-gold-census-2026-11-24.json` — the stream verbatim,
+the probe results, the license fields, the cron inventory). The
+deployed state (both workers, the D1) carries no new commit — the deploys
+ran origin/main's own tree as it stood.

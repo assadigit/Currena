@@ -1,0 +1,70 @@
+{
+  "captured_at": "2026-11-24T15:05:00Z",
+  "method": "plain GET with desktop Chrome UA + Accept-Language en-GB (sandbox), plus two Worker-side probe fetches (currena-te-probe, since deleted)",
+  "worker_side_probe": [
+    {
+      "status": 200,
+      "bytes": 443873,
+      "ms": 274,
+      "cf_ray": "a5f945561a340952-HKG",
+      "has_description_h2": true,
+      "challenge": false
+    },
+    {
+      "status": 200,
+      "bytes": 443873,
+      "ms": 211,
+      "cf_ray": "a5f9458c1c9fb441-HKG",
+      "has_description_h2": true,
+      "challenge": false
+    }
+  ],
+  "page": "https://tradingeconomics.com/commodity/gold",
+  "briefing_structure": {
+    "summary_card": "div.tab-pane#historical-desc > div.card-header 'Gold - Summary' > div.card-body > h2#description = the full daily briefing body",
+    "news_stream": "div.card > div.card-header 'News Stream' > div.list-group-item.indc_news_stream.te-stream-repeater > b > a[href=/commodity/gold/news/{id}] (the title) + div.comment.more (the FULL body, no truncation)",
+    "identity": "h2#description is byte-identical to the top news stream item's comment body (939 chars today)"
+  },
+  "news_detail_page": "/commodity/gold/news/{id} carries Article JSON-LD: name/headline, datePublished, dateModified, url, author (TE staff), mainEntityOfPage — the authoritative title + timestamp",
+  "license": {
+    "isAccessibleForFree": true,
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "declared_in": "Dataset JSON-LD on the commodity page"
+  },
+  "account_cron_inventory": {
+    "currena-api": "* * * * *",
+    "currena-markets": "0,30,50 1,7,8,23 * * *",
+    "currena-wgc-watch": "30 9 1-15 * * + 30 9 17-25/2 * *",
+    "total_used": 4,
+    "free_plan_max": 5,
+    "free_slots": 1
+  },
+  "observed_stream": [
+    {
+      "news_id": "603757",
+      "title": "Gold Holds Gains Amid Recovery in Equity Markets",
+      "body_chars": 939,
+      "body_first": "Gold held above $3,600 per ounce on Tuesday after recovering from more than one-year lows in the previous session, as a ",
+      "body_last": "t rate hike in December, while the remaining expectations point to a larger 50-basis-point increase.",
+      "datePublished": "2026-11-24T02:17:13Z"
+    },
+    {
+      "news_id": "603608",
+      "title": "Gold Rebounds From One-Year Lows",
+      "body_chars": 910,
+      "body_first": "Gold prices surged 4% to approach $3,680 an ounce on Monday, rebounding from a more than one-year low after Nvidia reins",
+      "body_last": ". Markets priced in a strong consensus for a 25bps hike by the central bank at its upcoming meeting.",
+      "datePublished": "2026-11-23T14:46:48Z"
+    },
+    {
+      "news_id": "603349",
+      "title": "Gold Rises as Fed Rate Hike Bets Ease",
+      "body_chars": 948,
+      "body_first": "Gold jumped 2% to around $3,600 an ounce on Monday, reversing losses from the previous session as traders dialed back be",
+      "body_last": "ish remarks from Fed officials and a liquidity squeeze triggered by the AI-driven stock market rout.",
+      "datePublished": "2026-11-23T01:53:00Z"
+    }
+  ],
+  "h2_description_chars": 939,
+  "h2_equals_stream_top_body": true
+}
