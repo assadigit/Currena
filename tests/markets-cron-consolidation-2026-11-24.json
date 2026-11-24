@@ -1,0 +1,56 @@
+{
+  "record": "The cron consolidation \u2014 currena-markets 4 triggers \u2192 1, freeing the account quota for the WGC watch worker",
+  "ranAt": "2026-11-24T01:50Z",
+  "why": "The account's Workers Free plan allows 5 cron triggers; currena-api (1: every minute) + currena-markets (4) consumed all five, blocking currena-wgc-watch's two triggers (Cloudflare error 10072). The owner's instruction: dedicate only 1 cron job to the markets worker.",
+  "before": {
+    "schedules": [
+      "0 7 * * 1-5",
+      "30 1 * * 2-6",
+      "30 23 * * 1-5",
+      "50 8 * * 2-6"
+    ],
+    "dispatch": "the deployed handler branched on event.cron string equality (MAIN_CRON main \u00b7 RETRY_CRON/ASIA_CRON retry \u00b7 AU_CRON the AU job)"
+  },
+  "after": {
+    "schedules": [
+      "0,30,50 1,7,8,23 * * *"
+    ],
+    "dispatch": "time-based, derived from event.scheduledTime (UTC day/hour/minute), equivalent to the original string dispatch at every original fire time; the covering expression's extra wakes (01:00, 01:50, 07:30, 08:00, 08:30, 23:00, 23:50) log one line and return"
+  },
+  "equivalenceProof": {
+    "method": "the original four-expression string dispatch vs the patched time dispatch, evaluated at every minute of a full week (Mon 2026-11-23 \u2192 Sun 2026-11-29), plus the covering expression's own coverage",
+    "minutesChecked": 10080,
+    "dispatchMismatches": 0,
+    "coveringFiresPerWeek": 84,
+    "realJobsPerWeek": 20,
+    "loggedNoOpsPerWeek": 64,
+    "uncoveredOriginalFires": 0,
+    "verdict": "EQUIVALENT \u2014 the patched dispatch reproduces the original at every minute of the week, and every original fire is covered"
+  },
+  "upload": {
+    "method": "the patched index.js (only the var index_default scheduled handler region replaced; every other byte identical) PUT through the Workers script API with keep_bindings [secret_text, secret_key] \u2014 the EODHD_API_TOKEN secret preserved without its value ever being read or printed, the RATES KV binding and observability (invocation logs) re-declared from the fetched settings",
+    "bindingsAfter": [
+      [
+        "secret_text",
+        "EODHD_API_TOKEN"
+      ],
+      [
+        "kv_namespace",
+        "RATES"
+      ]
+    ],
+    "observabilityAfter": true,
+    "compatibilityDate": "2026-09-01"
+  },
+  "rollback": {
+    "artifacts": "/home/z/markets-rollback-2026-11-24/ (the original deployed bundle byte-exact, the original and patched index.js, the upload metadata, the pre-change settings, the equivalence test)",
+    "procedure": "PUT the original index.js with the same metadata, then PUT the four original schedules as a bare array"
+  },
+  "ownerActionNeeded": "the markets worker's SOURCE (the owner's monorepo, packages/insights \u2014 not this repo) still carries the string dispatch and the four-cron wrangler config; the next deploy from that source would revert the dispatch and re-request four triggers. Port the time-based dispatch + the single covering cron into the source repo (the deployed patch is the reference), or the reverts will re-break the quota.",
+  "accountQuotaAfter": {
+    "currena-api": 1,
+    "currena-markets": 1,
+    "currena-wgc-watch": 2,
+    "spare": 1
+  }
+}

@@ -1390,3 +1390,64 @@ reading the same D1 the desk reads.
   the route's waiting counter include them. The DDL comment (verbatim
   §4.6) lists the seven spec'd events; the eighth value is this
   documented extension.
+
+### The cron quota freed — markets consolidated to one trigger, the watch crons attached (2026-11-24, later)
+
+The owner's instruction: "since we have limited amount of cron jobs,
+dedicate only 1 cron job for markets page, so we have available cron
+jobs then." What was found, what changed, and how it is proven:
+
+**The quota before:** the account's Workers Free plan allows five cron
+triggers; currena-api's every-minute trigger and currena-markets' four
+daily ones (MAIN "30 23 * * 1-5", RETRY "30 1 * * 2-6", ASIA
+"50 8 * * 2-6", AU "0 7 * * 1-5") consumed all five — the exact wall the
+previous sitting hit (error 10072).
+
+**The consolidation (behavior-preserving, not job-dropping):** dropping
+three schedules would silently kill the AU job and the retry runs, so
+instead the deployed handler was patched to a time-based dispatch and
+the four triggers became ONE covering expression:
+`0,30,50 1,7,8,23 * * *`. The markets worker's scheduled handler
+branched on `event.cron` string equality; the patch derives the job
+from the fire's own `event.scheduledTime` (UTC day/hour/minute) —
+byte-equivalent at every original fire time, with the covering
+expression's extra wakes logging one line and returning. The
+equivalence is proven offline over every minute of a full week
+(10,080 minutes, zero mismatches, all 20 weekly real jobs covered,
+64 logged no-op wakes — tests/markets-cron-equivalence-test.ts, the
+record in tests/markets-cron-consolidation-2026-11-24.json). The upload
+touched ONLY the `var index_default` scheduled-handler region (every
+other byte of the 1 MB bundle identical), rode the Workers script API
+with `keep_bindings` so the EODHD_API_TOKEN secret survived without its
+value ever being read, and re-declared the RATES KV binding and the
+observability settings from the fetched state — verified intact after
+the swap (bindings, invocation logs, compatibility date).
+
+**The rollback**, if ever needed: the original deployed bundle is kept
+byte-exact at /home/z/markets-rollback-2026-11-24/ with the upload
+metadata, the pre-change settings, and both index.js versions; the
+procedure is PUT the original with the same metadata, then PUT the four
+original schedules as a bare array.
+
+**The watch crons attached** — `bunx wrangler deploy` from wgc-watch/
+succeeded with both schedules live (30 9 1-15 * * and
+30 9 17-25/2 * *), worker version debd06ce. The account now runs
+4 of its 5 triggers (api 1 + markets 1 + wgc-watch 2, one spare), and
+the WGC pipeline's last open acceptance item — the cron observed firing
+— is armed: the next fires are November 25 09:30 UTC (a grace-day wake;
+the target 2026-10 is captured, so the fire exits stop-on-success and
+its console line lands in the worker's stored observability logs) and
+December 1+ (skip-month lines for the November target in the scrape
+log). The markets worker's patched dispatch proves itself in its own
+stored logs today: 07:00 UTC the AU job, 08:50 the Asia retry, 23:30
+the main run, with the covering wakes between them.
+
+**One owner action, stated plainly:** the markets worker's SOURCE (the
+owner's monorepo, packages/insights — not this repository) still
+carries the string dispatch and the four-cron wrangler config; the next
+deploy from that source would revert the dispatch and re-request four
+triggers (the quota now has room for one, so the attach would be
+partial and the dispatch would not recognize the covering expression).
+Port the time-based dispatch and the single covering cron into the
+source repo — the deployed patch (kept at the rollback path above) is
+the reference implementation.
