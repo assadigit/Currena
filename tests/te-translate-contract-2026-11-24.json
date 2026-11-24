@@ -1,0 +1,186 @@
+{
+  "ranAt": "2026-11-24T16:58:57.870Z",
+  "results": [
+    {
+      "check": "the happy path: outcome translated, one call, the fa row written",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "translated",
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "strings": 2
+        },
+        "faRows": 1
+      }
+    },
+    {
+      "check": "the chat contract sent: the model is the bake-off's selection",
+      "pass": true,
+      "extra": {
+        "model": "@cf/google/gemma-4-26b-a4b-it"
+      }
+    },
+    {
+      "check": "the chat contract sent: the system line carries the strict TE shape {\"headline\",\"body\"}, the user payload mirrors the briefing, max_tokens 2048",
+      "pass": true,
+      "extra": {
+        "system": "You are a professional English-to-Persian (Farsi) translator for gold-market financial commentary. Translate the given c",
+        "user": "{\"headline\":\"Gold Holds Gains Amid Recovery in Equity Markets\",\"body\":\"Gold held",
+        "max_tokens": 2048
+      }
+    },
+    {
+      "check": "the translated log line names the model and the item",
+      "pass": true,
+      "extra": {
+        "log": [
+          {
+            "event": "translated",
+            "news_id": "603757",
+            "detail": "model @cf/google/gemma-4-26b-a4b-it (chat contract, 2 strings), item 603757"
+          }
+        ]
+      }
+    },
+    {
+      "check": "the freshness gate: a fresh (hash-matching) stored translation is up-to-date, zero further calls",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "up-to-date"
+        },
+        "calls": 1
+      }
+    },
+    {
+      "check": "the failure discipline: a failed run logs translate-failed and stores NOTHING (never throws)",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "failed",
+          "reason": "the mock engine failed (the simulated quota wall)"
+        },
+        "faRows": 0,
+        "log": [
+          {
+            "event": "translate-failed",
+            "news_id": "603757",
+            "detail": "model @cf/google/gemma-4-26b-a4b-it: the mock engine failed (the simulated quota wall)"
+          }
+        ]
+      }
+    },
+    {
+      "check": "the identity discipline: an untranslated headline fails the run, nothing stored",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "failed",
+          "reason": "the headline came back untranslated — not a translation"
+        }
+      }
+    },
+    {
+      "check": "the identity discipline: an untranslated body fails the run, nothing stored",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "failed",
+          "reason": "the body came back untranslated — not a translation"
+        }
+      }
+    },
+    {
+      "check": "the mirror discipline: a dropped headline fails the run, nothing stored",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "failed",
+          "reason": "the headline field is missing, empty, or not a string"
+        }
+      }
+    },
+    {
+      "check": "the shape discipline: the strict two-field contract is enforced (extra fields never break it — the strict pair is read)",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "translated",
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "strings": 2
+        }
+      }
+    },
+    {
+      "check": "the empty-channel discipline: content null fails the run, nothing stored",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "failed",
+          "reason": "the model returned no content (empty channel)"
+        }
+      }
+    },
+    {
+      "check": "the defensive parse: a legacy {response} envelope still parses and stores",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "translated",
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "strings": 2
+        }
+      }
+    },
+    {
+      "check": "the defensive parse: a markdown-fenced reply still parses and stores",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "translated",
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "strings": 2
+        }
+      }
+    },
+    {
+      "check": "the re-store gate: the stored fa row carries the ENGLISH row's hash at translation time",
+      "pass": true,
+      "extra": {
+        "storedHash": "d7499df7dec9b3f4d0c327d0b2c2719ebbbbde6a23731dfbe3e0ada2646693fb",
+        "HASH_B": "d7499df7dec9b3f4d0c327d0b2c2719ebbbbde6a23731dfbe3e0ada2646693fb"
+      }
+    },
+    {
+      "check": "the re-store path: a changed English hash re-translates through the gate",
+      "pass": true,
+      "extra": {
+        "out": {
+          "outcome": "translated",
+          "model": "@cf/google/gemma-4-26b-a4b-it",
+          "strings": 2
+        },
+        "callsC": 1,
+        "faHash": "5f4052114d4f8df8f7e3efb9e7c56c1a02fa4f4c31a554240e1df8f2b5dce607"
+      }
+    },
+    {
+      "check": "the attribution discipline: a non-binding adapter's sourceModel is recorded in the row, never silent",
+      "pass": true,
+      "extra": {
+        "row": "contract-test-adapter"
+      }
+    },
+    {
+      "check": "runFire without env.AI: the fire runs exactly the capture behavior (no translation step, no fa write)",
+      "pass": true,
+      "extra": {
+        "fire": {
+          "action": "fetch-failed",
+          "detail": "HTTP 404"
+        }
+      }
+    }
+  ],
+  "failures": []
+}

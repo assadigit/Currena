@@ -1,0 +1,216 @@
+{
+  "runs": [
+    {
+      "ranAt": "2026-11-24T16:21:22.077Z",
+      "store": "local:/tmp/te-seed-test.db",
+      "ai": "none (captures only)",
+      "fire": {
+        "action": "structure-alert",
+        "detail": "the top item's body is 37 characters, under the 200-character gate (a login/interstitial page is not a briefing)"
+      },
+      "translations": [],
+      "storedBriefings": [],
+      "faStored": [],
+      "applied": "local store written directly (/tmp/te-seed-test.db)"
+    },
+    {
+      "ranAt": "2026-11-24T16:50:23.696Z",
+      "store": "remote-d1",
+      "ai": "none (captures only)",
+      "fire": {
+        "action": "structure-alert",
+        "detail": "the top item's body is 37 characters, under the 200-character gate (a login/interstitial page is not a briefing)"
+      },
+      "translations": [],
+      "storedBriefings": [],
+      "faStored": [],
+      "applied": "2 statement(s) applied to the remote D1 via wrangler d1 execute --file"
+    },
+    {
+      "ranAt": "2026-11-24T16:59:28.252Z",
+      "store": "remote-d1",
+      "ai": "none (captures only)",
+      "fire": {
+        "action": "capture",
+        "detail": "2 stored; 1 flash item(s) skipped (not briefings)"
+      },
+      "censusBackstop": [
+        {
+          "news_id": "603349",
+          "outcome": "stored",
+          "hash": "65857818ba6bd94e9fffe64807454fa021989110a889cbe84725081ba07cb55a"
+        }
+      ],
+      "translations": [],
+      "storedBriefings": [
+        {
+          "news_id": "603757",
+          "published_at": "2026-11-24T02:17:13Z",
+          "title": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "body_chars": 939,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603608",
+          "published_at": "2026-11-23T14:46:48Z",
+          "title": "Gold Rebounds From One-Year Lows",
+          "body_chars": 910,
+          "author": "Joana Ferreira",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603349",
+          "published_at": "2026-11-23T01:53:00Z",
+          "title": "Gold Rises as Fed Rate Hike Bets Ease",
+          "body_chars": 948,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        }
+      ],
+      "faStored": [],
+      "applied": "6 statement(s) applied to the remote D1 via wrangler d1 execute --file"
+    },
+    {
+      "ranAt": "2026-11-24T16:59:43.583Z",
+      "store": "local:db/custom.db",
+      "ai": "none (captures only)",
+      "fire": {
+        "action": "capture",
+        "detail": "2 stored; 1 flash item(s) skipped (not briefings)"
+      },
+      "censusBackstop": [
+        {
+          "news_id": "603349",
+          "outcome": "stored",
+          "hash": "65857818ba6bd94e9fffe64807454fa021989110a889cbe84725081ba07cb55a"
+        }
+      ],
+      "translations": [],
+      "storedBriefings": [
+        {
+          "news_id": "603757",
+          "published_at": "2026-11-24T02:17:13Z",
+          "title": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "body_chars": 939,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603608",
+          "published_at": "2026-11-23T14:46:48Z",
+          "title": "Gold Rebounds From One-Year Lows",
+          "body_chars": 910,
+          "author": "Joana Ferreira",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603349",
+          "published_at": "2026-11-23T01:53:00Z",
+          "title": "Gold Rises as Fed Rate Hike Bets Ease",
+          "body_chars": 948,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        }
+      ],
+      "faStored": [],
+      "applied": "local store written directly (db/custom.db)"
+    },
+    {
+      "ranAt": "2026-11-24T17:04:19.515Z",
+      "store": "local:/tmp/te-verify-final.db",
+      "ai": "none (captures only)",
+      "fire": {
+        "action": "capture",
+        "detail": "2 stored; 1 flash item(s) skipped (not briefings)"
+      },
+      "censusBackstop": [
+        {
+          "news_id": "603349",
+          "outcome": "stored",
+          "hash": "65857818ba6bd94e9fffe64807454fa021989110a889cbe84725081ba07cb55a"
+        }
+      ],
+      "translations": [],
+      "storedBriefings": [
+        {
+          "news_id": "603757",
+          "published_at": "2026-11-24T02:17:13Z",
+          "title": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "body_chars": 939,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603608",
+          "published_at": "2026-11-23T14:46:48Z",
+          "title": "Gold Rebounds From One-Year Lows",
+          "body_chars": 910,
+          "author": "Joana Ferreira",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603349",
+          "published_at": "2026-11-23T01:53:00Z",
+          "title": "Gold Rises as Fed Rate Hike Bets Ease",
+          "body_chars": 948,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        }
+      ],
+      "faStored": [],
+      "applied": "local store written directly (/tmp/te-verify-final.db)"
+    },
+    {
+      "ranAt": "2026-11-24T17:04:20.555Z",
+      "store": "local:/tmp/te-verify-final.db",
+      "ai": "none (captures only)",
+      "fire": {
+        "action": "quiet",
+        "detail": "2 briefing item(s) unchanged, 1 flash item(s) skipped"
+      },
+      "censusBackstop": [],
+      "translations": [],
+      "storedBriefings": [
+        {
+          "news_id": "603757",
+          "published_at": "2026-11-24T02:17:13Z",
+          "title": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "body_chars": 939,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603608",
+          "published_at": "2026-11-23T14:46:48Z",
+          "title": "Gold Rebounds From One-Year Lows",
+          "body_chars": 910,
+          "author": "Joana Ferreira",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603349",
+          "published_at": "2026-11-23T01:53:00Z",
+          "title": "Gold Rises as Fed Rate Hike Bets Ease",
+          "body_chars": 948,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        }
+      ],
+      "faStored": [],
+      "applied": "local store written directly (/tmp/te-verify-final.db)"
+    }
+  ]
+}

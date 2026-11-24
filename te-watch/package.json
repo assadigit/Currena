@@ -1,0 +1,10 @@
+{
+  "name": "currena-te-watch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Trading Economics daily gold briefing watch worker — scheduled fetch, parse, gates, upsert into the desk's D1, plus the Persian translation through the Workers AI binding. Zero dependencies; wrangler resolves from the repository root.",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --test-scheduled"
+  }
+}

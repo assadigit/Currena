@@ -2193,3 +2193,172 @@ spec edit. The next session opens with the §12 runway: first verify the
 2026-10 fa row landed (the forced run or the 09:30 fire), then re-run
 the TE probe, then build `currena-te-watch` — parser harness, clock
 walk, DDL twice, deploy, seed, live card.
+
+### The TE daily-briefing pipeline built end to end, the flash-item discovery shipped inside it (2026-11-24, the implementing sitting)
+
+The sitting opened on the §12 runway (the DECIDED spec, the owner's six
+§11 answers all confirming the defaults) with the brief's two pre-flight
+gates: the WGC 2026-10 fa verification and the TE re-probe. Both answered
+honestly: the live D1's `wgc_commentary_fa` is still empty (the quota
+gate — the armed 00:20 UTC forced-run job 546695 and the watch's own
+09:30 UTC fire carry it; the live route serves the English row exactly
+as designed), and the commodity page re-answered 200 with the census
+structure intact — carried live into this sitting's harness re-run
+(Phase A, all 13 checks green at 16:19 UTC by the previous context
+window; re-verified again after the refinement below).
+
+**The offline proofs landed first** (the previous context window's
+work, re-verified this sitting): the parser harness (Phase A census
+diff + B negatives + the 8-fire clock walk + D idempotence — 39 checks
+green), the translate contract test (17 checks — the gemma chat
+contract, the identity/mirror/shape disciplines, both served response
+shapes, the re-store gate), and the DDL's local idempotence twin.
+
+**The live legs, in order:**
+
+1. **The remote D1** — `bunx wrangler d1 execute aurum-desk --remote
+   --file te-watch/ddl.sql` twice: run one wrote 8 rows (the three
+   `te_*` tables, `num_tables` 10), run two wrote zero — the
+   idempotence proof, the read-back confirming `te_briefing`,
+   `te_briefing_fa`, `te_scrape_log` live beside the `wgc_*` family.
+2. **The worker** — `currena-te-watch` deployed from `te-watch/` with
+   both bindings attached (env.DB aurum-desk, env.AI) and the cron
+   `0 5,16 * * *` live — the account's fifth and LAST free cron slot
+   (5/5, stated plainly). The health endpoint answers on its
+   workers.dev URL. Version cbe157cd; redeployed c8cea117 after the
+   flash-item refinement below.
+3. **The read models** — the Prisma schema gained `TeBriefing`,
+   `TeBriefingFa`, `TeScrapeLog` (the DDL's own shape, read-only for
+   the desk); `db:push` applied them to the sandbox archive and
+   regenerated the client.
+4. **The route** — `/gold/api/gold/te-briefing` (and `?id={news_id}`),
+   the WGC route's own shape: flat §6 fields, the additive always-fresh
+   `fa` object (hash-keyed, fail-closed to absent), `waiting` with the
+   next fire named, `structure_alert` with the last known good beside,
+   the trailing `fetchFailed` streak additive on any state, and
+   `coverageSince` — the record-basis floor.
+5. **The card** — `te-card.tsx` in the WGC card's own visual family,
+   placed in the hero column between the Market Brief and the WGC
+   monthly card (the owner's Q5 answer: the daily voices together, the
+   monthly below). The bilingual chrome («خلاصهٔ روزانهٔ بازار طلا» +
+   EN subtitle), the fa mode's «ترجمهٔ ماشینی» pill over the primary
+   RTL Farsi with the English original captioned below, the 11px
+   whisper meta with the Persian calendar in fa mode («انتشار: ۳ آذر
+   ۱۴۰۵»), the honest states (waiting names the next fire, the
+   fetch-failed streak, the alert), and the record-basis line («سابقهٔ
+   ثبت از ۲ آذر ۱۴۰۵ آغاز می‌شود…»).
+
+**The flash-item discovery — the sitting's own §12.1 moment.** The
+first seed run (16:50 UTC) answered `structure-alert: the top item's
+body is 37 characters` — the live stream had rotated a PRICE FLASH onto
+the top slot (id 604014, "Gold is down by 2%", body "Gold decreased 2%
+to 3562.37 USD/t.oz"), pushing the briefing 603757 to second and
+603349 out of the 3-slot window. The previous context window had
+already recorded the census addendum (16:25 UTC) with the designed
+consequence; this sitting verified every claim live and implemented it:
+
+- The h2#description still carries the TOP BRIEFING's body (939 chars,
+  byte-identical to 603757) — the flash does not move it.
+- The detail pages carry the article's own full body in their
+  `<meta name="description">` — verified byte-identical to the stream
+  copy for 603757 (939) and matching the census fingerprint for the
+  rotated-out 603349 (948, first+last) — the rotation-proof source the
+  parser now reads (`detailBody`, order-insensitive, entity-decoded).
+- `BRIEFING_BODY_FLOOR = 200` + `briefingItemsOf()` define the capture
+  scope (the owner's Q1: "just the box of briefing + title"): flash
+  items are skipped — never stored, never fetched, never an alarm —
+  and the page gates carry the addendum's three reactions (all-flash +
+  no real h2 → the login alarm; all-flash + real h2 → the quiet fire;
+  briefings + h2 mismatch → template drift). The alarm's marker key
+  now targets the top briefing-qualified item.
+- The clock walk grew a ninth fire (the rotated-window quiet fire) and
+  the flash item rides the walk's raw top slot from fire 1 — the
+  harness re-ran with **39/39 checks green** (Phase A's live diff
+  included: the flash excluded, the census's in-window items verbatim,
+  the rotated-out item named, the meta-description identity true).
+- The first (pre-refinement) seed's misdiagnosis remains honestly in
+  the remote log — one `structure-alert` line and an inert marker row
+  (604014, empty body, filtered from every read path) — never revised,
+  only superseded.
+
+**The seed, twice.** The refined seed (16:59 UTC) captured the
+in-window briefings 603757 + 603608 ("2 stored; 1 flash item(s)
+skipped") plus the **census backstop** — 603349, rotated out before the
+seed ran, fetched by its ONE detail GET and verified through the
+fingerprint gates (the census's own body_chars/body_first/body_last +
+the JSON-LD headline and datePublished identity) before the same
+upsert: the owner's "all three" answer honored with no archive
+crawling. The local archive (db/custom.db) carries the same three rows
+for the sandbox preview; a re-run answers the honest quiet fire
+(idempotence proven on both stores).
+
+**The environment's own two walls, both met and fixed:**
+
+- `bun install` (pulling the lockfile's @prisma/adapter-d1, missing
+  from the drifted node_modules) bumped next 16.1.3 → 16.4.6 and
+  surfaced a Turbopack panic on Tailwind 4.1.18's auto-detection glob
+  (a genuinely malformed pattern — one open brace, two closes — the
+  "unopened alternate group" crash). The documented fix landed in
+  globals.css: an explicit `@source "../**/*.{js,ts,jsx,tsx,md,mdx}"`
+  (auto-detection off, the scan scope honest — every class lives under
+  src/). The page compiles clean; the dev server restarted and
+  re-verified.
+- A display quirk cost an hour of forensics before its nature was
+  proven: the Bash tool's text output EATS the two-byte sequence `[m`
+  (an ANSI-escape remnant) — a file line reading `@@index([monthKey])`
+  displays as `@@index(onthKey])`, od/hex/repr telling the truth while
+  sed/grep/python-repr lied. Recorded so the next sitting recognizes it
+  instantly: verify byte-level oddities with the Read/Grep tools or
+  od/hex, never with plain bash text output.
+
+**The desk worker redeployed** on the two-step OpenNext runbook
+(NEXT_PUBLIC_BASE_PATH=/gold on both, the dev server paused around the
+build and restarted after): live checks green — currena.ir 200
+untouched, currena.ir/gold 200, the live
+`/gold/api/gold/te-briefing` serving status ok with the real briefing
+(603757, 939 chars, author Jam Kaimo Samonte) and `coverageSince`
+2026-11-23T01:53:00Z; the full route set stays green (wgc-commentary
+200, rates 200, meter/daily 400-by-design param-required, 200 with a
+date); the WGC route's English-only state unchanged beside it.
+
+**The browser walk (agent-browser, the sandbox preview):** EN mode —
+the card's bilingual header, the briefing's own headline, the meta
+line (Published November 24, 2026 · fetched · Source: Trading
+Economics), the coverage line, no label (no stored Farsi — the honest
+interim). FA mode — «خلاصهٔ روزانهٔ بازار طلا» primary, the English
+verbatim in the LTR block with no fake translation, the Persian
+calendar meta («انتشار: ۳ آذر ۱۴۰۵»), the record-basis line in
+Farsi. 375px: card width 351, zero horizontal overflow, zero clipped
+elements. Dark mode captured. Zero console errors, zero page errors.
+Placement verified in the DOM: PriceCard → gold-briefing (Market
+Brief) → **gold-te-briefing** → gold-wgc. Two PNGs recorded
+(te-01-card-fa-mobile375, te-02-card-fa-dark-desktop).
+
+**The quota dependency stated plainly (§12.7):** the sitting landed
+BEFORE the daily neuron reset — the translation legs wait for it, each
+one scheduled and self-observing: job 546784 (2026-11-25 00:40 UTC,
+epoch-millis armed after the scheduler's timezone parse quirk) runs
+the seed's translation pass over the live D1 (three gemma calls, the
+same engine the worker carries), reads back the fa rows, and verifies
+the live route's additive fa object; job 546785 (05:30 UTC) observes
+the watch's FIRST real fire (05:00 UTC, the Asia-morning capture) and
+records it. The watch's own fires cover every leg redundantly after
+that (the pre-step translates one stored-but-untranslated row per
+fire). The WGC 2026-10 translation rides its own armed job 546695
+(00:20 UTC) — one allocation, four scheduled consumers, the honest
+order.
+
+The sitting's deliverable, pushed to main: the refined parser and
+pipeline (the flash-item scope), the seed's census backstop, the
+harness's ninth fire and re-verified 39-check evidence, the contract
+test's clean re-run, the Prisma read models, the desk route, the card
+and its bilingual copy, the page placement, the globals.css source
+fix, the seed evidence (six runs — the alarm, the refined captures,
+the idempotence re-runs), and this record.
+
+**Honestly NOT done, all quota- or clock-gated, all armed:** the three
+fa translations (00:40 UTC job), the first real fire's observation
+(05:30 UTC job), the live card's Persian rendering (rides the
+translations), and the WGC fa row (its own 00:20 UTC job). Nothing
+else remains — the pipeline is complete, deployed, and verified to the
+quota line.

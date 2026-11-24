@@ -83,6 +83,7 @@ import {
 } from "@/components/gold-page/context-cards";
 import { BridgeBoard, fetchRates, type RatesPayload } from "@/components/gold-page/bridge-board";
 import { WgcCard } from "@/components/gold-page/wgc-card";
+import { TeCard } from "@/components/gold-page/te-card";
 import { CalendarBand } from "@/components/gold-page/calendar";
 import { ScenariosBand } from "@/components/gold-page/scenarios";
 import { CompareBand } from "@/components/gold-page/compare";
@@ -1279,8 +1280,17 @@ export default function GoldPage() {
             <div className="flex flex-col gap-2.5 lg:gap-3">
               <PriceCard data={data} t={t} fmt={fmt} echo={echo} />
               <BriefingCard t={t} fmt={fmt} balance={balance} locale={locale} />
+              {/* the TE daily briefing — Trading Economics' own daily take
+                  directly under the Market Brief (the daily voices sit
+                  together, the owner's §11 Q5 answer), the WGC monthly
+                  card following it: the page's today/this-month pair of
+                  attributed market commentary. The briefing box verbatim
+                  in an LTR block, the fresh Persian under the honest
+                  «ترجمهٔ ماشینی» label, the waiting/fetch-failed/alert
+                  states riding the same card */}
+              <TeCard t={t.te} locale={locale} fmt={fmt} />
               {/* the WGC monthly commentary — the World Gold Council's own
-                  monthly one-glance directly under the Market Brief: the
+                  monthly one-glance under the daily pair: the
                   Highlights box verbatim in an LTR block, the honest
                   waiting/missed/alert states riding the same card */}
               <WgcCard t={t.wgc} locale={locale} fmt={fmt} />

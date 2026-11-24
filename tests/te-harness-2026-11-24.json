@@ -1,0 +1,510 @@
+{
+  "ranAt": "2026-11-24T16:58:57.897Z",
+  "phases": {
+    "A": [
+      {
+        "check": "the live commodity page answered 200 (442795 bytes)",
+        "pass": true,
+        "extra": {
+          "status": 200,
+          "bytes": 442795
+        }
+      },
+      {
+        "check": "the News Stream card was located and items parsed",
+        "pass": true,
+        "extra": {
+          "found": true,
+          "items": 3
+        }
+      },
+      {
+        "check": "the briefing-qualified scope: every item under the 200-char floor is excluded, at least one briefing remains (the flash-item discovery's own rule)",
+        "pass": true,
+        "extra": {
+          "flash": [
+            {
+              "news_id": "604014",
+              "body_chars": 37
+            }
+          ],
+          "briefingIds": [
+            "603757",
+            "603608"
+          ]
+        }
+      },
+      {
+        "check": "the h2#description cross-check is true (the TOP BRIEFING-QUALIFIED item's body equals the page's own summary — the flash at the raw top slot does not move the h2)",
+        "pass": true,
+        "extra": {
+          "h2Chars": 939,
+          "topBriefingChars": 939,
+          "flashAtTop": true
+        }
+      },
+      {
+        "check": "census item 603757: title verbatim",
+        "pass": true,
+        "extra": {
+          "live": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "census": "Gold Holds Gains Amid Recovery in Equity Markets"
+        }
+      },
+      {
+        "check": "census item 603757: body 939 chars (census byte count)",
+        "pass": true,
+        "extra": {
+          "live": 939,
+          "census": 939
+        }
+      },
+      {
+        "check": "census item 603608: title verbatim",
+        "pass": true,
+        "extra": {
+          "live": "Gold Rebounds From One-Year Lows",
+          "census": "Gold Rebounds From One-Year Lows"
+        }
+      },
+      {
+        "check": "census item 603608: body 910 chars (census byte count)",
+        "pass": true,
+        "extra": {
+          "live": 910,
+          "census": 910
+        }
+      },
+      {
+        "check": "the live window state is honest — the rotated-out census items named, the in-window items carry the structural identity",
+        "pass": true,
+        "extra": {
+          "rotatedOut": [
+            "603349"
+          ],
+          "liveIds": [
+            "604014",
+            "603757",
+            "603608"
+          ],
+          "liveBriefingIds": [
+            "603757",
+            "603608"
+          ],
+          "censusIds": [
+            "603757",
+            "603608",
+            "603349"
+          ]
+        }
+      },
+      {
+        "check": "the detail page 603757 answered 200 and carries the Article JSON-LD",
+        "pass": true,
+        "extra": {
+          "status": 200,
+          "ld": "present"
+        }
+      },
+      {
+        "check": "the detail JSON-LD headline equals the stream title (verbatim identity)",
+        "pass": true,
+        "extra": {
+          "ld": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "title": "Gold Holds Gains Amid Recovery in Equity Markets"
+        }
+      },
+      {
+        "check": "the detail JSON-LD datePublished is present",
+        "pass": true,
+        "extra": {
+          "datePublished": "2026-11-24T02:17:13Z"
+        }
+      },
+      {
+        "check": "the detail page's own body copy (its meta description — the rotation-proof source) is byte-identical to the commodity page's",
+        "pass": true,
+        "extra": {
+          "detailChars": 939,
+          "commodityChars": 939
+        }
+      }
+    ],
+    "A_live": {
+      "pageBytes": 442795,
+      "items": [
+        {
+          "news_id": "604014",
+          "kind": "flash",
+          "body_chars": 37
+        },
+        {
+          "news_id": "603757",
+          "kind": "briefing",
+          "body_chars": 939
+        },
+        {
+          "news_id": "603608",
+          "kind": "briefing",
+          "body_chars": 910
+        }
+      ],
+      "h2EqualsTopBriefingBody": true,
+      "detailLd": {
+        "headline": "Gold Holds Gains Amid Recovery in Equity Markets",
+        "datePublished": "2026-11-24T02:17:13Z",
+        "dateModified": "2026-11-24T02:17:13Z",
+        "url": "https://tradingeconomics.com/commodity/gold/news/603757",
+        "author": "Jam Kaimo Samonte"
+      }
+    },
+    "B": [
+      {
+        "check": "the login-page negative: the body gate fires (structure alarm, not a store)",
+        "pass": true,
+        "extra": {
+          "gates": {
+            "pass": false,
+            "reason": "the stream has zero briefing-qualified items (the longest body is 119 characters, under the 200-character gate) and no real page summary — a login/interstitial page is not a briefing"
+          },
+          "bodyChars": 120
+        }
+      },
+      {
+        "check": "the no-stream negative: the no-card gate fires (structure alarm)",
+        "pass": true,
+        "extra": {
+          "gates": {
+            "pass": false,
+            "reason": "no News Stream card: no <div class=\"card-header\"> whose text is exactly “News Stream”"
+          }
+        }
+      },
+      {
+        "check": "the rotated-window reaction: zero briefing-qualified items + a real h2 → the gates PASS (the quiet fire — the window rotated past the briefing, never an alarm)",
+        "pass": true,
+        "extra": {
+          "gates": {
+            "pass": true,
+            "reason": null
+          }
+        }
+      },
+      {
+        "check": "the challenge-page negative: the signature is detected",
+        "pass": true,
+        "extra": {}
+      },
+      {
+        "check": "the real commodity page is NOT a challenge page",
+        "pass": true,
+        "extra": {}
+      }
+    ],
+    "C": [
+      {
+        "check": "fire 1 (empty store, no AI): action capture, 2 stored",
+        "pass": true,
+        "extra": {
+          "action": "capture",
+          "detail": "2 stored; 1 flash item(s) skipped (not briefings)"
+        }
+      },
+      {
+        "check": "fire 1: exactly one page GET and 2 detail GETs (the flash item pays NO detail GET)",
+        "pass": true,
+        "extra": {
+          "pageCount": 1,
+          "detailCount": 2
+        }
+      },
+      {
+        "check": "fire 1: 2 ok rows, verbatim titles and bodies, no fa rows — and the flash item NEVER stored",
+        "pass": true,
+        "extra": {
+          "flashId": "604014"
+        }
+      },
+      {
+        "check": "fire 1: the JSON-LD author and datePublished landed verbatim (from the walk's own detail pages)",
+        "pass": true,
+        "extra": {
+          "author": "Clock Walk",
+          "published_at": "2026-11-24T02:17:13Z"
+        }
+      },
+      {
+        "check": "fire 2 (nothing new): the honest quiet fire — action quiet",
+        "pass": true,
+        "extra": {
+          "action": "quiet",
+          "detail": "2 briefing item(s) unchanged, 1 flash item(s) skipped"
+        }
+      },
+      {
+        "check": "fire 2: exactly ONE fire log line, zero other lines",
+        "pass": true,
+        "extra": {
+          "quietLines": [
+            {
+              "ts": "2026-11-24T16:58:57.984Z",
+              "event": "fire",
+              "news_id": null,
+              "detail": "quiet fire — the stream's 2 briefing item(s) all unchanged, 1 flash item(s) skipped"
+            }
+          ]
+        }
+      },
+      {
+        "check": "fire 2: zero briefing writes (row count unchanged, no updated_at bumps)",
+        "pass": true,
+        "extra": {}
+      },
+      {
+        "check": "fire 3 (new item, AI failing): the capture still lands — English stored, action capture",
+        "pass": true,
+        "extra": {
+          "action": "capture",
+          "detail": "1 stored; 1 unchanged; 1 flash item(s) skipped (not briefings); fa translation FAILED — logged, retried on the next fire: mock engine quota exhaustion (the clock walk's simulated failure); fa translation FAILED — logged, retried on the next fire: mock engine quota exhaustion (the clock walk's simulated failure)"
+        }
+      },
+      {
+        "check": "fire 3: the synthetic item's English row is safe (status ok)",
+        "pass": true,
+        "extra": {}
+      },
+      {
+        "check": "fire 3: translate-failed logged, no fa row",
+        "pass": true,
+        "extra": {}
+      },
+      {
+        "check": "fire 4 (AI healed): the pre-step healed the translation — translated + the quiet fire line",
+        "pass": true,
+        "extra": {
+          "action": "quiet",
+          "detail": "2 briefing item(s) unchanged, 1 flash item(s) skipped"
+        }
+      },
+      {
+        "check": "fire 4: the healing fire re-fetched the page (the clock's own rule) but made ZERO detail GETs",
+        "pass": true,
+        "extra": {
+          "newCalls": [
+            "https://tradingeconomics.com/commodity/gold"
+          ]
+        }
+      },
+      {
+        "check": "fire 4: the fa row landed with the mock adapter's honest sourceModel",
+        "pass": true,
+        "extra": {
+          "healedFa": {
+            "news_id": "999999",
+            "fa_title": "ترجمهٔ آزمایشی: Clock-walk synthetic briefing — not a real Trading Economics item",
+            "fa_body": "متن فارسی آزمایشی برای نیم‌ساعت شبانه‌روزی — Gold held above $3,600 per ounce on Tuesday after recovering from more than one-year lows in the previous session, as a rally in technology stocks and renewed optimism surrounding AI helped ease selling pressure on precious metals. The rebound followed Nvidia’s board decision to unanimously reinstate Jensen Huang as CEO after consultations with US government officials. Gold has faced sustained dow (synthetic continuation for the clock walk — never stored anywhere but the scratch database.) ral Reserve tightening. Markets are currently assigning roughly a 95% probability to a 25-basis-point rate hike in December, while the remaining expectations point to a larger 50-basis-point increase.",
+            "source_model": "clock-walk-mock-engine",
+            "translated_at": "2026-11-25T16:00:00.000Z",
+            "content_hash": "7f22ecd8614d444f5b2b6d77de50bb61282fa01f58ccd4b32a02d98d5c8c71b9"
+          }
+        }
+      },
+      {
+        "check": "fire 5 (TE edited the body): re-store — hash bumped, updated_at moved, re-stored log",
+        "pass": true,
+        "extra": {
+          "r": {
+            "action": "capture",
+            "detail": "1 re-stored; 1 unchanged; 1 flash item(s) skipped (not briefings); fa translation stored (clock-walk-mock-engine, 2 strings); fa translation stored (clock-walk-mock-engine, 2 strings)"
+          },
+          "reStoredRow": {
+            "news_id": "999999",
+            "published_at": "2026-11-25T02:00:00Z",
+            "title": "Clock-walk synthetic briefing — not a real Trading Economics item",
+            "body": "Gold held above $3,600 per ounce on Tuesday after recovering from more than one-year lows in the previous session, as a rally in technology stocks and renewed optimism surrounding AI helped ease selling pressure on precious metals. The rebound followed Nvidia’s board decision to unanimously reinstate Jensen Huang as CEO after consultations with US government officials. Gold has faced sustained dow (synthetic continuation for the clock walk — never stored anywhere but the scratch database.) ral Reserve tightening. Markets are currently assigning roughly a 95% probability to a 25-basis-point rate hike in December, while the remaining expectations point to a larger 50-basis-point increase. Edited post-publication by the clock walk — the hash moves.",
+            "source_url": "https://tradingeconomics.com/commodity/gold/news/999999",
+            "author": "Clock Walk",
+            "fetched_at": "2026-11-26T05:00:00.000Z",
+            "content_hash": "3e1b0d61128ad429307cea53c83fb7c45343f8ce20b8b08608c81d0b3634e5f9",
+            "status": "ok",
+            "updated_at": "2026-11-26T05:00:00.000Z"
+          }
+        }
+      },
+      {
+        "check": "fire 5: the re-store re-translated through the freshness gate (hash-keyed)",
+        "pass": true,
+        "extra": {}
+      },
+      {
+        "check": "fire 6 (unchanged): quiet again — zero briefing writes, the pre-step's one-row heal + the fire line the only writes",
+        "pass": true,
+        "extra": {
+          "r": {
+            "action": "quiet",
+            "detail": "2 briefing item(s) unchanged, 1 flash item(s) skipped"
+          },
+          "c6Lines": [
+            {
+              "ts": "2026-11-24T16:58:57.992Z",
+              "event": "translated",
+              "news_id": "603608",
+              "detail": "model clock-walk-mock-engine (chat contract, 2 strings), item 603608"
+            },
+            {
+              "ts": "2026-11-24T16:58:57.992Z",
+              "event": "fire",
+              "news_id": null,
+              "detail": "quiet fire — the stream's 2 briefing item(s) all unchanged, 1 flash item(s) skipped; fa translation stored (clock-walk-mock-engine, 2 strings)"
+            }
+          ]
+        }
+      },
+      {
+        "check": "fire 7 (403 challenge): fetch-failed, the challenge posture — never an alarm, never a store",
+        "pass": true,
+        "extra": {
+          "action": "fetch-failed",
+          "detail": "HTTP 403 (the challenge posture — no arms race, the card keeps the last known good)"
+        }
+      },
+      {
+        "check": "fire 8 (login page 200): the structure alarm path — the log names the 200-character gate, the last known good stays served",
+        "pass": true,
+        "extra": {
+          "action": "structure-alert",
+          "detail": "the stream has zero briefing-qualified items (the longest body is 119 characters, under the 200-character gate) and no real page summary — a login/interstitial page is not a briefing"
+        }
+      },
+      {
+        "check": "fire 8: the alarm marked the login item as a marker row — the 3 captured rows all keep their content and ok status",
+        "pass": true,
+        "extra": {
+          "alarmRows": [
+            "600001"
+          ]
+        }
+      },
+      {
+        "check": "fire 9 (all-flash window, real h2): the rotated window — the quiet fire, zero briefing writes, at most a pre-step heal beside the one fire line, never an alarm",
+        "pass": true,
+        "extra": {
+          "r": {
+            "action": "quiet",
+            "detail": "0 briefing item(s) unchanged, 1 flash item(s) skipped"
+          },
+          "c9Lines": [
+            {
+              "ts": "2026-11-24T16:58:57.994Z",
+              "event": "fire",
+              "news_id": null,
+              "detail": "quiet fire — the stream's 0 briefing item(s) all unchanged, 1 flash item(s) skipped"
+            }
+          ]
+        }
+      }
+    ],
+    "C_walk": {
+      "fires": 9,
+      "aiCalls": 6,
+      "fetchCalls": 10,
+      "finalLog": [
+        {
+          "event": "stored",
+          "news_id": "603757",
+          "detail": "published 2026-11-24T02:17:13Z, 939 chars, by Clock Walk"
+        },
+        {
+          "event": "stored",
+          "news_id": "603608",
+          "detail": "published 2026-11-23T14:46:48Z, 910 chars, by Clock Walk"
+        },
+        {
+          "event": "fire",
+          "news_id": null,
+          "detail": "quiet fire — the stream's 2 briefing item(s) all unchanged, 1 flash item(s) skipped"
+        },
+        {
+          "event": "translate-failed",
+          "news_id": "603757",
+          "detail": "model clock-walk-mock-engine: mock engine quota exhaustion (the clock walk's simulated failure)"
+        },
+        {
+          "event": "stored",
+          "news_id": "999999",
+          "detail": "published 2026-11-25T02:00:00Z, 695 chars, by Clock Walk"
+        },
+        {
+          "event": "translate-failed",
+          "news_id": "999999",
+          "detail": "model clock-walk-mock-engine: mock engine quota exhaustion (the clock walk's simulated failure)"
+        },
+        {
+          "event": "translated",
+          "news_id": "999999",
+          "detail": "model clock-walk-mock-engine (chat contract, 2 strings), item 999999"
+        },
+        {
+          "event": "fire",
+          "news_id": null,
+          "detail": "quiet fire — the stream's 2 briefing item(s) all unchanged, 1 flash item(s) skipped; fa translation stored (cl"
+        },
+        {
+          "event": "translated",
+          "news_id": "603757",
+          "detail": "model clock-walk-mock-engine (chat contract, 2 strings), item 603757"
+        },
+        {
+          "event": "re-stored",
+          "news_id": "999999",
+          "detail": "TE edited the briefing after publication (content hash changed); body now 755 chars"
+        },
+        {
+          "event": "translated",
+          "news_id": "999999",
+          "detail": "model clock-walk-mock-engine (chat contract, 2 strings), item 999999"
+        },
+        {
+          "event": "translated",
+          "news_id": "603608",
+          "detail": "model clock-walk-mock-engine (chat contract, 2 strings), item 603608"
+        },
+        {
+          "event": "fire",
+          "news_id": null,
+          "detail": "quiet fire — the stream's 2 briefing item(s) all unchanged, 1 flash item(s) skipped; fa translation stored (cl"
+        },
+        {
+          "event": "fetch-failed",
+          "news_id": null,
+          "detail": "HTTP 403 (the challenge posture — no arms race, the card keeps the last known good)"
+        },
+        {
+          "event": "structure-alert",
+          "news_id": "600001",
+          "detail": "the stream has zero briefing-qualified items (the longest body is 119 characters, under the 200-character gate"
+        },
+        {
+          "event": "fire",
+          "news_id": null,
+          "detail": "quiet fire — the stream's 0 briefing item(s) all unchanged, 1 flash item(s) skipped"
+        }
+      ]
+    },
+    "D": [
+      {
+        "check": "the DDL applied a second time with no error (idempotence)",
+        "pass": true,
+        "extra": {}
+      },
+      {
+        "check": "the tables still carry the walk's rows after the re-apply (2 captured + the synthetic + the alarm marker)",
+        "pass": true,
+        "extra": {
+          "n": 4
+        }
+      }
+    ]
+  },
+  "failures": []
+}

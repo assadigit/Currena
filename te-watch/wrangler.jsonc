@@ -1,0 +1,52 @@
+// currena-te-watch — the Trading Economics daily gold briefing watch
+// worker (docs/te-daily-briefing-spec.md §4.1, the DECIDED spec).
+//
+// A minimal, dependency-free Cloudflare Worker — the wgc-watch's own
+// sibling pattern: the scheduled fetch → parse → gates → upsert pipeline
+// over the SAME D1 database as the desk (aurum-desk), plus the Persian
+// translation through the [ai] binding, plus a read-only health endpoint
+// on its workers.dev URL. It binds the same database_id and claims no
+// route on currena.ir — the zone stays exactly as it is.
+//
+// The cron trigger (spec §4.2, the owner's §11 Q2 + Q4 answers): ONE
+// trigger, two fires a day — "0 5,16 * * *" UTC. 05:00 (08:30 Tehran)
+// captures the Asia-morning piece (observed ~02:00 UTC publishes, 3
+// hours of margin); 16:00 (19:30 Tehran) captures any intraday second
+// piece. Each fire is one page GET plus at most one detail GET per
+// genuinely new item; the day's budget is 2 page GETs + at most 2 detail
+// GETs + at most 2 translation runs. This takes the account's fifth and
+// LAST free cron slot — 5/5 after this deploy, stated plainly.
+//
+// The [ai] binding is the platform-native engine (the same choice the
+// wgc-watch made: no secret surface to manage, the free plan includes
+// it, and the neuron budget at two calls a day is irrelevant); the REST
+// + token path is what the seed script uses from outside the worker
+// (scripts/te-seed.ts).
+//
+// Deploy (from this directory, credentials env-only):
+//   CLOUDFLARE_API_TOKEN=… CLOUDFLARE_ACCOUNT_ID=… bunx wrangler deploy
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "currena-te-watch",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "triggers": {
+    "crons": ["0 5,16 * * *"]
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "aurum-desk",
+      // The desk's own database (wrangler d1 create aurum-desk, 2026-11-22) —
+      // shared, never re-seeded.
+      "database_id": "264617a4-5bfa-43af-8c9c-d4c95d257dc8"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

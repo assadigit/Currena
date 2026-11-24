@@ -177,3 +177,63 @@ model WgcScrapeLog {
   @@index([monthKey])
   @@map("wgc_scrape_log")
 }
+
+/* ------------------------------------------------------------------ *
+ * The Trading Economics daily gold briefing (te-watch/ddl.sql, the
+ * 2026-11-24 TE spec sitting — docs/te-daily-briefing-spec.md §4.6).
+ * One row per news-stream item, written by the currena-te-watch
+ * Worker's twice-daily fire; read-only for the desk.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The captured English briefing — title + body verbatim, TE's own
+ * timestamp and author from the item's Article JSON-LD.
+ */
+model TeBriefing {
+  newsId      String  @id @map("news_id") // TE's own item id ('603757')
+  publishedAt String  @map("published_at") // TE's Article JSON-LD datePublished, verbatim ISO UTC
+  title       String  @map("title") // verbatim
+  body        String  @map("body") // verbatim, the full briefing (empty on an alert marker row)
+  sourceUrl   String  @map("source_url") // https://tradingeconomics.com/commodity/gold/news/{id}
+  author      String? @map("author") // TE's own author field, verbatim
+  fetchedAt   String  @map("fetched_at") // ISO UTC — when the watch worker captured it
+  contentHash String  @map("content_hash") // sha256 of canonicalized title + body
+  status      String  @default("ok") @map("status") // ok | structure_alert
+  updatedAt   String? @map("updated_at") // bumped only on a re-store (TE edited after publication)
+
+  @@index([publishedAt])
+  @@map("te_briefing")
+}
+
+/**
+ * The Persian translation side table. One row per briefing, written by
+ * the watch worker's translation step (the same gemma engine and
+ * disciplines the WGC pipeline carries); content_hash is the ENGLISH
+ * row's hash at translation time — the freshness key.
+ */
+model TeBriefingFa {
+  newsId       String @id @map("news_id")
+  faTitle      String @map("fa_title")
+  faBody       String @map("fa_body")
+  sourceModel  String @map("source_model") // '@cf/google/gemma-4-26b-a4b-it' — never silent
+  translatedAt String @map("translated_at")
+  contentHash  String @map("content_hash")
+
+  @@map("te_briefing_fa")
+}
+
+/**
+ * The watch worker's scrape log — the per-fire record the health
+ * endpoint reads and this app reads for the honest state (the latest
+ * event and the trailing fetch-failed streak). Read-only for the desk.
+ */
+model TeScrapeLog {
+  ts     String  @map("ts") // ISO UTC
+  newsId String? @map("news_id") // NULL for fire-level events
+  event  String  @map("event") // fire | fetch-failed | stored | re-stored | translated | translate-failed | structure-alert
+  detail String?
+
+  @@id([ts, event]) // Prisma identity only — the DDL table carries no key of its own
+  @@index([event])
+  @@map("te_scrape_log")
+}

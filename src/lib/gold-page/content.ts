@@ -709,6 +709,27 @@ export const UI = {
         "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights. The balance leans against: conditions, not a forecast.",
       explore: "Explore the five forces",
     },
+    te: {
+      title: "Trading Economics daily gold briefing",
+      subtitle: "خلاصهٔ روزانهٔ بازار طلا",
+      seriesLine: "The gold page's news-stream top item · the briefing box, verbatim, twice daily",
+      // The fa layer's honest labels (TE spec §5); unused in EN rendering —
+      // the shared copy type keeps both bundles the same shape.
+      mtLabel: "Machine translation",
+      enOriginalLabel: "The English original, verbatim",
+      publishedLabel: "Published {date}",
+      fetchedLabel: "fetched {date}",
+      source: "Source: Trading Economics",
+      stateWaiting:
+        "No briefing captured yet. The watch fires twice daily — 05:00 and 16:00 UTC (08:30 and 19:30 Tehran); the next fire {time}.",
+      stateFetchFailed:
+        "Trading Economics has not been reachable for {n} fire(s) since {date} — no proxy, no arms race; the last captured briefing stays above, dated.",
+      stateAlert:
+        "The source's page template changed and the briefing could not be read; the last known good is shown. A human must look.",
+      coverageLine:
+        "The record begins {date} — the stream exposes only the latest three items; nothing earlier is backfilled.",
+      unavailable: "The daily briefing did not arrive; nothing is shown rather than a guess.",
+    },
     wgc: {
       title: "World Gold Council monthly commentary",
       subtitle: "نگارش ماهانهٔ شورای جهانی طلا",
@@ -1280,6 +1301,28 @@ export const UI = {
       body:
         "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند. ترازو علیه می‌چرخد؛ شرایط، نه پیش‌بینی.",
       explore: "پنج نیرو را کاوش کن",
+    },
+    te: {
+      title: "خلاصهٔ روزانهٔ بازار طلا",
+      subtitle: "Trading Economics · the daily gold briefing",
+      seriesLine: "خلاصهٔ خبری صفحهٔ طلا · متن اصلی، واژه‌به‌واژه، دو بار در روز",
+      // The honest label spec §5 mandates above the machine-translated
+      // Farsi — exactly those words, never softened — and the caption over
+      // the English original below it.
+      mtLabel: "ترجمهٔ ماشینی",
+      enOriginalLabel: "متن اصلی به انگلیسی — واژه‌به‌واژه",
+      publishedLabel: "انتشار: {date}",
+      fetchedLabel: "بازخوانی: {date}",
+      source: "منبع: Trading Economics",
+      stateWaiting:
+        "هنوز هیچ خلاصه‌ای ثبت نشده است. پایش دو بار در روز روشن می‌شود — ۵:۰۰ و ۱۶:۰۰ به‌وقت جهانی (۸:۳۰ و ۱۹:۳۰ تهران)؛ روشن‌شدن بعدی {time}.",
+      stateFetchFailed:
+        "از {date} تاکنون ({n} بار) Trading Economics در دسترس نبوده — بدون پروکسی، بدون جنگ‌افزار؛ آخرین خلاصهٔ ثبت‌شده بالا می‌ماند، با تاریخ خودش.",
+      stateAlert:
+        "قالب صفحهٔ منبع تغییر کرده و خلاصه خوانده نشد؛ آخرین نسخهٔ سالم نشان داده می‌شود. باید دستی بررسی شود.",
+      coverageLine:
+        "سابقهٔ ثبت از {date} آغاز می‌شود — این جریان فقط سه خبر آخر را نشان می‌دهد؛ چیزی از پیش از آن بازخوانی نشده است.",
+      unavailable: "خلاصهٔ روزانه نرسید؛ به‌جای حدس، هیچ‌چیز نشان داده نمی‌شود.",
     },
     wgc: {
       title: "نگارش ماهانهٔ شورای جهانی طلا",

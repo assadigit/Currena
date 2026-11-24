@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Explicit source roots (disables Tailwind v4's automatic source
+   detection): every class the desk uses lives under src/. The
+   4.1.18 auto-detection emits a malformed extension glob — one open
+   brace, two closes — that panics Turbopack 16.4.6's glob parser
+   (the "unopened alternate group" crash); an explicit, well-formed
+   source set is the documented fix and the honest scan scope. */
+@source "../**/*.{js,ts,jsx,tsx,md,mdx}";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -66,5 +66,39 @@
     }
   ],
   "h2_description_chars": 939,
-  "h2_equals_stream_top_body": true
+  "h2_equals_stream_top_body": true,
+  "addenda": [
+    {
+      "recorded_at": "2026-11-24T16:25:00Z",
+      "discovered_during": "the implementing sitting's §12.1 re-probe (the gate did its job)",
+      "finding": "the News Stream carries SHORT FLASH ITEMS beside the briefings: a price-change flash (id 604014, 'Gold is down by 2%', body 'Gold decreased 2% to 3562.37 USD/t.oz', 37 chars) rotated onto the top of the stream ~16:20 UTC, pushing the briefing 603757 to the second slot and 603349 out of the 3-slot window",
+      "consequence_for_the_parser": "the capture scope is the BRIEFING-QUALIFIED items (body >= 200 chars, observed 910-948); flash items (body < 200) are skipped, never stored, never an alarm — the owner's §11 Q1 answer ('just the box of briefing + title') defines the scope. The h2#description cross-check binds to the TOP BRIEFING-QUALIFIED item, not the raw top slot.",
+      "detail_page_finding": "the article's own body lives in the detail page's <meta name=\"description\"> — full, verbatim, rotation-proof. Verified byte-identical to the commodity page's stream copy for 603757 (939 chars, True) and matching the census record for the rotated-out 603349 (948 chars). The detail page's own News Stream is just the GLOBAL current stream (flash included) — it does NOT reliably contain the article's own body once the item rotates out.",
+      "gate_reactions": [
+        "a page whose stream has zero briefing-qualified items AND no (or short) h2#description -> structure alarm (the login/interstitial negative's semantics, preserved)",
+        "a page whose stream has zero briefing-qualified items but a real h2#description (>=200 chars) -> the quiet fire (the stream window rotated past the briefing; the page's own summary is unchanged)",
+        "h2 present + briefing items present + h2 != top briefing body -> structure alarm (template drift)"
+      ],
+      "live_stream_at_discovery": [
+        {
+          "news_id": "604014",
+          "kind": "flash",
+          "title": "Gold is down by 2%",
+          "body_chars": 37
+        },
+        {
+          "news_id": "603757",
+          "kind": "briefing",
+          "title": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "body_chars": 939
+        },
+        {
+          "news_id": "603608",
+          "kind": "briefing",
+          "title": "Gold Rebounds From One-Year Lows",
+          "body_chars": 910
+        }
+      ]
+    }
+  ]
 }
