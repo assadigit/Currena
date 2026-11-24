@@ -7,37 +7,52 @@
  * job moves to its own trigger).
  *
  * Surface: scheduled ONLY — this Worker deliberately exposes no fetch
- * handler, so a page request can NEVER reach a provider. The three cron
- * triggers are the stock section's own (spec §4 rule 3), keeping each
- * invocation far under the 50-subrequest cap (the combined worst case —
- * every market fetch bouncing to Yahoo AND the fx fallback firing — is
- * ≤48 subrequests INCLUDING the same-invocation KV ops, audit A-6: the
- * write gates compare against the runs' own start-of-run reads instead
- * of re-reading; see index.test.ts's combined budget test):
+ * handler, so a page request can NEVER reach a provider. Since the
+ * 2026-11-24 cron consolidation the Worker runs on ONE covering trigger
+ * (COVERING_CRON "0,30,50 1,7,8,23 * * *" — src/crons.ts) and the
+ * scheduled handler dispatches by the fire's own scheduled UTC time:
+ * byte-equivalent to the original four-trigger string dispatch at every
+ * original fire minute (the offline proof walked every minute of a full
+ * week — 10,080 minutes, zero mismatches, all 20 weekly real jobs
+ * covered). The covered job windows (src/crons.ts documents them as the
+ * four original expressions):
  *
- *   "30 23 * * 1-5"  main  — every market has closed by 23:30 UTC; fetch
- *                            all 16, EODHD first, Yahoo as fallback; then
- *                            the fx job (ONE Frankfurter call).
- *   "30 1 * * 2-6"   retry — re-fetch only failed/old markets; when the
- *                            whole snapshot is old (the main run's write
- *                            bounced off the saturated daily KV budget),
- *                            re-fetch through Yahoo — the closes are
- *                            immutable, so the data is identical and the
- *                            EODHD quota the main run already spent is
- *                            protected — and land the day's one write in
- *                            the fresh post-midnight budget slice. The fx
- *                            job runs again (its own write gate spends
- *                            nothing when nothing changed).
- *   "50 8 * * 2-6"   asia  — F1 (2026-10-21 session-finality round): the
- *                            01:30 retry now HOLDS an intraday Asian
- *                            point instead of freezing it as the day's
- *                            close; this rung re-fetches those markets
- *                            AFTER their sessions have closed (Tokyo
- *                            06:00, Sydney 06:00, Seoul 06:30, Taipei
- *                            05:30, Shanghai 07:00, Hong Kong 08:00 UTC)
- *                            and lands the day's rows. Mumbai (10:00 UTC
- *                            close) lands on the next rung or the 23:30
- *                            main. Retry-shaped: only failed/old markets.
+ *   23:30 UTC Mon–Fri  main  — every market has closed by 23:30 UTC; fetch
+ *                              all 16, EODHD first, Yahoo as fallback; then
+ *                              the fx job (ONE Frankfurter call).
+ *   01:30 UTC Tue–Sat  retry — re-fetch only failed/old markets; when the
+ *                              whole snapshot is old (the main run's write
+ *                              bounced off the saturated daily KV budget),
+ *                              re-fetch through Yahoo — the closes are
+ *                              immutable, so the data is identical and the
+ *                              EODHD quota the main run already spent is
+ *                              protected — and land the day's one write in
+ *                              the fresh post-midnight budget slice. The fx
+ *                              job runs again (its own write gate spends
+ *                              nothing when nothing changed).
+ *   08:50 UTC Tue–Sat  asia  — F1 (2026-10-21 session-finality round): the
+ *                              01:30 retry now HOLDS an intraday Asian
+ *                              point instead of freezing it as the day's
+ *                              close; this rung re-fetches those markets
+ *                              AFTER their sessions have closed (Tokyo
+ *                              06:00, Sydney 06:00, Seoul 06:30, Taipei
+ *                              05:30, Shanghai 07:00, Hong Kong 08:00 UTC)
+ *                              and lands the day's rows. Mumbai (10:00 UTC
+ *                              close) lands on the next rung or the 23:30
+ *                              main. Retry-shaped: only failed/old markets.
+ *   07:00 UTC Mon–Fri  au    — gap-closure S5-M5.4: the Australian markets
+ *                              board (the 18 probe-verified ASX indices),
+ *                              Yahoo-only, 30 min after the ASX 06:00 UTC
+ *                              close + 30 min F1 margin. Runs ALONE (no fx
+ *                              twin) in its own invocation with its own
+ *                              50-subrequest budget.
+ *
+ * The covering trigger's extra wakes (01:00, 01:50, 07:30, 08:00, 08:30,
+ * 23:00, 23:50 UTC — and any fire outside the four windows, e.g. a
+ * weekend minute at a job time) carry no job: one log line, return. The
+ * consolidation freed the account's cron quota for currena-wgc-watch
+ * (Workers Free allows five triggers: currena-api 1 + this Worker 1 +
+ * the watch Worker 2 + one spare).
  *
  * Both jobs are the SHARED runMarketsUpdate / runFxUpdate orchestrations
  * (the manual runner scripts use the same code paths — they cannot drift).
@@ -57,7 +72,6 @@ import { KvFxStore } from '@currena/insights/fx';
 import { auDefaultFetcher, formatAuRunReport, runAuMarketsUpdate } from '@currena/insights/markets-au';
 import type { AuMarketJobFetchers, RunAuMarketsUpdateResult } from '@currena/insights/markets-au';
 import { KvAuMarketsStore } from '@currena/insights/markets-au';
-import { MAIN_CRON, RETRY_CRON, ASIA_CRON, AU_CRON } from './crons';
 
 /**
  * The Worker's bindings. RATES is typed as the structural KV surface the
@@ -139,35 +153,49 @@ export default {
     env: MarketsEnv,
     ctx: ExecutionContext,
   ): Promise<void> {
-    // Cron-kind selection is explicit (QA audit A-7): an unknown trigger
-    // expression logs loudly and skips — never silently treated as 'retry'
-    // (the old string-inequality fallback ran ANY unexpected cron as the
-    // retry pass, which re-fetches through Yahoo and could burn quota on a
-    // misconfigured trigger). The Asia rung (F1) is retry-SHAPED: it runs
-    // the same retry orchestration (only failed/old markets), only its
-    // trigger time differs — after the Asian closes.
-    if (event.cron === AU_CRON) {
+    // [currena-markets cron consolidation, 2026-11-24] Cron-kind selection
+    // is by the fire's own scheduled UTC time — QA audit A-7's spirit
+    // kept: ONLY the four exact windows below (day-of-week + UTC
+    // hour:minute) map to a job; every other minute — the covering
+    // trigger's no-op wakes, and a job time landing outside its
+    // day-of-week window (e.g. a Sunday 23:30) — logs one line and
+    // returns, never silently treated as a run. The four windows are the
+    // original MAIN_CRON / RETRY_CRON / ASIA_CRON / AU_CRON expressions
+    // (src/crons.ts documents them; the dispatch reads only the time).
+    const t = new Date(event.scheduledTime);
+    const dow = t.getUTCDay();
+    const hh = t.getUTCHours();
+    const mm = t.getUTCMinutes();
+    const monToFri = dow >= 1 && dow <= 5;
+    const tueToSat = dow >= 2 && dow <= 6;
+    let kind: 'main' | 'retry' | undefined;
+    let au = false;
+    if (monToFri && hh === 23 && mm === 30) {
+      kind = 'main';
+    } else if (tueToSat && hh === 1 && mm === 30) {
+      kind = 'retry';
+    } else if (tueToSat && hh === 8 && mm === 50) {
+      // The Asia rung (F1) is retry-SHAPED: it runs the same retry
+      // orchestration (only failed/old markets), only its window differs.
+      kind = 'retry';
+    } else if (monToFri && hh === 7 && mm === 0) {
+      au = true;
+    }
+    if (au) {
       // gap-closure S5-M5.4: the AU markets rung runs ALONE (no fx twin) —
       // its own 50-subrequest budget, its own failure domain.
       const auWork = runScheduledAuMarkets(env).then(
         () => undefined,
         (err: unknown) => {
-          console.error(`[markets-au] run failed: ${err instanceof Error ? err.message : String(err)}`);
+          console.error(`arkets-au] run failed: ${err instanceof Error ? err.message : String(err)}`);
         },
       );
       ctx.waitUntil(auWork);
       return;
     }
-    const kind: 'main' | 'retry' | undefined =
-      event.cron === MAIN_CRON
-        ? 'main'
-        : event.cron === RETRY_CRON || event.cron === ASIA_CRON
-          ? 'retry'
-          : undefined;
     if (kind === undefined) {
-      console.error(
-        `[markets] unknown cron expression ${JSON.stringify(event.cron)} — skipping ` +
-          `(expected ${JSON.stringify(MAIN_CRON)}, ${JSON.stringify(RETRY_CRON)}, ${JSON.stringify(ASIA_CRON)} or ${JSON.stringify(AU_CRON)})`,
+      console.log(
+        `arkets] covering-cron wake at ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} UTC (day ${dow}) — no job at this minute`,
       );
       return;
     }
@@ -176,10 +204,10 @@ export default {
       (err: unknown) => {
         // One run's failure must never crash the Worker or future runs —
         // the stored snapshot survives (R7) and the next cron retries.
-        console.error(`[markets] ${kind} run failed: ${err instanceof Error ? err.message : String(err)}`);
+        console.error(`arkets] ${kind} run failed: ${err instanceof Error ? err.message : String(err)}`);
       },
     );
-    // The fx job rides the same triggers (§4.4's fallback), fault-isolated:
+    // The fx job rides the same windows (§4.4's fallback), fault-isolated:
     // it starts only after the markets job settles so the two never
     // interleave their provider calls inside one invocation.
     const fxWork = marketsWork.then(() => runScheduledFx(env)).then(

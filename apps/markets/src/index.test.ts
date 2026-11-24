@@ -19,7 +19,7 @@ import type { MarketId, MarketsSnapshot } from '@currena/core';
 import { ProviderError } from '@currena/insights/markets';
 import type { MarketJobFetchers, MarketSeries, KVLike } from '@currena/insights/markets';
 import { runScheduledMarkets } from './index';
-import { MAIN_CRON, RETRY_CRON, ASIA_CRON, AU_CRON } from './crons';
+import { COVERING_CRON, MAIN_CRON, RETRY_CRON, ASIA_CRON, AU_CRON } from './crons';
 
 // The node surface this TEST file uses, resolved at RUNTIME through a
 // non-literal specifier (vitest runs on Node) so the app's worker program
@@ -222,23 +222,26 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
     expect(kv.ops.writes).toBe(1);
   });
 
-  it('the cron expressions match wrangler.jsonc (the file is READ, not mirrored — audit C-8)', () => {
+  it('the cron config matches the code (the file is READ, not mirrored — audit C-8)', () => {
     // Parse the wrangler config the way a human would: strip // comments,
     // then pull triggers.crons out of the JSON. A drift between the code
     // constants and the deployed triggers fails HERE — the old literal
-    // mirror could never catch it.
+    // mirror could never catch it. Since the 2026-11-24 consolidation the
+    // Worker runs on the ONE covering trigger; the four original
+    // expressions below stay pinned as the documented windows the
+    // time-based dispatch implements (a wrong expression in BOTH places
+    // would otherwise pass silently).
     const raw = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
     const uncommented = raw.replace(/^\s*\/\/.*$/gm, '');
     const config = JSON.parse(uncommented) as { triggers?: { crons?: string[] } };
     const crons = config.triggers?.crons;
     expect(crons).toBeDefined();
-    expect(crons).toHaveLength(4);
-    expect(MAIN_CRON).toBe(crons![0]);
-    expect(RETRY_CRON).toBe(crons![1]);
-    expect(ASIA_CRON).toBe(crons![2]);
-    expect(AU_CRON).toBe(crons![3]);
-    // The literal spellings stay pinned too — a wrong expression in BOTH
-    // places would otherwise pass silently.
+    expect(crons).toHaveLength(1);
+    expect(COVERING_CRON).toBe(crons![0]);
+    // The covering literal stays pinned…
+    expect(COVERING_CRON).toBe('0,30,50 1,7,8,23 * * *');
+    // …and so do the four covered windows it must stay equivalent to
+    // (the dispatch's day-of-week/time guards — index.scheduled.test.ts).
     expect(MAIN_CRON).toBe('30 23 * * 1-5');
     expect(RETRY_CRON).toBe('30 1 * * 2-6');
     // F1 (2026-10-21 session-finality round): the Asia rung re-fetches the
@@ -251,8 +254,9 @@ describe('runScheduledMarkets — the 24-hour budget', () => {
 });
 
 /* ------------------------------------------------------------------ *
- * The fx job rides the same two triggers (insights-world-currencies-
- * spec.md §4.4's fallback: the account's 5-cron free limit is full) —
+ * The fx job rides the same job windows (insights-world-currencies-
+ * spec.md §4.4's fallback; since the 2026-11-24 consolidation the
+ * covering trigger hosts them all — see index.scheduled.test.ts) —
  * the COMBINED 24-hour budget (currencies §9 build step 10):
  *   - one Frankfurter call per fx run (Yahoo's 8 only on fallback);
  *   - KV writes ≤3/day across BOTH sections (in practice: the markets
