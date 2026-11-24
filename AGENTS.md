@@ -1157,3 +1157,29 @@ D1 and secrets untouched — the documented procedure), and verified
 against https://currena.ir/gold: every route 200, zero console and
 zero page errors, 375px with no horizontal overflow, the fa/RTL walk
 confirming all thirteen items above.
+
+### The wrap-up record: batch G on GitHub, the desk re-verified (2026-11-24, early)
+
+The sitting opened to wrap the previous one: local main sat one commit
+ahead (0fddb585, batch G) with no deploy-record commit after it — the
+state the context cutoff left behind. What the audit found and did:
+
+- **Pushed**: the fetch showed GitHub already carried 0fddb585 (the
+  previous sitting had pushed it right after committing; only the local
+  tracking ref was stale). `git push` confirmed everything up-to-date —
+  origin/main == 0fddb585, tree clean.
+- **Deployed, independently re-verified**: `wrangler deployments list` —
+  the live worker version `168dda40-fe04-470b-b7b1-8978cfe4ad27`,
+  created 2026-11-24T00:01:01Z, built on the batch G tree minutes before
+  its commit (the worker version the batch G record left unnamed).
+  currena.ir/gold and the workers.dev mirror answer 200 with equal
+  shells; the served section nav carries batch G's own structure (the
+  `gold-physical` chip, `gold-history` as the last chip, no
+  `gold-correlation` chip); the full API sweep green — every
+  `/gold/api/gold/*` route 200, `meter` and `daily` answering their honest
+  parameter 400s without a date and 200 with it; `currena.ir/` and
+  `/goldsmith` untouched. No new deploy was needed — nothing in the app
+  changed after 0fddb585; this sitting's commits are documentation only.
+- **The sandbox mirror synced**: the eight batch G files + AGENTS.md
+  copied to the sandbox tree, the dev server restarted on the current
+  tree.
