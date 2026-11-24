@@ -1183,3 +1183,42 @@ state the context cutoff left behind. What the audit found and did:
 - **The sandbox mirror synced**: the eight batch G files + AGENTS.md
   copied to the sandbox tree, the dev server restarted on the current
   tree.
+
+### The WGC monthly commentary spec — the highlights pipeline, proposed (2026-11-24)
+
+The owner's new brief: scrape the Highlights box of the World Gold
+Council's monthly Gold Market Commentary — highlights only — once a
+month, bounded to the dates the issues actually appear ("they might
+publish this with delay"). The research ran first, per the brief: 48 URLs
+(2023-01 → 2026-10 plus the skip months and two not-yet-published
+controls), fetched by the probe now in `scripts/wgc-probe.ts`, the raw
+census (every segment verbatim) in
+`docs/evidence/wgc-census-2026-11-24.json`. What it established:
+
+- The series is **ten issues a year** — every June and November has no
+  issue at all (clean 404s every year observed; June 2026 instead
+  301-redirects to July's issue — the exact trap the spec's slug guard
+  exists for, caught by comparing the final URL's slug).
+- Publication lands **4–12 days after the reviewed month's end** (39
+  genuine issues: median 7, always 08:00 London) → the proposed bounded
+  window: daily 09:30 UTC on days 1–15 of the following month plus
+  alternate grace days through 25, stop-on-success, at most 20 attempts
+  per month, zero requests in the skip months.
+- The Highlights box exists only since the **2025-03** issue, always
+  exactly two segments, and WGC rotates **five markup shapes** for it
+  (h2/h3 box heading × h3 subheads / strong-paragraph heads /
+  strong+`<br>` single paragraphs / `ul-li` bodies) — the parser
+  contract tokenizes all five, was validated against all 17 box issues,
+  and reproduces the owner's own pasted September snippet byte-identically
+  (two research iterations were needed to find the `li` bodies and the
+  `strong+br` paragraphs — both now in the contract).
+- The proposed architecture, all of it in the spec: a separate tiny
+  `currena-wgc-watch` Worker on the same D1 (`aurum-desk`), cron-bounded
+  and slug-guarded, two D1 tables (`wgc_commentary` + a scrape log),
+  structure-change alarms, a read-only `/gold/api/gold/wgc-commentary`
+  route, a bilingual card with the LTR block and the whisper meta line,
+  a 17-row backfill (2025-03 → 2026-10), and the acceptance list for the
+  implementing sitting (re-run the probe first).
+
+**Status: proposed only — nothing built, deployed, or wired in this
+sitting.** The full document: `docs/wgc-monthly-commentary-spec.md`.

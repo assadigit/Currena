@@ -1,0 +1,669 @@
+[
+  {
+    "monthKey": "2023-01",
+    "slug": "january-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-02-09T08:00:00+00:00",
+    "ldDescription": "A falling US dollar was a significant contributor to gold’s 6.1% return in January and another positive ‘unexplained’ factor could be continued central bank buying or expectations thereof. Gold futures have also helped support the rally and, looking forward, we expect North American gold ETFs to continue seeing positive demand in coming weeks as historical analysis shows that positioning in futures tends to lead ETFs flows by two weeks.",
+    "delayDays": 9
+  },
+  {
+    "monthKey": "2023-02",
+    "slug": "february-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-03-07T08:00:00+00:00",
+    "ldDescription": "Gold shed 5.2% in February, as surprisingly strong US economic data propelled both yields and the US dollar higher. Global gold ETFs suffered more losses led by European funds while North American funds saw small outflows for the first time in two months. Recent futures positioning remains unavailable following issues with the data.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2023-03",
+    "slug": "march-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-04-06T08:00:00+01:00",
+    "ldDescription": "Quarter in review: gold’s all-time-high in sight   Gold gained 9% in Q1 2023, but see-sawed on bond market volatility A surge in March to record the highest monthly inflows since 2019, reversed two weak months for global gold ETFs and futures investment  Looking forward   Gold’s ‘mere’ resilience in 2022 may have been a disappointment to some. Despite crosswinds from unprecedented monetary tightening and spiking inflation, no real crisis materialized. But the risk of one is growing now Unprecedented rate hikes have started to break things, most notably in small US banks and the commercial real estate sector. While contained for now, it represents an increasing risk of systemic escalation With a US recession still on the cards, growing systemic risk adds to gold’s case.",
+    "delayDays": 6
+  },
+  {
+    "monthKey": "2023-04",
+    "slug": "april-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-05-10T08:00:00+01:00",
+    "ldDescription": "Month in review   Gold in US$/oz returned just 0.1% in April, consolidating after a strong run up during Q1 Support for gold came from lower rates and positive ETF flows while lower inflation expectations and profit taking created a drag.  Looking forward   The strong run-up y-t-d has left gold in need of a catalyst to break beyond its all-time high: one likely contender is a sharp equity correction, as valuations remain lofty in the face of deteriorating fundamentals Gold’s performance during sharp equity corrections has almost always been positive but has varied quite a bit in magnitude; prior gold returns and the level of real interest rates are key factors  At current levels these two factors suggest gold's response to a sharp equity sell off could sit in the upper end of the historical range.",
+    "delayDays": 10
+  },
+  {
+    "monthKey": "2023-05",
+    "slug": "may-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-06-07T08:00:00+01:00",
+    "ldDescription": "Gold fell 0.9% in May as an unwinding of net long futures offset global gold ETF inflows. But the small drop was largely currency-driven as outside North America, gold saw gains. A debt-ceiling deal was reached in the 11th hour in the US which, coupled with good economic data, might remove some short-term support for gold. However, the saga has implications that may help gold over the next few months, and an economic slowdown has likely not been averted.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2023-06",
+    "slug": "june-2023",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  },
+  {
+    "monthKey": "2023-07",
+    "slug": "july-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-08-08T08:00:00+01:00",
+    "ldDescription": "July in reviewGold gained 3.1% in July helped by a lower dollar and a spike in breakeven inflation rates Global gold ETFs shed holdings for a fourth consecutive month but COMEX managed money net long futures positions more than offset the decline, rising by 93t.Looking forwardAugust has been a good month for gold returns over the past two decades, likely driven by seasonally weak bond yields and consumer sentiment, anticipation of seasonal equity volatility in September, and some gold restocking in India and ChinaThis time round we don’t expect these factors to be as supportive as in the past, with yields pressured higher, equities trending up and conditions for a demand pick-up poor in India and ChinaHowever, this does not diminish our view that over the next few months, economic concerns will continue to mount and asset volatility will rise with them – factors that should help underpin investor interest in gold.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2023-08",
+    "slug": "august-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-09-06T08:00:00+01:00",
+    "ldDescription": "August in reviewGold declined marginally by 1% in August, in the face of higher yields and a stronger dollarSentiment remained weak for most of the month as ETFs continued to lose AUM while COMEX managed money net long futures positions fell to a five month low.Looking forwardSince July, long-dated yields have risen faster than short-dated yields, meaning the yield curve is exhibiting a ‘bear steepening’, something often seen during a reflationary or early business cycle periodWhile gold tends to underperform risk assets during these periods, it is not common to see bear steepening this late in the business cycle and recent moves in yields may be masking other factors at play, such as higher risk premiumsSoft US economic data suggests also that a slowdown is still likely, which, alongside a potential change in the shape of the yield curve, could signal an environment where gold has historically performed well.",
+    "delayDays": 6
+  },
+  {
+    "monthKey": "2023-09",
+    "slug": "september-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-10-10T08:00:00+01:00",
+    "ldDescription": "Gold lost 3.7% in September, with the bulk of the move occurring during the last three days of the month. We attribute gold’s challenging month to an extensive run up in bond yields alongside a stronger dollar. The sell off at the end of the month was also likely the result of a strong adverse reaction to US economic data, a fall in the Chinese local premium and a negative technical breach.",
+    "delayDays": 10
+  },
+  {
+    "monthKey": "2023-10",
+    "slug": "october-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2023-11-07T08:00:00+00:00",
+    "ldDescription": "Gold prices started the month on the backfoot, having fallen below US$1,850/oz at the end of September. The events in Israel on 7 October set a rally in motion that took the US dollar price back up above US$2,000/oz by 27 October. The record-high monthly finish was mirrored in almost all other major currencies",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2023-11",
+    "slug": "november-2023",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  },
+  {
+    "monthKey": "2023-12",
+    "slug": "december-2023",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-01-10T08:00:00+00:00",
+    "ldDescription": "Central bank buying and elevated geopolitical risk helped gold prices rise 15% to reach new all-time highs in 2023. Looking forward, the lacklustre consensus outlook for gold in 2024 may be challenged by new geopolitical tensions and overexuberance regarding monetary policy.",
+    "delayDays": 10
+  },
+  {
+    "monthKey": "2024-01",
+    "slug": "january-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-02-07T08:00:00+00:00",
+    "ldDescription": "In January, gold gave back gains after hitting an all-time high at the close of 2023. Looking forward, hot US growth data may delay lower rates, but politics and geopolitics will likely maintain interest in gold.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2024-02",
+    "slug": "february-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-03-07T08:00:00+00:00",
+    "ldDescription": "Gold continued its slow start, giving back 0.3% in February on a rise in risk appetite and Treasury yields. But a bounce in early March has seen gold hit a new ATH. A Fed meeting with new dot plots and Iranian parliamentary elections are events to watch in March, with monetary and geopolitical uncertainty high.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2024-03",
+    "slug": "march-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-04-09T08:00:00+01:00",
+    "ldDescription": "Gold had a strong March, as futures investors and green shoots from US gold ETFs help drive prices to new all-time highs.",
+    "delayDays": 9
+  },
+  {
+    "monthKey": "2024-04",
+    "slug": "april-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-05-08T08:00:00+01:00",
+    "ldDescription": "In April, we saw strong buying from China and central banks, which resulted in gold reaching intra-month highs before pulling back by month-end. Looking forward, stagflation risks are on the rise as growth looks fragile and inflation remains problematic.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2024-05",
+    "slug": "may-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-06-06T08:00:00+01:00",
+    "ldDescription": "Gold posted a third consecutive monthly gain in May, rising by 2% m/m to US$2,348/oz. Despite the more moderate gain compared to March and April, gold hit a new all-time high of US$2,427/oz mid-month before pulling back – likely reflecting some profit taking.",
+    "delayDays": 6
+  },
+  {
+    "monthKey": "2024-06",
+    "slug": "june-2024",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  },
+  {
+    "monthKey": "2024-07",
+    "slug": "july-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-08-08T08:00:00+01:00",
+    "ldDescription": "August has typically been kind to gold, but seasonal winds are up against strong cross currents, that on balance look much more supportive than not.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2024-08",
+    "slug": "august-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-09-05T08:00:00+01:00",
+    "ldDescription": "Gold posted a 3.6% gain in August driven by lower rates and a weaker US dollar. Mixed data releases have made the direction of global economy less certain and gold options indicate that investors may be hedging against a combination of more aggressive rate cuts and US election uncertainty.",
+    "delayDays": 5
+  },
+  {
+    "monthKey": "2024-09",
+    "slug": "september-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-10-08T08:00:00+01:00",
+    "ldDescription": "Gold posted a 3.6% gain in August driven by lower rates and a weaker US dollar. Mixed data releases have made the direction of global economy less certain and gold options indicate that investors may be hedging against a combination of more aggressive rate cuts and US election uncertainty.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2024-10",
+    "slug": "october-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2024-11-12T08:00:00+00:00",
+    "ldDescription": "The start of November saw gold pressured by higher opportunity costs and a Republican clean sweep. Stronger bond yields and US dollar, risk-on in equities, a boost to cryptocurrencies and quelling of geopolitical risk might see a near-term retracement in gold.",
+    "delayDays": 12
+  },
+  {
+    "monthKey": "2024-11",
+    "slug": "november-2024",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  },
+  {
+    "monthKey": "2024-12",
+    "slug": "december-2024",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2025-01-08T08:00:00+00:00",
+    "ldDescription": "Gold gave back less than expected due to a strong dollar and profit-taking, as a positive outlook and higher risk constrained outflows.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2025-01",
+    "slug": "january-2025",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2025-02-10T08:00:00+00:00",
+    "ldDescription": "Gold punched through all-time-highs at the end of January with tariff fears, a weaker dollar and softer bond yields all contributing. Chinese gold market activity stayed true to its typical seasonal January strength and analysis suggests positive follow-through into February.",
+    "delayDays": 10
+  },
+  {
+    "monthKey": "2025-02",
+    "slug": "february-2025",
+    "status": 200,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false,
+    "publishedAt": "2025-03-06T08:00:00+00:00",
+    "ldDescription": "Gold hit new highs in February, supported by a weaker US dollar and extending its y-t-d gains to 9%. Rising inflation expectations, lower rates, and continued geoeconomic uncertainty are playing in gold’s favour.",
+    "delayDays": 6
+  },
+  {
+    "monthKey": "2025-03",
+    "slug": "march-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "March review",
+        "body": "A stronger euro, tariff fears and ETF buying edged gold to new highs once again in March."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "Fiscal and monetary support may be receding, and the timing isn’t great for risk assets given current turmoil. Fundamentals remain solid for gold."
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2025-04-08T08:00:00+01:00",
+    "ldDescription": "Looking back: A stronger euro and tariff fears edged gold to new highs once again in March. Looking ahead: fiscal and monetary support may be receding, and the timing isn’t great for risk assets given the liberation day turmoil. But gold could benefit further and despite a strong rally, fundamentals remain solid.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2025-04",
+    "slug": "april-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "April review",
+        "body": "A significantly weaker US dollar and overall heightened risk pushed gold higher during the month."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "We expect US policy and structural risks to continue driving gold investment. Profit taking could bring pause but may also encourage consumers."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2025-05-08T08:00:00+01:00",
+    "ldDescription": "Gold rose 6% m/m in April and is up by nearly 27% y-t-d. A significantly weaker US dollar and overall heightened risk pushed gold higher during the month. We expect US policy and structural risks to continue driving gold investment. Profit taking could bring pause but may also encourage consumers.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2025-05",
+    "slug": "may-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "May review",
+        "body": "Tariff news and inflation helped but momentum effects including ETF outflows, countered, to leave gold flat for the month."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "Tariffs are starting to bite, but not where intended, pushing stagflation risks higher and hamstringing several central banks ahead of their June meetings."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2025-06-05T08:00:00+01:00",
+    "ldDescription": "In May, tariff news and inflation helped but momentum effects including ETF outflows, countered, to leave gold flat for the month. Looking forward: Tariffs are starting to bite, but not where intended, pushing stagflation risks higher and hamstringing central banks.",
+    "delayDays": 5
+  },
+  {
+    "monthKey": "2025-06",
+    "slug": "june-2025",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  },
+  {
+    "monthKey": "2025-07",
+    "slug": "july-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "July review",
+        "body": "Gold edged up in July, aided by  higher tariff-led inflation expectations but a stronger US dollar proved a drag"
+      },
+      {
+        "heading": "Looking forward",
+        "body": "A gap between prices and COMEX positioning is likely to be filled by rising net longs, not falling prices, as we view fundamentals to be supportive of the former"
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2025-08-07T08:00:00+01:00",
+    "ldDescription": "Gold edged up 1.7% m/m in July and remains up 28% y-t-d. The move higher was supported by rising inflation expectations linked to tariffs, though gains were partially offset by a stronger US dollar. Strong underlying fundamentals suggest that the gap between prices and COMEX positioning is more likely to narrow through increased net longs positions rather than falling prices.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2025-08",
+    "slug": "august-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "August review",
+        "body": "Gold rallied into month-end on a US dollar reversal, geopolitical tensions and strong ETF inflows."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "US stagflationary forces and the prospect of lower rates, alongside policy risk, could dominate prices as emerging market demand takes a breather."
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2025-09-04T08:00:00+01:00",
+    "ldDescription": "A strong rally into month-end saw gold reach US$3,429/oz (+4%), and as of the end of August, gold was up 31% for the year. The move was supported by a weaker dollar, heightened geopolitical tensions, robust gold ETF inflows, and rising expectations for a September rate cut. Looking ahead, stagflationary pressures in the U.S., the prospect of lower rates, and ongoing policy risks could dominate price dynamics, even as emerging market demand takes a breather.",
+    "delayDays": 4
+  },
+  {
+    "monthKey": "2025-09",
+    "slug": "september-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "September review",
+        "body": "Continued political tension, US dollar weakness and options market activity drove gold to its 39th all-time high in 2025"
+      },
+      {
+        "heading": "Looking forward",
+        "body": "Equities on edge in October on broadening excesses. Gold likely to remain a good hedge despite its stellar run up."
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2025-10-07T08:00:00+01:00",
+    "ldDescription": "Record monthly ETF inflows took gold to its 39th new high for the year, finishing the month at US$3,825/oz (+12%). Y-t-d gold is up 47%, marking the highest return in a calendar year since 1979. Political tension, strong options market activity, and currency weakness played a key role in gold’s performance last month. Looking forward, there are plenty of reasons for investors to look at gold and the price could see further uplift should equities experience a correction. Perhaps only a major liquidity squeeze could upend both gold and equities, but there are no clear signs of fractures in credit or banking sectors…yet.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2025-10",
+    "slug": "october-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "October review",
+        "body": "A momentum flush out and stronger dollar contributed to a see-saw for gold from its 50th all-time high. But gold still managed good gains in October"
+      },
+      {
+        "heading": "Looking forward",
+        "body": "Technical analysis points to a much-needed pause but no damage to gold’s trend, which remains supported by solid fundamentals."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2025-11-06T08:00:00+00:00",
+    "ldDescription": "A momentum flush out and stronger dollar contributed to a see-saw for gold from its 50th all-time high. But gold still managed good gains in October.",
+    "delayDays": 6
+  },
+  {
+    "monthKey": "2025-11",
+    "slug": "november-2025",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  },
+  {
+    "monthKey": "2025-12",
+    "slug": "december-2025",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "December and FY 2025 review",
+        "body": "December’s 4% gain took gold’s full-year return to a multi-decade record of 67% y/y. Central banks, tariff and trade risks, strong options market activity and a weaker US dollar all played a part."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "The December precious metals surge, including silver and platinum, and commodity index rebalancing could elicit some near-term volatility. But beyond short-term effects, gold will likely hum to its own tune. Upcoming tariff rulings by the US Supreme Court will likely have important implications for US trade policy. The effect on gold may be more nuanced but potentially supportive . Finally, the continued stream of geopolitical flareups, most recently exemplified with US actions in Venezuela, create support for gold and highlight that it has become the safe haven of choice."
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2026-01-08T08:00:00+00:00",
+    "ldDescription": "Gold tagged its 53rd all-time PM price high for the year of US$4,449/oz on 23 December, before closing the year at US$4,368/oz. It was a stellar finish to a stellar year – posting a December return of 4.2% to take the full year return to 67%. Relatively stable FX led to similar returns across major currencies.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2026-01",
+    "slug": "january-2026",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "January review",
+        "body": "Gold’s impressive rally took it above the US$5,000 mark."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "US inflationary worries and the prospect of rising bond volatility could dominate gold’s behaviour going forward."
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2026-02-05T08:00:00+00:00",
+    "ldDescription": "A staggering 14% rally in January took gold above the US$5,000 mark, cementing the 5k number as a headline to match the first recorded annual 5,000 tonnes of total demand.",
+    "delayDays": 5
+  },
+  {
+    "monthKey": "2026-02",
+    "slug": "february-2026",
+    "status": 200,
+    "variant": "h2+strong-p",
+    "segments": [
+      {
+        "heading": "February review",
+        "body": "Gold gained 5% in February on dip buying, dollar weakness and softer US Treasury yields."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "Medium-term downtrend in the US dollar is likely to resume – post some near-term respite – and provide further support for gold prices."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2026-03-05T08:00:00+00:00",
+    "ldDescription": "Gold gained 5% in February on dip buying, dollar weakness and softer US Treasury yields. Looking forward: Medium-term trend for the US dollar is likely to resume – post some near-term respite – and provide further support for gold prices.",
+    "delayDays": 5
+  },
+  {
+    "monthKey": "2026-03",
+    "slug": "march-2026",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "March review",
+        "body": "March was the weakest month for gold since June 2013, a move driven by deleveraging and liquidity dynamics, not fundamentals."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "There are some green shoots for gold to re-establish its positive trend but short-term risks remain."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2026-04-08T08:00:00+01:00",
+    "ldDescription": "March was the weakest month for gold since June 2013, a move driven by deleveraging and liquidity dynamics, not fundamentals. Looking ahead, there are some green shoots for gold to re-establish its positive trend but short-term risks remain.",
+    "delayDays": 8
+  },
+  {
+    "monthKey": "2026-04",
+    "slug": "april-2026",
+    "status": 200,
+    "variant": "h2+strong-p",
+    "segments": [
+      {
+        "heading": "April review",
+        "body": "Gold ended April flat, weighed down by a return of risk appetite. But a weaker US dollar and ETF inflows led by Europe provided support."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "Short-term headwinds could sustain some gold weakness as it searches for a catalyst to regain the structural uptrend."
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2026-05-07T08:00:00+01:00",
+    "ldDescription": "Gold ended April flat, as a return of risk appetite weighed on gold, but a weaker US dollar and ETF inflows led by Europe provided support. Short term headwinds could sustain some gold weakness as it searches for a catalyst to regain the structural uptrend.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2026-05",
+    "slug": "may-2026",
+    "status": 200,
+    "variant": "h2+strong-br-p",
+    "segments": [
+      {
+        "heading": "May review",
+        "body": "Gold fell 1% in May, on continued positive risk sentiment and modest global gold ETF outflows."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "The Fed may need to hike rates as inflation pressures mount. We make the case for why it could – surprisingly – benefit gold. But gold also faces headwinds, which could be prolonged if the Hormuz standoff drags on."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2026-06-04T08:00:00+01:00",
+    "ldDescription": "Gold fell 1% in May, on continued positive risk sentiment and modest global gold ETF outflows. The Fed may need to hike rates as inflation pressures mount. We make the case for why it could – surprisingly – benefit gold.",
+    "delayDays": 4
+  },
+  {
+    "monthKey": "2026-06",
+    "slug": "june-2026",
+    "status": 200,
+    "variant": "h2+strong-p",
+    "segments": [
+      {
+        "heading": "July review",
+        "body": "Positive momentum factors offset negative risk factors to leave gold prices unchanged in July"
+      },
+      {
+        "heading": "Looking forward",
+        "body": "A second wave of high inflation, similar to the late 1970s, cannot be ruled out. But it does not imply a major gold rally on its own. That depends on how real rates, the US dollar, growth expectations, Asian investor demand and central banks respond."
+      }
+    ],
+    "ldMatch": true,
+    "redirectedTo": "gold-market-commentary-july-2026",
+    "publishedAt": "2026-08-06T08:00:00+01:00",
+    "ldDescription": "Positive momentum factors offset negative risk factors to leave gold prices unchanged in July. A second wave of high inflation, similar to the late 1970s, cannot be ruled out. But it does not imply a major gold rally on its own. That depends on how real rates, the US dollar, growth expectations, Asian investor demand and central banks respond.",
+    "delayDays": 37
+  },
+  {
+    "monthKey": "2026-07",
+    "slug": "july-2026",
+    "status": 200,
+    "variant": "h2+strong-p",
+    "segments": [
+      {
+        "heading": "July review",
+        "body": "Positive momentum factors offset negative risk factors to leave gold prices unchanged in July"
+      },
+      {
+        "heading": "Looking forward",
+        "body": "A second wave of high inflation, similar to the late 1970s, cannot be ruled out. But it does not imply a major gold rally on its own. That depends on how real rates, the US dollar, growth expectations, Asian investor demand and central banks respond."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2026-08-06T08:00:00+01:00",
+    "ldDescription": "Positive momentum factors offset negative risk factors to leave gold prices unchanged in July. A second wave of high inflation, similar to the late 1970s, cannot be ruled out. But it does not imply a major gold rally on its own. That depends on how real rates, the US dollar, growth expectations, Asian investor demand and central banks respond.",
+    "delayDays": 6
+  },
+  {
+    "monthKey": "2026-08",
+    "slug": "august-2026",
+    "status": 200,
+    "variant": "h3+strong-p",
+    "segments": [
+      {
+        "heading": "August review",
+        "body": "A bumper month for gold – driven by ETF flows, futures flows and options activity – helped cement August as the third strongest monthly return in a quarter century."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "Central bank intervention may be on the cards, but absent a credible fiscal plan, it is likely to reinforce gold’s appeal."
+      }
+    ],
+    "ldMatch": false,
+    "publishedAt": "2026-09-09T08:00:00+01:00",
+    "ldDescription": "A bumper month for gold, driven by ETF flows, futures flows and options activity helped cement August as the third strongest monthly return in a quarter century. Looking forward, central bank intervention may be on the cards, but absent a credible fiscal plan, it is likely to reinforce gold’s appeal",
+    "delayDays": 9
+  },
+  {
+    "monthKey": "2026-09",
+    "slug": "september-2026",
+    "status": 200,
+    "variant": "h3+strong-p",
+    "segments": [
+      {
+        "heading": "September review",
+        "body": "A surge in US Treasury yields and the US dollar alongside a drop in futures positions helped drive prices lower in September, despite impressive gold ETF inflows."
+      },
+      {
+        "heading": "Looking forward",
+        "body": "UK gold ETFs delivered a stellar Q3. Fiscal concerns may be helping, but this looks less like the short-lived 2022 surge and more like a sustained shift in demand."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2026-10-07T08:00:00+01:00",
+    "ldDescription": "September review: A surge in US Treasury yields and the US dollar alongside a drop in futures positions helped drive prices lower in September, despite impressive gold ETF inflows. Looking forward: UK gold ETFs delivered a stellar Q3. Fiscal concerns may be helping, but this looks less like the short-lived 2022 surge and more like a sustained shift in demand.",
+    "delayDays": 7
+  },
+  {
+    "monthKey": "2026-10",
+    "slug": "october-2026",
+    "status": 200,
+    "variant": "h2+h3-subheads",
+    "segments": [
+      {
+        "heading": "October in review",
+        "body": "Gold fell in October, likely on asset rotation, de-grossing and Fed rate-path repricing."
+      },
+      {
+        "heading": "Looking ahead",
+        "body": "The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high. The conditions for gold to recover are much stronger. Our framework shows that we may be nearing an interim bottom."
+      }
+    ],
+    "ldMatch": true,
+    "publishedAt": "2026-11-05T08:00:00+00:00",
+    "ldDescription": "Gold fell in October, likely on a rotation out of risk assets and gold into attractively-yielding Treasuries. The post-2011 downturn is a poor parallel for the current 25% drop from the January 2026 high. The conditions for gold to recover are much stronger. Our indicator shows that we may be close to an interim bottom.",
+    "delayDays": 5
+  },
+  {
+    "monthKey": "2026-11",
+    "slug": "november-2026",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  },
+  {
+    "monthKey": "2026-12",
+    "slug": "december-2026",
+    "status": 404,
+    "variant": "none",
+    "segments": [],
+    "ldMatch": false
+  }
+]
