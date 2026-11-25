@@ -1,0 +1,439 @@
+/**
+ * Compound Wealth — the maths tests (spec §12, tests 1–11).
+ *
+ * Run with:  bun test tests/compound-maths.test.ts
+ *
+ * Every fixed vector comes from the spec itself. Tolerances are the spec's
+ * (±0.5% on the money vectors, ±0.05 points on the AUD conversion).
+ */
+
+import { describe, expect, test } from "bun:test";
+import {
+  DEFAULT_YEARLY_COST,
+  MILESTONES_ON_CARDS,
+  MILESTONES_ON_PAGE,
+  addMonths,
+  audFromUsd,
+  chooseRate,
+  clamp,
+  clampDates,
+  computeCompound,
+  figuresAreStale,
+  formatMoney,
+  monthsBetween,
+  thisMonth,
+  whatIfCash,
+  whatIfLaterStart,
+  whatIfSmallChange,
+  type AssetFigures,
+  type PlanInput,
+} from "../src/lib/compound/maths";
+import {
+  COUNTRY_ROWS,
+  assetById,
+  assetChips,
+  cashRow,
+  defaultInflation,
+  figuresOf,
+  FIGURES_CHECKED_ON,
+} from "../src/lib/compound/figures";
+
+/** The plain baseline plan used by the spec's fixed vectors. */
+function basePlan(overrides: Partial<PlanInput> = {}): PlanInput {
+  return {
+    monthly: 100,
+    salary: null,
+    share: 0.03,
+    useShare: false,
+    age: null,
+    startingAmount: 0,
+    yearlyIncrease: 0,
+    yearlyCost: 0,
+    feePerPurchase: 0,
+    purchaseEveryMonths: 1,
+    rateMode: "average",
+    customRate: 0.07,
+    customLow: 0.05,
+    customHigh: 0.09,
+    inflation: 0,
+    ...overrides,
+  };
+}
+
+/** A synthetic asset with fixed figures (7% both windows). */
+const SEVEN: AssetFigures = { r20: 0.07, r30: 0.07 };
+
+const within = (got: number, want: number, tolPct: number) =>
+  Math.abs(got - want) / want <= tolPct / 100;
+
+/* ---------------------------------------------------------------- */
+/* Test 1 — the headline vector                                      */
+/* ---------------------------------------------------------------- */
+describe("test 1: 100/month, 20 years, 7%, no costs", () => {
+  const r = computeCompound(basePlan(), SEVEN, 240);
+  test("final ≈ 50,754 (±0.5%)", () => {
+    expect(within(r.finalValue, 50_754, 0.5)).toBe(true);
+  });
+  test("put in exactly 24,000", () => {
+    expect(r.totalPutIn).toBe(24_000);
+  });
+  test("growth is the difference", () => {
+    expect(r.growth).toBeCloseTo(r.finalValue - 24_000, 6);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Test 2 — percent-of-salary mode                                   */
+/* ---------------------------------------------------------------- */
+describe("test 2: 3% of a 5,000 salary, 20 years, 7%", () => {
+  const r = computeCompound(
+    basePlan({ salary: 5_000, share: 0.03, useShare: true }),
+    SEVEN,
+    240,
+  );
+  test("final ≈ 76,130 (±0.5%)", () => {
+    expect(within(r.finalValue, 76_130, 0.5)).toBe(true);
+  });
+  test("put in exactly 36,000", () => {
+    expect(r.totalPutIn).toBe(36_000);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Tests 3–4 — the fee vectors                                       */
+/* ---------------------------------------------------------------- */
+describe("test 3: fee 10 per purchase, monthly", () => {
+  const r = computeCompound(basePlan({ feePerPurchase: 10 }), SEVEN, 240);
+  test("final ≈ 45,678 (±0.5%)", () => {
+    expect(within(r.finalValue, 45_678, 0.5)).toBe(true);
+  });
+  test("fees paid exactly 2,400", () => {
+    expect(r.feesPaid).toBe(2_400);
+  });
+});
+
+describe("test 4: fee 10 per purchase, every 3 months", () => {
+  const r = computeCompound(
+    basePlan({ feePerPurchase: 10, purchaseEveryMonths: 3 }),
+    SEVEN,
+    240,
+  );
+  test("final ≈ 48,785 (±0.5%)", () => {
+    expect(within(r.finalValue, 48_785, 0.5)).toBe(true);
+  });
+  test("fees paid exactly 800", () => {
+    expect(r.feesPaid).toBe(800);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Test 5 — fee edge cases                                           */
+/* ---------------------------------------------------------------- */
+describe("test 5: fee eats the purchase", () => {
+  // Pending carries across skipped purchase months, so a plan only fails
+  // to invest when the pot never grows past the fee — here 50 × 24 = 1,200
+  // never clears a 1,500 fee.
+  const r = computeCompound(basePlan({ monthly: 50, feePerPurchase: 1_500 }), SEVEN, 24);
+  test("never invests", () => {
+    expect(r.neverInvests).toBe(true);
+  });
+  test("pending carries everything and is shown", () => {
+    expect(r.pending).toBe(50 * 24);
+    expect(r.finalValue).toBe(r.pending); // balance stayed 0
+  });
+  test("no fees were paid", () => {
+    expect(r.feesPaid).toBe(0);
+  });
+  test("a fee below the pot does invest (the carry rule)", () => {
+    // 50/month against a 60 fee: month 1 skips, month 2's pot of 100 clears it.
+    const carries = computeCompound(basePlan({ monthly: 50, feePerPurchase: 60 }), SEVEN, 120);
+    expect(carries.neverInvests).toBe(false);
+    expect(carries.feesPaid).toBeGreaterThan(0);
+  });
+  test("fee over 1% of each purchase raises the costs hint", () => {
+    const pricey = computeCompound(basePlan({ feePerPurchase: 10 }), SEVEN, 240);
+    expect(pricey.feeEatsLargeShare).toBe(true);
+    const cheap = computeCompound(basePlan({ feePerPurchase: 0.5 }), SEVEN, 240);
+    expect(cheap.feeEatsLargeShare).toBe(false);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Test 6 — zero return, increases, yearly cost                      */
+/* ---------------------------------------------------------------- */
+describe("test 6: zero return and costs", () => {
+  const flat = { r20: 0, r30: 0 } as AssetFigures;
+  test("0% return: final = put in (no fees)", () => {
+    const r = computeCompound(basePlan(), flat, 120);
+    expect(r.finalValue).toBeCloseTo(r.totalPutIn, 6);
+  });
+  test("0% return with a fee: final = put in minus fees", () => {
+    const r = computeCompound(basePlan({ feePerPurchase: 2 }), flat, 120);
+    expect(r.finalValue).toBeCloseTo(r.totalPutIn - r.feesPaid, 6);
+  });
+  test("a higher yearly increase puts in more", () => {
+    const low = computeCompound(basePlan({ yearlyIncrease: 0 }), flat, 240);
+    const high = computeCompound(basePlan({ yearlyIncrease: 0.05 }), flat, 240);
+    expect(high.totalPutIn).toBeGreaterThan(low.totalPutIn);
+  });
+  test("a yearly cost lowers the final value", () => {
+    const noCost = computeCompound(basePlan(), SEVEN, 240);
+    const withCost = computeCompound(
+      basePlan({ yearlyCost: DEFAULT_YEARLY_COST }),
+      SEVEN,
+      240,
+    );
+    expect(withCost.finalValue).toBeLessThan(noCost.finalValue);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Test 7 — the AUD conversion                                       */
+/* ---------------------------------------------------------------- */
+describe("test 7: AUD conversion (spec §6.3)", () => {
+  test("10% USD, FX 0.80 → 0.40, 20 years ≈ 13.88%", () => {
+    const rAud = audFromUsd(0.1, 0.8, 0.4, 20);
+    expect(Math.abs(rAud - 0.1388)).toBeLessThanOrEqual(0.0005);
+  });
+  test("a flat FX leaves the rate unchanged", () => {
+    expect(audFromUsd(0.07, 0.75, 0.75, 20)).toBeCloseTo(0.07, 10);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Test 8 — baseline, band, fallbacks, staleness                     */
+/* ---------------------------------------------------------------- */
+describe("test 8: baseline and band rules", () => {
+  test("baseline = the lower of the 20- and 30-year figures", () => {
+    const c = chooseRate({ r20: 0.09, r30: 0.072 }, basePlan());
+    expect(c.baseline).toBeCloseTo(0.072, 10);
+    expect(c.how).toBe("lower-of-two");
+  });
+  test("differing by ≥ 0.5 points: high end = the higher measured figure", () => {
+    const c = chooseRate({ r20: 0.09, r30: 0.072 }, basePlan());
+    expect(c.band).toEqual({ low: 0.072 - 0.02, high: 0.09 });
+    expect(c.highIsMeasured).toBe(true);
+  });
+  test("differing by < 0.5 points: high end is a what-if", () => {
+    const c = chooseRate({ r20: 0.072, r30: 0.07 }, basePlan());
+    expect(c.band!.low).toBeCloseTo(0.05, 10);
+    expect(c.band!.high).toBeCloseTo(0.09, 10);
+    expect(c.highIsMeasured).toBe(false);
+  });
+  test("single figure: baseline = it, band = ± what-if points", () => {
+    const c = chooseRate({ r20: null, r30: null, single: { rate: 0.122, years: 15 } }, basePlan());
+    expect(c.baseline).toBeCloseTo(0.122, 10);
+    expect(c.band).toEqual({ low: 0.102, high: 0.142 });
+    expect(c.how).toBe("single-figure");
+  });
+  test("custom rate: single line, no band", () => {
+    const c = chooseRate({ r20: 0.09, r30: 0.072 }, basePlan({ rateMode: "custom-rate", customRate: 0.05 }));
+    expect(c.baseline).toBe(0.05);
+    expect(c.band).toBeNull();
+  });
+  test("custom range: middle = average", () => {
+    const c = chooseRate(SEVEN, basePlan({ rateMode: "custom-range", customLow: 0.04, customHigh: 0.08 }));
+    expect(c.baseline).toBeCloseTo(0.06, 10);
+    expect(c.band).toEqual({ low: 0.04, high: 0.08 });
+  });
+  test("no measured figure: neutral 0%, no band, honest how", () => {
+    const c = chooseRate({ r20: null, r30: null }, basePlan());
+    expect(c.baseline).toBe(0);
+    expect(c.band).toBeNull();
+    expect(c.how).toBe("none");
+  });
+  test("unsourced assets are hidden from the chips", () => {
+    // The real figures file: every chip must have a figure, and unknown
+    // ids resolve to null (the page hides what has no figures).
+    for (const country of ["AU", "US"] as const) {
+      for (const chip of assetChips(country)) {
+        expect(chip.f20 !== null || chip.f30 !== null || chip.fsingle !== null).toBe(true);
+      }
+      expect(assetById(country, "does-not-exist")).toBeNull();
+    }
+  });
+  test("the cash row exists for both countries (the comparison needs it)", () => {
+    expect(cashRow("AU")).not.toBeNull();
+    expect(cashRow("US")).not.toBeNull();
+  });
+  test("staleness: older than 18 months is flagged", () => {
+    expect(figuresAreStale("2024-01-15")).toBe(true);
+    expect(figuresAreStale(FIGURES_CHECKED_ON)).toBe(false);
+    expect(figuresAreStale(addMonthsDay("2026-06-01"))).toBe(false);
+  });
+});
+
+function addMonthsDay(iso: string): string {
+  return iso; // helper kept for readability above
+}
+
+/* ---------------------------------------------------------------- */
+/* Test 9 — dates                                                     */
+/* ---------------------------------------------------------------- */
+describe("test 9: date clamping", () => {
+  test("a start before this month clamps to this month", () => {
+    const r = clampDates("2020-01", addMonths(thisMonth(), 24));
+    expect(r.start >= thisMonth()).toBe(true);
+    expect(r.clamped).toBe(true);
+  });
+  test("an end beyond 50 years clamps to exactly 50 years", () => {
+    const r = clampDates(thisMonth(), addMonths(thisMonth(), 700));
+    expect(monthsBetween(r.start, r.end)).toBe(600);
+    expect(r.clamped).toBe(true);
+  });
+  test("an end at or before the start is pushed one month on", () => {
+    const r = clampDates(thisMonth(), thisMonth());
+    expect(monthsBetween(r.start, r.end)).toBe(1);
+  });
+  test("year chips: 20 years from now is exactly 240 months", () => {
+    const end = addMonths(thisMonth(), 20 * 12);
+    expect(monthsBetween(thisMonth(), end)).toBe(240);
+  });
+  test("a valid pair is untouched", () => {
+    const r = clampDates(thisMonth(), addMonths(thisMonth(), 120));
+    expect(r.clamped).toBe(false);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Test 10 — milestones                                               */
+/* ---------------------------------------------------------------- */
+describe("test 10: milestones", () => {
+  const r = computeCompound(basePlan({ monthly: 500 }), SEVEN, 360); // big plan
+  test("only thresholds at or below the final value", () => {
+    for (const ms of r.milestones) {
+      expect(ms.threshold).toBeLessThanOrEqual(r.finalValue);
+    }
+  });
+  test("the month is the first crossing (checked against the series)", () => {
+    for (const ms of r.milestones) {
+      const at = r.series[ms.month - 1];
+      expect(at.value).toBeGreaterThanOrEqual(ms.threshold);
+      if (ms.month > 1) {
+        expect(r.series[ms.month - 2].value).toBeLessThan(ms.threshold);
+      }
+    }
+  });
+  test("the page shows at most MILESTONES_ON_PAGE, cards at most 5", () => {
+    expect(r.milestones.length).toBeLessThanOrEqual(MILESTONES_ON_CARDS);
+    expect(r.milestones.slice(-MILESTONES_ON_PAGE).length).toBeLessThanOrEqual(MILESTONES_ON_PAGE);
+  });
+  test("today's-money milestones cross later (or equally) for inflation > 0", () => {
+    const infl = computeCompound(basePlan({ monthly: 500, inflation: 0.025 }), SEVEN, 360);
+    const byThreshold = new Map(infl.milestones.map((ms) => [ms.threshold, ms.month]));
+    for (const msToday of infl.milestonesToday) {
+      const futureMonth = byThreshold.get(msToday.threshold);
+      if (futureMonth !== undefined) {
+        expect(msToday.month).toBeGreaterThanOrEqual(futureMonth);
+      }
+    }
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Test 11 — extreme and empty inputs                                 */
+/* ---------------------------------------------------------------- */
+describe("test 11: extremes never break", () => {
+  test("50 years, 30% return, 25% yearly increase stays finite", () => {
+    const r = computeCompound(
+      basePlan({ yearlyIncrease: 0.25, rateMode: "custom-rate", customRate: 0.3 }),
+      { r20: null, r30: null },
+      600,
+    );
+    expect(Number.isFinite(r.finalValue)).toBe(true);
+    expect(r.finalValue).toBeGreaterThan(0);
+  });
+  test("deeply negative custom rate stays finite (no complex roots)", () => {
+    const r = computeCompound(
+      basePlan({ rateMode: "custom-rate", customRate: -0.95 }),
+      { r20: null, r30: null },
+      120,
+    );
+    expect(Number.isFinite(r.finalValue)).toBe(true);
+  });
+  test("zero months: the starting amount stands", () => {
+    const r = computeCompound(basePlan({ startingAmount: 1_234 }), SEVEN, 0);
+    expect(r.finalValue).toBe(1_234);
+    expect(r.series).toHaveLength(0);
+  });
+  test("zero monthly amount with a starting amount still compounds", () => {
+    const r = computeCompound(basePlan({ monthly: 0, startingAmount: 1_000 }), SEVEN, 120);
+    expect(Number.isFinite(r.finalValue)).toBe(true);
+    expect(r.totalPutIn).toBe(1_000);
+  });
+  test("clamp guards NaN", () => {
+    expect(clamp(Number.NaN, 0, 1, 0.5)).toBe(0.5);
+    expect(clamp(2, 0, 1, 0.5)).toBe(1);
+  });
+  test("formatMoney handles NaN and Infinity", () => {
+    expect(formatMoney(Number.NaN, "en")).toBe("0");
+    expect(formatMoney(Number.POSITIVE_INFINITY, "fa")).toBe("۰");
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* Extra — the what-if helpers the cards rely on                      */
+/* ---------------------------------------------------------------- */
+describe("what-if helpers", () => {
+  test("1% more adds, 1% less loses; fixed mode is 10% of the amount", () => {
+    const w = whatIfSmallChange(basePlan(), SEVEN, 240);
+    expect(w).not.toBeNull();
+    expect(w!.describedAs).toBe("amount");
+    expect(w!.more).toBeGreaterThan(0);
+    expect(w!.less).toBeGreaterThan(0);
+  });
+  test("share mode is described as salary", () => {
+    const w = whatIfSmallChange(basePlan({ salary: 5_000, useShare: true }), SEVEN, 240);
+    expect(w!.describedAs).toBe("salary");
+  });
+  test("starting 5 years later costs something", () => {
+    const c = whatIfLaterStart(basePlan(), SEVEN, 240, 5);
+    expect(c).not.toBeNull();
+    expect(c!).toBeGreaterThan(0);
+  });
+  test("the cash comparison uses the cash figures", () => {
+    const cashFigures = figuresOf(cashRow("AU")!);
+    const c = whatIfCash(basePlan(), cashFigures, 240);
+    expect(c).not.toBeNull();
+    expect(c!).toBeGreaterThan(0);
+    expect(c!).toBeLessThan(computeCompound(basePlan(), SEVEN, 240).finalValue);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* The real figures file — sanity of the shipped table                */
+/* ---------------------------------------------------------------- */
+describe("the shipped figures file", () => {
+  test("both countries have a default asset that exists", () => {
+    for (const country of ["AU", "US"] as const) {
+      const rows = COUNTRY_ROWS[country];
+      const def = rows.assets.find((a) => a.id === rows.defaultAsset);
+      expect(def).toBeDefined();
+      expect(def!.f20 !== null || def!.f30 !== null).toBe(true);
+    }
+  });
+  test("every sourced rate is a sensible decimal", () => {
+    for (const country of ["AU", "US"] as const) {
+      const rows = COUNTRY_ROWS[country];
+      for (const row of [...rows.assets, rows.inflation]) {
+        for (const f of [row.f20, row.f30, row.fsingle]) {
+          if (f) {
+            expect(f.rate).toBeGreaterThan(-0.5);
+            expect(f.rate).toBeLessThan(0.5);
+            expect(f.periodEnd).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+          }
+        }
+      }
+    }
+  });
+  test("inflation defaults exist for both countries", () => {
+    expect(defaultInflation("AU")).toBeGreaterThan(0);
+    expect(defaultInflation("US")).toBeGreaterThan(0);
+  });
+  test("figuresOf carries the single-figure label through", () => {
+    const world = figuresOf(assetById("US", "world")!);
+    expect(world.r20).toBeNull();
+    expect(world.r30).toBeNull();
+    expect(world.single!.years).toBeGreaterThanOrEqual(10);
+  });
+});
