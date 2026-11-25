@@ -166,7 +166,6 @@ export const UI = {
     title: "Gold",
     dataAsOf: "Data as of {date}",
     loadingLine: "Reading the gold meter…",
-    recordNote: "Conditions record: Nov 21, 2026 · prices live",
     price: {
       eyebrow: "Gold price (ounce)",
       gramLine: "1 troy ounce = {g} grams",
@@ -202,18 +201,15 @@ export const UI = {
       howItWorks: "How it works",
       factorButton: "Open the explanation, {name}",
       trendTitle: "Gold's trend at every window",
-      trendNote: "1 day to 5 years, every window's change, at a glance, nothing to click.",
     },
     scenarios: {
-      eyebrow: "Scenarios",
       title: "Price-change scenarios",
       subtitle:
-        "The notable, possible bends — the handful of things that can move gold up or down, each dated from the economic calendar below when the schedule actually dates it, and honestly un-dated when it does not.",
+        "The world's major economic decisions — steered by institutions such as the U.S. Treasury, central banks and statistical agencies — move the gold price. The events ahead that can move it are listed here: some carry fixed, recurring dates, while others are periodic or conditional and may be adopted unannounced.",
       upLabel: "gold up",
       downLabel: "gold down",
       nextLabel: "next scheduled re-weigh",
       noSchedule: "no calendar date — it walks in unannounced",
-      note: "A list of the bends the market itself watches, never a forecast and never the desk's own odds — what can matter, not what will.",
     },
     balance: {
       eyebrow: "The balance",
@@ -254,8 +250,7 @@ export const UI = {
       spanNote: "the stored span: {span}",
     },
     calendar: {
-      eyebrow: "The calendar",
-      title: "What's coming · the events that can bend gold",
+      headLine: "What's ahead",
       subtitle:
         "The next releases that can change gold's path: {events}. Events marked ≈ sit near their usual slot, the agency fixes the exact date when it announces it.",
       impactHigh: "high impact",
@@ -273,9 +268,9 @@ export const UI = {
     },
     compare: {
       eyebrow: "The comparison",
-      title: "Gold against the alternatives",
+      title: "Gold's return against the alternatives",
       subtitle:
-        "The 10-year real yield, silver, Bitcoin and the S&P 500, each indexed to 100 at the window's start, with gold itself for reference. What holding each would have done, in one line each.",
+        "The 10-year real and nominal yields, silver, Bitcoin and the S&P 500 against gold itself: what holding each would have done over the window, one line each (the yields are rates — their lines ride their own true-% right axis).",
       windowLabel: "Window",
       ranges: { "3M": "3 months", "6M": "6 months", "1Y": "1 year", "3Y": "3 years", "5Y": "5 years" },
       bestLine: "Best gain: {name} {pct}",
@@ -283,13 +278,10 @@ export const UI = {
       bestLossLine: "smallest loss: {name} {pct}",
       worstLossLine: "Biggest loss: {name} {pct}",
       assets: { gold: "Gold", silver: "Silver", btc: "Bitcoin", spx: "S&P 500", realYield: "10y real yield", nominalYield: "10y nominal yield" },
-      realYieldNote:
-        "The real yield is a rate, not an asset, its line reads direction (indexed like the assets so one chart holds them all); the tooltip and the legend carry its actual % level.",
-      sourceNote:
-        "Sources: the desk's stored spot + COMEX history (gold) · Yahoo (silver, Bitcoin, S&P 500) · FRED DFII10 + DGS10 (the 10-year TIPS real and Treasury nominal yields). Daily closes, sampled weekly.",
       legendLine: "{name}: {pct} over the window",
       realYieldNow: "the real yield's own level: {v}%",
       toggleLabel: "Show or hide lines",
+      barsTitle: "The window's return, bar by bar",
       tableTitle: "The window's scorecard, in numbers",
       colAsset: "Asset",
       colStart: "Window start",
@@ -467,7 +459,7 @@ export const UI = {
       title: "Central-bank demand",
       subtitle: "Who is buying gold, the structural story of the decade.",
       chartTitle: "Global net purchases, rolling 12 months",
-      chartReportedWorld: "the reported world",
+      chartReportedWorld: "the reporting countries",
       chartUnit: "tonnes per year",
       asOf: "data through {month}",
       buyersTitle: "Gold buyers",
@@ -478,12 +470,13 @@ export const UI = {
       buyersHeadHoldings: "Holdings",
       buyersHeadShare: "Gold share of reserves",
       tonnesShort: "{v} tonnes",
+      holdingsNow: "current holdings: {v} tonnes",
       sellersTitle: "Gold sellers",
       sellersAsOf: "the reported quarterly record through 2026-Q3",
       sellersNote: "Sellers are rarer and smaller than buyers; the world aggregate has been positive for years. These rows are the reported reductions that mattered.",
       shareNote:
         "Gold valued at the live market price over total official reserve assets (gold re-valued at the same price; each country's latest reported value vintage). A rising share can be price arithmetic, not active buying.",
-      reportedWorldLine: "Reported world: {tonnes} tonnes across {n} reporters, not the whole world.",
+      reportedWorldLine: "This count only sees the countries that report — {n} of them, {tonnes} tonnes of official reserves in all; the whole world holds a little more than this.",
       methodTitle: "Method",
       methodLine:
         "Source: IMF (monthly reserves), the IL and IRFCL dataflows, merged per country (the fresher observation wins). Aggregates, the BIS banking book and broken rows are excluded.",
@@ -528,6 +521,12 @@ export const UI = {
       spanLine: "the stored span: {span}",
       unavailable: "The correlation data could not be read yet.",
     },
+    other: {
+      eyebrow: "The supporting numbers",
+      title: "Other indicators",
+      subtitle:
+        "The physical market's pulse and the London vault's plumbing — the supporting indicators, kept together at the page's foot.",
+    },
     physical: {
       eyebrow: "Physical gold",
       title: "The physical market",
@@ -549,6 +548,12 @@ export const UI = {
       verdictLong: "LONG · net long",
       verdictShort: "SHORT · net short",
       verdictNeutral: "NO LEAN, in the middle",
+      verdictLongDesc: "Speculative traders are betting on gold rising — {strength}.",
+      verdictShortDesc: "Speculative traders are betting on gold falling — {strength}.",
+      verdictNeutralDesc: "Speculative traders hold no clear side — the book is balanced.",
+      strengthHeavy: "a heavy, crowded bet",
+      strengthStrong: "a strong bet",
+      strengthModerate: "a moderate bet",
       verdictNote: "The speculators' book, read short-to-long: today's side is marked on the scale.",
       crowdingNote:
         "Why the briefing counts positioning as pressure: speculators are long — the crowd's normal side in gold — but longs this crowded are the fragile configuration; the risk is the unwind, not the direction.",
@@ -562,9 +567,10 @@ export const UI = {
       subtitle:
         "Six force families feed one hub — the price of gold. Every link is documented, in its own words, and labelled with its evidence class.",
       howToRead:
-        "Read each family as its own lane of pressure on the ounce; the chip on every link is its evidence class — the letter rides with the colour, never hue alone.",
+        "Read the map: each arrow is a family's pressure into gold — the thicker the arrow, the more documented links it carries; the letter on each node is its strongest evidence class. Dashed lines are the documented cross-links between forces. Tap a family to read its records.",
       hubWord: "gold",
       hubNote: "the price of an ounce",
+      allFamilies: "All families",
       showLabel: "Open the map",
       hideLabel: "Close the map",
       legendM: "M mechanism",
@@ -614,6 +620,7 @@ export const UI = {
       subtitle: "The same ounce through five numeraires plus the Iranian toman, the dollar story made visible.",
       tomanName: "Iranian toman",
       tomanMillion: "M toman",
+      tomanBillion: "bn toman",
       tomanNote: "The toman row: the live free-market dollar (Tehran) × the global ounce.",
       tomanLive: "live",
       basisNote: "The position is each cross's own stored window ({window} today), it widens as the stored series does.",
@@ -628,6 +635,7 @@ export const UI = {
       kgxWeak: "Gold fell in USD but rose in {ups} of {known} crosses over the last 30 days, the dollar weakening, not a global retreat.",
       kgxMixed: "Gold's 30-day moves split across currencies ({ups} of {known} up), no single story; read the rows.",
       kgxNone: "The 30-day windows need more stored data.",
+      strongWeakLine: "Gold is strongest against the {strong} ({spct} in 30 days) and weakest against the {weak} ({wpct}): the ounce buys more of the fallen currency, less of the risen one.",
       unavailable: "The currency grid could not be read yet.",
     },
     timeMachine: {
@@ -713,7 +721,6 @@ export const UI = {
       title: "Market Brief",
       body:
         "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights.",
-      close: "The balance leans against: conditions, not a forecast.",
       /* The price-position line, composed live from the page's own
          verdicts: the history echo (where the price has come back to),
          the 200-day distance, and the YTD / 1-year windows. */
@@ -775,7 +782,6 @@ export const UI = {
     title: "طلا",
     dataAsOf: "دادهٔ {date}",
     loadingLine: "در حال خواندن سنجهٔ طلا…",
-    recordNote: "سابقهٔ شرایط: ۳۰ آبان ۱۴۰۵ · قیمت‌ها زنده",
     price: {
       eyebrow: "قیمت طلا (اونس)",
       gramLine: "۱ اونس تروی = {g} گرم",
@@ -811,18 +817,15 @@ export const UI = {
       howItWorks: "چگونه کار می‌کند",
       factorButton: "گشودن توضیح؛ {name}",
       trendTitle: "روند طلا در همهٔ پنجره‌ها",
-      trendNote: "از یک روز تا پنج سال؛ تغییرِ هر پنجره در یک نگاه، بدون نیاز به کلیک.",
     },
     scenarios: {
-      eyebrow: "سناریوها",
       title: "سناریوهای تغییر قیمت",
       subtitle:
-        "چیزهای قابل‌توجه و ممکن — همان‌های کمی که می‌توانند طلا را بالا یا پایین ببرند؛ هر کدام که تقویم تاریخش را دارد، از تقویم اقتصادی پایین خوانده می‌شود و آن‌که ندارد، صادقانه بدون تاریخ می‌ماند.",
+        "تصمیم‌های کلان اقتصادی جهان — که نهادهایی مانند وزارت خزانه‌داری آمریکا، بانک‌های مرکزی و نهادهای آماری راهبری‌شان می‌کنند — بر قیمت طلا اثر می‌گذارند. رویدادهای پیشِ‌رویی که می‌توانند بر قیمت اثر بگذارند در این بخش آمده‌اند؛ برخی تاریخِ مشخص و تکرارشونده دارند و برخی به‌صورت دوره‌ای یا مشروط ممکن است اتخاذ شوند.",
       upLabel: "طلا بالا",
       downLabel: "طلا پایین",
       nextLabel: "بازسنجی بعدی",
       noSchedule: "بدون تاریخ تقویمی؛ بی‌اعلان می‌آید",
-      note: "فهرستی از پیچ‌هایی که خودِ بازار تماشا می‌کند؛ نه پیش‌بینی و نه شانس‌های خودِ میز — چه چیزهایی می‌توانند مهم باشند، نه چه خواهند بود.",
     },
     balance: {
       eyebrow: "ترازو",
@@ -863,8 +866,7 @@ export const UI = {
       spanNote: "پنجرهٔ ذخیره‌شده: {span}",
     },
     calendar: {
-      eyebrow: "تقویم",
-      title: "چه چیزی در راه است · رویدادهایی که مسیر طلا را می‌چرخانند",
+      headLine: "چه چیزی در راه است",
       subtitle: "انتشارهای بعدی که می‌توانند مسیر طلا را عوض کنند: {events}. رویدادهای علامت‌گذاری‌شده با ≈ نزدیک جایگاه همیشگی‌شان‌اند؛ نهاد مربوطه تاریخ دقیق را هنگام اعلام می‌بندد.",
       impactHigh: "اثر زیاد",
       impactMed: "متوسط",
@@ -881,8 +883,8 @@ export const UI = {
     },
     compare: {
       eyebrow: "مقایسه",
-      title: "طلا در برابر جایگزین‌ها",
-      subtitle: "بازده واقعی ۱۰ساله، نقره، بیت‌کوین و S&P 500؛ هر یک شاخص‌گذاری‌شده به ۱۰۰ در آغاز پنجره، با خودِ طلا برای مقایسه. نگه‌داشتن هر کدام چه کرده، هر کدام یک خط.",
+      title: "بازده طلا در برابر جایگزین‌ها",
+      subtitle: "بازده واقعی و اسمی ۱۰ ساله، نقره، بیت‌کوین و S&P 500 در برابر خودِ طلا؛ نگه‌داشتن هر کدام در این پنجره چه کرده، هر کدام یک خط. بازده‌ها «نرخ»اند و خطشان روی محور راستِ درصدِ واقعی خودش می‌نشیند.",
       windowLabel: "پنجره",
       ranges: { "3M": "۳ ماه", "6M": "۶ ماه", "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال" },
       bestLine: "بالاترین سود: {name} {pct}",
@@ -890,11 +892,10 @@ export const UI = {
       bestLossLine: "کمترین ضرر: {name} {pct}",
       worstLossLine: "بیشترین ضرر: {name} {pct}",
       assets: { gold: "طلا", silver: "نقره", btc: "بیت‌کوین", spx: "S&P 500", realYield: "بازده واقعی ۱۰ساله", nominalYield: "بازده اسمی ۱۰ساله" },
-      realYieldNote: "بازده واقعی «نرخ» است نه دارایی؛ خطش جهت را می‌خواند (مثل بقیه شاخص‌گذاری شده تا یک نمودار همه را نگه دارد)؛ تولتیپ و راهنما سطح واقعیِ درصدش را می‌گویند.",
-      sourceNote: "منابع: اسپاتِ ذخیره‌شدهٔ میز + تاریخچهٔ کامکس (طلا) · یاهو (نقره، بیت‌کوین، S&P 500) · FRED DFII10 + DGS10 (بازده واقعی TIPS و اسمی خزانهٔ ۱۰ ساله). قیمت پایانی روزانه، نمونه‌برداری هفتگی.",
       legendLine: "{name}: {pct} در این پنجره",
       realYieldNow: "سطح خودِ بازده واقعی: {v}٪",
       toggleLabel: "نمایش یا مخفی‌کردن خطوط",
+      barsTitle: "بازدهٔ پنجره، میله به میله",
       tableTitle: "کارنامهٔ پنجره، با عدد",
       colAsset: "دارایی",
       colStart: "آغاز پنجره",
@@ -1070,7 +1071,7 @@ export const UI = {
       title: "تقاضای بانک‌های مرکزی",
       subtitle: "چه کسی طلا می‌خرد؛ داستان ساختاری این دهه.",
       chartTitle: "خرید خالص جهانی، ۱۲ ماه متحرک",
-      chartReportedWorld: "دنیای گزارش‌شده",
+      chartReportedWorld: "کشورهای گزارش‌دهنده",
       chartUnit: "تن در سال",
       asOf: "داده تا {month}",
       buyersTitle: "خریداران طلا",
@@ -1081,10 +1082,11 @@ export const UI = {
       buyersHeadHoldings: "موجودی",
       buyersHeadShare: "سهم طلا از ذخایر",
       tonnesShort: "{v} تن",
+      holdingsNow: "ذخیره فعلی: {v} تن",
       sellersTitle: "فروشندگان طلا",
       shareNote:
         "طلا با قیمت لحظه‌ای بازار ارزش‌گذاری شده بر کل دارایی‌های ذخیرهٔ رسمی (طلا با همان قیمت دوباره ارزش‌گذاری می‌شود؛ آخرین فصل گزارش‌شدهٔ هر کشور). سهمِ در حال رشد می‌تواند حسابِ قیمت باشد، نه خرید فعال.",
-      reportedWorldLine: "دنیای گزارش‌شده: {tonnes} تن در {n} گزارش‌دهنده؛ نه کل جهان.",
+      reportedWorldLine: "این شمارش فقط کشورهایی را می‌بیند که گزارش رسمی می‌دهند — {n} کشور، مجموعاً {tonnes} تن ذخیرهٔ رسمی؛ کل جهان اندکی بیش از این در نزد خود دارد.",
       methodTitle: "روش",
       methodLine:
         "منبع: صندوق بین‌المللی پول (ذخایر ماهانه)؛ دو جریان دادهٔ IL و IRFCL، به‌ازای هر کشور ادغام شده‌اند (مشاهدهٔ تازه‌تر برنده می‌شود). تجمیع‌ها، دفتر بانکی BIS و ردیف‌های خراب کنار گذاشته شده‌اند.",
@@ -1129,6 +1131,11 @@ export const UI = {
       spanLine: "بازهٔ ذخیره‌شده: {span}",
       unavailable: "دادهٔ همبستگی هنوز خوانده نشد.",
     },
+    other: {
+      eyebrow: "عددهای پشتیبان",
+      title: "سایر شاخص‌ها",
+      subtitle: "نبض بازار فیزیکی و لوله‌کشی خزانهٔ لندن — شاخص‌های پشتیبان، یک‌جا در انتهای صفحه.",
+    },
     physical: {
       eyebrow: "طلای فیزیکی",
       title: "بازار فیزیکی طلا",
@@ -1149,6 +1156,12 @@ export const UI = {
       verdictLong: "لانگ · خالص خرید",
       verdictShort: "شورت · خالص فروش",
       verdictNeutral: "بی‌تمایل · وسط راه",
+      verdictLongDesc: "معامله‌گران سفته‌باز بر رشد قیمت طلا شرط بسته‌اند — {strength}.",
+      verdictShortDesc: "معامله‌گران سفته‌باز بر افت قیمت طلا شرط بسته‌اند — {strength}.",
+      verdictNeutralDesc: "معامله‌گران سفته‌باز گرایش روشنی ندارند — دفتر معاملات متوازن است.",
+      strengthHeavy: "شرطِ سنگین و شلوغ",
+      strengthStrong: "شرطی قوی",
+      strengthModerate: "شرطی متوسط",
       verdictNote: "دفتر سفته‌بازها از شورت تا لانگ خوانده می‌شود؛ سمتِ امروز روی خط نشانه می‌شود.",
       crowdingNote:
         "چرا مرور پوزیشن‌دهی را «فشار» می‌شمارد: سفته‌بازها لانگ‌اند — سمتِ همیشگیِ جمعیت در طلا — اما لانگِ این‌قدر شلوغ، پیکربندیِ شکننده است؛ ریسک، تخلیهٔ پوزیشن است، نه سمتِ آن.",
@@ -1161,9 +1174,10 @@ export const UI = {
       title: "نیروهای طلا چگونه به هم وصل‌اند",
       subtitle: "شش خانوادهٔ نیرو به یک هاب می‌ریزند — قیمت طلا. هر پیوند مستند است، به جمله‌های خودش، و با طبقهٔ شواهد خودش برچسب خورده.",
       howToRead:
-        "هر خانواده را مثل لاینِ فشارِ خودش بر اونس بخوانید؛ تراشهٔ روی هر پیوند، طبقهٔ شواهد آن است — حرف همراه رنگ می‌آید، هرگز فقط رنگ.",
+        "نقشه را این‌طور بخوانید: هر پیکان، فشارِ یک خانواده به طلاست — هرچه پیکان قطورتر باشد، پیوند مستندش بیشتر است؛ حرفِ روی هر گره، قوی‌ترین طبقهٔ شواهد آن است. خط‌چین‌ها پیوندهای مستند میان خودِ نیروها هستند. برای خواندن رکوردها روی هر خانواده بزنید.",
       hubWord: "طلا",
       hubNote: "قیمت هر اونس",
+      allFamilies: "همهٔ خانواده‌ها",
       legendM: "M سازوکار",
       legendC: "C همبستگی مشاهده‌شده",
       legendX: "X مشروط",
@@ -1213,6 +1227,7 @@ export const UI = {
       subtitle: "همان اونس با پنج پول، به‌علاوهٔ تومان ایرانی؛ ماجرای دلار، آشکار.",
       tomanName: "تومان ایرانی",
       tomanMillion: "میلیون تومان",
+      tomanBillion: "میلیارد تومان",
       tomanNote: "ردیف تومان: دلار آزاد تهران × اونس جهانی، زنده.",
       tomanLive: "زنده",
       basisNote: "جایگاه، پنجرهٔ ذخیره‌شدهٔ خودِ هر کراس است (امروز {window}) و با رشد سری ذخیره‌شده پهن‌تر می‌شود.",
@@ -1227,6 +1242,7 @@ export const UI = {
       kgxWeak: "طلا در ۳۰ روز گذشته به دلار پایین آمده اما در {ups} کراس از {known} بالا رفته؛ ضعف دلار است، نه عقب‌نشینی جهانی.",
       kgxMixed: "حرکت‌های ۳۰روزهٔ طلا میان ارزها دوپاره است ({ups} از {known} صعودی)؛ یک روایت واحد نیست، ردیف‌ها را بخوانید.",
       kgxNone: "پنجره‌های ۳۰روزه به دادهٔ ذخیره‌شدهٔ بیشتری نیاز دارند.",
+      strongWeakLine: "طلا در برابر {strong} قوی‌تر شده ({spct} در ۳۰ روز) و در برابر {weak} ضعیف‌تر ({wpct}): اونس طلا ارزِ افتاده را بیشتر می‌خرد و ارزِ قوی‌شده را کمتر.",
       unavailable: "جدول ارزی هنوز خوانده نشد.",
     },
     timeMachine: {
@@ -1312,7 +1328,6 @@ export const UI = {
       title: "مرور بازار",
       body:
         "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند.",
-      close: "ترازو علیه می‌چرخد؛ شرایط، نه پیش‌بینی.",
       /* سطر جایگاه قیمت — از خودِ حکم‌های صفحه زنده ساخته می‌شود:
          بازگشت به قیمتِ گذشته، فاصله از میانگین ۲۰۰ روزه و پنجره‌های
          ابتدای سال و یک‌ساله. */

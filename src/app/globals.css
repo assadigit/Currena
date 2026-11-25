@@ -683,6 +683,17 @@
   }
 }
 
+/* — The live-graph breathing dot (batch H): the direction-inked
+     liveness mark on the price card's chart; colour rides direction,
+     the soft scale/opacity breath says "live" without motion excess — */
+@keyframes cr-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.45); opacity: 0.5; }
+}
+.live-dot-breathe {
+  animation: cr-breathe 2.4s ease-in-out infinite;
+}
+
 /* — The global reduced-motion guard — */
 @media (prefers-reduced-motion: reduce) {
   .loader-dot {

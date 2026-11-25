@@ -39,13 +39,13 @@ type CmpT = {
   worstLossLine: string;
   assets: { gold: string; silver: string; btc: string; spx: string; realYield: string; nominalYield: string };
   toggleLabel: string;
+  barsTitle: string;
   tableTitle: string;
   colAsset: string;
   colStart: string;
   colEnd: string;
   colChange: string;
   unitPp: string;
-  sourceNote: string;
   unavailable: string;
 };
 
@@ -73,14 +73,17 @@ type CorrT = {
   unavailable: string;
 };
 
-/** The display order + the token colour of every line. */
+/** The display order + the token colour of every line — six lines, six
+ *  clearly different hues (the owner's batch-H ask: no two lines close
+ *  enough to confuse at a glance): gold-gold, navy (real yield), teal
+ *  (nominal yield), slate (silver), orange (Bitcoin), green (S&P). */
 const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }> = [
   { id: "gold", color: "var(--color-accent-gold-strong)" },
   { id: "realYield", color: "var(--color-status-context)", dashed: true },
   { id: "nominalYield", color: "var(--color-bridge-accent)", dashed: true },
   { id: "silver", color: "var(--color-text-secondary)" },
-  { id: "btc", color: "var(--color-currena-blue)" },
-  { id: "spx", color: "var(--color-chip-ink-context)" },
+  { id: "btc", color: "var(--color-status-stressed)" },
+  { id: "spx", color: "var(--color-status-normal)" },
 ];
 
 type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y";
@@ -107,6 +110,104 @@ function indexTo100(points: ReadonlyArray<{ d: string; v: number }>, w: WindowKe
   const base = slice[0]!.v;
   if (!Number.isFinite(base) || base === 0) return null;
   return slice.map((p) => ({ d: p.d, v: (p.v / base) * 100 }));
+}
+
+export interface CompareRow {
+  line: (typeof LINE_ORDER)[number];
+  name: string;
+  pct: number | null;
+  start: number;
+  end: number;
+  deltaPp: number | null;
+}
+
+/** Measure a block's own width after mount (the responsive-canvas trick
+ *  TraceChart uses; here so the bar view's labels never shrink to
+ *  unreadable on a phone). */
+function useElementWidth<T extends HTMLElement>() {
+  const ref = React.useRef<T | null>(null);
+  const [w, setW] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (el === null) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) setW(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return { ref, w };
+}
+
+/**
+ * The window's own bar view (the owner's batch-H ask): each ASSET's
+ * window % change as a vertical bar — the same numbers the scorecard
+ * reads, at a glance, in each line's own colour (the eye ties the bar
+ * to the line by hue; the signed label carries the direction, colour
+ * is never the sole carrier). Bars grow from a zero baseline, negative
+ * returns drop below it. The yields never join: a rate's pp is not a %
+ * return — the scorecard keeps their honest unit.
+ */
+function CompareBars({ t, rows, fmt, enabled }: { t: CmpT; rows: CompareRow[]; fmt: Fmt; enabled: Record<LineId, boolean> }) {
+  const assets = rows.filter((r) => r.pct !== null && enabled[r.line.id]);
+  const { ref, w } = useElementWidth<HTMLDivElement>();
+  if (assets.length === 0) return null;
+  const W = Math.max(320, Math.min(640, Math.round(w ?? 640)));
+  const H = 168;
+  const padT = 18;
+  const padB = 26;
+  const values = assets.map((r) => r.pct ?? 0);
+  const vmax = Math.max(0, ...values);
+  const vmin = Math.min(0, ...values);
+  const span = vmax - vmin || 1;
+  const plotH = H - padT - padB;
+  /* the zero baseline: at the bottom when nothing fell, otherwise
+     placed by the up/down share of the range */
+  const y0 = vmin < 0 ? padT + (vmax / span) * plotH : H - padB;
+  const slot = W / assets.length;
+  const barW = Math.min(58, slot * 0.5);
+  const ariaParts = assets.map((r) => `${r.name} ${fmt.pct(r.pct ?? 0, 1)}`);
+  return (
+    <div className="mt-3" ref={ref}>
+      <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.barsTitle}</h4>
+      <svg
+        dir="ltr"
+        viewBox={`0 0 ${W} ${H}`}
+        className="mt-1.5 block h-auto w-full"
+        role="img"
+        aria-label={`${t.barsTitle}: ${ariaParts.join(", ")}`}
+      >
+        {/* the zero baseline — every bar grows or drops from it */}
+        <line x1={4} y1={y0} x2={W - 4} y2={y0} stroke="var(--color-text-tertiary)" strokeWidth={1} opacity={0.55} />
+        {assets.map((r, i) => {
+          const v = r.pct ?? 0;
+          const cx = slot * i + slot / 2;
+          const h = (Math.abs(v) / span) * plotH;
+          const top = v >= 0 ? y0 - h : y0;
+          const labelY = v >= 0 ? top - 6 : top + h + 12;
+          return (
+            <g key={r.line.id}>
+              <rect
+                x={cx - barW / 2}
+                y={top}
+                width={barW}
+                height={Math.max(2, h)}
+                rx={4}
+                fill={r.line.color}
+                opacity={0.88}
+              />
+              <text x={cx} y={labelY} textAnchor="middle" fontSize={11} fontWeight={800} fill="var(--color-text-primary)">
+                {fmt.pct(v, 1)}
+              </text>
+              <text x={cx} y={H - 8} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-text-secondary)">
+                {r.name}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
 }
 
 export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; locale: Locale; fmt: Fmt; correlation: CorrelationPayload | null; corrT: CorrT }) {
@@ -260,6 +361,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
               height={300}
               responsive
               baseline={100}
+              lineLabels
               yFormat={(v) => fmt.num(v, 0)}
               yFormatRight={(v) => `${fmt.num(v, 1)}%`}
               fmt={fmt}
@@ -269,6 +371,10 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
               }
             />
           </div>
+
+          {/* the bar view — the window's % change, one vertical bar per
+              enabled asset, in each line's own colour (batch H) */}
+          <CompareBars t={t} rows={rows} fmt={fmt} enabled={enabled} />
 
           {/* the scorecard — the window's gains and losses, in numbers */}
           {rows.length > 0 ? (
@@ -369,9 +475,6 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
                   </tbody>
                 </table>
               </div>
-              {/* the band's own sources — every leg named, FRED for both
-                  yields (the real-yield re-sourcing; the honest line) */}
-              <p className="m-0 mt-1.5 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.sourceNote}</p>
             </div>
           ) : null}
         </>

@@ -246,6 +246,27 @@ function unitDefault(u: CalcUnit, mode: "one" | "dca"): number {
   return mode === "one" ? 100 : 50;
 }
 
+/** Normalize a raw keystroke string into calculator input text: Persian
+ *  and Arabic-Indic digits become ASCII, anything but digits and ONE dot
+ *  drops, and leading zeros collapse ("0100" → "100" — the reported
+ *  artifact dies here, never stored, never shown). An empty string is
+ *  legal while typing; the input's blur restores "0". */
+function sanitizeAmountText(raw: string): string {
+  const faDigits = "۰۱۲۳۴۵۶۷۸۹";
+  const arDigits = "٠١٢٣٤٥٦٧٨٩";
+  let s = "";
+  for (const ch of raw) {
+    const fi = faDigits.indexOf(ch);
+    const ai = arDigits.indexOf(ch);
+    s += fi >= 0 ? String(fi) : ai >= 0 ? String(ai) : ch;
+  }
+  s = s.replace(/[^\d.]/g, "");
+  const dot = s.indexOf(".");
+  if (dot >= 0) s = `${s.slice(0, dot + 1)}${s.slice(dot + 1).replace(/\./g, "")}`;
+  s = s.replace(/^0+(?=\d)/, "");
+  return s;
+}
+
 /** Money in one unit — the toman carries the site's own M/bn toman
  *  convention; FA speaks the unit's word, EN its symbol. */
 function unitMoney(v: number, u: CalcUnit, locale: Locale, fmt: Fmt): string {
@@ -381,6 +402,15 @@ export function CalculatorBand({
   const [unitId, setUnitId] = React.useState<string>("usd");
   const [calcYear, setCalcYear] = React.useState<number | null>(null);
   const [amount, setAmount] = React.useState<number>(100);
+  /* the input's own text mirror (the owner's batch-H bug report:
+     "typing 1000 gives 0100") — the root cause was a controlled
+     type=number: the browser and React fight over the value, a cleared
+     field snaps to "0" and prefixes the next digits, and select-all
+     typing appends instead of replacing. The input is TEXT now, the
+     mirror is the truth: fa/ar digits normalize, anything but digits
+     and one dot drops, leading zeros collapse ("0100" → "100"), and
+     the number commits underneath. */
+  const [amountText, setAmountText] = React.useState<string>("100");
   const unit = CALC_UNITS.find((u) => u.id === unitId) ?? CALC_UNITS[0]!;
   const unitKind: "ccy" | "gram" = unit.kind;
   const switchMode = (m: "one" | "dca") => {
@@ -400,6 +430,13 @@ export function CalculatorBand({
       setAmount(unitDefault(usd, mode));
     }
   };
+  /* keep the mirror honest when the number changes from OUTSIDE the
+     input (a unit / mode / asset switch re-defaults it) — while the
+     user types, the mirror leads and the number follows */
+  React.useEffect(() => {
+    if (Number(amountText) === amount) return;
+    setAmountText(String(amount));
+  }, [amount, amountText]);
 
   /* the FX month-end leg — the converter's own currency set + the
      toman on the site's own TGJU free-market basis */
@@ -597,14 +634,22 @@ export function CalculatorBand({
                 {mode === "one" ? calc.calcAmountOne : calc.calcAmountDca}
               </span>
               <input
-                type="number"
-                min={0}
-                step={unit.id === "toman" ? 100_000 : unit.kind === "gram" ? 0.5 : mode === "one" ? 10 : 5}
+                type="text"
                 inputMode="decimal"
-                value={amount}
+                autoComplete="off"
+                dir="ltr"
+                value={amountText}
                 onChange={(e) => {
-                  const v = Number(e.target.value);
-                  setAmount(Number.isFinite(v) && v >= 0 ? v : 0);
+                  const text = sanitizeAmountText(e.target.value);
+                  setAmountText(text);
+                  const v = Number(text);
+                  setAmount(text === "" || !Number.isFinite(v) ? 0 : Math.max(0, v));
+                }}
+                onBlur={() => {
+                  if (amountText === "") {
+                    setAmountText("0");
+                    setAmount(0);
+                  }
                 }}
                 className="w-[9rem] min-h-[38px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 type-label tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
               />

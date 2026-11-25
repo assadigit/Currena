@@ -2565,3 +2565,122 @@ importers, no yield label) stays untouched. The EODHD token path is
 untouched and one EODHD daily call is saved (realYield no longer
 consumes it). No new cron trigger (5/5 stays), no D1 migration, no
 seed re-run, secrets untouched.
+
+### The owner's twenty refinements, batch H (2026-11-25, the same sitting)
+
+The owner's twenty-item pass, one tree, deployed the same hour — the
+batch-D/F/G pattern. Every item browser-verified on the dev server
+(fa + EN) before the build and re-verified against the live canonical
+URL after the deploy; the full walk: fa/RTL and EN, dark, 375px
+(scrollWidth 375, zero horizontal overflow), zero console and zero
+page errors in a fresh context, lint green, and the one true bug
+reproduced before being fixed.
+
+1. **The vague lines removed**: the market summary's
+   «ترازو علیه می‌چرخد؛ شرایط، نه پیش‌بینی» close, the trend table's
+   «از یک روز تا پنج سال…» note, the balance header's «سابقهٔ شرایط»
+   record line (both its renders — the balance and the takeaway
+   header — plus the now-dead copy keys), the scenarios' «سناریوها»
+   eyebrow, and the «فهرستی از پیچ‌هایی…» note.
+2. **The price chart direction-inked**: green when the selected window
+   rises, a red that DEEPENS with the fall's severity
+   (`directionInk` — a color-mix ladder from a muted brick at −1% to
+   the full alert ink at −8% or worse), the house gold when flat or
+   unread; and the header's liveness dot now BREATHES (the
+   `cr-breathe` keyframes, guarded by the global reduced-motion rule)
+   in the same direction ink.
+3. **The balance's pans carry their side's ground**: the bowls' fill
+   raised from an 8% to a 16% color-mix of the green/red status inks —
+   the containers themselves say which pan is which.
+4. **The scenarios intro rewritten in the owner's own framing** (their
+   Persian draft, polished, with a parallel English): the world's
+   major economic decisions — steered by the U.S. Treasury, central
+   banks and statistical agencies — move the gold price; the events
+   ahead are listed here, some with fixed recurring dates, others
+   periodic or conditional and adopted unannounced.
+5. **The scenarios and the calendar MERGED into one card**
+   («سناریوهای تغییر قیمت»): the scenarios above, «چه چیزی در راه
+   است» as the calendar's sub-heading below, the institutions chip and
+   the 1:1 kinds line kept, the construction note kept as the card's
+   footnote — the events ARE the scenarios' own dates; the separate
+   calendar section, its nav item, and the duplicated framing are gone.
+6. **The compare band retitled** «بازده طلا در برابر جایگزین‌ها» / "Gold's
+   return against the alternatives" (the subtitle now tells the truth
+   about the right-axis yields), **six clearly different hues** (gold,
+   navy, teal, slate, orange, green — no two confusable), **each
+   line's name painted at its right end** in its own colour
+   (TraceChart's new `lineLabels`, de-collided vertically), the
+   sources line removed, and a **vertical bar view** added — one bar
+   per enabled asset, the window's % change in each line's own colour,
+   growing or dropping from a zero baseline (the yields never join: a
+   rate's pp is not a % return).
+7. **The TA levels as one row**: `[support | now | resistance]` —
+   always three cells side by side (was one-per-row on phones).
+8. **The central banks**: «ذخیره فعلی: ۶۹۰ تن» on every holding
+   (table + mobile rows), the valuation note shrunk to a
+   10.5px/70%-opacity whisper, and the reported-world line rewritten
+   plain: «این شمارش فقط کشورهایی را می‌بیند که گزارش رسمی می‌دهند —
+   {n} کشور، مجموعاً {tonnes} تن ذخیرهٔ رسمی؛ کل جهان اندکی بیش از این
+   در نزد خود دارد» (the chart's caption chip likewise reworded to
+   «کشورهای گزارش‌دهنده»).
+9. **The positions verdict explained**: below «لانگ» — «معامله‌گران
+   سفته‌باز بر رشد قیمت طلا شرط بسته‌اند — {قدرت}» with the strength
+   graded from the reading's own ratio (heavy past ±60, strong past
+   ±40, moderate otherwise).
+10. **The dashboard consolidated with نسبت‌ها**: the top-3 ratios
+    (طلا/نقره، قیمت واقعی طلا، طلا/نفت) are now first-class indicator
+    cards in the same grid (value, 30-day delta, decade-band whisper),
+    the inline gold/silver line is gone, and the expand now reveals
+    only the remaining five ratios — one metrics block, no duplicated
+    top-set.
+11. **The currency grid's verdict**: «طلا در برابر {strong} قوی‌تر شده
+    ({pct} در ۳۰ روز) و در برابر {weak} ضعیف‌تر — اونس طلا ارزِ افتاده
+    را بیشتر می‌خرد و ارزِ قوی‌شده را کمتر», plus the **toman unit
+    fixed**: an ounce over a billion toman reads «۱ میلیارد تومان» /
+    "bn toman", never «۱٬۰۰۸ میلیون» (the scale mistake was a unit
+    mistake).
+12. **The wealth calculator's input bug fixed** — the owner's report:
+    typing 1000 gives "0100". Root cause: a controlled `type=number`
+    (the browser and React fight over the value; a cleared field
+    snaps to "0" and prefixes the next digits; select-all typing
+    appends — reproduced live: selecting "100" and typing "1000" grew
+    to "11000"). The input is TEXT now with a sanitized mirror: fa/ar
+    digits normalize to ASCII, anything but digits and one dot drops,
+    leading zeros collapse («۰۱۰۰» → "100"), empty stays empty while
+    typing and restores "0" on blur; the number commits underneath.
+    Verified: select-all + type 1000 → "1000", clear + 500 → "500" —
+    on the dev server AND the live page.
+13. **The physical market and the London vault MERGED into «سایر
+    شاخص‌ها»** ("Other indicators") at the page's foot — one card, two
+    sub-blocks (بازار فیزیکی with its verdict box, خزانهٔ لندن و تسویه
+    with its own collapse), the two nav items replaced by one «سایر»;
+    the relationships map stays the page's closing view and the
+    history the very last section.
+14. **The relationship map is a graph now** (the owner's "still a
+    list" — the list survives as the reference layer beneath): six
+    family nodes around one gold hub, every edge an arrow INTO gold
+    (width by documented link count, ink by the family's strongest
+    evidence class), the letter chip on every node, and the two
+    documented cross-links drawn dashed — R-14 (borrowing costs feed
+    the dollar) and R-22 (in a true panic the dollar itself bids with
+    gold). Tap a node to read its records («همهٔ خانواده‌ها» resets);
+    responsive (radial on wide screens, twin-column on phones, the
+    viewBox follows the container); the how-to-read line rewritten for
+    the graph.
+
+**The verification record**: every removed string grep-clean on the
+live page (fa + EN), every new line present; the breathing dot's
+`cr-breathe` animation and the full-severity red chart stroke both
+read from the computed styles; the pan bowls' 16% tints; the merged
+sections' headers and the last-three order (سایر شاخص‌ها → نقشهٔ روابط
+→ تاریخ); the graph's nodes, arrows, dashed cross-links and the
+tap-to-select (4 records for هزینهٔ پول); the dashboard's ten-card
+grid (yields + indicators + the three ratios); the TA row's three
+columns; the CB labels; the positions description with «شرطی قوی»;
+the currency verdict; the toman's «۱ میلیارد تومان»; the compare
+band's four bars, six hues and on-chart labels; the calculator's
+fixed typing — and the route sweep green (`/gold`, every
+`/gold/api/gold/*`, `/gold/api/desk`, currena.ir/ and /goldsmith
+untouched). Deployed on the two-step OpenNext runbook
+(`NEXT_PUBLIC_BASE_PATH=/gold` on BOTH build and deploy), live PNGs
+tests/batchh-01…04.
