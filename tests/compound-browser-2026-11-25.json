@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:3100",
+  "base": "http://localhost:3000",
   "checks": [
     {
       "id": "12-answer-on-arrival",
@@ -24,7 +24,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 265ms"
+      "detail": "3 one-tap changes in 226ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -44,7 +44,7 @@
     {
       "id": "14-390x844-one-screen",
       "pass": true,
-      "detail": "chips bottom 727/844, scrollW 390, scrollY 24"
+      "detail": "chips bottom 733/844, scrollW 390, scrollY 18"
     },
     {
       "id": "14-360x800-one-screen",
