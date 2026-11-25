@@ -130,24 +130,6 @@ function crossStats(id: string, series: readonly CrossPoint[]): CrossStats | nul
   };
 }
 
-export type KgxKind = "genuine-demand" | "dollar-story" | "dollar-weakness" | "mixed";
-
-/** The KGX validation sentence's verdict (verbatim). */
-export function kgxVerdict(
-  usdChange30d: number | null,
-  crossChanges: ReadonlyArray<{ id: string; change30d: number | null }>,
-): { kind: KgxKind; ups: number; known: number } | null {
-  const known = crossChanges.filter((c): c is { id: string; change30d: number } => c.change30d !== null);
-  if (usdChange30d === null || known.length === 0) return null;
-  const ups = known.filter((c) => c.change30d > 0).length;
-  const downs = known.length - ups;
-  const usdUp = usdChange30d > 0;
-  if (usdUp && downs === 0) return { kind: "genuine-demand", ups, known: known.length };
-  if (usdUp && ups === 0) return { kind: "dollar-story", ups, known: known.length };
-  if (!usdUp && downs === 0) return { kind: "dollar-weakness", ups, known: known.length };
-  return { kind: "mixed", ups, known: known.length };
-}
-
 /* ------------------------------------------------------------------ *
  * The card ids + names (the upstream placement's own set)
  * ------------------------------------------------------------------ */
@@ -209,24 +191,16 @@ type CcT = {
 
 type GridT = {
   title: string;
-  subtitle: string;
   tomanName: string;
   tomanMillion: string;
   tomanBillion: string;
   tomanNote: string;
   tomanLive: string;
-  basisNote: string;
   positionLine: string;
   bandTop: string;
   bandBottom: string;
   bandMid: string;
   change30d: string;
-  kgxTitle: string;
-  kgxGenuine: string;
-  kgxDollar: string;
-  kgxWeak: string;
-  kgxMixed: string;
-  kgxNone: string;
   strongWeakLine: string;
   unavailable: string;
 };
@@ -363,14 +337,12 @@ export function ContextTable({
 
 export function CurrencyGridCard({
   crosses,
-  usdChange30d,
   tomanPerOunce,
   t,
   fmt,
   locale,
 }: {
   crosses: CrossesPayload | null;
-  usdChange30d: number | null;
   tomanPerOunce: number | null;
   t: GridT;
   fmt: Fmt;
@@ -384,13 +356,6 @@ export function CurrencyGridCard({
       .map((c) => ({ cross: c, stats: crossStats(c.id, c.series) }))
       .filter((r) => r.stats !== null);
   }, [crosses]);
-  const kgx = React.useMemo(() => {
-    if (rows === null) return null;
-    return kgxVerdict(
-      usdChange30d,
-      rows.map((r) => ({ id: r.stats!.id, change30d: r.stats!.change30d })),
-    );
-  }, [rows, usdChange30d]);
 
   /* the strongest / weakest verdict (the owner's batch-H ask): the cross
      that moved the most against its currency in 30 days is the one gold
@@ -415,17 +380,6 @@ export function CurrencyGridCard({
     );
   }
 
-  const kgxLine =
-    kgx === null
-      ? t.kgxNone
-      : kgx.kind === "genuine-demand"
-        ? t.kgxGenuine.replace("{ups}", fmt.num(kgx.ups, 0)).replace("{known}", fmt.num(kgx.known, 0))
-        : kgx.kind === "dollar-story"
-          ? t.kgxDollar.replace("{downs}", fmt.num(kgx.known - kgx.ups, 0)).replace("{known}", fmt.num(kgx.known, 0))
-          : kgx.kind === "dollar-weakness"
-            ? t.kgxWeak.replace("{ups}", fmt.num(kgx.ups, 0)).replace("{known}", fmt.num(kgx.known, 0))
-            : t.kgxMixed.replace("{ups}", fmt.num(kgx.ups, 0)).replace("{known}", fmt.num(kgx.known, 0));
-
   return (
     <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -440,12 +394,9 @@ export function CurrencyGridCard({
           {open ? (locale === "en" ? "hide" : "بستن") : locale === "en" ? "show" : "نمایش"}
         </button>
       </div>
-      <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.subtitle}</p>
-      <p className="m-0 type-caption text-[var(--color-text-tertiary)]">
-        <bdi>{t.kgxTitle}: {kgxLine}</bdi>
-      </p>
       {/* the strongest/weakest verdict — which currency gold gained or
-          lost the most against, and what it means (batch H) */}
+          lost the most against, and what it means (batch H); the card's
+          one verdict line, everything else is the grid itself */}
       {strongWeak !== null ? (
         <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]" data-currency-verdict>
           <bdi>
@@ -480,7 +431,12 @@ export function CurrencyGridCard({
                 <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
                   {fmt.num(stats!.last, dec)}
                 </bdi>
-                <span className="flex items-baseline gap-2 type-caption text-[var(--color-text-tertiary)]">
+                {/* the 30-day delta + the band: the delta's own icon and
+                    number are ONE unbreakable unit (the batch-I catch —
+                    the pair had been wrapping apart on narrow screens);
+                    the band breaks only between its own words, never
+                    inside the delta */}
+                <span className="flex min-w-0 flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 type-caption text-[var(--color-text-tertiary)]">
                   <SignedDelta v={stats!.change30d} fmt={fmt} />
                   {band !== null ? <span>{t.positionLine.replace("{band}", band)}</span> : null}
                 </span>
@@ -512,9 +468,6 @@ export function CurrencyGridCard({
               </span>
             </div>
           ) : null}
-          <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
-            {t.basisNote.replace("{window}", `${fmt.num(rows?.[0]?.stats?.basis?.points ?? 0, 0)} ${locale === "en" ? "points" : "نقطه"}`)}
-          </p>
         </div>
       ) : null}
     </div>

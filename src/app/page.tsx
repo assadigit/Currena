@@ -899,7 +899,6 @@ function DashboardBand({
   locale,
   projection,
   crosses,
-  usdChange30d,
   tomanPerOunce,
 }: {
   data: GoldPayload;
@@ -908,7 +907,6 @@ function DashboardBand({
   locale: Locale;
   projection: ProjectionPayload | null;
   crosses: CrossesPayload | null;
-  usdChange30d: number | null;
   tomanPerOunce: number | null;
 }) {
   const yieldsAligned =
@@ -1038,7 +1036,7 @@ function DashboardBand({
             />
           ) : null}
           {/* the currency grid — the ratios group's sub-card, open by default */}
-          <CurrencyGridCard crosses={crosses} usdChange30d={usdChange30d} tomanPerOunce={tomanPerOunce} t={t.currencyGrid} fmt={fmt} locale={locale} />
+          <CurrencyGridCard crosses={crosses} tomanPerOunce={tomanPerOunce} t={t.currencyGrid} fmt={fmt} locale={locale} />
         </div>
       ) : (
         <p className="m-0 mt-4 type-caption text-[var(--color-text-tertiary)]">{t.contextCards.unavailable}</p>
@@ -1180,7 +1178,6 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
         <summary className="cursor-pointer px-3 py-2 type-caption font-bold text-[var(--color-bridge-accent)]">{t.bridge.methodTitle}</summary>
         <p className="px-3 pb-3 m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.bridge.method}</p>
       </details>
-      <p className="m-0 mt-2 type-caption italic text-[var(--color-text-tertiary)]">{t.bridge.note}</p>
     </section>
   );
 }
@@ -1497,7 +1494,6 @@ export default function GoldPage() {
               locale={locale}
               projection={projection.data ?? null}
               crosses={crosses.data ?? null}
-              usdChange30d={data.gold.chg30d}
               tomanPerOunce={tomanPerOunce}
             />
 

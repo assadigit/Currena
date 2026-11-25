@@ -20,7 +20,7 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Landmark } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
@@ -35,19 +35,11 @@ import {
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
-/** The 1:1 list joiner — «الف، ب و ج» in fa, "a, b and c" in EN. */
-function joinList(items: readonly string[], locale: Locale): string {
-  if (items.length === 0) return "";
-  if (items.length === 1) return items[0]!;
-  const last = items[items.length - 1]!;
-  const rest = items.slice(0, -1);
-  return locale === "fa" ? `${rest.join("، ")} و ${last}` : `${rest.join(", ")} and ${last}`;
-}
-
 type CalT = {
-  /** The sub-heading inside the merged scenarios section (no eyebrow, no section title — one card, one framing). */
-  headLine: string;
-  subtitle: string;
+  /** The one lead line over the events list — the merged section's own
+   *  closing half (no second head, no second subtitle, no method block:
+   *  one card, one framing, the events ARE the scenarios' dates). */
+  eventsLead: string;
   impactHigh: string;
   impactMed: string;
   daysAway: string;
@@ -56,8 +48,6 @@ type CalT = {
   whyLabel: string;
   moreLabel: string;
   fewerLabel: string;
-  methodTitle: string;
-  methodLine: string;
   unavailable: string;
 };
 
@@ -429,31 +419,6 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
     return out;
   }, [now, merged.data]);
 
-  /* THE 1:1 description — the owner's ask: the subtitle names exactly the
-     event kinds the calendar below actually lists (built from the very
-     same `events` array, never a second hand-written list), and the header
-     chip carries the same kinds, compact */
-  const distinctKinds = React.useMemo(() => {
-    const seen = new Set<string>();
-    const out: UpcomingEvent[] = [];
-    for (const e of events) {
-      if (seen.has(e.def.id)) continue;
-      seen.add(e.def.id);
-      out.push(e);
-    }
-    return out;
-  }, [events]);
-  const kindNames = React.useMemo(() => distinctKinds.map((e) => e.def.name[lan(locale)]), [distinctKinds, locale]);
-  const subtitleText = t.subtitle.replace("{events}", events.length === 0 ? "…" : joinList(kindNames, locale));
-  const chipShorts = React.useMemo(
-    () =>
-      distinctKinds
-        .map((e) => e.def.short[lan(locale)])
-        .filter((s) => s.length <= 16)
-        .slice(0, 4),
-    [distinctKinds, locale],
-  );
-
   /* the three next events show at once; the rest ride the expandable */
   const [open, setOpen] = React.useState(false);
   const VISIBLE = 3;
@@ -528,16 +493,17 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
 
   return (
     <div className="mt-4 border-t border-[var(--color-border)] pt-3.5">
-      {/* the sub-heading row — the merged card's second half; the chip
-          carries the institutions, the line beneath lists the kinds */}
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.headLine}</h4>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-2.5 py-1 type-caption font-bold text-[var(--color-currena-blue-deep)]">
-          <Landmark className="h-3.5 w-3.5" aria-hidden="true" />
-          {chipShorts.length > 0 ? chipShorts.join(" · ") : "…"}
+      {/* THE one lead line (the owner's batch-I ask: the merged card has
+          one framing — the scenarios' own; the events below are simply
+          their dates, no second head, no second subtitle, no method
+          block — the user faces the upcoming events, nothing else) */}
+      <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 type-caption font-bold text-[var(--color-text-primary)]">
+        <CalendarClock className="h-3.5 w-3.5 shrink-0 text-[var(--color-currena-blue-deep)]" aria-hidden="true" />
+        {t.eventsLead}
+        <span className="font-semibold text-[var(--color-text-tertiary)]">
+          {events.length > 0 ? `· ${fmt.num(events.length, 0)} ${locale === "en" ? "events" : "رویداد"}` : ""}
         </span>
-      </div>
-      <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{subtitleText}</p>
+      </p>
 
       {now === null ? (
         <p className="m-0 mt-3 type-caption text-[var(--color-text-tertiary)]" aria-live="polite">
@@ -569,11 +535,6 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
           ) : null}
         </>
       )}
-
-      <details className="mt-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-        <summary className="cursor-pointer font-semibold text-[var(--color-currena-blue-deep)]">{t.methodTitle}</summary>
-        <p className="m-0 pt-1.5">{t.methodLine}</p>
-      </details>
 
       {/* the why-modal — the event's own explanation, behind the ? tap */}
       <Dialog

@@ -62,8 +62,14 @@ const CHAT_SYSTEM = [
 /**
  * The completion budget — a uniform envelope parameter, never a per-model
  * tune (the WGC bake-off's own law; the production runs carry it too).
+ *
+ * RAISED 2048 → 8192 (2026-11-25, the first live translation sitting —
+ * the WGC module's own recorded raise, carried over verbatim): the
+ * gemma-4-26b serving reasons first and the 2048 budget died at
+ * finish_reason "length" with an empty content channel; 8192 finishes
+ * (stop) inside ~3700 completion tokens. Still one call per briefing.
  */
-const MAX_TOKENS = 2048;
+const MAX_TOKENS = 8192;
 
 /** The structural AI surface (the Workers AI binding satisfies this). */
 export interface AiLike {

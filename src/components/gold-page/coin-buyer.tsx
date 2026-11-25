@@ -64,7 +64,6 @@ type CoinBuyerT = {
   tomanLine: string;
   perCoinLine: string;
   meltLine: string;
-  note: string;
   unavailable: string;
   millionToman: string;
   billionToman: string;
@@ -262,8 +261,6 @@ export function CoinBuyerBand({
               </p>
             ) : null}
           </div>
-
-          <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.note}</p>
         </>
       )}
     </div>

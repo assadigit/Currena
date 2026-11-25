@@ -371,8 +371,12 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
         {factsOpen ? (
           <div id="gold-ta-facts" className="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-3">
             {[t.factSma, t.factCross, t.factFib].map((fact, i) => (
-              <div key={i} className="flex items-start gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] p-2.5 ring-1 ring-[var(--color-accent-gold)]/25">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold text-[var(--color-accent-gold-ink)]" style={{ background: "var(--color-accent-gold)" }} aria-hidden="true">
+              <div key={i} className="flex items-start gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
+                {/* neutral counters (the minimal-ink rule): the numbers
+                    step back so the section's gold stays on the verdict
+                    alone, support green and resistance red the only
+                    other hues */}
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-currena-soft)] text-[11px] font-extrabold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]" aria-hidden="true">
                   {locale === "en" ? i + 1 : ["۱", "۲", "۳"][i]}
                 </span>
                 <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{fact}</p>
@@ -412,8 +416,13 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
               <ul className="m-0 flex list-none flex-col gap-1 p-0">
                 {data.crosses.map((c) => (
                   <li key={c.date} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-md px-2 py-1">
-                    <span className="type-caption font-bold text-[var(--color-accent-gold-deep)]">{fmt.dateWords(c.date)}</span>
-                    <span className={`type-caption font-bold ${c.kind === "golden" ? "text-[var(--color-chip-ink-attention)]" : "text-[var(--color-text-secondary)]"}`}>
+                    <span className="type-caption font-bold text-[var(--color-text-secondary)]">{fmt.dateWords(c.date)}</span>
+                    {/* the minimal-ink rule (the owner's batch-I ask): the
+                        whole section carries three hues — gold for the
+                        verdict, green for support, red for resistance; a
+                        golden cross rides the section's own gold ink, the
+                        death cross the neutral one */}
+                    <span className={`type-caption font-bold ${c.kind === "golden" ? "text-[var(--color-accent-gold-deep)]" : "text-[var(--color-text-secondary)]"}`}>
                       {c.kind === "golden" ? t.crossGolden : t.crossDeath}
                     </span>
                     <span className="ms-auto type-caption text-[var(--color-text-tertiary)]">

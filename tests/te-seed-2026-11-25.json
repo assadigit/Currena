@@ -1,0 +1,147 @@
+{
+  "runs": [
+    {
+      "ranAt": "2026-11-25T14:52:21.392Z",
+      "store": "remote-d1",
+      "ai": "rest-adapter",
+      "fire": {
+        "action": "capture",
+        "detail": "2 stored; 1 re-stored; fa translation stored (@cf/google/gemma-4-26b-a4b-it, 2 strings); fa translation stored (@cf/google/gemma-4-26b-a4b-it, 2 strings); fa translation stored (@cf/google/gemma-4-26b-a4b-it, 2 strings); fa translation stored (@cf/google/gemma-4-26b-a4b-it, 2 strings)"
+      },
+      "censusBackstop": [],
+      "translations": [
+        {
+          "newsId": "603757",
+          "outcome": {
+            "outcome": "translated",
+            "model": "@cf/google/gemma-4-26b-a4b-it",
+            "strings": 2
+          }
+        },
+        {
+          "newsId": "603608",
+          "outcome": {
+            "outcome": "translated",
+            "model": "@cf/google/gemma-4-26b-a4b-it",
+            "strings": 2
+          }
+        },
+        {
+          "newsId": "603349",
+          "outcome": {
+            "outcome": "translated",
+            "model": "@cf/google/gemma-4-26b-a4b-it",
+            "strings": 2
+          }
+        }
+      ],
+      "storedBriefings": [
+        {
+          "news_id": "604358",
+          "published_at": "2026-11-25T14:05:23Z",
+          "title": "Gold Falls Below $3,500",
+          "body_chars": 970,
+          "author": "Joana Ferreira",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "604287",
+          "published_at": "2026-11-25T11:52:33Z",
+          "title": "Gold Hovers Near 2025 Lows Ahead of Key US Data",
+          "body_chars": 997,
+          "author": "Joana Ferreira",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "604110",
+          "published_at": "2026-11-25T02:00:21Z",
+          "title": "Gold Slides to a 14-Month Low",
+          "body_chars": 939,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": "2026-11-25T14:52:21.392Z"
+        },
+        {
+          "news_id": "603757",
+          "published_at": "2026-11-24T02:17:13Z",
+          "title": "Gold Holds Gains Amid Recovery in Equity Markets",
+          "body_chars": 939,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603608",
+          "published_at": "2026-11-23T14:46:48Z",
+          "title": "Gold Rebounds From One-Year Lows",
+          "body_chars": 910,
+          "author": "Joana Ferreira",
+          "status": "ok",
+          "updated_at": null
+        },
+        {
+          "news_id": "603349",
+          "published_at": "2026-11-23T01:53:00Z",
+          "title": "Gold Rises as Fed Rate Hike Bets Ease",
+          "body_chars": 948,
+          "author": "Jam Kaimo Samonte",
+          "status": "ok",
+          "updated_at": null
+        }
+      ],
+      "faStored": [
+        {
+          "news_id": "604358",
+          "fa_title": "طلا به زیر ۳,۵۰۰ دلار سقوط کرد",
+          "source_model": "@cf/google/gemma-4-26b-a4b-it",
+          "translated_at": "2026-11-25T14:52:21.392Z",
+          "content_hash": "b060508aadb375a7e834ee7a0afccd855a6de380228a54357923d84c47ac82da",
+          "fa_body_chars": 989
+        },
+        {
+          "news_id": "604287",
+          "fa_title": "طلا در آستانه انتشار داده‌های کلیدی ایالات متحده، در نزدیکی کف‌های سال 2025 نوسان می‌کند",
+          "source_model": "@cf/google/gemma-4-26b-a4b-it",
+          "translated_at": "2026-11-25T14:52:21.392Z",
+          "content_hash": "9b6a862e65c61c59d359255ebe8ed06a85ba08b20e56c05d51f406cd152720dc",
+          "fa_body_chars": 1030
+        },
+        {
+          "news_id": "604110",
+          "fa_title": "ریزش طلا به پایین‌ترین سطح در 14 ماه اخیر",
+          "source_model": "@cf/google/gemma-4-26b-a4b-it",
+          "translated_at": "2026-11-25T14:52:21.392Z",
+          "content_hash": "3b37f81f1b2132a9a05a1893eed98d1764dab00819d3483726fda95718ba836f",
+          "fa_body_chars": 969
+        },
+        {
+          "news_id": "603757",
+          "fa_title": "طلا در بحبوحه بهبود بازارهای سهام، سود خود را حفظ کرد",
+          "source_model": "@cf/google/gemma-4-26b-a4b-it",
+          "translated_at": "2026-11-25T14:52:21.392Z",
+          "content_hash": "5904eee74c0df7ade995f170cbd1895c3020eb544c9ddb4d83e2ef632c16de55",
+          "fa_body_chars": 912
+        },
+        {
+          "news_id": "603608",
+          "fa_title": "بازگشت طلا از کف‌های یک‌ساله",
+          "source_model": "@cf/google/gemma-4-26b-a4b-it",
+          "translated_at": "2026-11-25T14:52:21.392Z",
+          "content_hash": "890c48be553ed8c0a9004cef7b4746ab52cb3b1b7c7cdc2079d10a782828092e",
+          "fa_body_chars": 920
+        },
+        {
+          "news_id": "603349",
+          "fa_title": "افزایش قیمت طلا همزمان با کاهش احتمال افزایش نرخ بهره توسط فدرال رزرو",
+          "source_model": "@cf/google/gemma-4-26b-a4b-it",
+          "translated_at": "2026-11-25T14:52:21.392Z",
+          "content_hash": "65857818ba6bd94e9fffe64807454fa021989110a889cbe84725081ba07cb55a",
+          "fa_body_chars": 1011
+        }
+      ],
+      "applied": "20 statement(s) applied to the remote D1 via wrangler d1 execute --file"
+    }
+  ]
+}

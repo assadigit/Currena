@@ -1,0 +1,28 @@
+{
+  "runs": [
+    {
+      "ranAt": "2026-11-25T14:31:45.636Z",
+      "store": "remote-d1",
+      "month": "2026-10",
+      "force": false,
+      "outcome": {
+        "outcome": "failed",
+        "reason": "the model returned no content (empty channel)"
+      },
+      "applied": "1 statement(s) applied to the remote D1 via wrangler d1 execute --file"
+    },
+    {
+      "ranAt": "2026-11-25T14:36:20.779Z",
+      "store": "remote-d1",
+      "month": "2026-10",
+      "force": false,
+      "outcome": {
+        "outcome": "translated",
+        "model": "@cf/google/gemma-4-26b-a4b-it",
+        "strings": 5,
+        "segments": 2
+      },
+      "applied": "2 statement(s) applied to the remote D1 via wrangler d1 execute --file"
+    }
+  ]
+}

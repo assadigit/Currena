@@ -81,8 +81,17 @@ const CHAT_SYSTEM = [
  * reasoning channel and returns content null with finish_reason "length"
  * (diagnosed live, 2026-11-24). Every candidate in the bake-off ran under
  * this same budget; the production runs carry it too.
+ *
+ * RAISED 2048 → 8192 (2026-11-25, the first live translation sitting):
+ * the gemma-4-26b serving (the -external variant) now reasons FIRST —
+ * the first forced run died at finish_reason "length" with an EMPTY
+ * content channel and ~7k reasoning characters under the 2048 budget;
+ * the re-probe of this module's own contract payload finished (stop)
+ * inside 3682 completion tokens with a parseable Persian result at
+ * 8192, at ~78s latency. Still one call per payload, still uniform
+ * across every model.
  */
-const MAX_TOKENS = 2048;
+const MAX_TOKENS = 8192;
 
 /** The structural AI surface (the Workers AI binding satisfies this). */
 export interface AiLike {

@@ -623,7 +623,7 @@ export function SignedDelta({ v, fmt, ariaHidden, big }: { v: number | null; fmt
   if (v === null || !Number.isFinite(v)) return <bdi className="type-caption text-[var(--color-text-tertiary)]" aria-hidden={ariaHidden}>·</bdi>;
   const down = v < 0;
   return (
-    <bdi dir="ltr" className={`${big ? "text-[15px] font-extrabold" : "type-caption font-bold"} ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
+    <bdi dir="ltr" className={`${big ? "text-[15px] font-extrabold" : "type-caption font-bold"} whitespace-nowrap ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
       {down ? "▼" : "▲"} {fmt.pct(Math.abs(v)).replace("+", "")}
     </bdi>
   );
@@ -640,14 +640,14 @@ export function PpDelta({ v, fmt, unit, ariaHidden }: { v: number | null; fmt: F
   if (v === 0) {
     // the compare scorecard's own yield law: zero renders signless, neutral
     return (
-      <bdi dir="ltr" className="type-caption font-bold tabular-nums text-[var(--color-text-secondary)]" aria-hidden={ariaHidden}>
+      <bdi dir="ltr" className="type-caption font-bold tabular-nums whitespace-nowrap text-[var(--color-text-secondary)]" aria-hidden={ariaHidden}>
         {fmt.num(0, 2)} {unit}
       </bdi>
     );
   }
   const down = v < 0;
   return (
-    <bdi dir="ltr" className={`type-caption font-bold tabular-nums ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
+    <bdi dir="ltr" className={`type-caption font-bold tabular-nums whitespace-nowrap ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
       {down ? "▼" : "▲"} {v > 0 ? "+" : ""}{fmt.num(Math.abs(v), 2)} {unit}
     </bdi>
   );

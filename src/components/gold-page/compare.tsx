@@ -39,7 +39,8 @@ type CmpT = {
   worstLossLine: string;
   assets: { gold: string; silver: string; btc: string; spx: string; realYield: string; nominalYield: string };
   toggleLabel: string;
-  barsTitle: string;
+  barsTitleYears: string;
+  barsTitleMonths: string;
   tableTitle: string;
   colAsset: string;
   colStart: string;
@@ -73,17 +74,19 @@ type CorrT = {
   unavailable: string;
 };
 
-/** The display order + the token colour of every line — six lines, six
- *  clearly different hues (the owner's batch-H ask: no two lines close
- *  enough to confuse at a glance): gold-gold, navy (real yield), teal
- *  (nominal yield), slate (silver), orange (Bitcoin), green (S&P). */
+/** The display order + the token colour of every line — six lines, the
+ *  owner's six literal hues (batch-I ask: gold is gold, the S&P is red,
+ *  Bitcoin blue, silver silver, the real yield green, the nominal
+ *  purple — one dedicated token each, pairwise distinct at a glance;
+ *  the lines are always labelled so the hue is never the sole
+ *  carrier). */
 const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }> = [
-  { id: "gold", color: "var(--color-accent-gold-strong)" },
-  { id: "realYield", color: "var(--color-status-context)", dashed: true },
-  { id: "nominalYield", color: "var(--color-bridge-accent)", dashed: true },
-  { id: "silver", color: "var(--color-text-secondary)" },
-  { id: "btc", color: "var(--color-status-stressed)" },
-  { id: "spx", color: "var(--color-status-normal)" },
+  { id: "gold", color: "var(--color-cmp-gold)" },
+  { id: "realYield", color: "var(--color-cmp-real)", dashed: true },
+  { id: "nominalYield", color: "var(--color-cmp-nominal)", dashed: true },
+  { id: "silver", color: "var(--color-cmp-silver)" },
+  { id: "btc", color: "var(--color-cmp-btc)" },
+  { id: "spx", color: "var(--color-cmp-spx)" },
 ];
 
 type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y";
@@ -148,11 +151,18 @@ function useElementWidth<T extends HTMLElement>() {
  * returns drop below it. The yields never join: a rate's pp is not a %
  * return — the scorecard keeps their honest unit.
  */
-function CompareBars({ t, rows, fmt, enabled }: { t: CmpT; rows: CompareRow[]; fmt: Fmt; enabled: Record<LineId, boolean> }) {
+function CompareBars({ t, rows, fmt, enabled, window: w }: { t: CmpT; rows: CompareRow[]; fmt: Fmt; enabled: Record<LineId, boolean>; window: WindowKey }) {
   const assets = rows.filter((r) => r.pct !== null && enabled[r.line.id]);
-  const { ref, w } = useElementWidth<HTMLDivElement>();
+  const { ref, w: measured } = useElementWidth<HTMLDivElement>();
+  /* the title names the window itself (the owner's batch-I ask): the
+     years — or the months — the chart shows, in the title */
+  const months = WINDOW_MONTHS[w];
+  const barsTitle =
+    months < 12
+      ? t.barsTitleMonths.replace("{n}", fmt.num(months, 0))
+      : t.barsTitleYears.replace("{n}", fmt.num(months / 12, 0));
   if (assets.length === 0) return null;
-  const W = Math.max(320, Math.min(640, Math.round(w ?? 640)));
+  const W = Math.max(320, Math.min(640, Math.round(measured ?? 640)));
   const H = 168;
   const padT = 18;
   const padB = 26;
@@ -169,13 +179,13 @@ function CompareBars({ t, rows, fmt, enabled }: { t: CmpT; rows: CompareRow[]; f
   const ariaParts = assets.map((r) => `${r.name} ${fmt.pct(r.pct ?? 0, 1)}`);
   return (
     <div className="mt-3" ref={ref}>
-      <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.barsTitle}</h4>
+      <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{barsTitle}</h4>
       <svg
         dir="ltr"
         viewBox={`0 0 ${W} ${H}`}
         className="mt-1.5 block h-auto w-full"
         role="img"
-        aria-label={`${t.barsTitle}: ${ariaParts.join(", ")}`}
+        aria-label={`${barsTitle}: ${ariaParts.join(", ")}`}
       >
         {/* the zero baseline — every bar grows or drops from it */}
         <line x1={4} y1={y0} x2={W - 4} y2={y0} stroke="var(--color-text-tertiary)" strokeWidth={1} opacity={0.55} />
@@ -373,8 +383,9 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
           </div>
 
           {/* the bar view — the window's % change, one vertical bar per
-              enabled asset, in each line's own colour (batch H) */}
-          <CompareBars t={t} rows={rows} fmt={fmt} enabled={enabled} />
+              enabled asset, in each line's own colour (batch H); the
+              title names the window itself (batch I) */}
+          <CompareBars t={t} rows={rows} fmt={fmt} enabled={enabled} window={window} />
 
           {/* the scorecard — the window's gains and losses, in numbers */}
           {rows.length > 0 ? (

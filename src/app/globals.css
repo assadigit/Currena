@@ -362,6 +362,18 @@
   --color-return-up: #00873a;
   --color-return-down: #e51527;
 
+  /* — The comparison band's own six inks (the owner's ask: one literal
+     hue per line — gold gold, S&P red, Bitcoin blue, silver silver, the
+     real yield green, the nominal purple — pairwise distinct at a
+     glance in both themes; the lines are always labelled so the hue is
+     never the sole carrier) — */
+  --color-cmp-gold: #b8860b;
+  --color-cmp-spx: #cc2931;
+  --color-cmp-btc: #2350c8;
+  --color-cmp-silver: #79828b;
+  --color-cmp-real: #0f8a4d;
+  --color-cmp-nominal: #8b3fd6;
+
   /* — Radii, shadows, type roles — */
   --cr-radius-md: 0.75rem;
   --cr-radius-lg: 1.125rem;
@@ -427,6 +439,15 @@
   --color-chip-ink-muted: #9aa8bc;
   --color-return-up: #30d96b;
   --color-return-down: #ff5963;
+
+  /* — The comparison band's six inks, night variants (same six literal
+     hues, brightened for the dark surface) — */
+  --color-cmp-gold: #d9a43e;
+  --color-cmp-spx: #ff6b74;
+  --color-cmp-btc: #7aa2f7;
+  --color-cmp-silver: #b9c1ca;
+  --color-cmp-real: #35c26e;
+  --color-cmp-nominal: #b18cf0;
 
   --bal-brass-hi: #f3d488;
   --bal-brass-mid: #d9a43e;

@@ -188,7 +188,7 @@ const restAi: AiLike = {
         method: "POST",
         headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
         body: JSON.stringify(input),
-        signal: AbortSignal.timeout(120_000),
+        signal: AbortSignal.timeout(240_000),
       },
     );
     const body = (await res.json().catch(() => null)) as
