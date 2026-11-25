@@ -84,6 +84,7 @@ import {
   type ProjectionReading,
 } from "@/components/gold-page/context-cards";
 import { BridgeBoard, fetchRates, type RatesPayload } from "@/components/gold-page/bridge-board";
+import { DollarTrendBand, fetchDollarTrend } from "@/components/gold-page/dollar-trend";
 import { LongViewCard } from "@/components/gold-page/longview";
 import { CoinBuyerBand } from "@/components/gold-page/coin-buyer";
 import { WgcCard } from "@/components/gold-page/wgc-card";
@@ -272,6 +273,7 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-other", key: null, label: ["Other", "سایر"] },
   { id: "gold-dashboard", key: null, label: ["Dashboard", "داشبورد"] },
   { id: "gold-bridge", key: null, label: ["Iran", "ایران"] },
+  { id: "gold-dollar-trend", key: null, label: ["Gold vs USD", "طلا و دلار"] },
   { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
   { id: "gold-history", key: null, label: ["History", "تاریخ"] },
@@ -1291,6 +1293,16 @@ export default function GoldPage() {
   const projection = useQuery({ queryKey: ["currena-gold-projection"], queryFn: fetchProjection, retry: 1 });
   const crosses = useQuery({ queryKey: ["currena-gold-crosses"], queryFn: fetchCrosses, retry: 1 });
   const rates = useQuery({ queryKey: ["currena-gold-rates"], queryFn: fetchRates, retry: 1 });
+  /* the dollar-vs-gold trend — «روند نرخ طلا در برابر دلار», the 47-year
+     Iran race (the cited static layer + the TGJU evergreen legs); the
+     static layer always serves, so the band renders through its own
+     honest states even before the live legs arrive */
+  const dollarTrend = useQuery({
+    queryKey: ["currena-gold-dollar-trend"],
+    queryFn: fetchDollarTrend,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
 
   /* THE complete Market Brief — the owner's ask: the brief carries the
      page's own verdicts, more of them. The conditions sentence and the
@@ -1473,6 +1485,19 @@ export default function GoldPage() {
 
             {/* the Iran bridge — now with the live Tehran board + the premium history */}
             <BridgeBand t={t} locale={locale} premium={premium.data ?? null} fmt={fmt} rates={rates.data ?? null} />
+
+            {/* the dollar-vs-gold trend — «روند نرخ طلا در برابر دلار»:
+                the 47-year race, immediately after the bridge (the
+                reader who just learned the حباب decomposition gets its
+                long payoff), before the calculator */}
+            <DollarTrendBand
+              t={t.dollarTrend}
+              locale={locale}
+              fmt={fmt}
+              data={dollarTrend.data ?? null}
+              pending={dollarTrend.isLoading}
+              rates={rates.data ?? null}
+            />
 
             {/* the calculator — ONE tool at the page's foot: the what-if
                 windows, the wealth calculator, the assets head-to-head,
