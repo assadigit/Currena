@@ -250,8 +250,9 @@ function unitDefault(u: CalcUnit, mode: "one" | "dca"): number {
  *  and Arabic-Indic digits become ASCII, anything but digits and ONE dot
  *  drops, and leading zeros collapse ("0100" → "100" — the reported
  *  artifact dies here, never stored, never shown). An empty string is
- *  legal while typing; the input's blur restores "0". */
-function sanitizeAmountText(raw: string): string {
+ *  legal while typing; the input's blur restores "0". Shared with the
+ *  long view's purchasing-power machine (the same input discipline). */
+export function sanitizeAmountText(raw: string): string {
   const faDigits = "۰۱۲۳۴۵۶۷۸۹";
   const arDigits = "٠١٢٣٤٥٦٧٨٩";
   let s = "";

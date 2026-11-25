@@ -84,6 +84,8 @@ import {
   type ProjectionReading,
 } from "@/components/gold-page/context-cards";
 import { BridgeBoard, fetchRates, type RatesPayload } from "@/components/gold-page/bridge-board";
+import { LongViewCard } from "@/components/gold-page/longview";
+import { CoinBuyerBand } from "@/components/gold-page/coin-buyer";
 import { WgcCard } from "@/components/gold-page/wgc-card";
 import { TeCard } from "@/components/gold-page/te-card";
 import { CalendarBand } from "@/components/gold-page/calendar";
@@ -1169,6 +1171,11 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
       {/* the live premium history — the previous page's bridge companion */}
       {premium ? <PremiumHistoryCard data={premium} t={t.bridge} fmt={fmt} locale={locale} /> : null}
 
+      {/* the coin budget machine — the owner's own ask: how many full
+          Emami coins a foreign-currency sum buys on the Tehran market,
+          the melt-value comparison riding beside it */}
+      <CoinBuyerBand rates={rates} t={t.bridge.coinBuyer} fmt={fmt} locale={locale} />
+
       <details className="mt-3 rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
         <summary className="cursor-pointer px-3 py-2 type-caption font-bold text-[var(--color-bridge-accent)]">{t.bridge.methodTitle}</summary>
         <p className="px-3 pb-3 m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.bridge.method}</p>
@@ -1204,6 +1211,13 @@ function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI
         </button>
       </div>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.history.subtitle}</p>
+
+      {/* THE long view — the two-century chart, the purchasing-power
+          machine, and the 20-year table behind its modal: the historical
+          perspective itself, always visible (the episodes below it stay
+          behind the tap) */}
+      <LongViewCard liveSpot={data.gold.spot} t={t.longview} locale={locale} fmt={fmt} />
+
       {open ? (
       <div className="mt-2.5 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
         <div className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)]">
