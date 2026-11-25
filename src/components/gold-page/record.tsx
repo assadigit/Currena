@@ -302,12 +302,18 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
       {/* the nearest levels — the price sandwiched between its closest
           reference lines: ONE row, three cells — support · now ·
           resistance (the owner's batch-H ask: never one-per-row, the
-          grid reads as the sandwich it is, on a phone too) */}
+          grid reads as the sandwich it is, on a phone too).
+          Batch M: the green/red GROUNDS are gone — three neutral cells
+          and a ▲/▼ triangle per side carry the direction (the owner's
+          ask; the ink on the label stays) */}
       {nearestSupport !== null || nearestResistance !== null ? (
         <div className="mt-2.5 grid grid-cols-3 gap-1.5">
           {nearestSupport !== null ? (
-            <div className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-up) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-up) 30%, transparent)" }}>
-              <span className="m-0 truncate text-[10.5px] font-bold leading-tight text-[var(--color-return-up)]">{t.nearestSupport}</span>
+            <div className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2 ring-1 ring-[var(--color-border)]">
+              <span className="m-0 truncate text-[10.5px] font-bold leading-tight text-[var(--color-return-up)]">
+                <span aria-hidden="true" className="me-1">▲</span>
+                {t.nearestSupport}
+              </span>
               <span className="m-0 flex flex-wrap items-baseline gap-x-1">
                 <bdi dir="ltr" className="type-caption font-extrabold tabular-nums text-[var(--color-text-primary)]">${fmt.num(nearestSupport.value, 0)}</bdi>
                 <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">{nearestSupport.tag}</span>
@@ -319,8 +325,11 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
             <bdi dir="ltr" className="m-0 type-caption font-extrabold tabular-nums text-[var(--color-accent-gold-deep)]">${fmt.num(lastClose, 0)}</bdi>
           </div>
           {nearestResistance !== null ? (
-            <div className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-down) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 30%, transparent)" }}>
-              <span className="m-0 truncate text-[10.5px] font-bold leading-tight text-[var(--color-return-down)]">{t.nearestResistance}</span>
+            <div className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2 ring-1 ring-[var(--color-border)]">
+              <span className="m-0 truncate text-[10.5px] font-bold leading-tight text-[var(--color-return-down)]">
+                <span aria-hidden="true" className="me-1">▼</span>
+                {t.nearestResistance}
+              </span>
               <span className="m-0 flex flex-wrap items-baseline gap-x-1">
                 <bdi dir="ltr" className="type-caption font-extrabold tabular-nums text-[var(--color-text-primary)]">${fmt.num(nearestResistance.value, 0)}</bdi>
                 <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">{nearestResistance.tag}</span>
@@ -657,6 +666,10 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
               <th scope="col" className="px-1.5 py-1 text-start font-semibold">{t.buyersHeadCountry}</th>
               <th scope="col" className="px-1.5 py-1 text-end font-semibold">{t.buyersHeadLatest}</th>
               <th scope="col" className="px-1.5 py-1 text-end font-semibold">{t.buyersHead12m}</th>
+              {/* batch M: the year's buying measured against the pile it
+                  already holds — "Poland bought ≈23% of its own holdings
+                  this year" (weights, not values) */}
+              <th scope="col" className="px-1.5 py-1 text-end font-semibold">{t.buyersHeadOfReserve}</th>
               <th scope="col" className="px-1.5 py-1 text-end font-semibold">{t.buyersHeadHoldings}</th>
               <th scope="col" className="px-1.5 py-1 text-end font-semibold">{t.buyersHeadShare}</th>
             </tr>
@@ -665,6 +678,10 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
             {data.buyers.map((b) => {
               const name = CB_COUNTRIES[b.code]?.[lan(locale)] ?? b.code;
               const share = buyerSharePct(b, spot, data.asOf);
+              /* the 12-month net over the country's own current holdings
+                  — the buying as a share of the reserve it already holds
+                  (batch M, the owner's ask); negative nets stay signed */
+              const ofHoldings = b.tonnes > 0 ? (b.sum12m / b.tonnes) * 100 : null;
               return (
                 <tr key={b.code}>
                   <th scope="row" className="px-1.5 py-1.5 text-start font-semibold text-[var(--color-text-primary)]">
@@ -682,6 +699,11 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
                   <td className="px-1.5 py-1.5 text-end font-bold text-[var(--color-text-primary)]">
                     {b.sum12m >= 0 ? "+" : "−"}{fmt.num(Math.abs(b.sum12m), 1)}
                   </td>
+                  <td className="px-1.5 py-1.5 text-end font-semibold tabular-nums text-[var(--color-text-secondary)]">
+                    {ofHoldings !== null && Number.isFinite(ofHoldings)
+                      ? `${ofHoldings >= 0 ? "+" : "−"}${fmt.num(Math.abs(ofHoldings), 0)}%`
+                      : "·"}
+                  </td>
                   <td className="px-1.5 py-1.5 text-end text-[var(--color-text-secondary)]">{t.holdingsNow.replace("{v}", fmt.num(b.tonnes, 0))}</td>
                   <td className="px-1.5 py-1.5 text-end font-semibold text-[var(--color-text-secondary)]">
                     {share !== null ? `${fmt.num(share, 1)}%` : "·"}
@@ -695,6 +717,7 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
         <ul className="m-0 flex list-none flex-col gap-1.5 p-0 sm:hidden">
           {data.buyers.slice(0, 5).map((b) => {
             const name = CB_COUNTRIES[b.code]?.[lan(locale)] ?? b.code;
+            const ofHoldings = b.tonnes > 0 ? (b.sum12m / b.tonnes) * 100 : null;
             return (
               <li key={b.code} className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
                 <div className="flex min-w-0 items-baseline justify-between gap-2.5">
@@ -708,6 +731,14 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
                 </div>
                 <p className="m-0 flex flex-wrap items-baseline gap-x-2 type-caption text-[var(--color-text-tertiary)]">
                   <span>{t.holdingsNow.replace("{v}", fmt.num(b.tonnes, 0))}</span>
+                  {ofHoldings !== null && Number.isFinite(ofHoldings) ? (
+                    <>
+                      <span aria-hidden="true"> · </span>
+                      <span className="font-semibold text-[var(--color-return-up)]">
+                        {t.buyPctLine.replace("{v}", `${fmt.num(Math.abs(ofHoldings), 0)}%`)}
+                      </span>
+                    </>
+                  ) : null}
                   <span aria-hidden="true"> · </span>
                   <span>{monthLabel(b.latestMonth, locale)} {b.latestDelta >= 0 ? "+" : "−"}{fmt.num(Math.abs(b.latestDelta), 1)}</span>
                 </p>
@@ -715,9 +746,10 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
             );
           })}
         </ul>
-        {/* the valuation note — small and low-opacity (the owner's
-            batch-H ask): the method stays, but whispers */}
+        {/* the valuation notes — small and low-opacity (the owner's
+            batch-H ask): the methods stay, but whisper */}
         <p className="m-0 text-[10.5px] leading-relaxed text-[var(--color-text-tertiary)]/70">{t.shareNote}</p>
+        <p className="m-0 text-[10.5px] leading-relaxed text-[var(--color-text-tertiary)]/70">{t.buyPctNote}</p>
       </div>
 
       {/* the sellers — the light-red box (فروشندگان طلا) */}
@@ -735,6 +767,9 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
         <ul className="m-0 flex list-none flex-col gap-1 p-0">
           {CB_SELLERS.map((r) => {
             const name = CB_COUNTRIES[r.code]?.[lan(locale)] ?? r.code;
+            /* the year's selling against the pile it held (batch M):
+              signed, the same weight-not-value measure the buyers carry */
+            const ofReserve = r.reserve > 0 ? (Math.abs(r.net12m) / r.reserve) * 100 : null;
             return (
               <li key={r.code} className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
                 <div className="flex min-w-0 items-baseline justify-between gap-2.5">
@@ -747,9 +782,15 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
                   </span>
                 </div>
                 {/* the seller's own estimated reserve (batch L, task 6) —
-                    the same quiet line the buyers' rows carry */}
-                <p className="m-0 type-caption text-[var(--color-text-tertiary)]">
-                  {t.holdingsNow.replace("{v}", fmt.num(r.reserve, r.reserve < 100 ? 1 : 0))}
+                    the same quiet line the buyers' rows carry, now with
+                    the sold share beside it (batch M) */}
+                <p className="m-0 flex flex-wrap items-baseline gap-x-2 type-caption text-[var(--color-text-tertiary)]">
+                  <span>{t.holdingsNow.replace("{v}", fmt.num(r.reserve, r.reserve < 100 ? 1 : 0))}</span>
+                  {ofReserve !== null && Number.isFinite(ofReserve) ? (
+                    <span className="font-semibold text-[var(--color-return-down)]">
+                      {t.soldPctLine.replace("{v}", `${fmt.num(ofReserve, 1)}%`)}
+                    </span>
+                  ) : null}
                 </p>
               </li>
             );

@@ -37,6 +37,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, AiTranslatedBadge, faDigits } from "@/components/gold-page/visuals";
+import { faGlossary } from "@/lib/gold-page/fa-glossary";
 
 /* ------------------------------------------------------------------ *
  * The payload (the route's contract)
@@ -253,7 +254,7 @@ export function WgcCard({
             <>
               {fa.headline ? (
                 <p className="m-0 mt-2 text-[13px] font-semibold leading-snug text-[var(--color-text-secondary)]">
-                  {faDigits(fa.headline)}
+                  {faDigits(faGlossary(fa.headline))}
                 </p>
               ) : null}
               <div
@@ -263,8 +264,8 @@ export function WgcCard({
                 {fa.segments.map((seg, i) => (
                   <React.Fragment key={`${seg.heading}-${i}`}>
                     {i > 0 ? <div className="my-3 border-t border-[var(--color-border)]" aria-hidden="true" /> : null}
-                    <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{faDigits(seg.heading)}</h4>
-                    <p className="m-0 mt-1 text-[13.5px] leading-[1.9] text-[var(--color-text-secondary)]">{faDigits(seg.body)}</p>
+                    <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{faDigits(faGlossary(seg.heading))}</h4>
+                    <p className="m-0 mt-1 text-[13.5px] leading-[1.9] text-[var(--color-text-secondary)]">{faDigits(faGlossary(seg.body))}</p>
                   </React.Fragment>
                 ))}
               </div>

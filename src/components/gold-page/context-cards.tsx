@@ -456,7 +456,11 @@ export function CurrencyGridCard({
           {/* the Iranian toman — the same row, the same surface, the
               site's own live basis (free-market dollar × the global
               ounce); live-only, so its third column carries the live
-              tag instead of a stored 30-day window */}
+              tag instead of a stored 30-day window.
+              Batch M: the value cell now reads like every other row —
+              the big bold tabular number first, the unit word a small
+              quiet companion beside it, never one mixed blob (the row
+              kept breaking the grid's rhythm) */}
           {tomanPerOunce !== null && Number.isFinite(tomanPerOunce) && tomanPerOunce > 0 ? (
             <div
               className="grid grid-cols-[minmax(84px,auto)_1fr_auto] items-baseline gap-x-3 gap-y-1 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]"
@@ -464,14 +468,17 @@ export function CurrencyGridCard({
               title={t.tomanNote}
             >
               <span className="type-caption font-bold text-[var(--color-text-primary)]">{t.tomanName}</span>
-              <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
+              <span dir="ltr" className="flex min-w-0 items-baseline gap-1.5">
                 {/* the honest unit (the owner's batch-H catch): an ounce
                     over a billion toman reads in BILLIONS, never as
                     "1008 million" — the scale mistake is a unit mistake */}
-                {tomanPerOunce >= 1_000_000_000
-                  ? `${fmt.num(tomanPerOunce / 1_000_000_000, 2)} ${t.tomanBillion}`
-                  : `${fmt.num(tomanPerOunce / 1_000_000, 1)} ${t.tomanMillion}`}
-              </bdi>
+                <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
+                  {tomanPerOunce >= 1_000_000_000 ? fmt.num(tomanPerOunce / 1_000_000_000, 2) : fmt.num(tomanPerOunce / 1_000_000, 1)}
+                </bdi>
+                <span className="text-[10.5px] font-semibold text-[var(--color-text-tertiary)]">
+                  {tomanPerOunce >= 1_000_000_000 ? t.tomanBillion : t.tomanMillion}
+                </span>
+              </span>
               <span className="inline-flex items-center gap-1 type-caption text-[var(--color-text-tertiary)]">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-currena-success)]" aria-hidden="true" />
                 {t.tomanLive}
@@ -519,58 +526,93 @@ export function ForecastRetroCard({ t, fmt, locale }: { t: FrT; fmt: Fmt; locale
         </bdi>
       </p>
 
-      {/* the percentages list, IN THE OPEN (batch L, task 9 — the
-          owner's ask): the last five scored years' misses + the
-          pending 2026, one chip each — the year and its error, the
-          same numbers the full table carries, no tap needed */}
-      <p className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-1 type-caption font-semibold">
-        <span className="text-[var(--color-text-tertiary)]">{t.missListLabel}</span>
-        {retro.scored.slice(-5).map((r) => (
-          <span key={r.year} className="inline-flex items-baseline gap-1 rounded-full bg-[var(--color-surface)] px-2 py-0.5 ring-1 ring-[var(--color-border)]/60">
-            <span className="text-[var(--color-text-primary)]">{locale === "fa" ? fmt.num(r.year, 0) : String(r.year)}</span>
-            <bdi dir="ltr" className={`tabular-nums ${r.missPct < 0 ? "text-[var(--color-currena-success)]" : "text-[var(--color-status-alert)]"}`}>
-              {signed(r.missPct)}
+      {/* batch M (the owner's ask): the verdicts as a LIST and the
+          recent years as a TABLE — the inline paragraph run and the
+          chip row are gone. Every verdict sentence its own row with
+          its own marker; the last five scored years + the pending one
+          read as the table they always were, no tap needed */}
+      <ol className="m-0 mt-1.5 flex list-none flex-col gap-1 p-0">
+        <li className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
+          <span aria-hidden="true" className="mt-[5px] inline-block h-2 w-2 shrink-0 rounded-[2px] bg-[var(--color-accent-gold)]" />
+          <bdi className="type-caption leading-relaxed text-[var(--color-text-secondary)]">
+            {t.headline
+              .replace("{under}", fmt.num(retro.underForecast.length, 0))
+              .replace("{n}", fmt.num(retro.n, 0))
+              .replace("{mean}", `${signed(retro.meanMissPct)}`)
+              .replace("{abs}", `${fmt.num(retro.meanAbsMissPct, 1)}%`)}
+          </bdi>
+        </li>
+        {y2025 ? (
+          <li className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
+            <span aria-hidden="true" className="mt-[5px] inline-block h-2 w-2 shrink-0 rounded-[2px] bg-[var(--color-status-alert)]" />
+            <bdi className="type-caption leading-relaxed text-[var(--color-text-secondary)]">
+              {t.y2025Line
+                .replace("{miss}", signed(y2025.missPct))
+                .replace("{forecast}", fmt.num(y2025.forecast, 0))
+                .replace("{actual}", fmt.num(y2025.actual, 1))}
             </bdi>
-          </span>
-        ))}
-        {retro.pending ? (
-          <span className="inline-flex items-baseline gap-1 rounded-full bg-[var(--color-surface)] px-2 py-0.5 ring-1 ring-[var(--color-border)]/60">
-            <span className="text-[var(--color-text-primary)]">{locale === "fa" ? fmt.num(retro.pending.year, 0) : String(retro.pending.year)}</span>
-            <span className="italic text-[var(--color-text-tertiary)]">{t.pendingCell}</span>
-          </span>
+          </li>
         ) : null}
-      </p>
+        {retro.pending ? (
+          <li className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
+            <span aria-hidden="true" className="mt-[5px] inline-block h-2 w-2 shrink-0 rounded-[2px] bg-[var(--color-currena-blue)]" />
+            <bdi className="type-caption leading-relaxed text-[var(--color-text-secondary)]">
+              {t.pendingLine
+                .replace("{forecast}", fmt.num(retro.pending.forecast, 2))
+                .replace("{revision}", fmt.num(LBMA_2026_MIDYEAR_REVISION, 0))}
+            </bdi>
+          </li>
+        ) : null}
+      </ol>
 
-      {/* the verdict, IN THE OPEN: the aggregate headline, the 2025
-          record miss, and how the specialists called 2026 so far */}
-      <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-        <bdi>
-          {t.headline
-            .replace("{under}", fmt.num(retro.underForecast.length, 0))
-            .replace("{n}", fmt.num(retro.n, 0))
-            .replace("{mean}", `${signed(retro.meanMissPct)}`)
-            .replace("{abs}", `${fmt.num(retro.meanAbsMissPct, 1)}%`)}
-        </bdi>
-      </p>
-      {y2025 ? (
-        <p className="m-0 type-caption font-semibold text-[var(--color-text-secondary)]">
-          <bdi>
-            {t.y2025Line
-              .replace("{miss}", signed(y2025.missPct))
-              .replace("{forecast}", fmt.num(y2025.forecast, 0))
-              .replace("{actual}", fmt.num(y2025.actual, 1))}
-          </bdi>
-        </p>
-      ) : null}
-      {retro.pending ? (
-        <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
-          <bdi>
-            {t.pendingLine
-              .replace("{forecast}", fmt.num(retro.pending.forecast, 2))
-              .replace("{revision}", fmt.num(LBMA_2026_MIDYEAR_REVISION, 0))}
-          </bdi>
-        </p>
-      ) : null}
+      {/* the recent years as a TABLE, in the open — the same numbers
+          the full 17-row record carries, the last five plus the
+          pending row, one glance */}
+      <div className="mt-1.5">
+        <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{t.recentTableTitle}</h4>
+        <div className="mt-1 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
+          <table className="w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption">
+            <thead>
+              <tr className="text-[var(--color-text-tertiary)]">
+                <th scope="col" className="px-1 py-1 text-start font-bold">{t.colYear}</th>
+                <th scope="col" className="px-1 py-1 text-end font-bold">{t.colForecast}</th>
+                <th scope="col" className="px-1 py-1 text-end font-bold">{t.colActual}</th>
+                <th scope="col" className="px-1 py-1 text-end font-bold">{t.colMiss}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {retro.scored.slice(-5).map((r) => (
+                <tr key={r.year} className="border-t border-[var(--color-border)]">
+                  <td className="px-1 py-1 font-bold text-[var(--color-text-primary)]">
+                    <bdi>{locale === "fa" ? fmt.num(r.year, 0) : String(r.year)}</bdi>
+                  </td>
+                  <td className="px-1 py-1 text-end tabular-nums text-[var(--color-text-secondary)]">
+                    <bdi dir="ltr">{fmt.num(r.forecast, r.forecast % 1 === 0 ? 0 : 2)}</bdi>
+                  </td>
+                  <td className="px-1 py-1 text-end tabular-nums text-[var(--color-text-secondary)]">
+                    <bdi dir="ltr">{fmt.num(r.actual, r.actual % 1 === 0 ? 0 : 2)}</bdi>
+                  </td>
+                  <td className={`px-1 py-1 text-end font-bold tabular-nums ${r.missPct < 0 ? "text-[var(--color-currena-success)]" : "text-[var(--color-status-alert)]"}`}>
+                    <bdi dir="ltr">{signed(r.missPct)}</bdi>
+                  </td>
+                </tr>
+              ))}
+              {retro.pending ? (
+                <tr key="pending" className="border-t border-[var(--color-border)]">
+                  <td className="px-1 py-1 font-bold text-[var(--color-text-primary)]">
+                    <bdi>{locale === "fa" ? fmt.num(retro.pending.year, 0) : String(retro.pending.year)}</bdi>
+                  </td>
+                  <td className="px-1 py-1 text-end tabular-nums text-[var(--color-text-secondary)]">
+                    <bdi dir="ltr">{fmt.num(retro.pending.forecast, 2)}</bdi>
+                  </td>
+                  <td className="px-1 py-1 text-end italic text-[var(--color-text-tertiary)]">{t.pendingCell}</td>
+                  <td className="px-1 py-1 text-end italic text-[var(--color-text-tertiary)]">·</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </div>
       {open ? (
         <div className="mt-1 flex flex-col gap-2">
           <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">

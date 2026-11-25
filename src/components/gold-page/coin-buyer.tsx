@@ -155,30 +155,40 @@ export function CoinBuyerBand({
         <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.unavailable}</p>
       ) : (
         <>
-          {/* the inputs — the money and its currency */}
+          {/* the inputs — the money and its currency. Batch M: the
+              picked currency's own name rides BESIDE the input as an
+              attached segment of one joined group ([دلار آمریکا][field])
+              — never a separate hint floating somewhere else; the
+              amount's unit is visible at point of use, the owner's
+              ask */}
           <div className="flex flex-wrap items-end gap-2.5">
             <label className="flex flex-col gap-1">
               <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{t.amountLabel}</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                autoComplete="off"
-                dir="ltr"
-                value={amountText}
-                onChange={(e) => {
-                  const text = sanitizeAmountText(e.target.value);
-                  setAmountText(text);
-                  const v = Number(text);
-                  setAmount(text === "" || !Number.isFinite(v) ? 0 : Math.max(0, v));
-                }}
-                onBlur={() => {
-                  if (amountText === "") {
-                    setAmountText("0");
-                    setAmount(0);
-                  }
-                }}
-                className="w-[9rem] min-h-[38px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 type-label tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
-              />
+              <span className="flex w-fit items-stretch overflow-hidden rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  dir="ltr"
+                  value={amountText}
+                  onChange={(e) => {
+                    const text = sanitizeAmountText(e.target.value);
+                    setAmountText(text);
+                    const v = Number(text);
+                    setAmount(text === "" || !Number.isFinite(v) ? 0 : Math.max(0, v));
+                  }}
+                  onBlur={() => {
+                    if (amountText === "") {
+                      setAmountText("0");
+                      setAmount(0);
+                    }
+                  }}
+                  className="w-[8.5rem] min-h-[38px] bg-[var(--color-surface)] px-2.5 py-1.5 type-label tabular-nums text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-currena-blue)]"
+                />
+                <span className="flex items-center whitespace-nowrap bg-[var(--color-currena-soft)] px-2.5 type-caption font-bold text-[var(--color-text-secondary)]">
+                  {currency !== null ? nameOf(currency) : "·"}
+                </span>
+              </span>
             </label>
             <label className="flex flex-col gap-1">
               <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{t.currencyLabel}</span>

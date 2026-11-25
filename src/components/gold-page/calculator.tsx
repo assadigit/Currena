@@ -648,13 +648,18 @@ export function CalculatorBand({
 
           {/* the amount · the unit · the since-year — the unit is the
               owner's own ask: dollars, any of the converter's currencies
-              (the toman included), or grams of gold */}
+              (the toman included), or grams of gold.
+              Batch M: the unit's name rides BESIDE the input as an
+              attached segment of one joined group — the old in-field
+              overlay hint collided with long fa unit words (دلار
+              استرالیا و هم‌اندازه‌هایش); a separate segment can never
+              collide with the typed number */}
           <div className="flex flex-wrap items-end gap-2.5">
             <label className="flex flex-col gap-1">
               <span className="type-caption font-semibold text-[var(--color-text-secondary)]">
                 {mode === "one" ? calc.calcAmountOne : calc.calcAmountDca}
               </span>
-              <div className="relative">
+              <span className="flex w-fit max-w-full items-stretch overflow-hidden rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
                 <input
                   type="text"
                   inputMode="decimal"
@@ -673,18 +678,12 @@ export function CalculatorBand({
                       setAmount(0);
                     }
                   }}
-                  className="w-[9rem] min-h-[38px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 pe-14 type-label tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
+                  className="w-[8.5rem] min-h-[38px] bg-[var(--color-surface)] px-2.5 py-1.5 type-label tabular-nums text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-currena-blue)]"
                 />
-                {amountText !== "" ? (
-                  <span
-                    aria-hidden="true"
-                    dir={locale === "en" ? "ltr" : "rtl"}
-                    className="pointer-events-none absolute inset-y-0 end-2.5 flex items-center type-caption font-semibold text-[var(--color-text-tertiary)]/70"
-                  >
-                    {unitHint(unit, locale)}
-                  </span>
-                ) : null}
-              </div>
+                <span className="flex items-center whitespace-nowrap bg-[var(--color-currena-soft)] px-2.5 type-caption font-bold text-[var(--color-text-secondary)]" aria-hidden="true">
+                  {unitHint(unit, locale)}
+                </span>
+              </span>
             </label>
             <label className="flex flex-col gap-1">
               <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{calc.calcUnitLabel}</span>

@@ -1370,10 +1370,10 @@ export default function GoldPage() {
             <span aria-current="page">{t.breadcrumb.current}</span>
           </nav>
 
-          {/* the gold identity — a circle with the gold coin in it (a
-              low-opacity border around the circle); the main heading
-              below carries the name, so the label never repeats */}
-          <div className="mt-2 flex items-center gap-2.5">
+          {/* the gold identity — the coin BESIDE the name on one line
+              (the owner's batch-M ask: [logo][title], never stacked);
+              the heading carries the name, the coin never repeats it */}
+          <div className="mt-2 flex items-center gap-3">
             <span
               className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full"
               style={{ boxShadow: "inset 0 0 0 2px color-mix(in srgb, var(--color-accent-gold) 42%, transparent)" }}
@@ -1381,9 +1381,9 @@ export default function GoldPage() {
             >
               <img src={`${deskBasePath}/gold-coin.png`} alt="" width={44} height={44} className="h-[44px] w-[44px] rounded-full object-cover" loading="lazy" decoding="async" />
             </span>
+            <h1 className="m-0 text-2xl font-extrabold leading-tight text-[var(--color-text-primary)] sm:text-[1.75rem]">{t.title}</h1>
           </div>
 
-          <h1 className="m-0 mt-2 text-2xl font-extrabold leading-tight text-[var(--color-text-primary)] sm:text-[1.75rem]">{t.title}</h1>
           <p className="m-0 mt-1.5 flex flex-wrap items-baseline gap-x-2.5 type-caption font-semibold text-[var(--color-text-tertiary)]">
             {t.dataAsOf.replace("{date}", data ? fmt.dateWords(data.asOf) : "·")}
           </p>

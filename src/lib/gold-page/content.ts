@@ -363,7 +363,7 @@ export const UI = {
       boardSnapshotNote: "Tehran snapshot {time}",
       boardUnavailable: "The Tehran board could not be read yet.",
       coinBuyer: {
-        title: "The coin budget machine",
+        title: "Currency → Iranian coin converter",
         subtitle:
           "How many full Emami coins your money buys on the Tehran market — one snapshot, both legs named.",
         amountLabel: "Your money",
@@ -403,6 +403,17 @@ export const UI = {
       verdictLine: "Since {year}: gold ×{g} against the dollar ×{d} — {winner} won {ratio}× over.",
       winnerGold: "gold",
       winnerDollar: "the dollar",
+      syncYearLabel: "most in-sync year",
+      divergeYearLabel: "most divergent year",
+      syncYearLine: "gold {g}, the dollar {d}: {direction}.",
+      divergeYearLine: "gold {g}, the dollar {d}: a {gap}-point gap, {direction}.",
+      dirBothUp: "both rose together",
+      dirBothDown: "both fell together",
+      dirGoldDownDollarUp: "gold down while the dollar rose",
+      dirGoldUpDollarDown: "gold up while the dollar fell",
+      dirSameSide: "both moved, but far apart",
+      dollarDecayLine:
+        "The dollar's own quiet decay: measured in gold alone, the US dollar has lost {pct} of its purchasing power since {year} — its Iranian rise is not all gain.",
       tableTitle: "The race, year by year",
       tableNote:
         "Each Jalali year's year-end values and its own winner; the running year reads its live rows — its own case, named, never mixed.",
@@ -425,6 +436,16 @@ export const UI = {
       decouplingColDollar: "Dollar (the cause)",
       decouplingEmpty:
         "No complete year yet where global gold fell while Iranian gold rose.",
+      decompTitle: "What gold's Iran growth was made of",
+      decompLine:
+        "Since {year}, gold in Iran multiplied ×{g}: the rial's fall alone would have given ×{d}, the world's gold alone ×{w}, the Tehran premium ×{p}.",
+      decompShareRial: "the rial's fall vs the dollar",
+      decompShareGlobal: "the world's gold move",
+      decompSharePremium: "the Tehran premium (حباب)",
+      decompSharesLine:
+        "Of that growth, {r} was the rial's fall, {w} the world's gold, {p} the Tehran premium.",
+      decompNote:
+        "The three factors multiply exactly — gold's toman multiple = the dollar's multiple × the global-ounce multiple × the premium's change — so the shares split the total multiple's logarithm and add to 100%. The rial's fall is the inflation/currency leg: a weaker rial makes everything costlier in toman, gold included. The world's gold is gold's own natural, dollar-priced growth.",
       syncTitle: "How in sync they moved",
       syncBothUp: "In {n} of {m} years, both rose together.",
       syncMax: "most in sync: {years}",
@@ -434,6 +455,7 @@ export const UI = {
       premiumNote: "geram18's market price over its parity, per year since 1392; the current value is the bridge board's own live computation above.",
       premiumNow: "now {v} over parity",
       premiumBridgeNote: "The live authority for the premium is the bridge board above.",
+      methodOpenLabel: "Basis & sources",
       methodLine:
         "Bases, named: 1357–1389 the dollar is the cited historical free-market table (the 1390 figure differs across sources — TGJU's own daily rows win wherever they exist), the gold the parity estimate (the annual-average ounce × the same dollar ÷ 31.1034768 × 0.75 — never a market price); 1390–1391 TGJU dollar actuals + the parity gold; 1392 → today TGJU geram18 market prices, each year's value its last daily row before Farvardin 1 (TGJU's own Jalali labelling); the running year rides the live rows. Global gold: each Jalali year reads the annual average of the Gregorian year it starts in (1357 → 1978; Jalali years run March → March); the running year reads the desk's live spot. Where both exist the live source wins. The counts and the detectors use complete years only; the running year's partial returns are marked live. Fail-closed: a leg that does not arrive is absent, never zero.",
       sourceLine:
@@ -585,8 +607,13 @@ export const UI = {
       buyersHead12m: "12-month net",
       buyersHeadHoldings: "Holdings",
       buyersHeadShare: "Gold share of reserves",
+      buyersHeadOfReserve: "12m net vs holdings",
       tonnesShort: "{v} tonnes",
       holdingsNow: "current holdings: {v} tonnes",
+      buyPctLine: "bought ≈{v} of its own holdings this year",
+      soldPctLine: "sold ≈{v} of its own reserves",
+      buyPctNote:
+        "The 'vs holdings' column divides the trailing-12-month net purchases by the country's current gold holdings — the year's buying as a share of the reserve it already holds (weights, not values).",
       sellersTitle: "Gold sellers",
       sellersAsOf: "the reported quarterly record through 2026-Q3",
       sellersNote: "Sellers are rarer and smaller than buyers; the world aggregate has been positive for years. These rows are the reported reductions that mattered. Each seller's reserve is its latest officially reported holdings (IMF IFS, via the WGC table) — some countries report with long lags.",
@@ -809,6 +836,7 @@ export const UI = {
       title: "Gold forecasts vs reality",
       subtitle: "LBMA's analyst survey under-forecast gold in {under} of {n} years, mean absolute miss {abs}.",
       missListLabel: "the recent record:",
+      recentTableTitle: "The recent record, in numbers",
       headline:
         "The professionals' published consensus missed gold's actual average in {under} of {n} years (2010–2025): the mean miss is {mean}, the mean absolute miss {abs}. The numbers are LBMA's own.",
       y2025Line: "2025, the biggest miss of the record: {miss} (consensus {forecast} vs actual {actual}).",
@@ -1085,7 +1113,7 @@ export const UI = {
       boardSnapshotNote: "اسنپ‌شات تهران {time}",
       boardUnavailable: "تختهٔ تهران هنوز خوانده نشد.",
       coinBuyer: {
-        title: "ماشین بودجهٔ سکه",
+        title: "مبدل ارز به سکهٔ ایران",
         subtitle:
           "پول شما روی بازار تهران چند سکهٔ تمام امامی می‌خرد — یک اسنپ‌شات، هر دو پایِ نام‌گذاری‌شده.",
         amountLabel: "پول شما",
@@ -1124,6 +1152,17 @@ export const UI = {
       verdictLine: "از {year}: طلا ×{g} در برابر دلار ×{d} — {winner} {ratio}× برنده.",
       winnerGold: "طلا",
       winnerDollar: "دلار",
+      syncYearLabel: "هم‌حرکت‌ترین سال",
+      divergeYearLabel: "واگراترین سال",
+      syncYearLine: "طلا {g}، دلار {d}: {direction}.",
+      divergeYearLine: "طلا {g}، دلار {d}: فاصلهٔ {gap} واحدی، {direction}.",
+      dirBothUp: "هر دو با هم بالا رفتند",
+      dirBothDown: "هر دو با هم پایین رفتند",
+      dirGoldDownDollarUp: "طلا پایین، دلار بالا",
+      dirGoldUpDollarDown: "طلا بالا، دلار پایین",
+      dirSameSide: "هر دو حرکت کردند، اما بسیار دور از هم",
+      dollarDecayLine:
+        "فرسایش خاموش دلار: فقط در برابر طلا، دلار آمریکا از {year} حدود {pct} از قدرت خریدش را از دست داده — صعودش در ایران همه‌اش سود نیست.",
       tableTitle: "مسابقه، سال‌به‌سال",
       tableNote:
         "ارقام پایان هر سال شمسی و برندهٔ خودش؛ سال جاری ردیف‌های زنده را می‌خواند — موردِ خودش، نام‌گذاری‌شده، هرگز مخلوط نشده.",
@@ -1146,6 +1185,16 @@ export const UI = {
       decouplingColDollar: "دلار (علت)",
       decouplingEmpty:
         "هنوز سالِ کاملی نیست که طلا در جهان پایین و در ایران بالا رفته باشد.",
+      decompTitle: "رشد طلای ایران از چه ساخته شده",
+      decompLine:
+        "از {year}، طلا در ایران ×{g} شد: افت ریال به‌تنهایی ×{d} می‌داد، طلای جهان به‌تنهایی ×{w}، و حباب تهران ×{p}.",
+      decompShareRial: "افت ریال در برابر دلار",
+      decompShareGlobal: "رشد جهانی طلا",
+      decompSharePremium: "حباب بازار تهران",
+      decompSharesLine:
+        "از این رشد، {r} افت ریال بود، {w} رشد جهانی طلا و {p} حباب تهران.",
+      decompNote:
+        "این سه عامل دقیقاً در هم ضرب می‌شوند — ضریب تومانی طلا = ضریب دلار × ضریب اونس جهانی × تغییر حباب — پس سهم‌ها لگاریتم ضریب کل را تقسیم می‌کنند و جمعشان ۱۰۰٪ می‌شود. افت ریال همان پای تورم و پول ملی است: ریال ضعیف‌تر یعنی همه‌چیز در تومان گران‌تر، طلا هم همین‌طور؛ رشد جهانی طلا رشد طبیعیِ خودِ طلا به دلار است.",
       syncTitle: "چقدر با هم هم‌حرکت بودند",
       syncBothUp: "در {n} سال از {m}، هر دو با هم بالا رفتند.",
       syncMax: "بیشترین هم‌حرکتی: {years}",
@@ -1155,6 +1204,7 @@ export const UI = {
       premiumNote: "قیمت بازار گرم ۱۸ نسبت به برابری‌اش، سال‌به‌سال از ۱۳۹۲؛ مقدارِ الان، همان محاسبهٔ زندهٔ تختهٔ پلِ بالاست.",
       premiumNow: "الان {v} بالاتر از برابری",
       premiumBridgeNote: "مرجعِ زندهٔ حباب، تختهٔ پلِ بالاست.",
+      methodOpenLabel: "مبنا و منابع",
       methodLine:
         "مبناها، نام‌گذاری‌شده: ۱۳۵۷–۱۳۸۹ دلار، جدول تاریخیِ نرخ آزاد است (رقم ۱۳۹۰ بین منابع متفاوت است — هر جا ردیف‌های خودِ TGJU باشند، همان‌ها می‌برند) و طلا، برآورد برابری (میانگین سالانهٔ اونس × همین دلار ÷ ۳۱٫۱۰۳۴۷۶۸ × ۰٫۷۵ — هرگز قیمت بازار نیست)؛ ۱۳۹۰–۱۳۹۱ دلارِ واقعی TGJU + طلا برابری؛ ۱۳۹۲ تا امروز قیمت بازار geram18، ارزشِ هر سال آخرین ردیف روزانهٔ پیش از فروردین ۱ (برچسب جلالیِ خود TGJU)؛ سال جاری روی ردیف‌های زنده. طلا جهانی: هر سال شمسی، میانگین سالانهٔ میلادیِ سالِ آغازش را می‌خواند (۱۳۵۷ → ۱۹۷۸؛ سال‌های شمسی از فروردین تا اسفندند)؛ سال جاری نقطهٔ زندهٔ میز. هر جا هر دو باشند، منبعِ زنده می‌برد. شمارش‌ها و آشکارسازها فقط سال‌های کامل؛ بازدهٔ ناقص سال جاری با «زنده» علامت می‌خورد. Fail-closed: پایِ نرسیده غایب است، هرگز صفر.",
       sourceLine:
@@ -1304,8 +1354,13 @@ export const UI = {
       buyersHead12m: "خالص ۱۲ ماهه",
       buyersHeadHoldings: "موجودی",
       buyersHeadShare: "سهم طلا از ذخایر",
+      buyersHeadOfReserve: "خالص ۱۲ماهه نسبت به موجودی",
       tonnesShort: "{v} تن",
       holdingsNow: "ذخیره فعلی: {v} تن",
+      buyPctLine: "حدود {v} موجودی خودش را در این سال خرید",
+      soldPctLine: "حدود {v} ذخایر خودش را فروخت",
+      buyPctNote:
+        "ستون «نسبت به موجودی» خالص خرید ۱۲ ماه اخیر را بر موجودی فعلی طلا همان کشور تقسیم می‌کند — خریدِ سال به‌عنوان سهمی از ذخیره‌ای که از قبل داشته (وزنی، نه ارزشی).",
       sellersTitle: "فروشندگان طلا",
       shareNote:
         "طلا با قیمت لحظه‌ای بازار ارزش‌گذاری شده بر کل دارایی‌های ذخیرهٔ رسمی (طلا با همان قیمت دوباره ارزش‌گذاری می‌شود؛ آخرین فصل گزارش‌شدهٔ هر کشور). سهمِ در حال رشد می‌تواند حسابِ قیمت باشد، نه خرید فعال.",
@@ -1523,6 +1578,7 @@ export const UI = {
       title: "پیش‌بینی رخدادهای طلا در مقابل واقعیت",
       subtitle: "نظرسنجی تحلیلگران LBMA در {under} سال از {n} سال، طلا را کمتر از واقعیت پیش‌بینی کرده؛ میانگین قدر مطلق خطا {abs}.",
       missListLabel: "سابقهٔ اخیر:",
+      recentTableTitle: "سابقهٔ اخیر، با عدد",
       headline:
         "اجماعِ منتشرشدهٔ حرفه‌ای‌ها در {under} سال از {n} سال (۲۰۱۰–۲۰۲۵) میانگینِ واقعیِ طلا را پیش‌بینی نکرد: میانگین خطا {mean} و میانگین قدر مطلق خطا {abs} است. این عدد، عددِ خودِ LBMA است.",
       y2025Line: "۲۰۲۵؛ بزرگ‌ترین خطای ثبت‌شده: {miss} (اجماع {forecast} در برابر واقعیت {actual}).",

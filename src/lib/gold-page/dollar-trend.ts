@@ -494,6 +494,152 @@ export function syncScore(p: DollarTrendPayload): SyncScore {
 }
 
 /* ------------------------------------------------------------------ *
+ * 4.4b — The two headline years: the most in-sync and the most
+ * divergent single year of the whole race (complete years only)
+ * ------------------------------------------------------------------ */
+
+/** One year's head-to-head reading for the two headline verdicts. */
+export interface TrendVerdictYear {
+  jy: number;
+  /** The gold gram's toman return that year, %. */
+  goldRet: number;
+  /** The dollar's toman return that year, %. */
+  dollarRet: number;
+  /** |goldRet − dollarRet|, percentage points. */
+  gap: number;
+  /** True when both returns carry the same sign (both up or both down). */
+  sameDirection: boolean;
+}
+
+/** The year the two assets moved most alike — the smallest return gap
+ *  among the complete years where BOTH moved the same way (both rose or
+ *  both fell): the race's most faithful, least surprising year. Null
+ *  when no complete year carries both same-signed returns. */
+export function mostSyncYear(p: DollarTrendPayload): TrendVerdictYear | null {
+  const rows = trendYearRows(p).filter((r) => !r.running && r.goldRet !== null && r.dollarRet !== null);
+  let best: TrendVerdictYear | null = null;
+  for (const r of rows) {
+    const g = r.goldRet!;
+    const d = r.dollarRet!;
+    const bothUp = g > 0 && d > 0;
+    const bothDown = g < 0 && d < 0;
+    if (!bothUp && !bothDown) continue;
+    const cand = { jy: r.jy, goldRet: g, dollarRet: d, gap: Math.abs(g - d), sameDirection: true };
+    if (best === null || cand.gap < best.gap) best = cand;
+  }
+  return best;
+}
+
+/** The year they moved most apart — the largest return gap, with the
+ *  opposite-direction years (gold down while the dollar rose, or the
+ *  reverse) always beating a same-direction year of equal gap: the
+ *  race's most two-faced year (dollar up, gold down — or the reverse). */
+export function mostDivergentYear(p: DollarTrendPayload): TrendVerdictYear | null {
+  const rows = trendYearRows(p).filter((r) => !r.running && r.goldRet !== null && r.dollarRet !== null);
+  let best: TrendVerdictYear | null = null;
+  for (const r of rows) {
+    const g = r.goldRet!;
+    const d = r.dollarRet!;
+    const sameDirection = (g >= 0 && d >= 0) || (g <= 0 && d <= 0);
+    const cand = { jy: r.jy, goldRet: g, dollarRet: d, gap: Math.abs(g - d), sameDirection };
+    if (best === null) {
+      best = cand;
+      continue;
+    }
+    // an opposite-direction year wins over a same-direction one at any gap
+    if (!cand.sameDirection && best.sameDirection) {
+      best = cand;
+      continue;
+    }
+    if (cand.sameDirection === best.sameDirection && cand.gap > best.gap) best = cand;
+  }
+  return best;
+}
+
+/** The world's gold multiple over the same span (the ounce's USD price
+ *  now ÷ the start year) — read alone, this IS the dollar's own global
+ *  decay against gold: a ×14 world means the dollar lost 1 − 1/14 ≈ 93%
+ *  of its gold-priced purchasing power. Null on missing legs. */
+export function globalGoldMultiple(p: DollarTrendPayload, startJy: number): number | null {
+  const rows = trendYearRows(p).filter((r) => r.jy >= startJy && r.goldUsdOz !== null);
+  if (rows.length < 2) return null;
+  const first = rows[0]!;
+  const last = rows[rows.length - 1]!;
+  if (first.goldUsdOz! <= 0 || last.goldUsdOz! <= 0) return null;
+  return last.goldUsdOz! / first.goldUsdOz!;
+}
+
+/* ------------------------------------------------------------------ *
+ * 4.4c — The growth decomposition: how much of gold's Iran growth was
+ * the rial's fall, how much the world's own gold move, how much the
+ * Tehran premium — the exact multiplicative identity, split
+ * additively by logarithms (the shares sum to 100%)
+ * ------------------------------------------------------------------ */
+
+/** The decomposition's whole answer, over the start year → the last
+ *  row where BOTH toman legs exist (the running year when live). */
+export interface GrowthDecomposition {
+  startJy: number;
+  endJy: number;
+  /** gold's toman multiple, now ÷ start (the thing being explained). */
+  goldX: number;
+  /** the dollar's toman multiple — the rial-fall leg. */
+  dollarX: number;
+  /** the global ounce's USD multiple — the world-gold leg. */
+  globalX: number;
+  /** the premium's multiple (goldX ÷ dollarX ÷ globalX) — the حباب leg. */
+  premiumX: number;
+  /** the three legs' shares of the total LOG growth, in percent —
+   *  null when the total is not a growth (goldX ≤ 1) so no honest
+   *  share exists. */
+  shares: { rialPct: number; globalPct: number; premiumPct: number } | null;
+}
+
+/** The exact identity goldX = dollarX × globalX × premiumX, computed
+ *  over the payload's own legs (never a guess: any missing leg at the
+ *  span's ends returns null). The shares split ln(goldX) — so a
+ *  negative leg (a falling world price) reads as a negative share, and
+ *  the three always sum to 100%. */
+export function growthDecomposition(p: DollarTrendPayload, startJy = RACE_START_JY): GrowthDecomposition | null {
+  const rows = trendYearRows(p);
+  const start = rows.find((r) => r.jy === startJy);
+  if (start === undefined) return null;
+  // the end: the last row whose BOTH toman legs exist (live-over-history)
+  let end: TrendYearRow | null = null;
+  for (const r of rows) {
+    if (r.gold18Toman !== null && r.dollarToman !== null) end = r;
+  }
+  if (end === null || end.jy <= startJy) return null;
+  if (start.gold18Toman === null || start.dollarToman === null) return null;
+  const g0 = start.gold18Toman;
+  const g1 = end.gold18Toman!;
+  const d0 = start.dollarToman;
+  const d1 = end.dollarToman!;
+  if (g0 <= 0 || g1 <= 0 || d0 <= 0 || d1 <= 0) return null;
+  const goldX = g1 / g0;
+  const dollarX = d1 / d0;
+  // the world leg: the global ounce at the same two rows
+  const u0 = start.goldUsdOz;
+  const u1 = end.goldUsdOz;
+  if (u0 === null || u1 === null || u0 <= 0 || u1 <= 0) return null;
+  const globalX = u1 / u0;
+  // the premium leg: the residual of the exact identity — ۱ in the
+  // parity era (gold IS parity there), the market-over-parity change in
+  // the TGJU era. This is exactly goldX ÷ (dollarX × globalX).
+  const premiumX = goldX / (dollarX * globalX);
+  if (!Number.isFinite(premiumX) || premiumX <= 0) return null;
+  const ln = Math.log(goldX);
+  const shares = ln > 0
+    ? {
+        rialPct: (Math.log(dollarX) / ln) * 100,
+        globalPct: (Math.log(globalX) / ln) * 100,
+        premiumPct: (Math.log(premiumX) / ln) * 100,
+      }
+    : null;
+  return { startJy, endJy: end.jy, goldX, dollarX, globalX, premiumX, shares };
+}
+
+/* ------------------------------------------------------------------ *
  * 4.5 — The premium arc: geram18 ÷ parity, the حباب's long arc
  * (TGJU era only — the parity era IS parity by construction)
  * ------------------------------------------------------------------ */

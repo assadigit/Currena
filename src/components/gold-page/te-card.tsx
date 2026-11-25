@@ -38,6 +38,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, AiTranslatedBadge, faDigits } from "@/components/gold-page/visuals";
+import { faGlossary } from "@/lib/gold-page/fa-glossary";
 
 /* ------------------------------------------------------------------ *
  * The payload (the route's contract)
@@ -255,13 +256,13 @@ export function TeCard({
           {fa ? (
             <>
               <h3 dir="rtl" className="type-label m-0 mt-3 text-start font-extrabold text-[var(--color-text-primary)]">
-                {faDigits(fa.title)}
+                {faDigits(faGlossary(fa.title))}
               </h3>
               <div
                 dir="rtl"
                 className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:p-3.5"
               >
-                <p className="m-0 text-[13.5px] leading-[1.9] text-[var(--color-text-secondary)]">{faDigits(fa.body)}</p>
+                <p className="m-0 text-[13.5px] leading-[1.9] text-[var(--color-text-secondary)]">{faDigits(faGlossary(fa.body))}</p>
               </div>
             </>
           ) : (

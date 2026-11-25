@@ -23,7 +23,7 @@
  */
 
 import * as React from "react";
-import { Scale } from "lucide-react";
+import { BookOpen, ChevronDown, Scale } from "lucide-react";
 import type { Locale, UI } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta, Sparkline } from "@/components/gold-page/visuals";
@@ -34,13 +34,18 @@ import {
   RACE_START_JY,
   chartSeries,
   decouplingYears,
+  globalGoldMultiple,
   gold18ParityToman,
+  growthDecomposition,
+  mostDivergentYear,
+  mostSyncYear,
   premiumArc,
   race,
   syncScore,
   trendYearRows,
   winCounts,
   type DollarTrendPayload,
+  type TrendVerdictYear,
 } from "@/lib/gold-page/dollar-trend";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
@@ -299,6 +304,14 @@ function windowOf(jy: number): { fromJy: number; toJy: number } {
   return { fromJy: jy - 4, toJy: jy };
 }
 
+/** The divergent verdict's direction word — the same-side years say so
+ *  honestly ("both moved, but far apart"); the opposite-side years name
+ *  the two faces (gold down while the dollar rose, or the reverse). */
+function directionWordOf(v: TrendVerdictYear, t: TrendT): string {
+  if (v.sameDirection) return t.dirSameSide;
+  return v.goldRet < 0 ? t.dirGoldDownDollarUp : t.dirGoldUpDollarDown;
+}
+
 /* ------------------------------------------------------------------ *
  * The band itself
  * ------------------------------------------------------------------ */
@@ -327,6 +340,10 @@ export function DollarTrendBand({
   const decoupled = React.useMemo(() => (data !== null ? decouplingYears(data) : []), [data]);
   const sync = React.useMemo(() => (data !== null ? syncScore(data) : null), [data]);
   const arc = React.useMemo(() => (data !== null ? premiumArc(data) : null), [data]);
+  /* the two headline years (batch M): the most in-sync and the most
+     divergent complete year of the race */
+  const syncYear = React.useMemo(() => (data !== null ? mostSyncYear(data) : null), [data]);
+  const divergeYear = React.useMemo(() => (data !== null ? mostDivergentYear(data) : null), [data]);
   /* the premium's current value — the bridge board's OWN computation
      (the same coinPremium engine, the same live legs), so the two
      boards can never disagree; the payload's running legs are the
@@ -359,6 +376,16 @@ export function DollarTrendBand({
   const [scale, setScale] = React.useState<"log" | "linear">("log");
   const [hoverJy, setHoverJy] = React.useState<number | null>(null);
   const [expanded, setExpanded] = React.useState(false);
+  /* batch M: the premium arc and the basis/sources note both hide
+     until asked for (the owner's ask) */
+  const [arcOpen, setArcOpen] = React.useState(false);
+  const [methodOpen, setMethodOpen] = React.useState(false);
+  /* the growth decomposition (batch M) — rides the chart's own start
+     year, so the reader's picked span is the span being explained; the
+     dollar's global decay against gold over the same span is its
+     honest counterweight */
+  const decomp = React.useMemo(() => (data !== null ? growthDecomposition(data, startJy) : null), [data, startJy]);
+  const decayMultiple = React.useMemo(() => (data !== null ? globalGoldMultiple(data, startJy) : null), [data, startJy]);
 
   /* the hover trace — the readout row above the chart; null falls back
      to the last point (the running year, live) */
@@ -443,6 +470,68 @@ export function DollarTrendBand({
                 </bdi>
               </p>
             </div>
+          ) : null}
+
+          {/* zone 1.5 — THE two most important verdicts (batch M): the
+              single year the two assets moved most alike, and the single
+              year they moved most apart — the race's most faithful and
+              most two-faced years, one box each, always in the open */}
+          {syncYear !== null || divergeYear !== null ? (
+            <div className="mt-2.5 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+              {syncYear !== null ? (
+                <div
+                  className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]"
+                  data-dollar-trend-sync-year
+                >
+                  <span className="type-caption font-bold text-[var(--color-text-tertiary)]">{t.syncYearLabel}</span>
+                  <bdi className="text-[1.35rem] font-black leading-tight tabular-nums text-[var(--color-text-primary)]">
+                    {yearLabel(syncYear.jy, locale)}
+                  </bdi>
+                  <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+                    <bdi>
+                      {t.syncYearLine
+                        .replace("{g}", fmt.pct(syncYear.goldRet, 1))
+                        .replace("{d}", fmt.pct(syncYear.dollarRet, 1))
+                        .replace("{direction}", syncYear.goldRet >= 0 ? t.dirBothUp : t.dirBothDown)}
+                    </bdi>
+                  </p>
+                </div>
+              ) : null}
+              {divergeYear !== null ? (
+                <div
+                  className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]"
+                  data-dollar-trend-diverge-year
+                >
+                  <span className="type-caption font-bold text-[var(--color-text-tertiary)]">{t.divergeYearLabel}</span>
+                  <bdi className="text-[1.35rem] font-black leading-tight tabular-nums text-[var(--color-text-primary)]">
+                    {yearLabel(divergeYear.jy, locale)}
+                  </bdi>
+                  <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+                    <bdi>
+                      {t.divergeYearLine
+                        .replace("{g}", fmt.pct(divergeYear.goldRet, 1))
+                        .replace("{d}", fmt.pct(divergeYear.dollarRet, 1))
+                        .replace("{gap}", fmt.num(divergeYear.gap, 0))
+                        .replace("{direction}", directionWordOf(divergeYear, t))}
+                    </bdi>
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {/* the dollar's own global decay (batch M): its Iranian rise is
+              not all gain — measured in gold alone, the dollar's
+              purchasing power fell over the same span; one honest line
+              under the two verdicts */}
+          {decayMultiple !== null && decayMultiple > 1 ? (
+            <p className="m-0 mt-1.5 type-caption leading-relaxed text-[var(--color-text-tertiary)]" data-dollar-trend-decay>
+              <bdi>
+                {t.dollarDecayLine
+                  .replace("{pct}", locale === "fa" ? `${fmt.num((1 - 1 / decayMultiple) * 100, 0)}٪` : `${fmt.num((1 - 1 / decayMultiple) * 100, 0)}%`)
+                  .replace("{year}", yearLabel(startJy, locale))}
+              </bdi>
+            </p>
           ) : null}
 
           {/* zone 2 — the chart */}
@@ -665,6 +754,81 @@ export function DollarTrendBand({
             )}
           </div>
 
+          {/* zone 4.5b — the growth decomposition (batch M, the owner's
+              ask): of gold's Iran growth since the picked year, how much
+              was the rial's fall (Iran's inflation / the weakening
+              currency — a weaker rial makes everything costlier in toman,
+              gold included), how much the world's own gold move, how much
+              the Tehran premium. The exact multiplicative identity, its
+              logarithm split additively so the shares sum to 100% */}
+          {decomp !== null ? (
+            <div
+              className="mt-2.5 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]"
+              data-dollar-trend-decomp
+            >
+              <h4 className="m-0 type-label font-extrabold text-[var(--color-bridge-accent)]">{t.decompTitle}</h4>
+              <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+                <bdi>
+                  {t.decompLine
+                    .replace("{year}", yearLabel(decomp.startJy, locale))
+                    .replace("{g}", fmt.num(decomp.goldX, 0))
+                    .replace("{d}", fmt.num(decomp.dollarX, 0))
+                    .replace("{w}", fmt.num(decomp.globalX, 0))
+                    /* the premium leg lives near ×۱ — two decimals so a
+                       ۱٫۰۴ never collapses into a clean ×۱ */
+                    .replace("{p}", fmt.num(decomp.premiumX, 2))}
+                </bdi>
+              </p>
+              {decomp.shares !== null ? (
+                <>
+                  {/* the stacked share bar — pastel segments (the batch-M
+                      colour law: solid hues stay on the chart's lines),
+                      drawn only when every share reads positive; a leg
+                      that subtracted from the growth steps back to the
+                      numbers alone, never a misleading bar */}
+                  {decomp.shares.rialPct >= 0 && decomp.shares.globalPct >= 0 && decomp.shares.premiumPct >= 0 ? (
+                    <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-border)]/25" aria-hidden="true">
+                      <span style={{ width: `${Math.min(100, Math.max(0, decomp.shares.rialPct))}%`, background: "var(--color-currena-blue)", opacity: 0.5 }} />
+                      <span style={{ width: `${Math.min(100, Math.max(0, decomp.shares.globalPct))}%`, background: "var(--color-accent-gold-strong)", opacity: 0.5 }} />
+                      <span style={{ width: `${Math.min(100, Math.max(0, decomp.shares.premiumPct))}%`, background: "var(--color-bridge-accent)", opacity: 0.5 }} />
+                    </div>
+                  ) : null}
+                  {/* the traditional legend — [square]: name, one entry
+                      per leg, the share beside it */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 type-caption text-[var(--color-text-tertiary)]">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span aria-hidden="true" className="inline-block h-3 w-3 rounded-[3px]" style={{ background: "var(--color-currena-blue)", opacity: 0.55 }} />
+                      {t.decompShareRial}
+                      <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">{fmt.pct(decomp.shares.rialPct, 0)}</bdi>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span aria-hidden="true" className="inline-block h-3 w-3 rounded-[3px]" style={{ background: "var(--color-accent-gold-strong)", opacity: 0.55 }} />
+                      {t.decompShareGlobal}
+                      <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">{fmt.pct(decomp.shares.globalPct, 0)}</bdi>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span aria-hidden="true" className="inline-block h-3 w-3 rounded-[3px]" style={{ background: "var(--color-bridge-accent)", opacity: 0.55 }} />
+                      {t.decompSharePremium}
+                      {/* the premium's share is the smallest leg — one
+                          decimal so a sub-percent share never reads as
+                          a clean zero */}
+                      <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">{fmt.pct(decomp.shares.premiumPct, Math.abs(decomp.shares.premiumPct) < 0.95 ? 1 : 0)}</bdi>
+                    </span>
+                  </div>
+                  <p className="m-0 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]">
+                    <bdi>
+                      {t.decompSharesLine
+                        .replace("{r}", fmt.pct(decomp.shares.rialPct, 0))
+                        .replace("{w}", fmt.pct(decomp.shares.globalPct, 0))
+                        .replace("{p}", fmt.pct(decomp.shares.premiumPct, Math.abs(decomp.shares.premiumPct) < 0.95 ? 1 : 0))}
+                    </bdi>
+                  </p>
+                </>
+              ) : null}
+              <p className="m-0 text-[10.5px] leading-relaxed text-[var(--color-text-tertiary)]/70">{t.decompNote}</p>
+            </div>
+          ) : null}
+
           {/* zone 5 — the sync verdict words + the rolling strip */}
           {sync !== null && sync.bothKnown > 0 ? (
             <div className="mt-3">
@@ -696,26 +860,68 @@ export function DollarTrendBand({
 
           {/* zone 4.5 — the premium arc, the حباب's long arc: the current
               value IS the bridge board's own live computation (one
-              number, never two); the spark shows the complete years */}
+              number, never two); the spark shows the complete years.
+              Batch M: HIDDEN by default (the owner's ask) — the live
+              value stays one tap away on the bridge board above; the
+              arc opens on demand, never pushes itself on the reader */}
           {arc !== null && arc.points.length > 1 ? (
-            <div className="mt-3 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3 ring-1 ring-[var(--color-bridge-accent)]/30">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <h4 className="m-0 type-label font-bold text-[var(--color-bridge-accent)]">{t.premiumTitle}</h4>
+            <div className="mt-3">
+              <button
+                type="button"
+                aria-expanded={arcOpen}
+                aria-controls="gold-dollar-trend-arc"
+                onClick={() => setArcOpen((o) => !o)}
+                className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full bg-[var(--color-bridge-accent)]/10 px-3 py-1 text-[12.5px] font-bold text-[var(--color-bridge-accent)] transition-transform hover:scale-[1.02] active:scale-95"
+                data-dollar-trend-arc-toggle
+              >
+                {t.premiumTitle}
                 {livePremiumPct !== null ? (
-                  <p className="m-0 type-caption font-bold tabular-nums text-[var(--color-text-primary)]" data-dollar-trend-premium>
-                    <bdi>{t.premiumNow.replace("{v}", fmt.pct(livePremiumPct, 1))}</bdi>
-                  </p>
+                  <bdi className="tabular-nums opacity-80">{fmt.pct(livePremiumPct, 1)}</bdi>
                 ) : null}
-              </div>
-              <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.premiumNote}</p>
-              <Sparkline values={arc.points.filter((p) => !p.running).map((p) => p.ratio)} height={44} color="var(--color-accent-gold-strong)" endDot aria-hidden="true" />
-              <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.premiumBridgeNote}</p>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${arcOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+              </button>
+              {arcOpen ? (
+                <div id="gold-dollar-trend-arc" className="mt-2 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3 ring-1 ring-[var(--color-bridge-accent)]/30">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                    <h4 className="m-0 type-label font-bold text-[var(--color-bridge-accent)]">{t.premiumTitle}</h4>
+                    {livePremiumPct !== null ? (
+                      <p className="m-0 type-caption font-bold tabular-nums text-[var(--color-text-primary)]" data-dollar-trend-premium>
+                        <bdi>{t.premiumNow.replace("{v}", fmt.pct(livePremiumPct, 1))}</bdi>
+                      </p>
+                    ) : null}
+                  </div>
+                  <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.premiumNote}</p>
+                  <Sparkline values={arc.points.filter((p) => !p.running).map((p) => p.ratio)} height={44} color="var(--color-accent-gold-strong)" endDot aria-hidden="true" />
+                  <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.premiumBridgeNote}</p>
+                </div>
+              ) : null}
             </div>
           ) : null}
 
-          {/* zone 6 — the method + sources line */}
-          <p className="m-0 mt-3 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">{t.methodLine}</p>
-          <p className="m-0 mt-1 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">{t.sourceLine}</p>
+          {/* zone 6 — the method + sources line. Batch M: behind ONE
+              button (the owner's ask) — the long basis note («مبنا
+              نام‌گذاری‌شده…») and the sources stay one tap away, the
+              section's face stays the verdicts */}
+          <div className="mt-3 flex flex-col gap-1">
+            <button
+              type="button"
+              aria-expanded={methodOpen}
+              aria-controls="gold-dollar-trend-method"
+              onClick={() => setMethodOpen((o) => !o)}
+              className="inline-flex min-h-[32px] w-fit items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+              data-dollar-trend-method-toggle
+            >
+              <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
+              {t.methodOpenLabel}
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${methodOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+            </button>
+            {methodOpen ? (
+              <div id="gold-dollar-trend-method" className="flex flex-col gap-1">
+                <p className="m-0 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">{t.methodLine}</p>
+                <p className="m-0 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">{t.sourceLine}</p>
+              </div>
+            ) : null}
+          </div>
         </>
       )}
     </section>

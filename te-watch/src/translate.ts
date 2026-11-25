@@ -41,6 +41,7 @@
  */
 
 import { getRow, logEvent, type D1Like } from "./pipeline";
+import { faGlossary } from "./glossary";
 
 /** The selected Workers AI translation model (the live bake-off's record — same as the WGC module's). */
 export const TRANSLATION_MODEL = "@cf/google/gemma-4-26b-a4b-it" as const;
@@ -54,7 +55,8 @@ export const TRANSLATION_MODEL = "@cf/google/gemma-4-26b-a4b-it" as const;
 const CHAT_SYSTEM = [
   "You are a professional English-to-Persian (Farsi) translator for gold-market financial commentary.",
   "Translate the given content into fluent, natural Persian (Farsi) — never Arabic.",
-  "Preserve every number, percentage, month and named entity (e.g. Fed, LBMA, WGC) exactly — but write ALL numerals as Persian digits (۰۱۲۳۴۵۶۷۸۹), never Latin digits.",
+  "Preserve every number, percentage and month exactly — but write ALL numerals as Persian digits (۰۱۲۳۴۵۶۷۸۹), never Latin digits.",
+  "Write the well-known institutions and places in their established Persian forms, never in Latin letters: Federal Reserve and the Fed → فدرال رزرو آمریکا، EU → اتحادیه اروپا، US / United States / US dollar → آمریکا / دلار آمریکا، Treasury → خزانه‌داری آمریکا، ECB → بانک مرکزی اروپا. (Ticker symbols like LBMA, WGC, PCE, XAU stay as they are.)",
   "Do not add, omit, or reinterpret any content. Do not explain.",
   'Output STRICT JSON only, no markdown fences: {"headline": <string>, "body": <string>}',
 ].join(" ");
@@ -167,17 +169,23 @@ async function runTranslationModel(ai: AiLike, briefing: ChatBriefing): Promise<
   }
   const fa: ChatBriefing = { headline: p.headline.trim(), body: p.body.trim() };
 
+  // The dictionary pass — the model leaves a few English tokens standing
+  // (دلار US, Federal Reserve, EU, Fed); the established Persian forms
+  // replace them before anything is judged or stored (the page's own
+  // render-side twin heals the rows already stored).
+  const glossed: ChatBriefing = { headline: faGlossary(fa.headline), body: faGlossary(fa.body) };
+
   // The identity discipline, per string: an output equal to its source is
   // a non-translation — exactly the observed llama-4-scout failure mode
   // (untranslated headings), refused here, never stored.
-  if (fa.headline === briefing.headline) {
+  if (glossed.headline === briefing.headline) {
     throw new Error("the headline came back untranslated — not a translation");
   }
-  if (fa.body === briefing.body) {
+  if (glossed.body === briefing.body) {
     throw new Error("the body came back untranslated — not a translation");
   }
 
-  return fa;
+  return glossed;
 }
 
 /* ------------------------------------------------------------------ *

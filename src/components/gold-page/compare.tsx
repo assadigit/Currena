@@ -153,6 +153,12 @@ function useElementWidth<T extends HTMLElement>() {
  * is never the sole carrier). Bars grow from a zero baseline, negative
  * returns drop below it. The yields never join: a rate's pp is not a %
  * return — the scorecard keeps their honest unit.
+ *
+ * Batch M: the bars ride PASTEL fills (the owner's ask — the solid
+ * hues hurt the eye; only the chart's lines stay solid), and the
+ * negative bars keep a SAFE SPACE from the asset names under them (a
+ * deep negative's value label once collided with the name row — the
+ * name row now sits below a reserved band the bars never enter).
  */
 function CompareBars({ t, rows, fmt, enabled, window: w }: { t: CmpT; rows: CompareRow[]; fmt: Fmt; enabled: Record<LineId, boolean>; window: WindowKey }) {
   const assets = rows.filter((r) => r.pct !== null && enabled[r.line.id]);
@@ -166,9 +172,12 @@ function CompareBars({ t, rows, fmt, enabled, window: w }: { t: CmpT; rows: Comp
       : t.barsTitleYears.replace("{n}", fmt.num(months / 12, 0));
   if (assets.length === 0) return null;
   const W = Math.max(320, Math.min(640, Math.round(measured ?? 640)));
-  const H = 168;
+  const H = 176;
   const padT = 18;
-  const padB = 26;
+  /* the reserved name band — the bars and their value labels never
+     enter it (the safe space the owner asked for: a deep negative bar
+     used to collide with the asset's name under it) */
+  const padB = 48;
   const values = assets.map((r) => r.pct ?? 0);
   const vmax = Math.max(0, ...values);
   const vmin = Math.min(0, ...values);
@@ -197,9 +206,13 @@ function CompareBars({ t, rows, fmt, enabled, window: w }: { t: CmpT; rows: Comp
           const cx = slot * i + slot / 2;
           const h = (Math.abs(v) / span) * plotH;
           const top = v >= 0 ? y0 - h : y0;
-          const labelY = v >= 0 ? top - 6 : top + h + 12;
+          /* the negative value label never leaves the plot band — the
+             name row below is reserved, never entered */
+          const labelY = v >= 0 ? top - 6 : Math.min(top + h + 12, H - padB - 8);
           return (
             <g key={r.line.id}>
+              {/* the pastel fill (batch M) — the solid hue stays on the
+                  chart's lines; a soft 40% tint carries the bar */}
               <rect
                 x={cx - barW / 2}
                 y={top}
@@ -207,12 +220,12 @@ function CompareBars({ t, rows, fmt, enabled, window: w }: { t: CmpT; rows: Comp
                 height={Math.max(2, h)}
                 rx={4}
                 fill={r.line.color}
-                opacity={0.88}
+                fillOpacity={0.4}
               />
               <text x={cx} y={labelY} textAnchor="middle" fontSize={11} fontWeight={800} fill="var(--color-text-primary)">
                 {fmt.pct(v, 1)}
               </text>
-              <text x={cx} y={H - 8} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-text-secondary)">
+              <text x={cx} y={H - 10} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-text-secondary)">
                 {r.name}
               </text>
             </g>
@@ -352,7 +365,10 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
                     : "bg-[var(--color-surface)] text-[var(--color-text-tertiary)] ring-1 ring-[var(--color-border)]"
               }`}
             >
-              <span aria-hidden="true" className={`inline-block h-[3px] w-[14px] rounded-full ${on ? "" : "opacity-30"}`} style={{ background: line.color }} />
+              {/* the traditional legend swatch (batch M): a colour
+                  SQUARE beside the name — [square]: bitcoin — not a
+                  line; still the toggle it always was */}
+              <span aria-hidden="true" className={`inline-block h-3 w-3 rounded-[3px] ${on ? "" : "opacity-30"}`} style={{ background: line.color }} />
               {t.assets[line.id]}
             </button>
           );
@@ -450,7 +466,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
                         >
                           <th scope="row" className="px-2 py-1.5 text-start font-bold">
                             <span className="inline-flex items-center gap-1.5">
-                              <span aria-hidden="true" className="inline-block h-[3px] w-[14px] rounded-full" style={{ background: row.line.color }} />
+                              <span aria-hidden="true" className="inline-block h-3 w-3 rounded-[3px]" style={{ background: row.line.color }} />
                               <span className="text-[var(--color-text-primary)]">{row.name}</span>
                             </span>
                           </th>
