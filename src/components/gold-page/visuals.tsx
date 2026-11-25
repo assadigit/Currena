@@ -568,6 +568,30 @@ export function SignedDelta({ v, fmt, ariaHidden, big }: { v: number | null; fmt
   );
 }
 
+/**
+ * The percentage-point delta — a rate's honest daily change (a yield
+ * moving 2.77 → 2.79 is +0.02pp, never "percent of a rate"). Neutral
+ * direction ink like its sibling SignedDelta (up reads green, down
+ * red); the compare scorecard keeps its own gold-lens yield law.
+ */
+export function PpDelta({ v, fmt, unit, ariaHidden }: { v: number | null; fmt: Fmt; unit: string; ariaHidden?: boolean }) {
+  if (v === null || !Number.isFinite(v)) return <bdi className="type-caption text-[var(--color-text-tertiary)]" aria-hidden={ariaHidden}>·</bdi>;
+  if (v === 0) {
+    // the compare scorecard's own yield law: zero renders signless, neutral
+    return (
+      <bdi dir="ltr" className="type-caption font-bold tabular-nums text-[var(--color-text-secondary)]" aria-hidden={ariaHidden}>
+        {fmt.num(0, 2)} {unit}
+      </bdi>
+    );
+  }
+  const down = v < 0;
+  return (
+    <bdi dir="ltr" className={`type-caption font-bold tabular-nums ${down ? "text-[var(--color-return-down)]" : "text-[var(--color-return-up)]"}`} aria-hidden={ariaHidden}>
+      {down ? "▼" : "▲"} {v > 0 ? "+" : ""}{fmt.num(Math.abs(v), 2)} {unit}
+    </bdi>
+  );
+}
+
 /* ------------------------------------------------------------------ *
  * LaneBar — the one lane-summary renderer (the S4 LaneBar)
  * ------------------------------------------------------------------ */

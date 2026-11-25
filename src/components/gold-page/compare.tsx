@@ -37,7 +37,7 @@ type CmpT = {
   worstLine: string;
   bestLossLine: string;
   worstLossLine: string;
-  assets: { gold: string; silver: string; btc: string; spx: string; realYield: string };
+  assets: { gold: string; silver: string; btc: string; spx: string; realYield: string; nominalYield: string };
   toggleLabel: string;
   tableTitle: string;
   colAsset: string;
@@ -45,10 +45,16 @@ type CmpT = {
   colEnd: string;
   colChange: string;
   unitPp: string;
+  sourceNote: string;
   unavailable: string;
 };
 
-type LineId = "gold" | "silver" | "btc" | "spx" | "realYield";
+type LineId = "gold" | "silver" | "btc" | "spx" | "realYield" | "nominalYield";
+
+/* the two rate lines — they ride the right axis at their true % level
+   and never join the assets' best/worst contest (a rate is not an
+   asset; the nominal is the opt-in toggle line, default off) */
+const YIELD_IDS: ReadonlySet<LineId> = new Set(["realYield", "nominalYield"]);
 
 /* the correlation lesson's own copy — the leg merged in from the old
    standalone section */
@@ -71,6 +77,7 @@ type CorrT = {
 const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }> = [
   { id: "gold", color: "var(--color-accent-gold-strong)" },
   { id: "realYield", color: "var(--color-status-context)", dashed: true },
+  { id: "nominalYield", color: "var(--color-bridge-accent)", dashed: true },
   { id: "silver", color: "var(--color-text-secondary)" },
   { id: "btc", color: "var(--color-currena-blue)" },
   { id: "spx", color: "var(--color-chip-ink-context)" },
@@ -109,10 +116,13 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
      alternatives), one tap away */
   const [corrOpen, setCorrOpen] = React.useState(false);
   /* which lines ride the chart — every asset on by default, each one
-     toggleable (gold against the S&P alone, or any subset) */
+     toggleable (gold against the S&P alone, or any subset); the
+     nominal yield is the opt-in line (default off — the owner's chart
+     keeps its real-yield line) */
   const [enabled, setEnabled] = React.useState<Record<LineId, boolean>>({
     gold: true,
     realYield: true,
+    nominalYield: false,
     silver: true,
     btc: true,
     spx: true,
@@ -124,11 +134,11 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
     retry: 1,
   });
 
-  /* every ASSET indexed to 100 at the window's start (left axis); the real
-     yield rides its own honest right axis at its true % level — a rate is
-     not an asset, and the dual axis says so instead of a nonsense index.
-     The lines ride a heavier stroke (the owner asked for a little more
-     width). */
+  /* every ASSET indexed to 100 at the window's start (left axis); the
+     two yields ride their own honest right axis at their true % level —
+     a rate is not an asset, and the dual axis says so instead of a
+     nonsense index. The lines ride a heavier stroke (the owner asked
+     for a little more width). */
   const series = React.useMemo(() => {
     if (data === undefined) return [];
     const out: TraceSeriesDef[] = [];
@@ -136,7 +146,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
       if (!enabled[line.id]) continue;
       const leg = data.legs.find((l) => l.id === line.id);
       if (leg === undefined) continue;
-      if (line.id === "realYield") {
+      if (YIELD_IDS.has(line.id)) {
         const cutoff = cutoffOf(leg.points[leg.points.length - 1]!.d, window);
         const slice = leg.points.filter((p) => Date.parse(`${p.d}T00:00:00Z`) >= cutoff);
         if (slice.length < 2) continue;
@@ -168,7 +178,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
       const cutoff = cutoffOf(leg.points[leg.points.length - 1]!.d, window);
       const slice = leg.points.filter((p) => Date.parse(`${p.d}T00:00:00Z`) >= cutoff);
       if (slice.length < 2) return null;
-      if (line.id === "realYield") {
+      if (YIELD_IDS.has(line.id)) {
         const delta = slice[slice.length - 1]!.v - slice[0]!.v;
         return { line, name: t.assets[line.id], pct: null, start: slice[0]!.v, end: slice[slice.length - 1]!.v, deltaPp: Number.isFinite(delta) ? delta : null };
       }
@@ -176,11 +186,11 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
       return { line, name: t.assets[line.id], pct: Number.isFinite(pct) ? pct : null, start: slice[0]!.v, end: slice[slice.length - 1]!.v, deltaPp: null };
     }).filter((r) => r !== null) as Array<{ line: (typeof LINE_ORDER)[number]; name: string; pct: number | null; start: number; end: number; deltaPp: number | null }>;
   }, [data, window, t.assets]);
-  /* the window's best and the worst (the assets' own % change; the real
-     yield is a rate and never joins the contest) — named, with the
+  /* the window's best and the worst (the assets' own % change; the
+     yields are rates and never join the contest) — named, with the
      number, for the one-line summary above the scorecard */
   const extremes = React.useMemo(() => {
-    const ranked = rows.filter((r) => r.pct !== null && r.line.id !== "realYield");
+    const ranked = rows.filter((r) => r.pct !== null && !YIELD_IDS.has(r.line.id));
     if (ranked.length < 2) return { best: null as string | null, worst: null as string | null, bestId: null as string | null, worstId: null as string | null, bestPct: null as number | null, worstPct: null as number | null };
     const sorted = [...ranked].sort((a, b) => (a.pct ?? 0) - (b.pct ?? 0));
     const best = sorted[sorted.length - 1]!;
@@ -301,7 +311,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
                   </thead>
                   <tbody>
                     {rows.map((row) => {
-                      const isYield = row.line.id === "realYield";
+                      const isYield = YIELD_IDS.has(row.line.id);
                       const money = row.line.id === "gold" || row.line.id === "silver" || row.line.id === "btc";
                       const fmtLevel = (v: number) =>
                         isYield ? `${fmt.num(v, 2)}%` : money ? `$${fmt.num(v, 2)}` : fmt.num(v, 2);
@@ -359,6 +369,9 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
                   </tbody>
                 </table>
               </div>
+              {/* the band's own sources — every leg named, FRED for both
+                  yields (the real-yield re-sourcing; the honest line) */}
+              <p className="m-0 mt-1.5 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.sourceNote}</p>
             </div>
           ) : null}
         </>

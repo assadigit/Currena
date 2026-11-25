@@ -1,0 +1,106 @@
+{
+  "captured_at": "2026-11-25T01:52:40.547Z",
+  "method": "plain GETs of fredgraph.csv with the desk's identified user agent (the compare leg's own convention); the archive leg reads db/custom.db strictly read-only via bun:sqlite",
+  "series": {
+    "DFII10": {
+      "title": "Market Yield on U.S. Treasury Securities at 10-Year Constant Maturity, Quoted on an Investment Basis, Inflation-Indexed",
+      "what_it_is": "the 10-year TIPS constant-maturity REAL yield, percent, not seasonally adjusted, daily (business days)",
+      "source": "Board of Governors of the Federal Reserve System (H.15)",
+      "endpoint": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFII10",
+      "http_status": 200,
+      "response_ms": 52,
+      "bytes": 99683,
+      "csv_header": "observation_date,DFII10",
+      "series_start": "2003-01-02",
+      "latest_observation_date": "2026-11-23",
+      "latest_value": 2.79,
+      "rows_full_history": 6233,
+      "missing_marker_rows_full_history": 256,
+      "rows_trailing_400_calendar_days": 285,
+      "missing_marker_rows_trailing_window": 12,
+      "cosd_trim_verified": true,
+      "cosd_used": "2025-10-21"
+    },
+    "DGS10": {
+      "title": "Market Yield on U.S. Treasury Securities at 10-Year Constant Maturity, Quoted on an Investment Basis",
+      "what_it_is": "the 10-year Treasury constant-maturity NOMINAL yield, percent, not seasonally adjusted, daily (business days)",
+      "source": "Board of Governors of the Federal Reserve System (H.15)",
+      "endpoint": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10",
+      "http_status": 200,
+      "response_ms": 58,
+      "bytes": 269503,
+      "csv_header": "observation_date,DGS10",
+      "series_start": "1962-01-02",
+      "latest_observation_date": "2026-11-23",
+      "latest_value": 4.92,
+      "rows_full_history": 16930,
+      "missing_marker_rows_full_history": 722,
+      "rows_trailing_400_calendar_days": 285,
+      "missing_marker_rows_trailing_window": 12,
+      "cosd_trim_verified": true,
+      "cosd_used": "2025-10-21"
+    }
+  },
+  "calendar": {
+    "trailing_window_rows": 285,
+    "trailing_window_rows_with_value": 273,
+    "missing_value_dates_in_window": [
+      "2025-11-11",
+      "2025-11-27",
+      "2025-12-25",
+      "2026-01-01",
+      "2026-01-19",
+      "2026-02-16",
+      "2026-05-25",
+      "2026-06-19",
+      "2026-07-03",
+      "2026-09-07",
+      "2026-10-12",
+      "2026-11-11"
+    ],
+    "missing_value_convention": "bond-market holidays print as date-only rows (empty value cell, sometimes '.') — dropped by the parser, never stored",
+    "trailing_window_common_days": 273,
+    "dfii_dgs10_identical_calendars": true,
+    "latest_common_date": "2026-11-23",
+    "derived_10y_breakeven_percent": {
+      "value": 2.13,
+      "formula": "DGS10 − DFII10",
+      "as_of": "2026-11-23"
+    }
+  },
+  "grounded_grid_impact": {
+    "archive": "db/custom.db (sandbox archive, read-only)",
+    "grid_current_common_trading_days": 251,
+    "grid_with_fred_common_trading_days": 249,
+    "dates_dropped_by_fred_bond_calendar": [
+      "2026-10-12",
+      "2026-11-11"
+    ],
+    "min_live_depth": 200,
+    "verdict": "PASS — the grid keeps ≥ 200 common trading days; no cosd widening needed (FRED history is free back to 2003 if it ever is)",
+    "binding_constraint": "the EODHD trailing-year fetch window (FETCH_WINDOW_DAYS = 380) — the FRED bond calendar is wider than the grid in every observed window"
+  },
+  "bug_as_found": {
+    "file": "src/lib/gold/sources/eodhd.ts",
+    "registry_entry": {
+      "dataset": "realYield",
+      "symbol": "^TNX.US",
+      "mode": "live-proxy",
+      "note": "Real-yield proxy: no TIPS real-yield series on this plan; the 10Y nominal Treasury yield stands in for it."
+    },
+    "mislabel_surface": "the gold page dashboard's first indicator card (indicators.realYield) reads Observation.dataset = 'realYield' (the ^TNX nominal closes) under the label 'Real 10y yield' / «بازده واقعی ۱۰ساله»",
+    "observed_mislabel_value": 4.92,
+    "true_real_yield_same_day": 2.79
+  },
+  "cron_inventory": {
+    "plan": "Workers Free — 5 cron triggers per account",
+    "used": 5,
+    "workers": {
+      "currena-api": "* * * * *",
+      "currena-markets": "0,30,50 1,7,8,23 * * *",
+      "currena-wgc-watch": "30 9 1-15 * * * + 30 9 17-25/2 * * *",
+      "currena-te-watch": "0 5,16 * * *"
+    },
+    "consequence": "no new cron worker — the FRED sync rides the desk's existing pull-on-render once-per-UTC-day gate (2 small CSV GETs, no key, no quota)"
+  }
+}
