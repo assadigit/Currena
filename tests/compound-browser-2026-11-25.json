@@ -17,9 +17,14 @@
       "detail": "range: If it goes worse: about 40,600. If it goes better: about 62,"
     },
     {
+      "id": "18-plain-language",
+      "pass": true,
+      "detail": "jargon: [], avg 15 words over 6 sentences"
+    },
+    {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 221ms"
+      "detail": "3 one-tap changes in 265ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -189,7 +194,7 @@
     }
   ],
   "summary": {
-    "total": 38,
+    "total": 39,
     "failed": 0
   }
 }

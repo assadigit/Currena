@@ -96,6 +96,42 @@ async function main() {
     `range: ${(rangeText ?? "").slice(0, 60)}`,
   );
 
+  // Test 18: plain language on the default screen (the first viewport):
+  // no banned jargon, average sentence length ≤ 15 words.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(300);
+  const plainLanguage = await page.evaluate(() => {
+    const vp = window.innerHeight;
+    const els = [...document.querySelectorAll("main h1, main h2, main p, main span, main label, main button, main div")]
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top >= 0 && r.top < vp && el.children.length === 0 && el.textContent.trim().length > 0;
+      })
+      .map((el) => el.textContent.trim());
+    const text = [...new Set(els)].join(" ");
+    const banned = [
+      "CAGR", "compound interest", "annualised", "annualized", "nominal", "real return",
+      "volatility", "ETF", "index fund", "dividend", "yield", "ROI", "APY",
+      "basis point", "expense ratio", "dollar-cost", "hedged", "total return",
+      "net present value", "risk-adjusted", "p.a.", "AUM", "drawdown", "alpha",
+      "benchmark", "securities", "equities", "portfolio",
+    ];
+    const hits = banned.filter((b) => new RegExp(b, "i").test(text));
+    const sentences = text.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 3);
+    const avgWords =
+      sentences.length === 0
+        ? 0
+        : sentences.reduce((n, s) => n + s.trim().split(/\s+/).length, 0) / sentences.length;
+    return { hits, avgWords: Math.round(avgWords * 10) / 10, sentenceCount: sentences.length };
+  });
+  check(
+    "18-plain-language",
+    plainLanguage.hits.length === 0 && plainLanguage.avgWords <= 15,
+    `jargon: ${JSON.stringify(plainLanguage.hits)}, avg ${plainLanguage.avgWords} words over ${plainLanguage.sentenceCount} sentences`,
+  );
+  await page.setViewportSize({ width: 1280, height: 900 });
+
   // Test 15: two taps to change the main question.
   const t0 = Date.now();
   await page.click('[data-cw="amount-200"]');
