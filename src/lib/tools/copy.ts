@@ -147,6 +147,7 @@ export interface ToolsCopy {
     headline: string;
     strong: string;
     rounding: string;
+    exactHint: string;
     formulaEqual: string;
     formulaWeighted: string;
     sumLine: string;
@@ -389,8 +390,9 @@ const EN: ToolsCopy = {
     personDefault: "Person {n}",
     shareOf: "{name}'s share",
     headline: "The whole is divided: {total} among {n} — {share} {each}.",
-    strong: "The split covers the whole; nothing is left over and nothing is invented.",
+    strong: "The exact split covers the whole; nothing is left over and nothing is invented.",
     rounding: "Shares are rounded for reading; the exact split is shown beside each share.",
+    exactHint: "exact: {value}",
     formulaEqual: "Each share = the whole ÷ the number of people",
     formulaWeighted: "Each share = the whole × the person's weight ÷ the sum of weights",
     sumLine: "Shares together: {sum} (the whole: {total})",
@@ -634,8 +636,9 @@ const FA: ToolsCopy = {
     personDefault: "نفر {n}",
     shareOf: "سهم {name}",
     headline: "کل تقسیم می‌شود: {total} میان {n} نفر — {share} {each}.",
-    strong: "تقسیم، همهٔ مبلغ را می‌پوشاند؛ نه چیزی می‌ماند، نه چیزی از خود ساخته می‌شود.",
+    strong: "تقسیمِ دقیق، همهٔ مبلغ را می‌پوشاند؛ نه چیزی می‌ماند، نه چیزی از خود ساخته می‌شود.",
     rounding: "سهم‌ها برای خواندن گرد شده‌اند؛ رقم دقیق کنار هر سهم نوشته شده است.",
+    exactHint: "دقیق: {value}",
     formulaEqual: "سهم هر نفر = کل ÷ تعداد نفرها",
     formulaWeighted: "سهم هر نفر = کل × وزنِ او ÷ مجموع وزن‌ها",
     sumLine: "جمع سهم‌ها: {sum} (کل: {total})",

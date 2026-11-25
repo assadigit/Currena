@@ -150,8 +150,18 @@ function DangBody({ locale }: { locale: Locale }) {
                     clampRange={[0.1, 100, 0.1]}
                   />
                 ) : null}
-                <span className="ms-auto text-[12.5px] font-extrabold tabular-nums text-[var(--color-currena-blue-deep)]">
-                  {fmtMoney(shares[i]?.rounded ?? 0, locale, digits)} {unit}
+                <span className="ms-auto flex flex-col items-end gap-0.5 leading-tight">
+                  <span className="text-[12.5px] font-extrabold tabular-nums text-[var(--color-currena-blue-deep)]">
+                    {fmtMoney(shares[i]?.rounded ?? 0, locale, digits)} {unit}
+                  </span>
+                  {shares[i] && Math.abs(shares[i].exact - shares[i].rounded) > 0.005 ? (
+                    <span className="text-[10.5px] font-semibold tabular-nums text-[var(--color-text-tertiary)]">
+                      {t.exactHint.replace(
+                        "{value}",
+                        fmtMoney(shares[i].exact, locale, 2)
+                      )}
+                    </span>
+                  ) : null}
                 </span>
                 {people.length > 2 ? (
                   <RemoveButton

@@ -2825,3 +2825,61 @@ pages the moment the bundle lands.
   Then live-verify currena.ir/tools (all nine cards) and each tool
   page in fa + EN, dark + 375px, zero console errors, and append the
   deploy record here.”
+
+## The tools-suite deploy record — the new token passes the versioned upload; currena.ir/tools is live (2026-11-25, the deploy sitting)
+
+The owner's next token (used env-only, never stored or printed) does
+what the record above asked: it verifies ACTIVE, reads the account's
+workers AND the services endpoint, and — the gate that mattered — the
+**versioned upload accepts it** (`opennextjs-cloudflare deploy` →
+`PUT /accounts/…/workers/services/currena-gold-desk`), the exact
+call the previous `cfut_` token failed with `10405`.
+
+### Deploy 1 — the tools suite ships
+
+Version `63306026-089a-4ce2-9010-3dd65cbb4696` on currena-gold-desk
+(routes currena.ir/tools and /tools/* now serve the nine tools;
+/gold untouched). The live walk:
+
+- All twelve routes 200: /tools, the nine tool pages, /gold, and
+  /gold/api/gold/rates (the production fetch path the tools' hook
+  reads).
+- The index shows all nine cards, grouped Wealth / Currency / Gold /
+  Shared money, in EN and fa (every Persian name exactly as the owner
+  wrote it), dark mode, and 375px with no horizontal overflow.
+- Every tool page: correct title, zero console errors, zero page
+  errors, no 375px overflow.
+- Live data end to end: the converter 100 USD → 29,289,000 toman on
+  the stated rate 292,890 (inverse stated too); the board USD
+  292,890 / EUR 321,800 with each row's day range and the last-read
+  timestamp; the gold hub 5 g 18k → 127,377,500 toman, the mesghal
+  cross-check (110,354,822 at the live gram price vs the live quote
+  110,345,000 — 0.009% apart), karat 10 g 18 → 7.5 g 24 worth
+  254,752,500; the settlement's sample (1,500,000 among 3 → per head
+  500,000, two minimal transfers); the receipt's form + preview +
+  print path; the desk calculator's base rate prefilled from the live
+  board (Source: 292,890); the batch converter's holdings + one
+  target.
+
+### The improvement the walk found — dang's exact figure, promised but never rendered
+
+The dang page's own copy said «the exact split is shown beside each
+share» — but the UI never rendered `exact`; only the rounded share
+appeared. Fixed: the exact figure now renders under each share
+(EN «exact: 333,333.33», fa «دقیق: ۳۳۳٬۳۳۳٫۳۳», Persian digits), and
+the line is hidden when rounding loses nothing (a 2-way split of
+1,000,000 shows a clean 500,000 with no hint). The strong line now
+says "The exact split covers the whole" — coherent with the
+sum-of-rounded line beside it. Lint green, tsc clean, the 20/20
+maths tests green; dev-verified in EN and fa.
+
+### Deploy 2 — the fix ships
+
+Version `e761a753-7798-44a4-9f1e-dbbbbfe97fce`, live-verified
+(«333,000 toman / exact: 333,333.33» on currena.ir/tools/dang, zero
+console errors). Record PNGs: `tests/tools-suite-live/01…07` (index
+EN / fa / fa-dark / fa-dark-375, the live board, the dang fix fa on
+dev and EN live).
+
+Nothing else was touched: currena-api and every other worker stand
+as they were; the main site's own converter page is untouched.
