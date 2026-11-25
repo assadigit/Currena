@@ -2684,3 +2684,144 @@ fixed typing — and the route sweep green (`/gold`, every
 untouched). Deployed on the two-step OpenNext runbook
 (`NEXT_PUBLIC_BASE_PATH=/gold` on BOTH build and deploy), live PNGs
 tests/batchh-01…04.
+
+## The tools suite — all nine tools consolidated on currena.ir/tools (2026-11-25, the tools sitting)
+
+The owner's instruction: add the nine tools to currena.ir/tools and
+consolidate everything there, improving the family over time. The
+list (verbatim intent): مبدل ارز، محاسبه ثروت مرکب (already live),
+محاسبه گرهای طلا as a dedicated tool that imports all gold tools onto
+one page، تابلوی نرخ های لحظه ای، ماشین حساب ارزی، رسیدساز ارزی،
+محاسبه دنگ، تسویه گروهی، تبدیل گروهی ارزها.
+
+### What was built (branch feat/tools-suite, from compound-wealth 1fc1a887)
+
+- **The consolidation seam** — `src/lib/tools/registry.ts`: ONE list of
+  every tool (slug, group, bilingual title + one line). The index, every
+  tool page's shell (breadcrumb + tab title) and the gold hub's nav all
+  read from it; adding a tool later = one entry + one page. The groups:
+  Wealth (ثروت) / Currency (ارز) / Gold (طلا) / Shared money (پول مشترک).
+- **The live seam** — `src/lib/tools/rates.ts`: one client hook over the
+  desk's own `/api/gold/rates` route (the currena-api snapshot: 17 FX
+  rows quoted foreign-units-per-toman + 10 gold rows), 60-second poll,
+  fail-closed honest states; plus the pure cross-rate helpers.
+- **The eight new pages** (all under the public /tools URLs, EN + fa/RTL
+  on the compound chrome, Persian digits and the Persian calendar at
+  render time, mobile-first 375px, dark mode):
+  - `/tools/currency-converter` — مبدل ارز: any two currencies through
+    the toman, the rate and its inverse stated, quick amounts.
+  - `/tools/live-rates` — تابلوی نرخ‌های لحظه‌ای: the whole board (17
+    currencies in toman-per-unit with each row's own day range; all 10
+    gold rows, the ounce in USD), auto-refresh every minute.
+  - `/tools/currency-calculator` — ماشین‌حساب ارزی: the exchange desk's
+    maths (sell to / buy from the customer, a base rate prefilled from
+    the live board, a margin; the quote, the toman total and the
+    desk's own margin come out — stated, never hidden).
+  - `/tools/exchange-receipt` — رسیدساز ارزی: the deal form + the
+    receipt preview + the print path (the digest-printing contract
+    restated: body.receipt-printing, ink on white, 76mm).
+  - `/tools/gold-calculators` — محاسبه‌گرهای طلا, the gold hub: ALL the
+    gold tools imported onto one dedicated page (the owner's
+    instruction) with an in-page nav — the value calculator (karats
+    24/22/18/14/12 on live prices; 24k and 18k from their own rows,
+    every other karat from the 24k row at purity ratio), the
+    jewellery-invoice fold (اجرت + سود, VAT on the wage + profit only —
+    the market's own rule), the mesghal ↔ grams converter on both bases
+    (۴٫۶۰۸۳ g 17k / ۴٫۳۳۱۸ g 18k, the kimiadevelop/saatchi formulation,
+    cross-checked against the live board: مظنه ÷ ۴٫۳۳۱۸ ≈ گرم ۱۸), the
+    karat conversion (وزن × عیار مبدأ ÷ عیار مقصد), and today's gold
+    board with the desk one link away.
+  - `/tools/dang` — محاسبه دنگ: «دنگ کردن», the fair split. Equal mode
+    is the common convention (each share = the whole ÷ the number of
+    people — the capora formulation); weighted mode carries the same
+    whole by per-person weights. Shares rounded for reading, the exact
+    figure stated, the sum checked against the whole.
+  - `/tools/group-settlement` — تسویه گروهی: expenses as paid, net
+    balances, then the smallest set of transfers that squares everyone
+    (greedy pairing, never more than people − 1).
+  - `/tools/batch-converter` — تبدیل گروهی ارزها: several lines, one
+    target (toman by default), the total.
+- **The revived index** — registry-driven, grouped, bilingual; the main
+  site's own converter stays linked under «از سایت اصلی» (its page
+  untouched, the original spec's rule).
+- **The chrome opened to the family** — chrome.tsx's prop types loosened
+  to the structural `ToolsChromeCopy` (the compound pages unchanged);
+  the shared atoms in `src/components/tools/atoms.tsx` restate the
+  compound tool's own controls (the typing-surviving NumberField, the
+  chips, the fold, the pickers).
+
+### The verification
+
+- `bun run lint` green; tsc clean on every new file (the repo's
+  pre-existing tolerated errors untouched).
+- **20/20 maths tests** (`bun test tests/tools-maths.test.ts`): the
+  rates direction against the live snapshot's own convention (the API's
+  USD rate is exactly 1/292,890 toman), the fair split (equal +
+  weighted + the rounding), the settlement (the four-person sample's
+  minimal three transfers; people − 1 bound), the gold constants (both
+  mesghal bases, the live-board cross-check مظنه ÷ ۴٫۳۳۱۸ ≈ گرم ۱۸,
+  the karat rule, the VAT-on-wage-only invoice), the receipt totals.
+- **The browser walk** (agent-browser, the dev server on :3000): all
+  ten routes 200; zero console errors, zero page errors; 375px with no
+  horizontal overflow on every page; fa/RTL + Persian digits verified
+  («مبدل ارز · کورنا», ۱۰۰ دلار آمریکا → ۲۹۲٬۸۹۰ تومان); dark mode;
+  live data through the whole stack (converter 100 USD → 29,289,000
+  toman on the exact live rate; the board 17 + 10 rows; the desk
+  calculator's 1٪ margin → 295,819/29,581,890/292,890; the hub's 5 g
+  18k → 127,377,500 on the live gram price; the receipt's payable
+  29,289,000 with the live-prefilled rate; the settlement's «Zhaleh
+  pays Nima/Arash/Sara»). Record PNGs: `tests/tools-suite/01…08`.
+- **The production mounting verified on workerd** (`wrangler dev`,
+  the OpenNext bundle built with `NEXT_PUBLIC_BASE_PATH=/gold`):
+  /tools, /tools/dang, /tools/gold-calculators 200 through the
+  worker-entry rewrite; `/gold/api/gold/rates` 200 (the production
+  fetch path the tools' hook uses); /gold 200 untouched; /tools/ →
+  301 /tools; /gold/tools/dang → 301 /tools/dang. The bundle is
+  production-correct.
+
+### The deploy — blocked by the token's authentication scheme (stated honestly)
+
+The owner's fresh `cfut_` token (used env-only, never stored or
+printed) verifies ACTIVE, reads the account's workers (sees
+currena-gold-desk + currena-api), and is AUTHORIZED on the classic
+`PUT /workers/scripts/{name}` endpoint (a probe passed authz into
+module validation) — but the **versioned upload** that wrangler 4.166's
+deploy performs (`PUT /accounts/…/workers/services/{name}`) is rejected
+with `10405 — Method not allowed for this authentication scheme` (and
+`10000` on the real run). The assets-upload-session endpoint accepts
+the token; the classic script upload accepts the token; only the
+services/versioned write refuses this scheme. The previous deploys
+ran on a token that the services endpoint accepted.
+
+**What is needed to ship the bundle** (it is built and
+production-verified in `.open-next/`): an API token the versioned
+upload accepts — the “Edit Cloudflare Workers” template (Workers
+Scripts: Edit + Workers Deployments: Edit + D1: Edit + Zone → Workers
+Routes: Edit for currena.ir + Account Settings: Read) — then the
+runbook verbatim:
+
+```
+NEXT_PUBLIC_BASE_PATH=/gold CLOUDFLARE_API_TOKEN=<token> \
+  CLOUDFLARE_ACCOUNT_ID=5f123468027e4b2094167df1d2f2e852 \
+  bun run worker:deploy
+```
+
+(The build step is already done and green; only the deploy fires.)
+
+Nothing on the live site was touched: currena-gold-desk continues
+serving the previous deploy; currena-api untouched; the routes
+(currena.ir/tools and /tools/*, already claimed) will serve the new
+pages the moment the bundle lands.
+
+### The close-out
+
+- Pushed to **feat/tools-suite** (never force main — the programme
+  convention).
+- The next session's copy-paste prompt: “The tools suite is on
+  feat/tools-suite, browser-verified and workerd-verified, with
+  `.open-next/` built. Deploy it: the runbook is at the end of the
+  tools-suite record in AGENTS.md — it needs a token that the
+  versioned upload accepts (the Edit Cloudflare Workers template).
+  Then live-verify currena.ir/tools (all nine cards) and each tool
+  page in fa + EN, dark + 375px, zero console errors, and append the
+  deploy record here.”
