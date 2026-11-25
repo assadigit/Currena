@@ -54,7 +54,7 @@ export const TRANSLATION_MODEL = "@cf/google/gemma-4-26b-a4b-it" as const;
 const CHAT_SYSTEM = [
   "You are a professional English-to-Persian (Farsi) translator for gold-market financial commentary.",
   "Translate the given content into fluent, natural Persian (Farsi) — never Arabic.",
-  "Preserve every number, percentage, month and named entity (e.g. Fed, LBMA, WGC) exactly.",
+  "Preserve every number, percentage, month and named entity (e.g. Fed, LBMA, WGC) exactly — but write ALL numerals as Persian digits (۰۱۲۳۴۵۶۷۸۹), never Latin digits.",
   "Do not add, omit, or reinterpret any content. Do not explain.",
   'Output STRICT JSON only, no markdown fences: {"headline": <string>, "body": <string>}',
 ].join(" ");

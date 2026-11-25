@@ -265,14 +265,14 @@ export const UI = {
       eyebrow: "The comparison",
       title: "Gold's return against the alternatives",
       subtitle:
-        "The 10-year real and nominal yields, silver, Bitcoin and the S&P 500 against gold itself: what holding each would have done over the window, one line each (the yields are rates — their lines ride their own true-% right axis).",
+        "The 10-year real yield, silver, Bitcoin and the S&P 500 against gold itself: what holding each would have done over the window, one line each (the yield is a rate — its line rides its own true-% right axis).",
       windowLabel: "Window",
-      ranges: { "3M": "3 months", "6M": "6 months", "1Y": "1 year", "3Y": "3 years", "5Y": "5 years" },
+      ranges: { "3M": "3 months", "6M": "6 months", "1Y": "1 year", "3Y": "3 years", "5Y": "5 years", "10Y": "10 years" },
       bestLine: "Best gain: {name} {pct}",
       worstLine: "lowest gain: {name} {pct}",
       bestLossLine: "smallest loss: {name} {pct}",
       worstLossLine: "Biggest loss: {name} {pct}",
-      assets: { gold: "Gold", silver: "Silver", btc: "Bitcoin", spx: "S&P 500", realYield: "10y real yield", nominalYield: "10y nominal yield" },
+      assets: { gold: "Gold", silver: "Silver", btc: "Bitcoin", spx: "S&P 500", realYield: "10y real yield" },
       legendLine: "{name}: {pct} over the window",
       realYieldNow: "the real yield's own level: {v}%",
       toggleLabel: "Show or hide lines",
@@ -397,8 +397,7 @@ export const UI = {
       eraFree: "since 1971 · the free market",
       liveWord: "live",
       avgWord: "average",
-      modalOpen: "The last 20 years, year by year",
-      modalTitle: "The last 20 years of gold",
+      modalTitle: "Gold in the last twenty years",
       modalNote:
         "Each year's own average price and its change over the year before. The running year reads the live spot — its own case, named, never mixed.",
       colYear: "Year",
@@ -529,7 +528,7 @@ export const UI = {
       holdingsNow: "current holdings: {v} tonnes",
       sellersTitle: "Gold sellers",
       sellersAsOf: "the reported quarterly record through 2026-Q3",
-      sellersNote: "Sellers are rarer and smaller than buyers; the world aggregate has been positive for years. These rows are the reported reductions that mattered.",
+      sellersNote: "Sellers are rarer and smaller than buyers; the world aggregate has been positive for years. These rows are the reported reductions that mattered. Each seller's reserve is its latest officially reported holdings (IMF IFS, via the WGC table) — some countries report with long lags.",
       shareNote:
         "Gold valued at the live market price over total official reserve assets (gold re-valued at the same price; each country's latest reported value vintage). A rising share can be price arithmetic, not active buying.",
       reportedWorldLine: "This count only sees the countries that report — {n} of them, {tonnes} tonnes of official reserves in all; the whole world holds a little more than this.",
@@ -678,7 +677,7 @@ export const UI = {
       tomanBillion: "bn toman",
       tomanNote: "The toman row: the live free-market dollar (Tehran) × the global ounce.",
       tomanLive: "live",
-      positionLine: "{band} of its stored window",
+      positionTail: "of its stored window",
       bandTop: "top {p}%",
       bandBottom: "bottom {p}%",
       bandMid: "mid-range",
@@ -689,8 +688,6 @@ export const UI = {
     timeMachine: {
       title: "The time machine",
       subtitle: "Any past day's meter reading, under the then-current voter table, the only historical-meter surface.",
-      eraNote:
-        "The meter's era begins November 2016, the stored series' own window, and no earlier meter state exists or is ever synthesized. The reading shown is the balance as the meter would have read it that day, under the voter table current AT that date; no live meter existed before late October 2026, so earlier days ride the published backtest's own frozen table.",
       howTitle: "How it works",
       how1: "Pick any day since November 2016 — the stored series' own window; no earlier meter state exists, and none is ever synthesized.",
       how2: "The day's own gold close: the desk's stored XAUUSD spot closes, or the seam-anchored COMEX futures history before the store's window — the nearest trading day to your pick, markets rest weekends and holidays.",
@@ -750,6 +747,7 @@ export const UI = {
     forecastRetro: {
       title: "Gold forecasts vs reality",
       subtitle: "LBMA's analyst survey under-forecast gold in {under} of {n} years, mean absolute miss {abs}.",
+      missListLabel: "the recent record:",
       headline:
         "The professionals' published consensus missed gold's actual average in {under} of {n} years (2010–2025): the mean miss is {mean}, the mean absolute miss {abs}. The numbers are LBMA's own.",
       y2025Line: "2025, the biggest miss of the record: {miss} (consensus {forecast} vs actual {actual}).",
@@ -786,7 +784,7 @@ export const UI = {
       aiBadgeTip: "Machine-translated to Farsi by {model}, {date}",
       publishedLabel: "Published {date}",
       fetchedLabel: "fetched {date}",
-      source: "Source: Trading Economics",
+      updatedLabel: "Updated {date}",
       stateWaiting:
         "No briefing captured yet. The watch fires twice daily — 05:00 and 16:00 UTC (08:30 and 19:30 Tehran); the next fire {time}.",
       stateFetchFailed:
@@ -804,7 +802,7 @@ export const UI = {
       aiBadgeTip: "Machine-translated to Farsi by {model}, {date}",
       publishedLabel: "Published {date}",
       fetchedLabel: "fetched {date}",
-      source: "Source: World Gold Council",
+      updatedLabel: "Updated {date}",
       stateWaiting:
         "The next issue is not published yet. The watch window: every day 1–15 plus 17, 19, 21, 23 and 25 of the following month, 09:30 UTC — {n} attempts so far.",
       stateMissed: "The publication window closed with no new issue — a stated fact, not a silent gap.",
@@ -928,14 +926,14 @@ export const UI = {
     compare: {
       eyebrow: "مقایسه",
       title: "بازده طلا در برابر جایگزین‌ها",
-      subtitle: "بازده واقعی و اسمی ۱۰ ساله، نقره، بیت‌کوین و S&P 500 در برابر خودِ طلا؛ نگه‌داشتن هر کدام در این پنجره چه کرده، هر کدام یک خط. بازده‌ها «نرخ»اند و خطشان روی محور راستِ درصدِ واقعی خودش می‌نشیند.",
+      subtitle: "بازده واقعی ۱۰ ساله، نقره، بیت‌کوین و S&P 500 در برابر خودِ طلا؛ نگه‌داشتن هر کدام در این پنجره چه کرده، هر کدام یک خط. بازده‌ها «نرخ»اند و خطشان روی محور راستِ درصدِ واقعی خودش می‌نشیند.",
       windowLabel: "پنجره",
-      ranges: { "3M": "۳ ماه", "6M": "۶ ماه", "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال" },
+      ranges: { "3M": "۳ ماه", "6M": "۶ ماه", "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال", "10Y": "۱۰ سال" },
       bestLine: "بالاترین سود: {name} {pct}",
       worstLine: "کمترین سود: {name} {pct}",
       bestLossLine: "کمترین ضرر: {name} {pct}",
       worstLossLine: "بیشترین ضرر: {name} {pct}",
-      assets: { gold: "طلا", silver: "نقره", btc: "بیت‌کوین", spx: "S&P 500", realYield: "بازده واقعی ۱۰ساله", nominalYield: "بازده اسمی ۱۰ساله" },
+      assets: { gold: "طلا", silver: "نقره", btc: "بیت‌کوین", spx: "S&P 500", realYield: "بازده واقعی ۱۰ساله" },
       legendLine: "{name}: {pct} در این پنجره",
       realYieldNow: "سطح خودِ بازده واقعی: {v}٪",
       toggleLabel: "نمایش یا مخفی‌کردن خطوط",
@@ -1059,8 +1057,7 @@ export const UI = {
       eraFree: "از ۱۹۷۱ · بازار آزاد",
       liveWord: "زنده",
       avgWord: "میانگین",
-      modalOpen: "۲۰ سال اخیر، سال‌به‌سال",
-      modalTitle: "۲۰ سال اخیر طلا",
+      modalTitle: "طلا در بیست سال اخیر",
       modalNote:
         "میانگین قیمتِ خودِ هر سال و تغییرش نسبت به سال قبل. سال جاری قیمتِ زندهٔ الان را می‌خواند — موردِ خودش، نام‌گذاری‌شده، هرگز مخلوط نشده.",
       colYear: "سال",
@@ -1108,7 +1105,7 @@ export const UI = {
       method:
         "هر دارایی یک بار، در نخستین پایان‌ماهِ سالِ انتخابی خریده می‌شود و به قیمتِ امروز ارزش‌گذاری می‌شود؛ تغییر درصدیِ بین این دو، همان پاسخ است. هر پنجره روی ردیف خودش نام‌گذاری می‌شود.",
       pickLabel: "از سال",
-      firstYearNote: "از نوامبر",
+      firstYearNote: "از آبان ۱۳۹۵",
       windowLine: "{from} تا {to} · {n} ماه",
       lumpWord: "یک‌جا",
       decileLine: "بازدهٔ این پنجره: صدکِ {d} از {n} پنجرهٔ هم‌طول.",
@@ -1197,7 +1194,7 @@ export const UI = {
       revisionNote: "داده‌های ماهانه بازنگری می‌شوند؛ بعضی خریداران با تأخیر گزارش می‌دهند.",
       chinaNote: "چین به‌صورت نامنظم و با تأخیر طولانی گزارش می‌دهد؛ ماه آرام همیشه معنای توقف خرید نیست.",
       sellersAsOf: "رکورد فصلیِ منتشرشده تا سهماههٔ سوم ۲۰۲۶",
-      sellersNote: "فروشنده‌ها کمتر و کوچک‌تر از خریدارها هستند؛ مجموع جهانی سال‌هاست مثبت است؛ این ردیف‌ها کاهش‌های گزارش‌شدهٔ مهم‌اند.",
+      sellersNote: "فروشنده‌ها کمتر و کوچک‌تر از خریدارها هستند؛ مجموع جهانی سال‌هاست مثبت است؛ این ردیف‌ها کاهش‌های گزارش‌شدهٔ مهم‌اند. ذخیرهٔ هر فروشنده، آخرین موجودی رسمیِ گزارش‌شدهٔ اوست (IMF IFS از جدول WGC)؛ بعضی کشورها با تأخیر طولانی گزارش می‌دهند.",
       sourceLabel: "منبع: IMF · WGC",
     },
     vault: {
@@ -1333,7 +1330,7 @@ export const UI = {
       tomanBillion: "میلیارد تومان",
       tomanNote: "ردیف تومان: دلار آزاد تهران × اونس جهانی، زنده.",
       tomanLive: "زنده",
-      positionLine: "{band} از پنجرهٔ ذخیره‌شده",
+      positionTail: "از پنجرهٔ ذخیره‌شده",
       bandTop: "{p}٪ بالایی",
       bandBottom: "{p}٪ پایینی",
       bandMid: "میانهٔ بازه",
@@ -1344,8 +1341,6 @@ export const UI = {
     timeMachine: {
       title: "ماشین زمان",
       subtitle: "قرائتِ متر در هر روز گذشته، با جدول رأی‌دهیِ همان روز؛ تنها سطح تاریخیِ متر.",
-      eraNote:
-        "عصر متر از نوامبر ۲۰۱۶ (آبان ۱۳۹۵) آغاز می‌شود؛ پنجرهٔ خودِ سری‌های ذخیره‌شده؛ و هیچ قرائتِ پیش از آن وجود ندارد یا ساخته نمی‌شود. قرائتِ نمایش‌داده‌شده برآیندِ همان روز زیر جدول رأی‌دهیِ رایج در آن تاریخ است؛ مترِ زنده پیش از اواخر اکتبر ۲۰۲۶ وجود نداشت، پس روزهای پیشتر با جدول منجمدِ خودِ بک‌تستِ منتشرشده می‌روند.",
       howTitle: "چگونه کار می‌کند",
       how1: "هر روزی از نوامبر ۲۰۱۶ به بعد را انتخاب کنید — پنجرهٔ خودِ سری‌های ذخیره‌شده؛ هیچ قرائتِ پیش‌تر وجود ندارد و هیچ‌وقت ساخته نمی‌شود.",
       how2: "قیمت پایانی طلای همان روز: قیمت‌های پایانی اسپاتِ ذخیره‌شدهٔ خودِ میز، یا تاریخچهٔ آتی کامکس پیش از پنجرهٔ ذخیره — نزدیک‌ترین روز کاری به انتخاب شما؛ بازارها آخر هفته و تعطیلات می‌خوابند.",
@@ -1405,6 +1400,7 @@ export const UI = {
     forecastRetro: {
       title: "پیش‌بینی رخدادهای طلا در مقابل واقعیت",
       subtitle: "نظرسنجی تحلیلگران LBMA در {under} سال از {n} سال، طلا را کمتر از واقعیت پیش‌بینی کرده؛ میانگین قدر مطلق خطا {abs}.",
+      missListLabel: "سابقهٔ اخیر:",
       headline:
         "اجماعِ منتشرشدهٔ حرفه‌ای‌ها در {under} سال از {n} سال (۲۰۱۰–۲۰۲۵) میانگینِ واقعیِ طلا را پیش‌بینی نکرد: میانگین خطا {mean} و میانگین قدر مطلق خطا {abs} است. این عدد، عددِ خودِ LBMA است.",
       y2025Line: "۲۰۲۵؛ بزرگ‌ترین خطای ثبت‌شده: {miss} (اجماع {forecast} در برابر واقعیت {actual}).",
@@ -1442,7 +1438,7 @@ export const UI = {
       aiBadgeTip: "ترجمهٔ ماشینی به فارسی با {model}، {date}",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
-      source: "منبع: Trading Economics",
+      updatedLabel: "به‌روزرسانی: {date}",
       stateWaiting:
         "هنوز هیچ خلاصه‌ای ثبت نشده است. پایش دو بار در روز روشن می‌شود — ۵:۰۰ و ۱۶:۰۰ به‌وقت جهانی (۸:۳۰ و ۱۹:۳۰ تهران)؛ روشن‌شدن بعدی {time}.",
       stateFetchFailed:
@@ -1461,7 +1457,7 @@ export const UI = {
       aiBadgeTip: "ترجمهٔ ماشینی به فارسی با {model}، {date}",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
-      source: "منبع: World Gold Council",
+      updatedLabel: "به‌روزرسانی: {date}",
       stateWaiting:
         "شمارهٔ بعدی هنوز منتشر نشده است. پنجرهٔ پایش: هر روزِ ۱ تا ۱۵ به‌علاوهٔ ۱۷، ۱۹، ۲۱، ۲۳ و ۲۵ ماهِ بعد، ساعت ۹:۳۰ به‌وقت جهانی (UTC) — تاکنون {n} تلاش.",
       stateMissed: "پنجرهٔ انتشار این ماه بدون شمارهٔ جدید بسته شد — واقعیتی ثبت‌شده، نه خلأیی پنهان.",
@@ -1655,6 +1651,23 @@ export const LANE_CONTENT: Record<LaneId, { label: [string, string]; intro: [str
     short: ["positioning", "پوزیشن‌ها"],
     intro: ["The crowd's own footprint, fuel, never the engine.", "ردپای خودِ جمعیت؛ سوخت، هرگز موتور."],
   },
+};
+
+/** The time machine's own descriptive lane vocabulary (batch L, the
+ *  owner's ask: not red/green bars — each lane said as the FACTOR's own
+ *  level that day, high / low / weak / strong / mixed, derived from the
+ *  same lane side the meter read: a lane "for" gold means rates were
+ *  LOW (borrowing), the dollar WEAK, stress HIGH, inflation HIGH, flows
+ *  STRONG — and vice versa; the direction is each family's own law.) */
+export const LANE_LEVEL: Record<
+  LaneId,
+  { for: [string, string]; against: [string, string]; neutral: [string, string]; split: [string, string]; unread: [string, string] }
+> = {
+  "borrowing-costs": { for: ["low", "پایین"], against: ["high", "بالا"], neutral: ["middling", "میانه"], split: ["mixed", "دوپاره"], unread: ["unread", "ناخوانده"] },
+  dollar: { for: ["weak", "ضعیف"], against: ["strong", "قوی"], neutral: ["middling", "میانه"], split: ["mixed", "دوپاره"], unread: ["unread", "ناخوانده"] },
+  stress: { for: ["high", "بالا"], against: ["low", "پایین"], neutral: ["middling", "میانه"], split: ["mixed", "دوپاره"], unread: ["unread", "ناخوانده"] },
+  inflation: { for: ["high", "بالا"], against: ["low", "پایین"], neutral: ["middling", "میانه"], split: ["mixed", "دوپاره"], unread: ["unread", "ناخوانده"] },
+  flows: { for: ["strong", "قوی"], against: ["weak", "ضعیف"], neutral: ["middling", "میانه"], split: ["mixed", "دوپاره"], unread: ["unread", "ناخوانده"] },
 };
 
 /** The episodes (the nine-record launch list, bilingual). */

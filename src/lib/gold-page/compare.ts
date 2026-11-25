@@ -12,10 +12,9 @@
  *   bitcoin      BTC-USD — Yahoo's public chart
  *   spx          the S&P 500 index (^GSPC) — Yahoo's public chart
  *   realYield    the 10-year TIPS real yield (DFII10) — FRED's public
- *                CSV (no key, no registration)
- *   nominalYield the 10-year Treasury nominal yield (DGS10) — FRED's
- *                public CSV (the opt-in toggle line; the same bond
- *                calendar as DFII10, date-aligned by construction)
+ *                CSV (no key, no registration). The nominal DGS10 line
+ *                was retired (batch L): the owner keeps one yield line,
+ *                the real one — the number that matters for gold.
  *
  * The yields are rates, not assets: their lines ride their own honest
  * right axis at the true % level (the component's dual-axis law — a
@@ -38,8 +37,7 @@ export type CompareLegId =
   | "silver"
   | "btc"
   | "spx"
-  | "realYield"
-  | "nominalYield";
+  | "realYield";
 
 export interface CompareLeg {
   id: CompareLegId;
@@ -83,7 +81,8 @@ const YAHOO_SYMBOLS: Record<string, string> = {
   spx: "%5EGSPC",
 };
 
-/** Fetch one Yahoo chart leg (5y daily closes), cached with a TTL. */
+/** Fetch one Yahoo chart leg (10y daily closes — the 10Y window needs
+ *  them; shorter windows slice the same series), cached with a TTL. */
 async function yahooLeg(id: "silver" | "btc" | "spx"): Promise<ComparePoint[] | null> {
   const hit = legCache.get(id);
   if (hit !== undefined && Date.now() - hit.at < (hit.value === null ? FAIL_TTL_MS : TTL_MS)) {
@@ -92,7 +91,7 @@ async function yahooLeg(id: "silver" | "btc" | "spx"): Promise<ComparePoint[] | 
   let value: ComparePoint[] | null = null;
   try {
     const res = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${YAHOO_SYMBOLS[id]}?range=5y&interval=1d`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${YAHOO_SYMBOLS[id]}?range=10y&interval=1d`,
       {
         headers: { "user-agent": YAHOO_UA, accept: "application/json" },
         signal: AbortSignal.timeout(10_000),
@@ -142,8 +141,8 @@ const globalForFred = globalThis as unknown as { __currenaFredDiag?: Record<stri
 const fredDiag: Record<string, unknown> = globalForFred.__currenaFredDiag ?? {};
 globalForFred.__currenaFredDiag = fredDiag;
 
-/** FRED's own public CSV endpoint (no key): DATE,<SERIES> pairs, 5y back. */
-async function fredLeg(id: "realYield" | "nominalYield", seriesId: "DFII10" | "DGS10"): Promise<ComparePoint[] | null> {
+/** FRED's own public CSV endpoint (no key): DATE,<SERIES> pairs, 10y back. */
+async function fredLeg(id: "realYield", seriesId: "DFII10"): Promise<ComparePoint[] | null> {
   const hit = legCache.get(id);
   if (hit !== undefined && Date.now() - hit.at < (hit.value === null ? FAIL_TTL_MS : TTL_MS)) {
     return hit.value;
@@ -155,7 +154,7 @@ async function fredLeg(id: "realYield" | "nominalYield", seriesId: "DFII10" | "D
   }
   try {
     const from = new Date();
-    from.setUTCFullYear(from.getUTCFullYear() - 5);
+    from.setUTCFullYear(from.getUTCFullYear() - 10);
     const fromIso = from.toISOString().slice(0, 10);
     const res = await fetch(
       `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${seriesId}&cosd=${fromIso}`,
@@ -201,7 +200,7 @@ async function fredLeg(id: "realYield" | "nominalYield", seriesId: "DFII10" | "D
 /* Weekly sampling + the assembly                                      */
 /* ------------------------------------------------------------------ */
 
-/** Keep the last close of each ISO week — a 5y line of ~260 points. */
+/** Keep the last close of each ISO week — a 10y line of ~520 points. */
 function sampleWeekly(points: ReadonlyArray<{ d: string; v: number }>): ComparePoint[] {
   const out: ComparePoint[] = [];
   let weekKey = -1;
@@ -227,41 +226,31 @@ function sliceYears(points: ComparePoint[], years: number): ComparePoint[] {
 }
 
 export async function getComparison(withDiag = false): Promise<ComparePayload> {
-  const [goldLong, silver, btc, spx, realYield, nominalYield] = await Promise.all([
-    getLongSeries("5y"),
+  const [goldLong, silver, btc, spx, realYield] = await Promise.all([
+    getLongSeries("10y"),
     yahooLeg("silver"),
     yahooLeg("btc"),
     yahooLeg("spx"),
     fredLeg("realYield", "DFII10"),
-    fredLeg("nominalYield", "DGS10"),
   ]);
 
   const legs: CompareLeg[] = [];
   if (goldLong.points.length >= 2) {
-    legs.push({ id: "gold", points: sliceYears(sampleWeekly(goldLong.points), 5) });
+    legs.push({ id: "gold", points: sliceYears(sampleWeekly(goldLong.points), 10) });
   }
-  if (silver !== null) legs.push({ id: "silver", points: sliceYears(sampleWeekly(silver), 5) });
-  if (btc !== null) legs.push({ id: "btc", points: sliceYears(sampleWeekly(btc), 5) });
-  if (spx !== null) legs.push({ id: "spx", points: sliceYears(sampleWeekly(spx), 5) });
+  if (silver !== null) legs.push({ id: "silver", points: sliceYears(sampleWeekly(silver), 10) });
+  if (btc !== null) legs.push({ id: "btc", points: sliceYears(sampleWeekly(btc), 10) });
+  if (spx !== null) legs.push({ id: "spx", points: sliceYears(sampleWeekly(spx), 10) });
 
   let realYieldLevels: { first: number; last: number } | null = null;
   if (realYield !== null) {
-    const sampled = sliceYears(sampleWeekly(realYield), 5);
+    const sampled = sliceYears(sampleWeekly(realYield), 10);
     if (sampled.length >= 2) {
       legs.push({ id: "realYield", points: sampled });
       realYieldLevels = {
         first: sampled[0]!.v,
         last: sampled[sampled.length - 1]!.v,
       };
-    }
-  }
-
-  // The nominal yield — the opt-in toggle line (default off; the same
-  // FRED bond calendar as the real yield, date-aligned by construction).
-  if (nominalYield !== null) {
-    const sampled = sliceYears(sampleWeekly(nominalYield), 5);
-    if (sampled.length >= 2) {
-      legs.push({ id: "nominalYield", points: sampled });
     }
   }
 

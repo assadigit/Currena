@@ -1,16 +1,20 @@
 "use client";
 
 /**
- * The comparison band — gold against the alternatives, five years.
+ * The comparison band — gold against the alternatives, one window of
+ * three months to ten years (batch L added the 10-year window).
  *
  * The owner's chart: the 10-year real yield, silver, Bitcoin and the
- * S&P 500, one line each, from today back up to five years — with gold
+ * S&P 500, one line each, from today back up to ten years — with gold
  * itself for reference. Every line is indexed to 100 at the window's
  * start so one chart holds them all; the real yield is a rate, not an
  * asset, so its line rides its own honest right axis at the true %
  * level. Each line can be toggled off and on (gold against the S&P
  * alone, or any subset), the lines ride a heavier stroke than the
  * house default, and the window's own scorecard — each item's start,
+ * The nominal-yield line was retired (batch L): one yield line — the
+ * real one — the number that matters for gold; the average reader is
+ * not asked to tell the two apart.
  * now and change in one table — sits under the chart because graphs
  * are hard to read numbers from. Served from /api/gold/compare (the
  * desk's own stitched gold window + the public Yahoo/FRED legs,
@@ -32,12 +36,12 @@ type CmpT = {
   title: string;
   subtitle: string;
   windowLabel: string;
-  ranges: Record<"3M" | "6M" | "1Y" | "3Y" | "5Y", string>;
+  ranges: Record<"3M" | "6M" | "1Y" | "3Y" | "5Y" | "10Y", string>;
   bestLine: string;
   worstLine: string;
   bestLossLine: string;
   worstLossLine: string;
-  assets: { gold: string; silver: string; btc: string; spx: string; realYield: string; nominalYield: string };
+  assets: { gold: string; silver: string; btc: string; spx: string; realYield: string };
   toggleLabel: string;
   barsTitleYears: string;
   barsTitleMonths: string;
@@ -50,12 +54,12 @@ type CmpT = {
   unavailable: string;
 };
 
-type LineId = "gold" | "silver" | "btc" | "spx" | "realYield" | "nominalYield";
+type LineId = "gold" | "silver" | "btc" | "spx" | "realYield";
 
-/* the two rate lines — they ride the right axis at their true % level
-   and never join the assets' best/worst contest (a rate is not an
-   asset; the nominal is the opt-in toggle line, default off) */
-const YIELD_IDS: ReadonlySet<LineId> = new Set(["realYield", "nominalYield"]);
+/* the one rate line — it rides the right axis at its true % level and
+   never joins the assets' best/worst contest (a rate is not an asset;
+   the nominal line was retired in batch L — one yield, the real one) */
+const YIELD_IDS: ReadonlySet<LineId> = new Set(["realYield"]);
 
 /* the correlation lesson's own copy — the leg merged in from the old
    standalone section */
@@ -74,26 +78,25 @@ type CorrT = {
   unavailable: string;
 };
 
-/** The display order + the token colour of every line — six lines, the
- *  owner's six literal hues (batch-I ask: gold is gold, the S&P is red,
- *  Bitcoin blue, silver silver, the real yield green, the nominal
- *  purple — one dedicated token each, pairwise distinct at a glance;
- *  the lines are always labelled so the hue is never the sole
- *  carrier). */
+/** The display order + the token colour of every line — five lines, the
+ *  owner's literal hues (batch-I ask: gold is gold, the S&P is red,
+ *  Bitcoin blue, silver silver, the real yield green — one dedicated
+ *  token each, pairwise distinct at a glance; the lines are always
+ *  labelled so the hue is never the sole carrier). */
 const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }> = [
   { id: "gold", color: "var(--color-cmp-gold)" },
   { id: "realYield", color: "var(--color-cmp-real)", dashed: true },
-  { id: "nominalYield", color: "var(--color-cmp-nominal)", dashed: true },
   { id: "silver", color: "var(--color-cmp-silver)" },
   { id: "btc", color: "var(--color-cmp-btc)" },
   { id: "spx", color: "var(--color-cmp-spx)" },
 ];
 
-type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y";
+type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y" | "10Y";
 /* the chips' own order — months then years, everywhere the windows are listed */
-const WINDOW_ORDER: ReadonlyArray<WindowKey> = ["3M", "6M", "1Y", "3Y", "5Y"];
-/* the window's own span, in months — 3 and 6 ride alongside the years */
-const WINDOW_MONTHS: Record<WindowKey, number> = { "3M": 3, "6M": 6, "1Y": 12, "3Y": 36, "5Y": 60 };
+const WINDOW_ORDER: ReadonlyArray<WindowKey> = ["3M", "6M", "1Y", "3Y", "5Y", "10Y"];
+/* the window's own span, in months — 3 and 6 ride alongside the years;
+   the 10-year window joined in batch L (the owner's ask) */
+const WINDOW_MONTHS: Record<WindowKey, number> = { "3M": 3, "6M": 6, "1Y": 12, "3Y": 36, "5Y": 60, "10Y": 120 };
 /** The cutoff instant — `months` back from the series' own last point. */
 function cutoffOf(lastDate: string, w: WindowKey): number {
   return Date.parse(`${lastDate}T00:00:00Z`) - (WINDOW_MONTHS[w] * 365.25 / 12) * 86_400_000;
@@ -226,14 +229,11 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
      section is gone; the real-yield relationship belongs with the
      alternatives), one tap away */
   const [corrOpen, setCorrOpen] = React.useState(false);
-  /* which lines ride the chart — every asset on by default, each one
-     toggleable (gold against the S&P alone, or any subset); the
-     nominal yield is the opt-in line (default off — the owner's chart
-     keeps its real-yield line) */
+  /* which lines ride the chart — every line on by default, each one
+     toggleable (gold against the S&P alone, or any subset) */
   const [enabled, setEnabled] = React.useState<Record<LineId, boolean>>({
     gold: true,
     realYield: true,
-    nominalYield: false,
     silver: true,
     btc: true,
     spx: true,

@@ -37,7 +37,7 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
-import { type Fmt, AiTranslatedBadge } from "@/components/gold-page/visuals";
+import { type Fmt, AiTranslatedBadge, faDigits } from "@/components/gold-page/visuals";
 
 /* ------------------------------------------------------------------ *
  * The payload (the route's contract)
@@ -100,7 +100,8 @@ export interface TeCardCopy {
   aiBadgeTip: string;
   publishedLabel: string;
   fetchedLabel: string;
-  source: string;
+  /** The single stamp when published and fetched are the same day (batch L). */
+  updatedLabel: string;
   stateWaiting: string;
   stateFetchFailed: string;
   stateAlert: string;
@@ -254,13 +255,13 @@ export function TeCard({
           {fa ? (
             <>
               <h3 dir="rtl" className="type-label m-0 mt-3 text-start font-extrabold text-[var(--color-text-primary)]">
-                {fa.title}
+                {faDigits(fa.title)}
               </h3>
               <div
                 dir="rtl"
                 className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] p-3 ring-1 ring-[var(--color-border)] sm:p-3.5"
               >
-                <p className="m-0 text-[13.5px] leading-[1.9] text-[var(--color-text-secondary)]">{fa.body}</p>
+                <p className="m-0 text-[13.5px] leading-[1.9] text-[var(--color-text-secondary)]">{faDigits(fa.body)}</p>
               </div>
             </>
           ) : (
@@ -278,23 +279,20 @@ export function TeCard({
             </>
           )}
 
-          {/* the 11px whisper meta line — provenance, always visible */}
+          {/* the 11px whisper meta line — the dates only (batch L: the
+              source line retired, all sources live elsewhere on the
+              page); when published and fetched are the same day one
+              "updated" stamp says it once instead of twice */}
           <p className="m-0 mt-2 flex flex-wrap items-baseline gap-x-1.5 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">
-            {published ? <span>{t.publishedLabel.replace("{date}", published)}</span> : null}
-            {published && fetched ? <span aria-hidden="true">·</span> : null}
-            {fetched ? <span>{t.fetchedLabel.replace("{date}", fetched)}</span> : null}
-            {published || fetched ? <span aria-hidden="true">·</span> : null}
-            <span>
-              {t.source.replace("Trading Economics", "")}
-              <a
-                href={briefing.sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-[var(--color-currena-blue-deep)] underline decoration-[var(--color-border)] underline-offset-2 hover:text-[var(--color-currena-blue)]"
-              >
-                Trading Economics
-              </a>
-            </span>
+            {published !== null && fetched !== null && published === fetched ? (
+              <span>{t.updatedLabel.replace("{date}", published)}</span>
+            ) : (
+              <>
+                {published ? <span>{t.publishedLabel.replace("{date}", published)}</span> : null}
+                {published && fetched ? <span aria-hidden="true">·</span> : null}
+                {fetched ? <span>{t.fetchedLabel.replace("{date}", fetched)}</span> : null}
+              </>
+            )}
           </p>
         </>
       ) : null}

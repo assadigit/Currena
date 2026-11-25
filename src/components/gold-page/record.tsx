@@ -524,12 +524,18 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
  *  mattered (IMF/WGC quarterly record through 2026-Q3; curated, dated,
  *  none of them a live meter input). Sellers are rarer and smaller than
  *  buyers — the world aggregate has been positive for years. */
-const CB_SELLERS: ReadonlyArray<{ code: string; net12m: number }> = [
-  { code: "DEU", net12m: -4.9 },
-  { code: "TUR", net12m: -3.4 },
-  { code: "MNG", net12m: -2.7 },
-  { code: "TJK", net12m: -2.1 },
-  { code: "LKA", net12m: -1.8 },
+const CB_SELLERS: ReadonlyArray<{ code: string; net12m: number; reserve: number }> = [
+  // the reserve figures: the latest officially reported holdings, IMF
+  // IFS via the WGC quarterly table (batch L, task 6 — the owner's
+  // ask): Germany 3349.1 t and Turkey 532.1 t as of 2026-Q3; Mongolia
+  // 7.9 t (2026-Q1); Tajikistan 7.4 t (its latest reported, 2024-Q1);
+  // Sri Lanka 0.47 t (2025-Q2, the series' own floor) — the reporting
+  // lag named in the note, never smoothed into a fake "now"
+  { code: "DEU", net12m: -4.9, reserve: 3349.1 },
+  { code: "TUR", net12m: -3.4, reserve: 532.1 },
+  { code: "MNG", net12m: -2.7, reserve: 7.9 },
+  { code: "TJK", net12m: -2.1, reserve: 7.4 },
+  { code: "LKA", net12m: -1.8, reserve: 0.5 },
 ];
 
 
@@ -730,12 +736,21 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
           {CB_SELLERS.map((r) => {
             const name = CB_COUNTRIES[r.code]?.[lan(locale)] ?? r.code;
             return (
-              <li key={r.code} className="flex min-w-0 items-baseline gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
-                <CountryFlag code={r.code} name={name} />
-                <span className="type-caption font-bold text-[var(--color-text-primary)]">{name}</span>
-                <span className="ms-auto type-caption font-bold text-[var(--color-return-down)]">
-                  ▼ {t.tonnesShort.replace("{v}", fmt.num(Math.abs(r.net12m), 1))}
-                </span>
+              <li key={r.code} className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
+                <div className="flex min-w-0 items-baseline justify-between gap-2.5">
+                  <span className="flex items-center gap-2 type-label font-bold text-[var(--color-text-primary)]">
+                    <CountryFlag code={r.code} name={name} />
+                    {name}
+                  </span>
+                  <span className="type-caption font-bold text-[var(--color-return-down)]">
+                    ▼ {t.tonnesShort.replace("{v}", fmt.num(Math.abs(r.net12m), 1))}
+                  </span>
+                </div>
+                {/* the seller's own estimated reserve (batch L, task 6) —
+                    the same quiet line the buyers' rows carry */}
+                <p className="m-0 type-caption text-[var(--color-text-tertiary)]">
+                  {t.holdingsNow.replace("{v}", fmt.num(r.reserve, r.reserve < 100 ? 1 : 0))}
+                </p>
               </li>
             );
           })}

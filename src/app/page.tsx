@@ -938,9 +938,12 @@ function DashboardBand({
      now MERGED into the indicator grid as first-class cards (the
      owner's batch-H consolidation: the dashboard and the ratios are
      one block, no top-set preview duplicated below) */
-  const TOP_RATIO_SET = new Set(["gold-silver", "real-gold-price", "gold-oil-ratio"]);
-  const topRatioCards = RATIO_IDS.filter((c) => TOP_RATIO_SET.has(c.id));
-  const restRatios = RATIO_IDS.filter((c) => !TOP_RATIO_SET.has(c.id));
+  /* batch L (task 7): the top ratio trio (gold/silver, gold/oil, the
+     real gold price) carried no mini graphs — the projection leg has no
+     series to draw them from — so per the owner's own alternative every
+     ratio rides the expandable table below the indicator grid, whose
+     rows DO carry their sparks */
+  const restRatios = RATIO_IDS;
   const [allRatios, setAllRatios] = React.useState(false);
   return (
     <section id="gold-dashboard" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
@@ -979,35 +982,6 @@ function DashboardBand({
             <MiniSpark values={r.stat.series.map((p) => p.v)} />
           </div>
         ))}
-        {/* the top ratios — first-class cards in the same grid (the
-            batch-H consolidation: the most important نسبت‌ها ride beside
-            the key indicators, one block, no duplicated top-set below) */}
-        {topRatioCards.map((c) => {
-          const r = byId.get(c.id);
-          if (r === undefined || r.value === null || !Number.isFinite(r.value)) return null;
-          const band = bandWord(r.percentile10y ?? null, t.contextCards, fmt);
-          return (
-            <div
-              key={c.id}
-              className="flex items-center gap-3 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2 ring-1 ring-[var(--color-border)]"
-              title={t.contextCards[c.meaning] as string}
-            >
-              <div className="min-w-0 flex-1">
-                <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{c.name[locale === "en" ? 0 : 1]}</p>
-                <p className="m-0 mt-0.5 flex items-baseline gap-2">
-                  <bdi dir="ltr" className="type-label font-bold text-[var(--color-text-primary)]">
-                    {c.unit === "$" ? "$" : ""}{fmt.num(r.value, c.unit === "$" ? 0 : 1)}{c.unit === "%" ? "%" : ""}
-                  </bdi>
-                  <SignedDelta v={r.change30d} fmt={fmt} />
-                  <span className="type-caption text-[var(--color-text-tertiary)]">{t.indicators.d30}</span>
-                </p>
-                {band !== null ? (
-                  <p className="m-0 mt-0.5 text-[10.5px] font-semibold text-[var(--color-text-secondary)]">{band}</p>
-                ) : null}
-              </div>
-            </div>
-          );
-        })}
       </div>
 
       {/* the remaining ratios — behind one expand (the top trio now lives
@@ -1510,7 +1484,6 @@ export default function GoldPage() {
               locale={locale}
               windowNames={t.price.windowNames}
               verdictWords={{ verdictFor: t.balance.verdictFor, verdictAgainst: t.balance.verdictAgainst, verdictBalanced: t.balance.verdictBalanced, verdictNone: t.balance.verdictNoneWord }}
-              laneWord={t.balance.laneWord}
               fmt={fmt}
               data={ifbought.data ?? null}
             />

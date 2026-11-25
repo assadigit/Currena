@@ -9,11 +9,13 @@
  *      now, the profit or loss), always visible;
  *   2. the wealth calculator (bought $x of gold since a window: what it
  *      is worth now), always visible;
- *   3. the assets head-to-head (gold vs S&P 500 vs Bitcoin vs silver
- *      since the year you pick — lump + the $100-a-month DCA), compact
- *      rows: name · change · bar · window · DCA, nothing else;
- *   4. any past day's meter reading (the old time machine's advanced
- *      leg) behind one tap.
+ *   3. any past day's meter reading (the old time machine's advanced
+ *      leg) behind one tap — WITH the assets head-to-head (gold vs
+ *      S&P 500 vs Bitcoin vs silver since the year you pick) merged
+ *      into it (batch L, task 13: one time machine — how gold did
+ *      against the alternatives since a year, plus any day's own
+ *      reading); the lanes are said in words now, not red/green bars
+ *      (batch L, task 14).
  *
  * The compute is the pure engines ported verbatim (src/lib/gold-page/
  * ifbought.ts + the trend/daily/meter routes); the data rides the page's
@@ -25,7 +27,7 @@ import * as React from "react";
 import { CalendarClock, Calculator } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { Locale, LaneId } from "@/lib/gold-page/content";
-import { LANE_CONTENT } from "@/lib/gold-page/content";
+import { LANE_CONTENT, LANE_LEVEL } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta } from "@/components/gold-page/visuals";
 import {
@@ -71,7 +73,6 @@ async function fetchTrendAll(): Promise<TrendWindowPayload[]> {
 }
 
 type TmT = {
-  eraNote: string;
   howTitle: string;
   how1: string;
   how2: string;
@@ -221,10 +222,21 @@ function yearText(y: number, locale: Locale): string {
   }
 }
 
-/** A month-end's own label — "Jan 2017" / "۱/۲۰۱۷" (m/y, the fa convention). */
+/** A month-end's own label — the Persian (Jalali) calendar in fa (the
+ *  owner's batch-L ask: «نوامبر ۲۰۱۶» → «آبان ۱۳۹۵», the same month-end
+ *  said in the reader's own calendar), "Jan 2017" in EN. */
 function monthText(ym: string, locale: Locale, fmt: Fmt): string {
   const [y, m] = ym.split("-");
-  if (locale === "fa") return `${fmt.num(Number(m), 0)}/${yearText(Number(y), locale)}`;
+  if (locale === "fa") {
+    try {
+      // the month's own last day, so the Persian month never lands on a
+      // boundary (the two calendars' months overlap, not align)
+      const day = new Date(Date.UTC(Number(y), Number(m), 0));
+      return new Intl.DateTimeFormat("fa-IR-u-ca-persian", { month: "long", year: "numeric" }).format(day);
+    } catch {
+      return `${fmt.num(Number(m), 0)}/${yearText(Number(y), locale)}`;
+    }
+  }
   const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${names[Number(m) - 1] ?? m} ${y}`;
 }
@@ -266,6 +278,16 @@ export function sanitizeAmountText(raw: string): string {
   if (dot >= 0) s = `${s.slice(0, dot + 1)}${s.slice(dot + 1).replace(/\./g, "")}`;
   s = s.replace(/^0+(?=\d)/, "");
   return s;
+}
+
+/** The input's own quiet unit hint (the owner's batch-L ask): the
+ *  picked currency's short word, lower opacity, beside the number the
+ *  user is typing — EN the symbol, fa the word, the toman and grams
+ *  their own. */
+function unitHint(u: CalcUnit, locale: Locale): string {
+  if (u.kind === "gram") return locale === "en" ? "g" : "گرم";
+  if (u.id === "toman") return locale === "en" ? "toman" : "تومان";
+  return locale === "en" ? u.symbol[0].trim() : u.symbol[1];
 }
 
 /** Money in one unit — the toman carries the site's own M/bn toman
@@ -351,7 +373,6 @@ export function CalculatorBand({
   calc,
   locale,
   verdictWords,
-  laneWord,
   windowNames,
   fmt,
   data,
@@ -361,7 +382,6 @@ export function CalculatorBand({
   calc: CalcT;
   locale: Locale;
   verdictWords: CalcVerdictWords;
-  laneWord: Record<LaneId, string>;
   windowNames: Record<IfWindow, string>;
   fmt: Fmt;
   data: IfBoughtSnapshot | null;
@@ -634,26 +654,37 @@ export function CalculatorBand({
               <span className="type-caption font-semibold text-[var(--color-text-secondary)]">
                 {mode === "one" ? calc.calcAmountOne : calc.calcAmountDca}
               </span>
-              <input
-                type="text"
-                inputMode="decimal"
-                autoComplete="off"
-                dir="ltr"
-                value={amountText}
-                onChange={(e) => {
-                  const text = sanitizeAmountText(e.target.value);
-                  setAmountText(text);
-                  const v = Number(text);
-                  setAmount(text === "" || !Number.isFinite(v) ? 0 : Math.max(0, v));
-                }}
-                onBlur={() => {
-                  if (amountText === "") {
-                    setAmountText("0");
-                    setAmount(0);
-                  }
-                }}
-                className="w-[9rem] min-h-[38px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 type-label tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  dir="ltr"
+                  value={amountText}
+                  onChange={(e) => {
+                    const text = sanitizeAmountText(e.target.value);
+                    setAmountText(text);
+                    const v = Number(text);
+                    setAmount(text === "" || !Number.isFinite(v) ? 0 : Math.max(0, v));
+                  }}
+                  onBlur={() => {
+                    if (amountText === "") {
+                      setAmountText("0");
+                      setAmount(0);
+                    }
+                  }}
+                  className="w-[9rem] min-h-[38px] rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-2.5 py-1.5 pe-14 type-label tabular-nums text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]"
+                />
+                {amountText !== "" ? (
+                  <span
+                    aria-hidden="true"
+                    dir={locale === "en" ? "ltr" : "rtl"}
+                    className="pointer-events-none absolute inset-y-0 end-2.5 flex items-center type-caption font-semibold text-[var(--color-text-tertiary)]/70"
+                  >
+                    {unitHint(unit, locale)}
+                  </span>
+                ) : null}
+              </div>
             </label>
             <label className="flex flex-col gap-1">
               <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{calc.calcUnitLabel}</span>
@@ -745,48 +776,6 @@ export function CalculatorBand({
           })()}
         </div>
 
-        {/* [3] the assets head-to-head — gold vs S&P vs Bitcoin vs silver
-            since the picked year, compact rows */}
-        <div className="flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{locale === "en" ? "Gold vs the alternatives" : "طلا در برابر جایگزین‌ها"}</h4>
-            {data !== null && years.length > 0 ? (
-              <label className="flex items-center gap-2">
-                <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{ib.pickLabel}</span>
-                <select
-                  value={effectiveSince ?? undefined}
-                  onChange={(e) => setSinceYear(Number(e.currentTarget.value))}
-                  className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold tabular-nums text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
-                  aria-label={ib.pickLabel}
-                >
-                  {years.map((y) => (
-                    <option key={y} value={y}>
-                      {yearText(y, locale)}
-                      {y === years[0] ? ` (${ib.firstYearNote})` : ""}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-          </div>
-          {data === null ? (
-            <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{ib.waiting}</p>
-          ) : (
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-              {rows.map(({ asset, result }) => (
-                <AssetRow
-                  key={asset}
-                  name={ib.assets[asset]}
-                  result={result}
-                  ib={ib}
-                  fmt={fmt}
-                  locale={locale}
-                  maxAbs={maxAbs}
-                />
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
 
       {/* [4] the advanced leg — any past day's meter reading + the day's
@@ -835,6 +824,51 @@ export function CalculatorBand({
                   </li>
                 ))}
               </ol>
+            </div>
+
+            {/* the assets head-to-head — MERGED into the time machine
+                (batch L, task 13): this is how gold performed against
+                the alternatives since the year you pick, in the same
+                tool where any past day's own reading lives */}
+            <div className="flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
+              <div className="flex flex-wrap items-end justify-between gap-2">
+                <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{locale === "en" ? "Gold vs the alternatives" : "طلا در برابر جایگزین‌ها"}</h4>
+                {data !== null && years.length > 0 ? (
+                  <label className="flex items-center gap-2">
+                    <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{ib.pickLabel}</span>
+                    <select
+                      value={effectiveSince ?? undefined}
+                      onChange={(e) => setSinceYear(Number(e.currentTarget.value))}
+                      className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold tabular-nums text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
+                      aria-label={ib.pickLabel}
+                    >
+                      {years.map((y) => (
+                        <option key={y} value={y}>
+                          {yearText(y, locale)}
+                          {y === years[0] ? ` (${ib.firstYearNote})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
+              </div>
+              {data === null ? (
+                <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{ib.waiting}</p>
+              ) : (
+                <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+                  {rows.map(({ asset, result }) => (
+                    <AssetRow
+                      key={asset}
+                      name={ib.assets[asset]}
+                      result={result}
+                      ib={ib}
+                      fmt={fmt}
+                      locale={locale}
+                      maxAbs={maxAbs}
+                    />
+                  ))}
+                </ul>
+              )}
             </div>
 
             {query.kind === "loading" ? <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{tm.loading}</p> : null}
@@ -913,72 +947,28 @@ export function CalculatorBand({
                     {locale === "en" ? "not leaning" : "بی‌طرف"} {fmt.num(row.counts.neutral, 0)} ·{" "}
                     {locale === "en" ? "unread" : "ناخوانده"} {fmt.num(row.counts.unread, 0)}
                   </p>
-                  {(() => {
-                    /* the day's own count bar — for · against · neutral ·
-                       unread in one glance, hue paired with the words above */
-                    const total = Math.max(
-                      1,
-                      row.counts.for + row.counts.against + row.counts.neutral + row.counts.unread,
-                    );
-                    const segs = [
-                      { n: row.counts.for, cls: "bg-[var(--color-currena-success)]" },
-                      { n: row.counts.against, cls: "bg-[var(--color-status-alert)]" },
-                      { n: row.counts.neutral, cls: "bg-[var(--color-border)]" },
-                      { n: row.counts.unread, cls: "bg-[var(--color-border)]/40" },
-                    ];
-                    return (
-                      <div className="flex h-2 w-full overflow-hidden rounded-full" aria-hidden="true">
-                        {segs.map((s, i) => (
-                          <span key={i} className={s.cls} style={{ width: `${(s.n / total) * 100}%` }} />
-                        ))}
-                      </div>
-                    );
-                  })()}
-                  <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                    {row.lanes.map((l) => {
+                  {/* the five forces, SAID IN WORDS (batch L, task 14): the
+                      owner's ask — no red/green bars, no ranges; each lane
+                      as the factor's own level that day (نرخ بهره دلار
+                      آمریکا، تنش، تورم… بالا/پایین), derived from the same
+                      side the meter read, quiet ink throughout */}
+                  <p className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-1 type-caption leading-relaxed">
+                    {row.lanes.map((l, i) => {
                       const laneId = LANES_IN_ORDER.find((k) => k === l.lane) ?? null;
-                      const word =
-                        laneId !== null
-                          ? l.split
-                            ? locale === "en"
-                              ? `split ${fmt.num(l.supports, 0)}·${fmt.num(l.pressures, 0)}`
-                              : `دوپاره ${fmt.num(l.supports, 0)}·${fmt.num(l.pressures, 0)}`
-                            : laneWord[laneId]
-                          : l.side;
-                      const tone =
-                        l.side === "for"
-                          ? "text-[var(--color-currena-success)]"
-                          : l.side === "against"
-                            ? "text-[var(--color-status-alert)]"
-                            : "text-[var(--color-text-tertiary)]";
+                      if (laneId === null) return null;
+                      const levelKey = (l.split ? "split" : l.side) as "for" | "against" | "neutral" | "split" | "unread";
                       return (
-                        <li key={l.lane} className="flex flex-col gap-1 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2 py-1.5 ring-1 ring-[var(--color-border)]/50">
-                          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 type-caption">
-                            <span className="font-semibold text-[var(--color-text-primary)]">
-                              {laneId !== null ? LANE_CONTENT[laneId].label[lan(locale)] : l.lane}
-                            </span>
-                            <span className={`font-bold ${tone}`}>{word}</span>
-                            <span className="text-[var(--color-text-tertiary)]">
-                              {fmt.num(l.readable, 0)} {locale === "en" ? "readable" : "خوانا"}
-                              {l.firing > 0 ? ` · ${fmt.num(l.firing, 0)} ${locale === "en" ? "firing" : "شلیک‌کننده"}` : ""}
-                            </span>
+                        <React.Fragment key={l.lane}>
+                          {i > 0 ? <span aria-hidden="true" className="text-[var(--color-text-tertiary)]">·</span> : null}
+                          <span className="font-semibold text-[var(--color-text-primary)]">
+                            {LANE_CONTENT[laneId].label[lan(locale)]}
                           </span>
-                          {(() => {
-                            /* the lane's own balance — supports vs pressures,
-                               one mini bar; hue never alone, the counts above it */
-                            const fire = l.supports + l.pressures;
-                            if (fire <= 0) return null;
-                            return (
-                              <span className="flex h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border)]/30" aria-hidden="true">
-                                <span className="bg-[var(--color-currena-success)]/70" style={{ width: `${(l.supports / fire) * 100}%` }} />
-                                <span className="bg-[var(--color-status-alert)]/70" style={{ width: `${(l.pressures / fire) * 100}%` }} />
-                              </span>
-                            );
-                          })()}
-                        </li>
+                          <span aria-hidden="true" className="text-[var(--color-text-tertiary)]">—</span>
+                          <span className="font-bold text-[var(--color-text-secondary)]">{LANE_LEVEL[laneId][levelKey][lan(locale)]}</span>
+                        </React.Fragment>
                       );
                     })}
-                  </ul>
+                  </p>
                   <p className="m-0 type-caption text-[var(--color-text-tertiary)]">
                     {row.source === "live" ? tm.provenanceLive : tm.provenanceBackfill}
                   </p>
@@ -986,9 +976,6 @@ export function CalculatorBand({
               )
             ) : null}
 
-            <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
-              <bdi>{tm.eraNote}</bdi>
-            </p>
           </div>
         ) : null}
       </div>

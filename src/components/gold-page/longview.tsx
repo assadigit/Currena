@@ -5,8 +5,9 @@
  * chart of gold's price across the longest reliable series (the annual
  * London market average since 1833 — the gold standard's fixed $20.67,
  * the $35 era, the free market after 1971, the live spot as the running
- * year's own last point), the last-20-years table behind a modal (the
- * owner's own "the more hidden by modal"), and the purchasing-power
+ * year's own last point), the last-20-years table IN THE OPEN on the
+ * card (batch L: the owner's law — «طلا در بیست سال اخیر» visibly, not
+ * behind a toggle), and the purchasing-power
  * machine — "with $12,000 in 2020, how many grams or ounces of gold
  * could I buy?" — the year's own average price against the same money's
  * buying power today.
@@ -22,13 +23,6 @@
 
 import * as React from "react";
 import { Hourglass } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import type { Locale } from "@/lib/gold-page/content";
 import { type Fmt, SignedDelta } from "@/components/gold-page/visuals";
 import { sanitizeAmountText } from "@/components/gold-page/calculator";
@@ -66,7 +60,7 @@ type LongviewT = {
   eraFree: string;
   liveWord: string;
   avgWord: string;
-  modalOpen: string;
+  /** the visible 20-year table's own title + caption (batch L: in the open) */
   modalTitle: string;
   modalNote: string;
   colYear: string;
@@ -292,7 +286,6 @@ export function LongViewCard({
   /* the chart's own state — the view (all / 100 years) and the Y scale */
   const [view, setView] = React.useState<"all" | "100y">("all");
   const [scale, setScale] = React.useState<"log" | "linear">("log");
-  const [tableOpen, setTableOpen] = React.useState(false);
 
   const points = React.useMemo(() => chartPoints(liveSpot), [liveSpot]);
   const visible = React.useMemo(
@@ -406,19 +399,31 @@ export function LongViewCard({
         </span>
       </div>
 
-      {/* the modal opener — the last 20 years, year by year, hidden by the modal */}
-      <button
-        type="button"
-        onClick={() => setTableOpen(true)}
-        aria-haspopup="dialog"
-        className="mt-3 inline-flex min-h-[36px] w-fit items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1.5 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
-      >
-        <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth={1.8}>
-          <rect x="2" y="2" width="12" height="12" rx="2" />
-          <path d="M2 6h12M6 2v12" />
-        </svg>
-        {t.modalOpen}
-      </button>
+      {/* the last 20 years, year by year — IN THE OPEN (batch L: the
+          owner's law, «طلا در بیست سال اخیر» visible, never behind a
+          toggle); the running year rides its own live spot */}
+      <div className="mt-3">
+        <h5 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.modalTitle}</h5>
+        <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.modalNote}</p>
+        <div className="mt-1.5 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
+          <table className="m-0 w-full border-collapse type-caption">
+            <thead>
+              <tr className="text-[var(--color-text-tertiary)]">
+                <th scope="col" className="px-2.5 py-1.5 text-start font-bold">{t.colYear}</th>
+                <th scope="col" className="px-1.5 py-1.5 text-end font-bold">{t.colAvg}</th>
+                <th scope="col" className="px-2.5 py-1.5 text-end font-bold">{t.colChange}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableRows.map((row) => (
+                <tr key={row.year} className={`border-t border-[var(--color-border)] ${row.running ? "bg-[var(--color-currena-soft)]/50" : ""}`}>
+                  <YearRowCells row={row} t={t} fmt={fmt} locale={locale} />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* the purchasing-power machine — the owner's own ask */}
       <div className="mt-3 flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
@@ -513,35 +518,6 @@ export function LongViewCard({
       <p className="m-0 mt-2.5 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.basisLine}</p>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.sourceLine}</p>
 
-      {/* the modal — the last 20 years, year by year */}
-      <Dialog open={tableOpen} onOpenChange={setTableOpen}>
-        <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[440px]">
-          <DialogHeader className="text-start pe-11">
-            <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">{t.modalTitle}</DialogTitle>
-            <DialogDescription className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)] pe-11">
-              {t.modalNote}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-1 max-h-[55vh] overflow-y-auto">
-            <table className="m-0 w-full border-collapse type-caption">
-              <thead className="sticky top-0 bg-[var(--color-surface)]">
-                <tr className="text-[var(--color-text-tertiary)]">
-                  <th scope="col" className="px-2.5 py-1.5 text-start font-bold">{t.colYear}</th>
-                  <th scope="col" className="px-1.5 py-1.5 text-end font-bold">{t.colAvg}</th>
-                  <th scope="col" className="px-2.5 py-1.5 text-end font-bold">{t.colChange}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableRows.map((row) => (
-                  <tr key={row.year} className={`border-t border-[var(--color-border)] ${row.running ? "bg-[var(--color-currena-soft)]/50" : ""}`}>
-                    <YearRowCells row={row} t={t} fmt={fmt} locale={locale} />
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

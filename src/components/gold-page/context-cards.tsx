@@ -196,7 +196,10 @@ type GridT = {
   tomanBillion: string;
   tomanNote: string;
   tomanLive: string;
-  positionLine: string;
+  /** the band label's own quiet tail — its own row (batch L, task 8:
+      «۱٪ پایینی» on one row, «از پنجرهٔ ذخیره‌شده» under it, never an
+      arbitrary mid-word wrap) */
+  positionTail: string;
   bandTop: string;
   bandBottom: string;
   bandMid: string;
@@ -208,6 +211,8 @@ type GridT = {
 type FrT = {
   title: string;
   subtitle: string;
+  /** the visible percentages list's own lead-in (batch L, task 9) */
+  missListLabel: string;
   headline: string;
   y2025Line: string;
   colYear: string;
@@ -438,7 +443,12 @@ export function CurrencyGridCard({
                     inside the delta */}
                 <span className="flex min-w-0 flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 type-caption text-[var(--color-text-tertiary)]">
                   <SignedDelta v={stats!.change30d} fmt={fmt} />
-                  {band !== null ? <span>{t.positionLine.replace("{band}", band)}</span> : null}
+                  {band !== null ? (
+                    <span className="flex flex-col items-end text-end leading-tight">
+                      <span>{band}</span>
+                      <span className="text-[10.5px]">{t.positionTail}</span>
+                    </span>
+                  ) : null}
                 </span>
               </div>
             );
@@ -508,30 +518,64 @@ export function ForecastRetroCard({ t, fmt, locale }: { t: FrT; fmt: Fmt; locale
             .replace("{abs}", `${fmt.num(retro.meanAbsMissPct, 1)}%`)}
         </bdi>
       </p>
+
+      {/* the percentages list, IN THE OPEN (batch L, task 9 — the
+          owner's ask): the last five scored years' misses + the
+          pending 2026, one chip each — the year and its error, the
+          same numbers the full table carries, no tap needed */}
+      <p className="m-0 flex flex-wrap items-baseline gap-x-1.5 gap-y-1 type-caption font-semibold">
+        <span className="text-[var(--color-text-tertiary)]">{t.missListLabel}</span>
+        {retro.scored.slice(-5).map((r) => (
+          <span key={r.year} className="inline-flex items-baseline gap-1 rounded-full bg-[var(--color-surface)] px-2 py-0.5 ring-1 ring-[var(--color-border)]/60">
+            <span className="text-[var(--color-text-primary)]">{locale === "fa" ? fmt.num(r.year, 0) : String(r.year)}</span>
+            <bdi dir="ltr" className={`tabular-nums ${r.missPct < 0 ? "text-[var(--color-currena-success)]" : "text-[var(--color-status-alert)]"}`}>
+              {signed(r.missPct)}
+            </bdi>
+          </span>
+        ))}
+        {retro.pending ? (
+          <span className="inline-flex items-baseline gap-1 rounded-full bg-[var(--color-surface)] px-2 py-0.5 ring-1 ring-[var(--color-border)]/60">
+            <span className="text-[var(--color-text-primary)]">{locale === "fa" ? fmt.num(retro.pending.year, 0) : String(retro.pending.year)}</span>
+            <span className="italic text-[var(--color-text-tertiary)]">{t.pendingCell}</span>
+          </span>
+        ) : null}
+      </p>
+
+      {/* the verdict, IN THE OPEN: the aggregate headline, the 2025
+          record miss, and how the specialists called 2026 so far */}
+      <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+        <bdi>
+          {t.headline
+            .replace("{under}", fmt.num(retro.underForecast.length, 0))
+            .replace("{n}", fmt.num(retro.n, 0))
+            .replace("{mean}", `${signed(retro.meanMissPct)}`)
+            .replace("{abs}", `${fmt.num(retro.meanAbsMissPct, 1)}%`)}
+        </bdi>
+      </p>
+      {y2025 ? (
+        <p className="m-0 type-caption font-semibold text-[var(--color-text-secondary)]">
+          <bdi>
+            {t.y2025Line
+              .replace("{miss}", signed(y2025.missPct))
+              .replace("{forecast}", fmt.num(y2025.forecast, 0))
+              .replace("{actual}", fmt.num(y2025.actual, 1))}
+          </bdi>
+        </p>
+      ) : null}
+      {retro.pending ? (
+        <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
+          <bdi>
+            {t.pendingLine
+              .replace("{forecast}", fmt.num(retro.pending.forecast, 2))
+              .replace("{revision}", fmt.num(LBMA_2026_MIDYEAR_REVISION, 0))}
+          </bdi>
+        </p>
+      ) : null}
       {open ? (
         <div className="mt-1 flex flex-col gap-2">
           <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
             <bdi>{t.pairNote}</bdi>
           </p>
-          <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-            <bdi>
-              {t.headline
-                .replace("{under}", fmt.num(retro.underForecast.length, 0))
-                .replace("{n}", fmt.num(retro.n, 0))
-                .replace("{mean}", `${signed(retro.meanMissPct)}`)
-                .replace("{abs}", `${fmt.num(retro.meanAbsMissPct, 1)}%`)}
-            </bdi>
-          </p>
-          {y2025 ? (
-            <p className="m-0 type-caption font-semibold text-[var(--color-text-secondary)]">
-              <bdi>
-                {t.y2025Line
-                  .replace("{miss}", signed(y2025.missPct))
-                  .replace("{forecast}", fmt.num(y2025.forecast, 0))
-                  .replace("{actual}", fmt.num(y2025.actual, 1))}
-              </bdi>
-            </p>
-          ) : null}
           <div className="overflow-x-auto">
             <table className="w-full border-collapse type-caption">
               <thead>
@@ -575,15 +619,6 @@ export function ForecastRetroCard({ t, fmt, locale }: { t: FrT; fmt: Fmt; locale
             </table>
           </div>
           <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.missConvention}</p>
-          {retro.pending ? (
-            <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
-              <bdi>
-                {t.pendingLine
-                  .replace("{forecast}", fmt.num(retro.pending.forecast, 2))
-                  .replace("{revision}", fmt.num(LBMA_2026_MIDYEAR_REVISION, 0))}
-              </bdi>
-            </p>
-          ) : null}
           <p className="m-0 type-caption text-[var(--color-text-tertiary)]">
             {t.sourceLine.replace("{date}", fmt.dateWords(LBMA_FORECAST_EXTRACTED_AT))}{" "}
             <a

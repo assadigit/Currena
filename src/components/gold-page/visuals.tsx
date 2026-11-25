@@ -617,6 +617,14 @@ export const STATE_INK: Record<SeatState, { ink: string; chip: string; glyph: st
   unread: { ink: "var(--color-text-tertiary)", chip: "var(--color-text-tertiary)", glyph: "◌" },
 };
 
+/** Persian digits for the fa layer — the AI translations can arrive
+ *  with Latin numerals (the engine preserves source digits); the
+ *  owner's law (batch L): Farsi text carries Farsi numerals, applied
+ *  deterministically at render time so every stored row obeys too. */
+export function faDigits(s: string): string {
+  return s.replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]!);
+}
+
 /** The AI-translated corner badge — the owner's batch-K ask: the
  *  machine-translation attribution moves from the in-body label to a
  *  quiet corner tag on the card's header row (a symbol + the tag,

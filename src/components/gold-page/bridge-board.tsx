@@ -163,7 +163,11 @@ export function BridgeBoard({
                   <td className="px-1 py-1.5 text-end font-bold tabular-nums text-[var(--color-text-primary)]">
                     <bdi dir="ltr">{row !== undefined ? toman(row.marketToman) : "·"}</bdi>
                   </td>
-                  <td className={`px-1 py-1.5 text-end font-bold tabular-nums ${row !== undefined && row.premiumPct >= 0 ? "text-[var(--color-text-secondary)]" : "text-[var(--color-status-alert)]"}`}>
+                  {/* the premium column, QUIET (batch L, task 10): the
+                      owner's call — the حباب is visual noise at full
+                      ink; tertiary at 65% opacity, no bold, the sign
+                      itself (+/−) carries the direction */}
+                  <td className="px-1 py-1.5 text-end tabular-nums text-[var(--color-text-tertiary)]/65">
                     {row !== undefined ? (
                       <bdi dir="ltr">
                         {(row.premiumPct >= 0

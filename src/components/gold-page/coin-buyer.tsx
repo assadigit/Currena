@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * The coin budget machine — the owner's own ask: "with 10k AUD, how many
- * full Emami coins can I buy?" One coherent Tehran snapshot answers it:
+ * The coin budget machine — the owner's own ask: "with this money, how
+ * many full Emami coins can I buy?" One coherent Tehran snapshot answers it:
  * the picked currency's own free-market rate (the TGJU board's own row,
  * toman per unit) converts the money to toman, the Emami coin's own
  * market price divides it — and the same money at the coin's melt value
@@ -24,33 +24,21 @@ import { deskBasePath } from "@/lib/utils";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
-/** The TGJU board's own FX rows the machine offers, the owner's AUD
- *  scenario first, then the majors, the toman itself last. */
-const CURRENCY_ORDER = [
-  "aud", "usd", "eur", "gbp", "cad", "nzd", "aed", "cny",
-  "chf", "jpy", "krw", "try", "myr", "idr", "php", "vnd", "irr",
-] as const;
+/** The TGJU board's own FX rows the machine offers — the owner's own
+ *  six, and only the six (batch L, task 11): the dollar and the toman
+ *  first — the two that matter most — then the euro, the pound, the
+ *  Australian and the Canadian dollar. */
+const CURRENCY_ORDER = ["usd", "irr", "eur", "gbp", "aud", "cad"] as const;
 
 /** The chips' own names — [code, EN, fa]; unknown codes fall back to
  *  their own code (never a guess). */
 const CURRENCY_NAMES: Record<string, [string, string]> = {
-  aud: ["Australian dollar", "دلار استرالیا"],
   usd: ["US dollar", "دلار آمریکا"],
-  eur: ["Euro", "یورو"],
-  gbp: ["British pound", "پوند انگلستان"],
-  cad: ["Canadian dollar", "دلار کانادا"],
-  nzd: ["New Zealand dollar", "دلار نیوزیلند"],
-  aed: ["UAE dirham", "درهم امارات"],
-  cny: ["Chinese yuan", "یوان چین"],
-  chf: ["Swiss franc", "فرانک سوئیس"],
-  jpy: ["Japanese yen", "ین ژاپن"],
-  krw: ["Korean won", "وون کره"],
-  try: ["Turkish lira", "لیر ترکیه"],
-  myr: ["Malaysian ringgit", "رینگیت مالزی"],
-  idr: ["Indonesian rupiah", "روپیه اندونزی"],
-  php: ["Philippine peso", "پزو فیلیپین"],
-  vnd: ["Vietnamese dong", "دونگ ویتنام"],
   irr: ["Iranian toman", "تومان"],
+  eur: ["Euro", "یورو"],
+  gbp: ["British pound", "پوند"],
+  aud: ["Australian dollar", "دلار استرالیا"],
+  cad: ["Canadian dollar", "دلار کانادا"],
 };
 
 type CoinBuyerT = {
@@ -100,8 +88,8 @@ export function CoinBuyerBand({
   fmt: Fmt;
   locale: Locale;
 }) {
-  /* the machine's own state — the owner's example rides as the default:
-     10,000 AUD against the full Emami coin */
+  /* the machine's own state — 10,000 of the picked currency (the
+     dollar, the first of the owner's six) against the full Emami coin */
   const [amount, setAmount] = React.useState<number>(10000);
   const [amountText, setAmountText] = React.useState<string>("10000");
   React.useEffect(() => {
@@ -121,7 +109,7 @@ export function CoinBuyerBand({
     const have = new Set(fxRows.map(codeOf));
     return CURRENCY_ORDER.filter((c) => have.has(c)) as string[];
   }, [fxRows]);
-  const [pick, setPick] = React.useState<string>("aud");
+  const [pick, setPick] = React.useState<string>("usd");
   const currency = available.includes(pick) ? pick : available[0] ?? null;
 
   /* the parity engine over the same snapshot — the melt leg */
@@ -254,7 +242,7 @@ export function CoinBuyerBand({
               </bdi>
             </p>
             {answer.meltCoins !== null ? (
-              <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">
+              <p className="m-0 mt-1 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]/65">
                 <bdi>
                   {t.meltLine.replace("{n}", fmt.num(answer.meltCoins, 2))}
                 </bdi>
