@@ -1,16 +1,26 @@
 "use client";
 
 /**
- * Compound Wealth — the /tools index view (spec §3): a simple list of
- * tool cards (name, one line). Phase 1 lists Compound Wealth and links
- * to the existing converter at its existing URL (currena.ir — the main
- * site's own page, untouched). Same chrome and language handling as the
- * tool page. (The route's metadata lives in src/app/tools/page.tsx.)
+ * The /tools index — the consolidation the owner asked for: every tool
+ * on currena.ir/tools, read from the one registry (src/lib/tools/
+ * registry.ts), grouped by family, each card carrying its bilingual
+ * name and one line. The main site's own converter stays linked under
+ * "From the main site" (its page is untouched, per the original spec).
  */
 
 import * as React from "react";
-import { COPY } from "@/lib/compound/content";
-import { ToolsFooter, ToolsHeader, useSiteLocale } from "@/components/compound/chrome";
+import {
+  ToolsFooter,
+  ToolsHeader,
+  useSiteLocale,
+} from "@/components/compound/chrome";
+import { TOOLS_COPY } from "@/lib/tools/copy";
+import {
+  TOOLS,
+  TOOL_GROUPS,
+  type ToolEntry,
+} from "@/lib/tools/registry";
+import type { Locale } from "@/lib/compound/content";
 
 function ToolCard({
   title,
@@ -34,8 +44,12 @@ function ToolCard({
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="m-0 text-[1.25rem] font-extrabold tracking-tight text-[var(--color-text-primary)]">{title}</h2>
-          <p className="mt-1 mb-0 text-[13.5px] leading-relaxed text-[var(--color-text-secondary)]">{line}</p>
+          <h2 className="m-0 text-[1.25rem] font-extrabold tracking-tight text-[var(--color-text-primary)]">
+            {title}
+          </h2>
+          <p className="mt-1 mb-0 text-[13.5px] leading-relaxed text-[var(--color-text-secondary)]">
+            {line}
+          </p>
         </div>
         <span className="mt-1 shrink-0 rounded-full bg-[var(--color-currena-soft)] px-3 py-1.5 text-[12px] font-bold text-[var(--color-currena-blue-deep)]">
           {cta} ↗
@@ -47,7 +61,7 @@ function ToolCard({
 
 export default function ToolsIndex() {
   const [locale, toggleLang] = useSiteLocale();
-  const copy = COPY[locale];
+  const copy = TOOLS_COPY[locale];
   const t = copy.index;
 
   React.useEffect(() => {
@@ -56,10 +70,21 @@ export default function ToolsIndex() {
     document.title = locale === "fa" ? `${t.title} · کورنا` : "Tools · Currena";
   }, [locale, copy.dir, t.title]);
 
+  const entryTitle = (e: ToolEntry) => (locale === "fa" ? e.fa.title : e.en.title);
+  const entryLine = (e: ToolEntry) => (locale === "fa" ? e.fa.line : e.en.line);
+
   return (
-    <div dir={copy.dir} lang={locale} className="flex min-h-screen flex-col bg-[var(--color-currena-bg-light)]">
+    <div
+      dir={copy.dir}
+      lang={locale}
+      className="flex min-h-screen flex-col bg-[var(--color-currena-bg-light)]"
+    >
       <span id="top" />
-      <ToolsHeader copy={copy} locale={locale} onToggleLang={toggleLang} />
+      <ToolsHeader
+        copy={{ nav: copy.nav, tool: { title: t.title, disclaimer: copy.footer.disclaimer, footer: { rights: copy.footer.rights } } }}
+        locale={locale}
+        onToggleLang={toggleLang}
+      />
 
       <main className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[800px] lg:px-8">
         <header className="mt-2 mb-4">
@@ -70,26 +95,42 @@ export default function ToolsIndex() {
           <p className="mt-1 mb-0 text-[13.5px] text-[var(--color-text-secondary)]">{t.promise}</p>
         </header>
 
-        <div className="space-y-3">
-          <ToolCard
-            title={copy.tool.title}
-            line={copy.tool.promise}
-            href="/tools/compound-wealth"
-            cta={t.open}
-          />
-        </div>
+        {TOOL_GROUPS.map((g) => {
+          const tools = TOOLS.filter((e) => e.group === g.id);
+          if (tools.length === 0) return null;
+          return (
+            <section key={g.id} className="mb-7">
+              <h2 className="type-kicker mb-2 text-[var(--color-text-tertiary)]">
+                {locale === "fa" ? g.fa : g.en}
+              </h2>
+              <div className="space-y-3">
+                {tools.map((e) => (
+                  <ToolCard
+                    key={e.slug}
+                    title={entryTitle(e)}
+                    line={entryLine(e)}
+                    href={`/tools/${e.slug}`}
+                    cta={t.open}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
 
-        <h2 className="type-kicker mt-8 mb-2 text-[var(--color-text-tertiary)]">{t.alsoConverter}</h2>
+        <h2 className="type-kicker mt-2 mb-2 text-[var(--color-text-tertiary)]">
+          {t.externalKicker}
+        </h2>
         <ToolCard
-          title={t.converterName}
-          line={t.converterLine}
+          title={t.externalName}
+          line={t.externalLine}
           href="https://currena.ir/"
-          cta={t.converterCta}
+          cta={t.externalCta}
           external
         />
       </main>
 
-      <ToolsFooter copy={copy} />
+      <ToolsFooter copy={{ nav: copy.nav, tool: { title: t.title, disclaimer: copy.footer.disclaimer, footer: { rights: copy.footer.rights } } }} />
     </div>
   );
 }

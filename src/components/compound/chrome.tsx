@@ -15,6 +15,28 @@ import { useTheme } from "next-themes";
 import { Moon, Sun, ChevronRight } from "lucide-react";
 import type { CompoundCopy, Locale } from "@/lib/compound/content";
 
+/**
+ * The structural subset of the copy the tools chrome reads — every
+ * tools-family page passes one of these (the compound tool passes its
+ * full CompoundCopy, which satisfies it structurally; the rest of the
+ * tools build theirs from src/lib/tools/copy.ts + registry).
+ */
+export interface ToolsChromeCopy {
+  nav: {
+    site: string;
+    tagline: string;
+    tools: string;
+    langToggle: string;
+    backToTools: string;
+  };
+  tool: {
+    title: string;
+    /** The footer's second line. */
+    disclaimer: string;
+    footer: { rights: string; madeInBrowser?: string };
+  };
+}
+
 /** The Currena mark (the gold page's own coin, byte-faithful). */
 export function CurrenaMark({ className }: { className?: string }) {
   return (
@@ -42,7 +64,7 @@ export function ToolsHeader({
   locale,
   onToggleLang,
 }: {
-  copy: CompoundCopy;
+  copy: ToolsChromeCopy;
   locale: Locale;
   onToggleLang: () => void;
 }) {
@@ -98,8 +120,9 @@ export function ToolsHeader({
   );
 }
 
-/** The "← Tools" breadcrumb (spec §3, navigation). */
-export function ToolsBreadcrumb({ copy, locale }: { copy: CompoundCopy; locale: Locale }) {
+/** The "← Tools" breadcrumb (spec §3, navigation) — the label is the
+ *  page's own title, so every tool page can carry its own name. */
+export function ToolsBreadcrumb({ copy, locale }: { copy: ToolsChromeCopy; locale: Locale }) {
   return (
     <nav className="flex items-center gap-1.5 type-caption text-[var(--color-text-tertiary)]" aria-label={locale === "en" ? "Breadcrumb" : "مسیر"}>
       <a
@@ -115,7 +138,7 @@ export function ToolsBreadcrumb({ copy, locale }: { copy: CompoundCopy; locale: 
   );
 }
 
-export function ToolsFooter({ copy }: { copy: CompoundCopy }) {
+export function ToolsFooter({ copy }: { copy: ToolsChromeCopy }) {
   return (
     <footer className="mt-auto border-t border-[var(--color-border)] bg-[var(--color-surface)]">
       <div className="mx-auto w-full max-w-[1080px] px-3 py-6 sm:px-6 lg:px-8">

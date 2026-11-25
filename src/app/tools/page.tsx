@@ -2,16 +2,32 @@ import type { Metadata } from "next";
 import ToolsIndex from "@/components/compound/tools-index";
 
 /**
- * /tools — the tools index (spec §3): a simple list of tool cards.
- * Served natively at /tools (the middleware maps the public URL onto
- * the basePath-mounted route in production).
+ * /tools — the tools index: every tool on currena.ir/tools, read from
+ * the one registry (src/lib/tools/registry.ts). Served natively at
+ * /tools (the middleware maps the public URL onto the basePath-mounted
+ * route in production).
  */
 
 export const metadata: Metadata = {
   title: "Tools · Currena",
   description:
-    "Small, quiet tools for money questions: the Compound Wealth growth tool, plus the Currena currency converter.",
-  keywords: ["Currena", "tools", "compound growth", "currency converter"],
+    "Small, quiet tools for money questions: compound wealth, the currency converter, the live rates board, the exchange desk's calculator and receipt maker, the gold calculators, the fair split and the group settlement.",
+  keywords: [
+    "Currena",
+    "tools",
+    "ابزارها",
+    "compound growth",
+    "currency converter",
+    "مبدل ارز",
+    "live rates",
+    "تابلوی نرخ های لحظه ای",
+    "gold calculator",
+    "محاسبه گر طلا",
+    "fair split",
+    "محاسبه دنگ",
+    "group settlement",
+    "تسویه گروهی",
+  ],
   alternates: {
     canonical: "https://currena.ir/tools",
   },

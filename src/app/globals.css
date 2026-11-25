@@ -921,3 +921,46 @@
     background: #14181f !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* The receipt maker's print path (src/components/tools/receipt.tsx).  */
+/* The same contract as the digest's: the button adds                  */
+/* body.receipt-printing around window.print(), so only the receipt   */
+/* sheet reaches the paper — a normal print of the page is untouched.  */
+/* Ink on white, no theme tokens: it prints identically from light or  */
+/* dark mode, and in either language.                                  */
+/* ------------------------------------------------------------------ */
+
+@media print {
+  body.receipt-printing > *:not(.tools-root) {
+    display: none !important;
+  }
+  body.receipt-printing .tools-root > *:not(main) {
+    display: none !important;
+  }
+  body.receipt-printing .tools-root main > *:not(#receipt-sheet) {
+    display: none !important;
+  }
+  body.receipt-printing .tools-root main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  body.receipt-printing #receipt-sheet {
+    max-width: 76mm !important;
+    margin: 0 auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #1c1917 !important;
+    padding: 4mm 2mm !important;
+  }
+  body.receipt-printing #receipt-sheet * {
+    color: #1c1917 !important;
+  }
+  body.receipt-printing #receipt-sheet .bg-\[var\(--color-currena-soft\)\] {
+    background: #f2f2f2 !important;
+  }
+  body.receipt-printing #receipt-sheet .bg-\[var\(--color-currena-bg-light\)\] {
+    background: #ffffff !important;
+  }
+}
