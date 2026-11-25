@@ -200,8 +200,8 @@ export function WgcCard({
           rides the opposite corner (batch K) — the engine + date on its
           tooltip */}
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-        <h2 className="m-0 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
-          <PackIcon file="gold-briefing.png" size={34} className="h-[34px] w-[34px]" />
+        <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+          <PackIcon file="gold-briefing.png" size={128} className="h-32 w-32" />
           {t.title}
         </h2>
         {fa ? (

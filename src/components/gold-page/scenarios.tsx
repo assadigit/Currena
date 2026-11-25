@@ -151,8 +151,8 @@ export function ScenariosBand({
 
   return (
     <section id="gold-scenarios" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h3 className="m-0 mt-1 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
-        <PackIcon file="gold-price-speculation-scenarios.png" size={34} className="h-[34px] w-[34px]" />
+      <h3 className="m-0 mt-1 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-price-speculation-scenarios.png" size={128} className="h-32 w-32" />
         {t.title}
       </h3>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>

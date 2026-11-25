@@ -28,6 +28,14 @@
  * empty — with width/height set so it never shifts layout, lazy and
  * async so the icons never block the page's own paint.
  *
+ * THE SIZE LAW (the owner's batch-O ask): every icon renders at the
+ * 128×128 CSS-pixel FLOOR — the owner found the first pass's sizes
+ * (26px sub-heads, 34px card and section titles) too small and asked
+ * for at least 128×128; the 250×250 sources stay crisp at 128
+ * (~1.95× density), and the rows ride the same flex law as before —
+ * the heading is the row, the icon its start element (items-center,
+ * gap-3/gap-4), RTL flips it to the start-side for free.
+ *
  * The files keep their pack spelling corrected only (calender →
  * calendar, scnearios → scenarios); the desk's basePath prefix rides
  * deskBasePath, as every other public asset on the page.
@@ -37,12 +45,13 @@ import { deskBasePath } from "@/lib/utils";
 
 export function PackIcon({
   file,
-  size = 34,
+  size = 128,
   className = "",
 }: {
   /** The file name inside public/icons/ (e.g. "gold-briefing.png"). */
   file: string;
-  /** The rendered square size in CSS pixels; width/height are set to it. */
+  /** The rendered square size in CSS pixels; width/height are set to it.
+      The owner's floor is 128 — no call site may ask for less. */
   size?: number;
   className?: string;
 }) {

@@ -499,12 +499,17 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
           block — the user faces the upcoming events, nothing else).
           The owner's pack icon (batch N) carries the calendar's
           identity — the gold desk-calendar render in place of the old
-          little lucide clock — riding the lead line at sub-head size. */}
-      <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 type-caption font-bold text-[var(--color-text-primary)]">
-        <PackIcon file="gold-events-calendar.png" size={26} className="h-[26px] w-[26px]" />
-        {t.eventsLead}
-        <span className="font-semibold text-[var(--color-text-tertiary)]">
-          {events.length > 0 ? `· ${fmt.num(events.length, 0)} ${locale === "en" ? "events" : "رویداد"}` : ""}
+          little lucide clock — riding the lead line at the owner's
+          batch-O 128px floor, with the lead words + count wrapping
+          INSIDE their own column beside it (never dropping under the
+          icon). */}
+      <p className="m-0 flex items-center gap-3 type-caption font-bold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-events-calendar.png" size={128} className="h-32 w-32" />
+        <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+          {t.eventsLead}
+          <span className="font-semibold text-[var(--color-text-tertiary)]">
+            {events.length > 0 ? `· ${fmt.num(events.length, 0)} ${locale === "en" ? "events" : "رویداد"}` : ""}
+          </span>
         </span>
       </p>
 

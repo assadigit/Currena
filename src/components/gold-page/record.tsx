@@ -279,8 +279,8 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
         </button>
       </div>
-      <h3 className="m-0 mt-1 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
-        <PackIcon file="gold-technical-analysis.png" size={34} className="h-[34px] w-[34px]" />
+      <h3 className="m-0 mt-1 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-technical-analysis.png" size={128} className="h-32 w-32" />
         {t.title}
       </h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
@@ -1026,8 +1026,8 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
   return (
     <section id="gold-positions" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
-        <PackIcon file="gold-dealers-long-short-position.png" size={34} className="h-[34px] w-[34px]" />
+      <h3 className="m-0 mt-1 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-dealers-long-short-position.png" size={128} className="h-32 w-32" />
         {t.title}
       </h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
