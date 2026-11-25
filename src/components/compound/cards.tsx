@@ -261,7 +261,7 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
                 bandHigh: copy.tool.chart.bandHighLabel,
                 crossover:
                   result.crossoverMonth !== null
-                    ? `${copy.tool.chart.crossoverLabel} ${monthYearLabel(isoOfMonth(startMonth, result.crossoverMonth), locale)}`
+                    ? `${copy.tool.chart.crossoverShort} ${monthYearLabel(isoOfMonth(startMonth, result.crossoverMonth), locale)}`
                     : copy.tool.chart.crossoverNever,
               }}
               fmtValue={(v) => formatMoney(v, locale)}

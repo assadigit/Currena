@@ -1,7 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "currena-gold-desk",
-  "main": ".open-next/worker.js",
+  // The entry is the /tools wrapper (worker-entry.ts), which imports the
+// generated OpenNext worker and owns the public /tools namespace; the
+// gold namespace passes through untouched.
+"main": "worker-entry.ts",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": [
     // Node.js APIs for the Next.js server (OpenNext requires this)

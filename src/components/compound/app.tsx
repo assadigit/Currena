@@ -638,7 +638,7 @@ export default function CompoundWealthApp() {
               bandHigh: t.chart.bandHighLabel,
               crossover:
                 result.crossoverMonth !== null
-                  ? `${t.chart.crossoverLabel} ${monthYearLabel(isoOfMonth(startMonth, result.crossoverMonth), locale)}`
+                  ? `${t.chart.crossoverShort} ${monthYearLabel(isoOfMonth(startMonth, result.crossoverMonth), locale)}`
                   : t.chart.crossoverNever,
             }}
             fmtValue={(v) => formatMoney(v, locale)}

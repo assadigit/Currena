@@ -19,7 +19,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 230ms"
+      "detail": "3 one-tap changes in 221ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -58,12 +58,12 @@
     {
       "id": "22-a4-en-light",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1094B numbers=true"
     },
     {
       "id": "22-a4-en-dark",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1094B numbers=true"
     },
     {
       "id": "22-a4-en-light-costs",
@@ -78,12 +78,12 @@
     {
       "id": "22-a4-fa-light",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1280B numbers=true"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1261B numbers=true"
     },
     {
       "id": "22-a4-fa-dark",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1280B numbers=true"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1261B numbers=true"
     },
     {
       "id": "22-a4-fa-light-costs",
