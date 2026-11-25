@@ -300,30 +300,30 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
       ) : null}
 
       {/* the nearest levels — the price sandwiched between its closest
-          reference lines: support below, resistance above, price between */}
+          reference lines: ONE row, three cells — support · now ·
+          resistance (the owner's batch-H ask: never one-per-row, the
+          grid reads as the sandwich it is, on a phone too) */}
       {nearestSupport !== null || nearestResistance !== null ? (
-        <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className="mt-2.5 grid grid-cols-3 gap-1.5">
           {nearestSupport !== null ? (
-            <div className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2.5" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-up) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-up) 30%, transparent)" }}>
-              <span className="type-caption font-bold text-[var(--color-return-up)]">{t.nearestSupport}</span>
-              <span className="type-label font-extrabold text-[var(--color-text-primary)]">
-                <bdi dir="ltr">${fmt.num(nearestSupport.value, 0)}</bdi>
-                <span className="ms-1.5 type-caption font-semibold text-[var(--color-text-tertiary)]">({nearestSupport.tag})</span>
+            <div className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-up) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-up) 30%, transparent)" }}>
+              <span className="m-0 truncate text-[10.5px] font-bold leading-tight text-[var(--color-return-up)]">{t.nearestSupport}</span>
+              <span className="m-0 flex flex-wrap items-baseline gap-x-1">
+                <bdi dir="ltr" className="type-caption font-extrabold tabular-nums text-[var(--color-text-primary)]">${fmt.num(nearestSupport.value, 0)}</bdi>
+                <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">{nearestSupport.tag}</span>
               </span>
             </div>
           ) : null}
-          <div className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
-            <span className="type-caption font-bold text-[var(--color-text-primary)]">{t.priceNowWord}</span>
-            <span className="type-label font-extrabold text-[var(--color-accent-gold-deep)]">
-              <bdi dir="ltr">${fmt.num(lastClose, 0)}</bdi>
-            </span>
+          <div className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2 ring-1 ring-[var(--color-border)]">
+            <span className="m-0 truncate text-[10.5px] font-bold leading-tight text-[var(--color-text-primary)]">{t.priceNowWord}</span>
+            <bdi dir="ltr" className="m-0 type-caption font-extrabold tabular-nums text-[var(--color-accent-gold-deep)]">${fmt.num(lastClose, 0)}</bdi>
           </div>
           {nearestResistance !== null ? (
-            <div className="flex flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2.5" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-down) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 30%, transparent)" }}>
-              <span className="type-caption font-bold text-[var(--color-return-down)]">{t.nearestResistance}</span>
-              <span className="type-label font-extrabold text-[var(--color-text-primary)]">
-                <bdi dir="ltr">${fmt.num(nearestResistance.value, 0)}</bdi>
-                <span className="ms-1.5 type-caption font-semibold text-[var(--color-text-tertiary)]">({nearestResistance.tag})</span>
+            <div className="flex min-w-0 flex-col gap-0.5 rounded-[var(--cr-radius-md)] p-2" style={{ backgroundColor: "color-mix(in srgb, var(--color-return-down) 9%, transparent)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 30%, transparent)" }}>
+              <span className="m-0 truncate text-[10.5px] font-bold leading-tight text-[var(--color-return-down)]">{t.nearestResistance}</span>
+              <span className="m-0 flex flex-wrap items-baseline gap-x-1">
+                <bdi dir="ltr" className="type-caption font-extrabold tabular-nums text-[var(--color-text-primary)]">${fmt.num(nearestResistance.value, 0)}</bdi>
+                <span className="text-[10px] font-semibold text-[var(--color-text-tertiary)]">{nearestResistance.tag}</span>
               </span>
             </div>
           ) : null}
@@ -667,7 +667,7 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
                   <td className="px-1.5 py-1.5 text-end font-bold text-[var(--color-text-primary)]">
                     {b.sum12m >= 0 ? "+" : "−"}{fmt.num(Math.abs(b.sum12m), 1)}
                   </td>
-                  <td className="px-1.5 py-1.5 text-end text-[var(--color-text-secondary)]">{t.tonnesShort.replace("{v}", fmt.num(b.tonnes, 0))}</td>
+                  <td className="px-1.5 py-1.5 text-end text-[var(--color-text-secondary)]">{t.holdingsNow.replace("{v}", fmt.num(b.tonnes, 0))}</td>
                   <td className="px-1.5 py-1.5 text-end font-semibold text-[var(--color-text-secondary)]">
                     {share !== null ? `${fmt.num(share, 1)}%` : "·"}
                   </td>
@@ -692,7 +692,7 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
                   </span>
                 </div>
                 <p className="m-0 flex flex-wrap items-baseline gap-x-2 type-caption text-[var(--color-text-tertiary)]">
-                  <span>{t.tonnesShort.replace("{v}", fmt.num(b.tonnes, 0))}</span>
+                  <span>{t.holdingsNow.replace("{v}", fmt.num(b.tonnes, 0))}</span>
                   <span aria-hidden="true"> · </span>
                   <span>{monthLabel(b.latestMonth, locale)} {b.latestDelta >= 0 ? "+" : "−"}{fmt.num(Math.abs(b.latestDelta), 1)}</span>
                 </p>
@@ -700,7 +700,9 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
             );
           })}
         </ul>
-        <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.shareNote}</p>
+        {/* the valuation note — small and low-opacity (the owner's
+            batch-H ask): the method stays, but whispers */}
+        <p className="m-0 text-[10.5px] leading-relaxed text-[var(--color-text-tertiary)]/70">{t.shareNote}</p>
       </div>
 
       {/* the sellers — the light-red box (فروشندگان طلا) */}
@@ -774,12 +776,11 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
      reader; one tap opens the whole section */
   const [open, setOpen] = React.useState(false);
   return (
-    <section id="gold-vault" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
+    /* a sub-block of the merged «سایر شاخص‌ها» section (batch H) — its own
+       collapse behaviour, its own sub-heading, no section of its own */
+    <div className="mt-4 border-t border-[var(--color-border)] pt-3.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <div className="min-w-0">
-          <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-          <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
-        </div>
+        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.title}</h4>
         <button
           type="button"
           aria-expanded={open}
@@ -839,7 +840,7 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
         </div>
       </div>
       ) : null}
-    </section>
+    </div>
   );
 }
 
@@ -936,6 +937,23 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
           ? "var(--color-return-down)"
           : "var(--color-text-secondary)";
   const verdictPos = main === null ? 50 : Math.min(98, Math.max(2, ((main.value + 100) / 200) * 100));
+  /* the plain-language verdict description (the owner's batch-H ask):
+     what the side MEANS in words, with the bet's strength graded from
+     the reading's own ratio — the deeper past ±60, the heavier */
+  const strengthWord = (v: number): string => {
+    const a = Math.abs(v);
+    if (a > 60) return t.strengthHeavy;
+    if (a > 40) return t.strengthStrong;
+    return t.strengthModerate;
+  };
+  const verdictDesc =
+    main === null
+      ? null
+      : main.value > 20
+        ? String(t.verdictLongDesc).replace("{strength}", strengthWord(main.value))
+        : main.value < -20
+          ? String(t.verdictShortDesc).replace("{strength}", strengthWord(main.value))
+          : t.verdictNeutralDesc;
   return (
     <section id="gold-positions" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
@@ -949,6 +967,13 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
               {verdictWord}
             </span>
           </div>
+          {/* the verdict in plain words — what the side means, with the
+              bet's strength from the reading's own ratio (batch H) */}
+          {verdictDesc !== null ? (
+            <p className="m-0 type-caption leading-relaxed text-[var(--color-text-primary)]" data-positions-verdict-desc>
+              {verdictDesc}
+            </p>
+          ) : null}
 
           {/* THE market thermometer — the full −100…+100 domain as a
               gradient track with zone ticks, a zero spine, and a labelled
@@ -1194,11 +1219,281 @@ function FamilyRecordRow({ r, t, locale }: { r: (typeof GOLD_RELATIONSHIPS)[numb
   );
 }
 
+/* ------------------------------------------------------------------ *
+ * The relationship GRAPH (the owner's batch-H ask: a real visualization,
+ * not a list) — six force family nodes around one gold hub, every edge
+ * an arrow INTO gold (width = documented link count, ink = the family's
+ * strongest evidence class), plus the two documented cross-links drawn
+ * dashed: borrowing costs feed the dollar (R-14), and in a true panic
+ * the dollar itself bids with gold (R-22). Tap a node to read its
+ * records below. Responsive: a wide radial map, a twin-column map on
+ * phones (the same graph, never a miniature).
+ * ------------------------------------------------------------------ */
+
+/** Measure a block's own width after mount (the responsive-canvas trick —
+ *  the graph's viewBox follows the container, clamped 320–680). */
+function useGraphWidth(): { ref: React.RefObject<HTMLDivElement | null>; w: number } {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const [w, setW] = React.useState<number | null>(null);
+  React.useEffect(() => {
+    const el = ref.current;
+    if (el === null) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) setW(entry.contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return { ref, w: w ?? 680 };
+}
+
+/** The family node's geometry: a pill that carries the title, the link
+ *  count, and the strongest evidence-class letter. */
+interface GraphNode {
+  family: (typeof FORCE_FAMILIES)[number];
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  ink: string;
+  letter: string;
+  count: number;
+}
+
+function RelationshipGraph({
+  t,
+  locale,
+  selected,
+  onSelect,
+}: {
+  t: AnyT;
+  locale: Locale;
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  const { ref, w } = useGraphWidth();
+  const W = Math.max(320, Math.min(680, Math.round(w)));
+  const narrow = W < 520;
+  const H = narrow ? 560 : 470;
+  const hub = { x: W / 2, y: H / 2 - (narrow ? 0 : 10) };
+  const hubR = 30;
+
+  /* the family nodes: dominant evidence class per family (the letter the
+     node carries), positions radial on wide screens, twin columns on
+     phones — [0,2,4] left, [1,3,5] right, so no two neighbours stack */
+  const nodes: GraphNode[] = React.useMemo(() => {
+    const layout = FORCE_FAMILIES.map((family, i) => {
+      const records = familyRecords(family);
+      const tally = new Map<string, number>();
+      for (const r of records) tally.set(r.class, (tally.get(r.class) ?? 0) + 1);
+      let letter = "M";
+      let best = -1;
+      for (const [c, n] of tally) {
+        if (n > best) {
+          best = n;
+          letter = c;
+        }
+      }
+      const ink = CLASS_INK[letter] ?? "var(--color-currena-blue-deep)";
+      let x: number;
+      let y: number;
+      if (narrow) {
+        const col = i % 2 === 0 ? 0 : 1;
+        const row = Math.floor(i / 2);
+        x = col === 0 ? 84 : W - 84;
+        y = 92 + row * ((H - 184) / 2);
+      } else {
+        const a = (-90 + i * 60) * (Math.PI / 180);
+        x = hub.x + Math.cos(a) * (W * 0.34);
+        y = hub.y + Math.sin(a) * 150;
+      }
+      const width = narrow ? 124 : 136;
+      return { family, x, y, w: width, h: 46, ink, letter, count: records.length } as GraphNode;
+    });
+    return layout;
+  }, [narrow, W, H, hub.x, hub.y]);
+
+  const nodeOf = (familyId: string): GraphNode | undefined => nodes.find((n) => n.family.id === familyId);
+  const lan0 = locale === "en" ? 0 : 1;
+
+  /* one family's arrow into gold: trimmed at the node's edge and the
+     hub's rim, tipped with a hand-drawn triangle in the same ink */
+  const edgeIntoHub = (n: GraphNode) => {
+    const dx = hub.x - n.x;
+    const dy = hub.y - n.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const trim = n.h / 2 + 10;
+    const x1 = n.x + ux * trim;
+    const y1 = n.y + uy * trim;
+    const x2 = hub.x - ux * (hubR + 10);
+    const y2 = hub.y - uy * (hubR + 10);
+    const isSel = selected === n.family.id;
+    const width = (1.4 + Math.min(2, n.count * 0.35)) * (isSel ? 1.5 : 1);
+    return { x1, y1, x2, y2, ux, uy, width, isSel };
+  };
+
+  const arrowTip = (x: number, y: number, ux: number, uy: number) => {
+    const bx = x - ux * 9;
+    const by = y - uy * 9;
+    const px = -uy;
+    const py = ux;
+    return `M${x},${y} L${bx + px * 4.5},${by + py * 4.5} L${bx - px * 4.5},${by - py * 4.5} Z`;
+  };
+
+  /* the two documented cross-links, dashed (R-14: costs → dollar; R-22:
+     the dollar bids with gold in a panic) */
+  const crossA = nodeOf("cost-of-money");
+  const crossB = nodeOf("the-dollar");
+  const crossPath =
+    crossA !== undefined && crossB !== undefined
+      ? `M${(crossA.x + crossB.x) / 2 + (crossB.y - crossA.y) * 0.12},${(crossA.y + crossB.y) / 2 - (crossB.x - crossA.x) * 0.12} Q${(crossA.x + crossB.x) / 2},${(crossA.y + crossB.y) / 2} ${(crossA.x + crossB.x) / 2 - (crossB.y - crossA.y) * 0.12},${(crossA.y + crossB.y) / 2 + (crossB.x - crossA.x) * 0.12}`
+      : null;
+  const dollarNode = nodeOf("the-dollar");
+
+  const ariaLabel =
+    locale === "en"
+      ? `The map: ${FORCE_FAMILIES.map((f) => `${f.title[0]} (${f.records.length} links)`).join("; ")} — all arrows point into gold.`
+      : `نقشه: ${FORCE_FAMILIES.map((f) => `${f.title[1]} (${f.records.length} پیوند)`).join("؛ ")} — همهٔ پیکان‌ها به طلا می‌روند.`;
+
+  return (
+    <div ref={ref} className="mt-3">
+      <svg
+        dir="ltr"
+        viewBox={`0 0 ${W} ${H}`}
+        className="block h-auto w-full"
+        role="img"
+        aria-label={ariaLabel}
+      >
+        {/* the family arrows into gold — width by link count, ink by the
+            family's strongest evidence class, arrowheads into the hub */}
+        {nodes.map((n) => {
+          const e = edgeIntoHub(n);
+          return (
+            <g key={`edge-${n.family.id}`}>
+              <line
+                x1={e.x1}
+                y1={e.y1}
+                x2={e.x2}
+                y2={e.y2}
+                stroke={n.ink}
+                strokeWidth={e.width}
+                strokeLinecap="round"
+                opacity={selected === null || e.isSel ? 0.85 : 0.25}
+              />
+              <path d={arrowTip(e.x2, e.y2, e.ux, e.uy)} fill={n.ink} opacity={selected === null || e.isSel ? 0.95 : 0.25} />
+            </g>
+          );
+        })}
+
+        {/* R-22 — the documented panic exception: in a true stress the
+            dollar itself bids with gold (dashed, the X ink) */}
+        {dollarNode !== undefined ? (() => {
+          const e = edgeIntoHub(dollarNode);
+          return (
+            <path
+              d={`M${e.x1},${e.y1} Q${(e.x1 + e.x2) / 2 + 26},${(e.y1 + e.y2) / 2 - 26} ${e.x2},${e.y2}`}
+              fill="none"
+              stroke="var(--color-chip-ink-attention)"
+              strokeWidth={1.3}
+              strokeDasharray="4 4"
+              opacity={selected === null || selected === "fear-and-stress" || selected === "the-dollar" ? 0.8 : 0.2}
+            />
+          );
+        })() : null}
+
+        {/* R-14 — borrowing costs feed the dollar (dashed, family to family) */}
+        {crossPath !== null ? (
+          <path
+            d={crossPath}
+            fill="none"
+            stroke="var(--color-text-tertiary)"
+            strokeWidth={1.1}
+            strokeDasharray="3 4"
+            opacity={selected === null || selected === "cost-of-money" || selected === "the-dollar" ? 0.75 : 0.2}
+          />
+        ) : null}
+
+        {/* the hub — gold itself, the ounce's price */}
+        <circle cx={hub.x} cy={hub.y} r={hubR} fill="var(--color-accent-gold)" stroke="var(--color-accent-gold-strong)" strokeWidth={2} />
+        <text x={hub.x} y={hub.y + 6} textAnchor="middle" fontSize={17} fontWeight={900} fill="var(--color-accent-gold-ink)">Au</text>
+        <text x={hub.x} y={hub.y + hubR + 16} textAnchor="middle" fontSize={11.5} fontWeight={800} fill="var(--color-text-primary)">{t.hubWord}</text>
+        <text x={hub.x} y={hub.y + hubR + 29} textAnchor="middle" fontSize={9.5} fill="var(--color-text-tertiary)">{t.hubNote}</text>
+
+        {/* the family nodes — pills, clickable, the selected one ringed */}
+        {nodes.map((n) => {
+          const isSel = selected === n.family.id;
+          const rx = n.x - n.w / 2;
+          const ry = n.y - n.h / 2;
+          return (
+            <g
+              key={`node-${n.family.id}`}
+              onClick={() => onSelect(isSel ? null : n.family.id)}
+              style={{ cursor: "pointer" }}
+            >
+              <rect
+                x={rx}
+                y={ry}
+                width={n.w}
+                height={n.h}
+                rx={11}
+                fill={`color-mix(in srgb, ${n.ink} 12%, transparent)`}
+                stroke={isSel ? "var(--color-accent-gold-strong)" : `color-mix(in srgb, ${n.ink} 45%, transparent)`}
+                strokeWidth={isSel ? 2 : 1.2}
+              />
+              <text x={n.x} y={n.y - 3} textAnchor="middle" fontSize={11.5} fontWeight={800} fill="var(--color-text-primary)">
+                {n.family.title[lan0]}
+              </text>
+              <text x={n.x} y={n.y + 13} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--color-text-tertiary)">
+                {locale === "fa" ? `${n.count} پیوند · ${n.letter}` : `${n.count} links · ${n.letter}`}
+              </text>
+              {/* the class letter chip, top-right — the letter rides with
+                  the colour, never hue alone */}
+              <circle cx={rx + n.w - 11} cy={ry + 11} r={8} fill={n.ink} />
+              <text x={rx + n.w - 11} y={ry + 14} textAnchor="middle" fontSize={8.5} fontWeight={900} fill="white">{n.letter}</text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
 export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
   /* collapsed by default — the map is the deep reference layer; one tap
      opens the full family view */
   const [open, setOpen] = React.useState(false);
+  /* the graph's own selection — a tapped family node shows its records
+     below (batch H: the graph is the visual, the cards are the detail) */
+  const [selected, setSelected] = React.useState<string | null>(null);
   const classes = ["M", "C", "X", "K"];
+  const renderFamilyCard = (family: (typeof FORCE_FAMILIES)[number]) => {
+    const records = familyRecords(family);
+    const Icon = FAMILY_ICONS[family.icon] ?? Percent;
+    return (
+      <div key={family.id} className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
+        <div className="flex flex-wrap items-start gap-2">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-currena-soft)] text-[var(--color-currena-blue-deep)]" aria-hidden="true">
+            <Icon className="h-4 w-4" />
+          </span>
+          <div className="flex min-w-0 flex-1 flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+            <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{family.title[lan(locale)]}</h4>
+            <span className="type-caption text-[var(--color-text-tertiary)]">
+              {fmtCount(records.length, locale)}
+            </span>
+          </div>
+          <p className="m-0 hidden basis-full text-[11.5px] leading-snug text-[var(--color-text-tertiary)] sm:block">{family.effect[lan(locale)]}</p>
+        </div>
+        <ul className="m-0 flex list-none flex-col gap-1 p-0">
+          {records.map((r) => (
+            <FamilyRecordRow key={r.id} r={r} t={t} locale={locale} />
+          ))}
+        </ul>
+      </div>
+    );
+  };
+  const selectedFamily = selected !== null ? FORCE_FAMILIES.find((f) => f.id === selected) ?? null : null;
   return (
     <section id="gold-relationships" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -1234,60 +1529,30 @@ export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
             </div>
           </div>
 
-          {/* THE map — six family cards, one rail, one hub; the flow reads
-              in the page's own direction: families → rail → gold. The hub
-              centers vertically against the families (the tall side), the
-              rail spans the stack and points at it */}
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:gap-0">
-            {/* the families — each its own lane of pressure; two columns
-                on wide screens so the map never becomes a scroll */}
-            <div className="flex min-w-0 flex-1 flex-col gap-2 lg:grid lg:grid-cols-2 lg:content-start">
-              {FORCE_FAMILIES.map((family) => {
-                const records = familyRecords(family);
-                const Icon = FAMILY_ICONS[family.icon] ?? Percent;
-                return (
-                  <div key={family.id} className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 ring-1 ring-[var(--color-border)]">
-                    <div className="flex flex-wrap items-start gap-2">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-currena-soft)] text-[var(--color-currena-blue-deep)]" aria-hidden="true">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <div className="flex min-w-0 flex-1 flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
-                        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{family.title[lan(locale)]}</h4>
-                        <span className="type-caption text-[var(--color-text-tertiary)]">
-                          {fmtCount(records.length, locale)}
-                        </span>
-                      </div>
-                      <p className="m-0 hidden basis-full text-[11.5px] leading-snug text-[var(--color-text-tertiary)] sm:block">{family.effect[lan(locale)]}</p>
-                    </div>
-                    <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                      {records.map((r) => (
-                        <FamilyRecordRow key={r.id} r={r} t={t} locale={locale} />
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
+          {/* THE map — the real graph (batch H): six family nodes, one
+              gold hub, arrows of pressure, dashed cross-links; tapping a
+              node opens its records below */}
+          <RelationshipGraph t={t} locale={locale} selected={selected} onSelect={setSelected} />
 
-            {/* the mobile connector — the same merge line, stacked */}
-            <div className="mx-auto hidden h-6 w-0.5 rounded-full bg-[var(--color-border)] max-sm:block sm:hidden" aria-hidden="true" />
-
-            {/* the rail — the families' merge line into the hub */}
-            <div className="relative hidden w-7 shrink-0 sm:block sm:self-stretch" aria-hidden="true">
-              <div className="absolute inset-y-3 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-[var(--color-border)]" />
-              <div className="absolute top-1/2 left-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[2px] bg-[var(--color-accent-gold)]" />
+          {/* the records — the selected family's card, or all six; the
+              cards are the reference layer under the visual */}
+          {selectedFamily !== null ? (
+            <div className="mt-3 flex min-w-0 flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+              >
+                <ChevronDown className="h-3.5 w-3.5 rotate-180 rtl:-rotate-180" aria-hidden="true" />
+                {t.allFamilies}
+              </button>
+              {renderFamilyCard(selectedFamily)}
             </div>
-
-            {/* the hub — gold itself, the ounce's price, centered against
-                the families it receives */}
-            <div className="flex w-full flex-col items-center justify-center gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] px-3 py-3 ring-2 ring-[var(--color-accent-gold)]/40 sm:w-32 sm:self-center">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-gold)] text-[15px] font-black text-[var(--color-accent-gold-ink)]" aria-hidden="true">
-                Au
-              </span>
-              <span className="type-label font-extrabold text-[var(--color-text-primary)]">{t.hubWord}</span>
-              <span className="text-[11px] leading-snug text-[var(--color-text-tertiary)]">{t.hubNote}</span>
+          ) : (
+            <div className="mt-3 flex min-w-0 flex-1 flex-col gap-2 lg:grid lg:grid-cols-2 lg:content-start">
+              {FORCE_FAMILIES.map(renderFamilyCard)}
             </div>
-          </div>
+          )}
         </>
       ) : null}
     </section>

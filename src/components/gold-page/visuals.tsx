@@ -180,6 +180,11 @@ export interface TraceChartProps {
    *  for the alternatives chart). Wide screens keep the house 640-unit
    *  canvas exactly as before. */
   responsive?: boolean;
+  /** True to paint each line's own name at its right end, low-opacity
+   *  in the line's own colour (the owner's batch-H ask: the eye finds
+   *  the line without hunting the legend). Labels de-collide vertically
+   *  and never leave the plot. */
+  lineLabels?: boolean;
 }
 
 /**
@@ -201,6 +206,7 @@ export function TraceChart({
   hoverNote = null,
   pricePoints = false,
   responsive = false,
+  lineLabels = false,
 }: TraceChartProps) {
   const [hoverT, setHoverT] = React.useState<number | null>(null);
   const traceRef = React.useRef<HTMLDivElement | null>(null);
@@ -367,6 +373,40 @@ export function TraceChart({
     return { rows, date };
   }, [series, hoverT, model]);
 
+  /* the on-chart line labels (lineLabels): each line's own name at its
+     right end, in its own colour at low opacity, nudged apart so two
+     labels never stack, clamped inside the plot (the owner's batch-H
+     ask: the eye finds the line without hunting the legend) */
+  const lineLabelPts = React.useMemo(() => {
+    if (model === null || !lineLabels) return [];
+    const GAP = 12;
+    const raw = series
+      .map((s) => {
+        const pts = s.points.filter((p) => Number.isFinite(p.v) && Number.isFinite(pointTime(p.d)));
+        if (pts.length === 0) return null;
+        const last = pts[pts.length - 1]!;
+        return { label: s.label, color: s.color, y: model.yOf(last.v, s.axis ?? "left") };
+      })
+      .filter((p): p is { label: string; color: string; y: number } => p !== null)
+      .sort((a, b) => a.y - b.y);
+    const placed: Array<{ label: string; color: string; y: number }> = [];
+    for (const p of raw) {
+      let y = p.y;
+      if (placed.length > 0) {
+        const prev = placed[placed.length - 1]!;
+        if (y - prev.y < GAP) y = prev.y + GAP;
+      }
+      placed.push({ ...p, y });
+    }
+    // re-clamp from the bottom after the nudge pass, keeping order stable
+    for (let i = placed.length - 2; i >= 0; i -= 1) {
+      if (placed[i + 1]!.y - placed[i]!.y < GAP) placed[i]!.y = placed[i + 1]!.y - GAP;
+    }
+    const clampLo = model.padT + 4;
+    const clampHi = model.H - model.padB - 4;
+    return placed.map((p) => ({ ...p, y: Math.max(clampLo, Math.min(clampHi, p.y)) }));
+  }, [series, model, lineLabels]);
+
   if (model === null) {
     return <div dir="ltr" aria-hidden="true" style={{ height: `${height}px` }} />;
   }
@@ -444,6 +484,27 @@ export function TraceChart({
             </g>
           );
         })}
+        {/* the on-chart line labels — low-opacity, the line's own colour,
+            at the right end, with a surface halo so they stay legible over
+            grid lines and neighbours */}
+        {lineLabelPts.map((p) => (
+          <text
+            key={p.label}
+            x={model.W - model.padR - 4}
+            y={p.y - 4}
+            textAnchor="end"
+            fontSize={10.5}
+            fontWeight={800}
+            fill={p.color}
+            opacity={0.72}
+            style={{ paintOrder: "stroke" }}
+            stroke="var(--color-surface)"
+            strokeWidth={3}
+            strokeLinejoin="round"
+          >
+            {p.label}
+          </text>
+        ))}
         {/* the price-point markers: first / last / highest / lowest, each
             with its own price tag — the hero's clear price points */}
         {pricePoints && model.markers.length > 0 && series.length > 0 ? (
@@ -737,10 +798,12 @@ export function BrassBalance({
             bowl's two rim corners (the classic V hanger, always full) */}
         <line x1={cx} y1={rest.y} x2={cx - panW / 2 + 12} y2={topY} stroke="var(--bal-brass-lo)" strokeWidth={1.4} />
         <line x1={cx} y1={rest.y} x2={cx + panW / 2 - 12} y2={topY} stroke="var(--bal-brass-lo)" strokeWidth={1.4} />
-        {/* the bowl */}
+        {/* the bowl — the pan's own pale green/red ground (the owner's
+            batch-H ask: the containers themselves carry the side's
+            tint, visible at a glance, not only the stroke) */}
         <path
           d={`M${cx - panW / 2},${topY} L${cx + panW / 2},${topY} L${cx + panW / 2 - 14},${botY} Q${cx},${botY + 12} ${cx - panW / 2 + 14},${botY} Z`}
-          fill={tone === "for" ? "color-mix(in srgb, var(--color-status-normal) 8%, transparent)" : "color-mix(in srgb, var(--color-status-alert) 8%, transparent)"}
+          fill={tone === "for" ? "color-mix(in srgb, var(--color-status-normal) 16%, transparent)" : "color-mix(in srgb, var(--color-status-alert) 16%, transparent)"}
           stroke={tone === "for" ? "var(--color-status-normal)" : "var(--color-status-alert)"}
           strokeWidth={1.2}
           opacity={0.95}

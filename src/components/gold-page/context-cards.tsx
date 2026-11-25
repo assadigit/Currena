@@ -212,6 +212,7 @@ type GridT = {
   subtitle: string;
   tomanName: string;
   tomanMillion: string;
+  tomanBillion: string;
   tomanNote: string;
   tomanLive: string;
   basisNote: string;
@@ -226,6 +227,7 @@ type GridT = {
   kgxWeak: string;
   kgxMixed: string;
   kgxNone: string;
+  strongWeakLine: string;
   unavailable: string;
 };
 
@@ -256,7 +258,7 @@ export interface ContextBandCopy {
 }
 
 /** The band word for a percentile (top/bottom/mid, the upstream's own). */
-function bandWord(pct: number | null, t: CcT, fmt: Fmt): string | null {
+export function bandWord(pct: number | null, t: CcT, fmt: Fmt): string | null {
   if (pct === null) return null;
   if (pct > 0.8) return t.bandTop.replace("{p}", fmt.num(Math.round((1 - pct) * 100)));
   if (pct < 0.2) return t.bandBottom.replace("{p}", fmt.num(Math.round(pct * 100)));
@@ -390,6 +392,20 @@ export function CurrencyGridCard({
     );
   }, [rows, usdChange30d]);
 
+  /* the strongest / weakest verdict (the owner's batch-H ask): the cross
+     that moved the most against its currency in 30 days is the one gold
+     is strongest against (the ounce buys more of the fallen currency);
+     the one that moved the least / fell is where gold is weakest */
+  const strongWeak = React.useMemo(() => {
+    if (rows === null || rows.length < 2) return null;
+    const ranked = rows
+      .map((r) => ({ id: r.stats!.id, chg: r.stats!.change30d }))
+      .filter((r) => r.chg !== null && Number.isFinite(r.chg)) as Array<{ id: string; chg: number }>;
+    if (ranked.length < 2) return null;
+    const sorted = [...ranked].sort((a, b) => a.chg - b.chg);
+    return { strong: sorted[sorted.length - 1]!, weak: sorted[0]! };
+  }, [rows]);
+
   if (crosses === null) {
     return (
       <div className="flex flex-col gap-1 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
@@ -428,6 +444,19 @@ export function CurrencyGridCard({
       <p className="m-0 type-caption text-[var(--color-text-tertiary)]">
         <bdi>{t.kgxTitle}: {kgxLine}</bdi>
       </p>
+      {/* the strongest/weakest verdict — which currency gold gained or
+          lost the most against, and what it means (batch H) */}
+      {strongWeak !== null ? (
+        <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]" data-currency-verdict>
+          <bdi>
+            {t.strongWeakLine
+              .replace("{strong}", CROSS_NAMES[strongWeak.strong.id]?.[lan(locale)] ?? strongWeak.strong.id)
+              .replace("{spct}", fmt.pct(strongWeak.strong.chg, 1))
+              .replace("{weak}", CROSS_NAMES[strongWeak.weak.id]?.[lan(locale)] ?? strongWeak.weak.id)
+              .replace("{wpct}", fmt.pct(strongWeak.weak.chg, 1))}
+          </bdi>
+        </p>
+      ) : null}
       {open ? (
         <div className="mt-1 flex flex-col gap-1.5">
           {rows?.map(({ cross, stats }) => {
@@ -470,7 +499,12 @@ export function CurrencyGridCard({
             >
               <span className="type-caption font-bold text-[var(--color-text-primary)]">{t.tomanName}</span>
               <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
-                {fmt.num(tomanPerOunce / 1_000_000, 1)} {t.tomanMillion}
+                {/* the honest unit (the owner's batch-H catch): an ounce
+                    over a billion toman reads in BILLIONS, never as
+                    "1008 million" — the scale mistake is a unit mistake */}
+                {tomanPerOunce >= 1_000_000_000
+                  ? `${fmt.num(tomanPerOunce / 1_000_000_000, 2)} ${t.tomanBillion}`
+                  : `${fmt.num(tomanPerOunce / 1_000_000, 1)} ${t.tomanMillion}`}
               </bdi>
               <span className="inline-flex items-center gap-1 type-caption text-[var(--color-text-tertiary)]">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-currena-success)]" aria-hidden="true" />

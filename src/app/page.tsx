@@ -71,6 +71,7 @@ import {
 } from "@/components/gold-page/record";
 import { CalculatorBand } from "@/components/gold-page/calculator";
 import {
+  bandWord,
   ContextTable,
   CurrencyGridCard,
   ForecastRetroCard,
@@ -262,16 +263,14 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-briefing", key: null, label: ["Briefing", "مرور"] },
   { id: "gold-balance", key: null, label: ["Balance", "ترازو"] },
   { id: "gold-scenarios", key: null, label: ["Scenarios", "سناریوها"] },
-  { id: "gold-calendar", key: null, label: ["Calendar", "تقویم"] },
   { id: "gold-compare", key: null, label: ["Compare", "مقایسه"] },
   { id: "gold-ta", key: null, label: ["Levels", "سطوح"] },
   { id: "gold-cb", key: null, label: ["Central banks", "بانک‌ها"] },
   { id: "gold-positions", key: null, label: ["Positions", "پوزیشن"] },
+  { id: "gold-other", key: null, label: ["Other", "سایر"] },
   { id: "gold-dashboard", key: null, label: ["Dashboard", "داشبورد"] },
-  { id: "gold-physical", key: null, label: ["Physical", "فیزیکی"] },
   { id: "gold-bridge", key: null, label: ["Iran", "ایران"] },
   { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
-  { id: "gold-vault", key: null, label: ["Plumbing", "لوله‌کشی"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
   { id: "gold-history", key: null, label: ["History", "تاریخ"] },
 ];
@@ -346,6 +345,25 @@ function localeEN(t: typeof UI.en): boolean {
   return t.dir === "ltr";
 }
 
+/**
+ * The chart's direction ink (the owner's batch-H ask): green when the
+ * selected window rises, a red that DEEPENS with the fall's severity
+ * (a mild −1% reads a muted brick, a −8% or worse reads the full
+ * alert ink), and the house gold when the window is flat or unread.
+ */
+function directionInk(chgPct: number | null | undefined): string {
+  if (chgPct === null || chgPct === undefined || !Number.isFinite(chgPct)) {
+    return "var(--color-accent-gold-strong)";
+  }
+  if (chgPct > 0.15) return "var(--color-return-up)";
+  if (chgPct < -0.15) {
+    const severity = Math.min(1, Math.abs(chgPct) / 8); // −8% or worse = full severity
+    const pct = Math.round(45 + severity * 55); // 45% → 100% of the red ink
+    return `color-mix(in srgb, var(--color-return-down) ${pct}%, var(--color-text-tertiary))`;
+  }
+  return "var(--color-accent-gold-strong)";
+}
+
 /** The history-echo line — when the market last traded at today's level. */
 function echoLine(
   echo: HistoryEchoPayload | null | undefined,
@@ -377,6 +395,10 @@ function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en;
     trend.data && trend.data.source !== "spot-store"
       ? (t.price.sourceNotes as Record<string, string>)[trend.data.source] ?? null
       : null;
+  /* the chart's direction ink — green when the window rises, a red
+     that deepens with the fall's severity; the breathing dot beside
+     the header carries the same ink (the live-graph mark) */
+  const chartInk = directionInk(trend.data?.chgPct ?? null);
   /* the per-gram price — the gram every reader actually buys in */
   const perGram = g.spot / TROY_OUNCE_GRAMS;
   const gramText = t.dir === "ltr" ? `$${fmt.num(perGram, 2)}` : `${fmt.num(perGram, 2)} دلار`;
@@ -384,7 +406,11 @@ function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en;
     <section className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:p-5" aria-label={t.price.eyebrow}>
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="type-kicker m-0 text-[var(--color-text-primary)]">{t.price.eyebrow}</h2>
-        <span className="live-dot h-2 w-2 rounded-full" style={{ background: "var(--color-currena-success)" }} aria-hidden="true" />
+        <span
+          className="live-dot-breathe h-2 w-2 rounded-full"
+          style={{ background: chartInk }}
+          aria-hidden="true"
+        />
       </div>
       <div className="mt-2 flex flex-wrap items-end gap-x-3 gap-y-1">
         <bdi dir="ltr" className="type-number-hero m-0 text-[var(--color-text-primary)]">
@@ -431,7 +457,7 @@ function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en;
             series={[
               {
                 label: t.price.eyebrow,
-                color: "var(--color-accent-gold-strong)",
+                color: chartInk,
                 points: trend.data.points,
                 fill: true,
                 lineWidth: 2.6,
@@ -449,7 +475,7 @@ function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en;
             values={values}
             width={340}
             height={92}
-            color="var(--color-accent-gold-strong)"
+            color={chartInk}
             fill
             ariaLabel={`${t.price.series}, ${t.price.ranges[range]} trend`}
           />
@@ -540,7 +566,6 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
           legible), and the rows breathe (the owner's ask). */}
       <div className="mt-3.5">
         <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{t.briefing.trendTitle}</h4>
-        <p className="m-0 mt-0.5 type-caption text-[var(--color-text-tertiary)]">{t.briefing.trendNote}</p>
         <div className="mt-2 min-w-0 overflow-hidden rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
           <table className="m-0 w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption" aria-label={t.briefing.trendTitle}>
             <tbody>
@@ -664,7 +689,6 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
         <h2 className="type-kicker m-0" style={{ color: "var(--bal-brass-text)" }}>
           {t.balance.eyebrow}
         </h2>
-        <span className="type-caption font-semibold text-[var(--color-text-tertiary)]">{t.recordNote}</span>
       </div>
       <h3 className="m-0 mt-1.5 text-[1.2rem] font-extrabold leading-tight text-[var(--color-text-primary)] sm:text-[1.35rem]">{t.balance.title}</h3>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.balance.subtitle}</p>
@@ -885,12 +909,6 @@ function DashboardBand({
   usdChange30d: number | null;
   tomanPerOunce: number | null;
 }) {
-  const ratio = data.silver && data.silver.last > 0 ? data.gold.spot / data.silver.last : null;
-  /* the two yields live in their own side-by-side pair above the
-     indicator grid (the real-yield re-sourcing: the true TIPS real
-     yield beside the nominal — FRED daily closes, both honestly
-     labeled with their as-of; the breakeven rides beneath, derived
-     from the pair only when they share the same FRED calendar day) */
   const yieldsAligned =
     data.realYield !== null &&
     data.nominalYield !== null &&
@@ -907,9 +925,8 @@ function DashboardBand({
     { name: t.indicators.oil, stat: data.oil, unit: "$" },
   ].filter((r) => r.stat !== null) as Array<{ name: string; stat: SeriesStat; unit: string }>;
   /* the merged context layer — the top ratios + the currency grid live
-     HERE; the rest of the ratios sit behind one expand (the owner's ask:
-     only the most important ones stay in the open); the physical market
-     has its own section now; the forecast retrospective stays */
+     HERE; the rest of the ratios sit behind one expand; the physical
+     market has its own section now; the forecast retrospective stays */
   const byId = React.useMemo(() => {
     const m = new Map<string, ProjectionReading>();
     if (projection !== null) {
@@ -917,23 +934,19 @@ function DashboardBand({
     }
     return m;
   }, [projection]);
-  /* the top ratios — the classic trio the gold crowd actually watches */
+  /* the top ratios — the classic trio the gold crowd actually watches,
+     now MERGED into the indicator grid as first-class cards (the
+     owner's batch-H consolidation: the dashboard and the ratios are
+     one block, no top-set preview duplicated below) */
   const TOP_RATIO_SET = new Set(["gold-silver", "real-gold-price", "gold-oil-ratio"]);
+  const topRatioCards = RATIO_IDS.filter((c) => TOP_RATIO_SET.has(c.id));
+  const restRatios = RATIO_IDS.filter((c) => !TOP_RATIO_SET.has(c.id));
   const [allRatios, setAllRatios] = React.useState(false);
-  const shownRatios = React.useMemo(
-    () => (allRatios ? RATIO_IDS : RATIO_IDS.filter((c) => TOP_RATIO_SET.has(c.id))),
-    [allRatios],
-  );
   return (
     <section id="gold-dashboard" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.indicators.eyebrow}</h2>
       <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.indicators.title}</h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.indicators.subtitle}</p>
-      {ratio ? (
-        <p className="m-0 mt-2 type-caption font-semibold text-[var(--color-text-primary)]">
-          {t.indicators.goldSilver}: <bdi dir="ltr">{fmt.num(ratio, 1)}</bdi>
-        </p>
-      ) : null}
       {/* the two yields — side by side (the real-yield re-sourcing: the
           true 10-year TIPS real yield and the 10-year nominal, FRED
           daily closes, each card carrying its source, its as-of and its
@@ -966,19 +979,42 @@ function DashboardBand({
             <MiniSpark values={r.stat.series.map((p) => p.v)} />
           </div>
         ))}
+        {/* the top ratios — first-class cards in the same grid (the
+            batch-H consolidation: the most important نسبت‌ها ride beside
+            the key indicators, one block, no duplicated top-set below) */}
+        {topRatioCards.map((c) => {
+          const r = byId.get(c.id);
+          if (r === undefined || r.value === null || !Number.isFinite(r.value)) return null;
+          const band = bandWord(r.percentile10y ?? null, t.contextCards, fmt);
+          return (
+            <div
+              key={c.id}
+              className="flex items-center gap-3 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2 ring-1 ring-[var(--color-border)]"
+              title={t.contextCards[c.meaning] as string}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{c.name[locale === "en" ? 0 : 1]}</p>
+                <p className="m-0 mt-0.5 flex items-baseline gap-2">
+                  <bdi dir="ltr" className="type-label font-bold text-[var(--color-text-primary)]">
+                    {c.unit === "$" ? "$" : ""}{fmt.num(r.value, c.unit === "$" ? 0 : 1)}{c.unit === "%" ? "%" : ""}
+                  </bdi>
+                  <SignedDelta v={r.change30d} fmt={fmt} />
+                  <span className="type-caption text-[var(--color-text-tertiary)]">{t.indicators.d30}</span>
+                </p>
+                {band !== null ? (
+                  <p className="m-0 mt-0.5 text-[10.5px] font-semibold text-[var(--color-text-secondary)]">{band}</p>
+                ) : null}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* the top ratios + the rest behind one expand (the owner's ask:
-          only the most important ones stay in the open) */}
+      {/* the remaining ratios — behind one expand (the top trio now lives
+          in the indicator grid above); the currency grid + the forecast
+          retrospective ride in the open, as before */}
       {projection !== null ? (
         <div className="mt-4 flex min-w-0 flex-col gap-2.5">
-          <ContextTable
-            rows={shownRatios.map((c) => ({ id: c.id, name: c.name, meaning: t.contextCards[c.meaning] as string, unit: c.unit }))}
-            byId={byId}
-            t={t.contextCards}
-            fmt={fmt}
-            locale={locale}
-          />
           <button
             type="button"
             aria-expanded={allRatios}
@@ -987,9 +1023,18 @@ function DashboardBand({
           >
             {allRatios
               ? locale === "en" ? "hide the other ratios" : "بستن بقیهٔ نسبت‌ها"
-              : locale === "en" ? `show the other ${RATIO_IDS.length - 3} ratios` : `بقیهٔ ${RATIO_IDS.length - 3} نسبت‌ها`}
+              : locale === "en" ? `show the other ${restRatios.length} ratios` : `بقیهٔ ${fmt.num(restRatios.length, 0)} نسبت‌ها`}
             <span aria-hidden="true" className={`text-[10px] transition-transform ${allRatios ? "rotate-180" : ""}`}>▾</span>
           </button>
+          {allRatios ? (
+            <ContextTable
+              rows={restRatios.map((c) => ({ id: c.id, name: c.name, meaning: t.contextCards[c.meaning] as string, unit: c.unit }))}
+              byId={byId}
+              t={t.contextCards}
+              fmt={fmt}
+              locale={locale}
+            />
+          ) : null}
           {/* the currency grid — the ratios group's sub-card, open by default */}
           <CurrencyGridCard crosses={crosses} usdChange30d={usdChange30d} tomanPerOunce={tomanPerOunce} t={t.currencyGrid} fmt={fmt} locale={locale} />
         </div>
@@ -1006,12 +1051,12 @@ function DashboardBand({
 }
 
 /* ------------------------------------------------------------------ *
- * The physical market — its own section now (the owner's ask): the
- * bigger title + THE verdict in a loud box, like the technical
- * analysis verdict; the trio's own numbers stay behind the expand
+ * Other indicators — سایر شاخص‌ها (the owner's batch-H consolidation):
+ * the physical market and the London vault, one section at the page's
+ * foot — the supporting numbers, one card, two sub-blocks
  * ------------------------------------------------------------------ */
 
-function PhysicalBand({ t, fmt, locale, projection }: { t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; locale: Locale; projection: ProjectionPayload | null }) {
+function PhysicalBand({ t, fmt, locale, projection, vault }: { t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; locale: Locale; projection: ProjectionPayload | null; vault: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   const byId = React.useMemo(() => {
     const m = new Map<string, ProjectionReading>();
@@ -1035,10 +1080,11 @@ function PhysicalBand({ t, fmt, locale, projection }: { t: typeof UI.en; fmt: Re
             ? t.contextCards.physicalVerdictFlat
             : t.contextCards.physicalVerdictDiscount;
   return (
-    <section id="gold-physical" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.physical.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.physical.title}</h3>
-      <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.physical.subtitle}</p>
+    <section id="gold-other" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
+      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.other.eyebrow}</h2>
+      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.other.title}</h3>
+      <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.other.subtitle}</p>
+      <h4 className="m-0 mt-3 type-label font-extrabold text-[var(--color-text-primary)]">{t.physical.title}</h4>
 
       {/* THE verdict — the TA verdict's own loud gold box, one readable sentence */}
       <div
@@ -1074,6 +1120,10 @@ function PhysicalBand({ t, fmt, locale, projection }: { t: typeof UI.en; fmt: Re
           />
         </div>
       ) : null}
+
+      {/* the London vault + clearing — the merged section's second half
+          (its own sub-block, its own collapse, as before) */}
+      {vault}
     </section>
   );
 }
@@ -1338,7 +1388,7 @@ export default function GoldPage() {
 
           <h1 className="m-0 mt-2 text-2xl font-extrabold leading-tight text-[var(--color-text-primary)] sm:text-[1.75rem]">{t.title}</h1>
           <p className="m-0 mt-1.5 flex flex-wrap items-baseline gap-x-2.5 type-caption font-semibold text-[var(--color-text-tertiary)]">
-            {t.dataAsOf.replace("{date}", data ? fmt.dateWords(data.asOf) : "·")} · {t.recordNote}
+            {t.dataAsOf.replace("{date}", data ? fmt.dateWords(data.asOf) : "·")}
           </p>
         </header>
 
@@ -1355,7 +1405,7 @@ export default function GoldPage() {
           <div className="min-w-0 flex-1">
             <h2 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.takeaway.title}</h2>
             <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-              {t.takeaway.body} <span className="font-bold text-[var(--color-text-primary)]">{t.takeaway.close}</span>
+              {t.takeaway.body}
             </p>
             {priceLine !== null ? (
               <p className="m-0 mt-1.5 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]" data-takeaway-price-line>
@@ -1408,12 +1458,10 @@ export default function GoldPage() {
             {/* the composition stack: the brass balance + the five lane bars */}
             <BalanceCard t={t} fmt={fmt} locale={locale} balance={balance} />
 
-            {/* the price-change scenarios — the notable, possible bends,
-                each dated from the economic calendar it links to */}
-            <ScenariosBand t={t.scenarios} locale={locale} fmt={fmt} />
-
-            {/* the economic calendar — what's coming that can bend gold */}
-            <CalendarBand t={t.calendar} locale={locale} fmt={fmt} />
+            {/* the price-change scenarios — merged with the economic
+                calendar (batch H): the notable, possible bends above,
+                the dated events below, one card, one framing */}
+            <ScenariosBand t={t.scenarios} locale={locale} fmt={fmt} calendar={<CalendarBand t={t.calendar} locale={locale} fmt={fmt} />} />
 
             {/* the comparison — gold against the real yield, silver, Bitcoin and the S&P; the correlation lesson (the old standalone section) merged in here behind one tap */}
             <CompareBand t={t.compare} locale={locale} fmt={fmt} correlation={correlation.data ?? null} corrT={t.correlation} />
@@ -1439,10 +1487,6 @@ export default function GoldPage() {
               tomanPerOunce={tomanPerOunce}
             />
 
-            {/* the physical market — its own section now: the bigger title
-                and the market's own verdict in a loud box */}
-            <PhysicalBand t={t} fmt={fmt} locale={locale} projection={projection.data ?? null} />
-
             {/* the Iran bridge — now with the live Tehran board + the premium history */}
             <BridgeBand t={t} locale={locale} premium={premium.data ?? null} fmt={fmt} rates={rates.data ?? null} />
 
@@ -1461,9 +1505,16 @@ export default function GoldPage() {
               data={ifbought.data ?? null}
             />
 
-            {/* the plumbing — the London vault and clearing, the page's
-                own institutional appendix; the map, the page's last word */}
-            {lbma.data ? <VaultBand data={lbma.data} t={t.vault} fmt={fmt} locale={locale} /> : null}
+            {/* other indicators — سایر شاخص‌ها (batch H): the physical
+                market and the London vault + clearing, one merged section
+                at the page's foot; the map, the page's last word */}
+            <PhysicalBand
+              t={t}
+              fmt={fmt}
+              locale={locale}
+              projection={projection.data ?? null}
+              vault={lbma.data ? <VaultBand data={lbma.data} t={t.vault} fmt={fmt} locale={locale} /> : null}
+            />
 
             {/* the relationship map — the forces, the page's closing
                 view: six force families feeding one hub */}

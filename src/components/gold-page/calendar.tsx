@@ -45,8 +45,8 @@ function joinList(items: readonly string[], locale: Locale): string {
 }
 
 type CalT = {
-  eyebrow: string;
-  title: string;
+  /** The sub-heading inside the merged scenarios section (no eyebrow, no section title — one card, one framing). */
+  headLine: string;
   subtitle: string;
   impactHigh: string;
   impactMed: string;
@@ -527,12 +527,11 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
   };
 
   return (
-    <section id="gold-calendar" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
+    <div className="mt-4 border-t border-[var(--color-border)] pt-3.5">
+      {/* the sub-heading row — the merged card's second half; the chip
+          carries the institutions, the line beneath lists the kinds */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <div>
-          <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-          <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
-        </div>
+        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.headLine}</h4>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-2.5 py-1 type-caption font-bold text-[var(--color-currena-blue-deep)]">
           <Landmark className="h-3.5 w-3.5" aria-hidden="true" />
           {chipShorts.length > 0 ? chipShorts.join(" · ") : "…"}
@@ -603,6 +602,6 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
           </DialogContent>
         ) : null}
       </Dialog>
-    </section>
+    </div>
   );
 }

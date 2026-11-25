@@ -1,7 +1,9 @@
 "use client";
 
 /**
- * The scenarios band — سناریوهای تغییر قیمت.
+ * The scenarios band — سناریوهای تغییر قیمت, merged with the calendar
+ * (the owner's batch-H consolidation: one section, no redundancy — the
+ * scenarios above, the dated events below, one construction note).
  *
  * The owner's ask: what replaced the old "what could change it" line — a
  * dedicated section: the 3–5 most relevant, notable, possible things that
@@ -9,7 +11,8 @@
  * when the calendar actually dates it (the next Fed decision, the next
  * inflation print…) and honestly un-dated when it does not (a stress
  * spike walks in unannounced). Not a forecast — a list of the bends the
- * market itself watches, never the desk's own odds.
+ * market itself watches, never the desk's own odds. The calendar rides
+ * inside the same card: the events ARE the scenarios' own dates.
  */
 
 import * as React from "react";
@@ -21,14 +24,12 @@ import { upcomingEvents } from "@/components/gold-page/calendar";
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
 export interface ScenarioT {
-  eyebrow: string;
   title: string;
   subtitle: string;
   upLabel: string;
   downLabel: string;
   nextLabel: string;
   noSchedule: string;
-  note: string;
 }
 
 /* ------------------------------------------------------------------ *
@@ -117,7 +118,18 @@ const SCENARIOS: ReadonlyArray<ScenarioDef> = [
  * The band
  * ------------------------------------------------------------------ */
 
-export function ScenariosBand({ t, locale, fmt }: { t: ScenarioT; locale: Locale; fmt: Fmt }) {
+export function ScenariosBand({
+  t,
+  locale,
+  fmt,
+  calendar,
+}: {
+  t: ScenarioT;
+  locale: Locale;
+  fmt: Fmt;
+  /** The calendar list (the merged section's second half — the events ARE the scenarios' dates). */
+  calendar: React.ReactNode;
+}) {
   /* mounted gate — the schedule reads the reader's own clock, after mount
      (hydration-safe, the same convention the calendar band itself uses) */
   const [now, setNow] = React.useState<Date | null>(null);
@@ -138,7 +150,6 @@ export function ScenariosBand({ t, locale, fmt }: { t: ScenarioT; locale: Locale
 
   return (
     <section id="gold-scenarios" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
       <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
@@ -206,7 +217,10 @@ export function ScenariosBand({ t, locale, fmt }: { t: ScenarioT; locale: Locale
         })}
       </div>
 
-      <p className="m-0 mt-3 border-t border-[var(--color-border)] pt-2.5 type-caption italic leading-relaxed text-[var(--color-text-tertiary)]">{t.note}</p>
+      {/* the merged calendar — the section's own second half (the events
+          ARE the scenarios' dates; one card, no second section, no
+          repeated framing) */}
+      {calendar}
     </section>
   );
 }
