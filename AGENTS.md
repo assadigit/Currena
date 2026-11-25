@@ -2452,3 +2452,116 @@ the wgc pre-box, the hand-written calendar list — all gone).
 The quota note stands as the owner stated it: the daily and monthly
 reports' Latin bodies are temporarily accepted while the AI workers
 quota resets; the fa layers ride their armed jobs exactly as before.
+
+### The real-yield re-sourcing, spec-first (2026-11-25, the FRED yields sitting)
+
+The owner's brief named a correctness bug, not a gap: the gold page's
+"Real 10y" card showed **4.92% — the DGS10 NOMINAL yield** — under the
+label "Real 10y yield" / «بازده واقعی ۱۰ساله», because the observation
+store's `realYield` dataset was EODHD `^TNX` (the registry's own note
+admitting the proxy). The true 10-year TIPS real yield that day:
+**2.79%** (FRED DFII10). The sitting replaced the proxy with the truth,
+added the nominal beside it, and shipped the pair honestly labeled —
+spec-first, per the house law.
+
+**The spec and the evidence first** (`docs/fred-yields-spec.md` +
+`docs/evidence/fred-yields-census-2026-11-25.json`, regenerable with
+`bun scripts/fred-probe.ts`): both FRED series serve as CSV with no
+key, no registration, no quota (header `observation_date,<SERIES>`,
+`&cosd=` trim verified); DFII10 (TIPS real, from 2003) and DGS10
+(nominal, from 1962) share an identical value-bearing calendar; the
+grid math answered the intersection risk the brief named — the FRED
+bond calendar drops exactly Columbus Day and Veterans Day from the
+common grid, **251 → 249 trading days, comfortably above
+MIN_LIVE_DEPTH = 200**, the EODHD 380-day window stays the binding
+constraint, no `cosd` widening needed; the cron inventory confirmed
+5/5 triggers (no new cron — the sync rides the pull-on-render gate);
+both series pages carry "Public Domain: Citation Requested" (Board of
+Governers H.15 via FRB St. Louis — freely redistributable with
+attribution).
+
+**What was built:**
+
+- **`src/lib/gold/sources/fred.ts`** — the sibling source module:
+  `FRED_SPECS` (realYield → DFII10, nominalYield → DGS10), one small
+  CSV GET per series over a 400-day window with the identified UA, the
+  same delete-then-create storeObservations + upsertSync discipline,
+  its own once-per-UTC-day gate, never throws (error → the honest
+  engine-modelled path, no proxy fallback exists).
+- **`eodhd.ts` re-sourced** — the `realYield` dataset key KEPT (no
+  engine ripple: the builder text, the correlations, every downstream
+  fact keep their shape; only the bytes behind the key became true),
+  symbol "FRED DFII10", mode `live`; `nominalYield` ("FRED DGS10")
+  added to the `MarketDataset` union, `SOURCE_REGISTRY`, and
+  `getGroundedBundle()`'s dataset list; the ^TNX entry deleted (grep
+  clean); `SourceSpec` gained `source: "eodhd" | "fred"`; and
+  `ensureObservations()` became the orchestrator over both legs.
+- **The daily gate fixed to registry coverage** — the old
+  every-row-stamped-today gate would have skipped the sync forever
+  once old rows exist and a NEW dataset joins the registry (the exact
+  trap this sitting set); each leg now gates over its own specs.
+- **`/api/gold` gained `nominalYield` + `chg1d`** (the daily change in
+  percentage points — a rate's honest unit, the compare band's own
+  law) **and the pull-on-render sync trigger**: the gold page calls no
+  desk route, so without its own trigger the yield cards would have
+  served the ^TNX-era rows until some desk visitor synced. The first
+  render of the day syncs (2 FRED GETs + the gated EODHD leg); a
+  failure logs and serves the store, the as-of lines state what they
+  hold.
+- **The bug the verification itself caught**: FRED's bond-market
+  holidays print as date-only rows with an **EMPTY value cell** —
+  `Number("") === 0`, finite — so both FRED parsers (the new source
+  module AND the compare leg's, live since 2026-11-23) would store
+  0-close rows (12 in the trailing window). Guarded in both; the
+  byte-level evidence (`2025-11-27,\n`) is in the census.
+- **The UI**: the dashboard's two side-by-side yield cards —
+  "10Y Real Yield (TIPS)" / "10Y Nominal Yield" («بازدهی واقعی ۱۰
+  ساله» / «بازدهی اسمی ۱۰ ساله») — each with the level, the daily pp
+  change (`PpDelta`, zero renders signless/neutral per the compare
+  scorecard's own law), the spark, and the provenance caption
+  "FRED · daily close · as of {date}" («FRED · قیمت پایانی روزانه ·
+  تا {تاریخ}», the Persian calendar in fa); the derived **10y
+  breakeven** whisper beneath (DGS10 − DFII10 = 2.13%, only when the
+  pair shares its FRED calendar day); the compare band's **opt-in
+  nominal line** (default off, right axis at the true % level, pp
+  scorecard row, never in the best/worst contest) and the band's
+  source note now actually rendered, naming FRED DFII10 + DGS10.
+
+**Verified before the push:** the 7/7 harness (`scripts/fred-verify.ts`
+— the bundle grounds with **249 common trading days and all seven
+datasets live**, the grid-aligned values are the true closes, the
+breakeven true); the browser walk EN + fa/RTL (Persian digits and the
+Persian calendar date «۲ آذر ۱۴۰۵»), dark mode, 375px (scrollWidth 375,
+the pair 319px, zero horizontal overflow), zero console and zero page
+errors; the same-day second `/api/gold` call answers in 86 ms with the
+gate skipping (0 FRED GETs); lint green; `tsc` introduces no new
+errors (the base tree's pre-existing noise is byte-identical).
+
+**Deployed** on the two-step OpenNext runbook
+(`NEXT_PUBLIC_BASE_PATH=/gold` on BOTH build and deploy — the encoded
+mistake avoided) and live-verified at https://currena.ir/gold: the
+**live D1 re-sourced itself through the pull-on-render sync on the
+first request** (273 + 273 value-bearing rows, zero empty-cell zeros,
+both SourceSync rows live at 2026-11-23, the ^TNX rows swapped out
+wholesale); the live cards read **2.79% real / 4.92% nominal** with
++0.02pp / 0pp and the 2.13% breakeven — re-checked against fresh FRED
+fetches at verify time (2026-11-23 = 2.79 / 4.92, the same day); the
+live compare payload carries both 5-year legs (−1.01 → 2.79 real,
+1.43 → 4.92 nominal — the true 2021 lows); the full route sweep green
+(every `/gold/api/gold/*` and `/gold/api/desk` 200, meter and daily
+with their dates; `currena.ir/` and `/goldsmith` still serving the
+converter untouched); the live fa/RTL walk, dark mode, 375px and the
+zero-console walk re-run against the canonical URL; the second
+same-day live call answers in 0.5 s (the gate held — zero FRED GETs).
+
+**Honest notes, stated:** the desk's cached DeskDay rows keep their
+own days' numbers (cache-first, the designed law — a pre-re-sourcing
+row honestly records what was served that day); the next UTC day's
+build (or a regenerate) picks the true real series up through the
+engine seam, and `/api/desk`'s provenance then lists both FRED
+datasets — at verify time the route served a cached modelled-era row.
+The dead `market-strip.tsx` (the old desk page's strip, zero
+importers, no yield label) stays untouched. The EODHD token path is
+untouched and one EODHD daily call is saved (realYield no longer
+consumes it). No new cron trigger (5/5 stays), no D1 migration, no
+seed re-run, secrets untouched.
