@@ -224,17 +224,28 @@ function Header({ t, locale, onToggleLang }: { t: typeof UI.en; locale: Locale; 
           </span>
         </a>
         <nav className="mx-auto hidden items-center gap-1 lg:flex" aria-label="Site">
-          {Object.values(t.nav.links).map((link, i) =>
-            i === 1 ? (
-              <span key={link} className="rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1.5 text-sm font-bold text-[var(--color-currena-blue-deep)]">
-                {link}
-              </span>
-            ) : (
-              <span key={link} className="rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--color-text-secondary)]">
-                {link}
-              </span>
-            ),
-          )}
+          {Object.entries(t.nav.links)
+            .filter(([key]) => key !== "tools")
+            .map(([, link], i) =>
+              i === 1 ? (
+                <span key={link} className="rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1.5 text-sm font-bold text-[var(--color-currena-blue-deep)]">
+                  {link}
+                </span>
+              ) : (
+                <span key={link} className="rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--color-text-secondary)]">
+                  {link}
+                </span>
+              ),
+            )}
+          {/* The tools namespace — a real link to the /tools index (the
+              Compound Wealth phase 1 routing). A plain <a> so the public
+              /tools URL is used in both mount points (dev and /gold). */}
+          <a
+            href="/tools"
+            className="rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
+          >
+            {t.nav.links.tools}
+          </a>
         </nav>
         <div className="ms-auto flex items-center gap-2 lg:ms-0">
           <span className="hidden items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-2.5 py-1 text-[10px] font-bold text-[var(--color-currena-blue-deep)] sm:flex">

@@ -1,0 +1,195 @@
+{
+  "base": "http://localhost:3100",
+  "checks": [
+    {
+      "id": "12-answer-on-arrival",
+      "pass": true,
+      "detail": "Investing A$100 a month for 20 years: you put in 24,000, and it could grow to about 50,800"
+    },
+    {
+      "id": "13-exact-controls",
+      "pass": true,
+      "detail": "27 interactive elements, all spec'd"
+    },
+    {
+      "id": "17-headline-honest",
+      "pass": true,
+      "detail": "range: If it goes worse: about 40,600. If it goes better: about 62,"
+    },
+    {
+      "id": "15-two-tap-rule",
+      "pass": true,
+      "detail": "3 one-tap changes in 230ms"
+    },
+    {
+      "id": "16-groups-collapsed",
+      "pass": true,
+      "detail": "[\"group-about:0\",\"group-costs:0\",\"group-rates:0\",\"group-dates:0\"]"
+    },
+    {
+      "id": "21-no-storage",
+      "pass": true,
+      "detail": "{\"local\":[],\"cookies\":\"\"}"
+    },
+    {
+      "id": "21-no-data-network",
+      "pass": true,
+      "detail": "26 resources, all app assets"
+    },
+    {
+      "id": "14-390x844-one-screen",
+      "pass": true,
+      "detail": "chips bottom 727/844, scrollW 390, scrollY 24"
+    },
+    {
+      "id": "14-360x800-one-screen",
+      "pass": true,
+      "detail": "chips bottom 778/800, scrollW 360, scrollY 0"
+    },
+    {
+      "id": "14-430x932-one-screen",
+      "pass": true,
+      "detail": "chips bottom 751/932, scrollW 430, scrollY 0"
+    },
+    {
+      "id": "sticky-bar-appears",
+      "pass": true
+    },
+    {
+      "id": "22-a4-en-light",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true"
+    },
+    {
+      "id": "22-a4-en-dark",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true"
+    },
+    {
+      "id": "22-a4-en-light-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1080B numbers=true"
+    },
+    {
+      "id": "22-a4-en-dark-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1080B numbers=true"
+    },
+    {
+      "id": "22-a4-fa-light",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1280B numbers=true"
+    },
+    {
+      "id": "22-a4-fa-dark",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1280B numbers=true"
+    },
+    {
+      "id": "22-a4-fa-light-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1229B numbers=true"
+    },
+    {
+      "id": "22-a4-fa-dark-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1229B numbers=true"
+    },
+    {
+      "id": "23-phone-en-dark-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-dark-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-dark-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-light-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-light-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-light-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-dark-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-dark-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-dark-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-light-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-light-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-light-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "19a-direct-load",
+      "pass": true,
+      "detail": "{\"/tools\":200,\"/tools/compound-wealth\":200,\"/tools/unknown\":404,\"/\":200}"
+    },
+    {
+      "id": "19b-refresh",
+      "pass": true,
+      "detail": "Compound Wealth · Currena"
+    },
+    {
+      "id": "19c-gold-page-intact",
+      "pass": true
+    },
+    {
+      "id": "20-meta-tags",
+      "pass": true,
+      "detail": "{\"title\":\"Compound Wealth · Currena\",\"desc\":\"See what small, steady investing becomes. A quiet compound-growth tool: pick an amount, a few years and an asset, a"
+    },
+    {
+      "id": "20-nav-tools-link",
+      "pass": true
+    },
+    {
+      "id": "20-breadcrumb",
+      "pass": true
+    },
+    {
+      "id": "no-page-errors",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 38,
+    "failed": 0
+  }
+}

@@ -47,6 +47,10 @@ export const YEARLY_COST_MAX = 0.03;
 
 /** The "what if it's lower/higher" band width, in percentage points (2). */
 export const WHAT_IF_POINTS = 2;
+
+/** Editable range for the what-if points (percentage points). */
+export const WHAT_IF_MIN = 0.5;
+export const WHAT_IF_MAX = 5;
 /** If the 20- and 30-year figures differ by at least this many points, the
  *  higher measured figure is used as the band's high end; otherwise the high
  *  end is a labelled what-if. In percentage points. */
@@ -120,6 +124,8 @@ export interface PlanInput {
   customHigh: number;
   /** Yearly inflation (decimal). */
   inflation: number;
+  /** The what-if band width in percentage points (editable). */
+  whatIfPoints: number;
 }
 
 /** The measured figures for one asset (from the figures file). */
@@ -246,12 +252,13 @@ export function chooseRate(figures: AssetFigures, plan: PlanInput): RateChoice {
     return { baseline: (low + high) / 2, band: { low, high }, highIsMeasured: true, how: "custom-range" };
   }
   const { r20, r30 } = figures;
+  const pts = (Number.isFinite(plan.whatIfPoints) ? plan.whatIfPoints : WHAT_IF_POINTS) / 100;
   if (r20 === null && r30 === null) {
     if (figures.single && figures.single.years >= 10) {
       const only = figures.single.rate;
       return {
         baseline: only,
-        band: { low: only - WHAT_IF_POINTS / 100, high: only + WHAT_IF_POINTS / 100 },
+        band: { low: only - pts, high: only + pts },
         highIsMeasured: false,
         how: "single-figure",
       };
@@ -264,7 +271,7 @@ export function chooseRate(figures: AssetFigures, plan: PlanInput): RateChoice {
     const only = (r20 ?? r30) as number;
     return {
       baseline: only,
-      band: { low: only - WHAT_IF_POINTS / 100, high: only + WHAT_IF_POINTS / 100 },
+      band: { low: only - pts, high: only + pts },
       highIsMeasured: false,
       how: "single-figure",
     };
@@ -275,8 +282,8 @@ export function chooseRate(figures: AssetFigures, plan: PlanInput): RateChoice {
   return {
     baseline: lower,
     band: {
-      low: lower - WHAT_IF_POINTS / 100,
-      high: differEnough ? higher : lower + WHAT_IF_POINTS / 100,
+      low: lower - pts,
+      high: differEnough ? higher : lower + pts,
     },
     highIsMeasured: differEnough,
     how: "lower-of-two",

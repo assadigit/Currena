@@ -56,6 +56,7 @@ function basePlan(overrides: Partial<PlanInput> = {}): PlanInput {
     customLow: 0.05,
     customHigh: 0.09,
     inflation: 0,
+    whatIfPoints: 2,
     ...overrides,
   };
 }

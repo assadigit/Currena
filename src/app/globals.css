@@ -729,3 +729,195 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* =================================================================== */
+/* COMPOUND WEALTH — the tools namespace's own layer                    */
+/*                                                                     */
+/* The A4 print card: a dedicated sheet that window.print() turns into  */
+/* exactly one A4 portrait page. The sheet is explicit ink-on-paper     */
+/* (the digest-print-sheet pattern): the Light style is the default     */
+/* and always ink-friendly; the Dark style is an ink-heavy option.      */
+/* Only the sheet prints — everything else on the page is hidden by     */
+/* body.cw-printing, added around window.print() and self-cleaned.      */
+/* =================================================================== */
+
+.cw-print-sheet {
+  position: relative;
+  display: block;
+  width: 190mm; /* A4 210mm − 2×10mm margins */
+  min-height: 257mm; /* 297mm − 2×10mm, fits one page */
+  max-height: 277mm;
+  overflow: hidden;
+  padding: 9mm 10mm 7mm;
+  border-radius: 4mm;
+  box-sizing: border-box;
+  color: #1c1917;
+  background: #ffffff;
+  font-size: 10pt;
+  line-height: 1.5;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* The Dark card style: an ink-heavy option, still one page. */
+.cw-print-sheet[data-style="dark"] {
+  color: #f2f4f7;
+  background: #14181f;
+}
+.cw-print-sheet[data-style="dark"] .cw-sheet-header,
+.cw-print-sheet[data-style="dark"] .cw-sheet-footer {
+  border-color: rgba(242, 244, 247, 0.35);
+}
+.cw-print-sheet[data-style="dark"] .cw-sheet-h2 {
+  color: #b9c1ca;
+  border-color: rgba(242, 244, 247, 0.25);
+}
+.cw-print-sheet[data-style="dark"] .cw-tile {
+  border-color: rgba(242, 244, 247, 0.25);
+  background: rgba(242, 244, 247, 0.05);
+}
+
+.cw-print-sheet .cw-rings {
+  width: 34mm;
+  height: 34mm;
+  margin-top: -2mm;
+}
+
+.cw-print-sheet .cw-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6mm;
+  border-bottom: 2px solid currentColor;
+  padding-bottom: 3mm;
+  margin-bottom: 4mm;
+}
+
+.cw-print-sheet .cw-sheet-hero {
+  margin-bottom: 4mm;
+}
+
+.cw-print-sheet .cw-sheet-chart {
+  margin-bottom: 3.5mm;
+}
+
+.cw-print-sheet .cw-sheet-columns {
+  display: flex;
+  gap: 6mm;
+  margin-bottom: 3.5mm;
+}
+.cw-print-sheet .cw-sheet-tiles {
+  flex: 1.1;
+  display: flex;
+  gap: 3mm;
+}
+.cw-print-sheet .cw-tile {
+  flex: 1;
+  border: 1px solid rgba(28, 25, 23, 0.25);
+  border-radius: 2.5mm;
+  padding: 2.5mm 3mm;
+}
+.cw-print-sheet .cw-tile-label {
+  font-size: 7.5pt;
+  font-weight: 700;
+  opacity: 0.7;
+}
+.cw-print-sheet .cw-tile-value {
+  margin-top: 0.8mm;
+  font-size: 13pt;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.cw-print-sheet .cw-sheet-milestones {
+  flex: 1;
+  min-width: 0;
+}
+
+.cw-print-sheet .cw-sheet-h2 {
+  font-size: 8pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #78716c;
+  border-bottom: 1px solid rgba(28, 25, 23, 0.2);
+  padding-bottom: 0.8mm;
+  margin: 0 0 1.6mm;
+}
+:lang(fa) .cw-print-sheet .cw-sheet-h2 {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cw-print-sheet .cw-sheet-assumptions {
+  border: 1px solid rgba(28, 25, 23, 0.2);
+  border-radius: 2.5mm;
+  padding: 2.5mm 3.5mm;
+  margin-bottom: 3.5mm;
+}
+
+.cw-print-sheet .cw-sheet-strong {
+  font-size: 13.5pt;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 3mm;
+}
+
+.cw-print-sheet .cw-sheet-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2mm 5mm;
+  border-top: 1px solid rgba(28, 25, 23, 0.25);
+  padding-top: 2mm;
+  font-size: 7.5pt;
+  opacity: 0.85;
+}
+.cw-print-sheet .cw-sheet-disclaimer {
+  flex-basis: 100%;
+  font-weight: 600;
+}
+
+/* The print rules: one A4 page, always. */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  body.cw-printing > *:not(.cw-print-overlay) {
+    display: none !important;
+  }
+  body.cw-printing .cw-print-overlay {
+    position: static !important;
+    display: block !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+  body.cw-printing .cw-print-toolbar {
+    display: none !important;
+  }
+  body.cw-printing .cw-print-sheet {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 auto !important;
+    width: 190mm !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .cw-print-fallback {
+    display: none !important;
+  }
+}
+
+/* The dark sheet keeps its background on paper (print-color-adjust above). */
+@media print {
+  body.cw-printing .cw-print-sheet[data-style="dark"] {
+    background: #14181f !important;
+  }
+}

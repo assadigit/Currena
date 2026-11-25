@@ -40,7 +40,13 @@
     // Zone routes take precedence on the paths they match; everything else on
     // currena.ir continues to flow to currena-api untouched.
     { "pattern": "currena.ir/gold", "custom_domain": false },
-    { "pattern": "currena.ir/gold/*", "custom_domain": false }
+    { "pattern": "currena.ir/gold/*", "custom_domain": false },
+    // The tools namespace (spec COMPOUND-WEALTH-SPEC.md §3): the same worker
+    // serves currena.ir/tools and currena.ir/tools/compound-wealth at the
+    // public URLs — src/middleware.ts maps /tools/* onto the basePath-mounted
+    // app routes, so direct links and refreshes work.
+    { "pattern": "currena.ir/tools", "custom_domain": false },
+    { "pattern": "currena.ir/tools/*", "custom_domain": false }
   ],
   "observability": {
     "enabled": true

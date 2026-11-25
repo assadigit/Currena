@@ -158,7 +158,7 @@ export const UI = {
     nav: {
       site: "Currena",
       tagline: "Currency intelligence",
-      links: { global: "Global", gold: "Gold", world: "World Markets", currencies: "Currencies", commodities: "Commodities" },
+      links: { global: "Global", gold: "Gold", world: "World Markets", currencies: "Currencies", commodities: "Commodities", tools: "Tools" },
       langToggle: "فا",
       liveTag: "LIVE",
     },
@@ -909,7 +909,7 @@ export const UI = {
     nav: {
       site: "Currena",
       tagline: "دادهٔ بازار، به روشنایی",
-      links: { global: "جهانی", gold: "طلا", world: "بازارهای جهان", currencies: "ارزها", commodities: "کالاها" },
+      links: { global: "جهانی", gold: "طلا", world: "بازارهای جهان", currencies: "ارزها", commodities: "کالاها", tools: "ابزارها" },
       langToggle: "EN",
       liveTag: "زنده",
     },

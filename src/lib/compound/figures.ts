@@ -59,6 +59,8 @@ export interface Figure {
   rate: number;
   /** The window, in words, for the page's tiny line and the method box. */
   windowLabel: string;
+  /** The same window in Farsi. */
+  windowLabelFa: string;
   /** When the window ends (YYYY-MM-DD). */
   periodEnd: string;
 }
@@ -120,8 +122,8 @@ const AU_ROWS: CountryRows = {
       labelFa: "سهام استرالیایی",
       measures: "S&P/ASX All Ordinaries Total Return Index (dividends included)",
       basis: "total return",
-      f20: { rate: 0.072, windowLabel: "20 years to 30 June 2026", periodEnd: "2026-06-30" },
-      f30: { rate: 0.09, windowLabel: "30 years to 30 June 2026", periodEnd: "2026-06-30" },
+      f20: { rate: 0.072, windowLabel: "20 years to 30 June 2026", windowLabelFa: "۲۰ سال تا ۳۰ ژوئن ۲۰۲۶", periodEnd: "2026-06-30" },
+      f30: { rate: 0.09, windowLabel: "30 years to 30 June 2026", windowLabelFa: "۳۰ سال تا ۳۰ ژوئن ۲۰۲۶", periodEnd: "2026-06-30" },
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
@@ -133,8 +135,8 @@ const AU_ROWS: CountryRows = {
       labelFa: "اس‌اند‌پی ۵۰۰",
       measures: "S&P 500 Total Return Index, in Australian dollars (unhedged)",
       basis: "total return",
-      f20: { rate: 0.118, windowLabel: "20 years to 30 June 2026", periodEnd: "2026-06-30" },
-      f30: { rate: 0.108, windowLabel: "30 years to 30 June 2026", periodEnd: "2026-06-30" },
+      f20: { rate: 0.118, windowLabel: "20 years to 30 June 2026", windowLabelFa: "۲۰ سال تا ۳۰ ژوئن ۲۰۲۶", periodEnd: "2026-06-30" },
+      f30: { rate: 0.108, windowLabel: "30 years to 30 June 2026", windowLabelFa: "۳۰ سال تا ۳۰ ژوئن ۲۰۲۶", periodEnd: "2026-06-30" },
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
@@ -146,8 +148,8 @@ const AU_ROWS: CountryRows = {
       labelFa: "سهام جهانی",
       measures: "MSCI World ex-Australia Net Total Return Index, in AUD",
       basis: "net total return",
-      f20: { rate: 0.091, windowLabel: "20 years to 30 June 2026", periodEnd: "2026-06-30" },
-      f30: { rate: 0.086, windowLabel: "30 years to 30 June 2026", periodEnd: "2026-06-30" },
+      f20: { rate: 0.091, windowLabel: "20 years to 30 June 2026", windowLabelFa: "۲۰ سال تا ۳۰ ژوئن ۲۰۲۶", periodEnd: "2026-06-30" },
+      f30: { rate: 0.086, windowLabel: "30 years to 30 June 2026", windowLabelFa: "۳۰ سال تا ۳۰ ژوئن ۲۰۲۶", periodEnd: "2026-06-30" },
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
@@ -159,8 +161,8 @@ const AU_ROWS: CountryRows = {
       labelFa: "طلا",
       measures: "Gold, London market price (LBMA), converted into AUD at endpoint exchange rates",
       basis: "total return",
-      f20: { rate: 0.1178, windowLabel: "20 years to 31 December 2025", periodEnd: "2025-12-31" },
-      f30: { rate: 0.0878, windowLabel: "30 years to 31 December 2025", periodEnd: "2025-12-31" },
+      f20: { rate: 0.1178, windowLabel: "20 years to 31 December 2025", windowLabelFa: "۲۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
+      f30: { rate: 0.0878, windowLabel: "30 years to 31 December 2025", windowLabelFa: "۳۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
       fsingle: null,
       sourceName: "LBMA year-end prices via NYU Stern (Damodaran); BIS exchange rates",
       sourceUrl: DAMODARAN_URL,
@@ -172,8 +174,8 @@ const AU_ROWS: CountryRows = {
       labelFa: "پول نقد",
       measures: "RBA cash rate target (monthly average over the window)",
       basis: "total return",
-      f20: { rate: 0.0303, windowLabel: "20 years to October 2026", periodEnd: "2026-10-31" },
-      f30: { rate: 0.0376, windowLabel: "30 years to October 2026", periodEnd: "2026-10-31" },
+      f20: { rate: 0.0303, windowLabel: "20 years to October 2026", windowLabelFa: "۲۰ سال تا اکتبر ۲۰۲۶", periodEnd: "2026-10-31" },
+      f30: { rate: 0.0376, windowLabel: "30 years to October 2026", windowLabelFa: "۳۰ سال تا اکتبر ۲۰۲۶", periodEnd: "2026-10-31" },
       fsingle: null,
       sourceName: "BIS policy-rate dataset (source: Reserve Bank of Australia)",
       sourceUrl: BIS_CBPOL_URL,
@@ -186,8 +188,8 @@ const AU_ROWS: CountryRows = {
     labelFa: "تورم",
     measures: "Australian CPI, all groups (index change between the period endpoints)",
     basis: "total return",
-    f20: { rate: 0.0276, windowLabel: "20 years to September 2026", periodEnd: "2026-09-30" },
-    f30: { rate: 0.0271, windowLabel: "30 years to September 2026", periodEnd: "2026-09-30" },
+    f20: { rate: 0.0276, windowLabel: "20 years to September 2026", windowLabelFa: "۲۰ سال تا سپتامبر ۲۰۲۶", periodEnd: "2026-09-30" },
+    f30: { rate: 0.0271, windowLabel: "30 years to September 2026", windowLabelFa: "۳۰ سال تا سپتامبر ۲۰۲۶", periodEnd: "2026-09-30" },
     fsingle: null,
     sourceName: "Australian Bureau of Statistics, Consumer Price Index",
     sourceUrl: ABS_CPI_URL,
@@ -211,8 +213,8 @@ const US_ROWS: CountryRows = {
       labelFa: "اس‌اند‌پی ۵۰۰",
       measures: "S&P 500, dividends included",
       basis: "total return",
-      f20: { rate: 0.109, windowLabel: "20 years to 31 December 2025", periodEnd: "2025-12-31" },
-      f30: { rate: 0.1026, windowLabel: "30 years to 31 December 2025", periodEnd: "2025-12-31" },
+      f20: { rate: 0.109, windowLabel: "20 years to 31 December 2025", windowLabelFa: "۲۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
+      f30: { rate: 0.1026, windowLabel: "30 years to 31 December 2025", windowLabelFa: "۳۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
       fsingle: null,
       sourceName: "NYU Stern — Aswath Damodaran, historical returns dataset",
       sourceUrl: DAMODARAN_URL,
@@ -226,7 +228,7 @@ const US_ROWS: CountryRows = {
       basis: "total return",
       f20: null,
       f30: null,
-      fsingle: { rate: 0.122, windowLabel: "15 years to 30 October 2026", periodEnd: "2026-10-30" },
+      fsingle: { rate: 0.122, windowLabel: "15 years to 30 October 2026", windowLabelFa: "۱۵ سال تا ۳۰ اکتبر ۲۰۲۶", periodEnd: "2026-10-30" },
       sourceName: "MSCI World Index (USD) factsheet, 30 October 2026",
       sourceUrl: MSCI_WORLD_URL,
       note: "MSCI publishes 20- and 30-year figures only inside its interactive (login-gated) tools, so this row uses the longest published window of at least 10 years: the factsheet's cumulative gross-return chart, 100 → 562.23 over Oct 2011 – Oct 2026, = ×5.6223 → 12.20% a year. The same factsheet also publishes 'since 31 Dec 1987' = 8.98% a year and 10 years = 13.50% a year, recorded here for context. The page labels this row '15 years'.",
@@ -237,8 +239,8 @@ const US_ROWS: CountryRows = {
       labelFa: "طلا",
       measures: "Gold, London market price (LBMA), in USD",
       basis: "total return",
-      f20: { rate: 0.1127, windowLabel: "20 years to 31 December 2025", periodEnd: "2025-12-31" },
-      f30: { rate: 0.0839, windowLabel: "30 years to 31 December 2025", periodEnd: "2025-12-31" },
+      f20: { rate: 0.1127, windowLabel: "20 years to 31 December 2025", windowLabelFa: "۲۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
+      f30: { rate: 0.0839, windowLabel: "30 years to 31 December 2025", windowLabelFa: "۳۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
       fsingle: null,
       sourceName: "LBMA year-end prices via NYU Stern (Damodaran)",
       sourceUrl: DAMODARAN_URL,
@@ -250,8 +252,8 @@ const US_ROWS: CountryRows = {
       labelFa: "پول نقد",
       measures: "Federal Reserve target rate, midpoint (monthly average over the window)",
       basis: "total return",
-      f20: { rate: 0.017, windowLabel: "20 years to October 2026", periodEnd: "2026-10-31" },
-      f30: { rate: 0.0241, windowLabel: "30 years to October 2026", periodEnd: "2026-10-31" },
+      f20: { rate: 0.017, windowLabel: "20 years to October 2026", windowLabelFa: "۲۰ سال تا اکتبر ۲۰۲۶", periodEnd: "2026-10-31" },
+      f30: { rate: 0.0241, windowLabel: "30 years to October 2026", windowLabelFa: "۳۰ سال تا اکتبر ۲۰۲۶", periodEnd: "2026-10-31" },
       fsingle: null,
       sourceName: "BIS policy-rate dataset (source: US Federal Reserve)",
       sourceUrl: BIS_CBPOL_URL,
@@ -264,8 +266,8 @@ const US_ROWS: CountryRows = {
     labelFa: "تورم",
     measures: "US CPI-U (index change between the period endpoints)",
     basis: "total return",
-    f20: { rate: 0.0253, windowLabel: "20 years to 31 December 2025", periodEnd: "2025-12-31" },
-    f30: { rate: 0.0252, windowLabel: "30 years to 31 December 2025", periodEnd: "2025-12-31" },
+    f20: { rate: 0.0253, windowLabel: "20 years to 31 December 2025", windowLabelFa: "۲۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
+    f30: { rate: 0.0252, windowLabel: "30 years to 31 December 2025", windowLabelFa: "۳۰ سال تا ۳۱ دسامبر ۲۰۲۵", periodEnd: "2025-12-31" },
     fsingle: null,
     sourceName: "US CPI-U (FRED CPIAUCNS) via NYU Stern (Damodaran)",
     sourceUrl: DAMODARAN_URL,
@@ -336,9 +338,14 @@ export function figuresOf(row: AssetRow): {
 /** The tiny line under the chart: which figures this asset used. */
 export function measuredLine(row: AssetRow, locale: "en" | "fa"): string {
   const parts: string[] = [];
-  if (row.f20) parts.push(`${pct(row.f20.rate)} · ${row.f20.windowLabel}`);
-  if (row.f30) parts.push(`${pct(row.f30.rate)} · ${row.f30.windowLabel}`);
-  if (row.fsingle) parts.push(`${pct(row.fsingle.rate)} · ${row.fsingle.windowLabel}`);
+  const label = (f: Figure) => (locale === "fa" ? f.windowLabelFa : f.windowLabel);
+  const pctOf = (v: number) =>
+    locale === "fa"
+      ? `${new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 1 }).format(v * 100)}٪`
+      : `${(v * 100).toFixed(1)}%`;
+  if (row.f20) parts.push(`${pctOf(row.f20.rate)} · ${label(row.f20)}`);
+  if (row.f30) parts.push(`${pctOf(row.f30.rate)} · ${label(row.f30)}`);
+  if (row.fsingle) parts.push(`${pctOf(row.fsingle.rate)} · ${label(row.fsingle)}`);
   const joined = parts.join(locale === "fa" ? "؛ " : "; ");
   if (row.f20 && row.f30) {
     return locale === "fa"
@@ -346,8 +353,4 @@ export function measuredLine(row: AssetRow, locale: "en" | "fa"): string {
       : `${joined}. We use the lower one.`;
   }
   return locale === "fa" ? joined : joined + ".";
-}
-
-function pct(v: number): string {
-  return `${(v * 100).toFixed(1)}%`;
 }
