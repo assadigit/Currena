@@ -1,16 +1,24 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { computeHistoryEcho, getLongSeries } from "@/lib/gold-page/trend";
+import { ensureObservations } from "@/lib/gold/sources/eodhd";
 
 /**
  * GET /api/gold — the Currena gold page's live market leg.
  *
  * Serves the real daily closes the desk already persists (the Observation
- * store: gold, silver, the 10y real yield, the dollar index + its pairs,
- * the S&P and oil) and derives the page's numbers from them: the spot,
- * the 7/30/90-day changes, the year position, and each series' own
- * 30-day change. Nothing is invented: every value is computed from the
- * stored observations, and the payload stamps its own as-of date.
+ * store: gold, silver, the 10y real + nominal yields, the dollar index
+ * + its pairs, the S&P and oil) and derives the page's numbers from
+ * them: the spot, the 7/30/90-day changes, the year position, and each
+ * series' own 30-day change. Nothing is invented: every value is
+ * computed from the stored observations, and the payload stamps its
+ * own as-of date.
+ *
+ * The two yields are FRED daily closes (the real-yield re-sourcing,
+ * docs/fred-yields-spec.md): realYield = DFII10 (the 10-year TIPS real
+ * yield), nominalYield = DGS10. Their daily change is stated in
+ * percentage POINTS (a rate's honest unit — the compare band's own
+ * convention), never percent-of-a-rate.
  */
 
 interface Point {
@@ -23,6 +31,8 @@ interface SeriesStat {
   last: number;
   asOf: string;
   chg30: number | null; // percent
+  /** Yields only: the daily change in percentage points (last − previous close). */
+  chg1d?: number | null;
 }
 
 /** The stored close closest to `days` before the anchor date. */
@@ -42,6 +52,19 @@ function refClose(list: Point[], anchor: string, days: number): Point | null {
 }
 
 export async function GET() {
+  // Pull-on-render sync: the gold page's own market leg rides the
+  // desk's once-per-UTC-day gate (the FRED yields re-source, §4 of the
+  // fred-yields-spec — 2 small CSV GETs, no key; the EODHD leg keeps
+  // its own token gate). A sync failure never breaks the read: the
+  // store serves what it holds and the provenance states its as-of.
+  try {
+    await ensureObservations();
+  } catch (e) {
+    console.error(
+      "[gold] observation sync failed:",
+      e instanceof Error ? e.message : e
+    );
+  }
   try {
     const rows = await db.observation.findMany({
       orderBy: { date: "asc" },
@@ -77,6 +100,19 @@ export async function GET() {
           ? (lastP.v / base.v - 1) * 100
           : null;
       return { series, last: lastP.v, asOf: lastP.d, chg30 };
+    };
+
+    // The yield stats carry their daily change in percentage points —
+    // a rate's honest unit (percent-of-a-rate would mislead).
+    const yieldOf = (dataset: string): SeriesStat | null => {
+      const stat = statOf(dataset);
+      if (stat === null) return null;
+      const series = stat.series;
+      const chg1d =
+        series.length >= 2
+          ? series[series.length - 1]!.v - series[series.length - 2]!.v
+          : null;
+      return { ...stat, chg1d: Number.isFinite(chg1d) ? chg1d : null };
     };
 
     const pct = (days: number): number | null => {
@@ -120,7 +156,8 @@ export async function GET() {
         asOf,
         gold,
         silver: statOf("silver"),
-        realYield: statOf("realYield"),
+        realYield: yieldOf("realYield"),
+        nominalYield: yieldOf("nominalYield"),
         dxy: statOf("dxy"),
         usdjpy: statOf("dxy:USDJPY"),
         eurusd: statOf("dxy:EURUSD"),

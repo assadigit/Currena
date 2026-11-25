@@ -49,6 +49,7 @@ import {
   BrassBalance,
   IfBoughtChart,
   SignedDelta,
+  PpDelta,
   STATE_INK,
   TraceChart,
 } from "@/components/gold-page/visuals";
@@ -103,6 +104,8 @@ interface SeriesStat {
   last: number;
   asOf: string;
   chg30: number | null;
+  /** Yields only: the daily change in percentage points (last − previous close). */
+  chg1d?: number | null;
 }
 /** The history echo — when the market last traded at today's level. */
 interface HistoryEchoPayload {
@@ -126,6 +129,7 @@ interface GoldPayload {
   };
   silver: SeriesStat | null;
   realYield: SeriesStat | null;
+  nominalYield: SeriesStat | null;
   dxy: SeriesStat | null;
   usdjpy: SeriesStat | null;
   eurusd: SeriesStat | null;
@@ -839,6 +843,29 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
  * The dashboard — the key indicators at a glance
  * ------------------------------------------------------------------ */
 
+/* One yield card — the true series (FRED daily close) under its honest
+ * name, with the daily change in percentage points, its own as-of date
+ * and the FRED provenance line. Fail-closed: no stored series, no card
+ * (the block degrades to the remaining indicators, never a guess). */
+function YieldCard({ name, stat, fmt, t }: { name: string; stat: SeriesStat | null; fmt: ReturnType<typeof makeFmt>; t: typeof UI.en.indicators }) {
+  if (stat === null) return null;
+  return (
+    <div className="flex items-center gap-3 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2 ring-1 ring-[var(--color-border)]">
+      <div className="min-w-0 flex-1">
+        <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{name}</p>
+        <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-2">
+          <bdi dir="ltr" className="type-label font-bold text-[var(--color-text-primary)]">
+            {fmt.num(stat.last, 2)}%
+          </bdi>
+          <PpDelta v={stat.chg1d ?? null} fmt={fmt} unit={t.unitPp} />
+        </p>
+        <p className="m-0 mt-0.5 type-caption text-[var(--color-text-tertiary)]">{t.fredDaily.replace("{date}", fmt.dateWords(stat.asOf))}</p>
+      </div>
+      <MiniSpark values={stat.series.map((p) => p.v)} />
+    </div>
+  );
+}
+
 function DashboardBand({
   data,
   t,
@@ -859,8 +886,20 @@ function DashboardBand({
   tomanPerOunce: number | null;
 }) {
   const ratio = data.silver && data.silver.last > 0 ? data.gold.spot / data.silver.last : null;
+  /* the two yields live in their own side-by-side pair above the
+     indicator grid (the real-yield re-sourcing: the true TIPS real
+     yield beside the nominal — FRED daily closes, both honestly
+     labeled with their as-of; the breakeven rides beneath, derived
+     from the pair only when they share the same FRED calendar day) */
+  const yieldsAligned =
+    data.realYield !== null &&
+    data.nominalYield !== null &&
+    data.realYield.asOf === data.nominalYield.asOf;
+  const breakeven =
+    data.realYield !== null && data.nominalYield !== null
+      ? data.nominalYield.last - data.realYield.last
+      : null;
   const rows = [
-    { name: t.indicators.realYield, stat: data.realYield, unit: "%" },
     { name: t.indicators.dxy, stat: data.dxy, unit: "" },
     { name: t.indicators.usdjpy, stat: data.usdjpy, unit: "" },
     { name: t.indicators.silver, stat: data.silver, unit: "$" },
@@ -893,6 +932,20 @@ function DashboardBand({
       {ratio ? (
         <p className="m-0 mt-2 type-caption font-semibold text-[var(--color-text-primary)]">
           {t.indicators.goldSilver}: <bdi dir="ltr">{fmt.num(ratio, 1)}</bdi>
+        </p>
+      ) : null}
+      {/* the two yields — side by side (the real-yield re-sourcing: the
+          true 10-year TIPS real yield and the 10-year nominal, FRED
+          daily closes, each card carrying its source, its as-of and its
+          daily change in pp); the derived breakeven rides beneath,
+          only when the pair shares the same FRED calendar day */}
+      <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2" data-yield-pair>
+        <YieldCard name={t.indicators.realYield} stat={data.realYield} fmt={fmt} t={t.indicators} />
+        <YieldCard name={t.indicators.nominalYield} stat={data.nominalYield} fmt={fmt} t={t.indicators} />
+      </div>
+      {yieldsAligned && breakeven !== null && Number.isFinite(breakeven) ? (
+        <p className="m-0 mt-1.5 type-caption text-[var(--color-text-secondary)]" data-yield-breakeven>
+          {t.indicators.breakeven.replace("{v}", fmt.num(breakeven, 2))}
         </p>
       ) : null}
       <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2">

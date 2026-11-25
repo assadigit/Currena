@@ -2,20 +2,24 @@
  * The comparison layer — gold against the alternatives, five years.
  *
  * The lines the owner asked for, side by side: the 10-year real yield,
- * silver, Bitcoin and the S&P 500 — with gold itself for reference.
- * Every leg is a public daily-close series read server-side and
+ * silver, Bitcoin and the S&P 500 — with gold itself for reference
+ * (the 10-year nominal yield rides as an opt-in toggle line). Every
+ * leg is a public daily-close series read server-side and
  * memory-cached for 30 minutes per isolate:
  *
- *   gold       the desk's own stitched spot+COMEX window (trend.ts)
- *   silver     COMEX silver futures (SI=F) — Yahoo's public chart
- *   bitcoin    BTC-USD — Yahoo's public chart
- *   spx        the S&P 500 index (^GSPC) — Yahoo's public chart
- *   realYield  the 10-year TIPS real yield (DFII10) — FRED's public
- *              CSV (no key, no registration)
+ *   gold         the desk's own stitched spot+COMEX window (trend.ts)
+ *   silver       COMEX silver futures (SI=F) — Yahoo's public chart
+ *   bitcoin      BTC-USD — Yahoo's public chart
+ *   spx          the S&P 500 index (^GSPC) — Yahoo's public chart
+ *   realYield    the 10-year TIPS real yield (DFII10) — FRED's public
+ *                CSV (no key, no registration)
+ *   nominalYield the 10-year Treasury nominal yield (DGS10) — FRED's
+ *                public CSV (the opt-in toggle line; the same bond
+ *                calendar as DFII10, date-aligned by construction)
  *
- * The yield is a rate, not an asset: its line is indexed like the
- * assets only so one chart can hold them all, and the payload carries
- * its true % levels so the tooltip and the legend speak the truth.
+ * The yields are rates, not assets: their lines ride their own honest
+ * right axis at the true % level (the component's dual-axis law — a
+ * rate is never indexed like an asset).
  *
  * Daily closes are sampled weekly (the last close of each ISO week) —
  * a 5-year line of ~260 points per leg. Every leg fails closed: a leg
@@ -29,8 +33,16 @@ export interface ComparePoint {
   v: number;
 }
 
+export type CompareLegId =
+  | "gold"
+  | "silver"
+  | "btc"
+  | "spx"
+  | "realYield"
+  | "nominalYield";
+
 export interface CompareLeg {
-  id: "gold" | "silver" | "btc" | "spx" | "realYield";
+  id: CompareLegId;
   points: ComparePoint[];
 }
 
@@ -118,10 +130,10 @@ async function yahooLeg(id: "silver" | "btc" | "spx"): Promise<ComparePoint[] | 
 }
 
 /* ------------------------------------------------------------------ */
-/* The FRED leg — the 10-year TIPS real yield (DFII10)                 */
+/* The FRED legs — the 10-year TIPS real (DFII10) and nominal (DGS10)  */
 /* ------------------------------------------------------------------ */
 
-/* The FRED leg's own honest user agent — plain, identified, never a
+/* The FRED legs' own honest user agent — plain, identified, never a
    browser spoof (FRED's public CSV endpoint allows programmatic reads). */
 const FRED_UA = "CurrenaGoldDesk/1.0 (currena.ir/gold; contact sedanama.ir@gmail.com)";
 
@@ -130,45 +142,55 @@ const globalForFred = globalThis as unknown as { __currenaFredDiag?: Record<stri
 const fredDiag: Record<string, unknown> = globalForFred.__currenaFredDiag ?? {};
 globalForFred.__currenaFredDiag = fredDiag;
 
-/** FRED's own public CSV endpoint (no key): DATE,DFII10 pairs. */
-async function fredRealYield(): Promise<ComparePoint[] | null> {
-  const id = "realYield";
+/** FRED's own public CSV endpoint (no key): DATE,<SERIES> pairs, 5y back. */
+async function fredLeg(id: "realYield" | "nominalYield", seriesId: "DFII10" | "DGS10"): Promise<ComparePoint[] | null> {
   const hit = legCache.get(id);
   if (hit !== undefined && Date.now() - hit.at < (hit.value === null ? FAIL_TTL_MS : TTL_MS)) {
     return hit.value;
   }
   let value: ComparePoint[] | null = null;
-  fredDiag.at = new Date().toISOString();
+  if (id === "realYield") {
+    // the diag surface records the real-yield leg only (the ?diag=1 contract)
+    fredDiag.at = new Date().toISOString();
+  }
   try {
     const from = new Date();
     from.setUTCFullYear(from.getUTCFullYear() - 5);
     const fromIso = from.toISOString().slice(0, 10);
     const res = await fetch(
-      `https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFII10&cosd=${fromIso}`,
+      `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${seriesId}&cosd=${fromIso}`,
       {
         headers: { accept: "text/csv", "user-agent": FRED_UA },
         signal: AbortSignal.timeout(15_000),
         cache: "no-store",
       },
     );
-    fredDiag.status = res.status;
-    fredDiag.contentType = res.headers.get("content-type");
+    if (id === "realYield") {
+      fredDiag.status = res.status;
+      fredDiag.contentType = res.headers.get("content-type");
+    }
     if (res.ok) {
       const csv = await res.text();
-      fredDiag.bytes = csv.length;
+      if (id === "realYield") fredDiag.bytes = csv.length;
       const pts: ComparePoint[] = [];
       for (const line of csv.split("\n").slice(1)) {
         const cells = line.trim().split(",");
         if (cells.length >= 2 && /^\d{4}-\d{2}-\d{2}$/.test(cells[0] ?? "")) {
-          const v = Number(cells[1]);
-          if (Number.isFinite(v)) pts.push({ d: cells[0]!, v });
+          const raw = cells[1] ?? "";
+          const v = Number(raw);
+          // "." — and the bond-market holidays print date-only rows with
+          // an EMPTY value cell, which Number() reads as 0 (finite!) —
+          // guarded explicitly, dropped, never stored.
+          if (raw !== "" && Number.isFinite(v)) pts.push({ d: cells[0]!, v });
         }
       }
-      fredDiag.rows = pts.length;
+      if (id === "realYield") fredDiag.rows = pts.length;
       if (pts.length >= 2) value = pts;
     }
   } catch (err) {
-    fredDiag.error = err instanceof Error ? err.message : String(err);
+    if (id === "realYield") {
+      fredDiag.error = err instanceof Error ? err.message : String(err);
+    }
     value = null;
   }
   legCache.set(id, { at: Date.now(), value });
@@ -205,12 +227,13 @@ function sliceYears(points: ComparePoint[], years: number): ComparePoint[] {
 }
 
 export async function getComparison(withDiag = false): Promise<ComparePayload> {
-  const [goldLong, silver, btc, spx, realYield] = await Promise.all([
+  const [goldLong, silver, btc, spx, realYield, nominalYield] = await Promise.all([
     getLongSeries("5y"),
     yahooLeg("silver"),
     yahooLeg("btc"),
     yahooLeg("spx"),
-    fredRealYield(),
+    fredLeg("realYield", "DFII10"),
+    fredLeg("nominalYield", "DGS10"),
   ]);
 
   const legs: CompareLeg[] = [];
@@ -230,6 +253,15 @@ export async function getComparison(withDiag = false): Promise<ComparePayload> {
         first: sampled[0]!.v,
         last: sampled[sampled.length - 1]!.v,
       };
+    }
+  }
+
+  // The nominal yield — the opt-in toggle line (default off; the same
+  // FRED bond calendar as the real yield, date-aligned by construction).
+  if (nominalYield !== null) {
+    const sampled = sliceYears(sampleWeekly(nominalYield), 5);
+    if (sampled.length >= 2) {
+      legs.push({ id: "nominalYield", points: sampled });
     }
   }
 

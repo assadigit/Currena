@@ -5,37 +5,50 @@
  * client components). Grounds the desk's price/macro series in real
  * market data via the EODHD end-of-day API:
  *
- *   gold       XAUUSD.FOREX   gold spot, USD per troy ounce
- *   silver     XAGUSD.FOREX   silver spot, USD per troy ounce
- *   dxy        ICE formula    US Dollar Index computed from the six
- *                              component FX pairs via the published
- *                              ICE weights (exact construction, not a
- *                              modelled proxy)
- *   spx        SPY.US         S&P 500 via SPDR SPY ETF closes (the
- *                              engine consumes only % moves)
- *   realYield  ^TNX.US        10Y nominal Treasury yield (CBOE ^TNX) —
- *                              real-yield PROXY: no TIPS real-yield
- *                              series exists on this subscription
- *   oil        USO.US         WTI crude via US Oil Fund ETF closes
- *                              (futures-roll proxy; correlations only)
+ *   gold         XAUUSD.FOREX   gold spot, USD per troy ounce
+ *   silver       XAGUSD.FOREX   silver spot, USD per troy ounce
+ *   dxy          ICE formula    US Dollar Index computed from the six
+ *                               component FX pairs via the published
+ *                               ICE weights (exact construction, not a
+ *                               modelled proxy)
+ *   spx          SPY.US         S&P 500 via SPDR SPY ETF closes (the
+ *                               engine consumes only % moves)
+ *   oil          USO.US         WTI crude via US Oil Fund ETF closes
+ *                               (futures-roll proxy; correlations only)
  *
- * Series with no EODHD source on this plan stay modelled by the
+ * The two yield datasets are served by FRED, not EODHD (the
+ * real-yield re-sourcing, docs/fred-yields-spec.md) — no TIPS series
+ * exists on this EODHD subscription, so the old nominal proxy entry is
+ * GONE:
+ *
+ *   realYield    FRED DFII10    the 10-year TIPS constant-maturity
+ *                               REAL yield, daily close (no key, no
+ *                               quota — the true series, never a proxy)
+ *   nominalYield FRED DGS10     the 10-year Treasury constant-maturity
+ *                               nominal yield, daily close
+ *
+ * Series with no live source on these plans stay modelled by the
  * deterministic engine: COMEX net specs (weekly CFTC report), gold ETF
  * flows, the news tape and news sentiment.
  *
- * The symbol registry below was recorded by a live probe of the API at
- * session start; EODHD plans gate symbol universes, so the registry
- * keeps honest notes rather than assumptions. The API token is read
- * from process.env.EODHD_TOKEN only — it is never stored in the repo,
- * the database, or the logs, and is never printed.
+ * The symbol registries below were recorded by live probes of each API
+ * at their sittings; both plans gate symbol universes, so the
+ * registries keep honest notes rather than assumptions. The EODHD API
+ * token is read from process.env.EODHD_TOKEN only — it is never stored
+ * in the repo, the database, or the logs, and is never printed. FRED
+ * needs no token at all.
  *
- * Fetching is trailing-window-once-per-day (SourceSync rows gate the
- * sync; a force re-pull is used by the regenerate path). Observations
- * persist in SQLite as one row per dataset-date.
+ * Fetching is trailing-window-once-per-day (SourceSync rows gate each
+ * source's sync; a force re-pull is used by the regenerate path).
+ * Observations persist in SQLite/D1 as one row per dataset-date.
+ * ensureObservations() orchestrates both sources and never throws per
+ * dataset — a source that fails records `error` and the desk falls
+ * back to the deterministic engine with honest provenance.
  */
 
 import { db } from "@/lib/db";
 import type { DatasetProvenance } from "../types";
+import { FRED_SPECS, ensureFredObservations } from "./fred";
 
 /* ------------------------------------------------------------------ */
 /* Constants                                                            */
@@ -67,6 +80,8 @@ export interface SourceSpec {
   note: string;
   /** live-proxy when the series is an ETF/formula standing in for the named instrument. */
   mode: "live" | "live-proxy";
+  /** Which upstream serves this dataset — EODHD (token) or FRED (keyless CSV). */
+  source: "eodhd" | "fred";
 }
 
 export type MarketDataset =
@@ -74,6 +89,7 @@ export type MarketDataset =
   | "dxy"
   | "spx"
   | "realYield"
+  | "nominalYield"
   | "silver"
   | "oil";
 
@@ -84,6 +100,7 @@ export const SOURCE_REGISTRY: SourceSpec[] = [
     label: "Gold spot (XAU/USD)",
     note: "USD per troy ounce, EODHD forex feed.",
     mode: "live",
+    source: "eodhd",
   },
   {
     dataset: "silver",
@@ -91,6 +108,7 @@ export const SOURCE_REGISTRY: SourceSpec[] = [
     label: "Silver spot (XAG/USD)",
     note: "USD per troy ounce, EODHD forex feed.",
     mode: "live",
+    source: "eodhd",
   },
   {
     dataset: "dxy",
@@ -98,6 +116,7 @@ export const SOURCE_REGISTRY: SourceSpec[] = [
     label: "US Dollar Index",
     note: "Computed from the six component pairs (EURUSD, USDJPY, GBPUSD, USDCAD, USDSEK, USDCHF) via the published ICE index weights — exact construction, not a modelled proxy.",
     mode: "live",
+    source: "eodhd",
   },
   {
     dataset: "spx",
@@ -105,20 +124,25 @@ export const SOURCE_REGISTRY: SourceSpec[] = [
     label: "S&P 500 (SPY ETF)",
     note: "Index not on this EODHD plan; served by SPDR SPY ETF closing prices — the desk consumes its daily % moves.",
     mode: "live-proxy",
+    source: "eodhd",
   },
-  {
-    dataset: "realYield",
-    symbol: "^TNX.US",
-    label: "10Y Treasury yield (CBOE ^TNX)",
-    note: "Real-yield proxy: no TIPS real-yield series on this plan; the 10Y nominal Treasury yield stands in for it.",
-    mode: "live-proxy",
-  },
+  // The two FRED datasets (specs owned by ./fred.ts — the real-yield
+  // re-sourcing; the old nominal proxy entry is deleted, no fallback).
+  ...FRED_SPECS.map((f) => ({
+    dataset: f.dataset,
+    symbol: f.symbol,
+    label: f.label,
+    note: f.note,
+    mode: "live" as const,
+    source: "fred" as const,
+  })),
   {
     dataset: "oil",
     symbol: "USO.US",
     label: "WTI crude (USO ETF)",
     note: "WTI futures-roll proxy via US Oil Fund ETF closes; used for correlations only.",
     mode: "live-proxy",
+    source: "eodhd",
   },
 ];
 
@@ -285,33 +309,64 @@ async function computeDxy(): Promise<EodRow[]> {
 }
 
 /**
- * Ensure the observation store is current. Runs the network sync at most
- * once per UTC day (cache-first); `force` re-pulls (the regenerate path).
- * Failures are recorded per dataset and never throw — the desk falls
- * back to the deterministic engine.
+ * Ensure the observation store is current across BOTH sources. Runs
+ * each source's own once-per-UTC-day gate (cache-first); `force`
+ * re-pulls both (the regenerate path). Failures are recorded per
+ * dataset and never throw — the desk falls back to the deterministic
+ * engine.
  */
 export async function ensureObservations(force = false): Promise<SyncReport> {
+  // The FRED leg first: no token, no quota — the two yield datasets
+  // (realYield re-sourced, nominalYield new).
+  const fred = await ensureFredObservations(force);
+  // The EODHD leg: the five market datasets.
+  const eodhd = await ensureEodhdObservations(force);
+  const asOfs = [fred.asOf, eodhd.asOf].filter(
+    (d): d is string => Boolean(d)
+  );
+  return {
+    skipped: fred.skipped && eodhd.skipped,
+    asOf: asOfs.sort().pop(),
+    statuses: [...fred.statuses, ...eodhd.statuses],
+  };
+}
+
+/** The EODHD-sourced specs (the gate and token path scope to these). */
+const EODHD_SPECS = SOURCE_REGISTRY.filter((s) => s.source === "eodhd");
+
+/**
+ * The EODHD leg of the sync — the trailing-window, once-per-day
+ * (cache-first) fetch of the five market datasets. The gate requires
+ * every EODHD-sourced registry spec to carry a SourceSync row stamped
+ * today (registry coverage — a NEW dataset joining the registry must
+ * never be skipped by stale rows of the old set).
+ */
+async function ensureEodhdObservations(force = false): Promise<SyncReport> {
   const existing = await db.sourceSync.findMany();
+  const byDataset = new Map(existing.map((s) => [s.dataset, s]));
+  const eodRows = EODHD_SPECS.map((spec) => byDataset.get(spec.dataset));
   const allSyncedToday =
-    existing.length > 0 &&
-    existing.every((s) => isSyncedToday(s.syncedAt)) &&
-    existing.some((s) => s.status === "live");
+    eodRows.every((s) => s !== undefined && isSyncedToday(s.syncedAt)) &&
+    eodRows.some((s) => s?.status === "live");
 
   if (!force && allSyncedToday) {
     return {
       skipped: true,
-      asOf: existing.find((s) => s.status === "live")?.asOf ?? undefined,
-      statuses: existing.map((s) => ({
-        dataset: s.dataset,
-        status: s.status,
-        asOf: s.asOf ?? undefined,
-        note: s.note ?? undefined,
-      })),
+      asOf: eodRows.find((s) => s?.status === "live")?.asOf ?? undefined,
+      statuses: EODHD_SPECS.map((spec) => {
+        const s = byDataset.get(spec.dataset);
+        return {
+          dataset: spec.dataset,
+          status: s?.status ?? "error",
+          asOf: s?.asOf ?? undefined,
+          note: s?.note ?? undefined,
+        };
+      }),
     };
   }
 
   if (!process.env.EODHD_TOKEN) {
-    for (const spec of SOURCE_REGISTRY) {
+    for (const spec of EODHD_SPECS) {
       await upsertSync(
         spec.dataset,
         spec.symbol,
@@ -322,7 +377,7 @@ export async function ensureObservations(force = false): Promise<SyncReport> {
     }
     return {
       skipped: false,
-      statuses: SOURCE_REGISTRY.map((s) => ({
+      statuses: EODHD_SPECS.map((s) => ({
         dataset: s.dataset,
         status: "unavailable",
         note: "EODHD token not configured",
@@ -334,8 +389,10 @@ export async function ensureObservations(force = false): Promise<SyncReport> {
   const to = isoToday();
   const statuses: SyncReport["statuses"] = [];
 
-  // Direct symbol datasets (all in parallel; the volume is one call per symbol).
-  const directSpecs = SOURCE_REGISTRY.filter((s) => s.dataset !== "dxy");
+  // Direct symbol datasets (all in parallel; the volume is one call per
+  // symbol). The FRED datasets never ride this loop — EODHD does not
+  // serve them (source === "eodhd" only, dxy handled below).
+  const directSpecs = EODHD_SPECS.filter((s) => s.dataset !== "dxy");
   const results = await Promise.allSettled(
     directSpecs.map((spec) => fetchEod(spec.symbol, from, to))
   );
@@ -480,6 +537,7 @@ export async function getGroundedBundle(
     "dxy",
     "spx",
     "realYield",
+    "nominalYield",
     "silver",
     "oil",
   ];
