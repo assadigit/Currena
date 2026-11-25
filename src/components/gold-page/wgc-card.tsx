@@ -12,12 +12,14 @@
  *    beside it), the English title in EN — on the house card patterns.
  *  - fa mode, when a fresh Persian translation is stored (spec §8,
  *    implemented 2026-11-25): the Farsi segments render as the PRIMARY
- *    RTL text under the honest «ترجمهٔ ماشینی» label — the
- *    non-negotiable — with the English original still available verbatim
- *    below (the quoted dir="ltr" block, now captioned as the original).
+ *    RTL text — the ONLY text (the owner's batch-K ask: one language
+ *    per page, the English original dropped, "in Farsi show Farsi, in
+ *    English show English") — with the attribution as the quiet
+ *    "AI-translated" corner badge on the header row (the engine + date
+ *    ride its tooltip), replacing the old in-body «ترجمهٔ ماشینی» label.
  *  - fa mode with NO stored Farsi (the 17 pre-feature issues, an AI
  *    failure): today's behavior exactly — the English verbatim, primary,
- *    with no label and no fake translation. EN mode always renders the
+ *    with no badge and no fake translation. EN mode always renders the
  *    English verbatim (the fa layer is the Persian page's own).
  *  - The 11px whisper meta line: the published date, the fetched date,
  *    and «منبع: World Gold Council» with the canonical gold.org link.
@@ -34,7 +36,7 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
-import type { Fmt } from "@/components/gold-page/visuals";
+import { type Fmt, AiTranslatedBadge } from "@/components/gold-page/visuals";
 
 /* ------------------------------------------------------------------ *
  * The payload (the route's contract)
@@ -94,10 +96,10 @@ async function fetchWgc(): Promise<WgcLatest> {
 export interface WgcCardCopy {
   title: string;
   issueLabel: string;
-  /** The honest machine-translation label (spec §8's non-negotiable) — fa only. */
-  mtLabel: string;
-  /** The caption over the English original below the Farsi translation — fa only. */
-  enOriginalLabel: string;
+  /** The AI-translated corner tag (batch K) — the literal Latin badge, both locales. */
+  aiBadge: string;
+  /** The badge's tooltip: the engine and date behind the translation. */
+  aiBadgeTip: string;
   publishedLabel: string;
   fetchedLabel: string;
   source: string;
@@ -190,8 +192,21 @@ export function WgcCard({
       className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-currena-bg-light)] p-4 ring-1 ring-[var(--color-border)] sm:p-5"
     >
       {/* the header — one language, one title: the fa h2 in fa mode, the
-          EN h2 in EN mode, never both (the owner's ask) */}
-      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
+          EN h2 in EN mode, never both (the owner's ask); when the card
+          serves the stored translation, the quiet AI-translated badge
+          rides the opposite corner (batch K) — the engine + date on its
+          tooltip */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+        <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
+        {fa ? (
+          <AiTranslatedBadge
+            tag={t.aiBadge}
+            tip={t.aiBadgeTip
+              .replace("{model}", fa.sourceModel ?? "Workers AI")
+              .replace("{date}", dateWordsOf(fa.translatedAt, fmt) ?? "")}
+          />
+        ) : null}
+      </div>
 
       {/* the honest states — riding the same card, each a stated fact */}
       {q.isError ? (
@@ -223,8 +238,10 @@ export function WgcCard({
         <p className="m-0 mt-2 type-caption text-[var(--color-text-tertiary)]">{t.stateSkip}</p>
       ) : null}
 
-      {/* the served issue — the Farsi translation primary (fa mode, stored),
-          or the English verbatim in an LTR block (every other case) */}
+      {/* the served issue — the Farsi translation primary and ALONE
+          (fa mode, stored: the owner's batch-K ask — one language per
+          page, the English original no longer rides below), or the
+          English verbatim in an LTR block (every other case) */}
       {issue ? (
         <>
           <h3 className="type-label m-0 mt-3 font-extrabold text-[var(--color-text-primary)]">
@@ -233,12 +250,6 @@ export function WgcCard({
 
           {fa ? (
             <>
-              {/* the honest label — spec §8's non-negotiable, always visible above the Farsi */}
-              <p
-                className="m-0 mt-2 inline-flex items-center gap-1 rounded-full bg-[var(--color-currena-soft)] px-2.5 py-1 text-[11px] font-semibold leading-none text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
-              >
-                {t.mtLabel}
-              </p>
               {fa.headline ? (
                 <p className="m-0 mt-2 text-[13px] font-semibold leading-snug text-[var(--color-text-secondary)]">
                   {fa.headline}
@@ -256,28 +267,29 @@ export function WgcCard({
                   </React.Fragment>
                 ))}
               </div>
-
-              {/* the English original, still available verbatim — quoted, captioned */}
-              <p className="m-0 mt-2.5 text-[11px] font-semibold text-[var(--color-text-tertiary)]">{t.enOriginalLabel}</p>
             </>
-          ) : issue.headline ? (
-            <p dir="ltr" className="m-0 mt-1 text-start text-[13px] font-semibold leading-snug text-[var(--color-text-secondary)]">
-              {issue.headline}
-            </p>
-          ) : null}
-          <blockquote
-            cite={issue.sourceUrl}
-            dir="ltr"
-            className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] p-3 text-start ring-1 ring-[var(--color-border)] sm:p-3.5"
-          >
-            {issue.segments.map((s, i) => (
-              <React.Fragment key={`${s.heading}-${i}`}>
-                {i > 0 ? <div className="my-3 border-t border-[var(--color-border)]" aria-hidden="true" /> : null}
-                <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{s.heading}</h4>
-                <p className="m-0 mt-1 text-[13.5px] leading-relaxed text-[var(--color-text-secondary)]">{s.body}</p>
-              </React.Fragment>
-            ))}
-          </blockquote>
+          ) : (
+            <>
+              {issue.headline ? (
+                <p dir="ltr" className="m-0 mt-1 text-start text-[13px] font-semibold leading-snug text-[var(--color-text-secondary)]">
+                  {issue.headline}
+                </p>
+              ) : null}
+              <blockquote
+                cite={issue.sourceUrl}
+                dir="ltr"
+                className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] p-3 text-start ring-1 ring-[var(--color-border)] sm:p-3.5"
+              >
+                {issue.segments.map((s, i) => (
+                  <React.Fragment key={`${s.heading}-${i}`}>
+                    {i > 0 ? <div className="my-3 border-t border-[var(--color-border)]" aria-hidden="true" /> : null}
+                    <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{s.heading}</h4>
+                    <p className="m-0 mt-1 text-[13.5px] leading-relaxed text-[var(--color-text-secondary)]">{s.body}</p>
+                  </React.Fragment>
+                ))}
+              </blockquote>
+            </>
+          )}
 
           {/* the 11px whisper meta line — provenance, always visible */}
           <p className="m-0 mt-2 flex flex-wrap items-baseline gap-x-1.5 text-[11px] leading-relaxed text-[var(--color-text-tertiary)]">

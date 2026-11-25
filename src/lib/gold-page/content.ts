@@ -780,10 +780,10 @@ export const UI = {
     },
     te: {
       title: "Trading Economics daily gold briefing",
-      // The fa layer's honest labels (TE spec §5); unused in EN rendering —
-      // the shared copy type keeps both bundles the same shape.
-      mtLabel: "Machine translation",
-      enOriginalLabel: "The English original, verbatim",
+      // The AI-translated corner badge (batch K): the literal Latin tag on
+      // both locales, the honest engine + date riding its tooltip.
+      aiBadge: "AI-translated",
+      aiBadgeTip: "Machine-translated to Farsi by {model}, {date}",
       publishedLabel: "Published {date}",
       fetchedLabel: "fetched {date}",
       source: "Source: Trading Economics",
@@ -798,10 +798,10 @@ export const UI = {
     wgc: {
       title: "World Gold Council monthly commentary",
       issueLabel: "{month} in review",
-      // The fa layer's honest labels (spec §8); unused in EN rendering — the
-      // shared copy type keeps both bundles the same shape.
-      mtLabel: "Machine translation",
-      enOriginalLabel: "The English original, verbatim",
+      // The AI-translated corner badge (batch K): the literal Latin tag on
+      // both locales, the honest engine + date riding its tooltip.
+      aiBadge: "AI-translated",
+      aiBadgeTip: "Machine-translated to Farsi by {model}, {date}",
       publishedLabel: "Published {date}",
       fetchedLabel: "fetched {date}",
       source: "Source: World Gold Council",
@@ -1435,11 +1435,11 @@ export const UI = {
     },
     te: {
       title: "خلاصهٔ روزانهٔ بازار طلا",
-      // The honest label spec §5 mandates above the machine-translated
-      // Farsi — exactly those words, never softened — and the caption over
-      // the English original below it.
-      mtLabel: "ترجمهٔ ماشینی",
-      enOriginalLabel: "متن اصلی به انگلیسی — واژه‌به‌واژه",
+      // The AI-translated corner badge (batch K): the literal Latin tag —
+      // the owner's own word for it — with the honest engine + date riding
+      // the tooltip, replacing the old in-body «ترجمهٔ ماشینی» label.
+      aiBadge: "AI-translated",
+      aiBadgeTip: "ترجمهٔ ماشینی به فارسی با {model}، {date}",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
       source: "منبع: Trading Economics",
@@ -1454,11 +1454,11 @@ export const UI = {
     wgc: {
       title: "نگارش ماهانهٔ شورای جهانی طلا",
       issueLabel: "مرور {month}",
-      // The honest label spec §8 mandates above the machine-translated
-      // Farsi — exactly those words, never softened — and the caption over
-      // the English original below it.
-      mtLabel: "ترجمهٔ ماشینی",
-      enOriginalLabel: "متن اصلی به انگلیسی — واژه‌به‌واژه",
+      // The AI-translated corner badge (batch K): the literal Latin tag —
+      // the owner's own word for it — with the honest engine + date riding
+      // the tooltip, replacing the old in-body «ترجمهٔ ماشینی» label.
+      aiBadge: "AI-translated",
+      aiBadgeTip: "ترجمهٔ ماشینی به فارسی با {model}، {date}",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
       source: "منبع: World Gold Council",
