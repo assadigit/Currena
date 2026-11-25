@@ -93,6 +93,28 @@
 - The gold page (the whole existing surface): loads clean with the Tools nav
   link added, browser-walked with zero page errors.
 
+### Live verification (after the deploy, 2026-11-25/26)
+
+Deployed with the provided Cloudflare token
+ (`NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build && bunx wrangler deploy`,
+ which also claimed the two `/tools` zone routes on currena.ir). Verified live:
+
+- `https://currena.ir/tools` → **200**; `https://currena.ir/tools/compound-wealth` →
+  **200** (browser-rendered: correct title, the headline with real numbers,
+  the chart, zero console/page errors);
+- `/tools/compound-wealth/` → **301** to the canonical URL; `/tools/` → **301**;
+  `/tools/unknown` → **404**; `/gold/tools/compound-wealth` → **301** to the
+  public spelling; `/gold` → **200** with the page intact and the Tools nav;
+- the D1-backed data plane is untouched: `https://currena.ir/gold/api/desk`
+  returns the live desk day (2026-11-23 briefing, spot 2,499) and
+  `/gold/api/gold` answers 200;
+- the workers.dev mirror serves `/tools` at 200 as a preview;
+- the live golden path walked in the browser: amount → 500, years → 30
+  (instant update, “you put in 180,000… about 585,000”), Save as card → phone
+  card → close, Save as card → print card → PDF (one page, text extractable);
+  live samples: `16-live-en-mobile390.png`, `17-live-phone-card.png`,
+  `18-live-a4-card.pdf`.
+
 ## 4. The figures — every number, its source and its working
 
 Research date: **2026-11-25** (UTC). Every value below was read from the linked
@@ -282,12 +304,12 @@ figures file (AU 2.76%, US 2.53%).
 
 ## 8. What is unfinished / needs the owner
 
-1. **Deploy.** The branch is pushed and the PR is open; the deploy itself
-   (`NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build && bunx wrangler deploy`,
-   which also creates the two `/tools` zone routes on currena.ir) was executed
-   from this sitting with the provided token — see the live-verification note
-   below. If it ever needs re-running by hand: those two commands from the repo
-   root, with `CLOUDFLARE_API_TOKEN` set.
+1. **Deploy: done.** The branch is pushed, the PR is open (#51), and the
+   worker was deployed from this sitting with the provided token — the live
+   verification above is the record. If it ever needs re-running by hand:
+   `NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build && bunx wrangler deploy`
+   from the repo root, with `CLOUDFLARE_API_TOKEN` set (the two `/tools` zone
+   routes are declared in `wrangler.jsonc`, so the deploy keeps them).
 2. **The main site's nav** (currena-api — outside this repo) has no Tools link;
    the gold page's nav has one, the tools pages link home. One line on the
    main site's nav when the owner wants it there.
