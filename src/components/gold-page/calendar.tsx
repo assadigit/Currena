@@ -20,11 +20,11 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarClock } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
 import { CountryFlag } from "@/components/gold-page/flags";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 import {
   Dialog,
   DialogContent,
@@ -496,9 +496,12 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
       {/* THE one lead line (the owner's batch-I ask: the merged card has
           one framing — the scenarios' own; the events below are simply
           their dates, no second head, no second subtitle, no method
-          block — the user faces the upcoming events, nothing else) */}
-      <p className="m-0 flex flex-wrap items-baseline gap-x-2 gap-y-1 type-caption font-bold text-[var(--color-text-primary)]">
-        <CalendarClock className="h-3.5 w-3.5 shrink-0 text-[var(--color-currena-blue-deep)]" aria-hidden="true" />
+          block — the user faces the upcoming events, nothing else).
+          The owner's pack icon (batch N) carries the calendar's
+          identity — the gold desk-calendar render in place of the old
+          little lucide clock — riding the lead line at sub-head size. */}
+      <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 type-caption font-bold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-events-calendar.png" size={26} className="h-[26px] w-[26px]" />
         {t.eventsLead}
         <span className="font-semibold text-[var(--color-text-tertiary)]">
           {events.length > 0 ? `· ${fmt.num(events.length, 0)} ${locale === "en" ? "events" : "رویداد"}` : ""}

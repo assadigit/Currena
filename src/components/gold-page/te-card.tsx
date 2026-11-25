@@ -39,6 +39,7 @@ import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, AiTranslatedBadge, faDigits } from "@/components/gold-page/visuals";
 import { faGlossary } from "@/lib/gold-page/fa-glossary";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 
 /* ------------------------------------------------------------------ *
  * The payload (the route's contract)
@@ -207,7 +208,10 @@ export function TeCard({
           rides the opposite corner (batch K) — the engine + date on its
           tooltip */}
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-        <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
+        <h2 className="m-0 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+          <PackIcon file="gold-briefing.png" size={34} className="h-[34px] w-[34px]" />
+          {t.title}
+        </h2>
         {fa ? (
           <AiTranslatedBadge
             tag={t.aiBadge}

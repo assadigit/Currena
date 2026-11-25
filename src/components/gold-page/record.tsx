@@ -22,6 +22,7 @@ import { ChevronDown, ChevronRight, DollarSign, Flame, Percent, Scale, ShieldAle
 import type { Locale } from "@/lib/gold-page/content";
 import { CONCEPT_NAMES, FORCE_FAMILIES, GOLD_RELATIONSHIPS, familyRecords } from "@/lib/gold-page/relationships";
 import { CountryFlag } from "@/components/gold-page/flags";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
 import type { IfBoughtSnapshot } from "@/lib/gold-page/ifbought";
@@ -278,7 +279,10 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
         </button>
       </div>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+      <h3 className="m-0 mt-1 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-technical-analysis.png" size={34} className="h-[34px] w-[34px]" />
+        {t.title}
+      </h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
       {/* THE plain verdict — one readable sentence, its own loud gold box */}
@@ -1022,7 +1026,10 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
   return (
     <section id="gold-positions" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+      <h3 className="m-0 mt-1 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-dealers-long-short-position.png" size={34} className="h-[34px] w-[34px]" />
+        {t.title}
+      </h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
       {verdictWord !== null && main !== null ? (
         <div className="mt-3 flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-3 ring-1 ring-[var(--color-border)]">

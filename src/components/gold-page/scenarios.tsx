@@ -19,6 +19,7 @@ import * as React from "react";
 import { CalendarClock, TrendingDown, TrendingUp } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import type { Fmt } from "@/components/gold-page/visuals";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 import { upcomingEvents } from "@/components/gold-page/calendar";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
@@ -150,7 +151,10 @@ export function ScenariosBand({
 
   return (
     <section id="gold-scenarios" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+      <h3 className="m-0 mt-1 flex items-center gap-2.5 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-price-speculation-scenarios.png" size={34} className="h-[34px] w-[34px]" />
+        {t.title}
+      </h3>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
       <div className="mt-3.5 grid grid-cols-1 gap-2.5 lg:grid-cols-2">

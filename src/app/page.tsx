@@ -70,6 +70,7 @@ import {
   type PremiumPayload,
 } from "@/components/gold-page/record";
 import { CalculatorBand } from "@/components/gold-page/calculator";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 import {
   bandWord,
   ContextTable,
@@ -569,7 +570,10 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
           then→now price path beside it whispers (small, muted, still
           legible), and the rows breathe (the owner's ask). */}
       <div className="mt-3.5">
-        <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{t.briefing.trendTitle}</h4>
+        <h4 className="type-label m-0 flex items-center gap-2 font-extrabold text-[var(--color-text-primary)]">
+          <PackIcon file="gold-price-up-or-down.png" size={26} className="h-[26px] w-[26px]" />
+          {t.briefing.trendTitle}
+        </h4>
         <div className="mt-2 min-w-0 overflow-hidden rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
           <table className="m-0 w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption" aria-label={t.briefing.trendTitle}>
             <tbody>
@@ -611,7 +615,10 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
       </div>
 
       <div className="mt-4">
-        <h4 className="type-label m-0 font-extrabold text-[var(--color-text-primary)]">{t.briefing.whyTitle}</h4>
+        <h4 className="type-label m-0 flex items-center gap-2 font-extrabold text-[var(--color-text-primary)]">
+          <PackIcon file="gold-price-influential-factors.png" size={26} className="h-[26px] w-[26px]" />
+          {t.briefing.whyTitle}
+        </h4>
         <div className="mt-2 flex flex-col gap-2">
           {reasonSeats.map(({ lane, seatId }) => {
             const content = SEAT_CONTENT[seatId];
