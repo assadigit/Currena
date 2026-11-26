@@ -315,17 +315,29 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
           <div className="cw-sheet-assumptions">
             <div className="cw-sheet-h2">{t.assumptionsTitle}</div>
             <ul className="m-0 list-none space-y-0.5 p-0 text-[8.5pt]" style={{ opacity: 0.9 }}>
-              {t.assumptions.map((line, i) => (
-                <li key={i}>
-                  {line
-                    .replace("{rate}", pct(result.baselineRate))
-                    .replace("{baseline}", baselineWords)
-                    .replace("{sources}", asset.sourceName)
-                    .replace("{cost}", `${pct(plan.yearlyCost)}${plan.yearlyCost === 0.002 ? "" : ""}`)
-                    .replace("{fee}", `${formatMoney(plan.feePerPurchase, locale, 2)}`)
-                    .replace("{inflation}", pct(plan.inflation))}
-                </li>
-              ))}
+              {t.assumptions.map((line, i) => {
+                /* W2: when the plan's asset is cash, the yearly-cost line
+                   states the rule instead of a number (cash pays no fund
+                   cost — spec §6.5). */
+                const isCostLine = line.includes("{cost}");
+                const costText =
+                  asset.id === "cash"
+                    ? locale === "fa"
+                      ? "شامل هزینهٔ سالانه نیست"
+                      : "not charged on cash"
+                    : pct(plan.yearlyCost);
+                return (
+                  <li key={i}>
+                    {line
+                      .replace("{rate}", pct(result.baselineRate))
+                      .replace("{baseline}", baselineWords)
+                      .replace("{sources}", asset.sourceName)
+                      .replace("{cost}", isCostLine ? costText : pct(plan.yearlyCost))
+                      .replace("{fee}", `${formatMoney(plan.feePerPurchase, locale, 2)}`)
+                      .replace("{inflation}", pct(plan.inflation))}
+                  </li>
+                );
+              })}
               <li>{copy.tool.how.overlapNote}</li>
               <li>{copy.tool.how.taxNote}</li>
             </ul>

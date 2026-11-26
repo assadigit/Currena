@@ -499,12 +499,46 @@ describe("v6 regression lock: the live defaults (spec §1.1)", () => {
     const c = whatIfLaterStart(plan, AU_SHARES, 240, 5);
     expect(Math.round(c! / 100) * 100).toBe(19_600);
   });
-  test("cash what-if — 32,100 with the cost WRONGLY applied (W2's before)", () => {
-    // The live page on 2026-11-26 showed "about 32,100", which is the cash
-    // rate (3.03%) with the 0.2% fund cost deducted. W2 removes the cost,
-    // so this expectation is DELIBERATELY re-pinned in the W2 block below.
+  test("cash what-if — re-pinned by W2 to 32,800 (the pre-W2 live value was 32,100)", () => {
+    // The live page on 2026-11-26 showed "about 32,100": the cash rate
+    // (3.03%) with the 0.2% fund cost wrongly deducted. W2 (spec §6.5)
+    // removed the cost, so the lock now pins the honest number; the
+    // before-value is still pinned in the W2 block below.
     const cashFigures = figuresOf(cashRow("AU")!);
     const c = whatIfCash(plan, cashFigures, 240);
-    expect(Math.round(c! / 100) * 100).toBe(32_100);
+    expect(Math.round(c! / 100) * 100).toBe(32_800);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* W2 (spec §6.5, test 34) — cash pays no yearly fund cost.          */
+/* The switch itself: APPLY_COST_TO_CASH = false (one config line).  */
+/* ---------------------------------------------------------------- */
+describe("W2: cash has no yearly fund cost", () => {
+  const CASH = figuresOf(cashRow("AU")!);
+  const plan = basePlan({ yearlyCost: 0.002, inflation: defaultInflation("AU") });
+
+  test("the cash what-if equals the cash rate with NO cost deducted (≈32,800)", () => {
+    const c = whatIfCash(plan, CASH, 240);
+    // Reference: simulate(100, 3.03, 20, cost 0) = 32,790 → page 32,800.
+    expect(within(c!, 32_790, 0.1)).toBe(true);
+    expect(Math.round(c! / 100) * 100).toBe(32_800);
+  });
+  test("isCash skips the cost inside computeCompound; without it the old lower number returns", () => {
+    const noCost = computeCompound(plan, CASH, 240, { isCash: true });
+    const withCost = computeCompound(plan, CASH, 240);
+    expect(within(noCost.finalValue, 32_790, 0.1)).toBe(true);
+    expect(within(withCost.finalValue, 32_102, 0.1)).toBe(true); // the W2 "before"
+    expect(noCost.finalValue).toBeGreaterThan(withCost.finalValue);
+  });
+  test("cash has no band (§6.2), but its baseline is still the lower of 20y/30y", () => {
+    const r = computeCompound(plan, CASH, 240, { isCash: true });
+    expect(r.band).toBeNull();
+    expect(Math.round(r.baselineRate * 10000) / 100).toBeCloseTo(3.03, 2);
+  });
+  test("the share assets still pay the cost (the switch only frees cash)", () => {
+    const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+    const r = computeCompound(plan, AU_SHARES, 240);
+    expect(Math.round((r.netRate * 100) * 10) / 10).toBeCloseTo(7.0, 1); // 7.2 − 0.2
   });
 });

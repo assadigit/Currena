@@ -83,6 +83,13 @@ export const DEFAULT_COUNTRY = "AU" as const;
  *  suggests buying every 3 months (1% = 0.01). */
 export const FEE_WARNING_SHARE = 0.01;
 
+/** W2 (spec §6.5): does the yearly fund cost apply to the Cash row?
+ *  A savings account has no fund fee, so the default is false — the
+ *  cash what-if card, the cash thin line and the compare table all use
+ *  the unreduced cash rate. The owner may reverse this decision; flip
+ *  this one switch and every cash path follows. */
+export const APPLY_COST_TO_CASH = false;
+
 /* =================================================================== *
  * Types                                                               *
  * =================================================================== */
@@ -319,13 +326,17 @@ function depositFor(plan: PlanInput, m: number): number {
 /**
  * Run one projection at a single annual rate. Returns the monthly series
  * plus the fees actually paid (purchases that cleared the fee).
+ *
+ * `isCash` marks the Cash asset: when APPLY_COST_TO_CASH is false the
+ * yearly fund cost is not deducted from it (spec §6.5).
  */
 function runAtRate(
   plan: PlanInput,
   rate: number,
   months: number,
+  isCash = false,
 ): { series: MonthPoint[]; feesPaid: number } {
-  const net = rate - plan.yearlyCost;
+  const net = rate - (isCash && !APPLY_COST_TO_CASH ? 0 : plan.yearlyCost);
   // The net monthly rate; guarded so a deeply negative net rate can never
   // produce a complex root (Math.pow of a negative base).
   const monthlyRate = 1 + net > 0 ? Math.pow(1 + net, 1 / 12) - 1 : Math.max(-1, net / 12);
@@ -390,15 +401,21 @@ function milestonesIn(series: MonthPoint[], pick: (p: MonthPoint) => number, max
  * The full result                                                     *
  * =================================================================== */
 
-/** Compute everything the page renders for one plan. */
+/** Compute everything the page renders for one plan.
+ *
+ * `opts.isCash` marks the Cash asset (the what-if card, the compare row
+ * and the chart's thin cash line): the yearly fund cost is not deducted
+ * from it while APPLY_COST_TO_CASH is false (spec §6.5).
+ */
 export function computeCompound(
   plan: PlanInput,
   figures: AssetFigures,
   months: number,
+  opts: { isCash?: boolean } = {},
 ): CompoundResult {
   const safeMonths = Math.max(0, Math.round(months));
   const choice = chooseRate(figures, plan);
-  const { series, feesPaid } = runAtRate(plan, choice.baseline, safeMonths);
+  const { series, feesPaid } = runAtRate(plan, choice.baseline, safeMonths, opts.isCash === true);
   const last = series.length > 0 ? series[series.length - 1] : null;
   const finalValue = last ? last.value : plan.startingAmount;
   const finalValueToday = last ? last.valueToday : plan.startingAmount;
@@ -424,14 +441,16 @@ export function computeCompound(
     }
   }
 
-  // Band runs.
+  // Band runs. Cash has no band (spec §6.2 "Cash: no band") — the
+  // compare table and the cash line use the single unreduced rate.
+  const band = opts.isCash === true ? null : choice.band;
   let lowSeries: MonthPoint[] | null = null;
   let highSeries: MonthPoint[] | null = null;
   let lowFinal: number | null = null;
   let highFinal: number | null = null;
-  if (choice.band) {
-    lowSeries = runAtRate(plan, choice.band.low, safeMonths).series;
-    highSeries = runAtRate(plan, choice.band.high, safeMonths).series;
+  if (band) {
+    lowSeries = runAtRate(plan, band.low, safeMonths).series;
+    highSeries = runAtRate(plan, band.high, safeMonths).series;
     lowFinal = lowSeries.length ? lowSeries[lowSeries.length - 1].value : null;
     highFinal = highSeries.length ? highSeries[highSeries.length - 1].value : null;
   }
@@ -448,9 +467,9 @@ export function computeCompound(
   return {
     months: safeMonths,
     baselineRate: choice.baseline,
-    band: choice.band,
+    band,
     bandHighIsMeasured: choice.highIsMeasured,
-    netRate: choice.baseline - plan.yearlyCost,
+    netRate: choice.baseline - (opts.isCash === true && !APPLY_COST_TO_CASH ? 0 : plan.yearlyCost),
     series,
     finalValue,
     finalValueToday,
@@ -523,14 +542,17 @@ export function whatIfLaterStart(
   return base.finalValue - late.finalValue;
 }
 
-/** The cash comparison: the same plan at the cash rate (no band). */
+/** The cash comparison: the same plan at the cash rate (no band, and no
+ *  yearly fund cost while APPLY_COST_TO_CASH is false — spec §6.5). */
 export function whatIfCash(
   plan: PlanInput,
   cashFigures: AssetFigures,
   months: number,
 ): number | null {
   if (cashFigures.r20 === null && cashFigures.r30 === null) return null;
-  const cash = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months);
+  const cash = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months, {
+    isCash: true,
+  });
   return cash.finalValue;
 }
 

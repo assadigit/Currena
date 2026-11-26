@@ -370,7 +370,9 @@ export default function CompoundWealthApp() {
       });
     }
     if (cashFigures) {
-      const r = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months);
+      const r = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months, {
+        isCash: true,
+      });
       out.push({ label: t.chart.cashLine, series: r.series, cash: true });
     }
     return out;
@@ -1105,7 +1107,9 @@ export default function CompoundWealthApp() {
                       </thead>
                       <tbody>
                         {chips.map((chip) => {
-                          const r = computeCompound(plan, figuresOf(chip), months);
+                          const r = computeCompound(plan, figuresOf(chip), months, {
+                            isCash: chip.id === "cash",
+                          });
                           const isCurrent = chip.id === asset.id;
                           return (
                             <tr key={chip.id} className={isCurrent ? "font-bold text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)]"}>
