@@ -542,3 +542,52 @@ describe("W2: cash has no yearly fund cost", () => {
     expect(Math.round((r.netRate * 100) * 10) / 10).toBeCloseTo(7.0, 1); // 7.2 − 0.2
   });
 });
+
+/* ---------------------------------------------------------------- */
+/* W1 (spec §5.2, tests 32–33) — small changes in money or points.   */
+/* ---------------------------------------------------------------- */
+describe("W1: small-changes wording maths", () => {
+  test("amount mode: the step is 10% of the amount, whole, minimum 1", () => {
+    const w100 = whatIfSmallChange(basePlan(), SEVEN, 240);
+    expect(w100!.moneyStep).toBe(10);
+    const w5 = whatIfSmallChange(basePlan({ monthly: 5 }), SEVEN, 240);
+    expect(w5!.moneyStep).toBe(1);
+    const w37 = whatIfSmallChange(basePlan({ monthly: 37 }), SEVEN, 240);
+    expect(w37!.moneyStep).toBe(4); // 3.7 rounds to 4
+  });
+  test("amount mode: 'more' is final(amount+step) − final(amount)", () => {
+    const w = whatIfSmallChange(basePlan(), SEVEN, 240);
+    const up = computeCompound(basePlan({ monthly: 110 }), SEVEN, 240);
+    const base = computeCompound(basePlan(), SEVEN, 240);
+    expect(w!.more).toBeCloseTo(up.finalValue - base.finalValue, 6);
+  });
+  test("amount mode with a salary: the step's share of the salary is exposed", () => {
+    const w = whatIfSmallChange(basePlan({ salary: 7_500 }), SEVEN, 240);
+    expect(w!.stepShareOfSalary).toBeCloseTo(10 / 7_500, 8);
+  });
+  test("% mode: one point either way, as percentages", () => {
+    const w = whatIfSmallChange(basePlan({ salary: 5_000, useShare: true, share: 0.03 }), SEVEN, 240);
+    expect(w!.pctNow).toBeCloseTo(0.03, 6);
+    expect(w!.pctUp).toBeCloseTo(0.04, 6);
+    expect(w!.pctDown).toBeCloseTo(0.02, 6);
+    expect(w!.hideLess).toBe(false);
+    expect(w!.hideMore).toBe(false);
+  });
+  test("% mode: the 'less' sentence hides when the lower value is under 0.5%", () => {
+    const w = whatIfSmallChange(basePlan({ salary: 5_000, useShare: true, share: 0.012 }), SEVEN, 240);
+    expect(w!.pctDown).toBeCloseTo(0.002, 6);
+    expect(w!.hideLess).toBe(true); // 0.2% < 0.5%
+    expect(w!.hideMore).toBe(false);
+  });
+  test("test 33: the copy never says '1% more' — the shipped strings are money or points", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const w = COPY[locale].tool.whatIf;
+      expect(w.moreMoney).toContain("{step}");
+      expect(w.lessMoney).toContain("{step}");
+      expect(w.morePct).toContain("{up}");
+      expect(w.lessPct).toContain("{down}");
+      expect(JSON.stringify(w)).not.toMatch(/1% more|۱٪ بیشتر/);
+    }
+  });
+});

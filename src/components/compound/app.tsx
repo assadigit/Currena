@@ -772,14 +772,51 @@ export default function CompoundWealthApp() {
           <h2 className="type-kicker mb-2 text-[var(--color-text-tertiary)]">{t.whatIf.title}</h2>
           <div className="grid gap-2 sm:grid-cols-2">
             {small ? (
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5" data-cw="small-changes">
                 <div className="text-[12px] font-bold text-[var(--color-text-tertiary)]">{t.whatIf.smallChanges}</div>
                 <p className="mt-1 mb-0 text-[13.5px] leading-relaxed text-[var(--color-text-primary)]">
-                  {t.whatIf.more.replace("{x}", fmt(small.more))} {t.whatIf.less.replace("{x}", fmt(small.less))}
+                  {/* W1: money terms in Amount mode, percentage points in %
+                      mode — never "1% more" for a 10%-of-the-amount change. */}
+                  {small.describedAs === "salary" && small.pctNow !== null ? (
+                    <>
+                      {!small.hideMore && small.pctUp !== null
+                        ? t.whatIf.morePct
+                            .replace("{up}", formatPctLocal(small.pctUp, locale))
+                            .replace("{now}", formatPctLocal(small.pctNow, locale))
+                            .replace("{x}", fmt(small.more))
+                        : ""}
+                      {!small.hideMore && !small.hideLess && small.pctDown !== null ? " " : ""}
+                      {!small.hideLess && small.pctDown !== null
+                        ? t.whatIf.lessPct
+                            .replace("{down}", formatPctLocal(small.pctDown, locale))
+                            .replace("{now}", formatPctLocal(small.pctNow, locale))
+                            .replace("{x}", fmt(small.less))
+                        : ""}
+                    </>
+                  ) : (
+                    <>
+                      {!small.hideMore && small.moneyStep !== null
+                        ? t.whatIf.moreMoney
+                            .replace("{step}", formatMoney(small.moneyStep, locale))
+                            .replace("{x}", fmt(small.more))
+                        : ""}
+                      {!small.hideMore && !small.hideLess && small.moneyStep !== null ? " " : ""}
+                      {!small.hideLess && small.moneyStep !== null
+                        ? t.whatIf.lessMoney
+                            .replace("{step}", formatMoney(small.moneyStep, locale))
+                            .replace("{x}", fmt(small.less))
+                        : ""}
+                    </>
+                  )}
                 </p>
-                <p className="mt-1 mb-0 text-[11px] text-[var(--color-text-tertiary)]">
-                  {small.describedAs === "salary" ? t.whatIf.smallChangesSalary : t.whatIf.smallChangesAmount}
-                </p>
+                {small.describedAs === "amount" &&
+                small.stepShareOfSalary !== null &&
+                small.moneyStep !== null &&
+                !small.hideMore ? (
+                  <p className="mt-1 mb-0 text-[11px] text-[var(--color-text-tertiary)]" data-cw="small-salary-suffix">
+                    {t.whatIf.salarySuffix.replace("{p}", formatPctLocal(small.stepShareOfSalary, locale))}
+                  </p>
+                ) : null}
               </div>
             ) : null}
             <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">

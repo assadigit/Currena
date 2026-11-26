@@ -496,27 +496,73 @@ export function computeCompound(
  * The what-if maths (spec §5.2)                                       *
  * =================================================================== */
 
+/** What the small-changes card says, in the words the spec asks for:
+ *  money terms in Amount mode ("Investing 10 more a month adds X"),
+ *  percentage points in % mode ("Investing 4% instead of 3% adds X"). */
+export interface SmallChange {
+  /** Final-value change for the "more" sentence (future money). */
+  more: number;
+  /** Final-value loss for the "less" sentence (future money). */
+  less: number;
+  /** Amount mode: the money step (10% of the amount, whole, min 1). */
+  moneyStep: number | null;
+  /** Amount mode with a known salary: the step as a share of the
+   *  monthly salary (a decimal, e.g. 0.002 for 0.2%), else null. */
+  stepShareOfSalary: number | null;
+  /** % mode: the current / up / down percentages (decimals). */
+  pctNow: number | null;
+  pctUp: number | null;
+  pctDown: number | null;
+  /** True when the "less" sentence must be hidden (the lower value
+   *  would be under 0.5%, or the amount would go negative). */
+  hideLess: boolean;
+  /** True when the "more" sentence must be hidden (out of range). */
+  hideMore: boolean;
+  /** Which mode the wording follows. */
+  describedAs: "amount" | "salary";
+}
+
 /**
- * "1% more / 1% less": in fixed mode 10% of the monthly amount, in share
- * mode 1 percentage point of salary share. Returns the final value change
- * at the same rate (future money).
+ * The small-changes card (W1): the step is money in Amount mode — 10%
+ * of the monthly amount, rounded to a whole number, minimum 1 — and
+ * one percentage point in % mode. Never "1% more" when the change is
+ * 10% of the amount.
  */
 export function whatIfSmallChange(
   plan: PlanInput,
   figures: AssetFigures,
   months: number,
-): { more: number; less: number; describedAs: "amount" | "salary" } | null {
+): SmallChange | null {
   if (months <= 0) return null;
   const up: PlanInput = { ...plan };
   const down: PlanInput = { ...plan };
+  let moneyStep: number | null = null;
+  let stepShareOfSalary: number | null = null;
+  let pctNow: number | null = null;
+  let pctUp: number | null = null;
+  let pctDown: number | null = null;
+  let hideLess = false;
+  let hideMore = false;
+
   if (plan.useShare && plan.salary !== null) {
-    if (plan.share + 0.01 > SHARE_MAX || plan.share - 0.01 < SHARE_MIN) return null;
-    up.share = plan.share + 0.01;
-    down.share = plan.share - 0.01;
+    // % mode: one percentage point either way (§5.2).
+    pctNow = plan.share;
+    pctUp = plan.share + 0.01;
+    pctDown = plan.share - 0.01;
+    hideMore = pctUp > SHARE_MAX;
+    hideLess = pctDown < 0.005; // "under 0.5%" hides the less sentence
+    up.share = Math.min(pctUp, SHARE_MAX);
+    if (!hideLess) down.share = pctDown;
   } else {
+    // Amount mode: 10% of the monthly amount, whole, minimum 1.
     if (plan.monthly <= 0) return null;
-    up.monthly = plan.monthly * 1.1;
-    down.monthly = plan.monthly * 0.9;
+    moneyStep = Math.max(1, Math.round(plan.monthly * 0.1));
+    up.monthly = plan.monthly + moneyStep;
+    hideLess = plan.monthly - moneyStep < 0;
+    if (!hideLess) down.monthly = plan.monthly - moneyStep;
+    if (plan.salary !== null && plan.salary > 0) {
+      stepShareOfSalary = moneyStep / plan.salary;
+    }
   }
   const base = computeCompound(plan, figures, months);
   const more = computeCompound(up, figures, months);
@@ -524,6 +570,13 @@ export function whatIfSmallChange(
   return {
     more: more.finalValue - base.finalValue,
     less: base.finalValue - less.finalValue,
+    moneyStep,
+    stepShareOfSalary,
+    pctNow,
+    pctUp,
+    pctDown,
+    hideLess,
+    hideMore,
     describedAs: plan.useShare && plan.salary !== null ? "salary" : "amount",
   };
 }

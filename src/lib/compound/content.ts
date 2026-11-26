@@ -94,12 +94,16 @@ export interface CompoundCopy {
     whatIf: {
       title: string;
       smallChanges: string;
-      smallChangesAmount: string; // "(10% of the monthly amount)"
-      smallChangesSalary: string; // "(1% of salary)"
       laterLabel: string;
       cashLabel: string;
-      more: string; // "1% more adds {x}"
-      less: string; // "1% less loses {x}"
+      /** Amount mode — money terms, never "1% more" (W1). */
+      moreMoney: string; // "Investing {step} more a month adds {x}."
+      lessMoney: string; // "Investing {step} less loses {x}."
+      /** % mode — percentage points. */
+      morePct: string; // "Investing {up}% instead of {now}% adds {x}."
+      lessPct: string; // "Investing {down}% instead of {now}% loses {x}."
+      /** The optional salary suffix in Amount mode (kept short). */
+      salarySuffix: string; // "(that is {p}% more of your salary)"
       later: string; // "Starting {n} years later costs you {x}."
       years: string[];
       cash: string; // "If you only save it as cash: about {x}."
@@ -297,12 +301,16 @@ export const COPY: Record<Locale, CompoundCopy> = {
       whatIf: {
         title: "What if…",
         smallChanges: "Small changes",
-        smallChangesAmount: "10% of the monthly amount",
-        smallChangesSalary: "1% of salary",
         laterLabel: "Starting later",
         cashLabel: "Cash comparison",
-        more: "1% more adds {x}.",
-        less: "1% less loses {x}.",
+        /** Amount mode — money terms, never "1% more" (W1). */
+        moreMoney: "Investing {step} more a month adds {x}.",
+        lessMoney: "Investing {step} less loses {x}.",
+        /** % mode — percentage points. */
+        morePct: "Investing {up}% instead of {now}% adds {x}.",
+        lessPct: "Investing {down}% instead of {now}% loses {x}.",
+        /** The optional salary suffix in Amount mode (kept short). */
+        salarySuffix: "(that is {p}% more of your salary)",
         later: "Starting {n} years later costs you {x}.",
         years: ["1", "3", "5"],
         cash: "If you only save it as cash: about {x}.",
@@ -510,12 +518,13 @@ export const COPY: Record<Locale, CompoundCopy> = {
       whatIf: {
         title: "اگر…",
         smallChanges: "تغییرهای کوچک",
-        smallChangesAmount: "۱۰٪ از مبلغ ماهانه",
-        smallChangesSalary: "۱٪ از حقوق",
         laterLabel: "شروع دیرتر",
         cashLabel: "مقایسه با نقد",
-        more: "۱٪ بیشتر، {x} اضافه می‌کند.",
-        less: "۱٪ کمتر، {x} از دست می‌دهد.",
+        moreMoney: "{step} بیشتر در ماه، {x} اضافه می‌کند.",
+        lessMoney: "{step} کمتر، {x} از دست می‌دهد.",
+        morePct: "سرمایه‌گذاری {up}٪ به‌جای {now}٪، {x} اضافه می‌کند.",
+        lessPct: "{down}٪ به‌جای {now}٪، {x} از دست می‌دهد.",
+        salarySuffix: "(یعنی {p}٪ بیشتر از حقوق شما)",
         later: "شروع {n} سال دیرتر، {x} از دست می‌دهد.",
         years: ["۱", "۳", "۵"],
         cash: "اگر فقط به‌صورت نقد پس‌اندازش کنید: حدود {x}.",
