@@ -47,7 +47,8 @@ export interface CompoundCopy {
       growTo: string;
       todayMoney: string;
     };
-    shareHeadline: string; // percent-mode lead sentence
+    shareHeadlineLead: string; // percent-mode lead sentence
+    shareHeadlineGrow: string; // the "growing as your salary grows" clause
     rangeWorse: string;
     rangeBetter: string;
     strongSentence: string;
@@ -59,6 +60,23 @@ export interface CompoundCopy {
       increase: string;
       years: string;
       amountHint: string;
+      /** W7: the Amount | % of salary switch. */
+      amountSwitchLabel: string;
+      switchAmount: string;
+      switchShare: string;
+      /** Amount mode: the salary link + live line. */
+      addSalary: string;
+      thatIs: string; // "That is {p}% of your salary."
+      /** % mode: the percent box, chips, salary box, live line. */
+      percentLabel: string;
+      salaryLabel: string;
+      salaryHint: string;
+      salaryPlaceholder: string; // "e.g. 90,000"
+      perYear: string;
+      salaryPerMonth: string;
+      salaryPeriodLabel: string;
+      liveLine: string; // "{p}% of {salary} {period} = {amount} a month."
+      enterSalary: string; // "Enter your salary to turn {p}% into dollars."
     };
     chart: {
       title: string;
@@ -66,7 +84,10 @@ export interface CompoundCopy {
       growthLabel: string;
       bandLabel: string;
       bandWhatIf: string;
+      bandLowLabel: string;
+      bandHighLabel: string;
       crossoverLabel: string;
+      crossoverShort: string;
       crossoverNever: string;
       otherAssets: string;
       cashLine: string;
@@ -118,10 +139,9 @@ export interface CompoundCopy {
     moreOptions: {
       title: string;
       aboutYou: string;
-      salaryLabel: string;
-      salaryHint: string;
-      useShare: string;
-      shareLabel: string;
+      /** W7: the one-line assumption note shown in About you while in
+       *  percent mode. */
+      shareGrowNote: string;
       ageLabel: string;
       ageHint: string;
       startingLabel: string;
@@ -199,6 +219,8 @@ export interface CompoundCopy {
       close: string;
       title: string;
       planSummary: string;
+      /** W7: the percent-mode plan line (never the salary). */
+      planShareSummary: string;
       milestonesTitle: string;
       assumptionsTitle: string;
       assumptions: string[]; // lines with {inflation} {cost} {fee}
@@ -210,6 +232,8 @@ export interface CompoundCopy {
     phone: {
       title: string;
       planLine: string;
+      /** W7: the percent-mode plan line (never the salary). */
+      planShareLine: string;
       next: string;
       hint: string;
       close: string;
@@ -259,7 +283,8 @@ export const COPY: Record<Locale, CompoundCopy> = {
         growTo: "and it could grow to about {final}",
         todayMoney: "(about {today} in today's money)",
       },
-      shareHeadline: "Putting {share} of your salary aside for {years} years:",
+      shareHeadlineLead: "Investing {share} of your salary ({amount} a month{grow}) for {years} years:",
+      shareHeadlineGrow: ", growing as your salary grows",
       rangeWorse: "If it goes worse: about {x}.",
       rangeBetter: "If it goes better: about {x}.",
       strongSentence: "Small and steady beats big and late.",
@@ -271,6 +296,20 @@ export const COPY: Record<Locale, CompoundCopy> = {
         increase: "More",
         years: "years",
         amountHint: "Any amount works. Try yours.",
+        amountSwitchLabel: "Amount or percent of salary",
+        switchAmount: "Amount",
+        switchShare: "% of salary",
+        addSalary: "Add your salary (optional)",
+        thatIs: "That is {p}% of your salary.",
+        percentLabel: "Percent of salary",
+        salaryLabel: "Salary",
+        salaryHint: "Use the salary you plan your saving from, before or after tax.",
+        salaryPlaceholder: "e.g. 90,000",
+        perYear: "per year",
+        salaryPerMonth: "per month",
+        salaryPeriodLabel: "Salary period",
+        liveLine: "{p}% of {salary} {period} = {amount} a month.",
+        enterSalary: "Enter your salary to turn {p}% into dollars.",
       },
       chart: {
         title: "The growth layer overtakes the money you put in",
@@ -332,10 +371,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       moreOptions: {
         title: "More options",
         aboutYou: "About you",
-        salaryLabel: "Monthly salary after tax",
-        salaryHint: "Optional. Only used to work out the amount.",
-        useShare: "Use a share of my salary instead",
-        shareLabel: "Share of salary",
+        shareGrowNote: "In percent mode, your monthly amount grows with your salary. We use the inflation average until you change it under Rates.",
         ageLabel: "Your age now",
         ageHint: "Optional. Adds “at age N” to the milestones.",
         startingLabel: "Already invested",
@@ -415,6 +451,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         close: "Close",
         title: "Compound Wealth",
         planSummary: "{amount} a month · {years} years · {asset} · {rate} a year, {baseline}",
+        planShareSummary: "{share} of your salary ({amount} a month) · {years} years · {asset} · {rate} a year, {baseline}",
         milestonesTitle: "Along the way",
         assumptionsTitle: "The numbers behind this",
         assumptions: [
@@ -432,6 +469,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       phone: {
         title: "Compound Wealth",
         planLine: "{amount} a month · {years} years",
+        planShareLine: "{share} of salary · {amount} a month · {years} years",
         next: "Next: {amount} in {date}",
         hint: "Take a screenshot, then set it as your lock screen.",
         close: "Close",
@@ -480,7 +518,8 @@ export const COPY: Record<Locale, CompoundCopy> = {
         growTo: "و ممکن است به حدود {final} برسد",
         todayMoney: "(حدود {today} به پول امروز)",
       },
-      shareHeadline: "با کنار گذاشتن {share} از حقوق برای {years} سال:",
+      shareHeadlineLead: "با سرمایه‌گذاری {share} از حقوق ({amount} در ماه{grow}) برای {years} سال:",
+      shareHeadlineGrow: "، همگام با رشد حقوق",
       rangeWorse: "اگر بدتر شود: حدود {x}.",
       rangeBetter: "اگر بهتر شود: حدود {x}.",
       strongSentence: "کم ولی پیوسته، از زیاد ولی دیر جلو می‌زند.",
@@ -492,6 +531,20 @@ export const COPY: Record<Locale, CompoundCopy> = {
         increase: "بیشتر",
         years: "سال",
         amountHint: "هر عددی کار می‌کند. عدد خودتان را امتحان کنید.",
+        amountSwitchLabel: "مبلغ یا درصدی از حقوق",
+        switchAmount: "مبلغ",
+        switchShare: "٪ از حقوق",
+        addSalary: "حقوق خود را اضافه کنید (اختیاری)",
+        thatIs: "این {p}٪ از حقوق شماست.",
+        percentLabel: "درصدی از حقوق",
+        salaryLabel: "حقوق",
+        salaryHint: "حقوقی را وارد کنید که پس‌انداز از آن انجام می‌شود؛ قبل یا بعد از مالیات.",
+        salaryPlaceholder: "مثلاً ۹۰٬۰۰۰",
+        perYear: "در سال",
+        salaryPerMonth: "در ماه",
+        salaryPeriodLabel: "دورهٔ حقوق",
+        liveLine: "{p}٪ از {salary} {period} = {amount} در ماه.",
+        enterSalary: "حقوق خود را وارد کنید تا {p}٪ به پول تبدیل شود.",
       },
       chart: {
         title: "لایهٔ رشد از پولی که وارد کرده‌اید جلو می‌زند",
@@ -550,10 +603,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       moreOptions: {
         title: "گزینه‌های بیشتر",
         aboutYou: "دربارهٔ شما",
-        salaryLabel: "حقوق ماهانه پس از کسر مالیات",
-        salaryHint: "اختیاری. فقط برای محاسبهٔ مبلغ استفاده می‌شود.",
-        useShare: "به‌جای مبلغ، سهمی از حقوقم را کنار بگذارم",
-        shareLabel: "سهم از حقوق",
+        shareGrowNote: "در حالت درصدی، مبلغ ماهانهٔ شما همگام با حقوق رشد می‌کند. تا زمانی که زیر «نرخ‌ها» تغییرش دهید، از میانگین تورم استفاده می‌کنیم.",
         ageLabel: "سن شما",
         ageHint: "اختیاری. «در N سالگی» را به شاخص‌ها اضافه می‌کند.",
         startingLabel: "از قبل سرمایه‌گذاری‌شده",
@@ -633,6 +683,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         close: "بستن",
         title: "ثروت مرکب",
         planSummary: "{amount} در ماه · {years} سال · {asset} · {rate} در سال، {baseline}",
+        planShareSummary: "{share} از حقوق شما ({amount} در ماه) · {years} سال · {asset} · {rate} در سال، {baseline}",
         milestonesTitle: "در مسیر",
         assumptionsTitle: "اعداد پشت این نتیجه",
         assumptions: [
@@ -650,6 +701,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       phone: {
         title: "ثروت مرکب",
         planLine: "{amount} در ماه · {years} سال",
+        planShareLine: "{share} از حقوق · {amount} در ماه · {years} سال",
         next: "بعدی: {amount} در {date}",
         hint: "یک اسکرین‌شات بگیرید و آن را صفحهٔ قفل گوشی‌تان کنید.",
         close: "بستن",

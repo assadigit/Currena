@@ -64,10 +64,18 @@ export const INFLATION_MAX = 0.15;
 export const INCREASE_MIN = 0;
 export const INCREASE_MAX = 0.15;
 
-/** The salary-share limits for percent mode (3% default). */
+/** The salary-share limits for percent mode (§11: 0.1–50%). */
 export const SHARE_DEFAULT = 0.03;
-export const SHARE_MIN = 0.005;
-export const SHARE_MAX = 0.30;
+export const SHARE_MIN = 0.001;
+export const SHARE_MAX = 0.5;
+/** The percent box's stepper step, in percentage points (§11). */
+export const PERCENT_STEP = 0.5;
+/** Quick chips for the percent box (§11: 1/3/5/10). */
+export const PERCENT_CHIPS: readonly number[] = [1, 3, 5, 10];
+/** How the salary is typed: per year (the default) or per month. */
+export type SalaryPeriod = "year" | "month";
+/** The salary box's default period (§11). */
+export const SALARY_PERIOD_DEFAULT: SalaryPeriod = "year";
 
 /** Years limits for the number box and the custom end date. */
 export const YEARS_MIN = 1;
@@ -104,9 +112,10 @@ export type RateMode = "average" | "custom-rate" | "custom-range";
 export interface PlanInput {
   /** Monthly amount in fixed mode (ignored when share mode is on). */
   monthly: number;
-  /** Percent-of-salary mode: monthly salary after tax. */
+  /** Percent-of-salary mode: the MONTHLY salary (the UI converts a
+   *  per-year salary by ÷ 12; §6.6). Null until a salary is entered. */
   salary: number | null;
-  /** Percent-of-salary mode: share of salary (decimal). */
+  /** Percent-of-salary mode: share of the monthly salary (decimal). */
   share: number;
   /** Use percent-of-salary mode instead of the fixed amount. */
   useShare: boolean;
@@ -316,9 +325,13 @@ export function addMonths(ym: string, months: number): string {
   return `${String(ny).padStart(4, "0")}-${String(nm).padStart(2, "0")}`;
 }
 
-/** The monthly deposit in month m (1-based) for a plan. */
+/** The monthly deposit in month m (1-based) for a plan. A salary of 0
+ *  or less reads as "no salary" (the UI's own rule): the amount stands. */
 function depositFor(plan: PlanInput, m: number): number {
-  const base = plan.useShare && plan.salary !== null ? plan.salary * plan.share : plan.monthly;
+  const base =
+    plan.useShare && plan.salary !== null && plan.salary > 0
+      ? plan.salary * plan.share
+      : plan.monthly;
   const year = Math.floor((m - 1) / 12); // deposit year y (0 for months 1–12)
   return base * Math.pow(1 + plan.yearlyIncrease, year);
 }
@@ -632,6 +645,31 @@ export function audFromUsd(
   const usdGrowth = Math.pow(1 + usdAnnualRate, years);
   const audGrowth = usdGrowth * (fxStart / fxEnd);
   return Math.pow(audGrowth, 1 / years) - 1;
+}
+
+/* =================================================================== *
+ * Percent-of-salary conversions (spec §6.6, W7)                        *
+ * =================================================================== */
+
+/** The monthly salary behind a typed salary and its period
+ *  (per year is divided by 12; per month passes through). */
+export function monthlySalaryFrom(salary: number, period: SalaryPeriod): number {
+  return period === "year" ? salary / 12 : salary;
+}
+
+/** The monthly amount invested: monthly salary × percent (full precision). */
+export function monthlyAmountFrom(monthlySalary: number, share: number): number {
+  return monthlySalary * share;
+}
+
+/** The reverse: what percent of the monthly salary an amount is. */
+export function shareFromAmount(monthlyAmount: number, monthlySalary: number): number {
+  return monthlyAmount / monthlySalary;
+}
+
+/** The years-of-salary line: today's-money final ÷ a year of salary. */
+export function yearsOfSalary(finalToday: number, monthlySalary: number): number {
+  return finalToday / (monthlySalary * 12);
 }
 
 /* =================================================================== *

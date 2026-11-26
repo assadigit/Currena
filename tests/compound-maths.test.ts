@@ -20,11 +20,15 @@ import {
   computeCompound,
   figuresAreStale,
   formatMoney,
+  monthlyAmountFrom,
+  monthlySalaryFrom,
   monthsBetween,
+  shareFromAmount,
   thisMonth,
   whatIfCash,
   whatIfLaterStart,
   whatIfSmallChange,
+  yearsOfSalary,
   type AssetFigures,
   type PlanInput,
 } from "../src/lib/compound/maths";
@@ -647,6 +651,115 @@ describe("W3/W5/W6: inflation visibility, index names, figures sanity", () => {
       expect(COPY[locale].tool.tiles.inflationCaption).toContain("{x}");
       expect(COPY[locale].tool.how.inflationRecentLine).toContain("{y}");
       expect(COPY[locale].tool.how.indicesTitle.length).toBeGreaterThan(3);
+    }
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* W7 (spec §5.1.1, §6.6, tests 25–32) — the percent-of-salary        */
+/* conversions as pure maths.                                         */
+/* ---------------------------------------------------------------- */
+describe("W7: percent-of-salary conversions", () => {
+  test("test 25: 3% of 90,000 a year = 225 a month (full precision kept)", () => {
+    const monthly = monthlySalaryFrom(90_000, "year");
+    expect(monthly).toBeCloseTo(7_500, 10);
+    expect(monthlyAmountFrom(monthly, 0.03)).toBeCloseTo(225, 10);
+  });
+  test("test 25: 3% of 5,000 a month = 150; 1% of 60,000 a year = 50", () => {
+    expect(monthlyAmountFrom(monthlySalaryFrom(5_000, "month"), 0.03)).toBeCloseTo(150, 10);
+    expect(monthlyAmountFrom(monthlySalaryFrom(60_000, "year"), 0.01)).toBeCloseTo(50, 10);
+  });
+  test("test 25: 0.5% of 100,000 a year ≈ 41.67 (shown as 42, full precision inside)", () => {
+    const amt = monthlyAmountFrom(monthlySalaryFrom(100_000, "year"), 0.005);
+    expect(amt).toBeCloseTo(41.66666, 3);
+    expect(Math.round(amt)).toBe(42);
+  });
+  test("test 25: the per year ↔ per month switch keeps the same money", () => {
+    const yearly = 90_000;
+    const monthly = monthlySalaryFrom(yearly, "year");
+    expect(monthlySalaryFrom(monthly, "month")).toBeCloseTo(monthly, 10);
+    // 90,000/12 = 7,500 → 7,500 × 12 = 90,000 (the round trip is exact)
+    expect(monthlySalaryFrom(monthly, "month") * 12).toBe(yearly);
+  });
+  test("test 26 (reverse): 225 a month with a 90,000-a-year salary is 3.0%", () => {
+    const pct = shareFromAmount(225, monthlySalaryFrom(90_000, "year")) * 100;
+    expect(Math.round(pct * 10) / 10).toBeCloseTo(3.0, 6);
+  });
+  test("test 26 (reverse): 100 with a 5,000-a-month salary is 2.0%", () => {
+    const pct = shareFromAmount(100, monthlySalaryFrom(5_000, "month")) * 100;
+    expect(Math.round(pct * 10) / 10).toBeCloseTo(2.0, 6);
+  });
+  test("test 27 (consistency): 3% of 90,000 a year, 0% increase == 225 a month, 0% increase", () => {
+    const sharePlan = basePlan({
+      salary: monthlySalaryFrom(90_000, "year"),
+      share: 0.03,
+      useShare: true,
+      yearlyIncrease: 0,
+    });
+    const amountPlan = basePlan({ monthly: 225, yearlyIncrease: 0 });
+    const a = computeCompound(sharePlan, SEVEN, 240);
+    const b = computeCompound(amountPlan, SEVEN, 240);
+    expect(a.finalValue).toBeCloseTo(b.finalValue, 6);
+    expect(a.totalPutIn).toBeCloseTo(b.totalPutIn, 6);
+    expect(a.finalValueToday).toBeCloseTo(b.finalValueToday, 6);
+    expect(a.crossoverMonth).toBe(b.crossoverMonth);
+    expect(a.milestones).toEqual(b.milestones);
+  });
+  test("test 28: the % mode default increase (the AU inflation average) raises the put-in", () => {
+    const plan0 = basePlan({ salary: 7_500, share: 0.03, useShare: true, yearlyIncrease: 0, inflation: 0.0276 });
+    const planGrow = basePlan({ salary: 7_500, share: 0.03, useShare: true, yearlyIncrease: 0.0276, inflation: 0.0276 });
+    const r0 = computeCompound(plan0, SEVEN, 240);
+    const rGrow = computeCompound(planGrow, SEVEN, 240);
+    expect(rGrow.totalPutIn).toBeGreaterThan(r0.totalPutIn);
+    expect(rGrow.finalValue).toBeGreaterThan(r0.finalValue);
+  });
+  test("test 29 (mode switch maths): 225 → 3.0% and 3% → 225 with a 90,000-a-year salary", () => {
+    const monthly = monthlySalaryFrom(90_000, "year");
+    const toShare = shareFromAmount(225, monthly); // amount → %
+    expect(Math.round(toShare * 1000) / 10).toBeCloseTo(3.0, 6);
+    const toAmount = monthlyAmountFrom(monthly, 0.03); // % → amount
+    expect(Math.round(toAmount)).toBe(225);
+  });
+  test("test 30 (edge): no salary means the plan falls back to the amount, never NaN", () => {
+    const plan = basePlan({ salary: null, share: 0.03, useShare: true, monthly: 137 });
+    const r = computeCompound(plan, SEVEN, 240);
+    expect(r.totalPutIn).toBe(137 * 240);
+    expect(Number.isFinite(r.finalValue)).toBe(true);
+  });
+  test("test 30 (edge): share mode with a 0/letters salary stays on the amount", () => {
+    // the UI treats 0, letters and empty as "no salary"; the engine agrees
+    const plan = basePlan({ salary: 0, share: 0.03, useShare: true, monthly: 100 });
+    const r = computeCompound(plan, SEVEN, 240);
+    expect(r.totalPutIn).toBe(24_000);
+  });
+  test("§6.6: the years-of-salary line = today's-money final ÷ a year of salary", () => {
+    const plan = basePlan({ salary: 7_500, share: 0.03, useShare: true, inflation: 0.0276 });
+    const r = computeCompound(plan, SEVEN, 240);
+    expect(yearsOfSalary(r.finalValueToday, 7_500)).toBeCloseTo(r.finalValueToday / 90_000, 6);
+  });
+  test("the config block: percent limits 0.1–50, step 0.5, chips 1/3/5/10 (§11)", async () => {
+    const mod = await import("../src/lib/compound/maths");
+    expect(mod.SHARE_MIN).toBe(0.001);
+    expect(mod.SHARE_MAX).toBe(0.5);
+    expect(mod.PERCENT_STEP).toBe(0.5);
+    expect(mod.PERCENT_CHIPS).toEqual([1, 3, 5, 10]);
+    expect(mod.SALARY_PERIOD_DEFAULT).toBe("year");
+  });
+  test("the copy: the live line, the enter-salary line and both card lines exist (fa + EN)", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const c = COPY[locale].tool;
+      expect(c.controls.liveLine).toContain("{p}");
+      expect(c.controls.liveLine).toContain("{amount}");
+      expect(c.controls.enterSalary).toContain("{p}");
+      expect(c.controls.thatIs).toContain("{p}");
+      expect(c.controls.switchAmount.length).toBeGreaterThan(0);
+      expect(c.controls.switchShare).toMatch(/%|٪/);
+      expect(c.print.planShareSummary).toContain("{share}");
+      expect(c.phone.planShareLine).toContain("{share}");
+      // the salary is never named with a number on the card lines
+      expect(c.print.planShareSummary).not.toContain("{salary}");
+      expect(c.phone.planShareLine).not.toContain("{salary}");
     }
   });
 });

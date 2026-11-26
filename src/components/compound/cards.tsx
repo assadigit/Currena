@@ -81,13 +81,16 @@ interface CardProps {
   months: number;
   startMonth: string;
   onClose: () => void;
+  /** W7: the page's own money label ("A$225" / «۲۲۵ دلار استرالیا"),
+   *  used on the percent-mode plan lines (spec §8.1/§8.2). */
+  money?: (v: number) => string;
 }
 
 /* =================================================================== *
  * The A4 print card                                                   *
  * =================================================================== */
 
-export function A4PrintCard({ copy, locale, result, plan, asset, months, startMonth, onClose }: CardProps) {
+export function A4PrintCard({ copy, locale, result, plan, asset, months, startMonth, onClose, money }: CardProps) {
   const t = copy.tool.print;
   const tool = copy.tool;
   const [style, setStyle] = React.useState<"light" | "dark">("light");
@@ -135,8 +138,13 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
         ? locale === "fa" ? "میانهٔ بازهٔ دلخواه شما" : "the middle of your custom range"
         : locale === "fa" ? "اعداد کمترِ ۲۰ و ۳۰ سال" : "the lower of the 20- and 30-year figures";
 
-  const planSummary = t.planSummary
-    .replace("{amount}", fmt(plan.useShare && plan.salary ? plan.salary * plan.share : plan.monthly))
+  /* W7: % mode shows the percent and the monthly amount (with the
+   *  currency symbol, spec §8.1) — never the salary itself. */
+  const shareMode = plan.useShare && plan.salary !== null;
+  const investedMonthly = shareMode ? plan.salary! * plan.share : plan.monthly;
+  const planSummary = (shareMode ? t.planShareSummary : t.planSummary)
+    .replace("{share}", `${formatMoney(shareMode ? plan.share * 100 : 0, locale, 1)}${locale === "fa" ? "٪" : "%"}`)
+    .replace("{amount}", shareMode && money ? money(investedMonthly) : fmt(investedMonthly))
     .replace("{years}", formatMoney(years, locale, years % 1 === 0 ? 0 : 1))
     .replace("{asset}", locale === "fa" ? asset.labelFa : asset.labelEn)
     .replace("{rate}", pct(result.baselineRate))
@@ -369,7 +377,7 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
  * The phone card                                                      *
  * =================================================================== */
 
-export function PhoneCard({ copy, locale, result, plan, asset, months, startMonth, onClose }: CardProps) {
+export function PhoneCard({ copy, locale, result, plan, asset, months, startMonth, onClose, money }: CardProps) {
   const t = copy.tool.phone;
   const [style, setStyle] = React.useState<"dark" | "light">("dark");
   /* The corner controls and the hint fade away after a quiet moment,
@@ -416,8 +424,13 @@ export function PhoneCard({ copy, locale, result, plan, asset, months, startMont
     ? "linear-gradient(175deg, #131a24 0%, #10151d 45%, #17130a 100%)"
     : "linear-gradient(175deg, #fbfaf7 0%, #f4f0e6 60%, #efe6d2 100%)";
 
-  const planLine = t.planLine
-    .replace("{amount}", fmt(plan.useShare && plan.salary ? plan.salary * plan.share : plan.monthly))
+  /* W7: % mode shows the percent and the monthly amount (with the
+   *  currency symbol, spec §8.2) — never the salary itself. */
+  const shareMode = plan.useShare && plan.salary !== null;
+  const investedMonthly = shareMode ? plan.salary! * plan.share : plan.monthly;
+  const planLine = (shareMode ? t.planShareLine : t.planLine)
+    .replace("{share}", `${formatMoney(shareMode ? plan.share * 100 : 0, locale, 1)}${locale === "fa" ? "٪" : "%"}`)
+    .replace("{amount}", shareMode && money ? money(investedMonthly) : fmt(investedMonthly))
     .replace("{years}", formatMoney(years, locale, years % 1 === 0 ? 0 : 1));
 
   return ReactDOM.createPortal(
