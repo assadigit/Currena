@@ -349,7 +349,7 @@ function FieldRow({ label, hint, children }: { label: string; hint?: string; chi
  * The page                                                            *
  * =================================================================== */
 
-export default function CompoundWealthApp() {
+export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: string }) {
   const [locale, toggleLang] = useSiteLocale();
   const copy = COPY[locale];
   const t = copy.tool;
@@ -389,8 +389,19 @@ export default function CompoundWealthApp() {
   const [inflation, setInflation] = React.useState(() => defaultInflation(DEFAULT_COUNTRY));
   const [increase, setIncrease] = React.useState(0);
   const [whatIfPts, setWhatIfPts] = React.useState(WHAT_IF_POINTS);
-  const [startMonth, setStartMonth] = React.useState(thisMonth());
-  const [endMonth, setEndMonth] = React.useState(() => addMonths(thisMonth(), DEFAULT_YEARS * 12));
+  const [startMonth, setStartMonth] = React.useState(() => ssrStartMonth ?? thisMonth());
+  const [endMonth, setEndMonth] = React.useState(() => addMonths(ssrStartMonth ?? thisMonth(), DEFAULT_YEARS * 12));
+  /* If the month rolled between the server render and this hydration
+     (a seconds-wide window at a UTC month boundary), quietly correct the
+     plan's month to the reader's own — never a hydration mismatch. */
+  React.useEffect(() => {
+    const now = thisMonth();
+    if (now !== startMonth) {
+      setStartMonth(now);
+      setEndMonth((e) => (e === addMonths(startMonth, DEFAULT_YEARS * 12) ? addMonths(now, DEFAULT_YEARS * 12) : e));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [clamped, setClamped] = React.useState(false);
   const [howOpen, setHowOpen] = React.useState(false);
   const [groupOpen, setGroupOpen] = React.useState<Record<string, boolean>>({});
