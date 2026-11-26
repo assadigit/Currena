@@ -1,7 +1,84 @@
 # Compound Wealth — Phase 1 build report
 
-**Spec:** `COMPOUND-WEALTH-SPEC.md` (v5, already in the repo root — verified byte-identical to the file this build was specified against)
-**Branch:** `compound-wealth` · **Built:** 2026-11-25/26 (Asia/Tehran) · **Site:** currena.ir
+**Spec:** `COMPOUND-WEALTH-SPEC.md` (v6, the pack's version — unzipped into the repo root, overwriting v5) · **Branch for v6:** `compound-wealth-v6` · **Built:** 2026-11-25/26 (Asia/Tehran) · **Site:** currena.ir
+
+## 0. The v6 plan (decided up front, per start-prompt step 2)
+
+Starting state recorded before any change: `python3 compound_reference_check.py
+--selftest` all six lines PASS; `bun run lint` exit 0 on `main` (after
+`bun install`); `bun test tests/compound-maths.test.ts` 53/53; the live page
+walked in a real browser (headline/range/tiles/what-if extracted verbatim,
+saved in `docs/compound-tests/live-today-en.png`) — every §1.1 number
+re-confirmed on the live page, and the audit items A/B/F plus the W3/W5 gaps
+re-confirmed by inspection (the "1% more" wording, the cash figure implying
+the 0.2% cost, the symbol-less tiles, the header Tools button that is not a
+link, the "Open ↗" pills on internal /tools cards, and the How fold that
+names no index and no recent inflation).
+
+The v6 work, in commit order:
+
+1. **Regression lock first:** a new test block in
+   `tests/compound-maths.test.ts` pinning the §1.1 live numbers (put-in
+   24,000, final ≈50,800, today ≈29,400, worse/better band, crossover month,
+   the three milestone months, starting-later 19,600) with the start month
+   frozen at 2026-11 — green on the current code before anything changes.
+   The cash figure (32,100 with the cost wrongly applied) is pinned the same
+   way and then **deliberately re-pinned** to the no-cost figure when W2
+   lands, with both values recorded here.
+2. **W2 (cash cost)** in `maths.ts`: `APPLY_COST_TO_CASH = false` config
+   switch; `computeCompound` takes an `isCash` flag so the cash what-if, the
+   cash thin line and the compare-table cash row all use the unreduced rate.
+3. **W1 (small-changes wording)** in `maths.ts` + `content.ts` + `app.tsx`:
+   money terms in Amount mode ("Investing 10 more a month adds X" — the step
+   is 10% of the amount, whole, min 1, plus the "(that is N% more of your
+   salary)" suffix when a salary is known and it stays short), percentage
+   points in % mode ("Investing 4% instead of 3% adds X"), the "less"
+   sentence hidden below 0.5%.
+4. **W3 (inflation visible)**: the caption under the tiles in today's-money
+   view ("Today's money uses average inflation of X% a year (last 20
+   years)." — X follows the editable setting), the How fold's new lines
+   (the average used + the latest 12-month figure with source and date), and
+   two new figures rows (latest 12-month CPI for AU and US).
+5. **W5 (exact index names)**: the How fold lists every asset's exact index,
+   read from the figures file's `measures` field so it can never drift.
+6. **W6 (polish)**: currency symbol on the tiles (A$/$ before the number in
+   English; the currency word after the number in Farsi, matching the
+   headline's own fa convention), the header "Tools" item becomes a real
+   link to /tools (the ▾ caret stays a separate drawer button), and the ↗
+   retired from every internal link (tools index cards, gold-hub).
+7. **W7 (percent-of-salary mini calculator)** in `maths.ts` (config: percent
+   limits 0.1–50, step 0.5, chips 1/3/5/10; the salary-period conversion;
+   §6.6 formulas as pure functions), `content.ts` (the full bilingual
+   dictionary for the switch, both modes, the live lines, the % headline,
+   the card lines), `app.tsx` (the Amount | % switch inside the Per-month
+   group, the salary box that lives in the amount group and is the same box
+   everywhere, mode switching that keeps the place, aria-live="polite"),
+   `cards.tsx` (% plan lines that show the percent and the monthly amount,
+   never the salary). The salary field moves OUT of More options (§5.3).
+8. **W4 (figures refresh)**: research pass with the web tools; the aim is
+   one common quarter-end for every row (30 September 2026 target), every
+   row re-verified against its source, derived rows recomputed, cross-checks
+   recorded in §4 below. Whatever cannot be honestly sourced to the common
+   date keeps its current period and is listed in the report.
+9. **Tests 25–38** added as unit tests where they are maths, and as browser
+   checks in the harness where they are UI; the grid replayed against the
+   live page after the deploy.
+10. **Deploy + PR**: `NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build &&
+    bunx wrangler deploy` with the owner's token, live verification, then
+    small commits pushed on `compound-wealth-v6` and a PR opened.
+
+Where v6 is silent, the chosen readings (all simplicity-first): the tiles'
+currency word in Farsi follows the headline's own fa convention (the number,
+then the word); the "Tools" header link keeps the site's dropdown caret as
+its own button so nothing restyles; the % mode's "keeps your place" rule
+converts both ways when a salary is known and leaves each mode's own state
+untouched when it is not (nothing invented); the percent box commits
+half-point steps with the stepper and accepts typed decimals; the live line
+rounds money to whole numbers for display and keeps full precision for the
+maths, exactly as §6.6 says.
+
+---
+
 
 ## 1. The plan (decided up front, per instruction 2)
 
