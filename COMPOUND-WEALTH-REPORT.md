@@ -1,6 +1,6 @@
-# Compound Wealth — Phase 1 build report
+# Compound Wealth — the build report (phase 1 + the v6 iteration)
 
-**Spec:** `COMPOUND-WEALTH-SPEC.md` (v6, the pack's version — unzipped into the repo root, overwriting v5) · **Branch for v6:** `compound-wealth-v6` · **Built:** 2026-11-25/26 (Asia/Tehran) · **Site:** currena.ir
+**Spec:** `COMPOUND-WEALTH-SPEC.md` (v6 — the pack's version, unzipped into the repo root overwriting v5) · **Branch:** `compound-wealth` (phase 1) → `compound-wealth-v6` (this iteration) · **Built:** 2026-11-25/26 (Asia/Tehran) · **Site:** currena.ir · **Status: v6 complete, live, all gates green** — see §10 for the v6 verification record and `COMPOUND-WEALTH-TEST-REPORT.md` for the full test pass.
 
 ## 0. The v6 plan (decided up front, per start-prompt step 2)
 
@@ -102,6 +102,10 @@ maths, exactly as §6.6 says.
 
 ## 2. What was built
 
+The phase-1 pieces (below) carry the v6 changes noted in §10; the figures
+file's "checked on" date is **2026-11-26** and it now carries the two W3
+rows (latest 12-month CPI for AU and US) and per-row re-verification notes.
+
 | Piece | File | What it is |
 |---|---|---|
 | The maths engine | `src/lib/compound/maths.ts` | The pure monthly loop (§6.1) with the config block at the top, the baseline/band rules (§6.2), the AUD conversion (§6.3), milestones (§6.4), date clamping, staleness, the what-if maths, formatting helpers. No imports, no React, no network. |
@@ -194,12 +198,22 @@ Deployed with the provided Cloudflare token
 
 ## 4. The figures — every number, its source and its working
 
-Research date: **2026-11-25** (UTC). Every value below was read from the linked
-source in this sitting; none is invented, estimated or recalled. Single figures
-quoted with attribution (the spec's sanctioned pattern); derived numbers carry
-their full working. Andex Charts' copyright covers the artistic chart, not the
-factual figures; each Vanguard number below is a single published figure cited
-with attribution.
+**W4 (2026-11-26): every row below was re-opened at its source and every
+derived row recomputed in this sitting — zero mismatches; the tables carry
+the same values, now with per-row re-verification notes in the figures
+file and the full research record (sources opened, blocked doors,
+cross-check gaps) in
+`docs/compound-tests/figures-research-2026-11-26.md`.** The two new W3
+rows: AU latest 12-month CPI **4.9%** (12 months to October 2026, ABS
+monthly CPI, read from the latest release on 2026-11-26) and US latest
+12-month CPI-U **3.7%** (12 months to September 2026, BLS September
+release — the October 12-month rate was never published because the 2025
+shutdown left no base month).
+
+Research date: **2026-11-25** (phase 1) and **2026-11-26** (the W4
+re-verification). Every value below was read from the linked source; none
+is invented, estimated or recalled. Single figures quoted with attribution
+(the spec's sanctioned pattern); derived numbers carry their full working.
 
 ### Australia (AUD)
 
@@ -294,16 +308,18 @@ Also for the record: **RBA's own site (rba.gov.au) blocks this sandbox's IP**
 (403), which is why the cash rate and FX came via the BIS (whose AU series is
 sourced from the RBA) — same official numbers, different door.
 
-## 5. Config values chosen (spec §11)
+## 5. Config values chosen (spec §11, updated to v6)
 
 All in `src/lib/compound/maths.ts`'s config block, each with a plain-English
 comment: milestones 5k→10M (11 lines), 3 on the page / 5 on the cards; amount
 100 default with chips 50/100/200/500; years 20 default, chips 10/20/30, box
 1–50; yearly cost 0.2% (editable 0–3%); what-if points 2 (editable 0.5–5);
 band threshold 0.5 points; inflation 0–15%; yearly increase 0–15%; salary
-share 3% (0.5–30%); staleness 18 months; country default AU; fee-warning
-share 1% of a purchase. The default inflation per country comes from the
-figures file (AU 2.76%, US 2.53%).
+share 3% default with **percent limits 0.1–50% (§11's v6 values), step 0.5,
+chips 1/3/5/10**; salary period default **per year**; staleness 18 months;
+country default AU; fee-warning share 1% of a purchase; and the W2 switch
+**`APPLY_COST_TO_CASH = false`**. The default inflation per country comes from
+the figures file (AU 2.76%, US 2.53%).
 
 ## 6. Routing decisions
 
@@ -346,13 +362,14 @@ figures file (AU 2.76%, US 2.53%).
 
 ## 7. Decisions log (where the spec was silent, or simplicity won)
 
+The phase-1 decisions (1–10 below) stand; the v6 decisions follow them.
+
 1. **The tiles' money toggle** (§5.1.5's own element) stays on the default
    screen — it is part of the tiles, not a control group; test 13's assertion
    was written to the full spec'd set accordingly.
-2. **"1% more adds X, 1% less loses Y"** — in this engine the final value is
-   linear in the deposit, so X and Y are always equal (with or without fees).
-   Both are shown, spec-literally; the equality is honest mathematics, noted
-   here so it doesn't read as a bug.
+2. **"1% more adds X, 1% less loses Y"** — superseded by W1 (v6): the card
+   now speaks money ("Investing 10 more a month adds X") or percentage
+   points; the linearity note survives only in the maths tests.
 3. **The chart is hand-built SVG** (the house Sparkline pattern), not Recharts:
    it must render identically inside the print card and the phone card with no
    timing/animation concerns, and the 1:1 measured-pixel drawing keeps labels
@@ -365,48 +382,130 @@ figures file (AU 2.76%, US 2.53%).
    (the repo's digest-sheet pattern, portal-mounted so the sheet is a direct
    child of body) — the same CSS the browser's own Print → Save as PDF uses;
    the harness generates the samples with Playwright's A4 `pdf()` for
-   reproducibility.
+   reproducibility. (v6: the overlay now sits at z-1100, above the site
+   header.)
 6. **The what-if "Starting later" selector defaults to 5 years** (spec default)
    with 1/3 available as small chips inside the card.
 7. **Percent-mode's default yearly increase** follows the spec: 0 in fixed
-   mode, the country's inflation average in share mode (the flip applies it).
+   mode, the country's inflation average in share mode — v6 refined the
+   timing: the default arrives when a salary is actually live, and a
+   hand-set value is never replaced.
 8. **`/gold/tools/*` 301s to `/tools/*`** so the internal and public spellings
    never coexist (canonical tags agree).
-9. **The salary → years-of-salary line** reads "The result is about N years of
-   your salary" (final value ÷ yearly salary) — the clearest reading of
-   Appendix B's "years-of-salary line".
+9. **The years-of-salary line** reads "The result is about N years of your
+   salary" — v6 moved it to today's money ÷ a year of salary, per §6.6's
+   formula.
 10. **The tools index's converter card** links to `https://currena.ir/` (the
     converter's existing URL — a hash route lives under it), external, so
     nothing on the main site moves.
 
+**The v6 decisions** (where the spec was silent, or simplicity won):
+
+11. **The tiles' currency in Farsi** follows the headline's own fa convention
+    (the number, then the currency word «دلار استرالیا»/«دلار آمریکا» at a
+    smaller size); English gets the A$/$ symbol before the number, exactly as
+    W6 asks.
+12. **The header "Tools" link** (W6) is a real `/tools` anchor whose ▾ caret
+    remains its own button opening the site's side drawer — nothing restyles,
+    both paths work.
+13. **The % mode's "keeps your place" rule** converts both ways when a salary
+    is known; without one, each mode keeps its own state and the plan keeps
+    the last amount actually used (the amount state mirrors the computed
+    monthly amount while share mode is live). Nothing is invented.
+14. **The % mode's deferred default-increase** is guarded by an explicit
+    `increaseTouched` flag: the inflation default applies when share mode goes
+    live with the increase still at the amount-mode default, and never
+    stomps a hand-set value (including an explicit 0).
+15. **The salary period switch converts the money** (90,000 per year ↔
+    7,500 per month, rounded to whole numbers — the page's money convention);
+    the round trip is exact for salaries divisible by 12.
+16. **The small-changes card's "less" sentence hides** when the lower percent
+    would be under 0.5% (per §5.2) or the amount would go negative.
+17. **The percent box's clamp** shows the repo's one plain message
+    ("outside the allowed range") rather than silently correcting.
+18. **The start month hydrates from the server's own month** (a prop from the
+    page) and corrects post-mount — closing the month-boundary hydration
+    mismatch the clock test found (pre-existing since v5).
+19. **Test 27's "all numbers"** compares the plan's outputs (headline numbers,
+    tiles, range, milestones, later-start, cash) — the small-changes card is
+    mode-specific by §5.2's own design (a 1-point step vs a 10%-of-amount
+    step), so its numbers differ between the two modes by design.
+20. **The plain-language sentence average** is measured over sentences
+    (paragraph/heading text); control labels and chips are not sentences —
+    the jargon scan still covers every visible word.
+21. **Decimal amounts** stay whole-number in the UI (the protected v5
+    convention); the engine handles decimals (the grid's 37.5 scenarios
+    verified 1200/1200 at the engine level).
+22. **The axe contrast findings** (active chips 3.29:1, gold tile 3.71:1) are
+    pre-existing shared-chrome tokens; fixing them restyles every currena.ir
+    page, so they are recorded as owner decisions, not changed here.
+
 ## 8. What is unfinished / needs the owner
 
-1. **Deploy: done.** The branch is pushed, the PR is open (#51), and the
-   worker was deployed from this sitting with the provided token — the live
-   verification above is the record. If it ever needs re-running by hand:
-   `NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build && bunx wrangler deploy`
-   from the repo root, with `CLOUDFLARE_API_TOKEN` set (the two `/tools` zone
-   routes are declared in `wrangler.jsonc`, so the deploy keeps them).
-2. **The main site's nav** (currena-api — outside this repo) has no Tools link;
-   the gold page's nav has one, the tools pages link home. One line on the
-   main site's nav when the owner wants it there.
-3. **ASX 200 and MSCI 20/30-year upgrades** — see §4's "Rows not filled".
-4. **The sitemap** — see §6 (no sitemap on this worker to extend).
+1. **Deploy: done** — v6 is live (deployed 2026-11-26 with the owner's
+   token; every check on this branch re-run against the production build).
+   Re-run by hand: `NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build &&
+   bunx wrangler deploy` with `CLOUDFLARE_API_TOKEN` set.
+2. **The main site's nav** (currena-api — outside this repo) has no Tools
+   link; the gold page's and every tools page's headers have one. One line
+   on the main site's nav when the owner wants it there.
+3. **ASX 200, MSCI 20/30-year and the common quarter-end** — see §4's "Rows
+   not filled" and the W4 record: the doors that would supply 30-Sep-2026
+   quarter-end figures (CFS PDF, S&P DJI, MSCI interactive, LBMA, RBA, BLS)
+   are IP-blocked or login-gated from this sandbox; the exact numbers to
+   fetch and where are listed there.
+4. **The sitemap** — no sitemap on this worker to extend (§6).
+5. **The owner-decisions list** in `COMPOUND-WEALTH-TEST-REPORT.md` (palette
+   contrast, the fa label-in-name, decimal amounts, the quarter-end
+   alignment, the MSCI upgrade).
 
 ## 9. How to roll back
 
-Everything is additive and self-contained:
+- **v6 code:** `git revert` the `compound-wealth-v6` commits on this branch
+  (the v6 pack, the regression lock, W2, W1, W3/W4/W5/W6, W7, the test
+  surface, Phase A fixes — each is one small, self-contained commit), or
+  merge `main` back over the branch. The v6 commits touch the shared site
+  chrome in exactly two places (the Tools nav anchor and the retired ↗
+  arrows) — both trivially revertible.
+- **Worker:** redeploy the previous tree (`git checkout main &&
+  NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build && bunx wrangler deploy`)
+  — the `/tools` zone routes stay claimed (they are the same routes).
+- **No data anywhere:** the tool still stores nothing — there is nothing to
+  clean up on any device or server.
 
-- **Code:** `git revert` the three `compound-wealth` commits (maths+figures+tests,
-  pages+cards+routing, worker-entry) — or merge `main` back over the branch.
-  The only file the tool touches that the gold page shares is
-  `src/lib/gold-page/content.ts` (two added nav label strings) and
-  `src/app/page.tsx` (the one nav link + the filtered map) — both trivially
-  revertible.
-- **Worker:** redeploy the previous tree (`git checkout main && bun run
-  worker:build && bunx wrangler deploy`) and delete the two `/tools` zone
-  routes (dashboard → currena.ir zone → Workers routes, or remove the two
-  route lines from `wrangler.jsonc` before deploying). The `/gold` routes and
-  the D1 database are untouched by this change.
-- **No data anywhere:** the tool stores nothing — there is nothing to clean up
-  on any device or server.
+## 10. The v6 verification record (2026-11-26)
+
+Every number below was produced on this branch's final state, run against
+**both** the local dev build and the live production deploy (twice — before
+and after the Phase B fixes):
+
+- `python3 compound_reference_check.py --selftest` — six lines PASS.
+- `bun test tests/compound-maths.test.ts` — **94/94** (spec §12's tests
+  1–11, the W1 wording maths, the W2 switch, the W3/W5/W6 figure checks and
+  the W7 conversion set 25–32, plus the v6 regression lock of §1.1's live
+  numbers).
+- `bun tests/compound-browser-harness.ts` — **64/64** on the live build
+  (simplicity 12–18 incl. the three one-screen sizes, the exact control
+  inventory with the W7 set, routing/meta, storage, ten A4 cards, eighteen
+  phone renders, the W7 browser set, the audit set 33–38, zero page errors).
+- `bun tests/compound-grid-replay.ts` — the reference engine's 1200-scenario
+  grid: **1200/1200** against the maths module, **15/15** driven through the
+  live page's real interface.
+- `bun tests/compound-phase-a.ts` (live + local) — **32/32**: the spec
+  vectors through the interface, the edge cases, the invariants, the clock
+  rollovers, the country switch, keyboard/focus/latency (35–89 ms), zero
+  console errors.
+- `bun tests/compound-axe.ts` — light+dark × EN+fa scanned; the findings
+  (all pre-existing shared tokens) recorded with the exact ratios in the
+  test report's owner-decisions list.
+- Lighthouse (live): **performance 98, accessibility 97** — CLS 0, TBT 61 ms
+  (`docs/compound-tests/phase-a-lighthouse.json`).
+- `bun run lint` — green on every commit.
+- The full test pass is written up in `COMPOUND-WEALTH-TEST-REPORT.md`
+  (Phase A's three verdicts, the test table, the eight-entry defect list —
+  five fixed with regression tests, three owner decisions — and the
+  data-source table with verification status).
+- **Insights, the converter and the narrator are untouched** (the only
+  shared files changed are the site chrome's Tools anchor and the retired
+  ↗ pills; the gold page's own tests and walk still pass in the harness's
+  19c check).
