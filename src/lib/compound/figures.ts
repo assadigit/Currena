@@ -134,7 +134,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
-      note: "Read straight from the chart's published returns table (per annum total returns to 30 June 2026; Australian Shares row; footnote 3 names the S&P/ASX All Ordinaries Total Return Index). Re-read and re-verified 2026-11-26. The spec asked for the S&P/ASX 200; the published 20- and 30-year figure the research could legally source is the All Ordinaries, which covers the whole Australian market — the page says 'Australian shares' and this note names the index. Cross-check: CFS 'Investment essentials' (30 Sep 2026) publishes 6.97% for the S&P/ASX 300 Accumulation over 20 years — 0.23 points below, an index difference plus the 3-month offset. See the report for how to upgrade to ASX 200.",
+      note: "Read straight from the chart's published returns table (per annum total returns to 30 June 2026; Australian Shares row; footnote 3 names the S&P/ASX All Ordinaries Total Return Index). Re-read and re-verified 2026-11-26. The spec asked for the S&P/ASX 200; the published 20- and 30-year figure the research could legally source is the All Ordinaries, which covers the whole Australian market — the page says 'Australian shares' and this note names the index. Cross-check: CFS 'Investment essentials' (30 Sep 2026) publishes 6.97% for the S&P/ASX 300 Accumulation over 20 years — 0.23 points below, an index difference plus the 3-month offset; the CFS PDF was opened and read directly in the v7 sitting's door retry (it was snippet-read in v6). See the report for how to upgrade to ASX 200.",
     },
     {
       id: "sp500",
@@ -160,7 +160,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
-      note: "The chart's 'International Shares' row is MSCI World ex-Australia Net Total Return (AUD) — the poster's footnote 4 — the world outside Australia, which is the right 'World shares' for the Australia preset because Australian shares have their own chip. Re-read and re-verified 2026-11-26. Cross-check: CFS 'Investment essentials' (30 Sep 2026) publishes 8.95% for MSCI World Net in A$ over 20 years — 0.15 points below, the 3-month offset.",
+      note: "The chart's 'International Shares' row is MSCI World ex-Australia Net Total Return (AUD) — the poster's footnote 4 — the world outside Australia, which is the right 'World shares' for the Australia preset because Australian shares have their own chip. Re-read and re-verified 2026-11-26. Cross-check: CFS 'Investment essentials' (30 Sep 2026) publishes 8.95% for MSCI World Net in A$ over 20 years — 0.15 points below, the 3-month offset; PDF read directly in the v7 door retry.",
     },
     {
       id: "gold",
@@ -186,7 +186,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "BIS policy-rate dataset (source: Reserve Bank of Australia)",
       sourceUrl: BIS_CBPOL_URL,
-      note: "Spec §7 method: the average of the official policy rate over the period — the mean of 240 (20y) and 360 (30y) month-end values of the RBA cash rate target, November 2006 – October 2026 and November 1996 – October 2026. Recomputed from the BIS bulk CSV on 2026-11-26: 3.0321% and 3.7561% — exact match. Cross-checks: Vanguard's chart publishes a bank-bill 'Cash' row of 3.3%/4.0% (bank bills track the cash rate plus a small spread); CFS (30 Sep 2026) publishes 3.25% for the Bloomberg AusBond Bank Bill Index.",
+      note: "Spec §7 method: the average of the official policy rate over the period — the mean of 240 (20y) and 360 (30y) month-end values of the RBA cash rate target, November 2006 – October 2026 and November 1996 – October 2026. Recomputed from the BIS bulk CSV on 2026-11-26: 3.0321% and 3.7561% — exact match. Cross-checks: Vanguard's chart publishes a bank-bill 'Cash' row of 3.3%/4.0% (bank bills track the cash rate plus a small spread); CFS (30 Sep 2026) publishes 3.25% for the Bloomberg AusBond Bank Bill Index — read directly from the CFS PDF in the v7 door retry.",
     },
   ],
   inflation: {

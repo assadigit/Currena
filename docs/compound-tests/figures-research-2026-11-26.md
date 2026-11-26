@@ -56,3 +56,23 @@ Conclusion: no quarter-end later than the current per-row windows is verifiable 
 every row from this sandbox. The file keeps each row at its own disclosed,
 freshly re-verified period end; the largest gaps against Sep-2026 cross-checks
 are all under 0.5 points and explained above.
+
+## The v7 blocked-doors retry — 2026-11-26 (second sitting, ~10 minutes, hard 30-minute timebox)
+
+The owner's v7 direction asked for one retry of the blocked doors. Result:
+
+| Door | Method | Result |
+|---|---|---|
+| **CFS "Investment essentials" PDF** | direct curl (200, 1.06 MB) + the page-reading tool | **OPENED.** Read first-hand: 20 years to 30 September 2026 — Australian shares (S&P/ASX 300 Accumulation) **6.97%**, global shares (MSCI World Net, $A) **8.95%**, cash (Bloomberg AusBond Bank Bill) **3.25%**; every 20-year cross-check in the table above now verified directly from the document instead of via search snippets. The PDF's own window note: "Data from 30 September 2006 to 30 September 2026". |
+| LBMA precious-metal prices | page shell loads (200) | The page renders, but the historical price series itself is a paid data feed — no quarter-end history without a licence (spec §7 forbids restricted-licence data). Historical door stays closed. |
+| RBA (rba.gov.au, incl. statistical tables) | curl 403; reader returns a titled but empty body | Still closed. |
+| BLS (bls.gov CPI news release) | curl 403; reader returns an empty body | Still closed — the US inflation rows remain verified via FRED CPIAUCNS, the DOL mirror and the release text through search, as recorded above. |
+| MSCI interactive (20y/30y) | the tools page shell loads; the data needs a login | Still login-gated; the public factsheet (30 Oct 2026, 15-year window) remains the only open MSCI door. |
+
+**The common quarter-end after the retry:** still not achievable. CFS publishes the 20-year
+figures only (no 30-year row); Vanguard publishes 20- and 30-year figures but only to
+30 June 2026 (yearly cadence); MSCI's 20/30-year figures are login-gated; LBMA history is
+paid. Re-anchoring every row to 30 September 2026 would mean mixing windows and indexes
+across rows — worse than the current per-row disclosed period ends, all of which are
+freshly verified. The file keeps its per-row period ends; the CFS cross-checks are upgraded
+from snippet-read to document-read.
