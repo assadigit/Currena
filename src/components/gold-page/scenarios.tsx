@@ -313,16 +313,24 @@ export function ScenariosBand({
         })}
       </div>
 
-      {/* the professional disclaimer (the owner's 2026-11-26 ask): the
-          un-dated risks — a stress spike, war, a banking crisis — stated
-          in a professional register, labelled «سلب مسئولیت», visible but
-          not loud; never the old informal aside. A hair quieter than the
-          cards, never washed out. */}
+      {/* the professional disclaimer (the owner's 2026-11-26 ask, raised
+          a notch the same day): the un-dated risks stated in a
+          professional register — now a proper warning strip: the ⚠ mark,
+          the «سلب مسئولیت» label, and a golden container (the house
+          gold accent, tinted) so it reads as a caution at a glance,
+          still never shouting. */}
       <div
-        className="mt-3 flex flex-col gap-1 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2.5 ring-1 ring-[var(--color-border)]"
+        className="mt-3 flex flex-col gap-1 rounded-[var(--cr-radius-md)] px-3 py-2.5"
+        style={{
+          backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 14%, transparent)",
+          boxShadow: "inset 0 0 0 1.5px color-mix(in srgb, var(--color-accent-gold-deep) 45%, transparent)",
+        }}
         data-scenarios-disclaimer
       >
-        <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.disclaimerLabel}</span>
+        <span className="flex items-center gap-1.5 type-caption font-bold text-[var(--color-accent-gold-deep)]">
+          <span aria-hidden="true" className="text-[14px] leading-none">⚠️</span>
+          {t.disclaimerLabel}
+        </span>
         <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.unscheduledNote}</p>
       </div>
 

@@ -327,15 +327,18 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
       <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
-      {/* the window chips + the line toggles */}
-      <div className="mt-3 flex flex-wrap items-center gap-1.5" role="group" aria-label={t.windowLabel}>
+      {/* the window chips + the line toggles — the window row is COMPACT
+          (the owner's 2026-11-26 ask: all six windows on ONE row, «۱۰سال»
+          never pushed to a second line): tight padding, tight gap, small
+          font, whitespace-nowrap so the chips never break internally */}
+      <div className="mt-3 flex flex-nowrap items-center gap-1 overflow-x-auto" role="group" aria-label={t.windowLabel}>
         {WINDOW_ORDER.map((key) => (
           <button
             key={key}
             type="button"
             aria-pressed={window === key}
             onClick={() => setWindow(key)}
-            className={`rounded-full px-3 py-1 text-[12px] font-bold transition-colors ${
+            className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-[11.5px] font-bold transition-colors ${
               window === key
                 ? "bg-[var(--color-accent-gold)] text-[var(--color-accent-gold-ink)]"
                 : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"

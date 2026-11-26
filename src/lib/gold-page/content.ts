@@ -280,7 +280,7 @@ export const UI = {
       subtitle:
         "The 10-year real yield, silver, Bitcoin and the S&P 500 against gold itself: what holding each would have done over the window, one line each (the yield is a rate — its line rides its own true-% right axis).",
       windowLabel: "Window",
-      ranges: { "3M": "3 months", "6M": "6 months", "1Y": "1 year", "3Y": "3 years", "5Y": "5 years", "10Y": "10 years" },
+      ranges: { "3M": "3M", "6M": "6M", "1Y": "1Y", "3Y": "3Y", "5Y": "5Y", "10Y": "10Y" },
       bestLine: "Best gain: {name} {pct}",
       worstLine: "lowest gain: {name} {pct}",
       bestLossLine: "smallest loss: {name} {pct}",
@@ -391,6 +391,7 @@ export const UI = {
           "the same money at the coin's melt value: {n} coins — the premium (حباب) is exactly the difference",
         unavailable:
           "The machine needs the coin's own market quote and the currency's free-market rate; a leg is missing right now, never a guess.",
+        enterAmountLine: "Enter an amount to see how many coins it buys.",
         millionToman: "{v}M toman",
         billionToman: "{v} bn toman",
         tomanWord: "toman",
@@ -442,6 +443,8 @@ export const UI = {
       chipDollar: "Dollar",
       expandAll: "all {n} years",
       collapseTen: "the last five years",
+      detailsOpenLabel: "the race details — tables, years, decomposition",
+      detailsHideLabel: "hide the details",
       millionWord: "million",
       decouplingTitle: "Down in the world, up in Iran",
       decouplingSubtitle:
@@ -455,12 +458,14 @@ export const UI = {
       decompTitle: "What gold's Iran growth was made of",
       decompCenterTitle: "gold's Iran growth",
       decompLine:
-        "Since {year}, gold in Iran multiplied ×{g}: the rial's fall alone would have given ×{d}, the world's gold alone ×{w}, the Tehran premium ×{p}.",
+        "Since {year}, gold's rise in Iran has three multiplicative drivers: the rial's fall against the dollar, the world's own gold growth, and the Tehran premium.",
       decompShareRial: "the rial's fall vs the dollar",
       decompShareGlobal: "the world's gold move",
       decompSharePremium: "the Tehran premium (حباب)",
       decompSharesLine:
         "Of that growth, {r} was the rial's fall, {w} the world's gold, {p} the Tehran premium.",
+      decompPriceLine:
+        "Of gold's current price in Iran, only about {w} comes from the world's own price growth — the other {r} is the rial's lost value against the dollar.",
       decompNoteLabel: "how the shares are computed",
       decompNote:
         "The three factors multiply exactly — gold's toman multiple = the dollar's multiple × the global-ounce multiple × the premium's change — so the shares split the total multiple's logarithm and add to 100%. The rial's fall is the inflation/currency leg: a weaker rial makes everything costlier in toman, gold included. The world's gold is gold's own natural, dollar-priced growth.",
@@ -484,6 +489,8 @@ export const UI = {
       subtitle:
         "The annual average price since 1833 — the longest reliable series there is: the gold standard's fixed $20.67, the $35 era, then the free market after 1971. The perspective behind every daily move.",
       chartAria: "Gold's annual average price since 1833, in US dollars per ounce",
+      chartOpenLabel: "the two-century chart — open it",
+      chartHideLabel: "close the chart",
       scaleLog: "log scale",
       scaleLinear: "linear",
       viewAll: "since 1833",
@@ -1042,7 +1049,7 @@ export const UI = {
       title: "بازده طلا در برابر جایگزین‌ها",
       subtitle: "بازده واقعی ۱۰ ساله، نقره، بیت‌کوین و S&P 500 در برابر خودِ طلا؛ نگه‌داشتن هر کدام در این پنجره چه کرده، هر کدام یک خط. بازده‌ها «نرخ»اند و خطشان روی محور راستِ درصدِ واقعی خودش می‌نشیند.",
       windowLabel: "پنجره",
-      ranges: { "3M": "۳ ماه", "6M": "۶ ماه", "1Y": "۱ سال", "3Y": "۳ سال", "5Y": "۵ سال", "10Y": "۱۰ سال" },
+      ranges: { "3M": "۳ماه", "6M": "۶ماه", "1Y": "۱سال", "3Y": "۳سال", "5Y": "۵سال", "10Y": "۱۰سال" },
       bestLine: "بالاترین سود: {name} {pct}",
       worstLine: "کمترین سود: {name} {pct}",
       bestLossLine: "کمترین ضرر: {name} {pct}",
@@ -1152,6 +1159,7 @@ export const UI = {
         meltLine: "همین پول با ارزش ذاتی سکه: {n} سکه — حباب دقیقاً همین تفاوت است",
         unavailable:
           "ماشین به نقل‌قول بازار سکه و نرخ آزادِ ارز هر دو نیاز دارد؛ الان یکی از پای‌ها نیست، بدون حدس.",
+        enterAmountLine: "مبلغ را وارد کنید تا ببینید چند سکه می‌خرد.",
         millionToman: "{v} میلیون تومان",
         billionToman: "{v} میلیارد تومان",
         tomanWord: "تومان",
@@ -1203,6 +1211,8 @@ export const UI = {
       chipDollar: "دلار",
       expandAll: "همهٔ {n} سال",
       collapseTen: "پنج سال اخیر",
+      detailsOpenLabel: "جزئیات مسابقه — جدول‌ها، سال‌ها، تجزیه",
+      detailsHideLabel: "بستن جزئیات",
       millionWord: "میلیون",
       decouplingTitle: "در جهان پایین، در ایران بالا",
       decouplingSubtitle:
@@ -1216,12 +1226,14 @@ export const UI = {
       decompTitle: "رشد طلای ایران از چه ساخته شده",
       decompCenterTitle: "رشد قیمت طلا در ایران",
       decompLine:
-        "از {year}، طلا در ایران ×{g} شد: افت ریال به‌تنهایی ×{d} می‌داد، طلای جهان به‌تنهایی ×{w}، و حباب تهران ×{p}.",
+        "از {year}، رشد طلا در ایران سه عاملِ ضرب‌شونده دارد: افت ریال در برابر دلار، رشد قیمتی خودِ طلای جهان، و حباب بازار تهران.",
       decompShareRial: "افت ریال در برابر دلار",
       decompShareGlobal: "رشد جهانی طلا",
       decompSharePremium: "حباب بازار تهران",
       decompSharesLine:
         "از این رشد، {r} افت ریال بود، {w} رشد جهانی طلا و {p} حباب تهران.",
+      decompPriceLine:
+        "از قیمت فعلی طلا در ایران، فقط حدود {w} ناشی از رشد قیمتی خودِ جهان است — {r} دیگر، افت ارزش ریال در برابر دلار است.",
       decompNoteLabel: "این سهم‌ها چگونه محاسبه می‌شوند",
       decompNote:
         "این سه عامل دقیقاً در هم ضرب می‌شوند — ضریب تومانی طلا = ضریب دلار × ضریب اونس جهانی × تغییر حباب — پس سهم‌ها لگاریتم ضریب کل را تقسیم می‌کنند و جمعشان ۱۰۰٪ می‌شود. افت ریال همان پای تورم و پول ملی است: ریال ضعیف‌تر یعنی همه‌چیز در تومان گران‌تر، طلا هم همین‌طور؛ رشد جهانی طلا رشد طبیعیِ خودِ طلا به دلار است.",
@@ -1245,6 +1257,8 @@ export const UI = {
       subtitle:
         "میانگین سالانهٔ قیمت از ۱۸۳۳ — بلندترین سریِ قابل‌اتکای موجود: قیمتِ ثابتِ ۲۰٫۶۷ دلاریِ استاندارد طلا، دورهٔ ۳۵ دلاری، و بازار آزاد پس از ۱۹۷۱. چشم‌اندازی که پشت هر حرکت روزانه است.",
       chartAria: "میانگین سالانهٔ قیمت طلا از ۱۸۳۳، دلار بر اونس",
+      chartOpenLabel: "نمودار دو سده — باز کردن",
+      chartHideLabel: "بستن نمودار",
       scaleLog: "مقیاس لگاریتمی",
       scaleLinear: "خطی",
       viewAll: "از ۱۸۳۳",

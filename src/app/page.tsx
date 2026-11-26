@@ -1195,9 +1195,10 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
           the melt-value comparison riding beside it */}
       <CoinBuyerBand rates={rates} t={t.bridge.coinBuyer} fmt={fmt} locale={locale} />
 
-      {/* the parity ladder — moved to the section's foot (the owner's
-          ask): the board and the machines first, the five steps after;
-          collapsed by default, one tap opens them */}
+      {/* the parity ladder + the method — MERGED into one collapsible
+          (the owner's 2026-11-26 ask): the five steps and the method
+          formula under one summary, one tap; the board and the
+          machines stay above, the section's foot stays one block */}
       <details className="mt-3 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3">
         <summary className="cursor-pointer type-caption font-bold text-[var(--color-bridge-accent)]">
           {locale === "en" ? "How the Tehran price is built · the 5 steps" : "قیمت تهران چگونه ساخته می‌شود؟ · ۵ گام"}
@@ -1211,12 +1212,13 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
               <span className="type-caption font-semibold text-[var(--color-text-primary)]">{s}</span>
             </div>
           ))}
+          {/* the method note rides INSIDE the same collapsible (the
+              owner's merge ask) — the formula the steps compute, in
+              words, one open away, no second block below */}
+          <p className="m-0 mt-1.5 border-t border-[var(--color-border)] pt-2 type-caption leading-relaxed text-[var(--color-text-secondary)]">
+            <b>{t.bridge.methodTitle}:</b> {t.bridge.method}
+          </p>
         </div>
-      </details>
-
-      <details className="mt-2.5 rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
-        <summary className="cursor-pointer px-3 py-2 type-caption font-bold text-[var(--color-bridge-accent)]">{t.bridge.methodTitle}</summary>
-        <p className="px-3 pb-3 m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.bridge.method}</p>
       </details>
     </section>
   );

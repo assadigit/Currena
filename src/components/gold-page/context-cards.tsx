@@ -543,11 +543,11 @@ export function ForecastRetroCard({ t, fmt, locale }: { t: FrT; fmt: Fmt; locale
         </bdi>
       </p>
 
-      {/* batch M (the owner's ask): the verdicts as a LIST and the
-          recent years as a TABLE — the inline paragraph run and the
-          chip row are gone. Every verdict sentence its own row with
-          its own marker; the last five scored years + the pending one
-          read as the table they always were, no tap needed */}
+      {/* the owner's 2026-11-26 ask: only the VERDICT stays visible —
+          the verdict list (the headline record, the 2025 record miss,
+          the pending year) reads in the open; every table and note
+          (the recent five, the full 17-row record, the convention, the
+          sources) waits behind the one expand toggle above */}
       <ol className="m-0 mt-1.5 flex list-none flex-col gap-1 p-0">
         <li className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]">
           <span aria-hidden="true" className="mt-[5px] inline-block h-2 w-2 shrink-0 rounded-[2px] bg-[var(--color-accent-gold)]" />
@@ -582,14 +582,16 @@ export function ForecastRetroCard({ t, fmt, locale }: { t: FrT; fmt: Fmt; locale
         ) : null}
       </ol>
 
-      {/* the recent years as a TABLE, in the open — the same numbers
-          the full 17-row record carries, the last five plus the
-          pending row, one glance */}
-      <div className="mt-1.5">
-        <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{t.recentTableTitle}</h4>
-        <div className="mt-1 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
-          <table className="w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption">
-            <thead>
+      {/* the recent years' table — behind the expand (the owner's
+          2026-11-26 ask: the verdict alone in the open), the same
+          numbers the full 17-row record carries, the last five plus
+          the pending row */}
+      {open ? (
+        <div className="mt-1.5">
+          <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{t.recentTableTitle}</h4>
+          <div className="mt-1 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
+            <table className="w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption">
+              <thead>
               <tr className="text-[var(--color-text-tertiary)]">
                 <th scope="col" className="px-1 py-1 text-start font-bold">{t.colYear}</th>
                 <th scope="col" className="px-1 py-1 text-end font-bold">{t.colForecast}</th>
@@ -627,9 +629,10 @@ export function ForecastRetroCard({ t, fmt, locale }: { t: FrT; fmt: Fmt; locale
                 </tr>
               ) : null}
             </tbody>
-          </table>
+            </table>
+          </div>
         </div>
-      </div>
+      ) : null}
       {open ? (
         <div className="mt-1 flex flex-col gap-2">
           <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">

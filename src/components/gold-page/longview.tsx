@@ -77,6 +77,10 @@ type LongviewT = {
   title: string;
   subtitle: string;
   chartAria: string;
+  /** the two-century chart's inline-expand toggle (the owner's
+   *  2026-11-26 evening ask: the chart hides, the verdict stays) */
+  chartOpenLabel: string;
+  chartHideLabel: string;
   scaleLog: string;
   scaleLinear: string;
   viewAll: string;
@@ -330,6 +334,10 @@ export function LongViewCard({
   /* the chart's own state — the view (all / 100 years) and the Y scale */
   const [view, setView] = React.useState<"all" | "100y">("all");
   const [scale, setScale] = React.useState<"log" | "linear">("log");
+  /* the owner's 2026-11-26 evening ask: the two-century chart hides
+     behind an inline expand — the 20-year verdict and table stay in
+     the open, the long history opens on demand */
+  const [chartOpen, setChartOpen] = React.useState(false);
 
   const points = React.useMemo(() => chartPoints(liveSpot), [liveSpot]);
   const visible = React.useMemo(
@@ -514,6 +522,22 @@ export function LongViewCard({
         </div>
       </div>
 
+      {/* the two-century chart — behind ONE inline expand (the owner's
+          2026-11-26 evening ask): the 20-year verdict below stays the
+          section's face; the long history opens on demand, in flow */}
+      <button
+        type="button"
+        aria-expanded={chartOpen}
+        aria-controls="gold-longview-chart"
+        onClick={() => setChartOpen((o) => !o)}
+        className="mt-3 inline-flex min-h-[36px] w-fit items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
+        data-longview-chart-toggle
+      >
+        {chartOpen ? t.chartHideLabel : t.chartOpenLabel}
+        <Hourglass className={`h-3.5 w-3.5 transition-transform ${chartOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+      </button>
+      {chartOpen ? (
+      <div id="gold-longview-chart" className="flex flex-col">
       {/* the toggles — the view (all / 100 years) and the Y scale */}
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         <div role="group" aria-label={t.viewAll} className="flex gap-1.5">
@@ -580,6 +604,8 @@ export function LongViewCard({
           {t.eraFree}
         </span>
       </div>
+      </div>
+      ) : null}
 
       {/* the last 20 years, year by year — IN THE OPEN (batch L: the
           owner's law, «طلا در بیست سال اخیر» visible, never behind a

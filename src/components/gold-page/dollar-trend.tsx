@@ -380,6 +380,10 @@ export function DollarTrendBand({
   /* the decomposition's method note (the multiplicative identity) hides
      behind its own toggle (the owner's 2026-11-26 ask) */
   const [decompNoteOpen, setDecompNoteOpen] = React.useState(false);
+  /* the owner's 2026-11-26 evening ask: the section's face is the CHART —
+     every verdict box, table, machine and note rides ONE inline expand
+     below the chart; the graph and its controls are all that shows */
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
   /* the growth decomposition (batch M) — rides the chart's own start
      year, so the reader's picked span is the span being explained; the
      dollar's global decay against gold over the same span is its
@@ -513,6 +517,13 @@ export function DollarTrendBand({
             </>
           ) : null}
 
+          {/* the owner's 2026-11-26 evening ask: everything below the
+              chart — the two verdict boxes, the decay line, the race
+              table, the decoupling list, the decomposition, the arc,
+              the method — rides ONE inline expand. The section's face
+              is the chart; the details stay one tap away, in flow. */}
+          {detailsOpen ? (
+          <>
           {/* zone 1.5 — THE two most important verdicts (batch M): the
               single year the two assets moved most alike, and the single
               year they moved most apart — the race's most faithful and
@@ -574,8 +585,13 @@ export function DollarTrendBand({
               </bdi>
             </p>
           ) : null}
+          </>
+          ) : null}
 
-          {/* zone 2 — the chart */}
+          {/* zone 2 — the chart controls + the chart itself: THE
+              section's face (the owner's 2026-11-26 evening ask) —
+              the picker, the scale, the readout and the graph always
+              in the open */}
           <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-2">
             <label className="flex flex-col gap-1">
               <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{t.startLabel}</span>
@@ -661,6 +677,25 @@ export function DollarTrendBand({
               {locale === "en" ? "1392 → today · the Tehran market" : "۱۳۹۲ → امروز · بازار تهران"}
             </span>
           </div>
+
+          {/* the one inline expand (the owner's 2026-11-26 evening ask):
+              every detail below the chart — the race table, the
+              decoupling years, the growth decomposition, the premium
+              arc, the method — opens in flow under this one button; the
+              graph above stays the section's whole face */}
+          <button
+            type="button"
+            aria-expanded={detailsOpen}
+            aria-controls="gold-dollar-trend-details"
+            onClick={() => setDetailsOpen((o) => !o)}
+            className="mt-3 inline-flex min-h-[36px] w-fit items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
+            data-dollar-trend-details-toggle
+          >
+            {detailsOpen ? t.detailsHideLabel : t.detailsOpenLabel}
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform ${detailsOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+          </button>
+          {detailsOpen ? (
+          <div id="gold-dollar-trend-details" className="flex flex-col">
 
           {/* zone 3 — the race table */}
           <div className="mt-3">
@@ -837,14 +872,10 @@ export function DollarTrendBand({
               <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-bridge-accent)]">{t.decompTitle}</h3>
               <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
                 <bdi>
-                  {t.decompLine
-                    .replace("{year}", yearLabel(decomp.startJy, locale))
-                    .replace("{g}", fmt.num(decomp.goldX, 0))
-                    .replace("{d}", fmt.num(decomp.dollarX, 0))
-                    .replace("{w}", fmt.num(decomp.globalX, 0))
-                    /* the premium leg lives near ×۱ — two decimals so a
-                       ۱٫۰۴ never collapses into a clean ×۱ */
-                    .replace("{p}", fmt.num(decomp.premiumX, 2))}
+                  {/* the owner's 2026-11-26 evening ask: the giant
+                      ×totals retired — the sentence names the three
+                      drivers; the shares ride the pie and the verdict */}
+                  {t.decompLine.replace("{year}", yearLabel(decomp.startJy, locale))}
                 </bdi>
               </p>
               {decomp.shares !== null ? (
@@ -895,10 +926,12 @@ export function DollarTrendBand({
                       <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">{fmt.pct(decomp.shares.premiumPct, Math.abs(decomp.shares.premiumPct) < 0.95 ? 1 : 0)}</bdi>
                     </span>
                   </div>
-                  {/* the boxed verdict (the owner's 2026-11-26 ask): the
-                      shares sentence as its own contained box — the
-                      section's takeaway, boxed like the race's own
-                      verdict chips, never a bare paragraph */}
+                  {/* the boxed verdict (the owner's 2026-11-26 evening
+                      ask): the PRICE-COMPOSITION sentence — of the
+                      current gold price in Iran, how much is the
+                      world's own price growth and how much the rial's
+                      lost value — as its own contained box, the
+                      section's takeaway, never a bare paragraph */}
                   <div
                     className="rounded-[var(--cr-radius-md)] px-3 py-2.5"
                     style={{
@@ -909,10 +942,12 @@ export function DollarTrendBand({
                   >
                     <p className="m-0 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]">
                       <bdi>
-                        {t.decompSharesLine
-                          .replace("{r}", fmt.pct(decomp.shares.rialPct, 0))
-                          .replace("{w}", fmt.pct(decomp.shares.globalPct, 0))
-                          .replace("{p}", fmt.pct(decomp.shares.premiumPct, Math.abs(decomp.shares.premiumPct) < 0.95 ? 1 : 0))}
+                        {/* unsigned — a composition share, not a delta:
+                            «about 28%», never «+28%» (fmt.pct always
+                            signs, so the share rides fmt.num + ٪) */}
+                        {t.decompPriceLine
+                          .replace("{w}", `${fmt.num(Math.abs(decomp.shares.globalPct), 0)}${locale === "fa" ? "٪" : "%"}`)
+                          .replace("{r}", `${fmt.num(Math.abs(decomp.shares.rialPct), 0)}${locale === "fa" ? "٪" : "%"}`)}
                       </bdi>
                     </p>
                   </div>
@@ -1006,6 +1041,8 @@ export function DollarTrendBand({
               </div>
             ) : null}
           </div>
+          </div>
+          ) : null}
         </>
       )}
     </section>
@@ -1021,7 +1058,7 @@ export function DollarTrendBand({
  * carries over, the legend below still names every leg.
  * ------------------------------------------------------------------ */
 
-const PIE_R = 54;
+const PIE_R = 64;
 const PIE_C = 2 * Math.PI * PIE_R;
 
 function DecompPie({
@@ -1059,25 +1096,30 @@ function DecompPie({
      12 o'clock start, clockwise (the rotate(-90) + dashoffset law) */
   const labelPos = (mid: number): { x: number; y: number } => {
     const theta = (mid / PIE_C) * 2 * Math.PI;
-    return { x: 88 + (PIE_R + 1) * Math.sin(theta), y: 88 - (PIE_R + 1) * Math.cos(theta) };
+    return { x: 110 + (PIE_R + 1) * Math.sin(theta), y: 110 - (PIE_R + 1) * Math.cos(theta) };
   };
   const pctText = (v: number): string => `${fmt.num(v, 0)}${locale === "fa" ? "٪" : "%"}`;
   return (
     <div className="mt-1.5 flex justify-center">
-      <svg dir="ltr" viewBox="0 0 176 176" className="h-[168px] w-[168px]" role="img" aria-label={ariaLabel}>
-        <g transform="rotate(-90 88 88)">
-          <circle cx={88} cy={88} r={PIE_R} fill="none" stroke="var(--color-border)" strokeWidth={22} opacity={0.3} />
+      {/* the owner's 2026-11-26 evening ask: the pie BIGGER (220px, was
+          168) and the hole carries ONLY the descriptive title — the
+          ×546,929-style total multiple retired from the hole (the full
+          multiples stay in the decomp sentence above and the verdict
+          box below carries the price-composition reading) */}
+      <svg dir="ltr" viewBox="0 0 220 220" className="h-[210px] w-[210px]" role="img" aria-label={ariaLabel}>
+        <g transform="rotate(-90 110 110)">
+          <circle cx={110} cy={110} r={PIE_R} fill="none" stroke="var(--color-border)" strokeWidth={26} opacity={0.3} />
           {arcs.map(
             (a, i) =>
               a.dash > 0.5 ? (
                 <circle
                   key={i}
-                  cx={88}
-                  cy={88}
+                  cx={110}
+                  cy={110}
                   r={PIE_R}
                   fill="none"
                   stroke={a.color}
-                  strokeWidth={22}
+                  strokeWidth={26}
                   opacity={0.62}
                   strokeDasharray={`${a.dash} ${PIE_C - a.dash}`}
                   strokeDashoffset={-a.offset}
@@ -1089,27 +1131,21 @@ function DecompPie({
           if (a.pct < 9) return null; // too thin to label on the ring — the legend names it
           const { x, y } = labelPos(a.mid);
           return (
-            <text key={`t${i}`} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight={800} fill="var(--color-text-primary)">
+            <text key={`t${i}`} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={800} fill="var(--color-text-primary)">
               {pctText(a.pct)}
             </text>
           );
         })}
-        {/* the hole — a descriptive title over the total multiple (the
-            owner's 2026-11-26 ask: a name, not a bare ×formula). The
-            title renders on its own line with the hole's own width and
-            the multiple sits under it; the font stays a step small so a
-            long locale's title never grazes the ring */}
-        <foreignObject x={48} y={70} width={80} height={26} style={{ direction: locale === "fa" ? "rtl" : "ltr" }}>
+        {/* the hole — the descriptive title alone (the owner's ask: no
+            ×multiple, no formula), two comfortable lines in a big hole */}
+        <foreignObject x={58} y={86} width={104} height={48} style={{ direction: locale === "fa" ? "rtl" : "ltr" }}>
           <div
             className="flex h-full items-center justify-center text-center"
-            style={{ fontSize: "9px", fontWeight: 700, color: "var(--color-text-secondary)", lineHeight: 1.3 }}
+            style={{ fontSize: "11px", fontWeight: 700, color: "var(--color-text-secondary)", lineHeight: 1.45 }}
           >
             {centerTitle}
           </div>
         </foreignObject>
-        <text x={88} y={98} textAnchor="middle" dominantBaseline="central" fontSize={15} fontWeight={800} fill="var(--color-text-primary)">
-          ×{fmt.num(multiple, 0)}
-        </text>
       </svg>
     </div>
   );

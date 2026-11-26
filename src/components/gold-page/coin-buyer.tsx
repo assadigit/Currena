@@ -53,6 +53,9 @@ type CoinBuyerT = {
   perCoinLine: string;
   meltLine: string;
   unavailable: string;
+  /** the blank-amount prompt — the answer box's own gentle stand-in
+   *  (the machine never unmounts, the owner's bug report) */
+  enterAmountLine: string;
   millionToman: string;
   billionToman: string;
   tomanWord: string;
@@ -121,9 +124,19 @@ export function CoinBuyerBand({
   const emami = premium.rows.find((r) => r.id === "coin-emami") ?? null;
   const emamiQuote = quotes.find((q) => q.id === "coin-emami") ?? null;
 
-  /* the machine's answer — one coherent snapshot, every leg named */
+  /* the machine's answer — one coherent snapshot, every leg named.
+   *  amount<=0 is NOT an error state: the inputs stay mounted (the
+   *  owner's 2026-11-26 bug report — clearing the field to type a
+   *  second amount unmounted the input mid-typing and it never came
+   *  back without a refresh); an empty amount only blanks the ANSWER,
+   *  the machine itself never disappears. */
+  const legsReady = currency !== null && (() => {
+    const row = fxRows.find((r) => codeOf(r) === currency);
+    const emamiPrice = emamiQuote?.price;
+    return row !== undefined && emamiPrice !== undefined && Number.isFinite(emamiPrice) && emamiPrice > 0;
+  })();
   const answer = React.useMemo(() => {
-    if (currency === null) return null;
+    if (!legsReady || currency === null) return null;
     const row = fxRows.find((r) => codeOf(r) === currency);
     if (row === undefined) return null;
     const emamiPrice = emamiQuote?.price;
@@ -135,7 +148,7 @@ export function CoinBuyerBand({
     const coins = amountToman / emamiPrice;
     const meltCoins = emami !== null && emami.intrinsicToman > 0 ? amountToman / emami.intrinsicToman : null;
     return { tomanPerUnit, amountToman, coins, meltCoins };
-  }, [currency, fxRows, amount, emamiQuote, emami]);
+  }, [legsReady, currency, fxRows, amount, emamiQuote, emami]);
 
   const nameOf = (code: string): string => CURRENCY_NAMES[code]?.[lan(locale)] ?? code.toUpperCase();
 
@@ -151,7 +164,7 @@ export function CoinBuyerBand({
         </div>
       </div>
 
-      {rates === null || answer === null ? (
+      {rates === null || !legsReady ? (
         <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.unavailable}</p>
       ) : (
         <>
@@ -212,7 +225,15 @@ export function CoinBuyerBand({
             </label>
           </div>
 
-          {/* the answer — the full coins the money buys, beside the coin itself */}
+          {/* the answer — the full coins the money buys, beside the coin
+              itself. A blank/zero amount keeps the box alive as its own
+              gentle prompt (the owner's bug report: never unmount the
+              machine mid-typing), never a vanishing input */}
+          {answer === null ? (
+            <div className="flex flex-col gap-1 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
+              <p className="m-0 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.enterAmountLine}</p>
+            </div>
+          ) : (
           <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
             <div className="flex items-center gap-3">
               <img
@@ -259,6 +280,7 @@ export function CoinBuyerBand({
               </p>
             ) : null}
           </div>
+          )}
         </>
       )}
     </div>
