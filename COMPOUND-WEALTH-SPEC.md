@@ -43,8 +43,8 @@ For **the owner himself, as a personal motivator** (phase 1). Many people undere
 
 It must answer instantly: "If I invest 100 a month for 20 years, with average returns and compounding, how much would I have, after realistic costs?" and, for people who think in percentages: "If I invest 3% of my salary, how much is that and what does it become?"
 
-Scope in: tool page, `/tools` index, country presets (Australia, USA), asset chips, years, amount or percent of salary, buying costs, milestones, what-if cards, A4 PDF card, phone card, English and Farsi.
-Out of scope (later phases, appendix A): time machine and any real-history calculation, historical-outcome ranges, compare two plans, goal tab, mix sliders, live conditions strip, scheduled jobs, KV, accounts, share links, calendar reminders, taxes, AI narration. **Store nothing: no localStorage, cookies, server writes, or numbers in the URL.**
+Scope in: tool page, `/tools` index, country presets (Australia, USA), asset chips, years, amount or percent of salary, buying costs, milestones, what-if cards, A4 PDF card, phone card, English and Farsi, and (v7) the optional after-tax estimate layer.
+Out of scope (later phases, appendix A): time machine and any real-history calculation, historical-outcome ranges, compare two plans, goal tab, mix sliders, live conditions strip, scheduled jobs, KV, accounts, share links, calendar reminders, AI narration. **Store nothing: no localStorage, cookies, server writes, or numbers in the URL.**
 
 ## 3. URLs and routing (already live; keep)
 
@@ -101,19 +101,19 @@ Goal: let people think the way they naturally do. Some say "100 a month"; some s
 
 ### 5.3 More options (collapsed; four plain groups)
 - **About you:** current age (adds "at age N"); starting amount (0; treated as already invested, no purchase cost). Salary is **not** here (it lives in the amount group, 5.1.1). The "years of salary" line appears once a salary is entered.
-- **Costs:** yearly cost (0.2%, "an assumption, change it", 0%–3%; not applied to Cash); cost per purchase (0); how often I buy (every month or every 3 months).
+- **Costs:** yearly cost (0.2%, "an assumption, change it", 0%–3%; not applied to Cash); cost per purchase (0); how often I buy (every month or every 3 months); **tax on your growth (estimate, v7)** — off until set (0–60%, clamped with one plain message), with an optional guided rate from a rough yearly income when the country is AU or US (income is session state only — never on a card, never in the URL, never stored; the US estimator adds a filing-status control offering exactly the statuses the tax data file carries).
 - **Rates:** return = Average (default), Custom rate, or Custom range (low and high); inflation (country average, editable 0%–15%); yearly increase of what you invest (Amount mode 0%; % mode = country inflation average; 0%–15%); "what if it's lower" points (2).
 - **Dates and compare:** custom start and end month (future only; start not before this month; end up to 50 years); collapsible "Compare assets" table (every asset for the country plus Custom and Cash: rate used, final amount, low and high).
 
 Rules: recalculate instantly; clamp out-of-range values with one small plain message; reload resets everything.
 
 ### 5.4 Page bottom
-**How is this worked out?** (collapsible, plain words): four-line method; the exact index behind each asset (W5); the 20-year/30-year overlap note; figures are total returns before tax unless a row says price only; yearly cost is an assumption and does not apply to cash; **the inflation used for today's money, and the latest 12-month inflation figure with its source and date (W3)**; in % mode, the assumption that your amount grows with your salary; cash waiting between purchases earns nothing; "employer super may already exist, so this is for extra money you invest on your own" (no rate stated); no taxes; exchange-rate effects are only those inside the AUD figures; past performance is not a promise. Then the site's existing single disclaimer component, unchanged. Staleness note when needed (7).
+**How is this worked out?** (collapsible, plain words): four-line method; the exact index behind each asset (W5); the 20-year/30-year overlap note; figures are total returns before tax unless a row says price only; yearly cost is an assumption and does not apply to cash; **the tax model (v7): tax is assumed paid each year on growth at the rate you set — costs first, then tax, then inflation for today's money; the guided rate is an estimate from official schedules, with source and date shown; plus the plain list of what is not included (US state taxes, capital-gains timing and discounts, tax-sheltered accounts such as super, 401(k) and ISA-style, offsets and credits, franking credits, any levy not named in the estimate); while the tax is off the fold still says "No taxes are included."**; the inflation used for today's money, and the latest 12-month inflation figure with its source and date (W3); in % mode, the assumption that your amount grows with your salary; cash waiting between purchases earns nothing; "employer super may already exist, so this is for extra money you invest on your own" (no rate stated); exchange-rate effects are only those inside the AUD figures; past performance is not a promise. Then the site's existing single disclaimer component, unchanged. Staleness note when needed (7).
 
 ## 6. The maths (exact)
 
-### 6.1 Core engine (unchanged)
-`r_net = r − cost` (cost 0 for Cash, see 6.5). Monthly rate `i = (1 + r_net)^(1/12) − 1`. Months run from the start month to the end month inclusive (`n`), `m = 1 … n`; default start = this month, end = start + years.
+### 6.1 Core engine (unchanged except the v7 tax rule)
+`r_net = r − cost` (cost 0 for Cash, see 6.5). **v7: after the cost rule, `r_after = r_net × (1 − taxRate)` — one rule, applied to every rate the engine touches (baseline, both band ends, custom rate and range, the compare table, Cash, every what-if); deposits, the purchase fee and the pending rule are untouched (tax never touches money you put in, only growth); Cash growth is taxed too — bank interest is taxable income — while the fund cost stays off Cash; the order is cost, then tax, then inflation for today's money.** Monthly rate `i = (1 + r_after)^(1/12) − 1`. Months run from the start month to the end month inclusive (`n`), `m = 1 … n`; default start = this month, end = start + years.
 - Deposit in year `y` (0 for the first 12 months): `d_m = base × (1 + g)^y`.
   - **Amount mode:** `base` = the amount; `g` = yearly increase (default 0%).
   - **% mode:** `base` = `monthly_salary × percent / 100`; `g` = yearly increase (default = country inflation average).
@@ -162,13 +162,13 @@ Decoration: calm, editorial, clearly Currena: quiet growth motif in inline SVG (
 Full-screen portrait view to **screenshot as a lock screen**; view only. Fills the viewport (`100dvh`); on desktop a centred phone-shaped frame (about 9:19.5). Safe zones: top ~28% and bottom ~12% free of text. Content in the middle band: the big final amount (today's money smaller beneath); "100 a month · 20 years" (% mode: "3% of salary · A$225 a month · 20 years"); stacked-area sparkline (SVG); next milestone; the strong sentence; tiny footer "An illustration, not a promise · currena.ir". Dark by default with a Light option; minimum text 14px at 390px width; no clipping at 360×800, 390×844, 430×932; help line "Take a screenshot, then set it as your lock screen." No PNG export.
 
 ## 9. Known limits (stated in the collapsible section)
-Averages are not a forecast and the 20- and 30-year figures overlap. No taxes. Exchange-rate effects only as already inside the AUD figures. Figures are reviewed by hand and carry a "checked on" date. Inflation for today's money is a long-run average; recent inflation can be higher or lower.
+Averages are not a forecast and the 20- and 30-year figures overlap. The tax layer (v7) is an estimate, not a tax return: US state taxes, capital-gains timing and discounts, tax-sheltered accounts, offsets and franking credits are not included, and the fold says so. Exchange-rate effects only as already inside the AUD figures. Figures are reviewed by hand and carry a "checked on" date. Inflation for today's money is a long-run average; recent inflation can be higher or lower.
 
 ## 10. Quality rules
 Maths in one small separate module with a config block at the top (milestones, defaults, thresholds, `APPLY_COST_TO_CASH`, percent limits, each with a plain-English comment); figures file separate. Accessible: labelled inputs, keyboard use, visible focus, AA contrast in light and dark, chart text summary. Reuse the Insights chart approach; no large new libraries. Do not change or degrade Insights, the converter, or narrator work; do not move or rename existing pages. Run the repo's gates command before and after.
 
 ## 11. Config block (top of the maths module)
-Defaults: amount 100, percent 3, years 20, yearly cost 0.2%, what-if points 2, band threshold 0.5 points, percent limits 0.1–50, percent step 0.5, percent chips 1/3/5/10, salary period default "year", inflation limits 0–15%, milestone list, staleness months 18, default country Australia, `APPLY_COST_TO_CASH = false`.
+Defaults: amount 100, percent 3, years 20, yearly cost 0.2%, what-if points 2, band threshold 0.5 points, percent limits 0.1–50, percent step 0.5, percent chips 1/3/5/10, salary period default "year", inflation limits 0–15%, milestone list, staleness months 18, default country Australia, `APPLY_COST_TO_CASH = false`. **v7: `TAX_MIN = 0`, `TAX_MAX = 0.60` (a ceiling, not a suggestion), tax stepper step 1 point, default 0 (off until set).**
 
 ## 12. Required tests
 
@@ -222,6 +222,21 @@ Defaults: amount 100, percent 3, years 20, yearly cost 0.2%, what-if points 2, b
 37. **W5:** About names the exact index behind each asset; chips keep plain names.
 38. **W6:** tiles show the currency symbol in both countries; header "Tools" links to `/tools`.
 
+**The tax layer (39–51, v7)**
+39. **Tax off = v6 exactly:** no tax-shaped element exists on the default screen; with `taxRate` 0 or absent, every result is byte-identical to v6 (the whole v6 suite re-run unmodified).
+40. **The engine rule:** `afterTaxRate = (baseline − cost) × (1 − tax)`; the order matters (cost first, then tax); monotonicity — a higher tax always lowers the final while the put-in, fees and pending stay untouched; Cash growth is taxed while the fund cost stays off Cash; both band ends and the compare table pass through the same rule.
+41. **Fixed vectors:** at least two taxed scenarios computed by the reference engine and pinned from its output, plus the strongest regression — `taxRate = 0` reproduces today's results exactly.
+42. **The tax-takes what-if:** the same plan run with the tax off, differenced on the finals; null while the tax is off; never on the default screen.
+43. **The estimator (AU):** bracket edges at each ATO threshold; the Medicare levy (2%) added to the bracket rate; the citation fields (source, year label, URL, checked-on date) ride on the result; non-positive income returns null.
+44. **The estimator (US):** every filing status present; bracket edges; the net-investment-income component appears exactly at its threshold per status (one dollar below vs on it).
+45. **Staleness:** the tax file carries one `TAX_CHECKED_ON` date with the same 18-month rule as the figures file; the estimator warns when stale.
+46. **Clamping and config:** 0–60% with one small plain message; `TAX_MIN`/`TAX_MAX`/step 1/default 0 in the config block.
+47. **The interface:** the row lives inside More options → Costs (nothing new on the default screen); manual and guided flows through the real interface (AU and US); the caption "After tax at N% a year (estimate)."; the cards gain the one tax line and never show the income; fa + RTL with Persian digits; store nothing; no network; one-screen fit at the three sizes with More options open; full keyboard path.
+48. **Plain language:** the word "marginal" never appears; the How fold's not-included list is present with tax on and absent with tax off; average sentence length holds.
+49. **The grid:** the taxed grid (at least three tax levels across the strata) replayed engine-side and a stratified subset through the live interface.
+50. **The tax data file:** every value sourced from an official page fetched this session (ATO and IRS), with URL, income-year label and retrieval date recorded in the report; or the estimator hidden with the blocked-door record.
+51. **The How fold's on/off pair:** "No taxes are included." with the tax off (the v6 line, unchanged); the model, the guided source line and the not-included list with the tax on.
+
 ## 13. Definition of done
 1. Everything in section 1.3 done, tests 1–38 pass (or UNVERIFIED with a stated reason).
 2. The simplicity contract holds with the percent calculator added (tests 12–18).
@@ -233,11 +248,22 @@ Defaults: amount 100, percent 3, years 20, yearly cost 0.2%, what-if points 2, b
 8. `COMPOUND-WEALTH-REPORT.md` updated: what changed, every figure with value, period, exact index and source link, AUD derivations with endpoint FX values and dates, cross-check table with gaps, hidden rows and what is needed, config values, anything unfinished, how to roll back.
 9. After building, the full test pass from `COMPOUND-WEALTH-TEST-PROMPT.md` has been run, its report written to `COMPOUND-WEALTH-TEST-REPORT.md`, and all code or wording defects it found are fixed and re-tested.
 
+**v7 additions (from COMPOUND-WEALTH-V7-PROMPT.md):**
+10. Preflight gates recorded before feature work; any red gate fixed first.
+11. Tax off = v6 exactly: the unmodified v6 suites all pass (reference selftest, unit tests, browser harness, grid replay, Phase A, lint).
+12. Tax on: engine, reference engine, grid, unit and browser tests green with evidence; at least two reference-computed fixed vectors; the tax = 0 exact-equality regression.
+13. The tax data file fully sourced (official URLs, dates, income-year labels, notes) — or the estimator hidden with the blocked-door recorded.
+14. The mobile contract re-verified at the three sizes; the sticky bar intact; the new UI AA-clean; Lighthouse not below 98/97, recorded; zero new axe violations.
+15. Live deploy verified end-to-end: the grid subset through the real interface, the golden path with tax on and off, EN + fa, screenshots in `docs/compound-tests/`, zero console errors.
+16. Insights, the converter, the narrator and the gold pages unaffected.
+
 ## Appendix A: Later phases (not now)
 - **Phase 2:** time machine using real history (US first via a published dataset; Australia only if a legally reusable source exists), historical-outcome ranges (worst, middle, best) to replace the what-if band, scheduled refresh of figures.
 - **Phase 3:** compare two plans, goal tab ("how much per month to reach X"), asset mix, live conditions strip, more currencies, salary per fortnight or week.
 - Possible: Toman view; PNG export of the phone card; progress tracking belongs in the owner's money/runway tracker, not in this tool. Every future addition must pass the simplicity contract or live inside "More options".
+- **Deliberately not built (v7 decision):** state-by-state US tax tables, capital-gains modelling, account wrappers (super, 401(k), ISA-style), offsets and credits, franking credits, auto-updating scrapers — each fails the simplicity contract or the sourcing rules; the How fold and the report list them.
 
 ## Appendix B: Owner decisions
 Still apply: simple above everything; URL `currena.ir/tools/compound-wealth`; phase 1 for the owner himself; phone card as the reminder; no storage; fixed, custom and percent amounts; optional age; calm tone with one strong sentence; years-of-salary line; end-of-month deposits; both money views; custom rate or range; yearly cost 0.2%; super note; stacked chart plus thin lines; sticky mobile results; wording per style guide; PDF by browser print-to-PDF; Australia and USA defaults using the lower of the 20- and 30-year figures; milestones; World shares.
 New in v6: the percent-of-salary mini calculator inside the amount control (the system converts automatically, in both directions; salary is never shown on the cards); fixes W1–W6 from the audit; no yearly cost on cash (reversible switch); inflation shown in plain words next to today's money.
+New in v7 (this session's owner direction): the optional after-tax estimate layer — one tax rate in the engine applied to every scenario, off by default (tax off = v6 exactly), living inside More options → Costs; a guided AU/US rate from official, dated schedules (ATO and IRS); the estimator's income is session state only; the deliberately-not-built list (state-by-state US tables, capital-gains modelling, account wrappers, offsets and credits, franking credits, auto-updating scrapers) recorded here and in the report.
