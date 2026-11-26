@@ -438,3 +438,73 @@ describe("the shipped figures file", () => {
     expect(world.single!.years).toBeGreaterThanOrEqual(10);
   });
 });
+
+/* ---------------------------------------------------------------- */
+/* v6 regression lock — the live numbers verified by independent     */
+/* recomputation on 2026-11-25 (spec v6 §1.1). Start month frozen at */
+/* 2026-11 (the build month) so the dates stay testable. The plan is */
+/* exactly the page defaults: 100 a month, 20 years, Australian      */
+/* shares (7.2% over 20y, 9.0% over 30y — the lower is used),        */
+/* yearly cost 0.2%, inflation 2.76% (the AU average).              */
+/* ---------------------------------------------------------------- */
+describe("v6 regression lock: the live defaults (spec §1.1)", () => {
+  const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+  const plan = basePlan({
+    yearlyCost: 0.002,
+    inflation: defaultInflation("AU"),
+  });
+  const r = computeCompound(plan, AU_SHARES, monthsBetween("2026-11", "2046-11"));
+
+  test("you put in exactly 24,000", () => {
+    expect(r.totalPutIn).toBe(24_000);
+  });
+  test("final ≈ 50,754 — the page says about 50,800", () => {
+    expect(within(r.finalValue, 50_753.6, 0.1)).toBe(true);
+    expect(Math.round(r.finalValue / 100) * 100).toBe(50_800);
+  });
+  test("growth ≈ 26,754 — the page says 26,800", () => {
+    expect(within(r.growth, 26_753.6, 0.1)).toBe(true);
+    expect(Math.round(r.growth / 100) * 100).toBe(26_800);
+  });
+  test("today's money ≈ 29,441 — the page says about 29,400", () => {
+    expect(within(r.finalValueToday, 29_441, 0.2)).toBe(true);
+    expect(Math.round(r.finalValueToday / 100) * 100).toBe(29_400);
+  });
+  test("the band: low ≈ 40,600 at 5.2%, high ≈ 62,400 at 9.0%", () => {
+    expect(r.band).not.toBeNull();
+    expect(Math.round((r.band!.low * 100) * 10) / 10).toBeCloseTo(5.2, 1);
+    expect(Math.round((r.band!.high * 100) * 10) / 10).toBeCloseTo(9.0, 1);
+    expect(Math.round(r.lowFinal! / 100) * 100).toBe(40_600);
+    expect(Math.round(r.highFinal! / 100) * 100).toBe(62_400);
+  });
+  test("the band's high end is a measured figure (30y vs 20y differ by 1.8)", () => {
+    expect(r.bandHighIsMeasured).toBe(true);
+  });
+  test("crossover: month 224 — June 2045", () => {
+    expect(r.crossoverMonth).toBe(224);
+    expect(addMonths("2026-11", 224 - 1)).toBe("2045-06");
+  });
+  test("milestones: the page's three are Jun 2033, Nov 2039, Sep 2046", () => {
+    const page = r.milestones.slice(-MILESTONES_ON_PAGE);
+    expect(page.map((m) => [m.threshold, m.month])).toEqual([
+      [10_000, 80],
+      [25_000, 157],
+      [50_000, 239],
+    ]);
+    expect(addMonths("2026-11", 80 - 1)).toBe("2033-06");
+    expect(addMonths("2026-11", 157 - 1)).toBe("2039-11");
+    expect(addMonths("2026-11", 239 - 1)).toBe("2046-09");
+  });
+  test("starting 5 years later costs ≈ 19,600", () => {
+    const c = whatIfLaterStart(plan, AU_SHARES, 240, 5);
+    expect(Math.round(c! / 100) * 100).toBe(19_600);
+  });
+  test("cash what-if — 32,100 with the cost WRONGLY applied (W2's before)", () => {
+    // The live page on 2026-11-26 showed "about 32,100", which is the cash
+    // rate (3.03%) with the 0.2% fund cost deducted. W2 removes the cost,
+    // so this expectation is DELIBERATELY re-pinned in the W2 block below.
+    const cashFigures = figuresOf(cashRow("AU")!);
+    const c = whatIfCash(plan, cashFigures, 240);
+    expect(Math.round(c! / 100) * 100).toBe(32_100);
+  });
+});
