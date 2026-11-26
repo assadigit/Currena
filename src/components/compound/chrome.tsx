@@ -3,16 +3,19 @@
 /**
  * Compound Wealth — the tools pages' site chrome.
  *
- * The gold page's own header/footer, restated small for the tools
- * namespace so nothing in the gold page itself has to move: same tokens,
- * same mark, same language and theme toggles, a real "Tools" nav chip
- * (this namespace's own page), and the sticky-footer layout contract
- * (min-h-screen flex column, mt-auto footer).
+ * The header and footer ARE the site's own chrome now
+ * (src/components/site/chrome.tsx): the real logo, the real nav,
+ * the real side drawer and the real footer of currena.ir, so every
+ * /tools page reads as a true sub-page of the site. The old
+ * self-made replica header (the coin mark + pill nav) is retired.
+ * The breadcrumb stays — it is page content, not site chrome — and
+ * the language state (read-only, the spec's no-storage rule) is
+ * still owned here.
  */
 
 import * as React from "react";
-import { useTheme } from "next-themes";
-import { Moon, Sun, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import type { CompoundCopy, Locale } from "@/lib/compound/content";
 
 /**
@@ -68,56 +71,12 @@ export function ToolsHeader({
   locale: Locale;
   onToggleLang: () => void;
 }) {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-  const dark = mounted && resolvedTheme === "dark";
-  return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[var(--color-surface)]/92 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-[1080px] items-center gap-3 px-3 sm:px-6 lg:h-20 lg:px-8">
-        {/* The link home is the site's own converter (the existing page,
-            untouched) — the tools namespace only ever points out. */}
-        <a href="https://currena.ir/" className="flex items-center gap-2.5">
-          <CurrenaMark className="h-9 w-9 lg:h-10 lg:w-10" />
-          <span className="flex flex-col leading-none">
-            <span className="text-[1.05rem] font-extrabold tracking-tight text-[var(--color-text-primary)] lg:text-[1.2rem]">
-              {copy.nav.site}
-            </span>
-            <span className="mt-0.5 text-[9.5px] font-semibold text-[var(--color-accent-gold-deep)]">{copy.nav.tagline}</span>
-          </span>
-        </a>
-        <nav className="mx-auto hidden items-center gap-1 lg:flex" aria-label="Site">
-          <span className="rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1.5 text-sm font-bold text-[var(--color-currena-blue-deep)]">
-            {copy.nav.tools}
-          </span>
-          <a
-            href="https://currena.ir/gold"
-            className="rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
-          >
-            Gold
-          </a>
-        </nav>
-        <div className="ms-auto flex items-center gap-2 lg:ms-0">
-          <button
-            type="button"
-            onClick={onToggleLang}
-            aria-label={locale === "en" ? "فارسی" : "English"}
-            className="min-h-[40px] min-w-[40px] rounded-xl bg-[var(--color-currena-soft)] px-3 text-sm font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform hover:scale-[1.03] active:scale-95"
-          >
-            {copy.nav.langToggle}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTheme(dark ? "light" : "dark")}
-            aria-label={dark ? "Light mode" : "Dark mode"}
-            className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform hover:scale-[1.03] active:scale-95"
-          >
-            {mounted ? (dark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />) : <Moon className="h-4.5 w-4.5" />}
-          </button>
-        </div>
-      </div>
-    </header>
-  );
+  /* The site's own header — every tools page is a sub-page of
+     currena.ir, so it wears the site's header with the Tools nav
+     item lit. (The copy's old nav strings are no longer drawn; the
+     prop stays so every existing call site keeps typing.) */
+  void copy;
+  return <SiteHeader locale={locale} onToggleLang={onToggleLang} active="tools" />;
 }
 
 /** The "← Tools" breadcrumb (spec §3, navigation) — the label is the
@@ -138,17 +97,12 @@ export function ToolsBreadcrumb({ copy, locale }: { copy: ToolsChromeCopy; local
   );
 }
 
-export function ToolsFooter({ copy }: { copy: ToolsChromeCopy }) {
-  return (
-    <footer className="mt-auto border-t border-[var(--color-border)] bg-[var(--color-surface)]">
-      <div className="mx-auto w-full max-w-[1080px] px-3 py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-          <span className="type-caption text-[var(--color-text-tertiary)]">{copy.tool.footer.rights}</span>
-          <span className="type-caption text-[var(--color-text-tertiary)]">{copy.tool.disclaimer}</span>
-        </div>
-      </div>
-    </footer>
-  );
+export function ToolsFooter({ copy, locale }: { copy: ToolsChromeCopy; locale: Locale }) {
+  /* The site's own footer, held to the viewport bottom by the
+     shell's flex column (the old rights/disclaimer lines live on in
+     each tool page's own body where they belong). */
+  void copy;
+  return <SiteFooter locale={locale} stickToBottom />;
 }
 
 /**

@@ -22,8 +22,8 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useTheme } from "next-themes";
-import { Moon, Sun, Lightbulb, ChevronRight } from "lucide-react";
+import { Lightbulb, ChevronRight } from "lucide-react";
+import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import {
   Dialog,
   DialogContent,
@@ -185,93 +185,14 @@ const lan = (l: Locale) => (l === "en" ? 0 : 1);
  * The site chrome
  * ------------------------------------------------------------------ */
 
-function CurrenaMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
-      <defs>
-        <linearGradient id="crCoin" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="var(--bal-brass-hi)" />
-          <stop offset="0.55" stopColor="var(--bal-brass-mid)" />
-          <stop offset="1" stopColor="var(--bal-brass-lo)" />
-        </linearGradient>
-      </defs>
-      <circle cx="20" cy="20" r="18.5" fill="url(#crCoin)" />
-      <circle cx="20" cy="20" r="14" fill="none" stroke="var(--bal-brass-ink)" strokeWidth="1.2" opacity="0.5" />
-      <circle cx="20" cy="20" r="10" fill="none" stroke="var(--bal-brass-ink)" strokeWidth="1" opacity="0.35" />
-      <rect x="12" y="17" width="3.2" height="7" rx="1.2" fill="var(--bal-brass-ink)" />
-      <rect x="17.2" y="13" width="3.2" height="11" rx="1.2" fill="var(--bal-brass-ink)" />
-      <rect x="22.4" y="15.4" width="3.2" height="8.6" rx="1.2" fill="var(--bal-brass-ink)" />
-      <rect x="27" y="18.6" width="3" height="5.4" rx="1.2" fill="var(--bal-brass-ink)" opacity="0.75" />
-    </svg>
-  );
-}
+/* The header and footer ARE the site's own chrome now
+ * (src/components/site/chrome.tsx): the real logo, the real nav, the
+ * real side drawer and the real footer of currena.ir — the gold page
+ * reads as a true sub-page of the site. The old self-made coin mark
+ * and pill nav are retired. */
 
-function Header({ t, locale, onToggleLang }: { t: typeof UI.en; locale: Locale; onToggleLang: () => void }) {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
-  const dark = mounted && resolvedTheme === "dark";
-  return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[var(--color-surface)]/92 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-[1080px] items-center gap-3 px-3 sm:px-6 lg:h-20 lg:px-8">
-        <a href="#top" className="flex items-center gap-2.5">
-          <CurrenaMark className="h-9 w-9 lg:h-10 lg:w-10" />
-          <span className="flex flex-col leading-none">
-            <span className="text-[1.05rem] font-extrabold tracking-tight text-[var(--color-text-primary)] lg:text-[1.2rem]">
-              {t.nav.site}
-            </span>
-            <span className="mt-0.5 text-[9.5px] font-semibold text-[var(--color-accent-gold-deep)]">{t.nav.tagline}</span>
-          </span>
-        </a>
-        <nav className="mx-auto hidden items-center gap-1 lg:flex" aria-label="Site">
-          {Object.entries(t.nav.links)
-            .filter(([key]) => key !== "tools")
-            .map(([, link], i) =>
-              i === 1 ? (
-                <span key={link} className="rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1.5 text-sm font-bold text-[var(--color-currena-blue-deep)]">
-                  {link}
-                </span>
-              ) : (
-                <span key={link} className="rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--color-text-secondary)]">
-                  {link}
-                </span>
-              ),
-            )}
-          {/* The tools namespace — a real link to the /tools index (the
-              Compound Wealth phase 1 routing). A plain <a> so the public
-              /tools URL is used in both mount points (dev and /gold). */}
-          <a
-            href="/tools"
-            className="rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
-          >
-            {t.nav.links.tools}
-          </a>
-        </nav>
-        <div className="ms-auto flex items-center gap-2 lg:ms-0">
-          <span className="hidden items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-2.5 py-1 text-[10px] font-bold text-[var(--color-currena-blue-deep)] sm:flex">
-            <span className="live-dot inline-block h-2 w-2 rounded-full bg-[var(--color-currena-success)]" aria-hidden="true" style={{ background: "var(--color-currena-success)" }} />
-            {t.nav.liveTag}
-          </span>
-          <button
-            type="button"
-            onClick={onToggleLang}
-            aria-label={locale === "en" ? "فارسی" : "English"}
-            className="min-h-[40px] min-w-[40px] rounded-xl bg-[var(--color-currena-soft)] px-3 text-sm font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform hover:scale-[1.03] active:scale-95"
-          >
-            {t.nav.langToggle}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTheme(dark ? "light" : "dark")}
-            aria-label={dark ? "Light mode" : "Dark mode"}
-            className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform hover:scale-[1.03] active:scale-95"
-          >
-            {mounted ? dark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
-          </button>
-        </div>
-      </div>
-    </header>
-  );
+function Header({ locale, onToggleLang }: { locale: Locale; onToggleLang: () => void }) {
+  return <SiteHeader locale={locale} onToggleLang={onToggleLang} active="gold" />;
 }
 
 const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | null; label: [string, string] }> = [
@@ -1248,16 +1169,8 @@ function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI
  * The takeaway + the footer
  * ------------------------------------------------------------------ */
 
-function Footer({ t }: { t: typeof UI.en }) {
-  return (
-    <footer className="mt-8 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
-      <div className="mx-auto w-full max-w-[1080px] px-3 py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-          <span className="type-caption text-[var(--color-text-tertiary)]">{t.footer.rights}</span>
-        </div>
-      </div>
-    </footer>
-  );
+function Footer({ locale }: { locale: Locale }) {
+  return <SiteFooter locale={locale} stickToBottom />;
 }
 
 /* ------------------------------------------------------------------ *
@@ -1376,10 +1289,10 @@ export default function GoldPage() {
   return (
     <div dir={t.dir} lang={locale} className="flex min-h-screen flex-col bg-[var(--color-currena-bg-light)]">
       <span id="top" />
-      <Header t={t} locale={locale} onToggleLang={() => setLocale((l) => (l === "en" ? "fa" : "en"))} />
+      <Header locale={locale} onToggleLang={() => setLocale((l) => (l === "en" ? "fa" : "en"))} />
       <SectionNav locale={locale} />
 
-      <main className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1080px] lg:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1080px] lg:px-8">
         {/* the heading block */}
         <header className="mb-3 sm:mb-4">
           <nav className="flex items-center gap-1.5 type-caption text-[var(--color-text-tertiary)]" aria-label="Breadcrumb">
@@ -1553,7 +1466,7 @@ export default function GoldPage() {
         )}
       </main>
 
-      <Footer t={t} />
+      <Footer locale={locale} />
     </div>
   );
 }

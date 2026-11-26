@@ -332,6 +332,12 @@
   --color-currena-warning-deep: #b92e2e;
   --color-currena-coral-deep: #9c5019;
 
+  /* — The site chrome's tint helpers (the main site's
+     bg-currena-blue/10 and /5, precomputed so the var() palette
+     can carry them) — */
+  --currena-blue-a10: rgba(74, 144, 226, 0.1);
+  --currena-blue-a5: rgba(74, 144, 226, 0.05);
+
   /* — The Insights ink ramp (every ink ≥ 7:1 on white) — */
   --color-text-primary: #2c3e50;
   --color-text-secondary: #47525d;
@@ -413,6 +419,9 @@
   --color-currena-warning-deep: #ff8080;
   --color-currena-coral-deep: #fbb48c;
 
+  --currena-blue-a10: rgba(111, 174, 236, 0.12);
+  --currena-blue-a5: rgba(111, 174, 236, 0.06);
+
   --color-text-primary: #e8edf4;
   --color-text-secondary: #a9b5c5;
   --color-text-tertiary: #a2aebc;
@@ -463,6 +472,12 @@
 /* — Farsi typography: Vazirmatn for :lang(fa) only — */
 :lang(fa) {
   font-family: var(--font-vazirmatn), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* — The site chrome's logo: the main site's own dark-mode rule,
+   verbatim — the brand image goes white when the page goes dark. — */
+.dark img.currena-brand-logo {
+  filter: brightness(0) invert();
 }
 
 /* — Type-role utilities (the four sizes the page speaks in) — */

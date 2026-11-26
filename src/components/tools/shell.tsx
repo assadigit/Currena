@@ -62,6 +62,7 @@ export function ToolPage({
       <ToolsHeader copy={chromeCopy} locale={locale} onToggleLang={toggleLang} />
 
       <main
+        id="main-content"
         className={`mx-auto w-full flex-1 px-3 py-4 sm:px-6 sm:py-5 ${
           wide ? "max-w-[560px] sm:max-w-[680px] lg:max-w-[860px]" : "max-w-[560px] sm:max-w-[680px] lg:max-w-[800px]"
         }`}
@@ -70,7 +71,7 @@ export function ToolPage({
         {typeof children === "function" ? children(locale) : children}
       </main>
 
-      <ToolsFooter copy={chromeCopy} />
+      <ToolsFooter copy={chromeCopy} locale={locale} />
     </div>
   );
 }

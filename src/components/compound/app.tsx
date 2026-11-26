@@ -474,7 +474,7 @@ export default function CompoundWealthApp() {
       <span id="top" />
       <ToolsHeader copy={copy} locale={locale} onToggleLang={toggleLang} />
 
-      <main className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[800px] lg:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[800px] lg:px-8">
         <ToolsBreadcrumb copy={copy} locale={locale} />
 
         {/* 1 — the country chips, then the title block */}
@@ -1229,7 +1229,7 @@ export default function CompoundWealthApp() {
         />
       ) : null}
 
-      <ToolsFooter copy={copy} />
+      <ToolsFooter copy={copy} locale={locale} />
     </div>
   );
 }

@@ -86,7 +86,7 @@ export default function ToolsIndex() {
         onToggleLang={toggleLang}
       />
 
-      <main className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[800px] lg:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[800px] lg:px-8">
         <header className="mt-2 mb-4">
           <p className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</p>
           <h1 className="mt-1 text-[1.7rem] font-extrabold leading-tight tracking-tight text-[var(--color-text-primary)]">
@@ -130,7 +130,7 @@ export default function ToolsIndex() {
         />
       </main>
 
-      <ToolsFooter copy={{ nav: copy.nav, tool: { title: t.title, disclaimer: copy.footer.disclaimer, footer: { rights: copy.footer.rights } } }} />
+      <ToolsFooter copy={{ nav: copy.nav, tool: { title: t.title, disclaimer: copy.footer.disclaimer, footer: { rights: copy.footer.rights } } }} locale={locale} />
     </div>
   );
 }
