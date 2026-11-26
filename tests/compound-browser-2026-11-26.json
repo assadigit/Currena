@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:3100",
+  "base": "https://currena.ir",
   "checks": [
     {
       "id": "12-answer-on-arrival",
@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 247ms"
+      "detail": "3 one-tap changes in 170ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -44,7 +44,7 @@
     {
       "id": "21-no-data-network",
       "pass": true,
-      "detail": "27 resources, all app assets"
+      "detail": "22 resources, all app assets"
     },
     {
       "id": "14-390x844-one-screen",

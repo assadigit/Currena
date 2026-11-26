@@ -201,11 +201,13 @@ async function main() {
   );
 
   // The page made no network requests for data (only app assets: Next
-  // chunks, the page itself and the site's own logo image).
+  // chunks, the page itself, the site's own logo image — and, on the live
+  // CDN, Cloudflare's own injected analytics beacon, which the app never
+  // asks for).
   const dataRequests = await page.evaluate(() => performance.getEntriesByType("resource").map((r) => r.name));
   check(
     "21-no-data-network",
-    dataRequests.every((u) => /\/_next\/|\/tools\/|\/images\/|\/icons\//.test(u)),
+    dataRequests.every((u) => /\/_next\/|\/tools\/|\/images\/|\/icons\/|cdn-cgi|cloudflareinsights/.test(u)),
     `${dataRequests.length} resources, all app assets`,
   );
 
@@ -721,8 +723,11 @@ async function main() {
     meta.title.includes("Compound Wealth") && meta.desc.length > 40 && meta.canonical === "https://currena.ir/tools/compound-wealth" && meta.ogTitle.length > 0 && meta.ogImage.includes("currena.ir"),
     JSON.stringify(meta).slice(0, 160),
   );
-  // The nav Tools link and the breadcrumb work.
-  await rp.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
+  // The nav Tools link and the breadcrumb work. On the dev server the
+  // root IS this worker's gold page; live, this worker's page is /gold
+  // (the root belongs to the main site, outside this repo).
+  const goldPath = BASE.includes("currena.ir") ? "/gold" : "/";
+  await rp.goto(`${BASE}${goldPath}`, { waitUntil: "domcontentloaded" });
   const toolsHref = await rp.evaluate(() => document.querySelector('header nav a[href="/tools"]')?.getAttribute("href"));
   check("20-nav-tools-link", toolsHref === "/tools");
   await rp.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "domcontentloaded" });
