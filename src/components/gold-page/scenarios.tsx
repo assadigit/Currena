@@ -13,6 +13,12 @@
  * spike walks in unannounced). Not a forecast — a list of the bends the
  * market itself watches, never the desk's own odds. The calendar rides
  * inside the same card: the events ARE the scenarios' own dates.
+ *
+ * The owner's 2026-11-26 refinement: the cards go compact — each
+ * direction line carries a SHORT label before the em-dash (the compact
+ * description, always visible) with the explanation behind a one-tap
+ * modal (the why-modal pattern the calendar's own rows ride), so the
+ * grid stays scannable and the reasoning stays one tap away.
  */
 
 import * as React from "react";
@@ -21,6 +27,13 @@ import type { Locale } from "@/lib/gold-page/content";
 import type { Fmt } from "@/components/gold-page/visuals";
 import { PackIcon } from "@/components/gold-page/pack-icon";
 import { upcomingEvents } from "@/components/gold-page/calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
@@ -31,24 +44,36 @@ export interface ScenarioT {
   downLabel: string;
   nextLabel: string;
   noSchedule: string;
-  /** the un-dated fifth force's own disclaimer (the owner's ask): the
- *   stress spike is not certain, so it is not a card — hedged words
- *   under the grid instead. */
+  /** the direction line's own one-tap affordance (the modal's trigger) */
+  whyLabel: string;
+  /** the professional disclaimer (the owner's 2026-11-26 ask): the
+   *   un-dated risks stated in a professional register, labelled —
+   *   visible but not loud, never the old informal aside */
+  disclaimerLabel: string;
   unscheduledNote: string;
 }
 
 /* ------------------------------------------------------------------ *
  * The scenario definitions (bilingual) — each links to a calendar
  * event id when the schedule actually dates it, else rides un-dated.
+ * Each direction case is a SHORT label (before the em-dash, always
+ * visible on the card) plus its full explanation (behind the modal).
  * ------------------------------------------------------------------ */
+
+interface ScenarioCase {
+  /** the short descriptive label — always visible (the owner's ask) */
+  short: [string, string];
+  /** the full explanation — one tap away, behind the modal */
+  why: [string, string];
+}
 
 interface ScenarioDef {
   id: string;
   /** The calendar event id this scenario is dated by (null = unscheduled). */
   calendarId: string | null;
   name: [string, string];
-  upCase: [string, string];
-  downCase: [string, string];
+  upCase: ScenarioCase;
+  downCase: ScenarioCase;
 }
 
 const SCENARIOS: ReadonlyArray<ScenarioDef> = [
@@ -56,57 +81,81 @@ const SCENARIOS: ReadonlyArray<ScenarioDef> = [
     id: "fed-rates",
     calendarId: "fomc",
     name: ["A change in the Fed's policy rate", "تغییر میزان نرخ بهرهٔ فدرال رزرو"],
-    upCase: [
-      "A cut, or a dovish hold — cash earns less, and gold's zero-yield rival weakens.",
-      "کاهش نرخ یا نگه‌داشتن با لحن انبساطی — پول نقد کم‌سودتر می‌شود و رقیبِ بدون‌بازدهیِ طلا ضعیف می‌شود.",
-    ],
-    downCase: [
-      "A hawkish hold, or a hike — richer cash re-arms the rival and pulls money out of gold.",
-      "نگه‌داشتن با لحن انقباضی یا افزایش نرخ — پول نقدِ پرسود رقیب را مسلح می‌کند و پول را از طلا بیرون می‌کشد.",
-    ],
+    upCase: {
+      short: ["A cut or a dovish hold", "کاهش نرخ یا نگه‌داشتن انبساطی"],
+      why: [
+        "A cut, or a dovish hold — cash earns less, and gold's zero-yield rival weakens.",
+        "کاهش نرخ یا نگه‌داشتن با لحن انبساطی — پول نقد کم‌سودتر می‌شود و رقیبِ بدون‌بازدهیِ طلا ضعیف می‌شود.",
+      ],
+    },
+    downCase: {
+      short: ["A hawkish hold or a hike", "نگه‌داشتن انقباضی یا افزایش نرخ"],
+      why: [
+        "A hawkish hold, or a hike — richer cash re-arms the rival and pulls money out of gold.",
+        "نگه‌داشتن با لحن انقباضی یا افزایش نرخ — پول نقدِ پرسود رقیب را مسلح می‌کند و پول را از طلا بیرون می‌کشد.",
+      ],
+    },
   },
   {
     id: "us-inflation",
     calendarId: "cpi",
     name: ["The US inflation print (CPI)", "انتشار تورم آمریکا (CPI)"],
-    upCase: [
-      "A hotter-than-expected print — inflation-hedging demand for gold picks up.",
-      "عددِ بالاتر از انتظار — تقاضای پناه‌گرفتن به طلا در برابر تورم بالا می‌رود.",
-    ],
-    downCase: [
-      "A cooler print — the hedge bid fades and the cut hopes thin.",
-      "عددِ خنک‌تر — تقاضای پناه طلا کم می‌شود و انتظارِ کاهش نرخ لاغر می‌شود.",
-    ],
+    upCase: {
+      short: ["A hotter-than-expected print", "عددِ بالاتر از انتظار"],
+      why: [
+        "A hotter-than-expected print — inflation-hedging demand for gold picks up.",
+        "عددِ بالاتر از انتظار — تقاضای پناه‌گرفتن به طلا در برابر تورم بالا می‌رود.",
+      ],
+    },
+    downCase: {
+      short: ["A cooler print", "عددِ خنک‌تر"],
+      why: [
+        "A cooler print — the hedge bid fades and the cut hopes thin.",
+        "عددِ خنک‌تر — تقاضای پناه طلا کم می‌شود و انتظارِ کاهش نرخ لاغر می‌شود.",
+      ],
+    },
   },
   {
     id: "us-jobs",
     calendarId: "nfp",
     name: ["The US jobs report (NFP)", "گزارش اشتغال آمریکا (NFP)"],
-    upCase: [
-      "Weak jobs — recession worry and rate-cut bets rise together.",
-      "اشتغال ضعیف — نگرانی رکود و شرط‌بندی روی کاهش نرخ، با هم بالا می‌روند.",
-    ],
-    downCase: [
-      "A blowout report — the cut hopes fade and cash gets bid.",
-      "گزارش قوی — امیدِ کاهش نرخ محو می‌شود و پول نقد خواستار می‌شود.",
-    ],
+    upCase: {
+      short: ["Weak jobs", "اشتغال ضعیف"],
+      why: [
+        "Weak jobs — recession worry and rate-cut bets rise together.",
+        "اشتغال ضعیف — نگرانی رکود و شرط‌بندی روی کاهش نرخ، با هم بالا می‌روند.",
+      ],
+    },
+    downCase: {
+      short: ["A blowout report", "گزارش قوی"],
+      why: [
+        "A blowout report — the cut hopes fade and cash gets bid.",
+        "گزارش قوی — امیدِ کاهش نرخ محو می‌شود و پول نقد خواستار می‌شود.",
+      ],
+    },
   },
   {
     id: "us-pce",
     calendarId: "pce",
     name: ["The Fed's own inflation gauge (PCE)", "سنجهٔ تورمِ خودِ فدرال رزرو (PCE)"],
-    upCase: [
-      "A hot PCE — the inflation-hedge bid deepens, the gauge the Fed actually watches.",
-      "PCE داغ — سنجه‌ای که فدرال رزرو واقعاً می‌نگرد؛ تقاضای پناهِ تورمی عمیق‌تر می‌شود.",
-    ],
-    downCase: [
-      "A cool PCE — the Fed's guard drops and gold's inflation story thins.",
-      "PCE خنک — گاردِ فدرال رزرو پایین می‌آید و روایتِ تورمیِ طلا لاغر می‌شود.",
-    ],
+    upCase: {
+      short: ["A hot PCE", "PCE داغ"],
+      why: [
+        "A hot PCE — the inflation-hedge bid deepens, the gauge the Fed actually watches.",
+        "PCE داغ — سنجه‌ای که فدرال رزرو واقعاً می‌نگرد؛ تقاضای پناهِ تورمی عمیق‌تر می‌شود.",
+      ],
+    },
+    downCase: {
+      short: ["A cool PCE", "PCE خنک"],
+      why: [
+        "A cool PCE — the Fed's guard drops and gold's inflation story thins.",
+        "PCE خنک — گاردِ فدرال رزرو پایین می‌آید و روایتِ تورمیِ طلا لاغر می‌شود.",
+      ],
+    },
   },
   /* the stress spike is retired from the cards (the owner's ask): it
      is not a dated, certain event — it walks in unannounced, so it
-     rides as the hedged disclaimer under the grid instead */
+     rides as the professional disclaimer under the grid instead */
 ];
 
 /* ------------------------------------------------------------------ *
@@ -131,6 +180,20 @@ export function ScenariosBand({
   React.useEffect(() => {
     setNow(new Date());
   }, []);
+
+  /* the why-modal — one dialog for the whole grid, driven by the opened
+     case's key (`scenarioId:up` / `scenarioId:down`); the cards carry
+     only the short labels, the explanation sits one tap away (the
+     owner's 2026-11-26 ask: compact cards, the reasoning behind a modal) */
+  const [openWhy, setOpenWhy] = React.useState<string | null>(null);
+  const lastWhyTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const whyCase = React.useMemo(() => {
+    if (openWhy === null) return null;
+    const [sid, dir] = openWhy.split(":") as [string, "up" | "down"];
+    const s = SCENARIOS.find((x) => x.id === sid) ?? null;
+    if (s === null) return null;
+    return { scenario: s, dir };
+  }, [openWhy]);
 
   /* every scenario's next dated occurrence, straight from the very same
      schedule generator the calendar band renders (one calendar, one truth) */
@@ -157,6 +220,41 @@ export function ScenariosBand({
     return [...withDate, ...rest];
   }, [nextOf]);
 
+  /* the direction line — the chip (رشد طلا / افت طلا), the SHORT label,
+     and the one-tap why affordance; the explanation itself rides the modal */
+  const renderCase = (s: ScenarioDef, dir: "up" | "down"): React.ReactNode => {
+    const kase = dir === "up" ? s.upCase : s.downCase;
+    const key = `${s.id}:${dir}`;
+    return (
+      <div className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] p-2">
+        <span
+          className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 type-caption font-bold"
+          style={{
+            color: dir === "up" ? "var(--color-return-up)" : "var(--color-return-down)",
+            boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${dir === "up" ? "var(--color-return-up)" : "var(--color-return-down)"} 35%, transparent)`,
+          }}
+        >
+          {dir === "up" ? <TrendingUp className="h-3 w-3" aria-hidden="true" /> : <TrendingDown className="h-3 w-3" aria-hidden="true" />}
+          {dir === "up" ? t.upLabel : t.downLabel}
+        </span>
+        <p className="m-0 type-caption font-semibold leading-relaxed text-[var(--color-text-secondary)]">{kase.short[lan(locale)]}</p>
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded={openWhy === key}
+          aria-label={`${t.whyLabel}: ${kase.short[lan(locale)]}`}
+          onClick={(ev) => {
+            lastWhyTriggerRef.current = ev.currentTarget;
+            setOpenWhy(key);
+          }}
+          className="ms-auto inline-flex h-[22px] shrink-0 items-center gap-1 rounded-full bg-[var(--color-currena-soft)] px-2 type-caption font-bold text-[var(--color-currena-blue-deep)] transition-colors hover:bg-[var(--color-accent-gold)]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
+        >
+          {t.whyLabel}
+        </button>
+      </div>
+    );
+  };
+
   return (
     <section id="gold-scenarios" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
@@ -171,7 +269,7 @@ export function ScenariosBand({
           return (
             <article
               key={s.id}
-              className="flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3.5 ring-1 ring-[var(--color-border)]"
+              className="flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3.5 ring-1 ring-[var(--color-border)]"
             >
               {/* the header — [date] over [title] (the owner's ask): the
                   next occurrence leads, the scenario's name under it */}
@@ -204,43 +302,61 @@ export function ScenariosBand({
               {/* the two directions — up first, down second, never alone;
                   the colour rides ONLY on the chip (رشد طلا / افت طلا),
                   the outcome sentence itself stays neutral (the owner's
-                  ask) */}
+                  ask); compact now: the short label visible, the full
+                  explanation behind the modal (the owner's 2026-11-26 ask) */}
               <div className="flex flex-col gap-1.5">
-                <div className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] p-2">
-                  <span className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 type-caption font-bold" style={{ color: "var(--color-return-up)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-up) 35%, transparent)" }}>
-                    <TrendingUp className="h-3 w-3" aria-hidden="true" />
-                    {t.upLabel}
-                  </span>
-                  <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{s.upCase[lan(locale)]}</p>
-                </div>
-                <div className="flex items-start gap-2 rounded-[var(--cr-radius-sm)] p-2">
-                  <span className="flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 type-caption font-bold" style={{ color: "var(--color-return-down)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 35%, transparent)" }}>
-                    <TrendingDown className="h-3 w-3" aria-hidden="true" />
-                    {t.downLabel}
-                  </span>
-                  <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{s.downCase[lan(locale)]}</p>
-                </div>
+                {renderCase(s, "up")}
+                {renderCase(s, "down")}
               </div>
             </article>
           );
         })}
       </div>
 
-      {/* the un-dated fifth force as a disclaimer (the owner's ask): the
-          stress spike is NOT certain — no card, no equal weight, hedged
-          words under the grid; the cards above stay the dated, scheduled
-          bends only */}
-      <p
-        className="m-0 mt-3 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 text-[12px] italic leading-relaxed text-[var(--color-text-tertiary)] ring-1 ring-[var(--color-border)]/60"
-        data-scenarios-unscheduled
+      {/* the professional disclaimer (the owner's 2026-11-26 ask): the
+          un-dated risks — a stress spike, war, a banking crisis — stated
+          in a professional register, labelled «سلب مسئولیت», visible but
+          not loud; never the old informal aside. A hair quieter than the
+          cards, never washed out. */}
+      <div
+        className="mt-3 flex flex-col gap-1 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-2.5 ring-1 ring-[var(--color-border)]"
+        data-scenarios-disclaimer
       >
-        {t.unscheduledNote}
-      </p>
+        <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.disclaimerLabel}</span>
+        <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.unscheduledNote}</p>
+      </div>
 
       {/* the merged calendar — the section's own second half (the events
           ARE the scenarios' dates; one card, no second section, no
           repeated framing) */}
       {calendar}
+
+      {/* the why-modal — the direction case's own explanation, behind the
+          one-tap affordance on the card */}
+      <Dialog
+        open={openWhy !== null}
+        onOpenChange={(o) => {
+          if (!o) {
+            setOpenWhy(null);
+            const trigger = lastWhyTriggerRef.current;
+            window.setTimeout(() => trigger?.focus(), 0);
+          }
+        }}
+      >
+        {whyCase !== null ? (
+          <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[440px]">
+            <DialogHeader className="text-start pe-11">
+              <p className="type-caption m-0 font-bold text-[var(--color-accent-gold-deep)]">{whyCase.scenario.name[lan(locale)]}</p>
+              <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">
+                {whyCase.dir === "up" ? t.upLabel : t.downLabel}: {(whyCase.dir === "up" ? whyCase.scenario.upCase : whyCase.scenario.downCase).short[lan(locale)]}
+              </DialogTitle>
+            </DialogHeader>
+            <DialogDescription className="m-0 type-label leading-relaxed text-[var(--color-text-secondary)] pe-11">
+              {(whyCase.dir === "up" ? whyCase.scenario.upCase : whyCase.scenario.downCase).why[lan(locale)]}
+            </DialogDescription>
+          </DialogContent>
+        ) : null}
+      </Dialog>
     </section>
   );
 }

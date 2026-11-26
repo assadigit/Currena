@@ -215,14 +215,15 @@ export const UI = {
     },
     scenarios: {
       title: "Price-change scenarios",
-      subtitle:
-        "The world's major economic decisions — steered by institutions such as the U.S. Treasury, central banks and statistical agencies — move the gold price. The events ahead that can move it are listed here: some carry fixed, recurring dates, while others are periodic or conditional and may be adopted unannounced.",
+      subtitle: "The world's major economic decisions — central banks, treasuries, statistical agencies — move the gold price. The events ahead that can move it are listed here.",
       upLabel: "Gold rising",
       downLabel: "Gold falling",
       nextLabel: "next scheduled re-weigh",
       noSchedule: "no calendar date — it walks in unannounced",
+      whyLabel: "why",
+      disclaimerLabel: "Disclaimer",
       unscheduledNote:
-        "And the one that carries no calendar date is not a card either: a stress spike — war, a banking scare, a default fear. It may never come; if it does, the monetary-hedge bid for gold can jump, fast and unscheduled. Nothing on this page treats it as certain or dated.",
+        "Risks that carry no calendar date — geopolitical conflict, a banking crisis, a default scare — can move gold suddenly and without warning. They may never materialize; nothing on this page treats them as certain, dated, or timed. This section describes possible market-moving events, not predictions or investment advice.",
     },
     balance: {
       eyebrow: "The balance",
@@ -268,6 +269,7 @@ export const UI = {
       todayWord: "today",
       tomorrowWord: "tomorrow",
       whyLabel: "Why it moves gold",
+      whyChip: "effect on gold",
       moreLabel: "Later events ({n})",
       fewerLabel: "Show fewer",
       unavailable: "The calendar is not available on this device.",
@@ -413,6 +415,7 @@ export const UI = {
       winnerWord: "winner",
       liveWord: "live",
       verdictLine: "Since {year}: gold ×{g} against the dollar ×{d} — {winner} won {ratio}× over.",
+      verdictChip: "Since {year}, {winner} has won {ratio}× over",
       winnerGold: "gold",
       winnerDollar: "the dollar",
       syncYearLabel: "most in-sync year",
@@ -438,7 +441,7 @@ export const UI = {
       chipGold: "Gold",
       chipDollar: "Dollar",
       expandAll: "all {n} years",
-      collapseTen: "the last ten years",
+      collapseTen: "the last five years",
       millionWord: "million",
       decouplingTitle: "Down in the world, up in Iran",
       decouplingSubtitle:
@@ -450,6 +453,7 @@ export const UI = {
       decouplingEmpty:
         "No complete year yet where global gold fell while Iranian gold rose.",
       decompTitle: "What gold's Iran growth was made of",
+      decompCenterTitle: "gold's Iran growth",
       decompLine:
         "Since {year}, gold in Iran multiplied ×{g}: the rial's fall alone would have given ×{d}, the world's gold alone ×{w}, the Tehran premium ×{p}.",
       decompShareRial: "the rial's fall vs the dollar",
@@ -457,6 +461,7 @@ export const UI = {
       decompSharePremium: "the Tehran premium (حباب)",
       decompSharesLine:
         "Of that growth, {r} was the rial's fall, {w} the world's gold, {p} the Tehran premium.",
+      decompNoteLabel: "how the shares are computed",
       decompNote:
         "The three factors multiply exactly — gold's toman multiple = the dollar's multiple × the global-ounce multiple × the premium's change — so the shares split the total multiple's logarithm and add to 100%. The rial's fall is the inflation/currency leg: a weaker rial makes everything costlier in toman, gold included. The world's gold is gold's own natural, dollar-priced growth.",
       premiumTitle: "The premium (حباب), the long arc",
@@ -973,14 +978,15 @@ export const UI = {
     },
     scenarios: {
       title: "سناریوهای تغییر قیمت",
-      subtitle:
-        "تصمیم‌های کلان اقتصادی جهان — که نهادهایی مانند وزارت خزانه‌داری آمریکا، بانک‌های مرکزی و نهادهای آماری راهبری‌شان می‌کنند — بر قیمت طلا اثر می‌گذارند. رویدادهای پیشِ‌رویی که می‌توانند بر قیمت اثر بگذارند در این بخش آمده‌اند؛ برخی تاریخِ مشخص و تکرارشونده دارند و برخی به‌صورت دوره‌ای یا مشروط ممکن است اتخاذ شوند.",
+      subtitle: "تصمیم‌های کلان اقتصادی جهان بر قیمت طلا اثر می‌گذارند؛ رویدادهای پیشِ‌رویی که می‌توانند بر آن اثر بگذارند در این بخش آمده‌اند.",
       upLabel: "رشد طلا",
       downLabel: "افت طلا",
       nextLabel: "بازسنجی بعدی",
       noSchedule: "بدون تاریخ تقویمی؛ بی‌اعلان می‌آید",
+      whyLabel: "چرا؟",
+      disclaimerLabel: "سلب مسئولیت",
       unscheduledNote:
-        "و آن‌چه تاریخ تقویمی ندارد، کارت هم نیست: جهش تنش — جنگ، بحران بانکی، ترس نکول. ممکن است هرگز نیاید؛ اگر بیاید، تقاضای پناهِ پولی برای طلا می‌تواند ناگهان و بی‌برنامه جهش کند. هیچ‌چیز در این صفحه آن را قطعی یا زمان‌دار فرض نکرده است.",
+        "خطرهایی که تاریخ تقویمی ندارند — تنش ژئوپلیتیک، بحران بانکی، ترس نکول — می‌توانند طلا را ناگهانی و بی‌اخطار تکان دهند. ممکن است هرگز رخ ندهند و هیچ‌چیز در این صفحه آن‌ها را قطعی یا زمان‌دار فرض نکرده است. این بخش رویدادهای اثرگذارِ ممکنِ بازار را توصیف می‌کند، نه پیش‌بینی و نه توصیهٔ سرمایه‌گذاری.",
     },
     balance: {
       eyebrow: "ترازو",
@@ -1026,6 +1032,7 @@ export const UI = {
       todayWord: "امروز",
       tomorrowWord: "فردا",
       whyLabel: "چرا طلا را تکان می‌دهد",
+      whyChip: "اثر بر طلا",
       moreLabel: "رویدادهای بعدی ({n})",
       fewerLabel: "نمایش کمتر",
       unavailable: "تقویم روی این دستگاه در دسترس نیست.",
@@ -1169,6 +1176,7 @@ export const UI = {
       winnerWord: "برنده",
       liveWord: "زنده",
       verdictLine: "از {year}: طلا ×{g} در برابر دلار ×{d} — {winner} {ratio}× برنده.",
+      verdictChip: "از {year}، {winner} {ratio}× برنده بوده است",
       winnerGold: "طلا",
       winnerDollar: "دلار",
       syncYearLabel: "هم‌حرکت‌ترین سال",
@@ -1194,7 +1202,7 @@ export const UI = {
       chipGold: "طلا",
       chipDollar: "دلار",
       expandAll: "همهٔ {n} سال",
-      collapseTen: "ده سال اخیر",
+      collapseTen: "پنج سال اخیر",
       millionWord: "میلیون",
       decouplingTitle: "در جهان پایین، در ایران بالا",
       decouplingSubtitle:
@@ -1206,6 +1214,7 @@ export const UI = {
       decouplingEmpty:
         "هنوز سالِ کاملی نیست که طلا در جهان پایین و در ایران بالا رفته باشد.",
       decompTitle: "رشد طلای ایران از چه ساخته شده",
+      decompCenterTitle: "رشد قیمت طلا در ایران",
       decompLine:
         "از {year}، طلا در ایران ×{g} شد: افت ریال به‌تنهایی ×{d} می‌داد، طلای جهان به‌تنهایی ×{w}، و حباب تهران ×{p}.",
       decompShareRial: "افت ریال در برابر دلار",
@@ -1213,6 +1222,7 @@ export const UI = {
       decompSharePremium: "حباب بازار تهران",
       decompSharesLine:
         "از این رشد، {r} افت ریال بود، {w} رشد جهانی طلا و {p} حباب تهران.",
+      decompNoteLabel: "این سهم‌ها چگونه محاسبه می‌شوند",
       decompNote:
         "این سه عامل دقیقاً در هم ضرب می‌شوند — ضریب تومانی طلا = ضریب دلار × ضریب اونس جهانی × تغییر حباب — پس سهم‌ها لگاریتم ضریب کل را تقسیم می‌کنند و جمعشان ۱۰۰٪ می‌شود. افت ریال همان پای تورم و پول ملی است: ریال ضعیف‌تر یعنی همه‌چیز در تومان گران‌تر، طلا هم همین‌طور؛ رشد جهانی طلا رشد طبیعیِ خودِ طلا به دلار است.",
       premiumTitle: "حباب، قوس بلند",

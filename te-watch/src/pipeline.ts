@@ -313,7 +313,7 @@ export async function recordStructureAlert(
     briefingItemsOf(parsed.items)[0]?.news_id ??
     (parsed.items.length > 0 ? parsed.items[0]!.news_id : null);
 
-  let key = topKey;
+  let key: string | null = topKey;
   if (!key) {
     const latest = await db
       .prepare("SELECT news_id FROM te_briefing ORDER BY rowid DESC LIMIT 1")

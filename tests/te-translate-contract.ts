@@ -8,7 +8,7 @@
 // The contract proven here (each check states itself; evidence appends to
 // tests/te-translate-contract-<date>.json):
 //  - the chat contract SENT: the model, the system line's strict
-//    {"headline","body"} shape, the user payload's shape, max_tokens 2048;
+//    {"headline","body"} shape, the user payload's shape, max_tokens 8192;
 //  - the happy path: ONE call per briefing, the fa row written, the
 //    `translated` log line naming the model;
 //  - the freshness gate: a second run is up-to-date, zero further calls;
@@ -171,14 +171,14 @@ check("the chat contract sent: the model is the bake-off's selection", lastCall(
   const user = input.messages?.[1]?.content ?? "";
   const userParsed = JSON.parse(user) as { headline?: string; body?: string };
   check(
-    "the chat contract sent: the system line carries the strict TE shape {\"headline\",\"body\"}, the user payload mirrors the briefing, max_tokens 2048",
+    "the chat contract sent: the system line carries the strict TE shape {\"headline\",\"body\"}, the user payload mirrors the briefing, max_tokens 8192",
     input.messages?.length === 2 &&
       input.messages[0]!.role === "system" &&
       input.messages[1]!.role === "user" &&
       system.includes('{"headline": <string>, "body": <string>}') &&
       userParsed.headline === EN_TITLE &&
       userParsed.body === EN_BODY &&
-      input.max_tokens === 2048,
+      input.max_tokens === 8192,
     { system: system.slice(0, 120), user: user.slice(0, 80), max_tokens: input.max_tokens },
   );
 }

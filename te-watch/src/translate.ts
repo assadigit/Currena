@@ -43,8 +43,37 @@
 import { getRow, logEvent, type D1Like } from "./pipeline";
 import { faGlossary } from "./glossary";
 
-/** The selected Workers AI translation model (the live bake-off's record — same as the WGC module's). */
+/** The primary Workers AI translation model (the live bake-off's record — same as the WGC module's). */
 export const TRANSLATION_MODEL = "@cf/google/gemma-4-26b-a4b-it" as const;
+
+/**
+ * The fallback chain (added 2026-11-26, the neuron-exhaustion sitting):
+ * the account's daily free allocation of 10,000 neurons is ACCOUNT-WIDE
+ * and shared — the markets worker's ten fires a day and the WGC watch's
+ * own gemma runs can exhaust it before the 05:00 UTC te fire, and the
+ * observed failure (te_scrape_log 2026-11-25/26, error 4006: "you have
+ * used up your daily free allocation of 10,000 neurons") left the
+ * briefing English-only for the whole day. The fallback is the cheaper
+ * fp8-fast llama — live-tested with the same chat contract (a clean
+ * two-field JSON translation, finish_reason stop) — tried in order when
+ * the primary answers with an allocation error; every other failure
+ * keeps the honest translate-failed discipline (retry next fire).
+ */
+export const FALLBACK_MODELS: readonly string[] = [
+  "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+] as const;
+
+/** The errors that mean "the account's free neurons ran out" — the only
+ *  failures that fall through to the next model in the chain. */
+function isAllocationError(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes("4006") ||
+    m.includes("daily free allocation") ||
+    m.includes("used up your daily free") ||
+    m.includes("neuron")
+  );
+}
 
 /**
  * The strict system contract every chat run carries — the WGC runner's own
@@ -129,8 +158,8 @@ interface ChatBriefing {
  * {response: string} and the OpenAI-compatible
  * {choices: [{message: {content: string}}]}.
  */
-async function runTranslationModel(ai: AiLike, briefing: ChatBriefing): Promise<ChatBriefing> {
-  const out = await ai.run(TRANSLATION_MODEL, {
+async function runTranslationModelOnce(ai: AiLike, model: string, briefing: ChatBriefing): Promise<ChatBriefing> {
+  const out = await ai.run(model, {
     messages: [
       { role: "system", content: CHAT_SYSTEM },
       { role: "user", content: JSON.stringify({ headline: briefing.headline, body: briefing.body }) },
@@ -188,6 +217,35 @@ async function runTranslationModel(ai: AiLike, briefing: ChatBriefing): Promise<
   return glossed;
 }
 
+/**
+ * The chain runner: the primary model first, then each fallback in order
+ * when the failure is the account's neuron allocation (error 4006). Any
+ * other failure rethrows immediately — the honest translate-failed
+ * discipline stands; only "the free neurons ran out" moves down the
+ * chain. The winning model's id rides the result so the side table and
+ * the log record the engine that actually did the work.
+ */
+async function runTranslationModel(ai: AiLike, briefing: ChatBriefing): Promise<{ fa: ChatBriefing; model: string }> {
+  const chain = [TRANSLATION_MODEL, ...FALLBACK_MODELS];
+  let lastAllocationError: unknown = null;
+  for (const model of chain) {
+    try {
+      const fa = await runTranslationModelOnce(ai, model, briefing);
+      return { fa, model };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      if (isAllocationError(message)) {
+        lastAllocationError = e;
+        continue; // the next model in the chain — a cheaper engine, same contract
+      }
+      throw e;
+    }
+  }
+  throw lastAllocationError instanceof Error
+    ? lastAllocationError
+    : new Error("every model in the chain reported the account's neuron allocation exhausted");
+}
+
 /* ------------------------------------------------------------------ *
  * The step (freshness gate + one model run + the side-table write)
  * ------------------------------------------------------------------ */
@@ -198,7 +256,7 @@ export async function translateBriefing(
   newsId: string,
   now: Date,
 ): Promise<TranslateOutcome> {
-  const recordedModel = ai.sourceModel ?? TRANSLATION_MODEL;
+  const adapterModel = ai.sourceModel ?? null; // declared only when the adapter is not the platform binding
   const nowIso = now.toISOString();
   try {
     // 1. The English row must be a real, captured briefing.
@@ -218,7 +276,13 @@ export async function translateBriefing(
     // 3. One chat-contract run for the whole briefing — either string
     //    failing (empty, untranslated, dropped, drifted shape) fails the
     //    whole run: fail-closed, a half-translated row is never stored.
-    const fa = await runTranslationModel(ai, { headline: row.title, body: row.body });
+    //    The chain: the primary gemma, then the cheaper fp8 llama when
+    //    the account's neuron allocation is the failure (error 4006).
+    //    The attribution discipline: a non-binding adapter's declared
+    //    sourceModel wins (the adapter's own engine identity); the
+    //    platform binding records the chain's winning model.
+    const { fa, model } = await runTranslationModel(ai, { headline: row.title, body: row.body });
+    const recordedModel = adapterModel ?? model;
 
     // 4. The side-table write (keyed by news_id; a re-translation replaces).
     await db
@@ -237,8 +301,9 @@ export async function translateBriefing(
     // log write itself fails (a D1 outage), swallow after recording it in
     // the invocation log only — the English row is already safe.
     const reason = String(e instanceof Error ? e.message : e).slice(0, 240);
+    const failedModel = adapterModel ?? TRANSLATION_MODEL;
     try {
-      await logEvent(db, newsId, "translate-failed", `model ${recordedModel}: ${reason}`);
+      await logEvent(db, newsId, "translate-failed", `model ${failedModel}: ${reason}`);
     } catch (logErr) {
       console.error(`[te-watch] translate-failed could not be logged (${newsId}): ${String(logErr).slice(0, 120)}`);
     }

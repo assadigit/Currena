@@ -30,6 +30,13 @@ import { type Fmt, SignedDelta, Sparkline } from "@/components/gold-page/visuals
 import { type RatesPayload } from "@/components/gold-page/bridge-board";
 import { coinPremium, dollarTomanOf } from "@/lib/gold-page/coin-premium";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
   DECOUPLING_EVENTS,
   RACE_START_JY,
   chartSeries,
@@ -365,6 +372,14 @@ export function DollarTrendBand({
      until asked for (the owner's ask) */
   const [arcOpen, setArcOpen] = React.useState(false);
   const [methodOpen, setMethodOpen] = React.useState(false);
+  /* the owner's 2026-11-26 ask: the since-۱۳۵۷ verdict formula (the
+     yellow chip) hides behind a modal — one compact chip names the
+     winner, the full formula opens on tap */
+  const [verdictOpen, setVerdictOpen] = React.useState(false);
+  const lastVerdictTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+  /* the decomposition's method note (the multiplicative identity) hides
+     behind its own toggle (the owner's 2026-11-26 ask) */
+  const [decompNoteOpen, setDecompNoteOpen] = React.useState(false);
   /* the growth decomposition (batch M) — rides the chart's own start
      year, so the reader's picked span is the span being explained; the
      dollar's global decay against gold over the same span is its
@@ -395,7 +410,9 @@ export function DollarTrendBand({
   const liveMissed =
     data !== null && data.running.dollarToman === null && data.running.gold18Toman === null;
 
-  const visibleRows = expanded ? rows : rows.slice(-10);
+  /* the race table's own compact law (the owner's 2026-11-26 ask): the
+     LAST FIVE years visible, the rest behind the expand button */
+  const visibleRows = expanded ? rows : rows.slice(-5);
 
   return (
     <section
@@ -431,27 +448,69 @@ export function DollarTrendBand({
             <p className="m-0 mt-3 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.liveMissed}</p>
           ) : null}
 
-          {/* the verdict chip — the since-۱۳۵۷ race, always visible */}
+          {/* the verdict chip — the since-۱۳۵۷ race (the owner's
+              2026-11-26 ask: the formula hides behind a modal): a compact
+              chip names the winner and the ratio, the full formula opens
+              on tap — the yellow ink stays, only quieter and one tap away */}
           {verdict !== null ? (
-            <div
-              className="mt-3 flex items-start gap-2.5 rounded-[var(--cr-radius-md)] px-3 py-2.5"
-              style={{
-                backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 10%, transparent)",
-                boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 35%, transparent)",
-              }}
-              data-dollar-trend-verdict
-            >
-              <p className="m-0 type-caption leading-relaxed text-[var(--color-text-primary)]">
-                <bdi>
-                  {t.verdictLine
-                    .replace("{year}", yearLabel(verdict.startJy, locale))
-                    .replace("{g}", fmt.num(verdict.goldX, 0))
-                    .replace("{d}", fmt.num(verdict.dollarX, 0))
-                    .replace("{ratio}", fmt.num(verdict.ratio, 1))
-                    .replace("{winner}", verdict.winner === "gold" ? t.winnerGold : t.winnerDollar)}
-                </bdi>
-              </p>
-            </div>
+            <>
+              <button
+                type="button"
+                onClick={(ev) => {
+                  lastVerdictTriggerRef.current = ev.currentTarget;
+                  setVerdictOpen(true);
+                }}
+                aria-haspopup="dialog"
+                aria-expanded={verdictOpen}
+                className="mt-3 flex w-fit items-start gap-2 rounded-[var(--cr-radius-md)] px-3 py-2 text-start transition-transform hover:scale-[1.01] active:scale-95"
+                style={{
+                  backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 10%, transparent)",
+                  boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 35%, transparent)",
+                }}
+                data-dollar-trend-verdict
+              >
+                <span className="m-0 type-caption font-bold leading-relaxed text-[var(--color-text-primary)]">
+                  <bdi>
+                    {t.verdictChip
+                      .replace("{year}", yearLabel(verdict.startJy, locale))
+                      .replace("{winner}", verdict.winner === "gold" ? t.winnerGold : t.winnerDollar)
+                      .replace("{ratio}", fmt.num(verdict.ratio, 1))}
+                  </bdi>
+                </span>
+                <ChevronDown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--color-accent-gold-deep)]" aria-hidden="true" />
+              </button>
+              <Dialog
+                open={verdictOpen}
+                onOpenChange={(o) => {
+                  if (!o) {
+                    setVerdictOpen(false);
+                    const trigger = lastVerdictTriggerRef.current;
+                    window.setTimeout(() => trigger?.focus(), 0);
+                  }
+                }}
+              >
+                <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[440px]">
+                  <DialogHeader className="text-start pe-11">
+                    <p className="type-caption m-0 font-bold text-[var(--color-accent-gold-deep)]">
+                      {t.eyebrow}
+                    </p>
+                    <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">
+                      {verdict.winner === "gold" ? t.winnerGold : t.winnerDollar} ×{fmt.num(verdict.ratio, 1)}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <DialogDescription className="m-0 type-label leading-relaxed text-[var(--color-text-secondary)] pe-11">
+                    <bdi>
+                      {t.verdictLine
+                        .replace("{year}", yearLabel(verdict.startJy, locale))
+                        .replace("{g}", fmt.num(verdict.goldX, 0))
+                        .replace("{d}", fmt.num(verdict.dollarX, 0))
+                        .replace("{ratio}", fmt.num(verdict.ratio, 1))
+                        .replace("{winner}", verdict.winner === "gold" ? t.winnerGold : t.winnerDollar)}
+                    </bdi>
+                  </DialogDescription>
+                </DialogContent>
+              </Dialog>
+            </>
           ) : null}
 
           {/* zone 1.5 — THE two most important verdicts (batch M): the
@@ -678,7 +737,7 @@ export function DollarTrendBand({
                 </tbody>
               </table>
             </div>
-            {rows.length > 10 ? (
+            {rows.length > 5 ? (
               <button
                 type="button"
                 onClick={() => setExpanded((v) => !v)}
@@ -686,6 +745,9 @@ export function DollarTrendBand({
                 className="mt-1.5 min-h-[32px] rounded-full bg-[var(--color-surface)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] transition-colors hover:text-[var(--color-text-primary)]"
               >
                 {expanded ? t.collapseTen : t.expandAll.replace("{n}", fmt.num(rows.length, 0))}
+                <span aria-hidden="true" className={`inline-block ps-1 text-[10px] transition-transform ${expanded ? "rotate-180" : ""}`}>
+                  ▾
+                </span>
               </button>
             ) : null}
           </div>
@@ -792,16 +854,19 @@ export function DollarTrendBand({
                       fall (Iran's currency/economic troubles), how much
                       the world's own gold growth, how much Tehran's
                       premium — the shares labelled right on the ring,
-                      the total multiple in the hole. Drawn only when
-                      every share reads positive; a leg that subtracted
-                      from the growth steps back to the numbers alone,
-                      never a misleading pie */}
+                      and the hole carries a descriptive title (the
+                      owner's 2026-11-26 ask: a name, never a bare
+                      formula), the total multiple under it. Drawn only
+                      when every share reads positive; a leg that
+                      subtracted from the growth steps back to the
+                      numbers alone, never a misleading pie */}
                   {decomp.shares.rialPct >= 0 && decomp.shares.globalPct >= 0 && decomp.shares.premiumPct >= 0 ? (
                     <DecompPie
                       shares={decomp.shares}
                       multiple={decomp.goldX}
                       fmt={fmt}
                       locale={locale}
+                      centerTitle={t.decompCenterTitle}
                       ariaLabel={t.decompSharesLine
                         .replace("{r}", fmt.pct(decomp.shares.rialPct, 0))
                         .replace("{w}", fmt.pct(decomp.shares.globalPct, 0))
@@ -830,17 +895,50 @@ export function DollarTrendBand({
                       <bdi className="font-bold tabular-nums text-[var(--color-text-secondary)]">{fmt.pct(decomp.shares.premiumPct, Math.abs(decomp.shares.premiumPct) < 0.95 ? 1 : 0)}</bdi>
                     </span>
                   </div>
-                  <p className="m-0 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]">
-                    <bdi>
-                      {t.decompSharesLine
-                        .replace("{r}", fmt.pct(decomp.shares.rialPct, 0))
-                        .replace("{w}", fmt.pct(decomp.shares.globalPct, 0))
-                        .replace("{p}", fmt.pct(decomp.shares.premiumPct, Math.abs(decomp.shares.premiumPct) < 0.95 ? 1 : 0))}
-                    </bdi>
-                  </p>
+                  {/* the boxed verdict (the owner's 2026-11-26 ask): the
+                      shares sentence as its own contained box — the
+                      section's takeaway, boxed like the race's own
+                      verdict chips, never a bare paragraph */}
+                  <div
+                    className="rounded-[var(--cr-radius-md)] px-3 py-2.5"
+                    style={{
+                      backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 12%, transparent)",
+                      boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 40%, transparent)",
+                    }}
+                    data-dollar-trend-decomp-verdict
+                  >
+                    <p className="m-0 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]">
+                      <bdi>
+                        {t.decompSharesLine
+                          .replace("{r}", fmt.pct(decomp.shares.rialPct, 0))
+                          .replace("{w}", fmt.pct(decomp.shares.globalPct, 0))
+                          .replace("{p}", fmt.pct(decomp.shares.premiumPct, Math.abs(decomp.shares.premiumPct) < 0.95 ? 1 : 0))}
+                      </bdi>
+                    </p>
+                  </div>
                 </>
               ) : null}
-              <p className="m-0 text-[10.5px] leading-relaxed text-[var(--color-text-tertiary)]/70">{t.decompNote}</p>
+              {/* the method note — the multiplicative identity (the
+                  owner's 2026-11-26 ask): behind its own small toggle,
+                  one tap away, never pushing itself on the reader */}
+              <div className="flex flex-col gap-1">
+                <button
+                  type="button"
+                  aria-expanded={decompNoteOpen}
+                  aria-controls="gold-dollar-trend-decomp-note"
+                  onClick={() => setDecompNoteOpen((o) => !o)}
+                  className="inline-flex min-h-[28px] w-fit items-center gap-1.5 rounded-full bg-transparent px-3 py-0.5 text-[12px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
+                  data-dollar-trend-decomp-note-toggle
+                >
+                  {t.decompNoteLabel}
+                  <ChevronDown className={`h-3 w-3 transition-transform ${decompNoteOpen ? "rotate-180" : ""}`} aria-hidden="true" />
+                </button>
+                {decompNoteOpen ? (
+                  <p id="gold-dollar-trend-decomp-note" className="m-0 text-[10.5px] leading-relaxed text-[var(--color-text-tertiary)]/70">
+                    {t.decompNote}
+                  </p>
+                ) : null}
+              </div>
             </div>
           ) : null}
 
@@ -931,12 +1029,17 @@ function DecompPie({
   multiple,
   fmt,
   locale,
+  centerTitle,
   ariaLabel,
 }: {
   shares: { rialPct: number; globalPct: number; premiumPct: number };
   multiple: number;
   fmt: Fmt;
   locale: Locale;
+  /** the hole's own descriptive title (the owner's 2026-11-26 ask): a
+   *  name for what the pie shows, never a bare formula — the total
+   *  multiple rides under it */
+  centerTitle: string;
   ariaLabel: string;
 }) {
   const segs = [
@@ -991,7 +1094,20 @@ function DecompPie({
             </text>
           );
         })}
-        <text x={88} y={88} textAnchor="middle" dominantBaseline="central" fontSize={17} fontWeight={800} fill="var(--color-text-primary)">
+        {/* the hole — a descriptive title over the total multiple (the
+            owner's 2026-11-26 ask: a name, not a bare ×formula). The
+            title renders on its own line with the hole's own width and
+            the multiple sits under it; the font stays a step small so a
+            long locale's title never grazes the ring */}
+        <foreignObject x={48} y={70} width={80} height={26} style={{ direction: locale === "fa" ? "rtl" : "ltr" }}>
+          <div
+            className="flex h-full items-center justify-center text-center"
+            style={{ fontSize: "9px", fontWeight: 700, color: "var(--color-text-secondary)", lineHeight: 1.3 }}
+          >
+            {centerTitle}
+          </div>
+        </foreignObject>
+        <text x={88} y={98} textAnchor="middle" dominantBaseline="central" fontSize={15} fontWeight={800} fill="var(--color-text-primary)">
           ×{fmt.num(multiple, 0)}
         </text>
       </svg>

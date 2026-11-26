@@ -20,6 +20,7 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Info } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt } from "@/components/gold-page/visuals";
@@ -46,6 +47,10 @@ type CalT = {
   todayWord: string;
   tomorrowWord: string;
   whyLabel: string;
+  /** the row's own one-tap affordance — a words-first chip that says the
+   *  modal carries the why (the owner's 2026-11-26 ask: the bare «؟»
+   *  retired; the affordance names what it opens) */
+  whyChip: string;
   moreLabel: string;
   fewerLabel: string;
   unavailable: string;
@@ -469,6 +474,10 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
             </span>
           ) : null}
           {hasWhy ? (
+            /* the why-chip (the owner's 2026-11-26 ask): the bare «؟» icon
+               retired — the affordance is a words-first chip that names
+               what the tap opens, so the reader knows it is clickable and
+               what they will get (the event's effect on gold) */
             <button
               type="button"
               aria-haspopup="dialog"
@@ -478,9 +487,10 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
                 lastWhyTriggerRef.current = ev.currentTarget;
                 setOpenWhy(e.key);
               }}
-              className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[var(--color-currena-soft)] text-[12px] font-black text-[var(--color-currena-blue-deep)] transition-colors hover:bg-[var(--color-accent-gold)]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
+              className="inline-flex min-h-[24px] shrink-0 items-center gap-1 rounded-full bg-[var(--color-currena-soft)] px-2.5 type-caption font-bold text-[var(--color-currena-blue-deep)] transition-colors hover:bg-[var(--color-accent-gold)]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
             >
-              ؟
+              <Info className="h-3 w-3" aria-hidden="true" />
+              {t.whyChip}
             </button>
           ) : null}
         </span>
