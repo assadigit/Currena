@@ -246,7 +246,7 @@
       "area": "behaviour",
       "tested": "typing 333 into the amount box",
       "expected": "the headline updates in under 100 ms",
-      "actual": "65 ms",
+      "actual": "83 ms",
       "pass": true
     },
     {

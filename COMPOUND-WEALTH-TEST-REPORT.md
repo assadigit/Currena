@@ -96,3 +96,105 @@ Phase B re-test: after fixes 1–5, the full surface was re-run on the redeploye
 
 - **D4 (one common quarter-end):** needs one of the blocked doors — the CFS PDF (403 from this sandbox), S&P DJI's 20/30y factsheets, MSCI's interactive history, or LBMA month-end prices — any one of which, opened from an unrestricted browser, allows the rows to be re-anchored and re-verified.
 - **The NY Fed effective-rate cross-check (0.02 pts)** was recorded from the previous sitting's research and not re-read this sitting (nyfed.org not probed); everything else in the cross-check table was re-read on 2026-11-26.
+
+---
+
+# The v7 pass (2026-11-26) — the tax estimate layer
+
+**Tested:** the same day, immediately after the v7 build, against both the local dev
+build and the live production deploy (twice — before and after the aria-label fix).
+**Preflight:** every v6 gate re-run unmodified before the feature work and re-run at the
+end: reference selftest six lines, 94/94, 64/64, 1200/1200 + 15/15, 32/32, lint — all
+green. **Tax off = v6 exactly** is the session's strongest regression: the unit suite
+asserts byte-identity of results with `taxRate` absent, 0 and 0.0, and the whole v6
+surface re-passed with the tax layer in the tree.
+
+## Verdict
+
+**The maths — PASS.** The reference engine carries the same tax rule
+(`r_after = r_net × (1 − tax)`, cost first, then tax) under a `tax_pct` parameter; its
+selftest now prints **10 PASS lines** (six v6 unmodified + the tax=0 equality + three
+taxed vectors pinned from its own output: 39,524.4 / 29,608.8 / 55,499.1). The new taxed
+grid (the same strata at 15/32/45% tax, `docs/compound-tests/grid-tax.json`, v6 grid
+untouched) replays **3600/3600** against the maths module, and **21/21** stratified
+scenarios through the **live page's real interface** (the tax typed into the Costs box,
+the after-tax caption's rate verified at every scenario). Unit tests: **141/141** — the
+tax=0 byte-identity lock, the pinned vectors, monotonicity, the cost-then-tax order, tax
+on Cash (cost off, tax on), the band under tax, the tax-takes difference, the estimator's
+bracket edges (AU every threshold; US all four statuses), the NIIT boundary (one dollar
+below vs on the threshold, per status), staleness, clamping and the copy discipline.
+
+**The data — PASS, fully sourced this session.** Every AU value read from the ATO's own
+published pages (the resident tax-rates page for the 2026–27 schedule; "What is the
+Medicare levy?" for the 2%); every US value read from the IRS's own documents (Rev. Proc.
+2025-32's four TY2026 rate tables, cross-checked against news release IR-2025-103; Topic
+no. 559 for the 3.8% NIIT and its thresholds). No fallback source was needed; the
+retrieval working, URLs and income-year labels are in the report's §11.2 tax data table.
+The estimator's semantics (next-dollar rate; levy always added; NIIT at or above the
+threshold) are recorded decisions, tested at the boundaries.
+
+**The behaviour — PASS.** The default screen is unchanged (zero tax-shaped elements;
+the v6 control inventory holds). The tax UI lives inside More options → Costs, hidden
+until the group opens, 44px/16px targets. Manual and guided flows (AU and US), the
+caption, the takes line, the How fold's on/off pair, the not-included list, fa + RTL +
+Persian digits, dark mode, store-nothing, reload-reset, no URL trace, one-screen fit
+with More options open at the three sizes, the full keyboard path, and the A4 card's one
+tax line with no income leak — all verified in the harness (**86/86**, 64 v6 + 22 v7)
+and live (**13/13**). Zero console errors everywhere. **Lighthouse (mobile, live): 98–99
+performance / 97 accessibility** — no regression from v6's 98/97. **axe (light + dark, EN
++ fa, tax UI open): zero new violations** — the 14–15 contrast nodes are the v6
+pre-existing shared-token findings (the +1 is the v6 "Every month" active chip newly
+visible with the Costs group open), and the v6 fa label-in-name finding on the language
+toggle is now FIXED (the v7 label-in-name extra).
+
+## The v7 test table
+
+| id | what was tested | expected | actual | result | evidence |
+|---|---|---|---|---|---|
+| V0 | preflight: all v6 gates before feature work | green | 6/6, 94/94, 64/64, 1200/1200+15/15, 32/32, lint | PASS | this report §verdicts (v6) + terminal transcripts |
+| V1 | reference selftest with the tax parameter | six v6 lines unmodified + taxed lines | 10 PASS lines | PASS | terminal transcript |
+| V2 | fixed taxed vectors (pinned from the engine's output) | 39,524.4 / 29,608.8 / 55,499.1 (±0.1%) | match | PASS | unit tests 40 |
+| V3 | tax = 0 exact equality | byte-identical to v6 | byte-identical over 6 plan vectors | PASS | unit tests 39 |
+| V4 | monotonicity + untouched inputs | higher tax → lower final; put-in/fees/pending fixed | holds | PASS | unit tests 41 |
+| V5 | cost-then-tax order | afterTaxRate = (b−cost)×(1−t), ≠ wrong order | holds and differs | PASS | unit tests 42 |
+| V6 | tax on Cash (cost off) | net 3.03% × 0.68 | 2.0604% effective | PASS | unit tests 43 |
+| V7 | band under tax; compare table consistency | both ends shrink | holds | PASS | unit tests 44 + grid |
+| V8 | tax-takes what-if | untaxed − taxed, null when off | exact; null | PASS | unit tests 45 |
+| V9 | AU estimator: every bracket edge + the levy | 0/15/30/37/45% + 2% | 2/17/32/39/47% | PASS | unit tests 46 |
+| V10 | US estimator: four statuses, bracket edges | 12/22/24/32/35/37% bands | correct per status | PASS | unit tests 47 |
+| V11 | NIIT boundary | below ≠ at threshold, per status | 199,999 → 24%; 200,000 → 27.8% (etc.) | PASS | unit tests 47 |
+| V12 | staleness + availability | 18-month rule, both countries | fresh, available | PASS | unit tests 48 |
+| V13 | config + clamping | TAX_MIN/MAX/STEP/DEFAULT; 70→60 + the one message | holds | PASS | unit tests 49 + harness 40b |
+| V14 | the copy | on/off pair, "marginal" never, income never on cards | holds | PASS | unit tests 50 |
+| V15 | the taxed grid engine-side | 3600/3600 | 3600/3600 | PASS | `compound-grid-replay.ts` |
+| V16 | the taxed grid through the live interface | 21/21 | 21/21 (local + live) | PASS | `compound-grid-replay-tax.ts` |
+| V17 | default screen unchanged | zero tax elements, v6 inventory | zero; inventory exact | PASS | harness 39 + 13 |
+| V18 | the Costs row (44px/16px, hidden until opened) | spec'd | 44px @ 16px, hidden | PASS | harness 39b |
+| V19 | manual tax flow (caption, takes, headline) | after-tax everywhere | 4.8% caption, 11,200 takes | PASS | harness 40 + live |
+| V20 | clamping + steppers | 70→60, message, 1-point steps | holds | PASS | harness 40b/40c |
+| V21 | AU guided flow | the line, the source, "Use this rate" | exact | PASS | harness 41* + live |
+| V22 | How fold on/off + plain language | model, guided line, 6-item list, no "marginal" | holds (13.2 words avg) | PASS | harness 42/42b |
+| V23 | US guided flow + statuses + NIIT lines | 22.0% at 90k; 35.8% at 250k single; 4 statuses | exact | PASS | harness 43* |
+| V24 | fa + RTL estimator | Persian digits, RTL, the fa How fold | holds | PASS | harness 44* |
+| V25 | store nothing, reload reset, no URL trace | nothing stored; tax resets | clean | PASS | harness 46 |
+| V26 | one-screen fit with More options open (3 sizes) | no horizontal clip | 360/390/430 all fit | PASS | harness 47 |
+| V27 | the keyboard path | type + Enter opens the estimator | works | PASS | harness 48 |
+| V28 | A4 card with the tax on | one page, tax line + source, no income | holds | PASS | harness 50 |
+| V29 | the live golden path (on/off, manual/guided, AU/US, fa, dark, sticky bar) | 13 checks | 13/13, zero console errors | PASS | `tests/v7-live-verify.ts`, `docs/compound-tests/v7-live-*.png` |
+| V30 | Lighthouse (mobile, live) | not below 98/97 | 98–99 / 97 | PASS | `v7-lighthouse.json` |
+| V31 | axe on the tax UI (light+dark × EN+fa) | zero new violations | zero new; fa label-in-name fixed | PASS | `v7-axe-tax.json` |
+
+## The v7 defect list (found → fixed → regression)
+
+| # | defect | severity | cause | fix |
+|---|---|---|---|---|
+| 1 | The clamp note never fired when typing an out-of-range tax (the shared NumberField pre-clamped the value, so the app-level clamp saw an in-range number) | medium (the spec'd "one small plain message") | the v6 house pattern clamps inside the box before `onCommit` | **FIXED** — the clamp moved into the app layer for the tax box; regression: harness 40b (70 → 60 + the message) |
+| 2 | The harness's US expectations mis-stated the band at $250,000 (expected the 24% band; the single schedule puts 250k in the 32% band) | test-only | my reading of the schedule | **FIXED** — the test asserts 32% + 3.8% = 35.8%, which the estimator produces; the boundary tests in the unit suite pin every band edge |
+| 3 | The fa live-line regexes matched ASCII dots against the Persian decimal separator (٫), failing two checks whose on-screen text was correct | test-only | regex bytes | **FIXED** — patterns now use ٫; the on-screen copy was never wrong |
+| 4 | The fa language toggle still failed axe's label-in-name with "(EN)" in the label — axe's matcher requires the visible text as a whitespace-delimited word | medium (a11y, the v6 owner-decision item) | parentheses around the visible token | **FIXED** — the aria-label uses a plain space separator ("تغییر به انگلیسی EN"); regression: `v7-axe-tax.json` shows the fa mismatch gone on the redeployed site |
+| 5 | Long browser sessions in one process stalled mid-replay (the sandbox chokes on two heavy sessions back-to-back; goto/fill timeouts) | environment | resource exhaustion with accumulated keep-alive sockets | **FIXED** — the taxed UI replay runs as its own gate file (fresh process, fresh browser, networkidle like v6, one quiet retry per scenario for dev-server pauses; a real failure fails twice and is recorded) |
+
+**Owner decisions carried forward:** the shared site palette's two sub-AA contrast
+tokens (site-wide restyle, outside this tool's remit) — unchanged this session; the
+fa label-in-name item is now resolved (the toggle carries the visible token in its
+accessible name).

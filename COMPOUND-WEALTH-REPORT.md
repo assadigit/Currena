@@ -453,11 +453,14 @@ The phase-1 decisions (1–10 below) stand; the v6 decisions follow them.
    not filled" and the W4 record: the doors that would supply 30-Sep-2026
    quarter-end figures (CFS PDF, S&P DJI, MSCI interactive, LBMA, RBA, BLS)
    are IP-blocked or login-gated from this sandbox; the exact numbers to
-   fetch and where are listed there.
+   fetch and where are listed there. **The v7 retry (§11.4) opened the CFS
+   PDF directly — the 20-year cross-checks are now first-hand — but the
+   30-year quarter-end figures still exist at no open door (CFS publishes
+   20 years only; Vanguard is June-ending), so the per-row period ends stay.**
 4. **The sitemap** — no sitemap on this worker to extend (§6).
 5. **The owner-decisions list** in `COMPOUND-WEALTH-TEST-REPORT.md` (palette
-   contrast, the fa label-in-name, decimal amounts, the quarter-end
-   alignment, the MSCI upgrade).
+   contrast, the fa label-in-name — **resolved in v7**, see §11.3 — decimal
+   amounts, the quarter-end alignment, the MSCI upgrade).
 
 ## 9. How to roll back
 
@@ -509,3 +512,224 @@ and after the Phase B fixes):
   shared files changed are the site chrome's Tools anchor and the retired
   ↗ pills; the gold page's own tests and walk still pass in the harness's
   19c check).
+
+## 11. The v7 session (2026-11-26): the tax estimate layer and the trust extras
+
+The owner's v7 direction (committed as `COMPOUND-WEALTH-V7-PROMPT.md`): make the tool
+more reliable, accurate and trustworthy, add income/savings tax estimates for Australia
+and the USA, keep the mobile experience excellent — and above all stay simple. Taxes were
+out of scope in v6 (spec §2 and Appendix A); **moving them in as a small, optional,
+clearly-labelled estimate behind More options was the owner's decision this session**,
+recorded here and in the decisions log below.
+
+### 11.1 What was built
+
+**The engine — one rule, applied everywhere.** `PlanInput` gained an optional `taxRate`
+(decimal, default 0 — every existing call site compiles and passes unmodified). After the
+existing cost rule, `r_after = r_net × (1 − taxRate)`; the monthly rate derives from
+`r_after` exactly as before. Every rate the engine touches — the baseline, both band
+ends, custom rate and range, the compare table, Cash, every what-if — passes through the
+same transformation, so the whole page stays consistent with one switch. Deposits, the
+purchase fee and the pending rule are untouched: tax never touches money you put in, only
+growth. **Cash growth is taxed** (bank interest is taxable income) while the fund cost
+stays off Cash (`APPLY_COST_TO_CASH = false` unchanged) — two separate rules, stated
+plainly in the How fold. New on the result: `afterTaxRate` (the effective after-tax
+annual rate, for the caption and the How fold) and `whatIfTaxTakes` (the same projection
+run with the tax off, differenced on the finals — the "Tax (estimate) takes X." line,
+beside the costs line, only while the tax is on). Config additions, each with a
+plain-English comment: `TAX_MIN = 0`, `TAX_MAX = 0.60` (a ceiling, not a suggestion),
+`TAX_STEP = 1`, `DEFAULT_TAX = 0`.
+
+**The tax data file — `src/lib/compound/tax.ts`**, modelled on figures.ts: a marked
+configuration block, one `TAX_CHECKED_ON` date, per country the latest published
+individual income-tax schedule the estimator uses plus exactly the named extras (AU: the
+Medicare levy; US: the four filing statuses and the net-investment-income threshold and
+rate), each with source name, source URL, income-year label and a plain note. One pure
+function, no engine coupling: `estimateTaxOnEarnings(country, income, status?)` →
+`{ rate, breakdown, yearLabel, sourceName, sourceUrl, checkedOn }`. The engine never
+reads tax.ts — it only ever sees `PlanInput.taxRate`.
+
+**The interface — all inside More options → Costs; nothing new on the default screen.**
+One new row, "Tax on your growth (estimate)" — off until set, a rate box (clamped 0–60%
+with one small plain message; the clamp lives in the app layer so the message actually
+fires) with ± steppers stepping 1 point, 44px targets and 16px text. A small link
+"Estimate from my income" expands inline (no modal): an income box ("a rough yearly
+income is fine — it only sets the bracket"; session state only — never on a card, never
+in the URL, never stored), plus for the USA a filing-status control offering exactly the
+statuses the data file carries (default: single). One plain live line,
+`aria-live="polite"`: "At that income, about N% of extra investment earnings goes to tax:
+(parts in words)." with the source and its date on a small line, and one button "Use this
+rate". Full precision internally; the line rounds to 0.1 points. When the tax is on: the
+headline, tiles, chart, milestones, what-ifs and compare table simply become after-tax,
+plus one small caption in the W3 style under the tiles ("After tax at N% a year
+(estimate).") — no before/after split on the main screen (the How fold may show both,
+and does via its model line + the guided source line). The cards: the A4 assumptions box
+gains one line when the tax is on ("Tax on growth: N% a year (estimate, your setting)"
+— or the source, when the rate came from the estimator) and never shows the income.
+
+**The How fold** replaces "No taxes are included." while the tax is on (the line returns
+verbatim when it is off — v6 exactly): the plain model (tax assumed paid each year on
+growth at the rate you set; order: costs first, then tax, then inflation for today's
+money; tax applies to cash because bank interest is taxable income, the fund cost does
+not), the guided rate's source line (when the rate came from the estimator), and a plain
+list of what is not included: US state taxes (raise the rate yourself to allow for them),
+capital-gains timing and discounts (real tax on shares can be lower because some gains
+are taxed later or at a discount), tax-sheltered accounts (super, 401(k), ISA-style),
+offsets, credits and franking credits, the Medicare levy's low-income reductions, and any
+levy not named in the estimate. The existing note that the measured figures themselves
+are before tax stays. Every new string in EN and fa, RTL-correct, Persian digits in fa.
+
+**Trust extras:** source-and-date on every surface that uses or explains a guided rate
+(estimator line, How fold, A4 card); the fa label-in-name fix on the site chrome's
+language toggle (the visible "فا"/"EN" now inside the aria-label, one line, no visual
+change — axe's word-boundary matcher needed a plain space separator, not parentheses);
+the blocked figures doors retried once with a hard 30-minute timebox (see §11.4).
+
+### 11.2 The tax data table — every value, its source and its retrieval
+
+All doors opened this session (2026-11-26, UTC). No bracket, rate, threshold or levy from
+memory.
+
+| Country | What | Value | Income-year label | Source (opened 2026-11-26) | Note |
+|---|---|---|---|---|---|
+| AU | Resident income-tax brackets | 0–$18,200 nil; $18,201–$45,000 15c/$1 over 18,200; $45,001–$135,000 $4,020 + 30c/$1 over 45,000; $135,001–$190,000 $31,020 + 37c/$1 over 135,000; $190,001+ $51,370 + 45c/$1 over 190,000 | the 2026–27 income year | ATO, "Tax rates – Australian resident" — https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents (page dated 13 Aug 2026; read via the page-reading tool — direct curl and a real browser are 403-blocked) | The published 2026–27 table already carries the Budget's cut of the second-bracket rate to 15%. The page itself states these rates do not include the Medicare levy. |
+| AU | Medicare levy | 2% of taxable income | (same income year) | ATO, "What is the Medicare levy?" — https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/what-is-the-medicare-levy (last updated 30 Apr 2026) | "The Medicare levy is 2% of your taxable income." Added in full by the estimator; the low-income reductions the page describes are not modelled (the How fold says so). |
+| US | TY2026 rate schedule — Single | 10% to $12,400; 12% to $50,400; 22% to $105,700; 24% to $201,775; 32% to $256,225; 35% to $640,600; 37% above | tax year 2026 | IRS Rev. Proc. 2025-32 §4.01 Table 3 — https://www.irs.gov/pub/irs-drop/rp-25-32.pdf (cross-checked against news release IR-2025-103, 9 Oct 2025 — https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill) | The revenue procedure is the definitive schedule; the release was read as the cross-check. |
+| US | TY2026 — Married filing jointly (and qualifying surviving spouses) | 10% to $24,800; 12% to $100,800; 22% to $211,400; 24% to $403,550; 32% to $512,450; 35% to $768,700; 37% above | tax year 2026 | same (Rev. Proc. 2025-32 Table 1) | Surviving spouses share the joint table per the table's own heading. |
+| US | TY2026 — Head of household | 10% to $17,700; 12% to $67,450; 22% to $105,700; 24% to $201,750; 32% to $256,200; 35% to $640,600; 37% above | tax year 2026 | same (Table 2) | |
+| US | TY2026 — Married filing separately | 10% to $12,400; 12% to $50,400; 22% to $105,700; 24% to $201,775; 32% to $256,225; 35% to $384,350; 37% above | tax year 2026 | same (Table 4) | |
+| US | Net investment income tax | 3.8% on the lesser of net investment income or the MAGI excess over: $200,000 single/head of household; $250,000 married filing jointly; $125,000 married filing separately | tax year 2026 | IRS Topic no. 559 — https://www.irs.gov/taxtopics/tc559 (page reviewed 25 Nov 2026) | The estimator adds the 3.8% at or above the threshold (the next dollar of investment income above it is NIIT-taxed). Thresholds are fixed by statute, not indexed. |
+
+**Doors used:** the ATO pages were fetched through the search/page-reading tools after
+direct curl and a real browser were refused (403 Access Denied — the same F5 network
+block the figures research hit); both IRS documents were fetched directly (the release
+and Rev. Proc. PDF over plain HTTPS). **No fallback secondary source was needed** —
+every value above is first-hand from an official door.
+
+**Estimator semantics (recorded as a decision):** the typed income only sets the bracket;
+the rate is the tax on the **next dollar** of investment earnings at that income ("the
+tax rate on extra earnings at your income level" — the plain-words replacement for the
+never-shown word "marginal"). AU adds the 2% Medicare levy to the bracket rate; US adds
+the 3.8% NIIT at or above the status threshold.
+
+### 11.3 The v7 verification record (2026-11-26, all on this branch's final state)
+
+- Preflight, before any feature work: `python3 compound_reference_check.py --selftest`
+  six lines PASS; `bun test tests/compound-maths.test.ts` **94/94**; the browser harness
+  **64/64**; the grid replay **1200/1200 engine + 15/15 live**; Phase A **32/32**; lint
+  clean. **Tax off = v6 exactly**, re-verified at the end of the session: the same v6
+  suites all still green with the tax layer in the tree (the unit suite's v6 portion,
+  the unmodified harness checks, the v6 grid, Phase A).
+- The reference engine extended: `--selftest` now prints **10 lines, all PASS** — the
+  six v6 lines unmodified, the tax=0 exact-equality line, and three taxed vectors
+  pinned from the engine's own output (100/mo, 20y: 7.2% − 0.2% cost × 68% = 39,524.4;
+  3.03% cash-style, no cost, 32% tax = 29,608.8; 7.2%, 15% tax, fee 10, every 3 months,
+  3% growth = 55,499.1). A `--tax-grid` flag writes the taxed grid (the same strata at
+  15/32/45% tax); the v6 grid.json is untouched.
+- Unit tests: **141/141** (94 v6 + 47 v7): the tax=0 byte-identity regression over six
+  plan vectors, the three pinned reference vectors (±0.1%), today's-money deflation of
+  the after-tax result, monotonicity (finals strictly decrease; put-in, fees, pending
+  untouched), the cost-then-tax order (and that the wrong order differs), tax on Cash
+  (cost off, tax on), the band under tax, the tax-takes difference, the AU bracket edges
+  and the levy, the US bracket edges for all four statuses and the NIIT boundary one
+  dollar below vs on the threshold, staleness, the config constants, the clamp, and the
+  copy discipline (the on/off pair exists, "marginal" never appears, the income never
+  reaches the card lines).
+- The grid replay: **1200/1200 + 3600/3600** engine-side (the v6 grid unmodified plus
+  the taxed grid), and **15/15 + 21/21** through the real interface — the taxed subset
+  types the tax into the real Costs box and verifies the after-tax caption's rate at
+  every scenario (`tests/compound-grid-replay.ts` and the new
+  `tests/compound-grid-replay-tax.ts`, run as its own gate so each browser session is
+  fresh — this sandbox chokes on two heavy sessions in one process; the main file notes
+  where its sibling lives).
+- The browser harness: **86/86** (64 v6 + 22 v7) — no tax-shaped element on the default
+  screen; the row inside Costs (hidden until the group opens; 44px box, 16px text); the
+  manual rate (caption + takes line + the after-tax headline, no clamp note); clamping
+  (70 → 60 with the one plain message) and the 1-point stepper; the AU guided flow (the
+  exact line, the source line, "Use this rate"); the How fold's on/off pair (model,
+  guided source, the six-item not-included list, "No taxes are included." gone while
+  on); plain language over the new copy (no "marginal", 13.2 words average); the US
+  guided flow (four statuses, the 22% and 35.8% lines, the source); the fa RTL estimator
+  with Persian digits; dark mode; store-nothing + reload-reset (the caption and the takes
+  line gone after reload, no URL trace); one-screen fit with More options open at
+  360×800 / 390×844 / 430×932; the full keyboard path (typed into the tax box by
+  keyboard, the estimator opened with Enter); the A4 card with the tax on (the one tax
+  line with its source; the income never appears; one page).
+- Phase A (the v6 pass, re-run): **32/32**.
+- **The live build** (deployed with `NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build
+  && bunx wrangler deploy`; the account ID in the owner's credentials note had its last
+  two characters transposed — the token's own account list showed `…e852`, and the
+  deploy went through with that): both grid subsets through the real interface
+  (**15/15 + 21/21**, zero page errors), the golden path with the tax on and off
+  (manual and guided, AU and US, fa + RTL + dark) — **13/13** (`tests/v7-live-verify.ts`,
+  screenshots in `docs/compound-tests/v7-live-*.png`), zero console errors everywhere.
+- **Lighthouse (mobile, live): performance 98–99, accessibility 97** (two runs; v6 was
+  98/97 — no regression; `docs/compound-tests/v7-lighthouse.json`).
+- **axe (light + dark, EN + fa, with the tax UI open): zero new violations.** The scan
+  shows 14–15 `color-contrast` nodes — the v6 baseline was 14/13 with the groups closed;
+  the +1 is the pre-existing active-chip pattern ("Every month") newly visible because
+  this scan opens the Costs group; every flagged node is a v6 element. The v6 fa
+  `label-content-name-mismatch` on the language toggle is **fixed** this session (the
+  label-in-name extra); `docs/compound-tests/v7-axe-tax.json`.
+- Lint clean on every commit; `bun run lint` green at the end.
+
+### 11.4 The blocked-doors retry (the trust extra)
+
+Retried once, ~10 minutes of a hard 30-minute timebox, recorded in
+`docs/compound-tests/figures-research-2026-11-26.md`:
+
+- **CFS "Investment essentials" PDF — OPENED** (direct curl, 200, read first-hand): the
+  20-year figures to 30 September 2026 — S&P/ASX 300 Accumulation 6.97%, MSCI World Net
+  $A 8.95%, Bloomberg AusBond Bank Bill 3.25% — upgrading the v6 cross-checks from
+  snippet-read to document-read. No change to the figures file's numbers was warranted
+  (they remain the Vanguard/Damodaran/BIS/ABS primary rows; CFS stays the cross-check).
+- LBMA's page shell opens but the historical price series is a paid feed (spec §7 forbids
+  restricted-licence data). RBA and BLS stay blocked (403 / empty bodies). MSCI's
+  20/30-year figures stay login-gated.
+- **The common quarter-end remains unachievable:** no open door publishes 30-year
+  figures to 30 September 2026 (CFS publishes 20 years only; Vanguard is June-ending on
+  a yearly cadence; MSCI is gated; LBMA history is paid). The per-row disclosed period
+  ends stay, each freshly re-verified.
+
+### 11.5 Decisions log (v7)
+
+1. **Taxes moved in scope as an optional estimate** — the owner's v7 direction; the
+   default screen and the off state are byte-identical to v6 (the strongest regression
+   in the suite).
+2. **The estimator's rate is the next-dollar rate** ("the tax rate on extra earnings at
+   your income level") — the honest plain-words version of the never-shown word
+   "marginal"; the typed income only sets the bracket, as the UI says.
+3. **The Medicare levy is added in full, always, for AU** — one simple rule; the
+   low-income reductions and exemptions are not modelled and the How fold says so (the
+   alternative — shade-in thresholds — was judged false precision for a rough guide).
+4. **The NIIT applies at or above the threshold** (income ≥ threshold), because the next
+   dollar of investment income above it is NIIT-taxed; verified at the boundary in the
+   unit tests, one dollar below vs on it.
+5. **The income is session state only** — never on a card, never in the URL, never
+   stored; the reload-reset is tested.
+6. **The clamp lives in the app layer, not the shared NumberField's pre-clamp** — so the
+   one plain message actually fires when a typed number is pulled into 0–60% (a v6-era
+   pattern made the percent box's note unreachable by typing; the tax box does it
+   right, and the harness tests it).
+7. **The guided rate's source stays attached to the number** — the How fold and the A4
+   card show the source while the plan's rate is still the guided one, and fall back to
+   "your setting" the moment it is edited away.
+8. **The account-ID typo** — the owner's credentials note carried `…e85b`; the token's
+   account list showed `…e852`; the deploy used the latter (recorded here so the next
+   session does not trip on it).
+9. **Deliberately not built** (fails the simplicity contract or the sourcing rules, and
+   listed in the How fold and Appendix A): state-by-state US tables, capital-gains
+   modelling, account wrappers (super, 401(k), ISA-style), offsets and credits, franking
+   credits, auto-updating scrapers.
+10. **The site palette's sub-AA contrast tokens stay untouched** (site-wide restyle,
+    outside this tool's remit; still an owner decision) — and the fa label-in-name issue
+    IS fixed this session (see §11.3).
+
+### 11.6 How to roll back v7
+
+- `git revert` the v7 commits on `compound-wealth-v7` (the tax layer, the test layer,
+  the spec amendments, the doors retry, the report pack — each is one small, focused
+  commit), or `git checkout compound-wealth-v6 && NEXT_PUBLIC_BASE_PATH=/gold bun run
+  worker:build && bunx wrangler deploy`. The v7 commits touch the shared site chrome in
+  exactly one place (the language toggle's aria-label) — trivially revertible. Nothing
+  is stored anywhere, so there is nothing to clean up.

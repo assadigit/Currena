@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 204ms"
+      "detail": "3 one-tap changes in 221ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -49,7 +49,7 @@
     {
       "id": "14-390x844-one-screen",
       "pass": true,
-      "detail": "chips bottom 734/844, scrollW 390, scrollY 37"
+      "detail": "chips bottom 743/844, scrollW 390, scrollY 28"
     },
     {
       "id": "14-360x800-one-screen",

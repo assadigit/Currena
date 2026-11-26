@@ -1,0 +1,34 @@
+{
+  "light-en": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "nodes": 15,
+      "help": "Elements must meet minimum color contrast ratio thresholds"
+    }
+  ],
+  "light-fa": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "nodes": 14,
+      "help": "Elements must meet minimum color contrast ratio thresholds"
+    }
+  ],
+  "dark-en": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "nodes": 15,
+      "help": "Elements must meet minimum color contrast ratio thresholds"
+    }
+  ],
+  "dark-fa": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "nodes": 14,
+      "help": "Elements must meet minimum color contrast ratio thresholds"
+    }
+  ]
+}
