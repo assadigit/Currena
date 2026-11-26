@@ -303,18 +303,31 @@ export function purchasingPower(
   liveSpot: number | null,
 ): PurchasingPowerResult | null {
   if (!Number.isFinite(amount) || amount <= 0) return null;
-  const priceThen = yearPrice(year, liveSpot);
-  if (priceThen === null || priceThen <= 0) return null;
   if (liveSpot === null || !Number.isFinite(liveSpot) || liveSpot <= 0) return null;
+  const priceThen = yearPrice(year, liveSpot);
+  if (priceThen === null) return null;
+  return finishPp(amount, priceThen, liveSpot);
+}
+
+/** The shared tail of every machine leg: the weights the money bought
+ *  then and buys today, the worth line, and the contrast percent — all
+ *  over per-ounce prices in the leg's own currency. */
+function finishPp(
+  amount: number,
+  priceThen: number,
+  priceToday: number,
+): PurchasingPowerResult | null {
+  if (!Number.isFinite(priceThen) || priceThen <= 0) return null;
+  if (!Number.isFinite(priceToday) || priceToday <= 0) return null;
   const ozThen = amount / priceThen;
   const gramsThen = ozThen * GRAMS_PER_TROY_OUNCE;
-  const ozToday = amount / liveSpot;
+  const ozToday = amount / priceToday;
   const gramsToday = ozToday * GRAMS_PER_TROY_OUNCE;
   return {
     priceThen,
     ozThen,
     gramsThen,
-    worthToday: gramsThen * (liveSpot / GRAMS_PER_TROY_OUNCE),
+    worthToday: gramsThen * (priceToday / GRAMS_PER_TROY_OUNCE),
     ozToday,
     gramsToday,
     gramsPct: (gramsToday / gramsThen - 1) * 100,
@@ -386,4 +399,170 @@ export function chartPoints(liveSpot: number | null): { y: number; p: number; li
     }
   }
   return pts;
+}
+
+/* ------------------------------------------------------------------ *
+ * The multi-currency extension (the owner's ask): the machine now
+ * answers in the toman, the euro, the pound, the Canadian and the
+ * Australian dollars too — the toman on Tehran's own 18k gram (the
+ * very same leg the race section rides), the four crosses on the
+ * London annual average × the desk's own month-end FX table (units of
+ * the currency per 1 USD). Pure + fail-closed: a missing leg is a
+ * null, never a guess, and every basis is named at point of use.
+ * ------------------------------------------------------------------ */
+
+/** The months of a COMPLETE year in an FX month table — a year that
+ *  carries all twelve month-ends (the table's own first month is
+ *  2016-10, so 2016 itself never qualifies). */
+export function fxCompleteYearMonths(table: Record<string, number>, year: number): string[] {
+  const prefix = `${year}-`;
+  const months = Object.keys(table)
+    .filter((k) => k.startsWith(prefix))
+    .sort();
+  return months.length === 12 ? months : [];
+}
+
+/** A complete year's average of the FX month-end closes (units of the
+ *  currency per 1 USD); null unless the year carries twelve closes. */
+export function fxYearAverage(table: Record<string, number> | undefined, year: number): number | null {
+  if (table === undefined) return null;
+  const months = fxCompleteYearMonths(table, year)
+    .map((k) => table[k])
+    .filter((v): v is number => Number.isFinite(v) && v > 0);
+  if (months.length !== 12) return null;
+  return months.reduce((a, b) => a + b, 0) / 12;
+}
+
+/** The table's latest month-end close — the running month's own latest
+ *  row (units of the currency per 1 USD). */
+export function fxLatest(table: Record<string, number> | undefined): number | null {
+  if (table === undefined) return null;
+  const keys = Object.keys(table).sort();
+  const last = keys.length > 0 ? table[keys[keys.length - 1]!] : undefined;
+  return last !== undefined && Number.isFinite(last) && last > 0 ? last : null;
+}
+
+/** The FX-crossed machine's own year options: every complete year the
+ *  table covers inside the London annual's own coverage, plus the
+ *  running year at the live cross when both legs are in hand. */
+export function yearOptionsCcy(table: Record<string, number> | undefined, liveSpot: number | null): number[] {
+  if (table === undefined) return [];
+  const years: number[] = [];
+  for (let y = FIRST_YEAR; y <= LAST_COMPLETE_YEAR; y++) {
+    if (!GOLD_ANNUAL.some((r) => r.y === y)) continue;
+    if (fxCompleteYearMonths(table, y).length === 12) years.push(y);
+  }
+  if (liveSpot !== null && Number.isFinite(liveSpot) && liveSpot > 0 && fxLatest(table) !== null) {
+    const ry = runningYear();
+    if (ry > LAST_COMPLETE_YEAR) years.push(ry);
+  }
+  return years;
+}
+
+/** The machine for the four crosses (EUR · GBP · CAD · AUD): the ounce
+ *  price of year Y = the London annual average × that year's average FX;
+ *  today's price = the live spot × the table's latest close. The
+ *  running year reads the live cross on both sides, its own case. */
+export function purchasingPowerCcy(
+  amount: number,
+  year: number,
+  liveSpot: number | null,
+  table: Record<string, number> | undefined,
+): PurchasingPowerResult | null {
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  if (liveSpot === null || !Number.isFinite(liveSpot) || liveSpot <= 0) return null;
+  const latest = fxLatest(table);
+  if (latest === null) return null;
+  const priceToday = liveSpot * latest;
+  if (year === runningYear() && year > LAST_COMPLETE_YEAR) {
+    return finishPp(amount, priceToday, priceToday);
+  }
+  const usdRow = GOLD_ANNUAL.find((r) => r.y === year);
+  if (usdRow === undefined) return null;
+  const avg = fxYearAverage(table, year);
+  if (avg === null) return null;
+  return finishPp(amount, usdRow.p * avg, priceToday);
+}
+
+/** The toman leg's own inputs — the race payload's gold18 rows (the
+ *  ۱۸-عیار gram, toman, with each row's own basis) + the running leg. */
+export interface TomanMachineLegs {
+  gold18: ReadonlyArray<{ jy: number; toman: number; basis: "parity" | "tgju" }>;
+  running: { jy: number; gold18Toman: number | null } | null;
+}
+
+/** The toman machine's own answer — everything in grams of 18k Tehran
+ *  gold (the ounce is not this market's own unit). */
+export interface PurchasingPowerTomanResult {
+  /** The picked year's own gram price, toman per gram. */
+  priceThenTomanPerGram: number;
+  /** The picked year's own basis: the pre-۱۳۹۲ parity estimate, the
+ *  Tehran market price from ۱۳۹۲ on, or the live read. */
+  basisThen: "parity" | "market" | "live";
+  gramsThen: number;
+  /** What that gold is worth today at the live Tehran gram price. */
+  worthTodayToman: number;
+  gramsToday: number;
+  gramsPct: number;
+}
+
+/** The toman machine: amount toman in Jalali year JY → the 18k grams it
+ *  bought then, their worth today, and the same money today. Pure;
+ *  null when a leg is missing (never a guess). */
+export function purchasingPowerToman(
+  amount: number,
+  jy: number,
+  legs: TomanMachineLegs,
+): PurchasingPowerTomanResult | null {
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  const liveToday = legs.running !== null ? legs.running.gold18Toman : null;
+  if (liveToday === null || !Number.isFinite(liveToday) || liveToday <= 0) return null;
+  let priceThen: number;
+  let basisThen: "parity" | "market" | "live";
+  if (legs.running !== null && jy === legs.running.jy) {
+    priceThen = liveToday;
+    basisThen = "live";
+  } else {
+    const row = legs.gold18.find((r) => r.jy === jy);
+    if (row === undefined) return null;
+    priceThen = row.toman;
+    basisThen = row.basis === "parity" ? "parity" : "market";
+  }
+  if (!Number.isFinite(priceThen) || priceThen <= 0) return null;
+  const gramsThen = amount / priceThen;
+  const gramsToday = amount / liveToday;
+  return {
+    priceThenTomanPerGram: priceThen,
+    basisThen,
+    gramsThen,
+    worthTodayToman: gramsThen * liveToday,
+    gramsToday,
+    gramsPct: (gramsToday / gramsThen - 1) * 100,
+  };
+}
+
+/** The toman machine's own year options: every complete Jalali year the
+ *  gold18 leg carries, plus the running year when the live leg is in. */
+export function yearOptionsToman(legs: TomanMachineLegs): number[] {
+  const years = legs.gold18.map((r) => r.jy);
+  const liveToday = legs.running !== null ? legs.running.gold18Toman : null;
+  if (
+    legs.running !== null &&
+    liveToday !== null &&
+    Number.isFinite(liveToday) &&
+    liveToday > 0 &&
+    !years.includes(legs.running.jy)
+  ) {
+    years.push(legs.running.jy);
+  }
+  return years;
+}
+
+/** The compound annual growth rate between two prices over `years`
+ *  years, in percent; null when the inputs cannot speak. */
+export function cagrPercent(first: number, last: number, years: number): number | null {
+  if (!Number.isFinite(first) || first <= 0) return null;
+  if (!Number.isFinite(last) || last <= 0) return null;
+  if (!Number.isFinite(years) || years <= 0) return null;
+  return (Math.pow(last / first, 1 / years) - 1) * 100;
 }

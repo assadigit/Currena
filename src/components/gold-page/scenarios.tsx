@@ -31,6 +31,10 @@ export interface ScenarioT {
   downLabel: string;
   nextLabel: string;
   noSchedule: string;
+  /** the un-dated fifth force's own disclaimer (the owner's ask): the
+ *   stress spike is not certain, so it is not a card — hedged words
+ *   under the grid instead. */
+  unscheduledNote: string;
 }
 
 /* ------------------------------------------------------------------ *
@@ -100,19 +104,9 @@ const SCENARIOS: ReadonlyArray<ScenarioDef> = [
       "PCE خنک — گاردِ فدرال رزرو پایین می‌آید و روایتِ تورمیِ طلا لاغر می‌شود.",
     ],
   },
-  {
-    id: "stress-spike",
-    calendarId: null,
-    name: ["A stress spike (war, bank, default scare)", "جهش تنش (جنگ، بانک، ترس نکول)"],
-    upCase: [
-      "A real stress event — the monetary-hedge bid for gold jumps, fast and unscheduled.",
-      "یک رویداد تنشِ واقعی — تقاضای پناهِ پولی برای طلا جهش می‌کند؛ سریع و بی‌برنامه.",
-    ],
-    downCase: [
-      "Calm returning — the hedge bid melts back out of the price.",
-      "بازگشت آرامش — تقاضای پناه از قیمت بیرون می‌ریزد.",
-    ],
-  },
+  /* the stress spike is retired from the cards (the owner's ask): it
+     is not a dated, certain event — it walks in unannounced, so it
+     rides as the hedged disclaimer under the grid instead */
 ];
 
 /* ------------------------------------------------------------------ *
@@ -150,7 +144,8 @@ export function ScenariosBand({
   }, [now]);
 
   /* the owner's ask: the cards sort by their next date — the most
-     upcoming first; the un-dated (the stress spike) always last */
+     upcoming first (every scenario carries a calendar date now, the
+     un-dated stress spike retired to the disclaimer below) */
   const ordered = React.useMemo(() => {
     const withDate = SCENARIOS.filter((s) => s.calendarId !== null && nextOf.has(s.calendarId!));
     const rest = SCENARIOS.filter((s) => !(s.calendarId !== null && nextOf.has(s.calendarId!)));
@@ -176,7 +171,7 @@ export function ScenariosBand({
           return (
             <article
               key={s.id}
-              className="flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3.5 ring-1 ring-[var(--color-border)] lg:last:col-span-2"
+              className="flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3.5 ring-1 ring-[var(--color-border)]"
             >
               {/* the header — [date] over [title] (the owner's ask): the
                   next occurrence leads, the scenario's name under it */}
@@ -230,6 +225,17 @@ export function ScenariosBand({
           );
         })}
       </div>
+
+      {/* the un-dated fifth force as a disclaimer (the owner's ask): the
+          stress spike is NOT certain — no card, no equal weight, hedged
+          words under the grid; the cards above stay the dated, scheduled
+          bends only */}
+      <p
+        className="m-0 mt-3 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-2.5 text-[12px] italic leading-relaxed text-[var(--color-text-tertiary)] ring-1 ring-[var(--color-border)]/60"
+        data-scenarios-unscheduled
+      >
+        {t.unscheduledNote}
+      </p>
 
       {/* the merged calendar — the section's own second half (the events
           ARE the scenarios' dates; one card, no second section, no

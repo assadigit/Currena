@@ -502,16 +502,17 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
           little lucide clock — riding the lead line at the owner's
           batch-O 128px floor, with the lead words + count wrapping
           INSIDE their own column beside it (never dropping under the
-          icon). */}
-      <p className="m-0 flex items-center gap-3 type-caption font-bold text-[var(--color-text-primary)]">
+          icon). The lead is a HEADING now (the owner's ask): the
+          events' own title, «رویدادهای پیش‌روی طلا». */}
+      <h3 className="m-0 flex items-center gap-3 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">
         <PackIcon file="gold-events-calendar.png" size={128} className="h-32 w-32" />
         <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
           {t.eventsLead}
-          <span className="font-semibold text-[var(--color-text-tertiary)]">
+          <span className="type-caption font-semibold text-[var(--color-text-tertiary)]">
             {events.length > 0 ? `· ${fmt.num(events.length, 0)} ${locale === "en" ? "events" : "رویداد"}` : ""}
           </span>
         </span>
-      </p>
+      </h3>
 
       {now === null ? (
         <p className="m-0 mt-3 type-caption text-[var(--color-text-tertiary)]" aria-live="polite">
@@ -529,7 +530,7 @@ export function CalendarBand({ t, locale, fmt }: { t: CalT; locale: Locale; fmt:
                 type="button"
                 aria-expanded={open}
                 onClick={() => setOpen((o) => !o)}
-                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
               >
                 {open ? t.fewerLabel : t.moreLabel.replace("{n}", fmt.num(events.length - VISIBLE, 0))}
                 <span aria-hidden="true" className={`text-[10px] transition-transform ${open ? "rotate-180" : ""}`}>

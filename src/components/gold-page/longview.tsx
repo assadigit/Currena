@@ -22,20 +22,46 @@
  */
 
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Hourglass } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
-import { type Fmt, SignedDelta } from "@/components/gold-page/visuals";
+import { deskBasePath } from "@/lib/utils";
+import { type Fmt, SignedDelta, faDigits } from "@/components/gold-page/visuals";
 import { sanitizeAmountText } from "@/components/gold-page/calculator";
+import { fetchDollarTrend } from "@/components/gold-page/dollar-trend";
+import type { FxPayload } from "@/lib/gold-page/ifbought";
 import {
+  cagrPercent,
   chartPoints,
   isRunningYear,
   lastYearsTable,
   purchasingPower,
+  purchasingPowerCcy,
+  purchasingPowerToman,
+  yearOptionsCcy,
   yearOptionsLong,
+  yearOptionsToman,
   type GoldYearRow,
+  type PurchasingPowerResult,
+  type PurchasingPowerTomanResult,
+  type TomanMachineLegs,
 } from "@/lib/gold-page/longview";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
+
+/** Persian and Arabic-Indic digits → ASCII (the fa amount box's own
+ *  input path: Farsi text carries Farsi numerals, the machine reads
+ *  ASCII underneath — typed or displayed, never a guess). */
+function toAsciiDigits(s: string): string {
+  const fa = "۰۱۲۳۴۵۶۷۸۹";
+  const ar = "٠١٢٣٤٥٦٧٨٩";
+  return s.replace(/[۰-۹٠-٩]/g, (d) => {
+    const i = fa.indexOf(d);
+    if (i >= 0) return String(i);
+    const j = ar.indexOf(d);
+    return j >= 0 ? String(j) : d;
+  });
+}
 
 /** A year, UNGROUPED (2026, never "2,026") — the locale digits still apply. */
 function yearText(y: number, locale: Locale): string {
@@ -63,6 +89,12 @@ type LongviewT = {
   /** the visible 20-year table's own title + caption (batch L: in the open) */
   modalTitle: string;
   modalNote: string;
+  /** the 20-year verdict container (the owner's ask): the average
+ *   per-year growth over the table's own span, compound, live-tailed. */
+  verdictTitle: string;
+  verdictLine: string;
+  verdictEndLive: string;
+  verdictEndAvg: string;
   colYear: string;
   colAvg: string;
   colChange: string;
@@ -80,6 +112,18 @@ type LongviewT = {
   ppMoreWord: string;
   ppRunningNote: string;
   ppUncovered: string;
+  /** the multi-currency layer (the owner's ask): the toman, the euro,
+ *   the pound, the Canadian and the Australian dollars beside the
+ *   dollar — each leg's own basis named in the note. */
+  ppYearJalali: string;
+  ppCcyLabel: string;
+  ppCcyNames: Record<string, string>;
+  ppBasisParity: string;
+  ppBasisMarket: string;
+  ppBasisFx: string;
+  ppTomanGramWord: string;
+  ppMillionToman: string;
+  ppBillionToman: string;
   basisLine: string;
   sourceLine: string;
 };
@@ -302,9 +346,40 @@ export function LongViewCard({
     return { y: base.y, p: base.p, live: base.live };
   }, [visible, hoverYear]);
 
-  /* the purchasing-power machine — the owner's example rides as the
-     default: $12,000 in 2020 */
-  const years = React.useMemo(() => yearOptionsLong(liveSpot), [liveSpot]);
+  /* the purchasing-power machine, now multi-currency (the owner's ask):
+     USD on the London annual average; the toman on Tehran's own 18k
+     gram and the free-market dollar (the very same leg the race section
+     rides); EUR · GBP · CAD · AUD on the London average crossed with
+     the desk's own month-end FX table. Each leg's own default rides the
+     switch; the owner's original example ($12,000 in 2020) stays the
+     USD default. */
+  const CCY_IDS = ["usd", "toman", "aud", "cad", "gbp", "eur"] as const;
+  type MachineCcyId = (typeof CCY_IDS)[number];
+  const CCY_DEFAULT_AMOUNT: Record<MachineCcyId, number> = {
+    usd: 12000,
+    toman: 100000000,
+    aud: 15000,
+    cad: 15000,
+    gbp: 8000,
+    eur: 10000,
+  };
+  const CCY_DEFAULT_YEAR: Record<MachineCcyId, number> = {
+    usd: 2020,
+    toman: 1400,
+    aud: 2020,
+    cad: 2020,
+    gbp: 2020,
+    eur: 2020,
+  };
+  const CCY_SYMBOL_EN: Record<MachineCcyId, string> = {
+    usd: "US$",
+    toman: "",
+    aud: "A$",
+    cad: "C$",
+    gbp: "£",
+    eur: "€",
+  };
+  const [ccy, setCcy] = React.useState<MachineCcyId>("usd");
   const [ppYear, setPpYear] = React.useState<number>(2020);
   const [amount, setAmount] = React.useState<number>(12000);
   const [amountText, setAmountText] = React.useState<string>("12000");
@@ -312,13 +387,120 @@ export function LongViewCard({
     if (Number(amountText) === amount) return;
     setAmountText(String(amount));
   }, [amount, amountText]);
-  const pickedYear = years.includes(ppYear) ? ppYear : years[0] ?? ppYear;
-  const answer = React.useMemo(
-    () => purchasingPower(amount, pickedYear, liveSpot),
-    [amount, pickedYear, liveSpot],
-  );
+
+  /* the machine's own legs — the desk's month-end FX table (the very
+     same query the wealth calculator rides, one cache) and the race
+     payload (the toman's gold18 series + its running leg) */
+  const fx = useQuery({
+    queryKey: ["currena-gold-fx-monthends"],
+    queryFn: async (): Promise<FxPayload> => {
+      const res = await fetch(`${deskBasePath}/api/gold/fx`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`The fx API responded with ${res.status}`);
+      return res.json() as Promise<FxPayload>;
+    },
+    retry: 1,
+  });
+  const dollarTrend = useQuery({
+    queryKey: ["currena-gold-dollar-trend"],
+    queryFn: fetchDollarTrend,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+  const fxTable = fx.data?.perUsd ?? null;
+  const tomanLegs = React.useMemo<TomanMachineLegs | null>(() => {
+    const p = dollarTrend.data ?? null;
+    if (p === null) return null;
+    return { gold18: p.gold18, running: p.running };
+  }, [dollarTrend.data]);
+
+  /* the year picker's own options per currency — Gregorian for USD and
+     the four crosses, Jalali for the toman (EN reads the Gregorian year
+     the Jalali year starts in, the race table's own convention) */
+  const yearOptions =
+    ccy === "usd"
+      ? yearOptionsLong(liveSpot)
+      : ccy === "toman"
+        ? tomanLegs === null
+          ? []
+          : yearOptionsToman(tomanLegs)
+        : yearOptionsCcy(fxTable !== null ? (fxTable[ccy] ?? undefined) : undefined, liveSpot);
+  const pickedYear = yearOptions.includes(ppYear) ? ppYear : (yearOptions[0] ?? ppYear);
+  const runningToman =
+    tomanLegs !== null && tomanLegs.running !== null && tomanLegs.running.gold18Toman !== null
+      ? tomanLegs.running
+      : null;
+  const machineYearLabel = (y: number): string => {
+    if (ccy !== "toman") return yearText(y, locale);
+    const shown = locale === "fa" ? y : y + 621;
+    try {
+      return shown.toLocaleString(locale === "fa" ? "fa-IR" : "en-US", { useGrouping: false });
+    } catch {
+      return String(shown);
+    }
+  };
+  const isRunningPick = (y: number): boolean => {
+    if (ccy === "toman") return runningToman !== null && runningToman.jy === y;
+    return isRunningYear(y);
+  };
+
+  /* the answer, normalized per leg kind — pure engines, fail-closed */
+  type MachineAnswer =
+    | { kind: "oz"; a: PurchasingPowerResult }
+    | { kind: "toman"; a: PurchasingPowerTomanResult }
+    | null;
+  /* the answer, normalized per leg kind — pure engines, fail-closed;
+     plain inline arithmetic (no manual memo: the compiler owns it) */
+  const answer: MachineAnswer = (() => {
+    if (!Number.isFinite(amount) || amount <= 0) return null;
+    if (ccy === "usd") {
+      const a = purchasingPower(amount, pickedYear, liveSpot);
+      return a === null ? null : { kind: "oz", a };
+    }
+    if (ccy === "toman") {
+      if (tomanLegs === null) return null;
+      const a = purchasingPowerToman(amount, pickedYear, tomanLegs);
+      return a === null ? null : { kind: "toman", a };
+    }
+    const a = purchasingPowerCcy(amount, pickedYear, liveSpot, fxTable !== null ? (fxTable[ccy] ?? undefined) : undefined);
+    return a === null ? null : { kind: "oz", a };
+  })();
+
+  /* the money words, currency-aware (fa: the word rides the number;
+     the toman compacts to millions/billions — the bridge board's own
+     convention for the big figures) */
+  const pctSign = locale === "fa" ? "٪" : "%";
+  const ccyName = t.ppCcyNames[ccy] ?? ccy;
+  const moneyText = (v: number): string => {
+    if (ccy === "toman") {
+      if (v >= 1e9) return t.ppBillionToman.replace("{v}", fmt.num(v / 1e9, 2));
+      if (v >= 1e6) return t.ppMillionToman.replace("{v}", fmt.num(v / 1e6, 1));
+      return locale === "fa" ? `${fmt.num(v, 0)} ${ccyName}` : `${fmt.num(v, 0)} toman`;
+    }
+    return locale === "fa" ? `${fmt.num(v, 0)} ${ccyName}` : `${CCY_SYMBOL_EN[ccy]}${fmt.num(v, 0)}`;
+  };
 
   const tableRows = React.useMemo(() => lastYearsTable(liveSpot), [liveSpot]);
+
+  /* the 20-year verdict (the owner's ask): the average per-year growth
+     over the table's own span — compound, computed live from the same
+     rows the table shows, the end named as its own case */
+  const verdict = React.useMemo(() => {
+    if (tableRows.length < 2) return null;
+    const first = tableRows[0]!;
+    const last = tableRows[tableRows.length - 1]!;
+    const years = last.year - first.year;
+    if (years <= 0) return null;
+    const pct = cagrPercent(first.price, last.price, years);
+    if (pct === null) return null;
+    const endWord = last.running
+      ? t.verdictEndLive
+      : t.verdictEndAvg.replace("{y}", yearText(last.year, locale));
+    return t.verdictLine
+      .replace("{pct}", fmt.num(pct, 1))
+      .replace("{a}", locale === "fa" ? fmt.num(first.price, 0) : `$${fmt.num(first.price, 0)}`)
+      .replace("{y0}", yearText(first.year, locale))
+      .replace("{end}", endWord);
+  }, [tableRows, t, fmt, locale]);
 
   return (
     <div className="mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)]">
@@ -401,10 +583,27 @@ export function LongViewCard({
 
       {/* the last 20 years, year by year — IN THE OPEN (batch L: the
           owner's law, «طلا در بیست سال اخیر» visible, never behind a
-          toggle); the running year rides its own live spot */}
+          toggle); the running year rides its own live spot. The verdict
+          container (the owner's ask) leads: the average per-year growth
+          over the table's own span, computed live from these same rows */}
       <div className="mt-3">
         <h5 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.modalTitle}</h5>
         <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.modalNote}</p>
+        {verdict !== null ? (
+          <div
+            className="mt-2 rounded-[var(--cr-radius-md)] px-3.5 py-3"
+            style={{
+              backgroundColor: "color-mix(in srgb, var(--color-accent-gold) 16%, transparent)",
+              boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 45%, transparent)",
+            }}
+            data-longview-verdict
+          >
+            <p className="m-0 type-caption font-bold text-[var(--color-accent-gold-deep)]">{t.verdictTitle}</p>
+            <p className="m-0 mt-0.5 text-[1.02rem] font-black leading-snug text-[var(--color-accent-gold-deep)] sm:text-[1.1rem]">
+              <bdi>{verdict}</bdi>
+            </p>
+          </div>
+        ) : null}
         <div className="mt-1.5 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
           <table className="m-0 w-full border-collapse type-caption">
             <thead>
@@ -425,7 +624,11 @@ export function LongViewCard({
         </div>
       </div>
 
-      {/* the purchasing-power machine — the owner's own ask */}
+      {/* the purchasing-power machine — the owner's own ask, now
+          multi-currency (the owner's batch): the currency select leads,
+          the amount box rides Persian digits in fa (the owner's law:
+          Farsi text carries Farsi numerals — typed or displayed), and
+          the year select speaks Jalali for the toman */}
       <div className="mt-3 flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
         <div>
           <h5 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{t.ppTitle}</h5>
@@ -434,15 +637,38 @@ export function LongViewCard({
 
         <div className="flex flex-wrap items-end gap-2.5">
           <label className="flex flex-col gap-1">
-            <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{t.ppAmountLabel}</span>
+            <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{t.ppCcyLabel}</span>
+            <select
+              value={ccy}
+              onChange={(e) => {
+                const next = e.currentTarget.value as MachineCcyId;
+                setCcy(next);
+                setAmount(CCY_DEFAULT_AMOUNT[next]);
+                setAmountText(String(CCY_DEFAULT_AMOUNT[next]));
+                setPpYear(CCY_DEFAULT_YEAR[next]);
+              }}
+              className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
+              aria-label={t.ppCcyLabel}
+            >
+              {CCY_IDS.map((c) => (
+                <option key={c} value={c}>
+                  {t.ppCcyNames[c] ?? c}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="type-caption font-semibold text-[var(--color-text-secondary)]">
+              {t.ppAmountLabel.replace("{c}", ccyName)}
+            </span>
             <input
               type="text"
               inputMode="decimal"
               autoComplete="off"
               dir="ltr"
-              value={amountText}
+              value={locale === "fa" ? faDigits(amountText) : amountText}
               onChange={(e) => {
-                const text = sanitizeAmountText(e.target.value);
+                const text = sanitizeAmountText(toAsciiDigits(e.target.value));
                 setAmountText(text);
                 const v = Number(text);
                 setAmount(text === "" || !Number.isFinite(v) ? 0 : Math.max(0, v));
@@ -457,17 +683,19 @@ export function LongViewCard({
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="type-caption font-semibold text-[var(--color-text-secondary)]">{t.ppYearLabel}</span>
+            <span className="type-caption font-semibold text-[var(--color-text-secondary)]">
+              {ccy === "toman" ? t.ppYearJalali : t.ppYearLabel}
+            </span>
             <select
               value={pickedYear}
               onChange={(e) => setPpYear(Number(e.currentTarget.value))}
               className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold tabular-nums text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
-              aria-label={t.ppYearLabel}
+              aria-label={ccy === "toman" ? t.ppYearJalali : t.ppYearLabel}
             >
-              {[...years].reverse().map((y) => (
+              {[...yearOptions].reverse().map((y) => (
                 <option key={y} value={y}>
-                  {yearText(y, locale)}
-                  {isRunningYear(y) ? ` · ${t.liveWord}` : ""}
+                  {machineYearLabel(y)}
+                  {isRunningPick(y) ? ` · ${t.liveWord}` : ""}
                 </option>
               ))}
             </select>
@@ -475,27 +703,31 @@ export function LongViewCard({
         </div>
 
         {/* the answer — the weight the money bought, its worth today, and
-            the same money's buying power now */}
+            the same money's buying power now; the toman leg speaks grams
+            of 18k Tehran gold only (the ounce is not that market's unit) */}
         {answer === null ? (
           <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.ppUncovered}</p>
-        ) : (
+        ) : answer.kind === "toman" ? (
           (() => {
-            const less = answer.gramsPct < 0;
+            const a = answer.a;
+            const less = a.gramsPct < 0;
             const tone = less ? "var(--color-return-down)" : "var(--color-return-up)";
+            const basisWord =
+              a.basisThen === "live" ? t.ppRunningNote : a.basisThen === "parity" ? t.ppBasisParity : t.ppBasisMarket;
             return (
               <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
                 <p className="m-0 type-caption font-semibold text-[var(--color-text-secondary)]">{t.ppBoughtWord}:</p>
                 <p className="m-0 inline-flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <bdi dir={locale === "en" ? "ltr" : "rtl"} className="text-[1.35rem] font-black leading-tight tabular-nums text-[var(--color-accent-gold-deep)] sm:text-[1.5rem]">
-                    {fmt.num(answer.ozThen, 2)} {t.ppOzWord} ≈ {fmt.num(answer.gramsThen, 1)} {t.ppGramWord}
+                    {fmt.num(a.gramsThen, 1)} {t.ppTomanGramWord}
                   </bdi>
-                  <bdi className="type-caption text-[var(--color-text-tertiary)]">
-                    {isRunningYear(pickedYear) ? t.ppRunningNote : `${t.avgWord} $${fmt.num(answer.priceThen, answer.priceThen < 100 ? 2 : 0)}`}
-                  </bdi>
+                  <bdi className="type-caption text-[var(--color-text-tertiary)]">{basisWord}</bdi>
                 </p>
                 <p className="m-0 type-caption text-[var(--color-text-secondary)]">
                   <span className="font-semibold">{t.ppWorthWord}:</span>{" "}
-                  <bdi dir="ltr" className="font-bold tabular-nums text-[var(--color-text-primary)]">{fmt.usd(answer.worthToday)}</bdi>
+                  <bdi dir={locale === "en" ? "ltr" : "rtl"} className="font-bold tabular-nums text-[var(--color-text-primary)]">
+                    {moneyText(a.worthTodayToman)}
+                  </bdi>
                 </p>
                 <p
                   className="m-0 inline-flex flex-wrap items-baseline gap-x-2 rounded-[var(--cr-radius-md)] px-3 py-2 type-caption"
@@ -506,7 +738,52 @@ export function LongViewCard({
                 >
                   <span className="font-semibold text-[var(--color-text-secondary)]">{t.ppSameTodayWord}:</span>
                   <bdi dir={locale === "en" ? "ltr" : "rtl"} className="font-black tabular-nums" style={{ color: tone }}>
-                    {fmt.num(answer.ozToday, 2)} {t.ppOzWord} ≈ {fmt.num(answer.gramsToday, 1)} {t.ppGramWord} — {fmt.num(Math.abs(answer.gramsPct), 1)}% {less ? t.ppLessWord : t.ppMoreWord}
+                    {fmt.num(a.gramsToday, 1)} {t.ppTomanGramWord} — {fmt.num(Math.abs(a.gramsPct), 1)}
+                    {pctSign} {less ? t.ppLessWord : t.ppMoreWord}
+                  </bdi>
+                </p>
+              </div>
+            );
+          })()
+        ) : (
+          (() => {
+            const a = answer.a;
+            const less = a.gramsPct < 0;
+            const tone = less ? "var(--color-return-down)" : "var(--color-return-up)";
+            const priceThenNote =
+              ccy === "usd"
+                ? isRunningYear(pickedYear)
+                  ? t.ppRunningNote
+                  : `${t.avgWord} $${fmt.num(a.priceThen, a.priceThen < 100 ? 2 : 0)}`
+                : isRunningYear(pickedYear)
+                  ? t.ppRunningNote
+                  : t.ppBasisFx;
+            return (
+              <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2.5 ring-1 ring-[var(--color-border)]">
+                <p className="m-0 type-caption font-semibold text-[var(--color-text-secondary)]">{t.ppBoughtWord}:</p>
+                <p className="m-0 inline-flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <bdi dir={locale === "en" ? "ltr" : "rtl"} className="text-[1.35rem] font-black leading-tight tabular-nums text-[var(--color-accent-gold-deep)] sm:text-[1.5rem]">
+                    {fmt.num(a.ozThen, 2)} {t.ppOzWord} ≈ {fmt.num(a.gramsThen, 1)} {t.ppGramWord}
+                  </bdi>
+                  <bdi className="type-caption text-[var(--color-text-tertiary)]">{priceThenNote}</bdi>
+                </p>
+                <p className="m-0 type-caption text-[var(--color-text-secondary)]">
+                  <span className="font-semibold">{t.ppWorthWord}:</span>{" "}
+                  <bdi dir={locale === "en" ? "ltr" : "rtl"} className="font-bold tabular-nums text-[var(--color-text-primary)]">
+                    {ccy === "usd" ? fmt.usd(a.worthToday) : moneyText(a.worthToday)}
+                  </bdi>
+                </p>
+                <p
+                  className="m-0 inline-flex flex-wrap items-baseline gap-x-2 rounded-[var(--cr-radius-md)] px-3 py-2 type-caption"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)`,
+                    boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${tone} 40%, transparent)`,
+                  }}
+                >
+                  <span className="font-semibold text-[var(--color-text-secondary)]">{t.ppSameTodayWord}:</span>
+                  <bdi dir={locale === "en" ? "ltr" : "rtl"} className="font-black tabular-nums" style={{ color: tone }}>
+                    {fmt.num(a.ozToday, 2)} {t.ppOzWord} ≈ {fmt.num(a.gramsToday, 1)} {t.ppGramWord} — {fmt.num(Math.abs(a.gramsPct), 1)}
+                    {pctSign} {less ? t.ppLessWord : t.ppMoreWord}
                   </bdi>
                 </p>
               </div>
@@ -515,7 +792,10 @@ export function LongViewCard({
         )}
       </div>
 
-      <p className="m-0 mt-2.5 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.basisLine}</p>
+      {/* the basis line as a P.S. (the owner's ask): quieter, smaller,
+          one step down from the caption register — a footnote, not a
+          claim */}
+      <p className="m-0 mt-2.5 text-[11px] italic leading-relaxed text-[var(--color-text-tertiary)] opacity-80">{t.basisLine}</p>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-tertiary)]">{t.sourceLine}</p>
 
     </div>

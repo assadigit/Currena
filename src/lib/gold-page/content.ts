@@ -196,10 +196,11 @@ export const UI = {
       // the verdict, then the market paragraph right under it.
       eyebrow: "Market Brief",
       headline: "Gold: conditions are against it",
-      assessment: "Pressure on gold is moderate",
+      nowLead: "Now:",
+      assessment: "the pressure on gold is moderate",
       marketBody:
         "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights.",
-      chipMonths: "Next 1–3 months",
+      outlookLead: "the next 1–3 months:",
       chipMonthsLean: "conditions are against gold",
       whyTitle: "Key factors at work right now",
       evidence: "Evidence",
@@ -220,6 +221,8 @@ export const UI = {
       downLabel: "Gold falling",
       nextLabel: "next scheduled re-weigh",
       noSchedule: "no calendar date — it walks in unannounced",
+      unscheduledNote:
+        "And the one that carries no calendar date is not a card either: a stress spike — war, a banking scare, a default fear. It may never come; if it does, the monetary-hedge bid for gold can jump, fast and unscheduled. Nothing on this page treats it as certain or dated.",
     },
     balance: {
       eyebrow: "The balance",
@@ -258,7 +261,7 @@ export const UI = {
       spanNote: "the stored span: {span}",
     },
     calendar: {
-      eventsLead: "The upcoming events · ≈ near its usual slot",
+      eventsLead: "Upcoming gold events",
       impactHigh: "high impact",
       impactMed: "medium",
       daysAway: "in {n} days",
@@ -320,11 +323,15 @@ export const UI = {
     indicators: {
       eyebrow: "At a glance",
       title: "Key indicators · the dashboard",
-      subtitle: "The handful of live series behind today's story.",
+      subtitle: "The three indicators that matter most to the gold price, always in the open — the rest one tap away.",
       realYield: "10Y Real Yield (TIPS)",
       nominalYield: "10Y Nominal Yield",
       fredDaily: "FRED · daily close · as of {date}",
-      breakeven: "10Y breakeven inflation (nominal − real): {v}%",
+      breakevenName: "10Y expected inflation",
+      breakevenSub: "the nominal minus the real yield",
+      restOpen: "the other indicators",
+      restTitle: "The other indicators",
+      restNote: "The rest of the dashboard's own live series, each with its spark and 30-day change.",
       unitPp: "pp",
       dxy: "Dollar index",
       usdjpy: "USD/JPY",
@@ -484,15 +491,36 @@ export const UI = {
       modalTitle: "Gold in the last twenty years",
       modalNote:
         "Each year's own average price and its change over the year before. The running year reads the live spot — its own case, named, never mixed.",
+      verdictTitle: "The twenty-year verdict",
+      verdictLine:
+        "Over the last twenty years gold has grown {pct}% a year on average — from the {y0} average of {a} to {end}; the compound annual growth rate.",
+      verdictEndLive: "today's live spot",
+      verdictEndAvg: "the {y} average",
       colYear: "Year",
       colAvg: "Average ($/oz)",
       colChange: "Change",
       runningCell: "live",
       ppTitle: "The purchasing-power machine",
       ppNote:
-        "How much gold a sum could actually buy in a past year — the year's own average price, the same money's buying power today, the contrast in one answer.",
-      ppAmountLabel: "The money (USD)",
+        "How much gold a sum could actually buy in a past year — the year's own average price, the same money's buying power today, the contrast in one answer. USD rides the London annual average; the toman rides Tehran's own 18k gold and the free-market dollar; the euro, the pound and the Canadian and Australian dollars ride the London average × that year's average FX.",
+      ppAmountLabel: "The money ({c})",
       ppYearLabel: "The year",
+      ppYearJalali: "The year (Jalali)",
+      ppCcyLabel: "Currency",
+      ppCcyNames: {
+        usd: "US dollar",
+        toman: "Iranian toman",
+        aud: "Australian dollar",
+        cad: "Canadian dollar",
+        gbp: "British pound",
+        eur: "Euro",
+      } as Record<string, string>,
+      ppBasisParity: "parity estimate",
+      ppBasisMarket: "Tehran market price",
+      ppBasisFx: "London average × that year's average FX",
+      ppTomanGramWord: "g of 18k Tehran gold",
+      ppMillionToman: "{v}M toman",
+      ppBillionToman: "{v} bn toman",
       ppBoughtWord: "you could buy",
       ppOzWord: "troy oz",
       ppGramWord: "g",
@@ -855,10 +883,6 @@ export const UI = {
     },
     te: {
       title: "Trading Economics daily gold briefing",
-      // The AI-translated corner badge (batch K): the literal Latin tag on
-      // both locales, the honest engine + date riding its tooltip.
-      aiBadge: "AI-translated",
-      aiBadgeTip: "Machine-translated to Farsi by {model}, {date}",
       publishedLabel: "Published {date}",
       fetchedLabel: "fetched {date}",
       updatedLabel: "Updated {date}",
@@ -873,10 +897,6 @@ export const UI = {
     wgc: {
       title: "World Gold Council monthly commentary",
       issueLabel: "{month} in review",
-      // The AI-translated corner badge (batch K): the literal Latin tag on
-      // both locales, the honest engine + date riding its tooltip.
-      aiBadge: "AI-translated",
-      aiBadgeTip: "Machine-translated to Farsi by {model}, {date}",
       publishedLabel: "Published {date}",
       fetchedLabel: "fetched {date}",
       updatedLabel: "Updated {date}",
@@ -934,10 +954,11 @@ export const UI = {
       // به خودِ همین بخش پیوسته — عنوان، حکم، و بعد بندِ مرور، درست زیر عنوان.
       eyebrow: "مرور بازار",
       headline: "طلا: شرایط علیه آن است",
+      nowLead: "اکنون:",
       assessment: "فشار بر طلا متوسط است",
       marketBody:
         "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند.",
-      chipMonths: "۱ تا ۳ ماه آینده",
+      outlookLead: "۱ تا ۳ ماه آینده:",
       chipMonthsLean: "شرایط علیه طلاست",
       whyTitle: "فاکتورهای شاخص تاثیرگذار کنونی",
       evidence: "شواهد",
@@ -958,6 +979,8 @@ export const UI = {
       downLabel: "افت طلا",
       nextLabel: "بازسنجی بعدی",
       noSchedule: "بدون تاریخ تقویمی؛ بی‌اعلان می‌آید",
+      unscheduledNote:
+        "و آن‌چه تاریخ تقویمی ندارد، کارت هم نیست: جهش تنش — جنگ، بحران بانکی، ترس نکول. ممکن است هرگز نیاید؛ اگر بیاید، تقاضای پناهِ پولی برای طلا می‌تواند ناگهان و بی‌برنامه جهش کند. هیچ‌چیز در این صفحه آن را قطعی یا زمان‌دار فرض نکرده است.",
     },
     balance: {
       eyebrow: "ترازو",
@@ -996,7 +1019,7 @@ export const UI = {
       spanNote: "پنجرهٔ ذخیره‌شده: {span}",
     },
     calendar: {
-      eventsLead: "رویدادهای پیش‌رو · ≈ نزدیک جایگاه همیشگی",
+      eventsLead: "رویدادهای پیش‌روی طلا",
       impactHigh: "اثر زیاد",
       impactMed: "متوسط",
       daysAway: "{n} روز بعد",
@@ -1057,11 +1080,15 @@ export const UI = {
     indicators: {
       eyebrow: "در یک نگاه",
       title: "شاخص‌های کلیدی · داشبورد",
-      subtitle: "مجموعهٔ کوچکی از سری‌های زنده پشت روایت امروز.",
+      subtitle: "سه شاخصی که بیشترین اثر را بر قیمت طلا دارند، همیشه روبه‌رو؛ بقیه پشت یک لمس.",
       realYield: "بازدهی واقعی ۱۰ ساله",
       nominalYield: "بازدهی اسمی ۱۰ ساله",
       fredDaily: "FRED · قیمت پایانی روزانه · تا {date}",
-      breakeven: "تورم مورد انتظار ۱۰ ساله (تفاضل اسمی و واقعی): {v}٪",
+      breakevenName: "تورم مورد انتظار ۱۰ ساله",
+      breakevenSub: "تفاضل بازدهی اسمی و واقعی",
+      restOpen: "بقیهٔ شاخص‌ها",
+      restTitle: "بقیهٔ شاخص‌های کلیدی",
+      restNote: "بقیهٔ سری‌های زندهٔ داشبورد؛ هر یک با نمودار کوچک و تغییر ۳۰روزهٔ خودش.",
       unitPp: "واحد درصد",
       dxy: "شاخص دلار",
       usdjpy: "دلار/ین",
@@ -1220,15 +1247,36 @@ export const UI = {
       modalTitle: "طلا در بیست سال اخیر",
       modalNote:
         "میانگین قیمتِ خودِ هر سال و تغییرش نسبت به سال قبل. سال جاری قیمتِ زندهٔ الان را می‌خواند — موردِ خودش، نام‌گذاری‌شده، هرگز مخلوط نشده.",
+      verdictTitle: "حکم بیست‌ساله",
+      verdictLine:
+        "طلا در بیست سال اخیر به‌طور میانگین سالانه {pct}٪ رشد کرده — از میانگین {a} دلاریِ سال {y0} تا {end}؛ نرخ رشد مرکب سالانه.",
+      verdictEndLive: "قیمت زندهٔ الان",
+      verdictEndAvg: "میانگین سال {y}",
       colYear: "سال",
       colAvg: "میانگین (دلار/اونس)",
       colChange: "تغییر",
       runningCell: "زنده",
       ppTitle: "ماشین قدرت خرید",
       ppNote:
-        "یک مبلغ در سالی گذشته واقعاً چه مقدار طلا می‌خرید — میانگین قیمتِ خودِ آن سال، قدرت خرید همین پول امروز، و تضادِ این دو در یک پاسخ.",
-      ppAmountLabel: "پول (دلار)",
+        "یک مبلغ در سالی گذشته واقعاً چه مقدار طلا می‌خرید — میانگین قیمتِ خودِ آن سال، قدرت خرید همین پول امروز، و تضادِ این دو در یک پاسخ. دلار: میانگین سالانهٔ لندن؛ تومان: طلای ۱۸ عیار تهران و دلار آزاد؛ یورو، پوند و دلارهای کانادا و استرالیا: میانگین لندن × میانگین نرخ همان سال.",
+      ppAmountLabel: "پول ({c})",
       ppYearLabel: "سال",
+      ppYearJalali: "سال (شمسی)",
+      ppCcyLabel: "ارز",
+      ppCcyNames: {
+        usd: "دلار آمریکا",
+        toman: "تومان",
+        aud: "دلار استرالیا",
+        cad: "دلار کانادا",
+        gbp: "پوند انگلستان",
+        eur: "یورو",
+      } as Record<string, string>,
+      ppBasisParity: "برآورد برابری",
+      ppBasisMarket: "قیمت بازار تهران",
+      ppBasisFx: "میانگین لندن × میانگین نرخ همان سال",
+      ppTomanGramWord: "گرم طلای ۱۸ عیار تهران",
+      ppMillionToman: "{v} میلیون تومان",
+      ppBillionToman: "{v} میلیارد تومان",
       ppBoughtWord: "می‌توانستید بخرید",
       ppOzWord: "اونس",
       ppGramWord: "گرم",
@@ -1584,11 +1632,6 @@ export const UI = {
     },
     te: {
       title: "خلاصهٔ روزانهٔ بازار طلا",
-      // The AI-translated corner badge (batch K): the literal Latin tag —
-      // the owner's own word for it — with the honest engine + date riding
-      // the tooltip, replacing the old in-body «ترجمهٔ ماشینی» label.
-      aiBadge: "AI-translated",
-      aiBadgeTip: "ترجمهٔ ماشینی به فارسی با {model}، {date}",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
       updatedLabel: "به‌روزرسانی: {date}",
@@ -1605,11 +1648,6 @@ export const UI = {
       // {jalali} carries the Persian-calendar twin of the reviewed month
       // («مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)») — the card builds it in fa mode.
       issueLabel: "مرور {month}{jalali}",
-      // The AI-translated corner badge (batch K): the literal Latin tag —
-      // the owner's own word for it — with the honest engine + date riding
-      // the tooltip, replacing the old in-body «ترجمهٔ ماشینی» label.
-      aiBadge: "AI-translated",
-      aiBadgeTip: "ترجمهٔ ماشینی به فارسی با {model}، {date}",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
       updatedLabel: "به‌روزرسانی: {date}",

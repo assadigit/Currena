@@ -276,7 +276,7 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          className="inline-flex items-center gap-1 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
         >
           {open ? t.hideLabel : t.showLabel}
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
@@ -357,7 +357,7 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
               lastFibTriggerRef.current = e.currentTarget;
               setFibOpen(true);
             }}
-            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
           >
             <Percent className="h-3.5 w-3.5" aria-hidden="true" />
             {t.fibOpenLabel}
@@ -375,7 +375,7 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
           aria-expanded={factsOpen}
           aria-controls="gold-ta-facts"
           onClick={() => setFactsOpen((o) => !o)}
-          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
         >
           {factsOpen ? t.factsClose : t.factsOpen}
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${factsOpen ? "rotate-180" : ""}`} aria-hidden="true" />
@@ -852,7 +852,7 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
         >
           {open ? (locale === "en" ? "hide" : "بستن") : locale === "en" ? "show" : "نمایش"}
         </button>
@@ -1573,7 +1573,7 @@ export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
         >
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "" : "-rotate-90 rtl:rotate-90"}`} aria-hidden="true" />
           {open ? t.hideLabel : t.showLabel}
@@ -1609,7 +1609,7 @@ export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+                className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
               >
                 <ChevronDown className="h-3.5 w-3.5 rotate-180 rtl:-rotate-180" aria-hidden="true" />
                 {t.allFamilies}

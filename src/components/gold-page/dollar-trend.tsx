@@ -894,7 +894,7 @@ export function DollarTrendBand({
               aria-expanded={methodOpen}
               aria-controls="gold-dollar-trend-method"
               onClick={() => setMethodOpen((o) => !o)}
-              className="inline-flex min-h-[32px] w-fit items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+              className="inline-flex min-h-[36px] w-fit items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
               data-dollar-trend-method-toggle
             >
               <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />

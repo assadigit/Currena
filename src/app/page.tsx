@@ -494,16 +494,17 @@ function BriefingCard({ t, fmt, balance, locale, priceLine }: { t: typeof UI.en;
         </p>
       ) : null}
 
-      <p className="m-0 mt-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+      {/* the horizon line (the owner's ask): the two similar texts —
+          the now-assessment and the 1–3-month chip — merged into ONE
+          line, each clause explicitly labelled: the now read, then the
+          next-1–3-months read, never two boxes saying it twice */}
+      <p className="m-0 mt-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]" data-briefing-horizons>
+        <span className="font-semibold">{t.briefing.nowLead}</span>{" "}
         <span className="font-bold text-[var(--color-chip-ink-attention)]">{t.briefing.assessment}</span>
+        <span aria-hidden="true" className="mx-1.5">·</span>
+        <span className="font-semibold">{t.briefing.outlookLead}</span>{" "}
+        <span className="font-bold text-[var(--color-chip-ink-attention)]">{t.briefing.chipMonthsLean}</span>
       </p>
-
-      <div className="mt-2 flex flex-wrap items-center gap-2" data-briefing-horizons>
-        <span className="inline-flex flex-wrap items-baseline gap-1.5 rounded-full bg-[var(--color-surface)] px-3 py-1 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]">
-          {t.briefing.chipMonths}
-          <span className="font-bold text-[var(--color-chip-ink-attention)]">· {t.briefing.chipMonthsLean}</span>
-        </span>
-      </div>
 
       {/* the trend table — every window's change in one organized table,
           visible without a click: day · week · month · 3m · 6m · 1y · 5y · YTD.
@@ -895,13 +896,20 @@ function DashboardBand({
     data.realYield !== null && data.nominalYield !== null
       ? data.nominalYield.last - data.realYield.last
       : null;
-  const rows = [
-    { name: t.indicators.dxy, stat: data.dxy, unit: "" },
+  /* the top trio's own split (the owner's ask: the dashboard shortened
+     to the three that matter most to the gold price — the real yield,
+     the dollar index and the derived breakeven, the site's own
+     five-forces taxonomy's three macro faces); the rest rides behind
+     the modal, one tap away */
+  const dxy = data.dxy;
+  const restRows = [
     { name: t.indicators.usdjpy, stat: data.usdjpy, unit: "" },
     { name: t.indicators.silver, stat: data.silver, unit: "$" },
     { name: t.indicators.spx, stat: data.spx, unit: "" },
     { name: t.indicators.oil, stat: data.oil, unit: "$" },
   ].filter((r) => r.stat !== null) as Array<{ name: string; stat: SeriesStat; unit: string }>;
+  const [restOpen, setRestOpen] = React.useState(false);
+  const lastRestTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   /* the merged context layer — the top ratios + the currency grid live
      HERE; the rest of the ratios sit behind one expand; the physical
      market has its own section now; the forecast retrospective stays */
@@ -927,53 +935,126 @@ function DashboardBand({
     <section id="gold-dashboard" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.indicators.title}</h2>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.indicators.subtitle}</p>
-      {/* the two yields — side by side (the real-yield re-sourcing: the
-          true 10-year TIPS real yield and the 10-year nominal, FRED
-          daily closes, each card carrying its source, its as-of and its
-          daily change in pp); the derived breakeven rides beneath,
-          only when the pair shares the same FRED calendar day */}
+      {/* the top trio (the owner's ask) — the real yield, the dollar
+          index and the derived breakeven, always in the open; the
+          nominal yield and the remaining series ride the modal below.
+          A negative reading paints the whole card a pastel red (the
+          owner's ask) — the dashboard's down readings read at a glance */}
       <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2" data-yield-pair>
         <YieldCard name={t.indicators.realYield} stat={data.realYield} fmt={fmt} t={t.indicators} />
-        <YieldCard name={t.indicators.nominalYield} stat={data.nominalYield} fmt={fmt} t={t.indicators} />
-      </div>
-      {yieldsAligned && breakeven !== null && Number.isFinite(breakeven) ? (
-        <p className="m-0 mt-1.5 type-caption text-[var(--color-text-secondary)]" data-yield-breakeven>
-          {t.indicators.breakeven.replace("{v}", fmt.num(breakeven, 2))}
-        </p>
-      ) : null}
-      <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {rows.map((r) => {
-          /* a negative 30-day change paints the whole card a pastel red
-             (the owner's ask) — the dashboard's down readings at a glance */
-          const negative = r.stat.chg30 !== null && Number.isFinite(r.stat.chg30) && r.stat.chg30 < 0;
-          return (
-            <div
-              key={r.name}
-              className="flex items-center gap-3 rounded-[var(--cr-radius-md)] px-3 py-2 ring-1"
-              style={{
-                backgroundColor: negative ? "color-mix(in srgb, var(--color-return-down) 7%, var(--color-surface))" : "var(--color-surface)",
-                boxShadow: negative
+        {dxy !== null ? (
+          <div
+            className="flex items-center gap-3 rounded-[var(--cr-radius-md)] px-3 py-2 ring-1"
+            style={{
+              backgroundColor: dxy.chg30 !== null && Number.isFinite(dxy.chg30) && dxy.chg30 < 0 ? "color-mix(in srgb, var(--color-return-down) 7%, var(--color-surface))" : "var(--color-surface)",
+              boxShadow:
+                dxy.chg30 !== null && Number.isFinite(dxy.chg30) && dxy.chg30 < 0
                   ? "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 32%, transparent)"
                   : "inset 0 0 0 1px var(--color-border)",
-              }}
-            >
-              <div className="min-w-0 flex-1">
-                <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{r.name}</p>
-                <p className="m-0 mt-0.5 flex items-baseline gap-2">
-                  <bdi dir="ltr" className="type-label font-bold text-[var(--color-text-primary)]">
-                    {r.unit === "$" ? "$" : r.unit === "%" ? "" : ""}
-                    {fmt.num(r.stat.last, r.unit === "%" ? 2 : r.unit === "$" ? 2 : 1)}
-                    {r.unit === "%" ? "%" : ""}
-                  </bdi>
-                  <SignedDelta v={r.stat.chg30} fmt={fmt} />
-                  <span className="type-caption text-[var(--color-text-tertiary)]">{t.indicators.d30}</span>
-                </p>
-              </div>
-              <MiniSpark values={r.stat.series.map((p) => p.v)} />
+            }}
+          >
+            <div className="min-w-0 flex-1">
+              <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{t.indicators.dxy}</p>
+              <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-2">
+                <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
+                  {fmt.num(dxy.last, 1)}
+                </bdi>
+                <SignedDelta v={dxy.chg30} fmt={fmt} />
+                <span className="type-caption text-[var(--color-text-tertiary)]">{t.indicators.d30}</span>
+              </p>
             </div>
-          );
-        })}
+            <MiniSpark values={dxy.series.map((p) => p.v)} />
+          </div>
+        ) : null}
+        {yieldsAligned && breakeven !== null && Number.isFinite(breakeven) ? (
+          <div
+            className="flex items-center gap-3 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2"
+            style={{ boxShadow: "inset 0 0 0 1px var(--color-border)" }}
+            data-yield-breakeven
+          >
+            <div className="min-w-0 flex-1">
+              <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{t.indicators.breakevenName}</p>
+              <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-2">
+                <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
+                  {fmt.num(breakeven, 2)}{locale === "fa" ? "٪" : "%"}
+                </bdi>
+              </p>
+              <p className="m-0 mt-0.5 type-caption text-[var(--color-text-tertiary)]">{t.indicators.breakevenSub}</p>
+            </div>
+          </div>
+        ) : null}
       </div>
+
+      {/* the rest — one tap away (the owner's ask), in the same read-more
+          style the correlation lesson set (no fill: the blue border and
+          the blue text carry it) */}
+      <div className="mt-2.5">
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded={restOpen}
+          onClick={(e) => {
+            lastRestTriggerRef.current = e.currentTarget;
+            setRestOpen(true);
+          }}
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
+        >
+          {t.indicators.restOpen}
+          <ChevronRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden="true" />
+        </button>
+      </div>
+      <Dialog
+        open={restOpen}
+        onOpenChange={(o) => {
+          if (!o) {
+            setRestOpen(false);
+            const trigger = lastRestTriggerRef.current;
+            window.setTimeout(() => trigger?.focus(), 0);
+          }
+        }}
+      >
+        <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[560px]">
+          <DialogHeader className="text-start pe-11">
+            <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">{t.indicators.restTitle}</DialogTitle>
+          </DialogHeader>
+          <DialogDescription asChild className="m-0 pe-11">
+            <div className="flex flex-col gap-2">
+              <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.indicators.restNote}</p>
+              <YieldCard name={t.indicators.nominalYield} stat={data.nominalYield} fmt={fmt} t={t.indicators} />
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {restRows.map((r) => {
+                  const negative = r.stat.chg30 !== null && Number.isFinite(r.stat.chg30) && r.stat.chg30 < 0;
+                  return (
+                    <div
+                      key={r.name}
+                      className="flex items-center gap-3 rounded-[var(--cr-radius-md)] px-3 py-2 ring-1"
+                      style={{
+                        backgroundColor: negative ? "color-mix(in srgb, var(--color-return-down) 7%, var(--color-surface))" : "var(--color-surface)",
+                        boxShadow: negative
+                          ? "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 32%, transparent)"
+                          : "inset 0 0 0 1px var(--color-border)",
+                      }}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{r.name}</p>
+                        <p className="m-0 mt-0.5 flex items-baseline gap-2">
+                          <bdi dir="ltr" className="type-label font-bold text-[var(--color-text-primary)]">
+                            {r.unit === "$" ? "$" : ""}
+                            {fmt.num(r.stat.last, r.unit === "$" ? 2 : 1)}
+                          </bdi>
+                          <SignedDelta v={r.stat.chg30} fmt={fmt} />
+                          <span className="type-caption text-[var(--color-text-tertiary)]">{t.indicators.d30}</span>
+                        </p>
+                      </div>
+                      <MiniSpark values={r.stat.series.map((p) => p.v)} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
 
       {/* the remaining ratios — behind one expand (the top trio now lives
           in the indicator grid above); the currency grid + the forecast
@@ -984,7 +1065,7 @@ function DashboardBand({
             type="button"
             aria-expanded={allRatios}
             onClick={() => setAllRatios((o) => !o)}
-            className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+            className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
           >
             {allRatios
               ? locale === "en" ? "hide the other ratios" : "بستن بقیهٔ نسبت‌ها"
@@ -1067,7 +1148,7 @@ function PhysicalBand({ t, fmt, locale, projection, vault }: { t: typeof UI.en; 
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+        className="self-start inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
       >
         <ChevronRight className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-90 rtl:-rotate-90" : ""}`} aria-hidden="true" />
         {open ? (locale === "en" ? "hide the numbers" : "بستن اعداد") : locale === "en" ? "show the numbers" : "نمایش اعداد"}
@@ -1159,7 +1240,7 @@ function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((o) => !o)}
-          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
         >
           <ChevronRight className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-90 rtl:-rotate-90" : ""}`} aria-hidden="true" />
           {open ? t.history.hideLabel : t.history.showLabel}

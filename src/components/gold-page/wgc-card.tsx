@@ -36,7 +36,7 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
-import { type Fmt, AiTranslatedBadge, faDigits } from "@/components/gold-page/visuals";
+import { type Fmt, faDigits } from "@/components/gold-page/visuals";
 import { faGlossary } from "@/lib/gold-page/fa-glossary";
 
 /* ------------------------------------------------------------------ *
@@ -97,10 +97,6 @@ async function fetchWgc(): Promise<WgcLatest> {
 export interface WgcCardCopy {
   title: string;
   issueLabel: string;
-  /** The AI-translated corner tag (batch K) — the literal Latin badge, both locales. */
-  aiBadge: string;
-  /** The badge's tooltip: the engine and date behind the translation. */
-  aiBadgeTip: string;
   publishedLabel: string;
   fetchedLabel: string;
   /** The single stamp when published and fetched are the same day (batch L). */
@@ -249,14 +245,6 @@ export function WgcCard({
           />
           {t.title}
         </h2>
-        {fa ? (
-          <AiTranslatedBadge
-            tag={t.aiBadge}
-            tip={t.aiBadgeTip
-              .replace("{model}", fa.sourceModel ?? "Workers AI")
-              .replace("{date}", dateWordsOf(fa.translatedAt, fmt) ?? "")}
-          />
-        ) : null}
       </div>
 
       {/* the honest states — riding the same card, each a stated fact */}

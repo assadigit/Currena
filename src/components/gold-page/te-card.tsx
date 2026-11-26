@@ -37,7 +37,7 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
-import { type Fmt, AiTranslatedBadge, faDigits } from "@/components/gold-page/visuals";
+import { type Fmt, faDigits } from "@/components/gold-page/visuals";
 import { faGlossary } from "@/lib/gold-page/fa-glossary";
 import { PackIcon } from "@/components/gold-page/pack-icon";
 
@@ -96,10 +96,6 @@ async function fetchTe(): Promise<TeLatest> {
 
 export interface TeCardCopy {
   title: string;
-  /** The AI-translated corner tag (batch K) — the literal Latin badge, both locales. */
-  aiBadge: string;
-  /** The badge's tooltip: the engine and date behind the translation. */
-  aiBadgeTip: string;
   publishedLabel: string;
   fetchedLabel: string;
   /** The single stamp when published and fetched are the same day (batch L). */
@@ -203,22 +199,14 @@ export function TeCard({
       className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-currena-bg-light)] p-4 ring-1 ring-[var(--color-border)] sm:p-5"
     >
       {/* the header — one language, one title: the fa h2 in fa mode, the
-          EN h2 in EN mode, never both (the owner's ask). The quiet
-          AI-translated badge sits BELOW the title (the owner's ask — the
-          corner position retired), the engine + date on its tooltip */}
+          EN h2 in EN mode, never both (the owner's ask). The retired
+          AI-translated badge (the owner's ask): the translation carries
+          itself, no machine label on the card */}
       <div className="flex flex-col gap-1.5">
         <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
           <PackIcon file="gold-briefing.png" size={128} className="h-32 w-32" />
           {t.title}
         </h2>
-        {fa ? (
-          <AiTranslatedBadge
-            tag={t.aiBadge}
-            tip={t.aiBadgeTip
-              .replace("{model}", fa.sourceModel ?? "Workers AI")
-              .replace("{date}", dateWordsOf(fa.translatedAt, fmt) ?? "")}
-          />
-        ) : null}
       </div>
 
       {/* the honest states — riding the same card, each a stated fact */}

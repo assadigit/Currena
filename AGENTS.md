@@ -3026,3 +3026,64 @@ the token the owner provided):
 Gates: lint green, 73/73 tests, zero console/page errors, 375px no
 overflow, EN + fa + dark walked. Record PNGs: `tests/batchp/` (dev
 crops + live briefing/scenarios/375).
+
+## Batch Q (2026-11-26) — the owner's eleven refinements, the multi-currency machine
+
+The sitting at a glance: the Market Brief's two similar texts merged
+into ONE explicitly-labelled now/next line; the AI-translated badges
+retired from the TE and WGC cards entirely; the stress spike demoted
+from a scenario card to a hedged disclaimer under the grid (it is not
+certain, so it carries no card and no equal weight); the calendar's
+lead line promoted to a real heading «رویدادهای پیش‌روی طلا» / "Upcoming
+gold events"; EVERY read-more pill on the page unified into the
+correlation-lesson's own register (transparent fill, blue border +
+blue text — the soft-blue filled chips retired across TA, Fibonacci,
+reading keys, vault, relationships, history, ratios, physical numbers,
+the time machines, the method line, the calendar's more-events, and
+the calculator's advanced leg); the dashboard shortened to the three
+indicators that matter most to the gold price (the real yield, the
+dollar index, the derived breakeven) with the rest behind one modal;
+the 20-year block carries its own verdict container — the average
+per-year growth, compound, computed live from the table's own rows
+(«از میانگین ۶۹۷ دلاریِ سال ۲۰۰۷ تا قیمت زندهٔ الان» ≈ ۸٫۹٪ a year);
+and the purchasing-power machine went multi-currency.
+
+- **The machine's six legs**: USD on the London annual average (as
+  always); the TOMAN on Tehran's own 18k gram and the free-market
+  dollar — the very same gold18 leg the race section rides (parity
+  estimate to ۱۳۹۱, geram18 market from ۱۳۹۲, TGJU's latest row live),
+  Jalali years in the picker (EN reads the Gregorian year the Jalali
+  year starts in, the race table's own convention); EUR · GBP · CAD ·
+  AUD on the London average × the desk's own month-end FX table's
+  year averages (complete years only — twelve month-ends each; the
+  running year reads the live cross on both sides, its own honest
+  zero). Per-currency defaults ride the switch; the toman's big
+  figures compact to millions/billions (the bridge board's own
+  register). Pure engines (`purchasingPowerCcy`,
+  `purchasingPowerToman`, `fxYearAverage`, `cagrPercent`), fail-closed
+  per leg, every basis named at point of use.
+- **Farsi numerals** in the machine: the fa amount box displays and
+  accepts Persian/Arabic-Indic digits (converted to ASCII underneath
+  before the sanitizer); the contrast line's percent sign is ٪ in fa.
+- **The basis line as a P.S.**: «مبنا: میانگین سالانهٔ قیمت بازار
+  لندن…» one step down — 11px, italic, tertiary, opacity-80.
+- **The fx route's direction correction** (found this sitting): the
+  four USD-quoted crosses (AUDUSD=X, NZDUSD=X, EURUSD=X, GBPUSD=X)
+  were stored raw as USD-per-unit inside the `perUsd` table — every
+  ratio computed over them was invariant, but absolute unit prices
+  were not. The route now inverts them (1 ÷ close) so the whole table
+  carries units per 1 USD like every other entry; live-verified
+  post-deploy (aud 1.508, eur 0.9117, gbp 0.7628 per USD).
+- **New maths tests**: `tests/gold-page-maths.test.ts` — the FX
+  table's complete-year law, both new machine legs (the weight ratio
+  vs the worth ratio checked independently), the table's true span
+  (2007 → the running year: 20 rows with the live tail, 19 without),
+  and the verdict's compound chain (696.67 → 3547.9 over 19 steps
+  ≈ 8.945%/yr).
+
+Gates: lint green; tsc no new errors over every touched file (the
+repo's known pre-existing noise untouched); 90/90 tests (73 + 17 new);
+live-verified on currena.ir/gold in fa + EN, light + dark, 375px no
+overflow, zero console/page errors; the modal, the six currency
+flows, the Jalali picker and the verdict all walked on the live
+deploy. Record PNGs: `tests/batchq-01…05`.

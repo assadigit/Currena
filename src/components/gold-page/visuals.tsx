@@ -14,7 +14,6 @@
  */
 
 import * as React from "react";
-import { Sparkles } from "lucide-react";
 import type { LaneReading } from "@/lib/gold-page/content";
 import { LANES, LANE_CONTENT, type Locale, type SeatState } from "@/lib/gold-page/content";
 
@@ -623,25 +622,6 @@ export const STATE_INK: Record<SeatState, { ink: string; chip: string; glyph: st
  *  deterministically at render time so every stored row obeys too. */
 export function faDigits(s: string): string {
   return s.replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]!);
-}
-
-/** The AI-translated corner badge — the owner's batch-K ask: the
- *  machine-translation attribution moves from the in-body label to a
- *  quiet corner tag on the card's header row (a symbol + the tag,
- *  "AI-translated"); the honest engine and date ride the title tooltip.
- *  Rendered only when a stored translation is what the card is actually
- *  serving — the locale whose text IS the translation (fa mode, fresh
- *  row); the English page serves the original, never a badge. */
-export function AiTranslatedBadge({ tag, tip }: { tag: string; tip: string }) {
-  return (
-    <span
-      title={tip}
-      className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--color-surface)] px-2 py-1 text-[10px] font-bold leading-none tracking-wide text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]"
-    >
-      <Sparkles className="h-3 w-3" aria-hidden="true" />
-      {tag}
-    </span>
-  );
 }
 
 /** The signed-return word (direction channel — loud hues + sign + triangle);

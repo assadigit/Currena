@@ -779,7 +779,7 @@ export function CalculatorBand({
           aria-expanded={advancedOpen}
           aria-controls="gold-calculator-advanced"
           onClick={() => setAdvancedOpen((o) => !o)}
-          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+          className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
         >
           <CalendarClock className="h-4 w-4 shrink-0" aria-hidden="true" />
           {advancedOpen ? (locale === "en" ? "hide the time machine" : "بستن ماشین زمان") : calc.advancedLabel}

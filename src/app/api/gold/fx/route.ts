@@ -24,12 +24,19 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 const TIMEOUT_MS = 20_000;
 
 /** The crosses the converter carries, with their Yahoo symbols and the
- *  per-USD direction (true: the pair's close is already units per USD). */
+ *  per-USD direction. `perUsd: true` — the pair's close is already units
+ *  per 1 USD (USDCAD=X ≈ 1.4 CAD per dollar). `perUsd: false` — the
+ *  pair's close is quoted the other way round (AUDUSD=X, EURUSD=X,
+ *  GBPUSD=X, NZDUSD=X are USD per unit; USDCHF=X is CHF per USD but
+ *  inverted), so the route inverts it (1 ÷ close) to store units per
+ *  1 USD like every other entry. (The direction correction: the four
+ *  USD-per-unit crosses used to be stored raw — every ratio computed
+ *  over them was invariant, but the absolute unit prices were not.) */
 const YAHOO_CROSSES: { ccy: string; symbol: string; perUsd: boolean }[] = [
-  { ccy: "aud", symbol: "AUDUSD=X", perUsd: true },
-  { ccy: "nzd", symbol: "NZDUSD=X", perUsd: true },
-  { ccy: "eur", symbol: "EURUSD=X", perUsd: true },
-  { ccy: "gbp", symbol: "GBPUSD=X", perUsd: true },
+  { ccy: "aud", symbol: "AUDUSD=X", perUsd: false },
+  { ccy: "nzd", symbol: "NZDUSD=X", perUsd: false },
+  { ccy: "eur", symbol: "EURUSD=X", perUsd: false },
+  { ccy: "gbp", symbol: "GBPUSD=X", perUsd: false },
   { ccy: "cad", symbol: "USDCAD=X", perUsd: true },
   { ccy: "chf", symbol: "USDCHF=X", perUsd: false },
   { ccy: "jpy", symbol: "USDJPY=X", perUsd: true },
