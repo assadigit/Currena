@@ -138,7 +138,7 @@ function GoldHubBody({ locale }: { locale: Locale }) {
             href="https://currena.ir/gold"
             className="text-[12.5px] font-extrabold text-[var(--color-currena-blue-deep)] hover:underline"
           >
-            {t.deskLink} ↗
+            {t.deskLink}
           </a>
         </div>
         <p className="mt-2 mb-0 text-[11.5px] leading-relaxed text-[var(--color-text-tertiary)]">

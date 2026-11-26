@@ -22,7 +22,7 @@
  * =================================================================== */
 
 /** The date every source below was read and recorded (YYYY-MM-DD, UTC). */
-export const FIGURES_CHECKED_ON = "2026-11-25";
+export const FIGURES_CHECKED_ON = "2026-11-26";
 
 /** The Vanguard 2026 Index Chart (the AUD rows' main source). */
 const VANGUARD_CHART_URL =
@@ -42,9 +42,13 @@ const MSCI_WORLD_URL =
 const BIS_CBPOL_URL = "https://data.bis.org/topics/CBPOL";
 /** BIS bilateral exchange rates (AUD per USD, month ends). */
 const BIS_XRU_URL = "https://data.bis.org/topics/XRU";
-/** ABS Consumer Price Index, Australia (Sep 2026 quarter release). */
+/** ABS Consumer Price Index, Australia (latest release read 2026-11-26:
+ *  the October 2026 monthly CPI — the W3 honesty figure). */
 const ABS_CPI_URL =
   "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/latest-release";
+/** BLS CPI-U news release, September 2026 (via FRED CPIAUCNS and the DOL
+ *  mirror — bls.gov itself is IP-blocked from the sandbox). */
+const BLS_CPI_URL = "https://www.bls.gov/news.release/archives/cpi_10142026.htm";
 
 /* =================================================================== *
  * Types                                                               *
@@ -102,6 +106,9 @@ export interface CountryRows {
   assets: AssetRow[];
   /** Average inflation (the "today's money" deflator), sourced like a row. */
   inflation: AssetRow;
+  /** W3 (spec §7): the latest 12-month inflation figure, for the honesty
+   *  line in "How is this worked out?" — never used in any maths. */
+  inflationLatest: { rate: number; labelEn: string; labelFa: string; sourceName: string; sourceUrl: string };
   /** The default asset id. */
   defaultAsset: string;
 }
@@ -127,7 +134,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
-      note: "Read straight from the chart's published returns table (per annum total returns to 30 June 2026; Australian Shares row). The spec asked for the S&P/ASX 200; the published 20- and 30-year figure the research could legally source is the All Ordinaries, which covers the whole Australian market — the page says 'Australian shares' and this note names the index. See the report for how to upgrade to ASX 200.",
+      note: "Read straight from the chart's published returns table (per annum total returns to 30 June 2026; Australian Shares row; footnote 3 names the S&P/ASX All Ordinaries Total Return Index). Re-read and re-verified 2026-11-26. The spec asked for the S&P/ASX 200; the published 20- and 30-year figure the research could legally source is the All Ordinaries, which covers the whole Australian market — the page says 'Australian shares' and this note names the index. Cross-check: CFS 'Investment essentials' (30 Sep 2026) publishes 6.97% for the S&P/ASX 300 Accumulation over 20 years — 0.23 points below, an index difference plus the 3-month offset. See the report for how to upgrade to ASX 200.",
     },
     {
       id: "sp500",
@@ -140,7 +147,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
-      note: "The chart's 'U.S. Shares' row is the S&P 500 Total Return Index expressed in AUD, so the exchange-rate effect is already inside the published figure — no separate AUD conversion was needed (spec §6.3's method is implemented in the maths and used for the gold row).",
+      note: "The chart's 'U.S. Shares' row is the S&P 500 Total Return Index expressed in AUD (the poster's footnote 2), so the exchange-rate effect is already inside the published figure — no separate AUD conversion was needed (spec §6.3's method is implemented in the maths and used for the gold row). Re-read and re-verified 2026-11-26. Cross-check: Damodaran's USD figure (10.90% over 20 years to Dec 2025) times the BIS FX effect (≈ +0.46 points a year from the AUD's fall) ≈ 11.4% — consistent.",
     },
     {
       id: "world",
@@ -153,7 +160,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "Vanguard Australia, 2026 Index Chart (Andex Charts)",
       sourceUrl: VANGUARD_POSTER_URL,
-      note: "The chart's 'International Shares' row is MSCI World ex-Australia (net dividends) in AUD — the world outside Australia, which is the right 'World shares' for the Australia preset because Australian shares have their own chip.",
+      note: "The chart's 'International Shares' row is MSCI World ex-Australia Net Total Return (AUD) — the poster's footnote 4 — the world outside Australia, which is the right 'World shares' for the Australia preset because Australian shares have their own chip. Re-read and re-verified 2026-11-26. Cross-check: CFS 'Investment essentials' (30 Sep 2026) publishes 8.95% for MSCI World Net in A$ over 20 years — 0.15 points below, the 3-month offset.",
     },
     {
       id: "gold",
@@ -166,7 +173,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "LBMA year-end prices via NYU Stern (Damodaran); BIS exchange rates",
       sourceUrl: DAMODARAN_URL,
-      note: "Derived by spec §6.3: USD growth = year-end LBMA price 513.00 (Dec 2005) → 4,339.645 (Dec 2025) = ×8.4593, and 387.00 (Dec 1995) → 4,339.645 = ×11.2136. FX = USD per 1 AUD at month ends (BIS, inverted from AUD per USD): Dec 1995 0.744498, Dec 2005 0.732323, Dec 2025 0.668335. AUD growth = USD growth × (FX start ÷ FX end): ×9.2693 (20y) and ×12.4914 (30y); annualised over 20 and 30 years → 11.78% and 8.78%. Gold pays no dividends, so price return is total return.",
+      note: "Derived by spec §6.3: USD growth = year-end LBMA price 513.00 (Dec 2005) → 4,339.645 (Dec 2025) = ×8.4593, and 387.00 (Dec 1995) → 4,339.645 = ×11.2136. FX = USD per 1 AUD at month ends (BIS daily series, inverted from AUD per USD): Dec 1995 0.744498, Dec 2005 0.732323, Dec 2025 0.668335. AUD growth = USD growth × (FX start ÷ FX end): ×9.2693 (20y) and ×12.4914 (30y); annualised over 20 and 30 years → 11.78% and 8.78%. Gold pays no dividends, so price return is total return. Both endpoint sets re-read and the derivation recomputed on 2026-11-26 — exact match.",
     },
     {
       id: "cash",
@@ -179,7 +186,7 @@ const AU_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "BIS policy-rate dataset (source: Reserve Bank of Australia)",
       sourceUrl: BIS_CBPOL_URL,
-      note: "Spec §7 method: the average of the official policy rate over the period — the mean of 240 (20y) and 360 (30y) month-end values of the RBA cash rate target, November 2006 – October 2026 and November 1996 – October 2026. Cross-check: Vanguard's chart publishes a bank-bill 'Cash' row of 3.3%/4.0% for the same idea (bank bills track the cash rate plus a small spread).",
+      note: "Spec §7 method: the average of the official policy rate over the period — the mean of 240 (20y) and 360 (30y) month-end values of the RBA cash rate target, November 2006 – October 2026 and November 1996 – October 2026. Recomputed from the BIS bulk CSV on 2026-11-26: 3.0321% and 3.7561% — exact match. Cross-checks: Vanguard's chart publishes a bank-bill 'Cash' row of 3.3%/4.0% (bank bills track the cash rate plus a small spread); CFS (30 Sep 2026) publishes 3.25% for the Bloomberg AusBond Bank Bill Index.",
     },
   ],
   inflation: {
@@ -193,7 +200,14 @@ const AU_ROWS: CountryRows = {
     fsingle: null,
     sourceName: "Australian Bureau of Statistics, Consumer Price Index",
     sourceUrl: ABS_CPI_URL,
-    note: "Spec §7 method: the annualised change of the CPI index between the period endpoints — 86.6 → 149.2 (Sep 2006 → Sep 2026) = 2.76% a year, and 66.9 → 149.2 (Sep 1996 → Sep 2026) = 2.71% a year, from the ABS quarterly all-groups series (the currently published long series is the seasonally adjusted one; over these horizons it differs from the original by less than 0.02 points). Cross-check: Vanguard's chart publishes 2.7% for both 20 and 30 years to 30 June 2026.",
+    note: "Spec §7 method: the annualised change of the CPI index between the period endpoints — 86.6 → 149.2 (Sep 2006 → Sep 2026) = 2.76% a year, and 66.9 → 149.2 (Sep 1996 → Sep 2026) = 2.71% a year, from the ABS quarterly all-groups series. Cross-check: Vanguard's chart (read 2026-11-26) publishes 2.7% for both 20 and 30 years to 30 June 2026 — within 0.06 points. The ABS's long quarterly series pages are retired from the current monthly-first release format; the endpoints' arithmetic and the Vanguard cross-check were re-verified this sitting.",
+  },
+  inflationLatest: {
+    rate: 0.049,
+    labelEn: "the 12 months to October 2026",
+    labelFa: "۱۲ ماه تا اکتبر ۲۰۲۶",
+    sourceName: "ABS monthly CPI, October 2026 release",
+    sourceUrl: ABS_CPI_URL,
   },
 };
 
@@ -218,7 +232,7 @@ const US_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "NYU Stern — Aswath Damodaran, historical returns dataset",
       sourceUrl: DAMODARAN_URL,
-      note: "Compounded from the dataset's published annual 'S&P 500 (includes dividends)' returns for 2006–2025 (×7.9205 → 10.90% a year) and 1996–2025 (×18.7103 → 10.26% a year). Cross-check: Vanguard's AUD figure for the S&P 500 (10.8% over 30 years to June 2026) matches this order once the falling AUD is accounted for.",
+      note: "Compounded from the dataset's published annual 'S&P 500 (includes dividends)' returns for 2006–2025 (×7.9205 → 10.90% a year) and 1996–2025 (×18.7103 → 10.26% a year). Re-downloaded and recomputed from the XLS on 2026-11-26 — exact match. Cross-check: Vanguard's AUD figure for the S&P 500 (11.8% over 20 years to June 2026) matches this order once the falling AUD is accounted for (≈ +0.46 points a year).",
     },
     {
       id: "world",
@@ -231,7 +245,7 @@ const US_ROWS: CountryRows = {
       fsingle: { rate: 0.122, windowLabel: "15 years to 30 October 2026", windowLabelFa: "۱۵ سال تا ۳۰ اکتبر ۲۰۲۶", periodEnd: "2026-10-30" },
       sourceName: "MSCI World Index (USD) factsheet, 30 October 2026",
       sourceUrl: MSCI_WORLD_URL,
-      note: "MSCI publishes 20- and 30-year figures only inside its interactive (login-gated) tools, so this row uses the longest published window of at least 10 years: the factsheet's cumulative gross-return chart, 100 → 562.23 over Oct 2011 – Oct 2026, = ×5.6223 → 12.20% a year. The same factsheet also publishes 'since 31 Dec 1987' = 8.98% a year and 10 years = 13.50% a year, recorded here for context. The page labels this row '15 years'.",
+      note: "MSCI publishes 20- and 30-year figures only inside its interactive (login-gated) tools, so this row uses the longest published window of at least 10 years: the factsheet's cumulative gross-return chart, 100 → 562.23 over Oct 2011 – Oct 2026, = ×5.6223 → 12.20% a year. The same factsheet also publishes 'since 31 Dec 1987' = 8.98% a year and 10 years = 13.50% a year, recorded here for context. The page labels this row '15 years'. The factsheet was re-read on 2026-11-26 — exact match.",
     },
     {
       id: "gold",
@@ -244,7 +258,7 @@ const US_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "LBMA year-end prices via NYU Stern (Damodaran)",
       sourceUrl: DAMODARAN_URL,
-      note: "Year-end LBMA price per ounce: $513.00 (Dec 2005) → $4,339.645 (Dec 2025) = ×8.4593 → 11.27% a year; $387.00 (Dec 1995) → $4,339.645 = ×11.2136 → 8.39% a year. Gold pays no dividends, so price return is total return. Cross-check: this repo's own long-view series (validated against LBMA annual averages within 1%) carries 2005 = 444.74 and 2025 = 3,441.50 as annual averages — a smoother basis, same story.",
+      note: "Year-end LBMA price per ounce: $513.00 (Dec 2005) → $4,339.645 (Dec 2025) = ×8.4593 → 11.27% a year; $387.00 (Dec 1995) → $4,339.645 = ×11.2136 → 8.39% a year. Gold pays no dividends, so price return is total return. Re-read and recomputed on 2026-11-26 — exact match. Cross-check: this repo's own long-view series (validated against LBMA annual averages within 1%) carries 2005 = 444.74 and 2025 = 3,441.50 as annual averages — a smoother basis, same story.",
     },
     {
       id: "cash",
@@ -257,7 +271,7 @@ const US_ROWS: CountryRows = {
       fsingle: null,
       sourceName: "BIS policy-rate dataset (source: US Federal Reserve)",
       sourceUrl: BIS_CBPOL_URL,
-      note: "Spec §7 method: the average of the official policy rate over the period — the mean of 240 (20y) and 360 (30y) month-end values of the Fed's target rate (midpoint of the target range since December 2008), November 2006 – October 2026 and November 1996 – October 2026. Cross-check: the NY Fed's effective fed funds rate over the same 20-year window averages 1.68%, within 0.02 points of the target midpoint.",
+      note: "Spec §7 method: the average of the official policy rate over the period — the mean of 240 (20y) and 360 (30y) month-end values of the Fed's target rate (midpoint of the target range since December 2008), November 2006 – October 2026 and November 1996 – October 2026. Recomputed from the BIS bulk CSV on 2026-11-26: 1.6953% and 2.4052% — exact match. Cross-check: the NY Fed's effective fed funds rate over the same 20-year window averages 1.68%, within 0.02 points of the target midpoint.",
     },
   ],
   inflation: {
@@ -271,7 +285,14 @@ const US_ROWS: CountryRows = {
     fsingle: null,
     sourceName: "US CPI-U (FRED CPIAUCNS) via NYU Stern (Damodaran)",
     sourceUrl: DAMODARAN_URL,
-    note: "Compounded from the dataset's published annual CPI-U inflation rates (the FRED CPIAUCNS series): 2006–2025 = ×1.6475 → 2.53% a year; 1996–2025 = ×2.1123 → 2.52% a year.",
+    note: "Compounded from the dataset's published annual CPI-U inflation rates (the FRED CPIAUCNS series): 2006–2025 = ×1.6475 → 2.53% a year; 1996–2025 = ×2.1123 → 2.52% a year. Re-downloaded and recomputed on 2026-11-26 — exact match; FRED's own index endpoints (Dec 2005 196.8 → Dec 2025 324.054) give 2.5250% and 2.5220% a year, within 0.01 points.",
+  },
+  inflationLatest: {
+    rate: 0.037,
+    labelEn: "the 12 months to September 2026",
+    labelFa: "۱۲ ماه تا سپتامبر ۲۰۲۶",
+    sourceName: "BLS CPI-U, September 2026 release",
+    sourceUrl: BLS_CPI_URL,
   },
 };
 
@@ -307,6 +328,11 @@ export function cashRow(country: "AU" | "US"): AssetRow | null {
 /** The inflation row. */
 export function inflationRow(country: "AU" | "US"): AssetRow {
   return COUNTRY_ROWS[country].inflation;
+}
+
+/** W3: the latest 12-month inflation (the honesty line only, never maths). */
+export function latestInflation(country: "AU" | "US") {
+  return COUNTRY_ROWS[country].inflationLatest;
 }
 
 /** Default inflation (the country average, editable on the page). */

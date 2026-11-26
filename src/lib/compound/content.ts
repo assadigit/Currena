@@ -79,6 +79,9 @@ export interface CompoundCopy {
       futureMoney: string;
       todaysMoney: string;
       notYetInvested: string;
+      /** W3: shown under the tiles whenever today's money is displayed.
+       *  {x} = the inflation percent the plan is using (editable). */
+      inflationCaption: string; // "Today's money uses average inflation of {x}% a year (last 20 years)."
     };
     milestones: {
       title: string;
@@ -173,6 +176,12 @@ export interface CompoundCopy {
       pastNote: string;
       sources: string;
       stale: string;
+      /** W5: the heading above the per-asset index list. */
+      indicesTitle: string;
+      /** W3: the two inflation lines — the average used (follows the
+       *  editable setting) and the latest 12-month figure. */
+      inflationLine: string; // "Today's money uses the long-run average of {x}% a year."
+      inflationRecentLine: string; // "Latest 12-month inflation: {y}% ({source}, {date})."
     };
     disclaimer: string;
     footer: {
@@ -286,6 +295,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         futureMoney: "Future money",
         todaysMoney: "Today's money",
         notYetInvested: "{x} not yet invested",
+        inflationCaption: "Today's money uses average inflation of {x}% a year (last 20 years).",
       },
       milestones: {
         title: "Along the way",
@@ -385,6 +395,9 @@ export const COPY: Record<Locale, CompoundCopy> = {
         pastNote: "Past performance is not a promise.",
         sources: "Figures: {sources}. Checked by hand on {date}.",
         stale: "These figures may be out of date.",
+        indicesTitle: "What each asset follows",
+        inflationLine: "Today's money uses the long-run average of {x}% a year. You can change it under Rates.",
+        inflationRecentLine: "Latest 12-month inflation: {y}% ({source}, {date}). Recent inflation can be higher or lower than the average.",
       },
       disclaimer: "Past returns are no guarantee of future results. This is a descriptive tool, not advice.",
       footer: {
@@ -503,6 +516,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         futureMoney: "پول آینده",
         todaysMoney: "پول امروز",
         notYetInvested: "{x} هنوز سرمایه‌گذاری نشده",
+        inflationCaption: "«پول امروز» با میانگین تورم {x}٪ در سال حساب می‌شود (۲۰ سال اخیر).",
       },
       milestones: {
         title: "در مسیر",
@@ -599,6 +613,9 @@ export const COPY: Record<Locale, CompoundCopy> = {
         pastNote: "عملکرد گذشته یک وعده نیست.",
         sources: "اعداد: {sources}. دستی بازبینی شده در {date}.",
         stale: "ممکن است این اعداد از تاریخ افتاده باشند.",
+        indicesTitle: "هر دارایی چه چیزی را دنبال می‌کند",
+        inflationLine: "«پول امروز» با میانگین بلندمدت {x}٪ در سال حساب می‌شود. می‌توانید زیر «نرخ‌ها» تغییرش دهید.",
+        inflationRecentLine: "تورم ۱۲ ماه اخیر: {y}٪ ({source}، {date}). تورم اخیر می‌تواند بیشتر یا کمتر از میانگین باشد.",
       },
       disclaimer: "بازده گذشته تضمینی برای آینده نیست. این یک ابزار توصیفی است، نه توصیه.",
       footer: {

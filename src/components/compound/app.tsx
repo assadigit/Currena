@@ -58,6 +58,7 @@ import {
   cashRow,
   defaultInflation,
   figuresOf,
+  latestInflation,
   measuredLine,
 } from "@/lib/compound/figures";
 import { COPY, type Locale } from "@/lib/compound/content";
@@ -465,6 +466,9 @@ export default function CompoundWealthApp() {
 
   const stale = figuresAreStale(FIGURES_CHECKED_ON);
 
+  /* --- W3: the latest 12-month inflation for the honesty line --- */
+  const latestInfl = React.useMemo(() => latestInflation(country), [country]);
+
   /* --- share mode flip carries the default increase rule --- */
   const flipShare = (on: boolean) => {
     setUseShare(on);
@@ -653,7 +657,7 @@ export default function CompoundWealthApp() {
           ) : null}
         </section>
 
-        {/* 5 — the three tiles */}
+        {/* 5 — the three tiles (each with the currency symbol, W6) */}
         <section className="mt-3" aria-label={t.tiles.youCouldHave}>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -673,16 +677,37 @@ export default function CompoundWealthApp() {
                   {tile.label}
                 </div>
                 <div
-                  className={`mt-1 text-[clamp(1.05rem,4.6vw,1.5rem)] font-extrabold tabular-nums leading-tight ${
+                  className={`mt-1 flex flex-wrap items-baseline gap-x-1 tabular-nums leading-tight ${
                     tile.tone === "gold" ? "text-[var(--color-accent-gold-deep)]" : "text-[var(--color-text-primary)]"
                   }`}
-                  dir="ltr"
                 >
-                  {fmt(tile.value)}
+                  {/* W6: the currency symbol sits with the number (A$/ $),
+                      exactly like the headline; Farsi keeps its own word
+                      convention (the number, then the currency word). */}
+                  <span
+                    className={locale === "en" ? "text-[clamp(0.8rem,3.4vw,1.05rem)] font-bold" : "hidden"}
+                    dir="ltr"
+                    aria-hidden={locale === "fa"}
+                  >
+                    {currencySymbol}
+                  </span>
+                  <span className="text-[clamp(1.05rem,4.6vw,1.5rem)] font-extrabold" dir="ltr">
+                    {fmt(tile.value)}
+                  </span>
+                  {locale === "fa" ? (
+                    <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{currencyWord}</span>
+                  ) : null}
                 </div>
               </div>
             ))}
           </div>
+          {/* W3: the inflation caption appears whenever today's money is shown,
+              and follows the editable inflation setting. */}
+          {moneyView === "today" ? (
+            <p className="mt-1.5 mb-0 text-[11.5px] leading-snug text-[var(--color-text-tertiary)]" data-cw="inflation-caption">
+              {t.tiles.inflationCaption.replace("{x}", formatPctLocal(inflation, locale))}
+            </p>
+          ) : null}
           <div className="mt-1.5 flex items-center justify-end gap-1" data-cw="money-toggle">
             <Chip active={moneyView === "future"} onClick={() => setMoneyView("future")} dataCw="money-future">
               {t.tiles.futureMoney}
@@ -1203,6 +1228,38 @@ export default function CompoundWealthApp() {
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.totalReturnNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.costNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.pendingNote}</p>
+            {/* W3: the inflation used for today's money, and the latest
+                12-month figure with its source and date. */}
+            <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-secondary)]" data-cw="how-inflation">
+              {t.how.inflationLine.replace("{x}", formatPctLocal(inflation, locale))}
+            </p>
+            <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]" data-cw="how-inflation-recent">
+              {t.how.inflationRecentLine
+                .replace("{y}", formatPctLocal(latestInfl.rate, locale))
+                .replace("{source}", latestInfl.sourceName)
+                .replace("{date}", locale === "fa" ? latestInfl.labelFa : latestInfl.labelEn)}
+            </p>
+            {/* W5: the exact index behind each asset, read from the figures
+                file so it can never drift from the numbers. */}
+            <p className="m-0 mt-1 text-[12px] font-semibold text-[var(--color-text-secondary)]" data-cw="how-indices-title">
+              {t.how.indicesTitle}
+            </p>
+            <ul className="m-0 list-none space-y-0.5 p-0 text-[11.5px] leading-relaxed text-[var(--color-text-tertiary)]" data-cw="how-indices">
+              {chips.map((chip) => (
+                <li key={chip.id} dir="auto">
+                  <span className="font-semibold text-[var(--color-text-secondary)]">
+                    {locale === "fa" ? chip.labelFa : chip.labelEn}:
+                  </span>{" "}
+                  {chip.measures}
+                </li>
+              ))}
+              <li dir="auto">
+                <span className="font-semibold text-[var(--color-text-secondary)]">
+                  {locale === "fa" ? rows.inflation.labelFa : rows.inflation.labelEn}:
+                </span>{" "}
+                {rows.inflation.measures}
+              </li>
+            </ul>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.superNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.taxNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.fxNote}</p>

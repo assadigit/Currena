@@ -591,3 +591,62 @@ describe("W1: small-changes wording maths", () => {
     }
   });
 });
+
+/* ---------------------------------------------------------------- */
+/* W3 / W5 / W6 (tests 33–38) — the figures file's honesty fields.   */
+/* ---------------------------------------------------------------- */
+describe("W3/W5/W6: inflation visibility, index names, figures sanity", () => {
+  test("W3 (35): both countries carry a latest 12-month inflation row", async () => {
+    const { latestInflation } = await import("../src/lib/compound/figures");
+    for (const country of ["AU", "US"] as const) {
+      const li = latestInflation(country);
+      expect(li.rate).toBeGreaterThan(0);
+      expect(li.rate).toBeLessThan(0.15);
+      expect(li.sourceName.length).toBeGreaterThan(3);
+      expect(li.sourceUrl).toMatch(/^https:\/\//);
+      expect(li.labelEn).toContain("12 months");
+    }
+  });
+  test("W3 (35): the AU honesty figure is the verified 4.9% to Oct 2026; the US is 3.7% to Sep 2026", async () => {
+    const { latestInflation } = await import("../src/lib/compound/figures");
+    expect(latestInflation("AU").rate).toBeCloseTo(0.049, 6);
+    expect(latestInflation("US").rate).toBeCloseTo(0.037, 6);
+  });
+  test("W5 (37): every asset row names the exact index behind its figure", async () => {
+    const { COUNTRY_ROWS } = await import("../src/lib/compound/figures");
+    for (const country of ["AU", "US"] as const) {
+      for (const row of COUNTRY_ROWS[country].assets) {
+        expect(row.measures.length).toBeGreaterThan(10);
+        expect(row.measures).toMatch(/[A-Za-z]/); // names the index or series
+      }
+    }
+  });
+  test("the chips keep plain names (not index jargon)", async () => {
+    const { assetChips } = await import("../src/lib/compound/figures");
+    for (const country of ["AU", "US"] as const) {
+      for (const chip of assetChips(country)) {
+        // plain chip labels — the index names live in `measures` only.
+        // ("S&P 500" stays: it IS the spec's own plain chip name.)
+        expect(chip.labelEn).not.toMatch(/Index|Total Return|Accumulation|Net|All Ordinaries/);
+      }
+    }
+  });
+  test("W6 (38): both countries carry a currency symbol", async () => {
+    const { COUNTRY_ROWS } = await import("../src/lib/compound/figures");
+    expect(COUNTRY_ROWS.AU.currencyEn).toBe("A$");
+    expect(COUNTRY_ROWS.US.currencyEn).toBe("$");
+  });
+  test("W4: the figures file's checked-on date is the research date", async () => {
+    const { FIGURES_CHECKED_ON } = await import("../src/lib/compound/figures");
+    expect(FIGURES_CHECKED_ON).toMatch(/^2026-11-2[0-9]$/);
+    expect(figuresAreStale(FIGURES_CHECKED_ON)).toBe(false);
+  });
+  test("the copy carries the inflation caption and the index heading (W3/W5)", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      expect(COPY[locale].tool.tiles.inflationCaption).toContain("{x}");
+      expect(COPY[locale].tool.how.inflationRecentLine).toContain("{y}");
+      expect(COPY[locale].tool.how.indicesTitle.length).toBeGreaterThan(3);
+    }
+  });
+});
