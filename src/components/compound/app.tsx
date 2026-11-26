@@ -1469,6 +1469,9 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                     id="cw-tax"
                     value={Math.round(taxRate * 1000) / 10}
                     onCommit={(v) => {
+                      // The clamp lives HERE (not in the box's own
+                      // clampRange) so the one plain message can fire when
+                      // a typed number is pulled into 0–60%.
                       const clamped = clamp(v, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100);
                       setTaxClamped(clamped !== v);
                       setTaxRate(clamped / 100);
@@ -1477,7 +1480,6 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                     suffix={pctSign(locale)}
                     ariaLabel={t.moreOptions.taxLabel}
                     decimals
-                    clampRange={[TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100]}
                     dataCw="tax-input"
                     big
                   />

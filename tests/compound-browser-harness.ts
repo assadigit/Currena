@@ -691,6 +691,370 @@ async function main() {
   await page.waitForTimeout(300);
 
   /* ---------------------------------------------------------------- *
+   * v7 — the tax layer (tests 39+)
+   * ---------------------------------------------------------------- */
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=headline]");
+
+  /** v7 helper: the estimator panel opens once and stays open; the link
+   *  only exists while it is closed. */
+  const openTaxEstimator = async () => {
+    if ((await page.$("[data-cw=tax-estimator]")) === null) {
+      await page.click("[data-cw=tax-estimate-link]");
+    }
+    await page.waitForSelector("[data-cw=tax-estimator]");
+  };
+
+  /** v7 helper: the Costs fold's open state persists across More-options
+   *  closes; only toggle when actually closed. */
+  const ensureCostsOpen = async () => {
+    if ((await page.$("#cw-tax")) === null) {
+      await page.click('[data-cw="group-costs"] button');
+      await page.waitForTimeout(250);
+    }
+  };
+
+  // Test 39: with the tax off (the default), nothing tax-shaped exists on
+  // the screen — the default view is exactly v6.
+  const taxElemsDefault = await page.evaluate(() =>
+    document.querySelectorAll('[data-cw^="tax-"], [data-cw=tax-caption], [data-cw=tax-takes]').length,
+  );
+  const howOffTax = await page.evaluate(() => {
+    const how = document.querySelector("[data-cw=how]");
+    return how ? how.textContent : null;
+  });
+  check(
+    "39-no-tax-ui-by-default",
+    taxElemsDefault === 0,
+    `tax elements on the default screen: ${taxElemsDefault}`,
+  );
+
+  // The tax UI appears only inside More options → Costs.
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  const taxRowWhileCollapsed = await page.evaluate(() => {
+    const row = document.querySelector("[data-cw=tax-row]");
+    return row !== null && (row as HTMLElement).offsetParent !== null;
+  });
+  await ensureCostsOpen();
+  const taxRowNow = await page.evaluate(() => {
+    const row = document.querySelector("[data-cw=tax-row]");
+    const input = document.querySelector("#cw-tax");
+    const link = document.querySelector("[data-cw=tax-estimate-link]");
+    return {
+      rowVisible: row !== null && (row as HTMLElement).offsetParent !== null,
+      inputVisible: input !== null && (input as HTMLElement).offsetParent !== null,
+      linkVisible: link !== null && (link as HTMLElement).offsetParent !== null,
+      height: input ? (input as HTMLElement).getBoundingClientRect().height : 0,
+      fontSize: input ? getComputedStyle(input as HTMLElement).fontSize : "",
+    };
+  });
+  check(
+    "39b-tax-row-inside-costs",
+    !taxRowWhileCollapsed &&
+      taxRowNow.rowVisible && taxRowNow.inputVisible && taxRowNow.linkVisible &&
+      taxRowNow.height >= 43 && parseFloat(taxRowNow.fontSize) >= 16,
+    `hidden until Costs opens: ${!taxRowWhileCollapsed}; box ${taxRowNow.height}px @ ${taxRowNow.fontSize}`,
+  );
+
+  // Test 40: the manual rate — type 32, the caption + the tax-takes line
+  // appear, the headline turns after-tax, no clamp note.
+  const headlineBefore = await page.textContent("[data-cw=headline] p");
+  await page.fill("#cw-tax", "32");
+  await page.waitForTimeout(300);
+  const manualTax = await page.evaluate(() => ({
+    caption: document.querySelector("[data-cw=tax-caption]")?.textContent ?? "",
+    takes: document.querySelector("[data-cw=tax-takes]")?.textContent ?? "",
+    headline: document.querySelector("[data-cw=headline] p")?.textContent ?? "",
+    clampNote: document.querySelector("[data-cw=tax-clamp-note]") ?? null,
+  }));
+  check(
+    "40-manual-tax",
+    /After tax at 4\.8% a year \(estimate\)\./.test(manualTax.caption) &&
+      /Tax \(estimate\) takes /.test(manualTax.takes) &&
+      manualTax.headline !== headlineBefore &&
+      manualTax.clampNote === null,
+    `caption: ${manualTax.caption}; takes: ${manualTax.takes.slice(0, 40)}; headline changed: ${manualTax.headline !== headlineBefore}`,
+  );
+
+  // Test 40b: clamping — type 70, kept at 60 with one plain message.
+  await page.fill("#cw-tax", "70");
+  await page.waitForTimeout(300);
+  const clampedTax = await page.evaluate(() => ({
+    value: (document.querySelector("#cw-tax") as HTMLInputElement)?.value ?? "",
+    note: document.querySelector("[data-cw=tax-clamp-note]")?.textContent ?? "",
+  }));
+  check(
+    "40b-tax-clamp",
+    clampedTax.value === "60" && clampedTax.note.length > 10,
+    `value: ${clampedTax.value}; note: ${clampedTax.note.slice(0, 60)}`,
+  );
+  // Steppers step by 1 point from the clamped value.
+  await page.click("[data-cw=tax-minus]");
+  await page.waitForTimeout(200);
+  const stepped = await page.evaluate(() => (document.querySelector("#cw-tax") as HTMLInputElement)?.value ?? "");
+  check("40c-tax-stepper", stepped === "59", `after −: ${stepped}`);
+
+  // Test 41: the AU guided estimator — income 90,000.
+  await page.click("[data-cw=tax-estimate-link]");
+  await page.waitForSelector("[data-cw=tax-estimator]");
+  await page.fill("#cw-tax-income", "90000");
+  await page.waitForTimeout(300);
+  const auEstimate = await page.evaluate(() => ({
+    line: document.querySelector("[data-cw=tax-estimate-line]")?.textContent ?? "",
+    source: document.querySelector("[data-cw=tax-source-line]")?.textContent ?? "",
+    ariaLive: document.querySelector("[data-cw=tax-estimate-line]")?.getAttribute("aria-live"),
+    incomeBox: document.querySelector("#cw-tax-income") ? (document.querySelector("#cw-tax-income") as HTMLElement).getBoundingClientRect().height : 0,
+  }));
+  check(
+    "41-au-guided-line",
+    /At that income, about 32\.0% of extra investment earnings goes to tax: 30% income tax plus 2% Medicare levy\./.test(auEstimate.line) &&
+      auEstimate.ariaLive === "polite",
+    auEstimate.line,
+  );
+  check(
+    "41b-au-source-line",
+    /Australian Taxation Office · the 2026–27 income year · read 26 November 2026/.test(auEstimate.source) &&
+      auEstimate.incomeBox >= 43,
+    `${auEstimate.source} (income box ${auEstimate.incomeBox}px)`,
+  );
+  // "Use this rate" writes 32 into the box (already 59 from the stepper test
+  // — the guided write replaces it).
+  await page.click("[data-cw=tax-use-rate]");
+  await page.waitForTimeout(300);
+  const afterUse = await page.evaluate(() => ({
+    value: (document.querySelector("#cw-tax") as HTMLInputElement)?.value ?? "",
+    caption: document.querySelector("[data-cw=tax-caption]")?.textContent ?? "",
+  }));
+  check("41c-use-this-rate", afterUse.value === "32" && /4\.8%/.test(afterUse.caption), `box: ${afterUse.value}; ${afterUse.caption}`);
+
+  // Test 42: the How fold with the tax on — the model, the guided source
+  // line, and the not-included list.
+  await page.click("[data-cw=more-options]"); // close more options first
+  await page.waitForTimeout(200);
+  await page.click("[data-cw=how-toggle]");
+  await page.waitForTimeout(300);
+  const howOnTax = await page.evaluate(() => ({
+    model: document.querySelector("[data-cw=how-tax-model]")?.textContent ?? "",
+    guided: document.querySelector("[data-cw=how-tax-guided]")?.textContent ?? "",
+    notIncluded: document.querySelectorAll("[data-cw=how-tax-not-included] li").length,
+    offLine: document.querySelector("[data-cw=how]")?.textContent?.includes("No taxes are included."),
+  }));
+  check(
+    "42-how-tax-on",
+    /Tax is assumed paid each year on the growth/.test(howOnTax.model) &&
+      /costs first, then tax, then inflation/.test(howOnTax.model) &&
+      /official schedules: Australian Taxation Office, the 2026–27 income year/.test(howOnTax.guided) &&
+      howOnTax.notIncluded >= 5 &&
+      howOnTax.offLine === false,
+    `model: ${howOnTax.model.slice(0, 60)}…; guided: ${howOnTax.guided.slice(0, 60)}…; not-included: ${howOnTax.notIncluded}`,
+  );
+
+  // Plain language over the new copy: no banned jargon, "marginal" never
+  // appears, average sentence length over the How fold stays ≤ 15 words.
+  const taxPlain = await page.evaluate(() => {
+    const how = document.querySelector("[data-cw=how]")!;
+    const paras = [...how.querySelectorAll("p, li")].map((el) => (el.textContent ?? "").trim());
+    const all = paras.join(" ");
+    const sentences = paras.join(" ").split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 3);
+    const avg = sentences.length ? sentences.reduce((n, s) => n + s.split(/\s+/).length, 0) / sentences.length : 0;
+    return { hasMarginal: /marginal/i.test(all), avgWords: Math.round(avg * 10) / 10 };
+  });
+  check(
+    "42b-plain-language-tax",
+    !taxPlain.hasMarginal && taxPlain.avgWords <= 16,
+    `marginal: ${taxPlain.hasMarginal}; avg ${taxPlain.avgWords} words per sentence in the How fold`,
+  );
+  await page.click("[data-cw=how-toggle]"); // close
+
+  // Test 43: the US guided estimator — the filing-status control, the NIIT
+  // above the threshold.
+  await page.click("[data-cw=country-US]");
+  await page.waitForTimeout(300);
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  await ensureCostsOpen();
+  await openTaxEstimator();
+  const statuses = await page.evaluate(() => ({
+    count: document.querySelectorAll("[data-cw^=tax-status-]").length,
+    labels: [...document.querySelectorAll("[data-cw^=tax-status-]")].map((b) => (b.textContent ?? "").trim()),
+  }));
+  await page.fill("#cw-tax-income", "90000");
+  await page.waitForTimeout(300);
+  const usAt90k = await page.textContent("[data-cw=tax-estimate-line]");
+  await page.fill("#cw-tax-income", "250000");
+  await page.waitForTimeout(300);
+  const usAt250k = await page.textContent("[data-cw=tax-estimate-line]");
+  const usSource = await page.textContent("[data-cw=tax-source-line]");
+  check(
+    "43-us-guided",
+    statuses.count === 4 &&
+      /about 22\.0% of extra investment earnings goes to tax: 22% income tax\./.test(usAt90k ?? "") &&
+      // 250,000 single sits in the 32% band (201,775–256,225) and above the
+      // NIIT threshold: 32% + 3.8% = 35.8%.
+      /about 35\.8% of extra investment earnings goes to tax: 32% income tax plus 3\.8% net investment income tax\./.test(usAt250k ?? ""),
+    `statuses: ${JSON.stringify(statuses.labels)}; 90k: ${usAt90k?.slice(0, 80)}; 250k: ${usAt250k?.slice(0, 100)}`,
+  );
+  check("43b-us-source", /IRS/.test(usSource ?? "") && /tax year 2026/.test(usSource ?? ""), usSource ?? "");
+  // Head of household at 200,000 hits the NIIT at the 24% band.
+  await page.click("[data-cw=tax-status-head-of-household]");
+  await page.fill("#cw-tax-income", "200000");
+  await page.waitForTimeout(300);
+  const hohAt200k = await page.textContent("[data-cw=tax-estimate-line]");
+  check(
+    "43c-hoh-niit",
+    /about 27\.8%.*24% income tax plus 3\.8% net investment income tax/.test(hohAt200k ?? ""),
+    hohAt200k?.slice(0, 110),
+  );
+
+  // Test 44: fa + RTL — the estimator and the How fold in Farsi, Persian
+  // digits, no LTR leakage in the live line.
+  await page.click('header button:has-text("فا")');
+  await page.waitForTimeout(400);
+  await page.fill("#cw-tax-income", "90000");
+  await page.waitForTimeout(300);
+  const faEstimate = await page.evaluate(() => ({
+    line: document.querySelector("[data-cw=tax-estimate-line]")?.textContent ?? "",
+    dir: getComputedStyle(document.querySelector("[data-cw=tax-estimate-line]") as HTMLElement).direction,
+    source: document.querySelector("[data-cw=tax-source-line]")?.textContent ?? "",
+    value: (document.querySelector("#cw-tax") as HTMLInputElement)?.value ?? "",
+  }));
+  check(
+    "44-fa-rtl-estimator",
+    // (The country is still the USA here: 90,000 single → 22%, no NIIT.)
+    /۲۲٫۰٪ از درآمد اضافی سرمایه‌گذاری به مالیات می‌رود: ۲۲٪ مالیات بر درآمد\./.test(faEstimate.line) &&
+      faEstimate.dir === "rtl",
+    faEstimate.line.slice(0, 90),
+  );
+  check("44b-fa-digits", faEstimate.value.includes("۳۲") || faEstimate.value.includes("32"), `tax box shows ${faEstimate.value}`);
+  // The fa How fold with the tax on.
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(200);
+  await page.click("[data-cw=how-toggle]");
+  await page.waitForTimeout(300);
+  const faHowTax = await page.evaluate(() => ({
+    model: document.querySelector("[data-cw=how-tax-model]")?.textContent ?? "",
+    notIncluded: document.querySelectorAll("[data-cw=how-tax-not-included] li").length,
+    dir: getComputedStyle(document.querySelector("[data-cw=how]") as HTMLElement).direction,
+  }));
+  check(
+    "44c-fa-how-tax",
+    /ترتیب این است: اول هزینه، بعد مالیات/.test(faHowTax.model) && faHowTax.notIncluded >= 5 && faHowTax.dir === "rtl",
+    `model: ${faHowTax.model.slice(0, 60)}…; items: ${faHowTax.notIncluded}`,
+  );
+  await page.click("[data-cw=how-toggle]");
+  await page.waitForTimeout(200);
+
+  // Test 46: dark mode with the tax UI open (screenshot).
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: `${OUT}/29a-fa-dark-tax-costs.png` });
+  await page.emulateMedia({ colorScheme: "light" });
+
+  // Test 46b: store nothing + no URL trace; reload resets the tax.
+  const storageTax = await page.evaluate(() => ({
+    local: Object.keys(window.localStorage),
+    session: Object.keys(window.sessionStorage),
+    cookies: document.cookie,
+    url: location.href,
+  }));
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=headline]");
+  const afterReload = await page.evaluate(() => ({
+    caption: document.querySelector("[data-cw=tax-caption]"),
+    takes: document.querySelector("[data-cw=tax-takes]"),
+    taxBox: document.querySelector("#cw-tax") ? (document.querySelector("#cw-tax") as HTMLInputElement).value : "(hidden)",
+  }));
+  check(
+    "46-store-nothing-and-reset",
+    storageTax.local.length === 0 && storageTax.session.length === 0 && storageTax.cookies === "" &&
+      !/\d/.test(storageTax.url.split("?")[1] ?? "") &&
+      afterReload.caption === null && afterReload.takes === null,
+    `storage: ${JSON.stringify(storageTax.local)}; after reload caption=${afterReload.caption === null ? "gone" : "present"}, takes=${afterReload.takes === null ? "gone" : "present"}`,
+  );
+
+  // Test 47: one-screen fit with More options open at the three sizes —
+  // no horizontal clipping, the group container visible.
+  for (const [w, h] of [[360, 800], [390, 844], [430, 932]] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.click("[data-cw=more-options]");
+    await page.waitForSelector("[data-cw=more-options-groups]");
+    const fitMore = await page.evaluate(() => ({
+      scrollW: document.documentElement.scrollWidth,
+      groupsVisible: (document.querySelector("[data-cw=more-options-groups]") as HTMLElement).offsetParent !== null,
+    }));
+    await page.click("[data-cw=more-options]");
+    await page.waitForTimeout(200);
+    check(
+      `47-more-open-${w}x${h}`,
+      fitMore.scrollW <= w && fitMore.groupsVisible,
+      `scrollW ${fitMore.scrollW}/${w}, groups visible: ${fitMore.groupsVisible}`,
+    );
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  // Test 48: the full keyboard path — tab into the tax box, type, and open
+  // the estimator with the keyboard.
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  await ensureCostsOpen();
+  await page.focus("#cw-tax");
+  await page.keyboard.type("25");
+  await page.waitForTimeout(250);
+  const kbTyped = await page.evaluate(() => (document.querySelector("#cw-tax") as HTMLInputElement)?.value ?? "");
+  await page.focus("[data-cw=tax-estimate-link]");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(300);
+  const kbEstimatorOpen = await page.evaluate(() => {
+    const est = document.querySelector("[data-cw=tax-estimator]");
+    return est !== null && (est as HTMLElement).offsetParent !== null;
+  });
+  check(
+    "48-keyboard-path",
+    kbTyped === "25" && kbEstimatorOpen,
+    `typed by keyboard: ${kbTyped}; estimator opened by Enter: ${kbEstimatorOpen}`,
+  );
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(200);
+
+  // Test 50: the A4 card with the tax on (guided) — the one tax line with
+  // its source, and never the income.
+  await page.click("[data-cw=country-AU]");
+  await page.waitForTimeout(300);
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  await ensureCostsOpen();
+  await page.fill("#cw-tax", "32");
+  await page.waitForTimeout(200);
+  await openTaxEstimator();
+  await page.fill("#cw-tax-income", "90000");
+  await page.waitForTimeout(250);
+  await page.click("[data-cw=tax-use-rate]");
+  await page.waitForTimeout(300);
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(250);
+  await page.click("[data-cw=save-card]");
+  await page.waitForSelector("[data-cw=card-menu]");
+  await page.click('[data-cw=card-menu] button:has-text("Print"), [data-cw=card-menu] button:has-text("چاپ")');
+  await page.waitForSelector("[data-cw=print-overlay]");
+  const pdfTaxPath = `${OUT}/a4-card-en-tax.pdf`;
+  await page.evaluate(() => document.body.classList.add("cw-printing"));
+  await page.pdf({ path: pdfTaxPath, format: "A4", printBackground: true });
+  await page.evaluate(() => document.body.classList.remove("cw-printing"));
+  const taxPdfText = execFileSync("pdftotext", [pdfTaxPath, "-"], { encoding: "utf8" });
+  const taxPages = /Pages:\s+(\d+)/.exec(execFileSync("pdfinfo", [pdfTaxPath], { encoding: "utf8" }))?.[1];
+  check(
+    "50-a4-card-tax",
+    taxPages === "1" &&
+      /Tax on growth: 32% a year \(estimate, Australian Taxation Office, the 2026–27 income year\)/.test(taxPdfText) &&
+      !/90,000|90000/.test(taxPdfText.replace(/\s/g, "")),
+    `pages=${taxPages}; tax line present: ${/Tax on growth/.test(taxPdfText)}; income leaked: ${/90,000|90000/.test(taxPdfText.replace(/\s/g, ""))}`,
+  );
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(300);
+
+  /* ---------------------------------------------------------------- *
    * Routing (test 19) — via a fresh context
    * ---------------------------------------------------------------- */
   const ctx = await browser.newContext();

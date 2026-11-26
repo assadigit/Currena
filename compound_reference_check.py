@@ -207,10 +207,33 @@ def build_grid(rate_pct, higher_pct, inflation_pct, start_ym):
     return grid
 
 
+# v7: the taxed grid — the same strata at three tax levels (15 / 32 / 45),
+# written to its own file so the v6 grid.json stays byte-for-byte untouched.
+TAX_GRID_LEVELS = [15.0, 32.0, 45.0]
+
+
+def build_tax_grid(rate_pct, higher_pct, inflation_pct, start_ym):
+    grid = []
+    for tax in TAX_GRID_LEVELS:
+        for exp in build_grid(rate_pct, higher_pct, inflation_pct, start_ym):
+            row = expected(exp["inputs"]["base"], rate_pct,
+                           exp["inputs"]["years"], start_ym=start_ym,
+                           higher_pct=higher_pct, inflation_pct=inflation_pct,
+                           cost_pct=exp["inputs"]["cost_pct"],
+                           fee=exp["inputs"]["fee"],
+                           every=exp["inputs"]["every"],
+                           growth_pct=exp["inputs"]["growth_pct"],
+                           start_amount=exp["inputs"]["start_amount"],
+                           tax_pct=tax)
+            grid.append(row)
+    return grid
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--grid", help="write a JSON grid of scenarios to this path")
+    ap.add_argument("--tax-grid", help="write the v7 taxed JSON grid (3 tax levels x the same strata)")
     ap.add_argument("--amount", type=float, default=100)
     ap.add_argument("--years", type=float, default=20)
     ap.add_argument("--rate", type=float, default=7.2, help="baseline annual rate in percent (before cost)")
@@ -231,6 +254,12 @@ def main():
         with open(a.grid, "w") as fh:
             json.dump(grid, fh, indent=1)
         print(f"Wrote {len(grid)} scenarios to {a.grid}")
+        return
+    if a.tax_grid:
+        tgrid = build_tax_grid(a.rate, a.higher_figure, a.inflation, a.start)
+        with open(a.tax_grid, "w") as fh:
+            json.dump(tgrid, fh, indent=1)
+        print(f"Wrote {len(tgrid)} taxed scenarios to {a.tax_grid}")
         return
     exp = expected(a.amount, a.rate, a.years, start_ym=a.start, higher_pct=a.higher_figure,
                    inflation_pct=a.inflation, cost_pct=a.cost, fee=a.fee, every=a.every,

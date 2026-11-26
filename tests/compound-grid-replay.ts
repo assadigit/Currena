@@ -8,9 +8,15 @@
  *     (amount, years, cost, fee, every, growth, starting amount), the
  *     page's own numbers read back and compared.
  *
+ * v7 adds the tax dimension: the taxed grid (grid-tax.json — the same
+ * strata at 15 / 32 / 45% tax) is replayed engine-side in full, and a
+ * stratified subset through the real interface with the tax typed into
+ * the Costs group's tax box. The tax = 0 equality is the v6 grid itself,
+ * which still runs unmodified.
+ *
  * Run: bun tests/compound-grid-replay.ts   (dev server on :3100)
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import {
   computeCompound,
@@ -24,6 +30,8 @@ interface GridRow {
     higher_pct: number | null; inflation_pct: number | null;
     cost_pct: number; fee: number; every: number;
     growth_pct: number; start_amount: number;
+    /** v7: the tax level (absent in the v6 grid — tax 0). */
+    tax_pct?: number;
   };
   final: number; put_in: number; growth: number;
   today_money: number | null; fees: number;
@@ -36,6 +44,12 @@ interface GridRow {
 }
 
 const grid = JSON.parse(readFileSync("docs/compound-tests/grid.json", "utf8")) as GridRow[];
+
+/** v7: the taxed grid, when present (same strata, 15/32/45% tax). */
+const taxGridPath = "docs/compound-tests/grid-tax.json";
+const taxGrid: GridRow[] = existsSync(taxGridPath)
+  ? (JSON.parse(readFileSync(taxGridPath, "utf8")) as GridRow[])
+  : [];
 
 /* The page's real figures: Australian shares (7.2% / 9.0%). */
 const FIGURES: AssetFigures = { r20: 0.072, r30: 0.09 };
@@ -59,6 +73,7 @@ function planOf(row: GridRow): PlanInput {
     customHigh: 0.09,
     inflation: (i.inflation_pct ?? 0) / 100,
     whatIfPoints: 2,
+    taxRate: (i.tax_pct ?? 0) / 100,
   };
 }
 
@@ -85,6 +100,41 @@ for (const row of grid) {
 }
 console.log(`ENGINE: ${checked - engineFails}/${checked} grid scenarios match the reference engine`);
 if (engineFails > 0) process.exitCode = 1;
+
+/* ------------------------------------------------------------------ *
+ * v7: the taxed grid, engine-side in full (3 tax levels x the strata).
+ * ------------------------------------------------------------------ */
+if (taxGrid.length > 0) {
+  let taxFails = 0;
+  let taxChecked = 0;
+  for (const row of taxGrid) {
+    const months = Math.round(row.inputs.years * 12);
+    const r = computeCompound(planOf(row), FIGURES, months);
+    taxChecked++;
+    const within = (got: number, want: number, tolPct: number) =>
+      Math.abs(got - want) / Math.max(1, Math.abs(want)) <= tolPct / 100;
+    const problems: string[] = [];
+    if (!within(r.finalValue, row.final, 0.01)) problems.push(`final ${r.finalValue.toFixed(2)} vs ${row.final.toFixed(2)}`);
+    if (Math.abs(r.totalPutIn - row.put_in) > 0.01) problems.push(`putIn ${r.totalPutIn} vs ${row.put_in}`);
+    if (!within(r.lowFinal ?? 0, row.low_final, 0.01)) problems.push(`low ${r.lowFinal} vs ${row.low_final}`);
+    if (!within(r.highFinal ?? 0, row.high_final, 0.01)) problems.push(`high ${r.highFinal} vs ${row.high_final}`);
+    if (row.today_money !== null && !within(r.finalValueToday, row.today_money, 0.01))
+      problems.push(`today ${r.finalValueToday.toFixed(2)} vs ${row.today_money.toFixed(2)}`);
+    if (Math.abs(r.feesPaid - row.fees) > 0.01) problems.push(`fees ${r.feesPaid} vs ${row.fees}`);
+    // the engine's own after-tax rate must be (baseline - cost) x (1 - tax)
+    const wantAfterTax = (0.072 - row.inputs.cost_pct / 100) * (1 - (row.inputs.tax_pct ?? 0) / 100);
+    if (Math.abs(r.afterTaxRate - wantAfterTax) > 1e-12) problems.push(`afterTaxRate ${r.afterTaxRate} vs ${wantAfterTax}`);
+    if (problems.length > 0) {
+      taxFails++;
+      if (taxFails <= 5) console.log("TAX-ENGINE-MISMATCH", JSON.stringify(row.inputs), problems.join("; "));
+    }
+  }
+  console.log(`ENGINE (taxed): ${taxChecked - taxFails}/${taxChecked} taxed grid scenarios match`);
+  if (taxFails > 0) process.exitCode = 1;
+} else {
+  console.log("ENGINE (taxed): grid-tax.json missing — skipped");
+  process.exitCode = 1;
+}
 
 /* ------------------------------------------------------------------ *
  * The live-page replay: a stratified subset through the real UI.
@@ -219,3 +269,9 @@ async function uiReplay() {
 }
 
 await uiReplay();
+
+/* ------------------------------------------------------------------ *
+ * v7: the taxed live-page replay runs as its own gate (a fresh browser
+ * session per file — this sandbox chokes on two heavy sessions in one
+ * process):  bun tests/compound-grid-replay-tax.ts
+ * ------------------------------------------------------------------ */

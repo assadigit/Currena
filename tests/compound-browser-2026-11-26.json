@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 253ms"
+      "detail": "3 one-tap changes in 204ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -286,6 +286,116 @@
       "detail": "AU: [\"YouputinA$20,400\",\"GrowthaddedA$22,700\",\"YoucouldhaveA$43,000\"] US: [\"Youputin$32,800\",\"Growthadded$66,000\",\"Youcouldhave$98,700\"]"
     },
     {
+      "id": "39-no-tax-ui-by-default",
+      "pass": true,
+      "detail": "tax elements on the default screen: 0"
+    },
+    {
+      "id": "39b-tax-row-inside-costs",
+      "pass": true,
+      "detail": "hidden until Costs opens: true; box 44px @ 16px"
+    },
+    {
+      "id": "40-manual-tax",
+      "pass": true,
+      "detail": "caption: After tax at 4.8% a year (estimate).; takes: Tax on your growth (estimate)Tax (estima; headline changed: true"
+    },
+    {
+      "id": "40b-tax-clamp",
+      "pass": true,
+      "detail": "value: 60; note: That number is outside the allowed range, so we kept the nea"
+    },
+    {
+      "id": "40c-tax-stepper",
+      "pass": true,
+      "detail": "after −: 59"
+    },
+    {
+      "id": "41-au-guided-line",
+      "pass": true,
+      "detail": "At that income, about 32.0% of extra investment earnings goes to tax: 30% income tax plus 2% Medicare levy."
+    },
+    {
+      "id": "41b-au-source-line",
+      "pass": true,
+      "detail": "Australian Taxation Office · the 2026–27 income year · read 26 November 2026 (income box 44px)"
+    },
+    {
+      "id": "41c-use-this-rate",
+      "pass": true,
+      "detail": "box: 32; After tax at 4.8% a year (estimate)."
+    },
+    {
+      "id": "42-how-tax-on",
+      "pass": true,
+      "detail": "model: Tax is assumed paid each year on the growth, at the rate you…; guided: The guided rate is an estimate from official schedules: Aust…; not-included: 6"
+    },
+    {
+      "id": "42b-plain-language-tax",
+      "pass": true,
+      "detail": "marginal: false; avg 13.2 words per sentence in the How fold"
+    },
+    {
+      "id": "43-us-guided",
+      "pass": true,
+      "detail": "statuses: [\"Single\",\"Married, filing jointly\",\"Head of household\",\"Married, filing separately\"]; 90k: At that income, about 22.0% of extra investment earnings goes to tax: 22% income; 250k: At that income, about 35.8% of extra investment earnings goes to tax: 32% income tax plus 3.8% net i"
+    },
+    {
+      "id": "43b-us-source",
+      "pass": true,
+      "detail": "IRS, Rev. Proc. 2025-32 (news release IR-2025-103) · tax year 2026 · read 26 November 2026"
+    },
+    {
+      "id": "43c-hoh-niit",
+      "pass": true,
+      "detail": "At that income, about 27.8% of extra investment earnings goes to tax: 24% income tax plus 3.8% net investment "
+    },
+    {
+      "id": "44-fa-rtl-estimator",
+      "pass": true,
+      "detail": "با آن درآمد، حدود ۲۲٫۰٪ از درآمد اضافی سرمایه‌گذاری به مالیات می‌رود: ۲۲٪ مالیات بر درآمد."
+    },
+    {
+      "id": "44b-fa-digits",
+      "pass": true,
+      "detail": "tax box shows ۳۲"
+    },
+    {
+      "id": "44c-fa-how-tax",
+      "pass": true,
+      "detail": "model: فرض می‌شود مالیات هر سال روی رشد پرداخت می‌شود، با نرخی که خ…; items: 6"
+    },
+    {
+      "id": "46-store-nothing-and-reset",
+      "pass": true,
+      "detail": "storage: []; after reload caption=gone, takes=gone"
+    },
+    {
+      "id": "47-more-open-360x800",
+      "pass": true,
+      "detail": "scrollW 360/360, groups visible: true"
+    },
+    {
+      "id": "47-more-open-390x844",
+      "pass": true,
+      "detail": "scrollW 390/390, groups visible: true"
+    },
+    {
+      "id": "47-more-open-430x932",
+      "pass": true,
+      "detail": "scrollW 430/430, groups visible: true"
+    },
+    {
+      "id": "48-keyboard-path",
+      "pass": true,
+      "detail": "typed by keyboard: 25; estimator opened by Enter: true"
+    },
+    {
+      "id": "50-a4-card-tax",
+      "pass": true,
+      "detail": "pages=1; tax line present: true; income leaked: false"
+    },
+    {
       "id": "19a-direct-load",
       "pass": true,
       "detail": "{\"/tools\":200,\"/tools/compound-wealth\":200,\"/tools/unknown\":404,\"/\":200}"
@@ -319,7 +429,7 @@
     }
   ],
   "summary": {
-    "total": 64,
+    "total": 86,
     "failed": 0
   }
 }
