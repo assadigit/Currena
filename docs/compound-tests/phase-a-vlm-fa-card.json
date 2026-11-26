@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) Yes, the Persian letters are correctly joined in proper cursive (e.g., \"ثروت‌مرکب\", \"سرمایه‌گذاری\" all connect correctly).\n\n2) The numerals are Persian/Eastern Arabic (۰، ۵، ۸، ۱۴۲۵، ۲۶٫۷٪).\n\n3) Yes, the layout is right-to-left: content aligned to the right, RTL reading order, bullet lists and labels mirrored correctly, with the Latin URL on the left (LTR) side.\n\n4) No tofu boxes or question marks; the text is clean. Minor overlapping/crowding appears near \"بازار\" where chart labels collide, but no garbled glyphs.\n\n5) One complete line: \"در ۱۴۰۲ خرج‌داد از ۱۰٬۰۰۰ عروء می‌کند\" — more clearly: \"در ۱۴۰۲ خرج‌داد از ۱۰٬۰۰۰ عبور می‌کند.\" (In 1402, spending exceeds 10,000.)",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795664491,
+  "id": "202611261141203e06f4b2499f4824",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "202611261141203e06f4b2499f4824",
+  "usage": {
+    "completion_tokens": 223,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1358,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1581
+  }
+}

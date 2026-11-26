@@ -20,11 +20,15 @@ import {
   computeCompound,
   figuresAreStale,
   formatMoney,
+  monthlyAmountFrom,
+  monthlySalaryFrom,
   monthsBetween,
+  shareFromAmount,
   thisMonth,
   whatIfCash,
   whatIfLaterStart,
   whatIfSmallChange,
+  yearsOfSalary,
   type AssetFigures,
   type PlanInput,
 } from "../src/lib/compound/maths";
@@ -436,5 +440,326 @@ describe("the shipped figures file", () => {
     expect(world.r20).toBeNull();
     expect(world.r30).toBeNull();
     expect(world.single!.years).toBeGreaterThanOrEqual(10);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* v6 regression lock — the live numbers verified by independent     */
+/* recomputation on 2026-11-25 (spec v6 §1.1). Start month frozen at */
+/* 2026-11 (the build month) so the dates stay testable. The plan is */
+/* exactly the page defaults: 100 a month, 20 years, Australian      */
+/* shares (7.2% over 20y, 9.0% over 30y — the lower is used),        */
+/* yearly cost 0.2%, inflation 2.76% (the AU average).              */
+/* ---------------------------------------------------------------- */
+describe("v6 regression lock: the live defaults (spec §1.1)", () => {
+  const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+  const plan = basePlan({
+    yearlyCost: 0.002,
+    inflation: defaultInflation("AU"),
+  });
+  const r = computeCompound(plan, AU_SHARES, monthsBetween("2026-11", "2046-11"));
+
+  test("you put in exactly 24,000", () => {
+    expect(r.totalPutIn).toBe(24_000);
+  });
+  test("final ≈ 50,754 — the page says about 50,800", () => {
+    expect(within(r.finalValue, 50_753.6, 0.1)).toBe(true);
+    expect(Math.round(r.finalValue / 100) * 100).toBe(50_800);
+  });
+  test("growth ≈ 26,754 — the page says 26,800", () => {
+    expect(within(r.growth, 26_753.6, 0.1)).toBe(true);
+    expect(Math.round(r.growth / 100) * 100).toBe(26_800);
+  });
+  test("today's money ≈ 29,441 — the page says about 29,400", () => {
+    expect(within(r.finalValueToday, 29_441, 0.2)).toBe(true);
+    expect(Math.round(r.finalValueToday / 100) * 100).toBe(29_400);
+  });
+  test("the band: low ≈ 40,600 at 5.2%, high ≈ 62,400 at 9.0%", () => {
+    expect(r.band).not.toBeNull();
+    expect(Math.round((r.band!.low * 100) * 10) / 10).toBeCloseTo(5.2, 1);
+    expect(Math.round((r.band!.high * 100) * 10) / 10).toBeCloseTo(9.0, 1);
+    expect(Math.round(r.lowFinal! / 100) * 100).toBe(40_600);
+    expect(Math.round(r.highFinal! / 100) * 100).toBe(62_400);
+  });
+  test("the band's high end is a measured figure (30y vs 20y differ by 1.8)", () => {
+    expect(r.bandHighIsMeasured).toBe(true);
+  });
+  test("crossover: month 224 — June 2045", () => {
+    expect(r.crossoverMonth).toBe(224);
+    expect(addMonths("2026-11", 224 - 1)).toBe("2045-06");
+  });
+  test("milestones: the page's three are Jun 2033, Nov 2039, Sep 2046", () => {
+    const page = r.milestones.slice(-MILESTONES_ON_PAGE);
+    expect(page.map((m) => [m.threshold, m.month])).toEqual([
+      [10_000, 80],
+      [25_000, 157],
+      [50_000, 239],
+    ]);
+    expect(addMonths("2026-11", 80 - 1)).toBe("2033-06");
+    expect(addMonths("2026-11", 157 - 1)).toBe("2039-11");
+    expect(addMonths("2026-11", 239 - 1)).toBe("2046-09");
+  });
+  test("starting 5 years later costs ≈ 19,600", () => {
+    const c = whatIfLaterStart(plan, AU_SHARES, 240, 5);
+    expect(Math.round(c! / 100) * 100).toBe(19_600);
+  });
+  test("cash what-if — re-pinned by W2 to 32,800 (the pre-W2 live value was 32,100)", () => {
+    // The live page on 2026-11-26 showed "about 32,100": the cash rate
+    // (3.03%) with the 0.2% fund cost wrongly deducted. W2 (spec §6.5)
+    // removed the cost, so the lock now pins the honest number; the
+    // before-value is still pinned in the W2 block below.
+    const cashFigures = figuresOf(cashRow("AU")!);
+    const c = whatIfCash(plan, cashFigures, 240);
+    expect(Math.round(c! / 100) * 100).toBe(32_800);
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* W2 (spec §6.5, test 34) — cash pays no yearly fund cost.          */
+/* The switch itself: APPLY_COST_TO_CASH = false (one config line).  */
+/* ---------------------------------------------------------------- */
+describe("W2: cash has no yearly fund cost", () => {
+  const CASH = figuresOf(cashRow("AU")!);
+  const plan = basePlan({ yearlyCost: 0.002, inflation: defaultInflation("AU") });
+
+  test("the cash what-if equals the cash rate with NO cost deducted (≈32,800)", () => {
+    const c = whatIfCash(plan, CASH, 240);
+    // Reference: simulate(100, 3.03, 20, cost 0) = 32,790 → page 32,800.
+    expect(within(c!, 32_790, 0.1)).toBe(true);
+    expect(Math.round(c! / 100) * 100).toBe(32_800);
+  });
+  test("isCash skips the cost inside computeCompound; without it the old lower number returns", () => {
+    const noCost = computeCompound(plan, CASH, 240, { isCash: true });
+    const withCost = computeCompound(plan, CASH, 240);
+    expect(within(noCost.finalValue, 32_790, 0.1)).toBe(true);
+    expect(within(withCost.finalValue, 32_102, 0.1)).toBe(true); // the W2 "before"
+    expect(noCost.finalValue).toBeGreaterThan(withCost.finalValue);
+  });
+  test("cash has no band (§6.2), but its baseline is still the lower of 20y/30y", () => {
+    const r = computeCompound(plan, CASH, 240, { isCash: true });
+    expect(r.band).toBeNull();
+    expect(Math.round(r.baselineRate * 10000) / 100).toBeCloseTo(3.03, 2);
+  });
+  test("the share assets still pay the cost (the switch only frees cash)", () => {
+    const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+    const r = computeCompound(plan, AU_SHARES, 240);
+    expect(Math.round((r.netRate * 100) * 10) / 10).toBeCloseTo(7.0, 1); // 7.2 − 0.2
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* W1 (spec §5.2, tests 32–33) — small changes in money or points.   */
+/* ---------------------------------------------------------------- */
+describe("W1: small-changes wording maths", () => {
+  test("amount mode: the step is 10% of the amount, whole, minimum 1", () => {
+    const w100 = whatIfSmallChange(basePlan(), SEVEN, 240);
+    expect(w100!.moneyStep).toBe(10);
+    const w5 = whatIfSmallChange(basePlan({ monthly: 5 }), SEVEN, 240);
+    expect(w5!.moneyStep).toBe(1);
+    const w37 = whatIfSmallChange(basePlan({ monthly: 37 }), SEVEN, 240);
+    expect(w37!.moneyStep).toBe(4); // 3.7 rounds to 4
+  });
+  test("amount mode: 'more' is final(amount+step) − final(amount)", () => {
+    const w = whatIfSmallChange(basePlan(), SEVEN, 240);
+    const up = computeCompound(basePlan({ monthly: 110 }), SEVEN, 240);
+    const base = computeCompound(basePlan(), SEVEN, 240);
+    expect(w!.more).toBeCloseTo(up.finalValue - base.finalValue, 6);
+  });
+  test("amount mode with a salary: the step's share of the salary is exposed", () => {
+    const w = whatIfSmallChange(basePlan({ salary: 7_500 }), SEVEN, 240);
+    expect(w!.stepShareOfSalary).toBeCloseTo(10 / 7_500, 8);
+  });
+  test("% mode: one point either way, as percentages", () => {
+    const w = whatIfSmallChange(basePlan({ salary: 5_000, useShare: true, share: 0.03 }), SEVEN, 240);
+    expect(w!.pctNow).toBeCloseTo(0.03, 6);
+    expect(w!.pctUp).toBeCloseTo(0.04, 6);
+    expect(w!.pctDown).toBeCloseTo(0.02, 6);
+    expect(w!.hideLess).toBe(false);
+    expect(w!.hideMore).toBe(false);
+  });
+  test("% mode: the 'less' sentence hides when the lower value is under 0.5%", () => {
+    const w = whatIfSmallChange(basePlan({ salary: 5_000, useShare: true, share: 0.012 }), SEVEN, 240);
+    expect(w!.pctDown).toBeCloseTo(0.002, 6);
+    expect(w!.hideLess).toBe(true); // 0.2% < 0.5%
+    expect(w!.hideMore).toBe(false);
+  });
+  test("test 33: the copy never says '1% more' — the shipped strings are money or points", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const w = COPY[locale].tool.whatIf;
+      expect(w.moreMoney).toContain("{step}");
+      expect(w.lessMoney).toContain("{step}");
+      expect(w.morePct).toContain("{up}");
+      expect(w.lessPct).toContain("{down}");
+      expect(JSON.stringify(w)).not.toMatch(/1% more|۱٪ بیشتر/);
+    }
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* W3 / W5 / W6 (tests 33–38) — the figures file's honesty fields.   */
+/* ---------------------------------------------------------------- */
+describe("W3/W5/W6: inflation visibility, index names, figures sanity", () => {
+  test("W3 (35): both countries carry a latest 12-month inflation row", async () => {
+    const { latestInflation } = await import("../src/lib/compound/figures");
+    for (const country of ["AU", "US"] as const) {
+      const li = latestInflation(country);
+      expect(li.rate).toBeGreaterThan(0);
+      expect(li.rate).toBeLessThan(0.15);
+      expect(li.sourceName.length).toBeGreaterThan(3);
+      expect(li.sourceUrl).toMatch(/^https:\/\//);
+      expect(li.labelEn).toContain("12 months");
+    }
+  });
+  test("W3 (35): the AU honesty figure is the verified 4.9% to Oct 2026; the US is 3.7% to Sep 2026", async () => {
+    const { latestInflation } = await import("../src/lib/compound/figures");
+    expect(latestInflation("AU").rate).toBeCloseTo(0.049, 6);
+    expect(latestInflation("US").rate).toBeCloseTo(0.037, 6);
+  });
+  test("W5 (37): every asset row names the exact index behind its figure", async () => {
+    const { COUNTRY_ROWS } = await import("../src/lib/compound/figures");
+    for (const country of ["AU", "US"] as const) {
+      for (const row of COUNTRY_ROWS[country].assets) {
+        expect(row.measures.length).toBeGreaterThan(10);
+        expect(row.measures).toMatch(/[A-Za-z]/); // names the index or series
+      }
+    }
+  });
+  test("the chips keep plain names (not index jargon)", async () => {
+    const { assetChips } = await import("../src/lib/compound/figures");
+    for (const country of ["AU", "US"] as const) {
+      for (const chip of assetChips(country)) {
+        // plain chip labels — the index names live in `measures` only.
+        // ("S&P 500" stays: it IS the spec's own plain chip name.)
+        expect(chip.labelEn).not.toMatch(/Index|Total Return|Accumulation|Net|All Ordinaries/);
+      }
+    }
+  });
+  test("W6 (38): both countries carry a currency symbol", async () => {
+    const { COUNTRY_ROWS } = await import("../src/lib/compound/figures");
+    expect(COUNTRY_ROWS.AU.currencyEn).toBe("A$");
+    expect(COUNTRY_ROWS.US.currencyEn).toBe("$");
+  });
+  test("W4: the figures file's checked-on date is the research date", async () => {
+    const { FIGURES_CHECKED_ON } = await import("../src/lib/compound/figures");
+    expect(FIGURES_CHECKED_ON).toMatch(/^2026-11-2[0-9]$/);
+    expect(figuresAreStale(FIGURES_CHECKED_ON)).toBe(false);
+  });
+  test("the copy carries the inflation caption and the index heading (W3/W5)", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      expect(COPY[locale].tool.tiles.inflationCaption).toContain("{x}");
+      expect(COPY[locale].tool.how.inflationRecentLine).toContain("{y}");
+      expect(COPY[locale].tool.how.indicesTitle.length).toBeGreaterThan(3);
+    }
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* W7 (spec §5.1.1, §6.6, tests 25–32) — the percent-of-salary        */
+/* conversions as pure maths.                                         */
+/* ---------------------------------------------------------------- */
+describe("W7: percent-of-salary conversions", () => {
+  test("test 25: 3% of 90,000 a year = 225 a month (full precision kept)", () => {
+    const monthly = monthlySalaryFrom(90_000, "year");
+    expect(monthly).toBeCloseTo(7_500, 10);
+    expect(monthlyAmountFrom(monthly, 0.03)).toBeCloseTo(225, 10);
+  });
+  test("test 25: 3% of 5,000 a month = 150; 1% of 60,000 a year = 50", () => {
+    expect(monthlyAmountFrom(monthlySalaryFrom(5_000, "month"), 0.03)).toBeCloseTo(150, 10);
+    expect(monthlyAmountFrom(monthlySalaryFrom(60_000, "year"), 0.01)).toBeCloseTo(50, 10);
+  });
+  test("test 25: 0.5% of 100,000 a year ≈ 41.67 (shown as 42, full precision inside)", () => {
+    const amt = monthlyAmountFrom(monthlySalaryFrom(100_000, "year"), 0.005);
+    expect(amt).toBeCloseTo(41.66666, 3);
+    expect(Math.round(amt)).toBe(42);
+  });
+  test("test 25: the per year ↔ per month switch keeps the same money", () => {
+    const yearly = 90_000;
+    const monthly = monthlySalaryFrom(yearly, "year");
+    expect(monthlySalaryFrom(monthly, "month")).toBeCloseTo(monthly, 10);
+    // 90,000/12 = 7,500 → 7,500 × 12 = 90,000 (the round trip is exact)
+    expect(monthlySalaryFrom(monthly, "month") * 12).toBe(yearly);
+  });
+  test("test 26 (reverse): 225 a month with a 90,000-a-year salary is 3.0%", () => {
+    const pct = shareFromAmount(225, monthlySalaryFrom(90_000, "year")) * 100;
+    expect(Math.round(pct * 10) / 10).toBeCloseTo(3.0, 6);
+  });
+  test("test 26 (reverse): 100 with a 5,000-a-month salary is 2.0%", () => {
+    const pct = shareFromAmount(100, monthlySalaryFrom(5_000, "month")) * 100;
+    expect(Math.round(pct * 10) / 10).toBeCloseTo(2.0, 6);
+  });
+  test("test 27 (consistency): 3% of 90,000 a year, 0% increase == 225 a month, 0% increase", () => {
+    const sharePlan = basePlan({
+      salary: monthlySalaryFrom(90_000, "year"),
+      share: 0.03,
+      useShare: true,
+      yearlyIncrease: 0,
+    });
+    const amountPlan = basePlan({ monthly: 225, yearlyIncrease: 0 });
+    const a = computeCompound(sharePlan, SEVEN, 240);
+    const b = computeCompound(amountPlan, SEVEN, 240);
+    expect(a.finalValue).toBeCloseTo(b.finalValue, 6);
+    expect(a.totalPutIn).toBeCloseTo(b.totalPutIn, 6);
+    expect(a.finalValueToday).toBeCloseTo(b.finalValueToday, 6);
+    expect(a.crossoverMonth).toBe(b.crossoverMonth);
+    expect(a.milestones).toEqual(b.milestones);
+  });
+  test("test 28: the % mode default increase (the AU inflation average) raises the put-in", () => {
+    const plan0 = basePlan({ salary: 7_500, share: 0.03, useShare: true, yearlyIncrease: 0, inflation: 0.0276 });
+    const planGrow = basePlan({ salary: 7_500, share: 0.03, useShare: true, yearlyIncrease: 0.0276, inflation: 0.0276 });
+    const r0 = computeCompound(plan0, SEVEN, 240);
+    const rGrow = computeCompound(planGrow, SEVEN, 240);
+    expect(rGrow.totalPutIn).toBeGreaterThan(r0.totalPutIn);
+    expect(rGrow.finalValue).toBeGreaterThan(r0.finalValue);
+  });
+  test("test 29 (mode switch maths): 225 → 3.0% and 3% → 225 with a 90,000-a-year salary", () => {
+    const monthly = monthlySalaryFrom(90_000, "year");
+    const toShare = shareFromAmount(225, monthly); // amount → %
+    expect(Math.round(toShare * 1000) / 10).toBeCloseTo(3.0, 6);
+    const toAmount = monthlyAmountFrom(monthly, 0.03); // % → amount
+    expect(Math.round(toAmount)).toBe(225);
+  });
+  test("test 30 (edge): no salary means the plan falls back to the amount, never NaN", () => {
+    const plan = basePlan({ salary: null, share: 0.03, useShare: true, monthly: 137 });
+    const r = computeCompound(plan, SEVEN, 240);
+    expect(r.totalPutIn).toBe(137 * 240);
+    expect(Number.isFinite(r.finalValue)).toBe(true);
+  });
+  test("test 30 (edge): share mode with a 0/letters salary stays on the amount", () => {
+    // the UI treats 0, letters and empty as "no salary"; the engine agrees
+    const plan = basePlan({ salary: 0, share: 0.03, useShare: true, monthly: 100 });
+    const r = computeCompound(plan, SEVEN, 240);
+    expect(r.totalPutIn).toBe(24_000);
+  });
+  test("§6.6: the years-of-salary line = today's-money final ÷ a year of salary", () => {
+    const plan = basePlan({ salary: 7_500, share: 0.03, useShare: true, inflation: 0.0276 });
+    const r = computeCompound(plan, SEVEN, 240);
+    expect(yearsOfSalary(r.finalValueToday, 7_500)).toBeCloseTo(r.finalValueToday / 90_000, 6);
+  });
+  test("the config block: percent limits 0.1–50, step 0.5, chips 1/3/5/10 (§11)", async () => {
+    const mod = await import("../src/lib/compound/maths");
+    expect(mod.SHARE_MIN).toBe(0.001);
+    expect(mod.SHARE_MAX).toBe(0.5);
+    expect(mod.PERCENT_STEP).toBe(0.5);
+    expect(mod.PERCENT_CHIPS).toEqual([1, 3, 5, 10]);
+    expect(mod.SALARY_PERIOD_DEFAULT).toBe("year");
+  });
+  test("the copy: the live line, the enter-salary line and both card lines exist (fa + EN)", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const c = COPY[locale].tool;
+      expect(c.controls.liveLine).toContain("{p}");
+      expect(c.controls.liveLine).toContain("{amount}");
+      expect(c.controls.enterSalary).toContain("{p}");
+      expect(c.controls.thatIs).toContain("{p}");
+      expect(c.controls.switchAmount.length).toBeGreaterThan(0);
+      expect(c.controls.switchShare).toMatch(/%|٪/);
+      expect(c.print.planShareSummary).toContain("{share}");
+      expect(c.phone.planShareLine).toContain("{share}");
+      // the salary is never named with a number on the card lines
+      expect(c.print.planShareSummary).not.toContain("{salary}");
+      expect(c.phone.planShareLine).not.toContain("{salary}");
+    }
   });
 });

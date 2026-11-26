@@ -52,7 +52,7 @@ function ToolCard({
           </p>
         </div>
         <span className="mt-1 shrink-0 rounded-full bg-[var(--color-currena-soft)] px-3 py-1.5 text-[12px] font-bold text-[var(--color-currena-blue-deep)]">
-          {cta} ↗
+          {cta}
         </span>
       </div>
     </a>

@@ -64,10 +64,18 @@ export const INFLATION_MAX = 0.15;
 export const INCREASE_MIN = 0;
 export const INCREASE_MAX = 0.15;
 
-/** The salary-share limits for percent mode (3% default). */
+/** The salary-share limits for percent mode (§11: 0.1–50%). */
 export const SHARE_DEFAULT = 0.03;
-export const SHARE_MIN = 0.005;
-export const SHARE_MAX = 0.30;
+export const SHARE_MIN = 0.001;
+export const SHARE_MAX = 0.5;
+/** The percent box's stepper step, in percentage points (§11). */
+export const PERCENT_STEP = 0.5;
+/** Quick chips for the percent box (§11: 1/3/5/10). */
+export const PERCENT_CHIPS: readonly number[] = [1, 3, 5, 10];
+/** How the salary is typed: per year (the default) or per month. */
+export type SalaryPeriod = "year" | "month";
+/** The salary box's default period (§11). */
+export const SALARY_PERIOD_DEFAULT: SalaryPeriod = "year";
 
 /** Years limits for the number box and the custom end date. */
 export const YEARS_MIN = 1;
@@ -83,6 +91,13 @@ export const DEFAULT_COUNTRY = "AU" as const;
  *  suggests buying every 3 months (1% = 0.01). */
 export const FEE_WARNING_SHARE = 0.01;
 
+/** W2 (spec §6.5): does the yearly fund cost apply to the Cash row?
+ *  A savings account has no fund fee, so the default is false — the
+ *  cash what-if card, the cash thin line and the compare table all use
+ *  the unreduced cash rate. The owner may reverse this decision; flip
+ *  this one switch and every cash path follows. */
+export const APPLY_COST_TO_CASH = false;
+
 /* =================================================================== *
  * Types                                                               *
  * =================================================================== */
@@ -97,9 +112,10 @@ export type RateMode = "average" | "custom-rate" | "custom-range";
 export interface PlanInput {
   /** Monthly amount in fixed mode (ignored when share mode is on). */
   monthly: number;
-  /** Percent-of-salary mode: monthly salary after tax. */
+  /** Percent-of-salary mode: the MONTHLY salary (the UI converts a
+   *  per-year salary by ÷ 12; §6.6). Null until a salary is entered. */
   salary: number | null;
-  /** Percent-of-salary mode: share of salary (decimal). */
+  /** Percent-of-salary mode: share of the monthly salary (decimal). */
   share: number;
   /** Use percent-of-salary mode instead of the fixed amount. */
   useShare: boolean;
@@ -309,9 +325,13 @@ export function addMonths(ym: string, months: number): string {
   return `${String(ny).padStart(4, "0")}-${String(nm).padStart(2, "0")}`;
 }
 
-/** The monthly deposit in month m (1-based) for a plan. */
+/** The monthly deposit in month m (1-based) for a plan. A salary of 0
+ *  or less reads as "no salary" (the UI's own rule): the amount stands. */
 function depositFor(plan: PlanInput, m: number): number {
-  const base = plan.useShare && plan.salary !== null ? plan.salary * plan.share : plan.monthly;
+  const base =
+    plan.useShare && plan.salary !== null && plan.salary > 0
+      ? plan.salary * plan.share
+      : plan.monthly;
   const year = Math.floor((m - 1) / 12); // deposit year y (0 for months 1–12)
   return base * Math.pow(1 + plan.yearlyIncrease, year);
 }
@@ -319,13 +339,17 @@ function depositFor(plan: PlanInput, m: number): number {
 /**
  * Run one projection at a single annual rate. Returns the monthly series
  * plus the fees actually paid (purchases that cleared the fee).
+ *
+ * `isCash` marks the Cash asset: when APPLY_COST_TO_CASH is false the
+ * yearly fund cost is not deducted from it (spec §6.5).
  */
 function runAtRate(
   plan: PlanInput,
   rate: number,
   months: number,
+  isCash = false,
 ): { series: MonthPoint[]; feesPaid: number } {
-  const net = rate - plan.yearlyCost;
+  const net = rate - (isCash && !APPLY_COST_TO_CASH ? 0 : plan.yearlyCost);
   // The net monthly rate; guarded so a deeply negative net rate can never
   // produce a complex root (Math.pow of a negative base).
   const monthlyRate = 1 + net > 0 ? Math.pow(1 + net, 1 / 12) - 1 : Math.max(-1, net / 12);
@@ -390,15 +414,21 @@ function milestonesIn(series: MonthPoint[], pick: (p: MonthPoint) => number, max
  * The full result                                                     *
  * =================================================================== */
 
-/** Compute everything the page renders for one plan. */
+/** Compute everything the page renders for one plan.
+ *
+ * `opts.isCash` marks the Cash asset (the what-if card, the compare row
+ * and the chart's thin cash line): the yearly fund cost is not deducted
+ * from it while APPLY_COST_TO_CASH is false (spec §6.5).
+ */
 export function computeCompound(
   plan: PlanInput,
   figures: AssetFigures,
   months: number,
+  opts: { isCash?: boolean } = {},
 ): CompoundResult {
   const safeMonths = Math.max(0, Math.round(months));
   const choice = chooseRate(figures, plan);
-  const { series, feesPaid } = runAtRate(plan, choice.baseline, safeMonths);
+  const { series, feesPaid } = runAtRate(plan, choice.baseline, safeMonths, opts.isCash === true);
   const last = series.length > 0 ? series[series.length - 1] : null;
   const finalValue = last ? last.value : plan.startingAmount;
   const finalValueToday = last ? last.valueToday : plan.startingAmount;
@@ -424,14 +454,16 @@ export function computeCompound(
     }
   }
 
-  // Band runs.
+  // Band runs. Cash has no band (spec §6.2 "Cash: no band") — the
+  // compare table and the cash line use the single unreduced rate.
+  const band = opts.isCash === true ? null : choice.band;
   let lowSeries: MonthPoint[] | null = null;
   let highSeries: MonthPoint[] | null = null;
   let lowFinal: number | null = null;
   let highFinal: number | null = null;
-  if (choice.band) {
-    lowSeries = runAtRate(plan, choice.band.low, safeMonths).series;
-    highSeries = runAtRate(plan, choice.band.high, safeMonths).series;
+  if (band) {
+    lowSeries = runAtRate(plan, band.low, safeMonths).series;
+    highSeries = runAtRate(plan, band.high, safeMonths).series;
     lowFinal = lowSeries.length ? lowSeries[lowSeries.length - 1].value : null;
     highFinal = highSeries.length ? highSeries[highSeries.length - 1].value : null;
   }
@@ -448,9 +480,9 @@ export function computeCompound(
   return {
     months: safeMonths,
     baselineRate: choice.baseline,
-    band: choice.band,
+    band,
     bandHighIsMeasured: choice.highIsMeasured,
-    netRate: choice.baseline - plan.yearlyCost,
+    netRate: choice.baseline - (opts.isCash === true && !APPLY_COST_TO_CASH ? 0 : plan.yearlyCost),
     series,
     finalValue,
     finalValueToday,
@@ -477,27 +509,73 @@ export function computeCompound(
  * The what-if maths (spec §5.2)                                       *
  * =================================================================== */
 
+/** What the small-changes card says, in the words the spec asks for:
+ *  money terms in Amount mode ("Investing 10 more a month adds X"),
+ *  percentage points in % mode ("Investing 4% instead of 3% adds X"). */
+export interface SmallChange {
+  /** Final-value change for the "more" sentence (future money). */
+  more: number;
+  /** Final-value loss for the "less" sentence (future money). */
+  less: number;
+  /** Amount mode: the money step (10% of the amount, whole, min 1). */
+  moneyStep: number | null;
+  /** Amount mode with a known salary: the step as a share of the
+   *  monthly salary (a decimal, e.g. 0.002 for 0.2%), else null. */
+  stepShareOfSalary: number | null;
+  /** % mode: the current / up / down percentages (decimals). */
+  pctNow: number | null;
+  pctUp: number | null;
+  pctDown: number | null;
+  /** True when the "less" sentence must be hidden (the lower value
+   *  would be under 0.5%, or the amount would go negative). */
+  hideLess: boolean;
+  /** True when the "more" sentence must be hidden (out of range). */
+  hideMore: boolean;
+  /** Which mode the wording follows. */
+  describedAs: "amount" | "salary";
+}
+
 /**
- * "1% more / 1% less": in fixed mode 10% of the monthly amount, in share
- * mode 1 percentage point of salary share. Returns the final value change
- * at the same rate (future money).
+ * The small-changes card (W1): the step is money in Amount mode — 10%
+ * of the monthly amount, rounded to a whole number, minimum 1 — and
+ * one percentage point in % mode. Never "1% more" when the change is
+ * 10% of the amount.
  */
 export function whatIfSmallChange(
   plan: PlanInput,
   figures: AssetFigures,
   months: number,
-): { more: number; less: number; describedAs: "amount" | "salary" } | null {
+): SmallChange | null {
   if (months <= 0) return null;
   const up: PlanInput = { ...plan };
   const down: PlanInput = { ...plan };
+  let moneyStep: number | null = null;
+  let stepShareOfSalary: number | null = null;
+  let pctNow: number | null = null;
+  let pctUp: number | null = null;
+  let pctDown: number | null = null;
+  let hideLess = false;
+  let hideMore = false;
+
   if (plan.useShare && plan.salary !== null) {
-    if (plan.share + 0.01 > SHARE_MAX || plan.share - 0.01 < SHARE_MIN) return null;
-    up.share = plan.share + 0.01;
-    down.share = plan.share - 0.01;
+    // % mode: one percentage point either way (§5.2).
+    pctNow = plan.share;
+    pctUp = plan.share + 0.01;
+    pctDown = plan.share - 0.01;
+    hideMore = pctUp > SHARE_MAX;
+    hideLess = pctDown < 0.005; // "under 0.5%" hides the less sentence
+    up.share = Math.min(pctUp, SHARE_MAX);
+    if (!hideLess) down.share = pctDown;
   } else {
+    // Amount mode: 10% of the monthly amount, whole, minimum 1.
     if (plan.monthly <= 0) return null;
-    up.monthly = plan.monthly * 1.1;
-    down.monthly = plan.monthly * 0.9;
+    moneyStep = Math.max(1, Math.round(plan.monthly * 0.1));
+    up.monthly = plan.monthly + moneyStep;
+    hideLess = plan.monthly - moneyStep < 0;
+    if (!hideLess) down.monthly = plan.monthly - moneyStep;
+    if (plan.salary !== null && plan.salary > 0) {
+      stepShareOfSalary = moneyStep / plan.salary;
+    }
   }
   const base = computeCompound(plan, figures, months);
   const more = computeCompound(up, figures, months);
@@ -505,6 +583,13 @@ export function whatIfSmallChange(
   return {
     more: more.finalValue - base.finalValue,
     less: base.finalValue - less.finalValue,
+    moneyStep,
+    stepShareOfSalary,
+    pctNow,
+    pctUp,
+    pctDown,
+    hideLess,
+    hideMore,
     describedAs: plan.useShare && plan.salary !== null ? "salary" : "amount",
   };
 }
@@ -523,14 +608,17 @@ export function whatIfLaterStart(
   return base.finalValue - late.finalValue;
 }
 
-/** The cash comparison: the same plan at the cash rate (no band). */
+/** The cash comparison: the same plan at the cash rate (no band, and no
+ *  yearly fund cost while APPLY_COST_TO_CASH is false — spec §6.5). */
 export function whatIfCash(
   plan: PlanInput,
   cashFigures: AssetFigures,
   months: number,
 ): number | null {
   if (cashFigures.r20 === null && cashFigures.r30 === null) return null;
-  const cash = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months);
+  const cash = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months, {
+    isCash: true,
+  });
   return cash.finalValue;
 }
 
@@ -557,6 +645,31 @@ export function audFromUsd(
   const usdGrowth = Math.pow(1 + usdAnnualRate, years);
   const audGrowth = usdGrowth * (fxStart / fxEnd);
   return Math.pow(audGrowth, 1 / years) - 1;
+}
+
+/* =================================================================== *
+ * Percent-of-salary conversions (spec §6.6, W7)                        *
+ * =================================================================== */
+
+/** The monthly salary behind a typed salary and its period
+ *  (per year is divided by 12; per month passes through). */
+export function monthlySalaryFrom(salary: number, period: SalaryPeriod): number {
+  return period === "year" ? salary / 12 : salary;
+}
+
+/** The monthly amount invested: monthly salary × percent (full precision). */
+export function monthlyAmountFrom(monthlySalary: number, share: number): number {
+  return monthlySalary * share;
+}
+
+/** The reverse: what percent of the monthly salary an amount is. */
+export function shareFromAmount(monthlyAmount: number, monthlySalary: number): number {
+  return monthlyAmount / monthlySalary;
+}
+
+/** The years-of-salary line: today's-money final ÷ a year of salary. */
+export function yearsOfSalary(finalToday: number, monthlySalary: number): number {
+  return finalToday / (monthlySalary * 12);
 }
 
 /* =================================================================== *

@@ -47,7 +47,8 @@ export interface CompoundCopy {
       growTo: string;
       todayMoney: string;
     };
-    shareHeadline: string; // percent-mode lead sentence
+    shareHeadlineLead: string; // percent-mode lead sentence
+    shareHeadlineGrow: string; // the "growing as your salary grows" clause
     rangeWorse: string;
     rangeBetter: string;
     strongSentence: string;
@@ -59,6 +60,23 @@ export interface CompoundCopy {
       increase: string;
       years: string;
       amountHint: string;
+      /** W7: the Amount | % of salary switch. */
+      amountSwitchLabel: string;
+      switchAmount: string;
+      switchShare: string;
+      /** Amount mode: the salary link + live line. */
+      addSalary: string;
+      thatIs: string; // "That is {p}% of your salary."
+      /** % mode: the percent box, chips, salary box, live line. */
+      percentLabel: string;
+      salaryLabel: string;
+      salaryHint: string;
+      salaryPlaceholder: string; // "e.g. 90,000"
+      perYear: string;
+      salaryPerMonth: string;
+      salaryPeriodLabel: string;
+      liveLine: string; // "{p}% of {salary} {period} = {amount} a month."
+      enterSalary: string; // "Enter your salary to turn {p}% into dollars."
     };
     chart: {
       title: string;
@@ -66,7 +84,10 @@ export interface CompoundCopy {
       growthLabel: string;
       bandLabel: string;
       bandWhatIf: string;
+      bandLowLabel: string;
+      bandHighLabel: string;
       crossoverLabel: string;
+      crossoverShort: string;
       crossoverNever: string;
       otherAssets: string;
       cashLine: string;
@@ -79,6 +100,9 @@ export interface CompoundCopy {
       futureMoney: string;
       todaysMoney: string;
       notYetInvested: string;
+      /** W3: shown under the tiles whenever today's money is displayed.
+       *  {x} = the inflation percent the plan is using (editable). */
+      inflationCaption: string; // "Today's money uses average inflation of {x}% a year (last 20 years)."
     };
     milestones: {
       title: string;
@@ -94,12 +118,16 @@ export interface CompoundCopy {
     whatIf: {
       title: string;
       smallChanges: string;
-      smallChangesAmount: string; // "(10% of the monthly amount)"
-      smallChangesSalary: string; // "(1% of salary)"
       laterLabel: string;
       cashLabel: string;
-      more: string; // "1% more adds {x}"
-      less: string; // "1% less loses {x}"
+      /** Amount mode — money terms, never "1% more" (W1). */
+      moreMoney: string; // "Investing {step} more a month adds {x}."
+      lessMoney: string; // "Investing {step} less loses {x}."
+      /** % mode — percentage points. */
+      morePct: string; // "Investing {up}% instead of {now}% adds {x}."
+      lessPct: string; // "Investing {down}% instead of {now}% loses {x}."
+      /** The optional salary suffix in Amount mode (kept short). */
+      salarySuffix: string; // "(that is {p}% more of your salary)"
       later: string; // "Starting {n} years later costs you {x}."
       years: string[];
       cash: string; // "If you only save it as cash: about {x}."
@@ -111,10 +139,9 @@ export interface CompoundCopy {
     moreOptions: {
       title: string;
       aboutYou: string;
-      salaryLabel: string;
-      salaryHint: string;
-      useShare: string;
-      shareLabel: string;
+      /** W7: the one-line assumption note shown in About you while in
+       *  percent mode. */
+      shareGrowNote: string;
       ageLabel: string;
       ageHint: string;
       startingLabel: string;
@@ -169,6 +196,12 @@ export interface CompoundCopy {
       pastNote: string;
       sources: string;
       stale: string;
+      /** W5: the heading above the per-asset index list. */
+      indicesTitle: string;
+      /** W3: the two inflation lines — the average used (follows the
+       *  editable setting) and the latest 12-month figure. */
+      inflationLine: string; // "Today's money uses the long-run average of {x}% a year."
+      inflationRecentLine: string; // "Latest 12-month inflation: {y}% ({source}, {date})."
     };
     disclaimer: string;
     footer: {
@@ -186,6 +219,8 @@ export interface CompoundCopy {
       close: string;
       title: string;
       planSummary: string;
+      /** W7: the percent-mode plan line (never the salary). */
+      planShareSummary: string;
       milestonesTitle: string;
       assumptionsTitle: string;
       assumptions: string[]; // lines with {inflation} {cost} {fee}
@@ -197,6 +232,8 @@ export interface CompoundCopy {
     phone: {
       title: string;
       planLine: string;
+      /** W7: the percent-mode plan line (never the salary). */
+      planShareLine: string;
       next: string;
       hint: string;
       close: string;
@@ -246,7 +283,8 @@ export const COPY: Record<Locale, CompoundCopy> = {
         growTo: "and it could grow to about {final}",
         todayMoney: "(about {today} in today's money)",
       },
-      shareHeadline: "Putting {share} of your salary aside for {years} years:",
+      shareHeadlineLead: "Investing {share} of your salary ({amount} a month{grow}) for {years} years:",
+      shareHeadlineGrow: ", growing as your salary grows",
       rangeWorse: "If it goes worse: about {x}.",
       rangeBetter: "If it goes better: about {x}.",
       strongSentence: "Small and steady beats big and late.",
@@ -258,6 +296,20 @@ export const COPY: Record<Locale, CompoundCopy> = {
         increase: "More",
         years: "years",
         amountHint: "Any amount works. Try yours.",
+        amountSwitchLabel: "Amount or percent of salary",
+        switchAmount: "Amount",
+        switchShare: "% of salary",
+        addSalary: "Add your salary (optional)",
+        thatIs: "That is {p}% of your salary.",
+        percentLabel: "Percent of salary",
+        salaryLabel: "Salary",
+        salaryHint: "Use the salary you plan your saving from, before or after tax.",
+        salaryPlaceholder: "e.g. 90,000",
+        perYear: "per year",
+        salaryPerMonth: "per month",
+        salaryPeriodLabel: "Salary period",
+        liveLine: "{p}% of {salary} {period} = {amount} a month.",
+        enterSalary: "Enter your salary to turn {p}% into dollars.",
       },
       chart: {
         title: "The growth layer overtakes the money you put in",
@@ -282,6 +334,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         futureMoney: "Future money",
         todaysMoney: "Today's money",
         notYetInvested: "{x} not yet invested",
+        inflationCaption: "Today's money uses average inflation of {x}% a year (last 20 years).",
       },
       milestones: {
         title: "Along the way",
@@ -297,12 +350,16 @@ export const COPY: Record<Locale, CompoundCopy> = {
       whatIf: {
         title: "What if…",
         smallChanges: "Small changes",
-        smallChangesAmount: "10% of the monthly amount",
-        smallChangesSalary: "1% of salary",
         laterLabel: "Starting later",
         cashLabel: "Cash comparison",
-        more: "1% more adds {x}.",
-        less: "1% less loses {x}.",
+        /** Amount mode — money terms, never "1% more" (W1). */
+        moreMoney: "Investing {step} more a month adds {x}.",
+        lessMoney: "Investing {step} less loses {x}.",
+        /** % mode — percentage points. */
+        morePct: "Investing {up}% instead of {now}% adds {x}.",
+        lessPct: "Investing {down}% instead of {now}% loses {x}.",
+        /** The optional salary suffix in Amount mode (kept short). */
+        salarySuffix: "(that is {p}% more of your salary)",
         later: "Starting {n} years later costs you {x}.",
         years: ["1", "3", "5"],
         cash: "If you only save it as cash: about {x}.",
@@ -314,10 +371,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       moreOptions: {
         title: "More options",
         aboutYou: "About you",
-        salaryLabel: "Monthly salary after tax",
-        salaryHint: "Optional. Only used to work out the amount.",
-        useShare: "Use a share of my salary instead",
-        shareLabel: "Share of salary",
+        shareGrowNote: "In percent mode, your monthly amount grows with your salary. We use the inflation average until you change it under Rates.",
         ageLabel: "Your age now",
         ageHint: "Optional. Adds “at age N” to the milestones.",
         startingLabel: "Already invested",
@@ -325,7 +379,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         yearsOfSalary: "The result is about {n} years of your salary.",
         costs: "Costs",
         yearlyCostLabel: "Yearly cost of investing",
-        yearlyCostHint: "An assumption. Change it.",
+        yearlyCostHint: "An assumption. Change it. Not charged on cash.",
         feeLabel: "Cost per purchase",
         feeHint: "A flat fee each time you buy.",
         everyLabel: "How often I buy",
@@ -369,7 +423,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         overlapNote: "The 20-year and 30-year periods overlap, and both include good and bad years.",
         totalReturnNote: "Figures include dividends (total return) before tax.",
         priceOnlyNote: "One row is price only: {row}.",
-        costNote: "The yearly cost is an assumption, not a fact.",
+        costNote: "The yearly cost is an assumption, not a fact. It is not charged on cash.",
         pendingNote: "Money waiting between purchases earns nothing.",
         superNote: "Employer super may already exist, so this is for extra money you invest on your own.",
         taxNote: "No taxes are included.",
@@ -377,6 +431,9 @@ export const COPY: Record<Locale, CompoundCopy> = {
         pastNote: "Past performance is not a promise.",
         sources: "Figures: {sources}. Checked by hand on {date}.",
         stale: "These figures may be out of date.",
+        indicesTitle: "What each asset follows",
+        inflationLine: "Today's money uses the long-run average of {x}% a year. You can change it under Rates.",
+        inflationRecentLine: "Latest 12-month inflation: {y}% ({source}, {date}). Recent inflation can be higher or lower than the average.",
       },
       disclaimer: "Past returns are no guarantee of future results. This is a descriptive tool, not advice.",
       footer: {
@@ -394,6 +451,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         close: "Close",
         title: "Compound Wealth",
         planSummary: "{amount} a month · {years} years · {asset} · {rate} a year, {baseline}",
+        planShareSummary: "{share} of your salary ({amount} a month) · {years} years · {asset} · {rate} a year, {baseline}",
         milestonesTitle: "Along the way",
         assumptionsTitle: "The numbers behind this",
         assumptions: [
@@ -411,6 +469,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       phone: {
         title: "Compound Wealth",
         planLine: "{amount} a month · {years} years",
+        planShareLine: "{share} of salary · {amount} a month · {years} years",
         next: "Next: {amount} in {date}",
         hint: "Take a screenshot, then set it as your lock screen.",
         close: "Close",
@@ -459,7 +518,8 @@ export const COPY: Record<Locale, CompoundCopy> = {
         growTo: "و ممکن است به حدود {final} برسد",
         todayMoney: "(حدود {today} به پول امروز)",
       },
-      shareHeadline: "با کنار گذاشتن {share} از حقوق برای {years} سال:",
+      shareHeadlineLead: "با سرمایه‌گذاری {share} از حقوق ({amount} در ماه{grow}) برای {years} سال:",
+      shareHeadlineGrow: "، همگام با رشد حقوق",
       rangeWorse: "اگر بدتر شود: حدود {x}.",
       rangeBetter: "اگر بهتر شود: حدود {x}.",
       strongSentence: "کم ولی پیوسته، از زیاد ولی دیر جلو می‌زند.",
@@ -471,6 +531,20 @@ export const COPY: Record<Locale, CompoundCopy> = {
         increase: "بیشتر",
         years: "سال",
         amountHint: "هر عددی کار می‌کند. عدد خودتان را امتحان کنید.",
+        amountSwitchLabel: "مبلغ یا درصدی از حقوق",
+        switchAmount: "مبلغ",
+        switchShare: "٪ از حقوق",
+        addSalary: "حقوق خود را اضافه کنید (اختیاری)",
+        thatIs: "این {p}٪ از حقوق شماست.",
+        percentLabel: "درصدی از حقوق",
+        salaryLabel: "حقوق",
+        salaryHint: "حقوقی را وارد کنید که پس‌انداز از آن انجام می‌شود؛ قبل یا بعد از مالیات.",
+        salaryPlaceholder: "مثلاً ۹۰٬۰۰۰",
+        perYear: "در سال",
+        salaryPerMonth: "در ماه",
+        salaryPeriodLabel: "دورهٔ حقوق",
+        liveLine: "{p}٪ از {salary} {period} = {amount} در ماه.",
+        enterSalary: "حقوق خود را وارد کنید تا {p}٪ به پول تبدیل شود.",
       },
       chart: {
         title: "لایهٔ رشد از پولی که وارد کرده‌اید جلو می‌زند",
@@ -495,6 +569,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         futureMoney: "پول آینده",
         todaysMoney: "پول امروز",
         notYetInvested: "{x} هنوز سرمایه‌گذاری نشده",
+        inflationCaption: "«پول امروز» با میانگین تورم {x}٪ در سال حساب می‌شود (۲۰ سال اخیر).",
       },
       milestones: {
         title: "در مسیر",
@@ -510,12 +585,13 @@ export const COPY: Record<Locale, CompoundCopy> = {
       whatIf: {
         title: "اگر…",
         smallChanges: "تغییرهای کوچک",
-        smallChangesAmount: "۱۰٪ از مبلغ ماهانه",
-        smallChangesSalary: "۱٪ از حقوق",
         laterLabel: "شروع دیرتر",
         cashLabel: "مقایسه با نقد",
-        more: "۱٪ بیشتر، {x} اضافه می‌کند.",
-        less: "۱٪ کمتر، {x} از دست می‌دهد.",
+        moreMoney: "{step} بیشتر در ماه، {x} اضافه می‌کند.",
+        lessMoney: "{step} کمتر، {x} از دست می‌دهد.",
+        morePct: "سرمایه‌گذاری {up}٪ به‌جای {now}٪، {x} اضافه می‌کند.",
+        lessPct: "{down}٪ به‌جای {now}٪، {x} از دست می‌دهد.",
+        salarySuffix: "(یعنی {p}٪ بیشتر از حقوق شما)",
         later: "شروع {n} سال دیرتر، {x} از دست می‌دهد.",
         years: ["۱", "۳", "۵"],
         cash: "اگر فقط به‌صورت نقد پس‌اندازش کنید: حدود {x}.",
@@ -527,10 +603,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       moreOptions: {
         title: "گزینه‌های بیشتر",
         aboutYou: "دربارهٔ شما",
-        salaryLabel: "حقوق ماهانه پس از کسر مالیات",
-        salaryHint: "اختیاری. فقط برای محاسبهٔ مبلغ استفاده می‌شود.",
-        useShare: "به‌جای مبلغ، سهمی از حقوقم را کنار بگذارم",
-        shareLabel: "سهم از حقوق",
+        shareGrowNote: "در حالت درصدی، مبلغ ماهانهٔ شما همگام با حقوق رشد می‌کند. تا زمانی که زیر «نرخ‌ها» تغییرش دهید، از میانگین تورم استفاده می‌کنیم.",
         ageLabel: "سن شما",
         ageHint: "اختیاری. «در N سالگی» را به شاخص‌ها اضافه می‌کند.",
         startingLabel: "از قبل سرمایه‌گذاری‌شده",
@@ -538,7 +611,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         yearsOfSalary: "نتیجه حدوداً {n} سال از حقوق شماست.",
         costs: "هزینه‌ها",
         yearlyCostLabel: "هزینهٔ سالانهٔ سرمایه‌گذاری",
-        yearlyCostHint: "یک فرض است. تغییرش دهید.",
+        yearlyCostHint: "یک فرض است. تغییرش دهید. روی پول نقد اعمال نمی‌شود.",
         feeLabel: "هزینهٔ هر خرید",
         feeHint: "کارمزد ثابت برای هر بار خرید.",
         everyLabel: "هر چند وقت یک‌بار می‌خرم",
@@ -582,7 +655,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         overlapNote: "دورهٔ ۲۰ ساله و ۳۰ ساله هم‌پوشانی دارند و هر دو سال‌های خوب و بد را دیده‌اند.",
         totalReturnNote: "اعداد شامل سود سهام (بازده کل) و پیش از مالیات است.",
         priceOnlyNote: "یک ردیف فقط قیمت است: {row}.",
-        costNote: "هزینهٔ سالانه یک فرض است، نه یک واقعیت.",
+        costNote: "هزینهٔ سالانه یک فرض است، نه یک واقعیت. روی پول نقد اعمال نمی‌شود.",
         pendingNote: "پولی که بین خریدها منتظر می‌ماند چیزی به دست نمی‌آورد.",
         superNote: "ممکن است سوپر کارفرما از قبل وجود داشته باشد؛ این ابزار برای پول اضافه‌ای است که خودتان سرمایه‌گذاری می‌کنید.",
         taxNote: "مالیات محاسبه نشده است.",
@@ -590,6 +663,9 @@ export const COPY: Record<Locale, CompoundCopy> = {
         pastNote: "عملکرد گذشته یک وعده نیست.",
         sources: "اعداد: {sources}. دستی بازبینی شده در {date}.",
         stale: "ممکن است این اعداد از تاریخ افتاده باشند.",
+        indicesTitle: "هر دارایی چه چیزی را دنبال می‌کند",
+        inflationLine: "«پول امروز» با میانگین بلندمدت {x}٪ در سال حساب می‌شود. می‌توانید زیر «نرخ‌ها» تغییرش دهید.",
+        inflationRecentLine: "تورم ۱۲ ماه اخیر: {y}٪ ({source}، {date}). تورم اخیر می‌تواند بیشتر یا کمتر از میانگین باشد.",
       },
       disclaimer: "بازده گذشته تضمینی برای آینده نیست. این یک ابزار توصیفی است، نه توصیه.",
       footer: {
@@ -607,6 +683,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         close: "بستن",
         title: "ثروت مرکب",
         planSummary: "{amount} در ماه · {years} سال · {asset} · {rate} در سال، {baseline}",
+        planShareSummary: "{share} از حقوق شما ({amount} در ماه) · {years} سال · {asset} · {rate} در سال، {baseline}",
         milestonesTitle: "در مسیر",
         assumptionsTitle: "اعداد پشت این نتیجه",
         assumptions: [
@@ -624,6 +701,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
       phone: {
         title: "ثروت مرکب",
         planLine: "{amount} در ماه · {years} سال",
+        planShareLine: "{share} از حقوق · {amount} در ماه · {years} سال",
         next: "بعدی: {amount} در {date}",
         hint: "یک اسکرین‌شات بگیرید و آن را صفحهٔ قفل گوشی‌تان کنید.",
         close: "بستن",

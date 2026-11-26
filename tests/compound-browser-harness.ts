@@ -67,7 +67,7 @@ async function main() {
   const controlInventory = await page.evaluate(() => {
     const main = document.querySelector("main")!;
     const interactive = [...main.querySelectorAll("button, input, select, a[href]")]
-      .filter((el) => el.offsetParent !== null || (el as HTMLElement).closest("[style*='opacity']") !== null)
+      .filter((el) => (el as HTMLElement).offsetParent !== null || (el as HTMLElement).closest("[style*='opacity']") !== null)
       .map((el) => ({
         tag: el.tagName,
         cw: el.getAttribute("data-cw") ?? el.getAttribute("data-testid") ?? "",
@@ -78,6 +78,9 @@ async function main() {
   const allowedPrefixes = [
     "country-", "amount-", "years-", "asset-", "more-options", "save-card", "money-", "card-menu",
     "later-", "how", "tools-link",
+    // W7: the percent-of-salary mini calculator lives inside the amount
+    // group (the switch, the salary link/box, the percent box and chips).
+    "mode-", "add-salary", "salary-", "percent-",
   ];
   const forbidden = controlInventory.filter(
     (c) => !allowedPrefixes.some((p) => c.cw.startsWith(p)),
@@ -86,6 +89,22 @@ async function main() {
     "13-exact-controls",
     forbidden.length === 0,
     forbidden.length ? `unexpected: ${forbidden.map((f) => `${f.tag}[${f.cw}]${f.text}`).join(", ")}` : `${controlInventory.length} interactive elements, all spec'd`,
+  );
+
+  // Test 13b (v6): the salary box is NOT visible in Amount mode — only
+  // the "Add your salary (optional)" link.
+  const salaryHiddenInAmount = await page.evaluate(() => {
+    const box = document.querySelector("[data-cw=salary-box]");
+    const link = document.querySelector("[data-cw=add-salary]");
+    return {
+      boxVisible: box !== null && (box as HTMLElement).offsetParent !== null,
+      linkVisible: link !== null && (link as HTMLElement).offsetParent !== null,
+    };
+  });
+  check(
+    "13b-salary-hidden-in-amount-mode",
+    !salaryHiddenInAmount.boxVisible && salaryHiddenInAmount.linkVisible,
+    JSON.stringify(salaryHiddenInAmount),
   );
 
   // Test 17: the headline shows both money views; the range line exists.
@@ -103,13 +122,21 @@ async function main() {
   await page.waitForTimeout(300);
   const plainLanguage = await page.evaluate(() => {
     const vp = window.innerHeight;
-    const els = [...document.querySelectorAll("main h1, main h2, main p, main span, main label, main button, main div")]
-      .filter((el) => {
-        const r = el.getBoundingClientRect();
-        return r.top >= 0 && r.top < vp && el.children.length === 0 && el.textContent.trim().length > 0;
-      })
-      .map((el) => el.textContent.trim());
-    const text = [...new Set(els)].join(" ");
+    const visible = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return r.top >= 0 && r.top < vp;
+    };
+    // Sentence length is measured over sentences (paragraph and heading
+    // text); control labels and chips are not sentences. Banned jargon is
+    // checked over every visible word.
+    const everything = [...document.querySelectorAll("main *")]
+      .filter((el) => visible(el) && el.children.length === 0 && (el.textContent ?? "").trim().length > 0)
+      .map((el) => (el.textContent ?? "").trim());
+    const allText = [...new Set(everything)].join(" ");
+    const sentenceText = [...document.querySelectorAll("main p, main h1, main h2")]
+      .filter(visible)
+      .map((el) => (el.textContent ?? "").trim())
+      .join(" ");
     const banned = [
       "CAGR", "compound interest", "annualised", "annualized", "nominal", "real return",
       "volatility", "ETF", "index fund", "dividend", "yield", "ROI", "APY",
@@ -117,8 +144,8 @@ async function main() {
       "net present value", "risk-adjusted", "p.a.", "AUM", "drawdown", "alpha",
       "benchmark", "securities", "equities", "portfolio",
     ];
-    const hits = banned.filter((b) => new RegExp(b, "i").test(text));
-    const sentences = text.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 3);
+    const hits = banned.filter((b) => new RegExp(b, "i").test(allText));
+    const sentences = sentenceText.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 3);
     const avgWords =
       sentences.length === 0
         ? 0
@@ -173,11 +200,14 @@ async function main() {
     JSON.stringify(storageAfterUse),
   );
 
-  // The page made no network requests for data (only Next assets).
+  // The page made no network requests for data (only app assets: Next
+  // chunks, the page itself, the site's own logo image — and, on the live
+  // CDN, Cloudflare's own injected analytics beacon, which the app never
+  // asks for).
   const dataRequests = await page.evaluate(() => performance.getEntriesByType("resource").map((r) => r.name));
   check(
     "21-no-data-network",
-    dataRequests.every((u) => /\/_next\/|\/tools\/compound-wealth/.test(u)),
+    dataRequests.every((u) => /\/_next\/|\/tools\/|\/images\/|\/icons\/|cdn-cgi|cloudflareinsights/.test(u)),
     `${dataRequests.length} resources, all app assets`,
   );
 
@@ -233,20 +263,28 @@ async function main() {
    * The A4 print card — EN/fa × light/dark × with/without costs
    * ---------------------------------------------------------------- */
   const printConfigs = [
-    { id: "en-light", fa: false, dark: false, costs: false },
-    { id: "en-dark", fa: false, dark: true, costs: false },
-    { id: "en-light-costs", fa: false, dark: false, costs: true },
-    { id: "en-dark-costs", fa: false, dark: true, costs: true },
-    { id: "fa-light", fa: true, dark: false, costs: false },
-    { id: "fa-dark", fa: true, dark: true, costs: false },
-    { id: "fa-light-costs", fa: true, dark: false, costs: true },
-    { id: "fa-dark-costs", fa: true, dark: true, costs: true },
+    { id: "en-light", fa: false, dark: false, costs: false, share: false },
+    { id: "en-dark", fa: false, dark: true, costs: false, share: false },
+    { id: "en-light-costs", fa: false, dark: false, costs: true, share: false },
+    { id: "en-dark-costs", fa: false, dark: true, costs: true, share: false },
+    // v6 (test 22): both cards in Amount AND % modes.
+    { id: "en-light-share", fa: false, dark: false, costs: false, share: true },
+    { id: "fa-light", fa: true, dark: false, costs: false, share: false },
+    { id: "fa-dark", fa: true, dark: true, costs: false, share: false },
+    { id: "fa-light-costs", fa: true, dark: false, costs: true, share: false },
+    { id: "fa-dark-costs", fa: true, dark: true, costs: true, share: false },
+    { id: "fa-dark-share", fa: true, dark: true, costs: false, share: true },
   ];
 
   for (const cfg of printConfigs) {
     // Reset the page state with a reload (also proves reset-on-reload).
     await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
     await page.waitForSelector("[data-cw=headline]");
+    if (cfg.share) {
+      await page.click("[data-cw=mode-share]");
+      await page.fill("#cw-salary", "90000");
+      await page.waitForTimeout(300);
+    }
     if (cfg.fa) {
       await page.click('header button:has-text("فا")');
       await page.waitForTimeout(400);
@@ -274,34 +312,52 @@ async function main() {
     await page.pdf({ path: pdfPath, format: "A4", printBackground: true });
     await page.evaluate(() => document.body.classList.remove("cw-printing"));
 
-    // Verify: exactly one A4 page, text extractable, key numbers present.
+    // Verify: exactly one A4 page, text extractable, key numbers present,
+    // and — in % mode — the percent line with the monthly amount, never the
+    // salary itself (spec test 22).
     const info = execFileSync("pdfinfo", [pdfPath], { encoding: "utf8" });
     const pages = /Pages:\s+(\d+)/.exec(info)?.[1];
     const size = /Page size:\s+([\d x.]+ pts)/.exec(info)?.[1];
     const text = execFileSync("pdftotext", [pdfPath, "-"], { encoding: "utf8" });
-    const hasNumbers = cfg.fa
-      ? /۵۰|۴۵|۷۲|۲۴/.test(text.replace(/\s/g, ""))
-      : /50,800|45,700|72,300|24,000/.test(text);
+    // (The Farsi plan line is checked bidi-safely: pdftotext reorders
+    // RTL runs and unbinds the lam-alef ligature, so match the skeleton.)
+    const hasNumbers = cfg.share
+      ? cfg.fa
+        ? /۳٪/.test(text.replace(/\s|[\u200e\u200f\u202a-\u202e]/g, "")) &&
+          /۲۲۵/.test(text.replace(/\s|[\u200e\u200f\u202a-\u202e]/g, "")) &&
+          /درماه/.test(text.replace(/\s|[\u200e\u200f\u202a-\u202e]/g, ""))
+        : /3% of your salary \(A\$225 a month\)/.test(text)
+      : cfg.fa
+        ? /۵۰|۴۵|۷۲|۲۴/.test(text.replace(/\s/g, ""))
+        : /50,800|45,700|72,300|24,000/.test(text);
+    const salaryLeak =
+      cfg.share && (cfg.fa ? /۹۰٬۰۰۰|۷٬۵۰۰|90000/.test(text.replace(/\s/g, "")) : /90,000|7500/.test(text.replace(/\s/g, "")));
     check(
       `22-a4-${cfg.id}`,
-      pages === "1" && size?.startsWith("595") === true && text.length > 200 && hasNumbers,
-      `pages=${pages} size=${size} text=${text.length}B numbers=${hasNumbers}`,
+      pages === "1" && size?.startsWith("595") === true && text.length > 200 && hasNumbers && !salaryLeak,
+      `pages=${pages} size=${size} text=${text.length}B numbers=${hasNumbers} salaryLeak=${salaryLeak}`,
     );
   }
 
   /* ---------------------------------------------------------------- *
-   * The phone card — 3 sizes × EN/fa × dark/light
+   * The phone card — 3 sizes × EN/fa × dark/light + both modes (v6)
    * ---------------------------------------------------------------- */
   for (const cfg of [
-    { id: "en-dark", fa: false, light: false },
-    { id: "en-light", fa: false, light: true },
-    { id: "fa-dark", fa: true, light: false },
-    { id: "fa-light", fa: true, light: true },
+    { id: "en-dark", fa: false, light: false, share: false },
+    { id: "en-light", fa: false, light: true, share: false },
+    { id: "en-dark-share", fa: false, light: false, share: true },
+    { id: "fa-dark", fa: true, light: false, share: false },
+    { id: "fa-light", fa: true, light: true, share: false },
   ]) {
     for (const [w, h] of [[360, 800], [390, 844], [430, 932]] as const) {
       await page.setViewportSize({ width: w, height: h });
       await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
       await page.waitForSelector("[data-cw=headline]");
+      if (cfg.share) {
+        await page.click("[data-cw=mode-share]");
+        await page.fill("#cw-salary", "90000");
+        await page.waitForTimeout(300);
+      }
       if (cfg.fa) {
         await page.click('header button:has-text("فا")');
         await page.waitForTimeout(400);
@@ -354,6 +410,287 @@ async function main() {
   }
 
   /* ---------------------------------------------------------------- *
+   * v6 — the percent-of-salary mini calculator (tests 25–32, W7)
+   * ---------------------------------------------------------------- */
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=headline]");
+
+  // Test 31a: the switch is a real two-option control (radio semantics,
+  // both options keyboard-focusable), and the live line is polite.
+  const switchSemantics = await page.evaluate(() => {
+    const group = document.querySelector("[data-cw=amount-mode-switch]");
+    const radios = group ? [...group.querySelectorAll('[role="radio"]')] : [];
+    const live = document.querySelector("[data-cw=share-live-line]");
+    return {
+      groupPresent: group !== null,
+      radioCount: radios.length,
+      ariaChecked: radios.map((r) => r.getAttribute("aria-checked")),
+      liveAttr: live ? live.getAttribute("aria-live") : null,
+    };
+  });
+  check(
+    "31a-switch-semantics",
+    switchSemantics.groupPresent && switchSemantics.radioCount === 2 &&
+      switchSemantics.ariaChecked[0] === "true" && switchSemantics.ariaChecked[1] === "false" &&
+      switchSemantics.liveAttr === null, // the live line only exists in % mode
+    JSON.stringify(switchSemantics),
+  );
+
+  // Test 30a: % mode with an empty salary — no empty state, the hint line,
+  // and the results keep the last amount used (identical numbers).
+  const beforeShare = await page.textContent("[data-cw=headline] p");
+  await page.click("[data-cw=mode-share]");
+  await page.waitForTimeout(300);
+  const emptySalary = await page.evaluate(() => ({
+    liveLine: document.querySelector("[data-cw=share-live-line]")?.textContent?.trim() ?? "",
+    livePolite: document.querySelector("[data-cw=share-live-line]")?.getAttribute("aria-live"),
+    headline: document.querySelector("[data-cw=headline] p")?.textContent?.trim() ?? "",
+  }));
+  check(
+    "30a-empty-salary-no-empty-state",
+    /Enter your salary/i.test(emptySalary.liveLine) &&
+      emptySalary.livePolite === "polite" &&
+      emptySalary.headline === beforeShare, // results unchanged
+    `live: ${emptySalary.liveLine.slice(0, 50)}; headline unchanged: ${emptySalary.headline === beforeShare}`,
+  );
+
+  // Test 25 (browser): type 90,000 → the live line and the % headline.
+  await page.fill("#cw-salary", "90000");
+  await page.waitForTimeout(300);
+  const withSalary = await page.evaluate(() => ({
+    liveLine: document.querySelector("[data-cw=share-live-line]")?.textContent?.trim() ?? "",
+    headline: document.querySelector("[data-cw=headline] p")?.textContent?.trim() ?? "",
+  }));
+  check(
+    "25-live-line",
+    /3% of A\$90,000 a year = A\$225 a month\./.test(withSalary.liveLine),
+    withSalary.liveLine,
+  );
+  check(
+    "25-share-headline",
+    /Investing 3% of your salary \(A\$225 a month, growing as your salary grows\) for 20 years/.test(withSalary.headline),
+    withSalary.headline.slice(0, 90),
+  );
+
+  // Test 25b: per year ↔ per month keeps the same money.
+  await page.click("[data-cw=salary-period-month]");
+  await page.waitForTimeout(300);
+  const perMonth = await page.evaluate(() => ({
+    box: (document.querySelector("#cw-salary") as HTMLInputElement).value,
+    live: document.querySelector("[data-cw=share-live-line]")?.textContent?.trim() ?? "",
+  }));
+  check(
+    "25b-period-switch-same-money",
+    perMonth.box === "7500" && /A\$7,500 a month = A\$225 a month/.test(perMonth.live),
+    `box=${perMonth.box} live=${perMonth.live}`,
+  );
+  await page.click("[data-cw=salary-period-year]");
+  await page.waitForTimeout(200);
+
+  // Test 31b: chips, stepper and typed value stay in sync; the stepper
+  // steps 0.5.
+  await page.click("[data-cw=percent-plus]");
+  await page.waitForTimeout(200);
+  const pctAfterPlus = await page.inputValue("#cw-percent");
+  await page.click("[data-cw=percent-minus]");
+  await page.click("[data-cw=percent-minus]");
+  await page.waitForTimeout(200);
+  const pctAfterMinus = await page.inputValue("#cw-percent");
+  await page.click("[data-cw=percent-3]");
+  await page.waitForTimeout(200);
+  const pctAfterChip = await page.inputValue("#cw-percent");
+  const chipActive = await page.evaluate(() => {
+    const chip = document.querySelector('[data-cw="percent-3"]');
+    return chip ? chip.className.includes("currena-blue") : false;
+  });
+  check(
+    "31b-percent-sync",
+    pctAfterPlus === "3.5" && pctAfterMinus === "2.5" && chipActive && pctAfterChip === "3",
+    `plus→${pctAfterPlus} minus→${pctAfterMinus} chip3→${pctAfterChip} active=${chipActive}`,
+  );
+
+  // Test 30b: out-of-range percent clamps with the one plain message.
+  await page.fill("#cw-percent", "60");
+  await page.waitForTimeout(300);
+  const clampNote = await page.textContent("[data-cw=percent-note]");
+  const clampedValue = await page.inputValue("#cw-percent");
+  check("30b-percent-clamp", clampedValue === "50" && /outside the allowed range/i.test(clampNote ?? ""), `box=${clampedValue} note=${clampNote?.slice(0, 50)}`);
+  await page.click("[data-cw=percent-3]");
+  await page.waitForTimeout(200);
+
+  // Test 30c: salary 0 / letters — no error, falls back to the hint line.
+  await page.fill("#cw-salary", "0");
+  await page.waitForTimeout(300);
+  const zeroSalary = await page.textContent("[data-cw=share-live-line]");
+  await page.fill("#cw-salary", "abc");
+  await page.waitForTimeout(300);
+  const lettersSalary = await page.textContent("[data-cw=share-live-line]");
+  check(
+    "30c-bad-salary",
+    /Enter your salary/i.test(zeroSalary ?? "") && /Enter your salary/i.test(lettersSalary ?? ""),
+    `0→${zeroSalary?.slice(0, 30)} letters→${lettersSalary?.slice(0, 30)}`,
+  );
+
+  // Test 29 (browser): mode switching keeps your place, both ways.
+  await page.fill("#cw-salary", "90000");
+  await page.waitForTimeout(300);
+  await page.click("[data-cw=mode-amount]");
+  await page.waitForTimeout(300);
+  const placeAfterAmount = await page.evaluate(() => ({
+    amount: (document.querySelector("#cw-amount") as HTMLInputElement).value,
+    thatIs: document.querySelector("[data-cw=amount-salary-line]")?.textContent?.trim() ?? "",
+  }));
+  check(
+    "29a-share-to-amount-keeps-place",
+    placeAfterAmount.amount === "225" && /That is 3\.0% of your salary\./.test(placeAfterAmount.thatIs),
+    `amount=${placeAfterAmount.amount} line=${placeAfterAmount.thatIs}`,
+  );
+  await page.click("[data-cw=mode-share]");
+  await page.waitForTimeout(300);
+  const placeAfterShare = await page.inputValue("#cw-percent");
+  check("29b-amount-to-share-keeps-place", placeAfterShare === "3", `percent=${placeAfterShare}`);
+
+  // Test 27 (browser): % mode at 0% increase == Amount mode at 225 — the
+  // whole visible result set matches (headline, tiles, range, what-if).
+  const grabNumbers = () =>
+    page.evaluate(() => ({
+      tiles: [...document.querySelectorAll('section[aria-label="You could have"] .grid > div')].map((d) => d.textContent?.replace(/[^0-9]/g, "")),
+      range: document.querySelector("[data-cw=range-line]")?.textContent?.replace(/[^0-9]/g, "") ?? "",
+      milestones: [...document.querySelectorAll('section[aria-label="Along the way"] li')].map((li) => li.textContent?.replace(/[^0-9]/g, "")),
+      // the later-start and cash what-if cards (NOT the small-changes
+      // card: its step is mode-specific by the spec's own §5.2)
+      whatIf: [...document.querySelectorAll('[data-cw=later-years], section[aria-label="What if…"] > div > div:nth-child(2) p, section[aria-label="What if…"] > div > div:nth-child(3) p')]
+        .filter((el) => (el.textContent ?? "").match(/\d/))
+        .map((el) => el.textContent?.replace(/[^0-9]/g, "")),
+      putIn: (document.querySelector("[data-cw=headline] p")?.textContent ?? "").match(/put in ([0-9,]+)/)?.[1] ?? "",
+      final: (document.querySelector("[data-cw=headline] p")?.textContent ?? "").match(/about ([0-9,]+)\./)?.[1] ?? "",
+    }));
+  // set the increase to 0 via More options → Rates
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  if (!(await page.$("#cw-incr"))) {
+    await page.click('[data-cw="group-rates"] button');
+    await page.waitForTimeout(250);
+  }
+  await page.fill("#cw-incr", "0");
+  await page.waitForTimeout(300);
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(250);
+  const shareNumbers = await grabNumbers();
+  // now the amount mode at 225
+  await page.click("[data-cw=mode-amount]");
+  await page.waitForTimeout(300);
+  const amountNumbers = await grabNumbers();
+  check(
+    "27-share-equals-amount",
+    JSON.stringify(shareNumbers) === JSON.stringify(amountNumbers),
+    JSON.stringify({ share: shareNumbers, amount: amountNumbers }).slice(0, 220),
+  );
+
+  // Test 28 (browser): the % mode default increase = the country inflation
+  // average (reload → % mode with salary → the About note + growth clause).
+  await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=headline]");
+  await page.click("[data-cw=mode-share]");
+  await page.fill("#cw-salary", "90000");
+  await page.waitForTimeout(300);
+  const growState = await page.evaluate(() => ({
+    headlineHasGrow: /growing as your salary grows/.test(document.querySelector("[data-cw=headline] p")?.textContent ?? ""),
+  }));
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  if (!(await page.$("[data-cw=share-grow-note]"))) await page.click('[data-cw="group-about"] button');
+  if (!(await page.$("#cw-incr"))) await page.click('[data-cw="group-rates"] button');
+  await page.waitForTimeout(250);
+  const aboutNote = await page.textContent("[data-cw=share-grow-note]");
+  const increaseValue = await page.inputValue("#cw-incr");
+  check(
+    "28-default-grow",
+    growState.headlineHasGrow && /grows with your salary/.test(aboutNote ?? "") && increaseValue === "2.8",
+    `headline grow: ${growState.headlineHasGrow}, note: ${aboutNote?.slice(0, 40)}, increase: ${increaseValue}`,
+  );
+  await page.click("[data-cw=more-options]");
+
+  // Test 32 (browser): the small-changes wording in both modes.
+  const smallShare = await page.textContent("[data-cw=small-changes] p");
+  await page.click("[data-cw=mode-amount]");
+  await page.waitForTimeout(300);
+  const smallAmount = await page.textContent("[data-cw=small-changes] p");
+  check(
+    "32-small-changes-wording",
+    /Investing 4% instead of 3% adds/.test(smallShare ?? "") && /Investing 23 more a month adds/.test(smallAmount ?? ""),
+    `share: ${smallShare?.slice(0, 60)} | amount: ${smallAmount?.slice(0, 60)}`,
+  );
+
+  /* ---------------------------------------------------------------- *
+   * v6 — the audit fixes (tests 33–38) as browser checks
+   * ---------------------------------------------------------------- */
+  // Test 33: no "1% more" anywhere on the page.
+  const bodyText = await page.textContent("body");
+  check("33-no-1pct-more", !/1% more/.test(bodyText ?? ""), "the old wording is gone");
+
+  // Test 34: the How fold says the cost is not charged on cash.
+  await page.click("[data-cw=how-toggle]");
+  await page.waitForTimeout(300);
+  const howText = await page.textContent("[data-cw=how]");
+  check("34-cash-cost-noted", /not charged on cash/i.test(howText ?? ""), "How says cash pays no fund cost");
+
+  // Test 35: the inflation caption when today's money shows, and it
+  // follows the editable setting.
+  await page.click("[data-cw=money-today]");
+  await page.waitForTimeout(300);
+  const captionBefore = await page.textContent("[data-cw=inflation-caption]");
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  if (!(await page.$("#cw-infl"))) {
+    await page.click('[data-cw="group-rates"] button');
+    await page.waitForTimeout(250);
+  }
+  await page.fill("#cw-infl", "5");
+  await page.waitForTimeout(300);
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(250);
+  const captionAfter = await page.textContent("[data-cw=inflation-caption]");
+  check(
+    "35-inflation-caption",
+    /Today's money uses average inflation of 2\.8% a year/.test(captionBefore ?? "") &&
+      /5% a year/.test(captionAfter ?? ""),
+    `before: ${captionBefore?.slice(0, 60)} after: ${captionAfter?.slice(0, 60)}`,
+  );
+  // and the How fold's recent-inflation line
+  const howRecent = await page.textContent("[data-cw=how-inflation-recent]");
+  check("35b-recent-inflation", /Latest 12-month inflation: 4\.9%/.test(howRecent ?? ""), howRecent?.slice(0, 80));
+
+  // Test 37: the How fold names the exact index behind each asset.
+  const howIndices = await page.textContent("[data-cw=how-indices]");
+  check(
+    "37-index-names",
+    /All Ordinaries/.test(howIndices ?? "") && /S&P 500 Total Return Index/.test(howIndices ?? "") &&
+      /MSCI World ex-Australia/.test(howIndices ?? "") && /LBMA/.test(howIndices ?? "") && /RBA cash rate target/.test(howIndices ?? ""),
+    howIndices?.slice(0, 120),
+  );
+
+  // Test 38: the tiles show the currency symbol in both countries (the
+  // number run inside each tile carries the symbol: "A$24,000" / "$...").
+  const tileRuns = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('section[aria-label="You could have"] .grid > div')]
+        .map((d) => (d.textContent ?? "").replace(/\s/g, "")),
+    );
+  const auTiles = await tileRuns();
+  await page.click("[data-cw=country-US]");
+  await page.waitForTimeout(300);
+  const usTiles = await tileRuns();
+  check(
+    "38-tile-currency",
+    auTiles.every((t) => /A\$[\d,]/.test(t ?? "")) && usTiles.every((t) => /\$[\d,]/.test(t ?? "") && !/A\$/.test(t ?? "")),
+    `AU: ${JSON.stringify(auTiles)} US: ${JSON.stringify(usTiles)}`,
+  );
+  await page.click("[data-cw=country-AU]");
+  await page.waitForTimeout(300);
+
+  /* ---------------------------------------------------------------- *
    * Routing (test 19) — via a fresh context
    * ---------------------------------------------------------------- */
   const ctx = await browser.newContext();
@@ -386,8 +723,11 @@ async function main() {
     meta.title.includes("Compound Wealth") && meta.desc.length > 40 && meta.canonical === "https://currena.ir/tools/compound-wealth" && meta.ogTitle.length > 0 && meta.ogImage.includes("currena.ir"),
     JSON.stringify(meta).slice(0, 160),
   );
-  // The nav Tools link and the breadcrumb work.
-  await rp.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
+  // The nav Tools link and the breadcrumb work. On the dev server the
+  // root IS this worker's gold page; live, this worker's page is /gold
+  // (the root belongs to the main site, outside this repo).
+  const goldPath = BASE.includes("currena.ir") ? "/gold" : "/";
+  await rp.goto(`${BASE}${goldPath}`, { waitUntil: "domcontentloaded" });
   const toolsHref = await rp.evaluate(() => document.querySelector('header nav a[href="/tools"]')?.getAttribute("href"));
   check("20-nav-tools-link", toolsHref === "/tools");
   await rp.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "domcontentloaded" });
