@@ -2883,3 +2883,84 @@ dev and EN live).
 
 Nothing else was touched: currena-api and every other worker stand
 as they were; the main site's own converter page is untouched.
+
+## The site-chrome compliance + the main-branch consolidation (2026-11-26, the compliance sitting)
+
+The owner's instruction: everything consolidated and focused on the
+repo's main branch (not scattered on side branches), and the gold
+page — and with it every tools page — must comply as a SUB-PAGE of
+currena.ir: the site's own header and logo, not the self-made
+replica chrome the separation had produced.
+
+### What was found
+
+The main site (currena.ir, the owner's currena-api worker) has its
+own header: the real logo image at /images/currena-logo.png (290x89,
+white in dark mode via `.dark img.currena-brand-logo { filter:
+brightness(0) invert() }`), the nav Global · Gold · World Markets ·
+Currencies · Commodities · Regions▾ · Tools▾, a side drawer
+(`nav.side-menu`, 22 links: the Markets section on the main site's
+own pages + the Tools section), the 📲/فا/🌙/☰ buttons, and the
+app-footer («Made with ❤️ by Ali Assadi» + Privacy · Terms · Contact
+· About). Its palette is the same currena-* variables this desk
+already ships (they flip in dark mode identically), its fonts are
+the same Poppins/Vazirmatn pair. Only the chrome differed — the desk
+had built a coin-mark logo + pill nav of its own.
+
+### What was built
+
+- **`src/components/site/chrome.tsx`** — `SiteHeader` + `SiteFooter`:
+  the main site's header and footer restated from its live markup,
+  classes verbatim (80px bar, white/95 + blur(20px), dark
+  #161D28/95, nav 13.6px/600 with the rounded-[10px] items and the
+  a10 tint on the active item, the h-11 rounded-[10px] icon buttons,
+  the drawer's 48px items, the app-footer). The logo is the site's
+  own image (the main worker serves it at /images/currena-logo.png;
+  a byte-identical copy ships in public/images for the dev server),
+  white in the dark exactly by the site's own rule. The Regions▾,
+  Tools▾ and ☰ buttons open the site's side drawer (inert when
+  closed, Esc/click-outside close, translate transition). Bilingual
+  EN/fa with the site's own labels (جهانی، طلا، بازارهای جهانی،
+  ارزها، کالاها، مناطق، ابزارها…), RTL-safe. The drawer's Tools
+  section carries the main site's tool list pointed at the
+  consolidated /tools suite (Converter→/tools/currency-converter …
+  Batch→/tools/batch-converter, plus All Tools, Compound Wealth and
+  Gold Calculators); History and About point at the main site's own
+  pages, as every Markets item does.
+- **The swap** — the tools chrome (compound/chrome.tsx
+  ToolsHeader/ToolsFooter) and the gold page's own Header/Footer now
+  delegate to the site chrome (the gold page lights Gold, every
+  /tools page lights Tools▾); the coin-mark replica header retired;
+  the breadcrumbs stay (page content, not site chrome); the
+  sticky-footer contract kept (stickToBottom); the print paths
+  re-checked (the receipt/digest rules hide the header with
+  everything else — only the sheet prints).
+- **The consolidation** — everything merged to **main** (fast-forward
+  54c0648e → a63f0332: the tools suite, the deploy record, the dang
+  fix, the chrome compliance) and pushed; feat/tools-suite kept in
+  sync. Main is the single trunk again.
+
+### The verification
+
+- Lint green; tsc clean on every touched file (the 3 pre-existing
+  tolerated errors in compound/app.tsx verified identical on HEAD);
+  73/73 tests.
+- Dev walk: the gold page and all ten tool pages — real header, logo
+  290x89 rendered at 44px (lg), Gold/Tools active states, the drawer
+  (22 items, active item, Esc + click-catcher close), fa/RTL with
+  the Persian labels and footer, dark mode (logo
+  brightness(0)invert(1), header #161D28/95), 375px no overflow,
+  ☰ visible with the nav hidden — zero console errors, zero page
+  errors. Computed styles diffed against the live main site:
+  height 80px, blur 20px, nav 13.6px/600/pad 8x12, logo 44px —
+  identical (the one deliberate difference: sticky instead of fixed,
+  so no pt surgery on twelve pages; visually the same bar).
+- **Live (version 813031d0)**: all eleven routes 200; the logo loads
+  from currena.ir/images/currena-logo.png on every page; Tools▾
+  active on /tools, Gold on /gold; the live drawer points at the
+  consolidated suite; fa + dark + 375px verified live; zero console
+  errors on every page. Record PNGs: `tests/chrome-*` (dev EN/fa/
+  dark/375 + live gold drawer, live tools fa-dark, live 375).
+
+Nothing else touched: currena-api and the other workers stand as
+they were; the main site's own pages unchanged.
