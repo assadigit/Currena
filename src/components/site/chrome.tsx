@@ -318,7 +318,7 @@ export function SiteHeader({
           <button
             type="button"
             title={t.switchToFarsi}
-            aria-label={t.switchToFarsi}
+            aria-label={`${t.switchToFarsi} (${locale === "en" ? "فا" : "EN"})`}
             onClick={onToggleLang}
             className={HEADER_BUTTON + " text-sm font-bold"}
           >

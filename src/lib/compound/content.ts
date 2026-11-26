@@ -103,6 +103,8 @@ export interface CompoundCopy {
       /** W3: shown under the tiles whenever today's money is displayed.
        *  {x} = the inflation percent the plan is using (editable). */
       inflationCaption: string; // "Today's money uses average inflation of {x}% a year (last 20 years)."
+      /** v7: shown under the tiles whenever the tax is on (estimate). */
+      taxCaption: string; // "After tax at {x}% a year (estimate)."
     };
     milestones: {
       title: string;
@@ -133,6 +135,8 @@ export interface CompoundCopy {
       cash: string; // "If you only save it as cash: about {x}."
       costs: string; // "Costs took {x} ({pct} of what you put in)."
       costsHint: string; // the buying-every-3-months hint
+      /** v7: the tax-takes what-if line (only when the tax is on). */
+      taxTakes: string; // "Tax (estimate) takes {x}."
       neverInvests: string;
       pendingLine: string;
     };
@@ -181,6 +185,19 @@ export interface CompoundCopy {
       compareCustom: string;
       customWord: string;
       reloadNote: string;
+      /** v7: the tax row inside the Costs group (off unless set). */
+      taxLabel: string; // "Tax on your growth (estimate)"
+      taxHint: string;
+      taxEstimateLink: string; // "Estimate from my income"
+      taxIncomeLabel: string;
+      taxIncomeHint: string;
+      taxIncomePlaceholder: string;
+      taxFilingLabel: string;
+      taxUseRate: string;
+      taxEstimateLine: string; // "At that income, about {p}% … goes to tax: {parts}."
+      taxSourceLine: string; // "{source} · {year} · read {date}"
+      taxEnterIncome: string;
+      taxStale: string;
     };
     how: {
       title: string;
@@ -191,7 +208,13 @@ export interface CompoundCopy {
       costNote: string;
       pendingNote: string;
       superNote: string;
+      /** v7: taxNote shows while the tax is OFF (the v6 line, unchanged);
+       *  the tax model below shows while it is ON. */
       taxNote: string;
+      taxModel: string;
+      taxGuidedLine: string;
+      taxNotIncludedTitle: string;
+      taxNotIncluded: string[];
       fxNote: string;
       pastNote: string;
       sources: string;
@@ -224,6 +247,9 @@ export interface CompoundCopy {
       milestonesTitle: string;
       assumptionsTitle: string;
       assumptions: string[]; // lines with {inflation} {cost} {fee}
+      /** v7: the assumptions line when the tax is on (never the income). */
+      taxAssumption: string; // "Tax on growth: {x}% a year (estimate, your setting)"
+      taxAssumptionGuided: string; // "Tax on growth: {x}% a year (estimate, {source}, {year})"
       growthRingsLabel: string;
       generatedOn: string;
       url: string;
@@ -335,6 +361,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         todaysMoney: "Today's money",
         notYetInvested: "{x} not yet invested",
         inflationCaption: "Today's money uses average inflation of {x}% a year (last 20 years).",
+        taxCaption: "After tax at {x}% a year (estimate).",
       },
       milestones: {
         title: "Along the way",
@@ -365,6 +392,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         cash: "If you only save it as cash: about {x}.",
         costs: "Costs took {x} ({pct} of what you put in).",
         costsHint: "Costs take a large share of each purchase. Buying every 3 months can help.",
+        taxTakes: "Tax (estimate) takes {x}.",
         neverInvests: "With these numbers, the cost eats every purchase, so nothing gets invested.",
         pendingLine: "{x} is still waiting to be invested.",
       },
@@ -411,6 +439,18 @@ export const COPY: Record<Locale, CompoundCopy> = {
         compareCustom: "Your custom rate",
         customWord: "Custom",
         reloadNote: "Everything resets when you reload.",
+        taxLabel: "Tax on your growth (estimate)",
+        taxHint: "Off until you set it. Bank interest is taxed too.",
+        taxEstimateLink: "Estimate from my income",
+        taxIncomeLabel: "Yearly income (rough)",
+        taxIncomeHint: "A rough number is fine — it only sets the bracket. Not saved anywhere.",
+        taxIncomePlaceholder: "e.g. 90,000",
+        taxFilingLabel: "Filing status",
+        taxUseRate: "Use this rate",
+        taxEstimateLine: "At that income, about {p}% of extra investment earnings goes to tax: {parts}.",
+        taxSourceLine: "{source} · {year} · read {date}",
+        taxEnterIncome: "Enter a rough income to see the rate.",
+        taxStale: "These tax figures may be out of date.",
       },
       how: {
         title: "How is this worked out?",
@@ -427,6 +467,17 @@ export const COPY: Record<Locale, CompoundCopy> = {
         pendingNote: "Money waiting between purchases earns nothing.",
         superNote: "Employer super may already exist, so this is for extra money you invest on your own.",
         taxNote: "No taxes are included.",
+        taxModel: "Tax is assumed paid each year on the growth, at the rate you set. The order is: costs first, then tax, then inflation for today's money. The tax also applies to cash, because bank interest is taxable income; the fund cost does not apply to cash.",
+        taxGuidedLine: "The guided rate is an estimate from official schedules: {source}, {year} (read {date}).",
+        taxNotIncludedTitle: "What the tax estimate leaves out",
+        taxNotIncluded: [
+          "State and city taxes in the USA. Raise the rate yourself to allow for them.",
+          "Capital-gains timing and discounts. Real tax on shares can be lower, because some gains are taxed later or at a discount.",
+          "Tax-sheltered accounts: super, 401(k) and ISA-style accounts.",
+          "Offsets, credits and franking credits.",
+          "Reductions of the Medicare levy for very low incomes.",
+          "Any levy not named in the estimate line.",
+        ],
         fxNote: "Exchange-rate effects are only those already inside the figures.",
         pastNote: "Past performance is not a promise.",
         sources: "Figures: {sources}. Checked by hand on {date}.",
@@ -461,6 +512,8 @@ export const COPY: Record<Locale, CompoundCopy> = {
           "Cost per purchase: {fee}",
           "Inflation: {inflation}",
         ],
+        taxAssumption: "Tax on growth: {x}% a year (estimate, your setting)",
+        taxAssumptionGuided: "Tax on growth: {x}% a year (estimate, {source}, {year})",
         growthRingsLabel: "growth rings",
         generatedOn: "Made {date}",
         url: "currena.ir/tools/compound-wealth",
@@ -570,6 +623,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         todaysMoney: "پول امروز",
         notYetInvested: "{x} هنوز سرمایه‌گذاری نشده",
         inflationCaption: "«پول امروز» با میانگین تورم {x}٪ در سال حساب می‌شود (۲۰ سال اخیر).",
+        taxCaption: "پس از مالیات با {x}٪ در سال (برآورد).",
       },
       milestones: {
         title: "در مسیر",
@@ -597,6 +651,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         cash: "اگر فقط به‌صورت نقد پس‌اندازش کنید: حدود {x}.",
         costs: "هزینه‌ها {x} بردند ({pct} از ورودی شما).",
         costsHint: "هزینه سهم زیادی از هر خرید را می‌برد. خرید هر ۳ ماه می‌تواند کمک کند.",
+        taxTakes: "مالیات (برآورد) {x} برمی‌دارد.",
         neverInvests: "با این اعداد، هزینه همهٔ خریدها را می‌خورد و چیزی سرمایه‌گذاری نمی‌شود.",
         pendingLine: "{x} هنوز در انتظار سرمایه‌گذاری است.",
       },
@@ -643,6 +698,18 @@ export const COPY: Record<Locale, CompoundCopy> = {
         compareCustom: "نرخ دلخواه شما",
         customWord: "دلخواه",
         reloadNote: "با بازخوانی صفحه همه‌چیز به حالت اول برمی‌گردد.",
+        taxLabel: "مالیات روی رشد شما (برآورد)",
+        taxHint: "تا وقتی مقدار ندهید خاموش است. سود بانکی هم مشمول مالیات است.",
+        taxEstimateLink: "از درآمدم برآورد کن",
+        taxIncomeLabel: "درآمد سالانه (تقریبی)",
+        taxIncomeHint: "یک عدد تقریبی کافی است — فقط پلهٔ مالیاتی را تعیین می‌کند. هیچ‌جا ذخیره نمی‌شود.",
+        taxIncomePlaceholder: "مثلاً ۹۰٬۰۰۰",
+        taxFilingLabel: "وضعیت اظهارنامه",
+        taxUseRate: "از این نرخ استفاده کن",
+        taxEstimateLine: "با آن درآمد، حدود {p}٪ از درآمد اضافی سرمایه‌گذاری به مالیات می‌رود: {parts}.",
+        taxSourceLine: "{source} · {year} · خوانده‌شده در {date}",
+        taxEnterIncome: "برای دیدن نرخ، یک درآمد تقریبی وارد کنید.",
+        taxStale: "ممکن است این اعداد مالیاتی از تاریخ افتاده باشند.",
       },
       how: {
         title: "این عدد چطور حساب شده؟",
@@ -659,6 +726,17 @@ export const COPY: Record<Locale, CompoundCopy> = {
         pendingNote: "پولی که بین خریدها منتظر می‌ماند چیزی به دست نمی‌آورد.",
         superNote: "ممکن است سوپر کارفرما از قبل وجود داشته باشد؛ این ابزار برای پول اضافه‌ای است که خودتان سرمایه‌گذاری می‌کنید.",
         taxNote: "مالیات محاسبه نشده است.",
+        taxModel: "فرض می‌شود مالیات هر سال روی رشد پرداخت می‌شود، با نرخی که خودتان تعیین کرده‌اید. ترتیب این است: اول هزینه، بعد مالیات، و در پایان تورم برای «پول امروز». مالیات روی پول نقد هم اعمال می‌شود، چون سود بانکی درآمد مشمول مالیات است؛ هزینهٔ صندوق روی پول نقد اعمال نمی‌شود.",
+        taxGuidedLine: "نرخِ راهنما یک برآورد از جدول‌های رسمی است: {source}، {year} (خوانده‌شده در {date}).",
+        taxNotIncludedTitle: "چه چیزهایی در این برآورد مالیاتی نیست",
+        taxNotIncluded: [
+          "مالیات‌های ایالتی و شهری آمریکا. برای لحاظ‌کردنشان، خودتان نرخ را بالاتر ببرید.",
+          "زمان‌بندی و تخفیف‌های سود سرمایه. مالیات واقعی سهام می‌تواند کمتر باشد، چون بخشی از سودها بعدتر یا با تخفیف مالیات می‌گیرند.",
+          "حساب‌های مالیاتیِ پناه‌داده: سوپر، 401(k) و حساب‌های شبیه ISA.",
+          "کسورات، اعتبارهای مالیاتی و اعتبارهای فرانکینگ.",
+          "کاهش‌های عوارض مدیکر برای درآمدهای بسیار کم.",
+          "هر عوارضی که در خط برآورد نام برده نشده باشد.",
+        ],
         fxNote: "اثر نرخ ارز فقط همان است که از قبل داخل اعداد است.",
         pastNote: "عملکرد گذشته یک وعده نیست.",
         sources: "اعداد: {sources}. دستی بازبینی شده در {date}.",
@@ -693,6 +771,8 @@ export const COPY: Record<Locale, CompoundCopy> = {
           "هزینهٔ هر خرید: {fee}",
           "تورم: {inflation}",
         ],
+        taxAssumption: "مالیات روی رشد: {x}٪ در سال (برآورد، تنظیم شما)",
+        taxAssumptionGuided: "مالیات روی رشد: {x}٪ در سال (برآورد، {source}، {year})",
         growthRingsLabel: "حلقه‌های رشد",
         generatedOn: "ساخته‌شده در {date}",
         url: "currena.ir/tools/compound-wealth",

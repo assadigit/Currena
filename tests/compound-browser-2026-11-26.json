@@ -1,5 +1,5 @@
 {
-  "base": "https://currena.ir",
+  "base": "http://localhost:3100",
   "checks": [
     {
       "id": "12-answer-on-arrival",
@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 178ms"
+      "detail": "3 one-tap changes in 253ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -44,12 +44,12 @@
     {
       "id": "21-no-data-network",
       "pass": true,
-      "detail": "22 resources, all app assets"
+      "detail": "27 resources, all app assets"
     },
     {
       "id": "14-390x844-one-screen",
       "pass": true,
-      "detail": "chips bottom 743/844, scrollW 390, scrollY 28"
+      "detail": "chips bottom 734/844, scrollW 390, scrollY 37"
     },
     {
       "id": "14-360x800-one-screen",

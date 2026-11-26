@@ -10,6 +10,11 @@ MILESTONES = [5_000, 10_000, 25_000, 50_000, 100_000, 250_000, 500_000,
 PAGE_ROUND_HEADLINE = 100       # the live page rounds the headline to the nearest 100
 PAGE_ROUND_SMALL_CARDS = 10     # the live page rounds the small cards to the nearest 10
 SELFTEST_TOLERANCE_PERCENT = 0.5
+# v7: the tax rule is the same everywhere — after the cost rule,
+#   r_net  = rate - cost      (cost stays 0 for cash)
+#   r_after = r_net * (1 - tax)
+# and the monthly rate derives from r_after exactly as before. Tax never
+# touches deposits, the purchase fee or pending money.
 # =====================================================================
 """
 Independent reference engine for the Currena "Compound Wealth" tool.
@@ -41,11 +46,12 @@ def half_up(x, step=1):
 
 
 def simulate(base, rate_pct, years, cost_pct=DEFAULT_COST_PCT, growth_pct=0.0, fee=0.0,
-             every=1, start_amount=0.0, inflation_pct=None, months=None):
+             every=1, start_amount=0.0, inflation_pct=None, months=None, tax_pct=0.0):
     """Return a dict with the final value and the full monthly series."""
     n = months if months is not None else int(round(years * 12))
     r_net = (rate_pct - cost_pct) / 100.0
-    i = (1 + r_net) ** (1 / 12) - 1
+    r_after = r_net * (1.0 - tax_pct / 100.0)   # v7: cost first, then tax
+    i = (1 + r_after) ** (1 / 12) - 1
     g = growth_pct / 100.0
     balance = float(start_amount)
     pending = 0.0
@@ -163,6 +169,14 @@ def selftest():
          simulate(100, 7.0, 20, cost_pct=0, fee=10, every=3)["final"]),
         ("Live default: 7.2% - 0.2% cost = 7.0% net", 50_754,
          simulate(100, 7.2, 20)["final"]),
+        ("v7 tax=0 reproduces the no-tax result exactly", 50_754,
+         simulate(100, 7.2, 20, tax_pct=0)["final"]),
+        ("v7 taxed: 7.2%, 0.2% cost, 32% tax (30c+2c levy example)", 39_524,
+         simulate(100, 7.2, 20, tax_pct=32)["final"]),
+        ("v7 taxed cash-style: 3.03%, no cost, 32% tax", 29_609,
+         simulate(100, 3.03, 20, cost_pct=0, tax_pct=32)["final"]),
+        ("v7 taxed with fee and growth: 7.2%, 0.2% cost, 15% tax, fee 10, every 3, growth 3%", 55_499,
+         simulate(100, 7.2, 20, tax_pct=15, fee=10, every=3, growth_pct=3)["final"]),
     ]
     ok = True
     for name, want, got in cases:

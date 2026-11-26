@@ -84,13 +84,16 @@ interface CardProps {
   /** W7: the page's own money label ("A$225" / «۲۲۵ دلار استرالیا"),
    *  used on the percent-mode plan lines (spec §8.1/§8.2). */
   money?: (v: number) => string;
+  /** v7: the tax layer's one card line — the rate and, when guided, its
+   *  source (never the income). Null/absent while the tax is off. */
+  tax?: { rate: number; guided: { sourceName: string; yearLabel: string; yearLabelFa: string } | null } | null;
 }
 
 /* =================================================================== *
  * The A4 print card                                                   *
  * =================================================================== */
 
-export function A4PrintCard({ copy, locale, result, plan, asset, months, startMonth, onClose, money }: CardProps) {
+export function A4PrintCard({ copy, locale, result, plan, asset, months, startMonth, onClose, money, tax }: CardProps) {
   const t = copy.tool.print;
   const tool = copy.tool;
   const [style, setStyle] = React.useState<"light" | "dark">("light");
@@ -347,7 +350,21 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
                 );
               })}
               <li>{copy.tool.how.overlapNote}</li>
-              <li>{copy.tool.how.taxNote}</li>
+              {/* v7: while the tax is off this is the exact v6 line; while
+                  it is on, the assumptions box gains the one tax line
+                  (never the income) with its source when guided. */}
+              {plan.taxRate && plan.taxRate > 0 ? (
+                <li data-cw="print-tax-line">
+                  {(tax?.guided
+                    ? t.taxAssumptionGuided
+                      .replace("{source}", tax.guided.sourceName)
+                      .replace("{year}", locale === "fa" ? tax.guided.yearLabelFa : tax.guided.yearLabel)
+                    : t.taxAssumption
+                  ).replace("{x}", formatMoney(plan.taxRate * 100, locale, 1))}
+                </li>
+              ) : (
+                <li>{copy.tool.how.taxNote}</li>
+              )}
             </ul>
           </div>
 

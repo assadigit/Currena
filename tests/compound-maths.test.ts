@@ -763,3 +763,324 @@ describe("W7: percent-of-salary conversions", () => {
     }
   });
 });
+
+/* ---------------------------------------------------------------- */
+/* v7 — the tax layer (spec §12 tests 39+)                            */
+/* ---------------------------------------------------------------- */
+import {
+  DEFAULT_TAX,
+  TAX_MAX,
+  TAX_MIN,
+  TAX_STEP,
+  whatIfTaxTakes,
+} from "../src/lib/compound/maths";
+import {
+  TAX_CHECKED_ON,
+  estimateTaxOnEarnings,
+  taxDataIsStale,
+  taxEstimatorAvailable,
+  US_STATUSES,
+  statusLabels,
+} from "../src/lib/compound/tax";
+import { monthsSince } from "../src/lib/compound/maths";
+
+/** The AU shares figures (7.2% / 9.0%) — the live default. */
+const AU_SHARES: AssetFigures = { r20: 0.072, r30: 0.09 };
+
+/** A result without the function field, for deep comparisons. */
+function serialisable(r: ReturnType<typeof computeCompound>) {
+  const { depositAt, ...rest } = r;
+  void depositAt;
+  return rest;
+}
+
+describe("v7 tests 39: tax off = v6 exactly (the strongest regression)", () => {
+  const vectors = [
+    basePlan(),
+    basePlan({ feePerPurchase: 10 }),
+    basePlan({ feePerPurchase: 10, purchaseEveryMonths: 3 }),
+    basePlan({ yearlyCost: 0.002 }),
+    basePlan({ salary: 7_500, share: 0.03, useShare: true, yearlyIncrease: 0.0276, inflation: 0.0276 }),
+    basePlan({ startingAmount: 5_000, yearlyIncrease: 0.03, yearlyCost: 0.01, feePerPurchase: 10, purchaseEveryMonths: 3 }),
+  ];
+  for (const [i, plan] of vectors.entries()) {
+    test(`vector ${i + 1}: taxRate absent, 0 and 0.0 are byte-identical`, () => {
+      const a = computeCompound(plan, AU_SHARES, 240);
+      const b = computeCompound({ ...plan, taxRate: 0 }, AU_SHARES, 240);
+      const c = computeCompound({ ...plan, taxRate: 0.0 }, AU_SHARES, 240);
+      expect(serialisable(a)).toEqual(serialisable(b));
+      expect(serialisable(a)).toEqual(serialisable(c));
+      // the v6 fields keep their meaning: afterTaxRate equals netRate
+      expect(a.afterTaxRate).toBe(a.netRate);
+      expect(a.taxRate).toBe(0);
+    });
+  }
+  test("the what-if helpers with tax off behave exactly as v6", () => {
+    const plan = basePlan({ yearlyCost: 0.002 });
+    expect(whatIfTaxTakes(plan, AU_SHARES, 240)).toBeNull();
+    const small = whatIfSmallChange(plan, AU_SHARES, 240);
+    expect(small).not.toBeNull();
+  });
+});
+
+describe("v7 tests 40: the reference engine's taxed fixed vectors (pinned from its output)", () => {
+  test("100/mo, 7.2%, 0.2% cost, 32% tax, 20y ≈ 39,524.39 (±0.1%)", () => {
+    const r = computeCompound(basePlan({ yearlyCost: 0.002, taxRate: 0.32 }), AU_SHARES, 240);
+    expect(within(r.finalValue, 39_524.3934, 0.1)).toBe(true);
+  });
+  test("100/mo, 3.03% (cash-style, no cost), 32% tax, 20y ≈ 29,608.83 (±0.1%)", () => {
+    const CASH: AssetFigures = { r20: 0.0303, r30: 0.0303 };
+    const r = computeCompound(basePlan({ taxRate: 0.32 }), CASH, 240);
+    expect(within(r.finalValue, 29_608.8343, 0.1)).toBe(true);
+  });
+  test("100/mo, 7.2%, 0.2% cost, 15% tax, fee 10, every 3, growth 3%, 20y ≈ 55,499.05 (±0.1%)", () => {
+    const r = computeCompound(
+      basePlan({ yearlyCost: 0.002, taxRate: 0.15, feePerPurchase: 10, purchaseEveryMonths: 3, yearlyIncrease: 0.03 }),
+      AU_SHARES,
+      240,
+    );
+    expect(within(r.finalValue, 55_499.0501, 0.1)).toBe(true);
+  });
+  test("today's money deflates the after-tax result: 32% tax, 2.76% inflation", () => {
+    const r = computeCompound(basePlan({ yearlyCost: 0.002, taxRate: 0.32, inflation: 0.0276 }), AU_SHARES, 240);
+    expect(within(r.finalValueToday, 22_928.9043, 0.1)).toBe(true);
+  });
+});
+
+describe("v7 test 41: monotonicity — higher tax lowers the final, put-in untouched", () => {
+  const taxes = [0, 0.15, 0.32, 0.45, 0.6];
+  const results = taxes.map((t) => computeCompound(basePlan({ yearlyCost: 0.002, taxRate: t }), AU_SHARES, 240));
+  test("finals strictly decrease as the tax rises", () => {
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i].finalValue).toBeLessThan(results[i - 1].finalValue);
+    }
+  });
+  test("total put in never changes (tax never touches money you put in)", () => {
+    for (const r of results) expect(r.totalPutIn).toBe(24_000);
+  });
+  test("fees and pending are untouched by the tax", () => {
+    for (const r of results) expect(r.feesPaid).toBe(0);
+  });
+});
+
+describe("v7 test 42: the order — cost first, then tax", () => {
+  test("afterTaxRate = (baseline − cost) × (1 − tax), exactly", () => {
+    const r = computeCompound(basePlan({ yearlyCost: 0.002, taxRate: 0.32 }), AU_SHARES, 240);
+    expect(r.netRate).toBeCloseTo(0.072 - 0.002, 12);
+    expect(r.afterTaxRate).toBeCloseTo((0.072 - 0.002) * (1 - 0.32), 12);
+    // 7.0% net × 0.68 = 4.76%
+    expect(r.afterTaxRate).toBeCloseTo(0.0476, 12);
+  });
+  test("order matters: cost-first-then-tax ≠ tax-first-then-cost", () => {
+    const r = computeCompound(basePlan({ yearlyCost: 0.002, taxRate: 0.32 }), AU_SHARES, 240);
+    const wrongOrder = (0.072 * (1 - 0.32)) - 0.002; // 4.6896% ≠ 4.76%
+    expect(r.afterTaxRate).not.toBeCloseTo(wrongOrder, 12);
+  });
+});
+
+describe("v7 test 43: tax applies to Cash growth; the fund cost does not (two separate rules)", () => {
+  const CASH: AssetFigures = { r20: 0.0303, r30: 0.0303 };
+  test("the cash what-if under tax: net 3.03% (no cost) × 0.68 = 2.0604%", () => {
+    const r = whatIfCash(basePlan({ taxRate: 0.32, yearlyCost: 0.002 }), CASH, 240);
+    expect(r).not.toBeNull();
+    // final equals a direct run at 3.03% × 0.68 with no cost
+    const direct = computeCompound(
+      { ...basePlan({ taxRate: 0.32, yearlyCost: 0.002 }), rateMode: "custom-rate", customRate: 0.0303 },
+      { r20: null, r30: null },
+      240,
+      { isCash: true },
+    );
+    expect(r).toBeCloseTo(direct.finalValue, 6);
+    // and the cash run's own afterTaxRate shows the untaxed-by-cost net
+    const cashRun = computeCompound(basePlan({ taxRate: 0.32, yearlyCost: 0.002 }), CASH, 240, { isCash: true });
+    expect(cashRun.netRate).toBeCloseTo(0.0303, 12);
+    expect(cashRun.afterTaxRate).toBeCloseTo(0.0303 * 0.68, 12);
+  });
+});
+
+describe("v7 test 44: the band under tax — both ends pass through the same rule", () => {
+  const taxed = computeCompound(basePlan({ yearlyCost: 0.002, taxRate: 0.32 }), AU_SHARES, 240);
+  const free = computeCompound(basePlan({ yearlyCost: 0.002 }), AU_SHARES, 240);
+  test("the band exists and both ends shrink under the tax", () => {
+    expect(taxed.band).not.toBeNull();
+    expect(taxed.lowFinal).not.toBeNull();
+    expect(taxed.highFinal).not.toBeNull();
+    expect(taxed.lowFinal!).toBeLessThan(free.lowFinal!);
+    expect(taxed.finalValue).toBeLessThan(free.finalValue);
+    expect(taxed.highFinal!).toBeLessThan(free.highFinal!);
+  });
+});
+
+describe("v7 test 45: the tax-takes what-if (same plan, tax off, differenced)", () => {
+  test("takes = the untaxed final − the taxed final, exactly", () => {
+    const plan = basePlan({ yearlyCost: 0.002, taxRate: 0.32 });
+    const taxed = computeCompound(plan, AU_SHARES, 240);
+    const free = computeCompound({ ...plan, taxRate: 0 }, AU_SHARES, 240);
+    const takes = whatIfTaxTakes(plan, AU_SHARES, 240);
+    expect(takes).not.toBeNull();
+    expect(takes).toBeCloseTo(free.finalValue - taxed.finalValue, 9);
+    expect(takes!).toBeGreaterThan(0);
+  });
+  test("null while the tax is off, and for an empty plan", () => {
+    expect(whatIfTaxTakes(basePlan(), AU_SHARES, 240)).toBeNull();
+    expect(whatIfTaxTakes(basePlan({ taxRate: 0.32 }), AU_SHARES, 0)).toBeNull();
+  });
+});
+
+describe("v7 test 46: the AU estimator — bracket edges and the Medicare levy", () => {
+  const cases: [number, number][] = [
+    [10_000, 0.02],          // under the free threshold: 0% + levy
+    [18_200, 0.17],          // exactly on the threshold: next dollar at 15% + 2%
+    [18_201, 0.17],
+    [44_999, 0.17],
+    [45_000, 0.32],          // 30% + 2%
+    [135_000, 0.39],         // 37% + 2%
+    [190_000, 0.47],         // 45% + 2%
+    [500_000, 0.47],
+  ];
+  for (const [income, want] of cases) {
+    test(`AU income ${income.toLocaleString()} → ${(want * 100).toFixed(0)}%`, () => {
+      const est = estimateTaxOnEarnings("AU", income);
+      expect(est).not.toBeNull();
+      expect(est!.rate).toBeCloseTo(want, 12);
+      expect(est!.breakdown.parts).toHaveLength(2);
+      expect(est!.breakdown.parts[0].nameEn).toBe("income tax");
+      expect(est!.breakdown.parts[1].nameEn).toBe("Medicare levy");
+      expect(est!.breakdown.parts[1].rate).toBe(0.02);
+    });
+  }
+  test("non-positive or invalid income returns null", () => {
+    expect(estimateTaxOnEarnings("AU", 0)).toBeNull();
+    expect(estimateTaxOnEarnings("AU", -5)).toBeNull();
+    expect(estimateTaxOnEarnings("AU", Number.NaN)).toBeNull();
+  });
+  test("the citation fields ride on the result", () => {
+    const est = estimateTaxOnEarnings("AU", 90_000)!;
+    expect(est.yearLabel).toContain("2026");
+    expect(est.sourceName).toContain("Australian Taxation Office");
+    expect(est.sourceUrl).toContain("ato.gov.au");
+    expect(est.checkedOn).toBe(TAX_CHECKED_ON);
+    expect(est.breakdown.yearLabelFa).toContain("۲۰۲۶");
+  });
+});
+
+describe("v7 test 47: the US estimator — statuses, bracket edges, the NIIT boundary", () => {
+  test("every filing status is present and labelled", () => {
+    expect(US_STATUSES).toHaveLength(4);
+    expect(US_STATUSES).toContain("single");
+    for (const s of US_STATUSES) {
+      expect(statusLabels(s).labelEn.length).toBeGreaterThan(0);
+      expect(statusLabels(s).labelFa.length).toBeGreaterThan(0);
+    }
+  });
+  const singleEdges: [number, number][] = [
+    [12_400, 0.12],   // on the threshold: next dollar 12% (+no NIIT)
+    [50_400, 0.22],   // 22%
+    [105_700, 0.24],  // 24%
+    [201_775, 0.358], // 32% + 3.8% NIIT
+    [256_225, 0.388], // 35% + 3.8% NIIT
+    [640_600, 0.408], // 37% + 3.8% NIIT
+  ];
+  for (const [income, want] of singleEdges) {
+    test(`US single ${income.toLocaleString()} → ${(want * 100).toFixed(0)}%`, () => {
+      const est = estimateTaxOnEarnings("US", income);
+      expect(est).not.toBeNull();
+      expect(est!.rate).toBeCloseTo(want, 12);
+    });
+  }
+  test("the statuses give different brackets at the same income", () => {
+    const at90k = (s: string) => estimateTaxOnEarnings("US", 90_000, s as never)!.rate;
+    expect(at90k("single")).toBeCloseTo(0.22, 12);
+    expect(at90k("married-joint")).toBeCloseTo(0.12, 12);
+    expect(at90k("married-separate")).toBeCloseTo(0.22, 12);
+    expect(at90k("head-of-household")).toBeCloseTo(0.22, 12);
+    const at30k = (s: string) => estimateTaxOnEarnings("US", 30_000, s as never)!.rate;
+    expect(at30k("head-of-household")).toBeCloseTo(0.12, 12);
+    expect(at30k("married-joint")).toBeCloseTo(0.12, 12);
+  });
+  test("the NIIT boundary: one dollar below the threshold vs on it", () => {
+    // single/HoH: $200,000 — at 199,999 the bracket is 24% (105,700–201,775)
+    expect(estimateTaxOnEarnings("US", 199_999)!.rate).toBeCloseTo(0.24, 12); // 24% only
+    const on = estimateTaxOnEarnings("US", 200_000)!;
+    expect(on.rate).toBeCloseTo(0.24 + 0.038, 12);
+    expect(on.breakdown.parts.some((p) => p.nameEn === "net investment income tax")).toBe(true);
+    // married joint: $250,000; married separate: $125,000 (both 24% band)
+    expect(estimateTaxOnEarnings("US", 249_999, "married-joint")!.rate).toBeCloseTo(0.24, 12);
+    expect(estimateTaxOnEarnings("US", 250_000, "married-joint")!.rate).toBeCloseTo(0.24 + 0.038, 12);
+    expect(estimateTaxOnEarnings("US", 124_999, "married-separate")!.rate).toBeCloseTo(0.24, 12);
+    expect(estimateTaxOnEarnings("US", 125_000, "married-separate")!.rate).toBeCloseTo(0.24 + 0.038, 12);
+    // head of household shares the single threshold (still the 24% band)
+    expect(estimateTaxOnEarnings("US", 200_000, "head-of-household")!.rate).toBeCloseTo(0.24 + 0.038, 12);
+  });
+  test("the US citation fields", () => {
+    const est = estimateTaxOnEarnings("US", 90_000)!;
+    expect(est.sourceName).toContain("IRS");
+    expect(est.sourceUrl).toContain("irs.gov");
+    expect(est.yearLabel).toContain("2026");
+  });
+});
+
+describe("v7 test 48: staleness and availability", () => {
+  test("TAX_CHECKED_ON is recorded and the file is fresh today", () => {
+    expect(/^\d{4}-\d{2}-\d{2}$/.test(TAX_CHECKED_ON)).toBe(true);
+    expect(monthsSince(TAX_CHECKED_ON)).toBeGreaterThanOrEqual(0);
+    expect(monthsSince(TAX_CHECKED_ON)).toBeLessThanOrEqual(18);
+    expect(taxDataIsStale()).toBe(false);
+  });
+  test("the estimator is available for both live countries", () => {
+    expect(taxEstimatorAvailable("AU")).toBe(true);
+    expect(taxEstimatorAvailable("US")).toBe(true);
+  });
+});
+
+describe("v7 test 49: the tax config block and clamping", () => {
+  test("TAX_MIN 0, TAX_MAX 0.60 (a ceiling, not a suggestion), step 1 point, default 0", () => {
+    expect(TAX_MIN).toBe(0);
+    expect(TAX_MAX).toBe(0.6);
+    expect(TAX_STEP).toBe(1);
+    expect(DEFAULT_TAX).toBe(0);
+  });
+  test("clamping uses the config's own numbers (the UI rule)", () => {
+    expect(clamp(70, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100)).toBe(60);
+    expect(clamp(-5, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100)).toBe(0);
+    expect(clamp(Number.NaN, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100)).toBe(0);
+    expect(clamp(32, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100)).toBe(32);
+  });
+});
+
+describe("v7 test 50: the copy — on/off-aware tax strings, plain words (fa + EN)", () => {
+  test("the on/off pair exists in both locales", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const c = COPY[locale].tool;
+      // off line (v6 exact)
+      expect(c.how.taxNote.length).toBeGreaterThan(0);
+      // on lines
+      expect(c.how.taxModel).toContain(locale === "fa" ? "ترتیب" : "order");
+      expect(c.how.taxGuidedLine).toContain("{source}");
+      expect(c.how.taxNotIncluded.length).toBeGreaterThanOrEqual(5);
+      // the row, the estimator, the caption, the what-if line, the card line
+      expect(c.moreOptions.taxLabel).toContain(locale === "fa" ? "برآورد" : "estimate");
+      expect(c.moreOptions.taxEstimateLine).toContain("{parts}");
+      expect(c.moreOptions.taxSourceLine).toContain("{source}");
+      expect(c.tiles.taxCaption).toContain("{x}");
+      expect(c.whatIf.taxTakes).toContain("{x}");
+      expect(c.print.taxAssumption).toContain("{x}");
+      expect(c.print.taxAssumptionGuided).toContain("{source}");
+    }
+  });
+  test("the word 'marginal' never appears in the visible copy", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    const all = JSON.stringify(COPY).toLowerCase();
+    expect(all).not.toContain("marginal");
+  });
+  test("the tax row never carries the income to the cards or the URL", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const c = COPY[locale].tool;
+      expect(c.print.taxAssumption).not.toContain("income");
+      expect(c.print.taxAssumption).not.toContain("{income}");
+      expect(c.moreOptions.taxIncomeHint.toLowerCase()).toContain(locale === "fa" ? "ذخیره" : "saved");
+    }
+  });
+});

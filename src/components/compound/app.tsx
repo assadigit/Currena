@@ -17,6 +17,7 @@ import {
   AMOUNT_CHIPS,
   DEFAULT_COUNTRY,
   DEFAULT_MONTHLY,
+  DEFAULT_TAX,
   DEFAULT_YEARLY_COST,
   DEFAULT_YEARS,
   INCREASE_MAX,
@@ -30,6 +31,9 @@ import {
   SHARE_DEFAULT,
   SHARE_MAX,
   SHARE_MIN,
+  TAX_MAX,
+  TAX_MIN,
+  TAX_STEP,
   WHAT_IF_MAX,
   WHAT_IF_MIN,
   WHAT_IF_POINTS,
@@ -52,6 +56,7 @@ import {
   whatIfCash,
   whatIfLaterStart,
   whatIfSmallChange,
+  whatIfTaxTakes,
   yearsOfSalary,
   type Country,
   type PlanInput,
@@ -70,6 +75,15 @@ import {
   measuredLine,
 } from "@/lib/compound/figures";
 import { COPY, type Locale } from "@/lib/compound/content";
+import {
+  TAX_CHECKED_ON,
+  US_STATUSES,
+  estimateTaxOnEarnings,
+  statusLabels,
+  taxDataIsStale,
+  taxEstimatorAvailable,
+  type FilingStatus,
+} from "@/lib/compound/tax";
 import { ToolsBreadcrumb, ToolsFooter, ToolsHeader, useSiteLocale } from "@/components/compound/chrome";
 import { GrowthChart, type OtherLine } from "@/components/compound/chart";
 import { A4PrintCard, PhoneCard } from "@/components/compound/cards";
@@ -117,6 +131,21 @@ function monthYearLabel(ym: string, locale: Locale): string {
   }
 }
 
+/** "26 November 2026" / «۵ آذر ۱۴۰۵» from a YYYY-MM-DD (the tax file's
+ *  "read on" dates — v7). */
+function dayDateLabel(iso: string, locale: Locale): string {
+  try {
+    return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-GB", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${iso}T00:00:00Z`));
+  } catch {
+    return iso;
+  }
+}
+
 /** The month of a 1-based plan month index, as YYYY-MM. */
 function isoOfMonth(startYm: string, m: number): string {
   const [y, mo] = startYm.split("-").map(Number);
@@ -151,6 +180,7 @@ function NumberField({
   decimals = false,
   className,
   dataCw,
+  big = false,
 }: {
   value: number;
   onCommit: (v: number) => void;
@@ -162,6 +192,8 @@ function NumberField({
   decimals?: boolean;
   className?: string;
   dataCw?: string;
+  /** v7: the bigger tap target for new inputs (≥44px, ≥16px text). */
+  big?: boolean;
 }) {
   const [text, setText] = React.useState<string>(() => String(value));
   React.useEffect(() => {
@@ -191,7 +223,11 @@ function NumberField({
         }}
         aria-label={ariaLabel}
         data-cw={dataCw}
-        className="h-10 w-[5.5rem] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-center text-[14.5px] font-bold tabular-nums text-[var(--color-text-primary)] outline-none ring-[var(--color-ring)] transition-shadow focus-visible:ring-2"
+        className={
+          big
+            ? "h-11 w-24 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-center text-[16px] font-bold tabular-nums text-[var(--color-text-primary)] outline-none ring-[var(--color-ring)] transition-shadow focus-visible:ring-2"
+            : "h-10 w-[5.5rem] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 text-center text-[14.5px] font-bold tabular-nums text-[var(--color-text-primary)] outline-none ring-[var(--color-ring)] transition-shadow focus-visible:ring-2"
+        }
       />
       {suffix ? (
         <span className="pointer-events-none absolute inset-y-0 end-2.5 flex items-center text-[11px] font-semibold text-[var(--color-text-tertiary)]">
@@ -382,6 +418,25 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
   const [yearlyCost, setYearlyCost] = React.useState(DEFAULT_YEARLY_COST);
   const [feeText, setFeeText] = React.useState("0");
   const [every, setEvery] = React.useState<1 | 3>(1);
+
+  // v7: the tax layer — one rate inside the Costs group, off by default.
+  // The estimator's income is session state only: never on a card, never
+  // in the URL, never stored anywhere.
+  const [taxRate, setTaxRate] = React.useState(DEFAULT_TAX);
+  const [taxClamped, setTaxClamped] = React.useState(false); // the one plain clamp message
+  const [taxEstimatorOpen, setTaxEstimatorOpen] = React.useState(false);
+  const [taxIncomeText, setTaxIncomeText] = React.useState("");
+  const [filingStatus, setFilingStatus] = React.useState<FilingStatus>("single");
+  /** v7: when the rate came from "Use this rate", remember its source so
+   *  the How fold and the card can show it beside the number (dropped the
+   *  moment the rate is edited away from it). */
+  const [taxGuided, setTaxGuided] = React.useState<{
+    rate: number;
+    sourceName: string;
+    yearLabel: string;
+    yearLabelFa: string;
+  } | null>(null);
+
   const [rateMode, setRateMode] = React.useState<RateMode>("average");
   const [customRateText, setCustomRateText] = React.useState("7");
   const [customLowText, setCustomLowText] = React.useState("5");
@@ -447,8 +502,9 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
       customHigh,
       inflation,
       whatIfPoints: whatIfPts,
+      taxRate,
     }),
-    [amount, salaryMonthly, share, amountMode, age, startingAmount, increase, yearlyCost, fee, every, rateMode, customRate, customLow, customHigh, inflation, whatIfPts],
+    [amount, salaryMonthly, share, amountMode, age, startingAmount, increase, yearlyCost, fee, every, rateMode, customRate, customLow, customHigh, inflation, whatIfPts, taxRate],
   );
 
   const figures = figuresOf(asset);
@@ -461,6 +517,31 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
     () => (cashFigures ? whatIfCash(plan, cashFigures, months) : null),
     [plan, cashFigures, months],
   );
+  /* v7: the tax-takes what-if line (null while the tax is off — v6 exact). */
+  const taxTakes = React.useMemo(
+    () => whatIfTaxTakes(plan, figures, months),
+    [plan, figures, months],
+  );
+
+  /* v7: the guided estimate from the typed income (session state only).
+   *  Full precision internally; the line rounds to 0.1 points. */
+  const taxIncomeNumber = Number(normalizeDigits(taxIncomeText));
+  const taxEstimate = React.useMemo(
+    () =>
+      taxEstimatorAvailable(country)
+        ? estimateTaxOnEarnings(
+            country,
+            taxIncomeText === "" || !Number.isFinite(taxIncomeNumber) ? 0 : taxIncomeNumber,
+            filingStatus,
+          )
+        : null,
+    [country, taxIncomeText, taxIncomeNumber, filingStatus],
+  );
+  const taxStale = taxDataIsStale();
+  /** Is the plan's rate still the guided one (source line applies)? */
+  const taxIsGuided =
+    taxGuided !== null && Math.abs(taxGuided.rate - taxRate) < 1e-9;
+  const taxOn = taxRate > 0;
 
   /* The thin lines: the other chips + cash. */
   const otherLines: OtherLine[] = React.useMemo(() => {
@@ -1071,6 +1152,13 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
               {t.tiles.inflationCaption.replace("{x}", formatPctLocal(inflation, locale))}
             </p>
           ) : null}
+          {/* v7: when the tax is on, every number on the page is after tax,
+              and this one small caption says so (W3 style). */}
+          {taxOn ? (
+            <p className="mt-1.5 mb-0 text-[11.5px] leading-snug text-[var(--color-text-tertiary)]" data-cw="tax-caption">
+              {t.tiles.taxCaption.replace("{x}", formatPctLocal(result.afterTaxRate, locale))}
+            </p>
+          ) : null}
           <div className="mt-1.5 flex items-center justify-end gap-1" data-cw="money-toggle">
             <Chip active={moneyView === "future"} onClick={() => setMoneyView("future")} dataCw="money-future">
               {t.tiles.futureMoney}
@@ -1258,6 +1346,17 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                 ) : null}
               </div>
             ) : null}
+            {/* v7: the tax-takes line, in the existing style, only while the
+                tax is on (never on the default screen) — the same plan run
+                with the tax off, differenced on the finals. */}
+            {taxTakes !== null ? (
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5" data-cw="tax-takes">
+                <div className="text-[12px] font-bold text-[var(--color-text-tertiary)]">{t.moreOptions.taxLabel}</div>
+                <p className="mt-1 mb-0 text-[13.5px] leading-relaxed text-[var(--color-text-primary)]">
+                  {t.whatIf.taxTakes.replace("{x}", fmt(taxTakes))}
+                </p>
+              </div>
+            ) : null}
           </div>
         </section>
 
@@ -1347,6 +1446,170 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                   </Chip>
                 </span>
               </FieldRow>
+
+              {/* v7: the tax row — off until set; one small plain message
+                  when a typed number is clamped into 0–60%. */}
+              <FieldRow label={t.moreOptions.taxLabel} hint={t.moreOptions.taxHint}>
+                <span className="flex items-center gap-1.5" data-cw="tax-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = Math.round(taxRate * 100 - TAX_STEP);
+                      const clamped = clamp(next, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100);
+                      setTaxClamped(clamped !== next);
+                      setTaxRate(clamped / 100);
+                    }}
+                    aria-label={t.controls.decrease}
+                    data-cw="tax-minus"
+                    className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  >
+                    −
+                  </button>
+                  <NumberField
+                    id="cw-tax"
+                    value={Math.round(taxRate * 1000) / 10}
+                    onCommit={(v) => {
+                      const clamped = clamp(v, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100);
+                      setTaxClamped(clamped !== v);
+                      setTaxRate(clamped / 100);
+                    }}
+                    locale={locale}
+                    suffix={pctSign(locale)}
+                    ariaLabel={t.moreOptions.taxLabel}
+                    decimals
+                    clampRange={[TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100]}
+                    dataCw="tax-input"
+                    big
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = Math.round(taxRate * 100 + TAX_STEP);
+                      const clamped = clamp(next, TAX_MIN * 100, TAX_MAX * 100, DEFAULT_TAX * 100);
+                      setTaxClamped(clamped !== next);
+                      setTaxRate(clamped / 100);
+                    }}
+                    aria-label={t.controls.increase}
+                    data-cw="tax-plus"
+                    className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  >
+                    +
+                  </button>
+                </span>
+              </FieldRow>
+              {taxClamped ? (
+                <p className="m-0 text-[11px] font-semibold text-[var(--color-chip-ink-attention)]" data-cw="tax-clamp-note">
+                  {t.errors.clampMessage}
+                </p>
+              ) : null}
+
+              {/* v7: the guided estimator — a small link that expands
+                  inline (no modal). The income is session state only. */}
+              {taxEstimatorAvailable(country) ?
+                !taxEstimatorOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setTaxEstimatorOpen(true)}
+                    data-cw="tax-estimate-link"
+                    className="text-[11.5px] font-semibold leading-none text-[var(--color-currena-blue-deep)] hover:underline"
+                  >
+                    + {t.moreOptions.taxEstimateLink}
+                  </button>
+                ) : (
+                  <div className="space-y-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-currena-bg-light)] px-2.5 py-2" data-cw="tax-estimator">
+                    <label htmlFor="cw-tax-income" className="text-[12px] font-bold text-[var(--color-text-secondary)]">
+                      {t.moreOptions.taxIncomeLabel}
+                    </label>
+                    <input
+                      id="cw-tax-income"
+                      inputMode="decimal"
+                      type="text"
+                      dir="ltr"
+                      value={locale === "fa" ? toFaDigits(taxIncomeText) : taxIncomeText}
+                      placeholder={t.moreOptions.taxIncomePlaceholder}
+                      onChange={(e) => setTaxIncomeText(normalizeDigits(e.target.value).replace(/[^\d.]/g, ""))}
+                      aria-label={t.moreOptions.taxIncomeLabel}
+                      data-cw="tax-income-input"
+                      className="h-11 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-start text-[16px] font-bold tabular-nums text-[var(--color-text-primary)] outline-none ring-[var(--color-ring)] transition-shadow placeholder:font-normal placeholder:text-[var(--color-text-tertiary)] focus-visible:ring-2"
+                    />
+                    <p className="m-0 text-[11px] leading-snug text-[var(--color-text-tertiary)]" data-cw="tax-income-hint">
+                      {t.moreOptions.taxIncomeHint}
+                    </p>
+                    {country === "US" ? (
+                      <div className="mt-0.5 space-y-1" data-cw="tax-filing">
+                        <span className="block text-[12px] font-bold text-[var(--color-text-secondary)]">{t.moreOptions.taxFilingLabel}</span>
+                        <div className="flex flex-wrap gap-1" role="radiogroup" aria-label={t.moreOptions.taxFilingLabel}>
+                          {US_STATUSES.map((s) => (
+                            <Chip
+                              key={s}
+                              active={filingStatus === s}
+                              onClick={() => setFilingStatus(s)}
+                              ariaLabel={locale === "fa" ? statusLabels(s).labelFa : statusLabels(s).labelEn}
+                              dataCw={`tax-status-${s}`}
+                            >
+                              {locale === "fa" ? statusLabels(s).labelFa : statusLabels(s).labelEn}
+                            </Chip>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                    {/* The one plain live line (announced politely), rounded
+                        to 0.1 points; parts in words; source + date below. */}
+                    <p
+                      className="m-0 rounded-xl bg-[var(--color-currena-soft)] px-3 py-2 text-[12.5px] font-bold leading-relaxed text-[var(--color-currena-blue-deep)]"
+                      aria-live="polite"
+                      data-cw="tax-estimate-line"
+                    >
+                      {taxEstimate
+                        ? t.moreOptions.taxEstimateLine
+                            .replace("{p}", pct1(taxEstimate.rate, locale))
+                            .replace(
+                              "{parts}",
+                              taxEstimate.breakdown.parts
+                                .map((p) =>
+                                  `${formatPctLocal(p.rate, locale)}${pctSign(locale)} ${
+                                    locale === "fa" ? p.nameFa : p.nameEn
+                                  }`,
+                                )
+                                .join(locale === "fa" ? " به‌علاوهٔ " : " plus "),
+                            )
+                        : t.moreOptions.taxEnterIncome}
+                    </p>
+                    {taxEstimate ? (
+                      <p className="m-0 text-[11px] leading-snug text-[var(--color-text-tertiary)]" data-cw="tax-source-line">
+                        {t.moreOptions.taxSourceLine
+                          .replace("{source}", taxEstimate.sourceName)
+                          .replace("{year}", locale === "fa" ? taxEstimate.breakdown.yearLabelFa : taxEstimate.yearLabel)
+                          .replace("{date}", dayDateLabel(taxEstimate.checkedOn, locale))}
+                      </p>
+                    ) : null}
+                    {taxStale ? (
+                      <p className="m-0 text-[11px] font-semibold text-[var(--color-chip-ink-watch)]" data-cw="tax-stale">
+                        {t.moreOptions.taxStale}
+                      </p>
+                    ) : null}
+                    {taxEstimate ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTaxRate(taxEstimate.rate);
+                          setTaxClamped(false);
+                          setTaxGuided({
+                            rate: taxEstimate.rate,
+                            sourceName: taxEstimate.sourceName,
+                            yearLabel: taxEstimate.yearLabel,
+                            yearLabelFa: taxEstimate.breakdown.yearLabelFa,
+                          });
+                        }}
+                        data-cw="tax-use-rate"
+                        className="min-h-[38px] rounded-xl bg-[var(--color-currena-soft)] px-3.5 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-95"
+                      >
+                        {t.moreOptions.taxUseRate}
+                      </button>
+                    ) : null}
+                  </div>
+                )
+              : null}
             </Fold>
 
             <Fold
@@ -1596,7 +1859,34 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
               </li>
             </ul>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.superNote}</p>
-            <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.taxNote}</p>
+            {/* v7: the plain tax model — "No taxes are included." while the
+                tax is off (the exact v6 line); the model, the guided rate's
+                source and the not-included list while it is on. */}
+            {taxOn ? (
+              <>
+                <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-secondary)]" data-cw="how-tax-model">
+                  {t.how.taxModel}
+                </p>
+                {taxIsGuided && taxGuided ? (
+                  <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-secondary)]" data-cw="how-tax-guided">
+                    {t.how.taxGuidedLine
+                      .replace("{source}", taxGuided.sourceName)
+                      .replace("{year}", locale === "fa" ? taxGuided.yearLabelFa : taxGuided.yearLabel)
+                      .replace("{date}", dayDateLabel(TAX_CHECKED_ON, locale))}
+                  </p>
+                ) : null}
+                <p className="m-0 mt-1 text-[12px] font-semibold text-[var(--color-text-secondary)]" data-cw="how-tax-not-included-title">
+                  {t.how.taxNotIncludedTitle}
+                </p>
+                <ul className="m-0 list-none space-y-0.5 p-0 text-[11.5px] leading-relaxed text-[var(--color-text-tertiary)]" data-cw="how-tax-not-included">
+                  {t.how.taxNotIncluded.map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.taxNote}</p>
+            )}
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.fxNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.pastNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]" data-cw="sources-line">{sourcesLine}</p>
@@ -1647,6 +1937,7 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
           months={months}
           startMonth={startMonth}
           money={moneyLabel}
+          tax={taxOn ? { rate: taxRate, guided: taxIsGuided ? taxGuided : null } : null}
           onClose={() => setPrintOpen(false)}
         />
       ) : null}

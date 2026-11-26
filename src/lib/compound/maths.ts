@@ -98,6 +98,15 @@ export const FEE_WARNING_SHARE = 0.01;
  *  this one switch and every cash path follows. */
 export const APPLY_COST_TO_CASH = false;
 
+/** v7: the tax on growth, limits (decimals). A ceiling, not a suggestion —
+ *  the guided estimate lands far below it. */
+export const TAX_MIN = 0;
+export const TAX_MAX = 0.6;
+/** v7: the tax box's stepper step, in percentage points (1 point). */
+export const TAX_STEP = 1;
+/** v7: the tax rate's default — the feature is off until you set it. */
+export const DEFAULT_TAX = 0;
+
 /* =================================================================== *
  * Types                                                               *
  * =================================================================== */
@@ -142,6 +151,10 @@ export interface PlanInput {
   inflation: number;
   /** The what-if band width in percentage points (editable). */
   whatIfPoints: number;
+  /** v7: the tax on growth (decimal; optional, default 0 — with it unset
+   *  every result is exactly the v6 number). Tax never touches deposits,
+   *  the purchase fee or pending money — only growth. */
+  taxRate?: number;
 }
 
 /** The measured figures for one asset (from the figures file). */
@@ -167,6 +180,11 @@ export interface CompoundResult {
   bandHighIsMeasured: boolean;
   /** Net rate after the yearly cost (decimal). */
   netRate: number;
+  /** v7: the effective annual rate after cost and tax (decimal) — equals
+   *  netRate whenever the tax is off. For the caption and the How fold. */
+  afterTaxRate: number;
+  /** v7: the rate of tax on growth actually applied (decimal). */
+  taxRate: number;
   /** The monthly series (m = 1..n), in future money. */
   series: MonthPoint[];
   /** Final value in future money (balance + pending). */
@@ -342,6 +360,14 @@ function depositFor(plan: PlanInput, m: number): number {
  *
  * `isCash` marks the Cash asset: when APPLY_COST_TO_CASH is false the
  * yearly fund cost is not deducted from it (spec §6.5).
+ *
+ * v7 tax rule (one rule, applied everywhere): after the existing cost rule
+ *   r_net = rate − cost        (cost stays 0 for Cash, §6.5)
+ *   r_after = r_net × (1 − taxRate)
+ * and the monthly rate derives from r_after exactly as before. Deposits,
+ * the purchase fee and the pending rule are untouched: tax only ever
+ * touches growth. Bank interest is taxable income, so Cash growth is
+ * taxed too — while the fund cost stays off Cash (two separate rules).
  */
 function runAtRate(
   plan: PlanInput,
@@ -350,9 +376,13 @@ function runAtRate(
   isCash = false,
 ): { series: MonthPoint[]; feesPaid: number } {
   const net = rate - (isCash && !APPLY_COST_TO_CASH ? 0 : plan.yearlyCost);
+  // v7: the tax takes its share of the net rate (spec §6.1 order: cost
+  // first, then tax; inflation deflates afterwards for today's money).
+  const tax = plan.taxRate ?? 0;
+  const afterTax = net * (1 - tax);
   // The net monthly rate; guarded so a deeply negative net rate can never
   // produce a complex root (Math.pow of a negative base).
-  const monthlyRate = 1 + net > 0 ? Math.pow(1 + net, 1 / 12) - 1 : Math.max(-1, net / 12);
+  const monthlyRate = 1 + afterTax > 0 ? Math.pow(1 + afterTax, 1 / 12) - 1 : Math.max(-1, afterTax / 12);
   const k = plan.purchaseEveryMonths;
   const series: MonthPoint[] = [];
   let balance = plan.startingAmount; // already invested, no purchase fee on it
@@ -483,6 +513,10 @@ export function computeCompound(
     band,
     bandHighIsMeasured: choice.highIsMeasured,
     netRate: choice.baseline - (opts.isCash === true && !APPLY_COST_TO_CASH ? 0 : plan.yearlyCost),
+    afterTaxRate:
+      (choice.baseline - (opts.isCash === true && !APPLY_COST_TO_CASH ? 0 : plan.yearlyCost)) *
+      (1 - (plan.taxRate ?? 0)),
+    taxRate: plan.taxRate ?? 0,
     series,
     finalValue,
     finalValueToday,
@@ -620,6 +654,23 @@ export function whatIfCash(
     isCash: true,
   });
   return cash.finalValue;
+}
+
+/** v7: "Tax (estimate) takes X" — the same projection with the tax off,
+ *  differenced on the finals. Null when the tax is off (v6 exactly) or
+ *  the plan is empty; never negative by construction (a tax can only
+ *  lower a positive-growth final). The one rule stays honest: this is a
+ *  what-if line, not a tax return. */
+export function whatIfTaxTakes(
+  plan: PlanInput,
+  figures: AssetFigures,
+  months: number,
+): number | null {
+  const tax = plan.taxRate ?? 0;
+  if (!(tax > 0) || months <= 0) return null;
+  const after = computeCompound(plan, figures, months);
+  const before = computeCompound({ ...plan, taxRate: 0 }, figures, months);
+  return before.finalValue - after.finalValue;
 }
 
 /* =================================================================== *
