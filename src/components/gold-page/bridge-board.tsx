@@ -18,7 +18,7 @@
 import * as React from "react";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
-import { type Fmt } from "@/components/gold-page/visuals";
+import { type Fmt, faDigits } from "@/components/gold-page/visuals";
 import {
   BRIDGE_INSTRUMENT_NAMES,
   coinPremium,
@@ -52,7 +52,6 @@ type BridgeT = {
   boardToman: string;
   boardParityOunce: string;
   boardNoParity: string;
-  boardSourceNote: string;
   boardSnapshotNote: string;
   boardUnavailable: string;
 };
@@ -123,7 +122,9 @@ export function BridgeBoard({
           <h4 className="m-0 type-label font-bold text-[var(--color-bridge-accent)]">{t.boardTitle}</h4>
         </span>
         {snapshotTime !== null ? (
-          <span className="type-caption text-[var(--color-text-tertiary)]">{t.boardSnapshotNote.replace("{time}", snapshotTime)}</span>
+          <span className="type-caption text-[var(--color-text-tertiary)]">
+            {t.boardSnapshotNote.replace("{time}", locale === "fa" ? faDigits(snapshotTime) : snapshotTime)}
+          </span>
         ) : null}
       </div>
 
@@ -161,7 +162,11 @@ export function BridgeBoard({
                     <bdi>{name}</bdi>
                   </td>
                   <td className="px-1 py-1.5 text-end font-bold tabular-nums text-[var(--color-text-primary)]">
-                    <bdi dir="ltr">{row !== undefined ? toman(row.marketToman) : "·"}</bdi>
+                    {/* the money cell follows the reader's own direction
+                        (the owner's catch): an LTR bdi flips «میلیون تومان»
+                        into «تومان میلیون»; fa renders RTL so the phrase
+                        reads whole — the number, then its unit, in order */}
+                    <bdi dir={locale === "fa" ? "rtl" : "ltr"} className="whitespace-nowrap">{row !== undefined ? toman(row.marketToman) : "·"}</bdi>
                   </td>
                   {/* the premium column, QUIET (batch L, task 10): the
                       owner's call — the حباب is visual noise at full
@@ -169,7 +174,7 @@ export function BridgeBoard({
                       itself (+/−) carries the direction */}
                   <td className="px-1 py-1.5 text-end tabular-nums text-[var(--color-text-tertiary)]/65">
                     {row !== undefined ? (
-                      <bdi dir="ltr">
+                      <bdi dir={locale === "fa" ? "rtl" : "ltr"} className="whitespace-nowrap">
                         {(row.premiumPct >= 0
                           ? t.boardPremiumShort
                           : t.boardDiscountShort
@@ -185,8 +190,6 @@ export function BridgeBoard({
           </tbody>
         </table>
       </div>
-
-      <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.boardSourceNote}</p>
     </div>
   );
 }

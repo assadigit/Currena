@@ -544,19 +544,13 @@ export function CalculatorBand({
       className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5"
       aria-label={calc.title}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-currena-soft)] text-[var(--color-accent-gold-deep)]" aria-hidden="true">
-          <Calculator className="h-4.5 w-4.5" />
-        </span>
-        <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{calc.eyebrow}</h2>
-      </div>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{calc.title}</h3>
+      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{calc.title}</h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{calc.subtitle}</p>
 
       {/* [1] THE what-if table — if you'd bought gold: 1 week / 1 month /
           3 months / 6 months / 1 year / 5 years, always visible */}
       <div className="mt-3 flex min-w-0 flex-col gap-2">
-        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{tm.ifTitle}</h4>
+        <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{tm.ifTitle}</h3>
         <div className="min-w-0 overflow-x-auto rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
           <table className="m-0 w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption" aria-label={tm.ifTitle}>
             <thead>

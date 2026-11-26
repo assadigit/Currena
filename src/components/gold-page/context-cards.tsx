@@ -22,6 +22,7 @@ import { ChevronDown } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta } from "@/components/gold-page/visuals";
+import { CountryFlag } from "@/components/gold-page/flags";
 import {
   forecastRetrospective,
   LBMA_2026_MIDYEAR_REVISION,
@@ -159,6 +160,16 @@ const CROSS_NAMES: Record<string, [string, string]> = {
   gbp: ["Pound sterling", "پوند"],
   cny: ["Chinese yuan", "یوان چین"],
   aud: ["Australian dollar", "دلار استرالیا"],
+};
+
+/* The flag each cross rides (the owner's ask: the currency grid speaks
+ * in country flags — the desk's own vendored flag pack). */
+const CROSS_FLAGS: Record<string, string> = {
+  eur: "EURO",
+  jpy: "JPN",
+  gbp: "GBR",
+  cny: "CHN",
+  aud: "AUS",
 };
 
 const CROSS_DECIMALS: Record<string, number> = { eur: 2, jpy: 0, gbp: 2, cny: 2, aud: 2 };
@@ -430,7 +441,10 @@ export function CurrencyGridCard({
                 key={stats!.id}
                 className="grid grid-cols-[minmax(84px,auto)_1fr_auto] items-baseline gap-x-3 gap-y-1 rounded-[var(--cr-radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5 ring-1 ring-[var(--color-border)]"
               >
-                <span className="type-caption font-bold text-[var(--color-text-primary)]">
+                <span className="flex items-center gap-1.5 type-caption font-bold text-[var(--color-text-primary)]">
+                  {CROSS_FLAGS[stats!.id] !== undefined ? (
+                    <CountryFlag code={CROSS_FLAGS[stats!.id]!} name={CROSS_NAMES[stats!.id]?.[0] ?? stats!.id} />
+                  ) : null}
                   {CROSS_NAMES[stats!.id]?.[lan(locale)] ?? stats!.id}
                 </span>
                 <bdi dir="ltr" className="type-label font-bold tabular-nums text-[var(--color-text-primary)]">
@@ -467,7 +481,10 @@ export function CurrencyGridCard({
               aria-label={t.tomanName}
               title={t.tomanNote}
             >
-              <span className="type-caption font-bold text-[var(--color-text-primary)]">{t.tomanName}</span>
+              <span className="flex items-center gap-1.5 type-caption font-bold text-[var(--color-text-primary)]">
+                <CountryFlag code="IRN" name={t.tomanName} />
+                {t.tomanName}
+              </span>
               <span dir="ltr" className="flex min-w-0 items-baseline gap-1.5">
                 {/* the honest unit (the owner's batch-H catch): an ounce
                     over a billion toman reads in BILLIONS, never as

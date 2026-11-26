@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) No — no section titled «مرور بازار» with the bold headline «طلا: شرایط علیه آن است» or that market paragraph appears; the page shows a «روند نخ طلا در برابر دلار» section instead.\n\n2) No — neither «عملکرد طلا در مقیاس‌های زمانی مختلف» nor «فاکتورهای شاخص تاثیرگذار کنونی» is present anywhere on the page.\n\n3) No — there are no «علیه قیمت طلا» / «به نفع قیمت طلا» red/green rectangle chips; the only chip-like labels are gold «طلا» / blue «دلار» badges in the table.\n\n4) No — there are no scenario cards at all: no pastel-gold numbered circles with white numbers, no dated cards with titles, and no «رشد طلا»/«افت طلا» direction chips.\n\n5) No obvious layout glitches. RTL alignment, table rows, chart, chips, and section spacing all look consistent; the page just ends mid-table (cut off by the viewport), which is not a rendering defect.",
+        "reasoning_content": "User asks about a gold page with specific sections — but screenshots show a different page (gold landing). No screenshots show «مرور بازار», headings, chips, scenario cards. Answer: not visible.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795655125,
+  "id": "202611260905172c44e42016224a5d",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "202611260905172c44e42016224a5d",
+  "usage": {
+    "completion_tokens": 280,
+    "completion_tokens_details": {
+      "reasoning_tokens": 40
+    },
+    "prompt_tokens": 4801,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 5081
+  }
+}

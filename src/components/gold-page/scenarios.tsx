@@ -16,7 +16,7 @@
  */
 
 import * as React from "react";
-import { CalendarClock, TrendingDown, TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 import type { Locale } from "@/lib/gold-page/content";
 import type { Fmt } from "@/components/gold-page/visuals";
 import { PackIcon } from "@/components/gold-page/pack-icon";
@@ -149,35 +149,65 @@ export function ScenariosBand({
     return m;
   }, [now]);
 
+  /* the owner's ask: the cards sort by their next date — the most
+     upcoming first; the un-dated (the stress spike) always last */
+  const ordered = React.useMemo(() => {
+    const withDate = SCENARIOS.filter((s) => s.calendarId !== null && nextOf.has(s.calendarId!));
+    const rest = SCENARIOS.filter((s) => !(s.calendarId !== null && nextOf.has(s.calendarId!)));
+    withDate.sort((a, b) => {
+      const da = nextOf.get(a.calendarId!)!.date;
+      const db = nextOf.get(b.calendarId!)!.date;
+      return da < db ? -1 : da > db ? 1 : 0;
+    });
+    return [...withDate, ...rest];
+  }, [nextOf]);
+
   return (
     <section id="gold-scenarios" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h3 className="m-0 mt-1 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+      <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
         <PackIcon file="gold-price-speculation-scenarios.png" size={128} className="h-32 w-32" />
         {t.title}
-      </h3>
+      </h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
       <div className="mt-3.5 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-        {SCENARIOS.map((s, i) => {
+        {ordered.map((s, i) => {
           const next = s.calendarId !== null ? nextOf.get(s.calendarId) ?? null : null;
           return (
             <article
               key={s.id}
               className="flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3.5 ring-1 ring-[var(--color-border)] lg:last:col-span-2"
             >
+              {/* the header — [date] over [title] (the owner's ask): the
+                  next occurrence leads, the scenario's name under it */}
               <div className="flex items-start gap-2.5">
                 <span
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-extrabold text-[var(--color-accent-gold-ink)]"
-                  style={{ background: "var(--color-accent-gold)" }}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-extrabold text-white"
+                  style={{
+                    /* pastel gold (the owner's ask — the harsh ink retired),
+                       white numerals riding a soft ring for definition */
+                    background: "color-mix(in srgb, var(--color-accent-gold) 68%, white)",
+                    boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold-deep) 40%, transparent)",
+                  }}
                   aria-hidden="true"
                 >
-                  {locale === "en" ? i + 1 : ["۱", "۲", "۳", "۴", "۵"][i]}
+                  {locale === "en" ? i + 1 : ["۱", "۲", "۳", "۴", "۵"][i] ?? fmt.num(i + 1, 0)}
                 </span>
-                <h4 className="m-0 type-label font-extrabold leading-snug text-[var(--color-text-primary)]">{s.name[lan(locale)]}</h4>
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  {next !== null ? (
+                    <bdi className="type-caption font-bold text-[var(--color-currena-blue-deep)]">
+                      {fmt.dateWords(next.date)}
+                      {next.approximate ? " ≈" : ""}
+                    </bdi>
+                  ) : (
+                    <span className="type-caption italic text-[var(--color-text-tertiary)]">{t.noSchedule}</span>
+                  )}
+                  <h3 className="m-0 type-label font-extrabold leading-snug text-[var(--color-text-primary)]">{s.name[lan(locale)]}</h3>
+                </div>
               </div>
 
               {/* the two directions — up first, down second, never alone;
-                  the colour rides ONLY on the chip (طلا بالا / طلا پایین),
+                  the colour rides ONLY on the chip (رشد طلا / افت طلا),
                   the outcome sentence itself stays neutral (the owner's
                   ask) */}
               <div className="flex flex-col gap-1.5">
@@ -196,26 +226,6 @@ export function ScenariosBand({
                   <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{s.downCase[lan(locale)]}</p>
                 </div>
               </div>
-
-              {/* the calendar tie — the scenario's own next dated
-                  re-weigh, read live from the economic calendar below */}
-              <p className="m-0 mt-auto flex flex-wrap items-center gap-1.5 type-caption text-[var(--color-text-tertiary)]">
-                {next !== null ? (
-                <>
-                  <CalendarClock className="h-3.5 w-3.5 shrink-0 text-[var(--color-currena-blue-deep)]" aria-hidden="true" />
-                  <span className="font-bold text-[var(--color-currena-blue-deep)]">{t.nextLabel}:</span>
-                  <bdi className="font-bold text-[var(--color-text-primary)]">
-                    {fmt.dateWords(next.date)}
-                    {next.approximate ? " ≈" : ""}
-                  </bdi>
-                </>
-              ) : (
-                <>
-                  <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-text-tertiary)]/60" />
-                  <span className="italic">{t.noSchedule}</span>
-                </>
-              )}
-              </p>
             </article>
           );
         })}

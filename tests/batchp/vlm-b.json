@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) Yes — soft gold/pastel circles with white numbers (۱–۵).\n2) Yes — each card shows a date line (e.g., «گرانتر از ۱۳۵۰») above the title.\n3) Yes — chips «رشد طلا» (green outline) and «افت طلا» (red outline) per card.\n4) Yes — negative indicator cards (e.g., «پازدهی اسمی ۱۰ ساله», «شاخص دلار», «تورم منتظره») have a pastel pink/red tint.\n5) Yes — titled «بازار طلا و سکه ایران» with no eyebrow label above it.\n6) Not verifiable in the crop — the Tehran board/live update label isn't shown (crop shows «تخته تهران، زنده» only). Cannot confirm «آخرین بروزسانی».\n7) Cannot verify «۲۶۱ میلیون تومان» — that cell isn't in the crop; visible prices like «۴۶۱,۲۱۸ میلیون تومان» read with unit in correct Persian order (not flipped).\n8) Yes — UK, China, Australia, Iran flags shown on currency rows.\n9) No — no donut/pie chart with percentages or × center appears in Image 4 (shows a history table «مسافره، سال‌به‌سال»).\n10) No visible glitches; layout and RTL rendering look correct.",
+        "reasoning_content": "Answer based on images.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795655220,
+  "id": "20261126090650dcae8df05f8240de",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "20261126090650dcae8df05f8240de",
+  "usage": {
+    "completion_tokens": 310,
+    "completion_tokens_details": {
+      "reasoning_tokens": 5
+    },
+    "prompt_tokens": 6014,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 6324
+  }
+}

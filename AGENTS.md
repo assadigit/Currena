@@ -2964,3 +2964,65 @@ had built a coin-mark logo + pill nav of its own.
 
 Nothing else touched: currena-api and the other workers stand as
 they were; the main site's own pages unchanged.
+
+## The gold-page fix batch (2026-11-26) — the owner's twenty-fix list, one sitting
+
+The owner's review of `/gold`, item by item, all shipped and
+live-verified on currena.ir/gold (deploy through the versioned upload,
+the token the owner provided):
+
+- **The Market Brief merged** — the old top-of-page «مرور بازار» box
+  folded into the briefing section itself: one title, the verdict
+  («طلا: شرایط علیه آن است»), the market paragraph right under it,
+  then the live price-position line, the assessment and the horizon
+  chip. No duplicated box above the price card.
+- **Consistent headings** — the inverted h2-eyebrow/h3-title pattern
+  retired across every section: h1 (page) → h2 (section titles,
+  1.25rem extrabold) → h3 (sub-block titles, 1.02rem extrabold — the
+  old type-label ones read like body text). The eyebrow kickers
+  («بانک‌های مرکزی», «فصل منطقه‌ای», «در یک نگاه», «ترازو», …) all
+  removed as noise — the section titles stand alone (the price card's
+  own «قیمت طلا (اونس)» stays: it is that card's only heading).
+- «روند طلا در همهٔ پنجره‌ها» → **«عملکرد طلا در مقیاس‌های زمانی
+  مختلف»**; «فاکتورهای شاخص تاثیرگذار کنونی» a proper heading.
+- **Red/green rectangle chips** around «علیه قیمت طلا» /
+  «به نفع قیمت طلا» (the briefing factor rows, both modals).
+- **است-phrasing** throughout the fa verdicts («شرایط به ضرر طلاست»,
+  «شرایط متعادل است», «فشار بر طلا متوسط است», «شرایط علیه طلاست»).
+- The two balance disclaimers retired («برای دیدن شمارش…», «هر عامل
+  وزن یکسانی دارد…»).
+- **Scenarios**: cards sorted by next date (soonest first, un-dated
+  last), the date line ABOVE each title ([date] [title]), the old
+  «بازسنجی بعدی» foot row gone, pastel-gold circles with WHITE
+  numerals, «رشد طلا»/«افت طلا» chips (EN: Gold rising/falling). The
+  calendar itself was already time-sorted.
+- **TE + WGC cards**: the AI-translated badge moved BELOW the titles;
+  the WGC card now carries the official World Gold Council logo (the
+  owner's own SVG, public/images/wgc-logo.svg) and the fa issue title
+  rides its Jalali twin — «مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)», the month's
+  last day naming the Persian month, composed month-then-year.
+- **TA retitled** «تحلیل تکنیکال قیمت طلا»; the correlation-lesson
+  chip restyled (blue border + blue text, the blue fill retired).
+- **The dashboard**: every negative indicator card (its own visible
+  delta down) painted a pastel red.
+- **The currency grid** speaks in country flags now (the vendored
+  flag pack: eu/jp/gb/cn/au + Iran's own flag on the toman row).
+- **The Iran chapter**: «بازار طلا و سکه ایران», the «فصل منطقه‌ای»
+  eyebrow and the «بازار منطقه‌ای · تهران» chip retired, the
+  five-step parity ladder moved to the section's foot, «اسنپ‌شات
+  تهران» → «آخرین بروزسانی», the live-rates source note retired, and
+  the money cells' bidi fixed (an LTR bdi was flipping «میلیون تومان»
+  into «تومان میلیون» — the cells now follow the reader's own
+  direction).
+- **The dollar-trend race reframed**: the decoupling table's third
+  column is the RIAL's own value now — «ارزش ریال (تومان بر دلار)»,
+  each row the year-end toman-per-USD rate with the rial's own % move
+  under it in red («not because the dollar grew — the toman lost
+  value»); the growth decomposition renders as a DONUT PIE with the
+  shares labelled on the ring (۷۸٪ افت ریال / ۲۲٪ رشد جهانی / حباب)
+  and the total multiple in the hole; the «چقدر با هم هم‌حرکت بودند»
+  sync block (and its rolling strip) removed.
+
+Gates: lint green, 73/73 tests, zero console/page errors, 375px no
+overflow, EN + fa + dark walked. Record PNGs: `tests/batchp/` (dev
+crops + live briefing/scenarios/375).

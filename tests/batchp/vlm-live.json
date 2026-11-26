@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) No — the \"Market Brief\" section (with «مرور بازار», the bold headline «طلا: شرایط علیه آن است», paragraph, and chips) is not visible in this screenshot. Only the intro paragraphs, a \"فشار بر طلا متوسط است\" note, a chip, the price-change table, and the start of the next section are shown.\n\n2) Cannot be judged from this screenshot, since the subsection headings («مرور بازار», etc.) aren't in view. Visible headings like «عملکرد طلا در مقیاس‌های زمانی مختلف» do look heading-like (large, bold).\n\n3) No clear visual defect; layout, alignment, and RTL rendering appear consistent.",
+        "reasoning_content": "Market Brief section not visible in screenshot (only intro, price table, next section heading).",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795655335,
+  "id": "2026112609084974a3cf6af89449b9",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "2026112609084974a3cf6af89449b9",
+  "usage": {
+    "completion_tokens": 167,
+    "completion_tokens_details": {
+      "reasoning_tokens": 18
+    },
+    "prompt_tokens": 1606,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1773
+  }
+}

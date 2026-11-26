@@ -1,0 +1,29 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) Partially: the bold headline «طلا: شرایط علیه آن است» is present with a market paragraph under it, but there is **no visible «مرور بازار» title** above them in this crop.\n\n2) Yes — both «عملکرد طلا در مقیاس‌های زمانی مختلف» and «فاکتورهای شاخص تاثیرگذار کنونی» are rendered as clear headings with gold 3D icons beside them.\n\n3) Yes — «علیه قیمت طلا» labels appear in small red chips and «به نفع قیمت طلا» in a green chip.\n\n4) Yes — the \"AI-translated\" badge sits below the card titles (under «خلاصهٔ روزانهٔ بازار طلا» and the WGC title), not in the far corner.\n\n5) Yes — the WGC card shows the official World Gold Council mark (gold circular logo + \"WORLD GOLD COUNCIL\" wordmark).\n\n6) No — the title reads «مرور اکتبر ۲۰۲۵ (آبان ۱۴۰۴)», not 2026/1405.\n\n7) No visible glitch; rendering is clean.",
+        "reasoning_content": "Image 1 lacks «مرور بازار» title and «طلا: شرایط علیه آن است» headline? It shows \"طلا: شرایط علیه آن است\" as headline, paragraph under it. But no «مرور بازار» title visible, and no «فاکتورهای شاخص تاثیرگذار کنونی» heading — instead «فاکتورهای شاخص تاثیرگذار کنونی» appears as \"فاکتورهای شاخص تاثیرگذار کنونی\"? Image 1 shows «عملکرد طلا در مقیاس‌های زمانی مختلف» as heading with icon, and «فاکتورهای شاخص تاثیرگذار کنونی» — yes it's there. Wait the heading text is «عملکرد طلا در مقیاس‌های زمانی مختلف» ✓ and «فاکتورهای شاخص تاثیرگذار کنونی» ✓. Q3: chips — yes red «علیه قیمت طلا» and green «به نفع قیمت طلا».\n\nQ1: no «مرور بازار» title visible; headline «طلا: شرایط علیه آن است» yes, paragraph under yes.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795655187,
+  "id": "2026112609061318f71b322ba143bf",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "2026112609061318f71b322ba143bf",
+  "usage": {
+    "completion_tokens": 501,
+    "completion_tokens_details": {
+      "reasoning_tokens": 249
+    },
+    "prompt_tokens": 3752,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 4253
+  }
+}

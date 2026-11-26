@@ -41,7 +41,6 @@ import {
   mostSyncYear,
   premiumArc,
   race,
-  syncScore,
   trendYearRows,
   winCounts,
   type DollarTrendPayload,
@@ -291,19 +290,6 @@ function yearLabel(jy: number, locale: Locale): string {
   }
 }
 
-/** A 5-year window's name: «۱۳۸۳–۸۷» / "2004–08". */
-function windowLabel(fromJy: number, toJy: number, locale: Locale): string {
-  const from = yearLabel(fromJy, locale);
-  const to = yearLabel(toJy, locale);
-  const tail = to.slice(-2);
-  return `${from}–${tail}`;
-}
-
-/** A window around a rolling point (its last year): jy−4 … jy. */
-function windowOf(jy: number): { fromJy: number; toJy: number } {
-  return { fromJy: jy - 4, toJy: jy };
-}
-
 /** The divergent verdict's direction word — the same-side years say so
  *  honestly ("both moved, but far apart"); the opposite-side years name
  *  the two faces (gold down while the dollar rose, or the reverse). */
@@ -338,7 +324,6 @@ export function DollarTrendBand({
   const verdict = React.useMemo(() => (data !== null ? race(data) : null), [data]);
   const counts = React.useMemo(() => (data !== null ? winCounts(data) : null), [data]);
   const decoupled = React.useMemo(() => (data !== null ? decouplingYears(data) : []), [data]);
-  const sync = React.useMemo(() => (data !== null ? syncScore(data) : null), [data]);
   const arc = React.useMemo(() => (data !== null ? premiumArc(data) : null), [data]);
   /* the two headline years (batch M): the most in-sync and the most
      divergent complete year of the race */
@@ -418,19 +403,16 @@ export function DollarTrendBand({
       className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-bridge-accent)]/30 sm:mt-5 sm:p-5"
       aria-label={t.title}
     >
-      {/* zone 1 — the header + the headline verdict chip */}
+      {/* zone 1 — the header */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-bridge-accent)]/12 text-[var(--color-bridge-accent)]" aria-hidden="true">
           <Scale className="h-4.5 w-4.5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+          <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
           <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
         </div>
       </div>
-      <span className="mt-2 inline-flex w-fit rounded-full bg-[var(--color-bridge-accent)]/10 px-2.5 py-0.5 type-caption font-bold text-[var(--color-bridge-accent)]">
-        {t.eyebrow}
-      </span>
 
       {pending ? (
         <div className="mt-3 flex flex-col items-center gap-2 py-6" role="status">
@@ -624,7 +606,7 @@ export function DollarTrendBand({
           {/* zone 3 — the race table */}
           <div className="mt-3">
             <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.tableTitle}</h4>
+              <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.tableTitle}</h3>
               {counts !== null && counts.decidedYears > 0 ? (
                 <p className="m-0 type-caption text-[var(--color-text-tertiary)]" data-dollar-trend-summary>
                   <bdi>
@@ -708,9 +690,13 @@ export function DollarTrendBand({
             ) : null}
           </div>
 
-          {/* zone 4 — the decoupling list, the section's signature */}
+          {/* zone 4 — the decoupling list, the section's signature.
+              The third column is the RIAL's own value (the owner's ask):
+              not "the dollar grew" — the toman lost value against the
+              dollar; each row states the year-end toman-per-USD rate,
+              the rial's own % fall riding under it in red */}
           <div className="mt-3">
-            <h4 className="m-0 type-label font-extrabold text-[var(--color-bridge-accent)]">{t.decouplingTitle}</h4>
+            <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-bridge-accent)]">{t.decouplingTitle}</h3>
             <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.decouplingSubtitle}</p>
             {decoupled.length === 0 ? (
               <p className="m-0 mt-1.5 type-caption text-[var(--color-text-tertiary)]">{t.decouplingEmpty}</p>
@@ -728,6 +714,9 @@ export function DollarTrendBand({
                   <tbody>
                     {decoupled.map((row) => {
                       const event = DECOUPLING_EVENTS[row.jy];
+                      /* the rial's own move = minus the dollar's — a
+                         falling rial renders red, a rising one green */
+                      const rialRet = -row.dollarRet;
                       return (
                         <tr key={row.jy} className="border-t border-[var(--color-border)]">
                           <th scope="row" className="px-2.5 py-1.5 text-start align-top font-bold tabular-nums text-[var(--color-text-primary)]">
@@ -742,8 +731,25 @@ export function DollarTrendBand({
                           <td className="px-1.5 py-1.5 text-end">
                             <SignedDelta v={row.iranRet} fmt={fmt} />
                           </td>
-                          <td className="px-2.5 py-1.5 text-end">
-                            <SignedDelta v={row.dollarRet} fmt={fmt} />
+                          <td className="px-2.5 py-1.5 text-end align-top">
+                            {row.dollarToman !== null && Number.isFinite(row.dollarToman) && row.dollarToman > 0 ? (
+                              <span className="flex flex-col items-end gap-0 leading-tight">
+                                <bdi className="font-bold tabular-nums text-[var(--color-text-primary)]">
+                                  {tomanCell(row.dollarToman)}
+                                  <span className="ms-1 font-semibold text-[var(--color-text-tertiary)]">{locale === "en" ? "toman" : "تومان"}</span>
+                                </bdi>
+                                <bdi
+                                  dir="ltr"
+                                  className="text-[10.5px] font-bold tabular-nums"
+                                  style={{ color: rialRet < 0 ? "var(--color-return-down)" : "var(--color-return-up)" }}
+                                  title={t.decouplingRialFall.replace("{v}", `${rialRet > 0 ? "+" : "−"}${fmt.num(Math.abs(rialRet), 0)}${locale === "fa" ? "٪" : "%"}`)}
+                                >
+                                  {rialRet > 0 ? "+" : "−"}{fmt.num(Math.abs(rialRet), 0)}{locale === "fa" ? "٪" : "%"}
+                                </bdi>
+                              </span>
+                            ) : (
+                              <SignedDelta v={row.dollarRet} fmt={fmt} />
+                            )}
                           </td>
                         </tr>
                       );
@@ -766,7 +772,7 @@ export function DollarTrendBand({
               className="mt-2.5 flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]"
               data-dollar-trend-decomp
             >
-              <h4 className="m-0 type-label font-extrabold text-[var(--color-bridge-accent)]">{t.decompTitle}</h4>
+              <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-bridge-accent)]">{t.decompTitle}</h3>
               <p className="m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">
                 <bdi>
                   {t.decompLine
@@ -781,17 +787,26 @@ export function DollarTrendBand({
               </p>
               {decomp.shares !== null ? (
                 <>
-                  {/* the stacked share bar — pastel segments (the batch-M
-                      colour law: solid hues stay on the chart's lines),
-                      drawn only when every share reads positive; a leg
-                      that subtracted from the growth steps back to the
-                      numbers alone, never a misleading bar */}
+                  {/* THE pie (the owner's ask): the growth split as a
+                      donut — how much of gold's Iran rise was the rial's
+                      fall (Iran's currency/economic troubles), how much
+                      the world's own gold growth, how much Tehran's
+                      premium — the shares labelled right on the ring,
+                      the total multiple in the hole. Drawn only when
+                      every share reads positive; a leg that subtracted
+                      from the growth steps back to the numbers alone,
+                      never a misleading pie */}
                   {decomp.shares.rialPct >= 0 && decomp.shares.globalPct >= 0 && decomp.shares.premiumPct >= 0 ? (
-                    <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-border)]/25" aria-hidden="true">
-                      <span style={{ width: `${Math.min(100, Math.max(0, decomp.shares.rialPct))}%`, background: "var(--color-currena-blue)", opacity: 0.5 }} />
-                      <span style={{ width: `${Math.min(100, Math.max(0, decomp.shares.globalPct))}%`, background: "var(--color-accent-gold-strong)", opacity: 0.5 }} />
-                      <span style={{ width: `${Math.min(100, Math.max(0, decomp.shares.premiumPct))}%`, background: "var(--color-bridge-accent)", opacity: 0.5 }} />
-                    </div>
+                    <DecompPie
+                      shares={decomp.shares}
+                      multiple={decomp.goldX}
+                      fmt={fmt}
+                      locale={locale}
+                      ariaLabel={t.decompSharesLine
+                        .replace("{r}", fmt.pct(decomp.shares.rialPct, 0))
+                        .replace("{w}", fmt.pct(decomp.shares.globalPct, 0))
+                        .replace("{p}", fmt.pct(decomp.shares.premiumPct, 0))}
+                    />
                   ) : null}
                   {/* the traditional legend — [square]: name, one entry
                       per leg, the share beside it */}
@@ -826,35 +841,6 @@ export function DollarTrendBand({
                 </>
               ) : null}
               <p className="m-0 text-[10.5px] leading-relaxed text-[var(--color-text-tertiary)]/70">{t.decompNote}</p>
-            </div>
-          ) : null}
-
-          {/* zone 5 — the sync verdict words + the rolling strip */}
-          {sync !== null && sync.bothKnown > 0 ? (
-            <div className="mt-3">
-              <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.syncTitle}</h4>
-              <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-                <bdi>{t.syncBothUp.replace("{n}", fmt.num(sync.bothUp, 0)).replace("{m}", fmt.num(sync.bothKnown, 0))}</bdi>
-              </p>
-              {sync.rolling.length > 1 ? (
-                <div className="mt-1.5" data-dollar-trend-sync>
-                  <RollingStrip rolling={sync.rolling} locale={locale} maxSync={sync.maxSync} maxDiverge={sync.maxDiverge} />
-                </div>
-              ) : null}
-              <p className="m-0 mt-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 type-caption text-[var(--color-text-secondary)]">
-                {sync.maxSync !== null ? (
-                  <bdi className="font-semibold">
-                    {t.syncMax.replace("{years}", windowLabel(windowOf(sync.maxSync.jy).fromJy, windowOf(sync.maxSync.jy).toJy, locale))}
-                  </bdi>
-                ) : null}
-                {sync.maxSync !== null && sync.maxDiverge !== null ? <span aria-hidden="true">·</span> : null}
-                {sync.maxDiverge !== null ? (
-                  <bdi className="font-semibold">
-                    {t.syncMin.replace("{years}", windowLabel(windowOf(sync.maxDiverge.jy).fromJy, windowOf(sync.maxDiverge.jy).toJy, locale))}
-                  </bdi>
-                ) : null}
-              </p>
-              <p className="m-0 mt-0.5 type-caption text-[var(--color-text-tertiary)]">{t.syncNote}</p>
             </div>
           ) : null}
 
@@ -929,101 +915,87 @@ export function DollarTrendBand({
 }
 
 /* ------------------------------------------------------------------ *
- * The rolling-correlation strip — a thin SVG: the 5-year correlation
- * of the two annual-return series per window, the zero line, the
- * max-sync and max-divergence windows dotted and named below.
+ * The decomposition pie — the growth split as a donut (the owner's
+ * ask): the rial's fall (Iran's currency / economic troubles), the
+ * world's own gold growth and Tehran's premium, each share labelled
+ * right on the ring, the total multiple in the hole. LTR root like
+ * every house chart; the pastel segment law of the old stacked bar
+ * carries over, the legend below still names every leg.
  * ------------------------------------------------------------------ */
 
-const STRIP_W = 640;
-const STRIP_H = 54;
-const STRIP_PAD = { l: 8, r: 34, t: 7, b: 13 };
+const PIE_R = 54;
+const PIE_C = 2 * Math.PI * PIE_R;
 
-function RollingStrip({
-  rolling,
+function DecompPie({
+  shares,
+  multiple,
+  fmt,
   locale,
-  maxSync,
-  maxDiverge,
+  ariaLabel,
 }: {
-  rolling: { jy: number; r: number | null }[];
+  shares: { rialPct: number; globalPct: number; premiumPct: number };
+  multiple: number;
+  fmt: Fmt;
   locale: Locale;
-  maxSync: { jy: number; r: number | null } | null;
-  maxDiverge: { jy: number; r: number | null } | null;
+  ariaLabel: string;
 }) {
-  const model = React.useMemo(() => {
-    const pts = rolling.map((w, i) => ({ i, jy: w.jy, r: w.r }));
-    const n = pts.length;
-    if (n < 2) return null;
-    const xOf = (i: number): number => STRIP_PAD.l + (i / (n - 1)) * (STRIP_W - STRIP_PAD.l - STRIP_PAD.r);
-    const yOf = (r: number): number =>
-      STRIP_PAD.t + (1 - (r + 1) / 2) * (STRIP_H - STRIP_PAD.t - STRIP_PAD.b);
-    let d = "";
-    let pen = false;
-    for (const p of pts) {
-      if (p.r === null || !Number.isFinite(p.r)) {
-        pen = false;
-        continue;
-      }
-      d += `${pen ? "L" : "M"}${xOf(p.i).toFixed(1)},${yOf(p.r).toFixed(1)} `;
-      pen = true;
-    }
-    const idxOf = (jy: number): number => {
-      const i = pts.findIndex((p) => p.jy === jy);
-      return i >= 0 ? i : -1;
-    };
-    return { pts, n, xOf, yOf, d: d.trim(), idxOf };
-  }, [rolling]);
-
-  if (model === null) return null;
-  const { n, xOf, yOf, d, idxOf } = model;
-  const zeroY = yOf(0);
-
-  const dot = (w: { jy: number; r: number | null } | null, color: string): React.ReactNode => {
-    if (w === null || w.r === null) return null;
-    const i = idxOf(w.jy);
-    if (i < 0) return null;
-    return <circle key={`d${w.jy}`} cx={xOf(i)} cy={yOf(w.r)} r={3} fill={color} stroke="var(--color-surface)" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />;
+  const segs = [
+    { pct: Math.max(0, shares.rialPct), color: "var(--color-currena-blue)" },
+    { pct: Math.max(0, shares.globalPct), color: "var(--color-accent-gold-strong)" },
+    { pct: Math.max(0, shares.premiumPct), color: "var(--color-bridge-accent)" },
+  ];
+  /* the running dash offset — each segment starts where the last ended */
+  let acc = 0;
+  const arcs = segs.map((s) => {
+    const dash = (s.pct / 100) * PIE_C;
+    const arc = { ...s, dash, offset: acc, mid: acc + dash / 2 };
+    acc += dash;
+    return arc;
+  });
+  /* the label position: on the ring at the segment's mid-angle,
+     12 o'clock start, clockwise (the rotate(-90) + dashoffset law) */
+  const labelPos = (mid: number): { x: number; y: number } => {
+    const theta = (mid / PIE_C) * 2 * Math.PI;
+    return { x: 88 + (PIE_R + 1) * Math.sin(theta), y: 88 - (PIE_R + 1) * Math.cos(theta) };
   };
-
+  const pctText = (v: number): string => `${fmt.num(v, 0)}${locale === "fa" ? "٪" : "%"}`;
   return (
-    <svg
-      dir="ltr"
-      viewBox={`0 0 ${STRIP_W} ${STRIP_H}`}
-      className="block h-auto w-full"
-      preserveAspectRatio="xMidYMid meet"
-      aria-hidden="true"
-    >
-      {/* the +1 / 0 / −1 guides */}
-      {[1, 0, -1].map((v) => (
-        <g key={`g${v}`}>
-          <line
-            x1={STRIP_PAD.l}
-            x2={STRIP_W - STRIP_PAD.r}
-            y1={yOf(v)}
-            y2={yOf(v)}
-            stroke="var(--color-border)"
-            strokeOpacity={v === 0 ? 0.7 : 0.35}
-            strokeDasharray={v === 0 ? "3 4" : "1 4"}
-            vectorEffect="non-scaling-stroke"
-          />
-          <text x={STRIP_W - STRIP_PAD.r + 5} y={yOf(v) + 3.5} fontSize={9} fill="var(--color-text-tertiary)" style={{ direction: "ltr" }}>
-            {v > 0 ? "+1" : v === 0 ? "0" : "−1"}
-          </text>
+    <div className="mt-1.5 flex justify-center">
+      <svg dir="ltr" viewBox="0 0 176 176" className="h-[168px] w-[168px]" role="img" aria-label={ariaLabel}>
+        <g transform="rotate(-90 88 88)">
+          <circle cx={88} cy={88} r={PIE_R} fill="none" stroke="var(--color-border)" strokeWidth={22} opacity={0.3} />
+          {arcs.map(
+            (a, i) =>
+              a.dash > 0.5 ? (
+                <circle
+                  key={i}
+                  cx={88}
+                  cy={88}
+                  r={PIE_R}
+                  fill="none"
+                  stroke={a.color}
+                  strokeWidth={22}
+                  opacity={0.62}
+                  strokeDasharray={`${a.dash} ${PIE_C - a.dash}`}
+                  strokeDashoffset={-a.offset}
+                />
+              ) : null,
+          )}
         </g>
-      ))}
-      {/* the correlation path */}
-      <path d={d} fill="none" stroke="var(--color-currena-blue)" strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-      {dot(maxSync, "var(--color-currena-blue)")}
-      {dot(maxDiverge, "var(--color-accent-gold-strong)")}
-      {/* the first/last window years at the ends */}
-      <text x={STRIP_PAD.l} y={STRIP_H - 3} fontSize={9} fill="var(--color-text-tertiary)" style={{ direction: "ltr" }}>
-        {yearLabel(rolling[0]!.jy - 4, locale)}
-      </text>
-      <text x={STRIP_W - STRIP_PAD.r} y={STRIP_H - 3} fontSize={9} fill="var(--color-text-tertiary)" textAnchor="end" style={{ direction: "ltr" }}>
-        {yearLabel(rolling[n - 1]!.jy, locale)}
-      </text>
-      {/* the zero line's tick at the middle of the x-axis */}
-      <line x1={xOf(Math.floor(n / 2))} x2={xOf(Math.floor(n / 2))} y1={zeroY - 2} y2={zeroY + 2} stroke="var(--color-text-tertiary)" strokeOpacity={0.5} vectorEffect="non-scaling-stroke" />
-    </svg>
+        {arcs.map((a, i) => {
+          if (a.pct < 9) return null; // too thin to label on the ring — the legend names it
+          const { x, y } = labelPos(a.mid);
+          return (
+            <text key={`t${i}`} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight={800} fill="var(--color-text-primary)">
+              {pctText(a.pct)}
+            </text>
+          );
+        })}
+        <text x={88} y={88} textAnchor="middle" dominantBaseline="central" fontSize={17} fontWeight={800} fill="var(--color-text-primary)">
+          ×{fmt.num(multiple, 0)}
+        </text>
+      </svg>
+    </div>
   );
 }
 

@@ -27,6 +27,9 @@ export const FLAGS: Record<string, string> = {
   BGD: "bd", NGA: "ng", MAR: "ma", DZA: "dz", TUN: "tn",
   // the calendar's jurisdictions (the Fed, the ECB, the BoE, the BoJ)
   USA: "us", EURO: "eu",
+  // the currency grid's Iranian toman row rides Iran's own flag
+  // (JPN/GBR/CHN/AUS already ride their flags above)
+  IRN: "ir",
 };
 
 export function CountryFlag({

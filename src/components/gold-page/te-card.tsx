@@ -203,11 +203,10 @@ export function TeCard({
       className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-currena-bg-light)] p-4 ring-1 ring-[var(--color-border)] sm:p-5"
     >
       {/* the header — one language, one title: the fa h2 in fa mode, the
-          EN h2 in EN mode, never both (the owner's ask); when the card
-          serves the stored translation, the quiet AI-translated badge
-          rides the opposite corner (batch K) — the engine + date on its
-          tooltip */}
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+          EN h2 in EN mode, never both (the owner's ask). The quiet
+          AI-translated badge sits BELOW the title (the owner's ask — the
+          corner position retired), the engine + date on its tooltip */}
+      <div className="flex flex-col gap-1.5">
         <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
           <PackIcon file="gold-briefing.png" size={128} className="h-32 w-32" />
           {t.title}

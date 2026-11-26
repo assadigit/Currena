@@ -38,7 +38,6 @@ import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, AiTranslatedBadge, faDigits } from "@/components/gold-page/visuals";
 import { faGlossary } from "@/lib/gold-page/fa-glossary";
-import { PackIcon } from "@/components/gold-page/pack-icon";
 
 /* ------------------------------------------------------------------ *
  * The payload (the route's contract)
@@ -138,6 +137,27 @@ function monthLabel(monthKey: string, locale: Locale): string {
   return `${name} ${yearText}`;
 }
 
+/** The reviewed Gregorian month's Jalali equivalent, «آبان ۱۴۰۵»-style
+ *  (the owner's ask: the Persian reader sees the Persian-calendar date
+ *  beside the Gregorian one, e.g. «مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)»). The
+ *  month's LAST day names the Jalali month — the issue lands at the
+ *  month's close, so its Persian-calendar address is where it ends. */
+function jalaliMonthLabel(monthKey: string): string | null {
+  const year = Number(monthKey.slice(0, 4));
+  const month = Number(monthKey.slice(5, 7));
+  if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) return null;
+  const lastDay = new Date(Date.UTC(year, month, 0)); // day 0 of next month = this month's last day
+  try {
+    /* composed month-then-year («آبان ۱۴۰۵», the owner's own order) —
+       a single {year, month} format would print the year first */
+    const m = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { month: "long" }).format(lastDay);
+    const y = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(lastDay);
+    return `${m} ${y}`.replace(/\u200f/g, ""); // the RTL mark the formatters inject
+  } catch {
+    return null;
+  }
+}
+
 /** The date part of an ISO stamp, formatted in the reader's calendar. */
 function dateWordsOf(iso: string | null | undefined, fmt: Fmt): string | null {
   if (!iso) return null;
@@ -188,6 +208,19 @@ export function WgcCard({
   const published = dateWordsOf(issue?.publishedAt, fmt);
   const fetched = dateWordsOf(issue?.fetchedAt, fmt);
 
+  /* the fa issue title carries its Jalali twin (the owner's ask):
+     «مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)» */
+  const issueTitle =
+    issue !== null
+      ? (() => {
+          const gregorian = monthLabel(issue.month, locale);
+          const jalali = locale === "fa" ? jalaliMonthLabel(issue.month) : null;
+          return t.issueLabel
+            .replace("{month}", gregorian)
+            .replace("{jalali}", jalali !== null ? ` (${jalali})` : "");
+        })()
+      : null;
+
   return (
     <section
       id="gold-wgc"
@@ -195,13 +228,25 @@ export function WgcCard({
       className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-currena-bg-light)] p-4 ring-1 ring-[var(--color-border)] sm:p-5"
     >
       {/* the header — one language, one title: the fa h2 in fa mode, the
-          EN h2 in EN mode, never both (the owner's ask); when the card
-          serves the stored translation, the quiet AI-translated badge
-          rides the opposite corner (batch K) — the engine + date on its
-          tooltip */}
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+          EN h2 in EN mode, never both (the owner's ask). The World Gold
+          Council's OWN official logo (the owner's upload) carries the
+          card's identity; the quiet AI-translated badge sits BELOW the
+          title (the owner's ask — the corner position retired), the
+          engine + date on its tooltip */}
+      <div className="flex flex-col gap-1.5">
         <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
-          <PackIcon file="gold-briefing.png" size={128} className="h-32 w-32" />
+          {/* the official World Gold Council mark — the owner's own file,
+              the WGC's wordmark-and-coin device in its house gold */}
+          <img
+            src={`${deskBasePath}/images/wgc-logo.svg`}
+            alt=""
+            width={132}
+            height={49}
+            className="h-[49px] w-[132px] shrink-0 object-contain"
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+          />
           {t.title}
         </h2>
         {fa ? (
@@ -251,7 +296,7 @@ export function WgcCard({
       {issue ? (
         <>
           <h3 className="type-label m-0 mt-3 font-extrabold text-[var(--color-text-primary)]">
-            {t.issueLabel.replace("{month}", monthLabel(issue.month, locale))}
+            {issueTitle}
           </h3>
 
           {fa ? (

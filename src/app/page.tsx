@@ -22,7 +22,7 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Lightbulb, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { SiteFooter, SiteHeader } from "@/components/site/chrome";
 import {
   Dialog,
@@ -446,7 +446,7 @@ function PriceCard({ data, t, fmt, echo }: { data: GoldPayload; t: typeof UI.en;
   );
 }
 
-function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; balance: ReturnType<typeof balanceOf>; locale: Locale }) {
+function BriefingCard({ t, fmt, balance, locale, priceLine }: { t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; balance: ReturnType<typeof balanceOf>; locale: Locale; priceLine: string | null }) {
   const reasonSeats: ReadonlyArray<{ lane: LaneId; seatId: string }> = [
     { lane: "borrowing-costs", seatId: "real-yield-10y" },
     { lane: "dollar", seatId: "dollar-basket" },
@@ -478,18 +478,27 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
   const openContent = seatOf(openSeat);
   return (
     <section id="gold-briefing" className="gold-focal-field flex flex-col rounded-[var(--cr-radius-lg)] p-4 ring-2 ring-[var(--color-accent-gold)]/40 sm:p-5" aria-label={t.briefing.eyebrow}>
-      <h2 className="type-kicker m-0" style={{ color: "var(--bal-brass-text)" }}>
-        {t.briefing.eyebrow}
-      </h2>
-      <h3 className="type-verdict m-0 mt-1.5 text-[var(--color-text-primary)]" data-briefing-headline>
+      {/* the merged Market Brief (the owner's ask): the old top-of-page
+          box folded in — the title, the verdict, the market paragraph
+          right under it, then the live price-position line */}
+      <h2 className="m-0 text-[1.25rem] font-extrabold leading-tight text-[var(--color-text-primary)]">{t.briefing.eyebrow}</h2>
+      <p className="m-0 mt-1.5 text-[1.05rem] font-extrabold leading-snug text-[var(--color-text-primary)]" data-briefing-headline>
         {t.briefing.headline}
-      </h3>
+      </p>
+      <p className="m-0 mt-1.5 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
+        {t.briefing.marketBody}
+      </p>
+      {priceLine !== null ? (
+        <p className="m-0 mt-1.5 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]" data-takeaway-price-line>
+          {priceLine}
+        </p>
+      ) : null}
 
       <p className="m-0 mt-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]">
         <span className="font-bold text-[var(--color-chip-ink-attention)]">{t.briefing.assessment}</span>
       </p>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2" data-briefing-horizons>
+      <div className="mt-2 flex flex-wrap items-center gap-2" data-briefing-horizons>
         <span className="inline-flex flex-wrap items-baseline gap-1.5 rounded-full bg-[var(--color-surface)] px-3 py-1 text-[length:var(--type-label)] font-semibold leading-relaxed text-[var(--color-text-primary)] ring-1 ring-[var(--color-border)]">
           {t.briefing.chipMonths}
           <span className="font-bold text-[var(--color-chip-ink-attention)]">· {t.briefing.chipMonthsLean}</span>
@@ -501,11 +510,11 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
           The PERCENT is the number (big and bold — the owner's ask); the
           then→now price path beside it whispers (small, muted, still
           legible), and the rows breathe (the owner's ask). */}
-      <div className="mt-3.5">
-        <h4 className="type-label m-0 flex items-center gap-3 font-extrabold text-[var(--color-text-primary)]">
+      <div className="mt-4">
+        <h3 className="m-0 flex items-center gap-3 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">
           <PackIcon file="gold-price-up-or-down.png" size={128} className="h-32 w-32" />
           {t.briefing.trendTitle}
-        </h4>
+        </h3>
         <div className="mt-2 min-w-0 overflow-hidden rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
           <table className="m-0 w-full border-collapse bg-[var(--color-currena-bg-light)] type-caption" aria-label={t.briefing.trendTitle}>
             <tbody>
@@ -547,10 +556,10 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
       </div>
 
       <div className="mt-4">
-        <h4 className="type-label m-0 flex items-center gap-3 font-extrabold text-[var(--color-text-primary)]">
+        <h3 className="m-0 flex items-center gap-3 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">
           <PackIcon file="gold-price-influential-factors.png" size={128} className="h-32 w-32" />
           {t.briefing.whyTitle}
-        </h4>
+        </h3>
         <div className="mt-2 flex flex-col gap-2">
           {reasonSeats.map(({ lane, seatId }) => {
             const content = SEAT_CONTENT[seatId];
@@ -572,8 +581,16 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
                 className="flex w-full items-center justify-between gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] p-3 text-start ring-1 ring-[var(--color-border)] transition-colors hover:bg-[var(--color-currena-soft)] hover:ring-[var(--color-accent-gold)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-gold)]"
               >
                 <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                  <span className="type-caption font-bold" style={{ color: ink.ink }}>
-                    {ink.glyph} {seatWord}
+                  <span
+                    className="inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 type-caption font-bold"
+                    style={{
+                      backgroundColor: `color-mix(in srgb, ${ink.ink} 10%, transparent)`,
+                      color: ink.ink,
+                      boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ink.ink} 42%, transparent)`,
+                    }}
+                  >
+                    <span aria-hidden="true" className="text-[0.85em] leading-none">{ink.glyph}</span>
+                    {seatWord}
                   </span>
                   <span className="type-label font-bold text-[var(--color-text-primary)]">{content[locale][0]}</span>
                 </span>
@@ -600,8 +617,16 @@ function BriefingCard({ t, fmt, balance, locale }: { t: typeof UI.en; fmt: Retur
         {openContent !== null ? (
           <DialogContent className="rounded-[var(--cr-radius-lg)] border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-start ring-1 ring-[var(--color-border)] sm:p-5 sm:max-w-[440px]">
             <DialogHeader className="text-start pe-11">
-              <p className="type-caption m-0 font-bold" style={{ color: openContent.ink.ink }}>
-                {openContent.ink.glyph} {openContent.seatWord}
+              <p
+                className="m-0 inline-flex w-fit items-center gap-1 rounded-md px-1.5 py-0.5 type-caption font-bold"
+                style={{
+                  backgroundColor: `color-mix(in srgb, ${openContent.ink.ink} 10%, transparent)`,
+                  color: openContent.ink.ink,
+                  boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${openContent.ink.ink} 42%, transparent)`,
+                }}
+              >
+                <span aria-hidden="true" className="text-[0.85em] leading-none">{openContent.ink.glyph}</span>
+                {openContent.seatWord}
               </p>
               <DialogTitle className="type-label text-start text-[var(--color-text-primary)]">
                 {openContent.content[locale][0]}
@@ -628,12 +653,7 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
   const lastTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   return (
     <section id="gold-balance" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="type-kicker m-0" style={{ color: "var(--bal-brass-text)" }}>
-          {t.balance.eyebrow}
-        </h2>
-      </div>
-      <h3 className="m-0 mt-1.5 text-[1.2rem] font-extrabold leading-tight text-[var(--color-text-primary)] sm:text-[1.35rem]">{t.balance.title}</h3>
+      <h2 className="m-0 text-[1.25rem] font-extrabold leading-tight text-[var(--color-text-primary)]">{t.balance.title}</h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.balance.subtitle}</p>
 
       <div className="mt-2">
@@ -729,11 +749,6 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
           </button>
         ))}
       </div>
-      <p className="m-0 mt-2 text-center type-caption text-[var(--color-text-tertiary)]">{t.balance.countHint}</p>
-
-      <div className="mt-3 border-t border-[var(--color-border)] pt-3">
-        <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.balance.honesty}</p>
-      </div>
 
       {/* the counted record — the modal (the موافق/مخالف/بی‌طرف numbers,
           only ever shown here, behind the click) */}
@@ -784,13 +799,23 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
                             {VOTER_NAMES[m.id][lan(locale)]}
                           </span>
                           <span className="ms-auto type-caption font-bold" style={{ color: ink.ink }}>
-                            {m.state === "supports"
-                              ? t.seats.seatSupports
-                              : m.state === "pressures"
-                                ? t.seats.seatPressures
-                                : m.state === "steady"
-                                  ? t.seats.seatSteady
-                                  : t.seats.seatUnread}
+                            {m.state === "supports" ? (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5"
+                                style={{ backgroundColor: `color-mix(in srgb, ${ink.ink} 10%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ink.ink} 42%, transparent)` }}
+                              >
+                                {t.seats.seatSupports}
+                              </span>
+                            ) : m.state === "pressures" ? (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5"
+                                style={{ backgroundColor: `color-mix(in srgb, ${ink.ink} 10%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ink.ink} 42%, transparent)` }}
+                              >
+                                {t.seats.seatPressures}
+                              </span>
+                            ) : m.state === "steady"
+                              ? t.seats.seatSteady
+                              : t.seats.seatUnread}
                           </span>
                         </li>
                       );
@@ -813,11 +838,23 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
 /* One yield card — the true series (FRED daily close) under its honest
  * name, with the daily change in percentage points, its own as-of date
  * and the FRED provenance line. Fail-closed: no stored series, no card
- * (the block degrades to the remaining indicators, never a guess). */
+ * (the block degrades to the remaining indicators, never a guess).
+ * A negative daily change paints the whole card a pastel red (the
+ * owner's ask) — the dashboard's down readings read at a glance. */
 function YieldCard({ name, stat, fmt, t }: { name: string; stat: SeriesStat | null; fmt: ReturnType<typeof makeFmt>; t: typeof UI.en.indicators }) {
   if (stat === null) return null;
+  const chg1d = stat.chg1d ?? null;
+  const negative = chg1d !== null && Number.isFinite(chg1d) && chg1d < 0;
   return (
-    <div className="flex items-center gap-3 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2 ring-1 ring-[var(--color-border)]">
+    <div
+      className="flex items-center gap-3 rounded-[var(--cr-radius-md)] px-3 py-2 ring-1"
+      style={{
+        backgroundColor: negative ? "color-mix(in srgb, var(--color-return-down) 7%, var(--color-surface))" : "var(--color-surface)",
+        boxShadow: negative
+          ? "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 32%, transparent)"
+          : "inset 0 0 0 1px var(--color-border)",
+      }}
+    >
       <div className="min-w-0 flex-1">
         <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{name}</p>
         <p className="m-0 mt-0.5 flex flex-wrap items-baseline gap-2">
@@ -888,8 +925,7 @@ function DashboardBand({
   const [allRatios, setAllRatios] = React.useState(false);
   return (
     <section id="gold-dashboard" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.indicators.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.indicators.title}</h3>
+      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.indicators.title}</h2>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.indicators.subtitle}</p>
       {/* the two yields — side by side (the real-yield re-sourcing: the
           true 10-year TIPS real yield and the 10-year nominal, FRED
@@ -906,23 +942,37 @@ function DashboardBand({
         </p>
       ) : null}
       <div className="mt-2.5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {rows.map((r) => (
-          <div key={r.name} className="flex items-center gap-3 rounded-[var(--cr-radius-md)] bg-[var(--color-surface)] px-3 py-2 ring-1 ring-[var(--color-border)]">
-            <div className="min-w-0 flex-1">
-              <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{r.name}</p>
-              <p className="m-0 mt-0.5 flex items-baseline gap-2">
-                <bdi dir="ltr" className="type-label font-bold text-[var(--color-text-primary)]">
-                  {r.unit === "$" ? "$" : r.unit === "%" ? "" : ""}
-                  {fmt.num(r.stat.last, r.unit === "%" ? 2 : r.unit === "$" ? 2 : 1)}
-                  {r.unit === "%" ? "%" : ""}
-                </bdi>
-                <SignedDelta v={r.stat.chg30} fmt={fmt} />
-                <span className="type-caption text-[var(--color-text-tertiary)]">{t.indicators.d30}</span>
-              </p>
+        {rows.map((r) => {
+          /* a negative 30-day change paints the whole card a pastel red
+             (the owner's ask) — the dashboard's down readings at a glance */
+          const negative = r.stat.chg30 !== null && Number.isFinite(r.stat.chg30) && r.stat.chg30 < 0;
+          return (
+            <div
+              key={r.name}
+              className="flex items-center gap-3 rounded-[var(--cr-radius-md)] px-3 py-2 ring-1"
+              style={{
+                backgroundColor: negative ? "color-mix(in srgb, var(--color-return-down) 7%, var(--color-surface))" : "var(--color-surface)",
+                boxShadow: negative
+                  ? "inset 0 0 0 1px color-mix(in srgb, var(--color-return-down) 32%, transparent)"
+                  : "inset 0 0 0 1px var(--color-border)",
+              }}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="m-0 type-caption font-semibold text-[var(--color-text-primary)]">{r.name}</p>
+                <p className="m-0 mt-0.5 flex items-baseline gap-2">
+                  <bdi dir="ltr" className="type-label font-bold text-[var(--color-text-primary)]">
+                    {r.unit === "$" ? "$" : r.unit === "%" ? "" : ""}
+                    {fmt.num(r.stat.last, r.unit === "%" ? 2 : r.unit === "$" ? 2 : 1)}
+                    {r.unit === "%" ? "%" : ""}
+                  </bdi>
+                  <SignedDelta v={r.stat.chg30} fmt={fmt} />
+                  <span className="type-caption text-[var(--color-text-tertiary)]">{t.indicators.d30}</span>
+                </p>
+              </div>
+              <MiniSpark values={r.stat.series.map((p) => p.v)} />
             </div>
-            <MiniSpark values={r.stat.series.map((p) => p.v)} />
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* the remaining ratios — behind one expand (the top trio now lives
@@ -996,10 +1046,9 @@ function PhysicalBand({ t, fmt, locale, projection, vault }: { t: typeof UI.en; 
             : t.contextCards.physicalVerdictDiscount;
   return (
     <section id="gold-other" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.other.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.other.title}</h3>
+      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.other.title}</h2>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.other.subtitle}</p>
-      <h4 className="m-0 mt-3 type-label font-extrabold text-[var(--color-text-primary)]">{t.physical.title}</h4>
+      <h3 className="m-0 mt-3 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.physical.title}</h3>
 
       {/* THE verdict — the TA verdict's own loud gold box, one readable sentence */}
       <div
@@ -1051,17 +1100,23 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
   const steps = [t.bridge.step1, t.bridge.step2, t.bridge.step3, t.bridge.step4, t.bridge.step5];
   return (
     <section id="gold-bridge" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-bridge-accent)]/30 sm:mt-5 sm:p-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="type-kicker m-0 text-[var(--color-bridge-accent)]">{t.bridge.eyebrow}</h2>
-        <span className="rounded-full bg-[var(--color-bridge-accent)]/10 px-2.5 py-0.5 type-caption font-bold text-[var(--color-bridge-accent)]">
-          {t.bridge.regionChip}
-        </span>
-      </div>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.bridge.title}</h3>
+      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.bridge.title}</h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.bridge.subtitle}</p>
 
-      {/* the parity ladder — collapsed by default (the board's own numbers
-          name the formula at point of use); one tap opens the five steps */}
+      {/* the live Tehran board — every instrument's market price beside its computed حباب premium */}
+      <BridgeBoard rates={rates} t={t.bridge} fmt={fmt} locale={locale} />
+
+      {/* the live premium history — the previous page's bridge companion */}
+      {premium ? <PremiumHistoryCard data={premium} t={t.bridge} fmt={fmt} locale={locale} /> : null}
+
+      {/* the coin budget machine — the owner's own ask: how many full
+          Emami coins a foreign-currency sum buys on the Tehran market,
+          the melt-value comparison riding beside it */}
+      <CoinBuyerBand rates={rates} t={t.bridge.coinBuyer} fmt={fmt} locale={locale} />
+
+      {/* the parity ladder — moved to the section's foot (the owner's
+          ask): the board and the machines first, the five steps after;
+          collapsed by default, one tap opens them */}
       <details className="mt-3 rounded-[var(--cr-radius-md)] bg-[var(--color-bridge-accent)]/5 p-3">
         <summary className="cursor-pointer type-caption font-bold text-[var(--color-bridge-accent)]">
           {locale === "en" ? "How the Tehran price is built · the 5 steps" : "قیمت تهران چگونه ساخته می‌شود؟ · ۵ گام"}
@@ -1078,18 +1133,7 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
         </div>
       </details>
 
-      {/* the live Tehran board — every instrument's market price beside its computed حباب premium */}
-      <BridgeBoard rates={rates} t={t.bridge} fmt={fmt} locale={locale} />
-
-      {/* the live premium history — the previous page's bridge companion */}
-      {premium ? <PremiumHistoryCard data={premium} t={t.bridge} fmt={fmt} locale={locale} /> : null}
-
-      {/* the coin budget machine — the owner's own ask: how many full
-          Emami coins a foreign-currency sum buys on the Tehran market,
-          the melt-value comparison riding beside it */}
-      <CoinBuyerBand rates={rates} t={t.bridge.coinBuyer} fmt={fmt} locale={locale} />
-
-      <details className="mt-3 rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
+      <details className="mt-2.5 rounded-[var(--cr-radius-md)] ring-1 ring-[var(--color-border)]">
         <summary className="cursor-pointer px-3 py-2 type-caption font-bold text-[var(--color-bridge-accent)]">{t.bridge.methodTitle}</summary>
         <p className="px-3 pb-3 m-0 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.bridge.method}</p>
       </details>
@@ -1109,8 +1153,7 @@ function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI
     <section id="gold-history" className="gold-anchor-mt mt-3 sm:mt-5">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <div>
-          <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.history.eyebrow}</h2>
-          <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.history.title}</h3>
+          <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.history.title}</h2>
         </div>
         <button
           type="button"
@@ -1153,7 +1196,7 @@ function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI
           </div>
         </div>
         <div className="flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)]">
-          <h4 className="m-0 text-[1.05rem] font-extrabold text-[var(--color-text-primary)]">{t.history.ifBought.title}</h4>
+          <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.history.ifBought.title}</h3>
           <p className="m-0 mt-0.5 type-caption text-[var(--color-text-tertiary)]">{t.history.ifBought.subtitle}</p>
           <div className="mt-3">
             <IfBoughtChart bars={data.gold.bars} spot={data.gold.spot} locale={locale} fmt={fmt} labels={{ title: "", subtitle: "", ago: () => "", worth: "" }} />
@@ -1235,23 +1278,22 @@ export default function GoldPage() {
     retry: 1,
   });
 
-  /* THE complete Market Brief — the owner's ask: the brief carries the
-     page's own verdicts, more of them. The conditions sentence and the
-     balance close stay the reviewed copy; the price-position line composes
-     live from the page's own readings — the history echo (where the price
-     has come back to, e.g. "about 15 months ago"), the 200-day distance
-     and the YTD / 1-year windows — each clause present only when its leg
-     actually arrived, never a guess. */
+  /* THE Market Brief's own price-position line (the owner's ask: the
+     brief carries the page's own verdicts): the history echo (where the
+     price has come back to, e.g. "about 15 months ago"), the 200-day
+     distance and the YTD / 1-year windows — each clause present only
+     when its leg actually arrived, never a guess. Renders inside the
+     briefing card, under the market paragraph. */
   const priceLine = React.useMemo(() => {
     const clauses: string[] = [];
     const echoPayload = data?.gold.historyEcho ?? null;
     if (echoPayload && echoPayload.mode === "return" && echoPayload.days !== undefined && echoPayload.days >= 1) {
-      clauses.push(t.takeaway.echo.replace("{n}", echoLookback(echoPayload.days, t, fmt)));
+      clauses.push(t.briefing.echo.replace("{n}", echoLookback(echoPayload.days, t, fmt)));
     }
     const sma = ta.data?.distance ?? null;
     if (sma !== null && Number.isFinite(sma.pct)) {
       const pctText = `${fmt.num(Math.abs(sma.pct), 1)}${locale === "fa" ? "٪" : "%"}`;
-      clauses.push((sma.pct >= 0 ? t.takeaway.smaAbove : t.takeaway.smaBelow).replace("{pct}", pctText));
+      clauses.push((sma.pct >= 0 ? t.briefing.smaAbove : t.briefing.smaBelow).replace("{pct}", pctText));
     }
     /* the trend pair — one clause group: YTD and 1-year, joined with a
        single "و"/"and" */
@@ -1262,8 +1304,8 @@ export default function GoldPage() {
     const ytd = trends.data?.find((w) => w.range === "YTD")?.chgPct ?? null;
     const yearPct = trends.data?.find((w) => w.range === "1Y")?.chgPct ?? null;
     const trendGroup: string[] = [];
-    if (ytd !== null && ytd !== undefined && Number.isFinite(ytd)) trendGroup.push(t.takeaway.ytd.replace("{v}", pctWords(ytd)));
-    if (yearPct !== null && yearPct !== undefined && Number.isFinite(yearPct)) trendGroup.push(t.takeaway.year.replace("{v}", pctWords(yearPct)));
+    if (ytd !== null && ytd !== undefined && Number.isFinite(ytd)) trendGroup.push(t.briefing.ytd.replace("{v}", pctWords(ytd)));
+    if (yearPct !== null && yearPct !== undefined && Number.isFinite(yearPct)) trendGroup.push(t.briefing.year.replace("{v}", pctWords(yearPct)));
     const endsOnTrend = trendGroup.length > 0;
     if (trendGroup.length > 0) clauses.push(trendGroup.join(locale === "fa" ? " و " : " and "));
     if (clauses.length === 0) return null;
@@ -1320,29 +1362,6 @@ export default function GoldPage() {
           </p>
         </header>
 
-        {/* THE ultimate compact verdict — پیام کلیدی, one paragraph, at the
-            top of the page: how gold is right now */}
-        <section
-          className="mb-3 flex items-start gap-3 rounded-[var(--cr-radius-lg)] bg-[var(--color-currena-soft)] p-3.5 sm:p-4"
-          style={{ boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--color-accent-gold) 35%, transparent)" }}
-          aria-label={t.takeaway.title}
-        >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-gold)] text-[var(--color-accent-gold-ink)]" aria-hidden="true">
-            <Lightbulb className="h-5 w-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.takeaway.title}</h2>
-            <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">
-              {t.takeaway.body}
-            </p>
-            {priceLine !== null ? (
-              <p className="m-0 mt-1.5 type-caption font-semibold leading-relaxed text-[var(--color-text-primary)]" data-takeaway-price-line>
-                {priceLine}
-              </p>
-            ) : null}
-          </div>
-        </section>
-
         {isLoading ? (
           <div className="mx-auto flex w-full max-w-[560px] flex-col items-center px-5 py-16" role="status">
             <p className="m-0 text-[length:var(--type-label)] font-semibold text-[var(--color-text-secondary)]">{t.loadingLine}</p>
@@ -1366,7 +1385,7 @@ export default function GoldPage() {
                 and mobile alike), the focal briefing card under it */}
             <div className="flex flex-col gap-2.5 lg:gap-3">
               <PriceCard data={data} t={t} fmt={fmt} echo={echo} />
-              <BriefingCard t={t} fmt={fmt} balance={balance} locale={locale} />
+              <BriefingCard t={t} fmt={fmt} balance={balance} locale={locale} priceLine={priceLine} />
               {/* the TE daily briefing — Trading Economics' own daily take
                   directly under the Market Brief (the daily voices sit
                   together, the owner's §11 Q5 answer), the WGC monthly

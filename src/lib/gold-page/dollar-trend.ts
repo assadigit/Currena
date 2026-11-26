@@ -376,8 +376,13 @@ export interface DecouplingRow {
   globalRet: number;
   /** The Iranian gold (toman) return that year — positive. */
   iranRet: number;
-  /** The dollar's own rise that year — the cause. */
+  /** The dollar's own rise that year — the rial's mirror (a rising
+   *  dollar IS a falling rial; the column reframes it as such). */
   dollarRet: number;
+  /** The year-end free-market rate, toman per USD — the rial's own
+   *  value stated in its own unit (the owner's ask: show how many toman
+   *  a dollar cost, not "the dollar grew"). Null when the leg is absent. */
+  dollarToman: number | null;
 }
 
 /** The historical event labels the copy carries on the rows that fire
@@ -398,7 +403,13 @@ export function decouplingYears(p: DollarTrendPayload): DecouplingRow[] {
   for (const r of rows) {
     if (r.goldUsdRet === null || r.goldRet === null || r.dollarRet === null) continue;
     if (r.goldUsdRet < 0 && r.goldRet > 0) {
-      out.push({ jy: r.jy, globalRet: r.goldUsdRet, iranRet: r.goldRet, dollarRet: r.dollarRet });
+      out.push({
+        jy: r.jy,
+        globalRet: r.goldUsdRet,
+        iranRet: r.goldRet,
+        dollarRet: r.dollarRet,
+        dollarToman: r.dollarToman,
+      });
     }
   }
   return out;

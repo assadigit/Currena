@@ -268,7 +268,10 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
   return (
     <section id="gold-ta" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
+        <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+          <PackIcon file="gold-technical-analysis.png" size={128} className="h-32 w-32" />
+          {t.title}
+        </h2>
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -279,10 +282,6 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
         </button>
       </div>
-      <h3 className="m-0 mt-1 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
-        <PackIcon file="gold-technical-analysis.png" size={128} className="h-32 w-32" />
-        {t.title}
-      </h3>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
       {/* THE plain verdict — one readable sentence, its own loud gold box */}
@@ -403,7 +402,7 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
         <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
           {/* the four standard moving averages */}
           <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-            <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.smaTitle}</h4>
+            <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.smaTitle}</h3>
             {data.sma.length === 0 ? (
               <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.smaNone}</p>
             ) : (
@@ -422,7 +421,7 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
 
           {/* the dated 50/200 crosses */}
           <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-            <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.crossTitle}</h4>
+            <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.crossTitle}</h3>
             {data.crosses.length === 0 ? (
               <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.crossNone}</p>
             ) : (
@@ -452,9 +451,9 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
           {/* the classic pivots */}
           {[data.dailyPivots, data.weeklyPivots].map((pv, i) => (
             <div key={i} className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-              <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">
+              <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">
                 {i === 0 ? t.pivotsDailyTitle : t.pivotsWeeklyTitle}
-              </h4>
+              </h3>
               {pv === null ? (
                 <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.pivotNone}</p>
               ) : (
@@ -604,8 +603,7 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
   const num = (n: number) => fmt.num(n, 0);
   return (
     <section id="gold-cb" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
       {/* the tracker chart */}
@@ -661,7 +659,7 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
         }}
       >
         <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5">
-          <h4 className="m-0 type-label font-extrabold text-[var(--color-return-up)]">{t.buyersTitle}</h4>
+          <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-return-up)]">{t.buyersTitle}</h3>
           <span className="type-caption text-[var(--color-text-tertiary)]">{t.buyersAsOf}</span>
         </div>
         <table className="m-0 hidden w-full border-collapse type-caption sm:table">
@@ -765,7 +763,7 @@ export function CentralBanksBand({ data, t, fmt, locale, spot }: { data: CbPaylo
         }}
       >
         <div className="flex flex-wrap items-baseline justify-between gap-x-2.5 gap-y-0.5">
-          <h4 className="m-0 type-label font-extrabold text-[var(--color-return-down)]">{t.sellersTitle}</h4>
+          <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-return-down)]">{t.sellersTitle}</h3>
           <span className="type-caption text-[var(--color-text-tertiary)]">{t.sellersAsOf}</span>
         </div>
         <ul className="m-0 flex list-none flex-col gap-1 p-0">
@@ -849,7 +847,7 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
        collapse behaviour, its own sub-heading, no section of its own */
     <div className="mt-4 border-t border-[var(--color-border)] pt-3.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.title}</h4>
+        <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
         <button
           type="button"
           aria-expanded={open}
@@ -863,7 +861,7 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
       {open ? (
       <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
         <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-          <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.vaultTitle}</h4>
+          <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.vaultTitle}</h3>
           <p className="m-0 type-label font-semibold text-[var(--color-text-secondary)]">
             <bdi>{t.vaultTopline.replace("{tonnes}", fmt.num(data.vault.goldTonnes, 0))}</bdi>
             <span aria-hidden="true"> · </span>
@@ -890,7 +888,7 @@ export function VaultBand({ data, t, fmt, locale }: { data: LbmaPayload; t: AnyT
           </details>
         </div>
         <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-          <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.clearingTitle}</h4>
+          <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.clearingTitle}</h3>
           <p className="m-0 type-label font-semibold text-[var(--color-text-secondary)]">
             <bdi>{t.clearingTopline.replace("{moz}", fmt.num(data.clearing.goldMoz, 1)).replace("{month}", monthLabel(data.clearing.asOf, locale))}</bdi>
           </p>
@@ -1025,11 +1023,10 @@ export function PositionsBand({ data, t, fmt, locale }: { data: PositionsPayload
           : t.verdictNeutralDesc;
   return (
     <section id="gold-positions" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+      <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
         <PackIcon file="gold-dealers-long-short-position.png" size={128} className="h-32 w-32" />
         {t.title}
-      </h3>
+      </h2>
       <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
       {verdictWord !== null && main !== null ? (
         <div className="mt-3 flex flex-col gap-2 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] px-3 py-3 ring-1 ring-[var(--color-border)]">
@@ -1570,8 +1567,7 @@ export function RelationshipsBand({ t, locale }: { t: AnyT; locale: Locale }) {
     <section id="gold-relationships" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <div>
-          <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-          <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+          <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
         </div>
         <button
           type="button"

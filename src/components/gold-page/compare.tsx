@@ -191,7 +191,7 @@ function CompareBars({ t, rows, fmt, enabled, window: w }: { t: CmpT; rows: Comp
   const ariaParts = assets.map((r) => `${r.name} ${fmt.pct(r.pct ?? 0, 1)}`);
   return (
     <div className="mt-3" ref={ref}>
-      <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{barsTitle}</h4>
+      <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{barsTitle}</h3>
       <svg
         dir="ltr"
         viewBox={`0 0 ${W} ${H}`}
@@ -324,8 +324,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
 
   return (
     <section id="gold-compare" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="type-kicker m-0 text-[var(--color-text-tertiary)]">{t.eyebrow}</h2>
-      <h3 className="m-0 mt-1 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h3>
+      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
       {/* the window chips + the line toggles */}
@@ -406,7 +405,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
           {/* the scorecard — the window's gains and losses, in numbers */}
           {rows.length > 0 ? (
             <div className="mt-3">
-              <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{t.tableTitle}</h4>
+              <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{t.tableTitle}</h3>
               {/* THE one-line summary — the window's own best and worst,
                   named, loss-aware: a loss is called a loss (بیشترین ضرر),
                   only a real gain is ever called a gain */}
@@ -516,7 +515,9 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
             type="button"
             aria-expanded={corrOpen}
             onClick={() => setCorrOpen((o) => !o)}
-            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-[var(--color-currena-soft)] px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] transition-transform hover:scale-[1.02] active:scale-95"
+            /* the owner's ask: no blue fill — the blue border + blue text
+               carry the chip, the background stays the page's own */
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-transparent px-3.5 py-1 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-currena-blue)]/60 transition-transform hover:scale-[1.02] active:scale-95"
           >
             {corrOpen ? corrT.lessonClose : corrT.lessonOpen}
             <span aria-hidden="true" className={`text-[10px] transition-transform ${corrOpen ? "rotate-180" : ""}`}>▾</span>
@@ -524,7 +525,7 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
           {corrOpen ? (
             <div className="mt-3 flex flex-col gap-2">
               <div>
-                <h4 className="m-0 type-label font-extrabold text-[var(--color-text-primary)]">{corrT.title}</h4>
+                <h3 className="m-0 text-[1.02rem] font-extrabold text-[var(--color-text-primary)]">{corrT.title}</h3>
                 <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{corrT.subtitle}</p>
               </div>
               <CorrelationLeg data={correlation} t={corrT} fmt={fmt} locale={locale} />

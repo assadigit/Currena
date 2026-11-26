@@ -191,23 +191,33 @@ export const UI = {
       },
     },
     briefing: {
-      eyebrow: "Briefing",
-      headline: "Gold: conditions lean against it",
-      assessment: "Conditions moderately pressure gold",
+      // The merged Market Brief (the owner's ask): the old top-of-page
+      // takeaway box folded into the briefing section — the title, then
+      // the verdict, then the market paragraph right under it.
+      eyebrow: "Market Brief",
+      headline: "Gold: conditions are against it",
+      assessment: "Pressure on gold is moderate",
+      marketBody:
+        "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights.",
       chipMonths: "Next 1–3 months",
-      chipMonthsLean: "leans against gold",
+      chipMonthsLean: "conditions are against gold",
       whyTitle: "Key factors at work right now",
       evidence: "Evidence",
       howItWorks: "How it works",
       factorButton: "Open the explanation, {name}",
-      trendTitle: "Gold's trend at every window",
+      trendTitle: "Gold's performance across time scales",
+      echo: "The price has returned to where it traded about {n} ago",
+      smaBelow: "sits {pct} below its 200-day average",
+      smaAbove: "sits {pct} above its 200-day average",
+      ytd: "{v} year-to-date",
+      year: "{v} over the past year",
     },
     scenarios: {
       title: "Price-change scenarios",
       subtitle:
         "The world's major economic decisions — steered by institutions such as the U.S. Treasury, central banks and statistical agencies — move the gold price. The events ahead that can move it are listed here: some carry fixed, recurring dates, while others are periodic or conditional and may be adopted unannounced.",
-      upLabel: "gold up",
-      downLabel: "gold down",
+      upLabel: "Gold rising",
+      downLabel: "Gold falling",
       nextLabel: "next scheduled re-weigh",
       noSchedule: "no calendar date — it walks in unannounced",
     },
@@ -217,16 +227,14 @@ export const UI = {
       subtitle:
         "Gold's five main drivers are each read against their usual range and weighed equally. The beam shows today's lean. It is not a forecast.",
       verdictEyebrow: "Today's lean",
-      verdictFor: "Leaning for gold",
-      verdictAgainst: "Leaning against gold",
-      verdictBalanced: "Level: no lean either way",
+      verdictFor: "Conditions are for gold",
+      verdictAgainst: "Conditions are against gold",
+      verdictBalanced: "Conditions are balanced",
       verdictNoneWord: "Nothing could be read",
       sideFor: "For gold",
       sideAgainst: "Against gold",
-      countHint: "tap either box for the counted record",
       trayTitle: "Not leaning",
       trayNote: "weighed, but no clear lean",
-      honesty: "Each factor weighs equally. This is a picture of current conditions, not a forecast and not advice.",
       laneWord: {
         "borrowing-costs": "tight",
         dollar: "strong",
@@ -327,9 +335,7 @@ export const UI = {
       d30: "30-day",
     },
     bridge: {
-      eyebrow: "Regional chapter",
-      regionChip: "Regional market · Tehran",
-      title: "The gold market in Iran",
+      title: "Iran's gold and coin market",
       subtitle:
         "Tehran gold prices decomposed into global gold, the free-market dollar, and the local premium (حباب)؛ the domestic market's own surcharge over parity.",
       parity: "the parity arithmetic",
@@ -359,8 +365,7 @@ export const UI = {
       boardToman: "toman",
       boardParityOunce: "Global ounce {ounce} × free-market dollar {dollar} = {perOunce} toman per ounce",
       boardNoParity: "The premium needs both the global ounce and the free-market dollar; one leg is missing right now, the prices above are still the market's own quotes.",
-      boardSourceNote: "Source: the live rates snapshot (TGJU's own published values; may be revised)",
-      boardSnapshotNote: "Tehran snapshot {time}",
+      boardSnapshotNote: "Last updated {time}",
       boardUnavailable: "The Tehran board could not be read yet.",
       coinBuyer: {
         title: "Currency → Iranian coin converter",
@@ -430,10 +435,11 @@ export const UI = {
       millionWord: "million",
       decouplingTitle: "Down in the world, up in Iran",
       decouplingSubtitle:
-        "The years global gold fell while Iranian gold rose — the rial fell faster than the world's gold; the dollar's own rise is the cause.",
+        "The years global gold fell while Iranian gold rose — not because the dollar grew: it was the toman losing value against the dollar. The last column shows how many toman a dollar cost that year.",
       decouplingColGlobal: "Global gold",
       decouplingColIran: "Gold in Iran",
-      decouplingColDollar: "Dollar (the cause)",
+      decouplingColDollar: "Rial value (toman per USD)",
+      decouplingRialFall: "the rial {v} that year",
       decouplingEmpty:
         "No complete year yet where global gold fell while Iranian gold rose.",
       decompTitle: "What gold's Iran growth was made of",
@@ -446,11 +452,6 @@ export const UI = {
         "Of that growth, {r} was the rial's fall, {w} the world's gold, {p} the Tehran premium.",
       decompNote:
         "The three factors multiply exactly — gold's toman multiple = the dollar's multiple × the global-ounce multiple × the premium's change — so the shares split the total multiple's logarithm and add to 100%. The rial's fall is the inflation/currency leg: a weaker rial makes everything costlier in toman, gold included. The world's gold is gold's own natural, dollar-priced growth.",
-      syncTitle: "How in sync they moved",
-      syncBothUp: "In {n} of {m} years, both rose together.",
-      syncMax: "most in sync: {years}",
-      syncMin: "most divergent: {years}",
-      syncNote: "Rolling 5-year correlation of the two annual-return series.",
       premiumTitle: "The premium (حباب), the long arc",
       premiumNote: "geram18's market price over its parity, per year since 1392; the current value is the bridge board's own live computation above.",
       premiumNow: "now {v} over parity",
@@ -543,7 +544,7 @@ export const UI = {
     },
     ta: {
       eyebrow: "Reference levels",
-      title: "Technical analysis · the plain reading",
+      title: "Technical analysis of the gold price",
       subtitle:
         "Where the price sits against the market's own reference lines: the 200-day average, the classic pivots and the Fibonacci correction levels — in plain words, no jargon, and never a signal.",
       distancePlain: "Gold trades {pct} {dir} — the market is in its {side} stretch.",
@@ -852,19 +853,6 @@ export const UI = {
         "Currena's meter claims no forecasting edge, its own measured no-edge record sits above this card. This card exists to show what the professionals' published consensus actually did, never to imply ours predicts better.",
       sourceLine: "Source: LBMA forecast survey, the performance page's own chart data, extracted {date}.",
     },
-    takeaway: {
-      title: "Market Brief",
-      body:
-        "Gold is being pressured by high real yields, a rising dollar, and crowded long positioning; stress and monetary-hedge demand are the counterweights.",
-      /* The price-position line, composed live from the page's own
-         verdicts: the history echo (where the price has come back to),
-         the 200-day distance, and the YTD / 1-year windows. */
-      echo: "The price has returned to where it traded about {n} ago",
-      smaBelow: "sits {pct} below its 200-day average",
-      smaAbove: "sits {pct} above its 200-day average",
-      ytd: "{v} year-to-date",
-      year: "{v} over the past year",
-    },
     te: {
       title: "Trading Economics daily gold briefing",
       // The AI-translated corner badge (batch K): the literal Latin tag on
@@ -942,23 +930,32 @@ export const UI = {
       },
     },
     briefing: {
+      // مرور بازار ادغام‌شده (خواستهٔ مالک): جعبهٔ «مرور بازار» بالای صفحه
+      // به خودِ همین بخش پیوسته — عنوان، حکم، و بعد بندِ مرور، درست زیر عنوان.
       eyebrow: "مرور بازار",
-      headline: "طلا: شرایط علیه آن می‌چرخد",
-      assessment: "شرایط به‌اندازهٔ متوسط بر طلا فشار می‌آورد",
+      headline: "طلا: شرایط علیه آن است",
+      assessment: "فشار بر طلا متوسط است",
+      marketBody:
+        "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند.",
       chipMonths: "۱ تا ۳ ماه آینده",
-      chipMonthsLean: "علیه طلا می‌چرخد",
+      chipMonthsLean: "شرایط علیه طلاست",
       whyTitle: "فاکتورهای شاخص تاثیرگذار کنونی",
       evidence: "شواهد",
       howItWorks: "چگونه کار می‌کند",
       factorButton: "گشودن توضیح؛ {name}",
-      trendTitle: "روند طلا در همهٔ پنجره‌ها",
+      trendTitle: "عملکرد طلا در مقیاس‌های زمانی مختلف",
+      echo: "قیمت به حدود {n} پیشِ خودش بازگشته است",
+      smaBelow: "{pct} پایین‌تر از میانگین ۲۰۰ روزه‌اش ایستاده",
+      smaAbove: "{pct} بالاتر از میانگین ۲۰۰ روزه‌اش ایستاده",
+      ytd: "از ابتدای سال میلادی {v}",
+      year: "در یک سال گذشته {v}",
     },
     scenarios: {
       title: "سناریوهای تغییر قیمت",
       subtitle:
         "تصمیم‌های کلان اقتصادی جهان — که نهادهایی مانند وزارت خزانه‌داری آمریکا، بانک‌های مرکزی و نهادهای آماری راهبری‌شان می‌کنند — بر قیمت طلا اثر می‌گذارند. رویدادهای پیشِ‌رویی که می‌توانند بر قیمت اثر بگذارند در این بخش آمده‌اند؛ برخی تاریخِ مشخص و تکرارشونده دارند و برخی به‌صورت دوره‌ای یا مشروط ممکن است اتخاذ شوند.",
-      upLabel: "طلا بالا",
-      downLabel: "طلا پایین",
+      upLabel: "رشد طلا",
+      downLabel: "افت طلا",
       nextLabel: "بازسنجی بعدی",
       noSchedule: "بدون تاریخ تقویمی؛ بی‌اعلان می‌آید",
     },
@@ -968,16 +965,14 @@ export const UI = {
       subtitle:
         "پنج عامل اصلی مؤثر بر طلا هرکدام در برابر محدودهٔ معمولشان خوانده و با وزن برابر سنجیده می‌شوند. ترازو گرایش امروز را نشان می‌دهد و پیش‌بینی نیست.",
       verdictEyebrow: "گرایش امروز",
-      verdictFor: "تمایل به نفع طلا",
-      verdictAgainst: "تمایل به ضرر طلا",
-      verdictBalanced: "تراز؛ بی‌تمایل به هیچ سمت",
+      verdictFor: "شرایط به نفع طلاست",
+      verdictAgainst: "شرایط به ضرر طلاست",
+      verdictBalanced: "شرایط متعادل است",
       verdictNoneWord: "چیزی خوانده نشد",
       sideFor: "به نفع طلا",
       sideAgainst: "علیه طلا",
-      countHint: "برای دیدن شمارش، هر کادر را بزنید",
       trayTitle: "بدون گرایش",
       trayNote: "سنجیده شد، اما گرایش روشنی نیست",
-      honesty: "هر عامل وزن یکسانی دارد. این تصویری از شرایط فعلی است، نه پیش‌بینی و نه توصیه.",
       laneWord: {
         "borrowing-costs": "سخت",
         dollar: "قوی",
@@ -1077,9 +1072,7 @@ export const UI = {
       d30: "۳۰ روز",
     },
     bridge: {
-      eyebrow: "فصل منطقه‌ای",
-      regionChip: "بازار منطقه‌ای · تهران",
-      title: "بازار طلا در ایران",
+      title: "بازار طلا و سکه ایران",
       subtitle:
         "قیمت طلا در تهران به طلاجهانی، دلارِ آزاد و حبابِ محلی تجزیه می‌شود؛ مابه‌التفاوت بازار داخلی بر سمتِ برابری.",
       parity: "حساب برابری",
@@ -1109,8 +1102,7 @@ export const UI = {
       boardToman: "تومان",
       boardParityOunce: "اونس جهانی {ounce} دلار × دلار آزاد {dollar} تومان = {perOunce} تومان به‌ازای هر اونس",
       boardNoParity: "حباب به هم اونس جهانی و هم دلار آزاد نیاز دارد؛ الان یکی از پای‌ها نیست؛ قیمت‌های بالا همچنان نقل‌قول‌های خودِ بازارند.",
-      boardSourceNote: "منبع: اسنپ‌شات نرخ‌های زنده (ارقام منتشرشدهٔ TGJU؛ ممکن است بازبینی شوند)",
-      boardSnapshotNote: "اسنپ‌شات تهران {time}",
+      boardSnapshotNote: "آخرین بروزسانی {time}",
       boardUnavailable: "تختهٔ تهران هنوز خوانده نشد.",
       coinBuyer: {
         title: "مبدل ارز به سکهٔ ایران",
@@ -1179,10 +1171,11 @@ export const UI = {
       millionWord: "میلیون",
       decouplingTitle: "در جهان پایین، در ایران بالا",
       decouplingSubtitle:
-        "سال‌هایی که طلا در جهان پایین رفت ولی در ایران بالا — چون ریال سریع‌تر از طلای جهان سقوط کرد؛ صعود خودِ دلار، علت است.",
+        "سال‌هایی که طلا در جهان پایین رفت ولی در ایران بالا — نه چون دلار رشد کرده باشد؛ ریال بود که در برابر دلار آب شد. ستون آخر نشان می‌دهد آن سال هر دلار چند تومان می‌ارزید.",
       decouplingColGlobal: "طلا جهانی",
       decouplingColIran: "طلا در ایران",
-      decouplingColDollar: "دلار (علت)",
+      decouplingColDollar: "ارزش ریال (تومان بر دلار)",
+      decouplingRialFall: "ریال {v} در آن سال",
       decouplingEmpty:
         "هنوز سالِ کاملی نیست که طلا در جهان پایین و در ایران بالا رفته باشد.",
       decompTitle: "رشد طلای ایران از چه ساخته شده",
@@ -1195,11 +1188,6 @@ export const UI = {
         "از این رشد، {r} افت ریال بود، {w} رشد جهانی طلا و {p} حباب تهران.",
       decompNote:
         "این سه عامل دقیقاً در هم ضرب می‌شوند — ضریب تومانی طلا = ضریب دلار × ضریب اونس جهانی × تغییر حباب — پس سهم‌ها لگاریتم ضریب کل را تقسیم می‌کنند و جمعشان ۱۰۰٪ می‌شود. افت ریال همان پای تورم و پول ملی است: ریال ضعیف‌تر یعنی همه‌چیز در تومان گران‌تر، طلا هم همین‌طور؛ رشد جهانی طلا رشد طبیعیِ خودِ طلا به دلار است.",
-      syncTitle: "چقدر با هم هم‌حرکت بودند",
-      syncBothUp: "در {n} سال از {m}، هر دو با هم بالا رفتند.",
-      syncMax: "بیشترین هم‌حرکتی: {years}",
-      syncMin: "بیشترین واگرایی: {years}",
-      syncNote: "همبستگی غلتانِ ۵-سالهٔ دو سریِ بازدهٔ سالانه.",
       premiumTitle: "حباب، قوس بلند",
       premiumNote: "قیمت بازار گرم ۱۸ نسبت به برابری‌اش، سال‌به‌سال از ۱۳۹۲؛ مقدارِ الان، همان محاسبهٔ زندهٔ تختهٔ پلِ بالاست.",
       premiumNow: "الان {v} بالاتر از برابری",
@@ -1292,7 +1280,7 @@ export const UI = {
     },
     ta: {
       eyebrow: "سطوح مرجع",
-      title: "تحلیل تکنیکال · به زبان ساده",
+      title: "تحلیل تکنیکال قیمت طلا",
       subtitle:
         "قیمت کجای خط‌های مرجعِ خودِ بازار ایستاده: میانگین ۲۰۰ روزه، پیوت‌های کلاسیک و سطوح اصلاح فیبوناچی — با واژهٔ ساده، بدون ژارگون؛ و همیشه توصیف، نه سیگنال.",
       distancePlain: "طلا الان {pct} {dir} است — بازار در دورهٔ {side} خودش ایستاده.",
@@ -1594,19 +1582,6 @@ export const UI = {
         "مترِ کرنا هیچ لبهٔ پیش‌بینی‌ای ادعا نمی‌کند؛ سابقهٔ اندازه‌گیری‌شدهٔ «بی‌لبه»ی خودش بالای همین کارت است. این کارت برای نشان دادنِ آن است که اجماعِ منتشرشدهٔ حرفه‌ای‌ها واقعاً چه کرد، نه برای این‌که بگوید ما بهتر پیش‌بینی می‌کنیم.",
       sourceLine: "منبع: نظرسنجی پیش‌بینی LBMA؛ دادهٔ نمودار خودِ صفحهٔ عملکرد، استخراج‌شده در {date}.",
     },
-    takeaway: {
-      title: "مرور بازار",
-      body:
-        "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند.",
-      /* سطر جایگاه قیمت — از خودِ حکم‌های صفحه زنده ساخته می‌شود:
-         بازگشت به قیمتِ گذشته، فاصله از میانگین ۲۰۰ روزه و پنجره‌های
-         ابتدای سال و یک‌ساله. */
-      echo: "قیمت به حدود {n} پیشِ خودش بازگشته است",
-      smaBelow: "{pct} پایین‌تر از میانگین ۲۰۰ روزه‌اش ایستاده",
-      smaAbove: "{pct} بالاتر از میانگین ۲۰۰ روزه‌اش ایستاده",
-      ytd: "از ابتدای سال میلادی {v}",
-      year: "در یک سال گذشته {v}",
-    },
     te: {
       title: "خلاصهٔ روزانهٔ بازار طلا",
       // The AI-translated corner badge (batch K): the literal Latin tag —
@@ -1627,7 +1602,9 @@ export const UI = {
     },
     wgc: {
       title: "نگارش ماهانهٔ شورای جهانی طلا",
-      issueLabel: "مرور {month}",
+      // {jalali} carries the Persian-calendar twin of the reviewed month
+      // («مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)») — the card builds it in fa mode.
+      issueLabel: "مرور {month}{jalali}",
       // The AI-translated corner badge (batch K): the literal Latin tag —
       // the owner's own word for it — with the honest engine + date riding
       // the tooltip, replacing the old in-body «ترجمهٔ ماشینی» label.
