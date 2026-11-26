@@ -400,8 +400,7 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
       setStartMonth(now);
       setEndMonth((e) => (e === addMonths(startMonth, DEFAULT_YEARS * 12) ? addMonths(now, DEFAULT_YEARS * 12) : e));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [startMonth]);
   const [clamped, setClamped] = React.useState(false);
   const [howOpen, setHowOpen] = React.useState(false);
   const [groupOpen, setGroupOpen] = React.useState<Record<string, boolean>>({});
