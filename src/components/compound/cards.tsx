@@ -161,7 +161,7 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
      print CSS can hide everything else exactly like the digest sheet. */
   return ReactDOM.createPortal(
     <div
-      className="cw-print-overlay fixed inset-0 z-50 overflow-y-auto bg-[rgba(15,23,42,0.55)] backdrop-blur-sm"
+      className="cw-print-overlay fixed inset-0 z-[1100] overflow-y-auto bg-[rgba(15,23,42,0.55)] backdrop-blur-sm"
       dir={copy.dir}
       lang={locale}
       role="dialog"
@@ -435,7 +435,7 @@ export function PhoneCard({ copy, locale, result, plan, asset, months, startMont
 
   return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/70 backdrop-blur-sm"
       dir={copy.dir}
       lang={locale}
       role="dialog"

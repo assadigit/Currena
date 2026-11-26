@@ -1,0 +1,325 @@
+{
+  "base": "http://localhost:3100",
+  "checks": [
+    {
+      "id": "12-answer-on-arrival",
+      "pass": true,
+      "detail": "Investing A$100 a month for 20 years: you put in 24,000, and it could grow to about 50,800"
+    },
+    {
+      "id": "13-exact-controls",
+      "pass": true,
+      "detail": "30 interactive elements, all spec'd"
+    },
+    {
+      "id": "13b-salary-hidden-in-amount-mode",
+      "pass": true,
+      "detail": "{\"boxVisible\":false,\"linkVisible\":true}"
+    },
+    {
+      "id": "17-headline-honest",
+      "pass": true,
+      "detail": "range: If it goes worse: about 40,600. If it goes better: about 62,"
+    },
+    {
+      "id": "18-plain-language",
+      "pass": true,
+      "detail": "jargon: [], avg 9.8 words over 6 sentences"
+    },
+    {
+      "id": "15-two-tap-rule",
+      "pass": true,
+      "detail": "3 one-tap changes in 247ms"
+    },
+    {
+      "id": "16-groups-collapsed",
+      "pass": true,
+      "detail": "[\"group-about:0\",\"group-costs:0\",\"group-rates:0\",\"group-dates:0\"]"
+    },
+    {
+      "id": "21-no-storage",
+      "pass": true,
+      "detail": "{\"local\":[],\"cookies\":\"\"}"
+    },
+    {
+      "id": "21-no-data-network",
+      "pass": true,
+      "detail": "27 resources, all app assets"
+    },
+    {
+      "id": "14-390x844-one-screen",
+      "pass": true,
+      "detail": "chips bottom 743/844, scrollW 390, scrollY 28"
+    },
+    {
+      "id": "14-360x800-one-screen",
+      "pass": true,
+      "detail": "chips bottom 798/800, scrollW 360, scrollY 0"
+    },
+    {
+      "id": "14-430x932-one-screen",
+      "pass": true,
+      "detail": "chips bottom 771/932, scrollW 430, scrollY 0"
+    },
+    {
+      "id": "sticky-bar-appears",
+      "pass": true
+    },
+    {
+      "id": "22-a4-en-light",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1094B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-en-dark",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1094B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-en-light-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1080B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-en-dark-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1080B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-en-light-share",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1136B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-fa-light",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1261B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-fa-dark",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1261B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-fa-light-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1229B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-fa-dark-costs",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1229B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "22-a4-fa-dark-share",
+      "pass": true,
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1329B numbers=true salaryLeak=false"
+    },
+    {
+      "id": "23-phone-en-dark-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-dark-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-dark-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-light-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-light-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-light-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-dark-share-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-dark-share-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-en-dark-share-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-dark-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-dark-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-dark-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-light-360x800",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-light-390x844",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "23-phone-fa-light-430x932",
+      "pass": true,
+      "detail": "top=[] badBottom=[] minFont=10 overflow=false"
+    },
+    {
+      "id": "31a-switch-semantics",
+      "pass": true,
+      "detail": "{\"groupPresent\":true,\"radioCount\":2,\"ariaChecked\":[\"true\",\"false\"],\"liveAttr\":null}"
+    },
+    {
+      "id": "30a-empty-salary-no-empty-state",
+      "pass": true,
+      "detail": "live: Enter your salary to turn 3% into dollars.; headline unchanged: true"
+    },
+    {
+      "id": "25-live-line",
+      "pass": true,
+      "detail": "3% of A$90,000 a year = A$225 a month."
+    },
+    {
+      "id": "25-share-headline",
+      "pass": true,
+      "detail": "Investing 3% of your salary (A$225 a month, growing as your salary grows) for 20 years: yo"
+    },
+    {
+      "id": "25b-period-switch-same-money",
+      "pass": true,
+      "detail": "box=7500 live=3% of A$7,500 a month = A$225 a month."
+    },
+    {
+      "id": "31b-percent-sync",
+      "pass": true,
+      "detail": "plus→3.5 minus→2.5 chip3→3 active=true"
+    },
+    {
+      "id": "30b-percent-clamp",
+      "pass": true,
+      "detail": "box=50 note=That number is outside the allowed range, so we ke"
+    },
+    {
+      "id": "30c-bad-salary",
+      "pass": true,
+      "detail": "0→Enter your salary to turn 3% i letters→Enter your salary to turn 3% i"
+    },
+    {
+      "id": "29a-share-to-amount-keeps-place",
+      "pass": true,
+      "detail": "amount=225 line=That is 3.0% of your salary."
+    },
+    {
+      "id": "29b-amount-to-share-keeps-place",
+      "pass": true,
+      "detail": "percent=3"
+    },
+    {
+      "id": "27-share-equals-amount",
+      "pass": true,
+      "detail": "{\"share\":{\"tiles\":[\"54000\",\"60200\",\"114000\"],\"range\":\"91300140000\",\"milestones\":[\"250002034\",\"500002038\",\"1000002045\"],\"whatIf\":[\"135\",\"544200\",\"73800\"],\"putIn\":\"54,000,\",\"final\":\"\"},\"amount\":{\"tiles\":[\"54000\",\"60200\",\"1"
+    },
+    {
+      "id": "28-default-grow",
+      "pass": true,
+      "detail": "headline grow: true, note: In percent mode, your monthly amount gro, increase: 2.8"
+    },
+    {
+      "id": "32-small-changes-wording",
+      "pass": true,
+      "detail": "share: Investing 4% instead of 3% adds 47,000. Investing 2% instead | amount: Investing 23 more a month adds 11,700. Investing 23 less los"
+    },
+    {
+      "id": "33-no-1pct-more",
+      "pass": true,
+      "detail": "the old wording is gone"
+    },
+    {
+      "id": "34-cash-cost-noted",
+      "pass": true,
+      "detail": "How says cash pays no fund cost"
+    },
+    {
+      "id": "35-inflation-caption",
+      "pass": true,
+      "detail": "before: Today's money uses average inflation of 2.8% a year (last 20 after: Today's money uses average inflation of 5% a year (last 20 y"
+    },
+    {
+      "id": "35b-recent-inflation",
+      "pass": true,
+      "detail": "Latest 12-month inflation: 4.9% (ABS monthly CPI, October 2026 release, the 12 m"
+    },
+    {
+      "id": "37-index-names",
+      "pass": true,
+      "detail": "Australian shares: S&P/ASX All Ordinaries Total Return Index (dividends included)S&P 500: S&P 500 Total Return Index, in"
+    },
+    {
+      "id": "38-tile-currency",
+      "pass": true,
+      "detail": "AU: [\"YouputinA$20,400\",\"GrowthaddedA$22,700\",\"YoucouldhaveA$43,000\"] US: [\"Youputin$32,800\",\"Growthadded$66,000\",\"Youcouldhave$98,700\"]"
+    },
+    {
+      "id": "19a-direct-load",
+      "pass": true,
+      "detail": "{\"/tools\":200,\"/tools/compound-wealth\":200,\"/tools/unknown\":404,\"/\":200}"
+    },
+    {
+      "id": "19b-refresh",
+      "pass": true,
+      "detail": "Compound Wealth · Currena"
+    },
+    {
+      "id": "19c-gold-page-intact",
+      "pass": true
+    },
+    {
+      "id": "20-meta-tags",
+      "pass": true,
+      "detail": "{\"title\":\"Compound Wealth · Currena\",\"desc\":\"See what small, steady investing becomes. A quiet compound-growth tool: pick an amount, a few years and an asset, a"
+    },
+    {
+      "id": "20-nav-tools-link",
+      "pass": true
+    },
+    {
+      "id": "20-breadcrumb",
+      "pass": true
+    },
+    {
+      "id": "no-page-errors",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "total": 64,
+    "failed": 0
+  }
+}
