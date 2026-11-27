@@ -94,6 +94,36 @@ phase (additions only).
    the desk-of-record db byte-stable (it was restored to the checkpoint
    bytes after the first runs). Production (D1, no file watcher) is
    unaffected.
+9. (S3) NAV_SECTIONS chip placement: the four new chips sit immediately
+   before `gold-faq` (i.e. after `gold-calculator`) — inside the
+   prompt's "between gold-other and gold-faq" range and the closest
+   match to true page order, because the bands mount after
+   CalculatorBand AND after PhysicalBand while the pre-existing
+   `gold-other` chip already sits earlier in the row than its band (an
+   existing condition, untouched).
+10. (S3) The prompt's "2 import lines" read as "one import line per new
+    band, per the house style" (Phase 1's record used the same
+    per-band counting for its two bands) → 4 import lines for 4 bands;
+    the additive proof stays additions-only either way.
+11. (S3) The four-prices Tehran row hides entirely when the Iran layer
+    is off (the owner's layer law: no Iranian numbers for the
+    international reader) and one quiet line names the hidden fourth
+    price without any numbers — the section title stays honest in EN.
+12. (S3) The venues band's Tehran card renders for every reader: it is
+    static education with no live numbers (the FAQ's own EN answers
+    already name Tehran and the حباب the same way); the layer law
+    governs live Iranian data, not the world-map education that names
+    the fourth venue.
+13. (S3) The futures term calendar anchors on the front's own expiry
+    parsed from the feed's contract name ("Gold Dec 26"); if the feed
+    ever stops naming it, the calendar falls back to today's UTC date
+    walked to the nearest quarterly — every symbol that fails to quote
+    is dropped honestly.
+14. (S3) The record watch's "highest level" is the highest CLOSE in the
+    5-year stitched window (a close-basis record), while the futures
+    52-week high and the projection's peak carry their own bases
+    (intraday/daily-high) — the three numbers can differ by design and
+    each is labeled with its own basis and stamp, never blended.
 
 ## BLOCKED items
 
@@ -163,3 +193,86 @@ phase (additions only).
   TGJU per-indicator verified for tether_gold_xaut. NOT approved this
   round: Phase 2 (buying guide), why-hold-gold cards. Docs only again —
   no page code touched.
+
+- S3 (2026-11-27/28): ALL FOUR approved items shipped, one additive commit
+  each, per SESSION-3-PROMPT.md. Sources re-verified live at session start
+  (Yahoo chart GC=F "Gold Dec 26" $3,668.5 + spark GCG27…GCZ27 OK; TGJU
+  tether_gold_xaut $3,567.41 dated 2026-11-26 OK). Shipped:
+
+  - **A — the COMEX futures band** (`gold-futures`, commit d77ec000):
+    new `src/lib/gold-page/futures.ts` (chart + spark legs, the trend
+    layer's own fetch grammar, 90 s warm / 60 s fail TTL cache, honest
+    nulls, term symbols computed off the front's own expiry read from
+    the feed's contract name), new `/api/gold/futures` route (503 when
+    both legs fail), new `src/components/gold-page/futures.tsx` (front
+    card with contract name/price/day change/day range/volume/updated ·
+    delayed stamp/52-week line labeled COMEX; the basis row vs the hero
+    store spot with BOTH stamps + the carry why-line; the delivery
+    calendar table with $ vs front and the curve verdict chip
+    contango/flat/backwardation, all translated; the Globex open/closed
+    chip computed from the New York clock client-side; the plain-words
+    `<details>` with the #gold-positions cross-link; the Yahoo source
+    line), icon `gold-futures-paper-market.png`.
+  - **B1+B3 — "one metal, four prices" + the digital-gold card**
+    (`gold-four-prices`, commit 39c828d2): new
+    `/api/gold/digital-gold` route (TGJU tether_gold_xaut per-indicator
+    leg, house fx pattern, 5-min cache, 503 fail-closed, the row's OWN
+    date stamped), new `src/components/gold-page/four-prices.tsx` — one
+    table, four rows, each row its own source + stamp + one-line why:
+    the store spot (EODHD stamp), the COMEX front (Yahoo, delayed,
+    shared react-query key with the futures band — one fetch), the
+    Shanghai premium (the projection's own shanghai-gold-premium
+    reading, same as PhysicalBand), Tehran's Emami حباب (the SAME
+    coin-premium engine + rates snapshot the bridge board renders —
+    browser-verified identical: +5.4% on both); the Tehran row rides
+    the owner's Iran layer (hidden for the EN reader without the
+    toggle, one quiet naming line instead); the B3 card under the
+    table — PAXG/XAUt price + change + own date + gap vs store spot +
+    the not-an-endorsement caveat; icon `gold-one-metal-prices.png`.
+  - **B2 — the physical venues explainer** (`gold-venues`, commit
+    46971c5b): new `src/components/gold-page/venues.tsx` — four static
+    education cards (London OTC, COMEX New York, Shanghai SGE, Tehran
+    bazaar + union) with the house CountryFlag glyphs, each card
+    cross-linked to the section carrying its live numbers, the
+    takeaway line in the loud gold box, "last reviewed" stamped; no
+    data, no fetch; icon `gold-market-venues.png`.
+  - **"Gold in 30 seconds" + the ATH record watch**
+    (`gold-thirty-seconds`, commit 30d4c074): new
+    `src/components/gold-page/thirty-seconds.tsx` — four verdict rows
+    (day/week/month/1 year, up-down-sideways per the house 0.15% flat
+    band, house colors, EN "down 9%" / fa «۹٪ پایین‌تر» word orders,
+    each row's own source label) riding the SAME trend payload the
+    briefing table uses (passed from the page's own query — zero new
+    fetches); the record watch in the loud gold box — the highest
+    close in the 5-year window labeled exactly "the highest level in
+    our stored price history (from {date})" (never an unqualified
+    "all-time high") + the distance from it + the futures market's own
+    52-week high with its own stamp (shared futures cache); the
+    why-it-moved line quoting ONLY fetched numbers (trend windows +
+    the projection's gold-usd percentile/from-peak when loaded, else
+    the honest neutral sentence) + the #gold-briefing link; the
+    descriptive-never-advice disclaimer; icon
+    `gold-thirty-seconds.png`.
+
+  Verified per item before its commit (and once more across all four at
+  the end): `bun run lint` clean; browser EN + fa (full RTL), 375 px (no
+  horizontal overflow) + desktop 1280 px, light + dark modes; every nav
+  chip scrolls to its band (all 21 chips now); `<details>` open/close;
+  money in `<bdi dir>`; fa digits in fa; fail-closed proven live by
+  blocking each new route in the browser (futures, digital-gold, trend)
+  — every case renders its honest unavailable line, never a stuck
+  spinner; no console/page errors; `/api/gold/futures` and
+  `/api/gold/digital-gold` curl-verified with real numbers and stamps.
+  Icons: the S1 pack recipe rebuilt (v3 — gradient-background
+  flood-following removal, dark-shadow pass, P-mode per-entry tRNS like
+  the pack's own files, 250×250, 15–23 KB), every icon VLM-verified
+  against the pack on dark + light composites (the stopwatch needed
+  three regenerations + a saturation-core cut: the generator kept
+  baking ground shadows; final icon is clean on both backgrounds).
+  Additive proof: `git diff fb79cf61..HEAD` = 2,294 insertions, 0
+  deletions; page.tsx receives exactly 4 import lines, 4 chip lines, 4
+  mount lines (+ their comment blocks); every other file is new.
+  Sandbox note: the desk's dev server ran on the sandbox's one exposed
+  port (3000) per the S1 runbook (/tmp db copy + EODHD token); the
+  sandbox's own scaffold server was stopped for the session — no repo
+  change involved.
