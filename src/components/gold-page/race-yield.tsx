@@ -30,6 +30,7 @@ import { UI, type Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { fetchDollarTrend } from "@/components/gold-page/dollar-trend";
 import type { Fmt } from "@/components/gold-page/visuals";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 import {
   raceYield,
   raceYieldSeries,
@@ -342,11 +343,15 @@ export function RaceYieldBand({
       className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-bridge-accent)]/30 sm:mt-5 sm:p-5"
       aria-label={t.title}
     >
-      {/* the header */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-bridge-accent)]/12 text-[var(--color-bridge-accent)]" aria-hidden="true">
-          <ChevronDown className="h-4.5 w-4.5" aria-hidden="true" />
-        </span>
+      {/* the header — the pack render at the row's start (the second
+          pack, 2026-11-27): the owner's commissioned gold-vs-dollar
+          icon carries the «طلا یا دلار؟» identity in place of the
+          generic chevron badge (the badge was decorative, the method
+          toggle keeps its own chevron below), riding the batch-O
+          128px floor, the title + subtitle column beside it, RTL
+          flipping it to the start-side for free */}
+      <div className="flex flex-wrap items-center gap-3">
+        <PackIcon file="gold-dollar-comparison-iran-inflation-hedge.png" size={128} className="h-32 w-32" />
         <div className="min-w-0 flex-1">
           <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
           <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>

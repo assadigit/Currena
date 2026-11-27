@@ -667,7 +667,10 @@ function BalanceCard({ t, fmt, locale, balance }: { t: typeof UI.en; fmt: Return
   const lastTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   return (
     <section id="gold-balance" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="m-0 text-[1.25rem] font-extrabold leading-tight text-[var(--color-text-primary)]">{t.balance.title}</h2>
+      <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold leading-tight text-[var(--color-text-primary)]">
+        <PackIcon file="gold-forces-bearish-bullish-balance.png" size={128} className="h-32 w-32" />
+        {t.balance.title}
+      </h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.balance.subtitle}</p>
 
       <div className="mt-2">
@@ -1194,7 +1197,10 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
   const steps = [t.bridge.step1, t.bridge.step2, t.bridge.step3, t.bridge.step4, t.bridge.step5];
   return (
     <section id="gold-bridge" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-bridge-accent)]/30 sm:mt-5 sm:p-5">
-      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.bridge.title}</h2>
+      <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="iranian-gold-coin-market.png" size={128} className="h-32 w-32" />
+        {t.bridge.title}
+      </h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.bridge.subtitle}</p>
 
       {/* the live Tehran board — every instrument's market price beside its computed حباب premium */}
@@ -1468,17 +1474,28 @@ export default function GoldPage() {
             <span aria-current="page">{t.breadcrumb.current}</span>
           </nav>
 
-          {/* the gold identity — the coin BESIDE the name on one line
-              (the owner's batch-M ask: [logo][title], never stacked);
-              the heading carries the name, the coin never repeats it */}
+          {/* the gold identity — the master icon BESIDE the name on one
+              line (the owner's batch-M ask: [logo][title], never
+              stacked); the heading carries the name, the icon never
+              repeats it. The second pack's gold-bar.png render is the
+              master icon now (the owner's 2026-11-27 ask): the round
+              coin and its circular ring retired together — a wide bar
+              render would poke past a circle — so the master mark rides
+              the pack's own plain transparent treatment out of
+              public/icons/, at the 64px box that keeps the identity
+              row's proportions (the batch-O 128px floor is the section
+              icons' own law, not the identity mark's). */}
           <div className="mt-2 flex items-center gap-3">
-            <span
-              className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full"
-              style={{ boxShadow: "inset 0 0 0 2px color-mix(in srgb, var(--color-accent-gold) 42%, transparent)" }}
+            <img
+              src={`${deskBasePath}/icons/gold-bar.png`}
+              alt=""
+              width={64}
+              height={64}
+              className="h-16 w-16 shrink-0 object-contain"
+              loading="lazy"
+              decoding="async"
               aria-hidden="true"
-            >
-              <img src={`${deskBasePath}/gold-coin.png`} alt="" width={44} height={44} className="h-[44px] w-[44px] rounded-full object-cover" loading="lazy" decoding="async" />
-            </span>
+            />
             <h1 className="m-0 text-2xl font-extrabold leading-tight text-[var(--color-text-primary)] sm:text-[1.75rem]">{t.title}</h1>
           </div>
 

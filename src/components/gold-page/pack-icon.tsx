@@ -21,6 +21,29 @@
  *   gold-price-speculation-scenarios.png → the price-change scenarios
  *   gold-technical-analysis.png          → the technical analysis
  *
+ * The second pack (the owner's Tinified-secondpack upload, 2026-11-27):
+ *
+ *   gold-against-major-currencies.png   → the currency-grid card — the
+ *                                        ounce against every major
+ *                                        currency (with the toman)
+ *   gold-and-alternative-assets-performance.png → the comparison —
+ *                                        gold's return against the
+ *                                        alternatives, the graph band
+ *   gold-central-bank-demand-supply.png → the central-bank demand —
+ *                                        the buyers' and sellers' tables
+ *   gold-dollar-comparison-iran-inflation-hedge.png → «طلا یا دلار؟» —
+ *                                        the Iran yield question
+ *   gold-forces-bearish-bullish-balance.png → the brass balance — the
+ *                                        aggregate of the five forces
+ *   gold-wealth-calculator.png          → the gold calculator band
+ *   iranian-gold-coin-market.png        → Iran's gold and coin market —
+ *                                        the Tehran board section
+ *
+ * The pack's master icon, gold-bar.png, does NOT ride this component:
+ * it replaced the round coin as the page header's identity mark (the
+ * batch-M [logo][title] law), at the header row's own 64px box — the
+ * 128px floor below is the section icons' law, not the identity mark's.
+ *
  * More icons are incoming; every one of them rides this single
  * component, so the treatment stays uniform: a plain
  * transparent-background <img> at the size the row asks for,
