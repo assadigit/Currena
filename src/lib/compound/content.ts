@@ -92,6 +92,12 @@ export interface CompoundCopy {
       otherAssets: string;
       cashLine: string;
       summary: string; // screen-reader text with {putIn} {final} {years}
+      /** v9: the chart-layer filter row (the customizable graph). */
+      layersLabel: string; // the group's aria-label
+      putInShort: string; // chip: the put-in layer
+      totalShort: string; // chip: the total line
+      bandShort: string; // chip: the what-if band
+      othersCaption: string; // shown when a comparison line is visible
     };
     tiles: {
       youPutIn: string;
@@ -362,6 +368,12 @@ export const COPY: Record<Locale, CompoundCopy> = {
         cashLine: "Cash",
         summary:
           "Line chart. Over {years} years you put in {putIn} and the plan could reach about {final}, {today} in today's money. Growth first overtakes what you put in {crossover}.",
+        layersLabel: "Show on the chart",
+        putInShort: "Put in",
+        totalShort: "Total",
+        bandShort: "Range",
+        othersCaption:
+          "Other lines: the same plan at each asset's own average return.",
       },
       tiles: {
         youPutIn: "You put in",
@@ -619,6 +631,11 @@ export const COPY: Record<Locale, CompoundCopy> = {
         cashLine: "پول نقد",
         summary:
           "نمودار خطی. در {years} سال، {putIn} وارد می‌کنید و برنامه ممکن است به حدود {final} برسد، یعنی {today} به پول امروز. رشد برای نخستین‌بار {crossover} از پول واردشده جلو می‌زند.",
+        layersLabel: "نمایش در نمودار",
+        putInShort: "واردشده",
+        totalShort: "مجموع",
+        bandShort: "محدوده",
+        othersCaption: "خطوط دیگر: همین برنامه با میانگین بازدهٔ هر دارایی.",
       },
       tiles: {
         youPutIn: "واردشده",

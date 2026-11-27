@@ -72,7 +72,7 @@ import {
 } from "@/lib/compound/figures";
 import { COPY, type Locale } from "@/lib/compound/content";
 import { ToolsBreadcrumb, ToolsFooter, ToolsHeader, useSiteLocale } from "@/components/compound/chrome";
-import { GrowthChart, type OtherLine } from "@/components/compound/chart";
+import { GrowthChart, DASHES, type ChartVisible, type OtherLine } from "@/components/compound/chart";
 import { A4PrintCard, PhoneCard } from "@/components/compound/cards";
 import { MiniBars, ShareBar, type MiniBarRow } from "@/components/compound/bars";
 
@@ -298,6 +298,51 @@ function Chip({
   );
 }
 
+/** v9: one chart-layer filter chip. An aria-pressed toggle whose swatch
+ *  mirrors the layer's own stroke in the chart (line style + token), so
+ *  the row doubles as the chart's key. `disabled` is the never-empty
+ *  guard: the last drawn series cannot be switched off. */
+function FilterChip({
+  on,
+  disabled,
+  onClick,
+  swatch,
+  children,
+  dataCw,
+}: {
+  on: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+  swatch: { area?: boolean; dash?: string; color: string };
+  children: React.ReactNode;
+  dataCw?: string;
+}) {
+  const ink = on ? "#ffffff" : swatch.color;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={on}
+      data-cw={dataCw}
+      className={`inline-flex min-h-[28px] shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[11.5px] font-semibold transition-all active:scale-95 ${
+        on
+          ? "bg-[var(--color-currena-blue)] text-white shadow-sm"
+          : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+      } ${disabled ? "cursor-not-allowed opacity-80" : ""}`}
+    >
+      <svg width="14" height="5" viewBox="0 0 14 5" aria-hidden="true" className="shrink-0">
+        {swatch.area ? (
+          <rect x="0" y="0.5" width="14" height="4" rx="2" fill={ink} />
+        ) : (
+          <line x1="1" y1="2.5" x2="13" y2="2.5" stroke={ink} strokeWidth="2.4" strokeLinecap="round" strokeDasharray={swatch.dash} />
+        )}
+      </svg>
+      {children}
+    </button>
+  );
+}
+
 /** A collapsible group (the More options + How sections). */
 function Fold({
   title,
@@ -407,6 +452,11 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
   const [howOpen, setHowOpen] = React.useState(false);
   const [groupOpen, setGroupOpen] = React.useState<Record<string, boolean>>({});
   const [compareOpen, setCompareOpen] = React.useState(false);
+  /* v9: the chart's layer filters — which series are drawn. The four
+     core layers default ON (your plan); the comparison lines default OFF
+     (opt-in: S&P 500, gold, …). Pure UI state — reload resets it, and
+     nothing is ever stored. */
+  const [chartLayers, setChartLayers] = React.useState<Record<string, boolean>>({});
 
   /* The typed salary, interpreted in its period — 0, letters and empty
      all read as "no salary yet" (nothing is invented). */
@@ -464,7 +514,8 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
     [plan, cashFigures, months],
   );
 
-  /* The thin lines: the other chips + cash. */
+  /* The thin lines: the other chips + cash. All of them are computed
+     (toggling is instant); the v9 filter row decides which are drawn. */
   const otherLines: OtherLine[] = React.useMemo(() => {
     const out: OtherLine[] = [];
     let dash = 1;
@@ -473,6 +524,7 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
       if (chip.id === "cash") continue;
       const r = computeCompound(plan, figuresOf(chip), months);
       out.push({
+        id: chip.id,
         label: locale === "fa" ? chip.labelFa : chip.labelEn,
         series: r.series,
         dash: dash++,
@@ -482,10 +534,42 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
       const r = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months, {
         isCash: true,
       });
-      out.push({ label: t.chart.cashLine, series: r.series, cash: true });
+      out.push({ id: "cash", label: t.chart.cashLine, series: r.series, cash: true });
     }
     return out;
   }, [chips, asset.id, plan, months, cashFigures, locale, t.chart.cashLine]);
+
+  /* --- v9: the layer filters (the customizable graph) ---
+     Ids: putin / growth / total / band + one per comparison line. */
+  const layerDefault = (id: string) => id === "putin" || id === "growth" || id === "total" || id === "band";
+  const layerOn = (id: string) => chartLayers[id] ?? layerDefault(id);
+  const toggleLayer = (id: string) => setChartLayers((s) => ({ ...s, [id]: !(s[id] ?? layerDefault(id)) }));
+  const otherId = (o: OtherLine) => o.id ?? o.label;
+  /* The never-empty guard: at least one drawn series stays on — the last
+     one's chip is disabled. The band is a companion, never the last. */
+  const guardIds = ["putin", "growth", "total", ...otherLines.map(otherId)];
+  const drawnCount = guardIds.filter(layerOn).length;
+  const shownOtherLines = otherLines.filter((o) => layerOn(otherId(o)));
+  const chartVisible: ChartVisible = {
+    putIn: layerOn("putin"),
+    growth: layerOn("growth"),
+    total: layerOn("total"),
+    band: layerOn("band"),
+  };
+  const layerChips: Array<{ id: string; label: string; swatch: { area?: boolean; dash?: string; color: string } }> = [
+    { id: "putin", label: t.chart.putInShort, swatch: { color: "var(--color-text-tertiary)" } },
+    { id: "growth", label: t.chart.growthLabel, swatch: { area: true, color: "var(--color-accent-gold)" } },
+    { id: "total", label: t.chart.totalShort, swatch: { color: "var(--color-accent-gold-deep)" } },
+    { id: "band", label: t.chart.bandShort, swatch: { dash: "2 2", color: "var(--color-accent-gold-deep)" } },
+    ...otherLines.map((o) => ({
+      id: otherId(o),
+      label: o.label,
+      swatch: {
+        dash: o.cash ? "1 2" : DASHES[(o.dash ?? 1) % DASHES.length] || undefined,
+        color: "var(--color-currena-muted)",
+      },
+    })),
+  ];
 
   /* --- money formatting --- */
   const fmt = React.useCallback(
@@ -1036,11 +1120,12 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
             series={result.series}
             lowSeries={result.lowSeries}
             highSeries={result.highSeries}
-            others={otherLines}
+            others={shownOtherLines}
             milestones={pageMilestones}
             crossoverMonth={result.crossoverMonth}
             locale={locale}
             startYm={startMonth}
+            visible={chartVisible}
             summary={t.chart.summary
               .replace("{years}", formatMoney(years, locale, years % 1 === 0 ? 0 : 1))
               .replace("{putIn}", fmt(result.totalPutIn))
@@ -1053,8 +1138,8 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                   : t.chart.crossoverNever,
               )}
             labels={{
-              putIn: t.chart.putInLabel,
-              growth: t.chart.growthLabel,
+              putIn: t.chart.putInShort,
+              value: t.chart.totalShort,
               bandLow: t.chart.bandLowLabel,
               bandHigh: t.chart.bandHighLabel,
               crossover:
@@ -1064,6 +1149,37 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
             }}
             fmtValue={(v) => formatMoney(v, locale)}
           />
+          {/* v9: the layer filters — the customizable graph. Each chip is
+              an aria-pressed toggle whose swatch mirrors its series' own
+              stroke, so the row doubles as the chart's key. The last drawn
+              series cannot be switched off (never-empty guard). */}
+          <div
+            className="mt-2 flex flex-wrap items-center gap-1.5"
+            role="group"
+            aria-label={t.chart.layersLabel}
+            data-cw="chart-layers"
+          >
+            {layerChips.map((c) => (
+              <FilterChip
+                key={c.id}
+                on={layerOn(c.id)}
+                disabled={drawnCount === 1 && layerOn(c.id)}
+                onClick={() => toggleLayer(c.id)}
+                swatch={c.swatch}
+                dataCw={`chart-toggle-${c.id}`}
+              >
+                {c.label}
+              </FilterChip>
+            ))}
+          </div>
+          {shownOtherLines.length > 0 ? (
+            <p
+              className="mt-1.5 mb-0 text-[11px] leading-snug text-[var(--color-text-tertiary)]"
+              data-cw="chart-others-caption"
+            >
+              {t.chart.othersCaption}
+            </p>
+          ) : null}
           <p className="mt-1.5 mb-0 text-[11.5px] leading-snug text-[var(--color-text-tertiary)]" data-cw="measured-line">
             {measuredLine(asset, locale)}
           </p>

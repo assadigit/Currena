@@ -265,7 +265,7 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
               startYm={startMonth}
               labels={{
                 putIn: copy.tool.chart.putInLabel,
-                growth: copy.tool.chart.growthLabel,
+                value: copy.tool.chart.growthLabel,
                 bandLow: copy.tool.chart.bandLowLabel,
                 bandHigh: copy.tool.chart.bandHighLabel,
                 crossover:

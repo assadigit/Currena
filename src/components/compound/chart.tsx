@@ -18,6 +18,8 @@ import type { Locale } from "@/lib/compound/content";
 import type { Milestone, MonthPoint } from "@/lib/compound/maths";
 
 export interface OtherLine {
+  /** Stable id for the v9 layer toggles (e.g. "sp500", "cash"). */
+  id?: string;
   /** Short label written at the line's end. */
   label: string;
   /** Total value by month (future money). */
@@ -26,6 +28,16 @@ export interface OtherLine {
   dash?: number;
   /** Is this the cash line? (drawn dotted, calm) */
   cash?: boolean;
+}
+
+/** v9: which of the chart's own layers are drawn (the page variant's
+ * filter row). Unspecified means all — so the print and spark variants
+ * and every other caller keep today's look untouched. */
+export interface ChartVisible {
+  putIn: boolean;
+  growth: boolean;
+  total: boolean;
+  band: boolean;
 }
 
 export interface GrowthChartProps {
@@ -39,9 +51,14 @@ export interface GrowthChartProps {
   variant?: "page" | "print" | "spark";
   /** Screen-reader summary (already translated). */
   summary?: string;
+  /** v9: layer visibility (page variant only; defaults to all shown). */
+  visible?: ChartVisible;
   labels?: {
     putIn: string;
-    growth: string;
+    /** The value (total) line's end label. The page passes its "Total"
+     * wording so the label maps 1:1 to the v9 Total chip; the print
+     * card keeps the v6 "Growth" wording (no chips there). */
+    value: string;
     bandLow: string;
     bandHigh: string;
     crossover: string;
@@ -84,7 +101,9 @@ const TOKEN = {
   grid: "var(--color-border)",
 };
 
-const DASHES = ["", "5 3", "1 4", "7 4", "2 2"];
+/** The dash patterns (index 0 = solid). Exported so the v9 filter chips
+ *  can mirror each line's own pattern in their swatches. */
+export const DASHES = ["", "5 3", "1 4", "7 4", "2 2"];
 
 /** Reduce a series to at most ~200 points for a smooth path. */
 function stride<T>(arr: T[], max = 200): T[] {
@@ -126,11 +145,15 @@ export function GrowthChart({
   locale,
   variant = "page",
   summary,
+  visible,
   labels,
   fmtValue,
   startYm,
 }: GrowthChartProps & { startYm?: string }) {
   const p = variant === "print" || variant === "spark" ? INK : TOKEN;
+  /* v9: the layer filters. Unset (print, spark, older callers) = all on,
+   * so only the page variant can hide layers. */
+  const vis: ChartVisible = visible ?? { putIn: true, growth: true, total: true, band: true };
 
   /* The page variant measures its box and draws 1:1 (crisp text at
      every width); print and spark are fixed-size. */
@@ -204,9 +227,13 @@ export function GrowthChart({
     return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
   })();
 
+  /* v9: the y scale fits only what is drawn — hidden layers (and the
+     hidden comparison lines the caller already filtered out of `others`)
+     must not squash the visible ones. */
+  const planDrawn = vis.putIn || vis.growth || vis.total;
   const maxCandidate = Math.max(
-    series[series.length - 1].value,
-    ...(highSeries ? [highSeries[highSeries.length - 1].value] : []),
+    ...(planDrawn ? [series[series.length - 1].value] : []),
+    ...(vis.band && highSeries ? [highSeries[highSeries.length - 1].value] : []),
     ...(others.map((o) => o.series[o.series.length - 1]?.value ?? 0)),
   );
   const maxV = Math.max(maxCandidate * 1.06, 1);
@@ -257,17 +284,21 @@ export function GrowthChart({
     ticks.push({ m, label: yearLabel(locale, isoOfMonth(start, m)) });
   }
 
-  // Milestone markers (only the shown ones land here).
+  // Milestone markers (only the shown ones land here). The y is clamped
+  // into the plot: with v9's visible-only scale, a milestone of a hidden
+  // larger plan can sit above the top edge — it hugs the edge instead of
+  // vanishing (the value label still tells the number).
+  const yInPlot = (y: number) => Math.max(padT + 3, Math.min(padT + plotH, y));
   const milestoneMarks = milestones
     .map((ms) => {
       const at = series[ms.month - 1];
       if (!at) return null;
-      return { x: xOf(ms.month), y: yOf(at.value), label: fmtValue ? fmtValue(ms.threshold) : String(ms.threshold) };
+      return { x: xOf(ms.month), y: yInPlot(yOf(at.value)), label: fmtValue ? fmtValue(ms.threshold) : String(ms.threshold) };
     })
     .filter(Boolean) as Array<{ x: number; y: number; label: string }>;
 
   const crossX = crossoverMonth !== null ? xOf(crossoverMonth) : null;
-  const crossY = crossoverMonth !== null && series[crossoverMonth - 1] ? yOf(series[crossoverMonth - 1].putIn) : null;
+  const crossY = crossoverMonth !== null && series[crossoverMonth - 1] ? yInPlot(yOf(series[crossoverMonth - 1].putIn)) : null;
   // Keep the crossover label off the left edge.
   const crossLabelAnchor =
     crossX !== null && crossX < padL + plotW * 0.3 ? "start" : crossX !== null && crossX > padL + plotW * 0.86 ? "end" : "middle";
@@ -295,12 +326,14 @@ export function GrowthChart({
     });
     void idx;
   });
-  if (labels && lowSeries && highSeries && lowSeries.length > 1 && highSeries.length > 1) {
+  if (labels && vis.band && lowSeries && highSeries && lowSeries.length > 1 && highSeries.length > 1) {
     endLabels.push({ y: yOf(stride(highSeries).slice(-1)[0].value) - 7, text: labels.bandHigh, color: p.textMuted, size: 9.5, weight: 400 });
     endLabels.push({ y: yOf(stride(lowSeries).slice(-1)[0].value) + 7, text: labels.bandLow, color: p.textMuted, size: 9.5, weight: 400 });
   }
-  if (labels) {
-    endLabels.push({ y: yOf(pts[pts.length - 1].value), text: labels.growth, color: p.valueLine, size: 10.5, weight: 700 });
+  if (labels && (vis.growth || vis.total)) {
+    endLabels.push({ y: yOf(pts[pts.length - 1].value), text: labels.value, color: p.valueLine, size: 10.5, weight: 700 });
+  }
+  if (labels && vis.putIn) {
     endLabels.push({ y: yOf(pts[pts.length - 1].putIn), text: labels.putIn, color: p.textMuted, size: 10, weight: 600 });
   }
   endLabels.sort((a, b) => a.y - b.y);
@@ -340,9 +373,9 @@ export function GrowthChart({
           />
         ))}
 
-        {/* the what-if band */}
-        {bandPath ? <path d={bandPath} fill={p.bandFill} fillOpacity={0.12} /> : null}
-        {lowSeries && lowSeries.length > 1 ? (
+        {/* the what-if band (v9: hideable) */}
+        {vis.band && bandPath ? <path d={bandPath} fill={p.bandFill} fillOpacity={0.12} /> : null}
+        {vis.band && lowSeries && lowSeries.length > 1 ? (
           <path
             d={stride(lowSeries).map((s, i) => `${i === 0 ? "M" : "L"}${xi(i).toFixed(1)},${yOf(s.value).toFixed(1)}`).join("")}
             fill="none"
@@ -352,7 +385,7 @@ export function GrowthChart({
             opacity={0.7}
           />
         ) : null}
-        {highSeries && highSeries.length > 1 ? (
+        {vis.band && highSeries && highSeries.length > 1 ? (
           <path
             d={stride(highSeries).map((s, i) => `${i === 0 ? "M" : "L"}${xi(i).toFixed(1)},${yOf(s.value).toFixed(1)}`).join("")}
             fill="none"
@@ -383,11 +416,13 @@ export function GrowthChart({
           );
         })}
 
-        {/* the stacked areas */}
-        <path d={putArea} fill={p.putInFill} fillOpacity={0.16} />
-        <path d={growthArea} fill={p.growthFill} fillOpacity={0.22} />
-        <path d={putLinePath} fill="none" stroke={p.putInLine} strokeWidth={1.4} />
-        <path d={linePath} fill="none" stroke={p.valueLine} strokeWidth={2} strokeLinejoin="round" />
+        {/* the stacked areas (v9: each layer hideable; the geometry is
+            unchanged — the growth area keeps its own lower boundary so
+            toggling never reshapes the curves) */}
+        {vis.putIn ? <path d={putArea} fill={p.putInFill} fillOpacity={0.16} /> : null}
+        {vis.growth ? <path d={growthArea} fill={p.growthFill} fillOpacity={0.22} /> : null}
+        {vis.putIn ? <path d={putLinePath} fill="none" stroke={p.putInLine} strokeWidth={1.4} /> : null}
+        {vis.total ? <path d={linePath} fill="none" stroke={p.valueLine} strokeWidth={2} strokeLinejoin="round" /> : null}
 
         {/* every end label, collision-free */}
         {endLabels.map((l, i) => (

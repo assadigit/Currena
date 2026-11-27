@@ -81,6 +81,8 @@ async function main() {
     // W7: the percent-of-salary mini calculator lives inside the amount
     // group (the switch, the salary link/box, the percent box and chips).
     "mode-", "add-salary", "salary-", "percent-",
+    // v9: the chart's layer filter chips (the customizable graph).
+    "chart-toggle",
   ];
   const forbidden = controlInventory.filter(
     (c) => !allowedPrefixes.some((p) => c.cw.startsWith(p)),
@@ -752,6 +754,7 @@ async function main() {
     const allowed = [
       "country-", "amount-", "years-", "asset-", "more-options", "save-card", "money-", "card-menu",
       "later-", "how", "tools-link", "mode-", "add-salary", "salary-", "percent-",
+      "chart-toggle",
     ];
     return {
       unexpected: interactive.filter((c) => !c.insideBar && !allowed.some((p) => c.cw.startsWith(p))).length,
@@ -1099,6 +1102,269 @@ async function main() {
     storageAfterBars.local.length === 0 && storageAfterBars.cookies === "",
     JSON.stringify(storageAfterBars),
   );
+
+  /* ---------------------------------------------------------------- *
+   * v9 — the chart layer filters (the customizable graph)
+   * ---------------------------------------------------------------- */
+  // Return to the canonical default first: test 15 left Gold selected,
+  // and the comparison chip set follows the selected asset (the selected
+  // asset IS the plan; the others are the opt-in lines).
+  await page.click('[data-cw="asset-australian-shares"]');
+  await page.waitForTimeout(300);
+
+  // v9-1: the filter row exists with the honest defaults — the four
+  // core layers ON (your plan), every comparison line OFF (opt-in),
+  // nothing disabled.
+  const chartState = () =>
+    page.evaluate(() => {
+      const group = document.querySelector("[data-cw=chart-layers]");
+      const section = group?.closest("section") ?? null;
+      const svg = section?.querySelector("svg") ?? null;
+      const chips = [...(group?.querySelectorAll("button") ?? [])].map((c) => ({
+        cw: c.getAttribute("data-cw") ?? "",
+        label: (c.textContent ?? "").trim(),
+        pressed: c.getAttribute("aria-pressed"),
+        disabled: (c as HTMLButtonElement).disabled,
+      }));
+      return {
+        present: !!group,
+        role: group?.getAttribute("role") ?? "",
+        aria: group?.getAttribute("aria-label") ?? "",
+        chips,
+        paths: svg ? svg.querySelectorAll("path").length : -1,
+        svgTexts: svg ? [...svg.querySelectorAll("text")].map((t) => t.textContent ?? "") : [],
+        caption: document.querySelector("[data-cw=chart-others-caption]")?.textContent ?? null,
+        headline: document.querySelector("[data-cw=headline] p")?.textContent ?? "",
+        tiles: [...document.querySelectorAll('section[aria-label="You could have"] .grid > div')].map((d) => d.textContent ?? ""),
+        range: document.querySelector("[data-cw=range-line]")?.textContent ?? "",
+      };
+    });
+  const v9Start = await chartState();
+  const coreOn = ["putin", "growth", "total", "band"];
+  const comparisons = ["sp500", "world", "gold", "cash"];
+  check(
+    "v9-1-filters-defaults",
+    v9Start.present &&
+      v9Start.role === "group" &&
+      v9Start.aria === "Show on the chart" &&
+      v9Start.chips.length === 8 &&
+      coreOn.every((id) => v9Start.chips.find((c) => c.cw === `chart-toggle-${id}`)?.pressed === "true") &&
+      comparisons.every((id) => v9Start.chips.find((c) => c.cw === `chart-toggle-${id}`)?.pressed === "false") &&
+      v9Start.chips.every((c) => !c.disabled),
+    `${v9Start.chips.length} chips: ${v9Start.chips.map((c) => `${c.label}=${c.pressed}`).join(", ")}`,
+  );
+
+  // v9-2: the default chart is plan-only — no comparison end labels, no
+  // caption (the quiet default; the old look is one click away, v9-13).
+  // The two end labels read "Put in" and "Total" — each its chip's own
+  // word, so the key maps 1:1 (and the long v6 wording no longer grazes
+  // the right edge at 360–390px).
+  check(
+    "v9-2-default-plan-only",
+    v9Start.paths === 7 &&
+      !v9Start.svgTexts.some((t) => /S&P 500|World shares|Gold|Cash/.test(t)) &&
+      v9Start.svgTexts.some((t) => /^Put in$/.test(t)) &&
+      v9Start.svgTexts.some((t) => /^Total$/.test(t)) &&
+      v9Start.caption === null,
+    `paths ${v9Start.paths}, texts ${JSON.stringify(v9Start.svgTexts.slice(0, 6))}`,
+  );
+
+  // v9-3: the owner's example view — only "your current money vs
+  // future potential money": growth and range off, put-in area + total
+  // line remain (three paths exactly). The value line's end label reads
+  // "Total" — mapping 1:1 to its chip (the v9 label fix).
+  await page.click('[data-cw="chart-toggle-growth"]');
+  await page.click('[data-cw="chart-toggle-band"]');
+  const exampleView = await chartState();
+  check(
+    "v9-3-owner-example-view",
+    exampleView.paths === 3 &&
+      exampleView.svgTexts.some((t) => /^Put in$/.test(t)) &&
+      exampleView.svgTexts.some((t) => /^Total$/.test(t)) &&
+      !exampleView.svgTexts.some((t) => /worse|better/.test(t)),
+    `paths ${exampleView.paths}, texts ${JSON.stringify(exampleView.svgTexts.slice(0, 5))}`,
+  );
+
+  // v9-4: the comparison lines are opt-in — S&P 500 and Gold draw as
+  // dashed lines with their end labels and the one-line caption.
+  await page.click('[data-cw="chart-toggle-sp500"]');
+  await page.click('[data-cw="chart-toggle-gold"]');
+  const benchView = await chartState();
+  check(
+    "v9-4-benchmarks-opt-in",
+    benchView.paths === 5 &&
+      benchView.svgTexts.some((t) => t === "S&P 500") &&
+      benchView.svgTexts.some((t) => t === "Gold") &&
+      /same plan at each asset's own average return/.test(benchView.caption ?? ""),
+    `paths ${benchView.paths}, caption "${benchView.caption}"`,
+  );
+
+  // v9-5: the filters change only the drawing — every number on the
+  // page is invariant through all the toggling.
+  // (checked again after v9-6/v9-7 against v9Start)
+
+  // v9-6: the never-empty guard — with every other series off, the last
+  // one's chip is disabled while still pressed.
+  await page.click('[data-cw="chart-toggle-putin"]');
+  await page.click('[data-cw="chart-toggle-sp500"]');
+  await page.click('[data-cw="chart-toggle-gold"]');
+  const guardView = await chartState();
+  const totalChip = guardView.chips.find((c) => c.cw === "chart-toggle-total");
+  check(
+    "v9-6-never-empty-guard",
+    guardView.paths === 1 &&
+      totalChip?.pressed === "true" &&
+      totalChip?.disabled === true &&
+      guardView.chips.filter((c) => c.pressed === "true").length === 1,
+    `paths ${guardView.paths}, total chip pressed=${totalChip?.pressed} disabled=${totalChip?.disabled}`,
+  );
+
+  // v9-7: the guard releases as soon as a second series returns.
+  await page.click('[data-cw="chart-toggle-putin"]');
+  const released = await chartState();
+  check(
+    "v9-7-guard-releases",
+    released.chips.find((c) => c.cw === "chart-toggle-total")?.disabled === false &&
+      released.paths === 3,
+    `paths ${released.paths}`,
+  );
+
+  // v9-5 (the invariance verdict, after all of the above).
+  const invariant =
+    released.headline === v9Start.headline &&
+    JSON.stringify(released.tiles) === JSON.stringify(v9Start.tiles) &&
+    released.range === v9Start.range;
+  check(
+    "v9-5-numbers-invariant",
+    invariant,
+    invariant ? "headline, tiles and range identical through every toggle" : "a number moved",
+  );
+
+  // v9-8: every chip carries the toggle semantics (button + aria-pressed;
+  // the group is named) — the label-in-name rule by construction.
+  check(
+    "v9-8-toggle-semantics",
+    v9Start.chips.every((c) => c.label.length > 0) &&
+      (await page.evaluate(() =>
+        [...document.querySelectorAll("[data-cw=chart-layers] button")].every(
+          (c) => c.tagName === "BUTTON" && c.getAttribute("aria-pressed") !== null,
+        ),
+      )),
+    "all chips are aria-pressed buttons inside the named group",
+  );
+
+  // v9-9: fa/RTL — the group and chip labels in Persian, the caption in
+  // Persian, and a toggle still works in fa.
+  await page.click('header button:has-text("فا")');
+  await page.waitForTimeout(500);
+  const faLayers = await page.evaluate(() => {
+    const group = document.querySelector("[data-cw=chart-layers]");
+    return {
+      aria: group?.getAttribute("aria-label") ?? "",
+      labels: [...(group?.querySelectorAll("button") ?? [])].map((c) => (c.textContent ?? "").trim()),
+      caption: document.querySelector("[data-cw=chart-others-caption]")?.textContent ?? null,
+      dir: getComputedStyle(group ?? document.body).direction,
+    };
+  });
+  const beforeFaToggle = await page.getAttribute('[data-cw="chart-toggle-growth"]', "aria-pressed");
+  await page.click('[data-cw="chart-toggle-growth"]');
+  const faToggled = await page.getAttribute('[data-cw="chart-toggle-growth"]', "aria-pressed");
+  await page.click('[data-cw="chart-toggle-growth"]'); // back where it was
+  check(
+    "v9-9-fa-rtl-layers",
+    faLayers.aria === "نمایش در نمودار" &&
+      faLayers.labels.includes("واردشده") &&
+      faLayers.labels.includes("مجموع") &&
+      faLayers.labels.includes("اس‌اند‌پی ۵۰۰") &&
+      faLayers.labels.includes("طلا") &&
+      faLayers.dir === "rtl" &&
+      beforeFaToggle === "false" &&
+      faToggled === "true" &&
+      (faLayers.caption === null || /میانگین بازده/.test(faLayers.caption)),
+    `aria "${faLayers.aria}", dir ${faLayers.dir}, toggle ${beforeFaToggle}→${faToggled}, labels ${JSON.stringify(faLayers.labels)}`,
+  );
+  await page.click('header button:has-text("EN")');
+  await page.waitForTimeout(400);
+
+  // v9-10: the row wraps at 360px — no sideways scroll, the row stays
+  // compact (at most ~3 chip rows inside the card).
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.waitForTimeout(400);
+  const mobileRow = await page.evaluate(() => {
+    const row = document.querySelector("[data-cw=chart-layers]") as HTMLElement | null;
+    const r = row?.getBoundingClientRect();
+    return {
+      h: r ? Math.round(r.height) : -1,
+      w: r ? Math.round(r.width) : -1,
+      scrollW: document.documentElement.scrollWidth,
+    };
+  });
+  await page.screenshot({ path: `${OUT}/v9-mobile360-layers.png` });
+  check(
+    "v9-10-mobile-360-wraps",
+    mobileRow.scrollW <= 360 && mobileRow.h > 0 && mobileRow.h <= 115 && mobileRow.w <= 336,
+    `row ${mobileRow.w}x${mobileRow.h}, scrollW ${mobileRow.scrollW}`,
+  );
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.waitForTimeout(300);
+
+  // v9-11: the chips reuse the page's own chip colour pairs (the asset
+  // chips' own AA-verified combination), in light and dark.
+  for (const scheme of ["light", "dark"] as const) {
+    await page.evaluate((s) => {
+      document.documentElement.classList.toggle("dark", s === "dark");
+    }, scheme);
+    await page.waitForTimeout(250);
+    const chipColours = await page.evaluate(() => {
+      const on = document.querySelector('[data-cw="chart-toggle-total"]') as HTMLElement | null;
+      const off = document.querySelector('[data-cw="chart-toggle-gold"]') as HTMLElement | null;
+      const activeAsset = document.querySelector('[data-cw="asset-australian-shares"]') as HTMLElement | null;
+      const inactiveAsset = document.querySelector('[data-cw="asset-gold"]') as HTMLElement | null;
+      const cs = (el: HTMLElement | null) => (el ? { color: getComputedStyle(el).color, bg: getComputedStyle(el).backgroundColor } : null);
+      return { on: cs(on), off: cs(off), asset: cs(activeAsset), offAsset: cs(inactiveAsset) };
+    });
+    check(
+      `v9-11-${scheme}-chip-tokens`,
+      chipColours.on !== null &&
+        chipColours.off !== null &&
+        chipColours.on.color === chipColours.asset?.color &&
+        chipColours.on.bg === chipColours.asset?.bg &&
+        chipColours.off.color === chipColours.offAsset?.color &&
+        chipColours.off.bg === chipColours.offAsset?.bg,
+      `${scheme}: on ${chipColours.on?.color} on ${chipColours.on?.bg} === the asset chips' own pair (off ${chipColours.off?.color} on ${chipColours.off?.bg})`,
+    );
+  }
+  await page.evaluate(() => document.documentElement.classList.remove("dark"));
+
+  // v9-12: store-nothing after all the layer toggling.
+  const storageAfterLayers = await page.evaluate(() => ({
+    local: Object.keys(window.localStorage),
+    cookies: document.cookie,
+  }));
+  check(
+    "v9-12-no-storage-after-layers",
+    storageAfterLayers.local.length === 0 && storageAfterLayers.cookies === "",
+    JSON.stringify(storageAfterLayers),
+  );
+
+  // v9-13: the pre-v9 look is one click-set away — everything on
+  // redraws all four comparison lines (the recorded v8 default).
+  for (const id of [...coreOn, ...comparisons]) {
+    const on = await page.getAttribute(`[data-cw="chart-toggle-${id}"]`, "aria-pressed");
+    if (on !== "true") await page.click(`[data-cw="chart-toggle-${id}"]`);
+  }
+  const allOn = await chartState();
+  check(
+    "v9-13-all-on-restores-v8-look",
+    allOn.paths === 11 &&
+      ["S&P 500", "World shares", "Gold", "Cash"].every((name) => allOn.svgTexts.includes(name)),
+    `paths ${allOn.paths}, comparison labels ${JSON.stringify(allOn.svgTexts.filter((t) => ["S&P 500", "World shares", "Gold", "Cash"].includes(t)))}`,
+  );
+  // Leave the page in its honest default for any later checks.
+  for (const id of comparisons) {
+    const on = await page.getAttribute(`[data-cw="chart-toggle-${id}"]`, "aria-pressed");
+    if (on === "true") await page.click(`[data-cw="chart-toggle-${id}"]`);
+  }
 
   /* ---------------------------------------------------------------- *
    * Routing (test 19) — via a fresh context
