@@ -275,24 +275,41 @@ export function SiteHeader({
               </button>
             </li>
             <li className="relative">
-              <button
-                type="button"
-                aria-haspopup="true"
-                aria-expanded={menuOpen}
-                onClick={toggleMenu}
-                className={NAV_DROPDOWN + (active === "tools" ? " " + NAV_ACTIVE : "")}
+              {/* W6 (spec §3): the header "Tools" item is a real link to
+                  /tools. The ▾ caret stays its own button so the site's
+                  side drawer keeps working from the header exactly as
+                  before. The link shares the pill's own styling. */}
+              <span
+                className={
+                  "inline-flex items-center gap-0.5 " + NAV_LINK + " " +
+                  (active === "tools" ? NAV_ACTIVE : NAV_IDLE)
+                }
               >
-                {t.tools}
-                <span
-                  aria-hidden="true"
+                <a
+                  href="/tools"
                   className={
-                    "ms-0.5 inline-block text-[0.6rem] transition-transform duration-200 " +
-                    (menuOpen ? "rotate-180" : "")
+                    "border-0 bg-transparent " +
+                    (active === "tools" ? "text-[var(--color-currena-blue)]" : "text-inherit")
                   }
                 >
-                  ▾
-                </span>
-              </button>
+                  {t.tools}
+                </a>
+                <button
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
+                  aria-label={`${t.tools} ${locale === "en" ? "menu" : "منو"}`}
+                  onClick={toggleMenu}
+                  className="inline-block border-0 bg-transparent text-[0.6rem] text-[var(--color-currena-muted)] transition-transform duration-200"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={"inline-block " + (menuOpen ? "rotate-180" : "")}
+                  >
+                    ▾
+                  </span>
+                </button>
+              </span>
             </li>
           </ul>
         </nav>

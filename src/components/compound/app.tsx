@@ -24,6 +24,9 @@ import {
   INFLATION_MAX,
   INFLATION_MIN,
   MILESTONES_ON_PAGE,
+  PERCENT_CHIPS,
+  PERCENT_STEP,
+  SALARY_PERIOD_DEFAULT,
   SHARE_DEFAULT,
   SHARE_MAX,
   SHARE_MIN,
@@ -41,14 +44,19 @@ import {
   computeCompound,
   figuresAreStale,
   formatMoney,
+  monthlyAmountFrom,
+  monthlySalaryFrom,
   monthsBetween,
+  shareFromAmount,
   thisMonth,
   whatIfCash,
   whatIfLaterStart,
   whatIfSmallChange,
+  yearsOfSalary,
   type Country,
   type PlanInput,
   type RateMode,
+  type SalaryPeriod,
 } from "@/lib/compound/maths";
 import {
   COUNTRY_ROWS,
@@ -58,6 +66,7 @@ import {
   cashRow,
   defaultInflation,
   figuresOf,
+  latestInflation,
   measuredLine,
 } from "@/lib/compound/figures";
 import { COPY, type Locale } from "@/lib/compound/content";
@@ -116,6 +125,19 @@ function isoOfMonth(startYm: string, m: number): string {
 }
 
 const pctSign = (locale: Locale) => (locale === "fa" ? "٪" : "%");
+
+/** A percent always with one decimal ("3.0" / «۳٫۰») — the way the
+ *  salary live line speaks it (spec §5.1.1: "That is 2.0%…"). */
+function pct1(v: number, locale: Locale): string {
+  try {
+    return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(v * 100);
+  } catch {
+    return (v * 100).toFixed(1);
+  }
+}
 
 /** A labelled number box that survives typing (the house pattern). */
 function NumberField({
@@ -177,6 +199,68 @@ function NumberField({
         </span>
       ) : null}
     </span>
+  );
+}
+
+/** W7: the salary box — a free-text money field that may stay empty
+ *  (the placeholder shows an example, never a prefilled value), with the
+ *  small per year | per month switch. The parent owns the text; every
+ *  keystroke updates the live line and the plan. */
+function SalaryBox({
+  value,
+  onChange,
+  locale,
+  placeholder,
+  label,
+  period,
+  onPeriod,
+  perYear,
+  salaryPerMonth,
+  salaryPeriodLabel,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  locale: Locale;
+  placeholder: string;
+  label: string;
+  period: SalaryPeriod;
+  onPeriod: (p: SalaryPeriod) => void;
+  perYear: string;
+  salaryPerMonth: string;
+  salaryPeriodLabel: string;
+}) {
+  const handle = (raw: string) => {
+    const norm = normalizeDigits(raw).replace(/[^\d.]/g, "");
+    onChange(norm);
+  };
+  return (
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-currena-bg-light)] px-2.5 py-2" data-cw="salary-box">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+        <label htmlFor="cw-salary" className="text-[12px] font-bold text-[var(--color-text-secondary)]">
+          {label}
+        </label>
+        <span className="flex items-center gap-1" role="group" aria-label={salaryPeriodLabel} data-cw="salary-period">
+          <Chip active={period === "year"} onClick={() => onPeriod("year")} dataCw="salary-period-year">
+            {perYear}
+          </Chip>
+          <Chip active={period === "month"} onClick={() => onPeriod("month")} dataCw="salary-period-month">
+            {salaryPerMonth}
+          </Chip>
+        </span>
+      </div>
+      <input
+        id="cw-salary"
+        inputMode="decimal"
+        type="text"
+        dir="ltr"
+        value={locale === "fa" ? toFaDigits(value) : value}
+        placeholder={placeholder}
+        onChange={(e) => handle(e.target.value)}
+        aria-label={label}
+        data-cw="salary-input"
+        className="mt-1.5 h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-start text-[14.5px] font-bold tabular-nums text-[var(--color-text-primary)] outline-none ring-[var(--color-ring)] transition-shadow placeholder:font-normal placeholder:text-[var(--color-text-tertiary)] focus-visible:ring-2"
+      />
+    </div>
   );
 }
 
@@ -265,7 +349,7 @@ function FieldRow({ label, hint, children }: { label: string; hint?: string; chi
  * The page                                                            *
  * =================================================================== */
 
-export default function CompoundWealthApp() {
+export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: string }) {
   const [locale, toggleLang] = useSiteLocale();
   const copy = COPY[locale];
   const t = copy.tool;
@@ -281,10 +365,18 @@ export default function CompoundWealthApp() {
   const [printOpen, setPrintOpen] = React.useState(false);
   const [phoneOpen, setPhoneOpen] = React.useState(false);
 
-  // More options
+  // W7: the percent-of-salary mini calculator, inside the amount group.
+  const [amountMode, setAmountMode] = React.useState<"amount" | "share">("amount");
   const [salaryText, setSalaryText] = React.useState("");
-  const [useShare, setUseShare] = React.useState(false);
+  const [salaryPeriod, setSalaryPeriod] = React.useState<SalaryPeriod>(SALARY_PERIOD_DEFAULT);
+  const [salaryOpen, setSalaryOpen] = React.useState(false); // Amount mode's link
   const [share, setShare] = React.useState(SHARE_DEFAULT);
+  const [pctNote, setPctNote] = React.useState(false); // the one plain clamp message
+  /** W7: has the user set the yearly increase by hand? A hand-set value
+   *  (including an explicit 0) is never replaced by a mode default. */
+  const [increaseTouched, setIncreaseTouched] = React.useState(false);
+
+  // More options
   const [ageText, setAgeText] = React.useState("");
   const [startingText, setStartingText] = React.useState("0");
   const [yearlyCost, setYearlyCost] = React.useState(DEFAULT_YEARLY_COST);
@@ -297,14 +389,29 @@ export default function CompoundWealthApp() {
   const [inflation, setInflation] = React.useState(() => defaultInflation(DEFAULT_COUNTRY));
   const [increase, setIncrease] = React.useState(0);
   const [whatIfPts, setWhatIfPts] = React.useState(WHAT_IF_POINTS);
-  const [startMonth, setStartMonth] = React.useState(thisMonth());
-  const [endMonth, setEndMonth] = React.useState(() => addMonths(thisMonth(), DEFAULT_YEARS * 12));
+  const [startMonth, setStartMonth] = React.useState(() => ssrStartMonth ?? thisMonth());
+  const [endMonth, setEndMonth] = React.useState(() => addMonths(ssrStartMonth ?? thisMonth(), DEFAULT_YEARS * 12));
+  /* If the month rolled between the server render and this hydration
+     (a seconds-wide window at a UTC month boundary), quietly correct the
+     plan's month to the reader's own — never a hydration mismatch. */
+  React.useEffect(() => {
+    const now = thisMonth();
+    if (now !== startMonth) {
+      setStartMonth(now);
+      setEndMonth((e) => (e === addMonths(startMonth, DEFAULT_YEARS * 12) ? addMonths(now, DEFAULT_YEARS * 12) : e));
+    }
+  }, [startMonth]);
   const [clamped, setClamped] = React.useState(false);
   const [howOpen, setHowOpen] = React.useState(false);
   const [groupOpen, setGroupOpen] = React.useState<Record<string, boolean>>({});
   const [compareOpen, setCompareOpen] = React.useState(false);
 
-  const salary = salaryText === "" ? null : Number(normalizeDigits(salaryText)) || null;
+  /* The typed salary, interpreted in its period — 0, letters and empty
+     all read as "no salary yet" (nothing is invented). */
+  const parsedSalary = salaryText === "" ? null : Number(normalizeDigits(salaryText));
+  const salaryNumber =
+    parsedSalary !== null && Number.isFinite(parsedSalary) && parsedSalary > 0 ? parsedSalary : null;
+  const salaryMonthly = salaryNumber !== null ? monthlySalaryFrom(salaryNumber, salaryPeriod) : null;
   const age = ageText === "" ? null : Number(normalizeDigits(ageText)) || null;
   const startingAmount = Number(normalizeDigits(startingText)) || 0;
   const fee = Number(normalizeDigits(feeText)) || 0;
@@ -325,9 +432,9 @@ export default function CompoundWealthApp() {
   const plan: PlanInput = React.useMemo(
     () => ({
       monthly: amount,
-      salary,
+      salary: salaryMonthly,
       share,
-      useShare,
+      useShare: amountMode === "share",
       age,
       startingAmount,
       yearlyIncrease: increase,
@@ -341,7 +448,7 @@ export default function CompoundWealthApp() {
       inflation,
       whatIfPoints: whatIfPts,
     }),
-    [amount, salary, share, useShare, age, startingAmount, increase, yearlyCost, fee, every, rateMode, customRate, customLow, customHigh, inflation, whatIfPts],
+    [amount, salaryMonthly, share, amountMode, age, startingAmount, increase, yearlyCost, fee, every, rateMode, customRate, customLow, customHigh, inflation, whatIfPts],
   );
 
   const figures = figuresOf(asset);
@@ -370,7 +477,9 @@ export default function CompoundWealthApp() {
       });
     }
     if (cashFigures) {
-      const r = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months);
+      const r = computeCompound({ ...plan, rateMode: "average" }, cashFigures, months, {
+        isCash: true,
+      });
       out.push({ label: t.chart.cashLine, series: r.series, cash: true });
     }
     return out;
@@ -383,7 +492,19 @@ export default function CompoundWealthApp() {
   );
   const currencyWord = locale === "fa" ? rows.currencyFa : "";
   const currencySymbol = rows.currencyEn;
-  const amountLabel = locale === "fa" ? `${formatMoney(amount, locale)} ${currencyWord}`.trim() : `${currencySymbol}${formatMoney(amount, locale)}`;
+  /** A money label the way the headline speaks it (A$100 / ۱۰۰ دلار استرالیا). */
+  const moneyLabel = React.useCallback(
+    (v: number) =>
+      locale === "fa"
+        ? `${formatMoney(Math.round(v), locale)} ${currencyWord}`.trim()
+        : `${currencySymbol}${formatMoney(Math.round(v), locale)}`,
+    [locale, currencyWord, currencySymbol],
+  );
+  const amountLabel = moneyLabel(amount);
+  /** The monthly amount the plan invests (share mode with a salary: the
+   *  salary × percent, at full precision — rounded only for display). */
+  const investedMonthly =
+    amountMode === "share" && salaryMonthly !== null ? monthlyAmountFrom(salaryMonthly, share) : amount;
 
   const shownFinal = moneyView === "today" ? result.finalValueToday : result.finalValue;
   const shownPutIn = moneyView === "today" ? result.totalPutInToday : result.totalPutIn;
@@ -393,9 +514,14 @@ export default function CompoundWealthApp() {
 
   /* --- the headline sentences --- */
   const headline = React.useMemo(() => {
-    const lead = useShare && salary !== null
-      ? t.shareHeadline
+    /* Share mode with a live salary names the percentage and the amount
+     * (§5.1.1); until then the amount headline stands (no empty state). */
+    const shareModeLive = amountMode === "share" && salaryMonthly !== null;
+    const lead = shareModeLive
+      ? t.shareHeadlineLead
           .replace("{share}", `${formatPctLocal(share, locale)}${pctSign(locale)}`)
+          .replace("{amount}", moneyLabel(monthlyAmountFrom(salaryMonthly!, share)))
+          .replace("{grow}", increase > 0 ? t.shareHeadlineGrow : "")
           .replace("{years}", formatMoney(years, locale, years % 1 === 0 ? 0 : 1))
       : t.headlineParts.lead
           .replace("{amount}", amountLabel)
@@ -406,7 +532,7 @@ export default function CompoundWealthApp() {
     return locale === "fa"
       ? `${lead} ${putIn} ${growTo} ${today}.`
       : `${lead} ${putIn}, ${growTo} ${today}.`;
-  }, [useShare, salary, t, share, locale, years, amountLabel, fmt, result.totalPutIn, result.finalValue, result.finalValueToday]);
+  }, [amountMode, salaryMonthly, t, share, locale, years, amountLabel, fmt, result.totalPutIn, result.finalValue, result.finalValueToday, increase, moneyLabel]);
 
   /* --- country switch resets the country-flavoured state --- */
   const switchCountry = (next: Country) => {
@@ -414,7 +540,10 @@ export default function CompoundWealthApp() {
     setCountry(next);
     setAssetId(COUNTRY_ROWS[next].defaultAsset);
     setInflation(defaultInflation(next));
-    setIncrease(0);
+    // The percent mode's default increase follows the new country's
+    // inflation average (§5.1.1); Amount mode stays at 0%.
+    setIncrease(amountMode === "share" ? defaultInflation(next) : 0);
+    setIncreaseTouched(false);
   };
 
   /* --- the money-view switch also updates document.title's locale --- */
@@ -463,10 +592,72 @@ export default function CompoundWealthApp() {
 
   const stale = figuresAreStale(FIGURES_CHECKED_ON);
 
-  /* --- share mode flip carries the default increase rule --- */
-  const flipShare = (on: boolean) => {
-    setUseShare(on);
-    setIncrease(on ? inflation : 0);
+  /* --- W3: the latest 12-month inflation for the honesty line --- */
+  const latestInfl = React.useMemo(() => latestInflation(country), [country]);
+
+  /* --- W7: the mode switch keeps your place (§5.1.1) ---
+   *
+   * Amount → % (salary known): the percent = amount ÷ monthly salary,
+   * rounded to 0.1. % → Amount (salary known): the amount = the computed
+   * monthly amount, rounded to a whole number. Without a salary nothing
+   * is invented: each mode keeps its own state.
+   * The yearly increase follows the mode's default (the country inflation
+   * average in % mode, 0% in Amount mode) — but only once a salary is
+   * actually live, so entering % mode without a salary never changes the
+   * results (§5.1.1: "the results keep showing the last amount used").
+   */
+  const switchAmountMode = (mode: "amount" | "share") => {
+    if (mode === amountMode) return;
+    if (mode === "share") {
+      if (salaryMonthly !== null && salaryMonthly > 0) {
+        const pct = shareFromAmount(amount, salaryMonthly) * 100;
+        setShare(clamp(Math.round(pct * 10) / 10 / 100, SHARE_MIN, SHARE_MAX, SHARE_DEFAULT));
+        setIncrease(inflation);
+      }
+      setAmountMode("share");
+      setSalaryOpen(true); // % mode always shows the salary box
+      setIncreaseTouched(false); // the mode's own default, not a user edit
+    } else {
+      setAmountMode("amount");
+      setIncrease(0);
+      setIncreaseTouched(false);
+    }
+  };
+
+  /* While share mode is live, the amount state mirrors the computed
+     monthly amount — so if the salary disappears the plan keeps the last
+     amount actually used (§5.1.1), and % → Amount keeps the place. */
+  React.useEffect(() => {
+    if (amountMode === "share" && salaryMonthly !== null && salaryMonthly > 0) {
+      const mirror = Math.max(1, Math.round(monthlyAmountFrom(salaryMonthly, share)));
+      if (mirror !== amount) setAmount(mirror);
+    }
+  }, [amountMode, salaryMonthly, share, amount]);
+
+  /* The % mode's default increase arrives with the salary: when share
+     mode is live, the increase is still at the amount-mode default (0)
+     and the user has never set it by hand, the country inflation average
+     becomes the default (§5.1.1). A hand-set value is never stomped. */
+  React.useEffect(() => {
+    if (
+      amountMode === "share" &&
+      salaryMonthly !== null &&
+      salaryMonthly > 0 &&
+      !increaseTouched &&
+      increase === 0
+    ) {
+      setIncrease(inflation);
+    }
+  }, [amountMode, salaryMonthly, increaseTouched, increase, inflation]);
+
+  /* --- the salary period switch keeps the same money (§5.1.1) --- */
+  const switchSalaryPeriod = (period: SalaryPeriod) => {
+    if (period === salaryPeriod) return;
+    setSalaryPeriod(period);
+    if (salaryNumber !== null) {
+      const converted = period === "month" ? salaryNumber / 12 : salaryNumber * 12;
+      setSalaryText(String(Math.max(0, Math.round(converted))));
+    }
   };
 
   return (
@@ -486,7 +677,7 @@ export default function CompoundWealthApp() {
             {t.countries.US}
           </Chip>
         </div>
-        <header className="mt-1.5 mb-2">
+        <header className="mt-1.5 mb-1.5">
           <h1 className="text-[1.5rem] font-extrabold leading-tight tracking-tight text-[var(--color-text-primary)] lg:text-[1.8rem]">
             {t.title}
           </h1>
@@ -494,12 +685,12 @@ export default function CompoundWealthApp() {
         </header>
 
         {/* 2 — the headline answer */}
-        <div ref={headlineRef} data-cw="headline" className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 py-3 shadow-[var(--cr-shadow-card)]">
+        <div ref={headlineRef} data-cw="headline" className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3.5 py-2.5 shadow-[var(--cr-shadow-card)]">
           <p className="m-0 text-[1.05rem] font-bold leading-[1.6] text-[var(--color-text-primary)] sm:text-[1.2rem]">
             {headline}
           </p>
           {result.band ? (
-            <p className="mt-1.5 mb-0 text-[12.5px] leading-relaxed text-[var(--color-text-secondary)]" data-cw="range-line">
+            <p className="mt-1 mb-0 text-[12.5px] leading-relaxed text-[var(--color-text-secondary)]" data-cw="range-line">
               {t.rangeWorse.replace("{x}", fmt(result.lowFinal ?? result.finalValue))}{" "}
               {t.rangeBetter.replace("{x}", fmt(result.highFinal ?? result.finalValue))}
             </p>
@@ -518,52 +709,230 @@ export default function CompoundWealthApp() {
         </div>
 
         {/* 3 — the three controls */}
-        <section aria-label={t.controls.investIn} className="mt-2 space-y-2" data-cw="controls">
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5">
+        <section aria-label={t.controls.investIn} className="mt-1 space-y-1.5" data-cw="controls">
+          {/* The amount group — with the W7 percent-of-salary mini calculator
+              inside it (the switch is part of this group, not a fourth). */}
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2" data-cw="amount-group">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <label htmlFor="cw-amount" className="type-label text-[var(--color-text-primary)]">
+              <label htmlFor={amountMode === "share" ? "cw-percent" : "cw-amount"} className="type-label text-[var(--color-text-primary)]">
                 {t.controls.perMonth}
               </label>
-              <div className="flex items-center gap-1.5">
+              {/* The Amount | % of salary switch — a real two-option control
+                  (radio semantics, keyboard-usable). */}
+              <span
+                role="radiogroup"
+                aria-label={t.controls.amountSwitchLabel}
+                data-cw="amount-mode-switch"
+                className="flex items-center gap-0.5 rounded-full bg-[var(--color-currena-bg-light)] p-0.5 ring-1 ring-[var(--color-border)]"
+              >
                 <button
                   type="button"
-                  onClick={() => setAmount((a) => Math.max(1, a - 10))}
-                  aria-label={t.controls.decrease}
-                  data-cw="amount-minus"
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  role="radio"
+                  aria-checked={amountMode === "amount"}
+                  onClick={() => switchAmountMode("amount")}
+                  data-cw="mode-amount"
+                  className={`min-h-[28px] rounded-full px-2.5 text-[11.5px] font-bold transition-all ${
+                    amountMode === "amount"
+                      ? "bg-[var(--color-currena-blue)] text-white shadow-sm"
+                      : "text-[var(--color-text-secondary)]"
+                  }`}
                 >
-                  −
+                  {t.controls.switchAmount}
                 </button>
-                <NumberField
-                  id="cw-amount"
-                  value={amount}
-                  onCommit={(v) => setAmount(Math.max(1, Math.round(v)))}
-                  locale={locale}
-                  suffix={currencySymbol}
-                  ariaLabel={t.controls.perMonth}
-                  dataCw="amount-input"
-                />
                 <button
                   type="button"
-                  onClick={() => setAmount((a) => a + 10)}
-                  aria-label={t.controls.increase}
-                  data-cw="amount-plus"
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  role="radio"
+                  aria-checked={amountMode === "share"}
+                  onClick={() => switchAmountMode("share")}
+                  data-cw="mode-share"
+                  className={`min-h-[28px] rounded-full px-2.5 text-[11.5px] font-bold transition-all ${
+                    amountMode === "share"
+                      ? "bg-[var(--color-currena-blue)] text-white shadow-sm"
+                      : "text-[var(--color-text-secondary)]"
+                  }`}
                 >
-                  +
+                  {t.controls.switchShare}
                 </button>
-              </div>
+              </span>
             </div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              {AMOUNT_CHIPS.map((c) => (
-                <Chip key={c} active={amount === c} onClick={() => setAmount(c)} dataCw={`amount-${c}`}>
-                  {formatMoney(c, locale)}
-                </Chip>
-              ))}
-            </div>
+
+            {amountMode === "amount" ? (
+              <>
+                <div className="mt-1 flex flex-wrap items-center justify-end gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setAmount((a) => Math.max(1, a - 10))}
+                    aria-label={t.controls.decrease}
+                    data-cw="amount-minus"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  >
+                    −
+                  </button>
+                  <NumberField
+                    id="cw-amount"
+                    value={amount}
+                    onCommit={(v) => setAmount(Math.max(1, Math.round(v)))}
+                    locale={locale}
+                    suffix={currencySymbol}
+                    ariaLabel={t.controls.perMonth}
+                    dataCw="amount-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setAmount((a) => a + 10)}
+                    aria-label={t.controls.increase}
+                    data-cw="amount-plus"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  {AMOUNT_CHIPS.map((c) => (
+                    <Chip key={c} active={amount === c} onClick={() => setAmount(c)} dataCw={`amount-${c}`}>
+                      {formatMoney(c, locale)}
+                    </Chip>
+                  ))}
+                  {/* The optional salary link — the same salary box used
+                      everywhere (W7). It rides the chips row so the three
+                      control groups still fit one small phone screen. */}
+                  {!salaryOpen ? (
+                    <button
+                      type="button"
+                      onClick={() => setSalaryOpen(true)}
+                      data-cw="add-salary"
+                      className="ms-auto text-[11px] font-semibold leading-none text-[var(--color-currena-blue-deep)] hover:underline"
+                    >
+                      + {t.controls.addSalary}
+                    </button>
+                  ) : null}
+                </div>
+                {salaryOpen ? (
+                  <div className="mt-2 space-y-1.5">
+                    <SalaryBox
+                      value={salaryText}
+                      onChange={setSalaryText}
+                      locale={locale}
+                      placeholder={t.controls.salaryPlaceholder}
+                      label={t.controls.salaryLabel}
+                      period={salaryPeriod}
+                      onPeriod={switchSalaryPeriod}
+                      perYear={t.controls.perYear}
+                      salaryPerMonth={t.controls.salaryPerMonth}
+                      salaryPeriodLabel={t.controls.salaryPeriodLabel}
+                    />
+                  </div>
+                ) : null}
+                {/* The live line: "That is 3.0% of your salary." (one
+                    decimal, as the spec writes it). */}
+                {salaryOpen && salaryMonthly !== null && salaryMonthly > 0 ? (
+                  <p className="mt-1 mb-0 text-[11.5px] font-semibold text-[var(--color-text-secondary)]" aria-live="polite" data-cw="amount-salary-line">
+                    {t.controls.thatIs.replace("{p}", pct1(amount / salaryMonthly, locale))}
+                  </p>
+                ) : null}
+              </>
+            ) : (
+              <>
+                <div className="mt-1 flex flex-wrap items-center justify-end gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = Math.round((share * 100 - PERCENT_STEP) * 10) / 10;
+                      setShare(clamp(next / 100, SHARE_MIN, SHARE_MAX, SHARE_DEFAULT));
+                      setPctNote(false);
+                    }}
+                    aria-label={t.controls.decrease}
+                    data-cw="percent-minus"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  >
+                    −
+                  </button>
+                  <NumberField
+                    id="cw-percent"
+                    value={Math.round(share * 1000) / 10}
+                    onCommit={(v) => {
+                      const clamped = clamp(v, SHARE_MIN * 100, SHARE_MAX * 100, SHARE_DEFAULT * 100);
+                      setPctNote(clamped !== v);
+                      setShare(clamped / 100);
+                    }}
+                    locale={locale}
+                    suffix={pctSign(locale)}
+                    ariaLabel={t.controls.percentLabel}
+                    decimals
+                    dataCw="percent-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = Math.round((share * 100 + PERCENT_STEP) * 10) / 10;
+                      setShare(clamp(next / 100, SHARE_MIN, SHARE_MAX, SHARE_DEFAULT));
+                      setPctNote(false);
+                    }}
+                    aria-label={t.controls.increase}
+                    data-cw="percent-plus"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-currena-soft)] text-lg font-extrabold text-[var(--color-currena-blue-deep)] ring-1 ring-[var(--color-border)] transition-transform active:scale-90"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  {PERCENT_CHIPS.map((c) => (
+                    <Chip
+                      key={c}
+                      active={Math.round(share * 1000) / 10 === c}
+                      onClick={() => {
+                        setShare(c / 100);
+                        setPctNote(false);
+                      }}
+                      dataCw={`percent-${c}`}
+                    >
+                      {formatMoney(c, locale)}{pctSign(locale)}
+                    </Chip>
+                  ))}
+                </div>
+                {/* The salary box — always visible in % mode (the same box
+                    used everywhere, W7). */}
+                <div className="mt-2 space-y-1.5">
+                  <SalaryBox
+                    value={salaryText}
+                    onChange={setSalaryText}
+                    locale={locale}
+                    placeholder={t.controls.salaryPlaceholder}
+                    label={t.controls.salaryLabel}
+                    period={salaryPeriod}
+                    onPeriod={switchSalaryPeriod}
+                    perYear={t.controls.perYear}
+                    salaryPerMonth={t.controls.salaryPerMonth}
+                    salaryPeriodLabel={t.controls.salaryPeriodLabel}
+                  />
+                  <p className="m-0 text-[11px] leading-snug text-[var(--color-text-tertiary)]">{t.controls.salaryHint}</p>
+                </div>
+                {/* The live result line — always visible, announced politely. */}
+                <p
+                  className="mt-1.5 mb-0 rounded-xl bg-[var(--color-currena-soft)] px-3 py-2 text-[12.5px] font-bold text-[var(--color-currena-blue-deep)]"
+                  aria-live="polite"
+                  data-cw="share-live-line"
+                >
+                  {salaryMonthly !== null && salaryMonthly > 0
+                    ? t.controls.liveLine
+                        .replace("{p}", formatPctLocal(share, locale))
+                        .replace("{salary}", moneyLabel(salaryNumber!))
+                        .replace("{period}", locale === "fa"
+                          ? (salaryPeriod === "year" ? t.controls.perYear : t.controls.salaryPerMonth)
+                          : (salaryPeriod === "year" ? "a year" : "a month"))
+                        .replace("{amount}", moneyLabel(monthlyAmountFrom(salaryMonthly, share)))
+                    : t.controls.enterSalary.replace("{p}", formatPctLocal(share, locale))}
+                </p>
+                {pctNote ? (
+                  <p className="mt-1 mb-0 text-[11px] font-semibold text-[var(--color-chip-ink-attention)]" data-cw="percent-note">
+                    {t.errors.clampMessage}
+                  </p>
+                ) : null}
+              </>
+            )}
           </div>
 
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <label htmlFor="cw-years" className="type-label text-[var(--color-text-primary)]">
                 {t.controls.forHowManyYears}
@@ -581,7 +950,7 @@ export default function CompoundWealthApp() {
                 />
               </div>
             </div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
               {YEAR_CHIPS.map((c) => (
                 <Chip key={c} active={yearsChipsActive(c)} onClick={() => setYears(c)} dataCw={`years-${c}`}>
                   {formatMoney(c, locale)}
@@ -590,9 +959,9 @@ export default function CompoundWealthApp() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2">
             <span className="type-label text-[var(--color-text-primary)]">{t.controls.investIn}</span>
-            <div className="mt-1.5 flex flex-wrap gap-1.5" role="group" aria-label={t.controls.investIn} data-cw="asset-chips">
+            <div className="mt-1 flex flex-wrap gap-1.5" role="group" aria-label={t.controls.investIn} data-cw="asset-chips">
               {chips.map((chip) => (
                 <Chip
                   key={chip.id}
@@ -651,7 +1020,7 @@ export default function CompoundWealthApp() {
           ) : null}
         </section>
 
-        {/* 5 — the three tiles */}
+        {/* 5 — the three tiles (each with the currency symbol, W6) */}
         <section className="mt-3" aria-label={t.tiles.youCouldHave}>
           <div className="grid grid-cols-3 gap-2">
             {[
@@ -671,16 +1040,37 @@ export default function CompoundWealthApp() {
                   {tile.label}
                 </div>
                 <div
-                  className={`mt-1 text-[clamp(1.05rem,4.6vw,1.5rem)] font-extrabold tabular-nums leading-tight ${
+                  className={`mt-1 flex flex-wrap items-baseline gap-x-1 tabular-nums leading-tight ${
                     tile.tone === "gold" ? "text-[var(--color-accent-gold-deep)]" : "text-[var(--color-text-primary)]"
                   }`}
-                  dir="ltr"
                 >
-                  {fmt(tile.value)}
+                  {/* W6: the currency symbol sits with the number (A$/ $),
+                      exactly like the headline; Farsi keeps its own word
+                      convention (the number, then the currency word). */}
+                  <span
+                    className={locale === "en" ? "text-[clamp(0.8rem,3.4vw,1.05rem)] font-bold" : "hidden"}
+                    dir="ltr"
+                    aria-hidden={locale === "fa"}
+                  >
+                    {currencySymbol}
+                  </span>
+                  <span className="text-[clamp(1.05rem,4.6vw,1.5rem)] font-extrabold" dir="ltr">
+                    {fmt(tile.value)}
+                  </span>
+                  {locale === "fa" ? (
+                    <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{currencyWord}</span>
+                  ) : null}
                 </div>
               </div>
             ))}
           </div>
+          {/* W3: the inflation caption appears whenever today's money is shown,
+              and follows the editable inflation setting. */}
+          {moneyView === "today" ? (
+            <p className="mt-1.5 mb-0 text-[11.5px] leading-snug text-[var(--color-text-tertiary)]" data-cw="inflation-caption">
+              {t.tiles.inflationCaption.replace("{x}", formatPctLocal(inflation, locale))}
+            </p>
+          ) : null}
           <div className="mt-1.5 flex items-center justify-end gap-1" data-cw="money-toggle">
             <Chip active={moneyView === "future"} onClick={() => setMoneyView("future")} dataCw="money-future">
               {t.tiles.futureMoney}
@@ -770,14 +1160,51 @@ export default function CompoundWealthApp() {
           <h2 className="type-kicker mb-2 text-[var(--color-text-tertiary)]">{t.whatIf.title}</h2>
           <div className="grid gap-2 sm:grid-cols-2">
             {small ? (
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5" data-cw="small-changes">
                 <div className="text-[12px] font-bold text-[var(--color-text-tertiary)]">{t.whatIf.smallChanges}</div>
                 <p className="mt-1 mb-0 text-[13.5px] leading-relaxed text-[var(--color-text-primary)]">
-                  {t.whatIf.more.replace("{x}", fmt(small.more))} {t.whatIf.less.replace("{x}", fmt(small.less))}
+                  {/* W1: money terms in Amount mode, percentage points in %
+                      mode — never "1% more" for a 10%-of-the-amount change. */}
+                  {small.describedAs === "salary" && small.pctNow !== null ? (
+                    <>
+                      {!small.hideMore && small.pctUp !== null
+                        ? t.whatIf.morePct
+                            .replace("{up}", formatPctLocal(small.pctUp, locale))
+                            .replace("{now}", formatPctLocal(small.pctNow, locale))
+                            .replace("{x}", fmt(small.more))
+                        : ""}
+                      {!small.hideMore && !small.hideLess && small.pctDown !== null ? " " : ""}
+                      {!small.hideLess && small.pctDown !== null
+                        ? t.whatIf.lessPct
+                            .replace("{down}", formatPctLocal(small.pctDown, locale))
+                            .replace("{now}", formatPctLocal(small.pctNow, locale))
+                            .replace("{x}", fmt(small.less))
+                        : ""}
+                    </>
+                  ) : (
+                    <>
+                      {!small.hideMore && small.moneyStep !== null
+                        ? t.whatIf.moreMoney
+                            .replace("{step}", formatMoney(small.moneyStep, locale))
+                            .replace("{x}", fmt(small.more))
+                        : ""}
+                      {!small.hideMore && !small.hideLess && small.moneyStep !== null ? " " : ""}
+                      {!small.hideLess && small.moneyStep !== null
+                        ? t.whatIf.lessMoney
+                            .replace("{step}", formatMoney(small.moneyStep, locale))
+                            .replace("{x}", fmt(small.less))
+                        : ""}
+                    </>
+                  )}
                 </p>
-                <p className="mt-1 mb-0 text-[11px] text-[var(--color-text-tertiary)]">
-                  {small.describedAs === "salary" ? t.whatIf.smallChangesSalary : t.whatIf.smallChangesAmount}
-                </p>
+                {small.describedAs === "amount" &&
+                small.stepShareOfSalary !== null &&
+                small.moneyStep !== null &&
+                !small.hideMore ? (
+                  <p className="mt-1 mb-0 text-[11px] text-[var(--color-text-tertiary)]" data-cw="small-salary-suffix">
+                    {t.whatIf.salarySuffix.replace("{p}", formatPctLocal(small.stepShareOfSalary, locale))}
+                  </p>
+                ) : null}
               </div>
             ) : null}
             <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
@@ -845,49 +1272,18 @@ export default function CompoundWealthApp() {
               onToggle={() => setGroupOpen((g) => ({ ...g, about: !g.about }))}
               dataCw="group-about"
             >
-              <FieldRow label={t.moreOptions.salaryLabel} hint={t.moreOptions.salaryHint}>
-                <NumberField
-                  id="cw-salary"
-                  value={salary ?? 0}
-                  onCommit={(v) => setSalaryText(v > 0 ? String(v) : "")}
-                  locale={locale}
-                  suffix={currencySymbol}
-                  ariaLabel={t.moreOptions.salaryLabel}
-                />
-              </FieldRow>
-              {salary !== null && salary > 0 ? (
-                <FieldRow label={t.moreOptions.useShare}>
-                  <span className="flex items-center gap-1" data-cw="share-mode">
-                    <Chip active={useShare} onClick={() => flipShare(true)}>
-                      {locale === "en" ? "On" : "روشن"}
-                    </Chip>
-                    <Chip active={!useShare} onClick={() => flipShare(false)}>
-                      {locale === "en" ? "Off" : "خاموش"}
-                    </Chip>
-                  </span>
-                </FieldRow>
+              {/* W7: the salary lives in the amount group (§5.3), not here.
+                  This note states the % mode's one-line assumption. */}
+              {amountMode === "share" ? (
+                <p className="m-0 rounded-xl bg-[var(--color-currena-soft)] px-3 py-2 text-[11.5px] leading-relaxed text-[var(--color-text-secondary)]" data-cw="share-grow-note">
+                  {t.moreOptions.shareGrowNote}
+                </p>
               ) : null}
-              {useShare && salary !== null ? (
-                <FieldRow label={t.moreOptions.shareLabel}>
-                  <span className="flex items-center gap-1.5">
-                    <NumberField
-                      id="cw-share"
-                      value={Math.round(share * 1000) / 10}
-                      onCommit={(v) => setShare(clamp(v / 100, SHARE_MIN, SHARE_MAX, SHARE_DEFAULT))}
-                      locale={locale}
-                      suffix={pctSign(locale)}
-                      decimals
-                      ariaLabel={t.moreOptions.shareLabel}
-                      clampRange={[SHARE_MIN * 100, SHARE_MAX * 100, SHARE_DEFAULT * 100]}
-                    />
-                  </span>
-                </FieldRow>
-              ) : null}
-              {salary !== null && salary > 0 ? (
-                <p className="m-0 text-[11.5px] text-[var(--color-text-tertiary)]">
+              {salaryMonthly !== null && salaryMonthly > 0 ? (
+                <p className="m-0 text-[11.5px] text-[var(--color-text-tertiary)]" data-cw="years-of-salary">
                   {t.moreOptions.yearsOfSalary.replace(
                     "{n}",
-                    formatMoney(result.finalValue / (salary * 12), locale, 1),
+                    formatMoney(yearsOfSalary(result.finalValueToday, salaryMonthly), locale, 1),
                   )}
                 </p>
               ) : null}
@@ -1030,7 +1426,10 @@ export default function CompoundWealthApp() {
                 <NumberField
                   id="cw-incr"
                   value={Math.round(increase * 1000) / 10}
-                  onCommit={(v) => setIncrease(clamp(v / 100, INCREASE_MIN, INCREASE_MAX, 0))}
+                  onCommit={(v) => {
+                    setIncreaseTouched(true);
+                    setIncrease(clamp(v / 100, INCREASE_MIN, INCREASE_MAX, 0));
+                  }}
                   locale={locale}
                   suffix={pctSign(locale)}
                   decimals
@@ -1105,7 +1504,9 @@ export default function CompoundWealthApp() {
                       </thead>
                       <tbody>
                         {chips.map((chip) => {
-                          const r = computeCompound(plan, figuresOf(chip), months);
+                          const r = computeCompound(plan, figuresOf(chip), months, {
+                            isCash: chip.id === "cash",
+                          });
                           const isCurrent = chip.id === asset.id;
                           return (
                             <tr key={chip.id} className={isCurrent ? "font-bold text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)]"}>
@@ -1162,6 +1563,38 @@ export default function CompoundWealthApp() {
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.totalReturnNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.costNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.pendingNote}</p>
+            {/* W3: the inflation used for today's money, and the latest
+                12-month figure with its source and date. */}
+            <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-secondary)]" data-cw="how-inflation">
+              {t.how.inflationLine.replace("{x}", formatPctLocal(inflation, locale))}
+            </p>
+            <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]" data-cw="how-inflation-recent">
+              {t.how.inflationRecentLine
+                .replace("{y}", formatPctLocal(latestInfl.rate, locale))
+                .replace("{source}", latestInfl.sourceName)
+                .replace("{date}", locale === "fa" ? latestInfl.labelFa : latestInfl.labelEn)}
+            </p>
+            {/* W5: the exact index behind each asset, read from the figures
+                file so it can never drift from the numbers. */}
+            <p className="m-0 mt-1 text-[12px] font-semibold text-[var(--color-text-secondary)]" data-cw="how-indices-title">
+              {t.how.indicesTitle}
+            </p>
+            <ul className="m-0 list-none space-y-0.5 p-0 text-[11.5px] leading-relaxed text-[var(--color-text-tertiary)]" data-cw="how-indices">
+              {chips.map((chip) => (
+                <li key={chip.id} dir="auto">
+                  <span className="font-semibold text-[var(--color-text-secondary)]">
+                    {locale === "fa" ? chip.labelFa : chip.labelEn}:
+                  </span>{" "}
+                  {chip.measures}
+                </li>
+              ))}
+              <li dir="auto">
+                <span className="font-semibold text-[var(--color-text-secondary)]">
+                  {locale === "fa" ? rows.inflation.labelFa : rows.inflation.labelEn}:
+                </span>{" "}
+                {rows.inflation.measures}
+              </li>
+            </ul>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.superNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.taxNote}</p>
             <p className="m-0 text-[12px] leading-relaxed text-[var(--color-text-tertiary)]">{t.how.fxNote}</p>
@@ -1213,6 +1646,7 @@ export default function CompoundWealthApp() {
           asset={asset}
           months={months}
           startMonth={startMonth}
+          money={moneyLabel}
           onClose={() => setPrintOpen(false)}
         />
       ) : null}
@@ -1225,6 +1659,7 @@ export default function CompoundWealthApp() {
           asset={asset}
           months={months}
           startMonth={startMonth}
+          money={moneyLabel}
           onClose={() => setPhoneOpen(false)}
         />
       ) : null}

@@ -1,0 +1,54 @@
+{
+  "light-en": {
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "help": "Elements must meet minimum color contrast ratio thresholds"
+      }
+    ]
+  },
+  "light-fa": {
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "help": "Elements must meet minimum color contrast ratio thresholds"
+      },
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "help": "Elements must have their visible text as part of their accessible name"
+      }
+    ]
+  },
+  "dark-en": {
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 14,
+        "help": "Elements must meet minimum color contrast ratio thresholds"
+      }
+    ]
+  },
+  "dark-fa": {
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 13,
+        "help": "Elements must meet minimum color contrast ratio thresholds"
+      },
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "nodes": 1,
+        "help": "Elements must have their visible text as part of their accessible name"
+      }
+    ]
+  }
+}

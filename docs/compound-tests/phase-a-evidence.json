@@ -1,0 +1,262 @@
+{
+  "base": "https://currena.ir",
+  "rows": [
+    {
+      "id": "T2-vector-1",
+      "area": "maths",
+      "tested": "custom rate 7%, cost 0, 100/mo, 20y",
+      "expected": "final ≈ 50,754, put in 24,000",
+      "actual": "tiles 24000/26800/50800 (page rounds: 240002680050800)",
+      "pass": true
+    },
+    {
+      "id": "T2-vector-2",
+      "area": "maths",
+      "tested": "3% of a 5,000/month salary, 0% increase, 7%",
+      "expected": "final ≈ 76,130, put in 36,000",
+      "actual": "tiles 36000/40100/76100",
+      "pass": true
+    },
+    {
+      "id": "T2-vector-3",
+      "area": "maths",
+      "tested": "fee 10 per purchase, monthly",
+      "expected": "final ≈ 45,678, fees 2,400",
+      "actual": "tiles 24000/21700/45700; costs card: Costs took 2,400 (10% of what you put in).",
+      "pass": true
+    },
+    {
+      "id": "T2-vector-4",
+      "area": "maths",
+      "tested": "fee 10, every 3 months",
+      "expected": "final ≈ 48,785, fees 800",
+      "actual": "tiles 24000/24800/48800; Costs took 800 (3.3% of what you put in).",
+      "pass": true
+    },
+    {
+      "id": "T3-amount-\"\"",
+      "area": "maths",
+      "tested": "typing \"\" in the amount box",
+      "expected": "box restores on blur, no NaN",
+      "actual": "box \"100\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-amount-\"0\"",
+      "area": "maths",
+      "tested": "typing \"0\" in the amount box",
+      "expected": "clamps to the minimum 1",
+      "actual": "box \"1\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-amount-\"abc\"",
+      "area": "maths",
+      "tested": "typing \"abc\" in the amount box",
+      "expected": "letters rejected, no NaN",
+      "actual": "box \"\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-amount-\"37.5\"",
+      "area": "maths",
+      "tested": "typing \"37.5\" in the amount box",
+      "expected": "the dot is dropped (integer box), no NaN",
+      "actual": "box \"375\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-amount-\"37,5\"",
+      "area": "maths",
+      "tested": "typing \"37,5\" in the amount box",
+      "expected": "comma decimal: comma dropped, no NaN",
+      "actual": "box \"375\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-amount-\"۲۵۰\"",
+      "area": "maths",
+      "tested": "typing \"۲۵۰\" in the amount box",
+      "expected": "Persian digits accepted as 250",
+      "actual": "box \"250\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-years-0",
+      "area": "maths",
+      "tested": "typing 0 in the years box",
+      "expected": "clamps to 1",
+      "actual": "box \"1\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-years-1",
+      "area": "maths",
+      "tested": "typing 1 in the years box",
+      "expected": "one year works",
+      "actual": "box \"1\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-years-50",
+      "area": "maths",
+      "tested": "typing 50 in the years box",
+      "expected": "fifty years works",
+      "actual": "box \"50\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-years-51",
+      "area": "maths",
+      "tested": "typing 51 in the years box",
+      "expected": "clamps to 50",
+      "actual": "box \"51\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-years-2.5",
+      "area": "maths",
+      "tested": "typing 2.5 in the years box",
+      "expected": "2.5 → rounds",
+      "actual": "box \"25\", headline finite",
+      "pass": true
+    },
+    {
+      "id": "T3-fee-eats-purchases",
+      "area": "maths",
+      "tested": "fee 30 with 1/month for 2 years (every purchase is skipped)",
+      "expected": "the plan never invests, plainly said",
+      "actual": "the never-invests message shows",
+      "pass": true
+    },
+    {
+      "id": "T3-fee-hint",
+      "area": "maths",
+      "tested": "fee 5 on 100/month (5% of a purchase)",
+      "expected": "the buying-every-3-months hint shows",
+      "actual": "hint shows",
+      "pass": true
+    },
+    {
+      "id": "T3-huge-amount",
+      "area": "maths",
+      "tested": "999,999,999 a month for 50 years",
+      "expected": "finite numbers, no NaN",
+      "actual": "Investing A$999,999,999 a month for 50 years: you put in 600,000,000,0",
+      "pass": true
+    },
+    {
+      "id": "T3-range-swap",
+      "area": "maths",
+      "tested": "custom range typed low 9 > high 5",
+      "expected": "low ≤ middle ≤ high always",
+      "actual": "range 39700 → 62400",
+      "pass": true
+    },
+    {
+      "id": "T4-invariants-100x10",
+      "area": "maths",
+      "tested": "put-in + growth = final; today < future; low ≤ final ≤ high",
+      "expected": "all three hold",
+      "actual": "putIn+growth=17110 final=17100 today=13000 low=15400 high=18800",
+      "pass": true
+    },
+    {
+      "id": "T4-invariants-500x20",
+      "area": "maths",
+      "tested": "put-in + growth = final; today < future; low ≤ final ≤ high",
+      "expected": "all three hold",
+      "actual": "putIn+growth=254000 final=254000 today=147000 low=203000 high=312000",
+      "pass": true
+    },
+    {
+      "id": "T4-invariants-50x30",
+      "area": "maths",
+      "tested": "put-in + growth = final; today < future; low ≤ final ≤ high",
+      "expected": "all three hold",
+      "actual": "putIn+growth=58500 final=58500 today=25800 low=40800 high=81900",
+      "pass": true
+    },
+    {
+      "id": "T4-monotonic",
+      "area": "maths",
+      "tested": "more money then more years",
+      "expected": "the result never falls",
+      "actual": "17100 → 85500 → 254000",
+      "pass": true
+    },
+    {
+      "id": "T4-toggle-consistency",
+      "area": "behaviour",
+      "tested": "future → today's money toggle",
+      "expected": "tiles shrink, milestone dates move later (or lines drop)",
+      "actual": "tiles 48000/53500/102000 → 27800/31000/58900; milestones 3 → 3",
+      "pass": true
+    },
+    {
+      "id": "T5-month-rollovers",
+      "area": "maths",
+      "tested": "31 Jan / 29 Feb 2028 / 31 Dec fixed clocks (this-month + milestones)",
+      "expected": "the start month tracks the clock, milestones right",
+      "actual": "Jan 31 → 2026-01; Feb 29 2028 → 3 milestones; Dec 31 → 2026-12",
+      "pass": true
+    },
+    {
+      "id": "T6-country-switch",
+      "area": "maths",
+      "tested": "USA preset: currency, chips, cash rate, headline",
+      "expected": "$ symbols, S&P 500 default, US figures",
+      "actual": "chips S&P 500,World shares,Gold,Cash; headline Investing $100 a month for 20 years: you put in 24,000, and …; cash line If you only save it as cash: about 28,500.",
+      "pass": true
+    },
+    {
+      "id": "T7-no-side-scroll-360",
+      "area": "behaviour",
+      "tested": "360px width",
+      "expected": "no sideways scrolling",
+      "actual": "scrollWidth 360",
+      "pass": true
+    },
+    {
+      "id": "T7-keyboard",
+      "area": "behaviour",
+      "tested": "keyboard-only: tab to the % switch and press Enter",
+      "expected": "the mode switches, the live line appears",
+      "actual": "keyboard activation works",
+      "pass": true
+    },
+    {
+      "id": "T7-focus-visible",
+      "area": "behaviour",
+      "tested": "focus on the amount box",
+      "expected": "a visible focus indication",
+      "actual": "{\"outline\":\"none\",\"boxShadow\":\"rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px ",
+      "pass": true
+    },
+    {
+      "id": "T8-five-second-shot",
+      "area": "behaviour",
+      "tested": "the default screen at 390×844",
+      "expected": "saved for the plain-words reading",
+      "actual": "docs/compound-tests/phase-a-five-second-390.png",
+      "pass": true
+    },
+    {
+      "id": "T7-input-latency",
+      "area": "behaviour",
+      "tested": "typing 333 into the amount box",
+      "expected": "the headline updates in under 100 ms",
+      "actual": "48 ms",
+      "pass": true
+    },
+    {
+      "id": "T9-no-console-errors",
+      "area": "behaviour",
+      "tested": "the whole Phase A walk",
+      "expected": "zero console/page errors",
+      "actual": "none",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

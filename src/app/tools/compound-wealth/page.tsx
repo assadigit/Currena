@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CompoundWealthApp from "@/components/compound/app";
+import { thisMonth } from "@/lib/compound/maths";
 
 /**
  * /tools/compound-wealth — the tool page (spec §3, §5).
@@ -44,5 +45,10 @@ export const metadata: Metadata = {
 };
 
 export default function CompoundWealthPage() {
-  return <CompoundWealthApp />;
+  /* The server's own month, passed down so the client's first render
+     matches the SSR text exactly (the start month drives every date on
+     the page). If the month rolls between render and hydration — a
+     seconds-wide window at a UTC month boundary — the app corrects
+     itself after mount instead of logging a hydration mismatch. */
+  return <CompoundWealthApp ssrStartMonth={thisMonth()} />;
 }

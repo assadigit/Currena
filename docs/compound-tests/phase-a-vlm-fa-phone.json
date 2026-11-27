@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) Yes — Persian letters are correctly joined (e.g., «نرخ دو چند شد»، «گم وول پيوسته...» render properly).\n2) Yes — Persian numerals used throughout: ۵۰٬۸۰۰٬ ۲۹٬۴۰۰٬ ۲۰, ۱۴۰۴.\n3) No clipping or garbled text; all lines are clean and legible.\n4) No — there is no line like «۳٪ از حقوق». The texts shown are the rate, \"پول ايزوز:\", \"مدار ماه ۲۰ سال\", the button line, and the bottom sentence.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1795664512,
+  "id": "202611261141449abff2164c3e4b33",
+  "model": "glm-5.3-flash",
+  "object": "chat.completion",
+  "request_id": "202611261141449abff2164c3e4b33",
+  "usage": {
+    "completion_tokens": 134,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 504,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 638
+  }
+}
