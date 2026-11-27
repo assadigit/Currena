@@ -97,6 +97,7 @@ import { CompareBand } from "@/components/gold-page/compare";
 import { FaqBand } from "@/components/gold-page/faq";
 import { SourcesBand } from "@/components/gold-page/sources";
 import { FuturesBand } from "@/components/gold-page/futures";
+import { FourPricesBand } from "@/components/gold-page/four-prices";
 import { dollarTomanOf } from "@/lib/gold-page/coin-premium";
 import { deskBasePath } from "@/lib/utils";
 
@@ -214,6 +215,7 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-race-yield", key: null, label: ["Gold or USD?", "طلا یا دلار؟"] },
   { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
   { id: "gold-futures", key: null, label: ["Futures", "آتی"] },
+  { id: "gold-four-prices", key: null, label: ["Four prices", "چهار قیمت"] },
   { id: "gold-faq", key: null, label: ["FAQ", "پرسش‌ها"] },
   { id: "gold-sources", key: null, label: ["Sources", "منابع"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
@@ -1668,6 +1670,21 @@ export default function GoldPage() {
                 delivery calendar with its curve verdict, the Globex
                 session chip, and the plain-words collapsible */}
             <FuturesBand data={data} locale={locale} fmt={fmt} />
+
+            {/* the "one metal, four prices" band — the approved item
+                B1 with the B3 digital-gold card inside: the spot, the
+                front future, the Shanghai premium and Tehran's own حباب
+                in one honest table, every row its own source and stamp;
+                the Tehran row rides the owner's Iran layer exactly like
+                the bridge */}
+            <FourPricesBand
+              data={data}
+              projection={projection.data ?? null}
+              rates={rates.data ?? null}
+              showIran={showIran}
+              locale={locale}
+              fmt={fmt}
+            />
 
             {/* the beginner FAQ + the page's own mini glossary — the
                 additive programme's Phase 1 (docs/gold-page/PLAN.md): the
