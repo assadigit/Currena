@@ -4,7 +4,7 @@
       {
         "id": "color-contrast",
         "impact": "serious",
-        "nodes": 14,
+        "nodes": 18,
         "help": "Elements must meet minimum color contrast ratio thresholds"
       }
     ]
@@ -14,7 +14,7 @@
       {
         "id": "color-contrast",
         "impact": "serious",
-        "nodes": 13,
+        "nodes": 17,
         "help": "Elements must meet minimum color contrast ratio thresholds"
       }
     ]
@@ -24,7 +24,7 @@
       {
         "id": "color-contrast",
         "impact": "serious",
-        "nodes": 14,
+        "nodes": 18,
         "help": "Elements must meet minimum color contrast ratio thresholds"
       }
     ]
@@ -34,7 +34,7 @@
       {
         "id": "color-contrast",
         "impact": "serious",
-        "nodes": 13,
+        "nodes": 17,
         "help": "Elements must meet minimum color contrast ratio thresholds"
       }
     ]

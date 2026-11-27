@@ -138,3 +138,51 @@ Phase B re-test: after fixes 1–5, the full surface was re-run on the redeploye
 
 - **Retired by v8:** the fa language toggle's label-in-name (owner decision #2 from the v6 list) — done, live, verified on three pages.
 - Still open from the v6 list: the shared palette's active-chip contrast (3.29:1) and the gold tile (3.71:1) — site-wide token changes, deliberately untouched by the no-restyle rule; the axe counts confirm v8 added nothing to them.
+
+## The v9 gate record (the customizable chart, 2026-11-27)
+
+| Gate | Result | The v9 extension it carries |
+|---|---|---|
+| `python3 compound_reference_check.py --selftest` | six PASS lines | unchanged |
+| `bun test tests/compound-maths.test.ts` | **103/103** | unchanged — v9 adds no maths (the comparison lines were already `computeCompound` at each asset's figures) |
+| `bun tests/compound-grid-replay.ts` | **1200/1200** engine, **15/15** UI, no page errors | unchanged and green — the engine and the read-back numbers are untouched by the filters |
+| `bun tests/compound-browser-harness.ts` | **93/93** | +14 checks v9-1…v9-13 (v9-11 light and dark): the filter defaults (8 chips, core on, comparisons off); the plan-only default chart (7 paths, no comparison labels, no caption); the owner's example view (growth + range off = the put-in area and the total line exactly, labelled "Put in"/"Total"); the opt-in benchmarks with the caption sentence; the numbers-invariance lock (headline, tiles, range byte-identical through every toggle); the never-empty guard (total pressed + disabled at 1 path) and its release; aria-pressed semantics inside the named group; fa/RTL (Persian labels, a working toggle in fa); the 360px wrap (310×96, no sideways scroll); the chips' computed colour pairs equal to the asset chips' own in light and dark; store-nothing re-checked; all-on restoring the recorded v8 look (11 paths, all four comparison labels) |
+| `bun run lint` | green | — |
+| `bun tests/compound-axe.ts` (live) | color-contrast **18/17/18/17** (EN-light/fa-light/EN-dark/fa-dark) | +4/+4 nodes vs the 14/13/14/13 baseline — exactly the four ON filter chips, which use the site's own white-on-currena-blue active-chip pair, the same accepted pattern as the five chip nodes already in the baseline (country, mode, amount, years, asset). Zero new violation kinds; the pair remains the open site-wide token decision from the v6 list |
+| Lighthouse (mobile, live) | accessibility **97** every run; performance **99/98/97/97** over four runs on a loaded sandbox | FCP/LCP ~1.8 s, TBT 0–150 ms, CLS 0; evidence `v9-lighthouse-1…4.json` |
+| The JS delta | **+901 bytes (0.45%)** — 200,204 → 201,105 bytes transferred, 10 JS files before and after | measured as the browser's actual transfer from two full worker builds (the v8 tree in a worktree vs the deployed v9 tree) |
+
+## The v9 findings this pass recorded
+
+1. **The always-on lines were the busy-chart cause.** The v6 chart drew four
+   comparison lines unconditionally, and the S&P 500 — the highest AU figure
+   at 11.8% — set the y scale, squashing the owner's own plan areas. The v9
+   default is plan-only; the all-on state (verified: 11 paths, every
+   comparison end label) restores the recorded v8 look for anyone who wants
+   it back.
+2. **The label mapping is part of the filter contract.** The VLM visual pass
+   caught what a fresh reader sees: a "Growth" end label on the line whose
+   chip says Total reads as a contradiction. The page chart's two end labels
+   now read "Put in" and "Total" — each its chip's own word — which also
+   retires the long "Money you put in" label that measured to the svg's
+   right edge at 390px (right: 390 of 390). The cards keep the v6 wording
+   (no chips there).
+3. **Toggles are drawing-only.** The numbers-invariance lock (harness v9-5)
+   is the design's centre: every number on the page — headline, tiles,
+   range, what-if cards, compare table — is byte-identical through every
+   toggle combination, because the filters only choose what the chart draws.
+4. **The guard's edge.** With everything else off, the last drawn series'
+   chip is disabled while still pressed (the chart never goes empty); the
+   band never counts as the last series (it is a companion, not a series).
+   Toggling the band off is always allowed.
+5. **Toggle state is deliberately not remembered.** Store-nothing is a
+   locked owner decision; the filters are one tap and reload-honest.
+
+## The v9 live walk (2026-11-27, version e61a9eea)
+
+EN mobile 390: the defaults (8 chips, the plan-only chart); the owner's
+example view (3 paths, "Put in"/"Total" labels); S&P 500 + Gold + Cash on
+with the caption; the numbers invariant; the guard live (the total chip
+pressed and disabled). fa + dark: the Persian group label, chip labels and
+caption, a toggle working. All-on: the v8 look restored (11 paths).
+**Zero console/page errors.** Screenshots `docs/compound-tests/v9-live-01…05`.

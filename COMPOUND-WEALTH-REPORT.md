@@ -706,3 +706,141 @@ commits on `compound-wealth-v8` (or `git checkout` the pre-v8 sha eaa63a86
 and redeploy). The merge commit itself (fb9120dc) may stay or go with it;
 the v6 tool it restored is the live baseline the owner recorded. The chrome
 fix is one line, trivially revertible on its own.
+
+## 12. The v9 pass — the customizable chart (2026-11-27)
+
+The owner's request, in his words: "I want the graph to have filters, like you
+can turn off some of them for example only show your current money vs future
+potential money, then if u wanted add the line of S&P, gold etc, so we have a
+customizable graph." Committed as `COMPOUND-WEALTH-V9-PROMPT.md`; the spec
+gains the v9 addendum (§5.1.4, §12 tests 44–47, §13.11, Appendix A.2).
+
+### 12.1 What the request met in the code (the audit, done before building)
+
+The comparison lines already existed — `otherLines` in `app.tsx` has drawn a
+dashed thin line for every non-selected asset plus a dotted cash line since
+the v6 chart, and the engine already computes each as the same plan at that
+asset's own figures (`computeCompound` with `figuresOf(chip)`, the
+1200-row-grid-verified path). What was missing was exactly what the owner
+asked for: control. The lines were always on (the default chart carried four
+of them), nothing could be turned off, and the S&P line — the highest
+AU figure at 11.8% — set the y scale, quietly squashing the owner's own plan.
+
+### 12.2 What was built
+
+- **The filter row** (`data-cw="chart-layers"`), directly under the page
+  chart: one small toggle chip per series — the four core layers (Put in /
+  Growth / Total / Range) and one per comparison line (S&P 500, World
+  shares, Gold, Cash on the AU default; the selected asset is the plan and
+  has no chip, so the set follows the asset selection). Real buttons with
+  `aria-pressed`, the group named "Show on the chart" / «نمایش در نمودار»,
+  each chip's swatch a 14×5 mirror of its series' own stroke (line style +
+  the chart's token), so the row doubles as the chart's key.
+- **Defaults**: the four core layers ON (your plan only — the calm chart),
+  every comparison line OFF. The S&P/gold/cash lines are opt-in, exactly as
+  asked. One caption line when any comparison is on: "Other lines: the same
+  plan at each asset's own average return." / «خطوط دیگر: همین برنامه با
+  میانگین بازدهٔ هر دارایی.»
+- **The behaviour**: the y scale fits only what is drawn; the milestone dots
+  and the crossover mark always draw (they are the plan's own annotations)
+  and clamp into the plot when the scale shrinks; the never-empty guard
+  disables the last drawn series' chip; the toggle state is pure React state
+  — reload resets it, nothing stored (store-nothing unchanged).
+- **The label mapping**: the page chart's two end labels now read "Put in"
+  and "Total" — each its chip's own word, so the key maps 1:1. The A4 and
+  phone cards keep the v6 "Money you put in"/"Growth" wording (they have no
+  chips).
+- **The engine, the tiles, the headline, the cards, the compare table:
+  untouched.** No new maths module code, no new dependencies.
+
+### 12.3 Decisions, each with its reason
+
+1. **Benchmarks opt-in rather than always-on** — the owner's own phrasing
+   ("if u wanted add the line of S&P, gold") plus the audit finding that the
+   always-on S&P line dominated the scale; the all-on state (one tap set)
+   restores the recorded v8 look exactly (verified: 11 paths, every
+   comparison end label).
+2. **The chips reuse the site's own chip look** (the asset chips' blue
+   active pill) rather than a new gold pair — the v8 no-new-colour-pairs
+   rule; the harness asserts the computed colour pairs equal the asset
+   chips' own in light and dark.
+3. **The Put in / Total relabel** — surfaced by the VLM visual pass: with
+   chips present, a "Growth" end label on the line toggled by the Total chip
+   read as a contradiction. Each label now names its chip's series. This
+   also retires the long "Money you put in" label, which measured to the
+   svg's right edge at 390px (right: 390 of 390 — grazing, occasionally
+   clipped by a pixel); "Put in" clears it.
+4. **The growth area keeps its geometry when the put-in layer is hidden** —
+   the area is the growth layer wherever its lower boundary is drawn;
+   toggling never reshapes a curve.
+5. **The guard counts only drawn series** (the band is a companion, never
+   the last) and the disabled chip stays visually on — it is on; it simply
+   cannot be the last thing turned off.
+6. **No persistence of toggle choices** — store-nothing is a locked owner
+   decision; one tap restores a view, and reload honesty is the tool's
+   character.
+
+### 12.4 Verification (the gates, local, on the final state)
+
+| Gate | Result |
+|---|---|
+| `python3 compound_reference_check.py --selftest` | six PASS lines |
+| `bun test tests/compound-maths.test.ts` | **103/103** (unchanged — v9 adds no maths) |
+| `bun tests/compound-grid-replay.ts` | **1200/1200** engine, **15/15** UI, no page errors (both untouched by v9 and green on it) |
+| `bun tests/compound-browser-harness.ts` | **93/93** (+14 checks: v9-1…v9-13, v9-11 in light and dark) |
+| `bun run lint` | green |
+| TypeScript | `tsc --noEmit` error count identical to the v8 baseline (104, all in pre-existing loose-typed test scripts) — zero new |
+
+The v9 harness checks: the defaults (8 chips, core on, comparisons off,
+nothing disabled); the plan-only default chart (7 paths, no comparison end
+labels, no caption); the owner's own example view (growth and range off:
+exactly the put-in area and the total line, labelled Put in and Total); the
+opt-in benchmarks (S&P 500 and Gold drawn with their end labels and the
+caption); the numbers-invariance lock (headline, tiles and range
+byte-identical through every toggle); the never-empty guard (the total chip
+pressed and disabled at 1 path) and its release; the toggle semantics; fa/RTL
+(Persian group label, chip labels and caption, a toggle working in fa); the
+360px wrap (row 310×96, no sideways scroll); the chip colour pairs equal to
+the asset chips' own in light and dark; store-nothing re-checked; the all-on
+state restoring the v8 look (11 paths, all four comparison labels).
+
+### 12.5 The live verification (after the 2026-11-27 12:29 UTC deploy, version e61a9eea)
+
+- The live walk (`scripts-research/v9-live-verify.ts`): the defaults, the
+  owner's example view (3 paths), S&P 500 + Gold + Cash on with the caption
+  (10 paths), the numbers invariant, the guard live, fa + dark with the
+  Persian labels, all-on restoring the v8 look (11 paths) — **zero
+  console/page errors**. Screenshots `docs/compound-tests/v9-live-01…05`.
+- **axe (light + dark, EN + fa):** `color-contrast` 18/17/18/17 — the v6/v8
+  baseline was 14/13/14/13. The +4/+4 nodes are exactly the four ON filter
+  chips, which use the site's own white-on-currena-blue active-chip pair —
+  the same accepted, owner-recorded pattern as the five chip nodes already
+  in the baseline (the country, mode, amount, years and asset chips). No new
+  violation kinds; the pair itself remains the open site-wide token decision
+  from the v6 list, deliberately untouched. Evidence:
+  `docs/compound-tests/phase-a-axe.json`, the node-level detail in
+  `scripts-research/v9-axe-detail.ts`'s run.
+- **Lighthouse (mobile, live):** accessibility **97** on every run (the v8
+  baseline); performance **99/98/97/97** across four runs on a loaded
+  sandbox (TBT 0–150 ms, FCP/LCP ~1.8 s, CLS 0) — the v9 cost is +901 bytes
+  of JS; the wobble is run variance, as v8 also recorded (95–99).
+  Evidence: `v9-lighthouse-1…4.json`.
+- **The JS delta, measured honestly from two full worker builds** (the v8
+  tree built in a worktree, the v9 tree as deployed): **200,204 → 201,105
+  bytes transferred, +901 bytes (0.45%), 10 JS files before and after.**
+
+### 12.6 The cut list (the spec's Appendix A.2)
+
+Remembering toggle choices across reloads (store-nothing wins); a
+type-your-own comparison-rate chip (Custom rate mode already answers it);
+per-series y-axes or axis numbers (the number-reading the v6 design
+retired); filters on the A4/phone cards (fixed share artifacts); animated
+transitions (the calm discipline); reordering the chips (configurability of
+the configurator is complexity, not clarity).
+
+### 12.7 Rollback
+
+Everything v9 added is additive: `git revert` the v9 commits on
+`compound-wealth-v9` (or `git checkout` the pre-v9 sha 26fcf35d and
+redeploy). The one behavioural change to a v6 element — the two end labels'
+wording — reverts with the same commits; the cards were never touched.
