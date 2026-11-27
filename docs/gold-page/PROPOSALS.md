@@ -136,3 +136,26 @@ price, not an endorsement". **Effort:** tiny.
 Front-month identification note: today GC=F's `shortName` is "Gold Dec 26"
 (sandbox date 2026-11-27), so the band must read the contract name from the
 feed, never hard-code a month.
+
+---
+
+## OWNER DECISION (2026-11-27, session 2)
+
+Approved: **A** (futures band), **B1** (four prices), **B2** (venues
+explainer), **B3** (digital-gold row, as a card inside B1), **"Gold in 30
+seconds"** and the **ATH record watch** (as one band).
+
+Not approved / still pending: Phase 2 (buying guide), the why-hold-gold
+cards, and everything under "Needs my approval" in PROGRESS.md.
+
+The implementation work order for these approved items is
+`docs/gold-page/SESSION-3-PROMPT.md` (self-contained; verified sources,
+exact mounting + chip lines, quality gates). Extra anchors pinned for it
+this session: NAV_SECTIONS chips are one-liners between `gold-other` and
+`gold-faq`; the new cluster mounts between `<PhysicalBand/>` and
+`<FaqBand/>` where `data`, `projection.data`, `rates.data`, `showIran`,
+`locale`, `fmt`, `t` are in scope; `/api/gold/trend?range=all` serves all
+eight windows (points + chgPct + source per window); the projection payload
+carries 48 readings incl. `shanghai-gold-premium` with value/percentile/
+from-peak fields; TGJU per-indicator endpoint verified for
+`tether_gold_xaut` ($3,567.41 close, 2026-11-26 row).

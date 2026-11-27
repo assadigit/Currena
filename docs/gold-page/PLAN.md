@@ -119,3 +119,14 @@ already handle both locales).
 Re-run the checklist against the live page, re-verify the additive proof across
 all sessions (every commit: additions-only diff), write the final report in
 PROGRESS.md.
+
+---
+
+## Phase 5 — the approved additions (owner sign-off 2026-11-27, session 2)
+
+The owner approved A + B1 + B2 + B3 + "Gold in 30 seconds" + ATH watch.
+Work order (self-contained, with verified sources and quality gates):
+`docs/gold-page/SESSION-3-PROMPT.md`. Order inside the phase: A futures
+band → B1+B3 four prices → B2 venues → 30 seconds + ATH. One additive
+commit per item; existing Phases 2–4 wait for their own approvals (the
+buying guide and the why-hold-gold cards were NOT approved this round).

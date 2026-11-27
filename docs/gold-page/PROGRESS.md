@@ -149,3 +149,17 @@ phase (additions only).
   (menu: A futures band, B1 four-prices unifier, B2 venues explainer,
   B3 digital-gold row, plus recap of Phases 2–4). No page code touched —
   docs only (this file + PROPOSALS.md). Awaiting owner approval.
+
+- S2b (2026-11-27, same day): the owner APPROVED A, B1, B2, B3, the ATH
+  record watch, and "Gold in 30 seconds" — and asked for an implementation
+  prompt for the next session. Prepared: SESSION-3-PROMPT.md written
+  (self-contained work order: scope, placement + chip lines, verified
+  sources, per-item specs, icons, quality gates, additive proof rules);
+  PROPOSALS.md carries the owner decision; PLAN.md carries Phase 5.
+  Anchor checks done for the prompt: mount-site scope in page.tsx
+  (data/projection/rates/showIran in scope between PhysicalBand and
+  FaqBand), NAV_SECTIONS chip shape, /api/gold/trend range=all windows,
+  projection readings shape (48 readings, shanghai-gold-premium via byId),
+  TGJU per-indicator verified for tether_gold_xaut. NOT approved this
+  round: Phase 2 (buying guide), why-hold-gold cards. Docs only again —
+  no page code touched.
