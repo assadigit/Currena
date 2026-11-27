@@ -691,6 +691,416 @@ async function main() {
   await page.waitForTimeout(300);
 
   /* ---------------------------------------------------------------- *
+   * v8 — the outcome bars: the share bar (the default screen's one
+   * new visual), the what-if micro-bars, the compare bars, the card
+   * bars, the fa/RTL rendering and the label-in-name toggle fix.
+   * ---------------------------------------------------------------- */
+  await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=headline]");
+
+  // v8-1: the share bar under the tiles — present, keyed, proportioned.
+  const shareBarDefault = await page.evaluate(() => {
+    const bar = document.querySelector("[data-cw=share-bar]") as HTMLElement | null;
+    const wrap = document.querySelector("[data-cw=share-bar-wrap]");
+    const tilesSec = document.querySelector('section[aria-label="You could have"]');
+    const key = document.querySelector("[data-cw=share-key]");
+    const caption = document.querySelector("[data-cw=share-caption]");
+    const segP = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
+    const segG = document.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
+    if (!bar || !segP || !segG) return { present: false };
+    const pw = segP.getBoundingClientRect().width;
+    const gw = segG.getBoundingClientRect().width;
+    return {
+      present: true,
+      inTilesSection: !!(wrap && tilesSec?.contains(wrap)),
+      role: bar.getAttribute("role"),
+      aria: bar.getAttribute("aria-label") ?? "",
+      putShare: +(pw / (pw + gw)).toFixed(3),
+      key: key?.textContent ?? "",
+      caption: caption?.textContent ?? "",
+      interactiveInside: bar.querySelectorAll("button, input, select, a[href]").length,
+      titlesInside: bar.querySelectorAll("[title]").length,
+      trackH: Math.round(segP.getBoundingClientRect().height),
+    };
+  });
+  check(
+    "v8-1-sharebar-default",
+    shareBarDefault.present === true &&
+      (shareBarDefault as any).inTilesSection === true &&
+      (shareBarDefault as any).role === "img" &&
+      /47% Money you put in/.test((shareBarDefault as any).key) &&
+      /53% Growth/.test((shareBarDefault as any).key) &&
+      Math.abs((shareBarDefault as any).putShare - 0.472) < 0.02 &&
+      /The same two colours as the chart/.test((shareBarDefault as any).caption) &&
+      (shareBarDefault as any).interactiveInside === 0 &&
+      (shareBarDefault as any).titlesInside === 0,
+    `put share ${(shareBarDefault as any).putShare}, key "${(shareBarDefault as any).key}"`,
+  );
+
+  // v8-2: the default screen's inventory gains the bar and nothing
+  // else — the same allowed set as test 13 (no new interactive
+  // elements; the bar is pure divs), plus the bar itself.
+  const inventoryWithBar = await page.evaluate(() => {
+    const main = document.querySelector("main")!;
+    const interactive = [...main.querySelectorAll("button, input, select, a[href]")]
+      .filter((el) => (el as HTMLElement).offsetParent !== null)
+      .map((el) => ({
+        cw: el.getAttribute("data-cw") ?? "",
+        insideBar: !!el.closest("[data-cw=share-bar-wrap], [data-cw=whatif-bars]"),
+      }));
+    const bar = document.querySelector("[data-cw=share-bar-wrap]");
+    const allowed = [
+      "country-", "amount-", "years-", "asset-", "more-options", "save-card", "money-", "card-menu",
+      "later-", "how", "tools-link", "mode-", "add-salary", "salary-", "percent-",
+    ];
+    return {
+      unexpected: interactive.filter((c) => !c.insideBar && !allowed.some((p) => c.cw.startsWith(p))).length,
+      insideBars: interactive.filter((c) => c.insideBar).length,
+      barPresent: !!bar,
+    };
+  });
+  check(
+    "v8-2-inventory-gains-bar-only",
+    inventoryWithBar.barPresent && inventoryWithBar.unexpected === 0 && inventoryWithBar.insideBars === 0,
+    `bar present: ${inventoryWithBar.barPresent}, unexpected: ${inventoryWithBar.unexpected}, interactive inside bars: ${inventoryWithBar.insideBars}`,
+  );
+
+  // v8-3: the money toggle flips the tiles and the bar follows — the
+  // engine deflates both shown values by the same factor, so the
+  // shares are view-invariant (a recorded v8 fact); the check is that
+  // the bar still matches the tiles' shown numbers in both views.
+  const tilesRatio = () =>
+    page.evaluate(() => {
+      const tiles = [...document.querySelectorAll('section[aria-label="You could have"] .grid > div')].map((d) =>
+        Number((d.textContent ?? "").replace(/[^0-9]/g, "")),
+      );
+      const segP = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
+      const segG = document.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
+      if (!segP || !segG || !tiles[0] || !tiles[2]) return null;
+      const pw = segP.getBoundingClientRect().width;
+      const gw = segG.getBoundingClientRect().width;
+      return { tilePct: Math.round((tiles[0] / tiles[2]) * 100), barPct: Math.round((pw / (pw + gw)) * 100) };
+    });
+  const ratioFuture = await tilesRatio();
+  await page.click("[data-cw=money-today]");
+  await page.waitForTimeout(300);
+  const ratioToday = await tilesRatio();
+  check(
+    "v8-3-toggle-follows-tiles",
+    ratioFuture !== null &&
+      ratioToday !== null &&
+      Math.abs(ratioFuture.barPct - ratioFuture.tilePct) <= 2 &&
+      Math.abs(ratioToday.barPct - ratioToday.tilePct) <= 2 &&
+      Math.abs(ratioToday.barPct - ratioFuture.barPct) <= 1,
+    `future tile/bar ${ratioFuture?.tilePct}/${ratioFuture?.barPct}%, today tile/bar ${ratioToday?.tilePct}/${ratioToday?.barPct}% (view-invariant by the engine's shared deflator)`,
+  );
+  await page.click("[data-cw=money-future]");
+  await page.waitForTimeout(200);
+
+  // v8-4: the under-one wording — a 1-year plan at a 0.5% custom rate
+  // (net +0.3%) has a growth share well under 1%.
+  await page.fill("#cw-years", "1");
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  await page.click('[data-cw="group-rates"] button');
+  await page.waitForTimeout(250);
+  await page.locator('[data-cw="group-rates"] button', { hasText: "Custom rate" }).click();
+  await page.waitForTimeout(200);
+  await page.fill("#cw-crate", "0.5");
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(300);
+  const underOne = await page.evaluate(() => document.querySelector("[data-cw=share-key]")?.textContent ?? "");
+  check("v8-4-under-one", /<1%/.test(underOne), underOne);
+
+  // v8-5: the negative-growth fallback — custom rate 0% with the default
+  // 0.2% yearly cost is net −0.2%: the bar must hide, the sentence stays.
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  // The rates fold may still be open from v8-4 — only open it if needed.
+  if (!(await page.$("#cw-crate"))) await page.click('[data-cw="group-rates"] button');
+  await page.waitForTimeout(250);
+  await page.fill("#cw-crate", "0");
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(300);
+  const negative = await page.evaluate(() => ({
+    bar: document.querySelector("[data-cw=share-bar]") !== null,
+    hidden: document.querySelector("[data-cw=share-bar-hidden]")?.textContent ?? "",
+    growthTile: [...document.querySelectorAll('section[aria-label="You could have"] .grid > div')][1]?.textContent ?? "",
+  }));
+  check(
+    "v8-5-negative-growth-fallback",
+    !negative.bar && /below what you put in/.test(negative.hidden),
+    `bar hidden: ${!negative.bar}, line "${negative.hidden.slice(0, 70)}", tile "${negative.growthTile}"`,
+  );
+
+  // v8-6: the what-if micro-bars — one set per card, on one scale, no
+  // interaction; the small-changes bars rise in step; later and cash
+  // keep your plan longest.
+  await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=headline]");
+  const whatifBars = await page.evaluate(() => {
+    const sets = [...document.querySelectorAll("[data-cw=whatif-bars]")].map((s) => {
+      const rows = [...s.children].map((r) => {
+        const fill = r.querySelector("span > span") as HTMLElement | null;
+        return {
+          label: (r.querySelector("span")?.textContent ?? "").trim(),
+          w: fill ? Math.round(fill.getBoundingClientRect().width) : 0,
+        };
+      });
+      return {
+        role: s.getAttribute("role"),
+        aria: s.getAttribute("aria-label") ?? "",
+        rows,
+        interactiveInside: s.querySelectorAll("button, input, select, a[href]").length,
+        titlesInside: s.querySelectorAll("[title]").length,
+      };
+    });
+    const costsCard = [...document.querySelectorAll("section[aria-label='What if…'] > div > div")].find((c) =>
+      /Costs/.test(c.querySelector("div")?.textContent ?? ""),
+    );
+    return { sets, costsCardPresent: !!costsCard };
+  });
+  const smallSet = whatifBars.sets[0];
+  const laterSet = whatifBars.sets[1];
+  const cashSet = whatifBars.sets[2];
+  check(
+    "v8-6-whatif-bars",
+    whatifBars.sets.length === 3 &&
+      !whatifBars.costsCardPresent &&
+      smallSet.rows.length === 3 &&
+      smallSet.rows[0].w < smallSet.rows[1].w &&
+      smallSet.rows[1].w < smallSet.rows[2].w &&
+      laterSet.rows.length === 2 &&
+      laterSet.rows[0].w > laterSet.rows[1].w &&
+      cashSet.rows.length === 2 &&
+      cashSet.rows[0].w > cashSet.rows[1].w &&
+      whatifBars.sets.every((s) => s.role === "img" && s.aria.length > 10 && s.interactiveInside === 0 && s.titlesInside === 0),
+    `3 sets (3/2/2 rows), small rising ${smallSet.rows.map((r) => r.w).join("<")}, later ${laterSet.rows.map((r) => r.w).join(">")}, cash ${cashSet.rows.map((r) => r.w).join(">")}`,
+  );
+
+  // v8-7: the costs card's before/after bars (fee 10 → the card appears).
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  await page.click('[data-cw="group-costs"] button');
+  await page.waitForTimeout(250);
+  await page.fill("#cw-fee", "10");
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(300);
+  const costsBars = await page.evaluate(() => {
+    const costsCard = [...document.querySelectorAll("section[aria-label='What if…'] > div > div")].find((c) =>
+      /^Costs$/.test(c.querySelector("div")?.textContent ?? ""),
+    );
+    const bars = costsCard?.querySelector("[data-cw=whatif-bars]");
+    if (!bars) return { present: false };
+    const rows = [...bars.children].map((r) => {
+      const fill = r.querySelector("span > span") as HTMLElement | null;
+      return { label: (r.querySelector("span")?.textContent ?? "").trim(), w: fill ? Math.round(fill.getBoundingClientRect().width) : 0 };
+    });
+    return { present: true, aria: bars.getAttribute("aria-label") ?? "", rows };
+  });
+  check(
+    "v8-7-costs-bars",
+    costsBars.present === true &&
+      costsBars.rows.length === 2 &&
+      costsBars.rows[0].w > costsBars.rows[1].w &&
+      /Before costs/.test(costsBars.rows[0].label) &&
+      /After costs/.test(costsBars.rows[1].label),
+    `before ${costsBars.rows[0]?.w}px > after ${costsBars.rows[1]?.w}px`,
+  );
+
+  // v8-8: the compare table's proportional bars (behind More options).
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  await page.click('[data-cw="group-dates"] button');
+  await page.waitForTimeout(250);
+  await page.click("[data-cw=compare-toggle]");
+  await page.waitForTimeout(400);
+  const compareBars = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll("[data-cw=compare-table] tbody tr")];
+    return rows.map((r) => {
+      const bar = r.querySelector("[data-cw=compare-bar]") as HTMLElement | null;
+      const final = Number((r.cells[2]?.textContent ?? "").replace(/[^0-9]/g, ""));
+      return { asset: r.cells[0]?.textContent ?? "", final, w: bar ? Math.round(bar.getBoundingClientRect().width) : 0 };
+    });
+  });
+  const spRow = compareBars.find((r) => /S&P 500/.test(r.asset));
+  const cashRow = compareBars.find((r) => /Cash/.test(r.asset));
+  check(
+    "v8-8-compare-bars",
+    compareBars.length === 5 &&
+      compareBars.every((r) => r.w > 0) &&
+      spRow !== undefined &&
+      cashRow !== undefined &&
+      spRow.w === Math.max(...compareBars.map((r) => r.w)) &&
+      cashRow.w === Math.min(...compareBars.map((r) => r.w)) &&
+      Math.abs(spRow.w / cashRow.w - spRow.final / cashRow.final) < 0.08,
+    `${compareBars.map((r) => `${r.asset.split(" ")[0]}:${r.w}`).join(", ")} — S&P/cash ${spRow ? (spRow.w / (cashRow?.w || 1)).toFixed(2) : "?"} vs finals ${(spRow?.final ?? 0) / (cashRow?.final ?? 1)}`,
+  );
+  await page.click("[data-cw=more-options]");
+  await page.waitForTimeout(200);
+
+  // v8-9: the phone card's strip — text-free, sr twin, proportioned.
+  // (A fresh reload first, so the 47/53 default shares are back — the
+  // fee-10 plan from v8-7 shifts them.)
+  await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=headline]");
+  await page.click("[data-cw=save-card]");
+  await page.waitForSelector("[data-cw=card-menu]");
+  await page.click('[data-cw=card-menu] button:has-text("Phone")');
+  await page.waitForSelector("[data-cw=phone-card]");
+  await page.waitForTimeout(600);
+  const phoneStrip = await page.evaluate(() => {
+    const strip = document.querySelector("[data-cw=phone-share-wrap] [data-cw=share-bar]") as HTMLElement | null;
+    if (!strip) return { present: false };
+    const segP = strip.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
+    const segG = strip.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
+    const pw = segP?.getBoundingClientRect().width ?? 0;
+    const gw = segG?.getBoundingClientRect().width ?? 0;
+    return {
+      present: true,
+      role: strip.getAttribute("role"),
+      aria: strip.getAttribute("aria-label") ?? "",
+      putShare: +(pw / (pw + gw)).toFixed(3),
+      textInside: (strip.textContent ?? "").trim(),
+      height: Math.round(strip.getBoundingClientRect().height),
+    };
+  });
+  check(
+    "v8-9-phone-strip",
+    phoneStrip.present === true &&
+      (phoneStrip as any).role === "img" &&
+      /47% is money you put in/.test((phoneStrip as any).aria) &&
+      Math.abs((phoneStrip as any).putShare - 0.472) < 0.02 &&
+      (phoneStrip as any).textInside === "" &&
+      (phoneStrip as any).height <= 8,
+    `put share ${(phoneStrip as any).putShare}, ${(phoneStrip as any).height}px, text-free`,
+  );
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(300);
+
+  // v8-10: the A4 card's bar + key line (ink-safe palette).
+  await page.click("[data-cw=save-card]");
+  await page.waitForSelector("[data-cw=card-menu]");
+  await page.click('[data-cw=card-menu] button:has-text("Print")');
+  await page.waitForSelector("[data-cw=print-overlay]");
+  await page.waitForTimeout(500);
+  const a4Bar = await page.evaluate(() => {
+    const bar = document.querySelector(".cw-share-bar [data-cw=share-bar]") as HTMLElement | null;
+    const key = document.querySelector(".cw-share-key");
+    if (!bar) return { present: false };
+    const segP = bar.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
+    const segG = bar.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
+    const pw = segP?.getBoundingClientRect().width ?? 0;
+    const gw = segG?.getBoundingClientRect().width ?? 0;
+    return {
+      present: true,
+      role: bar.getAttribute("role"),
+      aria: bar.getAttribute("aria-label") ?? "",
+      putShare: +(pw / (pw + gw)).toFixed(3),
+      key: key?.textContent ?? "",
+    };
+  });
+  check(
+    "v8-10-a4-bar",
+    a4Bar.present === true &&
+      (a4Bar as any).role === "img" &&
+      Math.abs((a4Bar as any).putShare - 0.472) < 0.02 &&
+      /47% Money you put in/.test((a4Bar as any).key) &&
+      /53% Growth/.test((a4Bar as any).key),
+    `key "${(a4Bar as any).key}"`,
+  );
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(300);
+
+  // v8-11: fa/RTL — Persian digits + ٪ in the key line, the put-in
+  // segment at the reading start (the right edge), the caption in
+  // Persian; and the language toggle's label-in-name fix (the visible
+  // text opens the accessible name).
+  await page.click('header button:has-text("فا")');
+  await page.waitForTimeout(500);
+  const faBar = await page.evaluate(() => {
+    const segP = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
+    const bar = document.querySelector("[data-cw=share-bar]") as HTMLElement | null;
+    const key = document.querySelector("[data-cw=share-key]");
+    const caption = document.querySelector("[data-cw=share-caption]");
+    const toggle = [...document.querySelectorAll("header button")].find((b) => (b.textContent ?? "").trim() === "EN");
+    if (!segP || !bar) return { present: false };
+    const br = bar.getBoundingClientRect();
+    const pr = segP.getBoundingClientRect();
+    return {
+      present: true,
+      key: key?.textContent ?? "",
+      caption: caption?.textContent ?? "",
+      putInAtReadingStart: Math.abs(br.right - pr.right) < 1.5,
+      toggleAria: toggle?.getAttribute("aria-label") ?? "",
+      toggleText: toggle?.textContent ?? "",
+    };
+  });
+  check(
+    "v8-11-fa-rtl-bar",
+    faBar.present === true &&
+      /[۰-۹]/.test((faBar as any).key) &&
+      (faBar as any).key.includes("٪") &&
+      (faBar as any).putInAtReadingStart &&
+      /نمودار/.test((faBar as any).caption) &&
+      (faBar as any).toggleAria.startsWith("EN —"),
+    `key "${(faBar as any).key}", put-in at the reading start: ${(faBar as any).putInAtReadingStart}, toggle aria "${(faBar as any).toggleAria}"`,
+  );
+  // back to EN: the toggle's accessible name now opens with "فا".
+  await page.click('header button:has-text("EN")');
+  await page.waitForTimeout(400);
+  const enToggleAria = await page.evaluate(() => {
+    const toggle = [...document.querySelectorAll("header button")].find((b) => (b.textContent ?? "").trim() === "فا");
+    return toggle?.getAttribute("aria-label") ?? "";
+  });
+  check("v8-12-toggle-label-in-name-en", enToggleAria.startsWith("فا —"), `aria "${enToggleAria}"`);
+
+  // v8-13: the new text uses the page's own caption tokens (no new
+  // colour pairs): the key line's colour === the page's secondary text,
+  // the caption's === the measured-line's tertiary. Dark is switched by
+  // the site's own .dark class (next-themes owns the toggle; flipping
+  // the class directly keeps the store-nothing rule intact).
+  let lightKey = "";
+  for (const scheme of ["light", "dark"] as const) {
+    await page.evaluate((s) => {
+      document.documentElement.classList.toggle("dark", s === "dark");
+    }, scheme);
+    await page.waitForTimeout(250);
+    const colours = await page.evaluate(() => {
+      const key = document.querySelector("[data-cw=share-key] span");
+      const cap = document.querySelector("[data-cw=share-caption]");
+      const measured = document.querySelector("[data-cw=measured-line]");
+      return {
+        dark: document.documentElement.classList.contains("dark"),
+        key: key ? getComputedStyle(key).color : "",
+        cap: cap ? getComputedStyle(cap).color : "",
+        measured: measured ? getComputedStyle(measured).color : "",
+      };
+    });
+    if (scheme === "light") lightKey = colours.key;
+    check(
+      `v8-13-${scheme}-tokens`,
+      colours.dark === (scheme === "dark") &&
+        colours.key.length > 0 &&
+        colours.cap === colours.measured &&
+        (scheme === "light" || colours.key !== lightKey),
+      `${scheme}: key ${colours.key}, caption ${colours.cap} (=== the measured line's own tertiary)`,
+    );
+  }
+  await page.evaluate(() => document.documentElement.classList.remove("dark"));
+
+  // v8-14: store-nothing re-checked after all the bar interactions.
+  const storageAfterBars = await page.evaluate(() => ({
+    local: Object.keys(window.localStorage),
+    cookies: document.cookie,
+  }));
+  check(
+    "v8-14-no-storage-recheck",
+    storageAfterBars.local.length === 0 && storageAfterBars.cookies === "",
+    JSON.stringify(storageAfterBars),
+  );
+
+  /* ---------------------------------------------------------------- *
    * Routing (test 19) — via a fresh context
    * ---------------------------------------------------------------- */
   const ctx = await browser.newContext();

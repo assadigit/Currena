@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 246ms"
+      "detail": "3 one-tap changes in 241ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -49,7 +49,7 @@
     {
       "id": "14-390x844-one-screen",
       "pass": true,
-      "detail": "chips bottom 743/844, scrollW 390, scrollY 28"
+      "detail": "chips bottom 731/844, scrollW 390, scrollY 40"
     },
     {
       "id": "14-360x800-one-screen",
@@ -68,52 +68,52 @@
     {
       "id": "22-a4-en-light",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1094B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1128B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-dark",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1094B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1128B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-light-costs",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1080B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-dark-costs",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1080B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-light-share",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1136B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1171B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-light",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1261B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1297B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-dark",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1261B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1297B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-light-costs",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1229B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1265B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-dark-costs",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1229B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1265B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-dark-share",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1329B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1365B numbers=true salaryLeak=false"
     },
     {
       "id": "23-phone-en-dark-360x800",
@@ -286,6 +286,81 @@
       "detail": "AU: [\"YouputinA$20,400\",\"GrowthaddedA$22,700\",\"YoucouldhaveA$43,000\"] US: [\"Youputin$32,800\",\"Growthadded$66,000\",\"Youcouldhave$98,700\"]"
     },
     {
+      "id": "v8-1-sharebar-default",
+      "pass": true,
+      "detail": "put share 0.473, key \"47% Money you put in53% Growth\""
+    },
+    {
+      "id": "v8-2-inventory-gains-bar-only",
+      "pass": true,
+      "detail": "bar present: true, unexpected: 0, interactive inside bars: 0"
+    },
+    {
+      "id": "v8-3-toggle-follows-tiles",
+      "pass": true,
+      "detail": "future tile/bar 47/47%, today tile/bar 47/47% (view-invariant by the engine's shared deflator)"
+    },
+    {
+      "id": "v8-4-under-one",
+      "pass": true,
+      "detail": "100% Money you put in<1% Growth"
+    },
+    {
+      "id": "v8-5-negative-growth-fallback",
+      "pass": true,
+      "detail": "bar hidden: true, line \"In today's money, this plan ends below what you put in, so there is no\", tile \"Growth addedA$-1\""
+    },
+    {
+      "id": "v8-6-whatif-bars",
+      "pass": true,
+      "detail": "3 sets (3/2/2 rows), small rising 169<187<206, later 206>126, cash 206>133"
+    },
+    {
+      "id": "v8-7-costs-bars",
+      "pass": true,
+      "detail": "before 206px > after 181px"
+    },
+    {
+      "id": "v8-8-compare-bars",
+      "pass": true,
+      "detail": "Australian:97, S&P:147, World:114, Gold:116, Cash:63 — S&P/cash 2.33 vs finals 2.352542372881356"
+    },
+    {
+      "id": "v8-9-phone-strip",
+      "pass": true,
+      "detail": "put share 0.473, 7px, text-free"
+    },
+    {
+      "id": "v8-10-a4-bar",
+      "pass": true,
+      "detail": "key \"47% Money you put in53% Growth\""
+    },
+    {
+      "id": "v8-11-fa-rtl-bar",
+      "pass": true,
+      "detail": "key \"۴۷٪ پول واردشده۵۳٪ رشد\", put-in at the reading start: true, toggle aria \"EN — تغییر به انگلیسی\""
+    },
+    {
+      "id": "v8-12-toggle-label-in-name-en",
+      "pass": true,
+      "detail": "aria \"فا — Switch to Farsi\""
+    },
+    {
+      "id": "v8-13-light-tokens",
+      "pass": true,
+      "detail": "light: key rgb(71, 82, 93), caption rgb(79, 90, 102) (=== the measured line's own tertiary)"
+    },
+    {
+      "id": "v8-13-dark-tokens",
+      "pass": true,
+      "detail": "dark: key rgb(169, 181, 197), caption rgb(162, 174, 188) (=== the measured line's own tertiary)"
+    },
+    {
+      "id": "v8-14-no-storage-recheck",
+      "pass": true,
+      "detail": "{\"local\":[],\"cookies\":\"\"}"
+    },
+    {
       "id": "19a-direct-load",
       "pass": true,
       "detail": "{\"/tools\":200,\"/tools/compound-wealth\":200,\"/tools/unknown\":404,\"/\":200}"
@@ -319,7 +394,7 @@
     }
   ],
   "summary": {
-    "total": 64,
+    "total": 79,
     "failed": 0
   }
 }

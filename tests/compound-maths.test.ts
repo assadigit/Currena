@@ -24,6 +24,8 @@ import {
   monthlySalaryFrom,
   monthsBetween,
   shareFromAmount,
+  shareRounded,
+  splitFinal,
   thisMonth,
   whatIfCash,
   whatIfLaterStart,
@@ -760,6 +762,108 @@ describe("W7: percent-of-salary conversions", () => {
       // the salary is never named with a number on the card lines
       expect(c.print.planShareSummary).not.toContain("{salary}");
       expect(c.phone.planShareLine).not.toContain("{salary}");
+    }
+  });
+});
+
+describe("v8: the share bar split (splitFinal / shareRounded)", () => {
+  test("growth 0 (a 0% return plan): drawable, all put in", () => {
+    const s = splitFinal(24_000, 24_000);
+    expect(s).not.toBeNull();
+    expect(s!.putInShare).toBe(1);
+    expect(s!.growthShare).toBe(0);
+  });
+  test("final below put in (today's money with high inflation): null — the honest edge", () => {
+    expect(splitFinal(28_900, 29_400)).toBeNull();
+  });
+  test("final 0 and negative finals: null", () => {
+    expect(splitFinal(0, 0)).toBeNull();
+    expect(splitFinal(-1, 0)).toBeNull();
+  });
+  test("put in 0 (a starting-amount-only plan that doubled): all growth", () => {
+    const s = splitFinal(20_000, 0);
+    expect(s).not.toBeNull();
+    expect(s!.putInShare).toBe(0);
+    expect(s!.growthShare).toBe(1);
+  });
+  test("the two shares always sum to exactly 1", () => {
+    for (const [f, p] of [
+      [50_757.6, 24_000],
+      [100.5, 100],
+      [1, 0.999],
+      [77_123.45, 51_003.21],
+    ]) {
+      const s = splitFinal(f, p)!;
+      expect(s.putInShare + s.growthShare).toBe(1);
+    }
+  });
+  test("sub-1% shares round to '<1%', never a misleading 0%", () => {
+    // a 0.05% growth share
+    expect(shareRounded(0.0005)).toEqual({ pct: 0, underOne: true });
+    // a 99.95% put-in share: the growth side is the tiny one
+    const s = splitFinal(10_000, 9_995);
+    expect(s!.growthShare).toBeLessThan(0.01);
+    expect(shareRounded(s!.growthShare).underOne).toBe(true);
+    // a plain share rounds to whole percents, never underOne
+    expect(shareRounded(0.473)).toEqual({ pct: 47, underOne: false });
+    // exactly 0 stays 0 without the under-one flag
+    expect(shareRounded(0)).toEqual({ pct: 0, underOne: false });
+  });
+  test("NaN guards: null, never a broken bar", () => {
+    expect(splitFinal(Number.NaN, 100)).toBeNull();
+    expect(splitFinal(100, Number.NaN)).toBeNull();
+    expect(shareRounded(Number.NaN)).toEqual({ pct: 0, underOne: false });
+  });
+  test("the future-vs-today pair: the shares are view-invariant (both shown values divide by the same deflator); the honest edge fires on negative-growth plans", () => {
+    // The default plan (100/mo, 20y, 7% net, AU inflation 2.76%): both
+    // views drawable, and the today shares equal the future shares —
+    // the engine deflates the final and the put-in by the same
+    // (1+inflation)^(months/12), so the money toggle moves the tiles'
+    // values but never the bar's split (a recorded v8 fact).
+    const r = computeCompound(basePlan({ yearlyCost: 0, inflation: 0.0276 }), SEVEN, 240);
+    const fut = splitFinal(r.finalValue, r.totalPutIn);
+    const tod = splitFinal(r.finalValueToday, r.totalPutInToday);
+    expect(fut).not.toBeNull();
+    expect(tod).not.toBeNull();
+    expect(fut!.putInShare).toBeCloseTo(r.totalPutIn / r.finalValue, 12);
+    expect(tod!.putInShare).toBeCloseTo(fut!.putInShare, 12);
+    expect(tod!.growthShare).toBeCloseTo(fut!.growthShare, 12);
+    // A high-inflation plan still keeps the shares (same deflator).
+    const hi = computeCompound(basePlan({ yearlyCost: 0, inflation: 0.10 }), SEVEN, 240);
+    const hiFut = splitFinal(hi.finalValue, hi.totalPutIn);
+    const hiTod = splitFinal(hi.finalValueToday, hi.totalPutInToday);
+    expect(hiFut).not.toBeNull();
+    expect(hiTod!.putInShare).toBeCloseTo(hiFut!.putInShare, 12);
+    // The honest edge: a negative-growth plan (0% return minus the
+    // 0.2% yearly cost → net −0.2%) hides the bar in BOTH views.
+    const neg = computeCompound(basePlan({ yearlyCost: 0.002, rateMode: "custom-rate", customRate: 0 }), SEVEN, 240);
+    expect(neg.finalValue).toBeLessThan(neg.totalPutIn);
+    expect(splitFinal(neg.finalValue, neg.totalPutIn)).toBeNull();
+    expect(splitFinal(neg.finalValueToday, neg.totalPutInToday)).toBeNull();
+  });
+  test("the copy: the share-bar and bar-label keys exist in both languages (fa + EN)", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const c = COPY[locale].tool;
+      // the share bar
+      expect(c.shareBar.caption.length).toBeGreaterThan(0);
+      expect(c.shareBar.sr).toContain("{put}");
+      expect(c.shareBar.sr).toContain("{growth}");
+      expect(c.shareBar.hiddenLine.length).toBeGreaterThan(0);
+      // fa's under-one carries its own percent sign; EN's is '<1%'
+      expect(c.shareBar.underOne).toBe(locale === "fa" ? "کمتر از ۱٪" : "<1%");
+      // the what-if bar words
+      expect(c.whatIf.barLabels.yourPlan.length).toBeGreaterThan(0);
+      expect(c.whatIf.barLabels.aBitLess.length).toBeGreaterThan(0);
+      expect(c.whatIf.barLabels.aBitMore.length).toBeGreaterThan(0);
+      expect(c.whatIf.barLabels.laterStart).toContain("{n}");
+      expect(c.whatIf.barLabels.invested.length).toBeGreaterThan(0);
+      expect(c.whatIf.barLabels.inCash.length).toBeGreaterThan(0);
+      expect(c.whatIf.barLabels.beforeCosts.length).toBeGreaterThan(0);
+      expect(c.whatIf.barLabels.afterCosts.length).toBeGreaterThan(0);
+      for (const key of ["small", "later", "cash", "costs"] as const) {
+        expect(c.whatIf.barSr[key].length).toBeGreaterThan(10);
+      }
     }
   });
 });

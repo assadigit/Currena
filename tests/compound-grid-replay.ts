@@ -14,6 +14,7 @@ import { readFileSync } from "node:fs";
 import { chromium } from "playwright";
 import {
   computeCompound,
+  splitFinal,
   type AssetFigures,
   type PlanInput,
 } from "../src/lib/compound/maths";
@@ -78,6 +79,17 @@ for (const row of grid) {
   if (row.today_money !== null && !within(r.finalValueToday, row.today_money, 0.01))
     problems.push(`today ${r.finalValueToday.toFixed(2)} vs ${row.today_money.toFixed(2)}`);
   if (Math.abs(r.feesPaid - row.fees) > 0.01) problems.push(`fees ${r.feesPaid} vs ${row.fees}`);
+  /* v8: the share-bar split — drawable iff growth ≥ 0 and final > 0
+     (the honest edge, checked against the reference row itself), and
+     the two shares always sum to exactly 100%. */
+  const split = splitFinal(row.final, row.put_in);
+  const drawable = row.final > 0 && row.final >= row.put_in;
+  if (drawable && split === null) problems.push("split should be drawable but splitFinal returned null");
+  if (!drawable && split !== null) problems.push("split should be hidden (negative growth) but splitFinal drew it");
+  if (split !== null && Math.abs(split.putInShare + split.growthShare - 1) > 1e-12)
+    problems.push(`shares sum ${split.putInShare + split.growthShare}`);
+  if (split !== null && Math.abs(split.putInShare - row.put_in / row.final) > 1e-12)
+    problems.push("putIn share does not match the row's own ratio");
   if (problems.length > 0) {
     engineFails++;
     if (engineFails <= 5) console.log("ENGINE-MISMATCH", JSON.stringify(row.inputs), problems.join("; "));
@@ -153,7 +165,23 @@ async function uiReplay() {
       const small = document.querySelector("[data-cw=small-changes] p")?.textContent ?? "";
       const later = [...document.querySelectorAll('section[aria-label="What if…"] p')].map((p) => p.textContent ?? "");
       const milestones = [...document.querySelectorAll('section[aria-label="Along the way"] li')].map((li) => li.textContent ?? "");
-      return { headline, tiles, range, small, later, milestones };
+      // v8: the share bar's segment widths + the key line's percent words.
+      const segPut = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
+      const segGrow = document.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
+      const key = document.querySelector("[data-cw=share-key]")?.textContent ?? "";
+      const barHiddenLine = document.querySelector("[data-cw=share-bar-hidden]")?.textContent ?? "";
+      return {
+        headline,
+        tiles,
+        range,
+        small,
+        later,
+        milestones,
+        segPutW: segPut ? segPut.getBoundingClientRect().width : null,
+        segGrowW: segGrow ? segGrow.getBoundingClientRect().width : null,
+        key,
+        barHiddenLine,
+      };
     });
     const num = (s: string) => Number((s.match(/[\d,]+(?:\.\d+)?/g) ?? []).join("").replace(/,/g, "")) || 0;
     /** The page's own adaptive rounding (the protected v5 convention). */
@@ -197,6 +225,35 @@ async function uiReplay() {
     if (!near(got.high, want.high, 1)) bad.push(`high ${got.high} vs ${want.high}`);
     if (row.today_money !== null && !near(got.today, want.today, 1)) bad.push(`today ${got.today} vs ${want.today}`);
     if (want.later5 > 0 && !near(got.later5, want.later5, 1)) bad.push(`later5 ${got.later5} vs ${want.later5}`);
+    /* v8: the share bar — present iff the row is drawable; the segment
+       widths ≈ the shares; the key line's percent words equal the
+       tiles' own numbers (the engine's ratio, and the tiles' rounded
+       numbers within a point). */
+    const drawableRow = row.final > 0 && row.final >= row.put_in;
+    if (drawableRow) {
+      if (shown.segPutW === null || shown.segGrowW === null) {
+        bad.push("share bar missing on a drawable scenario");
+      } else {
+        const wantPutShare = row.put_in / row.final;
+        const gotShare = shown.segPutW / (shown.segPutW + shown.segGrowW);
+        if (Math.abs(gotShare - wantPutShare) > 0.01) bad.push(`share width ${gotShare.toFixed(3)} vs ${wantPutShare.toFixed(3)}`);
+        const keyPcts = (shown.key.match(/(\d+)%/g) ?? []).map((s) => Number(s.replace("%", "")));
+        const wantPct = Math.round(wantPutShare * 100);
+        if (keyPcts.length !== 2) bad.push(`key line percents ${JSON.stringify(keyPcts)}`);
+        else {
+          if (Math.abs(keyPcts[0] - wantPct) > 1) bad.push(`key put% ${keyPcts[0]} vs ${wantPct}`);
+          if (Math.abs(keyPcts[0] + keyPcts[1] - 100) > 1) bad.push(`key percents sum ${keyPcts[0] + keyPcts[1]}`);
+          // the tiles' own numbers tell the same story (rounded)
+          if (got.final > 0) {
+            const tilePct = Math.round((got.putIn / got.final) * 100);
+            if (Math.abs(keyPcts[0] - tilePct) > 2) bad.push(`key put% ${keyPcts[0]} vs tiles' ${tilePct}`);
+          }
+        }
+      }
+    } else {
+      if (shown.segPutW !== null) bad.push("share bar drawn on a negative-growth scenario");
+      if (!shown.barHiddenLine) bad.push("hidden-line missing on a negative-growth scenario");
+    }
     if (bad.length > 0) {
       fails.push(`${JSON.stringify(i)} → ${bad.join("; ")}`);
     }
