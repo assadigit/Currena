@@ -1,5 +1,18 @@
 # Start prompt for the v7 session — the tax estimate, trust and mobile pass
 
+## Addendum (2026-11-26, before any v7 work): v8 ships first; re-base this plan on main
+
+The owner's next direction was the outcome-visuals pass (**v8**), and it was scheduled before this one. Nothing below is retired, but before starting v7:
+
+- **Do not branch from `compound-wealth-v6`** (the preflight instruction below is superseded): branch from **main**, which now carries the consolidated tools suite, the shared site chrome, and the v8 visual surface.
+- Read `COMPOUND-WEALTH-V8-PROMPT.md` (repo root, main) and the v8 section of `COMPOUND-WEALTH-REPORT.md` first — the v8 audit records what the tool's surfaces already show.
+- The v7 work itself is unchanged, with **three joins onto the v8 surface**: (1) the tax row still lives inside More options → Costs; (2) when tax is on, the share bar under the tiles shows the after-tax split and its caption line gains the same "after tax (estimate)" wording as the tiles' caption; (3) the "tax takes X" line joins the costs what-if card and takes the same micro-bar treatment as the other cards.
+- The fa language-toggle label-in-name fix and the AA checks for new elements: if v8 already shipped them, do not redo — re-check only.
+
+Everything below this addendum is the original v7 prompt, unchanged.
+
+---
+
 You are working in the Currena repository (github.com/assadigit/Currena, Cloudflare Workers, site currena.ir). The **Compound Wealth** tool is live at https://currena.ir/tools/compound-wealth and **complete to spec v6**: every gate was green on 2026-11-26 — maths 94/94, browser harness 64/64 on the live build, the reference grid 1200/1200 with 15/15 through the real interface, Phase A 32/32, Lighthouse 98/97, lint clean. The record is in `COMPOUND-WEALTH-REPORT.md` §10 and `COMPOUND-WEALTH-TEST-REPORT.md`.
 
 My direction for this session: make the tool **more reliable, accurate and trustworthy**, add **income/savings tax estimates for Australia and the USA**, and keep the **mobile experience excellent**. This prompt is the **v7 addendum** (it is also committed as `COMPOUND-WEALTH-V7-PROMPT.md` in the repo root). `COMPOUND-WEALTH-SPEC.md` (v6) stays the governing document except for the specific amendments in step 3; every other v6 rule — above all the simplicity contract — applies unchanged.
