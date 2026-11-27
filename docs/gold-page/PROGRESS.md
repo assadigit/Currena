@@ -140,3 +140,12 @@ phase (additions only).
 - S1 (2026-11-27): audit → plan → Phase 1 shipped (FAQ + glossary + sources
   band + share row, 2 new pack-style icons, additive proof clean). Phases
   2–4 remain; final review after Phase 4.
+- S2 (2026-11-27): the owner asked for proposed additive sections (wants:
+  futures market + physical market with reliable data) before further
+  implementation. Live source-verification pass run from the sandbox
+  (Yahoo chart+spark futures OK, front "Gold Dec 26"; CME direct blocked;
+  LBMA blocked from sandbox; EODHD daily quota hit; TGJU ajax + per-indicator
+  OK with fresh coin/حباب/PAXG rows). Proposals written to PROPOSALS.md
+  (menu: A futures band, B1 four-prices unifier, B2 venues explainer,
+  B3 digital-gold row, plus recap of Phases 2–4). No page code touched —
+  docs only (this file + PROPOSALS.md). Awaiting owner approval.
