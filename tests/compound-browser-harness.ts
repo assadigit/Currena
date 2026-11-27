@@ -2079,6 +2079,22 @@ async function main() {
     tag: document.querySelector("[data-cw=receipt-examples-tag]")?.textContent ?? "",
     count: document.querySelectorAll("[data-cw=receipt-item]").length,
   }));
+  // The locale-invariance rule (found on the live fa walk): a mid-session
+  // language toggle keeps the hint and the tag — the items are still the
+  // untouched examples, whatever language their labels were born in.
+  await page.click('header button:has-text("فا")');
+  await page.waitForTimeout(500);
+  const tagInFa = await page.evaluate(() => ({
+    tag: document.querySelector("[data-cw=receipt-examples-tag]")?.textContent ?? "",
+    hint: document.querySelector("[data-cw=receipt-hint]")?.textContent ?? "",
+  }));
+  await page.click('header button:has-text("EN")');
+  await page.waitForTimeout(400);
+  check(
+    "v10.1-4a-tag-survives-language-toggle",
+    /نمونه/.test(tagInFa.tag) && tagInFa.hint.includes("نمونه"),
+    `fa tag "${tagInFa.tag}", fa hint "${tagInFa.hint.slice(0, 40)}"`,
+  );
   await page.fill("[data-cw=receipt-what]", "Coffee");
   await page.fill("[data-cw=receipt-price]", "5");
   await page.click("[data-cw=receipt-add]");

@@ -236,12 +236,18 @@ export function SpendingReceipt({
     projection && !projection.neverInvests
       ? splitFinal(projection.finalValue, projection.totalPutIn)
       : null;
-  /** True while the current items are still exactly the three examples. */
+  /** True while the current items are still exactly the three examples.
+   *  Locale-invariant by design: the items are created with the arrival
+   *  locale's labels, so after a mid-session language toggle the labels
+   *  keep their original language while the paper around them switches —
+   *  the items are still untouched, so the hint and the examples tag must
+   *  stay (found on the live fa walk; compared against BOTH languages'
+   *  labels, the amounts and the cadences). */
   const examplesUntouched =
     items.length === RECEIPT_EXAMPLES.length &&
     items.every(
       (it, i) =>
-        it.label === (locale === "fa" ? RECEIPT_EXAMPLES[i].labelFa : RECEIPT_EXAMPLES[i].label) &&
+        (it.label === RECEIPT_EXAMPLES[i].label || it.label === RECEIPT_EXAMPLES[i].labelFa) &&
         it.amount === RECEIPT_EXAMPLES[i].amount &&
         it.cadence === RECEIPT_EXAMPLES[i].cadence,
     );

@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 250ms"
+      "detail": "3 one-tap changes in 237ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -546,6 +546,11 @@
       "detail": "Tab stayed inside (receipt-guide-close), Done closed: true, focus back: true"
     },
     {
+      "id": "v10.1-4a-tag-survives-language-toggle",
+      "pass": true,
+      "detail": "fa tag \"نمونه‌ها\", fa hint \"این‌ها نمونه‌اند — حذفشان کنید و هزینه‌ه\""
+    },
+    {
       "id": "v10.1-4-examples-tag-retires",
       "pass": true,
       "detail": "tag \"Examples\" on 3 pristine examples → gone: true, hint gone: true, 4 items"
@@ -594,7 +599,7 @@
     }
   ],
   "summary": {
-    "total": 119,
+    "total": 120,
     "failed": 0
   }
 }
