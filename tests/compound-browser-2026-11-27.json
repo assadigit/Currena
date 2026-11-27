@@ -9,7 +9,7 @@
     {
       "id": "13-exact-controls",
       "pass": true,
-      "detail": "49 interactive elements, all spec'd"
+      "detail": "50 interactive elements, all spec'd"
     },
     {
       "id": "13b-salary-hidden-in-amount-mode",
@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 264ms"
+      "detail": "3 one-tap changes in 250ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -49,7 +49,7 @@
     {
       "id": "14-390x844-one-screen",
       "pass": true,
-      "detail": "chips bottom 707/844, scrollW 390, scrollY 64"
+      "detail": "chips bottom 771/844, scrollW 390, scrollY 0"
     },
     {
       "id": "14-360x800-one-screen",
@@ -68,37 +68,37 @@
     {
       "id": "22-a4-en-light",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1128B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1138B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-dark",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1128B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1138B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-light-costs",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1114B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-dark-costs",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1115B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1114B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-en-light-share",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1171B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1169B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-light",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1297B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1299B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-dark",
       "pass": true,
-      "detail": "pages=1 size=595.92 x 842.88 pts text=1297B numbers=true salaryLeak=false"
+      "detail": "pages=1 size=595.92 x 842.88 pts text=1299B numbers=true salaryLeak=false"
     },
     {
       "id": "22-a4-fa-light-costs",
@@ -286,14 +286,14 @@
       "detail": "AU: [\"YouputinA$20,400\",\"GrowthaddedA$22,700\",\"YoucouldhaveA$43,000\"] US: [\"Youputin$32,800\",\"Growthadded$66,000\",\"Youcouldhave$98,700\"]"
     },
     {
-      "id": "v8-1-sharebar-default",
+      "id": "v8-1-sharedonut-default",
       "pass": true,
       "detail": "put share 0.473, key \"47% Money you put in53% Growth\""
     },
     {
-      "id": "v8-2-inventory-gains-bar-only",
+      "id": "v8-2-inventory-gains-donut-only",
       "pass": true,
-      "detail": "bar present: true, unexpected: 0, interactive inside bars: 0"
+      "detail": "donut present: true, unexpected: 0, interactive inside charts: 0"
     },
     {
       "id": "v8-3-toggle-follows-tiles",
@@ -308,37 +308,37 @@
     {
       "id": "v8-5-negative-growth-fallback",
       "pass": true,
-      "detail": "bar hidden: true, line \"In today's money, this plan ends below what you put in, so there is no\", tile \"Growth addedA$-1\""
+      "detail": "donut hidden: true, line \"In today's money, this plan ends below what you put in, so there is no\", tile \"Growth addedA$-1\""
     },
     {
-      "id": "v8-6-whatif-bars",
+      "id": "v8-6-whatif-cols",
       "pass": true,
-      "detail": "3 sets (3/2/2 rows), small rising 169<187<206, later 206>126, cash 206>133"
+      "detail": "3 sets (3/2/2 columns), small rising 36<40<44, later 44>27, cash 44>28, every label centred under its column"
     },
     {
-      "id": "v8-7-costs-bars",
+      "id": "v8-7-costs-cols",
       "pass": true,
-      "detail": "before 206px > after 181px"
+      "detail": "before 44px > after 39px"
     },
     {
-      "id": "v8-8-compare-bars",
+      "id": "v8-8-compare-cols",
       "pass": true,
-      "detail": "Australian:97, S&P:147, World:114, Gold:116, Cash:63 — S&P/cash 2.33 vs finals 2.352542372881356"
+      "detail": "5 columns on one scale under the table (tallest: S&P 500 44px vs 19px ≈ finals 69400/29500), 1 gold column (the current asset), sr \"One column per asset on one scale: the t\""
     },
     {
-      "id": "v8-9-phone-strip",
+      "id": "v8-9-phone-donut",
       "pass": true,
-      "detail": "put share 0.473, 7px, text-free"
+      "detail": "put share 0.473, 60px, text-free"
     },
     {
-      "id": "v8-10-a4-bar",
+      "id": "v8-10-a4-donut",
       "pass": true,
       "detail": "key \"47% Money you put in53% Growth\""
     },
     {
-      "id": "v8-11-fa-rtl-bar",
+      "id": "v8-11-fa-rtl-donut",
       "pass": true,
-      "detail": "key \"۴۷٪ پول واردشده۵۳٪ رشد\", put-in at the reading start: true, toggle aria \"EN — تغییر به انگلیسی\""
+      "detail": "key \"۴۷٪ پول واردشده۵۳٪ رشد\", donut sr has ٪: true, toggle aria \"EN — تغییر به انگلیسی\""
     },
     {
       "id": "v8-12-toggle-label-in-name-en",
@@ -433,7 +433,7 @@
     {
       "id": "v10-1-examples-on-arrival",
       "pass": true,
-      "detail": "items [\"YouTube Premium\",\"Spotify\",\"iCloud+ 2TB\"], monthly Total per monthA$34.97, sentence Investing A$34.97 a month for 10 years: about A$6,000 (about A$4,600 in today's money)."
+      "detail": "items [\"YouTube Premium\",\"Spotify\",\"iCloud+ 2TB\"], monthly Total per monthA$34.97, donut put% 70.154, sentence Investing A$34.97 a month for 10 years: about A$6,000 (about A$4,600 in today's money)."
     },
     {
       "id": "v10-2-add-updates-all",
@@ -488,7 +488,7 @@
     {
       "id": "v10-12-default-screen-untouched",
       "pass": true,
-      "detail": "receipt controls [\"receipt-add\",\"receipt-cadence\",\"receipt-clear\",\"receipt-horizon-10\",\"receipt-horizon-3\",\"receipt-horizon-5\",\"receipt-price\",\"receipt-remove\",\"receipt-remove\",\"receipt-remove\",\"receipt-what\"], one-screen true/true/true"
+      "detail": "receipt controls [\"receipt-add\",\"receipt-cadence\",\"receipt-clear\",\"receipt-guide-open\",\"receipt-horizon-10\",\"receipt-horizon-3\",\"receipt-horizon-5\",\"receipt-price\",\"receipt-remove\",\"receipt-remove\",\"receipt-remove\",\"receipt-what\"], one-screen true/true/true"
     },
     {
       "id": "v10-13-follows-asset",
@@ -531,6 +531,36 @@
       "detail": "jargon [], avg 12 words over 7 sentences"
     },
     {
+      "id": "v10.1-1-guide-modal-opens",
+      "pass": true,
+      "detail": "role=dialog, aria-modal=true, 4 steps, focus inside: true"
+    },
+    {
+      "id": "v10.1-2-guide-escape-focus",
+      "pass": true,
+      "detail": "modal gone: true, focus returned to the guide pill: true"
+    },
+    {
+      "id": "v10.1-3-guide-trap-and-done",
+      "pass": true,
+      "detail": "Tab stayed inside (receipt-guide-close), Done closed: true, focus back: true"
+    },
+    {
+      "id": "v10.1-4-examples-tag-retires",
+      "pass": true,
+      "detail": "tag \"Examples\" on 3 pristine examples → gone: true, hint gone: true, 4 items"
+    },
+    {
+      "id": "v10.1-5-chart-labels-collision-free",
+      "pass": true,
+      "detail": "default: [] outside []; all-on: [] outside [] over 18 labels"
+    },
+    {
+      "id": "v10.1-6-milestone-halos",
+      "pass": true,
+      "detail": "3 milestone labels, all haloed: true"
+    },
+    {
       "id": "19a-direct-load",
       "pass": true,
       "detail": "{\"/tools\":200,\"/tools/compound-wealth\":200,\"/tools/unknown\":404,\"/\":200}"
@@ -564,7 +594,7 @@
     }
   ],
   "summary": {
-    "total": 113,
+    "total": 119,
     "failed": 0
   }
 }

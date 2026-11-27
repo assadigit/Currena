@@ -145,16 +145,21 @@ export const RECEIPT_AMOUNT_MAX = 999_999;
 /** The paper card's fixed light palette (v10 spec §5) — a receipt is
  *  paper, so the card keeps its own light colours in BOTH themes (the
  *  A4 card's ink-safe precedent). Every text pair is AA on the paper
- *  ground: ink 12.7:1, muted 5.6:1 (measured). */
+ *  ground: ink 12.7:1, muted 5.6:1 (measured). The gold is the
+ *  projection donut's growth segment — a graphic, so the non-text
+ *  3:1 bar applies: 3.6:1 on the paper (measured; the ink chart's own
+ *  gold, #a87e1c). */
 export const RECEIPT_PALETTE = {
   /** The paper ground. */
   paper: "#fffdf6",
-  /** The main ink (labels, amounts, the sentence). */
+  /** The main ink (labels, amounts, the sentence, the donut's put-in). */
   ink: "#26333d",
   /** The secondary ink (hints, the assumption line, the thanks). */
   muted: "#5a6873",
   /** The dotted leaders and the dashed rules. */
   rule: "#aeb8c0",
+  /** The projection donut's growth segment (non-text, ≥3:1). */
+  gold: "#a87e1c",
 } as const;
 
 /* =================================================================== *

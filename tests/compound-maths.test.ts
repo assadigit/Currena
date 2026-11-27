@@ -15,6 +15,7 @@ import {
   RECEIPT_EXAMPLES,
   RECEIPT_HORIZONS,
   RECEIPT_HORIZON_DEFAULT,
+  RECEIPT_PALETTE,
   addMonths,
   audFromUsd,
   chooseRate,
@@ -1048,5 +1049,62 @@ describe("v10: the spending receipt (spec §6.7, test 48)", () => {
       expect(c.srSummary).toContain("{yearly}");
       expect(c.srSummary).toContain("{final}");
     }
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* v10.1 — the owner's feedback pass: donut/columns copy, the guide  */
+/* modal's copy keys, and the paper's gold tone (non-text ≥ 3:1)     */
+/* ---------------------------------------------------------------- */
+describe("v10.1: the feedback pass (donut, columns, the guide modal)", () => {
+  test("the guide modal's copy keys exist in both languages", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const c = COPY[locale].tool.receipt;
+      expect(c.guideLabel.length).toBeGreaterThan(2);
+      expect(c.guideTitle.length).toBeGreaterThan(5);
+      expect(c.guideSteps.length).toBe(4);
+      c.guideSteps.forEach((step) => expect(step.length).toBeGreaterThan(25));
+      expect(c.guideClose.length).toBeGreaterThan(2);
+      expect(c.guideDone.length).toBeGreaterThan(2);
+      expect(c.examplesTag.length).toBeGreaterThan(3);
+    }
+  });
+
+  test("the charts' sr sentences name columns, not bars", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const w = COPY[locale].tool.whatIf;
+      const columnWord = locale === "fa" ? /ستون/ : /column/i;
+      expect(w.barSr.small).toMatch(columnWord);
+      expect(w.barSr.later).toMatch(columnWord);
+      expect(w.barSr.cash).toMatch(columnWord);
+      expect(w.barSr.costs).toMatch(columnWord);
+      expect(COPY[locale].tool.moreOptions.compareSr.length).toBeGreaterThan(20);
+    }
+  });
+
+  test("the donut caption names the chart's own colours", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      expect(COPY[locale].tool.shareBar.caption.toLowerCase()).toContain(locale === "fa" ? "نمودار" : "chart");
+    }
+  });
+
+  test("the paper's gold tone is a graphic-safe >=3:1 on the paper", () => {
+    const lum = (hex: string) => {
+      const m = hex.replace("#", "");
+      const [r, g, b] = [0, 2, 4]
+        .map((i) => parseInt(m.slice(i, i + 2), 16) / 255)
+        .map((v) => (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const ratio = (a: string, b: string) => {
+      const la = lum(a), lb = lum(b);
+      return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    };
+    expect(RECEIPT_PALETTE.gold).toBe("#a87e1c");
+    expect(ratio(RECEIPT_PALETTE.gold, RECEIPT_PALETTE.paper)).toBeGreaterThanOrEqual(3);
+    expect(ratio(RECEIPT_PALETTE.ink, RECEIPT_PALETTE.paper)).toBeGreaterThanOrEqual(7);
   });
 });

@@ -219,7 +219,10 @@ async function main() {
   for (const [w, h] of [[390, 844], [360, 800], [430, 932]] as const) {
     await page.setViewportSize({ width: w, height: h });
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(350);
+    // (600ms: the resize re-render — the chart re-measures its width —
+    // can outlast 350ms on a loaded dev server; measured, the flake
+    // recorded in the v10.1 test report.)
+    await page.waitForTimeout(600);
     const fit = await page.evaluate(() => {
       const vp = window.innerHeight;
       const headline = document.querySelector("[data-cw=headline]")!.getBoundingClientRect();
@@ -702,40 +705,42 @@ async function main() {
   await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-cw=headline]");
 
-  // v8-1: the share bar under the tiles — present, keyed, proportioned.
+  // v8-1 (donut since v10.1): the share donut under the tiles —
+  // present, keyed, proportioned (pathLength=100 → the ring's
+  // stroke-dasharray IS the percent).
   const shareBarDefault = await page.evaluate(() => {
-    const bar = document.querySelector("[data-cw=share-bar]") as HTMLElement | null;
-    const wrap = document.querySelector("[data-cw=share-bar-wrap]");
+    const donut = document.querySelector("[data-cw=share-donut]") as SVGSVGElement | null;
+    const wrap = document.querySelector("[data-cw=share-donut-wrap]");
     const tilesSec = document.querySelector('section[aria-label="You could have"]');
     const key = document.querySelector("[data-cw=share-key]");
     const caption = document.querySelector("[data-cw=share-caption]");
-    const segP = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
-    const segG = document.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
-    if (!bar || !segP || !segG) return { present: false };
-    const pw = segP.getBoundingClientRect().width;
-    const gw = segG.getBoundingClientRect().width;
+    const segP = document.querySelector("[data-cw=share-seg-putin]");
+    const segG = document.querySelector("[data-cw=share-seg-growth]");
+    if (!donut || !segP || !segG) return { present: false };
+    const pw = Number((segP.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
+    const gw = Number((segG.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
     return {
       present: true,
       inTilesSection: !!(wrap && tilesSec?.contains(wrap)),
-      role: bar.getAttribute("role"),
-      aria: bar.getAttribute("aria-label") ?? "",
+      role: donut.getAttribute("role"),
+      aria: donut.getAttribute("aria-label") ?? "",
       putShare: +(pw / (pw + gw)).toFixed(3),
       key: key?.textContent ?? "",
       caption: caption?.textContent ?? "",
-      interactiveInside: bar.querySelectorAll("button, input, select, a[href]").length,
-      titlesInside: bar.querySelectorAll("[title]").length,
-      trackH: Math.round(segP.getBoundingClientRect().height),
+      interactiveInside: donut.querySelectorAll("button, input, select, a[href]").length,
+      titlesInside: donut.querySelectorAll("[title]").length,
+      svgH: Math.round(donut.getBoundingClientRect().height),
     };
   });
   check(
-    "v8-1-sharebar-default",
+    "v8-1-sharedonut-default",
     shareBarDefault.present === true &&
       (shareBarDefault as any).inTilesSection === true &&
       (shareBarDefault as any).role === "img" &&
       /47% Money you put in/.test((shareBarDefault as any).key) &&
       /53% Growth/.test((shareBarDefault as any).key) &&
       Math.abs((shareBarDefault as any).putShare - 0.472) < 0.02 &&
-      /The same two colours as the chart/.test((shareBarDefault as any).caption) &&
+      /chart's own two colours/.test((shareBarDefault as any).caption) &&
       (shareBarDefault as any).interactiveInside === 0 &&
       (shareBarDefault as any).titlesInside === 0,
     `put share ${(shareBarDefault as any).putShare}, key "${(shareBarDefault as any).key}"`,
@@ -752,9 +757,9 @@ async function main() {
       .filter((el) => (el as HTMLElement).offsetParent !== null)
       .map((el) => ({
         cw: el.getAttribute("data-cw") ?? "",
-        insideBar: !!el.closest("[data-cw=share-bar-wrap], [data-cw=whatif-bars]"),
+        insideChart: !!el.closest("[data-cw=share-donut-wrap], [data-cw=whatif-cols], [data-cw=compare-cols]"),
       }));
-    const bar = document.querySelector("[data-cw=share-bar-wrap]");
+    const bar = document.querySelector("[data-cw=share-donut-wrap]");
     const allowed = [
       "country-", "amount-", "years-", "asset-", "more-options", "save-card", "money-", "card-menu",
       "later-", "how", "tools-link", "mode-", "add-salary", "salary-", "percent-",
@@ -763,15 +768,15 @@ async function main() {
       "receipt-",
     ];
     return {
-      unexpected: interactive.filter((c) => !c.insideBar && !allowed.some((p) => c.cw.startsWith(p))).length,
-      insideBars: interactive.filter((c) => c.insideBar).length,
+      unexpected: interactive.filter((c) => !c.insideChart && !allowed.some((p) => c.cw.startsWith(p))).length,
+      insideCharts: interactive.filter((c) => c.insideChart).length,
       barPresent: !!bar,
     };
   });
   check(
-    "v8-2-inventory-gains-bar-only",
-    inventoryWithBar.barPresent && inventoryWithBar.unexpected === 0 && inventoryWithBar.insideBars === 0,
-    `bar present: ${inventoryWithBar.barPresent}, unexpected: ${inventoryWithBar.unexpected}, interactive inside bars: ${inventoryWithBar.insideBars}`,
+    "v8-2-inventory-gains-donut-only",
+    inventoryWithBar.barPresent && inventoryWithBar.unexpected === 0 && inventoryWithBar.insideCharts === 0,
+    `donut present: ${inventoryWithBar.barPresent}, unexpected: ${inventoryWithBar.unexpected}, interactive inside charts: ${inventoryWithBar.insideCharts}`,
   );
 
   // v8-3: the money toggle flips the tiles and the bar follows — the
@@ -783,11 +788,11 @@ async function main() {
       const tiles = [...document.querySelectorAll('section[aria-label="You could have"] .grid > div')].map((d) =>
         Number((d.textContent ?? "").replace(/[^0-9]/g, "")),
       );
-      const segP = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
-      const segG = document.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
+      const segP = document.querySelector("[data-cw=share-seg-putin]");
+      const segG = document.querySelector("[data-cw=share-seg-growth]");
       if (!segP || !segG || !tiles[0] || !tiles[2]) return null;
-      const pw = segP.getBoundingClientRect().width;
-      const gw = segG.getBoundingClientRect().width;
+      const pw = Number((segP.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
+      const gw = Number((segG.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
       return { tilePct: Math.round((tiles[0] / tiles[2]) * 100), barPct: Math.round((pw / (pw + gw)) * 100) };
     });
   const ratioFuture = await tilesRatio();
@@ -832,34 +837,40 @@ async function main() {
   await page.click("[data-cw=more-options]");
   await page.waitForTimeout(300);
   const negative = await page.evaluate(() => ({
-    bar: document.querySelector("[data-cw=share-bar]") !== null,
-    hidden: document.querySelector("[data-cw=share-bar-hidden]")?.textContent ?? "",
+    bar: document.querySelector("[data-cw=share-donut]") !== null,
+    hidden: document.querySelector("[data-cw=share-donut-hidden]")?.textContent ?? "",
     growthTile: [...document.querySelectorAll('section[aria-label="You could have"] .grid > div')][1]?.textContent ?? "",
   }));
   check(
     "v8-5-negative-growth-fallback",
     !negative.bar && /below what you put in/.test(negative.hidden),
-    `bar hidden: ${!negative.bar}, line "${negative.hidden.slice(0, 70)}", tile "${negative.growthTile}"`,
+    `donut hidden: ${!negative.bar}, line "${negative.hidden.slice(0, 70)}", tile "${negative.growthTile}"`,
   );
 
-  // v8-6: the what-if micro-bars — one set per card, on one scale, no
-  // interaction; the small-changes bars rise in step; later and cash
-  // keep your plan longest.
+  // v8-6 (columns since v10.1): the what-if column charts — one set
+  // per card, on one shared baseline, no interaction; the
+  // small-changes columns rise in step; later and cash keep your plan
+  // tallest; every label sits centred under its own column.
   await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-cw=headline]");
   const whatifBars = await page.evaluate(() => {
-    const sets = [...document.querySelectorAll("[data-cw=whatif-bars]")].map((s) => {
-      const rows = [...s.children].map((r) => {
-        const fill = r.querySelector("span > span") as HTMLElement | null;
+    const sets = [...document.querySelectorAll("[data-cw=whatif-cols]")].map((s) => {
+      const cols = [...s.querySelectorAll("[data-cw=whatif-col]")] as HTMLElement[];
+      const labels = [...s.querySelectorAll("div:last-child > span")] as HTMLElement[];
+      const rows = cols.map((c, i) => {
+        const cr = c.getBoundingClientRect();
+        const lr = labels[i]?.getBoundingClientRect();
         return {
-          label: (r.querySelector("span")?.textContent ?? "").trim(),
-          w: fill ? Math.round(fill.getBoundingClientRect().width) : 0,
+          label: (labels[i]?.textContent ?? "").trim(),
+          h: Math.round(cr.height),
+          labelOffset: lr ? Math.round(lr.left + lr.width / 2 - (cr.left + cr.width / 2)) : 99,
         };
       });
       return {
         role: s.getAttribute("role"),
         aria: s.getAttribute("aria-label") ?? "",
         rows,
+        aligned: rows.every((r) => Math.abs(r.labelOffset) <= 2),
         interactiveInside: s.querySelectorAll("button, input, select, a[href]").length,
         titlesInside: s.querySelectorAll("[title]").length,
       };
@@ -873,21 +884,22 @@ async function main() {
   const laterSet = whatifBars.sets[1];
   const cashSet = whatifBars.sets[2];
   check(
-    "v8-6-whatif-bars",
+    "v8-6-whatif-cols",
     whatifBars.sets.length === 3 &&
       !whatifBars.costsCardPresent &&
       smallSet.rows.length === 3 &&
-      smallSet.rows[0].w < smallSet.rows[1].w &&
-      smallSet.rows[1].w < smallSet.rows[2].w &&
+      smallSet.rows[0].h < smallSet.rows[1].h &&
+      smallSet.rows[1].h < smallSet.rows[2].h &&
       laterSet.rows.length === 2 &&
-      laterSet.rows[0].w > laterSet.rows[1].w &&
+      laterSet.rows[0].h > laterSet.rows[1].h &&
       cashSet.rows.length === 2 &&
-      cashSet.rows[0].w > cashSet.rows[1].w &&
-      whatifBars.sets.every((s) => s.role === "img" && s.aria.length > 10 && s.interactiveInside === 0 && s.titlesInside === 0),
-    `3 sets (3/2/2 rows), small rising ${smallSet.rows.map((r) => r.w).join("<")}, later ${laterSet.rows.map((r) => r.w).join(">")}, cash ${cashSet.rows.map((r) => r.w).join(">")}`,
+      cashSet.rows[0].h > cashSet.rows[1].h &&
+      whatifBars.sets.every((s) => s.role === "img" && s.aria.length > 10 && s.interactiveInside === 0 && s.titlesInside === 0 && s.aligned),
+    `3 sets (3/2/2 columns), small rising ${smallSet.rows.map((r) => r.h).join("<")}, later ${laterSet.rows.map((r) => r.h).join(">")}, cash ${cashSet.rows.map((r) => r.h).join(">")}, every label centred under its column`,
   );
 
-  // v8-7: the costs card's before/after bars (fee 10 → the card appears).
+  // v8-7 (columns since v10.1): the costs card's before/after columns
+  // (fee 10 → the card appears).
   await page.click("[data-cw=more-options]");
   await page.waitForSelector("[data-cw=more-options-groups]");
   await page.click('[data-cw="group-costs"] button');
@@ -899,25 +911,27 @@ async function main() {
     const costsCard = [...document.querySelectorAll("section[aria-label='What if…'] > div > div")].find((c) =>
       /^Costs$/.test(c.querySelector("div")?.textContent ?? ""),
     );
-    const bars = costsCard?.querySelector("[data-cw=whatif-bars]");
-    if (!bars) return { present: false };
-    const rows = [...bars.children].map((r) => {
-      const fill = r.querySelector("span > span") as HTMLElement | null;
-      return { label: (r.querySelector("span")?.textContent ?? "").trim(), w: fill ? Math.round(fill.getBoundingClientRect().width) : 0 };
-    });
-    return { present: true, aria: bars.getAttribute("aria-label") ?? "", rows };
+    const cols = costsCard?.querySelector("[data-cw=whatif-cols]");
+    if (!cols) return { present: false };
+    const rows = [...cols.querySelectorAll("[data-cw=whatif-col]")].map((c) =>
+      Math.round((c as HTMLElement).getBoundingClientRect().height),
+    );
+    const labels = [...cols.querySelectorAll("div:last-child > span")].map((s) => (s.textContent ?? "").trim());
+    return { present: true, aria: cols.getAttribute("aria-label") ?? "", rows, labels };
   });
   check(
-    "v8-7-costs-bars",
+    "v8-7-costs-cols",
     costsBars.present === true &&
-      costsBars.rows.length === 2 &&
-      costsBars.rows[0].w > costsBars.rows[1].w &&
-      /Before costs/.test(costsBars.rows[0].label) &&
-      /After costs/.test(costsBars.rows[1].label),
-    `before ${costsBars.rows[0]?.w}px > after ${costsBars.rows[1]?.w}px`,
+      (costsBars as any).rows.length === 2 &&
+      (costsBars as any).rows[0] > (costsBars as any).rows[1] &&
+      /Before costs/.test((costsBars as any).labels[0]) &&
+      /After costs/.test((costsBars as any).labels[1]),
+    `before ${(costsBars as any).rows[0]}px > after ${(costsBars as any).rows[1]}px`,
   );
 
-  // v8-8: the compare table's proportional bars (behind More options).
+  // v8-8 (columns since v10.1): the compare table's column chart under
+  // the table (behind More options) — one column per asset on one common
+  // scale, the current asset's column the gold one (its swatch colour).
   await page.click("[data-cw=more-options]");
   await page.waitForSelector("[data-cw=more-options-groups]");
   await page.click('[data-cw="group-dates"] button');
@@ -925,32 +939,47 @@ async function main() {
   await page.click("[data-cw=compare-toggle]");
   await page.waitForTimeout(400);
   const compareBars = await page.evaluate(() => {
-    const rows = [...document.querySelectorAll("[data-cw=compare-table] tbody tr")];
-    return rows.map((r) => {
-      const bar = r.querySelector("[data-cw=compare-bar]") as HTMLElement | null;
-      const final = Number((r.cells[2]?.textContent ?? "").replace(/[^0-9]/g, ""));
-      return { asset: r.cells[0]?.textContent ?? "", final, w: bar ? Math.round(bar.getBoundingClientRect().width) : 0 };
-    });
+    const rows = [...document.querySelectorAll("[data-cw=compare-table] tbody tr")] as HTMLTableRowElement[];
+    const cols = [...document.querySelectorAll("[data-cw=compare-cols] [data-cw=whatif-col]")] as HTMLElement[];
+    return {
+      tableRows: rows.map((r) => ({
+        asset: r.cells[0]?.textContent ?? "",
+        final: Number((r.cells[2]?.textContent ?? "").replace(/[^0-9]/g, "")),
+      })),
+      role: document.querySelector("[data-cw=compare-cols] [role=img]")?.getAttribute("aria-label") ?? "",
+      cols: cols.map((c) => ({
+        h: Math.round(c.getBoundingClientRect().height),
+        gold: getComputedStyle(c).backgroundColor,
+      })),
+    };
   });
-  const spRow = compareBars.find((r) => /S&P 500/.test(r.asset));
-  const cashRow = compareBars.find((r) => /Cash/.test(r.asset));
+  const spFinal = compareBars.tableRows.find((r) => /S&P 500/.test(r.asset))?.final ?? 0;
+  const cashFinal = compareBars.tableRows.find((r) => /Cash/.test(r.asset))?.final ?? 0;
+  const maxH = Math.max(...compareBars.cols.map((c) => c.h));
+  const minH = Math.min(...compareBars.cols.map((c) => c.h));
+  const maxFinal = Math.max(...compareBars.tableRows.map((r) => r.final));
+  const minFinal = Math.min(...compareBars.tableRows.map((r) => r.final));
+  const maxHFinal = compareBars.tableRows.find((r) => r.final === maxFinal)?.asset ?? "";
+  /** The current asset's column is the gold token (rgb(243,177,63) in
+   *  light); the others are the text-secondary ink (rgb(71,82,93)). */
+  const goldCols = compareBars.cols.filter((c) => c.gold === "rgb(243, 177, 63)").length;
   check(
-    "v8-8-compare-bars",
-    compareBars.length === 5 &&
-      compareBars.every((r) => r.w > 0) &&
-      spRow !== undefined &&
-      cashRow !== undefined &&
-      spRow.w === Math.max(...compareBars.map((r) => r.w)) &&
-      cashRow.w === Math.min(...compareBars.map((r) => r.w)) &&
-      Math.abs(spRow.w / cashRow.w - spRow.final / cashRow.final) < 0.08,
-    `${compareBars.map((r) => `${r.asset.split(" ")[0]}:${r.w}`).join(", ")} — S&P/cash ${spRow ? (spRow.w / (cashRow?.w || 1)).toFixed(2) : "?"} vs finals ${(spRow?.final ?? 0) / (cashRow?.final ?? 1)}`,
+    "v8-8-compare-cols",
+    compareBars.tableRows.length === 5 &&
+      compareBars.cols.length === 5 &&
+      compareBars.cols.every((c) => c.h > 0) &&
+      Math.abs(maxH / minH - maxFinal / minFinal) < 0.1 &&
+      spFinal > cashFinal &&
+      /one scale/i.test(compareBars.role) &&
+      goldCols === 1,
+    `5 columns on one scale under the table (tallest: ${maxHFinal} ${maxH}px vs ${minH}px ≈ finals ${maxFinal}/${minFinal}), ${goldCols} gold column (the current asset), sr "${compareBars.role.slice(0, 40)}"`,
   );
   await page.click("[data-cw=more-options]");
   await page.waitForTimeout(200);
 
-  // v8-9: the phone card's strip — text-free, sr twin, proportioned.
-  // (A fresh reload first, so the 47/53 default shares are back — the
-  // fee-10 plan from v8-7 shifts them.)
+  // v8-9 (donut since v10.1): the phone card's donut — text-free, sr
+  // twin, proportioned. (A fresh reload first, so the 47/53 default
+  // shares are back — the fee-10 plan from v8-7 shifts them.)
   await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-cw=headline]");
   await page.click("[data-cw=save-card]");
@@ -959,58 +988,60 @@ async function main() {
   await page.waitForSelector("[data-cw=phone-card]");
   await page.waitForTimeout(600);
   const phoneStrip = await page.evaluate(() => {
-    const strip = document.querySelector("[data-cw=phone-share-wrap] [data-cw=share-bar]") as HTMLElement | null;
-    if (!strip) return { present: false };
-    const segP = strip.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
-    const segG = strip.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
-    const pw = segP?.getBoundingClientRect().width ?? 0;
-    const gw = segG?.getBoundingClientRect().width ?? 0;
+    const wrap = document.querySelector("[data-cw=phone-share-wrap]");
+    const donut = wrap?.querySelector("[data-cw=share-donut]") as SVGSVGElement | null;
+    if (!donut) return { present: false };
+    const segP = donut.querySelector("[data-cw=share-seg-putin]");
+    const segG = donut.querySelector("[data-cw=share-seg-growth]");
+    const pw = Number((segP?.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
+    const gw = Number((segG?.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
     return {
       present: true,
-      role: strip.getAttribute("role"),
-      aria: strip.getAttribute("aria-label") ?? "",
+      role: donut.getAttribute("role"),
+      aria: donut.getAttribute("aria-label") ?? "",
       putShare: +(pw / (pw + gw)).toFixed(3),
-      textInside: (strip.textContent ?? "").trim(),
-      height: Math.round(strip.getBoundingClientRect().height),
+      textInside: (donut.textContent ?? "").trim(),
+      size: Math.round(donut.getBoundingClientRect().width),
     };
   });
   check(
-    "v8-9-phone-strip",
+    "v8-9-phone-donut",
     phoneStrip.present === true &&
       (phoneStrip as any).role === "img" &&
       /47% is money you put in/.test((phoneStrip as any).aria) &&
       Math.abs((phoneStrip as any).putShare - 0.472) < 0.02 &&
       (phoneStrip as any).textInside === "" &&
-      (phoneStrip as any).height <= 8,
-    `put share ${(phoneStrip as any).putShare}, ${(phoneStrip as any).height}px, text-free`,
+      (phoneStrip as any).size >= 40,
+    `put share ${(phoneStrip as any).putShare}, ${(phoneStrip as any).size}px, text-free`,
   );
   await page.keyboard.press("Escape");
   await page.waitForTimeout(300);
 
-  // v8-10: the A4 card's bar + key line (ink-safe palette).
+  // v8-10 (donut since v10.1): the A4 card's donut + key line (ink-safe
+  // palette).
   await page.click("[data-cw=save-card]");
   await page.waitForSelector("[data-cw=card-menu]");
   await page.click('[data-cw=card-menu] button:has-text("Print")');
   await page.waitForSelector("[data-cw=print-overlay]");
   await page.waitForTimeout(500);
   const a4Bar = await page.evaluate(() => {
-    const bar = document.querySelector(".cw-share-bar [data-cw=share-bar]") as HTMLElement | null;
+    const donut = document.querySelector(".cw-share-bar [data-cw=share-donut]") as SVGSVGElement | null;
     const key = document.querySelector(".cw-share-key");
-    if (!bar) return { present: false };
-    const segP = bar.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
-    const segG = bar.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
-    const pw = segP?.getBoundingClientRect().width ?? 0;
-    const gw = segG?.getBoundingClientRect().width ?? 0;
+    if (!donut) return { present: false };
+    const segP = donut.querySelector("[data-cw=share-seg-putin]");
+    const segG = donut.querySelector("[data-cw=share-seg-growth]");
+    const pw = Number((segP?.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
+    const gw = Number((segG?.getAttribute("stroke-dasharray") ?? "0 0").split(" ")[0]);
     return {
       present: true,
-      role: bar.getAttribute("role"),
-      aria: bar.getAttribute("aria-label") ?? "",
+      role: donut.getAttribute("role"),
+      aria: donut.getAttribute("aria-label") ?? "",
       putShare: +(pw / (pw + gw)).toFixed(3),
       key: key?.textContent ?? "",
     };
   });
   check(
-    "v8-10-a4-bar",
+    "v8-10-a4-donut",
     a4Bar.present === true &&
       (a4Bar as any).role === "img" &&
       Math.abs((a4Bar as any).putShare - 0.472) < 0.02 &&
@@ -1021,39 +1052,38 @@ async function main() {
   await page.keyboard.press("Escape");
   await page.waitForTimeout(300);
 
-  // v8-11: fa/RTL — Persian digits + ٪ in the key line, the put-in
-  // segment at the reading start (the right edge), the caption in
-  // Persian; and the language toggle's label-in-name fix (the visible
-  // text opens the accessible name).
+  // v8-11 (donut since v10.1): fa/RTL — Persian digits + ٪ in the key
+  // line, the key's first entry names the put-in word (reading order:
+  // the fa key line starts with the put-in share, mirroring the EN
+  // order), the caption in Persian; and the language toggle's
+  // label-in-name fix (the visible text opens the accessible name).
   await page.click('header button:has-text("فا")');
   await page.waitForTimeout(500);
   const faBar = await page.evaluate(() => {
-    const segP = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
-    const bar = document.querySelector("[data-cw=share-bar]") as HTMLElement | null;
     const key = document.querySelector("[data-cw=share-key]");
+    const donut = document.querySelector("[data-cw=share-donut]") as SVGSVGElement | null;
     const caption = document.querySelector("[data-cw=share-caption]");
     const toggle = [...document.querySelectorAll("header button")].find((b) => (b.textContent ?? "").trim() === "EN");
-    if (!segP || !bar) return { present: false };
-    const br = bar.getBoundingClientRect();
-    const pr = segP.getBoundingClientRect();
+    if (!donut) return { present: false };
     return {
       present: true,
       key: key?.textContent ?? "",
       caption: caption?.textContent ?? "",
-      putInAtReadingStart: Math.abs(br.right - pr.right) < 1.5,
+      donutAria: donut.getAttribute("aria-label") ?? "",
       toggleAria: toggle?.getAttribute("aria-label") ?? "",
       toggleText: toggle?.textContent ?? "",
     };
   });
   check(
-    "v8-11-fa-rtl-bar",
+    "v8-11-fa-rtl-donut",
     faBar.present === true &&
       /[۰-۹]/.test((faBar as any).key) &&
       (faBar as any).key.includes("٪") &&
-      (faBar as any).putInAtReadingStart &&
+      (faBar as any).key.trim().startsWith("۴۷") && // the key opens with the put-in share (reading order)
+      (faBar as any).donutAria.includes("٪") &&
       /نمودار/.test((faBar as any).caption) &&
       (faBar as any).toggleAria.startsWith("EN —"),
-    `key "${(faBar as any).key}", put-in at the reading start: ${(faBar as any).putInAtReadingStart}, toggle aria "${(faBar as any).toggleAria}"`,
+    `key "${(faBar as any).key}", donut sr has ٪: ${(faBar as any).donutAria.includes("٪")}, toggle aria "${(faBar as any).toggleAria}"`,
   );
   // back to EN: the toggle's accessible name now opens with "فا".
   await page.click('header button:has-text("EN")');
@@ -1400,7 +1430,10 @@ async function main() {
       fromLine: document.querySelector("[data-cw=receipt-fromline]")?.textContent ?? "",
       assumption: document.querySelector("[data-cw=receipt-assumption]")?.textContent ?? "",
       horizon10: document.querySelector("[data-cw=receipt-horizon-10]")?.getAttribute("aria-pressed"),
-      barSegments: document.querySelectorAll("[data-cw=receipt-bar] [data-cw=share-bar] > div").length,
+      donutPct: document.querySelector("[data-cw=receipt-donut] [data-cw=share-seg-putin]")?.getAttribute("stroke-dasharray")?.split(" ")[0] ?? null,
+      donutRole: document.querySelector("[data-cw=receipt-donut] [data-cw=share-donut]")?.getAttribute("role") ?? "",
+      examplesTag: document.querySelector("[data-cw=receipt-examples-tag]")?.textContent ?? "",
+      guideLabel: document.querySelector("[data-cw=receipt-guide-open]")?.textContent ?? "",
       sr: document.querySelector("[data-cw=receipt-sr]")?.textContent ?? "",
     };
   });
@@ -1418,10 +1451,13 @@ async function main() {
       receiptArrival.fromLine.includes("A$1,790") &&
       receiptArrival.assumption.includes("Australian shares") &&
       receiptArrival.horizon10 === "true" &&
-      receiptArrival.barSegments === 2 &&
+      Math.abs(Number((receiptArrival as any).donutPct) - 70.154) < 0.5 &&
+      (receiptArrival as any).donutRole === "img" &&
+      (receiptArrival as any).examplesTag.toUpperCase().includes("EXAMPLE") &&
+      (receiptArrival as any).guideLabel.length > 3 &&
       receiptArrival.sr.includes("A$34.97") &&
       receiptArrival.sr.includes("A$6,000"),
-    `items ${JSON.stringify(receiptArrival.items.map((i) => i.label))}, monthly ${receiptArrival.monthly}, sentence ${(receiptArrival.sentence ?? "").slice(0, 90)}`,
+    `items ${JSON.stringify(receiptArrival.items.map((i) => i.label))}, monthly ${receiptArrival.monthly}, donut put% ${(receiptArrival as any).donutPct}, sentence ${(receiptArrival.sentence ?? "").slice(0, 90)}`,
   );
 
   // v10-2: add (label + price + cadence) updates totals, projection and
@@ -1699,6 +1735,7 @@ async function main() {
   });
   const expectedReceiptIds = [
     "receipt-what", "receipt-price", "receipt-cadence", "receipt-add",
+    "receipt-guide-open",
     "receipt-remove", "receipt-remove", "receipt-remove",
     "receipt-clear", "receipt-horizon-3", "receipt-horizon-5", "receipt-horizon-10",
   ];
@@ -1706,7 +1743,10 @@ async function main() {
   for (const [w, h] of [[390, 844], [360, 800], [430, 932]] as const) {
     await page.setViewportSize({ width: w, height: h });
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(350);
+    // (600ms: the resize re-render — the chart re-measures its width —
+    // can outlast 350ms on a loaded dev server; measured, the flake
+    // recorded in the v10.1 test report.)
+    await page.waitForTimeout(600);
     const fit = await page.evaluate(() => {
       const vp = window.innerHeight;
       const headline = document.querySelector("[data-cw=headline]")!.getBoundingClientRect();
@@ -1772,7 +1812,7 @@ async function main() {
   await page.fill("#cw-crate", "0");
   await page.waitForSelector("[data-cw=receipt-sentence]");
   const zeroRate = await page.evaluate(() => ({
-    barInPaper: document.querySelectorAll("[data-cw=receipt-bar] [data-cw=share-bar]").length,
+    barInPaper: document.querySelectorAll("[data-cw=receipt-donut] [data-cw=share-donut]").length,
     sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
     todayBeside: document.querySelector("[data-cw=receipt-sentence]")?.textContent.includes("today's money"),
   }));
@@ -1794,7 +1834,7 @@ async function main() {
   const never = await page.evaluate(() => ({
     line: document.querySelector("[data-cw=receipt-never-invests]")?.textContent ?? "",
     sentenceGone: document.querySelector("[data-cw=receipt-sentence]") === null,
-    barGone: document.querySelectorAll("[data-cw=receipt-bar] [data-cw=share-bar]").length === 0,
+    barGone: document.querySelectorAll("[data-cw=receipt-donut] [data-cw=share-donut]").length === 0,
     sr: document.querySelector("[data-cw=receipt-sr]")?.textContent ?? "",
   }));
   check(
@@ -1823,7 +1863,7 @@ async function main() {
       hasPersianDigits: /[۰-۹]/.test(document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? ""),
       labelRightOfAmount: label.x > amount.x, // mirrored: label at the reading start (right)
       font: getComputedStyle(sec.querySelector("[data-cw=receipt-lines]")!).fontFamily,
-      barSr: document.querySelector("[data-cw=receipt-bar] [data-cw=share-bar]")?.getAttribute("aria-label") ?? "",
+      barSr: document.querySelector("[data-cw=receipt-donut] [data-cw=share-donut]")?.getAttribute("aria-label") ?? "",
       sr: document.querySelector("[data-cw=receipt-sr]")?.textContent ?? "",
       sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
       addLabel: document.querySelector("[data-cw=receipt-add]")?.textContent ?? "",
@@ -1948,6 +1988,183 @@ async function main() {
     "v10-20-plain-language",
     plain.hits.length === 0 && plain.avg <= 15,
     `jargon ${JSON.stringify(plain.hits)}, avg ${plain.avg} words over ${plain.sentences} sentences`,
+  );
+
+  /* ---------------------------------------------------------------- *
+   * v10.1 — the owner's feedback pass: the guide modal, the examples  *
+   * tag's retirement, and the chart's overlap regression.            *
+   * ---------------------------------------------------------------- */
+
+  // v10.1-1: the guide modal — opens from the header pill, is a
+  // labelled aria-modal dialog with the four steps, Escape closes it
+  // and focus returns to the pill that opened it.
+  await page.evaluate(() => document.getElementById("spending-receipt")?.scrollIntoView());
+  await page.waitForTimeout(250);
+  await page.click("[data-cw=receipt-guide-open]");
+  await page.waitForSelector("[data-cw=receipt-guide]");
+  await page.waitForTimeout(300);
+  const guideOpen = await page.evaluate(() => {
+    const dlg = document.querySelector("[data-cw=receipt-guide]") as HTMLElement | null;
+    if (!dlg) return { present: false };
+    return {
+      present: true,
+      role: dlg.getAttribute("role"),
+      ariaModal: dlg.getAttribute("aria-modal"),
+      ariaLabel: dlg.getAttribute("aria-label") ?? "",
+      title: dlg.querySelector("[data-cw=receipt-guide-title]")?.textContent ?? "",
+      steps: [...dlg.querySelectorAll("[data-cw=receipt-guide-step]")].map((s) => (s.textContent ?? "").trim()),
+      closeAria: dlg.querySelector("[data-cw=receipt-guide-close]")?.getAttribute("aria-label") ?? "",
+      done: dlg.querySelector("[data-cw=receipt-guide-done]")?.textContent ?? "",
+      focusInDialog: dlg.contains(document.activeElement),
+    };
+  });
+  check(
+    "v10.1-1-guide-modal-opens",
+    guideOpen.present === true &&
+      (guideOpen as any).role === "dialog" &&
+      (guideOpen as any).ariaModal === "true" &&
+      /How to use this receipt/i.test((guideOpen as any).ariaLabel) &&
+      (guideOpen as any).title === (guideOpen as any).ariaLabel &&
+      (guideOpen as any).steps.length === 4 &&
+      (guideOpen as any).steps.every((s: string) => s.length > 25) &&
+      (guideOpen as any).steps[0].includes("examples") &&
+      (guideOpen as any).closeAria.length > 2 &&
+      (guideOpen as any).done.length > 2 &&
+      (guideOpen as any).focusInDialog,
+    `role=${(guideOpen as any).role}, aria-modal=${(guideOpen as any).ariaModal}, ${(guideOpen as any).steps.length} steps, focus inside: ${(guideOpen as any).focusInDialog}`,
+  );
+
+  // v10.1-2: the guide modal's keyboard flow — Escape closes, focus
+  // returns to the guide pill; Tab stays inside the dialog (the small
+  // trap); the Done button closes too.
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(250);
+  const afterEscape = await page.evaluate(() => ({
+    gone: document.querySelector("[data-cw=receipt-guide]") === null,
+    focusBack: document.activeElement?.getAttribute("data-cw") === "receipt-guide-open",
+  }));
+  check(
+    "v10.1-2-guide-escape-focus",
+    afterEscape.gone && afterEscape.focusBack,
+    `modal gone: ${afterEscape.gone}, focus returned to the guide pill: ${afterEscape.focusBack}`,
+  );
+  await page.click("[data-cw=receipt-guide-open]");
+  await page.waitForSelector("[data-cw=receipt-guide]");
+  await page.waitForTimeout(250);
+  await page.keyboard.press("Tab"); // close → done (trapped at the end)
+  await page.keyboard.press("Tab"); // done → close (wraps to the start)
+  await page.waitForTimeout(120);
+  const trap = await page.evaluate(() => ({
+    inDialog: !!document.activeElement?.closest("[data-cw=receipt-guide]"),
+    on: document.activeElement?.getAttribute("data-cw") ?? "",
+  }));
+  await page.click("[data-cw=receipt-guide-done]");
+  await page.waitForTimeout(250);
+  const afterDone = await page.evaluate(() => ({
+    gone: document.querySelector("[data-cw=receipt-guide]") === null,
+    focusBack: document.activeElement?.getAttribute("data-cw") === "receipt-guide-open",
+  }));
+  check(
+    "v10.1-3-guide-trap-and-done",
+    trap.inDialog && afterDone.gone && afterDone.focusBack,
+    `Tab stayed inside (${trap.on}), Done closed: ${afterDone.gone}, focus back: ${afterDone.focusBack}`,
+  );
+
+  // v10.1-4: the examples tag retires with the first change — reload
+  // (restoring the pristine examples + the tag), add one item and the
+  // tag (like the hint) disappears.
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=receipt-paper]");
+  const tagBefore = await page.evaluate(() => ({
+    tag: document.querySelector("[data-cw=receipt-examples-tag]")?.textContent ?? "",
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+  }));
+  await page.fill("[data-cw=receipt-what]", "Coffee");
+  await page.fill("[data-cw=receipt-price]", "5");
+  await page.click("[data-cw=receipt-add]");
+  await page.waitForTimeout(250);
+  const tagAfterAdd = await page.evaluate(() => ({
+    tagGone: document.querySelector("[data-cw=receipt-examples-tag]") === null,
+    hintGone: document.querySelector("[data-cw=receipt-hint]") === null,
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+  }));
+  check(
+    "v10.1-4-examples-tag-retires",
+    /EXAMPLE/i.test(tagBefore.tag) &&
+      tagBefore.count === 3 &&
+      tagAfterAdd.tagGone &&
+      tagAfterAdd.hintGone &&
+      tagAfterAdd.count === 4,
+    `tag "${tagBefore.tag}" on ${tagBefore.count} pristine examples → gone: ${tagAfterAdd.tagGone}, hint gone: ${tagAfterAdd.hintGone}, ${tagAfterAdd.count} items`,
+  );
+
+  // v10.1-5: the chart's overlap regression — in the default view AND
+  // the all-comparison-lines view, no two text labels in the chart SVG
+  // may intersect (getBBox on every <text>, pairs checked), and every
+  // label must sit inside the SVG's own box.
+  const chartOverlap = async (allon: boolean) => {
+    await page.goto(`${BASE}/tools/compound-wealth`, { waitUntil: "networkidle" });
+    await page.waitForSelector("[data-cw=headline]");
+    if (allon) {
+      for (const c of ["sp500", "world", "gold", "cash"]) {
+        await page.click(`[data-cw=chart-toggle-${c}]`).catch(() => {});
+      }
+      await page.waitForTimeout(300);
+    }
+    return page.evaluate(() => {
+      const svg = document.querySelector('section[aria-label="The growth layer overtakes the money you put in"] svg');
+      if (!svg) return { ok: false, reason: "no svg" };
+      const texts = [...svg.querySelectorAll("text")] as SVGTextElement[];
+      const boxes = texts.map((t) => {
+        const b = t.getBBox();
+        return { text: t.textContent ?? "", x: b.x, y: b.y, w: b.width, h: b.height };
+      });
+      const overlap = (a: typeof boxes[0], b: typeof boxes[0]) =>
+        a.x < b.x + b.w - 0.5 && b.x < a.x + a.w - 0.5 && a.y < b.y + b.h - 0.5 && b.y < a.y + a.h - 0.5;
+      const collisions: string[] = [];
+      for (let i = 0; i < boxes.length; i++) {
+        for (let j = i + 1; j < boxes.length; j++) {
+            if (overlap(boxes[i], boxes[j])) collisions.push(`${boxes[i].text} ↔ ${boxes[j].text}`);
+        }
+      }
+      const W = Number(svg.getAttribute("width") ?? 0);
+      const H = Number(svg.getAttribute("height") ?? 0);
+      const outside = boxes.filter((b) => b.x < -1 || b.y < -1 || b.x + b.w > W + 1 || b.y + b.h > H + 1).map((b) => b.text);
+      return { ok: true, collisions, outside, n: boxes.length };
+    });
+  };
+  const chartDefault = await chartOverlap(false);
+  const chartAllOn = await chartOverlap(true);
+  check(
+    "v10.1-5-chart-labels-collision-free",
+    chartDefault.ok &&
+      chartAllOn.ok &&
+      (chartDefault as any).collisions.length === 0 &&
+      (chartDefault as any).outside.length === 0 &&
+      (chartAllOn as any).collisions.length === 0 &&
+      (chartAllOn as any).outside.length === 0,
+    `default: ${JSON.stringify((chartDefault as any).collisions.slice(0, 3))} outside ${JSON.stringify((chartDefault as any).outside.slice(0, 3))}; all-on: ${JSON.stringify((chartAllOn as any).collisions.slice(0, 3))} outside ${JSON.stringify((chartAllOn as any).outside.slice(0, 3))} over ${(chartAllOn as any).n} labels`,
+  );
+
+  // v10.1-6: the milestone labels ride halos — every milestone text in
+  // the chart (identified by the milestone token's own fill colour,
+  // which the x-axis year labels never use) carries the surface-coloured
+  // stroke (paint-order="stroke") that keeps the lines behind it readable.
+  const halos = await page.evaluate(() => {
+    const svg = document.querySelector('section[aria-label="The growth layer overtakes the money you put in"] svg');
+    const milestones = [...(svg?.querySelectorAll("text") ?? [])].filter(
+      (t) => (t.getAttribute("fill") ?? "").includes("accent-gold-deep") && /^[\d,]+$/.test((t.textContent ?? "").trim()),
+    );
+    return milestones.map((t) => ({
+      text: t.textContent ?? "",
+      paint: t.getAttribute("paint-order"),
+      stroke: t.getAttribute("stroke"),
+    }));
+  });
+  check(
+    "v10.1-6-milestone-halos",
+    halos.length >= 3 && halos.every((h: { paint: string | null; stroke: string | null }) => h.paint === "stroke" && !!h.stroke),
+    `${halos.length} milestone labels, all haloed: ${halos.every((h: { paint: string | null }) => h.paint === "stroke")}`,
   );
 
   /* ---------------------------------------------------------------- *

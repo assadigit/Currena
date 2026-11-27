@@ -216,10 +216,21 @@ export function GrowthChart({
   /* The full chart, drawn 1:1 in real pixels. */
   const W = variant === "print" ? 660 : measuredW;
   const H = variant === "print" ? 240 : 250;
-  const padL = 8;
-  const padR = Math.min(104, Math.max(78, Math.round(W * 0.16))); // room for end labels
+  const padL = 10;
+  const padR = Math.min(104, Math.max(86, Math.round(W * 0.16))); // room for end labels
   const padT = 18;
   const padB = 24;
+  /** The label halo: the card's own surface colour painted under
+   *  each text stroke (paint-order), so labels stay readable where
+   *  lines or band edges pass behind them — the v10.1 fix for the
+   *  overlap VLM audit (labels sitting "on" the lines). */
+  const halo = variant === "print" ? "#ffffff" : "var(--color-surface)";
+  const haloProps = {
+    stroke: halo,
+    strokeWidth: 3.5,
+    paintOrder: "stroke" as const,
+    strokeLinejoin: "round" as const,
+  };
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
   const start = startYm ?? (() => {
@@ -338,7 +349,7 @@ export function GrowthChart({
   }
   endLabels.sort((a, b) => a.y - b.y);
   for (let i = 1; i < endLabels.length; i++) {
-    const minGap = 11;
+    const minGap = 13;
     if (endLabels[i].y - endLabels[i - 1].y < minGap) {
       endLabels[i].y = endLabels[i - 1].y + minGap;
     }
@@ -428,12 +439,13 @@ export function GrowthChart({
         {endLabels.map((l, i) => (
           <text
             key={`${l.text}-${i}`}
-            x={padL + plotW + 5}
+            x={padL + plotW + 7}
             y={l.y}
             fontSize={l.size}
             fontWeight={l.weight}
             fill={l.color}
             dominantBaseline="middle"
+            {...haloProps}
           >
             {l.text}
           </text>
@@ -444,21 +456,31 @@ export function GrowthChart({
           <g>
             <line x1={crossX} x2={crossX} y1={padT + 14} y2={padT + plotH} stroke={p.crossover} strokeWidth={1} strokeDasharray="4 4" opacity={0.8} />
             <circle cx={crossX} cy={crossY} r={3.5} fill="none" stroke={p.crossover} strokeWidth={1.6} />
-            <text x={crossLabelX} y={padT + 8} fontSize={9.5} fill={p.crossover} textAnchor={crossLabelAnchor}>
+            <text x={crossLabelX} y={padT + 8} fontSize={9.5} fill={p.crossover} textAnchor={crossLabelAnchor} {...haloProps}>
               {labels.crossover}
             </text>
           </g>
         ) : null}
 
-        {/* milestone markers */}
-        {milestoneMarks.map((mk, i) => (
-          <g key={i}>
-            <circle cx={mk.x} cy={mk.y} r={2.6} fill={p.milestone} />
-            <text x={mk.x} y={mk.y - 7} fontSize={9} fill={p.milestone} textAnchor="middle">
-              {mk.label}
-            </text>
-          </g>
-        ))}
+        {/* milestone markers — the label rides a surface halo (lines
+            can pass behind it) and swings clear of the right edge, where
+            the end labels live: near the edge it anchors "end" and
+            pulls left of its dot, near the start "start" and pushes
+            right (the v10.1 overlap fix). */}
+        {milestoneMarks.map((mk, i) => {
+          const nearRight = mk.x > padL + plotW * 0.84;
+          const nearLeft = mk.x < padL + plotW * 0.16;
+          const anchor = nearRight ? "end" : nearLeft ? "start" : "middle";
+          const labelX = nearRight ? mk.x - 10 : nearLeft ? mk.x + 8 : mk.x;
+          return (
+            <g key={i}>
+              <circle cx={mk.x} cy={mk.y} r={2.6} fill={p.milestone} />
+              <text x={labelX} y={mk.y - 8} fontSize={9} fill={p.milestone} textAnchor={anchor} {...haloProps}>
+                {mk.label}
+              </text>
+            </g>
+          );
+        })}
 
         {/* x axis */}
         <line x1={padL} x2={padL + plotW} y1={padT + plotH} y2={padT + plotH} stroke={p.grid} strokeWidth={1} />

@@ -74,7 +74,7 @@ import { COPY, type Locale } from "@/lib/compound/content";
 import { ToolsBreadcrumb, ToolsFooter, ToolsHeader, useSiteLocale } from "@/components/compound/chrome";
 import { GrowthChart, DASHES, type ChartVisible, type OtherLine } from "@/components/compound/chart";
 import { A4PrintCard, PhoneCard } from "@/components/compound/cards";
-import { MiniBars, ShareBar, type MiniBarRow } from "@/components/compound/bars";
+import { MiniCols, ShareDonut, type MiniColRow } from "@/components/compound/bars";
 import { SpendingReceipt } from "@/components/compound/receipt";
 
 /* =================================================================== *
@@ -599,8 +599,9 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
   const shownMilestones = moneyView === "today" ? result.milestonesToday : result.milestones;
   const pageMilestones = shownMilestones.slice(-MILESTONES_ON_PAGE);
 
-  /* --- v8: the share bar + the what-if mini-bars' rows ---
-   * The shares come from the SHOWN values, so the bar follows the
+  /* --- v8 (donut + columns since v10.1): the share donut + the
+   * what-if column charts' rows ---
+   * The shares come from the SHOWN values, so the donut follows the
    * tiles' money toggle exactly. splitFinal hides itself (null) when
    * growth is negative or the final is empty — the honest edge. */
   const shareSplit = React.useMemo(
@@ -608,23 +609,23 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
     [shownFinal, shownPutIn],
   );
 
-  /* The mini-bars draw the sentences' own numbers: the base is the
+  /* The columns draw the sentences' own numbers: the base is the
    * headline final, and each neighbour is base ± the sentence's delta.
    * Rows whose sentence is hidden (the W1 range guards) drop out too.
    * The costs pair is the one engine-computed exception: the card's
    * sentence carries the fees paid, so "before costs" is the same
    * plan with every cost switched off (fee 0 + yearly cost 0) — the
-   * same engine, run once more, never a hand-tuned width. */
-  const smallBars = React.useMemo<MiniBarRow[]>(() => {
+   * same engine, run once more, never a hand-tuned height. */
+  const smallBars = React.useMemo<MiniColRow[]>(() => {
     if (!small) return [];
-    const rows: MiniBarRow[] = [];
+    const rows: MiniColRow[] = [];
     if (!small.hideLess) rows.push({ label: t.whatIf.barLabels.aBitLess, value: result.finalValue - small.less });
     rows.push({ label: t.whatIf.barLabels.yourPlan, value: result.finalValue, mine: true });
     if (!small.hideMore) rows.push({ label: t.whatIf.barLabels.aBitMore, value: result.finalValue + small.more });
     return rows;
   }, [small, result.finalValue, t.whatIf.barLabels]);
 
-  const laterBars = React.useMemo<MiniBarRow[]>(() => {
+  const laterBars = React.useMemo<MiniColRow[]>(() => {
     if (later === null) return [];
     return [
       { label: t.whatIf.barLabels.yourPlan, value: result.finalValue, mine: true },
@@ -632,7 +633,7 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
     ];
   }, [later, laterYears, locale, result.finalValue, t.whatIf.barLabels]);
 
-  const cashBars = React.useMemo<MiniBarRow[]>(() => {
+  const cashBars = React.useMemo<MiniColRow[]>(() => {
     if (asCash === null) return [];
     return [
       { label: t.whatIf.barLabels.invested, value: result.finalValue, mine: true },
@@ -640,7 +641,7 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
     ];
   }, [asCash, result.finalValue, t.whatIf.barLabels]);
 
-  const costBars = React.useMemo<MiniBarRow[]>(() => {
+  const costBars = React.useMemo<MiniColRow[]>(() => {
     if (result.feesShareOfPutIn === null) return [];
     const before = computeCompound({ ...plan, feePerPurchase: 0, yearlyCost: 0 }, figures, months).finalValue;
     return [
@@ -1233,12 +1234,13 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
               </div>
             ))}
           </div>
-          {/* v8 — the share bar: the tiles' proportion drawn in the chart's
-              own two colours (the bar doubles as the chart's key). It sits
-              directly under the three tiles and follows the money toggle;
-              splitFinal hides it honestly when today's money ends below
-              what was put in. */}
-          <ShareBar
+          {/* v8 (donut since v10.1) — the share donut: the tiles'
+              proportion drawn as a donut in the chart's own two colours
+              (the donut doubles as the chart's key). It sits directly
+              under the three tiles and follows the money toggle;
+              splitFinal hides it honestly when today's money ends
+              below what was put in. */}
+          <ShareDonut
             split={shareSplit}
             locale={locale}
             labels={{ putIn: t.chart.putInLabel, growth: t.chart.growthLabel }}
@@ -1385,8 +1387,9 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                     {t.whatIf.salarySuffix.replace("{p}", formatPctLocal(small.stepShareOfSalary, locale))}
                   </p>
                 ) : null}
-                {/* v8: the sentence's own three numbers as thin bars. */}
-                {smallBars.length > 0 ? <MiniBars rows={smallBars} sr={t.whatIf.barSr.small} /> : null}
+                {/* v8 (columns since v10.1): the sentence's own three
+                    numbers as one small column chart. */}
+                {smallBars.length > 0 ? <MiniCols rows={smallBars} sr={t.whatIf.barSr.small} /> : null}
               </div>
             ) : null}
             <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
@@ -1418,8 +1421,9 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                       .replace("{x}", fmt(later))
                   : ""}
               </p>
-              {/* v8: your plan against the later start, one scale. */}
-              {laterBars.length > 0 ? <MiniBars rows={laterBars} sr={t.whatIf.barSr.later} /> : null}
+              {/* v8 (columns since v10.1): your plan against the later
+                  start, one scale. */}
+              {laterBars.length > 0 ? <MiniCols rows={laterBars} sr={t.whatIf.barSr.later} /> : null}
             </div>
             {asCash !== null ? (
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
@@ -1427,8 +1431,9 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                 <p className="mt-1 mb-0 text-[13.5px] leading-relaxed text-[var(--color-text-primary)]">
                   {t.whatIf.cash.replace("{x}", fmt(asCash))}
                 </p>
-                {/* v8: invested against in cash, one scale. */}
-                {cashBars.length > 0 ? <MiniBars rows={cashBars} sr={t.whatIf.barSr.cash} /> : null}
+                {/* v8 (columns since v10.1): invested against in cash,
+                    one scale. */}
+                {cashBars.length > 0 ? <MiniCols rows={cashBars} sr={t.whatIf.barSr.cash} /> : null}
               </div>
             ) : null}
             {result.feesShareOfPutIn !== null ? (
@@ -1442,8 +1447,9 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                 {result.feeEatsLargeShare ? (
                   <p className="mt-1 mb-0 text-[11.5px] font-semibold text-[var(--color-chip-ink-watch)]">{t.whatIf.costsHint}</p>
                 ) : null}
-                {/* v8: before and after costs, one scale. */}
-                {costBars.length > 0 ? <MiniBars rows={costBars} sr={t.whatIf.barSr.costs} /> : null}
+                {/* v8 (columns since v10.1): before and after costs,
+                    one scale. */}
+                {costBars.length > 0 ? <MiniCols rows={costBars} sr={t.whatIf.barSr.costs} /> : null}
               </div>
             ) : null}
           </div>
@@ -1702,9 +1708,10 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                 </button>
                 {compareOpen ? (
                   <div className="overflow-x-auto border-t border-[var(--color-border)] px-3.5 py-3 scroll-slim" data-cw="compare-table">
-                    {/* v8: the rows are computed once so the final values
-                        can share one slim proportional bar scale; the bars
-                        sit under the numbers and add no width. */}
+                    {/* v8 (columns since v10.1): the rows are computed once
+                        so the finals can share one column-chart scale; the
+                        chart sits under the table, one column per row, the
+                        current asset's column in the gold token. */}
                     {(() => {
                       const rows = chips.map((chip) => ({
                         chip,
@@ -1718,9 +1725,15 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                           r: computeCompound({ ...plan }, { r20: null, r30: null }, months),
                         });
                       }
-                      const maxFinal = Math.max(...rows.map((x) => x.r.finalValue), 0);
-                      const barW = (v: number) => (maxFinal > 0 ? `${Math.min(100, (v / maxFinal) * 100).toFixed(2)}%` : "0%");
+                      const colRows: MiniColRow[] = rows.map(({ chip, r }) => ({
+                        label: chip === null
+                          ? t.moreOptions.customWord
+                          : locale === "fa" ? chip.labelFa : chip.labelEn,
+                        value: r.finalValue,
+                        mine: chip !== null && chip.id === asset.id,
+                      }));
                       return (
+                    <>
                     <table className="w-full min-w-[420px] border-collapse text-[12.5px]">
                       <thead>
                         <tr className="text-[var(--color-text-tertiary)]">
@@ -1746,17 +1759,6 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                               </td>
                               <td className="py-1.5 px-2 text-end tabular-nums" dir="ltr">
                                 {fmt(r.finalValue)}
-                                {/* v8: the slim proportional bar under the final value. */}
-                                <span className="mt-1 block h-[4px] w-full overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-border)_55%,var(--color-surface))]" aria-hidden="true">
-                                  <span
-                                    className="block h-full rounded-full"
-                                    style={{
-                                      width: barW(r.finalValue),
-                                      background: isCurrent ? "var(--color-accent-gold)" : "var(--color-text-secondary)",
-                                    }}
-                                    data-cw="compare-bar"
-                                  />
-                                </span>
                               </td>
                               <td className="py-1.5 px-2 text-end tabular-nums text-[var(--color-text-tertiary)]" dir="ltr">
                                 {r.lowFinal !== null ? fmt(r.lowFinal) : "·"}
@@ -1769,6 +1771,13 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                         })}
                       </tbody>
                     </table>
+                    {/* v10.1: one column per asset on one common scale — the
+                        finals' own shape, in the what-if cards' own chart
+                        style (words only; the table carries the numbers). */}
+                    <div className="mt-3 min-w-[420px]" data-cw="compare-cols">
+                      <MiniCols rows={colRows} sr={t.moreOptions.compareSr} />
+                    </div>
+                    </>
                       );
                     })()}
                   </div>

@@ -1065,3 +1065,151 @@ Everything v10 added is additive: `git revert` the v10 commits on
 `compound-wealth-v10` (or `git checkout` the v9 tip `7e315dbb` and
 redeploy). The Batch V merge reverts independently if ever needed. The
 engine, the grid and every pre-v10 number were never touched.
+
+## 14. The v10.1 pass — the owner's feedback: donuts, columns, the guide (2026-11-27)
+
+The owner's request, in his words: "The range visualization (horizental
+bars) are not very nice. also they must follow design tokens of other
+currena parts. to be consistent. use more understanble visuals like
+charts piecharts graphs etc. I dont like this horizental bars." — and:
+"when you added some items such as youtube, make them appear like example
+with a guide (on modal) to how to use it." — and: "also the graph (main)
+in compound has visual problems (items are into each other messed up)
+make sure it doesnt happen. verify with vlm." Three asks, one pass,
+scoped to the visuals only: the engine, the 1200-row grid, the receipt
+maths and every number are untouched — only shapes, tokens and labels
+moved.
+
+### 14.1 The audit first (VLM, before any code)
+
+The pass opened with a VLM audit of the shipped v10 surface, which
+confirmed all three complaints with specifics: the horizontal bars read
+"like default skeleton loaders rather than data viz"; the chart's
+milestone labels sat on the lines (the "60,000" label collided with the
+"Total" end label on mobile; "25,000" and "10,000" sat on the dashed
+comparison lines); the right-edge end-label stack ("better / Gold /
+World shares") was cramped at a 11px gap. The audit also caught that the
+fa receipt's example row wrapped, and that the guide ask had no surface
+at all.
+
+### 14.2 What was built
+
+- **The share donut** (bars.tsx, `ShareDonut`): the v8 share bar under
+  the tiles became a two-segment SVG donut in the chart's own two
+  tokens — the same colours, now in the shape people know. The ring
+  segments are circles with `pathLength="100"`, so each
+  `stroke-dasharray` literally states its percent (47.154 52.846) —
+  the numbers are inspectable in the DOM, and every test reads them
+  straight from the attribute. The key line (two stacked entries with
+  the chart's own dots) and the caption ("Put in and growth, in the
+  chart's own two colours.") sit beside it; the honest edge
+  (`splitFinal` → null) and "<1%" are inherited unchanged. The A4 card
+  carries the ink-safe donut with the one caption line; the phone card
+  carries a text-free donut with its sr twin.
+- **The what-if column charts** (`MiniCols`): the micro-bars became
+  small column charts on one shared 1.5px baseline and one common
+  scale per card — the sentence's own numbers as column heights, the
+  reader's own plan in the growth token, words-only labels centred
+  under their own columns (the column band and the label band share
+  one flex distribution, so they stay aligned at every width).
+- **The compare column chart**: the compare table's in-cell slim bars
+  became one column chart under the table — one column per asset on
+  one common scale, the current asset's column in gold, the asset
+  words under their columns, `role="img"` with its sr sentence.
+- **The receipt's donut + the examples tag + the guide modal**: the
+  projection bar became the donut in the paper's own palette (the
+  ink's put-in, a new measured gold `#a87e1c` at 3.6:1 on the paper —
+  the non-text 3:1 bar, a graphic); the three example rows gained a
+  small centred "Examples" / «نمونه‌ها» tag line directly above them
+  (measured first: a per-row pill would force "YouTube Premium" to
+  wrap at 360px — the tag costs no row width and retires with the
+  first change, exactly like the hint); and the header gained a "How
+  to use" / «راهنما» pill that opens a modal — the phone card's own
+  dialog pattern (`role="dialog"`, `aria-modal`, labelled, the
+  backdrop and Escape close it, focus comes to the close button and
+  returns to the pill, Tab stays inside) — with four plain steps and
+  a "Got it" button. The cadence word's column became auto-width so
+  the longest example label stays on one line even at 360px.
+- **The chart's collision-free labels** (chart.tsx): every text label
+  rides a surface-coloured halo (`paint-order="stroke"`) so lines and
+  band edges behind it never eat it; milestone labels near the right
+  edge anchor "end" and pull left of their dot (near the left,
+  "start"); the end labels keep a 13px minimum gap and a ≥ 86px right
+  gutter; padL 8 → 10. Verified two ways: a geometric harness check
+  (no two text bounding boxes intersect in the default and all-lines
+  views, none outside the SVG) and the VLM re-audit ("text-over-text
+  CLEAN" on both mobile and desktop; the zoomed verdict: "50,000
+  fully readable … the gap is clearly more than one character
+  width").
+
+### 14.3 The decisions (with reasons)
+
+1. **Donut, not pie:** a donut keeps the two tokens' full saturation
+   and reads as a share-of-a-whole; the hole keeps it quiet on the
+   default screen (44px, the one-screen rule re-measured: the asset
+   chips at 798px of 800 at 360px — it holds).
+2. **Column charts, not more donuts:** the what-if cards compare
+   magnitudes (not shares of one whole) — a shared baseline and
+   proportional heights is the honest shape; words-only kept (the
+   sentence above carries the numbers; v8's own rule).
+3. **The examples tag, not per-row badges:** the per-row pill was
+   built first and measured — at 360px the row's fixed items
+   (price + cadence + the 44px ×) leave ~52px for a label that needs
+   117px, so "YouTube Premium" wrapped into the badge (the VLM audit
+   caught it). The tag line labels all three rows at zero row width
+   and retires with the first change.
+4. **The guide as a modal, on demand:** the phone card's own dialog
+   pattern, not a new dependency and not an auto-open (reload would
+   re-open it forever — the store-nothing rule); the "How to use" pill
+   is discoverable at the paper's header.
+5. **Halo + anchors, not collision math:** the chart labels' overlap
+   needed a readability fix (halo) and a proximity fix (edge-aware
+   anchors + a wider gutter + a 13px stack gap) — no label-position
+   solver; the never-empty guard and every geometry invariant stay.
+6. **`stroke-dasharray` as the test surface:** with `pathLength="100"`
+   the ring states its own percent, so the harness and the grid
+   replay read the split from the attribute — stronger than measuring
+   rendered widths, and it survives any future size change.
+
+### 14.4 The gate table
+
+- Reference selftest: **9 PASS lines** (unchanged — the engine is
+  untouched).
+- Maths: **121/121** (the 117 v10 tests + 4 new v10.1 tests: the
+  guide's copy keys in both languages, the column wording in both
+  languages, the donut caption, the paper gold's ≥ 3:1 measured
+  contrast).
+- Browser harness: **119/119** (the 113 v10 checks reworked for the
+  donut/columns/tag + 6 new v10.1 checks: the guide modal's open,
+  its Escape/focus flow, its Tab trap and Done button, the examples
+  tag's retirement, the chart's collision-free labels, the milestone
+  halos; the one-screen wait raised 350 → 600ms — the resize
+  re-render raced it once, a test-stability fix, recorded).
+- Grid replay: **1200/1200 + 15/15** (the donut's percents read from
+  the dasharray; the engine byte-identical).
+- axe: **18/17/18/17** — the exact baseline, zero NEW violations,
+  zero nodes inside the new visuals.
+- Lint: clean. No new runtime dependencies (the donut and the
+  columns are hand-built SVG/divs, the house pattern).
+
+### 14.5 The receipt-honesty list (unchanged)
+
+Every v10 honesty rule carries over untouched: exact-to-the-cent
+totals, the same engine through `receiptProjection`, the honest edge,
+"<1%", the assumption line, the never-invests sentence, store-nothing
+(reload restores the examples — rechecked), the sr summary, the live
+region, label-in-name on every ×.
+
+### 14.6 What was deliberately not done
+
+No animations on the donut or columns (calm); no per-segment
+tooltips (the words are already there); no donut center percentage
+(the key line names both parts); no auto-open for the guide modal
+(store-nothing); no benchmark lines inside the receipt; the floating
+"N" bubble the VLM noted is the dev-tools indicator — a dev-only
+artifact, verified absent from the production build's screenshots.
+
+### 14.7 Rollback
+
+Revert the v10.1 commits; the v10 tip `4ae32f1d` is the last
+deployed-good compound state.

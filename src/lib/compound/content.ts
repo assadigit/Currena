@@ -110,18 +110,20 @@ export interface CompoundCopy {
        *  {x} = the inflation percent the plan is using (editable). */
       inflationCaption: string; // "Today's money uses average inflation of {x}% a year (last 20 years)."
     };
-    /** v8: the share bar under the tiles — the tiles' proportion drawn
-     *  in the chart's own two colours, so the bar doubles as the chart's
-     *  key. Shares are of the SHOWN money view (follows the toggle). */
+    /** v8 (donut since v10.1): the share donut under the tiles — the
+     *  tiles' proportion drawn as a donut in the chart's own two
+     *  colours, so the donut doubles as the chart's key. Shares are of
+     *  the SHOWN money view (follows the toggle). */
     shareBar: {
       /** The short caption under the key line, in the existing caption
-       *  style: says the bar uses the chart's colours. */
+       *  style: names the two parts and says the donut uses the
+       *  chart's colours. */
       caption: string;
-      /** The sr-only twin (the bar's aria-label). {put} and {growth} are
-       *  ready-made percent words like "62%" / "38%"; the two label
+      /** The sr-only twin (the donut's aria-label). {put} and {growth}
+       *  are ready-made percent words like "62%" / "38%"; the two label
        *  words come from chart.putInLabel / chart.growthLabel. */
       sr: string;
-      /** The honest-edge line shown INSTEAD of the bar when today's
+      /** The honest-edge line shown INSTEAD of the donut when today's
        *  money ends below what was put in (growth negative). */
       hiddenLine: string;
       /** Shares under 1% render as this, not a misleading "0%". */
@@ -158,8 +160,9 @@ export interface CompoundCopy {
       costsHint: string; // the buying-every-3-months hint
       neverInvests: string;
       pendingLine: string;
-      /** v8: the micro-bars' row labels (words only, never numbers —
-       *  the sentence above each set already carries the numbers). */
+      /** v8 (columns since v10.1): the what-if column charts' labels
+       *  (words only, never numbers — the sentence above each set
+       *  already carries the numbers). */
       barLabels: {
         yourPlan: string; // "Your plan"
         aBitLess: string; // "A bit less"
@@ -170,7 +173,8 @@ export interface CompoundCopy {
         beforeCosts: string; // "Before costs"
         afterCosts: string; // "After costs"
       };
-      /** v8: one sr-only sentence per card describing the bars' shape. */
+      /** v8 (columns since v10.1): one sr-only sentence per card
+       *  describing the columns' shape. */
       barSr: {
         small: string;
         later: string;
@@ -188,6 +192,19 @@ export interface CompoundCopy {
       lede: string;
       /** The one-line hint under the three example items. */
       hint: string;
+      /** v10.1: the small centred line above the three example rows
+       *  while they are still untouched. */
+      examplesTag: string; // "Examples"
+      /** v10.1: the header's guide button (opens the how-to-use modal). */
+      guideLabel: string; // "How to use"
+      /** v10.1: the guide modal's own title. */
+      guideTitle: string; // "How to use this receipt"
+      /** v10.1: the guide modal's steps, one plain sentence each. */
+      guideSteps: string[];
+      /** v10.1: the guide modal's close (aria) word. */
+      guideClose: string; // "Close"
+      /** v10.1: the guide modal's plain done button. */
+      guideDone: string; // "Got it"
       /** The add form's labels. */
       formLabel: string; // "What is it?"
       priceLabel: string; // "Price"
@@ -206,7 +223,7 @@ export interface CompoundCopy {
       projectionSentence: string; // "Investing {amount} a month for {years} years: about {final} (about {today} in today's money)."
       fromLine: string; // "You put in {putIn} · growth added {growth}."
       assumption: string; // "At your plan's own asset and costs above ({asset})."
-      barSr: string; // the split bar's aria-label sentence
+      barSr: string; // the split donut's aria-label sentence
       zinger: string;
       thanks: string; // "Thank you for shopping!"
       emptyHint: string;
@@ -257,6 +274,9 @@ export interface CompoundCopy {
       endLabel: string;
       datesClamped: string;
       compareTitle: string;
+      /** v10.1: the sr sentence for the compare column chart (one
+       *  common scale over the finals). */
+      compareSr: string;
       compareAsset: string;
       compareRate: string;
       compareFinal: string;
@@ -427,7 +447,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         inflationCaption: "Today's money uses average inflation of {x}% a year (last 20 years).",
       },
       shareBar: {
-        caption: "The same two colours as the chart.",
+        caption: "Put in and growth, in the chart's own two colours.",
         sr: "Of the final amount, {put} is money you put in and {growth} is growth. The same two colours as the chart.",
         hiddenLine: "In today's money, this plan ends below what you put in, so there is no growth share to show.",
         underOne: "<1%",
@@ -474,16 +494,27 @@ export const COPY: Record<Locale, CompoundCopy> = {
           afterCosts: "After costs",
         },
         barSr: {
-          small: "Three bars on one scale, rising in step: a bit less, your plan, a bit more.",
-          later: "Two bars on one scale: starting later is the shorter one.",
-          cash: "Two bars on one scale: the same money invested or held as cash.",
-          costs: "Two bars on one scale: the after-costs bar is the shorter one.",
+          small: "Three columns on one scale, rising in step: a bit less, your plan, a bit more.",
+          later: "Two columns on one scale: starting later is the shorter one.",
+          cash: "Two columns on one scale: the same money invested or held as cash.",
+          costs: "Two columns on one scale: the after-costs column is the shorter one.",
         },
       },
       receipt: {
         heading: "The spending receipt",
         lede: "Add the subscriptions and small costs you pay for on autopilot. See what they add up to — and what that money could have been.",
         hint: "These three are examples — remove them and add your own.",
+        examplesTag: "Examples",
+        guideLabel: "How to use",
+        guideTitle: "How to use this receipt",
+        guideSteps: [
+          "The three items here are examples — remove them with the × buttons, or clear them all at once.",
+          "Add your own costs: a name, a price, and how often it repeats — daily, weekly, monthly or yearly.",
+          "The totals show what the leak costs you per month and per year, exact to the cent.",
+          "The projection shows what that money could become if it were invested instead — using your plan's own asset and costs from the calculator above, for 3, 5 or 10 years.",
+        ],
+        guideClose: "Close",
+        guideDone: "Got it",
         formLabel: "What is it?",
         priceLabel: "Price",
         cadenceLabel: "How often",
@@ -545,6 +576,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         endLabel: "End month",
         datesClamped: "We moved your dates to the allowed range.",
         compareTitle: "Compare assets",
+        compareSr: "One column per asset on one scale: the taller the column, the larger the final amount. Your current asset is the gold one.",
         compareAsset: "Asset",
         compareRate: "Rate used",
         compareFinal: "Final amount",
@@ -719,7 +751,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         inflationCaption: "«پول امروز» با میانگین تورم {x}٪ در سال حساب می‌شود (۲۰ سال اخیر).",
       },
       shareBar: {
-        caption: "همان دو رنگِ نمودار.",
+        caption: "پول واردشده و رشد، با همان دو رنگِ نمودار.",
         sr: "از مبلغ نهایی، {put} پول واردشدهٔ شماست و {growth} رشد. همان دو رنگِ نمودار.",
         hiddenLine: "به پول امروز، این برنامه زیرِ مبلغ واردشده تمام می‌شود؛ سهمی از رشد برای نمایش نیست.",
         underOne: "کمتر از ۱٪",
@@ -763,16 +795,27 @@ export const COPY: Record<Locale, CompoundCopy> = {
           afterCosts: "پس از هزینه‌ها",
         },
         barSr: {
-          small: "سه میله در یک مقیاس، پله‌پله بالا می‌روند: کمی کمتر، برنامهٔ شما، کمی بیشتر.",
-          later: "دو میله در یک مقیاس: میلهٔ شروعِ دیرتر کوتاه‌تر است.",
-          cash: "دو میله در یک مقیاس: همان پول، سرمایه‌گذاری‌شده یا نقد نگه‌داشته‌شده.",
-          costs: "دو میله در یک مقیاس: میلهٔ پس از هزینه‌ها کوتاه‌تر است.",
+          small: "سه ستون در یک مقیاس، پله‌پله بالا می‌روند: کمی کمتر، برنامهٔ شما، کمی بیشتر.",
+          later: "دو ستون در یک مقیاس: ستونِ شروعِ دیرتر کوتاه‌تر است.",
+          cash: "دو ستون در یک مقیاس: همان پول، سرمایه‌گذاری‌شده یا نقد نگه‌داشته‌شده.",
+          costs: "دو ستون در یک مقیاس: ستونِ پس از هزینه‌ها کوتاه‌تر است.",
         },
       },
       receipt: {
         heading: "رسید خرج‌های شما",
         lede: "اشتراک‌ها و هزینه‌های خردی که خودکار تمدید می‌شوند را اضافه کنید؛ جمعشان را ببینید — و اینکه به‌جایش می‌توانست چه باشد.",
         hint: "این‌ها نمونه‌اند — حذفشان کنید و هزینه‌های خودتان را اضافه کنید.",
+        examplesTag: "نمونه‌ها",
+        guideLabel: "راهنما",
+        guideTitle: "راهنمای این رسید",
+        guideSteps: [
+          "این سه مورد نمونه‌اند — با دکمهٔ × حذفشان کنید، یا همه را یک‌جا پاک کنید.",
+          "هزینه‌های خودتان را اضافه کنید: نام، قیمت و اینکه هر چند وقت تکرار می‌شود — روزانه، هفتگی، ماهانه یا سالانه.",
+          "جمع‌ها نشان می‌دهند این خرج در ماه و در سال چقدر آب می‌رود، دقیق به سنت.",
+          "پیش‌بینی نشان می‌دهد همین پول اگر به‌جایش سرمایه‌گذاری می‌شد چه می‌شد — با همان دارایی و هزینه‌های برنامهٔ بالای صفحه، برای ۳، ۵ یا ۱۰ سال.",
+        ],
+        guideClose: "بستن",
+        guideDone: "متوجه شدم",
         formLabel: "چه هزینه‌ای؟",
         priceLabel: "قیمت",
         cadenceLabel: "دوره",
@@ -834,6 +877,7 @@ export const COPY: Record<Locale, CompoundCopy> = {
         endLabel: "ماه پایان",
         datesClamped: "تاریخ‌ها را به بازهٔ مجاز بردیم.",
         compareTitle: "مقایسهٔ دارایی‌ها",
+        compareSr: "یک ستون برای هر دارایی در یک مقیاس: هرچه ستون بلندتر باشد، مبلغ نهایی بزرگ‌تر است. دارایی فعلی شما طلایی است.",
         compareAsset: "دارایی",
         compareRate: "نرخ به‌کاررفته",
         compareFinal: "مبلغ نهایی",

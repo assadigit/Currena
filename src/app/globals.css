@@ -848,11 +848,15 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-/* v8: the share bar under the tiles — the same split as the chart's
-   two areas, in the ink-safe palette (greyscale-friendly); the one
-   caption line carries the two percentages in words. */
+/* v8 (donut since v10.1): the share donut under the tiles — the same
+   split as the chart's two areas, in the ink-safe palette
+   (greyscale-friendly); the one caption line carries the two
+   percentages in words. */
 .cw-print-sheet .cw-share-bar {
   margin-top: 2.5mm;
+  display: flex;
+  align-items: center;
+  gap: 3mm;
 }
 .cw-print-sheet .cw-share-key {
   display: flex;

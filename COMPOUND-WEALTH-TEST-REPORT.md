@@ -275,3 +275,73 @@ touched — the gold agent owns the gold files):
    was never in the 254-flag pack** — a standing 404 on every gold page
    load (both languages), pre-dating v10 and left untouched for the gold
    lane.
+
+## The v10.1 gate record (the owner's feedback pass, 2026-11-27)
+
+All on the final state, after the v10.1 visual changes (the donut, the
+column charts, the examples tag, the guide modal, the chart's halos):
+
+- Reference selftest: **9 PASS lines** (unchanged — the engine is
+  untouched by design).
+- Maths: **121/121** (the 117 v10 tests unmodified + 4 new v10.1 tests:
+  the guide modal's copy keys in both languages, the charts' sr
+  sentences naming columns in both languages, the donut caption naming
+  the chart's colours, and the paper gold's measured ≥ 3:1 contrast
+  against the paper — plus the ink's ≥ 7:1 re-asserted).
+- Browser harness: **119/119** (the v8 and v10 bar checks reworked for
+  the donut and the columns — the split now read from the ring's
+  `stroke-dasharray`, the columns' heights and their label alignment
+  measured, the compare chart read under the table — + 6 new v10.1
+  checks: the guide modal opens as a labelled aria-modal dialog with
+  four steps and focus inside; Escape closes it and focus returns to
+  the pill; Tab stays trapped and the Done button closes; the examples
+  tag retires with the first change; the chart's text labels are
+  geometrically collision-free in the default and all-lines views; the
+  milestone labels ride halos. Run twice — stable.)
+- Grid replay: **1200/1200 + 15/15** — the engine byte-identical; the
+  UI scenarios read the donut's percents from the dasharray.
+- axe (local, light+dark × EN+fa): **18/17/18/17** — the exact
+  baseline, zero NEW violations, zero nodes inside the new visuals.
+- Lint: clean. No new runtime dependencies.
+
+### The v10.1 findings this pass recorded
+
+1. **The per-row badge's width math (the big one):** the first build
+   put an "Example" pill on each example row; the VLM audit caught the
+   label wrapping into the badge. Measured: at 360px the row's fixed
+   items (price 52px + cadence 44px + the 44px × + gaps) leave ~52px
+   for a label that needs 117px — the pill could never fit. Replaced
+   with the zero-width examples tag line above the rows.
+2. **The cadence column's fixed width wasted 12px:** `w-[3.5rem]` for
+   a word that needs 44px; auto-width (right-aligned at a common edge,
+   receipt-style) frees exactly the 6px that kept "YouTube Premium" on
+   two lines at 360px — now one line at 360 and 390, no sideways
+   scroll.
+3. **The column/label alignment:** the first MiniCols put the columns
+   and their labels in one items-end flex with per-column stacks — a
+   two-line label lifted its column off the baseline. The two-band
+   layout (columns with a shared baseline, labels in a matching flex
+   row beneath) keeps every label centred under its own column at
+   every width (measured offsets 0/0/0 on all three sets).
+4. **The one-screen flake:** the harness's one-screen check raced the
+   resize re-render once at 390×844 (the chart re-measures its width
+   on resize); the wait was raised 350 → 600ms — a test-stability fix,
+   verified by a double run.
+5. **The VLM's "N avatar" overlap:** the Next.js dev-tools indicator
+   overlapping the page's bottom text in dev screenshots — a dev-only
+   artifact, absent from production; recorded so it is not chased
+   again.
+
+### The v10.1 dev walk (all zero console/page errors)
+
+The chart at 390 and 1280 (default and all-lines): VLM-verified
+text-over-text CLEAN on both, milestone labels haloed and readable,
+"50,000" clear of the end-label gutter by more than a character
+width (the zoomed verdict). The donut under the tiles with its key
+and caption; the what-if column charts rising in step; the receipt in
+EN light/dark and fa light/dark («رسید خرج‌های شما», the «نمونه‌ها»
+tag, the donut in the paper's ink and gold); the guide modal in EN
+and fa («راهنمای این رسید», four numbered steps, «متوجه شدم»), VLM
+-verified centered and readable with correct RTL mirroring; the
+compare column chart under the table with the gold column on the
+current asset.

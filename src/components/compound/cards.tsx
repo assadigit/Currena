@@ -17,7 +17,7 @@ import type { CompoundCopy, Locale } from "@/lib/compound/content";
 import type { AssetRow } from "@/lib/compound/figures";
 import { MILESTONES_ON_CARDS, formatMoney, splitFinal, type CompoundResult, type PlanInput } from "@/lib/compound/maths";
 import { GrowthChart } from "@/components/compound/chart";
-import { PRINT_COLORS, PRINT_COLORS_DARK, ShareBar } from "@/components/compound/bars";
+import { PRINT_COLORS, PRINT_COLORS_DARK, ShareDonut } from "@/components/compound/bars";
 import { CurrenaMark } from "@/components/compound/chrome";
 
 /* =================================================================== *
@@ -294,9 +294,10 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
                   <div className="cw-tile-value">{fmt(result.finalValue)}</div>
                 </div>
               </div>
-              {/* v8: the share bar under the tiles — the tiles' proportion
-                  in the chart's two inks, percentages in the caption line. */}
-              <ShareBar
+              {/* v8 (donut since v10.1): the share donut under the
+                  tiles — the tiles' proportion in the chart's two inks,
+                  percentages in the caption line. */}
+              <ShareDonut
                 split={splitFinal(result.finalValue, result.totalPutIn)}
                 locale={locale}
                 labels={{ putIn: copy.tool.chart.putInLabel, growth: copy.tool.chart.growthLabel }}
@@ -487,11 +488,11 @@ export function PhoneCard({ copy, locale, result, plan, asset, months, startMont
             </div>
           </div>
 
-          {/* v8: the share bar as a slim two-segment strip under the big
-              number — the future-money split, text-free (screenshot-safe),
-              with its sr-only twin sentence. */}
-          <div className="w-full max-w-[300px]" data-cw="phone-share-wrap">
-            <ShareBar
+          {/* v8 (donut since v10.1): the share donut under the big
+              number — the future-money split, text-free
+              (screenshot-safe), with its sr-only twin sentence. */}
+          <div className="flex w-full max-w-[300px] justify-center" data-cw="phone-share-wrap">
+            <ShareDonut
               split={splitFinal(result.finalValue, result.totalPutIn)}
               locale={locale}
               labels={{ putIn: copy.tool.chart.putInLabel, growth: copy.tool.chart.growthLabel }}

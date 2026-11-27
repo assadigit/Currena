@@ -165,11 +165,16 @@ async function uiReplay() {
       const small = document.querySelector("[data-cw=small-changes] p")?.textContent ?? "";
       const later = [...document.querySelectorAll('section[aria-label="What if…"] p')].map((p) => p.textContent ?? "");
       const milestones = [...document.querySelectorAll('section[aria-label="Along the way"] li')].map((li) => li.textContent ?? "");
-      // v8: the share bar's segment widths + the key line's percent words.
-      const segPut = document.querySelector("[data-cw=share-seg-putin]") as HTMLElement | null;
-      const segGrow = document.querySelector("[data-cw=share-seg-growth]") as HTMLElement | null;
+      // v10.1: the share donut's segments — pathLength="100" makes each
+      // circle's stroke-dasharray literally its percent, so the split is
+      // read straight from the attribute (the old bar's segment widths
+      // were measured; the donut states its own numbers).
+      const segPut = document.querySelector("[data-cw=share-seg-putin]");
+      const segGrow = document.querySelector("[data-cw=share-seg-growth]");
+      const segPutPct = segPut ? Number((segPut.getAttribute("stroke-dasharray") ?? "").split(" ")[0]) : null;
+      const segGrowPct = segGrow ? Number((segGrow.getAttribute("stroke-dasharray") ?? "").split(" ")[0]) : null;
       const key = document.querySelector("[data-cw=share-key]")?.textContent ?? "";
-      const barHiddenLine = document.querySelector("[data-cw=share-bar-hidden]")?.textContent ?? "";
+      const barHiddenLine = document.querySelector("[data-cw=share-donut-hidden]")?.textContent ?? "";
       return {
         headline,
         tiles,
@@ -177,8 +182,8 @@ async function uiReplay() {
         small,
         later,
         milestones,
-        segPutW: segPut ? segPut.getBoundingClientRect().width : null,
-        segGrowW: segGrow ? segGrow.getBoundingClientRect().width : null,
+        segPutPct,
+        segGrowPct,
         key,
         barHiddenLine,
       };
@@ -225,18 +230,18 @@ async function uiReplay() {
     if (!near(got.high, want.high, 1)) bad.push(`high ${got.high} vs ${want.high}`);
     if (row.today_money !== null && !near(got.today, want.today, 1)) bad.push(`today ${got.today} vs ${want.today}`);
     if (want.later5 > 0 && !near(got.later5, want.later5, 1)) bad.push(`later5 ${got.later5} vs ${want.later5}`);
-    /* v8: the share bar — present iff the row is drawable; the segment
-       widths ≈ the shares; the key line's percent words equal the
-       tiles' own numbers (the engine's ratio, and the tiles' rounded
-       numbers within a point). */
+    /* v8 (donut since v10.1): the share donut — present iff the row is
+       drawable; the ring segments' dasharray percents ≈ the shares; the
+       key line's percent words equal the tiles' own numbers (the
+       engine's ratio, and the tiles' rounded numbers within a point). */
     const drawableRow = row.final > 0 && row.final >= row.put_in;
     if (drawableRow) {
-      if (shown.segPutW === null || shown.segGrowW === null) {
-        bad.push("share bar missing on a drawable scenario");
+      if (shown.segPutPct === null || shown.segGrowPct === null) {
+        bad.push("share donut missing on a drawable scenario");
       } else {
         const wantPutShare = row.put_in / row.final;
-        const gotShare = shown.segPutW / (shown.segPutW + shown.segGrowW);
-        if (Math.abs(gotShare - wantPutShare) > 0.01) bad.push(`share width ${gotShare.toFixed(3)} vs ${wantPutShare.toFixed(3)}`);
+        const gotShare = shown.segPutPct / 100;
+        if (Math.abs(gotShare - wantPutShare) > 0.01) bad.push(`donut percent ${gotShare.toFixed(3)} vs ${wantPutShare.toFixed(3)}`);
         const keyPcts = (shown.key.match(/(\d+)%/g) ?? []).map((s) => Number(s.replace("%", "")));
         const wantPct = Math.round(wantPutShare * 100);
         if (keyPcts.length !== 2) bad.push(`key line percents ${JSON.stringify(keyPcts)}`);
@@ -251,7 +256,7 @@ async function uiReplay() {
         }
       }
     } else {
-      if (shown.segPutW !== null) bad.push("share bar drawn on a negative-growth scenario");
+      if (shown.segPutPct !== null) bad.push("share donut drawn on a negative-growth scenario");
       if (!shown.barHiddenLine) bad.push("hidden-line missing on a negative-growth scenario");
     }
     if (bad.length > 0) {

@@ -34,7 +34,7 @@ import {
   type PlanInput,
 } from "@/lib/compound/maths";
 import type { CompoundCopy, Locale } from "@/lib/compound/content";
-import { ShareBar, PRINT_COLORS, type ShareBarCopy } from "@/components/compound/bars";
+import { ShareDonut, type ShareBarCopy } from "@/components/compound/bars";
 
 /** The receipt's own copy block (content.ts). */
 type ReceiptCopy = CompoundCopy["en"]["tool"]["receipt"];
@@ -176,12 +176,52 @@ export function SpendingReceipt({
   const [armed, setArmed] = React.useState(false); // the clear's two-step guard
   const [note, setNote] = React.useState(""); // the one small plain message
   const [announcement, setAnnouncement] = React.useState(""); // the polite live region
+  const [guideOpen, setGuideOpen] = React.useState(false); // v10.1: the how-to-use modal
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const addRef = React.useRef<HTMLButtonElement | null>(null);
+  const guideButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const guideCloseRef = React.useRef<HTMLButtonElement | null>(null);
+  const guidePanelRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => () => {
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
+
+  /* --- v10.1: the guide modal's keyboard behaviour — Escape closes,
+     Tab stays inside the dialog (a small honest trap), and focus
+     returns to the guide button on close. --- */
+  React.useEffect(() => {
+    if (!guideOpen) return;
+    guideCloseRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setGuideOpen(false);
+        guideButtonRef.current?.focus();
+        return;
+      }
+      if (e.key === "Tab" && guidePanelRef.current) {
+        const focusable = [...guidePanelRef.current.querySelectorAll<HTMLElement>("button")];
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [guideOpen]);
+
+  const closeGuide = () => {
+    setGuideOpen(false);
+    guideButtonRef.current?.focus();
+  };
 
   /* --- the derived world (the same engine, on the leak money) --- */
   const totalOf = (list: ReceiptItem[]) => list.reduce((n, it) => n + normalizeToMonthly(it.amount, it.cadence), 0);
@@ -343,14 +383,32 @@ export function SpendingReceipt({
       style={{ background: P.paper, borderColor: P.rule, color: P.ink }}
     >
       <div className={monoClass}>
-        {/* The header line — the section's own word, no fake date. */}
-        <p
-          data-cw="receipt-header"
-          className="m-0 text-center text-[13px] font-bold uppercase"
-          style={{ color: P.ink, letterSpacing: locale === "fa" ? 0 : "0.08em" }}
-        >
-          {copy.heading}
-        </p>
+        {/* The header line — the section's own word, no fake date; the
+            v10.1 guide button rides its end edge (the paper's own
+            answer to "how do I use this?"). A spacer keeps the title
+            optically centred; the flex row makes crowding impossible. */}
+        <div className="flex items-center gap-2">
+          <span aria-hidden="true" className="w-11 shrink-0" />
+          <p
+            data-cw="receipt-header"
+            className="m-0 min-w-0 flex-1 text-center text-[13px] font-bold uppercase"
+            style={{ color: P.ink, letterSpacing: locale === "fa" ? 0 : "0.08em" }}
+          >
+            {copy.heading}
+          </p>
+          <button
+            type="button"
+            ref={guideButtonRef}
+            onClick={() => setGuideOpen(true)}
+            aria-haspopup="dialog"
+            aria-label={copy.guideTitle}
+            data-cw="receipt-guide-open"
+            className="shrink-0 rounded-full px-2 py-[2px] text-[9.5px] font-bold outline-none ring-[var(--color-ring)] transition-shadow focus-visible:ring-2"
+            style={{ color: P.muted, boxShadow: `inset 0 0 0 1.5px ${P.rule}` }}
+          >
+            {copy.guideLabel}
+          </button>
+        </div>
 
         {/* The add form — compact, on the paper; Enter submits. */}
         <form data-cw="receipt-form" onSubmit={addItem} noValidate className="mt-2.5 flex flex-wrap items-end gap-1.5">
@@ -434,6 +492,24 @@ export function SpendingReceipt({
           </p>
         ) : null}
 
+        {/* v10.1: the examples tag — one small centred line directly
+            above the three prefilled rows, with dotted flanks in the
+            paper's own rule colour. It marks the rows as examples
+            WITHOUT costing any row width (a per-row pill would force
+            the labels to wrap at 360px — measured), and it retires
+            with the first change, exactly like the hint. */}
+        {examplesUntouched ? (
+          <p
+            data-cw="receipt-examples-tag"
+            className="mt-2 mb-0 flex items-center gap-2 text-[9.5px] font-bold uppercase leading-none"
+            style={{ color: P.muted, letterSpacing: locale === "fa" ? 0 : "0.1em" }}
+          >
+            <span aria-hidden="true" className="h-px min-w-[10px] flex-1 border-t border-dotted" style={{ borderColor: P.rule }} />
+            <span className="shrink-0">{copy.examplesTag}</span>
+            <span aria-hidden="true" className="h-px min-w-[10px] flex-1 border-t border-dotted" style={{ borderColor: P.rule }} />
+          </p>
+        ) : null}
+
         {/* The itemised lines: label · dotted leader · price + cadence · ×.
             Alignment is by layout (flex), so fa/RTL mirrors itself. */}
         <ul data-cw="receipt-lines" className="mt-2 mb-0 list-none space-y-0.5 p-0">
@@ -448,8 +524,11 @@ export function SpendingReceipt({
                 style={{ borderColor: P.rule }}
               />
               <span className="whitespace-nowrap text-[13px] font-bold">{renderCents(it.amount)}</span>
+              {/* The cadence word right-aligns at a common edge (before
+                  the ×) — receipt-style — and its auto width leaves the
+                  long example labels one line even at 360px (measured). */}
               <span
-                className="w-[3.5rem] shrink-0 whitespace-nowrap text-end text-[11.5px] font-semibold"
+                className="w-auto shrink-0 whitespace-nowrap text-end text-[11.5px] font-semibold"
                 style={{ color: P.muted }}
               >
                 {copy.cadences[it.cadence]}
@@ -556,17 +635,19 @@ export function SpendingReceipt({
                   >
                     {fromLine}
                   </p>
-                  {/* The v8 share bar on the future values (the honest
-                      edge and "<1%" inherited; no visible key line — the
-                      from-line already names both parts in money). */}
-                  <div data-cw="receipt-bar" className="mt-2">
-                    <ShareBar
+                  {/* v10.1: the share donut on the future values (the
+                      honest edge and "<1%" inherited; no visible key
+                      line — the from-line already names both parts in
+                      money). Drawn in the paper's own ink and gold. */}
+                  <div data-cw="receipt-donut" className="mt-2 flex justify-center">
+                    <ShareDonut
                       split={split}
                       locale={locale}
                       labels={barLabels}
                       copy={barCopy}
                       variant="phone"
-                      colors={PRINT_COLORS}
+                      size={56}
+                      colors={{ putIn: P.ink, growth: P.gold }}
                     />
                   </div>
                 </>
@@ -599,6 +680,70 @@ export function SpendingReceipt({
             <span key={i} className="block" style={{ width: w * 2, background: P.ink }} />
           ))}
         </div>
+
+        {/* v10.1 — the how-to-use guide modal (the paper's own overlay,
+            following the phone card's own dialog pattern: aria-modal, a
+            labelled dialog, Escape and the backdrop close it, focus comes
+            to the close button and returns to the guide button). Inside
+            the paper's font wrapper, so fa keeps the site's own Persian
+            face via :lang(fa). */}
+        {guideOpen ? (
+          <div
+            className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/70 p-4"
+            dir={locale === "fa" ? "rtl" : "ltr"}
+            lang={locale}
+            role="dialog"
+            aria-modal="true"
+            aria-label={copy.guideTitle}
+            data-cw="receipt-guide"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) closeGuide();
+            }}
+          >
+            <div
+              ref={guidePanelRef}
+              className="w-full max-w-[340px] rounded-lg border p-4 shadow-[0_10px_40px_rgba(20,28,34,0.35)]"
+              style={{ background: P.paper, borderColor: P.rule, color: P.ink }}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <p
+                  data-cw="receipt-guide-title"
+                  className="m-0 text-[13.5px] font-extrabold"
+                  style={{ color: P.ink, letterSpacing: locale === "fa" ? 0 : "0.04em" }}
+                >
+                  {copy.guideTitle}
+                </p>
+                <button
+                  type="button"
+                  ref={guideCloseRef}
+                  onClick={closeGuide}
+                  aria-label={copy.guideClose}
+                  data-cw="receipt-guide-close"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[14px] font-bold leading-none outline-none ring-[var(--color-ring)] transition-shadow focus-visible:ring-2"
+                  style={{ color: P.muted }}
+                >
+                  <span aria-hidden="true">✕</span>
+                </button>
+              </div>
+              <ol className="mt-2.5 mb-0 list-decimal space-y-1.5 ps-5 text-[12.5px] leading-relaxed">
+                {copy.guideSteps.map((s, i) => (
+                  <li key={i} data-cw="receipt-guide-step" style={{ color: P.ink }}>
+                    {s}
+                  </li>
+                ))}
+              </ol>
+              <button
+                type="button"
+                onClick={closeGuide}
+                data-cw="receipt-guide-done"
+                className="mt-3 min-h-[38px] w-full rounded-lg px-3 text-[13px] font-bold transition-transform active:scale-95"
+                style={{ background: P.ink, color: P.paper }}
+              >
+                {copy.guideDone}
+              </button>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {/* The polite live region (add / remove / clear, always with the total). */}
