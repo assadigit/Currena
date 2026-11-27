@@ -509,3 +509,200 @@ and after the Phase B fixes):
   shared files changed are the site chrome's Tools anchor and the retired
   ↗ pills; the gold page's own tests and walk still pass in the harness's
   19c check).
+
+## 11. The v8 pass — the outcome visuals (2026-11-27)
+
+The owner's direction: the tool already explains its outcomes in words and
+numbers; show more of them visually, so a visitor understands the outcome at
+a glance. The audit (2026-11-26, recorded in the v8 prompt) found the chart
+already visually rich — so this pass is deliberately narrow: **exactly one
+small new visual on the default screen** (the share bar), everything else
+enriching elements that already exist, in place, below the fold or behind
+More options.
+
+### 11.1 The baseline drift this session found and fixed first
+
+The preflight (run the v6 gates unmodified on a branch from main) surfaced a
+real drift, recorded here before any feature work: **main had never absorbed
+the v6 branch.** Main carried the tools suite, the site chrome and the later
+gold-page batches, but its compound tool was still the v5 code (53 maths
+tests, the v5 wording — the live page was even showing the retired "1% more
+adds" sentence, because the gold-page batches' deploys had quietly
+overwritten the v6 compound deployment). The fix on this branch:
+`compound-wealth-v8` (cut from main) merges `compound-wealth-v6` — a clean
+merge, the two lines having touched no common file since their fork point
+142f5dc0. After the merge the recorded v6 baseline held exactly:
+
+- `python3 compound_reference_check.py --selftest` — six PASS lines.
+- `bun test tests/compound-maths.test.ts` — **94/94** (v6's set, unmodified).
+- `bun tests/compound-grid-replay.ts` — **1200/1200** engine + **15/15** UI.
+- `bun tests/compound-browser-harness.ts` — **64/64** (v6's set, unmodified).
+- `bun run lint` — green.
+
+Nothing in the v8 feature work touches those suites' subjects; they still
+pass on the final state (see §11.5).
+
+### 11.2 What was built
+
+| Piece | Where | What it is |
+|---|---|---|
+| The split helper | `src/lib/compound/maths.ts` | `splitFinal(final, putIn)` → null when not drawable (growth < 0 or final ≤ 0 — the honest edge), else the two shares summing to exactly 1; `shareRounded` applies the "<1%" rule (shares under 1%, but above zero, never render as a misleading "0%"). Config comment at the top of its section. |
+| The bars | `src/components/compound/bars.tsx` (new, plain divs, no libraries) | `ShareBar` (page/print/phone variants — the same two chart tokens on the page, ink-safe pair on the A4 card, the caller's dark/light colours on the phone) and `MiniBars` (the what-if cards' thin labelled rows on one common scale per card). Every graphic is `role="img"` with its sentence as the aria-label — the one pattern everywhere. |
+| The default screen | `app.tsx` §5.1.6 | The slim full-width two-segment bar directly under the three tiles: put-in in the chart's put-in token, growth in the growth token (so the bar doubles as the chart's key); the key line in words ("47% Money you put in · 53% Growth", reusing `chart.putInLabel`/`chart.growthLabel`); one short caption ("The same two colours as the chart."). Shares from the SHOWN values, so it follows the money toggle. Hidden honestly (with one plain sentence kept) when growth is negative. |
+| The what-if cards | `app.tsx` §5.2 | One shared MiniBars set per card: small changes → 3 rows (a bit less / your plan / a bit more), later start → 2, cash → 2, costs → 2 (before/after). Endpoints are the sentence's own numbers (base ± its deltas); rows whose sentence is hidden drop out. Words only, sr sentence per card, no interaction, no animation. |
+| The compare table | `app.tsx` §5.3 | One slim 4px proportional bar under each final value, one scale computed across the rows (the rows are now computed once). Current asset in gold, others in the muted token. |
+| The phone card | `cards.tsx` | A 7px two-segment strip under the big number — text-free (screenshot-safe), the card's own dark/light colours, sr twin on the strip. |
+| The A4 card | `cards.tsx` + `globals.css` | The bar under the tiles in the ink-safe palette (#47525d / #a87e1c; lighter inks in the dark card style), the two percentages in one caption line. |
+| The copy | `content.ts` | EN + fa: the caption, the sr sentence, the hidden line, "<1%"/«کمتر از ۱٪», the eight row labels, the four card sr sentences — plain, calm, RTL-correct, Persian digits at render. |
+| The chrome fix | `src/components/site/chrome.tsx` | The fa language toggle's label-in-name (the test report's owner decision #2): the visible "فا"/"EN" now opens the accessible name — one line, no visual change. |
+
+### 11.3 The audit table, and what this pass did about each gap
+
+| Audit finding | What v8 did |
+|---|---|
+| The tiles state the parts but nothing shows their proportion; the chart's two area colours have no key | The share bar: the proportion AND the key, in one quiet element |
+| The what-if cards are the most persuasive facts, prose only | The micro-bars: shape behind every sentence, below the fold |
+| The compare table is numbers only | The slim proportional bars (kept: fits 360px without widening) |
+
+### 11.4 Decisions, each with its reason
+
+1. **The percentages live in the caption line, not on the bar.** A 47/53
+   split at 360px cannot fit readable labels on 169px of bar; the key line
+   under the bar carries both percentages in words with the two colour dots,
+   which is also the chart key the page never had.
+2. **`role="img"` + aria-label everywhere** (not aria-hidden + sr-only twin
+   text): one pattern, one code path, the sentence travels with the graphic
+   on the page, on the phone strip and on the A4 card.
+3. **Solid tokens, not the chart's 16–22% alpha fills.** The bar is 10px
+   tall; at the chart's alpha the growth segment would read as a tint. Same
+   tokens, full strength — the key dots match, the calm is kept by size.
+4. **The toggle follows by recomputation, and a discovered engine fact is
+   recorded: the shares are view-invariant.** The engine deflates both shown
+   values by the same (1+inflation)^(months/12), so today's money can never
+   flip growth's sign — the honest edge fires on negative-growth plans (a
+   net rate below zero, the never-invests fee case), not on the money
+   toggle. The v8 prompt's assumption ("the today view can make real growth
+   negative") was corrected against the grid-verified engine semantics; the
+   unit test locks the fact and the harness check asserts the bar matches
+   the tiles' shown numbers in BOTH views.
+5. **The costs pair is the one engine-computed endpoint set.** The card's
+   sentence carries the fees paid, so "before costs" cannot be a sentence
+   number; it is the same plan with every cost switched off
+   (`feePerPurchase: 0, yearlyCost: 0`) — one more engine run, no new
+   formulas, no hand-tuned widths. (This is also the surface the v7 tax
+   line will join.)
+6. **The phone strip is text-free; the A4 bar carries the percentages.** The
+   phone card is a screenshot (nothing that can clip); the A4 card is paper
+   (the key line costs 3mm and keys the print chart).
+7. **The compare bars kept.** Measured: the bar sits under the number inside
+   the existing cell — zero width added at 360px (the table keeps its own
+   horizontal scroll, unchanged since v5).
+8. **The what-if cards' height rule.** Measured at 360×800: small changes
+   103→145px (1.41×), later 93→130px (1.40×), cash 82→108px (1.32×) — all
+   under the ~1.5× line, so no slimming or cuts were needed.
+9. **The one-screen rule.** The share bar adds 50px BELOW the fold (under
+   the tiles, under the chart); the measured asset-chips bottom stays
+   798/800 at 360×800 — identical to v6's recorded number. No sideways
+   scroll (scrollWidth 360).
+10. **The dark-token check flips the site's real `.dark` class**, not
+    Playwright's colour-scheme emulation (the site is class-based
+    next-themes; emulating the media query changes nothing, and clicking
+    the site's own toggle would write the theme to localStorage against the
+    store-nothing rule).
+
+### 11.5 Verification (the v8 gates, local)
+
+- `bun test tests/compound-maths.test.ts` — **103/103** (the 94 v6 tests
+  unmodified + 9 v8 tests: growth 0, final<putIn, final 0, putIn 0, the
+  sum-to-1 invariant, the <1% rounding, NaN guards, the future-vs-today
+  pair with the honest edge, the copy keys in both languages).
+- `bun tests/compound-grid-replay.ts` — **1200/1200** engine (now also
+  asserting drawable-iff-growth≥0 and shares-sum-to-100% on every row) +
+  **15/15** UI (now also asserting the bar's presence, segment widths ≈
+  shares, and the key line's percents equal to the tiles' own numbers; the
+  negative-growth stratum asserts the hidden line).
+- `bun tests/compound-browser-harness.ts` — **79/79** (the 64 v6 checks
+  unmodified + 15 v8 checks: v8-1..v8-14 plus the dark/light token pair).
+- `bun run lint` — green on every commit.
+- Store-nothing re-checked after every bar interaction (v8-14); no data
+  network calls (the v6 21-checks, re-run on every harness pass).
+
+### 11.6 The live verification (after the deploy) — see §11.7 for the numbers
+
+Deployed exactly as v6 did (`NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build
+&& bunx wrangler deploy`). Verified live: the golden path with the bar and
+the toggle, fa + dark, mobile screenshots into `docs/compound-tests/`, zero
+console errors, the fa toggle fix walked on two other tool pages, Lighthouse
+(mobile) and the live axe scans. The evidence lines are in §11.7.
+
+### 11.7 The live evidence (measured after the 2026-11-27 deploy)
+
+- **Live deploy: done** — `NEXT_PUBLIC_BASE_PATH=/gold bun run worker:build &&
+  bunx wrangler deploy` (the deploy confirmed at 100% traffic, 2026-11-27
+  11:20 UTC). The golden path walked on the production page in a real
+  browser: the bar present under the tiles at put-share 0.473 with the key
+  line "47% Money you put in · 53% Growth" and the caption; the money toggle
+  flipping the tiles to today's money (13,900/15,500/29,400) with the bar
+  still matching the tiles' own 47%; the three what-if bar sets with their
+  words; the phone card's text-free strip with its sr sentence; the compare
+  bars proportional in fa. Screenshots: `docs/compound-tests/v8-live-01…07`
+  (EN mobile 390, the today view, the what-if bars, the phone card, fa+dark
+  at 390, the fa bar close-up, the fa compare bars). **Zero console/page
+  errors.**
+- **The fa toggle fix walked on two other tools** — `/tools/currency-converter`
+  and `/tools/live-rates`: both load clean in EN and fa, RTL correct, and
+  the toggle's accessible name now opens with the visible text in both
+  directions ("فا — Switch to Farsi" / "EN — تغییر به انگلیسی"); nothing
+  else moved (screenshots `v8-live-chrome-walk-*`).
+- **Lighthouse (mobile, live):** accessibility **97**; performance **98–99
+  across repeated runs** (99 / 99 / 98 after the first cold request — the
+  single first hit measured 95 with TBT 207 ms, the known run-to-run
+  variance of one cold CDN request; the repeated runs show TBT 0–83 ms).
+  FCP/LCP unchanged from v6 (~1.8 s from this sandbox), CLS 0, SpeedIndex
+  2494 (v6: 2617). Evidence: `docs/compound-tests/v8-lighthouse.json` and
+  `v8-lighthouse-2/3/4.json`. At or above the v6 record of 98/97.
+- **The JS delta:** the compound page's client JS, measured as the bytes
+  the browser actually transfers from the built worker (pre-v8 tree
+  eaa63a86 vs the v8 tree, both built with the deploy command): **10 JS
+  files before and after; 198,094 → 200,204 bytes — a delta of +2,110
+  bytes (~2.1 KB, 1.1%)**, the new bars module and its wiring. Negligible.
+- **axe (light + dark, EN + fa, live):** `color-contrast` 14/13/14/13 nodes
+  — **the exact v6 baseline counts** (all pre-existing shared-chrome and
+  token patterns, recorded as owner decisions in the v6 test report) — and
+  the fa `label-content-name-mismatch` (1 node at v6) is **retired** by the
+  chrome fix: the one intended decrease, zero new violations. Evidence:
+  `docs/compound-tests/phase-a-axe.json` (re-run on the live v8 build).
+
+### 11.8 The cut list (with reasons — the spec's Appendix A.1)
+
+- A donut/pie of the final composition — the straight bar already matches
+  the chart's stacked semantics; pies read worse at small sizes and for
+  screen readers.
+- Hover/touch tooltips on the chart — desktop-biased, a11y and payload cost;
+  the milestone dots, end labels and sr-only summary already anchor the
+  numbers.
+- A second chart or a "stop investing" line — clutter; the put-in layer
+  already is the no-growth path, and the later-start card covers waiting's
+  cost.
+- A year-by-year numbers table — more numbers, not more understanding; the
+  maths is already grid-verified.
+- Animations on the chart or bars — against the calm discipline and the
+  reduced-motion rules.
+- A goal/target visual — a new input; against the three-control default
+  screen.
+
+### 11.9 The v7 ordering decision (recorded, not re-decided)
+
+The v7 tax prompt stays committed on branch `compound-wealth-v7` (with its
+rebase addendum at the top); **v8 ships first**, and v7 branches from main
+after this pass, joining the v8 surface at three points: the Costs row
+unchanged, the share bar caption when tax is on, and the "tax takes" line
+joining the costs card's bars. Nothing in v8 starts tax work.
+
+### 11.10 Rollback
+
+Everything v8 added is additive and self-contained: `git revert` the v8
+commits on `compound-wealth-v8` (or `git checkout` the pre-v8 sha eaa63a86
+and redeploy). The merge commit itself (fb9120dc) may stay or go with it;
+the v6 tool it restored is the live baseline the owner recorded. The chrome
+fix is one line, trivially revertible on its own.

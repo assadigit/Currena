@@ -16,12 +16,6 @@
         "impact": "serious",
         "nodes": 13,
         "help": "Elements must meet minimum color contrast ratio thresholds"
-      },
-      {
-        "id": "label-content-name-mismatch",
-        "impact": "serious",
-        "nodes": 1,
-        "help": "Elements must have their visible text as part of their accessible name"
       }
     ]
   },
@@ -42,12 +36,6 @@
         "impact": "serious",
         "nodes": 13,
         "help": "Elements must meet minimum color contrast ratio thresholds"
-      },
-      {
-        "id": "label-content-name-mismatch",
-        "impact": "serious",
-        "nodes": 1,
-        "help": "Elements must have their visible text as part of their accessible name"
       }
     ]
   }

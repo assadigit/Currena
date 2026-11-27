@@ -96,3 +96,45 @@ Phase B re-test: after fixes 1–5, the full surface was re-run on the redeploye
 
 - **D4 (one common quarter-end):** needs one of the blocked doors — the CFS PDF (403 from this sandbox), S&P DJI's 20/30y factsheets, MSCI's interactive history, or LBMA month-end prices — any one of which, opened from an unrestricted browser, allows the rows to be re-anchored and re-verified.
 - **The NY Fed effective-rate cross-check (0.02 pts)** was recorded from the previous sitting's research and not re-read this sitting (nyfed.org not probed); everything else in the cross-check table was re-read on 2026-11-26.
+
+---
+
+# The v8 pass — the outcome visuals (2026-11-27)
+
+**Tested:** 2026-11-27 (Asia/Tehran / UTC) · **Against:** the local dev build (localhost:3100) through every gate, plus the **live site** (currena.ir/tools/compound-wealth, deployed from branch `compound-wealth-v8`) for the golden path, the axe scans, Lighthouse and the chrome walk · **Baseline note:** the v8 preflight found main had never absorbed the v6 branch (the live tool had quietly regressed to the v5 wording); the v8 branch merges v6 back first, after which the recorded v6 baseline (94/94 · 64/64 · 1200/1200 + 15/15 · lint) held exactly before any feature work — the drift and the fix are recorded in the main report §11.1.
+
+## Verdict
+
+**PASS.** The default screen gains exactly one small visual (the share bar under the tiles); everything else enriches existing elements in place, below the fold or behind More options. Every gate green, with the v8 extensions folded into the standing suites.
+
+## The v8 gate record (all on the final state)
+
+| Gate | Result | The v8 extension it now carries |
+|---|---|---|
+| `python3 compound_reference_check.py --selftest` | six PASS lines | unchanged |
+| `bun test tests/compound-maths.test.ts` | **103/103** | +9 tests: growth 0 (drawable, all put in); final < put-in → null; final 0 → null; put-in 0 (all growth); shares sum to exactly 1 on adversarial pairs; the "<1%" rounding (never a misleading "0%"); NaN guards; the future-vs-today pair; the copy keys in both languages |
+| `bun tests/compound-grid-replay.ts` | **1200/1200** engine, **15/15** UI, no page errors | the engine loop now asserts drawable-iff-growth≥0 + final>0, shares sum to 100%, and the share equals the row's own ratio on **every** row; the 15 UI scenarios assert the bar's presence, the segment widths ≈ the shares (±1 point), the key line's percents equal the tiles' own numbers (±2 on the tiles' rounded values), and the negative-growth stratum (fee 25 on 50/mo) asserts the bar hidden and the sentence kept |
+| `bun tests/compound-browser-harness.ts` | **79/79** | +15 checks v8-1…v8-14 (v8-13 runs light and dark): the bar keyed and proportioned under the tiles; the inventory gains the bar and zero interactive elements; the money-toggle consistency in both views; the "<1%" wording (a 1-year 0.5%-rate plan); the negative-growth fallback (0% rate − 0.2% cost → bar hidden, the plain sentence kept, the growth tile reading −1); the what-if bars (3/2/2 rows, rising/plan-longest shapes, sr sentences, zero interaction, zero title tooltips); the costs before/after pair; the compare bars proportional to the finals' own ratios (S&P/cash 2.33 vs the finals' 2.35); the phone strip (text-free, 7px, sr twin); the A4 bar + key line; fa/RTL (Persian digits, ٪, the put-in segment at the reading start); the label-in-name toggle fix in both directions; the new text's colours are the page's own secondary/tertiary tokens in light and real dark; store-nothing re-checked after every bar interaction |
+| `bun run lint` | green on every commit | — |
+| `bun tests/compound-axe.ts` (live) | color-contrast 14/13/14/13 (EN-light/fa-light/EN-dark/fa-dark) | **the exact v6 baseline counts** — zero new violations; the fa `label-content-name-mismatch` (1 node at v6) is retired by the chrome fix, the one intended decrease |
+| Lighthouse (mobile, live) | accessibility **97**; performance **99/99/98** on repeated runs (the single first cold request measured 95/TBT 207 ms — cold-request variance; repeated TBT 0–83 ms) | FCP/LCP unchanged from v6 (~1.8 s), CLS 0, SpeedIndex 2494 (v6 2617); evidence `v8-lighthouse*.json` |
+| The JS delta | **+2,110 bytes (1.1%)** — 198,094 → 200,204 bytes transferred, 10 JS files before and after | measured as the browser's actual transfer from the built worker, pre-v8 tree vs v8 tree, both built with the deploy command |
+
+## The findings this pass recorded (not defects — facts and decisions)
+
+1. **The view-invariant shares (an engine fact, discovered by the v8 tests).** The engine deflates both shown values (final and put-in) by the same (1+inflation)^(months/12), so the today view can never flip growth's sign: the bar's split is identical in both money views, and the honest edge (bar hidden, sentence kept) fires on negative-growth plans — a net rate below zero (e.g. a 0% custom rate under the 0.2% default cost) or the never-invests fee case. The v8 prompt's assumption ("the today view can make real growth negative") was corrected against the grid-verified engine semantics; the unit test locks the fact and the harness asserts the bar matches the tiles' shown numbers in BOTH views. Recorded in the spec §12 test 39 and the main report §11.4.
+2. **The costs pair's endpoints.** The card's sentence carries the fees paid, so "before costs" cannot be one of the sentence's numbers; it is the same plan with every cost switched off (fee 0 + yearly cost 0) — one more run of the same engine, no new formulas. This is the surface the v7 tax line will join. Recorded in the spec §5.2.
+3. **The card-height rule.** Measured at 360×800: small changes 103→145 px (1.41×), later 93→130 px (1.40×), cash 82→108 px (1.32×) — all under the ~1.5× line, so no slimming and no cuts.
+4. **The one-screen rule with the bar.** The share bar adds 50 px below the fold (under the tiles, under the chart); the asset-chips bottom stays 798/800 at 360×800 — identical to v6's recorded number; no sideways scroll at any of the three sizes (harness checks 14-*).
+5. **The dark-token check.** The site's dark mode is class-based next-themes, so the harness flips the real `.dark` class rather than emulating a media query (which changes nothing here) or clicking the site's own toggle (which would write the theme to localStorage against the store-nothing rule). The new text's colours are the page's own secondary/tertiary tokens in both themes.
+
+## The live walk (the golden path, fa + dark, the chrome fix)
+
+- EN mobile 390: the bar at put-share 0.473 with the key line and caption; the toggle to today flips the tiles (13,900/15,500/29,400) with the bar consistent and the inflation caption appearing; the three what-if bar sets with their word labels; the phone card's text-free strip with its sr sentence; **zero console/page errors** (`v8-live-01…04`).
+- fa + dark mobile 390: the key line «۴۷٪ پول واردشده ۵۳٪ رشد» with Persian digits and ٪, the put-in segment at the reading start (the right edge), the caption «همان دو رنگِ نمودار.», the toggle's accessible name "EN — تغییر به انگلیسی"; the compare bars proportional in fa (`v8-live-05…07`).
+- The chrome fix walked on two other tools — `/tools/currency-converter` and `/tools/live-rates`: clean in EN and fa, RTL correct, the toggle's accessible name opening with the visible text in both directions, nothing else moved (`v8-live-chrome-walk-*`).
+
+## What remains as owner decisions (unchanged from v6, plus one retirement)
+
+- **Retired by v8:** the fa language toggle's label-in-name (owner decision #2 from the v6 list) — done, live, verified on three pages.
+- Still open from the v6 list: the shared palette's active-chip contrast (3.29:1) and the gold tile (3.71:1) — site-wide token changes, deliberately untouched by the no-restyle rule; the axe counts confirm v8 added nothing to them.
