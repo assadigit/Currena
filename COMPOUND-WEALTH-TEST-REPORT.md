@@ -236,13 +236,42 @@ clean merge `b7d2a33f` — recorded first, per test 53):
    figures only; the example block carries its own comment in the
    config.
 
-## The v10 live walk (2026-11-27, post-deploy)
+## The v10 live walk (2026-11-27, after the corrected deploy)
 
-EN mobile 390: the three examples on arrival (A$34.97/mo, A$419.64/yr,
-"about A$6,000 (about A$4,600 in today's money)"); add Netflix 15.98
-(live region announces, the fields clear); $120 yearly adds exactly 10;
-remove Spotify; the two-step clear (with its 4-second timeout); the clamp
-messages (empty, 2,000,000). fa + RTL + dark: «رسید خرج‌های شما», Persian
-digits (۳۴٫۹۷), mirrored leaders, ٪ in the bar's sr sentence. The gold
-page's pack icons restored after the Batch V merge deploy. **Zero
-console/page errors.** Screenshots `docs/compound-tests/v10-live-*.png`.
+Deployed live and verified end-to-end. EN mobile 390: the three examples
+on arrival (A$34.97/mo, A$419.64/yr, "about A$6,000 (about A$4,600 in
+today's money)", the two-segment bar, the hint); add Netflix 15.98 (the
+live region announces "Added Netflix. Total A$50.95 a month.", the
+fields clear, the cadence keeps); remove Spotify (A$39.96); the two-step
+clear (0 items, the plain hint, the totals at A$0.00); reload restores
+the examples. fa + RTL + dark: «رسید خرج‌های شما», «جمع ماهانه ۳۴٫۹۷ دلار
+استرالیا», «حدود ۶٬۰۰۰ … به پول امروز», ٪ in the bar's sr sentence,
+dir rtl. The gold page's pack icons restored: /gold 200, all eight
+second-pack icons present through the real browser (checked in fa, the
+Iran-layer sections' default), 15 distinct icons loaded. Live axe at
+the exact 18/17/18/17 baseline; live Lighthouse (mobile, six runs):
+accessibility 97 on every run, performance 98/96/98/98/98/95 (the
+loaded-sandbox wobble both v8 and v9 recorded; TBT 0–183 ms, CLS 0).
+**Zero console/page errors on every compound-page walk.** Screenshots
+`docs/compound-tests/v10-live-01…06`.
+
+Two live findings recorded for other lanes (neither v10's, neither
+touched — the gold agent owns the gold files):
+
+6. **The deploy account id in the session credential set is one
+   character wrong** (…85a vs the real …852) — the first deploy attempts
+   fail on it with a bare "Authentication error" until checked against
+   `/accounts`.
+7. **`worker:build` needs `NEXT_PUBLIC_BASE_PATH=/gold` in the
+   environment** (the next.config.ts comment says so; nothing in the
+   script sets it) — a build without it serves the gold page at `/` and
+   404s `/gold` while the tools keep working, which is exactly how this
+   session's first deploys briefly broke /gold (versions 90d12e4c and
+   d4145ccd, ~20 minutes, then the corrected rebuild). The v9 deploy's
+   builders knew this; the build script itself does not encode it —
+   worth encoding in `worker:build` (a one-line change) so no future
+   session repeats it.
+8. **The gold page's calendar EURO entry maps to `flags/eu.png`, which
+   was never in the 254-flag pack** — a standing 404 on every gold page
+   load (both languages), pre-dating v10 and left untouched for the gold
+   lane.

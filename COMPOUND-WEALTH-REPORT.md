@@ -988,30 +988,67 @@ message) never give NaN or a broken page.
 | Lint | clean | clean | **clean** |
 | axe (local pre-scan) | 18/17/18/17 | — | **18/17/18/17, zero receipt nodes** (live scan in §13.7) |
 
-### 13.7 The live verification (after the deploy) — see §13.8 for the numbers
+### 13.7 The live verification (after the deploy) — the honest record
 
-Deployed live (the worker at 100% traffic) and verified end-to-end: the
-golden path in EN (examples → A$34.97/mo → the projection → add, remove,
-clear), fa + RTL + dark with Persian digits and ٪, the gold page's pack
-icons restored, screenshots to `docs/compound-tests/v10-live-*.png`,
-zero console/page errors, the live axe scans at the 18/17/18/17 baseline,
-Lighthouse ≥ 98/97, and the JS delta measured honestly from two full
-worker builds (§13.8).
+**The deploy incident, first.** The account id in the session's credential
+set ends …85a; the account the tokens actually see ends …852 (verified
+against `/accounts`) — the first two deploy attempts failed on it. The
+third attempt (the right account) deployed successfully but exposed a
+build-invocation trap: `worker:build` bakes `NEXT_PUBLIC_BASE_PATH=/gold`
+from the ENVIRONMENT (the `next.config.ts` comment says so), and my
+first two deploys ran without it — a basePath-less build serves the gold
+page at `/` and 404s `/gold` (the tools kept working; the wrapper passes
+them to the app's native routes). The broken window lasted about 20
+minutes (worker versions 90d12e4c and d4145ccd, 14:57–15:16 UTC),
+diagnosed by reproducing on the local worker preview and — decisively —
+by building the v9 tip in a worktree the same wrong way and seeing the
+identical 404 (the build invocation, not the v10 code). Rebuilt with
+`NEXT_PUBLIC_BASE_PATH=/gold` and redeployed: **/gold 200 with the
+Batch V icons, /tools 200 with the receipt — both verified live.**
+(One consequence recorded: the JS delta below was measured on two
+basePath-less builds — the same invocation both sides, so the comparison
+stands.)
+
+**The golden path, live (EN, mobile 390):** the three examples on
+arrival with the exact totals (A$34.97/mo, A$419.64/yr) and the
+projection ("about A$6,000 (about A$4,600 in today's money)", the
+two-segment bar, the hint); add Netflix 15.98 (total A$50.95, the live
+region announcing it, the fields clearing, the cadence kept); remove
+Spotify (A$39.96); the two-step clear (0 items, the plain hint, the
+totals at A$0.00); reload restores the examples. **fa + RTL + dark:**
+«رسید خرج‌های شما», «جمع ماهانه ۳۴٫۹۷ دلار استرالیا», «حدود ۶٬۰۰۰ دلار
+استرالیا … به پول امروز», ٪ in the bar's sr sentence, dir rtl.
+**Zero console/page errors on every compound-page walk.**
+
+**The gold page's pack icons restored:** /gold live at 200 with the
+Batch V master icon (gold-bar.png) in the served HTML; through the real
+browser, after the lazy-load walk, **all eight second-pack icons
+present** (checked in fa, where the Iran-layer sections show by default
+— exactly the Batch V evidence's own framing) — 15 distinct pack icons
+loaded in total, zero page errors. One pre-existing 404 recorded (not
+v10's, left for the gold lane): the calendar's EURO entry maps to
+`flags/eu.png`, which was never in the 254-flag pack — the request
+404s on every deploy that ever included that mapping.
+
+Screenshots: `docs/compound-tests/v10-live-01…06`.
 
 ### 13.8 The measured evidence
 
 - **The JS delta, from two full worker builds** (the v9 tip `7e315dbb`
-  built in a worktree, the v10 tree as deployed, both via
-  `opennextjs-cloudflare build` + `wrangler dev`, measured as the
-  browser's actual transfer): **201,118 → 205,003 bytes, +3,885 bytes
-  (~1.9%), 10 JS files before and after** — the new receipt component
-  and its copy and wiring.
-- **axe (light + dark, EN + fa):** the v9 baseline counts hold
-  (18/17/18/17 color-contrast nodes, all pre-existing shared-chrome and
-  chip patterns) — **zero nodes inside the receipt section**, zero new
-  violation kinds. The paper's fixed palette makes this structural.
-- **Lighthouse:** recorded post-deploy in `docs/compound-tests/`
-  (`v10-lighthouse-*.json`), at or above the v8/v9 records (98/97).
+  built in a worktree, the v10 tree, both via `opennextjs-cloudflare
+  build` + `wrangler dev`, measured as the browser's actual transfer):
+  **201,118 → 205,003 bytes, +3,885 bytes (~1.9%), 10 JS files before
+  and after** — the new receipt component and its copy and wiring.
+- **axe (light + dark, EN + fa, live):** the v9 baseline counts hold
+  exactly — **18/17/18/17 color-contrast nodes** (the accepted
+  shared-chrome and active-chip patterns, unchanged) — zero nodes
+  inside the receipt section, zero new violation kinds. The paper's
+  fixed palette makes this structural.
+- **Lighthouse (mobile, live, six runs):** accessibility **97 on every
+  run** (the v8/v9 baseline); performance 98/96/98/98/98/95 — three
+  runs at 98, the 95/96 wobble on a loaded sandbox (TBT 0–183 ms,
+  LCP ~1.8 s, CLS 0), the same recorded variance band as v8 (95–99)
+  and v9 (97–99). Evidence: `v10-lighthouse-1…6.json`.
 
 ### 13.9 The cut list (the spec's Appendix A.3 — v10's own non-goals)
 
